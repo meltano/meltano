@@ -3,10 +3,11 @@ import fnmatch
 from typing import Dict, Union
 from collections import namedtuple
 from enum import Enum
-from typing import Optional
+from typing import Optional, Iterable
 
 from meltano.core.behavior.hookable import HookObject
-from meltano.core.utils import compact
+from meltano.core.behavior.canonical import Canonical
+from meltano.core.utils import compact, find_named
 
 
 class YAMLEnum(str, Enum):
@@ -19,6 +20,10 @@ class YAMLEnum(str, Enum):
 
 
 yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
+
+
+class Profile(Canonical):
+    pass
 
 
 class PluginType(YAMLEnum):
@@ -75,13 +80,16 @@ class PluginRef:
         return "@".join(compact(parts))
 
     def __eq__(self, other):
+        import pdb; pdb.set_trace()
         return self.name == other.name and self.type == other.type
 
     def __hash__(self):
         return hash((self.type, self.canonical_name, self.profile))
 
 
-class PluginInstall(HookObject, PluginRef):
+class PluginInstall(HookObject, Canonical, PluginRef):
+    _extras = {}
+
     def __init__(
         self,
         plugin_type: PluginType,
@@ -89,38 +97,26 @@ class PluginInstall(HookObject, PluginRef):
         pip_url: Optional[str] = None,
         select=set(),
         config={},
-        **extras
+        profiles=[],
+        **_extras
     ):
         super().__init__(plugin_type, name)
 
+        self.config = Canonical.parse(config)
+        self.profiles = list(map(Profile.parse, profiles))
+        self.select = select
         self.pip_url = pip_url
-        self._config = config
-        self._select = set(select)
-        self._extras = extras or {}
-
-    def canonical(self):
-        canonical = {"name": self.name, **self._extras}
-
-        if self.pip_url:
-            canonical.update({"pip_url": self.pip_url})
-
-        if self._select:
-            canonical.update({"select": list(self._select)})
-
-        if self._config:
-            canonical.update({"config": self._config})
-
-        return canonical
+        self._extras=_extras
 
     def installable(self):
         return self.pip_url is not None
 
     @property
-    def config(self):
+    def current_config(self):
         if not self.profile:
-            return self._config
+            return self.config
 
-        return self._extras["profiles"][self.profile]
+        return find_named(self.profiles, self.profile)
 
     @property
     def executable(self):
@@ -149,8 +145,16 @@ class PluginInstall(HookObject, PluginRef):
     def add_select_filter(self, filter: str):
         self._select.add(filter)
 
+    def add_profile(self, name: str, config: dict = None, label: str = None):
+        profile = Profile(name=name,
+                          config=config,
+                          label=label)
 
-class Plugin(PluginRef):
+        self._profiles.append(profile)
+        return profile
+
+
+class Plugin(Canonical, PluginRef):
     """
     Args:
     name: The unique name for the installed plugin
@@ -179,26 +183,6 @@ class Plugin(PluginRef):
         self.description = description
         self.capabilities = set(capabilities)
         self._extras = extras or {}
-
-    def canonical(self):
-        canonical = {"name": self.name, "namespace": self.namespace, **self._extras}
-
-        if self.pip_url:
-            canonical.update({"pip_url": self.pip_url})
-
-        if self.docs:
-            canonical.update({"docs": self.docs})
-
-        if self.description:
-            canonical.update({"description": self.description})
-
-        if self.settings:
-            canonical.update({"settings": self.settings})
-
-        if self.capabilities:
-            canonical.update({"capabilities": list(self.capabilities)})
-
-        return canonical
 
     def as_installed(self) -> PluginInstall:
         return PluginInstall(self.type, self.name, pip_url=self.pip_url, **self._extras)

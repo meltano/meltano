@@ -1,9 +1,9 @@
 import os
 import yaml
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Iterable
 
-from meltano.core.utils import nest
+from meltano.core.utils import nest, find_named
 from .project import Project
 from .plugin import Plugin, PluginInstall, PluginType, PluginRef
 from .plugin.factory import plugin_factory
@@ -18,18 +18,19 @@ class ConfigService:
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
 
     def add_to_file(self, plugin: PluginInstall):
-        installed_def = plugin.canonical()
-
         with self.project.meltano_update() as meltano_yml:
             if not plugin in self.plugins():
-                plugins = nest(meltano_yml, f"plugins.{plugin.type}", value=[])
-                plugins.append(installed_def)
+                if not plugin.type in meltano_yml.plugins:
+                    setattr(meltano_yml.plugins, plugin.type, [])
+
+                plugins = getattr(meltano_yml.plugins, plugin.type)
+                plugins.append(plugin)
+
+                return plugin
             else:
                 logging.warning(
                     f"{plugin.name} is already present, use `meltano install` to install it."
                 )
-
-        return plugin_factory(plugin.type, installed_def)
 
     def has_plugin(self, plugin_name: str):
         try:
@@ -53,7 +54,25 @@ class ConfigService:
             plugin.profile = profile
             return plugin
         except StopIteration:
-            raise PluginMissingError(name)
+            raise PluginMissingError(plugin.name)
+
+    def get_plugin(self, plugin_ref: PluginRef) -> PluginInstall:
+        try:
+            plugin = next(
+                plugin
+                for plugin in self.plugins()
+                if (
+                    plugin.name == plugin_ref.name
+                )
+            )
+
+            if plugin_ref.profile and not find_named(plugin.profiles, plugin_ref.profile):
+                raise PluginProfileMissingError(plugin.name, plugin_ref.profile)
+
+            plugin.profile = plugin_ref.profile
+            return plugin
+        except StopIteration:
+            raise PluginMissingError(plugin.name)
 
     def get_extractors(self):
         return filter(lambda p: p.type == PluginType.EXTRACTORS, self.plugins())
@@ -70,20 +89,16 @@ class ConfigService:
     def get_models(self):
         return filter(lambda p: p.type == PluginType.MODELS, self.plugins())
 
-    def get_database(self, database_name):
-        return yaml.load(
-            open(self.project.meltano_dir(f".database_{database_name}.yml"))
-        )
+    def update_plugin(self, plugin: PluginInstall):
+        with self.project.meltano_update() as meltano:
+            # find the proper plugin to update
+            idx = next(
+                i
+                for i, it in enumerate(self.plugins())
+                if it == plugin
+            )
+            meltano["plugins"][plugin.type][idx] = plugin.canonical()
 
-    def plugins(self) -> List[PluginInstall]:
-        """Parse the meltano.yml file and return it as `PluginInstall` instances."""
-
-        # this will parse the meltano.yml file and create an instance of the
-        # corresponding `plugin_class` for all the plugins.
-        return (
-            plugin_factory(plugin_type, plugin_def)
-            for plugin_type, plugin_defs in self.project.meltano.get(
-                "plugins", {}
-            ).items()
-            for plugin_def in plugin_defs
-        )
+    def plugins(self) -> Iterable[PluginInstall]:
+        for plugin_type, plugins in self.project.meltano.plugins:
+            yield from plugins

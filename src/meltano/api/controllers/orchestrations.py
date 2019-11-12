@@ -116,60 +116,31 @@ def get_plugin_configuration(plugin_ref) -> Response:
         settings.as_config(db.session, plugin_ref, redacted=True), reducer="dot"
     )
 
-    # TEMP, TODO proper Profile model and collection setup
-    defaultProfile = {
-        "name": "temp-1",
-        "label": "Temp 1",
-        "config": freeze_keys(config),
-    }
-    config["groups"] = ""
-    config["projects"] = ""
-    testProfile = {"name": "Temp 2", "config": freeze_keys(config)}
-    profiles = [defaultProfile, testProfile]
-
     return jsonify(
         {
             # freeze the keys because they are used for lookups
-            "profiles": profiles,
+            "profiles": [freeze_keys(profile.canonical()) for profile in plugin.profiles],
             "settings": settings.get_definition(plugin_ref).settings,
         }
     )
 
 
 @orchestrationsBP.route(
-    "/<plugin_ref:plugin_ref>/configuration/profile", methods=["PUT"]
+    "/<plugin_ref:plugin_ref>/configuration/profiles", methods=["POST"]
 )
 def add_plugin_configuration_profile(plugin_ref) -> Response:
     """
-    endpoint for adding a configuration profile to a plugin
+    Endpoint for adding a configuration profile to a plugin
     """
     payload = request.get_json()
+    project = Project.find()
+    config = ConfigService(project)
 
-    # TEMP, TODO proper profile implementation and persistance
-    profile = {
-        "name": payload["name"],
-        # TEMP Extractor Test
-        "config": freeze_keys(
-            {
-                "api_url": "https://gitlab.com",
-                "groups": None,
-                "private_token": None,
-                "projects": "tester",
-                "start_date": None,
-                "ultimate_license": False,
-            }
-        ),
-        # TEMP Loader Test
-        # "config": freeze_keys(
-        #     {
-        #         "dbname": "dogfooding",
-        #         "host": "localhost",
-        #         "password": "",
-        #         "port": "5432",
-        #         "user": "meltano_user",
-        #     }
-        # ),
-    }
+    plugin = config.get_plugin(plugin_ref)
+
+    # create the new profile for this plugin
+    profile = plugin.add_profile(payload["name"], config=payload["config"])
+    config.update_plugin(plugin)
 
     return jsonify(profile)
 

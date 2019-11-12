@@ -3,8 +3,8 @@ import utils from '@/utils/utils'
 
 export default {
   addConfigurationProfile({ type, name, profile }) {
-    return axios.put(
-      utils.apiUrl('orchestrations', `${type}/${name}/configuration/profile`),
+    return axios.post(
+      utils.apiUrl('orchestrations', `${type}/${name}/configuration/profiles`),
       profile
     )
   },

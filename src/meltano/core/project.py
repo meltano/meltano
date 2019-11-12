@@ -14,6 +14,7 @@ from typing import Union, Dict
 from .error import Error
 from .behavior.versioned import Versioned
 from .utils import makedirs, slugify
+from .meltano_file import MeltanoFile
 
 
 class ProjectNotFound(Error):
@@ -65,7 +66,7 @@ class Project(Versioned):
 
     @property
     def backend_version(self):
-        return int(self.meltano.get("version", 1))
+        return self.meltano.version
 
     @classmethod
     @fasteners.locked(lock="_find_lock")
@@ -93,7 +94,7 @@ class Project(Versioned):
 
     def _load_meltano(self):
         with self.meltanofile.open() as meltanofile:
-            return yaml.load(meltanofile, Loader=yaml.SafeLoader)
+            return MeltanoFile(**yaml.load(meltanofile, Loader=yaml.SafeLoader))
 
     @contextmanager
     def meltano_update(self):

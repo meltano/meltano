@@ -56,13 +56,5 @@ class SelectService:
     def select(self, entities_filter, attributes_filter, exclude=False):
         exclude = "!" if exclude else ""
         pattern = f"{exclude}{entities_filter}.{attributes_filter}"
-
-        with self.project.meltano_update() as meltano:
-            self.extractor.add_select_filter(pattern)
-
-            idx = next(
-                i
-                for i, it in enumerate(self.config.get_extractors())
-                if it == self.extractor
-            )
-            meltano["plugins"]["extractors"][idx] = self.extractor.canonical()
+        self.extractor.add_select_filter(pattern)
+        self.config.update_plugin(self.extractor)
