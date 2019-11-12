@@ -16,23 +16,18 @@ In this tutorial we'll explain how to get the [Google Analytics Extractor](https
 
 ## Prerequisites
 
-For this tutorial, you can use a new or existing Meltano project. 
+For this tutorial, you can use a new or existing Meltano project.
 
-If you need help getting started, we recommend reviewing the [Installation documentation](/docs/installation.html) and [Getting Started Guide](/docs/getting-started.html) to set up your first project. 
+If you need help getting started, we recommend reviewing the [Installation documentation](/docs/installation.html) and [Getting Started Guide](/docs/getting-started.html) to set up your first project.
 
-If this is your first time using Google Analytics with Meltano, you will also need to enable Google API access by following the instructions found in the [Google Analytics Extractor documentation](/plugins/extractors/google-analytics.html#google-analytics-setup). 
+If this is your first time using Google Analytics with Meltano, you will also need to:
 
-## Select entities
-
-Data sources can contain a lot of different entities. As a result, you might not want Meltano to pull every data source into your dashboard. As you can see on your screen, all of the entities are currently selected by default for `tap-google-analytics`.
-
-![Screenshot of Google Analytics Extractor Entity Selection](/images/google-analytics-tutorial/03-ga-entity-selection.png)
-
-We want to select all the default Entities (reports in the case of Google Analytics) that Meltano extracts, so click `Save` to finish configuring our extractor.
+1. Enable Google API access by following the instructions found in the [Google Analytics Extractor documentation](/plugins/extractors/google-analytics.html#google-analytics-setup).
+2. [Install the Google Analytics extractor](/plugins/extractors/google-analytics.html#configure-the-extractor)
 
 ## Setup the Postgres Loader
 
-Once you save your entities, you should be greeted with the Loaders page. Click to `Install` Postgres and set the credentials for your local Postgres.
+Once you save your Google Analytics extractor configuration settings, you should be greeted with the Loaders page. Click to `Install` Postgres and set the credentials for your local Postgres.
 
 ![Screenshot of Postgres Loader Configuration](/images/meltano-ui/target-postgres-configuration.png)
 
