@@ -1,5 +1,6 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
+import Vue from 'vue'
 
 import Dropdown from '@/components/generic/Dropdown'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
@@ -30,6 +31,16 @@ export default {
     this.$store.dispatch('configuration/getAllPipelineSchedules')
   },
   methods: {
+    ...mapActions('configuration', ['deletePipelineSchedule']),
+    deletePipeline(pipeline) {
+      this.deletePipelineSchedule(pipeline)
+        .then(() =>
+          Vue.toasted.global.success(
+            `Pipeline Successfully Removed - ${pipeline.name}`
+          )
+        )
+        .catch(error => Vue.toasted.global.error(error.response.data.code))
+    },
     goToCreatePipeline() {
       this.$router.push({ name: 'createSchedule' })
     },
@@ -172,7 +183,7 @@ export default {
                     >Model</router-link
                   >
                   <Dropdown
-                    button-classes="is-small"
+                    button-classes="is-small is-danger is-outlined"
                     menu-classes="dropdown-menu-300"
                     icon-open="trash-alt"
                     icon-close="caret-up"
@@ -198,6 +209,7 @@ export default {
                           <button
                             class="button is-danger"
                             data-dropdown-auto-close
+                            @click="deletePipeline(pipeline)"
                           >
                             Delete
                           </button>

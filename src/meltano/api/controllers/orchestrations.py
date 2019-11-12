@@ -14,7 +14,11 @@ from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.config_service import ConfigService
-from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExistsError
+from meltano.core.schedule_service import (
+    ScheduleService,
+    ScheduleAlreadyExistsError,
+    ScheduleDoesNotExistError,
+)
 from meltano.core.utils import flatten, iso8601_datetime, slugify
 from meltano.core.logging import JobLoggingService, MissingJobLogException
 from meltano.cli.add import extractor
@@ -35,10 +39,23 @@ def _handle(ex):
         jsonify(
             {
                 "error": True,
-                "code": f"A schedule with the name '{ex.schedule.name}' already exists. Try renaming the schedule.",
+                "code": f"A pipeline with the name '{ex.schedule.name}' already exists. Try renaming the pipeline.",
             }
         ),
         409,
+    )
+
+
+@orchestrationsBP.errorhandler(ScheduleDoesNotExistError)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"A pipeline with the name '{ex.name}' does not exist..",
+            }
+        ),
+        404,
     )
 
 
@@ -196,3 +213,13 @@ def delete_pipeline_schedule() -> Response:
     endpoint for persisting a pipeline schedule
     """
     incoming = request.get_json()
+    name = incoming["name"]
+
+    project = Project.find()
+    schedule_service = ScheduleService(project)
+
+    try:
+        schedule_service.remove(name)
+        return jsonify(name), 201
+    except ScheduleDoesNotExistError as e:
+        raise ScheduleDoesNotExistError(e.name)

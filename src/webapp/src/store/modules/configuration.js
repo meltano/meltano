@@ -81,6 +81,12 @@ const getters = {
 }
 
 const actions = {
+  deletePipelineSchedule({ commit }, pipeline) {
+    return orchestrationsApi.deletePipelineSchedule(pipeline).then(() => {
+      commit('deletePipeline', pipeline)
+    })
+  },
+
   getAllPipelineSchedules({ commit, dispatch }) {
     orchestrationsApi.getAllPipelineSchedules().then(response => {
       commit('setPipelines', response.data)
@@ -216,6 +222,11 @@ const actions = {
 const mutations = {
   addPipelinePoller(state, pipelinePoller) {
     state.pipelinePollers.push(pipelinePoller)
+  },
+
+  deletePipeline(state, pipeline) {
+    const idx = state.pipelines.indexOf(pipeline)
+    state.pipelines.splice(idx, 1)
   },
 
   removePipelinePoller(state, pipelinePoller) {

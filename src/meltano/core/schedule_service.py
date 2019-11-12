@@ -17,6 +17,13 @@ class ScheduleAlreadyExistsError(Exception):
         self.schedule = schedule
 
 
+class ScheduleDoesNotExistError(Exception):
+    """Occurs when a schedule does not exist."""
+
+    def __init__(self, name):
+        self.name = name
+
+
 Schedule = namedtuple(
     "Schedule",
     ("name", "extractor", "loader", "transform", "interval", "start_date", "env"),
@@ -52,6 +59,9 @@ class ScheduleService:
 
         return self.add_schedule(schedule)
 
+    def remove(self, name):
+        return self.remove_schedule(name)
+
     def default_start_date(self, session, extractor: str) -> datetime:
         """
         Returns the `start_date` of the extractor, or now.
@@ -81,11 +91,27 @@ class ScheduleService:
             if any(map(lambda s: s.name == schedule.name, self.schedules())):
                 raise ScheduleAlreadyExistsError(schedule)
 
-            # find the orchestrator plugin config
+            # find the schedules plugin config
             schedules = nest(meltano, "schedules", value=[])
             schedules.append(self.schedule_definition(schedule))
 
         return schedule
+
+    def remove_schedule(self, name: str):
+        with self.project.meltano_update() as meltano:
+            # guard if it doesn't exist
+            target = next(
+                (schedule for schedule in self.schedules() if schedule.name == name),
+                None,
+            )
+            if not target:
+                raise ScheduleDoesNotExistError(name)
+
+            # find the schedules plugin config
+            schedules = nest(meltano, "schedules", value=[])
+            schedules.remove(self.schedule_definition(target))
+
+        return name
 
     def schedules(self):
         return (
