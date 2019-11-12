@@ -57,6 +57,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1235](https://gitlab.com/meltano/meltano/issues/1235) Add help link button in the app
 - [#1285](https://gitlab.com/meltano/meltano/issues/1285) Add link to YouTube guidelines for release instructions
 - [#1277](https://gitlab.com/meltano/meltano/issues/1277) Move sections that don't apply to outside contributors from Contributing and Roadmap docs to Handbook: Release Process, Release Schedule, Demo Day, Speedruns, DigitalOcean Marketplace
+- [#1081](https://gitlab.com/meltano/meltano/issues/1081) Add ability to delete data pipelines
 
 ### Changes
 
