@@ -384,6 +384,17 @@ export default {
                 </div>
               </Dropdown>
             </div>
+            <div class="level-item">
+              <a
+                class="button tooltip is-tooltip-left"
+                data-tooltip="Getting Help"
+                target="_blank"
+                href="https://meltano.com/docs/getting-help.html"
+              >
+                <font-awesome-icon icon="question-circle"></font-awesome-icon>
+                &nbsp;Help
+              </a>
+            </div>
           </div>
         </div>
       </div>
