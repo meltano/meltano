@@ -36,7 +36,8 @@ import {
   faTable,
   faThLarge,
   faThList,
-  faUser
+  faUser,
+  faQuestionCircle
 } from '@fortawesome/free-solid-svg-icons'
 import {
   FontAwesomeIcon,
@@ -83,6 +84,7 @@ export default {
     library.add(faThLarge)
     library.add(faThList)
     library.add(faUser)
+    library.add(faQuestionCircle)
 
     Vue.component('font-awesome-icon', FontAwesomeIcon)
     Vue.component('font-awesome-layers', FontAwesomeLayers)
