@@ -12,6 +12,8 @@ from pathlib import Path
 from pyhocon import ConfigFactory
 from typing import Dict, List
 
+from meltano.core.plugin import PluginType
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.sql.design_helper import PypikaJoinExecutor
 from meltano.core.project import Project
 from meltano.core.plugin.model import Package
@@ -190,6 +192,12 @@ class MeltanoAnalysisFileParser:
             index_file.write(json.dumps(indices))
 
     def parse_packages(self):
+
+        discovery = PluginDiscoveryService(self.project)
+        model_plugins = [
+            plugin for plugin in discovery.plugins() if plugin.type is PluginType.MODELS
+        ]
+
         for package in self.packages():
             if not package.topics and package.tables:
                 raise MeltanoAnalysisMissingTopicFilesError(
@@ -204,7 +212,10 @@ class MeltanoAnalysisFileParser:
             for topic in package.topics:
                 conf = self.parse_m5o_file(topic)
                 parsed_topic = self.topic(conf, topic.name)
-                parsed_topic["namespace"] = package.name
+                model = next(
+                    plugin for plugin in model_plugins if plugin.name == package.name
+                )
+                parsed_topic["namespace"] = package.name  # model.namespace
                 self.packaged_topics.append(parsed_topic)
 
             # Reset the tables list so that tables with the same name from

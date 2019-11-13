@@ -27,7 +27,11 @@ export default {
   computed: {
     ...mapGetters('configuration', ['getRunningPipelineJobIds']),
     ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
-    ...mapState('repos', ['models'])
+    ...mapState('repos', ['models']),
+    contextualModels() {
+      // TODO filter on namespace once BE payload is resolved
+      return this.models
+    }
   },
   created() {
     this.jobId = this.$route.params.jobId
@@ -112,7 +116,7 @@ export default {
         >
           <div class="dropdown-content is-unselectable">
             <div
-              v-for="(v, model) in models"
+              v-for="(v, model) in contextualModels"
               :key="`${model}-panel`"
               class="box box-analyze-nav is-borderless is-shadowless is-marginless"
             >
