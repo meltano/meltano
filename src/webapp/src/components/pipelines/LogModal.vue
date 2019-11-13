@@ -74,7 +74,7 @@ export default {
 </script>
 
 <template>
-  <div class="modal is-active">
+  <div class="modal is-active" @keyup.esc="close">
     <div class="modal-background" @click="close"></div>
     <div class="modal-card is-wide">
       <header class="modal-card-head">
