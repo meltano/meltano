@@ -15,7 +15,7 @@ In order to contribute to Meltano, you will need the following:
 
 ## Where to start?
 
-We welcome contributions, idea submissions, and improvements. In fact we may already have open issues labeled [Accepting Merge Requests](https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=Accepting%20Merge%20Requests) if you don't know where to start. Please see the contribution guidelines below for source code related contributions.
+We welcome contributions, idea submissions, and improvements. In fact we may already have open issues labeled [Accepting Merge Requests] if you don't know where to start. Please see the contribution guidelines below for source code related contributions.
 
 ```bash
 # Clone the Meltano repo
@@ -61,7 +61,7 @@ As you contribute to Meltano, you may want to disable [metrics tracking](/docs/e
 export MELTANO_DISABLE_TRACKING=True
 ```
 
-## Meltano API Development
+## API Development
 
 For all changes that do not involve working on Meltano UI (front-end) itself, run the following command:
 
@@ -78,7 +78,7 @@ If you run into `/bin/sh: yarn: command not found`, double check that you've got
 On macOS, this can be solved by running `brew install yarn`.
 :::
 
-## Meltano UI Development
+## UI Development
 
 In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
 
@@ -106,7 +106,28 @@ If you need to change the URL of your development environment, you can do this b
 export MELTANO_UI_URL = ""
 ```
 
-## Meltano System Database
+## Taps & Targets Development
+
+### For existing taps/targets
+
+We should be good citizen about these, and use the default workflow to contribute. Most of these are on GitHub so:
+
+1. Fork (using Meltano organization)
+1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
+1. Modify and submits PRs
+1. If there is resistance, fork as our tap (2)
+
+### For taps/targets we create
+
+1. For tap development please use the [tap cookiecutter template](https://github.com/singer-io/singer-tap-template).
+1. For target development please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
+1. Use a separate repo (meltano/target|tap-x) in GitLab
+   e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
+1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
+1. Publish PyPI packages of these package (not for now)
+1. We could mirror this repo on GitHub if we want (not for now)
+
+## System Database
 
 Meltano API and CLI are both supported by a database that is managed using Alembic migrations.
 
@@ -274,7 +295,7 @@ Here is a technical breakdown:
 ## Merge Requests
 
 :::tip Searching for something to work on?
-Start off by looking at our [~"Accepting Merge Request"](https://gitlab.com/meltano/meltano/issues?label_name=Accepting+Merge+Requests) label.
+Start off by looking at our [~"Accepting Merge Requests"][Accepting Merge Requests] label.
 
 Keep in mind that this is only a suggestion: all improvements are welcome.
 :::
@@ -308,234 +329,6 @@ $ git add CHANGELOG.md
 ```
 
 Make sure to add CHANGELOG entries to your merge requests.
-
-## Demo Day
-
-For each demo day, we need to ensure that the following process is followed:
-
-### Demo Day: Setup
-
-1. Document list of features to demo
-2. Document order of people demoing
-3. Ensure every person demoing has proper display size (i.e., font sizes, zoomed in enough, etc.)
-   - Font size at least 20px
-   - Browser zoom at least 125%
-
-### Demo Day: Workflow
-
-1. Record each meeting with Zoom
-2. Generate list of timestamps for each featured demo
-3. Generate list of features (from Setup section) paired with timestamps
-4. Upload recording to YouTube
-5. Add features + timestamps to YouTube description
-
-## Release Process
-
-### Versioning
-
-Meltano uses [semver](https://semver.org/) as its version number scheme.
-
-### Prerequisites
-
-Ensure you have the latest `master` branch locally before continuing.
-
-```bash
-git fetch origin
-```
-
-### Workflow
-
-Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
-
-1. Meltano has a number of dependencies for the release toolchain that are required when performing a release. If you haven't already, please navigate to your meltano installation and run the following command to install all development dependencies:
-
-   ```bash
-   # activate your virtualenv
-   source ./venv/bin/activate
-
-   # pip3 install all the development dependencies
-   pip3 install .[dev]
-   ```
-
-1. Execute the commands below:
-
-   ```bash
-   # create and checkout the `release-next` branch from `origin/master`
-   git checkout -B release-next origin/master
-
-   # view changelog (verify changes made match changes logged)
-   changelog view
-
-   # after the changelog has been validated, tag the release
-   make release
-
-   # ensure the tag once the tag has been created, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
-   git describe --tags --abbrev=0
-
-   # push the tag upstream to trigger the release pipeline
-   git push origin $(git describe --tags --abbrev=0)
-
-   # push the release branch to merge the new version, then create a merge request
-   git push origin release-next
-   ```
-
-:::tip Releasing a hotfix?
-You can use `make type=patch release` to force a patch release. This is useful when we need to release hotfixes.
-:::
-
-1. Create a merge request from `release-next` targeting `master` and use the `release` template.
-1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
-1. Make sure to check `delete the source branch when the changes are merged`.
-1. When the **publish** pipeline succeeds, the release is publicly available on [PyPI](https://pypi.org/project/meltano/).
-1. Follow the [Digital Ocean publish process](#digitalocean-marketplace)
-1. If a non-patch release, record and distribute the [Speedrun Video](#speedruns):
-   - Meltano YouTube channel using the [Meltano YouTube guidelines](https://about.gitlab.com/handbook/meltano/marketing/#youtube)
-   - Meltano Slack `@channel` in `#general`
-
-## DigitalOcean Marketplace
-
-Meltano is deployed and available as a <a :href="$site.themeConfig.data.digitalOceanUrl">DigitalOcean Marketplace 1-Click install</a>.
-
-### Build the snapshot
-
-The `distribute` step in the CI/CD pipeline has a manual action named _digitalocean_marketplace_ that will use Packer to create a snapshot with the latest version of Meltano installed and ready.
-
-:::tip Master only
-The _digitalocean_marketplace_ job is only available on pipelines running off `master`.
-:::
-
-1. Click the "Play" button associated with this _digitalocean_marketplace_ `distribute` step
-1. The snapshot string should be available under `meltano-<timestamp>` on DigitalOcean, which you will find at the bottom of the _digitalocean_marketplace_ job. Take note of this snapshot string as you'll use it in the next step.
-
-### Update the DigitalOcean listing
-
-Then, head to the DigitalOcean vendor portal at <https://marketplace.digitalocean.com/vendorportal> to edit the Meltano listing.
-
-:::tip Don't see the Meltano listing?
-You'll have to be granted access to the DigitalOcean vendor portal. Please ask your manager for access.
-:::
-
-1. Once inside the listing, update the following entries:
-   - **Version** to the latest Meltano version
-   - **System Image** to the new image (match the aforementioned snapshot string)
-   - **Meltano Package Version** inside the _Software Included Entry_
-1. Submit it for review to finish the process.
-
-## Speedruns
-
-As part of Meltano's [Release process](/docs/contributing.html#release-process), speedruns allow the team to ensure that every release is stable.
-
-::: info
-🏆 Current Record: 1:35 (Ben Hong)
-:::
-
-::: tip
-Remember to leave each screen up for at least 2 seconds so users have a chance to notice that something actually happened.
-:::
-
-### Requirements
-
-1. Keep keystrokes to a minimum (ideally zero)
-1. You do not have to explain every step
-1. Do not need to stop and explain new features
-1. Time starts from when the webapp is loaded on the browser
-1. Make sure to pause between screens so user has a chance to register that a change is happening
-
-### Workflow
-
-1. Introduce Meltano to new users:
-
-```
-Meltano is an open source data toolkit
-that makes it easy to go from data source to dashboard.
-
-For more information, check us out at meltano.com!
-```
-
-2. Check that Meltano does not exist on your machine
-
-```bash
-meltano --version
-# command not found: meltano
-```
-
-3. Install Meltano on your machine using distributed version
-
-```bash
-pip3 install meltano
-```
-
-4. Check Meltano version matches latest release
-
-```bash
-meltano --version
-```
-
-5. Create a new Meltano project
-
-```bash
-meltano init speedrun-workflow
-```
-
-6. Change directory into your new project
-
-```bash
-cd speedrun-workflow
-```
-
-7. Start Meltano application
-
-```
-meltano ui
-```
-
-8. Assuming there are no conflicts on the port, you can now open your Meltano instance at http://localhost:5000.
-
-9. Run through `tap-gitlab` + `tap-postgres` workflow as quickly as possible with some narration, but don't pause mid-action to explain something.
-
-## Taps & Targets Workflow
-
-### For existing taps/targets
-
-We should be good citizen about these, and use the default workflow to contribute. Most of these are on GitHub so:
-
-1. Fork (using Meltano organization)
-1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
-1. Modify and submits PRs
-1. If there is resistance, fork as our tap (2)
-
-### For taps/targets we create
-
-1. For tap development please use the [tap cookiecutter template](https://github.com/singer-io/singer-tap-template).
-1. For target development please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
-1. Use a separate repo (meltano/target|tap-x) in GitLab
-   e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
-1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
-1. Publish PyPI packages of these package (not for now)
-1. We could mirror this repo on GitHub if we want (not for now)
-
-### Discoverability
-
-We maintain a curated list of taps/targets that are expected to work out of the box with Meltano. Meltano also helps the CLI user find components via a `discover` command.
-
-Get a list of extractors:
-
-```bash
-meltano discover extract
-tap-demo==...
-tap-zendesk==1.3.0
-tap-marketo==...
-...
-```
-
-Or a list of loaders
-
-```bash
-$ meltano discover load
-target-demo==...
-target-snowflake==git+https://gitlab.com/meltano/target-snowflake@master.git
-target-postgres==...
-```
 
 ## Tmuxinator
 
@@ -571,3 +364,5 @@ MELTANO_VENV=.venv tmuxinator local
 ### Resources
 
 - [Tmux Cheat Sheet & Quick Reference](https://tmuxcheatsheet.com/)
+
+[Accepting Merge Requests]: https://gitlab.com/groups/meltano/-/issues?label_name[]=Accepting%20Merge%20Requests
