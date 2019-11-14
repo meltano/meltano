@@ -146,9 +146,6 @@ extractors:
       - discover
       - state
     settings:
-      # TODO: remove, should be injected from Meltano
-      - name: client_id
-        label: Client ID
       - name: username
       - name: password
         kind: password
