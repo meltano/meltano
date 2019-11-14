@@ -73,6 +73,6 @@ class JobLoggingService:
         The result is ordered so that the most recent is first on the list
         """
         log_files = list(self.project.job_dir(job_id).glob("**/*.log"))
-        log_files.sort(key=os.path.getctime, reverse=True)
+        log_files.sort(key=lambda path: os.stat(path).st_ctime_ns, reverse=True)
 
         return log_files
