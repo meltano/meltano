@@ -70,16 +70,11 @@ export PG_ADDRESS=localhost
 export PG_PORT=5502
 export PG_DATABASE=warehouse
 
-export TAP_SALESFORCE_URL=
 export TAP_SALESFORCE_USERNAME=''
 export TAP_SALESFORCE_PASSWORD=''
 export TAP_SALESFORCE_SECURITY_TOKEN=''
-export TAP_SALESFORCE_CLIENT_ID='secret_client_id'
-
 export TAP_SALESFORCE_START_DATE='2019-03-01T00:00:00Z'
 ```
-
-You can leave `TAP_SALESFORCE_URL` and `TAP_SALESFORCE_CLIENT_ID` as they are in the example above, but you have to set `TAP_SALESFORCE_USERNAME`, `TAP_SALESFORCE_PASSWORD` and `TAP_SALESFORCE_SECURITY_TOKEN` and `TAP_SALESFORCE_START_DATE` according to your instance and preferences.
 
 ## Select The Entities to Export from Salesforce
 
