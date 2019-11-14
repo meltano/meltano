@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1282](https://gitlab.com/meltano/meltano/issues/1282) Remove Entity Selection from the UI (still available in CLI) and default to "All" entities for a given data source
 
 ### Fixes
+- [#1297](https://gitlab.com/meltano/meltano/issues/1297) Get actual latest ELT job log by sorting matches by creation time with nanosecond resolution
 
 ### Breaks
 
