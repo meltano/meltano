@@ -101,8 +101,9 @@ class TestProject:
         reader.stop()
         reader.join()
 
+        meltano = project.meltano
         for key, val in ((k, v) for payload in payloads for k, v in payload.items()):
-            assert project.meltano[key] == val, str(project.meltano)
+            assert meltano[key] == val
 
 
 class TestIncompatibleProject:
