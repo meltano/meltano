@@ -217,7 +217,7 @@ class MeltanoAnalysisFileParser:
                     plugin for plugin in model_plugins if plugin.name == package.name
                 )
                 parsed_topic["plugin_namespace"] = model.namespace
-                parsed_topic["namespace"] = package.name  # model.namespace
+                parsed_topic["namespace"] = package.name
                 self.packaged_topics.append(parsed_topic)
 
             # Reset the tables list so that tables with the same name from
