@@ -171,6 +171,7 @@ class MeltanoAnalysisFileParser:
 
             topic = self.graph_topic(topic)
             indices[str(topic_identifier)] = {
+                "plugin_namespace": topic["plugin_namespace"],
                 "namespace": topic["namespace"],
                 "name": topic["name"],
                 "designs": [e["name"] for e in topic["designs"]],
@@ -215,6 +216,7 @@ class MeltanoAnalysisFileParser:
                 model = next(
                     plugin for plugin in model_plugins if plugin.name == package.name
                 )
+                parsed_topic["plugin_namespace"] = model.namespace
                 parsed_topic["namespace"] = package.name  # model.namespace
                 self.packaged_topics.append(parsed_topic)
 

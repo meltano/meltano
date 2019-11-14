@@ -26,11 +26,25 @@ export default {
   },
   computed: {
     ...mapGetters('configuration', ['getRunningPipelineJobIds']),
+    ...mapGetters('plugins', ['getInstalledPlugin']),
     ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
+    ...mapState('configuration', ['pipelines']),
     ...mapState('repos', ['models']),
     contextualModels() {
-      // TODO filter on namespace once BE payload is resolved
-      return this.models
+      let models = this.models
+      if (this.relatedPipeline) {
+        const extractor = this.relatedPipeline.extractor
+        const namespace = this.getInstalledPlugin('extractors', extractor)
+          .namespace
+        models = Object.values(this.models).filter(
+          model => model.plugin_namespace === namespace
+        )
+      }
+
+      return models
+    },
+    relatedPipeline() {
+      return this.pipelines.find(pipeline => pipeline.name === this.jobId)
     }
   },
   created() {
