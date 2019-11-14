@@ -3,6 +3,7 @@ import requests
 import requests_mock
 import json
 import yaml
+import copy
 from unittest import mock
 
 from meltano.core.plugin import PluginType
@@ -67,19 +68,10 @@ class TestPluginDiscoveryService:
         assert PluginType.EXTRACTORS in discovery
         assert PluginType.LOADERS not in discovery
 
-        # test for all
-        discovery = subject.discover(PluginType.ALL)
-        for t in PluginType:
-            if t is PluginType.ALL:
-                continue
-
-            assert t in discovery
-            assert isinstance(discovery[t], list)
-
     @pytest.mark.usefixtures("discovery_yaml")
     def test_discovery_yaml(self, subject):
         # test for all
-        discovery = subject.discover(PluginType.ALL)
+        discovery = subject.discover()
 
         # raw yaml load
         for plugin_type, plugin_defs in subject._discovery.items():
@@ -95,12 +87,9 @@ class TestPluginDiscoveryService:
     @pytest.mark.usefixtures("extraneous_plugin")
     def test_discovery_unknown(self, subject):
         # test for all
-        discovery = subject.discover(PluginType.ALL)
+        discovery = subject.discover()
 
         for t in PluginType:
-            if t is PluginType.ALL:
-                continue
-
             assert t in discovery
             assert isinstance(discovery[t], list)
             assert "turboencabulator" not in discovery
@@ -136,7 +125,7 @@ class TestIncompatiblePluginDiscoveryService:
             subject.ensure_compatible()
 
     def test_remote_incompatible(self, subject):
-        compatible_discovery = subject._discovery.copy()
+        compatible_discovery = copy.deepcopy(subject._discovery)
         compatible_discovery["version"] = PluginDiscoveryService.__version__
 
         # fmt:off

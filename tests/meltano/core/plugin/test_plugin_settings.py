@@ -24,8 +24,9 @@ def test_create(session):
 def env_var(plugin_discovery_service, plugin_settings_service):
     def _wrapper(plugin: PluginRef, setting_name):
         plugin_def = plugin_discovery_service.find_plugin(plugin.type, plugin.name)
+        setting_def = plugin_settings_service.find_setting(plugin, setting_name)
 
-        return plugin_settings_service.setting_env({"name": setting_name}, plugin_def)
+        return plugin_settings_service.setting_env(setting_def, plugin_def)
 
     return _wrapper
 
@@ -64,7 +65,7 @@ class TestPluginSettingsService:
         # overriden via the `meltano.yml` configuration
         original_meltano = project.meltano
         with project.meltano_update() as meltano:
-            meltano["plugins"]["extractors"][0]["config"] = {"test": 42}
+            meltano.plugins.extractors[0].config = {"test": 42}
 
         assert subject.get_value(session, tap, "test") == (
             42,
@@ -73,7 +74,7 @@ class TestPluginSettingsService:
 
         # revert back to the original
         with project.meltano_update() as meltano:
-            meltano.update(original_meltano)
+            meltano.plugins.extractors[0].config = {}
 
         # overriden via ENV
         monkeypatch.setenv(env_var(tap, "test"), "N33DC0F33")
@@ -117,31 +118,3 @@ class TestPluginSettingsService:
 
         subject.unset(session, tap, "test")
         assert session.query(PluginSetting).count() == 0
-
-
-class TestCustomPluginSettingsService:
-    @pytest.fixture(scope="class", autouse=True)
-    def custom_setting(subject, project, config_service, tap):
-        with project.meltano_update() as meltano:
-            custom_settings = [
-                {
-                    "name": "custom_setting",
-                    "value": "pytest",
-                    "kind": "pytest",
-                    "env": "PYTEST_CUSTOM_SETTING",
-                },
-                {"name": "test", "value": "override"},
-            ]
-
-            tap_mock = meltano["plugins"]["extractors"][0]
-            tap_mock["settings"] = custom_settings
-
-    def test_setting_exists(self, subject, tap):
-        exists = lambda setting: setting["name"] == "custom_setting"
-
-        assert any(map(exists, subject.definitions(tap)))
-
-    def test_precedence(self, subject, session, tap):
-        value, _ = subject.get_value(session, tap, "test")
-
-        assert value == "override"

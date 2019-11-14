@@ -109,8 +109,8 @@ class PluginInvoker:
 
     def exec_path(self):
         return self.venv_service.exec_path(
-            self.plugin.executable,
-            name=self.plugin.canonical_name,
+            self.plugin.executable or self.plugin.name,
+            name=self.plugin.name,
             namespace=self.plugin.type,
         )
 

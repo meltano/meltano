@@ -15,7 +15,7 @@ from typing import Dict, List
 from meltano.core.sql.design_helper import PypikaJoinExecutor
 from meltano.core.project import Project
 from meltano.core.plugin.model import Package
-from meltano.core.utils import encode_id_from_file_path, slugify, find_named
+from meltano.core.utils import encode_id_from_file_path, slugify, find_named, NotFound
 
 
 class MeltanoAnalysisFileParserError(Exception):
@@ -273,7 +273,7 @@ class MeltanoAnalysisFileParser:
     def table_conf_by_name(self, table_name, cls, prop, file_name):
         try:
             return find_named(self.tables, table_name)
-        except StopIteration as e:
+        except NotFound as e:
             raise MeltanoAnalysisFileParserMissingTableError(
                 prop, table_name, cls, file_name
             )

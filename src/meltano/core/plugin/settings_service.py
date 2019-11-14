@@ -5,11 +5,11 @@ from typing import Iterable, Dict, Tuple, List
 from copy import deepcopy
 from enum import Enum
 
-from meltano.core.utils import nest
+from meltano.core.utils import nest, find_named, NotFound
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.error import Error
-from . import PluginRef, PluginType, Plugin, PluginInstall
+from . import PluginRef, PluginType, Plugin, PluginInstall, SettingDefinition
 from .error import PluginMissingError
 from .setting import PluginSetting, REDACTED_VALUE
 
@@ -26,26 +26,6 @@ class PluginSettingValueSource(int, Enum):
     MELTANO_YML = 1
     DB = 2
     DEFAULT = 3
-
-
-class SettingDefinition:
-    def __init__(self, definition: dict):
-        if "name" not in definition:
-            raise ValueError("Setting definition must have a `name`.")
-
-        self._definition = definition
-
-    def __getattr__(self, attr):
-        return getattr(self._definition, attr)
-
-    def __getitem__(self, item):
-        return self._definition[item]
-
-    def __eq__(self, other):
-        return self["name"] == other["name"]
-
-    def __hash__(self):
-        return hash(self["name"])
 
 
 class PluginSettingsService:
@@ -75,16 +55,16 @@ class PluginSettingsService:
 
         # definition settings
         for setting in self.definitions(plugin):
-            value, source = self.get_value(session, plugin, setting["name"])
+            value, source = self.get_value(session, plugin, setting.name)
             if sources and source not in sources:
                 continue
 
             # we don't want to leak secure informations
             # so we redact all `passwords`
-            if redacted and value and setting.get("kind") == "password":
+            if redacted and value and setting.kind == "password":
                 value = REDACTED_VALUE
 
-            nest(config, setting["name"], value)
+            nest(config, setting.name, value)
 
         return config
 
@@ -96,7 +76,7 @@ class PluginSettingsService:
         env = {}
 
         for setting in self.definitions(plugin):
-            value, source = self.get_value(session, plugin, setting["name"])
+            value, source = self.get_value(session, plugin, setting.name)
             if sources and source not in sources:
                 continue
 
@@ -140,45 +120,26 @@ class PluginSettingsService:
 
     def find_setting(self, plugin: PluginRef, name: str) -> Dict:
         try:
-            return next(
-                setting
-                for setting in self.definitions(plugin)
-                if setting["name"] == name
-            )
-        except StopIteration:
-            raise PluginSettingMissingError(plugin, name)
+            return find_named(self.definitions(plugin), name)
+        except NotFound as err:
+            raise PluginSettingMissingError(plugin, name) from err
 
     def definitions(self, plugin_ref: PluginRef) -> Iterable[Dict]:
         settings = set()
         plugin_def = self.get_definition(plugin_ref)
 
-        try:
-            # there might be some settings declared on the PluginInstall
-            # and such settings have precedence over the the definition
-            plugin_install = self.get_install(plugin_ref)
-            for setting_def in map(
-                SettingDefinition, plugin_install._extras.get("settings", [])
-            ):
-                settings.add(setting_def)
-        except PluginMissingError:
-            pass
-
-        # add the plugin definition settings
-        for setting_def in map(SettingDefinition, plugin_def.settings):
-            settings.add(setting_def)
-
-        return list(settings)
+        return plugin_def.settings
 
     def get_install(self, plugin: PluginRef) -> PluginInstall:
-        return self.config_service.find_plugin(plugin.name, plugin_type=plugin.type)
+        return self.config_service.get_plugin(plugin)
 
     def setting_env(self, setting_def, plugin_def):
-        try:
-            return setting_def["env"]
-        except KeyError:
-            parts = (plugin_def.namespace, setting_def["name"])
-            process = lambda s: s.replace(".", "__").upper()
-            return "_".join(map(process, parts))
+        if setting_def.env:
+            return setting_def.env
+
+        parts = (plugin_def.namespace, setting_def["name"])
+        process = lambda s: s.replace(".", "__").upper()
+        return "_".join(map(process, parts))
 
     # TODO: ensure `kind` is handled
     def get_value(self, session, plugin: PluginRef, name: str):
@@ -197,9 +158,9 @@ class PluginSettingsService:
                 return (os.environ[env_key], PluginSettingValueSource.ENV)
 
             # priority 2: installed configuration
-            if setting_def["name"] in plugin_install.config:
+            if setting_def.name in plugin_install.config:
                 return (
-                    plugin_install.config[setting_def["name"]],
+                    plugin_install.config[setting_def.name],
                     PluginSettingValueSource.MELTANO_YML,
                 )
 
@@ -216,4 +177,4 @@ class PluginSettingsService:
         except sqlalchemy.orm.exc.NoResultFound:
             # priority 4: setting default value
             # that means it was not overriden
-            return setting_def.get("value"), PluginSettingValueSource.DEFAULT
+            return setting_def.value, PluginSettingValueSource.DEFAULT

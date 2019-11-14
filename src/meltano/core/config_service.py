@@ -3,7 +3,7 @@ import yaml
 import logging
 from typing import Dict, List, Optional, Iterable
 
-from meltano.core.utils import nest, find_named
+from meltano.core.utils import nest
 from .project import Project
 from .plugin import Plugin, PluginInstall, PluginType, PluginRef
 from .plugin.factory import plugin_factory
@@ -21,11 +21,9 @@ class ConfigService:
         with self.project.meltano_update() as meltano_yml:
             if not plugin in self.plugins():
                 if not plugin.type in meltano_yml.plugins:
-                    setattr(meltano_yml.plugins, plugin.type, [])
+                    meltano_yml.plugins[plugin.type] = []
 
-                plugins = getattr(meltano_yml.plugins, plugin.type)
-                plugins.append(plugin)
-
+                meltano_yml.plugins[plugin.type].append(plugin)
                 return plugin
             else:
                 logging.warning(
@@ -51,28 +49,27 @@ class ConfigService:
                 )
             )
 
-            plugin.profile = profile
+            if profile:
+                plugin.use_profile(profile)
+
             return plugin
-        except StopIteration:
-            raise PluginMissingError(plugin.name)
+        except StopIteration as stop:
+            raise PluginMissingError(name) from stop
 
     def get_plugin(self, plugin_ref: PluginRef) -> PluginInstall:
         try:
             plugin = next(
                 plugin
                 for plugin in self.plugins()
-                if (
-                    plugin.name == plugin_ref.name
-                )
+                if plugin == plugin_ref
             )
 
-            if plugin_ref.profile and not find_named(plugin.profiles, plugin_ref.profile):
-                raise PluginProfileMissingError(plugin.name, plugin_ref.profile)
+            if plugin_ref.current_profile:
+                plugin.use_profile(plugin_ref.current_profile)
 
-            plugin.profile = plugin_ref.profile
             return plugin
-        except StopIteration:
-            raise PluginMissingError(plugin.name)
+        except StopIteration as stop:
+            raise PluginMissingError(plugin_ref.name) from stop
 
     def get_extractors(self):
         return filter(lambda p: p.type == PluginType.EXTRACTORS, self.plugins())
@@ -92,12 +89,15 @@ class ConfigService:
     def update_plugin(self, plugin: PluginInstall):
         with self.project.meltano_update() as meltano:
             # find the proper plugin to update
-            idx = next(
-                i
-                for i, it in enumerate(self.plugins())
+            idx, outdated = next(
+                (i, it)
+                for i, it in enumerate(meltano.plugins[plugin.type])
                 if it == plugin
             )
-            meltano["plugins"][plugin.type][idx] = plugin.canonical()
+
+            meltano.plugins[plugin.type][idx] = plugin
+
+            return outdated
 
     def plugins(self) -> Iterable[PluginInstall]:
         for plugin_type, plugins in self.project.meltano.plugins:

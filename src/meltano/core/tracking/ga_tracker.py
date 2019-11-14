@@ -23,7 +23,7 @@ class GoogleAnalyticsTracker:
 
         self.send_anonymous_usage_stats = (
             not truthy(os.getenv("MELTANO_DISABLE_TRACKING"))
-            and self.project.meltano.get("send_anonymous_usage_stats", False) == True
+            and self.project.meltano.send_anonymous_usage_stats == True
         )
         self.project_id = self.load_project_id()
         self.client_id = self.load_client_id()
@@ -31,7 +31,7 @@ class GoogleAnalyticsTracker:
     def update_permission_to_track(self, send_anonymous_usage_stats: bool) -> None:
         """Update the send_anonymous_usage_stats in meltano.yml."""
         with self.project.meltano_update() as meltano_yml:
-            meltano_yml["send_anonymous_usage_stats"] = send_anonymous_usage_stats
+            meltano_yml.send_anonymous_usage_stats = send_anonymous_usage_stats
 
     def load_project_id(self) -> uuid.UUID:
         """
@@ -41,7 +41,7 @@ class GoogleAnalyticsTracker:
         store it in the project config file.
         """
         try:
-            project_id_str = self.project.meltano.get("project_id", None) or ""
+            project_id_str = self.project.meltano.project_id or ""
             project_id = uuid.UUID(project_id_str, version=4)
         except ValueError:
             project_id = uuid.uuid4()
@@ -51,7 +51,7 @@ class GoogleAnalyticsTracker:
                 #  the generated project_id back to the project config file
                 #  so that it persists between meltano runs.
                 with self.project.meltano_update() as meltano_yml:
-                    meltano_yml["project_id"] = str(project_id)
+                    meltano_yml.project_id = str(project_id)
 
         return project_id
 

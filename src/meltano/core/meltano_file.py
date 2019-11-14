@@ -1,14 +1,38 @@
 import yaml
 import copy
+from datetime import datetime, date
+
 
 from typing import Iterable, List
 from meltano.core.plugin import PluginInstall
 from meltano.core.plugin.factory import plugin_factory
 from meltano.core.behavior.canonical import Canonical
-# from meltano.core.schedule_service import Schedule
 
 
 VERSION = 1
+
+
+class Schedule(Canonical):
+    def __init__(self,
+                 name: str = None,
+                 extractor: str = None,
+                 loader: str = None,
+                 transform: str = None,
+                 interval: str = None,
+                 start_date: datetime = None,
+                 env={}):
+        super().__init__()
+
+        self.name = name
+        self.extractor = extractor
+        self.loader = loader
+        self.transform = transform
+        self.interval = interval
+        self.start_date = start_date
+        self.env = env
+
+    def __eq__(self, other):
+        return self.name == other.name
 
 
 class MeltanoFile(Canonical):
@@ -26,6 +50,7 @@ class MeltanoFile(Canonical):
             plugins=self.load_plugins(attrs.pop("plugins", {})),
             schedules=self.load_schedules(attrs.pop("schedules", [])),
             send_anonymous_usage_stats=attrs.pop("send_anonymous_usage_stats", True),
+            project_id=attrs.pop("project_id", None),
             **attrs)
 
     def load_plugins(self, plugins) -> List[PluginInstall]:
@@ -44,4 +69,4 @@ class MeltanoFile(Canonical):
         return plugin_type_plugins
 
     def load_schedules(self, schedules):
-        return list(map(Canonical.parse, schedules))
+        return list(map(Schedule.parse, schedules))

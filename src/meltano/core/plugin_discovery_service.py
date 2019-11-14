@@ -9,6 +9,7 @@ from itertools import groupby, chain
 
 import meltano.core.bundle as bundle
 from .behavior.versioned import Versioned, IncompatibleVersionError
+from .behavior.canonical import Canonical
 from .config_service import ConfigService
 from .plugin import Plugin, PluginInstall, PluginType, PluginRef
 from .plugin.factory import plugin_factory
@@ -31,10 +32,30 @@ class DiscoveryUnavailableError(Exception):
 
 
 MELTANO_DISCOVERY_URL = "https://www.meltano.com/discovery.yml"
+VERSION = 4
+
+
+class DiscoveryFile(Canonical):
+    def __init__(self, **attrs):
+        version = int(attrs.pop("version", 1))
+
+        super().__init__(version=version)
+
+        for plugin_type, plugin_defs in attrs.items():
+            self[plugin_type] = []
+
+            for plugin_def in plugin_defs:
+                plugin = Plugin(
+                    plugin_type,
+                    plugin_def.pop("name"),
+                    plugin_def.pop("namespace"),
+                    **plugin_def,
+                )
+                self[plugin_type].append(plugin)
 
 
 class PluginDiscoveryService(Versioned):
-    __version__ = 4
+    __version__ = VERSION
 
     def __init__(
         self,
@@ -44,11 +65,11 @@ class PluginDiscoveryService(Versioned):
     ):
         self.project = project
         self.config_service = config_service or ConfigService(project)
-        self._discovery = discovery
+        self._discovery = DiscoveryFile.parse(discovery)
 
     @property
     def backend_version(self):
-        return int(self._discovery.get("version", 1))
+        return int(self._discovery.version)
 
     @property
     def discovery(self):
@@ -88,7 +109,7 @@ class PluginDiscoveryService(Versioned):
         try:
             response = requests.get(MELTANO_DISCOVERY_URL)
             response.raise_for_status()
-            self._discovery = yaml.load(response.text)
+            self._discovery = DiscoveryFile.parse(yaml.load(response.text))
             self.ensure_compatible()
 
             with self.cached_discovery_file.open("w") as discovery_cache:
@@ -116,7 +137,7 @@ class PluginDiscoveryService(Versioned):
     def cached_discovery(self):
         try:
             with self.cached_discovery_file.open() as discovery_cache:
-                return yaml.load(discovery_cache)
+                return DiscoveryFile.parse(yaml.load(discovery_cache))
         except (yaml.YAMLError, FileNotFoundError):
             logging.debug(
                 f"Discovery cache corrupted or missing, falling back on the bundled discovery."
@@ -125,33 +146,30 @@ class PluginDiscoveryService(Versioned):
 
             # load it back
             with self.cached_discovery_file.open() as discovery_cache:
-                return yaml.load(discovery_cache)
+                return DiscoveryFile.parse(yaml.load(discovery_cache))
 
     @property
     def cached_discovery_file(self):
         return self.project.meltano_dir("cache", "discovery.yml")
 
     def plugins(self) -> Iterator[Plugin]:
-        custom_plugins = self.make_plugins(self.project.meltano.get("plugins", {}))
-        discovery_plugins = self.make_plugins(self.discovery)
+        discovery_plugins = (plugin
+                             for plugin_type in PluginType
+                             for plugin in self.discovery[plugin_type])
 
-        return chain(custom_plugins, discovery_plugins)
+        yield from self.custom_plugins()
+        yield from discovery_plugins
 
-    def make_plugins(self, plugin_defs: Dict) -> Iterator[Plugin]:
-        plugins = deepcopy(plugin_defs)
-        plugins.pop("version", 1)
+    def custom_plugins(self) -> Iterator[Plugin]:
+        # some plugins in the Meltano file might be custom, thus they
+        # serve both as `PluginInstall` and `Plugin`
+        custom_plugins = (Plugin(custom_plugin.type,
+                                 custom_plugin.name,
+                                 **custom_plugin._extras)
+                          for custom_plugin in self.config_service.plugins()
+                          if custom_plugin.is_custom())
 
-        return (
-            Plugin(
-                plugin_type,
-                plugin_def.pop("name"),
-                plugin_def.pop("namespace"),
-                **plugin_def,
-            )
-            for plugin_type, plugin_defs in plugins.items()
-            for plugin_def in sorted(plugin_defs, key=lambda d: d["name"])
-            if (PluginType.value_exists(plugin_type) and "namespace" in plugin_def)
-        )
+        yield from custom_plugins
 
     def find_plugin(self, plugin_type: PluginType, plugin_name: str):
         name, _ = PluginRef.parse_name(plugin_name)
@@ -164,20 +182,10 @@ class PluginDiscoveryService(Versioned):
         except StopIteration:
             raise PluginNotFoundError(name)
 
-    def discover(self, plugin_type: PluginType):
+    def discover(self, plugin_type: PluginType = None):
         """Return a pretty printed list of available plugins."""
-        enabled_plugin_types = (
-            (
-                PluginType.EXTRACTORS,
-                PluginType.LOADERS,
-                PluginType.TRANSFORMERS,
-                PluginType.MODELS,
-                PluginType.TRANSFORMS,
-                PluginType.ORCHESTRATORS,
-            )
-            if plugin_type == PluginType.ALL
-            else (plugin_type,)
-        )
+        enabled_plugin_types = (plugin_type,) if plugin_type else iter(PluginType)
+
         return {
             plugin_type: [p.name for p in plugins]
             for plugin_type, plugins in groupby(self.plugins(), lambda p: p.type)

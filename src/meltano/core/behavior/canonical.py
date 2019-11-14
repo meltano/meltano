@@ -6,8 +6,7 @@ from typing import Iterable
 
 class Canonical(object):
     def __init__(self, *args, **attrs):
-        if len(self.__class__.__mro__) > 2:
-            super(Canonical, self).__init__(*args)
+        super(Canonical, self).__init__(*args)
 
         for attr, value in attrs.items():
             setattr(self, attr, value)
@@ -25,8 +24,14 @@ class Canonical(object):
 
         return copy.deepcopy(target)
 
+    def canonical(self):
+        return Canonical.as_canonical(self)
+
     @classmethod
     def parse(cls, obj) -> 'Canonical':
+        if obj is None:
+            return None
+
         if isinstance(obj, Canonical):
             return obj
 
@@ -40,10 +45,23 @@ class Canonical(object):
 
     def __iter__(self):
         for k, v in self.__dict__.items():
-            if v is None:
+            if k.startswith("_"):
+                continue
+
+            if not v:
                 continue
 
             yield (k, v)
+
+    def __len__(self):
+        return len(self.__dict__)
+
+    def __contains__(self, obj):
+        return obj in self.__dict__
+
+    def update(self, other):
+        for k, v in other:
+            self.k = v
 
     @classmethod
     def yaml(cls, dumper, obj):

@@ -112,15 +112,17 @@ def get_plugin_configuration(plugin_ref) -> Response:
     """
     project = Project.find()
     settings = PluginSettingsService(project)
+    plugin = ConfigService(project).get_plugin(plugin_ref)
+
     config = flatten(
-        settings.as_config(db.session, plugin_ref, redacted=True), reducer="dot"
+        settings.as_config(db.session, plugin, redacted=True), reducer="dot"
     )
 
     return jsonify(
         {
             # freeze the keys because they are used for lookups
             "profiles": [freeze_keys(profile.canonical()) for profile in plugin.profiles],
-            "settings": settings.get_definition(plugin_ref).settings,
+            "settings": list(map(dict, settings.get_definition(plugin).settings)),
         }
     )
 
@@ -158,7 +160,7 @@ def save_plugin_configuration(plugin_ref) -> Response:
     settings = PluginSettingsService(project)
     for name, value in payload.items():
         # we want to prevent the edition of protected settings from the UI
-        if settings.find_setting(plugin_ref, name).get("protected"):
+        if settings.find_setting(plugin_ref, name).protected:
             logging.warning("Cannot set a 'protected' configuration externally.")
             continue
 

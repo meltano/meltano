@@ -111,8 +111,8 @@ class SingerTap(SingerPlugin):
             with properties_file.open() as catalog:
                 schema = json.load(catalog)
 
-            reset_executor = SelectExecutor(["!*.*"])
-            select_executor = SelectExecutor(self.select)
+            reset_executor = SelectExecutor({"!*.*"})
+            select_executor = SelectExecutor(self.select or {"*.*"})
 
             reset_executor.visit(schema)
             select_executor.visit(schema)
