@@ -386,8 +386,7 @@ export default {
             </div>
             <div class="level-item">
               <a
-                class="button tooltip is-tooltip-left"
-                data-tooltip="Getting Help"
+                class="button"
                 target="_blank"
                 href="https://meltano.com/docs/getting-help.html"
               >
