@@ -145,6 +145,13 @@ extractors:
       - properties
       - discover
       - state
+    select:
+      - Lead.*
+      - Contact.*
+      - User.*
+      - OpportunityHistory.*
+      - Account.*
+      - Opportunity.*
     settings:
       - name: username
       - name: password
