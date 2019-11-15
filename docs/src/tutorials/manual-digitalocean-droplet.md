@@ -92,13 +92,13 @@ mkdir venv
 Then create a new virtual environment inside that directory:
 
 ```bash
-python -m venv ~/venv/meltano
+python -m venv ~/.venv/meltano
 ```
 
 Activate the virtual environment using:
 
 ```bash
-source ~/venv/meltano/bin/activate
+source ~/.venv/meltano/bin/activate
 ```
 
 ### Installing Meltano on your DigitalOcean Droplet
