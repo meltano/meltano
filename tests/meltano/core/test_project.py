@@ -89,6 +89,7 @@ class TestProject:
 
         assert all(map(lambda x: x is project, projects))
 
+    @pytest.mark.concurrent
     def test_meltano_concurrency(self, project, concurrency):
         payloads = [{f"test_{i}": i} for i in range(concurrency["cases"])]
 
@@ -101,8 +102,9 @@ class TestProject:
         reader.stop()
         reader.join()
 
+        meltano = project.meltano
         for key, val in ((k, v) for payload in payloads for k, v in payload.items()):
-            assert project.meltano[key] == val, str(project.meltano)
+            assert meltano[key] == val
 
 
 class TestIncompatibleProject:
