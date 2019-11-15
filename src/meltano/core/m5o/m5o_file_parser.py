@@ -214,9 +214,10 @@ class MeltanoAnalysisFileParser:
                 conf = self.parse_m5o_file(topic)
                 parsed_topic = self.topic(conf, topic.name)
                 model = next(
-                    plugin for plugin in model_plugins if plugin.name == package.name
+                    (plugin for plugin in model_plugins if plugin.name == package.name),
+                    None,
                 )
-                parsed_topic["plugin_namespace"] = model.namespace
+                parsed_topic["plugin_namespace"] = model.namespace if model else None
                 parsed_topic["namespace"] = package.name
                 self.packaged_topics.append(parsed_topic)
 

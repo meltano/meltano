@@ -39,6 +39,11 @@ export default {
         models = Object.values(this.models).filter(
           model => model.plugin_namespace === namespace
         )
+
+        // Fallback to all if no match
+        if (models.length < 1) {
+          models = this.models
+        }
       }
 
       return models
