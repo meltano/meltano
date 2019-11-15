@@ -78,7 +78,9 @@ export default {
                     >dbt</a
                   >
                   to transform the data extracted from the data sources into a
-                  consistent representation called <strong>Model</strong>.
+                  consistent representation called <strong>Model</strong>, but
+                  Meltano will <strong>never</strong> manipulate the source data
+                  file.
                 </p>
                 <p>
                   An ELT run is <em>required before</em> you can view the
