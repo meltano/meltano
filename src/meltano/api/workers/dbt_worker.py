@@ -126,4 +126,5 @@ class DbtWorker(threading.Thread):
             session.close()
 
     def stop(self):
-        self.observer.stop()
+        if self.observer:
+            self.observer.stop()
