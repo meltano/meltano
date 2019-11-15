@@ -27,6 +27,7 @@ import {
   faInfoCircle,
   faLock,
   faProjectDiagram,
+  faQuestionCircle,
   faSync,
   faSearch,
   faSort,
@@ -73,6 +74,7 @@ export default {
     library.add(faInfoCircle)
     library.add(faLock)
     library.add(faProjectDiagram)
+    library.add(faQuestionCircle)
     library.add(faSync)
     library.add(faSearch)
     library.add(faSort)
