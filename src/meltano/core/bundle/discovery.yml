@@ -1,4 +1,4 @@
-version: 4
+version: 5
 extractors:
   - name: tap-carbon-intensity
     description: National Grid ESO's Carbon Emissions Intensity API
