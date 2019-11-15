@@ -390,8 +390,10 @@ export default {
                 target="_blank"
                 href="https://meltano.com/docs/getting-help.html"
               >
-                <font-awesome-icon icon="question-circle"></font-awesome-icon>
-                &nbsp;Help
+                <span class="icon">
+                  <font-awesome-icon icon="question-circle"></font-awesome-icon>
+                </span>
+                <span>Help</span>
               </a>
             </div>
           </div>
