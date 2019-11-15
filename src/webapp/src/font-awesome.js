@@ -27,6 +27,7 @@ import {
   faInfoCircle,
   faLock,
   faProjectDiagram,
+  faQuestionCircle,
   faSync,
   faSearch,
   faSort,
@@ -36,8 +37,7 @@ import {
   faTable,
   faThLarge,
   faThList,
-  faUser,
-  faQuestionCircle
+  faUser
 } from '@fortawesome/free-solid-svg-icons'
 import {
   FontAwesomeIcon,
@@ -74,6 +74,7 @@ export default {
     library.add(faInfoCircle)
     library.add(faLock)
     library.add(faProjectDiagram)
+    library.add(faQuestionCircle)
     library.add(faSync)
     library.add(faSearch)
     library.add(faSort)
@@ -84,7 +85,6 @@ export default {
     library.add(faThLarge)
     library.add(faThList)
     library.add(faUser)
-    library.add(faQuestionCircle)
 
     Vue.component('font-awesome-icon', FontAwesomeIcon)
     Vue.component('font-awesome-layers', FontAwesomeLayers)
