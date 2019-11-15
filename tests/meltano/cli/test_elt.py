@@ -28,7 +28,8 @@ def test_elt(
     result = cli_runner.invoke(cli, ["elt"])
     assert result.exit_code == 2
 
-    args = ["elt", "--job_id", "pytest_test_elt", tap.name, target.name]
+    job_id = "pytest_test_elt"
+    args = ["elt", "--job_id", job_id, tap.name, target.name]
 
     # exit cleanly when everything is fine
     # fmt: off
@@ -45,6 +46,8 @@ def test_elt(
         result = cli_runner.invoke(cli, args)
         assert result.exit_code == 1
 
+    job_logging_service.delete_all_logs(job_id)
+
     with patch.object(
         SingerRunner, "run", side_effect=Exception("This is a grave danger.")
     ), patch(
@@ -58,7 +61,7 @@ def test_elt(
         assert result.exit_code == 1
 
         # ensure there is a log of this exception
-        log = job_logging_service.get_latest_log("pytest_test_elt")
+        log = job_logging_service.get_latest_log(job_id)
         assert "This is a grave danger.\n" in log
 
 
