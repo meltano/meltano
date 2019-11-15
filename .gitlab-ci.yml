@@ -45,7 +45,7 @@ docs:
   only:
     - master@meltano/meltano
 
-.test: &test
+.test:
   stage: test
   image:
     name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
@@ -54,14 +54,14 @@ docs:
     - pip install '.[dev]'
 
 lint:
-  <<: *test
+  extends: .test
   before_script:
     - pip install black
   script:
     - make show_lint
 
 install_e2e:
-  <<: *test
+  extends: .test
   before_script:
     - python -m venv venv
     - python --version
@@ -95,10 +95,10 @@ test_meltano_ui:
     - yarn
     # add e2e once ci is wired up for it
 
-.pytest: &pytest
-  <<: *test
+.pytest:
+  extends: .test
   script:
-    - pytest -v --cov-report= --cov meltano
+    - pytest -v --cov-report= --cov meltano -m "$PYTEST_MARKERS"
     - coverage combine .coverage
     - coverage report
     - coverage html
@@ -107,8 +107,8 @@ test_meltano_ui:
       - htmlcov/
     when: on_success
 
-pytest_postgres:
-  <<: *pytest
+.pytest_postgres:
+  extends: .pytest
   variables:
     PYTEST_BACKEND: postgresql
 
@@ -128,13 +128,40 @@ pytest_postgres:
   services:
     - postgres:11
 
-pytest_sqlite:
-  <<: *pytest
+.pytest_sqlite:
+  extends: .pytest
   variables:
     PYTEST_BACKEND: sqlite
 
     # `target-sqlite` configuration
     SQLITE_DATABASE: pytest_warehouse
+
+.pytest_concurrent:
+  variables:
+    PYTEST_MARKERS: concurrent
+  tags:
+    - concurrent
+  when: manual
+
+pytest_postgres:
+  extends: .pytest_postgres
+  variables:
+    PYTEST_MARKERS: not concurrent
+
+pytest_postgres_concurrent:
+  extends:
+    - .pytest_postgres
+    - .pytest_concurrent
+
+pytest_sqlite:
+  extends: .pytest_sqlite
+  variables:
+    PYTEST_MARKERS: not concurrent
+
+pytest_sqlite_concurrent:
+  extends:
+    - .pytest_sqlite
+    - .pytest_concurrent
 
 publish:
   image:
@@ -179,7 +206,7 @@ digitalocean_marketplace:
 
 # registry.gitlab.com/meltano/meltano:<tag> → docker.io/meltano:<tag>
 # registry.gitlab.com/meltano/meltano:latest → docker.io/meltano:latest
-hub_meltano: &docker_hub_publish
+hub_meltano:
   image: docker:latest
   stage: publish
   services:
