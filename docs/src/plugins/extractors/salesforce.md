@@ -32,6 +32,6 @@ If you are successful, you should see `Added and installed extractors 'tap-sales
 ```bash
 export TAP_SALESFORCE_USERNAME="Your Salesforce Username"
 export TAP_SALESFORCE_PASSWORD="Your Salesforce Password"
-export TAP_SALESFORCE_SECURITY_TOKEN="yourSalesforceSecurityToken"
+export TAP_SALESFORCE_SECURITY_TOKEN="Your Salesforce Security Token"
 export TAP_SALESFORCE_START_DATE="2018-01-01T00:00:00Z"
 ```
