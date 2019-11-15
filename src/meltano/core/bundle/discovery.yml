@@ -112,7 +112,7 @@ extractors:
       - name: client_secret
         kind: password
       - name: endpoint
-      - name: start_time
+      - name: start_date
         kind: date_iso8601
   - name: tap-mongodb
     description: General purpose, document-based, distributed database

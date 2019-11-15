@@ -30,9 +30,9 @@ If you are successful, you should see `Added and installed extractors 'tap-marke
 1. Add the following variables to your file:
 
 ```bash
-export TAP_MARKETO_CLIENT_ID="yourClientId"
-export TAP_MARKETO_CLIENT_SECRET="yourClientSecret"
-export TAP_MARKETO_ENDPOINT="yourEndpointUrl"
-export TAP_MARKETO_IDENTITY="yourIdentity"
-export TAP_MARKETO_START_TIME="yourStartTime"
+export TAP_MARKETO_CLIENT_ID="Your Client Id"
+export TAP_MARKETO_CLIENT_SECRET="Your Client Secret"
+export TAP_MARKETO_ENDPOINT="Your Endpoint Url"
+export TAP_MARKETO_IDENTITY="Your Identity"
+export TAP_MARKETO_START_DATE="2019-01-01T00:00:00Z"
 ```
