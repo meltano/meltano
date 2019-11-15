@@ -141,6 +141,7 @@ test_meltano_ui:
     PYTEST_MARKERS: concurrent
   tags:
     - concurrent
+  when: manual
 
 pytest_postgres:
   extends: .pytest_postgres
