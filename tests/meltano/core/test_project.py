@@ -89,6 +89,7 @@ class TestProject:
 
         assert all(map(lambda x: x is project, projects))
 
+    @pytest.mark.concurrent
     def test_meltano_concurrency(self, project, concurrency):
         payloads = [{f"test_{i}": i} for i in range(concurrency["cases"])]
 
