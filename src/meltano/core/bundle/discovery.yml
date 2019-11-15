@@ -372,6 +372,9 @@ orchestrators:
       - name: core.load_examples
         value: False
         env: AIRFLOW__CORE__LOAD_EXAMPLES
+      - name: core.dags_are_paused_at_creation
+        env: AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION
+        value: False
       - name: webserver.web_server_port
         value: 5010
         env: AIRFLOW__WEBSERVER__WEB_SERVER_PORT

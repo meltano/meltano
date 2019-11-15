@@ -1,3 +1,8 @@
+---
+metaTitle: Getting Started With Data Analysis
+description: Create your first data analysis project, build a pipeline, and analyze your data after installing Meltano.
+---
+
 # Getting Started
 
 Now that you have successfully installed Meltano [locally](/docs/installation.html) or [in the cloud](/docs/deployment.html), you're ready to start create your first project, connect data sources, build pipelines, perform analysis and create dashboards.
@@ -72,7 +77,7 @@ With our extractor and loader configured, you should now see the following page:
 
 ![Screenshot of Transform page on Meltano webapp](/images/getting-started-guide/gsg-06.png)
 
-This page allows you to apply transformations to your data. This is not necessary for our current setup, but if you'd like to learn more about how transforms work in Meltano, check out our [docs on Meltano transform](/docs/architecture.html#meltano-transform).
+This page allows you to apply transformations to your data. This is not necessary for our current setup, but if you'd like to learn more about how transformations work in Meltano, check out our documentation on [Meltano Transformations](/docs/architecture.html#meltano-transformations).
 
 By default, the Transform step is set to `Skip`, so all we need to is click `Save`.
 
@@ -82,7 +87,8 @@ You should now be greeted with the Schedules page with a modal to create your fi
 
 ![Create pipeline modal](/images/getting-started-guide/gsg-07.png)
 
-Pipelines allow you to create scheduled tasks through Apache Airflow. For example, you may want a recurring task that updates the database at the end of every business day.
+Meltano provides [Orchestration](/docs/orchestration.html) using Apache Airflow, which allows you to create scheduled tasks to run pipelines automatically.
+For example, you may want a recurring task that updates the database at the end of every business day.
 
 In the current form, you will see:
 

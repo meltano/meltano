@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Extract Data from MongoDB
+description: Use Meltano to extract raw data from MongoDB and insert it into Postgres, Snowflake, and more. 
 ---
 
 # MongoDB

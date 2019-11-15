@@ -1,3 +1,8 @@
+---
+metaTitle: Introduction to Meltano
+description: Learn where to use Meltano, how Meltano is built, and where to get started. 
+---
+
 # Introduction
 
 Meltano is an open source convention over configuration product for the whole data life cycle, all the way from loading data to analyzing it. To learn more about our progress, check out the [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md) and our weekly [milestones and roadmap](https://gitlab.com/groups/meltano/-/milestones).

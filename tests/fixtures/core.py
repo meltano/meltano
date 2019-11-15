@@ -19,6 +19,7 @@ from meltano.core.schedule_service import ScheduleService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.plugin import PluginRef, PluginType, PluginInstall
 from meltano.core.elt_context import ELTContextBuilder
+from meltano.core.logging.job_logging_service import JobLoggingService
 
 
 PROJECT_NAME = "a_meltano_project"
@@ -194,6 +195,11 @@ def elt_context_builder(project, plugin_settings_service, plugin_discovery_servi
         plugin_settings_service=plugin_settings_service,
         plugin_discovery_service=plugin_discovery_service,
     )
+
+
+@pytest.fixture(scope="class")
+def job_logging_service(project):
+    return JobLoggingService(project)
 
 
 @pytest.fixture(scope="class")

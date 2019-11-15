@@ -8,7 +8,6 @@ import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
   extractorInFocusConfiguration: {},
-  extractorInFocusEntities: null,
   loaderInFocusConfiguration: {},
   pipelinePollers: [],
   pipelines: [],
@@ -106,14 +105,6 @@ const actions = {
     })
   },
 
-  getExtractorInFocusEntities({ commit }, extractorName) {
-    return orchestrationsApi
-      .getExtractorInFocusEntities(extractorName)
-      .then(response => {
-        commit('setAllExtractorInFocusEntities', response.data)
-      })
-  },
-
   getJobLog(_, jobId) {
     return orchestrationsApi.getJobLog({ jobId })
   },
@@ -184,9 +175,6 @@ const actions = {
   resetExtractorInFocusConfiguration: ({ commit }) =>
     commit('reset', 'extractorInFocusConfiguration'),
 
-  resetExtractorInFocusEntities: ({ commit }) =>
-    commit('reset', 'extractorInFocusEntities'),
-
   resetLoaderInFocusConfiguration: ({ commit }) =>
     commit('reset', 'loaderInFocusConfiguration'),
 
@@ -209,61 +197,6 @@ const actions = {
     orchestrationsApi.savePluginConfiguration(configPayload)
   },
 
-  selectEntities({ state }) {
-    orchestrationsApi
-      .selectEntities(state.extractorInFocusEntities)
-      .then(() => {
-        // TODO confirm success or handle error in UI
-      })
-  },
-
-  toggleAllEntityGroupsOff({ commit, dispatch, state }) {
-    state.extractorInFocusEntities.entityGroups.forEach(entityGroup => {
-      if (entityGroup.selected) {
-        dispatch('toggleEntityGroup', entityGroup)
-      } else {
-        const selectedAttributes = entityGroup.attributes.filter(
-          attribute => attribute.selected
-        )
-        if (selectedAttributes.length > 0) {
-          selectedAttributes.forEach(attribute =>
-            commit('toggleSelected', attribute)
-          )
-        }
-      }
-    })
-  },
-
-  toggleAllEntityGroupsOn({ dispatch, state }) {
-    state.extractorInFocusEntities.entityGroups.forEach(group => {
-      if (!group.selected) {
-        dispatch('toggleEntityGroup', group)
-      }
-    })
-  },
-
-  toggleEntityAttribute({ commit }, { entityGroup, attribute }) {
-    commit('toggleSelected', attribute)
-    const hasDeselectedAttribute =
-      attribute.selected === false && entityGroup.selected
-    const hasAllSelectedAttributes = !entityGroup.attributes.find(
-      attr => !attr.selected
-    )
-    if (hasDeselectedAttribute || hasAllSelectedAttributes) {
-      commit('toggleSelected', entityGroup)
-    }
-  },
-
-  toggleEntityGroup({ commit }, entityGroup) {
-    commit('toggleSelected', entityGroup)
-    const selected = entityGroup.selected
-    entityGroup.attributes.forEach(attribute => {
-      if (attribute.selected !== selected) {
-        commit('toggleSelected', attribute)
-      }
-    })
-  },
-
   updateRecentELTSelections({ commit }, updatePayload) {
     commit('setELTRecentSelection', updatePayload)
   }
@@ -284,15 +217,6 @@ const mutations = {
     if (defaultState.hasOwnProperty(attr)) {
       state[attr] = lodash.cloneDeep(defaultState[attr])
     }
-  },
-
-  setAllExtractorInFocusEntities(state, entitiesData) {
-    state.extractorInFocusEntities = entitiesData
-      ? {
-          extractorName: entitiesData.extractorName,
-          entityGroups: entitiesData.entityGroups
-        }
-      : {}
   },
 
   setELTRecentSelection(state, { type, value }) {

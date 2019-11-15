@@ -1,3 +1,8 @@
+---
+metaTitle: Meltano Support & Help
+description: Learn where to file bugs, track issues, and how to get support from the Meltano Slack and other channels.
+---
+
 # Getting Help
 
 Whoops! Were you happily using Meltano when something went wrong or you got stuck? Don't worry, the Meltano team and community are here to help you.

@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Extract Data from Zendesk
+description: Use Meltano to extract raw data from Zendesk and insert it into Postgres, Snowflake, and more. 
 ---
 
 # Zendesk

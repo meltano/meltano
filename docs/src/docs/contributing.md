@@ -1,3 +1,8 @@
+---
+metaTitle: Contributing to Meltano
+description: Meltano is open source software built by an internal team at GitLab as well as the larger Meltano community.
+---
+
 # Contributing
 
 ## Prerequisites
@@ -229,7 +234,7 @@ Within each aforementioned depth level is an interactive color hierarchy that fu
 1. Secondary - _`$interactive-secondary`_
    - Supporting interactive elements (various controls) that assist the primary task(s) in the UI
    - Fill - Most important
-     - Can be used for selected state (typically delegated to stroke) for grouped buttons (examples usage seen in Entity Selection and Transform defaults)
+     - Can be used for selected state (typically delegated to stroke) for grouped buttons (examples usage seen in Transform defaults)
    - Stroke - Important
      - Denotes the states of selected, active, and/or valid where grey represents the opposites unselected, inactive, and/or invalid
 1. Tertiary - _Greyscale_
@@ -342,7 +347,7 @@ git fetch origin
 
 Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
 
-1. Meltano has a number of dependencies for the release toolchain that are required when performing a release. If you haven't already, please navigate to your meltano install and run the following command to install all development dependencies:
+1. Meltano has a number of dependencies for the release toolchain that are required when performing a release. If you haven't already, please navigate to your meltano installation and run the following command to install all development dependencies:
 
    ```bash
    # activate your virtualenv
@@ -378,12 +383,13 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 You can use `make type=patch release` to force a patch release. This is useful when we need to release hotfixes.
 :::
 
-1. Create a merge request from `release-next` targeting `master` and make sure to check `delete the source branch when the changes are merged`.
+1. Create a merge request from `release-next` targeting `master` and use the `release` template.
 1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
+1. Make sure to check `delete the source branch when the changes are merged`.
 1. When the **publish** pipeline succeeds, the release is publicly available on [PyPI](https://pypi.org/project/meltano/).
 1. Follow the [Digital Ocean publish process](#digitalocean-marketplace)
 1. If a non-patch release, record and distribute the [Speedrun Video](#speedruns):
-   - Meltano YouTube channel
+   - Meltano YouTube channel using the [Meltano YouTube guidelines](https://about.gitlab.com/handbook/meltano/marketing/#youtube)
    - Meltano Slack `@channel` in `#general`
 
 ## DigitalOcean Marketplace
@@ -406,12 +412,12 @@ The _digitalocean_marketplace_ job is only available on pipelines running off `m
 Then, head to the DigitalOcean vendor portal at <https://marketplace.digitalocean.com/vendorportal> to edit the Meltano listing.
 
 :::tip Don't see the Meltano listing?
-You'll have to be granted access to the DigitalOcean vendor portal. Please ask access to your manager.
+You'll have to be granted access to the DigitalOcean vendor portal. Please ask your manager for access.
 :::
 
 1. Once inside the listing, update the following entries:
-   - **System Image** to the new image (match the aforementioned snapshot string)
    - **Version** to the latest Meltano version
+   - **System Image** to the new image (match the aforementioned snapshot string)
    - **Meltano Package Version** inside the _Software Included Entry_
 1. Submit it for review to finish the process.
 

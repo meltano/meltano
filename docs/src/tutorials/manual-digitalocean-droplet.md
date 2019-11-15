@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Meltano Tutorial - Create a Meltano Digital Ocean Droplet
+description: Learn how to create a Digital Ocean Droplet ready to use to host a Meltano instance.
 ---
 
 # Manually Creating a DigitalOcean Droplet

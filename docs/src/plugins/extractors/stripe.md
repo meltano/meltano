@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Extract Data from Stripe
+description: Use Meltano to extract raw data from Stripe and insert it into Postgres, Snowflake, and more. 
 ---
 
 # Stripe

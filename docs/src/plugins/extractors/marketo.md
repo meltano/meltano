@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Extract Data from Marketo
+description: Use Meltano to extract raw data from Marketo and insert it into Postgres, Snowflake, and more. 
 ---
 
 # Marketo

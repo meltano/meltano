@@ -12,6 +12,9 @@ class PluginMissingError(Exception):
         else:
             self.plugin_name = plugin_or_name
 
+    def __str__(self):
+        return f"The requested plugin '{self.plugin_name}' is missing."
+
 
 class PluginExecutionError(Exception):
     """

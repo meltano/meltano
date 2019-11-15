@@ -119,7 +119,7 @@ export default {
               <span class="icon is-small" :class="getIconColor('/pipeline')">
                 <font-awesome-icon icon="stream"></font-awesome-icon>
               </span>
-              <span>Pipeline</span>
+              <span>Pipelines</span>
               <span
                 v-if="getRunningPipelines.length > 0"
                 class="tag tag-running-pipelines is-rounded is-info"
@@ -164,7 +164,7 @@ export default {
               :class="{ 'is-active': getIsCurrentPath('/pipeline/schedule') }"
               :disabled="!getIsStepScheduleMinimallyValidated"
               tag="button"
-              >Run</router-link
+              >Schedule</router-link
             >
           </div>
         </div>
@@ -383,20 +383,6 @@ export default {
                   </div>
                 </div>
               </Dropdown>
-            </div>
-            <div class="level-item">
-              <a
-                class="button has-background-light tooltip is-tooltip-warning is-tooltip-left"
-                data-tooltip="Help shape this feature by contributing your ideas"
-                target="_blank"
-                href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=permission"
-              >
-                <font-awesome-icon
-                  :icon="'user'"
-                  :style="{ color: '#0F3B66' }"
-                  title="Login currently disabled"
-                ></font-awesome-icon>
-              </a>
             </div>
           </div>
         </div>

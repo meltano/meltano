@@ -24,9 +24,6 @@ export default {
     }
   },
   methods: {
-    updateExtractorEntitySelection(extractor) {
-      this.$router.push({ name: 'extractorEntities', params: { extractor } })
-    },
     updateExtractorSettings(extractor) {
       this.$router.push({ name: 'extractorSettings', params: { extractor } })
     }
@@ -89,13 +86,6 @@ export default {
                     class="button is-interactive-primary is-small is-block"
                     @click="updateExtractorSettings(extractor.name)"
                     >Configure</a
-                  >
-                </div>
-                <div class="column">
-                  <a
-                    class="button is-interactive-primary is-outlined is-small is-block"
-                    @click="updateExtractorEntitySelection(extractor.name)"
-                    >Select</a
                   >
                 </div>
               </div>

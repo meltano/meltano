@@ -15,7 +15,7 @@ export default {
       steps: [
         {
           name: 'extractors',
-          routeMatches: ['extractors', 'extractorSettings', 'extractorEntities']
+          routeMatches: ['extractors', 'extractorSettings']
         },
         {
           name: 'loaders',

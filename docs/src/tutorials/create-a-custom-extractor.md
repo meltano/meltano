@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Meltano Tutorial - Create a Custom Extractor
+description: Learn how to use Meltano to create a custom data extractor.
 ---
 
 # Create a Custom Extractor
