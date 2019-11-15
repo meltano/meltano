@@ -98,7 +98,7 @@ test_meltano_ui:
 .pytest:
   extends: .test
   script:
-    - pytest -v --cov-report= --cov meltano -m $PYTEST_MARKERS
+    - pytest -v --cov-report= --cov meltano -m "$PYTEST_MARKERS"
     - coverage combine .coverage
     - coverage report
     - coverage html
