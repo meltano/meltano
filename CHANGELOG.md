@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.6.0 - (2019-11-18)
 
 ---
 
@@ -26,7 +39,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1297](https://gitlab.com/meltano/meltano/issues/1297) Get actual latest ELT job log by sorting matches by creation time with nanosecond resolution
 - [#1297](https://gitlab.com/meltano/meltano/issues/1297) Fix pipeline failure caused by jobs that require true concurrency being executed on CI runners that don't
 
-### Breaks
 
 ## 1.5.0 - (2019-11-11)
 
