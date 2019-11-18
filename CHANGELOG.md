@@ -15,12 +15,14 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1257](https://gitlab.com/meltano/meltano/issues/1257) Prevent modified logo file upon each build
 - [#1289](https://gitlab.com/meltano/meltano/issues/1289) Dismiss all modals when using the escape key
 - [#1282](https://gitlab.com/meltano/meltano/issues/1282) Remove Entity Selection from the UI (still available in CLI) and default to "All" entities for a given data source
 - [#1303](https://gitlab.com/meltano/meltano/issues/1303) Update the configuration options for the Salesforce Extractor to only include relevant properties. Remove properties like the client_id that were not used for username/password authentication.
 - [#1308](https://gitlab.com/meltano/meltano/issues/1308) Update the configuration options for the Marketo Extractor to use a Start Date instead of a Start Time.
 
 ### Fixes
+
 - [#1297](https://gitlab.com/meltano/meltano/issues/1297) Get actual latest ELT job log by sorting matches by creation time with nanosecond resolution
 - [#1297](https://gitlab.com/meltano/meltano/issues/1297) Fix pipeline failure caused by jobs that require true concurrency being executed on CI runners that don't
 
