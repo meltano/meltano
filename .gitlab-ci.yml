@@ -187,10 +187,8 @@ digitalocean_marketplace:
     - cd cloud/packer
     - packer build marketplace-image.json
   only:
-    refs:
-      - tags@meltano/meltano
-    variables:
-      - $CI_COMMIT_TAG =~ /^v*/
+    - master@meltano/meltano
+  when: manual
 
 .review:
   image: silvs/kubectl:latest
