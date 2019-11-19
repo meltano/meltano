@@ -37,6 +37,18 @@ export default {
     extractor() {
       return this.getInstalledPlugin('extractors', this.extractorName)
     },
+    extractorType() {
+      const keywords = this.extractor.name.split('-')
+      const type = keywords[0]
+
+      if (type === 'tap') {
+        return 'extractor'
+      } else if (type === 'target') {
+        return 'loader'
+      } else {
+        return 'plugin'
+      }
+    },
     isInstalled() {
       return this.getIsPluginInstalled('extractors', this.extractorName)
     },
@@ -197,7 +209,7 @@ export default {
                 :href="extractor.docs"
                 target="_blank"
                 class="has-text-underlined"
-                >{{ extractorName }} docs</a
+                >{{ extractor.label }} {{ extractorType }} docs</a
               >
               for more info.
             </p>
