@@ -250,7 +250,7 @@ export default {
         <p>
           View Meltano's
           <a :href="plugin.docs" target="_blank" class="has-text-underlined"
-            >{{ plugin.label }} {{ pluginType }} docs</a
+            >{{ plugin.label || plugin.name }} {{ pluginType }} docs</a
           >
           for more info.
         </p>
