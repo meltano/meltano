@@ -12,6 +12,8 @@ from pathlib import Path
 from pyhocon import ConfigFactory
 from typing import Dict, List
 
+from meltano.core.plugin import PluginType
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.sql.design_helper import PypikaJoinExecutor
 from meltano.core.project import Project
 from meltano.core.plugin.model import Package
@@ -169,6 +171,7 @@ class MeltanoAnalysisFileParser:
 
             topic = self.graph_topic(topic)
             indices[str(topic_identifier)] = {
+                "plugin_namespace": topic["plugin_namespace"],
                 "namespace": topic["namespace"],
                 "name": topic["name"],
                 "designs": [e["name"] for e in topic["designs"]],
@@ -190,6 +193,12 @@ class MeltanoAnalysisFileParser:
             index_file.write(json.dumps(indices))
 
     def parse_packages(self):
+
+        discovery = PluginDiscoveryService(self.project)
+        model_plugins = [
+            plugin for plugin in discovery.plugins() if plugin.type is PluginType.MODELS
+        ]
+
         for package in self.packages():
             if not package.topics and package.tables:
                 raise MeltanoAnalysisMissingTopicFilesError(
@@ -204,6 +213,11 @@ class MeltanoAnalysisFileParser:
             for topic in package.topics:
                 conf = self.parse_m5o_file(topic)
                 parsed_topic = self.topic(conf, topic.name)
+                model = next(
+                    (plugin for plugin in model_plugins if plugin.name == package.name),
+                    None,
+                )
+                parsed_topic["plugin_namespace"] = model.namespace if model else None
                 parsed_topic["namespace"] = package.name
                 self.packaged_topics.append(parsed_topic)
 
@@ -244,6 +258,10 @@ class MeltanoAnalysisFileParser:
                 # `project/models/dir1/dir2/mytopic.topic.m5o` --> `cutom/dir1/dir2`
                 parsed_topic["namespace"] = str(
                     Path("custom").joinpath(folder.relative_to(models))
+                )
+
+                parsed_topic["plugin_namespace"] = parsed_topic["namespace"].replace(
+                    "/", "_"
                 )
 
                 self.topics.append(parsed_topic)
