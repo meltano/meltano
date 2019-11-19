@@ -1,4 +1,4 @@
-version: 4
+version: 5
 extractors:
   - name: tap-carbon-intensity
     description: National Grid ESO's Carbon Emissions Intensity API
@@ -145,6 +145,13 @@ extractors:
       - properties
       - discover
       - state
+    select:
+      - Lead.*
+      - Contact.*
+      - User.*
+      - OpportunityHistory.*
+      - Account.*
+      - Opportunity.*
     settings:
       - name: username
       - name: password

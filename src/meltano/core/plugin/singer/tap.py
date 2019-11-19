@@ -112,7 +112,7 @@ class SingerTap(SingerPlugin):
                 schema = json.load(catalog)
 
             reset_executor = SelectExecutor(["!*.*"])
-            select_executor = SelectExecutor(self.select)
+            select_executor = SelectExecutor(plugin_invoker.select)
 
             reset_executor.visit(schema)
             select_executor.visit(schema)

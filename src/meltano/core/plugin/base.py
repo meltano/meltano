@@ -95,7 +95,7 @@ class PluginInstall(HookObject, PluginRef):
 
         self.pip_url = pip_url
         self._config = config
-        self._select = set(select)
+        self.select = set(select)
         self._extras = extras or {}
 
     def canonical(self):
@@ -104,8 +104,8 @@ class PluginInstall(HookObject, PluginRef):
         if self.pip_url:
             canonical.update({"pip_url": self.pip_url})
 
-        if self._select:
-            canonical.update({"select": list(self._select)})
+        if self.select:
+            canonical.update({"select": list(self.select)})
 
         if self._config:
             canonical.update({"config": self._config})
@@ -126,14 +126,6 @@ class PluginInstall(HookObject, PluginRef):
     def executable(self):
         return self._extras.get("executable", self.canonical_name)
 
-    @property
-    def select(self):
-        return self._select or {"*.*"}
-
-    @select.setter
-    def select(self, patterns):
-        self._select = set(patterns)
-
     def exec_args(self, files: Dict):
         return []
 
@@ -147,7 +139,7 @@ class PluginInstall(HookObject, PluginRef):
         return dict()
 
     def add_select_filter(self, filter: str):
-        self._select.add(filter)
+        self.select.add(filter)
 
 
 class Plugin(PluginRef):
@@ -168,6 +160,7 @@ class Plugin(PluginRef):
         docs=None,
         description=None,
         capabilities=set(),
+        select=set(),
         **extras
     ):
         super().__init__(plugin_type, name)
@@ -178,6 +171,7 @@ class Plugin(PluginRef):
         self.docs = docs
         self.description = description
         self.capabilities = set(capabilities)
+        self.select = set(select)
         self._extras = extras or {}
 
     def canonical(self):
@@ -198,7 +192,16 @@ class Plugin(PluginRef):
         if self.capabilities:
             canonical.update({"capabilities": list(self.capabilities)})
 
+        if self.select:
+            canonical.update({"select": list(self.select)})
+
         return canonical
 
     def as_installed(self) -> PluginInstall:
-        return PluginInstall(self.type, self.name, pip_url=self.pip_url, **self._extras)
+        return PluginInstall(
+            self.type,
+            self.name,
+            pip_url=self.pip_url,
+            select=self.select,
+            **self._extras
+        )
