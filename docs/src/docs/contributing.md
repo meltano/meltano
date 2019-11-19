@@ -108,6 +108,30 @@ export MELTANO_UI_URL = ""
 
 ## Taps & Targets Development
 
+### Changing discovery.yml
+
+When you need to make changes to `discovery.yml`, these changes are not automatically detected inside of the `meltano` repo during development. While there are a few ways to solve this problem, it is recommended to create a symbolic link in order ensure that changes made inside of the `meltano` repo appear inside the Meltano project you initialized and are testing on.
+
+1. Get path for `discovery.yml` in the repo
+
+- Example: `/Users/bencodezen/Projects/meltano/src/meltano/core/bundle/discovery.yml`
+
+2. Open your Meltano project in your terminal
+
+3. Create a symbolic link by running the following command:
+
+```
+ln -s $YOUR_DISCOVERY_YML_PATH
+```
+
+Now, when you run the `ls` command, you should see something like:
+
+```
+bencodezen  staff   72 Nov 19 09:19 discovery.yml -> /Users/bencodezen/Projects/meltano/src/meltano/core/bundle/discovery.yml
+```
+
+Now, you can see your changes in `discovery.yml` live in your project during development! 🎉
+
 ### For existing taps/targets
 
 We should be good citizen about these, and use the default workflow to contribute. Most of these are on GitHub so:
@@ -295,7 +319,7 @@ Here is a technical breakdown:
 ## Merge Requests
 
 :::tip Searching for something to work on?
-Start off by looking at our [~"Accepting Merge Requests"][Accepting Merge Requests] label.
+Start off by looking at our [~"Accepting Merge Requests"][accepting merge requests] label.
 
 Keep in mind that this is only a suggestion: all improvements are welcome.
 :::
