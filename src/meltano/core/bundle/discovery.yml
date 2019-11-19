@@ -3,6 +3,7 @@ extractors:
   - name: tap-carbon-intensity
     description: National Grid ESO's Carbon Emissions Intensity API
     namespace: tap_carbon
+    label: Carbon Emissions Intensity
     docs: 'https://meltano.com/plugins/extractors/carbon-intensity.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-carbon-intensity'
     capabilities:
@@ -10,6 +11,7 @@ extractors:
   - name: tap-csv
     description: Generic data extractor of CSV (comma separated value) files
     namespace: tap_csv
+    label: CSV
     docs: 'https://meltano.com/plugins/extractors/csv.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-csv.git'
     capabilities:
@@ -26,6 +28,7 @@ extractors:
   - name: tap-fastly
     description: Edge cloud computing services provider
     namespace: tap_fastly
+    label: Fastly
     docs: 'https://meltano.com/plugins/extractors/fastly.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-fastly.git'
     capabilities:
@@ -42,6 +45,7 @@ extractors:
   - name: tap-gitlab
     description: Single application for the entire DevOps lifecycle
     namespace: tap_gitlab
+    label: GitLab
     docs: 'https://meltano.com/plugins/extractors/gitlab.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
     capabilities:
@@ -75,6 +79,7 @@ extractors:
   - name: tap-google-analytics
     description: App and website analytics platform hosted by Google
     namespace: tap_google_analytics
+    label: Google Analytics
     docs: 'https://meltano.com/plugins/extractors/google-analytics.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-google-analytics.git'
     capabilities:
@@ -102,6 +107,7 @@ extractors:
   - name: tap-marketo
     description: Marketing automation for account-based marketing
     namespace: tap_marketo
+    label: Marketo
     docs: 'https://meltano.com/plugins/extractors/marketo.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
     capabilities: []
@@ -117,6 +123,7 @@ extractors:
   - name: tap-mongodb
     description: General purpose, document-based, distributed database
     namespace: tap_mongodb
+    label: MongoDB
     docs: 'https://meltano.com/plugins/extractors/mongodb.html'
     pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
     capabilities:
@@ -139,6 +146,7 @@ extractors:
   - name: tap-salesforce
     description: Customer-relationship management & customer success platform
     namespace: tap_salesforce
+    label: Salesforce
     docs: 'https://meltano.com/plugins/extractors/salesforce.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-salesforce.git'
     capabilities:
@@ -168,6 +176,7 @@ extractors:
   - name: tap-stripe
     description: Online payment processing for internet businesses
     namespace: tap_stripe
+    label: Stripe
     docs: 'https://meltano.com/plugins/extractors/stripe.html'
     pip_url: 'git+https://github.com/meltano/tap-stripe.git@v0.2.4'
     capabilities:
@@ -185,6 +194,7 @@ extractors:
   - name: tap-zendesk
     description: Support ticketing system & customer service platform
     namespace: tap_zendesk
+    label: Zendesk
     docs: 'https://meltano.com/plugins/extractors/zendesk.html'
     pip_url: 'tap-zendesk'
     capabilities:
@@ -206,6 +216,7 @@ loaders:
   - name: target-csv
     description: CSV loader
     namespace: target_csv
+    label: CSV
     docs: 'https://meltano.com/plugins/loaders/csv.html'
     pip_url: git+https://gitlab.com/meltano/target-csv.git
     settings:
@@ -234,6 +245,7 @@ loaders:
   - name: target-snowflake
     description: Snowflake database loader
     namespace: snowflake
+    label: Snowflake
     docs: 'https://meltano.com/plugins/loaders/snowflake.html'
     pip_url: 'git+https://gitlab.com/meltano/target-snowflake.git'
     signup_url: 'https://trial.snowflake.com?referrer=meltano'
@@ -261,6 +273,7 @@ loaders:
   - name: target-postgres
     description: PostgreSQL database loader
     namespace: postgres
+    label: PostgreSQL
     docs: 'https://meltano.com/plugins/loaders/postgres.html'
     pip_url: 'git+https://github.com/meltano/target-postgres.git'
     settings:
@@ -285,6 +298,7 @@ loaders:
   - name: target-sqlite
     description: SQLite database loader
     namespace: sqlite
+    label: SQLite
     docs: 'https://meltano.com/plugins/loaders/sqlite.html'
     pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
     settings:
