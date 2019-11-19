@@ -260,7 +260,9 @@ class MeltanoAnalysisFileParser:
                     Path("custom").joinpath(folder.relative_to(models))
                 )
 
-                parsed_topic["plugin_namespace"] = parsed_topic["namespace"].replace("/", "_")
+                parsed_topic["plugin_namespace"] = parsed_topic["namespace"].replace(
+                    "/", "_"
+                )
 
                 self.topics.append(parsed_topic)
 
