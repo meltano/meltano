@@ -32,10 +32,10 @@ pip3 install --upgrade setuptools
 
 # Optional, but it's recommended to create a virtual environment
 # in order to minimize side effects from unknown environment variable
-python -m venv ~/virtualenvs/meltano-development
+python -m venv ~/.venv/meltano-development
 
 # Activate your virtual environment
-source ~/virtualenvs/meltano-development/bin/activate
+source ~/.venv/meltano-development/bin/activate
 
 # Install all the dependencies
 pip3 install -r requirements.txt

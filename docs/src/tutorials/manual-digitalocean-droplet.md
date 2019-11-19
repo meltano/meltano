@@ -86,19 +86,19 @@ You may be tempted to create your DigitalOcean Droplet without a virtual environ
 Create a directory where you want your virtual environments to be saved:
 
 ```bash
-mkdir virtualenvs
+mkdir venv
 ```
 
 Then create a new virtual environment inside that directory:
 
 ```bash
-python -m venv ~/virtualenvs/meltano
+python -m venv venv/.venv/meltano
 ```
 
 Activate the virtual environment using:
 
 ```bash
-source ~/virtualenvs/meltano/bin/activate
+source venv/.venv/meltano/bin/activate
 ```
 
 ### Installing Meltano on your DigitalOcean Droplet
