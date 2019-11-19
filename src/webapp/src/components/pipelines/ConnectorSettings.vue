@@ -19,6 +19,10 @@ export default {
     fieldClass: {
       type: String,
       default: ''
+    },
+    plugin: {
+      type: Object,
+      required: true
     }
   },
   computed: {
@@ -65,6 +69,18 @@ export default {
     },
     labelClass() {
       return this.fieldClass || 'is-normal'
+    },
+    pluginType() {
+      const keywords = this.plugin.name.split('-')
+      const type = keywords[0]
+
+      if (type === 'tap') {
+        return 'extractor'
+      } else if (type === 'target') {
+        return 'loader'
+      } else {
+        return 'plugin'
+      }
     },
     successClass() {
       return setting => (setting ? 'has-text-success' : null)
@@ -228,6 +244,18 @@ export default {
         </div>
       </div>
     </form>
+
+    <slot name="docs">
+      <div v-if="plugin.docs" class="content has-text-centered mt1r">
+        <p>
+          View Meltano's
+          <a :href="plugin.docs" target="_blank" class="has-text-underlined"
+            >{{ plugin.label }} {{ pluginType }} docs</a
+          >
+          for more info.
+        </p>
+      </div>
+    </slot>
 
     <slot name="bottom" />
   </div>

@@ -37,18 +37,6 @@ export default {
     extractor() {
       return this.getInstalledPlugin('extractors', this.extractorName)
     },
-    extractorType() {
-      const keywords = this.extractor.name.split('-')
-      const type = keywords[0]
-
-      if (type === 'tap') {
-        return 'extractor'
-      } else if (type === 'target') {
-        return 'loader'
-      } else {
-        return 'plugin'
-      }
-    },
     isInstalled() {
       return this.getIsPluginInstalled('extractors', this.extractorName)
     },
@@ -201,19 +189,8 @@ export default {
             v-if="!extractorLacksConfigSettings"
             field-class="is-small"
             :config-settings="localConfiguration"
+            :plugin="extractor"
           />
-          <div v-if="extractor.docs" class="content has-text-centered mt1r">
-            <p>
-              View Meltano's
-              <a
-                :href="extractor.docs"
-                target="_blank"
-                class="has-text-underlined"
-                >{{ extractor.label }} {{ extractorType }} docs</a
-              >
-              for more info.
-            </p>
-          </div>
         </template>
       </section>
       <footer class="modal-card-foot field is-grouped is-grouped-right">
