@@ -380,6 +380,18 @@ JSON_SCHEMA = """
 }
 """
 
+CATALOG_PROPERTIES = {
+    "id",
+    "code",
+    "name",
+    "balance",
+    "created_at",
+    "active",
+    "payload",
+    "payload.content",
+    "payload.hash",
+}
+
 
 @pytest.fixture
 def select_all_executor():
@@ -459,6 +471,52 @@ class TestSingerTap:
             assert not invoker.files[
                 "catalog"
             ].exists(), "Catalog should not be present."
+
+    def test_apply_select(self, session, plugin_invoker_factory, subject):
+        invoker = plugin_invoker_factory(subject, prepare_with_session=session)
+
+        properties_file = invoker.files["catalog"]
+
+        def reset_properties():
+            properties_file.open("w").write(CATALOG)
+
+        def assert_properties(properties):
+            with properties_file.open() as catalog:
+                schema = json.load(catalog)
+
+            lister = ListSelectedExecutor()
+            visit(schema, lister)
+
+            assert lister.selected_properties["UniqueEntitiesName"] == properties
+
+        reset_properties()
+
+        subject.apply_select(invoker)
+
+        # When `select` isn't set in meltano.yml or discovery.yml, select all
+        assert_properties(CATALOG_PROPERTIES)
+
+        reset_properties()
+
+        # Pretend `select` is set in discovery.yml
+        with mock.patch.object(
+            invoker.plugin_def, "select", {"UniqueEntitiesName.name"}
+        ):
+            subject.apply_select(invoker)
+
+            # When `select` is set in discovery.yml, use the selection
+            assert_properties({"id", "created_at", "name"})
+
+            reset_properties()
+
+            # Pretend `select` is set in meltano.yml
+            with mock.patch.object(
+                invoker.plugin, "select", {"UniqueEntitiesName.code"}
+            ):
+                subject.apply_select(invoker)
+
+            # `select` set in meltano.yml takes precedence over discovery.yml
+            assert_properties({"id", "created_at", "code"})
 
     def test_apply_select_catalog_invalid(
         self, session, plugin_invoker_factory, subject
@@ -562,20 +620,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         "catalog,attrs",
         [
             ("CATALOG", {"id", "code", "name", "code", "created_at"}),
-            (
-                "JSON_SCHEMA",
-                {
-                    "id",
-                    "code",
-                    "name",
-                    "balance",
-                    "created_at",
-                    "active",
-                    "payload",
-                    "payload.content",
-                    "payload.hash",
-                },
-            ),
+            ("JSON_SCHEMA", CATALOG_PROPERTIES),
         ],
         indirect=["catalog"],
     )
@@ -605,20 +650,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                     "payload.hash",
                 },
             ),
-            (
-                "JSON_SCHEMA",
-                {
-                    "id",
-                    "code",
-                    "name",
-                    "balance",
-                    "created_at",
-                    "active",
-                    "payload",
-                    "payload.content",
-                    "payload.hash",
-                },
-            ),
+            ("JSON_SCHEMA", CATALOG_PROPERTIES),
         ],
         indirect=["catalog"],
     )
