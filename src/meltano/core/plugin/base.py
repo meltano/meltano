@@ -138,7 +138,7 @@ class PluginInstall(HookObject, PluginRef):
     def output_files(self):
         return dict()
 
-    def addselect_filter(self, filter: str):
+    def add_select_filter(self, filter: str):
         self.select.add(filter)
 
 
