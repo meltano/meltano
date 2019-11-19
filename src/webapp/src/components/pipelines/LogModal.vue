@@ -26,8 +26,31 @@ export default {
   },
   computed: {
     ...mapGetters('configuration', ['getRunningPipelineJobIds']),
+    ...mapGetters('plugins', ['getInstalledPlugin']),
     ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
-    ...mapState('repos', ['models'])
+    ...mapState('configuration', ['pipelines']),
+    ...mapState('repos', ['models']),
+    contextualModels() {
+      let models = this.models
+      if (this.relatedPipeline) {
+        const extractor = this.relatedPipeline.extractor
+        const namespace = this.getInstalledPlugin('extractors', extractor)
+          .namespace
+        models = Object.values(this.models).filter(
+          model => model.plugin_namespace === namespace
+        )
+
+        // Fallback to all if no match
+        if (models.length < 1) {
+          models = this.models
+        }
+      }
+
+      return models
+    },
+    relatedPipeline() {
+      return this.pipelines.find(pipeline => pipeline.name === this.jobId)
+    }
   },
   created() {
     this.jobId = this.$route.params.jobId
@@ -112,7 +135,7 @@ export default {
         >
           <div class="dropdown-content is-unselectable">
             <div
-              v-for="(v, model) in models"
+              v-for="(v, model) in contextualModels"
               :key="`${model}-panel`"
               class="box box-analyze-nav is-borderless is-shadowless is-marginless"
             >
