@@ -445,10 +445,11 @@ class TestSingerTap:
 
         def mock_discovery():
             invoker.files["catalog"].open("w").write(CATALOG)
-            return 0
+            return ("", "")
 
         process_mock = mock.Mock()
-        process_mock.wait = mock_discovery
+        process_mock.communicate = mock_discovery
+        process_mock.returncode = 0
 
         with mock.patch.object(
             PluginInvoker, "invoke", return_value=process_mock
@@ -459,7 +460,8 @@ class TestSingerTap:
 
     def test_run_discovery_fails(self, session, plugin_invoker_factory, subject):
         process_mock = mock.Mock()
-        process_mock.wait.return_value = 1  # something went wrong
+        process_mock.communicate.return_value = ("", "")
+        process_mock.returncode = 1  # something went wrong
 
         invoker = plugin_invoker_factory(subject, prepare_with_session=session)
 
