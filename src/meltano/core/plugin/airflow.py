@@ -72,7 +72,7 @@ class Airflow(PluginInstall):
         try:
             # generate the default `airflow.cfg`
             handle = invoker.invoke(
-                "--help", stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                "--help", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
             )
             handle.wait()
             logging.debug(f"Generated default '{str(airflow_cfg_path)}'")
