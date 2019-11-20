@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1298](https://gitlab.com/meltano/meltano/issues/1298) Let default entity selection be configured in discovery.yml under `select`
 - [#1298](https://gitlab.com/meltano/meltano/issues/1298) Define default entity selection for tap-salesforce
+- [#1304](https://gitlab.com/meltano/meltano/issues/1304) Fix Meltano subprocess fetching large catalogs (e.g. for Salesforce) getting stuck do to the subprocess' stderr buffer filling and the process getting deadlocked.
 
 
 ### Breaks

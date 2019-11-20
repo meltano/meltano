@@ -68,12 +68,13 @@ class SingerTap(SingerPlugin):
             result = plugin_invoker.invoke(
                 "--discover", stdout=catalog, stderr=subprocess.PIPE, text=True
             )
-            exit_code = result.wait()
+            stdout, stderr = result.communicate()
+            exit_code = result.returncode
 
         if exit_code != 0:
             properties_file.unlink()
             raise PluginExecutionError(
-                f"Schema discovery failed: command {plugin_invoker.exec_args('--discover')} returned {exit_code}: {result.stderr.read().rstrip()}"
+                f"Schema discovery failed: command {plugin_invoker.exec_args('--discover')} returned {exit_code}: {stderr.rstrip()}"
             )
 
         # test for the schema to be a valid catalog
