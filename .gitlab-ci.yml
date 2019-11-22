@@ -2,17 +2,6 @@ image: python:3.6
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
 
-include:
-  - local: .gitlab/ci/docs.gitlab-ci.yml
-  - local: .gitlab/ci/test.gitlab-ci.yml
-  - local: .gitlab/ci/publish.gitlab-ci.yml
-  - local: .gitlab/ci/docker.gitlab-ci.yml
-  - template: SAST.gitlab-ci.yml
-
-sast:
-  variables:
-    SAST_EXCLUDED_PATHS: cloud,docker,docs,model,scripts,tests
-
 stages:
   - docs
   - build-base
@@ -22,16 +11,14 @@ stages:
   - publish
   - distribute
 
-digitalocean_marketplace:
-  image:
-    name: hashicorp/packer
-    entrypoint: [""]
-  stage: distribute
-  script:
-    - cd cloud/packer
-    - packer build marketplace-image.json
-  only:
-    refs:
-      - tags@meltano/meltano
-    variables:
-      - $CI_COMMIT_TAG =~ /^v*/
+include:
+  - local: .gitlab/ci/docs.gitlab-ci.yml
+  - local: .gitlab/ci/test.gitlab-ci.yml
+  - local: .gitlab/ci/publish.gitlab-ci.yml
+  - local: .gitlab/ci/distribute.gitlab-ci.yml
+  - local: .gitlab/ci/docker.gitlab-ci.yml
+  - template: SAST.gitlab-ci.yml
+
+sast:
+  variables:
+    SAST_EXCLUDED_PATHS: cloud,docker,docs,model,scripts,tests
