@@ -6,7 +6,7 @@ docs:
   image: node:10.16.2
   cache:
     paths:
-      - node_modules/
+      - docs/node_modules/
   before_script:
     - "which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )"
     - eval $(ssh-agent -s)
