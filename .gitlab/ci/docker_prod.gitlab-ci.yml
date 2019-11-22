@@ -1,0 +1,48 @@
+.build_prod:
+  extends: .docker_build
+  stage: build-meltano
+  variables:
+    DOCKERFILE: docker/prod/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE
+    IMAGE_TAG: $CI_COMMIT_SHA
+  before_script:
+    - source .gitlab/ci/scripts/docker_build_before_script.sh
+    - export EXTRA_ARGS="--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/base:$BASE_SHA"
+  artifacts:
+    paths:
+      - dist
+
+# Manages:
+#  - meltano/meltano:<sha>
+meltano_dev:
+  extends: .build_prod
+  except:
+    - master
+    - tags
+
+# Manages:
+#  - meltano/meltano:<sha>
+#  - meltano/meltano:edge
+meltano_edge:
+  extends:
+    - .build_prod
+    - .only:master
+  script:
+    - source .gitlab/ci/scripts/docker_build_script.sh
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:edge
+    - docker push $IMAGE_NAME:edge
+
+# Manages:
+#  - meltano/meltano:<sha>
+#  - meltano/meltano:<tag>
+#  - meltano/meltano:latest
+meltano:
+  extends:
+    - .build_prod
+    - .only:version-tags
+  script:
+    - source .gitlab/ci/scripts/docker_build_script.sh
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+    - docker push $IMAGE_NAME:$CI_COMMIT_TAG
+    - docker push $IMAGE_NAME:latest
