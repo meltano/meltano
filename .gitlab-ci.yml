@@ -12,6 +12,7 @@ stages:
   - distribute
 
 include:
+  - local: .gitlab/ci/global.gitlab-ci.yml
   - local: .gitlab/ci/docs.gitlab-ci.yml
   - local: .gitlab/ci/test.gitlab-ci.yml
   - local: .gitlab/ci/publish.gitlab-ci.yml
