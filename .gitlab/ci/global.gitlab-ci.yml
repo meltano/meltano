@@ -4,3 +4,7 @@
       - tags@meltano/meltano
     variables:
       - $CI_COMMIT_TAG =~ /^v*/
+
+.only:master:
+  only:
+    - master@meltano/meltano
