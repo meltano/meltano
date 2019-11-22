@@ -52,6 +52,18 @@ install_e2e:
     paths:
       - htmlcov/
     when: on_success
+  only:
+    changes:
+      - src/meltano/**/*
+      - tests/**/*
+      - .coveragerc
+      - alembic.ini
+      - package.json
+      - pytest.inni
+      - requirements.txt
+      - setup.cgf
+      - setup.py
+      - yarn.lock
 
 .pytest_postgres:
   extends: .pytest
