@@ -34,16 +34,6 @@ class TestPluginDiscoveryService:
         assert requests.get(MELTANO_DISCOVERY_URL).status_code == 418
 
     @pytest.fixture
-    def extraneous_plugin(self, subject):
-        subject.discovery["turboencabulators"] = [
-            {
-                "name": "v1",
-                "namespace": "backtothefuture",
-                "pip_url": "turboencabulators",
-            }
-        ]
-
-    @pytest.fixture
     def discovery_yaml(self, subject):
         """Disable the discovery mock"""
         with subject.project.root_dir("discovery.yml").open("w") as d:
@@ -57,7 +47,6 @@ class TestPluginDiscoveryService:
         assert subject.discovery
         assert len(plugins) >= 6
 
-    @pytest.mark.usefixtures("extraneous_plugin")
     def test_plugins_unknown(self, subject):
         plugins = list(subject.plugins())
         assert len(plugins) >= 6
@@ -74,7 +63,7 @@ class TestPluginDiscoveryService:
         discovery = subject.discover()
 
         # raw yaml load
-        for plugin_type, plugin_defs in subject._discovery.items():
+        for plugin_type, plugin_defs in subject._discovery:
             if not PluginType.value_exists(plugin_type):
                 continue
 
@@ -83,16 +72,6 @@ class TestPluginDiscoveryService:
 
             assert plugin_type in discovery
             assert sorted(discovery[plugin_type]) == sorted(plugin_names)
-
-    @pytest.mark.usefixtures("extraneous_plugin")
-    def test_discovery_unknown(self, subject):
-        # test for all
-        discovery = subject.discover()
-
-        for t in PluginType:
-            assert t in discovery
-            assert isinstance(discovery[t], list)
-            assert "turboencabulator" not in discovery
 
 
 class TestPluginDiscoveryServiceRemote:
@@ -118,7 +97,7 @@ class TestIncompatiblePluginDiscoveryService:
 
     @pytest.fixture(autouse=True)
     def discovery_yaml(self, subject):
-        subject._discovery["version"] = 1000
+        subject._discovery["version"] = 1000000
 
     def test_discovery(self, subject):
         with pytest.raises(IncompatibleVersionError):
@@ -135,7 +114,7 @@ class TestIncompatiblePluginDiscoveryService:
                                return_value=compatible_discovery) as cached_discovery, \
             requests_mock.Mocker() as r:
         # fmt:on
-            r.get(MELTANO_DISCOVERY_URL, text=json.dumps(subject._discovery))
+            r.get(MELTANO_DISCOVERY_URL, text=json.dumps(subject._discovery.canonical()))
             subject.fetch_discovery()
 
             assert cached_discovery.called

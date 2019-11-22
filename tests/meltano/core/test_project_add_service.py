@@ -30,4 +30,5 @@ class TestProjectAddService:
     )
     def test_add(self, plugin_type, plugin_name, subject, project):
         added = subject.add(plugin_type, plugin_name)
-        assert added.canonical() in project.meltano["plugins"][plugin_type]
+
+        assert added in project.meltano["plugins"][plugin_type]

@@ -5,6 +5,7 @@ from flask import url_for
 from meltano.core.plugin.settings_service import (
     PluginSettingValueSource,
     REDACTED_VALUE,
+    Profile,
 )
 
 
@@ -28,7 +29,8 @@ class TestOrchestration:
                 "thisisatest",
                 PluginSettingValueSource.DB,
             )
-            assert res.json["config"]["secure"] == REDACTED_VALUE
+
+            assert res.json["profiles"][0]["config"]["secure"] == REDACTED_VALUE
 
     def test_save_configuration(self, app, api, tap, session, plugin_settings_service):
         plugin_settings_service.set(session, tap, "secure", "thisisatest")
@@ -40,7 +42,12 @@ class TestOrchestration:
         ), app.test_request_context():
             res = api.put(
                 url_for("orchestrations.save_plugin_configuration", plugin_ref=tap),
-                json={"protected": "N33DC0FF33", "secure": "newvalue"},
+                json=[
+                    {
+                        "name": Profile.DEFAULT.name,
+                        "config": {"protected": "N33DC0FF33", "secure": "newvalue"},
+                    }
+                ],
             )
 
             assert res.status_code == 200
@@ -51,7 +58,7 @@ class TestOrchestration:
                 "newvalue",
                 PluginSettingValueSource.DB,
             )
-            assert res.json["secure"] == REDACTED_VALUE
+            assert res.json[0]["config"]["secure"] == REDACTED_VALUE
 
             # make sure the `readonly` field has not been updated
             assert plugin_settings_service.get_value(session, tap, "protected") == (

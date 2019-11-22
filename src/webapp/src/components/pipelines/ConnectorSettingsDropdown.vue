@@ -81,7 +81,7 @@ export default {
 
 <template>
   <div class="level">
-    <div class="level-item">
+    <div class="level-item level-right">
       <p>Current profile:</p>
       <Dropdown
         :label="
@@ -137,9 +137,7 @@ export default {
       <span
         class="icon has-text-grey-light tooltip is-tooltip-multiline"
         :data-tooltip="
-          `Profiles enable a single connector (${
-            connector.name
-          } for example) to be reused with multiple accounts or configurations.`
+          `Profiles enable a single connector (${connector.name} for example) to be reused with multiple accounts or configurations.`
         "
       >
         <font-awesome-icon icon="info-circle"></font-awesome-icon>

@@ -24,11 +24,12 @@ class ConfigService:
                     meltano_yml.plugins[plugin.type] = []
 
                 meltano_yml.plugins[plugin.type].append(plugin)
-                return plugin
             else:
                 logging.warning(
                     f"{plugin.name} is already present, use `meltano install` to install it."
                 )
+
+        return plugin_factory(plugin.type, plugin.canonical())
 
     def has_plugin(self, plugin_name: str):
         try:
@@ -49,8 +50,8 @@ class ConfigService:
                 )
             )
 
-            if profile:
-                plugin.use_profile(profile)
+            profile = plugin.get_profile(profile)
+            plugin.use_profile(profile)
 
             return plugin
         except StopIteration as stop:
@@ -58,14 +59,10 @@ class ConfigService:
 
     def get_plugin(self, plugin_ref: PluginRef) -> PluginInstall:
         try:
-            plugin = next(
-                plugin
-                for plugin in self.plugins()
-                if plugin == plugin_ref
-            )
+            plugin = next(plugin for plugin in self.plugins() if plugin == plugin_ref)
 
-            if plugin_ref.current_profile:
-                plugin.use_profile(plugin_ref.current_profile)
+            profile = plugin.get_profile(plugin_ref.current_profile_name)
+            plugin.use_profile(profile)
 
             return plugin
         except StopIteration as stop:

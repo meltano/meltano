@@ -14,10 +14,10 @@ class Canonical(object):
     @classmethod
     def as_canonical(cls, target):
         if isinstance(target, Canonical):
-            return {
-                k: Canonical.as_canonical(v)
-                for k, v in target
-            }
+            return {k: Canonical.as_canonical(v) for k, v in target}
+
+        if isinstance(target, set):
+            return list(map(Canonical.as_canonical, target))
 
         if isinstance(target, list):
             return list(map(Canonical.as_canonical, target))
@@ -28,7 +28,7 @@ class Canonical(object):
         return Canonical.as_canonical(self)
 
     @classmethod
-    def parse(cls, obj) -> 'Canonical':
+    def parse(cls, obj) -> "Canonical":
         if obj is None:
             return None
 
@@ -60,15 +60,16 @@ class Canonical(object):
         return obj in self.__dict__
 
     def update(self, other):
-        for k, v in other:
-            self.k = v
+        other = Canonical.as_canonical(other)
+
+        for k, v in other.items():
+            setattr(self, k, v)
 
     @classmethod
     def yaml(cls, dumper, obj):
         return dumper.represent_mapping(
-            "tag:yaml.org,2002:map",
-            Canonical.as_canonical(obj),
-            flow_style=False)
+            "tag:yaml.org,2002:map", Canonical.as_canonical(obj), flow_style=False
+        )
 
 
 yaml.add_multi_representer(Canonical, Canonical.yaml)

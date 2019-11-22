@@ -124,7 +124,7 @@ export default {
         .dispatch('configuration/savePluginConfiguration', {
           name: this.extractor.name,
           type: 'extractors',
-          config: this.localConfiguration.config
+          profiles: this.localConfiguration.profiles
         })
         .then(() => {
           this.$store.dispatch('configuration/updateRecentELTSelections', {
@@ -133,9 +133,7 @@ export default {
           })
           this.$router.push({ name: 'loaders' })
           const message = this.extractorLacksConfigSettings
-            ? `Auto Advance - No Configuration needed for ${
-                this.extractor.name
-              }`
+            ? `Auto Advance - No Configuration needed for ${this.extractor.name}`
             : `Connection Saved - ${this.extractor.name}`
           Vue.toasted.global.success(message)
         })

@@ -21,7 +21,6 @@ class NotFound(Exception):
         super().__init__(f"{name} was not found.")
 
 
-
 # from https://github.com/jonathanj/compose/blob/master/compose.py
 def compose(*fs):
     """

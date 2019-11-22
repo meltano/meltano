@@ -40,6 +40,22 @@ export default {
       const hasOwns = []
       _.forOwn(this.pipeline, val => hasOwns.push(val))
       return hasOwns.find(val => val === '' || val === null) === undefined
+    },
+    availableExtractors() {
+      var extractors = []
+
+      for (var extractor_idx in this.installedPlugins.extractors) {
+        const extractor = this.installedPlugins.extractors[extractor_idx]
+        extractors.push(extractor.name)
+
+        for (var profile_idx in extractor['profiles']) {
+          const profile = extractor.profiles[profile_idx]
+
+          extractors.push(`${extractor.name}@${profile.name}`)
+        }
+      }
+
+      return extractors
     }
   },
   created() {
@@ -146,9 +162,9 @@ export default {
                       :disabled="!getHasInstalledPluginsOfType('extractors')"
                     >
                       <option
-                        v-for="extractor in installedPlugins.extractors"
-                        :key="extractor.name"
-                        >{{ extractor.name }}</option
+                        v-for="extractor in availableExtractors"
+                        :key="extractor"
+                        >{{ extractor }}</option
                       >
                     </select>
                   </span>

@@ -13,14 +13,16 @@ VERSION = 1
 
 
 class Schedule(Canonical):
-    def __init__(self,
-                 name: str = None,
-                 extractor: str = None,
-                 loader: str = None,
-                 transform: str = None,
-                 interval: str = None,
-                 start_date: datetime = None,
-                 env={}):
+    def __init__(
+        self,
+        name: str = None,
+        extractor: str = None,
+        loader: str = None,
+        transform: str = None,
+        interval: str = None,
+        start_date: datetime = None,
+        env={},
+    ):
         super().__init__()
 
         self.name = name
@@ -51,7 +53,8 @@ class MeltanoFile(Canonical):
             schedules=self.load_schedules(attrs.pop("schedules", [])),
             send_anonymous_usage_stats=attrs.pop("send_anonymous_usage_stats", True),
             project_id=attrs.pop("project_id", None),
-            **attrs)
+            **attrs
+        )
 
     def load_plugins(self, plugins) -> List[PluginInstall]:
         """Parse the meltano.yml file and return it as `PluginInstall` instances."""

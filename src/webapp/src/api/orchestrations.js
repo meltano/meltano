@@ -42,10 +42,10 @@ export default {
     )
   },
 
-  savePluginConfiguration({ type, name, config }) {
+  savePluginConfiguration({ type, name, profiles }) {
     return axios.put(
       utils.apiUrl('orchestrations', `${type}/${name}/configuration`),
-      config
+      profiles
     )
   }
 }

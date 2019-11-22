@@ -27,6 +27,9 @@ class Profile(Canonical):
     pass
 
 
+Profile.DEFAULT = Profile(name="default", label="Default")
+
+
 class PluginType(YAMLEnum):
     EXTRACTORS = "extractors"
     LOADERS = "loaders"
@@ -41,7 +44,7 @@ class PluginType(YAMLEnum):
     @property
     def cli_command(self):
         """Makes it singular for `meltano add PLUGIN_TYPE`"""
-        return self.value[:]
+        return self.value[:-1]
 
     @classmethod
     def value_exists(cls, value):
@@ -55,33 +58,26 @@ class PluginRef:
             if isinstance(plugin_type, PluginType)
             else PluginType(plugin_type)
         )
-        self.name, self._current_profile = self.parse_name(name)
+        self.name, self._current_profile_name = self.parse_name(name)
 
     @classmethod
     def parse_name(cls, name: str):
-        name, *profile = name.split("@")
-        profile = next(iter(profile), None)
+        name, *profile_name = name.split("@")
+        profile_name = next(iter(profile_name), None)
 
-        return (name, profile)
+        return (name, profile_name)
 
     @property
     def type(self):
         return self._type
 
-    def use_profile(self, profile):
-        try:
-            # ensure the profile exists
-            self._current_profile = find_named(plugin.profiles, plugin_ref.current_profile)
-        except NotFound as err:
-            raise PluginProfileMissingError(self.name, profile) from err
-
     @property
-    def current_profile(self):
-        return self._current_profile
+    def current_profile_name(self):
+        return self._current_profile_name
 
     @property
     def qualified_name(self):
-        parts = (self.type, self.name, self.current_profile)
+        parts = (self.type, self.name, self._current_profile_name)
 
         return ".".join(compact(parts))
 
@@ -97,7 +93,6 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         self,
         plugin_type: PluginType,
         name: str,
-        namespace: str = None,
         pip_url: Optional[str] = None,
         select=set(),
         config={},
@@ -123,6 +118,30 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         except AttributeError:
             return False
 
+    def get_profile(self, profile_name: str) -> Profile:
+        try:
+            return find_named(self.profiles, profile_name)
+        except NotFound:
+            return Profile.DEFAULT
+
+    def use_profile(self, profile: Profile):
+        try:
+            if profile is None or profile is Profile.DEFAULT:
+                self._current_profile_name = None
+                return
+
+            # ensure the profile exists
+            find_named(self.profiles, profile.name)
+
+            self._current_profile_name = profile.name
+        except NotFound as err:
+            raise err
+            # raise PluginProfileMissingError(self.name, profile) from err
+
+    @property
+    def current_profile(self):
+        return self.get_profile(self.current_profile_name)
+
     @property
     def current_config(self):
         if not self.current_profile:
@@ -146,42 +165,42 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         self.select.add(filter)
 
     def add_profile(self, name: str, config: dict = None, label: str = None):
-        profile = Profile(name=name,
-                          config=config,
-                          label=label)
+        profile = Profile(name=name, config=config, label=label)
 
         self.profiles.add(profile)
         return profile
 
 
 class SettingDefinition(Canonical):
-    def __init__(self,
-                 name: str = None,
-                 env: str = None,
-                 kind: str = None,
-                 value = None,
-                 label: str = None,
-                 documentation: str = None,
-                 description: str = None,
-                 tooltip: str = None,
-                 options: list = [],
-                 protected = False):
-        super().__init__(name=name,
-                         env=env,
-                         kind=kind,
-                         value=value,
-                         label=label,
-                         documentation=documentation,
-                         description=description,
-                         protected=protected)
-
+    def __init__(
+        self,
+        name: str = None,
+        env: str = None,
+        kind: str = None,
+        value=None,
+        label: str = None,
+        documentation: str = None,
+        description: str = None,
+        tooltip: str = None,
+        options: list = [],
+        protected=False,
+    ):
+        super().__init__(
+            name=name,
+            env=env,
+            kind=kind,
+            value=value,
+            label=label,
+            documentation=documentation,
+            description=description,
+            protected=protected,
+        )
 
     def __eq__(self, other):
         return self.name == other.name
 
     def __hash__(self):
         return hash(self.name)
-
 
 
 class Plugin(Canonical, PluginRef):
@@ -215,7 +234,4 @@ class Plugin(Canonical, PluginRef):
         self._extras = attrs
 
     def as_installed(self) -> PluginInstall:
-        return PluginInstall(self.type,
-                             self.name,
-                             pip_url=self.pip_url,
-                             **self._extras)
+        return PluginInstall(self.type, self.name, pip_url=self.pip_url, **self._extras)

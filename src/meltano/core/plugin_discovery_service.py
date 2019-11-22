@@ -1,4 +1,5 @@
 import os
+import io
 import yaml
 import requests
 import logging
@@ -89,7 +90,7 @@ class PluginDiscoveryService(Versioned):
 
             if local_discovery.is_file():
                 with local_discovery.open() as local:
-                    self._discovery = yaml.load(local) or {}
+                    self._discovery = self.load_discovery(local)
             else:
                 return self.fetch_discovery()
 
@@ -109,7 +110,7 @@ class PluginDiscoveryService(Versioned):
         try:
             response = requests.get(MELTANO_DISCOVERY_URL)
             response.raise_for_status()
-            self._discovery = DiscoveryFile.parse(yaml.load(response.text))
+            self._discovery = self.load_discovery(io.StringIO(response.text))
             self.ensure_compatible()
 
             with self.cached_discovery_file.open("w") as discovery_cache:
@@ -134,10 +135,10 @@ class PluginDiscoveryService(Versioned):
         return self._discovery
 
     @property
-    def cached_discovery(self):
+    def cached_discovery(self) -> DiscoveryFile:
         try:
             with self.cached_discovery_file.open() as discovery_cache:
-                return DiscoveryFile.parse(yaml.load(discovery_cache))
+                return self.load_discovery(discovery_cache)
         except (yaml.YAMLError, FileNotFoundError):
             logging.debug(
                 f"Discovery cache corrupted or missing, falling back on the bundled discovery."
@@ -146,16 +147,21 @@ class PluginDiscoveryService(Versioned):
 
             # load it back
             with self.cached_discovery_file.open() as discovery_cache:
-                return DiscoveryFile.parse(yaml.load(discovery_cache))
+                return self.load_discovery(discovery_cache)
 
     @property
     def cached_discovery_file(self):
         return self.project.meltano_dir("cache", "discovery.yml")
 
+    def load_discovery(self, discovery_file) -> DiscoveryFile:
+        return DiscoveryFile.parse(yaml.load(discovery_file))
+
     def plugins(self) -> Iterator[Plugin]:
-        discovery_plugins = (plugin
-                             for plugin_type in PluginType
-                             for plugin in self.discovery[plugin_type])
+        discovery_plugins = (
+            plugin
+            for plugin_type in PluginType
+            for plugin in self.discovery[plugin_type]
+        )
 
         yield from self.custom_plugins()
         yield from discovery_plugins
@@ -163,11 +169,11 @@ class PluginDiscoveryService(Versioned):
     def custom_plugins(self) -> Iterator[Plugin]:
         # some plugins in the Meltano file might be custom, thus they
         # serve both as `PluginInstall` and `Plugin`
-        custom_plugins = (Plugin(custom_plugin.type,
-                                 custom_plugin.name,
-                                 **custom_plugin._extras)
-                          for custom_plugin in self.config_service.plugins()
-                          if custom_plugin.is_custom())
+        custom_plugins = (
+            Plugin(custom_plugin.type, custom_plugin.name, **custom_plugin._extras)
+            for custom_plugin in self.config_service.plugins()
+            if custom_plugin.is_custom()
+        )
 
         yield from custom_plugins
 

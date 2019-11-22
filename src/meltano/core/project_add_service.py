@@ -42,5 +42,4 @@ class ProjectAddService:
         installed = plugin.as_installed()
         self.config_service.add_to_file(installed)
 
-        return plugin_factory(plugin_type,
-                              installed.canonical())
+        return plugin_factory(plugin_type, installed.canonical())

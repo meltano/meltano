@@ -5,11 +5,11 @@ from typing import Iterable, Dict, Tuple, List
 from copy import deepcopy
 from enum import Enum
 
-from meltano.core.utils import nest, find_named, NotFound
+from meltano.core.utils import nest, flatten, find_named, NotFound
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.error import Error
-from . import PluginRef, PluginType, Plugin, PluginInstall, SettingDefinition
+from . import PluginRef, PluginType, Plugin, PluginInstall, SettingDefinition, Profile
 from .error import PluginMissingError
 from .setting import PluginSetting, REDACTED_VALUE
 
@@ -66,7 +66,22 @@ class PluginSettingsService:
 
             nest(config, setting.name, value)
 
-        return config
+        return flatten(config, reducer="dot")
+
+    def as_profile_configs(
+        self, session, plugin: PluginRef, redacted=False
+    ) -> List[Dict]:
+        plugin_install = self.get_install(plugin)
+
+        profiles = []
+        for profile in (Profile.DEFAULT, *plugin_install.profiles):
+            plugin_install.use_profile(profile)
+
+            # set the loaded configuration
+            profile.config = self.as_config(session, plugin_install, redacted=redacted)
+            profiles.append(profile.canonical())
+
+        return profiles
 
     def as_env(
         self, session, plugin: PluginRef, sources: List[PluginSettingValueSource] = None

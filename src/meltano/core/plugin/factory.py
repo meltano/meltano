@@ -24,5 +24,4 @@ def plugin_factory(plugin_type: PluginType, plugin_def: Dict):
     # corresponding `plugin_class` for all the plugins.
     plugin_cls = plugin_class[plugin_type]()
 
-    return plugin_cls(plugin_def.pop("name"),
-                      **plugin_def)
+    return plugin_cls(plugin_def.pop("name"), **plugin_def)

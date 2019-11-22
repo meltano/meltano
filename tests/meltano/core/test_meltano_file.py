@@ -4,10 +4,9 @@ import yaml
 from meltano.core.meltano_file import Canonical, MeltanoFile
 
 
-
 definition = {
     # a, b, …, z
-    chr(ord('a') + i): i if i % 2 else None
+    chr(ord("a") + i): i if i % 2 else None
     for i in range(10)
 }
 
@@ -22,10 +21,7 @@ class TestCanonical:
         assert len(list(subject)) == 5
 
         subject.test = "hello"
-        yaml_definition = "\n".join(
-            f"{k}: {v}"
-            for k,v in iter(subject)
-        )
+        yaml_definition = "\n".join(f"{k}: {v}" for k, v in iter(subject))
 
         assert yaml.dump(subject).strip() == yaml_definition
 
@@ -33,7 +29,9 @@ class TestCanonical:
         nested = Canonical(test="value")
         subject.nested = nested
 
-        assert Canonical.as_canonical(subject)["nested"] == Canonical.as_canonical(nested)
+        assert Canonical.as_canonical(subject)["nested"] == Canonical.as_canonical(
+            nested
+        )
 
 
 class TestMeltanoFile:
