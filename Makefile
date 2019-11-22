@@ -12,14 +12,12 @@
 
 ifdef DOCKER_REGISTRY
 base_image_tag = ${DOCKER_REGISTRY}/meltano/meltano/base
-app_image_tag = ${DOCKER_REGISTRY}/meltano/meltano
+prod_image_tag = ${DOCKER_REGISTRY}/meltano/meltano
 runner_image_tag = ${DOCKER_REGISTRY}/meltano/meltano/runner
-cli_image_tag = ${DOCKER_REGISTRY}/meltano/meltano/runner
 else
 base_image_tag = meltano/meltano/base
-app_image_tag = meltano/meltano
+prod_image_tag = meltano/meltano
 runner_image_tag = meltano/meltano/runner
-cli_image_tag = meltano/meltano/cli
 endif
 
 DOCKER_RUN=docker run -it --rm -v $(shell pwd):/app -w /app
@@ -47,7 +45,7 @@ TO_CLEAN += ./${MELTANO_WEBAPP}/dist
 clean:
 	rm -rf ${TO_CLEAN}
 
-docker_images: base_image prod_image cli_image runner_image
+docker_images: base_image prod_image runner_image
 
 # Docker Image Related
 # ====================
@@ -67,21 +65,15 @@ base_image:
 prod_image: base_image ui
 	docker build \
 		--file docker/prod/Dockerfile \
-		-t $(app_image_tag) \
+		-t $(prod_image_tag) \
 		--build-arg BASE_IMAGE=$(base_image_tag) \
 		.
 
-cli_image:
-	docker build \
-		--file docker/cli/Dockerfile \
-		-t $(cli_image_tag) \
-		.
-
-runner_image: cli_image
+runner_image: prod_image
 	docker build \
 		--file docker/runner/Dockerfile \
 		-t $(runner_image_tag) \
-		--build-arg BASE_IMAGE=$(cli_image_tag) \
+		--build-arg BASE_IMAGE=$(prod_image_tag) \
 	  .
 
 # API Related
