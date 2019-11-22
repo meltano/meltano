@@ -3,7 +3,7 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
 
 include:
-  - "/docker/build-ci.yml"
+  - local: .gitlab/ci/docker.gitlab-ci.yml
   - template: SAST.gitlab-ci.yml
 
 sast:
