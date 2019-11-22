@@ -18,7 +18,6 @@ stages:
   - build-runner
   - publish
   - distribute
-  - review
 
 docs:
   variables:
@@ -191,16 +190,6 @@ digitalocean_marketplace:
       - tags@meltano/meltano
     variables:
       - $CI_COMMIT_TAG =~ /^v*/
-
-.review:
-  image: silvs/kubectl:latest
-  stage: review
-  script:
-    - echo ""
-  only:
-    - branches
-  except:
-    - master
 
 #############
 # Publish   #
