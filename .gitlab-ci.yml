@@ -18,6 +18,9 @@ include:
   - local: .gitlab/ci/publish.gitlab-ci.yml
   - local: .gitlab/ci/distribute.gitlab-ci.yml
   - local: .gitlab/ci/docker.gitlab-ci.yml
+  - local: .gitlab/ci/docker_base.gitlab-ci.yml
+  - local: .gitlab/ci/docker_prod.gitlab-ci.yml
+  - local: .gitlab/ci/docker_runner.gitlab-ci.yml
   - template: SAST.gitlab-ci.yml
 
 sast:

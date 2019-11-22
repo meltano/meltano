@@ -1,0 +1,29 @@
+.build_base:
+  extends: .docker_build
+  stage: build-base
+  variables:
+    DOCKERFILE: docker/base/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/base
+  before_script:
+    - source .gitlab/ci/scripts/docker_build_before_script.sh
+    - export IMAGE_TAG=$BASE_SHA
+
+# the meltano base should only be rebuild when the `requirements.txt` file
+# has a change, and should be inferable from the `BASE_SHA` environment
+# variable
+
+# Manages:
+#  - meltano/meltano/base:<base_sha>
+meltano_base:
+  extends: .build_base
+  only:
+    changes:
+      - docker/base/Dockerfile
+      - requirements.txt
+
+# Manages:
+#  - meltano/meltano/base:<base_sha>
+meltano_base_forks:
+  extends: .build_base
+  except:
+    - branches@meltano/meltano
