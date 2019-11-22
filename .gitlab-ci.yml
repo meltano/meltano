@@ -15,6 +15,7 @@ include:
   - local: .gitlab/ci/global.gitlab-ci.yml
   - local: .gitlab/ci/docs.gitlab-ci.yml
   - local: .gitlab/ci/test.gitlab-ci.yml
+  - local: .gitlab/ci/test_webapp.gitlab-ci.yml
   - local: .gitlab/ci/publish.gitlab-ci.yml
   - local: .gitlab/ci/distribute.gitlab-ci.yml
   - local: .gitlab/ci/docker.gitlab-ci.yml

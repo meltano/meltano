@@ -40,14 +40,6 @@ install_e2e:
     - meltano add loader target-sqlite
     - meltano elt tap-carbon-intensity target-sqlite
 
-test_meltano_ui:
-  stage: test
-  image: node:10.16.2
-  script:
-    - cd src/webapp
-    - yarn
-    # add e2e once ci is wired up for it
-
 .pytest:
   extends: .test
   script:
