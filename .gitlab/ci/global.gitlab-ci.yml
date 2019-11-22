@@ -8,3 +8,11 @@
 .only:master:
   only:
     - master@meltano/meltano
+
+.only:testables:
+  only:
+    refs:
+      - master
+      - /^release-/
+      - tags
+      - merge_requests

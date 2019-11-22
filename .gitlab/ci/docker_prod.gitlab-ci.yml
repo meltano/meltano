@@ -16,9 +16,11 @@
 #  - meltano/meltano:<sha>
 meltano_dev:
   extends: .build_prod
+  only:
+    - branches
+    - merge_requests
   except:
     - master
-    - tags
 
 # Manages:
 #  - meltano/meltano:<sha>

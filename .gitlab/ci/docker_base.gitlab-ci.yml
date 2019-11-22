@@ -17,6 +17,10 @@
 meltano_base:
   extends: .build_base
   only:
+    refs:
+      - branches@meltano/meltano
+      - tags@meltano/meltano
+      - merge_requests@meltano/meltano
     changes:
       - docker/base/Dockerfile
       - requirements.txt
@@ -25,5 +29,11 @@ meltano_base:
 #  - meltano/meltano/base:<base_sha>
 meltano_base_forks:
   extends: .build_base
+  only:
+    - branches
+    - tags
+    - merge_requests
   except:
-    - branches@meltano/meltano
+    - branches@meltano/meltanos
+    - tags@meltano/meltano
+    - merge_requests@meltano/meltano

@@ -1,4 +1,5 @@
 .test:
+  extends: .only:testables
   stage: test
   image:
     name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA

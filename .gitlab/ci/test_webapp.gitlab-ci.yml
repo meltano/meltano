@@ -1,4 +1,5 @@
 test_meltano_ui:
+  extends: .only:testables
   stage: test
   image: node:10.16.2
   script:
