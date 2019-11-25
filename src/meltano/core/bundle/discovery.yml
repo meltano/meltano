@@ -295,7 +295,7 @@ loaders:
 transformers:
   - name: dbt
     namespace: dbt
-    pip_url: dbt
+    pip_url: dbt==0.14.4
 transforms:
   - name: tap-carbon-intensity
     namespace: tap_carbon
