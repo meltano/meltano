@@ -3,9 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
-
 ## Unreleased
+
 ---
 
 ### New
@@ -14,23 +13,23 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1184](https://gitlab.com/meltano/meltano/merge_requests/1184/) Fix `contextualModels` implementation for contextual CTAs in Job Log modal
+
 ### Breaks
 
-
 ## 1.7.0 - (2019-11-25)
+
 ---
 
 ### New
 
 - [#1236](https://gitlab.com/meltano/meltano/issues/1236) Add contextual Analyze CTAs in the Job Log UI
 
-
 ### Fixes
 
 - [#1298](https://gitlab.com/meltano/meltano/issues/1298) Let default entity selection be configured in discovery.yml under `select`
 - [#1298](https://gitlab.com/meltano/meltano/issues/1298) Define default entity selection for tap-salesforce
 - [#1304](https://gitlab.com/meltano/meltano/issues/1304) Fix Meltano subprocess fetching large catalogs (e.g. for Salesforce) getting stuck do to the subprocess' stderr buffer filling and the process getting deadlocked.
-
 
 ## 1.6.0 - (2019-11-18)
 
