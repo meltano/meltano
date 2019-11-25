@@ -36,14 +36,15 @@ export default {
         const extractor = this.relatedPipeline.extractor
         const namespace = this.getInstalledPlugin('extractors', extractor)
           .namespace
-        models = Object.values(this.models).filter(
-          model => model.plugin_namespace === namespace
-        )
+        const filteredModels = {}
+        for (const prop in models) {
+          if (models[prop].plugin_namespace === namespace) {
+            filteredModels[prop] = models[prop]
+          }
+        }
 
         // Fallback to all if no match
-        if (models.length < 1) {
-          models = this.models
-        }
+        models = filteredModels.length < 1 ? this.models : filteredModels
       }
 
       return models
