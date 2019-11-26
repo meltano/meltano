@@ -2,6 +2,12 @@ import axios from 'axios'
 import utils from '@/utils/utils'
 
 export default {
+  deletePipelineSchedule(schedulePayload) {
+    return axios.delete(utils.apiUrl('orchestrations', 'pipeline_schedules'), {
+      data: schedulePayload
+    })
+  },
+
   extract(extractor) {
     return axios.post(utils.apiUrl('orchestrations', `extract/${extractor}`))
   },
