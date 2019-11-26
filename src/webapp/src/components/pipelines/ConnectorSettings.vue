@@ -71,12 +71,11 @@ export default {
       return this.fieldClass || 'is-normal'
     },
     pluginType() {
-      const keywords = this.plugin.name.split('-')
-      const type = keywords[0]
+      const pluginName = this.plugin.name
 
-      if (type === 'tap') {
+      if (pluginName.startsWith('tap')) {
         return 'extractor'
-      } else if (type === 'target') {
+      } else if (pluginName.startsWith('target')) {
         return 'loader'
       } else {
         return 'plugin'
