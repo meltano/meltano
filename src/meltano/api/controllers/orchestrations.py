@@ -198,13 +198,10 @@ def save_pipeline_schedule() -> Response:
     project = Project.find()
     schedule_service = ScheduleService(project)
 
-    try:
-        schedule = schedule_service.add(
-            db.session, name, extractor, loader, transform, interval
-        )
-        return jsonify(schedule._asdict()), 201
-    except ScheduleAlreadyExistsError as e:
-        raise ScheduleAlreadyExistsError(e.schedule)
+    schedule = schedule_service.add(
+        db.session, name, extractor, loader, transform, interval
+    )
+    return jsonify(schedule._asdict()), 201
 
 
 @orchestrationsBP.route("/pipeline_schedules", methods=["DELETE"])
@@ -218,8 +215,5 @@ def delete_pipeline_schedule() -> Response:
     project = Project.find()
     schedule_service = ScheduleService(project)
 
-    try:
-        schedule_service.remove(name)
-        return jsonify(name), 201
-    except ScheduleDoesNotExistError as e:
-        raise ScheduleDoesNotExistError(e.name)
+    schedule_service.remove(name)
+    return jsonify(name), 201
