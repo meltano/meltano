@@ -128,34 +128,30 @@ export default {
           })
           this.$router.push({ name: 'loaders' })
           const message = this.extractorLacksConfigSettings
-            ? `Auto Advance - No Configuration needed for ${
-                this.extractor.name
-              }`
+            ? `Auto Advance - No Configuration needed for ${this.extractor.name}`
             : `Connection Saved - ${this.extractor.name}`
           Vue.toasted.global.success(message)
         })
-        const message = this.extractorLacksConfigSettings
-          ? `Auto Advance - No Configuration needed for ${this.extractor.name}`
-          : `Connection Saved - ${this.extractor.name}`
-        Vue.toasted.global.success(message)
+      const message = this.extractorLacksConfigSettings
+        ? `Auto Advance - No Configuration needed for ${this.extractor.name}`
+        : `Connection Saved - ${this.extractor.name}`
+      Vue.toasted.global.success(message)
     },
     testConnection() {
       this.isTesting = true
+      const invalidMessage = `Invalid Extractor Connection - ${this.extractor.name}`
+      const validMessage = `Valid Extractor Connection - ${this.extractor.name}`
       this.testPluginConfiguration({
         name: this.extractor.name,
         type: 'extractors',
         config: this.localConfiguration.config
       })
-        .then(() =>
-          Vue.toasted.global.success(
-            `Valid Extractor Connection - ${this.extractor.name}`
-          )
-        )
-        .catch(() =>
-          Vue.toasted.global.error(
-            `Invalid Extractor Connection - ${this.extractor.name}`
-          )
-        )
+        .then(response => {
+          const method = response.isSuccess ? 'success' : 'error'
+          const message = response.isSuccess ? validMessage : invalidMessage
+          Vue.toasted.global[method](message)
+        })
+        .catch(() => Vue.toasted.global.error(invalidMessage))
         .finally(() => (this.isTesting = false))
     }
   }

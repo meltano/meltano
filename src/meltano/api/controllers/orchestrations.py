@@ -161,12 +161,11 @@ def test_plugin_configuration(plugin_ref) -> Response:
     plugin = config_service.find_plugin(plugin_ref.name, plugin_ref.type)
     success = False
 
-    async def print_stream(tap_stream) -> bool:
+    async def test_stream(tap_stream) -> bool:
         while not tap_stream.at_eof():
             message = await tap_stream.readline()
             json_dict = json.loads(message)
-            resp = json_dict["type"] == "RECORD"
-            if resp:
+            if json_dict["type"] == "RECORD":
                 return True
         return False
 
@@ -176,7 +175,7 @@ def test_plugin_configuration(plugin_ref) -> Response:
             invoker.plugin_config = config
             invoker.prepare(db.session)
             process = await invoker.invoke_async(stdout=asyncio.subprocess.PIPE)
-            success = await print_stream(process.stdout)
+            success = await test_stream(process.stdout)
             process.kill()
         except Exception as err:
             success = False
@@ -184,10 +183,7 @@ def test_plugin_configuration(plugin_ref) -> Response:
     loop = asyncio.get_event_loop()
     loop.run_until_complete(test_extractor(payload))
 
-    if success:
-        return jsonify({"success": success}), 202
-    else:
-        return jsonify({"success": success}), 404
+    return jsonify({"is_success": success}), 200
 
 
 @orchestrationsBP.route("/pipeline_schedules", methods=["GET"])
