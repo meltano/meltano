@@ -3,12 +3,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
-
 ## Unreleased
+
 ---
 
 ### New
+
+- [#1081](https://gitlab.com/meltano/meltano/issues/1081) Add ability to delete data pipelines
 
 ### Changes
 
@@ -16,14 +17,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Breaks
 
-
 ## 1.7.2 - (2019-11-26)
+
 ---
 
 ### Fixes
 
 - [#1318](https://gitlab.com/meltano/meltano/merge_requests/1318/) Pin dbt version to `v0.14.4` to address Meltano Transformation failing when using dbt `v0.15.0`
-
 
 ## 1.7.1 - (2019-11-25)
 
@@ -32,7 +32,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1184](https://gitlab.com/meltano/meltano/merge_requests/1184/) Fix `contextualModels` implementation for contextual CTAs in Job Log modal
-
 
 ## 1.7.0 - (2019-11-25)
 
@@ -57,7 +56,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1235](https://gitlab.com/meltano/meltano/issues/1235) Add help link button in the app
 - [#1285](https://gitlab.com/meltano/meltano/issues/1285) Add link to YouTube guidelines for release instructions
 - [#1277](https://gitlab.com/meltano/meltano/issues/1277) Move sections that don't apply to outside contributors from Contributing and Roadmap docs to Handbook: Release Process, Release Schedule, Demo Day, Speedruns, DigitalOcean Marketplace
-- [#1081](https://gitlab.com/meltano/meltano/issues/1081) Add ability to delete data pipelines
 
 ### Changes
 
