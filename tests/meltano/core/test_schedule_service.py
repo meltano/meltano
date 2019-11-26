@@ -1,12 +1,12 @@
 import pytest
 from datetime import datetime
-from freezegun import freeze_time
 from unittest import mock
 
 from meltano.core.schedule_service import (
     ScheduleService,
     Schedule,
     ScheduleAlreadyExistsError,
+    ScheduleDoesNotExistError,
     PluginSettingMissingError,
 )
 
@@ -47,6 +47,24 @@ class TestScheduleService:
         # but name must be unique
         with pytest.raises(ScheduleAlreadyExistsError):
             subject.add_schedule(schedules[0])
+
+    def test_remove_schedule(self, subject, create_schedule):
+        schedules_list = list(subject.schedules())
+        assert len(schedules_list) == 10
+
+        idx = 3
+        target_schedule = schedules_list[idx]
+        target_name = f"schedule_{idx}"
+        assert target_schedule.name == target_name
+
+        subject.remove_schedule(target_name)
+        schedules_list = list(subject.schedules())
+        assert len(schedules_list) == 9
+        assert target_schedule not in schedules_list
+
+        # schedule name must exist to be removed
+        with pytest.raises(ScheduleDoesNotExistError):
+            subject.remove_schedule(target_name)
 
     def test_schedule_start_date(self, subject, session, tap, target):
         # curry the `add` method to remove some arguments
