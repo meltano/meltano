@@ -1,7 +1,7 @@
 ---
 home: true
 heroImage: /meltano-logo.svg
-actionText: Get Started
+actionText: Create Meltano Account
 actionLink: https://meltano.typeform.com/to/NJPwxv
 doText: Install on DigitalOcean
 doLink: https://marketplace.digitalocean.com/apps/meltano
