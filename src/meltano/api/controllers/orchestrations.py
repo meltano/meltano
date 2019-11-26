@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import psutil
 
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
 
@@ -159,7 +160,6 @@ def test_plugin_configuration(plugin_ref) -> Response:
     payload = request.get_json()
     config_service = ConfigService(project)
     plugin = config_service.find_plugin(plugin_ref.name, plugin_ref.type)
-    success = False
 
     async def test_stream(tap_stream) -> bool:
         while not tap_stream.at_eof():
@@ -167,21 +167,33 @@ def test_plugin_configuration(plugin_ref) -> Response:
             json_dict = json.loads(message)
             if json_dict["type"] == "RECORD":
                 return True
+
         return False
 
     async def test_extractor(config={}):
         try:
             invoker = invoker_factory(project, plugin, prepare_with_session=db.session)
-            invoker.plugin_config = config
+            # overlay the config on top of the loaded configuration
+            invoker.plugin_config = {
+                **invoker.plugin_config,
+                **PluginSettingsService.unredact(config),  # remove all redacted values
+            }
+
             invoker.prepare(db.session)
             process = await invoker.invoke_async(stdout=asyncio.subprocess.PIPE)
-            success = await test_stream(process.stdout)
-            process.kill()
+            return await test_stream(process.stdout)
         except Exception as err:
-            success = False
+            # if anything happens, this is not successful
+            return False
+        finally:
+            try:
+                if process:
+                    psutil.Process(process.pid).terminate()
+            except Exception as err:
+                logging.debug(err)
 
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(test_extractor(payload))
+    success = loop.run_until_complete(test_extractor(payload))
 
     return jsonify({"is_success": success}), 200
 

@@ -147,11 +147,12 @@ export default {
         config: this.localConfiguration.config
       })
         .then(response => {
-          const method = response.isSuccess ? 'success' : 'error'
-          const message = response.isSuccess ? validMessage : invalidMessage
-          Vue.toasted.global[method](message)
+          if (response.data.isSuccess) {
+            Vue.toasted.global.success(validMessage)
+          } else {
+            Vue.toasted.global.error(invalidMessage)
+          }
         })
-        .catch(() => Vue.toasted.global.error(invalidMessage))
         .finally(() => (this.isTesting = false))
     }
   }
