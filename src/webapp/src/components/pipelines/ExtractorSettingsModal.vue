@@ -177,7 +177,7 @@ export default {
           <div v-if="!isLoadingConfigSettings && isInstalling" class="level">
             <div class="level-item">
               <p class="is-italic">
-                Installing {{ extractorName }} can take up to a minute.
+                Installing {{ extractor.label }} can take up to a minute.
               </p>
             </div>
           </div>
