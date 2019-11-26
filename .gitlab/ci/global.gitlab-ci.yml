@@ -7,4 +7,5 @@
 
 .only:master:
   only:
-    - master@meltano/meltano
+    refs:
+      - master@meltano/meltano
