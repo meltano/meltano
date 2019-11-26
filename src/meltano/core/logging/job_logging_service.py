@@ -2,6 +2,7 @@ import datetime
 import glob
 import logging
 import os
+import shutil
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Union, Optional
@@ -51,7 +52,7 @@ class JobLoggingService:
     def get_latest_log(self, job_id):
         """
         Get the contents of the most recent log for any ELT job
-         that run with the provided job_id
+         that ran with the provided job_id
         """
         try:
             latest_log = next(iter(self.get_all_logs(job_id)))
@@ -68,11 +69,22 @@ class JobLoggingService:
 
     def get_all_logs(self, job_id):
         """
-        Get all the log files for any ELT job that run with the provided job_id
+        Get all the log files for any ELT job that ran with the provided job_id
 
         The result is ordered so that the most recent is first on the list
         """
         log_files = list(self.project.job_dir(job_id).glob("**/*.log"))
-        log_files.sort(key=os.path.getctime, reverse=True)
+        log_files.sort(key=lambda path: os.stat(path).st_ctime_ns, reverse=True)
 
         return log_files
+
+    def delete_all_logs(self, job_id):
+        """
+        Delete all the log files for any ELT job that ran with the provided job_id
+        """
+
+        try:
+            shutil.rmtree(self.project.job_dir(job_id))
+        except OSError:
+            # If there already are no log files for this job_id, we're done.
+            return

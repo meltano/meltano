@@ -2,14 +2,6 @@ image: python:3.6
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
 
-include:
-  - "/docker/build-ci.yml"
-  - template: SAST.gitlab-ci.yml
-
-sast:
-  variables:
-    SAST_EXCLUDED_PATHS: cloud,docker,docs,model,scripts,tests
-
 stages:
   - docs
   - build-base
@@ -18,188 +10,20 @@ stages:
   - build-runner
   - publish
   - distribute
-  - review
 
-docs:
+include:
+  - local: .gitlab/ci/global.gitlab-ci.yml
+  - local: .gitlab/ci/docs.gitlab-ci.yml
+  - local: .gitlab/ci/test.gitlab-ci.yml
+  - local: .gitlab/ci/test_webapp.gitlab-ci.yml
+  - local: .gitlab/ci/publish.gitlab-ci.yml
+  - local: .gitlab/ci/distribute.gitlab-ci.yml
+  - local: .gitlab/ci/docker.gitlab-ci.yml
+  - local: .gitlab/ci/docker_base.gitlab-ci.yml
+  - local: .gitlab/ci/docker_prod.gitlab-ci.yml
+  - local: .gitlab/ci/docker_runner.gitlab-ci.yml
+  - template: SAST.gitlab-ci.yml
+
+sast:
   variables:
-    REMOTE_EXEC: ssh -o StrictHostKeyChecking=no $SSH_USER_DOMAIN -p$SSH_PORT
-  stage: docs
-  image: node:10.16.2
-  cache:
-    paths:
-      - node_modules/
-  before_script:
-    - "which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )"
-    - eval $(ssh-agent -s)
-    - chmod 600 $SSH_PRIVATE_KEY
-    - ssh-add $SSH_PRIVATE_KEY > /dev/null
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-  script:
-    - cd docs
-    - yarn
-    - yarn build:docs
-    - $REMOTE_EXEC "mkdir -p $SSH_BACKUP_DIRECTORY; tar zcvf $SSH_BACKUP_DIRECTORY-$(date +%Y-%m-%dT%H:%M).tar.gz $SSH_DIRECTORY/$SSH_WWW_DIRECTORY"
-    - $REMOTE_EXEC "cd $SSH_DIRECTORY && find ./$SSH_WWW_DIRECTORY -mindepth 1 -maxdepth 1 -not -name blog -not -name '.' -exec rm -rf  '{}' \;"
-    - scp -o stricthostkeychecking=no -P$SSH_PORT -r public/. $SSH_USER_DOMAIN:$SSH_DIRECTORY/$SSH_WWW_DIRECTORY
-  only:
-    - master@meltano/meltano
-
-.test: &test
-  stage: test
-  image:
-    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    entrypoint: [""]
-  before_script:
-    - pip install '.[dev]'
-
-lint:
-  <<: *test
-  before_script:
-    - pip install black
-  script:
-    - make show_lint
-
-install_e2e:
-  <<: *test
-  before_script:
-    - python -m venv venv
-    - python --version
-    - source ./venv/bin/activate
-    - pip install -e .
-  script:
-    - apt-get update
-    - curl -sL https://deb.nodesource.com/setup_10.x | bash -
-    - apt-get -y install nodejs
-    - apt-get -y install gcc g++ make
-    - node -v
-    - npm -v
-    - npm install -g yarn
-    - make bundle
-    - meltano --version
-    - pip list
-    - mkdir -p /home/projects
-    - cd /home/projects
-    - meltano init --no_usage_stats test_project
-    - cd test_project
-    - meltano discover all
-    - meltano add extractor tap-carbon-intensity
-    - meltano add loader target-sqlite
-    - meltano elt tap-carbon-intensity target-sqlite
-
-test_meltano_ui:
-  stage: test
-  image: node:10.16.2
-  script:
-    - cd src/webapp
-    - yarn
-    # add e2e once ci is wired up for it
-
-.pytest: &pytest
-  <<: *test
-  script:
-    - pytest -v --cov-report= --cov meltano
-    - coverage combine .coverage
-    - coverage report
-    - coverage html
-  artifacts:
-    paths:
-      - htmlcov/
-    when: on_success
-
-pytest_postgres:
-  <<: *pytest
-  variables:
-    PYTEST_BACKEND: postgresql
-
-    # `postgres` service configuration
-    POSTGRES_ADDRESS: postgres
-    POSTGRES_PORT: 5432
-    POSTGRES_USER: runner
-    POSTGRES_PASSWORD: ""
-    POSTGRES_DB: pytest_warehouse
-
-    # `target-postgres` configuration
-    PG_ADDRESS: $POSTGRES_ADDRESS
-    PG_PORT: $POSTGRES_PORT
-    PG_USERNAME: $POSTGRES_USER
-    PG_PASSWORD: $POSTGRES_PASSWORD
-    PG_DATABASE: $POSTGRES_DB
-  services:
-    - postgres:11
-
-pytest_sqlite:
-  <<: *pytest
-  variables:
-    PYTEST_BACKEND: sqlite
-
-    # `target-sqlite` configuration
-    SQLITE_DATABASE: pytest_warehouse
-
-publish:
-  image:
-    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
-    entrypoint: [""]
-  stage: publish
-  before_script:
-    - pip install twine
-  script:
-    - twine upload /meltano/dist/*
-  only:
-    refs:
-      - tags@meltano/meltano
-    variables:
-      - $CI_COMMIT_TAG =~ /^v*/
-
-digitalocean_marketplace:
-  image:
-    name: hashicorp/packer
-    entrypoint: [""]
-  stage: distribute
-  script:
-    - cd cloud/packer
-    - packer build marketplace-image.json
-  only:
-    - master@meltano/meltano
-  when: manual
-
-.review:
-  image: silvs/kubectl:latest
-  stage: review
-  script:
-    - echo ""
-  only:
-    - branches
-  except:
-    - master
-
-#############
-# Publish   #
-#############
-
-# registry.gitlab.com/meltano/meltano:<tag> → docker.io/meltano:<tag>
-# registry.gitlab.com/meltano/meltano:latest → docker.io/meltano:latest
-hub_meltano: &docker_hub_publish
-  image: docker:latest
-  stage: publish
-  services:
-    - docker:dind
-  variables:
-    DOCKERFILE: .
-    DOCKER_DRIVER: overlay2
-    IMAGE_NAME: meltano/meltano
-    IMAGE_TAG: $CI_COMMIT_TAG
-    SOURCE_IMAGE: $CI_REGISTRY_IMAGE
-  script:
-    - docker pull $SOURCE_IMAGE:$IMAGE_TAG
-    - docker pull $SOURCE_IMAGE:latest
-    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
-    - docker tag $SOURCE_IMAGE:$IMAGE_TAG $IMAGE_NAME:$IMAGE_TAG
-    - docker tag $SOURCE_IMAGE:latest $IMAGE_NAME:latest
-    - docker push $IMAGE_NAME:$IMAGE_TAG
-    - docker push $IMAGE_NAME:latest
-  only:
-    refs:
-      - tags
-    variables:
-      - $CI_COMMIT_TAG =~ /^v*/
+    SAST_EXCLUDED_PATHS: cloud,docker,docs,model,scripts,tests

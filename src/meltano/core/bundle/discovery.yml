@@ -1,4 +1,4 @@
-version: 4
+version: 5
 extractors:
   - name: tap-carbon-intensity
     description: National Grid ESO's Carbon Emissions Intensity API
@@ -112,7 +112,7 @@ extractors:
       - name: client_secret
         kind: password
       - name: endpoint
-      - name: start_time
+      - name: start_date
         kind: date_iso8601
   - name: tap-mongodb
     description: General purpose, document-based, distributed database
@@ -145,10 +145,14 @@ extractors:
       - properties
       - discover
       - state
+    select:
+      - Lead.*
+      - Contact.*
+      - User.*
+      - OpportunityHistory.*
+      - Account.*
+      - Opportunity.*
     settings:
-      # TODO: remove, should be injected from Meltano
-      - name: client_id
-        label: Client ID
       - name: username
       - name: password
         kind: password
@@ -291,7 +295,7 @@ loaders:
 transformers:
   - name: dbt
     namespace: dbt
-    pip_url: dbt
+    pip_url: dbt==0.14.4
 transforms:
   - name: tap-carbon-intensity
     namespace: tap_carbon

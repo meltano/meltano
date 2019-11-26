@@ -384,6 +384,18 @@ export default {
                 </div>
               </Dropdown>
             </div>
+            <div class="level-item">
+              <a
+                class="button"
+                target="_blank"
+                href="https://meltano.com/docs/getting-help.html"
+              >
+                <span class="icon">
+                  <font-awesome-icon icon="question-circle"></font-awesome-icon>
+                </span>
+                <span>Help</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>

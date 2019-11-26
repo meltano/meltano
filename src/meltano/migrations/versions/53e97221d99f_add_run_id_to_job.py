@@ -7,6 +7,7 @@ Create Date: 2019-10-10 13:12:55.147164
 """
 from alembic import op
 import sqlalchemy as sa
+import sqlalchemy.orm
 import sqlalchemy.types as types
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import UUID
@@ -56,6 +57,7 @@ revision = "53e97221d99f"
 down_revision = "6ef30ab7b8e5"
 branch_labels = None
 depends_on = None
+
 Session = sa.orm.sessionmaker()
 
 

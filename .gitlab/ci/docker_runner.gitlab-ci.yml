@@ -1,0 +1,34 @@
+.build_runner:
+  extends: .docker_build
+  stage: build-runner
+  variables:
+    DOCKERFILE: docker/runner/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
+  script:
+    - source .gitlab/ci/scripts/docker_build_script.sh
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$EXTRA_IMAGE_TAG
+    - docker push $IMAGE_NAME:$EXTRA_IMAGE_TAG
+
+# Manages:
+#   - meltano/meltano/runner:<sha>
+#   - meltano/meltano/runner:edge
+runner_edge:
+  extends:
+    - .build_runner
+    - .only:master
+  variables:
+    EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE:edge"
+    IMAGE_TAG: $CI_COMMIT_SHA
+    EXTRA_IMAGE_TAG: edge
+
+# Manages:
+#   - meltano/meltano/runner:<tag>
+#   - meltano/meltano/runner:latest
+runner:
+  extends:
+    - .build_runner
+    - .only:version-tags
+  variables:
+    EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE"
+    IMAGE_TAG: $CI_COMMIT_TAG
+    EXTRA_IMAGE_TAG: latest

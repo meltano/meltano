@@ -221,6 +221,7 @@ class Plugin(Canonical, PluginRef):
         docs=None,
         description=None,
         capabilities=set(),
+        select=set(),
         **attrs
     ):
         super().__init__(plugin_type, name, **attrs)
@@ -231,7 +232,14 @@ class Plugin(Canonical, PluginRef):
         self.docs = docs
         self.description = description
         self.capabilities = set(capabilities)
+        self.select = set(select)
         self._extras = attrs
 
     def as_installed(self) -> PluginInstall:
-        return PluginInstall(self.type, self.name, pip_url=self.pip_url, **self._extras)
+        return PluginInstall(
+            self.type,
+            self.name,
+            pip_url=self.pip_url,
+            select=self.select,
+            **self._extras
+        )
