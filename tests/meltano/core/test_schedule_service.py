@@ -48,7 +48,7 @@ class TestScheduleService:
         with pytest.raises(ScheduleAlreadyExistsError):
             subject.add_schedule(schedules[0])
 
-    def test_remove_schedule(self, subject, create_schedule):
+    def test_remove_schedule(self, subject):
         schedules_list = list(subject.schedules())
         assert len(schedules_list) == 10
 
