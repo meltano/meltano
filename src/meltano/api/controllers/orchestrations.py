@@ -110,7 +110,7 @@ def run():
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["GET"])
 def get_plugin_configuration(plugin_ref) -> Response:
     """
-    endpoint for getting a plugin's configuration
+    Endpoint for getting a plugin's configuration
     """
     project = Project.find()
     settings = PluginSettingsService(project)
@@ -130,7 +130,7 @@ def get_plugin_configuration(plugin_ref) -> Response:
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["PUT"])
 def save_plugin_configuration(plugin_ref) -> Response:
     """
-    endpoint for persisting a plugin configuration
+    Endpoint for persisting a plugin configuration
     """
     project = Project.find()
     payload = request.get_json()
@@ -153,7 +153,7 @@ def save_plugin_configuration(plugin_ref) -> Response:
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration/test", methods=["POST"])
 def test_plugin_configuration(plugin_ref) -> Response:
     """
-    endpoint for testing a plugin configuration's valid connection
+    Endpoint for testing a plugin configuration's valid connection
     """
     project = Project.find()
     payload = request.get_json()
@@ -189,7 +189,7 @@ def test_plugin_configuration(plugin_ref) -> Response:
 @orchestrationsBP.route("/pipeline_schedules", methods=["GET"])
 def get_pipeline_schedules():
     """
-    endpoint for getting the pipeline schedules
+    Endpoint for getting the pipeline schedules
     """
     project = Project.find()
     schedule_service = ScheduleService(project)
@@ -207,7 +207,7 @@ def get_pipeline_schedules():
 @orchestrationsBP.route("/pipeline_schedules", methods=["POST"])
 def save_pipeline_schedule() -> Response:
     """
-    endpoint for persisting a pipeline schedule
+    Endpoint for persisting a pipeline schedule
     """
     incoming = request.get_json()
     # Airflow requires alphanumeric characters, dashes, dots and underscores exclusively
