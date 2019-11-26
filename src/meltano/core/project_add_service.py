@@ -40,6 +40,4 @@ class ProjectAddService:
     def add(self, plugin_type: PluginType, plugin_name: str, **kwargs) -> PluginInstall:
         plugin = self.discovery_service.find_plugin(plugin_type, plugin_name)
         installed = plugin.as_installed()
-        self.config_service.add_to_file(installed)
-
-        return plugin_factory(plugin_type, installed.canonical())
+        return self.config_service.add_to_file(installed)

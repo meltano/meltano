@@ -74,7 +74,7 @@ class ScheduleService:
     def add_schedule(self, schedule: Schedule):
         with self.project.meltano_update() as meltano:
             # guard if it already exists
-            if any(map(lambda s: s.name == schedule.name, meltano.schedules)):
+            if schedule in meltano.schedules:
                 raise ScheduleAlreadyExistsError(schedule)
 
             meltano.schedules.append(schedule)

@@ -38,14 +38,6 @@ class Schedule(Canonical):
 
 
 class MeltanoFile(Canonical):
-    # __slots__ = [
-    #     "version",
-    #     "plugins",
-    #     "schedules"
-    #     "send_anonymous_usage_stats",
-    #     "project_id",
-    # ]
-
     def __init__(self, **attrs):
         super().__init__(
             version=int(attrs.pop("version", VERSION)),
@@ -56,7 +48,7 @@ class MeltanoFile(Canonical):
             **attrs
         )
 
-    def load_plugins(self, plugins) -> List[PluginInstall]:
+    def load_plugins(self, plugins) -> Canonical:
         """Parse the meltano.yml file and return it as `PluginInstall` instances."""
         plugin_type_plugins = Canonical()
 
@@ -71,5 +63,5 @@ class MeltanoFile(Canonical):
 
         return plugin_type_plugins
 
-    def load_schedules(self, schedules):
+    def load_schedules(self, schedules) -> List[Schedule]:
         return list(map(Schedule.parse, schedules))

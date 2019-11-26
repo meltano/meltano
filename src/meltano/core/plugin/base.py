@@ -24,7 +24,10 @@ yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
 
 
 class Profile(Canonical):
-    pass
+    def __init__(self, name: str = None, label: str = None, config={}):
+        self.name = name
+        self.label = label
+        self.config = config
 
 
 Profile.DEFAULT = Profile(name="default", label="Default")
@@ -119,32 +122,28 @@ class PluginInstall(HookObject, Canonical, PluginRef):
             return False
 
     def get_profile(self, profile_name: str) -> Profile:
-        try:
-            return find_named(self.profiles, profile_name)
-        except NotFound:
-            return Profile.DEFAULT
+        return find_named(self.profiles, profile_name)
 
     def use_profile(self, profile: Profile):
-        try:
-            if profile is None or profile is Profile.DEFAULT:
-                self._current_profile_name = None
-                return
+        if profile is None or profile is Profile.DEFAULT:
+            self._current_profile_name = None
+            return
 
-            # ensure the profile exists
-            find_named(self.profiles, profile.name)
+        # ensure the profile exists
+        find_named(self.profiles, profile.name)
 
-            self._current_profile_name = profile.name
-        except NotFound as err:
-            raise err
-            # raise PluginProfileMissingError(self.name, profile) from err
+        self._current_profile_name = profile.name
 
     @property
     def current_profile(self):
-        return self.get_profile(self.current_profile_name)
+        if self.current_profile_name:
+            return self.get_profile(self.current_profile_name)
+
+        return Profile.DEFAULT
 
     @property
     def current_config(self):
-        if not self.current_profile:
+        if self.current_profile is Profile.DEFAULT:
             return self.config
 
         return find_named(self.profiles, self.current_profile).config
