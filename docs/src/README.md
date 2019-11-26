@@ -1,8 +1,8 @@
 ---
 home: true
 heroImage: /meltano-logo.svg
-actionText: Install Meltano Locally
-actionLink: /docs/installation.html
+actionText: Get Started
+actionLink: https://meltano.typeform.com/to/NJPwxv
 doText: Install on DigitalOcean
 doLink: https://marketplace.digitalocean.com/apps/meltano
 contributeText: Host on DigitalOcean

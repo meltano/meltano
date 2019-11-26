@@ -10,7 +10,6 @@
 
           <p class="action" v-if="data.actionText && data.actionLink && data.contributeLink && data.contributeText">
             <NavLink class="action-button" :item="actionLink" />
-            <NavLink class="action-button secondary" :item="contributeLink" />
           </p>
         </div>
 

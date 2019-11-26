@@ -5,13 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ## Unreleased
 
----
-
 ### New
 
 - [#1081](https://gitlab.com/meltano/meltano/issues/1081) Add ability to delete data pipelines
 
 ### Changes
+- [#1323](https://gitlab.com/meltano/meltano/issues/1323) Add CTA to send users to Typeform to provide info for setting up a hosted dashboard
 
 ### Fixes
 
