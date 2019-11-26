@@ -11,12 +11,7 @@ from meltano.core.schedule_service import (
 )
 
 
-@pytest.fixture
-def subject(schedule_service):
-    return schedule_service
-
-
-@pytest.fixture
+@pytest.fixture(scope="session")
 def create_schedule():
     def make(name, **kwargs):
         attrs = dict(
@@ -35,6 +30,10 @@ def create_schedule():
 
 
 class TestScheduleService:
+    @pytest.fixture()
+    def subject(self, schedule_service):
+        return schedule_service
+
     def test_add_schedule(self, subject, create_schedule):
         COUNT = 10
 
@@ -49,18 +48,21 @@ class TestScheduleService:
             subject.add_schedule(schedules[0])
 
     def test_remove_schedule(self, subject):
-        schedules_list = list(subject.schedules())
-        assert len(schedules_list) == 10
+        schedules = list(subject.schedules())
+        schedules_count = len(schedules)
 
         idx = 3
-        target_schedule = schedules_list[idx]
+        target_schedule = schedules[idx]
         target_name = f"schedule_{idx}"
+
         assert target_schedule.name == target_name
 
         subject.remove_schedule(target_name)
-        schedules_list = list(subject.schedules())
-        assert len(schedules_list) == 9
-        assert target_schedule not in schedules_list
+
+        # make sure one has been removed
+        schedules = list(subject.schedules())
+        assert len(schedules) == schedules_count - 1
+        assert target_schedule not in schedules
 
         # schedule name must exist to be removed
         with pytest.raises(ScheduleDoesNotExistError):
