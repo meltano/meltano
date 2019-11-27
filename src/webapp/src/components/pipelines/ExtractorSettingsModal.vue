@@ -177,7 +177,7 @@ export default {
           <div v-if="!isLoadingConfigSettings && isInstalling" class="level">
             <div class="level-item">
               <p class="is-italic">
-                Installing {{ extractorName }} can take up to a minute.
+                Installing {{ extractor.label }} can take up to a minute.
               </p>
             </div>
           </div>
@@ -189,19 +189,8 @@ export default {
             v-if="!extractorLacksConfigSettings"
             field-class="is-small"
             :config-settings="localConfiguration"
+            :plugin="extractor"
           />
-          <div v-if="extractor.docs" class="content has-text-centered mt1r">
-            <p>
-              View Meltano's
-              <a
-                :href="extractor.docs"
-                target="_blank"
-                class="has-text-underlined"
-                >{{ extractorName }} docs</a
-              >
-              for more info.
-            </p>
-          </div>
         </template>
       </section>
       <footer class="modal-card-foot field is-grouped is-grouped-right">

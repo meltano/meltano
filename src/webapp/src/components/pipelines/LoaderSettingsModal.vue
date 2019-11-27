@@ -129,7 +129,7 @@ export default {
           <div v-if="!isLoadingConfigSettings && isInstalling" class="level">
             <div class="level-item">
               <p class="is-italic">
-                Installing {{ loaderName }} can take up to a minute.
+                Installing {{ loader.label }} can take up to a minute.
               </p>
             </div>
           </div>
@@ -146,16 +146,8 @@ export default {
           <ConnectorSettings
             field-class="is-small"
             :config-settings="localConfiguration"
+            :plugin="loader"
           />
-          <div v-if="loader.docs" class="content has-text-centered mt1r">
-            <p>
-              View Meltano's
-              <a :href="loader.docs" target="_blank" class="has-text-underlined"
-                >{{ loaderName }} docs</a
-              >
-              for more info.
-            </p>
-          </div>
         </template>
       </section>
 

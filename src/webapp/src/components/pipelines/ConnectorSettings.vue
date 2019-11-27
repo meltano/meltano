@@ -19,6 +19,10 @@ export default {
     fieldClass: {
       type: String,
       default: ''
+    },
+    plugin: {
+      type: Object,
+      required: true
     }
   },
   computed: {
@@ -65,6 +69,17 @@ export default {
     },
     labelClass() {
       return this.fieldClass || 'is-normal'
+    },
+    pluginType() {
+      const pluginName = this.plugin.name
+
+      if (pluginName.startsWith('tap')) {
+        return 'extractor'
+      } else if (pluginName.startsWith('target')) {
+        return 'loader'
+      } else {
+        return 'plugin'
+      }
     },
     successClass() {
       return setting => (setting ? 'has-text-success' : null)
@@ -124,18 +139,6 @@ export default {
 <template>
   <div>
     <slot name="top" />
-
-    <div class="content has-text-centered">
-      <em
-        >This configuration is global until we support
-        <a
-          class="has-text-underlined"
-          href="https://gitlab.com/meltano/meltano/issues/764"
-          target="_blank"
-          >Profiles</a
-        >.</em
-      >
-    </div>
 
     <form>
       <div
@@ -240,6 +243,18 @@ export default {
         </div>
       </div>
     </form>
+
+    <slot name="docs">
+      <div v-if="plugin.docs" class="content has-text-centered mt1r">
+        <p>
+          View Meltano's
+          <a :href="plugin.docs" target="_blank" class="has-text-underlined"
+            >{{ plugin.label || plugin.name }} {{ pluginType }} docs</a
+          >
+          for more info.
+        </p>
+      </div>
+    </slot>
 
     <slot name="bottom" />
   </div>
