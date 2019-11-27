@@ -221,6 +221,10 @@ const actions = {
     orchestrationsApi.savePluginConfiguration(configPayload)
   },
 
+  testPluginConfiguration(_, configPayload) {
+    return orchestrationsApi.testPluginConfiguration(configPayload)
+  },
+
   updateRecentELTSelections({ commit }, updatePayload) {
     commit('setELTRecentSelection', updatePayload)
   }

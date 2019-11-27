@@ -46,5 +46,12 @@ export default {
       utils.apiUrl('orchestrations', `${type}/${name}/configuration`),
       config
     )
+  },
+
+  testPluginConfiguration({ type, name, config }) {
+    return axios.post(
+      utils.apiUrl('orchestrations', `${type}/${name}/configuration/test`),
+      config
+    )
   }
 }
