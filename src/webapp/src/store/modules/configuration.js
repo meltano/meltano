@@ -250,9 +250,10 @@ const mutations = {
       const isIso8601Date = setting.kind && setting.kind === 'date_iso8601'
       configuration.profiles.forEach(profile => {
         const isDefaultNeeded =
-          profile.hasOwnProperty(setting.name) && profile[setting.name] === null
+          profile.config.hasOwnProperty(setting.name) &&
+          profile.config[setting.name] === null
         if (isIso8601Date && isDefaultNeeded) {
-          profile[setting.name] = utils.getFirstOfMonthAsIso8601()
+          profile.config[setting.name] = utils.getFirstOfMonthAsIso8601()
         }
       })
     })
