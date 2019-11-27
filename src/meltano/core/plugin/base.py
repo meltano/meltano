@@ -8,6 +8,7 @@ from typing import Optional, Iterable
 
 from meltano.core.behavior.hookable import HookObject
 from meltano.core.behavior.canonical import Canonical
+from meltano.core.behavior import NameEq
 from meltano.core.utils import compact, find_named, NotFound
 
 
@@ -23,7 +24,7 @@ class YAMLEnum(str, Enum):
 yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
 
 
-class Profile(Canonical):
+class Profile(NameEq, Canonical):
     def __init__(self, name: str = None, label: str = None, config={}):
         self.name = name
         self.label = label
@@ -31,6 +32,32 @@ class Profile(Canonical):
 
 
 Profile.DEFAULT = Profile(name="default", label="Default")
+
+
+class SettingDefinition(NameEq, Canonical):
+    def __init__(
+        self,
+        name: str = None,
+        env: str = None,
+        kind: str = None,
+        value=None,
+        label: str = None,
+        documentation: str = None,
+        description: str = None,
+        tooltip: str = None,
+        options: list = [],
+        protected=False,
+    ):
+        super().__init__(
+            name=name,
+            env=env,
+            kind=kind,
+            value=value,
+            label=label,
+            documentation=documentation,
+            description=description,
+            protected=protected,
+        )
 
 
 class PluginType(YAMLEnum):
@@ -80,7 +107,7 @@ class PluginRef:
 
     @property
     def qualified_name(self):
-        parts = (self.type, self.name, self._current_profile_name)
+        parts = (self.type, self.name, self.current_profile_name)
 
         return ".".join(compact(parts))
 
@@ -88,7 +115,7 @@ class PluginRef:
         return self.name == other.name and self.type == other.type
 
     def __hash__(self):
-        return hash((self.type, self.name, self.profile))
+        return hash((self.type, self.name, self.current_profile_name))
 
 
 class PluginInstall(HookObject, Canonical, PluginRef):
@@ -171,38 +198,6 @@ class PluginInstall(HookObject, Canonical, PluginRef):
 
         self.profiles.add(profile)
         return profile
-
-
-class SettingDefinition(Canonical):
-    def __init__(
-        self,
-        name: str = None,
-        env: str = None,
-        kind: str = None,
-        value=None,
-        label: str = None,
-        documentation: str = None,
-        description: str = None,
-        tooltip: str = None,
-        options: list = [],
-        protected=False,
-    ):
-        super().__init__(
-            name=name,
-            env=env,
-            kind=kind,
-            value=value,
-            label=label,
-            documentation=documentation,
-            description=description,
-            protected=protected,
-        )
-
-    def __eq__(self, other):
-        return self.name == other.name
-
-    def __hash__(self):
-        return hash(self.name)
 
 
 class Plugin(Canonical, PluginRef):

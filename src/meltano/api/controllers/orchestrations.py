@@ -162,6 +162,7 @@ def add_plugin_configuration_profile(plugin_ref) -> Response:
     project = Project.find()
     config = ConfigService(project)
     plugin = config.get_plugin(plugin_ref)
+    settings = PluginSettingsService(project)
 
     # create the new profile for this plugin
     profile = plugin.add_profile(
@@ -169,6 +170,10 @@ def add_plugin_configuration_profile(plugin_ref) -> Response:
     )
 
     config.update_plugin(plugin)
+    plugin.use_profile(profile)
+
+    # load the default config for the profile
+    profile.config = freeze_keys(settings.as_config(db.session, plugin, redacted=True))
 
     return jsonify(profile.canonical())
 

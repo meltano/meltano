@@ -154,11 +154,6 @@ export default {
               <a :href="loader.signupUrl" target="_blank">sign up here</a>.
             </p>
           </div>
-          <ConnectorSettingsDropdown
-            :connector="loader"
-            plugin-type="loaders"
-            :config-settings="localConfiguration"
-          ></ConnectorSettingsDropdown>
           <ConnectorSettings
             field-class="is-small"
             :config-settings="localConfiguration"

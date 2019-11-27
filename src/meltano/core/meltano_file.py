@@ -7,12 +7,13 @@ from typing import Iterable, List
 from meltano.core.plugin import PluginInstall
 from meltano.core.plugin.factory import plugin_factory
 from meltano.core.behavior.canonical import Canonical
+from meltano.core.behavior import NameEq
 
 
 VERSION = 1
 
 
-class Schedule(Canonical):
+class Schedule(NameEq, Canonical):
     def __init__(
         self,
         name: str = None,
@@ -32,9 +33,6 @@ class Schedule(Canonical):
         self.interval = interval
         self.start_date = start_date
         self.env = env
-
-    def __eq__(self, other):
-        return self.name == other.name
 
 
 class MeltanoFile(Canonical):

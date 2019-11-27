@@ -5,6 +5,17 @@ from typing import Iterable
 
 
 class Canonical(object):
+    """
+    This class defines an object that can be reprensented as a subset of
+    its attributes.
+
+    Its purpose is to be serializable as the smallest possible form.
+
+    The attribute rules are:
+      - All attributes that are Truthy
+      - All attributes that start with "_" are excluded
+    """
+
     def __init__(self, *args, **attrs):
         super(Canonical, self).__init__(*args)
 
