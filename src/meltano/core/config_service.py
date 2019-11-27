@@ -3,9 +3,9 @@ import yaml
 import logging
 from typing import Dict, List, Optional, Iterable
 
-from meltano.core.utils import nest
+from meltano.core.utils import nest, NotFound
 from .project import Project
-from .plugin import Plugin, PluginInstall, PluginType, PluginRef
+from .plugin import Plugin, PluginInstall, PluginType, PluginRef, Profile
 from .plugin.factory import plugin_factory
 from .plugin.error import PluginMissingError
 
@@ -39,7 +39,7 @@ class ConfigService:
             return False
 
     def find_plugin(self, plugin_name: str, plugin_type: Optional[PluginType] = None):
-        name, profile = PluginRef.parse_name(plugin_name)
+        name, profile_name = PluginRef.parse_name(plugin_name)
         try:
             plugin = next(
                 plugin
@@ -50,7 +50,7 @@ class ConfigService:
                 )
             )
 
-            profile = plugin.get_profile(profile)
+            profile = self.find_plugin_profile(plugin, profile_name)
             plugin.use_profile(profile)
 
             return plugin
@@ -61,12 +61,18 @@ class ConfigService:
         try:
             plugin = next(plugin for plugin in self.plugins() if plugin == plugin_ref)
 
-            profile = plugin.get_profile(plugin_ref.current_profile_name)
+            profile = self.find_plugin_profile(plugin, plugin_ref.current_profile_name)
             plugin.use_profile(profile)
 
             return plugin
         except StopIteration as stop:
             raise PluginMissingError(plugin_ref.name) from stop
+
+    def find_plugin_profile(self, plugin, profile_name) -> Optional[Profile]:
+        try:
+            return plugin.get_profile(profile_name)
+        except NotFound:
+            return Profile.DEFAULT
 
     def get_extractors(self):
         return filter(lambda p: p.type == PluginType.EXTRACTORS, self.plugins())

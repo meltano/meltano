@@ -122,6 +122,9 @@ class PluginInstall(HookObject, Canonical, PluginRef):
             return False
 
     def get_profile(self, profile_name: str) -> Profile:
+        if profile_name == Profile.DEFAULT.name:
+            return Profile.DEFAULT
+
         return find_named(self.profiles, profile_name)
 
     def use_profile(self, profile: Profile):
