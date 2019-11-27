@@ -143,10 +143,6 @@ export default {
             : `Connection Saved - ${this.extractor.name}`
           Vue.toasted.global.success(message)
         })
-      const message = this.extractorLacksConfigSettings
-        ? `Auto Advance - No Configuration needed for ${this.extractor.name}`
-        : `Connection Saved - ${this.extractor.name}`
-      Vue.toasted.global.success(message)
     },
     testConnection() {
       this.isTesting = true
