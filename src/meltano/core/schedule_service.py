@@ -18,6 +18,13 @@ class ScheduleAlreadyExistsError(Exception):
         self.schedule = schedule
 
 
+class ScheduleDoesNotExistError(Exception):
+    """Occurs when a schedule does not exist."""
+
+    def __init__(self, name):
+        self.name = name
+
+
 class ScheduleService:
     def __init__(
         self, project: Project, plugin_settings_service: PluginSettingsService = None
@@ -47,6 +54,9 @@ class ScheduleService:
         )
 
         return self.add_schedule(schedule)
+
+    def remove(self, name):
+        return self.remove_schedule(name)
 
     def default_start_date(self, session, extractor: str) -> datetime:
         """
@@ -80,6 +90,22 @@ class ScheduleService:
             meltano.schedules.append(schedule)
 
         return schedule
+
+    def remove_schedule(self, name: str):
+        with self.project.meltano_update() as meltano:
+            # guard if it doesn't exist
+            target = next(
+                (schedule for schedule in self.schedules() if schedule.name == name),
+                None,
+            )
+            if not target:
+                raise ScheduleDoesNotExistError(name)
+
+            # find the schedules plugin config
+            schedules = nest(meltano, "schedules", value=[])
+            schedules.remove(self.schedule_definition(target))
+
+        return name
 
     def schedules(self):
         return self.project.meltano.schedules

@@ -3,27 +3,27 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
-
 ## Unreleased
----
 
 ### New
 
+- [#1081](https://gitlab.com/meltano/meltano/issues/1081) Add ability to delete data pipelines
+- [#1217](https://gitlab.com/meltano/meltano/issues/1217) Add "Test Connection" button to validate connection settings prior to ELT runs
+
 ### Changes
+- [#1323](https://gitlab.com/meltano/meltano/issues/1323) Add CTA to send users to Typeform to provide info for setting up a hosted dashboard
 
 ### Fixes
 
 ### Breaks
 
-
 ## 1.7.2 - (2019-11-26)
+
 ---
 
 ### Fixes
 
 - [#1318](https://gitlab.com/meltano/meltano/merge_requests/1318/) Pin dbt version to `v0.14.4` to address Meltano Transformation failing when using dbt `v0.15.0`
-
 
 ## 1.7.1 - (2019-11-25)
 
@@ -32,7 +32,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1184](https://gitlab.com/meltano/meltano/merge_requests/1184/) Fix `contextualModels` implementation for contextual CTAs in Job Log modal
-
 
 ## 1.7.0 - (2019-11-25)
 

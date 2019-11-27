@@ -1,13 +1,15 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
+import Vue from 'vue'
 
+import Dropdown from '@/components/generic/Dropdown'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
-
 import utils from '@/utils/utils'
 
 export default {
   name: 'PipelineSchedules',
   components: {
+    Dropdown,
     ScheduleTableHead
   },
   computed: {
@@ -29,6 +31,16 @@ export default {
     this.$store.dispatch('configuration/getAllPipelineSchedules')
   },
   methods: {
+    ...mapActions('configuration', ['deletePipelineSchedule']),
+    deletePipeline(pipeline) {
+      this.deletePipelineSchedule(pipeline)
+        .then(() =>
+          Vue.toasted.global.success(
+            `Pipeline Successfully Removed - ${pipeline.name}`
+          )
+        )
+        .catch(error => Vue.toasted.global.error(error.response.data.code))
+    },
     goToCreatePipeline() {
       this.$router.push({ name: 'createSchedule' })
     },
@@ -170,6 +182,50 @@ export default {
                     :to="{ name: 'model' }"
                     >Model</router-link
                   >
+                  <Dropdown
+                    :button-classes="
+                      `is-small is-danger is-outlined ${
+                        pipeline.isDeleting ? 'is-loading' : ''
+                      }`
+                    "
+                    :disabled="pipeline.isRunning"
+                    :tooltip="{
+                      classes: 'is-tooltip-left',
+                      message: 'Delete this ELT Pipeline'
+                    }"
+                    menu-classes="dropdown-menu-300"
+                    icon-open="trash-alt"
+                    icon-close="caret-up"
+                    is-right-aligned
+                  >
+                    <div class="dropdown-content is-unselectable">
+                      <div class="dropdown-item">
+                        <div class="content">
+                          <p>
+                            Please confirm deletion of pipeline:<br /><em>{{
+                              pipeline.name
+                            }}</em
+                            >.
+                          </p>
+                        </div>
+                        <div class="buttons is-right">
+                          <button
+                            class="button is-text"
+                            data-dropdown-auto-close
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            class="button is-danger"
+                            data-dropdown-auto-close
+                            @click="deletePipeline(pipeline)"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Dropdown>
                 </div>
               </td>
             </tr>

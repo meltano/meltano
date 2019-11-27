@@ -41,6 +41,14 @@ class PluginSettingsService:
             project
         )
 
+    @classmethod
+    def unredact(cls, values: dict) -> Dict:
+        """
+        Removes any redacted values in a dictionary.
+        """
+
+        return {k: v for k, v in values.items() if v != REDACTED_VALUE}
+
     def as_config(
         self,
         session,

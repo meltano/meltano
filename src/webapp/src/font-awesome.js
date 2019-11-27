@@ -37,6 +37,7 @@ import {
   faTable,
   faThLarge,
   faThList,
+  faTrashAlt,
   faUser
 } from '@fortawesome/free-solid-svg-icons'
 import {
@@ -84,6 +85,7 @@ export default {
     library.add(faTable)
     library.add(faThLarge)
     library.add(faThList)
+    library.add(faTrashAlt)
     library.add(faUser)
 
     Vue.component('font-awesome-icon', FontAwesomeIcon)

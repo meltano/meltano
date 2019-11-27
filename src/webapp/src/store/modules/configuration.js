@@ -86,6 +86,19 @@ const actions = {
     })
   },
 
+  deletePipelineSchedule({ commit }, pipeline) {
+    let status = {
+      pipeline,
+      isRunning: pipeline.isRunning,
+      isDeleting: true
+    }
+    commit('setPipelineStatus', status)
+    return orchestrationsApi.deletePipelineSchedule(pipeline).then(() => {
+      commit('setPipelineStatus', Object.assign({ isDeleting: false }, status))
+      commit('deletePipeline', pipeline)
+    })
+  },
+
   getAllPipelineSchedules({ commit, dispatch }) {
     orchestrationsApi.getAllPipelineSchedules().then(response => {
       commit('setPipelines', response.data)
@@ -197,6 +210,10 @@ const actions = {
     orchestrationsApi.savePluginConfiguration(configPayload)
   },
 
+  testPluginConfiguration(_, configPayload) {
+    return orchestrationsApi.testPluginConfiguration(configPayload)
+  },
+
   updateRecentELTSelections({ commit }, updatePayload) {
     commit('setELTRecentSelection', updatePayload)
   }
@@ -205,6 +222,11 @@ const actions = {
 const mutations = {
   addPipelinePoller(state, pipelinePoller) {
     state.pipelinePollers.push(pipelinePoller)
+  },
+
+  deletePipeline(state, pipeline) {
+    const idx = state.pipelines.indexOf(pipeline)
+    state.pipelines.splice(idx, 1)
   },
 
   removePipelinePoller(state, pipelinePoller) {
@@ -237,9 +259,13 @@ const mutations = {
     state[target] = configuration
   },
 
-  setPipelineStatus(_, { pipeline, isRunning, hasError = false }) {
+  setPipelineStatus(
+    _,
+    { pipeline, isRunning, isDeleting = false, hasError = false }
+  ) {
     Vue.set(pipeline, 'isRunning', isRunning)
     Vue.set(pipeline, 'hasError', hasError)
+    Vue.set(pipeline, 'isDeleting', isDeleting)
   },
 
   setPipelineJobId(_, { pipeline, jobId }) {

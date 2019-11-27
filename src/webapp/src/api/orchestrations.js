@@ -9,6 +9,12 @@ export default {
     )
   },
 
+  deletePipelineSchedule(schedulePayload) {
+    return axios.delete(utils.apiUrl('orchestrations', 'pipeline_schedules'), {
+      data: schedulePayload
+    })
+  },
+
   extract(extractor) {
     return axios.post(utils.apiUrl('orchestrations', `extract/${extractor}`))
   },
@@ -46,6 +52,13 @@ export default {
     return axios.put(
       utils.apiUrl('orchestrations', `${type}/${name}/configuration`),
       profiles
+    )
+  },
+
+  testPluginConfiguration({ type, name, config }) {
+    return axios.post(
+      utils.apiUrl('orchestrations', `${type}/${name}/configuration/test`),
+      config
     )
   }
 }

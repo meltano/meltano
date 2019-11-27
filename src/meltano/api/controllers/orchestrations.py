@@ -1,3 +1,5 @@
+import asyncio
+import json
 import logging
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
 
@@ -10,11 +12,16 @@ from meltano.core.plugin.settings_service import (
     PluginSettingValueSource,
 )
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.config_service import ConfigService
-from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExistsError
+from meltano.core.schedule_service import (
+    ScheduleService,
+    ScheduleAlreadyExistsError,
+    ScheduleDoesNotExistError,
+)
 from meltano.core.utils import flatten, iso8601_datetime, slugify
 from meltano.core.logging import JobLoggingService, MissingJobLogException
 from meltano.cli.add import extractor
@@ -35,10 +42,23 @@ def _handle(ex):
         jsonify(
             {
                 "error": True,
-                "code": f"A schedule with the name '{ex.schedule.name}' already exists. Try renaming the schedule.",
+                "code": f"A pipeline with the name '{ex.schedule.name}' already exists. Try renaming the pipeline.",
             }
         ),
         409,
+    )
+
+
+@orchestrationsBP.errorhandler(ScheduleDoesNotExistError)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"A pipeline with the name '{ex.name}' does not exist..",
+            }
+        ),
+        404,
     )
 
 
@@ -156,7 +176,7 @@ def add_plugin_configuration_profile(plugin_ref) -> Response:
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["PUT"])
 def save_plugin_configuration(plugin_ref) -> Response:
     """
-    endpoint for persisting a plugin configuration
+    Endpoint for persisting a plugin configuration
     """
     project = Project.find()
     payload = request.get_json()
@@ -190,10 +210,57 @@ def save_plugin_configuration(plugin_ref) -> Response:
     return jsonify(profiles)
 
 
+@orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration/test", methods=["POST"])
+def test_plugin_configuration(plugin_ref) -> Response:
+    """
+    Endpoint for testing a plugin configuration's valid connection
+    """
+    project = Project.find()
+    payload = request.get_json()
+    config_service = ConfigService(project)
+    plugin = config_service.find_plugin(plugin_ref.name, plugin_ref.type)
+
+    async def test_stream(tap_stream) -> bool:
+        while not tap_stream.at_eof():
+            message = await tap_stream.readline()
+            json_dict = json.loads(message)
+            if json_dict["type"] == "RECORD":
+                return True
+
+        return False
+
+    async def test_extractor(config={}):
+        try:
+            invoker = invoker_factory(project, plugin, prepare_with_session=db.session)
+            # overlay the config on top of the loaded configuration
+            invoker.plugin_config = {
+                **invoker.plugin_config,
+                **PluginSettingsService.unredact(config),  # remove all redacted values
+            }
+
+            invoker.prepare(db.session)
+            process = await invoker.invoke_async(stdout=asyncio.subprocess.PIPE)
+            return await test_stream(process.stdout)
+        except Exception as err:
+            # if anything happens, this is not successful
+            return False
+        finally:
+            try:
+                if process:
+                    psutil.Process(process.pid).terminate()
+            except Exception as err:
+                logging.debug(err)
+
+    loop = asyncio.get_event_loop()
+    success = loop.run_until_complete(test_extractor(payload))
+
+    return jsonify({"is_success": success}), 200
+
+
 @orchestrationsBP.route("/pipeline_schedules", methods=["GET"])
 def get_pipeline_schedules():
     """
-    endpoint for getting the pipeline schedules
+    Endpoint for getting the pipeline schedules
     """
     project = Project.find()
     schedule_service = ScheduleService(project)
@@ -211,7 +278,7 @@ def get_pipeline_schedules():
 @orchestrationsBP.route("/pipeline_schedules", methods=["POST"])
 def save_pipeline_schedule() -> Response:
     """
-    endpoint for persisting a pipeline schedule
+    Endpoint for persisting a pipeline schedule
     """
     incoming = request.get_json()
     # Airflow requires alphanumeric characters, dashes, dots and underscores exclusively
@@ -224,10 +291,22 @@ def save_pipeline_schedule() -> Response:
     project = Project.find()
     schedule_service = ScheduleService(project)
 
-    try:
-        schedule = schedule_service.add(
-            db.session, name, extractor, loader, transform, interval
-        )
-        return jsonify(dict(schedule)), 201
-    except ScheduleAlreadyExistsError as e:
-        raise ScheduleAlreadyExistsError(e.schedule)
+    schedule = schedule_service.add(
+        db.session, name, extractor, loader, transform, interval
+    )
+    return jsonify(dict(schedule)), 201
+
+
+@orchestrationsBP.route("/pipeline_schedules", methods=["DELETE"])
+def delete_pipeline_schedule() -> Response:
+    """
+    endpoint for deleting a pipeline schedule
+    """
+    incoming = request.get_json()
+    name = incoming["name"]
+
+    project = Project.find()
+    schedule_service = ScheduleService(project)
+
+    schedule_service.remove(name)
+    return jsonify(name), 201
