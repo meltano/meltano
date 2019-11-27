@@ -106,7 +106,7 @@ export default {
         .dispatch('configuration/savePluginConfiguration', {
           name: this.loader.name,
           type: 'loaders',
-          config: this.localConfiguration.config
+          profiles: this.localConfiguration.profiles
         })
         .then(() => {
           this.$store.dispatch('configuration/updateRecentELTSelections', {
