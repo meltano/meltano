@@ -139,8 +139,6 @@ export default {
     },
     testConnection() {
       this.isTesting = true
-      const invalidMessage = `Invalid Extractor Connection - ${this.extractor.name}`
-      const validMessage = `Valid Extractor Connection - ${this.extractor.name}`
       this.testPluginConfiguration({
         name: this.extractor.name,
         type: 'extractors',
@@ -148,9 +146,13 @@ export default {
       })
         .then(response => {
           if (response.data.isSuccess) {
-            Vue.toasted.global.success(validMessage)
+            Vue.toasted.global.success(
+              `Valid Extractor Connection - ${this.extractor.name}`
+            )
           } else {
-            Vue.toasted.global.error(invalidMessage)
+            Vue.toasted.global.error(
+              `Invalid Extractor Connection - ${this.extractor.name}`
+            )
           }
         })
         .finally(() => (this.isTesting = false))
