@@ -6,14 +6,12 @@ import lodash from 'lodash'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
-import ConnectorSettingsDropdown from '@/components/pipelines/ConnectorSettingsDropdown'
 
 export default {
   name: 'LoaderSettingsModal',
   components: {
     ConnectorLogo,
-    ConnectorSettings,
-    ConnectorSettingsDropdown
+    ConnectorSettings
   },
   data() {
     return {

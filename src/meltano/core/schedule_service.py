@@ -7,7 +7,7 @@ from .plugin.settings_service import PluginSettingsService, PluginSettingMissing
 from .project import Project
 from .plugin import PluginType, PluginRef
 from .db import project_engine
-from .utils import nest, iso8601_datetime, coerce_datetime
+from .utils import nest, iso8601_datetime, coerce_datetime, find_named, NotFound
 from .meltano_file import Schedule
 
 
@@ -93,17 +93,14 @@ class ScheduleService:
 
     def remove_schedule(self, name: str):
         with self.project.meltano_update() as meltano:
-            # guard if it doesn't exist
-            target = next(
-                (schedule for schedule in self.schedules() if schedule.name == name),
-                None,
-            )
-            if not target:
+            try:
+                # guard if it doesn't exist
+                schedule = find_named(self.schedules(), name)
+            except NotFound:
                 raise ScheduleDoesNotExistError(name)
 
             # find the schedules plugin config
-            schedules = nest(meltano, "schedules", value=[])
-            schedules.remove(self.schedule_definition(target))
+            meltano.schedules.remove(schedule)
 
         return name
 

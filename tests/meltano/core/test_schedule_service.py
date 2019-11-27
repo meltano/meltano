@@ -68,6 +68,8 @@ class TestScheduleService:
         with pytest.raises(ScheduleDoesNotExistError):
             subject.remove_schedule(target_name)
 
+    ConnectorSettingsDropdown
+
     def test_schedule_start_date(self, subject, session, tap, target):
         # curry the `add` method to remove some arguments
         add = lambda name, start_date: subject.add(
