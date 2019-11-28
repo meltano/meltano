@@ -138,10 +138,7 @@ def get_plugin_configuration(plugin_ref) -> Response:
 
     # freeze the `config` keys
     for profile in profiles:
-        if not "config" in profile:
-            continue
-
-        profile["config"] = freeze_keys(profile["config"])
+        profile["config"] = freeze_keys(profile.get("config", {}))
 
     return jsonify(
         {
@@ -213,7 +210,7 @@ def save_plugin_configuration(plugin_ref) -> Response:
 
     # freeze the `config` keys
     for profile in profiles:
-        profile["config"] = freeze_keys(profile["config"])
+        profile["config"] = freeze_keys(profile.get("config", {}))
 
     return jsonify(profiles)
 
