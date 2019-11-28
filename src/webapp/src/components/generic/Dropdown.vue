@@ -132,7 +132,7 @@ export default {
         :disabled="disabled"
         :aria-controls="getHyphenatedLabel"
         aria-haspopup="true"
-        :data-tooltip="this.tooltip.message"
+        :data-tooltip="tooltip.message"
         @click="toggleDropdown"
       >
         <span v-if="label" :class="labelClasses">{{ label }}</span>
