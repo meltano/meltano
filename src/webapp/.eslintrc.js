@@ -21,7 +21,10 @@ module.exports = {
   rules: {
     'brace-style': ['error', '1tbs'],
     curly: ['warn', 'all'],
-    'max-len': ['error', { code: 200, ignoreUrls: true }],
+    'max-len': [
+      'error',
+      { code: 200, ignoreTemplateLiterals: true, ignoreUrls: true }
+    ],
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     // disallow reassignment of function parameters
