@@ -33,7 +33,8 @@ export default {
     contextualModels() {
       let models = this.models
       if (this.relatedPipeline) {
-        const extractor = this.relatedPipeline.extractor
+        // Split based on '@' profiles convention
+        const extractor = this.relatedPipeline.extractor.split('@')[0]
         const namespace = this.getInstalledPlugin('extractors', extractor)
           .namespace
         const filteredModels = {}
@@ -44,7 +45,10 @@ export default {
         }
 
         // Fallback to all if no match
-        models = filteredModels.length < 1 ? this.models : filteredModels
+        models =
+          Object.keys(filteredModels).length === 0
+            ? this.models
+            : filteredModels
       }
 
       return models
