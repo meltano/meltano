@@ -88,6 +88,16 @@ const getters = {
 
   getIsStepTransformsMinimallyValidated(_, getters) {
     return getters.getIsStepLoadersMinimallyValidated
+  },
+
+  getPluginProfiles() {
+    return plugin => {
+      const pluginProfiles = lodash.map(
+        plugin['profiles'],
+        profile => `${plugin.name}@${profile.name}`
+      )
+      return [plugin.name, ...pluginProfiles]
+    }
   }
 }
 

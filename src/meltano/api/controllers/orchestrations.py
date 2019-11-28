@@ -138,6 +138,9 @@ def get_plugin_configuration(plugin_ref) -> Response:
 
     # freeze the `config` keys
     for profile in profiles:
+        if not "config" in profile:
+            continue
+
         profile["config"] = freeze_keys(profile["config"])
 
     return jsonify(
@@ -223,7 +226,10 @@ def test_plugin_configuration(plugin_ref) -> Response:
     project = Project.find()
     payload = request.get_json()
     config_service = ConfigService(project)
-    plugin = config_service.find_plugin(plugin_ref.name, plugin_ref.type)
+    plugin = config_service.get_plugin(plugin_ref)
+
+    # load the correct profile
+    plugin.use_profile(plugin.get_profile(payload.get("profile")))
 
     async def test_stream(tap_stream) -> bool:
         while not tap_stream.at_eof():
@@ -257,7 +263,7 @@ def test_plugin_configuration(plugin_ref) -> Response:
                 logging.debug(err)
 
     loop = asyncio.get_event_loop()
-    success = loop.run_until_complete(test_extractor(payload))
+    success = loop.run_until_complete(test_extractor(payload.get("config")))
 
     return jsonify({"is_success": success}), 200
 

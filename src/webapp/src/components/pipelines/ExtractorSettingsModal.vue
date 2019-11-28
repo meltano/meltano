@@ -30,6 +30,12 @@ export default {
     ...mapGetters('configuration', ['getHasValidConfigSettings']),
     ...mapState('configuration', ['extractorInFocusConfiguration']),
     ...mapState('plugins', ['installedPlugins']),
+
+    currentProfile() {
+      return this.localConfiguration.profiles[
+        this.localConfiguration.profileInFocusIndex
+      ]
+    },
     extractorLacksConfigSettings() {
       return (
         this.localConfiguration.settings &&
@@ -146,10 +152,14 @@ export default {
     },
     testConnection() {
       this.isTesting = true
+
       this.testPluginConfiguration({
         name: this.extractor.name,
         type: 'extractors',
-        config: this.localConfiguration.config
+        payload: {
+          profile: this.currentProfile.name,
+          config: this.currentProfile.config
+        }
       })
         .then(response => {
           if (response.data.isSuccess) {

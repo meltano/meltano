@@ -34,7 +34,10 @@ export default {
   },
   computed: {
     ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
-    ...mapGetters('plugins', ['getHasInstalledPluginsOfType']),
+    ...mapGetters('plugins', [
+      'getHasInstalledPluginsOfType',
+      'getPluginProfiles'
+    ]),
     ...mapState('plugins', ['installedPlugins']),
     isSaveable() {
       const hasOwns = []
@@ -42,20 +45,16 @@ export default {
       return hasOwns.find(val => val === '' || val === null) === undefined
     },
     availableExtractors() {
-      var extractors = []
-
-      for (var extractor_idx in this.installedPlugins.extractors) {
-        const extractor = this.installedPlugins.extractors[extractor_idx]
-        extractors.push(extractor.name)
-
-        for (var profile_idx in extractor['profiles']) {
-          const profile = extractor.profiles[profile_idx]
-
-          extractors.push(`${extractor.name}@${profile.name}`)
-        }
-      }
-
-      return extractors
+      return _(this.installedPlugins.extractors)
+        .map(this.getPluginProfiles)
+        .flatten()
+        .value()
+    },
+    availableLoaders() {
+      return _(this.installedPlugins.loaders)
+        .map(this.getPluginProfiles)
+        .flatten()
+        .value()
     }
   },
   created() {
@@ -182,9 +181,9 @@ export default {
                       :disabled="!getHasInstalledPluginsOfType('loaders')"
                     >
                       <option
-                        v-for="loader in installedPlugins.loaders"
-                        :key="loader.name"
-                        >{{ loader.name }}</option
+                        v-for="loader in availableLoaders"
+                        :key="loader"
+                        >{{ loader }}</option
                       >
                     </select>
                   </span>

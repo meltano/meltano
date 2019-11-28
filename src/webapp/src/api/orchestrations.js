@@ -55,10 +55,10 @@ export default {
     )
   },
 
-  testPluginConfiguration({ type, name, config }) {
+  testPluginConfiguration({ type, name, payload }) {
     return axios.post(
       utils.apiUrl('orchestrations', `${type}/${name}/configuration/test`),
-      config
+      payload
     )
   }
 }

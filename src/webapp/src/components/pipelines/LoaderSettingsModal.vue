@@ -6,12 +6,14 @@ import lodash from 'lodash'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
+import ConnectorSettingsDropdown from '@/components/pipelines/ConnectorSettingsDropdown'
 
 export default {
   name: 'LoaderSettingsModal',
   components: {
     ConnectorLogo,
-    ConnectorSettings
+    ConnectorSettings,
+    ConnectorSettingsDropdown
   },
   data() {
     return {
@@ -22,7 +24,8 @@ export default {
     ...mapGetters('plugins', [
       'getInstalledPlugin',
       'getIsPluginInstalled',
-      'getIsInstallingPlugin'
+      'getIsInstallingPlugin',
+      'getPluginProfiles'
     ]),
     ...mapGetters('configuration', ['getHasValidConfigSettings']),
     ...mapState('configuration', ['loaderInFocusConfiguration']),
@@ -152,6 +155,11 @@ export default {
               <a :href="loader.signupUrl" target="_blank">sign up here</a>.
             </p>
           </div>
+          <ConnectorSettingsDropdown
+            :connector="loader"
+            plugin-type="loaders"
+            :config-settings="localConfiguration"
+          ></ConnectorSettingsDropdown>
           <ConnectorSettings
             field-class="is-small"
             :config-settings="localConfiguration"
