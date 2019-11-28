@@ -58,7 +58,7 @@ export default {
       )
     },
     isSaveable() {
-      if (this.isLoadingConfigSettings) {
+      if (this.isInstalling || this.isLoadingConfigSettings) {
         return
       }
       const configSettings = {
