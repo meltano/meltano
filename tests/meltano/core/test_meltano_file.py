@@ -25,6 +25,11 @@ class TestCanonical:
 
         assert yaml.dump(subject).strip() == yaml_definition
 
+    def test_false(self, subject):
+        subject.false_value = False
+
+        assert subject.canonical()["false_value"] is False
+
     def test_nested(self, subject):
         nested = Canonical(test="value")
         subject.nested = nested
