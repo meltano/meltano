@@ -4,4 +4,6 @@ proxy / localhost:5000 {
   transparent
 }
 
+basicauth /static/js meltano htpasswd=/etc/caddy/htpasswd
+
 tls admin@meltano.com
