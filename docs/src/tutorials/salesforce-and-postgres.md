@@ -25,7 +25,7 @@ Open your Meltano instance and click "Pipelines" in the top navigation bar. You 
 
 Let's install `tap-salesforce` by clicking on the `Install` button inside its card. 
 
-On the configuration modal we want to enter your username and password, the Security Token Salesforce extractor will use to connect to Salesforce, and the Start Date we want the extracted data set to start from.
+On the configuration modal enter your username and password, the Security Token Salesforce extractor will use to connect to Salesforce, and the Start Date you want the extracted data set to start from.
 
 ![Screenshot of Salesforce Extractor Configuration](/images/salesforce-tutorial/02-salesforce-configuration.png)
 
@@ -71,7 +71,7 @@ You should see a spinning icon that indicates that the pipeline is not completed
 
 ![Screenshot of run log of a completed pipeline for Salesforce Extractor](/images/salesforce-tutorial/04-salesforce-log-of-completed-pipeline.png)
 
-Now that you have connected to Salesforce, configured the Postgres Loader, and run a successful pipeline for the dataset, we are now ready to analyze the data!
+Now that you have connected to Salesforce, configured the Postgres Loader, and run a successful pipeline for the dataset, you are now ready to analyze the data!
 
 Click the Analyze button on the bottom right of the log modal and then select the option provided for the Salesforce Model.
 
@@ -100,7 +100,7 @@ And with that, the big moment is upon us, it's time to click `Run` to run our qu
 
 ![Screenshot of bar graph for Salesforce Opportunities data](/images/salesforce-tutorial/07-salesforce-opportunities-bar-graph.png)
 
-You should now see a bar chart visualization and a table below to see the data in detail!
+You should now see a bar chart visualization and a table below to see the data in detail.
 
 Let's order the data by Average Amount descending:
 
