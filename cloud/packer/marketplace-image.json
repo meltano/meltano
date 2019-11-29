@@ -35,6 +35,8 @@
       "type": "shell",
       "scripts": [
         "scripts/01-meltano.sh",
+        "scripts/02-caddy.sh",
+        "scripts/03-vsftpd.sh",
         "scripts/90-cleanup.sh",
         "scripts/99-img_check.sh"
       ]

@@ -18,6 +18,8 @@ ulimit -n 8192
 
 *** DigitalOcean PostgreSQL 1vCPU 25GB
 
+**** TODO With DigitalOcean API
+
 * TODO Meltano
 
 ** DONE Create the instance
@@ -57,7 +59,10 @@ tls admin@meltano.com
 # run caddy
 caddy -conf /path/to/Caddyfile
 
-*** TODO Make a systemd unit for caddy
+*** DONE Make a systemd unit for caddy
+
+https://github.com/caddyserver/caddy/tree/master/dist/init/linux-systemd
+
 
 ** DONE Local testing
 
@@ -75,11 +80,7 @@ tls self_signed
 ```
 
 ** TODO Setup Gitlab models
-
-
-
 ** TODO Setup Google Analytics models
-
 ** TODO Setup Orchestration (daily runs)
 
 
