@@ -41,7 +41,7 @@ class MeltanoFile(Canonical):
             version=int(attrs.pop("version", VERSION)),
             plugins=self.load_plugins(attrs.pop("plugins", {})),
             schedules=self.load_schedules(attrs.pop("schedules", [])),
-            send_anonymous_usage_stats=attrs.pop("send_anonymous_usage_stats", True),
+            send_anonymous_usage_stats=attrs.pop("send_anonymous_usage_stats", None),
             project_id=attrs.pop("project_id", None),
             **attrs
         )
