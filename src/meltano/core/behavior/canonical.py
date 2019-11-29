@@ -13,6 +13,7 @@ class Canonical(object):
 
     The attribute rules are:
       - All attributes that are Truthy
+      - All attributes that are boolean (False is valid)
       - All attributes that start with "_" are excluded
     """
 
@@ -59,7 +60,8 @@ class Canonical(object):
             if k.startswith("_"):
                 continue
 
-            if not v:
+            # bool values are valid and should be forwarded
+            if v is not False and not v:
                 continue
 
             yield (k, v)
