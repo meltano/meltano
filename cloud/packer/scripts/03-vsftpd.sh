@@ -4,7 +4,7 @@
 # a connection to the Meltano Project using FTP
 
 # install `vsftpd`
-sudo apt-get install -qqy vsftpd
+sudo apt-get install -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' vsftpd
 
 sudo useradd \
   -g meltano --no-user-group \
