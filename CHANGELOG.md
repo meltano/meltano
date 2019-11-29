@@ -15,8 +15,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 - [#1323](https://gitlab.com/meltano/meltano/issues/1323) Add CTA to send users to Typeform to provide info for setting up a hosted dashboard
-
 - [#1271](https://gitlab.com/meltano/meltano/issues/1271) Improve messaging on tap and target settings modals
+- [#1246](https://gitlab.com/meltano/meltano/issues/1246) Update the [Salesforce API + Postgres](https://www.meltano.com/tutorials/salesforce-and-postgres.html) Tutorial to use Meltano UI for setting up the Extractor and Loader, running the ELT pipeline and analyzing the results.
 
 ### Fixes
 
