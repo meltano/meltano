@@ -154,22 +154,22 @@ def add_transform(project: Project, plugin_name: str):
         project_add_service = ProjectAddService(project)
         plugin = project_add_service.add(PluginType.TRANSFORMS, plugin_name)
         click.secho(
-            f"Added transform '{plugin_name}' to your Meltano project.", fg="green"
+            f"Added transform '{plugin.name}' to your Meltano project.", fg="green"
         )
 
         # Add repo to my-test-project/transform/packages.yml
         transform_add_service = TransformAddService(project)
         transform_add_service.add_to_packages(plugin)
         click.secho(
-            f"Added transform '{plugin_name}' to your dbt packages.", fg="green"
+            f"Added transform '{plugin.name}' to your dbt packages.", fg="green"
         )
 
         # Add model and vars to my-test-project/transform/dbt_project.yml
         transform_add_service.update_dbt_project(plugin)
         click.secho(
-            f"Added transform '{plugin_name}' to your dbt_project.yml.", fg="green"
+            f"Added transform '{plugin.name}' to your dbt_project.yml.", fg="green"
         )
-        click.secho(f"Installed '{plugin_name}'.", fg="green")
+        click.secho(f"Installed '{plugin.name}'.", fg="green")
     except (PluginNotSupportedException, PluginNotFoundError):
         click.secho(f"Error: transform '{plugin_name}' is not supported.", fg="red")
         raise click.Abort()
