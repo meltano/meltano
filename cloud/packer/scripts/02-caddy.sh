@@ -1,7 +1,11 @@
 #!/bin/bash
 
 # make sure the bundled installed binary is executable
-chmod +x /usr/local/bin/caddy
+sudo chmod +x /usr/local/bin/caddy
+
+# create the SSL store
+sudo mkdir -p /etc/ssl/caddy
+sudo chown www-data:www-data /etc/ssl/caddy
 
 # enable Caddy to bind privileged ports
 sudo setcap 'cap_net_bind_service=+ep' /usr/local/bin/caddy

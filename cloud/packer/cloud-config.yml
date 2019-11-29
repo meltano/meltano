@@ -4,3 +4,7 @@ users:
   - name: meltano
     system: true
     homedir: /var/meltano
+write-files:
+  - path: /etc/caddy/environment
+    content: |
+      HOSTNAME=$HOSTNAME.meltanodata.com
