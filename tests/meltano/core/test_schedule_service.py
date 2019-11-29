@@ -41,7 +41,7 @@ class TestScheduleService:
         for schedule in schedules:
             subject.add_schedule(schedule)
 
-        assert list(subject.schedules()) == schedules
+        assert subject.schedules() == schedules
 
         # but name must be unique
         with pytest.raises(ScheduleAlreadyExistsError):

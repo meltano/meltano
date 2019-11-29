@@ -7,7 +7,8 @@ from .plugin.settings_service import PluginSettingsService, PluginSettingMissing
 from .project import Project
 from .plugin import PluginType, PluginRef
 from .db import project_engine
-from .utils import nest, iso8601_datetime, coerce_datetime
+from .utils import nest, iso8601_datetime, coerce_datetime, find_named, NotFound
+from .meltano_file import Schedule
 
 
 class ScheduleAlreadyExistsError(Exception):
@@ -22,12 +23,6 @@ class ScheduleDoesNotExistError(Exception):
 
     def __init__(self, name):
         self.name = name
-
-
-Schedule = namedtuple(
-    "Schedule",
-    ("name", "extractor", "loader", "transform", "interval", "start_date", "env"),
-)
 
 
 class ScheduleService:
@@ -53,6 +48,7 @@ class ScheduleService:
         start_date = coerce_datetime(start_date) or self.default_start_date(
             session, extractor
         )
+
         schedule = Schedule(
             name, extractor, loader, transform, interval, start_date, env=env
         )
@@ -88,42 +84,25 @@ class ScheduleService:
     def add_schedule(self, schedule: Schedule):
         with self.project.meltano_update() as meltano:
             # guard if it already exists
-            if any(map(lambda s: s.name == schedule.name, self.schedules())):
+            if schedule in meltano.schedules:
                 raise ScheduleAlreadyExistsError(schedule)
 
-            # find the schedules plugin config
-            schedules = nest(meltano, "schedules", value=[])
-            schedules.append(self.schedule_definition(schedule))
+            meltano.schedules.append(schedule)
 
         return schedule
 
     def remove_schedule(self, name: str):
         with self.project.meltano_update() as meltano:
-            # guard if it doesn't exist
-            target = next(
-                (schedule for schedule in self.schedules() if schedule.name == name),
-                None,
-            )
-            if not target:
+            try:
+                # guard if it doesn't exist
+                schedule = find_named(self.schedules(), name)
+            except NotFound:
                 raise ScheduleDoesNotExistError(name)
 
             # find the schedules plugin config
-            schedules = nest(meltano, "schedules", value=[])
-            schedules.remove(self.schedule_definition(target))
+            meltano.schedules.remove(schedule)
 
         return name
 
     def schedules(self):
-        return (
-            self.yaml_schedule(schedule_def)
-            for schedule_def in self.project.meltano.get("schedules", [])
-        )
-
-    @classmethod
-    def schedule_definition(cls, schedule: Schedule) -> dict:
-        definition = schedule._asdict()
-        return dict(definition)
-
-    @classmethod
-    def yaml_schedule(cls, schedule_definition: dict) -> Schedule:
-        return Schedule(**schedule_definition)
+        return self.project.meltano.schedules

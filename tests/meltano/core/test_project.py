@@ -22,7 +22,8 @@ def update(payload):
     project = Project.find()
 
     with project.meltano_update() as meltano:
-        meltano.update(payload)
+        for k, v in payload.items():
+            setattr(meltano, k, v)
 
 
 class IndefiniteThread(threading.Thread):
@@ -91,7 +92,7 @@ class TestProject:
 
     @pytest.mark.concurrent
     def test_meltano_concurrency(self, project, concurrency):
-        payloads = [{f"test_{i}": i} for i in range(concurrency["cases"])]
+        payloads = [{f"test_{i}": i} for i in range(1, concurrency["cases"] + 1)]
 
         reader = ProjectReader(project)
         reader.start()

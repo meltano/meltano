@@ -1,12 +1,11 @@
 import asyncio
 import json
 import logging
-import psutil
-
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
 
 from meltano.core.job import JobFinder, State
-from meltano.core.plugin import PluginRef
+from meltano.core.behavior.canonical import Canonical
+from meltano.core.plugin import PluginRef, Profile
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin.settings_service import (
     PluginSettingsService,
@@ -128,21 +127,55 @@ def run():
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["GET"])
 def get_plugin_configuration(plugin_ref) -> Response:
     """
-    Endpoint for getting a plugin's configuration
+    Endpoint for getting a plugin's configuration profiles
     """
+
     project = Project.find()
     settings = PluginSettingsService(project)
-    config = flatten(
-        settings.as_config(db.session, plugin_ref, redacted=True), reducer="dot"
-    )
+    plugin = ConfigService(project).get_plugin(plugin_ref)
+
+    profiles = settings.as_profile_configs(db.session, plugin, redacted=True)
+
+    # freeze the `config` keys
+    for profile in profiles:
+        profile["config"] = freeze_keys(profile.get("config", {}))
 
     return jsonify(
         {
             # freeze the keys because they are used for lookups
-            "config": freeze_keys(config),
-            "settings": settings.get_definition(plugin_ref).settings,
+            "profiles": profiles,
+            "settings": Canonical.as_canonical(
+                settings.get_definition(plugin).settings
+            ),
         }
     )
+
+
+@orchestrationsBP.route(
+    "/<plugin_ref:plugin_ref>/configuration/profiles", methods=["POST"]
+)
+def add_plugin_configuration_profile(plugin_ref) -> Response:
+    """
+    Endpoint for adding a configuration profile to a plugin
+    """
+    payload = request.get_json()
+    project = Project.find()
+    config = ConfigService(project)
+    plugin = config.get_plugin(plugin_ref)
+    settings = PluginSettingsService(project)
+
+    # create the new profile for this plugin
+    profile = plugin.add_profile(
+        slugify(payload["name"]), config=payload["config"], label=payload["name"]
+    )
+
+    config.update_plugin(plugin)
+    plugin.use_profile(profile)
+
+    # load the default config for the profile
+    profile.config = freeze_keys(settings.as_config(db.session, plugin, redacted=True))
+
+    return jsonify(profile.canonical())
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["PUT"])
@@ -152,20 +185,34 @@ def save_plugin_configuration(plugin_ref) -> Response:
     """
     project = Project.find()
     payload = request.get_json()
+    plugin = ConfigService(project).get_plugin(plugin_ref)
+
+    # TODO iterate pipelines and save each, also set this connector's profile (reuse `pipelineInFocusIndex`?)
 
     settings = PluginSettingsService(project)
-    for name, value in payload.items():
-        # we want to prevent the edition of protected settings from the UI
-        if settings.find_setting(plugin_ref, name).get("protected"):
-            logging.warning("Cannot set a 'protected' configuration externally.")
-            continue
 
-        if value == "":
-            settings.unset(db.session, plugin_ref, name)
-        else:
-            settings.set(db.session, plugin_ref, name, value)
+    for profile in payload:
+        # select the correct profile
+        plugin.use_profile(plugin.get_profile(profile["name"]))
 
-    return jsonify(settings.as_config(db.session, plugin_ref, redacted=True))
+        for name, value in profile["config"].items():
+            # we want to prevent the edition of protected settings from the UI
+            if settings.find_setting(plugin, name).protected:
+                logging.warning("Cannot set a 'protected' configuration externally.")
+                continue
+
+            if value == "":
+                settings.unset(db.session, plugin, name)
+            else:
+                settings.set(db.session, plugin, name, value)
+
+    profiles = settings.as_profile_configs(db.session, plugin, redacted=True)
+
+    # freeze the `config` keys
+    for profile in profiles:
+        profile["config"] = freeze_keys(profile.get("config", {}))
+
+    return jsonify(profiles)
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration/test", methods=["POST"])
@@ -176,7 +223,10 @@ def test_plugin_configuration(plugin_ref) -> Response:
     project = Project.find()
     payload = request.get_json()
     config_service = ConfigService(project)
-    plugin = config_service.find_plugin(plugin_ref.name, plugin_ref.type)
+    plugin = config_service.get_plugin(plugin_ref)
+
+    # load the correct profile
+    plugin.use_profile(plugin.get_profile(payload.get("profile")))
 
     async def test_stream(tap_stream) -> bool:
         while not tap_stream.at_eof():
@@ -210,7 +260,7 @@ def test_plugin_configuration(plugin_ref) -> Response:
                 logging.debug(err)
 
     loop = asyncio.get_event_loop()
-    success = loop.run_until_complete(test_extractor(payload))
+    success = loop.run_until_complete(test_extractor(payload.get("config")))
 
     return jsonify({"is_success": success}), 200
 
@@ -222,7 +272,7 @@ def get_pipeline_schedules():
     """
     project = Project.find()
     schedule_service = ScheduleService(project)
-    schedules = [s._asdict() for s in schedule_service.schedules()]
+    schedules = list(map(dict, schedule_service.schedules()))
     for schedule in schedules:
         finder = JobFinder(schedule["name"])
         state_job = finder.latest(db.session)
@@ -252,7 +302,7 @@ def save_pipeline_schedule() -> Response:
     schedule = schedule_service.add(
         db.session, name, extractor, loader, transform, interval
     )
-    return jsonify(schedule._asdict()), 201
+    return jsonify(dict(schedule)), 201
 
 
 @orchestrationsBP.route("/pipeline_schedules", methods=["DELETE"])

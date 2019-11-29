@@ -2,6 +2,13 @@ import axios from 'axios'
 import utils from '@/utils/utils'
 
 export default {
+  addConfigurationProfile({ type, name, profile }) {
+    return axios.post(
+      utils.apiUrl('orchestrations', `${type}/${name}/configuration/profiles`),
+      profile
+    )
+  },
+
   deletePipelineSchedule(schedulePayload) {
     return axios.delete(utils.apiUrl('orchestrations', 'pipeline_schedules'), {
       data: schedulePayload
@@ -41,17 +48,17 @@ export default {
     )
   },
 
-  savePluginConfiguration({ type, name, config }) {
+  savePluginConfiguration({ type, name, profiles }) {
     return axios.put(
       utils.apiUrl('orchestrations', `${type}/${name}/configuration`),
-      config
+      profiles
     )
   },
 
-  testPluginConfiguration({ type, name, config }) {
+  testPluginConfiguration({ type, name, payload }) {
     return axios.post(
       utils.apiUrl('orchestrations', `${type}/${name}/configuration/test`),
-      config
+      payload
     )
   }
 }

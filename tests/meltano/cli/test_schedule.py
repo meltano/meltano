@@ -32,8 +32,7 @@ class TestCliSchedule:
         )
 
         assert_cli_runner(res)
-
-        schedule = next(schedule_service.schedules())
+        schedule = schedule_service.schedules()[0]
 
         assert schedule.name == "schedule-mock"
         assert schedule.extractor == "tap-mock"

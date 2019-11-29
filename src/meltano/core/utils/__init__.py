@@ -14,6 +14,13 @@ from pathlib import Path
 TRUTHY = ("true", "1", "yes", "on")
 
 
+class NotFound(Exception):
+    """Occurs when an element is not found."""
+
+    def __init__(self, name):
+        super().__init__(f"{name} was not found.")
+
+
 # from https://github.com/jonathanj/compose/blob/master/compose.py
 def compose(*fs):
     """
@@ -192,7 +199,10 @@ def iso8601_datetime(d: str) -> Optional[datetime]:
 
 
 def find_named(xs: Iterable[dict], name: str):
-    return next(x for x in xs if x["name"] == name)
+    try:
+        return next(x for x in xs if x["name"] == name)
+    except StopIteration as stop:
+        raise NotFound(name)
 
 
 def makedirs(func):

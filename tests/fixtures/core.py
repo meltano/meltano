@@ -7,6 +7,7 @@ from pathlib import Path
 
 import meltano.core.bundle
 from meltano.core.project import Project
+from meltano.core.behavior.canonical import Canonical
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.plugin_install_service import PluginInstallService
@@ -17,6 +18,7 @@ from meltano.core.config_service import ConfigService
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.plugin import PluginRef, PluginType, PluginInstall
+from meltano.core.plugin.factory import plugin_factory
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.logging.job_logging_service import JobLoggingService
 
@@ -208,7 +210,7 @@ def project(test_dir, project_init_service):
 
     # empty out the `plugins`
     with project.meltano_update() as meltano:
-        meltano["plugins"] = {}
+        meltano.plugins = Canonical()
 
     # not setting the project as default to limit
     # the side effect in tests

@@ -15,6 +15,7 @@ from atomicwrites import atomic_write
 from .error import Error
 from .behavior.versioned import Versioned
 from .utils import makedirs, slugify
+from .meltano_file import MeltanoFile
 
 
 class ProjectNotFound(Error):
@@ -66,7 +67,7 @@ class Project(Versioned):
 
     @property
     def backend_version(self):
-        return int(self.meltano.get("version", 1))
+        return self.meltano.version
 
     @classmethod
     @fasteners.locked(lock="_find_lock")
@@ -92,7 +93,7 @@ class Project(Versioned):
         # fmt: off
         with self._meltano_rw_lock.read_lock(), \
              self.meltanofile.open() as meltanofile:
-            return yaml.safe_load(meltanofile)
+            return MeltanoFile.parse(yaml.safe_load(meltanofile))
         # fmt: on
 
     @contextmanager
@@ -107,7 +108,7 @@ class Project(Versioned):
 
             with self.meltanofile.open() as meltanofile:
                 # read the latest version
-                meltano_update = yaml.safe_load(meltanofile)
+                meltano_update = MeltanoFile.parse(yaml.safe_load(meltanofile))
 
             yield meltano_update
 

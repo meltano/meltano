@@ -1,5 +1,6 @@
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import lodash from 'lodash'
 import Vue from 'vue'
 
 import capitalize from '@/filters/capitalize'
@@ -61,8 +62,16 @@ export default {
       'resultsCount',
       'showJoinColumnAggregateHeader'
     ]),
+    ...mapGetters('plugins', ['getPluginProfiles']),
     ...mapState('dashboards', ['dashboards']),
     ...mapState('plugins', ['installedPlugins']),
+
+    availableLoaders() {
+      return lodash(this.installedPlugins.loaders)
+        .map(this.getPluginProfiles)
+        .flatten()
+        .value()
+    },
 
     canToggleTimeframe() {
       return !this.isLoaderSqlite
@@ -439,9 +448,9 @@ export default {
             <div class="select">
               <select v-model="loader" name="loader">
                 <option
-                  v-for="loaderPlugin in installedPlugins.loaders"
-                  :key="loaderPlugin.name"
-                  >{{ loaderPlugin.name }}</option
+                  v-for="loaderName in availableLoaders"
+                  :key="loaderName"
+                  >{{ loaderName }}</option
                 >
               </select>
             </div>

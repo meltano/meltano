@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#764](https://gitlab.com/meltano/meltano/issues/764) Add plugin profiles to enable multiple configurations for extractors
 - [#1081](https://gitlab.com/meltano/meltano/issues/1081) Add ability to delete data pipelines
 - [#1217](https://gitlab.com/meltano/meltano/issues/1217) Add "Test Connection" button to validate connection settings prior to ELT runs
 - [#1236](https://gitlab.com/meltano/meltano/issues/1236) Add contextual Analyze CTAs in the Job Log UI

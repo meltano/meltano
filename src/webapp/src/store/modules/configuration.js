@@ -7,7 +7,6 @@ import poller from '@/utils/poller'
 import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
-  connectionInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
   loaderInFocusConfiguration: {},
   pipelinePollers: [],
@@ -81,6 +80,12 @@ const getters = {
 }
 
 const actions = {
+  addConfigurationProfile(_, profile) {
+    return orchestrationsApi.addConfigurationProfile(profile).catch(error => {
+      Vue.toasted.global.error(error)
+    })
+  },
+
   deletePipelineSchedule({ commit }, pipeline) {
     let status = {
       pipeline,
@@ -98,19 +103,6 @@ const actions = {
     orchestrationsApi.getAllPipelineSchedules().then(response => {
       commit('setPipelines', response.data)
       dispatch('rehydratePollers')
-    })
-  },
-
-  // eslint-disable-next-line no-shadow
-  getConnectionConfiguration({ commit, dispatch }, connection) {
-    return dispatch('getPluginConfiguration', {
-      name: connection,
-      type: 'connections'
-    }).then(response => {
-      commit('setInFocusConfiguration', {
-        configuration: response.data,
-        target: 'connectionInFocusConfiguration'
-      })
     })
   },
 
@@ -193,9 +185,6 @@ const actions = {
     })
   },
 
-  resetConnectionInFocusConfiguration: ({ commit }) =>
-    commit('reset', 'connectionInFocusConfiguration'),
-
   resetExtractorInFocusConfiguration: ({ commit }) =>
     commit('reset', 'extractorInFocusConfiguration'),
 
@@ -259,12 +248,14 @@ const mutations = {
   setInFocusConfiguration(state, { configuration, target }) {
     configuration.settings.forEach(setting => {
       const isIso8601Date = setting.kind && setting.kind === 'date_iso8601'
-      const isDefaultNeeded =
-        configuration.config.hasOwnProperty(setting.name) &&
-        configuration.config[setting.name] === null
-      if (isIso8601Date && isDefaultNeeded) {
-        configuration.config[setting.name] = utils.getFirstOfMonthAsIso8601()
-      }
+      configuration.profiles.forEach(profile => {
+        const isDefaultNeeded =
+          profile.config.hasOwnProperty(setting.name) &&
+          profile.config[setting.name] === null
+        if (isIso8601Date && isDefaultNeeded) {
+          profile.config[setting.name] = utils.getFirstOfMonthAsIso8601()
+        }
+      })
     })
     state[target] = configuration
   },

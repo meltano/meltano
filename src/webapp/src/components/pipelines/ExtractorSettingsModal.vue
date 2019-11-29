@@ -6,12 +6,14 @@ import lodash from 'lodash'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
+import ConnectorSettingsDropdown from '@/components/pipelines/ConnectorSettingsDropdown'
 
 export default {
   name: 'ExtractorSettingsModal',
   components: {
     ConnectorLogo,
-    ConnectorSettings
+    ConnectorSettings,
+    ConnectorSettingsDropdown
   },
   data() {
     return {
@@ -28,6 +30,12 @@ export default {
     ...mapGetters('configuration', ['getHasValidConfigSettings']),
     ...mapState('configuration', ['extractorInFocusConfiguration']),
     ...mapState('plugins', ['installedPlugins']),
+
+    currentProfile() {
+      return this.localConfiguration.profiles[
+        this.localConfiguration.profileInFocusIndex
+      ]
+    },
     extractorLacksConfigSettings() {
       return (
         this.localConfiguration.settings &&
@@ -46,15 +54,24 @@ export default {
     isLoadingConfigSettings() {
       return !Object.prototype.hasOwnProperty.call(
         this.localConfiguration,
-        'config'
+        'profiles'
       )
     },
     isSaveable() {
+      if (this.isInstalling || this.isLoadingConfigSettings) {
+        return
+      }
+      const configSettings = {
+        config: this.localConfiguration.profiles[
+          this.localConfiguration.profileInFocusIndex
+        ].config,
+        settings: this.localConfiguration.settings
+      }
       const isValid = this.getHasValidConfigSettings(
-        this.localConfiguration,
+        configSettings,
         this.extractor.settingsGroupValidation
       )
-      return !this.isInstalling && this.isInstalled && isValid
+      return this.isInstalled && isValid
     }
   },
   created() {
@@ -104,7 +121,7 @@ export default {
     },
     createEditableConfiguration() {
       this.localConfiguration = Object.assign(
-        {},
+        { profileInFocusIndex: 0 },
         lodash.cloneDeep(this.extractorInFocusConfiguration)
       )
     },
@@ -119,7 +136,7 @@ export default {
         .dispatch('configuration/savePluginConfiguration', {
           name: this.extractor.name,
           type: 'extractors',
-          config: this.localConfiguration.config
+          profiles: this.localConfiguration.profiles
         })
         .then(() => {
           this.$store.dispatch('configuration/updateRecentELTSelections', {
@@ -132,17 +149,17 @@ export default {
             : `Connection Saved - ${this.extractor.name}`
           Vue.toasted.global.success(message)
         })
-      const message = this.extractorLacksConfigSettings
-        ? `Auto Advance - No Configuration needed for ${this.extractor.name}`
-        : `Connection Saved - ${this.extractor.name}`
-      Vue.toasted.global.success(message)
     },
     testConnection() {
       this.isTesting = true
+
       this.testPluginConfiguration({
         name: this.extractor.name,
         type: 'extractors',
-        config: this.localConfiguration.config
+        payload: {
+          profile: this.currentProfile.name,
+          config: this.currentProfile.config
+        }
       })
         .then(response => {
           if (response.data.isSuccess) {
@@ -185,6 +202,13 @@ export default {
         </div>
 
         <template v-if="!isLoadingConfigSettings">
+          <ConnectorSettingsDropdown
+            v-if="!extractorLacksConfigSettings"
+            :connector="extractor"
+            plugin-type="extractors"
+            :config-settings="localConfiguration"
+          ></ConnectorSettingsDropdown>
+
           <ConnectorSettings
             v-if="!extractorLacksConfigSettings"
             field-class="is-small"

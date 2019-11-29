@@ -60,7 +60,7 @@ class PluginInstallService:
         return {"errors": errors, "installed": installed}
 
     def install_plugin(self, plugin: PluginInstall):
-        if not plugin.installable():
+        if not plugin.is_installable():
             raise PluginNotInstallable()
 
         try:

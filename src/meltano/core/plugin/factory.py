@@ -23,4 +23,5 @@ def plugin_factory(plugin_type: PluginType, plugin_def: Dict):
     # this will parse the discovery file and create an instance of the
     # corresponding `plugin_class` for all the plugins.
     plugin_cls = plugin_class[plugin_type]()
-    return plugin_cls(**plugin_def)
+
+    return plugin_cls(plugin_def.pop("name"), **plugin_def)

@@ -50,10 +50,10 @@ def installed():
     for plugin in sorted(config.plugins(), key=lambda x: x.name):
         try:
             definition = discovery.find_plugin(plugin.type, plugin.name)
+            merged_plugin_definition = {**definition.canonical(), **plugin.canonical()}
         except PluginNotFoundError:
-            definition = {}
+            merged_plugin_definition = {**plugin.canonical()}
 
-        merged_plugin_definition = {**definition.canonical(), **plugin.canonical()}
         merged_plugin_definition.pop("settings", None)
         merged_plugin_definition.pop("select", None)
 
@@ -62,7 +62,7 @@ def installed():
 
         installed_plugins[plugin.type].append(merged_plugin_definition)
 
-    return jsonify({**project.meltano, "plugins": installed_plugins})
+    return jsonify({**project.meltano.canonical(), "plugins": installed_plugins})
 
 
 @pluginsBP.route("/add", methods=["POST"])
