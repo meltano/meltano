@@ -150,6 +150,6 @@ Once we click `Create`, we can now verify that the our report has been added to 
 
 And with that, you have now setup a complete end-to-end data solution for extracting and analyzing Salesforce data with Meltano! 🎉
 
-You can now check the rest of the pre-bundled Models for Projects, Merge Requests, Users and more.
+You can now check the advanced Tutorial on how to [Create Custom Transformations and Models](/tutorials/create-custom-transforms-and-models.html) for your Salesforce data.
 
-Don't forget to save the reports that you find useful and add reports to your dashboards. 
+And don't forget to save the reports that you find useful and add reports to your dashboards. 
