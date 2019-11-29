@@ -1,9 +1,7 @@
 {$HOSTNAME}
-
+basicauth /static/js meltano htpasswd=/etc/caddy/htpasswd
+tls admin@meltano.com
 proxy / localhost:5000 {
   transparent
 }
-
-basicauth /static/js meltano htpasswd=/etc/caddy/htpasswd
-
-tls admin@meltano.com
+gzip
