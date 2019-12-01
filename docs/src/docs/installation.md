@@ -185,7 +185,7 @@ Once you complete the cluster setup, you should be brought to the detail page fo
 In this section, we will install Meltano as an application you can access locally from your browser and on the command line. If you prefer to install to Docker, please view the installation instructions [here](/docs/installation.html#installing-on-docker).
 
 ::: tip
-We do not have a double click installer at this time, but [it is in our roadmap](https://gitlab.com/meltano/meltano/issues/1107) and we will be sure to update this page when we do!
+We do not have a double click installer at this time, but [it is on our roadmap](https://gitlab.com/meltano/meltano/issues/1107) and we will be sure to update this page when we do!
 :::
 
 ### Requirements
@@ -219,18 +219,19 @@ If you've installed Python 3, but are not getting the result you expect, you may
 `pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
 
 ```bash
-# Check for current version of pip using pip3
+# Check for current version of pip 
 # to ensure that it is using the Python3 pip
-pip3 --version
+pip --version
 
 # Update pip
-pip3 install --upgrade pip
+pip install --upgrade pip
 ```
+Depending on your versions, you may need to use `pip3` instad of `pip`
 
 #### Virtual Environment
 
 ::: danger IMPORTANT
-Unless you are building a Docker image, It is **strongly recommended** that Meltano be installed inside a virtual environment in order to avoid potential system conflicts that may be difficult to debug.
+Unless you are building a Docker image, it is **strongly recommended** that Meltano be installed inside a virtual environment in order to avoid potential system conflicts that may be difficult to debug.
 :::
 
 **Why use a virtual environment?**
