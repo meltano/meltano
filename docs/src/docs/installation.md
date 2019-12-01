@@ -226,7 +226,6 @@ pip --version
 # Update pip
 pip install --upgrade pip
 ```
-Depending on your versions, you may need to use `pip3` instad of `pip`
 
 #### Virtual Environment
 
@@ -281,7 +280,7 @@ You can deactivate a virtual environment by typing `deactivate` in your shell.
 Now that you have your virtual environment set up and running, run the following command to install the Meltano package:
 
 ```bash
-pip3 install meltano
+pip install meltano
 ```
 
 Once the installation completes, you can check if it was successful by running:
