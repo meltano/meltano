@@ -47,7 +47,7 @@ curl https://getcaddy.com
 
 # create the Caddyfile
 ```
-<subdomain>.meltanodata.com:443
+<subdomain>.meltanodata.com
 
 proxy / localhost:5000 {
   transparent
