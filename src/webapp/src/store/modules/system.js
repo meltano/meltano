@@ -6,12 +6,16 @@ import systemApi from '@/api/system'
 import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
+  hasGeneratedDbtDocs: false,
   latestVersion: null,
   updating: false,
   version: null
 })
 
 const getters = {
+  hasDbtDocs(state) {
+    return state.hasGeneratedDbtDocs
+  },
   updateAvailable(state) {
     if (state.latestVersion === null || state.version === null) {
       return false
@@ -27,6 +31,16 @@ const actions = {
       commit('setVersion', response.data.version)
       commit('setLatestVersion', response.data.latestVersion)
     })
+  },
+  checkHasDbtDocs({ commit }) {
+    systemApi
+      .dbtDocs()
+      .then(() => {
+        commit('setHasDbtDocs', true)
+      })
+      .catch(() => {
+        commit('setHasDbtDocs', false)
+      })
   },
   upgrade({ state, commit }) {
     let upgradePoller = null
@@ -65,6 +79,10 @@ const actions = {
 }
 
 const mutations = {
+  setHasDbtDocs(state, value) {
+    state.hasGeneratedDbtDocs = value
+  },
+
   setLatestVersion(state, version) {
     state.latestVersion = version
   },
