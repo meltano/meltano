@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# bump the ulimit for performance
-sudo ulimit -n 8192
-
 # install htpasswd
 sudo apt-get install -qqy apache2-utils
 
