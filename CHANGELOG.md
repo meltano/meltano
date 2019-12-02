@@ -14,9 +14,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1271](https://gitlab.com/meltano/meltano/issues/1271) Add labels in discovery.yml for easy brand definition
 
 ### Changes
-- [#1323](https://gitlab.com/meltano/meltano/issues/1323) Add CTA to send users to Typeform to provide info for setting up a hosted dashboard
 
+- [#1323](https://gitlab.com/meltano/meltano/issues/1323) Add CTA to send users to Typeform to provide info for setting up a hosted dashboard
 - [#1271](https://gitlab.com/meltano/meltano/issues/1271) Improve messaging on tap and target settings modals
+- [#1226](https://gitlab.com/meltano/meltano/issues/1226) Update Pipelines main navigation link to show all data pipeline schedules if that step has been reached
 
 ### Fixes
 
