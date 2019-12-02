@@ -106,7 +106,11 @@ export default {
       <div class="navbar-start">
         <div class="navbar-item navbar-child has-dropdown is-hoverable">
           <router-link
-            :to="{ name: 'dataSetup' }"
+            :to="{
+              name: getIsStepScheduleMinimallyValidated
+                ? 'schedules'
+                : 'dataSetup'
+            }"
             :class="{ 'router-link-active': getIsSubRouteOf('/pipeline') }"
             class="navbar-link has-text-weight-semibold"
           >
