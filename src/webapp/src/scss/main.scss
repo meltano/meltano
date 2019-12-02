@@ -73,10 +73,6 @@ Component helpers related to Bulma's component classes when bulma-overrides does
   &:not(:last-child) {
     margin-bottom: 0rem;
   }
-
-  @media screen and (min-width: $tablet) {
-    margin-left: 4.75rem;
-  }
 }
 
 .field {
