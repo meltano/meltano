@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.8.0 - (2019-12-02)
 
 ---
 
@@ -23,9 +36,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1225](https://gitlab.com/meltano/meltano/issues/1225) Update dbt docs link to be conditional so the user doesn't experience 404s
 
-### Fixes
-
-### Breaks
 
 ## 1.7.2 - (2019-11-26)
 
