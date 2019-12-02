@@ -6,12 +6,6 @@
 # install `vsftpd`
 sudo apt-get install -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' vsftpd
 
-sudo useradd \
-  -g meltano --no-user-group \
-  --home-dir /var/meltano/project --no-create-home \
-  --shell /usr/sbin/nologin \
-  meltano_ftp
-
 # armor the meltano project to make sure we can't
 # exfiltrate secret files
 cd /var/meltano/project
