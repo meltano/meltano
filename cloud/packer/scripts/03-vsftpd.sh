@@ -17,4 +17,7 @@ sudo find . -path ./.meltano -prune -o -type f -exec chmod 620 {} \;
 # in which `meltano_ftp` is a member
 sudo find . -path ./.meltano -prune -o -type d -exec chmod 770 {} \;
 
+# non-writable root for chroot
+sudo chmod g-w /var/meltano/project
+
 systemctl enable vsftpd
