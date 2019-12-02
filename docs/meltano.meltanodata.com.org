@@ -8,7 +8,7 @@
 
 Create "A" Record to the Compute IP
 
-** TODO Compute
+** DONE Compute
 
 *** DigitalOcean 2vCPU/4GB
 
@@ -38,7 +38,7 @@ Docs:
 https://www.digitalocean.com/docs/api
 https://www.digitalocean.com/docs/api/create-personal-access-token/
 
-** TODO TLS/HTTPS
+** DONE TLS/HTTPS
 
 *** DONE Setup Caddy with Let's Encrypt
 
@@ -84,9 +84,9 @@ tls self_signed
 ** TODO Setup Orchestration (daily runs)
 
 
-* TODO Maintenance
+* DONE Maintenance
 
-** TODO Setup FTP server
+** DONE Setup FTP server
 
 useradd -d /var/meltano/project -M meltano_ftp -g meltano
 
@@ -100,3 +100,10 @@ cd /var/meltano/project
 
 find . -path ./.meltano -prune -o -type f -exec chmod 620 {} \;
 find . -path ./.meltano -prune -o -type d -exec chmod 770 {} \;
+
+** TODO Setup htpasswd
+
+apt-get install apache2-utils
+
+htpasswd -b /etc/caddy/htpasswd meltano <password>
+passwd meltano_ftp <password>

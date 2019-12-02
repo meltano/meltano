@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# bump the ulimit for performance
+sudo ulimit -n 8192
+
+# install htpasswd
+sudo apt-get install -qqy apache2-utils
+
 # make sure the bundled installed binary is executable
 sudo chmod +x /usr/local/bin/caddy
 
