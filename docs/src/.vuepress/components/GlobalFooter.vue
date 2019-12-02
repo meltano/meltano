@@ -7,7 +7,9 @@ export default {
 <template>
   <footer class="footer">
     <slot></slot>
-    <a href="https://meltano.com/docs/contributing.html" target="_blank"
+    <a
+      href="https://about.gitlab.com/handbook/meltano/engineering/"
+      target="_blank"
       >Contribute to the project! <OutboundLink
     /></a>
     <a
@@ -30,6 +32,6 @@ export default {
 .footer a {
   color: white;
   font-weight: 500;
-  margin: .5rem;
+  margin: 0.5rem;
 }
 </style>

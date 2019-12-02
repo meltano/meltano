@@ -66,7 +66,6 @@ module.exports = {
         '/docs/environment-variables',
         '/docs/security-and-privacy',
         '/docs/architecture',
-        '/docs/contributing',
         '/docs/getting-help',
         '/docs/roadmap'
       ],
@@ -80,7 +79,6 @@ module.exports = {
         '/docs/environment-variables',
         '/docs/security-and-privacy',
         '/docs/architecture',
-        '/docs/contributing',
         '/docs/getting-help',
         '/docs/roadmap'
       ],
@@ -94,7 +92,6 @@ module.exports = {
         '/docs/environment-variables',
         '/docs/security-and-privacy',
         '/docs/architecture',
-        '/docs/contributing',
         '/docs/getting-help',
         '/docs/roadmap'
       ]
