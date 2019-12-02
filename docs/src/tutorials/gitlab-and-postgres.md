@@ -1,6 +1,6 @@
 ---
 sidebar: auto
-metaTitle: Meltano Tutorial - Load GitLab commit history into Postgres
+metaTitle: Meltano Tutorial - Load data from GitLab groups and projects into Postgres
 description: Learn how to use Meltano to analyze your GitLab data by automatically loading it into Postgres.
 ---
 
@@ -30,7 +30,7 @@ Open your Meltano instance and click "Pipelines" in the top navigation bar. You 
 
 Let's install `tap-gitlab` by clicking on the `Install` button inside its card. 
 
-On the configuration modal we want to enter the Private Token that Gitlab extractor will use to connect to GitLab, the Groups and Projects we are going to extract from and the Start Date we want the extracted data set to start from.
+On the configuration modal we want to enter the Private Token that GitLab extractor will use to connect to GitLab, the Groups and Projects we are going to extract from and the Start Date we want the extracted data set to start from.
 
 ![Screenshot of GitLab Extractor Configuration](/images/gitlab-tutorial/02-gitlab-configuration.png)
 
