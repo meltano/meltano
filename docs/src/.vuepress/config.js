@@ -37,6 +37,13 @@ module.exports = {
           'https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap'
       }
     ],
+    [
+      'meta',
+      {
+        name: 'google-site-verification',
+        content: 'bOaR0Nxus1Au31YuQX0zMqkNZV_tbAoIr7WkX4crUgI'
+      }
+    ],
     ['meta', { name: 'msapplication-TileColor', content: '#da532c' }],
     ['meta', { name: 'theme-color', content: '#ffffff' }]
   ],

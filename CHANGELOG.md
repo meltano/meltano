@@ -3,18 +3,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
+
+- [marketing#103](https://gitlab.com/meltano/meltano-marketing/issues/103) Add Google Site Verification token to site
 
 ### Changes
 
 ### Fixes
 
 ### Breaks
-
 
 ## 1.8.0 - (2019-12-02)
 
@@ -35,7 +36,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1226](https://gitlab.com/meltano/meltano/issues/1226) Update Pipelines main navigation link to show all data pipeline schedules if that step has been reached
 
 - [#1225](https://gitlab.com/meltano/meltano/issues/1225) Update dbt docs link to be conditional so the user doesn't experience 404s
-
 
 ## 1.7.2 - (2019-11-26)
 
