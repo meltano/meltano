@@ -4,13 +4,13 @@ When you need to upload files into your Meltano project, we recommend using FTP 
 
 ## Getting Started
 
-There are many options when it comes to FTP software. A great option we recommend is [Filezilla](https://filezilla-project.org/) since it works on all platforms and is 100% free! As a result, we will be using it for the remainder of this tutorial.
+There are many options when it comes to FTP software. A great option we recommend is [FileZilla](https://filezilla-project.org/) since it works on all platforms and is 100% free! As a result, we will be using it for the remainder of this tutorial.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/q9I4ZxQvfdg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="mt-2r"></iframe>
 
 ## How to Connect to Your Meltano Project
 
-First, we will start by saving a new connection in Filezilla.
+First, we will start by saving a new connection in FileZilla.
 
 1. Click on `File` > `Site Manager`
 2. Once the "Site Manager" window pops up, click the `New Site` button
