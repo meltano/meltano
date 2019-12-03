@@ -68,8 +68,20 @@ class SnowflakeSpecLoader:
         error_messages = self.ensure_valid_schema(spec)
         if error_messages:
             raise SpecLoadingError("\n".join(error_messages))
+        
+        def lower_values(value):
+            if isinstance(value, bool):
+                return value
+            elif isinstance(value, list):
+                return [lower_values(entry) for entry in value]
+            elif isinstance(value, str):
+                return value.lower()
+            elif isinstance(value, dict):
+                return {k.lower(): lower_values(v) for k, v in value.items()}
+        
+        lower_spec = lower_values(spec)
 
-        return spec
+        return lower_spec
 
     def ensure_valid_schema(self, spec: Dict) -> List[str]:
         """
