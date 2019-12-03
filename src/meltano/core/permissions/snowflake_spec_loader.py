@@ -78,7 +78,7 @@ class SnowflakeSpecLoader:
                 return value.lower()
             elif isinstance(value, dict):
                 return {k.lower(): lower_values(v) for k, v in value.items()}
-        
+
         lower_spec = lower_values(spec)
 
         return lower_spec
