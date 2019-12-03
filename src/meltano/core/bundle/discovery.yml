@@ -40,7 +40,7 @@ extractors:
         label: API Token
         kind: password
       - name: start_date
-        description: Pull data from this date through now
+        description: Pull data from this date to now
         label: Start Date
         kind: date_iso8601
   - name: tap-gitlab
@@ -85,7 +85,7 @@ extractors:
         documentation: https://meltano.com/plugins/extractors/gitlab.html#configuration
         env: GITLAB_API_ULTIMATE_LICENSE
       - name: start_date
-        description: Pull data from this date through now
+        description: Pull data from this date to now
         env: GITLAB_API_START_DATE
         kind: date_iso8601
   - name: tap-google-analytics
@@ -111,7 +111,7 @@ extractors:
       - name: reports
         env: GOOGLE_ANALYTICS_API_REPORTS
       - name: start_date
-        description: Pull data from this date through now
+        description: Pull data from this date to now
         env: GOOGLE_ANALYTICS_API_START_DATE
         kind: date_iso8601
       - name: end_date
@@ -132,7 +132,7 @@ extractors:
         kind: password
       - name: endpoint
       - name: start_date
-        description: Pull data from this date through now
+        description: Pull data from this date to now
         kind: date_iso8601
   - name: tap-mongodb
     label: MongoDB
@@ -186,7 +186,7 @@ extractors:
         value: true
         kind: boolean
       - name: start_date
-        description: Pull data from this date through now
+        description: Pull data from this date to now
         kind: date_iso8601
   - name: tap-stripe
     label: Stripe
@@ -205,7 +205,7 @@ extractors:
         kind: password
         env: STRIPE_API_KEY
       - name: start_date
-        description: Pull data from this date through now
+        description: Pull data from this date to now
         kind: date_iso8601
   - name: tap-zendesk
     label: Zendesk
@@ -227,7 +227,7 @@ extractors:
         label: Zendesk Domain
         description: <subdomain>.zendesk.com
       - name: start_date
-        description: Pull data from this date through now
+        description: Pull data from this date to now
         kind: date_iso8601
 loaders:
   - name: target-csv

@@ -19,7 +19,7 @@ import {
   faDotCircle,
   faDraftingCompass,
   faExclamationTriangle,
-  faExternalLinkAlt,
+  faExternalLinkSquareAlt,
   faFileAlt,
   faFilter,
   faGift,
@@ -68,7 +68,7 @@ export default {
     library.add(faDotCircle)
     library.add(faDraftingCompass)
     library.add(faExclamationTriangle)
-    library.add(faExternalLinkAlt)
+    library.add(faExternalLinkSquareAlt)
     library.add(faFileAlt)
     library.add(faFilter)
     library.add(faGift)

@@ -26,7 +26,7 @@ export default {
     }
   },
   computed: {
-    getCleanedLabel() {
+    getLabel() {
       return setting =>
         setting.label || utils.titleCase(utils.underscoreToSpace(setting.name))
     },
@@ -161,6 +161,19 @@ export default {
   <div>
     <slot name="top" />
 
+    <slot name="docs">
+      <div v-if="plugin.docs" class="content has-text-centered mt1r">
+        <p class="content">
+          View the
+          <a :href="plugin.docs" target="_blank" class="has-text-underlined">
+            {{ plugin.label || plugin.name }}
+            {{ pluginType }}
+          </a>
+          documentation.
+        </p>
+      </div>
+    </slot>
+
     <form>
       <div
         v-for="setting in configSettings.settings"
@@ -175,16 +188,18 @@ export default {
               :href="setting.documentation"
               class="has-text-underlined label tooltip"
               :data-tooltip="
-                `Learn more about the ${getCleanedLabel(setting)} setting.`
+                `Learn more about the ${getLabel(setting)} setting.`
               "
             >
-              {{ getCleanedLabel(setting) }}
-              <span class="icon">
-                <font-awesome-icon icon="external-link-alt"></font-awesome-icon>
+              {{ getLabel(setting) }}
+              <span class="icon is-small">
+                <font-awesome-icon
+                  icon="external-link-square-alt"
+                ></font-awesome-icon>
               </span>
             </a>
             <span v-else>
-              {{ getCleanedLabel(setting) }}
+              {{ getLabel(setting) }}
             </span>
             <TooltipCircle
               v-if="setting.tooltip"
@@ -284,18 +299,6 @@ export default {
         </div>
       </div>
     </form>
-
-    <slot name="docs">
-      <div v-if="plugin.docs" class="content has-text-centered mt1r">
-        <p>
-          View Meltano's
-          <a :href="plugin.docs" target="_blank" class="has-text-underlined"
-            >{{ plugin.label || plugin.name }} {{ pluginType }} docs
-          </a>
-          for more info.
-        </p>
-      </div>
-    </slot>
 
     <slot name="bottom" />
   </div>
