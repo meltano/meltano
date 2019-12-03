@@ -64,9 +64,11 @@ extractors:
         env: GITLAB_API_TOKEN
       - name: groups
         value: ''
+        description: Filling in 'groups' but leaving 'projects' empty will sync all the projects for the provided group(s). Filling in 'groups' and 'projects' will sync only the specified projects in those groups.
         env: GITLAB_API_GROUPS
       - name: projects
         value: ''
+        description: Filling in 'projects' but leaving 'groups' empty will sync the specified projects. Filling in 'groups' and 'projects' will sync only the specified projects in those groups.
         env: GITLAB_API_PROJECTS
       - name: ultimate_license
         value: false

@@ -50,6 +50,9 @@ export default {
         !this.getIsOfKindDate(kind) &&
         !this.getIsOfKindOptions(kind)
     },
+    getPlaceholder() {
+      return setting => setting.placeholder || setting.value || setting.name
+    },
     getTextBasedInputType() {
       let type = 'text'
       return setting => {
@@ -236,7 +239,7 @@ export default {
                 "
                 :class="['input', fieldClass, successClass(setting)]"
                 :type="getTextBasedInputType(setting)"
-                :placeholder="setting.value || setting.name"
+                :placeholder="getPlaceholder(setting)"
                 :disabled="getIsProtected(setting)"
                 :readonly="getIsProtected(setting)"
                 @focus="$event.target.select()"
