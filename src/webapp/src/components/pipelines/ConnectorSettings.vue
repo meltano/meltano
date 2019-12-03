@@ -27,7 +27,8 @@ export default {
   },
   computed: {
     getCleanedLabel() {
-      return value => utils.titleCase(utils.underscoreToSpace(value))
+      return setting =>
+        setting.label || utils.titleCase(utils.underscoreToSpace(setting.name))
     },
     getFormFieldForId() {
       return setting => `setting-${setting.name}`
@@ -167,8 +168,24 @@ export default {
         class="field is-horizontal"
       >
         <div :class="['field-label', labelClass]">
-          <label class="label" :for="getFormFieldForId(setting)"
-            >{{ setting.label || getCleanedLabel(setting.name) }}
+          <label class="label" :for="getFormFieldForId(setting)">
+            <a
+              v-if="setting.documentation"
+              target="_blank"
+              :href="setting.documentation"
+              class="has-text-underlined label tooltip"
+              :data-tooltip="
+                `Learn more about the ${getCleanedLabel(setting)} setting.`
+              "
+            >
+              {{ getCleanedLabel(setting) }}
+              <span class="icon">
+                <font-awesome-icon icon="external-link-alt"></font-awesome-icon>
+              </span>
+            </a>
+            <span v-else>
+              {{ getCleanedLabel(setting) }}
+            </span>
             <TooltipCircle
               v-if="setting.tooltip"
               :text="setting.tooltip"
@@ -263,14 +280,6 @@ export default {
             <p v-if="setting.description" class="help is-italic">
               {{ setting.description }}
             </p>
-            <p v-if="setting.documentation" class="help">
-              <a
-                :href="setting.documentation"
-                target="_blank"
-                class="has-text-underlined"
-                >More Info.</a
-              >
-            </p>
           </div>
         </div>
       </div>
@@ -281,8 +290,8 @@ export default {
         <p>
           View Meltano's
           <a :href="plugin.docs" target="_blank" class="has-text-underlined"
-            >{{ plugin.label || plugin.name }} {{ pluginType }} docs</a
-          >
+            >{{ plugin.label || plugin.name }} {{ pluginType }} docs
+          </a>
           for more info.
         </p>
       </div>
