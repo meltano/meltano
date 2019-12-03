@@ -192,7 +192,7 @@ export default {
               "
             >
               {{ getLabel(setting) }}
-              <span class="icon is-small">
+              <span class="icon is-small has-text-grey-light">
                 <font-awesome-icon
                   icon="external-link-square-alt"
                 ></font-awesome-icon>
