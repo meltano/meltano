@@ -90,10 +90,12 @@ class Airflow(PluginInstall):
                 airflow_cfg.read_file(cfg)
                 logging.debug(f"Loaded '{str(airflow_cfg_path)}'")
 
-            for section, cfg in plugin_settings_service.as_config(
-                session, self
-            ).items():
-                airflow_cfg[section].update(map_dict(str, cfg))
+            config = {}
+            for key, value in plugin_settings_service.as_config(session, self).items():
+                nest(config, key, str(value))
+
+            for section, cfg in config.items():
+                airflow_cfg[section].update(cfg)
                 logging.debug(f"\tUpdated section [{section}] with {cfg}")
 
             with airflow_cfg_path.open("w") as cfg:
