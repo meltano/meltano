@@ -40,6 +40,7 @@ extractors:
         label: API Token
         kind: password
       - name: start_date
+        description: Pull data from this date through now
         label: Start Date
         kind: date_iso8601
   - name: tap-gitlab
@@ -61,21 +62,30 @@ extractors:
         protected: true
       - name: private_token
         kind: password
+        description: Your GitLab profile access token
+        placeholder: Ex. I8vxHsiVAaDnAX3hA
+        documentation: https://meltano.com/plugins/extractors/gitlab.html#gitlab-api-token
         env: GITLAB_API_TOKEN
       - name: groups
         value: ''
-        description: Filling in 'groups' but leaving 'projects' empty will sync all the projects for the provided group(s). Filling in 'groups' and 'projects' will sync only the specified projects in those groups.
+        description: One or more space delimited 'group's
+        placeholder: Ex. my-organization
+        documentation: https://meltano.com/plugins/extractors/gitlab.html#groups
         env: GITLAB_API_GROUPS
       - name: projects
         value: ''
-        description: Filling in 'projects' but leaving 'groups' empty will sync the specified projects. Filling in 'groups' and 'projects' will sync only the specified projects in those groups.
+        description: One or more space delimited `group/project`s
+        placeholder: Ex. my-organization/project-1
+        documentation: https://meltano.com/plugins/extractors/gitlab.html#projects
         env: GITLAB_API_PROJECTS
       - name: ultimate_license
         value: false
         kind: boolean
-        description: Provides additional data only available for GitLab Ultimate and GitLab.com Gold accounts
+        description: Additional data for GitLab Ultimate and GitLab.com Gold accounts
+        documentation: https://meltano.com/plugins/extractors/gitlab.html#configuration
         env: GITLAB_API_ULTIMATE_LICENSE
       - name: start_date
+        description: Pull data from this date through now
         env: GITLAB_API_START_DATE
         kind: date_iso8601
   - name: tap-google-analytics
@@ -101,6 +111,7 @@ extractors:
       - name: reports
         env: GOOGLE_ANALYTICS_API_REPORTS
       - name: start_date
+        description: Pull data from this date through now
         env: GOOGLE_ANALYTICS_API_START_DATE
         kind: date_iso8601
       - name: end_date
@@ -121,6 +132,7 @@ extractors:
         kind: password
       - name: endpoint
       - name: start_date
+        description: Pull data from this date through now
         kind: date_iso8601
   - name: tap-mongodb
     label: MongoDB
@@ -174,6 +186,7 @@ extractors:
         value: true
         kind: boolean
       - name: start_date
+        description: Pull data from this date through now
         kind: date_iso8601
   - name: tap-stripe
     label: Stripe
@@ -192,6 +205,7 @@ extractors:
         kind: password
         env: STRIPE_API_KEY
       - name: start_date
+        description: Pull data from this date through now
         kind: date_iso8601
   - name: tap-zendesk
     label: Zendesk
@@ -213,6 +227,7 @@ extractors:
         label: Zendesk Domain
         description: <subdomain>.zendesk.com
       - name: start_date
+        description: Pull data from this date through now
         kind: date_iso8601
 loaders:
   - name: target-csv

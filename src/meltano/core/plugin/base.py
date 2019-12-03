@@ -44,6 +44,7 @@ class SettingDefinition(NameEq, Canonical):
         documentation: str = None,
         description: str = None,
         tooltip: str = None,
+        placeholder: str = None,
         options: list = [],
         protected=False,
     ):
@@ -56,6 +57,7 @@ class SettingDefinition(NameEq, Canonical):
             documentation=documentation,
             description=description,
             tooltip=tooltip,
+            placeholder=placeholder,
             protected=protected,
         )
 
