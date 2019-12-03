@@ -66,7 +66,10 @@ class SingerTap(SingerPlugin):
 
         with properties_file.open("w") as catalog:
             result = plugin_invoker.invoke(
-                "--discover", stdout=catalog, stderr=subprocess.PIPE, text=True
+                "--discover",
+                stdout=catalog,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
             )
             stdout, stderr = result.communicate()
             exit_code = result.returncode
