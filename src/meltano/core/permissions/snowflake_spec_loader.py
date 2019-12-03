@@ -23,7 +23,7 @@ class SnowflakeSpecLoader:
         self.spec = self.load_spec(spec_path)
 
         # Generate the entities (e.g databases, schemas, users, etc) referenced
-        #  by the spec file and make sure that no syntatical or refernce errors
+        #  by the spec file and make sure that no syntatical or reference errors
         #  exist (all referenced entities are also defined by the spec)
         click.secho("Checking spec file for errors", fg="green")
         self.entities = self.inspect_spec()
