@@ -31,8 +31,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1217](https://gitlab.com/meltano/meltano/issues/1217) Add "Test Connection" button to validate connection settings prior to ELT runs
 - [#1236](https://gitlab.com/meltano/meltano/issues/1236) Add contextual Analyze CTAs in the Job Log UI
 - [#1271](https://gitlab.com/meltano/meltano/issues/1271) Add labels in discovery.yml for easy brand definition
+- [#1292](https://gitlab.com/meltano/meltano/issues/1292) Add guide for setting up Meltano instances
 
 ### Changes
+
+- [#1323](https://gitlab.com/meltano/meltano/issues/1323) Add CTA to send users to Typeform to provide info for setting up a hosted dashboard
 
 - [#1323](https://gitlab.com/meltano/meltano/issues/1323) Add CTA to send users to Typeform to provide info for setting up a hosted dashboard
 - [#1271](https://gitlab.com/meltano/meltano/issues/1271) Improve messaging on tap and target settings modals
