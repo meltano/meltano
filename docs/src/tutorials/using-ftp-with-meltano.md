@@ -1,6 +1,8 @@
 # Using FTP with Meltano
 
-When you need to upload files into your Meltano project, we recommend using FTP (File Transfer Protocol). This will allow you to login to your Meltano project and interact with it similar to how you would work with any directory on your computer.
+Some extractors require you to place a file with credentials or other information inside your Meltano project. This is easy when your project lives on your local machine, but not quite as straightforward for project hosted on meltanodata.com.
+
+When you need to upload files into your Meltano project on meltanodata.com, we recommend using FTP (File Transfer Protocol). This will allow you to login to your Meltano project and interact with it similar to how you would work with any directory on your computer.
 
 ## Getting Started
 
