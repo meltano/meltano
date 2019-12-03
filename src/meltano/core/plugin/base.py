@@ -33,6 +33,7 @@ class Profile(NameEq, Canonical):
 
 Profile.DEFAULT = Profile(name="default", label="Default")
 
+
 class SettingDefinition(NameEq, Canonical):
     def __init__(
         self,
