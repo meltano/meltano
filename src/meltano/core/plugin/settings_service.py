@@ -72,9 +72,9 @@ class PluginSettingsService:
             if redacted and value and setting.kind == "password":
                 value = REDACTED_VALUE
 
-            nest(config, setting.name, value)
+            config[setting.name] = value
 
-        return flatten(config, reducer="dot")
+        return config
 
     def as_profile_configs(
         self, session, plugin: PluginRef, redacted=False
