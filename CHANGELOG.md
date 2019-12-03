@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1350](https://gitlab.com/meltano/meltano/issues/1350) Switches to all lower case for Snowflake permission comparisons
+
 ### Fixes
 
 ### Breaks
