@@ -30,6 +30,7 @@ To upload files, all you need to do is:
 
 1. Locate the files on the left panel (which contains your local files on your computer)
 2. Open the directory you want the file to live in on the server
+   - Most extractors look for their files in the project root directory: the first directory you'll see after connecting
 3. Click and drag the file from the left panel into the right panel
 
 Once you see the file appear on the right panel, your upload is successfully uploaded onto the server! :tada:
