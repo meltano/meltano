@@ -1,200 +1,155 @@
 ---
 sidebar: auto
 metaTitle: Meltano Tutorial - Load Salesforce data into Postgres
-description: Learn how to use Meltano to load Salesforce data into a Postgres database.
+description: Learn how to use Meltano to analyze your Salesforce data by automatically loading it into Postgres.
 ---
 
 # Tutorial: Salesforce API + Postgres
 
-This is the Salesforce API and Postgres database tutorial. It guides you through data extraction from your Salesforce account, loading extracted entities to a Postgres DB, transforming the raw data, and analyzing the results.
+In this tutorial we'll explain how to get the [Salesforce Extractor](https://gitlab.com/meltano/tap-salesforce) integrated with your Meltano project to pull your Salesforce data and load it into a Postgres analytics database.
+
 
 ## Prerequisites
 
-- Meltano's minimum and [optional requirements](/docs/installation.html#requirements) installed
-- Docker started
+For this tutorial, you can use a new or existing Meltano project. 
 
-## Initialize Your Project
+If you need help getting started, we recommend reviewing the [Installation documentation](/docs/installation.html) and [Getting Started Guide](/docs/getting-started.html) to set up your first project. 
 
-To get started, navigate to a directory, in your terminal, where you want your Meltano project to be installed and run the following commands:
+If this is your first time using Salesforce with Meltano, you will need to enable access to Salesforce's API and get your Salesforce Security Token by following the instructions found in the [Salesforce Extractor documentation](/plugins/extractors/salesforce.html#salesforce-setup). 
 
-::: tip Remember
-Run `source venv/bin/activate` to leverage the `meltano` installed in your virtual environment (`venv`) if you haven't already.
-:::
+## Setup the Salesforce Extractor
 
-Initialize a new project with a folder called sfdc-project
+Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data sources.
 
-```bash
-meltano init sfdc-project
-```
+![Screenshot of Meltano UI with all extractors not installed and Salesforce Extractor highlighted](/images/salesforce-tutorial/01-salesforce-extractor-selection.png)
 
-Change directory into your new sfdc-project project
+Let's install `tap-salesforce` by clicking on the `Install` button inside its card. 
 
-```bash
-cd sfdc-project
-```
+On the configuration modal enter your username and password, the Security Token Salesforce extractor will use to connect to Salesforce, and the Start Date you want the extracted data set to start from.
 
-Start docker postgres instance
+![Screenshot of Salesforce Extractor Configuration](/images/salesforce-tutorial/02-salesforce-configuration.png)
 
-```bash
-docker-compose up -d warehouse_db
-```
+## Setup the Postgres Loader
 
-Let's see what extractors and loaders are available
+Click `Save` to finish configuring the extractor and progress to the next step, the Loaders page.
 
-```bash
-meltano discover all
-```
+Click to `Install` Postgres and set the credentials for your local Postgres.
 
-Add tap-salesforce - to `select` which Salesforce entities will be extracted before running the meltano `elt` command and set the credentials for your Salesforce instance
+![Screenshot of Postgres Loader Configuration](/images/meltano-ui/target-postgres-configuration.png)
 
-```bash
-meltano add extractor tap-salesforce
-```
+Information on how to install a Postgres Database on your local machine and configure the Postgres Loader can be found on [PostgresQL Database Tutorials](/plugins/loaders/postgres.html).
 
-Add target-postgres - to set the credentials for your Postgres DB
+## Apply transformations as desired
 
-```bash
-meltano add loader target-postgres
-```
+With our extractor and loader configured, you should now see the following page:
 
-## Set Your Credentials
+![Screenshot of Transform page on Meltano webapp](/images/meltano-ui/transform-run-selected.png)
 
-Create a .env file in your project directory (i.e. sfdc-project) with the SFDC and Postgres DB credentials.
+This page allows you to apply transformations to your data. We want to run the default transforms that come pre-bundled with Meltano for data fetched from Salesforce, so we are going to select `Run` and then click `Save`. 
 
-**.env**
+If you'd like to learn more about how transforms work in Meltano, check out our [docs on Meltano transform](/docs/architecture.html#meltano-transform).
 
-```
-export PG_PASSWORD=warehouse
-export PG_USERNAME=warehouse
-export PG_ADDRESS=localhost
-export PG_PORT=5502
-export PG_DATABASE=warehouse
+## Create a pipeline schedule
 
-export TAP_SALESFORCE_USERNAME=''
-export TAP_SALESFORCE_PASSWORD=''
-export TAP_SALESFORCE_SECURITY_TOKEN=''
-export TAP_SALESFORCE_START_DATE='2019-03-01T00:00:00Z'
-```
+You should now be greeted with the Schedules page with a modal to create your first pipeline!
 
-## Select The Entities to Export from Salesforce
+![Create pipeline modal for Salesforce Extractor](/images/salesforce-tutorial/03-salesforce-create-new-pipeline.png)
 
-A Salesforce account may have more than 100 different entities. In order to see the list of available entities, please run
+Pipelines allow you to create scheduled tasks through Apache Airflow. For example, you may want a recurring task that updates the database at the end of every business day.
 
-```bash
-meltano select tap-salesforce --list --all
-```
+In the current form, you will see:
 
-In this tutorial, we are going to work with a couple of the most common ones and show you how to [select](/docs/command-line-interface.html#select) entities to extract from a specific API: Account, Contact, Lead, User, Opportunity and Opportunity History:
+- A pipeline **name** which has a default name that is dynamically generated, but can be easily changed if desired
+- The **extractor** the pipeline will use, which should be `tap-salesforce`
+- The **loader** the pipeline will use, which should be `target-postgres`
+- Whether the **transform** step should be applied, which should be `run`
+- The **interval** at which the pipeline should be run, which is set by default to be `@once`
 
-```bash
-meltano select tap-salesforce "User" "*"
-meltano select tap-salesforce "Account" "*"
-meltano select tap-salesforce "Lead" "*"
-meltano select tap-salesforce "Opportunity" "*"
-meltano select tap-salesforce "OpportunityHistory" "*"
-meltano select tap-salesforce "Contact" "*"
-```
+All we need to do is click `Save` to start our new pipeline! The pipeline's log opens automatically and you can check the pipeline running and what Meltano does behind the scenes to extract and load the data. 
 
-## Run ELT (extract, load, transform)
+You should see a spinning icon that indicates that the pipeline is not completed. Once it's complete, the indicator will disappear and you should be able to see the final results of the extraction:
 
-Run the full Extract > Load > Transform pipeline:
+![Screenshot of run log of a completed pipeline for Salesforce Extractor](/images/salesforce-tutorial/04-salesforce-log-of-completed-pipeline.png)
 
-```bash
-meltano elt tap-salesforce target-postgres --transform run
-```
+Now that you have connected to Salesforce, configured the Postgres Loader, and run a successful pipeline for the dataset, you are now ready to analyze the data!
 
-Depending on your Account, the aforementioned command may take from a couple minutes to a couple hours. That's why we propose to set the `TAP_SALESFORCE_START_DATE` not too far in the past for your first test.
+Click the Analyze button on the bottom right of the log modal and then select the option provided for the Salesforce Model.
 
-You could also extract and load the data and then run the transformations at a later point (examples below):
+![Screenshot of Analyze: Model options for Salesforce](/images/salesforce-tutorial/05-salesforce-model-selection.png)
 
-Only run the Extract and Load steps:
+Meltano Models provide a starting point to explore and analyze data for specific use cases. They are similar to templates with only what is relevant for each use case included.
 
-```bash
-meltano elt tap-salesforce target-postgres
-```
+## Analyze the data
 
-Only run the Transform Step:
+The Analyze page contains an interactive user interface to allow you to dynamically build queries and visualize your data.
 
-```bash
-meltano elt tap-salesforce target-postgres --transform only
-```
+Let's explore and analyze our Salesforce Opportunities data by selecting the following attributes in the left column:
 
-The transform step uses the dbt [transforms](/docs/transforms.html) defined by [Meltano's Salesforce dbt package](https://gitlab.com/meltano/dbt-tap-salesforce).
-When `meltano elt tap-salesforce target-postgres --transform run` is executed, both default and custom dbt transformations in the transform/ directory (a folder created upon project initilization) are being performed.
+- **Columns**
+  - Stage
+  - Opportunity Type
+  - Lead Source
+- **Aggregates**
+  - Total Opportunities
+  - Average Probability (%)
+  - Average Amount
 
-In order to visualize the data with existing transformations in the UI, the final step would be to add models:
+![Screenshot of selected attributes for Salesforce Opportunities](/images/salesforce-tutorial/06-salesforce-opportunities-analyze-page-with-selected-attributes.png)
 
-Add existing models:
+And with that, the big moment is upon us, it's time to click `Run` to run our query!
 
-```bash
-meltano add model model-salesforce
-```
+![Screenshot of bar graph for Salesforce Opportunities data](/images/salesforce-tutorial/07-salesforce-opportunities-bar-graph.png)
 
-### Setup incremental ELT
+You should now see a bar chart visualization and a table below to see the data in detail.
 
-Per default, Meltano will pull all data in the ELT process. This behavior is perfect to get started because of its simplicity. However, some datasets are too big to query as a whole: the solution is incremental ELT.
+Let's order the data by Average Amount descending:
 
-Incremental ELT will persist the extraction cursor (named `state`) to make sure any subsequent ELT only pull the data that changed **after** this cursor. This feature is currently implemented by the extractors and is pretty simple to setup in your Meltano project.
+![Screenshot of data and ordering for Salesforce Opportunities data](/images/salesforce-tutorial/08-salesforce-opportunities-ordering.png)
 
-:::warning
-Support for incremental ELT varies from extractor to extractor.
-:::
+Let's say that we want to figure out which combination of Source and Opportunity Type results to the highest average amounts. We can filter the results to only include won opportunities. 
 
-To enable it, Meltano must know which cursor to use for the ELT, which is set using the `--job_id` parameter on the `meltano elt` command.
-Alternatively, one can use the `MELTANO_JOB_ID` environmental variable. For each subsequent `ELT`, Meltano will look for a previous cursor to start from.
+Select the `Filters` dropdown menu at the top of the Query pane and add a filter to only keep opportunities in the `Closed Won` Stage:
 
-The first run will create a cursor state:
+`Stage Name` --> `Equal to` --> `Closed Won`
 
-```bash
-meltano elt --job_id=gitlab tap-gitlab target-postgres
-```
+![Screenshot of data and ordering for Salesforce Opportunities data](/images/salesforce-tutorial/09-salesforce-opportunities-filter.png)
 
-Subsequent runs will start from this cursor:
+Click `Add`, run the query and, finally, switch the graph to an area chart:
 
-```bash
-meltano elt --job_id=gitlab tap-gitlab target-postgres
-```
+![Screenshot of area chart for Salesforce Opportunities data](/images/salesforce-tutorial/10-salesforce-opportunities-area-diagram.png)
 
-:::warning
-Schedules currently only support the `MELTANO_JOB_ID` environment variable, which need to be set manually in the **meltano.yml**.
+In our example, we can see that the most valuable opportunities are new customers that are reffered by our partners.
 
-```yaml
-schedules:
-  - name: gitlab_postgres
-    …
-    env:
-      MELTANO_JOB_ID=gitlab
-```
+## Save a report
 
-:::
+When we find an analysis that we want to reference in the future, we can easily do this by creating a report. This can be accomplished by clicking on the `Save Report` dropdown in the Analyze toolbar. This will open a dropdown with a default report name that is dynamically populated, but can be easily changed.
 
-## Interact with Your Data in The Web App
+![Save Report dialogue for naming the report you want to save](/images/salesforce-tutorial/11-salesforce-opportunities-save-report-dialogue.png)
 
-In order to start the UI, where you can interact with the transformed data, please go back to your terminal and execute the following command:
+Once we click `Save`, we should see the upper left "Untitled Report" change to our new report name.
 
-This will start a local web server at [http://localhost:5000](http://localhost:5000)
+![Saved report with a designated report name](/images/salesforce-tutorial/12-salesforce-opportunities-saved-report.png)
 
-```bash
-meltano ui
-```
+And with that, our analysis has been saved!
 
-When you visit the URL, you will be using the default connection to Meltano's SQLite database. In order to allow the UI to access your postgres DB instance, please follow the steps below:
+## Add a report to a dashboard
 
-1. Navigate to the Postgres Loader Configuration (Configuration > Loaders > target-postgres > Configure)
-2. Enter connection settings
+As you acquire more reports, you will probably want to organize them via dashboards. This can be done by clicking on the new `Add to Dashboard` dropdown in the toolbar.
 
-- Name = `postgres_db` (important to use that name if you are following the tutorial)
-- Dialect = `PostgresSQl`
-- Host = `localhost`
-- Port = `5502`
-- Database, Username, Password = `warehouse`
-- Schema = `tap_salesforce` (or whatever the namespace of the tap is, by default the name of the tap with underscores instead of `-`s)
+![Dropdown menu for adding report to dashboard](/images/salesforce-tutorial/13-salesforce-opportunities-add-to-dashboard-dropdown.png)
 
-3. Click "Save Connection"
+Since we have never created a dashboard, click on `New Dashboard`, which will trigger a modal that contains a dynamically generated dashboard name that can be customized as desired.
 
-You can now query and explore the extracted data:
+![New dashboard dialog for configuring the dashboard](/images/salesforce-tutorial/14-salesforce-opportunities-new-dashboard-dialog.png)
 
-- Navigate to `Analyze` > `sf opportunity history joined` (under SFDC in the drop-down)
-- Toggle Columns and Aggregates buttons to generate the SQL query.
-- Click the Run button to query the transformed tables in the `analytics` schema.
-- Check the Results or Open the Charts accordion and explore the data.
+Once we click `Create`, we can now verify that the our report has been added to the Dashboard by clicking on the `Add to Dashboard` menu. We can also visit the Dashboard directly by clicking on the `Dashboard` navigation item in the header, which shows our newly created Dashboard and the associated Report.
+
+![Dashboard page with new dashboard and the associated Report](/images/salesforce-tutorial/15-salesforce-dashboard-page.png)
+
+## Next steps
+
+And with that, you have now setup a complete end-to-end data solution for extracting and analyzing Salesforce data with Meltano! 🎉
+
+You can now check the advanced Tutorial on how to [Create Custom Transformations and Models](/tutorials/create-custom-transforms-and-models.html) for your Salesforce data.
+
+And don't forget to save the reports that you find useful and add reports to your dashboards. 

@@ -34,6 +34,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1323](https://gitlab.com/meltano/meltano/issues/1323) Add CTA to send users to Typeform to provide info for setting up a hosted dashboard
 - [#1271](https://gitlab.com/meltano/meltano/issues/1271) Improve messaging on tap and target settings modals
 - [#1226](https://gitlab.com/meltano/meltano/issues/1226) Update Pipelines main navigation link to show all data pipeline schedules if that step has been reached
+- [#1323](https://gitlab.com/meltano/meltano/issues/1323) Add CTA to send users to Typeform to provide info for setting up a hosted dashboard
+- [#1271](https://gitlab.com/meltano/meltano/issues/1271) Improve messaging on tap and target settings modals
+- [#1246](https://gitlab.com/meltano/meltano/issues/1246) Update the [Salesforce API + Postgres](https://www.meltano.com/tutorials/salesforce-and-postgres.html) Tutorial to use Meltano UI for setting up the Extractor and Loader, running the ELT pipeline and analyzing the results.
 
 - [#1225](https://gitlab.com/meltano/meltano/issues/1225) Update dbt docs link to be conditional so the user doesn't experience 404s
 
