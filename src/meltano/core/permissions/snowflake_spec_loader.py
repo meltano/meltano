@@ -68,7 +68,7 @@ class SnowflakeSpecLoader:
         error_messages = self.ensure_valid_schema(spec)
         if error_messages:
             raise SpecLoadingError("\n".join(error_messages))
-        
+
         def lower_values(value):
             if isinstance(value, bool):
                 return value
@@ -509,11 +509,7 @@ class SnowflakeSpecLoader:
         tables = conn.show_tables()
         views = conn.show_views()
         for table in self.entities["table_refs"]:
-            if (
-                "*" not in table
-                and table not in tables
-                and table not in views
-            ):
+            if "*" not in table and table not in tables and table not in views:
                 error_messages.append(
                     f"Missing Entity Error: Table/View {table} was not found on"
                     " Snowflake Server. Please create it before continuing."
@@ -617,6 +613,7 @@ class SnowflakeSpecLoader:
 
         # For each permission in the spec, check if we have to generate an
         #  SQL command granting that permission
+
         for entity_type, entry in self.spec.items():
             if entity_type in ["databases", "warehouses", "version"]:
                 continue
@@ -663,7 +660,7 @@ class SnowflakeSpecLoader:
         for i, command in reversed(list(enumerate(sql_commands))):
             # Find all "GRANT OWNERSHIP commands"
             if command["sql"].startswith("GRANT OWNERSHIP ON"):
-                grant = (command["sql"].split("TO ROLE", 1)[0])
+                grant = command["sql"].split("TO ROLE", 1)[0]
 
                 if grant in grants:
                     # If there is already a GRANT OWNERSHIP for the same
