@@ -41,7 +41,7 @@ class SnowflakeGrantsGenerator:
         means that role reported has been granted the privilege to use the
         Database ANALYTICS on the Snowflake server.
         """
-        if SnowflakeConnector.snowflaky(entity_name).upper() in self.grants_to_role.get(
+        if SnowflakeConnector.snowflaky(entity_name) in self.grants_to_role.get(
             role, {}
         ).get(privilege, {}).get(entity_type, []):
             return True
@@ -64,7 +64,7 @@ class SnowflakeGrantsGenerator:
 
         try:
             for member_role in config["member_of"]:
-                granted_role = SnowflakeConnector.snowflaky(member_role).upper()
+                granted_role = SnowflakeConnector.snowflaky(member_role)
                 already_granted = False
                 if (
                     entity_type == "USER"
@@ -312,7 +312,7 @@ class SnowflakeGrantsGenerator:
         """
         sql_commands = []
 
-        usage_granted["databases"].add(database.upper())
+        usage_granted["databases"].add(database)
         already_granted = False
 
         if grant_type == "read":
@@ -416,7 +416,7 @@ class SnowflakeGrantsGenerator:
         # Before assigning privileges to a schema, check if
         #  usage to the database has been granted and
         # if not grant usage first to the database
-        if name_parts[0].upper() not in usage_granted["databases"]:
+        if name_parts[0] not in usage_granted["databases"]:
             new_commands, usage_granted = self.generate_database_grants(
                 role=role,
                 database=name_parts[0],
@@ -428,7 +428,7 @@ class SnowflakeGrantsGenerator:
 
         # Generate the INFORMATION_SCHEMA identifier for that database
         #  in order to be able to filter it out
-        info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
+        info_schema = f"{name_parts[0]}.INFORMATION_SCHEMA"
 
         schemas = []
 
@@ -492,7 +492,7 @@ class SnowflakeGrantsGenerator:
                 }
             )
 
-        usage_granted["schemas"].add(schema.upper())
+        usage_granted["schemas"].add(schema)
 
         return (sql_commands, usage_granted)
 
@@ -538,13 +538,13 @@ class SnowflakeGrantsGenerator:
 
         # Generate the INFORMATION_SCHEMA identifier for that database
         #  in order to be able to filter it out
-        info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
+        info_schema = f"{name_parts[0]}.INFORMATION_SCHEMA"
 
         # Before assigning privileges to a Table, check if
         #  usage to the database has been granted and
         # if not grant usage first to the database
         # Schemas will be checked as we generate them
-        if name_parts[0].upper() not in usage_granted["databases"]:
+        if name_parts[0] not in usage_granted["databases"]:
             new_commands, usage_granted = self.generate_database_grants(
                 role=role,
                 database=name_parts[0],
@@ -589,8 +589,8 @@ class SnowflakeGrantsGenerator:
             # first check if the role has been granted usage on the schema
             # either directly or indirectly (by granting to DB.*)
             if (
-                schema.upper() not in usage_granted["schemas"]
-                and f"{name_parts[0].upper()}.*" not in usage_granted["schemas"]
+                schema not in usage_granted["schemas"]
+                and f"{name_parts[0]}.*" not in usage_granted["schemas"]
             ):
                 new_commands, usage_granted = self.generate_schema_grants(
                     role=role,
@@ -664,9 +664,9 @@ class SnowflakeGrantsGenerator:
 
         else:
             # Only one table/view to be granted permissions to
-            if table.upper() in table_list:
+            if table in table_list:
                 tables = [table]
-            if table.upper() in view_list:
+            if table in view_list:
                 views = [table]
 
         # And then grant privileges to all tables in that schema
@@ -799,7 +799,7 @@ class SnowflakeGrantsGenerator:
         try:
             for schema in config["owns"]["schemas"]:
                 name_parts = schema.split(".")
-                info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
+                info_schema = f"{name_parts[0]}.INFORMATION_SCHEMA"
 
                 schemas = []
 
@@ -842,7 +842,7 @@ class SnowflakeGrantsGenerator:
 
             for table in config["owns"]["tables"]:
                 name_parts = table.split(".")
-                info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
+                info_schema = f"{name_parts[0]}.INFORMATION_SCHEMA"
 
                 if name_parts[2] == "*":
                     schemas = []

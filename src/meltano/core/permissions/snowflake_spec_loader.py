@@ -484,7 +484,7 @@ class SnowflakeSpecLoader:
 
         warehouses = conn.show_warehouses()
         for warehouse in self.entities["warehouses"]:
-            if warehouse.upper() not in warehouses:
+            if warehouse not in warehouses:
                 error_messages.append(
                     f"Missing Entity Error: Warehouse {warehouse} was not found on"
                     " Snowflake Server. Please create it before continuing."
@@ -492,7 +492,7 @@ class SnowflakeSpecLoader:
 
         databases = conn.show_databases()
         for db in self.entities["databases"]:
-            if db.upper() not in databases:
+            if db not in databases:
                 error_messages.append(
                     f"Missing Entity Error: Database {db} was not found on"
                     " Snowflake Server. Please create it before continuing."
@@ -500,7 +500,7 @@ class SnowflakeSpecLoader:
 
         schemas = conn.show_schemas()
         for schema in self.entities["schema_refs"]:
-            if "*" not in schema and schema.upper() not in schemas:
+            if "*" not in schema and schema not in schemas:
                 error_messages.append(
                     f"Missing Entity Error: Schema {schema} was not found on"
                     " Snowflake Server. Please create it before continuing."
@@ -511,8 +511,8 @@ class SnowflakeSpecLoader:
         for table in self.entities["table_refs"]:
             if (
                 "*" not in table
-                and table.upper() not in tables
-                and table.upper() not in views
+                and table not in tables
+                and table not in views
             ):
                 error_messages.append(
                     f"Missing Entity Error: Table/View {table} was not found on"
@@ -521,7 +521,7 @@ class SnowflakeSpecLoader:
 
         roles = conn.show_roles()
         for role in self.entities["roles"]:
-            if role.upper() not in roles:
+            if role not in roles:
                 error_messages.append(
                     f"Missing Entity Error: Role {role} was not found on"
                     " Snowflake Server. Please create it before continuing."
@@ -529,7 +529,7 @@ class SnowflakeSpecLoader:
 
         users = conn.show_users()
         for user in self.entities["users"]:
-            if user.upper() not in users:
+            if user not in users:
                 error_messages.append(
                     f"Missing Entity Error: User {user} was not found on"
                     " Snowflake Server. Please create it before continuing."
@@ -663,7 +663,7 @@ class SnowflakeSpecLoader:
         for i, command in reversed(list(enumerate(sql_commands))):
             # Find all "GRANT OWNERSHIP commands"
             if command["sql"].startswith("GRANT OWNERSHIP ON"):
-                grant = (command["sql"].split("TO ROLE", 1)[0]).upper()
+                grant = (command["sql"].split("TO ROLE", 1)[0])
 
                 if grant in grants:
                     # If there is already a GRANT OWNERSHIP for the same
@@ -674,7 +674,7 @@ class SnowflakeSpecLoader:
                     grants.append(grant)
 
             if command["sql"].startswith("REVOKE ALL"):
-                revoke = command["sql"].upper()
+                revoke = command["sql"]
                 if revoke in revokes:
                     # If there is already a REVOKE ALL for the same
                     #  DB/SCHEMA/TABLE --> remove the one before it
