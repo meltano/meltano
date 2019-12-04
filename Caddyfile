@@ -1,0 +1,7 @@
+{$HOSTNAME}
+
+proxy / localhost:5000 {
+  transparent
+}
+
+tls self_signed
