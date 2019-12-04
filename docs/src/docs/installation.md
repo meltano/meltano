@@ -21,7 +21,7 @@ In November, we released Meltano as a free hosted product! This eliminates the h
 
 Fill out [this form](https://meltano.typeform.com/to/NJPwxv) to get started with a free hosted Meltano account. We will contact you to schedule a setup time and learn everything we can about your needs.
 
-<a href="https://meltano.typeform.com/to/NJPwxva" class="button is-purple is-filled">Get started with your free hosted Meltano dashboard</a>
+<a href="https://meltano.typeform.com/to/NJPwxv" class="button is-purple is-filled">Get started with your free hosted Meltano dashboard</a>
 
 ## DigitalOcean Marketplace
 
