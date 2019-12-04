@@ -23,6 +23,10 @@ export default {
     plugin: {
       type: Object,
       required: true
+    },
+    requiredSettingsKeys: {
+      type: Array,
+      required: true
     }
   },
   computed: {
@@ -42,14 +46,17 @@ export default {
     getIsOfKindOptions() {
       return kind => kind === 'options'
     },
-    getIsProtected() {
-      return setting => setting.protected === true
-    },
     getIsOfKindTextBased() {
       return kind =>
         !this.getIsOfKindBoolean(kind) &&
         !this.getIsOfKindDate(kind) &&
         !this.getIsOfKindOptions(kind)
+    },
+    getIsProtected() {
+      return setting => setting.protected === true
+    },
+    getIsRequired() {
+      return setting => this.requiredSettingsKeys.includes(setting.name)
     },
     getPlaceholder() {
       return setting => setting.placeholder || setting.value || setting.name
@@ -186,18 +193,20 @@ export default {
               v-if="setting.documentation"
               target="_blank"
               :href="setting.documentation"
-              class="has-text-underlined label"
+              class="label"
             >
               <span
-                class="tooltip"
+                class="has-text-underlined tooltip"
                 :data-tooltip="
                   `Learn more about the ${getLabel(setting)} setting.`
                 "
                 >{{ getLabel(setting) }}</span
               >
+              <span>{{ getIsRequired(setting) ? '*' : '' }}</span>
             </a>
             <span v-else>
-              {{ getLabel(setting) }}
+              <span>{{ getLabel(setting) }}</span>
+              <span>{{ getIsRequired(setting) ? '*' : '' }}</span>
             </span>
             <TooltipCircle
               v-if="setting.tooltip"

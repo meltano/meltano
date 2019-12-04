@@ -72,6 +72,11 @@ export default {
         this.extractor.settingsGroupValidation
       )
       return this.isInstalled && isValid
+    },
+    requiredSettingsKeys() {
+      return this.extractor.settingsGroupValidation
+        ? lodash.uniq(lodash.flatten(this.extractor.settingsGroupValidation))
+        : this.localConfiguration.settings.map(setting => setting.name)
     }
   },
   created() {
@@ -214,6 +219,7 @@ export default {
             field-class="is-small"
             :config-settings="localConfiguration"
             :plugin="extractor"
+            :required-settings-keys="requiredSettingsKeys"
           />
         </template>
       </section>
