@@ -6,4 +6,4 @@ digitalocean_marketplace:
   stage: distribute
   script:
     - cd cloud/packer
-    - packer build marketplace-image.json
+    - packer build -only=digitalocean marketplace-image.json
