@@ -6,8 +6,11 @@ import yaml
 import copy
 from unittest import mock
 
+import meltano.core.bundle as bundle
+
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_discovery_service import (
+    DiscoveryFile,
     PluginDiscoveryService,
     MELTANO_DISCOVERY_URL,
 )
@@ -75,6 +78,13 @@ class TestPluginDiscoveryService:
 
 
 class TestPluginDiscoveryServiceRemote:
+    def test_bundled_discovery(self, subject):
+        # load the bundled discovery file
+        with bundle.find("discovery.yml").open() as bundled:
+            bundled_discovery = DiscoveryFile.parse(yaml.safe_load(bundled))
+
+        assert subject.cached_discovery.version == bundled_discovery.version
+
     def test_cached_discovery(self, subject):
         with mock.patch.object(
             PluginDiscoveryService,
