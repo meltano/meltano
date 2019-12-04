@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1358](https://gitlab.com/meltano/meltano/issues/1358) Update MeltanoData guide with maintenance and debugging instructions
 - [#1337](https://gitlab.com/meltano/meltano/issues/1337) Add CTA to installations for free hosted dashboards
+- [#1357](https://gitlab.com/meltano/meltano/issues/1357) Update LogModal Analyze CTAs so Analyze can preselect the correct loader for a given analysis
 
 ### Fixes
 
