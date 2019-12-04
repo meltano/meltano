@@ -40,6 +40,7 @@ extractors:
         label: API Token
         kind: password
       - name: start_date
+        description: Pull data from this date to now
         label: Start Date
         kind: date_iso8601
   - name: tap-gitlab
@@ -60,20 +61,32 @@ extractors:
         value: 'https://gitlab.com'
         protected: true
       - name: private_token
+        label: Private Token
         kind: password
+        description: Your GitLab profile access token
+        placeholder: Ex. *****************
+        documentation: https://meltano.com/plugins/extractors/gitlab.html#gitlab-api-token
         env: GITLAB_API_TOKEN
       - name: groups
         value: ''
+        description: One or more space delimited 'group's
+        placeholder: Ex. my-organization
+        documentation: https://meltano.com/plugins/extractors/gitlab.html#groups
         env: GITLAB_API_GROUPS
       - name: projects
         value: ''
+        description: One or more space delimited `group/project`s
+        placeholder: Ex. my-organization/project-1
+        documentation: https://meltano.com/plugins/extractors/gitlab.html#projects
         env: GITLAB_API_PROJECTS
       - name: ultimate_license
         value: false
         kind: boolean
-        description: Provides additional data only available for GitLab Ultimate and GitLab.com Gold accounts
+        description: Additional data for GitLab Ultimate and GitLab.com Gold accounts
+        documentation: https://meltano.com/plugins/extractors/gitlab.html#configuration
         env: GITLAB_API_ULTIMATE_LICENSE
       - name: start_date
+        description: Pull data from this date to now
         env: GITLAB_API_START_DATE
         kind: date_iso8601
   - name: tap-google-analytics
@@ -90,18 +103,31 @@ extractors:
       - ['key_file_location', 'view_id', 'start_date']
     settings:
       - name: key_file_location
-        env: GOOGLE_ANALYTICS_API_CLIENT_SECRETS
-        kind: file
+        label: Key File Location
         value: 'client_secrets.json'
+        placeholder: Ex. client_secrets.json
+        kind: file
+        description: Obtain this file from Google Analytics Service Accounts
+        documentation: https://meltano.com/plugins/extractors/google-analytics.html#creating-service-account-credentials
+        env: GOOGLE_ANALYTICS_API_CLIENT_SECRETS
       - name: view_id
+        label: View ID
+        placeholder: Ex. 198343027
+        description: Obtain this id from the Google Analytics Account Explorer
+        documentation: https://meltano.com/plugins/extractors/google-analytics.html#google-analytics-setup
         env: GOOGLE_ANALYTICS_API_VIEW_ID
         label: View ID
       - name: reports
+        label: Reports
+        placeholder: Ex. my_report_definition.json
+        documentation: https://gitlab.com/meltano/tap-google-analytics#tap-google-analytics
         env: GOOGLE_ANALYTICS_API_REPORTS
       - name: start_date
+        description: Pull data from this date
         env: GOOGLE_ANALYTICS_API_START_DATE
         kind: date_iso8601
       - name: end_date
+        description: Pull data up to this date
         env: GOOGLE_ANALYTICS_API_END_DATE
         kind: date_iso8601
   - name: tap-marketo
@@ -119,6 +145,7 @@ extractors:
         kind: password
       - name: endpoint
       - name: start_date
+        description: Pull data from this date to now
         kind: date_iso8601
   - name: tap-mongodb
     label: MongoDB
@@ -162,16 +189,29 @@ extractors:
       - Opportunity.*
     settings:
       - name: username
+        label: User Name
+        placeholder: Ex. me@my-organization.com
       - name: password
+        label: Password
+        placeholder:  Ex. *****************
         kind: password
       - name: security_token
+        label: Security Token
+        placeholder: Ex. *****************
+        description: Your Salesforce Account access token
+        documentation: https://meltano.com/plugins/extractors/salesforce.html#salesforce-setup
         kind: password
       - name: api_type
+        label: API Type
         value: REST
+        placeholder: Ex. REST
       - name: select_fields_by_default
+        label: Select Fields by Default
         value: true
         kind: boolean
+        description: Select by default any new fields discovered in Salesforce objects
       - name: start_date
+        description: Pull data from this date to now
         kind: date_iso8601
   - name: tap-stripe
     label: Stripe
@@ -190,6 +230,7 @@ extractors:
         kind: password
         env: STRIPE_API_KEY
       - name: start_date
+        description: Pull data from this date to now
         kind: date_iso8601
   - name: tap-zendesk
     label: Zendesk
@@ -203,14 +244,19 @@ extractors:
       - state
     settings:
       - name: email
+        placeholder: Ex. me@my-organization.com
         kind: email
       - name: api_token
-        label: Zendesk API Token
+        label: API Token
+        placeholder: Ex. *****************
         kind: password
+        documentation: https://support.zendesk.com/hc/en-us/articles/226022787-Generating-a-new-API-token-
       - name: subdomain
-        label: Zendesk Domain
-        description: <subdomain>.zendesk.com
+        label: Zendesk Subdomain
+        placeholder: Ex. my-subdomain.zendesk.com
+        documentation: https://support.zendesk.com/hc/en-us/articles/221682747-Where-can-I-find-my-Zendesk-subdomain-
       - name: start_date
+        description: Pull data from this date to now
         kind: date_iso8601
 loaders:
   - name: target-csv

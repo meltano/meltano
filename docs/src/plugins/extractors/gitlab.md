@@ -88,7 +88,7 @@ This property allows you to configure where you want your data set to start from
 
 ### Prerequisites
 
-* [Running instance of Meltano](/docs/getting-started.html)
+- [Running instance of Meltano](/docs/getting-started.html)
 
 ### Configure the Extractor
 
@@ -96,7 +96,7 @@ Open your Meltano instance and click "Pipelines" in the top navigation bar. You 
 
 ![Screenshot of Meltano UI with all extractors not installed and GitLab Extractor highlighted](/images/gitlab-tutorial/01-gitlab-extractor-selection.png)
 
-Let's install `tap-gitlab` by clicking on the `Install` button inside its card. 
+Let's install `tap-gitlab` by clicking on the `Install` button inside its card.
 
 On the configuration modal we want to enter the Private Token the GitLab extractor will use to connect to GitLab, the Groups and Projects we are going to extract from and the Start Date we want the extracted data set to start from.
 
@@ -104,7 +104,7 @@ On the configuration modal we want to enter the Private Token the GitLab extract
 
 ::: tip
 
-**Ready to do more with data from GitLab?** 
+**Ready to do more with data from GitLab?**
 
 Check out our [GitLab API + Postgres tutorial](/tutorials/gitlab-and-postgres.html) to learn how you can create an analytics database from within Meltano, and start analyzing your GitLab data.
 
@@ -131,7 +131,7 @@ Required:
 ```bash
 export GITLAB_API_TOKEN="private access token"
 export GITLAB_API_GROUPS="myorg mygroup"
-export GITLAB_API_PROJECTS="myorg/repo-a myorg-repo-b"
+export GITLAB_API_PROJECTS="myorg/repo-a myorg/repo-b"
 export GITLAB_API_START_DATE="YYYY-MM-DDTHH:MM:SSZ" # e.g. 2019-10-31T00:00:00Z
 ```
 
