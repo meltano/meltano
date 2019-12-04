@@ -60,6 +60,11 @@ export default {
     },
     loader() {
       return this.getInstalledPlugin('loaders', this.loaderName)
+    },
+    requiredSettingsKeys() {
+      return this.loader.settingsGroupValidation
+        ? lodash.uniq(lodash.flatten(this.loader.settingsGroupValidation))
+        : this.localConfiguration.settings.map(setting => setting.name)
     }
   },
   created() {
@@ -164,6 +169,7 @@ export default {
             field-class="is-small"
             :config-settings="localConfiguration"
             :plugin="loader"
+            :required-settings-keys="requiredSettingsKeys"
           />
         </template>
       </section>
