@@ -5,15 +5,23 @@ description: Meltano is easy to install on your local machine or in the cloud, i
 
 # Installation
 
-::: info
-Meltano officially released its first major version (v1)! Make sure to install the latest if you're still on an older version of Meltano.
-:::
+This section provides step-by-step guides for installing Meltano in various environments.
 
-This section provides step-by-step guides for installing Meltano in various environments. Currently, we provide detailed intructions for:
+No time to setup your own Meltano instance? We got you covered. Check out our [free hosted Meltano dashboards](/docs/installation.html#free-hosted-meltano-dashboards) solution.
+
+For instructions on how to setup your own Meltano instance, check out:
 
 - [DigitalOcean One-Click Installer](/docs/deployment.html#digitalocean-marketplace)
 - [Amazon Web Services (AWS)](/docs/deployment.html#amazon-web-services-aws)
 - [Local Installation](/docs/installation.html#local-installation)
+
+## Free Hosted Meltano Dashboards
+
+In November, we released Meltano as a free hosted product! This eliminates the hosting and installation hassle with a concierge-style setup so you can start building dashboards faster.
+
+Fill out [this form](https://meltano.typeform.com/to/NJPwxv) to get started with a free hosted Meltano account. We will contact you to schedule a setup time and learn everything we can about your needs.
+
+<a href="https://meltano.typeform.com/to/NJPwxv" class="button is-purple is-filled">Get started with your free hosted Meltano dashboard</a>
 
 ## DigitalOcean Marketplace
 
@@ -219,7 +227,7 @@ If you've installed Python 3, but are not getting the result you expect, you may
 `pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
 
 ```bash
-# Check for current version of pip 
+# Check for current version of pip
 # to ensure that it is using the Python3 pip
 pip --version
 
