@@ -32,7 +32,7 @@ export default {
       </div>
       <div>
         <p>
-          Experience the full extract, load, and transorm pipeline with
+          Experience the full extract, load, and transform pipeline with
           authentication using Meltano CLI followed by analysis using Meltano UI
           with its automatic SQL generation.
         </p>
@@ -51,7 +51,7 @@ export default {
       </div>
       <div>
         <p>
-          Experience the full extract, load, and transorm pipeline with
+          Experience the full extract, load, and transform pipeline with
           authentication using Meltano CLI followed by analysis using Meltano UI
           with its automatic SQL generation.
         </p>
@@ -70,7 +70,7 @@ export default {
       </div>
       <div>
         <p>
-          Experience the full extract, load, and transorm pipeline with
+          Experience the full extract, load, and transform pipeline with
           authentication using Meltano CLI followed by analysis using Meltano UI
           with its automatic SQL generation.
         </p>
