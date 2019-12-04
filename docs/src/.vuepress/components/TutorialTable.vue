@@ -45,7 +45,9 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="/tutorials/google-analytics-with-postgres.html">Google Analytics API + Postgres</a>
+        <a href="/tutorials/google-analytics-with-postgres.html">
+          Google Analytics API + Postgres
+        </a>
       </div>
       <div>
         <p>
@@ -125,9 +127,9 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="/tutorials/using-jupyter-notebooks.html"
-          >Using Jupyter Notebooks</a
-        >
+        <a href="/tutorials/using-jupyter-notebooks.html">
+          Using Jupyter Notebooks
+        </a>
       </div>
       <div>
         <p>
@@ -138,9 +140,9 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="/tutorials/manual-digitalocean-droplet.html"
-          >Manually Create a DigitalOcean Droplet for Meltano</a
-        >
+        <a href="/tutorials/manual-digitalocean-droplet.html">
+          Manually Create a DigitalOcean Droplet for Meltano
+        </a>
       </div>
       <div>
         <p>
@@ -158,6 +160,18 @@ export default {
       <div>
         <p>
           Learn how to create a custom extractor!
+        </p>
+      </div>
+    </div>
+    <div class="tutorial-item">
+      <div class="tutorial-header">
+        <a href="/tutorials/using-ftp-with-meltano.html">
+          How to Use FTP with Meltano
+        </a>
+      </div>
+      <div>
+        <p>
+          This guide will walk you through how to use FTP with Meltano.
         </p>
       </div>
     </div>
