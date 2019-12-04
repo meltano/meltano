@@ -92,19 +92,25 @@ class PluginDiscoveryService(Versioned):
                 with local_discovery.open() as local:
                     self._discovery = self.load_discovery(local)
             else:
-                return self.fetch_discovery()
+                self._discovery = self.fetch_discovery()
+        except DiscoveryInvalidError as e:
+            # let's use the bundled one
+            logging.error(
+                "Meltano could not parse the `discovery.yml` returned by the server."
+            )
+            logging.debug(str(e))
+            self._discovery = self.cached_discovery
 
+        try:
             self.ensure_compatible()
-
-            return self._discovery
-        except (yaml.YAMLError, FileNotFoundError) as e:
-            raise DiscoveryInvalidError("discovery.yml is not well formed.") from e
         except IncompatibleVersionError as e:
             logging.fatal(
                 "This version of Meltano cannot parse the plugins manifest, please update Meltano."
             )
             self._discovery = None
             raise
+
+        return self._discovery
 
     def fetch_discovery(self):
         try:
@@ -139,7 +145,7 @@ class PluginDiscoveryService(Versioned):
         try:
             with self.cached_discovery_file.open() as discovery_cache:
                 return self.load_discovery(discovery_cache)
-        except (yaml.YAMLError, FileNotFoundError):
+        except (yaml.YAMLError, FileNotFoundError, DiscoveryInvalidError):
             logging.debug(
                 f"Discovery cache corrupted or missing, falling back on the bundled discovery."
             )
@@ -154,7 +160,10 @@ class PluginDiscoveryService(Versioned):
         return self.project.meltano_dir("cache", "discovery.yml")
 
     def load_discovery(self, discovery_file) -> DiscoveryFile:
-        return DiscoveryFile.parse(yaml.load(discovery_file))
+        try:
+            return DiscoveryFile.parse(yaml.load(discovery_file))
+        except Exception as err:
+            raise DiscoveryInvalidError(str(err))
 
     def plugins(self) -> Iterator[Plugin]:
         discovery_plugins = (
