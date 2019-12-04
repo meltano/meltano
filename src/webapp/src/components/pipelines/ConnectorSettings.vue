@@ -55,11 +55,12 @@ export default {
     getIsProtected() {
       return setting => setting.protected === true
     },
-    getIsRequired() {
-      return setting => this.requiredSettingsKeys.includes(setting.name)
-    },
     getPlaceholder() {
       return setting => setting.placeholder || setting.value || setting.name
+    },
+    getRequiredLabel() {
+      return setting =>
+        this.requiredSettingsKeys.includes(setting.name) ? '*' : ''
     },
     getTextBasedInputType() {
       let type = 'text'
@@ -202,11 +203,11 @@ export default {
                 "
                 >{{ getLabel(setting) }}</span
               >
-              <span>{{ getIsRequired(setting) ? '*' : '' }}</span>
+              <span>{{ getRequiredLabel(setting) }}</span>
             </a>
             <span v-else>
               <span>{{ getLabel(setting) }}</span>
-              <span>{{ getIsRequired(setting) ? '*' : '' }}</span>
+              <span>{{ getRequiredLabel(setting) }}</span>
             </span>
             <TooltipCircle
               v-if="setting.tooltip"
