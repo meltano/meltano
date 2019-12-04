@@ -33,7 +33,7 @@ class DiscoveryUnavailableError(Exception):
 
 
 MELTANO_DISCOVERY_URL = "https://www.meltano.com/discovery.yml"
-VERSION = 5
+VERSION = 6
 
 
 class DiscoveryFile(Canonical):
