@@ -180,7 +180,7 @@ You should now be greeted by the `Connection details` tab which is important for
 1. SSH into your newly created droplet
 
 ```bash
-ssh $TENANT_NAME.meltanodata.com
+ssh root@$TENANT_NAME.meltanodata.com
 ```
 
 #### Configure Caddyfile
