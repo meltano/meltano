@@ -1,4 +1,4 @@
-version: 5
+version: 6
 extractors:
   - name: tap-carbon-intensity
     label: Carbon Emissions Intensity
