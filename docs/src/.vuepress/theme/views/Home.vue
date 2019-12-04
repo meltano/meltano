@@ -507,6 +507,12 @@ export default {
       color: #fff;
       background-color: $accentColor;
     }
+
+    &.is-purple.is-filled {
+      background-color: $purpleColor;
+      border-color: $purpleColor;
+      color: white;
+    }
 }
 
 .quote {
