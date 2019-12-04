@@ -13,6 +13,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1341](https://gitlab.com/meltano/meltano/issues/1341) Various `discovery.yml` and connector configuration UI updates to improve UX.
+- [#1341](https://gitlab.com/meltano/meltano/issues/1341) Updated documentation to communicate the various optional settings of a connector
+
 ### Fixes
 
 - [#1334](https://gitlab.com/meltano/meltano/issues/1334) Fix automatic population of airflow.cfg after installation
