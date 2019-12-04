@@ -186,17 +186,15 @@ export default {
               v-if="setting.documentation"
               target="_blank"
               :href="setting.documentation"
-              class="has-text-underlined label tooltip"
-              :data-tooltip="
-                `Learn more about the ${getLabel(setting)} setting.`
-              "
+              class="has-text-underlined label"
             >
-              {{ getLabel(setting) }}
-              <span class="icon is-small has-text-grey-light">
-                <font-awesome-icon
-                  icon="external-link-square-alt"
-                ></font-awesome-icon>
-              </span>
+              <span
+                class="tooltip"
+                :data-tooltip="
+                  `Learn more about the ${getLabel(setting)} setting.`
+                "
+                >{{ getLabel(setting) }}</span
+              >
             </a>
             <span v-else>
               {{ getLabel(setting) }}
@@ -292,8 +290,28 @@ export default {
               </a>
             </div>
 
-            <p v-if="setting.description" class="help is-italic">
-              {{ setting.description }}
+            <p v-if="setting.description || setting.documentation" class="help">
+              <a
+                v-if="setting.documentation"
+                target="_blank"
+                :href="setting.documentation"
+                class="tooltip"
+                :data-tooltip="
+                  `Learn more about the ${getLabel(setting)} setting.`
+                "
+              >
+                <span v-if="!setting.description" class="has-text-underlined"
+                  >Learn More.</span
+                >
+                <span class="icon has-text-link">
+                  <font-awesome-icon
+                    icon="external-link-square-alt"
+                  ></font-awesome-icon>
+                </span>
+              </a>
+              <span v-if="setting.description" class="is-italic"
+                >{{ setting.description }}.
+              </span>
             </p>
           </div>
         </div>
