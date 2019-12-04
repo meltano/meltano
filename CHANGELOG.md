@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-- [#1341](https://gitlab.com/meltano/meltano/issues/1341) Update connector settings UI to communicate the required status of each setting
+- [#1340](https://gitlab.com/meltano/meltano/issues/1340) Update connector settings UI to communicate the required status of each setting
 
 ### Fixes
 
