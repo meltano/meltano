@@ -16,7 +16,7 @@ chown $MELTANO_USER:$MELTANO_USER $MELTANO_ROOT
 
 sudo -H -u $MELTANO_USER python3 -m venv $MELTANO_VENV
 sudo -H -u $MELTANO_USER $MELTANO_VENV/bin/pip install --upgrade pip wheel
-sudo -H -u $MELTANO_USER $MELTANO_VENV/bin/pip install gunicorn meltano
+sudo -H -u $MELTANO_USER $MELTANO_VENV/bin/pip install meltano
 
 # create the Meltano project
 cd $MELTANO_ROOT
