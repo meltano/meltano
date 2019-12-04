@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1358](https://gitlab.com/meltano/meltano/issues/1358) Update MeltanoData guide with maintenance and debugging instructions
 - [#1337](https://gitlab.com/meltano/meltano/issues/1337) Add CTA to installations for free hosted dashboards
 - [#1365](https://gitlab.com/meltano/meltano/issues/1365) Add process for deleting meltanodata instances
+- [#1340](https://gitlab.com/meltano/meltano/issues/1340) Update connector settings UI to communicate the required status of each setting
 
 ### Fixes
 

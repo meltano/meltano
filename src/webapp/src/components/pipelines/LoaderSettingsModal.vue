@@ -7,6 +7,7 @@ import lodash from 'lodash'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
 import ConnectorSettingsDropdown from '@/components/pipelines/ConnectorSettingsDropdown'
+import utils from '@/utils/utils'
 
 export default {
   name: 'LoaderSettingsModal',
@@ -60,6 +61,12 @@ export default {
     },
     loader() {
       return this.getInstalledPlugin('loaders', this.loaderName)
+    },
+    requiredSettingsKeys() {
+      return utils.requiredConnectorSettingsKeys(
+        this.localConfiguration.settings,
+        this.loader.settingsGroupValidation
+      )
     }
   },
   created() {
@@ -164,6 +171,7 @@ export default {
             field-class="is-small"
             :config-settings="localConfiguration"
             :plugin="loader"
+            :required-settings-keys="requiredSettingsKeys"
           />
         </template>
       </section>

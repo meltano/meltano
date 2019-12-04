@@ -23,6 +23,10 @@ export default {
     plugin: {
       type: Object,
       required: true
+    },
+    requiredSettingsKeys: {
+      type: Array,
+      required: true
     }
   },
   computed: {
@@ -42,17 +46,21 @@ export default {
     getIsOfKindOptions() {
       return kind => kind === 'options'
     },
-    getIsProtected() {
-      return setting => setting.protected === true
-    },
     getIsOfKindTextBased() {
       return kind =>
         !this.getIsOfKindBoolean(kind) &&
         !this.getIsOfKindDate(kind) &&
         !this.getIsOfKindOptions(kind)
     },
+    getIsProtected() {
+      return setting => setting.protected === true
+    },
     getPlaceholder() {
       return setting => setting.placeholder || setting.value || setting.name
+    },
+    getRequiredLabel() {
+      return setting =>
+        this.requiredSettingsKeys.includes(setting.name) ? '*' : ''
     },
     getTextBasedInputType() {
       let type = 'text'
@@ -106,9 +114,6 @@ export default {
     this.focusInputIntelligently()
   },
   methods: {
-    findLabel(setting) {
-      return setting.options.find(item => item.value === setting.value).label
-    },
     focusInputIntelligently() {
       this.$nextTick(() => {
         const inputs = Array.from(this.$el.getElementsByTagName('input'))
@@ -186,18 +191,20 @@ export default {
               v-if="setting.documentation"
               target="_blank"
               :href="setting.documentation"
-              class="has-text-underlined label"
+              class="label"
             >
               <span
-                class="tooltip"
+                class="has-text-underlined tooltip"
                 :data-tooltip="
                   `Learn more about the ${getLabel(setting)} setting.`
                 "
                 >{{ getLabel(setting) }}</span
               >
+              <span>{{ getRequiredLabel(setting) }}</span>
             </a>
             <span v-else>
-              {{ getLabel(setting) }}
+              <span>{{ getLabel(setting) }}</span>
+              <span>{{ getRequiredLabel(setting) }}</span>
             </span>
             <TooltipCircle
               v-if="setting.tooltip"
