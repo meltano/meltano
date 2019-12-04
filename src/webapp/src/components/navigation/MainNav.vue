@@ -385,16 +385,28 @@ export default {
               </Dropdown>
             </div>
             <div class="level-item">
-              <a
-                class="button"
-                target="_blank"
-                href="https://meltano.com/docs/getting-help.html"
-              >
-                <span class="icon">
-                  <font-awesome-icon icon="question-circle"></font-awesome-icon>
-                </span>
-                <span>Help</span>
-              </a>
+              <div class="buttons">
+                <a
+                  v-if="!updateAvailable && version"
+                  class="button is-small is-borderless has-background-transparent"
+                  href="https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md"
+                  target="_blank"
+                >
+                  v{{ version }}
+                </a>
+                <a
+                  class="button"
+                  target="_blank"
+                  href="https://meltano.com/docs/getting-help.html"
+                >
+                  <span class="icon">
+                    <font-awesome-icon
+                      icon="question-circle"
+                    ></font-awesome-icon>
+                  </span>
+                  <span>Help</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
