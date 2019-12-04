@@ -470,7 +470,7 @@ chmod g-w /var/meltano/project
 
 When a client no longer needs a hosted instance of Meltano on meltanodata.com, you need to:
 
-1. Login to DigitalOcewan
-1. Delete the tenant's droplet
-1. Delete the A record in networking
-1. Delete the database cluster
+1. Login to DigitalOcean
+1. Delete the client's droplet
+1. Delete the client's A record in networking
+1. Delete the client's database cluster
