@@ -10,7 +10,7 @@ users:
     primary_group: meltano
   - name: meltano_ftp
     shell: /bin/sh
-    homedir: /var/meltano/project
+    homedir: /var/meltano
     primary_group: meltano
     no_user_group: true
     no_create_home: true
