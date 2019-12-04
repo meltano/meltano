@@ -3,8 +3,6 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
-
 ## Unreleased
 
 ---
@@ -15,18 +13,19 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1337](https://gitlab.com/meltano/meltano/issues/1337) Add CTA to installations for free hosted dashboards
+
 ### Fixes
 
 ### Breaks
 
-
 ## 1.9.1 - (2019-12-04)
+
 ---
 
 ### Fixes
 
 - [#1355](https://gitlab.com/meltano/meltano/issues/1355) Upgrade version of `discovery.yml` so that not upgraded Meltano instances with a pre v1.9.0 Meltano version do not break.
-
 
 ## 1.9.0 - (2019-12-03)
 
