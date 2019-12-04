@@ -3,18 +3,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
+
+- [#1343](https://gitlab.com/meltano/meltano/issues/1343) Add current Meltano version to main navigation
 
 ### Changes
 
 ### Fixes
 
 ### Breaks
-
 
 ## 1.9.0 - (2019-12-03)
 
@@ -25,7 +26,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [marketing#103](https://gitlab.com/meltano/meltano-marketing/issues/103) Add Google Site Verification token to site
 - [#1346](https://gitlab.com/meltano/meltano/issues/1346) Add new tutorial for using FileZilla with a Meltano project
 - [#1292](https://gitlab.com/meltano/meltano/issues/1292) Add guide for setting up Meltano projects on meltanodata.com
-- [#1343](https://gitlab.com/meltano/meltano/issues/1343) Add current Meltano version to main navigation
 
 ### Changes
 
@@ -36,7 +36,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1334](https://gitlab.com/meltano/meltano/issues/1334) Fix automatic population of airflow.cfg after installation
 - [#1344](https://gitlab.com/meltano/meltano/issues/1344) Fix an ELT automatic discovery error when running Meltano on Python3.6
-
 
 ## 1.8.0 - (2019-12-02)
 
