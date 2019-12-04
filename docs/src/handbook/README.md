@@ -6,4 +6,4 @@ sidebar: auto
 
 ## Engineering
 
-- [Client Setup Workflow](/handbook/engineering/client-setup/)
+- [Client Setup Workflow](/handbook/engineering/meltanodata-guide/)
