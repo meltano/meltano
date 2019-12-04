@@ -2,29 +2,31 @@
 sidebar: auto
 ---
 
-# New Client Setup Guide
+# MeltanoData Guide
 
-This is the guide for team members to use when setting up a new Meltano instance for clients.
+This will be the single source of truth for team members when it comes to creating and managing Meltano instances on MeltanoData.com.
 
-## Prerequisites
+## Creating a New Instance
+
+### Prerequisites
 
 - DigitalOcean Account
 - Access to DigitalOcean Meltano team
 - Client's tenant name (i.e., company name, etc.)
 
-## Step 1: Setup a new droplet
+### Step 1: Setup a new droplet
 
 1. Login to DigitalOcean
 1. Access the Meltano project workspace
 1. In the upper right, click on the `Create` button
 1. Select `Droplets` from the dropdown menu
 
-### Choose an image
+#### Choose an image
 
 1. Select the `Snapshots` tab
 1. Select the first image in the upper left corner (e.g., `Ubuntu meltano-123456789`)
 
-### Choose a plan
+#### Choose a plan
 
 1. Leave it on `Standard`
 1. Change machine plan cost to:
@@ -33,19 +35,19 @@ This is the guide for team members to use when setting up a new Meltano instance
    - 60 GB SSD Disk
    - 3 TB transfer
 
-### Add block storage
+#### Add block storage
 
 1. Leave empty
 
-### Choose a datacenter region
+#### Choose a datacenter region
 
 1. You can leave the default (e.g., New York 3), but make note which it is since you'll need it later on
 
-### Select additional options
+#### Select additional options
 
 1. Leave everything unselected
 
-### Authentication
+#### Authentication
 
 1. Select `SSH keys` if it is not selected by default
 1. Click `Select all` to provide all team members ability to access the droplet
@@ -54,27 +56,27 @@ This is the guide for team members to use when setting up a new Meltano instance
 If your SSH key is not included in the list above, make sure to add it now through the `New SSH Key` button.
 :::
 
-### Finalize and create
+#### Finalize and create
 
 1. Leave droplet at `1 droplet`
 1. For the hostname, use the desired URL for this client (i.e., `$TENANT_NAME.meltanodata.com`)
 1. Under tags, add `production`
 
-### Select Project
+#### Select Project
 
 1. Leave the default as `Meltano`
 
-### Add backups
+#### Add backups
 
 1. Leave `Enable backups` unchecked
 
-### Create droplet
+#### Create droplet
 
 1. Click on `Create droplet` to start the process.
 
 Once the droplet has completed setting up, you should see it in your `Droplets` table with an assigned IP address.
 
-### Verify droplet is working
+#### Verify droplet is working
 
 1. Open your terminal
 1. Ping the IP address with the command:
@@ -99,12 +101,12 @@ PING 123.456.789.01: 56 data bytes
 round-trip min/avg/max/stddev = 12.279/16.375/19.898/2.901 ms
 ```
 
-## Step 2: Configure Network
+### Step 2: Configure Network
 
 1. Click on the `Networking` link on the left side menu
 1. Under the **Domains** tab, click on `meltanodata.com` to access the DNS records dashboard
 
-### Create a new record for the client
+#### Create a new record for the client
 
 1. The current tab should be `A` records
 1. Under **Hostname**, fill in your client's `$TENANT_NAME`
@@ -114,7 +116,7 @@ round-trip min/avg/max/stddev = 12.279/16.375/19.898/2.901 ms
 
 This will automatically trigger a process that will initiate a workflow with Let's Encrypt to issue a HTTPS certificate for the subdomain.
 
-### Make sure everything works
+#### Make sure everything works
 
 1. Open your Terminal
 1. Ping the URL with the command:
@@ -141,31 +143,31 @@ round-trip min/avg/max/stddev = 12.279/16.375/19.898/2.901 ms
 
 If you are getting an error, give it a few more minutes since the records needs to propogate. If it is not working after 30 minutes though, please raise an issue with the team.
 
-## Step 3: Create Database Cluster
+### Step 3: Create Database Cluster
 
 1. Select `Databases` link in the left side menu
 1. In the upper right, click on `Create` button
 1. Select `Databases` from the dropdown
 
-### Choose a database engine
+#### Choose a database engine
 
 1. Leave default as `PostgreSQL 11`
 
-### Choose a cluster configuration
+#### Choose a cluster configuration
 
 1. Leave default on `$15/mo: 1 GB RAM / 1 vCPU / 10 GB Disk` plan
 
-### Choose a datacenter
+#### Choose a datacenter
 
 1. Choose the same geolocation as the droplet if possible
 
-### Finalize and create
+#### Finalize and create
 
 1. Under **Choose a unique database cluster name**, append the automatically generated name with `-$TENANT_NAME` (e.g., `db-postgresql-nyc3-52483-$TENANT_NAME`)
 1. Under **Select project**, leave it as the default `Meltano`
 1. Click on `Create a Database Cluster`
 
-### Configure the database
+#### Configure the database
 
 1. Click `Getting Started` button
 1. Restrict inbound connections by adding the recently created droplet under **Add trusted sources**
@@ -173,7 +175,7 @@ If you are getting an error, give it a few more minutes since the records needs 
 
 You should now be greeted by the `Connection details` tab which is important for later on. It contains your database credentials and will be referenced later on.
 
-## Step 4: Configure Meltano Droplet
+### Step 4: Configure Meltano Droplet
 
 1. SSH into your newly created droplet
 
@@ -181,7 +183,7 @@ You should now be greeted by the `Connection details` tab which is important for
 ssh $TENANT_NAME.meltanodata.com
 ```
 
-### Configure Caddyfile
+#### Configure Caddyfile
 
 1. Open `/etc/caddy/Caddyfile` in text editor (i.e., vim)
 
@@ -207,7 +209,7 @@ Navigate vim with arrow keys and press `I` key to enter Insert mode so you can m
 To exit Insert mode, press the `Esc` key, type `:wq`, and press `Enter` to save and quit vim
 :::
 
-### Configure Caddy Environment
+#### Configure Caddy Environment
 
 1. You should still be logged in to the droplet
 1. Open `/etc/caddy/environment` in text editor
@@ -224,7 +226,7 @@ HOSTNAME=$TENANT_NAME.meltanodata.com
 
 4. Save and quit file
 
-### Change Login Password
+#### Change Login Password
 
 1. You should be logged in to the droplet
 1. Create a new login in 1Password under the `meltanodata.com` vault
@@ -242,7 +244,7 @@ htpasswd -b /etc/caddy/htpasswd meltano $PASSWORD
 
 If you get the message `Updating password for user meltano`, you were successful in updating the login password.
 
-### Change FTP Login Password
+#### Change FTP Login Password
 
 1. You should be logged in to the droplet
 1. Create a new login in 1Password under the `meltanodata.com` vault
@@ -263,7 +265,7 @@ passwd meltano_ftp
 
 Once you see `passwd: password updated successfully`, you are good to go!
 
-### Restart Caddy
+#### Restart Caddy
 
 Now that the configurations are made, you need to restart Caddy by running the following command:
 
@@ -279,9 +281,9 @@ systemctl status
 
 And you should see a state of `running` in the return message.
 
-## Step 5: Configure Meltano UI
+### Step 5: Configure Meltano UI
 
-### Get credentials for database ready
+#### Get credentials for database ready
 
 1. Login to DigitalOcean
 1. Click on `Database` in left side menu
@@ -297,7 +299,7 @@ You should now be on the **Overview** tab and should see the **Connection Detail
 
 Keep this tab open because you'll need to refer to it shortly.
 
-### Install PostgreSQL loader on Meltano UI
+#### Install PostgreSQL loader on Meltano UI
 
 1. Visit `$TENANT_NAME.meltanodata.com` in your browser
 1. Login with credentials you setup in 1Password for the username `meltano`
@@ -306,7 +308,7 @@ Keep this tab open because you'll need to refer to it shortly.
 
 When you see the configuration modal, you are ready for the next step.
 
-### Configure PostgreSQL loader in meltano.yml
+#### Configure PostgreSQL loader in meltano.yml
 
 1. SSH into droplet
 1. Change into the Meltano project directory
@@ -335,7 +337,7 @@ vim meltano.yml
 
 You should now see your changes appear in for the `host` input for Meltano UI in the PostgreSQL loader configuration modal.
 
-### Finalize configurations
+#### Finalize configurations
 
 1. Using the credentials from the DigitalOcean Database instance to fill out:
 
@@ -346,6 +348,120 @@ You should now see your changes appear in for the `host` input for Meltano UI in
 
 1. Click `Save` to save your changes.
 
-## Step 6: Make sure everything works!
+### Step 6: Make sure everything works!
 
 Now all your have to do is check to make sure we can see reports being generated in Analyze and we're good to go! 🎉
+
+## Maintaining an Existing Instance
+
+### Upgrade a Meltano instance manually
+
+In the event you need to manually update the droplet's Meltano version:
+
+1. SSH into the droplet
+1. Activate the virtual environment
+
+```bash
+source /var/meltano/.venv/bin/activate
+```
+
+3. Change into the Meltano project directory
+
+```bash
+cd /var/meltano/project
+```
+
+4. Run Meltano upgrade command
+
+```bash
+meltano upgrade
+```
+
+And that's it. No need to restart the service at all!
+
+### Wipe database in Meltano demo instance
+
+#### Get credentials to access PostgreSQL
+
+1. Login to DigitalOcean
+1. Click on **Database** in left side menu
+1. Open Meltano database cluster
+   - This is tricky since the current cluster doesn't have meltano appended to it, but you can verify this by checking the trusted sources to verify it's the correct one
+1. In the **Connection Details** section on the right, open the dropdown with the default label `Connection parameters`
+1. Select `Flags`
+1. Copy the snippet using the **Copy** button so it properly copies the password hash
+
+#### Drop schemas in database
+
+1. Open your terminal
+1. Paste the snippet from `Flags` and press `Enter`
+
+   - If you get an error regarding a missing `psql` installation, you'll need to install `psql-client`
+
+   ```bash
+   # We are looking for the current version
+   apt search psql-client
+   # Add the current version, which is 10 right now
+   install psql-client-10
+   ```
+
+If you are successful, you should see be put in the psql prompt and see:
+
+```
+defaultdb=>
+```
+
+3. Check for the existing schemas:
+
+```
+\dn
+```
+
+4. For each schema EXCEPT `public`, run the following command:
+
+```sql
+DROP SCHEMA $EXISTING_SCHEMA_NAME CASCADE;
+```
+
+5. Once you're done, you can exit by pressing `Ctrl + D`
+
+## Debugging an Existing Instance
+
+### 500 error when accessing instance on browser
+
+::: warning Error
+{"error":"500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application."}
+:::
+
+If you see this error, most likely this is due to an issue with Meltano itself. In order to access the logs to debug this:
+
+1. SSH into the droplet
+1. Activate the virtual environment
+
+```bash
+source /var/meltano/.venv/bin/activate
+```
+
+3. Check system status and processes with
+
+```bash
+systemctl status
+```
+
+- Under `meltano.service`, you will see a directory path that will provide you with a hint towards where things live
+
+4. To check the logs, go to `/var/meltano/project/.meltano/run`
+
+5. The log used to debug this last time was `meltano-ui.log`
+
+### 500 error when FTPing into instance
+
+::: warning Error
+Response: 500 OOPS: vsftpd: refusing to run with writable root inside chroot()
+:::
+
+This means that the permissions on the root directory you are trying to access need to be changed. This should not be an issue on future images, but in case it is, you'll need a command similar to:
+
+```bash
+chmod g-w /var/meltano/project
+```
