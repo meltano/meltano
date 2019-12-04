@@ -6,9 +6,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## Unreleased
+
 ---
 
 ### New
+
+- [#1343](https://gitlab.com/meltano/meltano/issues/1343) Add current Meltano version to main navigation
 
 ### Changes
 
@@ -44,7 +47,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1334](https://gitlab.com/meltano/meltano/issues/1334) Fix automatic population of airflow.cfg after installation
 - [#1344](https://gitlab.com/meltano/meltano/issues/1344) Fix an ELT automatic discovery error when running Meltano on Python3.6
-
 
 ## 1.8.0 - (2019-12-02)
 
