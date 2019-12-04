@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [marketing#103](https://gitlab.com/meltano/meltano-marketing/issues/103) Add Google Site Verification token to site
+- [#1346](https://gitlab.com/meltano/meltano/issues/1346) Add new tutorial for using FileZilla with a Meltano project
 
 ### Changes
 
