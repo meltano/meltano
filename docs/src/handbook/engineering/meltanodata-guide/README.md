@@ -465,3 +465,12 @@ This means that the permissions on the root directory you are trying to access n
 ```bash
 chmod g-w /var/meltano/project
 ```
+
+## Deleting an instance
+
+When a client no longer needs a hosted instance of Meltano on meltanodata.com, you need to:
+
+1. Login to DigitalOcewan
+1. Delete the tenant's droplet
+1. Delete the A record in networking
+1. Delete the database cluster
