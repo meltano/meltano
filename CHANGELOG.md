@@ -3,27 +3,27 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
-
 ## Unreleased
+
 ---
 
 ### New
 
 ### Changes
 
+- [#1341](https://gitlab.com/meltano/meltano/issues/1341) Update connector settings UI to communicate the required status of each setting
+
 ### Fixes
 
 ### Breaks
 
-
 ## 1.9.1 - (2019-12-04)
+
 ---
 
 ### Fixes
 
 - [#1355](https://gitlab.com/meltano/meltano/issues/1355) Upgrade version of `discovery.yml` so that not upgraded Meltano instances with a pre v1.9.0 Meltano version do not break.
-
 
 ## 1.9.0 - (2019-12-03)
 
@@ -44,7 +44,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1334](https://gitlab.com/meltano/meltano/issues/1334) Fix automatic population of airflow.cfg after installation
 - [#1344](https://gitlab.com/meltano/meltano/issues/1344) Fix an ELT automatic discovery error when running Meltano on Python3.6
-
 
 ## 1.8.0 - (2019-12-02)
 
