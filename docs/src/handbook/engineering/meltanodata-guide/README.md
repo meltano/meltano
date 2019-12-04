@@ -281,7 +281,71 @@ And you should see a state of `running` in the return message.
 
 ## Step 5: Configure Meltano UI
 
-1. Get database credentials from Digital Ocean
-1. Install `Postgres` loader
-1. Update `meltano.yml` with PostgreSQL host location through SSH
-1. Make sure loader `Postgres` and has the correct host
+### Get credentials for database ready
+
+1. Login to DigitalOcean
+1. Click on `Database` in left side menu
+1. Select database instance for `db-postgresql-nyc1-01234-$TENANT_NAME`
+
+You should now be on the **Overview** tab and should see the **Connection Details** on the right side. It will contain critical information such as:
+
+- username
+- password
+- host
+- port
+- database
+
+Keep this tab open because you'll need to refer to it shortly.
+
+### Install PostgreSQL loader on Meltano UI
+
+1. Visit `$TENANT_NAME.meltanodata.com` in your browser
+1. Login with credentials you setup in 1Password for the username `meltano`
+1. Install `tap-carbon-intensity` since you cannot configure loaders without installing an extractor first
+1. Install `target-postgres` for the loader
+
+When you see the configuration modal, you are ready for the next step.
+
+### Configure PostgreSQL loader in meltano.yml
+
+1. SSH into droplet
+1. Change into the Meltano project directory
+
+```bash
+cd /var/meltano/project
+```
+
+3. Open `meltano.yml` in a text editor
+
+```bash
+vim meltano.yml
+```
+
+4. Update `meltano.yml` loaders to configure the `config` > `host` property:
+
+```yaml
+- label: PostgreSQL
+  name: target-postgres
+  pip_url: git+https://github.com/meltano/target-postgres.git
+  config:
+    host: db-postgresql-nyc3-000-wwright-do-user-000-0.db.ondigitalocean.com
+```
+
+5. Save and quit text editor
+
+You should now see your changes appear in for the `host` input for Meltano UI in the PostgreSQL loader configuration modal.
+
+### Finalize configurations
+
+1. Using the credentials from the DigitalOcean Database instance to fill out:
+
+- User
+- Password
+- Port
+- Database
+
+1. Click `Save` to save your changes.
+
+## Step 6: Make sure everything works!
+
+Now all your have to do is check to make sure we can see reports being generated in Analyze and we're good to go! 🎉
