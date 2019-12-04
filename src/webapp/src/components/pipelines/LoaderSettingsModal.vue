@@ -7,6 +7,7 @@ import lodash from 'lodash'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
 import ConnectorSettingsDropdown from '@/components/pipelines/ConnectorSettingsDropdown'
+import utils from '@/utils/utils'
 
 export default {
   name: 'LoaderSettingsModal',
@@ -62,9 +63,10 @@ export default {
       return this.getInstalledPlugin('loaders', this.loaderName)
     },
     requiredSettingsKeys() {
-      return this.loader.settingsGroupValidation
-        ? lodash.uniq(lodash.flatten(this.loader.settingsGroupValidation))
-        : this.localConfiguration.settings.map(setting => setting.name)
+      return utils.requiredConnectorSettingsKeys(
+        this.localConfiguration.settings,
+        this.loader.settingsGroupValidation
+      )
     }
   },
   created() {

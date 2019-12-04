@@ -1,3 +1,5 @@
+import lodash from 'lodash'
+
 import flaskContext from '@/flask'
 
 const regExpConnectorLogo = /(?:tap-|target-)?(.*)/
@@ -136,6 +138,11 @@ export default {
     } catch (e) {
       return value
     }
+  },
+  requiredConnectorSettingsKeys(settings, groupValidation) {
+    return groupValidation
+      ? lodash.intersection(...groupValidation)
+      : settings.map(setting => setting.name)
   },
   singularize(value) {
     if (!value) {

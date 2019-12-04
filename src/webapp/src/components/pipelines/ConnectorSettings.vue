@@ -114,9 +114,6 @@ export default {
     this.focusInputIntelligently()
   },
   methods: {
-    findLabel(setting) {
-      return setting.options.find(item => item.value === setting.value).label
-    },
     focusInputIntelligently() {
       this.$nextTick(() => {
         const inputs = Array.from(this.$el.getElementsByTagName('input'))
