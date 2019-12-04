@@ -19,7 +19,7 @@ For instructions on how to setup your own Meltano instance, check out:
 
 In November, we released Meltano as a free hosted product! This eliminates the hosting and installation hassle with a concierge-style setup so you can start building dashboards faster.
 
-Fill out [this form](https://meltano.typeform.com/to/NJPwxva) to get started with a free hosted Meltano account. We will contact you to schedule a setup time and learn everything we can about your needs.
+Fill out [this form](https://meltano.typeform.com/to/NJPwxv) to get started with a free hosted Meltano account. We will contact you to schedule a setup time and learn everything we can about your needs.
 
 <a href="https://meltano.typeform.com/to/NJPwxva" class="button is-purple is-filled">Get started with your free hosted Meltano dashboard</a>
 
