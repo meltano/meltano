@@ -254,7 +254,7 @@ HOSTNAME=$TENANT_NAME.meltanodata.com
 1. In the terminal, run the following command with `$PASSWORD` replaced with the 1Password generated one:
 
 ```bash
-htpasswd -b /etc/caddy/htpasswd meltano $PASSWORD
+htpasswd -b /etc/caddy/htpasswd meltano "$PASSWORD"
 ```
 
 If you get the message `Updating password for user meltano`, you were successful in updating the login password.
