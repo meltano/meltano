@@ -114,7 +114,9 @@ round-trip min/avg/max/stddev = 12.279/16.375/19.898/2.901 ms
 1. Leave **TTL (seconds)** with the default of `3600`
 1. Click `Create Record`
 
-This will automatically trigger a process that will initiate a workflow with Let's Encrypt to issue a HTTPS certificate for the subdomain.
+::: Automatic SSL Certificate
+An automatic HTTPS certificate routine is built-in the distribution, leveraging **Let's Encrypt** to issue a HTTPS certificate for this subdomain.
+:::
 
 #### Make sure everything works
 
@@ -183,6 +185,19 @@ You should now be greeted by the `Connection details` tab which is important for
 ssh root@$TENANT_NAME.meltanodata.com
 ```
 
+::: Troubleshooting
+
+If you can't connect, make sure the SSH key you registered on you DigitalOcean account is loaded by using:
+
+```bash
+# by default, only `~/.ssh/id_rsa` is loaded into SSH agent
+ssh-add /path/to/your/ssh-key
+```
+
+For more informations about using `ssh`, take a look at https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys#basic-connection-instructions
+
+:::
+
 #### Configure Caddyfile
 
 1. Open `/etc/caddy/Caddyfile` in text editor (i.e., vim)
@@ -239,7 +254,7 @@ HOSTNAME=$TENANT_NAME.meltanodata.com
 1. In the terminal, run the following command with `$PASSWORD` replaced with the 1Password generated one:
 
 ```bash
-htpasswd -b /etc/caddy/htpasswd meltano $PASSWORD
+htpasswd -b /etc/caddy/htpasswd meltano "$PASSWORD"
 ```
 
 If you get the message `Updating password for user meltano`, you were successful in updating the login password.
@@ -279,9 +294,20 @@ To verify this worked, you can run the following command:
 systemctl status
 ```
 
-And you should see a state of `running` in the return message.
+You should scan for the following services to make sure Meltano properly running:
 
-### Step 5: Configure Meltano UI
+  - `caddy.service`
+  - `meltano.service`
+  - `vsftpd.service`
+
+::: tip
+If you see a state of `running` in the status output, that means all services are running.
+
+If you see a state of `degraded`, that means something is wrong — use `systemctl --failed` to have a quick glance.
+:::
+
+
+### Step 5: Configure Meltano
 
 #### Get credentials for database ready
 
@@ -299,54 +325,42 @@ You should now be on the **Overview** tab and should see the **Connection Detail
 
 Keep this tab open because you'll need to refer to it shortly.
 
+#### Setup the Meltano environment variables
+
+Because we manage the database instance for each tenant, using environment variables to configure `target-postgres` is the most simple and secure way of configuring the plugin.
+
+Create or edit the `/var/meltano/project/.env` file using the DigitalOcean database connection parameters:
+
+```bash
+PG_USERNAME=<username>
+PG_PASSWORD=<password>
+PG_ADDRESS=<host>
+PG_PORT=<port>
+PG_DATABASE=<database>
+```
+
+Make sure the file is secure by running the following commands:
+
+```bash
+# make the `meltano` user sole owner
+chown meltano:meltano /var/meltano/project/.env
+
+# make the file only readable by `meltano`, and `write-only` for FTP access
+chmod 620 /var/meltano/project/.env
+
+# restart meltano to reload the .env
+systemctl restart meltano
+```
+
 #### Install PostgreSQL loader on Meltano UI
 
 1. Visit `$TENANT_NAME.meltanodata.com` in your browser
 1. Login with credentials you setup in 1Password for the username `meltano`
-1. Install `tap-carbon-intensity` since you cannot configure loaders without installing an extractor first
-1. Install `target-postgres` for the loader
+1. Install `target-postgres` by updating the URL to `/pipeline/load/target-postgres`
 
-When you see the configuration modal, you are ready for the next step.
-
-#### Configure PostgreSQL loader in meltano.yml
-
-1. SSH into droplet
-1. Change into the Meltano project directory
-
-```bash
-cd /var/meltano/project
-```
-
-3. Open `meltano.yml` in a text editor
-
-```bash
-vim meltano.yml
-```
-
-4. Update `meltano.yml` loaders to configure the `config` > `host` property:
-
-```yaml
-- label: PostgreSQL
-  name: target-postgres
-  pip_url: git+https://github.com/meltano/target-postgres.git
-  config:
-    host: db-postgresql-nyc3-000-wwright-do-user-000-0.db.ondigitalocean.com
-```
-
-5. Save and quit text editor
-
-You should now see your changes appear in for the `host` input for Meltano UI in the PostgreSQL loader configuration modal.
-
-#### Finalize configurations
-
-1. Using the credentials from the DigitalOcean Database instance to fill out:
-
-- User
-- Password
-- Port
-- Database
-
-1. Click `Save` to save your changes.
+::: tip
+If the `/var/meltano/project/.env` is properly loaded, all the configuration should be correct.
+:::
 
 ### Step 6: Make sure everything works!
 
@@ -359,6 +373,16 @@ Now all your have to do is check to make sure we can see reports being generated
 In the event you need to manually update the droplet's Meltano version:
 
 1. SSH into the droplet
+1. Switch to the `meltano` user
+
+```bash
+su meltano
+```
+
+::: warning
+It is important to use the `meltano` user when upgrading because new files could be created with the wrong permissions.
+:::
+
 1. Activate the virtual environment
 
 ```bash
@@ -436,13 +460,7 @@ DROP SCHEMA $EXISTING_SCHEMA_NAME CASCADE;
 If you see this error, most likely this is due to an issue with Meltano itself. In order to access the logs to debug this:
 
 1. SSH into the droplet
-1. Activate the virtual environment
-
-```bash
-source /var/meltano/.venv/bin/activate
-```
-
-3. Check system status and processes with
+1. Check system status and processes with
 
 ```bash
 systemctl status
@@ -450,9 +468,8 @@ systemctl status
 
 - Under `meltano.service`, you will see a directory path that will provide you with a hint towards where things live
 
-4. To check the logs, go to `/var/meltano/project/.meltano/run`
-
-5. The log used to debug this last time was `meltano-ui.log`
+3. To check the logs, go to `/var/meltano/project/.meltano/run`
+4. The log used to debug this last time was `meltano-ui.log`
 
 ### 500 error when FTPing into instance
 
