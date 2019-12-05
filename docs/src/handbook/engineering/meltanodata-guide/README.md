@@ -167,11 +167,12 @@ If you are getting an error, give it a few more minutes since the records needs 
 
 1. Under **Choose a unique database cluster name**, append the automatically generated name with `-$TENANT_NAME` (e.g., `db-postgresql-nyc3-52483-$TENANT_NAME`)
 1. Under **Select project**, leave it as the default `Meltano`
+1. Click `Add Tags` and add `production`
 1. Click on `Create a Database Cluster`
 
 #### Configure the database
 
-1. Click `Getting Started` button
+1. Click the `Get Started` button
 1. Restrict inbound connections by adding the recently created droplet under **Add trusted sources**
 1. Click `Allow these inbound sources only` button
 
@@ -364,7 +365,7 @@ If the `/var/meltano/project/.env` is properly loaded, all the configuration sho
 
 ### Step 6: Make sure everything works!
 
-Now all your have to do is check to make sure we can see reports being generated in Analyze and we're good to go! 🎉
+Now all you have to do is check to make sure we can see reports being generated in Analyze and we're good to go! 🎉
 
 ## Maintaining an Existing Instance
 
