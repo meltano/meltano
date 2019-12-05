@@ -323,30 +323,27 @@ cd /var/meltano/project
 vim meltano.yml
 ```
 
-4. Update `meltano.yml` loaders to configure the `config` > `host` property:
+4. Using the credentials from the DigitalOcean Database instance, update `meltano.yml` to configure PostgreSQL and add the following entries under `config`:
 
 ```yaml
+... ... ...
 - label: PostgreSQL
   name: target-postgres
   pip_url: git+https://github.com/meltano/target-postgres.git
   config:
-    host: db-postgresql-nyc3-000-wwright-do-user-000-0.db.ondigitalocean.com
+    user: doadmin
+    password: ******* (the password you get from the DigitalOcean Database instance)
+    host: ***** (the host you get from the DigitalOcean Database instance)
+    port: 25060
+    dbname: defaultdb
+... ... ...
 ```
 
 5. Save and quit text editor
 
-You should now see your changes appear in for the `host` input for Meltano UI in the PostgreSQL loader configuration modal.
+You should now see your changes appear in the PostgreSQL loader configuration modal.
 
-#### Finalize configurations
-
-1. Using the credentials from the DigitalOcean Database instance to fill out:
-
-- User
-- Password
-- Port
-- Database
-
-1. Click `Save` to save your changes.
+Check that everything is accordingly and click `Save` to save your changes.
 
 ### Step 6: Make sure everything works!
 
