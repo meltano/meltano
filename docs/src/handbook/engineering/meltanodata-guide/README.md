@@ -297,16 +297,15 @@ systemctl status
 
 You should scan for the following services to make sure Meltano properly running:
 
-  - `caddy.service`
-  - `meltano.service`
-  - `vsftpd.service`
+- `caddy.service`
+- `meltano.service`
+- `vsftpd.service`
 
 ::: tip
 If you see a state of `running` in the status output, that means all services are running.
 
 If you see a state of `degraded`, that means something is wrong — use `systemctl --failed` to have a quick glance.
 :::
-
 
 ### Step 5: Configure Meltano
 
