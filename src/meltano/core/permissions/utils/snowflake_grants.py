@@ -37,7 +37,7 @@ class SnowflakeGrantsGenerator:
         <entity_type> with name <entity_name>.
 
         For example:
-        check_grant_to_role('reporter', 'usage', 'database', 'ANALYTICS') -> True
+        check_grant_to_role('reporter', 'usage', 'database', 'analytics') -> True
         means that role reported has been granted the privilege to use the
         Database ANALYTICS on the Snowflake server.
         """
@@ -55,7 +55,7 @@ class SnowflakeGrantsGenerator:
         Generate the GRANT statements for both roles and users.
 
         entity_type: "USER" or "ROLE"
-        entity: the name of the entity (e.g. "yannis" or "REPORTER")
+        entity: the name of the entity (e.g. "yannis" or "reporter")
         config: the subtree for the entity as specified in the spec
 
         Returns the SQL commands generated as a list
@@ -103,7 +103,7 @@ class SnowflakeGrantsGenerator:
         Most of the SQL command that will be generated are privileges granted to
         roles and this function orchestrates the whole process
 
-        role: the name of the role (e.g. "LOADER" or "REPORTER") the privileges
+        role: the name of the role (e.g. "loader" or "reporter") the privileges
               are GRANTed to
         config: the subtree for the role as specified in the spec
         shared_dbs: a set of all the shared databases defined in the spec.
@@ -302,7 +302,7 @@ class SnowflakeGrantsGenerator:
         Generate the GRANT statements for Databases.
 
         role: the name of the role the privileges are GRANTed to
-        database: the name of the database (e.g. "RAW")
+        database: the name of the database (e.g. "raw")
         grant_type: What type of privileges are granted? One of {"read", "write"}
         usage_granted: Passed by generate_grant_privileges_to_role() to track all
             all the entities a role has been granted access (usage) to.
@@ -378,10 +378,10 @@ class SnowflakeGrantsGenerator:
         shared_dbs: Set,
     ) -> Tuple[List[str], Dict]:
         """
-        Generate the GRANT statements for SCHEMAs.
+        Generate the GRANT statements for schemas.
 
         role: the name of the role the privileges are GRANTed to
-        schema: the name of the Schema (e.g. "RAW.PUBLIC")
+        schema: the name of the Schema (e.g. "raw.public")
         grant_type: What type of privileges are granted? One of {"read", "write"}
         usage_granted: Passed by generate_grant_privileges_to_role() to track all
             all the entities a role has been granted access (usage) to.
@@ -505,10 +505,10 @@ class SnowflakeGrantsGenerator:
         shared_dbs: Set,
     ) -> Tuple[List[str], Dict]:
         """
-        Generate the GRANT statements for TABLEs and VIEWs.
+        Generate the GRANT statements for tables and views.
 
         role: the name of the role the privileges are GRANTed to
-        table: the name of the TABLE/VIEW (e.g. "RAW.PUBLIC.MY_TABLE")
+        table: the name of the TABLE/VIEW (e.g. "raw.public.my_table")
         grant_type: What type of privileges are granted? One of {"read", "write"}
         usage_granted: Passed by generate_grant_privileges_to_role() to track all
             all the entities a role has been granted access (usage) to.
@@ -763,9 +763,9 @@ class SnowflakeGrantsGenerator:
 
     def generate_grant_ownership(self, role: str, config: str) -> List[Dict]:
         """
-        Generate the GRANT ownership statements for databases, SCHEMAs and TABLEs.
+        Generate the GRANT ownership statements for databases, schemas and tables.
 
-        role: the name of the role (e.g. "LOADER") ownership will be GRANTed to
+        role: the name of the role (e.g. "loader") ownership will be GRANTed to
         config: the subtree for the role as specified in the spec
 
         Returns the SQL commands generated as a List
