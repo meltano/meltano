@@ -90,6 +90,26 @@ Let's install `tap-google-analytics` by clicking on the `Install` button inside 
 
 For the **Key File Location**, you will need to upload your `client_secrets.json` into the `extract` folder of your Meltano project. This can be done via FTP or logging in through your terminal.
 
+::: tip Uploading with FTP
+To upload with FTP:
+
+1. Login to your Meltano project with your FTP credentials.
+
+   - This should open a directory that contains folder such as
+
+     - `analyze`
+     - `extract`
+     - `load`
+     - `model`
+
+2. Open the `extract` folder by double clicking it.
+
+3. Locate the `client_secrets.json` file on your local machine in the left panel.
+
+4. Click and drag your `client_secrets.json` file over to the opened `extract` folder on the right panel.
+
+Once it appears in the right panel, everything is good to go!
+:::
 For the **View ID**, enter the ID you retrieved using [Google Analytics Account Explorer](https://ga-dev-tools.appspot.com/account-explorer/)
 
 For the **Start Date**, choose the date when you want to start extracting data for.
