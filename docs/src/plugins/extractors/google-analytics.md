@@ -80,7 +80,7 @@ Use this email address to [add a user](https://support.google.com/analytics/answ
 
 - [Running instance of Meltano](/docs/getting-started.html)
 
-### Configure the Extractor
+### Configuration
 
 Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data source.
 
