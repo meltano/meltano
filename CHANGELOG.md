@@ -3,18 +3,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
 
 ### Changes
 
+- [#1373](https://gitlab.com/meltano/meltano/issues/1373) Update MeltanoData deletion process with 1Password
+
 ### Fixes
 
-### Breaks
+- [#1373](https://gitlab.com/meltano/meltano/issues/1373) Fix formatting on custom containers in MeltanoData guide
 
+### Breaks
 
 ## 1.10.0 - (2019-12-04)
 
@@ -35,7 +38,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1364](https://gitlab.com/meltano/meltano/issues/1364) Fix instructions to SSH into MeltanoData.com instance
-
 
 ## 1.9.1 - (2019-12-04)
 
