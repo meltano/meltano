@@ -15,6 +15,15 @@ This will be the single source of truth for team members when it comes to creati
 - Client's tenant name (i.e., company name, etc.)
 - Access to the [Controller Node](./controller_node)
 
+::: info
+**DigitalOcean limits**
+
+Our DigitalOcean account is currently limited to 500 droplets and 500 database clusters.
+Since each Meltano instance requires one droplet and one cluster, our instance limit is 500.
+
+When we get close to hitting these limits, we can get them increased by sending an email to one of our contacts at DigitalOcean.
+:::
+
 ### Step 1: Setup a new droplet
 
 1. Login to DigitalOcean
