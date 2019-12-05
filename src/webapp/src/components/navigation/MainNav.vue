@@ -223,7 +223,7 @@ export default {
             </a>
           </a>
 
-          <div class="navbar-dropdown">
+          <div class="navbar-dropdown navbar-dropdown-scrollable">
             <template v-if="hasModels">
               <div
                 v-for="(v, model) in models"
@@ -446,6 +446,11 @@ export default {
   .navbar-item {
     &.has-dropdown {
       border-bottom: none;
+    }
+
+    .navbar-dropdown-scrollable {
+      overflow-y: scroll;
+      max-height: 90vh;
     }
   }
 
