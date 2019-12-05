@@ -1,4 +1,7 @@
+# Increment this version number whenever the schema of discovery.yml is changed.
+# See https://www.meltano.com/docs/contributing.html#discovery-yml-version for more information.
 version: 6
+
 extractors:
   - name: tap-carbon-intensity
     label: Carbon Emissions Intensity

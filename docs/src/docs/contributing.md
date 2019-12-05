@@ -110,6 +110,14 @@ export MELTANO_UI_URL = ""
 
 ### Changing discovery.yml
 
+#### `discovery.yml` version
+
+Whenever new functionality is introduced that changes the schema of `discovery.yml` (the exact properties it supports and their types), the `version` in `src/meltano/core/bundle/discovery.yml` and the `VERSION` constant in `src/meltano/core/plugin_discovery_service.py` must be incremented, so that older instances of Meltano don't attempt to download and parse a `discovery.yml` its parser is not compatible with.
+
+Changes to `discovery.yml` that only use existing properties do not constitute schema changes and do not require `version` to be incremented.
+
+#### Local changes to `discovery.yml`
+
 When you need to make changes to `discovery.yml`, these changes are not automatically detected inside of the `meltano` repo during development. While there are a few ways to solve this problem, it is recommended to create a symbolic link in order ensure that changes made inside of the `meltano` repo appear inside the Meltano project you initialized and are testing on.
 
 1. Get path for `discovery.yml` in the repo
