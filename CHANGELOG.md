@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1350](https://gitlab.com/meltano/meltano/issues/1350) Switches to all lower case for Snowflake permission comparisons
 - [#1373](https://gitlab.com/meltano/meltano/issues/1373) Update MeltanoData deletion process with 1Password
 
 ### Fixes
@@ -59,7 +60,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-- [#1350](https://gitlab.com/meltano/meltano/issues/1350) Switches to all lower case for Snowflake permission comparisons
 - [#1341](https://gitlab.com/meltano/meltano/issues/1341) Various `discovery.yml` and connector configuration UI updates to improve UX.
 - [#1341](https://gitlab.com/meltano/meltano/issues/1341) Updated documentation to communicate the various optional settings of a connector
 
