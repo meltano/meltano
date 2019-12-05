@@ -230,7 +230,9 @@ Use this command to check and manage the permissions of a Snowflake account.
 meltano permissions grant <spec_file> --db snowflake [--dry] [--diff] [--full-refresh]
 ```
 
-Given the parameters to connect to a Snowflake account and a YAML file (a "spec") representing the desired database configuration, this command makes sure that the configuration of that database matches the spec. If there are differences, it will return the sql commands required to make it match the spec.
+Given the parameters to connect to a Snowflake account and a YAML file (a "spec") representing the desired database configuration, this command makes sure that the configuration of that database matches the spec in an additive manner. If there are differences, it will return the sql grant commands required to make it match the spec. If there are additional permissions set in the database this command will not create the necessary revoke commands with the exception of:
+
+* Role membership for Users and Roles
 
 We currently support only Snowflake, as [pgbedrock](https://github.com/Squarespace/pgbedrock) can be used for managing the permissions in a Postgres database.
 
@@ -244,7 +246,7 @@ All permissions are abbreviated as `read` or `write` permissions, with Meltano g
 
 Tables and views are listed under `tables` and handled properly behind the scenes.
 
-If `*` is provided as the parameter for tables the grant statement will use the `ALL <object_type>S in SCHEMA` syntax. It will also grant to future tables and views. See Snowflake documenation for [`ON FUTURE`](https://docs.snowflake.net/manuals/sql-reference/sql/grant-privilege.html#optional-parameters)
+If `*` is provided as the parameter for tables the grant statement will use the `ALL <object_type>s in SCHEMA` syntax. It will also grant to future tables and views. See Snowflake documenation for [`ON FUTURE`](https://docs.snowflake.net/manuals/sql-reference/sql/grant-privilege.html#optional-parameters)
 
 If a schema name includes an asterisk, such as `snowplow_*`, then all schemas that match this pattern will be included in grant statement. This can be coupled with the asterisk for table grants to grant permissions on all tables in all schemas that match the given pattern. This is useful for date-partitioned schemas.
 
