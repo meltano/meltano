@@ -96,6 +96,14 @@ export default {
     },
     getHelp() {
       window.open('https://meltano.com/docs/getting-help.html')
+    },
+    prepareAnalyzeLoader(model, design) {
+      if (this.relatedPipeline) {
+        localStorage.setItem(
+          utils.concatLoaderModelDesign(model, design),
+          this.relatedPipeline.loader
+        )
+      }
     }
   }
 }
@@ -158,6 +166,7 @@ export default {
                   :key="design"
                   class="button is-small is-interactive-primary is-outlined"
                   :to="urlForModelDesign(model, design)"
+                  @click.native="prepareAnalyzeLoader(v.name, design)"
                   >{{ design | capitalize | underscoreToSpace }}</router-link
                 >
               </div>

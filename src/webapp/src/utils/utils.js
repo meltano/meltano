@@ -115,6 +115,9 @@ export default {
     const capMe = value.toString()
     return capMe.charAt(0).toUpperCase() + capMe.slice(1)
   },
+  concatLoaderModelDesign(model, design) {
+    return `loader:${model}:${design}`
+  },
   hyphenate(value, prepend) {
     if (!value) {
       return ''

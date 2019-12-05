@@ -107,7 +107,7 @@ export default {
 
         // set the connection for this specific design
         localStorage.setItem(
-          `loader:${this.currentModel}:${this.currentDesign}`,
+          utils.concatLoaderModelDesign(this.currentModel, this.currentDesign),
           value
         )
       }
@@ -160,7 +160,7 @@ export default {
       Promise.all([uponDesign, uponPlugins]).then(() => {
         const defaultLoader =
           localStorage.getItem(
-            `loader:${this.currentModel}:${this.currentDesign}`
+            utils.concatLoaderModelDesign(this.currentModel, this.currentDesign)
           ) ||
           localStorage.getItem('loader') ||
           this.installedPlugins.loaders[0].name
