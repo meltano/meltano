@@ -90,12 +90,18 @@ Let's install `tap-google-analytics` by clicking on the `Install` button inside 
 
 ![Screenshot of Google Analytics Extractor Configuration](/images/google-analytics-tutorial/02-ga-configuration.png)
 
-For the **Key File Location**, you will need to upload your `client_secrets.json` into the `extract` folder of your Meltano project. This can be done via FTP or logging in through your terminal.
+For the **Key File Location**, you will need to upload your `client_secrets.json` into the `extract` folder of your Meltano project. This can be done via an FTP client or logging in through your terminal.
 
-::: tip Uploading with FTP
-To upload with FTP:
+::: tip Need help with FTP?
+If you need help setting up your FTP client, make sure to check out [our guide on how to setup a FTP client to connect to your Meltano project](/tutorials/using-ftp-with-meltano.html).
+:::
 
-1. Login to your Meltano project with your FTP credentials.
+::: info
+**Uploading with FTP**
+
+Assuming your FTP client is setup, you can upload your file via FTP with the following steps:
+
+1. Login to your Meltano project (e.g., `meltano.meltanodata.com`) with your FTP credentials (e.g., `meltano_ftp` / `password`).
 
    - This should open a directory that contains folder such as
 
