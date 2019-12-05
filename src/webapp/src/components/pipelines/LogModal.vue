@@ -98,10 +98,12 @@ export default {
       window.open('https://meltano.com/docs/getting-help.html')
     },
     prepareAnalyzeLoader(model, design) {
-      localStorage.setItem(
-        utils.concatLoaderModelDesign(model, design),
-        this.relatedPipeline.loader
-      )
+      if (this.relatedPipeline) {
+        localStorage.setItem(
+          utils.concatLoaderModelDesign(model, design),
+          this.relatedPipeline.loader
+        )
+      }
     }
   }
 }
