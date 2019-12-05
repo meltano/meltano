@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1373](https://gitlab.com/meltano/meltano/issues/1373) Update MeltanoData deletion process with 1Password
+- [#1373](https://gitlab.com/meltano/meltano/issues/1373) Update Analyze dropdown as scrollable to better display model CTAs (scrollable dropdown vs. scrolling entire page)
 
 ### Fixes
 
