@@ -3,12 +3,22 @@
     <div>
       <div class="hero homepage-cta feature-section-wrapper">
         <div class="hero-left">
-          <h2 class="hero-header" style="border-bottom:0px;">Free data dashboards<br/><strong>for startup founders</strong></h2>
+          <h2 class="hero-header" style="border-bottom:0px;">
+            Free data dashboards<br /><strong>for startup founders</strong>
+          </h2>
           <p class="hero-tagline">
             Open source software to visualize business operations data
           </p>
 
-          <p class="action" v-if="data.actionText && data.actionLink && data.contributeLink && data.contributeText">
+          <p
+            class="action"
+            v-if="
+              data.actionText &&
+                data.actionLink &&
+                data.contributeLink &&
+                data.contributeText
+            "
+          >
             <NavLink class="action-button" :item="actionLink" />
           </p>
         </div>
@@ -24,8 +34,10 @@
     </div>
 
     <div class="feature-section-wrapper">
-      <div class="content-width-wide" style="background-color:#fffbe4; padding-top:20px; padding-bottom:20px;">
-
+      <div
+        class="content-width-wide"
+        style="background-color:#fffbe4; padding-top:20px; padding-bottom:20px;"
+      >
         <p class="description">
           Connect popular data sources and reporting database formats.
         </p>
@@ -87,7 +99,9 @@
         </p>
 
         <p style="text-align:center; font-size:12px;">
-          <em>All trademarks and logos are owned by their respective owners.</em>
+          <em
+            >All trademarks and logos are owned by their respective owners.</em
+          >
         </p>
       </div>
     </div>
@@ -117,8 +131,8 @@
             No queries required
           </h2>
           <p class="hero-tagline">
-            Meltano automatically generates SQL with a few clicks, so you
-            can get the insights you need.
+            Meltano automatically generates SQL with a few clicks, so you can
+            get the insights you need.
           </p>
         </div>
       </div>
@@ -343,8 +357,6 @@
       </div>
     </div>
 
-    
-
     <div class="feature-section-wrapper is-white">
       <div class="content-width-wide">
         <h2 class="section-title ta-c">What People Are Saying</h2>
@@ -390,7 +402,9 @@
 
     <div class="feature-section-wrapper is-shorter is-white">
       <section class="section">
-        <h2 class="section__title" style="padding-bottom:20px;">We'd Love to Hear From You</h2>
+        <h2 class="section__title" style="padding-bottom:20px;">
+          We'd Love to Hear From You
+        </h2>
         <a
           :href="$site.themeConfig.data.slackChannelUrl"
           class="button"
@@ -492,6 +506,12 @@ export default {
     &:focus {
       color: #fff;
       background-color: $accentColor;
+    }
+
+    &.is-purple.is-filled {
+      background-color: $purpleColor;
+      border-color: $purpleColor;
+      color: white;
     }
 }
 
@@ -901,5 +921,9 @@ export default {
 
 .embed-responsive-16by9 {
   padding-bottom: 56.25%;
+}
+
+.mt-2r {
+  margin-top: 1rem;
 }
 </style>

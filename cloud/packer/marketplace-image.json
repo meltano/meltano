@@ -14,6 +14,11 @@
       "ssh_username": "root",
       "snapshot_name": "{{user `image_name`}}",
       "user_data_file": "cloud-config.yml"
+    },
+    {
+      "type": "docker",
+      "image": "ubuntu:18.04",
+      "commit": true
     }
   ],
   "provisioners": [
@@ -23,20 +28,28 @@
       "destination": "/etc/"
     },
     {
+      "type": "file",
+      "source": "files/usr/",
+      "destination": "/usr/"
+    },
+    {
       "type": "shell",
       "inline": [
-        "cloud-init status --wait",
-        "apt -qqy update",
-        "apt -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' full-upgrade",
-	"apt -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install {{user `apt_packages`}}"
+	"cloud-init status --wait",
+	"apt -qqy update",
+	"apt -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' full-upgrade",
+	"apt -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install {{user `apt_packages`}}",
+	"systemctl restart systemd-journald"
       ]
     },
     {
       "type": "shell",
       "scripts": [
-        "scripts/01-meltano.sh",
-        "scripts/90-cleanup.sh",
-        "scripts/99-img_check.sh"
+	"scripts/01-meltano.sh",
+	"scripts/02-caddy.sh",
+	"scripts/03-vsftpd.sh",
+	"scripts/90-cleanup.sh",
+	"scripts/99-img_check.sh"
       ]
     }
   ]

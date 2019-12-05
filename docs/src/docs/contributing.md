@@ -132,6 +132,24 @@ bencodezen  staff   72 Nov 19 09:19 discovery.yml -> /Users/bencodezen/Projects/
 
 Now, you can see your changes in `discovery.yml` live in your project during development! 🎉
 
+#### Connector settings
+
+Each extractor (tap) and loader (target) in the `discovery.yml` has a `settings` property. Nested under this property are a variable amount of individual settings. In the Meltano UI these settings are parsed to generate a configuration form. To improve the UX of this form, each setting has a number of optional properties:
+
+```yaml
+- settings:
+    - name: setting_name # Required (must match the connector setting name)
+      label: Setting Name # Optional (human friendly text display of the setting name)
+      value: '' # Optional (Use to set a default value)
+      placeholder: Ex. format_like_this # Optional (Use to set the input's placeholder default)
+      kind: string # Optional (Use for a first-class input control. Default is `string`, others are `boolean`, `date_iso8601`, `password`, `options`, & `file`)
+      description: Setting description # Optional (Use to provide inline context)
+      tooltip: Here is some more info... # Optional (use to provide additional inline context)
+      documentation: https://meltano.com/ # Optional (use to link to specific supplemental documentation)
+      protected: true # Optional (use in combination with `value` to provide an uneditable default)
+      env: SOME_API_KEY # Optional (use to delegate to an environment variable for overriding this setting's value)
+```
+
 ### For existing taps/targets
 
 We should be good citizen about these, and use the default workflow to contribute. Most of these are on GitHub so:

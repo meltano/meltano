@@ -23,11 +23,16 @@ export default {
     plugin: {
       type: Object,
       required: true
+    },
+    requiredSettingsKeys: {
+      type: Array,
+      required: true
     }
   },
   computed: {
-    getCleanedLabel() {
-      return value => utils.titleCase(utils.underscoreToSpace(value))
+    getLabel() {
+      return setting =>
+        setting.label || utils.titleCase(utils.underscoreToSpace(setting.name))
     },
     getFormFieldForId() {
       return setting => `setting-${setting.name}`
@@ -41,14 +46,21 @@ export default {
     getIsOfKindOptions() {
       return kind => kind === 'options'
     },
-    getIsProtected() {
-      return setting => setting.protected === true
-    },
     getIsOfKindTextBased() {
       return kind =>
         !this.getIsOfKindBoolean(kind) &&
         !this.getIsOfKindDate(kind) &&
         !this.getIsOfKindOptions(kind)
+    },
+    getIsProtected() {
+      return setting => setting.protected === true
+    },
+    getPlaceholder() {
+      return setting => setting.placeholder || setting.value || setting.name
+    },
+    getRequiredLabel() {
+      return setting =>
+        this.requiredSettingsKeys.includes(setting.name) ? '*' : ''
     },
     getTextBasedInputType() {
       let type = 'text'
@@ -102,9 +114,6 @@ export default {
     this.focusInputIntelligently()
   },
   methods: {
-    findLabel(setting) {
-      return setting.options.find(item => item.value === setting.value).label
-    },
     focusInputIntelligently() {
       this.$nextTick(() => {
         const inputs = Array.from(this.$el.getElementsByTagName('input'))
@@ -157,6 +166,19 @@ export default {
   <div>
     <slot name="top" />
 
+    <slot name="docs">
+      <div v-if="plugin.docs" class="content has-text-centered mt1r">
+        <p class="content">
+          View the
+          <a :href="plugin.docs" target="_blank" class="has-text-underlined">
+            {{ plugin.label || plugin.name }}
+            {{ pluginType }}
+          </a>
+          documentation.
+        </p>
+      </div>
+    </slot>
+
     <form>
       <div
         v-for="setting in configSettings.settings"
@@ -164,8 +186,26 @@ export default {
         class="field is-horizontal"
       >
         <div :class="['field-label', labelClass]">
-          <label class="label" :for="getFormFieldForId(setting)"
-            >{{ setting.label || getCleanedLabel(setting.name) }}
+          <label class="label" :for="getFormFieldForId(setting)">
+            <a
+              v-if="setting.documentation"
+              target="_blank"
+              :href="setting.documentation"
+              class="label"
+            >
+              <span
+                class="has-text-underlined tooltip"
+                :data-tooltip="
+                  `Learn more about the ${getLabel(setting)} setting.`
+                "
+                >{{ getLabel(setting) }}</span
+              >
+              <span>{{ getRequiredLabel(setting) }}</span>
+            </a>
+            <span v-else>
+              <span>{{ getLabel(setting) }}</span>
+              <span>{{ getRequiredLabel(setting) }}</span>
+            </span>
             <TooltipCircle
               v-if="setting.tooltip"
               :text="setting.tooltip"
@@ -236,7 +276,7 @@ export default {
                 "
                 :class="['input', fieldClass, successClass(setting)]"
                 :type="getTextBasedInputType(setting)"
-                :placeholder="setting.value || setting.name"
+                :placeholder="getPlaceholder(setting)"
                 :disabled="getIsProtected(setting)"
                 :readonly="getIsProtected(setting)"
                 @focus="$event.target.select()"
@@ -257,33 +297,33 @@ export default {
               </a>
             </div>
 
-            <p v-if="setting.description" class="help is-italic">
-              {{ setting.description }}
-            </p>
-            <p v-if="setting.documentation" class="help">
+            <p v-if="setting.description || setting.documentation" class="help">
               <a
-                :href="setting.documentation"
+                v-if="setting.documentation"
                 target="_blank"
-                class="has-text-underlined"
-                >More Info.</a
+                :href="setting.documentation"
+                class="tooltip"
+                :data-tooltip="
+                  `Learn more about the ${getLabel(setting)} setting.`
+                "
               >
+                <span v-if="!setting.description" class="has-text-underlined"
+                  >Learn More.</span
+                >
+                <span class="icon has-text-link">
+                  <font-awesome-icon
+                    icon="external-link-square-alt"
+                  ></font-awesome-icon>
+                </span>
+              </a>
+              <span v-if="setting.description" class="is-italic"
+                >{{ setting.description }}.
+              </span>
             </p>
           </div>
         </div>
       </div>
     </form>
-
-    <slot name="docs">
-      <div v-if="plugin.docs" class="content has-text-centered mt1r">
-        <p>
-          View Meltano's
-          <a :href="plugin.docs" target="_blank" class="has-text-underlined"
-            >{{ plugin.label || plugin.name }} {{ pluginType }} docs</a
-          >
-          for more info.
-        </p>
-      </div>
-    </slot>
 
     <slot name="bottom" />
   </div>
