@@ -114,7 +114,9 @@ round-trip min/avg/max/stddev = 12.279/16.375/19.898/2.901 ms
 1. Leave **TTL (seconds)** with the default of `3600`
 1. Click `Create Record`
 
-::: Automatic SSL Certificate
+::: info
+**Automatic SSL Certificate**
+
 An automatic HTTPS certificate routine is built-in the distribution, leveraging **Let's Encrypt** to issue a HTTPS certificate for this subdomain.
 :::
 
@@ -186,7 +188,8 @@ You should now be greeted by the `Connection details` tab which is important for
 ssh root@$TENANT_NAME.meltanodata.com
 ```
 
-::: Troubleshooting
+::: info
+**Troubleshooting**
 
 If you can't connect, make sure the SSH key you registered on you DigitalOcean account is loaded by using:
 
@@ -196,7 +199,6 @@ ssh-add /path/to/your/ssh-key
 ```
 
 For more informations about using `ssh`, take a look at https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys#basic-connection-instructions
-
 :::
 
 #### Configure Caddyfile
@@ -297,16 +299,15 @@ systemctl status
 
 You should scan for the following services to make sure Meltano properly running:
 
-  - `caddy.service`
-  - `meltano.service`
-  - `vsftpd.service`
+- `caddy.service`
+- `meltano.service`
+- `vsftpd.service`
 
 ::: tip
 If you see a state of `running` in the status output, that means all services are running.
 
 If you see a state of `degraded`, that means something is wrong — use `systemctl --failed` to have a quick glance.
 :::
-
 
 ### Step 5: Configure Meltano
 
@@ -492,3 +493,4 @@ When a client no longer needs a hosted instance of Meltano on meltanodata.com, y
 1. Delete the client's droplet
 1. Delete the client's A record in networking
 1. Delete the client's database cluster
+1. Delete the client's passwords in 1Password
