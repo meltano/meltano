@@ -88,6 +88,8 @@ Open your Meltano instance and click "Pipelines" in the top navigation bar. You 
 
 Let's install `tap-google-analytics` by clicking on the `Install` button inside its card. When it's finished loading, you should see a configuration modal appear.
 
+![Screenshot of Google Analytics Extractor Configuration](/images/google-analytics-tutorial/02-ga-configuration.png)
+
 For the **Key File Location**, you will need to upload your `client_secrets.json` into the `extract` folder of your Meltano project. This can be done via FTP or logging in through your terminal.
 
 ::: tip Uploading with FTP
@@ -110,13 +112,12 @@ To upload with FTP:
 
 Once it appears in the right panel, everything is good to go!
 :::
+
 For the **View ID**, enter the ID you retrieved using [Google Analytics Account Explorer](https://ga-dev-tools.appspot.com/account-explorer/)
 
 For the **Start Date**, choose the date when you want to start extracting data for.
 
 For the **End Date**, it is set to yesterday by default if you do not configure a date. However, you can choose to set a specific end date for your data set if you want.
-
-![Screenshot of Google Analytics Extractor Configuration](/images/google-analytics-tutorial/02-ga-configuration.png)
 
 Click `Save` to finish configuring the extractor and progress to the next step: "Configure the Loader".
 
