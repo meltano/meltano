@@ -356,8 +356,7 @@ systemctl restart meltano
 
 1. Visit `$TENANT_NAME.meltanodata.com` in your browser
 1. Login with credentials you setup in 1Password for the username `meltano`
-1. Install `tap-carbon-intensity` since you cannot configure loaders without installing an extractor first
-1. Install `target-postgres` for the loader
+1. Install `target-postgres` by updating the URL to `/pipeline/load/target-postgres`
 
 ::: tip
 If the `/var/meltano/project/.env` is properly loaded, all the configuration should be correct.
