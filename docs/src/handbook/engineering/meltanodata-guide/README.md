@@ -491,3 +491,4 @@ When a client no longer needs a hosted instance of Meltano on meltanodata.com, y
 1. Delete the client's droplet
 1. Delete the client's A record in networking
 1. Delete the client's database cluster
+1. Delete the client's passwords in 1Password
