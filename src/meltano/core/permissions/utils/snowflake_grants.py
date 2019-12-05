@@ -11,9 +11,9 @@ GRANT_PRIVILEGES_TEMPLATE = (
     "GRANT {privileges} ON {resource_type} {resource_name} TO ROLE {role}"
 )
 
-GRANT_ALL_PRIVILEGES_TEMPLATE = "GRANT {privileges} ON ALL {resource_type}S IN SCHEMA {resource_name} TO ROLE {role}"
+GRANT_ALL_PRIVILEGES_TEMPLATE = "GRANT {privileges} ON ALL {resource_type}s IN SCHEMA {resource_name} TO ROLE {role}"
 
-GRANT_FUTURE_PRIVILEGES_TEMPLATE = "GRANT {privileges} ON FUTURE {resource_type}S IN SCHEMA {resource_name} TO ROLE {role}"
+GRANT_FUTURE_PRIVILEGES_TEMPLATE = "GRANT {privileges} ON FUTURE {resource_type}s IN SCHEMA {resource_name} TO ROLE {role}"
 
 ALTER_USER_TEMPLATE = "ALTER USER {user_name} SET {privileges}"
 
