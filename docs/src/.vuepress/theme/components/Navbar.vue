@@ -26,6 +26,9 @@
     >
       <AlgoliaSearchBox v-if="isAlgoliaSearch" :options="algolia" />
       <SearchBox v-else-if="$site.themeConfig.search !== false" />
+      <a href="https://meltano.typeform.com/to/NJPwxv" class="nav-cta">
+        Get your free hosted solution
+      </a>
       <NavLinks class="can-hide" />
     </div>
   </header>
@@ -123,6 +126,17 @@ $navbar-horizontal-padding = 1.5rem
       vertical-align top
     .nav-links
       flex 1
+  .nav-cta
+    display: none;
+    background-color: $purpleColor;
+    color: white;
+    padding: 0 0.75rem;
+    border-radius: 5px;
+    margin-right: 1rem;
+
+@media (min-width: $MQTabletCTA)
+  .navbar .nav-cta
+    display: inline-block
 
 @media (max-width: $MQMobile)
   .navbar
