@@ -211,11 +211,12 @@ extractors:
       - name: api_type
         label: API Type
         value: REST
+        kind: hidden
         placeholder: Ex. REST
       - name: select_fields_by_default
         label: Select Fields by Default
         value: true
-        kind: boolean
+        kind: hidden
         description: Select by default any new fields discovered in Salesforce objects
       - name: start_date
         description: Pull data from this date to now
