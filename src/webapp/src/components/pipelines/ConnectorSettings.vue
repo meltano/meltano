@@ -189,8 +189,8 @@ export default {
         :class="{ 'field is-horizontal': !getIsOfKindHidden(setting.kind) }"
       >
         <div
-          :class="['field-label', labelClass]"
           v-if="!getIsOfKindHidden(setting.kind)"
+          :class="['field-label', labelClass]"
         >
           <label class="label" :for="getFormFieldForId(setting)">
             <a
