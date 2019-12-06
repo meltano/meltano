@@ -35,6 +35,30 @@ An email with the Security Token will be sent to your email.
 ![Screenshot of Salesforce Security Token Reset](/images/salesforce/01-salesforce-reset-security-token.png)
 
 
+::: tip
+
+**Why is my "Reset Security Token" option missing?**
+
+If a user’s profile is configured such that there is a restriction on the IP ranges that can access Salesforce, then that user will not have the ability to access/reset their security token.
+
+In order to give access to the security token, either remove the user from the profile that contains the IP range restriction, or update the user’s profile by removing the IP range restriction.
+
+In rare cases where the user’s profile doesn’t contain IP range restriction and they still can’t access the security token reset option, edit the user’s profile and save (without making any actual changes to the profile).
+
+:::
+
+::: tip
+
+When you reset your Salesforce password, your security token resets as well. If that security token is used to integrate Meltano with Salesforce, that integration will break as well. Each time you reset an account password used to connect Meltano or other applications to Salesforce, you will need to re-enter your new security token into that application.
+
+:::
+
+::: warning
+
+If you have other third-party applications integrated with Salesforce and you reset your security token, that integration will break. Try to use your existing Security Token instead of resetting your existing one. Otherwise, you will need to re-enter your new security token into all the connected applications.
+
+:::
+
 ## Meltano Setup
 
 ### Prerequisites
