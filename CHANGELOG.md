@@ -25,12 +25,14 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1371](https://gitlab.com/meltano/meltano/issues/1371) Provide more specific instructions for Google Analytics configuration
 - [#1381](https://gitlab.com/meltano/meltano/issues/1381) Update the default directory for client_secrets.json for the Google Analytics Extractor to be located under the extract/ directory and not the project's root.
 - [#1345](https://gitlab.com/meltano/meltano/issues/1345) Update the documentation for the [Salesforce Extractor](https://www.meltano.com/plugins/extractors/salesforce.html) to contain additional information on Security Tokens
+- [#1383](https://gitlab.com/meltano/meltano/issues/1383) Add CTA for hosted solution signup to navigation
 
 ### Fixes
 
 - [#1379](https://gitlab.com/meltano/meltano/issues/1379) Fix an issue with Airflow scheduling too many jobs.
 - [#1386](https://gitlab.com/meltano/meltano/issues/1386) Fix connector modal clipping issue where small browser heights prevented accessing the "Save" area
 
+### Breaks
 
 ## 1.10.1 - (2019-12-05)
 
