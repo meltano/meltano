@@ -366,7 +366,12 @@ If the `/var/meltano/project/.env` is properly loaded, all the configuration sho
 
 ### Step 6: Make sure everything works!
 
-Now all you have to do is check to make sure we can see reports being generated in Analyze and we're good to go! 🎉
+Now all you have to do is check to make sure that everything works as expected:
+
+1. Go back to the instance using your browser and check that we can see reports being generated in Analyze .
+1. Connect using an ftp client to the instance and make sure that the ftp username/password are correct and that you can see the meltano project.
+
+And we're good to go! 🎉
 
 ## Maintaining an Existing Instance
 
