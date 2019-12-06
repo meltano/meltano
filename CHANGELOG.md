@@ -3,11 +3,22 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-## Unreleased
 
+## Unreleased
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.10.1 - (2019-12-05)
+
+---
 
 ### Changes
 
@@ -18,7 +29,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1373](https://gitlab.com/meltano/meltano/issues/1373) Fix formatting on custom containers in MeltanoData guide
 
-### Breaks
 
 ## 1.10.0 - (2019-12-04)
 
