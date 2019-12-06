@@ -51,10 +51,9 @@ for schedule in schedule_service.schedules():
     #
     # Because our extractors do not support date-window extraction, it serves no
     # purpose to enqueue date-chunked jobs for complete extraction window.
-    dag = DAG(dag_id,
-              catchup=False,
-              default_args=args,
-              schedule_interval=schedule.interval)
+    dag = DAG(
+        dag_id, catchup=False, default_args=args, schedule_interval=schedule.interval
+    )
 
     elt = BashOperator(
         task_id="extract_load",
