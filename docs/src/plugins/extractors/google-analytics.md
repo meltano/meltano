@@ -42,7 +42,7 @@ As a first step, you need to create or use an existing project in the Google Dev
 
 3. Click "Create service account"
 
-   In the Create service account window, type a name for the service account, and select Furnish a new private key. Then click Save and store it locally in your Meltano project directory as `client_secrets.json`.
+   In the Create service account window, type a name for the service account, and select Furnish a new private key. Then click Save and store it locally as `client_secrets.json`.
 
    If you already have a service account, you can generate a key by selecting 'Edit' for the account and then selecting the option to generate a key.
 
@@ -90,7 +90,7 @@ Let's install `tap-google-analytics` by clicking on the `Install` button inside 
 
 ![Screenshot of Google Analytics Extractor Configuration](/images/google-analytics-tutorial/02-ga-configuration.png)
 
-For the **Key File Location**, you will need to upload your `client_secrets.json` into the `extract` folder of your Meltano project. This can be done via an FTP client or logging in through your terminal.
+For the **Key File Location**, you will need to upload your `client_secrets.json` into the `extract` folder of your Meltano project. If Meltano runs on a cloud server, this can be done via an FTP client or logging in through your terminal.
 
 ::: tip Need help with FTP?
 If you need help setting up your FTP client, make sure to check out [our guide on how to setup a FTP client to connect to your Meltano project](/tutorials/using-ftp-with-meltano.html).

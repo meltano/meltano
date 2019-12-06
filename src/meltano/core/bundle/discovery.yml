@@ -111,8 +111,8 @@ extractors:
     settings:
       - name: key_file_location
         label: Key File Location
-        value: 'client_secrets.json'
-        placeholder: Ex. client_secrets.json
+        value: 'extract/client_secrets.json'
+        placeholder: Ex. extract/client_secrets.json
         kind: file
         description: Obtain this file from Google Analytics Service Accounts
         documentation: https://meltano.com/plugins/extractors/google-analytics.html#creating-service-account-credentials
