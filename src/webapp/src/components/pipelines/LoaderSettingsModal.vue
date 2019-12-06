@@ -162,11 +162,19 @@ export default {
               <a :href="loader.signupUrl" target="_blank">sign up here</a>.
             </p>
           </div>
-          <ConnectorSettingsDropdown
-            :connector="loader"
-            plugin-type="loaders"
-            :config-settings="localConfiguration"
-          ></ConnectorSettingsDropdown>
+          <!--
+            TEMP ConnectorSettingsDropdown removal from UI.
+            Conditional removal so existing users with 2+ profiles already created still can access them
+            Get context here https://gitlab.com/meltano/meltano/issues/1389.
+          -->
+          <template v-if="localConfiguration.profiles.length > 1">
+            <ConnectorSettingsDropdown
+              :connector="loader"
+              plugin-type="loaders"
+              :config-settings="localConfiguration"
+            ></ConnectorSettingsDropdown>
+          </template>
+
           <ConnectorSettings
             field-class="is-small"
             :config-settings="localConfiguration"
