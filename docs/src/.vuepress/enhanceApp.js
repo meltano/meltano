@@ -13,6 +13,7 @@ export default ({
   router.afterEach((to, from) => {
     Vue.nextTick(() => {
       enableCodeBlockCopying();
+      enableExternalScroll();
     });
   });
 
@@ -71,4 +72,21 @@ export default ({
     }
   };
 
+
+  function enableExternalScroll() {
+    window.addEventListener("message", (msg) => {
+      if (msg.data["source"] == "meltano") {
+        // swap the current fragment ?
+
+        const anchor_name = msg.data['anchor']
+        const anchor = document.getElementById(anchor_name)
+
+        if (anchor !== undefined) {
+          anchor.scrollIntoView()
+        } else {
+          console.log(`Cannot find ${anchor_name} in the current page.`)
+        }
+      }
+    })
+  }
 }
