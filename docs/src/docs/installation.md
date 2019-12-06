@@ -5,15 +5,7 @@ description: Meltano is easy to install on your local machine or in the cloud, i
 
 # Installation
 
-This section provides step-by-step guides for installing Meltano in various environments.
-
-No time to setup your own Meltano instance? We got you covered. Check out our [free hosted Meltano dashboards](/docs/installation.html#free-hosted-meltano-dashboards) solution.
-
-For instructions on how to setup your own Meltano instance, check out:
-
-- [DigitalOcean One-Click Installer](/docs/deployment.html#digitalocean-marketplace)
-- [Amazon Web Services (AWS)](/docs/deployment.html#amazon-web-services-aws)
-- [Local Installation](/docs/installation.html#local-installation)
+This section provides guides for getting setup with Meltano.
 
 ## Free Hosted Meltano Dashboards
 
@@ -22,6 +14,14 @@ In November, we released Meltano as a free hosted product! This eliminates the h
 Fill out [this form](https://meltano.typeform.com/to/NJPwxv) to get started with a free hosted Meltano account. We will contact you to schedule a setup time and learn everything we can about your needs.
 
 <a href="https://meltano.typeform.com/to/NJPwxv" class="button is-purple is-filled">Get started with your free hosted Meltano dashboard</a>
+
+## Self Hosted Solutions
+
+For instructions on how to setup your own Meltano instance, check out:
+
+- [DigitalOcean One-Click Installer](/docs/deployment.html#digitalocean-marketplace)
+- [Amazon Web Services (AWS)](/docs/deployment.html#amazon-web-services-aws)
+- [Local Installation](/docs/installation.html#local-installation)
 
 ## DigitalOcean Marketplace
 
