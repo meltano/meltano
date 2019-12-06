@@ -17,6 +17,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1401](https://gitlab.com/meltano/meltano/issues/1401) Fix double instance of self hosted CTA on desktop sites
+
 ### Breaks
 
 ## 1.10.2 - (2019-12-06)
