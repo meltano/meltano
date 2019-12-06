@@ -43,6 +43,9 @@ export default {
     getIsOfKindDate() {
       return kind => kind === 'date_iso8601'
     },
+    getIsOfKindHidden() {
+      return kind => kind === 'hidden'
+    },
     getIsOfKindOptions() {
       return kind => kind === 'options'
     },
@@ -183,9 +186,12 @@ export default {
       <div
         v-for="setting in configSettings.settings"
         :key="setting.name"
-        class="field is-horizontal"
+        :class="{ 'field is-horizontal': !getIsOfKindHidden(setting.kind) }"
       >
-        <div :class="['field-label', labelClass]">
+        <div
+          v-if="!getIsOfKindHidden(setting.kind)"
+          :class="['field-label', labelClass]"
+        >
           <label class="label" :for="getFormFieldForId(setting)">
             <a
               v-if="setting.documentation"
@@ -216,9 +222,20 @@ export default {
         <div class="field-body">
           <div class="field" :class="{ 'has-addons': getIsProtected(setting) }">
             <div class="control is-expanded has-icons-right">
+              <!-- Hidden -->
+              <input
+                v-if="getIsOfKindHidden(setting.kind)"
+                :id="getFormFieldForId(setting)"
+                v-model="
+                  configSettings.profiles[configSettings.profileInFocusIndex]
+                    .config[setting.name]
+                "
+                type="hidden"
+              />
+
               <!-- Boolean -->
               <input
-                v-if="getIsOfKindBoolean(setting.kind)"
+                v-else-if="getIsOfKindBoolean(setting.kind)"
                 :id="getFormFieldForId(setting)"
                 v-model="
                   configSettings.profiles[configSettings.profileInFocusIndex]
@@ -282,44 +299,51 @@ export default {
                 @focus="$event.target.select()"
               />
             </div>
-            <div v-if="getIsProtected(setting)" class="control">
-              <a
-                href="https://meltano.com/docs/environment-variables.html#connector-settings-configuration"
-                target="_blank"
-                class="button is-small"
-              >
-                <span
-                  class="icon has-text-grey-dark tooltip is-tooltip-multiline"
-                  data-tooltip="This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more."
-                >
-                  <font-awesome-icon icon="lock"></font-awesome-icon>
-                </span>
-              </a>
-            </div>
 
-            <p v-if="setting.description || setting.documentation" class="help">
-              <a
-                v-if="setting.documentation"
-                target="_blank"
-                :href="setting.documentation"
-                class="tooltip"
-                :data-tooltip="
-                  `Learn more about the ${getLabel(setting)} setting.`
-                "
-              >
-                <span v-if="!setting.description" class="has-text-underlined"
-                  >Learn More.</span
+            <!-- Visual helpers  -->
+            <template v-if="!getIsOfKindHidden(setting.kind)">
+              <div v-if="getIsProtected(setting)" class="control">
+                <a
+                  href="https://meltano.com/docs/environment-variables.html#connector-settings-configuration"
+                  target="_blank"
+                  class="button is-small"
                 >
-                <span class="icon has-text-link">
-                  <font-awesome-icon
-                    icon="external-link-square-alt"
-                  ></font-awesome-icon>
+                  <span
+                    class="icon has-text-grey-dark tooltip is-tooltip-multiline"
+                    data-tooltip="This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more."
+                  >
+                    <font-awesome-icon icon="lock"></font-awesome-icon>
+                  </span>
+                </a>
+              </div>
+
+              <p
+                v-if="setting.description || setting.documentation"
+                class="help"
+              >
+                <a
+                  v-if="setting.documentation"
+                  target="_blank"
+                  :href="setting.documentation"
+                  class="tooltip"
+                  :data-tooltip="
+                    `Learn more about the ${getLabel(setting)} setting.`
+                  "
+                >
+                  <span v-if="!setting.description" class="has-text-underlined"
+                    >Learn More.</span
+                  >
+                  <span class="icon has-text-link">
+                    <font-awesome-icon
+                      icon="external-link-square-alt"
+                    ></font-awesome-icon>
+                  </span>
+                </a>
+                <span v-if="setting.description" class="is-italic"
+                  >{{ setting.description }}.
                 </span>
-              </a>
-              <span v-if="setting.description" class="is-italic"
-                >{{ setting.description }}.
-              </span>
-            </p>
+              </p>
+            </template>
           </div>
         </div>
       </div>

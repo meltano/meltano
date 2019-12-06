@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributing.html#discovery-yml-version for more information.
-version: 6
+version: 7
 
 extractors:
   - name: tap-carbon-intensity
@@ -211,11 +211,12 @@ extractors:
       - name: api_type
         label: API Type
         value: REST
+        kind: hidden
         placeholder: Ex. REST
       - name: select_fields_by_default
         label: Select Fields by Default
         value: true
-        kind: boolean
+        kind: hidden
         description: Select by default any new fields discovered in Salesforce objects
       - name: start_date
         description: Pull data from this date to now
