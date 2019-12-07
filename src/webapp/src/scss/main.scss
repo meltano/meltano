@@ -130,7 +130,6 @@ Layout helpers, often with names based on Bulma naming conventions
 
 .modal-card {
   overflow: visible; // Prevents clipping of dropdown and similar components in Modal
-  overflow-y: scroll;
   max-height: 90vh;
 
   &.is-narrow {
