@@ -128,7 +128,7 @@ export default {
         <p class="modal-card-title">Create Pipeline</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
-      <section class="modal-card-body">
+      <section class="modal-card-body is-overflow-y-scroll">
         <table class="table is-fullwidth">
           <ScheduleTableHead />
 

@@ -143,7 +143,7 @@ export default {
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
 
-      <section class="modal-card-body">
+      <section class="modal-card-body is-overflow-y-scroll">
         <div v-if="isLoadingConfigSettings || isInstalling" class="content">
           <div v-if="!isLoadingConfigSettings && isInstalling" class="level">
             <div class="level-item">
