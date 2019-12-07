@@ -57,7 +57,7 @@ export default {
         <p class="modal-card-title">New Dashboard</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
-      <section class="modal-card-body">
+      <section class="modal-card-body is-overflow-y-scroll">
         <div>
           <div class="field">
             <label class="label">Name</label>
