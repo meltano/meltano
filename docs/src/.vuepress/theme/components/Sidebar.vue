@@ -115,6 +115,10 @@ function resolveOpenGroupIndex(route, items) {
     border-radius: 5px;
     margin-right: 1rem;
 
+@media (min-width: $MQMobile)
+  .sidebar .sidebar-cta
+    display: none
+
 @media (max-width: $MQMobile)
   .sidebar
     .nav-links
