@@ -318,7 +318,7 @@
           <div class="embed-responsive embed-responsive-16by9">
             <iframe
               class="embed-responsive-item"
-              src="https://www.youtube.com/embed/_fq9N_LI8S0"
+              src="https://www.youtube.com/embed/vtNStRP5m_Y"
               frameborder="0"
               allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
               allowfullscreen
@@ -354,8 +354,9 @@
 
     <div class="feature-section-wrapper">
       <h2 class="section-title" style="text-align: center; margin-top: 0;">
-        Take a tour of Meltano
+        Self Host Meltano Locally or in the Cloud
       </h2>
+      <p style="text-align: center; margin-bottom:20px;">Meltano is built to run wherever you get your work done. Looking to self host? <a href="/docs/installation.html">Check out our installation instructions</a>.</p>
 
       <div class="rich-media-container">
         <div class="embed-responsive embed-responsive-16by9">
