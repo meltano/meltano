@@ -21,7 +21,7 @@ export default {
   },
   created() {
     const defaultTransform =
-      this.recentELTSelections.transform || this.transformOptions[0]
+      this.recentELTSelections.transform || this.transformOptions[1]
     this.selectedTransformOption = defaultTransform
     this.checkHasDbtDocs()
   },
