@@ -7,7 +7,7 @@
             Free data dashboards<br /><strong>for startup founders</strong>
           </h2>
           <p class="hero-tagline">
-            Open source software to visualize business operations data
+            Analytics software to visualize your business operations
           </p>
 
           <p
@@ -39,7 +39,7 @@
         style="background-color:#fffbe4; padding-top:20px; padding-bottom:20px;"
       >
         <p class="description">
-          Connect popular data sources and reporting database formats.
+          Connect to data from popular services to build powerful dashboards
         </p>
 
         <div class="plugin-logos">
