@@ -4,7 +4,7 @@
       <div class="hero homepage-cta feature-section-wrapper">
         <div class="hero-left">
           <h2 class="hero-header" style="border-bottom:0px;">
-            Free data dashboards<br /><strong>for startup founders</strong>
+            Data dashboards<br /><strong>for startup founders</strong>
           </h2>
           <p class="hero-tagline">
             Analytics software to visualize your business operations
@@ -103,8 +103,7 @@
             No queries required
           </h2>
           <p class="hero-tagline">
-            Meltano automatically generates SQL with a few clicks, so you can
-            get the insights you need.
+            Go from data to dashboard in minutes, without writing any code.
           </p>
         </div>
       </div>

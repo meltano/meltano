@@ -26,10 +26,11 @@
     >
       <AlgoliaSearchBox v-if="isAlgoliaSearch" :options="algolia" />
       <SearchBox v-else-if="$site.themeConfig.search !== false" />
-      <a href="https://meltano.typeform.com/to/NJPwxv" class="nav-cta">
-        Get your free hosted solution
-      </a>
+      
       <NavLinks class="can-hide" />
+      <a style="margin-left:20px;" href="https://meltano.typeform.com/to/NJPwxv" class="nav-cta">
+        Create Account
+      </a>
     </div>
   </header>
 </template>
