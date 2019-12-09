@@ -10,10 +10,10 @@ export default {
   },
   created() {
     this.$store.dispatch('system/check')
-    this.acknowledgeAnalyticsTracking()
+    this.tryAcknowledgeAnalyticsTracking()
   },
   methods: {
-    acknowledgeAnalyticsTracking() {
+    tryAcknowledgeAnalyticsTracking() {
       if (this.$flask.isSendAnonymousUsageStats) {
         const hasAcknowledgedTracking =
           'hasAcknowledgedTracking' in localStorage &&
