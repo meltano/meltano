@@ -23,7 +23,7 @@ export default {
       <th class="has-text-centered">
         <span>Extractor</span>
         <span
-          class="icon has-text-grey-light tooltip is-tooltip-multiline"
+          class="icon has-text-grey-light tooltip is-tooltip-multiline is-tooltip-bottom"
           data-tooltip="The connector for data extraction within a scheduled ELT pipeline."
         >
           <font-awesome-icon icon="info-circle"></font-awesome-icon>
@@ -32,7 +32,7 @@ export default {
       <th class="has-text-centered">
         <span>Loader</span>
         <span
-          class="icon has-text-grey-light tooltip is-tooltip-multiline"
+          class="icon has-text-grey-light tooltip is-tooltip-multiline is-tooltip-bottom"
           data-tooltip="The connector for data loading within a scheduled ELT pipeline."
         >
           <font-awesome-icon icon="info-circle"></font-awesome-icon>
@@ -41,7 +41,7 @@ export default {
       <th class="has-text-centered">
         <span>Transform</span>
         <span
-          class="icon has-text-grey-light tooltip is-tooltip-multiline"
+          class="icon has-text-grey-light tooltip is-tooltip-multiline is-tooltip-bottom"
           data-tooltip="Options for data transformation within a scheduled ELT pipeline."
         >
           <font-awesome-icon icon="info-circle"></font-awesome-icon>
@@ -50,7 +50,7 @@ export default {
       <th class="has-text-centered">
         <span>Interval</span>
         <span
-          class="icon has-text-grey-light tooltip is-tooltip-multiline"
+          class="icon has-text-grey-light tooltip is-tooltip-multiline is-tooltip-left"
           data-tooltip="The frequency of running a scheduled ELT pipeline to get up-to-date data."
         >
           <font-awesome-icon icon="info-circle"></font-awesome-icon>

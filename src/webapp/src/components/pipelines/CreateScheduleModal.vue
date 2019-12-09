@@ -89,7 +89,7 @@ export default {
 
       const defaultTransform =
         this.recentELTSelections.transform ||
-        (!_.isEmpty(this.transformOptions) && this.transformOptions[0])
+        (!_.isEmpty(this.transformOptions) && this.transformOptions[1])
       this.pipeline.transform = defaultTransform ? defaultTransform.name : ''
 
       this.pipeline.interval = !_.isEmpty(this.intervalOptions)
