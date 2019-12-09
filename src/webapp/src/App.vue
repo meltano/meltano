@@ -10,14 +10,14 @@ export default {
     MainNav,
     PromoBanner
   },
-  created() {
-    this.$store.dispatch('system/check')
-    this.acknowledgeAnalyticsTracking()
-  },
   computed: {
     isMeltanoDemoSite() {
       return window.location.host === 'meltano.meltanodata.com'
     }
+  },
+  created() {
+    this.$store.dispatch('system/check')
+    this.acknowledgeAnalyticsTracking()
   },
   methods: {
     acknowledgeAnalyticsTracking() {
