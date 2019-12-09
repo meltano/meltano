@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1398](https://gitlab.com/meltano/meltano/issues/1398) Update default Transform from "Skip" to "Run"
+- [#1406](https://gitlab.com/meltano/meltano/issues/1406) Update Analyze Query section CSS for improved UX (visually improved organization and scanability)
 
 ### Fixes
 
