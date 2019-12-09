@@ -111,7 +111,7 @@ export default {
         this.loaderName
       )
     },
-    saveConfigAndGoToTransforms() {
+    saveConfigAndGoToSchedule() {
       this.$store
         .dispatch('configuration/savePluginConfiguration', {
           name: this.loader.name,
@@ -123,7 +123,7 @@ export default {
             type: 'loader',
             value: this.loader
           })
-          this.$router.push({ name: 'transforms' })
+          this.$router.push({ name: 'schedules' })
           Vue.toasted.global.success(`Connector Saved - ${this.loader.name}`)
         })
     }
@@ -189,7 +189,7 @@ export default {
         <button
           class="button is-interactive-primary"
           :disabled="!isSaveable"
-          @click.prevent="saveConfigAndGoToTransforms"
+          @click.prevent="saveConfigAndGoToSchedule"
         >
           Save
         </button>

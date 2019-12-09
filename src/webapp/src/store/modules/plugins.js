@@ -80,14 +80,10 @@ const getters = {
 
   getIsStepScheduleMinimallyValidated(state, getters) {
     return (
-      getters.getIsStepTransformsMinimallyValidated &&
+      getters.getIsStepLoadersMinimallyValidated &&
       state.installedPlugins.loaders &&
       state.installedPlugins.loaders.length > 0
     )
-  },
-
-  getIsStepTransformsMinimallyValidated(_, getters) {
-    return getters.getIsStepLoadersMinimallyValidated
   },
 
   getPluginProfiles() {
