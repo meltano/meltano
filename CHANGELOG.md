@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#1361](https://gitlab.com/meltano/meltano/issues/1361) Add `kind: hidden` to `discovery.yml` so certain connector settings can validate with a default `value` but remain hidden from the user for improved UX
+- [#1351](https://gitlab.com/meltano/meltano/issues/1351) Add "Create Meltano Account" promo for `meltano.meltanodata.com`
 
 ### Changes
 
