@@ -43,48 +43,20 @@
         </p>
 
         <div class="plugin-logos">
-          <a href="/plugins/extractors/gitlab.html"
-            ><img src="../assets/logo-gitlab.png" alt="GitLab Logo"
-          /></a>
+          
 
           <a href="/plugins/extractors/stripe.html"
             ><img src="../assets/logo-stripe.png" alt="Stripe Logo"
-          /></a>
-
-          <a href="/plugins/csv.html"
-            ><img src="../assets/logo-csv.png" alt="CSV Logo"
           /></a>
 
           <a href="/plugins/extractors/salesforce.html"
             ><img src="../assets/logo-salesforce.png" alt="Salesforce Logo"
           /></a>
 
-          <a href="/plugins/loaders/sqlite.html"
-            ><img src="../assets/logo-sqlite.png" alt="SQLite Logo"
-          /></a>
-
           <a href="/plugins/extractors/zendesk.html"
             ><img src="../assets/logo-zendesk.png" alt="Zendesk Logo"
           /></a>
 
-          <a href="/plugins/extractors/marketo.html"
-            ><img src="../assets/logo-marketo.png" alt="Marketo Logo"
-          /></a>
-          <a href="/plugins/extractors/carbon-intensity.html"
-            ><img src="../assets/logo-nationalgrid.png" alt="National Grid ESO"
-          /></a>
-
-          <a href="/plugins/extractors/fastly.html"
-            ><img src="../assets/logo-fastly.png" alt="Fastly Logo"
-          /></a>
-
-          <a href="/plugins/extractors/mongodb.html"
-            ><img src="../assets/logo-mongodb.png" alt="MongoDB Logo"
-          /></a>
-
-          <a href="/plugins/loaders/snowflake.html">
-            <img src="../assets/logo-snowflake.png" alt="Snowflake Logo" />
-          </a>
           <a href="/plugins/extractors/google-analytics.html"
             ><img
               src="../assets/logo-googleanalytics.png"
@@ -95,7 +67,7 @@
 
         <p class="description ta-c">
           For more information, check out our
-          <a href="/plugins/">plugins documentation</a>
+          <a href="/plugins/extractors/">plugins documentation</a>
         </p>
 
         <p style="text-align:center; font-size:12px;">
