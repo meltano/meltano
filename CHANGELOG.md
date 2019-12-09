@@ -3,18 +3,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
 
 ### Changes
 
+- [#1398](https://gitlab.com/meltano/meltano/issues/1398) Update default Transform from "Skip" to "Run"
+
 ### Fixes
 
 ### Breaks
-
 
 ## 1.11.0 - (2019-12-09)
 
@@ -31,7 +32,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1401](https://gitlab.com/meltano/meltano/issues/1401) Fix double instance of self hosted CTA on desktop sites
-
 
 ## 1.10.2 - (2019-12-06)
 
