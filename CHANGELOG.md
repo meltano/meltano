@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#1361](https://gitlab.com/meltano/meltano/issues/1361) Add `kind: hidden` to `discovery.yml` so certain connector settings can validate with a default `value` but remain hidden from the user for improved UX
+- [#1055](https://gitlab.com/meltano/meltano/issues/1055) Add "Disable" button to Tracking Acknowledgment toast so user's can opt-out from the UI
 
 ### Changes
 
