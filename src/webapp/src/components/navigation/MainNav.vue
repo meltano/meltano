@@ -416,8 +416,6 @@ export default {
 </template>
 
 <style lang="scss">
-@import '@/scss/bulma-preset-overrides.scss';
-
 .box-analyze-nav {
   min-width: 240px;
 }

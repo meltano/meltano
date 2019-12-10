@@ -152,8 +152,8 @@ export default {
     float: right;
     font-size: 9px;
     padding: 2px;
-    color: #aaa;
-    border: 1px solid #aaa;
+    color: $grey-light;
+    border: 1px solid $grey-light;
     border-radius: 4px;
     margin-top: 2px;
   }
