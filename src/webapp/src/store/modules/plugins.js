@@ -25,6 +25,12 @@ const defaultState = utils.deepFreeze({
 })
 
 const getters = {
+  getHasDefaultTransforms(state) {
+    return namespace =>
+      state.plugins.transforms.find(
+        transform => transform.namespace === namespace
+      )
+  },
   getHasInstalledPluginsOfType(state) {
     return pluginType => {
       const hasOwns = []

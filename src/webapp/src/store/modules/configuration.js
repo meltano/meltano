@@ -13,8 +13,7 @@ const defaultState = utils.deepFreeze({
   pipelines: [],
   recentELTSelections: {
     extractor: null,
-    loader: null,
-    transform: null
+    loader: null
   },
   transformOptions: [
     { label: 'Skip', name: 'skip' },

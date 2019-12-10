@@ -35,6 +35,7 @@ export default {
   computed: {
     ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
     ...mapGetters('plugins', [
+      'getHasDefaultTransforms',
       'getHasInstalledPluginsOfType',
       'getPluginProfiles'
     ]),
@@ -87,9 +88,11 @@ export default {
           this.installedPlugins.loaders[0])
       this.pipeline.loader = defaultLoader ? defaultLoader.name : ''
 
-      const defaultTransform =
-        this.recentELTSelections.transform ||
-        (!_.isEmpty(this.transformOptions) && this.transformOptions[1])
+      const defaultTransform = this.getHasDefaultTransforms(
+        defaultExtractor.namespace
+      )
+        ? this.transformOptions[1]
+        : this.transformOptions[0]
       this.pipeline.transform = defaultTransform ? defaultTransform.name : ''
 
       this.pipeline.interval = !_.isEmpty(this.intervalOptions)
