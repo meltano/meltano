@@ -58,9 +58,18 @@ export default function setup() {
           }
         },
         {
+          text: 'Disable',
+          onClick: (e, toastObject) => {
+            toastObject.goAway(0)
+            localStorage.setItem('hasDisabledTracking', true)
+            localStorage.setItem('hasAcknowledgedTracking', true)
+          }
+        },
+        {
           text: 'Got it',
           onClick: (e, toastObject) => {
             toastObject.goAway(0)
+            localStorage.setItem('hasDisabledTracking', false)
             localStorage.setItem('hasAcknowledgedTracking', true)
           }
         }
