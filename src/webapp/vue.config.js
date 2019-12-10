@@ -18,5 +18,15 @@ module.exports = {
         template: 'public/index.html'
       })
     ]
+  },
+  css: {
+    loaderOptions: {
+      sass: {
+        prependData: `
+          @import "node_modules/bulma/sass/utilities/initial-variables";
+          @import "@/scss/bulma-preset-overrides";
+        `
+      }
+    }
   }
 }

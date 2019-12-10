@@ -992,7 +992,7 @@ export default {
 
   &.analyze-join-table {
     margin-top: 1.5rem;
-    border-top: 1px solid #dbdbdb;
+    border-top: 1px solid $grey-lighter;
   }
 
   &.space-between {
@@ -1039,7 +1039,7 @@ export default {
 
   &.timeframe {
     &::after {
-      border: 3px solid #363636;
+      border: 3px solid $grey-darker;
       border-radius: 2px;
       border-right: 0;
       border-top: 0;
