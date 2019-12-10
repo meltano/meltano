@@ -118,6 +118,15 @@ export default {
           this.isSaving = false
           Vue.toasted.global.error(error.response.data.code)
         })
+    },
+    updateDefaultTransform() {
+      const namespace = this.installedPlugins.extractors.find(
+        extractor => extractor.name === this.pipeline.extractor
+      ).namespace
+      const defaultTransform = this.getHasDefaultTransforms(namespace)
+        ? this.transformOptions[1]
+        : this.transformOptions[0]
+      this.pipeline.transform = defaultTransform ? defaultTransform.name : ''
     }
   }
 }
@@ -162,6 +171,7 @@ export default {
                       v-model="pipeline.extractor"
                       :class="{ 'has-text-success': pipeline.extractor }"
                       :disabled="!getHasInstalledPluginsOfType('extractors')"
+                      @change="updateDefaultTransform"
                     >
                       <option
                         v-for="extractor in availableExtractors"
