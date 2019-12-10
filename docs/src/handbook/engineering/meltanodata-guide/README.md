@@ -13,6 +13,7 @@ This will be the single source of truth for team members when it comes to creati
 - DigitalOcean Account
 - Access to DigitalOcean Meltano team
 - Client's tenant name (i.e., company name, etc.)
+- Access to the [Controller Node](./controller_node)
 
 ### Step 1: Setup a new droplet
 
@@ -114,11 +115,25 @@ round-trip min/avg/max/stddev = 12.279/16.375/19.898/2.901 ms
 1. Leave **TTL (seconds)** with the default of `3600`
 1. Click `Create Record`
 
-::: info
-**Automatic SSL Certificate**
+#### Enable HTTPS
 
-An automatic HTTPS certificate routine is built-in the distribution, leveraging **Let's Encrypt** to issue a HTTPS certificate for this subdomain.
-:::
+Log in the Controller Node and run the `playbook/ssl.yml` playbook. To speed up the process, you can use `--limit=$TENANT_NAME.meltanodata.com`.
+
+Then update the `/etc/caddy/Caddyfile` with
+
+```
+# comment `tls self_signed`
+#tls self_signed
+
+# add the Meltano wildcard certificate
+tls /etc/caddy/com.meltanodata.crt /etc/caddy/com.meltanodata.key
+```
+
+Then restart caddy using:
+
+```
+systemctl restart caddy
+```
 
 #### Make sure everything works
 
