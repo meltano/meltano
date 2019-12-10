@@ -100,3 +100,11 @@ Ensure the Meltano certificate is present on the `*.meltanodata.com` nodes.
 ### playbooks/controller.yml
 
 Ensure the Controller access control is properly setup, requires `root` access.
+
+### playbooks/meltano.yml
+
+Ensure each node has proper access control setup.
+
+### playbooks/meltano-upgrade.yml
+
+Runs `meltano upgrade` in each node.
