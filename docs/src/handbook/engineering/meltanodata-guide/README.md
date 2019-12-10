@@ -452,7 +452,7 @@ You can now directly access the instance by adding the https:// in front of the 
 
 https://{TENANT}.meltanodata.com/
 
-You'll get a `Privacy Error: NET::ERR_CERT_AUTHORITY_INVALID`, but chose to `Proceed to $TENANT_NAME.meltanodata.com (unsafe)` (e.g. by first clicking on `Advanced` if you are using Chrome)
+You'll get a `Privacy Error: NET::ERR_CERT_AUTHORITY_INVALID`, but choose to `Proceed to $TENANT_NAME.meltanodata.com (unsafe)` (e.g. by first clicking on `Advanced` if you are using Chrome)
 
 ## Maintaining an Existing Instance
 
