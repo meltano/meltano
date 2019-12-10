@@ -157,7 +157,9 @@ const actions = {
             commit('setPipelineStatus', {
               pipeline: targetPipeline,
               hasError: jobStatus.hasError,
-              isRunning: !jobStatus.isComplete
+              isRunning: !jobStatus.isComplete,
+              lastStartedAt: jobStatus.startedAt,
+              lastEndedAt: jobStatus.endedAt
             })
           }
         })
@@ -262,11 +264,20 @@ const mutations = {
 
   setPipelineStatus(
     _,
-    { pipeline, isRunning, isDeleting = false, hasError = false }
+    {
+      pipeline,
+      isRunning,
+      isDeleting = false,
+      hasError = false,
+      lastStartedAt = null,
+      lastEndedAt = null
+    }
   ) {
     Vue.set(pipeline, 'isRunning', isRunning)
     Vue.set(pipeline, 'hasError', hasError)
     Vue.set(pipeline, 'isDeleting', isDeleting)
+    Vue.set(pipeline, 'lastStartedAt', lastStartedAt)
+    Vue.set(pipeline, 'lastEndedAt', lastEndedAt)
   },
 
   setPipelineJobId(_, { pipeline, jobId }) {

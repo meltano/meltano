@@ -18,6 +18,14 @@ export default {
     ...mapGetters('plugins', ['getIsPluginInstalled']),
     getFormattedDateStringYYYYMMDD() {
       return val => utils.formatDateStringYYYYMMDD(val)
+    },
+    getLastRunLabel() {
+      return pipeline => {
+        const label = pipeline.lastEndedAt
+          ? this.getFormattedDateStringYYYYMMDD(pipeline.lastEndedAt)
+          : 'Log'
+        return pipeline.isRunning ? 'Running...' : label
+      }
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -149,14 +157,30 @@ export default {
                   <button
                     class="button is-outlined is-small"
                     :class="{
-                      'tooltip is-tooltip-left': pipeline.jobId,
-                      'is-danger': pipeline.hasError
+                      'tooltip is-tooltip-left': pipeline.jobId
                     }"
                     data-tooltip="View this ELT Pipeline's last run logging status."
                     :disabled="!pipeline.jobId"
                     @click="goToLog(pipeline.jobId)"
                   >
-                    {{ pipeline.isRunning ? 'Running...' : 'Log' }}
+                    <span>
+                      {{ getLastRunLabel(pipeline) }}
+                    </span>
+                    <span
+                      v-if="!pipeline.isRunning"
+                      class="icon is-small"
+                      :class="
+                        `has-text-${pipeline.hasError ? 'danger' : 'success'}`
+                      "
+                    >
+                      <font-awesome-icon
+                        :icon="
+                          pipeline.hasError
+                            ? 'exclamation-triangle'
+                            : 'check-circle'
+                        "
+                      ></font-awesome-icon>
+                    </span>
                   </button>
                 </p>
               </td>

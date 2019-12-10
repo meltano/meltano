@@ -114,10 +114,12 @@ class Job(SystemModel):
         self.transit(State.SUCCESS)
 
     def __repr__(self):
-        return "<Job(id='%s', job_id='%s', state='%s')>" % (
+        return "<Job(id='%s', job_id='%s', state='%s', started_at='%s', ended_at='%s')>" % (
             self.id,
             self.job_id,
             self.state,
+            self.started_at,
+            self.ended_at,
         )
 
     def save(self, session):

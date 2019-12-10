@@ -69,7 +69,7 @@ export default {
 
       <template v-if="hasActions">
         <th class="has-text-centered">
-          <span>Status</span>
+          <span>Last Run</span>
           <span
             class="icon has-text-grey-light tooltip is-tooltip-multiline"
             data-tooltip="The logging status of the last ELT run for this pipeline."

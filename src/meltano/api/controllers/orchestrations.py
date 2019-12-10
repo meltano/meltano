@@ -88,6 +88,8 @@ def job_state() -> Response:
                     "job_id": job_id,
                     "is_complete": state_job.is_complete(),
                     "has_error": state_job.has_error(),
+                    "started_at": state_job.started_at,
+                    "ended_at": state_job.ended_at,
                 }
             )
 
