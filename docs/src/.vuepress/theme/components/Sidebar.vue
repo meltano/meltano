@@ -1,7 +1,7 @@
 <template>
   <div class="sidebar">
     <a href="https://meltano.typeform.com/to/NJPwxv" class="sidebar-cta">
-      Get your free hosted solution
+      Create Account
     </a>
     <NavLinks />
     <slot name="top" />
