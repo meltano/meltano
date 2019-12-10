@@ -158,8 +158,8 @@ const actions = {
               pipeline: targetPipeline,
               hasError: jobStatus.hasError,
               isRunning: !jobStatus.isComplete,
-              lastStartedAt: jobStatus.startedAt,
-              lastEndedAt: jobStatus.endedAt
+              startedAt: jobStatus.startedAt,
+              endedAt: jobStatus.endedAt
             })
           }
         })
@@ -269,15 +269,15 @@ const mutations = {
       isRunning,
       isDeleting = false,
       hasError = false,
-      lastStartedAt = null,
-      lastEndedAt = null
+      startedAt = null,
+      endedAt = null
     }
   ) {
     Vue.set(pipeline, 'isRunning', isRunning)
     Vue.set(pipeline, 'hasError', hasError)
     Vue.set(pipeline, 'isDeleting', isDeleting)
-    Vue.set(pipeline, 'lastStartedAt', lastStartedAt)
-    Vue.set(pipeline, 'lastEndedAt', lastEndedAt)
+    Vue.set(pipeline, 'startedAt', startedAt)
+    Vue.set(pipeline, 'endedAt', endedAt)
   },
 
   setPipelineJobId(_, { pipeline, jobId }) {
@@ -287,6 +287,12 @@ const mutations = {
   setPipelines(state, pipelines) {
     pipelines.forEach(pipeline => {
       pipeline.startDate = utils.dateIso8601(pipeline.startDate)
+      if (pipeline.startedAt) {
+        pipeline.startedAt = utils.dateIso8601(pipeline.startedAt)
+      }
+      if (pipeline.endedAt) {
+        pipeline.endedAt = utils.dateIso8601(pipeline.endedAt)
+      }
     })
     state.pipelines = pipelines
   },

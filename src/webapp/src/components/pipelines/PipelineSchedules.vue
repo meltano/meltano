@@ -21,8 +21,8 @@ export default {
     },
     getLastRunLabel() {
       return pipeline => {
-        const label = pipeline.lastEndedAt
-          ? this.getFormattedDateStringYYYYMMDD(pipeline.lastEndedAt)
+        const label = pipeline.endedAt
+          ? this.getFormattedDateStringYYYYMMDD(pipeline.endedAt)
           : 'Log'
         return pipeline.isRunning ? 'Running...' : label
       }
