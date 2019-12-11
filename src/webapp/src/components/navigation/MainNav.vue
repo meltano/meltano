@@ -29,7 +29,6 @@ export default {
     ...mapGetters('system', ['updateAvailable']),
     ...mapGetters('plugins', [
       'getIsStepLoadersMinimallyValidated',
-      'getIsStepTransformsMinimallyValidated',
       'getIsStepScheduleMinimallyValidated'
     ]),
     ...mapState('repos', ['models']),
@@ -147,16 +146,6 @@ export default {
               :disabled="!getIsStepLoadersMinimallyValidated"
               tag="button"
               >Load</router-link
-            >
-            <router-link
-              :to="{ name: 'transforms' }"
-              class="navbar-item button is-borderless"
-              :class="{
-                'is-active': getIsCurrentPath('/pipeline/transform')
-              }"
-              :disabled="!getIsStepTransformsMinimallyValidated"
-              tag="button"
-              >Transform</router-link
             >
             <router-link
               :to="{ name: 'schedules' }"

@@ -25,6 +25,12 @@ const defaultState = utils.deepFreeze({
 })
 
 const getters = {
+  getHasDefaultTransforms(state) {
+    return namespace =>
+      state.plugins.transforms.find(
+        transform => transform.namespace === namespace
+      )
+  },
   getHasInstalledPluginsOfType(state) {
     return pluginType => {
       const hasOwns = []
@@ -80,14 +86,10 @@ const getters = {
 
   getIsStepScheduleMinimallyValidated(state, getters) {
     return (
-      getters.getIsStepTransformsMinimallyValidated &&
+      getters.getIsStepLoadersMinimallyValidated &&
       state.installedPlugins.loaders &&
       state.installedPlugins.loaders.length > 0
     )
-  },
-
-  getIsStepTransformsMinimallyValidated(_, getters) {
-    return getters.getIsStepLoadersMinimallyValidated
   },
 
   getPluginProfiles() {

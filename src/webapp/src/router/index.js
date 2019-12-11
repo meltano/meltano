@@ -8,7 +8,6 @@ import Loaders from '@/components/pipelines/Loaders'
 import LoaderSettingsModal from '@/components/pipelines/LoaderSettingsModal'
 import LogModal from '@/components/pipelines/LogModal'
 import PipelineSchedules from '@/components/pipelines/PipelineSchedules'
-import Transforms from '@/components/pipelines/Transforms'
 
 import Analyze from '@/views/Analyze'
 import Dashboards from '@/views/Dashboards'
@@ -82,17 +81,6 @@ const router = new Router({
           meta: {
             isModal: true,
             title: 'Meltano: Pipeline - Loader Settings'
-          }
-        },
-        {
-          path: 'transform',
-          name: 'transforms',
-          components: {
-            default: Transforms
-          },
-          meta: {
-            isModal: false,
-            title: 'Meltano: Pipeline - Transform'
           }
         },
         {
