@@ -88,6 +88,8 @@ def job_state() -> Response:
                     "job_id": job_id,
                     "is_complete": state_job.is_complete(),
                     "has_error": state_job.has_error(),
+                    "started_at": state_job.started_at,
+                    "ended_at": state_job.ended_at,
                 }
             )
 
@@ -111,6 +113,8 @@ def job_log(job_id) -> Response:
             "job_id": job_id,
             "log": log,
             "has_error": state_job.has_error() if state_job else False,
+            "started_at": state_job.started_at if state_job else None,
+            "ended_at": state_job.ended_at if state_job else None,
         }
     )
 
@@ -279,6 +283,8 @@ def get_pipeline_schedules():
         schedule["has_error"] = state_job.has_error() if state_job else False
         schedule["is_running"] = state_job.is_running() if state_job else False
         schedule["job_id"] = state_job.job_id if state_job else None
+        schedule["started_at"] = state_job.started_at if state_job else None
+        schedule["ended_at"] = state_job.ended_at if state_job else None
 
     return jsonify(schedules)
 

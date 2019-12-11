@@ -157,7 +157,9 @@ const actions = {
             commit('setPipelineStatus', {
               pipeline: targetPipeline,
               hasError: jobStatus.hasError,
-              isRunning: !jobStatus.isComplete
+              isRunning: !jobStatus.isComplete,
+              startedAt: jobStatus.startedAt,
+              endedAt: jobStatus.endedAt
             })
           }
         })
@@ -192,9 +194,9 @@ const actions = {
     commit('reset', 'loaderInFocusConfiguration'),
 
   run({ commit, dispatch }, pipeline) {
+    commit('setPipelineStatus', { pipeline, isRunning: true })
     return orchestrationsApi.run(pipeline).then(response => {
       dispatch('queuePipelinePoller', response.data)
-      commit('setPipelineStatus', { pipeline, isRunning: true })
       commit('setPipelineJobId', { pipeline, jobId: response.data.jobId })
     })
   },
@@ -262,11 +264,20 @@ const mutations = {
 
   setPipelineStatus(
     _,
-    { pipeline, isRunning, isDeleting = false, hasError = false }
+    {
+      pipeline,
+      isRunning,
+      isDeleting = false,
+      hasError = false,
+      startedAt = null,
+      endedAt = null
+    }
   ) {
     Vue.set(pipeline, 'isRunning', isRunning)
     Vue.set(pipeline, 'hasError', hasError)
     Vue.set(pipeline, 'isDeleting', isDeleting)
+    Vue.set(pipeline, 'startedAt', utils.dateIso8601(startedAt))
+    Vue.set(pipeline, 'endedAt', utils.dateIso8601(endedAt))
   },
 
   setPipelineJobId(_, { pipeline, jobId }) {
@@ -276,6 +287,12 @@ const mutations = {
   setPipelines(state, pipelines) {
     pipelines.forEach(pipeline => {
       pipeline.startDate = utils.dateIso8601(pipeline.startDate)
+      if (pipeline.startedAt) {
+        pipeline.startedAt = utils.dateIso8601(pipeline.startedAt)
+      }
+      if (pipeline.endedAt) {
+        pipeline.endedAt = utils.dateIso8601(pipeline.endedAt)
+      }
     })
     state.pipelines = pipelines
   },
