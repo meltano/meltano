@@ -151,21 +151,21 @@ export default {
       </section>
       <footer class="modal-card-foot h-space-between">
         <div class="field is-grouped is-grouped-multiline">
-          <div class="control">
+          <div class="control control-job-log-tags">
             <div class="tags has-addons">
               <span class="tag is-white">Started</span>
               <span class="tag is-info">{{ getStartedAtLabel }}</span>
             </div>
           </div>
 
-          <div class="control">
+          <div class="control control-job-log-tags">
             <div class="tags has-addons">
               <span class="tag is-white">Ended</span>
               <span class="tag is-info">{{ getEndedAtLabel }}</span>
             </div>
           </div>
 
-          <div class="control">
+          <div class="control control-job-log-tags">
             <div class="tags has-addons">
               <span class="tag is-white">Elapsed</span>
               <span class="tag is-info">{{ getElapsedLabel }}</span>
@@ -224,4 +224,10 @@ export default {
   </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.field.is-grouped.is-grouped-multiline > .control.control-job-log-tags {
+  @media screen and (min-width: $desktop) {
+    margin-bottom: 0;
+  }
+}
+</style>
