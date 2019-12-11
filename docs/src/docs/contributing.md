@@ -132,7 +132,7 @@ When you need to make changes to `discovery.yml`, these changes are not automati
 ln -s $YOUR_DISCOVERY_YML_PATH
 ```
 
-Now, when you run the `ls` command, you should see something like:
+Now, when you run the `ls -l` command, you should see something like:
 
 ```
 bencodezen  staff   72 Nov 19 09:19 discovery.yml -> /Users/bencodezen/Projects/meltano/src/meltano/core/bundle/discovery.yml

@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1055](https://gitlab.com/meltano/meltano/issues/1055) Add "Disable" button to Tracking Acknowledgment toast so user's can opt-out from the UI
 - [#1408](https://gitlab.com/meltano/meltano/issues/1408) Add "Last Run" context to each pipeline
 - [#1408](https://gitlab.com/meltano/meltano/issues/1408) Add "Started At", "Ended At", and "Elapsed" to Job Log modal
+- [#1390](https://gitlab.com/meltano/meltano/issues/1390) Display of extractors and loaders can now be configured through the `hidden` property in `discovery.yml`
 
 ### Changes
 

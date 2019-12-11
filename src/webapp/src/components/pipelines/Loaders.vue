@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import SpeedRunIcon from '@/components/pipelines/SpeedRunIcon'
@@ -15,28 +15,11 @@ export default {
   }),
   computed: {
     ...mapGetters('plugins', [
+      'visibleLoaders',
       'getIsAddingPlugin',
       'getIsInstallingPlugin',
       'getIsPluginInstalled'
-    ]),
-    ...mapState('plugins', ['plugins']),
-    sortedLoaders() {
-      // This is a stop gap until we implement an eventual need for automatic text filtering for cards
-      const currentLoaders = this.plugins.loaders || []
-      let orderedForSpeedRunLoaders = []
-
-      if (currentLoaders.length > 0) {
-        const start = [
-          currentLoaders.find(plugin => plugin.name === this.speedRunLoader)
-        ]
-        const end = currentLoaders.filter(
-          plugin => plugin.name !== this.speedRunLoader
-        )
-        orderedForSpeedRunLoaders = start.concat(end)
-      }
-
-      return orderedForSpeedRunLoaders
-    }
+    ])
   },
   methods: {
     updateLoaderSettings(loader) {
@@ -66,7 +49,7 @@ export default {
 
     <div class="tile is-ancestor is-flex is-flex-wrap">
       <div
-        v-for="(loader, index) in sortedLoaders"
+        v-for="(loader, index) in visibleLoaders"
         :key="`${loader.name}-${index}`"
         :data-test-id="`${loader.name}-loader-card`"
         class="tile is-parent is-3 is-relative"
@@ -109,7 +92,7 @@ export default {
       </div>
     </div>
     <progress
-      v-if="!plugins.loaders"
+      v-if="!visibleLoaders"
       class="progress is-small is-info"
     ></progress>
   </div>
