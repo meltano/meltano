@@ -167,7 +167,7 @@ export default {
               <td>
                 <p class="has-text-centered">
                   <button
-                    class="button is-outlined is-small"
+                    class="button is-outlined is-small is-fullwidth h-space-between"
                     :class="{
                       'tooltip is-tooltip-left': pipeline.jobId
                     }"
