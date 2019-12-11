@@ -192,6 +192,16 @@ export default {
         profile.config[setting.name] = file.name
       }
     },
+    onFocusInput(ev) {
+      const anchor_name = ev.target.id
+      this.$refs.docs.contentWindow.postMessage(
+        {
+          source: 'meltano',
+          anchor: anchor_name.replace('setting-', '')
+        },
+        '*'
+      )
+    },
     refocusInput(newVal, oldVal) {
       if (newVal !== oldVal) {
         this.focusInputIntelligently()
@@ -244,194 +254,231 @@ export default {
       </div>
     </slot>
 
-    <form>
-      <div
-        v-for="setting in configSettings.settings"
-        :key="setting.name"
-        :class="{ 'field is-horizontal': !getIsOfKindHidden(setting.kind) }"
-      >
-        <div
-          v-if="!getIsOfKindHidden(setting.kind)"
-          :class="['field-label', labelClass]"
-        >
-          <label class="label" :for="getFormFieldForId(setting)">
-            <a
-              v-if="setting.documentation"
-              target="_blank"
-              :href="setting.documentation"
-              class="label"
+    <div class="columns">
+      <div class="column">
+        <form>
+          <div
+            v-for="setting in configSettings.settings"
+            :key="setting.name"
+            :class="{ 'field is-horizontal': !getIsOfKindHidden(setting.kind) }"
+            @focusin="onFocusInput"
+          >
+            <div
+              v-if="!getIsOfKindHidden(setting.kind)"
+              :class="['field-label', labelClass]"
             >
-              <span
-                class="has-text-underlined tooltip is-tooltip-right"
-                :data-tooltip="
-                  `Learn more about the ${getLabel(setting)} setting.`
-                "
-                >{{ getLabel(setting) }}</span
-              >
-              <span>{{ getRequiredLabel(setting) }}</span>
-            </a>
-            <span v-else>
-              <span>{{ getLabel(setting) }}</span>
-              <span>{{ getRequiredLabel(setting) }}</span>
-            </span>
-            <TooltipCircle
-              v-if="setting.tooltip"
-              :text="setting.tooltip"
-              class="label-tooltip"
-            />
-          </label>
-        </div>
-        <div class="field-body">
-          <div class="field" :class="{ 'has-addons': getIsProtected(setting) }">
-            <div class="control is-expanded has-icons-right">
-              <!-- Hidden -->
-              <input
-                v-if="getIsOfKindHidden(setting.kind)"
-                :id="getFormFieldForId(setting)"
-                v-model="connectorProfile.config[setting.name]"
-                type="hidden"
-              />
-
-              <!-- Boolean -->
-              <input
-                v-else-if="getIsOfKindBoolean(setting.kind)"
-                :id="getFormFieldForId(setting)"
-                v-model="connectorProfile.config[setting.name]"
-                class="checkbox"
-                :class="successClass(setting)"
-                type="checkbox"
-              />
-
-              <!-- Date -->
-              <InputDateIso8601
-                v-else-if="getIsOfKindDate(setting.kind)"
-                v-model="connectorProfile.config[setting.name]"
-                :name="setting.name"
-                :for-id="getFormFieldForId(setting)"
-                :input-classes="`is-small ${successClass(setting)}`"
-              />
-
-              <!-- File -->
-              <div
-                v-else-if="getIsOfKindFile(setting.kind)"
-                class="file has-name is-small"
-              >
-                <label class="file-label is-file-fullwidth">
-                  <div>
-                    <input
-                      class="file-input"
-                      type="file"
-                      :name="setting.name"
-                      @change="onFileChange($event, setting)"
-                    />
-                    <span class="file-cta has-background-white">
-                      <span class="file-icon">
-                        <font-awesome-icon
-                          icon="file-upload"
-                        ></font-awesome-icon>
-                      </span>
-                      <span class="file-label">
-                        <span>Upload</span>
-                      </span>
-                    </span>
-                  </div>
-                  <span
-                    class="file-name is-file-fullwidth file-name-width"
-                    :class="
-                      fileValue(setting)
-                        ? 'has-text-success'
-                        : 'has-text-grey-light'
-                    "
-                  >
-                    {{ fileValue(setting) || setting.placeholder }}
-                  </span>
-                </label>
-              </div>
-
-              <!-- Options -->
-              <div
-                v-else-if="getIsOfKindOptions(setting.kind)"
-                class="select is-small is-fullwidth"
-              >
-                <select
-                  :id="`${setting.name}-select-menu`"
-                  v-model="connectorProfile.config[setting.name]"
-                  :name="`${setting.name}-options`"
-                  :class="successClass(setting)"
-                >
-                  <option
-                    v-for="(option, index) in setting.options"
-                    :id="getFormFieldForId(setting)"
-                    :key="`${option.label}-${index}`"
-                    :value="option.value"
-                  >
-                    {{ option.label }}
-                  </option>
-                </select>
-              </div>
-
-              <!-- Text / Password / Email -->
-              <input
-                v-else-if="getIsOfKindTextBased(setting.kind)"
-                :id="getFormFieldForId(setting)"
-                v-model="connectorProfile.config[setting.name]"
-                :class="['input', fieldClass, successClass(setting)]"
-                :type="getTextBasedInputType(setting)"
-                :placeholder="getPlaceholder(setting)"
-                :disabled="getIsProtected(setting)"
-                :readonly="getIsProtected(setting)"
-                @focus="$event.target.select()"
-              />
-            </div>
-
-            <!-- Visual helpers  -->
-            <template v-if="!getIsOfKindHidden(setting.kind)">
-              <div v-if="getIsProtected(setting)" class="control">
-                <a
-                  href="https://meltano.com/docs/environment-variables.html#connector-settings-configuration"
-                  target="_blank"
-                  class="button is-small"
-                >
-                  <span
-                    class="icon has-text-grey-dark tooltip is-tooltip-left"
-                    :data-tooltip="protectedFieldMessage(setting)"
-                  >
-                    <font-awesome-icon icon="lock"></font-awesome-icon>
-                  </span>
-                </a>
-              </div>
-
-              <p
-                v-if="setting.description || setting.documentation"
-                class="help"
-              >
+              <label class="label" :for="getFormFieldForId(setting)">
                 <a
                   v-if="setting.documentation"
                   target="_blank"
                   :href="setting.documentation"
-                  class="tooltip"
-                  :data-tooltip="
-                    `Learn more about the ${getLabel(setting)} setting.`
-                  "
+                  class="label"
                 >
-                  <span v-if="!setting.description" class="has-text-underlined"
-                    >Learn More.</span
+                  <span
+                    class="has-text-underlined tooltip is-tooltip-right"
+                    :data-tooltip="
+                      `Learn more about the ${getLabel(setting)} setting.`
+                    "
+                    >{{ getLabel(setting) }}</span
                   >
-                  <span class="icon has-text-link">
-                    <font-awesome-icon
-                      icon="external-link-square-alt"
-                    ></font-awesome-icon>
-                  </span>
+                  <span>{{ getRequiredLabel(setting) }}</span>
                 </a>
-                <span v-if="setting.description" class="is-italic"
-                  >{{ setting.description }}.
+                <span v-else>
+                  <span>{{ getLabel(setting) }}</span>
+                  <span>{{ getRequiredLabel(setting) }}</span>
                 </span>
-              </p>
-            </template>
+                <TooltipCircle
+                  v-if="setting.tooltip"
+                  :text="setting.tooltip"
+                  class="label-tooltip"
+                />
+              </label>
+            </div>
+            <div class="field-body">
+              <div
+                class="field"
+                :class="{ 'has-addons': getIsProtected(setting) }"
+              >
+                <div class="control is-expanded has-icons-right">
+                  <!-- Hidden -->
+                  <input
+                    v-if="getIsOfKindHidden(setting.kind)"
+                    :id="getFormFieldForId(setting)"
+                    v-model="
+                      configSettings.profiles[
+                        configSettings.profileInFocusIndex
+                      ].config[setting.name]
+                    "
+                    type="hidden"
+                  />
+
+                  <!-- Boolean -->
+                  <input
+                    v-else-if="getIsOfKindBoolean(setting.kind)"
+                    :id="getFormFieldForId(setting)"
+                    v-model="
+                      configSettings.profiles[
+                        configSettings.profileInFocusIndex
+                      ].config[setting.name]
+                    "
+                    class="checkbox"
+                    :class="successClass(setting)"
+                    type="checkbox"
+                  />
+
+                  <!-- Date -->
+                  <InputDateIso8601
+                    v-else-if="getIsOfKindDate(setting.kind)"
+                    v-model="
+                      configSettings.profiles[
+                        configSettings.profileInFocusIndex
+                      ].config[setting.name]
+                    "
+                    :name="setting.name"
+                    :for-id="getFormFieldForId(setting)"
+                    :input-classes="`is-small ${successClass(setting)}`"
+                  />
+
+                  <!-- File -->
+                  <div
+                    v-else-if="getIsOfKindFile(setting.kind)"
+                    class="file has-name is-small"
+                  >
+                    <label class="file-label is-file-fullwidth">
+                      <div>
+                        <input
+                          class="file-input"
+                          type="file"
+                          :name="setting.name"
+                          @change="onFileChange($event, setting)"
+                        />
+                        <span class="file-cta has-background-white">
+                          <span class="file-icon">
+                            <font-awesome-icon
+                              icon="file-upload"
+                            ></font-awesome-icon>
+                          </span>
+                          <span class="file-label">
+                            <span>Upload</span>
+                          </span>
+                        </span>
+                      </div>
+                      <span
+                        class="file-name is-file-fullwidth file-name-width"
+                        :class="
+                          fileValue(setting)
+                            ? 'has-text-success'
+                            : 'has-text-grey-light'
+                        "
+                      >
+                        {{ fileValue(setting) || setting.placeholder }}
+                      </span>
+                    </label>
+                  </div>
+
+                  <!-- Dropdown -->
+                  <div
+                    v-else-if="getIsOfKindOptions(setting.kind)"
+                    class="select is-small is-fullwidth"
+                  >
+                    <select
+                      :id="`${setting.name}-select-menu`"
+                      v-model="
+                        configSettings.profiles[
+                          configSettings.profileInFocusIndex
+                        ].config[setting.name]
+                      "
+                      :name="`${setting.name}-options`"
+                      :class="successClass(setting)"
+                    >
+                      <option
+                        v-for="(option, index) in setting.options"
+                        :id="getFormFieldForId(setting)"
+                        :key="`${option.label}-${index}`"
+                        :value="option.value"
+                      >
+                        {{ option.label }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <!-- Text / Password / Email -->
+                  <input
+                    v-else-if="getIsOfKindTextBased(setting.kind)"
+                    :id="getFormFieldForId(setting)"
+                    v-model="
+                      configSettings.profiles[
+                        configSettings.profileInFocusIndex
+                      ].config[setting.name]
+                    "
+                    :class="['input', fieldClass, successClass(setting)]"
+                    :type="getTextBasedInputType(setting)"
+                    :placeholder="getPlaceholder(setting)"
+                    :disabled="getIsProtected(setting)"
+                    :readonly="getIsProtected(setting)"
+                    @focus="$event.target.select()"
+                  />
+                </div>
+
+                <!-- Visual helpers  -->
+                <template v-if="!getIsOfKindHidden(setting.kind)">
+                  <div v-if="getIsProtected(setting)" class="control">
+                    <a
+                      href="https://meltano.com/docs/environment-variables.html#connector-settings-configuration"
+                      target="_blank"
+                      class="button is-small"
+                    >
+                      <span
+                        class="icon has-text-grey-dark tooltip is-tooltip-multiline"
+                        data-tooltip="This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more."
+                      >
+                        <font-awesome-icon icon="lock"></font-awesome-icon>
+                      </span>
+                    </a>
+                  </div>
+
+                  <p
+                    v-if="setting.description || setting.documentation"
+                    class="help"
+                  >
+                    <a
+                      v-if="setting.documentation"
+                      target="_blank"
+                      :href="setting.documentation"
+                      class="tooltip"
+                      :data-tooltip="
+                        `Learn more about the ${getLabel(setting)} setting.`
+                      "
+                    >
+                      <span
+                        v-if="!setting.description"
+                        class="has-text-underlined"
+                        >Learn More.</span
+                      >
+                      <span class="icon has-text-link">
+                        <font-awesome-icon
+                          icon="external-link-square-alt"
+                        ></font-awesome-icon>
+                      </span>
+                    </a>
+                    <span v-if="setting.description" class="is-italic"
+                      >{{ setting.description }}.
+                    </span>
+                  </p>
+                </template>
+              </div>
+            </div>
           </div>
-        </div>
+        </form>
       </div>
-    </form>
+      <div class="column">
+        <iframe
+          ref="docs"
+          class="column"
+          src="https://meltano.com/plugins/extractors/gitlab.html?embed=true"
+        />
+      </div>
+    </div>
 
     <slot name="bottom" />
   </div>
