@@ -241,21 +241,8 @@ export default {
   <div>
     <slot name="top" />
 
-    <slot name="docs">
-      <div v-if="plugin.docs" class="content has-text-centered mt1r">
-        <p class="content">
-          View the
-          <a :href="plugin.docs" target="_blank" class="has-text-underlined">
-            {{ plugin.label || plugin.name }}
-            {{ pluginType }}
-          </a>
-          documentation.
-        </p>
-      </div>
-    </slot>
-
     <div class="columns">
-      <div class="column">
+      <div class="column is-two-fifths">
         <form>
           <div
             v-for="setting in configSettings.settings"
@@ -471,11 +458,17 @@ export default {
           </div>
         </form>
       </div>
-      <div class="column">
+      <div class="column is-three-fifths">
+        <!-- <iframe ref="docs" class="column" :src="`${plugin.docs}?embed=true`" /> -->
         <iframe
           ref="docs"
-          class="column"
-          src="https://meltano.com/plugins/extractors/gitlab.html?embed=true"
+          class="column docs"
+          :src="
+            `${plugin.docs.replace(
+              'https://meltano.com/',
+              'http://localhost:8081/'
+            )}?embed=true`
+          "
         />
       </div>
     </div>
@@ -498,6 +491,11 @@ export default {
     }
     max-width: 60em;
   }
+}
+
+iframe.docs {
+  width: 100%;
+  height: 500px;
 }
 
 .label-tooltip {
