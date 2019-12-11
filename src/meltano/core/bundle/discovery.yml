@@ -15,6 +15,7 @@ extractors:
     label: CSV
     description: Generic data extractor of CSV (comma separated value) files
     namespace: tap_csv
+    hidden: true
     docs: 'https://meltano.com/plugins/extractors/csv.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-csv.git'
     capabilities:
@@ -158,6 +159,7 @@ extractors:
     label: MongoDB
     description: General purpose, document-based, distributed database
     namespace: tap_mongodb
+    hidden: true
     docs: 'https://meltano.com/plugins/extractors/mongodb.html'
     pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
     capabilities:
