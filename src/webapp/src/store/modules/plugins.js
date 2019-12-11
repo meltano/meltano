@@ -25,12 +25,25 @@ const defaultState = utils.deepFreeze({
 })
 
 const getters = {
+  visibleExtractors(state) {
+    const extractors = state.plugins.extractors || []
+
+    return extractors.filter(extractor => !extractor.hidden)
+  },
+
+  visibleLoaders(state) {
+    const loaders = state.plugins.loaders || []
+
+    return loaders.filter(loader => !loader.hidden)
+  },
+
   getHasDefaultTransforms(state) {
     return namespace =>
       state.plugins.transforms.find(
         transform => transform.namespace === namespace
       )
   },
+
   getHasInstalledPluginsOfType(state) {
     return pluginType => {
       const hasOwns = []
