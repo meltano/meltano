@@ -14,13 +14,13 @@ export default {
   }),
   computed: {
     ...mapGetters('plugins', [
-      'filteredExtractors',
+      'visibleExtractors',
       'getIsAddingPlugin',
       'getIsPluginInstalled',
       'getIsInstallingPlugin'
     ]),
     isLoadingExtractors() {
-      return this.filteredExtractors && this.filteredExtractors.length === 0
+      return this.visibleExtractors && this.visibleExtractors.length === 0
     }
   },
   methods: {
@@ -56,7 +56,7 @@ export default {
 
     <div v-else class="tile is-ancestor is-flex is-flex-wrap">
       <div
-        v-for="(extractor, index) in filteredExtractors"
+        v-for="(extractor, index) in visibleExtractors"
         :key="`${extractor.name}-${index}`"
         :data-test-id="`${extractor.name}-extractor-card`"
         class="tile is-parent is-3 is-relative"
@@ -107,7 +107,7 @@ export default {
       </div>
     </div>
     <progress
-      v-if="!filteredExtractors"
+      v-if="!visibleExtractors"
       class="progress is-small is-info"
     ></progress>
   </div>

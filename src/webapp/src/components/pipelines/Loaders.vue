@@ -15,7 +15,7 @@ export default {
   }),
   computed: {
     ...mapGetters('plugins', [
-      'filteredLoaders',
+      'visibleLoaders',
       'getIsAddingPlugin',
       'getIsInstallingPlugin',
       'getIsPluginInstalled'
@@ -49,7 +49,7 @@ export default {
 
     <div class="tile is-ancestor is-flex is-flex-wrap">
       <div
-        v-for="(loader, index) in filteredLoaders"
+        v-for="(loader, index) in visibleLoaders"
         :key="`${loader.name}-${index}`"
         :data-test-id="`${loader.name}-loader-card`"
         class="tile is-parent is-3 is-relative"
@@ -92,7 +92,7 @@ export default {
       </div>
     </div>
     <progress
-      v-if="!filteredLoaders"
+      v-if="!visibleLoaders"
       class="progress is-small is-info"
     ></progress>
   </div>

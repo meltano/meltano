@@ -25,13 +25,13 @@ const defaultState = utils.deepFreeze({
 })
 
 const getters = {
-  filteredExtractors(state) {
+  visibleExtractors(state) {
     const extractors = state.plugins.extractors || []
 
     return extractors.filter(extractor => !extractor.hidden)
   },
 
-  filteredLoaders(state) {
+  visibleLoaders(state) {
     const loaders = state.plugins.loaders || []
 
     return loaders.filter(loader => !loader.hidden)
