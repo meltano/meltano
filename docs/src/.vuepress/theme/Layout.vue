@@ -107,7 +107,9 @@ export default {
 
   mounted() {
     // Intercom.io chat
-    this.$intercom.boot()
+    if(!this.isEmbedded) {
+      this.$intercom.boot()
+    }
 
     window.addEventListener('scroll', this.onScroll)
 
