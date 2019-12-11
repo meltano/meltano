@@ -170,7 +170,8 @@ export default {
         const inputs = Array.from(this.$el.getElementsByTagName('input'))
         if (inputs.length) {
           const firstEmptyInput = inputs.find(el => !el.value)
-          const targetInput = firstEmptyInput || inputs[0]
+          const firstEnabledInput = inputs.find(el => !el.disabled)
+          const targetInput = firstEmptyInput || firstEnabledInput || inputs[0]
           targetInput.focus()
         }
       })
@@ -192,15 +193,17 @@ export default {
         profile.config[setting.name] = file.name
       }
     },
-    onFocusInput(ev) {
-      const anchor_name = ev.target.id
-      this.$refs.docs.contentWindow.postMessage(
-        {
-          source: 'meltano',
-          anchor: anchor_name.replace('setting-', '')
-        },
-        '*'
-      )
+    onFocusInput(event) {
+      const anchorName = event.target.id
+      if (anchorName) {
+        this.$refs.docs.contentWindow.postMessage(
+          {
+            source: 'meltano',
+            anchor: anchorName.replace('setting-', '')
+          },
+          '*'
+        )
+      }
     },
     refocusInput(newVal, oldVal) {
       if (newVal !== oldVal) {
@@ -498,6 +501,7 @@ export default {
 .docs-container {
   display: flex;
   flex-direction: column;
+  min-height: 50vh;
   height: 100%;
 
   iframe.docs {
