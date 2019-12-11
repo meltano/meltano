@@ -113,6 +113,8 @@ def job_log(job_id) -> Response:
             "job_id": job_id,
             "log": log,
             "has_error": state_job.has_error() if state_job else False,
+            "started_at": state_job.started_at if state_job else None,
+            "ended_at": state_job.ended_at if state_job else None,
         }
     )
 
