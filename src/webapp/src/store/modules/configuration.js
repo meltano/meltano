@@ -276,8 +276,8 @@ const mutations = {
     Vue.set(pipeline, 'isRunning', isRunning)
     Vue.set(pipeline, 'hasError', hasError)
     Vue.set(pipeline, 'isDeleting', isDeleting)
-    Vue.set(pipeline, 'startedAt', startedAt)
-    Vue.set(pipeline, 'endedAt', endedAt)
+    Vue.set(pipeline, 'startedAt', utils.dateIso8601(startedAt))
+    Vue.set(pipeline, 'endedAt', utils.dateIso8601(endedAt))
   },
 
   setPipelineJobId(_, { pipeline, jobId }) {

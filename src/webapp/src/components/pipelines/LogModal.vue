@@ -68,11 +68,13 @@ export default {
       const fallback =
         this.jobStatus && !this.jobStatus.endedAt ? 'Running...' : '...'
       return this.jobStatus && this.jobStatus.endedAt
-        ? this.jobStatus.endedAt
+        ? utils.momentFormatlll(this.jobStatus.endedAt)
         : fallback
     },
     getStartedAtLabel() {
-      return this.jobStatus ? this.jobStatus.startedAt : '...'
+      return this.jobStatus
+        ? utils.momentFormatlll(this.jobStatus.startedAt)
+        : '...'
     },
     relatedPipeline() {
       return this.pipelines.find(pipeline => pipeline.name === this.jobId)
@@ -134,7 +136,7 @@ export default {
 <template>
   <div class="modal is-active" @keyup.esc="close">
     <div class="modal-background" @click="close"></div>
-    <div class="modal-card is-wide">
+    <div class="modal-card modal-card-log is-wide">
       <header class="modal-card-head">
         <p class="modal-card-title">
           Run Log: <span class="is-family-code">{{ jobId }}</span>
@@ -229,5 +231,9 @@ export default {
   @media screen and (min-width: $desktop) {
     margin-bottom: 0;
   }
+}
+
+.modal-card.modal-card-log {
+  height: 90vh;
 }
 </style>
