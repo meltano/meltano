@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import SpeedRunIcon from '@/components/pipelines/SpeedRunIcon'
@@ -19,8 +19,7 @@ export default {
       'getIsAddingPlugin',
       'getIsInstallingPlugin',
       'getIsPluginInstalled'
-    ]),
-    ...mapState('plugins', ['plugins'])
+    ])
   },
   methods: {
     updateLoaderSettings(loader) {
@@ -93,7 +92,7 @@ export default {
       </div>
     </div>
     <progress
-      v-if="!plugins.loaders"
+      v-if="!filteredLoaders"
       class="progress is-small is-info"
     ></progress>
   </div>
