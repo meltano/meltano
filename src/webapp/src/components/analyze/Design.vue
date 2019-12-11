@@ -336,9 +336,9 @@ export default {
                     :key="dashboard.id"
                     class="dropdown-item"
                   >
-                    <div class="row-space-between">
+                    <div class="h-space-between">
                       <label
-                        class="row-space-between-primary has-cursor-pointer is-unselectable"
+                        class="h-space-between-primary has-cursor-pointer is-unselectable"
                         for="'checkbox-' + dashboard.id"
                         @click.stop="toggleActiveReportInDashboard(dashboard)"
                       >

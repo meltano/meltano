@@ -21,7 +21,8 @@ export default {
       hasError: false,
       isPolling: true,
       jobLog: null,
-      jobPoller: null
+      jobPoller: null,
+      jobStatus: null
     }
   },
   computed: {
@@ -53,6 +54,28 @@ export default {
 
       return models
     },
+    getElapsedLabel() {
+      if (!this.jobStatus) {
+        return '...'
+      }
+      const end = this.jobStatus.endedAt
+        ? new Date(this.jobStatus.endedAt)
+        : Date.now()
+      const elapsed = end - new Date(this.jobStatus.startedAt)
+      return `${Math.floor(elapsed / 1000)} sec`
+    },
+    getEndedAtLabel() {
+      const fallback =
+        this.jobStatus && !this.jobStatus.endedAt ? 'Running...' : '...'
+      return this.jobStatus && this.jobStatus.endedAt
+        ? utils.momentFormatlll(this.jobStatus.endedAt)
+        : fallback
+    },
+    getStartedAtLabel() {
+      return this.jobStatus
+        ? utils.momentFormatlll(this.jobStatus.startedAt)
+        : '...'
+    },
     relatedPipeline() {
       return this.pipelines.find(pipeline => pipeline.name === this.jobId)
     }
@@ -79,6 +102,7 @@ export default {
           .then(response => {
             this.jobLog = response.data.log
             this.hasError = response.data.hasError
+            this.jobStatus = response.data
           })
           .catch(error => {
             this.jobLog = error.response.data.code
@@ -112,7 +136,7 @@ export default {
 <template>
   <div class="modal is-active" @keyup.esc="close">
     <div class="modal-background" @click="close"></div>
-    <div class="modal-card is-wide">
+    <div class="modal-card modal-card-log is-wide">
       <header class="modal-card-head">
         <p class="modal-card-title">
           Run Log: <span class="is-family-code">{{ jobId }}</span>
@@ -127,55 +151,89 @@ export default {
           <progress v-else class="progress is-small is-info"></progress>
         </div>
       </section>
-      <footer class="modal-card-foot buttons is-right">
-        <button class="button" @click="close">Close</button>
-
-        <button v-if="hasError" class="button is-danger" @click="getHelp">
-          Get Help
-        </button>
-        <Dropdown
-          v-else
-          label="Analyze"
-          :disabled="isPolling"
-          :button-classes="
-            `is-interactive-primary ${isPolling ? 'is-loading' : ''}`
-          "
-          menu-classes="dropdown-menu-300"
-          icon-open="chart-line"
-          icon-close="caret-down"
-          is-right-aligned
-          is-up
-        >
-          <div class="dropdown-content is-unselectable">
-            <div
-              v-for="(v, model) in contextualModels"
-              :key="`${model}-panel`"
-              class="box box-analyze-nav is-borderless is-shadowless is-marginless"
-            >
-              <div class="content">
-                <h3 class="is-size-6">
-                  {{ v.name | capitalize | underscoreToSpace }}
-                </h3>
-                <h4 class="is-size-7 has-text-grey">
-                  {{ v.namespace }}
-                </h4>
-              </div>
-              <div class="buttons">
-                <router-link
-                  v-for="design in v['designs']"
-                  :key="design"
-                  class="button is-small is-interactive-primary is-outlined"
-                  :to="urlForModelDesign(model, design)"
-                  @click.native="prepareAnalyzeLoader(v.name, design)"
-                  >{{ design | capitalize | underscoreToSpace }}</router-link
-                >
-              </div>
+      <footer class="modal-card-foot h-space-between">
+        <div class="field is-grouped is-grouped-multiline">
+          <div class="control control-job-log-tags">
+            <div class="tags has-addons">
+              <span class="tag is-white">Started</span>
+              <span class="tag is-info">{{ getStartedAtLabel }}</span>
             </div>
           </div>
-        </Dropdown>
+
+          <div class="control control-job-log-tags">
+            <div class="tags has-addons">
+              <span class="tag is-white">Ended</span>
+              <span class="tag is-info">{{ getEndedAtLabel }}</span>
+            </div>
+          </div>
+
+          <div class="control control-job-log-tags">
+            <div class="tags has-addons">
+              <span class="tag is-white">Elapsed</span>
+              <span class="tag is-info">{{ getElapsedLabel }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="buttons is-right">
+          <button class="button" @click="close">Close</button>
+
+          <button v-if="hasError" class="button is-danger" @click="getHelp">
+            Get Help
+          </button>
+          <Dropdown
+            v-else
+            label="Analyze"
+            :disabled="isPolling"
+            :button-classes="
+              `is-interactive-primary ${isPolling ? 'is-loading' : ''}`
+            "
+            menu-classes="dropdown-menu-300"
+            icon-open="chart-line"
+            icon-close="caret-down"
+            is-right-aligned
+            is-up
+          >
+            <div class="dropdown-content is-unselectable">
+              <div
+                v-for="(v, model) in contextualModels"
+                :key="`${model}-panel`"
+                class="box box-analyze-nav is-borderless is-shadowless is-marginless"
+              >
+                <div class="content">
+                  <h3 class="is-size-6">
+                    {{ v.name | capitalize | underscoreToSpace }}
+                  </h3>
+                  <h4 class="is-size-7 has-text-grey">
+                    {{ v.namespace }}
+                  </h4>
+                </div>
+                <div class="buttons">
+                  <router-link
+                    v-for="design in v['designs']"
+                    :key="design"
+                    class="button is-small is-interactive-primary is-outlined"
+                    :to="urlForModelDesign(model, design)"
+                    @click.native="prepareAnalyzeLoader(v.name, design)"
+                    >{{ design | capitalize | underscoreToSpace }}</router-link
+                  >
+                </div>
+              </div>
+            </div>
+          </Dropdown>
+        </div>
       </footer>
     </div>
   </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.field.is-grouped.is-grouped-multiline > .control.control-job-log-tags {
+  @media screen and (min-width: $desktop) {
+    margin-bottom: 0;
+  }
+}
+
+.modal-card.modal-card-log {
+  height: 90vh;
+}
+</style>
