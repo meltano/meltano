@@ -459,17 +459,19 @@ export default {
         </form>
       </div>
       <div class="column is-three-fifths">
-        <!-- <iframe ref="docs" class="column" :src="`${plugin.docs}?embed=true`" /> -->
-        <iframe
-          ref="docs"
-          class="column docs"
-          :src="
-            `${plugin.docs.replace(
-              'https://meltano.com/',
-              'http://localhost:8081/'
-            )}?embed=true`
-          "
-        />
+        <div class="docs-container">
+          <!-- <iframe ref="docs" class="column" :src="`${plugin.docs}?embed=true`" /> -->
+          <iframe
+            ref="docs"
+            class="docs"
+            :src="
+              `${plugin.docs.replace(
+                'https://meltano.com/',
+                'http://localhost:8081/'
+              )}?embed=true`
+            "
+          />
+        </div>
       </div>
     </div>
 
@@ -493,9 +495,16 @@ export default {
   }
 }
 
-iframe.docs {
-  width: 100%;
-  height: 500px;
+.docs-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  iframe.docs {
+    flex: 1;
+    padding: 0;
+    border: 1px solid #dbdbdb;
+  }
 }
 
 .label-tooltip {

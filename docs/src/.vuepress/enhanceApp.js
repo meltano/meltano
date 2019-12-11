@@ -6,7 +6,6 @@ export default ({
   router, // the router instance for the app
   siteData // site metadata
 }) => {
-
   // Initialization
 
   window.addEventListener('load', enableCodeBlockCopying);
@@ -21,7 +20,9 @@ export default ({
 
   function enableCodeBlockCopying() {
     // Inspired by https://github.com/vuejs/vuepress/pull/751/
-    const codeBlocks = Array.from(document.querySelectorAll('div[class*="language-"]'));
+    const codeBlocks = Array.from(
+      document.querySelectorAll('div[class*="language-"]')
+    );
     codeBlocks.forEach(generateCodeBlockButton);
   }
 
@@ -41,7 +42,7 @@ export default ({
     // Button style offset
     const pseudoBefore = getComputedStyle(container, ':before');
     const hasPseudo = pseudoBefore.getPropertyValue('content') !== 'none';
-    if(hasPseudo) {
+    if (hasPseudo) {
       copyElement.classList.add('code-block-copy-button-offset');
     }
   }
@@ -70,23 +71,18 @@ export default ({
       document.getSelection().removeAllRanges();
       document.getSelection().addRange(selected);
     }
-  };
-
+  }
 
   function enableExternalScroll() {
-    window.addEventListener("message", (msg) => {
-      if (msg.data["source"] == "meltano") {
-        // swap the current fragment ?
+    window.addEventListener('message', msg => {
+      if (msg.data['source'] == 'meltano') {
+        const anchor_name = msg.data['anchor'];
+        const anchor = document.getElementById(anchor_name);
 
-        const anchor_name = msg.data['anchor']
-        const anchor = document.getElementById(anchor_name)
-
-        if (anchor !== undefined) {
-          anchor.scrollIntoView()
-        } else {
-          console.log(`Cannot find ${anchor_name} in the current page.`)
+        if (anchor) {
+          anchor.scrollIntoView();
         }
       }
-    })
+    });
   }
-}
+};
