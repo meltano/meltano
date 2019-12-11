@@ -194,9 +194,9 @@ const actions = {
     commit('reset', 'loaderInFocusConfiguration'),
 
   run({ commit, dispatch }, pipeline) {
+    commit('setPipelineStatus', { pipeline, isRunning: true })
     return orchestrationsApi.run(pipeline).then(response => {
       dispatch('queuePipelinePoller', response.data)
-      commit('setPipelineStatus', { pipeline, isRunning: true })
       commit('setPipelineJobId', { pipeline, jobId: response.data.jobId })
     })
   },

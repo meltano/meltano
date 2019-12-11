@@ -62,12 +62,14 @@ export default {
         ? new Date(this.jobStatus.endedAt)
         : Date.now()
       const elapsed = end - new Date(this.jobStatus.startedAt)
-      return `${elapsed / 1000} sec`
+      return `${Math.floor(elapsed / 1000)} sec`
     },
     getEndedAtLabel() {
+      const fallback =
+        this.jobStatus && !this.jobStatus.endedAt ? 'Running...' : '...'
       return this.jobStatus && this.jobStatus.endedAt
         ? this.jobStatus.endedAt
-        : '...'
+        : fallback
     },
     getStartedAtLabel() {
       return this.jobStatus ? this.jobStatus.startedAt : '...'
