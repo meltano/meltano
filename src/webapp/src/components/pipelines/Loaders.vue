@@ -15,28 +15,12 @@ export default {
   }),
   computed: {
     ...mapGetters('plugins', [
+      'filteredLoaders',
       'getIsAddingPlugin',
       'getIsInstallingPlugin',
       'getIsPluginInstalled'
     ]),
-    ...mapState('plugins', ['plugins']),
-    sortedLoaders() {
-      // This is a stop gap until we implement an eventual need for automatic text filtering for cards
-      const currentLoaders = this.plugins.loaders || []
-      let orderedForSpeedRunLoaders = []
-
-      if (currentLoaders.length > 0) {
-        const start = [
-          currentLoaders.find(plugin => plugin.name === this.speedRunLoader)
-        ]
-        const end = currentLoaders.filter(
-          plugin => plugin.name !== this.speedRunLoader
-        )
-        orderedForSpeedRunLoaders = start.concat(end)
-      }
-
-      return orderedForSpeedRunLoaders
-    }
+    ...mapState('plugins', ['plugins'])
   },
   methods: {
     updateLoaderSettings(loader) {
@@ -66,7 +50,7 @@ export default {
 
     <div class="tile is-ancestor is-flex is-flex-wrap">
       <div
-        v-for="(loader, index) in sortedLoaders"
+        v-for="(loader, index) in filteredLoaders"
         :key="`${loader.name}-${index}`"
         :data-test-id="`${loader.name}-loader-card`"
         class="tile is-parent is-3 is-relative"

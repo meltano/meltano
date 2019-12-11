@@ -271,6 +271,7 @@ loaders:
     label: CSV
     description: CSV loader
     namespace: target_csv
+    hidden: true
     docs: 'https://meltano.com/plugins/loaders/csv.html'
     pip_url: git+https://gitlab.com/meltano/target-csv.git
     settings:
@@ -300,6 +301,7 @@ loaders:
     label: Snowflake
     description: Snowflake database loader
     namespace: snowflake
+    hidden: true
     docs: 'https://meltano.com/plugins/loaders/snowflake.html'
     pip_url: 'git+https://gitlab.com/meltano/target-snowflake.git'
     signup_url: 'https://trial.snowflake.com?referrer=meltano'
@@ -353,6 +355,7 @@ loaders:
     label: SQLite
     description: SQLite database loader
     namespace: sqlite
+    hidden: true
     docs: 'https://meltano.com/plugins/loaders/sqlite.html'
     pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
     settings:
