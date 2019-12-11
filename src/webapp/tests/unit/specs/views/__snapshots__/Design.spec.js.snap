@@ -941,6 +941,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
               label="Save Report"
               labelclasses=""
               menuclasses=""
+              tooltip="[object Object]"
             >
               <div
                 class="dropdown-content"
@@ -1005,6 +1006,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             label="Reports"
             labelclasses=""
             menuclasses=""
+            tooltip="[object Object]"
           >
             <div
               class="dropdown-content"
@@ -1057,6 +1059,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   label="SQL"
                   labelclasses=""
                   menuclasses=""
+                  tooltip="[object Object]"
                 >
                   <div
                     class="dropdown-content"
@@ -1294,6 +1297,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               label="Save Report"
               labelclasses=""
               menuclasses=""
+              tooltip="[object Object]"
             >
               <div
                 class="dropdown-content"
@@ -1357,6 +1361,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
             label="Reports"
             labelclasses=""
             menuclasses=""
+            tooltip="[object Object]"
           >
             <div
               class="dropdown-content"
@@ -1419,6 +1424,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   label="SQL"
                   labelclasses=""
                   menuclasses=""
+                  tooltip="[object Object]"
                 >
                   <div
                     class="dropdown-content"
