@@ -4,6 +4,7 @@ import lodash from 'lodash'
 
 import pluginsApi from '../../api/plugins'
 import utils from '@/utils/utils'
+import pluginUtils from '@/utils/plugins'
 
 const defaultState = utils.deepFreeze({
   addingPlugins: {
@@ -26,15 +27,11 @@ const defaultState = utils.deepFreeze({
 
 const getters = {
   visibleExtractors(state) {
-    const extractors = state.plugins.extractors || []
-
-    return extractors.filter(extractor => !extractor.hidden)
+    return pluginUtils.filterVisiblePlugins(state, 'extractors')
   },
 
   visibleLoaders(state) {
-    const loaders = state.plugins.loaders || []
-
-    return loaders.filter(loader => !loader.hidden)
+    return pluginUtils.filterVisiblePlugins(state, 'loaders')
   },
 
   getHasDefaultTransforms(state) {
