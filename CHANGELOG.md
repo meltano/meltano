@@ -16,6 +16,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1439](https://gitlab.com/meltano/meltano/issues/1439) Fix relative elapsed time since last run time display in the Pipelines UI
+
 ### Breaks
 
 ## 1.11.1 - (2019-12-12)
