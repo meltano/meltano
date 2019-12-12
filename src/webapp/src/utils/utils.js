@@ -233,7 +233,7 @@ export default {
   },
 
   momentFromNow(val) {
-    return moment(val, 'YYYYMMDD').fromNow()
+    return moment(val).fromNow()
   },
 
   momentFormatlll(val) {
