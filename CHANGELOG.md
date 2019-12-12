@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1440](https://gitlab.com/meltano/meltano/issues/1440) Allow installed plugins to appear in UI even if hidden in configuration
+
 ### Breaks
 
 ## 1.11.1 - (2019-12-12)
