@@ -33,7 +33,7 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
-      if (from.name === 'transforms') {
+      if (from.name === 'loaders' || from.name === 'loaderSettings') {
         vm.goToCreatePipeline()
       }
     })
