@@ -3,18 +3,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
 
 ### Changes
 
+- [#1435](https://gitlab.com/meltano/meltano/issues/1435) Change "Model" to "Analyze" so the Pipeline CTA is actionable and less abstract
+
 ### Fixes
 
 ### Breaks
-
 
 ## 1.11.1 - (2019-12-12)
 
@@ -35,7 +36,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1417](https://gitlab.com/meltano/meltano/issues/1417) Update SCSS variable usage in components for SSOT styling
 - [#1408](https://gitlab.com/meltano/meltano/issues/1408) Updated date and time displays to be human-friendly (`moment.js`)
 - [#1268](https://gitlab.com/meltano/meltano/issues/1268) Remove Transform step from UI (Create Schedule still allows choosing "Skip" or "Only" but will intelligently default to "Skip" or "Run")
-
 
 ## 1.11.0 - (2019-12-09)
 

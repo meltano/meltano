@@ -222,7 +222,7 @@ export default {
                     class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
                     data-tooltip="Analyze associated models."
                     :to="{ name: 'model' }"
-                    >Model</router-link
+                    >Analyze</router-link
                   >
                   <Dropdown
                     :button-classes="
