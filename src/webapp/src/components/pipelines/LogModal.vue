@@ -141,7 +141,6 @@ export default {
         <p class="modal-card-title">
           Run Log: <span class="is-family-code">{{ jobId }}</span>
         </p>
-        <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section ref="log-view" class="modal-card-body is-overflow-y-scroll">
         <div class="content">
@@ -175,7 +174,7 @@ export default {
           </div>
         </div>
         <div class="buttons is-right">
-          <button class="button" @click="close">Close</button>
+          <button class="button" @click="close">Back</button>
 
           <button v-if="hasError" class="button is-danger" @click="getHelp">
             Get Help

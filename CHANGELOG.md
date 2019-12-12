@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1435](https://gitlab.com/meltano/meltano/issues/1435) Change "Model" to "Analyze" so the Pipeline CTA is actionable and less abstract
+- [#1432](https://gitlab.com/meltano/meltano/issues/1432) Changed "Close" to "Back" in Log Modal to help mitigate "Am I ending the pipeline?" concerns
 
 ### Fixes
 
