@@ -487,14 +487,13 @@ To ensure clients are greeted with a fresh install, it's important to remove any
      - `models/model-carbon-intensity-sqlite`
      - `models/topics.index.m5oc`
 
-### Step 7: Make sure everything works!
+### Step 7: Verify FTP Works
 
-Now all you have to do is check to make sure that everything works as expected:
+1. Connect using an FTP client to the instance
+1. Make sure that the FTP username and password are correct
+1. Verify you can see the meltano project
 
-1. Go back to the instance using your browser and check that we can see reports being generated in Analyze .
-1. Connect using an ftp client to the instance and make sure that the ftp username/password are correct and that you can see the meltano project.
-
-And we're good to go! 🎉
+And with that, we're good to go! 🎉
 
 ## Maintaining an Existing Instance
 
