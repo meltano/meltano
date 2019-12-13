@@ -471,85 +471,6 @@ Now all you have to do is check to make sure that everything works as expected:
 
 And we're good to go! 🎉
 
-## Debugging TLS Certificate
-
-If the `caddy.service` is not working, you'll get an error similar to the following during [Step 4: Restart Caddy](/handbook/engineering/meltanodata-guide/#restart-caddy):
-
-```bash
-# systemctl status
-
-● $TENANT_NAME
-    State: degraded
-     Jobs: 0 queued
-   Failed: 1 units
-    Since: Tue 2019-12-10 11:24:40 UTC; 35min ago
-   ... ... ...
-
-# systemctl --failed
-
-  UNIT          LOAD   ACTIVE SUB    DESCRIPTION
-● caddy.service loaded failed failed Caddy HTTP/2 web server
-
-LOAD   = Reflects whether the unit definition was properly loaded.
-ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
-SUB    = The low-level unit activation state, values depend on unit type.
-
-1 loaded units listed. Pass --all to see loaded but inactive units, too.
-To show all installed unit files use 'systemctl list-unit-files'.
-
-```
-
-The reason may be that we have hit the [rate limit of 50 Certificates per Registered Domain per week](https://letsencrypt.org/docs/rate-limits/) in let's encrypt.
-
-To investigate this, run caddy manually and check the output. If you get the following error, then the reason for the failure is that we have hit the 50 Certificates rate limit:
-
-```bash
-# systemctl stop caddy
-# env $(< /etc/caddy/environment) /usr/local/bin/caddy -conf /etc/caddy/Caddyfile
-Activating privacy features... 2019/12/10 12:03:47 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
-2019/12/10 12:03:48 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
-2019/12/10 12:03:49 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
-2019/12/10 12:03:50 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
-2019/12/10 12:03:51 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
-2019/12/10 12:03:52 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
-2019/12/10 12:03:53 failed to obtain certificate: acme: error: 429 :: POST :: https://acme-v02.api.letsencrypt.org/acme/new-order :: urn:ietf:params:acme:error:rateLimited :: Error creating new order :: too many certificates already issued for: meltanodata.com: see https://letsencrypt.org/docs/rate-limits/, url:
-```
-
-There are two options:
-
-- The call is in more than 2 days and you can wait
-- You have to setup the instance ASAP
-
-In the later case, the only option at the moment is to setup the instance with a self signed certificate.
-
-(1) Revert the update we do in /etc/caddy/Caddyfile back to tls self_signed
-
-(2) Add a :443 in the end of the /etc/caddy/environment
-
-```bash
-HOSTNAME=$TENANT_NAME.meltanodata.com:443
-```
-
-(3) Restart Caddy manually
-
-```bash
-systemctl stop caddy
-systemctl daemon-reload
-systemctl start caddy
-```
-
-And verify that this worked, by running the following command:
-
-```bash
-systemctl status
-```
-
-You can now directly access the instance by adding the https:// in front of the domain the first time you access it:
-
-https://{TENANT}.meltanodata.com/
-
-You'll get a `Privacy Error: NET::ERR_CERT_AUTHORITY_INVALID`, but choose to `Proceed to $TENANT_NAME.meltanodata.com (unsafe)` (e.g. by first clicking on `Advanced` if you are using Chrome)
-
 ## Maintaining an Existing Instance
 
 ::: warning
@@ -705,6 +626,85 @@ Host key verification failed.
 ```
 
 This means that you have an old entry in the `known_hosts` file. To fix this, simply open `/Users/$USERNAME/.ssh/known_hosts` in a text editor and delete the domain in question.
+
+### Caddy Service Failed Error
+
+If the `caddy.service` is not working, you'll get an error similar to the following during [Step 4: Restart Caddy](/handbook/engineering/meltanodata-guide/#restart-caddy):
+
+```bash
+# systemctl status
+
+● $TENANT_NAME
+    State: degraded
+     Jobs: 0 queued
+   Failed: 1 units
+    Since: Tue 2019-12-10 11:24:40 UTC; 35min ago
+   ... ... ...
+
+# systemctl --failed
+
+  UNIT          LOAD   ACTIVE SUB    DESCRIPTION
+● caddy.service loaded failed failed Caddy HTTP/2 web server
+
+LOAD   = Reflects whether the unit definition was properly loaded.
+ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
+SUB    = The low-level unit activation state, values depend on unit type.
+
+1 loaded units listed. Pass --all to see loaded but inactive units, too.
+To show all installed unit files use 'systemctl list-unit-files'.
+
+```
+
+The reason may be that we have hit the [rate limit of 50 Certificates per Registered Domain per week](https://letsencrypt.org/docs/rate-limits/) in let's encrypt.
+
+To investigate this, run caddy manually and check the output. If you get the following error, then the reason for the failure is that we have hit the 50 Certificates rate limit:
+
+```bash
+# systemctl stop caddy
+# env $(< /etc/caddy/environment) /usr/local/bin/caddy -conf /etc/caddy/Caddyfile
+Activating privacy features... 2019/12/10 12:03:47 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
+2019/12/10 12:03:48 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
+2019/12/10 12:03:49 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
+2019/12/10 12:03:50 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
+2019/12/10 12:03:51 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
+2019/12/10 12:03:52 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
+2019/12/10 12:03:53 failed to obtain certificate: acme: error: 429 :: POST :: https://acme-v02.api.letsencrypt.org/acme/new-order :: urn:ietf:params:acme:error:rateLimited :: Error creating new order :: too many certificates already issued for: meltanodata.com: see https://letsencrypt.org/docs/rate-limits/, url:
+```
+
+There are two options:
+
+- The call is in more than 2 days and you can wait
+- You have to setup the instance ASAP
+
+In the later case, the only option at the moment is to setup the instance with a self signed certificate.
+
+(1) Revert the update we do in /etc/caddy/Caddyfile back to tls self_signed
+
+(2) Add a :443 in the end of the /etc/caddy/environment
+
+```bash
+HOSTNAME=$TENANT_NAME.meltanodata.com:443
+```
+
+(3) Restart Caddy manually
+
+```bash
+systemctl stop caddy
+systemctl daemon-reload
+systemctl start caddy
+```
+
+And verify that this worked, by running the following command:
+
+```bash
+systemctl status
+```
+
+You can now directly access the instance by adding the https:// in front of the domain the first time you access it:
+
+https://{TENANT}.meltanodata.com/
+
+You'll get a `Privacy Error: NET::ERR_CERT_AUTHORITY_INVALID`, but choose to `Proceed to $TENANT_NAME.meltanodata.com (unsafe)` (e.g. by first clicking on `Advanced` if you are using Chrome)
 
 ## Deleting an instance
 
