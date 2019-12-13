@@ -471,6 +471,16 @@ You'll get a `Privacy Error: NET::ERR_CERT_AUTHORITY_INVALID`, but choose to `Pr
 
 ## Maintaining an Existing Instance
 
+::: warning
+Make sure to run all `meltano` commands using the `meltano` user account by doing
+
+```bash
+su meltano
+```
+
+Failing to do so could cause permissions problems and degrade the service.
+:::
+
 ### Upgrade a Meltano instance manually
 
 In the event you need to manually update the droplet's Meltano version:
