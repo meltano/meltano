@@ -450,17 +450,42 @@ chmod 620 /var/meltano/project/.env
 systemctl restart meltano
 ```
 
-### Step 6: Verify Meltano UI Works
+### Step 6: Validate Meltano UI
 
-#### Install PostgreSQL loader on Meltano UI
+#### Ensure everything works
 
 1. Visit `$TENANT_NAME.meltanodata.com` in your browser
 1. Login with credentials you setup in 1Password for the username `meltano`
-1. Install `target-postgres` by updating the URL to `/pipeline/load/target-postgres`
+1. Install `tap-carbon-intensity` extractor
+1. Install `target-postgres` loader
+   - You can also this by visiting `/pipeline/load/target-postgres`
+1. When the configuration model for `target-postgres` appears, you should see the correct variables already configured from your `.env` file
+1. Create a simple pipeline
+1. Verify Analyze page is pulling in data and generating charts correctly
 
-::: tip
-If the `/var/meltano/project/.env` is properly loaded, all the configuration should be correct.
-:::
+#### Remove tap-carbon-intensity
+
+To ensure clients are greeted with a fresh install, it's important to remove any tests we ran.
+
+1. SSH into droplet
+1. Change directory to `/var/meltano/project`
+1. Edit `meltano.yml` in text editor
+   - Delete `extractors` section
+   - Delete `models` section
+   - Delete `transforms` section
+   - Delete `schedule` section
+1. Change directory into `/var/meltano/project/.meltano`
+1. Delete the contents of the following folders:
+   - `.../.meltano/extractors`
+     - `tap-carbon-intensity`
+   - `.../.meltano/models`
+     - `model-carbon-intensity`
+     - `model-carbon-intensity-sqlite`
+   - `.../.meltano/run`
+     - `tap-carbon-intensity`
+     - `models/model-carbon-intensity`
+     - `models/model-carbon-intensity-sqlite`
+     - `models/topics.index.m5oc`
 
 ### Step 7: Make sure everything works!
 
