@@ -142,6 +142,7 @@ extractors:
     label: Marketo
     description: Marketing automation for account-based marketing
     namespace: tap_marketo
+    hidden: true
     docs: 'https://meltano.com/plugins/extractors/marketo.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
     capabilities: []
