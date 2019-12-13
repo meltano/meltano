@@ -629,7 +629,9 @@ class SnowflakeSpecLoader:
                     if entity_type == "roles":
                         click.secho(f"     Processing role {entity_name}", fg="green")
                         sql_commands.extend(
-                            generator.generate_grant_roles("ROLE", entity_name, config)
+                            generator.generate_grant_roles(
+                                entity_type, entity_name, config
+                            )
                         )
 
                         sql_commands.extend(
@@ -648,7 +650,9 @@ class SnowflakeSpecLoader:
                         )
 
                         sql_commands.extend(
-                            generator.generate_grant_roles("USER", entity_name, config)
+                            generator.generate_grant_roles(
+                                entity_type, entity_name, config
+                            )
                         )
 
         return self.remove_duplicate_queries(sql_commands)
