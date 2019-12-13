@@ -130,13 +130,15 @@ def run():
     return jsonify({"job_id": job_id}), 202
 
 
-@orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration/upload-file", methods=["POST"])
+@orchestrationsBP.route(
+    "/<plugin_ref:plugin_ref>/configuration/upload-file", methods=["POST"]
+)
 def upload_plugin_configuration_file(plugin_ref) -> Response:
     """
     Endpoint for uploading a file for a specific plugin's configuration profile
     """
 
-    file = request.files['file']
+    file = request.files["file"]
     project = Project.find()
     filename = secure_filename(file.filename)
     file.save(join(project.extract_dir(), filename))
