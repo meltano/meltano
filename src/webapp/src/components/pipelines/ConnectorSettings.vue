@@ -139,18 +139,21 @@ export default {
     onFileChange(event, setting) {
       const file = event.target.files[0]
       if (file) {
-        this.configSettings.profiles[
+        const profile = this.configSettings.profiles[
           this.configSettings.profileInFocusIndex
-        ].config[setting.name] = file.name
+        ]
+        profile.config[setting.name] = file.name
 
-        const data = new FormData()
-        data.append('file', file)
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('profile', profile)
+        formData.append('setting', setting)
 
         this.$store
           .dispatch('configuration/uploadPluginConfigurationFile', {
             name: this.plugin.name,
             type: 'extractors',
-            profiles: this.configSettings.profiles
+            formData
           })
           .then(() => {})
       }

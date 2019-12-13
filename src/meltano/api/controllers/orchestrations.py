@@ -1,7 +1,9 @@
 import asyncio
 import json
 import logging
+from os.path import join
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
+from werkzeug.utils import secure_filename
 
 from meltano.core.job import JobFinder, State
 from meltano.core.behavior.canonical import Canonical
@@ -134,9 +136,12 @@ def upload_plugin_configuration_file(plugin_ref) -> Response:
     Endpoint for uploading a file for a specific plugin's configuration profile
     """
 
-    print("upload ******************")
+    file = request.files['file']
+    project = Project.find()
+    filename = secure_filename(file.filename)
+    file.save(join(project.extract_dir(), filename))
 
-    return jsonify( {"hit": True } )
+    return jsonify({"is_success": True}), 200
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["GET"])
