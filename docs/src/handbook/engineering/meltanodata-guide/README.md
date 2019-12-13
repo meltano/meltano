@@ -207,6 +207,7 @@ For more informations about using `ssh`, take a look at https://www.digitalocean
 
 #### Run Ansible Playbooks
 
+1. Make sure ssh-agent is registered
 1. Log in the Controller Node
 1. Export DigialOcean token
 
@@ -222,20 +223,67 @@ and run the `playbook/ssl.yml` playbook. To speed up the process, you can use `-
 ansible-playbook playbooks/ssl.yml --limit=TENANT.meltanodata.com
 ```
 
+You should get a response such as:
+
+```
+PLAY [*.meltanodata.com] *********************************************************************************************
+
+TASK [Copy the `*.meltanodata.com` certificate] **********************************************************************
+changed: [64.225.4.60]
+
+TASK [Copy the `*.meltanodata.com` key] ******************************************************************************
+changed: [64.225.4.60]
+
+PLAY RECAP ***********************************************************************************************************
+64.225.4.60                : ok=2    changed=2    unreachable=0    failed=0
+```
+
 ##### Configure Caddyfile
 
 1. Run caddy.yml playbook
 
+```
+PLAY [*.meltanodata.com] *********************************************************************************************
+
+TASK [/etc/caddy/Caddyfile] ******************************************************************************************
+changed: [64.225.4.60]
+
+TASK [Restart caddy] *************************************************************************************************
+changed: [64.225.4.60]
+
+PLAY RECAP ***********************************************************************************************************
+64.225.4.60                : ok=2    changed=2    unreachable=0    failed=0
+```
+
 ##### Verify changes were made
 
-Then update the `/etc/caddy/Caddyfile` with
+1. SSH into droplet
+1. Verify `/etc/caddy/Caddyfile` looks like:
 
 ```
-# comment `tls self_signed`
-#tls self_signed
+{$HOSTNAME}:80, {$HOSTNAME}:443
 
-# add the Meltano wildcard certificate
+# HTTP → HTTPS redirect
+redir 301 {
+  if {scheme} is http
+  /  https://{host}{uri}
+}
+
+basicauth /static/js meltano htpasswd=/etc/caddy/htpasswd
+
+# use a self-signed certificate if need be
+# tls self_signed
+
+# enable the Let's Encrypt certificate routine
+# warning: only do this if the DNS is propagated
+# or else you might blow the daily failure limit
 tls /etc/caddy/com.meltanodata.crt /etc/caddy/com.meltanodata.key
+
+proxy / localhost:5000 {
+  transparent
+}
+
+gzip
 ```
 
 Then restart caddy using:
