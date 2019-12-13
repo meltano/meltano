@@ -8,10 +8,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-- [#1374](https://gitlab.com/meltano/meltano/issues/1374) Add role revocation for users and roles
+- [#1374](https://gitlab.com/meltano/meltano/issues/1374) Add role revocation for users and roles in the `meltano permissions` command
 
 ### Changes
-- [#1350](https://gitlab.com/meltano/meltano/issues/1350) Switch to all lower case for Snowflake permission comparisons
+- [#1350](https://gitlab.com/meltano/meltano/issues/1350) Switch to all lower case for Snowflake permission comparisons in the `meltano permissions` command
+- [#1449](https://gitlab.com/meltano/meltano/issues/1449) Hide the Marketo Extractor form Meltano UI
 
 ### Fixes
 
