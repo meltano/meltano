@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+- [#1374](https://gitlab.com/meltano/meltano/issues/1374) Add role revocation for users and roles
 
 ### Changes
 
@@ -65,7 +66,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1389](https://gitlab.com/meltano/meltano/issues/1389) Temporary Profiles feature removal (conditionally removed if 2+ profiles not already created so existing users can continue using multiple profiles if created)
 - [#1350](https://gitlab.com/meltano/meltano/issues/1350) Switches to all lower case for Snowflake permission comparisons
 - [#1373](https://gitlab.com/meltano/meltano/issues/1373) Update MeltanoData deletion process with 1Password
-- [#1374](https://gitlab.com/meltano/meltano/issues/1374) Add role revocation for users and roles
 
 ### Fixes
 
