@@ -24,7 +24,7 @@ Since each Meltano instance requires one droplet and one cluster, our effective 
 When we get close to hitting either of these limits, we can get them increased by sending an email to one of our contacts at DigitalOcean.
 :::
 
-### Step 1: Setup a new droplet
+### Step 1: Create a New Droplet
 
 1. Login to DigitalOcean
 1. Access the Meltano project workspace
@@ -124,26 +124,6 @@ round-trip min/avg/max/stddev = 12.279/16.375/19.898/2.901 ms
 1. Leave **TTL (seconds)** with the default of `3600`
 1. Click `Create Record`
 
-#### Enable HTTPS
-
-Log in the Controller Node and run the `playbook/ssl.yml` playbook. To speed up the process, you can use `--limit=$TENANT_NAME.meltanodata.com`.
-
-Then update the `/etc/caddy/Caddyfile` with
-
-```
-# comment `tls self_signed`
-#tls self_signed
-
-# add the Meltano wildcard certificate
-tls /etc/caddy/com.meltanodata.crt /etc/caddy/com.meltanodata.key
-```
-
-Then restart caddy using:
-
-```
-systemctl restart caddy
-```
-
 #### Make sure everything works
 
 1. Open your Terminal
@@ -202,9 +182,9 @@ If you are getting an error, give it a few more minutes since the records needs 
 1. Restrict inbound connections by adding the recently created droplet under **Add trusted sources**
 1. Click `Allow these inbound sources only` button
 
-You should now be greeted by the `Connection details` tab which is important for later on. It contains your database credentials and will be referenced later on.
+You should now be greeted by the `Connection details` tab which is important for later on. It contains your database credentials and will be needed in the next section.
 
-### Step 4: Configure Meltano Droplet
+### Step 4: Configure Meltano Droplet Networking
 
 1. SSH into your newly created droplet
 
@@ -225,27 +205,29 @@ ssh-add /path/to/your/ssh-key
 For more informations about using `ssh`, take a look at https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys#basic-connection-instructions
 :::
 
-#### Configure Caddyfile
+#### Enable HTTPS
 
-1. Open `/etc/caddy/Caddyfile` in text editor (i.e., vim)
+Log in the Controller Node and run the `playbook/ssl.yml` playbook. To speed up the process, you can use `--limit=$TENANT_NAME.meltanodata.com`.
 
-```bash
-vim /etc/caddy/Caddyfile
+Then update the `/etc/caddy/Caddyfile` with
+
+```
+# comment `tls self_signed`
+#tls self_signed
+
+# add the Meltano wildcard certificate
+tls /etc/caddy/com.meltanodata.crt /etc/caddy/com.meltanodata.key
+```
+
+Then restart caddy using:
+
+```
+systemctl restart caddy
 ```
 
 ::: tip
 Navigate vim with arrow keys and press `I` key to enter Insert mode so you can modify the text
 :::
-
-2. Comment out `tls self_signed` by prepending it with a `#`
-
-```
-# tls self_signed
-```
-
-3. Uncomment `tls admin@meltano.com` by removing the `#` at the beginning of the line
-
-4. Save and exit file
 
 ::: tip
 To exit Insert mode, press the `Esc` key, type `:wq`, and press `Enter` to save and quit vim
@@ -335,7 +317,7 @@ If you see a state of `degraded`, that means something is wrong — use `systemc
 If the `caddy.service` is reported as failed, investigate if this is an issue with the [let's encrypt certificate](/handbook/engineering/meltanodata-guide/#debugging-tls-certificate)
 :::
 
-### Step 5: Configure Meltano
+### Step 5: Configure PostgreSQL Database
 
 #### Get credentials for database ready
 
@@ -355,9 +337,25 @@ Keep this tab open because you'll need to refer to it shortly.
 
 #### Setup the Meltano environment variables
 
-Because we manage the database instance for each tenant, using environment variables to configure `target-postgres` is the most simple and secure way of configuring the plugin.
+Because we manage the database instance for each tenant, we use environment variables to configure `target-postgres`as a simple and secure way of configuring the plugin.
 
-Create or edit the `/var/meltano/project/.env` file using the DigitalOcean database connection parameters:
+To do this, you need to:
+
+1. SSH into the droplet
+1. Change directory into `/var/meltano/project`
+1. If it doesn't exist already, create a new `.env` file
+
+```bash
+touch .env
+```
+
+4. Open the `.env` file in a text editor
+
+```bash
+vim .env
+```
+
+5. Copy and paste the following template into the `.env` file
 
 ```bash
 PG_USERNAME=<username>
@@ -367,7 +365,9 @@ PG_PORT=<port>
 PG_DATABASE=<database>
 ```
 
-Make sure the file is secure by running the following commands:
+6. Replace each field with the credentials from DigitalOcean
+
+1. Secure the file by running the following commands:
 
 ```bash
 # make the `meltano` user sole owner
@@ -375,10 +375,15 @@ chown meltano:meltano /var/meltano/project/.env
 
 # make the file only readable by `meltano`, and `write-only` for FTP access
 chmod 620 /var/meltano/project/.env
+```
 
-# restart meltano to reload the .env
+8. Reload the environment variables into Meltano by restarting the service
+
+```bash
 systemctl restart meltano
 ```
+
+### Step 6: Verify Meltano UI Works
 
 #### Install PostgreSQL loader on Meltano UI
 
@@ -390,7 +395,7 @@ systemctl restart meltano
 If the `/var/meltano/project/.env` is properly loaded, all the configuration should be correct.
 :::
 
-### Step 6: Make sure everything works!
+### Step 7: Make sure everything works!
 
 Now all you have to do is check to make sure that everything works as expected:
 
@@ -443,8 +448,8 @@ Activating privacy features... 2019/12/10 12:03:47 [INFO] [$TENANT_NAME.meltanod
 2019/12/10 12:03:53 failed to obtain certificate: acme: error: 429 :: POST :: https://acme-v02.api.letsencrypt.org/acme/new-order :: urn:ietf:params:acme:error:rateLimited :: Error creating new order :: too many certificates already issued for: meltanodata.com: see https://letsencrypt.org/docs/rate-limits/, url:
 ```
 
-
 There are two options:
+
 - The call is in more than 2 days and you can wait
 - You have to setup the instance ASAP
 
