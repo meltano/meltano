@@ -1,4 +1,6 @@
 <script>
+import Vue from 'vue'
+
 import InputDateIso8601 from '@/components/generic/InputDateIso8601'
 import TooltipCircle from '@/components/generic/TooltipCircle'
 
@@ -130,6 +132,13 @@ export default {
           targetInput.focus()
         }
       })
+    },
+    onFileChange(event, setting) {
+      const file = event.target.files[0]
+      if (file) {
+        setting.value = file.name
+        Vue.set(setting, 'valueComplex', file)
+      }
     },
     refocusInput(newVal, oldVal) {
       if (newVal !== oldVal) {
@@ -273,6 +282,8 @@ export default {
                       class="file-input"
                       type="file"
                       :name="setting.name"
+                      :value="setting.value ? setting.value.name : ''"
+                      @change="onFileChange($event, setting)"
                     />
                     <span class="file-cta has-background-white">
                       <span class="file-icon">
@@ -286,9 +297,14 @@ export default {
                     </span>
                   </div>
                   <span
-                    class="file-name is-file-fullwidth file-name-width has-text-grey-light"
+                    class="file-name is-file-fullwidth file-name-width"
+                    :class="
+                      setting.value && setting.valueComplex
+                        ? 'has-text-success'
+                        : 'has-text-grey-light'
+                    "
                   >
-                    {{ setting.placeholder }}
+                    {{ setting.value || setting.placeholder }}
                   </span>
                 </label>
               </div>
