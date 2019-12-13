@@ -205,9 +205,28 @@ ssh-add /path/to/your/ssh-key
 For more informations about using `ssh`, take a look at https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys#basic-connection-instructions
 :::
 
-#### Enable HTTPS
+#### Run Ansible Playbooks
 
-Log in the Controller Node and run the `playbook/ssl.yml` playbook. To speed up the process, you can use `--limit=$TENANT_NAME.meltanodata.com`.
+1. Log in the Controller Node
+1. Export DigialOcean token
+
+```
+export DO_API_TOKEN=200bc90fb6c8ad0ba904c1c3a8991e0701f7be8a4670afc2810420abc8c6ce43
+```
+
+##### Configure HTTPS Protocol
+
+and run the `playbook/ssl.yml` playbook. To speed up the process, you can use `--limit=$TENANT_NAME.meltanodata.com`.
+
+```
+ansible-playbook playbooks/ssl.yml --limit=TENANT.meltanodata.com
+```
+
+##### Configure Caddyfile
+
+1. Run caddy.yml playbook
+
+##### Verify changes were made
 
 Then update the `/etc/caddy/Caddyfile` with
 
