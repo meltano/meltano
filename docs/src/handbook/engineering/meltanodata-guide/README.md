@@ -677,6 +677,35 @@ This means that the permissions on the root directory you are trying to access n
 chmod g-w /var/meltano/project
 ```
 
+### DNS Spoofing Error
+
+If you get this error when you try to SSH into a droplet:
+
+```
+@       WARNING: POSSIBLE DNS SPOOFING DETECTED!          @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+The ECDSA host key for TENANT.meltanodata.com has changed,
+and the key for the corresponding IP address 12.345.6.78
+is unknown. This could either mean that
+DNS SPOOFING is happening or the IP address for the host
+and its host key have changed at the same time.
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+It is also possible that a host key has just been changed.
+The fingerprint for the ECDSA key sent by the remote host is
+SHA256:12345.
+Please contact your system administrator.
+Add correct host key in /Users/bencodezen/.ssh/known_hosts to get rid of this message.
+Offending ECDSA key in /Users/bencodezen/.ssh/known_hosts:34
+ECDSA host key for emilygitlab.meltanodata.com has changed and you have requested strict checking.
+Host key verification failed.
+```
+
+This means that you have an old entry in the `known_hosts` file. To fix this, simply open `/Users/$USERNAME/.ssh/known_hosts` in a text editor and delete the domain in question.
+
 ## Deleting an instance
 
 When a client no longer needs a hosted instance of Meltano on meltanodata.com, you need to:
