@@ -43,6 +43,9 @@ export default {
     getIsOfKindDate() {
       return kind => kind === 'date_iso8601'
     },
+    getIsOfKindFile() {
+      return kind => kind === 'file'
+    },
     getIsOfKindHidden() {
       return kind => kind === 'hidden'
     },
@@ -53,6 +56,7 @@ export default {
       return kind =>
         !this.getIsOfKindBoolean(kind) &&
         !this.getIsOfKindDate(kind) &&
+        !this.getIsOfKindFile(kind) &&
         !this.getIsOfKindOptions(kind)
     },
     getIsProtected() {
@@ -258,7 +262,38 @@ export default {
                 :input-classes="`is-small ${successClass(setting)}`"
               />
 
-              <!-- Dropdown -->
+              <!-- File -->
+              <div
+                v-else-if="getIsOfKindFile(setting.kind)"
+                class="file has-name is-small"
+              >
+                <label class="file-label is-file-fullwidth">
+                  <div>
+                    <input
+                      class="file-input"
+                      type="file"
+                      :name="setting.name"
+                    />
+                    <span class="file-cta has-background-white">
+                      <span class="file-icon">
+                        <font-awesome-icon
+                          icon="file-upload"
+                        ></font-awesome-icon>
+                      </span>
+                      <span class="file-label">
+                        <span>Upload</span>
+                      </span>
+                    </span>
+                  </div>
+                  <span
+                    class="file-name is-file-fullwidth file-name-width has-text-grey-light"
+                  >
+                    {{ setting.placeholder }}
+                  </span>
+                </label>
+              </div>
+
+              <!-- Options -->
               <div
                 v-else-if="getIsOfKindOptions(setting.kind)"
                 class="select is-small is-fullwidth"
@@ -354,6 +389,21 @@ export default {
 </template>
 
 <style lang="scss">
+// This file input is fragile style-wise as Bulma tricks the <input> for display purposes
+// As such, we set an explicit value in order to get the desired width with an "Upload" label.
+// Refactor at will if a better file style approach (or component) comes along.
+.file {
+  .is-file-fullwidth {
+    width: 100%;
+  }
+  .file-name-width {
+    @media screen and (min-width: $tablet) {
+      max-width: 14.6em;
+    }
+    max-width: 60em;
+  }
+}
+
 .label-tooltip {
   margin-left: 0.25em;
 }
