@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+- [#1350](https://gitlab.com/meltano/meltano/issues/1350) Switch to all lower case for Snowflake permission comparisons
 
 ### Fixes
 
@@ -63,7 +64,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1389](https://gitlab.com/meltano/meltano/issues/1389) Temporary Profiles feature removal (conditionally removed if 2+ profiles not already created so existing users can continue using multiple profiles if created)
-- [#1350](https://gitlab.com/meltano/meltano/issues/1350) Switches to all lower case for Snowflake permission comparisons
 - [#1373](https://gitlab.com/meltano/meltano/issues/1373) Update MeltanoData deletion process with 1Password
 
 ### Fixes
