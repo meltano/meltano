@@ -1,7 +1,7 @@
 ---
 home: true
 heroImage: /meltano-logo.svg
-actionText: Get Started for Free
+actionText: Start 30 Day Free Trial
 actionLink: https://meltano.typeform.com/to/NJPwxv
 doText: Install on DigitalOcean
 doLink: https://marketplace.digitalocean.com/apps/meltano
