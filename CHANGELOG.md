@@ -3,11 +3,22 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-## Unreleased
 
+## Unreleased
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.11.2 - (2019-12-13)
+
+---
 
 ### Changes
 
@@ -20,7 +31,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1441](https://gitlab.com/meltano/meltano/issues/1441) Fix auto advance to "Create Pipeline" when coming from "Load" step (previously "Transform" step, but this has been removed from the UI)
 - [#1440](https://gitlab.com/meltano/meltano/issues/1440) Allow installed plugins to appear in UI even if hidden in configuration
 
-### Breaks
 
 ## 1.11.1 - (2019-12-12)
 
