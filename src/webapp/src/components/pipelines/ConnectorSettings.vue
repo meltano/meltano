@@ -1,6 +1,4 @@
 <script>
-import Vue from 'vue'
-
 import InputDateIso8601 from '@/components/generic/InputDateIso8601'
 import TooltipCircle from '@/components/generic/TooltipCircle'
 
@@ -32,6 +30,11 @@ export default {
     }
   },
   computed: {
+    fileValue() {
+      return setting =>
+        this.configSettings.profiles[this.configSettings.profileInFocusIndex]
+          .config[setting.name]
+    },
     getLabel() {
       return setting =>
         setting.label || utils.titleCase(utils.underscoreToSpace(setting.name))
@@ -136,8 +139,20 @@ export default {
     onFileChange(event, setting) {
       const file = event.target.files[0]
       if (file) {
-        setting.value = file.name
-        Vue.set(setting, 'valueComplex', file)
+        this.configSettings.profiles[
+          this.configSettings.profileInFocusIndex
+        ].config[setting.name] = file.name
+
+        const data = new FormData()
+        data.append('file', file)
+
+        this.$store
+          .dispatch('configuration/uploadPluginConfigurationFile', {
+            name: this.plugin.name,
+            type: 'extractors',
+            profiles: this.configSettings.profiles
+          })
+          .then(() => {})
       }
     },
     refocusInput(newVal, oldVal) {
@@ -282,7 +297,6 @@ export default {
                       class="file-input"
                       type="file"
                       :name="setting.name"
-                      :value="setting.value ? setting.value.name : ''"
                       @change="onFileChange($event, setting)"
                     />
                     <span class="file-cta has-background-white">
@@ -299,12 +313,12 @@ export default {
                   <span
                     class="file-name is-file-fullwidth file-name-width"
                     :class="
-                      setting.value && setting.valueComplex
+                      fileValue(setting)
                         ? 'has-text-success'
                         : 'has-text-grey-light'
                     "
                   >
-                    {{ setting.value || setting.placeholder }}
+                    {{ fileValue(setting) || setting.placeholder }}
                   </span>
                 </label>
               </div>

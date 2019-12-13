@@ -128,6 +128,17 @@ def run():
     return jsonify({"job_id": job_id}), 202
 
 
+@orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration/upload-file", methods=["POST"])
+def upload_plugin_configuration_file(plugin_ref) -> Response:
+    """
+    Endpoint for uploading a file for a specific plugin's configuration profile
+    """
+
+    print("upload ******************")
+
+    return jsonify( {"hit": True } )
+
+
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["GET"])
 def get_plugin_configuration(plugin_ref) -> Response:
     """
