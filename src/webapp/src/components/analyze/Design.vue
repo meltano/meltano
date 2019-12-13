@@ -336,9 +336,9 @@ export default {
                     :key="dashboard.id"
                     class="dropdown-item"
                   >
-                    <div class="row-space-between">
+                    <div class="h-space-between">
                       <label
-                        class="row-space-between-primary has-cursor-pointer is-unselectable"
+                        class="h-space-between-primary has-cursor-pointer is-unselectable"
                         for="'checkbox-' + dashboard.id"
                         @click.stop="toggleActiveReportInDashboard(dashboard)"
                       >
@@ -592,21 +592,26 @@ export default {
               </label>
             </div>
 
-            <nav class="panel is-unselectable">
+            <nav class="panel is-size-7	is-unselectable">
               <!-- Base table first followed by join tables -->
               <template>
                 <a
                   class="panel-block
-                  has-background-white-bis
-                  has-text-grey
+                  table-heading
                   is-expandable"
                   :class="{ 'is-collapsed': design.relatedTable.collapsed }"
                   @click="tableRowClicked(design.relatedTable)"
                 >
-                  <span class="icon is-small panel-icon">
-                    <font-awesome-icon icon="table"></font-awesome-icon>
+                  <span class="icon is-small">
+                    <font-awesome-icon
+                      :icon="
+                        design.relatedTable.collapsed ? 'caret-down' : 'table'
+                      "
+                    ></font-awesome-icon>
                   </span>
-                  {{ design.label }}
+                  <span class="has-text-weight-bold">
+                    {{ design.label }}
+                  </span>
                 </a>
               </template>
               <template v-if="!design.relatedTable.collapsed">
@@ -615,7 +620,8 @@ export default {
                     showJoinColumnAggregateHeader(design.relatedTable.columns)
                   "
                   class="panel-block
-                    panel-block-heading
+                    attribute-heading
+                    has-text-weight-semibold
                     has-background-white"
                 >
                   Columns
@@ -676,7 +682,8 @@ export default {
                     )
                   "
                   class="panel-block
-                    panel-block-heading
+                    attribute-heading
+                    has-text-weight-semibold
                     has-background-white"
                 >
                   Aggregates
@@ -715,16 +722,20 @@ export default {
                   <a
                     :key="join.label"
                     class="panel-block
-                      has-background-white-bis
-                      has-text-grey
+                      table-heading
+                      analyze-join-table
                       is-expandable"
                     :class="{ 'is-collapsed': join.collapsed }"
                     @click="joinRowClicked(join)"
                   >
-                    <span class="icon is-small panel-icon">
-                      <font-awesome-icon icon="table"></font-awesome-icon>
+                    <span class="icon is-small">
+                      <font-awesome-icon
+                        :icon="join.collapsed ? 'caret-down' : 'table'"
+                      ></font-awesome-icon>
                     </span>
-                    {{ join.label }}
+                    <span class="has-text-weight-bold">
+                      {{ join.label }}
+                    </span>
                   </a>
                   <template v-if="!join.collapsed">
                     <!-- eslint-disable-next-line vue/require-v-for-key -->
@@ -733,8 +744,8 @@ export default {
                         showJoinColumnAggregateHeader(join.relatedTable.columns)
                       "
                       class="panel-block
-                      panel-block-heading
-                      has-text-weight-light
+                      attribute-heading
+                      has-text-weight-semibold
                       has-background-white"
                     >
                       Columns
@@ -806,7 +817,8 @@ export default {
                         )
                       "
                       class="panel-block
-                      panel-block-heading
+                      attribute-heading
+                      has-text-weight-semibold
                       has-background-white"
                     >
                       Aggregates
@@ -977,19 +989,33 @@ export default {
 <style lang="scss">
 .panel-block {
   position: relative;
+
+  &.analyze-join-table {
+    margin-top: 1.5rem;
+    border-top: 1px solid $grey-lighter;
+  }
+
   &.space-between {
     justify-content: space-between;
   }
+
   &.indented {
-    padding-left: 1.75rem;
+    padding-left: 1.5rem;
   }
-  &.panel-block-heading {
+
+  &.attribute-heading {
+    cursor: auto;
     padding: 0.25rem 0.75rem;
-    font-size: 0.75rem;
-    &:hover {
-      background: white;
+  }
+
+  &.table-heading {
+    padding: 0.75rem 0.5rem;
+
+    .icon {
+      margin-right: 0.5rem;
     }
   }
+
   &.is-sqlite-unsupported {
     opacity: 0.5;
     cursor: not-allowed;
@@ -1013,7 +1039,7 @@ export default {
 
   &.timeframe {
     &::after {
-      border: 3px solid #363636;
+      border: 3px solid $grey-darker;
       border-radius: 2px;
       border-right: 0;
       border-top: 0;

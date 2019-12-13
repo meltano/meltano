@@ -29,7 +29,6 @@ export default {
     ...mapGetters('system', ['updateAvailable']),
     ...mapGetters('plugins', [
       'getIsStepLoadersMinimallyValidated',
-      'getIsStepTransformsMinimallyValidated',
       'getIsStepScheduleMinimallyValidated'
     ]),
     ...mapState('repos', ['models']),
@@ -149,16 +148,6 @@ export default {
               >Load</router-link
             >
             <router-link
-              :to="{ name: 'transforms' }"
-              class="navbar-item button is-borderless"
-              :class="{
-                'is-active': getIsCurrentPath('/pipeline/transform')
-              }"
-              :disabled="!getIsStepTransformsMinimallyValidated"
-              tag="button"
-              >Transform</router-link
-            >
-            <router-link
               :to="{ name: 'schedules' }"
               class="navbar-item button is-borderless"
               :class="{ 'is-active': getIsCurrentPath('/pipeline/schedule') }"
@@ -223,7 +212,7 @@ export default {
             </a>
           </a>
 
-          <div class="navbar-dropdown">
+          <div class="navbar-dropdown navbar-dropdown-scrollable">
             <template v-if="hasModels">
               <div
                 v-for="(v, model) in models"
@@ -416,8 +405,6 @@ export default {
 </template>
 
 <style lang="scss">
-@import '@/scss/bulma-preset-overrides.scss';
-
 .box-analyze-nav {
   min-width: 240px;
 }
@@ -446,6 +433,11 @@ export default {
   .navbar-item {
     &.has-dropdown {
       border-bottom: none;
+    }
+
+    .navbar-dropdown-scrollable {
+      overflow-y: scroll;
+      max-height: 90vh;
     }
   }
 

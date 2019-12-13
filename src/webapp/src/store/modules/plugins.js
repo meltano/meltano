@@ -4,6 +4,7 @@ import lodash from 'lodash'
 
 import pluginsApi from '../../api/plugins'
 import utils from '@/utils/utils'
+import pluginUtils from '@/utils/plugins'
 
 const defaultState = utils.deepFreeze({
   addingPlugins: {
@@ -25,6 +26,27 @@ const defaultState = utils.deepFreeze({
 })
 
 const getters = {
+  visibleExtractors(state) {
+    return pluginUtils.filterVisiblePlugins({
+      installedPlugins: state.installedPlugins.extractors,
+      pluginList: state.plugins.extractors
+    })
+  },
+
+  visibleLoaders(state) {
+    return pluginUtils.filterVisiblePlugins({
+      installedPlugins: state.installedPlugins.loaders,
+      pluginList: state.plugins.loaders
+    })
+  },
+
+  getHasDefaultTransforms(state) {
+    return namespace =>
+      state.plugins.transforms.find(
+        transform => transform.namespace === namespace
+      )
+  },
+
   getHasInstalledPluginsOfType(state) {
     return pluginType => {
       const hasOwns = []
@@ -80,14 +102,10 @@ const getters = {
 
   getIsStepScheduleMinimallyValidated(state, getters) {
     return (
-      getters.getIsStepTransformsMinimallyValidated &&
+      getters.getIsStepLoadersMinimallyValidated &&
       state.installedPlugins.loaders &&
       state.installedPlugins.loaders.length > 0
     )
-  },
-
-  getIsStepTransformsMinimallyValidated(_, getters) {
-    return getters.getIsStepLoadersMinimallyValidated
   },
 
   getPluginProfiles() {

@@ -35,6 +35,7 @@ export default {
   computed: {
     ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
     ...mapGetters('plugins', [
+      'getHasDefaultTransforms',
       'getHasInstalledPluginsOfType',
       'getPluginProfiles'
     ]),
@@ -71,6 +72,12 @@ export default {
         this.$router.push({ name: 'schedules' })
       }
     },
+    onChangeExtractor() {
+      const namespace = this.installedPlugins.extractors.find(
+        extractor => extractor.name === this.pipeline.extractor
+      ).namespace
+      this.updateDefaultTransforms(namespace)
+    },
     prefillForm() {
       // TODO implement an intelligent prefill approach
       this.pipeline.name = `pipeline-${new Date().getTime()}`
@@ -87,10 +94,7 @@ export default {
           this.installedPlugins.loaders[0])
       this.pipeline.loader = defaultLoader ? defaultLoader.name : ''
 
-      const defaultTransform =
-        this.recentELTSelections.transform ||
-        (!_.isEmpty(this.transformOptions) && this.transformOptions[0])
-      this.pipeline.transform = defaultTransform ? defaultTransform.name : ''
+      this.updateDefaultTransforms(defaultExtractor.namespace)
 
       this.pipeline.interval = !_.isEmpty(this.intervalOptions)
         ? this.intervalOptions[0]
@@ -115,6 +119,12 @@ export default {
           this.isSaving = false
           Vue.toasted.global.error(error.response.data.code)
         })
+    },
+    updateDefaultTransforms(namespace) {
+      const defaultTransform = this.getHasDefaultTransforms(namespace)
+        ? this.transformOptions[1]
+        : this.transformOptions[0]
+      this.pipeline.transform = defaultTransform ? defaultTransform.name : ''
     }
   }
 }
@@ -128,7 +138,7 @@ export default {
         <p class="modal-card-title">Create Pipeline</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
-      <section class="modal-card-body">
+      <section class="modal-card-body is-overflow-y-scroll">
         <table class="table is-fullwidth">
           <ScheduleTableHead />
 
@@ -159,6 +169,7 @@ export default {
                       v-model="pipeline.extractor"
                       :class="{ 'has-text-success': pipeline.extractor }"
                       :disabled="!getHasInstalledPluginsOfType('extractors')"
+                      @change="onChangeExtractor"
                     >
                       <option
                         v-for="extractor in availableExtractors"

@@ -43,7 +43,17 @@ for schedule in schedule_service.schedules():
         continue
 
     dag_id = f"meltano_{schedule.name}"
-    dag = DAG(dag_id, default_args=args, schedule_interval=schedule.interval)
+
+    # from https://airflow.apache.org/docs/stable/scheduler.html#backfill-and-catchup
+    #
+    # It is crucial to set `catchup` to False so that Airflow only create a single job
+    # at the tail end of date window we want to extract data.
+    #
+    # Because our extractors do not support date-window extraction, it serves no
+    # purpose to enqueue date-chunked jobs for complete extraction window.
+    dag = DAG(
+        dag_id, catchup=False, default_args=args, schedule_interval=schedule.interval
+    )
 
     elt = BashOperator(
         task_id="extract_load",

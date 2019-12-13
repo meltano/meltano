@@ -111,7 +111,7 @@ export default {
         this.loaderName
       )
     },
-    saveConfigAndGoToTransforms() {
+    saveConfigAndGoToSchedule() {
       this.$store
         .dispatch('configuration/savePluginConfiguration', {
           name: this.loader.name,
@@ -123,7 +123,7 @@ export default {
             type: 'loader',
             value: this.loader
           })
-          this.$router.push({ name: 'transforms' })
+          this.$router.push({ name: 'schedules' })
           Vue.toasted.global.success(`Connector Saved - ${this.loader.name}`)
         })
     }
@@ -143,7 +143,7 @@ export default {
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
 
-      <section class="modal-card-body">
+      <section class="modal-card-body is-overflow-y-scroll">
         <div v-if="isLoadingConfigSettings || isInstalling" class="content">
           <div v-if="!isLoadingConfigSettings && isInstalling" class="level">
             <div class="level-item">
@@ -162,11 +162,19 @@ export default {
               <a :href="loader.signupUrl" target="_blank">sign up here</a>.
             </p>
           </div>
-          <ConnectorSettingsDropdown
-            :connector="loader"
-            plugin-type="loaders"
-            :config-settings="localConfiguration"
-          ></ConnectorSettingsDropdown>
+          <!--
+            TEMP ConnectorSettingsDropdown removal from UI.
+            Conditional removal so existing users with 2+ profiles already created still can access them
+            Get context here https://gitlab.com/meltano/meltano/issues/1389.
+          -->
+          <template v-if="localConfiguration.profiles.length > 1">
+            <ConnectorSettingsDropdown
+              :connector="loader"
+              plugin-type="loaders"
+              :config-settings="localConfiguration"
+            ></ConnectorSettingsDropdown>
+          </template>
+
           <ConnectorSettings
             field-class="is-small"
             :config-settings="localConfiguration"
@@ -181,7 +189,7 @@ export default {
         <button
           class="button is-interactive-primary"
           :disabled="!isSaveable"
-          @click.prevent="saveConfigAndGoToTransforms"
+          @click.prevent="saveConfigAndGoToSchedule"
         >
           Save
         </button>

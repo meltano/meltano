@@ -51,16 +51,16 @@ module.exports = {
   themeConfig: {
     nav: [
       {
-        text: 'Documentation',
-        link: '/docs/installation.html'
+        text: 'How It Works',
+        link: '/docs/getting-started.html#connect-a-data-source'
       },
       { text: 'Blog', link: 'https://www.meltano.com/blog', disableIcon: true },
       {
         text: 'Newsletter',
         link: 'https://meltano.substack.com',
         disableIcon: true
-      },
-      { text: 'Press', link: '/press/' }
+      }
+      
     ],
     sidebar: {
       '/docs': [

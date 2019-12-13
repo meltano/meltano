@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import SpeedRunIcon from '@/components/pipelines/SpeedRunIcon'
 
@@ -14,13 +14,13 @@ export default {
   }),
   computed: {
     ...mapGetters('plugins', [
+      'visibleExtractors',
       'getIsAddingPlugin',
       'getIsPluginInstalled',
       'getIsInstallingPlugin'
     ]),
-    ...mapState('plugins', ['plugins']),
     isLoadingExtractors() {
-      return this.plugins.extractors && this.plugins.extractors.length === 0
+      return this.visibleExtractors && this.visibleExtractors.length === 0
     }
   },
   methods: {
@@ -56,7 +56,7 @@ export default {
 
     <div v-else class="tile is-ancestor is-flex is-flex-wrap">
       <div
-        v-for="(extractor, index) in plugins.extractors"
+        v-for="(extractor, index) in visibleExtractors"
         :key="`${extractor.name}-${index}`"
         :data-test-id="`${extractor.name}-extractor-card`"
         class="tile is-parent is-3 is-relative"
@@ -107,7 +107,7 @@ export default {
       </div>
     </div>
     <progress
-      v-if="!plugins.extractors"
+      v-if="!visibleExtractors"
       class="progress is-small is-info"
     ></progress>
   </div>

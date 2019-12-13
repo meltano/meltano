@@ -1,4 +1,7 @@
-version: 6
+# Increment this version number whenever the schema of discovery.yml is changed.
+# See https://www.meltano.com/docs/contributing.html#discovery-yml-version for more information.
+version: 8
+
 extractors:
   - name: tap-carbon-intensity
     label: Carbon Emissions Intensity
@@ -12,6 +15,7 @@ extractors:
     label: CSV
     description: Generic data extractor of CSV (comma separated value) files
     namespace: tap_csv
+    hidden: true
     docs: 'https://meltano.com/plugins/extractors/csv.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-csv.git'
     capabilities:
@@ -108,8 +112,8 @@ extractors:
     settings:
       - name: key_file_location
         label: Key File Location
-        value: 'client_secrets.json'
-        placeholder: Ex. client_secrets.json
+        value: 'extract/client_secrets.json'
+        placeholder: Ex. extract/client_secrets.json
         kind: file
         description: Obtain this file from Google Analytics Service Accounts
         documentation: https://meltano.com/plugins/extractors/google-analytics.html#creating-service-account-credentials
@@ -155,6 +159,7 @@ extractors:
     label: MongoDB
     description: General purpose, document-based, distributed database
     namespace: tap_mongodb
+    hidden: true
     docs: 'https://meltano.com/plugins/extractors/mongodb.html'
     pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
     capabilities:
@@ -208,11 +213,12 @@ extractors:
       - name: api_type
         label: API Type
         value: REST
+        kind: hidden
         placeholder: Ex. REST
       - name: select_fields_by_default
         label: Select Fields by Default
         value: true
-        kind: boolean
+        kind: hidden
         description: Select by default any new fields discovered in Salesforce objects
       - name: start_date
         description: Pull data from this date to now
@@ -267,6 +273,7 @@ loaders:
     label: CSV
     description: CSV loader
     namespace: target_csv
+    hidden: true
     docs: 'https://meltano.com/plugins/loaders/csv.html'
     pip_url: git+https://gitlab.com/meltano/target-csv.git
     settings:
@@ -296,6 +303,7 @@ loaders:
     label: Snowflake
     description: Snowflake database loader
     namespace: snowflake
+    hidden: true
     docs: 'https://meltano.com/plugins/loaders/snowflake.html'
     pip_url: 'git+https://gitlab.com/meltano/target-snowflake.git'
     signup_url: 'https://trial.snowflake.com?referrer=meltano'
@@ -349,6 +357,7 @@ loaders:
     label: SQLite
     description: SQLite database loader
     namespace: sqlite
+    hidden: true
     docs: 'https://meltano.com/plugins/loaders/sqlite.html'
     pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
     settings:

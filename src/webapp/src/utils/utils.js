@@ -1,6 +1,7 @@
 import lodash from 'lodash'
 
 import flaskContext from '@/flask'
+import moment from 'moment'
 
 const regExpConnectorLogo = /(?:tap-|target-)?(.*)/
 const regExpPrivateInput = /(password|private|secret|token)/
@@ -229,5 +230,13 @@ export default {
 
   formatDateStringYYYYMMDD(date) {
     return new Date(date).toISOString().split('T')[0]
+  },
+
+  momentFromNow(val) {
+    return moment(val).fromNow()
+  },
+
+  momentFormatlll(val) {
+    return moment(val).format('lll')
   }
 }

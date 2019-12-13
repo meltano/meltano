@@ -16,13 +16,24 @@ export default {
     ...mapState('configuration', ['pipelines']),
     ...mapGetters('configuration', ['getHasPipelines']),
     ...mapGetters('plugins', ['getIsPluginInstalled']),
-    getFormattedDateStringYYYYMMDD() {
-      return val => utils.formatDateStringYYYYMMDD(val)
+    getMomentFormatlll() {
+      return val => utils.momentFormatlll(val)
+    },
+    getLastRunLabel() {
+      return pipeline => {
+        const label = pipeline.endedAt
+          ? utils.momentFromNow(pipeline.endedAt)
+          : 'Log'
+        return pipeline.isRunning ? 'Running...' : label
+      }
+    },
+    getMomentFromNow() {
+      return val => utils.momentFromNow(val)
     }
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
-      if (from.name === 'transforms') {
+      if (from.name === 'loaders' || from.name === 'loaderSettings') {
         vm.goToCreatePipeline()
       }
     })
@@ -137,26 +148,57 @@ export default {
               </td>
               <td>
                 <p class="has-text-centered">
-                  {{
-                    pipeline.startDate
-                      ? getFormattedDateStringYYYYMMDD(pipeline.startDate)
-                      : 'None'
-                  }}
+                  <span
+                    :class="{
+                      'tooltip is-tooltip-left': pipeline.jobId
+                    }"
+                    :data-tooltip="getMomentFormatlll(pipeline.startDate)"
+                  >
+                    <span>
+                      {{
+                        pipeline.startDate
+                          ? getMomentFromNow(pipeline.startDate)
+                          : 'None'
+                      }}
+                    </span>
+                  </span>
                 </p>
               </td>
               <td>
                 <p class="has-text-centered">
                   <button
-                    class="button is-outlined is-small"
+                    class="button is-outlined is-small is-fullwidth h-space-between"
                     :class="{
-                      'tooltip is-tooltip-left': pipeline.jobId,
-                      'is-danger': pipeline.hasError
+                      'tooltip is-tooltip-left': pipeline.jobId
                     }"
-                    data-tooltip="View this ELT Pipeline's last run logging status."
+                    :data-tooltip="
+                      `${
+                        pipeline.endedAt
+                          ? getMomentFormatlll(pipeline.endedAt)
+                          : 'View the last run of this ELT pipeline.'
+                      }`
+                    "
                     :disabled="!pipeline.jobId"
                     @click="goToLog(pipeline.jobId)"
                   >
-                    {{ pipeline.isRunning ? 'Running...' : 'Log' }}
+                    <span>
+                      {{ getLastRunLabel(pipeline) }}
+                    </span>
+                    <span
+                      v-if="!pipeline.isRunning"
+                      class="icon is-small"
+                      :class="
+                        `has-text-${pipeline.hasError ? 'danger' : 'success'}`
+                      "
+                    >
+                      <font-awesome-icon
+                        :icon="
+                          pipeline.hasError
+                            ? 'exclamation-triangle'
+                            : 'check-circle'
+                        "
+                      ></font-awesome-icon>
+                    </span>
                   </button>
                 </p>
               </td>
@@ -180,7 +222,7 @@ export default {
                     class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
                     data-tooltip="Analyze associated models."
                     :to="{ name: 'model' }"
-                    >Model</router-link
+                    >Analyze</router-link
                   >
                   <Dropdown
                     :button-classes="

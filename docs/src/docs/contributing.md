@@ -110,6 +110,14 @@ export MELTANO_UI_URL = ""
 
 ### Changing discovery.yml
 
+#### `discovery.yml` version
+
+Whenever new functionality is introduced that changes the schema of `discovery.yml` (the exact properties it supports and their types), the `version` in `src/meltano/core/bundle/discovery.yml` and the `VERSION` constant in `src/meltano/core/plugin_discovery_service.py` must be incremented, so that older instances of Meltano don't attempt to download and parse a `discovery.yml` its parser is not compatible with.
+
+Changes to `discovery.yml` that only use existing properties do not constitute schema changes and do not require `version` to be incremented.
+
+#### Local changes to `discovery.yml`
+
 When you need to make changes to `discovery.yml`, these changes are not automatically detected inside of the `meltano` repo during development. While there are a few ways to solve this problem, it is recommended to create a symbolic link in order ensure that changes made inside of the `meltano` repo appear inside the Meltano project you initialized and are testing on.
 
 1. Get path for `discovery.yml` in the repo
@@ -124,7 +132,7 @@ When you need to make changes to `discovery.yml`, these changes are not automati
 ln -s $YOUR_DISCOVERY_YML_PATH
 ```
 
-Now, when you run the `ls` command, you should see something like:
+Now, when you run the `ls -l` command, you should see something like:
 
 ```
 bencodezen  staff   72 Nov 19 09:19 discovery.yml -> /Users/bencodezen/Projects/meltano/src/meltano/core/bundle/discovery.yml
@@ -142,7 +150,7 @@ Each extractor (tap) and loader (target) in the `discovery.yml` has a `settings`
       label: Setting Name # Optional (human friendly text display of the setting name)
       value: '' # Optional (Use to set a default value)
       placeholder: Ex. format_like_this # Optional (Use to set the input's placeholder default)
-      kind: string # Optional (Use for a first-class input control. Default is `string`, others are `boolean`, `date_iso8601`, `password`, `options`, & `file`)
+      kind: string # Optional (Use for a first-class input control. Default is `string`, others are `hidden`, `boolean`, `date_iso8601`, `password`, `options`, & `file`)
       description: Setting description # Optional (Use to provide inline context)
       tooltip: Here is some more info... # Optional (use to provide additional inline context)
       documentation: https://meltano.com/ # Optional (use to link to specific supplemental documentation)

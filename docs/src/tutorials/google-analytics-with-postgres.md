@@ -23,7 +23,7 @@ If you need help getting started, we recommend reviewing the [Installation docum
 If this is your first time using Google Analytics with Meltano, you will also need to:
 
 1. Enable Google API access by following the instructions found in the [Google Analytics Extractor documentation](/plugins/extractors/google-analytics.html#google-analytics-setup).
-2. [Install the Google Analytics extractor](/plugins/extractors/google-analytics.html#configure-the-extractor)
+2. [Install the Google Analytics extractor](/plugins/extractors/google-analytics.html#configuration)
 
 ## Setup the Postgres Loader
 
