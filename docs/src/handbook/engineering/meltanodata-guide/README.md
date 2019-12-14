@@ -13,7 +13,7 @@ This will be the single source of truth for team members when it comes to creati
 - DigitalOcean Account
 - Access to DigitalOcean Meltano team
 - Client's tenant name (i.e., company name, etc.)
-- Access to the [Controller Node](./controller_node)
+- Access to the [Controller Node](/handbook/engineering/meltanodata-guide/controller-node.html)
 
 ::: info
 **DigitalOcean limits**

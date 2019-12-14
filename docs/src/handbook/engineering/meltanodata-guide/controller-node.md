@@ -2,11 +2,23 @@
 sidebar: auto
 ---
 
-## The Controller Node
+# Controller Node
 
 `*.meltanodata.com` can be managed using the controller node available at `controller.int.meltanodata.com`.
 
 The purpose of this node is to provide tools to enable team members to leverage _infrastructure-as-code_.
+
+## Prerequisites
+
+1. Verify SSH Agent is populated locally
+
+```bash
+ssh-add -L
+```
+
+If you see `No registered agent found`, you'll need to add your key.
+
+2. DigitalOcean API Key (Ready Access)
 
 ### Tools
 
@@ -62,16 +74,20 @@ Now, we need to connect DigitalOcean to enable ansible to pull nodes metadata fo
 
 This will enable us to target:
 
-  - Specific nodes with the droplet's `name`
-  - Groups of nodes with `tags`
-  - All the nodes with `*.meltanodata.com`
-  - … and more
+- Specific nodes with the droplet's `name`
+- Groups of nodes with `tags`
+- All the nodes with `*.meltanodata.com`
+- and more
 
 To do that, you will need to export your DigitalOcean API Token as `DO_API_TOKEN`.
 
 ```bash
 export DO_API_TOKEN=<access_token>
 ```
+
+::: tip
+You can also save this to your `.bashrc` file as long as the API key only has read access to save yourself some time.
+:::
 
 You can test that it works using:
 
@@ -93,18 +109,26 @@ ansible-playbook /path/to/playbook
 sudo ansible-playbook playbooks/controller.yml
 ```
 
-### playbooks/ssl.yml
+::: tip
+To speed things up, it is recommended to add a flag of `--limit=$TENANT.meltanodata.com` when running playbooks for a specific droplet.
+:::
 
-Ensure the Meltano certificate is present on the `*.meltanodata.com` nodes.
+### caddy.yml
 
-### playbooks/controller.yml
+Copies over Caddyfile to the droplet.
+
+### controller.yml
 
 Ensure the Controller access control is properly setup, requires `root` access.
 
-### playbooks/meltano.yml
+### meltano.yml
 
 Ensure each node has proper access control setup.
 
-### playbooks/meltano-upgrade.yml
+### meltano-upgrade.yml
 
 Runs `meltano upgrade` in each node.
+
+### ssl.yml
+
+Ensure the Meltano certificate is present on the `*.meltanodata.com` nodes.
