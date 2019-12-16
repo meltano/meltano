@@ -3,21 +3,26 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
+
 - [#1374](https://gitlab.com/meltano/meltano/issues/1374) Add role revocation for users and roles in the `meltano permissions` command
+- [#1377](https://gitlab.com/meltano/meltano/issues/1377) Document cleanup steps after MeltanoData testing
+- [#1438](https://gitlab.com/meltano/meltano/issues/1438) Add documentation for DNS spoofing error
 
 ### Changes
+
 - [#1350](https://gitlab.com/meltano/meltano/issues/1350) Switch to all lower case for Snowflake permission comparisons in the `meltano permissions` command
 - [#1449](https://gitlab.com/meltano/meltano/issues/1449) Hide the Marketo Extractor form Meltano UI
+- [#1397](https://gitlab.com/meltano/meltano/issues/1397) Optimize workflow for MeltanoData setup
+- [#1423](https://gitlab.com/meltano/meltano/issues/1423) Update sidebar and docs to include Ansible
 
 ### Fixes
 
 ### Breaks
-
 
 ## 1.11.2 - (2019-12-13)
 
@@ -33,7 +38,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1439](https://gitlab.com/meltano/meltano/issues/1439) Fix relative elapsed time since last run time display in the Pipelines UI
 - [#1441](https://gitlab.com/meltano/meltano/issues/1441) Fix auto advance to "Create Pipeline" when coming from "Load" step (previously "Transform" step, but this has been removed from the UI)
 - [#1440](https://gitlab.com/meltano/meltano/issues/1440) Allow installed plugins to appear in UI even if hidden in configuration
-
 
 ## 1.11.1 - (2019-12-12)
 
