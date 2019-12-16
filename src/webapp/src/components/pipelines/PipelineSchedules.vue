@@ -279,7 +279,7 @@ export default {
     <div v-else class="content">
       <p>
         There are no pipelines scheduled yet.
-        <router-link to="schedules/create"
+        <router-link to="schedule/create"
           >Schedule your first Pipeline</router-link
         >
         now.
