@@ -216,6 +216,27 @@ class SnowflakeGrantsGenerator:
                 )
             )
 
+        read_databases = (
+            config.get("privileges", {})
+            .get("databases", {})
+            .get("read", [])
+        )
+
+        write_databases = (
+            config.get("privileges", {})
+            .get("databases", {})
+            .get("write", [])
+        )
+
+        new_commands, usage_granted = self.generate_database_grants(
+            role=role,
+            databases=read_databases + write_databases,
+            grant_type="revoke",
+            usage_granted=usage_granted,
+            shared_dbs=shared_dbs,
+        )
+        sql_commands.extend(new_commands)
+
         try:
             for schema in config["privileges"]["schemas"]["read"]:
                 new_commands, usage_granted = self.generate_schema_grants(
@@ -381,7 +402,7 @@ class SnowflakeGrantsGenerator:
 
         role: the name of the role the privileges are GRANTed to
         databases: list of databases (e.g. "raw")
-        grant_type: What type of privileges are granted? One of {"read", "write"}
+        grant_type: What type of privileges are granted? One of {"read", "write", "revoke"}
         usage_granted: Passed by generate_grant_privileges_to_role() to track all
             all the entities a role has been granted access (usage) to.
         shared_dbs: a set of all the shared databases defined in the spec.
@@ -395,43 +416,8 @@ class SnowflakeGrantsGenerator:
 
         if grant_type == "read":
             privileges = read_privileges
-        elif grant_type == "write":
+        elif grant_type == "write" or grant_type == "revoke":
             privileges = write_privileges
-
-        for granted_database in (
-            self.grants_to_role.get(role, {}).get("usage", {}).get("database", [])
-        ):
-            # If it's a shared database, only revoke imported
-            # We'll only know if it's a shared DB based on the spec
-            if granted_database not in databases and granted_database in shared_dbs:
-                sql_commands.append(
-                    {
-                        "already_granted": False,
-                        "sql": REVOKE_PRIVILEGES_TEMPLATE.format(
-                            privileges="imported privileges",
-                            resource_type="database",
-                            resource_name=SnowflakeConnector.snowflaky(
-                                granted_database
-                            ),
-                            role=SnowflakeConnector.snowflaky(role),
-                        ),
-                    }
-                )
-            # Can revoke all privileges b/c it will still execute even if it's a no-op
-            elif granted_database not in databases:
-                sql_commands.append(
-                    {
-                        "already_granted": False,
-                        "sql": REVOKE_PRIVILEGES_TEMPLATE.format(
-                            privileges=write_privileges,
-                            resource_type="database",
-                            resource_name=SnowflakeConnector.snowflaky(
-                                granted_database
-                            ),
-                            role=SnowflakeConnector.snowflaky(role),
-                        ),
-                    }
-                )
 
         for database in databases:
             usage_granted["databases"].add(database)
@@ -488,6 +474,44 @@ class SnowflakeGrantsGenerator:
                     ),
                 }
             )
+
+        if grant_type == "revoke":
+            for granted_database in (
+                self.grants_to_role.get(role, {}).get("usage", {}).get("database", [])
+            ):
+                # If it's a shared database, only revoke imported
+                # We'll only know if it's a shared DB based on the spec
+                if granted_database not in databases and granted_database in shared_dbs:
+                    sql_commands.append(
+                        {
+                            "already_granted": False,
+                            "sql": REVOKE_PRIVILEGES_TEMPLATE.format(
+                                privileges="imported privileges",
+                                resource_type="database",
+                                resource_name=SnowflakeConnector.snowflaky(
+                                    granted_database
+                                ),
+                                role=SnowflakeConnector.snowflaky(role),
+                            ),
+                        }
+                    )
+                # Can revoke all privileges b/c it will still execute even if it's a no-op
+                elif granted_database not in databases:
+                    sql_commands.append(
+                        {
+                            "already_granted": False,
+                            "sql": REVOKE_PRIVILEGES_TEMPLATE.format(
+                                privileges=write_privileges,
+                                resource_type="database",
+                                resource_name=SnowflakeConnector.snowflaky(
+                                    granted_database
+                                ),
+                                role=SnowflakeConnector.snowflaky(role),
+                            ),
+                        }
+                    )
+            
+            return (sql_commands, usage_granted)
 
         return (sql_commands, usage_granted)
 
