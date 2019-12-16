@@ -174,15 +174,16 @@ def upload_plugin_configuration_file(plugin_ref) -> Response:
     Endpoint for uploading a file for a specific plugin's configuration profile
     """
 
+    project = Project.find()
     file = request.files["file"]
     connector_name = request.form["connector_name"]
     profile_name = request.form["profile_name"]
     setting_name = request.form["setting_name"]
-    directory = f"{connector_name}/{profile_name}/{setting_name}"
+    directory = project.extract_dir(connector_name, profile_name, setting_name)
     upload_helper = UploadHelper()
-    upload_helper.upload_file(directory, file)
+    file_path = upload_helper.upload_file(directory, file)
 
-    return jsonify({"is_success": True}), 200
+    return jsonify({"path": file_path}), 200
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["GET"])

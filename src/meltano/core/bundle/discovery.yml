@@ -110,7 +110,7 @@ extractors:
       - ['key_file_location', 'view_id', 'start_date']
     settings:
       - name: key_file_location
-        label: Key File
+        label: Key File Location
         placeholder: Ex. client_secrets.json
         kind: file
         description: Obtain this file from Google Analytics Service Accounts

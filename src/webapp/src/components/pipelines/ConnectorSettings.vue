@@ -158,9 +158,9 @@ export default {
             type: 'extractors',
             formData
           })
-          .then(() => {
+          .then(response => {
             // Model update as v-model on `<input type="file">` not supported
-            profile.config[setting.name] = file.name
+            profile.config[setting.name] = response.data.path
           })
           .catch(error => {
             Vue.toasted.global.error(error.response.data.code)

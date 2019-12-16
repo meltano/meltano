@@ -44,9 +44,12 @@ class UploadHelper:
         if not self.is_valid_size(file):
             raise InvalidFileSizeError(file)
 
-        project = Project.find()
         filename = secure_filename(file.filename)
-        file.save(join(project.extract_dir(directory), filename))
+        full_path = join(directory, filename)
+        file.save(full_path)
+
+        project = Project.find()
+        return full_path.replace(f"{str(project.root)}/", "")
 
     def is_valid_name(self, file):
         return file.filename != ""
