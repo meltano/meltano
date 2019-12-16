@@ -181,8 +181,10 @@ If you are getting an error, give it a few more minutes since the records needs 
 1. Click the `Get Started` button
 1. Restrict inbound connections by adding the recently created droplet under **Add trusted sources**
 1. Click `Allow these inbound sources only` button
+1. Click `Continue` to move past "Connection details"
+1. Click `Great, I'm done` for "Next Steps" section
 
-You should now be greeted by the `Connection details` tab which is important for later on. It contains your database credentials and will be needed in the next section.
+You should see `Connection details` on the right side of the page which is important for later on. It contains your database credentials and will be needed in the next section.
 
 ### Step 4: Configure Meltano Droplet Networking
 
