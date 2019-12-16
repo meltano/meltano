@@ -331,10 +331,6 @@ class SnowflakeGrantsGenerator:
                 }
             )
 
-# REVOKE_PRIVILEGES_TEMPLATE = (
-    # "REVOKE {privileges} ON {resource_type} {resource_name} FROM ROLE {role}"
-# )
-
         for granted_warehouse in (
             self.grants_to_role.get(role, {}).get("usage", {}).get("warehouse", [])
         ):
