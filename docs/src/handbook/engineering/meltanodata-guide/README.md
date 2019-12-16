@@ -214,7 +214,7 @@ For more informations about using `ssh`, take a look at https://www.digitalocean
 1. Export DigialOcean token
 
 ```
-export DO_API_TOKEN=200bc90fb6c8ad0ba904c1c3a8991e0701f7be8a4670afc2810420abc8c6ce43
+export DO_API_TOKEN=<access_token>
 ```
 
 ##### Configure HTTPS Protocol
