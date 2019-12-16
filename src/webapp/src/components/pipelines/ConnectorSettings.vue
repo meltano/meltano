@@ -147,8 +147,9 @@ export default {
 
         const formData = new FormData()
         formData.append('file', file)
-        formData.append('profile', profile)
-        formData.append('setting', setting)
+        formData.append('connector_name', this.plugin.name)
+        formData.append('profile_name', profile.name)
+        formData.append('setting_name', setting.name)
 
         this.$store
           .dispatch('configuration/uploadPluginConfigurationFile', {

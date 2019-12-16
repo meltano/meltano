@@ -1,9 +1,7 @@
 import asyncio
 import json
 import logging
-from os.path import join
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
-from werkzeug.utils import secure_filename
 
 from meltano.core.job import JobFinder, State
 from meltano.core.behavior.canonical import Canonical
@@ -31,6 +29,7 @@ from meltano.api.models import db
 from meltano.api.json import freeze_keys
 
 from meltano.api.executor import run_elt
+from .upload_helper import UploadHelper
 
 
 orchestrationsBP = Blueprint(
@@ -139,9 +138,12 @@ def upload_plugin_configuration_file(plugin_ref) -> Response:
     """
 
     file = request.files["file"]
-    project = Project.find()
-    filename = secure_filename(file.filename)
-    file.save(join(project.extract_dir(), filename))
+    connector_name = request.form["connector_name"]
+    profile_name = request.form["profile_name"]
+    setting_name = request.form["setting_name"]
+    directory = f"{connector_name}/{profile_name}/{setting_name}"
+    upload_helper = UploadHelper()
+    upload_helper.upload_file(directory, file)
 
     return jsonify({"is_success": True}), 200
 
