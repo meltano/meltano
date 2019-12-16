@@ -13,6 +13,10 @@ GRANT_PRIVILEGES_TEMPLATE = (
     "GRANT {privileges} ON {resource_type} {resource_name} TO ROLE {role}"
 )
 
+REVOKE_PRIVILEGES_TEMPLATE = (
+    "REVOKE {privileges} ON {resource_type} {resource_name} FROM ROLE {role}"
+)
+
 GRANT_ALL_PRIVILEGES_TEMPLATE = "GRANT {privileges} ON ALL {resource_type}s IN SCHEMA {resource_name} TO ROLE {role}"
 
 GRANT_FUTURE_PRIVILEGES_TEMPLATE = "GRANT {privileges} ON FUTURE {resource_type}s IN SCHEMA {resource_name} TO ROLE {role}"
@@ -165,11 +169,11 @@ class SnowflakeGrantsGenerator:
         usage_granted = {"databases": set(), "schemas": set()}
 
         try:
-            for warehouse in config["warehouses"]:
-                new_commands = self.generate_warehouse_grants(
-                    role=role, warehouse=warehouse
-                )
-                sql_commands.extend(new_commands)
+            warehouses = config["warehouses"]
+            new_commands = self.generate_warehouse_grants(
+                role=role, warehouses=warehouses
+            )
+            sql_commands.extend(new_commands)
         except KeyError:
             logging.debug(
                 "`warehouses` not found for role {}, skipping generation of Warehouse GRANT statements.".format(
@@ -281,50 +285,86 @@ class SnowflakeGrantsGenerator:
 
         return sql_commands
 
-    def generate_warehouse_grants(self, role: str, warehouse: str) -> List[str]:
+    def generate_warehouse_grants(self, role: str, warehouses: List) -> List[str]:
         """
         Generate the GRANT statements for Warehouse usage and operation.
 
         role: the name of the role the privileges are GRANTed to
-        warehouse: the name of the warehouse (e.g. "transforming")
+        warehouses: list of warehouses for the specified role
 
         Returns the SQL command generated
         """
         sql_commands = []
 
-        if self.check_grant_to_role(role, "usage", "warehouse", warehouse):
-            already_granted = True
-        else:
-            already_granted = False
+        for warehouse in warehouses:
+            if self.check_grant_to_role(role, "usage", "warehouse", warehouse):
+                already_granted = True
+            else:
+                already_granted = False
 
-        sql_commands.append(
-            {
-                "already_granted": already_granted,
-                "sql": GRANT_PRIVILEGES_TEMPLATE.format(
-                    privileges="usage",
-                    resource_type="warehouse",
-                    resource_name=SnowflakeConnector.snowflaky(warehouse),
-                    role=SnowflakeConnector.snowflaky(role),
-                ),
-            }
-        )
+            sql_commands.append(
+                {
+                    "already_granted": already_granted,
+                    "sql": GRANT_PRIVILEGES_TEMPLATE.format(
+                        privileges="usage",
+                        resource_type="warehouse",
+                        resource_name=SnowflakeConnector.snowflaky(warehouse),
+                        role=SnowflakeConnector.snowflaky(role),
+                    ),
+                }
+            )
 
-        if self.check_grant_to_role(role, "operate", "warehouse", warehouse):
-            already_granted = True
-        else:
-            already_granted = False
+            if self.check_grant_to_role(role, "operate", "warehouse", warehouse):
+                already_granted = True
+            else:
+                already_granted = False
 
-        sql_commands.append(
-            {
-                "already_granted": already_granted,
-                "sql": GRANT_PRIVILEGES_TEMPLATE.format(
-                    privileges="operate",
-                    resource_type="warehouse",
-                    resource_name=SnowflakeConnector.snowflaky(warehouse),
-                    role=SnowflakeConnector.snowflaky(role),
-                ),
-            }
-        )
+            sql_commands.append(
+                {
+                    "already_granted": already_granted,
+                    "sql": GRANT_PRIVILEGES_TEMPLATE.format(
+                        privileges="operate",
+                        resource_type="warehouse",
+                        resource_name=SnowflakeConnector.snowflaky(warehouse),
+                        role=SnowflakeConnector.snowflaky(role),
+                    ),
+                }
+            )
+
+# REVOKE_PRIVILEGES_TEMPLATE = (
+    # "REVOKE {privileges} ON {resource_type} {resource_name} FROM ROLE {role}"
+# )
+
+        for granted_warehouse in (
+            self.grants_to_role.get(role, {}).get("usage", {}).get("warehouse", [])
+        ):
+            if granted_warehouse not in warehouses:                
+                sql_commands.append(
+                    {
+                        "already_granted": False,
+                        "sql": REVOKE_PRIVILEGES_TEMPLATE.format(
+                            privileges="usage",
+                            resource_type="warehouse",
+                            resource_name=SnowflakeConnector.snowflaky(granted_warehouse),
+                            role=SnowflakeConnector.snowflaky(role),
+                        ),
+                    }
+                )
+        
+        for granted_warehouse in (
+            self.grants_to_role.get(role, {}).get("operate", {}).get("warehouse", [])
+        ):
+                sql_commands.append(
+                    {
+                        "already_granted": False,
+                        "sql": REVOKE_PRIVILEGES_TEMPLATE.format(
+                            privileges="operate",
+                            resource_type="warehouse",
+                            resource_name=SnowflakeConnector.snowflaky(granted_warehouse),
+                            role=SnowflakeConnector.snowflaky(role),
+                        ),
+                    }
+                )                
 
         return sql_commands
 
