@@ -158,7 +158,7 @@ export default {
             type: 'extractors',
             formData
           })
-          .then(response => {
+          .then(() => {
             // Model update as v-model on `<input type="file">` not supported
             profile.config[setting.name] = file.name
           })

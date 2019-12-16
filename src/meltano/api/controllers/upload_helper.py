@@ -5,8 +5,9 @@ from werkzeug.utils import secure_filename
 
 from meltano.core.project import Project
 
-MAX_FILE_SIZE = 4194304 # 4MB max
-ALLOWED_EXTENSIONS = {'json'}
+MAX_FILE_SIZE = 4194304  # 4MB max
+ALLOWED_EXTENSIONS = {"json"}
+
 
 class InvalidFileNameError(Exception):
     """Occurs when a file does not have a valid name."""
@@ -32,7 +33,6 @@ class InvalidFileSizeError(Exception):
 
 
 class UploadHelper:
-
     def upload_file(self, directory, file):
 
         if not self.is_valid_name(file):
@@ -49,10 +49,10 @@ class UploadHelper:
         file.save(join(project.extract_dir(directory), filename))
 
     def is_valid_name(self, file):
-        return file.filename != ''
+        return file.filename != ""
 
     def is_valid_type(self, file):
-        return file.filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        return file.filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
     def is_valid_size(self, file):
         file.seek(0, SEEK_END)
