@@ -142,6 +142,7 @@ export default {
         const profile = this.configSettings.profiles[
           this.configSettings.profileInFocusIndex
         ]
+        // Model update as v-model on `<input type="file">` not supported
         profile.config[setting.name] = file.name
 
         const formData = new FormData()
