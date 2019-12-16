@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+- [#1476](https://gitlab.com/meltano/meltano/issues/1476) Add database and warehouse revocations for roles in the `meltano permissions` command
 
 ### Fixes
 
