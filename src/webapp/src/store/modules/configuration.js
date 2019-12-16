@@ -220,7 +220,7 @@ const actions = {
   },
 
   uploadPluginConfigurationFile(_, configPayload) {
-    orchestrationsApi.uploadPluginConfigurationFile(configPayload)
+    return orchestrationsApi.uploadPluginConfigurationFile(configPayload)
   }
 }
 

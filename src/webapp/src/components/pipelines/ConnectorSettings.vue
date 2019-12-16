@@ -1,4 +1,6 @@
 <script>
+import Vue from 'vue'
+
 import InputDateIso8601 from '@/components/generic/InputDateIso8601'
 import TooltipCircle from '@/components/generic/TooltipCircle'
 
@@ -138,12 +140,11 @@ export default {
     },
     onFileChange(event, setting) {
       const file = event.target.files[0]
+
       if (file) {
         const profile = this.configSettings.profiles[
           this.configSettings.profileInFocusIndex
         ]
-        // Model update as v-model on `<input type="file">` not supported
-        profile.config[setting.name] = file.name
 
         const formData = new FormData()
         formData.append('file', file)
@@ -157,7 +158,13 @@ export default {
             type: 'extractors',
             formData
           })
-          .then(() => {})
+          .then(response => {
+            // Model update as v-model on `<input type="file">` not supported
+            profile.config[setting.name] = file.name
+          })
+          .catch(error => {
+            Vue.toasted.global.error(error.response.data.code)
+          })
       }
     },
     refocusInput(newVal, oldVal) {

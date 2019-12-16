@@ -29,7 +29,7 @@ from meltano.api.models import db
 from meltano.api.json import freeze_keys
 
 from meltano.api.executor import run_elt
-from .upload_helper import UploadHelper
+from .upload_helper import InvalidFileNameError, InvalidFileTypeError, InvalidFileSizeError, UploadHelper
 
 
 orchestrationsBP = Blueprint(
@@ -60,6 +60,46 @@ def _handle(ex):
             }
         ),
         404,
+    )
+
+
+@orchestrationsBP.errorhandler(InvalidFileNameError)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"The file lacks a valid name.",
+            }
+        ),
+        400,
+    )
+
+
+@orchestrationsBP.errorhandler(InvalidFileTypeError)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"The file '{ex.file.filename}' must be one of the following types: {ex.extensions}",
+            }
+        ),
+        400,
+    )
+
+
+@orchestrationsBP.errorhandler(InvalidFileSizeError)
+def _handle(ex):
+    print("****", ex)
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"The file '{ex.file.filename}' is empty or exceeds the {ex.max_file_size} size limit.",
+            }
+        ),
+        400,
     )
 
 
