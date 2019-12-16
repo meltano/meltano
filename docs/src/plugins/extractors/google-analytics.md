@@ -10,6 +10,12 @@ The Google Analytics extractor pulls raw data from the [Google Analytics Reporti
 
 ## Google Analytics Setup
 
+<br />
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe
+  width="560" height="315" src="https://www.youtube.com/embed/FON9ywXOcwM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
 In order to access your Google Analytics data, you will need:
 
 1. The ID for the Google Analytics View you want to fetch data from.
