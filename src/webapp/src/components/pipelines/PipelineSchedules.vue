@@ -128,22 +128,7 @@ export default {
               </td>
               <td>
                 <p class="has-text-centered">
-                  <span v-if="getIsPluginInstalled('orchestrators', 'airflow')">
-                    {{ pipeline.interval }}
-                  </span>
-                  <router-link
-                    v-else
-                    class="button is-small tooltip"
-                    data-tooltip="Airflow Orchestrator must be installed for intervaled runs."
-                    :to="{ name: 'orchestration' }"
-                  >
-                    <span>{{ pipeline.interval }}</span>
-                    <span class="icon is-small has-text-warning">
-                      <font-awesome-icon
-                        icon="exclamation-triangle"
-                      ></font-awesome-icon>
-                    </span>
-                  </router-link>
+                  <span>{{ pipeline.interval }}</span>
                 </p>
               </td>
               <td>
@@ -210,19 +195,6 @@ export default {
                     data-tooltip="Run this ELT pipeline once."
                     @click="runELT(pipeline)"
                     >Manual Run</a
-                  >
-                  <router-link
-                    v-if="getIsPluginInstalled('orchestrators', 'airflow')"
-                    class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
-                    data-tooltip="Automate this ELT pipeline with orchestration."
-                    :to="{ name: 'orchestration' }"
-                    >Orchestrate</router-link
-                  >
-                  <router-link
-                    class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
-                    data-tooltip="Analyze associated models."
-                    :to="{ name: 'model' }"
-                    >Analyze</router-link
                   >
                   <Dropdown
                     :button-classes="
