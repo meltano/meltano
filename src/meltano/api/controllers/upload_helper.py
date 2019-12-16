@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 
 from meltano.core.project import Project
 
-MAX_FILE_SIZE = 4194304  # 4MB max
+MAX_FILE_SIZE = 4_194_304  # 4MB max
 ALLOWED_EXTENSIONS = {"json"}
 
 
