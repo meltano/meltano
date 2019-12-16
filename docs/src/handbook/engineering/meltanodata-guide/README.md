@@ -421,11 +421,11 @@ vim .env
 4. Copy and paste the following template into the `.env` file
 
 ```bash
-PG_USERNAME=<username>
+PG_USERNAME=doadmin # default DO credential
 PG_PASSWORD=<password>
 PG_ADDRESS=<host>
-PG_PORT=<port>
-PG_DATABASE=<database>
+PG_PORT=25060 # default DO port
+PG_DATABASE=defaultdb # default DO database name
 ```
 
 5. Replace each field with the credentials from DigitalOcean
