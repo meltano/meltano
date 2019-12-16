@@ -217,15 +217,11 @@ class SnowflakeGrantsGenerator:
             )
 
         read_databases = (
-            config.get("privileges", {})
-            .get("databases", {})
-            .get("read", [])
+            config.get("privileges", {}).get("databases", {}).get("read", [])
         )
 
         write_databases = (
-            config.get("privileges", {})
-            .get("databases", {})
-            .get("write", [])
+            config.get("privileges", {}).get("databases", {}).get("write", [])
         )
 
         new_commands, usage_granted = self.generate_database_grants(
@@ -381,7 +377,9 @@ class SnowflakeGrantsGenerator:
                         "sql": REVOKE_PRIVILEGES_TEMPLATE.format(
                             privileges="operate",
                             resource_type="warehouse",
-                            resource_name=SnowflakeConnector.snowflaky(granted_warehouse),
+                            resource_name=SnowflakeConnector.snowflaky(
+                                granted_warehouse
+                            ),
                             role=SnowflakeConnector.snowflaky(role),
                         ),
                     }
@@ -510,7 +508,7 @@ class SnowflakeGrantsGenerator:
                             ),
                         }
                     )
-            
+
             return (sql_commands, usage_granted)
 
         return (sql_commands, usage_granted)
