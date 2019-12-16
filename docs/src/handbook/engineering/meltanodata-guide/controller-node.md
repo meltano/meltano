@@ -18,6 +18,14 @@ ssh-add -L
 
 If you see `No registered agent found`, you'll need to add your key.
 
+```bash
+# Register your id_rsa key as an agent
+ssh-add ~/.ssh/id_rsa
+
+# Verify key exists
+ssh-add -L
+```
+
 2. DigitalOcean API Key (Ready Access)
 
 ### Tools
