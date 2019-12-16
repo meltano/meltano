@@ -262,9 +262,28 @@ class SnowflakeSpecLoader:
                                 )
                             )
 
+                        read_databases = (
+                            config.get("privileges", {})
+                            .get("databases", {})
+                            .get("read", [])
+                        )
+
+                        write_databases = (
+                            config.get("privileges", {})
+                            .get("databases", {})
+                            .get("write", [])
+                        )
+
                         try:
                             for schema in config["privileges"]["schemas"]["read"]:
                                 entities["schema_refs"].add(schema)
+                                schema_db = schema.split(".")[0]
+                                if schema_db not in read_databases:
+                                    error_messages.append(
+                                        f"Privilege Error: Database {schema_db} referenced in "
+                                        "schema read privileges but not in database privileges "
+                                        f"for role {entity_name}"
+                                    )
                         except KeyError:
                             logging.debug(
                                 "`privileges.schemas.read` not found for role {}, skipping Schema Reference generation.".format(
@@ -275,6 +294,13 @@ class SnowflakeSpecLoader:
                         try:
                             for schema in config["privileges"]["schemas"]["write"]:
                                 entities["schema_refs"].add(schema)
+                                schema_db = schema.split(".")[0]
+                                if schema_db not in write_databases:
+                                    error_messages.append(
+                                        f"Privilege Error: Database {schema_db} referenced in "
+                                        "schema write privileges but not in database privileges "
+                                        f"for role {entity_name}"
+                                    )
                         except KeyError:
                             logging.debug(
                                 "`privileges.schemas.write` not found for role {}, skipping Schema Reference generation.".format(
@@ -285,6 +311,13 @@ class SnowflakeSpecLoader:
                         try:
                             for table in config["privileges"]["tables"]["read"]:
                                 entities["table_refs"].add(table)
+                                table_db = schema.split(".")[0]
+                                if table_db not in read_databases:
+                                    error_messages.append(
+                                        f"Privilege Error: Database {table_db} referenced in "
+                                        "table read privileges but not in database privileges "
+                                        f"for role {entity_name}"
+                                    )
                         except KeyError:
                             logging.debug(
                                 "`privileges.tables.read` not found for role {}, skipping Table Reference generation.".format(
@@ -295,6 +328,13 @@ class SnowflakeSpecLoader:
                         try:
                             for table in config["privileges"]["tables"]["write"]:
                                 entities["table_refs"].add(table)
+                                table_db = schema.split(".")[0]
+                                if table_db not in write_databases:
+                                    error_messages.append(
+                                        f"Privilege Error: Database {table_db} referenced in "
+                                        "table write privileges but not in database privileges "
+                                        f"for role {entity_name}"
+                                    )
                         except KeyError:
                             logging.debug(
                                 "`privileges.tables.write` not found for role {}, skipping Table Reference generation.".format(
@@ -396,7 +436,7 @@ class SnowflakeSpecLoader:
             if name_parts[1] != "*":
                 entities["schema_refs"].add(f"{name_parts[0]}.{name_parts[1]}")
 
-        return (entities, error_messages)
+        return (entities, list(set(error_messages)))
 
     def ensure_valid_entity_names(self, entities: Dict) -> List[str]:
         """
