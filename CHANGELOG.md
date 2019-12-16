@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.12.0 - (2019-12-16)
 
 ---
 
@@ -21,9 +34,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1397](https://gitlab.com/meltano/meltano/issues/1397) Optimize workflow for MeltanoData setup
 - [#1423](https://gitlab.com/meltano/meltano/issues/1423) Update sidebar and docs to include Ansible
 
-### Fixes
-
-### Breaks
 
 ## 1.11.2 - (2019-12-13)
 
