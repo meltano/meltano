@@ -181,11 +181,6 @@ export default {
                   </template>
                   <div v-else class="content">
                     <p>There are no reports added to this dashboard yet.</p>
-                    <router-link
-                      class="button is-interactive-primary is-outlined"
-                      :to="{ name: 'model' }"
-                      >Analyze Some Data First</router-link
-                    >
                   </div>
                 </template>
               </template>
