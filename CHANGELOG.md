@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1374](https://gitlab.com/meltano/meltano/issues/1374) Add role revocation for users and roles in the `meltano permissions` command
 - [#1377](https://gitlab.com/meltano/meltano/issues/1377) Document cleanup steps after MeltanoData testing
 - [#1438](https://gitlab.com/meltano/meltano/issues/1438) Add documentation for DNS spoofing error
+- [#1436](https://gitlab.com/meltano/meltano/issues/1436) Add video walkthrough on how to setup Google Analytics so that the Meltano Extractor can be able to access the Google APIs and the Google Analytics data.
 
 ### Changes
 
