@@ -60,7 +60,6 @@ module.exports = {
         link: 'https://meltano.substack.com',
         disableIcon: true
       }
-      
     ],
     sidebar: {
       '/docs': [
@@ -76,6 +75,10 @@ module.exports = {
         '/docs/contributing',
         '/docs/getting-help',
         '/docs/roadmap'
+      ],
+      '/handbook/engineering/meltanodata-guide': [
+        '/handbook/engineering/meltanodata-guide/',
+        '/handbook/engineering/meltanodata-guide/controller-node.html'
       ],
       '/plugins': [
         '/docs/',

@@ -1,5 +1,5 @@
 ---
-sidebar: auto
+sidebarDepth: 2
 ---
 
 # MeltanoData Guide
@@ -13,7 +13,7 @@ This will be the single source of truth for team members when it comes to creati
 - DigitalOcean Account
 - Access to DigitalOcean Meltano team
 - Client's tenant name (i.e., company name, etc.)
-- Access to the [Controller Node](./controller_node)
+- Access to the [Controller Node](/handbook/engineering/meltanodata-guide/controller-node.html)
 
 ::: info
 **DigitalOcean limits**
@@ -24,7 +24,7 @@ Since each Meltano instance requires one droplet and one cluster, our effective 
 When we get close to hitting either of these limits, we can get them increased by sending an email to one of our contacts at DigitalOcean.
 :::
 
-### Step 1: Setup a new droplet
+### Step 1: Create a New Droplet
 
 1. Login to DigitalOcean
 1. Access the Meltano project workspace
@@ -124,26 +124,6 @@ round-trip min/avg/max/stddev = 12.279/16.375/19.898/2.901 ms
 1. Leave **TTL (seconds)** with the default of `3600`
 1. Click `Create Record`
 
-#### Enable HTTPS
-
-Log in the Controller Node and run the `playbook/ssl.yml` playbook. To speed up the process, you can use `--limit=$TENANT_NAME.meltanodata.com`.
-
-Then update the `/etc/caddy/Caddyfile` with
-
-```
-# comment `tls self_signed`
-#tls self_signed
-
-# add the Meltano wildcard certificate
-tls /etc/caddy/com.meltanodata.crt /etc/caddy/com.meltanodata.key
-```
-
-Then restart caddy using:
-
-```
-systemctl restart caddy
-```
-
 #### Make sure everything works
 
 1. Open your Terminal
@@ -201,10 +181,12 @@ If you are getting an error, give it a few more minutes since the records needs 
 1. Click the `Get Started` button
 1. Restrict inbound connections by adding the recently created droplet under **Add trusted sources**
 1. Click `Allow these inbound sources only` button
+1. Click `Continue` to move past "Connection details"
+1. Click `Great, I'm done` for "Next Steps" section
 
-You should now be greeted by the `Connection details` tab which is important for later on. It contains your database credentials and will be referenced later on.
+You should see `Connection details` on the right side of the page which is important for later on. It contains your database credentials and will be needed in the next section.
 
-### Step 4: Configure Meltano Droplet
+### Step 4: Configure Meltano Droplet Networking
 
 1. SSH into your newly created droplet
 
@@ -225,27 +207,96 @@ ssh-add /path/to/your/ssh-key
 For more informations about using `ssh`, take a look at https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys#basic-connection-instructions
 :::
 
-#### Configure Caddyfile
+#### Run Ansible Playbooks
 
-1. Open `/etc/caddy/Caddyfile` in text editor (i.e., vim)
+1. Make sure ssh-agent is registered
+1. Log in to the Controller Node
+1. Export DigitalOcean token
 
-```bash
-vim /etc/caddy/Caddyfile
+```
+export DO_API_TOKEN=<access_token>
+```
+
+##### Configure HTTPS Protocol
+
+and run the `playbook/ssl.yml` playbook. To speed up the process, you can use `--limit=$TENANT_NAME.meltanodata.com`.
+
+```
+ansible-playbook playbooks/ssl.yml --limit=TENANT.meltanodata.com
+```
+
+You should get a response such as:
+
+```
+PLAY [*.meltanodata.com] *********************************************************************************************
+
+TASK [Copy the `*.meltanodata.com` certificate] **********************************************************************
+changed: [64.225.4.60]
+
+TASK [Copy the `*.meltanodata.com` key] ******************************************************************************
+changed: [64.225.4.60]
+
+PLAY RECAP ***********************************************************************************************************
+64.225.4.60                : ok=2    changed=2    unreachable=0    failed=0
+```
+
+##### Configure Caddyfile
+
+1. Run caddy.yml playbook
+
+```
+PLAY [*.meltanodata.com] *********************************************************************************************
+
+TASK [/etc/caddy/Caddyfile] ******************************************************************************************
+changed: [64.225.4.60]
+
+TASK [Restart caddy] *************************************************************************************************
+changed: [64.225.4.60]
+
+PLAY RECAP ***********************************************************************************************************
+64.225.4.60                : ok=2    changed=2    unreachable=0    failed=0
+```
+
+##### Verify changes were made
+
+1. SSH into droplet
+1. Verify `/etc/caddy/Caddyfile` looks like:
+
+```
+{$HOSTNAME}:80, {$HOSTNAME}:443
+
+# HTTP → HTTPS redirect
+redir 301 {
+  if {scheme} is http
+  /  https://{host}{uri}
+}
+
+basicauth /static/js meltano htpasswd=/etc/caddy/htpasswd
+
+# use a self-signed certificate if need be
+# tls self_signed
+
+# enable the Let's Encrypt certificate routine
+# warning: only do this if the DNS is propagated
+# or else you might blow the daily failure limit
+tls /etc/caddy/com.meltanodata.crt /etc/caddy/com.meltanodata.key
+
+proxy / localhost:5000 {
+  transparent
+}
+
+gzip
+```
+
+Then restart caddy using:
+
+```
+systemctl restart caddy
 ```
 
 ::: tip
 Navigate vim with arrow keys and press `I` key to enter Insert mode so you can modify the text
 :::
-
-2. Comment out `tls self_signed` by prepending it with a `#`
-
-```
-# tls self_signed
-```
-
-3. Uncomment `tls admin@meltano.com` by removing the `#` at the beginning of the line
-
-4. Save and exit file
 
 ::: tip
 To exit Insert mode, press the `Esc` key, type `:wq`, and press `Enter` to save and quit vim
@@ -335,7 +386,7 @@ If you see a state of `degraded`, that means something is wrong — use `systemc
 If the `caddy.service` is reported as failed, investigate if this is an issue with the [let's encrypt certificate](/handbook/engineering/meltanodata-guide/#debugging-tls-certificate)
 :::
 
-### Step 5: Configure Meltano
+### Step 5: Configure PostgreSQL Database
 
 #### Get credentials for database ready
 
@@ -355,19 +406,31 @@ Keep this tab open because you'll need to refer to it shortly.
 
 #### Setup the Meltano environment variables
 
-Because we manage the database instance for each tenant, using environment variables to configure `target-postgres` is the most simple and secure way of configuring the plugin.
+Because we manage the database instance for each tenant, we use environment variables to configure `target-postgres`as a simple and secure way of configuring the plugin.
 
-Create or edit the `/var/meltano/project/.env` file using the DigitalOcean database connection parameters:
+To do this, you need to:
+
+1. SSH into the droplet
+1. Change directory into `/var/meltano/project`
+1. If it doesn't exist already, create a new `.env` file and open it in a text editor
 
 ```bash
-PG_USERNAME=<username>
-PG_PASSWORD=<password>
-PG_ADDRESS=<host>
-PG_PORT=<port>
-PG_DATABASE=<database>
+vim .env
 ```
 
-Make sure the file is secure by running the following commands:
+4. Copy and paste the following template into the `.env` file
+
+```bash
+PG_USERNAME=doadmin # default DO credential
+PG_PASSWORD=<password>
+PG_ADDRESS=<host>
+PG_PORT=25060 # default DO port
+PG_DATABASE=defaultdb # default DO database name
+```
+
+5. Replace each field with the credentials from DigitalOcean
+
+1. Secure the file by running the following commands:
 
 ```bash
 # make the `meltano` user sole owner
@@ -375,108 +438,64 @@ chown meltano:meltano /var/meltano/project/.env
 
 # make the file only readable by `meltano`, and `write-only` for FTP access
 chmod 620 /var/meltano/project/.env
+```
 
-# restart meltano to reload the .env
+7. Reload the environment variables into Meltano by restarting the service
+
+```bash
 systemctl restart meltano
 ```
 
-#### Install PostgreSQL loader on Meltano UI
-
-1. Visit `$TENANT_NAME.meltanodata.com` in your browser
-1. Login with credentials you setup in 1Password for the username `meltano`
-1. Install `target-postgres` by updating the URL to `/pipeline/load/target-postgres`
-
-::: tip
-If the `/var/meltano/project/.env` is properly loaded, all the configuration should be correct.
-:::
-
-### Step 6: Make sure everything works!
-
-Now all you have to do is check to make sure that everything works as expected:
-
-1. Go back to the instance using your browser and check that we can see reports being generated in Analyze .
-1. Connect using an ftp client to the instance and make sure that the ftp username/password are correct and that you can see the meltano project.
-
-And we're good to go! 🎉
-
-## Debugging TLS Certificate
-
-If the `caddy.service` is not working, you'll get an error similar to the following during [Step 4: Restart Caddy](/handbook/engineering/meltanodata-guide/#restart-caddy):
-
-```bash
-# systemctl status
-
-● $TENANT_NAME
-    State: degraded
-     Jobs: 0 queued
-   Failed: 1 units
-    Since: Tue 2019-12-10 11:24:40 UTC; 35min ago
-   ... ... ...
-
-# systemctl --failed
-
-  UNIT          LOAD   ACTIVE SUB    DESCRIPTION
-● caddy.service loaded failed failed Caddy HTTP/2 web server
-
-LOAD   = Reflects whether the unit definition was properly loaded.
-ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
-SUB    = The low-level unit activation state, values depend on unit type.
-
-1 loaded units listed. Pass --all to see loaded but inactive units, too.
-To show all installed unit files use 'systemctl list-unit-files'.
-
-```
-
-The reason may be that we have hit the [rate limit of 50 Certificates per Registered Domain per week](https://letsencrypt.org/docs/rate-limits/) in let's encrypt.
-
-To investigate this, run caddy manually and check the output. If you get the following error, then the reason for the failure is that we have hit the 50 Certificates rate limit:
-
-```bash
-# systemctl stop caddy
-# env $(< /etc/caddy/environment) /usr/local/bin/caddy -conf /etc/caddy/Caddyfile
-Activating privacy features... 2019/12/10 12:03:47 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
-2019/12/10 12:03:48 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
-2019/12/10 12:03:49 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
-2019/12/10 12:03:50 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
-2019/12/10 12:03:51 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
-2019/12/10 12:03:52 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
-2019/12/10 12:03:53 failed to obtain certificate: acme: error: 429 :: POST :: https://acme-v02.api.letsencrypt.org/acme/new-order :: urn:ietf:params:acme:error:rateLimited :: Error creating new order :: too many certificates already issued for: meltanodata.com: see https://letsencrypt.org/docs/rate-limits/, url:
-```
-
-
-There are two options:
-- The call is in more than 2 days and you can wait
-- You have to setup the instance ASAP
-
-In the later case, the only option at the moment is to setup the instance with a self signed certificate.
-
-(1) Revert the update we do in /etc/caddy/Caddyfile back to tls self_signed
-
-(2) Add a :443 in the end of the /etc/caddy/environment
-
-```bash
-HOSTNAME=$TENANT_NAME.meltanodata.com:443
-```
-
-(3) Restart Caddy manually
-
-```bash
-systemctl stop caddy
-systemctl daemon-reload
-systemctl start caddy
-```
-
-And verify that this worked, by running the following command:
+8. Verify that the `meltano` service is working properly by checking:
 
 ```bash
 systemctl status
 ```
 
-You can now directly access the instance by adding the https:// in front of the domain the first time you access it:
+### Step 6: Validate Meltano UI
 
-https://{TENANT}.meltanodata.com/
+#### Ensure everything works
 
-You'll get a `Privacy Error: NET::ERR_CERT_AUTHORITY_INVALID`, but choose to `Proceed to $TENANT_NAME.meltanodata.com (unsafe)` (e.g. by first clicking on `Advanced` if you are using Chrome)
+1. Visit `$TENANT_NAME.meltanodata.com` in your browser
+1. Login with credentials you setup in 1Password for the username `meltano`
+1. Install `tap-carbon-intensity` extractor
+1. Install `target-postgres` loader
+   - You can also this by visiting `/pipeline/load/target-postgres`
+1. When the configuration model for `target-postgres` appears, you should see the correct variables already configured from your `.env` file
+1. Create a simple pipeline
+1. Verify Analyze page is pulling in data and generating charts correctly
+
+#### Remove tap-carbon-intensity
+
+To ensure clients are greeted with a fresh install, it's important to remove any tests we ran.
+
+1. SSH into droplet
+1. Change directory to `/var/meltano/project`
+1. Edit `meltano.yml` in text editor
+   - Delete `extractors` section
+   - Delete `models` section
+   - Delete `transforms` section
+   - Delete `schedule` section
+1. Change directory into `/var/meltano/project/.meltano`
+1. Delete the contents of the following folders:
+   - `.../.meltano/extractors`
+     - `tap-carbon-intensity`
+   - `.../.meltano/models`
+     - `model-carbon-intensity`
+     - `model-carbon-intensity-sqlite`
+   - `.../.meltano/run`
+     - `tap-carbon-intensity`
+     - `models/model-carbon-intensity`
+     - `models/model-carbon-intensity-sqlite`
+     - `models/topics.index.m5oc`
+
+### Step 7: Verify FTP Works
+
+1. Connect using an FTP client to the instance
+1. Make sure that the FTP username and password are correct
+1. Verify you can see the meltano project
+
+And with that, we're good to go! 🎉
 
 ## Maintaining an Existing Instance
 
@@ -604,6 +623,114 @@ This means that the permissions on the root directory you are trying to access n
 ```bash
 chmod g-w /var/meltano/project
 ```
+
+### DNS Spoofing Error
+
+If you get this error when you try to SSH into a droplet:
+
+```
+@       WARNING: POSSIBLE DNS SPOOFING DETECTED!          @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+The ECDSA host key for TENANT.meltanodata.com has changed,
+and the key for the corresponding IP address 12.345.6.78
+is unknown. This could either mean that
+DNS SPOOFING is happening or the IP address for the host
+and its host key have changed at the same time.
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+It is also possible that a host key has just been changed.
+The fingerprint for the ECDSA key sent by the remote host is
+SHA256:12345.
+Please contact your system administrator.
+Add correct host key in /Users/bencodezen/.ssh/known_hosts to get rid of this message.
+Offending ECDSA key in /Users/bencodezen/.ssh/known_hosts:34
+ECDSA host key for emilygitlab.meltanodata.com has changed and you have requested strict checking.
+Host key verification failed.
+```
+
+This means that you have an old entry in the `known_hosts` file. To fix this, simply open `/Users/$USERNAME/.ssh/known_hosts` in a text editor and delete the domain in question.
+
+### Caddy Service Failed Error
+
+If the `caddy.service` is not working, you'll get an error similar to the following during [Step 4: Restart Caddy](/handbook/engineering/meltanodata-guide/#restart-caddy):
+
+```bash
+# systemctl status
+
+● $TENANT_NAME
+    State: degraded
+     Jobs: 0 queued
+   Failed: 1 units
+    Since: Tue 2019-12-10 11:24:40 UTC; 35min ago
+   ... ... ...
+
+# systemctl --failed
+
+  UNIT          LOAD   ACTIVE SUB    DESCRIPTION
+● caddy.service loaded failed failed Caddy HTTP/2 web server
+
+LOAD   = Reflects whether the unit definition was properly loaded.
+ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
+SUB    = The low-level unit activation state, values depend on unit type.
+
+1 loaded units listed. Pass --all to see loaded but inactive units, too.
+To show all installed unit files use 'systemctl list-unit-files'.
+
+```
+
+The reason may be that we have hit the [rate limit of 50 Certificates per Registered Domain per week](https://letsencrypt.org/docs/rate-limits/) in let's encrypt.
+
+To investigate this, run caddy manually and check the output. If you get the following error, then the reason for the failure is that we have hit the 50 Certificates rate limit:
+
+```bash
+# systemctl stop caddy
+# env $(< /etc/caddy/environment) /usr/local/bin/caddy -conf /etc/caddy/Caddyfile
+Activating privacy features... 2019/12/10 12:03:47 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
+2019/12/10 12:03:48 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
+2019/12/10 12:03:49 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
+2019/12/10 12:03:50 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
+2019/12/10 12:03:51 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
+2019/12/10 12:03:52 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
+2019/12/10 12:03:53 failed to obtain certificate: acme: error: 429 :: POST :: https://acme-v02.api.letsencrypt.org/acme/new-order :: urn:ietf:params:acme:error:rateLimited :: Error creating new order :: too many certificates already issued for: meltanodata.com: see https://letsencrypt.org/docs/rate-limits/, url:
+```
+
+There are two options:
+
+- The call is in more than 2 days and you can wait
+- You have to setup the instance ASAP
+
+In the later case, the only option at the moment is to setup the instance with a self signed certificate.
+
+(1) Revert the update we do in /etc/caddy/Caddyfile back to tls self_signed
+
+(2) Add a :443 in the end of the /etc/caddy/environment
+
+```bash
+HOSTNAME=$TENANT_NAME.meltanodata.com:443
+```
+
+(3) Restart Caddy manually
+
+```bash
+systemctl stop caddy
+systemctl daemon-reload
+systemctl start caddy
+```
+
+And verify that this worked, by running the following command:
+
+```bash
+systemctl status
+```
+
+You can now directly access the instance by adding the https:// in front of the domain the first time you access it:
+
+https://{TENANT}.meltanodata.com/
+
+You'll get a `Privacy Error: NET::ERR_CERT_AUTHORITY_INVALID`, but choose to `Proceed to $TENANT_NAME.meltanodata.com (unsafe)` (e.g. by first clicking on `Advanced` if you are using Chrome)
 
 ## Deleting an instance
 
