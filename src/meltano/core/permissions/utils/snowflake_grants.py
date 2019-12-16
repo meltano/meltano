@@ -487,19 +487,6 @@ class SnowflakeGrantsGenerator:
                 f"Wrong grant_type {spec_path} provided to generate_schema_grants()"
             )
 
-        # Before assigning privileges to a schema, check if
-        #  usage to the database has been granted and
-        # if not grant usage first to the database
-        if name_parts[0] not in usage_granted["databases"]:
-            new_commands, usage_granted = self.generate_database_grants(
-                role=role,
-                database=name_parts[0],
-                grant_type="read",
-                usage_granted=usage_granted,
-                shared_dbs=shared_dbs,
-            )
-            sql_commands.extend(new_commands)
-
         # Generate the information_schema identifier for that database
         #  in order to be able to filter it out
         info_schema = f"{name_parts[0]}.information_schema"
@@ -613,20 +600,6 @@ class SnowflakeGrantsGenerator:
         # Generate the information_schema identifier for that database
         #  in order to be able to filter it out
         info_schema = f"{name_parts[0]}.information_schema"
-
-        # Before assigning privileges to a Table, check if
-        #  usage to the database has been granted and
-        # if not grant usage first to the database
-        # Schemas will be checked as we generate them
-        if name_parts[0] not in usage_granted["databases"]:
-            new_commands, usage_granted = self.generate_database_grants(
-                role=role,
-                database=name_parts[0],
-                grant_type="read",
-                usage_granted=usage_granted,
-                shared_dbs=shared_dbs,
-            )
-            sql_commands.extend(new_commands)
 
         # Gather the tables/views that privileges will be granted to
         tables = []
