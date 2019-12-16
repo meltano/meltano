@@ -210,8 +210,8 @@ For more informations about using `ssh`, take a look at https://www.digitalocean
 #### Run Ansible Playbooks
 
 1. Make sure ssh-agent is registered
-1. Log in the Controller Node
-1. Export DigialOcean token
+1. Log in to the Controller Node
+1. Export DigitalOcean token
 
 ```
 export DO_API_TOKEN=<access_token>
