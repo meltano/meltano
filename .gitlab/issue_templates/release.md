@@ -9,7 +9,7 @@
 - [ ] Follow [DigitalOcean publish process](https://about.gitlab.com/handbook/meltano/engineering/#digitalocean-marketplace)
 - [ ] If a non-patch release, record [Speedrun Video](https://about.gitlab.com/handbook/meltano/engineering/#speedruns):
   - [ ] Upload to Meltano YouTube channel using the [Meltano YouTube guidelines](https://about.gitlab.com/handbook/meltano/marketing/#youtube)
-  - [ ] Announce in Meltano Slack @channel in #announcements
+- [ ] Announce release in Meltano Slack @channel in #announcements
 
 ### Marketing
 
