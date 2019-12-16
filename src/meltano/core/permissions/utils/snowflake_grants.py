@@ -2,6 +2,7 @@ import logging
 
 from typing import Dict, List, Tuple, Set
 
+from meltano.core.permissions.utils.error import SpecLoadingError
 from meltano.core.permissions.utils.snowflake_connector import SnowflakeConnector
 
 
@@ -449,9 +450,11 @@ class SnowflakeGrantsGenerator:
                     )
                 ):
                     already_granted = True
+            elif grant_type == "revoke":
+                continue
             else:
                 raise SpecLoadingError(
-                    f"Wrong grant_type {spec_path} provided to generate_database_grants()"
+                    f"Wrong grant_type {grant_type} provided to generate_database_grants()"
                 )
 
             # If this is a shared database, we have to grant the "imported privileges"
