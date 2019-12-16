@@ -412,19 +412,13 @@ To do this, you need to:
 
 1. SSH into the droplet
 1. Change directory into `/var/meltano/project`
-1. If it doesn't exist already, create a new `.env` file
-
-```bash
-touch .env
-```
-
-4. Open the `.env` file in a text editor
+1. If it doesn't exist already, create a new `.env` file and open it in a text editor
 
 ```bash
 vim .env
 ```
 
-5. Copy and paste the following template into the `.env` file
+4. Copy and paste the following template into the `.env` file
 
 ```bash
 PG_USERNAME=<username>
@@ -434,7 +428,7 @@ PG_PORT=<port>
 PG_DATABASE=<database>
 ```
 
-6. Replace each field with the credentials from DigitalOcean
+5. Replace each field with the credentials from DigitalOcean
 
 1. Secure the file by running the following commands:
 
@@ -446,7 +440,7 @@ chown meltano:meltano /var/meltano/project/.env
 chmod 620 /var/meltano/project/.env
 ```
 
-8. Reload the environment variables into Meltano by restarting the service
+7. Reload the environment variables into Meltano by restarting the service
 
 ```bash
 systemctl restart meltano
