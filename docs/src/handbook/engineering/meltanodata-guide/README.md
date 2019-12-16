@@ -446,6 +446,12 @@ chmod 620 /var/meltano/project/.env
 systemctl restart meltano
 ```
 
+8. Verify that the `meltano` service is working properly by checking:
+
+```bash
+systemctl status
+```
+
 ### Step 6: Validate Meltano UI
 
 #### Ensure everything works
