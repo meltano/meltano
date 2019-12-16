@@ -4,17 +4,17 @@ import sqlalchemy
 
 from datetime import date, datetime
 from decimal import Decimal
-from flask import Blueprint, jsonify, request
-from flask_security import auth_required
+from flask import jsonify, request
 
 from .settings_helper import SettingsHelper
 from .sql_helper import SqlHelper, ConnectionNotFound, UnsupportedConnectionDialect
-from meltano.api.security import api_auth_required
+from meltano.api.api_blueprint import APIBlueprint
 from meltano.core.project import Project
 from meltano.core.sql.filter import FilterOptions
 from meltano.core.sql.base import ParseError, EmptyQuery
 
-sqlBP = Blueprint("sql", __name__, url_prefix="/api/v1/sql")
+
+sqlBP = APIBlueprint("sql", __name__)
 
 
 @sqlBP.errorhandler(ConnectionNotFound)
@@ -69,12 +69,6 @@ def default(obj):
     elif isinstance(obj, (datetime, date)):
         return obj.isoformat()
     raise TypeError(f"Object of type {type(obj).__name__} is not JSON serialize-able")
-
-
-@sqlBP.before_request
-@api_auth_required
-def before_request():
-    pass
 
 
 @sqlBP.route("/", methods=["GET"])

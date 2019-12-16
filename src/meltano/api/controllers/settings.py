@@ -1,21 +1,17 @@
-from flask import Blueprint, jsonify, request
+from flask import jsonify, request
 from flask_restful import Api, Resource, fields, marshal, marshal_with
 from flask_security import roles_required
 from flask_principal import Permission, Need
 from werkzeug.exceptions import Forbidden
 from sqlalchemy.orm import joinedload
-from meltano.api.security import api_auth_required, users
+from meltano.api.api_blueprint import APIBlueprint
+from meltano.api.security import users
 from meltano.api.models.security import db, User, Role, RolesUsers, RolePermissions
 from .settings_helper import SettingsHelper
 
-settingsBP = Blueprint("settings", __name__, url_prefix="/api/v1/settings")
+
+settingsBP = APIBlueprint("settings", __name__)
 settingsApi = Api(settingsBP)
-
-
-@settingsBP.before_request
-@api_auth_required
-def before_request():
-    pass
 
 
 @settingsBP.route("/", methods=["GET"])

@@ -4,12 +4,12 @@ from os.path import join
 from pathlib import Path
 
 import markdown
-from flask import Blueprint, jsonify, request
+from flask import jsonify, request
 
 from meltano.core.project import Project
 from meltano.core.utils import decode_file_path_from_id
 from meltano.core.compiler.project_compiler import ProjectCompiler
-from meltano.api.security import api_auth_required
+from meltano.api.api_blueprint import APIBlueprint
 from meltano.core.m5o.m5o_file_parser import (
     MeltanoAnalysisFileParser,
     MeltanoAnalysisMissingTopicFilesError,
@@ -25,7 +25,7 @@ from meltano.api.security.auth import permit
 from meltano.api.json import freeze_keys
 
 
-reposBP = Blueprint("repos", __name__, url_prefix="/api/v1/repos")
+reposBP = APIBlueprint("repos", __name__)
 
 
 class ReportIndexFilter(NameFilterMixin, ResourceFilter):
@@ -56,12 +56,6 @@ class M5ocFilter(ResourceFilter):
             for topic, topic_def in m5oc.items()
             if topic_def["designs"]
         }
-
-
-@reposBP.before_request
-@api_auth_required
-def before_request():
-    pass
 
 
 @reposBP.route("/", methods=["GET"])

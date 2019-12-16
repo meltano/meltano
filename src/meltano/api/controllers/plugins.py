@@ -1,4 +1,5 @@
 from itertools import groupby
+from flask import request, jsonify, g
 
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.error import PluginInstallError
@@ -11,10 +12,11 @@ from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin_install_service import PluginInstallService
+from meltano.api.security import api_auth_required
+from meltano.api.api_blueprint import APIBlueprint
 
-from flask import Blueprint, request, jsonify, g
 
-pluginsBP = Blueprint("plugins", __name__, url_prefix="/api/v1/plugins")
+pluginsBP = APIBlueprint("plugins", __name__)
 
 
 @pluginsBP.errorhandler(PluginInstallError)

@@ -34,14 +34,14 @@ SQLALCHEMY_DATABASE_URI = os.getenv("MELTANO_DATABASE_URI")
 # A better approach would be to have individual salts hashed resource
 SECURITY_PASSWORD_SALT = "b4c124932584ad6e69f2774a0ae5c138"
 SECURITY_PASSWORD_HASH = "bcrypt"
-SECURITY_REGISTERABLE = True
-SECURITY_CHANGEABLE = False
+SECURITY_REGISTERABLE = False
+SECURITY_CHANGEABLE = True
 SECURITY_RECOVERABLE = False
 SECURITY_CONFIRMABLE = False
 SECURITY_URL_PREFIX = "/auth"
 SECURITY_USER_IDENTITY_ATTRIBUTES = ("username", "email")
-
 SECURITY_SEND_REGISTER_EMAIL = False
+SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
 
 SECURITY_MSG_USERNAME_NOT_PROVIDED = ("You must provide a username.", "error")
 SECURITY_MSG_USERNAME_INVALID = (
@@ -54,6 +54,7 @@ SECURITY_MSG_USERNAME_ALREADY_TAKEN = ("This username is already taken.", "error
 # ------------------
 JWT_SECRET_KEY = SECRET_KEY
 JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(days=1)
+JWT_TOKEN_LOCATION = ("headers", "cookies")
 
 # Flask-Mail
 # -----------------
@@ -84,3 +85,4 @@ EXECUTOR_PROPAGATE_EXCEPTIONS = True
 # -----------------
 
 CORS_EXPOSE_HEADERS = ["X-Meltano-Version"]
+CORS_ALLOW_HEADERS = ["CONTENT-TYPE", "X-JSON-SCHEME"]

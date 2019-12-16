@@ -31,10 +31,14 @@ def key_convert(obj, converter):
     if isinstance(obj, dict) and not isinstance(obj, KeyFrozenDict):
         converted = {}
         for k, v in obj.items():
-            new_k = converter(k)
+            # if the key starts with `_`, ignore it
+            if k.startswith("_"):
+                new_k = k
+            else:
+                new_k = converter(k)
 
-            if new_k in converted:
-                raise ValueError(f"Naming scheme conversion conflict on `{new_k}`")
+                if new_k in converted:
+                    raise ValueError(f"Naming scheme conversion conflict on `{new_k}`")
 
             converted[new_k] = key_convert(v, converter)
 
@@ -57,10 +61,11 @@ class JSONSchemeDecoder(json.JSONDecoder):
         super().__init__(*args, **kwargs, object_hook=hooks)
 
     def hook(self, obj):
-        # transform to snakecase
-        obj = key_convert(obj, humps.decamelize)
-
-        return obj
+        # transform to snakecase if possible
+        try:
+            return key_convert(obj, humps.decamelize)
+        except ValueError:
+            return obj
 
 
 class JSONSchemeEncoder(json.JSONEncoder):
@@ -79,7 +84,8 @@ class JSONSchemeEncoder(json.JSONEncoder):
 
     def encode(self, obj):
         try:
-            scheme = request.headers.get("X-Json-Scheme")
+            scheme = request.headers.get("x-json-scheme")
+            print("*****", scheme)
             strategy = self.__class__.case_strategies[scheme]
             logging.debug(f"Using JSON Scheme: {scheme}")
             obj = key_convert(obj, strategy)
@@ -95,3 +101,7 @@ def setup_json(app):
 
     # flask-restful uses its own encoder
     app.config["RESTFUL_JSON"]["cls"] = app.json_encoder
+
+
+def jsonify():
+    return

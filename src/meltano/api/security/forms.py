@@ -20,7 +20,8 @@ class MeltanoLoginForm(LoginForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.next.data = "/auth/bootstrap"
+        # by default, go to `/auth/bootstrap`
+        self.next.data = self.next.data or "/auth/bootstrap"
 
 
 class UniqueUsernameMixin:

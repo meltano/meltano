@@ -1,7 +1,7 @@
 import asyncio
 import json
 import logging
-from flask import Blueprint, request, url_for, jsonify, make_response, Response
+from flask import request, url_for, jsonify, make_response, Response
 
 from meltano.core.job import JobFinder, State
 from meltano.core.behavior.canonical import Canonical
@@ -25,15 +25,13 @@ from meltano.core.schedule_service import (
 from meltano.core.utils import flatten, iso8601_datetime, slugify
 from meltano.core.logging import JobLoggingService, MissingJobLogException
 from meltano.cli.add import extractor
+from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.models import db
 from meltano.api.json import freeze_keys
-
 from meltano.api.executor import run_elt
 
 
-orchestrationsBP = Blueprint(
-    "orchestrations", __name__, url_prefix="/api/v1/orchestrations"
-)
+orchestrationsBP = APIBlueprint("orchestrations", __name__)
 
 
 @orchestrationsBP.errorhandler(ScheduleAlreadyExistsError)

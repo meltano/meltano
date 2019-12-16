@@ -8,11 +8,13 @@ from flask import (
     request,
     jsonify,
     redirect,
+    make_response,
     g,
     current_app,
     send_from_directory,
 )
-from flask_security import login_required, roles_required
+from flask_security import login_required, roles_required, logout_user
+from flask_jwt_extended import unset_jwt_cookies
 from jinja2 import TemplateNotFound
 
 import meltano
@@ -37,6 +39,19 @@ def dbt_docs(path):
     return send_from_directory(
         project.meltano_dir("transformers", "dbt", "target"), path
     )
+
+
+@root.route("/auth/destroy")
+def logout():
+    res = make_response(redirect("/auth/login"))
+
+    # destroy the session
+    logout_user()
+
+    # destroy the JWT cookies
+    unset_jwt_cookies(res)
+
+    return res
 
 
 # this route is a catch-all route to forward

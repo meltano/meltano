@@ -9,7 +9,10 @@ export class AuthMiddleware {
   }
 
   onRequest(req) {
-    req.headers.Authorization = `Bearer ${this.auth.authToken}`
+    if (req.url.startsWith(utils.apiRoot())) {
+      // enable the sending of cookies
+      req.withCredentials = true
+    }
 
     return req
   }
@@ -26,9 +29,6 @@ export class AuthMiddleware {
         break
       case 403:
         this.toasted.global.forbidden()
-        break
-      case 422:
-        window.location.href = utils.root('/auth/bootstrap')
         break
       default:
         break

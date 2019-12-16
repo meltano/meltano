@@ -1,12 +1,13 @@
 from datetime import timedelta
 from functools import wraps
-from flask import current_app, request, redirect, jsonify
+from flask import current_app, request, redirect, jsonify, make_response
 from flask_login import current_user
 from flask_security import Security, login_required
 from flask_security.utils import login_user
 from flask_jwt_extended import (
     JWTManager,
     create_access_token,
+    set_access_cookies,
     get_jwt_identity,
     verify_jwt_refresh_token_in_request,
 )
@@ -44,7 +45,9 @@ def setup_security(app, project):
     @jwt.user_loader_callback_loader
     def jwt_user_load(identity):
         user = users.find_user(id=identity["id"])
-        login_user(user)  # sets `flask_security` current_user
+
+        # this sets the current user and extends the session
+        login_user(user)
 
         return user
 
@@ -62,6 +65,19 @@ def setup_security(app, project):
         auth_identity = {"id": current_user.id, "username": current_user.username}
         access_token = create_access_token(identity=auth_identity)
 
-        return redirect(uri + f"?auth_token={access_token}")
+        # split the token into two separate tokens
+        # header.payload | signature
+        header, payload, signature = access_token.split(".")
+
+        # set the signature in a secure cookie
+        res = make_response(redirect(uri + f"?auth_token={header}.{payload}"))
+        set_access_cookies(res, access_token)
+
+        # res.set_cookie("jwt_signature",
+        #                value=signature,
+        #                secure=False, # True for production,
+        #                httponly=True)
+
+        return res
 
     app.register_blueprint(bp)

@@ -42,7 +42,7 @@ Vue.use(Auth, {
 })
 
 // Axios config
-axios.defaults.headers.common['X-JSON-SCHEME'] = 'camel'
+axios.defaults.headers.common['x-json-scheme'] = 'camel'
 
 // Flask context
 Vue.prototype.$flask = flaskContext()
