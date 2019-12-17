@@ -122,14 +122,15 @@ def setup(ctx, server_name, **flags):
     ui_file_path = project.root_dir("ui.cfg")
 
     if ui_file_path.exists():
-        logging.critical(f"Found secrets in file `{ui_file_path}`, please delete this file to regenerate the secrets.")
+        logging.critical(
+            f"Found secrets in file `{ui_file_path}`, please delete this file to regenerate the secrets."
+        )
         raise click.Abort()
 
     generate_secret = lambda: secrets.token_hex(int(flags["bits"] / 8))  # in bytes
 
     config = {
-        # "SERVER_NAME": server_name,
-        "SESSION_COOKIE_DOMAIN": server_name,
+        "SERVER_NAME": server_name,
         "SECRET_KEY": generate_secret(),
         "JWT_SECRET_KEY": generate_secret(),
         "SECURITY_PASSWORD_SALT": generate_secret(),
@@ -141,4 +142,4 @@ def setup(ctx, server_name, **flags):
     # Luckily the format is trivial to generate
     with ui_file_path.open("w") as f:
         for k, v in config.items():
-            f.write(f"{k} = \"{v}\"\n")
+            f.write(f'{k} = "{v}"\n')

@@ -100,14 +100,16 @@ class Production(object):
 
 def ensure_secure_setup(app):
     secure_variables = [
-                        # "SERVER_NAME",
-                        "SECRET_KEY",
-                        "JWT_SECRET_KEY",
-                        "SECURITY_PASSWORD_SALT",
-                        ]
+        "SERVER_NAME",
+        "SECRET_KEY",
+        "JWT_SECRET_KEY",
+        "SECURITY_PASSWORD_SALT",
+    ]
 
     # inferred configuration values
-    app.config["JWT_COOKIE_DOMAIN"] = app.config["SESSION_COOKIE_DOMAIN"] or app.config["SERVER_NAME"]
+    app.config["JWT_COOKIE_DOMAIN"] = (
+        app.config["SESSION_COOKIE_DOMAIN"] or app.config["SERVER_NAME"]
+    )
     app.config["JWT_COOKIE_SECURE"] = app.config["SESSION_COOKIE_SECURE"]
     app.config["JWT_COOKIE_HTTPONLY"] = app.config["SESSION_COOKIE_HTTPONLY"]
 
@@ -120,5 +122,7 @@ def ensure_secure_setup(app):
 
     if facts:
         facts_msg = "\n".join(facts)
-        logging.warning(f"The following variables are insecure and should be regenerated:\n{facts_msg}")
+        logging.warning(
+            f"The following variables are insecure and should be regenerated:\n{facts_msg}"
+        )
         logging.info(f"Use the `meltano ui setup` command to generate them.")

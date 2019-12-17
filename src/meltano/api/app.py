@@ -40,6 +40,7 @@ def create_app(config={}):
     app.config.update(**config)
 
     from meltano.api.config import ensure_secure_setup
+
     ensure_secure_setup(app)
 
     # register
@@ -82,11 +83,7 @@ def create_app(config={}):
     setup_json(app)
 
     # we need to setup CORS for development
-    CORS(
-        app,
-        origins="http://localhost:8080",
-        supports_credentials=True,
-    )
+    CORS(app, origins="http://localhost:8080", supports_credentials=True)
 
     # 2) Register the URL Converters
     from .url_converters import PluginRefConverter
