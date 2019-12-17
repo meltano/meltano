@@ -123,7 +123,7 @@ export default {
       'is-fullwidth': isFullWidth,
       'is-up': isUp
     }"
-    @click="onBubbleClose"
+    @click.stop="onBubbleClose"
   >
     <div class="dropdown-trigger">
       <button

@@ -27,6 +27,7 @@ export default {
     deleteDashboard() {
       // Todo
     },
+    editDashboard() {},
     goToDashboard(dashboard) {
       this.updateCurrentDashboard(dashboard).then(() => {
         this.$router.push({ name: 'dashboard', params: dashboard })
@@ -93,7 +94,9 @@ export default {
                   </td>
                   <td>
                     <div class="buttons is-right">
-                      <a class="button is-small">Edit</a>
+                      <a class="button is-small" @click.stop="editDashboard"
+                        >Edit</a
+                      >
                       <Dropdown
                         :button-classes="
                           `is-small is-danger is-outlined ${
