@@ -65,10 +65,7 @@ class JSONSchemeDecoder(json.JSONDecoder):
 
     def hook(self, obj):
         # transform to snakecase if possible
-        try:
-            return key_convert(obj, humps.decamelize)
-        except ValueError:
-            return obj
+        return key_convert(obj, humps.decamelize)
 
 
 class JSONSchemeEncoder(json.JSONEncoder):
