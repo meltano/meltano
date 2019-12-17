@@ -15,7 +15,8 @@ export default {
   },
   data() {
     return {
-      isCreateDashboardModalOpen: false
+      isCreateDashboardModalOpen: false,
+      dashboardInFocus: null
     }
   },
   computed: {
@@ -31,7 +32,8 @@ export default {
       'updateCurrentDashboard'
     ]),
     editDashboard(dashboard) {
-      console.log('edit', dashboard)
+      this.dashboardInFocus = dashboard
+      this.toggleCreateDashboardModal()
     },
     goToDashboard(dashboard) {
       this.updateCurrentDashboard(dashboard).then(() => {
@@ -181,6 +183,7 @@ export default {
 
       <CreateDashboardModal
         v-if="isCreateDashboardModalOpen"
+        :dashboard="dashboardInFocus"
         @close="toggleCreateDashboardModal"
       />
     </div>

@@ -36,5 +36,9 @@ export default {
 
   saveDashboard(data) {
     return axios.post(utils.apiUrl('dashboards/dashboard', 'save'), data)
+  },
+
+  updateDashboard(data) {
+    return axios.post(utils.apiUrl('dashboards/dashboard', 'update'), data)
   }
 }

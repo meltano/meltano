@@ -125,6 +125,12 @@ const actions = {
 
   updateCurrentDashboard({ commit }, dashboard) {
     commit('setCurrentDashboard', dashboard)
+  },
+
+  updateDashboard({ commit }, payload) {
+    return dashboardsApi.updateDashboard(payload).then(response => {
+      commit('setDashboard', response.data)
+    })
   }
 }
 
@@ -165,6 +171,12 @@ const mutations = {
 
   setCurrentDashboard(state, dashboard) {
     state.activeDashboard = dashboard
+  },
+
+  setDashboard(state, dashboard) {
+    const target = state.dashboards.find(item => item.id === dashboard.id)
+    const idx = state.dashboards.indexOf(target)
+    state.dashboards[idx] = dashboard
   },
 
   setDashboards(state, dashboards) {

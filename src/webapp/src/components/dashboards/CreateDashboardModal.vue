@@ -4,6 +4,10 @@ import Vue from 'vue'
 export default {
   name: 'CreateDashboardModal',
   props: {
+    dashboard: {
+      type: Object,
+      default: () => {}
+    },
     report: {
       type: Object,
       default: () => {}
@@ -15,7 +19,12 @@ export default {
     }
   },
   created() {
-    this.saveDashboardSettings.name = `dashboard-${new Date().getTime()}`
+    this.saveDashboardSettings.name = this.dashboard
+      ? this.dashboard.name
+      : `dashboard-${new Date().getTime()}`
+    this.saveDashboardSettings.description = this.dashboard
+      ? this.dashboard.description
+      : null
   },
   methods: {
     close() {
@@ -27,6 +36,11 @@ export default {
         action = this.$store.dispatch('dashboards/saveNewDashboardWithReport', {
           data: this.saveDashboardSettings,
           report: this.report
+        })
+      } else if (this.dashboard) {
+        action = this.$store.dispatch('dashboards/updateDashboard', {
+          dashboard: this.dashboard,
+          newSettings: this.saveDashboardSettings
         })
       } else {
         action = this.$store.dispatch(

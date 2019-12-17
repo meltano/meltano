@@ -101,6 +101,27 @@ class DashboardsHelper:
 
         return data
 
+    def update_dashboard(self, data):
+        project = Project.find()
+        dashboard = data["dashboard"]
+        slug = dashboard["slug"]
+        file_path = project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            new_settings = data["new_settings"]
+            new_name = new_settings["name"]
+            new_slug = slugify(new_name)
+            dashboard["slug"] = new_slug
+            dashboard["name"] = new_name
+            dashboard["description"] = new_settings["description"]
+            new_file_path = project.analyze_dir("dashboards", f"{new_slug}.dashboard.m5o")
+            with new_file_path.open("w") as f:
+                json.dump(dashboard, f)
+        else:
+            raise DashboardDoesNotExistError(data)
+
+        return dashboard
+
     def add_report_to_dashboard(self, data):
         project = Project.find()
         dashboard = self.get_dashboard(data["dashboard_id"])
