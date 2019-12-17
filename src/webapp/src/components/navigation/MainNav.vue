@@ -158,42 +158,6 @@ export default {
           </div>
         </div>
 
-        <router-link
-          :to="{ name: 'orchestration' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/orchestrate') }"
-          class="navbar-item navbar-child has-text-weight-semibold"
-        >
-          <a
-            class="button has-background-transparent is-borderless is-paddingless"
-            :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/orchestrate')
-            }"
-          >
-            <span class="icon is-small" :class="getIconColor('/orchestrate')">
-              <font-awesome-icon icon="project-diagram"></font-awesome-icon>
-            </span>
-            <span>Orchestrate</span>
-          </a>
-        </router-link>
-
-        <router-link
-          :to="{ name: 'model' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/model') }"
-          class="navbar-item navbar-child has-text-weight-semibold"
-        >
-          <a
-            class="button has-background-transparent is-borderless is-paddingless"
-            :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/model')
-            }"
-          >
-            <span class="icon is-small" :class="getIconColor('/model')">
-              <font-awesome-icon icon="file-alt"></font-awesome-icon>
-            </span>
-            <span>Model</span>
-          </a>
-        </router-link>
-
         <div class="navbar-item navbar-child has-dropdown is-hoverable">
           <a
             :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
@@ -277,24 +241,6 @@ export default {
             <span>Dashboard</span>
           </a>
         </router-link>
-
-        <a
-          class="navbar-item navbar-child has-text-weight-semibold"
-          target="_blank"
-          href="https://www.meltano.com/tutorials/using-jupyter-notebooks.html#using-jupyter-notebooks"
-        >
-          <a
-            class="button has-background-transparent is-borderless is-paddingless"
-            :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/notebook')
-            }"
-          >
-            <span class="icon is-small" :class="getIconColor('/notebook')">
-              <font-awesome-icon icon="book-open"></font-awesome-icon>
-            </span>
-            <span>Notebook</span>
-          </a>
-        </a>
       </div>
 
       <div class="navbar-end">
