@@ -27,4 +27,4 @@ class APIBlueprint(Blueprint):
 
     @api_auth_required
     def auth_filter():
-        logging.debug(f"Authentified as {current_user}")
+        logging.debug(f"Authenticated as {current_user}")
