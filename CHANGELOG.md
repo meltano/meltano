@@ -31,11 +31,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1269](https://gitlab.com/meltano/meltano/issues/1269) Add `kind: file` so single file uploads can be used with extractors (`tap-google-analytics`'s `key_file_location` is the first user)
 - [#1494](https://gitlab.com/meltano/meltano/issues/1494) Add `LIKE` options to Analyze Filter UI so users better understand what filtering patterns are available
+- [#1419](https://gitlab.com/meltano/meltano/issues/1419) Add ability to edit and delete dashboards
 
 ### Changes
 
 - [#1399](https://gitlab.com/meltano/meltano/issues/1399) Log Modal now has a prompt to explain potential factors in required time for pipelines to complete
 - [#1433](https://gitlab.com/meltano/meltano/issues/1433) Remove `/orchestrate` route and thus the Airflow iframe as this is overkill for our current target users
+
+- [#1473](https://gitlab.com/meltano/meltano/issues/1473) Update Release issue template to recent guidelines
+- [#1403](https://gitlab.com/meltano/meltano/issues/1403) Remove "Orchestrate", "Model", and "Notebook" from the main navigation until each respective UI is more useful (the `/orchestrate` and `/model` routes still exist)
+- [#1419](https://gitlab.com/meltano/meltano/issues/1419) Update Dashboards UI to align UX-wise with Pipelines UI via consistent layout and the same "list of items" with "Action" CTAs
 
 ### Fixes
 
