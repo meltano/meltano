@@ -13,46 +13,14 @@ export default {
   },
   data() {
     return {
-      isInitializing: false,
       isNewDashboardModalOpen: false
     }
   },
   computed: {
-<<<<<<< HEAD
-    ...mapState('dashboards', [
-      'activeDashboard',
-      'activeDashboardReports',
-      'dashboards',
-      'reports'
-    ]),
-    dashboardEmail() {
-      // eslint-disable-next-line
-      return `mailto:?subject=Dashboard: ${this.activeDashboard.name}&body=${window.location}`
-    },
-    isActive() {
-      return dashboard => dashboard.id === this.activeDashboard.id
-    }
-  },
-  watch: {
-    activeDashboard() {
-      this.isActiveDashboardLoading = true
-      this.getActiveDashboardReportsWithQueryResults().then(() => {
-        this.isActiveDashboardLoading = false
-      })
-    }
-  },
-  beforeDestroy() {
-    this.$store.dispatch('dashboards/resetActiveDashboard')
-    this.$store.dispatch('dashboards/resetActiveDashboardReports')
-=======
-    ...mapState('dashboards', ['dashboards'])
->>>>>>> further markup cleanup and properly ensure reports are using basic two-column grid with multiline until we implement a more robust resizing approach
+    ...mapState('dashboards', ['dashboards', 'isInitializing'])
   },
   created() {
-    this.isInitializing = true
-    this.initialize(this.$route.params.slug).then(() => {
-      this.isInitializing = false
-    })
+    this.initialize()
   },
   methods: {
     ...mapActions('dashboards', ['initialize', 'updateCurrentDashboard']),

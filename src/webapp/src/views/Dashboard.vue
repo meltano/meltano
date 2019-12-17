@@ -12,8 +12,7 @@ export default {
   },
   data() {
     return {
-      isActiveDashboardLoading: false,
-      isInitializing: false
+      isActiveDashboardLoading: false
     }
   },
   computed: {
@@ -21,6 +20,7 @@ export default {
       'activeDashboard',
       'activeDashboardReports',
       'dashboards',
+      'isInitializing',
       'reports'
     ]),
     isActive() {
@@ -40,10 +40,7 @@ export default {
     this.$store.dispatch('dashboards/resetActiveDashboardReports')
   },
   created() {
-    this.isInitializing = true
-    this.initialize(this.$route.params.slug).then(() => {
-      this.isInitializing = false
-    })
+    this.initialize(this.$route.params.slug)
   },
   methods: {
     ...mapActions('dashboards', [
@@ -113,6 +110,11 @@ export default {
             </div>
           </div>
         </div>
+
+        <progress
+          v-else-if="isInitializing || isActiveDashboardLoading"
+          class="progress is-small is-info"
+        ></progress>
 
         <div v-else class="columns">
           <div class="column">

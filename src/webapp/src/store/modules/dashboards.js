@@ -8,6 +8,7 @@ const defaultState = utils.deepFreeze({
   activeDashboard: {},
   activeDashboardReports: [],
   dashboards: [],
+  isInitializing: true,
   reports: []
 })
 
@@ -51,11 +52,15 @@ const actions = {
     })
   },
 
-  initialize({ dispatch }, slug) {
+  initialize({ commit, dispatch }, slug) {
+    commit('setIsInitialzing', true)
     const promiseGetReports = dispatch('getReports')
     const promiseGetDashboards = dispatch('getDashboards')
     return Promise.all([promiseGetReports, promiseGetDashboards]).then(() => {
-      dispatch('preloadDashboard', slug)
+      if (slug) {
+        dispatch('preloadDashboard', slug)
+      }
+      commit('setIsInitialzing', false)
     })
   },
 
@@ -145,6 +150,10 @@ const mutations = {
 
   setDashboards(state, dashboards) {
     state.dashboards = dashboards
+  },
+
+  setIsInitialzing(state, value) {
+    state.isInitializing = value
   },
 
   setReports(state, reports) {
