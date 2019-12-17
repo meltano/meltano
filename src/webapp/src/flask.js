@@ -8,7 +8,7 @@ module.exports = function() {
   return (
     window.FLASK || {
       airflowUrl: process.env.AIRFLOW_URL,
-      appUrl: process.env.MELTANO_WEBAPP_URL,
+      appUrl: process.env.MELTANO_API_URL,
       dbtDocsUrl: process.env.DBT_DOCS_URL,
       isSendAnonymousUsageStats: false,
       projectId: 'none',
