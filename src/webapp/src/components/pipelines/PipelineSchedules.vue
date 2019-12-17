@@ -90,15 +90,12 @@ export default {
 
     <div class="columns is-vcentered">
       <div class="column">
-        <h2 class="title is-5">Pipelines</h2>
-      </div>
-
-      <div class="column">
-        <div class="field is-pulled-right">
+        <h2 class="title is-inline-block">Pipelines</h2>
+        <div class="field is-pulled-right is-inline-block">
           <div class="control">
             <button
-              class="button is-interactive-primary"
-              @click="goToCreatePipeline()"
+              class="button is-medium is-interactive-primary"
+              @click="goToCreatePipeline"
             >
               <span>Create</span>
             </button>
