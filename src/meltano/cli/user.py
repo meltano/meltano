@@ -32,7 +32,7 @@ def add(ctx, username, password, role=[], **flags):
 
     try:
         with app.app_context():
-            # make sure our User doens't already exist
+            # make sure our User doesn't already exist
             if not flags["overwrite"] and users.get_user(username):
                 raise Exception(
                     f"User '{username}' already exists. Use --overwrite to update it."
