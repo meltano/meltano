@@ -123,6 +123,7 @@ def ensure_secure_setup(app):
     if facts:
         facts_msg = "\n".join(facts)
         logging.warning(
-            f"The following variables are insecure and should be regenerated:\n{facts_msg}"
+            "The following variables are insecure and should be regenerated:\n"
+            f"{facts_msg}\n\n"
+            "Use `meltano ui setup` command to generate new secrets."
         )
-        logging.info(f"Use the `meltano ui setup` command to generate them.")

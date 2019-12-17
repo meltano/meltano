@@ -34,14 +34,13 @@ def create_app(config={}):
 
     app.config.from_object("meltano.api.config")
     app.config.from_pyfile("ui.cfg", silent=True)
-    if app.env == "production":
-        app.config.from_object("meltano.api.config.Production")
-
     app.config.update(**config)
 
-    from meltano.api.config import ensure_secure_setup
+    if app.env == "production":
+        from meltano.api.config import ensure_secure_setup
 
-    ensure_secure_setup(app)
+        app.config.from_object("meltano.api.config.Production")
+        ensure_secure_setup(app)
 
     # register
     project_engine(
