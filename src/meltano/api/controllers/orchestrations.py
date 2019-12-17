@@ -382,7 +382,7 @@ def save_pipeline_schedule() -> Response:
 @orchestrationsBP.route("/pipeline_schedules", methods=["DELETE"])
 def delete_pipeline_schedule() -> Response:
     """
-    endpoint for deleting a pipeline schedule
+    Endpoint for deleting a pipeline schedule
     """
     incoming = request.get_json()
     name = incoming["name"]

@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 import lodash from 'lodash'
 
 import dashboardsApi from '../../api/dashboards'
@@ -17,6 +19,18 @@ const actions = {
     commit('addReportToDashboard', data)
     dashboardsApi.addReportToDashboard(data).then(response => {
       dispatch('updateCurrentDashboard', response.data)
+    })
+  },
+
+  deleteDashboard({ commit }, dashboard) {
+    let status = {
+      dashboard,
+      isDeleting: true
+    }
+    commit('setDashboardStatus', status)
+    return dashboardsApi.deleteDashboard(dashboard).then(() => {
+      commit('setDashboardStatus', Object.assign({ isDeleting: false }, status))
+      commit('deleteDashboard', dashboard)
     })
   },
 
@@ -126,6 +140,11 @@ const mutations = {
     state.dashboards.push(dashboard)
   },
 
+  deleteDashboard(state, dashboard) {
+    const idx = state.dashboards.indexOf(dashboard)
+    state.dashboards.splice(idx, 1)
+  },
+
   removeReportFromDashboard(state, idsPayload) {
     const targetDashboard = state.dashboards.find(
       dashboard => dashboard.id === idsPayload.dashboardId
@@ -150,6 +169,10 @@ const mutations = {
 
   setDashboards(state, dashboards) {
     state.dashboards = dashboards
+  },
+
+  setDashboardStatus(_, { dashboard, isDeleting = false }) {
+    Vue.set(dashboard, 'isDeleting', isDeleting)
   },
 
   setIsInitialzing(state, value) {

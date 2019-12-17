@@ -37,9 +37,23 @@ def get_dashboard(dashboard_id):
 
 @dashboardsBP.route("/dashboard/save", methods=["POST"])
 def save_dashboard():
+    """
+    Endpoint for saving a dashboard
+    """
     dashboards_helper = DashboardsHelper()
     post_data = request.get_json()
     response_data = dashboards_helper.save_dashboard(post_data)
+    return jsonify(response_data)
+
+
+@dashboardsBP.route("/dashboard/delete", methods=["DELETE"])
+def delete_dashboard():
+    """
+    Endpoint for deleting a dashboard
+    """
+    dashboards_helper = DashboardsHelper()
+    post_data = request.get_json()
+    response_data = dashboards_helper.delete_dashboard(post_data)
     return jsonify(response_data)
 
 

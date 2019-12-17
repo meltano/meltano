@@ -1,5 +1,7 @@
 <script>
+import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
+
 import Dropdown from '@/components/generic/Dropdown'
 import NewDashboardModal from '@/components/dashboards/NewDashboardModal'
 import RouterViewLayout from '@/views/RouterViewLayout'
@@ -23,15 +25,25 @@ export default {
     this.initialize()
   },
   methods: {
-    ...mapActions('dashboards', ['initialize', 'updateCurrentDashboard']),
-    deleteDashboard() {
-      // Todo
-    },
+    ...mapActions('dashboards', [
+      'deleteDashboard',
+      'initialize',
+      'updateCurrentDashboard'
+    ]),
     editDashboard() {},
     goToDashboard(dashboard) {
       this.updateCurrentDashboard(dashboard).then(() => {
         this.$router.push({ name: 'dashboard', params: dashboard })
       })
+    },
+    removeDashboard(dashboard) {
+      this.deleteDashboard(dashboard)
+        .then(() =>
+          Vue.toasted.global.success(
+            `Dashboard Successfully Removed - ${dashboard.name}`
+          )
+        )
+        .catch(error => Vue.toasted.global.error(error.response.data.code))
     },
     toggleNewDashboardModal() {
       this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen
@@ -94,16 +106,18 @@ export default {
                   </td>
                   <td>
                     <div class="buttons is-right">
-                      <a class="button is-small" @click.stop="editDashboard"
+                      <a
+                        class="button is-small"
+                        @click.stop="editDashboard(dashboard)"
                         >Edit</a
                       >
                       <Dropdown
                         :button-classes="
                           `is-small is-danger is-outlined ${
-                            false ? 'is-loading' : ''
+                            dashboard.isDeleting ? 'is-loading' : ''
                           }`
                         "
-                        :disabled="false"
+                        :disabled="dashboard.isDeleting"
                         :tooltip="{
                           classes: 'is-tooltip-left',
                           message: 'Delete this dashboard'
@@ -132,7 +146,7 @@ export default {
                               <button
                                 class="button is-danger"
                                 data-dropdown-auto-close
-                                @click="deleteDashboard(dashboard)"
+                                @click="removeDashboard(dashboard)"
                               >
                                 Delete
                               </button>

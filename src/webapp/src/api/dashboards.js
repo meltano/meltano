@@ -6,6 +6,12 @@ export default {
     return axios.post(utils.apiUrl('dashboards/dashboard/report', 'add'), data)
   },
 
+  deleteDashboard(dashboard) {
+    return axios.delete(utils.apiUrl('dashboards/dashboard', 'delete'), {
+      data: dashboard
+    })
+  },
+
   getActiveDashboardReportsWithQueryResults(activeReports) {
     return axios.post(
       utils.apiUrl('dashboards/dashboard', 'reports'),

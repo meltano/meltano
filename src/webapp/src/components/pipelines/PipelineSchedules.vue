@@ -43,7 +43,13 @@ export default {
   },
   methods: {
     ...mapActions('orchestration', ['deletePipelineSchedule']),
-    deletePipeline(pipeline) {
+    goToCreatePipeline() {
+      this.$router.push({ name: 'createSchedule' })
+    },
+    goToLog(jobId) {
+      this.$router.push({ name: 'runLog', params: { jobId } })
+    },
+    removePipeline(pipeline) {
       this.deletePipelineSchedule(pipeline)
         .then(() =>
           Vue.toasted.global.success(
@@ -51,12 +57,6 @@ export default {
           )
         )
         .catch(error => Vue.toasted.global.error(error.response.data.code))
-    },
-    goToCreatePipeline() {
-      this.$router.push({ name: 'createSchedule' })
-    },
-    goToLog(jobId) {
-      this.$router.push({ name: 'runLog', params: { jobId } })
     },
     runELT(pipeline) {
       this.$store.dispatch('orchestration/run', pipeline)
@@ -229,7 +229,7 @@ export default {
                           <button
                             class="button is-danger"
                             data-dropdown-auto-close
-                            @click="deletePipeline(pipeline)"
+                            @click="removePipeline(pipeline)"
                           >
                             Delete
                           </button>

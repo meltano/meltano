@@ -20,6 +20,13 @@ class DashboardAlreadyExistsError(Exception):
         self.dashboard = dashboard
 
 
+class DashboardDoesNotExistError(Exception):
+    """Occurs when a dashboard does not exist."""
+
+    def __init__(self, dashboard):
+        self.dashboard = dashboard
+
+
 class DashboardsHelper:
     VERSION = "1.0.0"
 
@@ -80,6 +87,17 @@ class DashboardsHelper:
 
         with file_path.open("w") as f:
             json.dump(data, f)
+
+        return data
+
+    def delete_dashboard(self, data):
+        project = Project.find()
+        slug = data["slug"]
+        file_path = project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        else:
+            raise DashboardDoesNotExistError(data)
 
         return data
 
