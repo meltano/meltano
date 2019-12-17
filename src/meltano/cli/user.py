@@ -56,5 +56,5 @@ def add(ctx, username, password, role=[], **flags):
             # for some reason the scoped_session doesn't trigger the commit
             users.db.session.commit()
     except Exception as err:
-        click.secho(f"Could not create user {username}: {err}", fg="red")
+        click.secho(f"Could not create user '{username}': {err}", fg="red")
         click.Abort()
