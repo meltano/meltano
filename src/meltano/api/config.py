@@ -1,7 +1,9 @@
 import os
+import logging
 import datetime
 
 from meltano.core.utils import truthy
+
 
 # Flask
 # -----------------
@@ -9,7 +11,7 @@ THREADS_PER_PAGE = 1
 PROFILE = truthy(os.getenv("FLASK_PROFILE"))
 
 ## Change this value in production
-SECRET_KEY = "483be43cf29204e24d85cf711e36ea978a4d0ab316d8ecd7ae1ce5ecff3e29c1"
+SECRET_KEY = "thisisnotapropersecretkey"
 
 # Meltano
 # -----------------
@@ -20,6 +22,9 @@ AIRFLOW_DISABLED = truthy(os.getenv("MELTANO_DISABLE_AIRFLOW"))
 API_ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 TEMP_FOLDER = os.path.join(API_ROOT_DIR, "static/tmp")
 PROJECT_ROOT_DIR = os.path.dirname(API_ROOT_DIR)
+
+JSON_SCHEME_HEADER = "X-JSON-SCHEME"
+VERSION_HEADER = "X-MELTANO-VERSION"
 
 # Flask-SQLAlchemy
 # -----------------
@@ -84,5 +89,36 @@ EXECUTOR_PROPAGATE_EXCEPTIONS = True
 # Flask-CORS
 # -----------------
 
-CORS_EXPOSE_HEADERS = ["X-Meltano-Version"]
-CORS_ALLOW_HEADERS = ["CONTENT-TYPE", "X-JSON-SCHEME"]
+CORS_EXPOSE_HEADERS = [VERSION_HEADER]
+CORS_ALLOW_HEADERS = ["CONTENT-TYPE", JSON_SCHEME_HEADER]
+
+
+class Production(object):
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+
+
+def ensure_secure_setup(app):
+    secure_variables = [
+                        # "SERVER_NAME",
+                        "SECRET_KEY",
+                        "JWT_SECRET_KEY",
+                        "SECURITY_PASSWORD_SALT",
+                        ]
+
+    # inferred configuration values
+    app.config["JWT_COOKIE_DOMAIN"] = app.config["SESSION_COOKIE_DOMAIN"] or app.config["SERVER_NAME"]
+    app.config["JWT_COOKIE_SECURE"] = app.config["SESSION_COOKIE_SECURE"]
+    app.config["JWT_COOKIE_HTTPONLY"] = app.config["SESSION_COOKIE_HTTPONLY"]
+
+    facts = []
+    for var in secure_variables:
+        if app.config[var] is None:
+            facts.append(f"\t- '{var}': variable is unset.")
+        elif app.config[var] == globals().get(var):
+            facts.append(f"\t- '{var}': variable has test value.")
+
+    if facts:
+        facts_msg = "\n".join(facts)
+        logging.warning(f"The following variables are insecure and should be regenerated:\n{facts_msg}")
+        logging.info(f"Use the `meltano ui setup` command to generate them.")

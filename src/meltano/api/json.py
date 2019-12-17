@@ -2,7 +2,7 @@ import logging
 import humps
 from enum import Enum
 from collections.abc import Mapping, Iterable
-from flask import request, json
+from flask import request, json, current_app
 
 from meltano.core.utils import compose
 
@@ -31,7 +31,10 @@ def key_convert(obj, converter):
     if isinstance(obj, dict) and not isinstance(obj, KeyFrozenDict):
         converted = {}
         for k, v in obj.items():
-            # if the key starts with `_`, ignore it
+            # treat a key that starts with `_` as frozen
+            # this will prevent internal tokens, such as
+            # a JWT to be decoded with humps using this
+            # decoder and failing to be parsed
             if k.startswith("_"):
                 new_k = k
             else:
@@ -83,9 +86,10 @@ class JSONSchemeEncoder(json.JSONEncoder):
     }
 
     def encode(self, obj):
+        header = current_app.config["JSON_SCHEME_HEADER"]
+
         try:
-            scheme = request.headers.get("x-json-scheme")
-            print("*****", scheme)
+            scheme = request.headers.get(header)
             strategy = self.__class__.case_strategies[scheme]
             logging.debug(f"Using JSON Scheme: {scheme}")
             obj = key_convert(obj, strategy)
@@ -101,7 +105,3 @@ def setup_json(app):
 
     # flask-restful uses its own encoder
     app.config["RESTFUL_JSON"]["cls"] = app.json_encoder
-
-
-def jsonify():
-    return

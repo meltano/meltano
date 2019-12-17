@@ -1,5 +1,6 @@
 import pytest
 from flask import json
+from meltano.api.json import JSON_SCHEME_HEADER
 import json as _json
 
 
@@ -49,7 +50,7 @@ class TestJSON:
         ],
     )
     def test_json_scheme_encoder(self, app, scheme, payload, expected):
-        with app.test_request_context(headers={"X-Json-Scheme": scheme}):
+        with app.test_request_context(headers={JSON_SCHEME_HEADER: scheme}):
             encoded = json.dumps(payload)
 
             # load with a Vanilla decoder

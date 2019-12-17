@@ -1,3 +1,4 @@
+import urllib.parse
 from datetime import timedelta
 from functools import wraps
 from flask import current_app, request, redirect, jsonify, make_response
@@ -57,26 +58,37 @@ def setup_security(app, project):
     @login_required
     def bootstrap_app():
         """Fire off the application with the current user logged in"""
-        uri = app.config["MELTANO_UI_URL"]
+        uri = urllib.parse.urlparse(app.config["MELTANO_UI_URL"])
 
         if not app.config["MELTANO_AUTHENTICATION"]:
-            return redirect(uri)
+            return redirect(urllib.parse.urlunparse(uri))
 
         auth_identity = {"id": current_user.id, "username": current_user.username}
         access_token = create_access_token(identity=auth_identity)
 
-        # split the token into two separate tokens
-        # header.payload | signature
+        # Split the token into its parts (header, payload, signature)
+        # this enable us to send the public portion of the token
+        # (header.payload) to the frontend without fearing a XSS
+        # attacks: the token lacks the signature and therefore cannot
+        # be used for authentication.
+        #
+        # However, it is still possible on the front-end to use its
+        # payload to adapt the UI according to the capabilities found
+        # inside the token.
+        #
+        # Even if the token would be tampered with, thus enabling more
+        # features, these would only be cosmetic and the backend would
+        # not authorize such actions.
         header, payload, signature = access_token.split(".")
 
-        # set the signature in a secure cookie
-        res = make_response(redirect(uri + f"?auth_token={header}.{payload}"))
-        set_access_cookies(res, access_token)
+        # add the `auth_token` parameter
+        params = urllib.parse.parse_qs(uri.query)
+        params["auth_token"] = f"{header}.{payload}"
+        uri._replace(query=urllib.parse.urlencode(params, doseq=True))
+        res = make_response(redirect(urllib.parse.urlunparse(uri)))
 
-        # res.set_cookie("jwt_signature",
-        #                value=signature,
-        #                secure=False, # True for production,
-        #                httponly=True)
+        # set the signature in a secure cookie
+        set_access_cookies(res, access_token)
 
         return res
 

@@ -6,7 +6,6 @@ import atexit
 from flask import Flask, request, g
 from flask_login import current_user
 from flask_cors import CORS
-from importlib import reload
 from urllib.parse import urlsplit
 
 import meltano
@@ -35,7 +34,13 @@ def create_app(config={}):
 
     app.config.from_object("meltano.api.config")
     app.config.from_pyfile("ui.cfg", silent=True)
+    if app.env == "production":
+        app.config.from_object("meltano.api.config.Production")
+
     app.config.update(**config)
+
+    from meltano.api.config import ensure_secure_setup
+    ensure_secure_setup(app)
 
     # register
     project_engine(
@@ -75,9 +80,11 @@ def create_app(config={}):
     setup_security(app, project)
     setup_oauth(app)
     setup_json(app)
+
+    # we need to setup CORS for development
     CORS(
         app,
-        origins=("http://localhost:8080", "https://*.meltanodata.com"),
+        origins="http://localhost:8080",
         supports_credentials=True,
     )
 
