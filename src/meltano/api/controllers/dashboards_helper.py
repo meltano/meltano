@@ -114,7 +114,9 @@ class DashboardsHelper:
             dashboard["slug"] = new_slug
             dashboard["name"] = new_name
             dashboard["description"] = new_settings["description"]
-            new_file_path = project.analyze_dir("dashboards", f"{new_slug}.dashboard.m5o")
+            new_file_path = project.analyze_dir(
+                "dashboards", f"{new_slug}.dashboard.m5o"
+            )
             with new_file_path.open("w") as f:
                 json.dump(dashboard, f)
         else:

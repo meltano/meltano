@@ -1,6 +1,9 @@
 from flask import jsonify, request
-
-from .dashboards_helper import DashboardAlreadyExistsError, DashboardDoesNotExistError, DashboardsHelper
+from .dashboards_helper import (
+    DashboardAlreadyExistsError,
+    DashboardDoesNotExistError,
+    DashboardsHelper,
+)
 from meltano.api.api_blueprint import APIBlueprint
 
 
@@ -26,10 +29,7 @@ def _handle(ex):
     dashboard_name = ex.dashboard["name"]
     return (
         jsonify(
-            {
-                "error": True,
-                "code": f"The dashboard '{dashboard_name}' does not exist.",
-            }
+            {"error": True, "code": f"The dashboard '{dashboard_name}' does not exist."}
         ),
         404,
     )
