@@ -6,7 +6,7 @@ import Vue from 'vue'
 import capitalize from '@/filters/capitalize'
 import Chart from '@/components/analyze/Chart'
 import Dropdown from '@/components/generic/Dropdown'
-import NewDashboardModal from '@/components/dashboards/NewDashboardModal'
+import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
 import QueryFilters from '@/components/analyze/QueryFilters'
 import ResultTable from '@/components/analyze/ResultTable'
 import utils from '@/utils/utils'
@@ -19,14 +19,14 @@ export default {
   components: {
     Chart,
     Dropdown,
-    NewDashboardModal,
+    CreateDashboardModal,
     QueryFilters,
     ResultTable
   },
   data() {
     return {
       isInitialized: false,
-      isNewDashboardModalOpen: false
+      isCreateDashboardModalOpen: false
     }
   },
   computed: {
@@ -306,8 +306,8 @@ export default {
         })
     },
 
-    toggleNewDashboardModal() {
-      this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen
+    toggleCreateDashboardModal() {
+      this.isCreateDashboardModalOpen = !this.isCreateDashboardModalOpen
     },
 
     updateReport() {
@@ -350,9 +350,9 @@ export default {
                   data-test-id="button-new-dashboard"
                   class="dropdown-item"
                   data-dropdown-auto-close
-                  @click="toggleNewDashboardModal()"
+                  @click="toggleCreateDashboardModal()"
                 >
-                  New Dashboard
+                  Create Dashboard
                 </a>
 
                 <template v-if="dashboards.length">
@@ -1002,13 +1002,13 @@ export default {
             <ResultTable></ResultTable>
           </div>
 
-          <!-- New Dashboard Modal -->
-          <NewDashboardModal
-            v-if="isNewDashboardModalOpen"
+          <!-- Create Dashboard Modal -->
+          <CreateDashboardModal
+            v-if="isCreateDashboardModalOpen"
             :report="activeReport"
-            @close="toggleNewDashboardModal"
+            @close="toggleCreateDashboardModal"
           >
-          </NewDashboardModal>
+          </CreateDashboardModal>
         </div>
       </div>
     </div>

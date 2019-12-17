@@ -3,19 +3,19 @@ import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
 
 import Dropdown from '@/components/generic/Dropdown'
-import NewDashboardModal from '@/components/dashboards/NewDashboardModal'
+import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
   name: 'Dashboards',
   components: {
     Dropdown,
-    NewDashboardModal,
+    CreateDashboardModal,
     RouterViewLayout
   },
   data() {
     return {
-      isNewDashboardModalOpen: false
+      isCreateDashboardModalOpen: false
     }
   },
   computed: {
@@ -30,7 +30,9 @@ export default {
       'initialize',
       'updateCurrentDashboard'
     ]),
-    editDashboard() {},
+    editDashboard(dashboard) {
+      console.log('edit', dashboard)
+    },
     goToDashboard(dashboard) {
       this.updateCurrentDashboard(dashboard).then(() => {
         this.$router.push({ name: 'dashboard', params: dashboard })
@@ -45,8 +47,8 @@ export default {
         )
         .catch(error => Vue.toasted.global.error(error.response.data.code))
     },
-    toggleNewDashboardModal() {
-      this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen
+    toggleCreateDashboardModal() {
+      this.isCreateDashboardModalOpen = !this.isCreateDashboardModalOpen
     }
   }
 }
@@ -63,7 +65,7 @@ export default {
               <div class="control">
                 <button
                   class="button is-medium is-interactive-primary"
-                  @click="toggleNewDashboardModal"
+                  @click="toggleCreateDashboardModal"
                 >
                   <span>Create</span>
                 </button>
@@ -106,6 +108,11 @@ export default {
                   </td>
                   <td>
                     <div class="buttons is-right">
+                      <a
+                        class="button is-small is-interactive-primary is-outlined"
+                        @click.stop="goToDashboard(dashboard)"
+                        >View</a
+                      >
                       <a
                         class="button is-small"
                         @click.stop="editDashboard(dashboard)"
@@ -172,9 +179,9 @@ export default {
         </div>
       </section>
 
-      <NewDashboardModal
-        v-if="isNewDashboardModalOpen"
-        @close="toggleNewDashboardModal"
+      <CreateDashboardModal
+        v-if="isCreateDashboardModalOpen"
+        @close="toggleCreateDashboardModal"
       />
     </div>
   </router-view-layout>
