@@ -31,14 +31,21 @@ export default {
       'initialize',
       'updateCurrentDashboard'
     ]),
+    closeCreateDashboardModal() {
+      this.isCreateDashboardModalOpen = false
+      this.dashboardInFocus = null
+    },
     editDashboard(dashboard) {
       this.dashboardInFocus = dashboard
-      this.toggleCreateDashboardModal()
+      this.openCreateDashboardModal()
     },
     goToDashboard(dashboard) {
       this.updateCurrentDashboard(dashboard).then(() => {
         this.$router.push({ name: 'dashboard', params: dashboard })
       })
+    },
+    openCreateDashboardModal() {
+      this.isCreateDashboardModalOpen = open
     },
     removeDashboard(dashboard) {
       this.deleteDashboard(dashboard)
@@ -48,9 +55,6 @@ export default {
           )
         )
         .catch(error => Vue.toasted.global.error(error.response.data.code))
-    },
-    toggleCreateDashboardModal() {
-      this.isCreateDashboardModalOpen = !this.isCreateDashboardModalOpen
     }
   }
 }
@@ -67,7 +71,7 @@ export default {
               <div class="control">
                 <button
                   class="button is-medium is-interactive-primary"
-                  @click="toggleCreateDashboardModal"
+                  @click="openCreateDashboardModal"
                 >
                   <span>Create</span>
                 </button>
@@ -184,7 +188,7 @@ export default {
       <CreateDashboardModal
         v-if="isCreateDashboardModalOpen"
         :dashboard="dashboardInFocus"
-        @close="toggleCreateDashboardModal"
+        @close="closeCreateDashboardModal"
       />
     </div>
   </router-view-layout>
