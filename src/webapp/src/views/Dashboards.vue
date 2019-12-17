@@ -1,6 +1,5 @@
 <script>
 import { mapActions, mapState } from 'vuex'
-import Chart from '@/components/analyze/Chart'
 import Dropdown from '@/components/generic/Dropdown'
 import NewDashboardModal from '@/components/dashboards/NewDashboardModal'
 import RouterViewLayout from '@/views/RouterViewLayout'
@@ -8,7 +7,6 @@ import RouterViewLayout from '@/views/RouterViewLayout'
 export default {
   name: 'Dashboards',
   components: {
-    Chart,
     Dropdown,
     NewDashboardModal,
     RouterViewLayout
@@ -58,7 +56,7 @@ export default {
   },
   methods: {
     ...mapActions('dashboards', ['initialize', 'updateCurrentDashboard']),
-    deleteDashboard(dashboard) {
+    deleteDashboard() {
       // Todo
     },
     goToDashboard(dashboard) {
