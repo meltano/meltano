@@ -18,8 +18,8 @@ This will be the single source of truth for team members when it comes to creati
 ::: info
 **DigitalOcean limits**
 
-Our DigitalOcean account is currently limited to 500 droplets and 50 database clusters.
-Since each Meltano instance requires one droplet and one cluster, our effective instance limit is 50.
+Our DigitalOcean account is currently limited to 500 droplets and 100 database clusters.
+Since each Meltano instance requires one droplet and one cluster, our effective instance limit is 100.
 
 When we get close to hitting either of these limits, we can get them increased by sending an email to one of our contacts at DigitalOcean.
 :::
