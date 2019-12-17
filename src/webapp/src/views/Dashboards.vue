@@ -15,12 +15,12 @@ export default {
   },
   data() {
     return {
-      isActiveDashboardLoading: false,
       isInitializing: false,
       isNewDashboardModalOpen: false
     }
   },
   computed: {
+<<<<<<< HEAD
     ...mapState('dashboards', [
       'activeDashboard',
       'activeDashboardReports',
@@ -46,6 +46,9 @@ export default {
   beforeDestroy() {
     this.$store.dispatch('dashboards/resetActiveDashboard')
     this.$store.dispatch('dashboards/resetActiveDashboardReports')
+=======
+    ...mapState('dashboards', ['dashboards'])
+>>>>>>> further markup cleanup and properly ensure reports are using basic two-column grid with multiline until we implement a more robust resizing approach
   },
   created() {
     this.isInitializing = true
@@ -54,29 +57,14 @@ export default {
     })
   },
   methods: {
-    ...mapActions('dashboards', [
-      'initialize',
-      'updateCurrentDashboard',
-      'getActiveDashboardReportsWithQueryResults'
-    ]),
+    ...mapActions('dashboards', ['initialize', 'updateCurrentDashboard']),
     deleteDashboard(dashboard) {
-      console.log('delete', dashboard)
+      // Todo
     },
     goToDashboard(dashboard) {
       this.updateCurrentDashboard(dashboard).then(() => {
         this.$router.push({ name: 'dashboard', params: dashboard })
       })
-    },
-    goToDesign(report) {
-      const params = {
-        design: report.design,
-        model: report.model,
-        namespace: report.namespace
-      }
-      this.$router.push({ name: 'analyzeDesign', params })
-    },
-    goToReport(report) {
-      this.$router.push({ name: 'report', params: report })
     },
     toggleNewDashboardModal() {
       this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen
@@ -111,21 +99,9 @@ export default {
               <tr>
                 <th>
                   <span>Name</span>
-                  <span
-                    class="icon has-text-grey-light tooltip is-tooltip-multiline is-tooltip-right"
-                    data-tooltip="The unique identifier for an ELT pipeline schedule and its settings."
-                  >
-                    <font-awesome-icon icon="info-circle"></font-awesome-icon>
-                  </span>
                 </th>
                 <th>
                   <span>Description</span>
-                  <span
-                    class="icon has-text-grey-light tooltip is-tooltip-multiline is-tooltip-bottom"
-                    data-tooltip="The connector for data extraction within a scheduled ELT pipeline."
-                  >
-                    <font-awesome-icon icon="info-circle"></font-awesome-icon>
-                  </span>
                 </th>
                 <th class="has-text-right">
                   <span>Actions</span>
@@ -137,14 +113,17 @@ export default {
                 <tr
                   :key="dashboard.id"
                   data-test-id="dashboard-link"
-                  :class="{ 'is-active': isActive(dashboard) }"
+                  class="has-cursor-pointer"
                   @click="goToDashboard(dashboard)"
                 >
                   <td>
                     <p>{{ dashboard.name }}</p>
                   </td>
                   <td>
-                    <p>{{ dashboard.description }}</p>
+                    <p v-if="dashboard.description">
+                      {{ dashboard.description }}
+                    </p>
+                    <p v-else class="is-italic has-text-grey">None</p>
                   </td>
                   <td>
                     <div class="buttons is-right">
