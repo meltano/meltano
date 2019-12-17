@@ -4,14 +4,23 @@
   {%- block html %}
   <head>
     {%- block head %}
-    <title>{% block title %}{{ title|default }}{% endblock title %}</title>
-
+      <title>
+        {% block title %}
+	Meltano - Login
+        {% endblock title %}
+      </title>
       {%- block metas %}
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       {%- endblock metas %}
 
       {%- block styles %}
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+      <style>
+	html {
+	    height: 100vh;
+	    background-color: whitesmoke;
+	}
+      </style>
       {%- endblock styles %}
     {%- endblock head %}
   </head>
@@ -21,7 +30,7 @@
       {%- endblock navbar %}
       <div class="columns is-centered is-vcentered">
         <div class="column is-one-third">
-          <figure style="margin: 1rem 2rem;" class="image">
+          <figure style="margin: 2rem;" class="image">
             <img src="/static/logos/meltano-logo.png">
           </figure>
           <div class="box">
