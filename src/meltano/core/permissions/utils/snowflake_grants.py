@@ -184,7 +184,7 @@ class SnowflakeGrantsGenerator:
 
         databases = {
             "read": config.get("privileges", {}).get("databases", {}).get("read", []),
-            "write": config.get("privileges", {}).get("databases", {}).get("write", [])
+            "write": config.get("privileges", {}).get("databases", {}).get("write", []),
         }
 
         if len(databases.get("read")) == 0:
@@ -202,9 +202,7 @@ class SnowflakeGrantsGenerator:
             )
 
         database_commands = self.generate_database_grants(
-            role=role,
-            databases=databases,
-            shared_dbs=shared_dbs,
+            role=role, databases=databases, shared_dbs=shared_dbs
         )
         sql_commands.extend(database_commands)
 
@@ -363,10 +361,7 @@ class SnowflakeGrantsGenerator:
         return sql_commands
 
     def generate_database_grants(
-        self,
-        role: str,
-        databases: Dict,
-        shared_dbs: Set,
+        self, role: str, databases: Dict, shared_dbs: Set
     ) -> List[str]:
         """
         Generate the GRANT and REVOKE statements for Databases
@@ -389,8 +384,8 @@ class SnowflakeGrantsGenerator:
         for database in databases.get("read", []):
             already_granted = False
             if self.check_grant_to_role(role, "usage", "database", database):
-                    already_granted = True
-            
+                already_granted = True
+
             # If this is a shared database, we have to grant the "imported privileges"
             #  privilege to the user and skip granting the specific permissions as
             #  "Granting individual privileges on imported databases is not allowed."
@@ -423,14 +418,14 @@ class SnowflakeGrantsGenerator:
         for database in databases.get("write", []):
             already_granted = False
             if (
-                    self.check_grant_to_role(role, "usage", "database", database)
-                    and self.check_grant_to_role(role, "monitor", "database", database)
-                    and self.check_grant_to_role(
-                        role, "create schema", "database", database
-                    )
-                ):
-                    already_granted = True
-            
+                self.check_grant_to_role(role, "usage", "database", database)
+                and self.check_grant_to_role(role, "monitor", "database", database)
+                and self.check_grant_to_role(
+                    role, "create schema", "database", database
+                )
+            ):
+                already_granted = True
+
             # If this is a shared database, we have to grant the "imported privileges"
             #  privilege to the user and skip granting the specific permissions as
             #  "Granting individual privileges on imported databases is not allowed."
