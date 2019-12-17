@@ -90,6 +90,9 @@ export default {
                 <th>
                   <span>Description</span>
                 </th>
+                <th>
+                  <span>Report Count</span>
+                </th>
                 <th class="has-text-right">
                   <span>Actions</span>
                 </th>
@@ -111,6 +114,9 @@ export default {
                       {{ dashboard.description }}
                     </p>
                     <p v-else class="is-italic has-text-grey">None</p>
+                  </td>
+                  <td>
+                    <p>{{ dashboard.reportIds.length }}</p>
                   </td>
                   <td>
                     <div class="buttons is-right">
