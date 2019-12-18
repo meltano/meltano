@@ -1,6 +1,6 @@
 import Router from 'vue-router'
 
-import CreateScheduleModal from '@/components/pipelines/CreateScheduleModal'
+import CreatePipelineScheduleModal from '@/components/pipelines/CreatePipelineScheduleModal'
 import Design from '@/components/analyze/Design'
 import Extractors from '@/components/pipelines/Extractors'
 import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModal'
@@ -96,10 +96,10 @@ const router = new Router({
         },
         {
           path: 'schedule/create',
-          name: 'createSchedule',
+          name: 'createPipelineSchedule',
           components: {
             default: PipelineSchedules,
-            createSchedule: CreateScheduleModal
+            createPipelineSchedule: CreatePipelineScheduleModal
           },
           meta: {
             isModal: true,

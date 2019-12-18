@@ -23,7 +23,7 @@ export default {
         },
         {
           name: 'schedules',
-          routeMatches: ['schedules', 'createSchedule', 'runLog']
+          routeMatches: ['schedules', 'createPipelineSchedule', 'runLog']
         }
       ]
     }

@@ -44,7 +44,7 @@ export default {
   methods: {
     ...mapActions('orchestration', ['deletePipelineSchedule']),
     goToCreatePipeline() {
-      this.$router.push({ name: 'createSchedule' })
+      this.$router.push({ name: 'createPipelineSchedule' })
     },
     goToLog(jobId) {
       this.$router.push({ name: 'runLog', params: { jobId } })
