@@ -1,6 +1,6 @@
 from os import SEEK_END
 from os.path import join
-
+from pathlib import Path
 from werkzeug.utils import secure_filename
 
 from meltano.core.project import Project
@@ -35,17 +35,18 @@ class InvalidFileSizeError(Exception):
 class UploadHelper:
     def upload_file(self, directory, file):
 
-        if not self.is_valid_name(file):
-            raise InvalidFileNameError(file)
-
         if not self.is_valid_type(file):
             raise InvalidFileTypeError(file)
 
-        if not self.is_valid_size(file):
-            raise InvalidFileSizeError(file)
+        if not self.is_valid_name(file):
+            raise InvalidFileNameError(file)
 
         filename = secure_filename(file.filename)
         full_path = join(directory, filename)
+
+        if not self.is_valid_size(full_path):
+            raise InvalidFileSizeError(file)
+
         file.save(full_path)
 
         project = Project.find()
@@ -57,8 +58,6 @@ class UploadHelper:
     def is_valid_type(self, file):
         return file.filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
-    def is_valid_size(self, file):
-        file.seek(0, SEEK_END)
-        file_length = file.tell()
-        file.seek(0)
-        return file_length > 0 and file_length <= MAX_FILE_SIZE
+    def is_valid_size(self, file_path):
+        file_size = Path(file_path).stat().st_size
+        return file_size > 0 and file_size <= MAX_FILE_SIZE
