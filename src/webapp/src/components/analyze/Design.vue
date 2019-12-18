@@ -116,8 +116,13 @@ export default {
   beforeDestroy() {
     this.$store.dispatch('designs/resetDefaults')
   },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.reinitialize()
+    })
+  },
   beforeRouteUpdate(to, from, next) {
-    this.$store.dispatch('designs/resetDefaults').then(this.initializeDesign)
+    this.reinitialize()
     next()
   },
   created() {
@@ -227,6 +232,10 @@ export default {
       if (column || aggregate) {
         this.runQuery()
       }
+    },
+
+    reinitialize() {
+      this.$store.dispatch('designs/resetDefaults').then(this.initializeDesign)
     },
 
     saveReport() {
