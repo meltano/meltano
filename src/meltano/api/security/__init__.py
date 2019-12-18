@@ -84,7 +84,7 @@ def setup_security(app, project):
         # add the `auth_token` parameter
         params = urllib.parse.parse_qs(uri.query)
         params["auth_token"] = f"{header}.{payload}"
-        uri._replace(query=urllib.parse.urlencode(params, doseq=True))
+        uri = uri._replace(query=urllib.parse.urlencode(params, doseq=True))
         res = make_response(redirect(urllib.parse.urlunparse(uri)))
 
         # set the signature in a secure cookie

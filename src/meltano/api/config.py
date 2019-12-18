@@ -16,7 +16,7 @@ SECRET_KEY = "thisisnotapropersecretkey"
 # Meltano
 # -----------------
 MELTANO_AUTHENTICATION = truthy(os.getenv("MELTANO_AUTHENTICATION"))
-MELTANO_UI_URL = os.getenv("MELTANO_UI_URL", "")
+MELTANO_UI_URL = os.getenv("MELTANO_UI_URL", "/")
 AIRFLOW_DISABLED = truthy(os.getenv("MELTANO_DISABLE_AIRFLOW"))
 
 API_ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
