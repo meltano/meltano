@@ -31,17 +31,10 @@ def key_convert(obj, converter):
     if isinstance(obj, dict) and not isinstance(obj, KeyFrozenDict):
         converted = {}
         for k, v in obj.items():
-            # treat a key that starts with `_` as frozen
-            # this will prevent internal tokens, such as
-            # a JWT to be decoded with humps using this
-            # decoder and failing to be parsed
-            if k.startswith("_"):
-                new_k = k
-            else:
-                new_k = converter(k)
+            new_k = converter(k)
 
-                if new_k in converted:
-                    raise ValueError(f"Naming scheme conversion conflict on `{new_k}`")
+            if new_k in converted:
+                raise ValueError(f"Naming scheme conversion conflict on `{new_k}`")
 
             converted[new_k] = key_convert(v, converter)
 

@@ -1,3 +1,4 @@
+import os
 import warnings
 import meltano
 import importlib
@@ -6,7 +7,7 @@ import importlib
 # this needs to run before `psycopg2` is imported
 warnings.filterwarnings("ignore", category=UserWarning, module="psycopg2")
 
-workers = 4
+workers = int(os.getenv("WORKERS", 4))
 timeout = 600
 
 

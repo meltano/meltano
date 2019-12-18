@@ -5,7 +5,6 @@ from functools import wraps
 from flask import request
 from flask_security import auth_required
 from flask_login import current_user
-from flask_jwt_extended import jwt_required
 from flask_principal import Permission, Need
 from werkzeug.exceptions import Forbidden
 from .identity import FreeUser
@@ -61,27 +60,23 @@ def permit(permission_type, context):
 
 
 def api_auth_required(f):
-    auth_decorated = jwt_required(f)
-
     @wraps(f)
     def decorated():
         if request.method == "OPTIONS":
             return f()
 
+        # bypass check for the FreeUser
         session_user = current_user._get_current_object()
         if isinstance(session_user, FreeUser):
             logging.debug(f"Authentication bypassed`")
             return f()
 
-        # enable the API to be authentified using the Session
-        # instead of an JWT.
+        # authentify the user
         if session_user.is_authenticated:
             logging.debug(f"@{session_user.username} authenticated via `session`")
             return f()
 
-        # defer to the JWT authentication
-        logging.debug("JWT authentication pending")
-        return auth_decorated()
+        return "Authentication required to access this resource.", 401
 
     return decorated
 

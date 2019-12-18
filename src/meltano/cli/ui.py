@@ -132,7 +132,6 @@ def setup(ctx, server_name, **flags):
     config = {
         "SERVER_NAME": server_name,
         "SECRET_KEY": generate_secret(),
-        "JWT_SECRET_KEY": generate_secret(),
         "SECURITY_PASSWORD_SALT": generate_secret(),
     }
 

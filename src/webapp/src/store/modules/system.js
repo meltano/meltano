@@ -9,7 +9,8 @@ const defaultState = utils.deepFreeze({
   hasGeneratedDbtDocs: false,
   latestVersion: null,
   updating: false,
-  version: null
+  version: null,
+  identity: null
 })
 
 const getters = {
@@ -22,9 +23,6 @@ const getters = {
     }
 
     return compareVersions.compare(state.latestVersion, state.version, '>')
-  },
-  urlForLogout() {
-    return utils.root('/auth/logout')
   }
 }
 
@@ -35,6 +33,7 @@ const actions = {
       commit('setLatestVersion', response.data.latestVersion)
     })
   },
+
   checkHasDbtDocs({ commit }) {
     systemApi
       .dbtDocs()
@@ -45,6 +44,7 @@ const actions = {
         commit('setHasDbtDocs', false)
       })
   },
+
   upgrade({ state, commit }) {
     let upgradePoller = null
 
@@ -78,6 +78,17 @@ const actions = {
       upgradePoller.dispose()
       commit('setUpdating', false)
     })
+  },
+
+  logout() {
+    window.location.href = utils.root('/auth/logout')
+  },
+
+  fetchIdentity({ commit }) {
+    systemApi
+      .identity()
+      .then(response => commit('setIdentity', response.data))
+      .catch(() => commit('setIdentity', null))
   }
 }
 
@@ -96,6 +107,10 @@ const mutations = {
 
   setVersion(state, version) {
     state.version = version
+  },
+
+  setIdentity(state, identity) {
+    state.identity = identity
   }
 }
 

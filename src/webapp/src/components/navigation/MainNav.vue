@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters, mapState, mapActions } from 'vuex'
 
 import capitalize from '@/filters/capitalize'
 import underscoreToSpace from '@/filters/underscoreToSpace'
@@ -26,13 +26,13 @@ export default {
   computed: {
     ...mapGetters('configuration', ['getRunningPipelines']),
     ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
-    ...mapGetters('system', ['updateAvailable', 'urlForLogout']),
+    ...mapGetters('system', ['updateAvailable']),
     ...mapGetters('plugins', [
       'getIsStepLoadersMinimallyValidated',
       'getIsStepScheduleMinimallyValidated'
     ]),
     ...mapState('repos', ['models']),
-    ...mapState('system', ['latestVersion', 'updating', 'version']),
+    ...mapState('system', ['latestVersion', 'updating', 'version', 'identity']),
     getIconColor() {
       return parentPath =>
         this.getIsSubRouteOf(parentPath)
@@ -57,6 +57,7 @@ export default {
     this.$store.dispatch('repos/getModels')
   },
   methods: {
+    ...mapActions('system', ['logout']),
     closeMobileMenu() {
       this.isMobileMenuOpen = false
     },
@@ -342,15 +343,15 @@ export default {
                   <span>Help</span>
                 </a>
                 <a
-                  v-if="$auth.user"
+                  v-if="identity"
                   class="button has-tooltip-bottom"
                   data-tooltip="Sign out"
-                  :href="urlForLogout"
+                  @click="logout"
                 >
                   <span class="icon">
                     <font-awesome-icon icon="sign-out-alt"></font-awesome-icon>
                   </span>
-                  <span>{{ $auth.user.username }}</span>
+                  <span>{{ identity.username }}</span>
                 </a>
               </div>
             </div>

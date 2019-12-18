@@ -55,12 +55,6 @@ SECURITY_MSG_USERNAME_INVALID = (
 )
 SECURITY_MSG_USERNAME_ALREADY_TAKEN = ("This username is already taken.", "error")
 
-# Flask-JWT-Extended
-# ------------------
-JWT_SECRET_KEY = SECRET_KEY
-JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(days=1)
-JWT_TOKEN_LOCATION = ("headers", "cookies")
-
 # Flask-Mail
 # -----------------
 
@@ -99,19 +93,7 @@ class Production(object):
 
 
 def ensure_secure_setup(app):
-    secure_variables = [
-        "SERVER_NAME",
-        "SECRET_KEY",
-        "JWT_SECRET_KEY",
-        "SECURITY_PASSWORD_SALT",
-    ]
-
-    # inferred configuration values
-    app.config["JWT_COOKIE_DOMAIN"] = (
-        app.config["SESSION_COOKIE_DOMAIN"] or app.config["SERVER_NAME"]
-    )
-    app.config["JWT_COOKIE_SECURE"] = app.config["SESSION_COOKIE_SECURE"]
-    app.config["JWT_COOKIE_HTTPONLY"] = app.config["SESSION_COOKIE_HTTPONLY"]
+    secure_variables = ["SERVER_NAME", "SECRET_KEY", "SECURITY_PASSWORD_SALT"]
 
     facts = []
     for var in secure_variables:

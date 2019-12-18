@@ -90,7 +90,6 @@ class TestSecurity:
                 assert res.status_code == 302
                 assert url.netloc == "localhost"
                 assert url.path == "/"
-                assert query["auth_token"]
 
     def test_bootstrap_unauthenticated(self, app, api):
         with app.test_request_context():

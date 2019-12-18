@@ -20,6 +20,7 @@ from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.db import project_engine
+from meltano.api.config import VERSION_HEADER
 
 
 logger = logging.getLogger(__name__)
@@ -147,7 +148,7 @@ def create_app(config={}):
 
     @app.after_request
     def after_request(res):
-        res.headers["X-Meltano-Version"] = meltano.__version__
+        res.headers[VERSION_HEADER] = meltano.__version__
         return res
 
     return app
