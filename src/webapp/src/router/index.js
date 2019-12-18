@@ -149,7 +149,7 @@ const router = new Router({
           name: 'report',
           component: Design,
           meta: {
-            title: 'Meltano: Analyze - Reports'
+            title: 'Meltano: Analyze - Report'
           }
         },
         {

@@ -75,6 +75,16 @@ Component helpers related to Bulma's component classes when bulma-overrides does
   }
 }
 
+.dropdown {
+  .dropdown-content {
+    .dropdown-item {
+      &.is-active {
+        @extend .is-active-line-item;
+      }
+    }
+  }
+}
+
 .field {
   &.is-horizontal {
     .field-body {
@@ -101,10 +111,9 @@ Component helpers related to Bulma's component classes when bulma-overrides does
 
 .panel-block {
   &.is-active {
-    color: $interactive-secondary;
     border-left-color: $interactive-secondary;
     border-left-width: 2px;
-    @extend .has-background-white-ter;
+    @extend .is-active-line-item;
   }
 }
 

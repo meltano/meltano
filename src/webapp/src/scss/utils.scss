@@ -16,6 +16,11 @@ Display-related utilities
   margin: 0.75rem 0;
 }
 
+.is-active-line-item {
+  color: $interactive-secondary;
+  @extend .has-background-white-ter;
+}
+
 .ellipsis {
   white-space: nowrap;
   overflow: hidden;

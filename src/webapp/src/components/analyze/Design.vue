@@ -431,6 +431,9 @@ export default {
                 <a
                   v-for="report in reports"
                   :key="report.name"
+                  :class="{
+                    'is-active': activeReport.id === report.id
+                  }"
                   class="dropdown-item"
                   data-dropdown-auto-close
                   @click="changeReport(report)"
