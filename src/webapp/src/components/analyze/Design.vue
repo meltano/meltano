@@ -301,7 +301,7 @@ export default {
 
 <template>
   <section>
-    <div class="columns is-vcentered">
+    <div class="columns is-vcentered v-pop-4-5r">
       <div class="column">
         <div class="is-grouped is-pulled-left">
           <div
