@@ -143,7 +143,7 @@ export default {
     },
 
     changeReport(report) {
-      // Let beforeRouteUpdate() manage the SSOT reset and init
+      // Let route lifecycle hooks delegate update responsibility
       this.$router.push({ name: 'report', params: report })
     },
 
