@@ -137,6 +137,11 @@ export default {
       this.$store.dispatch('designs/toggleAggregate', aggregate)
     },
 
+    changeReport(report) {
+      // Let beforeRouteUpdate() manage the SSOT reset and init
+      this.$router.push({ name: 'report', params: report })
+    },
+
     columnSelected(column) {
       this.$store.dispatch('designs/toggleColumn', column)
     },
@@ -203,14 +208,6 @@ export default {
 
     joinRowClicked(join) {
       this.$store.dispatch('designs/expandJoinRow', join)
-    },
-
-    loadReport(report) {
-      this.$store
-        .dispatch('designs/loadReport', { name: report.name })
-        .then(() => {
-          this.$router.push({ name: 'report', params: report })
-        })
     },
 
     preselectAttributes() {
@@ -436,7 +433,7 @@ export default {
                   :key="report.name"
                   class="dropdown-item"
                   data-dropdown-auto-close
-                  @click="loadReport(report)"
+                  @click="changeReport(report)"
                 >
                   {{ report.name }}
                 </a>
