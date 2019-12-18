@@ -145,7 +145,7 @@ const router = new Router({
       },
       children: [
         {
-          path: '/analyze/:namespace+/:model/:design/reports/report/:slug',
+          path: '/analyze/:namespace+/:model/:design/reports/:slug',
           name: 'report',
           component: Design,
           meta: {
