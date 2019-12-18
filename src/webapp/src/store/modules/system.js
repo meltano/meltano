@@ -22,6 +22,9 @@ const getters = {
     }
 
     return compareVersions.compare(state.latestVersion, state.version, '>')
+  },
+  urlForLogout() {
+    return utils.root('/auth/logout')
   }
 }
 

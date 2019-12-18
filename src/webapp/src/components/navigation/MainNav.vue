@@ -26,7 +26,7 @@ export default {
   computed: {
     ...mapGetters('configuration', ['getRunningPipelines']),
     ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
-    ...mapGetters('system', ['updateAvailable']),
+    ...mapGetters('system', ['updateAvailable', 'urlForLogout']),
     ...mapGetters('plugins', [
       'getIsStepLoadersMinimallyValidated',
       'getIsStepScheduleMinimallyValidated'
@@ -340,6 +340,17 @@ export default {
                     ></font-awesome-icon>
                   </span>
                   <span>Help</span>
+                </a>
+                <a
+                  v-if="$auth.user"
+                  class="button has-tooltip-bottom"
+                  data-tooltip="Sign out"
+                  :href="urlForLogout"
+                >
+                  <span class="icon">
+                    <font-awesome-icon icon="sign-out-alt"></font-awesome-icon>
+                  </span>
+                  <span>{{ $auth.user.username }}</span>
                 </a>
               </div>
             </div>
