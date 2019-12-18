@@ -3,11 +3,22 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-## Unreleased
 
+## Unreleased
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.12.1 - (2019-12-18)
+
+---
 
 ### Changes
 
@@ -15,9 +26,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1476](https://gitlab.com/meltano/meltano/issues/1476) Add database and warehouse revocations for roles in the `meltano permissions` command
 - [#1473](https://gitlab.com/meltano/meltano/issues/1473) Update Release issue template to recent guidelines
 
-### Fixes
-
-### Breaks
 
 ## 1.12.0 - (2019-12-16)
 
