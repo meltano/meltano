@@ -60,5 +60,5 @@ class UploadHelper:
     def is_valid_size(self, file):
         file.seek(0, SEEK_END)
         file_size = file.tell()
-        file.seek(0) # Return to 0 so subsequent write occurs from beginning of file
+        file.seek(0)  # Return to 0 so subsequent write occurs from beginning of file
         return file_size > 0 and file_size <= MAX_FILE_SIZE
