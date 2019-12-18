@@ -87,9 +87,6 @@ def setup_security(app, project):
         uri = uri._replace(query=urllib.parse.urlencode(params, doseq=True))
         res = make_response(redirect(urllib.parse.urlunparse(uri)))
 
-        # set the signature in a secure cookie
-        set_access_cookies(res, access_token)
-
         return res
 
     app.register_blueprint(bp)

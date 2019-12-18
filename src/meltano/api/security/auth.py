@@ -73,10 +73,13 @@ def api_auth_required(f):
             logging.debug(f"Authentication bypassed`")
             return f()
 
+        # enable the API to be authentified using the Session
+        # instead of an JWT.
         if session_user.is_authenticated:
             logging.debug(f"@{session_user.username} authenticated via `session`")
             return f()
 
+        # defer to the JWT authentication
         logging.debug("JWT authentication pending")
         return auth_decorated()
 
