@@ -65,7 +65,7 @@ This means that you're ready to start Meltano CLI development. For API and UI de
 
 ## API Development
 
-This section of the guide provides guidance on how to work with the Meltano API, which is built with the [Python framework: Flask](https://github.com/pallets/flask).
+This section of the guide provides guidance on how to work with the Meltano API, which serves as the backend of Meltano and is built with the [Python framework: Flask](https://github.com/pallets/flask).
 
 ### Getting Setup
 
@@ -82,7 +82,7 @@ cd $PROJECT_NAME
 FLASK_ENV=development meltano ui
 ```
 
-The development build of the Meltano API should now be available at <http://localhost:5000/>.
+The development build of the Meltano API & **production** build of the UI should now be available at <http://localhost:5000/>.
 
 ::: tip
 
