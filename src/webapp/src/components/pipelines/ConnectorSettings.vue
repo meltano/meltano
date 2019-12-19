@@ -200,7 +200,7 @@ export default {
               class="label"
             >
               <span
-                class="has-text-underlined tooltip"
+                class="has-text-underlined tooltip is-tooltip-right"
                 :data-tooltip="
                   `Learn more about the ${getLabel(setting)} setting.`
                 "
