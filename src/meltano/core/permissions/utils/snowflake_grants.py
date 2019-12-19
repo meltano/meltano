@@ -1,6 +1,6 @@
 import logging
 
-from typing import Dict, List, Tuple, Set
+from typing import Dict, List, Tuple, Set, Any
 
 from meltano.core.permissions.utils.error import SpecLoadingError
 from meltano.core.permissions.utils.snowflake_connector import SnowflakeConnector
@@ -54,6 +54,52 @@ class SnowflakeGrantsGenerator:
             return True
         else:
             return False
+
+    def full_schema_list(self, schema: str) -> List[str]:
+        """
+        For a given schema name, get all schemas it may be referencing.
+
+        For example, if <db>.* is given then all schemas in the database 
+        will be returned. if <db>.<schema_partial>_* is given, then all 
+        schemas that match the schema partial pattern will be returned.
+
+        This function can be enhanced in the future to handle more 
+        complicated schema names if necessary.
+
+        Returns a list of schema names.
+        """
+        # Generate the information_schema identifier for that database
+        # in order to be able to filter it out
+        name_parts = schema.split(".")
+
+        info_schema = f"{name_parts[0]}.information_schema"
+
+        fetched_schemas = []
+
+        if name_parts[1] == "*":
+            # If {DB_NAME}.* was provided as the schema identifier, we have to fetch
+            #  each schema in database DB_NAME, so that we can grant privileges
+            #  for each schema seperatelly.
+
+            conn = SnowflakeConnector()
+            db_schemas = conn.show_schemas(name_parts[0])
+            for db_schema in db_schemas:
+                if db_schema != info_schema:
+                    fetched_schemas.append(db_schema)
+
+        elif "*" in name_parts[1]:
+            conn = SnowflakeConnector()
+            db_schemas = conn.show_schemas(name_parts[0])
+            for db_schema in db_schemas:
+                schema_name = db_schema.split(".", 1)[1].lower()
+                if schema_name.startswith(name_parts[1].split("*", 1)[0]):
+                    fetched_schemas.append(db_schema)
+        
+        else:
+            # If no * in name, then return provided schema name
+            fetched_schemas = [schema]
+        
+        return fetched_schemas
 
     def generate_grant_roles(
         self, entity_type: str, entity: str, config: str
@@ -158,17 +204,6 @@ class SnowflakeGrantsGenerator:
         """
         sql_commands = []
 
-        # Track all schemas that have been given access to (GRANT usage)
-        # the given role. Used in order to recursively grant the required access
-        # to schemas implicitly referenced when permissions are GRANTED for a
-        # child Schema or Table.
-        # Example: A role is given read access to table MY_DB.MY_SCHEMA.MY_TABLE
-        # 1. In order to access MY_TABLE, the role has to be able to access MY_DB.MY_SCHEMA
-        # 2. The script checks if usage on MY_SCHEMA has been granted to the role and
-        #    assigns it to the role if not (and adds the DB to usage_granted["schemas"])
-        # 4. Finally the requested permissions are GRANTED to role for MY_TABLE
-        usage_granted = {"schemas": set()}
-
         try:
             warehouses = config["warehouses"]
             new_commands = self.generate_warehouse_grants(
@@ -182,6 +217,7 @@ class SnowflakeGrantsGenerator:
                 )
             )
 
+        # Databases
         databases = {
             "read": config.get("privileges", {}).get("databases", {}).get("read", []),
             "write": config.get("privileges", {}).get("databases", {}).get("write", []),
@@ -206,73 +242,71 @@ class SnowflakeGrantsGenerator:
         )
         sql_commands.extend(database_commands)
 
-        try:
-            for schema in config["privileges"]["schemas"]["read"]:
-                new_commands, usage_granted = self.generate_schema_grants(
-                    role=role,
-                    schema=schema,
-                    grant_type="read",
-                    usage_granted=usage_granted,
-                    shared_dbs=shared_dbs,
-                )
-                sql_commands.extend(new_commands)
-        except KeyError:
+        # Schemas
+        schemas = {
+            "read": config.get("privileges", {}).get("schemas", {}).get("read", []),
+            "write": config.get("privileges", {}).get("schemas", {}).get("write", []),
+        }
+
+        if len(schemas.get("read")) == 0:
             logging.debug(
-                "`privileges.schemas.read` not found for role {}, skipping generation of SCHEMA read level GRANT statements.".format(
+                "`privileges.schemas.read` not found for role {}, skipping generation of schemas read level GRANT statements.".format(
                     role
                 )
             )
 
-        try:
-            for schema in config["privileges"]["schemas"]["write"]:
-                new_commands, usage_granted = self.generate_schema_grants(
-                    role=role,
-                    schema=schema,
-                    grant_type="write",
-                    usage_granted=usage_granted,
-                    shared_dbs=shared_dbs,
-                )
-                sql_commands.extend(new_commands)
-        except KeyError:
+        if len(schemas.get("write")) == 0:
             logging.debug(
-                "`privileges.schemas.write` not found for role {}, skipping generation of SCHEMA write level GRANT statements.".format(
+                "`privileges.schemas.write` not found for role {}, skipping generation of schemas write level GRANT statements.".format(
                     role
                 )
             )
 
-        try:
-            for table in config["privileges"]["tables"]["read"]:
-                new_commands, usage_granted = self.generate_table_and_view_grants(
-                    role=role,
-                    table=table,
-                    grant_type="read",
-                    usage_granted=usage_granted,
-                    shared_dbs=shared_dbs,
-                )
-                sql_commands.extend(new_commands)
-        except KeyError:
+        schema_commands = self.generate_schema_grants(
+            role=role, schemas=schemas, shared_dbs=shared_dbs
+        )
+        sql_commands.extend(schema_commands)
+
+                # new_commands, usage_granted = self.generate_schema_grants(
+                #     role=role,
+                #     schema=schema,
+                #     grant_type="read",
+                #     usage_granted=usage_granted,
+                #     shared_dbs=shared_dbs,
+                # )
+
+        # Tables
+        tables = {
+            "read": config.get("privileges", {}).get("tables", {}).get("read", []),
+            "write": config.get("privileges", {}).get("tables", {}).get("write", []),
+        }
+
+        if len(tables.get("read")) == 0:
             logging.debug(
-                "`privileges.tables.read` not found for role {}, skipping generation of TABLE read level GRANT statements.".format(
+                "`privileges.tables.read` not found for role {}, skipping generation of tables read level GRANT statements.".format(
                     role
                 )
             )
 
-        try:
-            for table in config["privileges"]["tables"]["write"]:
-                new_commands, usage_granted = self.generate_table_and_view_grants(
-                    role=role,
-                    table=table,
-                    grant_type="write",
-                    usage_granted=usage_granted,
-                    shared_dbs=shared_dbs,
-                )
-                sql_commands.extend(new_commands)
-        except KeyError:
+        if len(tables.get("write")) == 0:
             logging.debug(
-                "`privileges.tables.write` not found for role {}, skipping generation of TABLE write level GRANT statements.".format(
+                "`privileges.tables.write` not found for role {}, skipping generation of tables write level GRANT statements.".format(
                     role
                 )
             )
+
+        # table_commands = self.generate_table_and_view_grants(
+        #     role=role, tables=tables, shared_dbs=shared_dbs
+        # )
+        # sql_commands.extend(table_commands)
+
+        #         # new_commands, usage_granted = self.generate_table_and_view_grants(
+        #         #     role=role,
+        #         #     table=table,
+        #         #     grant_type="read",
+        #         #     usage_granted=usage_granted,
+        #         #     shared_dbs=shared_dbs,
+        #         # )
 
         return sql_commands
 
@@ -496,116 +530,135 @@ class SnowflakeGrantsGenerator:
     def generate_schema_grants(
         self,
         role: str,
-        schema: str,
-        grant_type: str,
-        usage_granted: Dict,
+        schemas: str,
         shared_dbs: Set,
-    ) -> Tuple[List[str], Dict]:
+    ) -> List[Dict[str, Any]]:
         """
-        Generate the GRANT statements for schemas.
+        Generate the GRANT and REVOKE statements for schemas.
 
         role: the name of the role the privileges are GRANTed to
-        schema: the name of the Schema (e.g. "raw.public")
-        grant_type: What type of privileges are granted? One of {"read", "write"}
-        usage_granted: Passed by generate_grant_privileges_to_role() to track all
-            all the entities a role has been granted access (usage) to.
+        schemas: the name of the Schema (e.g. "raw.public")
         shared_dbs: a set of all the shared databases defined in the spec.
 
-        Returns the SQL commands generated and the updated usage_granted as a Tuple
+        Returns the SQL commands generated as a List
         """
         sql_commands = []
 
-        # Split the schema identifier into parts {DB_NAME}.{SCHEMA_NAME}
-        #  so that we can check and use each one
-        name_parts = schema.split(".")
-
-        # Do nothing if this is a schema inside a shared database:
-        #  "Granting individual privileges on imported databases is not allowed."
-        if name_parts[0] in shared_dbs:
-            return (sql_commands, usage_granted)
-
-        if grant_type == "read":
-            privileges = "usage"
-        elif grant_type == "write":
-            privileges = (
+        read_privileges = "usage"
+        write_privileges = (
                 "usage, monitor, create table,"
                 " create view, create stage, create file format,"
                 " create sequence, create function, create pipe"
             )
-        else:
-            raise SpecLoadingError(
-                f"Wrong grant_type {spec_path} provided to generate_schema_grants()"
-            )
 
-        # Generate the information_schema identifier for that database
-        #  in order to be able to filter it out
-        info_schema = f"{name_parts[0]}.information_schema"
+        for schema in schemas.get("read", []):
+            # Split the schema identifier into parts {DB_NAME}.{SCHEMA_NAME}
+            #  so that we can check and use each one
+            name_parts = schema.split(".")
 
-        schemas = []
+            # Do nothing if this is a schema inside a shared database:
+            # "Granting individual privileges on imported databases is not allowed."
+            if name_parts[0] in shared_dbs:
+                return sql_commands
 
-        if name_parts[1] == "*":
-            # If {DB_NAME}.* was provided as the schema identifier, we have to fetch
-            #  each schema in database DB_NAME, so that we can grant privileges
-            #  for each schema seperatelly.
-            # We could GRANT {privileges} TO ALL SCHEMAS IN database
-            #  but that would not allow us to know if a specific privilege has
-            #  been already granted or not
-            conn = SnowflakeConnector()
-            db_schemas = conn.show_schemas(name_parts[0])
-            for db_schema in db_schemas:
-                if db_schema != info_schema:
-                    schemas.append(db_schema)
-        elif "*" in name_parts[1]:
-            conn = SnowflakeConnector()
-            db_schemas = conn.show_schemas(name_parts[0])
-            for db_schema in db_schemas:
-                schema_name = db_schema.split(".", 1)[1].lower()
-                if schema_name.startswith(name_parts[1].split("*", 1)[0]):
-                    schemas.append(db_schema)
-        else:
-            schemas = [schema]
+            fetched_schemas = self.full_schema_list(schema)
 
-        for db_schema in schemas:
-            already_granted = False
+            for db_schema in fetched_schemas:
+                already_granted = False
 
-            if (
-                grant_type == "read"
-                and self.check_grant_to_role(role, "usage", "schema", db_schema)
-            ) or (
-                grant_type == "write"
-                and self.check_grant_to_role(role, "usage", "schema", db_schema)
-                and self.check_grant_to_role(role, "monitor", "schema", db_schema)
-                and self.check_grant_to_role(role, "create table", "schema", db_schema)
-                and self.check_grant_to_role(role, "create view", "schema", db_schema)
-                and self.check_grant_to_role(role, "create stage", "schema", db_schema)
-                and self.check_grant_to_role(
-                    role, "create file format", "schema", db_schema
+                if self.check_grant_to_role(role, "usage", "schema", db_schema):
+                    already_granted = True
+
+                sql_commands.append(
+                    {
+                        "already_granted": already_granted,
+                        "sql": GRANT_PRIVILEGES_TEMPLATE.format(
+                            privileges=read_privileges,
+                            resource_type="schema",
+                            resource_name=SnowflakeConnector.snowflaky(db_schema),
+                            role=SnowflakeConnector.snowflaky(role),
+                        ),
+                    }
                 )
-                and self.check_grant_to_role(
-                    role, "create sequence", "schema", db_schema
+
+        for schema in schemas.get("write", []):
+            # Split the schema identifier into parts {DB_NAME}.{SCHEMA_NAME}
+            # so that we can check and use each one
+            name_parts = schema.split(".")
+
+            # Do nothing if this is a schema inside a shared database:
+            # "Granting individual privileges on imported databases is not allowed."
+            if name_parts[0] in shared_dbs:
+                return sql_commands
+
+            fetched_schemas = self.full_schema_list(schema)
+
+            for db_schema in fetched_schemas:
+                already_granted = False
+
+                if (self.check_grant_to_role(role, "usage", "schema", db_schema)
+                    and self.check_grant_to_role(role, "monitor", "schema", db_schema)
+                    and self.check_grant_to_role(role, "create table", "schema", db_schema)
+                    and self.check_grant_to_role(role, "create view", "schema", db_schema)
+                    and self.check_grant_to_role(role, "create stage", "schema", db_schema)
+                    and self.check_grant_to_role(
+                        role, "create file format", "schema", db_schema
+                    )
+                    and self.check_grant_to_role(
+                        role, "create sequence", "schema", db_schema
+                    )
+                    and self.check_grant_to_role(
+                        role, "create function", "schema", db_schema
+                    )
+                    and self.check_grant_to_role(role, "create pipe", "schema", db_schema)
+                ):
+                    already_granted = True
+
+                sql_commands.append(
+                    {
+                        "already_granted": already_granted,
+                        "sql": GRANT_PRIVILEGES_TEMPLATE.format(
+                            privileges=write_privileges,
+                            resource_type="schema",
+                            resource_name=SnowflakeConnector.snowflaky(db_schema),
+                            role=SnowflakeConnector.snowflaky(role),
+                        ),
+                    }
                 )
-                and self.check_grant_to_role(
-                    role, "create function", "schema", db_schema
+
+        for granted_schema in list(set(
+            self.grants_to_role.get(role, {}).get("usage", {}).get("schema", []) +
+            self.grants_to_role.get(role, {}).get("monitor", {}).get("schema", []) +
+            self.grants_to_role.get(role, {}).get("create table", {}).get("schema", []) +
+            self.grants_to_role.get(role, {}).get("create view", {}).get("schema", []) +
+            self.grants_to_role.get(role, {}).get("create stage", {}).get("schema", []) +
+            self.grants_to_role.get(role, {}).get("create file format", {}).get("schema", []) +
+            self.grants_to_role.get(role, {}).get("create sequence", {}).get("schema", []) +
+            self.grants_to_role.get(role, {}).get("create pipe", {}).get("schema", [])
+        )):
+            all_schemas = schemas.get("read", []) + schemas.get("write", [])
+            database_name = granted_schema.split(".")[0]
+
+            if granted_schema not in all_schemas and database_name in shared_dbs:
+                # No privileges to revoke on imported db
+                continue
+            # Can revoke all privileges b/c it will still execute even if it's a no-op
+            elif granted_schema not in all_schemas:
+                sql_commands.append(
+                    {
+                        "already_granted": False,
+                        "sql": REVOKE_PRIVILEGES_TEMPLATE.format(
+                            privileges=write_privileges,
+                            resource_type="schema",
+                            resource_name=SnowflakeConnector.snowflaky(
+                                granted_schema
+                            ),
+                            role=SnowflakeConnector.snowflaky(role),
+                        ),
+                    }
                 )
-                and self.check_grant_to_role(role, "create pipe", "schema", db_schema)
-            ):
-                already_granted = True
 
-            sql_commands.append(
-                {
-                    "already_granted": already_granted,
-                    "sql": GRANT_PRIVILEGES_TEMPLATE.format(
-                        privileges=privileges,
-                        resource_type="schema",
-                        resource_name=SnowflakeConnector.snowflaky(db_schema),
-                        role=SnowflakeConnector.snowflaky(role),
-                    ),
-                }
-            )
-
-        usage_granted["schemas"].add(schema)
-
-        return (sql_commands, usage_granted)
+        return sql_commands
 
     def generate_table_and_view_grants(
         self,
