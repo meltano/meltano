@@ -109,7 +109,7 @@ class PluginRef:
         return self._current_profile_name
 
     @property
-    def name_at_current_profile(self):
+    def full_name(self):
         return f"{self.name}@{self.current_profile_name}"
 
     @property
