@@ -134,7 +134,6 @@ export default {
     next()
   },
   created() {
-    this.initializeDesign()
     this.initializeSettings()
   },
   methods: {
