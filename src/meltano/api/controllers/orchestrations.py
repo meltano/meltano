@@ -88,7 +88,6 @@ def _handle(ex):
 
 @orchestrationsBP.errorhandler(InvalidFileSizeError)
 def _handle(ex):
-    print("****", ex)
     return (
         jsonify(
             {
