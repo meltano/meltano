@@ -1,7 +1,10 @@
-from flask import Blueprint, jsonify, request
-from .dashboards_helper import DashboardAlreadyExistsError, DashboardsHelper
+from flask import jsonify, request
 
-dashboardsBP = Blueprint("dashboards", __name__, url_prefix="/api/v1/dashboards")
+from .dashboards_helper import DashboardAlreadyExistsError, DashboardsHelper
+from meltano.api.api_blueprint import APIBlueprint
+
+
+dashboardsBP = APIBlueprint("dashboards", __name__)
 
 
 @dashboardsBP.errorhandler(DashboardAlreadyExistsError)

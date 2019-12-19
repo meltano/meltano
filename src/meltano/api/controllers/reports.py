@@ -1,17 +1,11 @@
 from flask import Blueprint, jsonify, request
 from .reports_helper import ReportAlreadyExistsError, ReportsHelper
 
-from meltano.api.security import api_auth_required
+from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.security.auth import permit
 from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin, Need
 
-reportsBP = Blueprint("reports", __name__, url_prefix="/api/v1/reports")
-
-
-@reportsBP.before_request
-@api_auth_required
-def before_request():
-    pass
+reportsBP = APIBlueprint("reports", __name__)
 
 
 class ReportFilter(NameFilterMixin, ResourceFilter):

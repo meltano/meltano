@@ -1,6 +1,6 @@
 import pytest
-from flask import json
 import json as _json
+from flask import json
 
 
 class TestJSON:
@@ -49,7 +49,9 @@ class TestJSON:
         ],
     )
     def test_json_scheme_encoder(self, app, scheme, payload, expected):
-        with app.test_request_context(headers={"X-Json-Scheme": scheme}):
+        with app.test_request_context(
+            headers={app.config["JSON_SCHEME_HEADER"]: scheme}
+        ):
             encoded = json.dumps(payload)
 
             # load with a Vanilla decoder

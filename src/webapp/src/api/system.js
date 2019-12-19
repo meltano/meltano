@@ -14,5 +14,9 @@ export default {
 
   version(params) {
     return axios.get(utils.root('/version'), { params })
+  },
+
+  identity() {
+    return axios.get(utils.apiRoot('/identity'))
   }
 }

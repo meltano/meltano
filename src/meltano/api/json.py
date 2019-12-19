@@ -2,7 +2,7 @@ import logging
 import humps
 from enum import Enum
 from collections.abc import Mapping, Iterable
-from flask import request, json
+from flask import request, json, current_app
 
 from meltano.core.utils import compose
 
@@ -57,10 +57,8 @@ class JSONSchemeDecoder(json.JSONDecoder):
         super().__init__(*args, **kwargs, object_hook=hooks)
 
     def hook(self, obj):
-        # transform to snakecase
-        obj = key_convert(obj, humps.decamelize)
-
-        return obj
+        # transform to snakecase if possible
+        return key_convert(obj, humps.decamelize)
 
 
 class JSONSchemeEncoder(json.JSONEncoder):
@@ -78,8 +76,10 @@ class JSONSchemeEncoder(json.JSONEncoder):
     }
 
     def encode(self, obj):
+        header = current_app.config["JSON_SCHEME_HEADER"]
+
         try:
-            scheme = request.headers.get("X-Json-Scheme")
+            scheme = request.headers.get(header)
             strategy = self.__class__.case_strategies[scheme]
             logging.debug(f"Using JSON Scheme: {scheme}")
             obj = key_convert(obj, strategy)

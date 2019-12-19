@@ -67,6 +67,7 @@ class UpgradeService:
             bundle.find("transform/profile/profiles.yml"): self.project.root_dir(
                 "transform/profile/profiles.yml"
             ),
+            bundle.find(".gitignore"): self.project.root_dir(".gitignore"),
         }
 
         for src, dst in files_map.items():

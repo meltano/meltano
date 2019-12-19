@@ -6,7 +6,6 @@ import atexit
 from flask import Flask, request, g
 from flask_login import current_user
 from flask_cors import CORS
-from importlib import reload
 from urllib.parse import urlsplit
 
 import meltano
@@ -21,6 +20,7 @@ from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.db import project_engine
+from meltano.api.config import VERSION_HEADER
 
 
 logger = logging.getLogger(__name__)
@@ -36,6 +36,12 @@ def create_app(config={}):
     app.config.from_object("meltano.api.config")
     app.config.from_pyfile("ui.cfg", silent=True)
     app.config.update(**config)
+
+    if app.env == "production":
+        from meltano.api.config import ensure_secure_setup
+
+        app.config.from_object("meltano.api.config.Production")
+        ensure_secure_setup(app)
 
     # register
     project_engine(
@@ -75,7 +81,10 @@ def create_app(config={}):
     setup_security(app, project)
     setup_oauth(app)
     setup_json(app)
-    CORS(app, origins="*")
+
+    # we need to setup CORS for development
+    if app.env == "development":
+        CORS(app, origins="http://localhost:8080", supports_credentials=True)
 
     # 2) Register the URL Converters
     from .url_converters import PluginRefConverter
@@ -83,7 +92,7 @@ def create_app(config={}):
     app.url_map.converters["plugin_ref"] = PluginRefConverter
 
     # 3) Register the controllers
-    from .controllers.root import root
+
     from .controllers.dashboards import dashboardsBP
     from .controllers.reports import reportsBP
     from .controllers.repos import reposBP
@@ -91,8 +100,8 @@ def create_app(config={}):
     from .controllers.sql import sqlBP
     from .controllers.orchestrations import orchestrationsBP
     from .controllers.plugins import pluginsBP
+    from .controllers.root import root, api_root
 
-    app.register_blueprint(root)
     app.register_blueprint(dashboardsBP)
     app.register_blueprint(reportsBP)
     app.register_blueprint(reposBP)
@@ -100,6 +109,8 @@ def create_app(config={}):
     app.register_blueprint(sqlBP)
     app.register_blueprint(orchestrationsBP)
     app.register_blueprint(pluginsBP)
+    app.register_blueprint(root)
+    app.register_blueprint(api_root)
 
     if app.config["PROFILE"]:
         from .profiler import init
@@ -139,14 +150,7 @@ def create_app(config={}):
 
     @app.after_request
     def after_request(res):
-        request_message = f"[{request.url}]"
-
-        if request.method != "OPTIONS":
-            request_message += f" as {current_user}"
-
-        logger.info(request_message)
-
-        res.headers["X-Meltano-Version"] = meltano.__version__
+        res.headers[VERSION_HEADER] = meltano.__version__
         return res
 
     return app

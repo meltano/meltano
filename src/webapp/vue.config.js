@@ -9,7 +9,7 @@ module.exports = {
     plugins: [
       new webpack.EnvironmentPlugin({
         AIRFLOW_URL: 'http://localhost:5010',
-        MELTANO_WEBAPP_URL: 'http://localhost:5000',
+        MELTANO_APP_URL: 'http://localhost:5000',
         DBT_DOCS_URL: 'http://localhost:5000/-/dbt/'
       }),
       new HtmlWebpackPlugin({

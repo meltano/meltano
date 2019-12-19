@@ -1,3 +1,4 @@
+from flask import url_for
 from flask_security.forms import LoginForm, RegisterForm, ConfirmRegisterForm
 from flask_security.utils import _datastore, get_message
 from wtforms import StringField
@@ -20,7 +21,7 @@ class MeltanoLoginForm(LoginForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.next.data = "/auth/bootstrap"
+        self.next.data = self.next.data or url_for("root.bootstrap")
 
 
 class UniqueUsernameMixin:

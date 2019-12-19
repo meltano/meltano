@@ -154,6 +154,10 @@ def encode_id_from_file_path(file_path):
     return base64.b32encode(bytes(file_path, "utf-8")).decode("utf-8")
 
 
+def identity(x):
+    return x
+
+
 def noop(*_args, **_kwargs):
     pass
 

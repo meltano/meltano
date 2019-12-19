@@ -1,9 +1,11 @@
-import os
-import subprocess
-import click
-import signal
-import logging
 import asyncio
+import click
+import logging
+import os
+import secrets
+import signal
+import subprocess
+from click_default_group import DefaultGroup
 
 from . import cli
 from .params import project
@@ -36,7 +38,14 @@ def start_workers(workers):
     return stop_all
 
 
-@cli.command()
+@cli.group(cls=DefaultGroup, default="start", default_if_no_args=True)
+@project(migrate=True)
+@click.pass_context
+def ui(ctx, project):
+    ctx.obj["project"] = project
+
+
+@ui.command()
 @click.option("--reload", is_flag=True, default=False)
 @click.option(
     "--bind-port",
@@ -51,8 +60,9 @@ def start_workers(workers):
     help="The hostname (or IP address) to bind on",
     envvar="MELTANO_API_HOSTNAME",
 )
-@project(migrate=True)
-def ui(project, reload, bind_port, bind):
+@click.pass_context
+def start(ctx, reload, bind_port, bind):
+    project = ctx.obj["project"]
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_ui()
 
@@ -97,3 +107,37 @@ def ui(project, reload, bind_port, bind):
 
     signal.signal(signal.SIGTERM, handle_terminate)
     logger.info("All workers started.")
+
+
+@ui.command()
+@click.argument("server_name")
+@click.option("--bits", default=256)
+@click.pass_context
+def setup(ctx, server_name, **flags):
+    """
+    Generates the `ui.cfg` file to keep the server secrets keys.
+    """
+    project = ctx.obj["project"]
+    ui_file_path = project.root_dir("ui.cfg")
+
+    if ui_file_path.exists():
+        logging.critical(
+            f"Found secrets in file `{ui_file_path}`, please delete this file to regenerate the secrets."
+        )
+        raise click.Abort()
+
+    generate_secret = lambda: secrets.token_hex(int(flags["bits"] / 8))  # in bytes
+
+    config = {
+        "SERVER_NAME": server_name,
+        "SECRET_KEY": generate_secret(),
+        "SECURITY_PASSWORD_SALT": generate_secret(),
+    }
+
+    # Flask doesn't support `configparser` or any other configuration format
+    # than plain Python files.
+    #
+    # Luckily the format is trivial to generate
+    with ui_file_path.open("w") as f:
+        for k, v in config.items():
+            f.write(f'{k} = "{v}"\n')
