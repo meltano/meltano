@@ -474,7 +474,9 @@ class SnowflakeGrantsGenerator:
             )
 
         for granted_database in (
-            self.grants_to_role.get(role, {}).get("usage", {}).get("database", [])
+            self.grants_to_role.get(role, {}).get("usage", {}).get("database", []) +
+            self.grants_to_role.get(role, {}).get("monitor", {}).get("database", []) +
+            self.grants_to_role.get(role, {}).get("create_schema", {}).get("database", [])
         ):
             # If it's a shared database, only revoke imported
             # We'll only know if it's a shared DB based on the spec
