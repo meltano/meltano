@@ -151,13 +151,12 @@ export default {
 
         const formData = new FormData()
         formData.append('file', file)
-        formData.append('connector_name', this.plugin.name)
-        formData.append('profile_name', profile.name)
         formData.append('setting_name', setting.name)
 
         this.$store
           .dispatch('configuration/uploadPluginConfigurationFile', {
             name: this.plugin.name,
+            profileName: profile.name,
             type: 'extractors',
             formData
           })

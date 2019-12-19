@@ -175,10 +175,8 @@ def upload_plugin_configuration_file(plugin_ref) -> Response:
 
     project = Project.find()
     file = request.files["file"]
-    connector_name = request.form["connector_name"]
-    profile_name = request.form["profile_name"]
     setting_name = request.form["setting_name"]
-    directory = project.extract_dir(connector_name, profile_name, setting_name)
+    directory = project.extract_dir(plugin_ref.name_at_current_profile, setting_name)
     upload_helper = UploadHelper()
     file_path = upload_helper.upload_file(directory, file)
 

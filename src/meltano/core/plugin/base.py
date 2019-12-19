@@ -109,6 +109,10 @@ class PluginRef:
         return self._current_profile_name
 
     @property
+    def name_at_current_profile(self):
+        return f"{self.name}@{self.current_profile_name}"
+
+    @property
     def qualified_name(self):
         parts = (self.type, self.name, self.current_profile_name)
 
