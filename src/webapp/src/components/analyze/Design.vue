@@ -116,8 +116,21 @@ export default {
   beforeDestroy() {
     this.$store.dispatch('designs/resetDefaults')
   },
+  /*
+  These beforeRouteEnter|Update lifecycle hooks work in tandem with changeReport()'s route update.
+  Both hooks are required (Update for locally sourced route changes & Enter for globally sourced route changes)
+  */
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.reinitialize()
+    })
+  },
+  /*
+  These beforeRouteEnter|Update lifecycle hooks work in tandem with changeReport()'s route update.
+  Both hooks are required (Update for locally sourced route changes & Enter for globally sourced route changes)
+  */
   beforeRouteUpdate(to, from, next) {
-    this.$store.dispatch('designs/resetDefaults').then(this.initializeDesign)
+    this.reinitialize()
     next()
   },
   created() {
@@ -135,6 +148,11 @@ export default {
 
     aggregateSelected(aggregate) {
       this.$store.dispatch('designs/toggleAggregate', aggregate)
+    },
+
+    changeReport(report) {
+      // Let route lifecycle hooks delegate update responsibility
+      this.$router.push({ name: 'report', params: report })
     },
 
     columnSelected(column) {
@@ -205,14 +223,6 @@ export default {
       this.$store.dispatch('designs/expandJoinRow', join)
     },
 
-    loadReport(report) {
-      this.$store
-        .dispatch('designs/loadReport', { name: report.name })
-        .then(() => {
-          this.$router.push({ name: 'report', params: report })
-        })
-    },
-
     preselectAttributes() {
       const finder = collectionName =>
         this.design.relatedTable[collectionName].find(
@@ -230,6 +240,10 @@ export default {
       if (column || aggregate) {
         this.runQuery()
       }
+    },
+
+    reinitialize() {
+      this.$store.dispatch('designs/resetDefaults').then(this.initializeDesign)
     },
 
     saveReport() {
@@ -295,7 +309,7 @@ export default {
 
 <template>
   <section>
-    <div class="columns is-vcentered">
+    <div class="columns is-vcentered v-min-4-5r">
       <div class="column">
         <div class="is-grouped is-pulled-left">
           <div
@@ -434,9 +448,12 @@ export default {
                 <a
                   v-for="report in reports"
                   :key="report.name"
+                  :class="{
+                    'is-active': activeReport.id === report.id
+                  }"
                   class="dropdown-item"
                   data-dropdown-auto-close
-                  @click="loadReport(report)"
+                  @click="changeReport(report)"
                 >
                   {{ report.name }}
                 </a>

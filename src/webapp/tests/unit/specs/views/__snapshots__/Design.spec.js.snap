@@ -168,7 +168,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                 class="dropdown-content"
               >
                 <a
-                  class="dropdown-item"
+                  class="dropdown-item is-active"
                   data-dropdown-auto-close=""
                 >
                   
@@ -1367,7 +1367,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               class="dropdown-content"
             >
               <a
-                class="dropdown-item"
+                class="dropdown-item is-active"
                 data-dropdown-auto-close=""
               >
                 
