@@ -116,11 +116,19 @@ export default {
   beforeDestroy() {
     this.$store.dispatch('designs/resetDefaults')
   },
+  /*
+  These beforeRouteEnter|Update lifecycle hooks work in tandem with changeReport()'s route update.
+  Both hooks are required (Update for locally sourced route changes & Enter for globally sourced route changes)
+  */
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.reinitialize()
     })
   },
+  /*
+  These beforeRouteEnter|Update lifecycle hooks work in tandem with changeReport()'s route update.
+  Both hooks are required (Update for locally sourced route changes & Enter for globally sourced route changes)
+  */
   beforeRouteUpdate(to, from, next) {
     this.reinitialize()
     next()
@@ -301,7 +309,7 @@ export default {
 
 <template>
   <section>
-    <div class="columns is-vcentered v-pop-4-5r">
+    <div class="columns is-vcentered v-min-4-5r">
       <div class="column">
         <div class="is-grouped is-pulled-left">
           <div
