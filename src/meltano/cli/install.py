@@ -22,7 +22,7 @@ def install_status_update(data):
 
 
 @cli.command()
-@project()
+@project(migrate=True)
 def install(project):
     """
     Installs all the dependencies of your project based on the meltano.yml file.
