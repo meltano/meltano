@@ -453,6 +453,55 @@ Exclusion has precedence over inclusion. If an attribute is excluded, there is n
 
 - `meltano ui`: Start the Meltano UI.
 
+### `start` (default)
+
+Start the Meltano UI.
+
+### `setup`
+
+::: tip
+This command is only relevant for production-grade setup.
+:::
+
+Generate secure secrets in the `ui.cfg` so that the application is secure.
+
+::: warning
+Regenerating secrets will cause the following:
+
+  - All passwords will be invalid
+  - All sessions will be expired
+  
+Use with caution!
+:::
+
+#### --bits
+
+Specify the size of the secrets, default to 256.
+
+## `user`
+
+::: tip
+This command is only relevant when Meltano is run with authentication enabled.
+:::
+
+### `add` 
+
+Create a Meltano user account, active and ready to be used.
+
+#### --overwrite, -f
+
+Update the user instead of creating a new one.
+
+#### --role, -G
+
+Add the user to the role. Meltano ships with two built-in roles: `admin` and `regular`.
+
+#### How to use
+
+```bash
+meltano user add admin securepassword --role admin
+```
+
 ## `upgrade`
 
 Upgrade Meltano to the latest version.
@@ -465,7 +514,7 @@ This function will following process to upgrade Meltano:
 
 ## `version`
 
-It is used to check which version of Meltano you are using:
+It is used to check which version of Meltano currently installed.
 
 ### How to use
 

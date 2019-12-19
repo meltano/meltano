@@ -1,10 +1,5 @@
-{% if security.registerable or security.recoverable or security.confirmable %}
-<h2>{{ _('Menu') }}</h2>
+{% if security.registerable or security.recoverable or security.confirmable or security.changeable %}
 <ul>
-  <li>
-    <a class_="button is-link" href="{{ url_for('OAuth.login') }}">Login with GitLab</a>
-  </li>
-  <li><a href="{{ url_for_security('login') }}{% if 'next' in request.args %}?next={{ request.args.next|urlencode }}{% endif %}">{{ _('Login') }}</a></li>
   {% if security.registerable %}
   <li><a href="{{ url_for_security('register') }}{% if 'next' in request.args %}?next={{ request.args.next|urlencode }}{% endif %}">{{ _('Register') }}</a><br/></li>
   {% endif %}
@@ -13,6 +8,9 @@
   {% endif %}
   {% if security.confirmable %}
   <li><a href="{{ url_for_security('send_confirmation') }}">{{ _('Confirm account') }}</a></li>
+  {% endif %}
+  {% if security.changeable %}
+  <li><a href="{{ url_for_security('change_password') }}">{{ _('Change password') }}</a></li>
   {% endif %}
 </ul>
 {% endif %}

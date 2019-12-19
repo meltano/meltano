@@ -37,7 +37,6 @@ Vue.use(FatalError, {
 })
 Vue.use(Auth, {
   service,
-  router,
   toasted: Vue.toasted
 })
 

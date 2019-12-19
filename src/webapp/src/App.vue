@@ -17,6 +17,7 @@ export default {
   },
   created() {
     this.$store.dispatch('system/check')
+    this.$store.dispatch('system/fetchIdentity')
     this.tryAcknowledgeAnalyticsTracking()
   },
   methods: {
