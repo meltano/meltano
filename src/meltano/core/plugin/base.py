@@ -135,7 +135,7 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         config={},
         profiles=set(),
         executable: str = None,
-        **attrs
+        **attrs,
     ):
         super().__init__(plugin_type, name, **attrs)
 
@@ -226,7 +226,7 @@ class Plugin(Canonical, PluginRef):
         description=None,
         capabilities=set(),
         select=set(),
-        **attrs
+        **attrs,
     ):
         super().__init__(plugin_type, name, **attrs)
 
@@ -245,5 +245,5 @@ class Plugin(Canonical, PluginRef):
             self.name,
             pip_url=self.pip_url,
             select=self.select,
-            **self._extras
+            **self._extras,
         )
