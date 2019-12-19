@@ -145,19 +145,19 @@ const router = new Router({
       },
       children: [
         {
+          path: '/analyze/:namespace+/:model/:design/reports/:slug',
+          name: 'report',
+          component: Design,
+          meta: {
+            title: 'Meltano: Analyze - Report'
+          }
+        },
+        {
           path: '/analyze/:namespace+/:model/:design',
           name: 'analyzeDesign',
           component: Design,
           meta: {
             title: 'Meltano: Analyze - Model Design'
-          }
-        },
-        {
-          path: '/analyze/:namespace+/:model/:design/reports/report/:slug',
-          name: 'report',
-          component: Design,
-          meta: {
-            title: 'Meltano: Analyze - Reports'
           }
         }
       ]
