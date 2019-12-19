@@ -99,7 +99,7 @@ def create_app(config={}):
     from .controllers.sql import sqlBP
     from .controllers.orchestrations import orchestrationsBP
     from .controllers.plugins import pluginsBP
-    from .controllers.root import root
+    from .controllers.root import root, api_root
 
     app.register_blueprint(dashboardsBP)
     app.register_blueprint(reportsBP)
@@ -109,6 +109,7 @@ def create_app(config={}):
     app.register_blueprint(orchestrationsBP)
     app.register_blueprint(pluginsBP)
     app.register_blueprint(root)
+    app.register_blueprint(api_root)
 
     if app.config["PROFILE"]:
         from .profiler import init

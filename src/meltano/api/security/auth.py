@@ -76,7 +76,7 @@ def api_auth_required(f):
             logging.debug(f"@{session_user.username} authenticated via `session`")
             return f()
 
-        return "Authentication required to access this resource.", 401
+        return "Authentication is required to access this resource.", 401
 
     return decorated
 

@@ -32,20 +32,3 @@ def setup_security(app, project):
     security.init_app(app, users, **options)
     security.unauthorized_handler(unauthorized_callback)
     identity_loaded.connect_via(app)(_identity_loaded_hook)
-
-    bp = app.blueprints["security"]
-
-    @bp.route("/identity")
-    @api_auth_required
-    def identity():
-        return jsonify({"username": current_user.username})
-
-    @bp.route("/bootstrap")
-    @login_required
-    def bootstrap_app():
-        """Fire off the application with the current user logged in"""
-        uri = urllib.parse.urlparse(app.config["MELTANO_UI_URL"])
-
-        return redirect(urllib.parse.urlunparse(uri))
-
-    app.register_blueprint(bp)

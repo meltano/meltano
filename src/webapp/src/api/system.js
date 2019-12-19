@@ -17,6 +17,6 @@ export default {
   },
 
   identity() {
-    return axios.get(utils.root('/auth/identity'))
+    return axios.get(utils.apiRoot('/identity'))
   }
 }

@@ -83,17 +83,14 @@ class TestSecurity:
     def test_bootstrap(self, app, api, impersonate):
         with app.test_request_context():
             with impersonate(users.get_user("alice")):
-                res = api.get(url_for("security.bootstrap_app"))
-                url = urllib.parse.urlparse(res.location)
-                query = urllib.parse.parse_qs(url.query)
+                res = api.get(url_for("root.bootstrap"))
 
                 assert res.status_code == 302
-                assert url.netloc == "localhost"
-                assert url.path == "/"
+                assert res.location == url_for("root.default", _external=True)
 
     def test_bootstrap_unauthenticated(self, app, api):
         with app.test_request_context():
-            res = api.get(url_for("security.bootstrap_app"))
+            res = api.get(url_for("root.bootstrap"))
             url = urllib.parse.urlparse(res.location)
 
             assert res.status_code == 302
@@ -119,7 +116,7 @@ class TestSingleUser:
 
     def test_bootstrap(self, app, api):
         with app.test_request_context():
-            res = api.get(url_for("security.bootstrap_app"))
+            res = api.get(url_for("root.bootstrap"))
 
             assert res.status_code == 302
             assert res.location == url_for("root.default", _external=True)
