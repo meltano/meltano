@@ -20,11 +20,9 @@ def user(ctx, project):
 @click.argument("username")
 @click.argument("password")
 @click.option("--overwrite", "-f", is_flag=True, default=False)
-@click.option("--no-hash", "-H", is_flag=True, default=False)
 @click.option("--role", "-G", multiple=True)
 @click.pass_context
 def add(ctx, username, password, role=[], **flags):
-    h = identity if flags["no_hash"] else hash_password
     engine, _ = project_engine(ctx.obj["project"])
     app = create_app({"SQLALCHEMY_DATABASE_URI": str(engine.url)})
 
@@ -50,7 +48,7 @@ def add(ctx, username, password, role=[], **flags):
             current_user = users.get_user(username) or users.create_user(
                 username=username
             )
-            current_user.password = h(password)
+            current_user.password = hash_password(password)
             current_user.roles = roles
 
             # for some reason the scoped_session doesn't trigger the commit

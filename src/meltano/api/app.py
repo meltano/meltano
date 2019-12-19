@@ -83,7 +83,8 @@ def create_app(config={}):
     setup_json(app)
 
     # we need to setup CORS for development
-    CORS(app, origins="http://localhost:8080", supports_credentials=True)
+    if app.env == "development":
+        CORS(app, origins="http://localhost:8080", supports_credentials=True)
 
     # 2) Register the URL Converters
     from .url_converters import PluginRefConverter

@@ -112,7 +112,6 @@ def start(ctx, reload, bind_port, bind):
 @ui.command()
 @click.argument("server_name")
 @click.option("--bits", default=256)
-@click.option("--overwrite", is_flag=True, default=False)
 @click.pass_context
 def setup(ctx, server_name, **flags):
     """

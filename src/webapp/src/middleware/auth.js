@@ -6,7 +6,13 @@ export class AuthMiddleware {
   }
 
   onRequest(req) {
-    // enable the sending of cookie
+    // Enable the sending of cookie cross-domain,
+    // which enables the API to use the Session
+    //
+    // As the Session cookie is set for a specific
+    // domain, we can safely toggle this on for
+    // all XHRs without fear of having the session
+    // hijacked.
     req.withCredentials = true
 
     return req
