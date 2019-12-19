@@ -79,20 +79,21 @@ Enables you to change a plugin's configuration.
 
 Meltano uses configuration layers to resolve a plugin's configuration:
 
-1. Environments variables
+1. Environment variables
 1. Plugin definition's `config:` attribute in **meltano.yml**
-1. Settings set via `meltano config` or the in the UI (stored in the meltano database)
+1. Settings set via `meltano config` or in the UI (stored in the system database)
 1. Default values set in the setting definition in **discovery.yml**
 
-This way, a Meltano project can stay secure in production, where environment variables shall be used for sensible settings (such as _passwords_ or _keys_) or use the settings database.
-
 ::: info
-Meltano stores the configuration as-is, without encryption. The most secure way to set a plugin's setting to a sensible value is to use the environment variable associated with it.
+Sensitive settings such as _passwords_ or _keys_ should not be configured using `meltano.yml`, 
+since the entire contents of this file are available to the Meltano UI and its users.
 
-Use `meltano config <plugin_name> list` to see the proper variable to set for a setting.
+Instead, these sensitive values should be stored in environment variables, or the system database (using `meltano config` or the UI).
+
+You can use `meltano config <plugin_name> list` to find the environment variable associated with a setting.
+
+Note that in each of these cases, Meltano stores the configuration as-is, without encryption.
 :::
-
-In development, however, one can use the **meltano.yml** to quickly set the configuration, via the `config:` attribute in each plugin, or use a different set of environment variables.
 
 ### How to use
 
