@@ -167,9 +167,7 @@ def add_plugin_configuration_profile(plugin_ref) -> Response:
     settings = PluginSettingsService(project)
 
     # create the new profile for this plugin
-    profile = plugin.add_profile(
-        slugify(payload["name"]), config=payload["config"], label=payload["name"]
-    )
+    profile = plugin.add_profile(slugify(payload["name"]), label=payload["name"])
 
     config.update_plugin(plugin)
     plugin.use_profile(profile)
