@@ -162,7 +162,8 @@ const actions = {
               hasError: jobStatus.hasError,
               isRunning: !jobStatus.isComplete,
               startedAt: jobStatus.startedAt,
-              endedAt: jobStatus.endedAt
+              endedAt: jobStatus.endedAt,
+              hasEverSucceeded: jobStatus.hasEverSucceeded
             })
           }
         })
@@ -272,6 +273,7 @@ const mutations = {
       isRunning,
       isDeleting = false,
       hasError = false,
+      hasEverSucceeded = false,
       startedAt = null,
       endedAt = null
     }
@@ -279,6 +281,7 @@ const mutations = {
     Vue.set(pipeline, 'isRunning', isRunning)
     Vue.set(pipeline, 'hasError', hasError)
     Vue.set(pipeline, 'isDeleting', isDeleting)
+    Vue.set(pipeline, 'hasEverSucceeded', hasEverSucceeded)
     Vue.set(pipeline, 'startedAt', utils.dateIso8601(startedAt))
     Vue.set(pipeline, 'endedAt', utils.dateIso8601(endedAt))
   },
