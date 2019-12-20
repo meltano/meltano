@@ -142,7 +142,7 @@ export default {
           Run Log: <span class="is-family-code">{{ jobId }}</span>
         </p>
       </header>
-      <section v-if="isPolling" class="modal-card-body">
+      <section v-if="isPolling && relatedPipeline" class="modal-card-body">
         <p>
           Your data is currently being pulled from
           {{ relatedPipeline.extractor }}. Please note that depending on the
