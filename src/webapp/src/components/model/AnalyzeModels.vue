@@ -26,7 +26,7 @@ export default {
   created() {
     this.$store.dispatch('plugins/getAllPlugins')
     this.$store.dispatch('plugins/getInstalledPlugins')
-    this.$store.dispatch('repos/getModels')
+    this.$store.dispatch('repos/getAllModels')
     this.checkHasDbtDocs()
   },
   methods: {
@@ -35,7 +35,7 @@ export default {
     installModel(model) {
       this.addPlugin({ pluginType: 'models', name: model })
         .then(() => this.installPlugin({ pluginType: 'models', name: model }))
-        .then(() => this.$store.dispatch('repos/getModels'))
+        .then(() => this.$store.dispatch('repos/getAllModels'))
     }
   }
 }

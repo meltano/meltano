@@ -26,10 +26,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('configuration', ['getRunningPipelineJobIds']),
+    ...mapGetters('orchestration', ['getRunningPipelineJobIds']),
     ...mapGetters('plugins', ['getInstalledPlugin']),
     ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
-    ...mapState('configuration', ['pipelines']),
+    ...mapState('orchestration', ['pipelines']),
     ...mapState('repos', ['models']),
     contextualModels() {
       let models = this.models
@@ -88,7 +88,7 @@ export default {
     this.jobPoller.dispose()
   },
   methods: {
-    ...mapActions('configuration', ['getJobLog']),
+    ...mapActions('orchestration', ['getJobLog']),
     close() {
       if (this.prevRoute) {
         this.$router.go(-1)

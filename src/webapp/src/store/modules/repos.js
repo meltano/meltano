@@ -52,7 +52,7 @@ const actions = {
     })
   },
 
-  getModels({ commit }) {
+  getAllModels({ commit }) {
     repoApi.models().then(response => {
       commit('setModels', response.data)
     })
@@ -85,7 +85,7 @@ const actions = {
     repoApi
       .sync()
       .then(response => {
-        dispatch('getModels')
+        dispatch('getAllModels')
         commit('setValidatedState', response.data)
         state.loadingUpdate = false
       })

@@ -28,8 +28,8 @@ export default {
       'getIsInstallingPlugin',
       'getPluginProfiles'
     ]),
-    ...mapGetters('configuration', ['getHasValidConfigSettings']),
-    ...mapState('configuration', ['loaderInFocusConfiguration']),
+    ...mapGetters('orchestration', ['getHasValidConfigSettings']),
+    ...mapState('orchestration', ['loaderInFocusConfiguration']),
     ...mapState('plugins', ['installedPlugins']),
     isInstalled() {
       return this.getIsPluginInstalled('loaders', this.loaderName)
@@ -88,7 +88,7 @@ export default {
     })
   },
   beforeDestroy() {
-    this.$store.dispatch('configuration/resetLoaderInFocusConfiguration')
+    this.$store.dispatch('orchestration/resetLoaderInFocusConfiguration')
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
@@ -107,19 +107,19 @@ export default {
     },
     getLoaderConfiguration() {
       return this.$store.dispatch(
-        'configuration/getLoaderConfiguration',
+        'orchestration/getLoaderConfiguration',
         this.loaderName
       )
     },
     saveConfigAndGoToSchedule() {
       this.$store
-        .dispatch('configuration/savePluginConfiguration', {
+        .dispatch('orchestration/savePluginConfiguration', {
           name: this.loader.name,
           type: 'loaders',
           profiles: this.localConfiguration.profiles
         })
         .then(() => {
-          this.$store.dispatch('configuration/updateRecentELTSelections', {
+          this.$store.dispatch('orchestration/updateRecentELTSelections', {
             type: 'loader',
             value: this.loader
           })

@@ -28,8 +28,8 @@ export default {
       'getIsPluginInstalled',
       'getIsInstallingPlugin'
     ]),
-    ...mapGetters('configuration', ['getHasValidConfigSettings']),
-    ...mapState('configuration', ['extractorInFocusConfiguration']),
+    ...mapGetters('orchestration', ['getHasValidConfigSettings']),
+    ...mapState('orchestration', ['extractorInFocusConfiguration']),
     ...mapState('plugins', ['installedPlugins']),
 
     currentProfile() {
@@ -105,11 +105,11 @@ export default {
     })
   },
   beforeDestroy() {
-    this.$store.dispatch('configuration/resetExtractorInFocusConfiguration')
+    this.$store.dispatch('orchestration/resetExtractorInFocusConfiguration')
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
-    ...mapActions('configuration', [
+    ...mapActions('orchestration', [
       'savePluginConfiguration',
       'testPluginConfiguration',
       'updateRecentELTSelections'
@@ -134,19 +134,19 @@ export default {
     },
     getExtractorConfiguration() {
       return this.$store.dispatch(
-        'configuration/getExtractorConfiguration',
+        'orchestration/getExtractorConfiguration',
         this.extractorName
       )
     },
     saveConfigAndGoToLoaders() {
       this.$store
-        .dispatch('configuration/savePluginConfiguration', {
+        .dispatch('orchestration/savePluginConfiguration', {
           name: this.extractor.name,
           type: 'extractors',
           profiles: this.localConfiguration.profiles
         })
         .then(() => {
-          this.$store.dispatch('configuration/updateRecentELTSelections', {
+          this.$store.dispatch('orchestration/updateRecentELTSelections', {
             type: 'extractor',
             value: this.extractor
           })

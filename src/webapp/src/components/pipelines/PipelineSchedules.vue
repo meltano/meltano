@@ -13,8 +13,8 @@ export default {
     ScheduleTableHead
   },
   computed: {
-    ...mapState('configuration', ['pipelines']),
-    ...mapGetters('configuration', ['getHasPipelines']),
+    ...mapState('orchestration', ['pipelines']),
+    ...mapGetters('orchestration', ['getHasPipelines']),
     ...mapGetters('plugins', ['getIsPluginInstalled']),
     getMomentFormatlll() {
       return val => utils.momentFormatlll(val)
@@ -39,10 +39,10 @@ export default {
     })
   },
   created() {
-    this.$store.dispatch('configuration/getAllPipelineSchedules')
+    this.$store.dispatch('orchestration/getAllPipelineSchedules')
   },
   methods: {
-    ...mapActions('configuration', ['deletePipelineSchedule']),
+    ...mapActions('orchestration', ['deletePipelineSchedule']),
     deletePipeline(pipeline) {
       this.deletePipelineSchedule(pipeline)
         .then(() =>
@@ -59,7 +59,7 @@ export default {
       this.$router.push({ name: 'runLog', params: { jobId } })
     },
     runELT(pipeline) {
-      this.$store.dispatch('configuration/run', pipeline)
+      this.$store.dispatch('orchestration/run', pipeline)
     }
   }
 }

@@ -24,15 +24,36 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('configuration', ['getRunningPipelines']),
+    ...mapGetters('orchestration', [
+      'getRunningPipelines',
+      'getSuccessfulPipelines'
+    ]),
     ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
     ...mapGetters('system', ['updateAvailable']),
     ...mapGetters('plugins', [
       'getIsStepLoadersMinimallyValidated',
-      'getIsStepScheduleMinimallyValidated'
+      'getIsStepScheduleMinimallyValidated',
+      'visibleExtractors'
     ]),
     ...mapState('repos', ['models']),
     ...mapState('system', ['latestVersion', 'updating', 'version', 'identity']),
+    getIsModelEnabled() {
+      return model => {
+        if (!this.getSuccessfulPipelines || !this.visibleExtractors) {
+          return false
+        }
+
+        const matchedPlugins = this.visibleExtractors.filter(extractor => {
+          return this.getSuccessfulPipelines.find(
+            pipeline => pipeline.extractor === extractor.name
+          )
+        })
+
+        return matchedPlugins.find(
+          plugin => plugin.namespace === model.plugin_namespace
+        )
+      }
+    },
     getIconColor() {
       return parentPath =>
         this.getIsSubRouteOf(parentPath)
@@ -54,7 +75,10 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('repos/getModels')
+    this.$store.dispatch('orchestration/getAllPipelineSchedules')
+    this.$store.dispatch('plugins/getAllPlugins')
+    this.$store.dispatch('plugins/getInstalledPlugins')
+    this.$store.dispatch('repos/getAllModels')
   },
   methods: {
     ...mapActions('system', ['logout']),
@@ -180,24 +204,29 @@ export default {
           <div class="navbar-dropdown navbar-dropdown-scrollable">
             <template v-if="hasModels">
               <div
-                v-for="(v, model) in models"
-                :key="`${model}-panel`"
+                v-for="(model, modelKey) in models"
+                :key="`${modelKey}-panel`"
                 class="box box-analyze-nav is-borderless is-shadowless is-marginless"
               >
                 <div class="content">
                   <h3 class="is-size-6">
-                    {{ v.name | capitalize | underscoreToSpace }}
+                    {{ model.name | capitalize | underscoreToSpace }}
                   </h3>
-                  <h4 class="is-size-7 has-text-grey">
-                    {{ v.namespace }}
-                  </h4>
+                  <p
+                    v-if="!getIsModelEnabled(model)"
+                    class="is-size-7 is-italic has-text-grey has-text-weight-light"
+                  >
+                    A {{ model.name | capitalize | underscoreToSpace }} pipeline
+                    must complete to enable the below reports
+                  </p>
                 </div>
                 <div class="buttons">
                   <router-link
-                    v-for="design in v['designs']"
+                    v-for="design in model['designs']"
                     :key="design"
                     class="button is-small is-interactive-primary is-outlined"
-                    :to="urlForModelDesign(model, design)"
+                    :disabled="!getIsModelEnabled(model)"
+                    :to="urlForModelDesign(modelKey, design)"
                     >{{ design | capitalize | underscoreToSpace }}</router-link
                   >
                 </div>
