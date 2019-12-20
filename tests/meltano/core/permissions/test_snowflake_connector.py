@@ -5,7 +5,7 @@ from meltano.core.permissions.utils.snowflake_connector import SnowflakeConnecto
 
 class TestSnowflakeConnector:
     def test_snowflaky(self):
-        
+
         db1 = "analytics.schema.table"
         db2 = "1234raw.schema.table"
         db3 = '"123-with-quotes".schema.table'

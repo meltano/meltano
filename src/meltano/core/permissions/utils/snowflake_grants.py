@@ -174,7 +174,7 @@ class SnowflakeGrantsGenerator:
                                     role_name=SnowflakeConnector.snowflaky(
                                         granted_role
                                     ),
-                                    type=grant_type ,
+                                    type=grant_type,
                                     entity_name=SnowflakeConnector.snowflaky(entity),
                                 ),
                             }

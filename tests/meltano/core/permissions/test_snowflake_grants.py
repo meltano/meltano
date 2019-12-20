@@ -6,49 +6,32 @@ from meltano.core.permissions.utils.snowflake_grants import SnowflakeGrantsGener
 @pytest.fixture(scope="class")
 def test_grants_to_role():
 
-    roles = {
-        "functional_role": {
-            "usage": {
-                "role": [
-                    "object_role_1",
-                    "object_role_2",
-                ]
-            }
-        }
-    }
+    roles = {"functional_role": {"usage": {"role": ["object_role_1", "object_role_2"]}}}
 
     return roles
 
+
 @pytest.fixture(scope="class")
 def test_roles_granted_to_user():
-    return {
-        "user_name": [
-            "function_role",
-            "user_role"
-        ]
-    }
+    return {"user_name": ["function_role", "user_role"]}
+
 
 class TestSnowflakeGrants:
-    def test_generate_grant_roles(self, test_grants_to_role, test_roles_granted_to_user):
-        generator = SnowflakeGrantsGenerator(test_grants_to_role, test_roles_granted_to_user)
+    def test_generate_grant_roles(
+        self, test_grants_to_role, test_roles_granted_to_user
+    ):
+        generator = SnowflakeGrantsGenerator(
+            test_grants_to_role, test_roles_granted_to_user
+        )
 
         user_config = {
-            "user_name": {
-                "can_login": True,
-                "member_of": [
-                    "object_role",
-                    "user_role"
-                ]
-            }
+            "user_name": {"can_login": True, "member_of": ["object_role", "user_role"]}
         }
 
         role_config = {
             "functional_role": {
                 "warehouses": ["warehouse_1"],
-                "member_of": [
-                    "object_role_2",
-                    "object_role_3"
-                ]
+                "member_of": ["object_role_2", "object_role_3"],
             }
         }
 
@@ -61,7 +44,6 @@ class TestSnowflakeGrants:
         assert "grant role object_role_2 to role functional_role" in role_lower_list
         assert "grant role object_role_3 to role functional_role" in role_lower_list
         assert "revoke role object_role_1 from role functional_role" in role_lower_list
-
 
         user_command_list = generator.generate_grant_roles(
             "users", "user_name", user_config["user_name"]
