@@ -178,12 +178,20 @@ Layout helpers, often with names based on Bulma naming conventions
   font-style: italic;
 }
 
-.table td {
-  vertical-align: middle;
-}
+.table {
+  td {
+    vertical-align: middle;
+  }
 
-.table th span {
-  vertical-align: middle;
+  th span {
+    vertical-align: middle;
+  }
+
+  &.has-borderless-cells {
+    td {
+      @extend .is-borderless;
+    }
+  }
 }
 
 /*
