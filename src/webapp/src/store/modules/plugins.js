@@ -26,20 +26,6 @@ const defaultState = utils.deepFreeze({
 })
 
 const getters = {
-  visibleExtractors(state) {
-    return pluginUtils.filterVisiblePlugins({
-      installedPlugins: state.installedPlugins.extractors,
-      pluginList: state.plugins.extractors
-    })
-  },
-
-  visibleLoaders(state) {
-    return pluginUtils.filterVisiblePlugins({
-      installedPlugins: state.installedPlugins.loaders,
-      pluginList: state.plugins.loaders
-    })
-  },
-
   getHasDefaultTransforms(state) {
     return namespace =>
       state.plugins.transforms.find(
@@ -116,6 +102,20 @@ const getters = {
       )
       return [plugin.name, ...pluginProfiles]
     }
+  },
+
+  visibleExtractors(state) {
+    return pluginUtils.filterVisiblePlugins({
+      installedPlugins: state.installedPlugins.extractors,
+      pluginList: state.plugins.extractors
+    })
+  },
+
+  visibleLoaders(state) {
+    return pluginUtils.filterVisiblePlugins({
+      installedPlugins: state.installedPlugins.loaders,
+      pluginList: state.plugins.loaders
+    })
   }
 }
 
@@ -162,7 +162,7 @@ const actions = {
   installRelatedPlugins({ dispatch }, installConfig) {
     return pluginsApi.installBatch(installConfig).then(() => {
       dispatch('getAllPlugins')
-      dispatch('repos/getModels', null, { root: true })
+      dispatch('repos/getAllModels', null, { root: true })
     })
   }
 }

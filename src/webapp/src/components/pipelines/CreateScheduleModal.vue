@@ -33,7 +33,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
+    ...mapState('orchestration', ['recentELTSelections', 'transformOptions']),
     ...mapGetters('plugins', [
       'getHasDefaultTransforms',
       'getHasInstalledPluginsOfType',
@@ -106,9 +106,9 @@ export default {
     save() {
       this.isSaving = true
       this.$store
-        .dispatch('configuration/savePipelineSchedule', this.pipeline)
+        .dispatch('orchestration/savePipelineSchedule', this.pipeline)
         .then(() => {
-          this.$store.dispatch('configuration/run', this.pipeline).then(() => {
+          this.$store.dispatch('orchestration/run', this.pipeline).then(() => {
             Vue.toasted.global.success(`Schedule Saved - ${this.pipeline.name}`)
             Vue.toasted.global.success(`Auto Running - ${this.pipeline.name}`)
             this.isSaving = false

@@ -64,6 +64,9 @@ class Job(SystemModel):
     def is_complete(self):
         return self.state in [State.SUCCESS, State.FAIL]
 
+    def is_success(self):
+        return self.state is State.SUCCESS
+
     def can_transit(self, state: State) -> bool:
         if self.state is state:
             return True

@@ -16,6 +16,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1434](https://gitlab.com/meltano/meltano/issues/1434) Fix Analyze CTAs to only enable if at least one related pipeline has succeeded
+
 ### Breaks
 
 ## 1.12.2 - (2019-12-20)

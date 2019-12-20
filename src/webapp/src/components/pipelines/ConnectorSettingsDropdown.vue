@@ -37,7 +37,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('configuration', ['addConfigurationProfile']),
+    ...mapActions('orchestration', ['addConfigurationProfile']),
     addProfile() {
       const payload = {
         name: this.connector.name,
