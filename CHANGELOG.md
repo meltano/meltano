@@ -13,10 +13,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1399](https://gitlab.com/meltano/meltano/issues/1399) Log Modal now has a prompt to explain potential factors in required time for pipelines to complete
+
 ### Fixes
 
 ### Breaks
-
 
 ## 1.12.2 - (2019-12-20)
 
@@ -30,7 +31,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1466](https://gitlab.com/meltano/meltano/issues/1466) Filters now have clear language and indiciation that they use AND for chaining
 - [#1464](https://gitlab.com/meltano/meltano/issues/1464) Remove the "only" option for transforms in Create Pipeline form
-- [#1399](https://gitlab.com/meltano/meltano/issues/1399) Log Modal now has a prompt to explain potential factors in required time for pipelines to complete
 
 ### Changes
 
@@ -41,7 +41,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1447](https://gitlab.com/meltano/meltano/issues/1447) Various fixes around loading and reloading reports to mitigate false positive `sqlErrorMessage` conditions
 - [#1443](https://gitlab.com/meltano/meltano/issues/1443) Fix tooltip clipping in modals
 - [#1500](https://gitlab.com/meltano/meltano/issues/1500) Fix `meltano install` not running the migrations.
-
 
 ## 1.12.1 - (2019-12-18)
 
