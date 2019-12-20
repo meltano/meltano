@@ -56,6 +56,9 @@ export default {
         .map(this.getPluginProfiles)
         .flatten()
         .value()
+    },
+    transformOptionsWithoutOnly() {
+      return this.transformOptions.filter(option => option.name !== 'only')
     }
   },
   created() {
@@ -211,7 +214,7 @@ export default {
                       :class="{ 'has-text-success': pipeline.transform }"
                     >
                       <option
-                        v-for="transform in transformOptions"
+                        v-for="transform in transformOptionsWithoutOnly"
                         :key="transform.name"
                         >{{ transform.name }}</option
                       >
