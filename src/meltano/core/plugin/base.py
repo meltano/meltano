@@ -179,7 +179,7 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         if self.current_profile is Profile.DEFAULT:
             return self.config
 
-        return find_named(self.profiles, self.current_profile).config
+        return self.current_profile.config
 
     def exec_args(self, files: Dict):
         return []
