@@ -32,6 +32,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1466](https://gitlab.com/meltano/meltano/issues/1466) Filters now have clear language and indiciation that they use AND for chaining
 - [#1464](https://gitlab.com/meltano/meltano/issues/1464) Remove the "only" option for transforms in Create Pipeline form
 
+- [#1399](https://gitlab.com/meltano/meltano/issues/1399) Log Modal now has a prompt to explain potential factors in required time for pipelines to complete
+
 ### Changes
 
 - [#1422](https://gitlab.com/meltano/meltano/issues/1422) Update start date field to have a recommendation
