@@ -60,8 +60,10 @@ class SnowflakeGrantsGenerator:
         For a given schema name, get all schemas it may be referencing.
 
         For example, if <db>.* is given then all schemas in the database 
-        will be returned. if <db>.<schema_partial>_* is given, then all 
-        schemas that match the schema partial pattern will be returned.
+        will be returned. If <db>.<schema_partial>_* is given, then all 
+        schemas that match the schema partial pattern will be returned. 
+        If a full schema name is given, it will return that single schema
+        as a list.
 
         This function can be enhanced in the future to handle more 
         complicated schema names if necessary.
@@ -94,11 +96,11 @@ class SnowflakeGrantsGenerator:
                 schema_name = db_schema.split(".", 1)[1].lower()
                 if schema_name.startswith(name_parts[1].split("*", 1)[0]):
                     fetched_schemas.append(db_schema)
-        
+
         else:
             # If no * in name, then return provided schema name
             fetched_schemas = [schema]
-        
+
         return fetched_schemas
 
     def generate_grant_roles(
