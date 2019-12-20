@@ -29,6 +29,22 @@ export default {
     getFilterInputType() {
       return filterType => (filterType === 'aggregate' ? 'number' : 'text')
     },
+    getHasAtLeastOneLikeFilter() {
+      const likeExpression = 'like'
+      const filteredAttributes = [
+        ...this.filters.aggregates,
+        ...this.filters.columns
+      ]
+      const filterModelHasLike = filteredAttributes.find(
+        attribute => attribute.expression === likeExpression
+      )
+      return (
+        filterModelHasLike || this.addFilterModel.expression === likeExpression
+      )
+    },
+    getHasMultipleFilters() {
+      return this.getFlattenedFilters.length > 1
+    },
     getHasValidatedOptionals() {
       return (expression, value) =>
         this.getIsExpressionNullRelated(expression) || Boolean(value)
@@ -291,13 +307,16 @@ export default {
         </template>
       </tbody>
     </table>
-    <p
-      v-show="getFlattenedFilters.length > 1"
-      class="has-text-centered is-size-7"
+    <div
+      v-if="getHasAtLeastOneLikeFilter || getHasMultipleFilters"
+      class="content has-text-centered is-size-7"
     >
-      Currently, we only have the AND option for filter chains; but we intend to
-      support more!
-    </p>
+      <p v-if="getHasAtLeastOneLikeFilter">Options...</p>
+      <p v-if="getHasMultipleFilters">
+        Currently, we only have the AND option for filter chains; but we intend
+        to support more!
+      </p>
+    </div>
   </div>
 </template>
 
