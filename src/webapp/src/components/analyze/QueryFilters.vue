@@ -291,6 +291,13 @@ export default {
         </template>
       </tbody>
     </table>
+    <p
+      v-show="getFlattenedFilters.length > 1"
+      class="has-text-centered is-size-7"
+    >
+      Currently, we only have the AND option for filter chains; but we intend to
+      support more!
+    </p>
   </div>
 </template>
 
