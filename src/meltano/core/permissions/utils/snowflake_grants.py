@@ -117,6 +117,10 @@ class SnowflakeGrantsGenerator:
         """
         sql_commands = []
 
+        if entity_type == "users":
+            grant_type = "user"
+        if entity_type == "roles":
+            grant_type = "role"
         try:
             for member_role in config["member_of"]:
                 granted_role = SnowflakeConnector.snowflaky(member_role)
@@ -135,7 +139,7 @@ class SnowflakeGrantsGenerator:
                         "already_granted": already_granted,
                         "sql": GRANT_ROLE_TEMPLATE.format(
                             role_name=SnowflakeConnector.snowflaky(member_role),
-                            type=entity_type,
+                            type=grant_type,
                             entity_name=SnowflakeConnector.snowflaky(entity),
                         ),
                     }
@@ -152,7 +156,7 @@ class SnowflakeGrantsGenerator:
                                     role_name=SnowflakeConnector.snowflaky(
                                         granted_role
                                     ),
-                                    type=entity_type,
+                                    type=grant_type,
                                     entity_name=SnowflakeConnector.snowflaky(entity),
                                 ),
                             }
@@ -170,7 +174,7 @@ class SnowflakeGrantsGenerator:
                                     role_name=SnowflakeConnector.snowflaky(
                                         granted_role
                                     ),
-                                    type=entity_type,
+                                    type=grant_type ,
                                     entity_name=SnowflakeConnector.snowflaky(entity),
                                 ),
                             }
