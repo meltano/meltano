@@ -39,46 +39,84 @@ def subject(session, project_add_service, tap, plugin_settings_service):
 
 
 class TestPluginSettingsService:
-    def test_get_value(self, session, subject, project, tap, env_var, monkeypatch):
+    def test_get_value(
+        self, session, subject, project, tap, env_var, monkeypatch, config_service
+    ):
+        profile = tap.add_profile("profile", label="Profile")
+        config_service.update_plugin(tap)
+        tap_with_profile = config_service.find_plugin(tap.name)
+        tap_with_profile.use_profile(profile)
+
         # returns the default value when unset
         assert subject.get_value(session, tap, "test") == (
+            "mock",
+            PluginSettingValueSource.DEFAULT,
+        )
+        assert subject.get_value(session, tap_with_profile, "test") == (
             "mock",
             PluginSettingValueSource.DEFAULT,
         )
 
         # overriden by an PluginSetting db value when set
         setting = subject.set(session, tap, "test", "THIS_IS_FROM_DB")
+        setting_with_profile = subject.set(
+            session, tap_with_profile, "test", "THIS_IS_FROM_DB_WITH_PROFILE"
+        )
+
         assert subject.get_value(session, tap, "test") == (
             "THIS_IS_FROM_DB",
+            PluginSettingValueSource.DB,
+        )
+        assert subject.get_value(session, tap_with_profile, "test") == (
+            "THIS_IS_FROM_DB_WITH_PROFILE",
             PluginSettingValueSource.DB,
         )
 
         # but only if enabled
         setting.enabled = False
+        setting_with_profile.enabled = False
         session.merge(setting)
+        session.merge(setting_with_profile)
         session.commit()
+
         assert subject.get_value(session, tap, "test") == (
+            "mock",
+            PluginSettingValueSource.DEFAULT,
+        )
+        assert subject.get_value(session, tap_with_profile, "test") == (
             "mock",
             PluginSettingValueSource.DEFAULT,
         )
 
         # overriden via the `meltano.yml` configuration
-        original_meltano = project.meltano
         with project.meltano_update() as meltano:
-            meltano.plugins.extractors[0].config = {"test": 42}
+            extractor = meltano.plugins.extractors[0]
+            extractor.config = {"test": 42}
+            extractor.get_profile("profile").config = {"test": 43}
 
         assert subject.get_value(session, tap, "test") == (
             42,
             PluginSettingValueSource.MELTANO_YML,
         )
+        assert subject.get_value(session, tap_with_profile, "test") == (
+            43,
+            PluginSettingValueSource.MELTANO_YML,
+        )
 
         # revert back to the original
         with project.meltano_update() as meltano:
-            meltano.plugins.extractors[0].config = {}
+            extractor = meltano.plugins.extractors[0]
+            extractor.config = {}
+            extractor.get_profile("profile").config = {}
 
         # overriden via ENV
         monkeypatch.setenv(env_var(tap, "test"), "N33DC0F33")
+
         assert subject.get_value(session, tap, "test") == (
+            "N33DC0F33",
+            PluginSettingValueSource.ENV,
+        )
+        assert subject.get_value(session, tap_with_profile, "test") == (
             "N33DC0F33",
             PluginSettingValueSource.ENV,
         )
