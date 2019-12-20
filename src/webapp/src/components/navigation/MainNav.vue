@@ -75,7 +75,7 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('repos/getModels')
+    this.$store.dispatch('repos/getAllModels')
   },
   methods: {
     ...mapActions('system', ['logout']),
