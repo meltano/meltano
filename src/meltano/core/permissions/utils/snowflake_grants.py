@@ -397,7 +397,8 @@ class SnowflakeGrantsGenerator:
         sql_commands = []
 
         read_privileges = "usage"
-        write_privileges = "usage, monitor, create schema"
+        partial_write_privileges = "monitor, create schema"
+        write_privileges = f"{read_privileges}, {partial_write_privileges}"
 
         for database in databases.get("read", []):
             already_granted = False
@@ -473,10 +474,12 @@ class SnowflakeGrantsGenerator:
                 }
             )
 
+        # REVOKES
+            
+        # Usage is consistent across read and write. Compare granted usage to
+        # full read/write usage set and revoke missing ones
         for granted_database in (
-            self.grants_to_role.get(role, {}).get("usage", {}).get("database", []) +
-            self.grants_to_role.get(role, {}).get("monitor", {}).get("database", []) +
-            self.grants_to_role.get(role, {}).get("create_schema", {}).get("database", [])
+            self.grants_to_role.get(role, {}).get("usage", {}).get("database", [])
         ):
             # If it's a shared database, only revoke imported
             # We'll only know if it's a shared DB based on the spec
@@ -495,13 +498,53 @@ class SnowflakeGrantsGenerator:
                         ),
                     }
                 )
-            # Can revoke all privileges b/c it will still execute even if it's a no-op
+
             elif granted_database not in all_databases:
                 sql_commands.append(
                     {
                         "already_granted": False,
                         "sql": REVOKE_PRIVILEGES_TEMPLATE.format(
-                            privileges=write_privileges,
+                            privileges=read_privileges,
+                            resource_type="database",
+                            resource_name=SnowflakeConnector.snowflaky(
+                                granted_database
+                            ),
+                            role=SnowflakeConnector.snowflaky(role),
+                        ),
+                    }
+                )
+        # Get all other write privilege dbs in case there are dbs where
+        # usage was revoked but other write permissions still exist
+        # This also preserves the case where somebody switches write access
+        # for read access
+        for granted_database in (
+            self.grants_to_role.get(role, {}).get("monitor", {}).get("database", [])
+            + self.grants_to_role.get(role, {})
+            .get("create_schema", {})
+            .get("database", [])
+        ):
+            # If it's a shared database, only revoke imported
+            # We'll only know if it's a shared DB based on the spec
+            if granted_database not in databases.get("write", []) and granted_database in shared_dbs:
+                sql_commands.append(
+                    {
+                        "already_granted": False,
+                        "sql": REVOKE_PRIVILEGES_TEMPLATE.format(
+                            privileges="imported privileges",
+                            resource_type="database",
+                            resource_name=SnowflakeConnector.snowflaky(
+                                granted_database
+                            ),
+                            role=SnowflakeConnector.snowflaky(role),
+                        ),
+                    }
+                )
+            elif granted_database not in databases.get("write", []):
+                sql_commands.append(
+                    {
+                        "already_granted": False,
+                        "sql": REVOKE_PRIVILEGES_TEMPLATE.format(
+                            privileges=partial_write_privileges,
                             resource_type="database",
                             resource_name=SnowflakeConnector.snowflaky(
                                 granted_database
