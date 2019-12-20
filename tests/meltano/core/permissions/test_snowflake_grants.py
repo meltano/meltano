@@ -7,50 +7,11 @@ from meltano.core.permissions.utils.snowflake_grants import SnowflakeGrantsGener
 def test_grants_to_role():
 
     roles = {
-        "pluthra": {
-            "operate": {
-                "warehouse": [
-                    "analyst_xs"
-                ]
-            },
-            "usage": {
-                "warehouse": [
-                    "analyst_xs"
-                ]
-            }
-        },
-        "boneyard": {
-            "usage": {
-                "database": [
-                    "analytics"
-                ],
-                "schema": [
-                    "analytics.boneyard"
-                ],
-                "warehouse": [
-                    "analyst_xs"
-                ]
-            },
-            "select": {
-                "table": [
-                    "analytics.boneyard.interviews",
-                    "analytics.boneyard.rubric_max_points",
-                    "analytics.boneyard.testing",
-                    "analytics.boneyard.test_sheet"
-                ]
-            },
-            "operate": {
-                "warehouse": [
-                    "analyst_xs"
-                ]
-            }
-        },
-        "analyst_people": {
+        "functional_role": {
             "usage": {
                 "role": [
-                    "bamboohr",
-                    "boneyard",
-                    "greenhouse"
+                    "object_role_1",
+                    "object_role_2",
                 ]
             }
         }
@@ -61,9 +22,9 @@ def test_grants_to_role():
 @pytest.fixture(scope="class")
 def test_roles_granted_to_user():
     return {
-        "pluthra": [
-            "analyst_people",
-            "pluthra"
+        "user_name": [
+            "function_role",
+            "user_role"
         ]
     }
 
@@ -72,27 +33,42 @@ class TestSnowflakeGrants:
         generator = SnowflakeGrantsGenerator(test_grants_to_role, test_roles_granted_to_user)
 
         user_config = {
-            "pluthra": {
+            "user_name": {
                 "can_login": True,
                 "member_of": [
-                    "boneyard",
-                    "pluthra"
+                    "object_role",
+                    "user_role"
+                ]
+            }
+        }
+
+        role_config = {
+            "functional_role": {
+                "warehouses": ["warehouse_1"],
+                "member_of": [
+                    "object_role_2",
+                    "object_role_3"
                 ]
             }
         }
 
         role_command_list = generator.generate_grant_roles(
-            "roles", "pluthra", user_config["pluthra"]
+            "roles", "functional_role", role_config["functional_role"]
         )
 
         role_lower_list = [cmd.get("sql", "").lower() for cmd in role_command_list]
 
+        assert "grant role object_role_2 to role functional_role" in role_lower_list
+        assert "grant role object_role_3 to role functional_role" in role_lower_list
+        assert "revoke role object_role_1 from role functional_role" in role_lower_list
+
+
         user_command_list = generator.generate_grant_roles(
-            "users", "pluthra", user_config["pluthra"]
+            "users", "user_name", user_config["user_name"]
         )
 
         user_lower_list = [cmd.get("sql", "").lower() for cmd in user_command_list]
 
-        assert "grant role boneyard to user pluthra" in user_lower_list
-        assert "grant role pluthra to user pluthra" in user_lower_list
-        assert "revoke role analyst_people from user pluthra" in user_lower_list
+        assert "grant role object_role to user user_name" in user_lower_list
+        assert "grant role user_role to user user_name" in user_lower_list
+        assert "revoke role function_role from user user_name" in user_lower_list
