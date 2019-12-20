@@ -477,7 +477,7 @@ class SnowflakeGrantsGenerator:
             )
 
         # REVOKES
-            
+
         # Usage is consistent across read and write. Compare granted usage to
         # full read/write usage set and revoke missing ones
         for granted_database in (
@@ -519,15 +519,19 @@ class SnowflakeGrantsGenerator:
         # usage was revoked but other write permissions still exist
         # This also preserves the case where somebody switches write access
         # for read access
-        for granted_database in (
-            self.grants_to_role.get(role, {}).get("monitor", {}).get("database", [])
-            + self.grants_to_role.get(role, {})
-            .get("create_schema", {})
-            .get("database", [])
+        for granted_database in self.grants_to_role.get(role, {}).get(
+            "monitor", {}
+        ).get("database", []) + self.grants_to_role.get(role, {}).get(
+            "create_schema", {}
+        ).get(
+            "database", []
         ):
             # If it's a shared database, only revoke imported
             # We'll only know if it's a shared DB based on the spec
-            if granted_database not in databases.get("write", []) and granted_database in shared_dbs:
+            if (
+                granted_database not in databases.get("write", [])
+                and granted_database in shared_dbs
+            ):
                 sql_commands.append(
                     {
                         "already_granted": False,
@@ -764,7 +768,7 @@ class SnowflakeGrantsGenerator:
         write_grant_views = []
 
         read_privileges = "select"
-        write_partial_privileges = "insert, update, delete, truncate, references""
+        write_partial_privileges = "insert, update, delete, truncate, references"
         write_privileges = f"{read_privileges}, {write_partial_privileges}"
 
         for table in tables.get("read", []):
@@ -867,7 +871,7 @@ class SnowflakeGrantsGenerator:
             # Not strictly necessary to have for loop as for all cases b/c
             # currently it will be a single entity - a * or a fully
             # qualified name are the only valid options meaning the script
-            # will grant above for * or it will just be a single entry if 
+            # will grant above for * or it will just be a single entry if
             # it gets to here. This will change though when we want to add
             # additional features (like <table>_* selection)
             for db_table in read_grant_tables:
@@ -1002,7 +1006,7 @@ class SnowflakeGrantsGenerator:
             # Not strictly necessary to have for loop as for all cases b/c
             # currently it will be a single entity - a * or a fully
             # qualified name are the only valid options meaning the script
-            # will grant above for * or it will just be a single entry if 
+            # will grant above for * or it will just be a single entry if
             # it gets to here. This will change though when we want to add
             # additional features (like <table>_* selection)
             for db_table in write_grant_tables:
