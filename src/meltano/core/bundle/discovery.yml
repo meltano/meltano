@@ -25,10 +25,9 @@ extractors:
       - name: csv_files_definition
         env: TAP_CSV_FILES_DEFINITION
         label: CSV Files Definition
-        value: extract/files-def.json
+        placeholder: Ex. files-def.json
         kind: file
         documentation: https://gitlab.com/meltano/tap-csv#run
-        description: This definition file should be relative to the Meltano Project root. We recommend using the `extract/` directory.
   - name: tap-fastly
     label: Fastly
     description: Edge cloud computing services provider
@@ -112,8 +111,7 @@ extractors:
     settings:
       - name: key_file_location
         label: Key File Location
-        value: 'extract/client_secrets.json'
-        placeholder: Ex. extract/client_secrets.json
+        placeholder: Ex. client_secrets.json
         kind: file
         description: Obtain this file from Google Analytics Service Accounts
         documentation: https://meltano.com/plugins/extractors/google-analytics.html#creating-service-account-credentials

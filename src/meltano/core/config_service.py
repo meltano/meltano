@@ -49,9 +49,7 @@ class ConfigService:
                     and (plugin_type is None or plugin.type == plugin_type)
                 )
             )
-
-            profile = self.find_plugin_profile(plugin, profile_name)
-            plugin.use_profile(profile)
+            plugin.use_profile(profile_name)
 
             return plugin
         except StopIteration as stop:
@@ -60,19 +58,11 @@ class ConfigService:
     def get_plugin(self, plugin_ref: PluginRef) -> PluginInstall:
         try:
             plugin = next(plugin for plugin in self.plugins() if plugin == plugin_ref)
-
-            profile = self.find_plugin_profile(plugin, plugin_ref.current_profile_name)
-            plugin.use_profile(profile)
+            plugin.use_profile(plugin_ref.current_profile_name)
 
             return plugin
         except StopIteration as stop:
             raise PluginMissingError(plugin_ref.name) from stop
-
-    def find_plugin_profile(self, plugin, profile_name) -> Optional[Profile]:
-        try:
-            return plugin.get_profile(profile_name)
-        except NotFound:
-            return Profile.DEFAULT
 
     def get_extractors(self):
         return filter(lambda p: p.type == PluginType.EXTRACTORS, self.plugins())

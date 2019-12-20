@@ -60,5 +60,20 @@ export default {
       utils.apiUrl('orchestrations', `${type}/${name}/configuration/test`),
       payload
     )
+  },
+
+  uploadPluginConfigurationFile({ type, name, profileName, formData }) {
+    return axios.post(
+      utils.apiUrl(
+        'orchestrations',
+        `${type}/${name}@${profileName}/configuration/upload-file`
+      ),
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    )
   }
 }

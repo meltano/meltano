@@ -1,4 +1,6 @@
 <script>
+import Vue from 'vue'
+
 import InputDateIso8601 from '@/components/generic/InputDateIso8601'
 import TooltipCircle from '@/components/generic/TooltipCircle'
 
@@ -30,6 +32,14 @@ export default {
     }
   },
   computed: {
+    fileValue() {
+      return setting => {
+        let fullPath = this.configSettings.profiles[
+          this.configSettings.profileInFocusIndex
+        ].config[setting.name]
+        return utils.extractFileNameFromPath(fullPath)
+      }
+    },
     getLabel() {
       return setting =>
         setting.label || utils.titleCase(utils.underscoreToSpace(setting.name))
@@ -43,6 +53,9 @@ export default {
     getIsOfKindDate() {
       return kind => kind === 'date_iso8601'
     },
+    getIsOfKindFile() {
+      return kind => kind === 'file'
+    },
     getIsOfKindHidden() {
       return kind => kind === 'hidden'
     },
@@ -53,6 +66,7 @@ export default {
       return kind =>
         !this.getIsOfKindBoolean(kind) &&
         !this.getIsOfKindDate(kind) &&
+        !this.getIsOfKindFile(kind) &&
         !this.getIsOfKindOptions(kind)
     },
     getIsProtected() {
@@ -126,6 +140,34 @@ export default {
           targetInput.focus()
         }
       })
+    },
+    onFileChange(event, setting) {
+      const file = event.target.files[0]
+
+      if (file) {
+        const profile = this.configSettings.profiles[
+          this.configSettings.profileInFocusIndex
+        ]
+
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('setting_name', setting.name)
+
+        this.$store
+          .dispatch('configuration/uploadPluginConfigurationFile', {
+            name: this.plugin.name,
+            profileName: profile.name,
+            type: 'extractors',
+            formData
+          })
+          .then(response => {
+            // Model update as v-model on `<input type="file">` not supported
+            profile.config[setting.name] = response.data.path
+          })
+          .catch(error => {
+            Vue.toasted.global.error(error.response.data.code)
+          })
+      }
     },
     refocusInput(newVal, oldVal) {
       if (newVal !== oldVal) {
@@ -258,7 +300,44 @@ export default {
                 :input-classes="`is-small ${successClass(setting)}`"
               />
 
-              <!-- Dropdown -->
+              <!-- File -->
+              <div
+                v-else-if="getIsOfKindFile(setting.kind)"
+                class="file has-name is-small"
+              >
+                <label class="file-label is-file-fullwidth">
+                  <div>
+                    <input
+                      class="file-input"
+                      type="file"
+                      :name="setting.name"
+                      @change="onFileChange($event, setting)"
+                    />
+                    <span class="file-cta has-background-white">
+                      <span class="file-icon">
+                        <font-awesome-icon
+                          icon="file-upload"
+                        ></font-awesome-icon>
+                      </span>
+                      <span class="file-label">
+                        <span>Upload</span>
+                      </span>
+                    </span>
+                  </div>
+                  <span
+                    class="file-name is-file-fullwidth file-name-width"
+                    :class="
+                      fileValue(setting)
+                        ? 'has-text-success'
+                        : 'has-text-grey-light'
+                    "
+                  >
+                    {{ fileValue(setting) || setting.placeholder }}
+                  </span>
+                </label>
+              </div>
+
+              <!-- Options -->
               <div
                 v-else-if="getIsOfKindOptions(setting.kind)"
                 class="select is-small is-fullwidth"
@@ -354,6 +433,21 @@ export default {
 </template>
 
 <style lang="scss">
+// This file input is fragile style-wise as Bulma tricks the <input> for display purposes
+// As such, we set an explicit value in order to get the desired width with an "Upload" label.
+// Refactor at will if a better file style approach (or component) comes along.
+.file {
+  .is-file-fullwidth {
+    width: 100%;
+  }
+  .file-name-width {
+    @media screen and (min-width: $tablet) {
+      max-width: 14.6em;
+    }
+    max-width: 60em;
+  }
+}
+
 .label-tooltip {
   margin-left: 0.25em;
 }

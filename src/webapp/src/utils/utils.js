@@ -119,6 +119,9 @@ export default {
   concatLoaderModelDesign(model, design) {
     return `loader:${model}:${design}`
   },
+  extractFileNameFromPath(path) {
+    return path.replace(/^.*[\\/]/, '')
+  },
   hyphenate(value, prepend) {
     if (!value) {
       return ''
