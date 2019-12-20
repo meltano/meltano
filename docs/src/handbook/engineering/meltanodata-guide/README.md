@@ -240,7 +240,7 @@ export DO_API_TOKEN=<access_token>
 
 ##### Configure HTTPS Protocol
 
-and run the `playbook/ssl.yml` playbook. To speed up the process, you can use `--limit=$TENANT_NAME.meltanodata.com`.
+Run the `playbook/ssl.yml` playbook. To speed up the process, you can use `--limit=$TENANT_NAME.meltanodata.com`.
 
 ```
 ansible-playbook playbooks/ssl.yml --limit=TENANT.meltanodata.com
@@ -278,6 +278,10 @@ PLAY RECAP *********************************************************************
 64.225.4.60                : ok=2    changed=2    unreachable=0    failed=0
 ```
 
+##### Configure Meltano
+
+1. Run `meltano.yml` playbook
+
 ##### Verify changes were made
 
 1. SSH into droplet
@@ -291,8 +295,6 @@ redir 301 {
   if {scheme} is http
   /  https://{host}{uri}
 }
-
-basicauth /static/js meltano htpasswd=/etc/caddy/htpasswd
 
 # use a self-signed certificate if need be
 # tls self_signed
@@ -309,10 +311,12 @@ proxy / localhost:5000 {
 gzip
 ```
 
-Then restart caddy using:
+1. Verify `/var/meltano/project/ui.cfg` has been created
 
 ```
-systemctl restart caddy
+SERVER_NAME=$TENANT_NAME.meltanodata.com
+SECRET_KEY=n33d…c0ff33
+SECURITY_PASSWORD_SALT=f33d…f00d
 ```
 
 ::: tip
@@ -322,23 +326,6 @@ Navigate vim with arrow keys and press `I` key to enter Insert mode so you can m
 ::: tip
 To exit Insert mode, press the `Esc` key, type `:wq`, and press `Enter` to save and quit vim
 :::
-
-#### Configure Caddy Environment
-
-1. You should still be logged in to the droplet
-1. Open `/etc/caddy/environment` in text editor
-
-```bash
-vim /etc/caddy/environment
-```
-
-3. Replace `$HOSTNAME` with the client's `$TENANT_NAME`
-
-```
-HOSTNAME=$TENANT_NAME.meltanodata.com
-```
-
-4. Save and quit file
 
 #### Change Login Password
 
@@ -357,10 +344,14 @@ Make sure to quote the password using single quotes `'` as it might contains une
 :::
 
 ```bash
-htpasswd -b /etc/caddy/htpasswd meltano '$PASSWORD'
-```
+# load the meltano virtualenv
+su meltano
+source /var/meltano/.venv/bin/activate
+cd /var/meltano/project
 
-If you get the message `Updating password for user meltano`, you were successful in updating the login password.
+# create the `meltano` user account
+meltano user add meltano '$PASSWORD' --role admin
+```
 
 #### Change FTP Login Password
 
@@ -753,7 +744,7 @@ systemctl status
 
 You can now directly access the instance by adding the https:// in front of the domain the first time you access it:
 
-https://{TENANT}.meltanodata.com/
+https://{$TENANT_NAME}.meltanodata.com/
 
 You'll get a `Privacy Error: NET::ERR_CERT_AUTHORITY_INVALID`, but choose to `Proceed to $TENANT_NAME.meltanodata.com (unsafe)` (e.g. by first clicking on `Advanced` if you are using Chrome)
 

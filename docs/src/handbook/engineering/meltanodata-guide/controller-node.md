@@ -101,7 +101,7 @@ You can test that it works using:
 
 ```bash
 ansible all --list-hosts
-# you should see a long list of IP addresses
+# you should see a long list of IDs, these are the Droplet ID.
 ```
 
 ## Playbooks
@@ -123,7 +123,13 @@ To speed things up, it is recommended to add a flag of `--limit=$TENANT.meltanod
 
 ### caddy.yml
 
-Copies over Caddyfile to the droplet.
+Manage the Caddy configuration, namely:
+
+  - `/etc/caddy/environment`
+  - `/etc/caddy/Caddyfile`
+  - `caddy` service
+  
+Configurable using the `caddy` variable.
 
 ### controller.yml
 
@@ -131,11 +137,38 @@ Ensure the Controller access control is properly setup, requires `root` access.
 
 ### meltano.yml
 
-Ensure each node has proper access control setup.
+Manage the Meltano configuration, namely:
+
+  - `/etc/meltano/environment`
+  - `/var/meltano/project/ui.cfg`
+  - `meltano` service
+
+It also ensure each node has proper access control setup, so that ansible can connect to it.
 
 ### meltano-upgrade.yml
 
 Runs `meltano upgrade` in each node.
+
+### meltano-auth.yml
+
+::: warning
+This playbook was created as a one-off and should not be run unless you know what you are doing.
+:::
+
+Creates the default user account for the node.
+
+To add a user, add it to the `playbooks/vars/meltano/admins.yml.vlt`
+
+> `.vlt` files are encrypted using `ansible-vault`.
+> See https://gitlab.com/meltano/infrastructure#how-to-add-sensitive-data for more information on how to setup your vault access.
+
+Using the `ansible-vault edit playbooks/vars/meltano/admins.yml.vlt`, add the following entry for your host:
+
+```yaml
+$TENANT.meltanodata.com:
+  username: <username>
+  password: <password>
+```
 
 ### ssl.yml
 
