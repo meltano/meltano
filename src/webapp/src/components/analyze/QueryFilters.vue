@@ -229,6 +229,7 @@ export default {
           >
             <td>
               <p class="is-small">
+                <span v-show="index > 0">AND </span>
                 <span v-if="isFirstFilterMatch(filter)">
                   {{ filter.attribute.label }}
                 </span>
