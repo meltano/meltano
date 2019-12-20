@@ -142,6 +142,14 @@ export default {
           Run Log: <span class="is-family-code">{{ jobId }}</span>
         </p>
       </header>
+      <section v-if="isPolling" class="modal-card-body">
+        <p>
+          Your data is currently being pulled from
+          {{ relatedPipeline.extractor }}. Please note that depending on the
+          specific data source, time period, and amount of data, extraction can
+          take as little as a few seconds, or as long as multiple hours.
+        </p>
+      </section>
       <section ref="log-view" class="modal-card-body is-overflow-y-scroll">
         <div class="content">
           <div v-if="jobLog">
