@@ -85,9 +85,14 @@ class PluginSettingsService:
         for profile in (Profile.DEFAULT, *plugin_install.profiles):
             plugin_install.use_profile(profile)
 
-            # set the loaded configuration
-            profile.config = self.as_config(session, plugin_install, redacted=redacted)
-            profiles.append(profile.canonical())
+            profiles.append(
+                {
+                    **profile.canonical(),
+                    "config": self.as_config(
+                        session, plugin_install, redacted=redacted
+                    ),
+                }
+            )
 
         return profiles
 

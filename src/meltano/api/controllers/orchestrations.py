@@ -172,10 +172,14 @@ def add_plugin_configuration_profile(plugin_ref) -> Response:
     config.update_plugin(plugin)
     plugin.use_profile(profile)
 
-    # load the default config for the profile
-    profile.config = freeze_keys(settings.as_config(db.session, plugin, redacted=True))
-
-    return jsonify(profile.canonical())
+    return jsonify(
+        {
+            **profile.canonical(),
+            "config": freeze_keys(
+                settings.as_config(db.session, plugin, redacted=True)
+            ),
+        }
+    )
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["PUT"])
