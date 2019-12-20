@@ -22,6 +22,7 @@ import {
   faExclamationTriangle,
   faExternalLinkSquareAlt,
   faFileAlt,
+  faFileUpload,
   faFilter,
   faGift,
   faGlobeAmericas,
@@ -73,6 +74,7 @@ export default {
     library.add(faExclamationTriangle)
     library.add(faExternalLinkSquareAlt)
     library.add(faFileAlt)
+    library.add(faFileUpload)
     library.add(faFilter)
     library.add(faGift)
     library.add(faGlobeAmericas)

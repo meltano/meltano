@@ -29,6 +29,12 @@ from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.models import db
 from meltano.api.json import freeze_keys
 from meltano.api.executor import run_elt
+from .upload_helper import (
+    InvalidFileNameError,
+    InvalidFileTypeError,
+    InvalidFileSizeError,
+    UploadHelper,
+)
 
 
 orchestrationsBP = APIBlueprint("orchestrations", __name__)
@@ -57,6 +63,37 @@ def _handle(ex):
             }
         ),
         404,
+    )
+
+
+@orchestrationsBP.errorhandler(InvalidFileNameError)
+def _handle(ex):
+    return (jsonify({"error": True, "code": f"The file lacks a valid name."}), 400)
+
+
+@orchestrationsBP.errorhandler(InvalidFileTypeError)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"The file '{ex.file.filename}' must be one of the following types: {ex.extensions}",
+            }
+        ),
+        400,
+    )
+
+
+@orchestrationsBP.errorhandler(InvalidFileSizeError)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"The file '{ex.file.filename}' is empty or exceeds the {ex.max_file_size} size limit.",
+            }
+        ),
+        400,
     )
 
 
@@ -124,6 +161,24 @@ def run():
     job_id = run_elt(project, schedule_payload)
 
     return jsonify({"job_id": job_id}), 202
+
+
+@orchestrationsBP.route(
+    "/<plugin_ref:plugin_ref>/configuration/upload-file", methods=["POST"]
+)
+def upload_plugin_configuration_file(plugin_ref) -> Response:
+    """
+    Endpoint for uploading a file for a specific plugin's configuration profile
+    """
+
+    project = Project.find()
+    file = request.files["file"]
+    setting_name = request.form["setting_name"]
+    directory = project.extract_dir(plugin_ref.full_name, setting_name)
+    upload_helper = UploadHelper()
+    file_path = upload_helper.upload_file(directory, file)
+
+    return jsonify({"path": file_path}), 200
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["GET"])

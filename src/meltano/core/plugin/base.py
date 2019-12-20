@@ -96,7 +96,7 @@ class PluginRef:
     @classmethod
     def parse_name(cls, name: str):
         name, *profile_name = name.split("@")
-        profile_name = next(iter(profile_name), None)
+        profile_name = next(iter(profile_name), Profile.DEFAULT.name)
 
         return (name, profile_name)
 
@@ -107,6 +107,10 @@ class PluginRef:
     @property
     def current_profile_name(self):
         return self._current_profile_name
+
+    @property
+    def full_name(self):
+        return f"{self.name}@{self.current_profile_name}"
 
     @property
     def qualified_name(self):
@@ -131,7 +135,7 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         config={},
         profiles=set(),
         executable: str = None,
-        **attrs
+        **attrs,
     ):
         super().__init__(plugin_type, name, **attrs)
 
@@ -157,22 +161,19 @@ class PluginInstall(HookObject, Canonical, PluginRef):
 
         return find_named(self.profiles, profile_name)
 
-    def use_profile(self, profile: Profile):
-        if profile is None or profile is Profile.DEFAULT:
-            self._current_profile_name = None
-            return
-
-        # ensure the profile exists
-        find_named(self.profiles, profile.name)
+    def use_profile(self, profile_or_name: Union[str, Profile]):
+        if profile_or_name is None:
+            profile = Profile.DEFAULT
+        elif isinstance(profile_or_name, Profile):
+            profile = self.get_profile(profile_or_name.name)
+        else:
+            profile = self.get_profile(profile_or_name)
 
         self._current_profile_name = profile.name
 
     @property
     def current_profile(self):
-        if self.current_profile_name:
-            return self.get_profile(self.current_profile_name)
-
-        return Profile.DEFAULT
+        return self.get_profile(self.current_profile_name)
 
     @property
     def current_config(self):
@@ -222,7 +223,7 @@ class Plugin(Canonical, PluginRef):
         description=None,
         capabilities=set(),
         select=set(),
-        **attrs
+        **attrs,
     ):
         super().__init__(plugin_type, name, **attrs)
 
@@ -241,5 +242,5 @@ class Plugin(Canonical, PluginRef):
             self.name,
             pip_url=self.pip_url,
             select=self.select,
-            **self._extras
+            **self._extras,
         )

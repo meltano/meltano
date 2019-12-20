@@ -217,6 +217,10 @@ const actions = {
 
   updateRecentELTSelections({ commit }, updatePayload) {
     commit('setELTRecentSelection', updatePayload)
+  },
+
+  uploadPluginConfigurationFile(_, configPayload) {
+    return orchestrationsApi.uploadPluginConfigurationFile(configPayload)
   }
 }
 
