@@ -284,6 +284,9 @@ def get_pipeline_schedules():
         schedule["started_at"] = state_job.started_at if state_job else None
         schedule["ended_at"] = state_job.ended_at if state_job else None
 
+        state_job_success = finder.latest_success(db.session)
+        schedule["has_ever_succeeded"] = state_job_success.is_success() if state_job_success else None
+
     return jsonify(schedules)
 
 

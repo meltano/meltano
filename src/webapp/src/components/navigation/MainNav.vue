@@ -24,7 +24,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('configuration', ['getRunningPipelines']),
+    ...mapGetters('configuration', [
+      'getHasPipelineEverSucceeded',
+      'getRunningPipelines'
+    ]),
     ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
     ...mapGetters('system', ['updateAvailable']),
     ...mapGetters('plugins', [
@@ -188,15 +191,20 @@ export default {
                   <h3 class="is-size-6">
                     {{ v.name | capitalize | underscoreToSpace }}
                   </h3>
-                  <h4 class="is-size-7 has-text-grey">
-                    {{ v.namespace }}
-                  </h4>
+                  <p
+                    v-if="!getHasPipelineEverSucceeded(v)"
+                    class="is-size-7 is-italic has-text-grey has-text-weight-light"
+                  >
+                    A {{ v.name | capitalize | underscoreToSpace }} pipeline
+                    must complete to enable the below reports
+                  </p>
                 </div>
                 <div class="buttons">
                   <router-link
                     v-for="design in v['designs']"
                     :key="design"
                     class="button is-small is-interactive-primary is-outlined"
+                    :disabled="!getHasPipelineEverSucceeded(v)"
                     :to="urlForModelDesign(model, design)"
                     >{{ design | capitalize | underscoreToSpace }}</router-link
                   >

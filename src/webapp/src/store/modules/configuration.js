@@ -27,6 +27,12 @@ const getters = {
     return state.pipelines.length > 0
   },
 
+  getHasPipelineEverSucceeded() {
+    return () => {
+      return false
+    }
+  },
+
   getHasValidConfigSettings(_, getters) {
     return (configSettings, settingsGroupValidation = null) => {
       return settingsGroupValidation
