@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1437](https://gitlab.com/meltano/meltano/issues/1437) Users can now share their dashboards with an automatically generated email
+
 ### Changes
 
 ### Fixes
