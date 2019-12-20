@@ -19,8 +19,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1447](https://gitlab.com/meltano/meltano/issues/1447) Various fixes around loading and reloading reports to mitigate false positive `sqlErrorMessage` conditions
 - [#1443](https://gitlab.com/meltano/meltano/issues/1443) Fix tooltip clipping in modals
-
 - [#1500](https://gitlab.com/meltano/meltano/issues/1500) Fix `meltano install` not running the migrations.
+
 ### Breaks
 
 ## 1.12.1 - (2019-12-18)
