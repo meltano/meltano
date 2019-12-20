@@ -11,25 +11,24 @@ This will be the single source of truth for team members when it comes to creati
 ### Prerequisites
 
 - DigitalOcean Account
-- Access to DigitalOcean Meltano team
+- Access to DigitalOcean teams "Meltano" and "MeltanoData DBs" 1 through 10
 - Client's tenant name (i.e., company name, etc.)
 - Access to the [Controller Node](/handbook/engineering/meltanodata-guide/controller-node.html)
-
-::: info
-**DigitalOcean limits**
-
-Our DigitalOcean account is currently limited to 500 droplets and 100 database clusters.
-Since each Meltano instance requires one droplet and one cluster, our effective instance limit is 100.
-
-When we get close to hitting either of these limits, we can get them increased by sending an email to one of our contacts at DigitalOcean.
-:::
 
 ### Step 1: Create a New Droplet
 
 1. Login to DigitalOcean
-1. Access the Meltano project workspace
+1. Verify that you are in the "Meltano" project (see the top left) inside the "Meltano" team (see the top right)
 1. In the upper right, click on the `Create` button
 1. Select `Droplets` from the dropdown menu
+
+::: info
+**DigitalOcean droplet limit**
+
+The "Meltano" team is currently limited to 500 droplets.
+
+When we get close to hitting this limit, we can get it increased by sending an email to one of our contacts at DigitalOcean.
+:::
 
 #### Choose an image
 
@@ -85,6 +84,7 @@ If your SSH key is not included in the list above, make sure to add it now throu
 1. Click on `Create droplet` to start the process.
 
 Once the droplet has completed setting up, you should see it in your `Droplets` table with an assigned IP address.
+Make note of this IP address, you'll need it later.
 
 #### Verify droplet is working
 
@@ -153,9 +153,30 @@ If you are getting an error, give it a few more minutes since the records needs 
 
 ### Step 3: Create Database Cluster
 
+1. Open the profile/team dropdown in the top right corner
+1. Select the first "MeltanoData DBs" team that is not marked "(full)"
 1. Select `Databases` link in the left side menu
 1. In the upper right, click on `Create` button
 1. Select `Databases` from the dropdown
+
+::: info
+**DigitalOcean database cluster limit**
+
+Each of the "MeltanoData DBs" teams is currently limited to 10 database clusters, but a request has been submitted to get this increased to 50.
+
+If you hit the limit when trying to create a new database cluster, please:
+
+1. Select `Team` in the left menu under `Account`
+1. Click the `Edit Team Profile` button
+1. Add ` (full)` to the end of the Team name
+1. Click the `Update Team Profile` button
+1. Follow the steps above to create the cluster in the next team not marked "(full)"
+
+When we get close to running out of "MeltanoData DBs" teams not marked "(full)", we can
+[create a batch of new teams](https://www.digitalocean.com/docs/accounts/teams/quickstart/#create-teams)
+from the Meltano DigitalOcean account (credentials are in 1Password)
+and request for their database cluster limits to be increased from 10 to 50 by sending an email to one of our contacts at DigitalOcean.
+:::
 
 #### Choose a database engine
 
@@ -179,7 +200,7 @@ If you are getting an error, give it a few more minutes since the records needs 
 #### Configure the database
 
 1. Click the `Get Started` button
-1. Restrict inbound connections by adding the recently created droplet under **Add trusted sources**
+1. Restrict inbound connections by adding (the IP address of) the recently created droplet under **Add trusted sources**
 1. Click `Allow these inbound sources only` button
 1. Click `Continue` to move past "Connection details"
 1. Click `Great, I'm done` for "Next Steps" section
@@ -744,4 +765,5 @@ When a client no longer needs a hosted instance of Meltano on meltanodata.com, y
 1. Delete the client's droplet
 1. Delete the client's A record in networking
 1. Delete the client's database cluster
+    1. If the database cluster was created in a "MeltanoData DBs" team that is currently marked "(full)", edit the team name to indicate it is no longer full
 1. Delete the client's passwords in 1Password
