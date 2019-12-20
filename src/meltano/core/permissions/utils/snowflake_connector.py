@@ -169,7 +169,10 @@ class SnowflakeConnector:
         new_name_parts = []
 
         for part in name_parts:
-            if re.match("^[0-9a-zA-Z_]*$", part) is None:
+            if (
+                re.match("^[0-9a-zA-Z_]*$", part) is None
+                and re.match('^".*"$', part) is None
+            ):
                 new_name_parts.append(f'"{part}"')
             else:
                 new_name_parts.append(part)
