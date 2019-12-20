@@ -34,7 +34,7 @@ export default {
       'getIsStepScheduleMinimallyValidated'
     ]),
     ...mapState('plugins', ['installedPlugins']),
-    ...mapState('configuration', ['installedPlugins']),
+    ...mapState('orchestration', ['installedPlugins']),
     currentStep() {
       return this.steps.find(step =>
         step.routeMatches.find(match => this.$route.name === match)
