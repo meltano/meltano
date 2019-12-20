@@ -10,13 +10,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#1269](https://gitlab.com/meltano/meltano/issues/1269) Add `kind: file` so single file uploads can be used with extractors (`tap-google-analytics`'s `key_file_location` is the first user)
+- [#1494](https://gitlab.com/meltano/meltano/issues/1494) Add `LIKE` options to Analyze Filter UI so users better understand what filtering patterns are available
 
 ### Changes
 
 ### Fixes
 
 ### Breaks
-
 
 ## 1.12.2 - (2019-12-20)
 
@@ -36,7 +36,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1447](https://gitlab.com/meltano/meltano/issues/1447) Various fixes around loading and reloading reports to mitigate false positive `sqlErrorMessage` conditions
 - [#1443](https://gitlab.com/meltano/meltano/issues/1443) Fix tooltip clipping in modals
 - [#1500](https://gitlab.com/meltano/meltano/issues/1500) Fix `meltano install` not running the migrations.
-
 
 ## 1.12.1 - (2019-12-18)
 
