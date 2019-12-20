@@ -26,9 +26,8 @@ export default {
       'reports'
     ]),
     dashboardEmail() {
-      return `mailto:?subject=Dashboard: ${this.activeDashboard.name}&body=${
-        window.location
-      }`
+      // eslint-disable-next-line
+      return `mailto:?subject=Dashboard: ${this.activeDashboard.name}&body=${window.location}`
     },
     isActive() {
       return dashboard => dashboard.id === this.activeDashboard.id
