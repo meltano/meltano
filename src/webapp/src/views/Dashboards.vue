@@ -25,6 +25,11 @@ export default {
       'dashboards',
       'reports'
     ]),
+    dashboardEmail() {
+      return `mailto:?subject=Dashboard: ${this.activeDashboard.name}&body=${
+        window.location
+      }`
+    },
     isActive() {
       return dashboard => dashboard.id === this.activeDashboard.id
     }
@@ -126,7 +131,16 @@ export default {
               <template v-if="activeDashboard.name">
                 <div class="columns is-vcentered">
                   <div class="column">
-                    <h2 class="title is-5">{{ activeDashboard.name }}</h2>
+                    <div class="level">
+                      <h2 class="title is-5 level-left">
+                        {{ activeDashboard.name }}
+                      </h2>
+                      <a
+                        class="button is-small level-right"
+                        :href="dashboardEmail"
+                        >Share</a
+                      >
+                    </div>
                     <h3 v-if="activeDashboard.description" class="subtitle">
                       {{ activeDashboard.description }}
                     </h3>
