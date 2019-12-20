@@ -89,7 +89,9 @@ def job_state() -> Response:
                     "has_error": state_job.has_error(),
                     "started_at": state_job.started_at,
                     "ended_at": state_job.ended_at,
-                    "has_ever_succeeded": state_job_success.is_success() if state_job_success else None
+                    "has_ever_succeeded": state_job_success.is_success()
+                    if state_job_success
+                    else None,
                 }
             )
 
@@ -116,7 +118,9 @@ def job_log(job_id) -> Response:
             "has_error": state_job.has_error() if state_job else False,
             "started_at": state_job.started_at if state_job else None,
             "ended_at": state_job.ended_at if state_job else None,
-            "has_ever_succeeded": state_job_success.is_success() if state_job_success else None
+            "has_ever_succeeded": state_job_success.is_success()
+            if state_job_success
+            else None,
         }
     )
 
@@ -289,7 +293,9 @@ def get_pipeline_schedules():
         schedule["ended_at"] = state_job.ended_at if state_job else None
 
         state_job_success = finder.latest_success(db.session)
-        schedule["has_ever_succeeded"] = state_job_success.is_success() if state_job_success else None
+        schedule["has_ever_succeeded"] = (
+            state_job_success.is_success() if state_job_success else None
+        )
 
     return jsonify(schedules)
 
