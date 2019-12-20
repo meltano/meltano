@@ -758,8 +758,14 @@ class SnowflakeGrantsGenerator:
         """
         sql_commands = []
 
+        read_grant_tables = []
+        write_grant_tables = []
+        read_grant_views = []
+        write_grant_views = []
+
         read_privileges = "select"
-        write_privileges = "select, insert, update, delete, truncate, references"
+        write_partial_privileges = "insert, update, delete, truncate, references""
+        write_privileges = f"{read_privileges}, {write_partial_privileges}"
 
         for table in tables.get("read", []):
             # Split the table identifier into parts {DB_NAME}.{SCHEMA_NAME}.{TABLE_NAME}
@@ -772,22 +778,22 @@ class SnowflakeGrantsGenerator:
                 continue
 
             # Gather the tables/views that privileges will be granted to
-            grant_tables = []
-            grant_views = []
+            read_grant_tables = []
+            read_grant_views = []
 
             # List of all tables/views in schema
-            table_list = []
-            view_list = []
+            read_table_list = []
+            read_view_list = []
 
             fetched_schemas = self.full_schema_list(f"{name_parts[0]}.{name_parts[1]}")
 
             conn = SnowflakeConnector()
 
             for schema in fetched_schemas:
-                # Add the tables for that schema to the tables[] and views[]
-                #  that will be granted the permissions
-                table_list.extend(conn.show_tables(schema=schema))
-                view_list.extend(conn.show_views(schema=schema))
+                # Add the tables for that schema to the tables_list[] and views_list[]
+                # This is so we can check that the list table is valid
+                read_table_list.extend(conn.show_tables(schema=schema))
+                read_view_list.extend(conn.show_views(schema=schema))
 
             if name_parts[2] == "*":
                 # If <schema_name>.* then you can grant all, grant future, and exit
@@ -847,15 +853,24 @@ class SnowflakeGrantsGenerator:
 
                 continue
 
-            else:
-                # Only one table/view to be granted permissions to
-                if table in table_list:
-                    grant_tables = [table]
-                if table in view_list:
-                    grant_views = [table]
+            # elif: Future elif to have partial table name
 
-            # Grant privileges to all tables in that schema
-            for db_table in grant_tables:
+            else:
+                # The table passed is a single entity
+                # Check that it's valid and add to list
+                if table in read_table_list:
+                    read_grant_tables = [table]
+                if table in read_view_list:
+                    read_grant_views = [table]
+
+            # Grant privileges to all tables flagged for granting
+            # Not strictly necessary to have for loop as for all cases b/c
+            # currently it will be a single entity - a * or a fully
+            # qualified name are the only valid options meaning the script
+            # will grant above for * or it will just be a single entry if 
+            # it gets to here. This will change though when we want to add
+            # additional features (like <table>_* selection)
+            for db_table in read_grant_tables:
                 already_granted = False
                 if self.check_grant_to_role(role, "select", "table", db_table):
                     already_granted = True
@@ -872,8 +887,8 @@ class SnowflakeGrantsGenerator:
                     }
                 )
 
-            # Grant privileges to all views in that schema
-            for db_view in grant_views:
+            # Grant privileges to all flagged views
+            for db_view in read_grant_views:
                 already_granted = False
                 if self.check_grant_to_role(role, "select", "view", db_view):
                     already_granted = True
@@ -901,12 +916,12 @@ class SnowflakeGrantsGenerator:
                 continue
 
             # Gather the tables/views that privileges will be granted to
-            grant_tables = []
-            grant_views = []
+            write_grant_tables = []
+            write_grant_views = []
 
             # List of all tables/views in schema
-            table_list = []
-            view_list = []
+            write_table_list = []
+            write_view_list = []
 
             fetched_schemas = self.full_schema_list(f"{name_parts[0]}.{name_parts[1]}")
 
@@ -915,8 +930,8 @@ class SnowflakeGrantsGenerator:
             for schema in fetched_schemas:
                 # Add the tables for that schema to the tables[] and views[]
                 #  that will be granted the permissions
-                table_list.extend(conn.show_tables(schema=schema))
-                view_list.extend(conn.show_views(schema=schema))
+                write_table_list.extend(conn.show_tables(schema=schema))
+                write_view_list.extend(conn.show_views(schema=schema))
 
             if name_parts[2] == "*":
                 # If <schema_name>.* then you can grant all, grant future, and exit
@@ -978,20 +993,28 @@ class SnowflakeGrantsGenerator:
 
             else:
                 # Only one table/view to be granted permissions to
-                if table in table_list:
-                    grant_tables = [table]
-                if table in view_list:
-                    grant_views = [table]
+                if table in write_table_list:
+                    write_grant_tables = [table]
+                if table in write_view_list:
+                    write_grant_views = [table]
 
-            # Grant privileges to all tables in that schema
-            for db_table in grant_tables:
+            # Grant privileges to all tables flagged for granting
+            # Not strictly necessary to have for loop as for all cases b/c
+            # currently it will be a single entity - a * or a fully
+            # qualified name are the only valid options meaning the script
+            # will grant above for * or it will just be a single entry if 
+            # it gets to here. This will change though when we want to add
+            # additional features (like <table>_* selection)
+            for db_table in write_grant_tables:
                 already_granted = False
-                if (self.check_grant_to_role(role, "select", "table", db_table)
+                if (
+                    self.check_grant_to_role(role, "select", "table", db_table)
                     and self.check_grant_to_role(role, "insert", "table", db_table)
                     and self.check_grant_to_role(role, "update", "table", db_table)
                     and self.check_grant_to_role(role, "delete", "table", db_table)
                     and self.check_grant_to_role(role, "truncate", "table", db_table)
-                    and self.check_grant_to_role(role, "references", "table", db_table)):
+                    and self.check_grant_to_role(role, "references", "table", db_table)
+                ):
                     already_granted = True
 
                 sql_commands.append(
@@ -1007,14 +1030,16 @@ class SnowflakeGrantsGenerator:
                 )
 
             # Grant privileges to all views in that schema
-            for db_view in grant_views:
+            for db_view in write_grant_views:
                 already_granted = False
-                if (self.check_grant_to_role(role, "select", "table", db_view)
+                if (
+                    self.check_grant_to_role(role, "select", "table", db_view)
                     and self.check_grant_to_role(role, "insert", "table", db_view)
                     and self.check_grant_to_role(role, "update", "table", db_view)
                     and self.check_grant_to_role(role, "delete", "table", db_view)
                     and self.check_grant_to_role(role, "truncate", "table", db_view)
-                    and self.check_grant_to_role(role, "references", "table", db_view)):
+                    and self.check_grant_to_role(role, "references", "table", db_view)
+                ):
                     already_granted = True
 
                 sql_commands.append(
