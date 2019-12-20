@@ -116,7 +116,9 @@ export default {
 
 <template>
   <div>
-    <table class="table is-size-7 is-fullwidth is-narrow is-hoverable">
+    <table
+      class="table is-size-7 is-fullwidth is-narrow is-hoverable has-borderless-cells"
+    >
       <thead>
         <tr>
           <th>
@@ -245,7 +247,7 @@ export default {
           >
             <td>
               <p class="is-small">
-                <span v-show="index > 0">AND </span>
+                <span v-show="index > 0"><code>AND</code> </span>
                 <span v-if="isFirstFilterMatch(filter)">
                   {{ filter.attribute.label }}
                 </span>
@@ -309,13 +311,25 @@ export default {
     </table>
     <div
       v-if="getHasAtLeastOneLikeFilter || getHasMultipleFilters"
-      class="content has-text-centered is-size-7"
+      class="content is-size-7"
     >
-      <p v-if="getHasAtLeastOneLikeFilter">Options...</p>
-      <p v-if="getHasMultipleFilters">
-        Currently, we only have the AND option for filter chains; but we intend
-        to support more!
-      </p>
+      <template v-if="getHasAtLeastOneLikeFilter">
+        <hr class="hr-tight" />
+        <p><code>LIKE</code> options:</p>
+        <ul>
+          <li><code>_</code>: matches any single character</li>
+          <li>
+            <code>%</code>: matches any sequence of zero or more characters
+          </li>
+        </ul>
+      </template>
+      <template v-if="getHasMultipleFilters">
+        <hr class="hr-tight" />
+        <p class="has-text-centered">
+          Currently, we only have the <code>AND</code> option for filter chains;
+          but we intend to support more!
+        </p>
+      </template>
     </div>
   </div>
 </template>
