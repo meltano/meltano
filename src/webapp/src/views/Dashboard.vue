@@ -23,6 +23,10 @@ export default {
       'isInitializing',
       'reports'
     ]),
+    dashboardEmail() {
+      // eslint-disable-next-line
+      return `mailto:?subject=Dashboard: ${this.activeDashboard.name}&body=${window.location}`
+    },
     isActive() {
       return dashboard => dashboard.id === this.activeDashboard.id
     }
@@ -68,13 +72,17 @@ export default {
       <section>
         <div class="columns is-vcentered">
           <div class="column">
-            <h2 class="title is-inline-block">{{ activeDashboard.name }}</h2>
-            <div class="field is-pulled-right is-inline-block">
-              <div class="control">
-                <router-link class="button" :to="{ name: 'dashboards' }"
-                  >Back to Dashboards</router-link
-                >
-              </div>
+            <h2 class="title">{{ activeDashboard.name }}</h2>
+            <h3 v-if="activeDashboard.description" class="subtitle">
+              {{ activeDashboard.description }}
+            </h3>
+          </div>
+          <div class="column">
+            <div class="buttons is-pulled-right">
+              <a class="button" :href="dashboardEmail">Share</a>
+              <router-link class="button" :to="{ name: 'dashboards' }"
+                >Back to Dashboards</router-link
+              >
             </div>
           </div>
         </div>
