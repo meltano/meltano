@@ -68,7 +68,7 @@ class ProjectInitService:
         self.project_name = project_name.lower()
 
     def init(self) -> Project:
-        default_project_yaml = yaml.load(open(self.initialize_file))
+        default_project_yaml = yaml.safe_load(open(self.initialize_file))
         try:
             os.mkdir(self.project_name)
         except Exception as e:
