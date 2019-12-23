@@ -37,7 +37,7 @@ export default {
         let fullPath = this.configSettings.profiles[
           this.configSettings.profileInFocusIndex
         ].config[setting.name]
-        return utils.extractFileNameFromPath(fullPath)
+        return fullPath && utils.extractFileNameFromPath(fullPath)
       }
     },
     getLabel() {
