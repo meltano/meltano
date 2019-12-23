@@ -164,7 +164,7 @@ class PluginDiscoveryService(Versioned):
 
     def load_discovery(self, discovery_file) -> DiscoveryFile:
         try:
-            return DiscoveryFile.parse(yaml.load(discovery_file))
+            return DiscoveryFile.parse(yaml.safe_load(discovery_file))
         except Exception as err:
             raise DiscoveryInvalidError(str(err))
 

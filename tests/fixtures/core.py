@@ -29,7 +29,7 @@ PROJECT_NAME = "a_meltano_project"
 @pytest.fixture(scope="class")
 def discovery():
     with meltano.core.bundle.find("discovery.yml").open() as base:
-        discovery = yaml.load(base)
+        discovery = yaml.safe_load(base)
 
     discovery[PluginType.EXTRACTORS].append(
         {
