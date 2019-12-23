@@ -25,7 +25,7 @@ This will be the single source of truth for team members when it comes to creati
 ::: info
 **DigitalOcean droplet limit**
 
-The "Meltano" team is currently limited to 500 droplets.
+The "Meltano" team currently has a limit of 500 droplets.
 
 When we get close to hitting this limit, we can get it increased by sending an email to one of our contacts at DigitalOcean.
 :::
@@ -162,7 +162,7 @@ If you are getting an error, give it a few more minutes since the records needs 
 ::: info
 **DigitalOcean database cluster limit**
 
-Each of the "MeltanoData DBs" teams is currently limited to 10 database clusters, but a request has been submitted to get this increased to 50.
+Each "MeltanoData DBs" team currently has a limit of 60 database clusters.
 
 If you hit the limit when trying to create a new database cluster, please:
 
