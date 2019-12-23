@@ -37,7 +37,7 @@ export default {
         let fullPath = this.configSettings.profiles[
           this.configSettings.profileInFocusIndex
         ].config[setting.name]
-        return utils.extractFileNameFromPath(fullPath)
+        return fullPath && utils.extractFileNameFromPath(fullPath)
       }
     },
     getLabel() {
@@ -154,7 +154,7 @@ export default {
         formData.append('setting_name', setting.name)
 
         this.$store
-          .dispatch('configuration/uploadPluginConfigurationFile', {
+          .dispatch('orchestration/uploadPluginConfigurationFile', {
             name: this.plugin.name,
             profileName: profile.name,
             type: 'extractors',
