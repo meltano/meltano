@@ -4,7 +4,7 @@ If you're using SaaS tools to manage support, sales, marketing, revenue and othe
 
 When a new pipeline schedule is created using the [UI](/docs/getting-started.html#create-a-pipeline-schedule) or [CLI](/docs/command-line-interface.html#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 
-Airflow is automatically installed when the Meltano UI is launched for the first time, and automatically runs in the background while Meltano UI is running.
+Airflow is automatically installed when the Meltano UI is launched for the first time, and the scheduler automatically runs in the background while Meltano UI is running.
 
 ### Installing Airflow
 
@@ -32,11 +32,15 @@ Example:
 meltano schedule carbon__sqlite tap-carbon-intensity target-sqlite @daily
 ```
 
-Now that you've scheduled your first DAG, you can load the "Pipeline" page in the UI and see it show up. You can also refresh the "Orchestrate" page and see your DAG show up in the Airflow interface.
+Now that you've scheduled your first DAG, you can load the "Pipeline" page in the UI and see it show up.
 
 ### Using Airflow directly
 
-You are free to interact with Airflow directly through the "Orchestrate" page in the Meltano UI. 
+You are free to interact with Airflow directly through its own UI. You can start the web like this:
+
+```bash
+meltano invoke airflow webserver -D
+```
 
 By default, you'll only see Meltano's pipeline DAGs here, which are created automatically using the dynamic DAG generator included with every Meltano project, located at `orchestrate/dags/meltano.py`.
 
@@ -60,7 +64,7 @@ Manually trigger a task to run:
 meltano invoke airflow run --raw meltano extract_load $(date -I)
 ```
 
-Start the Airflow UI, if you're not already running Meltano UI: (will start in a separate browser)
+Start the Airflow UI: (will start in a separate browser)
 
 ```bash
 meltano invoke airflow webserver -D

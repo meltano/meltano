@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1399](https://gitlab.com/meltano/meltano/issues/1399) Log Modal now has a prompt to explain potential factors in required time for pipelines to complete
+- [#1433](https://gitlab.com/meltano/meltano/issues/1433) Remove `/orchestrate` route and thus the Airflow iframe as this is overkill for our current target users
 
 ### Fixes
 

@@ -11,12 +11,6 @@ from urllib.parse import urlsplit
 import meltano
 from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.plugin.error import PluginMissingError
-from meltano.core.plugin.settings_service import (
-    PluginSettingsService,
-    PluginSettingMissingError,
-)
-from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.db import project_engine
@@ -131,19 +125,6 @@ def create_app(config={}):
             g.jsContext["projectId"] = tracker.project_id
 
         g.jsContext["version"] = meltano.__version__
-
-        # setup the airflowUrl
-        try:
-            airflow = ConfigService(project).find_plugin("airflow")
-            settings = PluginSettingsService(project)
-            airflow_port, _ = settings.get_value(
-                db.session, airflow, "webserver.web_server_port"
-            )
-            g.jsContext["airflowUrl"] = appUrl._replace(
-                netloc=f"{appUrl.hostname}:{airflow_port}"
-            ).geturl()[:-1]
-        except (PluginMissingError, PluginSettingMissingError):
-            pass
 
         # setup the dbtDocsUrl
         g.jsContext["dbtDocsUrl"] = appUrl._replace(path="/-/dbt/").geturl()[:-1]

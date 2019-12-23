@@ -13,7 +13,6 @@ import Analyze from '@/views/Analyze'
 import Dashboards from '@/views/Dashboards'
 import Model from '@/views/Model'
 import NotFound from '@/views/NotFound'
-import Orchestration from '@/views/Orchestration'
 import Pipelines from '@/views/Pipelines'
 
 const router = new Router({
@@ -119,14 +118,6 @@ const router = new Router({
           }
         }
       ]
-    },
-    {
-      path: '/orchestrate/',
-      name: 'orchestration',
-      component: Orchestration,
-      meta: {
-        title: 'Meltano: Orchestration'
-      }
     },
     {
       path: '/model/',
