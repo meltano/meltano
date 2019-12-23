@@ -21,11 +21,11 @@ class PluginSettingMissingError(Error):
         super().__init__(f"Cannot find setting {name} in {plugin}")
 
 
-class PluginSettingValueSource(int, Enum):
-    ENV = 0
-    MELTANO_YML = 1
-    DB = 2
-    DEFAULT = 3
+class PluginSettingValueSource(str, Enum):
+    ENV = "env"  # 0
+    MELTANO_YML = "meltano_yml"  # 1
+    DB = "db"  # 2
+    DEFAULT = "default"  # 3
 
 
 class PluginSettingsService:
