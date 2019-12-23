@@ -43,7 +43,7 @@ extractors:
         label: API Token
         kind: password
       - name: start_date
-        description: Determines what date to start pulling data from. Please be aware that start dates beyond a month can increase the extraction time required.
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         label: Start Date
         kind: date_iso8601
   - name: tap-gitlab
@@ -93,7 +93,7 @@ extractors:
         documentation: https://meltano.com/plugins/extractors/gitlab.html#configuration
         env: GITLAB_API_ULTIMATE_LICENSE
       - name: start_date
-        description: Determines what date to start pulling data from. Please be aware that start dates beyond a month can increase the extraction time required.
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         env: GITLAB_API_START_DATE
         kind: date_iso8601
   - name: tap-google-analytics
@@ -129,7 +129,7 @@ extractors:
         documentation: https://gitlab.com/meltano/tap-google-analytics#tap-google-analytics
         env: GOOGLE_ANALYTICS_API_REPORTS
       - name: start_date
-        description: Determines what date to start pulling data from. Please be aware that start dates beyond a month can increase the extraction time required.
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         env: GOOGLE_ANALYTICS_API_START_DATE
         kind: date_iso8601
       - name: end_date
@@ -152,7 +152,7 @@ extractors:
         kind: password
       - name: endpoint
       - name: start_date
-        description: Determines what date to start pulling data from. Please be aware that start dates beyond a month can increase the extraction time required.
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
   - name: tap-mongodb
     label: MongoDB
@@ -220,7 +220,7 @@ extractors:
         kind: hidden
         description: Select by default any new fields discovered in Salesforce objects
       - name: start_date
-        description: Determines what date to start pulling data from. Please be aware that start dates beyond a month can increase the extraction time required.
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
   - name: tap-stripe
     label: Stripe
@@ -239,7 +239,7 @@ extractors:
         kind: password
         env: STRIPE_API_KEY
       - name: start_date
-        description: Determines what date to start pulling data from. Please be aware that start dates beyond a month can increase the extraction time required.
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
   - name: tap-zendesk
     label: Zendesk
@@ -265,7 +265,7 @@ extractors:
         placeholder: Ex. my-subdomain.zendesk.com
         documentation: https://support.zendesk.com/hc/en-us/articles/221682747-Where-can-I-find-my-Zendesk-subdomain-
       - name: start_date
-        description: Determines what date to start pulling data from. Please be aware that start dates beyond a month can increase the extraction time required.
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
 loaders:
   - name: target-csv
