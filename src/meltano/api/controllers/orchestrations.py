@@ -259,7 +259,7 @@ def add_plugin_configuration_profile(plugin_ref) -> Response:
         {
             **profile.canonical(),
             "config": freeze_keys(
-                settings.as_config(db.session, plugin, redacted=True)
+                settings.as_config_with_source(db.session, plugin, redacted=True)
             ),
         }
     )

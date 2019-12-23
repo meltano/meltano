@@ -49,13 +49,18 @@ class PluginSettingsService:
 
         return {k: v for k, v in values.items() if v != REDACTED_VALUE}
 
-    def as_config(
+    def as_config(self, *args, **kwargs) -> Dict:
+        full_config = self.as_config_with_source(*args, **kwargs)
+
+        return {key: config["value"] for key, config in full_config.items()}
+
+    def as_config_with_source(
         self,
         session,
         plugin: PluginRef,
         sources: List[PluginSettingValueSource] = None,
         redacted=False,
-    ) -> Dict:
+    ):
         # defaults to the meltano.yml for extraneous settings
         plugin_install = self.get_install(plugin)
         plugin_def = self.get_definition(plugin)
@@ -72,7 +77,7 @@ class PluginSettingsService:
             if redacted and value and setting.kind == "password":
                 value = REDACTED_VALUE
 
-            config[setting.name] = value
+            config[setting.name] = {"value": value, "source": source}
 
         return config
 
@@ -88,7 +93,7 @@ class PluginSettingsService:
             profiles.append(
                 {
                     **profile.canonical(),
-                    "config": self.as_config(
+                    "config": self.as_config_with_source(
                         session, plugin_install, redacted=redacted
                     ),
                 }
