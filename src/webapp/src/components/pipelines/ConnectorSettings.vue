@@ -154,7 +154,7 @@ export default {
         formData.append('setting_name', setting.name)
 
         this.$store
-          .dispatch('configuration/uploadPluginConfigurationFile', {
+          .dispatch('orchestration/uploadPluginConfigurationFile', {
             name: this.plugin.name,
             profileName: profile.name,
             type: 'extractors',
