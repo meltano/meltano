@@ -20,6 +20,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1434](https://gitlab.com/meltano/meltano/issues/1434) Fix Analyze CTAs to only enable if at least one related pipeline has succeeded
+- [#1447](https://gitlab.com/meltano/meltano/issues/1447) Various fixes around loading and reloading reports to mitigate false positive `sqlErrorMessage` conditions
+- [#1509](https://gitlab.com/meltano/meltano/issues/1509) Allow plugin profile config to be set through meltano.yml
 
 ### Breaks
 

@@ -42,7 +42,7 @@ export default {
       const payload = {
         name: this.connector.name,
         type: this.pluginType,
-        profile: Object.assign({ config: {} }, this.addProfileSettings)
+        profile: Object.assign({}, this.addProfileSettings)
       }
       this.addConfigurationProfile(payload).then(response => {
         const profile = this.setAddedProfileDefaults(response.data)
@@ -137,7 +137,9 @@ export default {
       <span
         class="icon has-text-grey-light tooltip is-tooltip-multiline"
         :data-tooltip="
-          `Profiles enable a single connector (${connector.name} for example) to be reused with multiple accounts or configurations.`
+          `Profiles enable a single connector (${
+            connector.name
+          } for example) to be reused with multiple accounts or configurations.`
         "
       >
         <font-awesome-icon icon="info-circle"></font-awesome-icon>

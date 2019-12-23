@@ -59,7 +59,7 @@ class PluginSettingsService:
         # defaults to the meltano.yml for extraneous settings
         plugin_install = self.get_install(plugin)
         plugin_def = self.get_definition(plugin)
-        config = deepcopy(plugin_install.config)
+        config = deepcopy(plugin_install.current_config)
 
         # definition settings
         for setting in self.definitions(plugin):
@@ -85,9 +85,14 @@ class PluginSettingsService:
         for profile in (Profile.DEFAULT, *plugin_install.profiles):
             plugin_install.use_profile(profile)
 
-            # set the loaded configuration
-            profile.config = self.as_config(session, plugin_install, redacted=redacted)
-            profiles.append(profile.canonical())
+            profiles.append(
+                {
+                    **profile.canonical(),
+                    "config": self.as_config(
+                        session, plugin_install, redacted=redacted
+                    ),
+                }
+            )
 
         return profiles
 
@@ -181,9 +186,9 @@ class PluginSettingsService:
                 return (os.environ[env_key], PluginSettingValueSource.ENV)
 
             # priority 2: installed configuration
-            if setting_def.name in plugin_install.config:
+            if setting_def.name in plugin_install.current_config:
                 return (
-                    plugin_install.config[setting_def.name],
+                    plugin_install.current_config[setting_def.name],
                     PluginSettingValueSource.MELTANO_YML,
                 )
 
