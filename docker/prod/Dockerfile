@@ -23,8 +23,5 @@ WORKDIR /project
 # meltano ui
 EXPOSE 5000
 
-# airflow ui
-EXPOSE 5010
-
 ENTRYPOINT ["meltano"]
 CMD ["ui"]

@@ -75,8 +75,11 @@ def start(ctx, reload, bind_port, bind):
     # TODO: remove when running on Python 3.8
     asyncio.get_child_watcher()
 
-    # init workers and conditionally append to it in the rest of this function body
-    workers = [MeltanoCompilerWorker(project)]
+    workers = []
+    if not truthy(os.getenv("MELTANO_DISABLE_AIRFLOW", False)):
+        workers.append(AirflowWorker(project))
+
+    workers.append(MeltanoCompilerWorker(project))
 
     # we need to whitelist the loaders here because not
     # all the loaders support dbt in the first place
