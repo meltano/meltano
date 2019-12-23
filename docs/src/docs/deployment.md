@@ -76,7 +76,6 @@ In this section, we will be going over how you can deploy a Meltano Docker image
 - **Memory Limits (MiB)**: Soft limit 1024
 - **Port mappings**:
   - 5000/tcp (meltano)
-  - 5010/tcp (airflow)
 
 1. Click `Update` button to finish setting up your container defintion
 1. Click `Edit` next to the _Task defintion_ heading

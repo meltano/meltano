@@ -26,41 +26,42 @@ class AirflowWorker(threading.Thread):
             project, config_service=self.config_service
         )
         self._plugin = None
-        self._webserver = None
-        self._scheduler = None
+        self.pid_file = PIDFile(self.project.run_dir("airflow", "scheduler.pid"))
 
     def kill_stale_workers(self):
-        stale_workers = []
-        workers_pid_files = map(self.pid_file, ("webserver", "scheduler"))
+        process = None
+        try:
+            process = self.pid_file.process
+        except UnknownProcessError:
+            pass
 
-        for pid_file in workers_pid_files:
-            try:
-                stale_workers.append(pid_file.process)
-            except UnknownProcessError:
-                pass
-
-        def on_terminate(process):
-            logging.info(f"Process {process} ended with exit code {process.returncode}")
-
-        for process in stale_workers:
-            logging.debug(f"Process {process} is stale, terminating it.")
+        if process is not None:
+            logging.debug(
+                f"Process {process} is running, possibly stale, terminating it."
+            )
             process.terminate()
 
-        gone, alive = psutil.wait_procs(stale_workers, timeout=5, callback=on_terminate)
+            def on_terminate(process):
+                logging.info(
+                    f"Process {process} ended with exit code {process.returncode}"
+                )
 
-        # kill the rest
-        for process in alive:
-            process.kill()
+            _gone, alive = psutil.wait_procs(
+                [process], timeout=5, callback=on_terminate
+            )
 
-        for pid_file in workers_pid_files:
-            try:
-                pid_file.unlink()
-            except:
-                pass
+            # kill the rest
+            for process in alive:
+                process.kill()
+
+        try:
+            self.pid_file.unlink()
+        except:
+            pass
 
     def start_all(self):
         _, Session = project_engine(self.project)
-        logs_dir = self.project.run_dir("airflow", "logs")
+        logs_path = self.project.run_dir("airflow", "logs", "scheduler.log")
 
         try:
             session = Session()
@@ -68,24 +69,13 @@ class AirflowWorker(threading.Thread):
                 self.project, self._plugin, prepare_with_session=session
             )
 
-            # fmt: off
-            with logs_dir.joinpath("webserver.log").open("w") as webserver, \
-              logs_dir.joinpath("scheduler.log").open("w") as scheduler:
-                self._webserver = invoker.invoke("webserver", "-w", "1", stdout=webserver)
-                self._scheduler = invoker.invoke("scheduler", stdout=scheduler)
-
-                self.pid_file("webserver").write_pid(self._webserver.pid)
-                self.pid_file("scheduler").write_pid(self._scheduler.pid)
-            # fmt: on
-
-            # Time padding for server initialization so UI iframe displays as expected
-            # (iteration potential on approach but following UIAvailableWorker sleep approach)
-            time.sleep(2)
+            with logs_path.open("w") as logs_file:
+                scheduler = invoker.invoke(
+                    "scheduler", "--pid", str(self.pid_file), stdout=logs_file
+                )
+                self.pid_file.write_pid(scheduler.pid)
         finally:
             session.close()
-
-    def pid_file(self, name) -> PIDFile:
-        return PIDFile(self.project.run_dir("airflow", f"{name}.pid"))
 
     def run(self):
         try:
