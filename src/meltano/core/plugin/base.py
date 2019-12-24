@@ -219,6 +219,7 @@ class Plugin(Canonical, PluginRef):
         namespace: str,
         pip_url: Optional[str] = None,
         settings: list = [],
+        settings_group_validation: list = [],
         docs=None,
         description=None,
         capabilities=set(),
@@ -230,6 +231,7 @@ class Plugin(Canonical, PluginRef):
         self.namespace = namespace
         self.pip_url = pip_url
         self.settings = list(map(SettingDefinition.parse, settings))
+        self.settings_group_validation = list(settings_group_validation)
         self.docs = docs
         self.description = description
         self.capabilities = set(capabilities)
