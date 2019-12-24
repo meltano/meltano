@@ -76,7 +76,15 @@ export default {
         !this.getIsOfKindOptions(kind)
     },
     getIsProtected() {
-      return setting => setting.protected === true
+      return setting => {
+        const settingSource = this.connectorProfile.config[setting.name].source
+
+        return (
+          setting.protected === true ||
+          settingSource === 'env' ||
+          settingSource === 'meltano_yml'
+        )
+      }
     },
     getPlaceholder() {
       return setting => setting.placeholder || setting.value || setting.name
