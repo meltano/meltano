@@ -287,10 +287,23 @@ export default {
       const methodName = this.isActiveReportInDashboard(dashboard)
         ? 'removeReportFromDashboard'
         : 'addReportToDashboard'
-      this.$store.dispatch(`dashboards/${methodName}`, {
-        reportId: this.activeReport.id,
-        dashboardId: dashboard.id
-      })
+      this.$store
+        .dispatch(`dashboards/${methodName}`, {
+          reportId: this.activeReport.id,
+          dashboardId: dashboard.id
+        })
+        .then(() => {
+          Vue.toasted.global.success(
+            `${this.activeReport.name} successful saved to ${dashboard.name}.`
+          )
+        })
+        .catch(error => {
+          Vue.toasted.global.error(
+            `${this.activeReport.name} was not saved to ${
+              dashboard.name
+            }. [Error code: ${error.response.data.code}]`
+          )
+        })
     },
 
     toggleNewDashboardModal() {
