@@ -446,7 +446,7 @@ PG_DATABASE=defaultdb # default DO database name
 
 5. Replace each field with the credentials from DigitalOcean
 
-1. Secure the file by running the following commands:
+6. Secure the file by running the following commands:
 
 ```bash
 # make the `meltano` user sole owner
@@ -483,27 +483,41 @@ systemctl status
 
 #### Remove tap-carbon-intensity
 
-To ensure clients are greeted with a fresh install, it's important to remove any tests we ran.
+To ensure clients are greeted with a fresh install, it's important to remove any traces of tests we ran.
 
 1. SSH into droplet
-1. Change directory to `/var/meltano/project`
-1. Edit `meltano.yml` in text editor
-   - Delete `extractors` section
-   - Delete `models` section
-   - Delete `transforms` section
-   - Delete `schedule` section
-1. Change directory into `/var/meltano/project/.meltano`
-1. Delete the contents of the following folders:
-   - `.../.meltano/extractors`
-     - `tap-carbon-intensity`
-   - `.../.meltano/models`
-     - `model-carbon-intensity`
-     - `model-carbon-intensity-sqlite`
-   - `.../.meltano/run`
-     - `tap-carbon-intensity`
-     - `models/model-carbon-intensity`
-     - `models/model-carbon-intensity-sqlite`
-     - `models/topics.index.m5oc`
+2. Change directory to `/var/meltano/project`
+
+```sh
+cd /var/meltano/project
+```
+
+3. Edit `meltano.yml` in text editor
+   - Delete (or comment out with `#`) the `extractors`, `models`, `transforms`, and `schedule` sections
+4. Change directory into `/var/meltano/project/.meltano`
+
+```sh
+cd .meltano
+```
+
+5. Delete the contents of the following folders and files:
+
+- `.meltano`
+  - `/extractors`
+    - `/tap-carbon-intensity`
+  - `/models`
+    - `/model-carbon-intensity`
+    - `/model-carbon-intensity-sqlite`
+  - `/run`
+    - `/tap-carbon-intensity`
+    - `/models`
+      - `/model-carbon-intensity`
+      - `/model-carbon-intensity-sqlite`
+      - `/topics.index.m5oc`
+
+```sh
+rm -r extractors models run/tap-carbon-intensity run/models
+```
 
 ### Step 7: Verify FTP Works
 
