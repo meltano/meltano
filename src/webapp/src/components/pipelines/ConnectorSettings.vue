@@ -35,11 +35,14 @@ export default {
     }
   },
   computed: {
+    connectorProfile() {
+      return this.configSettings
+        ? this.configSettings.profiles[this.configSettings.profileInFocusIndex]
+        : {}
+    },
     fileValue() {
       return setting => {
-        let fullPath = this.configSettings.profiles[
-          this.configSettings.profileInFocusIndex
-        ].config[setting.name]
+        let fullPath = this.connectorProfile.config[setting.name]
         return fullPath && utils.extractFileNameFromPath(fullPath)
       }
     },
@@ -188,14 +191,11 @@ export default {
           const vm = this
 
           setTimeout(() => {
-            vm.configSettings.profiles[
-              vm.configSettings.profileInFocusIndex
-            ].account = parsedAccountId
+            vm.connectorProfile.account = parsedAccountId
           }, 1000)
         } else {
-          this.configSettings.profiles[
-            this.configSettings.profileInFocusIndex
-          ].account = newVal.profiles[newVal.profileInFocusIndex].config.account
+          this.connectorProfile.account =
+            newVal.profiles[newVal.profileInFocusIndex].config.account
         }
       }
     }
@@ -264,10 +264,7 @@ export default {
               <input
                 v-if="getIsOfKindHidden(setting.kind)"
                 :id="getFormFieldForId(setting)"
-                v-model="
-                  configSettings.profiles[configSettings.profileInFocusIndex]
-                    .config[setting.name]
-                "
+                v-model="connectorProfile.config[setting.name]"
                 type="hidden"
               />
 
@@ -275,10 +272,7 @@ export default {
               <input
                 v-else-if="getIsOfKindBoolean(setting.kind)"
                 :id="getFormFieldForId(setting)"
-                v-model="
-                  configSettings.profiles[configSettings.profileInFocusIndex]
-                    .config[setting.name]
-                "
+                v-model="connectorProfile.config[setting.name]"
                 class="checkbox"
                 :class="successClass(setting)"
                 type="checkbox"
@@ -287,10 +281,7 @@ export default {
               <!-- Date -->
               <InputDateIso8601
                 v-else-if="getIsOfKindDate(setting.kind)"
-                v-model="
-                  configSettings.profiles[configSettings.profileInFocusIndex]
-                    .config[setting.name]
-                "
+                v-model="connectorProfile.config[setting.name]"
                 :name="setting.name"
                 :for-id="getFormFieldForId(setting)"
                 :input-classes="`is-small ${successClass(setting)}`"
@@ -340,10 +331,7 @@ export default {
               >
                 <select
                   :id="`${setting.name}-select-menu`"
-                  v-model="
-                    configSettings.profiles[configSettings.profileInFocusIndex]
-                      .config[setting.name]
-                  "
+                  v-model="connectorProfile.config[setting.name]"
                   :name="`${setting.name}-options`"
                   :class="successClass(setting)"
                 >
@@ -362,10 +350,7 @@ export default {
               <input
                 v-else-if="getIsOfKindTextBased(setting.kind)"
                 :id="getFormFieldForId(setting)"
-                v-model="
-                  configSettings.profiles[configSettings.profileInFocusIndex]
-                    .config[setting.name]
-                "
+                v-model="connectorProfile.config[setting.name].value"
                 :class="['input', fieldClass, successClass(setting)]"
                 :type="getTextBasedInputType(setting)"
                 :placeholder="getPlaceholder(setting)"
