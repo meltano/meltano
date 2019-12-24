@@ -26,7 +26,7 @@ ssh-add ~/.ssh/id_rsa
 ssh-add -L
 ```
 
-2. DigitalOcean API Key (Ready Access)
+2. [DigitalOcean API Key](https://www.digitalocean.com/docs/api/create-personal-access-token/)  with Read Access
 
 ### Tools
 
@@ -38,7 +38,7 @@ The Controller Node has Ansible installed and the `meltano/infrastructure` proje
 Access to this node is restricted to Meltano Team members.
 :::
 
-To access the controller, connect using SSH with your Meltano username.
+To access the controller, connect using SSH with your Meltano username (`<first initial><last name>`).
 
 ```bash
 ssh -A <username>@controller.int.meltanodata.com
@@ -62,10 +62,13 @@ Ansible is a configuration management and provisioning tool that enable infrastr
 
 The `meltano/infrastructure` project is located at `/var/meltano/infrastructure`.
 
+```bash
+cd /var/meltano/infrastructure
+```
+
 ### Ensure it works properly
 
 ```bash
-$ cd /var/meltano/infrastructure
 $ ansible controller -m ping
 
 # there might be some warnings, just ignore them for now.
@@ -94,7 +97,7 @@ export DO_API_TOKEN=<access_token>
 ```
 
 ::: tip
-You can also save this to your `.bashrc` file as long as the API key only has read access to save yourself some time.
+To save yourself some time, you can also save this to your `.bashrc` file (`/home/<username>/.bashrc`) as long as the API key only has read access.
 :::
 
 You can test that it works using:
