@@ -56,7 +56,6 @@ def installed():
         except PluginNotFoundError:
             merged_plugin_definition = {**plugin.canonical()}
 
-        merged_plugin_definition.pop("settings_group_validation", None)
         merged_plugin_definition.pop("settings", None)
         merged_plugin_definition.pop("select", None)
 

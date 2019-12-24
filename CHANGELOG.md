@@ -15,6 +15,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1518](https://gitlab.com/meltano/meltano/issues/1518) Fix bug that caused all text fields to show up as required in configuration modals
+
 ### Breaks
 
 
