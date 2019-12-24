@@ -77,7 +77,7 @@ export default {
     },
     getIsProtected() {
       return setting => {
-        const settingSource = this.connectorProfile.config[setting.name].source
+        const settingSource = this.connectorProfile.configSources[setting.name]
 
         return (
           setting.protected === true ||
@@ -358,7 +358,7 @@ export default {
               <input
                 v-else-if="getIsOfKindTextBased(setting.kind)"
                 :id="getFormFieldForId(setting)"
-                v-model="connectorProfile.config[setting.name].value"
+                v-model="connectorProfile.config[setting.name]"
                 :class="['input', fieldClass, successClass(setting)]"
                 :type="getTextBasedInputType(setting)"
                 :placeholder="getPlaceholder(setting)"

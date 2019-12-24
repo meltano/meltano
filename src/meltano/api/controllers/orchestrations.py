@@ -41,6 +41,11 @@ from .upload_helper import (
 )
 
 
+def freeze_profile_config_keys(profile):
+    profile["config"] = freeze_keys(profile.get("config", {}))
+    profile["config_sources"] = freeze_keys(profile.get("config_sources", {}))
+
+
 orchestrationsBP = APIBlueprint("orchestrations", __name__)
 
 
@@ -219,15 +224,12 @@ def get_plugin_configuration(plugin_ref) -> Response:
     settings = PluginSettingsService(project)
     plugin = ConfigService(project).get_plugin(plugin_ref)
 
-    profiles = settings.as_profile_configs(db.session, plugin, redacted=True)
-
-    # freeze the `config` keys
+    profiles = settings.profiles_with_config(db.session, plugin, redacted=True)
     for profile in profiles:
-        profile["config"] = freeze_keys(profile.get("config", {}))
+        freeze_profile_config_keys(profile)
 
     return jsonify(
         {
-            # freeze the keys because they are used for lookups
             "profiles": profiles,
             "settings": Canonical.as_canonical(
                 settings.get_definition(plugin).settings
@@ -253,16 +255,13 @@ def add_plugin_configuration_profile(plugin_ref) -> Response:
     profile = plugin.add_profile(slugify(payload["name"]), label=payload["name"])
 
     config.update_plugin(plugin)
-    plugin.use_profile(profile)
 
-    return jsonify(
-        {
-            **profile.canonical(),
-            "config": freeze_keys(
-                settings.as_config_with_source(db.session, plugin, redacted=True)
-            ),
-        }
+    profile_config = settings.profile_with_config(
+        db.session, plugin, profile, redacted=True
     )
+    freeze_profile_config_keys(profile_config)
+
+    return jsonify(profile_config)
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["PUT"])
@@ -288,16 +287,24 @@ def save_plugin_configuration(plugin_ref) -> Response:
                 logging.warning("Cannot set a 'protected' configuration externally.")
                 continue
 
+            old_value, source = settings.get_value(db.session, plugin_ref, name)
+            if source in (
+                PluginSettingValueSource.ENV,
+                PluginSettingValueSource.MELTANO_YML,
+            ):
+                logging.warning(
+                    "Cannot override a configuration set in the environment or meltano.yml."
+                )
+                continue
+
             if value == "":
                 settings.unset(db.session, plugin, name)
             else:
                 settings.set(db.session, plugin, name, value)
 
-    profiles = settings.as_profile_configs(db.session, plugin, redacted=True)
-
-    # freeze the `config` keys
+    profiles = settings.profiles_with_config(db.session, plugin, redacted=True)
     for profile in profiles:
-        profile["config"] = freeze_keys(profile.get("config", {}))
+        freeze_profile_config_keys(profile)
 
     return jsonify(profiles)
 

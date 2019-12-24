@@ -49,12 +49,36 @@ class PluginSettingsService:
 
         return {k: v for k, v in values.items() if v != REDACTED_VALUE}
 
-    def as_config(self, *args, **kwargs) -> Dict:
-        full_config = self.as_config_with_source(*args, **kwargs)
+    def profile_with_config(
+        self, session, plugin: PluginRef, profile: Profile, redacted=False
+    ):
+        plugin_install = self.get_install(plugin)
 
-        return {key: config["value"] for key, config in full_config.items()}
+        plugin_install.use_profile(profile)
 
-    def as_config_with_source(
+        full_config = self.config_with_sources(
+            session, plugin_install, redacted=redacted
+        )
+
+        return {
+            **profile.canonical(),
+            "config": {key: config["value"] for key, config in full_config.items()},
+            "config_sources": {
+                key: config["source"] for key, config in full_config.items()
+            },
+        }
+
+    def profiles_with_config(
+        self, session, plugin: PluginRef, redacted=False
+    ) -> List[Dict]:
+        plugin_install = self.get_install(plugin)
+
+        return [
+            self.profile_with_config(session, plugin, profile, redacted=redacted)
+            for profile in (Profile.DEFAULT, *plugin_install.profiles)
+        ]
+
+    def config_with_sources(
         self,
         session,
         plugin: PluginRef,
@@ -81,25 +105,10 @@ class PluginSettingsService:
 
         return config
 
-    def as_profile_configs(
-        self, session, plugin: PluginRef, redacted=False
-    ) -> List[Dict]:
-        plugin_install = self.get_install(plugin)
+    def as_config(self, *args, **kwargs) -> Dict:
+        full_config = self.config_with_sources(*args, **kwargs)
 
-        profiles = []
-        for profile in (Profile.DEFAULT, *plugin_install.profiles):
-            plugin_install.use_profile(profile)
-
-            profiles.append(
-                {
-                    **profile.canonical(),
-                    "config": self.as_config_with_source(
-                        session, plugin_install, redacted=redacted
-                    ),
-                }
-            )
-
-        return profiles
+        return {key: config["value"] for key, config in full_config.items()}
 
     def as_env(
         self, session, plugin: PluginRef, sources: List[PluginSettingValueSource] = None
