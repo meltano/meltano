@@ -207,26 +207,7 @@ and request for their database cluster limits to be increased from 10 to 50 by s
 
 You should see `Connection details` on the right side of the page which is important for later on. It contains your database credentials and will be needed in the next section.
 
-### Step 4: Configure Meltano Droplet Networking
-
-1. SSH into your newly created droplet
-
-```bash
-ssh root@$TENANT_NAME.meltanodata.com
-```
-
-::: info
-**Troubleshooting**
-
-If you can't connect, make sure the SSH key you registered on you DigitalOcean account is loaded by using:
-
-```bash
-# by default, only `~/.ssh/id_rsa` is loaded into SSH agent
-ssh-add /path/to/your/ssh-key
-```
-
-For more informations about using `ssh`, take a look at https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys#basic-connection-instructions
-:::
+### Step 4: Configure Droplet
 
 #### Run Ansible Playbooks
 
@@ -294,7 +275,25 @@ ansible-playbook playbooks/meltano.yml --limit=$TENANT_NAME.meltanodata.com
 
 ##### Verify changes were made
 
-1. SSH into droplet
+1. SSH into the droplet
+
+```bash
+ssh root@$TENANT_NAME.meltanodata.com
+```
+
+::: info
+**Troubleshooting**
+
+If you can't connect, make sure the SSH key you registered on you DigitalOcean account is loaded by using:
+
+```bash
+# by default, only `~/.ssh/id_rsa` is loaded into SSH agent
+ssh-add /path/to/your/ssh-key
+```
+
+For more informations about using `ssh`, take a look at https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys#basic-connection-instructions
+:::
+
 2. Verify `/etc/caddy/Caddyfile` looks like:
 
 ```
@@ -495,7 +494,7 @@ systemctl status
 
 To ensure clients are greeted with a fresh install, it's important to remove any traces of tests we ran.
 
-1. SSH into droplet
+1. SSH into the droplet
 2. Change directory to `/var/meltano/project`
 
 ```sh
