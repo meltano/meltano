@@ -108,7 +108,9 @@ export MELTANO_UI_URL = ""
 
 ## Taps & Targets Development
 
-Watch ["How taps are built"](https://www.youtube.com/watch?v=aImidnW8nsU), for an explanation of how Singer taps (which form the basis for Meltano extractors) work, and what goes into building new ones or verifying and modifying existing ones for various types of APIs.
+Watch ["How taps are built"](https://www.youtube.com/watch?v=aImidnW8nsU) for an explanation of how Singer taps (which form the basis for Meltano extractors) work, and what goes into building new ones or verifying and modifying existing ones for various types of APIs.
+
+Then watch ["How transforms are built"](https://www.youtube.com/watch?v=QRaCSKQC_74) for an explanation of how DBT transforms work, and what goes into building new ones for new data sources.
 
 ### Changing discovery.yml
 
