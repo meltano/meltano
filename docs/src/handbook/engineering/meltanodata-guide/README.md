@@ -221,59 +221,13 @@ You should see `Connection details` on the right side of the page which is impor
 cd /var/meltano/infrastructure
 ```
 
-##### Configure HTTPS Protocol
-
-1. Run the `playbook/ssl.yml` playbook. To speed up the process, you can use `--limit=$TENANT_NAME.meltanodata.com`.
+5. Run the SSL, Caddy, and Meltano playbooks. To speed up the process, you can use `--limit=$TENANT_NAME.meltanodata.com`.
 
 ```sh
-ansible-playbook playbooks/ssl.yml --limit=$TENANT_NAME.meltanodata.com
+ansible-playbook playbooks/ssl.yml playbooks/caddy.yml playbooks/meltano.yml --limit=$TENANT_NAME.meltanodata.com
 ```
 
-You should get a response such as:
-
-```
-PLAY [*.meltanodata.com] *********************************************************************************************
-
-TASK [Copy the `*.meltanodata.com` certificate] **********************************************************************
-changed: [64.225.4.60]
-
-TASK [Copy the `*.meltanodata.com` key] ******************************************************************************
-changed: [64.225.4.60]
-
-PLAY RECAP ***********************************************************************************************************
-64.225.4.60                : ok=2    changed=2    unreachable=0    failed=0
-```
-
-##### Configure Caddyfile
-
-1. Run caddy.yml playbook
-
-```sh
-ansible-playbook playbooks/caddy.yml --limit=$TENANT_NAME.meltanodata.com
-```
-
-```
-PLAY [*.meltanodata.com] *********************************************************************************************
-
-TASK [/etc/caddy/Caddyfile] ******************************************************************************************
-changed: [64.225.4.60]
-
-TASK [Restart caddy] *************************************************************************************************
-changed: [64.225.4.60]
-
-PLAY RECAP ***********************************************************************************************************
-64.225.4.60                : ok=2    changed=2    unreachable=0    failed=0
-```
-
-##### Configure Meltano
-
-1. Run `meltano.yml` playbook
-
-```sh
-ansible-playbook playbooks/meltano.yml --limit=$TENANT_NAME.meltanodata.com
-```
-
-##### Verify changes were made
+#### Verify changes were made
 
 1. SSH into the droplet
 
