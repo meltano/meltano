@@ -19,7 +19,8 @@ export default {
   data() {
     return {
       isTesting: false,
-      localConfiguration: {}
+      localConfiguration: {},
+      uploadFormData: null
     }
   },
   computed: {
@@ -138,13 +139,28 @@ export default {
         this.extractorName
       )
     },
+    onChangeUploadFormData(uploadFormData) {
+      this.uploadFormData = uploadFormData
+    },
     saveConfigAndGoToLoaders() {
-      this.$store
-        .dispatch('orchestration/savePluginConfiguration', {
+      const promises = [
+        this.$store.dispatch('orchestration/savePluginConfiguration', {
           name: this.extractor.name,
           type: 'extractors',
           profiles: this.localConfiguration.profiles
         })
+      ]
+      if (this.uploadFormData) {
+        promises.push(
+          this.$store.dispatch('orchestration/uploadPluginConfigurationFile', {
+            name: this.extractor.name,
+            profileName: this.currentProfile.name,
+            type: 'extractors',
+            formData: this.uploadFormData
+          })
+        )
+      }
+      Promise.all(promises)
         .then(() => {
           this.$store.dispatch('orchestration/updateRecentELTSelections', {
             type: 'extractor',
@@ -155,6 +171,9 @@ export default {
             ? `Auto Advance - No Configuration needed for ${this.extractor.name}`
             : `Connection Saved - ${this.extractor.name}`
           Vue.toasted.global.success(message)
+        })
+        .catch(error => {
+          Vue.toasted.global.error(error.response.data.code)
         })
     },
     testConnection() {
@@ -229,6 +248,8 @@ export default {
             :config-settings="localConfiguration"
             :plugin="extractor"
             :required-settings-keys="requiredSettingsKeys"
+            :upload-form-data="uploadFormData"
+            @onChangeUploadFormData="onChangeUploadFormData"
           />
         </template>
       </section>
