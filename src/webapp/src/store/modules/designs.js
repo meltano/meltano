@@ -417,7 +417,13 @@ const actions = {
       .then(response => {
         commit('setReports', response.data)
         if (slug) {
-          const reportMatch = state.reports.find(report => report.slug === slug)
+          const reportMatch = state.reports.find(
+            report =>
+              report.namespace === namespace &&
+              report.model === model &&
+              report.design === design &&
+              report.slug === slug
+          )
           if (reportMatch) {
             dispatch('loadReport', reportMatch)
           }
@@ -435,16 +441,14 @@ const actions = {
     })
   },
 
-  getSQL({ commit, getters, state }, { run, load }) {
+  getSQL({ commit, getters, state }, { run, payload }) {
     this.dispatch('designs/resetErrorMessage')
     commit('setIsLoadingQuery', !!run)
 
-    const queryPayload = Object.assign(
-      {},
-      helpers.getQueryPayloadFromDesign(state),
-      load
+    const postData = Object.assign(
+      { run },
+      payload || helpers.getQueryPayloadFromDesign(state)
     )
-    const postData = Object.assign({ run }, queryPayload)
     sqlApi
       .getSql(
         state.currentNamespace,
@@ -473,22 +477,13 @@ const actions = {
       })
   },
 
-  loadReport({ commit }, { name }) {
-    reportsApi
-      .loadReport(name)
-      .then(response => {
-        const report = response.data
-        this.dispatch('designs/getSQL', {
-          run: true,
-          load: report.queryPayload
-        })
-        commit('setCurrentReport', report)
-        commit('setStateFromLoadedReport', report)
-      })
-      .catch(e => {
-        commit('setSqlErrorMessage', e)
-        commit('setIsLoadingQuery', false)
-      })
+  loadReport({ commit }, report) {
+    this.dispatch('designs/getSQL', {
+      run: true,
+      payload: report.queryPayload
+    })
+    commit('setCurrentReport', report)
+    commit('setStateFromLoadedReport', report)
   },
 
   limitSet({ commit }, limit) {
@@ -819,9 +814,6 @@ const mutations = {
   setStateFromLoadedReport(state, report) {
     // General UI state updates
     state.chartType = report.chartType
-    state.currentNamespace = report.namespace
-    state.currentModel = report.model
-    state.currentDesign = report.design
     state.loader = report.queryPayload.loader
     state.filters = report.filters
     state.limit = report.queryPayload.limit
