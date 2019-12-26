@@ -155,8 +155,8 @@ export default {
 
       // 2. Initialize conditional request
       uponConditionalUpload.then(response => {
+        // 2.a Update setting value with updated and secure file path
         if (response) {
-          // 2.a Update setting value with updated and secure file path
           const payload = response.data
           this.currentProfile.config[payload.settingName] = payload.path
         }
