@@ -1,6 +1,4 @@
 <script>
-import Vue from 'vue'
-
 import InputDateIso8601 from '@/components/generic/InputDateIso8601'
 import TooltipCircle from '@/components/generic/TooltipCircle'
 

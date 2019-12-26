@@ -143,38 +143,46 @@ export default {
       this.uploadFormData = uploadFormData
     },
     saveConfigAndGoToLoaders() {
-      const promises = [
-        this.$store.dispatch('orchestration/savePluginConfiguration', {
-          name: this.extractor.name,
-          type: 'extractors',
-          profiles: this.localConfiguration.profiles
-        })
-      ]
-      if (this.uploadFormData) {
-        promises.push(
-          this.$store.dispatch('orchestration/uploadPluginConfigurationFile', {
+      // 1. Prepare conditional upload as response is needed to properly save config settings
+      let uponConditionalUpload = this.uploadFormData
+        ? this.$store.dispatch('orchestration/uploadPluginConfigurationFile', {
             name: this.extractor.name,
             profileName: this.currentProfile.name,
             type: 'extractors',
             formData: this.uploadFormData
           })
-        )
-      }
-      Promise.all(promises)
-        .then(() => {
-          this.$store.dispatch('orchestration/updateRecentELTSelections', {
-            type: 'extractor',
-            value: this.extractor
+        : Promise.resolve()
+
+      // 2. Initialize conditional request
+      uponConditionalUpload.then(response => {
+        if (response) {
+          // 2.a Update setting value with updated and secure file path
+          const payload = response.data
+          this.currentProfile.config[payload.settingName] = payload.path
+        }
+
+        // 3. Finally save config settings
+        this.$store
+          .dispatch('orchestration/savePluginConfiguration', {
+            name: this.extractor.name,
+            type: 'extractors',
+            profiles: this.localConfiguration.profiles
           })
-          this.$router.push({ name: 'loaders' })
-          const message = this.extractorLacksConfigSettings
-            ? `Auto Advance - No Configuration needed for ${this.extractor.name}`
-            : `Connection Saved - ${this.extractor.name}`
-          Vue.toasted.global.success(message)
-        })
-        .catch(error => {
-          Vue.toasted.global.error(error.response.data.code)
-        })
+          .then(() => {
+            this.$store.dispatch('orchestration/updateRecentELTSelections', {
+              type: 'extractor',
+              value: this.extractor
+            })
+            this.$router.push({ name: 'loaders' })
+            const message = this.extractorLacksConfigSettings
+              ? `Auto Advance - No Configuration needed for ${this.extractor.name}`
+              : `Connection Saved - ${this.extractor.name}`
+            Vue.toasted.global.success(message)
+          })
+          .catch(error => {
+            Vue.toasted.global.error(error.response.data.code)
+          })
+      })
     },
     testConnection() {
       this.isTesting = true
