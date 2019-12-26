@@ -479,22 +479,13 @@ const actions = {
       })
   },
 
-  loadReport({ commit }, { name }) {
-    reportsApi
-      .loadReport(name)
-      .then(response => {
-        const report = response.data
-        this.dispatch('designs/getSQL', {
-          run: true,
-          load: report.queryPayload
-        })
-        commit('setCurrentReport', report)
-        commit('setStateFromLoadedReport', report)
-      })
-      .catch(e => {
-        commit('setSqlErrorMessage', e)
-        commit('setIsLoadingQuery', false)
-      })
+  loadReport({ commit }, report) {
+    this.dispatch('designs/getSQL', {
+      run: true,
+      load: report.queryPayload
+    })
+    commit('setCurrentReport', report)
+    commit('setStateFromLoadedReport', report)
   },
 
   limitSet({ commit }, limit) {
