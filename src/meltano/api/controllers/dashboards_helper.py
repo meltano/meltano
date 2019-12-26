@@ -92,7 +92,8 @@ class DashboardsHelper:
 
     def delete_dashboard(self, data):
         project = Project.find()
-        slug = data["slug"]
+        dashboard = self.get_dashboard(data["id"])
+        slug = dashboard["slug"]
         file_path = project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
         if os.path.exists(file_path):
             os.remove(file_path)
@@ -103,7 +104,7 @@ class DashboardsHelper:
 
     def update_dashboard(self, data):
         project = Project.find()
-        dashboard = data["dashboard"]
+        dashboard = self.get_dashboard(data["dashboard"]["id"])
         slug = dashboard["slug"]
         file_path = project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
         if os.path.exists(file_path):
