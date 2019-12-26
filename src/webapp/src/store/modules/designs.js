@@ -825,9 +825,6 @@ const mutations = {
   setStateFromLoadedReport(state, report) {
     // General UI state updates
     state.chartType = report.chartType
-    state.currentNamespace = report.namespace
-    state.currentModel = report.model
-    state.currentDesign = report.design
     state.loader = report.queryPayload.loader
     state.filters = report.filters
     state.limit = report.queryPayload.limit
