@@ -417,7 +417,13 @@ const actions = {
       .then(response => {
         commit('setReports', response.data)
         if (slug) {
-          const reportMatch = state.reports.find(report => report.slug === slug)
+          const reportMatch = state.reports.find(
+            report =>
+              report.namespace === namespace &&
+              report.model === model &&
+              report.design === design &&
+              report.slug === slug
+          )
           if (reportMatch) {
             dispatch('loadReport', reportMatch)
           }
