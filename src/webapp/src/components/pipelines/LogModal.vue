@@ -147,33 +147,47 @@ export default {
           Run Log: <span class="is-family-code">{{ jobId }}</span>
         </p>
       </header>
-      <section v-if="isPolling && relatedPipeline" class="modal-card-body">
-        <div class="content">
-          <p>
-            Your data is currently being pulled from
-            {{ relatedPipeline.extractor }}. Please note that depending on the
-            specific data source, time period, and amount of data, extraction
-            can take as little as a few seconds, or as long as multiple hours.
-          </p>
-          <p>
-            Extraction will continue in the background even if you close this
-            view. Once extraction is complete, you will be able to analyze the
-            imported data.
-          </p>
-        </div>
-      </section>
-      <section ref="log-view" class="modal-card-body is-overflow-y-scroll">
-        <div class="content">
-          <div v-if="jobLog || hasLogExceededMaxSize">
-            <pre
-              v-if="jobLog"
-            ><code>{{jobLog}}{{isPolling ? '...' : ''}}</code></pre>
-            <div v-if="hasLogExceededMaxSize">
-              <div class="button">Download Log</div>
+      <section v-if="relatedPipeline" class="modal-card-body">
+        <article class="message is-small is-info">
+          <div class="message-body">
+            <div class="content">
+              <p>
+                This pipeline uses the
+                <code>{{ relatedPipeline.extractor }}</code> extractor. Please
+                note:
+              </p>
+              <ul>
+                <li>
+                  Depending on the specific data source, time period, and amount
+                  of data, extraction can take as little as a
+                  <em>few seconds</em>, or as long as <em>multiple hours</em>.
+                </li>
+                <li>
+                  Extraction will continue in the background even if you close
+                  this view.
+                </li>
+                <li>
+                  Once extraction is complete, use the "Analyze" button (lower
+                  right of this view) to analyze the imported data.
+                </li>
+              </ul>
             </div>
           </div>
-          <progress v-else class="progress is-small is-info"></progress>
+        </article>
+      </section>
+      <section
+        ref="log-view"
+        class="modal-card-body modal-card-body-log is-overflow-y-scroll"
+      >
+        <div v-if="jobLog">
+          <pre
+            v-if="jobLog"
+          ><code>{{jobLog}}{{isPolling ? '...' : ''}}</code></pre>
         </div>
+        <progress v-else class="progress is-small is-info"></progress>
+      </section>
+      <section class="modal-card-body">
+        <a class="button is-small" :disabled="isPolling">Download Log</a>
       </section>
       <footer class="modal-card-foot h-space-between">
         <div class="field is-grouped is-grouped-multiline">
@@ -255,6 +269,10 @@ export default {
   @media screen and (min-width: $desktop) {
     margin-bottom: 0;
   }
+}
+
+.modal-card-body-log {
+  height: 100%;
 }
 
 .modal-card.modal-card-log {
