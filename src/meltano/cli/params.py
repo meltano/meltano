@@ -42,6 +42,7 @@ class project:
                 raise click.ClickException(
                     f"`{ctx.command_path}` must be run inside a Meltano project."
                     "\nUse `meltano init <project_name>` to create one."
+                    "\nIf you are in a project, you may be in a subfolder. Navigate to the root directory."
                 )
 
             # register the system database connection
