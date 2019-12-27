@@ -1,6 +1,4 @@
 <script>
-import Vue from 'vue'
-
 import InputDateIso8601 from '@/components/generic/InputDateIso8601'
 import TooltipCircle from '@/components/generic/TooltipCircle'
 
@@ -29,6 +27,11 @@ export default {
     requiredSettingsKeys: {
       type: Array,
       required: true
+    },
+    uploadFormData: {
+      type: FormData,
+      required: false,
+      default: () => null
     }
   },
   computed: {
@@ -124,6 +127,7 @@ export default {
     'configSettings.profileInFocusIndex': {
       handler(newVal, oldVal) {
         this.refocusInput(newVal, oldVal)
+        this.clearUploadFormData()
       }
     }
   },
@@ -131,6 +135,9 @@ export default {
     this.focusInputIntelligently()
   },
   methods: {
+    clearUploadFormData() {
+      this.$emit('onChangeUploadFormData', null)
+    },
     focusInputIntelligently() {
       this.$nextTick(() => {
         const inputs = Array.from(this.$el.getElementsByTagName('input'))
@@ -143,30 +150,19 @@ export default {
     },
     onFileChange(event, setting) {
       const file = event.target.files[0]
-
       if (file) {
+        // Queue file upload vs. greedy upload
+        // Refactor needed if a setting requires multiple files and/or 2+ settings are `kind: file`
+        const uploadFormData = new FormData()
+        uploadFormData.append('file', file)
+        uploadFormData.append('setting_name', setting.name)
+        this.$emit('onChangeUploadFormData', uploadFormData)
+
+        // Model update as v-model on `<input type="file">` not supported
         const profile = this.configSettings.profiles[
           this.configSettings.profileInFocusIndex
         ]
-
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('setting_name', setting.name)
-
-        this.$store
-          .dispatch('orchestration/uploadPluginConfigurationFile', {
-            name: this.plugin.name,
-            profileName: profile.name,
-            type: 'extractors',
-            formData
-          })
-          .then(response => {
-            // Model update as v-model on `<input type="file">` not supported
-            profile.config[setting.name] = response.data.path
-          })
-          .catch(error => {
-            Vue.toasted.global.error(error.response.data.code)
-          })
+        profile.config[setting.name] = file.name
       }
     },
     refocusInput(newVal, oldVal) {

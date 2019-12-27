@@ -299,9 +299,7 @@ export default {
         })
         .catch(error => {
           Vue.toasted.global.error(
-            `${this.activeReport.name} was not saved to ${
-              dashboard.name
-            }. [Error code: ${error.response.data.code}]`
+            `${this.activeReport.name} was not saved to ${dashboard.name}. [Error code: ${error.response.data.code}]`
           )
         })
     },
