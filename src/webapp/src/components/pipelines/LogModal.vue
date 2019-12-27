@@ -2,7 +2,9 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 import capitalize from '@/filters/capitalize'
+import DownloadButton from '@/components/generic/DownloadButton'
 import Dropdown from '@/components/generic/Dropdown'
+import orchestrationsApi from '@/api/orchestrations'
 import poller from '@/utils/poller'
 import underscoreToSpace from '@/filters/underscoreToSpace'
 import utils from '@/utils/utils'
@@ -10,7 +12,8 @@ import utils from '@/utils/utils'
 export default {
   name: 'LogModal',
   components: {
-    Dropdown
+    Dropdown,
+    DownloadButton
   },
   filters: {
     capitalize,
@@ -54,6 +57,9 @@ export default {
       }
 
       return models
+    },
+    downloadMethod() {
+      return orchestrationsApi.downloadJobLog
     },
     getElapsedLabel() {
       if (!this.jobStatus) {
@@ -107,13 +113,13 @@ export default {
       const pollFn = () => {
         this.getJobLog(this.jobId)
           .then(response => {
-            if (response.data.hasLogExceededMaxSize) {
-              this.hasLogExceededMaxSize = response.data.hasLogExceededMaxSize
-            } else {
-              this.jobLog = response.data.log
-            }
-            this.hasError = response.data.hasError
             this.jobStatus = response.data
+            this.hasError = this.jobStatus.hasError
+            if (this.jobStatus.hasLogExceededMaxSize) {
+              this.hasLogExceededMaxSize = this.jobStatus.hasLogExceededMaxSize
+            } else {
+              this.jobLog = this.jobStatus.log
+            }
           })
           .catch(error => {
             this.jobLog = error.response.data.code
@@ -191,7 +197,13 @@ export default {
         <progress v-else class="progress is-small is-info"></progress>
       </section>
       <section class="modal-card-body">
-        <a class="button is-small" :disabled="isPolling">Download Log</a>
+        <DownloadButton
+          label="Download File"
+          :file-name="`${jobId}-job-log.txt`"
+          :is-disabled="isPolling"
+          :trigger-promise="downloadMethod"
+          :trigger-payload="{ jobId }"
+        ></DownloadButton>
       </section>
       <footer class="modal-card-foot h-space-between">
         <div class="field is-grouped is-grouped-multiline">

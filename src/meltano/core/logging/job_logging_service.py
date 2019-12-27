@@ -89,7 +89,7 @@ class JobLoggingService:
         """
         try:
             latest_log = next(iter(self.get_all_logs(job_id)))
-            return latest_log
+            return str(latest_log.resolve())
         except StopIteration:
             raise MissingJobLogException(
                 f"Could not find any log for job with id '{job_id}'"

@@ -36,6 +36,16 @@ export default {
     return `https://meltano.com/docs${path}.html${fragment}`
   },
 
+  downloadBlobAsFile(blob, fileName) {
+    const url = window.URL.createObjectURL(new Blob([blob]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', fileName)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  },
+
   getConnectorLogoUrl(connectorName) {
     connectorName = connectorName === 'postgresql' ? 'postgres' : connectorName
     const name = regExpConnectorLogo.exec(connectorName)[1]

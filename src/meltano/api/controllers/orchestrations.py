@@ -148,8 +148,10 @@ def job_log(job_id) -> Response:
     try:
         log_service = JobLoggingService(project)
         log = log_service.get_latest_log(job_id)
+        has_log_exceeded_max_size = False
     except SizeThresholdJobLogException as err:
         log = None
+        has_log_exceeded_max_size = True
 
     finder = JobFinder(job_id)
     state_job = finder.latest(db.session)
@@ -159,7 +161,7 @@ def job_log(job_id) -> Response:
         {
             "job_id": job_id,
             "log": log,
-            "has_log_exceeded_max_size": not log,
+            "has_log_exceeded_max_size": has_log_exceeded_max_size,
             "has_error": state_job.has_error() if state_job else False,
             "started_at": state_job.started_at if state_job else None,
             "ended_at": state_job.ended_at if state_job else None,
@@ -180,7 +182,6 @@ def download_job_log(job_id) -> Response:
     return send_file(
         log_service.get_downloadable_log(job_id),
         mimetype="text/plain",
-        attachment_filename="job-log.txt",
     )
 
 
