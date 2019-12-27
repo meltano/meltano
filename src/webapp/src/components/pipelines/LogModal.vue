@@ -58,7 +58,7 @@ export default {
 
       return models
     },
-    downloadMethod() {
+    getDownloadPromise() {
       return orchestrationsApi.downloadJobLog
     },
     getElapsedLabel() {
@@ -209,7 +209,7 @@ export default {
           label="Download Log"
           :file-name="`${jobId}-job-log.txt`"
           :is-disabled="isPolling"
-          :trigger-promise="downloadMethod"
+          :trigger-promise="getDownloadPromise"
           :trigger-payload="{ jobId }"
         ></DownloadButton>
       </section>
