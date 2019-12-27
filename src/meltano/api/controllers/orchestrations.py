@@ -186,7 +186,7 @@ def upload_plugin_configuration_file(plugin_ref) -> Response:
     upload_helper = UploadHelper()
     file_path = upload_helper.upload_file(directory, file)
 
-    return jsonify({"path": file_path}), 200
+    return jsonify({"path": file_path, "setting_name": setting_name}), 200
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["GET"])
