@@ -153,7 +153,7 @@ export default {
 <template>
   <div class="modal is-active" @keyup.esc="close">
     <div class="modal-background" @click="close"></div>
-    <div class="modal-card modal-card-log is-wide">
+    <div class="modal-card is-wide" :class="{ 'modal-card-log': jobLog }">
       <header class="modal-card-head">
         <p class="modal-card-title">
           Run Log: <span class="is-family-code">{{ jobId }}</span>
@@ -188,17 +188,25 @@ export default {
         </article>
       </section>
       <section
+        v-if="!hasLogExceededMaxSize"
         ref="log-view"
         class="modal-card-body modal-card-body-log is-overflow-y-scroll"
       >
-        <div v-if="jobLog">
-          <pre v-if="jobLog"><code>{{jobLog}}{{getLogAppender}}</code></pre>
-        </div>
+        <pre v-if="jobLog"><code>{{jobLog}}{{getLogAppender}}</code></pre>
         <progress v-else class="progress is-small is-info"></progress>
       </section>
       <section class="modal-card-body">
+        <article v-if="hasLogExceededMaxSize" class="message is-small">
+          <div class="message-body">
+            <div class="content">
+              <p>
+                The log is too large to display inline. Download it below.
+              </p>
+            </div>
+          </div>
+        </article>
         <DownloadButton
-          label="Download File"
+          label="Download Log"
           :file-name="`${jobId}-job-log.txt`"
           :is-disabled="isPolling"
           :trigger-promise="downloadMethod"
