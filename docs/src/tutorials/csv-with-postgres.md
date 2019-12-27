@@ -124,7 +124,7 @@ You can check the downloaded files as an example of valid CSV files (they were g
 
 We'll also need to download the following definition file in the same directory:
 
-**[files-def.json](/files/files-def.json)**
+**[files_def.json](/files/files-def.json)**
 
 ```json
 [
@@ -142,7 +142,12 @@ This file allows us to define the CSV files that the CSV Extractor is going to e
 
 ### Configure the Extractor
 
-Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data source.
+:::tip
+Meltano only supports importing CSV files for self-hosted users. This is a [known issue](https://gitlab.com/meltano/meltano/issues/1385).
+:::
+
+Add the CSV extractor which is hidden-by-default with `meltano add extractor tap-csv`. 
+Once it's successful, you should be able to reload the Meltano extractors page where you can configure it. 
 
 ![Screenshot of Meltano UI with all extractors not installed and the CSV Extractor highlighted](/images/csv-tutorial/01-csv-extractor-selection.png)
 
