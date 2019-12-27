@@ -72,6 +72,12 @@ export default {
         ? utils.momentFormatlll(this.jobStatus.endedAt)
         : fallback
     },
+    getLogAppender() {
+      const note = this.hasLogExceededMaxSize
+        ? 'Logging stream limit hit. Use the "Download Log" button below once extraction completes.'
+        : ''
+      return this.isPolling ? `... ${note}` : ''
+    },
     getStartedAtLabel() {
       return this.jobStatus
         ? utils.momentFormatlll(this.jobStatus.startedAt)
@@ -180,9 +186,7 @@ export default {
         class="modal-card-body modal-card-body-log is-overflow-y-scroll"
       >
         <div v-if="jobLog">
-          <pre
-            v-if="jobLog"
-          ><code>{{jobLog}}{{isPolling ? '...' : ''}}</code></pre>
+          <pre v-if="jobLog"><code>{{jobLog}}{{getLogAppender}}</code></pre>
         </div>
         <progress v-else class="progress is-small is-info"></progress>
       </section>

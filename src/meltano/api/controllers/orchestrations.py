@@ -1,7 +1,7 @@
 import asyncio
 import json
 import logging
-from flask import request, url_for, jsonify, make_response, Response
+from flask import request, url_for, jsonify, make_response, Response, send_file
 
 from meltano.core.job import JobFinder, State
 from meltano.core.behavior.canonical import Canonical
@@ -23,7 +23,11 @@ from meltano.core.schedule_service import (
     ScheduleDoesNotExistError,
 )
 from meltano.core.utils import flatten, iso8601_datetime, slugify
-from meltano.core.logging import JobLoggingService, MissingJobLogException, SizeThresholdJobLogException
+from meltano.core.logging import (
+    JobLoggingService,
+    MissingJobLogException,
+    SizeThresholdJobLogException,
+)
 from meltano.cli.add import extractor
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.models import db
@@ -163,6 +167,20 @@ def job_log(job_id) -> Response:
             if state_job_success
             else None,
         }
+    )
+
+
+@orchestrationsBP.route("/jobs/<job_id>/download", methods=["GET"])
+def download_job_log(job_id) -> Response:
+    """
+    Endpoint for downloading a job log with job_id
+    """
+    project = Project.find()
+    log_service = JobLoggingService(project)
+    return send_file(
+        log_service.get_downloadable_log(job_id),
+        mimetype="text/plain",
+        attachment_filename="job-log.txt",
     )
 
 
