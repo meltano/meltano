@@ -2,8 +2,12 @@
 import Vue from 'vue'
 
 export default {
-  name: 'NewDashboardModal',
+  name: 'CreateDashboardModal',
   props: {
+    dashboard: {
+      type: Object,
+      default: () => {}
+    },
     report: {
       type: Object,
       default: () => {}
@@ -15,7 +19,12 @@ export default {
     }
   },
   created() {
-    this.saveDashboardSettings.name = `dashboard-${new Date().getTime()}`
+    this.saveDashboardSettings.name = this.dashboard
+      ? this.dashboard.name
+      : `dashboard-${new Date().getTime()}`
+    this.saveDashboardSettings.description = this.dashboard
+      ? this.dashboard.description
+      : null
   },
   methods: {
     close() {
@@ -27,6 +36,11 @@ export default {
         action = this.$store.dispatch('dashboards/saveNewDashboardWithReport', {
           data: this.saveDashboardSettings,
           report: this.report
+        })
+      } else if (this.dashboard) {
+        action = this.$store.dispatch('dashboards/updateDashboard', {
+          dashboard: this.dashboard,
+          newSettings: this.saveDashboardSettings
         })
       } else {
         action = this.$store.dispatch(
@@ -54,7 +68,7 @@ export default {
     <div class="modal-background" @click="close"></div>
     <div class="modal-card">
       <header class="modal-card-head">
-        <p class="modal-card-title">New Dashboard</p>
+        <p class="modal-card-title">Create Dashboard</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body is-overflow-y-scroll">
@@ -90,7 +104,7 @@ export default {
           :disabled="!saveDashboardSettings.name"
           @click="saveDashboard"
         >
-          Create
+          Save
         </button>
       </footer>
     </div>

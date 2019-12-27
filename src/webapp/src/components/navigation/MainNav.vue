@@ -268,7 +268,7 @@ export default {
             <span class="icon is-small" :class="getIconColor('/dashboard')">
               <font-awesome-icon icon="th-large"></font-awesome-icon>
             </span>
-            <span>Dashboard</span>
+            <span>Dashboards</span>
           </a>
         </router-link>
       </div>

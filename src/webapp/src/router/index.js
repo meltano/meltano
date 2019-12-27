@@ -1,6 +1,6 @@
 import Router from 'vue-router'
 
-import CreateScheduleModal from '@/components/pipelines/CreateScheduleModal'
+import CreatePipelineScheduleModal from '@/components/pipelines/CreatePipelineScheduleModal'
 import Design from '@/components/analyze/Design'
 import Extractors from '@/components/pipelines/Extractors'
 import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModal'
@@ -11,6 +11,7 @@ import PipelineSchedules from '@/components/pipelines/PipelineSchedules'
 
 import Analyze from '@/views/Analyze'
 import Dashboards from '@/views/Dashboards'
+import Dashboard from '@/views/Dashboard'
 import Model from '@/views/Model'
 import NotFound from '@/views/NotFound'
 import Pipelines from '@/views/Pipelines'
@@ -95,10 +96,10 @@ const router = new Router({
         },
         {
           path: 'schedule/create',
-          name: 'createSchedule',
+          name: 'createPipelineSchedule',
           components: {
             default: PipelineSchedules,
-            createSchedule: CreateScheduleModal
+            createPipelineSchedule: CreatePipelineScheduleModal
           },
           meta: {
             isModal: true,
@@ -154,17 +155,17 @@ const router = new Router({
       ]
     },
     {
-      path: '/dashboard/',
+      path: '/dashboards/',
       name: 'dashboards',
       component: Dashboards,
       meta: {
-        title: 'Meltano: Dashboard'
+        title: 'Meltano: Dashboards'
       }
     },
     {
-      path: '/dashboard/:slug',
+      path: '/dashboards/:slug',
       name: 'dashboard',
-      component: Dashboards,
+      component: Dashboard,
       meta: {
         title: 'Meltano: Dashboard'
       }

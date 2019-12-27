@@ -123,11 +123,6 @@ Layout helpers, often with names based on Bulma naming conventions
 */
 
 .view-body {
-  border: 1px solid $grey-lighter;
-  border-radius: $radius-large;
-  background-color: $white-ter;
-  padding: 1em;
-
   // Full view height - (navbar + breadcrumbs) - (.view-body top and bottom padding + extra padding to mitigate unwanted vertical scrollbar)
   min-height: calc(100vh - 72px - 3.25rem);
 

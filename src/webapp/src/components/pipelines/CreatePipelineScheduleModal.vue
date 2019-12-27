@@ -7,7 +7,7 @@ import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
 import _ from 'lodash'
 
 export default {
-  name: 'CreateScheduleModal',
+  name: 'CreatePipelineScheduleModal',
   components: {
     ScheduleTableHead
   },
