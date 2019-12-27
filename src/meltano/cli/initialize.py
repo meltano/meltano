@@ -24,6 +24,9 @@ ALL = "all"
     "--no_usage_stats", help="Do not send anonymous usage stats.", is_flag=True
 )
 def init(ctx, project_name, no_usage_stats):
+    """
+    Creates a new Meltano project
+    """
     if ctx.obj["project"]:
         logging.warning(f"Found meltano project at: {ctx.obj['project'].root}")
         raise click.ClickException(
