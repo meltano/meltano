@@ -20,6 +20,13 @@ class DashboardAlreadyExistsError(Exception):
         self.dashboard = dashboard
 
 
+class DashboardDoesNotExistError(Exception):
+    """Occurs when a dashboard does not exist."""
+
+    def __init__(self, dashboard):
+        self.dashboard = dashboard
+
+
 class DashboardsHelper:
     VERSION = "1.0.0"
 
@@ -82,6 +89,41 @@ class DashboardsHelper:
             json.dump(data, f)
 
         return data
+
+    def delete_dashboard(self, data):
+        project = Project.find()
+        dashboard = self.get_dashboard(data["id"])
+        slug = dashboard["slug"]
+        file_path = project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        else:
+            raise DashboardDoesNotExistError(data)
+
+        return data
+
+    def update_dashboard(self, data):
+        project = Project.find()
+        dashboard = self.get_dashboard(data["dashboard"]["id"])
+        slug = dashboard["slug"]
+        file_path = project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            new_settings = data["new_settings"]
+            new_name = new_settings["name"]
+            new_slug = slugify(new_name)
+            dashboard["slug"] = new_slug
+            dashboard["name"] = new_name
+            dashboard["description"] = new_settings["description"]
+            new_file_path = project.analyze_dir(
+                "dashboards", f"{new_slug}.dashboard.m5o"
+            )
+            with new_file_path.open("w") as f:
+                json.dump(dashboard, f)
+        else:
+            raise DashboardDoesNotExistError(data)
+
+        return dashboard
 
     def add_report_to_dashboard(self, data):
         project = Project.find()

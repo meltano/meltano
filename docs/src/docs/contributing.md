@@ -292,11 +292,10 @@ When testing your contributions you may need to ensure that your various `__pyca
 The below level hierarchy defines the back to front depth sorting of UI elements. Use it as a mental model to inform your UI decisions.
 
 - Level 1 - Primary navigation, sub-navigation, and signage - _Grey_
-- Level 2 - Task container (traditionally the page metaphor) - _White-ish Grey_
-- Level 3 - Primary task container(s) - _White w/Shadow_
-- Level 4 - Dropdowns, dialogs, pop-overs, etc. - _White w/Shadow_
-- Level 5 - Modals - _White w/Lightbox_
-- Level 6 - Toasts - _White w/Shadow + Message Color_
+- Level 2 - Primary task container(s) - _White w/Shadow_
+- Level 3 - Dropdowns, dialogs, pop-overs, etc. - _White w/Shadow_
+- Level 4 - Modals - _White w/Lightbox_
+- Level 5 - Toasts - _White w/Shadow + Message Color_
 
 #### Interactivity
 

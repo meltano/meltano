@@ -1,6 +1,9 @@
 from flask import jsonify, request
-
-from .dashboards_helper import DashboardAlreadyExistsError, DashboardsHelper
+from .dashboards_helper import (
+    DashboardAlreadyExistsError,
+    DashboardDoesNotExistError,
+    DashboardsHelper,
+)
 from meltano.api.api_blueprint import APIBlueprint
 
 
@@ -21,6 +24,17 @@ def _handle(ex):
     )
 
 
+@dashboardsBP.errorhandler(DashboardDoesNotExistError)
+def _handle(ex):
+    dashboard_name = ex.dashboard["name"]
+    return (
+        jsonify(
+            {"error": True, "code": f"The dashboard '{dashboard_name}' does not exist."}
+        ),
+        404,
+    )
+
+
 @dashboardsBP.route("/all", methods=["GET"])
 def get_dashboards():
     dashboards_helper = DashboardsHelper()
@@ -37,9 +51,34 @@ def get_dashboard(dashboard_id):
 
 @dashboardsBP.route("/dashboard/save", methods=["POST"])
 def save_dashboard():
+    """
+    Endpoint for saving a dashboard
+    """
     dashboards_helper = DashboardsHelper()
     post_data = request.get_json()
     response_data = dashboards_helper.save_dashboard(post_data)
+    return jsonify(response_data)
+
+
+@dashboardsBP.route("/dashboard/delete", methods=["DELETE"])
+def delete_dashboard():
+    """
+    Endpoint for deleting a dashboard
+    """
+    dashboards_helper = DashboardsHelper()
+    post_data = request.get_json()
+    response_data = dashboards_helper.delete_dashboard(post_data)
+    return jsonify(response_data)
+
+
+@dashboardsBP.route("/dashboard/update", methods=["POST"])
+def update_dashboard():
+    """
+    Endpoint for updating a dashboard
+    """
+    dashboards_helper = DashboardsHelper()
+    post_data = request.get_json()
+    response_data = dashboards_helper.update_dashboard(post_data)
     return jsonify(response_data)
 
 
