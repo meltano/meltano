@@ -179,10 +179,7 @@ def download_job_log(job_id) -> Response:
     """
     project = Project.find()
     log_service = JobLoggingService(project)
-    return send_file(
-        log_service.get_downloadable_log(job_id),
-        mimetype="text/plain",
-    )
+    return send_file(log_service.get_downloadable_log(job_id), mimetype="text/plain")
 
 
 @orchestrationsBP.route("/run", methods=["POST"])
