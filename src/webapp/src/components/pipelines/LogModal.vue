@@ -19,6 +19,7 @@ export default {
   data() {
     return {
       hasError: false,
+      hasLogExceededMaxSize: false,
       isPolling: true,
       jobLog: null,
       jobPoller: null,
@@ -100,7 +101,11 @@ export default {
       const pollFn = () => {
         this.getJobLog(this.jobId)
           .then(response => {
-            this.jobLog = response.data.log
+            if (response.data.hasLogExceededMaxSize) {
+              this.hasLogExceededMaxSize = response.data.hasLogExceededMaxSize
+            } else {
+              this.jobLog = response.data.log
+            }
             this.hasError = response.data.hasError
             this.jobStatus = response.data
           })
@@ -115,7 +120,7 @@ export default {
             utils.scrollToBottom(this.$refs['log-view'])
           })
       }
-      this.jobPoller = poller.create(pollFn, null, 1200)
+      this.jobPoller = poller.create(pollFn, null, 1000)
       this.jobPoller.init()
     },
     getHelp() {
@@ -159,8 +164,13 @@ export default {
       </section>
       <section ref="log-view" class="modal-card-body is-overflow-y-scroll">
         <div class="content">
-          <div v-if="jobLog">
-            <pre><code>{{jobLog}}{{isPolling ? '...' : ''}}</code></pre>
+          <div v-if="jobLog || hasLogExceededMaxSize">
+            <pre
+              v-if="jobLog"
+            ><code>{{jobLog}}{{isPolling ? '...' : ''}}</code></pre>
+            <div v-if="hasLogExceededMaxSize">
+              <div class="button">Download Log</div>
+            </div>
           </div>
           <progress v-else class="progress is-small is-info"></progress>
         </div>
