@@ -172,6 +172,7 @@ export default {
           const firstEmptyInput = inputs.find(el => !el.value)
           const firstEnabledInput = inputs.find(el => !el.disabled)
           const targetInput = firstEmptyInput || firstEnabledInput || inputs[0]
+          targetInput.blur()
           targetInput.focus()
         }
       })
@@ -199,7 +200,7 @@ export default {
         this.$refs.docs.contentWindow.postMessage(
           {
             source: 'meltano',
-            anchor: anchorName.replace('setting-', '')
+            anchor: anchorName.replace('setting-', '').replace('_', '-')
           },
           '*'
         )
@@ -473,6 +474,7 @@ export default {
                 'http://localhost:8081/'
               )}?embed=true`
             "
+            @load="focusInputIntelligently"
           />
         </div>
       </div>

@@ -31,7 +31,7 @@ For more information you can check [the documentation for tap-gitlab](https://gi
 
 In order to access your GitLab data, you will need the Private Token that GitLab extractor will use to connect to GitLab, the Groups and Projects you want to extract from and the Start Date you want the extracted data set to start from.
 
-### GitLab API Token
+### Private Token
 
 Full access to GitLab's API requires a personal access token that will authenticate you with the server. This is very simple to do:
 
@@ -54,15 +54,6 @@ Full access to GitLab's API requires a personal access token that will authentic
 
 5. Copy and paste the token into the `Private Token` field. It should look something like this: `I8vxHsiVAaDnAX3hA`
 
-### Projects
-
-This property allows you to scope the project that the service fetches, but it is completely optional. If this is left blank, the extractor will try to fetch all projects that it can grab.
-
-If you want to configure this, the format for it is `group/project`. Here are a couple examples:
-
-- `meltano/meltano` - The core [Meltano project](https://gitlab.com/meltano/)
-- `meltano/tap-gitlab` - The project for the [GitLab Extractor](https://gitlab.com/meltano/tap-gitlab)
-
 ### Groups
 
 This property allows you to scope data that the extractor fetches to only the desired group(s). The group name can generally be found at the root of a repository's URL. If this is left blank, you have to at least provide a project.
@@ -79,6 +70,19 @@ For example, `https://www.gitlab.com/meltano/tap-gitlab` has a group of `meltano
 - Filling in 'groups' and 'projects' will sync only the specified projects in those groups.
 
 :::
+
+### Projects
+
+This property allows you to scope the project that the service fetches, but it is completely optional. If this is left blank, the extractor will try to fetch all projects that it can grab.
+
+If you want to configure this, the format for it is `group/project`. Here are a couple examples:
+
+- `meltano/meltano` - The core [Meltano project](https://gitlab.com/meltano/)
+- `meltano/tap-gitlab` - The project for the [GitLab Extractor](https://gitlab.com/meltano/tap-gitlab)
+
+### Ultimate License
+
+Pull in extra data (like Epics, Epic Issues and other entities) only available to GitLab Ultimate and GitLab.com Gold accounts.
 
 ### Start Date
 
