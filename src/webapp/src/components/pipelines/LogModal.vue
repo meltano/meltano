@@ -2,7 +2,9 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 import capitalize from '@/filters/capitalize'
+import DownloadButton from '@/components/generic/DownloadButton'
 import Dropdown from '@/components/generic/Dropdown'
+import orchestrationsApi from '@/api/orchestrations'
 import poller from '@/utils/poller'
 import underscoreToSpace from '@/filters/underscoreToSpace'
 import utils from '@/utils/utils'
@@ -10,7 +12,8 @@ import utils from '@/utils/utils'
 export default {
   name: 'LogModal',
   components: {
-    Dropdown
+    Dropdown,
+    DownloadButton
   },
   filters: {
     capitalize,
@@ -19,6 +22,7 @@ export default {
   data() {
     return {
       hasError: false,
+      hasLogExceededMaxSize: false,
       isPolling: true,
       jobLog: null,
       jobPoller: null,
@@ -54,6 +58,9 @@ export default {
 
       return models
     },
+    getDownloadPromise() {
+      return orchestrationsApi.downloadJobLog
+    },
     getElapsedLabel() {
       if (!this.jobStatus) {
         return '...'
@@ -70,6 +77,12 @@ export default {
       return this.jobStatus && this.jobStatus.endedAt
         ? utils.momentFormatlll(this.jobStatus.endedAt)
         : fallback
+    },
+    getLogAppender() {
+      const note = this.hasLogExceededMaxSize
+        ? 'Logging stream limit hit. Use the "Download Log" button below once extraction completes.'
+        : ''
+      return this.isPolling ? `... ${note}` : ''
     },
     getStartedAtLabel() {
       return this.jobStatus
@@ -100,9 +113,13 @@ export default {
       const pollFn = () => {
         this.getJobLog(this.jobId)
           .then(response => {
-            this.jobLog = response.data.log
-            this.hasError = response.data.hasError
             this.jobStatus = response.data
+            this.hasError = this.jobStatus.hasError
+            if (this.jobStatus.hasLogExceededMaxSize) {
+              this.hasLogExceededMaxSize = this.jobStatus.hasLogExceededMaxSize
+            } else {
+              this.jobLog = this.jobStatus.log
+            }
           })
           .catch(error => {
             this.jobLog = error.response.data.code
@@ -115,7 +132,7 @@ export default {
             utils.scrollToBottom(this.$refs['log-view'])
           })
       }
-      this.jobPoller = poller.create(pollFn, null, 1200)
+      this.jobPoller = poller.create(pollFn, null, 1000)
       this.jobPoller.init()
     },
     getHelp() {
@@ -136,34 +153,65 @@ export default {
 <template>
   <div class="modal is-active" @keyup.esc="close">
     <div class="modal-background" @click="close"></div>
-    <div class="modal-card modal-card-log is-wide">
+    <div class="modal-card is-wide" :class="{ 'modal-card-log': jobLog }">
       <header class="modal-card-head">
         <p class="modal-card-title">
           Run Log: <span class="is-family-code">{{ jobId }}</span>
         </p>
       </header>
-      <section v-if="isPolling && relatedPipeline" class="modal-card-body">
-        <div class="content">
-          <p>
-            Your data is currently being pulled from
-            {{ relatedPipeline.extractor }}. Please note that depending on the
-            specific data source, time period, and amount of data, extraction
-            can take as little as a few seconds, or as long as multiple hours.
-          </p>
-          <p>
-            Extraction will continue in the background even if you close this
-            view. Once extraction is complete, you will be able to analyze the
-            imported data.
-          </p>
-        </div>
-      </section>
-      <section ref="log-view" class="modal-card-body is-overflow-y-scroll">
-        <div class="content">
-          <div v-if="jobLog">
-            <pre><code>{{jobLog}}{{isPolling ? '...' : ''}}</code></pre>
+      <section v-if="relatedPipeline" class="modal-card-body">
+        <article class="message is-small is-info">
+          <div class="message-body">
+            <div class="content">
+              <p>
+                This pipeline uses the
+                <code>{{ relatedPipeline.extractor }}</code> extractor. Please
+                note:
+              </p>
+              <ul>
+                <li>
+                  Depending on the specific data source, time period, and amount
+                  of data, extraction can take as little as a
+                  <em>few seconds</em>, or as long as <em>multiple hours</em>.
+                </li>
+                <li>
+                  Extraction will continue in the background even if you close
+                  this view.
+                </li>
+                <li>
+                  Once extraction is complete, use the "Analyze" button (lower
+                  right of this view) to analyze the imported data.
+                </li>
+              </ul>
+            </div>
           </div>
-          <progress v-else class="progress is-small is-info"></progress>
-        </div>
+        </article>
+      </section>
+      <section
+        v-if="!hasLogExceededMaxSize"
+        ref="log-view"
+        class="modal-card-body modal-card-body-log is-overflow-y-scroll"
+      >
+        <pre v-if="jobLog"><code>{{jobLog}}{{getLogAppender}}</code></pre>
+        <progress v-else class="progress is-small is-info"></progress>
+      </section>
+      <section class="modal-card-body">
+        <article v-if="hasLogExceededMaxSize" class="message is-small">
+          <div class="message-body">
+            <div class="content">
+              <p>
+                The log is too large to display inline. Download it below.
+              </p>
+            </div>
+          </div>
+        </article>
+        <DownloadButton
+          label="Download Log"
+          :file-name="`${jobId}-job-log.txt`"
+          :is-disabled="isPolling"
+          :trigger-promise="getDownloadPromise"
+          :trigger-payload="{ jobId }"
+        ></DownloadButton>
       </section>
       <footer class="modal-card-foot h-space-between">
         <div class="field is-grouped is-grouped-multiline">
@@ -245,6 +293,10 @@ export default {
   @media screen and (min-width: $desktop) {
     margin-bottom: 0;
   }
+}
+
+.modal-card-body-log {
+  height: 100%;
 }
 
 .modal-card.modal-card-log {

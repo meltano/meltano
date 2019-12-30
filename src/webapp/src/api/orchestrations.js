@@ -27,6 +27,10 @@ export default {
     return axios.get(utils.apiUrl('orchestrations', `jobs/${jobId}/log`))
   },
 
+  downloadJobLog({ jobId }) {
+    return axios.get(utils.apiUrl('orchestrations', `jobs/${jobId}/download`))
+  },
+
   getPluginConfiguration({ type, name }) {
     return axios.get(
       utils.apiUrl('orchestrations', `${type}/${name}/configuration`)

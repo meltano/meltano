@@ -24,6 +24,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1461](https://gitlab.com/meltano/meltano/issues/1461) Display toasted notification for report adding to dashboard
 - [#1419](https://gitlab.com/meltano/meltano/issues/1419) Add ability to edit and delete dashboards
+- [#1411](https://gitlab.com/meltano/meltano/issues/1411) Add download log button to Job Log Modal
 
 ### Changes
 
@@ -34,6 +35,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1518](https://gitlab.com/meltano/meltano/issues/1518) Fix bug that caused all text fields to show up as required in configuration modals
 - [#1446](https://gitlab.com/meltano/meltano/issues/1446) Fix bug that could result in a broken report when the report URL was manually modified
+- [#1411](https://gitlab.com/meltano/meltano/issues/1411) Fix bug when reading too large a job log file
 
 
 ## 1.13.0 - (2019-12-23)

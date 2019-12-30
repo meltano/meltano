@@ -11,8 +11,17 @@ from meltano.core.project import Project
 from meltano.core.utils import slugify, makedirs
 
 
+MAX_FILE_SIZE = 2_097_152  # 2MB max
+
+
 class MissingJobLogException(Exception):
     """Occurs when JobLoggingService can not find a requested log."""
+
+    pass
+
+
+class SizeThresholdJobLogException(Exception):
+    """Occurs when a Job log exceeds the MAX_FILE_SIZE."""
 
     pass
 
@@ -56,8 +65,31 @@ class JobLoggingService:
         """
         try:
             latest_log = next(iter(self.get_all_logs(job_id)))
+
+            if latest_log.stat().st_size > MAX_FILE_SIZE:
+                raise SizeThresholdJobLogException(
+                    f"The log file size exceeds '{MAX_FILE_SIZE}'"
+                )
+
             with latest_log.open() as f:
                 return f.read()
+        except StopIteration:
+            raise MissingJobLogException(
+                f"Could not find any log for job with id '{job_id}'"
+            )
+        except FileNotFoundError:
+            raise MissingJobLogException(
+                f"Cannot log for job with id '{job_id}': '{latest_log}' is missing."
+            )
+
+    def get_downloadable_log(self, job_id):
+        """
+        Get the `*.log` file of the most recent log for any ELT job
+         that ran with the provided job_id
+        """
+        try:
+            latest_log = next(iter(self.get_all_logs(job_id)))
+            return str(latest_log.resolve())
         except StopIteration:
             raise MissingJobLogException(
                 f"Could not find any log for job with id '{job_id}'"
