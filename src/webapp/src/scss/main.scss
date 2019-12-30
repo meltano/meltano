@@ -124,7 +124,7 @@ Layout helpers, often with names based on Bulma naming conventions
 
 .view-body {
   // Full view height - (navbar + breadcrumbs) - (.view-body top and bottom padding + extra padding to mitigate unwanted vertical scrollbar)
-  min-height: calc(100vh - 72px - 3.25rem);
+  min-height: calc(100vh - 72px - 5.25rem);
 
   &.is-fluid {
     margin-left: 0;
