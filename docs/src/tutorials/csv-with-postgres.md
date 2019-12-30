@@ -124,7 +124,7 @@ You can check the downloaded files as an example of valid CSV files (they were g
 
 We'll also need to download the following definition file in the same directory:
 
-**[files-def.json](/files/files-def.json)**
+**[files_def.json](/files/files-def.json)**
 
 ```json
 [
@@ -148,7 +148,7 @@ Open your Meltano instance and click "Pipelines" in the top navigation bar. You 
 
 Let's install `tap-csv` by clicking on the `Install` button inside its card.
 
-On the configuration modal leave the default value for the CSV files definition location (`extract/files-def.json`) and click `Save` to finish configuring the extractor and progress to the next step.
+On the configuration modal leave the default value for the CSV files definition location (`extract/files_def.json`) and click `Save` to finish configuring the extractor and progress to the next step.
 
 ![Screenshot of the CSV Extractor Configuration](/images/csv-tutorial/02-csv-configuration.png)
 
@@ -757,7 +757,7 @@ You should now be able to follow the same steps to import your own CSV files and
 
 - Prepare your CSV files so that they have a header in the first line with the attribute names.
 
-- Update `files-def.json` to link your CSV files and use the proper entity name and key(s) for each.
+- Update `files_def.json` to link your CSV files and use the proper entity name and key(s) for each.
 
 - Import and check the raw data
 
