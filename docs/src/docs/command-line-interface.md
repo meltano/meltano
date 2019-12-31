@@ -234,9 +234,10 @@ meltano permissions grant <spec_file> --db snowflake [--dry] [--diff] [--full-re
 Given the parameters to connect to a Snowflake account and a YAML file (a "spec") representing the desired database configuration, this command makes sure that the configuration of that database matches the spec in an additive manner. If there are differences, it will return the sql grant and revoke commands required to make it match the spec. If there are additional permissions set in the database this command will not create the necessary revoke commands with the exception of:
 
 * Role membership for Users and Roles
+* Warehouse Operate/Usage privileges
 * Database Read/Write privileges
 * Shared Database privileges
-* Warehouse Operate/Usage privileges
+* Schema Read/Write privileges
 
 We currently support only Snowflake, as [pgbedrock](https://github.com/Squarespace/pgbedrock) can be used for managing the permissions in a Postgres database.
 

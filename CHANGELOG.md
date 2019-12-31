@@ -9,9 +9,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1480](https://gitlab.com/meltano/meltano/issues/1480) Add tests to `meltano permissions` command for Snowflake
+
 ### Changes
 
+- [#1480](https://gitlab.com/meltano/meltano/issues/1480) Add schema revocations for roles in the `meltano permissions` command
+
 ### Fixes
+
+- [#1480](https://gitlab.com/meltano/meltano/issues/1480) Fix database revocations corner case for roles in the `meltano permissions` command
 
 ### Breaks
 
