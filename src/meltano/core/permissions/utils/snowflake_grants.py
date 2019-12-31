@@ -78,17 +78,15 @@ class SnowflakeGrantsGenerator:
 
         fetched_schemas = []
 
+        # All Schemas
         if name_parts[1] == "*":
-            # If {DB_NAME}.* was provided as the schema identifier, we have to fetch
-            #  each schema in database DB_NAME, so that we can grant privileges
-            #  for each schema seperatelly.
-
             conn = SnowflakeConnector()
             db_schemas = conn.show_schemas(name_parts[0])
             for db_schema in db_schemas:
                 if db_schema != info_schema:
                     fetched_schemas.append(db_schema)
 
+        # Prefix schema match
         elif "*" in name_parts[1]:
             conn = SnowflakeConnector()
             db_schemas = conn.show_schemas(name_parts[0])
@@ -96,6 +94,8 @@ class SnowflakeGrantsGenerator:
                 schema_name = db_schema.split(".", 1)[1].lower()
                 if schema_name.startswith(name_parts[1].split("*", 1)[0]):
                     fetched_schemas.append(db_schema)
+
+        # TODO Handle more complicated matches
 
         else:
             # If no * in name, then return provided schema name
@@ -121,6 +121,7 @@ class SnowflakeGrantsGenerator:
             grant_type = "user"
         if entity_type == "roles":
             grant_type = "role"
+
         try:
             for member_role in config["member_of"]:
                 granted_role = SnowflakeConnector.snowflaky(member_role)
@@ -200,7 +201,7 @@ class SnowflakeGrantsGenerator:
         roles and this function orchestrates the whole process.
 
         role: the name of the role (e.g. "loader" or "reporter") the privileges
-              are GRANTed to
+              are granted to and revoked from
         config: the subtree for the role as specified in the spec
         shared_dbs: a set of all the shared databases defined in the spec.
                     Used down the road by generate_database_grants() to also grant
@@ -210,6 +211,7 @@ class SnowflakeGrantsGenerator:
         """
         sql_commands = []
 
+        # TODO Convert to simpler format
         try:
             warehouses = config["warehouses"]
             new_commands = self.generate_warehouse_grants(
@@ -385,17 +387,14 @@ class SnowflakeGrantsGenerator:
         return sql_commands
 
     def generate_database_grants(
-        self, role: str, databases: Dict, shared_dbs: Set
-    ) -> List[str]:
+        self, role: str, databases: Dict[str, List], shared_dbs: Set
+    ) -> List[Dict]:
         """
         Generate the GRANT and REVOKE statements for Databases
         to align Snowflake with the spec.
 
         role: the name of the role the privileges are GRANTed to
         databases: list of databases (e.g. "raw")
-        grant_type: What type of privileges are granted? One of {"read", "write", "revoke"}
-        usage_granted: Passed by generate_grant_privileges_to_role() to track all
-            all the entities a role has been granted access (usage) to.
         shared_dbs: a set of all the shared databases defined in the spec.
 
         Returns the SQL commands generated as a list
@@ -412,8 +411,8 @@ class SnowflakeGrantsGenerator:
                 already_granted = True
 
             # If this is a shared database, we have to grant the "imported privileges"
-            #  privilege to the user and skip granting the specific permissions as
-            #  "Granting individual privileges on imported databases is not allowed."
+            # privilege to the user and skip granting the specific permissions as
+            # "Granting individual privileges on imported databases is not allowed."
             if database in shared_dbs:
                 sql_commands.append(
                     {
@@ -452,8 +451,8 @@ class SnowflakeGrantsGenerator:
                 already_granted = True
 
             # If this is a shared database, we have to grant the "imported privileges"
-            #  privilege to the user and skip granting the specific permissions as
-            #  "Granting individual privileges on imported databases is not allowed."
+            # privilege to the user and skip granting the specific permissions as
+            # "Granting individual privileges on imported databases is not allowed."
             if database in shared_dbs:
                 sql_commands.append(
                     {
@@ -482,8 +481,9 @@ class SnowflakeGrantsGenerator:
 
         # REVOKES
 
-        # Usage is consistent across read and write. Compare granted usage to
-        # full read/write usage set and revoke missing ones
+        # The "Usage" privilege is consistent across read and write.
+        # Compare granted usage to full read/write usage set
+        # and revoke missing ones
         for granted_database in (
             self.grants_to_role.get(role, {}).get("usage", {}).get("database", [])
         ):
@@ -567,20 +567,22 @@ class SnowflakeGrantsGenerator:
         return sql_commands
 
     def generate_schema_grants(
-        self, role: str, schemas: str, shared_dbs: Set
-    ) -> List[Dict[str, Any]]:
+        self, role: str, schemas: Dict[str, List], shared_dbs: Set
+    ) -> List[Dict]:
         """
         Generate the GRANT and REVOKE statements for schemas.
 
         role: the name of the role the privileges are GRANTed to
-        schemas: the name of the Schema (e.g. "raw.public")
+        schemas: the name of the Schema (e.g. "raw.public", "raw.*")
         shared_dbs: a set of all the shared databases defined in the spec.
 
         Returns the SQL commands generated as a List
         """
         sql_commands = []
 
-        # Schema lists to hold read/write grants
+        # Schema lists to hold read/write grants. This is necessary
+        # as the provided schemas are not the full list - we determine
+        # the full list via full_schema_list and store in these variables
         read_grant_schemas = []
         write_grant_schemas = []
 
@@ -594,7 +596,7 @@ class SnowflakeGrantsGenerator:
 
         for schema in schemas.get("read", []):
             # Split the schema identifier into parts {DB_NAME}.{SCHEMA_NAME}
-            #  so that we can check and use each one
+            # so that we can check and use each one
             name_parts = schema.split(".")
 
             # Do nothing if this is a schema inside a shared database:
@@ -680,8 +682,8 @@ class SnowflakeGrantsGenerator:
 
         # REVOKES
 
-        # Usage is consistent across read and write. Compare granted usage to
-        # full read/write set and revoke missing ones
+        # The "usage" privilege is consistent across read and write.
+        # Compare granted usage to full read/write set and revoke missing ones
         for granted_schema in list(
             set(self.grants_to_role.get(role, {}).get("usage", {}).get("schema", []))
         ):
@@ -754,7 +756,7 @@ class SnowflakeGrantsGenerator:
 
     def generate_table_and_view_grants(
         self, role: str, tables: Dict[str, List], shared_dbs: Set
-    ) -> List[Dict[str, Any]]:
+    ) -> List[Dict]:
         """
         Generate the GRANT statements for tables and views.
 
@@ -762,10 +764,12 @@ class SnowflakeGrantsGenerator:
         table: the name of the TABLE/VIEW (e.g. "raw.public.my_table")
         shared_dbs: a set of all the shared databases defined in the spec.
 
-        Returns the SQL commands generated
+        Returns the SQL commands generated as a List
         """
         sql_commands = []
 
+        # These are necessary as the provided schemas are not the full list
+        # we determine the full list via full_schema_list and store in these variables
         read_grant_tables = []
         write_grant_tables = []
         read_grant_views = []
@@ -777,11 +781,11 @@ class SnowflakeGrantsGenerator:
 
         for table in tables.get("read", []):
             # Split the table identifier into parts {DB_NAME}.{SCHEMA_NAME}.{TABLE_NAME}
-            #  so that we can check and use each one
+            # so that we can check and use each one
             name_parts = table.split(".")
 
             # Do nothing if this is a table inside a shared database:
-            #  "Granting individual privileges on imported databases is not allowed."
+            # "Granting individual privileges on imported databases is not allowed."
             if name_parts[0] in shared_dbs:
                 continue
 
@@ -798,8 +802,10 @@ class SnowflakeGrantsGenerator:
             conn = SnowflakeConnector()
 
             for schema in fetched_schemas:
-                # Add the tables for that schema to the tables_list[] and views_list[]
-                # This is so we can check that the list table is valid
+                # Fetch all tables from Snowflake for each schema and add
+                # to the read_tables_list[] and read_views_list[] variables.
+                # This is so we can check that a table given in the config
+                # Is valid
                 read_table_list.extend(conn.show_tables(schema=schema))
                 read_view_list.extend(conn.show_views(schema=schema))
 
@@ -861,18 +867,18 @@ class SnowflakeGrantsGenerator:
 
                 continue
 
-            # elif: Future elif to have partial table name
+            # TODO Future elif to have partial table name
 
             else:
-                # The table passed is a single entity
+                # Else the table passed is a single entity
                 # Check that it's valid and add to list
                 if table in read_table_list:
                     read_grant_tables = [table]
                 if table in read_view_list:
                     read_grant_views = [table]
 
-            # Grant privileges to all tables flagged for granting
-            # Not strictly necessary to have for loop as for all cases b/c
+            # Grant privileges to all tables flagged for granting.
+            # This is not strictly necessary to have a loop for all cases b/c
             # currently it will be a single entity - a * or a fully
             # qualified name are the only valid options meaning the script
             # will grant above for * or it will just be a single entry if
@@ -936,8 +942,10 @@ class SnowflakeGrantsGenerator:
             conn = SnowflakeConnector()
 
             for schema in fetched_schemas:
-                # Add the tables for that schema to the tables[] and views[]
-                #  that will be granted the permissions
+                # Fetch all tables from Snowflake for each schema and add
+                # to the write_tables_list[] and write_views_list[] variables.
+                # This is so we can check that a table given in the config
+                # Is valid
                 write_table_list.extend(conn.show_tables(schema=schema))
                 write_view_list.extend(conn.show_views(schema=schema))
 
