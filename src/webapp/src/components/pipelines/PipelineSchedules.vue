@@ -229,6 +229,10 @@ export default {
                   <Dropdown
                     label="Analyze"
                     button-classes="is-interactive-primary is-outlined is-small"
+                    :tooltip="{
+                      classes: 'is-tooltip-left',
+                      message: 'Analyze models of this pipeline.'
+                    }"
                     menu-classes="dropdown-menu-300"
                     icon-open="chart-line"
                     icon-close="caret-down"
