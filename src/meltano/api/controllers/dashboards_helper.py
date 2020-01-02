@@ -115,13 +115,13 @@ class DashboardsHelper:
         new_slug = slugify(new_name)
         new_file_path = project.analyze_dir("dashboards", f"{new_slug}.dashboard.m5o")
         if os.path.exists(new_file_path):
-            raise DashboardAlreadyExistsError()
+            raise DashboardAlreadyExistsError(dashboard)
 
         os.remove(file_path)
         dashboard["slug"] = new_slug
         dashboard["name"] = new_name
         dashboard["description"] = new_settings["description"]
-        dashboard["path"] = new_file_path
+        dashboard["path"] = str(new_file_path)
         with new_file_path.open("w") as f:
             json.dump(dashboard, f)
 
