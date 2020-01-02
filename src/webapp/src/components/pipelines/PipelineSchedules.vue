@@ -2,8 +2,10 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 
+import capitalize from '@/filters/capitalize'
 import Dropdown from '@/components/generic/Dropdown'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
+import underscoreToSpace from '@/filters/underscoreToSpace'
 import utils from '@/utils/utils'
 
 export default {
@@ -12,10 +14,41 @@ export default {
     Dropdown,
     ScheduleTableHead
   },
+  filters: {
+    capitalize,
+    underscoreToSpace
+  },
   computed: {
     ...mapState('orchestration', ['pipelines']),
     ...mapGetters('orchestration', ['getHasPipelines']),
-    ...mapGetters('plugins', ['getIsPluginInstalled']),
+    ...mapGetters('plugins', ['getInstalledPlugin', 'getIsPluginInstalled']),
+    ...mapGetters('repos', ['urlForModelDesign']),
+    ...mapState('repos', ['models']),
+    contextualModels() {
+      return pipeline => {
+        let models = this.models
+        if (pipeline) {
+          // Split based on '@' profiles convention
+          const extractor = pipeline.extractor.split('@')[0]
+          const namespace = this.getInstalledPlugin('extractors', extractor)
+            .namespace
+          const filteredModels = {}
+          for (const prop in models) {
+            if (models[prop].plugin_namespace === namespace) {
+              filteredModels[prop] = models[prop]
+            }
+          }
+
+          // Fallback to all if no match
+          models =
+            Object.keys(filteredModels).length === 0
+              ? this.models
+              : filteredModels
+        }
+
+        return models
+      }
+    },
     getMomentFormatlll() {
       return val => utils.momentFormatlll(val)
     },
@@ -193,6 +226,43 @@ export default {
                     @click="runELT(pipeline)"
                     >Manual Run</a
                   >
+                  <Dropdown
+                    label="Analyze"
+                    button-classes="is-interactive-primary is-outlined is-small"
+                    menu-classes="dropdown-menu-300"
+                    icon-open="chart-line"
+                    icon-close="caret-down"
+                    is-right-aligned
+                  >
+                    <div class="dropdown-content is-unselectable">
+                      <div
+                        v-for="(v, model) in contextualModels(pipeline)"
+                        :key="`${model}-panel`"
+                        class="box box-analyze-nav is-borderless is-shadowless is-marginless"
+                      >
+                        <div class="content">
+                          <h3 class="is-size-6">
+                            {{ v.name | capitalize | underscoreToSpace }}
+                          </h3>
+                          <h4 class="is-size-7 has-text-grey">
+                            {{ v.namespace }}
+                          </h4>
+                        </div>
+                        <div class="buttons">
+                          <router-link
+                            v-for="design in v['designs']"
+                            :key="design"
+                            class="button is-small is-interactive-primary is-outlined"
+                            :to="urlForModelDesign(model, design)"
+                            @click.native="prepareAnalyzeLoader(v.name, design)"
+                            >{{
+                              design | capitalize | underscoreToSpace
+                            }}</router-link
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </Dropdown>
                   <Dropdown
                     :button-classes="
                       `is-small is-danger is-outlined ${
