@@ -2,53 +2,21 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 
-import capitalize from '@/filters/capitalize'
+import AnalyzeList from '@/components/analyze/AnalyzeList'
 import Dropdown from '@/components/generic/Dropdown'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
-import underscoreToSpace from '@/filters/underscoreToSpace'
 import utils from '@/utils/utils'
 
 export default {
   name: 'PipelineSchedules',
   components: {
+    AnalyzeList,
     Dropdown,
     ScheduleTableHead
-  },
-  filters: {
-    capitalize,
-    underscoreToSpace
   },
   computed: {
     ...mapState('orchestration', ['pipelines']),
     ...mapGetters('orchestration', ['getHasPipelines']),
-    ...mapGetters('plugins', ['getInstalledPlugin', 'getIsPluginInstalled']),
-    ...mapGetters('repos', ['urlForModelDesign']),
-    ...mapState('repos', ['models']),
-    contextualModels() {
-      return pipeline => {
-        let models = this.models
-        if (pipeline) {
-          // Split based on '@' profiles convention
-          const extractor = pipeline.extractor.split('@')[0]
-          const namespace = this.getInstalledPlugin('extractors', extractor)
-            .namespace
-          const filteredModels = {}
-          for (const prop in models) {
-            if (models[prop].plugin_namespace === namespace) {
-              filteredModels[prop] = models[prop]
-            }
-          }
-
-          // Fallback to all if no match
-          models =
-            Object.keys(filteredModels).length === 0
-              ? this.models
-              : filteredModels
-        }
-
-        return models
-      }
-    },
     getMomentFormatlll() {
       return val => utils.momentFormatlll(val)
     },
@@ -220,7 +188,7 @@ export default {
               <td>
                 <div class="buttons is-right">
                   <a
-                    class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
+                    class="button is-small tooltip is-tooltip-left"
                     :class="{ 'is-loading': pipeline.isRunning }"
                     data-tooltip="Run this ELT pipeline once."
                     @click="runELT(pipeline)"
@@ -239,32 +207,7 @@ export default {
                     is-right-aligned
                   >
                     <div class="dropdown-content is-unselectable">
-                      <div
-                        v-for="(v, model) in contextualModels(pipeline)"
-                        :key="`${model}-panel`"
-                        class="box box-analyze-nav is-borderless is-shadowless is-marginless"
-                      >
-                        <div class="content">
-                          <h3 class="is-size-6">
-                            {{ v.name | capitalize | underscoreToSpace }}
-                          </h3>
-                          <h4 class="is-size-7 has-text-grey">
-                            {{ v.namespace }}
-                          </h4>
-                        </div>
-                        <div class="buttons">
-                          <router-link
-                            v-for="design in v['designs']"
-                            :key="design"
-                            class="button is-small is-interactive-primary is-outlined"
-                            :to="urlForModelDesign(model, design)"
-                            @click.native="prepareAnalyzeLoader(v.name, design)"
-                            >{{
-                              design | capitalize | underscoreToSpace
-                            }}</router-link
-                          >
-                        </div>
-                      </div>
+                      <AnalyzeList :pipeline="pipeline"></AnalyzeList>
                     </div>
                   </Dropdown>
                   <Dropdown
