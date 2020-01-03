@@ -114,7 +114,8 @@ class DashboardsHelper:
         new_name = new_settings["name"]
         new_slug = slugify(new_name)
         new_file_path = project.analyze_dir("dashboards", f"{new_slug}.dashboard.m5o")
-        if os.path.exists(new_file_path):
+        is_same_file = new_slug == slug
+        if not is_same_file and os.path.exists(new_file_path):
             raise DashboardAlreadyExistsError(dashboard)
 
         os.remove(file_path)
