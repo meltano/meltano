@@ -15,7 +15,8 @@ export default {
     pipeline: { type: Object, required: false, default: null }
   },
   computed: {
-    ...mapGetters('plugins', ['getInstalledPlugin']),
+    ...mapGetters('orchestration', ['getSuccessfulPipelines']),
+    ...mapGetters('plugins', ['getInstalledPlugin', 'visibleExtractors']),
     ...mapGetters('repos', ['urlForModelDesign']),
     ...mapState('repos', ['models']),
     contextualModels() {
@@ -43,6 +44,23 @@ export default {
       }
 
       return models
+    },
+    getIsModelEnabled() {
+      return model => {
+        if (!this.getSuccessfulPipelines || !this.visibleExtractors) {
+          return false
+        }
+
+        const matchedPlugins = this.visibleExtractors.filter(extractor => {
+          return this.getSuccessfulPipelines.find(
+            pipeline => pipeline.extractor === extractor.name
+          )
+        })
+
+        return matchedPlugins.find(
+          plugin => plugin.namespace === model.plugin_namespace
+        )
+      }
     }
   },
   methods: {
@@ -61,25 +79,26 @@ export default {
 <template>
   <div>
     <div
-      v-for="(v, model) in contextualModels"
-      :key="`${model}-panel`"
+      v-for="(model, modelKey) in contextualModels"
+      :key="`${modelKey}-panel`"
       class="box box-analyze-nav is-borderless is-shadowless is-marginless"
     >
       <div class="content">
         <h3 class="is-size-6">
-          {{ v.name | capitalize | underscoreToSpace }}
+          {{ model.name | capitalize | underscoreToSpace }}
         </h3>
         <h4 class="is-size-7 has-text-grey">
-          {{ v.namespace }}
+          {{ model.namespace }}
         </h4>
       </div>
       <div class="buttons">
         <router-link
-          v-for="design in v['designs']"
+          v-for="design in model['designs']"
           :key="design"
           class="button is-small is-interactive-primary is-outlined"
-          :to="urlForModelDesign(model, design)"
-          @click.native="prepareAnalyzeLoader(v.name, design)"
+          :disabled="!getIsModelEnabled(model)"
+          :to="urlForModelDesign(modelKey, design)"
+          @click.native="prepareAnalyzeLoader(model.name, design)"
           >{{ design | capitalize | underscoreToSpace }}</router-link
         >
       </div>
