@@ -16,8 +16,8 @@ from .sql_helper import SqlHelper
 class DashboardAlreadyExistsError(Exception):
     """Occurs when a dashboard already exists."""
 
-    def __init__(self, dashboard):
-        self.dashboard = dashboard
+    def __init__(self, dashboard_name):
+        self.dashboard_name = dashboard_name
 
 
 class DashboardDoesNotExistError(Exception):
@@ -75,7 +75,7 @@ class DashboardsHelper:
         # guard if it already exists
         existing_dashboard = self.get_dashboard_by_name(dashboard_name)
         if existing_dashboard:
-            raise DashboardAlreadyExistsError(existing_dashboard)
+            raise DashboardAlreadyExistsError(dashboard_name)
 
         project = Project.find()
         slug = slugify(dashboard_name)
@@ -116,7 +116,7 @@ class DashboardsHelper:
         new_file_path = project.analyze_dir("dashboards", f"{new_slug}.dashboard.m5o")
         is_same_file = new_slug == slug
         if not is_same_file and os.path.exists(new_file_path):
-            raise DashboardAlreadyExistsError(dashboard)
+            raise DashboardAlreadyExistsError(new_name)
 
         os.remove(file_path)
         dashboard["slug"] = new_slug
