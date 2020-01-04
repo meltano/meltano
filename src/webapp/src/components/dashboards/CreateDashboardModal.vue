@@ -81,6 +81,7 @@ export default {
                 class="input"
                 type="text"
                 placeholder="Name your dashboard"
+                @focus="$event.target.select()"
               />
             </div>
           </div>
@@ -91,6 +92,7 @@ export default {
                 v-model="saveDashboardSettings.description"
                 class="textarea"
                 placeholder="Describe your dashboard for easier reference later"
+                @focus="$event.target.select()"
               ></textarea>
             </div>
           </div>
