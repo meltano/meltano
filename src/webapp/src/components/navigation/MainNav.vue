@@ -1,22 +1,17 @@
 <script>
 import { mapGetters, mapState, mapActions } from 'vuex'
 
-import capitalize from '@/filters/capitalize'
-import underscoreToSpace from '@/filters/underscoreToSpace'
-import utils from '@/utils/utils'
-
+import AnalyzeList from '@/components/analyze/AnalyzeList'
 import Dropdown from '@/components/generic/Dropdown'
 import Logo from '@/components/navigation/Logo'
+import utils from '@/utils/utils'
 
 export default {
   name: 'MainNav',
   components: {
+    AnalyzeList,
     Dropdown,
     Logo
-  },
-  filters: {
-    capitalize,
-    underscoreToSpace
   },
   data() {
     return {
@@ -24,36 +19,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('orchestration', [
-      'getRunningPipelines',
-      'getSuccessfulPipelines'
-    ]),
-    ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
-    ...mapGetters('system', ['updateAvailable']),
+    ...mapGetters('orchestration', ['getRunningPipelines']),
     ...mapGetters('plugins', [
       'getIsStepLoadersMinimallyValidated',
-      'getIsStepScheduleMinimallyValidated',
-      'visibleExtractors'
+      'getIsStepScheduleMinimallyValidated'
     ]),
-    ...mapState('repos', ['models']),
+    ...mapGetters('repos', ['hasModels']),
+    ...mapGetters('system', ['updateAvailable']),
     ...mapState('system', ['latestVersion', 'updating', 'version', 'identity']),
-    getIsModelEnabled() {
-      return model => {
-        if (!this.getSuccessfulPipelines || !this.visibleExtractors) {
-          return false
-        }
-
-        const matchedPlugins = this.visibleExtractors.filter(extractor => {
-          return this.getSuccessfulPipelines.find(
-            pipeline => pipeline.extractor === extractor.name
-          )
-        })
-
-        return matchedPlugins.find(
-          plugin => plugin.namespace === model.plugin_namespace
-        )
-      }
-    },
     getIconColor() {
       return parentPath =>
         this.getIsSubRouteOf(parentPath)
@@ -203,34 +176,7 @@ export default {
 
           <div class="navbar-dropdown navbar-dropdown-scrollable">
             <template v-if="hasModels">
-              <div
-                v-for="(model, modelKey) in models"
-                :key="`${modelKey}-panel`"
-                class="box box-analyze-nav is-borderless is-shadowless is-marginless"
-              >
-                <div class="content">
-                  <h3 class="is-size-6">
-                    {{ model.name | capitalize | underscoreToSpace }}
-                  </h3>
-                  <p
-                    v-if="!getIsModelEnabled(model)"
-                    class="is-size-7 is-italic has-text-grey has-text-weight-light"
-                  >
-                    A {{ model.name | capitalize | underscoreToSpace }} pipeline
-                    must complete to enable the below reports
-                  </p>
-                </div>
-                <div class="buttons">
-                  <router-link
-                    v-for="design in model['designs']"
-                    :key="design"
-                    class="button is-small is-interactive-primary is-outlined"
-                    :disabled="!getIsModelEnabled(model)"
-                    :to="urlForModelDesign(modelKey, design)"
-                    >{{ design | capitalize | underscoreToSpace }}</router-link
-                  >
-                </div>
-              </div>
+              <AnalyzeList></AnalyzeList>
             </template>
             <template v-else>
               <div class="box is-borderless is-shadowless is-marginless">

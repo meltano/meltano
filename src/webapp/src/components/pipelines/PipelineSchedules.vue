@@ -2,6 +2,7 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 
+import AnalyzeList from '@/components/analyze/AnalyzeList'
 import Dropdown from '@/components/generic/Dropdown'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
 import utils from '@/utils/utils'
@@ -9,13 +10,13 @@ import utils from '@/utils/utils'
 export default {
   name: 'PipelineSchedules',
   components: {
+    AnalyzeList,
     Dropdown,
     ScheduleTableHead
   },
   computed: {
     ...mapState('orchestration', ['pipelines']),
     ...mapGetters('orchestration', ['getHasPipelines']),
-    ...mapGetters('plugins', ['getIsPluginInstalled']),
     getMomentFormatlll() {
       return val => utils.momentFormatlll(val)
     },
@@ -187,12 +188,28 @@ export default {
               <td>
                 <div class="buttons is-right">
                   <a
-                    class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
+                    class="button is-small tooltip is-tooltip-left"
                     :class="{ 'is-loading': pipeline.isRunning }"
                     data-tooltip="Run this ELT pipeline once."
                     @click="runELT(pipeline)"
                     >Manual Run</a
                   >
+                  <Dropdown
+                    label="Analyze"
+                    button-classes="is-interactive-primary is-outlined is-small"
+                    :tooltip="{
+                      classes: 'is-tooltip-left',
+                      message: 'Analyze models of this pipeline.'
+                    }"
+                    menu-classes="dropdown-menu-300"
+                    icon-open="chart-line"
+                    icon-close="caret-down"
+                    is-right-aligned
+                  >
+                    <div class="dropdown-content is-unselectable">
+                      <AnalyzeList :pipeline="pipeline"></AnalyzeList>
+                    </div>
+                  </Dropdown>
                   <Dropdown
                     :button-classes="
                       `is-small is-danger is-outlined ${
