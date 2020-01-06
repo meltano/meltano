@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-## Unreleased
 
+## Unreleased
 ---
 
 ### New
@@ -13,9 +13,17 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+### Breaks
+
+
+## 1.14.1 - (2020-01-06)
+
+---
+
+### Fixes
+
 - [#1520](https://gitlab.com/meltano/meltano/issues/1520) Fix bug when updating a dashboard that could undesirably overwrite another existing dashboard
 
-### Breaks
 
 ## 1.14.0 - (2019-12-30)
 
