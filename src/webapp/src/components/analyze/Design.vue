@@ -39,7 +39,7 @@ export default {
       'design',
       'filterOptions',
       'hasSQLError',
-      'loader',
+      'pipeline',
       'isAutoRunQuery',
       'isLoadingQuery',
       'reports',
@@ -63,16 +63,8 @@ export default {
       'resultsCount',
       'showJoinColumnAggregateHeader'
     ]),
-    ...mapGetters('plugins', ['getPluginProfiles']),
     ...mapState('dashboards', ['dashboards']),
-    ...mapState('plugins', ['installedPlugins']),
-
-    availableLoaders() {
-      return lodash(this.installedPlugins.loaders)
-        .map(this.getPluginProfiles)
-        .flatten()
-        .value()
-    },
+    ...mapState('orchestration', ['pipelines']),
 
     canToggleTimeframe() {
       return !this.isLoaderSqlite
@@ -96,22 +88,28 @@ export default {
       }
     },
 
-    loader: {
+    pipeline: {
       get() {
-        return this.$store.getters['designs/getLoader']
+        return this.$store.getters['designs/currentPipelineName']
       },
       set(value) {
-        this.$store.commit('designs/setLoader', value)
+        const pipeline = this.pipelines.find(p => p.name === value)
 
-        // set the default loader for unknown designs
-        localStorage.setItem('loader', value)
+        this.$store.commit('designs/setPipeline', pipeline)
+
+        // set the default pipeline for unknown designs
+        localStorage.setItem('pipeline', value)
 
         // set the connection for this specific design
-        localStorage.setItem(
-          utils.concatLoaderModelDesign(this.currentModel, this.currentDesign),
-          value
-        )
+        localStorage.setItem(this.pipelineKey, value)
       }
+    },
+
+    pipelineKey() {
+      return lodash.join(
+        ['pipeline', this.currentModel, this.currentDesign],
+        ':'
+      )
     }
   },
   beforeDestroy() {
@@ -173,18 +171,20 @@ export default {
         design,
         slug
       })
-      const uponPlugins = this.$store.dispatch('plugins/getInstalledPlugins')
+      const uponPipelines = this.$store.dispatch(
+        'orchestration/getAllPipelineSchedules'
+      )
 
-      Promise.all([uponDesign, uponPlugins]).then(() => {
-        const defaultLoader =
-          localStorage.getItem(
-            utils.concatLoaderModelDesign(this.currentModel, this.currentDesign)
-          ) ||
-          localStorage.getItem('loader') ||
-          this.installedPlugins.loaders[0].name
+      Promise.all([uponDesign, uponPipelines]).then(() => {
+        const defaultPipeline =
+          localStorage.getItem(this.pipelineKey) ||
+          localStorage.getItem('pipeline') ||
+          this.pipelines[0].name
+
+        const pipeline = this.pipelines.find(p => p.name === defaultPipeline)
 
         // don't use the setter here not to update the user's preferences
-        this.$store.commit('designs/setLoader', defaultLoader)
+        this.$store.commit('designs/setPipeline', pipeline)
 
         // preselect if not loading a report
         if (!slug && this.isAutoRunQuery) {
@@ -300,7 +300,9 @@ export default {
         })
         .catch(error => {
           Vue.toasted.global.error(
-            `${this.activeReport.name} was not saved to ${dashboard.name}. [Error code: ${error.response.data.code}]`
+            `${this.activeReport.name} was not saved to ${
+              dashboard.name
+            }. [Error code: ${error.response.data.code}]`
           )
         })
     },
@@ -474,12 +476,10 @@ export default {
 
           <div v-if="isInitialized" class="control">
             <div class="select">
-              <select v-model="loader" name="loader">
-                <option
-                  v-for="loaderName in availableLoaders"
-                  :key="loaderName"
-                  >{{ loaderName }}</option
-                >
+              <select v-model="pipeline" name="pipeline">
+                <option v-for="pipeline in pipelines" :key="pipeline.name">{{
+                  pipeline.name
+                }}</option>
               </select>
             </div>
           </div>

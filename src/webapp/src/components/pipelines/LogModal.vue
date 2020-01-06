@@ -219,7 +219,30 @@ export default {
             is-up
           >
             <div class="dropdown-content is-unselectable">
-              <AnalyzeList :pipeline="relatedPipeline"></AnalyzeList>
+              <div
+                v-for="(v, model) in contextualModels"
+                :key="`${model}-panel`"
+                class="box box-analyze-nav is-borderless is-shadowless is-marginless"
+              >
+                <div class="content">
+                  <h3 class="is-size-6">
+                    {{ v.name | capitalize | underscoreToSpace }}
+                  </h3>
+                  <h4 class="is-size-7 has-text-grey">
+                    {{ v.namespace }}
+                  </h4>
+                </div>
+                <div class="buttons">
+                  <router-link
+                    v-for="design in v['designs']"
+                    :key="design"
+                    class="button is-small is-interactive-primary is-outlined"
+                    :to="urlForModelDesign(model, design)"
+                    @click.native="prepareAnalyzeLoader()"
+                    >{{ design | capitalize | underscoreToSpace }}</router-link
+                  >
+                </div>
+              </div>
             </div>
           </Dropdown>
         </div>

@@ -19,7 +19,7 @@ const defaultState = utils.deepFreeze({
   design: {
     relatedTable: {}
   },
-  loader: null,
+  pipeline: null,
   filterOptions: [],
   filters: {
     aggregates: [],
@@ -127,7 +127,7 @@ const helpers = {
       joins,
       order,
       limit: state.limit,
-      loader: state.loader,
+      pipeline: state.pipeline.name,
       filters
     }
   }
@@ -144,6 +144,10 @@ const getters = {
 
   currentModelLabel(state) {
     return utils.titleCase(state.currentModel)
+  },
+
+  currentPipelineName(state) {
+    return state.pipeline && state.pipeline.name
   },
 
   filtersCount(state) {
@@ -185,8 +189,6 @@ const getters = {
       return getters.getAttributes().find(finder)
     }
   },
-
-  getLoader: state => state.loader,
 
   // eslint-disable-next-line no-shadow
   getFilter(_, getters) {
@@ -294,7 +296,7 @@ const getters = {
   isColumnSelectedAggregate: state => columnName =>
     columnName in state.resultAggregates,
 
-  isLoaderSqlite: state => state.loader === 'target-sqlite',
+  isLoaderSqlite: state => state.pipeline.loader === 'target-sqlite',
 
   joinIsExpanded: () => join => join.expanded,
 
@@ -705,8 +707,8 @@ const mutations = {
     localStorage.setItem('isAutoRunQuery', state.isAutoRunQuery)
   },
 
-  setLoader(state, loader) {
-    state.loader = loader
+  setPipeline(state, pipeline) {
+    state.pipeline = pipeline
   },
 
   setErrorState(state) {
@@ -815,9 +817,18 @@ const mutations = {
   },
 
   setStateFromLoadedReport(state, report) {
+    const nameMatcher = (source, target) => source.name === target.name
+    const setSelected = (sourceCollection, targetCollection) => {
+      sourceCollection.forEach(item => {
+        Vue.set(item, 'selected', targetCollection.includes(item.name))
+      })
+    }
+
     // General UI state updates
     state.chartType = report.chartType
-    state.loader = report.queryPayload.loader
+    state.pipeline = state.orchestration.pipelines.find(
+      p => p.name === report.queryPayload.pipeline
+    )
     state.filters = report.filters
     state.limit = report.queryPayload.limit
     state.order = report.order
