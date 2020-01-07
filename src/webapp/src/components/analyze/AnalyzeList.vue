@@ -79,14 +79,23 @@ export default {
 <template>
   <div>
     <template v-if="isShowLackingContextualModelsMessage">
-      <div class="content has-text-centered">
-        <p>There are no models for this pipeline yet.</p>
-        <a
-          href="https://www.meltano.com/docs/architecture.html#meltano-model"
-          target="_blank"
-          class="button is-small is-text"
-          >Create a Model</a
-        >
+      <div class="box is-borderless is-shadowless is-marginless">
+        <div class="content">
+          <h3 class="is-size-6">
+            No Models Installed
+          </h3>
+          <p>
+            There are no models for this pipeline yet.
+          </p>
+          <p>
+            <a
+              href="https://www.meltano.com/docs/architecture.html#meltano-model"
+              target="_blank"
+              class="has-text-underlined"
+              >Learn More</a
+            >
+          </p>
+        </div>
       </div>
     </template>
     <template v-else>
