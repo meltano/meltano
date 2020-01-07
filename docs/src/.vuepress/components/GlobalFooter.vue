@@ -12,7 +12,7 @@ export default {
     /></a>
     <a
       href="https://about.gitlab.com/handbook/marketing/corporate-marketing/#gitlab-trademark--logo-guidelines"
-      >Meltano is a trademark of GitLab, Inc.</a
+      >Copyright 2020, all rights reserved. Meltano is a trademark of GitLab, Inc.</a
     >
   </footer>
 </template>
