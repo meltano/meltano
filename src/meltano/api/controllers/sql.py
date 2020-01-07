@@ -80,16 +80,10 @@ def index():
 
 @sqlBP.route("/get/<path:namespace>/<topic_name>/<design_name>", methods=["POST"])
 def get_sql(namespace, topic_name, design_name):
-    project = Project.find()
-    schedule_service = ScheduleService(project)
-
     sqlHelper = SqlHelper()
     m5oc = sqlHelper.get_m5oc_topic(namespace, topic_name)
     design = m5oc.design(design_name)
     incoming_json = request.get_json()
-
-    schedule = find_named(schedule_service.schedules(), incoming_json["pipeline"])
-    loader = schedule.loader
     sql_dict = sqlHelper.get_sql(design, incoming_json)
 
     outgoing_sql = sql_dict["sql"]
@@ -103,7 +97,11 @@ def get_sql(namespace, topic_name, design_name):
     if not incoming_json["run"]:
         return jsonify(base_dict)
 
-    results = sqlHelper.get_query_results(loader, outgoing_sql)
+    project = Project.find()
+    schedule_service = ScheduleService(project)
+    schedule = find_named(schedule_service.schedules(), incoming_json["pipeline"])
+
+    results = sqlHelper.get_query_results(schedule.loader, outgoing_sql)
     base_dict["results"] = results
     base_dict["empty"] = len(results) == 0
 

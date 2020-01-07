@@ -16,10 +16,10 @@ const defaultState = utils.deepFreeze({
   currentModel: '',
   currentNamespace: '',
   currentSQL: '',
+  currentPipeline: null,
   design: {
     relatedTable: {}
   },
-  pipeline: null,
   filterOptions: [],
   filters: {
     aggregates: [],
@@ -127,7 +127,7 @@ const helpers = {
       joins,
       order,
       limit: state.limit,
-      pipeline: state.pipeline.name,
+      pipeline: state.currentPipeline,
       filters
     }
   }
@@ -147,7 +147,7 @@ const getters = {
   },
 
   currentPipelineName(state) {
-    return state.pipeline && state.pipeline.name
+    return state.currentPipeline && state.currentPipeline.name
   },
 
   filtersCount(state) {
@@ -296,9 +296,15 @@ const getters = {
   isColumnSelectedAggregate: state => columnName =>
     columnName in state.resultAggregates,
 
-  isLoaderSqlite: state => state.pipeline.loader === 'target-sqlite',
+  isLoaderSqlite: (_, getters) =>
+    getters.pipeline && getters.pipeline.loader === 'target-sqlite',
 
   joinIsExpanded: () => join => join.expanded,
+
+  pipeline: (state, _, rootState) =>
+    rootState.orchestration.pipelines.find(
+      p => p.name == state.currentPipeline
+    ),
 
   resultsCount(state) {
     if (!state.results) {
@@ -480,13 +486,71 @@ const actions = {
       })
   },
 
-  loadReport({ commit }, report) {
+  loadReport({ state, commit }, report) {
     this.dispatch('designs/getSQL', {
       run: true,
       payload: report.queryPayload
     })
+
     commit('setCurrentReport', report)
-    commit('setStateFromLoadedReport', report)
+    commit('setCurrentPipeline', report.queryPayload.pipeline)
+
+    const nameMatcher = (source, target) => source.name === target.name
+    const nameMapper = item => item.name
+
+    // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
+    const baseTable = state.design.relatedTable
+    const queryPayload = report.queryPayload
+    const joinColumnGroups = state.design.joins.reduce((acc, curr) => {
+      acc.push({
+        name: curr.name,
+        columns: curr.relatedTable.columns,
+        aggregates: curr.relatedTable.aggregates,
+        timeframes: curr.relatedTable.timeframes
+      })
+      return acc
+    }, [])
+
+    const setSelected = (sourceCollection, targetCollection) => {
+      if (!sourceCollection) {
+        return
+      }
+
+      sourceCollection.forEach(item => {
+        item.selected = targetCollection.includes(item.name)
+      })
+    }
+
+    // toggle the selected items
+    setSelected(baseTable.columns, queryPayload.columns)
+    setSelected(baseTable.aggregates, queryPayload.aggregates)
+
+    // joins, timeframes, and periods
+    joinColumnGroups.forEach(joinGroup => {
+      // joins - columns
+      const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup))
+
+      setSelected(joinGroup.columns, targetJoin.columns)
+      setSelected(joinGroup.aggregates, targetJoin.aggregates)
+
+      // timeframes
+      if (targetJoin.timeframes) {
+        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(nameMapper))
+        // periods
+        joinGroup.timeframes.forEach(timeframe => {
+          const targetTimeframe = targetJoin.timeframes.find(tf =>
+            nameMatcher(tf, timeframe)
+          )
+
+          if (targetTimeframe) {
+            setSelected(
+              timeframe.periods,
+              targetTimeframe.periods.map(nameMapper)
+            )
+          }
+        })
+      }
+    })
   },
 
   limitSet({ commit }, limit) {
@@ -676,8 +740,18 @@ const mutations = {
     state.currentDesign = design
   },
 
+  setCurrentPipeline(state, pipeline) {
+    state.currentPipeline = pipeline
+  },
+
   setCurrentReport(state, report) {
     state.activeReport = report
+
+    state.chartType = report.chartType
+    state.filters = report.filters
+    state.order = report.order
+    state.limit = report.queryPayload.limit
+    // state.currentPipeline = report.queryPayload.pipeline
   },
 
   setDesign(state, designData) {
@@ -705,10 +779,6 @@ const mutations = {
   setIsAutoRunQuery(state, value) {
     state.isAutoRunQuery = value
     localStorage.setItem('isAutoRunQuery', state.isAutoRunQuery)
-  },
-
-  setPipeline(state, pipeline) {
-    state.pipeline = pipeline
   },
 
   setErrorState(state) {
@@ -814,79 +884,6 @@ const mutations = {
 
   setSQLResults(state, payload) {
     state.currentSQL = payload.sql
-  },
-
-  setStateFromLoadedReport(state, report) {
-    const nameMatcher = (source, target) => source.name === target.name
-    const setSelected = (sourceCollection, targetCollection) => {
-      sourceCollection.forEach(item => {
-        Vue.set(item, 'selected', targetCollection.includes(item.name))
-      })
-    }
-
-    // General UI state updates
-    state.chartType = report.chartType
-    state.pipeline = state.orchestration.pipelines.find(
-      p => p.name === report.queryPayload.pipeline
-    )
-    state.filters = report.filters
-    state.limit = report.queryPayload.limit
-    state.order = report.order
-
-    // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
-    const baseTable = state.design.relatedTable
-    const queryPayload = report.queryPayload
-    const joinColumnGroups = state.design.joins
-      ? state.design.joins.reduce((acc, curr) => {
-          acc.push({
-            name: curr.name,
-            columns: curr.relatedTable.columns,
-            aggregates: curr.relatedTable.aggregates,
-            timeframes: curr.relatedTable.timeframes
-          })
-          return acc
-        }, [])
-      : []
-    const nameMatcher = (source, target) => source.name === target.name
-    const setSelected = (sourceCollection, targetCollection) => {
-      sourceCollection.forEach(item => {
-        Vue.set(item, 'selected', targetCollection.includes(item.name))
-      })
-    }
-
-    // columns
-    setSelected(baseTable.columns, queryPayload.columns)
-    // aggregates
-    setSelected(baseTable.aggregates, queryPayload.aggregates)
-    // joins, timeframes, and periods
-    joinColumnGroups.forEach(joinGroup => {
-      // joins - columns
-      const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup))
-      setSelected(joinGroup.columns, targetJoin.columns)
-      // joins - aggregates
-      if (joinGroup.aggregates) {
-        setSelected(joinGroup.aggregates, targetJoin.aggregates)
-      }
-      // timeframes
-      if (targetJoin && targetJoin.timeframes) {
-        setSelected(
-          joinGroup.timeframes,
-          targetJoin.timeframes.map(utils.predicate.named)
-        )
-        // periods
-        joinGroup.timeframes.forEach(timeframe => {
-          const targetTimeframe = targetJoin.timeframes.find(tf =>
-            nameMatcher(tf, timeframe)
-          )
-          if (targetTimeframe && targetTimeframe.periods) {
-            setSelected(
-              timeframe.periods,
-              targetTimeframe.periods.map(utils.predicate.named)
-            )
-          }
-        })
-      }
-    })
   },
 
   toggleCollapsed(state, collapsable) {

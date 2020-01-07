@@ -1,6 +1,5 @@
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import lodash from 'lodash'
 import Vue from 'vue'
 
 import capitalize from '@/filters/capitalize'
@@ -36,10 +35,10 @@ export default {
       'currentDesign',
       'currentModel',
       'currentSQL',
+      'currentPipeline',
       'design',
       'filterOptions',
       'hasSQLError',
-      'pipeline',
       'isAutoRunQuery',
       'isLoadingQuery',
       'reports',
@@ -90,26 +89,20 @@ export default {
 
     pipeline: {
       get() {
-        return this.$store.getters['designs/currentPipelineName']
+        return this.currentPipeline
       },
       set(value) {
-        const pipeline = this.pipelines.find(p => p.name === value)
-
-        this.$store.commit('designs/setPipeline', pipeline)
+        this.$store.commit('designs/setCurrentPipeline', value)
 
         // set the default pipeline for unknown designs
-        localStorage.setItem('pipeline', value)
+        localStorage.setItem(utils.storageKey('pipeline'), value)
 
         // set the connection for this specific design
-        localStorage.setItem(this.pipelineKey, value)
+        localStorage.setItem(
+          utils.storageKey('pipeline', this.currentModel, this.currentDesign),
+          value
+        )
       }
-    },
-
-    pipelineKey() {
-      return lodash.join(
-        ['pipeline', this.currentModel, this.currentDesign],
-        ':'
-      )
     }
   },
   beforeDestroy() {
@@ -129,8 +122,7 @@ export default {
   Both hooks are required (Update for locally sourced route changes & Enter for globally sourced route changes)
   */
   beforeRouteUpdate(to, from, next) {
-    this.reinitialize()
-    next()
+    this.reinitialize().then(next)
   },
   created() {
     this.initializeSettings()
@@ -177,17 +169,16 @@ export default {
 
       Promise.all([uponDesign, uponPipelines]).then(() => {
         const defaultPipeline =
-          localStorage.getItem(this.pipelineKey) ||
-          localStorage.getItem('pipeline') ||
+          localStorage.getItem(
+            utils.storageKey('pipeline', this.currentDesign, this.currentModel)
+          ) ||
+          localStorage.getItem(utils.storageKey('pipeline')) ||
           this.pipelines[0].name
 
-        const pipeline = this.pipelines.find(p => p.name === defaultPipeline)
-
         // don't use the setter here not to update the user's preferences
-        this.$store.commit('designs/setPipeline', pipeline)
-
         // preselect if not loading a report
         if (!slug && this.isAutoRunQuery) {
+          this.$store.commit('designs/setCurrentPipeline', defaultPipeline)
           this.preselectAttributes()
         }
 
@@ -228,10 +219,12 @@ export default {
         this.design.relatedTable[collectionName].find(
           attribute => !attribute.hidden
         )
+
       const column = finder('columns')
       if (column) {
         this.columnSelected(column)
       }
+
       const aggregate = finder('aggregates')
       if (aggregate) {
         this.columnSelected(aggregate)
@@ -243,7 +236,9 @@ export default {
     },
 
     reinitialize() {
-      this.$store.dispatch('designs/resetDefaults').then(this.initializeDesign)
+      return this.$store
+        .dispatch('designs/resetDefaults')
+        .then(this.initializeDesign)
     },
 
     saveReport() {
@@ -477,8 +472,8 @@ export default {
           <div v-if="isInitialized" class="control">
             <div class="select">
               <select v-model="pipeline" name="pipeline">
-                <option v-for="pipeline in pipelines" :key="pipeline.name">{{
-                  pipeline.name
+                <option v-for="p in pipelines" :key="p.name">{{
+                  p.name
                 }}</option>
               </select>
             </div>

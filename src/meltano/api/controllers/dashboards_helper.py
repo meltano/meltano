@@ -9,7 +9,8 @@ from meltano.core.m5o.m5o_collection_parser import (
 )
 from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
 from meltano.core.project import Project
-from meltano.core.utils import slugify
+from meltano.core.schedule_service import ScheduleService
+from meltano.core.utils import slugify, find_named
 from .sql_helper import SqlHelper
 
 
@@ -39,18 +40,20 @@ class DashboardsHelper:
         return dashboardsParser.parse()
 
     def get_dashboard_reports_with_query_results(self, reports):
+        project = Project.find()
+        schedule_service = ScheduleService(project)
         sqlHelper = SqlHelper()
 
         for report in reports:
             m5oc = sqlHelper.get_m5oc_topic(report["namespace"], report["model"])
             design = m5oc.design(report["design"])
-            loader = report["query_payload"]["loader"]
+            schedule = find_named(schedule_service.schedules(), report["query_payload"]["pipeline"])
 
             sql_dict = sqlHelper.get_sql(design, report["query_payload"])
             outgoing_sql = sql_dict["sql"]
             aggregates = sql_dict["aggregates"]
 
-            report["query_results"] = sqlHelper.get_query_results(loader, outgoing_sql)
+            report["query_results"] = sqlHelper.get_query_results(schedule.loader, outgoing_sql)
             report["query_result_aggregates"] = aggregates
 
         return reports
