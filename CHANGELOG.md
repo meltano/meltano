@@ -15,8 +15,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-### Breaks
+- [#1448](https://gitlab.com/meltano/meltano/issues/1448) Fix `AnalyzeList.vue` to display message and link when lacking contextual models
 
+### Breaks
 
 ## 1.14.1 - (2020-01-06)
 
@@ -25,7 +26,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1520](https://gitlab.com/meltano/meltano/issues/1520) Fix bug when updating a dashboard that could undesirably overwrite another existing dashboard
-
 
 ## 1.14.0 - (2019-12-30)
 
