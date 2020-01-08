@@ -155,32 +155,34 @@ const getters = {
   },
 
   getAllAttributes(state) {
-    let attributes = []
-    const joinSources = state.design.joins || []
-    const sources = [state.design].concat(joinSources)
-    const batchCollect = (table, attributeTypes) => {
-      attributeTypes.forEach(attributeType => {
-        const attributesByType = table[attributeType]
-        if (attributesByType) {
-          attributes = attributes.concat(attributesByType)
-        }
+    return (types = ['columns', 'aggregates', 'timeframes']) => {
+      let attributes = []
+      const joinSources = state.design.joins || []
+      const sources = [state.design].concat(joinSources)
+      const batchCollect = (table, attributeTypes) => {
+        attributeTypes.forEach(attributeType => {
+          const attributesByType = table[attributeType]
+          if (attributesByType) {
+            attributes = attributes.concat(attributesByType)
+          }
+        })
+      }
+
+      sources.forEach(source => {
+        batchCollect(source.relatedTable, types)
       })
+
+      return attributes
     }
-
-    sources.forEach(source => {
-      batchCollect(source.relatedTable, ['columns', 'aggregates', 'timeframes'])
-    })
-
-    return attributes
   },
 
   // eslint-disable-next-line no-shadow
-  getAttributeByQueryAttribute(state, getters) {
+  getAttributeByQueryAttribute(_, getters) {
     return queryAttribute => {
       const finder = attr =>
         attr.sourceName === queryAttribute.sourceName &&
         attr.name === queryAttribute.attributeName
-      return getters.getAllAttributes.find(finder)
+      return getters.getAllAttributes().find(finder)
     }
   },
 
@@ -261,7 +263,7 @@ const getters = {
   // eslint-disable-next-line no-shadow
   getSelectedAttributes(_, getters) {
     const selector = attribute => attribute.selected
-    return getters.getAllAttributes.filter(selector)
+    return getters.getAllAttributes().filter(selector)
   },
 
   // eslint-disable-next-line no-shadow
@@ -466,7 +468,7 @@ const actions = {
           commit('setQueryResults', response.data)
           commit('setSQLResults', response.data)
           commit('setIsLoadingQuery', false)
-          commit('setSorting', getters.getAllAttributes)
+          commit('setSorting', getters.getAllAttributes())
         } else {
           commit('setSQLResults', response.data)
         }
@@ -744,10 +746,10 @@ const mutations = {
     state.order.unassigned = value
   },
 
-  setQueryResults(state, results) {
-    state.results = results.results
-    state.queryAttributes = results.queryAttributes
-    state.resultAggregates = results.aggregates
+  setQueryResults(state, payload) {
+    state.results = payload.results
+    state.queryAttributes = payload.queryAttributes
+    state.resultAggregates = payload.aggregates
   },
 
   setReports(state, reports) {
@@ -807,8 +809,8 @@ const mutations = {
     state.sqlErrorMessage = [error.code, error.orig, error.statement]
   },
 
-  setSQLResults(state, results) {
-    state.currentSQL = results.sql
+  setSQLResults(state, payload) {
+    state.currentSQL = payload.sql
   },
 
   setStateFromLoadedReport(state, report) {

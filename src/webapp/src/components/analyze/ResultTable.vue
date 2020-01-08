@@ -18,6 +18,7 @@ export default {
       'order'
     ]),
     ...mapGetters('designs', [
+      'getAllAttributes',
       'getFormattedValue',
       'hasResults',
       'isColumnSelectedAggregate'
@@ -27,6 +28,12 @@ export default {
         this.order.assigned.find(
           orderable => orderable.attribute.name === attributeName
         )
+    },
+    getHasMinimalSelectionRequirements() {
+      const selected = attribute => attribute.selected
+      const hasColumn = this.getAllAttributes(['columns']).find(selected)
+      const hasAggregate = this.getAllAttributes(['aggregates']).find(selected)
+      return hasColumn || hasAggregate
     },
     getIsOrderableAssigned() {
       return attributeName => Boolean(this.getAssignedOrderable(attributeName))
@@ -123,15 +130,17 @@ export default {
       </table>
     </div>
 
-    <article v-else class="message is-info">
+    <article
+      v-else-if="!getHasMinimalSelectionRequirements"
+      class="message is-info"
+    >
       <div class="message-body">
         <div class="content">
           <p>To display a <em>Table</em>:</p>
           <ol>
             <li>
-              Select at least one <strong>Column Attribute</strong> or
-              <strong>Aggregate Attribute</strong> from the
-              <em>Attributes</em> panel
+              Select at least one <strong>Column</strong> or
+              <strong>Aggregate</strong> from the <em>Attributes</em> panel
             </li>
             <li>
               Manually click the <em>Run</em> button (if
@@ -141,6 +150,13 @@ export default {
         </div>
       </div>
     </article>
+
+    <div v-else>
+      <p>
+        The current query resulted in no match. Update your selected
+        <em>Attributes</em> to run a new query
+      </p>
+    </div>
   </div>
 </template>
 

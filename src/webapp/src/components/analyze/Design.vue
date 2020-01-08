@@ -4,10 +4,10 @@ import lodash from 'lodash'
 import Vue from 'vue'
 
 import capitalize from '@/filters/capitalize'
-import Chart from '@/components/analyze/Chart'
-import Dropdown from '@/components/generic/Dropdown'
 import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
+import Dropdown from '@/components/generic/Dropdown'
 import QueryFilters from '@/components/analyze/QueryFilters'
+import ResultChart from '@/components/analyze/ResultChart'
 import ResultTable from '@/components/analyze/ResultTable'
 import utils from '@/utils/utils'
 
@@ -17,10 +17,10 @@ export default {
     capitalize
   },
   components: {
-    Chart,
-    Dropdown,
     CreateDashboardModal,
+    Dropdown,
     QueryFilters,
+    ResultChart,
     ResultTable
   },
   data() {
@@ -965,52 +965,23 @@ export default {
             </div>
           </div>
 
-          <!-- charts tab -->
-          <div>
-            <div v-if="hasChartableResults" class="chart-toggles">
-              <chart
-                :chart-type="chartType"
-                :results="results"
-                :result-aggregates="resultAggregates"
-              ></chart>
-            </div>
-            <div v-else>
-              <article class="message is-info">
-                <div class="message-body">
-                  <div class="content">
-                    <p>To display a <em>Chart</em>:</p>
-                    <ol>
-                      <li>
-                        Select at least one
-                        <strong>Aggregate Attribute</strong> from the
-                        <em>Attributes</em> panel
-                      </li>
-                      <li>
-                        Manually click the <em>Run</em> button (if
-                        <em>Autorun Queries</em> is toggled off)
-                      </li>
-                    </ol>
-                  </div>
-                </div>
-              </article>
-            </div>
+          <!-- SQL error -->
+          <div v-if="hasSQLError" class="notification is-danger">
+            <button class="delete" @click="resetErrorMessage"></button>
+            <ul>
+              <li v-for="(error, key) in sqlErrorMessage" :key="key">
+                {{ error }}
+              </li>
+            </ul>
           </div>
+
+          <!-- Chart UI -->
+          <ResultChart></ResultChart>
 
           <hr />
 
-          <!-- results/SQL tab -->
-          <div>
-            <div v-if="hasSQLError" class="notification is-danger">
-              <button class="delete" @click="resetErrorMessage"></button>
-              <ul>
-                <li v-for="(error, key) in sqlErrorMessage" :key="key">
-                  {{ error }}
-                </li>
-              </ul>
-            </div>
-
-            <ResultTable></ResultTable>
-          </div>
+          <!-- Table UI -->
+          <ResultTable></ResultTable>
 
           <!-- Create Dashboard Modal -->
           <CreateDashboardModal
