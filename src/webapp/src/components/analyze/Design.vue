@@ -94,6 +94,8 @@ export default {
       set(value) {
         this.$store.commit('designs/setCurrentPipeline', value)
 
+        this.$store.dispatch('designs/associateReport', value)
+
         // set the default pipeline for unknown designs
         localStorage.setItem(utils.storageKey('pipeline'), value)
 

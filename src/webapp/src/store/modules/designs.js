@@ -127,8 +127,16 @@ const helpers = {
       joins,
       order,
       limit: state.limit,
-      pipeline: state.currentPipeline,
       filters
+    }
+  },
+
+  getReportVersion(report) {
+    switch (report.version) {
+      case '1.0.0':
+        return 1
+      default:
+        return Number(report.version)
     }
   }
 }
@@ -433,6 +441,7 @@ const actions = {
               report.design === design &&
               report.slug === slug
           )
+
           if (reportMatch) {
             dispatch('loadReport', reportMatch)
           }
@@ -463,6 +472,7 @@ const actions = {
         state.currentNamespace,
         state.currentModel,
         state.currentDesign,
+        state.currentPipeline,
         postData
       )
       .then(response => {
@@ -486,14 +496,27 @@ const actions = {
       })
   },
 
-  loadReport({ state, commit }, report) {
+  async loadReport({ state, commit, rootState }, report) {
+    // TODO: can we not have this call?
+    await this.dispatch('plugins/getInstalledPlugins')
+    commit('setCurrentReport', report)
+
+    // infer the proper pipeline for this report
+    // this is pretty finicky, but the inference chain is the following:
+    // report.namespace → model.name → model.namespace → extractor.namespace → extractor.name → pipeline.extractor
+    const { models, extractors } = rootState.plugins.plugins
+
+    const model = models.find(m => m.name == report.namespace)
+    const extractor = extractors.find(e => e.namespace == model.namespace)
+    const pipeline = rootState.orchestration.pipelines.find(
+      p => p.extractor == extractor.name
+    )
+    commit('setCurrentPipeline', pipeline.name)
+
     this.dispatch('designs/getSQL', {
       run: true,
       payload: report.queryPayload
     })
-
-    commit('setCurrentReport', report)
-    commit('setCurrentPipeline', report.queryPayload.pipeline)
 
     const nameMatcher = (source, target) => source.name === target.name
     const nameMapper = item => item.name

@@ -6,9 +6,9 @@ export default {
     return axios.get(utils.apiUrl('sql/get', 'filter-options'))
   },
 
-  getSql(namespace, model, design, data) {
+  getSql(namespace, model, design, pipeline, data) {
     return axios.post(
-      utils.apiUrl('sql/get', `${namespace}/${model}/${design}`),
+      utils.apiUrl('sql/get', `${namespace}/${model}/${design}/${pipeline}`),
       data
     )
   }
