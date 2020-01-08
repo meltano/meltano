@@ -974,13 +974,25 @@ export default {
                 :result-aggregates="resultAggregates"
               ></chart>
             </div>
-            <div v-if="!hasChartableResults">
-              <div class="box is-radiusless is-shadowless has-text-centered">
-                <p>
-                  Run a query with at least one aggregate selected or load a
-                  report
-                </p>
-              </div>
+            <div v-else>
+              <article class="message is-info">
+                <div class="message-body">
+                  <div class="content">
+                    <p>To display a <em>Chart</em>:</p>
+                    <ol>
+                      <li>
+                        Select at least one
+                        <strong>Aggregate Attribute</strong> from the
+                        <em>Attributes</em> panel
+                      </li>
+                      <li>
+                        Manually click the <em>Run</em> button (if
+                        <em>Autorun Queries</em> is toggled off)
+                      </li>
+                    </ol>
+                  </div>
+                </div>
+              </article>
             </div>
           </div>
 

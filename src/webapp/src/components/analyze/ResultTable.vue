@@ -123,9 +123,24 @@ export default {
       </table>
     </div>
 
-    <div v-else class="notification is-italic">
-      No results
-    </div>
+    <article v-else class="message is-info">
+      <div class="message-body">
+        <div class="content">
+          <p>To display a <em>Table</em>:</p>
+          <ol>
+            <li>
+              Select at least one <strong>Column Attribute</strong> or
+              <strong>Aggregate Attribute</strong> from the
+              <em>Attributes</em> panel
+            </li>
+            <li>
+              Manually click the <em>Run</em> button (if
+              <em>Autorun Queries</em> is toggled off)
+            </li>
+          </ol>
+        </div>
+      </div>
+    </article>
   </div>
 </template>
 
