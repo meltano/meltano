@@ -78,8 +78,10 @@ def index():
     return jsonify({"result": True})
 
 
-@sqlBP.route("/get/<path:namespace>/<topic_name>/<design_name>/<pipeline>", methods=["POST"])
-def get_sql(namespace, topic_name, design_name, pipeline):
+@sqlBP.route(
+    "/get/<path:namespace>/<topic_name>/<design_name>/<pipeline_name>", methods=["POST"]
+)
+def get_sql(namespace, topic_name, design_name, pipeline_name):
     sqlHelper = SqlHelper()
     m5oc = sqlHelper.get_m5oc_topic(namespace, topic_name)
     design = m5oc.design(design_name)
@@ -99,7 +101,7 @@ def get_sql(namespace, topic_name, design_name, pipeline):
 
     project = Project.find()
     schedule_service = ScheduleService(project)
-    schedule = find_named(schedule_service.schedules(), pipeline)
+    schedule = find_named(schedule_service.schedules(), pipeline_name)
 
     results = sqlHelper.get_query_results(schedule.loader, outgoing_sql)
     base_dict["results"] = results

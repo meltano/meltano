@@ -25,7 +25,7 @@ def assertListEquivalence(xs: list, ys: list):
 @pytest.mark.usefixtures("project", "add_model")
 class TestSqlController:
     @pytest.fixture
-    def post(self, app, api, engine_sessionmaker):
+    def post(self, app, api, engine_sessionmaker, schedule):
         engine, _ = engine_sessionmaker
 
         @mock.patch(
@@ -41,9 +41,13 @@ class TestSqlController:
         return _post
 
     @classmethod
-    def url(cls, app, namespace, topic, design):
+    def url(cls, app, namespace, topic, design, pipeline):
         return url_for(
-            "sql.get_sql", namespace=namespace, topic_name=topic, design_name=design
+            "sql.get_sql",
+            namespace=namespace,
+            topic_name=topic,
+            design_name=design,
+            pipeline_name=pipeline,
         )
 
     def test_get_sql(self, post, payload_builder_factory):

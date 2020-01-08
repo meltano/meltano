@@ -47,13 +47,17 @@ class DashboardsHelper:
         for report in reports:
             m5oc = sqlHelper.get_m5oc_topic(report["namespace"], report["model"])
             design = m5oc.design(report["design"])
-            schedule = find_named(schedule_service.schedules(), report["query_payload"]["pipeline"])
+            schedule = find_named(
+                schedule_service.schedules(), report["query_payload"]["pipeline"]
+            )
 
             sql_dict = sqlHelper.get_sql(design, report["query_payload"])
             outgoing_sql = sql_dict["sql"]
             aggregates = sql_dict["aggregates"]
 
-            report["query_results"] = sqlHelper.get_query_results(schedule.loader, outgoing_sql)
+            report["query_results"] = sqlHelper.get_query_results(
+                schedule.loader, outgoing_sql
+            )
             report["query_result_aggregates"] = aggregates
 
         return reports

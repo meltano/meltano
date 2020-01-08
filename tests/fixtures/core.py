@@ -3,6 +3,7 @@ import os
 import shutil
 import yaml
 import logging
+import datetime
 from pathlib import Path
 
 import meltano.core.bundle
@@ -187,6 +188,19 @@ def target(config_service):
 @pytest.fixture(scope="class")
 def schedule_service(project, plugin_settings_service):
     return ScheduleService(project, plugin_settings_service=plugin_settings_service)
+
+
+@pytest.fixture(scope="class")
+def schedule(project, tap, target, schedule_service):
+    return schedule_service.add(
+        None,
+        "schedule-mock",
+        extractor=tap.name,
+        loader=target.name,
+        transform="skip",
+        interval="@once",
+        start_date=datetime.datetime.now(),
+    )
 
 
 @pytest.fixture(scope="class")
