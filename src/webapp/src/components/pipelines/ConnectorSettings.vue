@@ -386,7 +386,7 @@ export default {
                   class="button is-small"
                 >
                   <span
-                    class="icon has-text-grey-dark tooltip is-tooltip-multiline"
+                    class="icon has-text-grey-dark tooltip is-tooltip-left"
                     :data-tooltip="protectedFieldMessage(setting)"
                   >
                     <font-awesome-icon icon="lock"></font-awesome-icon>
