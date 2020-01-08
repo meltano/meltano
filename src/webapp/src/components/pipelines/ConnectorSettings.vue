@@ -3,6 +3,7 @@ import InputDateIso8601 from '@/components/generic/InputDateIso8601'
 import TooltipCircle from '@/components/generic/TooltipCircle'
 
 import utils from '@/utils/utils'
+import { ENV, MELTANO_YML } from '@/utils/constants'
 
 export default {
   name: 'ConnectorSettings',
@@ -81,8 +82,8 @@ export default {
 
         return (
           setting.protected === true ||
-          settingSource === 'env' ||
-          settingSource === 'meltano_yml'
+          settingSource === ENV ||
+          settingSource === MELTANO_YML
         )
       }
     },
@@ -117,7 +118,7 @@ export default {
       let configSources = this.configSettings.profiles[0].configSources
 
       return setting => {
-        return configSources[setting.name] === 'env'
+        return configSources[setting.name] === ENV
           ? 'This setting is currently controlled via an environment variable.'
           : 'This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more.'
       }
