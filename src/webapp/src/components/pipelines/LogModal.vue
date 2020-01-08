@@ -35,11 +35,11 @@ export default {
       if (!this.jobStatus) {
         return '...'
       }
-      const end = this.jobStatus.endedAt
+      const startDate = new Date(this.jobStatus.startedAt)
+      const endDate = this.jobStatus.endedAt
         ? new Date(this.jobStatus.endedAt)
         : Date.now()
-      const elapsed = end - new Date(this.jobStatus.startedAt)
-      return `${Math.floor(elapsed / 1000)} sec`
+      return utils.momentHumanizedDuration(startDate, endDate)
     },
     getEndedAtLabel() {
       const fallback =
@@ -120,6 +120,7 @@ export default {
         <p class="modal-card-title">
           Run Log: <span class="is-family-code">{{ jobId }}</span>
         </p>
+        <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section v-if="relatedPipeline" class="modal-card-body">
         <article class="message is-small is-info">
@@ -199,7 +200,7 @@ export default {
           </div>
         </div>
         <div class="buttons is-right">
-          <button class="button" @click="close">Back</button>
+          <button class="button" @click="close">Close</button>
 
           <button v-if="hasError" class="button is-danger" @click="getHelp">
             Get Help
