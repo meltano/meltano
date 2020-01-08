@@ -58,6 +58,7 @@ export default {
       'hasChartableResults',
       'hasFilters',
       'hasJoins',
+      'hasResults',
       'isLoaderSqlite',
       'resultsCount',
       'showJoinColumnAggregateHeader'
@@ -976,13 +977,45 @@ export default {
               </ul>
             </div>
 
-            <!-- Chart UI -->
-            <ResultChart :is-loading="isLoadingQuery"></ResultChart>
+            <div>
+              <article
+                v-if="!isLoadingQuery && !hasResults"
+                class="message is-info"
+              >
+                <div class="message-body">
+                  <div class="content">
+                    <p>
+                      Sometimes a query has no results. When this happens, try
+                      one or more of the following:
+                    </p>
+                    <ul>
+                      <li>
+                        Change the <strong>Column</strong> and/or
+                        <strong>Aggregate</strong> selections in the
+                        <em>Attributes</em> panel
+                      </li>
+                      <li>
+                        Add, remove, or update one of the
+                        <a
+                          class="has-text-underlined"
+                          @click.stop="jumpToFilters"
+                          ><strong>Filters</strong></a
+                        >
+                      </li>
+                    </ul>
+                    <p v-if="!isAutoRunQuery">
+                      Then click the <em>Run</em> button.
+                    </p>
+                  </div>
+                </div>
+              </article>
 
-            <hr />
-
-            <!-- Table UI -->
-            <ResultTable :is-loading="isLoadingQuery"></ResultTable>
+              <template v-else>
+                <ResultChart :is-loading="isLoadingQuery"></ResultChart>
+                <hr />
+                <ResultTable :is-loading="isLoadingQuery"></ResultTable>
+              </template>
+            </div>
           </template>
           <progress v-else class="progress is-small is-info"></progress>
 

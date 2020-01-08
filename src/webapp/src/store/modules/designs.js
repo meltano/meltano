@@ -25,6 +25,7 @@ const defaultState = utils.deepFreeze({
     aggregates: [],
     columns: []
   },
+  isLastRunResultsEmpty: false,
   hasSQLError: false,
   isAutoRunQuery: true,
   isLoadingQuery: false,
@@ -341,8 +342,8 @@ const actions = {
   },
 
   tryAutoRun({ dispatch, state }) {
-    const hasRan = state.results.length > 0
-    dispatch('runQuery', hasRan && state.isAutoRunQuery)
+    const hasRan = state.results.length > 0 || state.isLastRunResultsEmpty
+    dispatch('runQuery', state.isAutoRunQuery && hasRan)
   },
 
   // eslint-disable-next-line no-shadow
@@ -645,6 +646,7 @@ const mutations = {
   },
 
   resetQueryResults(state) {
+    state.isLastRunResultsEmpty = false
     state.results = []
     state.queryAttributes = []
     state.resultAggregates = []
@@ -747,6 +749,7 @@ const mutations = {
   },
 
   setQueryResults(state, payload) {
+    state.isLastRunResultsEmpty = payload.empty
     state.results = payload.results
     state.queryAttributes = payload.queryAttributes
     state.resultAggregates = payload.aggregates

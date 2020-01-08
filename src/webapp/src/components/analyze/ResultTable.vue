@@ -159,17 +159,9 @@ export default {
     </article>
 
     <div v-else>
-      <p v-if="isLoading">
+      <p>
         Loading...
       </p>
-      <article v-else class="message is-info">
-        <div class="message-body">
-          <div class="content">
-            The current query resulted in no match. Update your selected
-            <em>Attributes</em> to run a new query
-          </div>
-        </div>
-      </article>
     </div>
   </div>
 </template>
