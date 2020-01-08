@@ -29,7 +29,7 @@ class TestRepos:
         # we have topics
         topic_identifiers = payload.keys()
         assert topic_identifiers
-        assert "model-carbon-intensity-sqlite/carbon" in topic_identifiers
+        assert "model-carbon-intensity/carbon" in topic_identifiers
         assert "model-gitlab/gitlab" in topic_identifiers
 
         # each topic has a name, a namespace and designs
@@ -43,7 +43,7 @@ class TestRepos:
             res = api.get(
                 url_for(
                     "repos.design_read",
-                    namespace="model-carbon-intensity-sqlite",
+                    namespace="model-carbon-intensity",
                     topic_name="carbon",
                     design_name="region",
                 )

@@ -15,7 +15,7 @@ class TestMeltanoAnalysisFileParser:
         for topic in topics:
             if topic["name"] == "carbon":
                 assert len(topic["designs"]) == 1
-                assert topic["namespace"] == "model-carbon-intensity-sqlite"
+                assert topic["namespace"] == "model-carbon-intensity"
 
             elif topic["name"] == "sfdc":
                 assert len(topic["designs"]) == 1
@@ -31,7 +31,7 @@ class TestMeltanoAnalysisFileParser:
 
         assert "model-gitflix" in subfolders
         assert "gitflix.topic.m5oc" in compiled
-        assert "model-carbon-intensity-sqlite" in subfolders
+        assert "model-carbon-intensity" in subfolders
         assert "carbon.topic.m5oc" in compiled
         assert "model-salesforce" in subfolders
         assert "sfdc.topic.m5oc" in compiled

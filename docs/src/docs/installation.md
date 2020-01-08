@@ -406,7 +406,7 @@ Now that we have data in your database, let's add the corresponding model bundle
 ```
 docker run -v $(pwd):/project \
              -w /project \
-             meltano/meltano add model model-carbon-intensity-sqlite
+             meltano/meltano add model model-carbon-intensity
 ```
 
 ## Upgrading Meltano

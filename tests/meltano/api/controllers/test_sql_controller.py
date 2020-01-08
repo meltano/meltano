@@ -34,7 +34,7 @@ class TestSqlController:
         def _post(payload, engine_mock):
             with app.test_request_context():
                 return api.post(
-                    self.url(app, "model-carbon-intensity-sqlite", "carbon", "region"),
+                    self.url(app, "model-carbon-intensity", "carbon", "region"),
                     json=payload,
                 )
 
