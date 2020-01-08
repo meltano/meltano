@@ -3,6 +3,7 @@ import InputDateIso8601 from '@/components/generic/InputDateIso8601'
 import TooltipCircle from '@/components/generic/TooltipCircle'
 
 import utils from '@/utils/utils'
+import { ENV, MELTANO_YML } from '@/utils/constants'
 
 export default {
   name: 'ConnectorSettings',
@@ -35,11 +36,14 @@ export default {
     }
   },
   computed: {
+    connectorProfile() {
+      return this.configSettings
+        ? this.configSettings.profiles[this.configSettings.profileInFocusIndex]
+        : {}
+    },
     fileValue() {
       return setting => {
-        let fullPath = this.configSettings.profiles[
-          this.configSettings.profileInFocusIndex
-        ].config[setting.name]
+        let fullPath = this.connectorProfile.config[setting.name]
         return fullPath && utils.extractFileNameFromPath(fullPath)
       }
     },
@@ -73,7 +77,15 @@ export default {
         !this.getIsOfKindOptions(kind)
     },
     getIsProtected() {
-      return setting => setting.protected === true
+      return setting => {
+        const settingSource = this.connectorProfile.configSources[setting.name]
+
+        return (
+          setting.protected === true ||
+          settingSource === ENV ||
+          settingSource === MELTANO_YML
+        )
+      }
     },
     getPlaceholder() {
       return setting => setting.placeholder || setting.value || setting.name
@@ -101,6 +113,21 @@ export default {
     },
     labelClass() {
       return this.fieldClass || 'is-normal'
+    },
+    protectedFieldMessage() {
+      let configSources = this.configSettings.profiles[0].configSources
+
+      return setting => {
+        const configSource = configSources[setting.name]
+
+        if (configSource === ENV) {
+          return 'This setting is currently controlled by an environment variable.'
+        } else if (configSource === MELTANO_YML) {
+          return 'This setting is currently controlled through meltano.yml.'
+        } else {
+          return 'This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more.'
+        }
+      }
     },
     pluginType() {
       const pluginName = this.plugin.name
@@ -188,14 +215,11 @@ export default {
           const vm = this
 
           setTimeout(() => {
-            vm.configSettings.profiles[
-              vm.configSettings.profileInFocusIndex
-            ].account = parsedAccountId
+            vm.connectorProfile.account = parsedAccountId
           }, 1000)
         } else {
-          this.configSettings.profiles[
-            this.configSettings.profileInFocusIndex
-          ].account = newVal.profiles[newVal.profileInFocusIndex].config.account
+          this.connectorProfile.account =
+            newVal.profiles[newVal.profileInFocusIndex].config.account
         }
       }
     }
@@ -264,10 +288,7 @@ export default {
               <input
                 v-if="getIsOfKindHidden(setting.kind)"
                 :id="getFormFieldForId(setting)"
-                v-model="
-                  configSettings.profiles[configSettings.profileInFocusIndex]
-                    .config[setting.name]
-                "
+                v-model="connectorProfile.config[setting.name]"
                 type="hidden"
               />
 
@@ -275,10 +296,7 @@ export default {
               <input
                 v-else-if="getIsOfKindBoolean(setting.kind)"
                 :id="getFormFieldForId(setting)"
-                v-model="
-                  configSettings.profiles[configSettings.profileInFocusIndex]
-                    .config[setting.name]
-                "
+                v-model="connectorProfile.config[setting.name]"
                 class="checkbox"
                 :class="successClass(setting)"
                 type="checkbox"
@@ -287,10 +305,7 @@ export default {
               <!-- Date -->
               <InputDateIso8601
                 v-else-if="getIsOfKindDate(setting.kind)"
-                v-model="
-                  configSettings.profiles[configSettings.profileInFocusIndex]
-                    .config[setting.name]
-                "
+                v-model="connectorProfile.config[setting.name]"
                 :name="setting.name"
                 :for-id="getFormFieldForId(setting)"
                 :input-classes="`is-small ${successClass(setting)}`"
@@ -340,10 +355,7 @@ export default {
               >
                 <select
                   :id="`${setting.name}-select-menu`"
-                  v-model="
-                    configSettings.profiles[configSettings.profileInFocusIndex]
-                      .config[setting.name]
-                  "
+                  v-model="connectorProfile.config[setting.name]"
                   :name="`${setting.name}-options`"
                   :class="successClass(setting)"
                 >
@@ -362,10 +374,7 @@ export default {
               <input
                 v-else-if="getIsOfKindTextBased(setting.kind)"
                 :id="getFormFieldForId(setting)"
-                v-model="
-                  configSettings.profiles[configSettings.profileInFocusIndex]
-                    .config[setting.name]
-                "
+                v-model="connectorProfile.config[setting.name]"
                 :class="['input', fieldClass, successClass(setting)]"
                 :type="getTextBasedInputType(setting)"
                 :placeholder="getPlaceholder(setting)"
@@ -384,8 +393,8 @@ export default {
                   class="button is-small"
                 >
                   <span
-                    class="icon has-text-grey-dark tooltip is-tooltip-multiline"
-                    data-tooltip="This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more."
+                    class="icon has-text-grey-dark tooltip is-tooltip-left"
+                    :data-tooltip="protectedFieldMessage(setting)"
                   >
                     <font-awesome-icon icon="lock"></font-awesome-icon>
                   </span>
