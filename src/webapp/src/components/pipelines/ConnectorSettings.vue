@@ -118,9 +118,15 @@ export default {
       let configSources = this.configSettings.profiles[0].configSources
 
       return setting => {
-        return configSources[setting.name] === ENV
-          ? 'This setting is currently controlled via an environment variable.'
-          : 'This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more.'
+        const configSource = configSources[setting.name]
+
+        if (configSource === ENV) {
+          return 'This setting is currently controlled by an environment variable.'
+        } else if (configSource === MELTANO_YML) {
+          return 'This setting is currently controlled through meltano.yml.'
+        } else {
+          return 'This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more.'
+        }
       }
     },
     pluginType() {
