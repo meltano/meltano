@@ -113,6 +113,15 @@ export default {
     labelClass() {
       return this.fieldClass || 'is-normal'
     },
+    protectedFieldMessage() {
+      let configSources = this.configSettings.profiles[0].configSources
+
+      return setting => {
+        return configSources[setting.name] === 'env'
+          ? 'This setting is currently controlled via an environment variable.'
+          : 'This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more.'
+      }
+    },
     pluginType() {
       const pluginName = this.plugin.name
 
@@ -378,7 +387,7 @@ export default {
                 >
                   <span
                     class="icon has-text-grey-dark tooltip is-tooltip-multiline"
-                    data-tooltip="This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more."
+                    :data-tooltip="protectedFieldMessage(setting)"
                   >
                     <font-awesome-icon icon="lock"></font-awesome-icon>
                   </span>
