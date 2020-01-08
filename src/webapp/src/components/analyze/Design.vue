@@ -965,23 +965,26 @@ export default {
             </div>
           </div>
 
-          <!-- SQL error -->
-          <div v-if="hasSQLError" class="notification is-danger">
-            <button class="delete" @click="resetErrorMessage"></button>
-            <ul>
-              <li v-for="(error, key) in sqlErrorMessage" :key="key">
-                {{ error }}
-              </li>
-            </ul>
-          </div>
+          <template v-if="isInitialized">
+            <!-- SQL error -->
+            <div v-if="hasSQLError" class="notification is-danger">
+              <button class="delete" @click="resetErrorMessage"></button>
+              <ul>
+                <li v-for="(error, key) in sqlErrorMessage" :key="key">
+                  {{ error }}
+                </li>
+              </ul>
+            </div>
 
-          <!-- Chart UI -->
-          <ResultChart></ResultChart>
+            <!-- Chart UI -->
+            <ResultChart :is-loading="isLoadingQuery"></ResultChart>
 
-          <hr />
+            <hr />
 
-          <!-- Table UI -->
-          <ResultTable></ResultTable>
+            <!-- Table UI -->
+            <ResultTable :is-loading="isLoadingQuery"></ResultTable>
+          </template>
+          <progress v-else class="progress is-small is-info"></progress>
 
           <!-- Create Dashboard Modal -->
           <CreateDashboardModal

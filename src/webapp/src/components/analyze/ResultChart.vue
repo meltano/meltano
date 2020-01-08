@@ -2,11 +2,16 @@
 import { mapGetters, mapState } from 'vuex'
 
 import Chart from '@/components/analyze/Chart'
+import ResultLoadingOverlay from '@/components/analyze/ResultLoadingOverlay'
 
 export default {
   name: 'ResultTable',
   components: {
-    Chart
+    Chart,
+    ResultLoadingOverlay
+  },
+  props: {
+    isLoading: { type: Boolean, required: true, default: false }
   },
   computed: {
     ...mapState('designs', ['chartType', 'results', 'resultAggregates']),
@@ -25,39 +30,50 @@ export default {
 </script>
 
 <template>
-  <div v-if="hasChartableResults">
-    <Chart
-      :chart-type="chartType"
-      :results="results"
-      :result-aggregates="resultAggregates"
-    ></Chart>
-  </div>
+  <div class="has-position-relative">
+    <ResultLoadingOverlay :is-loading="isLoading"></ResultLoadingOverlay>
 
-  <div v-else-if="!getHasMinimalSelectionRequirements">
-    <article class="message is-info">
-      <div class="message-body">
-        <div class="content">
-          <p>To display a <em>Chart</em>:</p>
-          <ol>
-            <li>
-              Select at least one
-              <strong>Aggregate</strong> from the <em>Attributes</em> panel
-            </li>
-            <li>
-              Manually click the <em>Run</em> button (if
-              <em>Autorun Queries</em> is toggled off)
-            </li>
-          </ol>
+    <div v-if="hasChartableResults">
+      <Chart
+        :chart-type="chartType"
+        :results="results"
+        :result-aggregates="resultAggregates"
+      ></Chart>
+    </div>
+
+    <div v-else-if="!getHasMinimalSelectionRequirements">
+      <article class="message is-info">
+        <div class="message-body">
+          <div class="content">
+            <p>To display a <em>Chart</em>:</p>
+            <ol>
+              <li>
+                Select at least one
+                <strong>Aggregate</strong> from the <em>Attributes</em> panel
+              </li>
+              <li>
+                Manually click the <em>Run</em> button (if
+                <em>Autorun Queries</em> is toggled off)
+              </li>
+            </ol>
+          </div>
         </div>
-      </div>
-    </article>
-  </div>
+      </article>
+    </div>
 
-  <div v-else>
-    <p>
-      The current query resulted in no match. Update your selected
-      <em>Attributes</em> to run a new query
-    </p>
+    <div v-else>
+      <p v-if="isLoading">
+        Loading...
+      </p>
+      <article v-else class="message is-info">
+        <div class="message-body">
+          <div class="content">
+            The current query resulted in no match. Update your selected
+            <em>Attributes</em> to run a new query
+          </div>
+        </div>
+      </article>
+    </div>
   </div>
 </template>
 

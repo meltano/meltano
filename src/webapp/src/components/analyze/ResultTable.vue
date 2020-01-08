@@ -3,12 +3,17 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 
 import Dropdown from '@/components/generic/Dropdown'
 import QuerySortBy from '@/components/analyze/QuerySortBy'
+import ResultLoadingOverlay from '@/components/analyze/ResultLoadingOverlay'
 
 export default {
   name: 'ResultTable',
   components: {
     Dropdown,
-    QuerySortBy
+    QuerySortBy,
+    ResultLoadingOverlay
+  },
+  props: {
+    isLoading: { type: Boolean, required: true, default: false }
   },
   computed: {
     ...mapState('designs', [
@@ -59,7 +64,9 @@ export default {
 </script>
 
 <template>
-  <div class="result-data">
+  <div class="result-data has-position-relative">
+    <ResultLoadingOverlay :is-loading="isLoading"></ResultLoadingOverlay>
+
     <div v-if="hasResults">
       <table
         class="table
@@ -152,10 +159,17 @@ export default {
     </article>
 
     <div v-else>
-      <p>
-        The current query resulted in no match. Update your selected
-        <em>Attributes</em> to run a new query
+      <p v-if="isLoading">
+        Loading...
       </p>
+      <article v-else class="message is-info">
+        <div class="message-body">
+          <div class="content">
+            The current query resulted in no match. Update your selected
+            <em>Attributes</em> to run a new query
+          </div>
+        </div>
+      </article>
     </div>
   </div>
 </template>
