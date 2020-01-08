@@ -64,7 +64,7 @@ export default {
 </script>
 
 <template>
-  <div class="result-data has-position-relative">
+  <div class="result-data has-position-relative v-min-2r">
     <ResultLoadingOverlay :is-loading="isLoading"></ResultLoadingOverlay>
 
     <div v-if="hasResults">
@@ -157,12 +157,6 @@ export default {
         </div>
       </div>
     </article>
-
-    <div v-else>
-      <p>
-        Loading...
-      </p>
-    </div>
   </div>
 </template>
 
