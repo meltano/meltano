@@ -1,7 +1,6 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
 
-import AnalyzeList from '@/components/analyze/AnalyzeList'
 import DownloadButton from '@/components/generic/DownloadButton'
 import Dropdown from '@/components/generic/Dropdown'
 import orchestrationsApi from '@/api/orchestrations'
@@ -11,7 +10,6 @@ import utils from '@/utils/utils'
 export default {
   name: 'LogModal',
   components: {
-    AnalyzeList,
     Dropdown,
     DownloadButton
   },
