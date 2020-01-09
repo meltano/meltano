@@ -144,7 +144,6 @@ export default {
       })
 
       uponDesign.then(() => {
-        // don't use the setter here not to update the user's preferences
         // preselect if not loading a report
         if (!slug && this.isAutoRunQuery) {
           this.preselectAttributes()

@@ -128,15 +128,6 @@ const helpers = {
       limit: state.limit,
       filters
     }
-  },
-
-  getReportVersion(report) {
-    switch (report.version) {
-      case '1.0.0':
-        return 1
-      default:
-        return Number(report.version)
-    }
   }
 }
 

@@ -219,7 +219,7 @@ export default {
             is-up
           >
             <div class="dropdown-content is-unselectable">
-              <analyze-list :pipeline="relatedPipeline" />
+              <AnalyzeList :pipeline="relatedPipeline" />
             </div>
           </Dropdown>
         </div>
