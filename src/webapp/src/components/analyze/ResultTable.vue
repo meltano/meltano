@@ -4,6 +4,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import Dropdown from '@/components/generic/Dropdown'
 import LoadingOverlay from '@/components/generic/LoadingOverlay'
 import QuerySortBy from '@/components/analyze/QuerySortBy'
+import utils from '@/utils/utils'
 
 export default {
   name: 'ResultTable',
@@ -35,9 +36,12 @@ export default {
         )
     },
     getHasMinimalSelectionRequirements() {
-      const selected = attribute => attribute.selected
-      const hasColumn = this.getAllAttributes(['columns']).find(selected)
-      const hasAggregate = this.getAllAttributes(['aggregates']).find(selected)
+      const hasColumn = this.getAllAttributes(['columns']).find(
+        utils.predicate.selected
+      )
+      const hasAggregate = this.getAllAttributes(['aggregates']).find(
+        utils.predicate.selected
+      )
       return hasColumn || hasAggregate
     },
     getIsOrderableAssigned() {

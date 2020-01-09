@@ -49,12 +49,11 @@ const helpers = {
 
   getQueryPayloadFromDesign(state) {
     // Inline fn helpers
-    const selected = x => x.selected
     const namesOfSelected = arr => {
       if (!Array.isArray(arr)) {
         return null
       }
-      return arr.filter(selected).map(x => x.name)
+      return arr.filter(utils.predicate.selected).map(utils.predicate.named)
     }
 
     const baseTable = state.design.relatedTable
@@ -76,10 +75,10 @@ const helpers = {
 
         if (table.timeframes) {
           newJoin.timeframes = table.timeframes
-            .filter(selected)
+            .filter(utils.predicate.selected)
             .map(({ name, periods }) => ({
               name,
-              periods: periods.filter(selected)
+              periods: periods.filter(utils.predicate.selected)
             }))
             .filter(tf => tf.periods.length)
         }
@@ -96,7 +95,7 @@ const helpers = {
       []
         .map(tf => ({
           name: tf.name,
-          periods: tf.periods.filter(selected)
+          periods: tf.periods.filter(utils.predicate.selected)
         }))
         .filter(tf => tf.periods.length)
 
@@ -263,8 +262,7 @@ const getters = {
 
   // eslint-disable-next-line no-shadow
   getSelectedAttributes(_, getters) {
-    const selector = attribute => attribute.selected
-    return getters.getAllAttributes().filter(selector)
+    return getters.getAllAttributes().filter(utils.predicate.selected)
   },
 
   // eslint-disable-next-line no-shadow
