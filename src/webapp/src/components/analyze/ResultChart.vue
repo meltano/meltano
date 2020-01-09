@@ -12,7 +12,7 @@ export default {
     LoadingOverlay
   },
   props: {
-    isLoading: { type: Boolean, required: true, default: false }
+    isLoading: { type: Boolean, default: false }
   },
   computed: {
     ...mapState('designs', ['chartType', 'results', 'resultAggregates']),
