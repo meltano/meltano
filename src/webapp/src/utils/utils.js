@@ -159,7 +159,11 @@ export default {
   requiredConnectorSettingsKeys(settings, groupValidation) {
     return groupValidation
       ? lodash.intersection(...groupValidation)
-      : settings.map(setting => setting.name)
+      : settings.map(this.predicate.named)
+  },
+  predicate: {
+    named: item => item.name,
+    selected: item => item.selected
   },
   singularize(value) {
     if (!value) {
