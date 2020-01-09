@@ -18,6 +18,10 @@ For more information on the source code for the docs and running it locally, you
 
 We welcome contributions and improvements, please see the [contribution guidelines](https://meltano.com/docs/contributing.html)
 
+## Responsible Disclosure Policy
+
+Please refer to the [responsible disclosure policy](https://meltano.com/docs/responsible-disclosure.html) on our website.
+
 ## License
 
 This code is distributed under the MIT license, see the [LICENSE](LICENSE) file.
