@@ -35,6 +35,11 @@ export default {
       default: () => null
     }
   },
+  data() {
+    return {
+      isShowDocs: false
+    }
+  },
   computed: {
     connectorProfile() {
       return this.configSettings
@@ -485,6 +490,25 @@ export default {
             "
             @load="focusInputIntelligently"
           />
+          <div
+            v-if="!isShowDocs"
+            class="is-fill-space is-flex is-hcentered is-vcentered"
+          >
+            <div class="docs-overlay is-fill-space"></div>
+            <div class="docs-overlay-content content has-text-centered">
+              <p class="is-italic">
+                Some configurations are easier to setup than others.
+              </p>
+              <p class="is-italic">
+                We provide helpful information in these cases.
+              </p>
+              <a
+                class="button is-small is-interactive-secondary is-outlined"
+                @click="isShowDocs = true"
+                >Show Me</a
+              >
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -510,6 +534,7 @@ export default {
 }
 
 .docs-container {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 50vh;
@@ -519,6 +544,17 @@ export default {
     flex: 1;
     padding: 0;
     border: 1px solid #dbdbdb;
+  }
+
+  .docs-overlay {
+    z-index: 1;
+    background-color: $white;
+    opacity: 0.98;
+  }
+
+  .docs-overlay-content {
+    z-index: 2;
+    padding: 3rem;
   }
 }
 
