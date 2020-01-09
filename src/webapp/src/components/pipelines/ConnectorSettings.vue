@@ -194,8 +194,8 @@ export default {
         profile.config[setting.name] = file.name
       }
     },
-    onFocusInput(event) {
-      const anchorName = event.target.id
+    onFocusInput(el) {
+      const anchorName = el.id
       if (anchorName) {
         this.$refs.docs.contentWindow.postMessage(
           {
@@ -204,6 +204,13 @@ export default {
           },
           '*'
         )
+      }
+    },
+    onFocusInputViaClick(event) {
+      const el = event.currentTarget.querySelector('input')
+      if (el) {
+        el.focus()
+        this.onFocusInput(el)
       }
     },
     refocusInput(newVal, oldVal) {
@@ -252,7 +259,8 @@ export default {
             v-for="setting in configSettings.settings"
             :key="setting.name"
             :class="{ 'field is-horizontal': !getIsOfKindHidden(setting.kind) }"
-            @focusin="onFocusInput"
+            @click.stop="onFocusInputViaClick"
+            @focusin="onFocusInput($event.target)"
           >
             <div
               v-if="!getIsOfKindHidden(setting.kind)"
@@ -338,6 +346,7 @@ export default {
                     <label class="file-label is-file-fullwidth">
                       <div>
                         <input
+                          :id="getFormFieldForId(setting)"
                           class="file-input"
                           type="file"
                           :name="setting.name"

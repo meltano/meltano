@@ -31,9 +31,15 @@ For more information you can check [the documentation for tap-gitlab](https://gi
 
 In order to access your GitLab data, you will need the Private Token that GitLab extractor will use to connect to GitLab, the Groups and Projects you want to extract from and the Start Date you want the extracted data set to start from.
 
-### Private Token
+<h3 id="private-token">Access Token</h3>
 
-Full access to GitLab's API requires a personal access token that will authenticate you with the server. This is very simple to do:
+:::tip Configuration Notes
+
+- Full access to GitLab's API requires a personal access token that will authenticate you with the server
+
+:::
+
+The process for getting the access token is very simple:
 
 <video controls style="max-width: 100%">
   <source src="/screenshots/personal-access-token.mov">
@@ -56,6 +62,13 @@ Full access to GitLab's API requires a personal access token that will authentic
 
 ### Groups
 
+:::tip Configuration Notes
+
+- Space separated paths of groups to pull data from.
+- Leave empty if you'd like to pull data from projects in a personal user namespace
+
+:::
+
 This property allows you to scope data that the extractor fetches to only the desired group(s). The group name can generally be found at the root of a repository's URL. If this is left blank, you have to at least provide a project.
 
 For example, `https://www.gitlab.com/meltano/tap-gitlab` has a group of `meltano`. This can be confirmed as well by visiting `https://gitlab.com/meltano` and noting the Group ID below the header.
@@ -73,6 +86,13 @@ For example, `https://www.gitlab.com/meltano/tap-gitlab` has a group of `meltano
 
 ### Projects
 
+:::tip Configuration Notes
+
+- Space separated paths of projects to pull data from, in `namespace/project` format
+- Leave empty if you've specified one or more groups and would like to pull data from all projects inside these groups
+
+:::
+
 This property allows you to scope the project that the service fetches, but it is completely optional. If this is left blank, the extractor will try to fetch all projects that it can grab.
 
 If you want to configure this, the format for it is `group/project`. Here are a couple examples:
@@ -82,9 +102,19 @@ If you want to configure this, the format for it is `group/project`. Here are a 
 
 ### Ultimate License
 
-Pull in extra data (like Epics, Epic Issues and other entities) only available to GitLab Ultimate and GitLab.com Gold accounts.
+:::tip Configuration Notes
+
+- Pull in extra data (like Epics, Epic Issues and other entities) only available to GitLab Ultimate and GitLab.com Gold accounts.
+
+:::
 
 ### Start Date
+
+:::tip Configuration Notes
+
+- Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+
+:::
 
 This property allows you to configure where you want your data set to start from. Otherwise, if left blank, it will try to fetch the entire history of the groups or projects specified.
 

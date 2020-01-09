@@ -66,34 +66,21 @@ extractors:
       - name: private_token
         label: Access Token
         kind: password
-        description: Your GitLab personal access token
         placeholder: Ex. *****************
-        documentation: https://meltano.com/plugins/extractors/gitlab.html#gitlab-api-token
         env: GITLAB_API_TOKEN
       - name: groups
         value: ''
-        description: |
-          Space separated paths of groups to pull data from.
-          Leave empty if you'd like to pull data from projects in a personal user namespace, that you can specify below
         placeholder: Ex. my-organization
-        documentation: https://meltano.com/plugins/extractors/gitlab.html#groups
         env: GITLAB_API_GROUPS
       - name: projects
         value: ''
-        description: |
-          Space separated paths of projects to pull data from, in `namespace/project` format.
-          Leave empty if you've specified one or more groups and would like to pull data from all projects inside these groups
         placeholder: Ex. my-organization/project-1
-        documentation: https://meltano.com/plugins/extractors/gitlab.html#projects
         env: GITLAB_API_PROJECTS
       - name: ultimate_license
         value: false
         kind: boolean
-        description: Pull in extra data only available to GitLab Ultimate and GitLab.com Gold accounts
-        documentation: https://meltano.com/plugins/extractors/gitlab.html#configuration
         env: GITLAB_API_ULTIMATE_LICENSE
       - name: start_date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         env: GITLAB_API_START_DATE
         kind: date_iso8601
   - name: tap-google-analytics
