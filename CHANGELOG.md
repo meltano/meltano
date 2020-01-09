@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
 
+
 ## Unreleased
 ---
 
@@ -13,9 +14,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#1521](https://gitlab.com/meltano/meltano/issues/1521) Sanitize user-submitted string before using it in file path
-
 ### Breaks
+
+
+## 1.14.3 - (2020-01-09)
+---
+
+### Fixes
+
+- [#1521](https://gitlab.com/meltano/meltano/issues/1521) Sanitize user-submitted string before using it in file path
 
 
 ## 1.14.2 - (2020-01-09)
