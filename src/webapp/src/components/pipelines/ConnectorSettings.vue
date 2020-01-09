@@ -1,6 +1,5 @@
 <script>
 import InputDateIso8601 from '@/components/generic/InputDateIso8601'
-import TooltipCircle from '@/components/generic/TooltipCircle'
 
 import utils from '@/utils/utils'
 import { ENV, MELTANO_YML } from '@/utils/constants'
@@ -8,8 +7,7 @@ import { ENV, MELTANO_YML } from '@/utils/constants'
 export default {
   name: 'ConnectorSettings',
   components: {
-    InputDateIso8601,
-    TooltipCircle
+    InputDateIso8601
   },
   props: {
     configSettings: {
@@ -218,6 +216,10 @@ export default {
         this.onFocusInput(el)
       }
     },
+    onRevealInlineDocs() {
+      this.isShowDocs = true
+      this.focusInputIntelligently()
+    },
     refocusInput(newVal, oldVal) {
       if (newVal !== oldVal) {
         this.focusInputIntelligently()
@@ -257,13 +259,14 @@ export default {
   <div>
     <slot name="top" />
 
-    <div class="columns">
-      <div class="column is-two-fifths">
+    <div class="columns is-vcentered">
+      <div class="column" :class="isShowDocs ? 'is-two-fifths' : 'is-half'">
         <form>
           <div
             v-for="setting in configSettings.settings"
             :key="setting.name"
             :class="{ 'field is-horizontal': !getIsOfKindHidden(setting.kind) }"
+            class=" has-cursor-pointer"
             @click.stop="onFocusInputViaClick"
             @focusin="onFocusInput($event.target)"
           >
@@ -271,31 +274,17 @@ export default {
               v-if="!getIsOfKindHidden(setting.kind)"
               :class="['field-label', labelClass]"
             >
-              <label class="label" :for="getFormFieldForId(setting)">
-                <a
-                  v-if="setting.documentation"
-                  target="_blank"
-                  :href="setting.documentation"
-                  class="label"
-                >
-                  <span
-                    class="has-text-underlined tooltip is-tooltip-right"
-                    :data-tooltip="
-                      `Learn more about the ${getLabel(setting)} setting.`
-                    "
-                    >{{ getLabel(setting) }}</span
-                  >
-                  <span>{{ getRequiredLabel(setting) }}</span>
-                </a>
-                <span v-else>
+              <label
+                class="label"
+                :class="
+                  isShowDocs ? ' has-text-underlined has-cursor-pointer' : ''
+                "
+                :for="getFormFieldForId(setting)"
+              >
+                <span>
                   <span>{{ getLabel(setting) }}</span>
                   <span>{{ getRequiredLabel(setting) }}</span>
                 </span>
-                <TooltipCircle
-                  v-if="setting.tooltip"
-                  :text="setting.tooltip"
-                  class="label-tooltip"
-                />
               </label>
             </div>
             <div class="field-body">
@@ -476,8 +465,8 @@ export default {
           </div>
         </form>
       </div>
-      <div class="column is-three-fifths">
-        <div class="docs-container">
+      <div class="column" :class="isShowDocs ? 'is-three-fifths' : 'is-half'">
+        <div class="docs-container" :class="{ 'is-show-docs': isShowDocs }">
           <!-- <iframe ref="docs" class="column" :src="`${plugin.docs}?embed=true`" /> -->
           <iframe
             ref="docs"
@@ -500,11 +489,11 @@ export default {
                 Some configurations are easier to setup than others.
               </p>
               <p class="is-italic">
-                We provide helpful information in these cases.
+                We provide guidence in these cases.
               </p>
               <a
                 class="button is-small is-interactive-secondary is-outlined"
-                @click="isShowDocs = true"
+                @click="onRevealInlineDocs"
                 >Show Me</a
               >
             </div>
@@ -537,8 +526,11 @@ export default {
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 50vh;
   height: 100%;
+
+  &.is-show-docs {
+    min-height: 50vh;
+  }
 
   iframe.docs {
     flex: 1;
@@ -549,7 +541,6 @@ export default {
   .docs-overlay {
     z-index: 1;
     background-color: $white;
-    opacity: 0.98;
   }
 
   .docs-overlay-content {

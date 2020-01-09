@@ -1,12 +1,35 @@
 ---
 sidebar: auto
 metaTitle: Extract Data from Fastly
-description: Use Meltano to extract raw data from Fastly and insert it into Postgres, Snowflake, and more. 
+description: Use Meltano to extract raw data from Fastly and insert it into Postgres, Snowflake, and more.
 ---
 
 # Fastly
 
 `tap-fastly` pulls raw data from Fastly and produces JSON-formatted data per the [Singer spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
+
+## Fastly Setup
+
+In order to access your Fastly data, you will need:
+
+- An _API Token_ that the Fastly extractor will use to connect to Fastly servers
+- _Start Date_ you want the extracted data set to start from
+
+### API Token
+
+:::tip Configuration Notes
+
+- Full access to Fastly's API requires an API Token that will authenticate you with the server
+
+:::
+
+### Start Date
+
+:::tip Configuration Notes
+
+- Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take
+
+:::
 
 ## Info
 
