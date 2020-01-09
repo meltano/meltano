@@ -835,7 +835,6 @@ const mutations = {
       return acc
     }, [])
     const nameMatcher = (source, target) => source.name === target.name
-    const nameMapper = item => item.name
     const setSelected = (sourceCollection, targetCollection) => {
       sourceCollection.forEach(item => {
         Vue.set(item, 'selected', targetCollection.includes(item.name))
@@ -857,7 +856,10 @@ const mutations = {
       }
       // timeframes
       if (targetJoin && targetJoin.timeframes) {
-        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(nameMapper))
+        setSelected(
+          joinGroup.timeframes,
+          targetJoin.timeframes.map(utils.predicate.named)
+        )
         // periods
         joinGroup.timeframes.forEach(timeframe => {
           const targetTimeframe = targetJoin.timeframes.find(tf =>
@@ -866,7 +868,7 @@ const mutations = {
           if (targetTimeframe && targetTimeframe.periods) {
             setSelected(
               timeframe.periods,
-              targetTimeframe.periods.map(nameMapper)
+              targetTimeframe.periods.map(utils.predicate.named)
             )
           }
         })
