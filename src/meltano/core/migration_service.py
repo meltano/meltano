@@ -1,13 +1,16 @@
 import os
 import click
 import logging
+import sqlalchemy
 from pathlib import Path
 from alembic.config import Config
 from alembic.script import ScriptDirectory
 from alembic.runtime.migration import MigrationContext
 from alembic import command
 
-from meltano.migrations import MIGRATION_DIR, LOCK_PATH, seed
+from meltano.migrations import MIGRATION_DIR, LOCK_PATH
+from meltano.core.db import project_engine
+from meltano.api.models.security import Role, RolePermissions
 
 
 class MigrationUneededException(Exception):
@@ -62,4 +65,36 @@ class MigrationService:
             conn.close()
 
     def seed(self, project):
-        return seed(project)
+        _, Session = project_engine(project)
+
+        try:
+            session = Session()
+
+            if not session.query(Role).filter_by(name="admin").first():
+                session.add(
+                    Role(
+                        name="admin",
+                        description="Meltano Admin",
+                        permissions=[
+                            RolePermissions(type="view:design", context="*"),
+                            RolePermissions(type="view:reports", context="*"),
+                            RolePermissions(type="modify:acl", context="*"),
+                        ],
+                    )
+                )
+
+            if not session.query(Role).filter_by(name="regular").first():
+                session.merge(Role(name="regular", description="Meltano User"))
+
+            # add the universal permissions to Admin
+            admin = session.query(Role).filter_by(name="admin").one()
+            try:
+                session.query(RolePermissions).filter_by(
+                    role=admin, type="*", context="*"
+                ).one()
+            except sqlalchemy.orm.exc.NoResultFound:
+                admin.permissions.append(RolePermissions(type="*", context="*"))
+
+            session.commit()
+        finally:
+            session.close()
