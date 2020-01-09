@@ -10,8 +10,8 @@ export default {
   name: 'ResultTable',
   components: {
     Dropdown,
-    QuerySortBy,
-    LoadingOverlay
+    LoadingOverlay,
+    QuerySortBy
   },
   props: {
     isLoading: { type: Boolean, required: true, default: false }

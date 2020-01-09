@@ -13,7 +13,7 @@ export default {
     <div class="is-fill-space loading-result-overlay"></div>
     <div class="loading-result-loader">
       <button
-        class="button is-loading is-borderless is-interactive-primary is-outlined "
+        class="button is-loading is-borderless is-interactive-primary is-outlined"
       ></button>
     </div>
   </div>
