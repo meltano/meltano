@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from .errors import InvalidFileNameError
 from .reports_helper import ReportAlreadyExistsError, ReportsHelper
 
 from meltano.api.api_blueprint import APIBlueprint
@@ -30,6 +31,19 @@ def _handle(ex):
             }
         ),
         409,
+    )
+
+
+@reportsBP.errorhandler(InvalidFileNameError)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"The report name provided is invalid. Try a name without special characters.",
+            }
+        ),
+        400,
     )
 
 

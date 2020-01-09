@@ -19,6 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1430](https://gitlab.com/meltano/meltano/issues/1430) Fix the state not stored for pipelines when Transforms run
+- [#1521](https://gitlab.com/meltano/meltano/issues/1521) Sanitize user-submitted string before using it in file path
 
 ### Breaks
 
@@ -29,6 +30,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1520](https://gitlab.com/meltano/meltano/issues/1520) Fix bug when updating a dashboard that could undesirably overwrite another existing dashboard
+### Breaks
 
 ## 1.14.0 - (2019-12-30)
 

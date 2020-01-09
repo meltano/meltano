@@ -70,15 +70,15 @@ class DashboardsHelper:
         return dashboard
 
     def save_dashboard(self, data):
-        dashboard_name = data["name"]
+        name = data["name"]
 
         # guard if it already exists
-        existing_dashboard = self.get_dashboard_by_name(dashboard_name)
+        existing_dashboard = self.get_dashboard_by_name(name)
         if existing_dashboard:
             raise DashboardAlreadyExistsError(dashboard_name)
 
         project = Project.find()
-        slug = slugify(dashboard_name)
+        slug = slugify(name)
         file_path = project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(file_path, slug, data)
         data["version"] = DashboardsHelper.VERSION
