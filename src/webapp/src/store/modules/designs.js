@@ -838,7 +838,7 @@ const mutations = {
     const nameMapper = item => item.name
     const setSelected = (sourceCollection, targetCollection) => {
       sourceCollection.forEach(item => {
-        item.selected = targetCollection.includes(item.name)
+        Vue.set(item, 'selected', targetCollection.includes(item.name))
       })
     }
 
