@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1483](https://gitlab.com/meltano/meltano/issues/1483) Add login audit columns to track last login time
+
 ### Changes
 
 ### Fixes

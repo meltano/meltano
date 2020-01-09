@@ -1,6 +1,7 @@
 import logging
 from fnmatch import fnmatch
 from functools import wraps
+from datetime import datetime
 
 from flask import request
 from flask_security import auth_required
@@ -109,3 +110,11 @@ def _identity_loaded_hook(sender, identity):
         perm = Need(perm.type, perm.context)
 
         identity.provides.add(perm)
+
+
+def _user_logged_in_hook(sender, user):
+    """
+    Update the audit columns for the User
+    """
+    user.last_login_at = datetime.utcnow()
+    user.login_count += 1

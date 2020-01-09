@@ -5,6 +5,10 @@ WORKDIR /meltano
 
 # building the code
 COPY . .
+
+# this enables the build process to have access to local
+# `meltano` module
+ENV PYTHONPATH=src/
 RUN make sdist
 
 FROM $BASE_IMAGE as runtime
