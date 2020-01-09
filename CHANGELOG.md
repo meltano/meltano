@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1551](https://gitlab.com/meltano/meltano/issues/1551) Add dbt clean before compile and runs
+
 ### Changes
 
 ### Fixes
