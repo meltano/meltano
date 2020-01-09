@@ -8,6 +8,7 @@ Create Date: 2019-07-23 16:05:29.073296
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.ext.mutable import MutableDict
+from meltano.migrations import JSONEncodedDict, IntFlag
 from enum import Enum
 
 
@@ -16,11 +17,6 @@ revision = "b4c05e463b53"
 down_revision = None
 branch_labels = None
 depends_on = None
-
-# compat for types declared in `meltano.core.sqlalchemy`
-# basically returns the `impl` type backing the field
-JSONEncodedDict = sa.VARCHAR
-IntFlag = sa.INTEGER
 
 
 # from `src/meltano/core/job.py`

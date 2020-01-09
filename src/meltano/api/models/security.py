@@ -10,6 +10,8 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
+    last_login_at = db.Column(db.DateTime(), nullable=True)
+    login_count = db.Column(db.Integer, default=0)
     roles = db.relationship(
         "Role", secondary="roles_users", backref=db.backref("users", lazy="dynamic")
     )
