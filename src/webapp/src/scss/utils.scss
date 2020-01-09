@@ -45,6 +45,12 @@ Display-related utilities
 UTILITIES - SPACING --------------------------------------------------------------------------------
 */
 
+.is-fill-space {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
 .mt1r {
   margin-top: 1rem;
 }

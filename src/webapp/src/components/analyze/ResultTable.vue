@@ -2,15 +2,15 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 import Dropdown from '@/components/generic/Dropdown'
+import LoadingOverlay from '@/components/generic/LoadingOverlay'
 import QuerySortBy from '@/components/analyze/QuerySortBy'
-import ResultLoadingOverlay from '@/components/analyze/ResultLoadingOverlay'
 
 export default {
   name: 'ResultTable',
   components: {
     Dropdown,
     QuerySortBy,
-    ResultLoadingOverlay
+    LoadingOverlay
   },
   props: {
     isLoading: { type: Boolean, required: true, default: false }
@@ -65,7 +65,7 @@ export default {
 
 <template>
   <div class="result-data has-position-relative v-min-2r">
-    <ResultLoadingOverlay :is-loading="isLoading"></ResultLoadingOverlay>
+    <LoadingOverlay :is-loading="isLoading"></LoadingOverlay>
 
     <div v-if="hasResults">
       <table

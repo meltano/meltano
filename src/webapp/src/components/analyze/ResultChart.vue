@@ -2,13 +2,13 @@
 import { mapGetters, mapState } from 'vuex'
 
 import Chart from '@/components/analyze/Chart'
-import ResultLoadingOverlay from '@/components/analyze/ResultLoadingOverlay'
+import LoadingOverlay from '@/components/generic/LoadingOverlay'
 
 export default {
   name: 'ResultTable',
   components: {
     Chart,
-    ResultLoadingOverlay
+    LoadingOverlay
   },
   props: {
     isLoading: { type: Boolean, required: true, default: false }
@@ -31,7 +31,7 @@ export default {
 
 <template>
   <div class="has-position-relative v-min-2r">
-    <ResultLoadingOverlay :is-loading="isLoading"></ResultLoadingOverlay>
+    <LoadingOverlay :is-loading="isLoading"></LoadingOverlay>
 
     <div v-if="hasChartableResults">
       <Chart

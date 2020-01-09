@@ -230,6 +230,10 @@ Modifer helpers with names based on Bulma naming conventions
   flex-direction: row;
 }
 
+.is-hcentered {
+  justify-content: center;
+}
+
 .is-thin {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
