@@ -1,6 +1,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
 
+import AnalyzeList from '@/components/analyze/AnalyzeList'
 import DownloadButton from '@/components/generic/DownloadButton'
 import Dropdown from '@/components/generic/Dropdown'
 import orchestrationsApi from '@/api/orchestrations'
@@ -10,6 +11,7 @@ import utils from '@/utils/utils'
 export default {
   name: 'LogModal',
   components: {
+    AnalyzeList,
     Dropdown,
     DownloadButton
   },
@@ -217,30 +219,7 @@ export default {
             is-up
           >
             <div class="dropdown-content is-unselectable">
-              <div
-                v-for="(v, model) in contextualModels"
-                :key="`${model}-panel`"
-                class="box box-analyze-nav is-borderless is-shadowless is-marginless"
-              >
-                <div class="content">
-                  <h3 class="is-size-6">
-                    {{ v.name | capitalize | underscoreToSpace }}
-                  </h3>
-                  <h4 class="is-size-7 has-text-grey">
-                    {{ v.namespace }}
-                  </h4>
-                </div>
-                <div class="buttons">
-                  <router-link
-                    v-for="design in v['designs']"
-                    :key="design"
-                    class="button is-small is-interactive-primary is-outlined"
-                    :to="urlForModelDesign(model, design)"
-                    @click.native="prepareAnalyzeLoader()"
-                    >{{ design | capitalize | underscoreToSpace }}</router-link
-                  >
-                </div>
-              </div>
+              <analyze-list :pipeline="relatedPipeline" />
             </div>
           </Dropdown>
         </div>
