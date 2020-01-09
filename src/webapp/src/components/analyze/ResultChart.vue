@@ -17,12 +17,12 @@ export default {
   computed: {
     ...mapState('designs', ['chartType', 'results', 'resultAggregates']),
     ...mapGetters('designs', [
-      'getAllAttributes',
+      'getAttributes',
       'hasChartableResults',
       'hasResults'
     ]),
     getHasMinimalSelectionRequirements() {
-      const hasAggregate = this.getAllAttributes(['aggregates']).find(
+      const hasAggregate = this.getAttributes(['aggregates']).find(
         utils.predicate.selected
       )
       return hasAggregate

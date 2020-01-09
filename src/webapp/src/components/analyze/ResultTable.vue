@@ -24,7 +24,7 @@ export default {
       'order'
     ]),
     ...mapGetters('designs', [
-      'getAllAttributes',
+      'getAttributes',
       'getFormattedValue',
       'hasResults',
       'isColumnSelectedAggregate'
@@ -36,10 +36,10 @@ export default {
         )
     },
     getHasMinimalSelectionRequirements() {
-      const hasColumn = this.getAllAttributes(['columns']).find(
+      const hasColumn = this.getAttributes(['columns']).find(
         utils.predicate.selected
       )
-      const hasAggregate = this.getAllAttributes(['aggregates']).find(
+      const hasAggregate = this.getAttributes(['aggregates']).find(
         utils.predicate.selected
       )
       return hasColumn || hasAggregate

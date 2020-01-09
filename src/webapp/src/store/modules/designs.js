@@ -154,7 +154,7 @@ const getters = {
     return sqlFormatter.format(state.currentSQL)
   },
 
-  getAllAttributes(state) {
+  getAttributes(state) {
     return (types = ['columns', 'aggregates', 'timeframes']) => {
       let attributes = []
       const joinSources = state.design.joins || []
@@ -182,7 +182,7 @@ const getters = {
       const finder = attr =>
         attr.sourceName === queryAttribute.sourceName &&
         attr.name === queryAttribute.attributeName
-      return getters.getAllAttributes().find(finder)
+      return getters.getAttributes().find(finder)
     }
   },
 
@@ -262,7 +262,7 @@ const getters = {
 
   // eslint-disable-next-line no-shadow
   getSelectedAttributes(_, getters) {
-    return getters.getAllAttributes().filter(utils.predicate.selected)
+    return getters.getAttributes().filter(utils.predicate.selected)
   },
 
   // eslint-disable-next-line no-shadow
@@ -467,7 +467,7 @@ const actions = {
           commit('setQueryResults', response.data)
           commit('setSQLResults', response.data)
           commit('setIsLoadingQuery', false)
-          commit('setSorting', getters.getAllAttributes())
+          commit('setSorting', getters.getAttributes())
         } else {
           commit('setSQLResults', response.data)
         }
