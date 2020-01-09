@@ -2,13 +2,19 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 import Dropdown from '@/components/generic/Dropdown'
+import LoadingOverlay from '@/components/generic/LoadingOverlay'
 import QuerySortBy from '@/components/analyze/QuerySortBy'
+import utils from '@/utils/utils'
 
 export default {
   name: 'ResultTable',
   components: {
     Dropdown,
+    LoadingOverlay,
     QuerySortBy
+  },
+  props: {
+    isLoading: { type: Boolean, required: true, default: false }
   },
   computed: {
     ...mapState('designs', [
@@ -18,6 +24,7 @@ export default {
       'order'
     ]),
     ...mapGetters('designs', [
+      'getAttributes',
       'getFormattedValue',
       'hasResults',
       'isColumnSelectedAggregate'
@@ -27,6 +34,15 @@ export default {
         this.order.assigned.find(
           orderable => orderable.attribute.name === attributeName
         )
+    },
+    getHasMinimalSelectionRequirements() {
+      const hasColumn = this.getAttributes(['columns']).find(
+        utils.predicate.selected
+      )
+      const hasAggregate = this.getAttributes(['aggregates']).find(
+        utils.predicate.selected
+      )
+      return hasColumn || hasAggregate
     },
     getIsOrderableAssigned() {
       return attributeName => Boolean(this.getAssignedOrderable(attributeName))
@@ -52,7 +68,9 @@ export default {
 </script>
 
 <template>
-  <div class="result-data">
+  <div class="result-data has-position-relative v-min-2r">
+    <LoadingOverlay :is-loading="isLoading"></LoadingOverlay>
+
     <div v-if="hasResults">
       <table
         class="table
@@ -123,9 +141,26 @@ export default {
       </table>
     </div>
 
-    <div v-else class="notification is-italic">
-      No results
-    </div>
+    <article
+      v-else-if="!getHasMinimalSelectionRequirements"
+      class="message is-info"
+    >
+      <div class="message-body">
+        <div class="content">
+          <p>To display a <em>Table</em>:</p>
+          <ol>
+            <li>
+              Select at least one <strong>Column</strong> or
+              <strong>Aggregate</strong> from the <em>Attributes</em> panel
+            </li>
+            <li>
+              Manually click the <em>Run</em> button (if
+              <em>Autorun Queries</em> is toggled off)
+            </li>
+          </ol>
+        </div>
+      </div>
+    </article>
   </div>
 </template>
 

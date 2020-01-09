@@ -17,6 +17,17 @@ In order to contribute to Meltano, you will need the following:
 
 We welcome contributions, idea submissions, and improvements. In fact we may already have open issues labeled [Accepting Merge Requests] if you don't know where to start. Please see the contribution guidelines below for source code related contributions.
 
+### Metrics (anonymous usage data) tracking
+
+As you contribute to Meltano, you may want to disable [metrics tracking](/docs/environment-variables.html#anonymous-usage-data) globally rather than by project. You can do this by setting the environment variable `MELTANO_DISABLE_TRACKING` to `True`:
+
+```bash
+# Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
+export MELTANO_DISABLE_TRACKING=True
+```
+
+## Setting Up Your Environment
+
 ```bash
 # Clone the Meltano repo
 git clone git@gitlab.com:meltano/meltano.git
@@ -52,30 +63,37 @@ Meltano is now installed and available at `meltano`, as long as you remain in yo
 
 This means that you're ready to start Meltano CLI development. For API and UI development, read on.
 
-### Metrics (anonymous usage data) tracking
-
-As you contribute to Meltano, you may want to disable [metrics tracking](/docs/environment-variables.html#anonymous-usage-data) globally rather than by project. You can do this by setting the environment variable `MELTANO_DISABLE_TRACKING` to `True`:
-
-```bash
-# Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
-export MELTANO_DISABLE_TRACKING=True
-```
-
 ## API Development
 
-For all changes that do not involve working on Meltano UI (front-end) itself, run the following command:
+This section of the guide provides guidance on how to work with the Meltano API, which serves as the backend of Meltano and is built with the [Python framework: Flask](https://github.com/pallets/flask).
+
+### Getting Setup
+
+After all of your dependencies installed, we recommend opening a new window/tab in your terminal so you can run the following commands:
 
 ```bash
-# Starts both a development build of the Meltano API and a production build of Meltano UI
+# Create a new Meltano project
+meltano init $PROJECT_NAME
+
+# Change directory into your newly created project
+cd $PROJECT_NAME
+
+# Start a development build of the Meltano API and a production build of Meltano UI
 FLASK_ENV=development meltano ui
 ```
 
-The development build of the Meltano API should be available at <http://localhost:5000/>.
+The development build of the Meltano API & **production** build of the UI should now be available at <http://localhost:5000/>.
 
-:::warning Troubleshooting
-If you run into `/bin/sh: yarn: command not found`, double check that you've got [the prerequisites](https://www.meltano.com/docs/contributing.html#prerequisites) installed.
+::: tip
 
-On macOS, this can be solved by running `brew install yarn`.
+To debug your Python code, here is the recommended way to validate / debug your code:
+
+```python
+# Purpose: Start a debugger
+# Usage: Use as a one-line import / invocation for easier cleanup
+import pdb; pdb.set_trace()
+```
+
 :::
 
 ## UI Development

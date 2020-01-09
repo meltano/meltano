@@ -159,7 +159,11 @@ export default {
   requiredConnectorSettingsKeys(settings, groupValidation) {
     return groupValidation
       ? lodash.intersection(...groupValidation)
-      : settings.map(setting => setting.name)
+      : settings.map(this.predicate.named)
+  },
+  predicate: {
+    named: item => item.name,
+    selected: item => item.selected
   },
   singularize(value) {
     if (!value) {
@@ -245,11 +249,24 @@ export default {
     return new Date(date).toISOString().split('T')[0]
   },
 
+  // Time Utils
   momentFromNow(val) {
     return moment(val).fromNow()
   },
 
   momentFormatlll(val) {
     return moment(val).format('lll')
+  },
+
+  momentHumanizedDuration(startDate, endDate) {
+    const x = new moment(startDate)
+    const y = new moment(endDate)
+    const duration = moment.duration(y.diff(x))
+    const formatter = (val, append) => (val ? `${val} ${append} ` : '')
+    const strDays = formatter(duration.days(), 'days')
+    const strHour = formatter(duration.hours(), 'hours')
+    const strMin = formatter(duration.minutes(), 'min')
+    const strSec = formatter(duration.seconds(), 'sec')
+    return `${strDays}${strHour}${strMin}${strSec}`
   }
 }

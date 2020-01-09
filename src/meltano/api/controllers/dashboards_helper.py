@@ -16,8 +16,8 @@ from .sql_helper import SqlHelper
 class DashboardAlreadyExistsError(Exception):
     """Occurs when a dashboard already exists."""
 
-    def __init__(self, dashboard):
-        self.dashboard = dashboard
+    def __init__(self, dashboard_name):
+        self.dashboard_name = dashboard_name
 
 
 class DashboardDoesNotExistError(Exception):
@@ -70,15 +70,15 @@ class DashboardsHelper:
         return dashboard
 
     def save_dashboard(self, data):
-        dashboard_name = data["name"]
+        name = data["name"]
 
         # guard if it already exists
-        existing_dashboard = self.get_dashboard_by_name(dashboard_name)
+        existing_dashboard = self.get_dashboard_by_name(name)
         if existing_dashboard:
-            raise DashboardAlreadyExistsError(existing_dashboard)
+            raise DashboardAlreadyExistsError(dashboard_name)
 
         project = Project.find()
-        slug = slugify(dashboard_name)
+        slug = slugify(name)
         file_path = project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(file_path, slug, data)
         data["version"] = DashboardsHelper.VERSION
@@ -107,21 +107,24 @@ class DashboardsHelper:
         dashboard = self.get_dashboard(data["dashboard"]["id"])
         slug = dashboard["slug"]
         file_path = project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            new_settings = data["new_settings"]
-            new_name = new_settings["name"]
-            new_slug = slugify(new_name)
-            dashboard["slug"] = new_slug
-            dashboard["name"] = new_name
-            dashboard["description"] = new_settings["description"]
-            new_file_path = project.analyze_dir(
-                "dashboards", f"{new_slug}.dashboard.m5o"
-            )
-            with new_file_path.open("w") as f:
-                json.dump(dashboard, f)
-        else:
+        if not os.path.exists(file_path):
             raise DashboardDoesNotExistError(data)
+
+        new_settings = data["new_settings"]
+        new_name = new_settings["name"]
+        new_slug = slugify(new_name)
+        new_file_path = project.analyze_dir("dashboards", f"{new_slug}.dashboard.m5o")
+        is_same_file = new_slug == slug
+        if not is_same_file and os.path.exists(new_file_path):
+            raise DashboardAlreadyExistsError(new_name)
+
+        os.remove(file_path)
+        dashboard["slug"] = new_slug
+        dashboard["name"] = new_name
+        dashboard["description"] = new_settings["description"]
+        dashboard["path"] = str(new_file_path)
+        with new_file_path.open("w") as f:
+            json.dump(dashboard, f)
 
         return dashboard
 

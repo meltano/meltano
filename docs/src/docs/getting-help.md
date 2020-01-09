@@ -5,7 +5,7 @@ description: Learn where to file bugs, track issues, and how to get support from
 
 # Getting Help
 
-Whoops! Were you happily using Meltano when something went wrong or you got stuck? Don't worry, the Meltano team and community are here to help you.
+We would love to help, and you can reach us anytime at `hello@meltano.com`
 
 If you ran into a bug or other problem or have any kind of feedback, you can:
 

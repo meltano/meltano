@@ -4,6 +4,7 @@ from .dashboards_helper import (
     DashboardDoesNotExistError,
     DashboardsHelper,
 )
+from .errors import InvalidFileNameError
 from meltano.api.api_blueprint import APIBlueprint
 
 
@@ -12,7 +13,7 @@ dashboardsBP = APIBlueprint("dashboards", __name__)
 
 @dashboardsBP.errorhandler(DashboardAlreadyExistsError)
 def _handle(ex):
-    dashboard_name = ex.dashboard["name"]
+    dashboard_name = ex.dashboard_name
     return (
         jsonify(
             {
@@ -32,6 +33,19 @@ def _handle(ex):
             {"error": True, "code": f"The dashboard '{dashboard_name}' does not exist."}
         ),
         404,
+    )
+
+
+@dashboardsBP.errorhandler(InvalidFileNameError)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"The dashboard name provided is invalid. Try a name without special characters.",
+            }
+        ),
+        400,
     )
 
 

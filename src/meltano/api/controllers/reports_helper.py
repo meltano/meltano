@@ -41,21 +41,20 @@ class ReportsHelper:
 
         return reportsParser.parse()
 
-    def load_report(self, report_name):
-        return self.get_report_by_name(report_name)
+    def load_report(self, name):
+        return self.get_report_by_name(name)
 
     def save_report(self, data):
-        report_name = data["name"]
+        name = data["name"]
 
         # guard if it already exists
-        existing_report = self.get_report_by_name(report_name)
+        existing_report = self.get_report_by_name(name)
         if existing_report:
             raise ReportAlreadyExistsError(existing_report)
 
         project = Project.find()
-        slug = slugify(report_name)
+        slug = slugify(name)
         file_path = project.analyze_dir("reports", f"{slug}.report.m5o")
-
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(file_path, slug, data)
         data["version"] = ReportsHelper.VERSION
 
@@ -65,8 +64,11 @@ class ReportsHelper:
         return data
 
     def update_report(self, data):
+        name = data["name"]
+        existing_report = self.get_report_by_name(name)
+        slug = existing_report["slug"]
         project = Project.find()
-        file_path = project.analyze_dir("reports", f"{data['slug']}.report.m5o")
+        file_path = project.analyze_dir("reports", f"{slug}.report.m5o")
         with open(file_path, "w") as f:
             json.dump(data, f)
 

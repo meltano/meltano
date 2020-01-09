@@ -33,12 +33,14 @@ from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.models import db
 from meltano.api.json import freeze_keys
 from meltano.api.executor import run_elt
-from .upload_helper import (
-    InvalidFileNameError,
-    InvalidFileTypeError,
-    InvalidFileSizeError,
-    UploadHelper,
-)
+from .errors import InvalidFileNameError
+from .upload_helper import InvalidFileTypeError, InvalidFileSizeError, UploadHelper
+from .utils import enforce_secure_filename
+
+
+def freeze_profile_config_keys(profile):
+    profile["config"] = freeze_keys(profile.get("config", {}))
+    profile["config_sources"] = freeze_keys(profile.get("config_sources", {}))
 
 
 orchestrationsBP = APIBlueprint("orchestrations", __name__)
@@ -201,7 +203,7 @@ def upload_plugin_configuration_file(plugin_ref) -> Response:
 
     project = Project.find()
     file = request.files["file"]
-    setting_name = request.form["setting_name"]
+    setting_name = enforce_secure_filename(request.form["setting_name"])
     directory = project.extract_dir(plugin_ref.full_name, setting_name)
     upload_helper = UploadHelper()
     file_path = upload_helper.upload_file(directory, file)
@@ -219,15 +221,12 @@ def get_plugin_configuration(plugin_ref) -> Response:
     settings = PluginSettingsService(project)
     plugin = ConfigService(project).get_plugin(plugin_ref)
 
-    profiles = settings.as_profile_configs(db.session, plugin, redacted=True)
-
-    # freeze the `config` keys
+    profiles = settings.profiles_with_config(db.session, plugin, redacted=True)
     for profile in profiles:
-        profile["config"] = freeze_keys(profile.get("config", {}))
+        freeze_profile_config_keys(profile)
 
     return jsonify(
         {
-            # freeze the keys because they are used for lookups
             "profiles": profiles,
             "settings": Canonical.as_canonical(
                 settings.get_definition(plugin).settings
@@ -250,19 +249,17 @@ def add_plugin_configuration_profile(plugin_ref) -> Response:
     settings = PluginSettingsService(project)
 
     # create the new profile for this plugin
-    profile = plugin.add_profile(slugify(payload["name"]), label=payload["name"])
+    name = payload["name"]
+    profile = plugin.add_profile(slugify(name), label=name)
 
     config.update_plugin(plugin)
-    plugin.use_profile(profile)
 
-    return jsonify(
-        {
-            **profile.canonical(),
-            "config": freeze_keys(
-                settings.as_config(db.session, plugin, redacted=True)
-            ),
-        }
+    profile_config = settings.profile_with_config(
+        db.session, plugin, profile, redacted=True
     )
+    freeze_profile_config_keys(profile_config)
+
+    return jsonify(profile_config)
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["PUT"])
@@ -280,7 +277,8 @@ def save_plugin_configuration(plugin_ref) -> Response:
 
     for profile in payload:
         # select the correct profile
-        plugin.use_profile(plugin.get_profile(profile["name"]))
+        name = profile["name"]
+        plugin.use_profile(plugin.get_profile(name))
 
         for name, value in profile["config"].items():
             # we want to prevent the edition of protected settings from the UI
@@ -288,16 +286,24 @@ def save_plugin_configuration(plugin_ref) -> Response:
                 logging.warning("Cannot set a 'protected' configuration externally.")
                 continue
 
+            old_value, source = settings.get_value(db.session, plugin_ref, name)
+            if source in (
+                PluginSettingValueSource.ENV,
+                PluginSettingValueSource.MELTANO_YML,
+            ):
+                logging.warning(
+                    "Cannot override a configuration set in the environment or meltano.yml."
+                )
+                continue
+
             if value == "":
                 settings.unset(db.session, plugin, name)
             else:
                 settings.set(db.session, plugin, name, value)
 
-    profiles = settings.as_profile_configs(db.session, plugin, redacted=True)
-
-    # freeze the `config` keys
+    profiles = settings.profiles_with_config(db.session, plugin, redacted=True)
     for profile in profiles:
-        profile["config"] = freeze_keys(profile.get("config", {}))
+        freeze_profile_config_keys(profile)
 
     return jsonify(profiles)
 
@@ -382,19 +388,20 @@ def save_pipeline_schedule() -> Response:
     """
     Endpoint for persisting a pipeline schedule
     """
-    incoming = request.get_json()
+    payload = request.get_json()
     # Airflow requires alphanumeric characters, dashes, dots and underscores exclusively
-    name = slugify(incoming["name"])
-    extractor = incoming["extractor"]
-    loader = incoming["loader"]
-    transform = incoming["transform"]
-    interval = incoming["interval"]
+    name = payload["name"]
+    slug = slugify(name)
+    extractor = payload["extractor"]
+    loader = payload["loader"]
+    transform = payload["transform"]
+    interval = payload["interval"]
 
     project = Project.find()
     schedule_service = ScheduleService(project)
 
     schedule = schedule_service.add(
-        db.session, name, extractor, loader, transform, interval
+        db.session, slug, extractor, loader, transform, interval
     )
     return jsonify(dict(schedule)), 201
 
@@ -404,11 +411,10 @@ def delete_pipeline_schedule() -> Response:
     """
     Endpoint for deleting a pipeline schedule
     """
-    incoming = request.get_json()
-    name = incoming["name"]
-
+    payload = request.get_json()
     project = Project.find()
     schedule_service = ScheduleService(project)
 
+    name = payload["name"]
     schedule_service.remove(name)
     return jsonify(name), 201

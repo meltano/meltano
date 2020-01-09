@@ -25,6 +25,7 @@ const defaultState = utils.deepFreeze({
     aggregates: [],
     columns: []
   },
+  isLastRunResultsEmpty: false,
   hasSQLError: false,
   isAutoRunQuery: true,
   isLoadingQuery: false,
@@ -48,12 +49,11 @@ const helpers = {
 
   getQueryPayloadFromDesign(state) {
     // Inline fn helpers
-    const selected = x => x.selected
     const namesOfSelected = arr => {
       if (!Array.isArray(arr)) {
         return null
       }
-      return arr.filter(selected).map(x => x.name)
+      return arr.filter(utils.predicate.selected).map(utils.predicate.named)
     }
 
     const baseTable = state.design.relatedTable
@@ -75,10 +75,10 @@ const helpers = {
 
         if (table.timeframes) {
           newJoin.timeframes = table.timeframes
-            .filter(selected)
+            .filter(utils.predicate.selected)
             .map(({ name, periods }) => ({
               name,
-              periods: periods.filter(selected)
+              periods: periods.filter(utils.predicate.selected)
             }))
             .filter(tf => tf.periods.length)
         }
@@ -95,7 +95,7 @@ const helpers = {
       []
         .map(tf => ({
           name: tf.name,
-          periods: tf.periods.filter(selected)
+          periods: tf.periods.filter(utils.predicate.selected)
         }))
         .filter(tf => tf.periods.length)
 
@@ -154,33 +154,35 @@ const getters = {
     return sqlFormatter.format(state.currentSQL)
   },
 
-  getAllAttributes(state) {
-    let attributes = []
-    const joinSources = state.design.joins || []
-    const sources = [state.design].concat(joinSources)
-    const batchCollect = (table, attributeTypes) => {
-      attributeTypes.forEach(attributeType => {
-        const attributesByType = table[attributeType]
-        if (attributesByType) {
-          attributes = attributes.concat(attributesByType)
-        }
+  getAttributes(state) {
+    return (types = ['columns', 'aggregates', 'timeframes']) => {
+      let attributes = []
+      const joinSources = state.design.joins || []
+      const sources = [state.design].concat(joinSources)
+      const batchCollect = (table, attributeTypes) => {
+        attributeTypes.forEach(attributeType => {
+          const attributesByType = table[attributeType]
+          if (attributesByType) {
+            attributes = attributes.concat(attributesByType)
+          }
+        })
+      }
+
+      sources.forEach(source => {
+        batchCollect(source.relatedTable, types)
       })
+
+      return attributes
     }
-
-    sources.forEach(source => {
-      batchCollect(source.relatedTable, ['columns', 'aggregates', 'timeframes'])
-    })
-
-    return attributes
   },
 
   // eslint-disable-next-line no-shadow
-  getAttributeByQueryAttribute(state, getters) {
+  getAttributeByQueryAttribute(_, getters) {
     return queryAttribute => {
       const finder = attr =>
         attr.sourceName === queryAttribute.sourceName &&
         attr.name === queryAttribute.attributeName
-      return getters.getAllAttributes.find(finder)
+      return getters.getAttributes().find(finder)
     }
   },
 
@@ -260,8 +262,7 @@ const getters = {
 
   // eslint-disable-next-line no-shadow
   getSelectedAttributes(_, getters) {
-    const selector = attribute => attribute.selected
-    return getters.getAllAttributes.filter(selector)
+    return getters.getAttributes().filter(utils.predicate.selected)
   },
 
   // eslint-disable-next-line no-shadow
@@ -339,8 +340,8 @@ const actions = {
   },
 
   tryAutoRun({ dispatch, state }) {
-    const hasRan = state.results.length > 0
-    dispatch('runQuery', hasRan && state.isAutoRunQuery)
+    const hasRan = state.results.length > 0 || state.isLastRunResultsEmpty
+    dispatch('runQuery', state.isAutoRunQuery && hasRan)
   },
 
   // eslint-disable-next-line no-shadow
@@ -466,7 +467,7 @@ const actions = {
           commit('setQueryResults', response.data)
           commit('setSQLResults', response.data)
           commit('setIsLoadingQuery', false)
-          commit('setSorting', getters.getAllAttributes)
+          commit('setSorting', getters.getAttributes())
         } else {
           commit('setSQLResults', response.data)
         }
@@ -643,6 +644,7 @@ const mutations = {
   },
 
   resetQueryResults(state) {
+    state.isLastRunResultsEmpty = false
     state.results = []
     state.queryAttributes = []
     state.resultAggregates = []
@@ -744,10 +746,11 @@ const mutations = {
     state.order.unassigned = value
   },
 
-  setQueryResults(state, results) {
-    state.results = results.results
-    state.queryAttributes = results.queryAttributes
-    state.resultAggregates = results.aggregates
+  setQueryResults(state, payload) {
+    state.isLastRunResultsEmpty = payload.empty
+    state.results = payload.results
+    state.queryAttributes = payload.queryAttributes
+    state.resultAggregates = payload.aggregates
   },
 
   setReports(state, reports) {
@@ -807,8 +810,8 @@ const mutations = {
     state.sqlErrorMessage = [error.code, error.orig, error.statement]
   },
 
-  setSQLResults(state, results) {
-    state.currentSQL = results.sql
+  setSQLResults(state, payload) {
+    state.currentSQL = payload.sql
   },
 
   setStateFromLoadedReport(state, report) {
@@ -832,10 +835,9 @@ const mutations = {
       return acc
     }, [])
     const nameMatcher = (source, target) => source.name === target.name
-    const nameMapper = item => item.name
     const setSelected = (sourceCollection, targetCollection) => {
       sourceCollection.forEach(item => {
-        item.selected = targetCollection.includes(item.name)
+        Vue.set(item, 'selected', targetCollection.includes(item.name))
       })
     }
 
@@ -854,7 +856,10 @@ const mutations = {
       }
       // timeframes
       if (targetJoin && targetJoin.timeframes) {
-        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(nameMapper))
+        setSelected(
+          joinGroup.timeframes,
+          targetJoin.timeframes.map(utils.predicate.named)
+        )
         // periods
         joinGroup.timeframes.forEach(timeframe => {
           const targetTimeframe = targetJoin.timeframes.find(tf =>
@@ -863,7 +868,7 @@ const mutations = {
           if (targetTimeframe && targetTimeframe.periods) {
             setSelected(
               timeframe.periods,
-              targetTimeframe.periods.map(nameMapper)
+              targetTimeframe.periods.map(utils.predicate.named)
             )
           }
         })

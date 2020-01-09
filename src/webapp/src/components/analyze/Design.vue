@@ -4,10 +4,10 @@ import lodash from 'lodash'
 import Vue from 'vue'
 
 import capitalize from '@/filters/capitalize'
-import Chart from '@/components/analyze/Chart'
-import Dropdown from '@/components/generic/Dropdown'
 import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
+import Dropdown from '@/components/generic/Dropdown'
 import QueryFilters from '@/components/analyze/QueryFilters'
+import ResultChart from '@/components/analyze/ResultChart'
 import ResultTable from '@/components/analyze/ResultTable'
 import utils from '@/utils/utils'
 
@@ -17,10 +17,10 @@ export default {
     capitalize
   },
   components: {
-    Chart,
-    Dropdown,
     CreateDashboardModal,
+    Dropdown,
     QueryFilters,
+    ResultChart,
     ResultTable
   },
   data() {
@@ -58,6 +58,7 @@ export default {
       'hasChartableResults',
       'hasFilters',
       'hasJoins',
+      'hasResults',
       'isLoaderSqlite',
       'resultsCount',
       'showJoinColumnAggregateHeader'
@@ -965,29 +966,8 @@ export default {
             </div>
           </div>
 
-          <!-- charts tab -->
-          <div>
-            <div v-if="hasChartableResults" class="chart-toggles">
-              <chart
-                :chart-type="chartType"
-                :results="results"
-                :result-aggregates="resultAggregates"
-              ></chart>
-            </div>
-            <div v-if="!hasChartableResults">
-              <div class="box is-radiusless is-shadowless has-text-centered">
-                <p>
-                  Run a query with at least one aggregate selected or load a
-                  report
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <hr />
-
-          <!-- results/SQL tab -->
-          <div>
+          <template v-if="isInitialized">
+            <!-- SQL error -->
             <div v-if="hasSQLError" class="notification is-danger">
               <button class="delete" @click="resetErrorMessage"></button>
               <ul>
@@ -997,8 +977,47 @@ export default {
               </ul>
             </div>
 
-            <ResultTable></ResultTable>
-          </div>
+            <div>
+              <article
+                v-if="!isLoadingQuery && !hasResults"
+                class="message is-info"
+              >
+                <div class="message-body">
+                  <div class="content">
+                    <p>
+                      Sometimes a query has no results. When this happens, try
+                      one or more of the following:
+                    </p>
+                    <ul>
+                      <li>
+                        Change the <strong>Column</strong> and/or
+                        <strong>Aggregate</strong> selections in the
+                        <em>Attributes</em> panel
+                      </li>
+                      <li>
+                        Add, remove, or update one of the
+                        <a
+                          class="has-text-underlined"
+                          @click.stop="jumpToFilters"
+                          ><strong>Filters</strong></a
+                        >
+                      </li>
+                    </ul>
+                    <p v-if="!isAutoRunQuery">
+                      Then click the <em>Run</em> button.
+                    </p>
+                  </div>
+                </div>
+              </article>
+
+              <template v-else>
+                <ResultChart :is-loading="isLoadingQuery"></ResultChart>
+                <hr />
+                <ResultTable :is-loading="isLoadingQuery"></ResultTable>
+              </template>
+            </div>
+          </template>
+          <progress v-else class="progress is-small is-info"></progress>
 
           <!-- Create Dashboard Modal -->
           <CreateDashboardModal

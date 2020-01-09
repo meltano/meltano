@@ -1,23 +1,19 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
 
-import capitalize from '@/filters/capitalize'
+import AnalyzeList from '@/components/analyze/AnalyzeList'
 import DownloadButton from '@/components/generic/DownloadButton'
 import Dropdown from '@/components/generic/Dropdown'
 import orchestrationsApi from '@/api/orchestrations'
 import poller from '@/utils/poller'
-import underscoreToSpace from '@/filters/underscoreToSpace'
 import utils from '@/utils/utils'
 
 export default {
   name: 'LogModal',
   components: {
+    AnalyzeList,
     Dropdown,
     DownloadButton
-  },
-  filters: {
-    capitalize,
-    underscoreToSpace
   },
   data() {
     return {
@@ -31,33 +27,7 @@ export default {
   },
   computed: {
     ...mapGetters('orchestration', ['getRunningPipelineJobIds']),
-    ...mapGetters('plugins', ['getInstalledPlugin']),
-    ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
     ...mapState('orchestration', ['pipelines']),
-    ...mapState('repos', ['models']),
-    contextualModels() {
-      let models = this.models
-      if (this.relatedPipeline) {
-        // Split based on '@' profiles convention
-        const extractor = this.relatedPipeline.extractor.split('@')[0]
-        const namespace = this.getInstalledPlugin('extractors', extractor)
-          .namespace
-        const filteredModels = {}
-        for (const prop in models) {
-          if (models[prop].plugin_namespace === namespace) {
-            filteredModels[prop] = models[prop]
-          }
-        }
-
-        // Fallback to all if no match
-        models =
-          Object.keys(filteredModels).length === 0
-            ? this.models
-            : filteredModels
-      }
-
-      return models
-    },
     getDownloadPromise() {
       return orchestrationsApi.downloadJobLog
     },
@@ -65,11 +35,11 @@ export default {
       if (!this.jobStatus) {
         return '...'
       }
-      const end = this.jobStatus.endedAt
+      const startDate = new Date(this.jobStatus.startedAt)
+      const endDate = this.jobStatus.endedAt
         ? new Date(this.jobStatus.endedAt)
         : Date.now()
-      const elapsed = end - new Date(this.jobStatus.startedAt)
-      return `${Math.floor(elapsed / 1000)} sec`
+      return utils.momentHumanizedDuration(startDate, endDate)
     },
     getEndedAtLabel() {
       const fallback =
@@ -137,14 +107,6 @@ export default {
     },
     getHelp() {
       window.open('https://meltano.com/docs/getting-help.html')
-    },
-    prepareAnalyzeLoader(model, design) {
-      if (this.relatedPipeline) {
-        localStorage.setItem(
-          utils.concatLoaderModelDesign(model, design),
-          this.relatedPipeline.loader
-        )
-      }
     }
   }
 }
@@ -158,6 +120,7 @@ export default {
         <p class="modal-card-title">
           Run Log: <span class="is-family-code">{{ jobId }}</span>
         </p>
+        <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section v-if="relatedPipeline" class="modal-card-body">
         <article class="message is-small is-info">
@@ -237,7 +200,7 @@ export default {
           </div>
         </div>
         <div class="buttons is-right">
-          <button class="button" @click="close">Back</button>
+          <button class="button" @click="close">Close</button>
 
           <button v-if="hasError" class="button is-danger" @click="getHelp">
             Get Help
@@ -256,30 +219,7 @@ export default {
             is-up
           >
             <div class="dropdown-content is-unselectable">
-              <div
-                v-for="(v, model) in contextualModels"
-                :key="`${model}-panel`"
-                class="box box-analyze-nav is-borderless is-shadowless is-marginless"
-              >
-                <div class="content">
-                  <h3 class="is-size-6">
-                    {{ v.name | capitalize | underscoreToSpace }}
-                  </h3>
-                  <h4 class="is-size-7 has-text-grey">
-                    {{ v.namespace }}
-                  </h4>
-                </div>
-                <div class="buttons">
-                  <router-link
-                    v-for="design in v['designs']"
-                    :key="design"
-                    class="button is-small is-interactive-primary is-outlined"
-                    :to="urlForModelDesign(model, design)"
-                    @click.native="prepareAnalyzeLoader(v.name, design)"
-                    >{{ design | capitalize | underscoreToSpace }}</router-link
-                  >
-                </div>
-              </div>
+              <AnalyzeList :pipeline="relatedPipeline"></AnalyzeList>
             </div>
           </Dropdown>
         </div>

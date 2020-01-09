@@ -74,6 +74,7 @@ module.exports = {
         '/docs/architecture',
         '/docs/contributing',
         '/docs/getting-help',
+        '/docs/responsible-disclosure',
         '/docs/roadmap'
       ],
       '/handbook/engineering/meltanodata-guide': [
@@ -92,6 +93,7 @@ module.exports = {
         '/docs/architecture',
         '/docs/contributing',
         '/docs/getting-help',
+        '/docs/responsible-disclosure',
         '/docs/roadmap'
       ],
       '/tutorials': [
@@ -106,6 +108,7 @@ module.exports = {
         '/docs/architecture',
         '/docs/contributing',
         '/docs/getting-help',
+        '/docs/responsible-disclosure',
         '/docs/roadmap'
       ]
     },
