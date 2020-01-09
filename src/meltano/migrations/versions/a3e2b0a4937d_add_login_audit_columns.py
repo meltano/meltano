@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade():
     op.add_column("user", sa.Column("last_login_at", sa.DateTime(), nullable=True))
-    op.add_column("user", sa.Column("login_count", sa.DateTime(), default=0))
+    op.add_column("user", sa.Column("login_count", sa.Integer, default=0))
 
 
 def downgrade():
