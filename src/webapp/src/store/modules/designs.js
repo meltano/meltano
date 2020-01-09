@@ -16,7 +16,6 @@ const defaultState = utils.deepFreeze({
   currentModel: '',
   currentNamespace: '',
   currentSQL: '',
-  currentPipeline: null,
   design: {
     relatedTable: {}
   },
@@ -154,8 +153,8 @@ const getters = {
     return utils.titleCase(state.currentModel)
   },
 
-  currentPipelineName(state) {
-    return state.currentPipeline && state.currentPipeline.name
+  currentModelID(state) {
+    return lodash.join([state.currentNamespace, state.currentModel], '/')
   },
 
   filtersCount(state) {
@@ -304,15 +303,33 @@ const getters = {
   isColumnSelectedAggregate: state => columnName =>
     columnName in state.resultAggregates,
 
-  isLoaderSqlite: (_, getters) =>
-    getters.pipeline && getters.pipeline.loader === 'target-sqlite',
+  isLoaderSqlite(state, getters, rootState) {
+    // infer the proper pipeline for this report
+    // this is pretty finicky, but the inference chain is the following:
+    // report.namespace → model.name → model.namespace → extractor.namespace → extractor.name → pipeline.extractor
+    const model = rootState.repos.models[getters.currentModelID]
+    if (!model) {
+      return false
+    }
+
+    const extractor = rootState.plugins.plugins.extractors.find(
+      e => e.namespace == model.plugin_namespace
+    )
+    if (!extractor) {
+      return false
+    }
+
+    const pipeline = rootState.orchestration.pipelines.find(
+      p => p.extractor == extractor.name
+    )
+    if (!pipeline) {
+      return false
+    }
+
+    return pipeline.loader === 'target-sqlite'
+  },
 
   joinIsExpanded: () => join => join.expanded,
-
-  pipeline: (state, _, rootState) =>
-    rootState.orchestration.pipelines.find(
-      p => p.name == state.currentPipeline
-    ),
 
   resultsCount(state) {
     if (!state.results) {
@@ -467,12 +484,12 @@ const actions = {
       { run },
       payload || helpers.getQueryPayloadFromDesign(state)
     )
+
     sqlApi
       .getSql(
         state.currentNamespace,
         state.currentModel,
         state.currentDesign,
-        state.currentPipeline,
         postData
       )
       .then(response => {
@@ -496,22 +513,8 @@ const actions = {
       })
   },
 
-  async loadReport({ state, commit, rootState }, report) {
-    // TODO: can we not have this call?
-    await this.dispatch('plugins/getInstalledPlugins')
+  loadReport({ state, commit }, report) {
     commit('setCurrentReport', report)
-
-    // infer the proper pipeline for this report
-    // this is pretty finicky, but the inference chain is the following:
-    // report.namespace → model.name → model.namespace → extractor.namespace → extractor.name → pipeline.extractor
-    const { models, extractors } = rootState.plugins.plugins
-
-    const model = models.find(m => m.name == report.namespace)
-    const extractor = extractors.find(e => e.namespace == model.namespace)
-    const pipeline = rootState.orchestration.pipelines.find(
-      p => p.extractor == extractor.name
-    )
-    commit('setCurrentPipeline', pipeline.name)
 
     this.dispatch('designs/getSQL', {
       run: true,
@@ -763,10 +766,6 @@ const mutations = {
     state.currentDesign = design
   },
 
-  setCurrentPipeline(state, pipeline) {
-    state.currentPipeline = pipeline
-  },
-
   setCurrentReport(state, report) {
     state.activeReport = report
 
@@ -774,7 +773,6 @@ const mutations = {
     state.filters = report.filters
     state.order = report.order
     state.limit = report.queryPayload.limit
-    // state.currentPipeline = report.queryPayload.pipeline
   },
 
   setDesign(state, designData) {

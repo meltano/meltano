@@ -35,7 +35,6 @@ export default {
       'currentDesign',
       'currentModel',
       'currentSQL',
-      'currentPipeline',
       'design',
       'filterOptions',
       'hasSQLError',
@@ -63,8 +62,6 @@ export default {
       'showJoinColumnAggregateHeader'
     ]),
     ...mapState('dashboards', ['dashboards']),
-    ...mapState('orchestration', ['pipelines']),
-
     canToggleTimeframe() {
       return !this.isLoaderSqlite
     },
@@ -84,26 +81,6 @@ export default {
       set(value) {
         this.$store.dispatch('designs/limitSet', value)
         this.$store.dispatch('designs/getSQL', { run: false })
-      }
-    },
-
-    pipeline: {
-      get() {
-        return this.currentPipeline
-      },
-      set(value) {
-        this.$store.commit('designs/setCurrentPipeline', value)
-
-        this.$store.dispatch('designs/associateReport', value)
-
-        // set the default pipeline for unknown designs
-        localStorage.setItem(utils.storageKey('pipeline'), value)
-
-        // set the connection for this specific design
-        localStorage.setItem(
-          utils.storageKey('pipeline', this.currentModel, this.currentDesign),
-          value
-        )
       }
     }
   },
@@ -165,22 +142,11 @@ export default {
         design,
         slug
       })
-      const uponPipelines = this.$store.dispatch(
-        'orchestration/getAllPipelineSchedules'
-      )
 
-      Promise.all([uponDesign, uponPipelines]).then(() => {
-        const defaultPipeline =
-          localStorage.getItem(
-            utils.storageKey('pipeline', this.currentDesign, this.currentModel)
-          ) ||
-          localStorage.getItem(utils.storageKey('pipeline')) ||
-          this.pipelines[0].name
-
+      uponDesign.then(() => {
         // don't use the setter here not to update the user's preferences
         // preselect if not loading a report
         if (!slug && this.isAutoRunQuery) {
-          this.$store.commit('designs/setCurrentPipeline', defaultPipeline)
           this.preselectAttributes()
         }
 
@@ -470,16 +436,6 @@ export default {
               </div>
             </Dropdown>
           </p>
-
-          <div v-if="isInitialized" class="control">
-            <div class="select">
-              <select v-model="pipeline" name="pipeline">
-                <option v-for="p in pipelines" :key="p.name">{{
-                  p.name
-                }}</option>
-              </select>
-            </div>
-          </div>
         </div>
       </div>
     </div>

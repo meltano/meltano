@@ -14,7 +14,7 @@ export default {
 
   getActiveDashboardReportsWithQueryResults(activeReports) {
     return axios.post(
-      utils.apiUrl('dashboards/dashboard', 'reports'),
+      utils.apiUrl('dashboards/dashboard', `reports`),
       activeReports
     )
   },

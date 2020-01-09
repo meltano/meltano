@@ -47,8 +47,8 @@ class DashboardsHelper:
         for report in reports:
             m5oc = sqlHelper.get_m5oc_topic(report["namespace"], report["model"])
             design = m5oc.design(report["design"])
-            schedule = find_named(
-                schedule_service.schedules(), report["query_payload"]["pipeline"]
+            schedule = schedule_service.find_namespace_schedule(
+                m5oc.content["plugin_namespace"]
             )
 
             sql_dict = sqlHelper.get_sql(design, report["query_payload"])

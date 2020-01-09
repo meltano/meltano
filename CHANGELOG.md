@@ -24,6 +24,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1480](https://gitlab.com/meltano/meltano/issues/1480) Fix database revocations corner case for roles in the `meltano permissions` command
 - [#1553](https://gitlab.com/meltano/meltano/issues/1553) Fix bug occurring when loading a report that lacks join tables
 - [#1540](https://gitlab.com/meltano/meltano/issues/1540) Meltano Analyze will now leverage Pipelines instead of Loaders in the connection dropdown
+- [#1540](https://gitlab.com/meltano/meltano/issues/1540) Meltano Analyze will now infer the connection to use instead of it being provided by the user
 
 ### Breaks
 

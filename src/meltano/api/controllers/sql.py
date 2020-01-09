@@ -78,10 +78,8 @@ def index():
     return jsonify({"result": True})
 
 
-@sqlBP.route(
-    "/get/<path:namespace>/<topic_name>/<design_name>/<pipeline_name>", methods=["POST"]
-)
-def get_sql(namespace, topic_name, design_name, pipeline_name):
+@sqlBP.route("/get/<path:namespace>/<topic_name>/<design_name>", methods=["POST"])
+def get_sql(namespace, topic_name, design_name):
     sqlHelper = SqlHelper()
     m5oc = sqlHelper.get_m5oc_topic(namespace, topic_name)
     design = m5oc.design(design_name)
@@ -99,9 +97,14 @@ def get_sql(namespace, topic_name, design_name, pipeline_name):
     if not incoming_json["run"]:
         return jsonify(base_dict)
 
+    # we need to find the pipeline that loaded the data for this model
+    # this is running off the assumption that there is only one pipeline
+    # that can load data for a specific model
     project = Project.find()
     schedule_service = ScheduleService(project)
-    schedule = find_named(schedule_service.schedules(), pipeline_name)
+    schedule = schedule_service.find_namespace_schedule(
+        m5oc.content["plugin_namespace"]
+    )
 
     results = sqlHelper.get_query_results(schedule.loader, outgoing_sql)
     base_dict["results"] = results
