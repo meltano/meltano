@@ -1,8 +1,6 @@
 from pathlib import Path
 import meltano.core.sqlalchemy as types
 
-# the `scripts/alembic_freeze.py` refers to these paths
-# we need to make sure they match
 MIGRATION_DIR = Path(__path__[0])
 LOCK_PATH = MIGRATION_DIR.joinpath("db.lock")
 
@@ -12,7 +10,6 @@ LOCK_PATH = MIGRATION_DIR.joinpath("db.lock")
 # of these types change in `meltano.core`, we would then
 # create a version for this type for all migrations that
 # would follow.
-
 GUID = types.GUID
 JSONEncodedDict = types.JSONEncodedDict
 IntFlag = types.IntFlag

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import sys
 from pathlib import Path
 from alembic.script import ScriptDirectory
 from meltano.migrations import MIGRATION_DIR, LOCK_PATH
