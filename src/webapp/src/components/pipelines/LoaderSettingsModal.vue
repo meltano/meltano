@@ -134,7 +134,7 @@ export default {
 <template>
   <div class="modal is-active" @keyup.esc="close">
     <div class="modal-background" @click="close"></div>
-    <div class="modal-card is-wide">
+    <div class="modal-card is-narrow">
       <header class="modal-card-head">
         <div class="modal-card-head-image image is-64x64 level-item">
           <ConnectorLogo :connector="loaderName" />

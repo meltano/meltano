@@ -257,6 +257,7 @@ export default {
             :plugin="extractor"
             :required-settings-keys="requiredSettingsKeys"
             :upload-form-data="uploadFormData"
+            :is-show-docs="true"
             @onChangeUploadFormData="onChangeUploadFormData"
           />
         </template>

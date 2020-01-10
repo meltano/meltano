@@ -19,6 +19,10 @@ export default {
       type: String,
       default: ''
     },
+    isShowDocs: {
+      type: Boolean,
+      default: false
+    },
     plugin: {
       type: Object,
       required: true
@@ -31,11 +35,6 @@ export default {
       type: FormData,
       required: false,
       default: () => null
-    }
-  },
-  data() {
-    return {
-      isShowDocs: false
     }
   },
   computed: {
@@ -216,10 +215,6 @@ export default {
         this.onFocusInput(el)
       }
     },
-    onRevealInlineDocs() {
-      this.isShowDocs = true
-      this.focusInputIntelligently()
-    },
     refocusInput(newVal, oldVal) {
       if (newVal !== oldVal) {
         this.focusInputIntelligently()
@@ -259,8 +254,23 @@ export default {
   <div>
     <slot name="top" />
 
-    <div class="columns is-vcentered">
-      <div class="column" :class="isShowDocs ? 'is-two-fifths' : 'is-half'">
+    <div class="columns">
+      <div class="column" :class="{ 'is-two-fifths': isShowDocs }">
+        <div class="content ">
+          <h3 class="is-title">Inputs</h3>
+        </div>
+      </div>
+      <div
+        v-if="isShowDocs"
+        class="column"
+        :class="{ 'is-three-fifths': isShowDocs }"
+      >
+        <div class="content"><h3 class="is-title">Notes</h3></div>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="column" :class="{ 'is-two-fifths': isShowDocs }">
         <form>
           <div
             v-for="setting in configSettings.settings"
@@ -465,8 +475,12 @@ export default {
           </div>
         </form>
       </div>
-      <div class="column" :class="isShowDocs ? 'is-three-fifths' : 'is-half'">
-        <div class="docs-container" :class="{ 'is-show-docs': isShowDocs }">
+      <div
+        v-if="isShowDocs"
+        class="column"
+        :class="{ 'is-three-fifths': isShowDocs }"
+      >
+        <div class="docs-container">
           <!-- <iframe ref="docs" class="column" :src="`${plugin.docs}?embed=true`" /> -->
           <iframe
             ref="docs"
@@ -479,25 +493,6 @@ export default {
             "
             @load="focusInputIntelligently"
           />
-          <div
-            v-if="!isShowDocs"
-            class="is-fill-space is-flex is-hcentered is-vcentered"
-          >
-            <div class="docs-overlay is-fill-space"></div>
-            <div class="docs-overlay-content content has-text-centered">
-              <p class="is-italic">
-                Some configurations are easier to setup than others.
-              </p>
-              <p class="is-italic">
-                We provide guidence in these cases.
-              </p>
-              <a
-                class="button is-small is-interactive-secondary is-outlined"
-                @click="onRevealInlineDocs"
-                >Show Me</a
-              >
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -523,29 +518,14 @@ export default {
 }
 
 .docs-container {
-  position: relative;
   display: flex;
   flex-direction: column;
+  min-height: 50vh;
   height: 100%;
-
-  &.is-show-docs {
-    min-height: 50vh;
-  }
 
   iframe.docs {
     flex: 1;
-    padding: 0;
-    border: 1px solid #dbdbdb;
-  }
-
-  .docs-overlay {
-    z-index: 1;
-    background-color: $white;
-  }
-
-  .docs-overlay-content {
-    z-index: 2;
-    padding: 3rem;
+    border: 1px solid $grey-lightest;
   }
 }
 

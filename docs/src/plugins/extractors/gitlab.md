@@ -35,6 +35,14 @@ In order to access your GitLab data, you will need:
 - _Groups_ and _Projects_ you want to extract from
 - _Start Date_ you want the extracted data set to start from
 
+<h3 id="api-url">GitLab Instance</h3>
+
+:::tip Configuration Notes
+
+- `https://gitlab.com` is the default, but if you have a self-hosted GitLab instance [please reach out to us](mailto:hello@meltano.com)
+
+:::
+
 <h3 id="private-token">Access Token</h3>
 
 :::tip Configuration Notes
