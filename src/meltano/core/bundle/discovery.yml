@@ -235,6 +235,7 @@ extractors:
     settings:
       - name: account_id
         label: Account ID
+        env: STRIPE_ACCOUNT_ID
       - name: client_secret
         kind: password
         env: STRIPE_API_KEY
