@@ -49,6 +49,15 @@ export default {
         return fullPath && utils.extractFileNameFromPath(fullPath)
       }
     },
+    getInlineDocsUrl() {
+      return plugin => {
+        const meltanoUrl = 'https://meltano.com/'
+        const path = window.FLASK
+          ? meltanoUrl
+          : plugin.docs.replace(meltanoUrl, 'http://localhost:8081/')
+        return `${path}?embed=true`
+      }
+    },
     getLabel() {
       return setting =>
         setting.label || utils.titleCase(utils.underscoreToSpace(setting.name))
@@ -257,16 +266,7 @@ export default {
     <div class="columns">
       <div class="column" :class="{ 'is-two-fifths': isShowDocs }">
         <div class="content ">
-          <div class="columns">
-            <div class="column">
-              <h3 class="is-title">Configuration</h3>
-            </div>
-            <div class="column">
-              <span class="is-pulled-right"
-                >Required Inputs<strong>*</strong></span
-              >
-            </div>
-          </div>
+          <h3 class="is-title">Configuration</h3>
         </div>
       </div>
       <div
@@ -469,6 +469,9 @@ export default {
               </div>
             </div>
           </div>
+          <span class="is-italic is-pulled-right"
+            >Required Inputs<strong>*</strong></span
+          >
         </form>
       </div>
       <div
@@ -477,16 +480,10 @@ export default {
         :class="{ 'is-three-fifths': isShowDocs }"
       >
         <div class="docs-container">
-          <!-- <iframe ref="docs" class="column" :src="`${plugin.docs}?embed=true`" /> -->
           <iframe
             ref="docs"
             class="docs"
-            :src="
-              `${plugin.docs.replace(
-                'https://meltano.com/',
-                'http://localhost:8081/'
-              )}?embed=true`
-            "
+            :src="getInlineDocsUrl(plugin)"
             @load="focusInputIntelligently"
           />
         </div>
