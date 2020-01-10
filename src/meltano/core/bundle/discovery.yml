@@ -236,9 +236,11 @@ extractors:
       - name: account_id
         label: Account ID
         env: STRIPE_ACCOUNT_ID
+        placeholder: act_1a2b3c4d5e
       - name: client_secret
         kind: password
         env: STRIPE_API_KEY
+        placeholder: sk_live_1a2b3c4d5e
       - name: start_date
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
