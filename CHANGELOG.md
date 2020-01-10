@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1483](https://gitlab.com/meltano/meltano/issues/1483) Add login audit columns to track last login time
 - [#1480](https://gitlab.com/meltano/meltano/issues/1480) Add tests to `meltano permissions` command for Snowflake
+- [#1392](https://gitlab.com/meltano/meltano/issues/1392) Add inline docs to Extractor configurations in iteration toward improving data setup onboarding
 
 ### Changes
 
