@@ -8,12 +8,52 @@ description: Use Meltano to extract raw data from Stripe and insert it into Post
 
 `tap-stripe` is an extractor that pulls data from Stripe's API and produces JSON-formatted data following the [Singer spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
 
-## Info
+## Getting Started
 
-- **Data Source**: [Stripe's API](https://stripe.com/docs/api)
-- **Repository**: [https://github.com/meltano/tap-stripe](https://github.com/meltano/tap-stripe)
+In order to use `tap-stripe`, you need to two key pieces of information that will allow the Meltano application to fetch data.
 
-## Install
+1. Your account ID (e.g., `acct_152Bdedkol54`)
+1. A secret API key
+
+### Account ID
+
+To get your account ID:
+
+1. Visit your profile: [https://dashboard.stripe.com/settings/user](https://dashboard.stripe.com/settings/user)
+
+    - Or in the upper right, click on the avatar to access a dropdown, and click on `Profile`
+
+![Screenshot of what the avatar dropdown with Profile looks like](/images/tap-stripe/01-stripe-docs.png)
+
+2. Once the page loads, scroll to the bottom to find your account ID in the section labelled `Accounts`
+
+![](/images/tap-stripe/02-stripe-docs.png)
+
+3. Copy and paste it somewhere you can refer later on when configuring the tap.
+
+### Secret Key
+
+1. Visit your Developer API Keys page: [https://dashboard.stripe.com/apikeys](https://dashboard.stripe.com/apikeys)
+
+    - You can find this by clicking on the `Developers` link on the left navigation and clicking on `API Keys`
+
+![Screeenshot of where the Developers link is on the left side](/images/tap-stripe/03-stripe-docs.png)
+
+2. Under the `Standard keys` section, click on the button to `Create secret key`
+
+![Screenshot of where Create secret key button is](/images/tap-stripe/04-stripe-docs.png)
+
+3. To make things easy to track, assign the secret key a name of `Meltano` so you know why you created the key
+
+![Screenshot of naming secret key](/images/tap-stripe/05-stripe-docs.png)
+
+4. Once you click on `Create`, you should be greeted with you new API key which you'll copy and paste into the tap configuration.
+
+![Screenshot of the new API key](/images/tap-stripe/06-stripe-docs.png)
+
+### Install
+
+#### Command Line Interface
 
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
@@ -24,13 +64,21 @@ meltano add extractor tap-stripe
 
 If you are successful, you should see `Added and installed extractors 'tap-stripe'` in your terminal.
 
-## Configuration
+### Configuration
 
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
 
 ```bash
+# Can be found in your Profile
+export STRIPE_ACCOUNT_ID="yourAccountId"
+# Create a new secret key for Meltano
 export STRIPE_API_KEY="yourStripeApiKey"
 # The date uses ISO-8601 and supports time if desired
 export TAP_STRIPE_START_DATE="YYYY-MM-DD"
 ```
+
+## Additional Information
+
+- **Data Source**: [Stripe's API](https://stripe.com/docs/api)
+- **Repository**: [https://github.com/meltano/tap-stripe](https://github.com/meltano/tap-stripe)
