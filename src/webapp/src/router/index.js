@@ -12,7 +12,6 @@ import PipelineSchedules from '@/components/pipelines/PipelineSchedules'
 import Analyze from '@/views/Analyze'
 import Dashboards from '@/views/Dashboards'
 import Dashboard from '@/views/Dashboard'
-import Model from '@/views/Model'
 import NotFound from '@/views/NotFound'
 import Pipelines from '@/views/Pipelines'
 
@@ -119,14 +118,6 @@ const router = new Router({
           }
         }
       ]
-    },
-    {
-      path: '/model/',
-      name: 'model',
-      component: Model,
-      meta: {
-        title: 'Meltano: Model'
-      }
     },
     {
       path: '/analyze/',
