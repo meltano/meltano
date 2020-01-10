@@ -10,16 +10,21 @@ description: Use Meltano to extract raw data from Stripe and insert it into Post
 
 <YouTubeEmbed src="https://www.youtube.com/embed/Qp-EgNP6Pjw" />
 
-## Getting Started
+## Stripe Setup
 
-### Prerequisites
+In order to access your Stripe data, you will need:
 
-In order to use `tap-stripe`, you need to two key pieces of information that will allow the Meltano application to fetch data.
+- Account ID
+- Client Secret
+- Start Date
 
-1. Your account ID (e.g., `acct_152Bdedkol54`)
-1. A secret API key (e.g., `sk_live_eis72wonf921pqjdf`)
+### Account ID
 
-#### Account ID
+:::tip Configuration Notes
+
+- The account ID (e.g., `acct_152Bdedkol54`) used to sign in to your Stripe account
+
+:::
 
 To get your account ID:
 
@@ -35,7 +40,15 @@ To get your account ID:
 
 3. Copy and paste it somewhere you can refer later on when configuring the tap.
 
-#### Secret Key
+### Client Secret
+
+:::tip Configuration Notes
+
+- The client secret (e.g., `sk_live_eis72wonf921pqjdf`) is accessible in your Stripe account when signed in
+
+:::
+
+To get your client secret:
 
 1. Visit your Developer API Keys page: [https://dashboard.stripe.com/apikeys](https://dashboard.stripe.com/apikeys)
 
@@ -55,7 +68,15 @@ To get your account ID:
 
 ![Screenshot of the new API key](/images/tap-stripe/06-stripe-docs.png)
 
-### Install
+### Start Date
+
+:::tip Configuration Notes
+
+- Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+
+:::
+
+This property allows you to configure where you want your data set to start from. Otherwise, if left blank, it will try to fetch the entire history of the groups or projects specified.
 
 #### Web Application
 
@@ -68,7 +89,7 @@ To get your account ID:
 1. Click `Test Connection` to make sure that everything works correctly
 1. Click `Save` to finish installation!
 
-#### Command Line Interface
+## Advanced: Command Line Installation
 
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:

@@ -10,21 +10,32 @@ description: Use Meltano to extract raw data from Zendesk and insert it into Pos
 
 <YouTubeEmbed src="https://www.youtube.com/embed/bUnY-7Azhcc" />
 
-## Getting Started
+## Zendesk Setup
 
-### Prerequisites
+In order to access your Zendesk data, you will need:
 
-In order to use `tap-zendesk`, you need to three key pieces of information that will allow the Meltano application to fetch data.
+- Email
+- API Token
+- Zendesk Subdomain
+- Start Date
 
-1. Account email (e.g., `hello@meltano.com`)
-1. API key (e.g., `oz3M12Xdtlrkj38efLkOzHI9GhkJxrquuw`)
-1. Zendesk Subdomain (e.g., `meltano` from `meltano.zendesk.com`)
+### Email
 
-#### Account Email
+:::tip Configuration Notes
+
+- The Email (e.g., `hello@meltano.com`) used to sign in to your Zendesk account
+
+:::
 
 This is the email you use to login to your Zendesk dashboard.
 
-#### API Key
+### API Token
+
+:::tip Configuration Notes
+
+- The API Token (e.g., `oz3M12Xdtlrkj38efLkOzHI9GhkJxrquuw`) accessible via your Zendesk account when signed in
+
+:::
 
 1. Login to your Zendesk dashboard.
 
@@ -46,7 +57,21 @@ This is the email you use to login to your Zendesk dashboard.
 
 7. Click `Save` button to complete API key creation
 
-#### Zendesk Subdomain
+<h3 id="subdomain">Zendesk Subdomain</h3>
+
+:::tip Configuration Notes
+
+- The subdomain you access when using Zendesk
+
+:::
+
+### Zendesk Subdomain
+
+:::tip Configuration Notes
+
+- If the URL is `meltano.zendesk.com`, then the subdomain is `meltano`.
+
+:::
 
 When visiting your Zendesk instance, the URL is structured as follows:
 
@@ -58,9 +83,17 @@ You'll need this subdomain when configuring the extractor.
 
 For example, if the URL is `meltano.zendesk.com`, then the subdomain is `meltano`.
 
-### Install
+### Start Date
 
-#### Web Application
+:::tip Configuration Notes
+
+- Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+
+:::
+
+This property allows you to configure where you want your data set to start from. Otherwise, if left blank, it will try to fetch the entire history of the groups or projects specified.
+
+## Web Application
 
 1. On `Pipeline: Extract` page, find the `Zendesk` card and click on `Install`
 1. When it is complete, you should see the following modal
@@ -71,7 +104,7 @@ For example, if the URL is `meltano.zendesk.com`, then the subdomain is `meltano
 1. Click `Test Connection` to make sure that everything works correctly
 1. Click `Save` to finish installation!
 
-#### Command Line Interface
+## Advanced: Command Line Installation
 
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:

@@ -1,7 +1,7 @@
 ---
 sidebar: auto
 metaTitle: Extract Data from Salesforce
-description: Use Meltano to extract raw data from Salesforce and insert it into Postgres, Snowflake, and more. 
+description: Use Meltano to extract raw data from Salesforce and insert it into Postgres, Snowflake, and more.
 ---
 
 # Salesforce
@@ -18,7 +18,36 @@ For more information you can check [the documentation for tap-salesforce](https:
 
 ## Salesforce Setup
 
-In order for the Salesforce extractor to be able to access your Salesforce data, you will need to provide your username, password and the Salesforce Security Token for your account. 
+In order to access your Stripe data, you will need:
+
+- User Name
+- Password
+- Security Token
+- Start Date
+
+<h3 id="username">User Name</h3>
+
+:::tip Configuration Notes
+
+- The user name used to sign in to your Salesforce account
+
+:::
+
+### Password
+
+:::tip Configuration Notes
+
+- The password used to sign in to your Salesforce account
+
+:::
+
+### Security Token
+
+:::tip Configuration Notes
+
+- Access to Salesforce's API requires a security token that will authenticate you with the server
+
+:::
 
 If you don't already have a Salesforce Security Token for your account, you can generate one through the following steps:
 
@@ -28,12 +57,11 @@ If you don't already have a Salesforce Security Token for your account, you can 
 
 1. Click `Reset My Security Token` (Under the `My Personal Information` section)
 
-1. Click `Reset Security Token` 
+1. Click `Reset Security Token`
 
 An email with the Security Token will be sent to your email.
 
 ![Screenshot of Salesforce Security Token Reset](/images/salesforce/01-salesforce-reset-security-token.png)
-
 
 ::: tip
 
@@ -59,11 +87,21 @@ If you have other third-party applications integrated with Salesforce and you re
 
 :::
 
+### Start Date
+
+:::tip Configuration Notes
+
+- Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+
+:::
+
+This property allows you to configure where you want your data set to start from. Otherwise, if left blank, it will try to fetch the entire history of the groups or projects specified.
+
 ## Meltano Setup
 
 ### Prerequisites
 
-* [Running instance of Meltano](/docs/getting-started.html)
+- [Running instance of Meltano](/docs/getting-started.html)
 
 ### Configure the Extractor
 
@@ -71,7 +109,7 @@ Open your Meltano instance and click "Pipelines" in the top navigation bar. You 
 
 ![Screenshot of Meltano UI with all extractors not installed and Salesforce Extractor highlighted](/images/salesforce-tutorial/01-salesforce-extractor-selection.png)
 
-Let's install `tap-salesforce` by clicking on the `Install` button inside its card. 
+Let's install `tap-salesforce` by clicking on the `Install` button inside its card.
 
 On the configuration modal we want to enter your username and password, the Security Token Salesforce extractor will use to connect to Salesforce, and the Start Date we want the extracted data set to start from.
 
@@ -79,7 +117,7 @@ On the configuration modal we want to enter your username and password, the Secu
 
 ::: tip
 
-**Ready to do more with data from Salesforce?** 
+**Ready to do more with data from Salesforce?**
 
 Check out our [Salesforce API + Postgres tutorial](/tutorials/salesforce-and-postgres.html) to learn how you can create an analytics database from within Meltano, and start analyzing your Salesforce data.
 

@@ -36,7 +36,7 @@ In order to access your Fastly data, you will need:
 - **Data Source**: [Fastly](https://www.fastly.com/)
 - **Repository**: [https://gitlab.com/meltano/tap-fastly](https://gitlab.com/meltano/tap-fastly)
 
-## Install
+## Advanced: Command Line Installation
 
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
