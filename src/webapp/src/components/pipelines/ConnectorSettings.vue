@@ -257,7 +257,16 @@ export default {
     <div class="columns">
       <div class="column" :class="{ 'is-two-fifths': isShowDocs }">
         <div class="content ">
-          <h3 class="is-title">Configuration</h3>
+          <div class="columns">
+            <div class="column">
+              <h3 class="is-title">Configuration</h3>
+            </div>
+            <div class="column">
+              <span class="is-pulled-right"
+                >Required Inputs<strong>*</strong></span
+              >
+            </div>
+          </div>
         </div>
       </div>
       <div
@@ -300,14 +309,16 @@ export default {
             >
               <label
                 class="label"
-                :class="
-                  isShowDocs ? ' has-text-underlined has-cursor-pointer' : ''
-                "
+                :class="isShowDocs ? 'has-cursor-pointer' : ''"
                 :for="getFormFieldForId(setting)"
               >
                 <span>
-                  <span>{{ getLabel(setting) }}</span>
-                  <span>{{ getRequiredLabel(setting) }}</span>
+                  <span class="has-text-underlined">{{
+                    getLabel(setting)
+                  }}</span>
+                  <span>
+                    <strong>{{ getRequiredLabel(setting) }}</strong></span
+                  >
                 </span>
               </label>
             </div>
