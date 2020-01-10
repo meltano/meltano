@@ -299,7 +299,7 @@ export default {
               <div class="buttons">
                 <a
                   v-if="!updateAvailable && version"
-                  class="button is-small is-text has-background-transparent  tooltip is-tooltip-left"
+                  class="button is-small is-text has-background-transparent tooltip is-tooltip-left"
                   data-tooltip="View this version's additions, changes, & fixes"
                   href="https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md"
                   target="_blank"
