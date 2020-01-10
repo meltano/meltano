@@ -50,13 +50,13 @@ export default {
       }
     },
     getInlineDocsUrl() {
-      return plugin => {
-        const meltanoUrl = 'https://meltano.com/'
-        const path = window.FLASK
-          ? meltanoUrl
-          : plugin.docs.replace(meltanoUrl, 'http://localhost:8081/')
-        return `${path}?embed=true`
-      }
+      const path = window.FLASK
+        ? this.plugin.docs
+        : this.plugin.docs.replace(
+            'https://meltano.com/',
+            'http://localhost:8081/'
+          )
+      return `${path}?embed=true`
     },
     getLabel() {
       return setting =>
@@ -483,7 +483,7 @@ export default {
           <iframe
             ref="docs"
             class="docs"
-            :src="getInlineDocsUrl(plugin)"
+            :src="getInlineDocsUrl"
             @load="focusInputIntelligently"
           />
         </div>
