@@ -17,33 +17,24 @@ export default {
   computed: {
     ...mapGetters('orchestration', ['getSuccessfulPipelines']),
     ...mapGetters('plugins', ['getInstalledPlugin', 'visibleExtractors']),
-    ...mapGetters('repos', ['urlForModelDesign']),
+    ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
     ...mapState('repos', ['models']),
     contextualModels() {
-      // Default to all unless pipeline is provided for contextual display
-      let models = this.models
+      const contextualModels = {}
 
-      // Contextual dropdown based on specific pipeline
-      if (this.pipeline) {
+      if (this.isDisplayContextualModels) {
         // Split based on '@' profiles convention
         const extractor = this.pipeline.extractor.split('@')[0]
         const namespace = this.getInstalledPlugin('extractors', extractor)
           .namespace
-        const filteredModels = {}
-        for (const prop in models) {
-          if (models[prop].plugin_namespace === namespace) {
-            filteredModels[prop] = models[prop]
+        for (const prop in this.models) {
+          if (this.models[prop].plugin_namespace === namespace) {
+            contextualModels[prop] = this.models[prop]
           }
         }
-
-        // Fallback to all if no match
-        models =
-          Object.keys(filteredModels).length === 0
-            ? this.models
-            : filteredModels
       }
 
-      return models
+      return contextualModels
     },
     getIsModelEnabled() {
       return model => {
@@ -61,11 +52,28 @@ export default {
           plugin => plugin.namespace === model.plugin_namespace
         )
       }
+    },
+    getTargetModels() {
+      return this.isDisplayContextualModels
+        ? this.contextualModels
+        : this.models
+    },
+    hasContextualModels() {
+      return Object.keys(this.contextualModels).length > 0
+    },
+    isDisplayContextualModels() {
+      return this.pipeline !== null
+    },
+    isShowNoModelsMessage() {
+      return (
+        !this.hasModels ||
+        (this.isDisplayContextualModels && !this.hasContextualModels)
+      )
     }
   },
   methods: {
     prepareAnalyzeLoader(model, design) {
-      if (this.pipeline) {
+      if (this.isDisplayContextualModels) {
         localStorage.setItem(
           utils.concatLoaderModelDesign(model, design),
           this.pipeline.loader
@@ -78,31 +86,53 @@ export default {
 
 <template>
   <div>
-    <div
-      v-for="(model, modelKey) in contextualModels"
-      :key="`${modelKey}-panel`"
-      class="box box-analyze-nav is-borderless is-shadowless is-marginless"
-    >
-      <div class="content">
-        <h3 class="is-size-6">
-          {{ model.name | capitalize | underscoreToSpace }}
-        </h3>
-        <h4 class="is-size-7 has-text-grey">
-          {{ model.namespace }}
-        </h4>
+    <template v-if="isShowNoModelsMessage">
+      <div class="box is-borderless is-shadowless is-marginless">
+        <div class="content">
+          <h3 class="is-size-6">
+            No Models Installed
+          </h3>
+          <p>
+            There are no models for this pipeline yet.
+          </p>
+          <p>
+            <a
+              href="https://www.meltano.com/docs/architecture.html#meltano-model"
+              target="_blank"
+              class="has-text-underlined"
+              >Learn More</a
+            >
+          </p>
+        </div>
       </div>
-      <div class="buttons">
-        <router-link
-          v-for="design in model['designs']"
-          :key="design"
-          class="button is-small is-interactive-primary is-outlined"
-          :disabled="!getIsModelEnabled(model)"
-          :to="urlForModelDesign(modelKey, design)"
-          @click.native="prepareAnalyzeLoader(model.name, design)"
-          >{{ design | capitalize | underscoreToSpace }}</router-link
-        >
+    </template>
+    <template v-else>
+      <div
+        v-for="(model, modelKey) in getTargetModels"
+        :key="`${modelKey}-panel`"
+        class="box box-analyze-nav is-borderless is-shadowless is-marginless"
+      >
+        <div class="content">
+          <h3 class="is-size-6">
+            {{ model.name | capitalize | underscoreToSpace }}
+          </h3>
+          <h4 class="is-size-7 has-text-grey">
+            {{ model.namespace }}
+          </h4>
+        </div>
+        <div class="buttons">
+          <router-link
+            v-for="design in model['designs']"
+            :key="design"
+            class="button is-small is-interactive-primary is-outlined"
+            :disabled="!getIsModelEnabled(model)"
+            :to="urlForModelDesign(modelKey, design)"
+            @click.native="prepareAnalyzeLoader(model.name, design)"
+            >{{ design | capitalize | underscoreToSpace }}</router-link
+          >
+        </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
