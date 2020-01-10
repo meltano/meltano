@@ -22,7 +22,7 @@ In order to access your Stripe data, you will need:
 
 :::tip Configuration Notes
 
-- The account ID (e.g., `acct_152Bdedkol54`) used to sign in to your Stripe account
+- The account ID (e.g., `acct_152Bdedkol54`) attained from your Stripe account profile
 
 :::
 
