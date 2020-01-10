@@ -22,7 +22,7 @@ export default {
     contextualModels() {
       const contextualModels = {}
 
-      if (this.pipeline) {
+      if (this.isDisplayContextualModels) {
         // Split based on '@' profiles convention
         const extractor = this.pipeline.extractor.split('@')[0]
         const namespace = this.getInstalledPlugin('extractors', extractor)
@@ -54,18 +54,23 @@ export default {
       }
     },
     getTargetModels() {
-      return this.pipeline ? this.contextualModels : this.models
+      return this.isDisplayContextualModels
+        ? this.contextualModels
+        : this.models
     },
     hasContextualModels() {
       return Object.keys(this.contextualModels).length > 0
     },
-    isShowLackingContextualModelsMessage() {
-      return this.hasModels && this.pipeline && !this.hasContextualModels
+    isDisplayContextualModels() {
+      return this.pipeline !== null
+    },
+    isShowNoModelsMessage() {
+      return !this.hasModels || !this.hasContextualModels
     }
   },
   methods: {
     prepareAnalyzeLoader(model, design) {
-      if (this.pipeline) {
+      if (this.isDisplayContextualModels) {
         localStorage.setItem(
           utils.concatLoaderModelDesign(model, design),
           this.pipeline.loader
@@ -78,7 +83,7 @@ export default {
 
 <template>
   <div>
-    <template v-if="isShowLackingContextualModelsMessage">
+    <template v-if="isShowNoModelsMessage">
       <div class="box is-borderless is-shadowless is-marginless">
         <div class="content">
           <h3 class="is-size-6">
