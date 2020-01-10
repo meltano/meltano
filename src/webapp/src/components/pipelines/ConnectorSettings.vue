@@ -454,35 +454,6 @@ export default {
                       </span>
                     </a>
                   </div>
-
-                  <p
-                    v-if="setting.description || setting.documentation"
-                    class="help"
-                  >
-                    <a
-                      v-if="setting.documentation"
-                      target="_blank"
-                      :href="setting.documentation"
-                      class="tooltip"
-                      :data-tooltip="
-                        `Learn more about the ${getLabel(setting)} setting.`
-                      "
-                    >
-                      <span
-                        v-if="!setting.description"
-                        class="has-text-underlined"
-                        >Learn More.</span
-                      >
-                      <span class="icon has-text-link">
-                        <font-awesome-icon
-                          icon="external-link-square-alt"
-                        ></font-awesome-icon>
-                      </span>
-                    </a>
-                    <span v-if="setting.description" class="is-italic"
-                      >{{ setting.description }}.
-                    </span>
-                  </p>
                 </template>
               </div>
             </div>
