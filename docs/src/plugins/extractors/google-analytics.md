@@ -10,35 +10,32 @@ The Google Analytics extractor pulls raw data from the [Google Analytics Reporti
 
 ## Google Analytics Setup
 
-<br />
+In order to access your Google Analytics data, you will need:
+
+- Key File Location
+- View ID
+- Reports
+- Start Date
+- End Date
+
 <div class="embed-responsive embed-responsive-16by9">
   <iframe
   width="560" height="315" src="https://www.youtube.com/embed/FON9ywXOcwM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </div>
 
-In order to access your Google Analytics data, you will need:
+### Key File Location
 
-1. The ID for the Google Analytics View you want to fetch data from.
+:::tip Configuration Notes
 
-   You can easily find it by using [Google Analytics Account Explorer](https://ga-dev-tools.appspot.com/account-explorer/).
+- Follow the steps below if you don't already have a valid `client_secrets.json` to upload
+- The process below can take over 10 minutes, but it's a one-time setup that's well worth it
+  :::
 
-   ![Screenshot of Google Analytics Account Explorer](/images/tap-google-analytics/01-ga-account-explorer.png)
+This extractor supports service account based authorization, where an administrator manually creates a service account with the appropriate permissions to view the account, property, and view you wish to fetch data from.
 
-2. Authorization to access your Google Analytics account.
+To access your Google Analytics Account, it needs the Analytics Reporting API _and_ the Analytics API enabled. These need to be enabled for a project inside the same organization as your Google Analytics account.
 
-   This extractor supports service account based authorization, where an administrator manually creates a service account with the appropriate permissions to view the account, property, and view you wish to fetch data from.
-
-   To access your Google Analytics Account, it needs the Analytics Reporting API _and_ the Analytics API enabled. These need to be enabled for a project inside the same organization as your Google Analytics account (check the next section for more details).
-
-3. A way to authenticate when accessing the Analytics APIs
-
-   When you create a service account Google gives you a json file with that service account's credentials called the `client_secrets.json`, and that's all you need to pass to this tap.
-
-### Creating Service Account Credentials
-
-::: tip
-If you have a valid `client_secrets.json` for a service account, you can skip this section.
-:::
+#### Creating Service Account Credentials
 
 As a first step, you need to create or use an existing project in the Google Developers Console:
 
@@ -56,7 +53,11 @@ As a first step, you need to create or use an existing project in the Google Dev
 
 Your new public/private key pair is generated and downloaded to your machine; it serves as the only copy of this key. You are responsible for storing it securely.
 
-### Linking Credentials to Google Analytics
+A way to authenticate when accessing the Analytics APIs
+
+When you create a service account Google gives you a json file with that service account's credentials called the `client_secrets.json`, and that's all you need to pass to this tap.
+
+#### Linking Credentials to Google Analytics
 
 The newly created service account will have an email address that looks similar to:
 
@@ -68,7 +69,7 @@ Use this email address to [add a user](https://support.google.com/analytics/answ
 
 ![Screenshot of Google Analytics Add User](/images/tap-google-analytics/03-ga-add-user.png)
 
-### Enabling the APIs
+#### Enabling the APIs
 
 1. Visit the [Google Analytics Reporting API](https://console.developers.google.com/apis/api/analyticsreporting.googleapis.com/overview) dashboard and make sure that the project you used in the previous step is selected.
 
@@ -79,6 +80,46 @@ Use this email address to [add a user](https://support.google.com/analytics/answ
 2. Visit the [Google Analytics API](https://console.developers.google.com/apis/api/analytics.googleapis.com/overview) dashboard, make sure that the project you used in the previous step is selected, and enable the API for your account.
 
    ![Screenshot of Google Analytics API](/images/tap-google-analytics/05-ga-api.png)
+
+### View ID
+
+:::tip Configuration Notes
+
+- You can easily find the **View ID** for the Google Analytics View you want to fetch data from by using the [Google Analytics Account Explorer](https://ga-dev-tools.appspot.com/account-explorer/).
+
+:::
+
+![Screenshot of Google Analytics Account Explorer](/images/tap-google-analytics/01-ga-account-explorer.png)
+
+### Reports
+
+:::tip Configuration Notes
+
+- An _optional_ JSON file defining the reports to be generated
+
+:::
+
+Optionally, you can provide an additional JSON file for the definition of the reports to be generated. You can check, as an example, the JSON file used as a default in [tap-google-analytics/defaults/default_report_definition.json](https://gitlab.com/meltano/tap-google-analytics/blob/master/tap_google_analytics/defaults/default_report_definition.json). Those report definitions could be part of the config.json, but we prefer to keep config.json small and clean and provide the definitions by using an additional file.
+
+### Start Date
+
+:::tip Configuration Notes
+
+- Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+
+:::
+
+This property allows you to configure where you want your data set to start from. Otherwise, if left blank, it will try to fetch the entire history of the groups or projects specified.
+
+### End Date
+
+:::tip Configuration Notes
+
+- Restricts how much historical data will be extracted in relation to the **Start Date**
+
+:::
+
+This property allows you to configure where you want your data set to end in relation to the **Start Date**.
 
 ## Meltano Setup
 

@@ -12,8 +12,8 @@ description: Use Meltano to extract raw data from Fastly and insert it into Post
 
 In order to access your Fastly data, you will need:
 
-- An _API Token_ that the Fastly extractor will use to connect to Fastly servers
-- _Start Date_ you want the extracted data set to start from
+- API Token
+- Start Date
 
 ### API Token
 

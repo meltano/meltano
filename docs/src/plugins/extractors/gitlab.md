@@ -31,9 +31,11 @@ For more information you can check [the documentation for tap-gitlab](https://gi
 
 In order to access your GitLab data, you will need:
 
-- An _Access Token_ that the GitLab extractor will use to connect to GitLab servers
-- _Groups_ and _Projects_ you want to extract from
-- _Start Date_ you want the extracted data set to start from
+- GitLab Instance
+- Access Token
+- Groups
+- Projects
+- Start Date
 
 <h3 id="api-url">GitLab Instance</h3>
 

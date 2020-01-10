@@ -257,7 +257,7 @@ export default {
     <div class="columns">
       <div class="column" :class="{ 'is-two-fifths': isShowDocs }">
         <div class="content ">
-          <h3 class="is-title">Inputs</h3>
+          <h3 class="is-title">Configuration</h3>
         </div>
       </div>
       <div
@@ -265,7 +265,21 @@ export default {
         class="column"
         :class="{ 'is-three-fifths': isShowDocs }"
       >
-        <div class="content"><h3 class="is-title">Notes</h3></div>
+        <div class="content">
+          <div class="columns">
+            <div class="column">
+              <h3 class="is-title">Documentation</h3>
+            </div>
+            <div class="column">
+              <a
+                :href="plugin.docs"
+                target="_blank"
+                class="has-text-underlined is-pulled-right"
+                >View Documentation Externally
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -507,6 +521,7 @@ export default {
 // Refactor at will if a better file style approach (or component) comes along.
 .file {
   .is-file-fullwidth {
+    max-width: 20em;
     width: 100%;
   }
   .file-name-width {
