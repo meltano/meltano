@@ -825,15 +825,17 @@ const mutations = {
     // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
     const baseTable = state.design.relatedTable
     const queryPayload = report.queryPayload
-    const joinColumnGroups = state.design.joins.reduce((acc, curr) => {
-      acc.push({
-        name: curr.name,
-        columns: curr.relatedTable.columns,
-        aggregates: curr.relatedTable.aggregates,
-        timeframes: curr.relatedTable.timeframes
-      })
-      return acc
-    }, [])
+    const joinColumnGroups = state.design.joins
+      ? state.design.joins.reduce((acc, curr) => {
+          acc.push({
+            name: curr.name,
+            columns: curr.relatedTable.columns,
+            aggregates: curr.relatedTable.aggregates,
+            timeframes: curr.relatedTable.timeframes
+          })
+          return acc
+        }, [])
+      : []
     const nameMatcher = (source, target) => source.name === target.name
     const setSelected = (sourceCollection, targetCollection) => {
       sourceCollection.forEach(item => {
