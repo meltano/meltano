@@ -65,7 +65,10 @@ export default {
       return this.pipeline !== null
     },
     isShowNoModelsMessage() {
-      return !this.hasModels || !this.hasContextualModels
+      return (
+        !this.hasModels ||
+        (this.isDisplayContextualModels && !this.hasContextualModels)
+      )
     }
   },
   methods: {
