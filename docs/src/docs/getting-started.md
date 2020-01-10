@@ -65,11 +65,13 @@ Now that Meltano is pulling data in from your data source(s), you need to choose
 
 Let's use `target-postgres` for this project by clicking `Install` in its card.
 
+While it is installing, make sure that your PostreSQL database is up and running. If you need help with this, check out our [PostgreSQL database tutorial](/plugins/loaders/postgres.html#tutorials).
+
 Once it is finished installing, you will see the following modal:
 
-![Modal dialogue for successful Postgres installation](/images/getting-started-guide/gsg-04.png)
+![Modal dialogue for successful PostgreSQL installation](/images/getting-started-guide/gsg-04.png)
 
-By default, `target-postgres` is configured with a database named `warehouse` that can be customized if desired. For this guide however, let's just use the default name and click `Save`.
+By default, `target-postgres` is configured with a database named `warehouse` that can be customized if desired. Once you configure your database as desired, click `Save`.
 
 ## Create your first pipeline
 
