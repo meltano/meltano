@@ -10,17 +10,12 @@
             Analytics software to visualize your business operations
           </p>
 
-          <p
-            class="action"
-            v-if="
-              data.actionText &&
-                data.actionLink &&
-                data.contributeLink &&
-                data.contributeText
-            "
-          >
-            <NavLink class="action-button" :item="actionLink" />
-            <NavLink class="action-button secondary" :item="secondaryActionLink" />
+          <p class="action">
+            <NavLink class="action-button" :item="$frontmatter.primaryAction" />
+            <NavLink
+              class="action-button secondary"
+              :item="$frontmatter.secondaryAction"
+            />
           </p>
         </div>
 
@@ -44,8 +39,6 @@
         </p>
 
         <div class="plugin-logos">
-          
-
           <a href="/plugins/extractors/stripe.html"
             ><img src="../assets/logo-stripe.png" alt="Stripe Logo"
           /></a>
@@ -357,7 +350,13 @@
       <h2 class="section-title" style="text-align: center; margin-top: 0;">
         Self Host Meltano Locally or in the Cloud
       </h2>
-      <p style="text-align: center; margin-bottom:20px;">Meltano is built to run wherever you get your work done. Looking to self host? <a href="/docs/installation.html">Check out our installation instructions</a>.</p>
+      <p style="text-align: center; margin-bottom:20px;">
+        Meltano is built to run wherever you get your work done. Looking to self
+        host?
+        <a href="/docs/installation.html"
+          >Check out our installation instructions</a
+        >.
+      </p>
 
       <div class="rich-media-container">
         <div class="embed-responsive embed-responsive-16by9">
@@ -442,24 +441,6 @@ export default {
   computed: {
     data() {
       return this.$page.frontmatter
-    },
-    actionLink() {
-      return {
-        link: this.data.actionLink,
-        text: this.data.actionText
-      }
-    },
-    contributeLink() {
-      return {
-        link: this.data.contributeLink,
-        text: this.data.contributeText
-      }
-    },
-    secondaryActionLink() {
-      return {
-        link: this.data.secondaryActionLink,
-        text: this.data.secondaryActionText
-      }
     }
   }
 }
