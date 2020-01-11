@@ -20,6 +20,7 @@
             "
           >
             <NavLink class="action-button" :item="actionLink" />
+            <NavLink class="action-button secondary" :item="secondaryActionLink" />
           </p>
         </div>
 
@@ -442,7 +443,6 @@ export default {
     data() {
       return this.$page.frontmatter
     },
-
     actionLink() {
       return {
         link: this.data.actionLink,
@@ -453,6 +453,12 @@ export default {
       return {
         link: this.data.contributeLink,
         text: this.data.contributeText
+      }
+    },
+    secondaryActionLink() {
+      return {
+        link: this.data.secondaryActionLink,
+        text: this.data.secondaryActionText
       }
     }
   }
@@ -729,7 +735,7 @@ export default {
       background-color #464ACB;
       padding 0.8rem 1.6rem
       border-radius 4px
-      transition background-color .1s ease
+      transition background-color .2s ease
       letter-spacing 0.1rem
       box-sizing border-box
       margin-right: 0.4rem;
@@ -739,7 +745,7 @@ export default {
         box-shadow inset 0 0 0 2px #464ACB
         color #464ACB
         &:hover
-          background-color lighten(#fff, 10%)
+          background-color lighten(#464ACB, 80%)
       &:hover
         background-color lighten(#464ACB, 10%)
 
