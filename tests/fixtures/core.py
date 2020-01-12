@@ -142,7 +142,7 @@ def plugin_invoker_factory(project, plugin_settings_service, plugin_discovery_se
 @pytest.fixture(scope="class")
 def add_model(project, plugin_install_service, project_add_service):
     MODELS = [
-        "model-carbon-intensity-sqlite",
+        "model-carbon-intensity",
         "model-gitflix",
         "model-salesforce",
         "model-gitlab",

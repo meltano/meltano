@@ -14,7 +14,7 @@ class TestCliAdd:
         [
             (PluginType.EXTRACTORS, "tap-carbon-intensity"),
             (PluginType.LOADERS, "target-sqlite"),
-            (PluginType.MODELS, "model-carbon-intensity-sqlite"),
+            (PluginType.MODELS, "model-carbon-intensity"),
             (PluginType.TRANSFORMERS, "dbt"),
             (PluginType.TRANSFORMS, "tap-carbon-intensity"),
             (PluginType.ORCHESTRATORS, "airflow"),

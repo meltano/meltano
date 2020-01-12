@@ -45,9 +45,7 @@ class TestTopicFilter:
         identity.provides.add(Need("view:topic", "*"))
         identity.provides.add(Need("view:design", "*"))
 
-        path = project.run_dir(
-            "models", "model-carbon-intensity-sqlite", "carbon.topic.m5oc"
-        )
+        path = project.run_dir("models", "model-carbon-intensity", "carbon.topic.m5oc")
         m5o_file = M5ocFile.load(path)
         topic_filter = TopicFilter()
 

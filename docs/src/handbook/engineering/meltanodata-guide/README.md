@@ -168,7 +168,7 @@ If you hit the limit when trying to create a new database cluster, please:
 
 1. Select `Team` in the left menu under `Account`
 1. Click the `Edit Team Profile` button
-1. Add ` (full)` to the end of the Team name
+1. Add `(full)` to the end of the Team name
 1. Click the `Update Team Profile` button
 1. Follow the steps above to create the cluster in the next team not marked "(full)"
 
@@ -476,12 +476,10 @@ cd .meltano
     - `/tap-carbon-intensity`
   - `/models`
     - `/model-carbon-intensity`
-    - `/model-carbon-intensity-sqlite`
   - `/run`
     - `/tap-carbon-intensity`
     - `/models`
       - `/model-carbon-intensity`
-      - `/model-carbon-intensity-sqlite`
       - `/topics.index.m5oc`
 
 ```sh
@@ -739,5 +737,5 @@ When a client no longer needs a hosted instance of Meltano on meltanodata.com, y
 1. Delete the client's droplet
 1. Delete the client's A record in networking
 1. Delete the client's database cluster
-    1. If the database cluster was created in a "MeltanoData DBs" team that is currently marked "(full)", edit the team name to indicate it is no longer full
+   1. If the database cluster was created in a "MeltanoData DBs" team that is currently marked "(full)", edit the team name to indicate it is no longer full
 1. Delete the client's passwords in 1Password

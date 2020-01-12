@@ -59,33 +59,25 @@ The `tap-carbon-intensity` Extractor does not require any configuration (like a 
 
 Once you've setup your Extractor, you will be greeted with the Loaders page:
 
-![Loader page for Meltano project](/images/getting-started-guide/gsg-04.png)
+![Loader page for Meltano project](/images/getting-started-guide/gsg-03.png)
 
 Now that Meltano is pulling data in from your data source(s), you need to choose where and in what format you would like that data stored.
 
-Let's use `target-sqlite` for this project by clicking `Install` in its card.
+Let's use `target-postgres` for this project by clicking `Install` in its card.
+
+While it is installing, make sure that your PostreSQL database is up and running. If you need help with this, check out our [PostgreSQL database tutorial](/plugins/loaders/postgres.html#tutorials).
 
 Once it is finished installing, you will see the following modal:
 
-![Modal dialogue for successful SQLite installation](/images/getting-started-guide/gsg-05.png)
+![Modal dialogue for successful PostgreSQL installation](/images/getting-started-guide/gsg-04.png)
 
-By default, `target-sqlite` is configured with a database named `warehouse` that can be customized if desired. For this guide however, let's just use the default name and click `Save`.
+By default, `target-postgres` is configured with a database named `warehouse` that can be customized if desired. Once you configure your database as desired, click `Save`.
 
-## Apply transformations as desired
+## Create your first pipeline
 
-With our extractor and loader configured, you should now see the following page:
+With our extractor and loader configured, you should now be greeted with the Schedules page with a modal to create your first pipeline!
 
-![Screenshot of Transform page on Meltano webapp](/images/getting-started-guide/gsg-06.png)
-
-This page allows you to apply transformations to your data. This is not necessary for our current setup, but if you'd like to learn more about how transformations work in Meltano, check out our documentation on [Meltano Transformations](/docs/architecture.html#meltano-transformations).
-
-By default, the Transform step is set to `Skip`, so all we need to is click `Save`.
-
-## Create a pipeline schedule
-
-You should now be greeted with the Schedules page with a modal to create your first pipeline!
-
-![Create pipeline modal](/images/getting-started-guide/gsg-07.png)
+![Screenshot of Create Pipeline modal](/images/getting-started-guide/gsg-05.png)
 
 Meltano provides [Orchestration](/docs/orchestration.html) using Apache Airflow, which allows you to create scheduled tasks to run pipelines automatically.
 For example, you may want a recurring task that updates the database at the end of every business day.
@@ -95,65 +87,54 @@ In the current form, you will see:
 - A pipeline **name** which has a default name that is dynamically generated, but can be easily changed if desired
 - The **extractor** the pipeline will use, which should be `tap-carbon-intensity`
 - The **loader** the pipeline will use, which should be `target-sqlite`
-- Whether the **transform** step should be applied, which should be `skip`
+- Whether the **transform** step should be applied, which should be `run`
 - The **interval** at which the pipeline should be run, which is set by default to be `@once`
 
 All we need to do is click `Save` to start our new pipeline! The pipeline's log opens automatically and you can check the pipeline running and what Meltano does behind the scenes to extract and load the data. You should see a spinning icon that indicates that the pipeline is not completed:
 
-![Screenshot of run log of a pipeline being run](/images/getting-started-guide/gsg-08.png)
+![Screenshot of run log of a pipeline being run](/images/getting-started-guide/gsg-06.png)
 
 Once it's complete, the indicator will disappear and you should be able to see the final results of the extraction:
 
-![Screenshot of run log of a completed pipeline](/images/getting-started-guide/gsg-09.png)
+![Screenshot of run log of a completed pipeline](/images/getting-started-guide/gsg-07.png)
 
-You can click the `Analyze` button to [select a model to analyze](#analyze-the-data) or view the same models with more context in the Model page. If you close the log and go back to the Pipelines page you can check the log of any past pipeline by clicking the `Log` button next to it:
+You can click the `Analyze` button to [select a model to analyze](#analyze-the-data) or view the same models with more context in the Model page. If you close the log, you can check the log of any past pipeline by clicking the any cell under the **Last Run** column.
 
-![Screenshot of complete pipeline run](/images/getting-started-guide/gsg-09b.png)
+![Screenshot of complete pipeline run](/images/getting-started-guide/gsg-08.png)
 
 Congratulations! Now that you have connected a data source, configured a target database, and run a successful pipeline for the dataset, we are now ready to analyze the data!
 
 ## Select a data model
 
-Let's start by clicking on `Model` in the main navigation:
+Meltano Models determine how the data is defined and assists us with interactively generating SQL so that you can easily analyze and visualize your data.
 
-![Screenshot of Analyze: Model page](/images/getting-started-guide/gsg-10.png)
+To select which data model we want to analyze, let's click the **Analyze** dropdown and select the `model-carbon-intensity` **Region** model.
 
-Meltano Models determine how the data is defined and assists us with interactively generating SQL so that you can easily analyze and visualize your data. As you can see in the right column, `tap-carbon-intensity` already has the required models installed.
-
-Let's move on to the next step by clicking `Analyze` in the `model-carbon-intensity-sqlite` card to move on to the next step.
+![Screenshot of Analyze: Model page](/images/getting-started-guide/gsg-09.png)
 
 ## Analyze the data
 
-The Analyze page contains an interactive user interface to allow you to dynamically build queries and visualize your data.
+The Analyze page contains an interactive user interface to allow you to dynamically build queries and visualize your data. By default, it will run a standard report.
 
-![Screenshot of Analyze page for Carbon Region](/images/getting-started-guide/gsg-11.png)
+![Screenshot of Analyze page for Carbon Region](/images/getting-started-guide/gsg-10.png)
 
-Now, let's explore and analyze our `tap-carbon-intensity` data by selecting the following attributes in the left column:
+Now, you can explore and analyze the `tap-carbon-intensity` data by clicking on different Attributes in the **Query** side menu on the left hand side. This will trigger live changes to the SQL queries which will update the chart dynamically.
 
-- **Geographical Region**
-  - Columns: Name
-  - Aggregates: Count
-- **Electricity Generation Sources**
-  - Columns: ID
-  - Aggregates: Average Percent (%)
+While exploring the Analyze page, you can also check out:
 
-![Screenshot of selected attributes for tap-carbon-intensity](/images/getting-started-guide/gsg-12.png)
-
-And with that, the big moment is upon us, it's time to click `Run` to run our query!
-
-![Our query visualized as a bar graph!](/images/getting-started-guide/gsg-13.png)
-
-You should now see a beautiful data visualization and a table below to see the data in detail!
+- Filters
+- Different chart types which can be found in the upper right
+- Exploring table data and sorting data via column properties like ascending or descending
 
 ## Save a report
 
 When we find an analysis that we want to reference in the future, we can easily do this by creating a report. This can be accomplished by clicking on the `Save Report` dropdown in the Analyze toolbar. This will open a dropdown with a default report name that is dynamically populated, but can be easily changed.
 
-![Save Report dialogue for naming the report you want to save](/images/getting-started-guide/gsg-14.png)
+![Save Report dialogue for naming the report you want to save](/images/getting-started-guide/gsg-11.png)
 
 Once we click `Save`, we should see the upper left "Untitled Report" change to our new report name.
 
-![Saved report with a designated report name](/images/getting-started-guide/gsg-15.png)
+![Saved report with a designated report name](/images/getting-started-guide/gsg-12.png)
 
 And with that, our analysis has been saved!
 
@@ -161,19 +142,23 @@ And with that, our analysis has been saved!
 
 As you acquire more reports, you will probably want to organize them via dashboards. This can be done by clicking on the new `Add to Dashboard` dropdown in the toolbar.
 
-![Dropdown menu for adding report to dashboard](/images/getting-started-guide/gsg-16.png)
+![Dropdown menu for adding report to dashboard](/images/getting-started-guide/gsg-13.png)
 
 Since we have never created a dashboard, click on `New Dashboard`, which will trigger a modal that contains a dynamically generated dashboard name that can be customized as desired.
 
-![New dashboard dialog for configuring the dashboard](/images/getting-started-guide/gsg-17.png)
+![New dashboard dialog for configuring the dashboard](/images/getting-started-guide/gsg-14.png)
 
 Once we click `Create`, we can now verify that our report has been added to the Dashboard by clicking on the `Add to Dashboard` menu.
 
-![Confirmation that our report is added to the dashboard](/images/getting-started-guide/gsg-18.png)
+![Confirmation that our report is added to the dashboard](/images/getting-started-guide/gsg-15.png)
 
-We can also visit the Dashboard directly by clicking on the `Dashboard` navigation item in the header, which shows our newly created Dashboard and the associated Report.
+We can also visit the Dashboard directly by clicking on the `Dashboard` navigation item in the header, which shows our newly created Dashboard.
 
-![Dashboard page with new dashboard and the associated Report](/images/getting-started-guide/gsg-19.png)
+![Dashboard page with newly created dashboard](/images/getting-started-guide/gsg-16.png)
+
+Once we select it, you should see a similar page to below:
+
+![Dashboard with the saved Report](/images/getting-started-guide/gsg-17.png)
 
 ## Next steps
 
