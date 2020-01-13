@@ -8,6 +8,8 @@ description: Use Meltano to extract raw data from Stripe and insert it into Post
 
 `tap-stripe` is an extractor that pulls data from Stripe's API and produces JSON-formatted data following the [Singer spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
 
+<YouTubeEmbed src="https://www.youtube.com/embed/Qp-EgNP6Pjw" />
+
 ## Getting Started
 
 ### Prerequisites
