@@ -15,7 +15,7 @@ description: Use Meltano to extract raw data from Stripe and insert it into Post
 In order to use `tap-stripe`, you need to two key pieces of information that will allow the Meltano application to fetch data.
 
 1. Your account ID (e.g., `acct_152Bdedkol54`)
-1. A secret API key
+1. A secret API key (e.g., `sk_live_eis72wonf921pqjdf`)
 
 #### Account ID
 
