@@ -97,7 +97,11 @@ export default {
   Both hooks are required (Update for locally sourced route changes & Enter for globally sourced route changes)
   */
   beforeRouteUpdate(to, from, next) {
-    this.reinitialize().then(next)
+    next()
+
+    // it is crucial to wait after `next` is called so
+    // the route parameters are updated.
+    this.reinitialize()
   },
   created() {
     this.initializeSettings()
