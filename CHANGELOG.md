@@ -47,6 +47,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1391](https://gitlab.com/meltano/meltano/issues/1391) Lock all settings that are controlled through environment variables
 - [#1393](https://gitlab.com/meltano/meltano/issues/1393) Add contextual Analyze CTAs for each Pipeline in the Pipelines list
+- [#1551](https://gitlab.com/meltano/meltano/issues/1551) Add dbt clean before compile and runs
 
 ### Changes
 

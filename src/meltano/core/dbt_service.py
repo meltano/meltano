@@ -107,8 +107,12 @@ class DbtService:
     async def deps(self):
         await self.invoke("deps")
 
+    async def clean(self):
+        await self.invoke("clean")
+
     async def compile(self, models=None, **kwargs):
         params = self.project_args()
+
         if models:
             # Always include the my_meltano_project model
             all_models = f"{models} my_meltano_project"
