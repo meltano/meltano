@@ -21,9 +21,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1480](https://gitlab.com/meltano/meltano/issues/1480) Fix database revocations corner case for roles in the `meltano permissions` command
+- [#1553](https://gitlab.com/meltano/meltano/issues/1553) Fix bug occurring when loading a report that lacks join tables
 
 ### Breaks
-- [#1553](https://gitlab.com/meltano/meltano/issues/1553) Fix bug occurring when loading a report that lacks join tables
 
 ### Breaks
 
