@@ -4,6 +4,7 @@ from typing import Optional
 from datetime import datetime, date
 
 from .plugin.settings_service import PluginSettingsService, PluginSettingMissingError
+from .plugin_discovery_service import PluginDiscoveryService
 from .project import Project
 from .plugin import PluginType, PluginRef
 from .db import project_engine
@@ -27,9 +28,15 @@ class ScheduleDoesNotExistError(Exception):
 
 class ScheduleService:
     def __init__(
-        self, project: Project, plugin_settings_service: PluginSettingsService = None
+        self,
+        project: Project,
+        plugin_discovery_service: PluginDiscoveryService = None,
+        plugin_settings_service: PluginSettingsService = None,
     ):
         self.project = project
+        self.plugin_discovery_service = (
+            plugin_discovery_service or PluginDiscoveryService(project)
+        )
         self.plugin_settings_service = plugin_settings_service or PluginSettingsService(
             project
         )
@@ -103,6 +110,29 @@ class ScheduleService:
             meltano.schedules.remove(schedule)
 
         return name
+
+    def find_namespace_schedule(self, namespace: str) -> Schedule:
+        """
+        Search for a Schedule that runs for a certain plugin namespace.
+        For instance, `tap_carbon` would yield the first schedule that
+        runs for the `tap-carbon` extractor.
+        """
+
+        try:
+            extractor = next(
+                extractor
+                for extractor in self.plugin_discovery_service.plugins()
+                if extractor.type == PluginType.EXTRACTORS
+                and extractor.namespace == namespace
+            )
+
+            return next(
+                schedule
+                for schedule in self.schedules()
+                if schedule.extractor == extractor.name
+            )
+        except StopIteration:
+            raise NotFound(f"Cannot find a schedule for namespace '{namespace}'.")
 
     def schedules(self):
         return self.project.meltano.schedules

@@ -116,6 +116,7 @@ def remove_report_from_dashboard():
 def get_dashboard_reports_with_query_results():
     dashboards_helper = DashboardsHelper()
     post_data = request.get_json()
+
     response_data = dashboards_helper.get_dashboard_reports_with_query_results(
         post_data
     )

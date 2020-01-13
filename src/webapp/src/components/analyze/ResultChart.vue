@@ -3,7 +3,7 @@ import { mapGetters, mapState } from 'vuex'
 
 import Chart from '@/components/analyze/Chart'
 import LoadingOverlay from '@/components/generic/LoadingOverlay'
-import utils from '@/utils/utils'
+import { selected } from '@/utils/predicates'
 
 export default {
   name: 'ResultTable',
@@ -22,10 +22,7 @@ export default {
       'hasResults'
     ]),
     getHasMinimalSelectionRequirements() {
-      const hasAggregate = this.getAttributes(['aggregates']).find(
-        utils.predicate.selected
-      )
-      return hasAggregate
+      return this.getAttributes(['aggregates']).find(selected)
     }
   }
 }

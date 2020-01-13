@@ -1,6 +1,5 @@
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import lodash from 'lodash'
 import Vue from 'vue'
 
 import capitalize from '@/filters/capitalize'
@@ -39,7 +38,6 @@ export default {
       'design',
       'filterOptions',
       'hasSQLError',
-      'loader',
       'isAutoRunQuery',
       'isLoadingQuery',
       'reports',
@@ -59,24 +57,10 @@ export default {
       'hasFilters',
       'hasJoins',
       'hasResults',
-      'isLoaderSqlite',
       'resultsCount',
       'showJoinColumnAggregateHeader'
     ]),
-    ...mapGetters('plugins', ['getPluginProfiles']),
     ...mapState('dashboards', ['dashboards']),
-    ...mapState('plugins', ['installedPlugins']),
-
-    availableLoaders() {
-      return lodash(this.installedPlugins.loaders)
-        .map(this.getPluginProfiles)
-        .flatten()
-        .value()
-    },
-
-    canToggleTimeframe() {
-      return !this.isLoaderSqlite
-    },
 
     hasActiveReport() {
       return Object.keys(this.activeReport).length > 0
@@ -93,24 +77,6 @@ export default {
       set(value) {
         this.$store.dispatch('designs/limitSet', value)
         this.$store.dispatch('designs/getSQL', { run: false })
-      }
-    },
-
-    loader: {
-      get() {
-        return this.$store.getters['designs/getLoader']
-      },
-      set(value) {
-        this.$store.commit('designs/setLoader', value)
-
-        // set the default loader for unknown designs
-        localStorage.setItem('loader', value)
-
-        // set the connection for this specific design
-        localStorage.setItem(
-          utils.concatLoaderModelDesign(this.currentModel, this.currentDesign),
-          value
-        )
       }
     }
   },
@@ -131,8 +97,11 @@ export default {
   Both hooks are required (Update for locally sourced route changes & Enter for globally sourced route changes)
   */
   beforeRouteUpdate(to, from, next) {
-    this.reinitialize()
     next()
+
+    // it is crucial to wait after `next` is called so
+    // the route parameters are updated.
+    this.reinitialize()
   },
   created() {
     this.initializeSettings()
@@ -173,19 +142,8 @@ export default {
         design,
         slug
       })
-      const uponPlugins = this.$store.dispatch('plugins/getInstalledPlugins')
 
-      Promise.all([uponDesign, uponPlugins]).then(() => {
-        const defaultLoader =
-          localStorage.getItem(
-            utils.concatLoaderModelDesign(this.currentModel, this.currentDesign)
-          ) ||
-          localStorage.getItem('loader') ||
-          this.installedPlugins.loaders[0].name
-
-        // don't use the setter here not to update the user's preferences
-        this.$store.commit('designs/setLoader', defaultLoader)
-
+      uponDesign.then(() => {
         // preselect if not loading a report
         if (!slug && this.isAutoRunQuery) {
           this.preselectAttributes()
@@ -228,10 +186,12 @@ export default {
         this.design.relatedTable[collectionName].find(
           attribute => !attribute.hidden
         )
+
       const column = finder('columns')
       if (column) {
         this.columnSelected(column)
       }
+
       const aggregate = finder('aggregates')
       if (aggregate) {
         this.columnSelected(aggregate)
@@ -243,7 +203,9 @@ export default {
     },
 
     reinitialize() {
-      this.$store.dispatch('designs/resetDefaults').then(this.initializeDesign)
+      return this.$store
+        .dispatch('designs/resetDefaults')
+        .then(this.initializeDesign)
     },
 
     saveReport() {
@@ -300,7 +262,9 @@ export default {
         })
         .catch(error => {
           Vue.toasted.global.error(
-            `${this.activeReport.name} was not saved to ${dashboard.name}. [Error code: ${error.response.data.code}]`
+            `${this.activeReport.name} was not saved to ${
+              dashboard.name
+            }. [Error code: ${error.response.data.code}]`
           )
         })
     },
@@ -471,18 +435,6 @@ export default {
               </div>
             </Dropdown>
           </p>
-
-          <div v-if="isInitialized" class="control">
-            <div class="select">
-              <select v-model="loader" name="loader">
-                <option
-                  v-for="loaderName in availableLoaders"
-                  :key="loaderName"
-                  >{{ loaderName }}</option
-                >
-              </select>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -783,18 +735,11 @@ export default {
                         :key="timeframe.label"
                         class="panel-block timeframe"
                         :class="{
-                          'is-active': timeframe.selected,
-                          'is-sqlite-unsupported': isLoaderSqlite
+                          'is-active': timeframe.selected
                         }"
                         @click="timeframeSelected(timeframe)"
                       >
                         {{ timeframe.label }}
-                        <div
-                          v-if="isLoaderSqlite"
-                          class="sqlite-unsupported-container"
-                        >
-                          <small>Unsupported by SQLite</small>
-                        </div>
                       </a>
                       <template v-if="timeframe.selected">
                         <template v-for="period in timeframe.periods">
@@ -1059,27 +1004,6 @@ export default {
 
     .icon {
       margin-right: 0.5rem;
-    }
-  }
-
-  &.is-sqlite-unsupported {
-    opacity: 0.5;
-    cursor: not-allowed;
-    .sqlite-unsupported-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-end;
-      flex-grow: 1;
-
-      small {
-        font-size: 60%;
-        font-style: italic;
-      }
-    }
-    &.timeframe {
-      &::after {
-        display: none;
-      }
     }
   }
 

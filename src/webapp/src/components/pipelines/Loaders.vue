@@ -2,17 +2,12 @@
 import { mapGetters } from 'vuex'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
-import SpeedRunIcon from '@/components/pipelines/SpeedRunIcon'
 
 export default {
   name: 'Loaders',
   components: {
-    ConnectorLogo,
-    SpeedRunIcon
+    ConnectorLogo
   },
-  data: () => ({
-    speedRunLoader: 'target-sqlite'
-  }),
   computed: {
     ...mapGetters('plugins', [
       'visibleLoaders',
@@ -55,7 +50,6 @@ export default {
         class="tile is-parent is-3 is-relative"
       >
         <div class="tile level is-child box">
-          <SpeedRunIcon v-if="loader.name === speedRunLoader" />
           <div class="image level-item is-64x64 container">
             <ConnectorLogo
               :connector="loader.name"
