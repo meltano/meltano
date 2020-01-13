@@ -57,14 +57,10 @@ export default {
       'hasFilters',
       'hasJoins',
       'hasResults',
-      'isLoaderSqlite',
       'resultsCount',
       'showJoinColumnAggregateHeader'
     ]),
     ...mapState('dashboards', ['dashboards']),
-    canToggleTimeframe() {
-      return !this.isLoaderSqlite
-    },
 
     hasActiveReport() {
       return Object.keys(this.activeReport).length > 0
@@ -735,18 +731,11 @@ export default {
                         :key="timeframe.label"
                         class="panel-block timeframe"
                         :class="{
-                          'is-active': timeframe.selected,
-                          'is-sqlite-unsupported': isLoaderSqlite
+                          'is-active': timeframe.selected
                         }"
                         @click="timeframeSelected(timeframe)"
                       >
                         {{ timeframe.label }}
-                        <div
-                          v-if="isLoaderSqlite"
-                          class="sqlite-unsupported-container"
-                        >
-                          <small>Unsupported by SQLite</small>
-                        </div>
                       </a>
                       <template v-if="timeframe.selected">
                         <template v-for="period in timeframe.periods">
@@ -1011,27 +1000,6 @@ export default {
 
     .icon {
       margin-right: 0.5rem;
-    }
-  }
-
-  &.is-sqlite-unsupported {
-    opacity: 0.5;
-    cursor: not-allowed;
-    .sqlite-unsupported-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-end;
-      flex-grow: 1;
-
-      small {
-        font-size: 60%;
-        font-style: italic;
-      }
-    }
-    &.timeframe {
-      &::after {
-        display: none;
-      }
     }
   }
 

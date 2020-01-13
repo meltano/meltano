@@ -4,7 +4,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import Dropdown from '@/components/generic/Dropdown'
 import LoadingOverlay from '@/components/generic/LoadingOverlay'
 import QuerySortBy from '@/components/analyze/QuerySortBy'
-import utils from '@/utils/utils'
+import { selected } from '@/utils/predicates'
 
 export default {
   name: 'ResultTable',
@@ -36,12 +36,8 @@ export default {
         )
     },
     getHasMinimalSelectionRequirements() {
-      const hasColumn = this.getAttributes(['columns']).find(
-        utils.predicate.selected
-      )
-      const hasAggregate = this.getAttributes(['aggregates']).find(
-        utils.predicate.selected
-      )
+      const hasColumn = this.getAttributes(['columns']).find(selected)
+      const hasAggregate = this.getAttributes(['aggregates']).find(selected)
       return hasColumn || hasAggregate
     },
     getIsOrderableAssigned() {
@@ -86,7 +82,9 @@ export default {
             <th
               v-for="(queryAttribute, idx) in queryAttributes"
               :key="
-                `${queryAttribute.sourceName}-${queryAttribute.attributeName}-${idx}`
+                `${queryAttribute.sourceName}-${
+                  queryAttribute.attributeName
+                }-${idx}`
               "
             >
               <div class="is-flex">

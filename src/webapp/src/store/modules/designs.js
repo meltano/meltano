@@ -8,6 +8,8 @@ import designApi from '../../api/design'
 import reportsApi from '../../api/reports'
 import sqlApi from '../../api/sql'
 import utils from '@/utils/utils'
+import { selected } from '@/utils/predicates'
+import { namer } from '@/utils/mappers'
 
 const defaultState = utils.deepFreeze({
   activeReport: {},
@@ -52,7 +54,7 @@ const helpers = {
       if (!Array.isArray(arr)) {
         return null
       }
-      return arr.filter(utils.predicate.selected).map(utils.predicate.named)
+      return arr.filter(selected).map(namer)
     }
 
     const baseTable = state.design.relatedTable
@@ -74,10 +76,10 @@ const helpers = {
 
         if (table.timeframes) {
           newJoin.timeframes = table.timeframes
-            .filter(utils.predicate.selected)
+            .filter(selected)
             .map(({ name, periods }) => ({
               name,
-              periods: periods.filter(utils.predicate.selected)
+              periods: periods.filter(selected)
             }))
             .filter(tf => tf.periods.length)
         }
@@ -94,7 +96,7 @@ const helpers = {
       []
         .map(tf => ({
           name: tf.name,
-          periods: tf.periods.filter(utils.predicate.selected)
+          periods: tf.periods.filter(selected)
         }))
         .filter(tf => tf.periods.length)
 
@@ -140,12 +142,12 @@ const getters = {
     return state.limit
   },
 
-  currentModelLabel(state) {
-    return utils.titleCase(state.currentModel)
-  },
-
   currentModelID(state) {
     return lodash.join([state.currentNamespace, state.currentModel], '/')
+  },
+
+  currentModelLabel(state) {
+    return utils.titleCase(state.currentModel)
   },
 
   filtersCount(state) {
@@ -262,7 +264,7 @@ const getters = {
 
   // eslint-disable-next-line no-shadow
   getSelectedAttributes(_, getters) {
-    return getters.getAttributes().filter(utils.predicate.selected)
+    return getters.getAttributes().filter(selected)
   },
 
   // eslint-disable-next-line no-shadow
@@ -293,32 +295,6 @@ const getters = {
 
   isColumnSelectedAggregate: state => columnName =>
     columnName in state.resultAggregates,
-
-  isLoaderSqlite(state, getters, rootState) {
-    // infer the proper pipeline for this report
-    // this is pretty finicky, but the inference chain is the following:
-    // report.namespace → model.name → model.namespace → extractor.namespace → extractor.name → pipeline.extractor
-    const model = rootState.repos.models[getters.currentModelID]
-    if (!model) {
-      return false
-    }
-
-    const extractor = rootState.plugins.plugins.extractors.find(
-      e => e.namespace == model.plugin_namespace
-    )
-    if (!extractor) {
-      return false
-    }
-
-    const pipeline = rootState.orchestration.pipelines.find(
-      p => p.extractor == extractor.name
-    )
-    if (!pipeline) {
-      return false
-    }
-
-    return pipeline.loader === 'target-sqlite'
-  },
 
   joinIsExpanded: () => join => join.expanded,
 
@@ -505,28 +481,23 @@ const actions = {
   },
 
   loadReport({ state, commit }, report) {
-    commit('setCurrentReport', report)
-
-    this.dispatch('designs/getSQL', {
-      run: true,
-      payload: report.queryPayload
-    })
-
     const nameMatcher = (source, target) => source.name === target.name
-    const nameMapper = item => item.name
 
     // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
     const baseTable = state.design.relatedTable
     const queryPayload = report.queryPayload
-    const joinColumnGroups = state.design.joins.reduce((acc, curr) => {
-      acc.push({
-        name: curr.name,
-        columns: curr.relatedTable.columns,
-        aggregates: curr.relatedTable.aggregates,
-        timeframes: curr.relatedTable.timeframes
-      })
-      return acc
-    }, [])
+    let joinColumnGroups = []
+    if (state.design.joins) {
+      joinColumnGroups = state.design.joins.reduce((acc, curr) => {
+        acc.push({
+          name: curr.name,
+          columns: curr.relatedTable.columns,
+          aggregates: curr.relatedTable.aggregates,
+          timeframes: curr.relatedTable.timeframes
+        })
+        return acc
+      }, [])
+    }
 
     const setSelected = (sourceCollection, targetCollection) => {
       if (!sourceCollection) {
@@ -552,7 +523,7 @@ const actions = {
 
       // timeframes
       if (targetJoin.timeframes) {
-        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(nameMapper))
+        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(namer))
         // periods
         joinGroup.timeframes.forEach(timeframe => {
           const targetTimeframe = targetJoin.timeframes.find(tf =>
@@ -560,13 +531,17 @@ const actions = {
           )
 
           if (targetTimeframe) {
-            setSelected(
-              timeframe.periods,
-              targetTimeframe.periods.map(nameMapper)
-            )
+            setSelected(timeframe.periods, targetTimeframe.periods.map(namer))
           }
         })
       }
+    })
+
+    commit('setCurrentReport', report)
+
+    this.dispatch('designs/getSQL', {
+      run: true,
+      payload: report.queryPayload
     })
   },
 

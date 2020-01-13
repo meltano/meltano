@@ -2,6 +2,7 @@ import lodash from 'lodash'
 
 import flaskContext from '@/flask'
 import moment from 'moment'
+import { namer } from '@/utils/mappers'
 
 const regExpConnectorLogo = /(?:tap-|target-)?(.*)/
 const regExpPrivateInput = /(password|private|secret|token)/
@@ -156,11 +157,7 @@ export default {
   requiredConnectorSettingsKeys(settings, groupValidation) {
     return groupValidation
       ? lodash.intersection(...groupValidation)
-      : settings.map(this.predicate.named)
-  },
-  predicate: {
-    named: item => item.name,
-    selected: item => item.selected
+      : settings.map(namer)
   },
   singularize(value) {
     if (!value) {
