@@ -236,7 +236,7 @@ extractors:
       - name: account_id
         label: Account ID
         env: STRIPE_ACCOUNT_ID
-        placeholder: act_1a2b3c4d5e
+        placeholder: Ex. act_1a2b3c4d5e
       - name: client_secret
         label: Secret API Key
         kind: password
