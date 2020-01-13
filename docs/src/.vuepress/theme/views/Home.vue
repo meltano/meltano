@@ -10,16 +10,12 @@
             Analytics software to visualize your business operations
           </p>
 
-          <p
-            class="action"
-            v-if="
-              data.actionText &&
-                data.actionLink &&
-                data.contributeLink &&
-                data.contributeText
-            "
-          >
-            <NavLink class="action-button" :item="actionLink" />
+          <p class="action">
+            <NavLink class="action-button" :item="$frontmatter.primaryAction" />
+            <NavLink
+              class="action-button secondary"
+              :item="$frontmatter.secondaryAction"
+            />
           </p>
         </div>
 
@@ -43,8 +39,6 @@
         </p>
 
         <div class="plugin-logos">
-          
-
           <a href="/plugins/extractors/stripe.html"
             ><img src="../assets/logo-stripe.png" alt="Stripe Logo"
           /></a>
@@ -356,7 +350,13 @@
       <h2 class="section-title" style="text-align: center; margin-top: 0;">
         Self Host Meltano Locally or in the Cloud
       </h2>
-      <p style="text-align: center; margin-bottom:20px;">Meltano is built to run wherever you get your work done. Looking to self host? <a href="/docs/installation.html">Check out our installation instructions</a>.</p>
+      <p style="text-align: center; margin-bottom:20px;">
+        Meltano is built to run wherever you get your work done. Looking to self
+        host?
+        <a href="/docs/installation.html"
+          >Check out our installation instructions</a
+        >.
+      </p>
 
       <div class="rich-media-container">
         <div class="embed-responsive embed-responsive-16by9">
@@ -441,19 +441,6 @@ export default {
   computed: {
     data() {
       return this.$page.frontmatter
-    },
-
-    actionLink() {
-      return {
-        link: this.data.actionLink,
-        text: this.data.actionText
-      }
-    },
-    contributeLink() {
-      return {
-        link: this.data.contributeLink,
-        text: this.data.contributeText
-      }
     }
   }
 }
@@ -729,7 +716,7 @@ export default {
       background-color #464ACB;
       padding 0.8rem 1.6rem
       border-radius 4px
-      transition background-color .1s ease
+      transition background-color .2s ease
       letter-spacing 0.1rem
       box-sizing border-box
       margin-right: 0.4rem;
@@ -739,7 +726,7 @@ export default {
         box-shadow inset 0 0 0 2px #464ACB
         color #464ACB
         &:hover
-          background-color lighten(#fff, 10%)
+          background-color lighten(#464ACB, 80%)
       &:hover
         background-color lighten(#464ACB, 10%)
 
