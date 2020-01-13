@@ -11,7 +11,7 @@ export default {
 <template>
   <div v-if="isLoading" class="is-fill-space is-flex is-hcentered is-vcentered">
     <div class="is-fill-space loading-result-overlay"></div>
-    <div class="loading-result-loader">
+    <div class="loading-result-overlay-content">
       <button
         class="button is-loading is-borderless is-interactive-primary is-outlined"
       ></button>
@@ -26,7 +26,7 @@ export default {
   opacity: 0.5;
 }
 
-.loading-result-loader {
+.loading-result-overlay-content {
   z-index: 2;
 }
 </style>

@@ -42,8 +42,8 @@ extractors:
       - name: api_token
         label: API Token
         kind: password
+        placeholder: Ex. *****************
       - name: start_date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         label: Start Date
         kind: date_iso8601
   - name: tap-gitlab
@@ -66,34 +66,21 @@ extractors:
       - name: private_token
         label: Access Token
         kind: password
-        description: Your GitLab personal access token
         placeholder: Ex. *****************
-        documentation: https://meltano.com/plugins/extractors/gitlab.html#gitlab-api-token
         env: GITLAB_API_TOKEN
       - name: groups
         value: ''
-        description: |
-          Space separated paths of groups to pull data from.
-          Leave empty if you'd like to pull data from projects in a personal user namespace, that you can specify below
         placeholder: Ex. my-organization
-        documentation: https://meltano.com/plugins/extractors/gitlab.html#groups
         env: GITLAB_API_GROUPS
       - name: projects
         value: ''
-        description: |
-          Space separated paths of projects to pull data from, in `namespace/project` format.
-          Leave empty if you've specified one or more groups and would like to pull data from all projects inside these groups
         placeholder: Ex. my-organization/project-1
-        documentation: https://meltano.com/plugins/extractors/gitlab.html#projects
         env: GITLAB_API_PROJECTS
       - name: ultimate_license
         value: false
         kind: boolean
-        description: Pull in extra data only available to GitLab Ultimate and GitLab.com Gold accounts
-        documentation: https://meltano.com/plugins/extractors/gitlab.html#configuration
         env: GITLAB_API_ULTIMATE_LICENSE
       - name: start_date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         env: GITLAB_API_START_DATE
         kind: date_iso8601
   - name: tap-google-analytics
@@ -113,27 +100,21 @@ extractors:
         label: Key File Location
         placeholder: Ex. client_secrets.json
         kind: file
-        description: Obtain this file from Google Analytics Service Accounts
-        documentation: https://meltano.com/plugins/extractors/google-analytics.html#creating-service-account-credentials
         env: GOOGLE_ANALYTICS_API_CLIENT_SECRETS
       - name: view_id
         label: View ID
         placeholder: Ex. 198343027
-        description: Obtain this id from the Google Analytics Account Explorer
-        documentation: https://meltano.com/plugins/extractors/google-analytics.html#google-analytics-setup
         env: GOOGLE_ANALYTICS_API_VIEW_ID
         label: View ID
       - name: reports
         label: Reports
         placeholder: Ex. my_report_definition.json
-        documentation: https://gitlab.com/meltano/tap-google-analytics#tap-google-analytics
+        kind: file
         env: GOOGLE_ANALYTICS_API_REPORTS
       - name: start_date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         env: GOOGLE_ANALYTICS_API_START_DATE
         kind: date_iso8601
       - name: end_date
-        description: Pull data up to this date
         env: GOOGLE_ANALYTICS_API_END_DATE
         kind: date_iso8601
   - name: tap-marketo
@@ -235,11 +216,13 @@ extractors:
     settings:
       - name: account_id
         label: Account ID
+        placeholder: Ex. me@my-organization.com
         env: STRIPE_ACCOUNT_ID
         placeholder: Ex. act_1a2b3c4d5e
       - name: client_secret
         label: Secret API Key
         kind: password
+        placeholder: Ex. *****************
         env: STRIPE_API_KEY
         placeholder: Ex. sk_live_1a2b3c4d5e
       - name: start_date
@@ -314,7 +297,6 @@ loaders:
       - name: account
         env: SF_ACCOUNT
         description: This is automatically provided by Snowflake and can be found in the URL.
-        tooltip: Copy and paste your login URL if you don't know your account ID.
       - name: username
         env: SF_USER
         description: The username you use for logging in

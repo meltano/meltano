@@ -6,7 +6,6 @@
     @touchend="onTouchEnd"
   >
     <Navbar v-if="shouldShowNavbar" @toggle-sidebar="toggleSidebar" />
-
     <div class="sidebar-mask" @click="toggleSidebar(false)"></div>
 
     <Sidebar :items="sidebarItems" @toggle-sidebar="toggleSidebar">
@@ -44,6 +43,7 @@ export default {
 
   data() {
     return {
+      isEmbedded: false,
       isSidebarOpen: false,
       swUpdateEvent: null,
       userId: 1,
@@ -56,7 +56,7 @@ export default {
     shouldShowNavbar() {
       const { themeConfig } = this.$site
       const { frontmatter } = this.$page
-      if (frontmatter.navbar === false || themeConfig.navbar === false) {
+      if (frontmatter.navbar === false || themeConfig.navbar === false || this.isEmbedded) {
         return false
       }
       return (
@@ -74,6 +74,7 @@ export default {
         !frontmatter.layout &&
         !frontmatter.home &&
         frontmatter.sidebar !== false &&
+        !this.isEmbedded &&
         this.sidebarItems.length
       )
     },
@@ -97,12 +98,18 @@ export default {
         },
         userPageClass
       ]
-    }
+    },
+  },
+
+  created() {
+    this.isEmbedded = this.$route.query["embed"] || false
   },
 
   mounted() {
     // Intercom.io chat
-    this.$intercom.boot()
+    if(!this.isEmbedded) {
+      this.$intercom.boot()
+    }
 
     window.addEventListener('scroll', this.onScroll)
 
