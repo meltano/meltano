@@ -12,9 +12,9 @@ export default {
           404
         </h1>
         <h2 class="subtitle">
-          Oops... Seems this page is missing...
+          Oops... Seems like this page is missing...
         </h2>
-        <a href="/" class="button">Go back home</a>
+        <a class="button" @click="$router.back()">Go back to the last page</a>
       </div>
     </div>
   </section>
