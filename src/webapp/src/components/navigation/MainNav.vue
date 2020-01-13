@@ -299,14 +299,27 @@ export default {
               <div class="buttons">
                 <a
                   v-if="!updateAvailable && version"
-                  class="button is-small is-text has-background-transparent"
+                  class="button is-small is-text has-background-transparent tooltip is-tooltip-left"
+                  data-tooltip="View this version's additions, changes, & fixes"
                   href="https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md"
                   target="_blank"
                 >
                   v{{ version }}
                 </a>
                 <a
-                  class="button"
+                  v-if="identity"
+                  class="button is-small has-background-transparent tooltip is-tooltip-left"
+                  :data-tooltip="`Sign out: ${identity.username}`"
+                  @click="logout"
+                >
+                  <span>Sign Out</span>
+                  <span class="icon">
+                    <font-awesome-icon icon="user"></font-awesome-icon>
+                  </span>
+                </a>
+                <a
+                  class="button is-small has-background-transparent tooltip is-tooltip-left"
+                  data-tooltip="I need help"
                   target="_blank"
                   href="https://meltano.com/docs/getting-help.html"
                 >
@@ -315,18 +328,6 @@ export default {
                       icon="question-circle"
                     ></font-awesome-icon>
                   </span>
-                  <span>Help</span>
-                </a>
-                <a
-                  v-if="identity"
-                  class="button has-tooltip-bottom"
-                  data-tooltip="Sign out"
-                  @click="logout"
-                >
-                  <span class="icon">
-                    <font-awesome-icon icon="sign-out-alt"></font-awesome-icon>
-                  </span>
-                  <span>{{ identity.username }}</span>
                 </a>
               </div>
             </div>
