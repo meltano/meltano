@@ -2,6 +2,7 @@ import lodash from 'lodash'
 
 import flaskContext from '@/flask'
 import moment from 'moment'
+import { namer } from '@/utils/mappers'
 
 const regExpConnectorLogo = /(?:tap-|target-)?(.*)/
 const regExpPrivateInput = /(password|private|secret|token)/
@@ -126,9 +127,6 @@ export default {
     const capMe = value.toString()
     return capMe.charAt(0).toUpperCase() + capMe.slice(1)
   },
-  concatLoaderModelDesign(model, design) {
-    return `loader:${model}:${design}`
-  },
   extractFileNameFromPath(path) {
     return path.replace(/^.*[\\/]/, '')
   },
@@ -159,11 +157,7 @@ export default {
   requiredConnectorSettingsKeys(settings, groupValidation) {
     return groupValidation
       ? lodash.intersection(...groupValidation)
-      : settings.map(this.predicate.named)
-  },
-  predicate: {
-    named: item => item.name,
-    selected: item => item.selected
+      : settings.map(namer)
   },
   singularize(value) {
     if (!value) {

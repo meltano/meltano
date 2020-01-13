@@ -8,6 +8,8 @@ import designApi from '../../api/design'
 import reportsApi from '../../api/reports'
 import sqlApi from '../../api/sql'
 import utils from '@/utils/utils'
+import { selected } from '@/utils/predicates'
+import { namer } from '@/utils/mappers'
 
 const defaultState = utils.deepFreeze({
   activeReport: {},
@@ -19,7 +21,6 @@ const defaultState = utils.deepFreeze({
   design: {
     relatedTable: {}
   },
-  loader: null,
   filterOptions: [],
   filters: {
     aggregates: [],
@@ -53,7 +54,7 @@ const helpers = {
       if (!Array.isArray(arr)) {
         return null
       }
-      return arr.filter(utils.predicate.selected).map(utils.predicate.named)
+      return arr.filter(selected).map(namer)
     }
 
     const baseTable = state.design.relatedTable
@@ -75,10 +76,10 @@ const helpers = {
 
         if (table.timeframes) {
           newJoin.timeframes = table.timeframes
-            .filter(utils.predicate.selected)
+            .filter(selected)
             .map(({ name, periods }) => ({
               name,
-              periods: periods.filter(utils.predicate.selected)
+              periods: periods.filter(selected)
             }))
             .filter(tf => tf.periods.length)
         }
@@ -95,7 +96,7 @@ const helpers = {
       []
         .map(tf => ({
           name: tf.name,
-          periods: tf.periods.filter(utils.predicate.selected)
+          periods: tf.periods.filter(selected)
         }))
         .filter(tf => tf.periods.length)
 
@@ -127,7 +128,6 @@ const helpers = {
       joins,
       order,
       limit: state.limit,
-      loader: state.loader,
       filters
     }
   }
@@ -140,6 +140,10 @@ const getters = {
 
   currentLimit(state) {
     return state.limit
+  },
+
+  currentModelID(state) {
+    return lodash.join([state.currentNamespace, state.currentModel], '/')
   },
 
   currentModelLabel(state) {
@@ -185,8 +189,6 @@ const getters = {
       return getters.getAttributes().find(finder)
     }
   },
-
-  getLoader: state => state.loader,
 
   // eslint-disable-next-line no-shadow
   getFilter(_, getters) {
@@ -262,7 +264,7 @@ const getters = {
 
   // eslint-disable-next-line no-shadow
   getSelectedAttributes(_, getters) {
-    return getters.getAttributes().filter(utils.predicate.selected)
+    return getters.getAttributes().filter(selected)
   },
 
   // eslint-disable-next-line no-shadow
@@ -293,8 +295,6 @@ const getters = {
 
   isColumnSelectedAggregate: state => columnName =>
     columnName in state.resultAggregates,
-
-  isLoaderSqlite: state => state.loader === 'target-sqlite',
 
   joinIsExpanded: () => join => join.expanded,
 
@@ -425,6 +425,7 @@ const actions = {
               report.design === design &&
               report.slug === slug
           )
+
           if (reportMatch) {
             dispatch('loadReport', reportMatch)
           }
@@ -450,6 +451,7 @@ const actions = {
       { run },
       payload || helpers.getQueryPayloadFromDesign(state)
     )
+
     sqlApi
       .getSql(
         state.currentNamespace,
@@ -478,13 +480,69 @@ const actions = {
       })
   },
 
-  loadReport({ commit }, report) {
+  loadReport({ state, commit }, report) {
+    const nameMatcher = (source, target) => source.name === target.name
+
+    // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
+    const baseTable = state.design.relatedTable
+    const queryPayload = report.queryPayload
+    let joinColumnGroups = []
+    if (state.design.joins) {
+      joinColumnGroups = state.design.joins.reduce((acc, curr) => {
+        acc.push({
+          name: curr.name,
+          columns: curr.relatedTable.columns,
+          aggregates: curr.relatedTable.aggregates,
+          timeframes: curr.relatedTable.timeframes
+        })
+        return acc
+      }, [])
+    }
+
+    const setSelected = (sourceCollection, targetCollection) => {
+      if (!sourceCollection) {
+        return
+      }
+
+      sourceCollection.forEach(item => {
+        item.selected = targetCollection.includes(item.name)
+      })
+    }
+
+    // toggle the selected items
+    setSelected(baseTable.columns, queryPayload.columns)
+    setSelected(baseTable.aggregates, queryPayload.aggregates)
+
+    // joins, timeframes, and periods
+    joinColumnGroups.forEach(joinGroup => {
+      // joins - columns
+      const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup))
+
+      setSelected(joinGroup.columns, targetJoin.columns)
+      setSelected(joinGroup.aggregates, targetJoin.aggregates)
+
+      // timeframes
+      if (targetJoin.timeframes) {
+        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(namer))
+        // periods
+        joinGroup.timeframes.forEach(timeframe => {
+          const targetTimeframe = targetJoin.timeframes.find(tf =>
+            nameMatcher(tf, timeframe)
+          )
+
+          if (targetTimeframe) {
+            setSelected(timeframe.periods, targetTimeframe.periods.map(namer))
+          }
+        })
+      }
+    })
+
+    commit('setCurrentReport', report)
+
     this.dispatch('designs/getSQL', {
       run: true,
       payload: report.queryPayload
     })
-    commit('setCurrentReport', report)
-    commit('setStateFromLoadedReport', report)
   },
 
   limitSet({ commit }, limit) {
@@ -676,6 +734,11 @@ const mutations = {
 
   setCurrentReport(state, report) {
     state.activeReport = report
+
+    state.chartType = report.chartType
+    state.filters = report.filters
+    state.order = report.order
+    state.limit = report.queryPayload.limit
   },
 
   setDesign(state, designData) {
@@ -703,10 +766,6 @@ const mutations = {
   setIsAutoRunQuery(state, value) {
     state.isAutoRunQuery = value
     localStorage.setItem('isAutoRunQuery', state.isAutoRunQuery)
-  },
-
-  setLoader(state, loader) {
-    state.loader = loader
   },
 
   setErrorState(state) {
@@ -812,70 +871,6 @@ const mutations = {
 
   setSQLResults(state, payload) {
     state.currentSQL = payload.sql
-  },
-
-  setStateFromLoadedReport(state, report) {
-    // General UI state updates
-    state.chartType = report.chartType
-    state.loader = report.queryPayload.loader
-    state.filters = report.filters
-    state.limit = report.queryPayload.limit
-    state.order = report.order
-
-    // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
-    const baseTable = state.design.relatedTable
-    const queryPayload = report.queryPayload
-    const joinColumnGroups = state.design.joins
-      ? state.design.joins.reduce((acc, curr) => {
-          acc.push({
-            name: curr.name,
-            columns: curr.relatedTable.columns,
-            aggregates: curr.relatedTable.aggregates,
-            timeframes: curr.relatedTable.timeframes
-          })
-          return acc
-        }, [])
-      : []
-    const nameMatcher = (source, target) => source.name === target.name
-    const setSelected = (sourceCollection, targetCollection) => {
-      sourceCollection.forEach(item => {
-        Vue.set(item, 'selected', targetCollection.includes(item.name))
-      })
-    }
-
-    // columns
-    setSelected(baseTable.columns, queryPayload.columns)
-    // aggregates
-    setSelected(baseTable.aggregates, queryPayload.aggregates)
-    // joins, timeframes, and periods
-    joinColumnGroups.forEach(joinGroup => {
-      // joins - columns
-      const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup))
-      setSelected(joinGroup.columns, targetJoin.columns)
-      // joins - aggregates
-      if (joinGroup.aggregates) {
-        setSelected(joinGroup.aggregates, targetJoin.aggregates)
-      }
-      // timeframes
-      if (targetJoin && targetJoin.timeframes) {
-        setSelected(
-          joinGroup.timeframes,
-          targetJoin.timeframes.map(utils.predicate.named)
-        )
-        // periods
-        joinGroup.timeframes.forEach(timeframe => {
-          const targetTimeframe = targetJoin.timeframes.find(tf =>
-            nameMatcher(tf, timeframe)
-          )
-          if (targetTimeframe && targetTimeframe.periods) {
-            setSelected(
-              timeframe.periods,
-              targetTimeframe.periods.map(utils.predicate.named)
-            )
-          }
-        })
-      }
-    })
   },
 
   toggleCollapsed(state, collapsable) {

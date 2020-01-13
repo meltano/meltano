@@ -3,7 +3,6 @@ import { mapGetters, mapState } from 'vuex'
 
 import capitalize from '@/filters/capitalize'
 import underscoreToSpace from '@/filters/underscoreToSpace'
-import utils from '@/utils/utils'
 
 export default {
   name: 'AnalyzeList',
@@ -70,16 +69,6 @@ export default {
         (this.isDisplayContextualModels && !this.hasContextualModels)
       )
     }
-  },
-  methods: {
-    prepareAnalyzeLoader(model, design) {
-      if (this.isDisplayContextualModels) {
-        localStorage.setItem(
-          utils.concatLoaderModelDesign(model, design),
-          this.pipeline.loader
-        )
-      }
-    }
   }
 }
 </script>
@@ -127,7 +116,6 @@ export default {
             class="button is-small is-interactive-primary is-outlined"
             :disabled="!getIsModelEnabled(model)"
             :to="urlForModelDesign(modelKey, design)"
-            @click.native="prepareAnalyzeLoader(model.name, design)"
             >{{ design | capitalize | underscoreToSpace }}</router-link
           >
         </div>

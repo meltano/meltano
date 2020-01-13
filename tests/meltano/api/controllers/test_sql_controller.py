@@ -22,7 +22,7 @@ def assertListEquivalence(xs: list, ys: list):
     assert set(xs) == set(ys)
 
 
-@pytest.mark.usefixtures("project", "add_model")
+@pytest.mark.usefixtures("project", "add_model", "schedule")
 class TestSqlController:
     @pytest.fixture
     def post(self, app, api, engine_sessionmaker):

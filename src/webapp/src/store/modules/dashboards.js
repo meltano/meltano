@@ -17,7 +17,7 @@ const defaultState = utils.deepFreeze({
 const actions = {
   addReportToDashboard({ commit, dispatch }, data) {
     commit('addReportToDashboard', data)
-    dashboardsApi.addReportToDashboard(data).then(response => {
+    return dashboardsApi.addReportToDashboard(data).then(response => {
       dispatch('updateCurrentDashboard', response.data)
     })
   },
@@ -28,6 +28,7 @@ const actions = {
       isDeleting: true
     }
     commit('setDashboardStatus', status)
+
     return dashboardsApi.deleteDashboard(dashboard).then(() => {
       commit('setDashboardStatus', Object.assign({ isDeleting: false }, status))
       commit('deleteDashboard', dashboard)
@@ -48,22 +49,15 @@ const actions = {
   },
 
   getDashboards({ commit }) {
-    return new Promise(resolve => {
-      dashboardsApi.getDashboards().then(response => {
-        const dashboards = response.data
-        commit('setDashboards', dashboards)
-        resolve()
-      })
+    return dashboardsApi.getDashboards().then(response => {
+      commit('setDashboards', response.data)
     })
   },
 
   getReports({ commit }) {
-    return new Promise(resolve => {
-      reportsApi.loadReports().then(response => {
-        commit('setReports', response.data)
-        resolve()
-      })
-    })
+    return reportsApi
+      .loadReports()
+      .then(response => commit('setReports', response.data))
   },
 
   initialize({ commit, dispatch }, slug) {
