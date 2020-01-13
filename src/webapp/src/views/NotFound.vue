@@ -11,9 +11,9 @@ export default {
         <h1 class="title">
           404
         </h1>
-        <h2 class="subtitle mb-1r">
+        <p class="subtitle mb-1r">
           Oops... Seems like this page is missing...
-        </h2>
+        </p>
         <p class="mb-1r">
           If you think this is a bug,
           <a
