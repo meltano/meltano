@@ -8,6 +8,8 @@ description: Use Meltano to extract raw data from Zendesk and insert it into Pos
 
 `tap-zendesk` is an extractor that pulls data from a Zendesk REST API and produces JSON-formatted data following the [Singer spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
 
+<YouTubeEmbed src="https://www.youtube.com/embed/bUnY-7Azhcc" />
+
 ## Getting Started
 
 ### Prerequisites

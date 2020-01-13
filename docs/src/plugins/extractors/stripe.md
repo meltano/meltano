@@ -1,41 +1,45 @@
 ---
 sidebar: auto
 metaTitle: Extract Data from Stripe
-description: Use Meltano to extract raw data from Stripe and insert it into Postgres, Snowflake, and more. 
+description: Use Meltano to extract raw data from Stripe and insert it into Postgres, Snowflake, and more.
 ---
 
 # Stripe
 
 `tap-stripe` is an extractor that pulls data from Stripe's API and produces JSON-formatted data following the [Singer spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
 
+<YouTubeEmbed src="https://www.youtube.com/embed/Qp-EgNP6Pjw" />
+
 ## Getting Started
+
+### Prerequisites
 
 In order to use `tap-stripe`, you need to two key pieces of information that will allow the Meltano application to fetch data.
 
 1. Your account ID (e.g., `acct_152Bdedkol54`)
-1. A secret API key
+1. A secret API key (e.g., `sk_live_eis72wonf921pqjdf`)
 
-### Account ID
+#### Account ID
 
 To get your account ID:
 
 1. Visit your profile: [https://dashboard.stripe.com/settings/user](https://dashboard.stripe.com/settings/user)
 
-    - Or in the upper right, click on the avatar to access a dropdown, and click on `Profile`
+   - Or in the upper right, click on the avatar to access a dropdown, and click on `Profile`
 
 ![Screenshot of what the avatar dropdown with Profile looks like](/images/tap-stripe/01-stripe-docs.png)
 
 2. Once the page loads, scroll to the bottom to find your account ID in the section labelled `Accounts`
 
-![](/images/tap-stripe/02-stripe-docs.png)
+![Screenshot of account ID](/images/tap-stripe/02-stripe-docs.png)
 
 3. Copy and paste it somewhere you can refer later on when configuring the tap.
 
-### Secret Key
+#### Secret Key
 
 1. Visit your Developer API Keys page: [https://dashboard.stripe.com/apikeys](https://dashboard.stripe.com/apikeys)
 
-    - You can find this by clicking on the `Developers` link on the left navigation and clicking on `API Keys`
+   - You can find this by clicking on the `Developers` link on the left navigation and clicking on `API Keys`
 
 ![Screeenshot of where the Developers link is on the left side](/images/tap-stripe/03-stripe-docs.png)
 
@@ -52,6 +56,17 @@ To get your account ID:
 ![Screenshot of the new API key](/images/tap-stripe/06-stripe-docs.png)
 
 ### Install
+
+#### Web Application
+
+1. On `Pipeline: Extract` page, find the `Zendesk` card and click on `Install`
+1. When it is complete, you should see the following modal
+
+![Screenshot of tap-stripe modal](/images/tap-stripe/07-stripe-docs.png)
+
+3. Fill out the form with your [account ID](/plugins/extractors/stripe.html#account-id) and [secret key](/plugins/extractors/stripe.html#secret-key)
+1. Click `Test Connection` to make sure that everything works correctly
+1. Click `Save` to finish installation!
 
 #### Command Line Interface
 
