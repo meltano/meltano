@@ -98,7 +98,7 @@ Once it's complete, the indicator will disappear and you should be able to see t
 
 ![Screenshot of run log of a completed pipeline](/images/getting-started-guide/gsg-07.png)
 
-You can click the `Analyze` button to [select a model to analyze](#analyze-the-data) or view the same models with more context in the Model page. If you close the log, you can check the log of any past pipeline by clicking the any cell under the **Last Run** column.
+You can click the `Analyze` button to [select a model to analyze](#analyze-the-data). The same `Analyze` button is available inline within your pipeline. If you close the log and go back to the Pipelines page you can check the log of any past pipeline by clicking the `Log` button next to it:
 
 ![Screenshot of complete pipeline run](/images/getting-started-guide/gsg-08.png)
 
@@ -106,11 +106,13 @@ Congratulations! Now that you have connected a data source, configured a target 
 
 ## Select a data model
 
-Meltano Models determine how the data is defined and assists us with interactively generating SQL so that you can easily analyze and visualize your data.
+There are currently three ways to select a data model for analyzing, exploring, and report building:
 
-To select which data model we want to analyze, let's click the **Analyze** dropdown and select the `model-carbon-intensity` **Region** model.
+- Main navigation's `Analyze` dropdown (all data models)
+- Each pipeline's inline `Analyze` button (contextual data models)
+- Log modal's `Analyze` button (contextual data models)
 
-![Screenshot of Analyze: Model page](/images/getting-started-guide/gsg-09.png)
+Selecting a data model from one of these options takes us to the next step.
 
 ## Analyze the data
 
