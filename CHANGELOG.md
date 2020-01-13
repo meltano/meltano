@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1458](https://gitlab.com/meltano/meltano/issues/1458) Remove tap-carbon-intensity-sqlite model from default installation
 - [#1458](https://gitlab.com/meltano/meltano/issues/1458) Update docs to reflect new getting started path and updated screenshots
 - [#1513](https://gitlab.com/meltano/meltano/issues/1513) Remove dead code related to `/model` route that we no longer link to in favor of the contextual Analyze CTAs and the `MainNav.vue`'s Analyze dropdown
+- [#1542](https://gitlab.com/meltano/meltano/issues/1542) Update version, logout, and help UI partial (upper right) to have less prominence and more clearly communicate the "Sign Out" action
 
 ### Fixes
 
