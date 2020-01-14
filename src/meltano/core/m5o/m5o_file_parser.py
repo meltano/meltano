@@ -68,7 +68,7 @@ class MeltanoAnalysisFileParser:
         self.tables = []
         self.packaged_topics = []
         self.packaged_tables = []
-        self.required_topic_properties = ["name", "connection", "label", "designs"]
+        self.required_topic_properties = ["name", "label", "designs"]
         self.required_design_properties = ["from", "label", "description"]
         self.required_join_properties = ["sql_on", "relationship"]
         self.required_table_properties = ["sql_table_name", "columns"]
@@ -254,14 +254,14 @@ class MeltanoAnalysisFileParser:
                 # The namespace for a topic in a directory under project/models/
                 #   is `custom/path/to/directory`
                 # For example:
-                # `project/models/mytopic.topic.m5o` --> `cutom`
-                # `project/models/dir1/dir2/mytopic.topic.m5o` --> `cutom/dir1/dir2`
+                # `project/models/mytopic.topic.m5o` --> `custom`
+                # `project/models/dir1/dir2/mytopic.topic.m5o` --> `custom/dir1/dir2`
                 parsed_topic["namespace"] = str(
                     Path("custom").joinpath(folder.relative_to(models))
                 )
 
-                parsed_topic["plugin_namespace"] = parsed_topic["namespace"].replace(
-                    "/", "_"
+                parsed_topic["plugin_namespace"] = (
+                    conf["plugin_namespace"] or folder.name
                 )
 
                 self.topics.append(parsed_topic)
