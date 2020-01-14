@@ -1,6 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
-import Vue from 'vue'
+import _ from 'lodash'
 
 import Dropdown from '@/components/generic/Dropdown'
 import ExtractorList from '@/components/pipelines/ExtractorList'
