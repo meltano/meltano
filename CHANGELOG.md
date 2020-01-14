@@ -9,9 +9,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [meltano/model-stripe#2](https://gitlab.com/meltano/model-stripe/issues/2) Add timeframes to the Stripe models
+
 ### Changes
 
 ### Fixes
+
+- [#1538](https://gitlab.com/meltano/meltano/issues/1538) Fix timeframes not properly displaying on the base table
 
 ### Breaks
 
