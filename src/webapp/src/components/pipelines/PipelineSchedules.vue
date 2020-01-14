@@ -68,43 +68,6 @@ export default {
 
 <template>
   <div>
-    <div class="columns">
-      <div class="column is-three-fifths is-offset-one-fifth">
-        <div class="content has-text-centered">
-          <p class="level-item buttons">
-            <a class="button is-small is-static is-marginless is-borderless">
-              <span>Create a data pipeline below</span>
-            </a>
-            <span class="step-spacer">then</span>
-            <a class="button is-small is-static is-marginless is-borderless">
-              <span
-                >Click <span class="is-italic">Manual Run</span> to start data
-                collection</span
-              >
-            </a>
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <br />
-
-    <div class="columns is-vcentered">
-      <div class="column">
-        <h2 class="title is-inline-block">Pipelines</h2>
-        <div class="field is-pulled-right is-inline-block">
-          <div class="control">
-            <button
-              class="button is-medium is-interactive-primary"
-              @click="goToCreatePipeline"
-            >
-              <span>Create</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div v-if="getHasPipelines" class="box">
       <table class="table is-fullwidth is-narrow is-hoverable">
         <ScheduleTableHead has-actions has-start-date />
@@ -195,11 +158,11 @@ export default {
                     >Manual Run</a
                   >
                   <Dropdown
-                    label="Analyze"
+                    label="Reports"
                     button-classes="is-interactive-primary is-outlined is-small"
                     :tooltip="{
                       classes: 'is-tooltip-left',
-                      message: 'Analyze models of this pipeline.'
+                      message: 'Analyze related reports of this pipeline.'
                     }"
                     menu-classes="dropdown-menu-300"
                     icon-open="chart-line"

@@ -12,6 +12,7 @@ import PipelineSchedules from '@/components/pipelines/PipelineSchedules'
 import Analyze from '@/views/Analyze'
 import Dashboards from '@/views/Dashboards'
 import Dashboard from '@/views/Dashboard'
+import Datasets from '@/views/Datasets'
 import NotFound from '@/views/NotFound'
 import Pipelines from '@/views/Pipelines'
 
@@ -28,8 +29,64 @@ const router = new Router({
     },
     {
       path: '/',
-      redirect: '/pipeline'
+      redirect: '/datasets'
     },
+    {
+      path: '/datasets/',
+      name: 'datasets',
+      component: Datasets,
+      children: [
+        {
+          path: 'extract/:extractor/configure',
+          name: 'extractorSettings',
+          components: {
+            default: Datasets,
+            extractorSettings: ExtractorSettingsModal
+          },
+          meta: {
+            isModal: true,
+            title: 'Meltano: Pipeline - Extractor Configuration'
+          }
+        },
+        {
+          path: 'load/:loader',
+          name: 'loaderSettings',
+          components: {
+            default: Datasets,
+            loaderSettings: LoaderSettingsModal
+          },
+          meta: {
+            isModal: true,
+            title: 'Meltano: Pipeline - Loader Settings'
+          }
+        },
+        {
+          path: 'schedule/create',
+          name: 'createPipelineSchedule',
+          components: {
+            default: Datasets,
+            createPipelineSchedule: CreatePipelineScheduleModal
+          },
+          meta: {
+            isModal: true,
+            title: 'Meltano: Pipeline - Create Schedule'
+          }
+        },
+        {
+          path: 'schedule/log/:jobId',
+          name: 'runLog',
+          components: {
+            default: Datasets,
+            runLog: LogModal
+          },
+          meta: {
+            isModal: true,
+            title: 'Meltano: Pipeline - Run Log'
+          }
+        }
+      ]
+    },
+
     {
       path: '/pipeline/',
       redirect: '/pipeline/extract/',

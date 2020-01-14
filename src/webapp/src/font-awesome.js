@@ -17,6 +17,7 @@ import {
   faChartPie,
   faCheck,
   faCheckCircle,
+  faDatabase,
   faDotCircle,
   faDraftingCompass,
   faExclamationTriangle,
@@ -68,6 +69,7 @@ export default {
     library.add(faChartPie)
     library.add(faCheck)
     library.add(faCheckCircle)
+    library.add(faDatabase)
     library.add(faDotCircle)
     library.add(faDraftingCompass)
     library.add(faExclamationTriangle)
