@@ -86,23 +86,27 @@ export default {
     this.extractorName = this.$route.params.extractor
     this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
       const needsInstallation = this.extractor.name !== this.extractorName
-      if (needsInstallation) {
-        const config = {
-          pluginType: 'extractors',
-          name: this.extractorName
-        }
-        this.addPlugin(config).then(() => {
-          this.getExtractorConfiguration().then(
-            this.createEditableConfiguration
-          )
-          this.installPlugin(config).then(this.tryAutoAdvance)
-        })
-      } else {
-        this.getExtractorConfiguration().then(() => {
-          this.createEditableConfiguration()
-          this.tryAutoAdvance()
-        })
+      const addConfig = {
+        pluginType: 'extractors',
+        name: this.extractorName
       }
+
+      const uponPlugin = needsInstallation
+        ? this.addPlugin(addConfig).then(() => {
+            this.getExtractorConfiguration().then(
+              this.createEditableConfiguration
+            )
+            this.installPlugin(addConfig).then(this.tryAutoAdvance)
+          })
+        : this.getExtractorConfiguration().then(() => {
+            this.createEditableConfiguration()
+            this.tryAutoAdvance()
+          })
+
+      uponPlugin.catch(err => {
+        this.$error.handle(err)
+        this.close()
+      })
     })
   },
   beforeDestroy() {
@@ -175,13 +179,13 @@ export default {
             })
             this.$router.push({ name: 'loaders' })
             const message = this.extractorLacksConfigSettings
-              ? `Auto Advance - No Configuration needed for ${this.extractor.name}`
+              ? `Auto Advance - No Configuration needed for ${
+                  this.extractor.name
+                }`
               : `Connection Saved - ${this.extractor.name}`
             Vue.toasted.global.success(message)
           })
-          .catch(error => {
-            Vue.toasted.global.error(error.response.data.code)
-          })
+          .catch(this.close)
       })
     },
     testConnection() {

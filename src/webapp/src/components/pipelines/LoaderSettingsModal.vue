@@ -73,18 +73,19 @@ export default {
     this.loaderName = this.$route.params.loader
     this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
       const needsInstallation = this.loader.name !== this.loaderName
-      if (needsInstallation) {
-        const config = {
-          pluginType: 'loaders',
-          name: this.loaderName
-        }
-        this.addPlugin(config).then(() => {
-          this.getLoaderConfiguration().then(this.createEditableConfiguration)
-          this.installPlugin(config)
-        })
-      } else {
-        this.getLoaderConfiguration().then(this.createEditableConfiguration)
+      const addConfig = {
+        pluginType: 'loaders',
+        name: this.loaderName
       }
+
+      const uponPlugin = needsInstallation
+        ? this.addPlugin(addConfig).then(() => {
+            this.getLoaderConfiguration().then(this.createEditableConfiguration)
+            this.installPlugin(addConfig)
+          })
+        : this.getLoaderConfiguration().then(this.createEditableConfiguration)
+
+      uponPlugin.catch(this.$error.handle)
     })
   },
   beforeDestroy() {
@@ -126,6 +127,7 @@ export default {
           this.$router.push({ name: 'schedules' })
           Vue.toasted.global.success(`Connector Saved - ${this.loader.name}`)
         })
+        .catch(this.close)
     }
   }
 }

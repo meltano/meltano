@@ -6,6 +6,7 @@ from werkzeug.exceptions import Forbidden
 from sqlalchemy.orm import joinedload
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.security import users
+from meltano.api.security.readonly_killswitch import readonly_killswitch
 from meltano.api.models.security import db, User, Role, RolesUsers, RolePermissions
 from .settings_helper import SettingsHelper
 
@@ -23,6 +24,7 @@ def index():
 
 @settingsBP.route("/save", methods=["POST"])
 @roles_required("admin")
+@readonly_killswitch
 def save():
     settings_helper = SettingsHelper()
     connection = request.get_json()
@@ -31,6 +33,7 @@ def save():
 
 
 @settingsBP.route("/delete", methods=["POST"])
+@readonly_killswitch
 def delete():
     settings_helper = SettingsHelper()
     connection = request.get_json()
@@ -99,8 +102,9 @@ class AclResource(Resource):
 
 
 class RolesResource(Resource):
-    @marshal_with(AclResource.RoleDefinition)
+    @readonly_killswitch
     @roles_required("admin")
+    @marshal_with(AclResource.RoleDefinition)
     def post(self):
         payload = request.get_json()
         role = payload["role"]
@@ -119,6 +123,7 @@ class RolesResource(Resource):
         db.session.commit()
         return role, 201
 
+    @readonly_killswitch
     @roles_required("admin")
     @marshal_with(AclResource.RoleDefinition)
     def delete(self):
@@ -152,6 +157,7 @@ class RolePermissionsResource(Resource):
         payload = request.get_json()
         return payload["role"], payload["permission_type"], payload["context"]
 
+    @readonly_killswitch
     @roles_required("admin")
     @marshal_with(AclResource.RoleDefinition)
     def post(self):
@@ -177,6 +183,7 @@ class RolePermissionsResource(Resource):
 
         return role, 200
 
+    @readonly_killswitch
     @roles_required("admin")
     @marshal_with(AclResource.RoleDefinition)
     def delete(self):

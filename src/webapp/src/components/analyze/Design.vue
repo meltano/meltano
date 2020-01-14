@@ -215,9 +215,7 @@ export default {
         .then(() => {
           Vue.toasted.global.success(`Report Saved - ${reportName}`)
         })
-        .catch(error => {
-          Vue.toasted.global.error(error.response.data.code)
-        })
+        .catch(this.$error.handle)
     },
 
     setChartType(chartType) {

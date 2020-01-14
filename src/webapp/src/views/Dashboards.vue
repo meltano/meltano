@@ -54,7 +54,10 @@ export default {
             `Dashboard Successfully Removed - ${dashboard.name}`
           )
         )
-        .catch(error => Vue.toasted.global.error(error.response.data.code))
+        .catch(err => {
+          this.$error.handle(err)
+          this.closeCreateDashboardModal()
+        })
     }
   }
 }
