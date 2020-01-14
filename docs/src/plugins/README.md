@@ -24,6 +24,12 @@ Extract raw data from any CSV.
 
 Detailed [documentation can be found here](/plugins/extractors/csv.html).
 
+### Facebook Ads
+
+Extract Facebook Ads data from the Facebook Marketing API.
+
+Detailed [documentation can be found here](/plugins/extractors/facebook.html).
+
 ### Fastly
 
 Extract raw data from Fastly.
