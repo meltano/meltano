@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#608](https://gitlab.com/meltano/meltano/issues/608) Add the Facebook Ads Extractor to Meltano as a hidden plugin. It will be fully enabled on Meltano UI once bundled Transformations and Models are added. It uses the tap defined in https://gitlab.com/meltano/tap-facebook/
+
 ### Changes
 
 ### Fixes
