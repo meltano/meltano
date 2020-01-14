@@ -77,6 +77,9 @@ export default {
       <thead>
         <tr>
           <th>
+            <div>
+              <small class="has-text-interactive-navigation">Step 1</small>
+            </div>
             <span>Data Source</span>
             <span
               class="icon has-text-grey-light tooltip is-tooltip-right"
@@ -86,6 +89,9 @@ export default {
             </span>
           </th>
           <th>
+            <div>
+              <small class="has-text-interactive-navigation">Step 2</small>
+            </div>
             <span>Update Interval</span>
             <span
               class="icon has-text-grey-light tooltip is-tooltip-right"
@@ -95,6 +101,9 @@ export default {
             </span>
           </th>
           <th>
+            <div>
+              <small class="has-text-interactive-navigation">Step 3</small>
+            </div>
             <span>Name</span>
             <span
               class="icon has-text-grey-light tooltip is-tooltip-right"
@@ -164,7 +173,7 @@ export default {
                 data-tooltip="Create integration or custom data connection."
                 :class="{ 'is-loading': isSaving }"
                 :disabled="!isSaveable"
-                >Create</a
+                >Save</a
               >
             </div>
           </td>

@@ -121,15 +121,11 @@ export default {
     ]),
     tryAutoAdvance() {
       if (this.extractorLacksConfigSettings) {
-        this.saveConfigAndGoToLoaders()
+        this.saveConfig()
       }
     },
     close() {
-      if (this.prevRoute) {
-        this.$router.go(-1)
-      } else {
-        this.$router.push({ name: 'extractors' })
-      }
+      this.$router.go(-1)
     },
     createEditableConfiguration() {
       this.localConfiguration = Object.assign(
@@ -146,7 +142,7 @@ export default {
     onChangeUploadFormData(uploadFormData) {
       this.uploadFormData = uploadFormData
     },
-    saveConfigAndGoToLoaders() {
+    saveConfig() {
       // 1. Prepare conditional upload as response is needed to properly save config settings
       let uponConditionalUpload = this.uploadFormData
         ? this.$store.dispatch('orchestration/uploadPluginConfigurationFile', {
@@ -177,9 +173,9 @@ export default {
               type: 'extractor',
               value: this.extractor
             })
-            this.$router.push({ name: 'loaders' })
+            this.$router.push({ name: 'datasets' })
             const message = this.extractorLacksConfigSettings
-              ? `Auto Advance - No Configuration needed for ${this.extractor.name}`
+              ? `No Configuration needed for ${this.extractor.name}`
               : `Connection Saved - ${this.extractor.name}`
             Vue.toasted.global.success(message)
           })
@@ -225,20 +221,14 @@ export default {
         <div class="modal-card-head-image image is-64x64 level-item">
           <ConnectorLogo :connector="extractorName" />
         </div>
-        <p class="modal-card-title">Extractor Configuration</p>
+        <p class="modal-card-title">Connection Setup</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body is-overflow-y-scroll">
-        <div v-if="isLoadingConfigSettings || isInstalling" class="content">
-          <div v-if="!isLoadingConfigSettings && isInstalling" class="level">
-            <div class="level-item">
-              <p class="is-italic">
-                Installing {{ extractor.label }} can take up to a minute.
-              </p>
-            </div>
-          </div>
-          <progress class="progress is-small is-info"></progress>
-        </div>
+        <progress
+          v-if="isLoadingConfigSettings"
+          class="progress is-small is-info"
+        ></progress>
 
         <template v-if="!isLoadingConfigSettings">
           <!--
@@ -283,8 +273,11 @@ export default {
           <div class="control">
             <button
               class="button is-interactive-primary"
+              :class="{
+                'is-loading': isLoadingConfigSettings || isInstalling
+              }"
               :disabled="!isSaveable || isTesting"
-              @click="saveConfigAndGoToLoaders"
+              @click="saveConfig"
             >
               Save
             </button>

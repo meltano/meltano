@@ -11,7 +11,6 @@ export default {
     ...mapGetters('plugins', [
       'visibleExtractors',
       'getIsAddingPlugin',
-      'getIsPluginInstalled',
       'getIsInstallingPlugin'
     ]),
     isLoadingExtractors() {
@@ -40,16 +39,12 @@ export default {
           :key="`${extractor.name}-${index}`"
           class="media has-cursor-pointer"
           :data-test-id="`${extractor.name}-extractor-card`"
+          data-dropdown-auto-close
           @click="updateExtractorSettings(extractor.name)"
         >
           <figure class="media-left">
             <p class="image level-item is-48x48 container">
-              <ConnectorLogo
-                :connector="extractor.name"
-                :is-grayscale="
-                  !getIsPluginInstalled('extractors', extractor.name)
-                "
-              />
+              <ConnectorLogo :connector="extractor.name" />
             </p>
           </figure>
           <div class="media-content">
