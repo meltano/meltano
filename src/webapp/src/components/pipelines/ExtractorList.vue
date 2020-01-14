@@ -19,7 +19,11 @@ export default {
   },
   methods: {
     updateExtractorSettings(extractor) {
-      this.$router.push({ name: 'extractorSettings', params: { extractor } })
+      this.$emit('select', extractor)
+      this.$router.push({
+        name: 'extractorSettings',
+        params: { extractor: extractor.name }
+      })
     }
   }
 }
@@ -39,8 +43,7 @@ export default {
           :key="`${extractor.name}-${index}`"
           class="media has-cursor-pointer"
           :data-test-id="`${extractor.name}-extractor-card`"
-          data-dropdown-auto-close
-          @click="updateExtractorSettings(extractor.name)"
+          @click="updateExtractorSettings(extractor)"
         >
           <figure class="media-left">
             <p class="image level-item is-48x48 container">
@@ -50,7 +53,7 @@ export default {
           <div class="media-content">
             <div class="content">
               <p>
-                <strong>{{ extractor.name }}</strong>
+                <strong>{{ extractor.label }}</strong>
                 <br />
                 <small>{{ extractor.description }}</small>
               </p>
