@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import Vue from 'vue'
 
 import AnalyzeList from '@/components/analyze/AnalyzeList'
@@ -16,7 +16,6 @@ export default {
   },
   computed: {
     ...mapState('orchestration', ['pipelines']),
-    ...mapGetters('orchestration', ['getHasPipelines']),
     getMomentFormatlll() {
       return val => utils.momentFormatlll(val)
     },
@@ -67,173 +66,158 @@ export default {
 </script>
 
 <template>
-  <div>
-    <div v-if="getHasPipelines" class="box">
-      <table class="table is-fullwidth is-narrow is-hoverable">
-        <ScheduleTableHead has-actions has-start-date />
+  <div class="box">
+    <table class="table is-fullwidth is-narrow is-hoverable is-size-7">
+      <ScheduleTableHead has-actions has-start-date />
 
-        <tbody>
-          <template v-for="pipeline in pipelines">
-            <tr :key="pipeline.name">
-              <td>
-                <p>{{ pipeline.name }}</p>
-              </td>
-              <td>
-                <p class="has-text-centered">{{ pipeline.extractor }}</p>
-              </td>
-              <td>
-                <p class="has-text-centered">{{ pipeline.loader }}</p>
-              </td>
-              <td>
-                <p class="has-text-centered">{{ pipeline.transform }}</p>
-              </td>
-              <td>
-                <p class="has-text-centered">
-                  <span>{{ pipeline.interval }}</span>
-                </p>
-              </td>
-              <td>
-                <p class="has-text-centered">
-                  <span
-                    :class="{
-                      'tooltip is-tooltip-left': pipeline.jobId
-                    }"
-                    :data-tooltip="getMomentFormatlll(pipeline.startDate)"
-                  >
-                    <span>
-                      {{
-                        pipeline.startDate
-                          ? getMomentFromNow(pipeline.startDate)
-                          : 'None'
-                      }}
-                    </span>
+      <tbody>
+        <template v-for="pipeline in pipelines">
+          <tr :key="pipeline.name">
+            <td>
+              <p>{{ pipeline.name }}</p>
+            </td>
+            <td>
+              <p class="has-text-centered">{{ pipeline.extractor }}</p>
+            </td>
+            <td>
+              <p class="has-text-centered">{{ pipeline.loader }}</p>
+            </td>
+            <td>
+              <p class="has-text-centered">{{ pipeline.transform }}</p>
+            </td>
+            <td>
+              <p class="has-text-centered">
+                <span>{{ pipeline.interval }}</span>
+              </p>
+            </td>
+            <td>
+              <p class="has-text-centered">
+                <span
+                  :class="{
+                    'tooltip is-tooltip-left': pipeline.jobId
+                  }"
+                  :data-tooltip="getMomentFormatlll(pipeline.startDate)"
+                >
+                  <span>
+                    {{
+                      pipeline.startDate
+                        ? getMomentFromNow(pipeline.startDate)
+                        : 'None'
+                    }}
                   </span>
-                </p>
-              </td>
-              <td>
-                <p class="has-text-centered">
-                  <button
-                    class="button is-outlined is-small is-fullwidth h-space-between"
-                    :class="{
-                      'tooltip is-tooltip-left': pipeline.jobId
-                    }"
-                    :data-tooltip="
-                      `${
-                        pipeline.endedAt
-                          ? getMomentFormatlll(pipeline.endedAt)
-                          : 'View the last run of this ELT pipeline.'
-                      }`
+                </span>
+              </p>
+            </td>
+            <td>
+              <p class="has-text-centered">
+                <button
+                  class="button is-outlined is-small is-fullwidth h-space-between"
+                  :class="{
+                    'tooltip is-tooltip-left': pipeline.jobId
+                  }"
+                  :data-tooltip="
+                    `${
+                      pipeline.endedAt
+                        ? getMomentFormatlll(pipeline.endedAt)
+                        : 'View the last run of this ELT pipeline.'
+                    }`
+                  "
+                  :disabled="!pipeline.jobId"
+                  @click="goToLog(pipeline.jobId)"
+                >
+                  <span>
+                    {{ getLastRunLabel(pipeline) }}
+                  </span>
+                  <span
+                    v-if="!pipeline.isRunning"
+                    class="icon is-small"
+                    :class="
+                      `has-text-${pipeline.hasError ? 'danger' : 'success'}`
                     "
-                    :disabled="!pipeline.jobId"
-                    @click="goToLog(pipeline.jobId)"
                   >
-                    <span>
-                      {{ getLastRunLabel(pipeline) }}
-                    </span>
-                    <span
-                      v-if="!pipeline.isRunning"
-                      class="icon is-small"
-                      :class="
-                        `has-text-${pipeline.hasError ? 'danger' : 'success'}`
+                    <font-awesome-icon
+                      :icon="
+                        pipeline.hasError
+                          ? 'exclamation-triangle'
+                          : 'check-circle'
                       "
-                    >
-                      <font-awesome-icon
-                        :icon="
-                          pipeline.hasError
-                            ? 'exclamation-triangle'
-                            : 'check-circle'
-                        "
-                      ></font-awesome-icon>
-                    </span>
-                  </button>
-                </p>
-              </td>
-              <td>
-                <div class="buttons is-right">
-                  <a
-                    class="button is-small tooltip is-tooltip-left"
-                    :class="{ 'is-loading': pipeline.isRunning }"
-                    data-tooltip="Run this ELT pipeline once."
-                    @click="runELT(pipeline)"
-                    >Manual Run</a
-                  >
-                  <Dropdown
-                    label="Reports"
-                    button-classes="is-interactive-primary is-outlined is-small"
-                    :tooltip="{
-                      classes: 'is-tooltip-left',
-                      message: 'Analyze related reports of this pipeline.'
-                    }"
-                    menu-classes="dropdown-menu-300"
-                    icon-open="chart-line"
-                    icon-close="caret-down"
-                    is-right-aligned
-                  >
-                    <div class="dropdown-content is-unselectable">
-                      <AnalyzeList :pipeline="pipeline"></AnalyzeList>
-                    </div>
-                  </Dropdown>
-                  <Dropdown
-                    :button-classes="
-                      `is-small is-danger is-outlined ${
-                        pipeline.isDeleting ? 'is-loading' : ''
-                      }`
-                    "
-                    :disabled="pipeline.isRunning"
-                    :tooltip="{
-                      classes: 'is-tooltip-left',
-                      message: 'Delete this ELT Pipeline'
-                    }"
-                    menu-classes="dropdown-menu-300"
-                    icon-open="trash-alt"
-                    icon-close="caret-up"
-                    is-right-aligned
-                  >
-                    <div class="dropdown-content is-unselectable">
-                      <div class="dropdown-item">
-                        <div class="content">
-                          <p>
-                            Please confirm deletion of pipeline:<br /><em>{{
-                              pipeline.name
-                            }}</em
-                            >.
-                          </p>
-                        </div>
-                        <div class="buttons is-right">
-                          <button
-                            class="button is-text"
-                            data-dropdown-auto-close
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            class="button is-danger"
-                            data-dropdown-auto-close
-                            @click="removePipeline(pipeline)"
-                          >
-                            Delete
-                          </button>
-                        </div>
+                    ></font-awesome-icon>
+                  </span>
+                </button>
+              </p>
+            </td>
+            <td>
+              <div class="buttons is-right">
+                <a
+                  class="button is-small tooltip is-tooltip-left"
+                  :class="{ 'is-loading': pipeline.isRunning }"
+                  data-tooltip="Run this ELT pipeline once."
+                  @click="runELT(pipeline)"
+                  >Manual Run</a
+                >
+                <Dropdown
+                  label="Reports"
+                  button-classes="is-interactive-primary is-outlined is-small"
+                  :tooltip="{
+                    classes: 'is-tooltip-left',
+                    message: 'Analyze related reports of this pipeline.'
+                  }"
+                  menu-classes="dropdown-menu-300"
+                  icon-open="chart-line"
+                  icon-close="caret-down"
+                  is-right-aligned
+                >
+                  <div class="dropdown-content is-unselectable">
+                    <AnalyzeList :pipeline="pipeline"></AnalyzeList>
+                  </div>
+                </Dropdown>
+                <Dropdown
+                  :button-classes="
+                    `is-small is-danger is-outlined ${
+                      pipeline.isDeleting ? 'is-loading' : ''
+                    }`
+                  "
+                  :disabled="pipeline.isRunning"
+                  :tooltip="{
+                    classes: 'is-tooltip-left',
+                    message: 'Delete this ELT Pipeline'
+                  }"
+                  menu-classes="dropdown-menu-300"
+                  icon-open="trash-alt"
+                  icon-close="caret-up"
+                  is-right-aligned
+                >
+                  <div class="dropdown-content is-unselectable">
+                    <div class="dropdown-item">
+                      <div class="content">
+                        <p>
+                          Please confirm deletion of pipeline:<br /><em>{{
+                            pipeline.name
+                          }}</em
+                          >.
+                        </p>
+                      </div>
+                      <div class="buttons is-right">
+                        <button class="button is-text" data-dropdown-auto-close>
+                          Cancel
+                        </button>
+                        <button
+                          class="button is-danger"
+                          data-dropdown-auto-close
+                          @click="removePipeline(pipeline)"
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
-                  </Dropdown>
-                </div>
-              </td>
-            </tr>
-          </template>
-        </tbody>
-      </table>
-    </div>
-
-    <div v-else class="content">
-      <p>
-        There are no pipelines scheduled yet.
-        <router-link to="schedule/create"
-          >Schedule your first Pipeline</router-link
-        >
-        now.
-      </p>
-    </div>
+                  </div>
+                </Dropdown>
+              </div>
+            </td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
   </div>
 </template>
 
