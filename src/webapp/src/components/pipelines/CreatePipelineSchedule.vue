@@ -12,6 +12,7 @@ export default {
   },
   data() {
     return {
+      extractorInFocus: null,
       intervalOptions: [
         '@once',
         '@hourly',
@@ -33,7 +34,7 @@ export default {
   },
   computed: {
     getDataSourceLabel() {
-      return this.pipeline.extractor || 'None'
+      return this.extractorInFocus ? this.extractorInFocus.label : 'None'
     },
     isSaveable() {
       return false
@@ -43,6 +44,10 @@ export default {
     this.$store.dispatch('plugins/getInstalledPlugins').then(this.prefillForm)
   },
   methods: {
+    onSelected(extractor) {
+      this.extractorInFocus = extractor
+      this.$refs['datasets-dropdown'].close()
+    },
     prefillForm() {
       this.pipeline.name = `pipeline-${new Date().getTime()}`
 
@@ -119,6 +124,7 @@ export default {
         <tr>
           <td>
             <Dropdown
+              ref="datasets-dropdown"
               :label="getDataSourceLabel"
               button-classes="is-outlined"
               :tooltip="{
@@ -130,7 +136,7 @@ export default {
               is-full-width
             >
               <div class="dropdown-content is-unselectable">
-                <ExtractorList />
+                <ExtractorList @select="onSelected" />
               </div>
             </Dropdown>
           </td>
