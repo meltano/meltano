@@ -226,7 +226,7 @@ export default {
       </header>
       <section class="modal-card-body is-overflow-y-scroll">
         <progress
-          v-if="isLoadingConfigSettings"
+          v-if="isLoadingConfigSettings || extractorLacksConfigSettings"
           class="progress is-small is-info"
         ></progress>
 

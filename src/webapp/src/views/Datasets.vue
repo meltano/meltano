@@ -60,7 +60,7 @@ export default {
 <template>
   <router-view-layout>
     <div class="container view-body is-fluid">
-      <h2 class="title">Datasets</h2>
+      <h2 class="title">Data</h2>
       <p class="subtitle">Integrations and custom data connections</p>
 
       <div class="columns">
@@ -69,15 +69,18 @@ export default {
         </div>
       </div>
 
-      <div v-if="getHasPipelines" class="columns">
-        <div class="column">
-          <div class="content">
-            <h3 class="title">Pipelines</h3>
-            <p class="subtitle">Scheduled dataset collection</p>
+      <template v-if="getHasPipelines" class="columns">
+        <br />
+        <div class="columns">
+          <div class="column">
+            <div class="content">
+              <h3 class="title">Pipelines</h3>
+              <p class="subtitle">Scheduled data collection</p>
+            </div>
+            <PipelineSchedules />
           </div>
-          <PipelineSchedules />
         </div>
-      </div>
+      </template>
 
       <div v-if="isModal">
         <router-view :name="getModalName"></router-view>
