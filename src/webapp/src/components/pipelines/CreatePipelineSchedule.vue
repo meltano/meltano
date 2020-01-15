@@ -38,6 +38,7 @@ export default {
   },
   computed: {
     ...mapGetters('orchestration', ['getHasValidConfigSettings']),
+    ...mapGetters('plugins', ['getIsPluginInstalled']),
     ...mapState('orchestration', ['extractorInFocusConfiguration']),
     getDataSourceLabel() {
       return this.extractorInFocus ? this.extractorInFocus.label : 'None'
@@ -62,9 +63,15 @@ export default {
     onSelected(extractor) {
       this.extractorInFocus = extractor
       this.pipeline.extractor = this.extractorInFocus.name
-      this.getExtractorConfiguration(this.pipeline.extractor).then(
-        this.validateConfiguration
+      const isInstalled = this.getIsPluginInstalled(
+        'extractors',
+        this.pipeline.extractor
       )
+      if (isInstalled) {
+        this.getExtractorConfiguration(this.pipeline.extractor).then(
+          this.validateConfiguration
+        )
+      }
       this.$refs['datasets-dropdown'].close()
     },
     prefillForm() {
