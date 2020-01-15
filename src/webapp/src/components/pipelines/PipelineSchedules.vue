@@ -77,15 +77,6 @@ export default {
               <p>{{ pipeline.name }}</p>
             </td>
             <td>
-              <p class="has-text-centered">{{ pipeline.extractor }}</p>
-            </td>
-            <td>
-              <p class="has-text-centered">{{ pipeline.loader }}</p>
-            </td>
-            <td>
-              <p class="has-text-centered">{{ pipeline.transform }}</p>
-            </td>
-            <td>
               <p class="has-text-centered">
                 <span>{{ pipeline.interval }}</span>
               </p>
