@@ -1,20 +1,14 @@
 import Router from 'vue-router'
 
-import CreatePipelineScheduleModal from '@/components/pipelines/CreatePipelineScheduleModal'
 import Design from '@/components/analyze/Design'
-import Extractors from '@/components/pipelines/Extractors'
 import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModal'
-import Loaders from '@/components/pipelines/Loaders'
-import LoaderSettingsModal from '@/components/pipelines/LoaderSettingsModal'
 import LogModal from '@/components/pipelines/LogModal'
-import PipelineSchedules from '@/components/pipelines/PipelineSchedules'
 
 import Analyze from '@/views/Analyze'
 import Dashboards from '@/views/Dashboards'
 import Dashboard from '@/views/Dashboard'
 import Datasets from '@/views/Datasets'
 import NotFound from '@/views/NotFound'
-import Pipelines from '@/views/Pipelines'
 
 const router = new Router({
   mode: 'history',
