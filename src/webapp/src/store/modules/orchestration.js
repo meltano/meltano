@@ -109,7 +109,7 @@ const actions = {
     })
   },
 
-  getExtractorConfiguration({ commit, dispatch }, extractor) {
+  getExtractorConfiguration({ commit, dispatch, state }, extractor) {
     return dispatch('getPluginConfiguration', {
       name: extractor,
       type: 'extractors'
@@ -118,6 +118,7 @@ const actions = {
         configuration: response.data,
         target: 'extractorInFocusConfiguration'
       })
+      return state.extractorInFocusConfiguration
     })
   },
 
