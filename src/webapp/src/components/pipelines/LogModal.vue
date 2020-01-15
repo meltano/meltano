@@ -73,11 +73,7 @@ export default {
   methods: {
     ...mapActions('orchestration', ['getJobLog']),
     close() {
-      if (this.prevRoute) {
-        this.$router.go(-1)
-      } else {
-        this.$router.push({ name: 'schedules' })
-      }
+      this.$router.go(-1)
     },
     initJobPoller() {
       const pollFn = () => {
