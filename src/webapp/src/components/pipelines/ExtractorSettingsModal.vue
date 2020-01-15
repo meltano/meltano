@@ -116,8 +116,7 @@ export default {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
     ...mapActions('orchestration', [
       'savePluginConfiguration',
-      'testPluginConfiguration',
-      'updateRecentELTSelections'
+      'testPluginConfiguration'
     ]),
     tryAutoAdvance() {
       if (this.extractorLacksConfigSettings) {
@@ -169,10 +168,6 @@ export default {
             profiles: this.localConfiguration.profiles
           })
           .then(() => {
-            this.$store.dispatch('orchestration/updateRecentELTSelections', {
-              type: 'extractor',
-              value: this.extractor
-            })
             this.$router.push({ name: 'datasets' })
             const message = this.extractorLacksConfigSettings
               ? `No Configuration needed for ${this.extractor.name}`
