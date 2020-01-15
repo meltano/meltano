@@ -3,6 +3,7 @@ import { mapActions, mapState } from 'vuex'
 import Vue from 'vue'
 
 import AnalyzeList from '@/components/analyze/AnalyzeList'
+import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import Dropdown from '@/components/generic/Dropdown'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
 import utils from '@/utils/utils'
@@ -11,6 +12,7 @@ export default {
   name: 'PipelineSchedules',
   components: {
     AnalyzeList,
+    ConnectorLogo,
     Dropdown,
     ScheduleTableHead
   },
@@ -67,22 +69,44 @@ export default {
 
 <template>
   <div class="box">
-    <table class="table is-fullwidth is-narrow is-hoverable is-size-7">
+    <table class="table is-fullwidth  is-hoverable">
       <ScheduleTableHead has-actions has-start-date />
 
       <tbody>
         <template v-for="pipeline in pipelines">
           <tr :key="pipeline.name">
             <td>
-              <p>{{ pipeline.name }}</p>
+              <article class="media">
+                <figure class="media-left">
+                  <p class="image level-item is-48x48 container">
+                    <ConnectorLogo :connector="pipeline.extractor" />
+                  </p>
+                </figure>
+                <div class="media-content">
+                  <div class="content">
+                    <p>
+                      <strong>{{ pipeline.extractor }}</strong>
+                      <br />
+                      <small>Default</small>
+                    </p>
+                  </div>
+                </div>
+              </article>
             </td>
             <td>
-              <p class="has-text-centered">
-                <span>{{ pipeline.interval }}</span>
+              <p class="is-flex is-vcentered">
+                <a
+                  class="button tooltip is-tooltip-left"
+                  :class="{ 'is-loading': pipeline.isRunning }"
+                  data-tooltip="Manually run this pipeline once"
+                  @click="runELT(pipeline)"
+                  >Run</a
+                >
+                <span class="ml-05r">{{ pipeline.interval }}</span>
               </p>
             </td>
             <td>
-              <p class="has-text-centered">
+              <p>
                 <span
                   :class="{
                     'tooltip is-tooltip-left': pipeline.jobId
@@ -100,9 +124,9 @@ export default {
               </p>
             </td>
             <td>
-              <p class="has-text-centered">
+              <p>
                 <button
-                  class="button is-outlined is-small is-fullwidth h-space-between"
+                  class="button is-outlined is-fullwidth h-space-between"
                   :class="{
                     'tooltip is-tooltip-left': pipeline.jobId
                   }"
@@ -121,7 +145,7 @@ export default {
                   </span>
                   <span
                     v-if="!pipeline.isRunning"
-                    class="icon is-small"
+                    class="icon"
                     :class="
                       `has-text-${pipeline.hasError ? 'danger' : 'success'}`
                     "
@@ -139,19 +163,12 @@ export default {
             </td>
             <td>
               <div class="buttons is-right">
-                <a
-                  class="button is-small tooltip is-tooltip-left"
-                  :class="{ 'is-loading': pipeline.isRunning }"
-                  data-tooltip="Run this ELT pipeline once."
-                  @click="runELT(pipeline)"
-                  >Manual Run</a
-                >
                 <Dropdown
                   label="Reports"
-                  button-classes="is-interactive-primary is-outlined is-small"
+                  button-classes="is-interactive-primary"
                   :tooltip="{
                     classes: 'is-tooltip-left',
-                    message: 'Analyze related reports of this pipeline.'
+                    message: 'Analyze related reports of this pipeline'
                   }"
                   menu-classes="dropdown-menu-300"
                   icon-open="chart-line"
@@ -164,14 +181,14 @@ export default {
                 </Dropdown>
                 <Dropdown
                   :button-classes="
-                    `is-small is-danger is-outlined ${
+                    `is-danger is-outlined ${
                       pipeline.isDeleting ? 'is-loading' : ''
                     }`
                   "
                   :disabled="pipeline.isRunning"
                   :tooltip="{
                     classes: 'is-tooltip-left',
-                    message: 'Delete this ELT Pipeline'
+                    message: 'Delete this pipeline'
                   }"
                   menu-classes="dropdown-menu-300"
                   icon-open="trash-alt"
