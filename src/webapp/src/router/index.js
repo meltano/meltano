@@ -37,7 +37,7 @@ const router = new Router({
       component: Datasets,
       children: [
         {
-          path: 'extract/:extractor/configure',
+          path: 'extract/:extractor',
           name: 'extractorSettings',
           components: {
             default: Datasets,
@@ -45,35 +45,11 @@ const router = new Router({
           },
           meta: {
             isModal: true,
-            title: 'Meltano: Pipeline - Extractor Configuration'
+            title: 'Meltano: Data Extractor Configuration'
           }
         },
         {
-          path: 'load/:loader',
-          name: 'loaderSettings',
-          components: {
-            default: Datasets,
-            loaderSettings: LoaderSettingsModal
-          },
-          meta: {
-            isModal: true,
-            title: 'Meltano: Pipeline - Loader Settings'
-          }
-        },
-        {
-          path: 'schedule/create',
-          name: 'createPipelineSchedule',
-          components: {
-            default: Datasets,
-            createPipelineSchedule: CreatePipelineScheduleModal
-          },
-          meta: {
-            isModal: true,
-            title: 'Meltano: Pipeline - Create Schedule'
-          }
-        },
-        {
-          path: 'schedule/log/:jobId',
+          path: 'schedule/:jobId',
           name: 'runLog',
           components: {
             default: Datasets,
@@ -81,7 +57,7 @@ const router = new Router({
           },
           meta: {
             isModal: true,
-            title: 'Meltano: Pipeline - Run Log'
+            title: 'Meltano: Job Log'
           }
         }
       ]
