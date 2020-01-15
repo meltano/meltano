@@ -12,40 +12,40 @@ export default {
   <thead>
     <tr>
       <th>
-        <span>Name</span>
+        <span>Data Source</span>
         <span
-          class="icon has-text-grey-light tooltip is-tooltip-multiline is-tooltip-right"
-          data-tooltip="The unique identifier for an ELT pipeline schedule and its settings."
+          class="icon has-text-grey-light tooltip is-tooltip-right"
+          data-tooltip="The pipeline's data source"
         >
           <font-awesome-icon icon="info-circle"></font-awesome-icon>
         </span>
       </th>
-      <th class="has-text-centered">
+      <th>
         <span>Update Interval</span>
         <span
-          class="icon has-text-grey-light tooltip is-tooltip-multiline is-tooltip-left"
-          data-tooltip="The frequency of running a scheduled ELT pipeline to get up-to-date data."
+          class="icon has-text-grey-light tooltip is-tooltip-left"
+          data-tooltip="The pipeline's data refresh interval"
         >
           <font-awesome-icon icon="info-circle"></font-awesome-icon>
         </span>
       </th>
-      <th v-if="hasStartDate" class="has-text-centered">
+      <th v-if="hasStartDate">
         <span>Start Date</span>
         <span
-          class="icon has-text-grey-light tooltip is-tooltip-multiline is-tooltip-left"
+          class="icon has-text-grey-light tooltip is-tooltip-left"
           :class="{ 'is-tooltip-left': !hasActions }"
-          data-tooltip="The oldest date from which to extract data as part of this scheduled ELT pipeline. Currently, the extractor's Start Date value is used."
+          data-tooltip="The pipeline's first date to extract data from"
         >
           <font-awesome-icon icon="info-circle"></font-awesome-icon>
         </span>
       </th>
 
       <template v-if="hasActions">
-        <th class="has-text-centered">
+        <th>
           <span>Last Run</span>
           <span
-            class="icon has-text-grey-light tooltip is-tooltip-multiline is-tooltip-left"
-            data-tooltip="The logging status of the last ELT run for this pipeline."
+            class="icon has-text-grey-light tooltip is-tooltip-left"
+            data-tooltip="The status of the last data refresh"
           >
             <font-awesome-icon icon="info-circle"></font-awesome-icon>
           </span>
