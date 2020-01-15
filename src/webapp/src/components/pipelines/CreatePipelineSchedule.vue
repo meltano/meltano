@@ -161,18 +161,6 @@ export default {
               <font-awesome-icon icon="info-circle"></font-awesome-icon>
             </span>
           </th>
-          <th>
-            <div>
-              <small class="has-text-interactive-navigation">Step 3</small>
-            </div>
-            <span>Name</span>
-            <span
-              class="icon has-text-grey-light tooltip is-tooltip-right"
-              data-tooltip="The name of this data pipeline"
-            >
-              <font-awesome-icon icon="info-circle"></font-awesome-icon>
-            </span>
-          </th>
           <th></th>
         </tr>
       </thead>
@@ -212,21 +200,6 @@ export default {
                   }}</option>
                 </select>
               </span>
-            </div>
-          </td>
-          <td>
-            <div class="control is-expanded">
-              <input
-                ref="name"
-                v-model="pipeline.name"
-                class="input"
-                :class="{
-                  'has-text-success': pipeline.name
-                }"
-                type="text"
-                placeholder="Name"
-                @focus="$event.target.select()"
-              />
             </div>
           </td>
           <td>
