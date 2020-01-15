@@ -1,4 +1,7 @@
 <script>
+import { mapActions, mapGetters, mapState } from 'vuex'
+import Vue from 'vue'
+
 import _ from 'lodash'
 
 import Dropdown from '@/components/generic/Dropdown'
@@ -22,6 +25,7 @@ export default {
         '@yearly'
       ],
       isSaving: false,
+      isValidConfig: false,
       pipeline: {
         name: '',
         extractor: '',
@@ -33,44 +37,71 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('orchestration', ['getHasValidConfigSettings']),
+    ...mapState('orchestration', ['extractorInFocusConfiguration']),
     getDataSourceLabel() {
       return this.extractorInFocus ? this.extractorInFocus.label : 'None'
     },
     isSaveable() {
-      return false
+      const hasOwns = []
+      _.forOwn(this.pipeline, val => hasOwns.push(val))
+      const isValidPipeline =
+        hasOwns.find(val => val === '' || val === null) === undefined
+      return isValidPipeline && this.isValidConfig
     }
   },
   created() {
     this.$store.dispatch('plugins/getInstalledPlugins').then(this.prefillForm)
   },
   methods: {
+    ...mapActions('orchestration', [
+      'getExtractorConfiguration',
+      'run',
+      'savePipelineSchedule'
+    ]),
     onSelected(extractor) {
       this.extractorInFocus = extractor
+      this.pipeline.extractor = this.extractorInFocus.name
+      this.getExtractorConfiguration(this.pipeline.extractor).then(
+        this.validateConfiguration
+      )
       this.$refs['datasets-dropdown'].close()
     },
     prefillForm() {
       this.pipeline.name = `pipeline-${new Date().getTime()}`
-
-      // const defaultExtractor =
-      //   this.recentELTSelections.extractor ||
-      //   (!_.isEmpty(this.installedPlugins.extractors) &&
-      //     this.installedPlugins.extractors[0])
-      // this.pipeline.extractor = defaultExtractor ? defaultExtractor.name : ''
-
-      // const defaultLoader =
-      //   this.recentELTSelections.loader ||
-      //   (!_.isEmpty(this.installedPlugins.loaders) &&
-      //     this.installedPlugins.loaders[0])
-      // this.pipeline.loader = defaultLoader ? defaultLoader.name : ''
-
-      // this.updateDefaultTransforms(defaultExtractor.namespace)
-
       this.pipeline.interval = !_.isEmpty(this.intervalOptions)
         ? this.intervalOptions[0]
         : ''
     },
     save() {
       this.isSaving = true
+      this.savePipelineSchedule(this.pipeline)
+        .then(() => {
+          this.run(this.pipeline).then(() => {
+            Vue.toasted.global.success(`Schedule Saved - ${this.pipeline.name}`)
+            Vue.toasted.global.success(`Auto Running - ${this.pipeline.name}`)
+            this.isSaving = false
+            this.$router.push({
+              name: 'runLog',
+              params: { jobId: this.pipeline.jobId }
+            })
+          })
+        })
+        .catch(error => {
+          this.isSaving = false
+          Vue.toasted.global.error(error.response.data.code)
+        })
+    },
+    validateConfiguration(configuration) {
+      const configSettings = {
+        config: configuration.profiles[0].config, // TODO refactor when we reintroduce profiles
+        settings: configuration.settings
+      }
+      const isValid = this.getHasValidConfigSettings(
+        configSettings,
+        this.extractorInFocus.settingsGroupValidation
+      )
+      this.isValidConfig = isValid
     }
   }
 }
@@ -84,6 +115,9 @@ export default {
           <th>
             <div>
               <small class="has-text-interactive-navigation">Step 1</small>
+              <small v-if="!isValidConfig" class="is-italic has-text-warning">
+                Needs configuration</small
+              >
             </div>
             <span>Data Source</span>
             <span
@@ -127,6 +161,7 @@ export default {
               ref="datasets-dropdown"
               :label="getDataSourceLabel"
               button-classes="is-outlined"
+              :label-classes="isValidConfig ? 'has-text-success' : ''"
               :tooltip="{
                 classes: 'is-tooltip-right',
                 message:
@@ -179,6 +214,7 @@ export default {
                 data-tooltip="Create integration or custom data connection."
                 :class="{ 'is-loading': isSaving }"
                 :disabled="!isSaveable"
+                @click="save"
                 >Save</a
               >
             </div>

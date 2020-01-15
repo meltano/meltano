@@ -469,7 +469,7 @@ export default {
               </div>
             </div>
           </div>
-          <span class="is-italic is-pulled-right"
+          <span class="is-italic is-pulled-right is-size-7"
             >Required Inputs<strong>*</strong></span
           >
         </form>
