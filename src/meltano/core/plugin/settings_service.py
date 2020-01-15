@@ -87,8 +87,10 @@ class PluginSettingsService:
     ):
         # defaults to the meltano.yml for extraneous settings
         plugin_install = self.get_install(plugin)
-        plugin_def = self.get_definition(plugin)
-        config = deepcopy(plugin_install.current_config)
+        config = {
+            key: {"value": value, "source": PluginSettingValueSource.MELTANO_YML}
+            for key, value in deepcopy(plugin_install.current_config).items()
+        }
 
         # definition settings
         for setting in self.definitions(plugin):

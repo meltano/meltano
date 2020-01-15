@@ -1,6 +1,6 @@
 import pytest
 
-from meltano.core.plugin import PluginRef
+from meltano.core.plugin import PluginRef, PluginType, PluginInstall
 from meltano.core.plugin.setting import PluginSetting
 from meltano.core.plugin.settings_service import (
     PluginSettingValueSource,
@@ -120,6 +120,18 @@ class TestPluginSettingsService:
             "N33DC0F33",
             PluginSettingValueSource.ENV,
         )
+
+    def test_as_config_custom(self, subject, session, config_service):
+        EXPECTED = {"test": "custom", "start_date": None, "secure": None}
+        tap = PluginInstall(
+            PluginType.EXTRACTORS,
+            name="tap-custom",
+            namespace="tap_custom",
+            config=EXPECTED,
+        )
+        config_service.add_to_file(tap)
+
+        assert subject.as_config(session, tap) == EXPECTED
 
     def test_as_config(self, subject, session, tap):
         EXPECTED = {"test": "mock", "start_date": None, "secure": None}
