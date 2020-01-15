@@ -1,5 +1,5 @@
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 
 export default {
@@ -8,11 +8,15 @@ export default {
     ConnectorLogo
   },
   computed: {
-    ...mapGetters('plugins', [
-      'visibleExtractors',
-      'getIsAddingPlugin',
-      'getIsInstallingPlugin'
-    ]),
+    ...mapGetters('plugins', ['visibleExtractors']),
+    ...mapState('orchestration', ['pipelines']),
+    getHasPipelineWithExtractor() {
+      return extractorName => {
+        return this.pipelines.find(
+          pipeline => pipeline.extractor === extractorName
+        )
+      }
+    },
     isLoadingExtractors() {
       return this.visibleExtractors && this.visibleExtractors.length === 0
     }
@@ -59,6 +63,17 @@ export default {
               </p>
             </div>
           </div>
+          <figure
+            v-if="getHasPipelineWithExtractor(extractor.name)"
+            class="media-right"
+          >
+            <span
+              class="icon has-text-success tooltip is-tooltip-right"
+              data-tooltip="A pipeline for this data source already exists"
+            >
+              <font-awesome-icon icon="check"></font-awesome-icon>
+            </span>
+          </figure>
         </article>
       </div>
       <progress

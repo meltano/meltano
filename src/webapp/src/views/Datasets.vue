@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 import CreatePipelineSchedule from '@/components/pipelines/CreatePipelineSchedule'
 import PipelineSchedules from '@/components/pipelines/PipelineSchedules'
@@ -28,9 +28,13 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('orchestration/getAllPipelineSchedules')
-    this.$store.dispatch('plugins/getAllPlugins')
-    this.$store.dispatch('plugins/getInstalledPlugins')
+    this.getAllPipelineSchedules()
+    this.getAllPlugins()
+    this.getInstalledPlugins()
+  },
+  methods: {
+    ...mapActions('orchestration', ['getAllPipelineSchedules']),
+    ...mapActions('plugins', ['getAllPlugins', 'getInstalledPlugins'])
   }
 }
 </script>
