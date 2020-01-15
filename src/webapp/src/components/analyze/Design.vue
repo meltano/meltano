@@ -240,9 +240,6 @@ export default {
     },
 
     timeframeSelected(timeframe) {
-      if (!this.canToggleTimeframe) {
-        return
-      }
       this.$store.dispatch('designs/toggleTimeframe', timeframe)
     },
 
@@ -609,7 +606,7 @@ export default {
                 <template v-for="timeframe in design.relatedTable.timeframes">
                   <a
                     :key="timeframe.label"
-                    class="panel-block dimension-group"
+                    class="panel-block timeframe"
                     :class="{ 'is-active': timeframe.selected }"
                     @click="timeframeSelected(timeframe)"
                   >

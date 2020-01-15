@@ -1,0 +1,9 @@
+[submodule "transforms/dbt-tap-stripe"]
+	path = transform/dbt-tap-stripe
+	url = git@gitlab.com:meltano/dbt-tap-stripe.git
+[submodule "transforms/model-stripe"]
+	path = model/model-stripe
+	url = git@gitlab.com:meltano/model-stripe.git
+[submodule "model/model-carbon-intensity"]
+	path = model/model-carbon-intensity
+	url = git@gitlab.com:meltano/model-carbon-intensity.git
