@@ -37,7 +37,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('orchestration', ['getHasValidConfigSettings']),
+    ...mapGetters('orchestration', [
+      'getHasPipelineWithExtractor',
+      'getHasValidConfigSettings'
+    ]),
     ...mapGetters('plugins', ['getIsPluginInstalled']),
     ...mapState('orchestration', ['extractorInFocusConfiguration']),
     getDataSourceLabel() {
@@ -48,7 +51,18 @@ export default {
       _.forOwn(this.pipeline, val => hasOwns.push(val))
       const isValidPipeline =
         hasOwns.find(val => val === '' || val === null) === undefined
-      return isValidPipeline && this.isValidConfig
+      const hasPipelineMatch = this.getHasPipelineWithExtractor(
+        this.pipeline.extractor
+      )
+      return isValidPipeline && this.isValidConfig && !hasPipelineMatch
+    }
+  },
+  watch: {
+    extractorInFocusConfiguration: {
+      handler() {
+        this.checkConfiguration(this.pipeline.extractor)
+      },
+      deep: true
     }
   },
   created() {
@@ -60,18 +74,19 @@ export default {
       'run',
       'savePipelineSchedule'
     ]),
-    onSelected(extractor) {
-      this.extractorInFocus = extractor
-      this.pipeline.extractor = this.extractorInFocus.name
-      const isInstalled = this.getIsPluginInstalled(
-        'extractors',
-        this.pipeline.extractor
-      )
+    checkConfiguration(extractorName) {
+      this.isValidConfig = false
+      const isInstalled = this.getIsPluginInstalled('extractors', extractorName)
       if (isInstalled) {
-        this.getExtractorConfiguration(this.pipeline.extractor).then(
+        this.getExtractorConfiguration(extractorName).then(
           this.validateConfiguration
         )
       }
+    },
+    onSelected(extractor) {
+      this.extractorInFocus = extractor
+      this.pipeline.extractor = this.extractorInFocus.name
+      this.checkConfiguration(this.pipeline.extractor)
       this.$refs['datasets-dropdown'].close()
     },
     prefillForm() {
