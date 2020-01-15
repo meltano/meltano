@@ -191,7 +191,7 @@ const actions = {
       }
     })
 
-    return Promise.allSettled(pollersUponQueued)
+    return Promise.all(pollersUponQueued)
   },
 
   resetExtractorInFocusConfiguration: ({ commit }) =>
