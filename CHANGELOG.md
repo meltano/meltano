@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
@@ -14,11 +14,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1527](https://gitlab.com/meltano/meltano/issues/1527) Update the dashboard modal header to properly differentiate between "Create" and "Edit"
+- [#1456](https://gitlab.com/meltano/meltano/issues/1456) 404 Error page now has better back functionality and ability to file new issues directly from the page
 
 ### Fixes
 
 ### Breaks
-
 
 ## 1.15.0 - (2020-01-13)
 
