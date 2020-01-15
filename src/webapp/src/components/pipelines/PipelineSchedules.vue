@@ -100,7 +100,7 @@ export default {
                   :class="{ 'is-loading': pipeline.isRunning }"
                   data-tooltip="Manually run this pipeline once"
                   @click="runELT(pipeline)"
-                  >Run</a
+                  >Run Now</a
                 >
                 <span class="ml-05r">{{ pipeline.interval }}</span>
               </p>
