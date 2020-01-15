@@ -91,14 +91,12 @@ const helpers = {
     // TODO update default empty array likely
     // in the ma_file_parser to set proper defaults
     // if user's exclude certain properties in their models
-    const timeframes =
-      baseTable.timeframes ||
-      []
-        .map(tf => ({
-          name: tf.name,
-          periods: tf.periods.filter(selected)
-        }))
-        .filter(tf => tf.periods.length)
+    const timeframes = (baseTable.timeframes || [])
+      .map(tf => ({
+        name: tf.name,
+        periods: tf.periods.filter(selected)
+      }))
+      .filter(tf => tf.periods.length)
 
     // Ordering setup
     const order = state.order.assigned.map(orderable => {
