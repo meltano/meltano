@@ -29,10 +29,10 @@ const router = new Router({
     },
     {
       path: '/',
-      redirect: '/datasets'
+      redirect: '/data'
     },
     {
-      path: '/datasets/',
+      path: '/data/',
       name: 'datasets',
       component: Datasets,
       children: [

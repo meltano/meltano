@@ -91,19 +91,19 @@ export default {
       <div class="navbar-start">
         <router-link
           :to="{ name: 'datasets' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/dataset') }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/data') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
           <a
             class="button has-background-transparent is-borderless is-paddingless"
             :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/dataset')
+              'has-text-interactive-navigation': getIsSubRouteOf('/data')
             }"
           >
-            <span class="icon is-small" :class="getIconColor('/dataset')">
+            <span class="icon is-small" :class="getIconColor('/data')">
               <font-awesome-icon icon="database"></font-awesome-icon>
             </span>
-            <span>Datasets</span>
+            <span>Data</span>
           </a>
         </router-link>
 
