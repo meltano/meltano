@@ -33,7 +33,6 @@ export default {
           return
         }
 
-        debugger
         toasted.global.error(err.response.data.code)
         err.handled = true
       }
