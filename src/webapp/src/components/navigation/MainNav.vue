@@ -131,20 +131,14 @@ export default {
             </template>
             <template v-else>
               <div class="box is-borderless is-shadowless is-marginless">
-                <div class="content">
+                <div class="content no-report-models-message">
                   <h3 class="is-size-6">
-                    No Models Installed
+                    No Report Models Installed
                   </h3>
                   <p>
-                    Models are inferred and automatically installed for you
-                    based off the installed Extractors from your data pipelines.
-                    Set up a pipeline first.
+                    Report Models are inferred and automatically installed for
+                    you based off your connected data sources.
                   </p>
-                  <router-link
-                    class="button is-interactive-primary"
-                    :to="{ name: 'dataSetup' }"
-                    >Create Data Pipeline</router-link
-                  >
                 </div>
               </div>
             </template>
@@ -312,6 +306,10 @@ export default {
   .navbar-item {
     &.has-dropdown {
       border-bottom: none;
+
+      .no-report-models-message {
+        min-width: 300px;
+      }
     }
 
     .navbar-dropdown-scrollable {
