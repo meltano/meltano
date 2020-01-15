@@ -259,9 +259,8 @@ class MeltanoAnalysisFileParser:
                 parsed_topic["namespace"] = str(
                     Path("custom").joinpath(folder.relative_to(models))
                 )
-
-                parsed_topic["plugin_namespace"] = (
-                    conf["plugin_namespace"] or folder.name
+                parsed_topic["plugin_namespace"] = conf.get(
+                    "plugin_namespace", folder.name
                 )
 
                 self.topics.append(parsed_topic)
