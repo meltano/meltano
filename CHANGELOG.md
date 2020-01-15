@@ -21,6 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1538](https://gitlab.com/meltano/meltano/issues/1538) Fix timeframes not properly displaying on the base table
+- [#1568](https://gitlab.com/meltano/meltano/issues/1568) Restore support for custom plugins that don't have their available settings defined in discovery.yml
 
 ### Breaks
 
