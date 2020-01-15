@@ -9,14 +9,8 @@ export default {
   },
   computed: {
     ...mapGetters('plugins', ['visibleExtractors']),
+    ...mapGetters('orchestration', ['getHasPipelineWithExtractor']),
     ...mapState('orchestration', ['pipelines']),
-    getHasPipelineWithExtractor() {
-      return extractorName => {
-        return this.pipelines.find(
-          pipeline => pipeline.extractor === extractorName
-        )
-      }
-    },
     isLoadingExtractors() {
       return this.visibleExtractors && this.visibleExtractors.length === 0
     }

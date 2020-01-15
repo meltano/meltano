@@ -27,6 +27,14 @@ const getters = {
     return state.pipelines.length > 0
   },
 
+  getHasPipelineWithExtractor(state) {
+    return extractorName => {
+      return state.pipelines.find(
+        pipeline => pipeline.extractor === extractorName
+      )
+    }
+  },
+
   getHasValidConfigSettings(_, getters) {
     return (configSettings, settingsGroupValidation = null) => {
       return settingsGroupValidation
