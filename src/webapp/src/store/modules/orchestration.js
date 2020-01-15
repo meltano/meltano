@@ -10,16 +10,7 @@ const defaultState = utils.deepFreeze({
   extractorInFocusConfiguration: {},
   loaderInFocusConfiguration: {},
   pipelinePollers: [],
-  pipelines: [],
-  recentELTSelections: {
-    extractor: null,
-    loader: null
-  },
-  transformOptions: [
-    { label: 'Skip', name: 'skip' },
-    { label: 'Run', name: 'run' },
-    { label: 'Only', name: 'only' }
-  ]
+  pipelines: []
 })
 
 const getters = {
@@ -237,10 +228,6 @@ const actions = {
     return orchestrationsApi.testPluginConfiguration(configPayload)
   },
 
-  updateRecentELTSelections({ commit }, updatePayload) {
-    commit('setELTRecentSelection', updatePayload)
-  },
-
   uploadPluginConfigurationFile(_, configPayload) {
     return orchestrationsApi.uploadPluginConfigurationFile(configPayload)
   }
@@ -266,10 +253,6 @@ const mutations = {
     if (defaultState.hasOwnProperty(attr)) {
       state[attr] = lodash.cloneDeep(defaultState[attr])
     }
-  },
-
-  setELTRecentSelection(state, { type, value }) {
-    state.recentELTSelections[type] = value
   },
 
   setInFocusConfiguration(state, { configuration, target }) {

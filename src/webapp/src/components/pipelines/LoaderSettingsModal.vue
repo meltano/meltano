@@ -123,10 +123,6 @@ export default {
           profiles: this.localConfiguration.profiles
         })
         .then(() => {
-          this.$store.dispatch('orchestration/updateRecentELTSelections', {
-            type: 'loader',
-            value: this.loader
-          })
           this.$router.push({ name: 'schedules' })
           Vue.toasted.global.success(`Connector Saved - ${this.loader.name}`)
         })
