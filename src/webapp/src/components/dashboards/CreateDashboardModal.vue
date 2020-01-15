@@ -4,18 +4,23 @@ import Vue from 'vue'
 export default {
   name: 'CreateDashboardModal',
   props: {
-    dashboard: {
-      type: Object,
-      default: () => {}
-    },
-    report: {
-      type: Object,
-      default: () => {}
-    }
+    dashboard: { type: Object, default: null },
+    report: { type: Object, default: null }
   },
   data() {
     return {
       saveDashboardSettings: { name: null, description: null }
+    }
+  },
+  computed: {
+    getHeaderLabel() {
+      return `${this.getIsEditing ? 'Edit' : 'Create'} Dashboard`
+    },
+    getIsAddingToReport() {
+      return this.report !== null
+    },
+    getIsEditing() {
+      return this.dashboard !== null
     }
   },
   created() {
@@ -32,12 +37,12 @@ export default {
     },
     saveDashboard() {
       let action = null
-      if (this.report) {
+      if (this.getIsAddingToReport) {
         action = this.$store.dispatch('dashboards/saveNewDashboardWithReport', {
           data: this.saveDashboardSettings,
           report: this.report
         })
-      } else if (this.dashboard) {
+      } else if (this.getIsEditing) {
         action = this.$store.dispatch('dashboards/updateDashboard', {
           dashboard: this.dashboard,
           newSettings: this.saveDashboardSettings
@@ -68,7 +73,7 @@ export default {
     <div class="modal-background" @click="close"></div>
     <div class="modal-card">
       <header class="modal-card-head">
-        <p class="modal-card-title">Create Dashboard</p>
+        <p class="modal-card-title">{{ getHeaderLabel }}</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body is-overflow-y-scroll">
