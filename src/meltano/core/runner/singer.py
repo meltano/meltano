@@ -132,8 +132,6 @@ class SingerRunner(Runner):
 
             job.payload["singer_state"] = new_state
             job.payload_flags |= SingerPayload.STATE
-            job.ended_at = datetime.utcnow()
-            logging.info(f"Incremental state has been updated at {job.ended_at}.")
             logging.debug(f"Incremental state: {new_state}")
         except Exception as err:
             logging.warning(

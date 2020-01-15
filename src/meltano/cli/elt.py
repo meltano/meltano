@@ -50,12 +50,11 @@ def elt(project, extractor, loader, dry, transform, job_id):
         job_id=job_id or f'job_{datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S.%f")}'
     )
 
-    # fmt: off
-    with job.run(session), \
-        job_logging_service.create_log(job.job_id, job.run_id) as log_file, \
-        OutputLogger(log_file):
+    try:
+        with job.run(session), job_logging_service.create_log(
+            job.job_id, job.run_id
+        ) as log_file, OutputLogger(log_file):
 
-        try:
             install_missing_plugins(project, extractor, loader, transform)
 
             elt_context = (
@@ -72,14 +71,21 @@ def elt(project, extractor, loader, dry, transform, job_id):
                 click.secho("Extract & load skipped.", fg="yellow")
 
             if transform != "skip":
-                run_transform(elt_context, session, dry_run=dry, models=elt_context.extractor.ref.name)
+                run_transform(
+                    elt_context,
+                    session,
+                    dry_run=dry,
+                    models=elt_context.extractor.ref.name,
+                )
             else:
                 click.secho("Transformation skipped.", fg="yellow")
-        except Exception as err:
-            logging.error(f"ELT could not complete, an error happened during the process: {err}")
-            raise click.Abort()
-        finally:
-            session.close()
+    except Exception as err:
+        logging.error(
+            f"ELT could not complete, an error happened during the process: {err}"
+        )
+        raise click.Abort()
+    finally:
+        session.close()
     # fmt: on
 
     tracker = GoogleAnalyticsTracker(project)
