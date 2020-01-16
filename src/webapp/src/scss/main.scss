@@ -97,9 +97,16 @@ Component helpers related to Bulma's component classes when bulma-overrides does
   }
 }
 
-.media {
-  &.is-hoverable:hover {
-    background-color: $white-bis;
+article {
+  &.media {
+    padding: 1rem 0;
+    &.is-hoverable:hover {
+      background-color: $white-bis;
+    }
+    + .media {
+      padding: 1rem 0;
+      margin: 0;
+    }
   }
 }
 
