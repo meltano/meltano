@@ -55,54 +55,6 @@ class SnowflakeGrantsGenerator:
         else:
             return False
 
-    def full_schema_list(self, schema: str) -> List[str]:
-        """
-        For a given schema name, get all schemas it may be referencing.
-
-        For example, if <db>.* is given then all schemas in the database 
-        will be returned. If <db>.<schema_partial>_* is given, then all 
-        schemas that match the schema partial pattern will be returned. 
-        If a full schema name is given, it will return that single schema
-        as a list.
-
-        This function can be enhanced in the future to handle more 
-        complicated schema names if necessary.
-
-        Returns a list of schema names.
-        """
-        # Generate the information_schema identifier for that database
-        # in order to be able to filter it out
-        name_parts = schema.split(".")
-
-        info_schema = f"{name_parts[0]}.information_schema"
-
-        fetched_schemas = []
-
-        # All Schemas
-        if name_parts[1] == "*":
-            conn = SnowflakeConnector()
-            db_schemas = conn.show_schemas(name_parts[0])
-            for db_schema in db_schemas:
-                if db_schema != info_schema:
-                    fetched_schemas.append(db_schema)
-
-        # Prefix schema match
-        elif "*" in name_parts[1]:
-            conn = SnowflakeConnector()
-            db_schemas = conn.show_schemas(name_parts[0])
-            for db_schema in db_schemas:
-                schema_name = db_schema.split(".", 1)[1].lower()
-                if schema_name.startswith(name_parts[1].split("*", 1)[0]):
-                    fetched_schemas.append(db_schema)
-
-        # TODO Handle more complicated matches
-
-        else:
-            # If no * in name, then return provided schema name
-            fetched_schemas = [schema]
-
-        return fetched_schemas
-
     def generate_grant_roles(
         self, entity_type: str, entity: str, config: str
     ) -> List[Dict]:
@@ -604,7 +556,8 @@ class SnowflakeGrantsGenerator:
             if name_parts[0] in shared_dbs:
                 continue
 
-            fetched_schemas = self.full_schema_list(schema)
+            conn = SnowflakeConnector()
+            fetched_schemas = conn.full_schema_list(schema)
             read_grant_schemas.extend(fetched_schemas)
 
             for db_schema in fetched_schemas:
@@ -635,7 +588,8 @@ class SnowflakeGrantsGenerator:
             if name_parts[0] in shared_dbs:
                 continue
 
-            fetched_schemas = self.full_schema_list(schema)
+            conn = SnowflakeConnector()
+            fetched_schemas = conn.full_schema_list(schema)
             write_grant_schemas.extend(fetched_schemas)
 
             for db_schema in fetched_schemas:
@@ -779,6 +733,8 @@ class SnowflakeGrantsGenerator:
         write_partial_privileges = "insert, update, delete, truncate, references"
         write_privileges = f"{read_privileges}, {write_partial_privileges}"
 
+        conn = SnowflakeConnector()
+
         for table in tables.get("read", []):
             # Split the table identifier into parts {DB_NAME}.{SCHEMA_NAME}.{TABLE_NAME}
             # so that we can check and use each one
@@ -797,9 +753,7 @@ class SnowflakeGrantsGenerator:
             read_table_list = []
             read_view_list = []
 
-            fetched_schemas = self.full_schema_list(f"{name_parts[0]}.{name_parts[1]}")
-
-            conn = SnowflakeConnector()
+            fetched_schemas = conn.full_schema_list(f"{name_parts[0]}.{name_parts[1]}")
 
             for schema in fetched_schemas:
                 # Fetch all tables from Snowflake for each schema and add
@@ -937,9 +891,7 @@ class SnowflakeGrantsGenerator:
             write_table_list = []
             write_view_list = []
 
-            fetched_schemas = self.full_schema_list(f"{name_parts[0]}.{name_parts[1]}")
-
-            conn = SnowflakeConnector()
+            fetched_schemas = conn.full_schema_list(f"{name_parts[0]}.{name_parts[1]}")
 
             for schema in fetched_schemas:
                 # Fetch all tables from Snowflake for each schema and add
