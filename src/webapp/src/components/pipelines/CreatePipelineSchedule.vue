@@ -167,7 +167,7 @@ export default {
             />
           </td>
           <td class="is-vertical-align-baseline">
-            <div class="field">
+            <div class="field mt1r">
               <div class="control is-expanded">
                 <span
                   class="select is-medium is-fullwidth"
