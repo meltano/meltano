@@ -19,7 +19,7 @@ Our contribution to this progress comes through the democratization of data thro
 
 ## Persona
 
-Meltano is a small startup within GitLab, and in order to be successful we have chosen to ruthlessly focus on a serving a single person.
+Meltano is a small startup within GitLab, and in order to be successful we have chosen to ruthlessly focus on serving a single person.
 
 ### Target Persona Type: Founder
 
