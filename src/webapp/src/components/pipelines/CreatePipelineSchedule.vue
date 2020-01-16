@@ -41,9 +41,6 @@ export default {
     ]),
     ...mapGetters('plugins', ['getIsPluginInstalled']),
     ...mapState('orchestration', ['extractorInFocusConfiguration']),
-    getDataSourceLabel() {
-      return this.extractorInFocus ? this.extractorInFocus.label : 'None'
-    },
     isSaveable() {
       const hasOwns = []
       _.forOwn(this.pipeline, val => hasOwns.push(val))
@@ -164,7 +161,10 @@ export default {
       <tbody>
         <tr>
           <td>
-            <ExtractorList @select="onSelected" />
+            <ExtractorList
+              :focused-extractor="extractorInFocus"
+              @select="onSelected"
+            />
           </td>
           <td class="is-vertical-align-baseline">
             <div class="field">

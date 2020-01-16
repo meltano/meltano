@@ -7,6 +7,9 @@ export default {
   components: {
     ConnectorLogo
   },
+  props: {
+    focusedExtractor: { type: Object, default: null }
+  },
   computed: {
     ...mapGetters('plugins', ['visibleExtractors']),
     ...mapGetters('orchestration', ['getHasPipelineWithExtractor']),
@@ -18,7 +21,6 @@ export default {
   methods: {
     updateExtractorSettings(extractor) {
       if (this.getHasPipelineWithExtractor(extractor.name)) {
-        console.log('disabled...')
         return
       }
       this.$emit('select', extractor)
@@ -45,7 +47,9 @@ export default {
           :key="`${extractor.name}-${index}`"
           class="media"
           :class="{
-            'has-cursor-pointer': !getHasPipelineWithExtractor(extractor.name)
+            'has-cursor-pointer is-hoverable': !getHasPipelineWithExtractor(
+              extractor.name
+            )
           }"
           :data-test-id="`${extractor.name}-extractor-card`"
           @click="updateExtractorSettings(extractor)"
