@@ -82,7 +82,6 @@ export default {
       this.extractorInFocus = extractor
       this.pipeline.extractor = this.extractorInFocus.name
       this.checkConfiguration(this.pipeline.extractor)
-      this.$refs['datasets-dropdown'].close()
     },
     prefillForm() {
       this.pipeline.name = `pipeline-${new Date().getTime()}`

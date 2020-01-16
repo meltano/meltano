@@ -21,6 +21,11 @@ Display-related utilities
   @extend .has-background-white-ter;
 }
 
+.is-active-line-item-bordered {
+  border-left-color: $interactive-secondary;
+  border-left-width: 2px;
+}
+
 .ellipsis {
   white-space: nowrap;
   overflow: hidden;

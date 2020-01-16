@@ -14,6 +14,13 @@ export default {
     ...mapGetters('plugins', ['visibleExtractors']),
     ...mapGetters('orchestration', ['getHasPipelineWithExtractor']),
     ...mapState('orchestration', ['pipelines']),
+    getIsActive() {
+      return extractor => {
+        return this.focusedExtractor
+          ? this.focusedExtractor.name === extractor.name
+          : false
+      }
+    },
     isLoadingExtractors() {
       return this.visibleExtractors && this.visibleExtractors.length === 0
     }
@@ -48,7 +55,8 @@ export default {
         :class="{
           'has-cursor-pointer is-hoverable': !getHasPipelineWithExtractor(
             extractor.name
-          )
+          ),
+          'is-active': getIsActive(extractor)
         }"
         :data-test-id="`${extractor.name}-extractor-card`"
         @click="updateExtractorSettings(extractor)"
@@ -74,7 +82,7 @@ export default {
         >
           <div class="content">
             <p>
-              <strong>{{ extractor.label }}</strong>
+              <span class="has-text-weight-bold">{{ extractor.label }}</span>
               <br />
               <small>{{ extractor.description }}</small>
             </p>
