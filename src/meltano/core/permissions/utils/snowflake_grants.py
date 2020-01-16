@@ -768,8 +768,8 @@ class SnowflakeGrantsGenerator:
         """
         sql_commands = []
 
-        # These are necessary as the provided schemas are not the full list
-        # we determine the full list via full_schema_list and store in these variables
+        # These are necessary as the provided tables/views are not the full list
+        # we determine the full list via full_schema_list() and store in these variables
         read_grant_tables = []
         write_grant_tables = []
         read_grant_views = []
@@ -1045,16 +1045,13 @@ class SnowflakeGrantsGenerator:
                     }
                 )
 
-            # Grant privileges to all views in that schema
+            # Grant privileges to all views in that schema. 
+            # Select is the only schemaObjectPrivilege for views
+            # https://docs.snowflake.net/manuals/sql-reference/sql/grant-privilege.html
             for db_view in write_grant_views:
                 already_granted = False
                 if (
-                    self.check_grant_to_role(role, "select", "table", db_view)
-                    and self.check_grant_to_role(role, "insert", "table", db_view)
-                    and self.check_grant_to_role(role, "update", "table", db_view)
-                    and self.check_grant_to_role(role, "delete", "table", db_view)
-                    and self.check_grant_to_role(role, "truncate", "table", db_view)
-                    and self.check_grant_to_role(role, "references", "table", db_view)
+                    self.check_grant_to_role(role, "select", "view", db_view)
                 ):
                     already_granted = True
 
@@ -1062,13 +1059,103 @@ class SnowflakeGrantsGenerator:
                     {
                         "already_granted": already_granted,
                         "sql": GRANT_PRIVILEGES_TEMPLATE.format(
-                            privileges=write_privileges,
+                            privileges="select",
                             resource_type="view",
                             resource_name=SnowflakeConnector.snowflaky(db_view),
                             role=SnowflakeConnector.snowflaky(role),
                         ),
                     }
                 )
+
+        # REVOKES
+
+        # Read Privileges
+        # The "select" privilege is consistent across read and write.
+        # Compare granted usage to full read/write set and revoke missing ones
+        for granted_table in list(
+            set(self.grants_to_role.get(role, {}).get("select", {}).get("table", []))
+        ):
+            all_tables = read_grant_tables + write_grant_tables
+            database_name = granted_table.split(".")[0]
+            if granted_table not in all_tables and database_name in shared_dbs:
+                # No privileges to revoke on imported db. Done at database level
+                continue
+            elif granted_table not in all_tables:
+                sql_commands.append(
+                    {
+                        "already_granted": False,
+                        "sql": REVOKE_PRIVILEGES_TEMPLATE.format(
+                            privileges=read_privileges,
+                            resource_type="table",
+                            resource_name=SnowflakeConnector.snowflaky(granted_table),
+                            role=SnowflakeConnector.snowflaky(role),
+                        ),
+                    }
+                )
+
+        # SELECT is the only privilege for views so this covers both the read 
+        # and write case since we have "all_views" defined.
+        for granted_view in list(
+            set(self.grants_to_role.get(role, {}).get("select", {}).get("view", []))
+        ):
+            all_views = read_grant_views + write_grant_views
+            database_name = granted_view.split(".")[0]
+            if granted_view not in all_views and database_name in shared_dbs:
+                # No privileges to revoke on imported db. Done at database level
+                continue
+            elif granted_view not in all_views:
+                sql_commands.append(
+                    {
+                        "already_granted": False,
+                        "sql": REVOKE_PRIVILEGES_TEMPLATE.format(
+                            privileges=read_privileges,
+                            resource_type="view",
+                            resource_name=SnowflakeConnector.snowflaky(granted_view),
+                            role=SnowflakeConnector.snowflaky(role),
+                        ),
+                    }
+                )
+
+        # Write Privileges
+        # Only need to revoke write privileges for tables since SELECT is the 
+        # only privilege available for views
+        for granted_table in list(
+            set(
+                self.grants_to_role.get(role, {})
+                .get("insert", {})
+                .get("table", [])
+                + self.grants_to_role.get(role, {})
+                .get("update", {})
+                .get("table", [])
+                + self.grants_to_role.get(role, {})
+                .get("delete", {})
+                .get("table", [])
+                + self.grants_to_role.get(role, {})
+                .get("truncate", {})
+                .get("table", [])
+                + self.grants_to_role.get(role, {})
+                .get("references", {})
+                .get("table", [])
+            )
+        ):
+            database_name = granted_table.split(".")[0]
+            if granted_table not in write_grant_tables and database_name in shared_dbs:
+                # No privileges to revoke on imported db. Done at database level
+                continue
+            elif granted_table not in write_grant_tables:
+                sql_commands.append(
+                    {
+                        "already_granted": False,
+                        "sql": REVOKE_PRIVILEGES_TEMPLATE.format(
+                            privileges=write_privileges,
+                            resource_type="table",
+                            resource_name=SnowflakeConnector.snowflaky(granted_table),
+                            role=SnowflakeConnector.snowflaky(role),
+                        ),
+                    }
+                )
+
+
 
         return sql_commands
 
