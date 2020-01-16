@@ -25,11 +25,9 @@ $primary-invert: $pink-invert;
 
 /* Bulma framework styles */
 @import 'bulma-preset-overrides';
-@import 'bulma-steps-overrides';
 @import 'toasted-overrides';
 @import '~bulma';
 @import '~bulma-tooltip';
-@import '~bulma-steps/dist/css/bulma-steps.sass';
 
 /* Meltano dynamic styles */
 @import 'mixins.scss';

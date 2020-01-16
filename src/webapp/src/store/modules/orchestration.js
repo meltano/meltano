@@ -20,8 +20,8 @@ const getters = {
 
   getHasPipelineWithExtractor(state) {
     return extractorName => {
-      return state.pipelines.find(
-        pipeline => pipeline.extractor === extractorName
+      return Boolean(
+        state.pipelines.find(pipeline => pipeline.extractor === extractorName)
       )
     }
   },

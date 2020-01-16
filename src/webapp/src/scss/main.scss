@@ -97,6 +97,12 @@ Component helpers related to Bulma's component classes when bulma-overrides does
   }
 }
 
+.media {
+  &.is-hoverable:hover {
+    background-color: $white-bis;
+  }
+}
+
 .navbar {
   // Fixes hover dropdown auto closing in navbar via https://github.com/jgthms/bulma/issues/2514#issuecomment-510451361
   @media screen and (min-width: 1025px) {
