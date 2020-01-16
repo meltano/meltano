@@ -19,6 +19,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('orchestration', ['getRunningPipelines']),
     ...mapGetters('repos', ['hasModels']),
     ...mapGetters('system', ['updateAvailable']),
     ...mapState('system', ['latestVersion', 'updating', 'version', 'identity']),
@@ -104,6 +105,12 @@ export default {
               <font-awesome-icon icon="database"></font-awesome-icon>
             </span>
             <span>Data</span>
+            <span
+              v-if="getRunningPipelines.length > 0"
+              class="tag ml-05r is-rounded is-info"
+            >
+              {{ getRunningPipelines.length }}
+            </span>
           </a>
         </router-link>
 
