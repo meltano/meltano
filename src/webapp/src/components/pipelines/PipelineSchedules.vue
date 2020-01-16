@@ -195,6 +195,7 @@ export default {
                   icon-open="trash-alt"
                   icon-close="caret-up"
                   is-right-aligned
+                  is-up
                 >
                   <div class="dropdown-content is-unselectable">
                     <div class="dropdown-item">

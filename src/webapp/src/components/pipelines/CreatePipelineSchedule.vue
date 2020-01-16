@@ -129,7 +129,7 @@ export default {
 
 <template>
   <div class="box">
-    <table class="table is-fullwidth is-narrow is-hoverable">
+    <table class="table is-fullwidth is-narrow">
       <thead>
         <tr>
           <th>
