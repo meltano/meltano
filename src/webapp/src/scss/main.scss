@@ -176,6 +176,10 @@ Layout helpers, often with names based on Bulma naming conventions
 .table {
   td {
     vertical-align: middle;
+
+    &.is-vertical-align-baseline {
+      vertical-align: baseline;
+    }
   }
 
   th span {
@@ -237,6 +241,10 @@ Modifer helpers with names based on Bulma naming conventions
 .is-thin {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+}
+
+.is-transparent-50 {
+  opacity: 0.5;
 }
 
 .is-vcentered {
