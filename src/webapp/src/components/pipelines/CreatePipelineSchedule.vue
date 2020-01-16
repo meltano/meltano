@@ -4,13 +4,11 @@ import Vue from 'vue'
 
 import _ from 'lodash'
 
-import Dropdown from '@/components/generic/Dropdown'
 import ExtractorList from '@/components/pipelines/ExtractorList'
 
 export default {
   name: 'CreatePipelineSchedule',
   components: {
-    Dropdown,
     ExtractorList
   },
   data() {
@@ -161,51 +159,36 @@ export default {
               <font-awesome-icon icon="info-circle"></font-awesome-icon>
             </span>
           </th>
-          <th></th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>
-            <Dropdown
-              ref="datasets-dropdown"
-              :label="getDataSourceLabel"
-              button-classes="is-outlined"
-              :label-classes="isValidConfig ? 'has-text-success' : ''"
-              :tooltip="{
-                classes: 'is-tooltip-right',
-                message:
-                  'Select an integration or custom data source to connect to'
-              }"
-              menu-classes="dropdown-menu-600"
-              is-full-width
-            >
-              <div class="dropdown-content is-unselectable">
-                <ExtractorList @select="onSelected" />
-              </div>
-            </Dropdown>
+            <ExtractorList @select="onSelected" />
           </td>
-          <td>
-            <div class="control is-expanded">
-              <span
-                class="select is-fullwidth"
-                :class="{ 'is-loading': !pipeline.interval }"
-              >
-                <select
-                  v-model="pipeline.interval"
-                  :class="{ 'has-text-success': pipeline.interval }"
+          <td class="is-vertical-align-baseline">
+            <div class="field">
+              <div class="control is-expanded">
+                <span
+                  class="select is-medium is-fullwidth"
+                  :class="{ 'is-loading': !pipeline.interval }"
                 >
-                  <option v-for="interval in intervalOptions" :key="interval">{{
-                    interval
-                  }}</option>
-                </select>
-              </span>
+                  <select
+                    v-model="pipeline.interval"
+                    :class="{ 'has-text-success': pipeline.interval }"
+                  >
+                    <option
+                      v-for="interval in intervalOptions"
+                      :key="interval"
+                      >{{ interval }}</option
+                    >
+                  </select>
+                </span>
+              </div>
             </div>
-          </td>
-          <td>
-            <div class="buttons is-right">
+            <div class="field">
               <a
-                class="button is-interactive-primary tooltip is-tooltip-left"
+                class="button is-block is-medium is-interactive-primary tooltip is-tooltip-left"
                 data-tooltip="Create integration or custom data connection."
                 :class="{ 'is-loading': isSaving }"
                 :disabled="!isSaveable"
