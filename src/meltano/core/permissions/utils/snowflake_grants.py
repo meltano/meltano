@@ -1045,14 +1045,12 @@ class SnowflakeGrantsGenerator:
                     }
                 )
 
-            # Grant privileges to all views in that schema. 
+            # Grant privileges to all views in that schema.
             # Select is the only schemaObjectPrivilege for views
             # https://docs.snowflake.net/manuals/sql-reference/sql/grant-privilege.html
             for db_view in write_grant_views:
                 already_granted = False
-                if (
-                    self.check_grant_to_role(role, "select", "view", db_view)
-                ):
+                if self.check_grant_to_role(role, "select", "view", db_view):
                     already_granted = True
 
                 sql_commands.append(
@@ -1093,7 +1091,7 @@ class SnowflakeGrantsGenerator:
                     }
                 )
 
-        # SELECT is the only privilege for views so this covers both the read 
+        # SELECT is the only privilege for views so this covers both the read
         # and write case since we have "all_views" defined.
         for granted_view in list(
             set(self.grants_to_role.get(role, {}).get("select", {}).get("view", []))
@@ -1117,22 +1115,14 @@ class SnowflakeGrantsGenerator:
                 )
 
         # Write Privileges
-        # Only need to revoke write privileges for tables since SELECT is the 
+        # Only need to revoke write privileges for tables since SELECT is the
         # only privilege available for views
         for granted_table in list(
             set(
-                self.grants_to_role.get(role, {})
-                .get("insert", {})
-                .get("table", [])
-                + self.grants_to_role.get(role, {})
-                .get("update", {})
-                .get("table", [])
-                + self.grants_to_role.get(role, {})
-                .get("delete", {})
-                .get("table", [])
-                + self.grants_to_role.get(role, {})
-                .get("truncate", {})
-                .get("table", [])
+                self.grants_to_role.get(role, {}).get("insert", {}).get("table", [])
+                + self.grants_to_role.get(role, {}).get("update", {}).get("table", [])
+                + self.grants_to_role.get(role, {}).get("delete", {}).get("table", [])
+                + self.grants_to_role.get(role, {}).get("truncate", {}).get("table", [])
                 + self.grants_to_role.get(role, {})
                 .get("references", {})
                 .get("table", [])
@@ -1154,8 +1144,6 @@ class SnowflakeGrantsGenerator:
                         ),
                     }
                 )
-
-
 
         return sql_commands
 
