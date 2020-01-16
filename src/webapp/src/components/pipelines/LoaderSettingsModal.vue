@@ -85,7 +85,10 @@ export default {
           })
         : this.getLoaderConfiguration().then(this.createEditableConfiguration)
 
-      uponPlugin.catch(this.$error.handle)
+      uponPlugin.catch(err => {
+        this.$error.handle(err)
+        this.close()
+      })
     })
   },
   beforeDestroy() {
@@ -127,7 +130,10 @@ export default {
           this.$router.push({ name: 'schedules' })
           Vue.toasted.global.success(`Connector Saved - ${this.loader.name}`)
         })
-        .catch(this.close)
+        .catch(err => {
+          this.$error.handle(err)
+          this.close()
+        })
     }
   }
 }

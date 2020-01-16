@@ -185,7 +185,10 @@ export default {
               : `Connection Saved - ${this.extractor.name}`
             Vue.toasted.global.success(message)
           })
-          .catch(this.close)
+          .catch(err => {
+            this.$error.handle(err)
+            this.close()
+          })
       })
     },
     testConnection() {
