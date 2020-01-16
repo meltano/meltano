@@ -24,6 +24,7 @@ Display-related utilities
 .is-active-line-item-bordered {
   border-left-color: $interactive-secondary;
   border-left-width: 2px;
+  border-left-style: solid;
 }
 
 .ellipsis {
@@ -66,6 +67,10 @@ UTILITIES - SPACING ------------------------------------------------------------
 
 .ml-05r {
   margin-left: 0.5rem;
+}
+
+.ml1r {
+  margin-left: 1rem;
 }
 
 .v-min-2r {
