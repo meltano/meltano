@@ -11,7 +11,10 @@ def readonly_killswitch(f):
     @functools.wraps(f)
     def _decorated(*args, **kwargs):
         if current_app.config["MELTANO_READONLY"]:
-            return "Meltano is currently running in read-only mode.", HTTP_KILLSWITCH_CODE
+            return (
+                "Meltano is currently running in read-only mode.",
+                HTTP_KILLSWITCH_CODE,
+            )
 
         return f(*args, **kwargs)
 
