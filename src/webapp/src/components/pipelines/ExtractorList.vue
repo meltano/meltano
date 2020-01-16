@@ -64,7 +64,8 @@ export default {
         <figure
           class="media-left"
           :class="{
-            'is-transparent-50': getHasPipelineWithExtractor(extractor.name)
+            'is-transparent-50': getHasPipelineWithExtractor(extractor.name),
+            ml1r: getIsActive(extractor)
           }"
         >
           <p class="image level-item is-48x48 container">
