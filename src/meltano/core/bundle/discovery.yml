@@ -31,7 +31,6 @@ extractors:
     label: Facebook Ads
     description: Advertising Platform
     namespace: tap_facebook
-    hidden: true
     docs: 'https://meltano.com/plugins/extractors/facebook.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-facebook.git'
     capabilities:
