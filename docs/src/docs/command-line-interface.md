@@ -238,6 +238,7 @@ Given the parameters to connect to a Snowflake account and a YAML file (a "spec"
 * Database Read/Write privileges
 * Shared Database privileges
 * Schema Read/Write privileges
+* Table/View Read/Write privileges
 
 We currently support only Snowflake, as [pgbedrock](https://github.com/Squarespace/pgbedrock) can be used for managing the permissions in a Postgres database.
 
@@ -255,7 +256,7 @@ If `*` is provided as the parameter for tables the grant statement will use the 
 
 If a schema name includes an asterisk, such as `snowplow_*`, then all schemas that match this pattern will be included in grant statement. This can be coupled with the asterisk for table grants to grant permissions on all tables in all schemas that match the given pattern. This is useful for date-partitioned schemas.
 
-All entities must be explicitly referenced. For example, if a premission is granted to a schema or table then the database must be explicitly referenced for permissioning as well.
+All entities must be explicitly referenced. For example, if a permission is granted to a schema or table then the database must be explicitly referenced for permissioning as well.
 
 A specification file has the following structure:
 
