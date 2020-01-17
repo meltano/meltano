@@ -238,7 +238,9 @@ Given the parameters to connect to a Snowflake account and a YAML file (a "spec"
 * Database Read/Write privileges
 * Shared Database privileges
 * Schema Read/Write privileges
+* Future Schema Read/Write privileges
 * Table/View Read/Write privileges
+* Future Table/View Read/Write privileges
 
 We currently support only Snowflake, as [pgbedrock](https://github.com/Squarespace/pgbedrock) can be used for managing the permissions in a Postgres database.
 
