@@ -577,6 +577,8 @@ class SnowflakeSpecLoader:
     def get_privileges_from_snowflake_server(self) -> None:
         """
         Get the privileges granted to users and roles in the Snowflake account
+        Gets the future privileges granted in all database and schema objects
+        Consolidates role and future privileges into a single object for self.grants_to_role
         """
         conn = SnowflakeConnector()
 

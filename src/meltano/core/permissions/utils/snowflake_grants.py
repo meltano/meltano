@@ -18,8 +18,6 @@ REVOKE_PRIVILEGES_TEMPLATE = (
     "REVOKE {privileges} ON {resource_type} {resource_name} FROM ROLE {role}"
 )
 
-GRANT_ALL_PRIVILEGES_TEMPLATE = "GRANT {privileges} ON ALL {resource_type}s IN SCHEMA {resource_name} TO ROLE {role}"
-
 GRANT_FUTURE_SCHEMAS_PRIVILEGES_TEMPLATE = (
     "GRANT {privileges} ON FUTURE SCHEMAS IN DATABASE {resource_name} TO ROLE {role}"
 )
@@ -532,7 +530,8 @@ class SnowflakeGrantsGenerator:
         self, role: str, schemas: Dict[str, List], shared_dbs: Set
     ) -> List[Dict]:
         """
-        Generate the GRANT and REVOKE statements for schemas.
+        Generate the GRANT and REVOKE statements for schemas
+        including future grants.
 
         role: the name of the role the privileges are GRANTed to
         schemas: the name of the Schema (e.g. "raw.public", "raw.*")
@@ -795,7 +794,8 @@ class SnowflakeGrantsGenerator:
         self, role: str, tables: Dict[str, List], shared_dbs: Set
     ) -> List[Dict]:
         """
-        Generate the GRANT statements for tables and views.
+        Generate the GRANT and REVOKE statements for tables and views
+        including future grants.
 
         role: the name of the role the privileges are GRANTed to
         table: the name of the TABLE/VIEW (e.g. "raw.public.my_table")
