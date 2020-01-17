@@ -691,9 +691,9 @@ class SnowflakeGrantsGenerator:
             if granted_schema not in all_grant_schemas and database_name in shared_dbs:
                 # No privileges to revoke on imported db. Done at database level
                 continue
-            elif ( # If future privilege is granted on snowflake but not in grant list
-                granted_schema == future_schema_name 
-                and future_schema_name not in all_grant_schemas #
+            elif (  # If future privilege is granted on snowflake but not in grant list
+                granted_schema == future_schema_name
+                and future_schema_name not in all_grant_schemas  #
             ):
                 sql_commands.append(
                     {
@@ -705,7 +705,10 @@ class SnowflakeGrantsGenerator:
                         ),
                     }
                 )
-            elif granted_schema not in all_grant_schemas and future_schema_name not in all_grant_schemas:
+            elif (
+                granted_schema not in all_grant_schemas
+                and future_schema_name not in all_grant_schemas
+            ):
                 # Covers case where schema is granted in Snowflake
                 # But it's not in the grant list and it's not explicitly granted as a future grant
                 sql_commands.append(
@@ -755,7 +758,7 @@ class SnowflakeGrantsGenerator:
             ):
                 # No privileges to revoke on imported db
                 continue
-            elif ( # If future privilege is granted but not in grant list
+            elif (  # If future privilege is granted but not in grant list
                 granted_schema == future_schema_name
                 and future_schema_name not in write_grant_schemas
             ):
@@ -769,7 +772,10 @@ class SnowflakeGrantsGenerator:
                         ),
                     }
                 )
-            elif granted_schema not in write_grant_schemas and future_schema_name not in write_grant_schemas:
+            elif (
+                granted_schema not in write_grant_schemas
+                and future_schema_name not in write_grant_schemas
+            ):
                 # Covers case where schema is granted and it's not explicitly granted as a future grant
                 sql_commands.append(
                     {
@@ -800,11 +806,11 @@ class SnowflakeGrantsGenerator:
         sql_commands = []
 
         # These are necessary as the provided tables/views are not the full list
-        # we determine the full list for granting via full_schema_list() 
+        # we determine the full list for granting via full_schema_list()
         # and store in these variables
         read_grant_tables_full = []
         read_grant_views_full = []
-        
+
         write_grant_tables_full = []
         write_grant_views_full = []
 
@@ -1008,7 +1014,7 @@ class SnowflakeGrantsGenerator:
                     )
 
                 continue
-            
+
             # TODO Future elif to have partial table name
 
             else:
@@ -1084,7 +1090,7 @@ class SnowflakeGrantsGenerator:
             if granted_table not in all_grant_tables and database_name in shared_dbs:
                 # No privileges to revoke on imported db. Done at database level
                 continue
-            elif ( # If future privilege is granted in Snowflake but not in grant list
+            elif (  # If future privilege is granted in Snowflake but not in grant list
                 granted_table == future_table and future_table not in all_grant_tables
             ):
                 sql_commands.append(
@@ -1100,7 +1106,10 @@ class SnowflakeGrantsGenerator:
                         ),
                     }
                 )
-            elif granted_table not in all_grant_tables and future_table not in all_grant_tables:
+            elif (
+                granted_table not in all_grant_tables
+                and future_table not in all_grant_tables
+            ):
                 # Covers case where table is granted in Snowflake
                 # But it's not in the grant list and it's not explicitly granted as a future grant
                 sql_commands.append(
@@ -1144,7 +1153,10 @@ class SnowflakeGrantsGenerator:
                         ),
                     }
                 )
-            elif granted_view not in all_grant_views and future_view not in all_grant_views:
+            elif (
+                granted_view not in all_grant_views
+                and future_view not in all_grant_views
+            ):
                 # Covers case where view is granted in Snowflake
                 # But it's not in the grant list and it's not explicitly granted as a future grant
                 sql_commands.append(
@@ -1188,7 +1200,7 @@ class SnowflakeGrantsGenerator:
                 granted_table == future_table
                 and future_table not in write_grant_tables_full
             ):
-            # If future privilege is granted in Snowflake but not in grant list
+                # If future privilege is granted in Snowflake but not in grant list
                 sql_commands.append(
                     {
                         "already_granted": False,
@@ -1206,8 +1218,8 @@ class SnowflakeGrantsGenerator:
                 granted_table not in write_grant_tables_full
                 and future_table not in write_grant_tables_full
             ):
-            # Covers case where table is granted in Snowflake
-            # But it's not in the grant list and it's not explicitly granted as a future grant
+                # Covers case where table is granted in Snowflake
+                # But it's not in the grant list and it's not explicitly granted as a future grant
                 sql_commands.append(
                     {
                         "already_granted": False,
