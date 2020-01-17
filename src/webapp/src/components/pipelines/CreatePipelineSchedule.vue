@@ -135,7 +135,7 @@ export default {
                 Needs configuration</small
               >
             </div>
-            <span>Data Source</span>
+            <span>Data Sources</span>
             <span
               class="icon has-text-grey-light tooltip is-tooltip-right"
               data-tooltip="The integration or custom data source to connect to"
