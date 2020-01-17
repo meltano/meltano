@@ -26,7 +26,6 @@ extractors:
         env: TAP_CSV_FILES_DEFINITION
         label: CSV Files Definition
         placeholder: Ex. files-def.json
-        kind: file
         documentation: https://gitlab.com/meltano/tap-csv#run
   - name: tap-facebook
     label: Facebook Ads
