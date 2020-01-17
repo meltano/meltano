@@ -6,6 +6,7 @@ from .dashboards_helper import (
 )
 from .errors import InvalidFileNameError
 from meltano.api.api_blueprint import APIBlueprint
+from meltano.api.security.readonly_killswitch import readonly_killswitch
 
 
 dashboardsBP = APIBlueprint("dashboards", __name__)
@@ -64,6 +65,7 @@ def get_dashboard(dashboard_id):
 
 
 @dashboardsBP.route("/dashboard/save", methods=["POST"])
+@readonly_killswitch
 def save_dashboard():
     """
     Endpoint for saving a dashboard
@@ -75,6 +77,7 @@ def save_dashboard():
 
 
 @dashboardsBP.route("/dashboard/delete", methods=["DELETE"])
+@readonly_killswitch
 def delete_dashboard():
     """
     Endpoint for deleting a dashboard
@@ -86,6 +89,7 @@ def delete_dashboard():
 
 
 @dashboardsBP.route("/dashboard/update", methods=["POST"])
+@readonly_killswitch
 def update_dashboard():
     """
     Endpoint for updating a dashboard
@@ -97,6 +101,7 @@ def update_dashboard():
 
 
 @dashboardsBP.route("/dashboard/report/add", methods=["POST"])
+@readonly_killswitch
 def add_report_to_dashboard():
     dashboards_helper = DashboardsHelper()
     post_data = request.get_json()
@@ -105,6 +110,7 @@ def add_report_to_dashboard():
 
 
 @dashboardsBP.route("/dashboard/report/remove", methods=["POST"])
+@readonly_killswitch
 def remove_report_from_dashboard():
     dashboards_helper = DashboardsHelper()
     post_data = request.get_json()

@@ -13,6 +13,7 @@ from meltano.core.project_add_service import ProjectAddService
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.api.security import api_auth_required
+from meltano.api.security.readonly_killswitch import readonly_killswitch
 from meltano.api.api_blueprint import APIBlueprint
 
 
@@ -68,6 +69,7 @@ def installed():
 
 
 @pluginsBP.route("/add", methods=["POST"])
+@readonly_killswitch
 def add():
     payload = request.get_json()
     plugin_type = PluginType(payload["plugin_type"])
@@ -81,6 +83,7 @@ def add():
 
 
 @pluginsBP.route("/install/batch", methods=["POST"])
+@readonly_killswitch
 def install_batch():
     payload = request.get_json()
     plugin_type = PluginType(payload["plugin_type"])
@@ -120,6 +123,7 @@ def install_batch():
 
 
 @pluginsBP.route("/install", methods=["POST"])
+@readonly_killswitch
 def install():
     payload = request.get_json()
     plugin_type = PluginType(payload["plugin_type"])

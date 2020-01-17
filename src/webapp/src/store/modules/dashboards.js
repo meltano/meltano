@@ -29,10 +29,17 @@ const actions = {
     }
     commit('setDashboardStatus', status)
 
-    return dashboardsApi.deleteDashboard(dashboard).then(() => {
-      commit('setDashboardStatus', Object.assign({ isDeleting: false }, status))
-      commit('deleteDashboard', dashboard)
-    })
+    return dashboardsApi
+      .deleteDashboard(dashboard)
+      .then(() => {
+        commit('deleteDashboard', dashboard)
+      })
+      .finally(() => {
+        commit(
+          'setDashboardStatus',
+          Object.assign(status, { isDeleting: false })
+        )
+      })
   },
 
   getActiveDashboardReportsWithQueryResults({ commit, state }) {
@@ -88,8 +95,9 @@ const actions = {
 
   removeReportFromDashboard({ commit, dispatch }, data) {
     commit('removeReportFromDashboard', data)
-    dashboardsApi.removeReportFromDashboard(data).then(response => {
-      dispatch('updateCurrentDashboard', response.data)
+
+    return dashboardsApi.removeReportFromDashboard(data).then(response => {
+      return dispatch('updateCurrentDashboard', response.data)
     })
   },
 
@@ -101,7 +109,7 @@ const actions = {
   saveDashboard({ dispatch, commit }, data) {
     return dashboardsApi.saveDashboard(data).then(response => {
       commit('addSavedDashboardToDashboards', response.data)
-      return dispatch('updateCurrentDashboard', response.data)
+      dispatch('updateCurrentDashboard', response.data)
     })
   },
 
@@ -110,6 +118,7 @@ const actions = {
       const dashboard = response.data
       commit('setCurrentDashboard', dashboard)
       commit('addSavedDashboardToDashboards', dashboard)
+
       dispatch('addReportToDashboard', {
         reportId: report.id,
         dashboardId: dashboard.id

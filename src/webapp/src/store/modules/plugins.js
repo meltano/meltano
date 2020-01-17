@@ -124,10 +124,7 @@ const actions = {
     commit('addPluginStart', addConfig)
     return pluginsApi
       .addPlugin(addConfig)
-      .then(() => commit('addPluginComplete', addConfig))
-      .catch(error => {
-        Vue.toasted.global.error(error)
-      })
+      .finally(() => commit('addPluginComplete', addConfig))
   },
 
   getAllPlugins({ commit }) {
