@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
@@ -13,10 +13,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1541](https://gitlab.com/meltano/meltano/issues/1541) Revert `tap-csv`'s `kind: file` to text input for `csv_files_definition` as we don't fully support `tap-csv` via the UI with single (definition json) and multiple (csv files) file uploading
+
 ### Fixes
 
 ### Breaks
-
 
 ## 1.15.1 - (2020-01-16)
 
@@ -38,7 +39,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1538](https://gitlab.com/meltano/meltano/issues/1538) Fix timeframes not properly displaying on the base table
 - [#1574](https://gitlab.com/meltano/meltano/issues/1574) Fix an issue with Meltano crashing after a succesful login
 - [#1568](https://gitlab.com/meltano/meltano/issues/1568) Restore support for custom plugins that don't have their available settings defined in discovery.yml
-
 
 ## 1.15.0 - (2020-01-13)
 
