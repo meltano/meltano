@@ -1,13 +1,13 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 
-import Chart from '@/components/analyze/Chart'
+import Report from '@/components/Report'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
   name: 'Dashboard',
   components: {
-    Chart,
+    Report,
     RouterViewLayout
   },
   data() {
@@ -88,35 +88,11 @@ export default {
         </div>
 
         <div v-if="activeDashboardReports.length" class="columns is-multiline">
-          <div
+          <Report
             v-for="report in activeDashboardReports"
             :key="report.id"
-            class="column is-half"
-          >
-            <div class="box">
-              <div class="columns is-vcentered">
-                <div class="column">
-                  <h3 class="title is-5 is-inline-block">{{ report.name }}</h3>
-                  <div class="field is-pulled-right is-inline-block">
-                    <div class="buttons">
-                      <a class="button is-small" @click="goToReport(report)"
-                        >Edit</a
-                      >
-                      <a class="button is-small" @click="goToDesign(report)"
-                        >Explore</a
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <chart
-                :chart-type="report.chartType"
-                :results="report.queryResults"
-                :result-aggregates="report.queryResultAggregates"
-              ></chart>
-            </div>
-          </div>
+            :report="report"
+          />
         </div>
 
         <progress
