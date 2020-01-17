@@ -721,10 +721,14 @@ export default {
       box-sizing border-box
       margin-right: 0.4rem;
       margin-bottom: 1rem;
+      svg
+        color #fff
       &.secondary
         background none
         box-shadow inset 0 0 0 2px #464ACB
         color #464ACB
+        svg
+          color #464ACB
         &:hover
           background-color lighten(#464ACB, 80%)
       &:hover
