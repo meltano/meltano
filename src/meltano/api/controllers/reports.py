@@ -5,6 +5,7 @@ from .reports_helper import ReportAlreadyExistsError, ReportsHelper
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.security.auth import permit
 from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin, Need
+from meltano.api.security.readonly_killswitch import readonly_killswitch
 
 reportsBP = APIBlueprint("reports", __name__)
 
@@ -69,6 +70,7 @@ def load_report(report_name):
 
 
 @reportsBP.route("/save", methods=["POST"])
+@readonly_killswitch
 def save_report():
     reports_helper = ReportsHelper()
     post_data = request.get_json()
@@ -77,6 +79,7 @@ def save_report():
 
 
 @reportsBP.route("/update", methods=["POST"])
+@readonly_killswitch
 def update_report():
     reports_helper = ReportsHelper()
     post_data = request.get_json()

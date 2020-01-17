@@ -103,7 +103,7 @@ const actions = {
   },
 
   getAllPipelineSchedules({ commit, dispatch }) {
-    orchestrationsApi.getAllPipelineSchedules().then(response => {
+    return orchestrationsApi.getAllPipelineSchedules().then(response => {
       commit('setPipelines', response.data)
       dispatch('rehydratePollers')
     })
@@ -179,16 +179,19 @@ const actions = {
 
   rehydratePollers({ dispatch, getters, state }) {
     // Handle page refresh condition resulting in jobs running but no pollers
-    getters.getRunningPipelines.forEach(pipeline => {
+    const pollersUponQueued = getters.getRunningPipelines.map(pipeline => {
       const jobId = pipeline.name
       const isMissingPoller =
         state.pipelinePollers.find(
           pipelinePoller => pipelinePoller.getMetadata().jobId === jobId
         ) === undefined
+
       if (isMissingPoller) {
-        dispatch('queuePipelinePoller', { jobId })
+        return dispatch('queuePipelinePoller', { jobId })
       }
     })
+
+    return Promise.all(pollersUponQueued)
   },
 
   resetExtractorInFocusConfiguration: ({ commit }) =>
@@ -203,6 +206,7 @@ const actions = {
       isRunning: true,
       hasEverSucceeded: pipeline.hasEverSucceeded
     })
+
     return orchestrationsApi.run(pipeline).then(response => {
       dispatch('queuePipelinePoller', response.data)
       commit('setPipelineJobId', { pipeline, jobId: response.data.jobId })
@@ -217,7 +221,7 @@ const actions = {
   },
 
   savePluginConfiguration(_, configPayload) {
-    orchestrationsApi.savePluginConfiguration(configPayload)
+    return orchestrationsApi.savePluginConfiguration(configPayload)
   },
 
   testPluginConfiguration(_, configPayload) {

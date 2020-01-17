@@ -118,9 +118,10 @@ export default {
             })
           })
         })
-        .catch(error => {
+        .catch(err => {
           this.isSaving = false
-          Vue.toasted.global.error(error.response.data.code)
+          this.$error.handle(err)
+          this.close()
         })
     },
     updateDefaultTransforms(namespace) {

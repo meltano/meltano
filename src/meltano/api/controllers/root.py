@@ -20,6 +20,7 @@ from jinja2 import TemplateNotFound
 import meltano
 from meltano.core.project import Project
 from meltano.api.security import api_auth_required
+from meltano.api.security.readonly_killswitch import readonly_killswitch
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.core.utils import truthy
 
@@ -57,6 +58,7 @@ def default(path):
 
 @root.route("/upgrade", methods=["POST"])
 @roles_required("admin")
+@readonly_killswitch
 def upgrade():
     meltano.api.executor.upgrade()
     return "Meltano update in progress.", 201
