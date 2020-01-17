@@ -12,7 +12,10 @@ export default {
   },
   data() {
     return {
-      isActiveDashboardLoading: false
+      isActiveDashboardLoading: false,
+      reportLayoutWireframe: [],
+      showRearrangeUi: false,
+      changeHasBeenMade: false
     }
   },
   computed: {
@@ -27,6 +30,13 @@ export default {
       // eslint-disable-next-line
       return `mailto:?subject=Dashboard: ${this.activeDashboard.name}&body=${window.location}`
     },
+    displayedReports() {
+      if (this.showRearrangeUi || this.changeHasBeenMade) {
+        return this.reportLayoutWireframe
+      } else {
+        return this.activeDashboardReports
+      }
+    },
     isActive() {
       return dashboard => dashboard.id === this.activeDashboard.id
     }
@@ -37,6 +47,15 @@ export default {
       this.getActiveDashboardReportsWithQueryResults().then(() => {
         this.isActiveDashboardLoading = false
       })
+    },
+    showRearrangeUi() {
+      if (this.showRearrangeUi) {
+        this.reportLayoutWireframe = []
+
+        this.activeDashboardReports.forEach(report => {
+          this.reportLayoutWireframe.push(report)
+        })
+      }
     }
   },
   beforeDestroy() {
@@ -61,6 +80,12 @@ export default {
     },
     goToReport(report) {
       this.$router.push({ name: 'report', params: report })
+    },
+    updateReportPosition(data) {
+      const report = this.reportLayoutWireframe[data.oldPosition]
+      this.reportLayoutWireframe.splice(data.oldPosition, 1)
+      this.reportLayoutWireframe.splice(data.newPosition, 0, report)
+      this.changeHasBeenMade = data.changeHasBeenMade
     }
   }
 }
@@ -78,8 +103,29 @@ export default {
             </h3>
           </div>
           <div class="column">
-            <div class="buttons is-pulled-right">
+            <div v-if="showRearrangeUi" class="buttons is-pulled-right">
+              <button
+                class="button"
+                @click="showRearrangeUi = !showRearrangeUi"
+              >
+                Save
+              </button>
+              <button
+                class="button"
+                @click="showRearrangeUi = !showRearrangeUi"
+              >
+                Cancel
+              </button>
+            </div>
+            <div v-else class="buttons is-pulled-right">
               <a class="button" :href="dashboardEmail">Share</a>
+              <button
+                v-if="!showRearrangeUi"
+                class="button"
+                @click="showRearrangeUi = !showRearrangeUi"
+              >
+                Edit
+              </button>
               <router-link class="button" :to="{ name: 'dashboards' }"
                 >Back to Dashboards</router-link
               >
@@ -87,11 +133,14 @@ export default {
           </div>
         </div>
 
-        <div v-if="activeDashboardReports.length" class="columns is-multiline">
+        <div v-if="displayedReports.length" class="columns is-multiline">
           <Report
-            v-for="report in activeDashboardReports"
-            :key="report.id"
+            v-for="(report, index) in displayedReports"
+            :key="`${report.id}-${index}`"
             :report="report"
+            :index="index"
+            :edit="showRearrangeUi"
+            @update-report-position="updateReportPosition"
           />
         </div>
 

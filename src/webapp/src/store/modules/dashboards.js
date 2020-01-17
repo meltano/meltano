@@ -101,6 +101,13 @@ const actions = {
     })
   },
 
+  reorderDashboardReports({ dispatch }, data) {
+    console.log('hello')
+    dashboardsApi.reorderDashboardReports(data).then(response => {
+      dispatch('updateCurrentDashboard', response.data)
+    })
+  },
+
   resetActiveDashboard: ({ commit }) => commit('reset', 'activeDashboard'),
 
   resetActiveDashboardReports: ({ commit }) =>
@@ -169,7 +176,10 @@ const mutations = {
   },
 
   setActiveDashboardReports(state, reports) {
-    state.activeDashboardReports = reports
+    state.activeDashboardReports = reports.map((report, index) => {
+      report.position = index
+      return report
+    })
   },
 
   setCurrentDashboard(state, dashboard) {
