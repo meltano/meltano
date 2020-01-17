@@ -400,6 +400,11 @@ transforms:
     pip_url: 'https://gitlab.com/meltano/dbt-tap-salesforce.git'
     vars:
       schema: "{{ env_var('MELTANO_LOAD_SCHEMA') }}"
+  - name: tap-facebook
+    namespace: tap_facebook
+    pip_url: 'https://gitlab.com/meltano/dbt-tap-facebook.git'
+    vars:
+      schema: "{{ env_var('MELTANO_LOAD_SCHEMA') }}"
   - name: tap-gitlab
     namespace: tap_gitlab
     pip_url: 'https://gitlab.com/meltano/dbt-tap-gitlab.git'
