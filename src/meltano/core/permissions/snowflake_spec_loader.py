@@ -580,6 +580,35 @@ class SnowflakeSpecLoader:
         """
         conn = SnowflakeConnector()
 
+        future_grants = {}
+        for database in self.entities["database_refs"]:
+            grant_results = conn.show_future_grants(database=database)
+
+            for role in grant_results:
+                for privilege in grant_results[role]:
+                    for grant_on in grant_results[role][privilege]:
+                        future_grants.setdefault(role, {}).setdefault(
+                            privilege, {}
+                        ).setdefault(grant_on, []).extend(
+                            grant_results[role][privilege][grant_on]
+                        )
+        
+        for schema_ref in self.entities["schema_refs"]:
+            all_schema = conn.full_schema_list(schema_ref)
+
+            for schema in all_schema:
+                grant_results = conn.show_future_grants(schema=schema)
+
+                for role in grant_results:
+                    for privilege in grant_results[role]:
+                        for grant_on in grant_results[role][privilege]:
+                            future_grants.setdefault(role, {}).setdefault(
+                                privilege, {}
+                            ).setdefault(grant_on, []).extend(
+                                grant_results[role][privilege][grant_on]
+                            )
+        print(future_grants) # this works! Now to collapse it with show_grants_to_role
+
         for role in self.entities["roles"]:
             self.grants_to_role[role] = conn.show_grants_to_role(role)
 

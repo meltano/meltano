@@ -124,6 +124,34 @@ class SnowflakeConnector:
 
         return names
 
+    def show_future_grants(self, database: str = None, schema: str = None) -> List[str]:
+        future_grants = {}
+
+        if schema:
+            query = f"SHOW FUTURE GRANTS IN SCHEMA {schema}"
+        elif database:
+            query = f"SHOW FUTURE GRANTS IN DATABASE {database}"
+        else:
+            pass
+
+        with self.engine.connect() as connection:
+            results = connection.execute(query).fetchall()
+
+            for result in results:
+                if result["grant_to"] == "ROLE":
+                    role = result["grantee_name"].lower()
+                    privilege = result["privilege"].lower()
+                    granted_on = result["grant_on"].lower()
+
+                    future_grants.setdefault(role, {}).setdefault(
+                        privilege, {}
+                    ).setdefault(granted_on, []).append(result["name"].lower())
+
+                else:
+                    continue
+
+        return future_grants
+
     def show_grants_to_role(self, role) -> List[str]:
         grants = {}
 
@@ -135,9 +163,9 @@ class SnowflakeConnector:
                 privilege = result["privilege"].lower()
                 granted_on = result["granted_on"].lower()
 
-                grants[privilege] = grants.get(privilege, {})
-                grants[privilege][granted_on] = grants[privilege].get(granted_on, [])
-                grants[privilege][granted_on].append(result["name"].lower())
+                grants.setdefault(privilege, {}).setdefault(granted_on, []).append(
+                    result["name"].lower()
+                )
 
         return grants
 

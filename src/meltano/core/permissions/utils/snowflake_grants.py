@@ -557,6 +557,9 @@ class SnowflakeGrantsGenerator:
                 continue
 
             conn = SnowflakeConnector()
+            #TODO Append db.<schema> to read_grant_schemas
+            #TODO Add future grants for schemas? if name_parts[1] == "*":
+            # future grants
             fetched_schemas = conn.full_schema_list(schema)
             read_grant_schemas.extend(fetched_schemas)
 
@@ -767,6 +770,9 @@ class SnowflakeGrantsGenerator:
                 # If <schema_name>.* then you can grant all, grant future, and exit
                 # If *.* was provided then we're still ok as the full_schema_list
                 # Would fetch all schemas and we'd still iterate through each
+
+                #TODO Append schema.<table> and schema.<view> to read_grant_tables/views
+
                 for schema in fetched_schemas:
                     # Grant on ALL tables
                     sql_commands.append(
@@ -905,6 +911,9 @@ class SnowflakeGrantsGenerator:
                 # If <schema_name>.* then you can grant all, grant future, and exit
                 # If *.* was provided then we're still ok as the full_schema_list
                 # Would fetch all schemas and we'd still iterate through each
+
+                #TODO Append schema.<table> and schema.<view> to write_grant_tables/views
+
                 for schema in fetched_schemas:
                     # Grant on ALL tables
                     sql_commands.append(
