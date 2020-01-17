@@ -174,7 +174,6 @@ export default {
                   icon-open="chart-line"
                   icon-close="caret-down"
                   is-right-aligned
-                  is-up
                 >
                   <div class="dropdown-content is-unselectable">
                     <AnalyzeList :pipeline="pipeline"></AnalyzeList>
@@ -195,7 +194,6 @@ export default {
                   icon-open="trash-alt"
                   icon-close="caret-up"
                   is-right-aligned
-                  is-up
                 >
                   <div class="dropdown-content is-unselectable">
                     <div class="dropdown-item">
