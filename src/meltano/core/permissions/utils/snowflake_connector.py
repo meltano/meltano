@@ -2,7 +2,7 @@ import logging
 import os
 import re
 
-from typing import Dict, List
+from typing import Dict, List, Any
 from sqlalchemy import create_engine
 from snowflake.sqlalchemy import URL
 
@@ -152,7 +152,7 @@ class SnowflakeConnector:
 
         return future_grants
 
-    def show_grants_to_role(self, role) -> List[str]:
+    def show_grants_to_role(self, role) -> Dict[str, Any]:
         grants = {}
 
         query = f"SHOW GRANTS TO ROLE {SnowflakeConnector.snowflaky(role)}"
