@@ -151,7 +151,9 @@ export default {
         ref="log-view"
         class="modal-card-body modal-card-body-log is-overflow-y-scroll"
       >
-        <pre v-if="jobLog"><code>{{jobLog}}{{getLogAppender}}</code></pre>
+        <pre
+          v-if="jobLog"
+        ><code class="is-size-7">{{jobLog}}{{getLogAppender}}</code></pre>
         <progress v-else class="progress is-small is-info"></progress>
       </section>
       <section class="modal-card-body">
