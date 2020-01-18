@@ -89,6 +89,5 @@ clean-targets:
 #     └── snowplow_sessions.sql
 
 models:
-  my_meltano_project: 
   enabled: true    # configs defined here are applied to _all_ packages
   materialized: view   # but can be overridden in more specific configs below
