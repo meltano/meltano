@@ -1,14 +1,126 @@
+#########################
+#### PROJECT DETAILS ####
+#########################
+
+# name: Required. This is the name used to reference your package in the configs
+# below. Package names must only contain letters and underscores
 name: 'my_meltano_project'
+
+# version: Required. This indicates the current version of your package and
+# should conform to semantic versioning. The field is currently unused
 version: '1.0'
+
+# require-dbt-version: Optional. This is used to validate that your project is
+# compatible with your dbt version
+require-dbt-version: [">=0.14.0", "<0.15.0"]
+
+####################################
+#### CONNECTION CONFIGURATIONS #####
+####################################
+
+# profile: Required. This config specifies which profile dbt should use to
+# connect to your data warehouse. The provided value must exist in the
+# profiles.yml file.
 profile: 'meltano'
+
+
+##################################
+#### FILE PATH CONFIGURATIONS ####
+##################################
+
+# The following configs specify directories that dbt uses to operate. All
+# paths are specified relative to the path of dbt_project.yml.
+
+# ALL FILE PATH CONFIGURATIONS ARE OPTIONAL, the default values are listed below.
+
+# source-paths: Specify which path(s) dbt should look in to find models. Model
+# are.sql files. Model and source schema files (.yml files) should also be
+# included in this path
 source-paths: ["models"]
+
+# analysis-paths: Specify which path(s) dbt should look in to find analytical
+# queries. These queries are compiled, but not executed, by dbt.
 analysis-paths: ["analysis"]
+
+# test-paths: Specify which path(s) dbt should look in to find data test
+# definitions.
 test-paths: ["tests"]
+
+# data-paths: Specify which path(s) dbt should look in to find CSV files.
+# Running `dbt seed` will load these CSVs as tables in your warehouse.
 data-paths: ["data"]
+
+# macro-paths: Specify which path(s) dbt should look in to find macros. These
+# macros will be globally available to all models in your project.
 macro-paths: ["macros"]
-target-path: "../.meltano/transformers/dbt/target"  # directory which will store compiled SQL files
-clean-targets:                                      # directories to be removed by `dbt clean`
+
+# snapshot-paths: Specify with path(s) dbt should look in to finds napshots.
+# Running `dbt snapshot` will run these snapshots.
+snapshot-paths: ["snapshots"]
+
+# target-path: Specify which path dbt should write  compiled SQL to.
+target-path: "../.meltano/transformers/dbt/target" 
+
+# log-path: Specify which path dbt should write debug logs to.
+log-path: "logs"
+
+# modules-path: Specify which path dbt should use for storing and finding modules.
+modules-path: "dbt_modules"
+
+# clean-targets: Specify which path(s) should be removed by the clean task. Run
+# `dbt clean` to delete these directories
+clean-targets:
   - "../.meltano/transformers/dbt/target"
   - "dbt_modules"
+
+
+#################################
+#### RESOURCE CONFIGURATIONS ####
+#################################
+
+# The following section contains configurations that define how your resources
+# are instantiated by dbt. You can configure `models`, and `seeds` from here.
+# You can configure resources from both your own project, and installed 
+# packages included as dependencies.
+#
+# Options are specified on a per-package, per-directory, and per-model basis.
+# The configs are inherited, so configs applied to a package can be overridden
+# for directories and models contained within that package.
+#
+# The configuration structure within a package should mirror the directory
+# structure within that package. The example configs provided below are based
+# on the following directory structure.
+#
+# dbt_project.yml
+# models/
+# ├── adwords
+# │   └── adwords_ads.sql
+# └── snowplow
+#     ├── base
+#     │   └── snowplow_events.sql
+#     └── snowplow_sessions.sql
+
 models:
   my_meltano_project: null
+  enabled: true    # configs defined here are applied to _all_ packages
+  materialized: view   # but can be overridden in more specific configs below
+
+  # pre- and post- hooks can be defined anywhere within the model hierarchy.
+  # when defined at the root level (as they are here), they apply to all models
+  # in all packages. These hooks are compiled into the model SQL and run either
+  # before or after the model is materializated.
+  pre-hook:
+    - "insert into audit (model, state, time) values ('{{ this.name }}', 'start', getdate())"
+
+  post-hook:
+    - "grant select on {{this}} to user_1"
+    - "insert into audit (model, state, time) values ('{{ this.name }}', 'end', getdate())"
+
+seeds:
+  enabled: true
+
+###################
+#### RUN HOOKS ####
+###################
+# Like the pre- and post- hooks above, the on-run-start and on-run-end configs
+# make it possible to run SQL at the very beginning, and very end of a dbt run.
