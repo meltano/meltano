@@ -1,18 +1,7 @@
-#########################
-#### PROJECT DETAILS ####
-#########################
 
-# name: Required. This is the name used to reference your package in the configs
-# below. Package names must only contain letters and underscores
 name: 'my_meltano_project'
 
-# version: Required. This indicates the current version of your package and
-# should conform to semantic versioning. The field is currently unused
 version: '1.0'
-
-# require-dbt-version: Optional. This is used to validate that your project is
-# compatible with your dbt version
-require-dbt-version: [">=0.14.0", "<0.15.0"]
 
 ####################################
 #### CONNECTION CONFIGURATIONS #####
@@ -59,7 +48,7 @@ macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
 # target-path: Specify which path dbt should write  compiled SQL to.
-target-path: "../.meltano/transformers/dbt/target" 
+target-path: "../.meltano/transformers/dbt/target"
 
 # log-path: Specify which path dbt should write debug logs to.
 log-path: "logs"
@@ -70,7 +59,6 @@ modules-path: "dbt_modules"
 # clean-targets: Specify which path(s) should be removed by the clean task. Run
 # `dbt clean` to delete these directories
 clean-targets:
-  - "../.meltano/transformers/dbt/target"
   - "dbt_modules"
 
 
@@ -80,7 +68,7 @@ clean-targets:
 
 # The following section contains configurations that define how your resources
 # are instantiated by dbt. You can configure `models`, and `seeds` from here.
-# You can configure resources from both your own project, and installed 
+# You can configure resources from both your own project, and installed
 # packages included as dependencies.
 #
 # Options are specified on a per-package, per-directory, and per-model basis.
@@ -104,23 +92,3 @@ models:
   my_meltano_project: null
   enabled: true    # configs defined here are applied to _all_ packages
   materialized: view   # but can be overridden in more specific configs below
-
-  # pre- and post- hooks can be defined anywhere within the model hierarchy.
-  # when defined at the root level (as they are here), they apply to all models
-  # in all packages. These hooks are compiled into the model SQL and run either
-  # before or after the model is materializated.
-  pre-hook:
-    - "insert into audit (model, state, time) values ('{{ this.name }}', 'start', getdate())"
-
-  post-hook:
-    - "grant select on {{this}} to user_1"
-    - "insert into audit (model, state, time) values ('{{ this.name }}', 'end', getdate())"
-
-seeds:
-  enabled: true
-
-###################
-#### RUN HOOKS ####
-###################
-# Like the pre- and post- hooks above, the on-run-start and on-run-end configs
-# make it possible to run SQL at the very beginning, and very end of a dbt run.
