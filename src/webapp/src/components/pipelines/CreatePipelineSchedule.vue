@@ -131,9 +131,6 @@ export default {
           <th>
             <div>
               <small class="has-text-interactive-navigation">Step 1</small>
-              <small v-if="!isValidConfig" class="is-italic has-text-warning">
-                Needs configuration</small
-              >
             </div>
             <span>Data Sources</span>
             <span

@@ -14,6 +14,7 @@ export default {
   },
   computed: {
     ...mapGetters('orchestration', ['getHasPipelines']),
+    ...mapGetters('plugins', ['getIsLoadingPluginsOfType']),
     ...mapState('plugins', ['installedPlugins']),
     getModalName() {
       return this.$route.name
@@ -80,7 +81,10 @@ export default {
             <h3 id="integrations" class="title">Integrations</h3>
             <p class="subtitle">Integrations and custom data connections</p>
           </div>
-          <CreatePipelineSchedule />
+          <div v-if="getIsLoadingPluginsOfType('extractors')" class="box">
+            <progress class="progress is-small is-info"></progress>
+          </div>
+          <CreatePipelineSchedule v-else />
         </div>
       </div>
 
