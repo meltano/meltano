@@ -175,10 +175,7 @@ export default {
                   <p>
                     <span class="has-text-weight-bold">Custom</span>
                     <br />
-                    <small
-                      >Connect a custom data source or vote for an
-                      addition</small
-                    >
+                    <small>Connect a data source not listed above</small>
                   </p>
                 </div>
               </div>
