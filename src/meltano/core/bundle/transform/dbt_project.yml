@@ -59,7 +59,9 @@ modules-path: "dbt_modules"
 # clean-targets: Specify which path(s) should be removed by the clean task. Run
 # `dbt clean` to delete these directories
 clean-targets:
-  - "dbt_modules"
+    - "../.meltano/transformers/dbt/target"
+    - "dbt_modules"
+    - "logs"
 
 
 #################################
