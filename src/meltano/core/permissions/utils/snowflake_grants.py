@@ -1238,7 +1238,7 @@ class SnowflakeGrantsGenerator:
                     {
                         "already_granted": False,
                         "sql": REVOKE_FUTURE_SCHEMA_OBJECT_PRIVILEGES_TEMPLATE.format(
-                            privileges=write_privileges,
+                            privileges=write_partial_privileges,
                             resource_type="table",
                             resource_name=SnowflakeConnector.snowflaky(
                                 f"{database_name}.{schema_name}"
@@ -1257,7 +1257,7 @@ class SnowflakeGrantsGenerator:
                     {
                         "already_granted": False,
                         "sql": REVOKE_PRIVILEGES_TEMPLATE.format(
-                            privileges=write_privileges,
+                            privileges=write_partial_privileges,
                             resource_type="table",
                             resource_name=SnowflakeConnector.snowflaky(granted_table),
                             role=SnowflakeConnector.snowflaky(role),
