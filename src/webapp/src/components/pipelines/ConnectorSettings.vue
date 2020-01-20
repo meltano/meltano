@@ -50,13 +50,18 @@ export default {
       }
     },
     getInlineDocsUrl() {
-      const path = window.FLASK
+      let url = window.FLASK
         ? this.plugin.docs
         : this.plugin.docs.replace(
             'https://meltano.com/',
             'http://localhost:8081/'
           )
-      return `${path}?embed=true`
+      if (url.includes('?')) {
+        url = url.replace('?', '?embed=true&')
+      } else if (url.includes('#')) {
+        url = url.replace('#', '?embed=true#')
+      }
+      return url
     },
     getLabel() {
       return setting =>
