@@ -38,8 +38,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1579](https://gitlab.com/meltano/meltano/issues/1579) Make color contrast for CTA buttons accessible
 
-### Breaks
-
 ## 1.15.1 - (2020-01-16)
 
 ---
