@@ -53,6 +53,18 @@
       type = sum
       sql = "{{table}}.minutes"
     }
+    min_minutes {
+      label = Minimum Minutes
+      description = Minimum Minutes Watched
+      type = min
+      sql = "{{table}}.minutes"
+    }
+    max_minutes {
+      label = Maximum Minutes
+      description = Maximum Minutes Watched
+      type = max
+      sql = "{{table}}.minutes"
+    }
     count_days {
       label = Stream Days Count
       description = Total Days (used for testing attributes defined both as columns and as aggregates)

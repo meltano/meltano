@@ -365,6 +365,10 @@ class MeltanoAggregate(MeltanoBase):
             return fn.Coalesce(fn.Count(field), 0, alias=self.alias())
         elif self.type == "avg":
             return fn.Coalesce(fn.Avg(field), 0, alias=self.alias())
+        elif self.type == "max":
+            return fn.Coalesce(fn.Max(field), 0, alias=self.alias())
+        elif self.type == "min":
+            return fn.Coalesce(fn.Min(field), 0, alias=self.alias())
 
     def column_name(self) -> str:
         (table, column) = self.sql.split(".")
