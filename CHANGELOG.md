@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.16.0 - (2020-01-20)
 
 ---
 
@@ -20,10 +33,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-
-### Fixes
-
-### Breaks
 
 ## 1.15.1 - (2020-01-16)
 
