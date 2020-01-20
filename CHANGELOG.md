@@ -11,7 +11,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1510](https://gitlab.com/meltano/meltano/issues/1510) Remove breadcrumbs (not currently useful)
+- [#1589](https://gitlab.com/meltano/meltano/issues/1589) Add dbt-specific files to a .gitignore
+
 ### Fixes
+
+- [#1579](https://gitlab.com/meltano/meltano/issues/1579) Make color contrast for CTA buttons accessible
 
 ### Breaks
 
@@ -30,13 +35,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1541](https://gitlab.com/meltano/meltano/issues/1541) Revert `tap-csv`'s `kind: file` to text input for `csv_files_definition` as we don't fully support `tap-csv` via the UI with single (definition json) and multiple (csv files) file uploading
 - [#1477](https://gitlab.com/meltano/meltano/issues/1477) Add a `read-only` mode to Meltano to disable all modifications from the UI
-- [#1510](https://gitlab.com/meltano/meltano/issues/1510) Remove breadcrumbs (not currently useful)
-- [#1589](https://gitlab.com/meltano/meltano/issues/1589) Add dbt-specific files to a .gitignore
-
-### Changes
 
 ### Fixes
-- [#1579](https://gitlab.com/meltano/meltano/issues/1579) Make color contrast for CTA buttons accessible
 
 ### Breaks
 
