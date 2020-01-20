@@ -859,6 +859,8 @@ class SnowflakeGrantsGenerator:
                     # Adds the future grant table format to the granted lists
                     future_table = f"{schema}.<table>"
                     future_view = f"{schema}.<view>"
+                    read_grant_tables.extend(future_table)
+                    read_grant_views.extend(future_view)
                     read_grant_tables_full.append(future_table)
                     read_grant_views_full.append(future_view)
 
@@ -998,6 +1000,8 @@ class SnowflakeGrantsGenerator:
                     future_view = f"{schema}.<view>"
                     write_grant_tables.append(future_table)
                     write_grant_views.append(future_view)
+                    write_grant_tables_full.extend(future_table)
+                    write_grant_views_full.extend(future_view)
 
                     table_already_granted = True
 
