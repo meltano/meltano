@@ -60,6 +60,8 @@ export default {
         url = url.replace('?', '?embed=true&')
       } else if (url.includes('#')) {
         url = url.replace('#', '?embed=true#')
+      } else {
+        url = `${url}?embed=true`
       }
       return url
     },
