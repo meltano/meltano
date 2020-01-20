@@ -680,6 +680,7 @@ class SnowflakeGrantsGenerator:
             future_schema_name = f"{database_name}.<schema>"
             if granted_schema not in all_grant_schemas and database_name in shared_dbs:
                 # No privileges to revoke on imported db. Done at database level
+                #TODO Need to validate against set of listed databases in config
                 continue
             elif (  # If future privilege is granted on snowflake but not in grant list
                 granted_schema == future_schema_name
@@ -747,6 +748,7 @@ class SnowflakeGrantsGenerator:
                 and database_name in shared_dbs
             ):
                 # No privileges to revoke on imported db
+                #TODO Need to validate against set of listed databases in config
                 continue
             elif (  # If future privilege is granted but not in grant list
                 granted_schema == future_schema_name
@@ -1113,6 +1115,7 @@ class SnowflakeGrantsGenerator:
             future_table = f"{database_name}.{schema_name}.<table>"
             if granted_table not in all_grant_tables and database_name in shared_dbs:
                 # No privileges to revoke on imported db. Done at database level
+                #TODO Need to validate against set of listed databases in config
                 continue
             elif (  # If future privilege is granted in Snowflake but not in grant list
                 granted_table == future_table and future_table not in all_grant_tables
@@ -1161,6 +1164,7 @@ class SnowflakeGrantsGenerator:
             future_view = f"{database_name}.{schema_name}.<view>"
             if granted_view not in all_grant_views and database_name in shared_dbs:
                 # No privileges to revoke on imported db. Done at database level
+                #TODO Need to validate against set of listed databases in config
                 continue
             elif granted_view == future_view and future_view not in all_grant_views:
                 # If future privilege is granted in Snowflake but not in grant list
@@ -1219,6 +1223,7 @@ class SnowflakeGrantsGenerator:
                 and database_name in shared_dbs
             ):
                 # No privileges to revoke on imported db. Done at database level
+                #TODO Need to validate against set of listed databases in config
                 continue
             elif (
                 granted_table == future_table
