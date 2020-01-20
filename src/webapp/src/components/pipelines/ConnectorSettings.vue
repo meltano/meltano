@@ -1,8 +1,9 @@
 <script>
-import InputDateIso8601 from '@/components/generic/InputDateIso8601'
+import axios from 'axios'
 
-import utils from '@/utils/utils'
 import { ENV, MELTANO_YML } from '@/utils/constants'
+import InputDateIso8601 from '@/components/generic/InputDateIso8601'
+import utils from '@/utils/utils'
 
 export default {
   name: 'ConnectorSettings',
@@ -50,20 +51,17 @@ export default {
       }
     },
     getInlineDocsUrl() {
-      let url = window.FLASK
-        ? this.plugin.docs
-        : this.plugin.docs.replace(
-            'https://meltano.com/',
-            'http://localhost:8081/'
-          )
-      if (url.includes('?')) {
-        url = url.replace('?', '?embed=true&')
-      } else if (url.includes('#')) {
-        url = url.replace('#', '?embed=true#')
-      } else {
-        url = `${url}?embed=true`
-      }
-      return url
+      return axios.getUri({
+        url: window.FLASK
+          ? this.plugin.docs
+          : this.plugin.docs.replace(
+              'https://meltano.com/',
+              'http://localhost:8081/'
+            ),
+        params: {
+          embed: true
+        }
+      })
     },
     getLabel() {
       return setting =>
