@@ -900,8 +900,6 @@ class SnowflakeGrantsGenerator:
                         }
                     )
 
-                continue
-
             # TODO Future elif to have partial table name
 
             else:
@@ -1042,8 +1040,6 @@ class SnowflakeGrantsGenerator:
                             ),
                         }
                     )
-
-                continue
 
             # TODO Future elif to have partial table name
 
