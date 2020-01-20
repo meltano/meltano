@@ -16,7 +16,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1541](https://gitlab.com/meltano/meltano/issues/1541) Revert `tap-csv`'s `kind: file` to text input for `csv_files_definition` as we don't fully support `tap-csv` via the UI with single (definition json) and multiple (csv files) file uploading
-- [#608](https://gitlab.com/meltano/meltano/issues/608) Add the Facebook Ads Extractor to Meltano as a hidden plugin. It will be fully enabled on Meltano UI once bundled Transformations and Models are added. It uses the tap defined in https://gitlab.com/meltano/tap-facebook/
 - [#1477](https://gitlab.com/meltano/meltano/issues/1477) Add a `read-only` mode to Meltano to disable all modifications from the UI
 
 ### Changes
