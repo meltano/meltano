@@ -1,12 +1,10 @@
 <script>
-import Breadcrumbs from '@/components/navigation/Breadcrumbs'
 import MainNav from '@/components/navigation/MainNav'
 import PromoBanner from '@/components/generic/PromoBanner'
 
 export default {
   name: 'App',
   components: {
-    Breadcrumbs,
     MainNav,
     PromoBanner
   },
@@ -39,7 +37,6 @@ export default {
   <div id="app">
     <PromoBanner v-if="isMeltanoDemoSite"></PromoBanner>
     <main-nav></main-nav>
-    <Breadcrumbs></Breadcrumbs>
     <router-view />
   </div>
 </template>
