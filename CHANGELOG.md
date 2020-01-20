@@ -13,7 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#1573](https://gitlab.com/meltano/meltano/issues/1573) Fix inline docs `no-navbar` CSS and improve query string `embed=true` parsing
+- [#1573](https://gitlab.com/meltano/meltano/issues/1573) Fix docs `shouldShowNavbar` conditional and improve query string `embed=true` parsing
 
 ### Breaks
 
