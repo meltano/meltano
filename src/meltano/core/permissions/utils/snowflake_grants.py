@@ -629,7 +629,9 @@ class SnowflakeGrantsGenerator:
 
                 for privilege in write_privileges_array:
                     # If any of the privileges are not granted, set already_granted to False
-                    if not self.check_grant_to_role(role, privilege, "schema", future_schema):
+                    if not self.check_grant_to_role(
+                        role, privilege, "schema", future_schema
+                    ):
                         already_granted = False
 
                 # Grant on FUTURE schemas
@@ -649,7 +651,9 @@ class SnowflakeGrantsGenerator:
 
                 for privilege in write_privileges_array:
                     # If any of the privileges are not granted, set already_granted to False
-                    if not self.check_grant_to_role(role, privilege, "schema", db_schema):
+                    if not self.check_grant_to_role(
+                        role, privilege, "schema", db_schema
+                    ):
                         already_granted = False
 
                 sql_commands.append(
@@ -857,8 +861,10 @@ class SnowflakeGrantsGenerator:
                     read_grant_views_full.append(future_view)
 
                     table_already_granted = False
-                    
-                    if self.check_grant_to_role(role, read_privileges, "schema", future_table):
+
+                    if self.check_grant_to_role(
+                        role, read_privileges, "schema", future_table
+                    ):
                         table_already_granted = True
 
                     # Grant future on all tables
@@ -875,8 +881,10 @@ class SnowflakeGrantsGenerator:
                     )
 
                     view_already_granted = False
-                    
-                    if self.check_grant_to_role(role, read_privileges, "schema", future_view):
+
+                    if self.check_grant_to_role(
+                        role, read_privileges, "schema", future_view
+                    ):
                         view_already_granted = True
 
                     # Grant future on all views
@@ -995,7 +1003,9 @@ class SnowflakeGrantsGenerator:
 
                     for privilege in write_privileges_array:
                         # If any of the privileges are not granted, set already_granted to False
-                        if not self.check_grant_to_role(role, privilege, "schema", future_table):
+                        if not self.check_grant_to_role(
+                            role, privilege, "schema", future_table
+                        ):
                             table_already_granted = False
 
                     # Grant future on all tables
@@ -1015,7 +1025,9 @@ class SnowflakeGrantsGenerator:
 
                     for privilege in write_privileges_array:
                         # If any of the privileges are not granted, set already_granted to False
-                        if not self.check_grant_to_role(role, privilege, "schema", future_view):
+                        if not self.check_grant_to_role(
+                            role, privilege, "schema", future_view
+                        ):
                             view_already_granted = False
 
                     # Grant future on all views
@@ -1052,7 +1064,9 @@ class SnowflakeGrantsGenerator:
                 table_already_granted = True
                 for privilege in write_privileges_array:
                     # If any of the privileges are not granted, set already_granted to False
-                    if not self.check_grant_to_role(role, privilege, "schema", db_table):
+                    if not self.check_grant_to_role(
+                        role, privilege, "schema", db_table
+                    ):
                         table_already_granted = False
 
                 sql_commands.append(
