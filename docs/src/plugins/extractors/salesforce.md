@@ -18,7 +18,7 @@ For more information you can check [the documentation for tap-salesforce](https:
 
 ## Salesforce Setup
 
-In order to access your Stripe data, you will need:
+In order to access your Salesforce data, you will need:
 
 - User Name
 - Password
