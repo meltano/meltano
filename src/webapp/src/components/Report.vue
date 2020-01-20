@@ -47,22 +47,29 @@ export default {
         <div class="column">
           <h3 class="title is-5 is-inline-block">{{ report.name }}</h3>
           <div v-if="edit" class="field is-pulled-right is-inline-block">
-            <label for="report-position">Report Position: </label>
-            <input
-              id="report-position"
-              v-model.number="position"
-              type="text"
-              style="width: 50px; text-align: center;"
-              @focus="showMoveAction = true"
-            />
-            <button
+            <div>
+              <label for="report-position">Report Position: </label>
+              <input
+                id="report-position"
+                v-model.number="position"
+                type="text"
+                style="width: 50px; text-align: center; margin-bottom: 0.5rem;"
+                @focus="showMoveAction = true"
+              />
+            </div>
+            <div
               v-show="showMoveAction"
-              class="button is-small"
-              @click="updatePosition"
+              class="field is-pulled-right is-inline-block"
             >
-              Update Position
-            </button>
+              <button
+                class="button is-small is-primary"
+                @click="updatePosition"
+              >
+                Update Position
+              </button>
+            </div>
           </div>
+
           <div v-else class="field is-pulled-right is-inline-block">
             <div class="buttons">
               <a class="button is-small" @click="goToReport(report)">Edit</a>
