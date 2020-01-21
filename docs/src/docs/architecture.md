@@ -117,7 +117,7 @@ There are two foundational steps required for Meltano to extract, load, and tran
 
 #### Model Authoring (`.m5o` files)
 
-The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-Optimized Config Object Notation) format](https://github.com/lightbend/config/blob/master/HOCON.md#hocon-human-optimized-config-object-notation). Below are examples with comments to aid the authoring of your `...model.m5o` and `...table.m5o` files mentioned above.
+The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-Optimized Config Object Notation) format](https://github.com/lightbend/config/blob/master/HOCON.md#hocon-human-optimized-config-object-notation). Below are example model files with comments to aid the authoring of your `...topic.m5o` and `...table.m5o` files mentioned above.
 
 ##### Example `carbon.topic.m5o` file
 
