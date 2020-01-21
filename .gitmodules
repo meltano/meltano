@@ -34,3 +34,15 @@
 [submodule "transform/dbt-tap-stripe"]
 	path = transform/dbt-tap-stripe
 	url = git@gitlab.com:meltano/dbt-tap-stripe.git
+[submodule "tranform/dbt-tap-salesforce"]
+	path = transform/dbt-tap-salesforce
+	url = git@gitlab.com:meltano/dbt-tap-salesforce.git
+[submodule "transform/dbt-tap-facebook"]
+	path = transform/dbt-tap-facebook
+	url = git@gitlab.com:meltano/dbt-tap-facebook
+[submodule "transform/dbt-tap-google-analytics"]
+	path = transform/dbt-tap-google-analytics
+	url = git@gitlab.com:meltano/dbt-tap-google-analytics
+[submodule "transform/dbt-tap-zendesk"]
+	path = transform/dbt-tap-zendesk
+	url = git@gitlab.com:meltano/dbt-tap-zendesk

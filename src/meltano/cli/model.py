@@ -7,7 +7,7 @@ import itertools
 from meltano.core.compiler.project_compiler import ProjectCompiler
 
 
-def indent(text: str, width=2, char="\t"):
+def indent(text: str, width=2, char="  "):
     return "".join(list(itertools.repeat(char, width))) + text
 
 
@@ -57,9 +57,7 @@ def show(ctx):
             print(indent(f"[A] {dim['name']} ({dim['sql']})", width=3))
 
     for model in compiler.package_topics:
-        print(model["version"])
         print(model["namespace"])
-        print(model["plugin_namespace"])
 
         for design in model["designs"]:
             print(indent(design["name"], width=1))
