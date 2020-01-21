@@ -595,10 +595,9 @@ class SnowflakeSpecLoader:
                             grant_results[role][privilege][grant_on]
                         )
 
-        for schema_ref in self.entities["schema_refs"]:
-            all_schema = conn.full_schema_list(schema_ref)
-
-            for schema in all_schema:
+            # Get all schemas in all ref'd databases. Not all schemas will be
+            # ref'd in the spec.
+            for schema in conn.show_schemas(database=database):
                 grant_results = conn.show_future_grants(schema=schema)
 
                 for role in grant_results:
