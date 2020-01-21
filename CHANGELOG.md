@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#1592](https://gitlab.com/meltano/meltano/issues/1592) Add MAX and MIN aggregate functions to Meltano Models
+- [#1462](https://gitlab.com/meltano/meltano/issues/1462) User will be able to reorder dashboard reports
 
 ### Changes
 
