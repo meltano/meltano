@@ -128,8 +128,8 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
   version = 1
   # Define the name of the database used to denote automatically generated .m5oc for use by Meltano
   name = carbon
-  # Define the database connection
-  connection = runners_db
+  # Define the extractor's namespace from which the data should be loaded
+  plugin_namespace = tap_carbon
   # Define GUI label
   label = carbon intensity
   # Define base tables and their respective join relationships

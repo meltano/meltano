@@ -645,7 +645,7 @@ These files must be added under the `csv-project/model/` directory.
 {
   version = 1
   name = gitflix
-  connection = postgres_db
+  plugin_namespace = tap_csv
   label = GitFlix
   designs {
     gitflix_users {

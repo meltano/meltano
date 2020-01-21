@@ -1,7 +1,7 @@
 {
   version = 1
   name = gitflix
-  connection = runners_db
+  plugin_namespace = tap_csv
   label = GitFlix Example
   designs {
     users_design {
