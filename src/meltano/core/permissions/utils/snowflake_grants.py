@@ -1030,12 +1030,12 @@ class SnowflakeGrantsGenerator:
                         ):
                             view_already_granted = False
 
-                    # Grant future on all views
+                    # Grant future on all views. Select is only privilege
                     sql_commands.append(
                         {
                             "already_granted": view_already_granted,
                             "sql": GRANT_FUTURE_PRIVILEGES_TEMPLATE.format(
-                                privileges=write_privileges,
+                                privileges="select",
                                 resource_type="view",
                                 resource_name=SnowflakeConnector.snowflaky(schema),
                                 role=SnowflakeConnector.snowflaky(role),
