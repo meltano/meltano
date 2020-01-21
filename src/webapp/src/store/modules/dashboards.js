@@ -14,6 +14,12 @@ const defaultState = utils.deepFreeze({
   reports: []
 })
 
+const getters = {
+  activeReportIds: state => {
+    return state.activeDashboard.reportIds
+  }
+}
+
 const actions = {
   addReportToDashboard({ commit, dispatch }, data) {
     commit('addReportToDashboard', data)
@@ -42,9 +48,8 @@ const actions = {
       })
   },
 
-  getActiveDashboardReportsWithQueryResults({ commit, state }) {
-    const ids = state.activeDashboard.reportIds
-    const activeReports = ids.map(reportId => {
+  getActiveDashboardReportsWithQueryResults({ commit, state, getters }) {
+    const activeReports = getters.activeReportIds.map(reportId => {
       return state.reports.find(report => report.id === reportId)
     })
 
@@ -79,7 +84,7 @@ const actions = {
     })
   },
 
-  preloadDashboard({ dispatch, state }, slug) {
+  preloadDashboard({ dispatch, state, getters }, slug) {
     // Load from slug or refresh existing activeDashboard's reports with activeDashboardReports
     if (slug) {
       const dashboardMatch = state.dashboards.find(
@@ -88,7 +93,7 @@ const actions = {
       if (dashboardMatch) {
         dispatch('updateCurrentDashboard', dashboardMatch)
       }
-    } else if (state.activeDashboard.reportIds) {
+    } else if (getters.activeReportIds) {
       dispatch('getActiveDashboardReportsWithQueryResults')
     }
   },
@@ -213,6 +218,7 @@ const mutations = {
 export default {
   namespaced: true,
   state: lodash.cloneDeep(defaultState),
+  getters,
   actions,
   mutations
 }
