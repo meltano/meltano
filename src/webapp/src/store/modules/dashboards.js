@@ -133,6 +133,10 @@ const actions = {
     })
   },
 
+  updateActiveDashboardReports({ commit }, reports) {
+    commit('setActiveDashboardReports', reports)
+  },
+
   updateCurrentDashboard({ commit, dispatch }, dashboard) {
     commit('setCurrentDashboard', dashboard)
     dispatch('getActiveDashboardReportsWithQueryResults')
@@ -177,10 +181,7 @@ const mutations = {
   },
 
   setActiveDashboardReports(state, reports) {
-    state.activeDashboardReports = reports.map((report, index) => {
-      report.position = index
-      return report
-    })
+    state.activeDashboardReports = reports
   },
 
   setCurrentDashboard(state, dashboard) {

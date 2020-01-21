@@ -70,6 +70,7 @@ export default {
     ...mapActions('dashboards', [
       'initialize',
       'getActiveDashboardReportsWithQueryResults',
+      'updateActiveDashboardReports',
       'updateDashboard'
     ]),
     goToDesign(report) {
@@ -101,6 +102,7 @@ export default {
           }
         })
           .then(() => {
+            this.updateActiveDashboardReports(this.reportLayoutWireframe)
             Vue.toasted.global.success(
               `Dashboard reports order successfully saved!`
             )
