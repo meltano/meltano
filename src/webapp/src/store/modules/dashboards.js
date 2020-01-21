@@ -102,7 +102,6 @@ const actions = {
   },
 
   reorderDashboardReports({ dispatch }, data) {
-    console.log('hello')
     dashboardsApi.reorderDashboardReports(data).then(response => {
       dispatch('updateCurrentDashboard', response.data)
     })
