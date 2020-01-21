@@ -44,9 +44,9 @@ const actions = {
 
   getActiveDashboardReportsWithQueryResults({ commit, state }) {
     const ids = state.activeDashboard.reportIds
-    const activeReports = state.reports.filter(report =>
-      ids.includes(report.id)
-    )
+    const activeReports = ids.map(reportId => {
+      return state.reports.find(report => report.id === reportId)
+    })
 
     return dashboardsApi
       .getActiveDashboardReportsWithQueryResults(activeReports)
@@ -133,8 +133,9 @@ const actions = {
     })
   },
 
-  updateCurrentDashboard({ commit }, dashboard) {
+  updateCurrentDashboard({ commit, dispatch }, dashboard) {
     commit('setCurrentDashboard', dashboard)
+    dispatch('getActiveDashboardReportsWithQueryResults')
   },
 
   updateDashboard({ commit }, payload) {
