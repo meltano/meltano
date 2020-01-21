@@ -1,9 +1,6 @@
 <script>
 export default {
-  name: 'Embed',
-  created() {
-    console.log('init embed')
-  }
+  name: 'Embed'
 }
 </script>
 

@@ -1,12 +1,10 @@
 import Vue from 'vue'
-import store from './store'
+import store from '@/store'
 
-// here you can use all our components as if
-// you were in the app
-import Logo from '@/components/navigation/Logo'
+import Embed from '@/Embed'
 
 new Vue({
-  el: "#app",
+  el: '#app',
   store,
-  render: h => h(Logo)
+  render: h => h(Embed)
 })
