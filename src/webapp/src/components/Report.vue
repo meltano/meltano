@@ -48,9 +48,9 @@ export default {
           <h3 class="title is-5 is-inline-block">{{ report.name }}</h3>
           <div v-if="edit" class="field is-pulled-right is-inline-block">
             <div>
-              <label for="report-position">Report Position: </label>
+              <label :for="`report-position-${index}`">Report Position: </label>
               <input
-                id="report-position"
+                :id="`report-position-${index}`"
                 v-model.number="position"
                 type="text"
                 style="width: 50px; text-align: center; margin-bottom: 0.5rem;"
