@@ -56,7 +56,7 @@ export default {
     shouldShowNavbar() {
       const { themeConfig } = this.$site
       const { frontmatter } = this.$page
-      if (frontmatter.navbar === false || themeConfig.navbar === false || this.isEmbedded) {
+      if (!frontmatter.navbar || !themeConfig.navbar || this.isEmbedded) {
         return false
       }
       return (
