@@ -1,0 +1,12 @@
+diff --git a/setup.py b/setup.py
+index c4390cd..39cce9d 100644
+--- a/setup.py
++++ b/setup.py
+@@ -5,6 +5,6 @@ setup(
+     version='0.1',
+     description='Meltano .m5o models for data fetched using the Zuora API',
+     packages=find_packages(),
+-    package_data={'models': ['*.m5o']},
++    package_data={'models': ['**/*.m5o', '*.m5o']},
+     install_requires=[],
+ )
