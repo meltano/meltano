@@ -97,6 +97,25 @@ Component helpers related to Bulma's component classes when bulma-overrides does
   }
 }
 
+article {
+  &.media {
+    padding: 1rem 0;
+
+    &.is-active {
+      @extend .is-active-line-item;
+      @extend .is-active-line-item-bordered;
+    }
+
+    &.is-hoverable:hover {
+      background-color: $white-bis;
+    }
+    + .media {
+      padding: 1rem 0;
+      margin: 0;
+    }
+  }
+}
+
 .navbar {
   // Fixes hover dropdown auto closing in navbar via https://github.com/jgthms/bulma/issues/2514#issuecomment-510451361
   @media screen and (min-width: 1025px) {
@@ -111,9 +130,8 @@ Component helpers related to Bulma's component classes when bulma-overrides does
 
 .panel-block {
   &.is-active {
-    border-left-color: $interactive-secondary;
-    border-left-width: 2px;
     @extend .is-active-line-item;
+    @extend .is-active-line-item-bordered;
   }
 }
 
@@ -176,6 +194,10 @@ Layout helpers, often with names based on Bulma naming conventions
 .table {
   td {
     vertical-align: middle;
+
+    &.is-vertical-align-baseline {
+      vertical-align: baseline;
+    }
   }
 
   th span {
@@ -237,6 +259,10 @@ Modifer helpers with names based on Bulma naming conventions
 .is-thin {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+}
+
+.is-transparent-50 {
+  opacity: 0.5;
 }
 
 .is-vcentered {

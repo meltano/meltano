@@ -84,7 +84,7 @@ export default {
         </div>
 
         <div v-if="dashboards.length > 0" class="box">
-          <table class="table is-fullwidth is-narrow is-hoverable is-size-7	">
+          <table class="table is-fullwidth is-narrow is-hoverable">
             <thead>
               <tr>
                 <th>
@@ -124,18 +124,16 @@ export default {
                   <td>
                     <div class="buttons is-right">
                       <a
-                        class="button is-small is-interactive-primary is-outlined"
+                        class="button is-interactive-primary is-outlined"
                         @click.stop="goToDashboard(dashboard)"
                         >View</a
                       >
-                      <a
-                        class="button is-small"
-                        @click.stop="editDashboard(dashboard)"
+                      <a class="button" @click.stop="editDashboard(dashboard)"
                         >Edit</a
                       >
                       <Dropdown
                         :button-classes="
-                          `is-small is-danger is-outlined ${
+                          `is-danger is-outlined ${
                             dashboard.isDeleting ? 'is-loading' : ''
                           }`
                         "

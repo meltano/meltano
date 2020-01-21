@@ -21,6 +21,12 @@ Display-related utilities
   @extend .has-background-white-ter;
 }
 
+.is-active-line-item-bordered {
+  border-left-color: $interactive-secondary;
+  border-left-width: 2px;
+  border-left-style: solid;
+}
+
 .ellipsis {
   white-space: nowrap;
   overflow: hidden;
@@ -61,6 +67,14 @@ UTILITIES - SPACING ------------------------------------------------------------
 
 .ml-05r {
   margin-left: 0.5rem;
+}
+
+.ml1r {
+  margin-left: 1rem;
+}
+
+.mr1r {
+  margin-right: 1rem;
 }
 
 .v-min-2r {

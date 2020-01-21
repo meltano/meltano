@@ -38,6 +38,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1541](https://gitlab.com/meltano/meltano/issues/1541) Revert `tap-csv`'s `kind: file` to text input for `csv_files_definition` as we don't fully support `tap-csv` via the UI with single (definition json) and multiple (csv files) file uploading
 - [#1477](https://gitlab.com/meltano/meltano/issues/1477) Add a `read-only` mode to Meltano to disable all modifications from the UI
 
+- [#1402](https://gitlab.com/meltano/meltano/issues/1402) Onboarding redesign to minimize steps and friction ('Extractors' as 'Data Sources', pipelines are secondary to 'Data Source' integrations, and removed loader, transform, and pipeline name as editable in favor of preselected values in accordance with our hosted solution)
+- [#1402](https://gitlab.com/meltano/meltano/issues/1402) Local development now requires `.env` to connect a `target-postgres` loader (docs update to follow in [#1586](https://gitlab.com/meltano/meltano/issues/1586) )
+
 ### Fixes
 
 ### Breaks

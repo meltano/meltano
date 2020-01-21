@@ -79,10 +79,10 @@ export default {
       <div class="box is-borderless is-shadowless is-marginless">
         <div class="content">
           <h3 class="is-size-6">
-            No Models Installed
+            No Report Models Installed
           </h3>
           <p>
-            There are no models for this pipeline yet.
+            There are no Report Models for this pipeline yet.
           </p>
           <p>
             <a

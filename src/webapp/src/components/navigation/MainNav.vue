@@ -20,10 +20,6 @@ export default {
   },
   computed: {
     ...mapGetters('orchestration', ['getRunningPipelines']),
-    ...mapGetters('plugins', [
-      'getIsStepLoadersMinimallyValidated',
-      'getIsStepScheduleMinimallyValidated'
-    ]),
     ...mapGetters('repos', ['hasModels']),
     ...mapGetters('system', ['updateAvailable']),
     ...mapState('system', ['latestVersion', 'updating', 'version', 'identity']),
@@ -57,9 +53,6 @@ export default {
     ...mapActions('system', ['logout']),
     closeMobileMenu() {
       this.isMobileMenuOpen = false
-    },
-    goToSchedules() {
-      this.$router.push({ name: 'schedules' })
     },
     mobileMenuClicked() {
       this.isMobileMenuOpen = !this.isMobileMenuOpen
@@ -97,64 +90,29 @@ export default {
       :class="{ 'is-active': isMobileMenuOpen }"
     >
       <div class="navbar-start">
-        <div class="navbar-item navbar-child has-dropdown is-hoverable">
-          <router-link
-            :to="{
-              name: getIsStepScheduleMinimallyValidated
-                ? 'schedules'
-                : 'dataSetup'
+        <router-link
+          :to="{ name: 'datasets' }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/data') }"
+          class="navbar-item navbar-child has-text-weight-semibold"
+        >
+          <a
+            class="button has-background-transparent is-borderless is-paddingless"
+            :class="{
+              'has-text-interactive-navigation': getIsSubRouteOf('/data')
             }"
-            :class="{ 'router-link-active': getIsSubRouteOf('/pipeline') }"
-            class="navbar-link has-text-weight-semibold"
           >
-            <a
-              class="button has-background-transparent is-borderless is-paddingless"
-              :class="{
-                'has-text-interactive-navigation': getIsSubRouteOf('/pipeline')
-              }"
+            <span class="icon is-small" :class="getIconColor('/data')">
+              <font-awesome-icon icon="database"></font-awesome-icon>
+            </span>
+            <span>Data</span>
+            <span
+              v-if="getRunningPipelines.length > 0"
+              class="tag ml-05r is-rounded is-info"
             >
-              <span class="icon is-small" :class="getIconColor('/pipeline')">
-                <font-awesome-icon icon="stream"></font-awesome-icon>
-              </span>
-              <span>Pipelines</span>
-              <span
-                v-if="getRunningPipelines.length > 0"
-                class="tag tag-running-pipelines is-rounded is-info"
-                @click.prevent="goToSchedules"
-              >
-                {{ getRunningPipelines.length }}
-              </span>
-            </a>
-          </router-link>
-
-          <div class="navbar-dropdown">
-            <router-link
-              :to="{ name: 'extractors' }"
-              class="navbar-item button is-borderless"
-              :class="{
-                'is-active': getIsCurrentPath('/pipeline/extract')
-              }"
-              tag="button"
-              >Extract</router-link
-            >
-            <router-link
-              :to="{ name: 'loaders' }"
-              class="navbar-item button is-borderless"
-              :class="{ 'is-active': getIsCurrentPath('/pipeline/load') }"
-              :disabled="!getIsStepLoadersMinimallyValidated"
-              tag="button"
-              >Load</router-link
-            >
-            <router-link
-              :to="{ name: 'schedules' }"
-              class="navbar-item button is-borderless"
-              :class="{ 'is-active': getIsCurrentPath('/pipeline/schedule') }"
-              :disabled="!getIsStepScheduleMinimallyValidated"
-              tag="button"
-              >Schedule</router-link
-            >
-          </div>
-        </div>
+              {{ getRunningPipelines.length }}
+            </span>
+          </a>
+        </router-link>
 
         <div class="navbar-item navbar-child has-dropdown is-hoverable">
           <a
@@ -170,7 +128,7 @@ export default {
               <span class="icon is-small" :class="getIconColor('/analyze')">
                 <font-awesome-icon icon="chart-line"></font-awesome-icon>
               </span>
-              <span>Analyze</span>
+              <span>Reports</span>
             </a>
           </a>
 
@@ -180,20 +138,14 @@ export default {
             </template>
             <template v-else>
               <div class="box is-borderless is-shadowless is-marginless">
-                <div class="content">
+                <div class="content no-report-models-message">
                   <h3 class="is-size-6">
-                    No Models Installed
+                    No Report Models Installed
                   </h3>
                   <p>
-                    Models are inferred and automatically installed for you
-                    based off the installed Extractors from your data pipelines.
-                    Set up a pipeline first.
+                    Report Models are inferred and automatically installed for
+                    you based off your connected data sources.
                   </p>
-                  <router-link
-                    class="button is-interactive-primary"
-                    :to="{ name: 'dataSetup' }"
-                    >Create Data Pipeline</router-link
-                  >
                 </div>
               </div>
             </template>
@@ -339,12 +291,6 @@ export default {
 </template>
 
 <style lang="scss">
-.box-analyze-nav {
-  min-width: 240px;
-}
-.navbar-menu {
-  background-color: transparent;
-}
 .navbar-burger span {
   color: $interactive-navigation;
 }
@@ -367,11 +313,15 @@ export default {
   .navbar-item {
     &.has-dropdown {
       border-bottom: none;
+
+      .no-report-models-message {
+        min-width: 300px;
+      }
     }
 
     .navbar-dropdown-scrollable {
       overflow-y: scroll;
-      max-height: 90vh;
+      max-height: 80vh;
     }
   }
 
@@ -389,8 +339,5 @@ export default {
     color: $interactive-navigation;
     border-bottom: 1px solid $interactive-navigation-inactive;
   }
-}
-.tag-running-pipelines {
-  margin-left: 0.5rem;
 }
 </style>
