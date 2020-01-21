@@ -15,6 +15,12 @@ const defaultState = utils.deepFreeze({
 })
 
 const getters = {
+  activeReports: (state, getters) => {
+    return getters.activeReportIds.map(reportId => {
+      return state.reports.find(report => report.id === reportId)
+    })
+  },
+
   activeReportIds: state => {
     return state.activeDashboard.reportIds
   }
@@ -48,13 +54,9 @@ const actions = {
       })
   },
 
-  getActiveDashboardReportsWithQueryResults({ commit, state, getters }) {
-    const activeReports = getters.activeReportIds.map(reportId => {
-      return state.reports.find(report => report.id === reportId)
-    })
-
+  getActiveDashboardReportsWithQueryResults({ commit, getters }) {
     return dashboardsApi
-      .getActiveDashboardReportsWithQueryResults(activeReports)
+      .getActiveDashboardReportsWithQueryResults(getters.activeReports)
       .then(response => {
         commit('setActiveDashboardReports', response.data)
       })
