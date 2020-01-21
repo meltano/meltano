@@ -376,7 +376,7 @@ Please note, the name this model will be `custom_sfdc` in order to differentiate
 {
   version = 1
   name = custom_sfdc
-  connection = postgres_db
+  plugin_namespace = tap_salesforce
   label = Salesforce (Custom)
   designs {
     opportunity_won {
