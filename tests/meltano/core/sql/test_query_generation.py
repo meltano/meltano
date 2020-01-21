@@ -55,11 +55,11 @@ class TestQueryGeneration:
         return (
             PayloadBuilder("users_design")
             .columns("gender")
-            .aggregates("count", "avg_age", "sum_clv")
+            .aggregates("count", "avg_age", "sum_clv", "max_clv")
             .columns("day", "month", "year", join="streams_join")
             .aggregates("count", "sum_minutes", "count_days", join="streams_join")
             .columns("tv_series", join="episodes_join")
-            .aggregates("count", "avg_rating", join="episodes_join")
+            .aggregates("count", "avg_rating", "min_rating", join="episodes_join")
         )
 
     @pytest.fixture
@@ -69,9 +69,9 @@ class TestQueryGeneration:
             .columns("day", "month", "year")
             .aggregates("count", "sum_minutes", "count_days")
             .columns("gender", join="users_join")
-            .aggregates("count", "avg_age", "sum_clv", join="users_join")
+            .aggregates("count", "avg_age", "sum_clv", "max_clv", join="users_join")
             .columns("tv_series", join="episodes_join")
-            .aggregates("count", "avg_rating", join="episodes_join")
+            .aggregates("count", "avg_rating", "min_rating", join="episodes_join")
         )
 
     @pytest.fixture
@@ -79,7 +79,7 @@ class TestQueryGeneration:
         return (
             PayloadBuilder("users_design")
             .columns("name")
-            .aggregates("count", "avg_age", "sum_clv")
+            .aggregates("count", "avg_age", "sum_clv", "max_clv")
             .column_filter("users_design", "name", "is_not_null", "")
             .column_filter("users_design", "name", "like", "%yannis%")
             .column_filter("users_design", "gender", "is_null", "")
@@ -88,9 +88,11 @@ class TestQueryGeneration:
             .aggregate_filter("users_design", "avg_age", "less_than", 40)
             .aggregate_filter("users_design", "sum_clv", "greater_or_equal_than", 100)
             .aggregate_filter("users_design", "sum_clv", "less_or_equal_than", 500)
+            .aggregate_filter("users_design", "max_clv", "greater_than", 10)
             .order_by("users_design", "name", "asc")
             .order_by("users_design", "avg_age", "desc")
             .order_by("users_design", "sum_clv", "")
+            .order_by("users_design", "max_clv", "desc")
         )
 
     @pytest.fixture
@@ -102,13 +104,14 @@ class TestQueryGeneration:
             .columns("day", "month", "year", join="streams_join")
             .aggregates("count", "sum_minutes", "count_days", join="streams_join")
             .columns("tv_series", join="episodes_join")
-            .aggregates("count", "avg_rating", join="episodes_join")
+            .aggregates("count", "avg_rating", "min_rating", join="episodes_join")
             .column_filter("users_design", "gender", "equal_to", "male")
             .column_filter("streams_join", "year", "greater_or_equal_than", "2017")
             .column_filter("episodes_join", "tv_series", "like", "Marvel")
             .column_filter("episodes_join", "title", "like", "%Wolverine%")
             .aggregate_filter("users_design", "sum_clv", "less_than", 50)
             .aggregate_filter("episodes_join", "avg_rating", "greater_than", 8)
+            .aggregate_filter("episodes_join", "min_rating", "greater_than", 6)
             .order_by("users_design", "gender", "asc")
             .order_by("users_design", "avg_age", "asc")
             .order_by("streams_join", "year", "desc")
@@ -155,8 +158,22 @@ class TestQueryGeneration:
         assert "streams.id" in [a.column_alias() for a in table.aggregates()]
         assert "streams.sum_minutes" in [a.alias() for a in table.aggregates()]
         assert "streams.count_days" in [a.alias() for a in table.aggregates()]
+        assert "streams.min_minutes" in [a.alias() for a in table.aggregates()]
+        assert "streams.max_minutes" in [a.alias() for a in table.aggregates()]
 
-        assert len(table.aggregates()) == 3
+        # There are 3 aggregates defined over the minutes column (SUM, MIN, MAX)
+        assert (
+            len(
+                [
+                    a.column_alias()
+                    for a in table.aggregates()
+                    if a.column_name() == "minutes"
+                ]
+            )
+            == 3
+        )
+
+        assert len(table.aggregates()) == 5
         new_a = MeltanoAggregate(table)
         new_a.name = "avg_price"
         new_a.type = "avg"
@@ -164,7 +181,7 @@ class TestQueryGeneration:
         new_a.description = "Average Price"
         new_a.sql = "{{table}}.price"
         table.add_aggregate(new_a)
-        assert len(table.aggregates()) == 4
+        assert len(table.aggregates()) == 6
 
     def test_meltano_query(self, users, gitflix):
         # Test parsing a json payload using a Design generated from a m5oc file
@@ -185,6 +202,8 @@ class TestQueryGeneration:
         )
         assert any(attr["attribute_name"] == "sum_minutes" for attr in query_attributes)
         assert any(attr["id"] == "users.sum_clv" for attr in aggregate_columns)
+        assert any(attr["id"] == "users.max_clv" for attr in aggregate_columns)
+        assert any(attr["id"] == "episodes.min_rating" for attr in aggregate_columns)
 
         assert "WITH base_join AS (SELECT" in sql
         assert "base_streams_table AS (SELECT DISTINCT" in sql
@@ -192,6 +211,8 @@ class TestQueryGeneration:
         assert 'COALESCE(AVG("episodes.rating"),0)' in sql
         assert 'COALESCE(COUNT("users.id"),0)' in sql
         assert 'COALESCE(SUM("users.clv"),0)' in sql
+        assert 'COALESCE(MIN("episodes.rating"),0)' in sql
+        assert 'COALESCE(MAX("users.clv"),0)' in sql
         assert 'SELECT * FROM "result"' in sql
         assert 'JOIN "streams"' in sql
         assert 'JOIN "episodes"' in sql
@@ -264,10 +285,12 @@ class TestQueryGeneration:
         assert 'COALESCE(COUNT("users"."id"),0)=10' in sql
         assert 'COALESCE(AVG("users"."age"),0)>20' in sql
         assert 'COALESCE(AVG("users"."age"),0)<40' in sql
+        assert 'COALESCE(MAX("users"."clv"),0)>10' in sql
 
         # Check that the correct order by clauses have been generated
         assert (
-            'ORDER BY "users.name" ASC,"users.avg_age" DESC,"users.sum_clv" ASC' in sql
+            'ORDER BY "users.name" ASC,"users.avg_age" DESC,"users.sum_clv" ASC,"users.max_clv" DESC'
+            in sql
         )
 
     def test_meltano_hda_query_filters(self, join_with_filters, gitflix):
@@ -292,7 +315,8 @@ class TestQueryGeneration:
 
         # Check that all the HAVING filters were added correctly
         assert 'HAVING COALESCE(SUM("users.clv"),0)<50' in sql
-        assert 'HAVING COALESCE(AVG("episodes.rating"),0)>8' in sql
+        assert 'COALESCE(AVG("episodes.rating"),0)>8' in sql
+        assert 'COALESCE(MIN("episodes.rating"),0)>6' in sql
 
         # Check that the correct order by clauses have been generated
         #  and that they are in the correct order

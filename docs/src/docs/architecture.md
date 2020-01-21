@@ -80,7 +80,7 @@ A `Table` can be identified by the file naming schema: `<name>.table.m5o` and sh
 
 #### Aggregate
 
-An `Aggregate` relates to a calculable column, via `count`, `sum` or other (i.e., aggregate definitions). These are limited to predefined methods with no custom SQL as well since custom SQL will be handled through transforms with dbt.
+An `Aggregate` relates to a calculable column, via `count`, `sum`, `avg`, `min` or `max` (i.e., aggregate function definitions). These are limited to predefined methods with no custom SQL as well since custom SQL will be handled through transforms with dbt.
 
 An `Aggregate` can be referred as an `Attribute` in a `Design` context.
 
