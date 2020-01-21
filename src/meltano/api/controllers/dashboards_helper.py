@@ -17,8 +17,8 @@ from .sql_helper import SqlHelper
 class DashboardAlreadyExistsError(Exception):
     """Occurs when a dashboard already exists."""
 
-    def __init__(self, dashboard_name):
-        self.dashboard_name = dashboard_name
+    def __init__(self, dashboard):
+        self.dashboard = dashboard
 
 
 class DashboardDoesNotExistError(Exception):
@@ -82,7 +82,7 @@ class DashboardsHelper:
         # guard if it already exists
         existing_dashboard = self.get_dashboard_by_name(name)
         if existing_dashboard:
-            raise DashboardAlreadyExistsError(dashboard_name)
+            raise DashboardAlreadyExistsError(existing_dashboard)
 
         project = Project.find()
         slug = slugify(name)
@@ -110,10 +110,10 @@ class DashboardsHelper:
         return data
 
     def update_dashboard(self, data):
-        project = Project.find()
-
         dashboard = self.get_dashboard(data["dashboard"]["id"])
         slug = dashboard["slug"]
+
+        project = Project.find()
         file_path = project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
         if not os.path.exists(file_path):
             raise DashboardDoesNotExistError(data)
@@ -124,9 +124,12 @@ class DashboardsHelper:
         new_file_path = project.analyze_dir("dashboards", f"{new_slug}.dashboard.m5o")
         is_same_file = new_slug == slug
         if not is_same_file and os.path.exists(new_file_path):
-            raise DashboardAlreadyExistsError(new_name)
+            with new_file_path.open() as f:
+                existing_dashboard = json.load(f)
+            raise DashboardAlreadyExistsError(existing_dashboard)
 
         os.remove(file_path)
+
         dashboard["slug"] = new_slug
         dashboard["name"] = new_name
         dashboard["description"] = new_settings["description"]

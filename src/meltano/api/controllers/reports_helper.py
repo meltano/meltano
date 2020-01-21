@@ -67,9 +67,24 @@ class ReportsHelper:
         name = data["name"]
         existing_report = self.get_report_by_name(name)
         slug = existing_report["slug"]
+
         project = Project.find()
         file_path = project.analyze_dir("reports", f"{slug}.report.m5o")
-        with open(file_path, "w") as f:
+
+        new_name = data["name"]
+        new_slug = slugify(new_name)
+        new_file_path = project.analyze_dir("reports", f"{new_slug}.report.m5o")
+        is_same_file = new_slug == slug
+        if not is_same_file and os.path.exists(new_file_path):
+            with new_file_path.open() as f:
+                existing_report = json.load(f)
+            raise ReportAlreadyExistsError(existing_report)
+
+        os.remove(file_path)
+
+        data["slug"] = new_slug
+        data["path"] = str(new_file_path)
+        with new_file_path.open("w") as f:
             json.dump(data, f)
 
         return data

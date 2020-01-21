@@ -14,7 +14,7 @@ dashboardsBP = APIBlueprint("dashboards", __name__)
 
 @dashboardsBP.errorhandler(DashboardAlreadyExistsError)
 def _handle(ex):
-    dashboard_name = ex.dashboard_name
+    dashboard_name = ex.dashboard["name"]
     return (
         jsonify(
             {
