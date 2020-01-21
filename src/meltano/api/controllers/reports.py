@@ -62,6 +62,18 @@ def index():
     return jsonify(reports)
 
 
+@reportsBP.route("/load-with-query-results/<report_name>", methods=["GET"])
+def get_report_with_query_results(report_name):
+    # permit("view:reports", report_name)
+
+    reports_helper = ReportsHelper()
+    response_data = reports_helper.get_report_with_query_results(report_name)
+
+    # permit("view:design", response_data["design"])
+
+    return jsonify(response_data)
+
+
 @reportsBP.route("/load/<report_name>", methods=["GET"])
 def load_report(report_name):
     permit("view:reports", report_name)

@@ -1,7 +1,7 @@
 import Vue from 'vue'
-import store from '@/store'
 
 import Embed from '@/Embed'
+import store from '@/store'
 
 new Vue({
   el: '#app',

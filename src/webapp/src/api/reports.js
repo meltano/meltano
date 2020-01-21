@@ -6,6 +6,10 @@ export default {
     return axios.get(utils.apiUrl('reports/load', `${name}`))
   },
 
+  loadReportWithQueryResults(name) {
+    return axios.get(utils.apiUrl('reports/load-with-query-results', `${name}`))
+  },
+
   loadReports() {
     return axios.get(utils.apiUrl('reports'))
   },
