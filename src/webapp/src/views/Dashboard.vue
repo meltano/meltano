@@ -31,7 +31,7 @@ export default {
       return `mailto:?subject=Dashboard: ${this.activeDashboard.name}&body=${window.location}`
     },
     displayedReports() {
-      if (this.showRearrangeUi || this.changeHasBeenMade) {
+      if (this.showRearrangeUi) {
         return this.reportLayoutWireframe
       } else {
         return this.activeDashboardReports
@@ -68,7 +68,8 @@ export default {
   methods: {
     ...mapActions('dashboards', [
       'initialize',
-      'getActiveDashboardReportsWithQueryResults'
+      'getActiveDashboardReportsWithQueryResults',
+      'updateDashboard'
     ]),
     goToDesign(report) {
       const params = {
@@ -86,6 +87,26 @@ export default {
       this.reportLayoutWireframe.splice(data.oldPosition, 1)
       this.reportLayoutWireframe.splice(data.newPosition, 0, report)
       this.changeHasBeenMade = data.changeHasBeenMade
+    },
+    updateDashboardReportPositions() {
+      if (this.changeHasBeenMade) {
+        this.updateDashboard({
+          dashboard: this.activeDashboard,
+          newSettings: {
+            ...this.activeDashboard,
+            reportIds: this.reportLayoutWireframe.map(report => {
+              return report.id
+            })
+          }
+        })
+
+        // this.isActiveDashboardLoading = true
+        // this.getActiveDashboardReportsWithQueryResults().then(() => {
+        //   this.isActiveDashboardLoading = false
+        // })
+      }
+
+      this.showRearrangeUi = !this.showRearrangeUi
     }
   }
 }
@@ -104,10 +125,7 @@ export default {
           </div>
           <div class="column">
             <div v-if="showRearrangeUi" class="buttons is-pulled-right">
-              <button
-                class="button"
-                @click="showRearrangeUi = !showRearrangeUi"
-              >
+              <button class="button" @click="updateDashboardReportPositions">
                 Save
               </button>
               <button

@@ -111,6 +111,7 @@ class DashboardsHelper:
 
     def update_dashboard(self, data):
         project = Project.find()
+
         dashboard = self.get_dashboard(data["dashboard"]["id"])
         slug = dashboard["slug"]
         file_path = project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
@@ -130,6 +131,10 @@ class DashboardsHelper:
         dashboard["name"] = new_name
         dashboard["description"] = new_settings["description"]
         dashboard["path"] = str(new_file_path)
+
+        if len(new_settings["report_ids"]) == len(dashboard["report_ids"]):
+            dashboard["report_ids"] = new_settings["report_ids"]
+
         with new_file_path.open("w") as f:
             json.dump(dashboard, f)
 
