@@ -1,6 +1,6 @@
 import lodash from 'lodash'
 
-import flaskContext from '@/flask'
+import flaskContext from '@/utils/flask'
 import moment from 'moment'
 import { namer } from '@/utils/mappers'
 

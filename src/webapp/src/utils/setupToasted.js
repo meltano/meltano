@@ -3,7 +3,7 @@ import Vue from 'vue'
 import lodash from 'lodash'
 import Toasted from 'vue-toasted'
 
-import router from './router'
+import router from '@/router'
 
 export default function setup() {
   const toastedOptions = {
