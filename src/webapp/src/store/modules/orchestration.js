@@ -10,21 +10,20 @@ const defaultState = utils.deepFreeze({
   extractorInFocusConfiguration: {},
   loaderInFocusConfiguration: {},
   pipelinePollers: [],
-  pipelines: [],
-  recentELTSelections: {
-    extractor: null,
-    loader: null
-  },
-  transformOptions: [
-    { label: 'Skip', name: 'skip' },
-    { label: 'Run', name: 'run' },
-    { label: 'Only', name: 'only' }
-  ]
+  pipelines: []
 })
 
 const getters = {
   getHasPipelines(state) {
     return state.pipelines.length > 0
+  },
+
+  getHasPipelineWithExtractor(state) {
+    return extractorName => {
+      return Boolean(
+        state.pipelines.find(pipeline => pipeline.extractor === extractorName)
+      )
+    }
   },
 
   getHasValidConfigSettings(_, getters) {
@@ -109,7 +108,7 @@ const actions = {
     })
   },
 
-  getExtractorConfiguration({ commit, dispatch }, extractor) {
+  getExtractorConfiguration({ commit, dispatch, state }, extractor) {
     return dispatch('getPluginConfiguration', {
       name: extractor,
       type: 'extractors'
@@ -118,6 +117,7 @@ const actions = {
         configuration: response.data,
         target: 'extractorInFocusConfiguration'
       })
+      return state.extractorInFocusConfiguration
     })
   },
 
@@ -228,10 +228,6 @@ const actions = {
     return orchestrationsApi.testPluginConfiguration(configPayload)
   },
 
-  updateRecentELTSelections({ commit }, updatePayload) {
-    commit('setELTRecentSelection', updatePayload)
-  },
-
   uploadPluginConfigurationFile(_, configPayload) {
     return orchestrationsApi.uploadPluginConfigurationFile(configPayload)
   }
@@ -257,10 +253,6 @@ const mutations = {
     if (defaultState.hasOwnProperty(attr)) {
       state[attr] = lodash.cloneDeep(defaultState[attr])
     }
-  },
-
-  setELTRecentSelection(state, { type, value }) {
-    state.recentELTSelections[type] = value
   },
 
   setInFocusConfiguration(state, { configuration, target }) {

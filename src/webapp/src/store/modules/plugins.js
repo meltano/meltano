@@ -64,6 +64,13 @@ const getters = {
       state.installingPlugins[pluginType].includes(pluginName)
   },
 
+  getIsLoadingPluginsOfType(state) {
+    return pluginType => {
+      const plugins = state.plugins[pluginType]
+      return plugins === undefined || plugins.length === 0
+    }
+  },
+
   getIsPluginInstalled(state) {
     return (pluginType, pluginName) =>
       state.installedPlugins[pluginType]
@@ -73,25 +80,6 @@ const getters = {
             )
           )
         : false
-  },
-
-  getIsStepExtractorsMinimallyValidated(state) {
-    return (
-      state.installedPlugins.extractors &&
-      state.installedPlugins.extractors.length > 0
-    )
-  },
-
-  getIsStepLoadersMinimallyValidated(_, getters) {
-    return getters.getIsStepExtractorsMinimallyValidated
-  },
-
-  getIsStepScheduleMinimallyValidated(state, getters) {
-    return (
-      getters.getIsStepLoadersMinimallyValidated &&
-      state.installedPlugins.loaders &&
-      state.installedPlugins.loaders.length > 0
-    )
   },
 
   getPluginProfiles() {
