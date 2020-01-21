@@ -1,4 +1,5 @@
 <script>
+import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
 
 import Report from '@/components/Report'
@@ -31,7 +32,7 @@ export default {
       return `mailto:?subject=Dashboard: ${this.activeDashboard.name}&body=${window.location}`
     },
     displayedReports() {
-      if (this.showRearrangeUi) {
+      if (this.showRearrangeUi || this.changeHasBeenMade) {
         return this.reportLayoutWireframe
       } else {
         return this.activeDashboardReports
@@ -99,11 +100,16 @@ export default {
             })
           }
         })
-
-        // this.isActiveDashboardLoading = true
-        // this.getActiveDashboardReportsWithQueryResults().then(() => {
-        //   this.isActiveDashboardLoading = false
-        // })
+          .then(() => {
+            Vue.toasted.global.success(
+              `Dashboard reports order successfully saved!`
+            )
+          })
+          .catch(error => {
+            Vue.toasted.global.error(
+              `Dashboard reports order did not save correctly - ${error}`
+            )
+          })
       }
 
       this.showRearrangeUi = !this.showRearrangeUi
