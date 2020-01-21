@@ -70,6 +70,7 @@ class PluginType(YAMLEnum):
     TRANSFORMERS = "transformers"
     TRANSFORMS = "transforms"
     ORCHESTRATORS = "orchestrators"
+    DASHBOARDS = "dashboards"
 
     def __str__(self):
         return self.value

@@ -19,6 +19,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
     "plugin_type",
     type=click.Choice(
         [
+            PluginType.DASHBOARDS,
             PluginType.EXTRACTORS,
             PluginType.LOADERS,
             PluginType.TRANSFORMERS,

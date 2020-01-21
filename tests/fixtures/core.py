@@ -70,8 +70,16 @@ def discovery():
     discovery[PluginType.MODELS].append(
         {
             "name": "model-gitlab",
-            "namespace": "pytest",
+            "namespace": "tap_gitlab",
             "pip_url": "git+https://gitlab.com/meltano/model-gitlab.git",
+        }
+    )
+
+    discovery[PluginType.DASHBOARDS].append(
+        {
+            "name": "dashboard-google-analytics",
+            "namespace": "tap_google_analytics",
+            "pip_url": "git+https://gitlab.com/meltano/dashboard-google-analytics.git",
         }
     )
 

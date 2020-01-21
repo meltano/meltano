@@ -51,6 +51,17 @@ def add(ctx, project, custom):
 @click.argument("plugin_name")
 @project()
 @click.pass_context
+def dashboard(ctx, project, plugin_name):
+    add_plugin(ctx.obj["add_service"], project, PluginType.DASHBOARDS, plugin_name)
+
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_add(plugin_type="dashboard", plugin_name=plugin_name)
+
+
+@add.command()
+@click.argument("plugin_name")
+@project()
+@click.pass_context
 def extractor(ctx, project, plugin_name):
     add_plugin(ctx.obj["add_service"], project, PluginType.EXTRACTORS, plugin_name)
 

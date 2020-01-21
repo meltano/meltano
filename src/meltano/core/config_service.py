@@ -64,6 +64,9 @@ class ConfigService:
         except StopIteration as stop:
             raise PluginMissingError(plugin_ref.name) from stop
 
+    def get_dashboards(self):
+        return filter(lambda p: p.type == PluginType.DASHBOARDS, self.plugins())
+
     def get_extractors(self):
         return filter(lambda p: p.type == PluginType.EXTRACTORS, self.plugins())
 
