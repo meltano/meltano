@@ -21,7 +21,7 @@ export default {
   },
   data: () => ({
     position: 0,
-    showMoveAction: false
+    isEditable: false
   }),
   mounted() {
     this.position = this.index + 1
@@ -54,11 +54,11 @@ export default {
                 v-model.number="position"
                 type="text"
                 style="has-text-centered mb-05r"
-                @focus="showMoveAction = true"
+                @focus="isEditable = true"
               />
             </div>
             <div
-              v-show="showMoveAction"
+              v-show="isEditable"
               class="field is-pulled-right is-inline-block"
             >
               <button
