@@ -7,9 +7,6 @@ export default {
   components: {
     Chart
   },
-  props: {
-    token: { type: String, required: false }
-  },
   data() {
     return {
       isLoading: true,
