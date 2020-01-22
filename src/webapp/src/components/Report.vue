@@ -10,12 +10,12 @@ export default {
       type: Number,
       required: true
     },
-    report: {
-      type: Object,
-      required: true
-    },
     edit: {
       type: Boolean,
+      required: true
+    },
+    report: {
+      type: Object,
       required: true
     }
   },
