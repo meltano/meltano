@@ -108,8 +108,8 @@ const actions = {
     })
   },
 
-  reorderDashboardReports({ dispatch }, data) {
-    dashboardsApi.reorderDashboardReports(data).then(response => {
+  reorderDashboardReports({ dispatch }, payload) {
+    dashboardsApi.reorderDashboardReports(payload).then(response => {
       dispatch('updateCurrentDashboard', response.data)
     })
   },
@@ -119,8 +119,8 @@ const actions = {
   resetActiveDashboardReports: ({ commit }) =>
     commit('reset', 'activeDashboardReports'),
 
-  saveDashboard({ dispatch, commit }, data) {
-    return dashboardsApi.saveDashboard(data).then(response => {
+  saveDashboard({ dispatch, commit }, payload) {
+    return dashboardsApi.saveDashboard(payload).then(response => {
       commit('addSavedDashboardToDashboards', response.data)
       dispatch('updateCurrentDashboard', response.data)
     })
