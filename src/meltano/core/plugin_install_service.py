@@ -1,9 +1,12 @@
 import logging
 
+from .compiler.project_compiler import ProjectCompiler
+from .plugin_discovery_service import PluginDiscoveryService
+from .project_add_service import ProjectAddService
 from .config_service import ConfigService
 from .venv_service import VenvService
 from .utils import noop
-from .plugin import PluginInstall, Plugin, PluginRef
+from .plugin import PluginType, PluginInstall, Plugin, PluginRef
 from .project import Project
 from .error import (
     PluginInstallError,
@@ -30,6 +33,7 @@ class PluginInstallService:
     def install_all_plugins(self, status_cb=noop):
         errors = []
         installed = []
+        has_model = False
 
         # TODO: config service returns PluginInstall, not Plugin
         for plugin in self.config_service.plugins():
@@ -37,8 +41,10 @@ class PluginInstallService:
             status_cb(status)
 
             try:
-                self.create_venv(plugin)
-                self.install_plugin(plugin)
+                self.install_plugin(plugin, compile_models=False)
+
+                if plugin.type is PluginType.MODELS:
+                    has_model = True
 
                 status["status"] = "success"
                 installed.append(status)
@@ -57,19 +63,34 @@ class PluginInstallService:
 
             status_cb(status)
 
+        if has_model:
+            self.compile_models()
+
         return {"errors": errors, "installed": installed}
 
-    def install_plugin(self, plugin: PluginInstall):
+    def install_plugin(self, plugin: PluginInstall, compile_models=True):
         if not plugin.is_installable():
             raise PluginNotInstallable()
 
         try:
             with plugin.trigger_hooks("install", self.project):
                 self.create_venv(plugin)
-                return self.venv_service.install(
+                run = self.venv_service.install(
                     namespace=plugin.type, name=plugin.name, pip_url=plugin.pip_url
                 )
+
+                if compile_models and plugin.type is PluginType.MODELS:
+                    self.compile_models()
+
+                return run
         except SubprocessError as err:
             raise PluginInstallError(
                 f"{plugin.name} has an installation issue. {err}", err.process
             )
+
+    def compile_models(self):
+        compiler = ProjectCompiler(self.project)
+        try:
+            compiler.compile()
+        except Exception:
+            pass

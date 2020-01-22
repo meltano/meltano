@@ -1,7 +1,6 @@
 from itertools import groupby
 from flask import request, jsonify, g
 
-from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
@@ -130,18 +129,11 @@ def install():
     plugin_name = payload["name"]
 
     project = Project.find()
-    compiler = ProjectCompiler(project)
-    install_service = PluginInstallService(project)
+
     config_service = ConfigService(project)
-
     plugin = config_service.find_plugin(plugin_name, plugin_type=plugin_type)
-    run_venv = install_service.create_venv(plugin)
-    run_install_plugin = install_service.install_plugin(plugin)
 
-    if plugin_type is PluginType.MODELS:
-        try:
-            compiler.compile()
-        except Exception as e:
-            pass
+    install_service = PluginInstallService(project)
+    install_service.install_plugin(plugin)
 
     return jsonify(plugin.canonical())

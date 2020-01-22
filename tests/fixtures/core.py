@@ -159,7 +159,6 @@ def add_model(project, plugin_install_service, project_add_service):
 
     for model in MODELS:
         plugin = project_add_service.add(PluginType.MODELS, model)
-        plugin_install_service.create_venv(plugin)
         plugin_install_service.install_plugin(plugin)
 
     yield
