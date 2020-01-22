@@ -53,7 +53,7 @@ export default {
                 :id="`report-position-${index}`"
                 v-model.number="position"
                 type="text"
-                style="width: 50px; text-align: center; margin-bottom: 0.5rem;"
+                style="has-text-centered mb-05r"
                 @focus="showMoveAction = true"
               />
             </div>
@@ -97,5 +97,9 @@ export default {
 
 .fade {
   opacity: 0.5;
+}
+
+.mb-05r {
+  margin-bottom: 0.5rem;
 }
 </style>
