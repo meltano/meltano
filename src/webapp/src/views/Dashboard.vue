@@ -14,8 +14,8 @@ export default {
   data() {
     return {
       isActiveDashboardLoading: false,
+      isEditable: false,
       reportLayoutWireframe: [],
-      showRearrangeUi: false,
       changeHasBeenMade: false
     }
   },
@@ -32,7 +32,7 @@ export default {
       return `mailto:?subject=Dashboard: ${this.activeDashboard.name}&body=${window.location}`
     },
     displayedReports() {
-      if (this.showRearrangeUi || this.changeHasBeenMade) {
+      if (this.isEditable || this.changeHasBeenMade) {
         return this.reportLayoutWireframe
       } else {
         return this.activeDashboardReports
@@ -49,8 +49,8 @@ export default {
         this.isActiveDashboardLoading = false
       })
     },
-    showRearrangeUi() {
-      if (this.showRearrangeUi) {
+    isEditable() {
+      if (this.isEditable) {
         this.reportLayoutWireframe = []
 
         this.activeDashboardReports.forEach(report => {
@@ -114,7 +114,7 @@ export default {
           })
       }
 
-      this.showRearrangeUi = !this.showRearrangeUi
+      this.isEditable = !this.isEditable
     }
   }
 }
@@ -132,23 +132,20 @@ export default {
             </h3>
           </div>
           <div class="column">
-            <div v-if="showRearrangeUi" class="buttons is-pulled-right">
+            <div v-if="isEditable" class="buttons is-pulled-right">
               <button class="button" @click="updateDashboardReportPositions">
                 Save
               </button>
-              <button
-                class="button"
-                @click="showRearrangeUi = !showRearrangeUi"
-              >
+              <button class="button" @click="isEditable = !isEditable">
                 Cancel
               </button>
             </div>
             <div v-else class="buttons is-pulled-right">
               <a class="button" :href="dashboardEmail">Share</a>
               <button
-                v-if="!showRearrangeUi"
+                v-if="!isEditable"
                 class="button"
-                @click="showRearrangeUi = !showRearrangeUi"
+                @click="isEditable = !isEditable"
               >
                 Edit
               </button>
@@ -165,7 +162,7 @@ export default {
             :key="`${report.id}-${index}`"
             :report="report"
             :index="index"
-            :edit="showRearrangeUi"
+            :edit="isEditable"
             @update-report-position="updateReportPosition"
           />
         </div>
