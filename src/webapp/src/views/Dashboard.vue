@@ -43,9 +43,11 @@ export default {
   watch: {
     activeDashboard() {
       this.isActiveDashboardLoading = true
-      this.getActiveDashboardReportsWithQueryResults().then(() => {
-        this.isActiveDashboardLoading = false
-      })
+      this.getActiveDashboardReportsWithQueryResults()
+        .then(() => {
+          this.isActiveDashboardLoading = false
+        })
+        .catch(this.$error.handle)
     },
     isEditable() {
       if (this.isEditable) {

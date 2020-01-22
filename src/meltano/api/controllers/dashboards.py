@@ -2,6 +2,7 @@ from flask import jsonify, request
 from .dashboards_helper import (
     DashboardAlreadyExistsError,
     DashboardDoesNotExistError,
+    DashboardReportScheduleNotFoundError,
     DashboardsHelper,
 )
 from .errors import InvalidFileNameError
@@ -47,6 +48,19 @@ def _handle(ex):
             }
         ),
         400,
+    )
+
+
+@dashboardsBP.errorhandler(DashboardReportScheduleNotFoundError)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"The reports could not be loaded because a pipeline for namespace '{ex.namespace}' could not be found.",
+            }
+        ),
+        404,
     )
 
 

@@ -9,7 +9,7 @@ from meltano.core.m5o.m5o_collection_parser import (
 )
 from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
 from meltano.core.project import Project
-from meltano.core.schedule_service import ScheduleService
+from meltano.core.schedule_service import ScheduleService, ScheduleNotFoundError
 from meltano.core.utils import slugify, find_named
 from .sql_helper import SqlHelper
 
@@ -26,6 +26,13 @@ class DashboardDoesNotExistError(Exception):
 
     def __init__(self, dashboard):
         self.dashboard = dashboard
+
+
+class DashboardReportScheduleNotFoundError(Exception):
+    """Occurs when dashboard reports cannot be loaded because a schedule could not be found."""
+
+    def __init__(self, namespace):
+        self.namespace = namespace
 
 
 class DashboardsHelper:
@@ -47,9 +54,12 @@ class DashboardsHelper:
         for report in reports:
             m5oc = sqlHelper.get_m5oc_topic(report["namespace"], report["model"])
             design = m5oc.design(report["design"])
-            schedule = schedule_service.find_namespace_schedule(
-                m5oc.content["plugin_namespace"]
-            )
+            try:
+                schedule = schedule_service.find_namespace_schedule(
+                    m5oc.content["plugin_namespace"]
+                )
+            except ScheduleNotFoundError as e:
+                raise DashboardReportScheduleNotFoundError(e.namespace)
 
             sql_dict = sqlHelper.get_sql(design, report["query_payload"])
             outgoing_sql = sql_dict["sql"]
