@@ -60,6 +60,7 @@ export default {
       'resultsCount',
       'showJoinColumnAggregateHeader'
     ]),
+    ...mapGetters('orchestration', ['lastUpdatedDate']),
     ...mapState('dashboards', ['dashboards']),
 
     hasActiveReport() {
@@ -257,7 +258,9 @@ export default {
         })
         .catch(error => {
           Vue.toasted.global.error(
-            `${this.activeReport.name} was not saved to ${dashboard.name}. [Error code: ${error.response.data.code}]`
+            `${this.activeReport.name} was not saved to ${
+              dashboard.name
+            }. [Error code: ${error.response.data.code}]`
           )
         })
     },
@@ -289,6 +292,7 @@ export default {
             }}</span>
           </div>
           <div v-if="design.description">{{ design.description }}</div>
+          <div>Last updated: {{ lastUpdatedDate(`tap-${currentModel}`) }}</div>
         </div>
       </div>
 
