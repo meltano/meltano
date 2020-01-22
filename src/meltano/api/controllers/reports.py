@@ -66,7 +66,9 @@ def index():
 def embed():
     post_data = request.get_json()
     # TODO util fn to get cached id or generate, but need to validate permission prior to making this public (maybe via the `permit`?)
-    response_data = { "snippet": "<iframe class='embed' src='meltano.meltanodata.com/-/public/123' />" }
+    response_data = {
+        "snippet": "<iframe class='embed' src='meltano.meltanodata.com/-/public/123' />"
+    }
     return jsonify(response_data)
 
 
