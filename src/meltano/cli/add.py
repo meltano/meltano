@@ -13,12 +13,14 @@ from meltano.core.project_add_service import (
     PluginNotSupportedException,
     PluginAlreadyAddedException,
 )
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.project_add_custom_service import ProjectAddCustomService
 from meltano.core.plugin_install_service import (
     PluginInstallService,
     PluginNotInstallable,
 )
 from meltano.core.plugin_discovery_service import PluginNotFoundError
+from meltano.core.config_service import ConfigService
 from meltano.core.plugin import PluginType, Plugin
 from meltano.core.project import Project
 from meltano.core.transform_add_service import TransformAddService
@@ -34,6 +36,7 @@ from meltano.core.db import project_engine
 def add(ctx, project, custom):
     if custom:
         if ctx.invoked_subcommand in (
+            "related",
             "transformer",
             "transform",
             "orchestrator",
@@ -45,6 +48,43 @@ def add(ctx, project, custom):
         ctx.obj["add_service"] = ProjectAddCustomService(project)
     else:
         ctx.obj["add_service"] = ProjectAddService(project)
+
+
+@add.command()
+@project()
+@click.pass_context
+def related(ctx, project):
+    config_service = ConfigService(project)
+    discovery_service = PluginDiscoveryService(project)
+
+    added_plugins = []
+    installed_plugins = config_service.plugins()
+    for plugin_install in installed_plugins:
+        try:
+            plugin_def = discovery_service.find_plugin(
+                plugin_install.type, plugin_install.name
+            )
+        except PluginNotFoundError:
+            continue
+
+        related_plugins = ctx.obj["add_service"].add_related(plugin_def)
+
+        for plugin in related_plugins:
+            if plugin in installed_plugins or plugin in added_plugins:
+                continue
+
+            click.secho(
+                f"Added '{plugin.name}' to your Meltano project because it is related to '{plugin_def.name}'.",
+                fg="green",
+            )
+
+            added_plugins.append(plugin)
+
+    if len(added_plugins) == 0:
+        click.secho("No related plugins found that are not already installed.")
+        return
+
+    click.secho("Run `meltano install` to install them.")
 
 
 @add.command()
