@@ -15,8 +15,8 @@ export default {
     return {
       isActiveDashboardLoading: false,
       isEditable: false,
-      reportLayoutWireframe: [],
-      changeHasBeenMade: false
+      isUpdated: false,
+      reportLayoutWireframe: []
     }
   },
   computed: {
@@ -32,7 +32,7 @@ export default {
       return `mailto:?subject=Dashboard: ${this.activeDashboard.name}&body=${window.location}`
     },
     displayedReports() {
-      if (this.isEditable || this.changeHasBeenMade) {
+      if (this.isEditable || this.isUpdated) {
         return this.reportLayoutWireframe
       } else {
         return this.activeDashboardReports
@@ -88,10 +88,10 @@ export default {
       const report = this.reportLayoutWireframe[data.oldPosition]
       this.reportLayoutWireframe.splice(data.oldPosition, 1)
       this.reportLayoutWireframe.splice(data.newPosition, 0, report)
-      this.changeHasBeenMade = data.changeHasBeenMade
+      this.isUpdated = data.isUpdated
     },
     updateDashboardReportPositions() {
-      if (this.changeHasBeenMade) {
+      if (this.isUpdated) {
         this.updateDashboard({
           dashboard: this.activeDashboard,
           newSettings: {
