@@ -33,41 +33,55 @@ class DashboardPlugin(PluginInstall):
         )
         reports = reports_parser.parse()
 
-        logging.debug(f"Found {len(reports)} reports")
-
         dashboards_parser = M5oCollectionParser(
             packages_dir.joinpath("dashboards"), M5oCollectionParserTypes.Dashboard
         )
         dashboards = dashboards_parser.parse()
 
-        logging.debug(f"Found {len(dashboards)} dashboards")
+        logging.debug(f"Found {len(reports)} reports to import")
+        logging.debug(f"Found {len(dashboards)} dashboards to import")
 
         report_id_map = self.add_reports(reports)
         self.add_dashboards(dashboards, report_id_map)
 
     def add_reports(self, reports):
+        reports_helper = ReportsHelper()
+        local_reports = reports_helper.get_reports()
+
         report_id_map = {}
-
         for report in reports:
-            original_id = report["id"]
+            original_report_id = report["id"]
+            report = self.add_report(report, local_reports)
 
-            report = self.add_report(report)
-
-            report_id_map[original_id] = report["id"]
+            report_id_map[original_report_id] = report["id"]
             logging.debug(
-                f"Mapped original report ID '{original_id}' to new ID '{report['id']}'"
+                f"Mapped original report ID '{original_report_id}' to new ID '{report['id']}'"
             )
 
         return report_id_map
 
-    def add_report(self, report):
+    def add_report(self, report, local_reports):
         try:
+            imported_report = next(
+                (
+                    lr
+                    for lr in local_reports
+                    if "imported_from_id" in lr
+                    and lr["imported_from_id"] == report["id"]
+                ),
+                None,
+            )
+            if imported_report is not None:
+                raise ReportAlreadyExistsError(imported_report)
+
+            report["imported_from_id"] = report["id"]
             report = ReportsHelper().save_report(report)
 
             logging.debug(
                 f"Added report with name '{report['name']}', ID '{report['id']}'"
             )
         except ReportAlreadyExistsError as e:
+            # ReportAlreadyExistsError can be raised by the `try` block or `save_report`
             report = e.report
 
             logging.debug(
@@ -77,14 +91,13 @@ class DashboardPlugin(PluginInstall):
         return report
 
     def add_dashboards(self, dashboards, report_id_map):
+        dashboards_helper = DashboardsHelper()
+        local_dashboards = dashboards_helper.get_dashboards()
+
         for dashboard in dashboards:
             original_report_ids = dashboard["report_ids"]
 
-            dashboard = self.add_dashboard(dashboard)
-
-            # Don't add new reports to dashboards that already have some and were presumably imported or created before
-            if len(dashboard["report_ids"]) > 0:
-                continue
+            dashboard = self.add_dashboard(dashboard, local_dashboards)
 
             for original_report_id in original_report_ids:
                 try:
@@ -103,14 +116,28 @@ class DashboardPlugin(PluginInstall):
                     f"Added report with ID '{report_id}' to dashboard with ID '{dashboard['id']}'"
                 )
 
-    def add_dashboard(self, dashboard):
+    def add_dashboard(self, dashboard, local_dashboards):
         try:
+            imported_dashboard = next(
+                (
+                    lr
+                    for lr in local_dashboards
+                    if "imported_from_id" in lr
+                    and lr["imported_from_id"] == dashboard["id"]
+                ),
+                None,
+            )
+            if imported_dashboard is not None:
+                raise DashboardAlreadyExistsError(imported_dashboard)
+
+            dashboard["imported_from_id"] = dashboard["id"]
             dashboard = DashboardsHelper().save_dashboard(dashboard)
 
             logging.debug(
                 f"Added dashboard with name '{dashboard['name']}', ID '{dashboard['id']}'"
             )
         except DashboardAlreadyExistsError as e:
+            # DashboardAlreadyExistsError can be raised by the `try` block or `save_dashboard`
             dashboard = e.dashboard
 
             logging.debug(
