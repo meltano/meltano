@@ -10,7 +10,12 @@ As much as we'd like to support all the data sources out there, we'll need your 
 
 We aim to make Meltano as thin as possible on top of the components it abstracts, so adding a new plugin should be straightforward.
 
-## How to Create a Extractor
+If you think a new extractor is popular or useful enough for others, you can:
+
+- Contribute it back so everyone can benefit!
+- [Submit a "New Extractor Request"](https://gitlab.com/meltano/meltano/issues/new?issue[title]=New%20Extractor%20Request&issuable_template=feature_proposal)
+
+## How to Create an Extractor
 
 First things first, you'll need a data source to integrate: in this example, let's say we want to create a tap to fetch data from `GitLab`.
 
@@ -101,8 +106,8 @@ When creating a new plugin, you'll often have to expose some settings to the use
 
 To expose such a setting, you'll need to define it as such
 
-- **name**: Identifier of this setting in the configuration.  
-  The name is the most important field of a setting, as it defines how the value will be passed down to the underlying component.  
+- **name**: Identifier of this setting in the configuration.
+  The name is the most important field of a setting, as it defines how the value will be passed down to the underlying component.
   Nesting can be represented using the `.` separator.
 
   - `foo` represents the `{ foo: VALUE }` in the output configuration.

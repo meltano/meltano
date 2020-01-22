@@ -30,6 +30,7 @@ import {
   faHashtag,
   faInfoCircle,
   faLock,
+  faPlus,
   faProjectDiagram,
   faQuestionCircle,
   faSync,
@@ -82,6 +83,7 @@ export default {
     library.add(faHashtag)
     library.add(faInfoCircle)
     library.add(faLock)
+    library.add(faPlus)
     library.add(faProjectDiagram)
     library.add(faQuestionCircle)
     library.add(faSync)
