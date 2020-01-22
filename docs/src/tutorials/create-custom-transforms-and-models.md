@@ -236,7 +236,7 @@ meltano elt tap-salesforce target-postgres --transform only
 
 ## Adding Custom Models
 
-In order to access the newly transformed data from the Analyze Section in Meltano UI, a `table.m5o` file, which defines the available columns and aggregates for each table should be created. A `model.m5o` file for representing how the tables are connected is also required. The files will be stored in the `model/` directory. For more details on how `.m5o` files are structured, please refer to the documentation on [Meltano Models](https://www.meltano.com/docs/architecture.html#meltano-model).
+In order to access the newly transformed data from the Analyze Section in Meltano UI, a `table.m5o` file, which defines the available columns and aggregates for each table should be created. A `topic.m5o` file for representing how the tables are connected is also required. The files will be stored in the `model/` directory. For more details on how `.m5o` files are structured, please refer to the documentation on [Meltano Models](https://www.meltano.com/docs/architecture.html#meltano-model).
 
 Account Category Table
 `sfdc-project/model/account_category.table.m5o`
@@ -370,7 +370,7 @@ Opportunities Won Table
 
 Please note, the name this model will be `custom_sfdc` in order to differentiate it from the sfdc model that comes by default with Meltano:
 
-`sfdc-project/model/custom_sfdc.model.m5o`
+`sfdc-project/model/custom_sfdc.topic.m5o`
 
 ```
 {
