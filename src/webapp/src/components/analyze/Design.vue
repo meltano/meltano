@@ -71,6 +71,12 @@ export default {
       return dashboard => dashboard.reportIds.includes(this.activeReport.id)
     },
 
+    formattedLastUpdatedDate() {
+      const extractor = `tap-${this.currentModel}`
+
+      return utils.formatDateStringYYYYMMDD(this.lastUpdatedDate(extractor))
+    },
+
     limit: {
       get() {
         return this.$store.getters['designs/currentLimit']
@@ -292,7 +298,7 @@ export default {
             }}</span>
           </div>
           <div v-if="design.description">{{ design.description }}</div>
-          <div>Last updated: {{ lastUpdatedDate(`tap-${currentModel}`) }}</div>
+          <div>Last updated: {{ formattedLastUpdatedDate }}</div>
         </div>
       </div>
 
