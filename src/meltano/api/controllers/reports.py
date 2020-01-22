@@ -62,6 +62,14 @@ def index():
     return jsonify(reports)
 
 
+@reportsBP.route("/embed", methods=["POST"])
+def embed():
+    post_data = request.get_json()
+    # TODO util fn to get cached id or generate, but need to validate permission prior to making this public (maybe via the `permit`?)
+    response_data = { "snippet": "<iframe class='embed' src='meltano.meltanodata.com/-/public/123' />" }
+    return jsonify(response_data)
+
+
 @reportsBP.route("/<report_name>", methods=["POST"])
 def load_report(report_name):
     permit("view:reports", report_name)

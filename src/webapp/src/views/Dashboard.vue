@@ -3,6 +3,7 @@ import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
 
 import Report from '@/components/Report'
+import reportsApi from '@/api/reports'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
@@ -73,12 +74,6 @@ export default {
       'updateActiveDashboardReportsWithQueryResults',
       'updateDashboard'
     ]),
-    updateReportPosition({ isUpdated, oldPosition, newPosition }) {
-      const report = this.editableDashboardReports[oldPosition]
-      this.editableDashboardReports.splice(oldPosition, 1)
-      this.editableDashboardReports.splice(newPosition, 0, report)
-      this.isUpdated = isUpdated
-    },
     updateDashboardReportPositions() {
       if (this.isUpdated) {
         this.updateDashboard({
@@ -106,6 +101,12 @@ export default {
       }
 
       this.isEditable = !this.isEditable
+    },
+    updateReportPosition({ isUpdated, oldPosition, newPosition }) {
+      const report = this.editableDashboardReports[oldPosition]
+      this.editableDashboardReports.splice(oldPosition, 1)
+      this.editableDashboardReports.splice(newPosition, 0, report)
+      this.isUpdated = isUpdated
     }
   }
 }

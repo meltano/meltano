@@ -7,9 +7,13 @@ export default {
   components: {
     Chart
   },
+  // props: {
+  //   token: { type: String, required: false }
+  // },
   data() {
     return {
       isLoading: true,
+      isValid: false,
       report: null
     }
   },
@@ -22,6 +26,7 @@ export default {
       const name = 'Test Report'
       reportsApi.loadReportWithQueryResults(name).then(response => {
         this.report = response.data
+        this.isValid = true
         this.isLoading = false
       })
     }
@@ -33,12 +38,18 @@ export default {
   <div>
     <progress v-if="!report" class="progress is-small is-info"></progress>
 
-    <Chart
-      v-else
-      :chart-type="report.chartType"
-      :results="report.queryResults"
-      :result-aggregates="report.queryResultAggregates"
-    ></Chart>
+    <template v-else>
+      <Chart
+        v-if="isValid"
+        :chart-type="report.chartType"
+        :results="report.queryResults"
+        :result-aggregates="report.queryResultAggregates"
+      ></Chart>
+
+      <div v-else class="content">
+        <p>The requested embedded report is no longer public.</p>
+      </div>
+    </template>
   </div>
 </template>
 

@@ -2,6 +2,10 @@ import axios from 'axios'
 import utils from '@/utils/utils'
 
 export default {
+  embed(data) {
+    return axios.post(utils.apiUrl('reports', 'embed'), data)
+  },
+
   loadReport(name) {
     return axios.post(utils.apiUrl('reports', `${name}`), {
       hasResults: false
