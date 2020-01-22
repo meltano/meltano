@@ -32,11 +32,9 @@ export default {
       return `mailto:?subject=Dashboard: ${this.activeDashboard.name}&body=${window.location}`
     },
     displayedReports() {
-      if (this.isEditable || this.isUpdated) {
-        return this.reportLayoutWireframe
-      } else {
-        return this.activeDashboardReports
-      }
+      return this.isEditable || this.isUpdated
+        ? this.reportLayoutWireframe
+        : this.activeDashboardReports
     },
     isActive() {
       return dashboard => dashboard.id === this.activeDashboard.id
