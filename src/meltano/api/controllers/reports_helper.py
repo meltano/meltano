@@ -40,7 +40,9 @@ class ReportsHelper:
         schedule_service = ScheduleService(project)
         sql_helper = SqlHelper()
         report = self.get_report_by_name(name)
-        report_with_query_results = self.update_report_with_query_results(report, schedule_service, sql_helper)
+        report_with_query_results = self.update_report_with_query_results(
+            report, schedule_service, sql_helper
+        )
 
         return report_with_query_results
 
@@ -84,7 +86,6 @@ class ReportsHelper:
             json.dump(data, f)
 
         return data
-
 
     def update_report_with_query_results(self, report, schedule_service, sql_helper):
         m5oc = sql_helper.get_m5oc_topic(report["namespace"], report["model"])

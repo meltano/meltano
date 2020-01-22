@@ -20,6 +20,8 @@ class DashboardsHelper:
         reports_helper = ReportsHelper()
 
         for report in reports:
-            reports_helper.update_report_with_query_results(report, schedule_service, sql_helper)
+            reports_helper.update_report_with_query_results(
+                report, schedule_service, sql_helper
+            )
 
         return reports
