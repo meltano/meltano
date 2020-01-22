@@ -298,7 +298,9 @@ export default {
             }}</span>
           </div>
           <div v-if="design.description">{{ design.description }}</div>
-          <div>Last updated: {{ formattedLastUpdatedDate }}</div>
+          <div class="is-italic has-text-primary">
+            Last updated: {{ formattedLastUpdatedDate }}
+          </div>
         </div>
       </div>
 
