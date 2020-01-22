@@ -3,11 +3,15 @@ import utils from '@/utils/utils'
 
 export default {
   loadReport(name) {
-    return axios.get(utils.apiUrl('reports/load', `${name}`))
+    return axios.post(utils.apiUrl('reports', `${name}`), {
+      hasResults: false
+    })
   },
 
   loadReportWithQueryResults(name) {
-    return axios.get(utils.apiUrl('reports/load-with-query-results', `${name}`))
+    return axios.post(utils.apiUrl('reports', `${name}`), {
+      hasResults: true
+    })
   },
 
   loadReports() {

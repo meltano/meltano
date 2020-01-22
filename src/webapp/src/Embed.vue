@@ -35,9 +35,9 @@ export default {
 
     <Chart
       v-else
-      :chart-type="report.chart_type"
-      :results="report.query_results"
-      :result-aggregates="report.query_result_aggregates"
+      :chart-type="report.chartType"
+      :results="report.queryResults"
+      :result-aggregates="report.queryResultAggregates"
     ></Chart>
   </div>
 </template>

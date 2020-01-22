@@ -1,10 +1,12 @@
 import Vue from 'vue'
 
+import axios from 'axios'
+
 import Embed from '@/Embed'
-import store from '@/store'
+
+axios.defaults.headers.common['X-JSON-SCHEME'] = 'camel'
 
 new Vue({
   el: '#app',
-  store,
   render: h => h(Embed)
 })
