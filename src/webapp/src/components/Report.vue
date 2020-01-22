@@ -80,7 +80,7 @@ export default {
       </div>
 
       <chart
-        :class="edit ? 'fade' : ''"
+        :class="edit ? 'is-transparent-50' : ''"
         :chart-type="report.chartType"
         :results="report.queryResults"
         :result-aggregates="report.queryResultAggregates"
@@ -93,10 +93,6 @@ export default {
 .wireframe {
   color: red;
   border: 3px dotted #ddd;
-}
-
-.fade {
-  opacity: 0.5;
 }
 
 .mb-05r {
