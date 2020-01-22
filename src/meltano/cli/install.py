@@ -29,7 +29,9 @@ def install(project):
     Read more at https://www.meltano.com/docs/command-line-interface.html#command-line-interface.
     """
     install_service = PluginInstallService(project)
-    install_status = install_service.install_all_plugins(install_status_update)
+    install_status = install_service.install_all_plugins(
+        status_cb=install_status_update
+    )
     num_installed = len(install_status["installed"])
     num_failed = len(install_status["errors"])
 

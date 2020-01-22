@@ -41,3 +41,21 @@ class ProjectAddService:
         plugin = self.discovery_service.find_plugin(plugin_type, plugin_name)
         installed = plugin.as_installed()
         return self.config_service.add_to_file(installed)
+
+    def add_related(self, target_plugin: PluginInstall):
+        # Transforms are installed automatically as part of the ELT pipeline
+        ignored_types = [target_plugin.type, PluginType.TRANSFORMS]
+
+        related_plugins = [
+            plugin
+            for plugin in self.discovery_service.plugins()
+            if plugin.namespace == target_plugin.namespace
+            and plugin.type not in ignored_types
+        ]
+
+        added = []
+        for plugin in related_plugins:
+            plugin_install = self.add(plugin.type, plugin.name)
+            added.append(plugin_install)
+
+        return added

@@ -31,12 +31,15 @@ class PluginInstallService:
         return self.venv_service.create(namespace=plugin.type, name=plugin.name)
 
     def install_all_plugins(self, status_cb=noop):
+        # TODO: config service returns PluginInstall, not Plugin
+        return self.install_plugins(self.config_service.plugins())
+
+    def install_plugins(self, plugins, status_cb=noop):
         errors = []
         installed = []
         has_model = False
 
-        # TODO: config service returns PluginInstall, not Plugin
-        for plugin in self.config_service.plugins():
+        for plugin in plugins:
             status = {"plugin": plugin, "status": "running"}
             status_cb(status)
 
