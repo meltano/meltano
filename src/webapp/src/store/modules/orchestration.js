@@ -78,6 +78,13 @@ const getters = {
 
   getSuccessfulPipelines(state) {
     return state.pipelines.filter(pipeline => pipeline.hasEverSucceeded)
+  },
+
+  lastUpdatedDate(state) {
+    return extractor => {
+      return state.pipelines.find(pipeline => pipeline.extractor === extractor)
+        .endedAt
+    }
   }
 }
 
