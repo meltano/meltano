@@ -1,44 +1,12 @@
 <script>
-import Chart from '@/components/analyze/Chart'
-import reportsApi from '@/api/reports'
-
 export default {
-  name: 'Embed',
-  components: {
-    Chart
-  },
-  data() {
-    return {
-      isLoading: true,
-      report: null
-    }
-  },
-  created() {
-    this.initialize()
-  },
-  methods: {
-    initialize() {
-      // swap to token/id consumed from from route
-      const name = 'Test Report'
-      reportsApi.loadReportWithQueryResults(name).then(response => {
-        this.report = response.data
-        this.isLoading = false
-      })
-    }
-  }
+  name: 'Embed'
 }
 </script>
 
 <template>
   <div id="app">
-    <progress v-if="!report" class="progress is-small is-info"></progress>
-
-    <Chart
-      v-else
-      :chart-type="report.chartType"
-      :results="report.queryResults"
-      :result-aggregates="report.queryResultAggregates"
-    ></Chart>
+    <router-view />
   </div>
 </template>
 

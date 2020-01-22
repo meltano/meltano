@@ -11,7 +11,7 @@ import FontAwesome from '@/utils/font-awesome'
 import flaskContext from '@/utils/flask'
 import setupAnalytics from '@/utils/setupAnalytics'
 import setupToasted from '@/utils/setupToasted'
-import router from '@/router'
+import router from '@/router/app'
 import store from '@/store'
 import Upgrade from '@/middleware/upgrade'
 

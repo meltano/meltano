@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 import VueAnalytics from 'vue-analytics'
 
-import router from '@/router'
+import router from '@/router/app'
 
 export default function setup() {
   const isDisabled =

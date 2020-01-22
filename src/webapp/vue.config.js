@@ -4,7 +4,7 @@ const isProd = process.env.NODE_ENV == 'production'
 module.exports = {
   assetsDir: 'static',
 
-  // add another entrypoint to the webpack configuration
+  // add another entry point to the webpack configuration
   pages: {
     app: {
       entry: 'src/main.js',
