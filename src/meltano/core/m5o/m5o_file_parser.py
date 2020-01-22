@@ -389,7 +389,13 @@ class MeltanoAnalysisFileParser:
         file_dict["path"] = str(file)
         file_dict["id"] = encode_id_from_file_path(file_dict["path"])
         file_dict["slug"] = slugify(name)
-        file_dict["createdAt"] = time.time()
+
+        # Legacy reports and dashboards can have a `createdAt` key that would
+        # conflict with the new `created_at` key instead of being overwritten.
+        file_dict.pop("createdAt", None)
+
+        file_dict["created_at"] = time.time()
+
         return file_dict
 
     def packages(self) -> List[Package]:
