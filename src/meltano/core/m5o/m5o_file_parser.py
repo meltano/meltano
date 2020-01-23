@@ -1,7 +1,7 @@
 import os
 import json
 import sqlparse
-import time
+from datetime import datetime, timezone
 import glob
 
 import networkx as nx
@@ -394,7 +394,7 @@ class MeltanoAnalysisFileParser:
         # conflict with the new `created_at` key instead of being overwritten.
         file_dict.pop("createdAt", None)
 
-        file_dict["created_at"] = time.time()
+        file_dict["created_at"] = datetime.now(timezone.utc).timestamp()
 
         return file_dict
 
