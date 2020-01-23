@@ -13,10 +13,10 @@ export default {
   },
   data() {
     return {
+      editableDashboardReports: [],
       isActiveDashboardLoading: false,
       isEditable: false,
-      isUpdated: false,
-      reportLayoutWireframe: []
+      isUpdated: false
     }
   },
   computed: {
@@ -33,7 +33,7 @@ export default {
     },
     displayedReports() {
       return this.isEditable || this.isUpdated
-        ? this.reportLayoutWireframe
+        ? this.editableDashboardReports
         : this.activeDashboardReports
     },
     isActive() {
@@ -49,10 +49,10 @@ export default {
     },
     isEditable() {
       if (this.isEditable) {
-        this.reportLayoutWireframe = []
+        this.editableDashboardReports = []
 
         this.activeDashboardReports.forEach(report => {
-          this.reportLayoutWireframe.push(report)
+          this.editableDashboardReports.push(report)
         })
       }
     }
@@ -83,9 +83,9 @@ export default {
       this.$router.push({ name: 'report', params: report })
     },
     updateReportPosition(data) {
-      const report = this.reportLayoutWireframe[data.oldPosition]
-      this.reportLayoutWireframe.splice(data.oldPosition, 1)
-      this.reportLayoutWireframe.splice(data.newPosition, 0, report)
+      const report = this.editableDashboardReports[data.oldPosition]
+      this.editableDashboardReports.splice(data.oldPosition, 1)
+      this.editableDashboardReports.splice(data.newPosition, 0, report)
       this.isUpdated = data.isUpdated
     },
     updateDashboardReportPositions() {
@@ -94,13 +94,13 @@ export default {
           dashboard: this.activeDashboard,
           newSettings: {
             ...this.activeDashboard,
-            reportIds: this.reportLayoutWireframe.map(report => {
+            reportIds: this.editableDashboardReports.map(report => {
               return report.id
             })
           }
         })
           .then(() => {
-            this.updateActiveDashboardReports(this.reportLayoutWireframe)
+            this.updateActiveDashboardReports(this.editableDashboardReports)
             Vue.toasted.global.success(
               `Dashboard reports order successfully saved!`
             )
