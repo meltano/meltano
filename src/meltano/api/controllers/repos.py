@@ -81,7 +81,9 @@ def index():
     onlydocs = project.model_dir().parent.glob("*.md")
 
     for d in onlydocs:
-        file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(d, str(d.name))
+        file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(
+            d.relative_to(project.root), str(d.name)
+        )
         sortedM5oFiles["documents"]["items"].append(file_dict)
 
     for f in onlyfiles:
@@ -92,7 +94,9 @@ def index():
         # filename splittext twice occurs due to current *.type.extension convention (two dots)
         filename = filename.lower()
         filename, ext = os.path.splitext(filename)
-        file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(f, filename)
+        file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(
+            f.relative_to(project.root), filename
+        )
         if ext == ".topic":
             sortedM5oFiles["topics"]["items"].append(file_dict)
         if ext == ".table":

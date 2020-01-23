@@ -97,7 +97,9 @@ class DashboardsHelper:
         project = Project.find()
         slug = slugify(name)
         file_path = project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
-        data = MeltanoAnalysisFileParser.fill_base_m5o_dict(file_path, slug, data)
+        data = MeltanoAnalysisFileParser.fill_base_m5o_dict(
+            file_path.relative_to(project.root), slug, data
+        )
         data["version"] = DashboardsHelper.VERSION
         data["description"] = data["description"] or ""
         data["report_ids"] = []
@@ -143,7 +145,7 @@ class DashboardsHelper:
         dashboard["slug"] = new_slug
         dashboard["name"] = new_name
         dashboard["description"] = new_settings["description"]
-        dashboard["path"] = str(new_file_path)
+        dashboard["path"] = str(new_file_path.relative_to(project.root))
 
         if set(new_settings["report_ids"]) == set(dashboard["report_ids"]):
             dashboard["report_ids"] = new_settings["report_ids"]

@@ -55,7 +55,9 @@ class ReportsHelper:
         project = Project.find()
         slug = slugify(name)
         file_path = project.analyze_dir("reports", f"{slug}.report.m5o")
-        data = MeltanoAnalysisFileParser.fill_base_m5o_dict(file_path, slug, data)
+        data = MeltanoAnalysisFileParser.fill_base_m5o_dict(
+            file_path.relative_to(project.root), slug, data
+        )
         data["version"] = ReportsHelper.VERSION
 
         with file_path.open("w") as f:
@@ -83,7 +85,7 @@ class ReportsHelper:
         os.remove(file_path)
 
         data["slug"] = new_slug
-        data["path"] = str(new_file_path)
+        data["path"] = str(new_file_path.relative_to(project.root))
         with new_file_path.open("w") as f:
             json.dump(data, f)
 
