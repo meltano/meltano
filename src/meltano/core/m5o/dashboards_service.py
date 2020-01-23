@@ -1,7 +1,6 @@
 import os
 import json
 
-from meltano.core.project import Project
 from meltano.core.utils import slugify
 
 from .m5o_collection_parser import M5oCollectionParser, M5oCollectionParserTypes
@@ -25,10 +24,12 @@ class DashboardDoesNotExistError(Exception):
 class DashboardsService:
     VERSION = "1.0.0"
 
+    def __init__(self, project):
+        self.project = project
+
     def get_dashboards(self):
-        project = Project.find()
         dashboardsParser = M5oCollectionParser(
-            project.analyze_dir("dashboards"), M5oCollectionParserTypes.Dashboard
+            self.project.analyze_dir("dashboards"), M5oCollectionParserTypes.Dashboard
         )
 
         return dashboardsParser.parse()
@@ -55,11 +56,10 @@ class DashboardsService:
         if existing_dashboard:
             raise DashboardAlreadyExistsError(existing_dashboard)
 
-        project = Project.find()
         slug = slugify(name)
-        file_path = project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
+        file_path = self.project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(
-            file_path.relative_to(project.root), slug, data
+            file_path.relative_to(self.project.root), slug, data
         )
         data["version"] = DashboardsService.VERSION
         data["description"] = data["description"] or ""
@@ -71,10 +71,9 @@ class DashboardsService:
         return data
 
     def delete_dashboard(self, data):
-        project = Project.find()
         dashboard = self.get_dashboard(data["id"])
         slug = dashboard["slug"]
-        file_path = project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
+        file_path = self.project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
         if os.path.exists(file_path):
             os.remove(file_path)
         else:
@@ -86,15 +85,16 @@ class DashboardsService:
         dashboard = self.get_dashboard(data["dashboard"]["id"])
         slug = dashboard["slug"]
 
-        project = Project.find()
-        file_path = project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
+        file_path = self.project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
         if not os.path.exists(file_path):
             raise DashboardDoesNotExistError(data)
 
         new_settings = data["new_settings"]
         new_name = new_settings["name"]
         new_slug = slugify(new_name)
-        new_file_path = project.analyze_dir("dashboards", f"{new_slug}.dashboard.m5o")
+        new_file_path = self.project.analyze_dir(
+            "dashboards", f"{new_slug}.dashboard.m5o"
+        )
         is_same_file = new_slug == slug
         if not is_same_file and os.path.exists(new_file_path):
             with new_file_path.open() as f:
@@ -106,7 +106,7 @@ class DashboardsService:
         dashboard["slug"] = new_slug
         dashboard["name"] = new_name
         dashboard["description"] = new_settings["description"]
-        dashboard["path"] = str(new_file_path.relative_to(project.root))
+        dashboard["path"] = str(new_file_path.relative_to(self.project.root))
 
         if set(new_settings["report_ids"]) == set(dashboard["report_ids"]):
             dashboard["report_ids"] = new_settings["report_ids"]
@@ -117,12 +117,11 @@ class DashboardsService:
         return dashboard
 
     def add_report_to_dashboard(self, data):
-        project = Project.find()
         dashboard = self.get_dashboard(data["dashboard_id"])
 
         if data["report_id"] not in dashboard["report_ids"]:
             dashboard["report_ids"].append(data["report_id"])
-            file_path = project.analyze_dir(
+            file_path = self.project.analyze_dir(
                 "dashboards", f"{dashboard['slug']}.dashboard.m5o"
             )
             with file_path.open("w") as f:
@@ -131,12 +130,11 @@ class DashboardsService:
         return dashboard
 
     def remove_report_from_dashboard(self, data):
-        project = Project.find()
         dashboard = self.get_dashboard(data["dashboard_id"])
 
         if data["report_id"] in dashboard["report_ids"]:
             dashboard["report_ids"].remove(data["report_id"])
-            file_path = project.analyze_dir(
+            file_path = self.project.analyze_dir(
                 "dashboards", f"{dashboard['slug']}.dashboard.m5o"
             )
 

@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from .errors import InvalidFileNameError
+from meltano.core.project import Project
 from meltano.core.m5o.reports_service import ReportAlreadyExistsError, ReportsService
 
 from meltano.api.api_blueprint import APIBlueprint
@@ -8,6 +9,11 @@ from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin
 from meltano.api.security.readonly_killswitch import readonly_killswitch
 
 reportsBP = APIBlueprint("reports", __name__)
+
+
+def reports_service():
+    project = Project.find()
+    return ReportsService(project)
 
 
 class ReportFilter(NameFilterMixin, ResourceFilter):
@@ -50,8 +56,7 @@ def _handle(ex):
 
 @reportsBP.route("/", methods=["GET"])
 def index():
-    reports_service = ReportsService()
-    reports = reports_service.get_reports()
+    reports = reports_service().get_reports()
     reports = ReportFilter().filter_all("view:reports", reports)
 
     return jsonify(reports)
@@ -61,8 +66,7 @@ def index():
 def load_report(report_name):
     permit("view:reports", report_name)
 
-    reports_service = ReportsService()
-    response_data = reports_service.load_report(report_name)
+    response_data = reports_service().load_report(report_name)
 
     permit("view:design", response_data["design"])
 
@@ -72,16 +76,14 @@ def load_report(report_name):
 @reportsBP.route("/save", methods=["POST"])
 @readonly_killswitch
 def save_report():
-    reports_service = ReportsService()
     post_data = request.get_json()
-    response_data = reports_service.save_report(post_data)
+    response_data = reports_service().save_report(post_data)
     return jsonify(response_data)
 
 
 @reportsBP.route("/update", methods=["POST"])
 @readonly_killswitch
 def update_report():
-    reports_service = ReportsService()
     post_data = request.get_json()
-    response_data = reports_service.update_report(post_data)
+    response_data = reports_service().update_report(post_data)
     return jsonify(response_data)

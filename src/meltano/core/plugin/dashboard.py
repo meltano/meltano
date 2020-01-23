@@ -38,17 +38,25 @@ class DashboardPlugin(PluginInstall):
         logging.debug(f"Found {len(reports)} reports to import")
         logging.debug(f"Found {len(dashboards)} dashboards to import")
 
-        report_id_map = self.add_reports(reports)
-        self.add_dashboards(dashboards, report_id_map)
+        reports_service = ReportsService(project)
+        report_id_map = self.add_reports(reports, reports_service=reports_service)
 
-    def add_reports(self, reports):
-        reports_service = ReportsService()
+        dashboards_service = DashboardsService(project)
+        self.add_dashboards(
+            dashboards,
+            report_id_map=report_id_map,
+            dashboards_service=dashboards_service,
+        )
+
+    def add_reports(self, reports, reports_service):
         local_reports = reports_service.get_reports()
 
         report_id_map = {}
         for report in reports:
             original_report_id = report["id"]
-            report = self.add_report(report, local_reports)
+            report = self.add_report(
+                report, local_reports=local_reports, reports_service=reports_service
+            )
 
             report_id_map[original_report_id] = report["id"]
             logging.debug(
@@ -57,7 +65,7 @@ class DashboardPlugin(PluginInstall):
 
         return report_id_map
 
-    def add_report(self, report, local_reports):
+    def add_report(self, report, local_reports, reports_service):
         try:
             imported_report = next(
                 (
@@ -72,7 +80,7 @@ class DashboardPlugin(PluginInstall):
                 raise ReportAlreadyExistsError(imported_report)
 
             report["imported_from_id"] = report["id"]
-            report = ReportsService().save_report(report)
+            report = reports_service.save_report(report)
 
             logging.debug(
                 f"Added report with name '{report['name']}', ID '{report['id']}'"
@@ -87,14 +95,17 @@ class DashboardPlugin(PluginInstall):
 
         return report
 
-    def add_dashboards(self, dashboards, report_id_map):
-        dashboards_service = DashboardsService()
+    def add_dashboards(self, dashboards, report_id_map, dashboards_service):
         local_dashboards = dashboards_service.get_dashboards()
 
         for dashboard in dashboards:
             original_report_ids = dashboard["report_ids"]
 
-            dashboard = self.add_dashboard(dashboard, local_dashboards)
+            dashboard = self.add_dashboard(
+                dashboard,
+                local_dashboards=local_dashboards,
+                dashboards_service=dashboards_service,
+            )
 
             for original_report_id in original_report_ids:
                 try:
@@ -105,7 +116,7 @@ class DashboardPlugin(PluginInstall):
                     )
                     continue
 
-                DashboardsService().add_report_to_dashboard(
+                dashboards_service.add_report_to_dashboard(
                     {"dashboard_id": dashboard["id"], "report_id": report_id}
                 )
 
@@ -113,7 +124,7 @@ class DashboardPlugin(PluginInstall):
                     f"Added report with ID '{report_id}' to dashboard with ID '{dashboard['id']}'"
                 )
 
-    def add_dashboard(self, dashboard, local_dashboards):
+    def add_dashboard(self, dashboard, local_dashboards, dashboards_service):
         try:
             imported_dashboard = next(
                 (
@@ -128,7 +139,7 @@ class DashboardPlugin(PluginInstall):
                 raise DashboardAlreadyExistsError(imported_dashboard)
 
             dashboard["imported_from_id"] = dashboard["id"]
-            dashboard = DashboardsService().save_dashboard(dashboard)
+            dashboard = dashboards_service.save_dashboard(dashboard)
 
             logging.debug(
                 f"Added dashboard with name '{dashboard['name']}', ID '{dashboard['id']}'"
