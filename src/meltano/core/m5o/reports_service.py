@@ -1,21 +1,11 @@
-import json
 import os
+import json
 
-from os.path import join
-from pathlib import Path
-
-from meltano.core.m5o.m5oc_file import M5ocFile
-from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
-from meltano.core.m5o.m5o_collection_parser import (
-    M5oCollectionParser,
-    M5oCollectionParserTypes,
-)
 from meltano.core.project import Project
 from meltano.core.utils import slugify
-from meltano.core.m5o.m5o_collection_parser import (
-    M5oCollectionParser,
-    M5oCollectionParserTypes,
-)
+
+from .m5o_collection_parser import M5oCollectionParser, M5oCollectionParserTypes
+from .m5o_file_parser import MeltanoAnalysisFileParser
 
 
 class ReportAlreadyExistsError(Exception):
@@ -25,7 +15,7 @@ class ReportAlreadyExistsError(Exception):
         self.report = report
 
 
-class ReportsHelper:
+class ReportsService:
     VERSION = "1.0.0"
 
     def get_report_by_name(self, name):
@@ -58,7 +48,7 @@ class ReportsHelper:
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(
             file_path.relative_to(project.root), slug, data
         )
-        data["version"] = ReportsHelper.VERSION
+        data["version"] = ReportsService.VERSION
 
         with file_path.open("w") as f:
             json.dump(data, f)

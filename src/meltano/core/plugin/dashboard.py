@@ -7,13 +7,10 @@ from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParserTypes,
 )
 from meltano.core.venv_service import VirtualEnv
-from meltano.api.controllers.reports_helper import (
-    ReportAlreadyExistsError,
-    ReportsHelper,
-)
-from meltano.api.controllers.dashboards_helper import (
+from meltano.core.m5o.reports_service import ReportAlreadyExistsError, ReportsService
+from meltano.core.m5o.dashboards_service import (
     DashboardAlreadyExistsError,
-    DashboardsHelper,
+    DashboardsService,
 )
 
 
@@ -45,8 +42,8 @@ class DashboardPlugin(PluginInstall):
         self.add_dashboards(dashboards, report_id_map)
 
     def add_reports(self, reports):
-        reports_helper = ReportsHelper()
-        local_reports = reports_helper.get_reports()
+        reports_service = ReportsService()
+        local_reports = reports_service.get_reports()
 
         report_id_map = {}
         for report in reports:
@@ -75,7 +72,7 @@ class DashboardPlugin(PluginInstall):
                 raise ReportAlreadyExistsError(imported_report)
 
             report["imported_from_id"] = report["id"]
-            report = ReportsHelper().save_report(report)
+            report = ReportsService().save_report(report)
 
             logging.debug(
                 f"Added report with name '{report['name']}', ID '{report['id']}'"
@@ -91,8 +88,8 @@ class DashboardPlugin(PluginInstall):
         return report
 
     def add_dashboards(self, dashboards, report_id_map):
-        dashboards_helper = DashboardsHelper()
-        local_dashboards = dashboards_helper.get_dashboards()
+        dashboards_service = DashboardsService()
+        local_dashboards = dashboards_service.get_dashboards()
 
         for dashboard in dashboards:
             original_report_ids = dashboard["report_ids"]
@@ -108,7 +105,7 @@ class DashboardPlugin(PluginInstall):
                     )
                     continue
 
-                DashboardsHelper().add_report_to_dashboard(
+                DashboardsService().add_report_to_dashboard(
                     {"dashboard_id": dashboard["id"], "report_id": report_id}
                 )
 
@@ -131,7 +128,7 @@ class DashboardPlugin(PluginInstall):
                 raise DashboardAlreadyExistsError(imported_dashboard)
 
             dashboard["imported_from_id"] = dashboard["id"]
-            dashboard = DashboardsHelper().save_dashboard(dashboard)
+            dashboard = DashboardsService().save_dashboard(dashboard)
 
             logging.debug(
                 f"Added dashboard with name '{dashboard['name']}', ID '{dashboard['id']}'"
