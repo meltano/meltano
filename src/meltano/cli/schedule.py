@@ -4,7 +4,6 @@ import click
 import datetime
 
 from . import cli
-from .add import add_plugin, add_transform
 from .params import project
 from click_default_group import DefaultGroup
 from meltano.core.project import Project, ProjectNotFound

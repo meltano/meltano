@@ -16,19 +16,19 @@ from .error import (
 )
 
 
-class PluginInstallService:
-    def __init__(
-        self,
-        project: Project,
-        venv_service: VenvService = None,
-        config_service: ConfigService = None,
-    ):
-        self.project = project
-        self.venv_service = venv_service or VenvService(project)
-        self.config_service = config_service or ConfigService(project)
+def installer_factory(project, plugin, *args, **kwargs):
+    cls = PipPluginInstaller
 
-    def create_venv(self, plugin: PluginRef):
-        return self.venv_service.create(namespace=plugin.type, name=plugin.name)
+    if hasattr(plugin.__class__, "__installer_cls__"):
+        cls = plugin.__class__.__installer_cls__
+
+    return cls(project, plugin, *args, **kwargs)
+
+
+class PluginInstallService:
+    def __init__(self, project: Project, config_service: ConfigService = None):
+        self.project = project
+        self.config_service = config_service or ConfigService(project)
 
     def install_all_plugins(self, status_cb=noop):
         # TODO: config service returns PluginInstall, not Plugin
@@ -75,21 +75,13 @@ class PluginInstallService:
         if not plugin.is_installable():
             raise PluginNotInstallable()
 
-        try:
-            with plugin.trigger_hooks("install", self.project):
-                self.create_venv(plugin)
-                run = self.venv_service.install(
-                    namespace=plugin.type, name=plugin.name, pip_url=plugin.pip_url
-                )
+        with plugin.trigger_hooks("install", self.project):
+            run = installer_factory(self.project, plugin).install()
 
-                if compile_models and plugin.type is PluginType.MODELS:
-                    self.compile_models()
+            if compile_models and plugin.type is PluginType.MODELS:
+                self.compile_models()
 
-                return run
-        except SubprocessError as err:
-            raise PluginInstallError(
-                f"{plugin.name} has an installation issue. {err}", err.process
-            )
+            return run
 
     def compile_models(self):
         compiler = ProjectCompiler(self.project)
@@ -97,3 +89,22 @@ class PluginInstallService:
             compiler.compile()
         except Exception:
             pass
+
+
+class PipPluginInstaller:
+    def __init__(self, project, plugin: PluginRef, venv_service: VenvService = None):
+        self.plugin = plugin
+        self.venv_service = venv_service or VenvService(project)
+
+    def install(self):
+        try:
+            self.venv_service.create(namespace=self.plugin.type, name=self.plugin.name)
+            return self.venv_service.install(
+                namespace=self.plugin.type,
+                name=self.plugin.name,
+                pip_url=self.plugin.pip_url,
+            )
+        except SubprocessError as err:
+            raise PluginInstallError(
+                f"{self.plugin.name} has an installation issue. {err}", err.process
+            )

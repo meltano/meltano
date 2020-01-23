@@ -23,7 +23,6 @@ from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin import PluginType, Plugin
 from meltano.core.project import Project
-from meltano.core.transform_add_service import TransformAddService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.error import SubprocessError
 from meltano.core.db import project_engine
@@ -156,8 +155,9 @@ def orchestrator(ctx, project, plugin_name):
 @add.command()
 @click.argument("plugin_name")
 @project()
-def transform(project, plugin_name):
-    add_transform(project, plugin_name)
+@click.pass_context
+def transform(ctx, project, plugin_name):
+    add_plugin(ctx.obj["add_service"], project, PluginType.TRANSFORMS, plugin_name)
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type="transform", plugin_name=plugin_name)
@@ -184,7 +184,8 @@ def add_plugin(
         click.secho(f"Installing '{plugin_name}'...")
         install_service = PluginInstallService(project)
         run = install_service.install_plugin(plugin)
-        click.secho(run.stdout)
+        if run:
+            click.secho(run.stdout)
         click.secho(f"Installed '{plugin_name}'.", fg="green")
 
         click.secho(f"Added and installed {plugin_type} '{plugin_name}'.", fg="green")
@@ -198,29 +199,3 @@ def add_plugin(
     docs_link = plugin._extras.get("docs")
     if docs_link:
         click.secho(f"Visit {docs_link} for more details about '{plugin.name}'.")
-
-
-def add_transform(project: Project, plugin_name: str):
-    try:
-        project_add_service = ProjectAddService(project)
-        plugin = project_add_service.add(PluginType.TRANSFORMS, plugin_name)
-        click.secho(
-            f"Added transform '{plugin.name}' to your Meltano project.", fg="green"
-        )
-
-        # Add repo to my-test-project/transform/packages.yml
-        transform_add_service = TransformAddService(project)
-        transform_add_service.add_to_packages(plugin)
-        click.secho(
-            f"Added transform '{plugin.name}' to your dbt packages.", fg="green"
-        )
-
-        # Add model and vars to my-test-project/transform/dbt_project.yml
-        transform_add_service.update_dbt_project(plugin)
-        click.secho(
-            f"Added transform '{plugin.name}' to your dbt_project.yml.", fg="green"
-        )
-        click.secho(f"Installed '{plugin.name}'.", fg="green")
-    except (PluginNotSupportedException, PluginNotFoundError):
-        click.secho(f"Error: transform '{plugin_name}' is not supported.", fg="red")
-        raise click.Abort()
