@@ -3,27 +3,40 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.16.1 - (2020-01-23)
 
 ---
 
 ### New
 
 - [#1592](https://gitlab.com/meltano/meltano/issues/1592) Add MAX and MIN aggregate functions to Meltano Models
+- [#1552](https://gitlab.com/meltano/meltano/issues/1552) Add "Custom" data source CTA to link to the create custom data source docs
 
 ### Changes
 
 - [#1510](https://gitlab.com/meltano/meltano/issues/1510) Remove breadcrumbs (not currently useful)
 - [#1589](https://gitlab.com/meltano/meltano/issues/1589) Add dbt-specific files to a .gitignore
+- [#1402](https://gitlab.com/meltano/meltano/issues/1402) Onboarding redesign to minimize steps and friction ('Extractors' as 'Data Sources', pipelines are secondary to 'Data Source' integrations, and removed loader, transform, and pipeline name as editable in favor of preselected values in accordance with our hosted solution)
+- [#1402](https://gitlab.com/meltano/meltano/issues/1402) Local development now requires `.env` to connect a `target-postgres` loader (docs update to follow in [#1586](https://gitlab.com/meltano/meltano/issues/1586) )
 
 ### Fixes
 
+- [#1573](https://gitlab.com/meltano/meltano/issues/1573) Fix docs `shouldShowNavbar` conditional and improve query string `embed=true` parsing
 - [#1579](https://gitlab.com/meltano/meltano/issues/1579) Make color contrast for CTA buttons accessible
 
-### Breaks
-- [#1573](https://gitlab.com/meltano/meltano/issues/1573) Fix docs `shouldShowNavbar` conditional and improve query string `embed=true` parsing
-
-### Breaks
 
 ## 1.16.0 - (2020-01-20)
 
@@ -34,21 +47,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1556](https://gitlab.com/meltano/meltano/issues/1556) Add default transformations for the Facebook Ads Extractor. They are using the dbt package defined in https://gitlab.com/meltano/dbt-tap-facebook
 - [#1557](https://gitlab.com/meltano/meltano/issues/1557) Add default Meltano Models for the Facebook Ads Extractor. They are defined in https://gitlab.com/meltano/model-facebook
 - [#1560](https://gitlab.com/meltano/meltano/issues/1560) Make the Facebook Ads Extractor available by default on Meltano UI
-- [#1552](https://gitlab.com/meltano/meltano/issues/1552) Add "Custom" data source CTA to link to the create custom data source docs
+
 ### Changes
 
 - [#1541](https://gitlab.com/meltano/meltano/issues/1541) Revert `tap-csv`'s `kind: file` to text input for `csv_files_definition` as we don't fully support `tap-csv` via the UI with single (definition json) and multiple (csv files) file uploading
 - [#1477](https://gitlab.com/meltano/meltano/issues/1477) Add a `read-only` mode to Meltano to disable all modifications from the UI
 
-- [#1402](https://gitlab.com/meltano/meltano/issues/1402) Onboarding redesign to minimize steps and friction ('Extractors' as 'Data Sources', pipelines are secondary to 'Data Source' integrations, and removed loader, transform, and pipeline name as editable in favor of preselected values in accordance with our hosted solution)
-- [#1402](https://gitlab.com/meltano/meltano/issues/1402) Local development now requires `.env` to connect a `target-postgres` loader (docs update to follow in [#1586](https://gitlab.com/meltano/meltano/issues/1586) )
-
-- [#1402](https://gitlab.com/meltano/meltano/issues/1402) Onboarding redesign to minimize steps and friction ('Extractors' as 'Data Sources', pipelines are secondary to 'Data Source' integrations, and removed loader, transform, and pipeline name as editable in favor of preselected values in accordance with our hosted solution)
-- [#1402](https://gitlab.com/meltano/meltano/issues/1402) Local development now requires `.env` to connect a `target-postgres` loader (docs update to follow in [#1586](https://gitlab.com/meltano/meltano/issues/1586) )
-
 ### Fixes
 
-- [#1579](https://gitlab.com/meltano/meltano/issues/1579) Make color contrast for CTA buttons accessible
+### Breaks
+
 
 ## 1.15.1 - (2020-01-16)
 
