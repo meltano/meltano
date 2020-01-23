@@ -7,7 +7,6 @@ import markdown
 from flask import jsonify, request
 
 from meltano.core.project import Project
-from meltano.core.utils import decode_file_path_from_id
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.core.m5o.m5o_file_parser import (
@@ -119,28 +118,6 @@ def index():
         )
 
     return jsonify(sortedM5oFiles)
-
-
-@reposBP.route("/file/<unique_id>", methods=["GET"])
-def file(unique_id):
-    file_path = decode_file_path_from_id(unique_id)
-    (filename, ext) = os.path.splitext(file_path)
-    is_markdown = False
-    project = Project.find()
-    path_to_file = project.model_dir(file_path).resolve()
-    with open(path_to_file, "r") as read_file:
-        data = read_file.read()
-        if ext == ".md":
-            data = markdown.markdown(data)
-            is_markdown = True
-        return jsonify(
-            {
-                "file": data,
-                "is_markdown": is_markdown,
-                "id": unique_id,
-                "populated": True,
-            }
-        )
 
 
 def lint_all(compile):

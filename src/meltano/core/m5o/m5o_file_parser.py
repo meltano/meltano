@@ -3,6 +3,7 @@ import json
 import sqlparse
 from datetime import datetime, timezone
 import glob
+import uuid
 
 import networkx as nx
 
@@ -17,7 +18,7 @@ from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.sql.design_helper import PypikaJoinExecutor
 from meltano.core.project import Project
 from meltano.core.plugin.model import Package
-from meltano.core.utils import encode_id_from_file_path, slugify, find_named, NotFound
+from meltano.core.utils import slugify, find_named, NotFound
 
 
 class MeltanoAnalysisFileParserError(Exception):
@@ -387,7 +388,7 @@ class MeltanoAnalysisFileParser:
             file_dict = {"name": name}
 
         file_dict["path"] = str(file)
-        file_dict["id"] = encode_id_from_file_path(file_dict["path"])
+        file_dict["id"] = str(uuid.uuid4())
         file_dict["slug"] = slugify(name)
 
         # Legacy reports and dashboards can have a `createdAt` key that would
