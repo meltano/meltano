@@ -28,11 +28,13 @@ export default {
   },
   methods: {
     updatePosition() {
-      let isUpdated = this.index !== this.position - 1
+      const oldPosition = this.index
+      const newPosition = this.position - 1
+      const isUpdated = oldPosition !== newPosition
 
       this.$emit('update-report-position', {
-        oldPosition: this.index,
-        newPosition: this.position - 1,
+        oldPosition,
+        newPosition,
         isUpdated
       })
     }
