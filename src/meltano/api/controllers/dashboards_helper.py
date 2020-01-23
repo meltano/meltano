@@ -132,7 +132,7 @@ class DashboardsHelper:
         dashboard["description"] = new_settings["description"]
         dashboard["path"] = str(new_file_path)
 
-        if len(new_settings["report_ids"]) == len(dashboard["report_ids"]):
+        if set(new_settings["report_ids"]) == set(dashboard["report_ids"]):
             dashboard["report_ids"] = new_settings["report_ids"]
 
         with new_file_path.open("w") as f:
