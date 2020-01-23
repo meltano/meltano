@@ -48,7 +48,7 @@ class DashboardsService:
 
         return dashboard
 
-    def save_dashboard(self, data):
+    def save_dashboard(self, data, keep_id=False):
         name = data["name"]
 
         # guard if it already exists
@@ -59,7 +59,7 @@ class DashboardsService:
         slug = slugify(name)
         file_path = self.project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(
-            file_path.relative_to(self.project.root), slug, data
+            file_path.relative_to(self.project.root), slug, data, keep_id=keep_id
         )
         data["version"] = DashboardsService.VERSION
         data["description"] = data["description"] or ""

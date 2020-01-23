@@ -14,6 +14,10 @@ from meltano.core.m5o.dashboards_service import (
 )
 
 
+def find_by_id(records, id):
+    return next((r for r in records if r["id"] == id), None)
+
+
 class DashboardPlugin(PluginInstall):
     __plugin_type__ = PluginType.DASHBOARDS
 
@@ -67,20 +71,11 @@ class DashboardPlugin(PluginInstall):
 
     def add_report(self, report, local_reports, reports_service):
         try:
-            imported_report = next(
-                (
-                    lr
-                    for lr in local_reports
-                    if "imported_from_id" in lr
-                    and lr["imported_from_id"] == report["id"]
-                ),
-                None,
-            )
+            imported_report = find_by_id(local_reports, report["id"])
             if imported_report is not None:
                 raise ReportAlreadyExistsError(imported_report)
 
-            report["imported_from_id"] = report["id"]
-            report = reports_service.save_report(report)
+            report = reports_service.save_report(report, keep_id=True)
 
             logging.debug(
                 f"Added report with name '{report['name']}', ID '{report['id']}'"
@@ -126,20 +121,11 @@ class DashboardPlugin(PluginInstall):
 
     def add_dashboard(self, dashboard, local_dashboards, dashboards_service):
         try:
-            imported_dashboard = next(
-                (
-                    lr
-                    for lr in local_dashboards
-                    if "imported_from_id" in lr
-                    and lr["imported_from_id"] == dashboard["id"]
-                ),
-                None,
-            )
+            imported_dashboard = find_by_id(local_dashboards, dashboard["id"])
             if imported_dashboard is not None:
                 raise DashboardAlreadyExistsError(imported_dashboard)
 
-            dashboard["imported_from_id"] = dashboard["id"]
-            dashboard = dashboards_service.save_dashboard(dashboard)
+            dashboard = dashboards_service.save_dashboard(dashboard, keep_id=True)
 
             logging.debug(
                 f"Added dashboard with name '{dashboard['name']}', ID '{dashboard['id']}'"
