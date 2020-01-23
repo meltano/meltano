@@ -66,50 +66,64 @@ class DashboardPlugin(PluginInstall):
             )
 
     def import_report(self, report, reports_service):
-        return self.import_record(
+        report, existing = self.import_record(
             report,
-            "record",
-            get_func=reports_service.get_report,
             save_func=reports_service.save_report,
             already_exists_error=ReportAlreadyExistsError,
         )
 
+        if existing:
+            logging.debug(
+                f"Found existing report with name '{report['name']}', ID '{report['id']}'"
+            )
+        else:
+            logging.debug(
+                f"Added report with name '{report['name']}', ID '{report['id']}'"
+            )
+
+        return report
+
     def import_dashboard(self, dashboard, dashboards_service):
-        return self.import_record(
+        dashboard, existing = self.import_record(
             dashboard,
-            "dashboard",
-            get_func=dashboards_service.get_dashboard,
             save_func=dashboards_service.save_dashboard,
             already_exists_error=DashboardAlreadyExistsError,
         )
 
-    def import_record(
-        self, record, record_type, get_func, save_func, already_exists_error
-    ):
-        imported_record = get_func(record["id"])
-        if imported_record:
-            record = imported_record
-
+        if existing:
             logging.debug(
-                f"Found existing {record_type} with name '{record['name']}', ID '{record['id']}'"
+                f"Found existing dashboard with name '{dashboard['name']}', ID '{dashboard['id']}'"
             )
         else:
-            original_name = record["name"]
-            counter = 1
-            while True:
-                try:
-                    record = save_func(record, keep_id=True)
-                except already_exists_error:
-                    counter += 1
-                    record["name"] = f"{original_name} {counter}"
-                else:
-                    break
-
             logging.debug(
-                f"Added {record_type} with name '{record['name']}', ID '{record['id']}'"
+                f"Added dashboard with name '{dashboard['name']}', ID '{dashboard['id']}'"
             )
 
-        return record
+        return dashboard
+
+    def import_record(self, record, save_func, already_exists_error):
+        """
+        Imports record.
+
+        Returns `(record: Dict, existing: Bool)`
+        """
+        original_name = record["name"]
+        counter = 1
+
+        while True:
+            try:
+                record = save_func(record, keep_id=True)
+                return (record, False)
+            except already_exists_error as e:
+                if e.field == "slug":
+                    counter += 1
+                    record["name"] = f"{original_name} {counter}"
+
+                    # Retry!
+                    continue
+                else:
+                    record = e.record
+                    return (record, True)
 
     def add_reports_to_dashboard(self, dashboard, report_ids, dashboards_service):
         for report_id in report_ids:

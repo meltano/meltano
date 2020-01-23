@@ -10,8 +10,13 @@ from .m5o_file_parser import MeltanoAnalysisFileParser
 class ReportAlreadyExistsError(Exception):
     """Occurs when a report already exists."""
 
-    def __init__(self, report):
+    def __init__(self, report, field):
         self.report = report
+        self.field = field
+
+    @property
+    def record(self):
+        return self.report
 
 
 class ReportsService:
@@ -41,6 +46,11 @@ class ReportsService:
         return self.get_report_by_name(name)
 
     def save_report(self, data, keep_id=False):
+        if keep_id and "id" in data:
+            existing_report = self.get_report(data["id"])
+            if existing_report:
+                raise ReportAlreadyExistsError(existing_report, "id")
+
         name = data["name"]
         slug = slugify(name)
         file_path = self.project.analyze_dir("reports", f"{slug}.report.m5o")
@@ -48,7 +58,7 @@ class ReportsService:
         if os.path.exists(file_path):
             with file_path.open() as f:
                 existing_report = json.load(f)
-            raise ReportAlreadyExistsError(existing_report)
+            raise ReportAlreadyExistsError(existing_report, "slug")
 
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(
             file_path.relative_to(self.project.root), slug, data, keep_id=keep_id
