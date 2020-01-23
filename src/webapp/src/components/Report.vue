@@ -6,12 +6,12 @@ export default {
     Chart
   },
   props: {
-    index: {
-      type: Number,
-      required: true
-    },
     edit: {
       type: Boolean,
+      required: true
+    },
+    index: {
+      type: Number,
       required: true
     },
     report: {
