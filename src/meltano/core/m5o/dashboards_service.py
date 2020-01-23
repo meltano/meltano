@@ -36,16 +36,12 @@ class DashboardsService:
 
     def get_dashboard(self, dashboard_id):
         dashboards = self.get_dashboards()
-        target_dashboard = [
-            dashboard for dashboard in dashboards if dashboard["id"] == dashboard_id
-        ]
-
-        return target_dashboard[0]
+        dashboard = next(filter(lambda r: r["id"] == dashboard_id, dashboards), None)
+        return dashboard
 
     def get_dashboard_by_name(self, name):
         dashboards = self.get_dashboards()
         dashboard = next(filter(lambda r: r["name"] == name, dashboards), None)
-
         return dashboard
 
     def save_dashboard(self, data, keep_id=False):

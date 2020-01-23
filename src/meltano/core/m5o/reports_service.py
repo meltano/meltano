@@ -20,17 +20,22 @@ class ReportsService:
     def __init__(self, project):
         self.project = project
 
-    def get_report_by_name(self, name):
-        reports = self.get_reports()
-        report = next(filter(lambda r: r["name"] == name, reports), None)
-        return report
-
     def get_reports(self):
         reportsParser = M5oCollectionParser(
             self.project.analyze_dir("reports"), M5oCollectionParserTypes.Report
         )
 
         return reportsParser.parse()
+
+    def get_report(self, report_id):
+        reports = self.get_reports()
+        report = next(filter(lambda r: r["id"] == report_id, reports), None)
+        return report
+
+    def get_report_by_name(self, name):
+        reports = self.get_reports()
+        report = next(filter(lambda r: r["name"] == name, reports), None)
+        return report
 
     def load_report(self, name):
         return self.get_report_by_name(name)
