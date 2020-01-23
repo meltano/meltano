@@ -589,10 +589,11 @@ class SnowflakeSpecLoader:
             for role in grant_results:
                 for privilege in grant_results[role]:
                     for grant_on in grant_results[role][privilege]:
-                        future_grants.setdefault(role, {}).setdefault(
-                            privilege, {}
-                        ).setdefault(grant_on, []).extend(
-                            grant_results[role][privilege][grant_on]
+                        (
+                            future_grants.setdefault(role, {})
+                            .setdefault(privilege, {})
+                            .setdefault(grant_on, [])
+                            .extend(grant_results[role][privilege][grant_on])
                         )
 
             # Get all schemas in all ref'd databases. Not all schemas will be
@@ -603,20 +604,22 @@ class SnowflakeSpecLoader:
                 for role in grant_results:
                     for privilege in grant_results[role]:
                         for grant_on in grant_results[role][privilege]:
-                            future_grants.setdefault(role, {}).setdefault(
-                                privilege, {}
-                            ).setdefault(grant_on, []).extend(
-                                grant_results[role][privilege][grant_on]
+                            (
+                                future_grants.setdefault(role, {})
+                                .setdefault(privilege, {})
+                                .setdefault(grant_on, [])
+                                .extend(grant_results[role][privilege][grant_on])
                             )
 
         for role in self.entities["roles"]:
             grant_results = conn.show_grants_to_role(role)
             for privilege in grant_results:
                 for grant_on in grant_results[privilege]:
-                    future_grants.setdefault(role, {}).setdefault(
-                        privilege, {}
-                    ).setdefault(grant_on, []).extend(
-                        grant_results[privilege][grant_on]
+                    (
+                        future_grants.setdefault(role, {})
+                        .setdefault(privilege, {})
+                        .setdefault(grant_on, [])
+                        .extend(grant_results[privilege][grant_on])
                     )
 
         self.grants_to_role = future_grants
