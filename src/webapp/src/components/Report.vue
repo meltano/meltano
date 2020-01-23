@@ -27,6 +27,17 @@ export default {
     this.position = this.index + 1
   },
   methods: {
+    goToDesign(report) {
+      const params = {
+        design: report.design,
+        model: report.model,
+        namespace: report.namespace
+      }
+      this.$router.push({ name: 'analyzeDesign', params })
+    },
+    goToReport(report) {
+      this.$router.push({ name: 'report', params: report })
+    },
     updatePosition() {
       const oldPosition = this.index
       const newPosition = this.position - 1
