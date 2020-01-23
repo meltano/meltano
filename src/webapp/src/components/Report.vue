@@ -32,11 +32,13 @@ export default {
       const newPosition = this.position - 1
       const isUpdated = oldPosition !== newPosition
 
-      this.$emit('update-report-position', {
-        oldPosition,
-        newPosition,
-        isUpdated
-      })
+      if (isUpdated) {
+        this.$emit('update-report-position', {
+          oldPosition,
+          newPosition,
+          isUpdated
+        })
+      }
     }
   }
 }
