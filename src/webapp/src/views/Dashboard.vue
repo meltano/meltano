@@ -82,11 +82,11 @@ export default {
     goToReport(report) {
       this.$router.push({ name: 'report', params: report })
     },
-    updateReportPosition(data) {
-      const report = this.editableDashboardReports[data.oldPosition]
-      this.editableDashboardReports.splice(data.oldPosition, 1)
-      this.editableDashboardReports.splice(data.newPosition, 0, report)
-      this.isUpdated = data.isUpdated
+    updateReportPosition({ isUpdated, oldPosition, newPosition }) {
+      const report = this.editableDashboardReports[oldPosition]
+      this.editableDashboardReports.splice(oldPosition, 1)
+      this.editableDashboardReports.splice(newPosition, 0, report)
+      this.isUpdated = isUpdated
     },
     updateDashboardReportPositions() {
       if (this.isUpdated) {
