@@ -1,18 +1,22 @@
 <script>
+import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
 
-import Chart from '@/components/analyze/Chart'
+import Report from '@/components/Report'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
   name: 'Dashboard',
   components: {
-    Chart,
+    Report,
     RouterViewLayout
   },
   data() {
     return {
-      isActiveDashboardLoading: false
+      editableDashboardReports: [],
+      isActiveDashboardLoading: false,
+      isEditable: false,
+      isUpdated: false
     }
   },
   computed: {
@@ -27,6 +31,11 @@ export default {
       // eslint-disable-next-line
       return `mailto:?subject=Dashboard: ${this.activeDashboard.name}&body=${window.location}`
     },
+    displayedReports() {
+      return this.isEditable || this.isUpdated
+        ? this.editableDashboardReports
+        : this.activeDashboardReports
+    },
     isActive() {
       return dashboard => dashboard.id === this.activeDashboard.id
     }
@@ -37,6 +46,15 @@ export default {
       this.getActiveDashboardReportsWithQueryResults().then(() => {
         this.isActiveDashboardLoading = false
       })
+    },
+    isEditable() {
+      if (this.isEditable) {
+        this.editableDashboardReports = []
+
+        this.activeDashboardReports.forEach(report => {
+          this.editableDashboardReports.push(report)
+        })
+      }
     }
   },
   beforeDestroy() {
@@ -49,18 +67,41 @@ export default {
   methods: {
     ...mapActions('dashboards', [
       'initialize',
-      'getActiveDashboardReportsWithQueryResults'
+      'getActiveDashboardReportsWithQueryResults',
+      'updateActiveDashboardReports',
+      'updateDashboard'
     ]),
-    goToDesign(report) {
-      const params = {
-        design: report.design,
-        model: report.model,
-        namespace: report.namespace
-      }
-      this.$router.push({ name: 'analyzeDesign', params })
+    updateReportPosition({ isUpdated, oldPosition, newPosition }) {
+      const report = this.editableDashboardReports[oldPosition]
+      this.editableDashboardReports.splice(oldPosition, 1)
+      this.editableDashboardReports.splice(newPosition, 0, report)
+      this.isUpdated = isUpdated
     },
-    goToReport(report) {
-      this.$router.push({ name: 'report', params: report })
+    updateDashboardReportPositions() {
+      if (this.isUpdated) {
+        this.updateDashboard({
+          dashboard: this.activeDashboard,
+          newSettings: {
+            ...this.activeDashboard,
+            reportIds: this.editableDashboardReports.map(report => {
+              return report.id
+            })
+          }
+        })
+          .then(() => {
+            this.updateActiveDashboardReports(this.editableDashboardReports)
+            Vue.toasted.global.success(
+              `Dashboard reports order successfully saved!`
+            )
+          })
+          .catch(error => {
+            Vue.toasted.global.error(
+              `Dashboard reports order did not save correctly - ${error}`
+            )
+          })
+      }
+
+      this.isEditable = !this.isEditable
     }
   }
 }
@@ -78,8 +119,23 @@ export default {
             </h3>
           </div>
           <div class="column">
-            <div class="buttons is-pulled-right">
+            <div v-if="isEditable" class="buttons is-pulled-right">
+              <button class="button" @click="updateDashboardReportPositions">
+                Save
+              </button>
+              <button class="button" @click="isEditable = !isEditable">
+                Cancel
+              </button>
+            </div>
+            <div v-else class="buttons is-pulled-right">
               <a class="button" :href="dashboardEmail">Share</a>
+              <button
+                v-if="!isEditable"
+                class="button"
+                @click="isEditable = !isEditable"
+              >
+                Edit
+              </button>
               <router-link class="button" :to="{ name: 'dashboards' }"
                 >Back to Dashboards</router-link
               >
@@ -87,36 +143,15 @@ export default {
           </div>
         </div>
 
-        <div v-if="activeDashboardReports.length" class="columns is-multiline">
-          <div
-            v-for="report in activeDashboardReports"
-            :key="report.id"
-            class="column is-half"
-          >
-            <div class="box">
-              <div class="columns is-vcentered">
-                <div class="column">
-                  <h3 class="title is-5 is-inline-block">{{ report.name }}</h3>
-                  <div class="field is-pulled-right is-inline-block">
-                    <div class="buttons">
-                      <a class="button is-small" @click="goToReport(report)"
-                        >Edit</a
-                      >
-                      <a class="button is-small" @click="goToDesign(report)"
-                        >Explore</a
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <chart
-                :chart-type="report.chartType"
-                :results="report.queryResults"
-                :result-aggregates="report.queryResultAggregates"
-              ></chart>
-            </div>
-          </div>
+        <div v-if="displayedReports.length" class="columns is-multiline">
+          <Report
+            v-for="(report, index) in displayedReports"
+            :key="`${report.id}-${index}`"
+            :report="report"
+            :index="index"
+            :edit="isEditable"
+            @update-report-position="updateReportPosition"
+          />
         </div>
 
         <progress

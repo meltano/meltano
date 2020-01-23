@@ -14,6 +14,18 @@ const defaultState = utils.deepFreeze({
   reports: []
 })
 
+const getters = {
+  activeReports: (state, getters) => {
+    return getters.activeReportIds.map(reportId => {
+      return state.reports.find(report => report.id === reportId)
+    })
+  },
+
+  activeReportIds: state => {
+    return state.activeDashboard.reportIds
+  }
+}
+
 const actions = {
   addReportToDashboard({ commit, dispatch }, data) {
     commit('addReportToDashboard', data)
@@ -42,14 +54,9 @@ const actions = {
       })
   },
 
-  getActiveDashboardReportsWithQueryResults({ commit, state }) {
-    const ids = state.activeDashboard.reportIds
-    const activeReports = state.reports.filter(report =>
-      ids.includes(report.id)
-    )
-
+  getActiveDashboardReportsWithQueryResults({ commit, getters }) {
     return dashboardsApi
-      .getActiveDashboardReportsWithQueryResults(activeReports)
+      .getActiveDashboardReportsWithQueryResults(getters.activeReports)
       .then(response => {
         commit('setActiveDashboardReports', response.data)
       })
@@ -79,7 +86,7 @@ const actions = {
     })
   },
 
-  preloadDashboard({ dispatch, state }, slug) {
+  preloadDashboard({ dispatch, state, getters }, slug) {
     // Load from slug or refresh existing activeDashboard's reports with activeDashboardReports
     if (slug) {
       const dashboardMatch = state.dashboards.find(
@@ -88,7 +95,7 @@ const actions = {
       if (dashboardMatch) {
         dispatch('updateCurrentDashboard', dashboardMatch)
       }
-    } else if (state.activeDashboard.reportIds) {
+    } else if (getters.activeReportIds) {
       dispatch('getActiveDashboardReportsWithQueryResults')
     }
   },
@@ -101,13 +108,19 @@ const actions = {
     })
   },
 
+  reorderDashboardReports({ dispatch }, payload) {
+    dashboardsApi.reorderDashboardReports(payload).then(response => {
+      dispatch('updateCurrentDashboard', response.data)
+    })
+  },
+
   resetActiveDashboard: ({ commit }) => commit('reset', 'activeDashboard'),
 
   resetActiveDashboardReports: ({ commit }) =>
     commit('reset', 'activeDashboardReports'),
 
-  saveDashboard({ dispatch, commit }, data) {
-    return dashboardsApi.saveDashboard(data).then(response => {
+  saveDashboard({ dispatch, commit }, payload) {
+    return dashboardsApi.saveDashboard(payload).then(response => {
       commit('addSavedDashboardToDashboards', response.data)
       dispatch('updateCurrentDashboard', response.data)
     })
@@ -126,8 +139,13 @@ const actions = {
     })
   },
 
-  updateCurrentDashboard({ commit }, dashboard) {
+  updateActiveDashboardReports({ commit }, reports) {
+    commit('setActiveDashboardReports', reports)
+  },
+
+  updateCurrentDashboard({ commit, dispatch }, dashboard) {
     commit('setCurrentDashboard', dashboard)
+    dispatch('getActiveDashboardReportsWithQueryResults')
   },
 
   updateDashboard({ commit }, payload) {
@@ -202,6 +220,7 @@ const mutations = {
 export default {
   namespaced: true,
   state: lodash.cloneDeep(defaultState),
+  getters,
   actions,
   mutations
 }
