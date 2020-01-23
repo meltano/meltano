@@ -37,14 +37,14 @@ class ReportsService:
 
     def save_report(self, data, keep_id=False):
         name = data["name"]
-
-        # guard if it already exists
-        existing_report = self.get_report_by_name(name)
-        if existing_report:
-            raise ReportAlreadyExistsError(existing_report)
-
         slug = slugify(name)
         file_path = self.project.analyze_dir("reports", f"{slug}.report.m5o")
+
+        if os.path.exists(file_path):
+            with file_path.open() as f:
+                existing_report = json.load(f)
+            raise ReportAlreadyExistsError(existing_report)
+
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(
             file_path.relative_to(self.project.root), slug, data, keep_id=keep_id
         )

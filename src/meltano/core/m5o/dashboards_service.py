@@ -50,14 +50,14 @@ class DashboardsService:
 
     def save_dashboard(self, data, keep_id=False):
         name = data["name"]
-
-        # guard if it already exists
-        existing_dashboard = self.get_dashboard_by_name(name)
-        if existing_dashboard:
-            raise DashboardAlreadyExistsError(existing_dashboard)
-
         slug = slugify(name)
         file_path = self.project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
+
+        if os.path.exists(file_path):
+            with file_path.open() as f:
+                existing_dashboard = json.load(f)
+            raise DashboardAlreadyExistsError(existing_dashboard)
+
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(
             file_path.relative_to(self.project.root), slug, data, keep_id=keep_id
         )
