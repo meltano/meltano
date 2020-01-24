@@ -117,12 +117,11 @@ export default {
         config: configuration.profiles[0].config, // TODO refactor when we reintroduce profiles
         settings: configuration.settings
       }
+
       this.isValidConfig = this.getHasValidConfigSettings(
         configSettings,
         this.extractorInFocus.settingsGroupValidation
       )
-
-      console.log("isValid", this.isValidConfig)
     }
   }
 }
