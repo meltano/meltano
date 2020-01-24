@@ -216,7 +216,7 @@ export default {
         this.$refs.docs.contentWindow.postMessage(
           {
             source: 'meltano',
-            anchor: anchorName.replace('setting-', '').replace('_', '-')
+            anchor: anchorName.replace('setting-', '').replace(/_/g, '-')
           },
           '*'
         )
