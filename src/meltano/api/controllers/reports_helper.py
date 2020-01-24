@@ -30,6 +30,12 @@ class ReportAlreadyExistsError(Exception):
 class ReportsHelper:
     VERSION = "1.0.0"
 
+    def get_embed_snippet(self, name):
+        # TODO util to connect to app/system db, get match, or generate new
+        return  {
+            "snippet": f"<iframe src='meltano.meltanodata.com/-/public/{name}' />"
+        }
+
     def get_report_by_name(self, name):
         reports = self.get_reports()
         report = next(filter(lambda r: r["name"] == name, reports), None)
