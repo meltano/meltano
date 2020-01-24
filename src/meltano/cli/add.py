@@ -13,107 +13,59 @@ from meltano.core.project_add_service import (
     PluginNotSupportedException,
     PluginAlreadyAddedException,
 )
+from meltano.core.plugin_discovery_service import (
+    PluginDiscoveryService,
+    PluginNotFoundError,
+)
 from meltano.core.project_add_custom_service import ProjectAddCustomService
 from meltano.core.plugin_install_service import (
     PluginInstallService,
     PluginNotInstallable,
 )
-from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin import PluginType, Plugin
 from meltano.core.project import Project
-from meltano.core.transform_add_service import TransformAddService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.error import SubprocessError
 from meltano.core.db import project_engine
 
 
-@cli.group()
+@cli.command()
+@click.argument(
+    "plugin_type", type=click.Choice([type.cli_command for type in list(PluginType)])
+)
+@click.argument("plugin_name")
 @click.option("--custom", is_flag=True)
+@click.option("--include-related", is_flag=True)
 @project()
 @click.pass_context
-def add(ctx, project, custom):
-    if custom:
-        if ctx.invoked_subcommand in (
-            "transformer",
-            "transform",
-            "orchestrator",
-            "connections",
-        ):
+def add(ctx, project, plugin_type, plugin_name, **flags):
+    if flags["custom"]:
+        if plugin_type in ("transformer", "transform", "orchestrator"):
             click.secho(f"--custom is not supported for {ctx.invoked_subcommand}")
             raise click.Abort()
 
-        ctx.obj["add_service"] = ProjectAddCustomService(project)
+        add_service = ProjectAddCustomService(project)
     else:
-        ctx.obj["add_service"] = ProjectAddService(project)
+        add_service = ProjectAddService(project)
 
-
-@add.command()
-@click.argument("plugin_name")
-@project()
-@click.pass_context
-def extractor(ctx, project, plugin_name):
-    add_plugin(ctx.obj["add_service"], project, PluginType.EXTRACTORS, plugin_name)
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="extractor", plugin_name=plugin_name)
-
-
-@add.command()
-@click.argument("plugin_name")
-@project()
-@click.pass_context
-def model(ctx, project, plugin_name):
-    add_plugin(ctx.obj["add_service"], project, PluginType.MODELS, plugin_name)
+    add_plugin(
+        add_service,
+        project,
+        PluginType(f"{plugin_type}s"),
+        plugin_name,
+        include_related=flags["include_related"],
+    )
 
     tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="model", plugin_name=plugin_name)
-
-
-@add.command()
-@click.argument("plugin_name")
-@project()
-@click.pass_context
-def loader(ctx, project, plugin_name):
-    add_plugin(ctx.obj["add_service"], project, PluginType.LOADERS, plugin_name)
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="loader", plugin_name=plugin_name)
-
-
-@add.command()
-@click.argument("plugin_name")
-@project()
-@click.pass_context
-def transformer(ctx, project, plugin_name):
-    add_plugin(ctx.obj["add_service"], project, PluginType.TRANSFORMERS, plugin_name)
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="transformer", plugin_name=plugin_name)
-
-
-@add.command()
-@click.argument("plugin_name")
-@project()
-@click.pass_context
-def orchestrator(ctx, project, plugin_name):
-    add_plugin(ctx.obj["add_service"], project, PluginType.ORCHESTRATORS, plugin_name)
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="orchestrator", plugin_name=plugin_name)
-
-
-@add.command()
-@click.argument("plugin_name")
-@project()
-def transform(project, plugin_name):
-    add_transform(project, plugin_name)
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="transform", plugin_name=plugin_name)
+    tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
 
 
 def add_plugin(
-    add_service, project: Project, plugin_type: PluginType, plugin_name: str
+    add_service,
+    project: Project,
+    plugin_type: PluginType,
+    plugin_name: str,
+    include_related=False,
 ):
     try:
         plugin = add_service.add(plugin_type, plugin_name)
@@ -129,11 +81,13 @@ def add_plugin(
         click.secho(f"Error: {plugin_type} '{plugin_name}' is not supported.", fg="red")
         raise click.Abort()
 
+    install_service = PluginInstallService(project)
+
     try:
         click.secho(f"Installing '{plugin_name}'...")
-        install_service = PluginInstallService(project)
         run = install_service.install_plugin(plugin)
-        click.secho(run.stdout)
+        if run:
+            click.secho(run.stdout)
         click.secho(f"Installed '{plugin_name}'.", fg="green")
 
         click.secho(f"Added and installed {plugin_type} '{plugin_name}'.", fg="green")
@@ -148,28 +102,33 @@ def add_plugin(
     if docs_link:
         click.secho(f"Visit {docs_link} for more details about '{plugin.name}'.")
 
+    if include_related:
+        discovery_service = PluginDiscoveryService(project)
+        plugin_def = discovery_service.find_plugin(plugin.type, plugin.name)
 
-def add_transform(project: Project, plugin_name: str):
-    try:
-        project_add_service = ProjectAddService(project)
-        plugin = project_add_service.add(PluginType.TRANSFORMS, plugin_name)
-        click.secho(
-            f"Added transform '{plugin.name}' to your Meltano project.", fg="green"
-        )
+        related_plugins = add_service.add_related(plugin_def)
+        if len(related_plugins) == 0:
+            click.secho("No related plugins found that are not already installed.")
+        else:
+            for plugin in related_plugins:
+                click.secho(
+                    f"Added related plugin '{plugin.name}' to your Meltano project.",
+                    fg="green",
+                )
 
-        # Add repo to my-test-project/transform/packages.yml
-        transform_add_service = TransformAddService(project)
-        transform_add_service.add_to_packages(plugin)
-        click.secho(
-            f"Added transform '{plugin.name}' to your dbt packages.", fg="green"
-        )
+            click.secho(f"Installing {len(related_plugins)} related plugins...")
+            install_status = install_service.install_plugins(related_plugins)
 
-        # Add model and vars to my-test-project/transform/dbt_project.yml
-        transform_add_service.update_dbt_project(plugin)
-        click.secho(
-            f"Added transform '{plugin.name}' to your dbt_project.yml.", fg="green"
-        )
-        click.secho(f"Installed '{plugin.name}'.", fg="green")
-    except (PluginNotSupportedException, PluginNotFoundError):
-        click.secho(f"Error: transform '{plugin_name}' is not supported.", fg="red")
-        raise click.Abort()
+            num_installed = len(install_status["installed"])
+            num_failed = len(install_status["errors"])
+
+            fg = "green"
+            if num_failed >= 0 and num_installed == 0:
+                fg = "red"
+            elif num_failed > 0 and num_installed > 0:
+                fg = "yellow"
+
+            click.secho(
+                f"Installed {num_installed}/{num_installed+num_failed} related plugins.",
+                fg=fg,
+            )

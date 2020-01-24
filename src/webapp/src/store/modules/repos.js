@@ -46,12 +46,6 @@ const getters = {
 }
 
 const actions = {
-  getFile({ commit }, file) {
-    repoApi.file(file.id).then(response => {
-      commit('setCurrentFileTable', response.data)
-    })
-  },
-
   getAllModels({ commit }) {
     repoApi.models().then(response => {
       commit('setModels', response.data)

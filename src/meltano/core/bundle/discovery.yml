@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributing.html#discovery-yml-version for more information.
-version: 8
+version: 9
 
 extractors:
   - name: tap-carbon-intensity
@@ -453,6 +453,10 @@ models:
   - name: model-google-analytics
     namespace: tap_google_analytics
     pip_url: 'git+https://gitlab.com/meltano/model-google-analytics.git'
+dashboards:
+  - name: dashboard-google-analytics
+    namespace: tap_google_analytics
+    pip_url: 'git+https://gitlab.com/meltano/dashboard-google-analytics.git'
 orchestrators:
   - name: airflow
     namespace: airflow

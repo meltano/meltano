@@ -19,6 +19,8 @@ When you add a extractor or loader to a Meltano instance, Meltano will:
 1. Add it to the `meltano.yml` file
 1. Installs it in the `.meltano` directory with `venv` and `pip`
 
+You can run `meltano add` with `--include-related` to automatically install all transform, model, and dashboard plugins related to an extractor.
+
 #### Examples
 
 ```bash
@@ -27,6 +29,9 @@ meltano add [extractor | loader] [name_of_plugin]
 
 # Extractor Example
 meltano add extractor tap-gitlab
+
+# Extractor Example including related plugins
+meltano add --include-related extractor tap-google-analytics
 
 # Loader Example
 meltano add loader target-postgres
@@ -52,12 +57,25 @@ meltano add [transform] [name_of_transform]
 When you add a model to a Meltano instance, Meltano will:
 
 1. Add a model bundle to your `meltano.yml` file to help you interactively generate SQL
-1. Installed inside the `.meltano` directory which are then available to use in the Meltano webapp
+1. Install the model inside the `.meltano` directory which are then available to use in the Meltano webapp
 
 #### Example
 
 ```bash
 meltano add model [name_of_model]
+```
+
+### Dashboard
+
+When you add a dashboard to a Meltano instance, Meltano will:
+
+1. Add a dashboard bundle to your `meltano.yml` file
+1. Install the dashboard and reports inside the `analyze` directory which are then available to use in the Meltano webapp
+
+#### Example
+
+```bash
+meltano add dashboard [name_of_dashboard]
 ```
 
 ### Orchestration
@@ -201,10 +219,14 @@ meltano init [project_name] [--no_usage_stats]
 
 Installs all the dependencies of your project based on the **meltano.yml** file.
 
+Use `--include-related` to automatically install transform, model, and dashboard plugins related to installed extractor plugins.
+
 ### How to Use
 
 ```bash
 meltano install
+
+meltano install --include-related
 ```
 
 ## `invoke`

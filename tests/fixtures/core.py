@@ -51,14 +51,6 @@ def discovery():
         {"name": "target-mock", "namespace": "target_mock", "pip_url": "target-mock"}
     )
 
-    discovery[PluginType.TRANSFORMERS].append(
-        {
-            "name": "transformer-mock",
-            "namespace": "transformer_mock",
-            "pip_url": "transformer-mock",
-        }
-    )
-
     discovery[PluginType.TRANSFORMS].append(
         {
             "name": "tap-mock-transform",
@@ -70,8 +62,16 @@ def discovery():
     discovery[PluginType.MODELS].append(
         {
             "name": "model-gitlab",
-            "namespace": "pytest",
+            "namespace": "tap_gitlab",
             "pip_url": "git+https://gitlab.com/meltano/model-gitlab.git",
+        }
+    )
+
+    discovery[PluginType.DASHBOARDS].append(
+        {
+            "name": "dashboard-google-analytics",
+            "namespace": "tap_google_analytics",
+            "pip_url": "git+https://gitlab.com/meltano/dashboard-google-analytics.git",
         }
     )
 
@@ -80,6 +80,14 @@ def discovery():
             "name": "orchestrator-mock",
             "namespace": "pytest",
             "pip_url": "orchestrator-mock",
+        }
+    )
+
+    discovery[PluginType.TRANSFORMERS].append(
+        {
+            "name": "transformer-mock",
+            "namespace": "transformer_mock",
+            "pip_url": "transformer-mock",
         }
     )
 
@@ -151,7 +159,6 @@ def add_model(project, plugin_install_service, project_add_service):
 
     for model in MODELS:
         plugin = project_add_service.add(PluginType.MODELS, model)
-        plugin_install_service.create_venv(plugin)
         plugin_install_service.install_plugin(plugin)
 
     yield
