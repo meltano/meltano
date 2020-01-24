@@ -12,13 +12,13 @@ class TestCliAdd:
     @pytest.mark.parametrize(
         "plugin_type,plugin_name",
         [
-            (PluginType.ORCHESTRATORS, "airflow"),
-            (PluginType.TRANSFORMERS, "dbt"),
             (PluginType.EXTRACTORS, "tap-carbon-intensity"),
             (PluginType.LOADERS, "target-sqlite"),
             (PluginType.TRANSFORMS, "tap-carbon-intensity"),
             (PluginType.MODELS, "model-carbon-intensity"),
             (PluginType.DASHBOARDS, "dashboard-google-analytics"),
+            (PluginType.ORCHESTRATORS, "airflow"),
+            (PluginType.TRANSFORMERS, "dbt"),
         ],
     )
     def test_add(self, plugin_type, plugin_name, project, cli_runner, config_service):

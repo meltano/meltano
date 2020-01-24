@@ -16,20 +16,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 
 @cli.command()
 @click.argument(
-    "plugin_type",
-    type=click.Choice(
-        [
-            PluginType.DASHBOARDS,
-            PluginType.EXTRACTORS,
-            PluginType.LOADERS,
-            PluginType.TRANSFORMERS,
-            PluginType.MODELS,
-            PluginType.TRANSFORMS,
-            PluginType.ORCHESTRATORS,
-            "all",
-        ]
-    ),
-    default="all",
+    "plugin_type", type=click.Choice([*list(PluginType), "all"]), default="all"
 )
 @project()
 def discover(project, plugin_type):

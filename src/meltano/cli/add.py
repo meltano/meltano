@@ -31,21 +31,7 @@ from meltano.core.db import project_engine
 
 @cli.command()
 @click.argument(
-    "plugin_type",
-    type=click.Choice(
-        [
-            type.cli_command
-            for type in [
-                PluginType.DASHBOARDS,
-                PluginType.EXTRACTORS,
-                PluginType.LOADERS,
-                PluginType.TRANSFORMERS,
-                PluginType.MODELS,
-                PluginType.TRANSFORMS,
-                PluginType.ORCHESTRATORS,
-            ]
-        ]
-    ),
+    "plugin_type", type=click.Choice([type.cli_command for type in list(PluginType)])
 )
 @click.argument("plugin_name")
 @click.option("--custom", is_flag=True)
