@@ -85,6 +85,13 @@ const getters = {
       return state.pipelines.find(pipeline => pipeline.extractor === extractor)
         .endedAt
     }
+  },
+
+  startDate(state) {
+    return extractor => {
+      return state.pipelines.find(pipeline => pipeline.extractor === extractor)
+        .startDate
+    }
   }
 }
 

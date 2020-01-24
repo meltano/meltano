@@ -60,7 +60,7 @@ export default {
       'resultsCount',
       'showJoinColumnAggregateHeader'
     ]),
-    ...mapGetters('orchestration', ['lastUpdatedDate']),
+    ...mapGetters('orchestration', ['lastUpdatedDate', 'startDate']),
     ...mapState('dashboards', ['dashboards']),
 
     hasActiveReport() {
@@ -75,6 +75,12 @@ export default {
       const extractor = `tap-${this.currentModel}`
 
       return utils.formatDateStringYYYYMMDD(this.lastUpdatedDate(extractor))
+    },
+
+    formattedDataStartDate() {
+      const extractor = `tap-${this.currentModel}`
+
+      return utils.formatDateStringYYYYMMDD(this.startDate(extractor))
     },
 
     limit: {
@@ -299,7 +305,7 @@ export default {
           </div>
           <div v-if="design.description">{{ design.description }}</div>
           <p class="has-text-grey">
-            Data starting from: {{ formattedLastUpdatedDate }}
+            Data starting from: {{ formattedDataStartDate }}
           </p>
         </div>
       </div>
