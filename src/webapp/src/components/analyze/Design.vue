@@ -58,7 +58,8 @@ export default {
       'hasJoins',
       'hasResults',
       'resultsCount',
-      'showJoinColumnAggregateHeader'
+      'showJoinColumnAggregateHeader',
+      'isTimeframeSelected'
     ]),
     ...mapState('dashboards', ['dashboards']),
 
@@ -270,6 +271,13 @@ export default {
       this.$store.dispatch('designs/updateReport').then(() => {
         Vue.toasted.global.success(`Report Updated - ${this.activeReport.name}`)
       })
+    },
+
+    $key(...attrs) {
+      console.log(attrs)
+      const extractKey = obj => obj['name'] || String(obj)
+
+      return attrs.map(extractKey).join(':')
     }
   }
 }
@@ -599,31 +607,10 @@ export default {
                 >
                   Columns
                 </a>
-                <template v-for="timeframe in design.relatedTable.timeframes">
-                  <a
-                    :key="timeframe.label"
-                    class="panel-block timeframe"
-                    :class="{ 'is-active': timeframe.selected }"
-                    @click="timeframeSelected(timeframe)"
-                  >
-                    {{ timeframe.label }}
-                  </a>
-                  <template v-for="period in timeframe.periods">
-                    <a
-                      v-if="timeframe.selected"
-                      :key="period.label"
-                      class="panel-block indented"
-                      :class="{ 'is-active': period.selected }"
-                      @click="timeframePeriodSelected(timeframe, period)"
-                    >
-                      {{ period.label }}
-                    </a>
-                  </template>
-                </template>
                 <template v-for="column in design.relatedTable.columns">
                   <a
                     v-if="!column.hidden"
-                    :key="column.label"
+                    :key="$key(design.relatedTable, 'column', column)"
                     :data-test-id="`column-${column.label}`.toLowerCase()"
                     class="panel-block space-between has-text-weight-medium"
                     :class="{ 'is-active': column.selected }"
@@ -649,6 +636,37 @@ export default {
                 </template>
                 <!-- eslint-disable-next-line vue/require-v-for-key -->
                 <a
+                  v-if="design.relatedTable.timeframes"
+                  class="panel-block
+                         attribute-heading
+                         has-text-weight-semibold
+                         has-background-white"
+                >
+                  Timeframes
+                </a>
+                <template v-for="timeframe in design.relatedTable.timeframes">
+                  <a
+                    :key="$key(design.relatedTable, 'timeframe', timeframe)"
+                    class="panel-block timeframe"
+                    :class="{ 'is-active': isTimeframeSelected(timeframe) }"
+                    @click="timeframeSelected(timeframe)"
+                  >
+                    {{ timeframe.label }}
+                  </a>
+                  <template v-for="period in timeframe.periods">
+                    <a
+                      v-if="timeframe.selected"
+                      :key="period.label"
+                      class="panel-block indented"
+                      :class="{ 'is-active': period.selected }"
+                      @click="timeframePeriodSelected(timeframe, period)"
+                    >
+                      {{ period.label }}
+                    </a>
+                  </template>
+                </template>
+                <!-- eslint-disable-next-line vue/require-v-for-key -->
+                <a
                   v-if="
                     showJoinColumnAggregateHeader(
                       design.relatedTable.aggregates
@@ -663,7 +681,7 @@ export default {
                 </a>
                 <a
                   v-for="aggregate in design.relatedTable.aggregates"
-                  :key="aggregate.label"
+                  :key="$key(design.relatedTable, 'aggregate', aggregate)"
                   :data-test-id="`aggregate-${aggregate.label}`.toLowerCase()"
                   class="panel-block space-between has-text-weight-medium"
                   :class="{ 'is-active': aggregate.selected }"

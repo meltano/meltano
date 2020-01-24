@@ -26,6 +26,7 @@ export default {
     ...mapGetters('designs', [
       'getAttributes',
       'getFormattedValue',
+      'getIsOrderableAttribute',
       'hasResults',
       'isColumnSelectedAggregate'
     ]),
@@ -88,7 +89,10 @@ export default {
               <div class="is-flex">
                 <div
                   class="sort-header"
-                  @click="updateSortAttribute(queryAttribute)"
+                  @click="
+                    getIsOrderableAttribute(queryAttribute) &&
+                      updateSortAttribute(queryAttribute)
+                  "
                 >
                   <span>{{ queryAttribute.attributeLabel }}</span>
                 </div>
@@ -103,6 +107,7 @@ export default {
                     }`
                   "
                   :menu-classes="'dropdown-menu-300'"
+                  :disabled="!getIsOrderableAttribute(queryAttribute)"
                   icon-open="sort"
                   icon-close="caret-down"
                   is-right-aligned
