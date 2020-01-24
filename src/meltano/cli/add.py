@@ -28,146 +28,49 @@ from meltano.core.error import SubprocessError
 from meltano.core.db import project_engine
 
 
-@cli.group()
+@cli.command()
+@click.argument(
+    "plugin_type",
+    type=click.Choice(
+        [
+            type.cli_command
+            for type in [
+                PluginType.DASHBOARDS,
+                PluginType.EXTRACTORS,
+                PluginType.LOADERS,
+                PluginType.TRANSFORMERS,
+                PluginType.MODELS,
+                PluginType.TRANSFORMS,
+                PluginType.ORCHESTRATORS,
+            ]
+        ]
+    ),
+)
+@click.argument("plugin_name")
 @click.option("--custom", is_flag=True)
 @click.option("--include-related", is_flag=True)
 @project()
 @click.pass_context
-def add(ctx, project, include_related, custom):
-    if custom:
-        if ctx.invoked_subcommand in (
-            "transformer",
-            "transform",
-            "orchestrator",
-            "connections",
-        ):
+def add(ctx, project, plugin_type, plugin_name, **flags):
+    if flags["custom"]:
+        if plugin_type in ("transformer", "transform", "orchestrator"):
             click.secho(f"--custom is not supported for {ctx.invoked_subcommand}")
             raise click.Abort()
 
-        ctx.obj["add_service"] = ProjectAddCustomService(project)
+        add_service = ProjectAddCustomService(project)
     else:
-        ctx.obj["add_service"] = ProjectAddService(project)
+        add_service = ProjectAddService(project)
 
-    ctx.obj["include_related"] = include_related
-
-
-@add.command()
-@click.argument("plugin_name")
-@project()
-@click.pass_context
-def dashboard(ctx, project, plugin_name):
     add_plugin(
-        ctx.obj["add_service"],
+        add_service,
         project,
-        PluginType.DASHBOARDS,
+        PluginType(f"{plugin_type}s"),
         plugin_name,
-        include_related=ctx.obj["include_related"],
+        include_related=flags["include_related"],
     )
 
     tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="dashboard", plugin_name=plugin_name)
-
-
-@add.command()
-@click.argument("plugin_name")
-@project()
-@click.pass_context
-def extractor(ctx, project, plugin_name):
-    add_plugin(
-        ctx.obj["add_service"],
-        project,
-        PluginType.EXTRACTORS,
-        plugin_name,
-        include_related=ctx.obj["include_related"],
-    )
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="extractor", plugin_name=plugin_name)
-
-
-@add.command()
-@click.argument("plugin_name")
-@project()
-@click.pass_context
-def model(ctx, project, plugin_name):
-    add_plugin(
-        ctx.obj["add_service"],
-        project,
-        PluginType.MODELS,
-        plugin_name,
-        include_related=ctx.obj["include_related"],
-    )
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="model", plugin_name=plugin_name)
-
-
-@add.command()
-@click.argument("plugin_name")
-@project()
-@click.pass_context
-def loader(ctx, project, plugin_name):
-    add_plugin(
-        ctx.obj["add_service"],
-        project,
-        PluginType.LOADERS,
-        plugin_name,
-        include_related=ctx.obj["include_related"],
-    )
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="loader", plugin_name=plugin_name)
-
-
-@add.command()
-@click.argument("plugin_name")
-@project()
-@click.pass_context
-def transformer(ctx, project, plugin_name):
-    add_plugin(
-        ctx.obj["add_service"],
-        project,
-        PluginType.TRANSFORMERS,
-        plugin_name,
-        include_related=ctx.obj["include_related"],
-    )
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="transformer", plugin_name=plugin_name)
-
-
-@add.command()
-@click.argument("plugin_name")
-@project()
-@click.pass_context
-def orchestrator(ctx, project, plugin_name):
-    add_plugin(
-        ctx.obj["add_service"],
-        project,
-        PluginType.ORCHESTRATORS,
-        plugin_name,
-        include_related=ctx.obj["include_related"],
-    )
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="orchestrator", plugin_name=plugin_name)
-
-
-@add.command()
-@click.argument("plugin_name")
-@project()
-@click.pass_context
-def transform(ctx, project, plugin_name):
-    add_plugin(
-        ctx.obj["add_service"],
-        project,
-        PluginType.TRANSFORMS,
-        plugin_name,
-        include_related=ctx.obj["include_related"],
-    )
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="transform", plugin_name=plugin_name)
+    tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
 
 
 def add_plugin(
