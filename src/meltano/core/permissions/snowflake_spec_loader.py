@@ -577,11 +577,52 @@ class SnowflakeSpecLoader:
     def get_privileges_from_snowflake_server(self) -> None:
         """
         Get the privileges granted to users and roles in the Snowflake account
+        Gets the future privileges granted in all database and schema objects
+        Consolidates role and future privileges into a single object for self.grants_to_role
         """
         conn = SnowflakeConnector()
 
+        future_grants = {}
+        for database in self.entities["database_refs"]:
+            grant_results = conn.show_future_grants(database=database)
+
+            for role in grant_results:
+                for privilege in grant_results[role]:
+                    for grant_on in grant_results[role][privilege]:
+                        (
+                            future_grants.setdefault(role, {})
+                            .setdefault(privilege, {})
+                            .setdefault(grant_on, [])
+                            .extend(grant_results[role][privilege][grant_on])
+                        )
+
+            # Get all schemas in all ref'd databases. Not all schemas will be
+            # ref'd in the spec.
+            for schema in conn.show_schemas(database=database):
+                grant_results = conn.show_future_grants(schema=schema)
+
+                for role in grant_results:
+                    for privilege in grant_results[role]:
+                        for grant_on in grant_results[role][privilege]:
+                            (
+                                future_grants.setdefault(role, {})
+                                .setdefault(privilege, {})
+                                .setdefault(grant_on, [])
+                                .extend(grant_results[role][privilege][grant_on])
+                            )
+
         for role in self.entities["roles"]:
-            self.grants_to_role[role] = conn.show_grants_to_role(role)
+            grant_results = conn.show_grants_to_role(role)
+            for privilege in grant_results:
+                for grant_on in grant_results[privilege]:
+                    (
+                        future_grants.setdefault(role, {})
+                        .setdefault(privilege, {})
+                        .setdefault(grant_on, [])
+                        .extend(grant_results[privilege][grant_on])
+                    )
+
+        self.grants_to_role = future_grants
 
         for user in self.entities["users"]:
             self.roles_granted_to_user[user] = conn.show_roles_granted_to_user(user)
