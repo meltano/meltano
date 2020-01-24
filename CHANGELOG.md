@@ -24,8 +24,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1600](https://gitlab.com/meltano/meltano/issues/1600) Fix tooltip for Data Source "Connect" buttons
 - [#1605](https://gitlab.com/meltano/meltano/issues/1605) Fix an infinite loop causing extraneous API calls to the configuration endpoint
-
-### Breaks
 - [#1561](https://gitlab.com/meltano/meltano/issues/1561) Fix `onFocusInput` to properly focus-and-auto-scroll to `<input>`s of `type='file'` in the data source docs UI
 
 ### Breaks
