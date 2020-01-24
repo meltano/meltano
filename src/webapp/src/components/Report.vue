@@ -109,8 +109,4 @@ export default {
   color: red;
   border: 3px dotted #ddd;
 }
-
-.mb-05r {
-  margin-bottom: 0.5rem;
-}
 </style>
