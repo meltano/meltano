@@ -22,6 +22,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1605](https://gitlab.com/meltano/meltano/issues/1605) Fix an infinite loop causing extraneous API calls to the configuration endpoint
+
 ### Breaks
 
 
