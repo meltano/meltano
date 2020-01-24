@@ -66,10 +66,11 @@ class SettingDefinition(NameEq, Canonical):
 class PluginType(YAMLEnum):
     EXTRACTORS = "extractors"
     LOADERS = "loaders"
-    MODELS = "models"
-    TRANSFORMERS = "transformers"
     TRANSFORMS = "transforms"
+    MODELS = "models"
+    DASHBOARDS = "dashboards"
     ORCHESTRATORS = "orchestrators"
+    TRANSFORMERS = "transformers"
 
     def __str__(self):
         return self.value

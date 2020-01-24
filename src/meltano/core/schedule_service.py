@@ -26,6 +26,13 @@ class ScheduleDoesNotExistError(Exception):
         self.name = name
 
 
+class ScheduleNotFoundError(Exception):
+    """Occurs when a schedule for a namespace cannot be found."""
+
+    def __init__(self, namespace):
+        self.namespace = namespace
+
+
 class ScheduleService:
     def __init__(
         self,
@@ -132,7 +139,7 @@ class ScheduleService:
                 if schedule.extractor == extractor.name
             )
         except StopIteration:
-            raise NotFound(f"Cannot find a schedule for namespace '{namespace}'.")
+            raise ScheduleNotFoundError(namespace)
 
     def schedules(self):
         return self.project.meltano.schedules

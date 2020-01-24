@@ -28,7 +28,6 @@ from meltano.core.logging import (
     MissingJobLogException,
     SizeThresholdJobLogException,
 )
-from meltano.cli.add import extractor
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.models import db
 from meltano.api.json import freeze_keys

@@ -5,7 +5,7 @@ import os
 import sys
 
 from . import cli
-from .add import add_plugin, add_transform
+from .add import add_plugin
 from .params import project
 from meltano.core.config_service import ConfigService
 from meltano.core.runner.singer import SingerRunner
@@ -150,7 +150,6 @@ def install_missing_plugins(
             )
             add_plugin(add_service, project, PluginType.TRANSFORMERS, "dbt")
 
-        transform_add_service = TransformAddService(project)
         try:
             # the extractor name should match the transform name
             plugin = config_service.find_plugin(
@@ -158,6 +157,7 @@ def install_missing_plugins(
             )
 
             # Update dbt_project.yml in case the vars values have changed in meltano.yml
+            transform_add_service = TransformAddService(project)
             transform_add_service.update_dbt_project(plugin)
         except PluginMissingError:
             try:
@@ -170,7 +170,9 @@ def install_missing_plugins(
                     f"Transform '{transform_def.name}' is missing, trying to install it...",
                     fg="yellow",
                 )
-                add_transform(project, extractor)
+                add_plugin(
+                    add_service, project, PluginType.TRANSFORMS, transform_def.name
+                )
             except PluginNotFoundError:
                 # There is no default transform for this extractor..
                 # Don't panic, everything is cool - just run custom transforms

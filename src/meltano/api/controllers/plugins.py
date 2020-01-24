@@ -1,7 +1,6 @@
 from itertools import groupby
 from flask import request, jsonify, g
 
-from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
@@ -90,36 +89,19 @@ def install_batch():
     plugin_name = payload["name"]
 
     project = Project.find()
+
+    # We use the DiscoveryService rather than the ConfigService because the
+    # plugin may not actually be installed yet at this point.
     discovery = PluginDiscoveryService(project)
-    target_plugin = discovery.find_plugin(plugin_type, plugin_name)
+    plugin = discovery.find_plugin(plugin_type, plugin_name)
 
-    config_service = ConfigService(project)
     add_service = ProjectAddService(project)
+    related_plugins = add_service.add_related(plugin)
+
     install_service = PluginInstallService(project)
-    ignored_types = [target_plugin.type, PluginType.TRANSFORMS]
-    has_model = False
-    batched = []
-    for plugin in discovery.plugins():
-        if plugin.namespace == target_plugin.namespace:
-            if plugin.type not in ignored_types:
-                add_service.add(plugin.type, plugin.name)
-                plugin_install = config_service.find_plugin(
-                    plugin.name, plugin_type=plugin.type
-                )
-                batched.append(plugin_install.canonical())
-                run_venv = install_service.create_venv(plugin_install)
-                run_install_plugin = install_service.install_plugin(plugin_install)
-                if plugin.type is PluginType.MODELS:
-                    has_model = True
+    install_service.install_plugins(related_plugins)
 
-    if has_model:
-        compiler = ProjectCompiler(project)
-        try:
-            compiler.compile()
-        except Exception as e:
-            pass
-
-    return jsonify(batched)
+    return jsonify([plugin.canonical() for plugin in related_plugins])
 
 
 @pluginsBP.route("/install", methods=["POST"])
@@ -130,18 +112,11 @@ def install():
     plugin_name = payload["name"]
 
     project = Project.find()
-    compiler = ProjectCompiler(project)
-    install_service = PluginInstallService(project)
+
     config_service = ConfigService(project)
-
     plugin = config_service.find_plugin(plugin_name, plugin_type=plugin_type)
-    run_venv = install_service.create_venv(plugin)
-    run_install_plugin = install_service.install_plugin(plugin)
 
-    if plugin_type is PluginType.MODELS:
-        try:
-            compiler.compile()
-        except Exception as e:
-            pass
+    install_service = PluginInstallService(project)
+    install_service.install_plugin(plugin)
 
     return jsonify(plugin.canonical())

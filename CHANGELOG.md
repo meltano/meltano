@@ -12,6 +12,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1462](https://gitlab.com/meltano/meltano/issues/1462) User will be able to reorder dashboard reports
 - [#1482](https://gitlab.com/meltano/meltano/issues/1482) Add future grants and revocations for schemas, tables, and views for roles in the `meltano permissions` command
 
+- [#1241](https://gitlab.com/meltano/meltano/issues/1241) Add `dashboard` plugin type to enable bundling curated reports and dashboards for data sources
+- [#1241](https://gitlab.com/meltano/meltano/issues/1241) Add `--include-related` flag to `meltano add` and `meltano install` to automatically install related plugins based on namespace
+- [#1241](https://gitlab.com/meltano/meltano/issues/1241) Add default dashboard and reports for Google Analytics
+
 ### Changes
 
 - [#1481](https://gitlab.com/meltano/meltano/issues/1481) Add table and view revocations for roles in the `meltano permissions` command

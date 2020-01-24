@@ -70,14 +70,17 @@ class ConfigService:
     def get_loaders(self):
         return filter(lambda p: p.type == PluginType.LOADERS, self.plugins())
 
-    def get_transformers(self):
-        return filter(lambda p: p.type == PluginType.TRANSFORMERS, self.plugins())
-
     def get_transforms(self):
         return filter(lambda p: p.type == PluginType.TRANSFORMS, self.plugins())
 
     def get_models(self):
         return filter(lambda p: p.type == PluginType.MODELS, self.plugins())
+
+    def get_dashboards(self):
+        return filter(lambda p: p.type == PluginType.DASHBOARDS, self.plugins())
+
+    def get_transformers(self):
+        return filter(lambda p: p.type == PluginType.TRANSFORMERS, self.plugins())
 
     def update_plugin(self, plugin: PluginInstall):
         with self.project.meltano_update() as meltano:
