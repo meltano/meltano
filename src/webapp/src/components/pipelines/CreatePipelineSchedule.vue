@@ -71,12 +71,16 @@ export default {
     ]),
     checkConfiguration(extractorName) {
       this.isValidConfig = false
-      const isInstalled = this.getIsPluginInstalled('extractors', extractorName)
-      if (isInstalled) {
-        this.getExtractorConfiguration(extractorName).then(
-          this.validateConfiguration
-        )
+      if (!this.getIsPluginInstalled('extractors', extractorName)) {
+        return
       }
+
+      // let's lazy load the configuration here
+      const uponConfig = _.isEmpty(this.extractorInFocusConfiguration)
+                       ? this.getExtractorConfiguration(extractorName)
+                       : Promise.resolve(this.extractorInFocusConfiguration)
+
+      uponConfig.then(this.validateConfiguration)
     },
     onSelected(extractor) {
       this.extractorInFocus = extractor
@@ -113,11 +117,11 @@ export default {
         config: configuration.profiles[0].config, // TODO refactor when we reintroduce profiles
         settings: configuration.settings
       }
-      const isValid = this.getHasValidConfigSettings(
+
+      this.isValidConfig = this.getHasValidConfigSettings(
         configSettings,
         this.extractorInFocus.settingsGroupValidation
       )
-      this.isValidConfig = isValid
     }
   }
 }
