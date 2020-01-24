@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
@@ -22,8 +22,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-### Breaks
+- [#1600](https://gitlab.com/meltano/meltano/issues/1600) Fix tooltip for Data Source "Connect" buttons
 
+### Breaks
 
 ## 1.16.1 - (2020-01-23)
 
@@ -48,7 +49,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Breaks
 
-
 ## 1.16.0 - (2020-01-20)
 
 ---
@@ -67,7 +67,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 ### Breaks
-
 
 ## 1.15.1 - (2020-01-16)
 

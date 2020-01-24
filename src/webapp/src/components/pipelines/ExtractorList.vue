@@ -101,7 +101,7 @@ export default {
         <a
           v-else
           class="button is-interactive-primary tooltip is-tooltip-left"
-          data-tooltip="A pipeline for this data source already exists"
+          data-tooltip="Install and connect to this data source"
           @click="updateExtractorSettings(extractor)"
         >
           <span>Connect</span>
