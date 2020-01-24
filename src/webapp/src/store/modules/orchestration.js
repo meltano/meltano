@@ -82,15 +82,33 @@ const getters = {
 
   lastUpdatedDate(state) {
     return extractor => {
-      return state.pipelines.find(pipeline => pipeline.extractor === extractor)
-        .endedAt
+      let pipelineExtractor = state.pipelines.find(
+        pipeline => pipeline.extractor === extractor
+      )
+
+      console.log(pipelineExtractor)
+      console.log(extractor)
+      console.log(state)
+
+      if (pipelineExtractor) {
+        return pipelineExtractor.endedAt
+      } else {
+        return ''
+      }
     }
   },
 
   startDate(state) {
     return extractor => {
-      return state.pipelines.find(pipeline => pipeline.extractor === extractor)
-        .startDate
+      const pipelineExtractor = state.pipelines.find(
+        pipeline => pipeline.extractor === extractor
+      )
+
+      if (pipelineExtractor) {
+        return pipelineExtractor.startDate
+      } else {
+        return ''
+      }
     }
   }
 }

@@ -26,10 +26,15 @@ export default {
     isEditable: false
   }),
   computed: {
+    ...mapGetters('design', ['currentExtractor']),
     ...mapGetters('orchestration', ['lastUpdatedDate', 'startDate']),
+
     formattedLastUpdatedDate() {
-      const extractor = `tap-${this.report.model}`
-      return utils.formatDateStringYYYYMMDD(this.lastUpdatedDate(extractor))
+      return this.lastUpdatedDate(this.currentExtractor)
+        ? utils.formatDateStringYYYYMMDD(
+            this.lastUpdatedDate(this.currentExtractor)
+          )
+        : 'Missing data'
     }
   },
   mounted() {

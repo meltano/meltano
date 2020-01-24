@@ -33,7 +33,6 @@ export default {
       'activeReport',
       'chartType',
       'currentDesign',
-      'currentModel',
       'currentSQL',
       'design',
       'filterOptions',
@@ -48,6 +47,7 @@ export default {
     ]),
     ...mapGetters('designs', [
       'currentDesignLabel',
+      'currentExtractor',
       'currentModelLabel',
       'filtersCount',
       'formattedSql',
@@ -72,15 +72,17 @@ export default {
     },
 
     formattedLastUpdatedDate() {
-      const extractor = `tap-${this.currentModel}`
-
-      return utils.formatDateStringYYYYMMDD(this.lastUpdatedDate(extractor))
+      return this.lastUpdatedDate(this.currentExtractor)
+        ? utils.formatDateStringYYYYMMDD(
+            this.lastUpdatedDate(this.currentExtractor)
+          )
+        : 'Missing data'
     },
 
     formattedDataStartDate() {
-      const extractor = `tap-${this.currentModel}`
-
-      return utils.formatDateStringYYYYMMDD(this.startDate(extractor))
+      return this.startDate(this.currentExtractor)
+        ? utils.formatDateStringYYYYMMDD(this.startDate(this.currentExtractor))
+        : 'N/A'
     },
 
     limit: {
