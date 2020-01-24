@@ -13,14 +13,15 @@ from meltano.core.project_add_service import (
     PluginNotSupportedException,
     PluginAlreadyAddedException,
 )
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin_discovery_service import (
+    PluginDiscoveryService,
+    PluginNotFoundError,
+)
 from meltano.core.project_add_custom_service import ProjectAddCustomService
 from meltano.core.plugin_install_service import (
     PluginInstallService,
     PluginNotInstallable,
 )
-from meltano.core.plugin_discovery_service import PluginNotFoundError
-from meltano.core.config_service import ConfigService
 from meltano.core.plugin import PluginType, Plugin
 from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
