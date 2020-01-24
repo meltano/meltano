@@ -7,6 +7,7 @@ extractors:
     label: Carbon Emissions Intensity
     description: National Grid ESO's Carbon Emissions Intensity API
     namespace: tap_carbon
+    hidden: true
     docs: 'https://meltano.com/plugins/extractors/carbon-intensity.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-carbon-intensity'
     capabilities:
