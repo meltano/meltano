@@ -49,8 +49,8 @@ class DashboardsService:
         dashboard = next(filter(lambda r: r["name"] == name, dashboards), None)
         return dashboard
 
-    def save_dashboard(self, data, keep_id=False):
-        if keep_id and "id" in data:
+    def save_dashboard(self, data):
+        if "id" in data:
             existing_dashboard = self.get_dashboard(data["id"])
             if existing_dashboard:
                 raise DashboardAlreadyExistsError(existing_dashboard, "id")
@@ -65,7 +65,7 @@ class DashboardsService:
             raise DashboardAlreadyExistsError(existing_dashboard, "slug")
 
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(
-            file_path.relative_to(self.project.root), slug, data, keep_id=keep_id
+            file_path.relative_to(self.project.root), slug, data
         )
         data["version"] = DashboardsService.VERSION
         data["description"] = data["description"] or ""

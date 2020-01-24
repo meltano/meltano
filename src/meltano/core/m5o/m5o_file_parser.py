@@ -383,14 +383,14 @@ class MeltanoAnalysisFileParser:
         return [{"name": k, **rest} for k, rest in d.items()]
 
     @staticmethod
-    def fill_base_m5o_dict(file, name, file_dict=None, keep_id=False):
+    def fill_base_m5o_dict(file, name, file_dict=None):
         if file_dict is None:
             file_dict = {"name": name}
 
         file_dict["path"] = str(file)
         file_dict["slug"] = slugify(name)
 
-        if "id" not in file_dict or not keep_id:
+        if "id" not in file_dict:
             file_dict["id"] = str(uuid.uuid4())
 
         # Legacy reports and dashboards can have a `createdAt` key that would

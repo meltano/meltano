@@ -45,8 +45,8 @@ class ReportsService:
     def load_report(self, name):
         return self.get_report_by_name(name)
 
-    def save_report(self, data, keep_id=False):
-        if keep_id and "id" in data:
+    def save_report(self, data):
+        if "id" in data:
             existing_report = self.get_report(data["id"])
             if existing_report:
                 raise ReportAlreadyExistsError(existing_report, "id")
@@ -61,7 +61,7 @@ class ReportsService:
             raise ReportAlreadyExistsError(existing_report, "slug")
 
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(
-            file_path.relative_to(self.project.root), slug, data, keep_id=keep_id
+            file_path.relative_to(self.project.root), slug, data
         )
         data["version"] = ReportsService.VERSION
 

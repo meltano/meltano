@@ -112,7 +112,7 @@ class DashboardPlugin(PluginInstall):
 
         while True:
             try:
-                record = save_func(record, keep_id=True)
+                record = save_func(record)
                 return (record, False)
             except already_exists_error as e:
                 if e.field == "slug":
