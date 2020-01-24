@@ -274,7 +274,6 @@ export default {
     },
 
     $key(...attrs) {
-      console.log(attrs)
       const extractKey = obj => obj['name'] || String(obj)
 
       return attrs.map(extractKey).join(':')
@@ -731,15 +730,13 @@ export default {
                   <template v-if="!join.collapsed">
                     <!-- eslint-disable-next-line vue/require-v-for-key -->
                     <a
-                      v-if="
-                        showJoinColumnAggregateHeader(join.relatedTable.columns)
-                      "
+                      v-if="showJoinColumnAggregateHeader(join.relatedTable.timeframes)"
                       class="panel-block
-                      attribute-heading
-                      has-text-weight-semibold
-                      has-background-white"
+                            attribute-heading
+                            has-text-weight-semibold
+                            has-background-white"
                     >
-                      Columns
+                      Timeframes
                     </a>
                     <template v-for="timeframe in join.relatedTable.timeframes">
                       <a
@@ -765,6 +762,19 @@ export default {
                         </template>
                       </template>
                     </template>
+
+                    <!-- eslint-disable-next-line vue/require-v-for-key -->
+                    <a
+                      v-if="
+                        showJoinColumnAggregateHeader(join.relatedTable.columns)
+                      "
+                      class="panel-block
+                      attribute-heading
+                      has-text-weight-semibold
+                      has-background-white"
+                    >
+                      Columns
+                    </a>
                     <template v-for="column in join.relatedTable.columns">
                       <a
                         v-if="!column.hidden"

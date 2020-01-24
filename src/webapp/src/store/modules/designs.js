@@ -524,18 +524,25 @@ const actions = {
     }
 
     const setSelected = (sourceCollection, targetCollection) => {
-      if (!sourceCollection) {
+      if (!(sourceCollection && targetCollection)) {
         return
       }
 
       sourceCollection.forEach(item => {
-        item.selected = targetCollection.includes(item.name)
+        Vue.set(item, 'selected', targetCollection.includes(item.name))
       })
     }
 
     // toggle the selected items
     setSelected(baseTable.columns, queryPayload.columns)
     setSelected(baseTable.aggregates, queryPayload.aggregates)
+    setSelected(baseTable.timeframes, queryPayload.timeframes.map(namer))
+
+    // timeframes periods
+    queryPayload.timeframes.forEach(queryTimeframe => {
+      const timeframe = baseTable.timeframes.find(tf => nameMatcher(tf, queryTimeframe))
+      setSelected(timeframe.periods, queryTimeframe.periods.map(namer))
+    })
 
     // joins, timeframes, and periods
     joinColumnGroups.forEach(joinGroup => {
@@ -544,25 +551,16 @@ const actions = {
 
       setSelected(joinGroup.columns, targetJoin.columns)
       setSelected(joinGroup.aggregates, targetJoin.aggregates)
+      setSelected(joinGroup.timeframes, targetJoin.timeframes.map(namer))
 
-      // timeframes
-      if (targetJoin.timeframes) {
-        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(namer))
-        // periods
-        joinGroup.timeframes.forEach(timeframe => {
-          const targetTimeframe = targetJoin.timeframes.find(tf =>
-            nameMatcher(tf, timeframe)
-          )
-
-          if (targetTimeframe) {
-            setSelected(timeframe.periods, targetTimeframe.periods.map(namer))
-          }
-        })
-      }
+      // timeframes periods
+      targetJoin.timeframes.forEach(queryTimeframe => {
+        const timeframe = joinGroup.timeframes.find(tf => nameMatcher(tf, queryTimeframe))
+        setSelected(timeframe.periods, queryTimeframe.periods.map(namer))
+      })
     })
 
     commit('setCurrentReport', report)
-
     this.dispatch('designs/getSQL', {
       run: true,
       payload: report.queryPayload
