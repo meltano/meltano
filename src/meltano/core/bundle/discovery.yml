@@ -453,7 +453,10 @@ models:
   - name: model-google-analytics
     namespace: tap_google_analytics
     pip_url: 'git+https://gitlab.com/meltano/model-google-analytics.git'
-dashboards: []
+dashboards:
+  - name: dashboard-google-analytics
+    namespace: tap_google_analytics
+    pip_url: 'git+https://gitlab.com/meltano/dashboard-google-analytics.git'
 orchestrators:
   - name: airflow
     namespace: airflow
