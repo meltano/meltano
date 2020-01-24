@@ -1,11 +1,9 @@
 <script>
-import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
+import Vue from 'vue'
 
 import Report from '@/components/Report'
-import reportsApi from '@/api/reports'
 import RouterViewLayout from '@/views/RouterViewLayout'
-import utils from '@/utils/utils'
 
 export default {
   name: 'Dashboard',
