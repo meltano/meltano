@@ -298,9 +298,9 @@ export default {
             }}</span>
           </div>
           <div v-if="design.description">{{ design.description }}</div>
-          <div class="is-italic has-text-primary">
-            Last updated: {{ formattedLastUpdatedDate }}
-          </div>
+          <p class="has-text-grey">
+            Data starting from: {{ formattedLastUpdatedDate }}
+          </p>
         </div>
       </div>
 
@@ -841,14 +841,18 @@ export default {
         <div class="box">
           <div class="columns is-vcentered">
             <div class="column">
-              <h2 class="title is-5">
+              <h2 class="title is-5" style="margin-bottom: 0.5rem">
                 <span>Results</span>
                 <span
                   v-if="resultsCount > 0"
                   class="has-text-weight-light has-text-grey-light is-size-7"
-                  >({{ resultsCount }})</span
+                >
+                  ({{ resultsCount }})</span
                 >
               </h2>
+              <div class="has-text-grey is-size-6">
+                Last updated: {{ formattedLastUpdatedDate }}
+              </div>
             </div>
             <div class="column">
               <div class="buttons has-addons is-right">
