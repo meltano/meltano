@@ -847,7 +847,7 @@ export default {
         <div class="box">
           <div class="columns is-vcentered">
             <div class="column">
-              <h2 class="title is-5" style="margin-bottom: 0.5rem">
+              <h2 class="title is-5 mb-05r">
                 <span>Results</span>
                 <span
                   v-if="resultsCount > 0"
@@ -1050,6 +1050,11 @@ export default {
       }
     }
   }
+}
+
+// Temporary hack due to Bulma specificity
+.title.mb-05r {
+  margin-bottom: 0.5rem;
 }
 
 textarea {
