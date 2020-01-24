@@ -199,6 +199,25 @@ We should be good citizen about these, and use the default workflow to contribut
 1. Publish PyPI packages of these package (not for now)
 1. We could mirror this repo on GitHub if we want (not for now)
 
+## Dashboard Development
+
+To create a dashboard plugin like https://gitlab.com/meltano/dashboard-google-analytics, follow these steps:
+
+1. Set up the extractor and model you are creating dashboard(s) and reports for in your local Meltano instance.
+1. Start Meltano UI.
+1. Use the UI to create the desired reports based on the model's designs. Name the reports appropriately, but don't include the extractor name or label.
+1. Create one or more new dashboard and add the reports to it. If you're creating just one dashboard, name it after the extractor label (e.g. "Google Analytics", not `tap-google-analytics`). If you're creating multiple dashboards, add an appropriate subtitle after a colon (e.g. "Google Analytics: My Dashboard").
+1. Create a new plugin repository named `dashboard-<data source>` (e.g. `dashboard-google-analytics`).
+1. Copy over `setup.py`, `README.md`, and `LICENSE` from https://gitlab.com/meltano/dashboard-google-analytics and edit these files as appropriate.
+1. Move your newly created dashboards and reports from your local Meltano project's `analyze/dashboards` and `analyze/reports` to `dashboards` and `reports` inside the new plugin repository.
+1. Push your new plugin repository to GitLab.com. Official dashboard plugins live at `https://gitlab.com/meltano/dashboard-...`.
+1. Add an entry to `src/meltano/core/bundle/discovery.yml`  under `dashboards`. Set `namespace` to the `namespace` of the extractor and model plugins the dashboard(s) and reports are related to (e.g. `tap_google_analytics`), and set `name` and `pip_url` set as appropriate.
+1. Delete the dashboard(s) and reports from your local Meltano project's `analyze` directory.
+1. Ensure that your local Meltano instance uses the recently modified `discovery.yml` by following the steps under ["Local changes to discovery.yml](#local-changes-to-discovery-yml).
+1. Run `meltano add --include-related extractor <extractor name>` to automatically install all plugins related to the extractor, including our new dashboard plugin. Related plugins are also installed automatically when installing an extractor using the UI, but we can't use that flow here because the extractor has already been installed.
+1. Verify that the dashboard(s) and reports have automatically been added to your local Meltano project's `analyze` directory and show up under "Dashboards" in the UI.
+1. Success! You can now submit a merge request to Meltano containing the changes to `discovery.yml` (and an appropriate `CHANGELOG` item, of course).
+
 ## System Database
 
 Meltano API and CLI are both supported by a database that is managed using Alembic migrations.
