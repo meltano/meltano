@@ -86,10 +86,6 @@ const getters = {
         pipeline => pipeline.extractor === extractor
       )
 
-      console.log(pipelineExtractor)
-      console.log(extractor)
-      console.log(state)
-
       if (pipelineExtractor) {
         return pipelineExtractor.endedAt
       } else {
