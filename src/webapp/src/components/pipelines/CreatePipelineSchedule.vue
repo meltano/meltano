@@ -77,8 +77,8 @@ export default {
 
       // let's lazy load the configuration here
       const uponConfig = _.isEmpty(this.extractorInFocusConfiguration)
-                       ? this.getExtractorConfiguration(extractorName)
-                       : Promise.resolve(this.extractorInFocusConfiguration)
+        ? this.getExtractorConfiguration(extractorName)
+        : Promise.resolve(this.extractorInFocusConfiguration)
 
       uponConfig.then(this.validateConfiguration)
     },
