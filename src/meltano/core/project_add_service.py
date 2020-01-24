@@ -50,8 +50,13 @@ class ProjectAddService:
             and plugin.type != target_plugin.type
         )
 
+        installed_plugins = self.config_service.plugins()
+
         added = []
         for plugin in related_plugins:
+            if plugin in installed_plugins:
+                continue
+
             plugin_install = self.add(plugin.type, plugin.name)
             added.append(plugin_install)
 

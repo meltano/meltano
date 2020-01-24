@@ -37,7 +37,11 @@ def install(project, include_related):
     if include_related:
         config_service = ConfigService(project)
         discovery_service = PluginDiscoveryService(project)
-        add_service = ProjectAddService(project)
+        add_service = ProjectAddService(
+            project,
+            config_service=config_service,
+            plugin_discovery_service=discovery_service,
+        )
 
         installed_plugins = config_service.plugins()
         for plugin_install in installed_plugins:
@@ -50,9 +54,6 @@ def install(project, include_related):
 
             related_plugins = add_service.add_related(plugin_def)
             for plugin in related_plugins:
-                if plugin in installed_plugins:
-                    continue
-
                 click.secho(
                     f"Added '{plugin.name}' to your Meltano project because it is related to '{plugin_def.name}'.",
                     fg="green",

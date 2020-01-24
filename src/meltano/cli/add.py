@@ -108,7 +108,7 @@ def add_plugin(
 
         related_plugins = add_service.add_related(plugin_def)
         if len(related_plugins) == 0:
-            click.secho("No related plugins found.")
+            click.secho("No related plugins found that are not already installed.")
         else:
             for plugin in related_plugins:
                 click.secho(
