@@ -730,41 +730,6 @@ export default {
                   <template v-if="!join.collapsed">
                     <!-- eslint-disable-next-line vue/require-v-for-key -->
                     <a
-                      v-if="showJoinColumnAggregateHeader(join.relatedTable.timeframes)"
-                      class="panel-block
-                            attribute-heading
-                            has-text-weight-semibold
-                            has-background-white"
-                    >
-                      Timeframes
-                    </a>
-                    <template v-for="timeframe in join.relatedTable.timeframes">
-                      <a
-                        :key="timeframe.label"
-                        class="panel-block timeframe"
-                        :class="{
-                          'is-active': timeframe.selected
-                        }"
-                        @click="timeframeSelected(timeframe)"
-                      >
-                        {{ timeframe.label }}
-                      </a>
-                      <template v-if="timeframe.selected">
-                        <template v-for="period in timeframe.periods">
-                          <a
-                            :key="timeframe.label.concat('-', period.label)"
-                            class="panel-block indented"
-                            :class="{ 'is-active': period.selected }"
-                            @click="timeframePeriodSelected(timeframe, period)"
-                          >
-                            {{ period.label }}
-                          </a>
-                        </template>
-                      </template>
-                    </template>
-
-                    <!-- eslint-disable-next-line vue/require-v-for-key -->
-                    <a
                       v-if="
                         showJoinColumnAggregateHeader(join.relatedTable.columns)
                       "
@@ -803,6 +768,42 @@ export default {
                         </button>
                       </a>
                     </template>
+
+                    <!-- eslint-disable-next-line vue/require-v-for-key -->
+                    <a
+                      v-if="showJoinColumnAggregateHeader(join.relatedTable.timeframes)"
+                      class="panel-block
+                            attribute-heading
+                            has-text-weight-semibold
+                            has-background-white"
+                    >
+                      Timeframes
+                    </a>
+                    <template v-for="timeframe in join.relatedTable.timeframes">
+                      <a
+                        :key="timeframe.label"
+                        class="panel-block timeframe"
+                        :class="{
+                          'is-active': timeframe.selected
+                        }"
+                        @click="timeframeSelected(timeframe)"
+                      >
+                        {{ timeframe.label }}
+                      </a>
+                      <template v-if="timeframe.selected">
+                        <template v-for="period in timeframe.periods">
+                          <a
+                            :key="timeframe.label.concat('-', period.label)"
+                            class="panel-block indented"
+                            :class="{ 'is-active': period.selected }"
+                            @click="timeframePeriodSelected(timeframe, period)"
+                          >
+                            {{ period.label }}
+                          </a>
+                        </template>
+                      </template>
+                    </template>
+
                     <!-- eslint-disable-next-line vue/require-v-for-key -->
                     <a
                       v-if="
