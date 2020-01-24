@@ -1,5 +1,7 @@
 <script>
+import { mapGetters } from 'vuex'
 import Chart from '@/components/analyze/Chart'
+import utils from '@/utils/utils'
 
 export default {
   components: {
@@ -23,6 +25,13 @@ export default {
     position: 0,
     isEditable: false
   }),
+  computed: {
+    ...mapGetters('orchestration', ['lastUpdatedDate', 'startDate']),
+    formattedLastUpdatedDate() {
+      const extractor = `tap-${this.report.model}`
+      return utils.formatDateStringYYYYMMDD(this.lastUpdatedDate(extractor))
+    }
+  },
   mounted() {
     this.position = this.index + 1
   },
@@ -60,7 +69,12 @@ export default {
     <div class="box">
       <div class="columns is-vcentered">
         <div class="column">
-          <h3 class="title is-5 is-inline-block">{{ report.name }}</h3>
+          <div class="is-grouped is-pulled-left">
+            <h3 class="title is-5 is-inline-block mb-05r">{{ report.name }}</h3>
+            <div class="has-text-grey is-size-6">
+              Last updated: {{ formattedLastUpdatedDate }}
+            </div>
+          </div>
           <div v-if="edit" class="field is-pulled-right is-inline-block">
             <div>
               <label :for="`report-position-${index}`">Report Position: </label>
