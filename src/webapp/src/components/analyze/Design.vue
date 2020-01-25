@@ -63,14 +63,6 @@ export default {
     ...mapGetters('orchestration', ['lastUpdatedDate', 'startDate']),
     ...mapState('dashboards', ['dashboards']),
 
-    hasActiveReport() {
-      return Object.keys(this.activeReport).length > 0
-    },
-
-    isActiveReportInDashboard() {
-      return dashboard => dashboard.reportIds.includes(this.activeReport.id)
-    },
-
     dataLastUpdatedDate() {
       const date = this.lastUpdatedDate(this.currentExtractor)
 
@@ -81,6 +73,14 @@ export default {
       const startDate = this.startDate(this.currentExtractor)
 
       return startDate ? startDate : 'Not available'
+    },
+
+    hasActiveReport() {
+      return Object.keys(this.activeReport).length > 0
+    },
+
+    isActiveReportInDashboard() {
+      return dashboard => dashboard.reportIds.includes(this.activeReport.id)
     },
 
     limit: {

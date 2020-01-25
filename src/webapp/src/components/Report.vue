@@ -27,16 +27,16 @@ export default {
   computed: {
     ...mapGetters('orchestration', ['lastUpdatedDate']),
 
-    extractorName() {
-      return this.report.namespace
-        ? this.report.namespace.replace('model', 'tap')
-        : ''
-    },
-
     dataLastUpdatedDate() {
       const date = this.lastUpdatedDate(this.extractorName)
 
       return date ? date : 'Not available'
+    },
+
+    extractorName() {
+      return this.report.namespace
+        ? this.report.namespace.replace('model', 'tap')
+        : ''
     }
   },
   mounted() {
