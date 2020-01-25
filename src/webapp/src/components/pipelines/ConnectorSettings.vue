@@ -216,7 +216,7 @@ export default {
         this.$refs.docs.contentWindow.postMessage(
           {
             source: 'meltano',
-            anchor: anchorName.replace('setting-', '').replace('_', '-')
+            anchor: anchorName.replace('setting-', '').replace(/_/g, '-')
           },
           '*'
         )
@@ -398,7 +398,7 @@ export default {
                         </span>
                       </div>
                       <span
-                        class="file-name is-file-fullwidth file-name-width"
+                        class="file-name is-file-fullwidth"
                         :class="
                           fileValue(setting)
                             ? 'has-text-success'
@@ -501,18 +501,13 @@ export default {
 
 <style lang="scss">
 // This file input is fragile style-wise as Bulma tricks the <input> for display purposes
-// As such, we set an explicit value in order to get the desired width with an "Upload" label.
 // Refactor at will if a better file style approach (or component) comes along.
 .file {
   .is-file-fullwidth {
-    max-width: 20em;
     width: 100%;
   }
-  .file-name-width {
-    @media screen and (min-width: $tablet) {
-      max-width: 14.6em;
-    }
-    max-width: 60em;
+  .file-name {
+    max-width: none;
   }
 }
 
