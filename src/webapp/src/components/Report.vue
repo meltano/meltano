@@ -1,7 +1,6 @@
 <script>
 import { mapGetters } from 'vuex'
 import Chart from '@/components/analyze/Chart'
-import utils from '@/utils/utils'
 
 export default {
   components: {
@@ -26,15 +25,18 @@ export default {
     isEditable: false
   }),
   computed: {
-    ...mapGetters('design', ['currentExtractor']),
-    ...mapGetters('orchestration', ['lastUpdatedDate', 'startDate']),
+    ...mapGetters('orchestration', ['lastUpdatedDate']),
 
-    formattedLastUpdatedDate() {
-      return this.lastUpdatedDate(this.currentExtractor)
-        ? utils.formatDateStringYYYYMMDD(
-            this.lastUpdatedDate(this.currentExtractor)
-          )
-        : 'Missing data'
+    extractorName() {
+      return this.report.namespace
+        ? this.report.namespace.replace('model', 'tap')
+        : ''
+    },
+
+    dataLastUpdatedDate() {
+      const date = this.lastUpdatedDate(this.extractorName)
+
+      return date ? date : 'Not available'
     }
   },
   mounted() {
@@ -77,7 +79,7 @@ export default {
           <div class="is-grouped is-pulled-left">
             <h3 class="title is-5 is-inline-block mb-05r">{{ report.name }}</h3>
             <div class="has-text-grey is-size-6">
-              Last updated: {{ formattedLastUpdatedDate }}
+              Last updated: {{ dataLastUpdatedDate }}
             </div>
           </div>
           <div v-if="edit" class="field is-pulled-right is-inline-block">

@@ -88,7 +88,9 @@ const getters = {
     return extractor => {
       const pipelineExtractor = getters.getPipelineWithExtractor(extractor)
 
-      return pipelineExtractor ? pipelineExtractor.endedAt : ''
+      return pipelineExtractor
+        ? utils.formatDateStringYYYYMMDD(pipelineExtractor.endedAt)
+        : ''
     }
   },
 
@@ -96,7 +98,9 @@ const getters = {
     return extractor => {
       const pipelineExtractor = getters.getPipelineWithExtractor(extractor)
 
-      return pipelineExtractor ? pipelineExtractor.startDate : ''
+      return pipelineExtractor
+        ? utils.formatDateStringYYYYMMDD(pipelineExtractor.startDate)
+        : ''
     }
   }
 }

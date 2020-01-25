@@ -71,18 +71,16 @@ export default {
       return dashboard => dashboard.reportIds.includes(this.activeReport.id)
     },
 
-    formattedLastUpdatedDate() {
-      return this.lastUpdatedDate(this.currentExtractor)
-        ? utils.formatDateStringYYYYMMDD(
-            this.lastUpdatedDate(this.currentExtractor)
-          )
-        : 'Missing data'
+    dataLastUpdatedDate() {
+      const date = this.lastUpdatedDate(this.currentExtractor)
+
+      return date ? date : 'Missing data'
     },
 
-    formattedDataStartDate() {
-      return this.startDate(this.currentExtractor)
-        ? utils.formatDateStringYYYYMMDD(this.startDate(this.currentExtractor))
-        : 'N/A'
+    dataStartDate() {
+      const startDate = this.startDate(this.currentExtractor)
+
+      return startDate ? startDate : 'Not available'
     },
 
     limit: {
@@ -307,9 +305,7 @@ export default {
             }}</span>
           </div>
           <div v-if="design.description">{{ design.description }}</div>
-          <p class="has-text-grey">
-            Data starting from: {{ formattedDataStartDate }}
-          </p>
+          <p class="has-text-grey">Data starting from: {{ dataStartDate }}</p>
         </div>
       </div>
 
@@ -860,7 +856,7 @@ export default {
                 >
               </h2>
               <div class="has-text-grey is-size-6">
-                Last updated: {{ formattedLastUpdatedDate }}
+                Last updated: {{ dataLastUpdatedDate }}
               </div>
             </div>
             <div class="column">
