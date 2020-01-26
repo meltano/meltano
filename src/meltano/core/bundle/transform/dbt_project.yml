@@ -1,94 +1,18 @@
-
 name: 'my_meltano_project'
-
-version: '1.0'
-
-####################################
-#### CONNECTION CONFIGURATIONS #####
-####################################
-
-# profile: Required. This config specifies which profile dbt should use to
-# connect to your data warehouse. The provided value must exist in the
-# profiles.yml file.
+version: '1.0
 profile: 'meltano'
-
-
-##################################
-#### FILE PATH CONFIGURATIONS ####
-##################################
-
-# The following configs specify directories that dbt uses to operate. All
-# paths are specified relative to the path of dbt_project.yml.
-
-# ALL FILE PATH CONFIGURATIONS ARE OPTIONAL, the default values are listed below.
-
-# source-paths: Specify which path(s) dbt should look in to find models. Model
-# are.sql files. Model and source schema files (.yml files) should also be
-# included in this path
 source-paths: ["models"]
-
-# analysis-paths: Specify which path(s) dbt should look in to find analytical
-# queries. These queries are compiled, but not executed, by dbt.
 analysis-paths: ["analysis"]
-
-# test-paths: Specify which path(s) dbt should look in to find data test
-# definitions.
 test-paths: ["tests"]
-
-# data-paths: Specify which path(s) dbt should look in to find CSV files.
-# Running `dbt seed` will load these CSVs as tables in your warehouse.
 data-paths: ["data"]
-
-# macro-paths: Specify which path(s) dbt should look in to find macros. These
-# macros will be globally available to all models in your project.
 macro-paths: ["macros"]
-
-# snapshot-paths: Specify with path(s) dbt should look in to finds napshots.
-# Running `dbt snapshot` will run these snapshots.
 snapshot-paths: ["snapshots"]
-
-# target-path: Specify which path dbt should write  compiled SQL to.
 target-path: "../.meltano/transformers/dbt/target"
-
-# log-path: Specify which path dbt should write debug logs to.
 log-path: "logs"
-
-# modules-path: Specify which path dbt should use for storing and finding modules.
 modules-path: "dbt_modules"
-
-# clean-targets: Specify which path(s) should be removed by the clean task. Run
-# `dbt clean` to delete these directories
 clean-targets:
     - "../.meltano/transformers/dbt/target"
     - "dbt_modules"
     - "logs"
-
-
-#################################
-#### RESOURCE CONFIGURATIONS ####
-#################################
-
-# The following section contains configurations that define how your resources
-# are instantiated by dbt. You can configure `models`, and `seeds` from here.
-# You can configure resources from both your own project, and installed
-# packages included as dependencies.
-#
-# Options are specified on a per-package, per-directory, and per-model basis.
-# The configs are inherited, so configs applied to a package can be overridden
-# for directories and models contained within that package.
-#
-# The configuration structure within a package should mirror the directory
-# structure within that package. The example configs provided below are based
-# on the following directory structure.
-#
-# dbt_project.yml
-# models/
-# ├── adwords
-# │   └── adwords_ads.sql
-# └── snowplow
-#     ├── base
-#     │   └── snowplow_events.sql
-#     └── snowplow_sessions.sql
-
 models:
   enabled: true    # configs defined here are applied to _all_ packages
