@@ -1,9 +1,11 @@
 import json
 import os
-
+import sqlalchemy
 from os.path import join
 from pathlib import Path
 
+from meltano.api.models.embed_token import EmbedToken
+from meltano.core.db import project_engine
 from meltano.core.m5o.m5oc_file import M5ocFile
 from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
 from meltano.core.m5o.m5o_collection_parser import (
@@ -30,9 +32,27 @@ class ReportAlreadyExistsError(Exception):
 class ReportsHelper:
     VERSION = "1.0.0"
 
-    def get_embed_snippet(self, name):
-        # TODO util to connect to app/system db, get match, or generate new
-        return {"snippet": f"<iframe src='meltano.meltanodata.com/-/public/{name}' />"}
+    def get_embed_snippet(self, name, origin):
+        project = Project.find()
+        _, Session = project_engine(project)
+
+        try:
+            session = Session()
+            embed_token = session.query(EmbedToken).filter_by(resource_id=name).one()
+            is_cached = True
+        except sqlalchemy.orm.exc.NoResultFound:
+            embed_token = EmbedToken(resource_id=name)
+            session.add(embed_token)
+            is_cached = False
+        finally:
+            token = embed_token.token
+            session.commit()
+            session.close()
+
+        return {
+            "is_cached": is_cached,
+            "snippet": f"<iframe src='{origin}/-/public/{token}' />",
+        }
 
     def get_report_by_name(self, name):
         reports = self.get_reports()

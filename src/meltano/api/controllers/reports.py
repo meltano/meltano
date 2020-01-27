@@ -66,9 +66,9 @@ def index():
 def embed():
     reports_helper = ReportsHelper()
     post_data = request.get_json()
-    # TODO util fn to get cached id or generate, but need to validate permission prior to making this public (maybe via the `permit`?)
-    response_data = reports_helper.get_embed_snippet(post_data["name"])
-
+    origin = request.environ["HTTP_ORIGIN"]
+    # TODO validate permission prior to making this public (maybe via the `permit`?)
+    response_data = reports_helper.get_embed_snippet(post_data["name"], origin)
     return jsonify(response_data)
 
 
