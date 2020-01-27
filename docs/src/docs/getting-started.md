@@ -24,10 +24,10 @@ If you would prefer to use Meltano without sending the team this data, learn how
 :::
 
 ```bash
-meltano init carbon
+meltano init my-meltano-project
 ```
 
-This will create a new directory named `carbon` in the current directory and initialize Meltano's basic directory structure inside it.
+This will create a new directory named `my-meltano-project` in the current directory and initialize Meltano's basic directory structure inside it.
 
 Inside the Meltano project directory, all plugin configuration (which may include tokens and passwords) is stored inside the `.meltano` directory,
 which is automatically added to the project's `.gitignore` file to prevent this potentially sensitive information from accidentally being pushed up to a hosted Git repository.
@@ -37,7 +37,7 @@ which is automatically added to the project's `.gitignore` file to prevent this 
 Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
 
 ```bash
-cd carbon
+cd my-meltano-project
 meltano ui
 ```
 
@@ -49,70 +49,42 @@ You should see now see the Extractors page, which contains various options for c
 
 ![Meltano UI with all extractors not installed initial loading screen](/images/getting-started-guide/gsg-01.png)
 
-For this guide, we will be following the "Fast Path" to get you up and running as quickly as possible. So let's install `tap-carbon-intensity` by clicking on the `Install` button inside its card. While an Extractor is installed, you are presented with the following modal:
+Go ahead and select the data source you're interested in connecting to Meltano. If you need assistance configuring your data source, you should see documentation to help you with this.
 
-![Modal Information about tap-carbon-intensity being installed, doesn't require configuration and will progress to the next step when the installation is done](/images/getting-started-guide/gsg-02.png)
+![Example of Stripe docs appearing next to configuration form](/images/getting-started-guide/gsg-02.png)
 
-The `tap-carbon-intensity` Extractor does not require any configuration (like a username or password). Once the installation is complete, you will progress to the next step: "Load".
+Some of our popular taps include:
 
-## Determine where the data will live
+- [Google Analytics](/plugins/extractors/google-analytics.html#google-analytics)
+- [Stripe](/plugins/extractors/stripe.html#stripe)
+- [Salesforce](/plugins/extractors/salesforce.html#salesforce)
 
-Once you've setup your Extractor, you will be greeted with the Loaders page:
+## Choose how often your data is updated
 
-![Loader page for Meltano project](/images/getting-started-guide/gsg-03.png)
+By default, Meltano assumes you will be using a PostgreSQL instance that is already configured for you on your DigitalOcean instance. 
 
-Now that Meltano is pulling data in from your data source(s), you need to choose where and in what format you would like that data stored.
+::: info 
+If you are working with your own Meltano instance, You can follow [these instructions](https://www.meltano.com/plugins/loaders/postgres.html#postgresql-database) to make sure your PostgreSQL instance is setup correctly.
+:::
 
-Let's use `target-postgres` for this project by clicking `Install` in its card.
+As a result, all we need to do now it select how often we want our data to update. On the right hand side of your Data page, choose your desired interval and then click on `Save`.
 
-While it is installing, make sure that your PostreSQL database is up and running. If you need help with this, check out our [PostgreSQL database tutorial](/plugins/loaders/postgres.html#tutorials).
-
-Once it is finished installing, you will see the following modal:
-
-![Modal dialogue for successful PostgreSQL installation](/images/getting-started-guide/gsg-04.png)
-
-By default, `target-postgres` is configured with a database named `warehouse` that can be customized if desired. Once you configure your database as desired, click `Save`.
-
-## Create your first pipeline
-
-With our extractor and loader configured, you should now be greeted with the Schedules page with a modal to create your first pipeline!
-
-![Screenshot of Create Pipeline modal](/images/getting-started-guide/gsg-05.png)
-
+::: info 
 Meltano provides [Orchestration](/docs/orchestration.html) using Apache Airflow, which allows you to create scheduled tasks to run pipelines automatically.
 For example, you may want a recurring task that updates the database at the end of every business day.
+:::
 
-In the current form, you will see:
+Once your pipeline is setup, you will see your Data page update with a Pipelines section.
 
-- A pipeline **name** which has a default name that is dynamically generated, but can be easily changed if desired
-- The **extractor** the pipeline will use, which should be `tap-carbon-intensity`
-- The **loader** the pipeline will use, which should be `target-sqlite`
-- Whether the **transform** step should be applied, which should be `run`
-- The **interval** at which the pipeline should be run, which is set by default to be `@once`
-
-All we need to do is click `Save` to start our new pipeline! The pipeline's log opens automatically and you can check the pipeline running and what Meltano does behind the scenes to extract and load the data. You should see a spinning icon that indicates that the pipeline is not completed:
-
-![Screenshot of run log of a pipeline being run](/images/getting-started-guide/gsg-06.png)
+![Screenshot of Pipelines section on Data page](/images/getting-started-guide/gsg-03.png)
 
 Once it's complete, the indicator will disappear and you should be able to see the final results of the extraction:
 
-![Screenshot of run log of a completed pipeline](/images/getting-started-guide/gsg-07.png)
+![Screenshot of run log of a completed pipeline](/images/getting-started-guide/gsg-04.png)
 
 You can click the `Analyze` button to [select a model to analyze](#analyze-the-data). The same `Analyze` button is available inline within your pipeline. If you close the log and go back to the Pipelines page you can check the log of any past pipeline by clicking the `Log` button next to it:
 
-![Screenshot of complete pipeline run](/images/getting-started-guide/gsg-08.png)
-
-Congratulations! Now that you have connected a data source, configured a target database, and run a successful pipeline for the dataset, we are now ready to analyze the data!
-
-## Select a data model
-
-There are currently three ways to select a data model for analyzing, exploring, and report building:
-
-- Main navigation's `Analyze` dropdown (all data models)
-- Each pipeline's inline `Analyze` button (contextual data models)
-- Log modal's `Analyze` button (contextual data models)
-
-Selecting a data model from one of these options takes us to the next step.
+Congratulations! Now that you have connected a data source, and run a successful pipeline for the dataset, we are now ready to analyze the data!
 
 ## Analyze the data
 
@@ -120,7 +92,7 @@ The Analyze page contains an interactive user interface to allow you to dynamica
 
 ![Screenshot of Analyze page for Carbon Region](/images/getting-started-guide/gsg-10.png)
 
-Now, you can explore and analyze the `tap-carbon-intensity` data by clicking on different Attributes in the **Query** side menu on the left hand side. This will trigger live changes to the SQL queries which will update the chart dynamically.
+Now, you can explore and analyze the data by clicking on different Attributes in the **Query** side menu on the left hand side. This will trigger live changes to the SQL queries which will update the chart dynamically.
 
 While exploring the Analyze page, you can also check out:
 
