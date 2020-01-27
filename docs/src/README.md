@@ -6,7 +6,7 @@ primaryAction:
   link: https://meltano.typeform.com/to/NJPwxv
 secondaryAction:
   text: Live Demo
-  link: https://meltano.meltanodata.com/pipeline/extract/
+  link: https://meltano.meltanodata.com/
 metaTitle: Meltano is an open source data dashboarding tool from GitLab
 description: Meltano provides an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.
 ---
