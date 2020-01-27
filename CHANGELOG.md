@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1462](https://gitlab.com/meltano/meltano/issues/1462) User will be able to reorder dashboard reports
 - [#1482](https://gitlab.com/meltano/meltano/issues/1482) Add future grants and revocations for schemas, tables, and views for roles in the `meltano permissions` command
+- [#1376](https://gitlab.com/meltano/meltano/issues/1376) Add last updated date to reports
+- [#1409](https://gitlab.com/meltano/meltano/issues/1409) Add data start date to Analysis page
 
 - [#1241](https://gitlab.com/meltano/meltano/issues/1241) Add `dashboard` plugin type to enable bundling curated reports and dashboards for data sources
 - [#1241](https://gitlab.com/meltano/meltano/issues/1241) Add `--include-related` flag to `meltano add` and `meltano install` to automatically install related plugins based on namespace
@@ -38,6 +40,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1592](https://gitlab.com/meltano/meltano/issues/1592) Add MAX and MIN aggregate functions to Meltano Models
 - [#1552](https://gitlab.com/meltano/meltano/issues/1552) Add "Custom" data source CTA to link to the create custom data source docs
+- [#1462](https://gitlab.com/meltano/meltano/issues/1462) User will be able to reorder dashboard reports
 
 ### Changes
 
