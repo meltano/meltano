@@ -1,5 +1,5 @@
 name: 'my_meltano_project'
-version: '1.0
+version: '1.0'
 profile: 'meltano'
 source-paths: ["models"]
 analysis-paths: ["analysis"]
