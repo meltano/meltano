@@ -7,9 +7,9 @@ export default {
   components: {
     Chart
   },
-  // props: {
-  //   token: { type: String, required: false }
-  // },
+  props: {
+    token: { type: String, default: 'none' }
+  },
   data() {
     return {
       isLoading: true,
@@ -23,7 +23,8 @@ export default {
   methods: {
     initialize() {
       // swap to token/id consumed from from route
-      const name = 'Test Report'
+      const name = 'test report'
+
       reportsApi.loadReportWithQueryResults(name).then(response => {
         this.report = response.data
         this.isValid = true
