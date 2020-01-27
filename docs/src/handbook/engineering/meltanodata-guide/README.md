@@ -437,54 +437,6 @@ systemctl status
 
 1. Visit `$TENANT_NAME.meltanodata.com` in your browser
 1. Login with credentials you setup in 1Password for the username `meltano`
-1. Install `tap-carbon-intensity` extractor
-1. Install `target-postgres` loader
-   - You can also this by visiting `/pipeline/load/target-postgres`
-1. When the configuration model for `target-postgres` appears, you should see the correct variables already configured from your `.env` file
-1. Create a simple pipeline
-1. Verify Analyze page is pulling in data and generating charts correctly
-
-#### Remove tap-carbon-intensity
-
-To ensure clients are greeted with a fresh install, it's important to remove any traces of tests we ran.
-
-1. SSH into the droplet
-2. Change directory to `/var/meltano/project`
-
-```sh
-cd /var/meltano/project
-```
-
-3. Open `meltano.yml` in text editor
-
-```sh
-nano meltano.yml
-```
-
-4. Delete (or comment out with `#`) the `extractors`, `models`, `transforms`, and `schedule` sections and save
-
-5. Change directory into `/var/meltano/project/.meltano`
-
-```sh
-cd .meltano
-```
-
-6. Delete the contents of the following folders and files:
-
-- `.meltano`
-  - `/extractors`
-    - `/tap-carbon-intensity`
-  - `/models`
-    - `/model-carbon-intensity`
-  - `/run`
-    - `/tap-carbon-intensity`
-    - `/models`
-      - `/model-carbon-intensity`
-      - `/topics.index.m5oc`
-
-```sh
-rm -r extractors models run/tap-carbon-intensity run/models
-```
 
 ### Step 7: Verify FTP Works
 

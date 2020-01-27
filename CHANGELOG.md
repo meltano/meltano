@@ -19,6 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1481](https://gitlab.com/meltano/meltano/issues/1481) Add table and view revocations for roles in the `meltano permissions` command
+- [#1459](https://gitlab.com/meltano/meltano/issues/1459) Users can no longer install tap-carbon-intensity from the UI
 
 ### Fixes
 
