@@ -367,13 +367,18 @@ class MeltanoAnalysisFileParser:
                 missing_properties, "table", file_name
             )
 
-        for prop_name, prop_def in table_file.items():
-            subproperties = ("columns", "aggregates", "timeframes")
+        # set all the subproperties
+        for prop_name in ("columns", "aggregates", "timeframes"):
+            prop_def = table_file.get(prop_name, {})
+            temp_table[prop_name] = self.name_flatten_dict(prop_def)
 
-            if prop_name in subproperties:
-                temp_table[prop_name] = self.name_flatten_dict(prop_def)
-            else:
-                temp_table[prop_name] = prop_def
+        # set the rest of the properties
+        for prop_name, prop_def in table_file.items():
+            # subproperties are already set
+            if prop_name in temp_table:
+                continue
+
+            temp_table[prop_name] = prop_def
 
         return temp_table
 

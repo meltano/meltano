@@ -44,6 +44,8 @@ const defaultState = utils.deepFreeze({
 })
 
 const helpers = {
+  buildKey: (...parts) => lodash.join(parts, '.'),
+
   getFilterTypePlural(filterType) {
     return `${filterType}s`
   },
@@ -175,12 +177,10 @@ const getters = {
     }
   },
 
-  // build an Attributes index based on the attribute `key`
   getOrderableAttributesIndex(state, getters) {
     const attributes = getters.getAttributes()
-    const key = (...parts) => lodash.join(parts, '.')
 
-    let index = {}
+    let attributesIndex = {}
     attributes.forEach(attribute => {
       if (
         !getters.getIsOrderableAttribute({ attributeClass: attribute.class })
@@ -188,10 +188,12 @@ const getters = {
         return
       }
 
-      index[key(attribute.sourceName, attribute.name)] = attribute
+      attributesIndex[
+        helpers.buildKey(attribute.sourceName, attribute.name)
+      ] = attribute
     })
 
-    return index
+    return attributesIndex
   },
 
   // eslint-disable-next-line no-shadow
@@ -263,6 +265,8 @@ const getters = {
       !!getters.getFilter(sourceName, name, filterType)
   },
 
+  // Timeframes are not sortable
+  // https://gitlab.com/meltano/meltano/issues/1188
   getIsOrderableAttribute() {
     return queryAttribute => queryAttribute.attributeClass != 'timeframes'
   },
@@ -540,7 +544,9 @@ const actions = {
 
     // timeframes periods
     queryPayload.timeframes.forEach(queryTimeframe => {
-      const timeframe = baseTable.timeframes.find(tf => nameMatcher(tf, queryTimeframe))
+      const timeframe = baseTable.timeframes.find(tf =>
+        nameMatcher(tf, queryTimeframe)
+      )
       setSelected(timeframe.periods, queryTimeframe.periods.map(namer))
     })
 
@@ -555,7 +561,9 @@ const actions = {
 
       // timeframes periods
       targetJoin.timeframes.forEach(queryTimeframe => {
-        const timeframe = joinGroup.timeframes.find(tf => nameMatcher(tf, queryTimeframe))
+        const timeframe = joinGroup.timeframes.find(tf =>
+          nameMatcher(tf, queryTimeframe)
+        )
         setSelected(timeframe.periods, queryTimeframe.periods.map(namer))
       })
     })
@@ -849,10 +857,12 @@ const mutations = {
 
   setSorting(state, { attributesIndex }) {
     state.queryAttributes.forEach(queryAttribute => {
-      const key = (...parts) => lodash.join(parts, '.')
       const attribute =
         attributesIndex[
-          key(queryAttribute.sourceName, queryAttribute.attributeName)
+          helpers.buildKey(
+            queryAttribute.sourceName,
+            queryAttribute.attributeName
+          )
         ]
 
       // the index only contains attributes that are Orderable

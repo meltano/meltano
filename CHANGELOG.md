@@ -15,7 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1510](https://gitlab.com/meltano/meltano/issues/1510) Remove breadcrumbs (not currently useful)
 - [#1589](https://gitlab.com/meltano/meltano/issues/1589) Add dbt-specific files to a .gitignore
-- [#1410](https://gitlab.com/meltano/meltano/issues/1410) Update the Design UI to expose timeframes explicitely
+- [#1410](https://gitlab.com/meltano/meltano/issues/1410) Update the Design UI to expose timeframes explicitly
 
 ### Fixes
 

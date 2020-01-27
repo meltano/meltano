@@ -57,9 +57,9 @@ export default {
       'hasFilters',
       'hasJoins',
       'hasResults',
+      'isTimeframeSelected',
       'resultsCount',
-      'showJoinColumnAggregateHeader',
-      'isTimeframeSelected'
+      'showJoinColumnAggregateHeader'
     ]),
     ...mapState('dashboards', ['dashboards']),
 
@@ -710,7 +710,7 @@ export default {
               <template v-if="hasJoins">
                 <template v-for="join in design.joins">
                   <a
-                    :key="join.label"
+                    :key="$key(join.relatedTable)"
                     class="panel-block
                       table-heading
                       analyze-join-table
@@ -743,7 +743,7 @@ export default {
                     <template v-for="column in join.relatedTable.columns">
                       <a
                         v-if="!column.hidden"
-                        :key="column.label"
+                        :key="$key(join.relatedTable, 'column', column)"
                         class="panel-block space-between has-text-weight-medium"
                         :class="{ 'is-active': column.selected }"
                         @click="joinColumnSelected(join, column)"
@@ -771,7 +771,11 @@ export default {
 
                     <!-- eslint-disable-next-line vue/require-v-for-key -->
                     <a
-                      v-if="showJoinColumnAggregateHeader(join.relatedTable.timeframes)"
+                      v-if="
+                        showJoinColumnAggregateHeader(
+                          join.relatedTable.timeframes
+                        )
+                      "
                       class="panel-block
                             attribute-heading
                             has-text-weight-semibold
@@ -781,7 +785,7 @@ export default {
                     </a>
                     <template v-for="timeframe in join.relatedTable.timeframes">
                       <a
-                        :key="timeframe.label"
+                        :key="$key(join.relatedTable, 'timeframe', timeframe)"
                         class="panel-block timeframe"
                         :class="{
                           'is-active': timeframe.selected
@@ -793,7 +797,15 @@ export default {
                       <template v-if="timeframe.selected">
                         <template v-for="period in timeframe.periods">
                           <a
-                            :key="timeframe.label.concat('-', period.label)"
+                            :key="
+                              $key(
+                                join.relatedTable,
+                                'timeframe',
+                                timeframe,
+                                'period',
+                                period
+                              )
+                            "
                             class="panel-block indented"
                             :class="{ 'is-active': period.selected }"
                             @click="timeframePeriodSelected(timeframe, period)"
@@ -820,7 +832,7 @@ export default {
                     </a>
                     <template v-for="aggregate in join.relatedTable.aggregates">
                       <a
-                        :key="aggregate.label"
+                        :key="$key(join.relatedTable, 'aggregate', aggregate)"
                         class="panel-block space-between has-text-weight-medium"
                         :class="{ 'is-active': aggregate.selected }"
                         @click="joinAggregateSelected(join, aggregate)"

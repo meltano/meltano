@@ -7,8 +7,8 @@ import itertools
 from meltano.core.compiler.project_compiler import ProjectCompiler
 
 
-def indent(text: str, width=2, char="  "):
-    return "".join(list(itertools.repeat(char, width))) + text
+def indent(text: str, count=2, char="  "):
+    return "".join(list(itertools.repeat(char, count))) + text
 
 
 @cli.group(hidden=True, invoke_without_command=True)
@@ -45,22 +45,22 @@ def show(ctx):
     compiler = ctx.obj["compiler"]
 
     def print_table(table: dict):
-        print(indent(table["name"], width=2))
+        print(indent(table["name"], count=2))
 
         for dim in table.get("columns", []):
-            print(indent(f"[C] {dim['name']} ({dim['sql']})", width=3))
+            print(indent(f"[C] {dim['name']} ({dim['sql']})", count=3))
 
         for dim in table.get("timeframes", []):
-            print(indent(f"[T] {dim['name']} ({dim['sql']})", width=3))
+            print(indent(f"[T] {dim['name']} ({dim['sql']})", count=3))
 
         for dim in table.get("aggregates", []):
-            print(indent(f"[A] {dim['name']} ({dim['sql']})", width=3))
+            print(indent(f"[A] {dim['name']} ({dim['sql']})", count=3))
 
     for model in compiler.package_topics:
         print(model["namespace"])
 
         for design in model["designs"]:
-            print(indent(design["name"], width=1))
+            print(indent(design["name"], count=1))
             print_table(design["related_table"])
 
             for join in design.get("joins", []):

@@ -59,7 +59,14 @@ export default {
     }
   },
   methods: {
-    ...mapActions('designs', ['updateSortAttribute'])
+    ...mapActions('designs', ['updateSortAttribute']),
+    handleHeaderClick(queryAttribute) {
+      if (!this.getIsOrderableAttribute(queryAttribute)) {
+        return
+      }
+
+      this.updateSortAttribute(queryAttribute)
+    }
   }
 }
 </script>
@@ -89,10 +96,7 @@ export default {
               <div class="is-flex">
                 <div
                   class="sort-header"
-                  @click="
-                    getIsOrderableAttribute(queryAttribute) &&
-                      updateSortAttribute(queryAttribute)
-                  "
+                  @click="handleHeaderClick(queryAttribute)"
                 >
                   <span>{{ queryAttribute.attributeLabel }}</span>
                 </div>
