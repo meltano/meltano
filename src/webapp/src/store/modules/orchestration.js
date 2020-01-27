@@ -18,11 +18,9 @@ const getters = {
     return state.pipelines.length > 0
   },
 
-  getHasPipelineWithExtractor(state) {
+  getHasPipelineWithExtractor(_, getters) {
     return extractorName => {
-      return Boolean(
-        state.pipelines.find(pipeline => pipeline.extractor === extractorName)
-      )
+      return Boolean(getters.getPipelineWithExtractor(extractorName))
     }
   },
 
@@ -47,6 +45,12 @@ const getters = {
         configSettings.settings &&
         lodash.every(configSettings.settings, isValid)
       )
+    }
+  },
+
+  getPipelineWithExtractor(state) {
+    return extractor => {
+      return state.pipelines.find(pipeline => pipeline.extractor === extractor)
     }
   },
 
@@ -78,6 +82,26 @@ const getters = {
 
   getSuccessfulPipelines(state) {
     return state.pipelines.filter(pipeline => pipeline.hasEverSucceeded)
+  },
+
+  lastUpdatedDate(_, getters) {
+    return extractor => {
+      const pipelineExtractor = getters.getPipelineWithExtractor(extractor)
+
+      return pipelineExtractor
+        ? utils.formatDateStringYYYYMMDD(pipelineExtractor.endedAt)
+        : ''
+    }
+  },
+
+  startDate(_, getters) {
+    return extractor => {
+      const pipelineExtractor = getters.getPipelineWithExtractor(extractor)
+
+      return pipelineExtractor
+        ? utils.formatDateStringYYYYMMDD(pipelineExtractor.startDate)
+        : ''
+    }
   }
 }
 

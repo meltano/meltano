@@ -33,7 +33,6 @@ export default {
       'activeReport',
       'chartType',
       'currentDesign',
-      'currentModel',
       'currentSQL',
       'design',
       'filterOptions',
@@ -48,6 +47,7 @@ export default {
     ]),
     ...mapGetters('designs', [
       'currentDesignLabel',
+      'currentExtractor',
       'currentModelLabel',
       'filtersCount',
       'formattedSql',
@@ -60,7 +60,20 @@ export default {
       'resultsCount',
       'showJoinColumnAggregateHeader'
     ]),
+    ...mapGetters('orchestration', ['lastUpdatedDate', 'startDate']),
     ...mapState('dashboards', ['dashboards']),
+
+    dataLastUpdatedDate() {
+      const date = this.lastUpdatedDate(this.currentExtractor)
+
+      return date ? date : 'Missing data'
+    },
+
+    dataStartDate() {
+      const startDate = this.startDate(this.currentExtractor)
+
+      return startDate ? startDate : 'Not available'
+    },
 
     hasActiveReport() {
       return Object.keys(this.activeReport).length > 0
@@ -257,7 +270,10 @@ export default {
         })
         .catch(error => {
           Vue.toasted.global.error(
-            `${this.activeReport.name} was not saved to ${dashboard.name}. [Error code: ${error.response.data.code}]`
+            `${this.activeReport.name} was not saved to ${
+              // eslint-disable-next-line
+              dashboard.name
+            }. [Error code: ${error.response.data.code}]`
           )
         })
     },
@@ -289,6 +305,7 @@ export default {
             }}</span>
           </div>
           <div v-if="design.description">{{ design.description }}</div>
+          <p class="has-text-grey">Data starting from: {{ dataStartDate }}</p>
         </div>
       </div>
 
@@ -829,14 +846,18 @@ export default {
         <div class="box">
           <div class="columns is-vcentered">
             <div class="column">
-              <h2 class="title is-5">
+              <h2 class="title is-5 mb-05r">
                 <span>Results</span>
                 <span
                   v-if="resultsCount > 0"
                   class="has-text-weight-light has-text-grey-light is-size-7"
-                  >({{ resultsCount }})</span
+                >
+                  ({{ resultsCount }})</span
                 >
               </h2>
+              <div class="has-text-grey is-size-6">
+                Last updated: {{ dataLastUpdatedDate }}
+              </div>
             </div>
             <div class="column">
               <div class="buttons has-addons is-right">
@@ -1028,6 +1049,11 @@ export default {
       }
     }
   }
+}
+
+// Temporary hack due to Bulma specificity
+.title.mb-05r {
+  margin-bottom: 0.5rem;
 }
 
 textarea {

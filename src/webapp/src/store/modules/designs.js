@@ -136,6 +136,10 @@ const getters = {
     return utils.titleCase(state.currentDesign)
   },
 
+  currentExtractor(state) {
+    return state.currentNamespace.replace('model', 'tap')
+  },
+
   currentLimit(state) {
     return state.limit
   },
