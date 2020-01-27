@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.17.0 - (2020-01-27)
 
 ---
 
@@ -30,7 +43,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1561](https://gitlab.com/meltano/meltano/issues/1561) Fix `onFocusInput()` to properly focus-and-auto-scroll to `<input type='file'>`s in the data source docs UI
 - [#1561](https://gitlab.com/meltano/meltano/issues/1561) Fix `<input type='file'>` styling to better accommodate flexible widths
 
-### Breaks
 
 ## 1.16.1 - (2020-01-23)
 
