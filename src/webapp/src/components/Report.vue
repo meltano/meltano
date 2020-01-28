@@ -1,10 +1,16 @@
 <script>
 import { mapGetters } from 'vuex'
+import Vue from 'vue'
+
 import Chart from '@/components/analyze/Chart'
+import Dropdown from '@/components/generic/Dropdown'
+import reportsApi from '@/api/reports'
+import utils from '@/utils/utils'
 
 export default {
   components: {
-    Chart
+    Chart,
+    Dropdown
   },
   props: {
     edit: {
@@ -22,6 +28,7 @@ export default {
   },
   data: () => ({
     position: 0,
+    isAwaitingEmbed: false,
     isEditable: false
   }),
   computed: {
@@ -43,6 +50,30 @@ export default {
     this.position = this.index + 1
   },
   methods: {
+    copyToClipboard(refName) {
+      const el = this.$refs[refName]
+      const isSuccess = utils.copyToClipboard(el)
+      isSuccess
+        ? Vue.toasted.global.success('Copied to clipboard')
+        : Vue.toasted.global.error('Failed copy, try manual selection')
+    },
+    getReportEmbed(report) {
+      this.isAwaitingEmbed = true
+      reportsApi
+        .generateEmbedURL(report)
+        .then(response => {
+          this.$refs[`embed-${report.id}`].value = response.data.snippet
+          if (!response.data.isCached) {
+            Vue.toasted.global.success(`${report.name} embed code created`)
+          }
+        })
+        .catch(error => {
+          Vue.toasted.global.error(
+            `${report.name} embed error. [Error code: ${error.response.data.code}]`
+          )
+        })
+        .finally(() => (this.isAwaitingEmbed = false))
+    },
     goToDesign(report) {
       const params = {
         design: report.design,
@@ -110,6 +141,49 @@ export default {
             <div class="buttons">
               <a class="button is-small" @click="goToReport(report)">Edit</a>
               <a class="button is-small" @click="goToDesign(report)">Explore</a>
+              <Dropdown
+                :tooltip="{
+                  classes: 'is-tooltip-left',
+                  message: 'Create an embeddable iframe'
+                }"
+                label="Embed"
+                button-classes="button is-small"
+                :menu-classes="'dropdown-menu-300'"
+                :disabled="isAwaitingEmbed"
+                is-right-aligned
+                @dropdown:open="getReportEmbed(report)"
+              >
+                <div class="dropdown-content is-size-7">
+                  <div class="dropdown-item">
+                    <div class="field has-addons">
+                      <p class="control is-expanded">
+                        <input
+                          :ref="`embed-${report.id}`"
+                          class="input is-small is-family-code has-background-white-ter	has-text-grey-dark	"
+                          type="text"
+                          placeholder="Generating snippet..."
+                          readonly
+                        />
+                      </p>
+                      <p class="control">
+                        <button
+                          class="button is-small"
+                          :disabled="isAwaitingEmbed"
+                          @click="copyToClipboard(`embed-${report.id}`)"
+                        >
+                          Copy Snippet
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+                  <div class="dropdown-item">
+                    <p class="is-italic has-text-centered is-size-7">
+                      This report is now
+                      <strong>publicly embeddable</strong>
+                    </p>
+                  </div>
+                </div>
+              </Dropdown>
             </div>
           </div>
         </div>

@@ -1,5 +1,8 @@
 from flask import Blueprint, jsonify, request
+
 from .errors import InvalidFileNameError
+from .reports_helper import ReportsHelper
+
 from meltano.core.project import Project
 from meltano.core.m5o.reports_service import ReportAlreadyExistsError, ReportsService
 
