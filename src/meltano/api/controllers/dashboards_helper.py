@@ -1,6 +1,6 @@
 from meltano.core.project import Project
 from meltano.core.schedule_service import ScheduleService
-from meltano.core.utils import slugify, find_named
+
 from .reports_helper import ReportsHelper
 from .sql_helper import SqlHelper
 
