@@ -91,6 +91,7 @@ requirements.txt: setup.py
 bundle: clean ui
 	mkdir -p src/meltano/api/templates && \
 	cp src/webapp/dist/index.html src/meltano/api/templates/webapp.html && \
+	cp src/webapp/dist/index-embed.html src/meltano/api/templates/embed.html && \
 	cp -r src/webapp/dist/static/. src/meltano/api/static
 
 freeze_db:
