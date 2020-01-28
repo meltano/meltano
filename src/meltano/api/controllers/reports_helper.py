@@ -23,10 +23,11 @@ class ReportsHelper:
             session.commit()
 
         embed_url = url_for("root.embed", token=embed_token.token, _external=True)
+        inline_styles = "margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline;"
         return {
             "is_new": is_new,
             "url": embed_url,
-            "snippet": f"<iframe src='{embed_url}' />",
+            "snippet": f"<iframe src='{embed_url}' style='{inline_styles}' />",
         }
 
     def get_embed(self, session, token):

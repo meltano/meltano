@@ -1,3 +1,4 @@
+import sqlalchemy
 from flask import Blueprint, jsonify, request
 
 from .errors import InvalidFileNameError
@@ -58,6 +59,19 @@ def _handle(ex):
     )
 
 
+@reportsBP.errorhandler(sqlalchemy.orm.exc.NoResultFound)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"No matching report found or this report is no longer public.",
+            }
+        ),
+        400,
+    )
+
+
 @reportsBP.route("/", methods=["GET"])
 def index():
     reports = reports_service().get_reports()
@@ -71,8 +85,9 @@ def get_embed(token):
     reports_helper = ReportsHelper()
     embed = reports_helper.get_embed(db.session, token)
     report = reports_service().get_report_by_name(embed.resource_id)
+    report_with_query_results = reports_helper.get_report_with_query_results(report)
 
-    return jsonify(report)
+    return jsonify(report_with_query_results)
 
 
 @reportsBP.route("/embed", methods=["POST"])

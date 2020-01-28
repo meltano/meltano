@@ -27,9 +27,9 @@ export default {
     }
   },
   data: () => ({
-    position: 0,
     isAwaitingEmbed: false,
-    isEditable: false
+    isEditable: false,
+    position: 0
   }),
   computed: {
     ...mapGetters('orchestration', ['lastUpdatedDate']),
@@ -190,12 +190,12 @@ export default {
         </div>
       </div>
 
-      <chart
+      <Chart
         :class="edit ? 'is-transparent-50' : ''"
         :chart-type="report.chartType"
         :results="report.queryResults"
         :result-aggregates="report.queryResultAggregates"
-      ></chart>
+      />
     </div>
   </div>
 </template>

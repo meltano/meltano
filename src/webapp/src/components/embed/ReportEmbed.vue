@@ -12,6 +12,7 @@ export default {
   },
   data() {
     return {
+      errorMessage: null,
       isLoading: true,
       isValid: false,
       report: null
@@ -22,17 +23,17 @@ export default {
   },
   methods: {
     initialize() {
-      // swap to token/id consumed from from route
       reportsApi
         .loadFromEmbedToken(this.token)
-        .then(response =>
-          reportsApi.loadReportWithQueryResults(response.data['name'])
-        )
         .then(response => {
           this.report = response.data
           this.isValid = true
-          this.isLoading = false
         })
+        .catch(error => {
+          this.errorMessage = error.response.data.code
+          this.isValid = false
+        })
+        .finally(() => (this.isLoading = false))
     }
   }
 }
@@ -40,7 +41,7 @@ export default {
 
 <template>
   <div>
-    <progress v-if="!report" class="progress is-small is-info"></progress>
+    <progress v-if="isLoading" class="progress is-small is-info"></progress>
 
     <template v-else>
       <Chart
@@ -51,7 +52,7 @@ export default {
       ></Chart>
 
       <div v-else class="content">
-        <p>The requested embedded report is no longer public.</p>
+        <p>{{ errorMessage }}</p>
       </div>
     </template>
   </div>
