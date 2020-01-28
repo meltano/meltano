@@ -23,13 +23,16 @@ export default {
   methods: {
     initialize() {
       // swap to token/id consumed from from route
-      reportsApi.loadFromEmbedToken(this.token)
-                .then(response => reportsApi.loadReportWithQueryResults(response.data["name"]))
-                .then(response => {
-                  this.report = response.data
-                  this.isValid = true
-                  this.isLoading = false
-                })
+      reportsApi
+        .loadFromEmbedToken(this.token)
+        .then(response =>
+          reportsApi.loadReportWithQueryResults(response.data['name'])
+        )
+        .then(response => {
+          this.report = response.data
+          this.isValid = true
+          this.isLoading = false
+        })
     }
   }
 }
