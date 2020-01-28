@@ -22,8 +22,8 @@ Hosted Meltano accounts currently support extracting data from:
 If you don't see the extractor you need here, we have a [tutorial for creating your extractor](/tutorials/create-a-custom-extractor.html). We are constantly working to build new extractors, and our current roadmap includes: Google Ads, Shopify and Segment as next on the list.
 :::
 
-## Loaders
+#### Reporting Database
 
-Meltano hosted accounts offer a pre-configured [Postgres](/plugins/loaders/postgres.html) database, which will act as the reporting database where all your extracted data from the sources above will live.
+Meltano hosted accounts come with a pre-configured [Postgres](/plugins/loaders/postgres.html) database, which acts as the reporting database where all your extracted data from the sources above will live.
 
 
