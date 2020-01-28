@@ -1,3 +1,4 @@
+import sqlalchemy
 from flask import url_for
 
 from meltano.api.models.embed_token import EmbedToken
@@ -13,16 +14,17 @@ class ReportsHelper:
     def create_embed_snippet(self, session, name):
         try:
             embed_token = session.query(EmbedToken).filter_by(resource_id=name).one()
-            is_cached = True
+            is_new = True
+        except sqlalchemy.orm.exc.NoResultFound:
             embed_token = EmbedToken(resource_id=name)
             session.add(embed_token)
-            is_cached = False
+            is_new = False
         finally:
             session.commit()
 
         embed_url = url_for("root.embed", token=embed_token.token, _external=True)
         return {
-            "is_cached": is_cached,
+            "is_new": is_new,
             "url": embed_url,
             "snippet": f"<iframe src='{embed_url}' />",
         }

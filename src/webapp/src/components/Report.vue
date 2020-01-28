@@ -63,7 +63,7 @@ export default {
         .generateEmbedURL(report)
         .then(response => {
           this.$refs[`embed-${report.id}`].value = response.data.snippet
-          if (!response.data.isCached) {
+          if (!response.data.isNew) {
             Vue.toasted.global.success(`${report.name} embed code created`)
           }
         })
