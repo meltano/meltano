@@ -13,11 +13,13 @@ class TestJSON:
                     "a_dict": {"camel_case": 1},
                     "a_list": [{"camel_case": 1}],
                     "a_val": "camel_value",
+                    "_a_val": "camel_value",
                 },
                 {
                     "aDict": {"camelCase": 1},
                     "aList": [{"camelCase": 1}],
                     "aVal": "camel_value",
+                    "_a_val": "camel_value",
                 },
             ),
             (
@@ -26,11 +28,13 @@ class TestJSON:
                     "aDict": {"snakeCase": 1},
                     "aList": [{"snakeCase": 1}],
                     "aVal": "snakeValue",
+                    "_aVal": "snakeValue",
                 },
                 {
                     "a_dict": {"snake_case": 1},
                     "a_list": [{"snake_case": 1}],
                     "a_val": "snakeValue",
+                    "_aVal": "snakeValue",
                 },
             ),
             (
@@ -67,11 +71,15 @@ class TestJSON:
                     "aDict": {"camelCase": 1},
                     "aList": [{"camelCase": 1}],
                     "aVal": "simpleValue",
+                    # `_` prefixed are not converted
+                    "_aVal": "simpleValue",
                 },
                 {
                     "a_dict": {"camel_case": 1},
                     "a_list": [{"camel_case": 1}],
                     "a_val": "simpleValue",
+                    # `_` prefixed are not converted
+                    "_aVal": "simpleValue",
                 },
             )
         ],
@@ -83,9 +91,12 @@ class TestJSON:
 
             assert decoded == expected
 
-    def test_json_scheme_fails(self, app):
+    def test_json_scheme_encoder_fails(self, app):
         payload = {"snakeCase": 1, "snake_case": 2}
 
-        with pytest.raises(ValueError) as e, app.test_request_context():
+        with app.test_request_context():
             encoded = _json.dumps(payload)
-            json.loads(encoded)
+
+            # if there is an issue with the encoding
+            # it fallbacks to the original notation
+            assert _json.loads(encoded) == payload
