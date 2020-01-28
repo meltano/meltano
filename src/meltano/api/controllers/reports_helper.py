@@ -14,11 +14,11 @@ class ReportsHelper:
     def create_embed_snippet(self, session, name):
         try:
             embed_token = session.query(EmbedToken).filter_by(resource_id=name).one()
-            is_new = True
+            is_new = False
         except sqlalchemy.orm.exc.NoResultFound:
             embed_token = EmbedToken(resource_id=name)
             session.add(embed_token)
-            is_new = False
+            is_new = True
         finally:
             session.commit()
 
