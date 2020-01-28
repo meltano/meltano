@@ -33,7 +33,7 @@ class ReportAlreadyExistsError(Exception):
 class ReportsHelper:
     VERSION = "1.0.0"
 
-    def get_embed_snippet(self, session, name):
+    def create_embed_snippet(self, session, name):
         try:
             embed_token = session.query(EmbedToken).filter_by(resource_id=name).one()
             is_cached = True
