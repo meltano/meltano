@@ -177,9 +177,10 @@ export default {
                     </div>
                   </div>
                   <div class="dropdown-item">
-                    <p class="is-italic has-text-centered is-size-7">
+                    <p class="is-italic is-size-7">
                       This report is now
-                      <strong>publicly embeddable</strong>
+                      <strong>publicly embeddable</strong>. It is only public
+                      when embedded on another website.
                     </p>
                   </div>
                 </div>

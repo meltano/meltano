@@ -70,7 +70,7 @@ def index():
 def get_embed(token):
     reports_helper = ReportsHelper()
     embed = reports_helper.get_embed(db.session, token)
-    report = reports_helper.get_report_by_name(embed.resource_id)
+    report = reports_service().get_report_by_name(embed.resource_id)
 
     return jsonify(report)
 
@@ -91,10 +91,11 @@ def load_report(report_name):
 
     reports_helper = ReportsHelper()
     post_data = request.get_json()
+    report = reports_service().get_report_by_name(report_name)
     response_data = (
-        reports_helper.get_report_with_query_results(report_name)
+        reports_helper.get_report_with_query_results(report)
         if post_data["has_results"]
-        else reports_service().load_report(report_name)
+        else report
     )
 
     permit("view:design", response_data["design"])

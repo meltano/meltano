@@ -42,9 +42,6 @@ class ReportsService:
         report = next(filter(lambda r: r["name"] == name, reports), None)
         return report
 
-    def load_report(self, name):
-        return self.get_report_by_name(name)
-
     def save_report(self, data):
         if "id" in data:
             existing_report = self.get_report(data["id"])
