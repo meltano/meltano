@@ -5,13 +5,6 @@ from .reports_helper import ReportsHelper
 from .sql_helper import SqlHelper
 
 
-class DashboardReportScheduleNotFoundError(Exception):
-    """Occurs when dashboard reports cannot be loaded because a schedule could not be found."""
-
-    def __init__(self, namespace):
-        self.namespace = namespace
-
-
 class DashboardsHelper:
     def get_dashboard_reports_with_query_results(self, reports):
         project = Project.find()
