@@ -60,11 +60,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1589](https://gitlab.com/meltano/meltano/issues/1589) Add dbt-specific files to a .gitignore
 - [#1402](https://gitlab.com/meltano/meltano/issues/1402) Onboarding redesign to minimize steps and friction ('Extractors' as 'Data Sources', pipelines are secondary to 'Data Source' integrations, and removed loader, transform, and pipeline name as editable in favor of preselected values in accordance with our hosted solution)
 - [#1402](https://gitlab.com/meltano/meltano/issues/1402) Local development now requires `.env` to connect a `target-postgres` loader (docs update to follow in [#1586](https://gitlab.com/meltano/meltano/issues/1586) )
+- [#1410](https://gitlab.com/meltano/meltano/issues/1410) Update the Design UI to expose timeframes explicitly
 
 ### Fixes
 
 - [#1573](https://gitlab.com/meltano/meltano/issues/1573) Fix docs `shouldShowNavbar` conditional and improve query string `embed=true` parsing
 - [#1579](https://gitlab.com/meltano/meltano/issues/1579) Make color contrast for CTA buttons accessible
+- [#1410](https://gitlab.com/meltano/meltano/issues/1410) Fix a problem with Report that has timeframes selections
 
 ### Breaks
 

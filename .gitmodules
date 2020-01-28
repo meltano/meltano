@@ -1,9 +1,48 @@
-[submodule "transforms/dbt-tap-stripe"]
-	path = transform/dbt-tap-stripe
-	url = git@gitlab.com:meltano/dbt-tap-stripe.git
-[submodule "transforms/model-stripe"]
-	path = model/model-stripe
-	url = git@gitlab.com:meltano/model-stripe.git
+[submodule "model/model-facebook"]
+	path = model/model-facebook
+	url = git@gitlab.com:meltano/model-facebook.git
+[submodule "model/model-gitlab-ultimate"]
+	path = model/model-gitlab-ultimate
+	url = git@gitlab.com:meltano/model-gitlab-ultimate.git
+[submodule "model/model-google-analytics"]
+	path = model/model-google-analytics
+	url = git@gitlab.com:meltano/model-google-analytics.git
+[submodule "model/model-zendesk"]
+	path = model/model-zendesk
+	url = git@gitlab.com:meltano/model-zendesk.git
+[submodule "model/model-zuora"]
+	path = model/model-zuora
+	url = git@gitlab.com:meltano/model-zuora.git
+[submodule "model/model-gitlab"]
+	path = model/model-gitlab
+	url = git@gitlab.com:meltano/model-gitlab.git
+[submodule "model/model-salesforce"]
+	path = model/model-salesforce
+	url = git@gitlab.com:meltano/model-salesforce.git
+[submodule "transform/dbt-tap-gitlab"]
+	path = transform/dbt-tap-gitlab
+	url = git@gitlab.com:meltano/dbt-tap-gitlab.git
+[submodule "model/model-shared"]
+	path = model/model-shared
+	url = git@gitlab.com:meltano/model-shared.git
 [submodule "model/model-carbon-intensity"]
 	path = model/model-carbon-intensity
 	url = git@gitlab.com:meltano/model-carbon-intensity.git
+[submodule "model/model-stripe"]
+	path = model/model-stripe
+	url = git@gitlab.com:meltano/model-stripe.git
+[submodule "transform/dbt-tap-stripe"]
+	path = transform/dbt-tap-stripe
+	url = git@gitlab.com:meltano/dbt-tap-stripe.git
+[submodule "tranform/dbt-tap-salesforce"]
+	path = transform/dbt-tap-salesforce
+	url = git@gitlab.com:meltano/dbt-tap-salesforce.git
+[submodule "transform/dbt-tap-facebook"]
+	path = transform/dbt-tap-facebook
+	url = git@gitlab.com:meltano/dbt-tap-facebook
+[submodule "transform/dbt-tap-google-analytics"]
+	path = transform/dbt-tap-google-analytics
+	url = git@gitlab.com:meltano/dbt-tap-google-analytics
+[submodule "transform/dbt-tap-zendesk"]
+	path = transform/dbt-tap-zendesk
+	url = git@gitlab.com:meltano/dbt-tap-zendesk

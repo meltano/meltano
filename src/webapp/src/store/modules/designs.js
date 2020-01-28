@@ -44,6 +44,8 @@ const defaultState = utils.deepFreeze({
 })
 
 const helpers = {
+  buildKey: (...parts) => lodash.join(parts, '.'),
+
   getFilterTypePlural(filterType) {
     return `${filterType}s`
   },
@@ -167,10 +169,7 @@ const getters = {
       const sources = [state.design].concat(joinSources)
       const batchCollect = (table, attributeTypes) => {
         attributeTypes.forEach(attributeType => {
-          const attributesByType = table[attributeType]
-          if (attributesByType) {
-            attributes = attributes.concat(attributesByType)
-          }
+          attributes = attributes.concat(table[attributeType] || [])
         })
       }
 
@@ -182,12 +181,32 @@ const getters = {
     }
   },
 
+  getOrderableAttributesIndex(state, getters) {
+    const attributes = getters.getAttributes()
+
+    let attributesIndex = {}
+    attributes.forEach(attribute => {
+      if (
+        !getters.getIsOrderableAttribute({ attributeClass: attribute.class })
+      ) {
+        return
+      }
+
+      attributesIndex[
+        helpers.buildKey(attribute.sourceName, attribute.name)
+      ] = attribute
+    })
+
+    return attributesIndex
+  },
+
   // eslint-disable-next-line no-shadow
   getAttributeByQueryAttribute(_, getters) {
     return queryAttribute => {
       const finder = attr =>
         attr.sourceName === queryAttribute.sourceName &&
-        attr.name === queryAttribute.attributeName
+        attr.name == queryAttribute.attributeName &&
+        attr.class === queryAttribute.attributeClass
       return getters.getAttributes().find(finder)
     }
   },
@@ -250,6 +269,12 @@ const getters = {
       !!getters.getFilter(sourceName, name, filterType)
   },
 
+  // Timeframes are not sortable
+  // https://gitlab.com/meltano/meltano/issues/1188
+  getIsOrderableAttribute() {
+    return queryAttribute => queryAttribute.attributeClass != 'timeframes'
+  },
+
   getIsOrderableAttributeAscending() {
     return orderableAttribute => orderableAttribute.direction === 'asc'
   },
@@ -298,6 +323,9 @@ const getters = {
   isColumnSelectedAggregate: state => columnName =>
     columnName in state.resultAggregates,
 
+  isTimeframeSelected: () => timeframe =>
+    timeframe.selected || lodash.some(timeframe.periods, selected),
+
   joinIsExpanded: () => join => join.expanded,
 
   resultsCount(state) {
@@ -307,7 +335,7 @@ const getters = {
     return state.results.length
   },
 
-  showJoinColumnAggregateHeader: () => obj => !!obj
+  showAttributesHeader: () => attributes => attributes && attributes.length
 }
 
 const actions = {
@@ -471,7 +499,9 @@ const actions = {
           commit('setQueryResults', response.data)
           commit('setSQLResults', response.data)
           commit('setIsLoadingQuery', false)
-          commit('setSorting', getters.getAttributes())
+          commit('setSorting', {
+            attributesIndex: getters.getOrderableAttributesIndex
+          })
         } else {
           commit('setSQLResults', response.data)
         }
@@ -502,18 +532,27 @@ const actions = {
     }
 
     const setSelected = (sourceCollection, targetCollection) => {
-      if (!sourceCollection) {
+      if (!(sourceCollection && targetCollection)) {
         return
       }
 
       sourceCollection.forEach(item => {
-        item.selected = targetCollection.includes(item.name)
+        Vue.set(item, 'selected', targetCollection.includes(item.name))
       })
     }
 
     // toggle the selected items
     setSelected(baseTable.columns, queryPayload.columns)
     setSelected(baseTable.aggregates, queryPayload.aggregates)
+    setSelected(baseTable.timeframes, queryPayload.timeframes.map(namer))
+
+    // timeframes periods
+    queryPayload.timeframes.forEach(queryTimeframe => {
+      const timeframe = baseTable.timeframes.find(tf =>
+        nameMatcher(tf, queryTimeframe)
+      )
+      setSelected(timeframe.periods, queryTimeframe.periods.map(namer))
+    })
 
     // joins, timeframes, and periods
     joinColumnGroups.forEach(joinGroup => {
@@ -522,25 +561,18 @@ const actions = {
 
       setSelected(joinGroup.columns, targetJoin.columns)
       setSelected(joinGroup.aggregates, targetJoin.aggregates)
+      setSelected(joinGroup.timeframes, targetJoin.timeframes.map(namer))
 
-      // timeframes
-      if (targetJoin.timeframes) {
-        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(namer))
-        // periods
-        joinGroup.timeframes.forEach(timeframe => {
-          const targetTimeframe = targetJoin.timeframes.find(tf =>
-            nameMatcher(tf, timeframe)
-          )
-
-          if (targetTimeframe) {
-            setSelected(timeframe.periods, targetTimeframe.periods.map(namer))
-          }
-        })
-      }
+      // timeframes periods
+      targetJoin.timeframes.forEach(queryTimeframe => {
+        const timeframe = joinGroup.timeframes.find(tf =>
+          nameMatcher(tf, queryTimeframe)
+        )
+        setSelected(timeframe.periods, queryTimeframe.periods.map(namer))
+      })
     })
 
     commit('setCurrentReport', report)
-
     this.dispatch('designs/getSQL', {
       run: true,
       payload: report.queryPayload
@@ -753,6 +785,7 @@ const mutations = {
           table[attributeType].forEach(attribute => {
             attribute.sourceName = source.name
             attribute.sourceLabel = source.label
+            attribute.class = attributeType
           })
         }
       })
@@ -826,33 +859,30 @@ const mutations = {
     orderableAttribute.direction = direction
   },
 
-  setSorting(state, allAttributes) {
+  setSorting(state, { attributesIndex }) {
     state.queryAttributes.forEach(queryAttribute => {
-      const getName = attribute => {
-        // Account for timeframes matching
-        let period = null
-        if (attribute.periods) {
-          period = attribute.periods.find(
-            period => period.name === queryAttribute.attributeName
+      const attribute =
+        attributesIndex[
+          helpers.buildKey(
+            queryAttribute.sourceName,
+            queryAttribute.attributeName
           )
-        }
-        return period ? period.name : attribute.name
+        ]
+
+      // the index only contains attributes that are Orderable
+      if (!attribute) {
+        return
       }
+
       const finder = orderableAttribute =>
-        orderableAttribute.attribute.sourceName === queryAttribute.sourceName &&
-        getName(orderableAttribute.attribute) === queryAttribute.attributeName
+        orderableAttribute.attribute === attribute
 
       const accounted = state.order.assigned.concat(state.order.unassigned)
-      const isAccountedFor = accounted.find(finder)
+      const isAccountedFor = lodash.some(accounted, finder)
+
       if (!isAccountedFor) {
-        const targetAttribute = allAttributes.find(attribute => {
-          return (
-            attribute.sourceName === queryAttribute.sourceName &&
-            getName(attribute) === queryAttribute.attributeName
-          )
-        })
         state.order.unassigned.push({
-          attribute: targetAttribute,
+          attribute,
           direction: 'asc'
         })
       }
