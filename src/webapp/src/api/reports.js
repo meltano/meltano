@@ -2,7 +2,11 @@ import axios from 'axios'
 import utils from '@/utils/utils'
 
 export default {
-  embed(data) {
+  loadFromEmbedToken(token) {
+    return axios.get(utils.apiUrl('reports/embed', token))
+  },
+
+  generateEmbedURL(data) {
     return axios.post(utils.apiUrl('reports', 'embed'), data)
   },
 

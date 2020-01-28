@@ -43,6 +43,15 @@ def dbt_docs(path):
     )
 
 
+@root.route("/-/embed/", defaults={"token": ""})
+@root.route("/-/embed/<token>")
+def embed(token):
+    try:
+        return render_template("embed.html", jsContext=g.jsContext)
+    except TemplateNotFound:
+        return "Please run `make bundle` from src/webapp of the Meltano project."
+
+
 # this route is a catch-all route to forward
 # all oustanding request (not caught by any route)
 # to the front-end.

@@ -8,7 +8,7 @@ export default {
     Chart
   },
   props: {
-    token: { type: String, default: 'none' }
+    token: { type: String, default: null }
   },
   data() {
     return {
@@ -23,13 +23,13 @@ export default {
   methods: {
     initialize() {
       // swap to token/id consumed from from route
-      const name = 'test report'
-
-      reportsApi.loadReportWithQueryResults(name).then(response => {
-        this.report = response.data
-        this.isValid = true
-        this.isLoading = false
-      })
+      reportsApi.loadFromEmbedToken(this.token)
+                .then(response => reportsApi.loadReportWithQueryResults(response.data["name"]))
+                .then(response => {
+                  this.report = response.data
+                  this.isValid = true
+                  this.isLoading = false
+                })
     }
   }
 }

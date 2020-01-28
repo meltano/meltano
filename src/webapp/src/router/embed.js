@@ -6,13 +6,13 @@ const router = new Router({
   mode: 'history',
   routes: [
     {
-      path: '/-/public/:token',
+      path: '/-/embed/:token',
       name: 'report-embed',
       component: ReportEmbed,
       meta: {
         title: 'Meltano Report Embed'
       },
-      props: { default: true }
+      props: true
     }
   ]
 })

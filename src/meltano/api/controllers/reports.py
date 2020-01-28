@@ -7,6 +7,7 @@ from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.security.auth import permit
 from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin, Need
 from meltano.api.security.readonly_killswitch import readonly_killswitch
+from meltano.api.models import db
 
 reportsBP = APIBlueprint("reports", __name__)
 
@@ -62,13 +63,22 @@ def index():
     return jsonify(reports)
 
 
+@reportsBP.route("/embed/<token>", methods=["GET"])
+def get_embed(token):
+    reports_helper = ReportsHelper()
+    embed = reports_helper.get_embed(db.session, token)
+    report = reports_helper.get_report_by_name(embed.resource_id)
+
+    return jsonify(report)
+
+
 @reportsBP.route("/embed", methods=["POST"])
 def embed():
     reports_helper = ReportsHelper()
     post_data = request.get_json()
-    origin = request.environ["HTTP_ORIGIN"]
     # TODO validate permission prior to making this public (maybe via the `permit`?)
-    response_data = reports_helper.get_embed_snippet(post_data["name"], origin)
+    response_data = reports_helper.get_embed_snippet(db.session, post_data["name"])
+
     return jsonify(response_data)
 
 
