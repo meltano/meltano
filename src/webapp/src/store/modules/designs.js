@@ -331,7 +331,7 @@ const getters = {
     return state.results.length
   },
 
-  showJoinColumnAggregateHeader: () => obj => !!obj
+  showAttributesHeader: () => attributes => attributes && attributes.length
 }
 
 const actions = {

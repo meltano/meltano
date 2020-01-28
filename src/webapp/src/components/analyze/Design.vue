@@ -59,7 +59,7 @@ export default {
       'hasResults',
       'isTimeframeSelected',
       'resultsCount',
-      'showJoinColumnAggregateHeader'
+      'showAttributesHeader'
     ]),
     ...mapState('dashboards', ['dashboards']),
 
@@ -596,9 +596,7 @@ export default {
               </template>
               <template v-if="!design.relatedTable.collapsed">
                 <a
-                  v-if="
-                    showJoinColumnAggregateHeader(design.relatedTable.columns)
-                  "
+                  v-if="showAttributesHeader(design.relatedTable.columns)"
                   class="panel-block
                     attribute-heading
                     has-text-weight-semibold
@@ -635,7 +633,7 @@ export default {
                 </template>
                 <!-- eslint-disable-next-line vue/require-v-for-key -->
                 <a
-                  v-if="design.relatedTable.timeframes"
+                  v-if="showAttributesHeader(design.relatedTable.timeframes)"
                   class="panel-block
                          attribute-heading
                          has-text-weight-semibold
@@ -666,11 +664,7 @@ export default {
                 </template>
                 <!-- eslint-disable-next-line vue/require-v-for-key -->
                 <a
-                  v-if="
-                    showJoinColumnAggregateHeader(
-                      design.relatedTable.aggregates
-                    )
-                  "
+                  v-if="showAttributesHeader(design.relatedTable.aggregates)"
                   class="panel-block
                     attribute-heading
                     has-text-weight-semibold
@@ -730,9 +724,7 @@ export default {
                   <template v-if="!join.collapsed">
                     <!-- eslint-disable-next-line vue/require-v-for-key -->
                     <a
-                      v-if="
-                        showJoinColumnAggregateHeader(join.relatedTable.columns)
-                      "
+                      v-if="showAttributesHeader(join.relatedTable.columns)"
                       class="panel-block
                       attribute-heading
                       has-text-weight-semibold
@@ -771,11 +763,7 @@ export default {
 
                     <!-- eslint-disable-next-line vue/require-v-for-key -->
                     <a
-                      v-if="
-                        showJoinColumnAggregateHeader(
-                          join.relatedTable.timeframes
-                        )
-                      "
+                      v-if="showAttributesHeader(join.relatedTable.timeframes)"
                       class="panel-block
                             attribute-heading
                             has-text-weight-semibold
@@ -818,11 +806,7 @@ export default {
 
                     <!-- eslint-disable-next-line vue/require-v-for-key -->
                     <a
-                      v-if="
-                        showJoinColumnAggregateHeader(
-                          join.relatedTable.aggregates
-                        )
-                      "
+                      v-if="showAttributesHeader(join.relatedTable.aggregates)"
                       class="panel-block
                       attribute-heading
                       has-text-weight-semibold
