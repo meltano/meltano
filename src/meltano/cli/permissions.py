@@ -30,10 +30,6 @@ def permissions():
 def grant(project, db, spec, dry, diff):
     """Grant the permissions provided in the provided specification file."""
     try:
-        if not dry:
-            click.secho("Error: Only dry runs are supported at the moment", fg="red")
-            sys.exit(1)
-
         sql_commands = grant_permissions(db, spec, dry_run=dry)
         tracker = GoogleAnalyticsTracker(project)
         tracker.track_meltano_permissions_grant(db=db, dry=dry)
@@ -51,16 +47,24 @@ def grant(project, db, spec, dry, diff):
         for command in sql_commands:
             if command["already_granted"]:
                 if diff:
-                    fg = "cyan"
                     diff_prefix = "  "
                 else:
                     continue
             else:
-                fg = "green"
                 if diff:
                     diff_prefix = "+ "
+            
+            if command["run_status"]:
+                fg = "green"
+                run_prefix = "[SUCCESS] "
+            elif command["run_status"] is None:
+                fg = "cyan"
+                run_prefix = "[SKIPPED] "
+            else:
+                fg = "red"
+                run_prefix = "[ERROR] "
 
-            click.secho(f"{diff_prefix}{command['sql']};", fg=fg)
+            click.secho(f"{diff_prefix}{run_prefix}{command['sql']};", fg=fg)
     except SpecLoadingError as exc:
         for line in str(exc).splitlines():
             click.secho(line, fg="red")
