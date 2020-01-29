@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1625](https://gitlab.com/meltano/meltano/issues/1625) Update docs on meltano.com to only include extractors and loaders provided in the hosted version of Meltano.
+
 ### Fixes
 
 - [#1618](https://gitlab.com/meltano/meltano/issues/1618) Fix an issue where an expired session would not redirect to the Login page
