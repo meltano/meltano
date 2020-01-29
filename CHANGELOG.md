@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1545](https://gitlab.com/meltano/meltano/issues/1545) Add read-only report embed functionality via embeddable `iframe`
+
 ### Changes
 
 ### Fixes
