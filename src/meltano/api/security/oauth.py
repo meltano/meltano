@@ -2,7 +2,7 @@ import json
 import base64
 import gitlab
 from authlib.flask.client import OAuth as OAuthClient
-from flask import Blueprint, url_for, redirect, current_app
+from flask import Blueprint, url_for, redirect, current_app, jsonify
 from flask_security import current_user, AnonymousUser
 from flask_security.utils import login_user, do_flash, url_for_security
 from sqlalchemy.orm import joinedload
@@ -25,8 +25,7 @@ def base64_pad(s):
 jwt_decode = compose(json.loads, base64.urlsafe_b64decode, base64_pad)
 
 
-def setup_oauth(app):
-    oauth = OAuthClient(app)
+def setup_oauth_gitlab(oauth):
     oauth.register(
         "gitlab",
         access_token_url="https://gitlab.com/oauth/token",
@@ -34,7 +33,7 @@ def setup_oauth(app):
         authorize_url="https://gitlab.com/oauth/authorize",
     )
 
-    oauthBP = Blueprint("OAuth", __name__, url_prefix="/oauth")
+    oauthBP = Blueprint("OAuth.GitLab", __name__, url_prefix="/oauth/gitlab")
 
     @oauthBP.route("/login")
     def login():
@@ -54,7 +53,38 @@ def setup_oauth(app):
             do_flash(str(e))
             return redirect(url_for_security("login"))
 
-    app.register_blueprint(oauthBP)
+    oauth.app.register_blueprint(oauthBP)
+
+
+def setup_oauth_facebook(oauth):
+    oauth.register(
+        "facebook",
+        access_token_url="https://graph.facebook.com/v5.0/oauth/access_token",
+        client_kwargs={"scope": "ads_read ads_management manage_pages"},
+        authorize_url="https://www.facebook.com/v5.0/dialog/oauth",
+    )
+
+    oauthBP = Blueprint("OAuth.Facebook", __name__, url_prefix="/oauth/facebook")
+
+    @oauthBP.route("/login")
+    def login():
+        redirect_uri = url_for(".authorize", _external=True)
+        return oauth.facebook.authorize_redirect(redirect_uri)
+
+    @oauthBP.route("/authorize")
+    def authorize():
+        token = oauth.facebook.authorize_access_token(test="123")
+
+        return jsonify(token)
+
+    oauth.app.register_blueprint(oauthBP)
+
+
+def setup_oauth(app):
+    oauth = OAuthClient(app)
+
+    #setup_oauth_gitlab(oauth)
+    setup_oauth_facebook(oauth)
 
 
 def gitlab_token_identity(token):
