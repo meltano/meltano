@@ -1,6 +1,6 @@
 import Router from 'vue-router'
 
-import ReportEmbed from '@/components/embed/ReportEmbed'
+import ReportEmbed from '@/views/ReportEmbed'
 
 const router = new Router({
   mode: 'history',

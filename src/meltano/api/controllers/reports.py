@@ -94,7 +94,6 @@ def get_embed(token):
 def embed():
     reports_helper = ReportsHelper()
     post_data = request.get_json()
-    # TODO validate permission prior to making this public (maybe via the `permit`?)
     response_data = reports_helper.create_embed_snippet(db.session, post_data["name"])
 
     return jsonify(response_data)
