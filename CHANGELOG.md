@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1625](https://gitlab.com/meltano/meltano/issues/1625) Update docs on meltano.com to only include extractors and loaders provided in the hosted version of Meltano.
+- [#1590](https://gitlab.com/meltano/meltano/issues/1590) Add additional targets to `dbt clean`
 
 ### Fixes
 
@@ -88,7 +89,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1541](https://gitlab.com/meltano/meltano/issues/1541) Revert `tap-csv`'s `kind: file` to text input for `csv_files_definition` as we don't fully support `tap-csv` via the UI with single (definition json) and multiple (csv files) file uploading
 - [#1477](https://gitlab.com/meltano/meltano/issues/1477) Add a `read-only` mode to Meltano to disable all modifications from the UI
-- [#1590](https://gitlab.com/meltano/meltano/issues/1590) Add additional targets to `dbt clean`
 
 ### Fixes
 
