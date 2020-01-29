@@ -144,7 +144,7 @@ export default {
               <Dropdown
                 :tooltip="{
                   classes: 'is-tooltip-left',
-                  message: 'Create an embeddable iframe'
+                  message: 'Create an embeddable code snippet'
                 }"
                 label="Embed"
                 button-classes="button is-small"
@@ -202,7 +202,6 @@ export default {
 
 <style>
 .wireframe {
-  color: red;
   border: 3px dotted #ddd;
 }
 </style>
