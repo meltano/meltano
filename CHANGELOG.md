@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
@@ -17,9 +17,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1618](https://gitlab.com/meltano/meltano/issues/1618) Fix an issue where an expired session would not redirect to the Login page
+- [#1630](https://gitlab.com/meltano/meltano/issues/1630) Fix an integrations setup bug that prevented subsequent pipelines to be created unless a full page refresh occurred
 
 ### Breaks
-
 
 ## 1.17.0 - (2020-01-27)
 
@@ -47,7 +47,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1605](https://gitlab.com/meltano/meltano/issues/1605) Fix an infinite loop causing extraneous API calls to the configuration endpoint
 - [#1561](https://gitlab.com/meltano/meltano/issues/1561) Fix `onFocusInput()` to properly focus-and-auto-scroll to `<input type='file'>`s in the data source docs UI
 - [#1561](https://gitlab.com/meltano/meltano/issues/1561) Fix `<input type='file'>` styling to better accommodate flexible widths
-
 
 ## 1.16.1 - (2020-01-23)
 

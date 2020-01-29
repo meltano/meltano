@@ -37,7 +37,8 @@ export default {
   computed: {
     ...mapGetters('orchestration', [
       'getHasPipelineWithExtractor',
-      'getHasValidConfigSettings'
+      'getHasValidConfigSettings',
+      'getPipelineWithExtractor'
     ]),
     ...mapGetters('plugins', ['getIsPluginInstalled']),
     ...mapState('orchestration', ['extractorInFocusConfiguration']),
@@ -61,7 +62,7 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('plugins/getInstalledPlugins').then(this.prefillForm)
+    this.$store.dispatch('plugins/getInstalledPlugins').then(this.prepareForm)
   },
   methods: {
     ...mapActions('orchestration', [
@@ -87,29 +88,37 @@ export default {
       this.pipeline.extractor = this.extractorInFocus.name
       this.checkConfiguration(this.pipeline.extractor)
     },
-    prefillForm() {
+    prepareForm() {
       this.pipeline.name = `pipeline-${new Date().getTime()}`
+      this.pipeline.extractor = ''
       this.pipeline.interval = !_.isEmpty(this.intervalOptions)
         ? this.intervalOptions[0]
         : ''
+      this.pipeline.isRunning = false
     },
     save() {
       this.isSaving = true
-      this.savePipelineSchedule(this.pipeline)
+      const newPipeline = Object.assign({}, this.pipeline)
+      this.savePipelineSchedule(newPipeline)
         .then(() => {
-          this.run(this.pipeline).then(() => {
-            Vue.toasted.global.success(`Schedule Saved - ${this.pipeline.name}`)
-            Vue.toasted.global.success(`Auto Running - ${this.pipeline.name}`)
-            this.isSaving = false
+          const savedPipeline = this.getPipelineWithExtractor(
+            newPipeline.extractor
+          )
+          this.run(savedPipeline).then(() => {
+            Vue.toasted.global.success(`Schedule Saved - ${savedPipeline.name}`)
+            Vue.toasted.global.success(`Auto Running - ${savedPipeline.name}`)
             this.$router.push({
               name: 'runLog',
-              params: { jobId: this.pipeline.jobId }
+              params: { jobId: savedPipeline.jobId }
             })
           })
         })
         .catch(error => {
-          this.isSaving = false
           Vue.toasted.global.error(error.response.data.code)
+        })
+        .finally(() => {
+          this.isSaving = false
+          this.prepareForm()
         })
     },
     validateConfiguration(configuration) {
