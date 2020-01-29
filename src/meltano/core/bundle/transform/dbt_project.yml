@@ -15,4 +15,4 @@ clean-targets:
     - "dbt_modules"
     - "logs"
 models:
-  enabled: true    # configs defined here are applied to _all_ packages
+  my_meltano_project: null
