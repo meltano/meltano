@@ -6,9 +6,13 @@ analysis-paths: ["analysis"]
 test-paths: ["tests"]
 data-paths: ["data"]
 macro-paths: ["macros"]
-target-path: "../.meltano/transformers/dbt/target"  # directory which will store compiled SQL files
-clean-targets:                                      # directories to be removed by `dbt clean`
-  - "../.meltano/transformers/dbt/target"
-  - "dbt_modules"
+snapshot-paths: ["snapshots"]
+target-path: "../.meltano/transformers/dbt/target"
+log-path: "logs"
+modules-path: "dbt_modules"
+clean-targets:
+    - "../.meltano/transformers/dbt/target"
+    - "dbt_modules"
+    - "logs"
 models:
-  my_meltano_project: null
+  enabled: true    # configs defined here are applied to _all_ packages
