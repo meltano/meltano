@@ -137,7 +137,6 @@ export default {
                         : 'View the last run of this ELT pipeline.'
                     }`
                   "
-                  :disabled="!pipeline.jobId"
                   @click="goToLog(pipeline.jobId)"
                 >
                   <span>
