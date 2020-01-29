@@ -6,7 +6,7 @@ from meltano.core.permissions.utils.error import SpecLoadingError
 
 
 def grant_permissions(
-    db: str, spec_path: str, dry_run: bool, refresh: bool
+    db: str, spec_path: str, dry_run: bool
 ) -> List[str]:
     if db == "postgres":
         spec_loader = PGSpecLoader(spec_path)
