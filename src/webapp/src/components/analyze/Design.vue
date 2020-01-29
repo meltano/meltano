@@ -5,6 +5,7 @@ import Vue from 'vue'
 import capitalize from '@/filters/capitalize'
 import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
 import Dropdown from '@/components/generic/Dropdown'
+import EmbedButton from '@/components/generic/EmbedButton'
 import QueryFilters from '@/components/analyze/QueryFilters'
 import ResultChart from '@/components/analyze/ResultChart'
 import ResultTable from '@/components/analyze/ResultTable'
@@ -18,6 +19,7 @@ export default {
   components: {
     CreateDashboardModal,
     Dropdown,
+    EmbedButton,
     QueryFilters,
     ResultChart,
     ResultTable
@@ -948,8 +950,8 @@ export default {
                     </span>
                   </button>
                 </div>
-                <div class="contro">
-                  <button class="button">Embed...</button>
+                <div v-if="hasActiveReport" class="control">
+                  <EmbedButton :report="activeReport" />
                 </div>
               </div>
             </div>
