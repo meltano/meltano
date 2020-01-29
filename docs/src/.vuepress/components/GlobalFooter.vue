@@ -12,12 +12,10 @@ export default {
     /></a>
     <a
       href="https://about.gitlab.com/handbook/marketing/corporate-marketing/#gitlab-trademark--logo-guidelines"
-      >Copyright 2020, all rights reserved. Meltano is a trademark of GitLab, Inc.</a
+      >Copyright 2020, all rights reserved. Meltano is a trademark of GitLab,
+      Inc.</a
     >
-    <a 
-      href=""
-      >Terms of Service</a
-    >
+    <a href="/terms.html">Terms of Service</a>
   </footer>
 </template>
 
@@ -34,6 +32,6 @@ export default {
 .footer a {
   color: white;
   font-weight: 500;
-  margin: .5rem;
+  margin: 0.5rem;
 }
 </style>
