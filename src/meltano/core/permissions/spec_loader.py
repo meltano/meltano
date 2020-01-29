@@ -5,9 +5,7 @@ from meltano.core.permissions.snowflake_spec_loader import SnowflakeSpecLoader
 from meltano.core.permissions.utils.error import SpecLoadingError
 
 
-def grant_permissions(
-    db: str, spec_path: str, dry_run: bool
-) -> List[str]:
+def grant_permissions(db: str, spec_path: str, dry_run: bool) -> List[str]:
     if db == "postgres":
         spec_loader = PGSpecLoader(spec_path)
     elif db == "snowflake":
