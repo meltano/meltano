@@ -672,7 +672,10 @@ class SnowflakeSpecLoader:
 
                         sql_commands.extend(
                             generator.generate_grant_privileges_to_role(
-                                entity_name, config, self.entities["shared_databases"]
+                                entity_name,
+                                config,
+                                self.entities["shared_databases"],
+                                self.entities["databases"],
                             )
                         )
                     elif entity_type == "users":

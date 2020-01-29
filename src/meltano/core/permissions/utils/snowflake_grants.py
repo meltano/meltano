@@ -151,7 +151,7 @@ class SnowflakeGrantsGenerator:
         return sql_commands
 
     def generate_grant_privileges_to_role(
-        self, role: str, config: str, shared_dbs: Set
+        self, role: str, config: str, shared_dbs: Set, spec_dbs: Set
     ) -> List[Dict]:
         """
         Generate all the privilege granting and revocation
@@ -166,6 +166,8 @@ class SnowflakeGrantsGenerator:
         shared_dbs: a set of all the shared databases defined in the spec.
                     Used down the road by generate_database_grants() to also grant
                     "imported privileges" when access is granted to a shared DB.
+        spec_dbs: a set of all the databases defined in the spec. This is used in revoke
+                    commands to validate revocations are only for spec'd databases
 
         Returns the SQL commands generated as a list
         """
@@ -206,7 +208,7 @@ class SnowflakeGrantsGenerator:
             )
 
         database_commands = self.generate_database_grants(
-            role=role, databases=databases, shared_dbs=shared_dbs
+            role=role, databases=databases, shared_dbs=shared_dbs, spec_dbs=spec_dbs
         )
         sql_commands.extend(database_commands)
 
@@ -231,7 +233,7 @@ class SnowflakeGrantsGenerator:
             )
 
         schema_commands = self.generate_schema_grants(
-            role=role, schemas=schemas, shared_dbs=shared_dbs
+            role=role, schemas=schemas, shared_dbs=shared_dbs, spec_dbs=spec_dbs
         )
         sql_commands.extend(schema_commands)
 
@@ -256,7 +258,7 @@ class SnowflakeGrantsGenerator:
             )
 
         table_commands = self.generate_table_and_view_grants(
-            role=role, tables=tables, shared_dbs=shared_dbs
+            role=role, tables=tables, shared_dbs=shared_dbs, spec_dbs=spec_dbs
         )
         sql_commands.extend(table_commands)
 
@@ -347,7 +349,7 @@ class SnowflakeGrantsGenerator:
         return sql_commands
 
     def generate_database_grants(
-        self, role: str, databases: Dict[str, List], shared_dbs: Set
+        self, role: str, databases: Dict[str, List], shared_dbs: Set, spec_dbs: Set
     ) -> List[Dict]:
         """
         Generate the GRANT and REVOKE statements for Databases
@@ -356,6 +358,8 @@ class SnowflakeGrantsGenerator:
         role: the name of the role the privileges are GRANTed to
         databases: list of databases (e.g. "raw")
         shared_dbs: a set of all the shared databases defined in the spec.
+        spec_dbs: a set of all the databases defined in the spec. This is used in revoke
+            commands to validate revocations are only for spec'd databases
 
         Returns the SQL commands generated as a list
         """
@@ -450,7 +454,12 @@ class SnowflakeGrantsGenerator:
             # If it's a shared database, only revoke imported
             # We'll only know if it's a shared DB based on the spec
             all_databases = databases.get("read", []) + databases.get("write", [])
-            if granted_database not in all_databases and granted_database in shared_dbs:
+            if granted_database not in spec_dbs:
+                # Skip revocation on database that are not defined in spec
+                continue
+            elif (
+                granted_database not in all_databases and granted_database in shared_dbs
+            ):
                 sql_commands.append(
                     {
                         "already_granted": False,
@@ -527,7 +536,7 @@ class SnowflakeGrantsGenerator:
         return sql_commands
 
     def generate_schema_grants(
-        self, role: str, schemas: Dict[str, List], shared_dbs: Set
+        self, role: str, schemas: Dict[str, List], shared_dbs: Set, spec_dbs: Set
     ) -> List[Dict]:
         """
         Generate the GRANT and REVOKE statements for schemas
@@ -536,6 +545,8 @@ class SnowflakeGrantsGenerator:
         role: the name of the role the privileges are GRANTed to
         schemas: the name of the Schema (e.g. "raw.public", "raw.*")
         shared_dbs: a set of all the shared databases defined in the spec.
+        spec_dbs: a set of all the databases defined in the spec. This is used in revoke
+                commands to validate revocations are only for spec'd databases
 
         Returns the SQL commands generated as a List
         """
@@ -678,9 +689,11 @@ class SnowflakeGrantsGenerator:
             all_grant_schemas = read_grant_schemas + write_grant_schemas
             database_name = granted_schema.split(".")[0]
             future_schema_name = f"{database_name}.<schema>"
-            if granted_schema not in all_grant_schemas and database_name in shared_dbs:
+            if granted_schema not in all_grant_schemas and (
+                database_name in shared_dbs or database_name in spec_dbs
+            ):
                 # No privileges to revoke on imported db. Done at database level
-                # TODO Need to validate against set of listed databases in config
+                # Don't revoke on privileges on databases not defined in spec.
                 continue
             elif (  # If future privilege is granted on snowflake but not in grant list
                 granted_schema == future_schema_name
@@ -748,7 +761,6 @@ class SnowflakeGrantsGenerator:
                 and database_name in shared_dbs
             ):
                 # No privileges to revoke on imported db
-                # TODO Need to validate against set of listed databases in config
                 continue
             elif (  # If future privilege is granted but not in grant list
                 granted_schema == future_schema_name
@@ -784,7 +796,7 @@ class SnowflakeGrantsGenerator:
         return sql_commands
 
     def generate_table_and_view_grants(
-        self, role: str, tables: Dict[str, List], shared_dbs: Set
+        self, role: str, tables: Dict[str, List], shared_dbs: Set, spec_dbs: Set
     ) -> List[Dict]:
         """
         Generate the GRANT and REVOKE statements for tables and views
@@ -793,6 +805,8 @@ class SnowflakeGrantsGenerator:
         role: the name of the role the privileges are GRANTed to
         table: the name of the TABLE/VIEW (e.g. "raw.public.my_table")
         shared_dbs: a set of all the shared databases defined in the spec.
+        spec_dbs: a set of all the databases defined in the spec. This is used in revoke
+                    commands to validate revocations are only for spec'd databases
 
         Returns the SQL commands generated as a List
         """
@@ -1113,9 +1127,11 @@ class SnowflakeGrantsGenerator:
             schema_name = table_split[1]
             table_name = table_split[2]
             future_table = f"{database_name}.{schema_name}.<table>"
-            if granted_table not in all_grant_tables and database_name in shared_dbs:
+            if granted_table not in all_grant_tables and (
+                database_name in shared_dbs or database_name not in spec_dbs
+            ):
                 # No privileges to revoke on imported db. Done at database level
-                # TODO Need to validate against set of listed databases in config
+                # Don't revoke on privileges on databases not defined in spec.
                 continue
             elif (  # If future privilege is granted in Snowflake but not in grant list
                 granted_table == future_table and future_table not in all_grant_tables
@@ -1162,9 +1178,11 @@ class SnowflakeGrantsGenerator:
             schema_name = view_split[1]
             view_name = view_split[2]
             future_view = f"{database_name}.{schema_name}.<view>"
-            if granted_view not in all_grant_views and database_name in shared_dbs:
+            if granted_view not in all_grant_views and (
+                database_name in shared_dbs or database_name not in spec_dbs
+            ):
                 # No privileges to revoke on imported db. Done at database level
-                # TODO Need to validate against set of listed databases in config
+                # Don't revoke on privileges on databases not defined in spec.
                 continue
             elif granted_view == future_view and future_view not in all_grant_views:
                 # If future privilege is granted in Snowflake but not in grant list
@@ -1218,12 +1236,11 @@ class SnowflakeGrantsGenerator:
             schema_name = table_split[1]
             table_name = table_split[2]
             future_table = f"{database_name}.{schema_name}.<table>"
-            if (
-                granted_table not in write_grant_tables_full
-                and database_name in shared_dbs
+            if granted_table not in write_grant_tables_full and (
+                database_name in shared_dbs or database_name not in spec_dbs
             ):
                 # No privileges to revoke on imported db. Done at database level
-                # TODO Need to validate against set of listed databases in config
+                # Don't revoke on privileges on databases not defined in spec.
                 continue
             elif (
                 granted_table == future_table
