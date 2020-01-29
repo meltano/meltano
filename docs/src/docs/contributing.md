@@ -82,7 +82,7 @@ cd $PROJECT_NAME
 FLASK_ENV=development meltano ui
 ```
 
-The development build of the Meltano API & **production** build of the UI should now be available at <http://localhost:5000/>.
+The development build of the Meltano API and a production build of the UI will now be available at <http://localhost:5000/>.
 
 ::: tip
 
@@ -101,11 +101,18 @@ import pdb; pdb.set_trace()
 In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
 
 ```bash
-# Navigate to a Meltano project that has already been initialized
+# Create a new Meltano project
+meltano init $PROJECT_NAME
+
+# Change directory into your newly created project
+cd $PROJECT_NAME
+
 # Start the Meltano API and a production build of Meltano UI that you can ignore
 meltano ui
 
 # Open a new terminal tab and go to your meltano directory
+cd $PROJECT_NAME
+
 # Install frontend infrastructure at the root directory
 yarn setup
 
@@ -113,7 +120,9 @@ yarn setup
 yarn serve
 ```
 
-The development build of the Meltano UI will be available at <http://localhost:8080/>.
+The development build of the Meltano UI will now be available at <http://localhost:8080/>. 
+
+A production build of the API will be available at <http://localhost:5000/> to support the UI, but you will not need to interact with this directly.
 
 If you need to change the URL of your development environment, you can do this by updating your `.env` in your project directory with the following configuration:
 
