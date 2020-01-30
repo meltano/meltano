@@ -29,10 +29,10 @@ def grant_permissions(db: str, spec_path: str, dry_run: bool) -> List[str]:
                     status = True
                 except:
                     status = False
-        
+
         ran_query = query
         ran_query["run_status"] = status
         run_queries.append(ran_query)
-    
+
     # Always return the SQL commands that ran
     return run_queries

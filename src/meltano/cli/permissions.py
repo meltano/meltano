@@ -53,7 +53,7 @@ def grant(project, db, spec, dry, diff):
             else:
                 if diff:
                     diff_prefix = "+ "
-            
+
             if command["run_status"]:
                 fg = "green"
                 run_prefix = "[SUCCESS] "

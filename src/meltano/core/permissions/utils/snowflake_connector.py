@@ -182,7 +182,7 @@ class SnowflakeConnector:
         return roles
 
     def run_query(self, query: str):
-        
+
         with self.engine.connect() as connection:
             result = connection.execute(query)
 
