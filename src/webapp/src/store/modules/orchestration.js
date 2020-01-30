@@ -237,7 +237,15 @@ const actions = {
     })
   },
 
-  savePipelineSchedule({ commit }, pipeline) {
+  savePipelineSchedule({ commit }, extractor) {
+    let pipeline = {
+      name: `pipeline-${new Date().getTime()}`,
+      extractor,
+      loader: 'target-postgres', // Refactor vs. hard code when we again want to display in the UI
+      transform: 'run', // Refactor vs. hard code when we again want to display in the UI
+      interval: '@once', // Refactor vs. hard code when we again want to display in the UI
+      isRunning: false
+    }
     return orchestrationsApi.savePipelineSchedule(pipeline).then(response => {
       pipeline = Object.assign(pipeline, response.data)
       commit('updatePipelines', pipeline)

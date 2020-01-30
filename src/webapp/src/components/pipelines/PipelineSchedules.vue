@@ -37,13 +37,6 @@ export default {
       return val => utils.momentFromNow(val)
     }
   },
-  beforeRouteEnter(to, from, next) {
-    next(vm => {
-      if (from.name === 'loaders' || from.name === 'loaderSettings') {
-        vm.goToCreatePipeline()
-      }
-    })
-  },
   created() {
     this.$store.dispatch('orchestration/getAllPipelineSchedules')
   },
@@ -54,9 +47,6 @@ export default {
   },
   methods: {
     ...mapActions('orchestration', ['deletePipelineSchedule']),
-    goToCreatePipeline() {
-      this.$router.push({ name: 'createPipelineSchedule' })
-    },
     goToLog(jobId) {
       this.$router.push({ name: 'runLog', params: { jobId } })
     },

@@ -18,6 +18,7 @@ export default {
   },
   data() {
     return {
+      isSaving: false,
       isTesting: false,
       localConfiguration: {},
       uploadFormData: null
@@ -29,7 +30,10 @@ export default {
       'getIsPluginInstalled',
       'getIsInstallingPlugin'
     ]),
-    ...mapGetters('orchestration', ['getHasValidConfigSettings']),
+    ...mapGetters('orchestration', [
+      'getHasValidConfigSettings',
+      'getPipelineWithExtractor'
+    ]),
     ...mapState('orchestration', ['extractorInFocusConfiguration']),
     ...mapState('plugins', ['installedPlugins']),
 
@@ -115,16 +119,18 @@ export default {
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
     ...mapActions('orchestration', [
+      'run',
+      'savePipelineSchedule',
       'savePluginConfiguration',
       'testPluginConfiguration'
     ]),
     tryAutoAdvance() {
       if (this.extractorLacksConfigSettings) {
-        this.saveConfig()
+        this.save()
       }
     },
     close() {
-      this.$router.go(-1)
+      this.$router.push({ name: 'datasets' })
     },
     createEditableConfiguration() {
       this.localConfiguration = Object.assign(
@@ -141,7 +147,9 @@ export default {
     onChangeUploadFormData(uploadFormData) {
       this.uploadFormData = uploadFormData
     },
-    saveConfig() {
+    save() {
+      this.isSaving = true
+
       // 1. Prepare conditional upload as response is needed to properly save config settings
       let uponConditionalUpload = this.uploadFormData
         ? this.$store.dispatch('orchestration/uploadPluginConfigurationFile', {
@@ -160,24 +168,46 @@ export default {
           this.currentProfile.config[payload.settingName] = payload.path
         }
 
-        // 3. Finally save config settings
-        this.$store
-          .dispatch('orchestration/savePluginConfiguration', {
-            name: this.extractor.name,
-            type: 'extractors',
-            profiles: this.localConfiguration.profiles
-          })
+        // 3. Save config settings
+        this.savePluginConfiguration({
+          name: this.extractor.name,
+          type: 'extractors',
+          profiles: this.localConfiguration.profiles
+        })
           .then(() => {
-            this.$router.push({ name: 'datasets' })
             const message = this.extractorLacksConfigSettings
-              ? `No Configuration needed for ${this.extractor.name}`
-              : `Connection Saved - ${this.extractor.name}`
+              ? `No configuration needed for ${this.extractor.name}`
+              : `Connection saved - ${this.extractor.name}`
             Vue.toasted.global.success(message)
+
+            // 4. Finally save pipeline that's relient on valid config settings
+            this.savePipelineSchedule(this.extractor.name)
+              .then(() => {
+                const pipeline = this.getPipelineWithExtractor(
+                  this.extractor.name
+                )
+                this.run(pipeline).then(() => {
+                  Vue.toasted.global.success(
+                    `Pipeline saved - ${pipeline.name}`
+                  )
+                  Vue.toasted.global.success(
+                    `Auto running pipeline - ${pipeline.name}`
+                  )
+                  this.$router.push({
+                    name: 'runLog',
+                    params: { jobId: pipeline.jobId }
+                  })
+                })
+              })
+              .catch(error => {
+                Vue.toasted.global.error(error.response.data.code)
+              })
           })
-          .catch(err => {
-            this.$error.handle(err)
+          .catch(error => {
+            this.$error.handle(error)
             this.close()
           })
+          .finally(() => (this.isSaving = false))
       })
     },
     testConnection() {
@@ -259,7 +289,7 @@ export default {
             <button
               class="button"
               :class="{ 'is-loading': isTesting }"
-              :disabled="!isSaveable"
+              :disabled="!isSaveable || isTesting || isSaving"
               @click="testConnection"
             >
               Test Connection
@@ -269,10 +299,11 @@ export default {
             <button
               class="button is-interactive-primary"
               :class="{
-                'is-loading': isLoadingConfigSettings || isInstalling
+                'is-loading':
+                  isLoadingConfigSettings || isInstalling || isSaving
               }"
-              :disabled="!isSaveable || isTesting"
-              @click="saveConfig"
+              :disabled="!isSaveable || isTesting || isSaving"
+              @click="save"
             >
               Save
             </button>
