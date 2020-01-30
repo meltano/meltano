@@ -121,12 +121,12 @@ const actions = {
   deletePipelineSchedule({ commit }, pipeline) {
     let status = {
       pipeline,
+      ...pipeline,
       isRunning: pipeline.isRunning,
       isDeleting: true
     }
     commit('setPipelineStatus', status)
     return orchestrationsApi.deletePipelineSchedule(pipeline).then(() => {
-      commit('setPipelineStatus', Object.assign(status, { isDeleting: false }))
       commit('deletePipeline', pipeline)
     })
   },
@@ -189,6 +189,7 @@ const actions = {
 
             commit('setPipelineStatus', {
               pipeline: targetPipeline,
+              ...targetPipeline,
               hasError: jobStatus.hasError,
               hasEverSucceeded: jobStatus.hasEverSucceeded,
               isRunning: !jobStatus.isComplete,
@@ -233,6 +234,7 @@ const actions = {
   run({ commit, dispatch }, pipeline) {
     commit('setPipelineStatus', {
       pipeline,
+      ...pipeline,
       isRunning: true,
       hasEverSucceeded: pipeline.hasEverSucceeded
     })
@@ -267,11 +269,16 @@ const actions = {
   },
 
   updatePipelineSchedule({ commit }, payload) {
-    commit('setPipelineStatus', { pipeline: payload.pipeline, isSaving: true })
+    commit('setPipelineStatus', {
+      pipeline: payload.pipeline,
+      ...payload.pipeline,
+      isSaving: true
+    })
     return orchestrationsApi.updatePipelineSchedule(payload).then(response => {
       const updatedPipeline = Object.assign({}, payload.pipeline, response.data)
       commit('setPipelineStatus', {
         pipeline: updatedPipeline,
+        ...updatedPipeline,
         isSaving: false
       })
       commit('setPipeline', updatedPipeline)
