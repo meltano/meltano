@@ -10,7 +10,7 @@ export default {
   },
 
   deletePipelineSchedule(schedulePayload) {
-    return axios.delete(utils.apiUrl('orchestrations', 'pipeline_schedules'), {
+    return axios.delete(utils.apiUrl('orchestrations', 'pipeline-schedules'), {
       data: schedulePayload
     })
   },
@@ -20,7 +20,7 @@ export default {
   },
 
   getAllPipelineSchedules() {
-    return axios.get(utils.apiUrl('orchestrations', 'pipeline_schedules'))
+    return axios.get(utils.apiUrl('orchestrations', 'pipeline-schedules'))
   },
 
   getJobLog({ jobId }) {
@@ -47,7 +47,7 @@ export default {
 
   savePipelineSchedule(schedulePayload) {
     return axios.post(
-      utils.apiUrl('orchestrations', 'pipeline_schedules'),
+      utils.apiUrl('orchestrations', 'pipeline-schedules'),
       schedulePayload
     )
   },
@@ -63,6 +63,13 @@ export default {
     return axios.post(
       utils.apiUrl('orchestrations', `${type}/${name}/configuration/test`),
       payload
+    )
+  },
+
+  updatePipelineSchedule(schedulePayload) {
+    return axios.put(
+      utils.apiUrl('orchestrations', 'pipeline-schedules'),
+      schedulePayload
     )
   },
 

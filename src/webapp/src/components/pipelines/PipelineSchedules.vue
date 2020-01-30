@@ -16,12 +16,25 @@ export default {
     Dropdown,
     ScheduleTableHead
   },
-  data: () => ({
-    meltanoDataInstance: false
-  }),
+  data() {
+    return {
+      intervalOptions: [
+        '@once',
+        '@hourly',
+        '@daily',
+        '@weekly',
+        '@monthly',
+        '@yearly'
+      ],
+      meltanoDataInstance: false
+    }
+  },
   computed: {
+    ...mapGetters('plugins', ['getInstalledPlugin', 'getPluginLabel']),
     ...mapState('orchestration', ['pipelines']),
-    ...mapGetters('plugins', ['getPluginLabel']),
+    getIsDisabled() {
+      return pipeline => pipeline.isRunning || pipeline.isSaving
+    },
     getMomentFormatlll() {
       return val => utils.momentFormatlll(val)
     },
@@ -46,15 +59,34 @@ export default {
     }
   },
   methods: {
-    ...mapActions('orchestration', ['deletePipelineSchedule']),
+    ...mapActions('orchestration', [
+      'deletePipelineSchedule',
+      'updatePipelineSchedule'
+    ]),
     goToLog(jobId) {
       this.$router.push({ name: 'runLog', params: { jobId } })
+    },
+    onChangeInterval(option, pipeline) {
+      const interval = option.srcElement.selectedOptions[0].value
+      if (interval !== pipeline.interval) {
+        const pluginNamespace = this.getInstalledPlugin(
+          'extractors',
+          pipeline.extractor
+        ).namespace
+        this.updatePipelineSchedule({ interval, pipeline, pluginNamespace })
+          .then(() =>
+            Vue.toasted.global.success(
+              `Pipeline successfully updated - ${pipeline.name}`
+            )
+          )
+          .catch(error => Vue.toasted.global.error(error.response.data.code))
+      }
     },
     removePipeline(pipeline) {
       this.deletePipelineSchedule(pipeline)
         .then(() =>
           Vue.toasted.global.success(
-            `Pipeline Successfully Removed - ${pipeline.name}`
+            `Pipeline successfully removed - ${pipeline.name}`
           )
         )
         .catch(error => Vue.toasted.global.error(error.response.data.code))
@@ -95,16 +127,41 @@ export default {
               </article>
             </td>
             <td>
-              <p class="is-flex is-vcentered">
-                <a
-                  class="button tooltip is-tooltip-left"
-                  :class="{ 'is-loading': pipeline.isRunning }"
-                  data-tooltip="Manually run this pipeline once"
-                  @click="runELT(pipeline)"
-                  >Run Now</a
-                >
-                <span class="ml-05r">{{ pipeline.interval }}</span>
-              </p>
+              <div class="is-flex is-vcentered">
+                <div class="field has-addons">
+                  <div class="control">
+                    <button
+                      class="button tooltip is-tooltip-left"
+                      :class="{ 'is-loading': pipeline.isRunning }"
+                      :disabled="getIsDisabled(pipeline)"
+                      data-tooltip="Manually run this pipeline once"
+                      @click="runELT(pipeline)"
+                    >
+                      Run Now
+                    </button>
+                  </div>
+                  <div class="control is-expanded">
+                    <span
+                      class="select is-fullwidth"
+                      :class="{
+                        'is-loading': getIsDisabled(pipeline)
+                      }"
+                    >
+                      <select
+                        :disabled="getIsDisabled(pipeline)"
+                        :value="pipeline.interval"
+                        @input="onChangeInterval($event, pipeline)"
+                      >
+                        <option
+                          v-for="interval in intervalOptions"
+                          :key="interval"
+                          >{{ interval }}</option
+                        >
+                      </select>
+                    </span>
+                  </div>
+                </div>
+              </div>
             </td>
             <td>
               <p>
@@ -185,7 +242,7 @@ export default {
                       pipeline.isDeleting ? 'is-loading' : ''
                     }`
                   "
-                  :disabled="pipeline.isRunning"
+                  :disabled="getIsDisabled(pipeline)"
                   :tooltip="{
                     classes: 'is-tooltip-left',
                     message: 'Delete this pipeline'

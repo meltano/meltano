@@ -120,7 +120,7 @@ const actions = {
     }
     commit('setPipelineStatus', status)
     return orchestrationsApi.deletePipelineSchedule(pipeline).then(() => {
-      commit('setPipelineStatus', Object.assign({ isDeleting: false }, status))
+      commit('setPipelineStatus', Object.assign(status, { isDeleting: false }))
       commit('deletePipeline', pipeline)
     })
   },
@@ -184,10 +184,10 @@ const actions = {
             commit('setPipelineStatus', {
               pipeline: targetPipeline,
               hasError: jobStatus.hasError,
+              hasEverSucceeded: jobStatus.hasEverSucceeded,
               isRunning: !jobStatus.isComplete,
               startedAt: jobStatus.startedAt,
-              endedAt: jobStatus.endedAt,
-              hasEverSucceeded: jobStatus.hasEverSucceeded
+              endedAt: jobStatus.endedAt
             })
           }
         })
@@ -260,6 +260,18 @@ const actions = {
     return orchestrationsApi.testPluginConfiguration(configPayload)
   },
 
+  updatePipelineSchedule({ commit }, payload) {
+    commit('setPipelineStatus', { pipeline: payload.pipeline, isSaving: true })
+    return orchestrationsApi.updatePipelineSchedule(payload).then(response => {
+      const updatedPipeline = Object.assign({}, payload.pipeline, response.data)
+      commit('setPipelineStatus', {
+        pipeline: updatedPipeline,
+        isSaving: false
+      })
+      commit('setPipeline', updatedPipeline)
+    })
+  },
+
   uploadPluginConfigurationFile(_, configPayload) {
     return orchestrationsApi.uploadPluginConfigurationFile(configPayload)
   }
@@ -302,22 +314,30 @@ const mutations = {
     state[target] = configuration
   },
 
+  setPipeline(state, pipeline) {
+    const target = state.pipelines.find(p => p.name === pipeline.name)
+    const idx = state.pipelines.indexOf(target)
+    state.pipelines.splice(idx, 1, pipeline)
+  },
+
   setPipelineStatus(
     _,
     {
       pipeline,
+      hasError,
+      hasEverSucceeded,
+      isDeleting,
       isRunning,
-      isDeleting = false,
-      hasError = false,
-      hasEverSucceeded = false,
+      isSaving,
       startedAt = null,
       endedAt = null
     }
   ) {
-    Vue.set(pipeline, 'isRunning', isRunning)
-    Vue.set(pipeline, 'hasError', hasError)
-    Vue.set(pipeline, 'isDeleting', isDeleting)
-    Vue.set(pipeline, 'hasEverSucceeded', hasEverSucceeded)
+    Vue.set(pipeline, 'hasError', hasError || false)
+    Vue.set(pipeline, 'hasEverSucceeded', hasEverSucceeded || false)
+    Vue.set(pipeline, 'isDeleting', isDeleting || false)
+    Vue.set(pipeline, 'isRunning', isRunning || false)
+    Vue.set(pipeline, 'isSaving', isSaving || false)
     Vue.set(pipeline, 'startedAt', utils.dateIso8601(startedAt))
     Vue.set(pipeline, 'endedAt', utils.dateIso8601(endedAt))
   },
