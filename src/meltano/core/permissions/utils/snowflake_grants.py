@@ -167,7 +167,7 @@ class SnowflakeGrantsGenerator:
                     Used down the road by generate_database_grants() to also grant
                     "imported privileges" when access is granted to a shared DB.
         spec_dbs: a set of all the databases defined in the spec. This is used in revoke
-                    commands to validate revocations are only for spec'd databases
+                  commands to validate revocations are only for spec'd databases
 
         Returns the SQL commands generated as a list
         """
@@ -359,7 +359,7 @@ class SnowflakeGrantsGenerator:
         databases: list of databases (e.g. "raw")
         shared_dbs: a set of all the shared databases defined in the spec.
         spec_dbs: a set of all the databases defined in the spec. This is used in revoke
-            commands to validate revocations are only for spec'd databases
+                  commands to validate revocations are only for spec'd databases
 
         Returns the SQL commands generated as a list
         """
@@ -546,7 +546,7 @@ class SnowflakeGrantsGenerator:
         schemas: the name of the Schema (e.g. "raw.public", "raw.*")
         shared_dbs: a set of all the shared databases defined in the spec.
         spec_dbs: a set of all the databases defined in the spec. This is used in revoke
-                commands to validate revocations are only for spec'd databases
+                  commands to validate revocations are only for spec'd databases
 
         Returns the SQL commands generated as a List
         """
@@ -806,7 +806,7 @@ class SnowflakeGrantsGenerator:
         table: the name of the TABLE/VIEW (e.g. "raw.public.my_table")
         shared_dbs: a set of all the shared databases defined in the spec.
         spec_dbs: a set of all the databases defined in the spec. This is used in revoke
-                    commands to validate revocations are only for spec'd databases
+                  commands to validate revocations are only for spec'd databases
 
         Returns the SQL commands generated as a List
         """
