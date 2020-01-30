@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 import lodash from 'lodash'
 
-import orchestrationsApi from '../../api/orchestrations'
+import orchestrationsApi from '@/api/orchestrations'
 import poller from '@/utils/poller'
 import utils from '@/utils/utils'
 
