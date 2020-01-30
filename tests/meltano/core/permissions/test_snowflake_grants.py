@@ -17,6 +17,9 @@ def test_database_config():
 
     return config
 
+@pytest.fixture(scope="class")
+def test_spec_dbs(test_database_config):
+    return [database for database in test_database_config["databases"]]
 
 @pytest.fixture(scope="class")
 def test_shared_dbs(test_database_config):
@@ -165,6 +168,7 @@ class TestSnowflakeGrants:
         test_role_config,
         test_user_config,
         test_shared_dbs,
+        test_spec_dbs
     ):
         generator = SnowflakeGrantsGenerator(
             test_grants_to_role, test_roles_granted_to_user
@@ -174,6 +178,7 @@ class TestSnowflakeGrants:
             "functional_role",
             test_role_config["functional_role"]["privileges"]["databases"],
             test_shared_dbs,
+            test_spec_dbs
         )
 
         database_lower_list = [
