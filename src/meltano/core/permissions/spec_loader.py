@@ -14,20 +14,14 @@ def grant_permissions(db: str, spec_path: str, dry_run: bool) -> List[str]:
     else:
         raise SpecLoadingError(f"Permissions Spec File for {db} is not supported.")
 
-    # sql_grant_queries = spec_loader.generate_permission_queries()
-
-    sql_grant_queries = [
-        {"already_granted": True, "sql": "select 1"},
-        {"already_granted": False, "sql": "grant usage on schema analytics.analytics to role engineer"},
-        {"already_granted": False, "sql": "grant scpart on schema analytics.analytics to role engineer"}
-    ]
+    sql_grant_queries = spec_loader.generate_permission_queries()
 
     run_queries = []
 
-    if not dry_run:
-        conn = SnowflakeConnector()
-        for query in sql_grant_queries:
-            status = None
+    conn = SnowflakeConnector()
+    for query in sql_grant_queries:
+        status = None
+        if not dry_run:
             if not query.get("already_granted"):
                 try:
                     result = conn.run_query(query.get("sql"))
@@ -35,10 +29,10 @@ def grant_permissions(db: str, spec_path: str, dry_run: bool) -> List[str]:
                     status = True
                 except:
                     status = False
-            
-            ran_query = query
-            ran_query["run_status"] = status
-            run_queries.append(ran_query)
-
+        
+        ran_query = query
+        ran_query["run_status"] = status
+        run_queries.append(ran_query)
+    
     # Always return the SQL commands that ran
     return run_queries
