@@ -59,7 +59,7 @@ export default {
   },
 
   scrollToBottom(element = window) {
-    this.scrollToTarget(element, Number.MAX_SAFE_INTEGER)
+    this.scrollToTarget(element, element.scrollHeight)
   },
 
   scrollToTarget(element, top) {
