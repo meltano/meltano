@@ -60,7 +60,7 @@ def setup_oauth_facebook(oauth):
     oauth.register(
         "facebook",
         access_token_url="https://graph.facebook.com/v5.0/oauth/access_token",
-        client_kwargs={"scope": "ads_read ads_management manage_pages"},
+        client_kwargs={"scopes": "ads_read ads_management"},
         authorize_url="https://www.facebook.com/v5.0/dialog/oauth",
     )
 
@@ -73,7 +73,9 @@ def setup_oauth_facebook(oauth):
 
     @oauthBP.route("/authorize")
     def authorize():
-        token = oauth.facebook.authorize_access_token(test="123")
+        token = oauth.facebook.authorize_access_token()
+
+        # create a system user?
 
         return jsonify(token)
 
@@ -83,7 +85,7 @@ def setup_oauth_facebook(oauth):
 def setup_oauth(app):
     oauth = OAuthClient(app)
 
-    #setup_oauth_gitlab(oauth)
+    # setup_oauth_gitlab(oauth)
     setup_oauth_facebook(oauth)
 
 
