@@ -29,6 +29,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1516](https://gitlab.com/meltano/meltano/issues/1516) Pipelines now show extractor label rather than name
 - [#1652](https://gitlab.com/meltano/meltano/issues/1652) Removes the `--full-refresh` command from `meltano permissions`
+- [#1594](https://gitlab.com/meltano/meltano/issues/1594) Update pipelines to be sorted alphabetically to match data sources organization
 
 ### Fixes
 
