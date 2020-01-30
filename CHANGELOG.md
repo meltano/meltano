@@ -8,13 +8,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+- [#1154](https://gitlab.com/meltano/meltano/issues/1154) Adds non-dry mode to `meltano permissions` on Snowflake so that queries can be executed
 
 ### Changes
 
 ### Fixes
+- [#1595](https://gitlab.com/meltano/meltano/issues/1595) Updates `meltano permissions` to only revoke permissions on databases defined in the spec
 
 ### Breaks
-
+- [#1652](https://gitlab.com/meltano/meltano/issues/1652) Removes the `--full-refresh` command from `meltano permissions`
 
 ## 1.17.1 - (2020-01-29)
 
