@@ -31,6 +31,7 @@ export default {
   },
   computed: {
     ...mapGetters('plugins', ['getInstalledPlugin', 'getPluginLabel']),
+    ...mapGetters('orchestration', ['getSortedPipelines']),
     ...mapState('orchestration', ['pipelines']),
     getIsDisabled() {
       return pipeline => pipeline.isRunning || pipeline.isSaving
@@ -104,7 +105,7 @@ export default {
       <ScheduleTableHead has-actions has-start-date />
 
       <tbody>
-        <template v-for="pipeline in pipelines">
+        <template v-for="pipeline in getSortedPipelines">
           <tr :key="pipeline.name">
             <td>
               <article class="media">

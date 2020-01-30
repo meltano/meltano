@@ -48,12 +48,6 @@ const getters = {
     }
   },
 
-  getPipelineWithExtractor(state) {
-    return extractor => {
-      return state.pipelines.find(pipeline => pipeline.extractor === extractor)
-    }
-  },
-
   getHasGroupValidationConfigSettings() {
     return (configSettings, settingsGroupValidation) => {
       const matchGroup = settingsGroupValidation.find(group => {
@@ -70,6 +64,12 @@ const getters = {
     }
   },
 
+  getPipelineWithExtractor(state) {
+    return extractor => {
+      return state.pipelines.find(pipeline => pipeline.extractor === extractor)
+    }
+  },
+
   getRunningPipelines(state) {
     return state.pipelines.filter(pipeline => pipeline.isRunning)
   },
@@ -78,6 +78,12 @@ const getters = {
     return state.pipelinePollers.map(
       pipelinePoller => pipelinePoller.getMetadata().jobId
     )
+  },
+
+  getSortedPipelines(state) {
+    return [...state.pipelines].sort((p1, p2) => {
+      return p1.extractor > p2.extractor ? 1 : -1
+    })
   },
 
   getSuccessfulPipelines(state) {
