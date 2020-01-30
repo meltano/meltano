@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
@@ -15,7 +15,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Breaks
 
-
 ## 1.17.1 - (2020-01-29)
 
 ---
@@ -24,12 +23,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1625](https://gitlab.com/meltano/meltano/issues/1625) Update docs on meltano.com to only include extractors and loaders provided in the hosted version of Meltano.
 - [#1590](https://gitlab.com/meltano/meltano/issues/1590) Add additional targets to `dbt clean`
+- [#1655](https://gitlab.com/meltano/meltano/issues/1655) Add UX message to close buttons in Job Log Modal to reinforce that the pipeline still runs after closing (Ben's hover idea)
 
 ### Fixes
 
 - [#1618](https://gitlab.com/meltano/meltano/issues/1618) Fix an issue where an expired session would not redirect to the Login page
 - [#1630](https://gitlab.com/meltano/meltano/issues/1630) Fix an integrations setup bug that prevented subsequent pipelines to be created unless a full page refresh occurred
-
 
 ## 1.17.0 - (2020-01-27)
 
