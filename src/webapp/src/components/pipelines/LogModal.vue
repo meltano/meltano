@@ -116,7 +116,12 @@ export default {
         <p class="modal-card-title">
           Run Log: <span class="is-family-code">{{ jobId }}</span>
         </p>
-        <button class="delete" aria-label="close" @click="close"></button>
+        <div
+          class=" tooltip is-tooltip-left"
+          data-tooltip="The pipeline still runs when closed"
+        >
+          <button class="delete" aria-label="close" @click="close"></button>
+        </div>
       </header>
       <section v-if="relatedPipeline" class="modal-card-body">
         <article class="message is-small is-info">
@@ -198,7 +203,13 @@ export default {
           </div>
         </div>
         <div class="buttons is-right">
-          <button class="button" @click="close">Close</button>
+          <button
+            class="button tooltip is-tooltip-left"
+            data-tooltip="The pipeline still runs when closed"
+            @click="close"
+          >
+            Close
+          </button>
 
           <button v-if="hasError" class="button is-danger" @click="getHelp">
             Get Help
