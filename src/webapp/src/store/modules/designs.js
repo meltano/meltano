@@ -519,8 +519,6 @@ const actions = {
   loadReport({ state, commit }, report) {
     const nameMatcher = (source, target) => source.name === target.name
 
-    console.log('**: load report errorror')
-
     // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
     const baseTable = state.design.relatedTable
     const queryPayload = report.queryPayload

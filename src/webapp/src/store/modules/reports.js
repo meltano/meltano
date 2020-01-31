@@ -43,6 +43,8 @@ const actions = {
 
 const mutations = {
   addReport(state, report) {
+    console.log('added report')
+
     state.reports.push(report)
   },
   setReports(state, reports) {
