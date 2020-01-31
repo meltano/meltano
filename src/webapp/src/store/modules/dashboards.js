@@ -2,8 +2,8 @@ import Vue from 'vue'
 
 import lodash from 'lodash'
 
-import dashboardsApi from '../../api/dashboards'
-import reportsApi from '../../api/reports'
+import dashboardsApi from '@/api/dashboards'
+import reportsApi from '@/api/reports'
 import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
@@ -197,7 +197,7 @@ const mutations = {
   setDashboard(state, dashboard) {
     const target = state.dashboards.find(item => item.id === dashboard.id)
     const idx = state.dashboards.indexOf(target)
-    state.dashboards[idx] = dashboard
+    state.dashboards.splice(idx, 1, dashboard)
   },
 
   setDashboards(state, dashboards) {
