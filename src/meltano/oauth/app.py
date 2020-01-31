@@ -22,4 +22,4 @@ facebook(app)
 OAuth.init_app(app)
 
 # enable the parsing of X-Forwarded-* headers
-ProxyFix(app)
+app.wsgi_app = ProxyFix(app.wsgi_app)

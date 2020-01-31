@@ -133,7 +133,7 @@ def create_app(config={}):
         g.jsContext["dbtDocsUrl"] = appUrl._replace(path="/-/dbt/").geturl()[:-1]
 
         # setup the oauthServerUrl
-        g.jsContext = {"oauthServerUrl": app.config["OAUTH_SERVER_URL"]}
+        g.jsContext["oauthServerUrl"] = app.config["OAUTH_SERVER_URL"]
 
     @app.after_request
     def after_request(res):
@@ -141,6 +141,6 @@ def create_app(config={}):
         return res
 
     # create the dispatcher to host the `OAuthService`
-    dispatcher = DispatcherMiddleware(app, {"/-/oauth": oauth_service})
+    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/-/oauth": oauth_service})
 
-    return dispatcher
+    return app
