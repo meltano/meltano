@@ -5,6 +5,10 @@ import sqlFormatter from 'sql-formatter'
 import SSF from 'ssf'
 
 import designApi from '@/api/design'
+console.log(
+  '**: remove all reportsApi uses in favor of reports store action w/promise'
+)
+
 import reportsApi from '@/api/reports'
 import sqlApi from '@/api/sql'
 import utils from '@/utils/utils'
@@ -448,6 +452,10 @@ const actions = {
       .then(response => {
         commit('setReports', response.data)
         if (slug) {
+          console.log(
+            '**: import reports and use its state.reports or create a util for getReportByDesign'
+          )
+
           const reportMatch = state.reports.find(
             report =>
               report.namespace === namespace &&
@@ -457,6 +465,8 @@ const actions = {
           )
 
           if (reportMatch) {
+            console.log('**: loadReport to reports store setup')
+
             dispatch('loadReport', reportMatch)
           }
         }
@@ -707,6 +717,8 @@ const mutations = {
   },
 
   addSavedReportToReports(state, report) {
+    console.log('**: import reports and refactor addSavedReportToReports to it')
+
     state.reports.push(report)
   },
 
@@ -850,6 +862,8 @@ const mutations = {
   },
 
   setReports(state, reports) {
+    console.log('**: remove/refactor into reports module')
+
     state.reports = reports
   },
 

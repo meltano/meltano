@@ -3,26 +3,21 @@ import Vue from 'vue'
 import lodash from 'lodash'
 
 import dashboardsApi from '@/api/dashboards'
-import reportsApi from '@/api/reports'
 import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
   activeDashboard: {},
   activeDashboardReportsWithQueryResults: [],
   dashboards: [],
-  isInitializing: true,
-  reports: []
+  isInitializing: true
 })
 
 const getters = {
-  activeReports: (state, getters) => {
-    return getters.activeReportIds.map(reportId => {
-      return state.reports.find(report => report.id === reportId)
-    })
-  },
-
   activeReportIds: state => {
     return state.activeDashboard.reportIds
+  },
+  activeReports: (state, getters, rootState, rootGetters) => {
+    return rootGetters['reports/getReportsByIds'](getters.activeReportIds)
   }
 }
 
@@ -68,15 +63,11 @@ const actions = {
     })
   },
 
-  getReports({ commit }) {
-    return reportsApi
-      .loadReports()
-      .then(response => commit('setReports', response.data))
-  },
-
   initialize({ commit, dispatch }, slug) {
     commit('setIsInitialzing', true)
-    const promiseGetReports = dispatch('getReports')
+    const promiseGetReports = dispatch('reports/loadReports', null, {
+      root: true
+    })
     const promiseGetDashboards = dispatch('getDashboards')
     return Promise.all([promiseGetReports, promiseGetDashboards]).then(() => {
       if (slug) {
@@ -210,10 +201,6 @@ const mutations = {
 
   setIsInitialzing(state, value) {
     state.isInitializing = value
-  },
-
-  setReports(state, reports) {
-    state.reports = reports
   }
 }
 
