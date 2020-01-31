@@ -4,7 +4,8 @@ import reportsApi from '@/api/reports'
 import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
-  reports: []
+  reports: [],
+  saveReportSettings: { name: null }
 })
 
 const getters = {
@@ -32,12 +33,17 @@ const actions = {
   saveReport({ commit }, payload) {
     return reportsApi.saveReport(payload).then(response => {
       commit('addReport', response.data)
+      commit('resetSaveReportSettings')
     })
   },
   updateReport(_, payload) {
     return reportsApi.updateReport(payload).then(response => {
       console.log('**: setReport mutation?')
+      commit('resetSaveReportSettings')
     })
+  },
+  updateSaveReportSettings({ commit }, name) {
+    commit('setSaveReportSettingsName', name)
   }
 }
 
@@ -47,8 +53,14 @@ const mutations = {
 
     state.reports.push(report)
   },
+  resetSaveReportSettings(state) {
+    state.saveReportSettings = { name: null }
+  },
   setReports(state, reports) {
     state.reports = reports
+  },
+  setSaveReportSettingsName(state, name) {
+    state.saveReportSettings.name = name
   }
 }
 

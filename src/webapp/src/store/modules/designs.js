@@ -38,7 +38,6 @@ const defaultState = utils.deepFreeze({
   reports: [],
   resultAggregates: [],
   results: [],
-  saveReportSettings: { name: null },
   sqlErrorMessage: []
 })
 
@@ -623,9 +622,10 @@ const actions = {
     }
     return dispatch('reports/saveReport', postData, { root: true }).then(
       response => {
-        commit('resetSaveReportSettings')
-        commit('setCurrentReport', response.data)
-        console.log('**: likely plae above two commits in reports store')
+        // commit('setCurrentReport', response.data)
+        console.log(
+          '**: likely place above two commits in reports store. currentReport (aka activeReport?) as getter in reports store?'
+        )
       }
     )
   },
@@ -671,13 +671,8 @@ const actions = {
     return dispatch('reports/updateReport', state.activeReport, {
       root: true
     }).then(response => {
-      commit('resetSaveReportSettings')
       commit('setCurrentReport', response.data)
     })
-  },
-
-  updateSaveReportSettings({ commit }, name) {
-    commit('setSaveReportSettingsName', name)
   },
 
   // eslint-disable-next-line no-shadow
@@ -746,10 +741,6 @@ const mutations = {
     state.results = []
     state.queryAttributes = []
     state.resultAggregates = []
-  },
-
-  resetSaveReportSettings(state) {
-    state.saveReportSettings = { name: null }
   },
 
   resetSortAttributes(state) {
@@ -851,10 +842,6 @@ const mutations = {
     state.results = payload.results
     state.queryAttributes = payload.queryAttributes
     state.resultAggregates = payload.aggregates
-  },
-
-  setSaveReportSettingsName(state, name) {
-    state.saveReportSettings.name = name
   },
 
   setSortableAttributeDirection(_, { orderableAttribute, direction }) {
