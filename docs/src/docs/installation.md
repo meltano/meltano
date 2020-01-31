@@ -329,6 +329,14 @@ At this time, the GUI for configuring the loader from your project has been temp
 
 Once you create the file, you will need to paste in the configuration for your database. For example, PostgreSQL configurations can [be found here](/loaders/postgres.html#intermediate-connecting-meltano-to-an-existing-postgresql-database).
 
+After saving your configurations, you can load your configurations by running:
+
+```bash
+source .env
+```
+
+And just like that, your loader is configured!
+
 ### Start the application
 
 Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
