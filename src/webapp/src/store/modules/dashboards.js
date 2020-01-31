@@ -8,7 +8,7 @@ import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
   activeDashboard: {},
-  activeDashboardReports: [],
+  activeDashboardReportsWithQueryResults: [],
   dashboards: [],
   isInitializing: true,
   reports: []
@@ -58,7 +58,7 @@ const actions = {
     return dashboardsApi
       .getActiveDashboardReportsWithQueryResults(getters.activeReports)
       .then(response => {
-        commit('setActiveDashboardReports', response.data)
+        commit('setActiveDashboardReportsWithQueryResults', response.data)
       })
   },
 
@@ -87,7 +87,7 @@ const actions = {
   },
 
   preloadDashboard({ dispatch, state, getters }, slug) {
-    // Load from slug or refresh existing activeDashboard's reports with activeDashboardReports
+    // Load from slug or refresh existing activeDashboard's reports with activeDashboardReportsWithQueryResults
     if (slug) {
       const dashboardMatch = state.dashboards.find(
         dashboard => dashboard.slug === slug
@@ -117,7 +117,7 @@ const actions = {
   resetActiveDashboard: ({ commit }) => commit('reset', 'activeDashboard'),
 
   resetActiveDashboardReports: ({ commit }) =>
-    commit('reset', 'activeDashboardReports'),
+    commit('reset', 'activeDashboardReportsWithQueryResults'),
 
   saveDashboard({ dispatch, commit }, payload) {
     return dashboardsApi.saveDashboard(payload).then(response => {
@@ -139,8 +139,8 @@ const actions = {
     })
   },
 
-  updateActiveDashboardReports({ commit }, reports) {
-    commit('setActiveDashboardReports', reports)
+  updateActiveDashboardReportsWithQueryResults({ commit }, reports) {
+    commit('setActiveDashboardReportsWithQueryResults', reports)
   },
 
   updateCurrentDashboard({ commit, dispatch }, dashboard) {
@@ -186,8 +186,8 @@ const mutations = {
     }
   },
 
-  setActiveDashboardReports(state, reports) {
-    state.activeDashboardReports = reports
+  setActiveDashboardReportsWithQueryResults(state, reports) {
+    state.activeDashboardReportsWithQueryResults = reports
   },
 
   setCurrentDashboard(state, dashboard) {

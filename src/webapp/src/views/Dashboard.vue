@@ -22,7 +22,7 @@ export default {
   computed: {
     ...mapState('dashboards', [
       'activeDashboard',
-      'activeDashboardReports',
+      'activeDashboardReportsWithQueryResults',
       'dashboards',
       'isInitializing',
       'reports'
@@ -34,7 +34,7 @@ export default {
     displayedReports() {
       return this.isEditable || this.isUpdated
         ? this.editableDashboardReports
-        : this.activeDashboardReports
+        : this.activeDashboardReportsWithQueryResults
     },
     isActive() {
       return dashboard => dashboard.id === this.activeDashboard.id
@@ -53,7 +53,7 @@ export default {
       if (this.isEditable) {
         this.editableDashboardReports = []
 
-        this.activeDashboardReports.forEach(report => {
+        this.activeDashboardReportsWithQueryResults.forEach(report => {
           this.editableDashboardReports.push(report)
         })
       }
@@ -70,7 +70,7 @@ export default {
     ...mapActions('dashboards', [
       'initialize',
       'getActiveDashboardReportsWithQueryResults',
-      'updateActiveDashboardReports',
+      'updateActiveDashboardReportsWithQueryResults',
       'updateDashboard'
     ]),
     updateReportPosition({ isUpdated, oldPosition, newPosition }) {
@@ -91,7 +91,9 @@ export default {
           }
         })
           .then(() => {
-            this.updateActiveDashboardReports(this.editableDashboardReports)
+            this.updateActiveDashboardReportsWithQueryResults(
+              this.editableDashboardReports
+            )
             Vue.toasted.global.success(
               `Dashboard reports order successfully saved!`
             )
