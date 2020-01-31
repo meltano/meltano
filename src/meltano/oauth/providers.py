@@ -1,4 +1,4 @@
-from flask import Blueprint, url_for, redirect, current_app, jsonify
+from flask import Blueprint, url_for, redirect, render_template, jsonify
 from authlib.flask.client import OAuth as OAuthClient
 
 
@@ -17,14 +17,13 @@ def facebook(app):
 
     @oauthBP.route("/")
     def login():
-        redirect_uri = url_for(".authorize", _external=True, _scheme="http")
-        print(redirect_uri)
+        redirect_uri = url_for(".authorize", _external=True)
         return OAuth.facebook.authorize_redirect(redirect_uri)
 
     @oauthBP.route("/authorize")
     def authorize():
         token = OAuth.facebook.authorize_access_token()
 
-        return jsonify(token)
+        return render_template("token.html", token=token)
 
     app.register_blueprint(oauthBP)

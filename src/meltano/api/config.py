@@ -17,6 +17,8 @@ SECRET_KEY = "thisisnotapropersecretkey"
 # -----------------
 MELTANO_AUTHENTICATION = truthy(os.getenv("MELTANO_AUTHENTICATION"))
 MELTANO_UI_URL = os.getenv("MELTANO_UI_URL", "/")
+# TODO: make sure it works on any port
+OAUTH_SERVER_URL = os.getenv("OAUTH_SERVER_URL", "http://localhost:5000/-/oauth")
 MELTANO_READONLY = truthy(os.getenv("MELTANO_READONLY"))
 AIRFLOW_DISABLED = truthy(os.getenv("MELTANO_DISABLE_AIRFLOW"))
 
