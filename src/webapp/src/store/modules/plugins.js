@@ -82,6 +82,15 @@ const getters = {
         : false
   },
 
+  getPluginLabel(state) {
+    return (type, name) => {
+      const pluginList = state.plugins[type]
+      const targetPlugin = pluginList.find(plugin => plugin.name === name)
+
+      return targetPlugin ? targetPlugin.label : 'Undefined label'
+    }
+  },
+
   getPluginProfiles() {
     return plugin => {
       const pluginProfiles = lodash.map(
