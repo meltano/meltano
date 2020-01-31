@@ -4,12 +4,6 @@ import lodash from 'lodash'
 import sqlFormatter from 'sql-formatter'
 import SSF from 'ssf'
 
-import designApi from '@/api/design'
-console.log(
-  '**: remove all reportsApi uses in favor of reports store action w/promise'
-)
-
-import reportsApi from '@/api/reports'
 import sqlApi from '@/api/sql'
 import utils from '@/utils/utils'
 import { selected } from '@/utils/predicates'
@@ -443,12 +437,16 @@ const actions = {
     commit('resetSQLResults')
     commit('setCurrentMetadata', { namespace, model, design })
 
+    const uponLoadReports = dispatch('reports/loadReports', null, {
+      root: true
+    })
+
     return designApi
       .index(namespace, model, design)
       .then(response => {
         commit('setDesign', response.data)
       })
-      .then(reportsApi.loadReports)
+      .then(uponLoadReports)
       .then(response => {
         commit('setReports', response.data)
         if (slug) {
@@ -616,7 +614,7 @@ const actions = {
     })
   },
 
-  saveReport({ commit, state }, { name }) {
+  saveReport({ commit, dispatch, state }, { name }) {
     const postData = {
       chartType: state.chartType,
       design: state.currentDesign,
@@ -627,11 +625,13 @@ const actions = {
       order: state.order,
       queryPayload: helpers.getQueryPayloadFromDesign(state)
     }
-    return reportsApi.saveReport(postData).then(response => {
-      commit('resetSaveReportSettings')
-      commit('setCurrentReport', response.data)
-      commit('addSavedReportToReports', response.data)
-    })
+    return dispatch('reports/saveReport', postData, { root: true }).then(
+      response => {
+        commit('resetSaveReportSettings')
+        commit('setCurrentReport', response.data)
+        commit('addSavedReportToReports', response.data)
+      }
+    )
   },
 
   // TODO: remove and use `mapMutations`
@@ -670,9 +670,11 @@ const actions = {
     dispatch('tryAutoRun')
   },
 
-  updateReport({ commit, state }) {
+  updateReport({ commit, dispatch, state }) {
     commit('updateActiveReport')
-    return reportsApi.updateReport(state.activeReport).then(response => {
+    return dispatch('reports/updateReport', state.activeReport, {
+      root: true
+    }).then(response => {
       commit('resetSaveReportSettings')
       commit('setCurrentReport', response.data)
     })

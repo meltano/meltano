@@ -20,6 +20,12 @@ const actions = {
     return reportsApi
       .loadReports()
       .then(response => commit('setReports', response.data))
+  },
+  saveReport(_, payload) {
+    return reportsApi.saveReport(payload)
+  },
+  updateReport(_, payload) {
+    return reportsApi.updateReport(payload)
   }
 }
 
