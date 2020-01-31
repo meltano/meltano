@@ -16,6 +16,9 @@ export default {
     Dropdown,
     ScheduleTableHead
   },
+  data: () => ({
+    meltanoDataInstance: false
+  }),
   computed: {
     ...mapState('orchestration', ['pipelines']),
     ...mapGetters('plugins', ['getPluginLabel']),
@@ -43,6 +46,11 @@ export default {
   },
   created() {
     this.$store.dispatch('orchestration/getAllPipelineSchedules')
+  },
+  mounted() {
+    if (window.location.href.indexOf('meltanodata.com') > -1) {
+      this.meltanoDataInstance = true
+    }
   },
   methods: {
     ...mapActions('orchestration', ['deletePipelineSchedule']),
@@ -228,6 +236,11 @@ export default {
         </template>
       </tbody>
     </table>
+    <p v-if="meltanoDataInstance" class="has-text-centered is-italic">
+      Want to delete your data from your MeltanoData.com instance? Visit
+      <a href="https://meltano.com/docs/getting-help.html">our help page</a> for
+      more information.
+    </p>
   </div>
 </template>
 
