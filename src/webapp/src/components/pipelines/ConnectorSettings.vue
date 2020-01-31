@@ -3,12 +3,14 @@ import axios from 'axios'
 
 import { ENV, MELTANO_YML } from '@/utils/constants'
 import InputDateIso8601 from '@/components/generic/InputDateIso8601'
+import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import utils from '@/utils/utils'
 
 export default {
   name: 'ConnectorSettings',
   components: {
-    InputDateIso8601
+    InputDateIso8601,
+    ConnectorLogo
   },
   props: {
     configSettings: {
@@ -89,12 +91,20 @@ export default {
     getIsOfKindOptions() {
       return kind => kind === 'options'
     },
+    getIsOfKindOAuth() {
+      return kind => kind && kind.startsWith('oauth')
+    },
     getIsOfKindTextBased() {
       return kind =>
         !this.getIsOfKindBoolean(kind) &&
         !this.getIsOfKindDate(kind) &&
         !this.getIsOfKindFile(kind) &&
         !this.getIsOfKindOptions(kind)
+    },
+    getHasAddons(getters) {
+      return setting =>
+        getters.getIsProtected(setting) ||
+        getters.getIsOfKindOAuth(setting.kind)
     },
     getIsProtected() {
       return setting => {
@@ -220,6 +230,39 @@ export default {
       if (newVal !== oldVal) {
         this.focusInputIntelligently()
       }
+    },
+    snowflakeHelper(newVal) {
+      /**
+       * Improve account UX by auto-detecting Account ID via URL
+       * for configs that have `account`
+       * This is currently Loader-Snowflake specific
+       * and we'll need a more robust solution
+       * when/if we add UX helpers like this for more connectors
+       * TODO: Need to add a loader indicator to show something is "processing"
+       */
+      const accountInput =
+        newVal.profiles[newVal.profileInFocusIndex].config.account
+      if (accountInput) {
+        const parsedAccountId = utils.snowflakeAccountParser(accountInput)
+
+        if (parsedAccountId) {
+          const vm = this
+
+          setTimeout(() => {
+            vm.connectorProfile.account = parsedAccountId
+          }, 1000)
+        } else {
+          this.connectorProfile.account =
+            newVal.profiles[newVal.profileInFocusIndex].config.account
+        }
+      }
+    },
+    openOAuthPopup(provider) {
+      const oauthUrl = `${this.$flask.oauthServerUrl}/${provider}`
+      const winOpts =
+        'resizable=no,scrollbars=no,close=yes,height=640,width=480'
+
+      window.open(oauthUrl, name, winOpts)
     }
   }
 }
@@ -301,9 +344,11 @@ export default {
             <div class="field-body">
               <div
                 class="field"
-                :class="{ 'has-addons': getIsProtected(setting) }"
+                :class="{
+                  'has-addons': getHasAddons(setting)
+                }"
               >
-                <div class="control is-expanded has-icons-right">
+                <div class="control is-expanded">
                   <!-- Hidden -->
                   <input
                     v-if="getIsOfKindHidden(setting.kind)"
@@ -440,6 +485,19 @@ export default {
                         <font-awesome-icon icon="lock"></font-awesome-icon>
                       </span>
                     </a>
+                  </div>
+
+                  <!-- OAuth helper -->
+                  <div v-if="getIsOfKindOAuth(setting.kind)" class="control">
+                    <button
+                      class="button is-small is-primary"
+                      @click="openOAuthPopup(setting.oauth.provider)"
+                    >
+                      <span>Get with &nbsp;</span>
+                      <span class="icon has-text-grey-dark">
+                        <connector-logo :connector="plugin.name" />
+                      </span>
+                    </button>
                   </div>
                 </template>
               </div>

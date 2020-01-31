@@ -16,6 +16,9 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.db import project_engine
 from meltano.api.config import VERSION_HEADER
 
+from werkzeug.wsgi import DispatcherMiddleware
+from meltano.oauth.app import app as oauth_service
+
 
 logger = logging.getLogger(__name__)
 
@@ -134,4 +137,7 @@ def create_app(config={}):
         res.headers[VERSION_HEADER] = meltano.__version__
         return res
 
-    return app
+    # create the dispatcher to host the `OAuthService`
+    dispatcher = DispatcherMiddleware(app, {"/-/oauth": oauth_service})
+
+    return dispatcher

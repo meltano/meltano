@@ -13,11 +13,12 @@ def facebook(app):
         authorize_url="https://www.facebook.com/v5.0/dialog/oauth",
     )
 
-    oauthBP = Blueprint("OAuth.Facebook", __name__, url_prefix="/oauth/facebook")
+    oauthBP = Blueprint("OAuth.Facebook", __name__, url_prefix="/facebook")
 
-    @oauthBP.route("/login")
+    @oauthBP.route("/")
     def login():
-        redirect_uri = url_for(".authorize", _external=True)
+        redirect_uri = url_for(".authorize", _external=True, _scheme="http")
+        print(redirect_uri)
         return OAuth.facebook.authorize_redirect(redirect_uri)
 
     @oauthBP.route("/authorize")

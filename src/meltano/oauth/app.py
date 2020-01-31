@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, url_for
 import logging
 import os
 
@@ -17,4 +17,6 @@ OAuth.init_app(app)
 
 @app.route("/")
 def root():
-    return '<a href="/oauth/facebook/login">Facebook</a>'
+    url = url_for("OAuth.Facebook.login")
+
+    return f"<a href='{url}'>Facebook</a>"
