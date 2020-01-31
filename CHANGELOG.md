@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1516](https://gitlab.com/meltano/meltano/issues/1516) Pipelines now show extractor label rather than name
+
 ### Fixes
 
 - [#1588](https://gitlab.com/meltano/meltano/issues/1588) Update `scrollTo` behavior in Job Log to work across browsers
