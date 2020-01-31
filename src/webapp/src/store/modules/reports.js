@@ -8,10 +8,18 @@ const defaultState = utils.deepFreeze({
 })
 
 const getters = {
+  getReportBySlug(state) {
+    return ({ design, model, namespace, slug }) =>
+      state.reports.find(
+        report =>
+          report.design === design &&
+          report.model === model &&
+          report.namespace === namespace &&
+          report.slug === slug
+      )
+  },
   getReportsByIds(state) {
-    return ids => {
-      return state.reports.filter(report => ids.includes(report.id))
-    }
+    return ids => state.reports.filter(report => ids.includes(report.id))
   }
 }
 
@@ -21,15 +29,22 @@ const actions = {
       .loadReports()
       .then(response => commit('setReports', response.data))
   },
-  saveReport(_, payload) {
-    return reportsApi.saveReport(payload)
+  saveReport({ commit }, payload) {
+    return reportsApi.saveReport(payload).then(response => {
+      commit('addReport', response.data)
+    })
   },
   updateReport(_, payload) {
-    return reportsApi.updateReport(payload)
+    return reportsApi.updateReport(payload).then(response => {
+      console.log('**: setReport mutation?')
+    })
   }
 }
 
 const mutations = {
+  addReport(state, report) {
+    state.reports.push(report)
+  },
   setReports(state, reports) {
     state.reports = reports
   }

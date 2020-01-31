@@ -434,7 +434,10 @@ const actions = {
     commit('toggleCollapsed', row)
   },
 
-  getDesign({ commit, dispatch, state }, { namespace, model, design, slug }) {
+  getDesign(
+    { commit, dispatch, state, rootGetters },
+    { namespace, model, design, slug }
+  ) {
     commit('resetSQLResults')
     commit('setCurrentMetadata', { namespace, model, design })
 
@@ -448,24 +451,16 @@ const actions = {
         commit('setDesign', response.data)
       })
       .then(uponLoadReports)
-      .then(response => {
-        commit('setReports', response.data)
+      .then(() => {
         if (slug) {
-          console.log(
-            '**: import reports and use its state.reports or create a util for getReportByDesign'
-          )
-
-          const reportMatch = state.reports.find(
-            report =>
-              report.namespace === namespace &&
-              report.model === model &&
-              report.design === design &&
-              report.slug === slug
-          )
+          const reportMatch = rootGetters['reports/getReportBySlug']({
+            design,
+            model,
+            namespace,
+            slug
+          })
 
           if (reportMatch) {
-            console.log('**: loadReport to reports store setup')
-
             dispatch('loadReport', reportMatch)
           }
         }
@@ -523,6 +518,8 @@ const actions = {
 
   loadReport({ state, commit }, report) {
     const nameMatcher = (source, target) => source.name === target.name
+
+    console.log('**: load report errorror')
 
     // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
     const baseTable = state.design.relatedTable
@@ -630,7 +627,7 @@ const actions = {
       response => {
         commit('resetSaveReportSettings')
         commit('setCurrentReport', response.data)
-        commit('addSavedReportToReports', response.data)
+        console.log('**: likely plae above two commits in reports store')
       }
     )
   },
@@ -717,12 +714,6 @@ const actions = {
 const mutations = {
   addFilter(state, filter) {
     state.filters[helpers.getFilterTypePlural(filter.filterType)].push(filter)
-  },
-
-  addSavedReportToReports(state, report) {
-    console.log('**: import reports and refactor addSavedReportToReports to it')
-
-    state.reports.push(report)
   },
 
   assignSortableAttribute(state, attribute) {
@@ -862,12 +853,6 @@ const mutations = {
     state.results = payload.results
     state.queryAttributes = payload.queryAttributes
     state.resultAggregates = payload.aggregates
-  },
-
-  setReports(state, reports) {
-    console.log('**: remove/refactor into reports module')
-
-    state.reports = reports
   },
 
   setSaveReportSettingsName(state, name) {
