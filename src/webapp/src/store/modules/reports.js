@@ -36,8 +36,8 @@ const actions = {
       commit('resetSaveReportSettings')
     })
   },
-  updateReport(_, payload) {
-    return reportsApi.updateReport(payload).then(response => {
+  updateReport({ commit }, payload) {
+    return reportsApi.updateReport(payload).then(() => {
       console.log('**: setReport mutation?')
       commit('resetSaveReportSettings')
     })

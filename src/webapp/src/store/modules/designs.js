@@ -434,7 +434,7 @@ const actions = {
   },
 
   getDesign(
-    { commit, dispatch, state, rootGetters },
+    { commit, dispatch, rootGetters },
     { namespace, model, design, slug }
   ) {
     commit('resetSQLResults')
@@ -609,7 +609,7 @@ const actions = {
     })
   },
 
-  saveReport({ commit, dispatch, state }, { name }) {
+  saveReport({ dispatch, state }, { name }) {
     const postData = {
       chartType: state.chartType,
       design: state.currentDesign,
@@ -620,14 +620,12 @@ const actions = {
       order: state.order,
       queryPayload: helpers.getQueryPayloadFromDesign(state)
     }
-    return dispatch('reports/saveReport', postData, { root: true }).then(
-      response => {
-        // commit('setCurrentReport', response.data)
-        console.log(
-          '**: likely place above two commits in reports store. currentReport (aka activeReport?) as getter in reports store?'
-        )
-      }
-    )
+    return dispatch('reports/saveReport', postData, { root: true }).then(() => {
+      // commit('setCurrentReport', response.data)
+      console.log(
+        '**: likely place above two commits in reports store. currentReport (aka activeReport?) as getter in reports store?'
+      )
+    })
   },
 
   // TODO: remove and use `mapMutations`
