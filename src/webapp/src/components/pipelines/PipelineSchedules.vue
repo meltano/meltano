@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 
 import AnalyzeList from '@/components/analyze/AnalyzeList'
@@ -18,6 +18,7 @@ export default {
   },
   computed: {
     ...mapState('orchestration', ['pipelines']),
+    ...mapGetters('plugins', ['getPluginLabel']),
     getMomentFormatlll() {
       return val => utils.momentFormatlll(val)
     },
@@ -85,7 +86,9 @@ export default {
                 <div class="media-content">
                   <div class="content">
                     <p>
-                      <strong>{{ pipeline.extractor }}</strong>
+                      <strong>
+                        {{ getPluginLabel('extractors', pipeline.extractor) }}
+                      </strong>
                       <br />
                       <small>Default</small>
                     </p>
