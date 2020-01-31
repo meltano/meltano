@@ -537,7 +537,9 @@ const actions = {
       }
 
       sourceCollection.forEach(item => {
-        Vue.set(item, 'selected', targetCollection.includes(item.name))
+        if (targetCollection.includes(item.name)) {
+          commit('toggleSelected', item)
+        }
       })
     }
 
