@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1578](https://gitlab.com/meltano/meltano/issues/1578) User can request help to delete their data from their MeltanoData instance
+
 ### Changes
 
 ### Fixes
