@@ -199,6 +199,10 @@ Before you install Meltano, make sure you have the following requirements instal
 
 #### Unix-like environment
 
+::: warning
+There is currently a known issue with macOS 10.15 and Python 3. For more information, visit [issue #1468](https://gitlab.com/meltano/meltano/issues/1468).
+:::
+
 Recent versions of Linux and macOS are both fully supported, but Windows is not.
 
 If you'd like to run Meltano on Windows, you can install it inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about). You may also try [installing Meltano on Docker](#installing-on-docker), although Docker on Windows is known to have [some idiosyncrasies](https://gitlab.com/meltano/meltano/issues/1261#note_240256080) that might hinder Meltano's ability to function.
