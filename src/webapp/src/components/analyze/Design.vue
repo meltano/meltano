@@ -39,7 +39,6 @@ export default {
       'hasSQLError',
       'isAutoRunQuery',
       'isLoadingQuery',
-      'reports',
       'resultAggregates',
       'results',
       'sqlErrorMessage'
@@ -62,7 +61,7 @@ export default {
     ]),
     ...mapGetters('orchestration', ['lastUpdatedDate', 'startDate']),
     ...mapState('dashboards', ['dashboards']),
-    ...mapState('reports', ['saveReportSettings']),
+    ...mapState('reports', ['reports', 'saveReportSettings']),
 
     dataLastUpdatedDate() {
       const date = this.lastUpdatedDate(this.currentExtractor)
