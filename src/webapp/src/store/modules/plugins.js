@@ -85,7 +85,9 @@ const getters = {
   getPluginLabel(state) {
     return (type, name) => {
       const pluginList = state.plugins[type]
-      const targetPlugin = pluginList.find(plugin => plugin.name === name)
+      const targetPlugin = pluginList
+        ? pluginList.find(plugin => plugin.name === name)
+        : {}
 
       return targetPlugin ? targetPlugin.label : 'Undefined label'
     }
