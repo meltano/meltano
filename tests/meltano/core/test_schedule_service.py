@@ -68,6 +68,27 @@ class TestScheduleService:
         with pytest.raises(ScheduleDoesNotExistError):
             subject.remove_schedule(target_name)
 
+    def test_schedule_update(self, subject):
+        schedule = subject.schedules()[0]
+
+        schedule.interval = "@pytest"
+        subject.update_schedule(schedule)
+
+        # there should be only 1 element with the set interval
+        assert sum(map(lambda s: s.interval == "@pytest", subject.schedules())) == 1
+
+        # it should be the first element
+        assert subject.schedules()[0].interval == "@pytest"
+
+        # it should be a copy of the original element
+        assert schedule is not subject.schedules()[0]
+
+        # it must exists
+        with pytest.raises(ScheduleDoesNotExistError):
+            schedule.name = "llamasareverynice"
+            subject.update_schedule(schedule)
+
+
     def test_schedule_start_date(self, subject, session, tap, target):
         # curry the `add` method to remove some arguments
         add = lambda name, start_date: subject.add(

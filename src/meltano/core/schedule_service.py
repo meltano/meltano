@@ -118,7 +118,16 @@ class ScheduleService:
 
         return name
 
+    def update_schedule(self, schedule: Schedule):
+        with self.project.meltano_update() as meltano:
+            try:
+                idx = meltano.schedules.index(schedule)
+                meltano.schedules[idx] = schedule
+            except ValueError:
+                raise ScheduleDoesNotExistError(schedule.name)
+
     def find_namespace_schedule(self, namespace: str) -> Schedule:
+
         """
         Search for a Schedule that runs for a certain plugin namespace.
         For instance, `tap_carbon` would yield the first schedule that
