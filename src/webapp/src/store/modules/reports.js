@@ -19,6 +19,9 @@ const getters = {
           report.slug === slug
       )
   },
+  getReportById(state) {
+    return id => state.reports.find(report => report.id === id)
+  },
   getReportsByIds(state) {
     return ids => state.reports.filter(report => ids.includes(report.id))
   }
@@ -34,12 +37,14 @@ const actions = {
     return reportsApi.saveReport(payload).then(response => {
       commit('addReport', response.data)
       commit('resetSaveReportSettings')
+      return response
     })
   },
   updateReport({ commit }, payload) {
-    return reportsApi.updateReport(payload).then(() => {
-      console.log('**: setReport mutation?')
+    return reportsApi.updateReport(payload).then(response => {
+      commit('setReport', response.data)
       commit('resetSaveReportSettings')
+      return response
     })
   },
   updateSaveReportSettings({ commit }, name) {
@@ -49,12 +54,15 @@ const actions = {
 
 const mutations = {
   addReport(state, report) {
-    console.log('added report')
-
     state.reports.push(report)
   },
   resetSaveReportSettings(state) {
     state.saveReportSettings = { name: null }
+  },
+  setReport(state, report) {
+    const target = state.reports.find(item => item.id === report.id)
+    const idx = state.reports.indexOf(target)
+    state.reports.splice(idx, 1, report)
   },
   setReports(state, reports) {
     state.reports = reports

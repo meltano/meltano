@@ -609,7 +609,7 @@ const actions = {
     })
   },
 
-  saveReport({ dispatch, state }, { name }) {
+  saveReport({ commit, dispatch, rootGetters, state }, { name }) {
     const postData = {
       chartType: state.chartType,
       design: state.currentDesign,
@@ -620,12 +620,12 @@ const actions = {
       order: state.order,
       queryPayload: helpers.getQueryPayloadFromDesign(state)
     }
-    return dispatch('reports/saveReport', postData, { root: true }).then(() => {
-      // commit('setCurrentReport', response.data)
-      console.log(
-        '**: likely place above two commits in reports store. currentReport (aka activeReport?) as getter in reports store?'
-      )
-    })
+    return dispatch('reports/saveReport', postData, { root: true }).then(
+      response => {
+        const report = rootGetters['reports/getReportById'](response.data.id)
+        commit('setCurrentReport', report)
+      }
+    )
   },
 
   // TODO: remove and use `mapMutations`
@@ -664,12 +664,13 @@ const actions = {
     dispatch('tryAutoRun')
   },
 
-  updateReport({ commit, dispatch, state }) {
+  updateReport({ commit, dispatch, rootGetters, state }) {
     commit('updateActiveReport')
     return dispatch('reports/updateReport', state.activeReport, {
       root: true
     }).then(response => {
-      commit('setCurrentReport', response.data)
+      const report = rootGetters['reports/getReportById'](response.data.id)
+      commit('setCurrentReport', report)
     })
   },
 
