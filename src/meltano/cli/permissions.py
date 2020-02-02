@@ -54,10 +54,10 @@ def grant(project, db, spec, dry, diff):
                 if diff:
                     diff_prefix = "+ "
 
-            if command["run_status"]:
+            if command.get("run_status"):
                 fg = "green"
                 run_prefix = "[SUCCESS] "
-            elif command["run_status"] is None:
+            elif command.get("run_status") is None:
                 fg = "cyan"
                 run_prefix = "[SKIPPED] "
             else:
