@@ -181,6 +181,13 @@ class SnowflakeConnector:
 
         return roles
 
+    def run_query(self, query: str):
+
+        with self.engine.connect() as connection:
+            result = connection.execute(query)
+
+        return result
+
     def full_schema_list(self, schema: str) -> List[str]:
         """
         For a given schema name, get all schemas it may be referencing.
