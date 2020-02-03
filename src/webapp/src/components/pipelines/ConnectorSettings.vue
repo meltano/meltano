@@ -258,7 +258,7 @@ export default {
       }
     },
     openOAuthPopup(provider) {
-      const oauthUrl = `${this.$flask.oauthServerUrl}/${provider}`
+      const oauthUrl = `${this.$flask.oauthServiceUrl}/${provider}`
       const winOpts =
         'resizable=no,scrollbars=no,close=yes,height=640,width=480'
 
