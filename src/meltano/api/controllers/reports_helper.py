@@ -8,6 +8,13 @@ from meltano.core.schedule_service import ScheduleService
 from .sql_helper import SqlHelper
 
 
+class InvalidEmbedToken(Exception):
+    """Occurs when an embed token isn't found."""
+
+    def __init__(self, token):
+        self.token = token
+
+
 class ReportsHelper:
     VERSION = "1.0.0"
 
@@ -31,7 +38,10 @@ class ReportsHelper:
         }
 
     def get_embed(self, session, token):
-        return session.query(EmbedToken).filter_by(token=token).one()
+        try:
+            return session.query(EmbedToken).filter_by(token=token).one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            raise InvalidEmbedToken(token)
 
     def get_report_with_query_results(self, report):
         project = Project.find()

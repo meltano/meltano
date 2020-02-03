@@ -2,7 +2,7 @@ import sqlalchemy
 from flask import Blueprint, jsonify, request
 
 from .errors import InvalidFileNameError
-from .reports_helper import ReportsHelper
+from .reports_helper import InvalidEmbedToken, ReportsHelper
 
 from meltano.core.project import Project
 from meltano.core.m5o.reports_service import ReportAlreadyExistsError, ReportsService
@@ -59,7 +59,7 @@ def _handle(ex):
     )
 
 
-@reportsBP.errorhandler(sqlalchemy.orm.exc.NoResultFound)
+@reportsBP.errorhandler(InvalidEmbedToken)
 def _handle(ex):
     return (
         jsonify(
