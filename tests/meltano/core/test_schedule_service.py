@@ -88,7 +88,6 @@ class TestScheduleService:
             schedule.name = "llamasareverynice"
             subject.update_schedule(schedule)
 
-
     def test_schedule_start_date(self, subject, session, tap, target):
         # curry the `add` method to remove some arguments
         add = lambda name, start_date: subject.add(
