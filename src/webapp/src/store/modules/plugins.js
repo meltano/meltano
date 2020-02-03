@@ -168,7 +168,7 @@ const mutations = {
     const idx = state.addingPlugins[addConfig.pluginType].indexOf(
       addConfig.name
     )
-    state.addingPlugins[addConfig.pluginType].splice(idx, 1)
+    Vue.delete(state.addingPlugins[addConfig.pluginType], idx)
   },
 
   addPluginStart(state, addConfig) {
@@ -179,7 +179,7 @@ const mutations = {
     const idx = state.installingPlugins[installConfig.pluginType].indexOf(
       installConfig.name
     )
-    state.installingPlugins[installConfig.pluginType].splice(idx, 1)
+    Vue.delete(state.installingPlugins[installConfig.pluginType], idx)
   },
 
   installPluginStart(state, installConfig) {

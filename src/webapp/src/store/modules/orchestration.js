@@ -297,13 +297,13 @@ const mutations = {
 
   deletePipeline(state, pipeline) {
     const idx = state.pipelines.indexOf(pipeline)
-    state.pipelines.splice(idx, 1)
+    Vue.delete(state.pipelines, idx)
   },
 
   removePipelinePoller(state, pipelinePoller) {
     pipelinePoller.dispose()
     const idx = state.pipelinePollers.indexOf(pipelinePoller)
-    state.pipelinePollers.splice(idx, 1)
+    Vue.delete(state.pipelinePollers, idx)
   },
 
   reset(state, attr) {
@@ -330,7 +330,7 @@ const mutations = {
   setPipeline(state, pipeline) {
     const target = state.pipelines.find(p => p.name === pipeline.name)
     const idx = state.pipelines.indexOf(target)
-    state.pipelines.splice(idx, 1, pipeline)
+    Vue.set(state.pipelines, idx, pipeline)
   },
 
   setPipelineStatus(

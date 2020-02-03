@@ -713,7 +713,7 @@ const mutations = {
       orderableAttr => orderableAttr.attribute === attribute
     )
     const idx = state.order.unassigned.indexOf(orderableAttribute)
-    state.order.unassigned.splice(idx, 1)
+    Vue.delete(state.order.unassigned, idx)
     state.order.assigned.push(orderableAttribute)
   },
 
@@ -722,13 +722,13 @@ const mutations = {
       const filtersByType =
         state.filters[helpers.getFilterTypePlural(filter.filterType)]
       const idx = filtersByType.indexOf(filter)
-      filtersByType.splice(idx, 1)
+      Vue.delete(filtersByType, idx)
     }
   },
 
-  removeOrder(state, { collection, queryAttribute }) {
+  removeOrder(_, { collection, queryAttribute }) {
     const idx = collection.indexOf(queryAttribute)
-    collection.splice(idx, 1)
+    Vue.delete(collection, idx)
   },
 
   resetDefaults(state) {
