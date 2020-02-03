@@ -4,9 +4,8 @@ import lodash from 'lodash'
 import sqlFormatter from 'sql-formatter'
 import SSF from 'ssf'
 
-import designApi from '../../api/design'
-import reportsApi from '../../api/reports'
-import sqlApi from '../../api/sql'
+import designApi from '@/api/design'
+import sqlApi from '@/api/sql'
 import utils from '@/utils/utils'
 import { selected } from '@/utils/predicates'
 import { namer } from '@/utils/mappers'
@@ -39,7 +38,6 @@ const defaultState = utils.deepFreeze({
   reports: [],
   resultAggregates: [],
   results: [],
-  saveReportSettings: { name: null },
   sqlErrorMessage: []
 })
 
@@ -435,26 +433,31 @@ const actions = {
     commit('toggleCollapsed', row)
   },
 
-  getDesign({ commit, dispatch, state }, { namespace, model, design, slug }) {
+  getDesign(
+    { commit, dispatch, rootGetters },
+    { namespace, model, design, slug }
+  ) {
     commit('resetSQLResults')
     commit('setCurrentMetadata', { namespace, model, design })
+
+    const uponLoadReports = dispatch('reports/loadReports', null, {
+      root: true
+    })
 
     return designApi
       .index(namespace, model, design)
       .then(response => {
         commit('setDesign', response.data)
       })
-      .then(reportsApi.loadReports)
-      .then(response => {
-        commit('setReports', response.data)
+      .then(uponLoadReports)
+      .then(() => {
         if (slug) {
-          const reportMatch = state.reports.find(
-            report =>
-              report.namespace === namespace &&
-              report.model === model &&
-              report.design === design &&
-              report.slug === slug
-          )
+          const reportMatch = rootGetters['reports/getReportBySlug']({
+            design,
+            model,
+            namespace,
+            slug
+          })
 
           if (reportMatch) {
             dispatch('loadReport', reportMatch)
@@ -606,7 +609,7 @@ const actions = {
     })
   },
 
-  saveReport({ commit, state }, { name }) {
+  saveReport({ commit, dispatch, rootGetters, state }, { name }) {
     const postData = {
       chartType: state.chartType,
       design: state.currentDesign,
@@ -617,11 +620,12 @@ const actions = {
       order: state.order,
       queryPayload: helpers.getQueryPayloadFromDesign(state)
     }
-    return reportsApi.saveReport(postData).then(response => {
-      commit('resetSaveReportSettings')
-      commit('setCurrentReport', response.data)
-      commit('addSavedReportToReports', response.data)
-    })
+    return dispatch('reports/saveReport', postData, { root: true }).then(
+      response => {
+        const report = rootGetters['reports/getReportById'](response.data.id)
+        commit('setCurrentReport', report)
+      }
+    )
   },
 
   // TODO: remove and use `mapMutations`
@@ -660,16 +664,14 @@ const actions = {
     dispatch('tryAutoRun')
   },
 
-  updateReport({ commit, state }) {
+  updateReport({ commit, dispatch, rootGetters, state }) {
     commit('updateActiveReport')
-    return reportsApi.updateReport(state.activeReport).then(response => {
-      commit('resetSaveReportSettings')
-      commit('setCurrentReport', response.data)
+    return dispatch('reports/updateReport', state.activeReport, {
+      root: true
+    }).then(response => {
+      const report = rootGetters['reports/getReportById'](response.data.id)
+      commit('setCurrentReport', report)
     })
-  },
-
-  updateSaveReportSettings({ commit }, name) {
-    commit('setSaveReportSettingsName', name)
   },
 
   // eslint-disable-next-line no-shadow
@@ -706,10 +708,6 @@ const mutations = {
     state.filters[helpers.getFilterTypePlural(filter.filterType)].push(filter)
   },
 
-  addSavedReportToReports(state, report) {
-    state.reports.push(report)
-  },
-
   assignSortableAttribute(state, attribute) {
     const orderableAttribute = state.order.unassigned.find(
       orderableAttr => orderableAttr.attribute === attribute
@@ -742,10 +740,6 @@ const mutations = {
     state.results = []
     state.queryAttributes = []
     state.resultAggregates = []
-  },
-
-  resetSaveReportSettings(state) {
-    state.saveReportSettings = { name: null }
   },
 
   resetSortAttributes(state) {
@@ -847,14 +841,6 @@ const mutations = {
     state.results = payload.results
     state.queryAttributes = payload.queryAttributes
     state.resultAggregates = payload.aggregates
-  },
-
-  setReports(state, reports) {
-    state.reports = reports
-  },
-
-  setSaveReportSettingsName(state, name) {
-    state.saveReportSettings.name = name
   },
 
   setSortableAttributeDirection(_, { orderableAttribute, direction }) {

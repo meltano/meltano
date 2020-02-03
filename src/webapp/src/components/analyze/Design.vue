@@ -39,10 +39,8 @@ export default {
       'hasSQLError',
       'isAutoRunQuery',
       'isLoadingQuery',
-      'reports',
       'resultAggregates',
       'results',
-      'saveReportSettings',
       'sqlErrorMessage'
     ]),
     ...mapGetters('designs', [
@@ -63,6 +61,7 @@ export default {
     ]),
     ...mapGetters('orchestration', ['lastUpdatedDate', 'startDate']),
     ...mapState('dashboards', ['dashboards']),
+    ...mapState('reports', ['reports', 'saveReportSettings']),
 
     dataLastUpdatedDate() {
       const date = this.lastUpdatedDate(this.currentExtractor)
@@ -127,6 +126,7 @@ export default {
       'runQuery',
       'toggleIsAutoRunQuery'
     ]),
+    ...mapActions('reports', ['updateSaveReportSettings']),
     ...mapMutations('designs', ['setIsAutoRunQuery']),
 
     aggregateSelected(aggregate) {
@@ -237,7 +237,7 @@ export default {
     },
 
     setReportName(name) {
-      this.$store.dispatch('designs/updateSaveReportSettings', name)
+      this.updateSaveReportSettings(name)
     },
 
     tableRowClicked(relatedTable) {
