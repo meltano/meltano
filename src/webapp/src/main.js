@@ -48,7 +48,7 @@ Vue.prototype.$flask = flaskContext()
 
 // Conditional analytics using flask context
 if (Vue.prototype.$flask.isSendAnonymousUsageStats) {
-  setupAnalytics()
+  setupAnalytics(router)
 }
 
 /* eslint-disable no-new */

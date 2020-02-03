@@ -2,16 +2,16 @@ import Vue from 'vue'
 
 import VueAnalytics from 'vue-analytics'
 
-import router from '@/router/app'
-
-export default function setup() {
+export default function setup(router, isEmbedApp = false) {
   const isDisabled =
     'hasDisabledTracking' in localStorage &&
     localStorage.getItem('hasDisabledTracking') === 'true'
 
   if (!isDisabled) {
+    // GA property ID determined by GA console (2 = Meltano UI & 6 = Meltano Embed UI)
+    const propertyId = isEmbedApp ? '6' : '2'
     Vue.use(VueAnalytics, {
-      id: 'UA-132758957-2',
+      id: `UA-132758957-${propertyId}`,
       router,
       set: [
         {
