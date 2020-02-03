@@ -8,24 +8,23 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-- [#1154](https://gitlab.com/meltano/meltano/issues/1154) Adds non-dry mode to `meltano permissions` on Snowflake so that queries can be executed
 
+- [#1154](https://gitlab.com/meltano/meltano/issues/1154) Adds non-dry mode to `meltano permissions` on Snowflake so that queries can be executed
 - [#1578](https://gitlab.com/meltano/meltano/issues/1578) User can request help to delete their data from their MeltanoData instance
 
 ### Changes
 
 - [#1516](https://gitlab.com/meltano/meltano/issues/1516) Pipelines now show extractor label rather than name
+- [#1652](https://gitlab.com/meltano/meltano/issues/1652) Removes the `--full-refresh` command from `meltano permissions`
 
 ### Fixes
-- [#1595](https://gitlab.com/meltano/meltano/issues/1595) Updates `meltano permissions` to only revoke permissions on databases defined in the spec
 
+- [#1595](https://gitlab.com/meltano/meltano/issues/1595) Updates `meltano permissions` to only revoke permissions on databases defined in the spec
 - [#1588](https://gitlab.com/meltano/meltano/issues/1588) Update `scrollTo` behavior in Job Log to work across browsers
 - [#1660](https://gitlab.com/meltano/meltano/issues/1660) Fix minor action/mutation bug when loading a report in Analyze
 - [#1607](https://gitlab.com/meltano/meltano/issues/1607) Fix inaccurate error during report additions/removal from dashboards (via refactor SSOT reports store)
 
 ### Breaks
-### Breaks
-- [#1652](https://gitlab.com/meltano/meltano/issues/1652) Removes the `--full-refresh` command from `meltano permissions`
 
 ## 1.17.1 - (2020-01-29)
 
