@@ -21,6 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1588](https://gitlab.com/meltano/meltano/issues/1588) Update `scrollTo` behavior in Job Log to work across browsers
 - [#1660](https://gitlab.com/meltano/meltano/issues/1660) Fix minor action/mutation bug when loading a report in Analyze
+- [#1607](https://gitlab.com/meltano/meltano/issues/1607) Fix inaccurate error during report additions/removal from dashboards (via refactor SSOT reports store)
 
 ### Breaks
 ### Breaks

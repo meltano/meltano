@@ -5,6 +5,7 @@ import designs from './modules/designs'
 import dashboards from './modules/dashboards'
 import orchestration from './modules/orchestration'
 import plugins from './modules/plugins'
+import reports from './modules/reports'
 import repos from './modules/repos'
 import settings from './modules/settings'
 import system from './modules/system'
@@ -17,6 +18,7 @@ export default new Vuex.Store({
     dashboards,
     orchestration,
     plugins,
+    reports,
     repos,
     settings,
     system

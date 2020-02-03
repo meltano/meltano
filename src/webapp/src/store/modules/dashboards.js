@@ -2,27 +2,22 @@ import Vue from 'vue'
 
 import lodash from 'lodash'
 
-import dashboardsApi from '../../api/dashboards'
-import reportsApi from '../../api/reports'
+import dashboardsApi from '@/api/dashboards'
 import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
   activeDashboard: {},
-  activeDashboardReports: [],
+  activeDashboardReportsWithQueryResults: [],
   dashboards: [],
-  isInitializing: true,
-  reports: []
+  isInitializing: true
 })
 
 const getters = {
-  activeReports: (state, getters) => {
-    return getters.activeReportIds.map(reportId => {
-      return state.reports.find(report => report.id === reportId)
-    })
-  },
-
   activeReportIds: state => {
     return state.activeDashboard.reportIds
+  },
+  activeReports: (state, getters, rootState, rootGetters) => {
+    return rootGetters['reports/getReportsByIds'](getters.activeReportIds)
   }
 }
 
@@ -58,7 +53,7 @@ const actions = {
     return dashboardsApi
       .getActiveDashboardReportsWithQueryResults(getters.activeReports)
       .then(response => {
-        commit('setActiveDashboardReports', response.data)
+        commit('setActiveDashboardReportsWithQueryResults', response.data)
       })
   },
 
@@ -68,17 +63,13 @@ const actions = {
     })
   },
 
-  getReports({ commit }) {
-    return reportsApi
-      .loadReports()
-      .then(response => commit('setReports', response.data))
-  },
-
   initialize({ commit, dispatch }, slug) {
     commit('setIsInitialzing', true)
-    const promiseGetReports = dispatch('getReports')
-    const promiseGetDashboards = dispatch('getDashboards')
-    return Promise.all([promiseGetReports, promiseGetDashboards]).then(() => {
+    const uponLoadReports = dispatch('reports/loadReports', null, {
+      root: true
+    })
+    const uponGetDashboards = dispatch('getDashboards')
+    return Promise.all([uponLoadReports, uponGetDashboards]).then(() => {
       if (slug) {
         dispatch('preloadDashboard', slug)
       }
@@ -87,7 +78,7 @@ const actions = {
   },
 
   preloadDashboard({ dispatch, state, getters }, slug) {
-    // Load from slug or refresh existing activeDashboard's reports with activeDashboardReports
+    // Load from slug or refresh existing activeDashboard's reports with activeDashboardReportsWithQueryResults
     if (slug) {
       const dashboardMatch = state.dashboards.find(
         dashboard => dashboard.slug === slug
@@ -117,7 +108,7 @@ const actions = {
   resetActiveDashboard: ({ commit }) => commit('reset', 'activeDashboard'),
 
   resetActiveDashboardReports: ({ commit }) =>
-    commit('reset', 'activeDashboardReports'),
+    commit('reset', 'activeDashboardReportsWithQueryResults'),
 
   saveDashboard({ dispatch, commit }, payload) {
     return dashboardsApi.saveDashboard(payload).then(response => {
@@ -139,8 +130,8 @@ const actions = {
     })
   },
 
-  updateActiveDashboardReports({ commit }, reports) {
-    commit('setActiveDashboardReports', reports)
+  updateActiveDashboardReportsWithQueryResults({ commit }, reports) {
+    commit('setActiveDashboardReportsWithQueryResults', reports)
   },
 
   updateCurrentDashboard({ commit, dispatch }, dashboard) {
@@ -186,8 +177,8 @@ const mutations = {
     }
   },
 
-  setActiveDashboardReports(state, reports) {
-    state.activeDashboardReports = reports
+  setActiveDashboardReportsWithQueryResults(state, reports) {
+    state.activeDashboardReportsWithQueryResults = reports
   },
 
   setCurrentDashboard(state, dashboard) {
@@ -197,7 +188,7 @@ const mutations = {
   setDashboard(state, dashboard) {
     const target = state.dashboards.find(item => item.id === dashboard.id)
     const idx = state.dashboards.indexOf(target)
-    state.dashboards[idx] = dashboard
+    state.dashboards.splice(idx, 1, dashboard)
   },
 
   setDashboards(state, dashboards) {
@@ -210,10 +201,6 @@ const mutations = {
 
   setIsInitialzing(state, value) {
     state.isInitializing = value
-  },
-
-  setReports(state, reports) {
-    state.reports = reports
   }
 }
 
