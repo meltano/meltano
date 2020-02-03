@@ -307,23 +307,52 @@ You may use `make lint` to automatically lint all your code, or `make show_lint`
 
 > A contributor should know the exact line-of-code to make a change based on convention
 
-In the spirit of GitLab's "boring solutions" with the above tools and mantra, the frontend codebase is additionally sorted as follows:
+In the spirit of GitLab's "boring solutions" with the above tools and mantra, the codebase is additionally sorted as follows:
 
-- `import`s are alphabetical and subgrouped by _core_ -> _third-party_ -> _application_ with a return delineating. For example:
+#### Imports
 
-  ```js
-  // core
-  import Vue from 'vue'
-  // third-party
-  import lodash from 'lodash'
-  // application
-  import poller from '@/utils/poller'
-  import utils from '@/utils/utils'
-  ```
+- `import`s are sorted using the following pattern:
 
-- object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
+  1. Code source location: third-party → local (separate each group with a single blank line)
+  1. Import scheme: Default imports → Partial imports
+  1. Name of the module, alphabetically: 'lodash' → 'vue'
 
-Over time we hope to automate the enforcement of the above sorting rules.
+::: tip
+There should be only 2 blocks of imports with a single blank line between both blocks.
+The first rule is used to separate both blocks.
+:::
+
+```js
+import Vue from 'vue'
+import lodash from 'lodash'
+import { bar, foo } from 'alib'
+import { mapAction, mapState } from 'vuex'
+¶  // 1 blank line to split import groups
+import poller from '@/utils/poller'
+import { bar, foo } from '@/utils/utils'
+import Widget from '@component/widget'
+¶
+¶  // 2 blank lines to split the imports from the code 
+```
+
+```python
+import flask
+from datetime import datetime
+¶  # 1 blank line to split import groups
+import meltano
+from meltano.core.plugin import Plugin, PluginType
+from meltano.core.project import Project
+¶
+¶  # 2 blank lines to split the imports from the code 
+```
+
+#### Definitions
+
+- Object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
+
+::: warning
+We are looking to automate these rules in https://gitlab.com/meltano/meltano/issues/1609.
+:::
 
 :::warning Troubleshooting
 When testing your contributions you may need to ensure that your various `__pycache__` directories are removed. This helps ensure that you are running the code you expect to be running.
