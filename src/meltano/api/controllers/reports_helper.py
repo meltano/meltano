@@ -20,7 +20,9 @@ class ReportsHelper:
 
     def create_embed_snippet(self, session, report_id):
         try:
-            embed_token = session.query(EmbedToken).filter_by(resource_id=report_id).one()
+            embed_token = (
+                session.query(EmbedToken).filter_by(resource_id=report_id).one()
+            )
             is_new = False
         except sqlalchemy.orm.exc.NoResultFound:
             embed_token = EmbedToken(resource_id=report_id)
