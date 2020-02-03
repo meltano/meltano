@@ -99,24 +99,6 @@ def embed():
     return jsonify(response_data)
 
 
-@reportsBP.route("/<report_name>", methods=["POST"])
-def load_report(report_name):
-    permit("view:reports", report_name)
-
-    reports_helper = ReportsHelper()
-    post_data = request.get_json()
-    report = reports_service().get_report_by_name(report_name)
-    response_data = (
-        reports_helper.get_report_with_query_results(report)
-        if post_data["has_results"]
-        else report
-    )
-
-    permit("view:design", response_data["design"])
-
-    return jsonify(response_data)
-
-
 @reportsBP.route("/save", methods=["POST"])
 @readonly_killswitch
 def save_report():

@@ -10,18 +10,6 @@ export default {
     return axios.post(utils.apiUrl('reports', 'embed'), data)
   },
 
-  loadReport(name) {
-    return axios.post(utils.apiUrl('reports', `${name}`), {
-      hasResults: false
-    })
-  },
-
-  loadReportWithQueryResults(name) {
-    return axios.post(utils.apiUrl('reports', `${name}`), {
-      hasResults: true
-    })
-  },
-
   loadReports() {
     return axios.get(utils.apiUrl('reports'))
   },
