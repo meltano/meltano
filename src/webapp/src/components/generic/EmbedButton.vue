@@ -28,7 +28,7 @@ export default {
     getReportEmbed(report) {
       this.isAwaitingEmbed = true
       reportsApi
-        .generateEmbedURL(report)
+        .generateEmbedURL(report.id)
         .then(response => {
           this.$refs[`embed-${report.id}`].value = response.data.snippet
           if (response.data.isNew) {

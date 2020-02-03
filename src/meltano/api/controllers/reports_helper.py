@@ -18,12 +18,12 @@ class InvalidEmbedToken(Exception):
 class ReportsHelper:
     VERSION = "1.0.0"
 
-    def create_embed_snippet(self, session, name):
+    def create_embed_snippet(self, session, report_id):
         try:
-            embed_token = session.query(EmbedToken).filter_by(resource_id=name).one()
+            embed_token = session.query(EmbedToken).filter_by(resource_id=report_id).one()
             is_new = False
         except sqlalchemy.orm.exc.NoResultFound:
-            embed_token = EmbedToken(resource_id=name)
+            embed_token = EmbedToken(resource_id=report_id)
             session.add(embed_token)
             is_new = True
         finally:

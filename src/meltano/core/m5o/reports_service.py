@@ -37,11 +37,6 @@ class ReportsService:
         report = next(filter(lambda r: r["id"] == report_id, reports), None)
         return report
 
-    def get_report_by_name(self, name):
-        reports = self.get_reports()
-        report = next(filter(lambda r: r["name"] == name, reports), None)
-        return report
-
     def save_report(self, data):
         if "id" in data:
             existing_report = self.get_report(data["id"])
@@ -68,8 +63,8 @@ class ReportsService:
         return data
 
     def update_report(self, data):
-        name = data["name"]
-        existing_report = self.get_report_by_name(name)
+        id = data["id"]
+        existing_report = self.get_report(id)
         slug = existing_report["slug"]
 
         file_path = self.project.analyze_dir("reports", f"{slug}.report.m5o")

@@ -84,7 +84,7 @@ def index():
 def get_embed(token):
     reports_helper = ReportsHelper()
     embed = reports_helper.get_embed(db.session, token)
-    report = reports_service().get_report_by_name(embed.resource_id)
+    report = reports_service().get_report(embed.resource_id)
     report_with_query_results = reports_helper.get_report_with_query_results(report)
 
     return jsonify(report_with_query_results)
@@ -94,7 +94,7 @@ def get_embed(token):
 def embed():
     reports_helper = ReportsHelper()
     post_data = request.get_json()
-    response_data = reports_helper.create_embed_snippet(db.session, post_data["name"])
+    response_data = reports_helper.create_embed_snippet(db.session, post_data["id"])
 
     return jsonify(response_data)
 
