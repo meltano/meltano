@@ -311,7 +311,7 @@ In the spirit of GitLab's "boring solutions" with the above tools and mantra, th
 
 #### Imports
 
-- `import`s are sorted using the following pattern:
+`import`s are sorted using the following pattern:
 
   1. Code source location: third-party → local (separate each group with a single blank line)
   1. Import scheme: Default imports → Partial imports
@@ -348,7 +348,7 @@ from meltano.core.project import Project
 
 #### Definitions
 
-- Object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
+Object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
 
 ::: warning
 We are looking to automate these rules in https://gitlab.com/meltano/meltano/issues/1609.
