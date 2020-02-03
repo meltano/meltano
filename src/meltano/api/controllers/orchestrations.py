@@ -424,8 +424,7 @@ def update_pipeline_schedule() -> Response:
     plugin_namespace = payload["plugin_namespace"]
     schedule = schedule_service.find_namespace_schedule(plugin_namespace)
     schedule.interval = interval
-
-    # TODO ensure change persists on the backend
+    schedule_service.update_schedule(schedule)
 
     return jsonify(dict(schedule)), 201
 
