@@ -323,14 +323,14 @@ The first rule is used to separate both blocks.
 :::
 
 ```js
-import Vue from 'vue'
 import lodash from 'lodash'
+import Vue from 'vue'
 import { bar, foo } from 'alib'
 import { mapAction, mapState } from 'vuex'
 ¶  // 1 blank line to split import groups
 import poller from '@/utils/poller'
-import { bar, foo } from '@/utils/utils'
 import Widget from '@component/widget'
+import { bar, foo } from '@/utils/utils'
 ¶
 ¶  // 2 blank lines to split the imports from the code 
 ```
