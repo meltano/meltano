@@ -147,6 +147,17 @@ export default {
     onChangeUploadFormData(uploadFormData) {
       this.uploadFormData = uploadFormData
     },
+    runPipeline() {
+      const pipeline = this.getPipelineWithExtractor(this.extractor.name)
+      this.run(pipeline).then(() => {
+        Vue.toasted.global.success(`Pipeline saved - ${pipeline.name}`)
+        Vue.toasted.global.success(`Auto running pipeline - ${pipeline.name}`)
+        this.$router.push({
+          name: 'runLog',
+          params: { jobId: pipeline.jobId }
+        })
+      })
+    },
     save() {
       this.isSaving = true
 
@@ -182,23 +193,7 @@ export default {
 
             // 4. Finally save pipeline that's relient on valid config settings
             this.savePipelineSchedule(this.extractor.name)
-              .then(() => {
-                const pipeline = this.getPipelineWithExtractor(
-                  this.extractor.name
-                )
-                this.run(pipeline).then(() => {
-                  Vue.toasted.global.success(
-                    `Pipeline saved - ${pipeline.name}`
-                  )
-                  Vue.toasted.global.success(
-                    `Auto running pipeline - ${pipeline.name}`
-                  )
-                  this.$router.push({
-                    name: 'runLog',
-                    params: { jobId: pipeline.jobId }
-                  })
-                })
-              })
+              .then(this.runPipeline)
               .catch(error => {
                 Vue.toasted.global.error(error.response.data.code)
               })
