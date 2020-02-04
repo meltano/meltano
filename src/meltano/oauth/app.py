@@ -5,15 +5,23 @@ import os
 
 
 app = Flask(__name__, instance_path=os.getcwd(), instance_relative_config=True)
+
 app.config.from_object("meltano.oauth.config")
 app.config.from_pyfile("ui.cfg", silent=True)
 
 
 @app.route("/")
 def root():
-    url = url_for("OAuth.Facebook.login")
-
-    return f"<a href='{url}'>Facebook</a>"
+    return render_template(
+        "home.html",
+        providers=(
+            {
+                "label": "Facebook",
+                "url": url_for("OAuth.Facebook.login"),
+                "logo": "/static/logos/facebook-logo.png",
+            },
+        ),
+    )
 
 
 from .providers import OAuth, facebook
