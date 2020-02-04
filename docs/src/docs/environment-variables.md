@@ -118,7 +118,7 @@ For more information on how to get these from your GitLab application, check out
 
 ### Read-Only mode
 
-The disable all modifications from the Meltano UI, you can run Meltano using the *read-only* mode.
+The disable all modifications to the Meltano UI, you can run Meltano using the *read-only* mode.
 
 ```bash
 # Meltano read-only mode

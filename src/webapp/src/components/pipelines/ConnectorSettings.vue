@@ -9,8 +9,8 @@ import utils from '@/utils/utils'
 export default {
   name: 'ConnectorSettings',
   components: {
-    InputDateIso8601,
-    ConnectorLogo
+    ConnectorLogo,
+    InputDateIso8601
   },
   props: {
     configSettings: {
@@ -88,11 +88,11 @@ export default {
     getIsOfKindHidden() {
       return kind => kind === 'hidden'
     },
+    getIsOfKindOAuth() {
+      return kind => kind === 'oauth'
+    },
     getIsOfKindOptions() {
       return kind => kind === 'options'
-    },
-    getIsOfKindOAuth() {
-      return kind => kind && kind.startsWith('oauth')
     },
     getIsOfKindTextBased() {
       return kind =>
@@ -491,9 +491,9 @@ export default {
                   <div v-if="getIsOfKindOAuth(setting.kind)" class="control">
                     <button
                       class="button is-small is-primary"
-                      @click="openOAuthPopup(setting.oauth.provider)"
+                      @click.prevent="openOAuthPopup(setting.oauth.provider)"
                     >
-                      <span>Get with &nbsp;</span>
+                      <span class="mr-025r">Get with</span>
                       <span class="icon has-text-grey-dark">
                         <connector-logo :connector="plugin.name" />
                       </span>

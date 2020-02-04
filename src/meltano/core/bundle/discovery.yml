@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributing.html#discovery-yml-version for more information.
-version: 9
+version: 10
 
 extractors:
   - name: tap-carbon-intensity
@@ -52,7 +52,6 @@ extractors:
         kind: oauth
         oauth:
           provider: facebook
-          # server: https://oauth.svc.meltanodata.com/
       - name: start_date
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601

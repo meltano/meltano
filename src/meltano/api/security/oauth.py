@@ -56,37 +56,9 @@ def setup_oauth_gitlab(oauth):
     oauth.app.register_blueprint(oauthBP)
 
 
-def setup_oauth_facebook(oauth):
-    oauth.register(
-        "facebook",
-        access_token_url="https://graph.facebook.com/v5.0/oauth/access_token",
-        client_kwargs={"scopes": "ads_read ads_management"},
-        authorize_url="https://www.facebook.com/v5.0/dialog/oauth",
-    )
-
-    oauthBP = Blueprint("OAuth.Facebook", __name__, url_prefix="/oauth/facebook")
-
-    @oauthBP.route("/login")
-    def login():
-        redirect_uri = url_for(".authorize", _external=True)
-        return oauth.facebook.authorize_redirect(redirect_uri)
-
-    @oauthBP.route("/authorize")
-    def authorize():
-        token = oauth.facebook.authorize_access_token()
-
-        # create a system user?
-
-        return jsonify(token)
-
-    oauth.app.register_blueprint(oauthBP)
-
-
 def setup_oauth(app):
     oauth = OAuthClient(app)
-
-    # setup_oauth_gitlab(oauth)
-    setup_oauth_facebook(oauth)
+    setup_oauth_gitlab(oauth)
 
 
 def gitlab_token_identity(token):
