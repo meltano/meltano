@@ -132,11 +132,8 @@ Meltano provides a public hosted solution at `https://oauth.svc.meltanodata.com/
 :::
 
 ```bash
-# use the development OAuth Service
-OAUTH_SERVICE_URL=https://localhost:5000/-/oauth/
-
-# Disable the OAuth Service
-MELTANO_DISABLE_OAUTH_SERVICE=True
+# use the local OAuth Service
+OAUTH_SERVICE_URL=https://localhost:5000/-/oauth
 ```
 
 ## Meltano OAuth Service
@@ -161,9 +158,10 @@ As it is a Flask application, it can also be run as a standalone using:
 FLASK_ENV=production FLASK_APP=meltano.oauth python -m flask run --port 9999
 ```
 
-### Providers
+### Providers configuration
 
 #### Facebook
+
 ```bash
 OAUTH_FACEBOOK_CLIENT_ID=<application_id>
 OAUTH_FACEBOOK_CLIENT_SECRET=<application_secret>
