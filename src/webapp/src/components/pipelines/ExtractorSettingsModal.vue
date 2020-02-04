@@ -194,9 +194,7 @@ export default {
             // 4. Finally save pipeline that's relient on valid config settings
             this.savePipelineSchedule(this.extractor.name)
               .then(this.runPipeline)
-              .catch(error => {
-                Vue.toasted.global.error(error.response.data.code)
-              })
+              .catch(this.$error.handle)
           })
           .catch(error => {
             this.$error.handle(error)

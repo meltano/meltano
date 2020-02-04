@@ -80,7 +80,7 @@ export default {
               `Pipeline successfully updated - ${pipeline.name}`
             )
           )
-          .catch(error => Vue.toasted.global.error(error.response.data.code))
+          .catch(this.$error.handle)
       }
     },
     removePipeline(pipeline) {
@@ -90,7 +90,7 @@ export default {
             `Pipeline successfully removed - ${pipeline.name}`
           )
         )
-        .catch(error => Vue.toasted.global.error(error.response.data.code))
+        .catch(this.$error.handle)
     },
     runELT(pipeline) {
       this.$store.dispatch('orchestration/run', pipeline)

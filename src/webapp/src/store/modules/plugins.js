@@ -150,9 +150,7 @@ const actions = {
       .then(() => commit('installPluginComplete', installConfig))
       .then(dispatch('getInstalledPlugins'))
       .then(dispatch('getAllPlugins'))
-      .catch(error => {
-        Vue.toasted.global.error(error.response.data.code)
-      })
+      .catch(this.$error.handle)
   },
 
   installRelatedPlugins({ dispatch }, installConfig) {
