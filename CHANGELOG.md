@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
@@ -15,8 +15,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-### Breaks
+- [#1657](https://gitlab.com/meltano/meltano/issues/1657) Fix `update_dashboard` error when payload lacked a `new_settings` key
 
+### Breaks
 
 ## 1.18.0 - (2020-02-03)
 
@@ -38,7 +39,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1588](https://gitlab.com/meltano/meltano/issues/1588) Update `scrollTo` behavior in Job Log to work across browsers
 - [#1660](https://gitlab.com/meltano/meltano/issues/1660) Fix minor action/mutation bug when loading a report in Analyze
 - [#1607](https://gitlab.com/meltano/meltano/issues/1607) Fix inaccurate error during report additions/removal from dashboards (via refactor SSOT reports store)
-
 
 ## 1.17.1 - (2020-01-29)
 
