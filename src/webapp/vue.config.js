@@ -19,7 +19,10 @@ module.exports = {
       entry: 'src/main-embed.js',
       template: 'public/index.html',
       filename: 'index-embed.html',
-      chunks: ['chunk-vendors', 'chunk-common', 'embed']
+      chunks: ['chunk-vendors', 'chunk-common', 'embed'],
+
+      // forwarded to html-webpack-plugin
+      injectFlaskContext: isProd
     }
   },
 
