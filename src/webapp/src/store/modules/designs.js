@@ -43,6 +43,7 @@ const defaultState = utils.deepFreeze({
 
 const helpers = {
   buildKey: (...parts) => lodash.join(parts, '.'),
+  debouncedAutoRun: null,
 
   getFilterTypePlural(filterType) {
     return `${filterType}s`
@@ -367,11 +368,6 @@ const actions = {
     }
   },
 
-  tryAutoRun({ dispatch, state }) {
-    const hasRan = state.results.length > 0 || state.isLastRunResultsEmpty
-    dispatch('runQuery', state.isAutoRunQuery && hasRan)
-  },
-
   // eslint-disable-next-line no-shadow
   cleanFiltering({ commit, getters }, { attribute, type }) {
     if (!attribute.selected) {
@@ -638,6 +634,17 @@ const actions = {
     dispatch('cleanOrdering', aggregate)
     dispatch('cleanFiltering', { attribute: aggregate, type: 'aggregate' })
     dispatch('tryAutoRun')
+  },
+
+  tryAutoRun({ dispatch, state }) {
+    if (helpers.debouncedAutoRun) {
+      helpers.debouncedAutoRun.cancel()
+    }
+    helpers.debouncedAutoRun = lodash.debounce(() => {
+      const hasRan = state.results.length > 0 || state.isLastRunResultsEmpty
+      dispatch('runQuery', state.isAutoRunQuery && hasRan)
+    }, 500)
+    helpers.debouncedAutoRun()
   },
 
   toggleColumn({ commit, dispatch }, column) {
