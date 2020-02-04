@@ -54,7 +54,7 @@ Examples:
 
 #### Create App
 
-First, you will need to create a Facebook App trough the Developer Portal.
+First, you will need to create a Facebook App through the Developer Portal.
 
 1. Go to <https://developers.facebook.com/>.
 2. Log into Facebook if you haven't already. Make sure that your account is an Admin of the Ads Account you will be pulling data from.
@@ -105,7 +105,7 @@ To prevent any interruption of your data pipeline, we recommend that you generat
 
 <h3 id="start-date">Start Date</h3>
 
-This property allows you to configure where you want your extracted data set to start from. 
+This property allows you to configure where you want your extracted data set to start from.
 
 :::tip Configuration Notes
 
