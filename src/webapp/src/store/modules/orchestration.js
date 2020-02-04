@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 import lodash from 'lodash'
 
-import orchestrationsApi from '../../api/orchestrations'
+import orchestrationsApi from '@/api/orchestrations'
 import poller from '@/utils/poller'
 import utils from '@/utils/utils'
 
@@ -48,12 +48,6 @@ const getters = {
     }
   },
 
-  getPipelineWithExtractor(state) {
-    return extractor => {
-      return state.pipelines.find(pipeline => pipeline.extractor === extractor)
-    }
-  },
-
   getHasGroupValidationConfigSettings() {
     return (configSettings, settingsGroupValidation) => {
       const matchGroup = settingsGroupValidation.find(group => {
@@ -70,6 +64,12 @@ const getters = {
     }
   },
 
+  getPipelineWithExtractor(state) {
+    return extractor => {
+      return state.pipelines.find(pipeline => pipeline.extractor === extractor)
+    }
+  },
+
   getRunningPipelines(state) {
     return state.pipelines.filter(pipeline => pipeline.isRunning)
   },
@@ -78,6 +78,12 @@ const getters = {
     return state.pipelinePollers.map(
       pipelinePoller => pipelinePoller.getMetadata().jobId
     )
+  },
+
+  getSortedPipelines(state) {
+    return [...state.pipelines].sort((p1, p2) => {
+      return p1.extractor > p2.extractor ? 1 : -1
+    })
   },
 
   getSuccessfulPipelines(state) {
@@ -115,12 +121,11 @@ const actions = {
   deletePipelineSchedule({ commit }, pipeline) {
     let status = {
       pipeline,
-      isRunning: pipeline.isRunning,
+      ...pipeline,
       isDeleting: true
     }
     commit('setPipelineStatus', status)
     return orchestrationsApi.deletePipelineSchedule(pipeline).then(() => {
-      commit('setPipelineStatus', Object.assign({ isDeleting: false }, status))
       commit('deletePipeline', pipeline)
     })
   },
@@ -183,11 +188,12 @@ const actions = {
 
             commit('setPipelineStatus', {
               pipeline: targetPipeline,
+              ...targetPipeline,
               hasError: jobStatus.hasError,
+              hasEverSucceeded: jobStatus.hasEverSucceeded,
               isRunning: !jobStatus.isComplete,
               startedAt: jobStatus.startedAt,
-              endedAt: jobStatus.endedAt,
-              hasEverSucceeded: jobStatus.hasEverSucceeded
+              endedAt: jobStatus.endedAt
             })
           }
         })
@@ -227,8 +233,8 @@ const actions = {
   run({ commit, dispatch }, pipeline) {
     commit('setPipelineStatus', {
       pipeline,
-      isRunning: true,
-      hasEverSucceeded: pipeline.hasEverSucceeded
+      ...pipeline,
+      isRunning: true
     })
 
     return orchestrationsApi.run(pipeline).then(response => {
@@ -237,7 +243,15 @@ const actions = {
     })
   },
 
-  savePipelineSchedule({ commit }, pipeline) {
+  savePipelineSchedule({ commit }, extractor) {
+    let pipeline = {
+      name: `pipeline-${new Date().getTime()}`,
+      extractor,
+      loader: 'target-postgres', // Refactor vs. hard code when we again want to display in the UI
+      transform: 'run', // Refactor vs. hard code when we again want to display in the UI
+      interval: '@once', // Refactor vs. hard code when we again want to display in the UI
+      isRunning: false
+    }
     return orchestrationsApi.savePipelineSchedule(pipeline).then(response => {
       pipeline = Object.assign(pipeline, response.data)
       commit('updatePipelines', pipeline)
@@ -252,6 +266,23 @@ const actions = {
     return orchestrationsApi.testPluginConfiguration(configPayload)
   },
 
+  updatePipelineSchedule({ commit }, payload) {
+    commit('setPipelineStatus', {
+      pipeline: payload.pipeline,
+      ...payload.pipeline,
+      isSaving: true
+    })
+    return orchestrationsApi.updatePipelineSchedule(payload).then(response => {
+      const updatedPipeline = Object.assign({}, payload.pipeline, response.data)
+      commit('setPipelineStatus', {
+        pipeline: updatedPipeline,
+        ...updatedPipeline,
+        isSaving: false
+      })
+      commit('setPipeline', updatedPipeline)
+    })
+  },
+
   uploadPluginConfigurationFile(_, configPayload) {
     return orchestrationsApi.uploadPluginConfigurationFile(configPayload)
   }
@@ -264,13 +295,13 @@ const mutations = {
 
   deletePipeline(state, pipeline) {
     const idx = state.pipelines.indexOf(pipeline)
-    state.pipelines.splice(idx, 1)
+    Vue.delete(state.pipelines, idx)
   },
 
   removePipelinePoller(state, pipelinePoller) {
     pipelinePoller.dispose()
     const idx = state.pipelinePollers.indexOf(pipelinePoller)
-    state.pipelinePollers.splice(idx, 1)
+    Vue.delete(state.pipelinePollers, idx)
   },
 
   reset(state, attr) {
@@ -294,22 +325,30 @@ const mutations = {
     state[target] = configuration
   },
 
+  setPipeline(state, pipeline) {
+    const target = state.pipelines.find(p => p.name === pipeline.name)
+    const idx = state.pipelines.indexOf(target)
+    Vue.set(state.pipelines, idx, pipeline)
+  },
+
   setPipelineStatus(
     _,
     {
       pipeline,
+      hasError,
+      hasEverSucceeded,
+      isDeleting,
       isRunning,
-      isDeleting = false,
-      hasError = false,
-      hasEverSucceeded = false,
+      isSaving,
       startedAt = null,
       endedAt = null
     }
   ) {
-    Vue.set(pipeline, 'isRunning', isRunning)
-    Vue.set(pipeline, 'hasError', hasError)
-    Vue.set(pipeline, 'isDeleting', isDeleting)
-    Vue.set(pipeline, 'hasEverSucceeded', hasEverSucceeded)
+    Vue.set(pipeline, 'hasError', hasError || false)
+    Vue.set(pipeline, 'hasEverSucceeded', hasEverSucceeded || false)
+    Vue.set(pipeline, 'isDeleting', isDeleting || false)
+    Vue.set(pipeline, 'isRunning', isRunning || false)
+    Vue.set(pipeline, 'isSaving', isSaving || false)
     Vue.set(pipeline, 'startedAt', utils.dateIso8601(startedAt))
     Vue.set(pipeline, 'endedAt', utils.dateIso8601(endedAt))
   },

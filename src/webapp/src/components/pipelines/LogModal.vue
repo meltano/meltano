@@ -73,7 +73,7 @@ export default {
   methods: {
     ...mapActions('orchestration', ['getJobLog']),
     close() {
-      this.$router.go(-1)
+      this.$router.push({ name: 'datasets' })
     },
     initJobPoller() {
       const pollFn = () => {
@@ -143,7 +143,7 @@ export default {
                   this view.
                 </li>
                 <li>
-                  Once extraction is complete, use the "Analyze" button (lower
+                  Once extraction is complete, use the "Reports" button (lower
                   right of this view) to analyze the imported data.
                 </li>
               </ul>
@@ -216,7 +216,7 @@ export default {
           </button>
           <Dropdown
             v-else
-            label="Analyze"
+            label="Reports"
             :disabled="isPolling"
             :button-classes="
               `is-interactive-primary ${isPolling ? 'is-loading' : ''}`

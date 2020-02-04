@@ -361,7 +361,7 @@ def test_plugin_configuration(plugin_ref) -> Response:
     return jsonify({"is_success": success}), 200
 
 
-@orchestrationsBP.route("/pipeline_schedules", methods=["GET"])
+@orchestrationsBP.route("/pipeline-schedules", methods=["GET"])
 def get_pipeline_schedules():
     """
     Endpoint for getting the pipeline schedules
@@ -386,7 +386,7 @@ def get_pipeline_schedules():
     return jsonify(schedules)
 
 
-@orchestrationsBP.route("/pipeline_schedules", methods=["POST"])
+@orchestrationsBP.route("/pipeline-schedules", methods=["POST"])
 @readonly_killswitch
 def save_pipeline_schedule() -> Response:
     """
@@ -410,7 +410,26 @@ def save_pipeline_schedule() -> Response:
     return jsonify(dict(schedule)), 201
 
 
-@orchestrationsBP.route("/pipeline_schedules", methods=["DELETE"])
+@orchestrationsBP.route("/pipeline-schedules", methods=["PUT"])
+@readonly_killswitch
+def update_pipeline_schedule() -> Response:
+    """
+    Endpoint for updating a pipeline schedule
+    """
+    payload = request.get_json()
+    project = Project.find()
+    schedule_service = ScheduleService(project)
+
+    interval = payload["interval"]
+    plugin_namespace = payload["plugin_namespace"]
+    schedule = schedule_service.find_namespace_schedule(plugin_namespace)
+    schedule.interval = interval
+    schedule_service.update_schedule(schedule)
+
+    return jsonify(dict(schedule)), 201
+
+
+@orchestrationsBP.route("/pipeline-schedules", methods=["DELETE"])
 @readonly_killswitch
 def delete_pipeline_schedule() -> Response:
     """

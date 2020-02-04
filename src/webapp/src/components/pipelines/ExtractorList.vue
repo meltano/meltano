@@ -7,9 +7,6 @@ export default {
   components: {
     ConnectorLogo
   },
-  props: {
-    focusedExtractor: { type: Object, default: null }
-  },
   computed: {
     ...mapGetters('plugins', [
       'getIsLoadingPluginsOfType',
@@ -17,14 +14,7 @@ export default {
       'visibleExtractors'
     ]),
     ...mapGetters('orchestration', ['getHasPipelineWithExtractor']),
-    ...mapState('orchestration', ['pipelines']),
-    getIsActive() {
-      return extractor => {
-        return this.focusedExtractor
-          ? this.focusedExtractor.name === extractor.name
-          : false
-      }
-    }
+    ...mapState('orchestration', ['pipelines'])
   },
   methods: {
     updateExtractorSettings(extractor) {
@@ -46,19 +36,10 @@ export default {
     <article
       v-for="(extractor, index) in visibleExtractors"
       :key="`${extractor.name}-${index}`"
-      class="media"
-      :class="{
-        'is-hoverable': !getHasPipelineWithExtractor(extractor.name),
-        'is-active': getIsActive(extractor)
-      }"
+      class="media is-hoverable"
       :data-test-id="`${extractor.name}-extractor-card`"
     >
-      <figure
-        class="media-left"
-        :class="{
-          ml1r: getIsActive(extractor)
-        }"
-      >
+      <figure class="media-left">
         <p class="image level-item is-48x48 container">
           <ConnectorLogo :connector="extractor.name" />
         </p>
@@ -83,12 +64,7 @@ export default {
           </p>
         </div>
       </div>
-      <figure
-        class="media-right is-flex is-flex-column is-vcentered"
-        :class="{
-          mr1r: getIsActive(extractor)
-        }"
-      >
+      <figure class="media-right is-flex is-flex-column is-vcentered">
         <a
           v-if="getHasPipelineWithExtractor(extractor.name)"
           href="#pipelines"

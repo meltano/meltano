@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 import lodash from 'lodash'
 
 import reportsApi from '@/api/reports'
@@ -62,7 +64,7 @@ const mutations = {
   setReport(state, report) {
     const target = state.reports.find(item => item.id === report.id)
     const idx = state.reports.indexOf(target)
-    state.reports.splice(idx, 1, report)
+    Vue.set(state.reports, idx, report)
   },
   setReports(state, reports) {
     state.reports = reports
