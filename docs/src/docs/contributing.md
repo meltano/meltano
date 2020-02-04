@@ -323,26 +323,30 @@ The first rule is used to separate both blocks.
 :::
 
 ```js
-import lodash from 'lodash'
-import Vue from 'vue'
-import { bar, foo } from 'alib'
-import { mapAction, mapState } from 'vuex'
+import lodash from 'lodash'                  // 1: third-party, 2: default, 3: [l]odash
+import Vue from 'vue'                        // 1: third-party, 2: default, 3: [v]ue
+import { bar, foo } from 'alib'              // 1: third-party, 2: partial, 3: [a]lib
+import { mapAction, mapState } from 'vuex'   // 1: third-party, 2: partial, 3: [v]uex
 ¶  // 1 blank line to split import groups
-import poller from '@/utils/poller'
-import Widget from '@component/widget'
-import { bar, foo } from '@/utils/utils'
+import Widget from '@/component/Widget'      // 1: local, 2: default, 3: @/[c]omponent/Widget
+import poller from '@/utils/poller'          // 1: local, 2: default, 3: @/[u]tils/poller
+import { Medal } from '@/component/globals'  // 1: local, 2: partial, 3: @/[c]omponent/globals
+import { bar, thing } from '@/utils/utils'   // 1: local, 2: partial, 3: @/[u]tils/utils
 ¶
 ¶  // 2 blank lines to split the imports from the code 
 ```
 
 ```python
-import flask
-from datetime import datetime
+import flask                                        # 1: third-party, 2: default, 3: [f]lask
+import os                                           # 1: third-party, 2: default, 3: [o]s
+from datetime import datetime                       # 1: third-party, 2: partial, 3: [d]atetime
+from functools import wraps                         # 1: third-party, 2: partial, 3: [f]unctools
 ¶  # 1 blank line to split import groups
-import meltano
-from meltano.core.plugin import Plugin, PluginType
-from meltano.core.project import Project
-¶
+import meltano                                      # 1: local, 2: default, 3: [meltano]
+import meltano.migrations                           # 1: local, 2: default, 3: [meltano.m]igrations
+from meltano.core.plugin import Plugin, PluginType  # 1: local, 2: partial, 3: [meltano.core.pl]ugin
+from meltano.core.project import Project            # 1: local, 2: partial, 3: [meltano.core.pr]oject
+¶ 
 ¶  # 2 blank lines to split the imports from the code 
 ```
 
