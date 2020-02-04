@@ -324,23 +324,56 @@ You may use `make lint` to automatically lint all your code, or `make show_lint`
 
 > A contributor should know the exact line-of-code to make a change based on convention
 
-In the spirit of GitLab's "boring solutions" with the above tools and mantra, the frontend codebase is additionally sorted as follows:
+In the spirit of GitLab's "boring solutions" with the above tools and mantra, the codebase is additionally sorted as follows:
 
-- `import`s are alphabetical and subgrouped by _core_ -> _third-party_ -> _application_ with a return delineating. For example:
+#### Imports
 
-  ```js
-  // core
-  import Vue from 'vue'
-  // third-party
-  import lodash from 'lodash'
-  // application
-  import poller from '@/utils/poller'
-  import utils from '@/utils/utils'
-  ```
+`import`s are sorted using the following pattern:
 
-- object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
+  1. Code source location: third-party → local (separate each group with a single blank line)
+  1. Import scheme: Default imports → Partial imports
+  1. Name of the module, alphabetically: 'lodash' → 'vue'
 
-Over time we hope to automate the enforcement of the above sorting rules.
+::: tip
+There should be only 2 blocks of imports with a single blank line between both blocks.
+The first rule is used to separate both blocks.
+:::
+
+```js
+import lodash from 'lodash'                  // 1: third-party, 2: default, 3: [l]odash
+import Vue from 'vue'                        // 1: third-party, 2: default, 3: [v]ue
+import { bar, foo } from 'alib'              // 1: third-party, 2: partial, 3: [a]lib
+import { mapAction, mapState } from 'vuex'   // 1: third-party, 2: partial, 3: [v]uex
+¶  // 1 blank line to split import groups
+import Widget from '@/component/Widget'      // 1: local, 2: default, 3: @/[c]omponent/Widget
+import poller from '@/utils/poller'          // 1: local, 2: default, 3: @/[u]tils/poller
+import { Medal } from '@/component/globals'  // 1: local, 2: partial, 3: @/[c]omponent/globals
+import { bar, thing } from '@/utils/utils'   // 1: local, 2: partial, 3: @/[u]tils/utils
+¶
+¶  // 2 blank lines to split the imports from the code 
+```
+
+```python
+import flask                                        # 1: third-party, 2: default, 3: [f]lask
+import os                                           # 1: third-party, 2: default, 3: [o]s
+from datetime import datetime                       # 1: third-party, 2: partial, 3: [d]atetime
+from functools import wraps                         # 1: third-party, 2: partial, 3: [f]unctools
+¶  # 1 blank line to split import groups
+import meltano                                      # 1: local, 2: default, 3: [meltano]
+import meltano.migrations                           # 1: local, 2: default, 3: [meltano.m]igrations
+from meltano.core.plugin import Plugin, PluginType  # 1: local, 2: partial, 3: [meltano.core.pl]ugin
+from meltano.core.project import Project            # 1: local, 2: partial, 3: [meltano.core.pr]oject
+¶ 
+¶  # 2 blank lines to split the imports from the code 
+```
+
+#### Definitions
+
+Object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
+
+::: warning
+We are looking to automate these rules in https://gitlab.com/meltano/meltano/issues/1609.
+:::
 
 :::warning Troubleshooting
 When testing your contributions you may need to ensure that your various `__pycache__` directories are removed. This helps ensure that you are running the code you expect to be running.
