@@ -122,7 +122,6 @@ const actions = {
     let status = {
       pipeline,
       ...pipeline,
-      isRunning: pipeline.isRunning,
       isDeleting: true
     }
     commit('setPipelineStatus', status)
@@ -235,8 +234,7 @@ const actions = {
     commit('setPipelineStatus', {
       pipeline,
       ...pipeline,
-      isRunning: true,
-      hasEverSucceeded: pipeline.hasEverSucceeded
+      isRunning: true
     })
 
     return orchestrationsApi.run(pipeline).then(response => {
