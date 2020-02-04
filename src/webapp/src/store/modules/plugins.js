@@ -150,9 +150,7 @@ const actions = {
       .then(() => commit('installPluginComplete', installConfig))
       .then(dispatch('getInstalledPlugins'))
       .then(dispatch('getAllPlugins'))
-      .catch(error => {
-        Vue.toasted.global.error(error.response.data.code)
-      })
+      .catch(this.$error.handle)
   },
 
   installRelatedPlugins({ dispatch }, installConfig) {
@@ -168,7 +166,7 @@ const mutations = {
     const idx = state.addingPlugins[addConfig.pluginType].indexOf(
       addConfig.name
     )
-    state.addingPlugins[addConfig.pluginType].splice(idx, 1)
+    Vue.delete(state.addingPlugins[addConfig.pluginType], idx)
   },
 
   addPluginStart(state, addConfig) {
@@ -179,7 +177,7 @@ const mutations = {
     const idx = state.installingPlugins[installConfig.pluginType].indexOf(
       installConfig.name
     )
-    state.installingPlugins[installConfig.pluginType].splice(idx, 1)
+    Vue.delete(state.installingPlugins[installConfig.pluginType], idx)
   },
 
   installPluginStart(state, installConfig) {

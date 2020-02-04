@@ -160,7 +160,7 @@ const mutations = {
 
   deleteDashboard(state, dashboard) {
     const idx = state.dashboards.indexOf(dashboard)
-    state.dashboards.splice(idx, 1)
+    Vue.delete(state.dashboards, idx)
   },
 
   removeReportFromDashboard(state, idsPayload) {
@@ -168,7 +168,7 @@ const mutations = {
       dashboard => dashboard.id === idsPayload.dashboardId
     )
     const idx = targetDashboard.reportIds.indexOf(idsPayload.reportId)
-    targetDashboard.reportIds.splice(idx, 1)
+    Vue.delete(targetDashboard.reportIds, idx)
   },
 
   reset(state, attr) {
@@ -188,7 +188,7 @@ const mutations = {
   setDashboard(state, dashboard) {
     const target = state.dashboards.find(item => item.id === dashboard.id)
     const idx = state.dashboards.indexOf(target)
-    state.dashboards.splice(idx, 1, dashboard)
+    Vue.set(state.dashboards, idx, dashboard)
   },
 
   setDashboards(state, dashboards) {

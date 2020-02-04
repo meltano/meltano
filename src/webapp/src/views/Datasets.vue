@@ -1,14 +1,14 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
 
-import CreatePipelineSchedule from '@/components/pipelines/CreatePipelineSchedule'
+import ExtractorList from '@/components/pipelines/ExtractorList'
 import PipelineSchedules from '@/components/pipelines/PipelineSchedules'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
   name: 'Datasets',
   components: {
-    CreatePipelineSchedule,
+    ExtractorList,
     PipelineSchedules,
     RouterViewLayout
   },
@@ -81,10 +81,44 @@ export default {
             <h3 id="integrations" class="title">Integrations</h3>
             <p class="subtitle">Integrations and custom data connections</p>
           </div>
-          <div v-if="getIsLoadingPluginsOfType('extractors')" class="box">
-            <progress class="progress is-small is-info"></progress>
+          <div class="box">
+            <progress
+              v-if="getIsLoadingPluginsOfType('extractors')"
+              class="progress is-small is-info"
+            ></progress>
+            <template v-else>
+              <ExtractorList />
+              <hr />
+              <article class="media">
+                <figure class="media-left">
+                  <p class="image level-item container">
+                    <span class="icon is-large fa-2x has-text-grey-light">
+                      <font-awesome-icon icon="plus"></font-awesome-icon>
+                    </span>
+                  </p>
+                </figure>
+                <div class="media-content">
+                  <div class="content">
+                    <p>
+                      <span class="has-text-weight-bold">Custom</span>
+                      <br />
+                      <small>Connect a data source not listed above</small>
+                    </p>
+                  </div>
+                </div>
+                <figure class="media-right is-flex is-flex-column is-vcentered">
+                  <a
+                    href="https://www.meltano.com/tutorials/create-a-custom-extractor.html"
+                    target="_blank"
+                    class="button is-text tooltip is-tooltip-left"
+                    data-tooltip="Create your own data source"
+                  >
+                    <span>Learn More</span>
+                  </a>
+                </figure>
+              </article>
+            </template>
           </div>
-          <CreatePipelineSchedule v-else />
         </div>
       </div>
 
