@@ -124,6 +124,23 @@ The development build of the Meltano UI will now be available at <http://localho
 
 A production build of the API will be available at <http://localhost:5000/> to support the UI, but you will not need to interact with this directly.
 
+::: tip
+
+If you're developing for the _Embed_ app (embeddable `iframe` for reports) you can toggle `MELTANO_EMBED`:
+
+```bash
+# Develop for the embed app
+export MELTANO_EMBED=1
+
+# Develop for the main app (this is the default)
+export MELTANO_EMBED=0
+
+# Start local development environment
+yarn serve
+```
+
+:::
+
 If you need to change the URL of your development environment, you can do this by updating your `.env` in your project directory with the following configuration:
 
 ```bash

@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from .dashboards_helper import DashboardReportScheduleNotFoundError, DashboardsHelper
+from .dashboards_helper import DashboardsHelper
 from meltano.core.project import Project
 from meltano.core.m5o.dashboards_service import (
     DashboardAlreadyExistsError,
@@ -54,19 +54,6 @@ def _handle(ex):
             }
         ),
         400,
-    )
-
-
-@dashboardsBP.errorhandler(DashboardReportScheduleNotFoundError)
-def _handle(ex):
-    return (
-        jsonify(
-            {
-                "error": True,
-                "code": f"The reports could not be loaded because a pipeline for namespace '{ex.namespace}' could not be found.",
-            }
-        ),
-        404,
     )
 
 
@@ -135,7 +122,6 @@ def remove_report_from_dashboard():
 def get_dashboard_reports_with_query_results():
     dashboards_helper = DashboardsHelper()
     post_data = request.get_json()
-
     response_data = dashboards_helper.get_dashboard_reports_with_query_results(
         post_data
     )

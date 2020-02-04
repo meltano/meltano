@@ -1,5 +1,9 @@
+import sqlalchemy
 from flask import Blueprint, jsonify, request
+
 from .errors import InvalidFileNameError
+from .reports_helper import InvalidEmbedToken, ReportsHelper
+
 from meltano.core.project import Project
 from meltano.core.m5o.reports_service import ReportAlreadyExistsError, ReportsService
 
@@ -7,6 +11,7 @@ from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.security.auth import permit
 from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin, Need
 from meltano.api.security.readonly_killswitch import readonly_killswitch
+from meltano.api.models import db
 
 reportsBP = APIBlueprint("reports", __name__)
 
@@ -54,6 +59,19 @@ def _handle(ex):
     )
 
 
+@reportsBP.errorhandler(InvalidEmbedToken)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"No matching report found or this report is no longer public.",
+            }
+        ),
+        400,
+    )
+
+
 @reportsBP.route("/", methods=["GET"])
 def index():
     reports = reports_service().get_reports()
@@ -62,13 +80,21 @@ def index():
     return jsonify(reports)
 
 
-@reportsBP.route("/load/<report_name>", methods=["GET"])
-def load_report(report_name):
-    permit("view:reports", report_name)
+@reportsBP.route("/embed/<token>", methods=["GET"])
+def get_embed(token):
+    reports_helper = ReportsHelper()
+    embed = reports_helper.get_embed(db.session, token)
+    report = reports_service().get_report(embed.resource_id)
+    report_with_query_results = reports_helper.get_report_with_query_results(report)
 
-    response_data = reports_service().load_report(report_name)
+    return jsonify(report_with_query_results)
 
-    permit("view:design", response_data["design"])
+
+@reportsBP.route("/embed", methods=["POST"])
+def embed():
+    reports_helper = ReportsHelper()
+    post_data = request.get_json()
+    response_data = reports_helper.create_embed_snippet(db.session, post_data["id"])
 
     return jsonify(response_data)
 

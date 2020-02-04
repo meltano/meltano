@@ -2,16 +2,14 @@ import Vue from 'vue'
 
 import VueAnalytics from 'vue-analytics'
 
-import router from './router'
-
-export default function setup() {
+export default function setup({ id, router }) {
   const isDisabled =
     'hasDisabledTracking' in localStorage &&
     localStorage.getItem('hasDisabledTracking') === 'true'
 
   if (!isDisabled) {
     Vue.use(VueAnalytics, {
-      id: 'UA-132758957-2',
+      id,
       router,
       set: [
         {

@@ -1,6 +1,6 @@
 import lodash from 'lodash'
 
-import flaskContext from '@/flask'
+import flaskContext from '@/utils/flask'
 import moment from 'moment'
 import { namer } from '@/utils/mappers'
 
@@ -262,5 +262,20 @@ export default {
     const strMin = formatter(duration.minutes(), 'min')
     const strSec = formatter(duration.seconds(), 'sec')
     return `${strDays}${strHour}${strMin}${strSec}`
+  },
+
+  // Interaction utils
+  copyToClipboard(el) {
+    el.select()
+    el.setSelectionRange(0, 99999)
+    let isSuccess
+    try {
+      isSuccess = document.execCommand('copy')
+    } catch (e) {
+      isSuccess = false
+    } finally {
+      document.getSelection().removeAllRanges()
+    }
+    return isSuccess
   }
 }

@@ -1,10 +1,13 @@
 <script>
 import { mapGetters } from 'vuex'
+
 import Chart from '@/components/analyze/Chart'
+import EmbedButton from '@/components/generic/EmbedButton'
 
 export default {
   components: {
-    Chart
+    Chart,
+    EmbedButton
   },
   props: {
     edit: {
@@ -21,8 +24,8 @@ export default {
     }
   },
   data: () => ({
-    position: 0,
-    isEditable: false
+    isEditable: false,
+    position: 0
   }),
   computed: {
     ...mapGetters('orchestration', ['lastUpdatedDate']),
@@ -110,24 +113,24 @@ export default {
             <div class="buttons">
               <a class="button is-small" @click="goToReport(report)">Edit</a>
               <a class="button is-small" @click="goToDesign(report)">Explore</a>
+              <EmbedButton :report="report" button-classes="is-small" />
             </div>
           </div>
         </div>
       </div>
 
-      <chart
+      <Chart
         :class="edit ? 'is-transparent-50' : ''"
         :chart-type="report.chartType"
         :results="report.queryResults"
         :result-aggregates="report.queryResultAggregates"
-      ></chart>
+      />
     </div>
   </div>
 </template>
 
 <style>
 .wireframe {
-  color: red;
   border: 3px dotted #ddd;
 }
 </style>

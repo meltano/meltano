@@ -1,4 +1,4 @@
-import flaskContext from '@/flask'
+import flaskContext from '@/utils/flask'
 
 const FLASK_CONTEXT = flaskContext()
 
