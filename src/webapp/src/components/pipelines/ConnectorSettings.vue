@@ -249,7 +249,7 @@ export default {
               <a
                 :href="plugin.docs"
                 target="_blank"
-                class="has-text-underlined is-pulled-right"
+                class="is-size-7 has-text-underlined is-pulled-right"
                 >View Documentation Externally
               </a>
             </div>
