@@ -75,7 +75,7 @@ export default {
   <div class="result-data has-position-relative v-min-2r">
     <LoadingOverlay :is-loading="isLoading"></LoadingOverlay>
 
-    <div v-if="hasResults">
+    <div v-if="hasResults" class="table-container">
       <table
         class="table
           is-bordered

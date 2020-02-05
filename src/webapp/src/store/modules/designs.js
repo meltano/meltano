@@ -26,6 +26,7 @@ const defaultState = utils.deepFreeze({
     columns: []
   },
   isLastRunResultsEmpty: false,
+  hasCompletedFirstQueryRun: false,
   hasSQLError: false,
   isAutoRunQuery: true,
   isLoadingQuery: false,
@@ -493,11 +494,10 @@ const actions = {
         if (response.status === 204) {
           commit('resetQueryResults')
           commit('resetSQLResults')
-          commit('setIsLoadingQuery', false)
         } else if (run) {
+          commit('setHasCompletedFirstQueryRun', true)
           commit('setQueryResults', response.data)
           commit('setSQLResults', response.data)
-          commit('setIsLoadingQuery', false)
           commit('setSorting', {
             attributesIndex: getters.getOrderableAttributesIndex
           })
@@ -507,8 +507,8 @@ const actions = {
       })
       .catch(e => {
         commit('setSqlErrorMessage', e)
-        commit('setIsLoadingQuery', false)
       })
+      .finally(() => commit('setIsLoadingQuery', false))
   },
 
   loadReport({ state, commit }, report) {
@@ -815,8 +815,12 @@ const mutations = {
     state.filterOptions = options
   },
 
-  setLimit(state, limit) {
-    state.limit = limit
+  setHasCompletedFirstQueryRun(state, value) {
+    state.hasCompletedFirstQueryRun = value
+  },
+
+  setIsLoadingQuery(state, value) {
+    state.isLoadingQuery = value
   },
 
   setJoinAggregates(_, { aggregates, join }) {
@@ -831,8 +835,8 @@ const mutations = {
     join.timeframes = timeframes
   },
 
-  setIsLoadingQuery(state, value) {
-    state.isLoadingQuery = value
+  setLimit(state, limit) {
+    state.limit = limit
   },
 
   setOrderAssigned(state, value) {
