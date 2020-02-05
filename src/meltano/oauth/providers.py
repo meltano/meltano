@@ -9,7 +9,7 @@ def facebook(app):
     OAuth.register(
         "facebook",
         access_token_url="https://graph.facebook.com/v5.0/oauth/access_token",
-        client_kwargs={"scopes": "ads_read ads_management"},
+        client_kwargs={"scope": "ads_read ads_management manage_pages"},
         authorize_url="https://www.facebook.com/v5.0/dialog/oauth",
     )
 
@@ -18,7 +18,8 @@ def facebook(app):
     @oauthBP.route("/")
     def login():
         redirect_uri = url_for(".authorize", _external=True)
-        return OAuth.facebook.authorize_redirect(redirect_uri)
+
+        return OAuth.facebook.authorize_redirect(redirect_uri, auth_type="rerequest")
 
     @oauthBP.route("/authorize")
     def authorize():
