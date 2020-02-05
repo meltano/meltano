@@ -55,8 +55,7 @@ export default {
   computed: {
     shouldShowNavbar() {
       const { themeConfig } = this.$site
-      const { frontmatter } = this.$page
-      if (frontmatter.navbar === false || themeConfig.navbar === false || this.isEmbedded) {
+      if (this.isEmbedded) {
         return false
       }
       return (
