@@ -6,12 +6,12 @@ export default {
     return axios.post(utils.apiUrl('plugins', 'add'), addConfig)
   },
 
-  getAllPlugins() {
-    return axios.get(utils.apiUrl('plugins', 'all'))
-  },
-
   getInstalledPlugins() {
     return axios.get(utils.apiUrl('plugins', 'installed'))
+  },
+
+  getPlugins() {
+    return axios.get(utils.apiUrl('plugins', 'all'))
   },
 
   installBatch(installConfig) {

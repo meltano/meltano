@@ -126,15 +126,15 @@ const actions = {
       .finally(() => commit('addPluginComplete', addConfig))
   },
 
-  getAllPlugins({ commit }) {
-    pluginsApi.getAllPlugins().then(response => {
-      commit('setAllPlugins', response.data)
-    })
-  },
-
   getInstalledPlugins({ commit }) {
     return pluginsApi.getInstalledPlugins().then(response => {
       commit('setInstalledPlugins', response.data)
+    })
+  },
+
+  getPlugins({ commit }) {
+    pluginsApi.getPlugins().then(response => {
+      commit('setAllPlugins', response.data)
     })
   },
 
@@ -149,14 +149,16 @@ const actions = {
       .installPlugin(installConfig)
       .then(() => commit('installPluginComplete', installConfig))
       .then(dispatch('getInstalledPlugins'))
-      .then(dispatch('getAllPlugins'))
+      .then(dispatch('getPlugins'))
       .catch(this.$error.handle)
   },
 
   installRelatedPlugins({ dispatch }, installConfig) {
     return pluginsApi.installBatch(installConfig).then(() => {
-      dispatch('getAllPlugins')
-      dispatch('repos/getAllModels', null, { root: true })
+      dispatch('getPlugins')
+      dispatch('dashboards/getDashboards', null, { root: true })
+      dispatch('reports/loadReports', null, { root: true })
+      dispatch('repos/getModels', null, { root: true })
     })
   }
 }
