@@ -28,13 +28,14 @@ export default {
 </script>
 
 <template>
-  <a
+  <button
     class="button"
     :class="{ 'is-loading': isLoading }"
     :disabled="isDisabled"
     @click="download"
-    >{{ label }}</a
   >
+    {{ label }}
+  </button>
 </template>
 
 <style lang="scss"></style>

@@ -112,6 +112,7 @@ export default {
         <div class="buttons">
           <router-link
             v-for="design in model['designs']"
+            tag="button"
             :key="design"
             class="button is-small is-interactive-primary is-outlined"
             :disabled="!getIsModelEnabled(model)"

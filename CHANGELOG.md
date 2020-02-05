@@ -19,6 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1657](https://gitlab.com/meltano/meltano/issues/1657) Fix `update_dashboard` error when payload lacked a `new_settings` key
+- [#1602](https://gitlab.com/meltano/meltano/issues/1602) Fix instances where `<a disabled='...'>` vs. `<button disabled='...'>` didn't functionally disable the button (previously they were only disabled visually)
 
 ### Breaks
 
