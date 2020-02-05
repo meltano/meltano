@@ -52,7 +52,7 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('orchestration/getAllPipelineSchedules')
+    this.$store.dispatch('orchestration/getPipelineSchedules')
   },
   mounted() {
     if (window.location.href.indexOf('meltanodata.com') > -1) {

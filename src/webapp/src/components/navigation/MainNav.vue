@@ -44,10 +44,10 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('orchestration/getAllPipelineSchedules')
-    this.$store.dispatch('plugins/getAllPlugins')
+    this.$store.dispatch('orchestration/getPipelineSchedules')
+    this.$store.dispatch('plugins/getPlugins')
     this.$store.dispatch('plugins/getInstalledPlugins')
-    this.$store.dispatch('repos/getAllModels')
+    this.$store.dispatch('repos/getModels')
   },
   methods: {
     ...mapActions('system', ['logout']),

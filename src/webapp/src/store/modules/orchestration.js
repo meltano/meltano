@@ -130,13 +130,6 @@ const actions = {
     })
   },
 
-  getAllPipelineSchedules({ commit, dispatch }) {
-    return orchestrationsApi.getAllPipelineSchedules().then(response => {
-      commit('setPipelines', response.data)
-      dispatch('rehydratePollers')
-    })
-  },
-
   getExtractorConfiguration({ commit, dispatch, state }, extractor) {
     return dispatch('getPluginConfiguration', {
       name: extractor,
@@ -163,6 +156,13 @@ const actions = {
         configuration: response.data,
         target: 'loaderInFocusConfiguration'
       })
+    })
+  },
+
+  getPipelineSchedules({ commit, dispatch }) {
+    return orchestrationsApi.getPipelineSchedules().then(response => {
+      commit('setPipelines', response.data)
+      dispatch('rehydratePollers')
     })
   },
 
