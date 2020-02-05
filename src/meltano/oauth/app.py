@@ -18,7 +18,7 @@ def root():
             {
                 "label": "Facebook",
                 "url": url_for("OAuth.Facebook.login"),
-                "logo": "/static/logos/facebook-logo.png",
+                "logo": url_for("static", filename="logos/facebook-logo.png"),
             },
         ),
     )
