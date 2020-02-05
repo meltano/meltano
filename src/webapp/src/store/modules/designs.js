@@ -28,7 +28,9 @@ const defaultState = utils.deepFreeze({
   isLastRunResultsEmpty: false,
   hasCompletedFirstQueryRun: false,
   hasSQLError: false,
-  isAutoRunQuery: true,
+  isAutoRunQuery:
+    'isAutoRunQuery' in localStorage &&
+    localStorage.getItem('isAutoRunQuery') === 'true',
   isLoadingQuery: false,
   limit: 50,
   order: {

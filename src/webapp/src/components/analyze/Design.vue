@@ -88,6 +88,13 @@ export default {
       return dashboard => dashboard.reportIds.includes(this.activeReport.id)
     },
 
+    isShowLoader() {
+      return (
+        this.isAutoRunQuery &&
+        (!this.hasCompletedFirstQueryRun || this.isLoadingQuery)
+      )
+    },
+
     limit: {
       get() {
         return this.$store.getters['designs/currentLimit']
@@ -120,9 +127,6 @@ export default {
     // it is crucial to wait after `next` is called so
     // the route parameters are updated.
     this.reinitialize()
-  },
-  created() {
-    this.initializeSettings()
   },
   methods: {
     ...mapActions('dashboards', ['getDashboards']),
@@ -173,14 +177,6 @@ export default {
       })
 
       this.$store.dispatch('designs/getFilterOptions')
-    },
-
-    initializeSettings() {
-      if ('isAutoRunQuery' in localStorage) {
-        this.setIsAutoRunQuery(
-          localStorage.getItem('isAutoRunQuery') === 'true'
-        )
-      }
     },
 
     jumpToFilters() {
@@ -502,10 +498,9 @@ export default {
                         data-test-id="run-query-button"
                         class="button is-success"
                         :class="{
-                          'is-loading':
-                            !hasCompletedFirstQueryRun || isLoadingQuery
+                          'is-loading': isLoadingQuery
                         }"
-                        :disabled="!currentSQL"
+                        :disabled="!currentSQL || isLoadingQuery"
                         @click="runQuery"
                       >
                         Run
@@ -523,7 +518,7 @@ export default {
                           'has-text-grey-light': !isAutoRunQuery,
                           'is-active has-text-interactive-primary': isAutoRunQuery
                         }"
-                        :disabled="!currentSQL"
+                        :disabled="!currentSQL || isLoadingQuery"
                         @click="toggleIsAutoRunQuery"
                       >
                         <span class="icon is-small is-size-7">
@@ -599,7 +594,7 @@ export default {
 
             <div class="is-relative">
               <LoadingOverlay
-                :is-loading="!hasCompletedFirstQueryRun"
+                :is-loading="isAutoRunQuery && !hasCompletedFirstQueryRun"
               ></LoadingOverlay>
 
               <nav class="panel is-size-7	is-unselectable">
@@ -1026,13 +1021,9 @@ export default {
               </article>
 
               <template v-else>
-                <ResultChart
-                  :is-loading="!hasCompletedFirstQueryRun || isLoadingQuery"
-                ></ResultChart>
+                <ResultChart :is-loading="isShowLoader"></ResultChart>
                 <hr />
-                <ResultTable
-                  :is-loading="!hasCompletedFirstQueryRun || isLoadingQuery"
-                ></ResultTable>
+                <ResultTable :is-loading="isShowLoader"></ResultTable>
               </template>
             </div>
           </template>
