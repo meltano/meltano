@@ -90,8 +90,8 @@ export default {
 
     isShowLoader() {
       return (
-        this.isAutoRunQuery &&
-        (!this.hasCompletedFirstQueryRun || this.isLoadingQuery)
+        (this.isAutoRunQuery && !this.hasCompletedFirstQueryRun) ||
+        this.isLoadingQuery
       )
     },
 

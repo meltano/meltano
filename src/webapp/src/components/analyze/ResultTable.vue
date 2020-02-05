@@ -146,6 +146,13 @@ export default {
       </table>
     </div>
 
+    <div
+      v-else-if="!isLoading && getHasMinimalSelectionRequirements"
+      class="content has-text-centered is-italic"
+    >
+      <p>Run query to see table results</p>
+    </div>
+
     <article
       v-else-if="!getHasMinimalSelectionRequirements"
       class="message is-info"

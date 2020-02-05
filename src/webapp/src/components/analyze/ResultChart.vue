@@ -40,6 +40,13 @@ export default {
       ></Chart>
     </div>
 
+    <div
+      v-else-if="!isLoading && getHasMinimalSelectionRequirements"
+      class="content has-text-centered is-italic"
+    >
+      <p>Run query to see chart results</p>
+    </div>
+
     <div v-else-if="!getHasMinimalSelectionRequirements">
       <article class="message is-info">
         <div class="message-body">
