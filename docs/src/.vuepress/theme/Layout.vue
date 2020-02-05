@@ -101,7 +101,7 @@ export default {
   },
 
   created() {
-    this.isEmbedded = this.$route.query["embed"] || false
+    this.isEmbedded = this.$route.query["embed"] === 'true'
   },
 
   mounted() {
