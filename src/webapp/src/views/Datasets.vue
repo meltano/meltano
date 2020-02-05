@@ -24,16 +24,16 @@ export default {
     }
   },
   created() {
-    this.getAllPipelineSchedules()
-    this.getAllPlugins()
+    this.getPipelineSchedules()
+    this.getPlugins()
     // Until we want to reintroduce a "Loader" UI, we will default to loading target-postgres as the default loader
     this.getInstalledPlugins().then(this.tryInstallLoaderPostgres)
   },
   methods: {
-    ...mapActions('orchestration', ['getAllPipelineSchedules']),
+    ...mapActions('orchestration', ['getPipelineSchedules']),
     ...mapActions('plugins', [
       'addPlugin',
-      'getAllPlugins',
+      'getPlugins',
       'getInstalledPlugins',
       'installPlugin'
     ]),

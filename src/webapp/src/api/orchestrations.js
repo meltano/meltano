@@ -15,20 +15,20 @@ export default {
     })
   },
 
-  extract(extractor) {
-    return axios.post(utils.apiUrl('orchestrations', `extract/${extractor}`))
+  downloadJobLog({ jobId }) {
+    return axios.get(utils.apiUrl('orchestrations', `jobs/${jobId}/download`))
   },
 
-  getAllPipelineSchedules() {
-    return axios.get(utils.apiUrl('orchestrations', 'pipeline-schedules'))
+  extract(extractor) {
+    return axios.post(utils.apiUrl('orchestrations', `extract/${extractor}`))
   },
 
   getJobLog({ jobId }) {
     return axios.get(utils.apiUrl('orchestrations', `jobs/${jobId}/log`))
   },
 
-  downloadJobLog({ jobId }) {
-    return axios.get(utils.apiUrl('orchestrations', `jobs/${jobId}/download`))
+  getPipelineSchedules() {
+    return axios.get(utils.apiUrl('orchestrations', 'pipeline-schedules'))
   },
 
   getPluginConfiguration({ type, name }) {
