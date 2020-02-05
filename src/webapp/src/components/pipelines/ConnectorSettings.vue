@@ -151,11 +151,14 @@ export default {
     },
     gitLabSettings() {
       let newSettings = []
-      const currentSettings = this.configSettings.settings
-      const currentSource = this.configSettings.profiles[
+      const currentProfile = this.configSettings.profiles[
         this.configSettings.profileInFocusIndex
-      ].config.source
+      ]
+      const currentSettings = this.configSettings.settings
+      const currentSource = currentProfile.config.source
       const currentSourceApiLabel = currentSource + 's'
+      const hasGroupSetting = currentProfile.config.groups
+      const hasProjectSetting = currentProfile.config.projects
       const ignoreList = ['groups', 'projects'].filter(
         item => item !== currentSourceApiLabel
       )
@@ -168,8 +171,8 @@ export default {
           kind: 'options',
           options: [
             { label: 'Choose Group or Project', value: '' },
-            { label: 'Group', value: 'group' },
-            { label: 'Project', value: 'project' }
+            { label: 'Group', value: 'group', selected: hasGroupSetting },
+            { label: 'Project', value: 'project', selected: hasProjectSetting }
           ]
         })
 
@@ -223,6 +226,20 @@ export default {
   },
   mounted() {
     this.focusInputIntelligently()
+
+    // Temporary code while we figure out our strategy
+    // for handling these types of scenarios
+    const currentProfile = this.configSettings.profiles[
+      this.configSettings.profileInFocusIndex
+    ]
+    const hasGroupSetting = currentProfile.config.groups
+    const hasProjectSetting = currentProfile.config.projects
+
+    if (hasProjectSetting) {
+      currentProfile.config.source = 'project'
+    } else if (hasGroupSetting) {
+      currentProfile.config.source = 'group'
+    }
   },
   methods: {
     clearUploadFormData() {
