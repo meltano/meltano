@@ -150,38 +150,40 @@ export default {
         : this.configSettings.settings
     },
     gitLabSettings() {
-      const newSettings = []
+      let newSettings = []
       const currentSettings = this.configSettings.settings
       const currentSource = this.configSettings.profiles[
         this.configSettings.profileInFocusIndex
       ].config.source
+      const currentSourceApiLabel = currentSource + 's'
+      const ignoreList = ['groups', 'projects'].filter(
+        item => item !== currentSourceApiLabel
+      )
 
       if (this.plugin.name === 'tap-gitlab') {
-        for (let i = 0; i < currentSettings.length; i++) {
-          const setting = currentSettings[i]
+        // Copy over currentSettings and add in custom select menu
+        newSettings = currentSettings.map(setting => setting)
+        newSettings.splice(2, 0, {
+          name: 'source',
+          kind: 'options',
+          options: [
+            { label: 'Choose Group or Project', value: '' },
+            { label: 'Group', value: 'group' },
+            { label: 'Project', value: 'project' }
+          ]
+        })
 
-          if (setting.name === 'private_token') {
-            newSettings.push(setting)
-            newSettings.push({
-              name: 'source',
-              kind: 'options',
-              options: [
-                { label: 'Choose Group or Project', value: '' },
-                { label: 'Group', value: 'group' },
-                { label: 'Project', value: 'project' }
-              ]
-            })
-          } else if (setting.name === currentSource + 's') {
-            let tempSetting = setting
-            tempSetting.name = tempSetting.name.slice(0, -1)
+        return newSettings.filter(setting => {
+          let foundIgnoredSetting = false
 
-            newSettings.push(setting)
-          } else if (setting.name === 'groups' || setting.name === 'projects') {
-            continue
-          } else {
-            newSettings.push(setting)
-          }
-        }
+          ignoreList.forEach(ignoredSetting => {
+            if (ignoredSetting === setting.name) {
+              foundIgnoredSetting = true
+            }
+          })
+
+          return foundIgnoredSetting ? false : setting
+        })
       }
 
       return newSettings
