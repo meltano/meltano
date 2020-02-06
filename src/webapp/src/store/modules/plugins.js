@@ -150,7 +150,6 @@ const actions = {
       .then(() => commit('installPluginComplete', installConfig))
       .then(dispatch('getInstalledPlugins'))
       .then(dispatch('getPlugins'))
-      .catch(this.$error.handle)
   },
 
   installRelatedPlugins({ dispatch }, installConfig) {
