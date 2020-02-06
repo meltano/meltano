@@ -61,7 +61,9 @@ class SnowflakeGrantsGenerator:
         """
         future = True if re.search(r"<(table|view|schema)>", entity_name) else False
 
-        grants = self.grants_to_role.get(role, {}).get(privilege, {}).get(entity_type, [])
+        grants = (
+            self.grants_to_role.get(role, {}).get(privilege, {}).get(entity_type, [])
+        )
 
         if future and entity_name in grants:
             return True
@@ -596,9 +598,9 @@ class SnowflakeGrantsGenerator:
 
                 schema_already_granted = False
                 if self.check_grant_to_role(
-                        role, read_privileges, "schema", future_schema
-                    ):
-                        schema_already_granted = True
+                    role, read_privileges, "schema", future_schema
+                ):
+                    schema_already_granted = True
 
                 # Grant on FUTURE schemas
                 sql_commands.append(
@@ -1088,9 +1090,7 @@ class SnowflakeGrantsGenerator:
                 table_already_granted = True
                 for privilege in write_privileges_array:
                     # If any of the privileges are not granted, set already_granted to False
-                    if not self.check_grant_to_role(
-                        role, privilege, "table", db_table
-                    ):
+                    if not self.check_grant_to_role(role, privilege, "table", db_table):
                         table_already_granted = False
 
                 sql_commands.append(
