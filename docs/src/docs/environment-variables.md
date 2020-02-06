@@ -128,12 +128,15 @@ export MELTANO_READONLY=1
 ### OAuth Service
 
 ::: tip
-Meltano provides a public hosted solution at `https://oauth.svc.meltanodata.com/` which is used by default.
+Meltano provides a public hosted solution at <https://oauth.svc.meltanodata.com>.
 :::
 
 ```bash
+# use the public OAuth Service
+MELTANO_OAUTH_SERVICE_URL=https://oauth.svc.meltanodata.com
+
 # use the local OAuth Service
-OAUTH_SERVICE_URL=https://localhost:5000/-/oauth
+MELTANO_OAUTH_SERVICE_URL=http://localhost:5000/-/oauth
 ```
 
 ## Meltano OAuth Service

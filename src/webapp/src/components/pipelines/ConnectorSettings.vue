@@ -89,7 +89,7 @@ export default {
       return kind => kind === 'hidden'
     },
     getIsOfKindOAuth() {
-      return kind => kind === 'oauth'
+      return kind => this.isOAuthEnabled && kind === 'oauth'
     },
     getIsOfKindOptions() {
       return kind => kind === 'options'
@@ -140,6 +140,9 @@ export default {
         }
         return type
       }
+    },
+    isOAuthEnabled() {
+      return !!this.$flask['oauthServiceUrl']
     },
     labelClass() {
       return this.fieldClass || 'is-normal'
