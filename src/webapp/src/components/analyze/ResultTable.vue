@@ -75,7 +75,7 @@ export default {
   <div class="result-data has-position-relative v-min-2r">
     <LoadingOverlay :is-loading="isLoading"></LoadingOverlay>
 
-    <div v-if="hasResults">
+    <div v-if="hasResults" class="table-container">
       <table
         class="table
           is-bordered
@@ -144,6 +144,13 @@ export default {
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div
+      v-else-if="!isLoading && getHasMinimalSelectionRequirements"
+      class="content has-text-centered is-italic"
+    >
+      <p>Run query to see table results</p>
     </div>
 
     <article

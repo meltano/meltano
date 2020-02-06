@@ -26,8 +26,12 @@ const defaultState = utils.deepFreeze({
     columns: []
   },
   isLastRunResultsEmpty: false,
+  hasCompletedFirstQueryRun: false,
   hasSQLError: false,
-  isAutoRunQuery: true,
+  isAutoRunQuery:
+    'isAutoRunQuery' in localStorage
+      ? localStorage.getItem('isAutoRunQuery') === 'true'
+      : true,
   isLoadingQuery: false,
   limit: 50,
   order: {
@@ -43,6 +47,7 @@ const defaultState = utils.deepFreeze({
 
 const helpers = {
   buildKey: (...parts) => lodash.join(parts, '.'),
+  debouncedAutoRun: null,
 
   getFilterTypePlural(filterType) {
     return `${filterType}s`
@@ -367,11 +372,6 @@ const actions = {
     }
   },
 
-  tryAutoRun({ dispatch, state }) {
-    const hasRan = state.results.length > 0 || state.isLastRunResultsEmpty
-    dispatch('runQuery', state.isAutoRunQuery && hasRan)
-  },
-
   // eslint-disable-next-line no-shadow
   cleanFiltering({ commit, getters }, { attribute, type }) {
     if (!attribute.selected) {
@@ -497,11 +497,10 @@ const actions = {
         if (response.status === 204) {
           commit('resetQueryResults')
           commit('resetSQLResults')
-          commit('setIsLoadingQuery', false)
         } else if (run) {
+          commit('setHasCompletedFirstQueryRun', true)
           commit('setQueryResults', response.data)
           commit('setSQLResults', response.data)
-          commit('setIsLoadingQuery', false)
           commit('setSorting', {
             attributesIndex: getters.getOrderableAttributesIndex
           })
@@ -511,8 +510,8 @@ const actions = {
       })
       .catch(e => {
         commit('setSqlErrorMessage', e)
-        commit('setIsLoadingQuery', false)
       })
+      .finally(() => commit('setIsLoadingQuery', false))
   },
 
   loadReport({ state, commit }, report) {
@@ -638,6 +637,17 @@ const actions = {
     dispatch('cleanOrdering', aggregate)
     dispatch('cleanFiltering', { attribute: aggregate, type: 'aggregate' })
     dispatch('tryAutoRun')
+  },
+
+  tryAutoRun({ dispatch, state }) {
+    if (helpers.debouncedAutoRun) {
+      helpers.debouncedAutoRun.cancel()
+    }
+    helpers.debouncedAutoRun = lodash.debounce(() => {
+      const hasRan = state.results.length > 0 || state.isLastRunResultsEmpty
+      dispatch('runQuery', state.isAutoRunQuery && hasRan)
+    }, 500)
+    helpers.debouncedAutoRun()
   },
 
   toggleColumn({ commit, dispatch }, column) {
@@ -808,8 +818,12 @@ const mutations = {
     state.filterOptions = options
   },
 
-  setLimit(state, limit) {
-    state.limit = limit
+  setHasCompletedFirstQueryRun(state, value) {
+    state.hasCompletedFirstQueryRun = value
+  },
+
+  setIsLoadingQuery(state, value) {
+    state.isLoadingQuery = value
   },
 
   setJoinAggregates(_, { aggregates, join }) {
@@ -824,8 +838,8 @@ const mutations = {
     join.timeframes = timeframes
   },
 
-  setIsLoadingQuery(state, value) {
-    state.isLoadingQuery = value
+  setLimit(state, limit) {
+    state.limit = limit
   },
 
   setOrderAssigned(state, value) {
