@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-## Unreleased
 
+## Unreleased
 ---
 
 ### New
@@ -13,9 +13,17 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+### Breaks
+
+
+## 1.19.2 - (2020-02-06)
+
+---
+
+### Fixes
+
 - [#1672](https://gitlab.com/meltano/meltano/issues/1672) Pin Werkzeug version to 0.16.1 since 1.0.0 is unsupported by Flask-BabelEx
 
-### Breaks
 
 ## 1.19.1 - (2020-02-06)
 
