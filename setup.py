@@ -48,6 +48,7 @@ requires = [
     'urllib3==1.23',
     'sqlparse==0.3.0',
     'watchdog==0.9.0',
+    'werkzeug==0.16.1',
 ]
 
 # conflicts resolution, see https://gitlab.com/meltano/meltano/issues/193

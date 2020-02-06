@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1672](https://gitlab.com/meltano/meltano/issues/1672) Pin Werkzeug version to 0.16.1 since 1.0.0 is unsupported by Flask-BabelEx
 - [#1671](https://gitlab.com/meltano/meltano/issues/1671) Fix error handling bug that caused a console error that impacted further UI interaction
 
 ### Breaks

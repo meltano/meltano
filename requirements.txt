@@ -179,7 +179,7 @@ Unidecode==1.0.22
 urllib3==1.23
 watchdog==0.9.0
 wcwidth==0.1.7
-Werkzeug==0.14.1
+Werkzeug==0.16.1
 whichcraft==0.5.2
 wrapt==1.11.2
 WTForms==2.2.1
