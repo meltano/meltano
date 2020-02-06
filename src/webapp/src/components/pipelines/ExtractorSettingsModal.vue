@@ -271,6 +271,7 @@ export default {
             :required-settings-keys="requiredSettingsKeys"
             :upload-form-data="uploadFormData"
             :is-show-docs="true"
+            :is-show-config-warning="getPipelineWithExtractor(extractor.name)"
             @onChangeUploadFormData="onChangeUploadFormData"
           />
         </template>
