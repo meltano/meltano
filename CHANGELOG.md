@@ -24,6 +24,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1545](https://gitlab.com/meltano/meltano/issues/1545) Add read-only report embed functionality via embeddable `iframe` copy-to-clipboard snippet
 - [#1606](https://gitlab.com/meltano/meltano/issues/1606) Update UI after successful plugin configuration with auto installed reports and dashboards
+- [#1614](https://gitlab.com/meltano/meltano/issues/1614) Add 'Fix Connection' and 'View Connection' CTAs to Integrations with corresponding pipelines
 
 ### Changes
 

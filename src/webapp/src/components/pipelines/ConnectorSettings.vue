@@ -24,6 +24,10 @@ export default {
       type: Boolean,
       default: false
     },
+    isShowConfigWarning: {
+      type: Boolean,
+      default: false
+    },
     plugin: {
       type: Object,
       required: true
@@ -145,28 +149,11 @@ export default {
         }
       }
     },
-    pluginType() {
-      const pluginName = this.plugin.name
-
-      if (pluginName.startsWith('tap')) {
-        return 'extractor'
-      } else if (pluginName.startsWith('target')) {
-        return 'loader'
-      } else {
-        return 'plugin'
-      }
-    },
     successClass() {
       return setting => (setting ? 'has-text-success' : null)
     }
   },
   watch: {
-    configSettings: {
-      handler(newVal) {
-        this.snowflakeHelper(newVal)
-      },
-      deep: true
-    },
     'configSettings.profileInFocusIndex': {
       handler(newVal, oldVal) {
         this.refocusInput(newVal, oldVal)
@@ -233,32 +220,6 @@ export default {
       if (newVal !== oldVal) {
         this.focusInputIntelligently()
       }
-    },
-    snowflakeHelper(newVal) {
-      /**
-       * Improve account UX by auto-detecting Account ID via URL
-       * for configs that have `account`
-       * This is currently Loader-Snowflake specific
-       * and we'll need a more robust solution
-       * when/if we add UX helpers like this for more connectors
-       * TODO: Need to add a loader indicator to show something is "processing"
-       */
-      const accountInput =
-        newVal.profiles[newVal.profileInFocusIndex].config.account
-      if (accountInput) {
-        const parsedAccountId = utils.snowflakeAccountParser(accountInput)
-
-        if (parsedAccountId) {
-          const vm = this
-
-          setTimeout(() => {
-            vm.connectorProfile.account = parsedAccountId
-          }, 1000)
-        } else {
-          this.connectorProfile.account =
-            newVal.profiles[newVal.profileInFocusIndex].config.account
-        }
-      }
     }
   }
 }
@@ -288,7 +249,7 @@ export default {
               <a
                 :href="plugin.docs"
                 target="_blank"
-                class="has-text-underlined is-pulled-right"
+                class="is-size-7 has-text-underlined is-pulled-right"
                 >View Documentation Externally
               </a>
             </div>
@@ -299,6 +260,16 @@ export default {
 
     <div class="columns">
       <div class="column" :class="{ 'is-two-fifths': isShowDocs }">
+        <article v-if="isShowConfigWarning" class="message is-warning is-small">
+          <div class="message-body">
+            <div class="content">
+              <p>
+                Take note that changing non-date related settings of an existing
+                configuration can result in overwritten or merged data.
+              </p>
+            </div>
+          </div>
+        </article>
         <form>
           <div
             v-for="setting in configSettings.settings"

@@ -13,14 +13,39 @@ export default {
       'getIsPluginInstalled',
       'visibleExtractors'
     ]),
-    ...mapGetters('orchestration', ['getHasPipelineWithExtractor']),
-    ...mapState('orchestration', ['pipelines'])
+    ...mapGetters('orchestration', [
+      'getHasPipelineWithExtractor',
+      'getPipelineWithExtractor'
+    ]),
+    ...mapState('orchestration', ['pipelines']),
+    getConnectionLabel() {
+      return extractorName => {
+        const connectLabel = this.getHasPipelineWithExtractor(extractorName)
+          ? 'View Connection'
+          : 'Connect'
+        return this.getExtractorConfigurationNeedsFixing(extractorName)
+          ? 'Fix Connection'
+          : connectLabel
+      }
+    },
+    getConnectionStyle() {
+      return extractorName => {
+        const connectStyle = this.getHasPipelineWithExtractor(extractorName)
+          ? ''
+          : 'is-interactive-primary'
+        return this.getExtractorConfigurationNeedsFixing(extractorName)
+          ? 'is-danger'
+          : connectStyle
+      }
+    },
+    getExtractorConfigurationNeedsFixing() {
+      return extractorName =>
+        this.getHasPipelineWithExtractor(extractorName) &&
+        !this.getPipelineWithExtractor(extractorName).hasEverSucceeded
+    }
   },
   methods: {
     updateExtractorSettings(extractor) {
-      if (this.getHasPipelineWithExtractor(extractor.name)) {
-        return
-      }
       this.$emit('select', extractor)
       this.$router.push({
         name: 'extractorSettings',
@@ -65,23 +90,25 @@ export default {
         </div>
       </div>
       <figure class="media-right is-flex is-flex-column is-vcentered">
-        <a
-          v-if="getHasPipelineWithExtractor(extractor.name)"
-          href="#pipelines"
-          class="button tooltip is-tooltip-left"
-          data-tooltip="A pipeline for this data source already exists"
-          @click.stop="() => {}"
-        >
-          <span>View Pipeline</span>
-        </a>
-        <a
-          v-else
-          class="button is-interactive-primary tooltip is-tooltip-left"
-          data-tooltip="Install and connect to this data source"
-          @click="updateExtractorSettings(extractor)"
-        >
-          <span>Connect</span>
-        </a>
+        <div class="buttons">
+          <a
+            v-if="getHasPipelineWithExtractor(extractor.name)"
+            href="#pipelines"
+            class="button tooltip is-tooltip-left"
+            data-tooltip="A pipeline for this data source already exists"
+            @click.stop="() => {}"
+          >
+            <span>View Pipeline</span>
+          </a>
+          <a
+            class="button tooltip is-tooltip-left"
+            :class="getConnectionStyle(extractor.name)"
+            data-tooltip="Install and connect to this data source"
+            @click="updateExtractorSettings(extractor)"
+          >
+            <span>{{ getConnectionLabel(extractor.name) }}</span>
+          </a>
+        </div>
       </figure>
     </article>
   </div>
