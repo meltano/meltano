@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
@@ -13,8 +13,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-### Breaks
+- [#1671](https://gitlab.com/meltano/meltano/issues/1671) Fix error handling bug that caused a console error that impacted further UI interaction
 
+### Breaks
 
 ## 1.19.0 - (2020-02-06)
 
@@ -37,7 +38,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1657](https://gitlab.com/meltano/meltano/issues/1657) Fix `update_dashboard` error when payload lacked a `new_settings` key
 - [#1602](https://gitlab.com/meltano/meltano/issues/1602) Fix instances where `<a disabled='...'>` vs. `<button disabled='...'>` didn't functionally disable the button (previously they were only disabled visually)
 - [#1656](https://gitlab.com/meltano/meltano/issues/1656) Fix conditional header in docs to support Meltano.com and inline docs within the Meltano app
-
 
 ## 1.18.0 - (2020-02-03)
 
