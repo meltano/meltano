@@ -215,13 +215,42 @@ We should be good citizen about these, and use the default workflow to contribut
 1. Modify and submits PRs
 1. If there is resistance, fork as our tap (2)
 
+#### How to test a tap?
+
+We qualify taps with the capabilities it supports:
+
+  - properties: the tap uses the old `--properties` format for the catalog
+  - catalog: the tap uses the new `--catalog` format for the catalog
+  - discover: the tap supports catalog extraction
+  - state: the tap supports incremental extraction
+
+##### Properties/Catalog
+
+You should look at the tap's documentation to see which one is supported.
+
+##### Discover
+
+Try to run the tap with the `--discover` switch, which should output a catalog on STDOUT.
+
+##### State
+
+  1. Try to run the tap connect and extract data first, watching for `STATE` messages.
+  1. Do two ELT run with `target-postgres`, then validate that:
+    1. All the tables in the schema created have a PRIMARY KEY constraint. (this is important for incremental updates)
+    1. There is no duplicates after multiple extractions
+
+#### Troubleshooting
+
+##### Tables are lacking primary keys
+
+This might be a configuration issue with the catalog file that is sent to the tap. Take a look at the tap's documentation and look for custom metadata on the catalog. 
+
 ### For taps/targets we create
 
 1. For tap development please use the [tap cookiecutter template](https://github.com/singer-io/singer-tap-template).
 1. For target development please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
 1. Use a separate repo (meltano/target|tap-x) in GitLab
    e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
-1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
 1. Publish PyPI packages of these package (not for now)
 1. We could mirror this repo on GitHub if we want (not for now)
 
