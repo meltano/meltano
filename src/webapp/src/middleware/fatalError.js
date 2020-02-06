@@ -29,6 +29,10 @@ export default {
 
     Vue.prototype.$error = {
       handle(err) {
+        if (!err.response) {
+          throw err
+        }
+
         if (err.handled) {
           return
         }
