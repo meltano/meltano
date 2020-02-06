@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1594](https://gitlab.com/meltano/meltano/issues/1594) Improve onboarding UX by moving the "Update Interval" selection to a post-successful-pipeline action
 - [#1594](https://gitlab.com/meltano/meltano/issues/1594) Update pipelines to be sorted alphabetically to match data sources organization
+- [#1659](https://gitlab.com/meltano/meltano/issues/1659) Update query attribute toggling and results UX when autorun query is on (via 500ms debounce)
 
 ### Fixes
 
