@@ -3,11 +3,13 @@ import axios from 'axios'
 
 import { ENV, MELTANO_YML } from '@/utils/constants'
 import InputDateIso8601 from '@/components/generic/InputDateIso8601'
+import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import utils from '@/utils/utils'
 
 export default {
   name: 'ConnectorSettings',
   components: {
+    ConnectorLogo,
     InputDateIso8601
   },
   props: {
@@ -86,6 +88,9 @@ export default {
     getIsOfKindHidden() {
       return kind => kind === 'hidden'
     },
+    getIsOfKindOAuth() {
+      return kind => this.isOAuthEnabled && kind === 'oauth'
+    },
     getIsOfKindOptions() {
       return kind => kind === 'options'
     },
@@ -95,6 +100,11 @@ export default {
         !this.getIsOfKindDate(kind) &&
         !this.getIsOfKindFile(kind) &&
         !this.getIsOfKindOptions(kind)
+    },
+    getHasAddons(getters) {
+      return setting =>
+        getters.getIsProtected(setting) ||
+        getters.getIsOfKindOAuth(setting.kind)
     },
     getIsProtected() {
       return setting => {
@@ -130,6 +140,9 @@ export default {
         }
         return type
       }
+    },
+    isOAuthEnabled() {
+      return !!this.$flask['oauthServiceUrl']
     },
     labelClass() {
       return this.fieldClass || 'is-normal'
@@ -220,6 +233,13 @@ export default {
       if (newVal !== oldVal) {
         this.focusInputIntelligently()
       }
+    },
+    openOAuthPopup(provider) {
+      const oauthUrl = `${this.$flask.oauthServiceUrl}/${provider}`
+      const winOpts =
+        'resizable=no,scrollbars=no,close=yes,height=640,width=480'
+
+      window.open(oauthUrl, name, winOpts)
     }
   }
 }
@@ -301,9 +321,11 @@ export default {
             <div class="field-body">
               <div
                 class="field"
-                :class="{ 'has-addons': getIsProtected(setting) }"
+                :class="{
+                  'has-addons': getHasAddons(setting)
+                }"
               >
-                <div class="control is-expanded has-icons-right">
+                <div class="control is-expanded">
                   <!-- Hidden -->
                   <input
                     v-if="getIsOfKindHidden(setting.kind)"
@@ -440,6 +462,19 @@ export default {
                         <font-awesome-icon icon="lock"></font-awesome-icon>
                       </span>
                     </a>
+                  </div>
+
+                  <!-- OAuth helper -->
+                  <div v-if="getIsOfKindOAuth(setting.kind)" class="control">
+                    <button
+                      class="button is-small is-primary"
+                      @click.prevent="openOAuthPopup(setting.oauth.provider)"
+                    >
+                      <span class="mr-025r">Get with</span>
+                      <span class="icon has-text-grey-dark">
+                        <connector-logo :connector="plugin.name" />
+                      </span>
+                    </button>
                   </div>
                 </template>
               </div>

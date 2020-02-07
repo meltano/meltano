@@ -45,9 +45,11 @@ class SettingDefinition(NameEq, Canonical):
         documentation: str = None,
         description: str = None,
         tooltip: str = None,
-        placeholder: str = None,
         options: list = [],
+        oauth: dict = {},
+        placeholder: str = None,
         protected=False,
+        **attrs,
     ):
         super().__init__(
             name=name,
@@ -58,8 +60,11 @@ class SettingDefinition(NameEq, Canonical):
             documentation=documentation,
             description=description,
             tooltip=tooltip,
+            options=options,
+            oauth=oauth,
             placeholder=placeholder,
             protected=protected,
+            **attrs,
         )
 
 
