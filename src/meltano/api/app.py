@@ -126,9 +126,6 @@ def create_app(config={}):
 
         g.jsContext["version"] = meltano.__version__
 
-        # setup the dbtDocsUrl
-        g.jsContext["dbtDocsUrl"] = appUrl._replace(path="/-/dbt/").geturl()[:-1]
-
     @app.after_request
     def after_request(res):
         res.headers[VERSION_HEADER] = meltano.__version__

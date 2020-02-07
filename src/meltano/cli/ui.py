@@ -18,7 +18,6 @@ from meltano.api.workers import (
     AirflowWorker,
     APIWorker,
     UIAvailableWorker,
-    DbtWorker,
 )
 
 
@@ -66,30 +65,11 @@ def start(ctx, reload, bind_port, bind):
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_ui()
 
-    loop = asyncio.get_event_loop()
-
-    # we need to prime the ChildWatcher here so we can
-    # call subprocesses asynchronously from threads
-    #
-    # see https://docs.python.org/3/library/asyncio-subprocess.html#subprocess-and-threads
-    # TODO: remove when running on Python 3.8
-    asyncio.get_child_watcher()
-
     workers = []
     if not truthy(os.getenv("MELTANO_DISABLE_AIRFLOW", False)):
         workers.append(AirflowWorker(project))
 
     workers.append(MeltanoCompilerWorker(project))
-
-    # we need to whitelist the loaders here because not
-    # all the loaders support dbt in the first place
-    dbt_docs_loader = os.getenv("MELTANO_DBT_DOCS_LOADER", "target-postgres")
-    if dbt_docs_loader:
-        workers.append(DbtWorker(project, dbt_docs_loader, loop=loop))
-    else:
-        logging.info(
-            "No loader enabled for dbt docs generation, set the MELTANO_DBT_DOCS_LOADER variable to enable one."
-        )
 
     workers.append(UIAvailableWorker("http://localhost:{bind_port}"))
     workers.append(
