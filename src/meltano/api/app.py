@@ -129,9 +129,6 @@ def create_app(config={}):
 
         g.jsContext["version"] = meltano.__version__
 
-        # setup the dbtDocsUrl
-        g.jsContext["dbtDocsUrl"] = appUrl._replace(path="/-/dbt/").geturl()[:-1]
-
         # setup the oauthServiceUrl
         g.jsContext["oauthServiceUrl"] = app.config["MELTANO_OAUTH_SERVICE_URL"]
 
