@@ -6,7 +6,7 @@ import reportsApi from '@/api/reports'
 import utils from '@/utils/utils'
 
 export default {
-  name: 'EmbedButton',
+  name: 'EmbedShareButton',
   components: {
     Dropdown
   },
@@ -30,6 +30,7 @@ export default {
       reportsApi
         .generateEmbedURL(report.id)
         .then(response => {
+          this.$refs[`link-${report.id}`].value = response.data.url
           this.$refs[`embed-${report.id}`].value = response.data.snippet
           if (response.data.isNew) {
             Vue.toasted.global.success(`${report.name} embed code created`)
@@ -50,9 +51,9 @@ export default {
   <Dropdown
     :tooltip="{
       classes: 'is-tooltip-left',
-      message: 'Create an embeddable code snippet'
+      message: 'Create an embed or link to share'
     }"
-    label="Embed"
+    label="Share"
     :button-classes="`button ${buttonClasses}`"
     menu-classes="dropdown-menu-300"
     :disabled="isAwaitingEmbed"
@@ -61,13 +62,14 @@ export default {
   >
     <div class="dropdown-content is-size-7">
       <div class="dropdown-item">
+        <label class="label">Link</label>
         <div class="field has-addons">
           <p class="control is-expanded">
             <input
-              :ref="`embed-${report.id}`"
+              :ref="`link-${report.id}`"
               class="input is-small is-family-code has-background-white-ter	has-text-grey-dark	"
               type="text"
-              placeholder="Generating snippet..."
+              placeholder="Generating link..."
               readonly
             />
           </p>
@@ -75,18 +77,43 @@ export default {
             <button
               class="button is-small"
               :disabled="isAwaitingEmbed"
-              @click="copyToClipboard(`embed-${report.id}`)"
+              @click="copyToClipboard(`link-${report.id}`)"
             >
-              Copy Snippet
+              Copy
             </button>
           </p>
         </div>
       </div>
       <div class="dropdown-item">
+        <div class="field">
+          <label class="label">Embed</label>
+          <div class="field has-addons">
+            <p class="control is-expanded">
+              <input
+                :ref="`embed-${report.id}`"
+                class="input is-small is-family-code has-background-white-ter	has-text-grey-dark	"
+                type="text"
+                placeholder="Generating snippet..."
+                readonly
+              />
+            </p>
+            <p class="control">
+              <button
+                class="button is-small"
+                :disabled="isAwaitingEmbed"
+                @click="copyToClipboard(`embed-${report.id}`)"
+              >
+                Copy
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="dropdown-item">
         <p class="is-italic is-size-7">
-          The above snippet is a
-          <strong>publicly embeddable</strong> and
-          <strong>read-only</strong> version of this report.
+          The above link and embed are
+          <strong>publicly accessible</strong> and
+          <strong>read-only</strong> versions of this report.
         </p>
       </div>
     </div>

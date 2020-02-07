@@ -5,7 +5,7 @@ import Vue from 'vue'
 import capitalize from '@/filters/capitalize'
 import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
 import Dropdown from '@/components/generic/Dropdown'
-import EmbedButton from '@/components/generic/EmbedButton'
+import EmbedShareButton from '@/components/generic/EmbedShareButton'
 import LoadingOverlay from '@/components/generic/LoadingOverlay'
 import QueryFilters from '@/components/analyze/QueryFilters'
 import ResultChart from '@/components/analyze/ResultChart'
@@ -20,7 +20,7 @@ export default {
   components: {
     CreateDashboardModal,
     Dropdown,
-    EmbedButton,
+    EmbedShareButton,
     LoadingOverlay,
     QueryFilters,
     ResultChart,
@@ -977,7 +977,7 @@ export default {
                   </button>
                 </div>
                 <div v-if="hasActiveReport" class="control">
-                  <EmbedButton :report="activeReport" />
+                  <EmbedShareButton :report="activeReport" />
                 </div>
               </div>
             </div>

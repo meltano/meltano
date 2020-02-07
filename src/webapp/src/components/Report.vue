@@ -2,12 +2,12 @@
 import { mapGetters } from 'vuex'
 
 import Chart from '@/components/analyze/Chart'
-import EmbedButton from '@/components/generic/EmbedButton'
+import EmbedShareButton from '@/components/generic/EmbedShareButton'
 
 export default {
   components: {
     Chart,
-    EmbedButton
+    EmbedShareButton
   },
   props: {
     edit: {
@@ -113,7 +113,7 @@ export default {
             <div class="buttons">
               <a class="button is-small" @click="goToReport(report)">Edit</a>
               <a class="button is-small" @click="goToDesign(report)">Explore</a>
-              <EmbedButton :report="report" button-classes="is-small" />
+              <EmbedShareButton :report="report" button-classes="is-small" />
             </div>
           </div>
         </div>
