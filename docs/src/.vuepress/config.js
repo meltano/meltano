@@ -1,3 +1,20 @@
+docsSidebar = [
+  '/docs/',
+  '/docs/installation',
+  '/docs/getting-started',
+  '/tutorials/',
+  '/plugins/',
+  '/docs/command-line-interface',
+  '/docs/environment-variables',
+  '/docs/security-and-privacy',
+  '/docs/architecture',
+  '/docs/contributing',
+  '/docs/getting-help',
+  '/docs/responsible-disclosure',
+  '/docs/roadmap',
+  '/handbook/'
+]
+
 module.exports = {
   title: 'Meltano',
   description: 'Open source data dashboarding',
@@ -62,54 +79,18 @@ module.exports = {
       }
     ],
     sidebar: {
-      '/docs': [
-        '/docs/',
-        '/docs/installation',
-        '/docs/getting-started',
-        '/tutorials/',
-        '/plugins/',
-        '/docs/command-line-interface',
-        '/docs/environment-variables',
-        '/docs/security-and-privacy',
-        '/docs/architecture',
-        '/docs/contributing',
-        '/docs/getting-help',
-        '/docs/responsible-disclosure',
-        '/docs/roadmap'
-      ],
+      '/docs': docsSidebar,
+      '/plugins': docsSidebar,
+      '/tutorials': docsSidebar,
       '/handbook/engineering/meltanodata-guide': [
         '/handbook/engineering/meltanodata-guide/',
         '/handbook/engineering/meltanodata-guide/controller-node.html'
       ],
-      '/plugins': [
-        '/docs/',
-        '/docs/installation',
-        '/docs/getting-started',
-        '/tutorials/',
-        '/plugins/',
-        '/docs/command-line-interface',
-        '/docs/environment-variables',
-        '/docs/security-and-privacy',
-        '/docs/architecture',
-        '/docs/contributing',
-        '/docs/getting-help',
-        '/docs/responsible-disclosure',
-        '/docs/roadmap'
-      ],
-      '/tutorials': [
-        '/docs/',
-        '/docs/installation',
-        '/docs/getting-started',
-        '/tutorials/',
-        '/plugins/',
-        '/docs/command-line-interface',
-        '/docs/environment-variables',
-        '/docs/security-and-privacy',
-        '/docs/architecture',
-        '/docs/contributing',
-        '/docs/getting-help',
-        '/docs/responsible-disclosure',
-        '/docs/roadmap'
+      '/handbook': [
+        '/handbook/',
+        '/handbook/engineering/',
+        '/handbook/marketing/',
+        '/handbook/product/'
       ]
     },
     logo: '/meltano-logo.svg',
