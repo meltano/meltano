@@ -458,6 +458,9 @@ dashboards:
   - name: dashboard-google-analytics
     namespace: tap_google_analytics
     pip_url: 'git+https://gitlab.com/meltano/dashboard-google-analytics.git'
+  - name: dashboard-stripe
+    namespace: tap_stripe
+    pip_url: 'git+https://gitlab.com/meltano/dashboard-stripe.git'
 orchestrators:
   - name: airflow
     namespace: airflow
