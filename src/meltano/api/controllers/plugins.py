@@ -1,6 +1,7 @@
 from itertools import groupby
 from flask import request, jsonify, g
 
+from meltano.api.json import freeze_keys
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
@@ -33,7 +34,7 @@ def all():
     for type, plugins in groupby(discovery.plugins(), key=lambda p: p.type):
         ordered_plugins[type] = [plugin.canonical() for plugin in plugins]
 
-    return jsonify(ordered_plugins)
+    return jsonify(freeze_keys(ordered_plugins))
 
 
 @pluginsBP.route("/installed", methods=["GET"])
