@@ -7,6 +7,10 @@
       height: 0;
   }
   .token {
+      position: relative;
+      overflow: hidden;
+  }
+  .token__code {
       display: inline-block;
       width: 100%;
       white-space: pre-wrap;
@@ -14,6 +18,17 @@
       color: #696969;
       background-color: transparent;
       padding: 1em;
+  }
+  .token__overlay {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(transparent, white 60%);
+      transition: top 0.2s;
+  }
+  .token:hover .token__overlay {
+      top: 100%;
   }
   .close {
       color: gray;
@@ -39,7 +54,10 @@
 
 <div class="box">
   <h2 class="subtitle">Your access token</h2>
-  <code class="token">{{ token.access_token }}</code>
+  <div class="token">
+    <code class="token__code">{{ token.access_token }}</code>
+    <figure class="token__overlay"></figure>
+  </div>
 
   <input id="token" class="hidden" type="textarea" value="{{ token.access_token }}" />
   <button class="button is-primary is-fullwidth" onclick="clipToken();">Copy to clipboard</button>

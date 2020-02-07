@@ -5,7 +5,7 @@ import moment from 'moment'
 import { namer } from '@/utils/mappers'
 
 const regExpConnectorLogo = /(?:tap-|target-)?(.*)/
-const regExpPrivateInput = /(password|private|secret)/
+const regExpPrivateInput = /(password|private|secret|token)/
 
 const FLASK = flaskContext()
 
