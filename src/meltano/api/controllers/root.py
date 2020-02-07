@@ -11,14 +11,12 @@ from flask import (
     make_response,
     g,
     current_app,
-    send_from_directory,
 )
 from flask_login import current_user
 from flask_security import login_required, roles_required, logout_user
 from jinja2 import TemplateNotFound
 
 import meltano
-from meltano.core.project import Project
 from meltano.api.security import api_auth_required
 from meltano.api.security.readonly_killswitch import readonly_killswitch
 from meltano.api.api_blueprint import APIBlueprint
@@ -32,15 +30,6 @@ root = Blueprint("root", __name__)
 def internal_error(exception):
     logger.info(f"[{request.remote_addr}], error: {exception}")
     return jsonify({"error": str(exception)}), 500
-
-
-@root.route("/-/dbt/", defaults={"path": "index.html"})
-@root.route("/-/dbt/<path:path>")
-def dbt_docs(path):
-    project = Project.find()
-    return send_from_directory(
-        project.meltano_dir("transformers", "dbt", "target"), path
-    )
 
 
 @root.route("/-/embed/", defaults={"token": ""})
