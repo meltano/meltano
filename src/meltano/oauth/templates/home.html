@@ -1,58 +1,18 @@
-{% set meltano_link = '<a href="https://meltano.com">Meltano</a>' %}
+{% extends "base.html" %}
 
-<html>
-  <head>
-    <title>Meltano — OAuth Service</title>
+{% block main %}
+{% include "_title.html" %}
 
-    {%- block metas %}
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {%- endblock metas %}
+<div class="box">
+  <h2 class="subtitle">Providers</h2>
 
-    {%- block styles %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
-    <style>
-    html {
-        height: 100vh;
-        background-color: whitesmoke;
-    }
-
-    body {
-        margin: 4rem;
-        padding-top: 6rem;
-    }
-    </style>
-    {%- endblock styles %}
-  </head>
-  <body>
-    <div class="columns is-centered is-vcentered">
-      <div class="column is-one-third has-text-centered">
-        <figure style="margin: 2rem;" class="image">
-          <img src="{{ url_for('static', filename='logos/meltano-logo.png') }}">
-        </figure>
-
-        <div class="content">
-          <h1>OAuth Service</h1>
-          <p class="is-size-7 has-text-grey">This service should be used by the {{ meltano_link | safe }} application.</p>
-        </div>
-
-        <div class="box">
-          <h2 class="subtitle">Providers</h2>
-
-          {% for provider in providers %}
-          <a class="button is-medium is-fullwidth" href="{{ provider.url }}" target="_blank">
-            <figure class="icon">
-              <img class="icon" src="{{ provider.logo }}" />
-            </figure>
-            <span>{{ provider.label }}</span>
-          </a>
-          {% endfor %}
-        </div>
-
-        <footer>
-          Made with ♥ by {{ meltano_link | safe}}
-        </footer>
-      </div>
-    </div>
-
-  </body>
-</html>
+  {% for provider in providers %}
+  <a class="button is-medium is-fullwidth" href="{{ provider.url }}" target="_blank">
+    <figure class="icon">
+      <img class="icon" src="{{ provider.logo }}" />
+    </figure>
+    <span>{{ provider.label }}</span>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}
