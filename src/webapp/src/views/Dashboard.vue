@@ -121,7 +121,6 @@ export default {
               </button>
             </div>
             <div v-else class="buttons is-pulled-right">
-              <a class="button" :href="dashboardEmail">Share</a>
               <button
                 v-if="!isEditable"
                 class="button"
@@ -129,9 +128,7 @@ export default {
               >
                 Edit
               </button>
-              <router-link class="button" :to="{ name: 'dashboards' }"
-                >Back to Dashboards</router-link
-              >
+              <a class="button" :href="dashboardEmail">Share</a>
             </div>
           </div>
         </div>
