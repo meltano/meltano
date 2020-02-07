@@ -95,7 +95,7 @@ For our recent changes, you can check [our CHANGELOG](https://gitlab.com/meltano
 
 You can track our weekly progress and forward-looking plans in greater detail through [our milestones](https://gitlab.com/groups/meltano/-/milestones).
 
-The release process is covered in more detail in [the Handbook](https://about.gitlab.com/handbook/meltano/engineering/#release-process).
+The release process is covered in more detail in [the Handbook](/handbook/engineering/#release-process).
 
 ### History
 
