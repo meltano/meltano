@@ -1,5 +1,6 @@
 <script>
 import Chart from '@/components/analyze/Chart'
+import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import Logo from '@/components/navigation/Logo'
 import reportsApi from '@/api/reports'
 import RouterViewLayout from '@/views/RouterViewLayout'
@@ -8,6 +9,7 @@ export default {
   name: 'ReportEmbed',
   components: {
     Chart,
+    ConnectorLogo,
     Logo,
     RouterViewLayout
   },
@@ -20,6 +22,13 @@ export default {
       isLoading: true,
       isValid: false,
       report: null
+    }
+  },
+  computed: {
+    extractorName() {
+      return this.report.namespace
+        ? this.report.namespace.replace('model', 'tap')
+        : ''
     }
   },
   created() {
@@ -50,11 +59,17 @@ export default {
 
       <template v-else>
         <template v-if="isValid">
-          <div class="is-grouped is-pulled-left">
-            <h3 class="title is-5 is-inline-block mb-05r">
+          <article class="media is-paddingless is-vcentered">
+            <figure class="media-left">
+              <p class="image level-item is-48x48 container">
+                <ConnectorLogo :connector="extractorName" />
+              </p>
+            </figure>
+            <h3 class="title is-5">
               {{ report.name }}
             </h3>
-          </div>
+          </article>
+
           <Chart
             :chart-type="report.chartType"
             :results="report.queryResults"
