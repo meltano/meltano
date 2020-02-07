@@ -17,6 +17,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 - [#1675](https://gitlab.com/meltano/meltano/issues/1675) Fix future grant diffing for databases and schemas
 
+- [#1674](https://gitlab.com/meltano/meltano/issues/1674) Fix duplicate pipelines bug resulting from recent addition to view and update existing connections
+
 ### Breaks
 
 
