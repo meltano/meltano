@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1514](https://gitlab.com/meltano/meltano/issues/1514) Remove DBT docs integration
+
 ### Fixes
 
 ### Breaks

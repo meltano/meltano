@@ -7,8 +7,6 @@ from typing import Optional
 from .config_service import ConfigService
 from .db import project_engine
 from .plugin import PluginType, PluginRef
-from .plugin_discovery_service import PluginDiscoveryService
-from .plugin.settings_service import PluginSettingsService
 from .plugin_invoker import invoker_factory
 from .venv_service import VenvService
 from .logging import capture_subprocess_output
@@ -21,12 +19,6 @@ class DbtService:
         self.config_service = config_service or ConfigService(project)
         self.project_dir = self.project.root_dir("transform")
         self.profile_dir = self.project_dir.joinpath("profile")
-        self.plugin_settings_service = PluginSettingsService(
-            project, config_service=config_service
-        )
-        self.discovery_service = PluginDiscoveryService(
-            project, config_service=config_service
-        )
 
         self._plugin = None
 
@@ -85,24 +77,6 @@ class DbtService:
             raise Exception(
                 f"dbt {cmd} didn't exit cleanly. Exit code: {handle.returncode}"
             )
-
-    async def docs(self, session, loader: PluginRef, *args, **kwargs):
-        params = self.project_args()
-        loader_install = self.config_service.find_plugin(loader.name)
-        loader_def = self.discovery_service.find_plugin(PluginType.LOADERS, loader.name)
-
-        loader_env = self.plugin_settings_service.as_env(session, loader_install)
-
-        await self.invoke(
-            "docs",
-            *args,
-            *params,
-            env={
-                "DBT_TARGET": os.getenv("DBT_TARGET", loader_def.namespace),
-                "MELTANO_LOAD_SCHEMA": "<meltano>",
-                **loader_env,
-            },
-        )
 
     async def deps(self):
         await self.invoke("deps")

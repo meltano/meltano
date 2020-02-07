@@ -38,8 +38,7 @@ module.exports = {
   configureWebpack: {
     plugins: [
       new webpack.EnvironmentPlugin({
-        MELTANO_APP_URL: 'http://localhost:5000',
-        DBT_DOCS_URL: 'http://localhost:5000/-/dbt/'
+        MELTANO_APP_URL: 'http://localhost:5000'
       })
     ]
   },
