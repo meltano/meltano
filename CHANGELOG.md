@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1674](https://gitlab.com/meltano/meltano/issues/1674) Fix duplicate pipelines bug resulting from recent addition to view and update existing connections
+
 ### Breaks
 
 

@@ -191,10 +191,12 @@ export default {
               : `Connection saved - ${this.extractor.name}`
             Vue.toasted.global.success(message)
 
-            // 4. Finally save pipeline that's relient on valid config settings
-            this.savePipelineSchedule(this.extractor.name)
-              .then(this.runPipeline)
-              .catch(this.$error.handle)
+            // 4. Finally, conditionally save the pipeline that's relient on valid config settings
+            if (!this.getPipelineWithExtractor(this.extractor.name)) {
+              this.savePipelineSchedule(this.extractor.name)
+                .then(this.runPipeline)
+                .catch(this.$error.handle)
+            }
           })
           .catch(error => {
             this.$error.handle(error)
