@@ -28,44 +28,6 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="/tutorials/google-analytics-with-postgres.html">
-          Google Analytics API + Postgres
-        </a>
-      </div>
-      <div>
-        <p>
-          Experience the full extract, load, and transform pipeline with
-          authentication using Meltano CLI followed by analysis using Meltano UI
-          with its automatic SQL generation.
-        </p>
-        <ul>
-          <li>Postgres database</li>
-          <li>Authentication</li>
-          <li>Your private Google Analytics dataset</li>
-        </ul>
-      </div>
-    </div>
-    <div class="tutorial-item">
-      <div class="tutorial-header">
-        <a href="/tutorials/salesforce-and-postgres.html"
-          >Salesforce API + Postgres</a
-        >
-      </div>
-      <div>
-        <p>
-          Experience the full extract, load, and transform pipeline with
-          authentication using Meltano CLI followed by analysis using Meltano UI
-          with its automatic SQL generation.
-        </p>
-        <ul>
-          <li>Postgres database</li>
-          <li>Authentication</li>
-          <li>Your private Salesforce dataset</li>
-        </ul>
-      </div>
-    </div>
-    <div class="tutorial-item">
-      <div class="tutorial-header">
         <a href="/tutorials/create-custom-transforms-and-models.html">
           Create Custom Transformations and Models
         </a>
