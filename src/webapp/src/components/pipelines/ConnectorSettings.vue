@@ -234,32 +234,6 @@ export default {
         this.focusInputIntelligently()
       }
     },
-    snowflakeHelper(newVal) {
-      /**
-       * Improve account UX by auto-detecting Account ID via URL
-       * for configs that have `account`
-       * This is currently Loader-Snowflake specific
-       * and we'll need a more robust solution
-       * when/if we add UX helpers like this for more connectors
-       * TODO: Need to add a loader indicator to show something is "processing"
-       */
-      const accountInput =
-        newVal.profiles[newVal.profileInFocusIndex].config.account
-      if (accountInput) {
-        const parsedAccountId = utils.snowflakeAccountParser(accountInput)
-
-        if (parsedAccountId) {
-          const vm = this
-
-          setTimeout(() => {
-            vm.connectorProfile.account = parsedAccountId
-          }, 1000)
-        } else {
-          this.connectorProfile.account =
-            newVal.profiles[newVal.profileInFocusIndex].config.account
-        }
-      }
-    },
     openOAuthPopup(provider) {
       const oauthUrl = `${this.$flask.oauthServiceUrl}/${provider}`
       const winOpts =
