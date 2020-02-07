@@ -32,6 +32,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1650](https://gitlab.com/meltano/meltano/issues/1650) create TOS page and add TOS link to website footer
 - [#1629](https://gitlab.com/meltano/meltano/issues/1629) Update report "Embed" button to "Share" button and additionally include a share link in addition to the existing embed snippet
+- [#1629](https://gitlab.com/meltano/meltano/issues/1629) Update report "Embed" button to "Share" and include a share link to accompany the existing embed snippet
 
 ### Changes
 
