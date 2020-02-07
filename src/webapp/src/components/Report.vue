@@ -2,11 +2,13 @@
 import { mapGetters } from 'vuex'
 
 import Chart from '@/components/analyze/Chart'
+import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import EmbedShareButton from '@/components/generic/EmbedShareButton'
 
 export default {
   components: {
     Chart,
+    ConnectorLogo,
     EmbedShareButton
   },
   props: {
@@ -77,14 +79,24 @@ export default {
 <template>
   <div class="column is-half" :class="edit ? 'wireframe' : ''">
     <div class="box">
-      <div class="columns is-vcentered">
-        <div class="column">
-          <div class="is-grouped is-pulled-left">
-            <h3 class="title is-5 is-inline-block mb-05r">{{ report.name }}</h3>
-            <div class="has-text-grey is-size-6">
-              Last updated: {{ dataLastUpdatedDate }}
-            </div>
+      <article class="media is-paddingless">
+        <figure class="media-left">
+          <p class="image level-item is-48x48 container">
+            <ConnectorLogo :connector="extractorName" />
+          </p>
+        </figure>
+        <div class="media-content">
+          <div class="content">
+            <p>
+              <strong>{{ report.name }}</strong>
+              <br />
+              <small class="has-text-grey"
+                >Last updated: {{ dataLastUpdatedDate }}</small
+              >
+            </p>
           </div>
+        </div>
+        <div class="media-right">
           <div v-if="edit" class="field is-pulled-right is-inline-block">
             <div>
               <label :for="`report-position-${index}`">Report Position: </label>
@@ -112,12 +124,13 @@ export default {
           <div v-else class="field is-pulled-right is-inline-block">
             <div class="buttons">
               <a class="button is-small" @click="goToReport(report)">Edit</a>
-              <a class="button is-small" @click="goToDesign(report)">Explore</a>
               <EmbedShareButton :report="report" button-classes="is-small" />
             </div>
           </div>
         </div>
-      </div>
+      </article>
+
+      <br />
 
       <Chart
         :class="edit ? 'is-transparent-50' : ''"
