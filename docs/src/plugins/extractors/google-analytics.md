@@ -131,11 +131,7 @@ This property allows you to configure where you want your data set to end in rel
 
 Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data source.
 
-![Screenshot of Meltano UI with all extractors not installed and Google Analytics highlighted](/images/google-analytics-tutorial/01-ga-extractor-selection.png)
-
-Let's install `tap-google-analytics` by clicking on the `Install` button inside its card. When it's finished loading, you should see a configuration modal appear.
-
-![Screenshot of Google Analytics Extractor Configuration](/images/google-analytics-tutorial/02-ga-configuration.png)
+Let's install `tap-google-analytics` by clicking on the `Connect` button inside its card.
 
 For the **Key File Location**, you will need to upload your `client_secrets.json` using the file uploader. If using FTP or the CLI, the path should be:
 
@@ -177,14 +173,6 @@ For the **Start Date**, choose the date when you want to start extracting data f
 For the **End Date**, it is set to yesterday by default if you do not configure a date. However, you can choose to set a specific end date for your data set if you want.
 
 Click `Save` to finish configuring the extractor and progress to the next step: "Configure the Loader".
-
-::: tip
-
-**Ready to do more with data from Google Analytics?**
-
-Check out our [Google Analytics API + Postgres tutorial](/tutorials/google-analytics-with-postgres.html#select-a-data-model) to learn how you can create an analytics database from within Meltano, and start analyzing your Google Analytics data.
-
-:::
 
 ## Advanced: Command Line Installation
 
