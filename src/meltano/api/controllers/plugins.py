@@ -32,9 +32,19 @@ def all():
     ordered_plugins = {}
 
     for type, plugins in groupby(discovery.plugins(), key=lambda p: p.type):
-        ordered_plugins[type] = [plugin.canonical() for plugin in plugins]
+        frozen_plugins = []
+        for plugin in plugins:
+            froze_plugin = plugin.canonical()
+            if "settings" in froze_plugin:
+                for setting in froze_plugin["settings"]:
+                    if "value" in setting:
+                        if isinstance(setting["value"], dict):
+                            setting_name = setting["name"]
+                            setting["value"] = freeze_keys(setting["value"])
+            frozen_plugins.append(froze_plugin)
+        ordered_plugins[type] = frozen_plugins
 
-    return jsonify(freeze_keys(ordered_plugins))
+    return jsonify(ordered_plugins)
 
 
 @pluginsBP.route("/installed", methods=["GET"])
