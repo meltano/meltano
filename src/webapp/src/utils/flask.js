@@ -8,6 +8,7 @@ module.exports = function() {
   return (
     window.FLASK || {
       appUrl: process.env.MELTANO_APP_URL,
+      oauthServiceUrl: process.env.MELTANO_OAUTH_SERVICE_URL || null,
       isSendAnonymousUsageStats: false,
       projectId: 'none',
       version: 'source'

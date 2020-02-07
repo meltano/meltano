@@ -1,0 +1,78 @@
+{% set meltano_link = '<a href="https://meltano.com">Meltano</a>' %}
+
+<html>
+  <head>
+    <title>Meltano — OAuth Service</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    {%- block metas %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {%- endblock metas %}
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+    <style>
+    html {
+        height: 100vh;
+        background-color: whitesmoke;
+    }
+    .main {
+        padding: 3rem 1rem;
+    }
+    .logo {
+        display: inline-block;
+
+        max-width: 65%;
+        margin: 2rem;
+    }
+    footer {
+        position: fixed;
+        bottom: 0;
+
+        background-color: lightgrey;
+
+        width: 100%;
+        padding: 1rem;
+    }
+    </style>
+    {% block styles -%}
+    {%- endblock styles %}
+  </head>
+  <body>
+    {% block body -%}
+    <section class="main">
+      <div class="columns is-centered is-vcentered">
+        <div class="column is-half has-text-centered">
+          <figure class="image logo">
+            <img src="{{ url_for('static', filename='logos/meltano-logo.png') }}">
+          </figure>
+
+          {% block main -%}
+          <div class="content">
+            <h1>OAuth Service</h1>
+            <p class="is-size-7 has-text-grey">This service should be used by the {{ meltano_link | safe }} application.</p>
+          </div>
+
+          <div class="box">
+            <h2 class="subtitle">Providers</h2>
+
+            {% for provider in providers %}
+            <a class="button is-medium is-fullwidth" href="{{ provider.url }}" target="_blank">
+              <figure class="icon">
+                <img class="icon" src="{{ provider.logo }}" />
+              </figure>
+              <span>{{ provider.label }}</span>
+            </a>
+            {% endfor %}
+          </div>
+          {%- endblock main %}
+        </div>
+      </div>
+    </section>
+
+    <footer class="has-text-centered">
+      Made with ♥ by {{ meltano_link | safe}}
+    </footer>
+    {%- endblock body %}
+    {% block scripts -%}
+    {%- endblock scripts %}
+  </body>
+</html>

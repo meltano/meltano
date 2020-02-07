@@ -49,6 +49,10 @@ class PluginSettingsService:
 
         return {k: v for k, v in values.items() if v != REDACTED_VALUE}
 
+    @classmethod
+    def is_kind_redacted(cls, kind) -> bool:
+        return kind in ("password", "oauth")
+
     def profile_with_config(
         self, session, plugin: PluginRef, profile: Profile, redacted=False
     ):
@@ -100,7 +104,7 @@ class PluginSettingsService:
 
             # we don't want to leak secure informations
             # so we redact all `passwords`
-            if redacted and value and setting.kind == "password":
+            if redacted and value and self.is_kind_redacted(setting.kind):
                 value = REDACTED_VALUE
 
             config[setting.name] = {"value": value, "source": source}

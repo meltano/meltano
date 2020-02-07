@@ -44,7 +44,7 @@ Vue.use(Auth, {
 axios.defaults.headers.common['X-JSON-SCHEME'] = 'camel'
 
 // Flask context
-Vue.prototype.$flask = flaskContext()
+Vue.prototype.$flask = Object.freeze(flaskContext())
 
 // Conditional analytics using flask context
 if (Vue.prototype.$flask.isSendAnonymousUsageStats) {
