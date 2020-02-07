@@ -115,14 +115,6 @@ On the configuration modal we want to enter your username and password, the Secu
 
 ![Screenshot of Salesforce Extractor Configuration](/images/salesforce-tutorial/02-salesforce-configuration.png)
 
-::: tip
-
-**Ready to do more with data from Salesforce?**
-
-Check out our [Salesforce API + Postgres tutorial](/tutorials/salesforce-and-postgres.html) to learn how you can create an analytics database from within Meltano, and start analyzing your Salesforce data.
-
-:::
-
 ## Advanced: Command Line Installation
 
 1. Navigate to your Meltano project in the terminal
