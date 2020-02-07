@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1514](https://gitlab.com/meltano/meltano/issues/1514) Remove DBT docs integration
+- [#1682](https://gitlab.com/meltano/meltano/issues/1682) Use human-readable update interval labels
 
 ### Fixes
 - [#1675](https://gitlab.com/meltano/meltano/issues/1675) Fix future grant diffing for databases and schemas

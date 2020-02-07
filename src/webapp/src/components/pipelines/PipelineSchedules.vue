@@ -18,14 +18,14 @@ export default {
   },
   data() {
     return {
-      intervalOptions: [
-        '@once',
-        '@hourly',
-        '@daily',
-        '@weekly',
-        '@monthly',
-        '@yearly'
-      ],
+      intervalOptions: {
+        '@once': 'Once (Manual)',
+        '@hourly': 'Hourly',
+        '@daily': 'Daily',
+        '@weekly': 'Weekly',
+        '@monthly': 'Monthly',
+        '@yearly': 'Yearly'
+      },
       meltanoDataInstance: false
     }
   },
@@ -130,17 +130,6 @@ export default {
             <td>
               <div class="is-flex is-vcentered">
                 <div class="field has-addons">
-                  <div class="control">
-                    <button
-                      class="button tooltip is-tooltip-left"
-                      :class="{ 'is-loading': pipeline.isRunning }"
-                      :disabled="getIsDisabled(pipeline)"
-                      data-tooltip="Manually run this pipeline once"
-                      @click="runELT(pipeline)"
-                    >
-                      Run Now
-                    </button>
-                  </div>
                   <div class="control is-expanded">
                     <span
                       class="select is-fullwidth"
@@ -154,12 +143,25 @@ export default {
                         @input="onChangeInterval($event, pipeline)"
                       >
                         <option
-                          v-for="interval in intervalOptions"
-                          :key="interval"
-                          >{{ interval }}</option
+                          v-for="(label, value) in intervalOptions"
+                          :key="value"
+                          :value="value"
+                          >{{ label }}</option
                         >
                       </select>
                     </span>
+                  </div>
+
+                  <div class="control">
+                    <button
+                      class="button tooltip is-tooltip-right"
+                      :class="{ 'is-loading': pipeline.isRunning }"
+                      :disabled="getIsDisabled(pipeline)"
+                      data-tooltip="Manually run this pipeline once"
+                      @click="runELT(pipeline)"
+                    >
+                      Run Now
+                    </button>
                   </div>
                 </div>
               </div>
