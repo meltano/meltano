@@ -149,9 +149,6 @@ export default {
         return type
       }
     },
-    isOAuthEnabled() {
-      return !!this.$flask['oauthServiceUrl']
-    },
     gitLabSettings() {
       const currentSourceApiLabel = this.source + 's'
       const ignoreList = ['groups', 'projects'].filter(
@@ -185,6 +182,9 @@ export default {
       }
 
       return []
+    },
+    isOAuthEnabled() {
+      return !!this.$flask['oauthServiceUrl']
     },
     isTapGitLab() {
       return this.plugin.name === 'tap-gitlab'
