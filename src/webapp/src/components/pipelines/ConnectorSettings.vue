@@ -48,6 +48,11 @@ export default {
     source: ''
   }),
   computed: {
+    computedSettings() {
+      return this.isTapGitLab
+        ? this.gitLabSettings
+        : this.configSettings.settings
+    },
     connectorProfile() {
       return this.configSettings
         ? this.configSettings.profiles[this.configSettings.profileInFocusIndex]
@@ -146,11 +151,6 @@ export default {
     },
     isOAuthEnabled() {
       return !!this.$flask['oauthServiceUrl']
-    },
-    computedSettings() {
-      return this.isTapGitLab
-        ? this.gitLabSettings
-        : this.configSettings.settings
     },
     gitLabSettings() {
       const currentSourceApiLabel = this.source + 's'
