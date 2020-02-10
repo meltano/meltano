@@ -32,17 +32,17 @@ def all():
     ordered_plugins = {}
 
     for type, plugins in groupby(discovery.plugins(), key=lambda p: p.type):
-        frozen_plugins = []
+        canonical_plugins = []
         for plugin in plugins:
-            froze_plugin = plugin.canonical()
-            if "settings" in froze_plugin:
-                for setting in froze_plugin["settings"]:
-                    if "value" in setting:
-                        if isinstance(setting["value"], dict):
-                            setting_name = setting["name"]
-                            setting["value"] = freeze_keys(setting["value"])
-            frozen_plugins.append(froze_plugin)
-        ordered_plugins[type] = frozen_plugins
+            canonical_plugin = plugin.canonical()
+
+            # let's remove all the settings related data
+            canonical_plugin.pop("settings", None)
+            canonical_plugin.pop("settings_group_validation", None)
+
+            canonical_plugins.append(canonical_plugin)
+
+        ordered_plugins[type] = canonical_plugins
 
     return jsonify(ordered_plugins)
 

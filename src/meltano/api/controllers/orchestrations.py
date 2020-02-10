@@ -219,7 +219,7 @@ def get_plugin_configuration(plugin_ref) -> Response:
     """
 
     project = Project.find()
-    settings = PluginSettingsService(project)
+    settings = PluginSettingsService(project, show_hidden=False)
     plugin = ConfigService(project).get_plugin(plugin_ref)
 
     profiles = settings.profiles_with_config(db.session, plugin, redacted=True)
@@ -229,9 +229,7 @@ def get_plugin_configuration(plugin_ref) -> Response:
     return jsonify(
         {
             "profiles": profiles,
-            "settings": Canonical.as_canonical(
-                settings.get_definition(plugin).settings
-            ),
+            "settings": Canonical.as_canonical(settings.definitions(plugin)),
         }
     )
 
@@ -276,7 +274,7 @@ def save_plugin_configuration(plugin_ref) -> Response:
 
     # TODO iterate pipelines and save each, also set this connector's profile (reuse `pipelineInFocusIndex`?)
 
-    settings = PluginSettingsService(project)
+    settings = PluginSettingsService(project, show_hidden=False)
 
     for profile in payload:
         # select the correct profile
