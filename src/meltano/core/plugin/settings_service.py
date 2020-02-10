@@ -96,9 +96,6 @@ class PluginSettingsService:
 
         # definition settings
         for setting in self.definitions(plugin):
-            if setting.kind == "hidden" and not self.show_hidden:
-                continue
-
             value, source = self.get_value(session, plugin, setting.name)
             if sources and source not in sources:
                 continue
@@ -125,10 +122,6 @@ class PluginSettingsService:
         env = {}
 
         for setting in self.definitions(plugin):
-            if setting.kind == "hidden" and not self.show_hidden:
-                logging.debug(f"Setting {setting.name} is hidden.")
-                continue
-
             value, source = self.get_value(session, plugin, setting.name)
             if sources and source not in sources:
                 logging.debug(f"Setting {setting.name} is not in sources: {sources}.")
@@ -181,12 +174,9 @@ class PluginSettingsService:
     def definitions(self, plugin_ref: PluginRef) -> Iterable[Dict]:
         settings = set()
         plugin_def = self.get_definition(plugin_ref)
+        only_visible = lambda s: s.kind != "hidden" or self.show_hidden
 
-        return list(
-            filter(
-                lambda s: s.kind != "hidden" or self.show_hidden, plugin_def.settings
-            )
-        )
+        return list(filter(only_visible, plugin_def.settings))
 
     def get_install(self, plugin: PluginRef) -> PluginInstall:
         return self.config_service.get_plugin(plugin)
