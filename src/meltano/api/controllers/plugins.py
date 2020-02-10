@@ -1,7 +1,6 @@
 from itertools import groupby
 from flask import request, jsonify, g
 
-from meltano.api.json import freeze_keys
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
