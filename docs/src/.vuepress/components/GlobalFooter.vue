@@ -8,12 +8,14 @@ export default {
   <footer class="footer">
     <slot></slot>
     <a href="https://meltano.com/docs/contributing.html" target="_blank"
-      >Contribute to the project! <OutboundLink
+      >Meltano is open source. Contribute to the project! <OutboundLink
     /></a>
     <a
       href="https://about.gitlab.com/handbook/marketing/corporate-marketing/#gitlab-trademark--logo-guidelines"
-      >Copyright 2020, all rights reserved. Meltano is a trademark of GitLab, Inc.</a
+      >Copyright 2020, all rights reserved. Meltano is a trademark of GitLab,
+      Inc.</a
     >
+    <a href="/terms.html">Terms of Service</a>
   </footer>
 </template>
 
@@ -30,6 +32,6 @@ export default {
 .footer a {
   color: white;
   font-weight: 500;
-  margin: .5rem;
+  margin: 0.5rem;
 }
 </style>
