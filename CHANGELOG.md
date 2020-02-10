@@ -12,7 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1514](https://gitlab.com/meltano/meltano/issues/1514) Remove DBT docs integration
-- [#1679](https://gitlab.com/meltano/meltano/issues/1679) Update `/plugins/all` response to leverage `freeze_keys` on the `values` to bypass conversion (Python's `snake_case` <=> JavaScript's `camelCase`). This work is in preparation for extending complex vs. primitive plugin settings `value`s
+- [#1679](https://gitlab.com/meltano/meltano/issues/1679) Prevent the `hidden` settings from being sent to the front-end, potentially causing configuration failure
 
 ### Fixes
 
