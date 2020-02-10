@@ -84,6 +84,19 @@ export default {
         this.localConfiguration.settings,
         this.extractor.settingsGroupValidation
       )
+    },
+    submittedProfiles() {
+      if (this.extractor.name === 'tap-gitlab') {
+        return this.localConfiguration.profiles.map(profile => {
+          if (profile.config.hasOwnProperty('source')) {
+            delete profile.config.source
+          }
+
+          return profile
+        })
+      } else {
+        return this.localConfiguration.profiles
+      }
     }
   },
   created() {
@@ -183,7 +196,7 @@ export default {
         this.savePluginConfiguration({
           name: this.extractor.name,
           type: 'extractors',
-          profiles: this.localConfiguration.profiles
+          profiles: this.submittedProfiles
         })
           .then(() => {
             const message = this.extractorLacksConfigSettings

@@ -33,8 +33,7 @@ In order to access your GitLab data, you will need:
 
 - GitLab Instance
 - Access Token
-- Groups
-- Projects
+- Group OR Project
 - Start Date
 
 <h3 id="api-url">GitLab Instance</h3>
@@ -74,29 +73,19 @@ The process for getting the access token is very simple:
 
 5. Copy and paste the token into the `Private Token` field. It should look something like this: `I8vxHsiVAaDnAX3hA`
 
-### Groups
+### Group
 
 :::tip Configuration Notes
 
-- Space separated paths of groups to pull data from.
-- Leave empty if you'd like to pull data from projects in a personal user namespace
+- Leave empty if you'd like to pull data from a project in a personal user namespace
 
 :::
 
-This property allows you to scope data that the extractor fetches to only the desired group(s). The group name can generally be found at the root of a repository's URL. If this is left blank, you have to at least provide a project.
+This property allows you to scope data that the extractor fetches to only the desired group. The group name can generally be found at the root of a repository's URL. If this is left blank, you have to at least provide a project.
 
 For example, `https://www.gitlab.com/meltano/tap-gitlab` has a group of `meltano`. This can be confirmed as well by visiting `https://gitlab.com/meltano` and noting the Group ID below the header.
 
 ![Group ID verification example](/screenshots/group-header-example.png)
-
-:::tip Configuration options for Groups and projects
-
-- Either groups or projects need to be provided
-- Filling in 'groups' but leaving 'projects' empty will sync all the projects for the provided group(s).
-- Filling in 'projects' but leaving 'groups' empty will sync the specified projects.
-- Filling in 'groups' and 'projects' will sync only the specified projects in those groups.
-
-:::
 
 ### Projects
 

@@ -44,7 +44,15 @@ export default {
       default: () => null
     }
   },
+  data: () => ({
+    source: ''
+  }),
   computed: {
+    computedSettings() {
+      return this.isTapGitLab
+        ? this.gitLabSettings
+        : this.configSettings.settings
+    },
     connectorProfile() {
       return this.configSettings
         ? this.configSettings.profiles[this.configSettings.profileInFocusIndex]
@@ -141,8 +149,35 @@ export default {
         return type
       }
     },
+    gitLabSettings() {
+      const currentSourceApiLabel = this.source + 's'
+      const ignoreList = ['groups', 'projects'].filter(
+        item => item !== currentSourceApiLabel
+      )
+
+      if (this.isTapGitLab) {
+        // Copy over currentSettings and add in custom select menu
+        const newSettings = this.configSettings.settings.map(setting => setting)
+        newSettings.splice(2, 0, {
+          name: 'source',
+          kind: 'options',
+          options: [
+            { label: 'Choose Group or Project', value: '' },
+            { label: 'Group', value: 'group' },
+            { label: 'Project', value: 'project' }
+          ]
+        })
+
+        return newSettings.filter(setting => !ignoreList.includes(setting.name))
+      }
+
+      return []
+    },
     isOAuthEnabled() {
       return !!this.$flask['oauthServiceUrl']
+    },
+    isTapGitLab() {
+      return this.plugin.name === 'tap-gitlab'
     },
     labelClass() {
       return this.fieldClass || 'is-normal'
@@ -176,6 +211,7 @@ export default {
   },
   mounted() {
     this.focusInputIntelligently()
+    this.isTapGitLab ? this.setGitLabSource() : null
   },
   methods: {
     clearUploadFormData() {
@@ -240,6 +276,19 @@ export default {
         'resizable=no,scrollbars=no,close=yes,height=640,width=480'
 
       window.open(oauthUrl, name, winOpts)
+    },
+    setGitLabSource() {
+      const currentProfile = this.configSettings.profiles[
+        this.configSettings.profileInFocusIndex
+      ]
+      const hasGroupSetting = currentProfile.config.groups
+      const hasProjectSetting = currentProfile.config.projects
+
+      if (hasProjectSetting) {
+        this.source = 'project'
+      } else if (hasGroupSetting) {
+        this.source = 'group'
+      }
     }
   }
 }
@@ -292,7 +341,7 @@ export default {
         </article>
         <form>
           <div
-            v-for="setting in configSettings.settings"
+            v-for="setting in computedSettings"
             :key="setting.name"
             :class="{ 'field is-horizontal': !getIsOfKindHidden(setting.kind) }"
             class=" has-cursor-pointer"
@@ -401,6 +450,28 @@ export default {
                         {{ fileValue(setting) || setting.placeholder }}
                       </span>
                     </label>
+                  </div>
+
+                  <!-- Custom Temporary Dropdown for tap-gitlab -->
+                  <div
+                    v-else-if="getIsOfKindOptions(setting.kind) && isTapGitLab"
+                    class="select is-small is-fullwidth"
+                  >
+                    <select
+                      :id="`${setting.name}-select-menu`"
+                      v-model="source"
+                      :name="`${setting.name}-options`"
+                      :class="successClass(setting)"
+                    >
+                      <option
+                        v-for="(option, index) in setting.options"
+                        :id="getFormFieldForId(setting)"
+                        :key="`${option.label}-${index}`"
+                        :value="option.value"
+                      >
+                        {{ option.label }}
+                      </option>
+                    </select>
                   </div>
 
                   <!-- Dropdown -->

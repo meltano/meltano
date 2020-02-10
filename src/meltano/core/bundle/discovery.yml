@@ -103,10 +103,12 @@ extractors:
         placeholder: Ex. *****************
         env: GITLAB_API_TOKEN
       - name: groups
+        label: Group
         value: ''
         placeholder: Ex. my-organization
         env: GITLAB_API_GROUPS
       - name: projects
+        label: Project
         value: ''
         placeholder: Ex. my-organization/project-1
         env: GITLAB_API_PROJECTS
