@@ -31,7 +31,17 @@ def all():
     ordered_plugins = {}
 
     for type, plugins in groupby(discovery.plugins(), key=lambda p: p.type):
-        ordered_plugins[type] = [plugin.canonical() for plugin in plugins]
+        canonical_plugins = []
+        for plugin in plugins:
+            canonical_plugin = plugin.canonical()
+
+            # let's remove all the settings related data
+            canonical_plugin.pop("settings", None)
+            canonical_plugin.pop("settings_group_validation", None)
+
+            canonical_plugins.append(canonical_plugin)
+
+        ordered_plugins[type] = canonical_plugins
 
     return jsonify(ordered_plugins)
 
