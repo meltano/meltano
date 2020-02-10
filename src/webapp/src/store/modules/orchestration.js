@@ -243,12 +243,12 @@ const actions = {
     })
   },
 
-  savePipelineSchedule({ commit }, extractor) {
+  savePipelineSchedule({ commit }, { hasDefaultTransforms, extractorName }) {
     let pipeline = {
       name: `pipeline-${new Date().getTime()}`,
-      extractor,
+      extractor: extractorName,
       loader: 'target-postgres', // Refactor vs. hard code when we again want to display in the UI
-      transform: 'run', // Refactor vs. hard code when we again want to display in the UI
+      transform: hasDefaultTransforms ? 'run' : 'skip',
       interval: '@once', // Refactor vs. hard code when we again want to display in the UI
       isRunning: false
     }
