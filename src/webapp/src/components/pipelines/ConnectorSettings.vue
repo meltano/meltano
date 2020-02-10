@@ -168,17 +168,7 @@ export default {
           ]
         })
 
-        return newSettings.filter(setting => {
-          let foundIgnoredSetting = false
-
-          ignoreList.forEach(ignoredSetting => {
-            if (ignoredSetting === setting.name) {
-              foundIgnoredSetting = true
-            }
-          })
-
-          return foundIgnoredSetting ? false : setting
-        })
+        return newSettings.filter(setting => !ignoreList.includes(setting.name))
       }
 
       return []
