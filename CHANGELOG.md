@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+- [#1650](https://gitlab.com/meltano/meltano/issues/1650) create TOS page and add TOS link to website footer
 
 ### Changes
 
