@@ -3,24 +3,37 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-## Unreleased
 
+## Unreleased
 ---
 
 ### New
 
 ### Changes
 
-- [#1514](https://gitlab.com/meltano/meltano/issues/1514) Remove DBT docs integration
+### Fixes
+
+### Breaks
+
+
+## 1.20.0 - (2020-02-10)
+
+---
+
+### New
+
 - [#1682](https://gitlab.com/meltano/meltano/issues/1682) Use human-readable update interval labels
+
+### Changes
+
+- [#1514](https://gitlab.com/meltano/meltano/issues/1514) Remove DBT docs integration
 - [#1679](https://gitlab.com/meltano/meltano/issues/1679) Prevent the `hidden` settings from being sent to the front-end, potentially causing configuration failure
 
 ### Fixes
-- [#1675](https://gitlab.com/meltano/meltano/issues/1675) Fix future grant diffing for databases and schemas
 
+- [#1675](https://gitlab.com/meltano/meltano/issues/1675) Fix future grant diffing for databases and schemas
 - [#1674](https://gitlab.com/meltano/meltano/issues/1674) Fix duplicate pipelines bug resulting from recent addition to view and update existing connections
 
-### Breaks
 
 ## 1.19.2 - (2020-02-06)
 
