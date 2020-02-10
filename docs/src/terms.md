@@ -1,10 +1,10 @@
 ## Website Terms of Use
 
-Your use of the meltano.com website is governed by the GitLab Website Terms of Use, the GitLab DMCA Policy, the GitLab Privacy Policy and any other terms, conditions, notices or disclaimers displayed on the Meltano website. 
+Your use of the meltano.com website is governed by the [GitLab Website Terms of Use](https://about.gitlab.com/terms/), the [GitLab DMCA Policy](https://about.gitlab.com/handbook/dmca/), the [GitLab Privacy Policy](https://about.gitlab.com/privacy/) and any other terms, conditions, notices or disclaimers displayed on the Meltano website. 
 
 ### Meltano Subscription Terms
 
-These Meltano Subscription Terms (these “Terms”) are entered into by and between GitLab, Inc. (or one of its affiliates as specified in a GitLab issued order form or quote) (“we” or “us”) and you, and sets forth the terms under which you may access and use our software as a service offering known as Meltano and any successor services or products (the “Meltano Service”). Any other Meltano or GitLab service or software (including any service or software made available under an open source license) is governed by separate terms. 
+These **Meltano Subscription Terms** (these “Terms”) are entered into by and between GitLab, Inc. (or one of its affiliates as specified in a GitLab issued order form or quote) (“we” or “us”) and you, and sets forth the terms under which you may access and use our software as a service offering known as Meltano and any successor services or products (the “Meltano Service”). Any other Meltano or GitLab service or software (including any service or software made available under an open source license) is governed by separate terms. 
 
 BY USING THE MELTANO SERVICE, CLICKING A BOX INDICATING ACCEPTANCE, OR EXECUTING A DOCUMENT THAT REFERENCES THESE TERMS, YOU AGREE TO THESE TERMS. IF YOU DO NOT AGREE TO THESE TERMS, YOU MUST IMMEDIATELY CEASE USING THE MELTANO SERVICE. IF YOU ARE EXECUTING THESE TERMS ON BEHALF OF AN ORGANIZATION, YOU REPRESENT AND WARRANT THAT YOU HAVE AUTHORITY TO DO SO. IN CONSIDERATION OF THE RIGHTS GRANTED TO YOU IN THESE TERMS, YOU MUST COMPLY WITH THESE TERMS.
 
