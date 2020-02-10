@@ -34,12 +34,14 @@ class PluginSettingsService:
         project,
         config_service: ConfigService = None,
         plugin_discovery_service: PluginDiscoveryService = None,
+        show_hidden=True,
     ):
         self.project = project
         self.config_service = config_service or ConfigService(project)
         self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
             project
         )
+        self.show_hidden = show_hidden
 
     @classmethod
     def unredact(cls, values: dict) -> Dict:
@@ -126,6 +128,7 @@ class PluginSettingsService:
         for setting in self.definitions(plugin):
             value, source = self.get_value(session, plugin, setting.name)
             if sources and source not in sources:
+                logging.debug(f"Setting {setting.name} is not in sources: {sources}.")
                 continue
 
             env_key = self.setting_env(setting, plugin_def)
@@ -175,8 +178,9 @@ class PluginSettingsService:
     def definitions(self, plugin_ref: PluginRef) -> Iterable[Dict]:
         settings = set()
         plugin_def = self.get_definition(plugin_ref)
+        only_visible = lambda s: s.kind != "hidden" or self.show_hidden
 
-        return plugin_def.settings
+        return list(filter(only_visible, plugin_def.settings))
 
     def get_install(self, plugin: PluginRef) -> PluginInstall:
         return self.config_service.get_plugin(plugin)

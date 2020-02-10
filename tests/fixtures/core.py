@@ -43,6 +43,7 @@ def discovery():
                 {"name": "start_date"},
                 {"name": "protected", "protected": True},
                 {"name": "secure", "kind": "password"},
+                {"name": "hidden", "kind": "hidden", "value": 42},
             ],
         }
     )
