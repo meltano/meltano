@@ -351,7 +351,7 @@ export default {
         </article>
         <form>
           <div
-            v-for="setting in configSettings.settings"
+            v-for="setting in computedSettings"
             :key="setting.name"
             :class="{ 'field is-horizontal': !getIsOfKindHidden(setting.kind) }"
             class=" has-cursor-pointer"
@@ -462,6 +462,7 @@ export default {
                     </label>
                   </div>
 
+                  <!-- Custom Temporary Dropdown for tap-gitlab -->
                   <div
                     v-else-if="getIsOfKindOptions(setting.kind) && isTapGitLab"
                     class="select is-small is-fullwidth"
