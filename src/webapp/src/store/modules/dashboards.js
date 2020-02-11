@@ -26,7 +26,7 @@ const actions = {
   addReportToDashboard({ commit, dispatch }, data) {
     commit('addReportToDashboard', data)
     return dashboardsApi.addReportToDashboard(data).then(response => {
-      dispatch('updateCurrentDashboard', response.data)
+      dispatch('updateActiveDashboard', response.data)
     })
   },
 
@@ -87,7 +87,7 @@ const actions = {
         dashboard => dashboard.slug === slug
       )
       if (dashboardMatch) {
-        dispatch('updateCurrentDashboard', dashboardMatch)
+        dispatch('updateActiveDashboard', dashboardMatch)
       }
     } else if (getters.activeReportIds) {
       dispatch('getActiveDashboardReportsWithQueryResults')
@@ -98,13 +98,13 @@ const actions = {
     commit('removeReportFromDashboard', data)
 
     return dashboardsApi.removeReportFromDashboard(data).then(response => {
-      return dispatch('updateCurrentDashboard', response.data)
+      return dispatch('updateActiveDashboard', response.data)
     })
   },
 
   reorderDashboardReports({ dispatch }, payload) {
     dashboardsApi.reorderDashboardReports(payload).then(response => {
-      dispatch('updateCurrentDashboard', response.data)
+      dispatch('updateActiveDashboard', response.data)
     })
   },
 
@@ -116,14 +116,14 @@ const actions = {
   saveDashboard({ dispatch, commit }, payload) {
     return dashboardsApi.saveDashboard(payload).then(response => {
       commit('addSavedDashboardToDashboards', response.data)
-      dispatch('updateCurrentDashboard', response.data)
+      dispatch('updateActiveDashboard', response.data)
     })
   },
 
   saveNewDashboardWithReport({ commit, dispatch }, { data, report }) {
     return dashboardsApi.saveDashboard(data).then(response => {
       const dashboard = response.data
-      commit('setCurrentDashboard', dashboard)
+      commit('setActiveDashboard', dashboard)
       commit('addSavedDashboardToDashboards', dashboard)
 
       dispatch('addReportToDashboard', {
@@ -137,8 +137,8 @@ const actions = {
     commit('setActiveDashboardReportsWithQueryResults', reports)
   },
 
-  updateCurrentDashboard({ commit, dispatch }, dashboard) {
-    commit('setCurrentDashboard', dashboard)
+  updateActiveDashboard({ commit, dispatch }, dashboard) {
+    commit('setActiveDashboard', dashboard)
     dispatch('getActiveDashboardReportsWithQueryResults')
   },
 
@@ -180,12 +180,12 @@ const mutations = {
     }
   },
 
-  setActiveDashboardReportsWithQueryResults(state, reports) {
-    state.activeDashboardReportsWithQueryResults = reports
+  setActiveDashboard(state, dashboard) {
+    state.activeDashboard = dashboard
   },
 
-  setCurrentDashboard(state, dashboard) {
-    state.activeDashboard = dashboard
+  setActiveDashboardReportsWithQueryResults(state, reports) {
+    state.activeDashboardReportsWithQueryResults = reports
   },
 
   setDashboard(state, dashboard) {
