@@ -460,7 +460,7 @@ export default {
     <div class="columns">
       <aside class="column is-one-quarter">
         <div class="box">
-          <div class="level">
+          <div class="level is-flex-wrap">
             <div class="level-left">
               <h2 class="title is-5">Query</h2>
             </div>
