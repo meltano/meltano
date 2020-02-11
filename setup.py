@@ -14,6 +14,7 @@ requires = [
     'authlib==0.10',
     'backoff==1.8.0',
     'bcrypt==3.1.6',
+    'cerberus==1.2',
     'click==7.0',
     'click-default-group==1.2.1',
     'colorama==0.3.9',

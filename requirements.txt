@@ -21,6 +21,7 @@ bcrypt==3.1.6
 blinker==1.4
 boto3==1.8.9
 botocore==1.11.9
+Cerberus==1.2
 certifi==2019.11.28
 cffi==1.14.0
 chardet==3.0.4
@@ -55,6 +56,7 @@ iso8601==0.1.12
 isodate==0.6.0
 isort==4.3.21
 itsdangerous==1.1.0
+jedi==0.16.0
 Jinja2==2.11.1
 jmespath==0.9.4
 json-merge-patch==0.2
@@ -70,6 +72,7 @@ msrest==0.6.11
 multidict==4.7.4
 networkx==2.2
 oauthlib==3.1.0
+parso==0.6.1
 passlib==1.7.2
 pathlib2==2.3.5
 pathtools==0.1.2
@@ -105,6 +108,7 @@ simplejson==3.16.0
 six==1.14.0
 snowflake-connector-python==1.6.10
 snowflake-sqlalchemy==1.1.2
+speaklater==1.3
 SQLAlchemy==1.2.12
 sqlparse==0.3.0
 stringcase==1.2.0
