@@ -9,7 +9,8 @@ const defaultState = utils.deepFreeze({
   activeDashboard: {},
   activeDashboardReportsWithQueryResults: [],
   dashboards: [],
-  isInitializing: true
+  isInitializing: true,
+  isLoadingActiveDashboard: true
 })
 
 const getters = {
@@ -50,10 +51,12 @@ const actions = {
   },
 
   getActiveDashboardReportsWithQueryResults({ commit, getters }) {
+    commit('setIsLoadingActiveDashboard', true)
     return dashboardsApi
       .getActiveDashboardReportsWithQueryResults(getters.activeReports)
       .then(response => {
         commit('setActiveDashboardReportsWithQueryResults', response.data)
+        commit('setIsLoadingActiveDashboard', false)
       })
   },
 
@@ -64,7 +67,7 @@ const actions = {
   },
 
   initialize({ commit, dispatch }, slug) {
-    commit('setIsInitialzing', true)
+    commit('setIsInitializing', true)
     const uponLoadReports = dispatch('reports/loadReports', null, {
       root: true
     })
@@ -73,7 +76,7 @@ const actions = {
       if (slug) {
         dispatch('preloadDashboard', slug)
       }
-      commit('setIsInitialzing', false)
+      commit('setIsInitializing', false)
     })
   },
 
@@ -199,8 +202,12 @@ const mutations = {
     Vue.set(dashboard, 'isDeleting', isDeleting)
   },
 
-  setIsInitialzing(state, value) {
+  setIsInitializing(state, value) {
     state.isInitializing = value
+  },
+
+  setIsLoadingActiveDashboard(state, value) {
+    state.isLoadingActiveDashboard = value
   }
 }
 

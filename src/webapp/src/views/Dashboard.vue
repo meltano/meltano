@@ -14,7 +14,6 @@ export default {
   data() {
     return {
       editableDashboardReports: [],
-      isActiveDashboardLoading: false,
       isEditable: false,
       isUpdated: false
     }
@@ -25,6 +24,7 @@ export default {
       'activeDashboardReportsWithQueryResults',
       'dashboards',
       'isInitializing',
+      'isLoadingActiveDashboard',
       'reports'
     ]),
     dashboardEmail() {
@@ -35,20 +35,9 @@ export default {
       return this.isEditable || this.isUpdated
         ? this.editableDashboardReports
         : this.activeDashboardReportsWithQueryResults
-    },
-    isActive() {
-      return dashboard => dashboard.id === this.activeDashboard.id
     }
   },
   watch: {
-    activeDashboard() {
-      this.isActiveDashboardLoading = true
-      this.getActiveDashboardReportsWithQueryResults()
-        .then(() => {
-          this.isActiveDashboardLoading = false
-        })
-        .catch(this.$error.handle)
-    },
     isEditable() {
       if (this.isEditable) {
         this.editableDashboardReports = []
@@ -159,7 +148,7 @@ export default {
         </div>
 
         <progress
-          v-else-if="isInitializing || isActiveDashboardLoading"
+          v-else-if="isInitializing || isLoadingActiveDashboard"
           class="progress is-small is-info"
         ></progress>
 

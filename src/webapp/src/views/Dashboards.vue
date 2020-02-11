@@ -26,11 +26,7 @@ export default {
     this.initialize()
   },
   methods: {
-    ...mapActions('dashboards', [
-      'deleteDashboard',
-      'initialize',
-      'updateCurrentDashboard'
-    ]),
+    ...mapActions('dashboards', ['deleteDashboard', 'initialize']),
     closeCreateDashboardModal() {
       this.isCreateDashboardModalOpen = false
       this.dashboardInFocus = null
@@ -40,9 +36,7 @@ export default {
       this.openCreateDashboardModal()
     },
     goToDashboard(dashboard) {
-      this.updateCurrentDashboard(dashboard).then(() => {
-        this.$router.push({ name: 'dashboard', params: dashboard })
-      })
+      this.$router.push({ name: 'dashboard', params: dashboard })
     },
     openCreateDashboardModal() {
       this.isCreateDashboardModalOpen = open
