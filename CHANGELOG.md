@@ -3,19 +3,22 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
+
 - [#1650](https://gitlab.com/meltano/meltano/issues/1650) create TOS page and add TOS link to website footer
 
 ### Changes
 
 ### Fixes
 
-### Breaks
+- [#1696](https://gitlab.com/meltano/meltano/issues/1696) Fix duplicate chart renders when dashboard is loaded
+- [#1696](https://gitlab.com/meltano/meltano/issues/1696) Fix "Add to Dashboards" button when loading an existing report (additionally updated `disabled` button states)
 
+### Breaks
 
 ## 1.20.0 - (2020-02-10)
 
@@ -34,7 +37,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1675](https://gitlab.com/meltano/meltano/issues/1675) Fix future grant diffing for databases and schemas
 - [#1674](https://gitlab.com/meltano/meltano/issues/1674) Fix duplicate pipelines bug resulting from recent addition to view and update existing connections
-
 
 ## 1.19.2 - (2020-02-06)
 
