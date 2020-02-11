@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1696](https://gitlab.com/meltano/meltano/issues/1696) Update dashboards list to be alphabetically sorted
+
 ### Fixes
 
 - [#1696](https://gitlab.com/meltano/meltano/issues/1696) Fix duplicate chart renders when dashboard is loaded

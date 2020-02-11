@@ -19,6 +19,11 @@ const getters = {
   },
   activeReports: (state, getters, rootState, rootGetters) => {
     return rootGetters['reports/getReportsByIds'](getters.activeReportIds)
+  },
+  getSortedDashboards(state) {
+    return [...state.dashboards].sort((d1, d2) => {
+      return d1.name > d2.name ? 1 : -1
+    })
   }
 }
 
