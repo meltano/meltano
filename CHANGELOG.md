@@ -37,6 +37,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1711](https://gitlab.com/meltano/meltano/issues/1711) Disable fields of all kinds when a plugin setting is protected or set in env or meltano.yml
 - [#1712](https://gitlab.com/meltano/meltano/issues/1712) Fix lock icon tooltip message on plugin settings that were set in env or meltano.yml
 - [#1677](https://gitlab.com/meltano/meltano/issues/1677) Properly represent values of boolean settings that were set using environment verariables in UI
+- [#1680](https://gitlab.com/meltano/meltano/issues/1680) Fix initial "Last Run" button of a pipeline run to properly open the corresponding job log
 
 
 ## 1.20.0 - (2020-02-10)
