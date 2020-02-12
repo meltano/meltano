@@ -37,7 +37,7 @@ export default {
   methods: {
     initialize() {
       embedsApi
-        .loadFromToken(this.token)
+        .load(this.token)
         .then(response => {
           this.report = response.data
           this.isValid = true

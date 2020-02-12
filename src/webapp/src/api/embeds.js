@@ -3,9 +3,9 @@ import utils from '@/utils/utils'
 
 export default {
   generate(payload) {
-    return axios.post(utils.apiUrl('reports', 'embed'), payload)
+    return axios.post(utils.apiUrl('embeds', 'embed'), payload)
   },
-  loadFromToken(token) {
-    return axios.get(utils.apiUrl('reports/embed', token))
+  load(token) {
+    return axios.get(utils.apiUrl('embeds/embed', token))
   }
 }
