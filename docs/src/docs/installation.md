@@ -146,37 +146,7 @@ You should now see a page where Amazon prepares the services we configured. Ther
 The IP address can be mapped to a domain using Route53. We will be writing up a guide on how to do this. You can follow along at [meltano#625](https://gitlab.com/meltano/meltano/issues/625).
 :::
 
-Now that you have successfully installed Meltano [locally](/docs/installation.html) or [in the cloud](/docs/deployment.html), you're ready to start create your first project, connect data sources, build pipelines, perform analysis and create dashboards.
-
-### Configure network access
-
-::: tip
-This section is only necessary if you do not have a Security Group that allows for port 5000,5010 inbound.
-:::
-
-Once you complete the cluster setup, you should be brought to the detail page for the service. You should be default on a tab called _Details_ with a _Network Access_ section.
-
-1. Navigate to the _Details_ tab
-1. Under _Network Access_, click on the link next to _Security Groups_ (e.g., sg-f0dj093dkjf10)
-1. This should open a new tab with your security group
-1. Navigate to the _Inbound Rules_ tab on the bottom of the page
-1. Click `Edit Rules`
-1. Delete any existing rules
-1. Click `Add Rule` with the following properties:
-
-- **Type**: Custom TCP Rule
-- **Protocol**: TCP
-- **Port Range**: 5000
-- **Source**: Custom 0.0.0.0/0
-
-1. Click "Add Rule" with the following properties:
-
-- **Type**: Custom TCP Rule
-- **Protocol**: TCP
-- **Port Range**: 5010
-- **Source**: Custom 0.0.0.0/0
-
-1. Click `Save rules`
+**GO TO THE NEXT STEP >>** [CREATE YOUR FIRST PROJECT](/docs/installation.html#create-your-first-project)
 
 ## Local Installation
 
@@ -444,4 +414,36 @@ meltano upgrade
 
 ## Troubleshooting
 
+::: tip
 Are you having installation or deployment problems? We are here to help you. Check out [Getting Help](/docs/getting-help.html) on the different ways to get in touch with us.
+:::
+
+### Configure network access
+
+::: tip
+This section is only necessary if you do not have a Security Group that allows for port 5000,5010 inbound.
+:::
+
+Once you complete the cluster setup, you should be brought to the detail page for the service. You should be default on a tab called _Details_ with a _Network Access_ section.
+
+1. Navigate to the _Details_ tab
+1. Under _Network Access_, click on the link next to _Security Groups_ (e.g., sg-f0dj093dkjf10)
+1. This should open a new tab with your security group
+1. Navigate to the _Inbound Rules_ tab on the bottom of the page
+1. Click `Edit Rules`
+1. Delete any existing rules
+1. Click `Add Rule` with the following properties:
+
+- **Type**: Custom TCP Rule
+- **Protocol**: TCP
+- **Port Range**: 5000
+- **Source**: Custom 0.0.0.0/0
+
+1. Click "Add Rule" with the following properties:
+
+- **Type**: Custom TCP Rule
+- **Protocol**: TCP
+- **Port Range**: 5010
+- **Source**: Custom 0.0.0.0/0
+
+1. Click `Save rules`
