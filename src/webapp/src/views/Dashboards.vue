@@ -1,6 +1,6 @@
 <script>
 import Vue from 'vue'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 import Dropdown from '@/components/generic/Dropdown'
 import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
@@ -20,17 +20,14 @@ export default {
     }
   },
   computed: {
-    ...mapState('dashboards', ['dashboards', 'isInitializing'])
+    ...mapGetters('dashboards', ['getSortedDashboards']),
+    ...mapState('dashboards', ['isInitializing'])
   },
   created() {
     this.initialize()
   },
   methods: {
-    ...mapActions('dashboards', [
-      'deleteDashboard',
-      'initialize',
-      'updateCurrentDashboard'
-    ]),
+    ...mapActions('dashboards', ['deleteDashboard', 'initialize']),
     closeCreateDashboardModal() {
       this.isCreateDashboardModalOpen = false
       this.dashboardInFocus = null
@@ -40,9 +37,7 @@ export default {
       this.openCreateDashboardModal()
     },
     goToDashboard(dashboard) {
-      this.updateCurrentDashboard(dashboard).then(() => {
-        this.$router.push({ name: 'dashboard', params: dashboard })
-      })
+      this.$router.push({ name: 'dashboard', params: dashboard })
     },
     openCreateDashboardModal() {
       this.isCreateDashboardModalOpen = open
@@ -83,7 +78,7 @@ export default {
           </div>
         </div>
 
-        <div v-if="dashboards.length > 0" class="box">
+        <div v-if="getSortedDashboards.length > 0" class="box">
           <table class="table is-fullwidth is-narrow is-hoverable">
             <thead>
               <tr>
@@ -102,7 +97,7 @@ export default {
               </tr>
             </thead>
             <tbody>
-              <template v-for="dashboard in dashboards">
+              <template v-for="dashboard in getSortedDashboards">
                 <tr
                   :key="dashboard.id"
                   data-test-id="dashboard-link"
