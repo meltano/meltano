@@ -398,6 +398,7 @@ export default {
                     "
                     class="checkbox"
                     :class="successClass(setting)"
+                    :disabled="getIsProtected(setting)"
                     type="checkbox"
                   />
 
@@ -412,6 +413,7 @@ export default {
                     :name="setting.name"
                     :for-id="getFormFieldForId(setting)"
                     :input-classes="`is-small ${successClass(setting)}`"
+                    :disabled="getIsProtected(setting)"
                   />
 
                   <!-- File -->
@@ -426,6 +428,7 @@ export default {
                           class="file-input"
                           type="file"
                           :name="setting.name"
+                          :disabled="getIsProtected(setting)"
                           @change="onFileChange($event, setting)"
                         />
                         <span class="file-cta has-background-white">
@@ -462,6 +465,7 @@ export default {
                       v-model="source"
                       :name="`${setting.name}-options`"
                       :class="successClass(setting)"
+                      :disabled="getIsProtected(setting)"
                     >
                       <option
                         v-for="(option, index) in setting.options"
@@ -488,6 +492,7 @@ export default {
                       "
                       :name="`${setting.name}-options`"
                       :class="successClass(setting)"
+                      :disabled="getIsProtected(setting)"
                     >
                       <option
                         v-for="(option, index) in setting.options"
