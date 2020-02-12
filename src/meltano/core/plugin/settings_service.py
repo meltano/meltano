@@ -5,7 +5,7 @@ from typing import Iterable, Dict, Tuple, List
 from copy import deepcopy
 from enum import Enum
 
-from meltano.core.utils import nest, flatten, find_named, NotFound
+from meltano.core.utils import nest, flatten, find_named, NotFound, truthy
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.error import Error
@@ -193,7 +193,6 @@ class PluginSettingsService:
         process = lambda s: s.replace(".", "__").upper()
         return "_".join(map(process, parts))
 
-    # TODO: ensure `kind` is handled
     def get_value(self, session, plugin: PluginRef, name: str):
         plugin_install = self.get_install(plugin)
         plugin_def = self.get_definition(plugin)
@@ -207,7 +206,12 @@ class PluginSettingsService:
                 logging.debug(
                     f"Found ENV variable {env_key} for {plugin_def.namespace}:{name}"
                 )
-                return (os.environ[env_key], PluginSettingValueSource.ENV)
+
+                value = os.environ[env_key]
+                if setting_def.kind == "boolean":
+                    value = truthy(value)
+
+                return (value, PluginSettingValueSource.ENV)
 
             # priority 2: installed configuration
             if setting_def.name in plugin_install.current_config:
