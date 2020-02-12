@@ -40,8 +40,8 @@ export default {
     },
     getExtractorConfigurationNeedsFixing() {
       return extractorName => {
-        const extractor = this.getHasPipelineWithExtractor(extractorName)
-        return extractor && extractor.hasEverSucceeded
+        const pipeline = this.getPipelineWithExtractor(extractorName)
+        return pipeline && !pipeline.isRunning && !pipeline.hasEverSucceeded
       }
     },
     getIsRelatedPipelineRunning() {
