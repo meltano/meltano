@@ -3,31 +3,6 @@
 version: 10
 
 extractors:
-  - name: tap-carbon-intensity
-    label: Carbon Emissions Intensity
-    description: National Grid ESO's Carbon Emissions Intensity API
-    namespace: tap_carbon
-    hidden: true
-    docs: 'https://meltano.com/plugins/extractors/carbon-intensity.html'
-    pip_url: 'git+https://gitlab.com/meltano/tap-carbon-intensity'
-    capabilities:
-      - discover
-  - name: tap-csv
-    label: CSV
-    description: Generic data extractor of CSV (comma separated value) files
-    namespace: tap_csv
-    hidden: true
-    docs: 'https://meltano.com/plugins/extractors/csv.html'
-    pip_url: 'git+https://gitlab.com/meltano/tap-csv.git'
-    capabilities:
-      - discover
-      - state
-    settings:
-      - name: csv_files_definition
-        env: TAP_CSV_FILES_DEFINITION
-        label: CSV Files Definition
-        placeholder: Ex. files-def.json
-        documentation: https://gitlab.com/meltano/tap-csv#run
   - name: tap-facebook
     label: Facebook Ads
     description: Advertising Platform
@@ -62,24 +37,6 @@ extractors:
         value: 0
         kind: hidden
         description: How many Days before the Start Date to fetch Ads Insights for
-  - name: tap-fastly
-    label: Fastly
-    description: Edge cloud computing services provider
-    namespace: tap_fastly
-    docs: 'https://meltano.com/plugins/extractors/fastly.html'
-    pip_url: 'git+https://gitlab.com/meltano/tap-fastly.git'
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings:
-      - name: api_token
-        label: API Token
-        kind: password
-        placeholder: Ex. *****************
-      - name: start_date
-        label: Start Date
-        kind: date_iso8601
   - name: tap-gitlab
     label: GitLab
     description: Single application for the entire DevOps lifecycle
@@ -153,48 +110,6 @@ extractors:
       - name: end_date
         env: GOOGLE_ANALYTICS_API_END_DATE
         kind: date_iso8601
-  - name: tap-marketo
-    label: Marketo
-    description: Marketing automation for account-based marketing
-    namespace: tap_marketo
-    hidden: true
-    docs: 'https://meltano.com/plugins/extractors/marketo.html'
-    pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
-    capabilities: []
-    settings:
-      - name: identity
-      - name: client_id
-        label: Client ID
-      - name: client_secret
-        kind: password
-      - name: endpoint
-      - name: start_date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-        kind: date_iso8601
-  - name: tap-mongodb
-    label: MongoDB
-    description: General purpose, document-based, distributed database
-    namespace: tap_mongodb
-    hidden: true
-    docs: 'https://meltano.com/plugins/extractors/mongodb.html'
-    pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings:
-      - name: host
-        label: Host URL
-        value: localhost
-        protected: true
-      - name: port
-        value: 27017
-      - name: user
-        env: MONGODB_USERNAME
-      - name: password
-        kind: password
-      - name: dbname
-        label: Database Name
   - name: tap-salesforce
     label: Salesforce
     description: Customer-relationship management & customer success platform
@@ -290,7 +205,122 @@ extractors:
       - name: start_date
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
+
+  # Hidden taps:
+  - name: tap-carbon-intensity
+    label: Carbon Emissions Intensity
+    description: National Grid ESO's Carbon Emissions Intensity API
+    namespace: tap_carbon
+    hidden: true
+    docs: 'https://meltano.com/plugins/extractors/carbon-intensity.html'
+    pip_url: 'git+https://gitlab.com/meltano/tap-carbon-intensity'
+    capabilities:
+      - discover
+  - name: tap-csv
+    label: CSV
+    description: Generic data extractor of CSV (comma separated value) files
+    namespace: tap_csv
+    hidden: true
+    docs: 'https://meltano.com/plugins/extractors/csv.html'
+    pip_url: 'git+https://gitlab.com/meltano/tap-csv.git'
+    capabilities:
+      - discover
+      - state
+    settings:
+      - name: csv_files_definition
+        env: TAP_CSV_FILES_DEFINITION
+        label: CSV Files Definition
+        placeholder: Ex. files-def.json
+        documentation: https://gitlab.com/meltano/tap-csv#run
+  - name: tap-fastly
+    label: Fastly
+    description: Edge cloud computing services provider
+    namespace: tap_fastly
+    hidden: true
+    docs: 'https://meltano.com/plugins/extractors/fastly.html'
+    pip_url: 'git+https://gitlab.com/meltano/tap-fastly.git'
+    capabilities:
+      - catalog
+      - discover
+      - state
+    settings:
+      - name: api_token
+        label: API Token
+        kind: password
+        placeholder: Ex. *****************
+      - name: start_date
+        label: Start Date
+        kind: date_iso8601
+  - name: tap-marketo
+    label: Marketo
+    description: Marketing automation for account-based marketing
+    namespace: tap_marketo
+    hidden: true
+    docs: 'https://meltano.com/plugins/extractors/marketo.html'
+    pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
+    capabilities: []
+    settings:
+      - name: identity
+      - name: client_id
+        label: Client ID
+      - name: client_secret
+        kind: password
+      - name: endpoint
+      - name: start_date
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+        kind: date_iso8601
+  - name: tap-mongodb
+    label: MongoDB
+    description: General purpose, document-based, distributed database
+    namespace: tap_mongodb
+    hidden: true
+    docs: 'https://meltano.com/plugins/extractors/mongodb.html'
+    pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
+    capabilities:
+      - catalog
+      - discover
+      - state
+    settings:
+      - name: host
+        label: Host URL
+        value: localhost
+        protected: true
+      - name: port
+        value: 27017
+      - name: user
+        env: MONGODB_USERNAME
+      - name: password
+        kind: password
+      - name: dbname
+        label: Database Name
 loaders:
+  - name: target-postgres
+    label: PostgreSQL
+    description: PostgreSQL database loader
+    namespace: postgres
+    docs: 'https://meltano.com/plugins/loaders/postgres.html'
+    pip_url: 'git+https://github.com/meltano/target-postgres.git'
+    settings:
+      - name: user
+        env: PG_USERNAME
+        value: warehouse
+      - name: password
+        kind: password
+        env: PG_PASSWORD
+        value: warehouse
+      - name: host
+        env: PG_ADDRESS
+        value: localhost
+        protected: true
+      - name: port
+        env: PG_PORT
+        value: 5502
+      - name: dbname
+        label: Database Name
+        env: PG_DATABASE
+        value: warehouse
+  
+  # Hidden loaders:
   - name: target-csv
     label: CSV
     description: CSV loader
@@ -349,31 +379,6 @@ loaders:
       - name: warehouse
         env: SF_WAREHOUSE
         description: The name of the Snowflake warehouse you want to use
-  - name: target-postgres
-    label: PostgreSQL
-    description: PostgreSQL database loader
-    namespace: postgres
-    docs: 'https://meltano.com/plugins/loaders/postgres.html'
-    pip_url: 'git+https://github.com/meltano/target-postgres.git'
-    settings:
-      - name: user
-        env: PG_USERNAME
-        value: warehouse
-      - name: password
-        kind: password
-        env: PG_PASSWORD
-        value: warehouse
-      - name: host
-        env: PG_ADDRESS
-        value: localhost
-        protected: true
-      - name: port
-        env: PG_PORT
-        value: 5502
-      - name: dbname
-        label: Database Name
-        env: PG_DATABASE
-        value: warehouse
   - name: target-sqlite
     label: SQLite
     description: SQLite database loader
