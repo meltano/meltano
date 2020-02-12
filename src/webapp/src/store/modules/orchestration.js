@@ -237,7 +237,10 @@ const actions = {
 
     return orchestrationsApi.run(pipeline).then(response => {
       dispatch('queuePipelinePoller', response.data)
-      commit('setPipelineJobId', { pipeline, jobId: response.data.jobId })
+      const pipelineWithJobId = Object.assign(pipeline, {
+        jobId: response.data.jobId
+      })
+      commit('setPipeline', pipelineWithJobId)
     })
   },
 
@@ -349,10 +352,6 @@ const mutations = {
     Vue.set(pipeline, 'isSaving', isSaving || false)
     Vue.set(pipeline, 'startedAt', utils.dateIso8601(startedAt))
     Vue.set(pipeline, 'endedAt', utils.dateIso8601(endedAt))
-  },
-
-  setPipelineJobId(_, { pipeline, jobId }) {
-    Vue.set(pipeline, 'jobId', jobId)
   },
 
   setPipelines(state, pipelines) {
