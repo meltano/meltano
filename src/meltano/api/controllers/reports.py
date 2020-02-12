@@ -60,7 +60,6 @@ def _handle(ex):
 def index():
     reports = reports_service().get_reports()
     reports = ReportFilter().filter_all("view:reports", reports)
-
     return jsonify(reports)
 
 

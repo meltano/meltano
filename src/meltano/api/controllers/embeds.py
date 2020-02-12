@@ -44,16 +44,16 @@ def get_embed(token):
 @embedsBP.route("/embed", methods=["POST"])
 def embed():
     post_data = request.get_json()
-    response_data = generate_embed_snippet(db.session, post_data["id"], post_data["type"])
+    response_data = generate_embed_snippet(
+        db.session, post_data["id"], post_data["type"]
+    )
 
     return jsonify(response_data)
 
 
 def generate_embed_snippet(session, resource_id, resource_type):
     try:
-        embed_token = (
-            session.query(EmbedToken).filter_by(resource_id=resource_id).one()
-        )
+        embed_token = session.query(EmbedToken).filter_by(resource_id=resource_id).one()
         is_new = False
     except sqlalchemy.orm.exc.NoResultFound:
         embed_token = EmbedToken(resource_id=resource_id, resource_type=resource_type)
@@ -70,6 +70,7 @@ def generate_embed_snippet(session, resource_id, resource_type):
         "resource_type": embed_token.resource_type,
         "snippet": f"<iframe src='{embed_url}' style='{inline_styles}' />",
     }
+
 
 def get_embed_from_token(session, token):
     try:
