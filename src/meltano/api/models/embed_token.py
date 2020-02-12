@@ -7,6 +7,7 @@ from . import db
 
 TOKEN_BITS_SIZE = 32
 
+
 class ResourceType(str, Enum):
     REPORT = "report"
     DASHBOARD = "dashboard"

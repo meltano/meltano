@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '23ea52e6d784'
-down_revision = 'ceb00d7ff3bd'
+revision = "23ea52e6d784"
+down_revision = "ceb00d7ff3bd"
 branch_labels = None
 depends_on = None
 
@@ -23,7 +23,7 @@ def upgrade():
 
     metadata = sa.MetaData(bind=op.get_bind())
     Embed_Tokens = sa.Table("embed_tokens", metadata, autoload=True)
-    op.execute(Embed_Tokens.update().values({'resource_type': "report"}))
+    op.execute(Embed_Tokens.update().values({"resource_type": "report"}))
 
 
 def downgrade():
