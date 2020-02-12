@@ -22,13 +22,8 @@ def upgrade():
     op.add_column("embed_tokens", sa.Column("resource_type", sa.String()))
 
     metadata = sa.MetaData(bind=op.get_bind())
-    session = Session(bind=op.get_bind())
     Embed_Tokens = sa.Table("embed_tokens", metadata, autoload=True)
-
-    for embed_token in session.query(Embed_Tokens):
-        embed_token.resource_type = "report"
-
-    session.commit()
+    op.execute(Embed_Tokens.update().values({'resource_type': "report"}))
 
 
 def downgrade():
