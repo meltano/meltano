@@ -2,7 +2,7 @@
 import Vue from 'vue'
 
 import Dropdown from '@/components/generic/Dropdown'
-import reportsApi from '@/api/reports'
+import embedsApi from '@/api/embeds'
 import utils from '@/utils/utils'
 
 export default {
@@ -12,7 +12,12 @@ export default {
   },
   props: {
     buttonClasses: { type: String, default: '' },
-    report: { type: Object, required: true }
+    resource: { type: Object, required: true },
+    resourceType: {
+      type: String,
+      required: true,
+      validator: value => ['dashboard', 'report'].includes(value)
+    }
   },
   data: () => ({
     isAwaitingEmbed: false
@@ -25,20 +30,20 @@ export default {
         ? Vue.toasted.global.success('Copied to clipboard')
         : Vue.toasted.global.error('Failed copy, try manual selection')
     },
-    getReportEmbed(report) {
+    getResourceEmbed(resource) {
       this.isAwaitingEmbed = true
-      reportsApi
-        .generateEmbedURL(report.id)
+      embedsApi
+        .generate({ id: resource.id, type: this.resourceType })
         .then(response => {
-          this.$refs[`link-${report.id}`].value = response.data.url
-          this.$refs[`embed-${report.id}`].value = response.data.snippet
+          this.$refs[`link-${resource.id}`].value = response.data.url
+          this.$refs[`embed-${resource.id}`].value = response.data.snippet
           if (response.data.isNew) {
-            Vue.toasted.global.success(`${report.name} embed code created`)
+            Vue.toasted.global.success(`${resource.name} embed code created`)
           }
         })
         .catch(error => {
           Vue.toasted.global.error(
-            `${report.name} embed error. [Error code: ${error.response.data.code}]`
+            `${resource.name} embed error. [Error code: ${error.response.data.code}]`
           )
         })
         .finally(() => (this.isAwaitingEmbed = false))
@@ -58,7 +63,7 @@ export default {
     menu-classes="dropdown-menu-300"
     :disabled="isAwaitingEmbed"
     is-right-aligned
-    @dropdown:open="getReportEmbed(report)"
+    @dropdown:open="getResourceEmbed(resource)"
   >
     <div class="dropdown-content is-size-7">
       <div class="dropdown-item">
@@ -66,7 +71,7 @@ export default {
         <div class="field has-addons">
           <p class="control is-expanded">
             <input
-              :ref="`link-${report.id}`"
+              :ref="`link-${resource.id}`"
               class="input is-small is-family-code has-background-white-ter	has-text-grey-dark	"
               type="text"
               placeholder="Generating link..."
@@ -77,7 +82,7 @@ export default {
             <button
               class="button is-small"
               :disabled="isAwaitingEmbed"
-              @click="copyToClipboard(`link-${report.id}`)"
+              @click="copyToClipboard(`link-${resource.id}`)"
             >
               Copy
             </button>
@@ -90,7 +95,7 @@ export default {
           <div class="field has-addons">
             <p class="control is-expanded">
               <input
-                :ref="`embed-${report.id}`"
+                :ref="`embed-${resource.id}`"
                 class="input is-small is-family-code has-background-white-ter	has-text-grey-dark	"
                 type="text"
                 placeholder="Generating snippet..."
@@ -101,7 +106,7 @@ export default {
               <button
                 class="button is-small"
                 :disabled="isAwaitingEmbed"
-                @click="copyToClipboard(`embed-${report.id}`)"
+                @click="copyToClipboard(`embed-${resource.id}`)"
               >
                 Copy
               </button>
@@ -113,7 +118,7 @@ export default {
         <p class="is-italic is-size-7">
           The above link and embed are
           <strong>publicly accessible</strong> and
-          <strong>read-only</strong> versions of this report.
+          <strong>read-only</strong> versions of this resource.
         </p>
       </div>
     </div>

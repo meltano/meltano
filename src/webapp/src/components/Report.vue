@@ -124,7 +124,11 @@ export default {
           <div v-else class="field is-pulled-right is-inline-block">
             <div class="buttons">
               <a class="button is-small" @click="goToReport(report)">Edit</a>
-              <EmbedShareButton :report="report" button-classes="is-small" />
+              <EmbedShareButton
+                :resource="report"
+                resource-type="report"
+                button-classes="is-small"
+              />
             </div>
           </div>
         </div>

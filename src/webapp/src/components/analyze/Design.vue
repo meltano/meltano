@@ -977,7 +977,10 @@ export default {
                   </button>
                 </div>
                 <div v-if="hasActiveReport" class="control">
-                  <EmbedShareButton :report="activeReport" />
+                  <EmbedShareButton
+                    :resource="activeReport"
+                    resource-type="report"
+                  />
                 </div>
               </div>
             </div>

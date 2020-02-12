@@ -1,8 +1,8 @@
 <script>
 import Chart from '@/components/analyze/Chart'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
+import embedsApi from '@/api/embeds'
 import Logo from '@/components/navigation/Logo'
-import reportsApi from '@/api/reports'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
@@ -36,8 +36,8 @@ export default {
   },
   methods: {
     initialize() {
-      reportsApi
-        .loadFromEmbedToken(this.token)
+      embedsApi
+        .loadFromToken(this.token)
         .then(response => {
           this.report = response.data
           this.isValid = true
