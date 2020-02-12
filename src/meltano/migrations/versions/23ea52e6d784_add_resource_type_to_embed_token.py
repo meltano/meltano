@@ -8,8 +8,6 @@ Create Date: 2020-02-12 09:29:31.592426
 from alembic import op
 import sqlalchemy as sa
 
-from meltano.api.models.embed_token import ResourceType
-
 
 # revision identifiers, used by Alembic.
 revision = '23ea52e6d784'
@@ -28,7 +26,7 @@ def upgrade():
     Embed_Tokens = sa.Table("embed_tokens", metadata, autoload=True)
 
     for embed_token in session.query(Embed_Tokens):
-        embed_token.resource_type = ResourceType.REPORT
+        embed_token.resource_type = "report"
 
     session.commit()
 
