@@ -15,7 +15,7 @@ def facebook(app):
 
     oauthBP = Blueprint("OAuth.Facebook", __name__, url_prefix="/facebook")
 
-    @oauthBP.route("/")
+    @oauthBP.route("/", strict_slashes=False)
     def login():
         redirect_uri = url_for(".authorize", _external=True)
 
