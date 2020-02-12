@@ -26,6 +26,7 @@ export default {
   },
   computed: {
     ...mapGetters('plugins', [
+      'getHasDefaultTransforms',
       'getInstalledPlugin',
       'getIsPluginInstalled',
       'getIsInstallingPlugin'
@@ -206,7 +207,13 @@ export default {
 
             // 4. Finally, run after conditionally saving the pipeline that's relient on valid config settings
             if (!this.getPipelineWithExtractor(this.extractor.name)) {
-              this.savePipelineSchedule(this.extractor.name)
+              const hasDefaultTransforms = this.getHasDefaultTransforms(
+                this.extractor.namespace
+              )
+              this.savePipelineSchedule({
+                hasDefaultTransforms,
+                extractorName: this.extractor.name
+              })
                 .then(this.runPipeline)
                 .catch(this.$error.handle)
             } else {
