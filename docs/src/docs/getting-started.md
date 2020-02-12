@@ -5,10 +5,14 @@ description: Create your first data analysis project, build a pipeline, and anal
 
 # Getting Started
 
-Now that you have successfully installed Meltano [locally](/docs/installation.html) or [in the cloud](/docs/deployment.html), you're ready to start create your first project, connect data sources, build pipelines, perform analysis and create dashboards.
+## Create your Meltano account
+
+To create your Meltano account [fill out the signup form](https://meltano.typeform.com/to/NJPwxv) and we will email you login information.
+
+<a href="https://meltano.typeform.com/to/NJPwxv" class="button is-purple is-filled">Get started with your free hosted Meltano dashboard</a>
 
 ::: tip
-The following instructions assume you are able to access Meltano's user interface locally from `http://localhost:5000` or at `http://YOUR_CLOUD_IP_ADDRESS:5000`.
+We recommend using Meltano is available as hosted software (SaaS), but if you prefer to host Meltano yourself please see our [open source installation instructions]((/docs/installation.html#local-installation)).
 :::
 
 ## Create your first project

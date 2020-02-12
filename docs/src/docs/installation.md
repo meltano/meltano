@@ -3,35 +3,22 @@ metaTitle: How to Install Meltano
 description: Meltano is easy to install on your local machine or in the cloud, including on AWS, Digital Ocean, and other cloud services.
 ---
 
-# Installation
+# Self-Hosted Installation
 
-This section provides guides for getting setup with Meltano.
-
-## Free Hosted Meltano Dashboards
-
-In November, we released Meltano as a free hosted product! This eliminates the hosting and installation hassle with a concierge-style setup so you can start building dashboards faster.
-
-Fill out [this form](https://meltano.typeform.com/to/NJPwxv) to get started with a free hosted Meltano account. We will contact you to schedule a setup time and learn everything we can about your needs.
-
-<a href="https://meltano.typeform.com/to/NJPwxv" class="button is-purple is-filled">Get started with your free hosted Meltano dashboard</a>
-
-## Self Hosted Solutions
-
-For instructions on how to setup your own Meltano instance, check out:
+This section provides guides for getting set up with a self-hosted instance of Meltano's open source data analytics software on your local computer or using popular hosting solutions:
 
 - [DigitalOcean One-Click Installer](/docs/deployment.html#digitalocean-marketplace)
 - [Amazon Web Services (AWS)](/docs/deployment.html#amazon-web-services-aws)
 - [Local Installation](/docs/installation.html#local-installation)
 
+
+::: tip
+Are you trying Meltano for the first time? You can skip this installation process (for now) and we will set you up with a free 30-day trial of Meltano as a hosted service. [Sign up here.](https://meltano.typeform.com/to/NJPwxv)
+:::
+
 ## DigitalOcean Marketplace
 
 DigitalOcean provides a simple container for spinning up a server where Meltano can be deployed to the Cloud. [Install the Meltano 1-Click App in the DigitalOcean Marketplace](https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322)
-
-:::tip Get $100 of DigitalOcean Credit for Free!
-When you create a new DigitalOcean account using [this link](https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322) (which contains our referral code) you will receive $100 of free credit over 60 days.
-:::
-
-### Video Walkthrough
 
 <br />
 <div class="embed-responsive embed-responsive-16by9">
@@ -39,6 +26,10 @@ When you create a new DigitalOcean account using [this link](https://marketplace
 </div>
 
 ### Step-by-Step Instructions
+
+:::tip Get $100 of DigitalOcean Credit for Free!
+When you create a new DigitalOcean account using [this link](https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322) (which contains our referral code) you will receive $100 of free credit over 60 days.
+:::
 
 1. Go to <a :href="$site.themeConfig.data.digitalOceanUrl">Meltano in the DigitalOcean Marketplace</a>
 
@@ -154,6 +145,8 @@ You should now see a page where Amazon prepares the services we configured. Ther
 ::: tip
 The IP address can be mapped to a domain using Route53. We will be writing up a guide on how to do this. You can follow along at [meltano#625](https://gitlab.com/meltano/meltano/issues/625).
 :::
+
+Now that you have successfully installed Meltano [locally](/docs/installation.html) or [in the cloud](/docs/deployment.html), you're ready to start create your first project, connect data sources, build pipelines, perform analysis and create dashboards.
 
 ### Configure network access
 

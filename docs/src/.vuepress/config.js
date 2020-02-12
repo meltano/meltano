@@ -1,7 +1,7 @@
 docsSidebar = [
   '/docs/',
-  '/docs/installation',
   '/docs/getting-started',
+  '/docs/installation',
   '/tutorials/',
   '/plugins/',
   '/docs/command-line-interface',
