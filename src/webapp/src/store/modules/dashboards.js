@@ -59,8 +59,8 @@ const actions = {
       .getActiveDashboardReportsWithQueryResults(getters.activeReports)
       .then(response => {
         commit('setActiveDashboardReportsWithQueryResults', response.data)
-        commit('setIsLoadingActiveDashboard', false)
       })
+      .finally(() => commit('setIsLoadingActiveDashboard', false))
   },
 
   getDashboards({ commit }) {
@@ -75,12 +75,13 @@ const actions = {
       root: true
     })
     const uponGetDashboards = dispatch('getDashboards')
-    return Promise.all([uponLoadReports, uponGetDashboards]).then(() => {
-      if (slug) {
-        dispatch('preloadDashboard', slug)
-      }
-      commit('setIsInitializing', false)
-    })
+    return Promise.all([uponLoadReports, uponGetDashboards])
+      .then(() => {
+        if (slug) {
+          dispatch('preloadDashboard', slug)
+        }
+      })
+      .finally(() => commit('setIsInitializing', false))
   },
 
   preloadDashboard({ dispatch, state, getters }, slug) {
