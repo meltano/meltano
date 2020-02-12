@@ -8,13 +8,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
 - [#1650](https://gitlab.com/meltano/meltano/issues/1650) create TOS page and add TOS link to website footer
 
 ### Changes
 
 - [#1681](https://gitlab.com/meltano/meltano/issues/1681) Update `transform` during pipeline save to conditionally set `skip` vs. `run` to prevent wasted cycles for extractors that lack transformations
+- [#1696](https://gitlab.com/meltano/meltano/issues/1696) Update dashboards list to be alphabetically sorted
 
 ### Fixes
+
+- [#1696](https://gitlab.com/meltano/meltano/issues/1696) Fix duplicate chart renders when dashboard is loaded
+- [#1696](https://gitlab.com/meltano/meltano/issues/1696) Fix "Add to Dashboards" button when loading an existing report (additionally updated `disabled` button states)
 
 ### Breaks
 

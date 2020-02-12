@@ -176,7 +176,11 @@ export default {
         this.isInitialized = true
       })
 
+      // additional requests to faciliate core click-to-code experience
       this.$store.dispatch('designs/getFilterOptions')
+      if (slug) {
+        this.getDashboards()
+      }
     },
 
     jumpToFilters() {
@@ -325,7 +329,11 @@ export default {
             data-test-id="dropdown-add-to-dashboard"
             @click="getDashboards"
           >
-            <Dropdown label="Add to Dashboard" is-right-aligned>
+            <Dropdown
+              label="Add to Dashboard"
+              :disabled="!hasChartableResults"
+              is-right-aligned
+            >
               <div class="dropdown-content">
                 <a
                   data-test-id="button-new-dashboard"
@@ -383,6 +391,7 @@ export default {
               <button
                 v-if="hasActiveReport"
                 class="button"
+                :disabled="!hasChartableResults"
                 @click="updateReport()"
               >
                 <span>Save Report</span>

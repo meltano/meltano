@@ -81,9 +81,7 @@ const getters = {
   },
 
   getSortedPipelines(state) {
-    return [...state.pipelines].sort((p1, p2) => {
-      return p1.extractor > p2.extractor ? 1 : -1
-    })
+    return lodash.orderBy(state.pipelines, 'extractor')
   },
 
   getSuccessfulPipelines(state) {

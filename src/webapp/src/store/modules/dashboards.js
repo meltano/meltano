@@ -9,7 +9,8 @@ const defaultState = utils.deepFreeze({
   activeDashboard: {},
   activeDashboardReportsWithQueryResults: [],
   dashboards: [],
-  isInitializing: true
+  isInitializing: true,
+  isLoadingActiveDashboard: true
 })
 
 const getters = {
@@ -18,6 +19,9 @@ const getters = {
   },
   activeReports: (state, getters, rootState, rootGetters) => {
     return rootGetters['reports/getReportsByIds'](getters.activeReportIds)
+  },
+  getSortedDashboards(state) {
+    return lodash.orderBy(state.dashboards, 'name')
   }
 }
 
@@ -25,7 +29,7 @@ const actions = {
   addReportToDashboard({ commit, dispatch }, data) {
     commit('addReportToDashboard', data)
     return dashboardsApi.addReportToDashboard(data).then(response => {
-      dispatch('updateCurrentDashboard', response.data)
+      dispatch('updateActiveDashboard', response.data)
     })
   },
 
@@ -50,11 +54,13 @@ const actions = {
   },
 
   getActiveDashboardReportsWithQueryResults({ commit, getters }) {
+    commit('setIsLoadingActiveDashboard', true)
     return dashboardsApi
       .getActiveDashboardReportsWithQueryResults(getters.activeReports)
       .then(response => {
         commit('setActiveDashboardReportsWithQueryResults', response.data)
       })
+      .finally(() => commit('setIsLoadingActiveDashboard', false))
   },
 
   getDashboards({ commit }) {
@@ -64,17 +70,18 @@ const actions = {
   },
 
   initialize({ commit, dispatch }, slug) {
-    commit('setIsInitialzing', true)
+    commit('setIsInitializing', true)
     const uponLoadReports = dispatch('reports/loadReports', null, {
       root: true
     })
     const uponGetDashboards = dispatch('getDashboards')
-    return Promise.all([uponLoadReports, uponGetDashboards]).then(() => {
-      if (slug) {
-        dispatch('preloadDashboard', slug)
-      }
-      commit('setIsInitialzing', false)
-    })
+    return Promise.all([uponLoadReports, uponGetDashboards])
+      .then(() => {
+        if (slug) {
+          dispatch('preloadDashboard', slug)
+        }
+      })
+      .finally(() => commit('setIsInitializing', false))
   },
 
   preloadDashboard({ dispatch, state, getters }, slug) {
@@ -84,7 +91,7 @@ const actions = {
         dashboard => dashboard.slug === slug
       )
       if (dashboardMatch) {
-        dispatch('updateCurrentDashboard', dashboardMatch)
+        dispatch('updateActiveDashboard', dashboardMatch)
       }
     } else if (getters.activeReportIds) {
       dispatch('getActiveDashboardReportsWithQueryResults')
@@ -95,13 +102,13 @@ const actions = {
     commit('removeReportFromDashboard', data)
 
     return dashboardsApi.removeReportFromDashboard(data).then(response => {
-      return dispatch('updateCurrentDashboard', response.data)
+      return dispatch('updateActiveDashboard', response.data)
     })
   },
 
   reorderDashboardReports({ dispatch }, payload) {
     dashboardsApi.reorderDashboardReports(payload).then(response => {
-      dispatch('updateCurrentDashboard', response.data)
+      dispatch('updateActiveDashboard', response.data)
     })
   },
 
@@ -113,14 +120,14 @@ const actions = {
   saveDashboard({ dispatch, commit }, payload) {
     return dashboardsApi.saveDashboard(payload).then(response => {
       commit('addSavedDashboardToDashboards', response.data)
-      dispatch('updateCurrentDashboard', response.data)
+      dispatch('updateActiveDashboard', response.data)
     })
   },
 
   saveNewDashboardWithReport({ commit, dispatch }, { data, report }) {
     return dashboardsApi.saveDashboard(data).then(response => {
       const dashboard = response.data
-      commit('setCurrentDashboard', dashboard)
+      commit('setActiveDashboard', dashboard)
       commit('addSavedDashboardToDashboards', dashboard)
 
       dispatch('addReportToDashboard', {
@@ -134,8 +141,8 @@ const actions = {
     commit('setActiveDashboardReportsWithQueryResults', reports)
   },
 
-  updateCurrentDashboard({ commit, dispatch }, dashboard) {
-    commit('setCurrentDashboard', dashboard)
+  updateActiveDashboard({ commit, dispatch }, dashboard) {
+    commit('setActiveDashboard', dashboard)
     dispatch('getActiveDashboardReportsWithQueryResults')
   },
 
@@ -177,12 +184,12 @@ const mutations = {
     }
   },
 
-  setActiveDashboardReportsWithQueryResults(state, reports) {
-    state.activeDashboardReportsWithQueryResults = reports
+  setActiveDashboard(state, dashboard) {
+    state.activeDashboard = dashboard
   },
 
-  setCurrentDashboard(state, dashboard) {
-    state.activeDashboard = dashboard
+  setActiveDashboardReportsWithQueryResults(state, reports) {
+    state.activeDashboardReportsWithQueryResults = reports
   },
 
   setDashboard(state, dashboard) {
@@ -199,8 +206,12 @@ const mutations = {
     Vue.set(dashboard, 'isDeleting', isDeleting)
   },
 
-  setIsInitialzing(state, value) {
+  setIsInitializing(state, value) {
     state.isInitializing = value
+  },
+
+  setIsLoadingActiveDashboard(state, value) {
+    state.isLoadingActiveDashboard = value
   }
 }
 
