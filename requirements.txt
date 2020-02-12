@@ -13,7 +13,6 @@ azure-common==1.1.24
 azure-core==1.2.2
 azure-nspkg==2.0.0
 azure-storage==0.36.0
-azure-storage-blob==12.1.0
 Babel==2.8.0
 backcall==0.1.0
 backoff==1.8.0
