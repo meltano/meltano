@@ -31,14 +31,14 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#1650](https://gitlab.com/meltano/meltano/issues/1650) create TOS page and add TOS link to website footer
-- [#1629](https://gitlab.com/meltano/meltano/issues/1629) Update report "Embed" button to "Share" button and additionally include a share link in addition to the existing embed snippet
-- [#1629](https://gitlab.com/meltano/meltano/issues/1629) Update report "Embed" button to "Share" and include a share link to accompany the existing embed snippet
+- [#1629](https://gitlab.com/meltano/meltano/issues/1629) Add "Share Dashboard" functionality
 
 ### Changes
 
 - [#1681](https://gitlab.com/meltano/meltano/issues/1681) Update `transform` during pipeline save to conditionally set `skip` vs. `run` to prevent wasted cycles for extractors that lack transformations
 - [#1696](https://gitlab.com/meltano/meltano/issues/1696) Update dashboards list to be alphabetically sorted
 - [#1710](https://gitlab.com/meltano/meltano/issues/1710) Hide `tap-fastly` in UI
+- [#1629](https://gitlab.com/meltano/meltano/issues/1629) Update report "Embed" button to "Share" and include a share link to accompany the embed snippet
 
 ### Fixes
 
