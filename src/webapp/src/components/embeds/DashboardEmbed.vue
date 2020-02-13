@@ -7,7 +7,8 @@ export default {
     ReportEmbed
   },
   props: {
-    dashboard: { type: Object, default: null }
+    dashboard: { type: Object, default: null },
+    reportsWithQueryResults: { type: Array, default: null }
   }
 }
 </script>
@@ -16,19 +17,16 @@ export default {
   <div>
     <div class="columns is-vcentered">
       <div class="column">
-        <h2 class="title">{{ dashboard.dashboard.name }}</h2>
-        <h3 v-if="dashboard.dashboard.description" class="subtitle">
+        <h2 class="title">{{ dashboard.name }}</h2>
+        <h3 v-if="dashboard.description" class="subtitle">
           {{ activeDashboard.description }}
         </h3>
       </div>
     </div>
 
-    <div
-      v-if="dashboard.reportsWithQueryResults.length"
-      class="columns is-multiline"
-    >
+    <div v-if="reportsWithQueryResults.length" class="columns is-multiline">
       <div
-        v-for="report in dashboard.reportsWithQueryResults"
+        v-for="report in reportsWithQueryResults"
         :key="report.id"
         class="column is-half"
       >

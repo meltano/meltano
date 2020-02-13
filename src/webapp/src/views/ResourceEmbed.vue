@@ -55,7 +55,10 @@ export default {
     </div>
 
     <template v-else-if="type === 'dashboard'">
-      <DashboardEmbed :dashboard="resource" />
+      <DashboardEmbed
+        :dashboard="resource.dashboard"
+        :reports-with-query-results="resource.reportsWithQueryResults"
+      />
     </template>
 
     <div v-else class="box is-marginless">
