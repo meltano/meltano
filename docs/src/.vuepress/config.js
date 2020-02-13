@@ -1,17 +1,11 @@
 docsSidebar = [
   '/docs/',
-  '/docs/installation',
   '/docs/getting-started',
   '/tutorials/',
   '/plugins/',
-  '/docs/command-line-interface',
-  '/docs/environment-variables',
-  '/docs/security-and-privacy',
-  '/docs/architecture',
-  '/docs/contributing',
+  '/docs/developer-tools',
   '/docs/getting-help',
   '/docs/responsible-disclosure',
-  '/docs/roadmap',
   '/handbook/'
 ]
 
@@ -69,7 +63,7 @@ module.exports = {
     nav: [
       {
         text: 'How It Works',
-        link: '/docs/getting-started.html#connect-a-data-source'
+        link: '/docs/getting-started.html'
       },
       { text: 'Blog', link: 'https://www.meltano.com/blog', disableIcon: true },
       {

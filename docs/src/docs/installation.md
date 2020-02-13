@@ -3,35 +3,22 @@ metaTitle: How to Install Meltano
 description: Meltano is easy to install on your local machine or in the cloud, including on AWS, Digital Ocean, and other cloud services.
 ---
 
-# Installation
+# Self-Hosted Installation
 
-This section provides guides for getting setup with Meltano.
-
-## Free Hosted Meltano Dashboards
-
-In November, we released Meltano as a free hosted product! This eliminates the hosting and installation hassle with a concierge-style setup so you can start building dashboards faster.
-
-Fill out [this form](https://meltano.typeform.com/to/NJPwxv) to get started with a free hosted Meltano account. We will contact you to schedule a setup time and learn everything we can about your needs.
-
-<a href="https://meltano.typeform.com/to/NJPwxv" class="button is-purple is-filled">Get started with your free hosted Meltano dashboard</a>
-
-## Self Hosted Solutions
-
-For instructions on how to setup your own Meltano instance, check out:
+This section provides guides for getting set up with a self-hosted instance of Meltano's open source data analytics software on your local computer or using popular hosting solutions:
 
 - [DigitalOcean One-Click Installer](/docs/deployment.html#digitalocean-marketplace)
 - [Amazon Web Services (AWS)](/docs/deployment.html#amazon-web-services-aws)
 - [Local Installation](/docs/installation.html#local-installation)
 
+
+::: tip
+Are you trying Meltano for the first time? You can skip this installation process (for now) and we will set you up with a free 30-day trial of Meltano as a hosted service. [Sign up here.](https://meltano.typeform.com/to/NJPwxv)
+:::
+
 ## DigitalOcean Marketplace
 
 DigitalOcean provides a simple container for spinning up a server where Meltano can be deployed to the Cloud. [Install the Meltano 1-Click App in the DigitalOcean Marketplace](https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322)
-
-:::tip Get $100 of DigitalOcean Credit for Free!
-When you create a new DigitalOcean account using [this link](https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322) (which contains our referral code) you will receive $100 of free credit over 60 days.
-:::
-
-### Video Walkthrough
 
 <br />
 <div class="embed-responsive embed-responsive-16by9">
@@ -39,6 +26,10 @@ When you create a new DigitalOcean account using [this link](https://marketplace
 </div>
 
 ### Step-by-Step Instructions
+
+:::tip Get $100 of DigitalOcean Credit for Free!
+When you create a new DigitalOcean account using [this link](https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322) (which contains our referral code) you will receive $100 of free credit over 60 days.
+:::
 
 1. Go to <a :href="$site.themeConfig.data.digitalOceanUrl">Meltano in the DigitalOcean Marketplace</a>
 
@@ -155,35 +146,7 @@ You should now see a page where Amazon prepares the services we configured. Ther
 The IP address can be mapped to a domain using Route53. We will be writing up a guide on how to do this. You can follow along at [meltano#625](https://gitlab.com/meltano/meltano/issues/625).
 :::
 
-### Configure network access
-
-::: tip
-This section is only necessary if you do not have a Security Group that allows for port 5000,5010 inbound.
-:::
-
-Once you complete the cluster setup, you should be brought to the detail page for the service. You should be default on a tab called _Details_ with a _Network Access_ section.
-
-1. Navigate to the _Details_ tab
-1. Under _Network Access_, click on the link next to _Security Groups_ (e.g., sg-f0dj093dkjf10)
-1. This should open a new tab with your security group
-1. Navigate to the _Inbound Rules_ tab on the bottom of the page
-1. Click `Edit Rules`
-1. Delete any existing rules
-1. Click `Add Rule` with the following properties:
-
-- **Type**: Custom TCP Rule
-- **Protocol**: TCP
-- **Port Range**: 5000
-- **Source**: Custom 0.0.0.0/0
-
-1. Click "Add Rule" with the following properties:
-
-- **Type**: Custom TCP Rule
-- **Protocol**: TCP
-- **Port Range**: 5010
-- **Source**: Custom 0.0.0.0/0
-
-1. Click `Save rules`
+**GO TO THE NEXT STEP >>** [CREATE YOUR FIRST PROJECT](/docs/installation.html#create-your-first-project)
 
 ## Local Installation
 
@@ -327,7 +290,7 @@ which is automatically added to the project's `.gitignore` file to prevent this 
 
 At this time, the GUI for configuring the loader from your project has been temporarily disabled. As a result, you will need to supply your database configuration through a `.env` file.
 
-Once you create the file, you will need to paste in the configuration for your database. For example, PostgreSQL configurations can [be found here](/loaders/postgres.html#intermediate-connecting-meltano-to-an-existing-postgresql-database).
+Once you create the file, you will need to paste in the configuration for your database. For example, PostgreSQL configurations can [be found here](/plugins/loaders/postgres.html#beginner-using-a-postgresql-database-for-the-first-time).
 
 After saving your configurations, you can load your configurations by running:
 
@@ -451,4 +414,36 @@ meltano upgrade
 
 ## Troubleshooting
 
+::: tip
 Are you having installation or deployment problems? We are here to help you. Check out [Getting Help](/docs/getting-help.html) on the different ways to get in touch with us.
+:::
+
+### Configure network access
+
+::: tip
+This section is only necessary if you do not have a Security Group that allows for port 5000,5010 inbound.
+:::
+
+Once you complete the cluster setup, you should be brought to the detail page for the service. You should be default on a tab called _Details_ with a _Network Access_ section.
+
+1. Navigate to the _Details_ tab
+1. Under _Network Access_, click on the link next to _Security Groups_ (e.g., sg-f0dj093dkjf10)
+1. This should open a new tab with your security group
+1. Navigate to the _Inbound Rules_ tab on the bottom of the page
+1. Click `Edit Rules`
+1. Delete any existing rules
+1. Click `Add Rule` with the following properties:
+
+- **Type**: Custom TCP Rule
+- **Protocol**: TCP
+- **Port Range**: 5000
+- **Source**: Custom 0.0.0.0/0
+
+1. Click "Add Rule" with the following properties:
+
+- **Type**: Custom TCP Rule
+- **Protocol**: TCP
+- **Port Range**: 5010
+- **Source**: Custom 0.0.0.0/0
+
+1. Click `Save rules`
