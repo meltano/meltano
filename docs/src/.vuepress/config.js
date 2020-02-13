@@ -63,7 +63,7 @@ module.exports = {
     nav: [
       {
         text: 'How It Works',
-        link: '/docs/getting-started.html#connect-a-data-source'
+        link: '/docs/getting-started.html'
       },
       { text: 'Blog', link: 'https://www.meltano.com/blog', disableIcon: true },
       {
