@@ -5,7 +5,6 @@ docsSidebar = [
   '/plugins/',
   '/docs/architecture',
   '/docs/developer-tools',
-  '/docs/contributing',
   '/docs/getting-help',
   '/docs/responsible-disclosure',
   '/handbook/'
