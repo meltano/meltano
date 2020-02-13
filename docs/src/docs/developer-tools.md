@@ -236,30 +236,6 @@ If you are a Meltano end-user who is not going to be contributing code to our op
 
 Follow the steps in our [Getting Started Guide](/docs/getting-started.html) to get started.
 
-#### For Contributors: Example Command Line Syntax for Docker
-
-Here are some example of CLI commands you may need to run if you are working with Meltano as an open source contributor:
-
-##### Running the ELT from the Command Line
-
-To run the ELT and extract some data from the **tap-carbon-intensity** into **target-sqlite**:
-
-```
-docker run -v $(pwd):/project \
-             -w /project \
-             meltano/meltano elt tap-carbon-intensity target-sqlite
-```
-
-##### Adding a Model from the Command Line
-
-Now that we have data in your database, let's add the corresponding model bundle as the basis of our analysis.
-
-```
-docker run -v $(pwd):/project \
-             -w /project \
-             meltano/meltano add model model-carbon-intensity
-```
-
 ### Troubleshooting Installation
 
 ::: tip
