@@ -15,21 +15,7 @@ To create your Meltano account [fill out the signup form](https://meltano.typefo
 We recommend using Meltano is available as hosted software (SaaS), but if you prefer to host Meltano yourself please see our [open source installation instructions]((/docs/installation.html#local-installation)).
 :::
 
-## Create your first project
 
-To initialize a new project, open your terminal and navigate to the directory that you'd like to store your Meltano projects in.
-
-Next, to create your project, you will use the `meltano init` command which takes a `PROJECT_NAME` that is of your own choosing. For this guide, let's create a project called "carbon."
-
-::: info
-Meltano shares anonymous usage data with the team through Google Analytics. This is used to help us learn about how Meltano is being used to ensure that we are making Meltano even more useful to our users.
-
-If you would prefer to use Meltano without sending the team this data, learn how to configure this through our [environment variables docs](/docs/environment-variables.html#anonymous-usage-data).
-:::
-
-```bash
-meltano init my-meltano-project
-```
 
 This will create a new directory named `my-meltano-project` in the current directory and initialize Meltano's basic directory structure inside it.
 

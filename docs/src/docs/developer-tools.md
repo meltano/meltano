@@ -16,7 +16,7 @@ This section provides guides for getting set up with a self-hosted instance of M
 
 - [Local Installation](/docs/developer-tools.html#local-installation)
 - [Docker](/docs/developer-tools.html#installing-on-docker)
-- Amazon Web Services (AWS)
+- [Amazon Web Services (AWS)](/docs/developer-tools.html#amazon-web-services-aws)
 
 ::: tip
 Are you trying Meltano for the first time? You can skip the installation process and we'll set you up with a free 30-day trial of Meltano as a hosted service. If you decide you want to switch to self-hosted later we can clone your instance so you can take it with you. [Sign up here.](https://meltano.typeform.com/to/NJPwxv)
@@ -238,6 +238,92 @@ If you are a Meltano end-user who is not going to be contributing code to our op
 
 Follow the steps in our [Getting Started Guide](/docs/getting-started.html) to get started.
 
+## Amazon Web Services (AWS)
+
+::: warning Prerequisites
+This guide assumes that you have a functioning Docker image where your Meltano project is already bundled with the Meltano installation. To track this issue, follow [meltano#624](https://gitlab.com/meltano/meltano/issues/624).
+:::
+
+In this section, we will be going over how you can deploy a Meltano Docker image to AWS.
+
+### Setting Up Elastic Container Service (ECS)
+
+1. Login to [AWS Console](https://console.aws.amazon.com)
+1. Search for [ECS](https://console.aws.amazon.com/ecs) and click on the link
+
+![](/screenshots/aws-ecs.png)
+
+![](/screenshots/aws-ecs-getting-started.png)
+
+1. We will create a new _Container definition_ by clicking on the `Configure` button in the **custom** card
+1. Fill out the form with the following data:
+
+- **Container name**: Meltano
+- **Image**: YOUR_DOCKER_IMAGE_URL
+  - Examples:
+    - docker.io/namespace/image-name:tag
+    - registry.gitlab.com/namespace/project/image-name:tag
+- **Memory Limits (MiB)**: Soft limit 1024
+- **Port mappings**:
+  - 5000/tcp (meltano)
+
+1. Click `Update` button to finish setting up your container defintion
+1. Click `Edit` next to the _Task defintion_ heading
+1. Update the form with the following:
+
+- **Task definition name**: meltano-run
+- **Network mode**: awsvpc
+- **Task execution role**: ecsTaskExecutionRole
+- **Compatibilities**: FARGATE
+- **Task memory**: 1GB (1024)
+- **Task CPU**: 0.25 vCPU (256)
+
+1. Click `Next` to move to the next step
+
+### Review service properties
+
+![](/screenshots/aws-ecs-review-service.png)
+
+1. Verify that the properties are as follows:
+
+- **Service name**: meltano-service
+- **Number of desired tasks**: 1
+- **Security group**: Automatically create new
+- **Load balancer type**: None
+
+1. Click `Next` to move on to the next step
+
+### Configure Your Cluster
+
+The main configuration here is the **Cluster name**. We provide a suggestion below, but feel free to name it as you wish.
+
+- **Cluster name**: meltano-cluster
+- **VPC ID**: Automatically create new
+- **Subnets**: Automatically create new
+
+### Review Cluster Configuration
+
+After you click `Next`, you will have the opportunity to review all of the properties that you set. Once you confirm that the settings are correct, click `Create` to setup your ECS.
+
+You should now see a page where Amazon prepares the services we configured. There will be spinning icons on the right of each service that will live update as it finished. Once you see everything has setup properly, you're cluster has been successfully deployed!
+
+### Final steps
+
+![](/screenshots/aws-ecs-final-steps.png)
+
+1. Open the page with your cluster
+1. Click on the _Tasks_ tab
+1. You should see a task that has a status of `RUNNING` for _Last Status_
+1. Click on the _Task ID_ link (e.g., 0b35dea-3ca..)
+1. Under _Network_, you can find the URL for your instance under _Public IP_ (e.g., 18.18.134.18)
+1. Open a new tab in your browser and visit this new URL on port 5000 (e.g., http://18.18.134.18:5000)
+
+::: tip
+The IP address can be mapped to a domain using Route53. We will be writing up a guide on how to do this. You can follow along at [meltano#625](https://gitlab.com/meltano/meltano/issues/625).
+:::
+
+**GO TO THE NEXT STEP >>** [CREATE YOUR FIRST PROJECT](/docs/installation.html#create-your-first-project)
+
 ### Troubleshooting Installation
 
 ::: tip
@@ -301,6 +387,29 @@ meltano upgrade
 ## Command Line Interface
 
 Meltano provides a command line interface (CLI) that allows you to manage the configuration and orchestration of Meltano instances. It provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run, and debug every step of the data life cycle.
+
+- [Getting Started Guide for the Command Line](/docs/developer-tools.html#gettting-started-with-meltano-on-the-command-line)
+- [Glossary of Command Line Concepts]()
+
+### Getting Started with Meltano on the Command Line
+
+Once you have successfully installed Meltano from the command line, you will need to create a project before you launch the Meltano UI.
+
+## Create your first project
+
+To initialize a new project, open your terminal and navigate to the directory that you'd like to store your Meltano projects in.
+
+Use the `meltano init` command, which takes a `PROJECT_NAME` that is of your own choosing. For this guide, let's create a project called "myprojectname".
+
+```bash
+meltano init myprojectname
+```
+
+
+
+
+
+### Glossary of Command Line Concepts
 
 ### `add`
 
