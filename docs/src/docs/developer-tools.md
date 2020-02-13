@@ -138,34 +138,13 @@ meltano --version
 
 That's it! Meltano is now be available for you to use.
 
-Now that you have successfully installed Meltano and its requirements, you can create your first project.
-
-#### Create your first project
-
-To initialize a new project, open your terminal and navigate to the directory that you'd like to store your Meltano projects in.
-
-Next, to create your project, you will use the `meltano init` command which takes a `PROJECT_NAME` that is of your own choosing. For this guide, let's create a project called "carbon."
-
-::: info
-Meltano shares anonymous usage data with the team through Google Analytics. This is used to help us learn about how Meltano is being used to ensure that we are making Meltano even more useful to our users.
-
-If you would prefer to use Meltano without sending the team this data, learn how to configure this through our [environment variables docs](/docs/developer-tools.html#environment-variables).
-:::
-
-```bash
-meltano init yourprojectname
-```
-
-This will create a new directory named `yourprojectname` and initialize Meltano's basic directory structure inside it.
-
-Inside the Meltano project directory, all plugin configuration (which may include tokens and passwords) is stored inside the `.meltano` directory,
-which is automatically added to the project's `.gitignore` file to prevent this potentially sensitive information from accidentally being pushed up to a hosted Git repository.
+Now that you have successfully installed Meltano and its requirements, you can [create your first project](http://localhost:8080/docs/developer-tools.html#create-your-first-project).
 
 ### Setup your loader
 
 At this time, the GUI for configuring the loader from your project has been temporarily disabled. As a result, you will need to supply your database configuration through a `.env` file.
 
-Once you create the file, you will need to paste in the configuration for your database. For example, PostgreSQL configurations can [be found here](/loaders/postgres.html#intermediate-connecting-meltano-to-an-existing-postgresql-database).
+Once you create the file, you will need to paste in the configuration for your database. For example, PostgreSQL configurations can [be found here](/plugins/loaders/postgres.html#intermediate-connecting-meltano-to-an-existing-postgresql-database).
 
 After saving your configurations, you can load your configurations by running:
 
@@ -321,9 +300,11 @@ You should now see a page where Amazon prepares the services we configured. Ther
 The IP address can be mapped to a domain using Route53. We will be writing up a guide on how to do this. You can follow along at [meltano#625](https://gitlab.com/meltano/meltano/issues/625).
 :::
 
-**GO TO THE NEXT STEP >>** [CREATE YOUR FIRST PROJECT](/docs/installation.html#create-your-first-project)
+#### Next Steps
 
-### Troubleshooting Installation
+Once you have successfully installed Meltano from the command line, you will need to [create your first project from the command line](/docs/developer-tools.html#create-your-first-project-2).
+
+## Troubleshooting Installation
 
 ::: tip
 Are you having installation or deployment problems? We are here to help you. Check out [Getting Help](/docs/getting-help.html) on the different ways to get in touch with us.
