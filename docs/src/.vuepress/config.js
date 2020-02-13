@@ -3,9 +3,9 @@ docsSidebar = [
   '/docs/getting-started',
   '/tutorials/',
   '/plugins/',
-  '/docs/developer-tools',
   '/docs/getting-help',
   '/docs/responsible-disclosure',
+  '/developer-tools/',
   '/handbook/'
 ]
 
@@ -65,6 +65,10 @@ module.exports = {
         text: 'How It Works',
         link: '/docs/getting-started.html'
       },
+      {
+        text: 'Developer Tools',
+        link: '/developer-tools/'
+      },
       { text: 'Blog', link: 'https://www.meltano.com/blog', disableIcon: true },
       {
         text: 'Newsletter',
@@ -85,6 +89,16 @@ module.exports = {
         '/handbook/engineering/',
         '/handbook/marketing/',
         '/handbook/product/'
+      ],
+      '/developer-tools': [
+        '/developer-tools/',
+        '/developer-tools/self-hosted-installation.html',
+        '/developer-tools/command-line-interface.html',
+        '/developer-tools/environment-variables.html',
+        '/developer-tools/reporting-database-options.html',
+        '/developer-tools/role-based-access-control.html',
+        '/developer-tools/contributor-guide.html',
+        '/developer-tools/architecture.html'
       ]
     },
     logo: '/meltano-logo.svg',
