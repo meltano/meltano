@@ -6,7 +6,7 @@ description: Create your first data analysis project, build a pipeline, and anal
 # Getting Started
 
 ::: tip
-We recommend using Meltano as hosted software (SaaS), but if you prefer to host Meltano yourself please see our [open source installation instructions]((/docs/installation.html#local-installation)).
+We recommend using Meltano as hosted software (SaaS), but if you prefer to host Meltano yourself please see our [open source installation instructions](/docs/developer-tools.html#self-hosted-installation).
 :::
 
 ## Create Your Account
@@ -17,19 +17,21 @@ To create your Meltano account [fill out the signup form](https://meltano.typefo
 
 ## Connect Data Sources
 
-You should see now see the Extractors page, which contains various options for connecting your data source.
+Once you've logged into Meltano, you'll begin on the **Data** page to connect your [data sources](/plugins/).
 
 ![Meltano UI with all extractors not installed initial loading screen](/images/getting-started-guide/gsg-01.png)
 
-Go ahead and select the data source you're interested in connecting to Meltano. If you need assistance configuring your data source, you should see documentation to help you with this.
+Choose a data source to connect, and fill in the form with your authentication details.
 
 ![Example of Stripe docs appearing next to configuration form](/images/getting-started-guide/gsg-02.png)
 
-Some of our popular taps include:
+Some of our popular data source connectors include:
 
 - [Google Analytics](/plugins/extractors/google-analytics.html#google-analytics)
 - [Stripe](/plugins/extractors/stripe.html#stripe)
 - [Salesforce](/plugins/extractors/salesforce.html#salesforce)
+
+See a [full list of data sources here](/plugins/).
 
 ## Choose Data Update Schedule
 
