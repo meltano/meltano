@@ -19,7 +19,7 @@ export default {
       <div class="column">
         <h2 class="title">{{ dashboard.name }}</h2>
         <h3 v-if="dashboard.description" class="subtitle">
-          {{ activeDashboard.description }}
+          {{ dashboard.description }}
         </h3>
       </div>
     </div>
