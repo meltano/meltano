@@ -6,7 +6,7 @@ description: Create your first data analysis project, build a pipeline, and anal
 # Getting Started
 
 ::: tip
-We recommend using Meltano as hosted software (SaaS), but if you prefer to host Meltano yourself please see our [open source installation instructions](/docs/developer-tools.html#self-hosted-installation).
+We recommend using Meltano as hosted software (SaaS), but if you prefer to host Meltano yourself please see our [open source installation instructions](/developer-tools/self-hosted-installation.html).
 :::
 
 ## Create Your Account

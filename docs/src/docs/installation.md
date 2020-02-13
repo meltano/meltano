@@ -9,7 +9,7 @@ This section provides guides for getting set up with a self-hosted instance of M
 
 - [DigitalOcean One-Click Installer](/docs/deployment.html#digitalocean-marketplace)
 - [Amazon Web Services (AWS)](/docs/deployment.html#amazon-web-services-aws)
-- [Local Installation](/docs/installation.html#local-installation)
+- [Local Installation](/developer-tools/self-hosted-installation.html#local-installation)
 
 
 ::: tip
@@ -146,11 +146,11 @@ You should now see a page where Amazon prepares the services we configured. Ther
 The IP address can be mapped to a domain using Route53. We will be writing up a guide on how to do this. You can follow along at [meltano#625](https://gitlab.com/meltano/meltano/issues/625).
 :::
 
-**GO TO THE NEXT STEP >>** [CREATE YOUR FIRST PROJECT](/docs/installation.html#create-your-first-project)
+**GO TO THE NEXT STEP >>** [CREATE YOUR FIRST PROJECT](/developer-tools/self-hosted-installation.html#create-your-first-project)
 
 ## Local Installation
 
-In this section, we will install Meltano as an application you can access locally from your browser and on the command line. If you prefer to install to Docker, please view the installation instructions [here](/docs/installation.html#installing-on-docker).
+In this section, we will install Meltano as an application you can access locally from your browser and on the command line. If you prefer to install to Docker, please view the installation instructions [here](/developer-tools/self-hosted-installation.html#installing-on-docker).
 
 ::: tip
 We do not have a double click installer at this time, but [it is on our roadmap](https://gitlab.com/meltano/meltano/issues/1107) and we will be sure to update this page when we do!
@@ -263,7 +263,7 @@ meltano --version
 
 That's it! Meltano is now be available for you to use.
 
-Now that you have successfully [installed Meltano](/docs/installation.html) and its requirements, you can create your first project.
+Now that you have successfully [installed Meltano](/developer-tools/self-hosted-installation.html) and its requirements, you can create your first project.
 
 ### Create your first project
 
@@ -315,7 +315,7 @@ You are now ready to add data sources, configure reporting databases, schedule u
 
 #### Installing on Docker
 
-[Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](/docs/installation.html#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
+[Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](/developer-tools/self-hosted-installation.html#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
 
 ##### Using Pre-built Docker Images
 
