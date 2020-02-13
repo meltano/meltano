@@ -1,16 +1,16 @@
 <script>
-import Chart from '@/components/analyze/Chart'
-import ConnectorLogo from '@/components/generic/ConnectorLogo'
+import DashboardEmbed from '@/components/embeds/DashboardEmbed'
 import embedsApi from '@/api/embeds'
 import Logo from '@/components/navigation/Logo'
+import ReportEmbed from '@/components/embeds/ReportEmbed'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
   name: 'ResourceEmbed',
   components: {
-    Chart,
-    ConnectorLogo,
+    DashboardEmbed,
     Logo,
+    ReportEmbed,
     RouterViewLayout
   },
   props: {
@@ -20,15 +20,8 @@ export default {
     return {
       error: null,
       isLoading: true,
-      isValid: false,
-      report: null
-    }
-  },
-  computed: {
-    extractorName() {
-      return this.report.namespace
-        ? this.report.namespace.replace('model', 'tap')
-        : ''
+      resource: null,
+      type: null
     }
   },
   created() {
@@ -39,12 +32,11 @@ export default {
       embedsApi
         .load(this.token)
         .then(response => {
-          this.report = response.data.resource
-          this.isValid = true
+          this.resource = response.data.resource
+          this.type = response.data.type
         })
         .catch(error => {
           this.error = error.response.data.code
-          this.isValid = false
         })
         .finally(() => (this.isLoading = false))
     }
@@ -54,32 +46,22 @@ export default {
 
 <template>
   <router-view-layout>
-    <div class="box is-marginless">
-      <progress v-if="isLoading" class="progress is-small is-info"></progress>
+    <div v-if="isLoading" class="box is-marginless">
+      <progress class="progress is-small is-info"></progress>
+    </div>
 
-      <template v-else>
-        <template v-if="isValid">
-          <article class="media is-paddingless is-vcentered">
-            <figure class="media-left">
-              <p class="image level-item is-48x48 container">
-                <ConnectorLogo :connector="extractorName" />
-              </p>
-            </figure>
-            <h3 class="title is-5">
-              {{ report.name }}
-            </h3>
-          </article>
+    <div v-else-if="type === 'report'" class="box is-marginless">
+      <ReportEmbed :report="resource" />
+    </div>
 
-          <Chart
-            :chart-type="report.chartType"
-            :results="report.queryResults"
-            :result-aggregates="report.queryResultAggregates"
-          />
-        </template>
-        <div v-else class="content has-text-centered">
-          <p class="is-italic">{{ error }}</p>
-        </div>
-      </template>
+    <template v-else-if="type === 'dashboard'">
+      <DashboardEmbed :dashboard="resource" />
+    </template>
+
+    <div v-else class="box is-marginless">
+      <div class="content has-text-centered">
+        <p class="is-italic">{{ error }}</p>
+      </div>
     </div>
 
     <div class="is-pulled-right mt-05r scale-08">

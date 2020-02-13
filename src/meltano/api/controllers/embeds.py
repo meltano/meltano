@@ -6,6 +6,7 @@ from .reports_helper import ReportsHelper
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.models.embed_token import EmbedToken, ResourceType
 from meltano.api.models import db
+from meltano.core.m5o.dashboards_service import DashboardsService
 from meltano.core.m5o.reports_service import ReportsService
 from meltano.core.project import Project
 
@@ -38,14 +39,29 @@ def get_embed(token):
     project = Project.find()
     embed_token = get_embed_from_token(db.session, token)
     resource_type = embed_token.resource_type
+    resource_id = embed_token.resource_id
+
+    reports_service = ReportsService(project)
 
     if resource_type == ResourceType.REPORT.value:
-        reports_service = ReportsService(project)
-        report = reports_service.get_report(embed_token.resource_id)
+        report = reports_service.get_report(resource_id)
         reports_helper = ReportsHelper()
         resource_payload = reports_helper.get_report_with_query_results(report)
     elif resource_type == ResourceType.DASHBOARD.value:
-        resource_payload = "testing..."
+        dashboards_service = DashboardsService(project)
+        dashboard = dashboards_service.get_dashboard(resource_id)
+        reports = [
+            reports_service.get_report(report_id)
+            for report_id in dashboard["report_ids"]
+        ]
+        dashboards_helper = DashboardsHelper()
+        reports_with_query_results = dashboards_helper.get_dashboard_reports_with_query_results(
+            reports
+        )
+        resource_payload = {
+            "dashboard": dashboard,
+            "reports_with_query_results": reports_with_query_results,
+        }
 
     return jsonify({"resource": resource_payload, "type": embed_token.resource_type})
 
