@@ -69,13 +69,21 @@ def generate_embed_snippet(session, resource_id, resource_type):
     finally:
         session.commit()
 
+    if resource_type == ResourceType.REPORT.value:
+        min_width = "500px"
+        min_height = "400px"
+    elif resource_type == ResourceType.DASHBOARD.value:
+        min_width = "100%"
+        min_height = "100vh"
+    inline_styles = f"margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; min-width: {min_width}; min-height: {min_height};"
     embed_url = url_for("root.embed", token=embed_token.token, _external=True)
-    inline_styles = "margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; min-width: 500px; min-height: 400px;"
+    snippet = f"<iframe src='{embed_url}' style='{inline_styles}' />"
+
     return {
         "is_new": is_new,
         "url": embed_url,
         "resource_type": embed_token.resource_type,
-        "snippet": f"<iframe src='{embed_url}' style='{inline_styles}' />",
+        "snippet": snippet,
     }
 
 
