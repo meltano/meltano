@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.20.1 - (2020-02-13)
 
 ---
 
@@ -25,7 +38,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1712](https://gitlab.com/meltano/meltano/issues/1712) Fix lock icon tooltip message on plugin settings that were set in env or meltano.yml
 - [#1677](https://gitlab.com/meltano/meltano/issues/1677) Properly represent values of boolean settings that were set using environment verariables in UI
 
-### Breaks
 
 ## 1.20.0 - (2020-02-10)
 
