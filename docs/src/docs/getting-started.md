@@ -35,34 +35,27 @@ See a [full list of data sources here](/plugins/).
 
 ## Choose Data Update Schedule
 
-By default, Meltano assumes you will be using a PostgreSQL instance that is already configured for you on your DigitalOcean instance. 
+Now that you've connected a data source, you can select how often we want your data to update. On the right hand side of your **Data** page, choose your desired interval and then click on `Save`.
 
-::: info 
-If you are working with your own Meltano instance, You can follow [these instructions](https://www.meltano.com/plugins/loaders/postgres.html#postgresql-database) to make sure your PostgreSQL instance is setup correctly.
-:::
-
-As a result, all we need to do now it select how often we want our data to update. On the right hand side of your Data page, choose your desired interval and then click on `Save`.
-
-::: info 
-Meltano provides [Orchestration](/docs/orchestration.html) using Apache Airflow, which allows you to create scheduled tasks to run pipelines automatically.
-For example, you may want a recurring task that updates the database at the end of every business day.
-:::
-
-Once your pipeline is setup, you will see your Data page update with a Pipelines section.
-
-![Screenshot of Pipelines section on Data page](/images/getting-started-guide/gsg-03.png)
-
-Once it's complete, the indicator will disappear and you should be able to see the final results of the extraction:
+The pipeline will begin running, and Meltano will provide a modal with a live log showing you what is happening behind the scenes:
 
 ![Screenshot of run log of a completed pipeline](/images/getting-started-guide/gsg-04.png)
 
-You can click the `Analyze` button to [select a model to analyze](#analyze-the-data). The same `Analyze` button is available inline within your pipeline. If you close the log and go back to the Pipelines page you can check the log of any past pipeline by clicking the `Log` button next to it:
+::: tip
+You can close this modal at anytime, and the pipeline will continue to run.
+:::
 
-Congratulations! Now that you have connected a data source, and run a successful pipeline for the dataset, we are now ready to analyze the data!
+Once the pipeline has finished running, the indicator will disappear and you'll see the final results of the data extraction. You will also see your **Data** page update with a **Pipelines** section.
+
+![Screenshot of Pipelines section on Data page](/images/getting-started-guide/gsg-03.png)
 
 ## Analyze Your Data
 
-The Analyze page contains an interactive user interface to allow you to dynamically build queries and visualize your data. By default, it will run a standard report.
+Congratulations! Now that you have connected a data source, and run a successful pipeline for the dataset, we are now ready to analyze the data!
+
+Click `Reports` next to your newly created pipeline to visualize the data from your source.
+
+The **Analyze** page contains an interactive user interface to allow you to dynamically build queries and visualize your data. By default, it will run a standard report.
 
 ![Screenshot of Analyze page for Carbon Region](/images/getting-started-guide/gsg-10.png)
 
@@ -108,8 +101,8 @@ Once we select it, you should see a similar page to below:
 
 ![Dashboard with the saved Report](/images/getting-started-guide/gsg-17.png)
 
-### Next steps
+### Next Steps
 
-And with that, you have now setup a complete end-to-end data solution with Meltano! 🎉
+Now you have now setup a complete end-to-end data analysis solution with Meltano! 🎉
 
 To learn about more Meltano recipes and functionality with our [tutorials](/tutorials/).
