@@ -44,6 +44,7 @@ def discovery():
                 {"name": "protected", "protected": True},
                 {"name": "secure", "kind": "password"},
                 {"name": "hidden", "kind": "hidden", "value": 42},
+                {"name": "boolean", "kind": "boolean", "value": False},
             ],
         }
     )
