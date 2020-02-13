@@ -136,13 +136,11 @@ Once the installation completes, you can check if it was successful by running:
 meltano --version
 ```
 
-That's it! Meltano is now be available for you to use.
-
-Now that you have successfully installed Meltano and its requirements, you can [create your first project](http://localhost:8080/docs/developer-tools.html#create-your-first-project).
+Now that you've installed Meltano and its requirements, you can [create your first project](/docs/developer-tools.html#create-your-first-project).
 
 ### Installing on Docker
 
-[Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](/docs/installation.html#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
+[Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](/docs/developer-tools.html#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
 
 ##### Using Pre-built Docker Images
 
@@ -191,7 +189,7 @@ If you are a Meltano end-user who is not going to be contributing code to our op
 
 Follow the steps in our [Getting Started Guide](/docs/getting-started.html) to get started.
 
-## Amazon Web Services (AWS)
+### Amazon Web Services (AWS)
 
 ::: warning Prerequisites
 This guide assumes that you have a functioning Docker image where your Meltano project is already bundled with the Meltano installation. To track this issue, follow [meltano#624](https://gitlab.com/meltano/meltano/issues/624).
@@ -279,7 +277,7 @@ The IP address can be mapped to a domain using Route53. We will be writing up a 
 
 Once you have successfully installed Meltano from the command line, you will need to [create your first project from the command line](/docs/developer-tools.html#create-your-first-project).
 
-## Troubleshooting Installation
+### Troubleshooting Installation
 
 ::: tip
 Are you having installation or deployment problems? We are here to help you. Check out [Getting Help](/docs/getting-help.html) on the different ways to get in touch with us.
@@ -344,7 +342,7 @@ meltano upgrade
 Meltano provides a command line interface (CLI) that allows you to manage the configuration and orchestration of Meltano instances. It provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run, and debug every step of the data life cycle.
 
 - [Getting Started Guide for the Command Line](/docs/developer-tools.html#gettting-started-with-meltano-on-the-command-line)
-- [Glossary of Command Line Concepts]()
+- [Glossary of Command Line Concepts](/docs/developer-tools.html#glossary-of-command-line-concepts)
 
 ### Getting Started with Meltano on the Command Line
 
