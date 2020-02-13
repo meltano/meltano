@@ -54,12 +54,11 @@ export default {
       <ReportEmbed :report="resource" />
     </div>
 
-    <template v-else-if="type === 'dashboard'">
-      <DashboardEmbed
-        :dashboard="resource.dashboard"
-        :reports-with-query-results="resource.reportsWithQueryResults"
-      />
-    </template>
+    <DashboardEmbed
+      v-else-if="type === 'dashboard'"
+      :dashboard="resource.dashboard"
+      :reports-with-query-results="resource.reportsWithQueryResults"
+    />
 
     <div v-else class="box is-marginless">
       <div class="content has-text-centered">
