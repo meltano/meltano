@@ -379,11 +379,7 @@ export default {
                   <input
                     v-if="getIsOfKindHidden(setting.kind)"
                     :id="getFormFieldForId(setting)"
-                    v-model="
-                      configSettings.profiles[
-                        configSettings.profileInFocusIndex
-                      ].config[setting.name]
-                    "
+                    v-model="connectorProfile.config[setting.name]"
                     type="hidden"
                   />
 
@@ -391,11 +387,7 @@ export default {
                   <input
                     v-else-if="getIsOfKindBoolean(setting.kind)"
                     :id="getFormFieldForId(setting)"
-                    v-model="
-                      configSettings.profiles[
-                        configSettings.profileInFocusIndex
-                      ].config[setting.name]
-                    "
+                    v-model="connectorProfile.config[setting.name]"
                     class="checkbox"
                     :class="successClass(setting)"
                     :disabled="getIsProtected(setting)"
@@ -405,11 +397,7 @@ export default {
                   <!-- Date -->
                   <InputDateIso8601
                     v-else-if="getIsOfKindDate(setting.kind)"
-                    v-model="
-                      configSettings.profiles[
-                        configSettings.profileInFocusIndex
-                      ].config[setting.name]
-                    "
+                    v-model="connectorProfile.config[setting.name]"
                     :name="setting.name"
                     :for-id="getFormFieldForId(setting)"
                     :input-classes="`is-small ${successClass(setting)}`"
@@ -509,11 +497,7 @@ export default {
                   <input
                     v-else-if="getIsOfKindTextBased(setting.kind)"
                     :id="getFormFieldForId(setting)"
-                    v-model="
-                      configSettings.profiles[
-                        configSettings.profileInFocusIndex
-                      ].config[setting.name]
-                    "
+                    v-model="connectorProfile.config[setting.name]"
                     :class="['input', fieldClass, successClass(setting)]"
                     :type="getTextBasedInputType(setting)"
                     :placeholder="getPlaceholder(setting)"
@@ -532,8 +516,8 @@ export default {
                       class="button is-small"
                     >
                       <span
-                        class="icon has-text-grey-dark tooltip is-tooltip-multiline"
-                        data-tooltip="This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more."
+                        class="icon has-text-grey-dark tooltip is-tooltip-left"
+                        :data-tooltip="protectedFieldMessage(setting)"
                       >
                         <font-awesome-icon icon="lock"></font-awesome-icon>
                       </span>
