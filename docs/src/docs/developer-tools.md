@@ -140,31 +140,6 @@ That's it! Meltano is now be available for you to use.
 
 Now that you have successfully installed Meltano and its requirements, you can [create your first project](http://localhost:8080/docs/developer-tools.html#create-your-first-project).
 
-### Setup your loader
-
-At this time, the GUI for configuring the loader from your project has been temporarily disabled. As a result, you will need to supply your database configuration through a `.env` file.
-
-Once you create the file, you will need to paste in the configuration for your database. For example, PostgreSQL configurations can [be found here](/plugins/loaders/postgres.html#intermediate-connecting-meltano-to-an-existing-postgresql-database).
-
-After saving your configurations, you can load your configurations by running:
-
-```bash
-source .env
-```
-
-And just like that, your loader is configured!
-
-### Start the application
-
-Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
-
-```bash
-cd yourprojectname
-meltano ui
-```
-
-Meltano is now running and should open a new tab at [http://localhost:5000](http://localhost:5000).
-
 ### Installing on Docker
 
 [Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](/docs/installation.html#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
@@ -302,7 +277,7 @@ The IP address can be mapped to a domain using Route53. We will be writing up a 
 
 #### Next Steps
 
-Once you have successfully installed Meltano from the command line, you will need to [create your first project from the command line](/docs/developer-tools.html#create-your-first-project-2).
+Once you have successfully installed Meltano from the command line, you will need to [create your first project from the command line](/docs/developer-tools.html#create-your-first-project).
 
 ## Troubleshooting Installation
 
@@ -388,6 +363,20 @@ meltano init myprojectname
 This will create a new directory named `myprojectname` in the current directory and initialize Meltano's basic directory structure inside it.
 
 Inside the Meltano project directory, all plugin configuration (which may include tokens and passwords) is stored inside the `.meltano` directory, which is automatically added to the project's `.gitignore` file to prevent this potentially sensitive information from accidentally being pushed up to a hosted Git repository.
+
+### Setup your loader
+
+Self-hosted Meltano instances require you to configure your reporting database, which we call the Meltano **Loader**, from the command line. To do this, you will supply your database configuration through a `.env` file.
+
+Once you create the file, you will need to paste in the configuration for your database. For example, PostgreSQL configurations can [be found here](/plugins/loaders/postgres.html#intermediate-connecting-meltano-to-an-existing-postgresql-database).
+
+After saving your configurations, you can load your configurations by running:
+
+```bash
+source .env
+```
+
+And just like that, your loader is configured!
 
 ### Start the application
 
