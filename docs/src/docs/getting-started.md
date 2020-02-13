@@ -15,24 +15,6 @@ To create your Meltano account [fill out the signup form](https://meltano.typefo
 We recommend using Meltano is available as hosted software (SaaS), but if you prefer to host Meltano yourself please see our [open source installation instructions]((/docs/installation.html#local-installation)).
 :::
 
-
-
-This will create a new directory named `my-meltano-project` in the current directory and initialize Meltano's basic directory structure inside it.
-
-Inside the Meltano project directory, all plugin configuration (which may include tokens and passwords) is stored inside the `.meltano` directory,
-which is automatically added to the project's `.gitignore` file to prevent this potentially sensitive information from accidentally being pushed up to a hosted Git repository.
-
-## Start the application
-
-Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
-
-```bash
-cd my-meltano-project
-meltano ui
-```
-
-Meltano is now running and should open a new tab at [http://localhost:5000](http://localhost:5000).
-
 ## Connect a data source
 
 You should see now see the Extractors page, which contains various options for connecting your data source.

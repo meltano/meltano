@@ -395,7 +395,7 @@ Meltano provides a command line interface (CLI) that allows you to manage the co
 
 Once you have successfully installed Meltano from the command line, you will need to create a project before you launch the Meltano UI.
 
-## Create your first project
+### Create your first project
 
 To initialize a new project, open your terminal and navigate to the directory that you'd like to store your Meltano projects in.
 
@@ -405,8 +405,22 @@ Use the `meltano init` command, which takes a `PROJECT_NAME` that is of your own
 meltano init myprojectname
 ```
 
+This will create a new directory named `myprojectname` in the current directory and initialize Meltano's basic directory structure inside it.
 
+Inside the Meltano project directory, all plugin configuration (which may include tokens and passwords) is stored inside the `.meltano` directory, which is automatically added to the project's `.gitignore` file to prevent this potentially sensitive information from accidentally being pushed up to a hosted Git repository.
 
+### Start the application
+
+Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
+
+```bash
+cd myprojectname
+meltano ui
+```
+
+Meltano is now running and should open a new tab at [http://localhost:5000](http://localhost:5000).
+
+Now that you have access to the Meltano UI, [use our Getting Started guide](http://localhost:8080/docs/getting-started.html#create-your-meltano-account) to learn more about how to use the software.
 
 
 ### Glossary of Command Line Concepts
