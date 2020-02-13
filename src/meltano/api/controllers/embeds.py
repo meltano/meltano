@@ -36,32 +36,14 @@ def _handle(ex):
 
 @embedsBP.route("/embed/<token>", methods=["GET"])
 def get_embed(token):
-    project = Project.find()
     embed_token = get_embed_from_token(db.session, token)
     resource_type = embed_token.resource_type
     resource_id = embed_token.resource_id
 
-    reports_service = ReportsService(project)
-
     if resource_type == ResourceType.REPORT.value:
-        report = reports_service.get_report(resource_id)
-        reports_helper = ReportsHelper()
-        resource_payload = reports_helper.get_report_with_query_results(report)
+        resource_payload = get_report_resource(resource_id)
     elif resource_type == ResourceType.DASHBOARD.value:
-        dashboards_service = DashboardsService(project)
-        dashboard = dashboards_service.get_dashboard(resource_id)
-        reports = [
-            reports_service.get_report(report_id)
-            for report_id in dashboard["report_ids"]
-        ]
-        dashboards_helper = DashboardsHelper()
-        reports_with_query_results = dashboards_helper.get_dashboard_reports_with_query_results(
-            reports
-        )
-        resource_payload = {
-            "dashboard": dashboard,
-            "reports_with_query_results": reports_with_query_results,
-        }
+        resource_payload = get_dashboard_resource(resource_id)
 
     return jsonify({"resource": resource_payload, "type": embed_token.resource_type})
 
@@ -102,3 +84,31 @@ def get_embed_from_token(session, token):
         return session.query(EmbedToken).filter_by(token=token).one()
     except sqlalchemy.orm.exc.NoResultFound:
         raise InvalidEmbedToken(token)
+
+
+def get_dashboard_resource(resource_id):
+    project = Project.find()
+    reports_service = ReportsService(project)
+    dashboards_service = DashboardsService(project)
+
+    dashboard = dashboards_service.get_dashboard(resource_id)
+    reports = [
+        reports_service.get_report(report_id) for report_id in dashboard["report_ids"]
+    ]
+    dashboards_helper = DashboardsHelper()
+    reports_with_query_results = dashboards_helper.get_dashboard_reports_with_query_results(
+        reports
+    )
+    return {
+        "dashboard": dashboard,
+        "reports_with_query_results": reports_with_query_results,
+    }
+
+
+def get_report_resource(resource_id):
+    project = Project.find()
+    reports_service = ReportsService(project)
+
+    report = reports_service.get_report(resource_id)
+    reports_helper = ReportsHelper()
+    return reports_helper.get_report_with_query_results(report)

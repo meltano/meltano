@@ -56,7 +56,7 @@ export default {
   <Dropdown
     :tooltip="{
       classes: 'is-tooltip-left',
-      message: 'Create an embed or link to share'
+      message: 'Create a link or embed to share'
     }"
     label="Share"
     :button-classes="`button ${buttonClasses}`"
