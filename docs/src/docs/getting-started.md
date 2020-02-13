@@ -5,17 +5,17 @@ description: Create your first data analysis project, build a pipeline, and anal
 
 # Getting Started
 
-## Create your Meltano account
+::: tip
+We recommend using Meltano as hosted software (SaaS), but if you prefer to host Meltano yourself please see our [open source installation instructions]((/docs/installation.html#local-installation)).
+:::
+
+## Create Your Account
 
 To create your Meltano account [fill out the signup form](https://meltano.typeform.com/to/NJPwxv) and we will email you login information.
 
 <a href="https://meltano.typeform.com/to/NJPwxv" class="button is-purple is-filled">Get started with your free hosted Meltano dashboard</a>
 
-::: tip
-We recommend using Meltano is available as hosted software (SaaS), but if you prefer to host Meltano yourself please see our [open source installation instructions]((/docs/installation.html#local-installation)).
-:::
-
-## Connect a data source
+## Connect Data Sources
 
 You should see now see the Extractors page, which contains various options for connecting your data source.
 
@@ -31,7 +31,7 @@ Some of our popular taps include:
 - [Stripe](/plugins/extractors/stripe.html#stripe)
 - [Salesforce](/plugins/extractors/salesforce.html#salesforce)
 
-## Choose how often your data is updated
+## Choose Data Update Schedule
 
 By default, Meltano assumes you will be using a PostgreSQL instance that is already configured for you on your DigitalOcean instance. 
 
@@ -58,7 +58,7 @@ You can click the `Analyze` button to [select a model to analyze](#analyze-the-d
 
 Congratulations! Now that you have connected a data source, and run a successful pipeline for the dataset, we are now ready to analyze the data!
 
-## Analyze the data
+## Analyze Your Data
 
 The Analyze page contains an interactive user interface to allow you to dynamically build queries and visualize your data. By default, it will run a standard report.
 
@@ -72,7 +72,7 @@ While exploring the Analyze page, you can also check out:
 - Different chart types which can be found in the upper right
 - Exploring table data and sorting data via column properties like ascending or descending
 
-## Save a report
+## Create Reports
 
 When we find an analysis that we want to reference in the future, we can easily do this by creating a report. This can be accomplished by clicking on the `Save Report` dropdown in the Analyze toolbar. This will open a dropdown with a default report name that is dynamically populated, but can be easily changed.
 
@@ -84,7 +84,7 @@ Once we click `Save`, we should see the upper left "Untitled Report" change to o
 
 And with that, our analysis has been saved!
 
-## Add a report to a dashboard
+## Create Dashboards
 
 As you acquire more reports, you will probably want to organize them via dashboards. This can be done by clicking on the new `Add to Dashboard` dropdown in the toolbar.
 
@@ -106,7 +106,7 @@ Once we select it, you should see a similar page to below:
 
 ![Dashboard with the saved Report](/images/getting-started-guide/gsg-17.png)
 
-## Next steps
+### Next steps
 
 And with that, you have now setup a complete end-to-end data solution with Meltano! 🎉
 
