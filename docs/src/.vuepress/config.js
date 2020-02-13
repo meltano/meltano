@@ -3,7 +3,6 @@ docsSidebar = [
   '/docs/getting-started',
   '/tutorials/',
   '/plugins/',
-  '/docs/security-and-privacy',
   '/docs/architecture',
   '/docs/developer-tools',
   '/docs/contributing',
