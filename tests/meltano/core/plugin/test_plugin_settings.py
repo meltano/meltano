@@ -121,6 +121,21 @@ class TestPluginSettingsService:
             PluginSettingValueSource.ENV,
         )
 
+        # Verify that boolean settings set in env are cast correctly
+        monkeypatch.setenv(env_var(tap, "boolean"), "on")
+
+        assert subject.get_value(session, tap, "boolean") == (
+            True,
+            PluginSettingValueSource.ENV,
+        )
+
+        monkeypatch.setenv(env_var(tap, "boolean"), "0")
+
+        assert subject.get_value(session, tap, "boolean") == (
+            False,
+            PluginSettingValueSource.ENV,
+        )
+
     def test_as_config_custom(self, subject, session, config_service):
         EXPECTED = {"test": "custom", "start_date": None, "secure": None}
         tap = PluginInstall(
