@@ -2,12 +2,14 @@
 import { mapActions, mapState } from 'vuex'
 import Vue from 'vue'
 
+import EmbedShareButton from '@/components/generic/EmbedShareButton'
 import Report from '@/components/Report'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
   name: 'Dashboard',
   components: {
+    EmbedShareButton,
     Report,
     RouterViewLayout
   },
@@ -27,10 +29,6 @@ export default {
       'isLoadingActiveDashboard',
       'reports'
     ]),
-    dashboardEmail() {
-      // eslint-disable-next-line
-      return `mailto:?subject=Dashboard: ${this.activeDashboard.name}&body=${window.location}`
-    },
     displayedReports() {
       return this.isEditable || this.isUpdated
         ? this.editableDashboardReports
@@ -128,7 +126,10 @@ export default {
               >
                 Edit
               </button>
-              <a class="button" :href="dashboardEmail">Share</a>
+              <EmbedShareButton
+                :resource="activeDashboard"
+                resource-type="dashboard"
+              />
             </div>
           </div>
         </div>
@@ -144,15 +145,14 @@ export default {
           />
         </div>
 
-        <progress
-          v-else-if="isInitializing || isLoadingActiveDashboard"
-          class="progress is-small is-info"
-        ></progress>
-
         <div v-else class="columns">
           <div class="column">
             <div class="box">
-              <div class="content">
+              <progress
+                v-if="isInitializing || isLoadingActiveDashboard"
+                class="progress is-small is-info"
+              ></progress>
+              <div v-else class="content">
                 <p>No reports yet...</p>
               </div>
             </div>
