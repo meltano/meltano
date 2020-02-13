@@ -21,6 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1696](https://gitlab.com/meltano/meltano/issues/1696) Fix duplicate chart renders when dashboard is loaded
 - [#1696](https://gitlab.com/meltano/meltano/issues/1696) Fix "Add to Dashboards" button when loading an existing report (additionally updated `disabled` button states)
+- [#1711](https://gitlab.com/meltano/meltano/issues/1711) Disable fields of all kinds when a plugin setting is protected or set in env or meltano.yml
 
 ### Breaks
 
