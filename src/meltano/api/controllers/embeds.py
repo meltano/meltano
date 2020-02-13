@@ -4,8 +4,11 @@ from flask import jsonify, request, url_for
 from .dashboards_helper import DashboardsHelper
 from .reports_helper import ReportsHelper
 from meltano.api.api_blueprint import APIBlueprint
-from meltano.api.models.embed_token import EmbedToken
+from meltano.api.models.embed_token import EmbedToken, ResourceType
 from meltano.api.models import db
+from meltano.core.m5o.reports_service import ReportsService
+from meltano.core.project import Project
+
 
 embedsBP = APIBlueprint("embeds", __name__)
 
@@ -32,13 +35,19 @@ def _handle(ex):
 
 @embedsBP.route("/embed/<token>", methods=["GET"])
 def get_embed(token):
-    reports_helper = ReportsHelper()
-    embed = get_embed_from_token(db.session, token)
-    # TODO conditional on embed.resource_type
-    report = reports_service().get_report(embed.resource_id)
-    report_with_query_results = reports_helper.get_report_with_query_results(report)
+    project = Project.find()
+    embed_token = get_embed_from_token(db.session, token)
+    resource_type = embed_token.resource_type
 
-    return jsonify(report_with_query_results)
+    if resource_type == ResourceType.REPORT.value:
+        reports_service = ReportsService(project)
+        report = reports_service.get_report(embed_token.resource_id)
+        reports_helper = ReportsHelper()
+        resource_payload = reports_helper.get_report_with_query_results(report)
+    elif resource_type == ResourceType.DASHBOARD.value:
+        resource_payload = "testing..."
+
+    return jsonify({"resource": resource_payload, "type": embed_token.resource_type})
 
 
 @embedsBP.route("/embed", methods=["POST"])

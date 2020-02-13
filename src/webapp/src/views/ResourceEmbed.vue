@@ -6,7 +6,7 @@ import Logo from '@/components/navigation/Logo'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
-  name: 'ReportEmbed',
+  name: 'ResourceEmbed',
   components: {
     Chart,
     ConnectorLogo,
@@ -39,7 +39,7 @@ export default {
       embedsApi
         .load(this.token)
         .then(response => {
-          this.report = response.data
+          this.report = response.data.resource
           this.isValid = true
         })
         .catch(error => {
