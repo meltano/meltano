@@ -290,7 +290,7 @@ which is automatically added to the project's `.gitignore` file to prevent this 
 
 At this time, the GUI for configuring the loader from your project has been temporarily disabled. As a result, you will need to supply your database configuration through a `.env` file.
 
-Once you create the file, you will need to paste in the configuration for your database. For example, PostgreSQL configurations can [be found here](/loaders/postgres.html#intermediate-connecting-meltano-to-an-existing-postgresql-database).
+Once you create the file, you will need to paste in the configuration for your database. For example, PostgreSQL configurations can [be found here](/plugins/loaders/postgres.html#beginner-using-a-postgresql-database-for-the-first-time).
 
 After saving your configurations, you can load your configurations by running:
 

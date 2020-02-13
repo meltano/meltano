@@ -6,6 +6,7 @@ Meltano is primarily offered to end-users as a hosted software-as-a-service (Saa
 - [Upgrading Meltano Version](/docs/developer-tools.html#upgrading-meltano-version)
 - [Command Line Interface](/docs/developer-tools.html#command-line-interface)
 - [Environment Variables](/docs/developer-tools.html#environment-variables)
+- [Reporting Database Options](/docs/developer-tools.html#reporting-database-options)
 - [Role-Based Access Control](/docs/developer-tools.html#role-based-access-control-alpha)
 - [Open Source Contributor Guide](/docs/developer-tools.html#contributor-guide)
 - [Overview of Meltano Architecture](/docs/developer-tools.html#architecture)
@@ -24,7 +25,7 @@ Are you trying Meltano for the first time? You can skip the installation process
 
 ### Local Installation
 
-In this section, we will install Meltano as an application you can access locally from your browser and on the command line. If you prefer to install to Docker, please view the installation instructions [here](/docs/installation.html#installing-on-docker).
+In this section, we will install Meltano as a local application on your computer that you can access from your browser and on the command line.
 
 ::: tip
 We do not have a double click installer at this time, but [it is on our roadmap](https://gitlab.com/meltano/meltano/issues/1107) and we will be sure to update this page when we do!
@@ -148,14 +149,14 @@ Next, to create your project, you will use the `meltano init` command which take
 ::: info
 Meltano shares anonymous usage data with the team through Google Analytics. This is used to help us learn about how Meltano is being used to ensure that we are making Meltano even more useful to our users.
 
-If you would prefer to use Meltano without sending the team this data, learn how to configure this through our [environment variables docs](/docs/environment-variables.html#anonymous-usage-data).
+If you would prefer to use Meltano without sending the team this data, learn how to configure this through our [environment variables docs](/docs/developer-tools.html#environment-variables).
 :::
 
 ```bash
 meltano init yourprojectname
 ```
 
-This will create a new directory named `projectname` and initialize Meltano's basic directory structure inside it.
+This will create a new directory named `yourprojectname` and initialize Meltano's basic directory structure inside it.
 
 Inside the Meltano project directory, all plugin configuration (which may include tokens and passwords) is stored inside the `.meltano` directory,
 which is automatically added to the project's `.gitignore` file to prevent this potentially sensitive information from accidentally being pushed up to a hosted Git repository.
@@ -184,8 +185,6 @@ meltano ui
 ```
 
 Meltano is now running and should open a new tab at [http://localhost:5000](http://localhost:5000).
-
-You are now ready to add data sources, configure reporting databases, schedule updates and build dashboards!
 
 ### Installing on Docker
 
@@ -1123,6 +1122,19 @@ FLASK_ENV=production FLASK_APP=meltano.oauth python -m flask run --port 9999
 OAUTH_FACEBOOK_CLIENT_ID=<application_id>
 OAUTH_FACEBOOK_CLIENT_SECRET=<application_secret>
 ```
+
+## Reporting Database Options
+
+Users who chose to self-host Meltano need to create, configure and connect a **Loader** database to Meltano. Meltano Loaders _load data in bulk_ after it has been imported from source(s) using Extractors. Meltano currently supports loading data in the follow formats:
+
+- [Comma Separated Values (CSV)](/plugins/loaders/csv.html)
+- [Snowflake Data Warehouse](/plugins/loaders/snowflake.html)
+- [PostgresQL Database](/plugins/loaders/postgres.html)
+- [SQLite Database](/plugins/loaders/sqlite.html)
+
+::: tip
+Hosted instances of Meltano come with a pre-configured PostgresQL database where Meltano loads extracted data so that it can be analyzed. If you are not sure how to set up your Loader, you can [sign up for a free hosted instance](https://meltano.typeform.com/to/NJPwxv) and we'll take care of that for you.
+:::
 
 ## Role Based Access Control <sup>ALPHA</sup>
 
