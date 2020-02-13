@@ -14,12 +14,12 @@ requires = [
     'authlib==0.10',
     'backoff==1.8.0',
     'bcrypt==3.1.6',
-    'Cerberus==1.2',
+    'cerberus==1.2',
     'click==7.0',
     'click-default-group==1.2.1',
     'colorama==0.3.9',
-    'gitpython==2.1.11',
     'gunicorn==19.9.0',
+    'ipython==7.5.0',
     'jsonschema==2.6.0',
     'markdown==3.0.1',
     'networkx==2.2',
@@ -66,9 +66,12 @@ dev_requires = [
     'freezegun==0.3.12',
     'pytest==4.3.1',
     'pytest-asyncio==0.10.0',
-    'requests-mock==1.6.0',
-    'ipython==7.5.0',
     'pytest-cov==2.6.1',
+    'requests-mock==1.6.0',
+]
+
+infra_requires = [
+    'ansible==2.9.4'
 ]
 
 setup(
@@ -96,7 +99,8 @@ setup(
         *requires
     ],
     extras_require={
-        'dev': dev_requires
+        'dev': dev_requires,
+        'infra': infra_requires,
     },
     entry_points={
         'console_scripts': [
