@@ -44,7 +44,6 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('orchestration/getPipelineSchedules')
     this.$store.dispatch('plugins/getPlugins')
     this.$store.dispatch('plugins/getInstalledPlugins')
     this.$store.dispatch('repos/getModels')

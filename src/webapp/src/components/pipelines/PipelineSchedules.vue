@@ -16,6 +16,9 @@ export default {
     Dropdown,
     ScheduleTableHead
   },
+  props: {
+    pipelines: { type: Array, required: true, default: () => [] }
+  },
   data() {
     return {
       intervalOptions: {
@@ -31,7 +34,6 @@ export default {
   },
   computed: {
     ...mapGetters('plugins', ['getInstalledPlugin', 'getPluginLabel']),
-    ...mapGetters('orchestration', ['getSortedPipelines']),
     getIsDisabled() {
       return pipeline => pipeline.isRunning || pipeline.isSaving
     },
@@ -49,9 +51,6 @@ export default {
     getMomentFromNow() {
       return val => utils.momentFromNow(val)
     }
-  },
-  created() {
-    this.$store.dispatch('orchestration/getPipelineSchedules')
   },
   mounted() {
     if (window.location.href.indexOf('meltanodata.com') > -1) {
@@ -104,7 +103,7 @@ export default {
       <ScheduleTableHead has-actions has-start-date />
 
       <tbody>
-        <template v-for="pipeline in getSortedPipelines">
+        <template v-for="pipeline in pipelines">
           <tr :key="pipeline.name">
             <td>
               <article class="media">
