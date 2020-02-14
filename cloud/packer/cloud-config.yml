@@ -8,12 +8,7 @@ users:
     homedir: /var/meltano
     no_user_group: true
     primary_group: meltano
-  - name: meltano_ftp
-    shell: /bin/sh
-    homedir: /var/meltano/project
-    primary_group: meltano
-    no_user_group: true
-    no_create_home: true
+
 write_files:
   - path: /etc/caddy/environment
     content: |
