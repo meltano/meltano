@@ -112,7 +112,7 @@ export default {
             </h3>
           </div>
           <div class="column">
-            <div v-if="isEditable" class="buttons is-pulled-right">
+            <div v-if="isEditable" class="buttons is-right">
               <button class="button" @click="updateDashboardReportPositions">
                 Save
               </button>
@@ -120,7 +120,7 @@ export default {
                 Cancel
               </button>
             </div>
-            <div v-else class="buttons is-pulled-right">
+            <div v-else class="buttons is-right">
               <a class="button" :href="dashboardEmail">Share</a>
               <button
                 v-if="!isEditable"
