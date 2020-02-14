@@ -1,6 +1,6 @@
 <script>
 import DashboardEmbed from '@/components/embeds/DashboardEmbed'
-import embedsApi from '@/api/embeds'
+import embedsApi, { EMBED_RESOURCE_TYPES } from '@/api/embeds'
 import Logo from '@/components/navigation/Logo'
 import ReportEmbed from '@/components/embeds/ReportEmbed'
 import RouterViewLayout from '@/views/RouterViewLayout'
@@ -50,12 +50,15 @@ export default {
       <progress class="progress is-small is-info"></progress>
     </div>
 
-    <div v-else-if="resourceType === 'report'" class="box is-marginless">
+    <div
+      v-else-if="resourceType === EMBED_RESOURCE_TYPES.REPORT"
+      class="box is-marginless"
+    >
       <ReportEmbed :report="resource" />
     </div>
 
     <DashboardEmbed
-      v-else-if="resourceType === 'dashboard'"
+      v-else-if="resourceType === EMBED_RESOURCE_TYPES.DASHBOARD"
       :dashboard="resource.dashboard"
       :reports-with-query-results="resource.reportsWithQueryResults"
     />

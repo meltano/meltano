@@ -2,7 +2,7 @@
 import Vue from 'vue'
 
 import Dropdown from '@/components/generic/Dropdown'
-import embedsApi from '@/api/embeds'
+import embedsApi, { EMBED_RESOURCE_TYPES } from '@/api/embeds'
 import utils from '@/utils/utils'
 
 export default {
@@ -16,7 +16,7 @@ export default {
     resourceType: {
       type: String,
       required: true,
-      validator: value => ['dashboard', 'report'].includes(value)
+      validator: value => Object.values(EMBED_RESOURCE_TYPES).includes(value)
     }
   },
   data: () => ({
