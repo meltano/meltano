@@ -48,7 +48,7 @@ export default {
 
 <template>
   <router-view-layout>
-    <div class="container view-body">
+    <div class="container view-body is-widescreen">
       <section>
         <div class="columns is-gapless">
           <div class="column is-one-quarter">

@@ -102,7 +102,7 @@ export default {
 
 <template>
   <router-view-layout>
-    <div class="container view-body">
+    <div class="container view-body is-widescreen">
       <section>
         <div class="columns is-vcentered">
           <div class="column">

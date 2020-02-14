@@ -16,7 +16,7 @@ export default {
 
 <template>
   <router-view-layout>
-    <div class="container view-body">
+    <div class="container view-body is-widescreen">
       <router-view />
       <div v-if="isModal">
         <router-view :name="$route.name"></router-view>

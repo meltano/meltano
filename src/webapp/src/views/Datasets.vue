@@ -60,7 +60,7 @@ export default {
 
 <template>
   <router-view-layout>
-    <div class="container view-body">
+    <div class="container view-body is-widescreen">
       <h2 id="data" class="title">Data</h2>
 
       <template v-if="getHasPipelines" class="columns">
