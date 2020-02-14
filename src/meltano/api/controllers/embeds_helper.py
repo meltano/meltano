@@ -32,10 +32,11 @@ class EmbedsHelper:
         finally:
             session.commit()
 
-        if resource_type == ResourceType.REPORT.value:
+        resource_type = ResourceType(embed_token.resource_type)
+        if resource_type is ResourceType.REPORT:
             min_width = "500px"
             min_height = "400px"
-        elif resource_type == ResourceType.DASHBOARD.value:
+        elif resource_type is ResourceType.DASHBOARD:
             min_width = "100%"
             min_height = "100vh"
         inline_styles = f"margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; min-width: {min_width}; min-height: {min_height};"
@@ -55,12 +56,12 @@ class EmbedsHelper:
         except sqlalchemy.orm.exc.NoResultFound:
             raise InvalidEmbedToken(token)
 
-        resource_type = embed_token.resource_type
+        resource_type = ResourceType(embed_token.resource_type)
         resource_id = embed_token.resource_id
 
-        if resource_type == ResourceType.REPORT.value:
+        if resource_type is ResourceType.REPORT:
             resource_payload = self.get_report_resource(resource_id)
-        elif resource_type == ResourceType.DASHBOARD.value:
+        elif resource_type is ResourceType.DASHBOARD:
             resource_payload = self.get_dashboard_resource(resource_id)
 
         return {"resource": resource_payload, "resource_type": embed_token.resource_type}
