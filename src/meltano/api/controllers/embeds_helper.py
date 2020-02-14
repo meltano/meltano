@@ -19,10 +19,14 @@ class InvalidEmbedToken(Exception):
 class EmbedsHelper:
     def generate_embed_snippet(self, session, resource_id, resource_type):
         try:
-            embed_token = session.query(EmbedToken).filter_by(resource_id=resource_id).one()
+            embed_token = (
+                session.query(EmbedToken).filter_by(resource_id=resource_id).one()
+            )
             is_new = False
         except sqlalchemy.orm.exc.NoResultFound:
-            embed_token = EmbedToken(resource_id=resource_id, resource_type=resource_type)
+            embed_token = EmbedToken(
+                resource_id=resource_id, resource_type=resource_type
+            )
             session.add(embed_token)
             is_new = True
         finally:
@@ -45,7 +49,6 @@ class EmbedsHelper:
             "snippet": snippet,
         }
 
-
     def get_embed_from_token(self, session, token):
         try:
             embed_token = session.query(EmbedToken).filter_by(token=token).one()
@@ -62,7 +65,6 @@ class EmbedsHelper:
 
         return {"resource": resource_payload, "type": embed_token.resource_type}
 
-
     def get_dashboard_resource(self, resource_id):
         project = Project.find()
         reports_service = ReportsService(project)
@@ -70,7 +72,8 @@ class EmbedsHelper:
 
         dashboard = dashboards_service.get_dashboard(resource_id)
         reports = [
-            reports_service.get_report(report_id) for report_id in dashboard["report_ids"]
+            reports_service.get_report(report_id)
+            for report_id in dashboard["report_ids"]
         ]
         dashboards_helper = DashboardsHelper()
         reports_with_query_results = dashboards_helper.get_dashboard_reports_with_query_results(
@@ -80,7 +83,6 @@ class EmbedsHelper:
             "dashboard": dashboard,
             "reports_with_query_results": reports_with_query_results,
         }
-
 
     def get_report_resource(self, resource_id):
         project = Project.find()
