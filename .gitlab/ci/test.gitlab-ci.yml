@@ -54,6 +54,7 @@ install_e2e:
     PYTEST_BACKEND: postgresql
 
     # `postgres` service configuration
+    POSTGRES_HOST_AUTH_METHOD: trust
     POSTGRES_ADDRESS: postgres
     POSTGRES_PORT: 5432
     POSTGRES_USER: runner
