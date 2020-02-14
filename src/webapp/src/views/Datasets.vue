@@ -60,7 +60,7 @@ export default {
 
 <template>
   <router-view-layout>
-    <div class="container view-body is-fluid">
+    <div class="container view-body">
       <h2 id="data" class="title">Data</h2>
 
       <template v-if="getHasPipelines" class="columns">
