@@ -32,6 +32,7 @@ export default {
       'getIsInstallingPlugin'
     ]),
     ...mapGetters('orchestration', [
+      'getHasPipelineWithExtractor',
       'getHasValidConfigSettings',
       'getPipelineWithExtractor'
     ]),
@@ -206,7 +207,7 @@ export default {
             Vue.toasted.global.success(message)
 
             // 4. Finally, run after conditionally saving the pipeline that's relient on valid config settings
-            if (!this.getPipelineWithExtractor(this.extractor.name)) {
+            if (!this.getHasPipelineWithExtractor(this.extractor.name)) {
               const hasDefaultTransforms = this.getHasDefaultTransforms(
                 this.extractor.namespace
               )
@@ -296,7 +297,7 @@ export default {
             :upload-form-data="uploadFormData"
             :is-show-docs="true"
             :is-show-config-warning="
-              Boolean(getPipelineWithExtractor(extractor.name))
+              getHasPipelineWithExtractor(extractor.name)
             "
             @onChangeUploadFormData="onChangeUploadFormData"
           />
