@@ -36,7 +36,7 @@ export default {
 </script>
 
 <template>
-  <div>
+  <div class="table-container">
     <table class="table is-fullwidth">
       <thead>
         <tr>

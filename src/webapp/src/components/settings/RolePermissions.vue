@@ -50,7 +50,7 @@ export default {
 </script>
 
 <template>
-  <div class="box" style="margin-bottom: 2em;">
+  <div class="box table-container" style="margin-bottom: 2em;">
     <p class="is-italic">{{ permission.name }}</p>
     <table class="table is-fullwidth">
       <thead>
