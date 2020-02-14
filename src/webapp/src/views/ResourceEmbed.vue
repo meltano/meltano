@@ -21,7 +21,7 @@ export default {
       error: null,
       isLoading: true,
       resource: null,
-      type: null
+      resourceType: null
     }
   },
   created() {
@@ -33,7 +33,7 @@ export default {
         .load(this.token)
         .then(response => {
           this.resource = response.data.resource
-          this.type = response.data.type
+          this.resourceType = response.data.resourceType
         })
         .catch(error => {
           this.error = error.response.data.code
@@ -50,12 +50,12 @@ export default {
       <progress class="progress is-small is-info"></progress>
     </div>
 
-    <div v-else-if="type === 'report'" class="box is-marginless">
+    <div v-else-if="resourceType === 'report'" class="box is-marginless">
       <ReportEmbed :report="resource" />
     </div>
 
     <DashboardEmbed
-      v-else-if="type === 'dashboard'"
+      v-else-if="resourceType === 'dashboard'"
       :dashboard="resource.dashboard"
       :reports-with-query-results="resource.reportsWithQueryResults"
     />

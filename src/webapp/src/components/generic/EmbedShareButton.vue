@@ -33,7 +33,7 @@ export default {
     getResourceEmbed(resource) {
       this.isAwaitingEmbed = true
       embedsApi
-        .generate({ id: resource.id, type: this.resourceType })
+        .generate({ resourceId: resource.id, resourceType: this.resourceType })
         .then(response => {
           this.$refs[`link-${resource.id}`].value = response.data.url
           this.$refs[`embed-${resource.id}`].value = response.data.snippet

@@ -32,8 +32,8 @@ def get_embed(token):
 @embedsBP.route("/embed", methods=["POST"])
 def embed():
     post_data = request.get_json()
-    resource_id = post_data["id"]
-    resource_type = post_data["type"]
+    resource_id = post_data["resource_id"]
+    resource_type = post_data["resource_type"]
     embeds_helper = EmbedsHelper()
     response_data = embeds_helper.generate_embed_snippet(
         db.session, resource_id, resource_type

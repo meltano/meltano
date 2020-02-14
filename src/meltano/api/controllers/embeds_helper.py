@@ -63,7 +63,7 @@ class EmbedsHelper:
         elif resource_type == ResourceType.DASHBOARD.value:
             resource_payload = self.get_dashboard_resource(resource_id)
 
-        return {"resource": resource_payload, "type": embed_token.resource_type}
+        return {"resource": resource_payload, "resource_type": embed_token.resource_type}
 
     def get_dashboard_resource(self, resource_id):
         project = Project.find()
