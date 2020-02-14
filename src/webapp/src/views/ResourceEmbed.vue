@@ -27,6 +27,14 @@ export default {
   created() {
     this.initialize()
   },
+  getters: {
+    getIsResourceDashboard() {
+      return this.resourceType === EMBED_RESOURCE_TYPES.DASHBOARD
+    },
+    getIsResourceReport() {
+      return this.resourceType === EMBED_RESOURCE_TYPES.REPORT
+    }
+  },
   methods: {
     initialize() {
       embedsApi
@@ -50,15 +58,12 @@ export default {
       <progress class="progress is-small is-info"></progress>
     </div>
 
-    <div
-      v-else-if="resourceType === EMBED_RESOURCE_TYPES.REPORT"
-      class="box is-marginless"
-    >
+    <div v-else-if="getIsResourceReport" class="box is-marginless">
       <ReportEmbed :report="resource" />
     </div>
 
     <DashboardEmbed
-      v-else-if="resourceType === EMBED_RESOURCE_TYPES.DASHBOARD"
+      v-else-if="getIsResourceDashboard"
       :dashboard="resource.dashboard"
       :reports-with-query-results="resource.reportsWithQueryResults"
     />
