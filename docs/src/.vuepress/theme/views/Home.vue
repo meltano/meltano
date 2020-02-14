@@ -353,7 +353,7 @@
       <p style="text-align: center; margin-bottom:20px;">
         Meltano is built to run wherever you get your work done. Looking to self
         host?
-        <a href="/docs/installation.html"
+        <a href="/developer-tools/self-hosted-installation.html"
           >Check out our installation instructions</a
         >.
       </p>

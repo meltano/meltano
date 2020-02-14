@@ -49,6 +49,6 @@ def cli(ctx, log_level, verbose):
             fg="yellow",
         )
         click.echo(
-            "Visit http://meltano.com/docs/installation.html#upgrading-version for more details."
+            "Visit http://meltano.com/developer-tools/self-hosted-installation.html#upgrading-meltano-version for more details."
         )
         sys.exit(3)
