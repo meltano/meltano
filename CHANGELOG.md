@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [!1460](https://gitlab.com/meltano/meltano/merge_requests/1460) Removed the FTP access from Meltano hosted instances
+
 ### Fixes
 
 ### Breaks
