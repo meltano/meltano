@@ -133,38 +133,11 @@ Open your Meltano instance and click "Pipelines" in the top navigation bar. You 
 
 Let's install `tap-google-analytics` by clicking on the `Connect` button inside its card.
 
-For the **Key File Location**, you will need to upload your `client_secrets.json` using the file uploader. If using FTP or the CLI, the path should be:
+For the **Key File Location**, you will need to upload your `client_secrets.json` using the file uploader, or put it in the following location:
 
 `extract/tap-google-analytics@<profile_name>/key_file_location`
 
 Where `<profile_name>` is dynamic based on which account profile you have setup for this particular pipeline. Use `default` in its place if you aren't knowingly using multiple profiles.
-
-::: tip Need help with FTP?
-If you need help setting up your FTP client, make sure to check out [our guide on how to setup a FTP client to connect to your Meltano project](/tutorials/using-ftp-with-meltano.html).
-:::
-
-::: info
-**Uploading with FTP**
-
-Assuming your FTP client is setup, you can upload your file via FTP with the following steps:
-
-1. Login to your Meltano project (e.g., `meltano.meltanodata.com`) with your FTP credentials (e.g., `meltano_ftp` / `password`).
-
-   - This should open a directory that contains folder such as
-
-     - `analyze`
-     - `extract`
-     - `load`
-     - `model`
-
-2. Open the `extract` folder by double clicking it.
-
-3. Locate the `client_secrets.json` file on your local machine in the left panel.
-
-4. Click and drag your `client_secrets.json` file over to the opened `extract` folder on the right panel.
-
-Once it appears in the right panel, everything is good to go!
-:::
 
 For the **View ID**, enter the ID you retrieved using [Google Analytics Account Explorer](https://ga-dev-tools.appspot.com/account-explorer/)
 
