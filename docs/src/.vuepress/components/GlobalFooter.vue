@@ -16,6 +16,7 @@ export default {
       Inc.</a
     >
     <a href="/terms.html">Terms of Service</a>
+    <a href="/privacy.html">Privacy Policy</a>
   </footer>
 </template>
 
