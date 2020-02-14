@@ -133,11 +133,7 @@ Open your Meltano instance and click "Pipelines" in the top navigation bar. You 
 
 Let's install `tap-google-analytics` by clicking on the `Connect` button inside its card.
 
-For the **Key File Location**, you will need to upload your `client_secrets.json` using the file uploader, or put it in the following location:
-
-`extract/tap-google-analytics@<profile_name>/key_file_location`
-
-Where `<profile_name>` is dynamic based on which account profile you have setup for this particular pipeline. Use `default` in its place if you aren't knowingly using multiple profiles.
+For the **Key File Location**, you will need to upload your `client_secrets.json` using the file uploader.
 
 For the **View ID**, enter the ID you retrieved using [Google Analytics Account Explorer](https://ga-dev-tools.appspot.com/account-explorer/)
 
