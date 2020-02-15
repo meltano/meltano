@@ -13,7 +13,7 @@ export default {
     RouterViewLayout
   },
   computed: {
-    ...mapGetters('orchestration', ['getHasPipelines']),
+    ...mapGetters('orchestration', ['getHasPipelines', 'getSortedPipelines']),
     ...mapGetters('plugins', ['getIsLoadingPluginsOfType']),
     ...mapState('plugins', ['installedPlugins']),
     getModalName() {
@@ -70,7 +70,7 @@ export default {
               <h3 id="pipelines" class="title">Pipelines</h3>
               <p class="subtitle">Scheduled data collection</p>
             </div>
-            <PipelineSchedules />
+            <PipelineSchedules :pipelines="getSortedPipelines" />
           </div>
         </div>
       </template>
