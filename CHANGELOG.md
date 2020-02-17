@@ -18,6 +18,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [!1460](https://gitlab.com/meltano/meltano/merge_requests/1460) Removed the FTP access from Meltano hosted instances
+- [#1629](https://gitlab.com/meltano/meltano/issues/1629) Add "Share Dashboard" functionality
+
+### Changes
+
+- [#1629](https://gitlab.com/meltano/meltano/issues/1629) Update report "Embed" button to "Share" and include a share link to accompany the embed snippet
 
 ### Fixes
 
