@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-## Unreleased
 
+## Unreleased
 ---
 
 ### New
@@ -13,9 +13,17 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+### Breaks
+
+
+## 1.21.1 - (2020-02-17)
+
+---
+
+### Fixes
+
 - [#1754](https://gitlab.com/meltano/meltano/issues/1754) Fix duplicate "Share" button and Reports dropdown clipping issue
 
-### Breaks
 
 ## 1.21.0 - (2020-02-17)
 
