@@ -119,7 +119,6 @@ export default {
               </button>
             </div>
             <div v-else class="buttons is-pulled-right">
-              <a class="button" :href="dashboardEmail">Share</a>
               <button
                 v-if="!isEditable"
                 class="button"
