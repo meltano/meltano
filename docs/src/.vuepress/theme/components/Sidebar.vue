@@ -1,7 +1,10 @@
 <template>
   <div class="sidebar">
-    <NavLinks/>
-    <slot name="top"/>
+    <a href="https://meltano.typeform.com/to/NJPwxv" class="sidebar-cta">
+      Create Account
+    </a>
+    <NavLinks />
+    <slot name="top" />
     <ul class="sidebar-links" v-if="items.length">
       <li v-for="(item, i) in items" :key="i">
         <SidebarGroup
@@ -12,10 +15,10 @@
           :collapsable="item.collapsable || item.collapsible"
           @toggle="toggleGroup(i)"
         />
-        <SidebarLink v-else :item="item"/>
+        <SidebarLink v-else :item="item" />
       </li>
     </ul>
-    <slot name="bottom"/>
+    <slot name="bottom" />
   </div>
 </template>
 
@@ -30,47 +33,47 @@ export default {
 
   props: ['items'],
 
-  data () {
+  data() {
     return {
       openGroupIndex: 0
     }
   },
 
-  created () {
+  created() {
     this.refreshIndex()
   },
 
   watch: {
-    '$route' () {
+    $route() {
       this.refreshIndex()
     }
   },
 
   methods: {
-    refreshIndex () {
-      const index = resolveOpenGroupIndex(
-        this.$route,
-        this.items
-      )
+    refreshIndex() {
+      const index = resolveOpenGroupIndex(this.$route, this.items)
       if (index > -1) {
         this.openGroupIndex = index
       }
     },
 
-    toggleGroup (index) {
+    toggleGroup(index) {
       this.openGroupIndex = index === this.openGroupIndex ? -1 : index
     },
 
-    isActive (page) {
+    isActive(page) {
       return isActive(this.$route, page.path)
     }
   }
 }
 
-function resolveOpenGroupIndex (route, items) {
+function resolveOpenGroupIndex(route, items) {
   for (let i = 0; i < items.length; i++) {
     const item = items[i]
-    if (item.type === 'group' && item.children.some(c => isActive(route, c.path))) {
+    if (
+      item.type === 'group' &&
+      item.children.some(c => isActive(route, c.path))
+    ) {
       return i
     }
   }
@@ -101,6 +104,20 @@ function resolveOpenGroupIndex (route, items) {
       padding 0.5rem 0 0.5rem 1.5rem
   .sidebar-links
     padding 1.5rem 0
+  .sidebar-cta
+    display: block;
+    background-color: $purpleColor;
+    color: white;
+    padding: 0.5rem;
+    text-align: center;
+    margin: 1rem;
+    margin-bottom: 0;
+    border-radius: 5px;
+    margin-right: 1rem;
+
+@media (min-width: $MQMobile)
+  .sidebar .sidebar-cta
+    display: none
 
 @media (max-width: $MQMobile)
   .sidebar

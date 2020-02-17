@@ -10,22 +10,22 @@ with open("VERSION") as version_file:
 requires = [
     'aiohttp==3.4.4',
     'alembic==1.0.11',
+    'atomicwrites==1.2.1',
     'authlib==0.10',
     'backoff==1.8.0',
     'bcrypt==3.1.6',
-    'Cerberus==1.2',
+    'cerberus==1.2',
     'click==7.0',
     'click-default-group==1.2.1',
     'colorama==0.3.9',
-    'gitpython==2.1.11',
     'gunicorn==19.9.0',
+    'ipython==7.5.0',
     'jsonschema==2.6.0',
     'markdown==3.0.1',
     'networkx==2.2',
-    'pandas==0.24.1',
     'psycopg2==2.7.7',
     'psutil==5.6.3',
-    'pyhumps==0.4.0',
+    'pyhumps==1.2.2',
     'pypika==0.25.1',
     'python-dotenv==0.10.1',
     'pyyaml==3.13',
@@ -38,7 +38,6 @@ requires = [
     'flask-executor==0.9.2',
     'flask-sqlalchemy==2.3.2',
     'flask-restful==0.3.7',
-    'flask-jwt-extended==3.17.0',
     'flatten-dict==0.1.0',
     'meltano-flask-security==0.1.0',
     'pyhocon==0.3.51',
@@ -48,6 +47,7 @@ requires = [
     'urllib3==1.23',
     'sqlparse==0.3.0',
     'watchdog==0.9.0',
+    'werkzeug==0.16.1',
 ]
 
 # conflicts resolution, see https://gitlab.com/meltano/meltano/issues/193
@@ -62,12 +62,16 @@ dev_requires = [
     'black==18.9b0',
     'bumpversion==0.5.3',
     'changelog-cli==0.6.2',
+    'coverage==4.5.4',
     'freezegun==0.3.12',
     'pytest==4.3.1',
     'pytest-asyncio==0.10.0',
-    'requests-mock==1.6.0',
-    'ipython==7.5.0',
     'pytest-cov==2.6.1',
+    'requests-mock==1.6.0',
+]
+
+infra_requires = [
+    'ansible==2.9.4'
 ]
 
 setup(
@@ -95,7 +99,8 @@ setup(
         *requires
     ],
     extras_require={
-        'dev': dev_requires
+        'dev': dev_requires,
+        'infra': infra_requires,
     },
     entry_points={
         'console_scripts': [

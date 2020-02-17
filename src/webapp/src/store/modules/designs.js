@@ -4,10 +4,11 @@ import lodash from 'lodash'
 import sqlFormatter from 'sql-formatter'
 import SSF from 'ssf'
 
-import designApi from '../../api/design'
-import reportsApi from '../../api/reports'
-import sqlApi from '../../api/sql'
+import designApi from '@/api/design'
+import sqlApi from '@/api/sql'
 import utils from '@/utils/utils'
+import { selected } from '@/utils/predicates'
+import { namer } from '@/utils/mappers'
 
 const defaultState = utils.deepFreeze({
   activeReport: {},
@@ -19,14 +20,18 @@ const defaultState = utils.deepFreeze({
   design: {
     relatedTable: {}
   },
-  loader: null,
   filterOptions: [],
   filters: {
     aggregates: [],
     columns: []
   },
+  isLastRunResultsEmpty: false,
+  hasCompletedFirstQueryRun: false,
   hasSQLError: false,
-  isAutoRunQuery: true,
+  isAutoRunQuery:
+    'isAutoRunQuery' in localStorage
+      ? localStorage.getItem('isAutoRunQuery') === 'true'
+      : true,
   isLoadingQuery: false,
   limit: 50,
   order: {
@@ -37,23 +42,24 @@ const defaultState = utils.deepFreeze({
   reports: [],
   resultAggregates: [],
   results: [],
-  saveReportSettings: { name: null },
   sqlErrorMessage: []
 })
 
 const helpers = {
+  buildKey: (...parts) => lodash.join(parts, '.'),
+  debouncedAutoRun: null,
+
   getFilterTypePlural(filterType) {
     return `${filterType}s`
   },
 
   getQueryPayloadFromDesign(state) {
     // Inline fn helpers
-    const selected = x => x.selected
     const namesOfSelected = arr => {
       if (!Array.isArray(arr)) {
         return null
       }
-      return arr.filter(selected).map(x => x.name)
+      return arr.filter(selected).map(namer)
     }
 
     const baseTable = state.design.relatedTable
@@ -90,14 +96,12 @@ const helpers = {
     // TODO update default empty array likely
     // in the ma_file_parser to set proper defaults
     // if user's exclude certain properties in their models
-    const timeframes =
-      baseTable.timeframes ||
-      []
-        .map(tf => ({
-          name: tf.name,
-          periods: tf.periods.filter(selected)
-        }))
-        .filter(tf => tf.periods.length)
+    const timeframes = (baseTable.timeframes || [])
+      .map(tf => ({
+        name: tf.name,
+        periods: tf.periods.filter(selected)
+      }))
+      .filter(tf => tf.periods.length)
 
     // Ordering setup
     const order = state.order.assigned.map(orderable => {
@@ -127,7 +131,6 @@ const helpers = {
       joins,
       order,
       limit: state.limit,
-      loader: state.loader,
       filters
     }
   }
@@ -138,8 +141,16 @@ const getters = {
     return utils.titleCase(state.currentDesign)
   },
 
+  currentExtractor(state) {
+    return state.currentNamespace.replace('model', 'tap')
+  },
+
   currentLimit(state) {
     return state.limit
+  },
+
+  currentModelID(state) {
+    return lodash.join([state.currentNamespace, state.currentModel], '/')
   },
 
   currentModelLabel(state) {
@@ -154,37 +165,54 @@ const getters = {
     return sqlFormatter.format(state.currentSQL)
   },
 
-  getAllAttributes(state) {
-    let attributes = []
-    const joinSources = state.design.joins || []
-    const sources = [state.design].concat(joinSources)
-    const batchCollect = (table, attributeTypes) => {
-      attributeTypes.forEach(attributeType => {
-        const attributesByType = table[attributeType]
-        if (attributesByType) {
-          attributes = attributes.concat(attributesByType)
-        }
-      })
-    }
+  getAttributes(state) {
+    return (types = ['columns', 'aggregates', 'timeframes']) => {
+      let attributes = []
+      const joinSources = state.design.joins || []
+      const sources = [state.design].concat(joinSources)
+      const batchCollect = (table, attributeTypes) => {
+        attributeTypes.forEach(attributeType => {
+          attributes = attributes.concat(table[attributeType] || [])
+        })
+      }
 
-    sources.forEach(source => {
-      batchCollect(source.relatedTable, ['columns', 'aggregates', 'timeframes'])
+      sources.forEach(source => {
+        batchCollect(source.relatedTable, types)
+      })
+
+      return attributes
+    }
+  },
+
+  getOrderableAttributesIndex(state, getters) {
+    const attributes = getters.getAttributes()
+
+    let attributesIndex = {}
+    attributes.forEach(attribute => {
+      if (
+        !getters.getIsOrderableAttribute({ attributeClass: attribute.class })
+      ) {
+        return
+      }
+
+      attributesIndex[
+        helpers.buildKey(attribute.sourceName, attribute.name)
+      ] = attribute
     })
 
-    return attributes
+    return attributesIndex
   },
 
   // eslint-disable-next-line no-shadow
-  getAttributeByQueryAttribute(state, getters) {
+  getAttributeByQueryAttribute(_, getters) {
     return queryAttribute => {
       const finder = attr =>
         attr.sourceName === queryAttribute.sourceName &&
-        attr.name === queryAttribute.attributeName
-      return getters.getAllAttributes.find(finder)
+        attr.name == queryAttribute.attributeName &&
+        attr.class === queryAttribute.attributeClass
+      return getters.getAttributes().find(finder)
     }
   },
-
-  getLoader: state => state.loader,
 
   // eslint-disable-next-line no-shadow
   getFilter(_, getters) {
@@ -244,6 +272,12 @@ const getters = {
       !!getters.getFilter(sourceName, name, filterType)
   },
 
+  // Timeframes are not sortable
+  // https://gitlab.com/meltano/meltano/issues/1188
+  getIsOrderableAttribute() {
+    return queryAttribute => queryAttribute.attributeClass != 'timeframes'
+  },
+
   getIsOrderableAttributeAscending() {
     return orderableAttribute => orderableAttribute.direction === 'asc'
   },
@@ -260,8 +294,7 @@ const getters = {
 
   // eslint-disable-next-line no-shadow
   getSelectedAttributes(_, getters) {
-    const selector = attribute => attribute.selected
-    return getters.getAllAttributes.filter(selector)
+    return getters.getAttributes().filter(selected)
   },
 
   // eslint-disable-next-line no-shadow
@@ -293,7 +326,8 @@ const getters = {
   isColumnSelectedAggregate: state => columnName =>
     columnName in state.resultAggregates,
 
-  isLoaderSqlite: state => state.loader === 'target-sqlite',
+  isTimeframeSelected: () => timeframe =>
+    timeframe.selected || lodash.some(timeframe.periods, selected),
 
   joinIsExpanded: () => join => join.expanded,
 
@@ -304,7 +338,7 @@ const getters = {
     return state.results.length
   },
 
-  showJoinColumnAggregateHeader: () => obj => !!obj
+  showAttributesHeader: () => attributes => attributes && attributes.length
 }
 
 const actions = {
@@ -336,11 +370,6 @@ const actions = {
     if (filterType === 'aggregate' && isValidToggleSelection) {
       commit('toggleSelected', attribute)
     }
-  },
-
-  tryAutoRun({ dispatch, state }) {
-    const hasRan = state.results.length > 0
-    dispatch('runQuery', hasRan && state.isAutoRunQuery)
   },
 
   // eslint-disable-next-line no-shadow
@@ -404,20 +433,32 @@ const actions = {
     commit('toggleCollapsed', row)
   },
 
-  getDesign({ commit, dispatch, state }, { namespace, model, design, slug }) {
+  getDesign(
+    { commit, dispatch, rootGetters },
+    { namespace, model, design, slug }
+  ) {
     commit('resetSQLResults')
     commit('setCurrentMetadata', { namespace, model, design })
+
+    const uponLoadReports = dispatch('reports/loadReports', null, {
+      root: true
+    })
 
     return designApi
       .index(namespace, model, design)
       .then(response => {
         commit('setDesign', response.data)
       })
-      .then(reportsApi.loadReports)
-      .then(response => {
-        commit('setReports', response.data)
+      .then(uponLoadReports)
+      .then(() => {
         if (slug) {
-          const reportMatch = state.reports.find(report => report.slug === slug)
+          const reportMatch = rootGetters['reports/getReportBySlug']({
+            design,
+            model,
+            namespace,
+            slug
+          })
+
           if (reportMatch) {
             dispatch('loadReport', reportMatch)
           }
@@ -435,16 +476,15 @@ const actions = {
     })
   },
 
-  getSQL({ commit, getters, state }, { run, load }) {
+  getSQL({ commit, getters, state }, { run, payload }) {
     this.dispatch('designs/resetErrorMessage')
     commit('setIsLoadingQuery', !!run)
 
-    const queryPayload = Object.assign(
-      {},
-      helpers.getQueryPayloadFromDesign(state),
-      load
+    const postData = Object.assign(
+      { run },
+      payload || helpers.getQueryPayloadFromDesign(state)
     )
-    const postData = Object.assign({ run }, queryPayload)
+
     sqlApi
       .getSql(
         state.currentNamespace,
@@ -457,38 +497,90 @@ const actions = {
         if (response.status === 204) {
           commit('resetQueryResults')
           commit('resetSQLResults')
-          commit('setIsLoadingQuery', false)
         } else if (run) {
+          commit('setHasCompletedFirstQueryRun', true)
           commit('setQueryResults', response.data)
           commit('setSQLResults', response.data)
-          commit('setIsLoadingQuery', false)
-          commit('setSorting', getters.getAllAttributes)
+          commit('setSorting', {
+            attributesIndex: getters.getOrderableAttributesIndex
+          })
         } else {
           commit('setSQLResults', response.data)
         }
       })
       .catch(e => {
         commit('setSqlErrorMessage', e)
-        commit('setIsLoadingQuery', false)
       })
+      .finally(() => commit('setIsLoadingQuery', false))
   },
 
-  loadReport({ commit }, { name }) {
-    reportsApi
-      .loadReport(name)
-      .then(response => {
-        const report = response.data
-        this.dispatch('designs/getSQL', {
-          run: true,
-          load: report.queryPayload
+  loadReport({ state, commit }, report) {
+    const nameMatcher = (source, target) => source.name === target.name
+
+    // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
+    const baseTable = state.design.relatedTable
+    const queryPayload = report.queryPayload
+    let joinColumnGroups = []
+    if (state.design.joins) {
+      joinColumnGroups = state.design.joins.reduce((acc, curr) => {
+        acc.push({
+          name: curr.name,
+          columns: curr.relatedTable.columns,
+          aggregates: curr.relatedTable.aggregates,
+          timeframes: curr.relatedTable.timeframes
         })
-        commit('setCurrentReport', report)
-        commit('setStateFromLoadedReport', report)
+        return acc
+      }, [])
+    }
+
+    const setSelected = (sourceCollection, targetCollection) => {
+      if (!(sourceCollection && targetCollection)) {
+        return
+      }
+
+      sourceCollection.forEach(item => {
+        if (targetCollection.includes(item.name)) {
+          commit('toggleSelected', item)
+        }
       })
-      .catch(e => {
-        commit('setSqlErrorMessage', e)
-        commit('setIsLoadingQuery', false)
+    }
+
+    // toggle the selected items
+    setSelected(baseTable.columns, queryPayload.columns)
+    setSelected(baseTable.aggregates, queryPayload.aggregates)
+    setSelected(baseTable.timeframes, queryPayload.timeframes.map(namer))
+
+    // timeframes periods
+    queryPayload.timeframes.forEach(queryTimeframe => {
+      const timeframe = baseTable.timeframes.find(tf =>
+        nameMatcher(tf, queryTimeframe)
+      )
+      setSelected(timeframe.periods, queryTimeframe.periods.map(namer))
+    })
+
+    // joins, timeframes, and periods
+    joinColumnGroups.forEach(joinGroup => {
+      // joins - columns
+      const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup))
+
+      setSelected(joinGroup.columns, targetJoin.columns)
+      setSelected(joinGroup.aggregates, targetJoin.aggregates)
+      setSelected(joinGroup.timeframes, targetJoin.timeframes.map(namer))
+
+      // timeframes periods
+      targetJoin.timeframes.forEach(queryTimeframe => {
+        const timeframe = joinGroup.timeframes.find(tf =>
+          nameMatcher(tf, queryTimeframe)
+        )
+        setSelected(timeframe.periods, queryTimeframe.periods.map(namer))
       })
+    })
+
+    commit('setCurrentReport', report)
+    this.dispatch('designs/getSQL', {
+      run: true,
+      payload: report.queryPayload
+    })
   },
 
   limitSet({ commit }, limit) {
@@ -516,7 +608,7 @@ const actions = {
     })
   },
 
-  saveReport({ commit, state }, { name }) {
+  saveReport({ commit, dispatch, rootGetters, state }, { name }) {
     const postData = {
       chartType: state.chartType,
       design: state.currentDesign,
@@ -527,11 +619,12 @@ const actions = {
       order: state.order,
       queryPayload: helpers.getQueryPayloadFromDesign(state)
     }
-    return reportsApi.saveReport(postData).then(response => {
-      commit('resetSaveReportSettings')
-      commit('setCurrentReport', response.data)
-      commit('addSavedReportToReports', response.data)
-    })
+    return dispatch('reports/saveReport', postData, { root: true }).then(
+      response => {
+        const report = rootGetters['reports/getReportById'](response.data.id)
+        commit('setCurrentReport', report)
+      }
+    )
   },
 
   // TODO: remove and use `mapMutations`
@@ -544,6 +637,17 @@ const actions = {
     dispatch('cleanOrdering', aggregate)
     dispatch('cleanFiltering', { attribute: aggregate, type: 'aggregate' })
     dispatch('tryAutoRun')
+  },
+
+  tryAutoRun({ dispatch, state }) {
+    if (helpers.debouncedAutoRun) {
+      helpers.debouncedAutoRun.cancel()
+    }
+    helpers.debouncedAutoRun = lodash.debounce(() => {
+      const hasRan = state.results.length > 0 || state.isLastRunResultsEmpty
+      dispatch('runQuery', state.isAutoRunQuery && hasRan)
+    }, 500)
+    helpers.debouncedAutoRun()
   },
 
   toggleColumn({ commit, dispatch }, column) {
@@ -570,16 +674,14 @@ const actions = {
     dispatch('tryAutoRun')
   },
 
-  updateReport({ commit, state }) {
+  updateReport({ commit, dispatch, rootGetters, state }) {
     commit('updateActiveReport')
-    return reportsApi.updateReport(state.activeReport).then(response => {
-      commit('resetSaveReportSettings')
-      commit('setCurrentReport', response.data)
+    return dispatch('reports/updateReport', state.activeReport, {
+      root: true
+    }).then(response => {
+      const report = rootGetters['reports/getReportById'](response.data.id)
+      commit('setCurrentReport', report)
     })
-  },
-
-  updateSaveReportSettings({ commit }, name) {
-    commit('setSaveReportSettingsName', name)
   },
 
   // eslint-disable-next-line no-shadow
@@ -616,16 +718,12 @@ const mutations = {
     state.filters[helpers.getFilterTypePlural(filter.filterType)].push(filter)
   },
 
-  addSavedReportToReports(state, report) {
-    state.reports.push(report)
-  },
-
   assignSortableAttribute(state, attribute) {
     const orderableAttribute = state.order.unassigned.find(
       orderableAttr => orderableAttr.attribute === attribute
     )
     const idx = state.order.unassigned.indexOf(orderableAttribute)
-    state.order.unassigned.splice(idx, 1)
+    Vue.delete(state.order.unassigned, idx)
     state.order.assigned.push(orderableAttribute)
   },
 
@@ -634,13 +732,13 @@ const mutations = {
       const filtersByType =
         state.filters[helpers.getFilterTypePlural(filter.filterType)]
       const idx = filtersByType.indexOf(filter)
-      filtersByType.splice(idx, 1)
+      Vue.delete(filtersByType, idx)
     }
   },
 
-  removeOrder(state, { collection, queryAttribute }) {
+  removeOrder(_, { collection, queryAttribute }) {
     const idx = collection.indexOf(queryAttribute)
-    collection.splice(idx, 1)
+    Vue.delete(collection, idx)
   },
 
   resetDefaults(state) {
@@ -648,13 +746,10 @@ const mutations = {
   },
 
   resetQueryResults(state) {
+    state.isLastRunResultsEmpty = false
     state.results = []
     state.queryAttributes = []
     state.resultAggregates = []
-  },
-
-  resetSaveReportSettings(state) {
-    state.saveReportSettings = { name: null }
   },
 
   resetSortAttributes(state) {
@@ -679,6 +774,11 @@ const mutations = {
 
   setCurrentReport(state, report) {
     state.activeReport = report
+
+    state.chartType = report.chartType
+    state.filters = report.filters
+    state.order = report.order
+    state.limit = report.queryPayload.limit
   },
 
   setDesign(state, designData) {
@@ -691,6 +791,7 @@ const mutations = {
           table[attributeType].forEach(attribute => {
             attribute.sourceName = source.name
             attribute.sourceLabel = source.label
+            attribute.class = attributeType
           })
         }
       })
@@ -708,10 +809,6 @@ const mutations = {
     localStorage.setItem('isAutoRunQuery', state.isAutoRunQuery)
   },
 
-  setLoader(state, loader) {
-    state.loader = loader
-  },
-
   setErrorState(state) {
     state.hasSQLError = false
     state.sqlErrorMessage = []
@@ -721,8 +818,12 @@ const mutations = {
     state.filterOptions = options
   },
 
-  setLimit(state, limit) {
-    state.limit = limit
+  setHasCompletedFirstQueryRun(state, value) {
+    state.hasCompletedFirstQueryRun = value
+  },
+
+  setIsLoadingQuery(state, value) {
+    state.isLoadingQuery = value
   },
 
   setJoinAggregates(_, { aggregates, join }) {
@@ -737,8 +838,8 @@ const mutations = {
     join.timeframes = timeframes
   },
 
-  setIsLoadingQuery(state, value) {
-    state.isLoadingQuery = value
+  setLimit(state, limit) {
+    state.limit = limit
   },
 
   setOrderAssigned(state, value) {
@@ -749,51 +850,41 @@ const mutations = {
     state.order.unassigned = value
   },
 
-  setQueryResults(state, results) {
-    state.results = results.results
-    state.queryAttributes = results.queryAttributes
-    state.resultAggregates = results.aggregates
-  },
-
-  setReports(state, reports) {
-    state.reports = reports
-  },
-
-  setSaveReportSettingsName(state, name) {
-    state.saveReportSettings.name = name
+  setQueryResults(state, payload) {
+    state.isLastRunResultsEmpty = payload.empty
+    state.results = payload.results
+    state.queryAttributes = payload.queryAttributes
+    state.resultAggregates = payload.aggregates
   },
 
   setSortableAttributeDirection(_, { orderableAttribute, direction }) {
     orderableAttribute.direction = direction
   },
 
-  setSorting(state, allAttributes) {
+  setSorting(state, { attributesIndex }) {
     state.queryAttributes.forEach(queryAttribute => {
-      const getName = attribute => {
-        // Account for timeframes matching
-        let period = null
-        if (attribute.periods) {
-          period = attribute.periods.find(
-            period => period.name === queryAttribute.attributeName
+      const attribute =
+        attributesIndex[
+          helpers.buildKey(
+            queryAttribute.sourceName,
+            queryAttribute.attributeName
           )
-        }
-        return period ? period.name : attribute.name
+        ]
+
+      // the index only contains attributes that are Orderable
+      if (!attribute) {
+        return
       }
+
       const finder = orderableAttribute =>
-        orderableAttribute.attribute.sourceName === queryAttribute.sourceName &&
-        getName(orderableAttribute.attribute) === queryAttribute.attributeName
+        orderableAttribute.attribute === attribute
 
       const accounted = state.order.assigned.concat(state.order.unassigned)
-      const isAccountedFor = accounted.find(finder)
+      const isAccountedFor = lodash.some(accounted, finder)
+
       if (!isAccountedFor) {
-        const targetAttribute = allAttributes.find(attribute => {
-          return (
-            attribute.sourceName === queryAttribute.sourceName &&
-            getName(attribute) === queryAttribute.attributeName
-          )
-        })
         state.order.unassigned.push({
-          attribute: targetAttribute,
+          attribute,
           direction: 'asc'
         })
       }
@@ -812,71 +903,8 @@ const mutations = {
     state.sqlErrorMessage = [error.code, error.orig, error.statement]
   },
 
-  setSQLResults(state, results) {
-    state.currentSQL = results.sql
-  },
-
-  setStateFromLoadedReport(state, report) {
-    // General UI state updates
-    state.chartType = report.chartType
-    state.currentNamespace = report.namespace
-    state.currentModel = report.model
-    state.currentDesign = report.design
-    state.loader = report.queryPayload.loader
-    state.filters = report.filters
-    state.limit = report.queryPayload.limit
-    state.order = report.order
-
-    // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
-    const baseTable = state.design.relatedTable
-    const queryPayload = report.queryPayload
-    const joinColumnGroups = state.design.joins.reduce((acc, curr) => {
-      acc.push({
-        name: curr.name,
-        columns: curr.relatedTable.columns,
-        aggregates: curr.relatedTable.aggregates,
-        timeframes: curr.relatedTable.timeframes
-      })
-      return acc
-    }, [])
-    const nameMatcher = (source, target) => source.name === target.name
-    const nameMapper = item => item.name
-    const setSelected = (sourceCollection, targetCollection) => {
-      sourceCollection.forEach(item => {
-        item.selected = targetCollection.includes(item.name)
-      })
-    }
-
-    // columns
-    setSelected(baseTable.columns, queryPayload.columns)
-    // aggregates
-    setSelected(baseTable.aggregates, queryPayload.aggregates)
-    // joins, timeframes, and periods
-    joinColumnGroups.forEach(joinGroup => {
-      // joins - columns
-      const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup))
-      setSelected(joinGroup.columns, targetJoin.columns)
-      // joins - aggregates
-      if (joinGroup.aggregates) {
-        setSelected(joinGroup.aggregates, targetJoin.aggregates)
-      }
-      // timeframes
-      if (targetJoin && targetJoin.timeframes) {
-        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(nameMapper))
-        // periods
-        joinGroup.timeframes.forEach(timeframe => {
-          const targetTimeframe = targetJoin.timeframes.find(tf =>
-            nameMatcher(tf, timeframe)
-          )
-          if (targetTimeframe && targetTimeframe.periods) {
-            setSelected(
-              timeframe.periods,
-              targetTimeframe.periods.map(nameMapper)
-            )
-          }
-        })
-      }
-    })
+  setSQLResults(state, payload) {
+    state.currentSQL = payload.sql
   },
 
   toggleCollapsed(state, collapsable) {

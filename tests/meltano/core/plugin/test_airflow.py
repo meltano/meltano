@@ -28,7 +28,11 @@ class TestAirflow:
         def invoke_mock(*args, **kwargs):
             # first time, it creates the `airflow.cfg`
             if "--help" in args:
-                project.run_dir("airflow", "airflow.cfg").touch()
+                airflow_cfg = ConfigParser()
+                airflow_cfg["core"] = {"dummy": "dummy"}
+                airflow_cfg["webserver"] = {"dummy": "dummy"}
+                with project.run_dir("airflow", "airflow.cfg").open("w") as cfg:
+                    airflow_cfg.write(cfg)
 
             # second time, it creates the `airflow.db`
             if "initdb" in args:
@@ -38,12 +42,16 @@ class TestAirflow:
 
         # fmt: off
         with mock.patch.object(AirflowInvoker, "invoke", side_effect=invoke_mock) as invoke, \
-          mock.patch("meltano.core.plugin_invoker.PluginConfigService.configure") as configure, \
-          mock.patch.object(ConfigParser, "__getitem__") as get_config_item, \
-          mock.patch.object(ConfigParser, "write") as config_write:
+          mock.patch("meltano.core.plugin_invoker.PluginConfigService.configure") as configure:
             subject.after_install(project)
             commands = [args[0]
                         for name, args, kwargs in invoke.mock_calls]
             assert commands == ["--help", "initdb"]
             assert configure.call_count == 2
+
+            airflow_cfg = ConfigParser()
+            with project.plugin_dir(subject, "airflow.cfg").open() as cfg:
+                airflow_cfg.read_file(cfg)
+
+            assert airflow_cfg['core']['dags_folder']
         # fmt: on

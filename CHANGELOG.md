@@ -3,7 +3,630 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.21.1 - (2020-02-17)
+
+---
+
+### Fixes
+
+- [#1754](https://gitlab.com/meltano/meltano/issues/1754) Fix duplicate "Share" button and Reports dropdown clipping issue
+
+
+## 1.21.0 - (2020-02-17)
+
+---
+
+### New
+
+- [#609](https://gitlab.com/meltano/meltano/issues/609) Add the Google Ads Extractor to Meltano as a hidden plugin. It will be fully enabled on Meltano UI once OAuth support is added. It uses the tap defined in https://gitlab.com/meltano/tap-adwords/
+- [#1693](https://gitlab.com/meltano/meltano/issues/1693) Add default transformations for the Google Ads Extractor. They are using the dbt package defined in https://gitlab.com/meltano/dbt-tap-adwords
+- [#1694](https://gitlab.com/meltano/meltano/issues/1694) Add default Meltano Models for the Google Ads Extractor. They are defined in https://gitlab.com/meltano/model-adwords
+- [#1695](https://gitlab.com/meltano/meltano/issues/1695) Add documentation for the Google Ads Extractor
+- [#1723](https://gitlab.com/meltano/meltano/issues/1723) Add various mobile and widescreen related style tweaks to improve base layout at mobile and widescreen widths
+
+### Changes
+
+- [!1460](https://gitlab.com/meltano/meltano/merge_requests/1460) Remove the FTP access from Meltano hosted instances
+- [#1629](https://gitlab.com/meltano/meltano/issues/1629) Add "Share Dashboard" functionality
+- [#1629](https://gitlab.com/meltano/meltano/issues/1629) Update report "Embed" button to "Share" and include a share link to accompany the embed snippet
+
+### Fixes
+
+- [#1680](https://gitlab.com/meltano/meltano/issues/1680) Fix initial "Last Run" button of a pipeline run to properly open the corresponding job log
+
+## 1.20.1 - (2020-02-13)
+
+---
+
+### New
+
+- [#1650](https://gitlab.com/meltano/meltano/issues/1650) create TOS page and add TOS link to website footer
+
+### Changes
+
+- [#1681](https://gitlab.com/meltano/meltano/issues/1681) Update `transform` during pipeline save to conditionally set `skip` vs. `run` to prevent wasted cycles for extractors that lack transformations
+- [#1696](https://gitlab.com/meltano/meltano/issues/1696) Update dashboards list to be alphabetically sorted
+- [#1710](https://gitlab.com/meltano/meltano/issues/1710) Hide `tap-fastly` in UI
+
+### Fixes
+
+- [#1696](https://gitlab.com/meltano/meltano/issues/1696) Fix duplicate chart renders when dashboard is loaded
+- [#1696](https://gitlab.com/meltano/meltano/issues/1696) Fix "Add to Dashboards" button when loading an existing report (additionally updated `disabled` button states)
+- [#1711](https://gitlab.com/meltano/meltano/issues/1711) Disable fields of all kinds when a plugin setting is protected or set in env or meltano.yml
+- [#1712](https://gitlab.com/meltano/meltano/issues/1712) Fix lock icon tooltip message on plugin settings that were set in env or meltano.yml
+- [#1677](https://gitlab.com/meltano/meltano/issues/1677) Properly represent values of boolean settings that were set using environment verariables in UI
+
+## 1.20.0 - (2020-02-10)
+
+---
+
+### New
+
+- [#1682](https://gitlab.com/meltano/meltano/issues/1682) Use human-readable update interval labels
+
+### Changes
+
+- [#1514](https://gitlab.com/meltano/meltano/issues/1514) Remove DBT docs integration
+- [#1679](https://gitlab.com/meltano/meltano/issues/1679) Prevent the `hidden` settings from being sent to the front-end, potentially causing configuration failure
+
+### Fixes
+
+- [#1675](https://gitlab.com/meltano/meltano/issues/1675) Fix future grant diffing for databases and schemas
+- [#1674](https://gitlab.com/meltano/meltano/issues/1674) Fix duplicate pipelines bug resulting from recent addition to view and update existing connections
+
+## 1.19.2 - (2020-02-06)
+
+---
+
+### Fixes
+
+- [#1672](https://gitlab.com/meltano/meltano/issues/1672) Pin Werkzeug version to 0.16.1 since 1.0.0 is unsupported by Flask-BabelEx
+
+## 1.19.1 - (2020-02-06)
+
+---
+
+### Fixes
+
+- [#1671](https://gitlab.com/meltano/meltano/issues/1671) Fix error handling bug that caused a console error that impacted further UI interaction
+
+## 1.19.0 - (2020-02-06)
+
+---
+
+### New
+
+- [#1545](https://gitlab.com/meltano/meltano/issues/1545) Add read-only report embed functionality via embeddable `iframe` copy-to-clipboard snippet
+- [#1606](https://gitlab.com/meltano/meltano/issues/1606) Update UI after successful plugin configuration with auto installed reports and dashboards
+- [#1614](https://gitlab.com/meltano/meltano/issues/1614) Add 'Fix Connection' and 'View Connection' CTAs to Integrations with corresponding pipelines
+- [#1550](https://gitlab.com/meltano/meltano/issues/1550) Add the Meltano OAuth Service integration to manage the OAuth flow in the plugin configuration
+
+### Changes
+
+- [#1594](https://gitlab.com/meltano/meltano/issues/1594) Improve onboarding UX by moving the "Update Interval" selection to a post-successful-pipeline action
+- [#1594](https://gitlab.com/meltano/meltano/issues/1594) Update pipelines to be sorted alphabetically to match data sources organization
+- [#1659](https://gitlab.com/meltano/meltano/issues/1659) Update query attribute toggling and results UX when autorun query is on (via 500ms debounce)
+- [#1475](https://gitlab.com/meltano/meltano/issues/1475) GitLab extractor in the UI steers user towards a single data source
+
+### Fixes
+
+- [#1657](https://gitlab.com/meltano/meltano/issues/1657) Fix `update_dashboard` error when payload lacked a `new_settings` key
+- [#1602](https://gitlab.com/meltano/meltano/issues/1602) Fix instances where `<a disabled='...'>` vs. `<button disabled='...'>` didn't functionally disable the button (previously they were only disabled visually)
+- [#1656](https://gitlab.com/meltano/meltano/issues/1656) Fix conditional header in docs to support Meltano.com and inline docs within the Meltano app
+
+## 1.18.0 - (2020-02-03)
+
+---
+
+### New
+
+- [#1154](https://gitlab.com/meltano/meltano/issues/1154) Adds non-dry mode to `meltano permissions` on Snowflake so that queries can be executed
+- [#1578](https://gitlab.com/meltano/meltano/issues/1578) User can request help to delete their data from their MeltanoData instance
+
+### Changes
+
+- [#1516](https://gitlab.com/meltano/meltano/issues/1516) Pipelines now show extractor label rather than name
+- [#1652](https://gitlab.com/meltano/meltano/issues/1652) Removes the `--full-refresh` command from `meltano permissions`
+
+### Fixes
+
+- [#1595](https://gitlab.com/meltano/meltano/issues/1595) Updates `meltano permissions` to only revoke permissions on databases defined in the spec
+- [#1588](https://gitlab.com/meltano/meltano/issues/1588) Update `scrollTo` behavior in Job Log to work across browsers
+- [#1660](https://gitlab.com/meltano/meltano/issues/1660) Fix minor action/mutation bug when loading a report in Analyze
+- [#1607](https://gitlab.com/meltano/meltano/issues/1607) Fix inaccurate error during report additions/removal from dashboards (via refactor SSOT reports store)
+
+## 1.17.1 - (2020-01-29)
+
+---
+
+### Changes
+
+- [#1625](https://gitlab.com/meltano/meltano/issues/1625) Update docs on meltano.com to only include extractors and loaders provided in the hosted version of Meltano.
+- [#1590](https://gitlab.com/meltano/meltano/issues/1590) Add additional targets to `dbt clean`
+- [#1655](https://gitlab.com/meltano/meltano/issues/1655) Add UX message to close buttons in Job Log Modal to reinforce that the pipeline still runs after closing (Ben's hover idea)
+
+### Fixes
+
+- [#1618](https://gitlab.com/meltano/meltano/issues/1618) Fix an issue where an expired session would not redirect to the Login page
+- [#1630](https://gitlab.com/meltano/meltano/issues/1630) Fix an integrations setup bug that prevented subsequent pipelines to be created unless a full page refresh occurred
+
+## 1.17.0 - (2020-01-27)
+
+---
+
+### New
+
+- [#1462](https://gitlab.com/meltano/meltano/issues/1462) User will be able to reorder dashboard reports
+- [#1482](https://gitlab.com/meltano/meltano/issues/1482) Add future grants and revocations for schemas, tables, and views for roles in the `meltano permissions` command
+- [#1376](https://gitlab.com/meltano/meltano/issues/1376) Add last updated date to reports
+- [#1409](https://gitlab.com/meltano/meltano/issues/1409) Add data start date to Analysis page
+
+- [#1241](https://gitlab.com/meltano/meltano/issues/1241) Add `dashboard` plugin type to enable bundling curated reports and dashboards for data sources
+- [#1241](https://gitlab.com/meltano/meltano/issues/1241) Add `--include-related` flag to `meltano add` and `meltano install` to automatically install related plugins based on namespace
+- [#1241](https://gitlab.com/meltano/meltano/issues/1241) Add default dashboard and reports for Google Analytics
+
+### Changes
+
+- [#1481](https://gitlab.com/meltano/meltano/issues/1481) Add table and view revocations for roles in the `meltano permissions` command
+- [#1459](https://gitlab.com/meltano/meltano/issues/1459) Users can no longer install tap-carbon-intensity from the UI
+
+### Fixes
+
+- [#1600](https://gitlab.com/meltano/meltano/issues/1600) Fix tooltip for Data Source "Connect" buttons
+- [#1605](https://gitlab.com/meltano/meltano/issues/1605) Fix an infinite loop causing extraneous API calls to the configuration endpoint
+- [#1561](https://gitlab.com/meltano/meltano/issues/1561) Fix `onFocusInput()` to properly focus-and-auto-scroll to `<input type='file'>`s in the data source docs UI
+- [#1561](https://gitlab.com/meltano/meltano/issues/1561) Fix `<input type='file'>` styling to better accommodate flexible widths
+
+## 1.16.1 - (2020-01-23)
+
+---
+
+### New
+
+- [#1592](https://gitlab.com/meltano/meltano/issues/1592) Add MAX and MIN aggregate functions to Meltano Models
+- [#1552](https://gitlab.com/meltano/meltano/issues/1552) Add "Custom" data source CTA to link to the create custom data source docs
+- [#1462](https://gitlab.com/meltano/meltano/issues/1462) User will be able to reorder dashboard reports
+
+### Changes
+
+- [#1510](https://gitlab.com/meltano/meltano/issues/1510) Remove breadcrumbs (not currently useful)
+- [#1589](https://gitlab.com/meltano/meltano/issues/1589) Add dbt-specific files to a .gitignore
+- [#1402](https://gitlab.com/meltano/meltano/issues/1402) Onboarding redesign to minimize steps and friction ('Extractors' as 'Data Sources', pipelines are secondary to 'Data Source' integrations, and removed loader, transform, and pipeline name as editable in favor of preselected values in accordance with our hosted solution)
+- [#1402](https://gitlab.com/meltano/meltano/issues/1402) Local development now requires `.env` to connect a `target-postgres` loader (docs update to follow in [#1586](https://gitlab.com/meltano/meltano/issues/1586) )
+- [#1410](https://gitlab.com/meltano/meltano/issues/1410) Update the Design UI to expose timeframes explicitly
+
+### Fixes
+
+- [#1573](https://gitlab.com/meltano/meltano/issues/1573) Fix docs `shouldShowNavbar` conditional and improve query string `embed=true` parsing
+- [#1579](https://gitlab.com/meltano/meltano/issues/1579) Make color contrast for CTA buttons accessible
+- [#1410](https://gitlab.com/meltano/meltano/issues/1410) Fix a problem with Report that has timeframes selections
+
+### Breaks
+
+## 1.16.0 - (2020-01-20)
+
+---
+
+### New
+
+- [#1556](https://gitlab.com/meltano/meltano/issues/1556) Add default transformations for the Facebook Ads Extractor. They are using the dbt package defined in https://gitlab.com/meltano/dbt-tap-facebook
+- [#1557](https://gitlab.com/meltano/meltano/issues/1557) Add default Meltano Models for the Facebook Ads Extractor. They are defined in https://gitlab.com/meltano/model-facebook
+- [#1560](https://gitlab.com/meltano/meltano/issues/1560) Make the Facebook Ads Extractor available by default on Meltano UI
+
+### Changes
+
+- [#1541](https://gitlab.com/meltano/meltano/issues/1541) Revert `tap-csv`'s `kind: file` to text input for `csv_files_definition` as we don't fully support `tap-csv` via the UI with single (definition json) and multiple (csv files) file uploading
+- [#1477](https://gitlab.com/meltano/meltano/issues/1477) Add a `read-only` mode to Meltano to disable all modifications from the UI
+
+### Fixes
+
+### Breaks
+
+## 1.15.1 - (2020-01-16)
+
+---
+
+### New
+
+- [#608](https://gitlab.com/meltano/meltano/issues/608) Add the Facebook Ads Extractor to Meltano as a hidden plugin. It will be fully enabled on Meltano UI once bundled Transformations and Models are added. It uses the tap defined in https://gitlab.com/meltano/tap-facebook/
+- [meltano/model-stripe#2](https://gitlab.com/meltano/model-stripe/issues/2) Add timeframes to the Stripe models
+- [#1533](https://gitlab.com/meltano/meltano/issues/1533) Add documentation for the Facebook Ads Extractor
+
+### Changes
+
+- [#1527](https://gitlab.com/meltano/meltano/issues/1527) Update the dashboard modal header to properly differentiate between "Create" and "Edit"
+- [#1456](https://gitlab.com/meltano/meltano/issues/1456) 404 Error page now has better back functionality and ability to file new issues directly from the page
+
+### Fixes
+
+- [#1538](https://gitlab.com/meltano/meltano/issues/1538) Fix timeframes not properly displaying on the base table
+- [#1574](https://gitlab.com/meltano/meltano/issues/1574) Fix an issue with Meltano crashing after a succesful login
+- [#1568](https://gitlab.com/meltano/meltano/issues/1568) Restore support for custom plugins that don't have their available settings defined in discovery.yml
+
+## 1.15.0 - (2020-01-13)
+
+---
+
+### New
+
+- [#1483](https://gitlab.com/meltano/meltano/issues/1483) Add login audit columns to track last login time
+- [#1480](https://gitlab.com/meltano/meltano/issues/1480) Add tests to `meltano permissions` command for Snowflake
+- [#1392](https://gitlab.com/meltano/meltano/issues/1392) Add inline docs to Extractor configurations in iteration toward improving data setup onboarding
+
+### Changes
+
+- [#1480](https://gitlab.com/meltano/meltano/issues/1480) Add schema revocations for roles in the `meltano permissions` command
+- [#1458](https://gitlab.com/meltano/meltano/issues/1458) Remove tap-carbon-intensity-sqlite model from default installation
+- [#1458](https://gitlab.com/meltano/meltano/issues/1458) Update docs to reflect new getting started path and updated screenshots
+- [#1513](https://gitlab.com/meltano/meltano/issues/1513) Remove dead code related to `/model` route that we no longer link to in favor of the contextual Analyze CTAs and the `MainNav.vue`'s Analyze dropdown
+- [#1542](https://gitlab.com/meltano/meltano/issues/1542) Update version, logout, and help UI partial (upper right) to have less prominence and more clearly communicate the "Sign Out" action
+
+### Fixes
+
+- [#1480](https://gitlab.com/meltano/meltano/issues/1480) Fix database revocations corner case for roles in the `meltano permissions` command
+- [#1553](https://gitlab.com/meltano/meltano/issues/1553) Fix bug occurring when loading a report that lacks join tables
+- [#1540](https://gitlab.com/meltano/meltano/issues/1540) Meltano Analyze will now leverage Pipelines instead of Loaders in the connection dropdown
+- [#1540](https://gitlab.com/meltano/meltano/issues/1540) Meltano Analyze will now infer the connection to use instead of it being provided by the user
+
+### Breaks
+
+## 1.14.3 - (2020-01-09)
+
+---
+
+### Fixes
+
+- [#1521](https://gitlab.com/meltano/meltano/issues/1521) Sanitize user-submitted string before using it in file path
+
+## 1.14.2 - (2020-01-09)
+
+---
+
+### New
+
+- [#1391](https://gitlab.com/meltano/meltano/issues/1391) Lock all settings that are controlled through environment variables
+- [#1393](https://gitlab.com/meltano/meltano/issues/1393) Add contextual Analyze CTAs for each Pipeline in the Pipelines list
+- [#1551](https://gitlab.com/meltano/meltano/issues/1551) Add dbt clean before compile and runs
+
+### Changes
+
+- [#1424](https://gitlab.com/meltano/meltano/issues/1424) Update pipeline elapsed time display to be more human friendly
+
+### Fixes
+
+- [#1430](https://gitlab.com/meltano/meltano/issues/1430) Fix the state not stored for pipelines when Transforms run
+- [#1448](https://gitlab.com/meltano/meltano/issues/1448) Fix `AnalyzeList.vue` to display message and link when lacking contextual models
+
+### Breaks
+
+## 1.14.1 - (2020-01-06)
+
+---
+
+### Fixes
+
+- [#1520](https://gitlab.com/meltano/meltano/issues/1520) Fix bug when updating a dashboard that could undesirably overwrite another existing dashboard
+
+### Breaks
+
+## 1.14.0 - (2019-12-30)
+
+---
+
+### New
+
+- [#1461](https://gitlab.com/meltano/meltano/issues/1461) Display toasted notification for report adding to dashboard
+- [#1419](https://gitlab.com/meltano/meltano/issues/1419) Add ability to edit and delete dashboards
+- [#1411](https://gitlab.com/meltano/meltano/issues/1411) Add download log button to Job Log Modal
+
+### Changes
+
+- [#1311](https://gitlab.com/meltano/meltano/issues/1311) Remove unused meltano/meltano/runner docker image
+- [#1502](https://gitlab.com/meltano/meltano/issues/1502) Update configuration file uploads to occur on save vs. file picker completion
+
+### Fixes
+
+- [#1518](https://gitlab.com/meltano/meltano/issues/1518) Fix bug that caused all text fields to show up as required in configuration modals
+- [#1446](https://gitlab.com/meltano/meltano/issues/1446) Fix bug that could result in a broken report when the report URL was manually modified
+- [#1411](https://gitlab.com/meltano/meltano/issues/1411) Fix bug when reading too large a job log file
+
+## 1.13.0 - (2019-12-23)
+
+---
+
+### New
+
+- [#1269](https://gitlab.com/meltano/meltano/issues/1269) Add `kind: file` so single file uploads can be used with extractors (`tap-google-analytics`'s `key_file_location` is the first user)
+- [#1494](https://gitlab.com/meltano/meltano/issues/1494) Add `LIKE` options to Analyze Filter UI so users better understand what filtering patterns are available
+
+### Changes
+
+- [#1399](https://gitlab.com/meltano/meltano/issues/1399) Log Modal now has a prompt to explain potential factors in required time for pipelines to complete
+- [#1433](https://gitlab.com/meltano/meltano/issues/1433) Remove `/orchestrate` route and thus the Airflow iframe as this is overkill for our current target users
+
+### Fixes
+
+- [#1434](https://gitlab.com/meltano/meltano/issues/1434) Fix Analyze CTAs to only enable if at least one related pipeline has succeeded
+- [#1447](https://gitlab.com/meltano/meltano/issues/1447) Various fixes around loading and reloading reports to mitigate false positive `sqlErrorMessage` conditions
+- [#1509](https://gitlab.com/meltano/meltano/issues/1509) Allow plugin profile config to be set through meltano.yml
+
+## 1.12.2 - (2019-12-20)
+
+---
+
+### New
+
+- [#1437](https://gitlab.com/meltano/meltano/issues/1437) Users can now share their dashboards with an automatically generated email
+
+### Changes
+
+- [#1466](https://gitlab.com/meltano/meltano/issues/1466) Filters now have clear language and indiciation that they use AND for chaining
+- [#1464](https://gitlab.com/meltano/meltano/issues/1464) Remove the "only" option for transforms in Create Pipeline form
+
+- [#1399](https://gitlab.com/meltano/meltano/issues/1399) Log Modal now has a prompt to explain potential factors in required time for pipelines to complete
+- [#1431](https://gitlab.com/meltano/meltano/issues/1431) Add "pipeline will still run if modal is closed" message in the Job Log Modal
+
+### Changes
+
+- [#1422](https://gitlab.com/meltano/meltano/issues/1422) Update start date field to have a recommendation
+
+### Fixes
+
+- [#1447](https://gitlab.com/meltano/meltano/issues/1447) Various fixes around loading and reloading reports to mitigate false positive `sqlErrorMessage` conditions
+- [#1443](https://gitlab.com/meltano/meltano/issues/1443) Fix tooltip clipping in modals
+- [#1500](https://gitlab.com/meltano/meltano/issues/1500) Fix `meltano install` not running the migrations.
+
+## 1.12.1 - (2019-12-18)
+
+---
+
+### Changes
+
+- [#1403](https://gitlab.com/meltano/meltano/issues/1403) Remove "Orchestrate", "Model", and "Notebook" from the main navigation until each respective UI is more useful (the `/orchestrate` and `/model` routes still exist)
+- [#1476](https://gitlab.com/meltano/meltano/issues/1476) Add database and warehouse revocations for roles in the `meltano permissions` command
+- [#1473](https://gitlab.com/meltano/meltano/issues/1473) Update Release issue template to recent guidelines
+
+## 1.12.0 - (2019-12-16)
+
+---
+
+### New
+
+- [#1374](https://gitlab.com/meltano/meltano/issues/1374) Add role revocation for users and roles in the `meltano permissions` command
+- [#1377](https://gitlab.com/meltano/meltano/issues/1377) Document cleanup steps after MeltanoData testing
+- [#1438](https://gitlab.com/meltano/meltano/issues/1438) Add documentation for DNS spoofing error
+- [#1436](https://gitlab.com/meltano/meltano/issues/1436) Add video walkthrough on how to setup Google Analytics so that the Meltano Extractor can be able to access the Google APIs and the Google Analytics data.
+
+### Changes
+
+- [#1350](https://gitlab.com/meltano/meltano/issues/1350) Switch to all lower case for Snowflake permission comparisons in the `meltano permissions` command
+- [#1449](https://gitlab.com/meltano/meltano/issues/1449) Hide the Marketo Extractor form Meltano UI
+- [#1397](https://gitlab.com/meltano/meltano/issues/1397) Optimize workflow for MeltanoData setup
+- [#1423](https://gitlab.com/meltano/meltano/issues/1423) Update sidebar and docs to include Ansible
+
+## 1.11.2 - (2019-12-13)
+
+---
+
+### Changes
+
+- [#1435](https://gitlab.com/meltano/meltano/issues/1435) Change "Model" to "Analyze" so the Pipeline CTA is actionable and less abstract
+- [#1432](https://gitlab.com/meltano/meltano/issues/1432) Changed "Close" to "Back" in Log Modal to help mitigate "Am I ending the pipeline?" concerns
+
+### Fixes
+
+- [#1439](https://gitlab.com/meltano/meltano/issues/1439) Fix relative elapsed time since last run time display in the Pipelines UI
+- [#1441](https://gitlab.com/meltano/meltano/issues/1441) Fix auto advance to "Create Pipeline" when coming from "Load" step (previously "Transform" step, but this has been removed from the UI)
+- [#1440](https://gitlab.com/meltano/meltano/issues/1440) Allow installed plugins to appear in UI even if hidden in configuration
+
+## 1.11.1 - (2019-12-12)
+
+---
+
+### New
+
+- [#1351](https://gitlab.com/meltano/meltano/issues/1351) Add "Create Meltano Account" promo for `meltano.meltanodata.com`
+- [#1055](https://gitlab.com/meltano/meltano/issues/1055) Add "Disable" button to Tracking Acknowledgment toast so user's can opt-out from the UI
+- [#1408](https://gitlab.com/meltano/meltano/issues/1408) Add "Last Run" context to each pipeline
+- [#1408](https://gitlab.com/meltano/meltano/issues/1408) Add "Started At", "Ended At", and "Elapsed" to Job Log modal
+- [#1390](https://gitlab.com/meltano/meltano/issues/1390) Display of extractors and loaders can now be configured through the `hidden` property in `discovery.yml`
+
+### Changes
+
+- [#1398](https://gitlab.com/meltano/meltano/issues/1398) Update default Transform from "Skip" to "Run"
+- [#1406](https://gitlab.com/meltano/meltano/issues/1406) Update Analyze Query section CSS for improved UX (visually improved organization and scanability)
+- [#1417](https://gitlab.com/meltano/meltano/issues/1417) Update SCSS variable usage in components for SSOT styling
+- [#1408](https://gitlab.com/meltano/meltano/issues/1408) Updated date and time displays to be human-friendly (`moment.js`)
+- [#1268](https://gitlab.com/meltano/meltano/issues/1268) Remove Transform step from UI (Create Schedule still allows choosing "Skip" or "Only" but will intelligently default to "Skip" or "Run")
+
+## 1.11.0 - (2019-12-09)
+
+---
+
+### New
+
+- [#1361](https://gitlab.com/meltano/meltano/issues/1361) Add `kind: hidden` to `discovery.yml` so certain connector settings can validate with a default `value` but remain hidden from the user for improved UX
+
+### Changes
+
+- [#1389](https://gitlab.com/meltano/meltano/issues/1389) Temporary Profiles feature removal (conditionally removed if 2+ profiles not already created so existing users can continue using multiple profiles if created)
+- [#1373](https://gitlab.com/meltano/meltano/issues/1373) Update MeltanoData deletion process with 1Password
+
+### Fixes
+
+- [#1401](https://gitlab.com/meltano/meltano/issues/1401) Fix double instance of self hosted CTA on desktop sites
+
+## 1.10.2 - (2019-12-06)
+
+---
+
+### Changes
+
+- [#1371](https://gitlab.com/meltano/meltano/issues/1371) Provide more specific instructions for Google Analytics configuration
+- [#1381](https://gitlab.com/meltano/meltano/issues/1381) Update the default directory for client_secrets.json for the Google Analytics Extractor to be located under the extract/ directory and not the project's root.
+- [#1345](https://gitlab.com/meltano/meltano/issues/1345) Update the documentation for the [Salesforce Extractor](https://www.meltano.com/plugins/extractors/salesforce.html) to contain additional information on Security Tokens
+- [#1383](https://gitlab.com/meltano/meltano/issues/1383) Add CTA for hosted solution signup to navigation
+
+### Fixes
+
+- [#1379](https://gitlab.com/meltano/meltano/issues/1379) Fix an issue with Airflow scheduling too many jobs.
+- [#1386](https://gitlab.com/meltano/meltano/issues/1386) Fix connector modal clipping issue where small browser heights prevented accessing the "Save" area
+
+### Breaks
+
+## 1.10.1 - (2019-12-05)
+
+---
+
+### Changes
+
+- [#1373](https://gitlab.com/meltano/meltano/issues/1373) Update MeltanoData deletion process with 1Password
+- [#1373](https://gitlab.com/meltano/meltano/issues/1373) Update Analyze dropdown as scrollable to better display model CTAs (scrollable dropdown vs. scrolling entire page)
+
+### Fixes
+
+- [#1373](https://gitlab.com/meltano/meltano/issues/1373) Fix formatting on custom containers in MeltanoData guide
+
+## 1.10.0 - (2019-12-04)
+
+---
+
+### New
+
+- [#1343](https://gitlab.com/meltano/meltano/issues/1343) Add current Meltano version to main navigation
+
+### Changes
+
+- [#1358](https://gitlab.com/meltano/meltano/issues/1358) Update MeltanoData guide with maintenance and debugging instructions
+- [#1337](https://gitlab.com/meltano/meltano/issues/1337) Add CTA to installations for free hosted dashboards
+- [#1365](https://gitlab.com/meltano/meltano/issues/1365) Add process for deleting meltanodata instances
+- [#1340](https://gitlab.com/meltano/meltano/issues/1340) Update connector settings UI to communicate the required status of each setting
+- [#1357](https://gitlab.com/meltano/meltano/issues/1357) Update LogModal Analyze CTAs so Analyze can preselect the correct loader for a given analysis
+
+### Fixes
+
+- [#1364](https://gitlab.com/meltano/meltano/issues/1364) Fix instructions to SSH into MeltanoData.com instance
+
+## 1.9.1 - (2019-12-04)
+
+---
+
+### Fixes
+
+- [#1355](https://gitlab.com/meltano/meltano/issues/1355) Upgrade version of `discovery.yml` so that not upgraded Meltano instances with a pre v1.9.0 Meltano version do not break.
+
+## 1.9.0 - (2019-12-03)
+
+---
+
+### New
+
+- [marketing#103](https://gitlab.com/meltano/meltano-marketing/issues/103) Add Google Site Verification token to site
+- [#1346](https://gitlab.com/meltano/meltano/issues/1346) Add new tutorial for using FileZilla with a Meltano project
+- [#1292](https://gitlab.com/meltano/meltano/issues/1292) Add guide for setting up Meltano projects on meltanodata.com
+
+### Changes
+
+- [#1341](https://gitlab.com/meltano/meltano/issues/1341) Various `discovery.yml` and connector configuration UI updates to improve UX.
+- [#1341](https://gitlab.com/meltano/meltano/issues/1341) Updated documentation to communicate the various optional settings of a connector
+
+### Fixes
+
+- [#1334](https://gitlab.com/meltano/meltano/issues/1334) Fix automatic population of airflow.cfg after installation
+- [#1344](https://gitlab.com/meltano/meltano/issues/1344) Fix an ELT automatic discovery error when running Meltano on Python3.6
+
+## 1.8.0 - (2019-12-02)
+
+---
+
+### New
+
+- [#764](https://gitlab.com/meltano/meltano/issues/764) Add plugin profiles to enable multiple configurations for extractors
+- [#1081](https://gitlab.com/meltano/meltano/issues/1081) Add ability to delete data pipelines
+- [#1217](https://gitlab.com/meltano/meltano/issues/1217) Add "Test Connection" button to validate connection settings prior to ELT runs
+- [#1236](https://gitlab.com/meltano/meltano/issues/1236) Add contextual Analyze CTAs in the Job Log UI
+- [#1271](https://gitlab.com/meltano/meltano/issues/1271) Add labels in discovery.yml for easy brand definition
+
+### Changes
+
+- [#1323](https://gitlab.com/meltano/meltano/issues/1323) Add CTA to send users to Typeform to provide info for setting up a hosted dashboard
+
+- [#1323](https://gitlab.com/meltano/meltano/issues/1323) Add CTA to send users to Typeform to provide info for setting up a hosted dashboard
+- [#1271](https://gitlab.com/meltano/meltano/issues/1271) Improve messaging on tap and target settings modals
+- [#1226](https://gitlab.com/meltano/meltano/issues/1226) Update Pipelines main navigation link to show all data pipeline schedules if that step has been reached
+- [#1323](https://gitlab.com/meltano/meltano/issues/1323) Add CTA to send users to Typeform to provide info for setting up a hosted dashboard
+- [#1271](https://gitlab.com/meltano/meltano/issues/1271) Improve messaging on tap and target settings modals
+- [#1246](https://gitlab.com/meltano/meltano/issues/1246) Update the [Salesforce API + Postgres](https://www.meltano.com/tutorials/salesforce-and-postgres.html) Tutorial to use Meltano UI for setting up the Extractor and Loader, running the ELT pipeline and analyzing the results.
+
+- [#1225](https://gitlab.com/meltano/meltano/issues/1225) Update dbt docs link to be conditional so the user doesn't experience 404s
+
+## 1.7.2 - (2019-11-26)
+
+---
+
+### Fixes
+
+- [#1318](https://gitlab.com/meltano/meltano/merge_requests/1318/) Pin dbt version to `v0.14.4` to address Meltano Transformation failing when using dbt `v0.15.0`
+
+## 1.7.1 - (2019-11-25)
+
+---
+
+### Fixes
+
+- [#1184](https://gitlab.com/meltano/meltano/merge_requests/1184/) Fix `contextualModels` implementation for contextual CTAs in Job Log modal
+
+## 1.7.0 - (2019-11-25)
+
+---
+
+### New
+
+- [#1236](https://gitlab.com/meltano/meltano/issues/1236) Add contextual Analyze CTAs in the Job Log UI
+
+### Fixes
+
+- [#1298](https://gitlab.com/meltano/meltano/issues/1298) Let default entity selection be configured in discovery.yml under `select`
+- [#1298](https://gitlab.com/meltano/meltano/issues/1298) Define default entity selection for tap-salesforce
+- [#1304](https://gitlab.com/meltano/meltano/issues/1304) Fix Meltano subprocess fetching large catalogs (e.g. for Salesforce) getting stuck do to the subprocess' stderr buffer filling and the process getting deadlocked.
+
+## 1.6.0 - (2019-11-18)
+
+---
+
+### New
+
+- [#1235](https://gitlab.com/meltano/meltano/issues/1235) Add help link button in the app
+- [#1285](https://gitlab.com/meltano/meltano/issues/1285) Add link to YouTube guidelines for release instructions
+- [#1277](https://gitlab.com/meltano/meltano/issues/1277) Move sections that don't apply to outside contributors from Contributing and Roadmap docs to Handbook: Release Process, Release Schedule, Demo Day, Speedruns, DigitalOcean Marketplace
+
+### Changes
+
+- [#1257](https://gitlab.com/meltano/meltano/issues/1257) Prevent modified logo file upon each build
+- [#1289](https://gitlab.com/meltano/meltano/issues/1289) Dismiss all modals when using the escape key
+- [#1282](https://gitlab.com/meltano/meltano/issues/1282) Remove Entity Selection from the UI (still available in CLI) and default to "All" entities for a given data source
+- [#1303](https://gitlab.com/meltano/meltano/issues/1303) Update the configuration options for the Salesforce Extractor to only include relevant properties. Remove properties like the client_id that were not used for username/password authentication.
+- [#1308](https://gitlab.com/meltano/meltano/issues/1308) Update the configuration options for the Marketo Extractor to use a Start Date instead of a Start Time.
+
+### Fixes
+
+- [#1297](https://gitlab.com/meltano/meltano/issues/1297) Get actual latest ELT job log by sorting matches by creation time with nanosecond resolution
+- [#1297](https://gitlab.com/meltano/meltano/issues/1297) Fix pipeline failure caused by jobs that require true concurrency being executed on CI runners that don't
+
+## 1.5.0 - (2019-11-11)
 
 ---
 
@@ -34,11 +657,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1259](https://gitlab.com/meltano/meltano/issues/1259) Fix `meltano elt` not properly logging errors happening in the ELT process
+- [#1183](https://gitlab.com/meltano/meltano/issues/1183) Fix a race condition causing the `meltano.yml` to be empty in some occurence
 - [#1258](https://gitlab.com/meltano/meltano/issues/1258) Fix format of custom extractor's capabilities in meltano.yml
 - [#1215](https://gitlab.com/meltano/meltano/issues/1215) Fix intercom documentation footer overlap issue.
 - [#1215](https://gitlab.com/meltano/meltano/issues/1215) Fix YouTube iframes to be responsive (resolves unwanted side-effect of horizontal scrollbar at mobile/tablet media queries)
-
-### Breaks
 
 ## 1.4.0 - (2019-11-04)
 
@@ -55,6 +677,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1244](https://gitlab.com/meltano/meltano/issues/1244) Add instructions on how to deactivate a virtual environment
 - [#1082](https://gitlab.com/meltano/meltano/issues/1082) Meltano will now enable automatically DAGs created in Airflow
+- [#1231](https://gitlab.com/meltano/meltano/issues/1231) Update CLI output during project initialization
 - [#1126](https://gitlab.com/meltano/meltano/issues/1126) Minor UI updates to improve clarity around Schedule step and Manual vs Orchestrated runs
 - [#1210](https://gitlab.com/meltano/meltano/issues/1210) Improved SQLite loader configuration context (name and description)
 - [#1185](https://gitlab.com/meltano/meltano/issues/1185) Remove majority of unimplemented placeholder UI buttons
@@ -482,7 +1105,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#735](https://gitlab.com/meltano/meltano/issues/735) Update Entities UI to only display entity selection "Configure" CTAs for installed (vs. previously all) extractors
 - [#548](https://gitlab.com/meltano/meltano/issues/548) Update Meltano mission, vision and path to v1 on [roadmap page](https://meltano.com/docs/roadmap.html) of Meltano.com
 - [#824](https://gitlab.com/meltano/meltano/issues/824) Update `meltano select` to use the unique `tap_stream_id` instead of the `stream` property for filtering streams. This adds support for taps with multiple streams with the same name, like, for example, the ones produced by `tap-postgres` when tables with the same name are defined in different schemas.
-- [#842](https://gitlab.com/meltano/meltano/issues/842) Collapse Deployment section in the docs to be under [Installation](https://meltano.com/docs/installation.html)
+- [#842](https://gitlab.com/meltano/meltano/issues/842) Collapse Deployment section in the docs to be under [Installation](https://meltano.com/developer-tools/self-hosted-installation.html)
 
 ### Fixes
 

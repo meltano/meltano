@@ -11,28 +11,11 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="/docs/getting-started.html">Carbon Emissions + SQLite</a>
-      </div>
-      <div>
-        <p>
-          Experience a taste of data extraction and loading using Meltano CLI
-          followed by analysis using Meltano UI with its automatic SQL
-          generation.
-        </p>
-        <ul>
-          <li>SQLite database</li>
-          <li>No authentication</li>
-          <li>Public carbon emissions dataset</li>
-        </ul>
-      </div>
-    </div>
-    <div class="tutorial-item">
-      <div class="tutorial-header">
         <a href="/tutorials/gitlab-and-postgres.html">GitLab API + Postgres</a>
       </div>
       <div>
         <p>
-          Experience the full extract, load, and transorm pipeline with
+          Experience the full extract, load, and transform pipeline with
           authentication using Meltano CLI followed by analysis using Meltano UI
           with its automatic SQL generation.
         </p>
@@ -40,42 +23,6 @@ export default {
           <li>Postgres database</li>
           <li>Authentication</li>
           <li>Your private GitLab dataset</li>
-        </ul>
-      </div>
-    </div>
-    <div class="tutorial-item">
-      <div class="tutorial-header">
-        <a href="/tutorials/google-analytics-with-postgres.html">Google Analytics API + Postgres</a>
-      </div>
-      <div>
-        <p>
-          Experience the full extract, load, and transorm pipeline with
-          authentication using Meltano CLI followed by analysis using Meltano UI
-          with its automatic SQL generation.
-        </p>
-        <ul>
-          <li>Postgres database</li>
-          <li>Authentication</li>
-          <li>Your private Google Analytics dataset</li>
-        </ul>
-      </div>
-    </div>
-    <div class="tutorial-item">
-      <div class="tutorial-header">
-        <a href="/tutorials/salesforce-and-postgres.html"
-          >Salesforce API + Postgres</a
-        >
-      </div>
-      <div>
-        <p>
-          Experience the full extract, load, and transorm pipeline with
-          authentication using Meltano CLI followed by analysis using Meltano UI
-          with its automatic SQL generation.
-        </p>
-        <ul>
-          <li>Postgres database</li>
-          <li>Authentication</li>
-          <li>Your private Salesforce dataset</li>
         </ul>
       </div>
     </div>
@@ -125,9 +72,9 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="/tutorials/using-jupyter-notebooks.html"
-          >Using Jupyter Notebooks</a
-        >
+        <a href="/tutorials/using-jupyter-notebooks.html">
+          Using Jupyter Notebooks
+        </a>
       </div>
       <div>
         <p>
@@ -138,9 +85,9 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="/tutorials/manual-digitalocean-droplet.html"
-          >Manually Create a DigitalOcean Droplet for Meltano</a
-        >
+        <a href="/tutorials/manual-digitalocean-droplet.html">
+          Manually Create a DigitalOcean Droplet for Meltano
+        </a>
       </div>
       <div>
         <p>
@@ -158,6 +105,18 @@ export default {
       <div>
         <p>
           Learn how to create a custom extractor!
+        </p>
+      </div>
+    </div>
+    <div class="tutorial-item">
+      <div class="tutorial-header">
+        <a href="/tutorials/using-ftp-with-meltano.html">
+          How to Use FTP with Meltano
+        </a>
+      </div>
+      <div>
+        <p>
+          This guide will walk you through how to use FTP with Meltano.
         </p>
       </div>
     </div>

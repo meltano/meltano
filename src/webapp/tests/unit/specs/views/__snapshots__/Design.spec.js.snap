@@ -3,7 +3,7 @@
 exports[`Design.vue Load report button enabled if reports exist 1`] = `
 <section>
   <div
-    class="columns is-vcentered"
+    class="columns is-vcentered v-min-4-5r"
   >
     <div
       class="column"
@@ -168,7 +168,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                 class="dropdown-content"
               >
                 <a
-                  class="dropdown-item"
+                  class="dropdown-item is-active"
                   data-dropdown-auto-close=""
                 >
                   
@@ -453,7 +453,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
 exports[`Design.vue Run Query button enabled and SQL tab focused and displayed if selection(s) are made 1`] = `
 <section>
   <div
-    class="columns is-vcentered"
+    class="columns is-vcentered v-min-4-5r"
   >
     <div
       class="column"
@@ -892,7 +892,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
 exports[`Design.vue Save report button enabled if query has ran 1`] = `
 <section>
   <div
-    class="columns is-vcentered"
+    class="columns is-vcentered v-min-4-5r"
   >
     <div
       class="column"
@@ -941,6 +941,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
               label="Save Report"
               labelclasses=""
               menuclasses=""
+              tooltip="[object Object]"
             >
               <div
                 class="dropdown-content"
@@ -1005,6 +1006,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             label="Reports"
             labelclasses=""
             menuclasses=""
+            tooltip="[object Object]"
           >
             <div
               class="dropdown-content"
@@ -1057,6 +1059,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   label="SQL"
                   labelclasses=""
                   menuclasses=""
+                  tooltip="[object Object]"
                 >
                   <div
                     class="dropdown-content"
@@ -1245,7 +1248,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
 exports[`Design.vue a loaded report renders report name, selections, chart, SQL, and results where the Save, Load, and Run Query buttons are enabled 1`] = `
 <section>
   <div
-    class="columns is-vcentered"
+    class="columns is-vcentered v-min-4-5r"
   >
     <div
       class="column"
@@ -1294,6 +1297,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               label="Save Report"
               labelclasses=""
               menuclasses=""
+              tooltip="[object Object]"
             >
               <div
                 class="dropdown-content"
@@ -1357,12 +1361,13 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
             label="Reports"
             labelclasses=""
             menuclasses=""
+            tooltip="[object Object]"
           >
             <div
               class="dropdown-content"
             >
               <a
-                class="dropdown-item"
+                class="dropdown-item is-active"
                 data-dropdown-auto-close=""
               >
                 
@@ -1419,6 +1424,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   label="SQL"
                   labelclasses=""
                   menuclasses=""
+                  tooltip="[object Object]"
                 >
                   <div
                     class="dropdown-content"
@@ -1609,7 +1615,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
 exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, and Run Query buttons are disabled by default 1`] = `
 <section>
   <div
-    class="columns is-vcentered"
+    class="columns is-vcentered v-min-4-5r"
   >
     <div
       class="column"

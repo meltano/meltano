@@ -4,10 +4,6 @@
 !/README.md
 !/VERSION
 !/docs
-!/extract
-!/load
-!/model
-!/orchestrate
 !/requirements.txt
 !/setup.py
 !/setup.cfg
@@ -17,7 +13,6 @@
 !/scripts
 !/docker
 
-!/transform
 !/.pyre_configuration
 
 docs/build

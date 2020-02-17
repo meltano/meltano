@@ -4,6 +4,7 @@ import lodash from 'lodash'
 
 import pluginsApi from '../../api/plugins'
 import utils from '@/utils/utils'
+import pluginUtils from '@/utils/plugins'
 
 const defaultState = utils.deepFreeze({
   addingPlugins: {
@@ -25,6 +26,13 @@ const defaultState = utils.deepFreeze({
 })
 
 const getters = {
+  getHasDefaultTransforms(state) {
+    return namespace =>
+      state.plugins.transforms.find(
+        transform => transform.namespace === namespace
+      )
+  },
+
   getHasInstalledPluginsOfType(state) {
     return pluginType => {
       const hasOwns = []
@@ -56,6 +64,13 @@ const getters = {
       state.installingPlugins[pluginType].includes(pluginName)
   },
 
+  getIsLoadingPluginsOfType(state) {
+    return pluginType => {
+      const plugins = state.plugins[pluginType]
+      return plugins === undefined || plugins.length === 0
+    }
+  },
+
   getIsPluginInstalled(state) {
     return (pluginType, pluginName) =>
       state.installedPlugins[pluginType]
@@ -67,27 +82,39 @@ const getters = {
         : false
   },
 
-  getIsStepExtractorsMinimallyValidated(state) {
-    return (
-      state.installedPlugins.extractors &&
-      state.installedPlugins.extractors.length > 0
-    )
+  getPluginLabel(state) {
+    return (type, name) => {
+      const pluginList = state.plugins[type]
+      const targetPlugin = pluginList
+        ? pluginList.find(plugin => plugin.name === name)
+        : {}
+
+      return targetPlugin ? targetPlugin.label : 'Undefined label'
+    }
   },
 
-  getIsStepLoadersMinimallyValidated(_, getters) {
-    return getters.getIsStepExtractorsMinimallyValidated
+  getPluginProfiles() {
+    return plugin => {
+      const pluginProfiles = lodash.map(
+        plugin['profiles'],
+        profile => `${plugin.name}@${profile.name}`
+      )
+      return [plugin.name, ...pluginProfiles]
+    }
   },
 
-  getIsStepScheduleMinimallyValidated(state, getters) {
-    return (
-      getters.getIsStepTransformsMinimallyValidated &&
-      state.installedPlugins.loaders &&
-      state.installedPlugins.loaders.length > 0
-    )
+  visibleExtractors(state) {
+    return pluginUtils.filterVisiblePlugins({
+      installedPlugins: state.installedPlugins.extractors,
+      pluginList: state.plugins.extractors
+    })
   },
 
-  getIsStepTransformsMinimallyValidated(_, getters) {
-    return getters.getIsStepLoadersMinimallyValidated
+  visibleLoaders(state) {
+    return pluginUtils.filterVisiblePlugins({
+      installedPlugins: state.installedPlugins.loaders,
+      pluginList: state.plugins.loaders
+    })
   }
 }
 
@@ -96,21 +123,18 @@ const actions = {
     commit('addPluginStart', addConfig)
     return pluginsApi
       .addPlugin(addConfig)
-      .then(() => commit('addPluginComplete', addConfig))
-      .catch(error => {
-        Vue.toasted.global.error(error)
-      })
-  },
-
-  getAllPlugins({ commit }) {
-    pluginsApi.getAllPlugins().then(response => {
-      commit('setAllPlugins', response.data)
-    })
+      .finally(() => commit('addPluginComplete', addConfig))
   },
 
   getInstalledPlugins({ commit }) {
     return pluginsApi.getInstalledPlugins().then(response => {
       commit('setInstalledPlugins', response.data)
+    })
+  },
+
+  getPlugins({ commit }) {
+    pluginsApi.getPlugins().then(response => {
+      commit('setAllPlugins', response.data)
     })
   },
 
@@ -125,15 +149,14 @@ const actions = {
       .installPlugin(installConfig)
       .then(() => commit('installPluginComplete', installConfig))
       .then(dispatch('getInstalledPlugins'))
-      .then(dispatch('getAllPlugins'))
-      .catch(error => {
-        Vue.toasted.global.error(error.response.data.code)
-      })
+      .then(dispatch('getPlugins'))
   },
 
   installRelatedPlugins({ dispatch }, installConfig) {
     return pluginsApi.installBatch(installConfig).then(() => {
-      dispatch('getAllPlugins')
+      dispatch('getPlugins')
+      dispatch('dashboards/getDashboards', null, { root: true })
+      dispatch('reports/loadReports', null, { root: true })
       dispatch('repos/getModels', null, { root: true })
     })
   }
@@ -144,7 +167,7 @@ const mutations = {
     const idx = state.addingPlugins[addConfig.pluginType].indexOf(
       addConfig.name
     )
-    state.addingPlugins[addConfig.pluginType].splice(idx, 1)
+    Vue.delete(state.addingPlugins[addConfig.pluginType], idx)
   },
 
   addPluginStart(state, addConfig) {
@@ -155,7 +178,7 @@ const mutations = {
     const idx = state.installingPlugins[installConfig.pluginType].indexOf(
       installConfig.name
     )
-    state.installingPlugins[installConfig.pluginType].splice(idx, 1)
+    Vue.delete(state.installingPlugins[installConfig.pluginType], idx)
   },
 
   installPluginStart(state, installConfig) {

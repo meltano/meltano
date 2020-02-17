@@ -26,7 +26,7 @@ ssh root@YOUR_DROPLET_IP_ADDRESS
 
 ## Requirements
 
-Your new server will not have any of [Meltano's requirements](/docs/installation.html#requirements) installed by default, so you will need to install them.
+Your new server will not have any of [Meltano's requirements](/developer-tools/self-hosted-installation.html#requirements) installed by default, so you will need to install them.
 
 ### Python
 
@@ -86,24 +86,24 @@ You may be tempted to create your DigitalOcean Droplet without a virtual environ
 Create a directory where you want your virtual environments to be saved:
 
 ```bash
-mkdir virtualenvs
+mkdir venv
 ```
 
 Then create a new virtual environment inside that directory:
 
 ```bash
-python -m venv ~/virtualenvs/meltano
+python -m venv venv/.venv/meltano
 ```
 
 Activate the virtual environment using:
 
 ```bash
-source ~/virtualenvs/meltano/bin/activate
+source venv/.venv/meltano/bin/activate
 ```
 
 ### Installing Meltano on your DigitalOcean Droplet
 
-Now that you are inside your virtual environment, follow the [Meltano installation instructions](/docs/installation.html#installing-meltano)
+Now that you are inside your virtual environment, follow the [Meltano installation instructions](/developer-tools/self-hosted-installation.html#installing-meltano)
 
 Initialize Meltano:
 

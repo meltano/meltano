@@ -10,10 +10,12 @@ from dotenv import load_dotenv
 from functools import wraps
 from pathlib import Path
 from typing import Union, Dict
+from atomicwrites import atomic_write
 
 from .error import Error
 from .behavior.versioned import Versioned
 from .utils import makedirs, slugify
+from .meltano_file import MeltanoFile
 
 
 class ProjectNotFound(Error):
@@ -65,7 +67,7 @@ class Project(Versioned):
 
     @property
     def backend_version(self):
-        return int(self.meltano.get("version", 1))
+        return self.meltano.version
 
     @classmethod
     @fasteners.locked(lock="_find_lock")
@@ -88,12 +90,11 @@ class Project(Versioned):
     @property
     def meltano(self) -> Dict:
         """Return a copy of the current meltano config"""
-        with self._meltano_rw_lock.read_lock():
-            return self._load_meltano()
-
-    def _load_meltano(self):
-        with self.meltanofile.open() as meltanofile:
-            return yaml.load(meltanofile, Loader=yaml.SafeLoader)
+        # fmt: off
+        with self._meltano_rw_lock.read_lock(), \
+             self.meltanofile.open() as meltanofile:
+            return MeltanoFile.parse(yaml.safe_load(meltanofile))
+        # fmt: on
 
     @contextmanager
     def meltano_update(self):
@@ -104,19 +105,20 @@ class Project(Versioned):
         # fmt: off
         with self._meltano_rw_lock.write_lock(), \
             self._meltano_ip_lock:
-            # read the latest version
-            meltano_update = self._load_meltano()
+
+            with self.meltanofile.open() as meltanofile:
+                # read the latest version
+                meltano_update = MeltanoFile.parse(yaml.safe_load(meltanofile))
+
             yield meltano_update
 
-            # save it
-            with self.meltanofile.open("w") as meltanofile:
-                try:
-                    meltanofile.write(
-                        yaml.dump(meltano_update, default_flow_style=False)
-                    )
-                except Exception as err:
-                    logging.error(f"Could not update meltano.yml: {err}")
-                    raise
+            try:
+                with atomic_write(self.meltanofile, overwrite=True) as meltanofile:
+                    # update if everything is fine
+                    yaml.dump(meltano_update, meltanofile, default_flow_style=False)
+            except Exception as err:
+                logging.critical(f"Could not update meltano.yml: {err}")
+                raise
         # fmt: on
 
     def root_dir(self, *joinpaths):
@@ -133,6 +135,10 @@ class Project(Versioned):
     @makedirs
     def analyze_dir(self, *joinpaths):
         return self.root_dir("analyze", *joinpaths)
+
+    @makedirs
+    def extract_dir(self, *joinpaths):
+        return self.root_dir("extract", *joinpaths)
 
     @makedirs
     def venvs_dir(self, *prefixes):

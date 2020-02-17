@@ -78,6 +78,6 @@ def list(ctx):
     for setting_def in settings.definitions(plugin):
         env_key = settings.setting_env(setting_def, plugin_def)
         description_marker = (
-            f": {setting_def['description']}" if setting_def.get("description") else ""
+            f": {setting_def.description}" if setting_def.description else ""
         )
-        click.secho(f"{setting_def['name']} [{env_key}]{description_marker}")
+        click.secho(f"{setting_def.name} [{env_key}]{description_marker}")

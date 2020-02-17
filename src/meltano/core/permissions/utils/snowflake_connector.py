@@ -2,7 +2,7 @@ import logging
 import os
 import re
 
-from typing import Dict, List
+from typing import Dict, List, Any
 from sqlalchemy import create_engine
 from snowflake.sqlalchemy import URL
 
@@ -46,7 +46,7 @@ class SnowflakeConnector:
             results = connection.execute(query).fetchall()
 
             for result in results:
-                names.append(result["name"].upper())
+                names.append(result["name"].lower())
 
         return names
 
@@ -75,7 +75,7 @@ class SnowflakeConnector:
 
             for result in results:
                 names.append(
-                    f"{result['database_name'].upper()}.{result['name'].upper()}"
+                    f"{result['database_name'].lower()}.{result['name'].lower()}"
                 )
 
         return names
@@ -95,9 +95,9 @@ class SnowflakeConnector:
 
             for result in results:
                 names.append(
-                    f"{result['database_name'].upper()}"
-                    + f".{result['schema_name'].upper()}"
-                    + f".{result['name'].upper()}"
+                    f"{result['database_name'].lower()}"
+                    + f".{result['schema_name'].lower()}"
+                    + f".{result['name'].lower()}"
                 )
 
         return names
@@ -117,14 +117,42 @@ class SnowflakeConnector:
 
             for result in results:
                 names.append(
-                    f"{result['database_name'].upper()}"
-                    + f".{result['schema_name'].upper()}"
-                    + f".{result['name'].upper()}"
+                    f"{result['database_name'].lower()}"
+                    + f".{result['schema_name'].lower()}"
+                    + f".{result['name'].lower()}"
                 )
 
         return names
 
-    def show_grants_to_role(self, role) -> List[str]:
+    def show_future_grants(self, database: str = None, schema: str = None) -> List[str]:
+        future_grants = {}
+
+        if schema:
+            query = f"SHOW FUTURE GRANTS IN SCHEMA {schema}"
+        elif database:
+            query = f"SHOW FUTURE GRANTS IN DATABASE {database}"
+        else:
+            pass
+
+        with self.engine.connect() as connection:
+            results = connection.execute(query).fetchall()
+
+            for result in results:
+                if result["grant_to"] == "ROLE":
+                    role = result["grantee_name"].lower()
+                    privilege = result["privilege"].lower()
+                    granted_on = result["grant_on"].lower()
+
+                    future_grants.setdefault(role, {}).setdefault(
+                        privilege, {}
+                    ).setdefault(granted_on, []).append(result["name"].lower())
+
+                else:
+                    continue
+
+        return future_grants
+
+    def show_grants_to_role(self, role) -> Dict[str, Any]:
         grants = {}
 
         query = f"SHOW GRANTS TO ROLE {SnowflakeConnector.snowflaky(role)}"
@@ -132,12 +160,12 @@ class SnowflakeConnector:
             results = connection.execute(query).fetchall()
 
             for result in results:
-                privilege = result["privilege"].upper()
-                granted_on = result["granted_on"].upper()
+                privilege = result["privilege"].lower()
+                granted_on = result["granted_on"].lower()
 
-                grants[privilege] = grants.get(privilege, {})
-                grants[privilege][granted_on] = grants[privilege].get(granted_on, [])
-                grants[privilege][granted_on].append(result["name"].upper())
+                grants.setdefault(privilege, {}).setdefault(granted_on, []).append(
+                    result["name"].lower()
+                )
 
         return grants
 
@@ -149,9 +177,62 @@ class SnowflakeConnector:
             results = connection.execute(query).fetchall()
 
             for result in results:
-                roles.append(result["role"].upper())
+                roles.append(result["role"].lower())
 
         return roles
+
+    def run_query(self, query: str):
+
+        with self.engine.connect() as connection:
+            result = connection.execute(query)
+
+        return result
+
+    def full_schema_list(self, schema: str) -> List[str]:
+        """
+        For a given schema name, get all schemas it may be referencing.
+
+        For example, if <db>.* is given then all schemas in the database 
+        will be returned. If <db>.<schema_partial>_* is given, then all 
+        schemas that match the schema partial pattern will be returned. 
+        If a full schema name is given, it will return that single schema
+        as a list.
+
+        This function can be enhanced in the future to handle more 
+        complicated schema names if necessary.
+
+        Returns a list of schema names.
+        """
+        # Generate the information_schema identifier for that database
+        # in order to be able to filter it out
+        name_parts = schema.split(".")
+
+        info_schema = f"{name_parts[0]}.information_schema"
+
+        fetched_schemas = []
+
+        # All Schemas
+        if name_parts[1] == "*":
+            db_schemas = self.show_schemas(name_parts[0])
+            for db_schema in db_schemas:
+                if db_schema != info_schema:
+                    fetched_schemas.append(db_schema)
+
+        # Prefix schema match
+        elif "*" in name_parts[1]:
+            db_schemas = self.show_schemas(name_parts[0])
+            for db_schema in db_schemas:
+                schema_name = db_schema.split(".", 1)[1].lower()
+                if schema_name.startswith(name_parts[1].split("*", 1)[0]):
+                    fetched_schemas.append(db_schema)
+
+        # TODO Handle more complicated matches
+
+        else:
+            # If no * in name, then return provided schema name
+            fetched_schemas = [schema]
+
+        return fetched_schemas
 
     def snowflaky(name: str) -> str:
         """
@@ -169,7 +250,10 @@ class SnowflakeConnector:
         new_name_parts = []
 
         for part in name_parts:
-            if re.match("^[0-9a-zA-Z_]*$", part) is None:
+            if (
+                re.match("^[0-9a-zA-Z_]*$", part) is None  # Proper formatting
+                and re.match('^".*"$', part) is None  # Already quoted
+            ):
                 new_name_parts.append(f'"{part}"')
             else:
                 new_name_parts.append(part)

@@ -64,6 +64,9 @@ class Job(SystemModel):
     def is_complete(self):
         return self.state in [State.SUCCESS, State.FAIL]
 
+    def is_success(self):
+        return self.state is State.SUCCESS
+
     def can_transit(self, state: State) -> bool:
         if self.state is state:
             return True
@@ -114,10 +117,9 @@ class Job(SystemModel):
         self.transit(State.SUCCESS)
 
     def __repr__(self):
-        return "<Job(id='%s', job_id='%s', state='%s')>" % (
-            self.id,
-            self.job_id,
-            self.state,
+        return (
+            "<Job(id='%s', job_id='%s', state='%s', started_at='%s', ended_at='%s')>"
+            % (self.id, self.job_id, self.state, self.started_at, self.ended_at)
         )
 
     def save(self, session):

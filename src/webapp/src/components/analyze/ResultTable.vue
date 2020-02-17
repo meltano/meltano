@@ -2,13 +2,19 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 import Dropdown from '@/components/generic/Dropdown'
+import LoadingOverlay from '@/components/generic/LoadingOverlay'
 import QuerySortBy from '@/components/analyze/QuerySortBy'
+import { selected } from '@/utils/predicates'
 
 export default {
   name: 'ResultTable',
   components: {
     Dropdown,
+    LoadingOverlay,
     QuerySortBy
+  },
+  props: {
+    isLoading: { type: Boolean, required: true, default: false }
   },
   computed: {
     ...mapState('designs', [
@@ -18,7 +24,9 @@ export default {
       'order'
     ]),
     ...mapGetters('designs', [
+      'getAttributes',
       'getFormattedValue',
+      'getIsOrderableAttribute',
       'hasResults',
       'isColumnSelectedAggregate'
     ]),
@@ -27,6 +35,11 @@ export default {
         this.order.assigned.find(
           orderable => orderable.attribute.name === attributeName
         )
+    },
+    getHasMinimalSelectionRequirements() {
+      const hasColumn = this.getAttributes(['columns']).find(selected)
+      const hasAggregate = this.getAttributes(['aggregates']).find(selected)
+      return hasColumn || hasAggregate
     },
     getIsOrderableAssigned() {
       return attributeName => Boolean(this.getAssignedOrderable(attributeName))
@@ -46,14 +59,23 @@ export default {
     }
   },
   methods: {
-    ...mapActions('designs', ['updateSortAttribute'])
+    ...mapActions('designs', ['updateSortAttribute']),
+    handleHeaderClick(queryAttribute) {
+      if (!this.getIsOrderableAttribute(queryAttribute)) {
+        return
+      }
+
+      this.updateSortAttribute(queryAttribute)
+    }
   }
 }
 </script>
 
 <template>
-  <div class="result-data">
-    <div v-if="hasResults">
+  <div class="result-data has-position-relative v-min-2r">
+    <LoadingOverlay :is-loading="isLoading"></LoadingOverlay>
+
+    <div v-if="hasResults" class="table-container">
       <table
         class="table
           is-bordered
@@ -68,13 +90,15 @@ export default {
             <th
               v-for="(queryAttribute, idx) in queryAttributes"
               :key="
-                `${queryAttribute.sourceName}-${queryAttribute.attributeName}-${idx}`
+                `${queryAttribute.sourceName}-${
+                  queryAttribute.attributeName
+                }-${idx}`
               "
             >
               <div class="is-flex">
                 <div
                   class="sort-header"
-                  @click="updateSortAttribute(queryAttribute)"
+                  @click="handleHeaderClick(queryAttribute)"
                 >
                   <span>{{ queryAttribute.attributeLabel }}</span>
                 </div>
@@ -89,6 +113,7 @@ export default {
                     }`
                   "
                   :menu-classes="'dropdown-menu-300'"
+                  :disabled="!getIsOrderableAttribute(queryAttribute)"
                   icon-open="sort"
                   icon-close="caret-down"
                   is-right-aligned
@@ -123,9 +148,33 @@ export default {
       </table>
     </div>
 
-    <div v-else class="notification is-italic">
-      No results
+    <div
+      v-else-if="!isLoading && getHasMinimalSelectionRequirements"
+      class="content has-text-centered is-italic"
+    >
+      <p>Run query to see table results</p>
     </div>
+
+    <article
+      v-else-if="!getHasMinimalSelectionRequirements"
+      class="message is-info"
+    >
+      <div class="message-body">
+        <div class="content">
+          <p>To display a <em>Table</em>:</p>
+          <ol>
+            <li>
+              Select at least one <strong>Column</strong> or
+              <strong>Aggregate</strong> from the <em>Attributes</em> panel
+            </li>
+            <li>
+              Manually click the <em>Run</em> button (if
+              <em>Autorun Queries</em> is toggled off)
+            </li>
+          </ol>
+        </div>
+      </div>
+    </article>
   </div>
 </template>
 
@@ -152,8 +201,8 @@ export default {
     float: right;
     font-size: 9px;
     padding: 2px;
-    color: #aaa;
-    border: 1px solid #aaa;
+    color: $grey-light;
+    border: 1px solid $grey-light;
     border-radius: 4px;
     margin-top: 2px;
   }

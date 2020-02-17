@@ -1,0 +1,11 @@
+.only:version-tags:
+  only:
+    refs:
+      - tags@meltano/meltano
+    variables:
+      - $CI_COMMIT_TAG =~ /^v*/
+
+.only:master:
+  only:
+    refs:
+      - master@meltano/meltano

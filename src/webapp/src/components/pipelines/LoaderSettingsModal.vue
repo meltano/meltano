@@ -6,12 +6,15 @@ import lodash from 'lodash'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
+import ConnectorSettingsDropdown from '@/components/pipelines/ConnectorSettingsDropdown'
+import utils from '@/utils/utils'
 
 export default {
   name: 'LoaderSettingsModal',
   components: {
     ConnectorLogo,
-    ConnectorSettings
+    ConnectorSettings,
+    ConnectorSettingsDropdown
   },
   data() {
     return {
@@ -22,10 +25,11 @@ export default {
     ...mapGetters('plugins', [
       'getInstalledPlugin',
       'getIsPluginInstalled',
-      'getIsInstallingPlugin'
+      'getIsInstallingPlugin',
+      'getPluginProfiles'
     ]),
-    ...mapGetters('configuration', ['getHasValidConfigSettings']),
-    ...mapState('configuration', ['loaderInFocusConfiguration']),
+    ...mapGetters('orchestration', ['getHasValidConfigSettings']),
+    ...mapState('orchestration', ['loaderInFocusConfiguration']),
     ...mapState('plugins', ['installedPlugins']),
     isInstalled() {
       return this.getIsPluginInstalled('loaders', this.loaderName)
@@ -36,40 +40,59 @@ export default {
     isLoadingConfigSettings() {
       return !Object.prototype.hasOwnProperty.call(
         this.localConfiguration,
-        'config'
+        'profiles'
       )
     },
     isSaveable() {
+      if (this.isInstalling || this.isLoadingConfigSettings) {
+        return
+      }
+      const configSettings = {
+        config: this.localConfiguration.profiles[
+          this.localConfiguration.profileInFocusIndex
+        ].config,
+        settings: this.localConfiguration.settings
+      }
       const isValid = this.getHasValidConfigSettings(
-        this.localConfiguration,
+        configSettings,
         this.loader.settingsGroupValidation
       )
-      return !this.isInstalling && this.isInstalled && isValid
+      return this.isInstalled && isValid
     },
     loader() {
       return this.getInstalledPlugin('loaders', this.loaderName)
+    },
+    requiredSettingsKeys() {
+      return utils.requiredConnectorSettingsKeys(
+        this.localConfiguration.settings,
+        this.loader.settingsGroupValidation
+      )
     }
   },
   created() {
     this.loaderName = this.$route.params.loader
     this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
       const needsInstallation = this.loader.name !== this.loaderName
-      if (needsInstallation) {
-        const config = {
-          pluginType: 'loaders',
-          name: this.loaderName
-        }
-        this.addPlugin(config).then(() => {
-          this.getLoaderConfiguration().then(this.createEditableConfiguration)
-          this.installPlugin(config)
-        })
-      } else {
-        this.getLoaderConfiguration().then(this.createEditableConfiguration)
+      const addConfig = {
+        pluginType: 'loaders',
+        name: this.loaderName
       }
+
+      const uponPlugin = needsInstallation
+        ? this.addPlugin(addConfig).then(() => {
+            this.getLoaderConfiguration().then(this.createEditableConfiguration)
+            this.installPlugin(addConfig)
+          })
+        : this.getLoaderConfiguration().then(this.createEditableConfiguration)
+
+      uponPlugin.catch(err => {
+        this.$error.handle(err)
+        this.close()
+      })
     })
   },
   beforeDestroy() {
-    this.$store.dispatch('configuration/resetLoaderInFocusConfiguration')
+    this.$store.dispatch('orchestration/resetLoaderInFocusConfiguration')
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
@@ -82,30 +105,30 @@ export default {
     },
     createEditableConfiguration() {
       this.localConfiguration = Object.assign(
-        {},
+        { profileInFocusIndex: 0 },
         lodash.cloneDeep(this.loaderInFocusConfiguration)
       )
     },
     getLoaderConfiguration() {
       return this.$store.dispatch(
-        'configuration/getLoaderConfiguration',
+        'orchestration/getLoaderConfiguration',
         this.loaderName
       )
     },
-    saveConfigAndGoToTransforms() {
+    saveConfigAndGoToSchedule() {
       this.$store
-        .dispatch('configuration/savePluginConfiguration', {
+        .dispatch('orchestration/savePluginConfiguration', {
           name: this.loader.name,
           type: 'loaders',
-          config: this.localConfiguration.config
+          profiles: this.localConfiguration.profiles
         })
         .then(() => {
-          this.$store.dispatch('configuration/updateRecentELTSelections', {
-            type: 'loader',
-            value: this.loader
-          })
-          this.$router.push({ name: 'transforms' })
+          this.$router.push({ name: 'schedules' })
           Vue.toasted.global.success(`Connector Saved - ${this.loader.name}`)
+        })
+        .catch(err => {
+          this.$error.handle(err)
+          this.close()
         })
     }
   }
@@ -113,7 +136,7 @@ export default {
 </script>
 
 <template>
-  <div class="modal is-active">
+  <div class="modal is-active" @keyup.esc="close">
     <div class="modal-background" @click="close"></div>
     <div class="modal-card is-narrow">
       <header class="modal-card-head">
@@ -124,12 +147,12 @@ export default {
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
 
-      <section class="modal-card-body">
+      <section class="modal-card-body is-overflow-y-scroll">
         <div v-if="isLoadingConfigSettings || isInstalling" class="content">
           <div v-if="!isLoadingConfigSettings && isInstalling" class="level">
             <div class="level-item">
               <p class="is-italic">
-                Installing {{ loaderName }} can take up to a minute.
+                Installing {{ loader.label }} can take up to a minute.
               </p>
             </div>
           </div>
@@ -143,19 +166,25 @@ export default {
               <a :href="loader.signupUrl" target="_blank">sign up here</a>.
             </p>
           </div>
+          <!--
+            TEMP ConnectorSettingsDropdown removal from UI.
+            Conditional removal so existing users with 2+ profiles already created still can access them
+            Get context here https://gitlab.com/meltano/meltano/issues/1389.
+          -->
+          <template v-if="localConfiguration.profiles.length > 1">
+            <ConnectorSettingsDropdown
+              :connector="loader"
+              plugin-type="loaders"
+              :config-settings="localConfiguration"
+            ></ConnectorSettingsDropdown>
+          </template>
+
           <ConnectorSettings
             field-class="is-small"
             :config-settings="localConfiguration"
+            :plugin="loader"
+            :required-settings-keys="requiredSettingsKeys"
           />
-          <div v-if="loader.docs" class="content has-text-centered mt1r">
-            <p>
-              View Meltano's
-              <a :href="loader.docs" target="_blank" class="has-text-underlined"
-                >{{ loaderName }} docs</a
-              >
-              for more info.
-            </p>
-          </div>
         </template>
       </section>
 
@@ -164,7 +193,7 @@ export default {
         <button
           class="button is-interactive-primary"
           :disabled="!isSaveable"
-          @click.prevent="saveConfigAndGoToTransforms"
+          @click.prevent="saveConfigAndGoToSchedule"
         >
           Save
         </button>

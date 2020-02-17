@@ -1,31 +1,24 @@
 ---
 metaTitle: How to Install Meltano
-description: Meltano is easy to install on your local machine or in the cloud, including on AWS, Digital Ocean, and other cloud services. 
+description: Meltano is easy to install on your local machine or in the cloud, including on AWS, Digital Ocean, and other cloud services.
 ---
 
-# Installation
+# Self-Hosted Installation
 
-::: info
-Meltano officially released its first major version (v1)! Make sure to install the latest if you're still on an older version of Meltano.
-:::
-
-This section provides step-by-step guides for installing Meltano in various environments. Currently, we provide detailed intructions for:
+This section provides guides for getting set up with a self-hosted instance of Meltano's open source data analytics software on your local computer or using popular hosting solutions:
 
 - [DigitalOcean One-Click Installer](/docs/deployment.html#digitalocean-marketplace)
 - [Amazon Web Services (AWS)](/docs/deployment.html#amazon-web-services-aws)
-- [Local Installation](/docs/installation.html#local-installation)
+- [Local Installation](/developer-tools/self-hosted-installation.html#local-installation)
+
+
+::: tip
+Are you trying Meltano for the first time? You can skip this installation process (for now) and we will set you up with a free 30-day trial of Meltano as a hosted service. [Sign up here.](https://meltano.typeform.com/to/NJPwxv)
+:::
 
 ## DigitalOcean Marketplace
 
 DigitalOcean provides a simple container for spinning up a server where Meltano can be deployed to the Cloud. [Install the Meltano 1-Click App in the DigitalOcean Marketplace](https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322)
-
-:::tip Get $50 Worth of DigitalOcean Credits for Free
-When you create a new DigitalOcean account using [this link](https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322) (which contains our referral code) you will receive $50 of free credit over 30 days.
-:::
-
-Please note, at times the Meltano version on DigitalOcean may be slightly behind the [current PyPi version](https://pypi.org/project/meltano/).
-
-### Video Walkthrough
 
 <br />
 <div class="embed-responsive embed-responsive-16by9">
@@ -33,6 +26,10 @@ Please note, at times the Meltano version on DigitalOcean may be slightly behind
 </div>
 
 ### Step-by-Step Instructions
+
+:::tip Get $100 of DigitalOcean Credit for Free!
+When you create a new DigitalOcean account using [this link](https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322) (which contains our referral code) you will receive $100 of free credit over 60 days.
+:::
 
 1. Go to <a :href="$site.themeConfig.data.digitalOceanUrl">Meltano in the DigitalOcean Marketplace</a>
 
@@ -93,7 +90,6 @@ In this section, we will be going over how you can deploy a Meltano Docker image
 - **Memory Limits (MiB)**: Soft limit 1024
 - **Port mappings**:
   - 5000/tcp (meltano)
-  - 5010/tcp (airflow)
 
 1. Click `Update` button to finish setting up your container defintion
 1. Click `Edit` next to the _Task defintion_ heading
@@ -150,42 +146,14 @@ You should now see a page where Amazon prepares the services we configured. Ther
 The IP address can be mapped to a domain using Route53. We will be writing up a guide on how to do this. You can follow along at [meltano#625](https://gitlab.com/meltano/meltano/issues/625).
 :::
 
-### Configure network access
-
-::: tip
-This section is only necessary if you do not have a Security Group that allows for port 5000,5010 inbound.
-:::
-
-Once you complete the cluster setup, you should be brought to the detail page for the service. You should be default on a tab called _Details_ with a _Network Access_ section.
-
-1. Navigate to the _Details_ tab
-1. Under _Network Access_, click on the link next to _Security Groups_ (e.g., sg-f0dj093dkjf10)
-1. This should open a new tab with your security group
-1. Navigate to the _Inbound Rules_ tab on the bottom of the page
-1. Click `Edit Rules`
-1. Delete any existing rules
-1. Click `Add Rule` with the following properties:
-
-- **Type**: Custom TCP Rule
-- **Protocol**: TCP
-- **Port Range**: 5000
-- **Source**: Custom 0.0.0.0/0
-
-1. Click "Add Rule" with the following properties:
-
-- **Type**: Custom TCP Rule
-- **Protocol**: TCP
-- **Port Range**: 5010
-- **Source**: Custom 0.0.0.0/0
-
-1. Click `Save rules`
+**GO TO THE NEXT STEP >>** [CREATE YOUR FIRST PROJECT](/developer-tools/self-hosted-installation.html#create-your-first-project)
 
 ## Local Installation
 
-In this section, we will install Meltano as an application you can access locally from your browser and on the command line. If you prefer to install to Docker, please view the installation instructions [here](/docs/installation.html#installing-on-docker).
+In this section, we will install Meltano as an application you can access locally from your browser and on the command line. If you prefer to install to Docker, please view the installation instructions [here](/developer-tools/self-hosted-installation.html#installing-on-docker).
 
 ::: tip
-We do not have a double click installer at this time, but [it is in our roadmap](https://gitlab.com/meltano/meltano/issues/1107) and we will be sure to update this page when we do!
+We do not have a double click installer at this time, but [it is on our roadmap](https://gitlab.com/meltano/meltano/issues/1107) and we will be sure to update this page when we do!
 :::
 
 ### Requirements
@@ -193,6 +161,10 @@ We do not have a double click installer at this time, but [it is in our roadmap]
 Before you install Meltano, make sure you have the following requirements installed and up to date.
 
 #### Unix-like environment
+
+::: warning
+There is currently a known issue with macOS 10.15 and Python 3. For more information, visit [issue #1468](https://gitlab.com/meltano/meltano/issues/1468).
+:::
 
 Recent versions of Linux and macOS are both fully supported, but Windows is not.
 
@@ -219,18 +191,18 @@ If you've installed Python 3, but are not getting the result you expect, you may
 `pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
 
 ```bash
-# Check for current version of pip using pip3
+# Check for current version of pip
 # to ensure that it is using the Python3 pip
-pip3 --version
+pip --version
 
 # Update pip
-pip3 install --upgrade pip
+pip install --upgrade pip
 ```
 
 #### Virtual Environment
 
 ::: danger IMPORTANT
-Unless you are building a Docker image, It is **strongly recommended** that Meltano be installed inside a virtual environment in order to avoid potential system conflicts that may be difficult to debug.
+Unless you are building a Docker image, it is **strongly recommended** that Meltano be installed inside a virtual environment in order to avoid potential system conflicts that may be difficult to debug.
 :::
 
 **Why use a virtual environment?**
@@ -239,13 +211,13 @@ Your local environment may use a different version of Python or other dependenci
 
 ##### Recommended Virtual Environment Setup
 
-We suggest you create a directory where you want your virtual environments to be saved, e.g. `~/virtualenvs`.
+We suggest you create a directory where you want your virtual environments to be saved (e.g. `.venv/`). This can be any directory in your environment, but we recommend saving it in your Meltano project to make it easier to keep track of.
 
 Then create a new virtual environment inside that directory:
 
 ```bash
-mkdir ~/virtualenvs
-python -m venv ~/virtualenvs/meltano
+mkdir .venv
+python -m venv .venv/meltano
 ```
 
 ##### Activating Your Virtual Environment
@@ -253,7 +225,7 @@ python -m venv ~/virtualenvs/meltano
 Activate the virtual environment using:
 
 ```bash
-source ~/virtualenvs/meltano/bin/activate
+source .venv/meltano/bin/activate
 ```
 
 If the virtual environment was activated successfully, you'll see a `(meltano)` indicator added to your prompt.
@@ -265,7 +237,7 @@ To streamline this process, you can define a [shell alias](https://shapeshed.com
 
 ```bash
 # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
-alias meltano!="source ~/virtualenvs/meltano/bin/activate"
+alias meltano!="source $MELTANO_PROJECT_PATH/.venv/meltano/bin/activate"
 
 # Use as follows, after creating a new shell:
 meltano!
@@ -280,7 +252,7 @@ You can deactivate a virtual environment by typing `deactivate` in your shell.
 Now that you have your virtual environment set up and running, run the following command to install the Meltano package:
 
 ```bash
-pip3 install meltano
+pip install meltano
 ```
 
 Once the installation completes, you can check if it was successful by running:
@@ -291,7 +263,7 @@ meltano --version
 
 That's it! Meltano is now be available for you to use.
 
-Now that you have successfully [installed Meltano](/docs/installation.html) and its requirements, you can create your first project.
+Now that you have successfully [installed Meltano](/developer-tools/self-hosted-installation.html) and its requirements, you can create your first project.
 
 ### Create your first project
 
@@ -314,6 +286,20 @@ This will create a new directory named `carbon` and initialize Meltano's basic d
 Inside the Meltano project directory, all plugin configuration (which may include tokens and passwords) is stored inside the `.meltano` directory,
 which is automatically added to the project's `.gitignore` file to prevent this potentially sensitive information from accidentally being pushed up to a hosted Git repository.
 
+### Setup your loader
+
+At this time, the GUI for configuring the loader from your project has been temporarily disabled. As a result, you will need to supply your database configuration through a `.env` file.
+
+Once you create the file, you will need to paste in the configuration for your database. For example, PostgreSQL configurations can [be found here](/plugins/loaders/postgres.html#beginner-using-a-postgresql-database-for-the-first-time).
+
+After saving your configurations, you can load your configurations by running:
+
+```bash
+source .env
+```
+
+And just like that, your loader is configured!
+
 ### Start the application
 
 Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
@@ -329,7 +315,7 @@ You are now ready to add data sources, configure reporting databases, schedule u
 
 #### Installing on Docker
 
-[Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](/docs/installation.html#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
+[Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](/developer-tools/self-hosted-installation.html#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
 
 ##### Using Pre-built Docker Images
 
@@ -399,7 +385,7 @@ Now that we have data in your database, let's add the corresponding model bundle
 ```
 docker run -v $(pwd):/project \
              -w /project \
-             meltano/meltano add model model-carbon-intensity-sqlite
+             meltano/meltano add model model-carbon-intensity
 ```
 
 ## Upgrading Meltano
@@ -428,4 +414,36 @@ meltano upgrade
 
 ## Troubleshooting
 
+::: tip
 Are you having installation or deployment problems? We are here to help you. Check out [Getting Help](/docs/getting-help.html) on the different ways to get in touch with us.
+:::
+
+### Configure network access
+
+::: tip
+This section is only necessary if you do not have a Security Group that allows for port 5000,5010 inbound.
+:::
+
+Once you complete the cluster setup, you should be brought to the detail page for the service. You should be default on a tab called _Details_ with a _Network Access_ section.
+
+1. Navigate to the _Details_ tab
+1. Under _Network Access_, click on the link next to _Security Groups_ (e.g., sg-f0dj093dkjf10)
+1. This should open a new tab with your security group
+1. Navigate to the _Inbound Rules_ tab on the bottom of the page
+1. Click `Edit Rules`
+1. Delete any existing rules
+1. Click `Add Rule` with the following properties:
+
+- **Type**: Custom TCP Rule
+- **Protocol**: TCP
+- **Port Range**: 5000
+- **Source**: Custom 0.0.0.0/0
+
+1. Click "Add Rule" with the following properties:
+
+- **Type**: Custom TCP Rule
+- **Protocol**: TCP
+- **Port Range**: 5010
+- **Source**: Custom 0.0.0.0/0
+
+1. Click `Save rules`

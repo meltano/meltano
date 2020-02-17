@@ -3,14 +3,19 @@
     <div>
       <div class="hero homepage-cta feature-section-wrapper">
         <div class="hero-left">
-          <h2 class="hero-header" style="border-bottom:0px;">Free data dashboards<br/><strong>for startup founders</strong></h2>
+          <h2 class="hero-header" style="border-bottom:0px;">
+            Data dashboards<br /><strong>for startup founders</strong>
+          </h2>
           <p class="hero-tagline">
-            Open source software to visualize business operations data
+            Analytics software to visualize your business operations
           </p>
 
-          <p class="action" v-if="data.actionText && data.actionLink && data.contributeLink && data.contributeText">
-            <NavLink class="action-button" :item="actionLink" />
-            <NavLink class="action-button secondary" :item="contributeLink" />
+          <p class="action">
+            <NavLink class="action-button" :item="$frontmatter.primaryAction" />
+            <NavLink
+              class="action-button secondary"
+              :item="$frontmatter.secondaryAction"
+            />
           </p>
         </div>
 
@@ -25,55 +30,27 @@
     </div>
 
     <div class="feature-section-wrapper">
-      <div class="content-width-wide" style="background-color:#fffbe4; padding-top:20px; padding-bottom:20px;">
-
+      <div
+        class="content-width-wide"
+        style="background-color:#fffbe4; padding-top:20px; padding-bottom:20px;"
+      >
         <p class="description">
-          Connect popular data sources and reporting database formats.
+          Connect to data from popular services to build powerful dashboards
         </p>
 
         <div class="plugin-logos">
-          <a href="/plugins/extractors/gitlab.html"
-            ><img src="../assets/logo-gitlab.png" alt="GitLab Logo"
-          /></a>
-
           <a href="/plugins/extractors/stripe.html"
             ><img src="../assets/logo-stripe.png" alt="Stripe Logo"
-          /></a>
-
-          <a href="/plugins/csv.html"
-            ><img src="../assets/logo-csv.png" alt="CSV Logo"
           /></a>
 
           <a href="/plugins/extractors/salesforce.html"
             ><img src="../assets/logo-salesforce.png" alt="Salesforce Logo"
           /></a>
 
-          <a href="/plugins/loaders/sqlite.html"
-            ><img src="../assets/logo-sqlite.png" alt="SQLite Logo"
-          /></a>
-
           <a href="/plugins/extractors/zendesk.html"
             ><img src="../assets/logo-zendesk.png" alt="Zendesk Logo"
           /></a>
 
-          <a href="/plugins/extractors/marketo.html"
-            ><img src="../assets/logo-marketo.png" alt="Marketo Logo"
-          /></a>
-          <a href="/plugins/extractors/carbon-intensity.html"
-            ><img src="../assets/logo-nationalgrid.png" alt="National Grid ESO"
-          /></a>
-
-          <a href="/plugins/extractors/fastly.html"
-            ><img src="../assets/logo-fastly.png" alt="Fastly Logo"
-          /></a>
-
-          <a href="/plugins/extractors/mongodb.html"
-            ><img src="../assets/logo-mongodb.png" alt="MongoDB Logo"
-          /></a>
-
-          <a href="/plugins/loaders/snowflake.html">
-            <img src="../assets/logo-snowflake.png" alt="Snowflake Logo" />
-          </a>
           <a href="/plugins/extractors/google-analytics.html"
             ><img
               src="../assets/logo-googleanalytics.png"
@@ -84,11 +61,13 @@
 
         <p class="description ta-c">
           For more information, check out our
-          <a href="/plugins/">plugins documentation</a>
+          <a href="/plugins/extractors/">plugins documentation</a>
         </p>
 
         <p style="text-align:center; font-size:12px;">
-          <em>All trademarks and logos are owned by their respective owners.</em>
+          <em
+            >All trademarks and logos are owned by their respective owners.</em
+          >
         </p>
       </div>
     </div>
@@ -118,8 +97,7 @@
             No queries required
           </h2>
           <p class="hero-tagline">
-            Meltano automatically generates SQL with a few clicks, so you
-            can get the insights you need.
+            Go from data to dashboard in minutes, without writing any code.
           </p>
         </div>
       </div>
@@ -334,7 +312,7 @@
           <div class="embed-responsive embed-responsive-16by9">
             <iframe
               class="embed-responsive-item"
-              src="https://www.youtube.com/embed/_fq9N_LI8S0"
+              src="https://www.youtube.com/embed/vtNStRP5m_Y"
               frameborder="0"
               allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
               allowfullscreen
@@ -343,8 +321,6 @@
         </div>
       </div>
     </div>
-
-    
 
     <div class="feature-section-wrapper is-white">
       <div class="content-width-wide">
@@ -372,8 +348,15 @@
 
     <div class="feature-section-wrapper">
       <h2 class="section-title" style="text-align: center; margin-top: 0;">
-        Take a tour of Meltano
+        Self Host Meltano Locally or in the Cloud
       </h2>
+      <p style="text-align: center; margin-bottom:20px;">
+        Meltano is built to run wherever you get your work done. Looking to self
+        host?
+        <a href="/developer-tools/self-hosted-installation.html"
+          >Check out our installation instructions</a
+        >.
+      </p>
 
       <div class="rich-media-container">
         <div class="embed-responsive embed-responsive-16by9">
@@ -391,7 +374,9 @@
 
     <div class="feature-section-wrapper is-shorter is-white">
       <section class="section">
-        <h2 class="section__title" style="padding-bottom:20px;">We'd Love to Hear From You</h2>
+        <h2 class="section__title" style="padding-bottom:20px;">
+          We'd Love to Hear From You
+        </h2>
         <a
           :href="$site.themeConfig.data.slackChannelUrl"
           class="button"
@@ -456,19 +441,6 @@ export default {
   computed: {
     data() {
       return this.$page.frontmatter
-    },
-
-    actionLink() {
-      return {
-        link: this.data.actionLink,
-        text: this.data.actionText
-      }
-    },
-    contributeLink() {
-      return {
-        link: this.data.contributeLink,
-        text: this.data.contributeText
-      }
     }
   }
 }
@@ -493,6 +465,12 @@ export default {
     &:focus {
       color: #fff;
       background-color: $accentColor;
+    }
+
+    &.is-purple.is-filled {
+      background-color: $purpleColor;
+      border-color: $purpleColor;
+      color: white;
     }
 }
 
@@ -738,17 +716,21 @@ export default {
       background-color #464ACB;
       padding 0.8rem 1.6rem
       border-radius 4px
-      transition background-color .1s ease
+      transition background-color .2s ease
       letter-spacing 0.1rem
       box-sizing border-box
       margin-right: 0.4rem;
       margin-bottom: 1rem;
+      svg
+        color #fff
       &.secondary
         background none
         box-shadow inset 0 0 0 2px #464ACB
         color #464ACB
+        svg
+          color #464ACB
         &:hover
-          background-color lighten(#fff, 10%)
+          background-color lighten(#464ACB, 80%)
       &:hover
         background-color lighten(#464ACB, 10%)
 
@@ -902,5 +884,9 @@ export default {
 
 .embed-responsive-16by9 {
   padding-bottom: 56.25%;
+}
+
+.mt-2r {
+  margin-top: 1rem;
 }
 </style>

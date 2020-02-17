@@ -4,12 +4,11 @@ from os.path import join
 from pathlib import Path
 
 import markdown
-from flask import Blueprint, jsonify, request
+from flask import jsonify, request
 
 from meltano.core.project import Project
-from meltano.core.utils import decode_file_path_from_id
 from meltano.core.compiler.project_compiler import ProjectCompiler
-from meltano.api.security import api_auth_required
+from meltano.api.api_blueprint import APIBlueprint
 from meltano.core.m5o.m5o_file_parser import (
     MeltanoAnalysisFileParser,
     MeltanoAnalysisMissingTopicFilesError,
@@ -25,7 +24,7 @@ from meltano.api.security.auth import permit
 from meltano.api.json import freeze_keys
 
 
-reposBP = Blueprint("repos", __name__, url_prefix="/api/v1/repos")
+reposBP = APIBlueprint("repos", __name__)
 
 
 class ReportIndexFilter(NameFilterMixin, ResourceFilter):
@@ -58,12 +57,6 @@ class M5ocFilter(ResourceFilter):
         }
 
 
-@reposBP.before_request
-@api_auth_required
-def before_request():
-    pass
-
-
 @reposBP.route("/", methods=["GET"])
 def index():
     project = Project.find()
@@ -87,7 +80,9 @@ def index():
     onlydocs = project.model_dir().parent.glob("*.md")
 
     for d in onlydocs:
-        file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(d, str(d.name))
+        file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(
+            d.relative_to(project.root), str(d.name)
+        )
         sortedM5oFiles["documents"]["items"].append(file_dict)
 
     for f in onlyfiles:
@@ -98,7 +93,9 @@ def index():
         # filename splittext twice occurs due to current *.type.extension convention (two dots)
         filename = filename.lower()
         filename, ext = os.path.splitext(filename)
-        file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(f, filename)
+        file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(
+            f.relative_to(project.root), filename
+        )
         if ext == ".topic":
             sortedM5oFiles["topics"]["items"].append(file_dict)
         if ext == ".table":
@@ -121,28 +118,6 @@ def index():
         )
 
     return jsonify(sortedM5oFiles)
-
-
-@reposBP.route("/file/<unique_id>", methods=["GET"])
-def file(unique_id):
-    file_path = decode_file_path_from_id(unique_id)
-    (filename, ext) = os.path.splitext(file_path)
-    is_markdown = False
-    project = Project.find()
-    path_to_file = project.model_dir(file_path).resolve()
-    with open(path_to_file, "r") as read_file:
-        data = read_file.read()
-        if ext == ".md":
-            data = markdown.markdown(data)
-            is_markdown = True
-        return jsonify(
-            {
-                "file": data,
-                "is_markdown": is_markdown,
-                "id": unique_id,
-                "populated": True,
-            }
-        )
 
 
 def lint_all(compile):

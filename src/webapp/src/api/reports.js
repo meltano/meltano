@@ -2,10 +2,6 @@ import axios from 'axios'
 import utils from '@/utils/utils'
 
 export default {
-  loadReport(name) {
-    return axios.get(utils.apiUrl('reports/load', `${name}`))
-  },
-
   loadReports() {
     return axios.get(utils.apiUrl('reports'))
   },

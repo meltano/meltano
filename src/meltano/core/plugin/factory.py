@@ -14,13 +14,15 @@ def plugin_factory(plugin_type: PluginType, plugin_def: Dict):
     plugin_class = {
         PluginType.EXTRACTORS: lazy_import(".singer", "SingerTap"),
         PluginType.LOADERS: lazy_import(".singer", "SingerTarget"),
-        PluginType.TRANSFORMERS: lazy_import(".dbt", "DbtPlugin"),
         PluginType.TRANSFORMS: lazy_import(".dbt", "DbtTransformPlugin"),
         PluginType.MODELS: lazy_import(".model", "ModelPlugin"),
+        PluginType.DASHBOARDS: lazy_import(".dashboard", "DashboardPlugin"),
         PluginType.ORCHESTRATORS: lazy_import(".airflow", "Airflow"),
+        PluginType.TRANSFORMERS: lazy_import(".dbt", "DbtPlugin"),
     }
 
     # this will parse the discovery file and create an instance of the
     # corresponding `plugin_class` for all the plugins.
     plugin_cls = plugin_class[plugin_type]()
-    return plugin_cls(**plugin_def)
+
+    return plugin_cls(plugin_def.pop("name"), **plugin_def)

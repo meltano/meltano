@@ -8,16 +8,18 @@ from flask import (
     request,
     jsonify,
     redirect,
+    make_response,
     g,
     current_app,
-    send_from_directory,
 )
-from flask_security import login_required, roles_required
+from flask_login import current_user
+from flask_security import login_required, roles_required, logout_user
 from jinja2 import TemplateNotFound
 
 import meltano
-from meltano.core.project import Project
 from meltano.api.security import api_auth_required
+from meltano.api.security.readonly_killswitch import readonly_killswitch
+from meltano.api.api_blueprint import APIBlueprint
 from meltano.core.utils import truthy
 
 logger = logging.getLogger(__name__)
@@ -30,13 +32,13 @@ def internal_error(exception):
     return jsonify({"error": str(exception)}), 500
 
 
-@root.route("/-/dbt/", defaults={"path": "index.html"})
-@root.route("/-/dbt/<path:path>")
-def dbt_docs(path):
-    project = Project.find()
-    return send_from_directory(
-        project.meltano_dir("transformers", "dbt", "target"), path
-    )
+@root.route("/-/embed/", defaults={"token": ""})
+@root.route("/-/embed/<token>")
+def embed(token):
+    try:
+        return render_template("embed.html", jsContext=g.jsContext)
+    except TemplateNotFound:
+        return "Please run `make bundle` from src/webapp of the Meltano project."
 
 
 # this route is a catch-all route to forward
@@ -54,6 +56,7 @@ def default(path):
 
 @root.route("/upgrade", methods=["POST"])
 @roles_required("admin")
+@readonly_killswitch
 def upgrade():
     meltano.api.executor.upgrade()
     return "Meltano update in progress.", 201
@@ -71,8 +74,25 @@ def version():
     return jsonify(response_payload)
 
 
+@root.route("/bootstrap")
+@login_required
+def bootstrap():
+    return redirect(current_app.config["MELTANO_UI_URL"])
+
+
 @root.route("/echo", methods=["POST"])
 def echo():
     payload = request.get_json()
     print(payload)
     return jsonify(payload)
+
+
+api_root = APIBlueprint("api_root", __name__, url_prefix="/api/v1/")
+
+
+@api_root.route("/identity")
+def identity():
+    if current_user.is_anonymous:
+        return "", 204
+
+    return jsonify({"username": current_user.username})

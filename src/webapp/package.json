@@ -1,6 +1,6 @@
 {
   "name": "meltano-webapp",
-  "version": "1.4.0",
+  "version": "1.21.1",
   "private": true,
   "scripts": {
     "dev": "npm run serve",
@@ -22,6 +22,7 @@
     "core-js": "^2.6.5",
     "dotenv": "^8.0.0",
     "lodash": "^4.17.14",
+    "moment": "^2.24.0",
     "vue": "^2.6.10",
     "vue-analytics": "^5.17.2",
     "vue-router": "^3.0.3",
@@ -50,8 +51,8 @@
     "eslint-plugin-vue": "^5.0.0",
     "jwt-decode": "^2.2.0",
     "lint-staged": "^8.1.5",
-    "node-sass": "^4.9.0",
-    "sass-loader": "^7.1.0",
+    "node-sass": "^4.13.0",
+    "sass-loader": "^8.0.0",
     "sql-formatter": "^2.3.3",
     "ssf": "^0.10.2",
     "vue-template-compiler": "^2.6.10",

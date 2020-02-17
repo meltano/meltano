@@ -1,193 +1,294 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
+import Vue from 'vue'
 
+import AnalyzeList from '@/components/analyze/AnalyzeList'
+import ConnectorLogo from '@/components/generic/ConnectorLogo'
+import Dropdown from '@/components/generic/Dropdown'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
-
 import utils from '@/utils/utils'
 
 export default {
   name: 'PipelineSchedules',
   components: {
+    AnalyzeList,
+    ConnectorLogo,
+    Dropdown,
     ScheduleTableHead
   },
-  computed: {
-    ...mapState('configuration', ['pipelines']),
-    ...mapGetters('configuration', ['getHasPipelines']),
-    ...mapGetters('plugins', ['getIsPluginInstalled']),
-    getFormattedDateStringYYYYMMDD() {
-      return val => utils.formatDateStringYYYYMMDD(val)
+  props: {
+    pipelines: { type: Array, required: true, default: () => [] }
+  },
+  data() {
+    return {
+      intervalOptions: {
+        '@once': 'Once (Manual)',
+        '@hourly': 'Hourly',
+        '@daily': 'Daily',
+        '@weekly': 'Weekly',
+        '@monthly': 'Monthly',
+        '@yearly': 'Yearly'
+      },
+      meltanoDataInstance: false
     }
   },
-  beforeRouteEnter(to, from, next) {
-    next(vm => {
-      if (from.name === 'transforms') {
-        vm.goToCreatePipeline()
+  computed: {
+    ...mapGetters('plugins', ['getInstalledPlugin', 'getPluginLabel']),
+    getIsDisabled() {
+      return pipeline => pipeline.isRunning || pipeline.isSaving
+    },
+    getMomentFormatlll() {
+      return val => utils.momentFormatlll(val)
+    },
+    getLastRunLabel() {
+      return pipeline => {
+        const label = pipeline.endedAt
+          ? utils.momentFromNow(pipeline.endedAt)
+          : 'Log'
+        return pipeline.isRunning ? 'Running...' : label
       }
-    })
+    },
+    getMomentFromNow() {
+      return val => utils.momentFromNow(val)
+    }
   },
-  created() {
-    this.$store.dispatch('configuration/getAllPipelineSchedules')
+  mounted() {
+    if (window.location.href.indexOf('meltanodata.com') > -1) {
+      this.meltanoDataInstance = true
+    }
   },
   methods: {
-    goToCreatePipeline() {
-      this.$router.push({ name: 'createSchedule' })
-    },
+    ...mapActions('orchestration', [
+      'deletePipelineSchedule',
+      'updatePipelineSchedule'
+    ]),
     goToLog(jobId) {
       this.$router.push({ name: 'runLog', params: { jobId } })
     },
+    onChangeInterval(option, pipeline) {
+      const interval = option.srcElement.selectedOptions[0].value
+      if (interval !== pipeline.interval) {
+        const pluginNamespace = this.getInstalledPlugin(
+          'extractors',
+          pipeline.extractor
+        ).namespace
+        this.updatePipelineSchedule({ interval, pipeline, pluginNamespace })
+          .then(() =>
+            Vue.toasted.global.success(
+              `Pipeline successfully updated - ${pipeline.name}`
+            )
+          )
+          .catch(this.$error.handle)
+      }
+    },
+    removePipeline(pipeline) {
+      this.deletePipelineSchedule(pipeline)
+        .then(() =>
+          Vue.toasted.global.success(
+            `Pipeline successfully removed - ${pipeline.name}`
+          )
+        )
+        .catch(this.$error.handle)
+    },
     runELT(pipeline) {
-      this.$store.dispatch('configuration/run', pipeline)
+      this.$store.dispatch('orchestration/run', pipeline)
     }
   }
 }
 </script>
 
 <template>
-  <div>
-    <div class="columns">
-      <div class="column is-three-fifths is-offset-one-fifth">
-        <div class="content has-text-centered">
-          <p class="level-item buttons">
-            <a class="button is-small is-static is-marginless is-borderless">
-              <span>Create a data pipeline below</span>
-            </a>
-            <span class="step-spacer">then</span>
-            <a class="button is-small is-static is-marginless is-borderless">
-              <span
-                >Click <span class="is-italic">Manual Run</span> to start data
-                collection</span
-              >
-            </a>
-          </p>
-        </div>
-      </div>
-    </div>
+  <div class="box">
+    <table class="table is-fullwidth is-hoverable">
+      <ScheduleTableHead has-actions has-start-date />
 
-    <br />
-
-    <div class="columns is-vcentered">
-      <div class="column">
-        <h2 class="title is-5">Pipelines</h2>
-      </div>
-
-      <div class="column">
-        <div class="field is-pulled-right">
-          <div class="control">
-            <button
-              class="button is-interactive-primary"
-              data-cy="create-pipeline-button"
-              @click="goToCreatePipeline()"
-            >
-              <span>Create</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="getHasPipelines" class="box">
-      <table class="table is-fullwidth is-narrow is-hoverable">
-        <ScheduleTableHead has-actions has-start-date />
-
-        <tbody>
-          <template v-for="pipeline in pipelines">
-            <tr :key="pipeline.name">
-              <td>
-                <p>{{ pipeline.name }}</p>
-              </td>
-              <td>
-                <p class="has-text-centered">{{ pipeline.extractor }}</p>
-              </td>
-              <td>
-                <p class="has-text-centered">{{ pipeline.loader }}</p>
-              </td>
-              <td>
-                <p class="has-text-centered">{{ pipeline.transform }}</p>
-              </td>
-              <td>
-                <p class="has-text-centered">
-                  <span v-if="getIsPluginInstalled('orchestrators', 'airflow')">
-                    {{ pipeline.interval }}
-                  </span>
-                  <router-link
-                    v-else
-                    class="button is-small tooltip"
-                    data-tooltip="Airflow Orchestrator must be installed for intervaled runs."
-                    :to="{ name: 'orchestration' }"
-                  >
-                    <span>{{ pipeline.interval }}</span>
-                    <span class="icon is-small has-text-warning">
-                      <font-awesome-icon
-                        icon="exclamation-triangle"
-                      ></font-awesome-icon>
-                    </span>
-                  </router-link>
-                </p>
-              </td>
-              <td>
-                <p class="has-text-centered">
-                  {{
-                    pipeline.startDate
-                      ? getFormattedDateStringYYYYMMDD(pipeline.startDate)
-                      : 'None'
-                  }}
-                </p>
-              </td>
-              <td>
-                <p class="has-text-centered">
-                  <button
-                    class="button is-outlined is-small"
-                    :class="{
-                      'tooltip is-tooltip-left': pipeline.jobId,
-                      'is-danger': pipeline.hasError
-                    }"
-                    data-tooltip="View this ELT Pipeline's last run logging status."
-                    :disabled="!pipeline.jobId"
-                    @click="goToLog(pipeline.jobId)"
-                  >
-                    {{ pipeline.isRunning ? 'Running...' : 'Log' }}
-                  </button>
-                </p>
-              </td>
-              <td>
-                <div class="buttons is-right">
-                  <a
-                    class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
-                    :class="{ 'is-loading': pipeline.isRunning }"
-                    data-tooltip="Run this ELT pipeline once."
-                    @click="runELT(pipeline)"
-                    >Manual Run</a
-                  >
-                  <router-link
-                    v-if="getIsPluginInstalled('orchestrators', 'airflow')"
-                    class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
-                    data-tooltip="Automate this ELT pipeline with orchestration."
-                    :to="{ name: 'orchestration' }"
-                    >Orchestrate</router-link
-                  >
-                  <router-link
-                    class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
-                    data-tooltip="Analyze associated models."
-                    :to="{ name: 'model' }"
-                    >Model</router-link
-                  >
+      <tbody>
+        <template v-for="pipeline in pipelines">
+          <tr :key="pipeline.name">
+            <td>
+              <article class="media">
+                <figure class="media-left">
+                  <p class="image level-item is-48x48 container">
+                    <ConnectorLogo :connector="pipeline.extractor" />
+                  </p>
+                </figure>
+                <div class="media-content">
+                  <div class="content">
+                    <p>
+                      <strong>
+                        {{ getPluginLabel('extractors', pipeline.extractor) }}
+                      </strong>
+                      <br />
+                      <small>Default</small>
+                    </p>
+                  </div>
                 </div>
-              </td>
-            </tr>
-          </template>
-        </tbody>
-      </table>
-    </div>
+              </article>
+            </td>
+            <td>
+              <div class="is-flex is-vcentered">
+                <div class="field has-addons">
+                  <div class="control is-expanded">
+                    <span
+                      class="select is-fullwidth"
+                      :class="{
+                        'is-loading': getIsDisabled(pipeline)
+                      }"
+                    >
+                      <select
+                        :disabled="getIsDisabled(pipeline)"
+                        :value="pipeline.interval"
+                        @input="onChangeInterval($event, pipeline)"
+                      >
+                        <option
+                          v-for="(label, value) in intervalOptions"
+                          :key="value"
+                          :value="value"
+                          >{{ label }}</option
+                        >
+                      </select>
+                    </span>
+                  </div>
 
-    <div v-else class="content">
-      <p>
-        There are no pipelines scheduled yet.
-        <router-link to="schedules/create"
-          >Schedule your first Pipeline</router-link
-        >
-        now.
-      </p>
-    </div>
+                  <div class="control">
+                    <button
+                      class="button tooltip is-tooltip-right"
+                      :class="{ 'is-loading': pipeline.isRunning }"
+                      :disabled="getIsDisabled(pipeline)"
+                      data-tooltip="Manually run this pipeline once"
+                      @click="runELT(pipeline)"
+                    >
+                      Run Now
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <p>
+                <span
+                  :class="{
+                    'tooltip is-tooltip-left': pipeline.hasEverSucceeded
+                  }"
+                  :data-tooltip="getMomentFormatlll(pipeline.startDate)"
+                >
+                  <span>
+                    {{
+                      pipeline.startDate
+                        ? getMomentFromNow(pipeline.startDate)
+                        : 'None'
+                    }}
+                  </span>
+                </span>
+              </p>
+            </td>
+            <td>
+              <p>
+                <button
+                  class="button is-outlined is-fullwidth h-space-between"
+                  :class="{
+                    'tooltip is-tooltip-left': pipeline.hasEverSucceeded
+                  }"
+                  :data-tooltip="
+                    `${
+                      pipeline.endedAt
+                        ? getMomentFormatlll(pipeline.endedAt)
+                        : 'View the last run of this ELT pipeline.'
+                    }`
+                  "
+                  @click="goToLog(pipeline.jobId)"
+                >
+                  <span>
+                    {{ getLastRunLabel(pipeline) }}
+                  </span>
+                  <span
+                    v-if="!pipeline.isRunning"
+                    class="icon"
+                    :class="
+                      `has-text-${pipeline.hasError ? 'danger' : 'success'}`
+                    "
+                  >
+                    <font-awesome-icon
+                      :icon="
+                        pipeline.hasError
+                          ? 'exclamation-triangle'
+                          : 'check-circle'
+                      "
+                    ></font-awesome-icon>
+                  </span>
+                </button>
+              </p>
+            </td>
+            <td>
+              <div class="buttons is-right">
+                <Dropdown
+                  label="Reports"
+                  button-classes="is-interactive-primary"
+                  :tooltip="{
+                    classes: 'is-tooltip-left',
+                    message: 'Analyze related reports of this pipeline'
+                  }"
+                  menu-classes="dropdown-menu-300"
+                  icon-open="chart-line"
+                  icon-close="caret-down"
+                  is-right-aligned
+                >
+                  <div class="dropdown-content is-unselectable">
+                    <AnalyzeList :pipeline="pipeline"></AnalyzeList>
+                  </div>
+                </Dropdown>
+                <Dropdown
+                  :button-classes="
+                    `is-danger is-outlined ${
+                      pipeline.isDeleting ? 'is-loading' : ''
+                    }`
+                  "
+                  :disabled="getIsDisabled(pipeline)"
+                  :tooltip="{
+                    classes: 'is-tooltip-left',
+                    message: 'Delete this pipeline'
+                  }"
+                  menu-classes="dropdown-menu-300"
+                  icon-open="trash-alt"
+                  icon-close="caret-up"
+                  is-right-aligned
+                >
+                  <div class="dropdown-content is-unselectable">
+                    <div class="dropdown-item">
+                      <div class="content">
+                        <p>
+                          Please confirm deletion of pipeline:<br /><em>{{
+                            pipeline.name
+                          }}</em
+                          >.
+                        </p>
+                      </div>
+                      <div class="buttons is-right">
+                        <button class="button is-text" data-dropdown-auto-close>
+                          Cancel
+                        </button>
+                        <button
+                          class="button is-danger"
+                          data-dropdown-auto-close
+                          @click="removePipeline(pipeline)"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </Dropdown>
+              </div>
+            </td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+    <p v-if="meltanoDataInstance" class="has-text-centered is-italic">
+      Want to delete your data from your MeltanoData.com instance? Visit
+      <a href="https://meltano.com/docs/getting-help.html">our help page</a> for
+      more information.
+    </p>
   </div>
 </template>
 

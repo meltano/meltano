@@ -19,6 +19,8 @@ When you add a extractor or loader to a Meltano instance, Meltano will:
 1. Add it to the `meltano.yml` file
 1. Installs it in the `.meltano` directory with `venv` and `pip`
 
+You can run `meltano add` with `--include-related` to automatically install all transform, model, and dashboard plugins related to an extractor.
+
 #### Examples
 
 ```bash
@@ -27,6 +29,9 @@ meltano add [extractor | loader] [name_of_plugin]
 
 # Extractor Example
 meltano add extractor tap-gitlab
+
+# Extractor Example including related plugins
+meltano add --include-related extractor tap-google-analytics
 
 # Loader Example
 meltano add loader target-postgres
@@ -52,12 +57,25 @@ meltano add [transform] [name_of_transform]
 When you add a model to a Meltano instance, Meltano will:
 
 1. Add a model bundle to your `meltano.yml` file to help you interactively generate SQL
-1. Installed inside the `.meltano` directory which are then available to use in the Meltano webapp
+1. Install the model inside the `.meltano` directory which are then available to use in the Meltano webapp
 
 #### Example
 
 ```bash
 meltano add model [name_of_model]
+```
+
+### Dashboard
+
+When you add a dashboard to a Meltano instance, Meltano will:
+
+1. Add a dashboard bundle to your `meltano.yml` file
+1. Install the dashboard and reports inside the `analyze` directory which are then available to use in the Meltano webapp
+
+#### Example
+
+```bash
+meltano add dashboard [name_of_dashboard]
 ```
 
 ### Orchestration
@@ -79,20 +97,21 @@ Enables you to change a plugin's configuration.
 
 Meltano uses configuration layers to resolve a plugin's configuration:
 
-1. Environments variables
+1. Environment variables
 1. Plugin definition's `config:` attribute in **meltano.yml**
-1. Settings set via `meltano config` or the in the UI (stored in the meltano database)
+1. Settings set via `meltano config` or in the UI (stored in the system database)
 1. Default values set in the setting definition in **discovery.yml**
 
-This way, a Meltano project can stay secure in production, where environment variables shall be used for sensible settings (such as _passwords_ or _keys_) or use the settings database.
-
 ::: info
-Meltano stores the configuration as-is, without encryption. The most secure way to set a plugin's setting to a sensible value is to use the environment variable associated with it.
+Sensitive settings such as _passwords_ or _keys_ should not be configured using `meltano.yml`, 
+since the entire contents of this file are available to the Meltano UI and its users.
 
-Use `meltano config <plugin_name> list` to see the proper variable to set for a setting.
+Instead, these sensitive values should be stored in environment variables, or the system database (using `meltano config` or the UI).
+
+You can use `meltano config <plugin_name> list` to find the environment variable associated with a setting.
+
+Note that in each of these cases, Meltano stores the configuration as-is, without encryption.
 :::
-
-In development, however, one can use the **meltano.yml** to quickly set the configuration, via the `config:` attribute in each plugin, or use a different set of environment variables.
 
 ### How to use
 
@@ -200,10 +219,14 @@ meltano init [project_name] [--no_usage_stats]
 
 Installs all the dependencies of your project based on the **meltano.yml** file.
 
+Use `--include-related` to automatically install transform, model, and dashboard plugins related to installed extractor plugins.
+
 ### How to Use
 
 ```bash
 meltano install
+
+meltano install --include-related
 ```
 
 ## `invoke`
@@ -227,10 +250,13 @@ Alpha-quality [Role Based Access Control (RBAC)](/docs/security-and-privacy.html
 Use this command to check and manage the permissions of a Snowflake account.
 
 ```bash
-meltano permissions grant <spec_file> --db snowflake [--dry] [--diff] [--full-refresh]
+meltano permissions grant <spec_file> --db snowflake [--dry] [--diff]
 ```
 
-Given the parameters to connect to a Snowflake account and a YAML file (a "spec") representing the desired database configuration, this command makes sure that the configuration of that database matches the spec. If there are differences, it will return the sql commands required to make it match the spec.
+Given the parameters to connect to a Snowflake account and a YAML file (a "spec") representing the desired database configuration, this command makes sure that the configuration of that database matches the spec. If there are differences, it will return the sql grant and revoke commands required to make it match the spec. If there are additional permissions set in the database this command will create the necessary revoke commands with the exception of:
+
+* Object Ownership
+* Warehouse Privileges
 
 We currently support only Snowflake, as [pgbedrock](https://github.com/Squarespace/pgbedrock) can be used for managing the permissions in a Postgres database.
 
@@ -244,9 +270,11 @@ All permissions are abbreviated as `read` or `write` permissions, with Meltano g
 
 Tables and views are listed under `tables` and handled properly behind the scenes.
 
-If `*` is provided as the parameter for tables the grant statement will use the `ALL <object_type>S in SCHEMA` syntax. It will also grant to future tables and views. See Snowflake documenation for [`ON FUTURE`](https://docs.snowflake.net/manuals/sql-reference/sql/grant-privilege.html#optional-parameters)
+If `*` is provided as the parameter for tables the grant statement will use the `ALL <object_type>s in SCHEMA` syntax. It will also grant to future tables and views. See Snowflake documenation for [`ON FUTURE`](https://docs.snowflake.net/manuals/sql-reference/sql/grant-privilege.html#optional-parameters)
 
 If a schema name includes an asterisk, such as `snowplow_*`, then all schemas that match this pattern will be included in grant statement. This can be coupled with the asterisk for table grants to grant permissions on all tables in all schemas that match the given pattern. This is useful for date-partitioned schemas.
+
+All entities must be explicitly referenced. For example, if a permission is granted to a schema or table then the database must be explicitly referenced for permissioning as well.
 
 A specification file has the following structure:
 
@@ -357,11 +385,8 @@ When this flag is set, a full diff with both new and already granted commands is
 
 When this flag is set, the permission queries generated are not actually sent to the server and run; They are just returned to the user for examining them and running them manually.
 
-Currently we are still evaluating the results generated by the `meltano permissions grant` command, so the `--dry` flag is required.
+When this flag is not set, the commands will be executed on Snowflake and their status will be returned and shown on the command line.
 
-#### --full-refresh
-
-When this flag is set, the permission queries generated are revoke statements for all roles, warehouse, databases, schemas, and tables listed in the spec file. Currently it will not revoke ownership of database objects or disable users. The revoke commands are run prior to the grant commands.
 
 #### Connection Parameters
 
@@ -446,6 +471,55 @@ Exclusion has precedence over inclusion. If an attribute is excluded, there is n
 
 - `meltano ui`: Start the Meltano UI.
 
+### `start` (default)
+
+Start the Meltano UI.
+
+### `setup`
+
+::: tip
+This command is only relevant for production-grade setup.
+:::
+
+Generate secure secrets in the `ui.cfg` so that the application is secure.
+
+::: warning
+Regenerating secrets will cause the following:
+
+  - All passwords will be invalid
+  - All sessions will be expired
+  
+Use with caution!
+:::
+
+#### --bits
+
+Specify the size of the secrets, default to 256.
+
+## `user`
+
+::: tip
+This command is only relevant when Meltano is run with authentication enabled.
+:::
+
+### `add` 
+
+Create a Meltano user account, active and ready to be used.
+
+#### --overwrite, -f
+
+Update the user instead of creating a new one.
+
+#### --role, -G
+
+Add the user to the role. Meltano ships with two built-in roles: `admin` and `regular`.
+
+#### How to use
+
+```bash
+meltano user add admin securepassword --role admin
+```
+
 ## `upgrade`
 
 Upgrade Meltano to the latest version.
@@ -458,7 +532,7 @@ This function will following process to upgrade Meltano:
 
 ## `version`
 
-It is used to check which version of Meltano you are using:
+It is used to check which version of Meltano currently installed.
 
 ### How to use
 

@@ -4,17 +4,19 @@ import sqlalchemy
 
 from datetime import date, datetime
 from decimal import Decimal
-from flask import Blueprint, jsonify, request
-from flask_security import auth_required
+from flask import jsonify, request
 
 from .settings_helper import SettingsHelper
 from .sql_helper import SqlHelper, ConnectionNotFound, UnsupportedConnectionDialect
-from meltano.api.security import api_auth_required
+from meltano.api.api_blueprint import APIBlueprint
 from meltano.core.project import Project
+from meltano.core.schedule_service import ScheduleService
+from meltano.core.utils import find_named, NotFound
 from meltano.core.sql.filter import FilterOptions
 from meltano.core.sql.base import ParseError, EmptyQuery
 
-sqlBP = Blueprint("sql", __name__, url_prefix="/api/v1/sql")
+
+sqlBP = APIBlueprint("sql", __name__)
 
 
 @sqlBP.errorhandler(ConnectionNotFound)
@@ -71,12 +73,6 @@ def default(obj):
     raise TypeError(f"Object of type {type(obj).__name__} is not JSON serialize-able")
 
 
-@sqlBP.before_request
-@api_auth_required
-def before_request():
-    pass
-
-
 @sqlBP.route("/", methods=["GET"])
 def index():
     return jsonify({"result": True})
@@ -88,8 +84,6 @@ def get_sql(namespace, topic_name, design_name):
     m5oc = sqlHelper.get_m5oc_topic(namespace, topic_name)
     design = m5oc.design(design_name)
     incoming_json = request.get_json()
-
-    loader = incoming_json["loader"]
     sql_dict = sqlHelper.get_sql(design, incoming_json)
 
     outgoing_sql = sql_dict["sql"]
@@ -103,7 +97,16 @@ def get_sql(namespace, topic_name, design_name):
     if not incoming_json["run"]:
         return jsonify(base_dict)
 
-    results = sqlHelper.get_query_results(loader, outgoing_sql)
+    # we need to find the pipeline that loaded the data for this model
+    # this is running off the assumption that there is only one pipeline
+    # that can load data for a specific model
+    project = Project.find()
+    schedule_service = ScheduleService(project)
+    schedule = schedule_service.find_namespace_schedule(
+        m5oc.content["plugin_namespace"]
+    )
+
+    results = sqlHelper.get_query_results(schedule.loader, outgoing_sql)
     base_dict["results"] = results
     base_dict["empty"] = len(results) == 0
 

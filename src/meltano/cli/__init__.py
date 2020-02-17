@@ -15,6 +15,7 @@ from . import (
     repl,
     config,
     model,
+    user,
 )
 
 

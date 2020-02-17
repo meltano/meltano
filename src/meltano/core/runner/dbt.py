@@ -51,6 +51,7 @@ class DbtRunner(Runner):
 
         # Get an asyncio event loop and use it to run the dbt commands
         loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.dbt_service.clean())
         loop.run_until_complete(self.dbt_service.deps())
 
         if models is not None:

@@ -12,7 +12,7 @@ $button-focus-box-shadow-size: 0px;
 /* Colors ------------------- */
 
 // Brand colors
-$primary: #0f3b66;
+$primary: #464acb;
 
 // Color semantics match GitLab Pajamas 500-level | Blue, Green, Orange, Red
 // https://design.gitlab.com/foundations/colors/
@@ -27,6 +27,11 @@ $error: $red;
 $link: $primary; // Set to match $interactive-navigation which is assigned after these primary Bulma color settings
 $warning: $orange;
 $modal-background-background-color: rgba(#000000, 0.65);
+
+/* Font-- ------------------ */
+
+$family-sans-serif: 'IBM Plex Sans';
+$family-monospace: 'IBM Plex Mono';
 
 /* Modal -------------------- */
 

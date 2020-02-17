@@ -2,20 +2,33 @@ import axios from 'axios'
 import utils from '@/utils/utils'
 
 export default {
+  addConfigurationProfile({ type, name, profile }) {
+    return axios.post(
+      utils.apiUrl('orchestrations', `${type}/${name}/configuration/profiles`),
+      profile
+    )
+  },
+
+  deletePipelineSchedule(schedulePayload) {
+    return axios.delete(utils.apiUrl('orchestrations', 'pipeline-schedules'), {
+      data: schedulePayload
+    })
+  },
+
+  downloadJobLog({ jobId }) {
+    return axios.get(utils.apiUrl('orchestrations', `jobs/${jobId}/download`))
+  },
+
   extract(extractor) {
     return axios.post(utils.apiUrl('orchestrations', `extract/${extractor}`))
   },
 
-  getAllPipelineSchedules() {
-    return axios.get(utils.apiUrl('orchestrations', 'pipeline_schedules'))
-  },
-
-  getExtractorInFocusEntities(extractor) {
-    return axios.post(utils.apiUrl('orchestrations', `entities/${extractor}`))
-  },
-
   getJobLog({ jobId }) {
     return axios.get(utils.apiUrl('orchestrations', `jobs/${jobId}/log`))
+  },
+
+  getPipelineSchedules() {
+    return axios.get(utils.apiUrl('orchestrations', 'pipeline-schedules'))
   },
 
   getPluginConfiguration({ type, name }) {
@@ -34,22 +47,44 @@ export default {
 
   savePipelineSchedule(schedulePayload) {
     return axios.post(
-      utils.apiUrl('orchestrations', 'pipeline_schedules'),
+      utils.apiUrl('orchestrations', 'pipeline-schedules'),
       schedulePayload
     )
   },
 
-  savePluginConfiguration({ type, name, config }) {
+  savePluginConfiguration({ type, name, profiles }) {
     return axios.put(
       utils.apiUrl('orchestrations', `${type}/${name}/configuration`),
-      config
+      profiles
     )
   },
 
-  selectEntities(extractorEntities) {
+  testPluginConfiguration({ type, name, payload }) {
     return axios.post(
-      utils.apiUrl('orchestrations', 'select-entities'),
-      extractorEntities
+      utils.apiUrl('orchestrations', `${type}/${name}/configuration/test`),
+      payload
+    )
+  },
+
+  updatePipelineSchedule(schedulePayload) {
+    return axios.put(
+      utils.apiUrl('orchestrations', 'pipeline-schedules'),
+      schedulePayload
+    )
+  },
+
+  uploadPluginConfigurationFile({ type, name, profileName, formData }) {
+    return axios.post(
+      utils.apiUrl(
+        'orchestrations',
+        `${type}/${name}@${profileName}/configuration/upload-file`
+      ),
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
     )
   }
 }

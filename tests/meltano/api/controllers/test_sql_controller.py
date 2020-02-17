@@ -22,7 +22,7 @@ def assertListEquivalence(xs: list, ys: list):
     assert set(xs) == set(ys)
 
 
-@pytest.mark.usefixtures("project", "add_model")
+@pytest.mark.usefixtures("project", "add_model", "schedule")
 class TestSqlController:
     @pytest.fixture
     def post(self, app, api, engine_sessionmaker):
@@ -34,7 +34,7 @@ class TestSqlController:
         def _post(payload, engine_mock):
             with app.test_request_context():
                 return api.post(
-                    self.url(app, "model-carbon-intensity-sqlite", "carbon", "region"),
+                    self.url(app, "model-carbon-intensity", "carbon", "region"),
                     json=payload,
                 )
 
@@ -75,10 +75,14 @@ class TestSqlController:
 
         assert res.status_code == 200
         assertIsSQL(res.json["sql"])
+
+        # tests the label names
         assertListEquivalence(
             [attr["attribute_label"] for attr in res.json["query_attributes"]],
-            ["Name", "Forecast", "Percent (%)", "Fuel Type"],
+            ["Region Name", "Forecast", "Percent (%)", "Fuel Type"],
         )
+
+        # tests the column names
         assertListEquivalence(
             [attr["attribute_name"] for attr in res.json["query_attributes"]],
             ["name", "forecast", "perc", "fuel"],
@@ -93,7 +97,11 @@ class TestSqlController:
         assert res.status_code == 200
         assertIsSQL(res.json["sql"])
 
-        assert any(attr["id"] == "region.count" for attr in res.json["aggregates"])
+        assert any(
+            attr["id"] == "carbon_intensity_region.count"
+            for attr in res.json["aggregates"]
+        ), res.json
+
         assertListEquivalence(
             [attr["attribute_name"] for attr in res.json["query_attributes"]],
             ["name", "count"],
@@ -137,11 +145,20 @@ class TestSqlController:
         assert res.status_code == 200, res.data
         assertIsSQL(res.json["sql"])
 
+        # tests label
         assertListEquivalence(
             [attr["attribute_label"] for attr in res.json["query_attributes"]],
-            ["Name", "Forecast", "Week (entry.from)", "Percent (%)", "Fuel Type"],
+            [
+                "Region Name",
+                "Forecast",
+                "Week (entry.from)",
+                "Percent (%)",
+                "Fuel Type",
+            ],
         )
+
+        # tests column name
         assertListEquivalence(
             [attr["attribute_name"] for attr in res.json["query_attributes"]],
-            ["name", "forecast", "week", "perc", "fuel"],
+            ["name", "forecast", "from.week", "perc", "fuel"],
         )

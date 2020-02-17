@@ -10,7 +10,6 @@ from meltano.core.permissions.utils.error import SpecLoadingError
 from meltano.core.permissions.utils.snowflake_connector import SnowflakeConnector
 from meltano.core.permissions.spec_schemas.snowflake import *
 from meltano.core.permissions.utils.snowflake_grants import SnowflakeGrantsGenerator
-from meltano.core.permissions.utils.snowflake_revoke import SnowflakeRevokesGenerator
 
 
 VALIDATION_ERR_MSG = 'Spec error: {} "{}", field "{}": {}'
@@ -23,7 +22,7 @@ class SnowflakeSpecLoader:
         self.spec = self.load_spec(spec_path)
 
         # Generate the entities (e.g databases, schemas, users, etc) referenced
-        #  by the spec file and make sure that no syntatical or refernce errors
+        #  by the spec file and make sure that no syntatical or reference errors
         #  exist (all referenced entities are also defined by the spec)
         click.secho("Checking spec file for errors", fg="green")
         self.entities = self.inspect_spec()
@@ -61,7 +60,7 @@ class SnowflakeSpecLoader:
         """
         try:
             with open(spec_path, "r") as stream:
-                spec = yaml.load(stream)
+                spec = yaml.safe_load(stream)
         except FileNotFoundError:
             raise SpecLoadingError(f"Spec File {spec_path} not found")
 
@@ -69,7 +68,19 @@ class SnowflakeSpecLoader:
         if error_messages:
             raise SpecLoadingError("\n".join(error_messages))
 
-        return spec
+        def lower_values(value):
+            if isinstance(value, bool):
+                return value
+            elif isinstance(value, list):
+                return [lower_values(entry) for entry in value]
+            elif isinstance(value, str):
+                return value.lower()
+            elif isinstance(value, dict):
+                return {k.lower(): lower_values(v) for k, v in value.items()}
+
+        lower_spec = lower_values(spec)
+
+        return lower_spec
 
     def ensure_valid_schema(self, spec: Dict) -> List[str]:
         """
@@ -79,7 +90,7 @@ class SnowflakeSpecLoader:
         """
         error_messages = []
 
-        validator = cerberus.Validator(yaml.load(SNOWFLAKE_SPEC_SCHEMA))
+        validator = cerberus.Validator(yaml.safe_load(SNOWFLAKE_SPEC_SCHEMA))
         validator.validate(spec)
         for entity_type, err_msg in validator.errors.items():
             if isinstance(err_msg[0], str):
@@ -93,10 +104,10 @@ class SnowflakeSpecLoader:
             return error_messages
 
         schema = {
-            "databases": yaml.load(SNOWFLAKE_SPEC_DATABASE_SCHEMA),
-            "roles": yaml.load(SNOWFLAKE_SPEC_ROLE_SCHEMA),
-            "users": yaml.load(SNOWFLAKE_SPEC_USER_SCHEMA),
-            "warehouses": yaml.load(SNOWFLAKE_SPEC_WAREHOUSE_SCHEMA),
+            "databases": yaml.safe_load(SNOWFLAKE_SPEC_DATABASE_SCHEMA),
+            "roles": yaml.safe_load(SNOWFLAKE_SPEC_ROLE_SCHEMA),
+            "users": yaml.safe_load(SNOWFLAKE_SPEC_USER_SCHEMA),
+            "warehouses": yaml.safe_load(SNOWFLAKE_SPEC_WAREHOUSE_SCHEMA),
         }
 
         validators = {
@@ -250,9 +261,28 @@ class SnowflakeSpecLoader:
                                 )
                             )
 
+                        read_databases = (
+                            config.get("privileges", {})
+                            .get("databases", {})
+                            .get("read", [])
+                        )
+
+                        write_databases = (
+                            config.get("privileges", {})
+                            .get("databases", {})
+                            .get("write", [])
+                        )
+
                         try:
                             for schema in config["privileges"]["schemas"]["read"]:
                                 entities["schema_refs"].add(schema)
+                                schema_db = schema.split(".")[0]
+                                if schema_db not in read_databases:
+                                    error_messages.append(
+                                        f"Privilege Error: Database {schema_db} referenced in "
+                                        "schema read privileges but not in database privileges "
+                                        f"for role {entity_name}"
+                                    )
                         except KeyError:
                             logging.debug(
                                 "`privileges.schemas.read` not found for role {}, skipping Schema Reference generation.".format(
@@ -263,6 +293,13 @@ class SnowflakeSpecLoader:
                         try:
                             for schema in config["privileges"]["schemas"]["write"]:
                                 entities["schema_refs"].add(schema)
+                                schema_db = schema.split(".")[0]
+                                if schema_db not in write_databases:
+                                    error_messages.append(
+                                        f"Privilege Error: Database {schema_db} referenced in "
+                                        "schema write privileges but not in database privileges "
+                                        f"for role {entity_name}"
+                                    )
                         except KeyError:
                             logging.debug(
                                 "`privileges.schemas.write` not found for role {}, skipping Schema Reference generation.".format(
@@ -273,6 +310,13 @@ class SnowflakeSpecLoader:
                         try:
                             for table in config["privileges"]["tables"]["read"]:
                                 entities["table_refs"].add(table)
+                                table_db = schema.split(".")[0]
+                                if table_db not in read_databases:
+                                    error_messages.append(
+                                        f"Privilege Error: Database {table_db} referenced in "
+                                        "table read privileges but not in database privileges "
+                                        f"for role {entity_name}"
+                                    )
                         except KeyError:
                             logging.debug(
                                 "`privileges.tables.read` not found for role {}, skipping Table Reference generation.".format(
@@ -283,6 +327,13 @@ class SnowflakeSpecLoader:
                         try:
                             for table in config["privileges"]["tables"]["write"]:
                                 entities["table_refs"].add(table)
+                                table_db = schema.split(".")[0]
+                                if table_db not in write_databases:
+                                    error_messages.append(
+                                        f"Privilege Error: Database {table_db} referenced in "
+                                        "table write privileges but not in database privileges "
+                                        f"for role {entity_name}"
+                                    )
                         except KeyError:
                             logging.debug(
                                 "`privileges.tables.write` not found for role {}, skipping Table Reference generation.".format(
@@ -384,7 +435,7 @@ class SnowflakeSpecLoader:
             if name_parts[1] != "*":
                 entities["schema_refs"].add(f"{name_parts[0]}.{name_parts[1]}")
 
-        return (entities, error_messages)
+        return (entities, list(set(error_messages)))
 
     def ensure_valid_entity_names(self, entities: Dict) -> List[str]:
         """
@@ -472,7 +523,7 @@ class SnowflakeSpecLoader:
 
         warehouses = conn.show_warehouses()
         for warehouse in self.entities["warehouses"]:
-            if warehouse.upper() not in warehouses:
+            if warehouse not in warehouses:
                 error_messages.append(
                     f"Missing Entity Error: Warehouse {warehouse} was not found on"
                     " Snowflake Server. Please create it before continuing."
@@ -480,7 +531,7 @@ class SnowflakeSpecLoader:
 
         databases = conn.show_databases()
         for db in self.entities["databases"]:
-            if db.upper() not in databases:
+            if db not in databases:
                 error_messages.append(
                     f"Missing Entity Error: Database {db} was not found on"
                     " Snowflake Server. Please create it before continuing."
@@ -488,7 +539,7 @@ class SnowflakeSpecLoader:
 
         schemas = conn.show_schemas()
         for schema in self.entities["schema_refs"]:
-            if "*" not in schema and schema.upper() not in schemas:
+            if "*" not in schema and schema not in schemas:
                 error_messages.append(
                     f"Missing Entity Error: Schema {schema} was not found on"
                     " Snowflake Server. Please create it before continuing."
@@ -497,11 +548,7 @@ class SnowflakeSpecLoader:
         tables = conn.show_tables()
         views = conn.show_views()
         for table in self.entities["table_refs"]:
-            if (
-                "*" not in table
-                and table.upper() not in tables
-                and table.upper() not in views
-            ):
+            if "*" not in table and table not in tables and table not in views:
                 error_messages.append(
                     f"Missing Entity Error: Table/View {table} was not found on"
                     " Snowflake Server. Please create it before continuing."
@@ -509,7 +556,7 @@ class SnowflakeSpecLoader:
 
         roles = conn.show_roles()
         for role in self.entities["roles"]:
-            if role.upper() not in roles:
+            if role not in roles:
                 error_messages.append(
                     f"Missing Entity Error: Role {role} was not found on"
                     " Snowflake Server. Please create it before continuing."
@@ -517,7 +564,7 @@ class SnowflakeSpecLoader:
 
         users = conn.show_users()
         for user in self.entities["users"]:
-            if user.upper() not in users:
+            if user not in users:
                 error_messages.append(
                     f"Missing Entity Error: User {user} was not found on"
                     " Snowflake Server. Please create it before continuing."
@@ -529,62 +576,55 @@ class SnowflakeSpecLoader:
     def get_privileges_from_snowflake_server(self) -> None:
         """
         Get the privileges granted to users and roles in the Snowflake account
+        Gets the future privileges granted in all database and schema objects
+        Consolidates role and future privileges into a single object for self.grants_to_role
         """
         conn = SnowflakeConnector()
 
+        future_grants = {}
+        for database in self.entities["database_refs"]:
+            grant_results = conn.show_future_grants(database=database)
+
+            for role in grant_results:
+                for privilege in grant_results[role]:
+                    for grant_on in grant_results[role][privilege]:
+                        (
+                            future_grants.setdefault(role, {})
+                            .setdefault(privilege, {})
+                            .setdefault(grant_on, [])
+                            .extend(grant_results[role][privilege][grant_on])
+                        )
+
+            # Get all schemas in all ref'd databases. Not all schemas will be
+            # ref'd in the spec.
+            for schema in conn.show_schemas(database=database):
+                grant_results = conn.show_future_grants(schema=schema)
+
+                for role in grant_results:
+                    for privilege in grant_results[role]:
+                        for grant_on in grant_results[role][privilege]:
+                            (
+                                future_grants.setdefault(role, {})
+                                .setdefault(privilege, {})
+                                .setdefault(grant_on, [])
+                                .extend(grant_results[role][privilege][grant_on])
+                            )
+
         for role in self.entities["roles"]:
-            self.grants_to_role[role] = conn.show_grants_to_role(role)
+            grant_results = conn.show_grants_to_role(role)
+            for privilege in grant_results:
+                for grant_on in grant_results[privilege]:
+                    (
+                        future_grants.setdefault(role, {})
+                        .setdefault(privilege, {})
+                        .setdefault(grant_on, [])
+                        .extend(grant_results[privilege][grant_on])
+                    )
+
+        self.grants_to_role = future_grants
 
         for user in self.entities["users"]:
             self.roles_granted_to_user[user] = conn.show_roles_granted_to_user(user)
-
-    def generate_revoke_queries(self) -> List[Dict]:
-        """
-        Starting point to generate all the revoke queries.
-
-        For each entity type (e.g. user or role) that is affected by the spec,
-        the proper sql revoke queries are generated.
-
-        Returns all the SQL commands as a list.
-        """
-        sql_commands = []
-
-        generator = SnowflakeRevokesGenerator(
-            self.grants_to_role, self.roles_granted_to_user
-        )
-
-        click.secho("Generating revoke statements for Snowflake", fg="green")
-
-        for entity_type, entry in self.spec.items():
-            if entity_type in ["databases", "warehouses", "version"]:
-                continue
-
-            for entity_dict in entry:
-                entity_configs = [
-                    (entity_name, config)
-                    for entity_name, config in entity_dict.items()
-                    if config
-                ]
-
-                for entity_name, config in entity_configs:
-                    if entity_type == "roles":
-                        click.secho(f"     Processing role {entity_name}", fg="green")
-                        sql_commands.extend(
-                            generator.generate_revoke_roles("ROLE", entity_name, config)
-                        )
-
-                        sql_commands.extend(
-                            generator.generate_revoke_privileges_to_role(
-                                entity_name, config, self.entities["shared_databases"]
-                            )
-                        )
-                    elif entity_type == "users":
-                        click.secho(f"     Processing user {entity_name}", fg="green")
-                        sql_commands.extend(
-                            generator.generate_revoke_roles("USER", entity_name, config)
-                        )
-
-        return self.remove_duplicate_queries(sql_commands)
 
     def generate_permission_queries(self) -> List[Dict]:
         """
@@ -605,6 +645,7 @@ class SnowflakeSpecLoader:
 
         # For each permission in the spec, check if we have to generate an
         #  SQL command granting that permission
+
         for entity_type, entry in self.spec.items():
             if entity_type in ["databases", "warehouses", "version"]:
                 continue
@@ -620,7 +661,9 @@ class SnowflakeSpecLoader:
                     if entity_type == "roles":
                         click.secho(f"     Processing role {entity_name}", fg="green")
                         sql_commands.extend(
-                            generator.generate_grant_roles("ROLE", entity_name, config)
+                            generator.generate_grant_roles(
+                                entity_type, entity_name, config
+                            )
                         )
 
                         sql_commands.extend(
@@ -629,7 +672,10 @@ class SnowflakeSpecLoader:
 
                         sql_commands.extend(
                             generator.generate_grant_privileges_to_role(
-                                entity_name, config, self.entities["shared_databases"]
+                                entity_name,
+                                config,
+                                self.entities["shared_databases"],
+                                self.entities["databases"],
                             )
                         )
                     elif entity_type == "users":
@@ -639,7 +685,9 @@ class SnowflakeSpecLoader:
                         )
 
                         sql_commands.extend(
-                            generator.generate_grant_roles("USER", entity_name, config)
+                            generator.generate_grant_roles(
+                                entity_type, entity_name, config
+                            )
                         )
 
         return self.remove_duplicate_queries(sql_commands)
@@ -651,7 +699,7 @@ class SnowflakeSpecLoader:
         for i, command in reversed(list(enumerate(sql_commands))):
             # Find all "GRANT OWNERSHIP commands"
             if command["sql"].startswith("GRANT OWNERSHIP ON"):
-                grant = (command["sql"].split("TO ROLE", 1)[0]).upper()
+                grant = command["sql"].split("TO ROLE", 1)[0]
 
                 if grant in grants:
                     # If there is already a GRANT OWNERSHIP for the same
@@ -662,7 +710,7 @@ class SnowflakeSpecLoader:
                     grants.append(grant)
 
             if command["sql"].startswith("REVOKE ALL"):
-                revoke = command["sql"].upper()
+                revoke = command["sql"]
                 if revoke in revokes:
                     # If there is already a REVOKE ALL for the same
                     #  DB/SCHEMA/TABLE --> remove the one before it

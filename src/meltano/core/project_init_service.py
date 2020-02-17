@@ -68,7 +68,7 @@ class ProjectInitService:
         self.project_name = project_name.lower()
 
     def init(self) -> Project:
-        default_project_yaml = yaml.load(open(self.initialize_file))
+        default_project_yaml = yaml.safe_load(open(self.initialize_file))
         try:
             os.mkdir(self.project_name)
         except Exception as e:
@@ -93,8 +93,19 @@ class ProjectInitService:
             "\tVisit https://meltano.com/docs/getting-started.html in order to try us out"
         )
 
-        click.echo(
-            "\nMeltano sends anonymous usage data that helps us improve the product.\nFor more information, see https://www.meltano.com/docs/environment-variables.html#anonymous-usage-data"
+        click.secho("> ", fg="bright_black", nl=False)
+
+        click.secho("Meltano sends anonymous usage data that help improve the product.")
+
+        click.secho("> ", fg="bright_black", nl=False)
+
+        click.echo("You can opt-out for new, existing, or all projects.")
+
+        click.secho("> ", fg="bright_black", nl=False)
+
+        click.secho(
+            "https://meltano.com/docs/environment-variables.html#anonymous-usage-data",
+            fg="cyan",
         )
 
     def join_with_project_base(self, filename):

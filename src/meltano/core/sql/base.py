@@ -365,6 +365,10 @@ class MeltanoAggregate(MeltanoBase):
             return fn.Coalesce(fn.Count(field), 0, alias=self.alias())
         elif self.type == "avg":
             return fn.Coalesce(fn.Avg(field), 0, alias=self.alias())
+        elif self.type == "max":
+            return fn.Coalesce(fn.Max(field), 0, alias=self.alias())
+        elif self.type == "min":
+            return fn.Coalesce(fn.Min(field), 0, alias=self.alias())
 
     def column_name(self) -> str:
         (table, column) = self.sql.split(".")
@@ -1026,7 +1030,8 @@ class MeltanoQuery(MeltanoBase):
                         "source_name": table.find_source_name(),
                         "attribute_name": c.name,
                         "attribute_label": c.label,
-                        "attribute_type": "column",
+                        "attribute_type": c.type,
+                        "attribute_class": "columns",
                     }
                 )
 
@@ -1050,9 +1055,10 @@ class MeltanoQuery(MeltanoBase):
                             "key": t.alias(period),
                             "table_name": table.name,
                             "source_name": table.find_source_name(),
-                            "attribute_name": period["name"],
+                            "attribute_name": t.period_column_name(period),
                             "attribute_label": t.period_label(period),
-                            "attribute_type": "timeframe",
+                            "attribute_type": t.type,
+                            "attribute_class": "timeframes",
                         }
                     )
 
@@ -1070,7 +1076,8 @@ class MeltanoQuery(MeltanoBase):
                         "source_name": table.find_source_name(),
                         "attribute_name": a.name,
                         "attribute_label": a.label,
-                        "attribute_type": "aggregate",
+                        "attribute_type": a.type,
+                        "attribute_class": "aggregates",
                     }
                 )
 
@@ -1107,6 +1114,8 @@ class MeltanoQuery(MeltanoBase):
                     order = Order.asc
 
                 table_def = self.design.find_table(source_name)
+
+                # this only works if the field is present in the Select statement
                 orderby_field = Field(table_def.get_attribute(attribute_name).alias())
 
                 no_join_query = no_join_query.orderby(orderby_field, order=order)
@@ -1228,7 +1237,8 @@ class MeltanoQuery(MeltanoBase):
                             "source_name": table.find_source_name(),
                             "attribute_name": period["name"],
                             "attribute_label": t.period_label(period),
-                            "attribute_type": "timeframe",
+                            "attribute_type": t.type,
+                            "attribute_class": "timeframes",
                         }
                     )
 
@@ -1330,7 +1340,8 @@ class MeltanoQuery(MeltanoBase):
                                 "source_name": t.find_source_name(),
                                 "attribute_name": c.name,
                                 "attribute_label": c.label,
-                                "attribute_type": "column",
+                                "attribute_type": c.type,
+                                "attribute_class": "columns",
                             }
                         )
 
@@ -1354,7 +1365,8 @@ class MeltanoQuery(MeltanoBase):
                         "source_name": table.find_source_name(),
                         "attribute_name": a.name,
                         "attribute_label": a.label,
-                        "attribute_type": "aggregate",
+                        "attribute_type": a.type,
+                        "attribute_class": "aggregates",
                     }
                 )
 

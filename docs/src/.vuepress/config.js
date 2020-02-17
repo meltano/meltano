@@ -1,3 +1,14 @@
+docsSidebar = [
+  '/docs/',
+  '/docs/getting-started',
+  '/tutorials/',
+  '/plugins/',
+  '/docs/getting-help',
+  '/docs/responsible-disclosure',
+  '/developer-tools/',
+  '/handbook/'
+]
+
 module.exports = {
   title: 'Meltano',
   description: 'Open source data dashboarding',
@@ -37,6 +48,13 @@ module.exports = {
           'https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap'
       }
     ],
+    [
+      'meta',
+      {
+        name: 'google-site-verification',
+        content: 'bOaR0Nxus1Au31YuQX0zMqkNZV_tbAoIr7WkX4crUgI'
+      }
+    ],
     ['meta', { name: 'msapplication-TileColor', content: '#da532c' }],
     ['meta', { name: 'theme-color', content: '#ffffff' }]
   ],
@@ -44,59 +62,43 @@ module.exports = {
   themeConfig: {
     nav: [
       {
-        text: 'Documentation',
-        link: '/docs/installation.html'
+        text: 'How It Works',
+        link: '/docs/getting-started.html'
+      },
+      {
+        text: 'Developer Tools',
+        link: '/developer-tools/'
       },
       { text: 'Blog', link: 'https://www.meltano.com/blog', disableIcon: true },
       {
         text: 'Newsletter',
         link: 'https://meltano.substack.com',
         disableIcon: true
-      },
-      { text: 'Press', link: '/press/' }
+      }
     ],
     sidebar: {
-      '/docs': [
-        '/docs/',
-        '/docs/installation',
-        '/docs/getting-started',
-        '/tutorials/',
-        '/plugins/',
-        '/docs/command-line-interface',
-        '/docs/environment-variables',
-        '/docs/security-and-privacy',
-        '/docs/architecture',
-        '/docs/contributing',
-        '/docs/getting-help',
-        '/docs/roadmap'
+      '/docs': docsSidebar,
+      '/plugins': docsSidebar,
+      '/tutorials': docsSidebar,
+      '/handbook/engineering/meltanodata-guide': [
+        '/handbook/engineering/meltanodata-guide/',
+        '/handbook/engineering/meltanodata-guide/controller-node.html'
       ],
-      '/plugins': [
-        '/docs/',
-        '/docs/installation',
-        '/docs/getting-started',
-        '/tutorials/',
-        '/plugins/',
-        '/docs/command-line-interface',
-        '/docs/environment-variables',
-        '/docs/security-and-privacy',
-        '/docs/architecture',
-        '/docs/contributing',
-        '/docs/getting-help',
-        '/docs/roadmap'
+      '/handbook': [
+        '/handbook/',
+        '/handbook/engineering/',
+        '/handbook/marketing/',
+        '/handbook/product/'
       ],
-      '/tutorials': [
-        '/docs/',
-        '/docs/installation',
-        '/docs/getting-started',
-        '/tutorials/',
-        '/plugins/',
-        '/docs/command-line-interface',
-        '/docs/environment-variables',
-        '/docs/security-and-privacy',
-        '/docs/architecture',
-        '/docs/contributing',
-        '/docs/getting-help',
-        '/docs/roadmap'
+      '/developer-tools': [
+        '/developer-tools/',
+        '/developer-tools/self-hosted-installation.html',
+        '/developer-tools/command-line-interface.html',
+        '/developer-tools/environment-variables.html',
+        '/developer-tools/reporting-database-options.html',
+        '/developer-tools/role-based-access-control.html',
+        '/developer-tools/contributor-guide.html',
+        '/developer-tools/architecture.html'
       ]
     },
     logo: '/meltano-logo.svg',

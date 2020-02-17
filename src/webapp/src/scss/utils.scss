@@ -3,7 +3,7 @@ UTILITIES ----------------------------------------------------------------------
 Display-related utilities
 */
 
-.flex-and-wrap {
+.is-flex-wrap {
   display: flex;
   flex-wrap: wrap;
 }
@@ -14,6 +14,17 @@ Display-related utilities
 
 .hr-tight {
   margin: 0.75rem 0;
+}
+
+.is-active-line-item {
+  color: $interactive-secondary;
+  @extend .has-background-white-ter;
+}
+
+.is-active-line-item-bordered {
+  border-left-color: $interactive-secondary;
+  border-left-width: 2px;
+  border-left-style: solid;
 }
 
 .ellipsis {
@@ -40,6 +51,16 @@ Display-related utilities
 UTILITIES - SPACING --------------------------------------------------------------------------------
 */
 
+.is-fill-space {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.mt-05r {
+  margin-top: 0.5rem;
+}
+
 .mt1r {
   margin-top: 1rem;
 }
@@ -48,6 +69,30 @@ UTILITIES - SPACING ------------------------------------------------------------
   margin-bottom: 1rem;
 }
 
+.mb-05r {
+  margin-bottom: 0.5rem;
+}
+
 .ml-05r {
   margin-left: 0.5rem;
+}
+
+.mr-025r {
+  margin-right: 0.25rem;
+}
+
+.ml1r {
+  margin-left: 1rem;
+}
+
+.mr1r {
+  margin-right: 1rem;
+}
+
+.v-min-2r {
+  min-height: 2rem;
+}
+
+.v-min-4-5r {
+  min-height: 4.5rem;
 }

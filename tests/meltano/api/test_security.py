@@ -1,6 +1,7 @@
 import pytest
 import gitlab
 import urllib
+from datetime import datetime
 from unittest import mock
 from sqlalchemy.orm import joinedload
 from meltano.api.security import FreeUser, users
@@ -11,6 +12,7 @@ from meltano.api.models.oauth import OAuth
 from flask import url_for
 from flask_login import current_user
 from flask_security import login_user, logout_user, AnonymousUser
+from freezegun import freeze_time
 
 
 def gitlab_client():
@@ -83,21 +85,30 @@ class TestSecurity:
     def test_bootstrap(self, app, api, impersonate):
         with app.test_request_context():
             with impersonate(users.get_user("alice")):
-                res = api.get(url_for("security.bootstrap_app"))
-                url = urllib.parse.urlparse(res.location)
-                query = urllib.parse.parse_qs(url.query)
+                res = api.get(url_for("root.bootstrap"))
 
                 assert res.status_code == 302
-                assert url.netloc == "localhost"
-                assert query["auth_token"]
+                assert res.location == url_for("root.default", _external=True)
 
     def test_bootstrap_unauthenticated(self, app, api):
         with app.test_request_context():
-            res = api.get(url_for("security.bootstrap_app"))
+            res = api.get(url_for("root.bootstrap"))
             url = urllib.parse.urlparse(res.location)
 
             assert res.status_code == 302
             assert res.location.startswith(url_for("security.login", _external=True))
+
+    @freeze_time("2000-01-01")
+    def test_login_audit_columns(self, app):
+        with app.test_request_context():
+            alice = users.get_user("alice")
+            login_count = alice.login_count
+
+            login_user(alice)
+
+            # time is frozen, so it should work
+            assert alice.last_login_at == datetime.utcnow()
+            assert alice.login_count == login_count + 1
 
 
 @pytest.mark.usefixtures("seed_users")
@@ -119,7 +130,7 @@ class TestSingleUser:
 
     def test_bootstrap(self, app, api):
         with app.test_request_context():
-            res = api.get(url_for("security.bootstrap_app"))
+            res = api.get(url_for("root.bootstrap"))
 
             assert res.status_code == 302
             assert res.location == url_for("root.default", _external=True)

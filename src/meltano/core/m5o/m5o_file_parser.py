@@ -1,8 +1,9 @@
 import os
 import json
 import sqlparse
-import time
+from datetime import datetime, timezone
 import glob
+import uuid
 
 import networkx as nx
 
@@ -12,10 +13,12 @@ from pathlib import Path
 from pyhocon import ConfigFactory
 from typing import Dict, List
 
+from meltano.core.plugin import PluginType
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.sql.design_helper import PypikaJoinExecutor
 from meltano.core.project import Project
 from meltano.core.plugin.model import Package
-from meltano.core.utils import encode_id_from_file_path, slugify, find_named
+from meltano.core.utils import slugify, find_named, NotFound
 
 
 class MeltanoAnalysisFileParserError(Exception):
@@ -66,7 +69,7 @@ class MeltanoAnalysisFileParser:
         self.tables = []
         self.packaged_topics = []
         self.packaged_tables = []
-        self.required_topic_properties = ["name", "connection", "label", "designs"]
+        self.required_topic_properties = ["name", "label", "designs"]
         self.required_design_properties = ["from", "label", "description"]
         self.required_join_properties = ["sql_on", "relationship"]
         self.required_table_properties = ["sql_table_name", "columns"]
@@ -169,6 +172,7 @@ class MeltanoAnalysisFileParser:
 
             topic = self.graph_topic(topic)
             indices[str(topic_identifier)] = {
+                "plugin_namespace": topic["plugin_namespace"],
                 "namespace": topic["namespace"],
                 "name": topic["name"],
                 "designs": [e["name"] for e in topic["designs"]],
@@ -190,6 +194,12 @@ class MeltanoAnalysisFileParser:
             index_file.write(json.dumps(indices))
 
     def parse_packages(self):
+
+        discovery = PluginDiscoveryService(self.project)
+        model_plugins = [
+            plugin for plugin in discovery.plugins() if plugin.type is PluginType.MODELS
+        ]
+
         for package in self.packages():
             if not package.topics and package.tables:
                 raise MeltanoAnalysisMissingTopicFilesError(
@@ -204,6 +214,11 @@ class MeltanoAnalysisFileParser:
             for topic in package.topics:
                 conf = self.parse_m5o_file(topic)
                 parsed_topic = self.topic(conf, topic.name)
+                model = next(
+                    (plugin for plugin in model_plugins if plugin.name == package.name),
+                    None,
+                )
+                parsed_topic["plugin_namespace"] = model.namespace if model else None
                 parsed_topic["namespace"] = package.name
                 self.packaged_topics.append(parsed_topic)
 
@@ -240,10 +255,13 @@ class MeltanoAnalysisFileParser:
                 # The namespace for a topic in a directory under project/models/
                 #   is `custom/path/to/directory`
                 # For example:
-                # `project/models/mytopic.topic.m5o` --> `cutom`
-                # `project/models/dir1/dir2/mytopic.topic.m5o` --> `cutom/dir1/dir2`
+                # `project/models/mytopic.topic.m5o` --> `custom`
+                # `project/models/dir1/dir2/mytopic.topic.m5o` --> `custom/dir1/dir2`
                 parsed_topic["namespace"] = str(
                     Path("custom").joinpath(folder.relative_to(models))
+                )
+                parsed_topic["plugin_namespace"] = conf.get(
+                    "plugin_namespace", folder.name
                 )
 
                 self.topics.append(parsed_topic)
@@ -273,7 +291,7 @@ class MeltanoAnalysisFileParser:
     def table_conf_by_name(self, table_name, cls, prop, file_name):
         try:
             return find_named(self.tables, table_name)
-        except StopIteration as e:
+        except NotFound as e:
             raise MeltanoAnalysisFileParserMissingTableError(
                 prop, table_name, cls, file_name
             )
@@ -350,13 +368,18 @@ class MeltanoAnalysisFileParser:
                 missing_properties, "table", file_name
             )
 
-        for prop_name, prop_def in table_file.items():
-            subproperties = ("columns", "aggregates", "timeframes")
+        # set all the subproperties
+        for prop_name in ("columns", "aggregates", "timeframes"):
+            prop_def = table_file.get(prop_name, {})
+            temp_table[prop_name] = self.name_flatten_dict(prop_def)
 
-            if prop_name in subproperties:
-                temp_table[prop_name] = self.name_flatten_dict(prop_def)
-            else:
-                temp_table[prop_name] = prop_def
+        # set the rest of the properties
+        for prop_name, prop_def in table_file.items():
+            # subproperties are already set
+            if prop_name in temp_table:
+                continue
+
+            temp_table[prop_name] = prop_def
 
         return temp_table
 
@@ -370,9 +393,17 @@ class MeltanoAnalysisFileParser:
             file_dict = {"name": name}
 
         file_dict["path"] = str(file)
-        file_dict["id"] = encode_id_from_file_path(file_dict["path"])
         file_dict["slug"] = slugify(name)
-        file_dict["createdAt"] = time.time()
+
+        if "id" not in file_dict:
+            file_dict["id"] = str(uuid.uuid4())
+
+        # Legacy reports and dashboards can have a `createdAt` key that would
+        # conflict with the new `created_at` key instead of being overwritten.
+        file_dict.pop("createdAt", None)
+
+        file_dict["created_at"] = datetime.now(timezone.utc).timestamp()
+
         return file_dict
 
     def packages(self) -> List[Package]:

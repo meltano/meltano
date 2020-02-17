@@ -2,7 +2,7 @@ import logging
 import humps
 from enum import Enum
 from collections.abc import Mapping, Iterable
-from flask import request, json
+from flask import request, json, current_app
 
 from meltano.core.utils import compose
 
@@ -31,7 +31,12 @@ def key_convert(obj, converter):
     if isinstance(obj, dict) and not isinstance(obj, KeyFrozenDict):
         converted = {}
         for k, v in obj.items():
-            new_k = converter(k)
+            # humps fails to convert undescored values
+            # see https://github.com/nficano/humps/issues/2
+            if k.startswith("_"):
+                new_k = k
+            else:
+                new_k = converter(k)
 
             if new_k in converted:
                 raise ValueError(f"Naming scheme conversion conflict on `{new_k}`")
@@ -57,10 +62,12 @@ class JSONSchemeDecoder(json.JSONDecoder):
         super().__init__(*args, **kwargs, object_hook=hooks)
 
     def hook(self, obj):
-        # transform to snakecase
-        obj = key_convert(obj, humps.decamelize)
-
-        return obj
+        # transform to snakecase if possible
+        try:
+            return key_convert(obj, humps.decamelize)
+        except ValueError as err:
+            logging.err(str(err))
+            return super().hook(obj)
 
 
 class JSONSchemeEncoder(json.JSONEncoder):
@@ -78,11 +85,18 @@ class JSONSchemeEncoder(json.JSONEncoder):
     }
 
     def encode(self, obj):
+        header = current_app.config["JSON_SCHEME_HEADER"]
+
         try:
-            scheme = request.headers.get("X-Json-Scheme")
+            scheme = request.headers.get(header)
             strategy = self.__class__.case_strategies[scheme]
             logging.debug(f"Using JSON Scheme: {scheme}")
             obj = key_convert(obj, strategy)
+        except ValueError as err:
+            logging.error(str(err))
+            # if we can't convert the keys, let's fallback to
+            # the default implementation
+            return super().encode(obj)
         except KeyError:
             pass
 

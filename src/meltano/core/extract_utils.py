@@ -108,7 +108,7 @@ def tables_from_manifest(
     manifest_file_path: str, metadata: MetaData, schema_name: str
 ) -> {str: Table}:
     with open(manifest_file_path) as file:
-        schema_manifest: dict = yaml.load(file)
+        schema_manifest: dict = yaml.safe_load(file)
         tables = {}
         for table_name in schema_manifest:
             primary_key_col_name = schema_manifest[table_name]["primary_key"]

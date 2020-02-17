@@ -1,0 +1,27 @@
+docs:
+  extends: .only:master
+  variables:
+    REMOTE_EXEC: ssh -o StrictHostKeyChecking=no $SSH_USER_DOMAIN -p$SSH_PORT
+  stage: docs
+  image: node:10.16.2
+  cache:
+    paths:
+      - docs/node_modules/
+  before_script:
+    - "which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )"
+    - eval $(ssh-agent -s)
+    - chmod 600 $SSH_PRIVATE_KEY
+    - ssh-add $SSH_PRIVATE_KEY > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+  script:
+    - cd docs
+    - yarn
+    - yarn build:docs
+    - $REMOTE_EXEC "mkdir -p $SSH_BACKUP_DIRECTORY; tar zcvf $SSH_BACKUP_DIRECTORY-$(date +%Y-%m-%dT%H:%M).tar.gz $SSH_DIRECTORY/$SSH_WWW_DIRECTORY"
+    - $REMOTE_EXEC "cd $SSH_DIRECTORY && find ./$SSH_WWW_DIRECTORY -mindepth 1 -maxdepth 1 -not -name blog -not -name '.' -exec rm -rf  '{}' \;"
+    - scp -o stricthostkeychecking=no -P$SSH_PORT -r public/. $SSH_USER_DOMAIN:$SSH_DIRECTORY/$SSH_WWW_DIRECTORY
+  only:
+    changes:
+      - docs/**/*
+      - src/meltano/core/bundle/discovery.yml

@@ -8,7 +8,8 @@ import utils from '@/utils/utils'
 const defaultState = utils.deepFreeze({
   latestVersion: null,
   updating: false,
-  version: null
+  version: null,
+  identity: null
 })
 
 const getters = {
@@ -28,6 +29,7 @@ const actions = {
       commit('setLatestVersion', response.data.latestVersion)
     })
   },
+
   upgrade({ state, commit }) {
     let upgradePoller = null
 
@@ -61,6 +63,17 @@ const actions = {
       upgradePoller.dispose()
       commit('setUpdating', false)
     })
+  },
+
+  logout() {
+    window.location.href = utils.root('/auth/logout')
+  },
+
+  fetchIdentity({ commit }) {
+    systemApi
+      .identity()
+      .then(response => commit('setIdentity', response.data))
+      .catch(() => commit('setIdentity', null))
   }
 }
 
@@ -75,6 +88,10 @@ const mutations = {
 
   setVersion(state, version) {
     state.version = version
+  },
+
+  setIdentity(state, identity) {
+    state.identity = identity
   }
 }
 

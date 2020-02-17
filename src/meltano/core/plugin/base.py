@@ -1,12 +1,15 @@
 import yaml
 import fnmatch
+import copy
 from typing import Dict, Union
 from collections import namedtuple
 from enum import Enum
-from typing import Optional
+from typing import Optional, Iterable
 
 from meltano.core.behavior.hookable import HookObject
-from meltano.core.utils import compact
+from meltano.core.behavior.canonical import Canonical
+from meltano.core.behavior import NameEq
+from meltano.core.utils import compact, find_named, NotFound
 
 
 class YAMLEnum(str, Enum):
@@ -21,14 +24,58 @@ class YAMLEnum(str, Enum):
 yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
 
 
+class Profile(NameEq, Canonical):
+    def __init__(self, name: str = None, label: str = None, config={}):
+        self.name = name
+        self.label = label
+        self.config = config
+
+
+Profile.DEFAULT = Profile(name="default", label="Default")
+
+
+class SettingDefinition(NameEq, Canonical):
+    def __init__(
+        self,
+        name: str = None,
+        env: str = None,
+        kind: str = None,
+        value=None,
+        label: str = None,
+        documentation: str = None,
+        description: str = None,
+        tooltip: str = None,
+        options: list = [],
+        oauth: dict = {},
+        placeholder: str = None,
+        protected=False,
+        **attrs,
+    ):
+        super().__init__(
+            name=name,
+            env=env,
+            kind=kind,
+            value=value,
+            label=label,
+            documentation=documentation,
+            description=description,
+            tooltip=tooltip,
+            options=options,
+            oauth=oauth,
+            placeholder=placeholder,
+            protected=protected,
+            **attrs,
+        )
+
+
 class PluginType(YAMLEnum):
     EXTRACTORS = "extractors"
     LOADERS = "loaders"
-    MODELS = "models"
-    TRANSFORMERS = "transformers"
     TRANSFORMS = "transforms"
+    MODELS = "models"
+    DASHBOARDS = "dashboards"
     ORCHESTRATORS = "orchestrators"
-    ALL = "all"
+    TRANSFORMERS = "transformers"
 
     def __str__(self):
         return self.value
@@ -36,9 +83,6 @@ class PluginType(YAMLEnum):
     @property
     def cli_command(self):
         """Makes it singular for `meltano add PLUGIN_TYPE`"""
-        if self is self.__class__.ALL:
-            raise NotImplemented()
-
         return self.value[:-1]
 
     @classmethod
@@ -48,40 +92,46 @@ class PluginType(YAMLEnum):
 
 class PluginRef:
     def __init__(self, plugin_type: Union[str, PluginType], name: str):
-        self.type = (
+        self._type = (
             plugin_type
             if isinstance(plugin_type, PluginType)
             else PluginType(plugin_type)
         )
-        self.canonical_name, self.profile = self.parse_name(name)
+        self.name, self._current_profile_name = self.parse_name(name)
 
     @classmethod
     def parse_name(cls, name: str):
-        name, *profile = name.split("@")
-        profile = next(iter(profile), None)
+        name, *profile_name = name.split("@")
+        profile_name = next(iter(profile_name), Profile.DEFAULT.name)
 
-        return (name, profile)
+        return (name, profile_name)
+
+    @property
+    def type(self):
+        return self._type
+
+    @property
+    def current_profile_name(self):
+        return self._current_profile_name
+
+    @property
+    def full_name(self):
+        return f"{self.name}@{self.current_profile_name}"
 
     @property
     def qualified_name(self):
-        parts = (self.type, self.canonical_name, self.profile)
+        parts = (self.type, self.name, self.current_profile_name)
 
         return ".".join(compact(parts))
-
-    @property
-    def name(self):
-        parts = (self.canonical_name, self.profile)
-
-        return "@".join(compact(parts))
 
     def __eq__(self, other):
         return self.name == other.name and self.type == other.type
 
     def __hash__(self):
-        return hash((self.type, self.canonical_name, self.profile))
+        return hash((self.type, self.name, self.current_profile_name))
 
 
-class PluginInstall(HookObject, PluginRef):
+class PluginInstall(HookObject, Canonical, PluginRef):
     def __init__(
         self,
         plugin_type: PluginType,
@@ -89,50 +139,54 @@ class PluginInstall(HookObject, PluginRef):
         pip_url: Optional[str] = None,
         select=set(),
         config={},
-        **extras
+        profiles=set(),
+        executable: str = None,
+        **attrs,
     ):
-        super().__init__(plugin_type, name)
+        super().__init__(plugin_type, name, **attrs)
 
+        self.config = copy.deepcopy(config)
+        self.profiles = set(map(Profile.parse, profiles))
+        self.select = select
         self.pip_url = pip_url
-        self._config = config
-        self._select = set(select)
-        self._extras = extras or {}
+        self.executable = executable
+        self._extras = attrs
 
-    def canonical(self):
-        canonical = {"name": self.name, **self._extras}
-
-        if self.pip_url:
-            canonical.update({"pip_url": self.pip_url})
-
-        if self._select:
-            canonical.update({"select": list(self._select)})
-
-        if self._config:
-            canonical.update({"config": self._config})
-
-        return canonical
-
-    def installable(self):
+    def is_installable(self):
         return self.pip_url is not None
 
+    def is_custom(self):
+        try:
+            return bool(self.namespace)
+        except AttributeError:
+            return False
+
+    def get_profile(self, profile_name: str) -> Profile:
+        if profile_name == Profile.DEFAULT.name:
+            return Profile.DEFAULT
+
+        return find_named(self.profiles, profile_name)
+
+    def use_profile(self, profile_or_name: Union[str, Profile]):
+        if profile_or_name is None:
+            profile = Profile.DEFAULT
+        elif isinstance(profile_or_name, Profile):
+            profile = self.get_profile(profile_or_name.name)
+        else:
+            profile = self.get_profile(profile_or_name)
+
+        self._current_profile_name = profile.name
+
     @property
-    def config(self):
-        if not self.profile:
-            return self._config
-
-        return self._extras["profiles"][self.profile]
+    def current_profile(self):
+        return self.get_profile(self.current_profile_name)
 
     @property
-    def executable(self):
-        return self._extras.get("executable", self.canonical_name)
+    def current_config(self):
+        if self.current_profile is Profile.DEFAULT:
+            return self.config
 
-    @property
-    def select(self):
-        return self._select or {"*.*"}
-
-    @select.setter
-    def select(self, patterns):
-        self._select = set(patterns)
+        return self.current_profile.config
 
     def exec_args(self, files: Dict):
         return []
@@ -147,10 +201,16 @@ class PluginInstall(HookObject, PluginRef):
         return dict()
 
     def add_select_filter(self, filter: str):
-        self._select.add(filter)
+        self.select.add(filter)
+
+    def add_profile(self, name: str, config: dict = None, label: str = None):
+        profile = Profile(name=name, config=config, label=label)
+
+        self.profiles.add(profile)
+        return profile
 
 
-class Plugin(PluginRef):
+class Plugin(Canonical, PluginRef):
     """
     Args:
     name: The unique name for the installed plugin
@@ -165,40 +225,30 @@ class Plugin(PluginRef):
         namespace: str,
         pip_url: Optional[str] = None,
         settings: list = [],
+        settings_group_validation: list = [],
         docs=None,
         description=None,
         capabilities=set(),
-        **extras
+        select=set(),
+        **attrs,
     ):
-        super().__init__(plugin_type, name)
+        super().__init__(plugin_type, name, **attrs)
 
         self.namespace = namespace
         self.pip_url = pip_url
-        self.settings = settings
+        self.settings = list(map(SettingDefinition.parse, settings))
+        self.settings_group_validation = list(settings_group_validation)
         self.docs = docs
         self.description = description
         self.capabilities = set(capabilities)
-        self._extras = extras or {}
-
-    def canonical(self):
-        canonical = {"name": self.name, "namespace": self.namespace, **self._extras}
-
-        if self.pip_url:
-            canonical.update({"pip_url": self.pip_url})
-
-        if self.docs:
-            canonical.update({"docs": self.docs})
-
-        if self.description:
-            canonical.update({"description": self.description})
-
-        if self.settings:
-            canonical.update({"settings": self.settings})
-
-        if self.capabilities:
-            canonical.update({"capabilities": list(self.capabilities)})
-
-        return canonical
+        self.select = set(select)
+        self._extras = attrs
 
     def as_installed(self) -> PluginInstall:
-        return PluginInstall(self.type, self.name, pip_url=self.pip_url, **self._extras)
+        return PluginInstall(
+            self.type,
+            self.name,
+            pip_url=self.pip_url,
+            select=self.select,
+            **self._extras,
+        )

@@ -1,0 +1,107 @@
+.test:
+  stage: test
+  image:
+    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    entrypoint: [""]
+  before_script:
+    - pip install '.[dev]'
+
+lint:
+  extends: .test
+  before_script:
+    - pip install black
+  script:
+    - make show_lint
+
+install_e2e:
+  extends: .test
+  before_script:
+    - python -m venv venv
+    - python --version
+    - source ./venv/bin/activate
+    - pip install -e .
+  script:
+    - node -v
+    - npm -v
+    - yarn -v
+    - make bundle
+    - meltano --version
+    - pip list
+    - mkdir -p /home/projects
+    - cd /home/projects
+    - meltano init --no_usage_stats test_project
+    - cd test_project
+    - meltano discover all
+    - meltano add extractor tap-carbon-intensity
+    - meltano add loader target-sqlite
+    - meltano elt tap-carbon-intensity target-sqlite
+
+.pytest:
+  extends: .test
+  script:
+    - pytest -v --cov-report= --cov meltano -m "$PYTEST_MARKERS"
+    - coverage combine .coverage
+    - coverage report
+    - coverage html
+  artifacts:
+    paths:
+      - htmlcov/
+    when: always
+    expire_in: 1 week
+
+.pytest_postgres:
+  extends: .pytest
+  variables:
+    PYTEST_BACKEND: postgresql
+
+    # `postgres` service configuration
+    POSTGRES_HOST_AUTH_METHOD: trust
+    POSTGRES_ADDRESS: postgres
+    POSTGRES_PORT: 5432
+    POSTGRES_USER: runner
+    POSTGRES_PASSWORD: ""
+    POSTGRES_DB: pytest_warehouse
+
+    # `target-postgres` configuration
+    PG_ADDRESS: $POSTGRES_ADDRESS
+    PG_PORT: $POSTGRES_PORT
+    PG_USERNAME: $POSTGRES_USER
+    PG_PASSWORD: $POSTGRES_PASSWORD
+    PG_DATABASE: $POSTGRES_DB
+  services:
+    - postgres:11
+
+.pytest_sqlite:
+  extends: .pytest
+  variables:
+    PYTEST_BACKEND: sqlite
+
+    # `target-sqlite` configuration
+    SQLITE_DATABASE: pytest_warehouse
+
+.pytest_concurrent:
+  variables:
+    PYTEST_MARKERS: concurrent
+  tags:
+    - concurrent
+  when: manual
+
+pytest_postgres:
+  extends: .pytest_postgres
+  variables:
+    PYTEST_MARKERS: not concurrent
+
+pytest_postgres_concurrent:
+  extends:
+    - .pytest_postgres
+    - .pytest_concurrent
+
+pytest_sqlite:
+  extends: .pytest_sqlite
+  variables:
+    PYTEST_MARKERS: not concurrent
+
+pytest_sqlite_concurrent:
+  extends:
+    - .pytest_sqlite
+    - .pytest_concurrent

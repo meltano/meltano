@@ -21,8 +21,9 @@
   <p class="control">{{ field(class_=cls, **kwargs)|safe }}</p>
 {% endmacro %}
 
-{% macro title(text) %}
-  <h1 style="margin-bottom: 1em;" class="has-text-grey-light has-text-weight-light has-text-centered">{{ text|safe }}</h1>
+{% macro header(text) %}
+  <h1 style="margin-bottom: 1em;" class="has-text-grey-light has-text-centered">  {{ text|safe }}
+  </h1>
 {% endmacro %}
 
 {% macro render_button(field) %}

@@ -1,73 +1,36 @@
-import json
-import os
-
-from os.path import join
-from pathlib import Path
-
-from meltano.core.m5o.m5oc_file import M5ocFile
-from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
-from meltano.core.m5o.m5o_collection_parser import (
-    M5oCollectionParser,
-    M5oCollectionParserTypes,
-)
 from meltano.core.project import Project
-from meltano.core.utils import slugify
-from meltano.core.m5o.m5o_collection_parser import (
-    M5oCollectionParser,
-    M5oCollectionParserTypes,
-)
+from meltano.core.schedule_service import ScheduleService
 
-
-class ReportAlreadyExistsError(Exception):
-    """Occurs when a report already exists."""
-
-    def __init__(self, report):
-        self.report = report
+from .sql_helper import SqlHelper
 
 
 class ReportsHelper:
     VERSION = "1.0.0"
 
-    def get_report_by_name(self, name):
-        reports = self.get_reports()
-        report = next(filter(lambda r: r["name"] == name, reports), None)
-        return report
-
-    def get_reports(self):
+    def get_report_with_query_results(self, report):
         project = Project.find()
-        reportsParser = M5oCollectionParser(
-            project.analyze_dir("reports"), M5oCollectionParserTypes.Report
+        schedule_service = ScheduleService(project)
+        sql_helper = SqlHelper()
+        report_with_query_results = self.update_report_with_query_results(
+            report, schedule_service, sql_helper
         )
 
-        return reportsParser.parse()
+        return report_with_query_results
 
-    def load_report(self, report_name):
-        return self.get_report_by_name(report_name)
+    def update_report_with_query_results(self, report, schedule_service, sql_helper):
+        m5oc = sql_helper.get_m5oc_topic(report["namespace"], report["model"])
+        design = m5oc.design(report["design"])
+        schedule = schedule_service.find_namespace_schedule(
+            m5oc.content["plugin_namespace"]
+        )
 
-    def save_report(self, data):
-        report_name = data["name"]
+        sql_dict = sql_helper.get_sql(design, report["query_payload"])
+        outgoing_sql = sql_dict["sql"]
+        aggregates = sql_dict["aggregates"]
 
-        # guard if it already exists
-        existing_report = self.get_report_by_name(report_name)
-        if existing_report:
-            raise ReportAlreadyExistsError(existing_report)
+        report["query_results"] = sql_helper.get_query_results(
+            schedule.loader, outgoing_sql
+        )
+        report["query_result_aggregates"] = aggregates
 
-        project = Project.find()
-        slug = slugify(report_name)
-        file_path = project.analyze_dir("reports", f"{slug}.report.m5o")
-
-        data = MeltanoAnalysisFileParser.fill_base_m5o_dict(file_path, slug, data)
-        data["version"] = ReportsHelper.VERSION
-
-        with file_path.open("w") as f:
-            json.dump(data, f)
-
-        return data
-
-    def update_report(self, data):
-        project = Project.find()
-        file_path = project.analyze_dir("reports", f"{data['slug']}.report.m5o")
-        with open(file_path, "w") as f:
-            json.dump(data, f)
-
-        return data
+        return report

@@ -41,5 +41,11 @@
       type = avg
       sql = "{{table}}.rating"
     }
+    min_rating {
+      label = Minimum Rating
+      description = Minimum Episode Rating
+      type = min
+      sql = "{{table}}.rating"
+    }
   }
 }

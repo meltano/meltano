@@ -1,11 +1,30 @@
 ---
 metaTitle: Meltano Plugins, Extractors, and Loaders
 description: Meltano Extractors and Loaders connect to external services to extract and load data for analysis.
+sidebarDepth: 2
 ---
 
-# Plugins
+# Data Sources
 
-Meltano's ecosystem consist of plugins to help you facilitate your data pipeline. You can learn more about our:
+To connect your data sources to Meltano you will use plugins called Extractors, which can be configured to pull data from the tools you use to conduct business every day.
 
-- [Extractors](/plugins/extractors/)
-- [Loaders](/plugins/loaders/)
+Hosted Meltano accounts currently support extracting data from:
+
+* [Facebook Ads](/plugins/extractors/facebook.html)
+* [Fastly](/plugins/extractors/fastly.html)
+* [GitLab](/plugins/extractors/gitlab.html)
+* [Google Ads](/plugins/extractors/adwords.html)
+* [Google Analytics](/plugins/extractors/google-analytics.html)
+* [Salesforce](/plugins/extractors/salesforce.html)
+* [Stripe](/plugins/extractors/stripe.html)
+* [Zendesk](/plugins/extractors/zendesk.html)
+
+::: tip
+If you don't see the extractor you need here, we have a [tutorial for creating your extractor](/tutorials/create-a-custom-extractor.html). We are constantly working to build new extractors, and our current roadmap includes: Google Ads, Shopify and Segment as next on the list.
+:::
+
+#### Reporting Database
+
+Meltano hosted accounts come with a pre-configured [Postgres](/plugins/loaders/postgres.html) database, which acts as the reporting database where all your extracted data from the sources above will live.
+
+

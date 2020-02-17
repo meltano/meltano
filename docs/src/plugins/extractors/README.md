@@ -12,8 +12,10 @@ Meltano Extractors _extract data in bulk_, and are commonly prefixed with [tap](
 
 - [Carbon Emissions Intensity](/plugins/extractors/carbon-intensity.html)
 - [Comma Separated Values (CSV)](/plugins/extractors/csv.html)
+- [Facebook Ads](/plugins/extractors/facebook.html)
 - [Fastly](/plugins/extractors/fastly.html)
 - [GitLab](/plugins/extractors/gitlab.html)
+- [Google Ads](/plugins/extractors/adwords.html)
 - [Google Analytics](/plugins/extractors/google-analytics.html)
 - [Marketo](/plugins/extractors/marketo.html)
 - [MongoDB](/plugins/extractors/mongodb.html)

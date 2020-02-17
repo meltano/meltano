@@ -1,0 +1,29 @@
+cypress:
+  stage: test
+  image:
+    name: cypress/included:3.4.1
+    entrypoint: [""]
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .npm
+      - cache/Cypress
+      - node_modules
+  variables:
+    npm_config_cache: "$CI_PROJECT_DIR/.npm"
+    CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
+    CYPRESS_baseUrl: http://meltano:5000/
+    MELTANO_PROJECT_INIT: cypress
+  script:
+    - cd src/webapp
+    - yarn
+    - yarn cypress run
+  services:
+    - name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+      alias: meltano
+  artifacts:
+    paths:
+      - tests/e2e/videos
+      - tests/e2e/screenshots
+    when: always
+    expire_in: 1 week

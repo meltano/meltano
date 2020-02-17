@@ -1,18 +1,16 @@
-## Release To Do Items
+## Release Checklist
 
-### Publish
+### Publishing
 
-- [ ] Record [Release Process](https://www.meltano.com/docs/contributing.html#release-process) to kick off pipelines
+- [ ] Record [Release Process](https://meltano.com/handbook/engineering/#release-process) to kick off pipelines
+  - [ ] Upload to Meltano YouTube channel using the [Meltano YouTube guidelines](https://meltano.com/handbook/marketing/#youtube)
+- [ ] Verify release was published successfully to [PyPi](https://pypi.org/project/meltano/)
 - [ ] Verify users can successfully install new version on local machine
-- [ ] Deploy to DigitalOcean
+- [ ] Follow [DigitalOcean publish process](https://meltano.com/handbook/engineering/#digitalocean-marketplace)
+- [ ] If a non-patch release, record [Speedrun Video](https://meltano.com/handbook/engineering/#speedruns):
+  - [ ] Upload to Meltano YouTube channel using the [Meltano YouTube guidelines](https://meltano.com/handbook/marketing/#youtube)
+- [ ] Announce release in Meltano Slack @channel in #announcements
 
 ### Marketing
 
-- [ ] Write blog post about release
-- [ ] Add release video to blog post
-  - [ ] Tweet out release blog post
-  - [ ] Publish blog post to on Meltano Slack channel
-- [ ] Record [Speedrun Workflow](https://www.meltano.com/docs/contributing.html#speedruns)
-  - [ ] Tweet out speedrun
-  - [ ] Publish speedrun to on Meltano Slack channel
-  - [ ] Update home page in docs to have the latest speedrun embed
+TBD

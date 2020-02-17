@@ -106,7 +106,7 @@ We'll use Meltano to:
 
 For this tutorial, you can use a new or existing Meltano project. Throughout the rest of this tutorial, we'll assume that your Meltano project is called `csv-project`.
 
-If you need help getting started, we recommend reviewing the [Installation documentation](/docs/installation.html) and [Getting Started Guide](/docs/getting-started.html) to set up your first project. 
+If you need help getting started, we recommend reviewing the [Installation documentation](/developer-tools/self-hosted-installation.html) and [Getting Started Guide](/docs/getting-started.html) to set up your first project. 
 
 To speed up the process, download the example CSV files to the `extract/` directory of your Meltano project (e.g. `csv-project/extract/`):
 
@@ -124,7 +124,7 @@ You can check the downloaded files as an example of valid CSV files (they were g
 
 We'll also need to download the following definition file in the same directory:
 
-**[files-def.json](/files/files-def.json)**
+**[files_def.json](/files/files-def.json)**
 
 ```json
 [
@@ -142,13 +142,18 @@ This file allows us to define the CSV files that the CSV Extractor is going to e
 
 ### Configure the Extractor
 
-Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data source.
+:::tip
+Meltano only supports importing CSV files for self-hosted users. This is a [known issue](https://gitlab.com/meltano/meltano/issues/1385).
+:::
+
+Add the CSV extractor which is hidden-by-default with `meltano add extractor tap-csv`. 
+Once it's successful, you should be able to reload the Meltano extractors page where you can configure it. 
 
 ![Screenshot of Meltano UI with all extractors not installed and the CSV Extractor highlighted](/images/csv-tutorial/01-csv-extractor-selection.png)
 
 Let's install `tap-csv` by clicking on the `Install` button inside its card.
 
-On the configuration modal leave the default value for the CSV files definition location (`extract/files-def.json`) and click `Save` to finish configuring the extractor and progress to the next step.
+On the configuration modal leave the default value for the CSV files definition location (`extract/files_def.json`) and click `Save` to finish configuring the extractor and progress to the next step.
 
 ![Screenshot of the CSV Extractor Configuration](/images/csv-tutorial/02-csv-configuration.png)
 
@@ -640,7 +645,7 @@ These files must be added under the `csv-project/model/` directory.
 {
   version = 1
   name = gitflix
-  connection = postgres_db
+  plugin_namespace = tap_csv
   label = GitFlix
   designs {
     gitflix_users {
@@ -757,7 +762,7 @@ You should now be able to follow the same steps to import your own CSV files and
 
 - Prepare your CSV files so that they have a header in the first line with the attribute names.
 
-- Update `files-def.json` to link your CSV files and use the proper entity name and key(s) for each.
+- Update `files_def.json` to link your CSV files and use the proper entity name and key(s) for each.
 
 - Import and check the raw data
 

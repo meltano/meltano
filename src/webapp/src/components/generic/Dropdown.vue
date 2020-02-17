@@ -7,33 +7,21 @@ export default {
     hyphenate
   },
   props: {
-    label: {
-      type: String,
-      default: ''
-    },
-    labelClasses: {
-      type: String,
-      default: ''
-    },
     buttonClasses: {
       type: String,
       default: ''
     },
-    menuClasses: {
-      type: String,
-      default: ''
-    },
-    iconOpen: {
-      type: String,
-      default: 'caret-down'
+    disabled: {
+      type: Boolean,
+      default: false
     },
     iconClose: {
       type: String,
       default: 'caret-up'
     },
-    disabled: {
-      type: Boolean,
-      default: false
+    iconOpen: {
+      type: String,
+      default: 'caret-down'
     },
     isIconRemoved: {
       type: Boolean,
@@ -50,6 +38,24 @@ export default {
     isUp: {
       type: Boolean,
       default: false
+    },
+    label: {
+      type: String,
+      default: ''
+    },
+    labelClasses: {
+      type: String,
+      default: ''
+    },
+    menuClasses: {
+      type: String,
+      default: ''
+    },
+    tooltip: {
+      type: Object,
+      default: () => {
+        return {}
+      }
     }
   },
   data() {
@@ -59,6 +65,15 @@ export default {
     }
   },
   computed: {
+    getButtonClasses() {
+      return () => {
+        let classes = this.buttonClasses
+        if (this.tooltip.message) {
+          classes += ` tooltip ${this.tooltip.classes}`
+        }
+        return classes
+      }
+    },
     getHyphenatedLabel() {
       return hyphenate(this.label, 'dropdown')
     }
@@ -108,15 +123,16 @@ export default {
       'is-fullwidth': isFullWidth,
       'is-up': isUp
     }"
-    @click="onBubbleClose"
+    @click.stop="onBubbleClose"
   >
     <div class="dropdown-trigger">
       <button
         class="button"
-        :class="buttonClasses"
+        :class="getButtonClasses()"
         :disabled="disabled"
         :aria-controls="getHyphenatedLabel"
         aria-haspopup="true"
+        :data-tooltip="tooltip.message"
         @click="toggleDropdown"
       >
         <span v-if="label" :class="labelClasses">{{ label }}</span>

@@ -1,76 +1,58 @@
 <script>
-import { mapActions, mapState } from 'vuex'
-import Chart from '@/components/analyze/Chart'
-import NewDashboardModal from '@/components/dashboards/NewDashboardModal'
+import Vue from 'vue'
+import { mapActions, mapGetters, mapState } from 'vuex'
+
+import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
+import Dropdown from '@/components/generic/Dropdown'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
   name: 'Dashboards',
   components: {
-    Chart,
-    NewDashboardModal,
+    CreateDashboardModal,
+    Dropdown,
     RouterViewLayout
   },
   data() {
     return {
-      isActiveDashboardLoading: false,
-      isInitializing: false,
-      isNewDashboardModalOpen: false
+      isCreateDashboardModalOpen: false,
+      dashboardInFocus: null
     }
   },
   computed: {
-    ...mapState('dashboards', [
-      'activeDashboard',
-      'activeDashboardReports',
-      'dashboards',
-      'reports'
-    ]),
-    isActive() {
-      return dashboard => dashboard.id === this.activeDashboard.id
-    }
-  },
-  watch: {
-    activeDashboard() {
-      this.isActiveDashboardLoading = true
-      this.getActiveDashboardReportsWithQueryResults().then(() => {
-        this.isActiveDashboardLoading = false
-      })
-    }
-  },
-  beforeDestroy() {
-    this.$store.dispatch('dashboards/resetActiveDashboard')
-    this.$store.dispatch('dashboards/resetActiveDashboardReports')
+    ...mapGetters('dashboards', ['getSortedDashboards']),
+    ...mapState('dashboards', ['isInitializing'])
   },
   created() {
-    this.isInitializing = true
-    this.initialize(this.$route.params.slug).then(() => {
-      this.isInitializing = false
-    })
+    this.initialize()
   },
   methods: {
-    ...mapActions('dashboards', [
-      'initialize',
-      'updateCurrentDashboard',
-      'getActiveDashboardReportsWithQueryResults'
-    ]),
+    ...mapActions('dashboards', ['deleteDashboard', 'initialize']),
+    closeCreateDashboardModal() {
+      this.isCreateDashboardModalOpen = false
+      this.dashboardInFocus = null
+    },
+    editDashboard(dashboard) {
+      this.dashboardInFocus = dashboard
+      this.openCreateDashboardModal()
+    },
     goToDashboard(dashboard) {
-      this.updateCurrentDashboard(dashboard).then(() => {
-        this.$router.push({ name: 'dashboard', params: dashboard })
-      })
+      this.$router.push({ name: 'dashboard', params: dashboard })
     },
-    goToDesign(report) {
-      const params = {
-        design: report.design,
-        model: report.model,
-        namespace: report.namespace
-      }
-      this.$router.push({ name: 'analyzeDesign', params })
+    openCreateDashboardModal() {
+      this.isCreateDashboardModalOpen = open
     },
-    goToReport(report) {
-      this.$router.push({ name: 'report', params: report })
-    },
-    toggleNewDashboardModal() {
-      this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen
+    removeDashboard(dashboard) {
+      this.deleteDashboard(dashboard)
+        .then(() =>
+          Vue.toasted.global.success(
+            `Dashboard Successfully Removed - ${dashboard.name}`
+          )
+        )
+        .catch(err => {
+          this.$error.handle(err)
+          this.closeCreateDashboardModal()
+        })
     }
   }
 }
@@ -78,146 +60,138 @@ export default {
 
 <template>
   <router-view-layout>
-    <div class="container view-body is-fluid">
+    <div class="container view-body is-widescreen">
       <section>
-        <div class="columns">
-          <aside class="column is-one-quarter">
-            <div class="box">
-              <div class="columns is-vcentered">
-                <div class="column is-three-fifths">
-                  <h2 class="title is-5">Dashboards</h2>
-                </div>
-                <div class="column is-two-fifths">
-                  <div class="buttons is-right">
-                    <button
-                      class="button is-success"
-                      @click="toggleNewDashboardModal"
-                    >
-                      New
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <progress
-                v-if="isInitializing"
-                class="progress is-small is-info"
-              ></progress>
-
-              <template v-if="dashboards.length > 0">
-                <div class="panel">
-                  <a
-                    v-for="dashboard in dashboards"
-                    :key="dashboard.id"
-                    data-cy="dashboard-link"
-                    class="panel-block space-between has-text-weight-medium"
-                    :class="{ 'is-active': isActive(dashboard) }"
-                    @click="goToDashboard(dashboard)"
-                  >
-                    {{ dashboard.name }}
-                  </a>
-                </div>
-              </template>
-            </div>
-          </aside>
-
-          <div class="column is-three-quarters">
-            <div class="box">
-              <template v-if="activeDashboard.name">
-                <div class="columns is-vcentered">
-                  <div class="column">
-                    <h2 class="title is-5">{{ activeDashboard.name }}</h2>
-                    <h3 v-if="activeDashboard.description" class="subtitle">
-                      {{ activeDashboard.description }}
-                    </h3>
-                  </div>
-                </div>
-
-                <progress
-                  v-if="isActiveDashboardLoading"
-                  class="progress is-small is-info"
+        <div class="columns is-vcentered">
+          <div class="column">
+            <h2 class="title is-inline-block">Dashboards</h2>
+            <div class="field is-pulled-right is-inline-block">
+              <div class="control">
+                <button
+                  class="button is-medium is-interactive-primary"
+                  @click="openCreateDashboardModal"
                 >
-                </progress>
-                <template v-else>
-                  <template v-if="activeDashboardReports.length > 0">
-                    <div
-                      v-for="report in activeDashboardReports"
-                      :key="report.id"
-                    >
-                      <hr />
-                      <div class="level">
-                        <div class="level-left">
-                          <div class="level-item">
-                            <div class="content">
-                              <h5 class="has-text-centered">
-                                {{ report.name }}
-                              </h5>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="level-right">
-                          <div class="level-item">
-                            <div class="buttons">
-                              <a
-                                class="button is-small"
-                                @click="goToReport(report)"
-                                >Edit</a
-                              >
-                              <a
-                                class="button is-small"
-                                @click="goToDesign(report)"
-                                >Explore</a
-                              >
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <chart
-                        :chart-type="report.chartType"
-                        :results="report.queryResults"
-                        :result-aggregates="report.queryResultAggregates"
-                      ></chart>
-                    </div>
-                  </template>
-                  <div v-else class="content">
-                    <p>There are no reports added to this dashboard yet.</p>
-                    <router-link
-                      class="button is-interactive-primary is-outlined"
-                      :to="{ name: 'model' }"
-                      >Analyze Some Data First</router-link
-                    >
-                  </div>
-                </template>
-              </template>
-
-              <template v-else>
-                <div class="column content">
-                  <p>
-                    Select a dashboard or click "New" to the left and add
-                    reports to it to view them here.
-                  </p>
-                  <p>You can add a report by:</p>
-                  <ul>
-                    <li>
-                      In Analyze, clicking "Add to Dashboard" after creating a
-                      report
-                    </li>
-                    <li>
-                      Clicking the "Add Report" button to an existing dashboard
-                      (coming soon)
-                    </li>
-                  </ul>
-                </div>
-              </template>
-
-              <NewDashboardModal
-                v-if="isNewDashboardModalOpen"
-                @close="toggleNewDashboardModal"
-              />
+                  <span>Create</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
+
+        <div v-if="getSortedDashboards.length > 0" class="box table-container">
+          <table class="table is-fullwidth is-narrow is-hoverable">
+            <thead>
+              <tr>
+                <th>
+                  <span>Name</span>
+                </th>
+                <th>
+                  <span>Description</span>
+                </th>
+                <th>
+                  <span>Report Count</span>
+                </th>
+                <th class="has-text-right">
+                  <span>Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <template v-for="dashboard in getSortedDashboards">
+                <tr
+                  :key="dashboard.id"
+                  data-test-id="dashboard-link"
+                  class="has-cursor-pointer"
+                  @click="goToDashboard(dashboard)"
+                >
+                  <td>
+                    <p>{{ dashboard.name }}</p>
+                  </td>
+                  <td>
+                    <p v-if="dashboard.description">
+                      {{ dashboard.description }}
+                    </p>
+                    <p v-else class="is-italic has-text-grey">None</p>
+                  </td>
+                  <td>
+                    <p>{{ dashboard.reportIds.length }}</p>
+                  </td>
+                  <td>
+                    <div class="buttons is-right">
+                      <a
+                        class="button is-interactive-primary is-outlined"
+                        @click.stop="goToDashboard(dashboard)"
+                        >View</a
+                      >
+                      <a class="button" @click.stop="editDashboard(dashboard)"
+                        >Edit</a
+                      >
+                      <Dropdown
+                        :button-classes="
+                          `is-danger is-outlined ${
+                            dashboard.isDeleting ? 'is-loading' : ''
+                          }`
+                        "
+                        :disabled="dashboard.isDeleting"
+                        :tooltip="{
+                          classes: 'is-tooltip-left',
+                          message: 'Delete this dashboard'
+                        }"
+                        menu-classes="dropdown-menu-300"
+                        icon-open="trash-alt"
+                        icon-close="caret-up"
+                        is-right-aligned
+                      >
+                        <div class="dropdown-content is-unselectable">
+                          <div class="dropdown-item">
+                            <div class="content">
+                              <p>
+                                Please confirm deletion of dashboard:<br /><em
+                                  >{{ dashboard.name }}</em
+                                >.
+                              </p>
+                            </div>
+                            <div class="buttons is-right">
+                              <button
+                                class="button is-text"
+                                data-dropdown-auto-close
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                class="button is-danger"
+                                data-dropdown-auto-close
+                                @click="removeDashboard(dashboard)"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </Dropdown>
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+        <progress
+          v-else-if="isInitializing"
+          class="progress is-small is-info"
+        ></progress>
+        <div v-else>
+          <div class="content">
+            <p>No dashboards...</p>
+          </div>
+        </div>
       </section>
+
+      <CreateDashboardModal
+        v-if="isCreateDashboardModalOpen"
+        :dashboard="dashboardInFocus"
+        @close="closeCreateDashboardModal"
+      />
     </div>
   </router-view-layout>
 </template>

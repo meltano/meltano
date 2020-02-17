@@ -12,14 +12,10 @@
 
 ifdef DOCKER_REGISTRY
 base_image_tag = ${DOCKER_REGISTRY}/meltano/meltano/base
-app_image_tag = ${DOCKER_REGISTRY}/meltano/meltano
-runner_image_tag = ${DOCKER_REGISTRY}/meltano/meltano/runner
-cli_image_tag = ${DOCKER_REGISTRY}/meltano/meltano/runner
+prod_image_tag = ${DOCKER_REGISTRY}/meltano/meltano
 else
 base_image_tag = meltano/meltano/base
-app_image_tag = meltano/meltano
-runner_image_tag = meltano/meltano/runner
-cli_image_tag = meltano/meltano/cli
+prod_image_tag = meltano/meltano
 endif
 
 DOCKER_RUN=docker run -it --rm -v $(shell pwd):/app -w /app
@@ -47,7 +43,7 @@ TO_CLEAN += ./${MELTANO_WEBAPP}/dist
 clean:
 	rm -rf ${TO_CLEAN}
 
-docker_images: base_image prod_image cli_image runner_image
+docker_images: base_image prod_image
 
 # Docker Image Related
 # ====================
@@ -56,7 +52,7 @@ docker_images: base_image prod_image cli_image runner_image
 # - `make prod_image` builds meltano/meltano which is an all-in-one production
 #   image that includes the static ui artifacts in the image.
 
-.PHONY: base_image prod_image runner_image
+.PHONY: base_image prod_image
 
 base_image:
 	docker build \
@@ -67,22 +63,9 @@ base_image:
 prod_image: base_image ui
 	docker build \
 		--file docker/prod/Dockerfile \
-		-t $(app_image_tag) \
+		-t $(prod_image_tag) \
 		--build-arg BASE_IMAGE=$(base_image_tag) \
 		.
-
-cli_image:
-	docker build \
-		--file docker/cli/Dockerfile \
-		-t $(cli_image_tag) \
-		.
-
-runner_image: cli_image
-	docker build \
-		--file docker/runner/Dockerfile \
-		-t $(runner_image_tag) \
-		--build-arg BASE_IMAGE=$(cli_image_tag) \
-	  .
 
 # API Related
 # ===========
@@ -108,6 +91,7 @@ requirements.txt: setup.py
 bundle: clean ui
 	mkdir -p src/meltano/api/templates && \
 	cp src/webapp/dist/index.html src/meltano/api/templates/webapp.html && \
+	cp src/webapp/dist/index-embed.html src/meltano/api/templates/embed.html && \
 	cp -r src/webapp/dist/static/. src/meltano/api/static
 
 freeze_db:

@@ -3,7 +3,7 @@ metaTitle: Contributing to Meltano
 description: Meltano is open source software built by an internal team at GitLab as well as the larger Meltano community.
 ---
 
-# Contributing
+# Contributor Guide
 
 ## Prerequisites
 
@@ -15,42 +15,7 @@ In order to contribute to Meltano, you will need the following:
 
 ## Where to start?
 
-We welcome contributions, idea submissions, and improvements. In fact we may already have open issues labeled [Accepting Merge Requests](https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=Accepting%20Merge%20Requests) if you don't know where to start. Please see the contribution guidelines below for source code related contributions.
-
-```bash
-# Clone the Meltano repo
-git clone git@gitlab.com:meltano/meltano.git
-
-# Change directory into the Meltano project
-cd meltano
-
-# Optional, but it's best to have the latest pip
-pip3 install --upgrade pip
-
-# Optional, but it's best to have the latest setuptools
-pip3 install --upgrade setuptools
-
-# Optional, but it's recommended to create a virtual environment
-# in order to minimize side effects from unknown environment variable
-python -m venv ~/virtualenvs/meltano-development
-
-# Activate your virtual environment
-source ~/virtualenvs/meltano-development/bin/activate
-
-# Install all the dependencies
-pip3 install -r requirements.txt
-
-# Install dev dependencies with the edit flag on to detect changes
-# Note: you may have to escape the .`[dev]` argument on some shells, like zsh
-pip3 install -e .[dev]
-
-# Bundle the Meltano UI into the `meltano` package
-make bundle
-```
-
-Meltano is now installed and available at `meltano`, as long as you remain in your `meltano-development` virtual environment!
-
-This means that you're ready to start Meltano CLI development. For API and UI development, read on.
+We welcome contributions, idea submissions, and improvements. In fact we may already have open issues labeled [Accepting Merge Requests] if you don't know where to start. Please see the contribution guidelines below for source code related contributions.
 
 ### Metrics (anonymous usage data) tracking
 
@@ -61,33 +26,93 @@ As you contribute to Meltano, you may want to disable [metrics tracking](/docs/e
 export MELTANO_DISABLE_TRACKING=True
 ```
 
-## Meltano API Development
-
-For all changes that do not involve working on Meltano UI (front-end) itself, run the following command:
+## Setting Up Your Environment
 
 ```bash
-# Starts both a development build of the Meltano API and a production build of Meltano UI
+# Clone the Meltano repo
+git clone git@gitlab.com:meltano/meltano.git
+
+# Change directory into the Meltano project
+cd meltano
+
+# Optional, but it's best to have the latest pip
+pip install --upgrade pip
+
+# Optional, but it's best to have the latest setuptools
+pip install --upgrade setuptools
+
+# Optional, but it's recommended to create a virtual environment
+# in order to minimize side effects from unknown environment variable
+python -m venv ~/.venv/meltano-development
+
+# Activate your virtual environment
+source ~/.venv/meltano-development/bin/activate
+
+# Install all the dependencies
+pip install -r requirements.txt
+
+# Install dev dependencies with the edit flag on to detect changes
+# Note: you may have to escape the .`[dev]` argument on some shells, like zsh
+pip install -e .[dev]
+
+# Bundle the Meltano UI into the `meltano` package
+make bundle
+```
+
+Meltano is now installed and available at `meltano`, as long as you remain in your `meltano-development` virtual environment!
+
+This means that you're ready to start Meltano CLI development. For API and UI development, read on.
+
+## API Development
+
+This section of the guide provides guidance on how to work with the Meltano API, which serves as the backend of Meltano and is built with the [Python framework: Flask](https://github.com/pallets/flask).
+
+### Getting Setup
+
+After all of your dependencies installed, we recommend opening a new window/tab in your terminal so you can run the following commands:
+
+```bash
+# Create a new Meltano project
+meltano init $PROJECT_NAME
+
+# Change directory into your newly created project
+cd $PROJECT_NAME
+
+# Start a development build of the Meltano API and a production build of Meltano UI
 FLASK_ENV=development meltano ui
 ```
 
-The development build of the Meltano API should be available at <http://localhost:5000/>.
+The development build of the Meltano API and a production build of the UI will now be available at <http://localhost:5000/>.
 
-:::warning Troubleshooting
-If you run into `/bin/sh: yarn: command not found`, double check that you've got [the prerequisites](https://www.meltano.com/docs/contributing.html#prerequisites) installed.
+::: tip
 
-On macOS, this can be solved by running `brew install yarn`.
+To debug your Python code, here is the recommended way to validate / debug your code:
+
+```python
+# Purpose: Start a debugger
+# Usage: Use as a one-line import / invocation for easier cleanup
+import pdb; pdb.set_trace()
+```
+
 :::
 
-## Meltano UI Development
+## UI Development
 
 In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
 
 ```bash
-# Navigate to a Meltano project that has already been initialized
+# Create a new Meltano project
+meltano init $PROJECT_NAME
+
+# Change directory into your newly created project
+cd $PROJECT_NAME
+
 # Start the Meltano API and a production build of Meltano UI that you can ignore
 meltano ui
 
 # Open a new terminal tab and go to your meltano directory
+cd $PROJECT_NAME
+
 # Install frontend infrastructure at the root directory
 yarn setup
 
@@ -95,7 +120,26 @@ yarn setup
 yarn serve
 ```
 
-The development build of the Meltano UI will be available at <http://localhost:8080/>.
+The development build of the Meltano UI will now be available at <http://localhost:8080/>. 
+
+A production build of the API will be available at <http://localhost:5000/> to support the UI, but you will not need to interact with this directly.
+
+::: tip
+
+If you're developing for the _Embed_ app (embeddable `iframe` for reports) you can toggle `MELTANO_EMBED`:
+
+```bash
+# Develop for the embed app
+export MELTANO_EMBED=1
+
+# Develop for the main app (this is the default)
+export MELTANO_EMBED=0
+
+# Start local development environment
+yarn serve
+```
+
+:::
 
 If you need to change the URL of your development environment, you can do this by updating your `.env` in your project directory with the following configuration:
 
@@ -106,7 +150,130 @@ If you need to change the URL of your development environment, you can do this b
 export MELTANO_UI_URL = ""
 ```
 
-## Meltano System Database
+## Taps & Targets Development
+
+Watch ["How taps are built"](https://www.youtube.com/watch?v=aImidnW8nsU) for an explanation of how Singer taps (which form the basis for Meltano extractors) work, and what goes into building new ones or verifying and modifying existing ones for various types of APIs.
+
+Then watch ["How transforms are built"](https://www.youtube.com/watch?v=QRaCSKQC_74) for an explanation of how DBT transforms work, and what goes into building new ones for new data sources.
+
+### Changing discovery.yml
+
+#### `discovery.yml` version
+
+Whenever new functionality is introduced that changes the schema of `discovery.yml` (the exact properties it supports and their types), the `version` in `src/meltano/core/bundle/discovery.yml` and the `VERSION` constant in `src/meltano/core/plugin_discovery_service.py` must be incremented, so that older instances of Meltano don't attempt to download and parse a `discovery.yml` its parser is not compatible with.
+
+Changes to `discovery.yml` that only use existing properties do not constitute schema changes and do not require `version` to be incremented.
+
+#### Local changes to `discovery.yml`
+
+When you need to make changes to `discovery.yml`, these changes are not automatically detected inside of the `meltano` repo during development. While there are a few ways to solve this problem, it is recommended to create a symbolic link in order ensure that changes made inside of the `meltano` repo appear inside the Meltano project you initialized and are testing on.
+
+1. Get path for `discovery.yml` in the repo
+
+- Example: `/Users/bencodezen/Projects/meltano/src/meltano/core/bundle/discovery.yml`
+
+2. Open your Meltano project in your terminal
+
+3. Create a symbolic link by running the following command:
+
+```
+ln -s $YOUR_DISCOVERY_YML_PATH
+```
+
+Now, when you run the `ls -l` command, you should see something like:
+
+```
+bencodezen  staff   72 Nov 19 09:19 discovery.yml -> /Users/bencodezen/Projects/meltano/src/meltano/core/bundle/discovery.yml
+```
+
+Now, you can see your changes in `discovery.yml` live in your project during development! 🎉
+
+#### Connector settings
+
+Each extractor (tap) and loader (target) in the `discovery.yml` has a `settings` property. Nested under this property are a variable amount of individual settings. In the Meltano UI these settings are parsed to generate a configuration form. To improve the UX of this form, each setting has a number of optional properties:
+
+```yaml
+- settings:
+    - name: setting_name # Required (must match the connector setting name)
+      label: Setting Name # Optional (human friendly text display of the setting name)
+      value: '' # Optional (Use to set a default value)
+      placeholder: Ex. format_like_this # Optional (Use to set the input's placeholder default)
+      kind: string # Optional (Use for a first-class input control. Default is `string`, others are `hidden`, `boolean`, `date_iso8601`, `password`, `options`, & `file`)
+      description: Setting description # Optional (Use to provide inline context)
+      tooltip: Here is some more info... # Optional (use to provide additional inline context)
+      documentation: https://meltano.com/ # Optional (use to link to specific supplemental documentation)
+      protected: true # Optional (use in combination with `value` to provide an uneditable default)
+      env: SOME_API_KEY # Optional (use to delegate to an environment variable for overriding this setting's value)
+```
+
+### For existing taps/targets
+
+We should be good citizen about these, and use the default workflow to contribute. Most of these are on GitHub so:
+
+1. Fork (using Meltano organization)
+1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
+1. Modify and submits PRs
+1. If there is resistance, fork as our tap (2)
+
+#### How to test a tap?
+
+We qualify taps with the capabilities it supports:
+
+  - properties: the tap uses the old `--properties` format for the catalog
+  - catalog: the tap uses the new `--catalog` format for the catalog
+  - discover: the tap supports catalog extraction
+  - state: the tap supports incremental extraction
+
+##### Properties/Catalog
+
+You should look at the tap's documentation to see which one is supported.
+
+##### Discover
+
+Try to run the tap with the `--discover` switch, which should output a catalog on STDOUT.
+
+##### State
+
+  1. Try to run the tap connect and extract data first, watching for `STATE` messages.
+  1. Do two ELT run with `target-postgres`, then validate that:
+    1. All the tables in the schema created have a PRIMARY KEY constraint. (this is important for incremental updates)
+    1. There is no duplicates after multiple extractions
+
+#### Troubleshooting
+
+##### Tables are lacking primary keys
+
+This might be a configuration issue with the catalog file that is sent to the tap. Take a look at the tap's documentation and look for custom metadata on the catalog. 
+
+### For taps/targets we create
+
+1. For tap development please use the [tap cookiecutter template](https://github.com/singer-io/singer-tap-template).
+1. For target development please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
+1. Use a separate repo (meltano/target|tap-x) in GitLab
+   e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
+1. Publish PyPI packages of these package (not for now)
+1. We could mirror this repo on GitHub if we want (not for now)
+
+## Dashboard Development
+
+To create a dashboard plugin like https://gitlab.com/meltano/dashboard-google-analytics, follow these steps:
+
+1. Set up the extractor and model you are creating dashboard(s) and reports for in your local Meltano instance.
+1. Start Meltano UI.
+1. Use the UI to create the desired reports based on the model's designs. Name the reports appropriately, but don't include the extractor name or label.
+1. Create one or more new dashboard and add the reports to it. If you're creating just one dashboard, name it after the extractor label (e.g. "Google Analytics", not `tap-google-analytics`). If you're creating multiple dashboards, add an appropriate subtitle after a colon (e.g. "Google Analytics: My Dashboard").
+1. Create a new plugin repository named `dashboard-<data source>` (e.g. `dashboard-google-analytics`).
+1. Copy over `setup.py`, `README.md`, and `LICENSE` from https://gitlab.com/meltano/dashboard-google-analytics and edit these files as appropriate.
+1. Move your newly created dashboards and reports from your local Meltano project's `analyze/dashboards` and `analyze/reports` to `dashboards` and `reports` inside the new plugin repository.
+1. Push your new plugin repository to GitLab.com. Official dashboard plugins live at `https://gitlab.com/meltano/dashboard-...`.
+1. Add an entry to `src/meltano/core/bundle/discovery.yml`  under `dashboards`. Set `namespace` to the `namespace` of the extractor and model plugins the dashboard(s) and reports are related to (e.g. `tap_google_analytics`), and set `name` and `pip_url` set as appropriate.
+1. Delete the dashboard(s) and reports from your local Meltano project's `analyze` directory.
+1. Ensure that your local Meltano instance uses the recently modified `discovery.yml` by following the steps under ["Local changes to discovery.yml](#local-changes-to-discovery-yml).
+1. Run `meltano add --include-related extractor <extractor name>` to automatically install all plugins related to the extractor, including our new dashboard plugin. Related plugins are also installed automatically when installing an extractor using the UI, but we can't use that flow here because the extractor has already been installed.
+1. Verify that the dashboard(s) and reports have automatically been added to your local Meltano project's `analyze` directory and show up under "Dashboards" in the UI.
+1. Success! You can now submit a merge request to Meltano containing the changes to `discovery.yml` (and an appropriate `CHANGELOG` item, of course).
+
+## System Database
 
 Meltano API and CLI are both supported by a database that is managed using Alembic migrations.
 
@@ -186,23 +353,56 @@ You may use `make lint` to automatically lint all your code, or `make show_lint`
 
 > A contributor should know the exact line-of-code to make a change based on convention
 
-In the spirit of GitLab's "boring solutions" with the above tools and mantra, the frontend codebase is additionally sorted as follows:
+In the spirit of GitLab's "boring solutions" with the above tools and mantra, the codebase is additionally sorted as follows:
 
-- `import`s are alphabetical and subgrouped by _core_ -> _third-party_ -> _application_ with a return delineating. For example:
+#### Imports
 
-  ```js
-  // core
-  import Vue from 'vue'
-  // third-party
-  import lodash from 'lodash'
-  // application
-  import poller from '@/utils/poller'
-  import utils from '@/utils/utils'
-  ```
+`import`s are sorted using the following pattern:
 
-- object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
+  1. Code source location: third-party → local (separate each group with a single blank line)
+  1. Import scheme: Default imports → Partial imports
+  1. Name of the module, alphabetically: 'lodash' → 'vue'
 
-Over time we hope to automate the enforcement of the above sorting rules.
+::: tip
+There should be only 2 blocks of imports with a single blank line between both blocks.
+The first rule is used to separate both blocks.
+:::
+
+```js
+import lodash from 'lodash'                  // 1: third-party, 2: default, 3: [l]odash
+import Vue from 'vue'                        // 1: third-party, 2: default, 3: [v]ue
+import { bar, foo } from 'alib'              // 1: third-party, 2: partial, 3: [a]lib
+import { mapAction, mapState } from 'vuex'   // 1: third-party, 2: partial, 3: [v]uex
+¶  // 1 blank line to split import groups
+import Widget from '@/component/Widget'      // 1: local, 2: default, 3: @/[c]omponent/Widget
+import poller from '@/utils/poller'          // 1: local, 2: default, 3: @/[u]tils/poller
+import { Medal } from '@/component/globals'  // 1: local, 2: partial, 3: @/[c]omponent/globals
+import { bar, thing } from '@/utils/utils'   // 1: local, 2: partial, 3: @/[u]tils/utils
+¶
+¶  // 2 blank lines to split the imports from the code 
+```
+
+```python
+import flask                                        # 1: third-party, 2: default, 3: [f]lask
+import os                                           # 1: third-party, 2: default, 3: [o]s
+from datetime import datetime                       # 1: third-party, 2: partial, 3: [d]atetime
+from functools import wraps                         # 1: third-party, 2: partial, 3: [f]unctools
+¶  # 1 blank line to split import groups
+import meltano                                      # 1: local, 2: default, 3: [meltano]
+import meltano.migrations                           # 1: local, 2: default, 3: [meltano.m]igrations
+from meltano.core.plugin import Plugin, PluginType  # 1: local, 2: partial, 3: [meltano.core.pl]ugin
+from meltano.core.project import Project            # 1: local, 2: partial, 3: [meltano.core.pr]oject
+¶ 
+¶  # 2 blank lines to split the imports from the code 
+```
+
+#### Definitions
+
+Object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
+
+::: warning
+We are looking to automate these rules in https://gitlab.com/meltano/meltano/issues/1609.
+:::
 
 :::warning Troubleshooting
 When testing your contributions you may need to ensure that your various `__pycache__` directories are removed. This helps ensure that you are running the code you expect to be running.
@@ -217,11 +417,10 @@ When testing your contributions you may need to ensure that your various `__pyca
 The below level hierarchy defines the back to front depth sorting of UI elements. Use it as a mental model to inform your UI decisions.
 
 - Level 1 - Primary navigation, sub-navigation, and signage - _Grey_
-- Level 2 - Task container (traditionally the page metaphor) - _White-ish Grey_
-- Level 3 - Primary task container(s) - _White w/Shadow_
-- Level 4 - Dropdowns, dialogs, pop-overs, etc. - _White w/Shadow_
-- Level 5 - Modals - _White w/Lightbox_
-- Level 6 - Toasts - _White w/Shadow + Message Color_
+- Level 2 - Primary task container(s) - _White w/Shadow_
+- Level 3 - Dropdowns, dialogs, pop-overs, etc. - _White w/Shadow_
+- Level 4 - Modals - _White w/Lightbox_
+- Level 5 - Toasts - _White w/Shadow + Message Color_
 
 #### Interactivity
 
@@ -234,7 +433,7 @@ Within each aforementioned depth level is an interactive color hierarchy that fu
 1. Secondary - _`$interactive-secondary`_
    - Supporting interactive elements (various controls) that assist the primary task(s) in the UI
    - Fill - Most important
-     - Can be used for selected state (typically delegated to stroke) for grouped buttons (examples usage seen in Entity Selection and Transform defaults)
+     - Can be used for selected state (typically delegated to stroke) for grouped buttons (examples usage seen in Transform defaults)
    - Stroke - Important
      - Denotes the states of selected, active, and/or valid where grey represents the opposites unselected, inactive, and/or invalid
 1. Tertiary - _Greyscale_
@@ -274,7 +473,7 @@ Here is a technical breakdown:
 ## Merge Requests
 
 :::tip Searching for something to work on?
-Start off by looking at our [~"Accepting Merge Request"](https://gitlab.com/meltano/meltano/issues?label_name=Accepting+Merge+Requests) label.
+Start off by looking at our [~"Accepting Merge Requests"][accepting merge requests] label.
 
 Keep in mind that this is only a suggestion: all improvements are welcome.
 :::
@@ -308,233 +507,6 @@ $ git add CHANGELOG.md
 ```
 
 Make sure to add CHANGELOG entries to your merge requests.
-
-## Demo Day
-
-For each demo day, we need to ensure that the following process is followed:
-
-### Demo Day: Setup
-
-1. Document list of features to demo
-2. Document order of people demoing
-3. Ensure every person demoing has proper display size (i.e., font sizes, zoomed in enough, etc.)
-   - Font size at least 20px
-   - Browser zoom at least 125%
-
-### Demo Day: Workflow
-
-1. Record each meeting with Zoom
-2. Generate list of timestamps for each featured demo
-3. Generate list of features (from Setup section) paired with timestamps
-4. Upload recording to YouTube
-5. Add features + timestamps to YouTube description
-
-## Release Process
-
-### Versioning
-
-Meltano uses [semver](https://semver.org/) as its version number scheme.
-
-### Prerequisites
-
-Ensure you have the latest `master` branch locally before continuing.
-
-```bash
-git fetch origin
-```
-
-### Workflow
-
-Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
-
-1. Meltano has a number of dependencies for the release toolchain that are required when performing a release. If you haven't already, please navigate to your meltano install and run the following command to install all development dependencies:
-
-   ```bash
-   # activate your virtualenv
-   source ./venv/bin/activate
-
-   # pip3 install all the development dependencies
-   pip3 install .[dev]
-   ```
-
-1. Execute the commands below:
-
-   ```bash
-   # create and checkout the `release-next` branch from `origin/master`
-   git checkout -B release-next origin/master
-
-   # view changelog (verify changes made match changes logged)
-   changelog view
-
-   # after the changelog has been validated, tag the release
-   make release
-
-   # ensure the tag once the tag has been created, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
-   git describe --tags --abbrev=0
-
-   # push the tag upstream to trigger the release pipeline
-   git push origin $(git describe --tags --abbrev=0)
-
-   # push the release branch to merge the new version, then create a merge request
-   git push origin release-next
-   ```
-
-:::tip Releasing a hotfix?
-You can use `make type=patch release` to force a patch release. This is useful when we need to release hotfixes.
-:::
-
-1. Create a merge request from `release-next` targeting `master` and make sure to check `delete the source branch when the changes are merged`.
-1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
-1. When the **publish** pipeline succeeds, the release is publicly available on [PyPI](https://pypi.org/project/meltano/).
-1. Follow the [Digital Ocean publish process](#digitalocean-marketplace)
-1. If a non-patch release, record and distribute the [Speedrun Video](#speedruns):
-   - Meltano YouTube channel
-   - Meltano Slack `@channel` in `#general`
-
-## DigitalOcean Marketplace
-
-Meltano is deployed and available as a <a :href="$site.themeConfig.data.digitalOceanUrl">DigitalOcean Marketplace 1-Click install</a>.
-
-### Build the snapshot
-
-The `distribute` step in the CI/CD pipeline has a manual action named _digitalocean_marketplace_ that will use Packer to create a snapshot with the latest version of Meltano installed and ready.
-
-:::tip Master only
-The _digitalocean_marketplace_ job is only available on pipelines running off `master`.
-:::
-
-1. Click the "Play" button associated with this _digitalocean_marketplace_ `distribute` step
-1. The snapshot string should be available under `meltano-<timestamp>` on DigitalOcean, which you will find at the bottom of the _digitalocean_marketplace_ job. Take note of this snapshot string as you'll use it in the next step.
-
-### Update the DigitalOcean listing
-
-Then, head to the DigitalOcean vendor portal at <https://marketplace.digitalocean.com/vendorportal> to edit the Meltano listing.
-
-:::tip Don't see the Meltano listing?
-You'll have to be granted access to the DigitalOcean vendor portal. Please ask access to your manager.
-:::
-
-1. Once inside the listing, update the following entries:
-   - **System Image** to the new image (match the aforementioned snapshot string)
-   - **Version** to the latest Meltano version
-   - **Meltano Package Version** inside the _Software Included Entry_
-1. Submit it for review to finish the process.
-
-## Speedruns
-
-As part of Meltano's [Release process](/docs/contributing.html#release-process), speedruns allow the team to ensure that every release is stable.
-
-::: info
-🏆 Current Record: 1:35 (Ben Hong)
-:::
-
-::: tip
-Remember to leave each screen up for at least 2 seconds so users have a chance to notice that something actually happened.
-:::
-
-### Requirements
-
-1. Keep keystrokes to a minimum (ideally zero)
-1. You do not have to explain every step
-1. Do not need to stop and explain new features
-1. Time starts from when the webapp is loaded on the browser
-1. Make sure to pause between screens so user has a chance to register that a change is happening
-
-### Workflow
-
-1. Introduce Meltano to new users:
-
-```
-Meltano is an open source data toolkit
-that makes it easy to go from data source to dashboard.
-
-For more information, check us out at meltano.com!
-```
-
-2. Check that Meltano does not exist on your machine
-
-```bash
-meltano --version
-# command not found: meltano
-```
-
-3. Install Meltano on your machine using distributed version
-
-```bash
-pip3 install meltano
-```
-
-4. Check Meltano version matches latest release
-
-```bash
-meltano --version
-```
-
-5. Create a new Meltano project
-
-```bash
-meltano init speedrun-workflow
-```
-
-6. Change directory into your new project
-
-```bash
-cd speedrun-workflow
-```
-
-7. Start Meltano application
-
-```
-meltano ui
-```
-
-8. Assuming there are no conflicts on the port, you can now open your Meltano instance at http://localhost:5000.
-
-9. Run through `tap-gitlab` + `tap-postgres` workflow as quickly as possible with some narration, but don't pause mid-action to explain something.
-
-## Taps & Targets Workflow
-
-### For existing taps/targets
-
-We should be good citizen about these, and use the default workflow to contribute. Most of these are on GitHub so:
-
-1. Fork (using Meltano organization)
-1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
-1. Modify and submits PRs
-1. If there is resistance, fork as our tap (2)
-
-### For taps/targets we create
-
-1. For tap development please use the [tap cookiecutter template](https://github.com/singer-io/singer-tap-template).
-1. For target development please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
-1. Use a separate repo (meltano/target|tap-x) in GitLab
-   e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
-1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
-1. Publish PyPI packages of these package (not for now)
-1. We could mirror this repo on GitHub if we want (not for now)
-
-### Discoverability
-
-We maintain a curated list of taps/targets that are expected to work out of the box with Meltano. Meltano also helps the CLI user find components via a `discover` command.
-
-Get a list of extractors:
-
-```bash
-meltano discover extract
-tap-demo==...
-tap-zendesk==1.3.0
-tap-marketo==...
-...
-```
-
-Or a list of loaders
-
-```bash
-$ meltano discover load
-target-demo==...
-target-snowflake==git+https://gitlab.com/meltano/target-snowflake@master.git
-target-postgres==...
-```
 
 ## Tmuxinator
 
@@ -570,3 +542,5 @@ MELTANO_VENV=.venv tmuxinator local
 ### Resources
 
 - [Tmux Cheat Sheet & Quick Reference](https://tmuxcheatsheet.com/)
+
+[Accepting Merge Requests]: https://gitlab.com/groups/meltano/-/issues?label_name[]=Accepting%20Merge%20Requests

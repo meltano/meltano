@@ -1,6 +1,6 @@
 ---
 metaTitle: Configuring Meltano Environment Variables
-description: Manage a Meltano configuration globally with environment variables. 
+description: Manage a Meltano configuration globally with environment variables.
 ---
 
 # Environment Variables
@@ -56,7 +56,9 @@ If you want to evaluate Meltano's anonymous usage tracking strategy for yourself
 
 Until role-based access control is implemented in Meltano, we need to prevent user editing of certain settings from the UI. View this [`tap-gitlab` environment variable setup example](/tutorials/gitlab-and-postgres.html#add-extractor) to learn how to work with this current limitation.
 
-## System Database
+## Meltano UI
+
+### System Database
 
 By default, Meltano uses a SQLite database named `./meltano/meltano.db` as its system database.
 
@@ -70,7 +72,7 @@ export MELTANO_DATABASE_URI=sqlite:////path/to/system_database.db
 export MELTANO_DATABASE_URI=postgresql://username:password@host:port/database
 ```
 
-## Flask
+### Flask
 
 The following are the environment variables currently available for customization for Flask.
 
@@ -81,9 +83,27 @@ export FLASK_PROFILE = ""
 export FLASK_ENV = ""
 ```
 
-### AuthLib
+#### Service Listen Configuration
+
+By default, the API service listens with following host/port combination.
+
+API: `http://0.0.0.0:5000`
+
+To change the host/port configuration on which the API server listens, update your `.env` in your project directory with the following configuration:
+
+```bash
+# Meltano API configuration
+export MELTANO_API_HOSTNAME="0.0.0.0"
+export MELTANO_API_PORT="5000"
+```
+
+#### Single Sign On
 
 These variables are specific to [Flask-OAuthlib](https://flask-oauthlib.readthedocs.io/en/latest/#) and work with [OAuth authentication with GitLab](https://docs.gitlab.com/ee/integration/oauth_provider.html).
+
+::: tip
+These settings are used for single-sign-on using an external OAuth provider.
+:::
 
 Update your `.env` file in your project directory with the desired customizations.
 
@@ -96,36 +116,56 @@ export OAUTH_GITLAB_SECRET = ""
 
 For more information on how to get these from your GitLab application, check out the [integration docs from GitLab](https://docs.gitlab.com/ee/integration/gitlab.html).
 
-## Log Path
+### Read-Only mode
 
-To change the directory where Meltano logs will be generated, update your `.env` in your project directory with the following configuration:
+The disable all modifications to the Meltano UI, you can run Meltano using the *read-only* mode.
 
 ```bash
-# The directory where the Meltano logs will be generated
-export MELTANO_LOG_PATH = ""
+# Meltano read-only mode
+export MELTANO_READONLY=1
 ```
 
-## Service Listen Configuration
+### OAuth Service
 
-By default, the API and Airflow services listen with following host/port combinations.
-
-API: `http://0.0.0.0:5000`
-Airflow: `http://0.0.0.0:5010`
-
-To change the host/port configuration on which the API or Airflow server listen, update your `.env` in your project directory with the following configuration:
-
-:::warning Airflow integration
-Meltano expects Airflow to be available on the **same host** it is currently exposed from.
-
-Meltano doesn't support connecting to a remote Airflow instance.
+::: tip
+Meltano provides a public hosted solution at <https://oauth.svc.meltanodata.com>.
 :::
 
 ```bash
-# Meltano API configuration
-export MELTANO_API_HOSTNAME="0.0.0.0"
-export MELTANO_API_PORT="5000"
+# use the public OAuth Service
+MELTANO_OAUTH_SERVICE_URL=https://oauth.svc.meltanodata.com
 
-# Airflow configuration
-export AIRFLOW__WEBSERVER__WEB_SERVER_HOST="0.0.0.0"
-export AIRFLOW__WEBSERVER__WEB_SERVER_PORT="5010"
+# use the local OAuth Service
+MELTANO_OAUTH_SERVICE_URL=http://localhost:5000/-/oauth
+```
+
+## Meltano OAuth Service
+
+Meltano ships with an OAuth Service to handle the OAuth flow in the Extractors' configuration.
+
+::: warning
+To run this service, you **must** have a registered OAuth application on the [Authorization server](https://www.oauth.com/oauth2-servers/definitions/#the-authorization-server).
+
+Most importantly, the Redirect URI must be set properly so that the OAuth flow can be completed.
+
+This process is specific to each Provider.
+:::
+
+### Starting the service
+
+The OAuth Service is bundled within Meltano, and is automatically started with `meltano ui` and mounted at `/-/oauth` for development purposes.
+
+As it is a Flask application, it can also be run as a standalone using:
+
+```bash
+FLASK_ENV=production FLASK_APP=meltano.oauth python -m flask run --port 9999
+```
+
+### Providers configuration
+
+#### Facebook
+
+```bash
+OAUTH_FACEBOOK_CLIENT_ID=<application_id>
+OAUTH_FACEBOOK_CLIENT_SECRET=<application_secret>
 ```

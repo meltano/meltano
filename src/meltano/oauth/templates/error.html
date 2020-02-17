@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block main %}
+{% include "_title.html" %}
+
+<div class="box">
+  <h2 class="subtitle">Something when wrong :(</h2>
+
+  <div class="content has-text-left">
+    <p>
+      We could not fetch the token from the provider for any of the following reasons:
+    </p>
+    <ul>
+      <li>The authorization flow has been interrupted</li>
+      <li>You are not authorized to access the provider's resources</li>
+      <li>OAuth Service cannot process the provider's response</li>
+    </ul>
+  </div>
+</div>
+
+{% endblock %}

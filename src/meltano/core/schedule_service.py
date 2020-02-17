@@ -4,10 +4,12 @@ from typing import Optional
 from datetime import datetime, date
 
 from .plugin.settings_service import PluginSettingsService, PluginSettingMissingError
+from .plugin_discovery_service import PluginDiscoveryService
 from .project import Project
 from .plugin import PluginType, PluginRef
 from .db import project_engine
-from .utils import nest, iso8601_datetime, coerce_datetime
+from .utils import nest, iso8601_datetime, coerce_datetime, find_named, NotFound
+from .meltano_file import Schedule
 
 
 class ScheduleAlreadyExistsError(Exception):
@@ -17,17 +19,31 @@ class ScheduleAlreadyExistsError(Exception):
         self.schedule = schedule
 
 
-Schedule = namedtuple(
-    "Schedule",
-    ("name", "extractor", "loader", "transform", "interval", "start_date", "env"),
-)
+class ScheduleDoesNotExistError(Exception):
+    """Occurs when a schedule does not exist."""
+
+    def __init__(self, name):
+        self.name = name
+
+
+class ScheduleNotFoundError(Exception):
+    """Occurs when a schedule for a namespace cannot be found."""
+
+    def __init__(self, namespace):
+        self.namespace = namespace
 
 
 class ScheduleService:
     def __init__(
-        self, project: Project, plugin_settings_service: PluginSettingsService = None
+        self,
+        project: Project,
+        plugin_discovery_service: PluginDiscoveryService = None,
+        plugin_settings_service: PluginSettingsService = None,
     ):
         self.project = project
+        self.plugin_discovery_service = (
+            plugin_discovery_service or PluginDiscoveryService(project)
+        )
         self.plugin_settings_service = plugin_settings_service or PluginSettingsService(
             project
         )
@@ -46,11 +62,15 @@ class ScheduleService:
         start_date = coerce_datetime(start_date) or self.default_start_date(
             session, extractor
         )
+
         schedule = Schedule(
             name, extractor, loader, transform, interval, start_date, env=env
         )
 
         return self.add_schedule(schedule)
+
+    def remove(self, name):
+        return self.remove_schedule(name)
 
     def default_start_date(self, session, extractor: str) -> datetime:
         """
@@ -78,26 +98,57 @@ class ScheduleService:
     def add_schedule(self, schedule: Schedule):
         with self.project.meltano_update() as meltano:
             # guard if it already exists
-            if any(map(lambda s: s.name == schedule.name, self.schedules())):
+            if schedule in meltano.schedules:
                 raise ScheduleAlreadyExistsError(schedule)
 
-            # find the orchestrator plugin config
-            schedules = nest(meltano, "schedules", value=[])
-            schedules.append(self.schedule_definition(schedule))
+            meltano.schedules.append(schedule)
 
         return schedule
 
+    def remove_schedule(self, name: str):
+        with self.project.meltano_update() as meltano:
+            try:
+                # guard if it doesn't exist
+                schedule = find_named(self.schedules(), name)
+            except NotFound:
+                raise ScheduleDoesNotExistError(name)
+
+            # find the schedules plugin config
+            meltano.schedules.remove(schedule)
+
+        return name
+
+    def update_schedule(self, schedule: Schedule):
+        with self.project.meltano_update() as meltano:
+            try:
+                idx = meltano.schedules.index(schedule)
+                meltano.schedules[idx] = schedule
+            except ValueError:
+                raise ScheduleDoesNotExistError(schedule.name)
+
+    def find_namespace_schedule(self, namespace: str) -> Schedule:
+
+        """
+        Search for a Schedule that runs for a certain plugin namespace.
+        For instance, `tap_carbon` would yield the first schedule that
+        runs for the `tap-carbon` extractor.
+        """
+
+        try:
+            extractor = next(
+                extractor
+                for extractor in self.plugin_discovery_service.plugins()
+                if extractor.type == PluginType.EXTRACTORS
+                and extractor.namespace == namespace
+            )
+
+            return next(
+                schedule
+                for schedule in self.schedules()
+                if schedule.extractor == extractor.name
+            )
+        except StopIteration:
+            raise ScheduleNotFoundError(namespace)
+
     def schedules(self):
-        return (
-            self.yaml_schedule(schedule_def)
-            for schedule_def in self.project.meltano.get("schedules", [])
-        )
-
-    @classmethod
-    def schedule_definition(cls, schedule: Schedule) -> dict:
-        definition = schedule._asdict()
-        return dict(definition)
-
-    @classmethod
-    def yaml_schedule(cls, schedule_definition: dict) -> Schedule:
-        return Schedule(**schedule_definition)
+        return self.project.meltano.schedules

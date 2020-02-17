@@ -1,11 +1,11 @@
 import logging
 from fnmatch import fnmatch
 from functools import wraps
+from datetime import datetime
 
 from flask import request
 from flask_security import auth_required
 from flask_login import current_user
-from flask_jwt_extended import jwt_required
 from flask_principal import Permission, Need
 from werkzeug.exceptions import Forbidden
 from .identity import FreeUser
@@ -61,24 +61,23 @@ def permit(permission_type, context):
 
 
 def api_auth_required(f):
-    auth_decorated = jwt_required(f)
-
     @wraps(f)
     def decorated():
         if request.method == "OPTIONS":
             return f()
 
+        # bypass check for the FreeUser
         session_user = current_user._get_current_object()
         if isinstance(session_user, FreeUser):
             logging.debug(f"Authentication bypassed`")
             return f()
 
+        # authentify the user
         if session_user.is_authenticated:
             logging.debug(f"@{session_user.username} authenticated via `session`")
             return f()
 
-        logging.debug("JWT authentication pending")
-        return auth_decorated()
+        return "Authentication is required to access this resource.", 401
 
     return decorated
 
@@ -111,3 +110,11 @@ def _identity_loaded_hook(sender, identity):
         perm = Need(perm.type, perm.context)
 
         identity.provides.add(perm)
+
+
+def _user_logged_in_hook(sender, user):
+    """
+    Update the audit columns for the User
+    """
+    user.last_login_at = datetime.utcnow()
+    user.login_count += 1

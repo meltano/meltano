@@ -6,6 +6,7 @@ export default {
   props: {
     forId: { type: String, default: '' },
     inputClasses: { type: String, default: '' },
+    disabled: { type: Boolean, default: false },
     name: { type: String, default: '' },
     value: { type: String, default: '' }
   },
@@ -34,6 +35,7 @@ export default {
       :class="inputClasses"
       :value="formatDateStringYYYYMMDD(value)"
       :name="forId || `date-${name}`"
+      :disabled="disabled"
       :pattern="getInputDateMeta.pattern"
       :min="getInputDateMeta.min"
       :max="getInputDateMeta.today"

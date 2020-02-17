@@ -4,15 +4,15 @@ import Vue from 'vue'
 import { Service } from 'axios-middleware'
 import axios from 'axios'
 
-import App from './App'
+import App from '@/App'
 import Auth from '@/middleware/auth'
 import FatalError from '@/middleware/fatalError'
-import FontAwesome from '@/font-awesome'
-import flaskContext from '@/flask'
-import setupAnalytics from '@/setupAnalytics'
-import setupToasted from '@/setupToasted'
-import router from './router'
-import store from './store'
+import flaskContext from '@/utils/flask'
+import FontAwesome from '@/utils/font-awesome'
+import router from '@/router/app'
+import setupAnalytics from '@/utils/setupAnalytics'
+import setupToasted from '@/utils/setupToasted'
+import store from '@/store'
 import Upgrade from '@/middleware/upgrade'
 
 Vue.config.productionTip = false
@@ -37,7 +37,6 @@ Vue.use(FatalError, {
 })
 Vue.use(Auth, {
   service,
-  router,
   toasted: Vue.toasted
 })
 
@@ -45,10 +44,10 @@ Vue.use(Auth, {
 axios.defaults.headers.common['X-JSON-SCHEME'] = 'camel'
 
 // Flask context
-Vue.prototype.$flask = flaskContext()
+Vue.prototype.$flask = Object.freeze(flaskContext())
 
-// Setup Analytics and Tracking
-setupAnalytics()
+// Conditional analytics using flask context
+setupAnalytics({ id: 'UA-132758957-2', router })
 
 /* eslint-disable no-new */
 new Vue({

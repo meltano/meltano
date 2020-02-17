@@ -17,4 +17,8 @@ class TimeframePeriod:
 
     @property
     def sql(self):
-        return fn.Extract(self.period["label"], self.field.sql, alias=self.alias)
+        return fn.Cast(
+            fn.Extract(self.period["label"], self.field.sql),
+            "INTEGER",
+            alias=self.alias,
+        )

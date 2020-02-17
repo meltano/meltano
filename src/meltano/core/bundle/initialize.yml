@@ -7,6 +7,7 @@ README.md: ""
   /venv
   /.meltano
   .env
+  ui.cfg
 model/.gitkeep: ""
 extract/.gitkeep: ""
 load/.gitkeep: ""
@@ -15,6 +16,10 @@ transform/:
   dbt_project.yml: "bundle://transform/dbt_project.yml"
   profile/profiles.yml: "bundle://transform/profile/profiles.yml"
   models/my_meltano_project/.gitkeep: ""
+  .gitignore: |
+    target/
+    dbt_modules/
+    logs/
 analyze/.gitkeep: ""
 notebook/.gitkeep: ""
 orchestrate/dags: "bundle://dags"

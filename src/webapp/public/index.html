@@ -9,6 +9,7 @@
     <% if (htmlWebpackPlugin.options.injectFlaskContext) { %>
     <%= "<script>window.FLASK = JSON.parse('{{ jsContext | tojson | safe }}');</script>" %>
     <% } %>
+    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono|IBM+Plex+Sans&display=swap" rel="stylesheet">
   </head>
   <body>
     <noscript>
