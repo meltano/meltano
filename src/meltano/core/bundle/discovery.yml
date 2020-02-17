@@ -291,7 +291,7 @@ extractors:
       - ['developer_token', 'oauth_client_id', 'oauth_client_secret', 'refresh_token', 'user_agent', 'customer_ids', 'start_date']
     settings:
       - name: customer_ids
-        label: AdWords account IDs
+        label: AdWords Account IDs
         placeholder: Ex. 1234567890, 1234567891, 1234567892
         description: A comma-separated list of AdWords account IDs to replicate data from
       - name: start_date
@@ -305,21 +305,21 @@ extractors:
         description: Your Developer Token for Google AdWords
         kind: password
       - name: oauth_client_id
-        label: Oauth Client ID
+        label: OAuth Client ID
         placeholder: Ex. 123456789012345.apps.googleusercontent.com
-        description: Your Google Oauth Client ID
+        description: Your Google OAuth Client ID
       - name: oauth_client_secret
-        label: Oauth Client Secret
+        label: OAuth Client Secret
         placeholder: Ex. *****************
-        description: Your Google Oauth Client Secret
+        description: Your Google OAuth Client Secret
       - name: refresh_token
-        label: Oauth Refresh Token
+        label: OAuth Refresh Token
         placeholder: Ex. *****************
         description: The Refresh Token generated through the OAuth flow run using your OAuth Client and your Developer Token
       - name: user_agent
-        label: User Agent for your Oauth Client
+        label: User Agent for your OAuth Client
         placeholder: Ex. Meltano
-        description: The User Agent for your Oauth Client (used in requests made to the AdWords API)
+        description: The User Agent for your OAuth Client (used in requests made to the AdWords API)
       - name: conversion_window_days
         label: Conversion Window Days
         value: 0
