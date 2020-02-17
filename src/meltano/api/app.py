@@ -91,6 +91,7 @@ def create_app(config={}):
     # 3) Register the controllers
 
     from .controllers.dashboards import dashboardsBP
+    from .controllers.embeds import embedsBP
     from .controllers.reports import reportsBP
     from .controllers.repos import reposBP
     from .controllers.settings import settingsBP
@@ -100,6 +101,7 @@ def create_app(config={}):
     from .controllers.root import root, api_root
 
     app.register_blueprint(dashboardsBP)
+    app.register_blueprint(embedsBP)
     app.register_blueprint(reportsBP)
     app.register_blueprint(reposBP)
     app.register_blueprint(settingsBP)
