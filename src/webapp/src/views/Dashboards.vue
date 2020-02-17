@@ -2,15 +2,15 @@
 import Vue from 'vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
 
-import Dropdown from '@/components/generic/Dropdown'
 import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
+import Dropdown from '@/components/generic/Dropdown'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
   name: 'Dashboards',
   components: {
-    Dropdown,
     CreateDashboardModal,
+    Dropdown,
     RouterViewLayout
   },
   data() {

@@ -1,16 +1,16 @@
 import Router from 'vue-router'
 
-import ReportEmbed from '@/views/ReportEmbed'
+import ResourceEmbed from '@/views/ResourceEmbed'
 
 const router = new Router({
   mode: 'history',
   routes: [
     {
       path: '/-/embed/:token',
-      name: 'report-embed',
-      component: ReportEmbed,
+      name: 'resource-embed',
+      component: ResourceEmbed,
       meta: {
-        title: 'Meltano Report Embed'
+        title: 'Meltano Resource Embed'
       },
       props: true
     }
