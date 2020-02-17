@@ -3,18 +3,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
 
+- [#1740](https://gitlab.com/meltano/meltano/issues/1740) Add "Sharing Reports and Dashboards" section to Getting Started guide
+
 ### Changes
+
+- [#1740](https://gitlab.com/meltano/meltano/issues/1740) Update Getting Started guide screenshots with up-to-date UI
 
 ### Fixes
 
 ### Breaks
-
 
 ## 1.21.0 - (2020-02-17)
 
@@ -37,7 +40,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1680](https://gitlab.com/meltano/meltano/issues/1680) Fix initial "Last Run" button of a pipeline run to properly open the corresponding job log
-
 
 ## 1.20.1 - (2020-02-13)
 
