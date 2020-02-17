@@ -35,6 +35,7 @@ These buttons are also available via the **Reports** main navigation dropdown or
 
 Some of our popular data source connectors include:
 
+- [Facebook Ads](/plugins/extractors/facebook.html)
 - [Google Analytics](/plugins/extractors/google-analytics.html#google-analytics)
 - [Stripe](/plugins/extractors/stripe.html#stripe)
 - [Salesforce](/plugins/extractors/salesforce.html#salesforce)
