@@ -100,7 +100,7 @@ export default {
 
 <template>
   <router-view-layout>
-    <div class="container view-body is-fluid">
+    <div class="container view-body is-widescreen">
       <section>
         <div class="columns is-vcentered">
           <div class="column">
@@ -110,7 +110,7 @@ export default {
             </h3>
           </div>
           <div class="column">
-            <div v-if="isEditable" class="buttons is-pulled-right">
+            <div v-if="isEditable" class="buttons is-right">
               <button class="button" @click="updateDashboardReportPositions">
                 Save
               </button>
@@ -119,6 +119,7 @@ export default {
               </button>
             </div>
             <div v-else class="buttons is-pulled-right">
+              <a class="button" :href="dashboardEmail">Share</a>
               <button
                 v-if="!isEditable"
                 class="button"
