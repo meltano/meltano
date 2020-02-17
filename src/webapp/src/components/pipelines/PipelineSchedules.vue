@@ -98,7 +98,7 @@ export default {
 </script>
 
 <template>
-  <div class="box table-container">
+  <div class="box">
     <table class="table is-fullwidth is-hoverable">
       <ScheduleTableHead has-actions has-start-date />
 
