@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1693](https://gitlab.com/meltano/meltano/issues/1693) Add default transformations for the Google Ads Extractor. They are using the dbt package defined in https://gitlab.com/meltano/dbt-tap-adwords
 - [#1694](https://gitlab.com/meltano/meltano/issues/1694) Add default Meltano Models for the Google Ads Extractor. They are defined in https://gitlab.com/meltano/model-adwords
 - [#1695](https://gitlab.com/meltano/meltano/issues/1695) Add documentation for the Google Ads Extractor
+- [#1723](https://gitlab.com/meltano/meltano/issues/1723) Added various mobile and widescreen related style tweaks to improve base layout at mobile and widescreen widths
 
 ### Changes
 

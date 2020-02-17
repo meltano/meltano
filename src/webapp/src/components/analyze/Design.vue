@@ -307,7 +307,7 @@ export default {
   <section>
     <div class="columns is-vcentered v-min-4-5r">
       <div class="column">
-        <div class="is-grouped is-pulled-left">
+        <div class="is-grouped">
           <div
             class="has-text-weight-bold"
             :class="{ 'is-italic': !hasActiveReport }"
@@ -322,7 +322,7 @@ export default {
       </div>
 
       <div class="column">
-        <div class="field is-grouped is-pulled-right">
+        <div class="field is-grouped is-grouped-right">
           <p
             v-if="hasActiveReport"
             class="control"
@@ -913,7 +913,7 @@ export default {
               </div>
             </div>
             <div class="column">
-              <div class="field is-grouped is-pulled-right">
+              <div class="field is-grouped is-grouped-right">
                 <div class="control buttons has-addons">
                   <button
                     class="button tooltip"

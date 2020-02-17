@@ -60,7 +60,7 @@ export default {
 
 <template>
   <router-view-layout>
-    <div class="container view-body is-fluid">
+    <div class="container view-body is-widescreen">
       <section>
         <div class="columns is-vcentered">
           <div class="column">
@@ -78,7 +78,7 @@ export default {
           </div>
         </div>
 
-        <div v-if="getSortedDashboards.length > 0" class="box">
+        <div v-if="getSortedDashboards.length > 0" class="box table-container">
           <table class="table is-fullwidth is-narrow is-hoverable">
             <thead>
               <tr>

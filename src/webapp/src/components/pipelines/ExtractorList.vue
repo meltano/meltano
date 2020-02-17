@@ -65,39 +65,49 @@ export default {
 
 <template>
   <div>
-    <article
+    <div
       v-for="(extractor, index) in visibleExtractors"
       :key="`${extractor.name}-${index}`"
-      class="media is-hoverable"
-      :data-test-id="`${extractor.name}-extractor-card`"
+      class="columns is-vcentered"
     >
-      <figure class="media-left">
-        <p class="image level-item is-48x48 container">
-          <ConnectorLogo :connector="extractor.name" />
-        </p>
-      </figure>
-      <div class="media-content">
-        <div class="content">
-          <p>
-            <span class="has-text-weight-bold">{{ extractor.label }}</span>
-            <br />
-            <small>{{ extractor.description }}</small>
-            <template v-if="getIsPluginInstalled('extractors', extractor.name)">
-              <br />
-              <a
-                class="button is-static is-small is-borderless has-background-white"
-              >
-                <span class="icon" :class="`has-text-success`">
-                  <font-awesome-icon icon="check-circle"></font-awesome-icon>
-                </span>
-                <span class="has-text-grey is-italic">Installed</span>
-              </a>
-            </template>
-          </p>
-        </div>
+      <div class="column">
+        <article
+          class="media"
+          :data-test-id="`${extractor.name}-extractor-card`"
+        >
+          <figure class="media-left">
+            <p class="image level-item is-48x48 container">
+              <ConnectorLogo :connector="extractor.name" />
+            </p>
+          </figure>
+          <div class="media-content">
+            <div class="content">
+              <p>
+                <span class="has-text-weight-bold">{{ extractor.label }}</span>
+                <br />
+                <small>{{ extractor.description }}</small>
+                <template
+                  v-if="getIsPluginInstalled('extractors', extractor.name)"
+                >
+                  <br />
+                  <a
+                    class="button is-static is-small is-borderless has-background-white"
+                  >
+                    <span class="icon" :class="`has-text-success`">
+                      <font-awesome-icon
+                        icon="check-circle"
+                      ></font-awesome-icon>
+                    </span>
+                    <span class="has-text-grey is-italic">Installed</span>
+                  </a>
+                </template>
+              </p>
+            </div>
+          </div>
+        </article>
       </div>
-      <figure class="media-right is-flex is-flex-column is-vcentered">
-        <div class="buttons">
+      <div class="column">
+        <div class="buttons is-right">
           <a
             v-if="getHasPipelineWithExtractor(extractor.name)"
             href="#pipelines"
@@ -117,8 +127,8 @@ export default {
             <span>{{ getConnectionLabel(extractor.name) }}</span>
           </button>
         </div>
-      </figure>
-    </article>
+      </div>
+    </div>
   </div>
 </template>
 
