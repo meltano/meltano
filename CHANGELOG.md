@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.21.0 - (2020-02-17)
 
 ---
 
@@ -25,7 +38,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1680](https://gitlab.com/meltano/meltano/issues/1680) Fix initial "Last Run" button of a pipeline run to properly open the corresponding job log
 
-### Breaks
 
 ## 1.20.1 - (2020-02-13)
 
