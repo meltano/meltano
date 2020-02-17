@@ -3,24 +3,42 @@ cypress:
   image:
     name: cypress/included:3.4.1
     entrypoint: [""]
+  variables:
+    npm_config_cache: "$CI_PROJECT_DIR/.npm"
+    CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
+    CYPRESS_baseUrl: http://meltano:5000/
+
+    # `meltano` service configuration
+    MELTANO_PROJECT_INIT: cypress
+
+    # `postgres` service configuration
+    POSTGRES_HOST_AUTH_METHOD: trust
+    POSTGRES_ADDRESS: postgres
+    POSTGRES_PORT: 5432
+    POSTGRES_USER: runner
+    POSTGRES_PASSWORD: ""
+    POSTGRES_DB: pytest_warehouse
+
+    # `target-postgres` configuration
+    PG_ADDRESS: $POSTGRES_ADDRESS
+    PG_PORT: $POSTGRES_PORT
+    PG_USERNAME: $POSTGRES_USER
+    PG_PASSWORD: $POSTGRES_PASSWORD
+    PG_DATABASE: $POSTGRES_DB
+  services:
+    - name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+      alias: meltano
+    - name: postgres:11
+  script:
+    - cd src/webapp
+    - yarn
+    - yarn cypress run
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
       - .npm
       - cache/Cypress
       - node_modules
-  variables:
-    npm_config_cache: "$CI_PROJECT_DIR/.npm"
-    CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
-    CYPRESS_baseUrl: http://meltano:5000/
-    MELTANO_PROJECT_INIT: cypress
-  script:
-    - cd src/webapp
-    - yarn
-    - yarn cypress run
-  services:
-    - name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-      alias: meltano
   artifacts:
     paths:
       - src/webapp/tests/e2e/videos
