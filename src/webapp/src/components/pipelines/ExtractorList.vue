@@ -39,9 +39,16 @@ export default {
       }
     },
     getExtractorConfigurationNeedsFixing() {
-      return extractorName =>
-        this.getHasPipelineWithExtractor(extractorName) &&
-        !this.getPipelineWithExtractor(extractorName).hasEverSucceeded
+      return extractorName => {
+        const pipeline = this.getPipelineWithExtractor(extractorName)
+        return pipeline && !pipeline.isRunning && !pipeline.hasEverSucceeded
+      }
+    },
+    getIsRelatedPipelineRunning() {
+      return extractorName => {
+        const pipeline = this.getPipelineWithExtractor(extractorName)
+        return pipeline && pipeline.isRunning
+      }
     }
   },
   methods: {
@@ -100,14 +107,15 @@ export default {
           >
             <span>View Pipeline</span>
           </a>
-          <a
+          <button
             class="button tooltip is-tooltip-left"
             :class="getConnectionStyle(extractor.name)"
+            :disabled="getIsRelatedPipelineRunning(extractor.name)"
             data-tooltip="Install and connect to this data source"
             @click="updateExtractorSettings(extractor)"
           >
             <span>{{ getConnectionLabel(extractor.name) }}</span>
-          </a>
+          </button>
         </div>
       </figure>
     </article>
