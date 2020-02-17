@@ -9,6 +9,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#609](https://gitlab.com/meltano/meltano/issues/609) Add the Google Ads Extractor to Meltano as a hidden plugin. It will be fully enabled on Meltano UI once OAuth support is added. It uses the tap defined in https://gitlab.com/meltano/tap-adwords/
+- [#1693](https://gitlab.com/meltano/meltano/issues/1693) Add default transformations for the Google Ads Extractor. They are using the dbt package defined in https://gitlab.com/meltano/dbt-tap-adwords
+- [#1694](https://gitlab.com/meltano/meltano/issues/1694) Add default Meltano Models for the Google Ads Extractor. They are defined in https://gitlab.com/meltano/model-adwords
+- [#1695](https://gitlab.com/meltano/meltano/issues/1695) Add documentation for the Google Ads Extractor
+
 ### Changes
 
 - [!1460](https://gitlab.com/meltano/meltano/merge_requests/1460) Removed the FTP access from Meltano hosted instances
