@@ -11,8 +11,8 @@ import sqlalchemy as sa
 from meltano.migrations import GUID
 
 # revision identifiers, used by Alembic.
-revision = '87d9638f6ac6'
-down_revision = '23ea52e6d784'
+revision = "87d9638f6ac6"
+down_revision = "23ea52e6d784"
 branch_labels = None
 depends_on = None
 

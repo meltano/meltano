@@ -474,7 +474,7 @@ class SubscriptionResource(Resource):
         Subscription.query.filter_by(id=id).delete()
         db.session.commit()
 
-        return '', 204
+        return "", 204
 
 
 orchestrationsAPI.add_resource(SubscriptionsResource, "/subscriptions")

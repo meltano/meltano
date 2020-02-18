@@ -2,23 +2,21 @@
 import Vue from 'vue'
 import { mapActions } from 'vuex'
 
-import orchestrationsApi from '@/api/orchestrations'
 import utils from '@/utils/utils'
 
-
 export default {
-  name: "Subscribe",
+  name: 'Subscribe',
   props: {
     eventType: { type: String, required: true },
     sourceType: { type: String, default: null },
-    sourceId: { type: String, default: null },
+    sourceId: { type: String, default: null }
   },
 
   data() {
     return {
       model: {
         recipient: null
-      },
+      }
     }
   },
 
@@ -29,9 +27,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('orchestration', [
-      'createSubscription'
-    ]),
+    ...mapActions('orchestration', ['createSubscription']),
     handleSubscribe() {
       if (!this.isValid) {
         return
@@ -42,16 +38,18 @@ export default {
         sourceType: this.sourceType,
         sourceId: this.sourceId,
         ...this.model
-      }).then(response => {
-        const { recipient } = response.data
-        Vue.toasted.global.success(`Subscription created for '${recipient}'.`)
-      }).catch(this.$error.handle)
-      .finally(this.reset)
+      })
+        .then(response => {
+          const { recipient } = response.data
+          Vue.toasted.global.success(`Subscription created for '${recipient}'.`)
+        })
+        .catch(this.$error.handle)
+        .finally(this.reset)
     },
 
     reset() {
       this.model.recipient = null
-    },
+    }
   }
 }
 </script>
@@ -59,11 +57,13 @@ export default {
 <template>
   <div class="field has-addons">
     <div class="control has-icons-left">
-      <input class="input"
-             v-model="model.recipient"
-             type="email"
-             name="email"
-             placeholder="Your email address" />
+      <input
+        v-model="model.recipient"
+        class="input"
+        type="email"
+        name="email"
+        placeholder="Your email address"
+      />
       <span class="icon is-small is-left">
         <font-awesome-icon icon="envelope" />
       </span>

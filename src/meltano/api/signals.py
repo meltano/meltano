@@ -13,7 +13,7 @@ from meltano.api.models.subscription import Subscription
 
 
 pipeline = Namespace()
-pipeline_completed = pipeline.signal('completed')
+pipeline_completed = pipeline.signal("completed")
 
 
 class PipelineSignals:
@@ -22,11 +22,7 @@ class PipelineSignals:
         job_finder = JobFinder(pipeline["name"])
         jobs = job_finder.successful(session).all()
 
-        pipeline_completed.send(
-            pipeline,
-            success=success,
-            first_run=len(jobs) <= 1
-        )
+        pipeline_completed.send(pipeline, success=success, first_run=len(jobs) <= 1)
 
 
 class NotificationHandlers:
@@ -42,31 +38,35 @@ class NotificationHandlers:
         """
 
         if not kwargs["success"]:
-            logging.debug(f"Not sending 'pipeline_first_run' because `{sender}` run has failed.")
+            logging.debug(
+                f"Not sending 'pipeline_first_run' because `{sender}` run has failed."
+            )
             return
 
         if not kwargs["first_run"]:
-            logging.debug(f"Not sending 'pipeline_first_run' because `{sender}` has already ran.")
+            logging.debug(
+                f"Not sending 'pipeline_first_run' because `{sender}` has already ran."
+            )
             return
 
         messages = []
-        job_id = sender['name']
-        instance_url = url_for('root.default', path=f"data/schedule/{job_id}", _external=True)
-        subscriptions = (
-            Subscription.query
-            .filter_by(event_type='pipeline_first_run',
-                       source_type="pipeline",
-                       source_id=job_id)
-            .all()
+        job_id = sender["name"]
+        instance_url = url_for(
+            "root.default", path=f"data/schedule/{job_id}", _external=True
         )
-        html = render_template('email/pipeline_first_run.html',
-                                   pipeline=sender,
-                                   instance_url=instance_url)
+        subscriptions = Subscription.query.filter_by(
+            event_type="pipeline_first_run", source_type="pipeline", source_id=job_id
+        ).all()
+        html = render_template(
+            "email/pipeline_first_run.html", pipeline=sender, instance_url=instance_url
+        )
 
         for subscription in subscriptions:
-            msg = Message(subject="Your Meltano data source is ready!",
-                          html=html,
-                          recipients=[subscription.recipient])
+            msg = Message(
+                subject="Your Meltano data source is ready!",
+                html=html,
+                recipients=[subscription.recipient],
+            )
             messages.append(msg)
 
         with mail.connect() as conn:

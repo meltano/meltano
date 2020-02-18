@@ -119,6 +119,7 @@ def create_app(config={}):
     # Notifications
     if app.config["MELTANO_NOTIFICATION"]:
         from meltano.api.signals import NotificationHandlers
+
         notifications = NotificationHandlers()
         notifications.init(app)
 

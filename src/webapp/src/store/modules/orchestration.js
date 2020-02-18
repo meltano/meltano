@@ -145,10 +145,6 @@ const actions = {
     })
   },
 
-  getPipelineSubscriptions({ commit, dispatch }, pipeline) {
-    return orchestrationsApi.getSubscriptions()
-  },
-
   getJobLog(_, jobId) {
     return orchestrationsApi.getJobLog({ jobId })
   },

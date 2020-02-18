@@ -37,9 +37,9 @@ def defer_run_elt(schedule_payload: dict):
 
     result = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    PipelineSignals.on_completed(db.session,
-                                 schedule_payload,
-                                 success=result.returncode == 0)
+    PipelineSignals.on_completed(
+        db.session, schedule_payload, success=result.returncode == 0
+    )
 
 
 def run_elt(project: Project, schedule_payload: dict):

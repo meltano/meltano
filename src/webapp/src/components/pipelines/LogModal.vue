@@ -182,9 +182,11 @@ export default {
             :trigger-promise="getDownloadPromise"
             :trigger-payload="{ jobId }"
           ></DownloadButton>
-          <SubscribeButton eventType="pipeline_first_run"
-                           sourceType="pipeline"
-                           :sourceId="jobId" />
+          <SubscribeButton
+            event-type="pipeline_first_run"
+            source-type="pipeline"
+            :source-id="jobId"
+          />
         </div>
       </section>
       <footer class="modal-card-foot h-space-between">
