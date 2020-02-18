@@ -167,10 +167,8 @@ export default {
       })
 
       uponDesign.then(() => {
-        // preselect if not loading a report
-        if (!slug && this.isAutoRunQuery) {
-          this.preselectAttributes()
-        }
+        // conditional attribute preselections
+        this.tryPreselect(!slug)
 
         // validate initialization so UI can display while removing the loading bar
         this.isInitialized = true
@@ -198,27 +196,6 @@ export default {
 
     joinRowClicked(join) {
       this.$store.dispatch('designs/expandJoinRow', join)
-    },
-
-    preselectAttributes() {
-      const finder = collectionName =>
-        this.design.relatedTable[collectionName].find(
-          attribute => !attribute.hidden
-        )
-
-      const column = finder('columns')
-      if (column) {
-        this.columnSelected(column)
-      }
-
-      const aggregate = finder('aggregates')
-      if (aggregate) {
-        this.columnSelected(aggregate)
-      }
-
-      if (column || aggregate) {
-        this.runQuery()
-      }
     },
 
     reinitialize() {
@@ -286,6 +263,59 @@ export default {
 
     toggleCreateDashboardModal() {
       this.isCreateDashboardModalOpen = !this.isCreateDashboardModalOpen
+    },
+
+    tryPreselect(isNoSlug) {
+      let hasDefaultPreselections = false
+      let hasRequiredPreselections = false
+
+      // preselect if not loading a report
+      if (isNoSlug) {
+        hasDefaultPreselections = this.tryPreselectDefaultAttributes()
+      }
+      // preselect requireds (temporary until calculated and derived attributes are added https://gitlab.com/meltano/meltano/issues/1714)
+      hasRequiredPreselections = this.tryPreselectRequiredAttributes()
+
+      const hasPreselections =
+        hasDefaultPreselections || hasRequiredPreselections
+      if (this.isAutoRunQuery && hasPreselections) {
+        this.runQuery()
+      }
+    },
+
+    tryPreselectDefaultAttributes() {
+      const finder = collectionName =>
+        this.design.relatedTable[collectionName].find(
+          attribute => !attribute.hidden
+        )
+
+      const column = finder('columns')
+      if (column) {
+        this.columnSelected(column)
+      }
+
+      const aggregate = finder('aggregates')
+      if (aggregate) {
+        this.columnSelected(aggregate)
+      }
+
+      const hasPreselection = column || aggregate
+      return hasPreselection
+    },
+
+    tryPreselectRequiredAttributes() {
+      const requireds = this.design.relatedTable['columns'].filter(
+        attribute => attribute.required && !attribute.hidden
+      )
+      const hasRequireds = requireds.length > 0
+
+      if (hasRequireds) {
+        requireds.forEach(columnAttribute =>
+          this.columnSelected(columnAttribute)
+        )
+      }
+
+      return hasRequireds
     },
 
     updateReport() {
@@ -643,6 +673,7 @@ export default {
                       v-if="!column.hidden"
                       :key="$key(design.relatedTable, 'column', column)"
                       :data-test-id="`column-${column.label}`.toLowerCase()"
+                      :disabled="column.required"
                       class="panel-block space-between has-text-weight-medium"
                       :class="{ 'is-active': column.selected }"
                       @click="columnSelected(column)"
@@ -770,6 +801,7 @@ export default {
                         <a
                           v-if="!column.hidden"
                           :key="$key(join.relatedTable, 'column', column)"
+                          :disabled="column.required"
                           class="panel-block space-between has-text-weight-medium"
                           :class="{ 'is-active': column.selected }"
                           @click="joinColumnSelected(join, column)"
