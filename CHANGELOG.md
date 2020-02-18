@@ -17,8 +17,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-### Breaks
+- [#1751](https://gitlab.com/meltano/meltano/issues/1751) Custom report ordering now works based on user customization
 
+### Breaks
 
 ## 1.21.1 - (2020-02-17)
 
@@ -27,7 +28,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1754](https://gitlab.com/meltano/meltano/issues/1754) Fix duplicate "Share" button and Reports dropdown clipping issue
-
 
 ## 1.21.0 - (2020-02-17)
 
