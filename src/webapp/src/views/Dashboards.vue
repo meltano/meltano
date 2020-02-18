@@ -100,7 +100,7 @@ export default {
               <template v-for="dashboard in getSortedDashboards">
                 <tr
                   :key="dashboard.id"
-                  data-test-id="dashboard-link"
+                  data-cy="dashboard-link"
                   class="has-cursor-pointer"
                   @click="goToDashboard(dashboard)"
                 >

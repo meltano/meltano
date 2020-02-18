@@ -110,7 +110,7 @@ export default {
                 Cancel
               </button>
               <button
-                data-test-id="button-save-report"
+                data-cy="button-save-report"
                 class="button"
                 :disabled="!addProfileSettings.name"
                 data-dropdown-auto-close

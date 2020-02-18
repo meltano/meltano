@@ -69,12 +69,10 @@ export default {
       v-for="(extractor, index) in visibleExtractors"
       :key="`${extractor.name}-${index}`"
       class="columns is-vcentered"
+      :data-cy="`${extractor.name}-extractor-card`"
     >
       <div class="column">
-        <article
-          class="media"
-          :data-test-id="`${extractor.name}-extractor-card`"
-        >
+        <article class="media">
           <figure class="media-left">
             <p class="image level-item is-48x48 container">
               <ConnectorLogo :connector="extractor.name" />

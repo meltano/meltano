@@ -326,6 +326,7 @@ Our end-to-end tests are currently being built with [Cypress](https://www.cypres
 1. Open Meltano repo in Terminal
 1. Run `yarn setup`
 1. Run `yarn test:e2e`
+<!-- Update to say that UI development steps should be followed -->
 
 This will kick off a Cypress application that will allow you to run tests as desired by clicking each test suite (which can be found in `/src/tests/e2e/specs/*.spec.js`)
 
