@@ -25,7 +25,7 @@ const getters = {
     return id => state.reports.find(report => report.id === id)
   },
   getReportsByIds(state) {
-    return ids => state.reports.filter(report => ids.includes(report.id))
+    return ids => ids.map(id => state.reports.find(report => report.id === id))
   }
 }
 
