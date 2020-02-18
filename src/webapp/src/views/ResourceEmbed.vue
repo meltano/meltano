@@ -24,16 +24,16 @@ export default {
       resourceType: null
     }
   },
-  created() {
-    this.initialize()
-  },
-  getters: {
+  computed: {
     getIsResourceDashboard() {
       return this.resourceType === EMBED_RESOURCE_TYPES.DASHBOARD
     },
     getIsResourceReport() {
       return this.resourceType === EMBED_RESOURCE_TYPES.REPORT
     }
+  },
+  created() {
+    this.initialize()
   },
   methods: {
     initialize() {
