@@ -2,6 +2,25 @@ import axios from 'axios'
 import utils from '@/utils/utils'
 
 export default {
+  createSubscription(subscriptionPayload) {
+    return axios.post(
+      utils.apiUrl('orchestrations', `subscriptions`),
+      subscriptionPayload
+    )
+  },
+
+  getSubscriptions() {
+    return axios.get(
+      utils.apiUrl('orchestrations', `subscriptions`)
+    )
+  },
+
+  deleteSubscription(id) {
+    return axios.delete(
+      utils.apiUrl('orchestrations', `subscriptions/${id}`)
+    )
+  },
+
   addConfigurationProfile({ type, name, profile }) {
     return axios.post(
       utils.apiUrl('orchestrations', `${type}/${name}/configuration/profiles`),

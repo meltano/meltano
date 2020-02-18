@@ -4,6 +4,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import AnalyzeList from '@/components/analyze/AnalyzeList'
 import DownloadButton from '@/components/generic/DownloadButton'
 import Dropdown from '@/components/generic/Dropdown'
+import SubscribeButton from '@/components/generic/SubscribeButton'
 import orchestrationsApi from '@/api/orchestrations'
 import poller from '@/utils/poller'
 import utils from '@/utils/utils'
@@ -13,7 +14,8 @@ export default {
   components: {
     AnalyzeList,
     Dropdown,
-    DownloadButton
+    DownloadButton,
+    SubscribeButton
   },
   data() {
     return {
@@ -171,13 +173,19 @@ export default {
             </div>
           </div>
         </article>
-        <DownloadButton
-          label="Download Log"
-          :file-name="`${jobId}-job-log.txt`"
-          :is-disabled="isPolling"
-          :trigger-promise="getDownloadPromise"
-          :trigger-payload="{ jobId }"
-        ></DownloadButton>
+
+        <div class="level">
+          <DownloadButton
+            label="Download Log"
+            :file-name="`${jobId}-job-log.txt`"
+            :is-disabled="isPolling"
+            :trigger-promise="getDownloadPromise"
+            :trigger-payload="{ jobId }"
+          ></DownloadButton>
+          <SubscribeButton eventType="pipeline_first_run"
+                           sourceType="pipeline"
+                           :sourceId="jobId" />
+        </div>
       </section>
       <footer class="modal-card-foot h-space-between">
         <div class="field is-grouped is-grouped-multiline">

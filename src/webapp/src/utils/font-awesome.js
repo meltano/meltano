@@ -6,6 +6,7 @@ import {
   faArrowRight,
   faArrowUp,
   faArrowsAltV,
+  faBell,
   faBolt,
   faBookOpen,
   faCaretDown,
@@ -20,6 +21,7 @@ import {
   faDatabase,
   faDotCircle,
   faDraftingCompass,
+  faEnvelope,
   faExclamationTriangle,
   faExternalLinkSquareAlt,
   faFileAlt,
@@ -59,6 +61,7 @@ export default {
     library.add(faArrowDown)
     library.add(faArrowRight)
     library.add(faArrowUp)
+    library.add(faBell)
     library.add(faBolt)
     library.add(faBookOpen)
     library.add(faCaretDown)
@@ -73,6 +76,7 @@ export default {
     library.add(faDatabase)
     library.add(faDotCircle)
     library.add(faDraftingCompass)
+    library.add(faEnvelope)
     library.add(faExclamationTriangle)
     library.add(faExternalLinkSquareAlt)
     library.add(faFileAlt)

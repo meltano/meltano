@@ -4,9 +4,9 @@ import logging
 import os
 from functools import partial
 from flask_executor import Executor
-from flask_mail import Message
 
-from meltano.api.mail import mail
+from meltano.api.signals import PipelineSignals
+from meltano.api.models import db
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.project import Project
 
@@ -37,12 +37,9 @@ def defer_run_elt(schedule_payload: dict):
 
     result = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    # send a success email?
-    msg = Message(subject="A new Data Source is ready!",
-                  body="Congratulations my man!",
-                  recipients=["mbergeron@gitlab.com"])
-
-    mail.send(msg)
+    PipelineSignals.on_completed(db.session,
+                                 schedule_payload,
+                                 success=result.returncode == 0)
 
 
 def run_elt(project: Project, schedule_payload: dict):

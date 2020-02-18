@@ -116,6 +116,10 @@ const actions = {
     })
   },
 
+  createSubscription(_, subscription) {
+    return orchestrationsApi.createSubscription(subscription)
+  },
+
   deletePipelineSchedule({ commit }, pipeline) {
     let status = {
       pipeline,
@@ -139,6 +143,10 @@ const actions = {
       })
       return state.extractorInFocusConfiguration
     })
+  },
+
+  getPipelineSubscriptions({ commit, dispatch }, pipeline) {
+    return orchestrationsApi.getSubscriptions()
   },
 
   getJobLog(_, jobId) {

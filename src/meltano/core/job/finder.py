@@ -18,7 +18,7 @@ class JobFinder:
             .first()
         )
 
-    def latest_success(self, session):
+    def successful(self, session):
         return (
             session.query(Job)
             .filter(
@@ -26,6 +26,11 @@ class JobFinder:
                 & (Job.state == State.SUCCESS)
                 & Job.ended_at.isnot(None)
             )
+        )
+
+    def latest_success(self, session):
+        return (
+            self.successful(session)
             .order_by(Job.ended_at.desc())
             .first()
         )
