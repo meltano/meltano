@@ -94,7 +94,7 @@ Once we select it, you will see the dashboard you created. You can repeat the ab
 
 ## Share Reports and Dashboards
 
-You can share reports and dashboards publicly too. To do so you click the share dropdown at either the dashboard or report level. The share options for each are:
+Once you've created reports and dashboards, you can share them publicly. Click the share dropdown at either the dashboard or report level. The share options for each are:
 
 - Link (dedicated landing page)
 - Embed (code snippet to embed in a website)
