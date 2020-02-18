@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#1740](https://gitlab.com/meltano/meltano/issues/1740) Add "Sharing Reports and Dashboards" section to Getting Started guide
+- [#1484](https://gitlab.com/meltano/meltano/issues/1484) Add a subscription field to be notified when a Pipeline will be completed.
 
 ### Changes
 
