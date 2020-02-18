@@ -3,13 +3,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
 
+- [#1740](https://gitlab.com/meltano/meltano/issues/1740) Add "Sharing Reports and Dashboards" section to Getting Started guide
+
 ### Changes
+
+- [#1740](https://gitlab.com/meltano/meltano/issues/1740) Update Getting Started guide screenshots with up-to-date UI
 
 ### Fixes
 
