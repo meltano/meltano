@@ -69,7 +69,7 @@ export default {
       </span>
     </div>
     <div class="control">
-      <button class="button is-primary is-outlined" @click="handleSubscribe">
+      <button class="button is-interactive-secondary" @click="handleSubscribe">
         <span class="icon is-small">
           <font-awesome-icon icon="bell" />
         </span>
