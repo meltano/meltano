@@ -703,7 +703,7 @@ export default {
                       :attribute="column"
                       :attribute-type="getAttributeTypeColumn"
                       :design="design"
-                      :disabled="column.required"
+                      :is-disabled="Boolean(column.required)"
                       @attribute-selected="columnSelected(column)"
                       @filter-click="jumpToFilters"
                     />
@@ -824,7 +824,7 @@ export default {
                           :attribute="column"
                           :attribute-type="getAttributeTypeColumn"
                           :design="join"
-                          :disabled="column.required"
+                          :is-disabled="Boolean(column.required)"
                           @attribute-selected="joinColumnSelected(join, column)"
                           @filter-click="jumpToFilters"
                         />
