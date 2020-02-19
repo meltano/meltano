@@ -2,6 +2,8 @@
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import Vue from 'vue'
 
+import lodash from 'lodash'
+
 import capitalize from '@/filters/capitalize'
 import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
 import Dropdown from '@/components/generic/Dropdown'
@@ -304,7 +306,14 @@ export default {
     },
 
     tryPreselectRequiredAttributes() {
-      const requireds = this.design.relatedTable['columns'].filter(
+      const baseTableColumns = this.design.relatedTable['columns']
+      const joinTableColumns = this.design.joins
+        ? this.design.joins.map(join => join.relatedTable['columns'])
+        : []
+      const allAttributes = lodash.flatten(
+        [baseTableColumns].concat(joinTableColumns)
+      )
+      const requireds = allAttributes.filter(
         attribute => attribute.required && !attribute.hidden
       )
       const hasRequireds = requireds.length > 0
@@ -314,7 +323,6 @@ export default {
           this.columnSelected(columnAttribute)
         )
       }
-
       return hasRequireds
     },
 
@@ -669,12 +677,12 @@ export default {
                     Columns
                   </a>
                   <template v-for="column in design.relatedTable.columns">
-                    <a
+                    <button
                       v-if="!column.hidden"
                       :key="$key(design.relatedTable, 'column', column)"
                       :data-test-id="`column-${column.label}`.toLowerCase()"
                       :disabled="column.required"
-                      class="panel-block space-between has-text-weight-medium"
+                      class="panel-block panel-block-button button is-small space-between has-text-weight-medium"
                       :class="{ 'is-active': column.selected }"
                       @click="columnSelected(column)"
                     >
@@ -694,7 +702,7 @@ export default {
                           <font-awesome-icon icon="filter"></font-awesome-icon>
                         </span>
                       </button>
-                    </a>
+                    </button>
                   </template>
                   <!-- eslint-disable-next-line vue/require-v-for-key -->
                   <a
@@ -798,11 +806,11 @@ export default {
                         Columns
                       </a>
                       <template v-for="column in join.relatedTable.columns">
-                        <a
+                        <button
                           v-if="!column.hidden"
                           :key="$key(join.relatedTable, 'column', column)"
                           :disabled="column.required"
-                          class="panel-block space-between has-text-weight-medium"
+                          class="panel-block panel-block-button button is-small space-between has-text-weight-medium"
                           :class="{ 'is-active': column.selected }"
                           @click="joinColumnSelected(join, column)"
                         >
@@ -824,7 +832,7 @@ export default {
                               ></font-awesome-icon>
                             </span>
                           </button>
-                        </a>
+                        </button>
                       </template>
 
                       <!-- eslint-disable-next-line vue/require-v-for-key -->
@@ -1106,6 +1114,19 @@ export default {
   &.attribute-heading {
     cursor: auto;
     padding: 0.25rem 0.75rem;
+  }
+
+  &.panel-block-button {
+    width: 100%;
+    height: auto;
+    border-top: 0;
+    border-bottom: 1px solid #dbdbdb;
+    border-right: 1px solid #dbdbdb;
+    border-radius: 0;
+
+    &:hover {
+      background-color: $white-ter;
+    }
   }
 
   &.table-heading {
