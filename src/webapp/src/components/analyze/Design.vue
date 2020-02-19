@@ -298,7 +298,7 @@ export default {
 
       const aggregate = finder('aggregates')
       if (aggregate) {
-        this.columnSelected(aggregate)
+        this.aggregateSelected(aggregate)
       }
 
       const hasPreselection = column || aggregate
