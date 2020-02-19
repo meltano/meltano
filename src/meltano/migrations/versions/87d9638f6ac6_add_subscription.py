@@ -26,6 +26,7 @@ def upgrade():
         sa.Column("source_type", sa.String(), nullable=True),
         sa.Column("source_id", sa.String(), nullable=True),
         sa.Column("created_at", sa.DateTime),
+        sa.UniqueConstraint("recipient", "event_type", "source_type", "source_id"),
     )
 
 

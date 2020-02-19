@@ -1,8 +1,10 @@
 import asyncio
 import json
 import logging
+import sqlalchemy
 from flask import request, url_for, jsonify, make_response, Response, send_file
 from flask_restful import Api, Resource, fields, marshal, marshal_with
+from werkzeug.exceptions import Conflict
 
 from meltano.core.job import JobFinder, State
 from meltano.core.behavior.canonical import Canonical
@@ -46,8 +48,13 @@ def freeze_profile_config_keys(profile):
 
 
 orchestrationsBP = APIBlueprint("orchestrations", __name__)
-orchestrationsAPI = Api(orchestrationsBP)
-
+orchestrationsAPI = Api(orchestrationsBP, errors={
+     'Conflict': {
+         "error": True,
+         "code": "A subscription already exists for this address.",
+         "status": Conflict.code
+     }
+})
 
 @orchestrationsBP.errorhandler(ScheduleAlreadyExistsError)
 def _handle(ex):
@@ -462,9 +469,13 @@ class SubscriptionsResource(Resource):
     @marshal_with(SubscriptionDefinition)
     def post(self):
         payload = request.get_json()
-        subscription = Subscription(**payload)
-        db.session.add(subscription)
-        db.session.commit()
+
+        try:
+            subscription = Subscription(**payload)
+            db.session.add(subscription)
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            raise Conflict()
 
         return subscription, 201
 
