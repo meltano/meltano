@@ -35,6 +35,10 @@ Interactive helpers often with improved semantic names built on top of Bulma
   @extend .is-info;
 }
 
+.is-size-8 {
+  font-size: 0.6rem !important;
+}
+
 .has-text-interactive-primary {
   @extend .has-text-success;
 }
@@ -49,6 +53,10 @@ Interactive helpers often with improved semantic names built on top of Bulma
 
 .has-text-interactive-navigation {
   color: $primary;
+}
+
+.has-text-inherited {
+  color: inherit;
 }
 
 a.disabled {

@@ -127,29 +127,44 @@ export default {
       </header>
       <section v-if="relatedPipeline" class="modal-card-body">
         <article class="message is-small is-info">
-          <div class="message-body">
-            <div class="content">
-              <p>
-                This pipeline uses the
-                <code>{{ relatedPipeline.extractor }}</code> extractor. Please
-                note:
-              </p>
-              <ul>
-                <li>
-                  Depending on the specific data source, time period, and amount
-                  of data, extraction can take as little as a
-                  <em>few seconds</em>, or as long as <em>multiple hours</em>.
-                </li>
-                <li>
-                  Extraction will continue in the background even if you close
-                  this view.
-                </li>
-                <li>
-                  Once extraction is complete, use the "Reports" button (lower
-                  right of this view) to analyze the imported data.
-                </li>
-              </ul>
-            </div>
+          <p class="message-header">
+            Your data source is getting ready.
+          </p>
+          <div class="message-body content">
+            <p>
+              This pipeline is using the
+              <code>{{ relatedPipeline.extractor }}</code> extractor, please
+              note:
+            </p>
+            <ul>
+              <li>
+                Depending on the specific data source, time period, and amount
+                of data, extraction can take as little as a
+                <em>few seconds</em>, or as long as <em>multiple hours</em>.
+              </li>
+              <li>
+                Extraction will continue in the background even if you close
+                this view.
+              </li>
+              <li>
+                Once extraction is complete, use the "Reports" button (lower
+                right of this view) to analyze the imported data.
+              </li>
+            </ul>
+            <p>
+              <SubscribeButton
+                event-type="pipeline_first_run"
+                source-type="pipeline"
+                :source-id="jobId"
+              >
+                <label
+                  slot="label"
+                  class="label has-text-inherited is-small"
+                  for="email"
+                  >Please notify me when the data is ready</label
+                >
+              </SubscribeButton>
+            </p>
           </div>
         </article>
       </section>
@@ -160,7 +175,7 @@ export default {
       >
         <pre
           v-if="jobLog"
-        ><code class="is-size-7">{{jobLog}}{{getLogAppender}}</code></pre>
+        ><code class="is-size-8">{{jobLog}}{{getLogAppender}}</code></pre>
         <progress v-else class="progress is-small is-info"></progress>
       </section>
       <section class="modal-card-body">
@@ -173,21 +188,13 @@ export default {
             </div>
           </div>
         </article>
-
-        <div class="level">
-          <DownloadButton
-            label="Download Log"
-            :file-name="`${jobId}-job-log.txt`"
-            :is-disabled="isPolling"
-            :trigger-promise="getDownloadPromise"
-            :trigger-payload="{ jobId }"
-          ></DownloadButton>
-          <SubscribeButton
-            event-type="pipeline_first_run"
-            source-type="pipeline"
-            :source-id="jobId"
-          />
-        </div>
+        <DownloadButton
+          label="Download Log"
+          :file-name="`${jobId}-job-log.txt`"
+          :is-disabled="isPolling"
+          :trigger-promise="getDownloadPromise"
+          :trigger-payload="{ jobId }"
+        ></DownloadButton>
       </section>
       <footer class="modal-card-foot h-space-between">
         <div class="field is-grouped is-grouped-multiline">
@@ -256,6 +263,7 @@ export default {
 
 .modal-card-body-log {
   height: 100%;
+  padding: 0;
 }
 
 .modal-card.modal-card-log {

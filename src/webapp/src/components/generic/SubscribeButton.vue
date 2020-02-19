@@ -55,28 +55,36 @@ export default {
 </script>
 
 <template>
-  <div class="field has-addons">
-    <div class="control has-icons-left">
-      <input
-        v-model="model.recipient"
-        class="input"
-        type="email"
-        name="email"
-        placeholder="Your email address"
-      />
-      <span class="icon is-small is-left">
-        <font-awesome-icon icon="envelope" />
-      </span>
-    </div>
-    <div class="control">
-      <button class="button is-interactive-secondary" @click="handleSubscribe">
-        <span class="icon is-small">
-          <font-awesome-icon icon="bell" />
-        </span>
-        <span>
-          Subscribe
-        </span>
-      </button>
+  <div class="field">
+    <slot name="label"></slot>
+    <div class="field-body">
+      <div class="field has-addons">
+        <div class="control has-icons-left">
+          <input
+            v-model="model.recipient"
+            class="input is-small"
+            type="email"
+            name="email"
+            placeholder="Your email address"
+          />
+          <span class="icon is-small is-left">
+            <font-awesome-icon icon="envelope" />
+          </span>
+        </div>
+        <div class="control">
+          <button
+            class="button is-small is-interactive-secondary"
+            @click="handleSubscribe"
+          >
+            <span class="icon is-small">
+              <font-awesome-icon icon="bell" />
+            </span>
+            <span>
+              Notify me
+            </span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>

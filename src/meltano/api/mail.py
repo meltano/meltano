@@ -33,6 +33,8 @@ class MailService:
     def create_message(self, subscription, **kwargs) -> Message:
         """
         Create the basic Message with the proper headers.
+
+        Uses the SendGrid SMTPAPI.
         """
 
         headers = SMTPAPIHeader()
