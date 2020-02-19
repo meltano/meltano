@@ -695,7 +695,13 @@ export default {
                   <template v-for="column in design.relatedTable.columns">
                     <TableAttributeButton
                       v-if="!column.hidden"
-                      :key="$key(design.relatedTable, 'column', column)"
+                      :key="
+                        $key(
+                          design.relatedTable,
+                          getAttributeTypeColumn,
+                          column
+                        )
+                      "
                       :data-test-id="`column-${column.label}`.toLowerCase()"
                       :attribute="column"
                       :attribute-type="getAttributeTypeColumn"
@@ -746,31 +752,26 @@ export default {
                   >
                     Aggregates
                   </a>
-                  <a
-                    v-for="aggregate in design.relatedTable.aggregates"
-                    :key="$key(design.relatedTable, 'aggregate', aggregate)"
-                    :data-test-id="`aggregate-${aggregate.label}`.toLowerCase()"
-                    class="panel-block space-between has-text-weight-medium"
-                    :class="{ 'is-active': aggregate.selected }"
-                    @click="aggregateSelected(aggregate)"
-                  >
-                    {{ aggregate.label }}
-                    <button
-                      v-if="
-                        getIsAttributeInFilters(
-                          design.name,
-                          aggregate.name,
-                          'aggregate'
+                  <template v-for="aggregate in design.relatedTable.aggregates">
+                    <TableAttributeButton
+                      v-if="!aggregate.hidden"
+                      :key="
+                        $key(
+                          design.relatedTable,
+                          getAttributeTypeAggregate,
+                          aggregate
                         )
                       "
-                      class="button is-small"
-                      @click.stop="jumpToFilters"
-                    >
-                      <span class="icon has-text-interactive-secondary">
-                        <font-awesome-icon icon="filter"></font-awesome-icon>
-                      </span>
-                    </button>
-                  </a>
+                      :data-test-id="
+                        `aggregate-${aggregate.label}`.toLowerCase()
+                      "
+                      :attribute="aggregate"
+                      :attribute-type="getAttributeTypeAggregate"
+                      :design="design"
+                      @attribute-selected="aggregateSelected(aggregate)"
+                      @filter-click="jumpToFilters"
+                    />
+                  </template>
                 </template>
 
                 <!-- Join table(s) second, preceded by the base table -->
@@ -809,7 +810,13 @@ export default {
                       <template v-for="column in join.relatedTable.columns">
                         <TableAttributeButton
                           v-if="!column.hidden"
-                          :key="$key(join.relatedTable, 'column', column)"
+                          :key="
+                            $key(
+                              join.relatedTable,
+                              getAttributeTypeColumn,
+                              column
+                            )
+                          "
                           :data-test-id="`column-${column.label}`.toLowerCase()"
                           :attribute="column"
                           :attribute-type="getAttributeTypeColumn"
@@ -884,31 +891,26 @@ export default {
                       <template
                         v-for="aggregate in join.relatedTable.aggregates"
                       >
-                        <a
-                          :key="$key(join.relatedTable, 'aggregate', aggregate)"
-                          class="panel-block space-between has-text-weight-medium"
-                          :class="{ 'is-active': aggregate.selected }"
-                          @click="joinAggregateSelected(join, aggregate)"
-                        >
-                          {{ aggregate.label }}
-                          <button
-                            v-if="
-                              getIsAttributeInFilters(
-                                join.name,
-                                aggregate.name,
-                                'aggregate'
-                              )
-                            "
-                            class="button is-small"
-                            @click.stop="jumpToFilters"
-                          >
-                            <span class="icon has-text-interactive-secondary">
-                              <font-awesome-icon
-                                icon="filter"
-                              ></font-awesome-icon>
-                            </span>
-                          </button>
-                        </a>
+                        <TableAttributeButton
+                          v-if="!aggregate.hidden"
+                          :key="
+                            $key(
+                              join.relatedTable,
+                              getAttributeTypeAggregate,
+                              aggregate
+                            )
+                          "
+                          :data-test-id="
+                            `aggregate-${aggregate.label}`.toLowerCase()
+                          "
+                          :attribute="aggregate"
+                          :attribute-type="getAttributeTypeAggregate"
+                          :design="join"
+                          @attribute-selected="
+                            joinAggregateSelected(join, aggregate)
+                          "
+                          @filter-click="jumpToFilters"
+                        />
                       </template>
                     </template>
                   </template>
