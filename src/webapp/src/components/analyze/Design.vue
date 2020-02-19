@@ -12,6 +12,9 @@ import LoadingOverlay from '@/components/generic/LoadingOverlay'
 import QueryFilters from '@/components/analyze/QueryFilters'
 import ResultChart from '@/components/analyze/ResultChart'
 import ResultTable from '@/components/analyze/ResultTable'
+import TableAttributeButton, {
+  TABLE_ATTRIBUTE_TYPES
+} from '@/components/analyze/TableAttributeButton'
 import utils from '@/utils/utils'
 
 export default {
@@ -26,7 +29,8 @@ export default {
     LoadingOverlay,
     QueryFilters,
     ResultChart,
-    ResultTable
+    ResultTable,
+    TableAttributeButton
   },
   data() {
     return {
@@ -80,6 +84,18 @@ export default {
       const startDate = this.startDate(this.currentExtractor)
 
       return startDate ? startDate : 'Not available'
+    },
+
+    getAttributeTypeAggregate() {
+      return TABLE_ATTRIBUTE_TYPES.AGGREGATE
+    },
+
+    getAttributeTypeColumn() {
+      return TABLE_ATTRIBUTE_TYPES.COLUMN
+    },
+
+    getAttributeTypeTimeframe() {
+      return TABLE_ATTRIBUTE_TYPES.TIMEFRAME
     },
 
     hasActiveReport() {
@@ -677,32 +693,17 @@ export default {
                     Columns
                   </a>
                   <template v-for="column in design.relatedTable.columns">
-                    <button
+                    <TableAttributeButton
                       v-if="!column.hidden"
                       :key="$key(design.relatedTable, 'column', column)"
                       :data-test-id="`column-${column.label}`.toLowerCase()"
+                      :attribute="column"
+                      :attribute-type="getAttributeTypeColumn"
+                      :design="design"
                       :disabled="column.required"
-                      class="panel-block panel-block-button button is-small space-between has-text-weight-medium"
-                      :class="{ 'is-active': column.selected }"
-                      @click="columnSelected(column)"
-                    >
-                      {{ column.label }}
-                      <button
-                        v-if="
-                          getIsAttributeInFilters(
-                            design.name,
-                            column.name,
-                            'column'
-                          )
-                        "
-                        class="button is-small"
-                        @click.stop="jumpToFilters"
-                      >
-                        <span class="icon has-text-interactive-secondary">
-                          <font-awesome-icon icon="filter"></font-awesome-icon>
-                        </span>
-                      </button>
-                    </button>
+                      @attribute-selected="columnSelected(column)"
+                      @filter-click="jumpToFilters"
+                    />
                   </template>
                   <!-- eslint-disable-next-line vue/require-v-for-key -->
                   <a
@@ -806,33 +807,17 @@ export default {
                         Columns
                       </a>
                       <template v-for="column in join.relatedTable.columns">
-                        <button
+                        <TableAttributeButton
                           v-if="!column.hidden"
                           :key="$key(join.relatedTable, 'column', column)"
+                          :data-test-id="`column-${column.label}`.toLowerCase()"
+                          :attribute="column"
+                          :attribute-type="getAttributeTypeColumn"
+                          :design="join"
                           :disabled="column.required"
-                          class="panel-block panel-block-button button is-small space-between has-text-weight-medium"
-                          :class="{ 'is-active': column.selected }"
-                          @click="joinColumnSelected(join, column)"
-                        >
-                          {{ column.label }}
-                          <button
-                            v-if="
-                              getIsAttributeInFilters(
-                                join.name,
-                                column.name,
-                                'column'
-                              )
-                            "
-                            class="button is-small"
-                            @click.stop="jumpToFilters"
-                          >
-                            <span class="icon has-text-interactive-secondary">
-                              <font-awesome-icon
-                                icon="filter"
-                              ></font-awesome-icon>
-                            </span>
-                          </button>
-                        </button>
+                          @attribute-selected="joinColumnSelected(join, column)"
+                          @filter-click="jumpToFilters"
+                        />
                       </template>
 
                       <!-- eslint-disable-next-line vue/require-v-for-key -->
