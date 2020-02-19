@@ -88,9 +88,14 @@ export default {
   &.panel-block-button {
     height: auto;
     border-top: 0;
-    border-bottom: 1px solid #dbdbdb;
-    border-right: 1px solid #dbdbdb;
+    border-bottom: 1px solid $grey-lighter;
+    border-right: 1px solid $grey-lighter;
     border-radius: 0;
+
+    &:focus:not(.is-active) {
+      border-color: $grey-lighter;
+      outline: none;
+    }
 
     &:hover {
       background-color: $white-ter;
