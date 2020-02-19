@@ -61,6 +61,9 @@ export default {
         ? utils.momentFormatlll(this.jobStatus.startedAt)
         : '...'
     },
+    isUITrigger() {
+      return this.jobStatus.trigger == 'ui'
+    },
     relatedPipeline() {
       return this.pipelines.find(pipeline => pipeline.name === this.jobId)
     }
@@ -151,7 +154,7 @@ export default {
                 right of this view) to analyze the imported data.
               </li>
             </ul>
-            <p>
+            <p v-if="isUITrigger">
               <SubscribeButton
                 event-type="pipeline_first_run"
                 source-type="pipeline"

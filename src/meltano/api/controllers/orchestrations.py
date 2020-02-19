@@ -181,6 +181,7 @@ def job_log(job_id) -> Response:
             "has_error": state_job.has_error() if state_job else False,
             "started_at": state_job.started_at if state_job else None,
             "ended_at": state_job.ended_at if state_job else None,
+            "trigger": state_job.trigger if state_job else None,
             "has_ever_succeeded": state_job_success.is_success()
             if state_job_success
             else None,
@@ -389,6 +390,7 @@ def get_pipeline_schedules():
         schedule["job_id"] = state_job.job_id if state_job else None
         schedule["started_at"] = state_job.started_at if state_job else None
         schedule["ended_at"] = state_job.ended_at if state_job else None
+        schedule["trigger"] = state_job.trigger if state_job else None
 
         state_job_success = finder.latest_success(db.session)
         schedule["has_ever_succeeded"] = (

@@ -35,7 +35,12 @@ def defer_run_elt(schedule_payload: dict):
         transform,
     ]
 
-    result = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    result = subprocess.run(
+        cmd,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        env={**os.environ, "MELTANO_JOB_TRIGGER": "ui"},
+    )
 
     # It would probably be better that we would use sqlalchemy ORM events
     # on the `Job` instance, but it would require more changes as it is
