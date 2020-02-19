@@ -1098,30 +1098,13 @@ export default {
     border-top: 1px solid $grey-lighter;
   }
 
-  &.space-between {
-    justify-content: space-between;
-  }
-
-  &.indented {
-    padding-left: 1.5rem;
-  }
-
   &.attribute-heading {
     cursor: auto;
     padding: 0.25rem 0.75rem;
   }
 
-  &.panel-block-button {
-    width: 100%;
-    height: auto;
-    border-top: 0;
-    border-bottom: 1px solid #dbdbdb;
-    border-right: 1px solid #dbdbdb;
-    border-radius: 0;
-
-    &:hover {
-      background-color: $white-ter;
-    }
+  &.indented {
+    padding-left: 1.5rem;
   }
 
   &.table-heading {
@@ -1129,35 +1112,6 @@ export default {
 
     .icon {
       margin-right: 0.5rem;
-    }
-  }
-
-  &.timeframe {
-    &::after {
-      border: 3px solid $grey-darker;
-      border-radius: 2px;
-      border-right: 0;
-      border-top: 0;
-      content: ' ';
-      display: block;
-      height: 0.625em;
-      margin-top: -0.321em;
-      pointer-events: none;
-      position: absolute;
-      top: 50%;
-      -webkit-transform: rotate(-134deg);
-      transform: rotate(-134deg);
-      -webkit-transform-origin: center;
-      transform-origin: center;
-      width: 0.625em;
-      right: 7%;
-    }
-    &.is-active {
-      &::after {
-        margin-top: -0.4375em;
-        -webkit-transform: rotate(-45deg);
-        transform: rotate(-45deg);
-      }
     }
   }
 }

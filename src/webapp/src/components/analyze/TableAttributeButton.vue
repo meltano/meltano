@@ -23,17 +23,21 @@ export default {
   },
   computed: {
     ...mapGetters('designs', ['getIsAttributeInFilters']),
+    getHasSelectedPeriods() {
+      return (
+        this.getIsTimeframe && lodash.some(this.attribute.periods, selected)
+      )
+    },
     getIsActive() {
       return this.getIsTimeframe
-        ? this.getIsTimeframeSelected
+        ? this.attribute.selected || this.getHasSelectedPeriods
         : this.attribute.selected
     },
     getIsTimeframe() {
       return this.attributeType === TABLE_ATTRIBUTE_TYPES.TIMEFRAME
     },
-    getIsTimeframeSelected() {
-      const hasSelectedPeriods = lodash.some(this.attribute.periods, selected)
-      return this.attribute.selected || hasSelectedPeriods
+    getTimeframeIcon() {
+      return `chevron-${this.attribute.selected ? 'up' : 'down'}`
     }
   },
   methods: {
@@ -49,24 +53,53 @@ export default {
 
 <template>
   <button
-    class="panel-block panel-block-button button is-small space-between has-text-weight-medium"
-    :class="{
-      'is-active': getIsActive,
-      timeframe: getIsTimeframe
-    }"
+    class="panel-block panel-block-button button is-small is-fullwidth space-between has-text-weight-medium"
+    :class="{ 'is-active': getIsActive }"
     @click="onAttributeSelected"
   >
     {{ attribute.label }}
-    <button
-      v-if="getIsAttributeInFilters(design.name, attribute.name, attributeType)"
-      class="button is-small"
-      @click.stop="onFilterClick"
-    >
-      <span class="icon has-text-interactive-secondary">
-        <font-awesome-icon icon="filter"></font-awesome-icon>
+
+    <!-- Timeframe vs. Column or Aggregate -->
+    <div v-if="getIsTimeframe" class="mr-025r">
+      <span
+        class="icon"
+        :class="{ 'has-text-interactive-secondary': getIsActive }"
+      >
+        <font-awesome-icon :icon="getTimeframeIcon"></font-awesome-icon>
       </span>
-    </button>
+    </div>
+    <template v-else>
+      <button
+        v-if="
+          getIsAttributeInFilters(design.name, attribute.name, attributeType)
+        "
+        class="button is-small"
+        @click.stop="onFilterClick"
+      >
+        <span class="icon has-text-interactive-secondary">
+          <font-awesome-icon icon="filter"></font-awesome-icon>
+        </span>
+      </button>
+    </template>
   </button>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.panel-block {
+  &.space-between {
+    justify-content: space-between;
+  }
+
+  &.panel-block-button {
+    height: auto;
+    border-top: 0;
+    border-bottom: 1px solid #dbdbdb;
+    border-right: 1px solid #dbdbdb;
+    border-radius: 0;
+
+    &:hover {
+      background-color: $white-ter;
+    }
+  }
+}
+</style>
