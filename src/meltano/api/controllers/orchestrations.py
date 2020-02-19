@@ -48,13 +48,17 @@ def freeze_profile_config_keys(profile):
 
 
 orchestrationsBP = APIBlueprint("orchestrations", __name__)
-orchestrationsAPI = Api(orchestrationsBP, errors={
-     'Conflict': {
-         "error": True,
-         "code": "A subscription already exists for this address.",
-         "status": Conflict.code
-     }
-})
+orchestrationsAPI = Api(
+    orchestrationsBP,
+    errors={
+        "Conflict": {
+            "error": True,
+            "code": "A subscription already exists for this address.",
+            "status": Conflict.code,
+        }
+    },
+)
+
 
 @orchestrationsBP.errorhandler(ScheduleAlreadyExistsError)
 def _handle(ex):

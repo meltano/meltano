@@ -1,8 +1,13 @@
 import uuid
 from datetime import datetime
+from enum import Enum
 
 from meltano.core.sqlalchemy import GUID
 from . import db
+
+
+class SubscriptionEventType(str, Enum):
+    PIPELINE_FIRST_RUN = "pipeline_first_run"
 
 
 class Subscription(db.Model):

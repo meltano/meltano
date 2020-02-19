@@ -37,9 +37,16 @@ def defer_run_elt(schedule_payload: dict):
 
     result = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    PipelineSignals.on_completed(
-        db.session, schedule_payload, success=result.returncode == 0
-    )
+    # It would probably be better that we would use sqlalchemy ORM events
+    # on the `Job` instance, but it would require more changes as it is
+    # a `meltano.core` model.
+    #
+    # The benefit is that we are currently in an executor Thread, so we can
+    # safely send emails without thinking about blocking any requests.
+    #
+    # The caveat here is that pipeline that runs from Airflow won't trigger
+    # this signal, and thus won't send any notification.
+    PipelineSignals.on_complete(schedule_payload, success=result.returncode == 0)
 
 
 def run_elt(project: Project, schedule_payload: dict):
