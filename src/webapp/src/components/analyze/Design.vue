@@ -60,13 +60,11 @@ export default {
       'currentModelLabel',
       'filtersCount',
       'formattedSql',
-      'getIsAttributeInFilters',
       'getSelectedAttributesCount',
       'hasChartableResults',
       'hasFilters',
       'hasJoins',
       'hasResults',
-      'isTimeframeSelected',
       'resultsCount',
       'showAttributesHeader'
     ]),
@@ -722,14 +720,20 @@ export default {
                     Timeframes
                   </a>
                   <template v-for="timeframe in design.relatedTable.timeframes">
-                    <a
-                      :key="$key(design.relatedTable, 'timeframe', timeframe)"
-                      class="panel-block timeframe"
-                      :class="{ 'is-active': isTimeframeSelected(timeframe) }"
-                      @click="timeframeSelected(timeframe)"
-                    >
-                      {{ timeframe.label }}
-                    </a>
+                    <TableAttributeButton
+                      v-if="!timeframe.hidden"
+                      :key="
+                        $key(
+                          design.relatedTable,
+                          getAttributeTypeTimeframe,
+                          timeframe
+                        )
+                      "
+                      :attribute="timeframe"
+                      :attribute-type="getAttributeTypeTimeframe"
+                      :design="design"
+                      @attribute-selected="timeframeSelected(timeframe)"
+                    />
                     <template v-for="period in timeframe.periods">
                       <a
                         v-if="timeframe.selected"
@@ -842,16 +846,20 @@ export default {
                       <template
                         v-for="timeframe in join.relatedTable.timeframes"
                       >
-                        <a
-                          :key="$key(join.relatedTable, 'timeframe', timeframe)"
-                          class="panel-block timeframe"
-                          :class="{
-                            'is-active': timeframe.selected
-                          }"
-                          @click="timeframeSelected(timeframe)"
-                        >
-                          {{ timeframe.label }}
-                        </a>
+                        <TableAttributeButton
+                          v-if="!timeframe.hidden"
+                          :key="
+                            $key(
+                              join.relatedTable,
+                              getAttributeTypeTimeframe,
+                              timeframe
+                            )
+                          "
+                          :attribute="timeframe"
+                          :attribute-type="getAttributeTypeTimeframe"
+                          :design="join"
+                          @attribute-selected="timeframeSelected(timeframe)"
+                        />
                         <template v-if="timeframe.selected">
                           <template v-for="period in timeframe.periods">
                             <a

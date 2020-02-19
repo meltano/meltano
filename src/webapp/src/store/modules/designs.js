@@ -326,9 +326,6 @@ const getters = {
   isColumnSelectedAggregate: state => columnName =>
     columnName in state.resultAggregates,
 
-  isTimeframeSelected: () => timeframe =>
-    timeframe.selected || lodash.some(timeframe.periods, selected),
-
   joinIsExpanded: () => join => join.expanded,
 
   resultsCount(state) {

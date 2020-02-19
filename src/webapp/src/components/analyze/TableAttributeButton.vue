@@ -1,5 +1,8 @@
 <script>
 import { mapGetters } from 'vuex'
+import lodash from 'lodash'
+
+import { selected } from '@/utils/predicates'
 
 export const TABLE_ATTRIBUTE_TYPES = Object.freeze({
   COLUMN: 'column',
@@ -19,7 +22,19 @@ export default {
     design: { type: Object, required: true } // The base table's design or the design of a join table (`.name` and `.relatedTable` use)
   },
   computed: {
-    ...mapGetters('designs', ['getIsAttributeInFilters'])
+    ...mapGetters('designs', ['getIsAttributeInFilters']),
+    getIsActive() {
+      return this.getIsTimeframe
+        ? this.getIsTimeframeSelected
+        : this.attribute.selected
+    },
+    getIsTimeframe() {
+      return this.attributeType === TABLE_ATTRIBUTE_TYPES.TIMEFRAME
+    },
+    getIsTimeframeSelected() {
+      const hasSelectedPeriods = lodash.some(this.attribute.periods, selected)
+      return this.attribute.selected || hasSelectedPeriods
+    }
   },
   methods: {
     onAttributeSelected() {
@@ -35,7 +50,10 @@ export default {
 <template>
   <button
     class="panel-block panel-block-button button is-small space-between has-text-weight-medium"
-    :class="{ 'is-active': attribute.selected }"
+    :class="{
+      'is-active': getIsActive,
+      timeframe: getIsTimeframe
+    }"
     @click="onAttributeSelected"
   >
     {{ attribute.label }}
