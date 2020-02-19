@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#1646](https://gitlab.com/meltano/meltano/issues/1646) Add default Stripe dashboard
+- [#1759](https://gitlab.com/meltano/meltano/issues/1759) Add default reports and dashboard for Google Ads data
 
 ### Changes
 
