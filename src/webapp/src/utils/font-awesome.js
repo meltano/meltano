@@ -26,6 +26,7 @@ import {
   faExternalLinkSquareAlt,
   faFileAlt,
   faFileUpload,
+  faFileDownload,
   faFilter,
   faGift,
   faGlobeAmericas,
@@ -81,6 +82,7 @@ export default {
     library.add(faExternalLinkSquareAlt)
     library.add(faFileAlt)
     library.add(faFileUpload)
+    library.add(faFileDownload)
     library.add(faFilter)
     library.add(faGift)
     library.add(faGlobeAmericas)
