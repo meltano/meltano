@@ -12,9 +12,8 @@ import LoadingOverlay from '@/components/generic/LoadingOverlay'
 import QueryFilters from '@/components/analyze/QueryFilters'
 import ResultChart from '@/components/analyze/ResultChart'
 import ResultTable from '@/components/analyze/ResultTable'
-import TableAttributeButton, {
-  TABLE_ATTRIBUTE_TYPES
-} from '@/components/analyze/TableAttributeButton'
+import TableAttributeButton from '@/components/analyze/TableAttributeButton'
+import { QUERY_ATTRIBUTE_TYPES } from '@/api/design'
 import utils from '@/utils/utils'
 
 export default {
@@ -85,15 +84,15 @@ export default {
     },
 
     getAttributeTypeAggregate() {
-      return TABLE_ATTRIBUTE_TYPES.AGGREGATE
+      return QUERY_ATTRIBUTE_TYPES.AGGREGATE
     },
 
     getAttributeTypeColumn() {
-      return TABLE_ATTRIBUTE_TYPES.COLUMN
+      return QUERY_ATTRIBUTE_TYPES.COLUMN
     },
 
     getAttributeTypeTimeframe() {
-      return TABLE_ATTRIBUTE_TYPES.TIMEFRAME
+      return QUERY_ATTRIBUTE_TYPES.TIMEFRAME
     },
 
     hasActiveReport() {

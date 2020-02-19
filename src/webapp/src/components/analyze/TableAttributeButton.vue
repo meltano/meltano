@@ -2,13 +2,8 @@
 import { mapGetters } from 'vuex'
 import lodash from 'lodash'
 
+import { QUERY_ATTRIBUTE_TYPES } from '@/api/design'
 import { selected } from '@/utils/predicates'
-
-export const TABLE_ATTRIBUTE_TYPES = Object.freeze({
-  COLUMN: 'column',
-  AGGREGATE: 'aggregate',
-  TIMEFRAME: 'timeframe'
-})
 
 export default {
   name: 'TableAttributeButton',
@@ -17,7 +12,7 @@ export default {
     attributeType: {
       type: String,
       required: true,
-      validator: value => Object.values(TABLE_ATTRIBUTE_TYPES).includes(value)
+      validator: value => Object.values(QUERY_ATTRIBUTE_TYPES).includes(value)
     },
     design: { type: Object, required: true } // The base table's design or the design of a join table (`.name` and `.relatedTable` use)
   },
@@ -34,7 +29,7 @@ export default {
         : this.attribute.selected
     },
     getIsTimeframe() {
-      return this.attributeType === TABLE_ATTRIBUTE_TYPES.TIMEFRAME
+      return this.attributeType === QUERY_ATTRIBUTE_TYPES.TIMEFRAME
     },
     getTimeframeIcon() {
       return `chevron-${this.attribute.selected ? 'up' : 'down'}`
