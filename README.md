@@ -2,7 +2,7 @@
 
 # Meltano
 
-Meltano [(www.meltano.com)](https://meltano.com/) is an open source convention-over-configuration product for the whole data lifecycle, all the way from loading data to analyzing it. It is delivered as self-hosted software which can be [installed locally or to the cloud](http://meltano.com/developer-tools/self-hosted-installation.html).
+Meltano [(www.meltano.com)](https://meltano.com/) is an open source convention-over-configuration product for the whole data lifecycle, all the way from loading data to analyzing it. It is delivered as self-hosted software which can be [installed locally or to the cloud](/developer-tools/self-hosted-installation.html).
 
 It does [data ops](https://en.wikipedia.org/wiki/DataOps), data engineering, analytics, business intelligence, and data science. It leverages open source software and software development best practices including version control, CI, CD, and review apps.
 
