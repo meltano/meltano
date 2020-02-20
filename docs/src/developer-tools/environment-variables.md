@@ -197,3 +197,11 @@ FLASK_ENV=production FLASK_APP=meltano.oauth python -m flask run --port 9999
 OAUTH_FACEBOOK_CLIENT_ID=<application_id>
 OAUTH_FACEBOOK_CLIENT_SECRET=<application_secret>
 ```
+
+#### Google Ads
+
+```bash
+OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN=<developer_token>
+OAUTH_GOOGLE_ADWORDS_CLIENT_ID=<application_id>
+OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET=<application_secret>
+```
