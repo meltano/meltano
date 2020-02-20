@@ -376,15 +376,108 @@ export default {
 
       <div class="column">
         <div class="field is-grouped is-grouped-right">
+          <p class="control">
+            <Dropdown
+              label="No Date Filtering Applied"
+              is-right-aligned
+              icon-open="calendar"
+            >
+              <div class="dropdown-content">
+                <div class="dropdown-item">
+                  Date range picker...
+                </div>
+              </div>
+            </Dropdown>
+          </p>
+          <div
+            class="control field"
+            :class="{ 'has-addons': hasActiveReport }"
+            data-test-id="dropdown-save-report"
+          >
+            <p class="control">
+              <button
+                v-if="hasActiveReport"
+                class="button is-interactive-primary"
+                :disabled="!hasChartableResults"
+                @click="updateReport()"
+              >
+                <span>Save Report</span>
+              </button>
+            </p>
+            <p class="control">
+              <Dropdown
+                :disabled="!hasChartableResults"
+                :label="hasActiveReport ? '' : 'Save Report'"
+                button-classes="is-interactive-primary"
+                is-right-aligned
+                @dropdown:open="setReportName(`report-${new Date().getTime()}`)"
+              >
+                <div class="dropdown-content">
+                  <div class="dropdown-item">
+                    <div class="field">
+                      <label class="label"
+                        >Save {{ hasActiveReport ? 'as' : '' }}</label
+                      >
+                      <div class="control">
+                        <input
+                          :value="saveReportSettings.name"
+                          class="input"
+                          type="text"
+                          placeholder="Name your report"
+                          @input="setReportName($event.target.value)"
+                        />
+                      </div>
+                    </div>
+                    <div class="buttons is-right">
+                      <button class="button is-text" data-dropdown-auto-close>
+                        Cancel
+                      </button>
+                      <button
+                        data-test-id="button-save-report"
+                        class="button"
+                        :disabled="!saveReportSettings.name"
+                        data-dropdown-auto-close
+                        @click="saveReport"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                  <template v-if="reports.length">
+                    <hr class="dropdown-divider" />
+                    <div class="dropdown-item">
+                      <div class="field">
+                        <label class="label">Load Report</label>
+                      </div>
+                    </div>
+                    <a
+                      v-for="report in reports"
+                      :key="report.name"
+                      :class="{
+                        'is-active': activeReport.id === report.id
+                      }"
+                      class="dropdown-item"
+                      data-dropdown-auto-close
+                      @click="changeReport(report)"
+                    >
+                      {{ report.name }}
+                    </a>
+                  </template>
+                </div>
+              </Dropdown>
+            </p>
+          </div>
+        </div>
+        <div class="field is-grouped is-grouped-right">
           <p
-            v-if="hasActiveReport"
             class="control"
             data-test-id="dropdown-add-to-dashboard"
             @click="getDashboards"
           >
             <Dropdown
               label="Add to Dashboard"
-              :disabled="!hasChartableResults"
+              :disabled="!hasChartableResults || !hasActiveReport"
+              button-classes="is-small"
               is-right-aligned
             >
               <div class="dropdown-content">
@@ -435,86 +528,14 @@ export default {
             </Dropdown>
           </p>
 
-          <div
-            class="control field"
-            :class="{ 'has-addons': hasActiveReport }"
-            data-test-id="dropdown-save-report"
-          >
-            <p class="control">
-              <button
-                v-if="hasActiveReport"
-                class="button"
-                :disabled="!hasChartableResults"
-                @click="updateReport()"
-              >
-                <span>Save Report</span>
-              </button>
-            </p>
-            <p class="control">
-              <Dropdown
-                :disabled="!hasChartableResults"
-                :label="hasActiveReport ? '' : 'Save Report'"
-                is-right-aligned
-                @dropdown:open="setReportName(`report-${new Date().getTime()}`)"
-              >
-                <div class="dropdown-content">
-                  <div class="dropdown-item">
-                    <div class="field">
-                      <label v-if="hasActiveReport" class="label"
-                        >Save as</label
-                      >
-                      <div class="control">
-                        <input
-                          :value="saveReportSettings.name"
-                          class="input"
-                          type="text"
-                          placeholder="Name your report"
-                          @input="setReportName($event.target.value)"
-                        />
-                      </div>
-                    </div>
-                    <div class="buttons is-right">
-                      <button class="button is-text" data-dropdown-auto-close>
-                        Cancel
-                      </button>
-                      <button
-                        data-test-id="button-save-report"
-                        class="button"
-                        :disabled="!saveReportSettings.name"
-                        data-dropdown-auto-close
-                        @click="saveReport"
-                      >
-                        Save
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </Dropdown>
-            </p>
+          <div class="control">
+            <EmbedShareButton
+              button-classes="is-small"
+              :is-disabled="!hasActiveReport"
+              :resource="activeReport"
+              resource-type="report"
+            />
           </div>
-
-          <p class="control">
-            <Dropdown
-              :disabled="!reports.length"
-              label="Reports"
-              is-right-aligned
-            >
-              <div class="dropdown-content">
-                <a
-                  v-for="report in reports"
-                  :key="report.name"
-                  :class="{
-                    'is-active': activeReport.id === report.id
-                  }"
-                  class="dropdown-item"
-                  data-dropdown-auto-close
-                  @click="changeReport(report)"
-                >
-                  {{ report.name }}
-                </a>
-              </div>
-            </Dropdown>
-          </p>
         </div>
       </div>
     </div>
@@ -1011,12 +1032,6 @@ export default {
                       <font-awesome-icon icon="dot-circle"></font-awesome-icon>
                     </span>
                   </button>
-                </div>
-                <div v-if="hasActiveReport" class="control">
-                  <EmbedShareButton
-                    :resource="activeReport"
-                    resource-type="report"
-                  />
                 </div>
               </div>
             </div>
