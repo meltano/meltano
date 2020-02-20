@@ -6,6 +6,8 @@ import { namer } from '@/utils/mappers'
 
 const regExpConnectorLogo = /(?:tap-|target-)?(.*)/
 const regExpPrivateInput = /(password|private|secret|token)/
+// matches the W3C regex for `type=email` inputs
+const regExpEmailInput = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 
 const FLASK = flaskContext()
 
@@ -140,6 +142,9 @@ export default {
   },
   inferInputType(value) {
     return regExpPrivateInput.test(value) ? 'password' : 'text'
+  },
+  isValidEmail(value) {
+    return regExpEmailInput.test(value)
   },
   jsDashify(type, name) {
     if (!type || !name) {

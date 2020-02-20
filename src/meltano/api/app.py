@@ -116,6 +116,13 @@ def create_app(config={}):
 
         init(app)
 
+    # Notifications
+    if app.config["MELTANO_NOTIFICATION"]:
+        from meltano.api.events import NotificationEvents
+
+        notifications = NotificationEvents(project)
+        notifications.init(app)
+
     # Google Analytics setup
     tracker = GoogleAnalyticsTracker(project)
 

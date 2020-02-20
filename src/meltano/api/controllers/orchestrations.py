@@ -1,7 +1,10 @@
 import asyncio
 import json
 import logging
+import sqlalchemy
 from flask import request, url_for, jsonify, make_response, Response, send_file
+from flask_restful import Api, Resource, fields, marshal, marshal_with
+from werkzeug.exceptions import Conflict, UnprocessableEntity
 
 from meltano.core.job import JobFinder, State
 from meltano.core.behavior.canonical import Canonical
@@ -30,6 +33,7 @@ from meltano.core.logging import (
 )
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.models import db
+from meltano.api.models.subscription import Subscription
 from meltano.api.json import freeze_keys
 from meltano.api.executor import run_elt
 from meltano.api.security.readonly_killswitch import readonly_killswitch
@@ -44,6 +48,21 @@ def freeze_profile_config_keys(profile):
 
 
 orchestrationsBP = APIBlueprint("orchestrations", __name__)
+orchestrationsAPI = Api(
+    orchestrationsBP,
+    errors={
+        "UnprocessableEntity": {
+            "error": True,
+            "code": "The subscription could not be created.",
+            "status": UnprocessableEntity.code,
+        },
+        "Conflict": {
+            "error": True,
+            "code": "A subscription already exists for this address.",
+            "status": Conflict.code,
+        },
+    },
+)
 
 
 @orchestrationsBP.errorhandler(ScheduleAlreadyExistsError)
@@ -167,6 +186,7 @@ def job_log(job_id) -> Response:
             "has_error": state_job.has_error() if state_job else False,
             "started_at": state_job.started_at if state_job else None,
             "ended_at": state_job.ended_at if state_job else None,
+            "trigger": state_job.trigger if state_job else None,
             "has_ever_succeeded": state_job_success.is_success()
             if state_job_success
             else None,
@@ -375,6 +395,7 @@ def get_pipeline_schedules():
         schedule["job_id"] = state_job.job_id if state_job else None
         schedule["started_at"] = state_job.started_at if state_job else None
         schedule["ended_at"] = state_job.ended_at if state_job else None
+        schedule["trigger"] = state_job.trigger if state_job else None
 
         state_job_success = finder.latest_success(db.session)
         schedule["has_ever_succeeded"] = (
@@ -440,3 +461,45 @@ def delete_pipeline_schedule() -> Response:
     name = payload["name"]
     schedule_service.remove(name)
     return jsonify(name), 201
+
+
+class SubscriptionsResource(Resource):
+    SubscriptionDefinition = {
+        "id": fields.String,
+        "recipient": fields.String,
+        "event_type": fields.String,
+        "source_type": fields.String,
+        "source_id": fields.String,
+        "created_at": fields.DateTime,
+    }
+
+    @marshal_with(SubscriptionDefinition)
+    def get(self):
+        return Subscription.query.all()
+
+    @marshal_with(SubscriptionDefinition)
+    def post(self):
+        payload = request.get_json()
+
+        try:
+            subscription = Subscription(**payload)
+            db.session.add(subscription)
+            db.session.commit()
+        except AssertionError as err:
+            raise UnprocessableEntity() from err
+        except sqlalchemy.exc.IntegrityError:
+            raise Conflict()
+
+        return subscription, 201
+
+
+class SubscriptionResource(Resource):
+    def delete(self, id):
+        Subscription.query.filter_by(id=id).delete()
+        db.session.commit()
+
+        return "", 204
+
+
+orchestrationsAPI.add_resource(SubscriptionsResource, "/subscriptions")
+orchestrationsAPI.add_resource(SubscriptionResource, "/subscriptions/<id>")

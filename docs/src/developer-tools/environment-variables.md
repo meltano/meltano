@@ -115,6 +115,33 @@ export OAUTH_GITLAB_SECRET = ""
 
 For more information on how to get these from your GitLab application, check out the [integration docs from GitLab](https://docs.gitlab.com/ee/integration/gitlab.html).
 
+
+### Email Notifications
+
+Meltano can send email notifications upon certain events.
+
+::: warning
+Meltano uses [Flask-Mail](https://pythonhosted.org/Flask-Mail/) to send emails. Take a look at the documentation to properly configure your outgoing email server.
+:::
+
+To enable the notifications, use the following variables.
+
+```
+MELTANO_NOTIFICATION=1
+```
+
+::: tip
+To ease the development and testing, Meltano is preconfigured to use a local [MailHog](https://github.com/mailhog) instance to trap all the outgoing emails.
+
+Use the following docker command to start it:
+
+```bash
+docker run --rm -p 1025:1025 -p 8025:8025 --name mailhog mailhog/mailhog
+```
+:::
+
+All emails sent by Meltano should now be available at `http://localhost:8025/`
+
 ### Read-Only mode
 
 The disable all modifications to the Meltano UI, you can run Meltano using the *read-only* mode.
@@ -168,4 +195,3 @@ FLASK_ENV=production FLASK_APP=meltano.oauth python -m flask run --port 9999
 OAUTH_FACEBOOK_CLIENT_ID=<application_id>
 OAUTH_FACEBOOK_CLIENT_SECRET=<application_secret>
 ```
-

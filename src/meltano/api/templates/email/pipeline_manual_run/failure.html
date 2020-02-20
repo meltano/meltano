@@ -1,0 +1,17 @@
+{% extends "email/pipeline_manual_run/base.html" %}
+
+{% block body %}
+<p class="subtitle">Your {{ data_source }} extraction has failed.</p>
+
+<section>
+  <p>
+    A pipeline for the data source <code>{{ data_source }}</code> has failed.
+  </p>
+  <p>
+    You can take a look at the <a href="{{ urls['docs'] }}">documentation</a> for more informations about this extractor.
+  </p>
+  <p>
+    You can fix the configuration directly on <a href="{{ urls['config'] }}">your Meltano instance<a/>.
+  </p>
+<section>
+{% endblock %}

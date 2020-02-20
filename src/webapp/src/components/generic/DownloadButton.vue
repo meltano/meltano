@@ -34,7 +34,10 @@ export default {
     :disabled="isDisabled"
     @click="download"
   >
-    {{ label }}
+    <span class="icon">
+      <font-awesome-icon icon="file-download" />
+    </span>
+    <span>{{ label }}</span>
   </button>
 </template>
 

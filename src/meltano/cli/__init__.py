@@ -1,3 +1,5 @@
+import os
+
 from .cli import cli
 from . import (
     elt,
@@ -20,4 +22,7 @@ from . import (
 
 
 def main():
+    # mark the current process as executed via the `cli`
+    os.environ["MELTANO_JOB_TRIGGER"] = os.getenv("MELTANO_JOB_TRIGGER", "cli")
+
     cli(obj={"project": None})
