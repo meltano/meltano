@@ -9,6 +9,8 @@ Meltano is primarily offered to end-users as a hosted software-as-a-service (Saa
 - [Self-Hosted Installation Guide](/developer-tools/self-hosted-installation.html)
 - [Command Line Interface](/developer-tools/command-line-interface.html)
 - [Environment Variables](/developer-tools/environment-variables.html)
+- [Orchestration](/developer-tools/orchestration.html)
+- [Transforms](/developer-tools/transforms.html)
 - [Reporting Database Options](/developer-tools/reporting-database-options.html)
 - [Role-Based Access Control](/developer-tools/role-based-access-control.html)
 - [Open Source Contributor Guide](/developer-tools/contributor-guide.html)

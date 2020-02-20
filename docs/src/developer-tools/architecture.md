@@ -1,4 +1,6 @@
 ---
+metaTitle: Meltano Software Architecture
+description: Meltano utilizes a taps and targets architecture, making it easy to implement in any ELT pipeline.
 sidebarDepth: 2
 ---
 
@@ -27,7 +29,7 @@ A `Design` maps multiple `Tables` together via `Joins` and represent the query c
 Each `Design` is also a `Source`, and thus can be refered to by the `Joins` it defines.
 
 ```
- defines a Design named `sample`
+# defines a Design named `sample`
 sample {
   from: table_name
   joins {
@@ -121,7 +123,7 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
 ##### Example `carbon.topic.m5o` file
 
 ```bash
- Define a database, connection settings, and the table relationships (further defined in each `my-table.table.m5o` file) to inform Meltano how to connect for ELT, orchestration, and interactive SQL generation using the Meltano UI
+# Define a database, connection settings, and the table relationships (further defined in each `my-table.table.m5o` file) to inform Meltano how to connect for ELT, orchestration, and interactive SQL generation using the Meltano UI
 {
   # Define version metadata
   version = 1
@@ -163,7 +165,7 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
 ##### Example `entry.table.m5o` file
 
 ```bash
- Define a database table for connecting to using Meltano's CLI and/or UI
+# Define a database table for connecting to using Meltano's CLI and/or UI
 {
   # Define the schema.table-name pattern used for connecting to a specific table in a database
   sql_table_name = gitlab.entry

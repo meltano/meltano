@@ -1,4 +1,6 @@
 ---
+metaTitle: Configuring Meltano Environment Variables
+description: Manage a Meltano configuration globally with environment variables.
 sidebarDepth: 2
 ---
 
@@ -65,9 +67,9 @@ You can choose to use a different system database backend or configuration using
 option of the `meltano` command, or the `MELTANO_DATABASE_URI` environment variable:
 
 ```bash
- SQLite (absolute path required, notice the `3` slashes before the path)
+# SQLite (absolute path required, notice the `3` slashes before the path)
 export MELTANO_DATABASE_URI=sqlite:////path/to/system_database.db
- PostgreSQL:
+# PostgreSQL:
 export MELTANO_DATABASE_URI=postgresql://username:password@host:port/database
 ```
 
@@ -91,7 +93,7 @@ API: `http://0.0.0.0:5000`
 To change the host/port configuration on which the API server listens, update your `.env` in your project directory with the following configuration:
 
 ```bash
- Meltano API configuration
+# Meltano API configuration
 export MELTANO_API_HOSTNAME="0.0.0.0"
 export MELTANO_API_PORT="5000"
 ```
@@ -107,9 +109,9 @@ These settings are used for single-sign-on using an external OAuth provider.
 Update your `.env` file in your project directory with the desired customizations.
 
 ```bash
- GitLab Client ID
+# GitLab Client ID
 export OAUTH_GITLAB_APPLICATION_ID = ""
- GitLab Client Secret
+# GitLab Client Secret
 export OAUTH_GITLAB_SECRET = ""
 ```
 
@@ -147,7 +149,7 @@ All emails sent by Meltano should now be available at `http://localhost:8025/`
 The disable all modifications to the Meltano UI, you can run Meltano using the *read-only* mode.
 
 ```bash
- Meltano read-only mode
+# Meltano read-only mode
 export MELTANO_READONLY=1
 ```
 
@@ -158,10 +160,10 @@ Meltano provides a public hosted solution at <https://oauth.svc.meltanodata.com>
 :::
 
 ```bash
- use the public OAuth Service
+# use the public OAuth Service
 MELTANO_OAUTH_SERVICE_URL=https://oauth.svc.meltanodata.com
 
- use the local OAuth Service
+# use the local OAuth Service
 MELTANO_OAUTH_SERVICE_URL=http://localhost:5000/-/oauth
 ```
 

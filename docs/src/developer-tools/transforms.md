@@ -1,4 +1,10 @@
-# Transform
+---
+metaTitle: Transforms in Meltano
+description: Using DBT with Meltano for transformations
+sidebarDepth: 2
+---
+
+# Transforms
 
 Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations.
 

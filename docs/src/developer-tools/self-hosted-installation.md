@@ -1,3 +1,9 @@
+---
+metaTitle: How to Install Meltano
+description: Meltano is easy to install on your local machine or in the cloud, including on AWS, Digital Ocean, and other cloud services.
+sidebarDepth: 2
+---
+
 # Self-Hosted Installation
 
 This section provides guides for getting set up with a self-hosted instance of Meltano's open source data analytics software on your local computer or using popular hosting solutions:

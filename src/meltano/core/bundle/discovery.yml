@@ -1,5 +1,5 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
-# See https://www.meltano.com/docs/contributing.html#discovery-yml-version for more information.
+# See https://www.meltano.com/developer-tools/contributor-guide.html#discovery-yml-version for more information.
 version: 10
 
 extractors:

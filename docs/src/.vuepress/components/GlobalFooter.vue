@@ -1,13 +1,15 @@
 <script>
 export default {
-  name: 'GlobalFooter'
-}
+  name: "GlobalFooter"
+};
 </script>
 
 <template>
   <footer class="footer">
     <slot></slot>
-    <a href="https://meltano.com/docs/contributing.html" target="_blank"
+    <a
+      href="https://meltano.com/developer-tools/contributor-guide.html"
+      target="_blank"
       >Meltano is open source. Contribute to the project! <OutboundLink
     /></a>
     <a

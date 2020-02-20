@@ -22,7 +22,7 @@ In contrast to loading data from an API, the attributes (schema) of the data inc
 
 That means that Meltano can not include pre-bundled Transforms and Models for data loaded from CSV files. To make the most of your data and be able to run analyses, you have to add custom Transforms and Models. 
 
-You can check how [Transforms](/docs/architecture.html#meltano-transformations) and [Models](/docs/architecture.html#meltano-model) work in Meltano and the Tutorial on [how to add Custom Transforms and Models](/tutorials/create-custom-transforms-and-models.html) if you want more information on those topics.
+You can check how [Transforms](/developer-tools/architecture.html#meltano-transformations) and [Models](/developer-tools/architecture.html#meltano-model) work in Meltano and the Tutorial on [how to add Custom Transforms and Models](/tutorials/create-custom-transforms-and-models.html) if you want more information on those topics.
 
 ## Motivation and Running example
 
@@ -179,7 +179,7 @@ You should now be greeted with the Schedules page with a modal to create your fi
 
 ![Create pipeline modal for the CSV Extractor](/images/csv-tutorial/03-csv-create-new-pipeline.png)
 
-Meltano provides [Orchestration](/docs/orchestration.html) using Apache Airflow, which allows you to create scheduled tasks to run pipelines automatically.
+Meltano provides [Orchestration](/developer-tools/orchestration.html) using Apache Airflow, which allows you to create scheduled tasks to run pipelines automatically.
 For example, you may want a recurring task that updates the database at the end of every business day.
 
 In the current form, you will see:
