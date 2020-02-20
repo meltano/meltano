@@ -31,7 +31,7 @@ Before you install Meltano, make sure you have the following requirements instal
 #### Unix-like environment
 
 ::: warning
-There is currently a known issue with macOS 10.15 and Python 3. The current fix for this is to use Python 3.7+ to run all of your commands. You will then run all of your commands with `python3` or `pip3` rather than the standard `python` or `pip`.
+There is currently a known issue with macOS 10.15 and Python 3. The current fix for this is to use Python 3.7+ to run all of your commands (e.g., `python3` vs `python`).
 
 For more information on this issue, visit [issue #1468](https://gitlab.com/meltano/meltano/issues/1468).
 :::
