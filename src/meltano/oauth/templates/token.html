@@ -55,11 +55,11 @@
 <div class="box">
   <h2 class="subtitle">Your access token</h2>
   <div class="token">
-    <code class="token__code">{{ token.access_token }}</code>
+    <code class="token__code">{{ token }}</code>
     <figure class="token__overlay"></figure>
   </div>
 
-  <input id="token" class="hidden" type="textarea" value="{{ token.access_token }}" />
+  <input id="token" class="hidden" type="textarea" value="{{ token }}" />
   <button class="button is-primary is-fullwidth" onclick="clipToken();">Copy to clipboard</button>
 </div>
 <p class="close">You can now close this window.</p>
