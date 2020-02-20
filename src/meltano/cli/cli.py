@@ -32,7 +32,7 @@ LEVELS = {
 @click.pass_context
 def cli(ctx, log_level, verbose):
     """
-    Get help at https://www.meltano.com/docs/command-line-interface.html#command-line-interface
+    Get help at https://www.meltano.com/developer-tools/command-line-interface.html#command-line-interface
     """
     setup_logging(log_level=LEVELS[log_level])
 

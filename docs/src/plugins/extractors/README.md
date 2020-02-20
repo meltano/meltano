@@ -8,7 +8,7 @@ description: Use Meltano to extract raw data from numerous sources including CSV
 
 **E**xtracting data is the **E** in the term **ELT**. In this section, we provide a detailed overview of how Meltano pulls data from your sources.
 
-Meltano Extractors _extract data in bulk_, and are commonly prefixed with [tap](/docs/architecture.html#taps). Meltano currently supports importing data from the following sources:
+Meltano Extractors _extract data in bulk_, and are commonly prefixed with [tap](/developer-tools/architecture.html#taps). Meltano currently supports importing data from the following sources:
 
 - [Carbon Emissions Intensity](/plugins/extractors/carbon-intensity.html)
 - [Comma Separated Values (CSV)](/plugins/extractors/csv.html)

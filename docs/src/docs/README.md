@@ -87,8 +87,8 @@ Read the [October 2019 recap post on the Meltano blog](https://meltano.com/blog/
 We track the leading indicators upstream of MAUI in the funnel to understand the health of our user adoption funnel from first impression to fully onboarded user:
 
 1. [Meltano.com Website](https://meltano.com)
-2. [Meltano Command Line Interface - CLI](https://meltano.com/docs/command-line-interface.html)
-3. [Meltano UI](https://meltano.com/docs/architecture.html#meltano-ui)
+2. [Meltano Command Line Interface - CLI](https://meltano.com/developer-tools/command-line-interface.html)
+3. [Meltano UI](https://meltano.com/developer-tools/architecture.html#meltano-ui)
 
 Internal metrics:
 

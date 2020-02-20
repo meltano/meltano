@@ -1,4 +1,6 @@
 ---
+metaTitle: Using the Meltano CLI
+description: The Meltano command line interface makes it easy to develop, run, and debug every step of the data analysis lifecycle.
 sidebarDepth: 2
 ---
 
@@ -73,16 +75,16 @@ You can run `meltano add` with `--include-related` to automatically install all 
 #### Examples
 
 ```bash
- Extractor / Loader Template
+# Extractor / Loader Template
 meltano add [extractor | loader] [name_of_plugin]
 
- Extractor Example
+# Extractor Example
 meltano add extractor tap-gitlab
 
- Extractor Example including related plugins
+# Extractor Example including related plugins
 meltano add --include-related extractor tap-google-analytics
 
- Loader Example
+# Loader Example
 meltano add loader target-postgres
 ```
 
@@ -97,7 +99,7 @@ When you add a transform to a Meltano instance, Meltano will:
 #### Example
 
 ```bash
- Transform Template
+# Transform Template
 meltano add [transform] [name_of_transform]
 ```
 
@@ -165,19 +167,19 @@ Note that in each of these cases, Meltano stores the configuration as-is, withou
 ### How to use
 
 ```bash
- Displays the plugin's configuration.
+# Displays the plugin's configuration.
 meltano config <plugin_name>
 
- List the available settings for the plugin.
+# List the available settings for the plugin.
 meltano config <plugin_name> list
 
- Sets the configuration's setting `<name>` to `<value>`.
+# Sets the configuration's setting `<name>` to `<value>`.
 meltano config <plugin_name> set <name> <value>
 
- Remove the configuration's setting `<name>`.
+# Remove the configuration's setting `<name>`.
 meltano config <plugin_name> unset <name>
 
- Clear the configuration (back to defaults).
+# Clear the configuration (back to defaults).
 meltano config <plugin_name> reset
 ```
 
@@ -188,16 +190,16 @@ Lists the available plugins you are interested in.
 ### How to Use
 
 ```bash
- List all available plugins
+# List all available plugins
 meltano discover all
 
- Only list available extractors
+# Only list available extractors
 meltano discover extractors
 
- Only list available loaders
+# Only list available loaders
 meltano discover loaders
 
- Only list available models
+# Only list available models
 meltano discover models
 ```
 
@@ -252,7 +254,7 @@ Used to create a new meltano project with a basic infrastructure in place in the
 ### How to use
 
 ```bash
- Format
+# Format
 meltano init [project_name] [--no_usage_stats]
 ```
 
@@ -293,7 +295,7 @@ Use `--list` to list the current selected tap attributes.
 ::: info
 This is an optional tool for users who want to configure permissions if they're using Snowflake as the data warehouse and want to granularly set who has access to which data at the warehouse level.
 
-Alpha-quality [Role Based Access Control (RBAC)](/docs/security-and-privacy.html#role-based-access-control-rbac-alpha) is also available.
+Alpha-quality [Role Based Access Control (RBAC)](/developer-tools/role-based-access-control.html#role-based-access-control-rbac-alpha) is also available.
 :::
 
 Use this command to check and manage the permissions of a Snowflake account.
@@ -328,7 +330,7 @@ All entities must be explicitly referenced. For example, if a permission is gran
 A specification file has the following structure:
 
 ```bash
- Databases
+# Databases
 databases:
     - db_name:
         shared: boolean
@@ -336,7 +338,7 @@ databases:
         shared: boolean
     ... ... ...
 
- Roles
+# Roles
 roles:
     - role_name:
         warehouses:
@@ -403,7 +405,7 @@ roles:
     - role_name:
     ... ... ...
 
- Users
+# Users
 users:
     - user_name:
         can_login: boolean
@@ -413,7 +415,7 @@ users:
     - user_name:
     ... ... ...
 
- Warehouses
+# Warehouses
 warehouses:
     - warehouse_name:
         size: x-small
@@ -453,7 +455,7 @@ $PERMISSION_BOT_WAREHOUSE
 ## `schedule`
 
 ::: tip
-An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Orchestration](/docs/orchestration.html) documentation to get started with Meltano orchestration.
+An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Orchestration](/developer-tools/orchestration.html) documentation to get started with Meltano orchestration.
 :::
 
 Meltano provides a `schedule` method to run specified ELT pipelines at regular intervals. Schedules are defined inside the `meltano.yml` project as such:
@@ -490,7 +492,7 @@ Meltano select patterns are inspired by the [glob](<https://en.wikipedia.org/wik
 - `[abc]`: matches either `a`, `b`, or `c`
 - `[!abc]`: matches any character **but** `a`, `b`, or `c`
 
-#### Examples
+### Examples
 
 ```bash
 $ meltano select tap-carbon-intensity '*' 'name*'

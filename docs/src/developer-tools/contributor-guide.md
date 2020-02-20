@@ -1,4 +1,6 @@
 ---
+metaTitle: Contributing to Meltano
+description: Meltano is open source software built by an internal team at GitLab as well as the larger Meltano community.
 sidebarDepth: 2
 ---
 
@@ -18,43 +20,43 @@ We welcome contributions, idea submissions, and improvements. In fact we may alr
 
 ### Metrics (anonymous usage data) tracking
 
-As you contribute to Meltano, you may want to disable [metrics tracking](/docs/environment-variables.html#anonymous-usage-data) globally rather than by project. You can do this by setting the environment variable `MELTANO_DISABLE_TRACKING` to `True`:
+As you contribute to Meltano, you may want to disable [metrics tracking](/developer-tools/environment-variables.html#anonymous-usage-data) globally rather than by project. You can do this by setting the environment variable `MELTANO_DISABLE_TRACKING` to `True`:
 
 ```bash
- Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
+# Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
 export MELTANO_DISABLE_TRACKING=True
 ```
 
 ## Setting Up Your Environment
 
 ```bash
- Clone the Meltano repo
+# Clone the Meltano repo
 git clone git@gitlab.com:meltano/meltano.git
 
- Change directory into the Meltano project
+# Change directory into the Meltano project
 cd meltano
 
- Optional, but it's best to have the latest pip
+# Optional, but it's best to have the latest pip
 pip install --upgrade pip
 
- Optional, but it's best to have the latest setuptools
+# Optional, but it's best to have the latest setuptools
 pip install --upgrade setuptools
 
- Optional, but it's recommended to create a virtual environment
- in order to minimize side effects from unknown environment variable
+# Optional, but it's recommended to create a virtual environment
+# in order to minimize side effects from unknown environment variable
 python -m venv ~/.venv/meltano-development
 
- Activate your virtual environment
+# Activate your virtual environment
 source ~/.venv/meltano-development/bin/activate
 
- Install all the dependencies
+# Install all the dependencies
 pip install -r requirements.txt
 
- Install dev dependencies with the edit flag on to detect changes
- Note: you may have to escape the .`[dev]` argument on some shells, like zsh
+# Install dev dependencies with the edit flag on to detect changes
+# Note: you may have to escape the .`[dev]` argument on some shells, like zsh
 pip install -e .[dev]
 
- Bundle the Meltano UI into the `meltano` package
+# Bundle the Meltano UI into the `meltano` package
 make bundle
 ```
 
@@ -71,13 +73,13 @@ This section of the guide provides guidance on how to work with the Meltano API,
 After all of your dependencies installed, we recommend opening a new window/tab in your terminal so you can run the following commands:
 
 ```bash
- Create a new Meltano project
+# Create a new Meltano project
 meltano init $PROJECT_NAME
 
- Change directory into your newly created project
+# Change directory into your newly created project
 cd $PROJECT_NAME
 
- Start a development build of the Meltano API and a production build of Meltano UI
+# Start a development build of the Meltano API and a production build of Meltano UI
 FLASK_ENV=development meltano ui
 ```
 
@@ -88,8 +90,8 @@ The development build of the Meltano API and a production build of the UI will n
 To debug your Python code, here is the recommended way to validate / debug your code:
 
 ```python
- Purpose: Start a debugger
- Usage: Use as a one-line import / invocation for easier cleanup
+# Purpose: Start a debugger
+# Usage: Use as a one-line import / invocation for easier cleanup
 import pdb; pdb.set_trace()
 ```
 
@@ -100,22 +102,22 @@ import pdb; pdb.set_trace()
 In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
 
 ```bash
- Create a new Meltano project
+# Create a new Meltano project
 meltano init $PROJECT_NAME
 
- Change directory into your newly created project
+# Change directory into your newly created project
 cd $PROJECT_NAME
 
- Start the Meltano API and a production build of Meltano UI that you can ignore
+# Start the Meltano API and a production build of Meltano UI that you can ignore
 meltano ui
 
- Open a new terminal tab and go to your meltano directory
+# Open a new terminal tab and go to your meltano directory
 cd $PROJECT_NAME
 
- Install frontend infrastructure at the root directory
+# Install frontend infrastructure at the root directory
 yarn setup
 
- Start local development environment
+# Start local development environment
 yarn serve
 ```
 
@@ -128,13 +130,13 @@ A production build of the API will be available at <http://localhost:5000/> to s
 If you're developing for the _Embed_ app (embeddable `iframe` for reports) you can toggle `MELTANO_EMBED`:
 
 ```bash
- Develop for the embed app
+# Develop for the embed app
 export MELTANO_EMBED=1
 
- Develop for the main app (this is the default)
+# Develop for the main app (this is the default)
 export MELTANO_EMBED=0
 
- Start local development environment
+# Start local development environment
 yarn serve
 ```
 
@@ -143,9 +145,9 @@ yarn serve
 If you need to change the URL of your development environment, you can do this by updating your `.env` in your project directory with the following configuration:
 
 ```bash
- The URL where the web app will be located when working locally in development
- since it provides the redirect after authentication.
- Not require for production
+# The URL where the web app will be located when working locally in development
+# since it provides the redirect after authentication.
+# Not require for production
 export MELTANO_UI_URL = ""
 ```
 
@@ -543,4 +545,3 @@ MELTANO_VENV=.venv tmuxinator local
 - [Tmux Cheat Sheet & Quick Reference](https://tmuxcheatsheet.com/)
 
 [Accepting Merge Requests]: https://gitlab.com/groups/meltano/-/issues?label_name[]=Accepting%20Merge%20Requests
-

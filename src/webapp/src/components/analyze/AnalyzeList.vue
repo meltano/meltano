@@ -86,7 +86,7 @@ export default {
           </p>
           <p>
             <a
-              href="https://www.meltano.com/docs/architecture.html#meltano-model"
+              href="https://www.meltano.com/developer-tools/architecture.html#meltano-model"
               target="_blank"
               class="has-text-underlined"
               >Learn More</a
