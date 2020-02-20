@@ -19,26 +19,12 @@ For more information you can check [the documentation for tap-adwords](https://g
 
 ## Google Ads Setup
 
-::: warning
-
-Please note that this is the initial version of the Google Ads Extractor, which requires a really advanced technical setup to work.
-
-If you do not have (1) a developer token for your Google Ads Account and (2) an approved Google OAuth Client, the process that you have to go through to generate those may take between one and four weeks.
-
-Additionally, once you have a developer token and an approved OAuth client, the generation of an OAuth refresh token requires that you run low level scripts provided by Google.
-
-We are going to add support for the full OAuth flow to Meltano UI; if you are not already using an OAuth CLient to fetch your data, we propose that you wait for that feature to be released before using this Extractor.
-
-You can follow the progress on this feature in the following issue: [meltano/meltano#1706](https://gitlab.com/meltano/meltano/issues/1706)
-
-:::
-
 In order to access your Google Ads data, you will need the following:
 
 - The Account IDs to replicate data from
 - Your Developer Token for Google AdWords
 - The Client ID and Secret for a valid Google OAuth Client
-- A Refresh Token generated through the OAuth flow by using your OAuth Client and your Developer Token. 
+- A Refresh Token generated through the OAuth flow by using your OAuth Client and your Developer Token.
 
 <h3 id="customer-ids">Account IDs</h3>
 
@@ -61,20 +47,11 @@ This property allows you to configure where you want your extracted data set to 
 
 This property allows you to configure where you want your extracted data set to end. Otherwise, if left blank, it will try to fetch all the Ads data from the Start Date until the date you run the Extractor.
 
-
-<h3 id="developer-token">Developer Token</h3>
-
-[Your Developer Token for Google AdWords](https://developers.google.com/adwords/api/docs/guides/first-api-call#request_a_developer_token)
-
-<h3 id="oauth-client-id">OAuth Client ID</h3>
-
-[Your Google OAuth Client ID](https://developers.google.com/adwords/api/docs/guides/first-api-call#set_up_oauth2_authentication)
-
-<h3 id="oauth-client-secret">OAuth Client Secret</h3>
-
-[Your Google OAuth Client Secret](https://developers.google.com/adwords/api/docs/guides/first-api-call#set_up_oauth2_authentication)
-
 <h3 id="refresh-token">OAuth Refresh Token</h3>
+
+::: tip Get it now!
+You can also use the <OAuthServiceLink provider="google-adwords">Meltano OAuth Service</OAuthServiceLink> to acquire this token.
+:::
 
 The Refresh Token generated through the OAuth flow run using your OAuth Client and your Developer Token.
 
@@ -88,14 +65,39 @@ The User Agent for your OAuth Client (used in requests made to the AdWords API).
 
 For example: `Meltano`
 
-
 ## Meltano Setup
+
+::: warning Self-Hosted
+Please note that this extractor requires advanced configuration for self-hosted Meltano instances.
+
+If you do not have (1) a developer token for your Google Ads Account and (2) an approved Google OAuth Client, the process that you have to go through to generate those may take between one and four weeks.
+:::
 
 ### Prerequisites
 
 - [Running instance of Meltano](/docs/getting-started.html)
+- A valid [Google OAuth 2.0 Client](https://console.cloud.google.com/apis/credentials), including:
+  - [Your Developer Token for Google AdWords](https://developers.google.com/adwords/api/docs/guides/first-api-call#request_a_developer_token)
+  - [Your Google OAuth Client ID](https://developers.google.com/adwords/api/docs/guides/first-api-call#set_up_oauth2_authentication)
+  - [Your Google OAuth Client Secret](https://developers.google.com/adwords/api/docs/guides/first-api-call#set_up_oauth2_authentication)
 
-### Configure the Extractor
+### Configure the OAuth Client
+
+In order for the extractor to properly authenticate on Google APIs, it requires to be able to acquire new access tokens.
+The following variables are required for the authentication flow:
+
+#### Configuration
+
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
+
+```bash
+export OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN=<developer_token>
+export OAUTH_GOOGLE_ADWORDS_CLIENT_ID=<client_id>
+export OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET=<client_secret>
+```
+
+### Configuration with the Meltano UI
 
 Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data sources.
 
@@ -106,7 +108,6 @@ Let's install the Google Ads Extractor by clicking on the `Install` button insid
 On the configuration modal we want to enter all the fields descibed in the [Google Ads Setup](/plugins/extractors/adwords.html#google-ads-setup) section.
 
 ![Screenshot of the Google Ads Extractor Configuration](/images/adwords-tutorial/02-adwords-configuration.png)
-
 
 ## Advanced: Command Line Installation
 
@@ -127,9 +128,6 @@ If you are successful, you should see `Added and installed extractors 'tap-adwor
 Required:
 
 ```bash
-export TAP_ADWORDS_DEVELOPER_TOKEN=""
-export TAP_ADWORDS_OAUTH_CLIENT_ID=""
-export TAP_ADWORDS_OAUTH_CLIENT_SECRET=""
 export TAP_ADWORDS_REFRESH_TOKEN=""
 export TAP_ADWORDS_USER_AGENT=""
 export TAP_ADWORDS_CUSTOMER_IDS=""

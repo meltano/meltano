@@ -52,6 +52,10 @@ Examples:
 
 <h3 id="access-token">Access Token</h3>
 
+::: tip Get it now!
+You can also use the <OAuthServiceLink provider="facebook">Meltano OAuth Service</OAuthServiceLink> to acquire this token.
+:::
+
 #### Create App
 
 First, you will need to create a Facebook App through the Developer Portal.
