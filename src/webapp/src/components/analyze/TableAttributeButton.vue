@@ -2,7 +2,7 @@
 import { mapGetters } from 'vuex'
 import lodash from 'lodash'
 
-import { QUERY_ATTRIBUTE_TYPES } from '@/api/design'
+import { QUERY_ATTRIBUTE_DATA_TYPES, QUERY_ATTRIBUTE_TYPES } from '@/api/design'
 import { selected } from '@/utils/predicates'
 
 export default {
@@ -24,10 +24,22 @@ export default {
         this.getIsTimeframe && lodash.some(this.attribute.periods, selected)
       )
     },
+    getHasValidDateRange() {
+      return false
+    },
     getIsActive() {
       return this.getIsTimeframe
         ? this.attribute.selected || this.getHasSelectedPeriods
         : this.attribute.selected
+    },
+    getIsColumn() {
+      return this.attributeType === QUERY_ATTRIBUTE_TYPES.COLUMN
+    },
+    getIsDateFilter() {
+      return (
+        this.getIsColumn &&
+        this.attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.DATE
+      )
     },
     getIsTimeframe() {
       return this.attributeType === QUERY_ATTRIBUTE_TYPES.TIMEFRAME
@@ -42,7 +54,8 @@ export default {
     },
     onFilterClick() {
       this.$emit('filter-click')
-    }
+    },
+    onSelectDateRange() {}
   }
 }
 </script>
@@ -63,7 +76,7 @@ export default {
 
     <!-- Right side of space-between -->
     <div class="is-flex is-vcentered">
-      <!-- Timeframe vs. Column or Aggregate -->
+      <!-- Timeframe -->
       <div v-if="getIsTimeframe" class="mr-05r">
         <span
           class="icon"
@@ -72,14 +85,29 @@ export default {
           <font-awesome-icon :icon="getTimeframeIcon"></font-awesome-icon>
         </span>
       </div>
+      <!-- Column or Aggregate -->
       <template v-else>
+        <!-- Disabled -->
         <div v-if="isDisabled" class="mr-05r">
           <span class="icon">
             <font-awesome-icon icon="lock"></font-awesome-icon>
           </span>
         </div>
+        <!-- Date Filter vs. Generic Filter -->
         <button
-          v-if="
+          v-if="getIsDateFilter"
+          class="button is-small"
+          @click.stop="onSelectDateRange"
+        >
+          <span
+            class="icon"
+            :class="{ 'has-text-interactive-secondary': getHasValidDateRange }"
+          >
+            <font-awesome-icon icon="calendar"></font-awesome-icon>
+          </span>
+        </button>
+        <button
+          v-else-if="
             getIsAttributeInFilters(design.name, attribute.name, attributeType)
           "
           class="button is-small"

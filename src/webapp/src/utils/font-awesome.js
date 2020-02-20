@@ -9,6 +9,7 @@ import {
   faBell,
   faBolt,
   faBookOpen,
+  faCalendar,
   faCaretDown,
   faCaretUp,
   faCertificate,
@@ -67,6 +68,7 @@ export default {
     library.add(faBell)
     library.add(faBolt)
     library.add(faBookOpen)
+    library.add(faCalendar)
     library.add(faCaretDown)
     library.add(faCaretUp)
     library.add(faCertificate)

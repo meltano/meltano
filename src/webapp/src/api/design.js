@@ -7,6 +7,11 @@ export const QUERY_ATTRIBUTE_TYPES = Object.freeze({
   TIMEFRAME: 'timeframe'
 })
 
+export const QUERY_ATTRIBUTE_DATA_TYPES = Object.freeze({
+  DATE: 'date',
+  STRING: 'string'
+})
+
 export default {
   getTable(table) {
     return axios.get(utils.apiUrl('repos/tables', `${table}`))
