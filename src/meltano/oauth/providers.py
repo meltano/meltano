@@ -33,7 +33,6 @@ def facebook(app):
     app.register_blueprint(oauthBP)
 
 
-import urllib.parse
 def google_adwords(app):
     OAuth.register(
         "google_adwords",
@@ -47,6 +46,8 @@ def google_adwords(app):
     @oauthBP.route("/", strict_slashes=False)
     def login():
         redirect_uri = url_for(".authorize", _external=True)
+        # `consent` prompt is required to have a refresh_token
+        # `offline` access_type is required to have a refresh_token
         redirect = OAuth.google_adwords.authorize_redirect(redirect_uri,
                                                            prompt="consent",
                                                            access_type="offline")
