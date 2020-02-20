@@ -1,4 +1,5 @@
-from flask import Blueprint, url_for, redirect, render_template, jsonify
+import logging
+from flask import Blueprint, request, url_for, redirect, render_template, jsonify
 from authlib.flask.client import OAuth as OAuthClient
 
 
@@ -27,6 +28,34 @@ def facebook(app):
     def authorize():
         token = OAuth.facebook.authorize_access_token()
 
-        return render_template("token.html", token=token)
+        return render_template("token.html", token=token['access_token'])
+
+    app.register_blueprint(oauthBP)
+
+
+import urllib.parse
+def google_adwords(app):
+    OAuth.register(
+        "google_adwords",
+        authorize_url="https://accounts.google.com/o/oauth2/auth",
+        client_kwargs={"scope": "https://www.googleapis.com/auth/adwords"},
+        access_token_url="https://oauth2.googleapis.com/token",
+    )
+
+    oauthBP = Blueprint("OAuth.GoogleAdwords", __name__, url_prefix="/google-adwords")
+
+    @oauthBP.route("/", strict_slashes=False)
+    def login():
+        redirect_uri = url_for(".authorize", _external=True)
+        redirect = OAuth.google_adwords.authorize_redirect(redirect_uri,
+                                                           prompt="consent",
+                                                           access_type="offline")
+        return redirect
+
+    @oauthBP.route("/authorize")
+    def authorize():
+        token = OAuth.google_adwords.authorize_access_token()
+
+        return render_template("token.html", token=token['refresh_token'])
 
     app.register_blueprint(oauthBP)

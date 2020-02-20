@@ -14,6 +14,7 @@ app.config.from_pyfile("ui.cfg", silent=True)
 
 @app.errorhandler(Exception)
 def _handle(e):
+    print(e)
     return error()
 
 
@@ -41,9 +42,9 @@ def error():
     return render_template("error.html")
 
 
-from .providers import OAuth, facebook
-
+from .providers import OAuth, facebook, google_adwords
 facebook(app)
+google_adwords(app)
 OAuth.init_app(app)
 
 # enable the parsing of X-Forwarded-* headers
