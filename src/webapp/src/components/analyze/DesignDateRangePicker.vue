@@ -17,7 +17,7 @@ export default {
   }),
   computed: {
     ...mapGetters('designs', ['getIsAttributeInFilters']),
-    key() {
+    getKey() {
       return utils.key
     }
   },
@@ -40,7 +40,7 @@ export default {
     <div class="dropdown-content">
       <div
         v-for="attribute in attributes"
-        :key="key(attribute.name)"
+        :key="getKey(attribute.name)"
         class="dropdown-item"
       >
         <div class="columns is-vcentered is-marginless">

@@ -113,7 +113,7 @@ export default {
       )
     },
 
-    key() {
+    getKey() {
       return utils.key
     },
 
@@ -707,7 +707,11 @@ export default {
                     <TableAttributeButton
                       v-if="!column.hidden"
                       :key="
-                        key(design.relatedTable, getAttributeTypeColumn, column)
+                        getKey(
+                          design.relatedTable,
+                          getAttributeTypeColumn,
+                          column
+                        )
                       "
                       :data-test-id="`column-${column.label}`.toLowerCase()"
                       :attribute="column"
@@ -732,7 +736,7 @@ export default {
                     <TableAttributeButton
                       v-if="!timeframe.hidden"
                       :key="
-                        key(
+                        getKey(
                           design.relatedTable,
                           getAttributeTypeTimeframe,
                           timeframe
@@ -769,7 +773,7 @@ export default {
                     <TableAttributeButton
                       v-if="!aggregate.hidden"
                       :key="
-                        key(
+                        getKey(
                           design.relatedTable,
                           getAttributeTypeAggregate,
                           aggregate
@@ -792,7 +796,7 @@ export default {
                 <template v-if="hasJoins">
                   <template v-for="join in design.joins">
                     <a
-                      :key="key(join.relatedTable)"
+                      :key="getKey(join.relatedTable)"
                       class="panel-block
                       table-heading
                       analyze-join-table
@@ -824,7 +828,7 @@ export default {
                         <TableAttributeButton
                           v-if="!column.hidden"
                           :key="
-                            key(
+                            getKey(
                               join.relatedTable,
                               getAttributeTypeColumn,
                               column
@@ -858,7 +862,7 @@ export default {
                         <TableAttributeButton
                           v-if="!timeframe.hidden"
                           :key="
-                            key(
+                            getKey(
                               join.relatedTable,
                               getAttributeTypeTimeframe,
                               timeframe
@@ -873,7 +877,7 @@ export default {
                           <template v-for="period in timeframe.periods">
                             <a
                               :key="
-                                key(
+                                getKey(
                                   join.relatedTable,
                                   'timeframe',
                                   timeframe,
@@ -911,7 +915,7 @@ export default {
                         <TableAttributeButton
                           v-if="!aggregate.hidden"
                           :key="
-                            key(
+                            getKey(
                               join.relatedTable,
                               getAttributeTypeAggregate,
                               aggregate
