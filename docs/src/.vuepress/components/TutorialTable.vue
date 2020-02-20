@@ -108,18 +108,6 @@ export default {
         </p>
       </div>
     </div>
-    <div class="tutorial-item">
-      <div class="tutorial-header">
-        <a href="/tutorials/using-ftp-with-meltano.html">
-          How to Use FTP with Meltano
-        </a>
-      </div>
-      <div>
-        <p>
-          This guide will walk you through how to use FTP with Meltano.
-        </p>
-      </div>
-    </div>
   </div>
 </template>
 
