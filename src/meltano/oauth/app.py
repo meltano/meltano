@@ -14,7 +14,7 @@ app.config.from_pyfile("ui.cfg", silent=True)
 
 @app.errorhandler(Exception)
 def _handle(e):
-    print(e)
+    logging.exception(e)
     return error()
 
 
