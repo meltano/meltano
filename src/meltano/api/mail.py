@@ -16,7 +16,7 @@ class UnsubscribeGroup(int, Enum):
 
 class MailService:
     EventTypeUnsubscribeGroup = {
-        SubscriptionEventType.PIPELINE_FIRST_RUN: UnsubscribeGroup.ELT_NOTIFICATIONS
+        SubscriptionEventType.PIPELINE_MANUAL_RUN: UnsubscribeGroup.ELT_NOTIFICATIONS
     }
 
     def __init__(self, project: Project):

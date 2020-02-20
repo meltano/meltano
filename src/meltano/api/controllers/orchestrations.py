@@ -4,7 +4,7 @@ import logging
 import sqlalchemy
 from flask import request, url_for, jsonify, make_response, Response, send_file
 from flask_restful import Api, Resource, fields, marshal, marshal_with
-from werkzeug.exceptions import Conflict
+from werkzeug.exceptions import Conflict, UnprocessableEntity
 
 from meltano.core.job import JobFinder, State
 from meltano.core.behavior.canonical import Canonical
@@ -51,11 +51,16 @@ orchestrationsBP = APIBlueprint("orchestrations", __name__)
 orchestrationsAPI = Api(
     orchestrationsBP,
     errors={
+        "UnprocessableEntity": {
+            "error": True,
+            "code": "The subscription could not be created.",
+            "status": UnprocessableEntity.code,
+        },
         "Conflict": {
             "error": True,
             "code": "A subscription already exists for this address.",
             "status": Conflict.code,
-        }
+        },
     },
 )
 
@@ -480,6 +485,8 @@ class SubscriptionsResource(Resource):
             subscription = Subscription(**payload)
             db.session.add(subscription)
             db.session.commit()
+        except AssertionError as err:
+            raise UnprocessableEntity() from err
         except sqlalchemy.exc.IntegrityError:
             raise Conflict()
 

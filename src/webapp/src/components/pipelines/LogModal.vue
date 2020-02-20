@@ -131,13 +131,11 @@ export default {
       <section v-if="relatedPipeline" class="modal-card-body">
         <article class="message is-small is-info">
           <p class="message-header">
-            Your data source is getting ready.
+            Your data source is being extracted.
           </p>
           <div class="message-body content">
             <p>
-              This pipeline is using the
-              <code>{{ relatedPipeline.extractor }}</code> extractor, please
-              note:
+              Please note:
             </p>
             <ul>
               <li>
@@ -156,7 +154,7 @@ export default {
             </ul>
             <p v-if="isUITrigger">
               <SubscribeButton
-                event-type="pipeline_first_run"
+                event-type="pipeline_manual_run"
                 source-type="pipeline"
                 :source-id="jobId"
               >

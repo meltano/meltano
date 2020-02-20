@@ -21,20 +21,13 @@
   </head>
   <body>
     <h1>Meltano</h1>
-    <p class="subtitle">A new data source is available</p>
 
-    <section>
-      <p>
-        A pipeline named <code>{{ pipeline["name"] }}</code> has completed its first run successfully, which means there you have new data ready to be explored.
-      </p>
-      <p>
-        Go ahead and see for yourself on <a href="{{ instance_url }}">your Meltano instance<a/>.
-      </p>
-    <section>
+    {%- block body %}
+    {% endblock -%}
 
     <footer>
       <p>
-        You are receiving this email because you subscribed to this pipeline's completion.
+        You are receiving this email because you asked to be notified of this pipeline's completion
       </p>
     </footer>
   </body>

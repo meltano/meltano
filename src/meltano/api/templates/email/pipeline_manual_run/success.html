@@ -1,0 +1,14 @@
+{% extends "email/pipeline_manual_run/base.html" %}
+
+{% block body %}
+<p class="subtitle">Your {{ data_source }} data is now available!</p>
+
+<section>
+  <p>
+    A pipeline for the data source <code>{{ data_source }}</code> has completed successfully, which means there you have new data ready to be explored.
+  </p>
+  <p>
+    Go ahead and see for yourself on <a href="{{ urls['log'] }}">your Meltano instance<a/>.
+  </p>
+<section>
+{% endblock %}

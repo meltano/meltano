@@ -5,7 +5,7 @@ import { mapActions } from 'vuex'
 import utils from '@/utils/utils'
 
 export default {
-  name: 'Subscribe',
+  name: 'SubscribeButton',
   props: {
     eventType: { type: String, required: true },
     sourceType: { type: String, default: null },

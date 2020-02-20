@@ -11,7 +11,7 @@ export default {
 
   createSubscription(subscriptionPayload) {
     return axios.post(
-      utils.apiUrl('orchestrations', `subscriptions`),
+      utils.apiUrl('orchestrations', 'subscriptions'),
       subscriptionPayload
     )
   },
@@ -53,7 +53,7 @@ export default {
   },
 
   getSubscriptions() {
-    return axios.get(utils.apiUrl('orchestrations', `subscriptions`))
+    return axios.get(utils.apiUrl('orchestrations', 'subscriptions'))
   },
 
   run(eltPayload) {
