@@ -2,7 +2,7 @@
 import { mapGetters } from 'vuex'
 import lodash from 'lodash'
 
-import { QUERY_ATTRIBUTE_DATA_TYPES, QUERY_ATTRIBUTE_TYPES } from '@/api/design'
+import { QUERY_ATTRIBUTE_TYPES } from '@/api/design'
 import { selected } from '@/utils/predicates'
 
 export default {
@@ -17,18 +17,12 @@ export default {
     design: { type: Object, required: true }, // The base table's design or the design of a join table (`.name` and `.relatedTable` use)
     isDisabled: { type: Boolean, required: false }
   },
-  data: () => ({
-    dateRange: { start: null, end: null }
-  }),
   computed: {
     ...mapGetters('designs', ['getIsAttributeInFilters']),
     getHasSelectedPeriods() {
       return (
         this.getIsTimeframe && lodash.some(this.attribute.periods, selected)
       )
-    },
-    getHasValidDateRange() {
-      return false
     },
     getIsActive() {
       return this.getIsTimeframe
@@ -37,12 +31,6 @@ export default {
     },
     getIsColumn() {
       return this.attributeType === QUERY_ATTRIBUTE_TYPES.COLUMN
-    },
-    getIsDateFilter() {
-      return (
-        this.getIsColumn &&
-        this.attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.DATE
-      )
     },
     getIsTimeframe() {
       return this.attributeType === QUERY_ATTRIBUTE_TYPES.TIMEFRAME
@@ -57,9 +45,7 @@ export default {
     },
     onFilterClick() {
       this.$emit('filter-click')
-    },
-    onPopoverDidHide() {},
-    onSelectDateRange() {}
+    }
   }
 }
 </script>
@@ -97,31 +83,9 @@ export default {
             <font-awesome-icon icon="lock"></font-awesome-icon>
           </span>
         </div>
-        <!-- Date Filter vs. Generic Filter -->
-        <v-date-picker
-          v-if="getIsDateFilter"
-          v-model="dateRange"
-          mode="range"
-          :max-date="new Date()"
-          :columns="2"
-          :popover="{ placement: 'right', visibility: 'click' }"
-          @input="onSelectDateRange"
-          @popoverDidHide="onPopoverDidHide"
-        >
-          <button class="button is-small">
-            <span
-              class="icon"
-              :class="{
-                'has-text-interactive-secondary': getHasValidDateRange
-              }"
-            >
-              <font-awesome-icon icon="calendar"></font-awesome-icon>
-            </span>
-          </button>
-        </v-date-picker>
-
+        <!-- Filter -->
         <button
-          v-else-if="
+          v-if="
             getIsAttributeInFilters(design.name, attribute.name, attributeType)
           "
           class="button is-small"

@@ -7,6 +7,7 @@ import SSF from 'ssf'
 import designApi from '@/api/design'
 import sqlApi from '@/api/sql'
 import utils from '@/utils/utils'
+import { QUERY_ATTRIBUTE_DATA_TYPES } from '@/api/design'
 import { selected } from '@/utils/predicates'
 import { namer } from '@/utils/mappers'
 
@@ -182,6 +183,12 @@ const getters = {
 
       return attributes
     }
+  },
+
+  getAttributesOfDate(_, getters) {
+    return getters.getAttributes(['columns']).filter(attribute => {
+      return attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.DATE
+    })
   },
 
   getOrderableAttributesIndex(state, getters) {

@@ -6,6 +6,7 @@ import lodash from 'lodash'
 
 import capitalize from '@/filters/capitalize'
 import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
+import DesignDateRangePicker from '@/components/analyze/DesignDateRangePicker'
 import Dropdown from '@/components/generic/Dropdown'
 import EmbedShareButton from '@/components/generic/EmbedShareButton'
 import LoadingOverlay from '@/components/generic/LoadingOverlay'
@@ -23,6 +24,7 @@ export default {
   },
   components: {
     CreateDashboardModal,
+    DesignDateRangePicker,
     Dropdown,
     EmbedShareButton,
     LoadingOverlay,
@@ -60,6 +62,7 @@ export default {
       'filtersCount',
       'formattedSql',
       'getSelectedAttributesCount',
+      'getAttributesOfDate',
       'hasChartableResults',
       'hasFilters',
       'hasJoins',
@@ -108,6 +111,10 @@ export default {
         (this.isAutoRunQuery && !this.hasCompletedFirstQueryRun) ||
         this.isLoadingQuery
       )
+    },
+
+    key() {
+      return utils.key
     },
 
     limit: {
@@ -345,12 +352,6 @@ export default {
       this.$store.dispatch('designs/updateReport').then(() => {
         Vue.toasted.global.success(`Report Updated - ${this.activeReport.name}`)
       })
-    },
-
-    $key(...attrs) {
-      const extractKey = obj => obj['name'] || String(obj)
-
-      return attrs.map(extractKey).join(':')
     }
   }
 }
@@ -377,17 +378,7 @@ export default {
       <div class="column">
         <div class="field is-grouped is-grouped-right">
           <p class="control">
-            <Dropdown
-              label="No Date Filtering Applied"
-              is-right-aligned
-              icon-open="calendar"
-            >
-              <div class="dropdown-content">
-                <div class="dropdown-item">
-                  Date range picker...
-                </div>
-              </div>
-            </Dropdown>
+            <DesignDateRangePicker :attributes="getAttributesOfDate" />
           </p>
           <div
             class="control field"
@@ -716,11 +707,7 @@ export default {
                     <TableAttributeButton
                       v-if="!column.hidden"
                       :key="
-                        $key(
-                          design.relatedTable,
-                          getAttributeTypeColumn,
-                          column
-                        )
+                        key(design.relatedTable, getAttributeTypeColumn, column)
                       "
                       :data-test-id="`column-${column.label}`.toLowerCase()"
                       :attribute="column"
@@ -745,7 +732,7 @@ export default {
                     <TableAttributeButton
                       v-if="!timeframe.hidden"
                       :key="
-                        $key(
+                        key(
                           design.relatedTable,
                           getAttributeTypeTimeframe,
                           timeframe
@@ -782,7 +769,7 @@ export default {
                     <TableAttributeButton
                       v-if="!aggregate.hidden"
                       :key="
-                        $key(
+                        key(
                           design.relatedTable,
                           getAttributeTypeAggregate,
                           aggregate
@@ -805,7 +792,7 @@ export default {
                 <template v-if="hasJoins">
                   <template v-for="join in design.joins">
                     <a
-                      :key="$key(join.relatedTable)"
+                      :key="key(join.relatedTable)"
                       class="panel-block
                       table-heading
                       analyze-join-table
@@ -837,7 +824,7 @@ export default {
                         <TableAttributeButton
                           v-if="!column.hidden"
                           :key="
-                            $key(
+                            key(
                               join.relatedTable,
                               getAttributeTypeColumn,
                               column
@@ -871,7 +858,7 @@ export default {
                         <TableAttributeButton
                           v-if="!timeframe.hidden"
                           :key="
-                            $key(
+                            key(
                               join.relatedTable,
                               getAttributeTypeTimeframe,
                               timeframe
@@ -886,7 +873,7 @@ export default {
                           <template v-for="period in timeframe.periods">
                             <a
                               :key="
-                                $key(
+                                key(
                                   join.relatedTable,
                                   'timeframe',
                                   timeframe,
@@ -924,7 +911,7 @@ export default {
                         <TableAttributeButton
                           v-if="!aggregate.hidden"
                           :key="
-                            $key(
+                            key(
                               join.relatedTable,
                               getAttributeTypeAggregate,
                               aggregate
