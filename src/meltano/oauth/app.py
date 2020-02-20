@@ -28,13 +28,18 @@ def root():
                 "url": url_for("OAuth.Facebook.login"),
                 "logo": url_for("static", filename="logos/facebook-logo.png"),
             },
+            {
+                "label": "Google Adwords",
+                "url": url_for("OAuth.GoogleAdwords.login"),
+                "logo": url_for("static", filename="logos/adwords-logo.png"),
+            },
         ),
     )
 
 
 @app.route("/sample")
 def sample():
-    return render_template("token.html", token={"access_token": secrets.token_hex(128)})
+    return render_template("token.html", token=secrets.token_hex(128))
 
 
 @app.route("/error")
@@ -43,6 +48,7 @@ def error():
 
 
 from .providers import OAuth, facebook, google_adwords
+
 facebook(app)
 google_adwords(app)
 OAuth.init_app(app)

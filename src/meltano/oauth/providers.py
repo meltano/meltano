@@ -10,7 +10,7 @@ def facebook(app):
     OAuth.register(
         "facebook",
         access_token_url="https://graph.facebook.com/v5.0/oauth/access_token",
-        client_kwargs={ "scope": "ads_read ads_management manage_pages" },
+        client_kwargs={"scope": "ads_read ads_management manage_pages"},
         authorize_url="https://www.facebook.com/v5.0/dialog/oauth",
     )
 
@@ -20,15 +20,15 @@ def facebook(app):
     def login():
         redirect_uri = url_for(".authorize", _external=True)
 
-        return OAuth.facebook.authorize_redirect(redirect_uri,
-                                                 display="popup",
-                                                 auth_type="rerequest")
+        return OAuth.facebook.authorize_redirect(
+            redirect_uri, display="popup", auth_type="rerequest"
+        )
 
     @oauthBP.route("/authorize")
     def authorize():
         token = OAuth.facebook.authorize_access_token()
 
-        return render_template("token.html", token=token['access_token'])
+        return render_template("token.html", token=token["access_token"])
 
     app.register_blueprint(oauthBP)
 
@@ -48,15 +48,15 @@ def google_adwords(app):
         redirect_uri = url_for(".authorize", _external=True)
         # `consent` prompt is required to have a refresh_token
         # `offline` access_type is required to have a refresh_token
-        redirect = OAuth.google_adwords.authorize_redirect(redirect_uri,
-                                                           prompt="consent",
-                                                           access_type="offline")
+        redirect = OAuth.google_adwords.authorize_redirect(
+            redirect_uri, prompt="consent", access_type="offline"
+        )
         return redirect
 
     @oauthBP.route("/authorize")
     def authorize():
         token = OAuth.google_adwords.authorize_access_token()
 
-        return render_template("token.html", token=token['refresh_token'])
+        return render_template("token.html", token=token["refresh_token"])
 
     app.register_blueprint(oauthBP)
