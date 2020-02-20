@@ -116,6 +116,10 @@ const actions = {
     })
   },
 
+  createSubscription(_, subscription) {
+    return orchestrationsApi.createSubscription(subscription)
+  },
+
   deletePipelineSchedule({ commit }, pipeline) {
     let status = {
       pipeline,

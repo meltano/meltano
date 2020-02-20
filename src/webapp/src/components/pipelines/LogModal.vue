@@ -4,6 +4,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import AnalyzeList from '@/components/analyze/AnalyzeList'
 import DownloadButton from '@/components/generic/DownloadButton'
 import Dropdown from '@/components/generic/Dropdown'
+import SubscribeButton from '@/components/generic/SubscribeButton'
 import orchestrationsApi from '@/api/orchestrations'
 import poller from '@/utils/poller'
 import utils from '@/utils/utils'
@@ -13,7 +14,8 @@ export default {
   components: {
     AnalyzeList,
     Dropdown,
-    DownloadButton
+    DownloadButton,
+    SubscribeButton
   },
   data() {
     return {
@@ -58,6 +60,9 @@ export default {
       return this.jobStatus
         ? utils.momentFormatlll(this.jobStatus.startedAt)
         : '...'
+    },
+    isUITrigger() {
+      return this.jobStatus.trigger == 'ui'
     },
     relatedPipeline() {
       return this.pipelines.find(pipeline => pipeline.name === this.jobId)
@@ -125,29 +130,42 @@ export default {
       </header>
       <section v-if="relatedPipeline" class="modal-card-body">
         <article class="message is-small is-info">
-          <div class="message-body">
-            <div class="content">
-              <p>
-                This pipeline uses the
-                <code>{{ relatedPipeline.extractor }}</code> extractor. Please
-                note:
-              </p>
-              <ul>
-                <li>
-                  Depending on the specific data source, time period, and amount
-                  of data, extraction can take as little as a
-                  <em>few seconds</em>, or as long as <em>multiple hours</em>.
-                </li>
-                <li>
-                  Extraction will continue in the background even if you close
-                  this view.
-                </li>
-                <li>
-                  Once extraction is complete, use the "Reports" button (lower
-                  right of this view) to analyze the imported data.
-                </li>
-              </ul>
-            </div>
+          <p class="message-header">
+            Your data source is being extracted.
+          </p>
+          <div class="message-body content">
+            <p>
+              Please note:
+            </p>
+            <ul>
+              <li>
+                Depending on the specific data source, time period, and amount
+                of data, extraction can take as little as a
+                <em>few seconds</em>, or as long as <em>multiple hours</em>.
+              </li>
+              <li>
+                Extraction will continue in the background even if you close
+                this view.
+              </li>
+              <li>
+                Once extraction is complete, use the "Reports" button (lower
+                right of this view) to analyze the imported data.
+              </li>
+            </ul>
+            <p v-if="isUITrigger">
+              <SubscribeButton
+                event-type="pipeline_manual_run"
+                source-type="pipeline"
+                :source-id="jobId"
+              >
+                <label
+                  slot="label"
+                  class="label has-text-inherited is-small"
+                  for="email"
+                  >Please notify me when the data is ready</label
+                >
+              </SubscribeButton>
+            </p>
           </div>
         </article>
       </section>
@@ -158,7 +176,7 @@ export default {
       >
         <pre
           v-if="jobLog"
-        ><code class="is-size-7">{{jobLog}}{{getLogAppender}}</code></pre>
+        ><code class="is-size-8">{{jobLog}}{{getLogAppender}}</code></pre>
         <progress v-else class="progress is-small is-info"></progress>
       </section>
       <section class="modal-card-body">
@@ -246,6 +264,7 @@ export default {
 
 .modal-card-body-log {
   height: 100%;
+  padding: 0;
 }
 
 .modal-card.modal-card-log {

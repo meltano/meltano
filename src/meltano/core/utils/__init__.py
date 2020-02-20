@@ -12,6 +12,7 @@ from pathlib import Path
 
 
 TRUTHY = ("true", "1", "yes", "on")
+REGEX_EMAIL = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
 
 
 class NotFound(Exception):
@@ -217,3 +218,7 @@ def makedirs(func):
         return path
 
     return decorate
+
+
+def is_email_valid(value: str):
+    return re.match(REGEX_EMAIL, value)

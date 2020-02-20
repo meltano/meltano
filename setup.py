@@ -29,6 +29,7 @@ requires = [
     'pypika==0.25.1',
     'python-dotenv==0.10.1',
     'pyyaml==3.13',
+    'smtpapi==0.4.1',
     'snowflake-connector-python==1.6.10',
     'snowflake-sqlalchemy==1.1.2',
     'sqlalchemy==1.2.12',

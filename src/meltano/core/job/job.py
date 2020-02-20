@@ -1,4 +1,5 @@
 import logging
+import os
 import sqlalchemy.types as types
 import uuid
 from datetime import datetime
@@ -38,6 +39,10 @@ class State(Enum):
         return self.name
 
 
+def current_trigger():
+    return os.getenv("MELTANO_JOB_TRIGGER")
+
+
 class Job(SystemModel):
     __tablename__ = "job"
 
@@ -49,6 +54,7 @@ class Job(SystemModel):
     ended_at = Column(types.DateTime)
     payload = Column(MutableDict.as_mutable(JSONEncodedDict))
     payload_flags = Column(IntFlag, default=0)
+    trigger = Column(types.String, default=current_trigger)
 
     def __init__(self, **kwargs):
         kwargs["state"] = kwargs.get("state", State.IDLE)
