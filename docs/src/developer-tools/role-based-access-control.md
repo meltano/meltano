@@ -13,7 +13,7 @@ In the current architecture of Meltano, authorization is technically always enab
 While this functionality is still in alpha, you can enable RBAC by setting the environment variable `MELTANO_AUTHENTICATION` to `true`.
 
 ```bash
- Set in your .env file
+# Set in your .env file
 export MELTANO_AUTHENTICATION=true
 ```
 

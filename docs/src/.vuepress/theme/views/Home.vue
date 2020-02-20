@@ -145,7 +145,7 @@
               <td class="meltano-uses">Meltano uses:</td>
               <td class="meltano-uses-secondary">
                 <a
-                  href="https://meltano.com/docs/architecture.html#meltano-model"
+                  href="https://meltano.com/developer-tools/architecture.html#meltano-model"
                   target="_blank"
                   >Meltano Model</a
                 >
@@ -160,7 +160,7 @@
                 <a href="https://www.getdbt.com/">dbt</a>
               </td>
               <td class="meltano-uses-secondary">
-                <a href="https://meltano.com/docs/architecture.html#meltano-ui"
+                <a href="https://meltano.com/developer-tools/architecture.html#meltano-ui"
                   >Meltano UI</a
                 >
               </td>

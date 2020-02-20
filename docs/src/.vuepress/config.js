@@ -95,6 +95,8 @@ module.exports = {
         '/developer-tools/self-hosted-installation.html',
         '/developer-tools/command-line-interface.html',
         '/developer-tools/environment-variables.html',
+        '/developer-tools/orchestration.html',
+        '/developer-tools/transforms.html',
         '/developer-tools/reporting-database-options.html',
         '/developer-tools/role-based-access-control.html',
         '/developer-tools/contributor-guide.html',
