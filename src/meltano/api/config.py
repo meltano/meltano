@@ -17,9 +17,10 @@ SECRET_KEY = "thisisnotapropersecretkey"
 # -----------------
 AIRFLOW_DISABLED = truthy(os.getenv("MELTANO_DISABLE_AIRFLOW"))
 MELTANO_AUTHENTICATION = truthy(os.getenv("MELTANO_AUTHENTICATION"))
+MELTANO_NOTIFICATION = truthy(os.getenv("MELTANO_NOTIFICATION"))
+MELTANO_OAUTH_SERVICE_URL = os.getenv("MELTANO_OAUTH_SERVICE_URL", None)
 MELTANO_READONLY = truthy(os.getenv("MELTANO_READONLY"))
 MELTANO_UI_URL = os.getenv("MELTANO_UI_URL", "/")
-MELTANO_OAUTH_SERVICE_URL = os.getenv("MELTANO_OAUTH_SERVICE_URL", None)
 
 API_ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 TEMP_FOLDER = os.path.join(API_ROOT_DIR, "static/tmp")
@@ -61,9 +62,10 @@ SECURITY_MSG_USERNAME_ALREADY_TAKEN = ("This username is already taken.", "error
 # -----------------
 
 # Change these configuration for your SMTP server
+# This is currently setup for development
 MAIL_SERVER = "localhost"
-MAIL_PORT = 587
-MAIL_DEFAULT_SENDER = '"Meltano" <bot@metlano.com>'
+MAIL_PORT = 1025
+MAIL_DEFAULT_SENDER = '"Meltano" <bot@meltano.com>'
 
 # Flask-Authlib
 # -----------------

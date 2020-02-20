@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <style>
+      html {
+          font-family: Helvetica, Verdana, Open Sans;
+          font-size: 0.8em;
+      }
+      h1 {
+          font-weight: 500;
+      }
+      .subtitle {
+          margin-top: -0.8rem;
+          font-size: 1.2em;
+          color: #323232;
+      }
+      footer {
+          border-top: 1px solid lightgray;
+          font-size: 0.8em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Meltano</h1>
+
+    {%- block body %}
+    {% endblock -%}
+
+    <footer>
+      <p>
+        You are receiving this email because you asked to be notified of this pipeline's completion
+      </p>
+    </footer>
+  </body>
+</html>
