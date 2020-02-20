@@ -17,6 +17,9 @@ export default {
     design: { type: Object, required: true }, // The base table's design or the design of a join table (`.name` and `.relatedTable` use)
     isDisabled: { type: Boolean, required: false }
   },
+  data: () => ({
+    dateRange: { start: null, end: null }
+  }),
   computed: {
     ...mapGetters('designs', ['getIsAttributeInFilters']),
     getHasSelectedPeriods() {
@@ -55,6 +58,7 @@ export default {
     onFilterClick() {
       this.$emit('filter-click')
     },
+    onPopoverDidHide() {},
     onSelectDateRange() {}
   }
 }
@@ -94,18 +98,28 @@ export default {
           </span>
         </div>
         <!-- Date Filter vs. Generic Filter -->
-        <button
+        <v-date-picker
           v-if="getIsDateFilter"
-          class="button is-small"
-          @click.stop="onSelectDateRange"
+          v-model="dateRange"
+          mode="range"
+          :max-date="new Date()"
+          :columns="2"
+          :popover="{ placement: 'right', visibility: 'click' }"
+          @input="onSelectDateRange"
+          @popoverDidHide="onPopoverDidHide"
         >
-          <span
-            class="icon"
-            :class="{ 'has-text-interactive-secondary': getHasValidDateRange }"
-          >
-            <font-awesome-icon icon="calendar"></font-awesome-icon>
-          </span>
-        </button>
+          <button class="button is-small">
+            <span
+              class="icon"
+              :class="{
+                'has-text-interactive-secondary': getHasValidDateRange
+              }"
+            >
+              <font-awesome-icon icon="calendar"></font-awesome-icon>
+            </span>
+          </button>
+        </v-date-picker>
+
         <button
           v-else-if="
             getIsAttributeInFilters(design.name, attribute.name, attributeType)
