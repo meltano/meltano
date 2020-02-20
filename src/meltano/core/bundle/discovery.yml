@@ -300,22 +300,31 @@ extractors:
       - name: end_date
         kind: date_iso8601
       - name: developer_token
+        description: Your Developer Token for Google AdWord Application
+        env: OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN
+        kind: hidden
         label: Developer Token
         placeholder: Ex. *****************
-        description: Your Developer Token for Google AdWords
-        kind: password
       - name: oauth_client_id
+        description: Your Google OAuth Client ID
+        env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
+        kind: hidden
         label: OAuth Client ID
         placeholder: Ex. 123456789012345.apps.googleusercontent.com
-        description: Your Google OAuth Client ID
       - name: oauth_client_secret
+        description: Your Google OAuth Client Secret
+        env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
+        kind: hidden
         label: OAuth Client Secret
         placeholder: Ex. *****************
-        description: Your Google OAuth Client Secret
       - name: refresh_token
         label: OAuth Refresh Token
         placeholder: Ex. *****************
         description: The Refresh Token generated through the OAuth flow run using your OAuth Client and your Developer Token
+        kind: oauth
+        oauth:
+          # https://oauth.svc.meltanodata.com/google-adwords/
+          provider: google-adwords
       - name: user_agent
         label: User Agent for your OAuth Client
         placeholder: Ex. Meltano
