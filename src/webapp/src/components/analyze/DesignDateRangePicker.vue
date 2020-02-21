@@ -43,7 +43,21 @@ export default {
       return utils.key
     },
     getLabel() {
-      return 'Date Ranges'
+      const validDateRangeLength = this.getValidDateRanges.length
+      const hasValidDateRanges = validDateRangeLength > 0
+      let rangeLabel
+      if (hasValidDateRanges) {
+        rangeLabel = this.getDateLabel(this.getValidDateRanges[0])
+        if (validDateRangeLength > 1) {
+          rangeLabel += ` (+${validDateRangeLength - 1})`
+        }
+      }
+      return hasValidDateRanges ? rangeLabel : 'Date Ranges'
+    },
+    getValidDateRanges() {
+      return this.attributePairs.filter(attributePair =>
+        this.getHasValidDateRange(attributePair.dateRange)
+      )
     }
   },
   methods: {
@@ -74,6 +88,9 @@ export default {
   <Dropdown
     :label="getLabel"
     menu-classes="dropdown-menu-600"
+    :button-classes="
+      `${getValidDateRanges.length > 0 ? 'has-text-interactive-secondary' : ''}`
+    "
     is-right-aligned
     icon-open="calendar"
     @dropdown:open="onDropdownOpen"
@@ -97,7 +114,12 @@ export default {
           </div>
           <div class="column">
             <div class="is-flex is-vcentered is-pulled-right">
-              <span class="mr-05r">{{ getDateLabel(attributePair) }}</span>
+              <span
+                :class="{
+                  'mr-05r': getHasValidDateRange(attributePair.dateRange)
+                }"
+                >{{ getDateLabel(attributePair) }}</span
+              >
               <button
                 v-if="getHasValidDateRange(attributePair.dateRange)"
                 class="button is-small"
