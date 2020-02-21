@@ -7,7 +7,7 @@ import Dropdown from '@/components/generic/Dropdown'
 import utils from '@/utils/utils'
 
 export default {
-  name: 'Bar',
+  name: 'DesignDateRangePicker',
   components: {
     Dropdown
   },
