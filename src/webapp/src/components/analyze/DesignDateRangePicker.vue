@@ -70,6 +70,7 @@ export default {
         return { attribute, dateRange }
       })
     },
+    onDropdownClose() {},
     onDropdownOpen() {
       this.initializeAttributePairs()
       this.initialDateRanges = Object.freeze(
@@ -94,6 +95,7 @@ export default {
     is-right-aligned
     icon-open="calendar"
     @dropdown:open="onDropdownOpen"
+    @dropdown:close="onDropdownClose"
   >
     <div class="dropdown-content">
       <div
