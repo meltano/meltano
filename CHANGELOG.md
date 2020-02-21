@@ -31,6 +31,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1775](https://gitlab.com/meltano/meltano/issues/1775) Add default dashboard for GitLab extractor
 - [#1714](https://gitlab.com/meltano/meltano/issues/1714) Add support for a `required` setting in Models so Analyze can still work with more complex reporting scenarios (Facebook and Google Adwords need this)
 - [#1780](https://gitlab.com/meltano/meltano/issues/1780) Add default reports and dashboard for Facebook Ads data
+- [#1499](https://gitlab.com/meltano/meltano/issues/1499) Add date range selector to Analyze UI (requires a `type=date` in each model needing this functionality)
 
 
 ## 1.21.2 - (2020-02-18)
