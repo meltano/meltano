@@ -377,7 +377,7 @@ export default {
 
       <div class="column">
         <div class="field is-grouped is-grouped-right">
-          <p class="control">
+          <p v-if="getAttributesOfDate.length" class="control">
             <DesignDateRangePicker :attributes="getAttributesOfDate" />
           </p>
           <div

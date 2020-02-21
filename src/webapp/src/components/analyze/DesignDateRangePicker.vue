@@ -80,8 +80,8 @@ export default {
             >
           </div>
           <div class="column">
-            <div class="is-pulled-right">
-              <span>{{ getDateLabel(attributePair) }}</span>
+            <div class="is-flex is-vcentered is-pulled-right">
+              <span class="mr-05r">{{ getDateLabel(attributePair) }}</span>
               <button
                 v-if="getHasValidDateRange(attributePair.dateRange)"
                 class="button is-small"
@@ -97,7 +97,6 @@ export default {
           mode="range"
           is-expanded
           is-inline
-          :max-date="new Date()"
           :columns="2"
           @input="onSelectDateRange"
         />
