@@ -2,6 +2,8 @@
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import Vue from 'vue'
 
+import lodash from 'lodash'
+
 import capitalize from '@/filters/capitalize'
 import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
 import Dropdown from '@/components/generic/Dropdown'
@@ -10,6 +12,8 @@ import LoadingOverlay from '@/components/generic/LoadingOverlay'
 import QueryFilters from '@/components/analyze/QueryFilters'
 import ResultChart from '@/components/analyze/ResultChart'
 import ResultTable from '@/components/analyze/ResultTable'
+import TableAttributeButton from '@/components/analyze/TableAttributeButton'
+import { QUERY_ATTRIBUTE_TYPES } from '@/api/design'
 import utils from '@/utils/utils'
 
 export default {
@@ -24,7 +28,8 @@ export default {
     LoadingOverlay,
     QueryFilters,
     ResultChart,
-    ResultTable
+    ResultTable,
+    TableAttributeButton
   },
   data() {
     return {
@@ -54,13 +59,11 @@ export default {
       'currentModelLabel',
       'filtersCount',
       'formattedSql',
-      'getIsAttributeInFilters',
       'getSelectedAttributesCount',
       'hasChartableResults',
       'hasFilters',
       'hasJoins',
       'hasResults',
-      'isTimeframeSelected',
       'resultsCount',
       'showAttributesHeader'
     ]),
@@ -78,6 +81,18 @@ export default {
       const startDate = this.startDate(this.currentExtractor)
 
       return startDate ? startDate : 'Not available'
+    },
+
+    getAttributeTypeAggregate() {
+      return QUERY_ATTRIBUTE_TYPES.AGGREGATE
+    },
+
+    getAttributeTypeColumn() {
+      return QUERY_ATTRIBUTE_TYPES.COLUMN
+    },
+
+    getAttributeTypeTimeframe() {
+      return QUERY_ATTRIBUTE_TYPES.TIMEFRAME
     },
 
     hasActiveReport() {
@@ -167,10 +182,8 @@ export default {
       })
 
       uponDesign.then(() => {
-        // preselect if not loading a report
-        if (!slug && this.isAutoRunQuery) {
-          this.preselectAttributes()
-        }
+        // conditional attribute preselections
+        this.tryPreselect(!slug)
 
         // validate initialization so UI can display while removing the loading bar
         this.isInitialized = true
@@ -198,27 +211,6 @@ export default {
 
     joinRowClicked(join) {
       this.$store.dispatch('designs/expandJoinRow', join)
-    },
-
-    preselectAttributes() {
-      const finder = collectionName =>
-        this.design.relatedTable[collectionName].find(
-          attribute => !attribute.hidden
-        )
-
-      const column = finder('columns')
-      if (column) {
-        this.columnSelected(column)
-      }
-
-      const aggregate = finder('aggregates')
-      if (aggregate) {
-        this.columnSelected(aggregate)
-      }
-
-      if (column || aggregate) {
-        this.runQuery()
-      }
     },
 
     reinitialize() {
@@ -286,6 +278,67 @@ export default {
 
     toggleCreateDashboardModal() {
       this.isCreateDashboardModalOpen = !this.isCreateDashboardModalOpen
+    },
+
+    tryPreselect(isNoSlug) {
+      let hasDefaultPreselections = false
+      let hasRequiredPreselections = false
+
+      // preselect if not loading a report
+      if (isNoSlug) {
+        hasDefaultPreselections = this.tryPreselectDefaultAttributes()
+      }
+      // preselect requireds (temporary until calculated and derived attributes are added https://gitlab.com/meltano/meltano/issues/1714)
+      hasRequiredPreselections = this.tryPreselectRequiredAttributes()
+
+      const hasPreselections =
+        hasDefaultPreselections || hasRequiredPreselections
+      if (this.isAutoRunQuery && hasPreselections) {
+        this.runQuery()
+      }
+    },
+
+    tryPreselectDefaultAttributes() {
+      const finder = collectionName =>
+        this.design.relatedTable[collectionName].find(
+          attribute => !attribute.hidden
+        )
+
+      const column = finder('columns')
+      if (column) {
+        this.columnSelected(column)
+      }
+
+      const aggregate = finder('aggregates')
+      if (aggregate) {
+        this.aggregateSelected(aggregate)
+      }
+
+      const hasPreselection = column || aggregate
+      return hasPreselection
+    },
+
+    tryPreselectRequiredAttributes() {
+      const baseTableColumns = this.design.relatedTable['columns']
+      const joinTableColumns = this.design.joins
+        ? this.design.joins.map(join => join.relatedTable['columns'])
+        : []
+      const allAttributes = lodash.flatten(
+        [baseTableColumns].concat(joinTableColumns)
+      )
+      const requireds = allAttributes.filter(
+        attribute => attribute.required && !attribute.hidden
+      )
+      const hasRequireds = requireds.length > 0
+
+      if (hasRequireds) {
+        requireds.forEach(columnAttribute => {
+          if (!columnAttribute.selected) {
+            this.columnSelected(columnAttribute)
+          }
+        })
+      }
+      return hasRequireds
     },
 
     updateReport() {
@@ -639,31 +692,23 @@ export default {
                     Columns
                   </a>
                   <template v-for="column in design.relatedTable.columns">
-                    <a
+                    <TableAttributeButton
                       v-if="!column.hidden"
-                      :key="$key(design.relatedTable, 'column', column)"
+                      :key="
+                        $key(
+                          design.relatedTable,
+                          getAttributeTypeColumn,
+                          column
+                        )
+                      "
                       :data-test-id="`column-${column.label}`.toLowerCase()"
-                      class="panel-block space-between has-text-weight-medium"
-                      :class="{ 'is-active': column.selected }"
-                      @click="columnSelected(column)"
-                    >
-                      {{ column.label }}
-                      <button
-                        v-if="
-                          getIsAttributeInFilters(
-                            design.name,
-                            column.name,
-                            'column'
-                          )
-                        "
-                        class="button is-small"
-                        @click.stop="jumpToFilters"
-                      >
-                        <span class="icon has-text-interactive-secondary">
-                          <font-awesome-icon icon="filter"></font-awesome-icon>
-                        </span>
-                      </button>
-                    </a>
+                      :attribute="column"
+                      :attribute-type="getAttributeTypeColumn"
+                      :design="design"
+                      :is-disabled="Boolean(column.required)"
+                      @attribute-selected="columnSelected(column)"
+                      @filter-click="jumpToFilters"
+                    />
                   </template>
                   <!-- eslint-disable-next-line vue/require-v-for-key -->
                   <a
@@ -676,14 +721,20 @@ export default {
                     Timeframes
                   </a>
                   <template v-for="timeframe in design.relatedTable.timeframes">
-                    <a
-                      :key="$key(design.relatedTable, 'timeframe', timeframe)"
-                      class="panel-block timeframe"
-                      :class="{ 'is-active': isTimeframeSelected(timeframe) }"
-                      @click="timeframeSelected(timeframe)"
-                    >
-                      {{ timeframe.label }}
-                    </a>
+                    <TableAttributeButton
+                      v-if="!timeframe.hidden"
+                      :key="
+                        $key(
+                          design.relatedTable,
+                          getAttributeTypeTimeframe,
+                          timeframe
+                        )
+                      "
+                      :attribute="timeframe"
+                      :attribute-type="getAttributeTypeTimeframe"
+                      :design="design"
+                      @attribute-selected="timeframeSelected(timeframe)"
+                    />
                     <template v-for="period in timeframe.periods">
                       <a
                         v-if="timeframe.selected"
@@ -706,31 +757,26 @@ export default {
                   >
                     Aggregates
                   </a>
-                  <a
-                    v-for="aggregate in design.relatedTable.aggregates"
-                    :key="$key(design.relatedTable, 'aggregate', aggregate)"
-                    :data-test-id="`aggregate-${aggregate.label}`.toLowerCase()"
-                    class="panel-block space-between has-text-weight-medium"
-                    :class="{ 'is-active': aggregate.selected }"
-                    @click="aggregateSelected(aggregate)"
-                  >
-                    {{ aggregate.label }}
-                    <button
-                      v-if="
-                        getIsAttributeInFilters(
-                          design.name,
-                          aggregate.name,
-                          'aggregate'
+                  <template v-for="aggregate in design.relatedTable.aggregates">
+                    <TableAttributeButton
+                      v-if="!aggregate.hidden"
+                      :key="
+                        $key(
+                          design.relatedTable,
+                          getAttributeTypeAggregate,
+                          aggregate
                         )
                       "
-                      class="button is-small"
-                      @click.stop="jumpToFilters"
-                    >
-                      <span class="icon has-text-interactive-secondary">
-                        <font-awesome-icon icon="filter"></font-awesome-icon>
-                      </span>
-                    </button>
-                  </a>
+                      :data-test-id="
+                        `aggregate-${aggregate.label}`.toLowerCase()
+                      "
+                      :attribute="aggregate"
+                      :attribute-type="getAttributeTypeAggregate"
+                      :design="design"
+                      @attribute-selected="aggregateSelected(aggregate)"
+                      @filter-click="jumpToFilters"
+                    />
+                  </template>
                 </template>
 
                 <!-- Join table(s) second, preceded by the base table -->
@@ -767,32 +813,23 @@ export default {
                         Columns
                       </a>
                       <template v-for="column in join.relatedTable.columns">
-                        <a
+                        <TableAttributeButton
                           v-if="!column.hidden"
-                          :key="$key(join.relatedTable, 'column', column)"
-                          class="panel-block space-between has-text-weight-medium"
-                          :class="{ 'is-active': column.selected }"
-                          @click="joinColumnSelected(join, column)"
-                        >
-                          {{ column.label }}
-                          <button
-                            v-if="
-                              getIsAttributeInFilters(
-                                join.name,
-                                column.name,
-                                'column'
-                              )
-                            "
-                            class="button is-small"
-                            @click.stop="jumpToFilters"
-                          >
-                            <span class="icon has-text-interactive-secondary">
-                              <font-awesome-icon
-                                icon="filter"
-                              ></font-awesome-icon>
-                            </span>
-                          </button>
-                        </a>
+                          :key="
+                            $key(
+                              join.relatedTable,
+                              getAttributeTypeColumn,
+                              column
+                            )
+                          "
+                          :data-test-id="`column-${column.label}`.toLowerCase()"
+                          :attribute="column"
+                          :attribute-type="getAttributeTypeColumn"
+                          :design="join"
+                          :is-disabled="Boolean(column.required)"
+                          @attribute-selected="joinColumnSelected(join, column)"
+                          @filter-click="jumpToFilters"
+                        />
                       </template>
 
                       <!-- eslint-disable-next-line vue/require-v-for-key -->
@@ -810,16 +847,20 @@ export default {
                       <template
                         v-for="timeframe in join.relatedTable.timeframes"
                       >
-                        <a
-                          :key="$key(join.relatedTable, 'timeframe', timeframe)"
-                          class="panel-block timeframe"
-                          :class="{
-                            'is-active': timeframe.selected
-                          }"
-                          @click="timeframeSelected(timeframe)"
-                        >
-                          {{ timeframe.label }}
-                        </a>
+                        <TableAttributeButton
+                          v-if="!timeframe.hidden"
+                          :key="
+                            $key(
+                              join.relatedTable,
+                              getAttributeTypeTimeframe,
+                              timeframe
+                            )
+                          "
+                          :attribute="timeframe"
+                          :attribute-type="getAttributeTypeTimeframe"
+                          :design="join"
+                          @attribute-selected="timeframeSelected(timeframe)"
+                        />
                         <template v-if="timeframe.selected">
                           <template v-for="period in timeframe.periods">
                             <a
@@ -859,31 +900,26 @@ export default {
                       <template
                         v-for="aggregate in join.relatedTable.aggregates"
                       >
-                        <a
-                          :key="$key(join.relatedTable, 'aggregate', aggregate)"
-                          class="panel-block space-between has-text-weight-medium"
-                          :class="{ 'is-active': aggregate.selected }"
-                          @click="joinAggregateSelected(join, aggregate)"
-                        >
-                          {{ aggregate.label }}
-                          <button
-                            v-if="
-                              getIsAttributeInFilters(
-                                join.name,
-                                aggregate.name,
-                                'aggregate'
-                              )
-                            "
-                            class="button is-small"
-                            @click.stop="jumpToFilters"
-                          >
-                            <span class="icon has-text-interactive-secondary">
-                              <font-awesome-icon
-                                icon="filter"
-                              ></font-awesome-icon>
-                            </span>
-                          </button>
-                        </a>
+                        <TableAttributeButton
+                          v-if="!aggregate.hidden"
+                          :key="
+                            $key(
+                              join.relatedTable,
+                              getAttributeTypeAggregate,
+                              aggregate
+                            )
+                          "
+                          :data-test-id="
+                            `aggregate-${aggregate.label}`.toLowerCase()
+                          "
+                          :attribute="aggregate"
+                          :attribute-type="getAttributeTypeAggregate"
+                          :design="join"
+                          @attribute-selected="
+                            joinAggregateSelected(join, aggregate)
+                          "
+                          @filter-click="jumpToFilters"
+                        />
                       </template>
                     </template>
                   </template>
@@ -1063,17 +1099,13 @@ export default {
     border-top: 1px solid $grey-lighter;
   }
 
-  &.space-between {
-    justify-content: space-between;
+  &.attribute-heading {
+    cursor: auto;
+    padding: 0.25rem 0.75rem;
   }
 
   &.indented {
     padding-left: 1.5rem;
-  }
-
-  &.attribute-heading {
-    cursor: auto;
-    padding: 0.25rem 0.75rem;
   }
 
   &.table-heading {
@@ -1081,35 +1113,6 @@ export default {
 
     .icon {
       margin-right: 0.5rem;
-    }
-  }
-
-  &.timeframe {
-    &::after {
-      border: 3px solid $grey-darker;
-      border-radius: 2px;
-      border-right: 0;
-      border-top: 0;
-      content: ' ';
-      display: block;
-      height: 0.625em;
-      margin-top: -0.321em;
-      pointer-events: none;
-      position: absolute;
-      top: 50%;
-      -webkit-transform: rotate(-134deg);
-      transform: rotate(-134deg);
-      -webkit-transform-origin: center;
-      transform-origin: center;
-      width: 0.625em;
-      right: 7%;
-    }
-    &.is-active {
-      &::after {
-        margin-top: -0.4375em;
-        -webkit-transform: rotate(-45deg);
-        transform: rotate(-45deg);
-      }
     }
   }
 }

@@ -18,6 +18,8 @@ import {
   faChartPie,
   faCheck,
   faCheckCircle,
+  faChevronDown,
+  faChevronUp,
   faDatabase,
   faDotCircle,
   faDraftingCompass,
@@ -74,6 +76,8 @@ export default {
     library.add(faChartPie)
     library.add(faCheck)
     library.add(faCheckCircle)
+    library.add(faChevronDown)
+    library.add(faChevronUp)
     library.add(faDatabase)
     library.add(faDotCircle)
     library.add(faDraftingCompass)

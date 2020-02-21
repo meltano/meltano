@@ -1,7 +1,6 @@
 ---
 metaTitle: Meltano Software Architecture
 description: Meltano utilizes a taps and targets architecture, making it easy to implement in any ELT pipeline.
-sidebarDepth: 2
 ---
 
 # Architecture
@@ -26,7 +25,7 @@ A `Topic` can be identified by the naming schema: `<name>.topic.m5o` and should 
 
 A `Design` maps multiple `Tables` together via `Joins` and represent the query context required for the actual analysis.
 
-Each `Design` is also a `Source`, and thus can be referred to by the `Joins` it defines.
+Each `Design` is also a `Source`, and thus can be refered to by the `Joins` it defines.
 
 ```
 # defines a Design named `sample`
