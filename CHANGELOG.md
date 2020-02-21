@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1646](https://gitlab.com/meltano/meltano/issues/1646) Add default Stripe dashboard
 - [#1759](https://gitlab.com/meltano/meltano/issues/1759) Add default reports and dashboard for Google Ads data
 - [#1775](https://gitlab.com/meltano/meltano/issues/1775) Add default dashboard for GitLab extractor
+- [#1714](https://gitlab.com/meltano/meltano/issues/1714) Add support for a `required` setting in Models so Analyze can still work with more complex reporting scenarios (Facebook and Google Adwords need this)
 
 ### Changes
 
