@@ -11,13 +11,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1646](https://gitlab.com/meltano/meltano/issues/1646) Add default Stripe dashboard
 - [#1759](https://gitlab.com/meltano/meltano/issues/1759) Add default reports and dashboard for Google Ads data
+- [#1775](https://gitlab.com/meltano/meltano/issues/1775) Add default dashboard for GitLab extractor
 
 ### Changes
 
 ### Fixes
 
 ### Breaks
-
 
 ## 1.21.2 - (2020-02-18)
 
@@ -36,7 +36,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1751](https://gitlab.com/meltano/meltano/issues/1751) Custom report ordering now works based on user customization
 - [#1756](https://gitlab.com/meltano/meltano/issues/1756) Fix embed app to properly render based on `report` or `dashboard` type
-
 
 ## 1.21.1 - (2020-02-17)
 
