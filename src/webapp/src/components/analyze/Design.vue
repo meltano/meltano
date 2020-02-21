@@ -332,9 +332,11 @@ export default {
       const hasRequireds = requireds.length > 0
 
       if (hasRequireds) {
-        requireds.forEach(columnAttribute =>
-          this.columnSelected(columnAttribute)
-        )
+        requireds.forEach(columnAttribute => {
+          if (!columnAttribute.selected) {
+            this.columnSelected(columnAttribute)
+          }
+        })
       }
       return hasRequireds
     },
