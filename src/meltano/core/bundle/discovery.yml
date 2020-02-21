@@ -749,7 +749,10 @@ models:
 dashboards:
   - name: dashboard-adwords
     namespace: tap_adwords
-    pip_url: 'git+https://gitlab.com/meltano/dashboard-adwords'
+    pip_url: 'git+https://gitlab.com/meltano/dashboard-adwords.git'
+  - name: dashboard-facebook
+    namespace: tap_facebook
+    pip_url: 'git+https://gitlab.com/meltano/dashboard-facebook.git'
   - name: dashboard-gitlab
     namespace: tap_gitlab
     pip_url: 'git+https://gitlab.com/meltano/dashboard-gitlab.git'
