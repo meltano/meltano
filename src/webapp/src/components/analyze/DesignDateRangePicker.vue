@@ -1,6 +1,8 @@
 <script>
 import { mapGetters } from 'vuex'
 
+import lodash from 'lodash'
+
 import Dropdown from '@/components/generic/Dropdown'
 import utils from '@/utils/utils'
 
@@ -13,7 +15,9 @@ export default {
     attributes: { type: Array, required: true }
   },
   data: () => ({
-    attributePairs: []
+    attributePairs: [],
+    defaultDateRange: Object.freeze({ start: null, end: null }),
+    initialDateRanges: []
   }),
   computed: {
     ...mapGetters('designs', ['getIsAttributeInFilters']),
@@ -30,25 +34,37 @@ export default {
       return dateRange => dateRange.start && dateRange.end
     },
     getIsSavable() {
-      return false
+      const dateRanges = this.attributePairs.map(
+        attributePair => attributePair.dateRange
+      )
+      return !lodash.isEqual(dateRanges, this.initialDateRanges)
     },
     getKey() {
       return utils.key
+    },
+    getLabel() {
+      return 'Date Ranges'
     }
   },
   methods: {
     clearDateRange(attributePair) {
-      attributePair.dateRange = { start: null, end: null }
+      attributePair.dateRange = this.defaultDateRange
     },
-    onDropdownOpen() {
-      this.processAttributePairs()
-    },
-    onSelectDateRange() {},
-    processAttributePairs() {
+    initializeAttributePairs() {
       this.attributePairs = this.attributes.map(attribute => {
-        return { attribute, dateRange: { start: null, end: null } }
+        const dateRange = attribute.dateRange || this.defaultDateRange
+        return { attribute, dateRange }
       })
     },
+    onDropdownOpen() {
+      this.initializeAttributePairs()
+      this.initialDateRanges = Object.freeze(
+        lodash.cloneDeep(
+          this.attributePairs.map(attributePair => attributePair.dateRange)
+        )
+      )
+    },
+    onSelectDateRange() {},
     saveDateRanges() {}
   }
 }
@@ -56,7 +72,7 @@ export default {
 
 <template>
   <Dropdown
-    label="Date Ranges"
+    :label="getLabel"
     menu-classes="dropdown-menu-600"
     is-right-aligned
     icon-open="calendar"
