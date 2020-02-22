@@ -351,6 +351,7 @@ const actions = {
     const filter = new FilterModel(payload)
     commit('addFilter', filter)
 
+    // Aggregates must be selected if they're used as a filter target where columns do not
     const isValidToggleSelection =
       !filter.attribute.hasOwnProperty('selected') || !filter.attribute.selected
     if (filter.filterType === 'aggregate' && isValidToggleSelection) {

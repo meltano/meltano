@@ -1,9 +1,10 @@
 <script>
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 import lodash from 'lodash'
 
 import Dropdown from '@/components/generic/Dropdown'
+import { QUERY_ATTRIBUTE_TYPES } from '@/api/design'
 import utils from '@/utils/utils'
 
 export default {
@@ -21,6 +22,7 @@ export default {
   }),
   computed: {
     ...mapGetters('designs', ['getIsAttributeInFilters']),
+    ...mapState('designs', ['filterOptions', 'filters']),
     getDateLabel() {
       return attributePair => {
         return this.getHasValidDateRange(attributePair.dateRange)
@@ -61,6 +63,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions('designs', ['addFilter', 'removeFilter']),
     clearDateRange(attributePair) {
       attributePair.dateRange = this.defaultDateRange
     },
@@ -80,7 +83,27 @@ export default {
       )
     },
     onSelectDateRange() {},
-    saveDateRanges() {}
+    saveDateRanges() {
+      this.attributePairs.forEach(attributePair => {
+        const { attribute, dateRange } = attributePair
+        const partialShared = {
+          sourceName: attribute.sourceName,
+          attribute: attribute,
+          filterType: QUERY_ATTRIBUTE_TYPES.COLUMN
+        }
+        const partialStart = {
+          expression: 'greater_or_equal_than', // TODO refactor `filterOptions` and/or constants approach
+          value: dateRange.start
+        }
+        const partialEnd = {
+          expression: 'less_or_equal_than', // TODO refactor `filterOptions` and/or constants approach
+          value: dateRange.end
+        }
+        // Add filters as pair
+        this.addFilter(Object.assign(partialStart, partialShared))
+        this.addFilter(Object.assign(partialEnd, partialShared))
+      })
+    }
   }
 }
 </script>
