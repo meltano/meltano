@@ -115,6 +115,7 @@ export default {
           value: dateRange.end
         }
         // Add filters as pair
+        // TODO conditionally add/remove/update based on existing status
         this.addFilter(Object.assign(partialStart, partialShared))
         this.addFilter(Object.assign(partialEnd, partialShared))
       })
