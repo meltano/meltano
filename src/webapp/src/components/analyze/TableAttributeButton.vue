@@ -18,7 +18,10 @@ export default {
     isDisabled: { type: Boolean, required: false }
   },
   computed: {
-    ...mapGetters('designs', ['getIsAttributeInFilters']),
+    ...mapGetters('designs', [
+      'getAttributesOfDate',
+      'getIsAttributeInFilters'
+    ]),
     getHasSelectedPeriods() {
       return (
         this.getIsTimeframe && lodash.some(this.attribute.periods, selected)
@@ -35,6 +38,10 @@ export default {
     getIsTimeframe() {
       return this.attributeType === QUERY_ATTRIBUTE_TYPES.TIMEFRAME
     },
+    getFilterIcon() {
+      return attribute =>
+        this.getAttributesOfDate.includes(attribute) ? 'calendar' : 'filter'
+    },
     getTimeframeIcon() {
       return `chevron-${this.attribute.selected ? 'up' : 'down'}`
     }
@@ -43,8 +50,11 @@ export default {
     onAttributeSelected() {
       this.$emit('attribute-selected')
     },
-    onFilterClick() {
-      this.$emit('filter-click')
+    onFilterClick(attribute) {
+      const eventName = this.getAttributesOfDate.includes(attribute)
+        ? 'calendar-click'
+        : 'filter-click'
+      this.$emit(eventName)
     }
   }
 }
@@ -89,10 +99,12 @@ export default {
             getIsAttributeInFilters(design.name, attribute.name, attributeType)
           "
           class="button is-small"
-          @click.stop="onFilterClick"
+          @click.stop="onFilterClick(attribute)"
         >
           <span class="icon has-text-interactive-secondary">
-            <font-awesome-icon icon="filter"></font-awesome-icon>
+            <font-awesome-icon
+              :icon="getFilterIcon(attribute)"
+            ></font-awesome-icon>
           </span>
         </button>
       </template>

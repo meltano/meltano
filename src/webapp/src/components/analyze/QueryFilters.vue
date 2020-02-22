@@ -20,10 +20,17 @@ export default {
   },
   computed: {
     ...mapState('designs', ['filterOptions', 'filters']),
-    ...mapGetters('designs', ['getFilterAttributes', 'hasFilters']),
+    ...mapGetters('designs', [
+      'getAttributesOfDate',
+      'getNonDateFilterAttributes',
+      'hasNonDateFilters'
+    ]),
     getFlattenedFilters() {
-      return this.hasFilters
-        ? _.sortBy(this.filters.columns.concat(this.filters.aggregates), 'name')
+      const nonDateFilterColumns = this.filters.columns.filter(
+        filter => !this.getAttributesOfDate.includes(filter.attribute)
+      )
+      return this.hasNonDateFilters
+        ? _.sortBy(nonDateFilterColumns.concat(this.filters.aggregates), 'name')
         : []
     },
     getFilterInputType() {
@@ -161,7 +168,7 @@ export default {
               <span class="select is-fullwidth is-small">
                 <select v-model="addFilterModel.attributeHelper">
                   <optgroup
-                    v-for="attribute in getFilterAttributes"
+                    v-for="attribute in getNonDateFilterAttributes"
                     :key="attribute.tableLabel"
                     :label="attribute.tableLabel"
                   >
@@ -238,7 +245,7 @@ export default {
           </td>
         </tr>
 
-        <template v-if="hasFilters">
+        <template v-if="hasNonDateFilters">
           <br />
 
           <tr

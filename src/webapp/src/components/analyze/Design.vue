@@ -59,13 +59,13 @@ export default {
       'currentDesignLabel',
       'currentExtractor',
       'currentModelLabel',
-      'filtersCount',
+      'getNonDateFiltersCount',
       'formattedSql',
       'getSelectedAttributesCount',
       'getAttributesOfDate',
       'hasChartableResults',
-      'hasFilters',
       'hasJoins',
+      'hasNonDateFilters',
       'hasResults',
       'resultsCount',
       'showAttributesHeader'
@@ -201,6 +201,11 @@ export default {
       if (slug) {
         this.getDashboards()
       }
+    },
+
+    jumpToDateFilters() {
+      utils.scrollToTop()
+      // TODO event emit for cal open
     },
 
     jumpToFilters() {
@@ -627,18 +632,20 @@ export default {
                   <label class="label">
                     <span>Filters</span>
                     <span
-                      v-if="filtersCount > 0"
+                      v-if="getNonDateFiltersCount > 0"
                       class="has-text-weight-light has-text-grey-light is-size-7"
-                      >({{ filtersCount }})</span
+                      >({{ getNonDateFiltersCount }})</span
                     >
                   </label>
                   <div class="control is-expanded">
                     <Dropdown
                       ref="filter-dropdown"
-                      :label="hasFilters ? 'Edit' : 'None'"
+                      :label="hasNonDateFilters ? 'Edit' : 'None'"
                       :button-classes="
                         `is-small ${
-                          hasFilters ? 'has-text-interactive-secondary' : ''
+                          hasNonDateFilters
+                            ? 'has-text-interactive-secondary'
+                            : ''
                         }`
                       "
                       :menu-classes="'dropdown-menu-600'"
@@ -719,6 +726,7 @@ export default {
                       :design="design"
                       :is-disabled="Boolean(column.required)"
                       @attribute-selected="columnSelected(column)"
+                      @calendar-click="jumpToDateFilters"
                       @filter-click="jumpToFilters"
                     />
                   </template>
@@ -840,6 +848,7 @@ export default {
                           :design="join"
                           :is-disabled="Boolean(column.required)"
                           @attribute-selected="joinColumnSelected(join, column)"
+                          @calendar-click="jumpToDateFilters"
                           @filter-click="jumpToFilters"
                         />
                       </template>

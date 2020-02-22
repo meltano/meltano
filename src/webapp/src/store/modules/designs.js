@@ -159,10 +159,6 @@ const getters = {
     return utils.titleCase(state.currentModel)
   },
 
-  filtersCount(state) {
-    return state.filters.columns.length + state.filters.aggregates.length
-  },
-
   formattedSql(state) {
     return sqlFormatter.format(state.currentSQL)
   },
@@ -233,10 +229,11 @@ const getters = {
         )
   },
 
-  getFilterAttributes(state) {
+  getNonDateFilterAttributes(state) {
     const sources = []
     const design = state.design
-    const attributeFilter = attr => !attr.hidden
+    const attributeFilter = attr =>
+      !attr.hidden && attr.type !== QUERY_ATTRIBUTE_DATA_TYPES.DATE
     if (design.label) {
       sources.push({
         tableLabel: design.label,
@@ -264,6 +261,10 @@ const getters = {
       })
     }
     return sources
+  },
+
+  getNonDateFiltersCount(_, getters) {
+    return getters.getNonDateFilterAttributes.length
   },
 
   getFiltersByType(state) {
@@ -315,13 +316,12 @@ const getters = {
     return getters.hasResults && state.resultAggregates.length
   },
 
-  // eslint-disable-next-line
-  hasFilters(_, getters) {
-    return getters.filtersCount > 0
-  },
-
   hasJoins(state) {
     return !!(state.design.joins && state.design.joins.length)
+  },
+
+  hasNonDateFilters(_, getters) {
+    return getters.getNonDateFiltersCount > 0
   },
 
   hasResults(state) {
