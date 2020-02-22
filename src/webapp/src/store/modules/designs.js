@@ -5,6 +5,7 @@ import sqlFormatter from 'sql-formatter'
 import SSF from 'ssf'
 
 import designApi from '@/api/design'
+import FilterModel from '@/store/models/FilterModel'
 import sqlApi from '@/api/sql'
 import utils from '@/utils/utils'
 import { QUERY_ATTRIBUTE_DATA_TYPES } from '@/api/design'
@@ -346,33 +347,14 @@ const getters = {
 }
 
 const actions = {
-  // eslint-disable-next-line
-  addFilter(
-    { commit },
-    {
-      sourceName,
-      attribute,
-      filterType,
-      expression = '',
-      value = '',
-      isActive = true
-    }
-  ) {
-    const filter = {
-      sourceName,
-      name: attribute.name,
-      expression,
-      value,
-      attribute,
-      filterType,
-      isActive
-    }
+  addFilter({ commit }, payload) {
+    const filter = new FilterModel(payload)
     commit('addFilter', filter)
 
     const isValidToggleSelection =
-      !attribute.hasOwnProperty('selected') || !attribute.selected
-    if (filterType === 'aggregate' && isValidToggleSelection) {
-      commit('toggleSelected', attribute)
+      !filter.attribute.hasOwnProperty('selected') || !filter.attribute.selected
+    if (filter.filterType === 'aggregate' && isValidToggleSelection) {
+      commit('toggleSelected', filter.attribute)
     }
   },
 
