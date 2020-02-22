@@ -1,5 +1,4 @@
 export default function FilterModel({
-  sourceName,
   attribute,
   filterType,
   expression = '',
@@ -7,7 +6,7 @@ export default function FilterModel({
   isActive = true
 }) {
   const filter = {
-    sourceName,
+    sourceName: attribute.sourceName,
     name: attribute.name,
     expression,
     value,

@@ -103,7 +103,6 @@ export default {
       this.attributePairs.forEach(attributePair => {
         const { attribute, dateRange } = attributePair
         const partialShared = {
-          sourceName: attribute.sourceName,
           attribute: attribute,
           filterType: QUERY_ATTRIBUTE_TYPES.COLUMN
         }

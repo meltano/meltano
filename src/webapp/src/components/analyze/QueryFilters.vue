@@ -92,7 +92,6 @@ export default {
     addNewFilter() {
       const vm = this.addFilterModel
       this.addFilter({
-        sourceName: vm.attributeHelper.sourceName,
         attribute: vm.attributeHelper.attribute,
         filterType: vm.attributeHelper.type,
         expression: vm.expression,
