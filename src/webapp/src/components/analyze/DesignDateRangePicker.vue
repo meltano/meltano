@@ -13,7 +13,8 @@ export default {
     Dropdown
   },
   props: {
-    attributes: { type: Array, required: true }
+    attributes: { type: Array, required: true },
+    columnFilters: { type: Array, required: true }
   },
   data: () => ({
     attributePairs: [],
@@ -21,8 +22,15 @@ export default {
     initialDateRanges: []
   }),
   computed: {
-    ...mapGetters('designs', ['getIsAttributeInFilters']),
-    ...mapState('designs', ['filterOptions', 'filters']),
+    ...mapGetters('designs', [
+      'getAttributesOfDate',
+      'getIsAttributeInFilters'
+    ]),
+    getDateFilters() {
+      return this.columnFilters.filter(filter =>
+        this.getAttributesOfDate.includes(filter.attribute)
+      )
+    },
     getDateLabel() {
       return attributePair => {
         return this.getHasValidDateRange(attributePair.dateRange)
@@ -68,8 +76,16 @@ export default {
       attributePair.dateRange = this.defaultDateRange
     },
     initializeAttributePairs() {
+      const groupedFilters = lodash.groupBy(this.getDateFilters, 'expression')
       this.attributePairs = this.attributes.map(attribute => {
-        const dateRange = attribute.dateRange || this.defaultDateRange
+        const finder = filter => filter.attribute === attribute
+        let dateRange = this.defaultDateRange
+        if (!lodash.isEmpty(groupedFilters)) {
+          const start = groupedFilters['greater_or_equal_than'].find(finder)
+            .value
+          const end = groupedFilters['less_or_equal_than'].find(finder).value
+          dateRange = { start, end }
+        }
         return { attribute, dateRange }
       })
     },

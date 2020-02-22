@@ -47,6 +47,7 @@ export default {
       'currentSQL',
       'design',
       'filterOptions',
+      'filters',
       'hasCompletedFirstQueryRun',
       'hasSQLError',
       'isAutoRunQuery',
@@ -383,7 +384,10 @@ export default {
       <div class="column">
         <div class="field is-grouped is-grouped-right">
           <p v-if="getAttributesOfDate.length" class="control">
-            <DesignDateRangePicker :attributes="getAttributesOfDate" />
+            <DesignDateRangePicker
+              :attributes="getAttributesOfDate"
+              :column-filters="filters.columns"
+            />
           </p>
           <div
             class="control field"

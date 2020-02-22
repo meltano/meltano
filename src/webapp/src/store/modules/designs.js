@@ -761,7 +761,6 @@ const mutations = {
 
   setCurrentReport(state, report) {
     state.activeReport = report
-
     state.chartType = report.chartType
     state.filters = report.filters
     state.order = report.order
