@@ -263,10 +263,6 @@ const getters = {
     return sources
   },
 
-  getNonDateFiltersCount(_, getters) {
-    return getters.getNonDateFlattenedFilters.length
-  },
-
   getFiltersByType(state) {
     return filterType =>
       state.filters[helpers.getFilterTypePlural(filterType)] || []
@@ -289,6 +285,10 @@ const getters = {
 
   getIsOrderableAttributeAscending() {
     return orderableAttribute => orderableAttribute.direction === 'asc'
+  },
+
+  getNonDateFiltersCount(_, getters) {
+    return getters.getNonDateFlattenedFilters.length
   },
 
   getNonDateFlattenedFilters(state, getters) {
