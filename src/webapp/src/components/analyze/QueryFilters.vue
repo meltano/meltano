@@ -27,7 +27,12 @@ export default {
     ]),
     getFlattenedFilters() {
       const nonDateFilterColumns = this.filters.columns.filter(
-        filter => !this.getAttributesOfDate.includes(filter.attribute)
+        filter =>
+          !this.getAttributesOfDate.find(
+            attribute =>
+              filter.sourceName === attribute.sourceName &&
+              filter.name === attribute.name
+          )
       )
       return this.hasNonDateFilters
         ? _.sortBy(nonDateFilterColumns.concat(this.filters.aggregates), 'name')
