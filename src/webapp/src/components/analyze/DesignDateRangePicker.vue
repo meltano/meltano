@@ -123,7 +123,7 @@ export default {
         }
         // Add filters as pair
         // TODO conditionally add/remove/update based on existing status
-        // TODO we may still need to properly set state.filters in the design store when loading reports so that the attributes in the design are the same as those in filters (or can we change how attribute refs vs. ids are passed?)
+        // TODO we may still need to properly set state.filters in the design store
         this.addFilter(Object.assign(partialStart, partialShared))
         this.addFilter(Object.assign(partialEnd, partialShared))
       })
