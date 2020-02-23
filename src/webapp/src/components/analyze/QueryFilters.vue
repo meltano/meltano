@@ -22,7 +22,7 @@ export default {
     ...mapState('designs', ['filterOptions', 'filters']),
     ...mapGetters('designs', [
       'getAttributesOfDate',
-      'getNonDateFilterAttributes',
+      'getNonDateAttributeSources',
       'hasNonDateFilters'
     ]),
     getFlattenedFilters() {
@@ -172,17 +172,17 @@ export default {
               <span class="select is-fullwidth is-small">
                 <select v-model="addFilterModel.attributeHelper">
                   <optgroup
-                    v-for="attribute in getNonDateFilterAttributes"
-                    :key="attribute.tableLabel"
-                    :label="attribute.tableLabel"
+                    v-for="source in getNonDateAttributeSources"
+                    :key="source.tableLabel"
+                    :label="source.tableLabel"
                   >
                     <option disabled>Columns</option>
                     <option
-                      v-for="column in attribute.columns"
+                      v-for="column in source.columns"
                       :key="column.label"
                       :value="{
-                        attribute: column,
-                        sourceName: attribute.sourceName,
+                        source: column,
+                        sourceName: source.sourceName,
                         type: 'column'
                       }"
                     >
@@ -190,11 +190,11 @@ export default {
                     </option>
                     <option disabled>Aggregates</option>
                     <option
-                      v-for="aggregate in attribute.aggregates"
+                      v-for="aggregate in source.aggregates"
                       :key="aggregate.label"
                       :value="{
-                        attribute: aggregate,
-                        sourceName: attribute.sourceName,
+                        source: aggregate,
+                        sourceName: source.sourceName,
                         type: 'aggregate'
                       }"
                     >

@@ -229,7 +229,7 @@ const getters = {
         )
   },
 
-  getNonDateFilterAttributes(state) {
+  getNonDateAttributeSources(state) {
     const sources = []
     const design = state.design
     const attributeFilter = attr =>
@@ -264,7 +264,7 @@ const getters = {
   },
 
   getNonDateFiltersCount(_, getters) {
-    return getters.getNonDateFilterAttributes.length
+    return getters.getNonDateAttributeSources.length
   },
 
   getFiltersByType(state) {
