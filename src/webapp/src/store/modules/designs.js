@@ -264,7 +264,7 @@ const getters = {
   },
 
   getNonDateFiltersCount(_, getters) {
-    return getters.getNonDateAttributeSources.length
+    return getters.getNonDateFlattenedFilters.length
   },
 
   getFiltersByType(state) {
@@ -289,6 +289,21 @@ const getters = {
 
   getIsOrderableAttributeAscending() {
     return orderableAttribute => orderableAttribute.direction === 'asc'
+  },
+
+  getNonDateFlattenedFilters(state, getters) {
+    const nonDateFilterColumns = state.filters.columns.filter(
+      filter =>
+        !getters.getAttributesOfDate.find(
+          attribute =>
+            filter.sourceName === attribute.sourceName &&
+            filter.name === attribute.name
+        )
+    )
+    return lodash.sortBy(
+      nonDateFilterColumns.concat(state.filters.aggregates),
+      'name'
+    )
   },
 
   // eslint-disable-next-line no-shadow

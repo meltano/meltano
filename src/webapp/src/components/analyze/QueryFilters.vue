@@ -1,6 +1,5 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import _ from 'lodash'
 
 export default {
   name: 'QueryFilters',
@@ -21,23 +20,10 @@ export default {
   computed: {
     ...mapState('designs', ['filterOptions', 'filters']),
     ...mapGetters('designs', [
-      'getAttributesOfDate',
+      'getNonDateFlattenedFilters',
       'getNonDateAttributeSources',
       'hasNonDateFilters'
     ]),
-    getFlattenedFilters() {
-      const nonDateFilterColumns = this.filters.columns.filter(
-        filter =>
-          !this.getAttributesOfDate.find(
-            attribute =>
-              filter.sourceName === attribute.sourceName &&
-              filter.name === attribute.name
-          )
-      )
-      return this.hasNonDateFilters
-        ? _.sortBy(nonDateFilterColumns.concat(this.filters.aggregates), 'name')
-        : []
-    },
     getFilterInputType() {
       return filterType => (filterType === 'aggregate' ? 'number' : 'text')
     },
@@ -55,7 +41,7 @@ export default {
       )
     },
     getHasMultipleFilters() {
-      return this.getFlattenedFilters.length > 1
+      return this.getNonDateFlattenedFilters.length > 1
     },
     getHasValidatedOptionals() {
       return (expression, value) =>
@@ -71,7 +57,7 @@ export default {
     },
     isFirstFilterMatch() {
       return filter => {
-        const match = this.getFlattenedFilters.find(
+        const match = this.getNonDateFlattenedFilters.find(
           tempFilter =>
             tempFilter.sourceName === filter.sourceName &&
             tempFilter.name === filter.name
@@ -181,7 +167,7 @@ export default {
                       v-for="column in source.columns"
                       :key="column.label"
                       :value="{
-                        source: column,
+                        attribute: column,
                         sourceName: source.sourceName,
                         type: 'column'
                       }"
@@ -193,7 +179,7 @@ export default {
                       v-for="aggregate in source.aggregates"
                       :key="aggregate.label"
                       :value="{
-                        source: aggregate,
+                        attribute: aggregate,
                         sourceName: source.sourceName,
                         type: 'aggregate'
                       }"
@@ -253,7 +239,7 @@ export default {
           <br />
 
           <tr
-            v-for="(filter, index) in getFlattenedFilters"
+            v-for="(filter, index) in getNonDateFlattenedFilters"
             :key="`${filter.sourceName}-${filter.name}-${index}`"
           >
             <td>
