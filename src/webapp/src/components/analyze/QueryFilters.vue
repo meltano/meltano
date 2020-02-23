@@ -20,8 +20,8 @@ export default {
   computed: {
     ...mapState('designs', ['filterOptions', 'filters']),
     ...mapGetters('designs', [
-      'getNonDateFlattenedFilters',
       'getNonDateAttributeSources',
+      'getNonDateFlattenedFilters',
       'hasNonDateFilters'
     ]),
     getFilterInputType() {
