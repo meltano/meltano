@@ -17,15 +17,15 @@ export default {
     columnFilters: { type: Array, required: true }
   },
   data: () => ({
-    defaultDateRange: Object.freeze({ start: null, end: null }),
-    initialDateRanges: []
+    attributePairsModel: [],
+    defaultDateRange: Object.freeze({ start: null, end: null })
   }),
   computed: {
     ...mapGetters('designs', [
       'getAttributesOfDate',
       'getIsAttributeInFilters'
     ]),
-    getAttributePairs() {
+    getAttributePairsInitial() {
       const groupedFilters = lodash.groupBy(this.getDateFilters, 'expression')
       return this.attributes.map(attribute => {
         const finder = filter => {
@@ -66,28 +66,28 @@ export default {
       return dateRange => dateRange.start && dateRange.end
     },
     getIsSavable() {
-      const dateRanges = this.getAttributePairs.map(
-        attributePair => attributePair.dateRange
-      )
-      return !lodash.isEqual(dateRanges, this.initialDateRanges)
+      const mapper = attributePair => attributePair.dateRange
+      const initialDateRanges = this.getAttributePairsInitial.map(mapper)
+      const modelDateRanges = this.attributePairsModel.map(mapper)
+      return !lodash.isEqual(initialDateRanges, modelDateRanges)
     },
     getKey() {
       return utils.key
     },
     getLabel() {
-      const validDateRangeLength = this.getValidDateRanges.length
+      const validDateRangeLength = this.getValidDateRangesInitial.length
       const hasValidDateRanges = validDateRangeLength > 0
       let rangeLabel
       if (hasValidDateRanges) {
-        rangeLabel = this.getDateLabel(this.getValidDateRanges[0])
+        rangeLabel = this.getDateLabel(this.getValidDateRangesInitial[0])
         if (validDateRangeLength > 1) {
           rangeLabel += ` (+${validDateRangeLength - 1})`
         }
       }
       return hasValidDateRanges ? rangeLabel : 'Date Ranges'
     },
-    getValidDateRanges() {
-      return this.getAttributePairs.filter(attributePair =>
+    getValidDateRangesInitial() {
+      return this.getAttributePairsInitial.filter(attributePair =>
         this.getHasValidDateRange(attributePair.dateRange)
       )
     }
@@ -99,15 +99,11 @@ export default {
     },
     onDropdownClose() {},
     onDropdownOpen() {
-      this.initialDateRanges = Object.freeze(
-        lodash.cloneDeep(
-          this.getAttributePairs.map(attributePair => attributePair.dateRange)
-        )
-      )
+      this.attributePairsModel = lodash.cloneDeep(this.getAttributePairsInitial)
     },
     onSelectDateRange() {},
     saveDateRanges() {
-      this.getAttributePairs.forEach(attributePair => {
+      this.attributePairsModel.forEach(attributePair => {
         const { attribute, dateRange } = attributePair
         const partialShared = {
           attribute: attribute,
@@ -137,7 +133,11 @@ export default {
     :label="getLabel"
     menu-classes="dropdown-menu-600"
     :button-classes="
-      `${getValidDateRanges.length > 0 ? 'has-text-interactive-secondary' : ''}`
+      `${
+        getValidDateRangesInitial.length > 0
+          ? 'has-text-interactive-secondary'
+          : ''
+      }`
     "
     is-right-aligned
     icon-open="calendar"
@@ -146,7 +146,7 @@ export default {
   >
     <div class="dropdown-content">
       <div
-        v-for="attributePair in getAttributePairs"
+        v-for="attributePair in attributePairsModel"
         :key="getKey(attributePair.attribute.name)"
         class="dropdown-item"
       >
