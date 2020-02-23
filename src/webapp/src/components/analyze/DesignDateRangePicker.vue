@@ -17,7 +17,6 @@ export default {
     columnFilters: { type: Array, required: true }
   },
   data: () => ({
-    attributePairs: [],
     defaultDateRange: Object.freeze({ start: null, end: null }),
     initialDateRanges: []
   }),
@@ -26,9 +25,32 @@ export default {
       'getAttributesOfDate',
       'getIsAttributeInFilters'
     ]),
+    getAttributePairs() {
+      const groupedFilters = lodash.groupBy(this.getDateFilters, 'expression')
+      return this.attributes.map(attribute => {
+        const finder = filter => {
+          return (
+            filter.sourceName === attribute.sourceName &&
+            filter.name === attribute.name
+          )
+        }
+        let dateRange = this.defaultDateRange
+        if (!lodash.isEmpty(groupedFilters)) {
+          const start = groupedFilters['greater_or_equal_than'].find(finder)
+            .value
+          const end = groupedFilters['less_or_equal_than'].find(finder).value
+          dateRange = { start: new Date(start), end: new Date(end) }
+        }
+        return { attribute, dateRange }
+      })
+    },
     getDateFilters() {
       return this.columnFilters.filter(filter =>
-        this.getAttributesOfDate.includes(filter.attribute)
+        this.getAttributesOfDate.find(
+          attribute =>
+            filter.sourceName === attribute.sourceName &&
+            filter.name === attribute.name
+        )
       )
     },
     getDateLabel() {
@@ -44,7 +66,7 @@ export default {
       return dateRange => dateRange.start && dateRange.end
     },
     getIsSavable() {
-      const dateRanges = this.attributePairs.map(
+      const dateRanges = this.getAttributePairs.map(
         attributePair => attributePair.dateRange
       )
       return !lodash.isEqual(dateRanges, this.initialDateRanges)
@@ -65,7 +87,7 @@ export default {
       return hasValidDateRanges ? rangeLabel : 'Date Ranges'
     },
     getValidDateRanges() {
-      return this.attributePairs.filter(attributePair =>
+      return this.getAttributePairs.filter(attributePair =>
         this.getHasValidDateRange(attributePair.dateRange)
       )
     }
@@ -75,32 +97,17 @@ export default {
     clearDateRange(attributePair) {
       attributePair.dateRange = this.defaultDateRange
     },
-    initializeAttributePairs() {
-      const groupedFilters = lodash.groupBy(this.getDateFilters, 'expression')
-      this.attributePairs = this.attributes.map(attribute => {
-        const finder = filter => filter.attribute === attribute
-        let dateRange = this.defaultDateRange
-        if (!lodash.isEmpty(groupedFilters)) {
-          const start = groupedFilters['greater_or_equal_than'].find(finder)
-            .value
-          const end = groupedFilters['less_or_equal_than'].find(finder).value
-          dateRange = { start, end }
-        }
-        return { attribute, dateRange }
-      })
-    },
     onDropdownClose() {},
     onDropdownOpen() {
-      this.initializeAttributePairs()
       this.initialDateRanges = Object.freeze(
         lodash.cloneDeep(
-          this.attributePairs.map(attributePair => attributePair.dateRange)
+          this.getAttributePairs.map(attributePair => attributePair.dateRange)
         )
       )
     },
     onSelectDateRange() {},
     saveDateRanges() {
-      this.attributePairs.forEach(attributePair => {
+      this.getAttributePairs.forEach(attributePair => {
         const { attribute, dateRange } = attributePair
         const partialShared = {
           attribute: attribute,
@@ -116,6 +123,7 @@ export default {
         }
         // Add filters as pair
         // TODO conditionally add/remove/update based on existing status
+        // TODO we may still need to properly set state.filters in the design store when loading reports so that the attributes in the design are the same as those in filters (or can we change how attribute refs vs. ids are passed?)
         this.addFilter(Object.assign(partialStart, partialShared))
         this.addFilter(Object.assign(partialEnd, partialShared))
       })
@@ -138,7 +146,7 @@ export default {
   >
     <div class="dropdown-content">
       <div
-        v-for="attributePair in attributePairs"
+        v-for="attributePair in getAttributePairs"
         :key="getKey(attributePair.attribute.name)"
         class="dropdown-item"
       >
