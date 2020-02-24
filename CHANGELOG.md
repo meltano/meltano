@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.22.0 - (2020-02-24)
 
 ---
 
@@ -15,11 +28,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1714](https://gitlab.com/meltano/meltano/issues/1714) Add support for a `required` setting in Models so Analyze can still work with more complex reporting scenarios (Facebook and Google Adwords need this)
 - [#1780](https://gitlab.com/meltano/meltano/issues/1780) Add default reports and dashboard for Facebook Ads data
 
-### Changes
-
-### Fixes
-
-### Breaks
 
 ## 1.21.2 - (2020-02-18)
 
