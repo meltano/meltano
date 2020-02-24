@@ -665,6 +665,10 @@ const actions = {
     dispatch('tryAutoRun')
   },
 
+  updateFilter({ commit }, payload) {
+    commit('updateFilter', payload)
+  },
+
   updateReport({ commit, dispatch, rootGetters, state }) {
     commit('updateActiveReport')
     return dispatch('reports/updateReport', state.activeReport, {
@@ -907,6 +911,12 @@ const mutations = {
   updateActiveReport(state) {
     state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign(state)
     state.activeReport.chartType = state.chartType
+  },
+
+  updateFilter(state, { filter, value }) {
+    if (filter) {
+      filter.value = value
+    }
   }
 }
 

@@ -95,7 +95,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('designs', ['addFilter', 'removeFilter']),
+    ...mapActions('designs', ['addFilter', 'removeFilter', 'updateFilter']),
     clearDateRange(attributePair) {
       attributePair.dateRange.start = null
       attributePair.dateRange.end = null
@@ -121,7 +121,7 @@ export default {
           value: dateRange.end
         }
 
-        // Apply filters as a pair
+        // Apply filters as a pair of add|remove|update
         const { name, sourceName } = attribute
         const filters = this.getFilters(
           sourceName,
@@ -140,7 +140,11 @@ export default {
             this.removeFilter(startFilter)
             this.removeFilter(endFilter)
           } else {
-            // TODO update existing
+            this.updateFilter({
+              filter: startFilter,
+              value: partialStart.value
+            })
+            this.updateFilter({ filter: endFilter, value: partialEnd.value })
           }
         } else {
           this.addFilter(Object.assign(partialStart, partialShared))
