@@ -17,12 +17,12 @@ export default {
     columnFilters: { type: Array, required: true }
   },
   data: () => ({
-    attributePairsModel: [],
-    defaultDateRange: Object.freeze({ start: null, end: null })
+    attributePairsModel: []
   }),
   computed: {
     ...mapGetters('designs', [
       'getAttributesOfDate',
+      'getFilters',
       'getIsAttributeInFilters'
     ]),
     getAttributePairsInitial() {
@@ -34,12 +34,14 @@ export default {
             filter.name === attribute.name
           )
         }
-        let dateRange = this.defaultDateRange
+        let dateRange = { start: null, end: null }
         if (!lodash.isEmpty(groupedFilters)) {
           const start = groupedFilters['greater_or_equal_than'].find(finder)
-            .value
-          const end = groupedFilters['less_or_equal_than'].find(finder).value
-          dateRange = { start: new Date(start), end: new Date(end) }
+          const end = groupedFilters['less_or_equal_than'].find(finder)
+          dateRange = {
+            start: start ? new Date(start.value) : null,
+            end: end ? new Date(end.value) : null
+          }
         }
         return { attribute, dateRange }
       })
@@ -95,7 +97,8 @@ export default {
   methods: {
     ...mapActions('designs', ['addFilter', 'removeFilter']),
     clearDateRange(attributePair) {
-      attributePair.dateRange = this.defaultDateRange
+      attributePair.dateRange.start = null
+      attributePair.dateRange.end = null
     },
     onDropdownClose() {},
     onDropdownOpen() {
@@ -117,11 +120,32 @@ export default {
           expression: 'less_or_equal_than', // TODO refactor `filterOptions` and/or constants approach
           value: dateRange.end
         }
-        // Add filters as pair
-        // TODO conditionally add/remove/update based on existing status
-        // TODO we may still need to properly set state.filters in the design store
-        this.addFilter(Object.assign(partialStart, partialShared))
-        this.addFilter(Object.assign(partialEnd, partialShared))
+
+        // Apply filters as a pair
+        const { name, sourceName } = attribute
+        const filters = this.getFilters(
+          sourceName,
+          name,
+          QUERY_ATTRIBUTE_TYPES.COLUMN
+        )
+        if (filters.length) {
+          const startFilter = filters.find(
+            filter => filter.expression === partialStart.expression
+          )
+          const endFilter = filters.find(
+            filter => filter.expression === partialEnd.expression
+          )
+          const isRemove = partialStart.value === null
+          if (isRemove) {
+            this.removeFilter(startFilter)
+            this.removeFilter(endFilter)
+          } else {
+            // TODO update existing
+          }
+        } else {
+          this.addFilter(Object.assign(partialStart, partialShared))
+          this.addFilter(Object.assign(partialEnd, partialShared))
+        }
       })
     }
   }
