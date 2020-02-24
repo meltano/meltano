@@ -97,14 +97,11 @@ export default {
   methods: {
     ...mapActions('designs', ['addFilter', 'removeFilter', 'updateFilter']),
     clearDateRange(attributePair) {
-      attributePair.dateRange.start = null
-      attributePair.dateRange.end = null
+      attributePair.dateRange = { start: null, end: null }
     },
-    onDropdownClose() {},
     onDropdownOpen() {
       this.attributePairsModel = lodash.cloneDeep(this.getAttributePairsInitial)
     },
-    onSelectDateRange() {},
     saveDateRanges() {
       this.attributePairsModel.forEach(attributePair => {
         const { attribute, dateRange } = attributePair
@@ -128,15 +125,20 @@ export default {
           name,
           QUERY_ATTRIBUTE_TYPES.COLUMN
         )
-        if (filters.length) {
+        const isAdd = filters.length === 0
+        const isNullRange =
+          partialStart.value === null && partialEnd.value === null
+        if (isAdd && !isNullRange) {
+          this.addFilter(Object.assign(partialStart, partialShared))
+          this.addFilter(Object.assign(partialEnd, partialShared))
+        } else {
           const startFilter = filters.find(
             filter => filter.expression === partialStart.expression
           )
           const endFilter = filters.find(
             filter => filter.expression === partialEnd.expression
           )
-          const isRemove = partialStart.value === null
-          if (isRemove) {
+          if (isNullRange) {
             this.removeFilter(startFilter)
             this.removeFilter(endFilter)
           } else {
@@ -146,9 +148,6 @@ export default {
             })
             this.updateFilter({ filter: endFilter, value: partialEnd.value })
           }
-        } else {
-          this.addFilter(Object.assign(partialStart, partialShared))
-          this.addFilter(Object.assign(partialEnd, partialShared))
         }
       })
     }
@@ -170,7 +169,6 @@ export default {
     is-right-aligned
     icon-open="calendar"
     @dropdown:open="onDropdownOpen"
-    @dropdown:close="onDropdownClose"
   >
     <div class="dropdown-content">
       <div
@@ -213,7 +211,6 @@ export default {
           is-expanded
           is-inline
           :columns="2"
-          @input="onSelectDateRange"
         />
       </div>
       <div class="dropdown-item">
