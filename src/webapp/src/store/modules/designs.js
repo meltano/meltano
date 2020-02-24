@@ -207,7 +207,6 @@ const getters = {
     return attributesIndex
   },
 
-  // eslint-disable-next-line no-shadow
   getAttributeByQueryAttribute(_, getters) {
     return queryAttribute => {
       const finder = attr =>
@@ -218,13 +217,11 @@ const getters = {
     }
   },
 
-  // eslint-disable-next-line no-shadow
-  getFilter(_, getters) {
-    // eslint-disable-next-line
+  getFilters(_, getters) {
     return (sourceName, name, filterType) =>
       getters
         .getFiltersByType(filterType)
-        .find(
+        .filter(
           filter => filter.name === name && filter.sourceName === sourceName
         )
   },
@@ -270,11 +267,9 @@ const getters = {
 
   getFormattedValue: () => (fmt, value) => SSF.format(fmt, Number(value)),
 
-  // eslint-disable-next-line no-shadow
   getIsAttributeInFilters(_, getters) {
-    // eslint-disable-next-line
     return (sourceName, name, filterType) =>
-      !!getters.getFilter(sourceName, name, filterType)
+      getters.getFilters(sourceName, name, filterType).length > 0
   },
 
   // Timeframes are not sortable
@@ -306,7 +301,6 @@ const getters = {
     )
   },
 
-  // eslint-disable-next-line no-shadow
   getOrderableAttributeFromCollectionByAttribute(state) {
     return (orderCollection, attribute) => {
       const finder = orderableAttribute => {
@@ -316,17 +310,14 @@ const getters = {
     }
   },
 
-  // eslint-disable-next-line no-shadow
   getSelectedAttributes(_, getters) {
     return getters.getAttributes().filter(selected)
   },
 
-  // eslint-disable-next-line no-shadow
   getSelectedAttributesCount(_, getters) {
     return getters.getSelectedAttributes.length
   },
 
-  // eslint-disable-next-line
   hasChartableResults(state, getters) {
     return getters.hasResults && state.resultAggregates.length
   },
@@ -374,21 +365,19 @@ const actions = {
     }
   },
 
-  // eslint-disable-next-line no-shadow
   cleanFiltering({ commit, getters }, { attribute, type }) {
     if (!attribute.selected) {
-      const filter = getters.getFilter(
+      const filters = getters.getFilters(
         attribute.sourceName,
         attribute.name,
         type
       )
-      if (filter) {
-        commit('removeFilter', filter)
+      if (filters.length > 0) {
+        filters.forEach(filter => commit('removeFilter', filter))
       }
     }
   },
 
-  // eslint-disable-next-line no-shadow
   cleanOrdering({ commit, getters, state }, attribute) {
     if (!attribute.selected) {
       const matchAssigned = getters.getOrderableAttributeFromCollectionByAttribute(
@@ -686,7 +675,6 @@ const actions = {
     })
   },
 
-  // eslint-disable-next-line no-shadow
   updateSortAttribute({ commit, getters }, queryAttribute) {
     const attribute = getters.getAttributeByQueryAttribute(queryAttribute)
     const matchInAssigned = getters.getOrderableAttributeFromCollectionByAttribute(
