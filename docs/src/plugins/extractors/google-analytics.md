@@ -43,19 +43,25 @@ As a first step, you need to create or use an existing project in the Google Dev
 
 2. Open the [Service accounts page](https://console.developers.google.com/iam-admin/serviceaccounts). If prompted, select a project or create a new one to use for accessing Google Analytics.
 
+   ![Screenshot of Google Service Accounts page](/images/tap-google-analytics/02-ga-service-account-configuration-create-new-account.png)
+
 3. Click "Create service account"
 
-   In the Create service account window, type a name for the service account, and select Furnish a new private key. Then click Save and store it locally as `client_secrets.json`.
+   In the Create service account window, type a name for the service account, and click `Create`.
+
+   We do not need to provide any additional permissions for this account, so click `Continue` in the `Service account permissions` configuration page.
+
+   We also do not need to grant access to any users for this service account, as we only need the key.
+
+   ![Screenshot of Google Service Account Configuration for new Account](/images/tap-google-analytics/02-ga-service-account-configuration-new-account.png)
+
+   Click `Create Key`, select `JSON` as the key type and Furnish a new private key. Then click Save and store it locally as `client_secrets.json`.
 
    If you already have a service account, you can generate a key by selecting 'Edit' for the account and then selecting the option to generate a key.
 
-![Screenshot of Google Service Account Configuration](/images/tap-google-analytics/02-ga-service-account-configuration.png)
+   ![Screenshot of Google Service Account Configuration for existing Account](/images/tap-google-analytics/02-ga-service-account-configuration.png)
 
 Your new public/private key pair is generated and downloaded to your machine; it serves as the only copy of this key. You are responsible for storing it securely.
-
-A way to authenticate when accessing the Analytics APIs
-
-When you create a service account Google gives you a json file with that service account's credentials called the `client_secrets.json`, and that's all you need to pass to this tap.
 
 #### Linking Credentials to Google Analytics
 
@@ -65,7 +71,9 @@ The newly created service account will have an email address that looks similar 
 quickstart@PROJECT-ID.iam.gserviceaccount.com
 ```
 
-Use this email address to [add a user](https://support.google.com/analytics/answer/1009702) to the Google analytics view you want to access via the API. Only [Read & Analyze permissions](https://support.google.com/analytics/answer/2884495) are needed.
+Use this email address to [add a user](https://support.google.com/analytics/answer/1009702) to the Google analytics Account, property or View that you want to access via the API. 
+
+Only the [Read & Analyze permissions](https://support.google.com/analytics/answer/2884495) are needed as Meltano only extracts data to generate reports.
 
 ![Screenshot of Google Analytics Add User](/images/tap-google-analytics/03-ga-add-user.png)
 
