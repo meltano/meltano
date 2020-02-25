@@ -647,7 +647,7 @@ export default {
                   <label class="label">
                     <span>Filters</span>
                     <span
-                      v-if="getNonDateFiltersCount > 0"
+                      v-if="hasNonDateFilters"
                       class="has-text-weight-light has-text-grey-light is-size-7"
                       >({{ getNonDateFiltersCount }})</span
                     >
