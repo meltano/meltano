@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1798](https://gitlab.com/meltano/meltano/issues/1798) Add OK button to toasts that couldn't be dismissed previously, to prevent them from getting in the way of modal buttons
+
 ### Breaks
 
 
