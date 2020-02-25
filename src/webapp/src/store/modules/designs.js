@@ -232,20 +232,16 @@ const getters = {
         )
   },
 
-  getTableSources(state) {
+  getTableSources(state, getters) {
     return isFilterOutDates => {
       const sources = []
       const design = state.design
       let attributeFilter
       if (isFilterOutDates) {
-        attributeFilter = attr => {
-          const isDateOrTime =
-            attr.type === QUERY_ATTRIBUTE_DATA_TYPES.DATE ||
-            attr.type === QUERY_ATTRIBUTE_DATA_TYPES.TIME
-          return !attr.hidden && !isDateOrTime
-        }
+        attributeFilter = attribute =>
+          !attribute.hidden && !getters.getIsDateAttribute(attribute)
       } else {
-        attributeFilter = attr => !attr.hidden
+        attributeFilter = attribute => !attribute.hidden
       }
 
       if (design.label) {
