@@ -5,6 +5,10 @@ import lodash from 'lodash'
 
 import DateRangePickerHeader from '@/components/analyze/date-range-picker/DateRangePickerHeader'
 import Dropdown from '@/components/generic/Dropdown'
+import {
+  getDateLabel,
+  getHasValidDateRange
+} from '@/components/analyze/date-range-picker/utils'
 import { QUERY_ATTRIBUTE_TYPES } from '@/api/design'
 import utils from '@/utils/utils'
 
@@ -54,13 +58,10 @@ export default {
       )
     },
     getDateLabel() {
-      return attributePair => {
-        return this.getHasValidDateRange(attributePair.dateRange)
-          ? `${utils.formatDateStringYYYYMMDD(
-              attributePair.dateRange.start
-            )} - ${utils.formatDateStringYYYYMMDD(attributePair.dateRange.end)}`
-          : 'None'
-      }
+      return getDateLabel
+    },
+    getHasValidDateRange() {
+      return getHasValidDateRange
     },
     getFiltersForAttribute() {
       return attribute =>
@@ -69,9 +70,6 @@ export default {
           attribute.name,
           QUERY_ATTRIBUTE_TYPES.COLUMN
         )
-    },
-    getHasValidDateRange() {
-      return dateRange => dateRange.start && dateRange.end
     },
     getIsAttributePairInFocus() {
       return attributePair =>
@@ -188,8 +186,6 @@ export default {
         <DateRangePickerHeader
           :attribute-pair="getAttributePairInFocus"
           :attribute-pairs-model="attributePairsModel"
-          :get-date-label="getDateLabel"
-          :get-has-valid-date-range="getHasValidDateRange"
           :table-sources="tableSources"
           @attribute-pair-change="onChangeAttributePairInFocus"
           @clear-date-range="onClearDateRange"

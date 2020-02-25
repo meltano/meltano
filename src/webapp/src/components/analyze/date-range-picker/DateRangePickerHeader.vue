@@ -1,14 +1,23 @@
 <script>
+import {
+  getDateLabel,
+  getHasValidDateRange
+} from '@/components/analyze/date-range-picker/utils'
+
 export default {
   name: 'DateRangePickerHeader',
   props: {
     attributePair: { type: Object, required: true },
     attributePairsModel: { type: Array, required: true },
-    getDateLabel: { type: Function, required: true },
-    getHasValidDateRange: { type: Function, required: true },
     tableSources: { type: Array, required: true }
   },
   computed: {
+    getDateLabel() {
+      return getDateLabel
+    },
+    getHasValidDateRange() {
+      return getHasValidDateRange
+    },
     getLabel() {
       return targetAttributePair => {
         const attribute = targetAttributePair.attribute
