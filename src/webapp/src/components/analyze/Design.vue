@@ -207,7 +207,16 @@ export default {
 
     jumpToDateFilters() {
       utils.scrollToTop()
-      // TODO event emit for cal open
+      /*
+        TODO likely refactor to use Ben's recommeded GlobalEvents approach (https://github.com/shentao/vue-global-events#readme)
+        In doing so, likely refactor all dropdowns to auto generate their own `ref` so this global event approach can ensure
+        only one dropdown is open at a time
+      */
+      const childComponent = this.$children.find(
+        child => child.$refs['date-range-dropdown']
+      )
+      const dateRangeDropdown = childComponent.$refs['date-range-dropdown']
+      dateRangeDropdown.open()
     },
 
     jumpToFilters() {

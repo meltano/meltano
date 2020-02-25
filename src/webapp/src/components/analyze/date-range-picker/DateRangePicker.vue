@@ -174,6 +174,7 @@ export default {
 
 <template>
   <Dropdown
+    ref="date-range-dropdown"
     :label="getLabel"
     menu-classes="dropdown-menu-600"
     :button-classes="
@@ -188,7 +189,7 @@ export default {
     @dropdown:open="onDropdownOpen"
   >
     <div class="dropdown-content">
-      <!-- AttributePair Selector -->
+      <!-- Picker Header -->
       <div v-if="getAttributePairInFocus" class="dropdown-item">
         <DateRangePickerHeader
           :attribute-pair="getAttributePairInFocus"
@@ -201,11 +202,16 @@ export default {
         />
       </div>
 
-      <!-- Calendar Picker -->
+      <!-- Picker Body -->
       <template v-for="attributePair in attributePairsModel">
         <div
           v-if="getIsAttributePairInFocus(attributePair)"
-          :key="getKey(attributePair.attribute.name)"
+          :key="
+            getKey(
+              attributePair.attribute.sourceName,
+              attributePair.attribute.name
+            )
+          "
           class="dropdown-item"
         >
           <v-date-picker
@@ -218,7 +224,7 @@ export default {
         </div>
       </template>
 
-      <!-- Cancel/Save -->
+      <!-- Picker Footer -->
       <div class="dropdown-item">
         <div class="buttons is-right">
           <button class="button is-text" data-dropdown-auto-close>
