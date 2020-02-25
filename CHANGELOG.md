@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1783](https://gitlab.com/meltano/meltano/issues/1873) Add Shopify extractor as a hidden plugin
+
 ### Changes
 
 ### Fixes
