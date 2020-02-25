@@ -230,10 +230,13 @@ const getters = {
     return isIncludeAttributesOfDate => {
       const sources = []
       const design = state.design
-      const attributeFilter = attr =>
-        !attr.hidden &&
-        (isIncludeAttributesOfDate ||
-          attr.type !== QUERY_ATTRIBUTE_DATA_TYPES.DATE)
+      let attributeFilter
+      if (isIncludeAttributesOfDate) {
+        attributeFilter = attr => !attr.hidden
+      } else {
+        attributeFilter = attr =>
+          !attr.hidden && attr.type !== QUERY_ATTRIBUTE_DATA_TYPES.DATE
+      }
 
       if (design.label) {
         sources.push({
