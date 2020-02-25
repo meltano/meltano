@@ -57,12 +57,14 @@ export default {
         this.getHasValidatedOptionals(filter.expression, filter.value)
     },
     getSourcesWithoutDateAttributes() {
-      return this.getTableSources.map(source => ({
-        ...source,
-        columns: source.columns.filter(
-          attribute => !this.getIsDateAttribute(attribute)
-        )
-      }))
+      return this.getTableSources
+        ? this.getTableSources.map(source => ({
+            ...source,
+            columns: source.columns.filter(
+              attribute => !this.getIsDateAttribute(attribute)
+            )
+          }))
+        : []
     },
     isFirstFilterMatch() {
       return filter => {
