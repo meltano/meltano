@@ -26,6 +26,9 @@ export default {
       'getFilters',
       'getIsAttributeInFilters'
     ]),
+    getAttributePairInFocus() {
+      return this.attributePairsModel[this.attributePairInFocusIndex]
+    },
     getAttributePairsInitial() {
       const groupedFilters = lodash.groupBy(this.getDateFilters, 'expression')
       return this.attributes.map(attribute => {
@@ -107,11 +110,11 @@ export default {
     },
     onChangeAttributePairInFocus(option) {
       const targetLabel = option.srcElement.selectedOptions[0].value
-      const targetAttribute = this.attributePairsModel.find(
+      const targetAttributePair = this.attributePairsModel.find(
         attributePair => attributePair.attribute.label === targetLabel
       )
       this.attributePairInFocusIndex = this.attributePairsModel.indexOf(
-        targetAttribute
+        targetAttributePair
       )
     },
     onDropdownOpen() {
@@ -186,59 +189,62 @@ export default {
     @dropdown:open="onDropdownOpen"
   >
     <div class="dropdown-content">
+      <!-- AttributePair Selector -->
+      <div v-if="getAttributePairInFocus" class="dropdown-item">
+        <div class="columns is-vcentered">
+          <div class="column">
+            <div class="field">
+              <div class="control">
+                <span class="select">
+                  <select
+                    :value="getAttributePairInFocus.attribute.label"
+                    :class="{
+                      'has-text-interactive-secondary':
+                        getAttributePairInFocus.attribute.selected
+                    }"
+                    @input="onChangeAttributePairInFocus($event)"
+                  >
+                    <option
+                      v-for="pair in attributePairsModel"
+                      :key="pair.attribute.label"
+                      :value="pair.attribute.label"
+                      >{{ pair.attribute.label }}</option
+                    >
+                  </select>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="is-flex is-vcentered is-pulled-right">
+              <span
+                :class="{
+                  'mr-05r': getHasValidDateRange(
+                    getAttributePairInFocus.dateRange
+                  )
+                }"
+                >{{ getDateLabel(getAttributePairInFocus) }}</span
+              >
+              <button
+                v-if="getHasValidDateRange(getAttributePairInFocus.dateRange)"
+                class="button is-small"
+                @click="clearDateRange(getAttributePairInFocus)"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calendar Picker -->
       <template v-for="attributePair in attributePairsModel">
         <div
           v-if="getIsAttributePairInFocus(attributePair)"
           :key="getKey(attributePair.attribute.name)"
           class="dropdown-item"
         >
-          <div class="columns is-vcentered is-marginless">
-            <div class="column">
-              <div class="field">
-                <div class="control">
-                  <span class="select">
-                    <select
-                      :value="
-                        attributePairsModel[attributePairInFocusIndex].attribute
-                          .label
-                      "
-                      :class="{
-                        'has-text-interactive-secondary':
-                          attributePairsModel[attributePairInFocusIndex]
-                            .attribute.selected
-                      }"
-                      @input="onChangeAttributePairInFocus($event)"
-                    >
-                      <option
-                        v-for="pair in attributePairsModel"
-                        :key="pair.attribute.label"
-                        :value="pair.attribute.label"
-                        >{{ pair.attribute.label }}</option
-                      >
-                    </select>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div class="column">
-              <div class="is-flex is-vcentered is-pulled-right">
-                <span
-                  :class="{
-                    'mr-05r': getHasValidDateRange(attributePair.dateRange)
-                  }"
-                  >{{ getDateLabel(attributePair) }}</span
-                >
-                <button
-                  v-if="getHasValidDateRange(attributePair.dateRange)"
-                  class="button is-small"
-                  @click="clearDateRange(attributePair)"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
-          </div>
           <v-date-picker
             v-model="attributePair.dateRange"
             mode="range"
@@ -248,6 +254,8 @@ export default {
           />
         </div>
       </template>
+
+      <!-- Cancel/Save -->
       <div class="dropdown-item">
         <div class="buttons is-right">
           <button class="button is-text" data-dropdown-auto-close>
