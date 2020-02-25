@@ -216,6 +216,7 @@ export default {
         >
           <v-date-picker
             v-model="attributePair.dateRange"
+            class="v-calendar-theme"
             mode="range"
             is-expanded
             is-inline
@@ -244,4 +245,9 @@ export default {
   </Dropdown>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+/* TODO refactor with proper themeing (font and is-interactive-secondary color) when guide is udpated https://vcalendar.io/theming-guide.html */
+.v-calendar-theme {
+  font-family: $family-sans-serif;
+}
+</style>

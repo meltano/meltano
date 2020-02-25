@@ -29,12 +29,12 @@ export default {
     },
     getHasAtLeastOneLikeFilter() {
       const likeExpression = 'like'
-      const filteredAttributes = [
+      const filtersByAttribute = [
         ...this.filters.aggregates,
         ...this.filters.columns
       ]
-      const filterModelHasLike = filteredAttributes.find(
-        attribute => attribute.expression === likeExpression
+      const filterModelHasLike = filtersByAttribute.find(
+        filter => filter.expression === likeExpression
       )
       return (
         filterModelHasLike || this.addFilterModel.expression === likeExpression
