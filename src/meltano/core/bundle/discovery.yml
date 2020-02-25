@@ -574,7 +574,7 @@ extractors:
     namespace: tap_shopify
     hidden: true
     docs: 'https://meltano.com/plugins/extractors/shopify.html'
-    pip_url: 'git+https://github.com/singer-io/tap-shopify.git'
+    pip_url: tap-shopify==1.1.17
     capabilities:
       - catalog
       - discover
