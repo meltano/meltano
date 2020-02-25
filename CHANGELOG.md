@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
@@ -13,12 +13,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1777](https://gitlab.com/meltano/meltano/issues/1777) Update Meltano Analyze to only preselect the first column and aggregate attributes when no attributes have a `require`d setting
+
 ### Fixes
 
 - [#1798](https://gitlab.com/meltano/meltano/issues/1798) Add OK button to toasts that couldn't be dismissed previously, to prevent them from getting in the way of modal buttons
 
 ### Breaks
-
 
 ## 1.22.0 - (2020-02-24)
 
@@ -31,7 +32,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1775](https://gitlab.com/meltano/meltano/issues/1775) Add default dashboard for GitLab extractor
 - [#1714](https://gitlab.com/meltano/meltano/issues/1714) Add support for a `required` setting in Models so Analyze can still work with more complex reporting scenarios (Facebook and Google Adwords need this)
 - [#1780](https://gitlab.com/meltano/meltano/issues/1780) Add default reports and dashboard for Facebook Ads data
-
 
 ## 1.21.2 - (2020-02-18)
 

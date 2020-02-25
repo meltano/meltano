@@ -284,12 +284,13 @@ export default {
       let hasDefaultPreselections = false
       let hasRequiredPreselections = false
 
-      // preselect if not loading a report
-      if (isNoSlug) {
-        hasDefaultPreselections = this.tryPreselectDefaultAttributes()
-      }
       // preselect requireds (temporary until calculated and derived attributes are added https://gitlab.com/meltano/meltano/issues/1714)
       hasRequiredPreselections = this.tryPreselectRequiredAttributes()
+
+      // preselect if not loading a report or if no required preselections exist
+      if (isNoSlug && !hasRequiredPreselections) {
+        hasDefaultPreselections = this.tryPreselectDefaultAttributes()
+      }
 
       const hasPreselections =
         hasDefaultPreselections || hasRequiredPreselections
