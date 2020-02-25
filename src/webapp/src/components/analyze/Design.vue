@@ -6,7 +6,7 @@ import lodash from 'lodash'
 
 import capitalize from '@/filters/capitalize'
 import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
-import DesignDateRangePicker from '@/components/analyze/DesignDateRangePicker'
+import DateRangePicker from '@/components/analyze/date-range-picker/DateRangePicker'
 import Dropdown from '@/components/generic/Dropdown'
 import EmbedShareButton from '@/components/generic/EmbedShareButton'
 import LoadingOverlay from '@/components/generic/LoadingOverlay'
@@ -24,7 +24,7 @@ export default {
   },
   components: {
     CreateDashboardModal,
-    DesignDateRangePicker,
+    DateRangePicker,
     Dropdown,
     EmbedShareButton,
     LoadingOverlay,
@@ -385,7 +385,7 @@ export default {
       <div class="column">
         <div class="field is-grouped is-grouped-right">
           <p v-if="getAttributesOfDate.length" class="control">
-            <DesignDateRangePicker
+            <DateRangePicker
               :attributes="getAttributesOfDate"
               :column-filters="filters.columns"
               :table-sources="getTableSources(true)"
