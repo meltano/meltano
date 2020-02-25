@@ -124,7 +124,11 @@ sudo ansible-playbook playbooks/controller.yml
 To speed things up, it is recommended to add a flag of `--limit=$TENANT.meltanodata.com` when running playbooks for a specific droplet.
 :::
 
-### caddy.yml
+### playbooks/ssl.yml
+
+Ensure the Meltano certificate is present on the `*.meltanodata.com` nodes.
+
+### playbooks/caddy.yml
 
 Manage the Caddy configuration, namely:
 
@@ -134,11 +138,11 @@ Manage the Caddy configuration, namely:
 
 Configurable using the `caddy` variable.
 
-### controller.yml
+### playbooks/controller.yml
 
 Ensure the Controller access control is properly setup, requires `root` access.
 
-### meltano.yml
+### playbooks/meltano.yml
 
 Manage the Meltano configuration, namely:
 
@@ -148,14 +152,14 @@ Manage the Meltano configuration, namely:
 
 It also ensure each node has proper access control setup, so that ansible can connect to it.
 
-### meltano-upgrade.yml
+### playbooks/meltano-upgrade.yml
 
 Runs, on each node:
 
   - `meltano upgrade`
   - `meltano install --include-related` (can be skipped using `--skip-tags=plugins`)
 
-### meltano-auth.yml
+### migrations/meltano-auth.yml
 
 ::: warning
 This playbook was created as a one-off and should not be run unless you know what you are doing.
@@ -176,6 +180,10 @@ $TENANT.meltanodata.com:
   password: <password>
 ```
 
-### ssl.yml
+### migrations/meltano-dotenv-as-feature.yml
 
-Ensure the Meltano certificate is present on the `*.meltanodata.com` nodes.
+::: warning
+This playbook was created as a one-off and should not be run unless you know what you are doing.
+:::
+
+Moves the `/var/meltano/project/.env` to the `/etc/meltano/environment.d/postgres` file, so that we can use the `.env` for the feature flags.
