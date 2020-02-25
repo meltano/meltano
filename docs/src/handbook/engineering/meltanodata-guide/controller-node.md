@@ -153,7 +153,7 @@ It also ensure each node has proper access control setup, so that ansible can co
 Runs, on each node:
 
   - `meltano upgrade`
-  - `meltano install` (can be skipped using `--skip-tags=plugins`)
+  - `meltano install --include-related` (can be skipped using `--skip-tags=plugins`)
 
 ### meltano-auth.yml
 
