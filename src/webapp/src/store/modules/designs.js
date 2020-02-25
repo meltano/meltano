@@ -184,7 +184,10 @@ const getters = {
 
   getAttributesOfDate(_, getters) {
     return getters.getAttributes(['columns']).filter(attribute => {
-      return attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.DATE
+      return (
+        attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.DATE ||
+        QUERY_ATTRIBUTE_DATA_TYPES.TIME
+      )
     })
   },
 
@@ -235,7 +238,9 @@ const getters = {
         attributeFilter = attr => !attr.hidden
       } else {
         attributeFilter = attr =>
-          !attr.hidden && attr.type !== QUERY_ATTRIBUTE_DATA_TYPES.DATE
+          !attr.hidden &&
+          (attr.type !== QUERY_ATTRIBUTE_DATA_TYPES.DATE ||
+            attr.type !== QUERY_ATTRIBUTE_DATA_TYPES.TIME)
       }
 
       if (design.label) {

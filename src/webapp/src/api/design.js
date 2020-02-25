@@ -9,7 +9,8 @@ export const QUERY_ATTRIBUTE_TYPES = Object.freeze({
 
 export const QUERY_ATTRIBUTE_DATA_TYPES = Object.freeze({
   DATE: 'date',
-  STRING: 'string'
+  STRING: 'string',
+  TIME: 'time'
 })
 
 export default {
