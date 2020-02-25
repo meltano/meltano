@@ -374,11 +374,11 @@ nano /etc/meltano/environment.d/postgres
 4. Copy and paste the following template into the file
 
 ```bash
-PG_USERNAME=doadmin # default DO credential
+PG_USERNAME=doadmin
 PG_PASSWORD=<password>
 PG_ADDRESS=<host>
-PG_PORT=25060 # default DO port
-PG_DATABASE=defaultdb # default DO database name
+PG_PORT=25060
+PG_DATABASE=defaultdb
 ```
 
 5. Replace each field with the credentials from DigitalOcean
