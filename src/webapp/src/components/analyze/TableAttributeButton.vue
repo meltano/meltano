@@ -39,8 +39,15 @@ export default {
       return this.attributeType === QUERY_ATTRIBUTE_TYPES.TIMEFRAME
     },
     getFilterIcon() {
-      return attribute =>
-        this.getAttributesOfDate.includes(attribute) ? 'calendar' : 'filter'
+      return this.getAttributesOfDate.includes(this.attribute)
+        ? 'calendar'
+        : 'filter'
+    },
+    getFilterTooltip() {
+      const label = this.getAttributesOfDate.includes(this.attribute)
+        ? 'Date Ranges'
+        : 'Filters'
+      return `Jump to ${label}`
     },
     getTimeframeIcon() {
       return `chevron-${this.attribute.selected ? 'up' : 'down'}`
@@ -98,13 +105,12 @@ export default {
           v-if="
             getIsAttributeInFilters(design.name, attribute.name, attributeType)
           "
-          class="button is-small"
+          class="button is-small tooltip is-tooltip-right"
+          :data-tooltip="getFilterTooltip"
           @click.stop="onFilterClick(attribute)"
         >
           <span class="icon has-text-interactive-secondary">
-            <font-awesome-icon
-              :icon="getFilterIcon(attribute)"
-            ></font-awesome-icon>
+            <font-awesome-icon :icon="getFilterIcon"></font-awesome-icon>
           </span>
         </button>
       </template>
