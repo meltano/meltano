@@ -20,8 +20,8 @@ export default {
   computed: {
     ...mapState('designs', ['filterOptions', 'filters']),
     ...mapGetters('designs', [
-      'getNonDateAttributeSources',
       'getNonDateFlattenedFilters',
+      'getTableSources',
       'hasNonDateFilters'
     ]),
     getFilterInputType() {
@@ -158,7 +158,7 @@ export default {
               <span class="select is-fullwidth is-small">
                 <select v-model="addFilterModel.attributeHelper">
                   <optgroup
-                    v-for="source in getNonDateAttributeSources"
+                    v-for="source in getTableSources"
                     :key="source.tableLabel"
                     :label="source.tableLabel"
                   >

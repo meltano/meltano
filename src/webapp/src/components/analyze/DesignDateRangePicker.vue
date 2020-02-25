@@ -14,7 +14,8 @@ export default {
   },
   props: {
     attributes: { type: Array, required: true },
-    columnFilters: { type: Array, required: true }
+    columnFilters: { type: Array, required: true },
+    tableSources: { type: Array, required: true }
   },
   data: () => ({
     attributePairsModel: [],
@@ -96,6 +97,12 @@ export default {
         }
       }
       return hasValidDateRanges ? rangeLabel : 'Date Ranges'
+    },
+    getSourceTableByAttribute() {
+      return attribute =>
+        this.tableSources.find(
+          source => source.sourceName === attribute.sourceName
+        )
     },
     getValidDateRangesInitial() {
       return this.getAttributePairsInitial.filter(attributePair =>

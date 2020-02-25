@@ -226,38 +226,45 @@ const getters = {
         )
   },
 
-  getNonDateAttributeSources(state) {
-    const sources = []
-    const design = state.design
-    const attributeFilter = attr =>
-      !attr.hidden && attr.type !== QUERY_ATTRIBUTE_DATA_TYPES.DATE
-    if (design.label) {
-      sources.push({
-        tableLabel: design.label,
-        sourceName: design.name,
-        columns: design.relatedTable.columns
-          ? design.relatedTable.columns.filter(attributeFilter)
-          : [],
-        aggregates: design.relatedTable.aggregates
-          ? design.relatedTable.aggregates.filter(attributeFilter)
-          : []
-      })
-    }
-    if (design.joins) {
-      design.joins.forEach(join => {
+  getTableSources(state) {
+    return isIncludeAttributesOfDate => {
+      const sources = []
+      const design = state.design
+      const attributeFilter = attr =>
+        !attr.hidden &&
+        (isIncludeAttributesOfDate ||
+          attr.type !== QUERY_ATTRIBUTE_DATA_TYPES.DATE)
+
+      if (design.label) {
         sources.push({
-          tableLabel: join.label,
-          sourceName: join.name,
-          columns: join.relatedTable.columns
-            ? join.relatedTable.columns.filter(attributeFilter)
+          tableLabel: design.label,
+          sourceName: design.name,
+          columns: design.relatedTable.columns
+            ? design.relatedTable.columns.filter(attributeFilter)
             : [],
-          aggregates: join.relatedTable.aggregates
-            ? join.relatedTable.aggregates.filter(attributeFilter)
+          aggregates: design.relatedTable.aggregates
+            ? design.relatedTable.aggregates.filter(attributeFilter)
             : []
         })
-      })
+      }
+
+      if (design.joins) {
+        design.joins.forEach(join => {
+          sources.push({
+            tableLabel: join.label,
+            sourceName: join.name,
+            columns: join.relatedTable.columns
+              ? join.relatedTable.columns.filter(attributeFilter)
+              : [],
+            aggregates: join.relatedTable.aggregates
+              ? join.relatedTable.aggregates.filter(attributeFilter)
+              : []
+          })
+        })
+      }
+
+      return sources
     }
-    return sources
   },
 
   getFiltersByType(state) {

@@ -64,6 +64,7 @@ export default {
       'formattedSql',
       'getSelectedAttributesCount',
       'getAttributesOfDate',
+      'getTableSources',
       'hasChartableResults',
       'hasJoins',
       'hasNonDateFilters',
@@ -387,6 +388,7 @@ export default {
             <DesignDateRangePicker
               :attributes="getAttributesOfDate"
               :column-filters="filters.columns"
+              :table-sources="getTableSources(true)"
             />
           </p>
           <div
