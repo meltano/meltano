@@ -100,12 +100,6 @@ export default {
       }
       return hasValidDateRanges ? rangeLabel : 'Date Ranges'
     },
-    getSourceTableByAttribute() {
-      return attribute =>
-        this.tableSources.find(
-          source => source.sourceName === attribute.sourceName
-        )
-    },
     getValidDateRangesInitial() {
       return this.getAttributePairsInitial.filter(attributePair =>
         this.getHasValidDateRange(attributePair.dateRange)
@@ -114,13 +108,9 @@ export default {
   },
   methods: {
     ...mapActions('designs', ['addFilter', 'removeFilter', 'updateFilter']),
-    onChangeAttributePairInFocus(option) {
-      const targetLabel = option.srcElement.selectedOptions[0].value
-      const targetAttributePair = this.attributePairsModel.find(
-        attributePair => attributePair.attribute.label === targetLabel
-      )
+    onChangeAttributePairInFocus(attributePair) {
       this.attributePairInFocusIndex = this.attributePairsModel.indexOf(
-        targetAttributePair
+        attributePair
       )
     },
     onClearDateRange(attributePair) {
@@ -201,10 +191,11 @@ export default {
       <!-- AttributePair Selector -->
       <div v-if="getAttributePairInFocus" class="dropdown-item">
         <DateRangePickerHeader
-          :attribute-pair-in-focus="getAttributePairInFocus"
+          :attribute-pair="getAttributePairInFocus"
           :attribute-pairs-model="attributePairsModel"
           :get-date-label="getDateLabel"
           :get-has-valid-date-range="getHasValidDateRange"
+          :table-sources="tableSources"
           @attribute-pair-change="onChangeAttributePairInFocus"
           @clear-date-range="onClearDateRange"
         />

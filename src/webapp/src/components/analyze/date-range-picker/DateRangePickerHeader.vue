@@ -2,17 +2,46 @@
 export default {
   name: 'DateRangePickerHeader',
   props: {
-    attributePairInFocus: { type: Object, required: true },
+    attributePair: { type: Object, required: true },
     attributePairsModel: { type: Array, required: true },
     getDateLabel: { type: Function, required: true },
-    getHasValidDateRange: { type: Function, required: true }
+    getHasValidDateRange: { type: Function, required: true },
+    tableSources: { type: Array, required: true }
+  },
+  computed: {
+    getLabel() {
+      return targetAttributePair => {
+        const attribute = targetAttributePair.attribute
+        const source = this.getSourceTableByAttribute(attribute)
+        return `${source.tableLabel} - ${attribute.label}`
+      }
+    },
+    getSourceTableByAttribute() {
+      return attribute =>
+        this.tableSources.find(
+          source => source.sourceName === attribute.sourceName
+        )
+    },
+    getValue() {
+      return targetAttributePair => {
+        const attribute = targetAttributePair.attribute
+        return `${attribute.sourceName}.${attribute.name}`
+      }
+    }
   },
   methods: {
-    onChangeAttributePairInFocus(option) {
-      this.$emit('attribute-pair-change', option)
+    onChangeAttributePair(option) {
+      const value = option.srcElement.selectedOptions[0].value
+      const [sourceName, name] = value.split('.')
+      const targetAttributePair = this.attributePairsModel.find(
+        attributePair =>
+          attributePair.attribute.sourceName === sourceName &&
+          attributePair.attribute.name === name
+      )
+      this.$emit('attribute-pair-change', targetAttributePair)
     },
     onClearDateRange() {
-      this.$emit('clear-date-range', this.attributePairInFocus)
+      this.$emit('clear-date-range', this.attributePair)
     }
   }
 }
@@ -23,20 +52,20 @@ export default {
     <div class="column">
       <div class="field">
         <div class="control">
-          <span class="select">
+          <span class="select is-small">
             <select
-              :value="attributePairInFocus.attribute.label"
+              :value="getValue(attributePair)"
               :class="{
                 'has-text-interactive-secondary':
-                  attributePairInFocus.attribute.selected
+                  attributePair.attribute.selected
               }"
-              @input="onChangeAttributePairInFocus($event)"
+              @input="onChangeAttributePair($event)"
             >
               <option
                 v-for="pair in attributePairsModel"
-                :key="pair.attribute.label"
-                :value="pair.attribute.label"
-                >{{ pair.attribute.label }}</option
+                :key="getValue(pair)"
+                :value="getValue(pair)"
+                >{{ getLabel(pair) }}</option
               >
             </select>
           </span>
@@ -47,13 +76,14 @@ export default {
     <div class="column">
       <div class="is-flex is-vcentered is-pulled-right">
         <span
+          class="is-size-7"
           :class="{
-            'mr-05r': getHasValidDateRange(attributePairInFocus.dateRange)
+            'mr-05r': getHasValidDateRange(attributePair.dateRange)
           }"
-          >{{ getDateLabel(attributePairInFocus) }}</span
+          >{{ getDateLabel(attributePair) }}</span
         >
         <button
-          v-if="getHasValidDateRange(attributePairInFocus.dateRange)"
+          v-if="getHasValidDateRange(attributePair.dateRange)"
           class="button is-small"
           @click="onClearDateRange"
         >
