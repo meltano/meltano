@@ -84,7 +84,15 @@ export default function setup() {
     'success',
     message => message,
     Object.assign(lodash.cloneDeep(toastedOptions), {
-      type: 'success'
+      type: 'success',
+      action: [
+        {
+          text: 'OK',
+          onClick: (e, toastObject) => {
+            toastObject.goAway(0)
+          }
+        }
+      ]
     })
   )
 
@@ -93,7 +101,15 @@ export default function setup() {
     'error',
     message => message,
     Object.assign(lodash.cloneDeep(toastedOptions), {
-      type: 'error'
+      type: 'error',
+      action: [
+        {
+          text: 'OK',
+          onClick: (e, toastObject) => {
+            toastObject.goAway(0)
+          }
+        }
+      ]
     })
   )
 
