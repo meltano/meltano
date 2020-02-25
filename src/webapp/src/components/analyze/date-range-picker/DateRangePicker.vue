@@ -20,8 +20,7 @@ export default {
   },
   props: {
     attributes: { type: Array, required: true },
-    columnFilters: { type: Array, required: true },
-    tableSources: { type: Array, required: true }
+    columnFilters: { type: Array, required: true }
   },
   data: () => ({
     attributePairsModel: [],
@@ -186,7 +185,6 @@ export default {
         <DateRangePickerHeader
           :attribute-pair="getAttributePairInFocus"
           :attribute-pairs-model="attributePairsModel"
-          :table-sources="tableSources"
           @attribute-pair-change="onChangeAttributePairInFocus"
           @clear-date-range="onClearDateRange"
         />

@@ -1,4 +1,6 @@
 <script>
+import { mapGetters } from 'vuex'
+
 import {
   getDateLabel,
   getHasValidDateRange
@@ -8,10 +10,10 @@ export default {
   name: 'DateRangePickerHeader',
   props: {
     attributePair: { type: Object, required: true },
-    attributePairsModel: { type: Array, required: true },
-    tableSources: { type: Array, required: true }
+    attributePairsModel: { type: Array, required: true }
   },
   computed: {
+    ...mapGetters('designs', ['getTableSources']),
     getDateLabel() {
       return getDateLabel
     },
@@ -22,13 +24,13 @@ export default {
       return targetAttributePair => {
         const attribute = targetAttributePair.attribute
         const source = this.getSourceTableByAttribute(attribute)
-        return `${source.tableLabel} - ${attribute.label}`
+        return `${source.label} - ${attribute.label}`
       }
     },
     getSourceTableByAttribute() {
       return attribute =>
-        this.tableSources.find(
-          source => source.sourceName === attribute.sourceName
+        this.getTableSources.find(
+          source => source.name === attribute.sourceName
         )
     },
     getValue() {

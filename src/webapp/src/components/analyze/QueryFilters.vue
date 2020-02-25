@@ -20,6 +20,7 @@ export default {
   computed: {
     ...mapState('designs', ['filterOptions', 'filters']),
     ...mapGetters('designs', [
+      'getIsDateAttribute',
       'getNonDateFlattenedFilters',
       'getTableSources',
       'hasNonDateFilters'
@@ -54,6 +55,14 @@ export default {
     getIsFilterValid() {
       return filter =>
         this.getHasValidatedOptionals(filter.expression, filter.value)
+    },
+    getSourcesWithoutDateAttributes() {
+      return this.getTableSources.map(source => ({
+        ...source,
+        columns: source.columns.filter(
+          attribute => !this.getIsDateAttribute(attribute)
+        )
+      }))
     },
     isFirstFilterMatch() {
       return filter => {
@@ -158,9 +167,9 @@ export default {
               <span class="select is-fullwidth is-small">
                 <select v-model="addFilterModel.attributeHelper">
                   <optgroup
-                    v-for="source in getTableSources(true)"
-                    :key="source.tableLabel"
-                    :label="source.tableLabel"
+                    v-for="source in getSourcesWithoutDateAttributes"
+                    :key="source.label"
+                    :label="source.label"
                   >
                     <option disabled>Columns</option>
                     <option
@@ -168,7 +177,7 @@ export default {
                       :key="column.label"
                       :value="{
                         attribute: column,
-                        sourceName: source.sourceName,
+                        sourceName: source.name,
                         type: 'column'
                       }"
                     >
@@ -180,7 +189,7 @@ export default {
                       :key="aggregate.label"
                       :value="{
                         attribute: aggregate,
-                        sourceName: source.sourceName,
+                        sourceName: source.name,
                         type: 'aggregate'
                       }"
                     >

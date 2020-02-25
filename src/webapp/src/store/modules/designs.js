@@ -232,45 +232,37 @@ const getters = {
         )
   },
 
-  getTableSources(state, getters) {
-    return isFilterOutDates => {
-      const sources = []
-      const design = state.design
-      let attributeFilter
-      if (isFilterOutDates) {
-        attributeFilter = attribute =>
-          !attribute.hidden && !getters.getIsDateAttribute(attribute)
-      } else {
-        attributeFilter = attribute => !attribute.hidden
-      }
+  getTableSources(state) {
+    const sources = []
+    const design = state.design
+    const attributeFilter = attribute => !attribute.hidden
 
-      if (design.label) {
+    if (design.label) {
+      sources.push({
+        name: design.name,
+        label: design.label,
+        columns: design.relatedTable.columns
+          ? design.relatedTable.columns.filter(attributeFilter)
+          : [],
+        aggregates: design.relatedTable.aggregates
+          ? design.relatedTable.aggregates.filter(attributeFilter)
+          : []
+      })
+    }
+
+    if (design.joins) {
+      design.joins.forEach(join => {
         sources.push({
-          tableLabel: design.label,
-          sourceName: design.name,
-          columns: design.relatedTable.columns
-            ? design.relatedTable.columns.filter(attributeFilter)
+          name: join.name,
+          label: join.label,
+          columns: join.relatedTable.columns
+            ? join.relatedTable.columns.filter(attributeFilter)
             : [],
-          aggregates: design.relatedTable.aggregates
-            ? design.relatedTable.aggregates.filter(attributeFilter)
+          aggregates: join.relatedTable.aggregates
+            ? join.relatedTable.aggregates.filter(attributeFilter)
             : []
         })
-      }
-
-      if (design.joins) {
-        design.joins.forEach(join => {
-          sources.push({
-            tableLabel: join.label,
-            sourceName: join.name,
-            columns: join.relatedTable.columns
-              ? join.relatedTable.columns.filter(attributeFilter)
-              : [],
-            aggregates: join.relatedTable.aggregates
-              ? join.relatedTable.aggregates.filter(attributeFilter)
-              : []
-          })
-        })
-      }
+      })
 
       return sources
     }
