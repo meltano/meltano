@@ -57,8 +57,8 @@ export default {
     onAttributeSelected() {
       this.$emit('attribute-selected')
     },
-    onFilterClick(attribute) {
-      const eventName = this.getAttributesOfDate.includes(attribute)
+    onFilterClick() {
+      const eventName = this.getAttributesOfDate.includes(this.attribute)
         ? 'calendar-click'
         : 'filter-click'
       this.$emit(eventName)
@@ -107,7 +107,7 @@ export default {
           "
           class="button is-small tooltip is-tooltip-right"
           :data-tooltip="getFilterTooltip"
-          @click.stop="onFilterClick(attribute)"
+          @click.stop="onFilterClick"
         >
           <span class="icon has-text-interactive-secondary">
             <font-awesome-icon :icon="getFilterIcon"></font-awesome-icon>
