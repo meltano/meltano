@@ -131,7 +131,7 @@ Manage the Caddy configuration, namely:
   - `/etc/caddy/environment`
   - `/etc/caddy/Caddyfile`
   - `caddy` service
-  
+
 Configurable using the `caddy` variable.
 
 ### controller.yml
@@ -150,7 +150,10 @@ It also ensure each node has proper access control setup, so that ansible can co
 
 ### meltano-upgrade.yml
 
-Runs `meltano upgrade` in each node.
+Runs, on each node:
+
+  - `meltano upgrade`
+  - `meltano install --include-related` (can be skipped using `--skip-tags=plugins`)
 
 ### meltano-auth.yml
 
