@@ -183,12 +183,15 @@ const getters = {
   },
 
   getAttributesOfDate(_, getters) {
-    return getters.getAttributes(['columns']).filter(attribute => {
-      return (
-        attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.DATE ||
-        attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.TIME
-      )
-    })
+    return getters
+      .getAttributes(['columns'])
+      .filter(attribute => getters.getIsDateAttribute(attribute))
+  },
+
+  getIsDateAttribute() {
+    return attribute =>
+      attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.DATE ||
+      attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.TIME
   },
 
   getOrderableAttributesIndex(state, getters) {
@@ -305,12 +308,7 @@ const getters = {
 
   getNonDateFlattenedFilters(state, getters) {
     const nonDateFilterColumns = state.filters.columns.filter(
-      filter =>
-        !getters.getAttributesOfDate.find(
-          attribute =>
-            filter.sourceName === attribute.sourceName &&
-            filter.name === attribute.name
-        )
+      filter => !getters.getIsDateAttribute(filter.attribute)
     )
     return lodash.sortBy(
       nonDateFilterColumns.concat(state.filters.aggregates),

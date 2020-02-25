@@ -18,10 +18,7 @@ export default {
     isDisabled: { type: Boolean, required: false }
   },
   computed: {
-    ...mapGetters('designs', [
-      'getAttributesOfDate',
-      'getIsAttributeInFilters'
-    ]),
+    ...mapGetters('designs', ['getIsAttributeInFilters', 'getIsDateAttribute']),
     getHasSelectedPeriods() {
       return (
         this.getIsTimeframe && lodash.some(this.attribute.periods, selected)
@@ -39,12 +36,10 @@ export default {
       return this.attributeType === QUERY_ATTRIBUTE_TYPES.TIMEFRAME
     },
     getFilterIcon() {
-      return this.getAttributesOfDate.includes(this.attribute)
-        ? 'calendar'
-        : 'filter'
+      return this.getIsDateAttribute(this.attribute) ? 'calendar' : 'filter'
     },
     getFilterTooltip() {
-      const label = this.getAttributesOfDate.includes(this.attribute)
+      const label = this.getIsDateAttribute(this.attribute)
         ? 'Date Ranges'
         : 'Filters'
       return `Jump to ${label}`
@@ -58,7 +53,7 @@ export default {
       this.$emit('attribute-selected')
     },
     onFilterClick() {
-      const eventName = this.getAttributesOfDate.includes(this.attribute)
+      const eventName = this.getIsDateAttribute(this.attribute)
         ? 'calendar-click'
         : 'filter-click'
       this.$emit(eventName)

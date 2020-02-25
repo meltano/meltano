@@ -25,9 +25,9 @@ export default {
   }),
   computed: {
     ...mapGetters('designs', [
-      'getAttributesOfDate',
       'getFilters',
-      'getIsAttributeInFilters'
+      'getIsAttributeInFilters',
+      'getIsDateAttribute'
     ]),
     getAttributePairInFocus() {
       return this.attributePairsModel[this.attributePairInFocusIndex]
@@ -55,11 +55,7 @@ export default {
     },
     getDateFilters() {
       return this.columnFilters.filter(filter =>
-        this.getAttributesOfDate.find(
-          attribute =>
-            filter.sourceName === attribute.sourceName &&
-            filter.name === attribute.name
-        )
+        this.getIsDateAttribute(filter.attribute)
       )
     },
     getDateLabel() {
