@@ -359,24 +359,19 @@ Keep this tab open because you'll need to refer to it shortly.
 
 #### Setup the Meltano environment variables
 
-Because we manage the database instance for each tenant, we use environment variables to configure `target-postgres`as a simple and secure way of configuring the plugin.
+Because we manage the database instance for each tenant, we use environment variables to configure `target-postgres` as a simple and secure way of configuring the plugin.
 
 To do this, you need to:
 
 1. SSH into the droplet
-2. Change directory into `/var/meltano/project`
+
+2. Open (or create) the `/etc/meltano/environment.d/postgres` file
 
 ```sh
-cd /var/meltano/project
+nano /etc/meltano/environment.d/postgres
 ```
 
-3. If it doesn't exist already, create a new `.env` file and open it in a text editor
-
-```bash
-nano .env
-```
-
-4. Copy and paste the following template into the `.env` file
+4. Copy and paste the following template into the file
 
 ```bash
 PG_USERNAME=doadmin # default DO credential
@@ -392,10 +387,10 @@ PG_DATABASE=defaultdb # default DO database name
 
 ```bash
 # make the `meltano` user sole owner
-chown meltano:meltano /var/meltano/project/.env
+chown meltano:meltano /etc/meltano/environment.d/postgres
 
-# make the file only readable by `meltano`, and `write-only` for FTP access
-chmod 620 /var/meltano/project/.env
+# make the file only readable by `meltano`
+chmod 600 /etc/meltano/environment.d/postgres
 ```
 
 7. Reload the environment variables into Meltano by restarting the service
@@ -545,6 +540,16 @@ This means that the permissions on the root directory you are trying to access n
 ```bash
 chmod g-w /var/meltano/project
 ```
+
+### /var/meltano/project/.env has been overwritten
+
+This file should only host the feature flags of Meltano, so that it can be hot-reloaded using `systemctl reload meltano` instead of having to reboot the whole worker fleet.
+
+::: warning
+Sensitive data should only be stored in `/etc/meltano/environment.d`, because its ACLs are exclusive to the `meltano` user.
+:::
+
+This file is managed by ansible, so you'll have to create an infrastructure issue, or create a new file in `/etc/meltano/environment.d`, which are loaded at every cold-boot.
 
 ### DNS Spoofing Error
 
