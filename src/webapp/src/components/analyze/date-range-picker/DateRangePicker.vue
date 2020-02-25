@@ -33,22 +33,17 @@ export default {
       return this.attributePairsModel[this.attributePairInFocusIndex]
     },
     getAttributePairsInitial() {
-      const groupedFilters = lodash.groupBy(this.getDateFilters, 'expression')
       return this.attributes.map(attribute => {
-        const finder = filter => {
-          return (
-            filter.sourceName === attribute.sourceName &&
-            filter.name === attribute.name
-          )
-        }
-        let dateRange = { start: null, end: null }
-        if (!lodash.isEmpty(groupedFilters)) {
-          const start = groupedFilters['greater_or_equal_than'].find(finder)
-          const end = groupedFilters['less_or_equal_than'].find(finder)
-          dateRange = {
-            start: start ? new Date(start.value) : null,
-            end: end ? new Date(end.value) : null
-          }
+        const filters = this.getFiltersForAttribute(attribute)
+        const start = filters.find(
+          filter => filter.expression === 'greater_or_equal_than'
+        )
+        const end = filters.find(
+          filter => filter.expression === 'less_or_equal_than'
+        )
+        const dateRange = {
+          start: start ? new Date(start.value) : null,
+          end: end ? new Date(end.value) : null
         }
         return { attribute, dateRange }
       })
@@ -66,6 +61,14 @@ export default {
             )} - ${utils.formatDateStringYYYYMMDD(attributePair.dateRange.end)}`
           : 'None'
       }
+    },
+    getFiltersForAttribute() {
+      return attribute =>
+        this.getFilters(
+          attribute.sourceName,
+          attribute.name,
+          QUERY_ATTRIBUTE_TYPES.COLUMN
+        )
     },
     getHasValidDateRange() {
       return dateRange => dateRange.start && dateRange.end
@@ -132,12 +135,7 @@ export default {
         }
 
         // Apply filters as a pair of add|remove|update
-        const { name, sourceName } = attribute
-        const filters = this.getFilters(
-          sourceName,
-          name,
-          QUERY_ATTRIBUTE_TYPES.COLUMN
-        )
+        const filters = this.getFiltersForAttribute(attribute)
         const isAdd = filters.length === 0
         const isNullRange =
           partialStart.value === null && partialEnd.value === null
