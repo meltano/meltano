@@ -158,7 +158,7 @@ export default {
               <span class="select is-fullwidth is-small">
                 <select v-model="addFilterModel.attributeHelper">
                   <optgroup
-                    v-for="source in getTableSources(false)"
+                    v-for="source in getTableSources(true)"
                     :key="source.tableLabel"
                     :label="source.tableLabel"
                   >

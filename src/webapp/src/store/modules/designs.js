@@ -186,7 +186,7 @@ const getters = {
     return getters.getAttributes(['columns']).filter(attribute => {
       return (
         attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.DATE ||
-        QUERY_ATTRIBUTE_DATA_TYPES.TIME
+        attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.TIME
       )
     })
   },
@@ -230,17 +230,19 @@ const getters = {
   },
 
   getTableSources(state) {
-    return isIncludeAttributesOfDate => {
+    return isFilterOutDates => {
       const sources = []
       const design = state.design
       let attributeFilter
-      if (isIncludeAttributesOfDate) {
-        attributeFilter = attr => !attr.hidden
+      if (isFilterOutDates) {
+        attributeFilter = attr => {
+          const isDateOrTime =
+            attr.type === QUERY_ATTRIBUTE_DATA_TYPES.DATE ||
+            attr.type === QUERY_ATTRIBUTE_DATA_TYPES.TIME
+          return !attr.hidden && !isDateOrTime
+        }
       } else {
-        attributeFilter = attr =>
-          !attr.hidden &&
-          (attr.type !== QUERY_ATTRIBUTE_DATA_TYPES.DATE ||
-            attr.type !== QUERY_ATTRIBUTE_DATA_TYPES.TIME)
+        attributeFilter = attr => !attr.hidden
       }
 
       if (design.label) {

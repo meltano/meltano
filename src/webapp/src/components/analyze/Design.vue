@@ -397,7 +397,7 @@ export default {
             <DateRangePicker
               :attributes="getAttributesOfDate"
               :column-filters="filters.columns"
-              :table-sources="getTableSources(true)"
+              :table-sources="getTableSources(false)"
             />
           </p>
           <div
