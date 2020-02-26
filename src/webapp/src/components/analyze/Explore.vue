@@ -5,18 +5,26 @@ export default {
   name: 'Explore',
   data() {
     return {
-      title: 'Explore',
-      hasLoadedReports: false
+      hasLoadedReports: false,
+      namespace: '',
+      title: 'Explore'
     }
   },
   computed: {
-    ...mapState('reports', ['reports'])
+    ...mapState('reports', ['reports']),
+    getFilteredReports() {
+      return this.reports.filter(report => report.namespace === this.namespace)
+    }
   },
   created() {
+    this.namespace = this.$route.params.namespace
     this.loadReports().then(() => (this.hasLoadedReports = true))
   },
   methods: {
-    ...mapActions('reports', ['loadReports'])
+    ...mapActions('reports', ['loadReports']),
+    goToReport(report) {
+      this.$router.push({ name: 'report', params: report })
+    }
   }
 }
 </script>
@@ -50,9 +58,23 @@ export default {
             class="progress is-small is-info"
           ></progress>
           <template v-else-if="reports.length">
-            <a v-for="report in reports" :key="report.name">
-              {{ report.name }}
-            </a>
+            <div class="list is-hoverable is-shadowless">
+              <div
+                v-for="report in getFilteredReports"
+                :key="report.name"
+                class="is-flex h-space-between list-item is-list-tight has-cursor-pointer"
+                @click="goToReport(report)"
+              >
+                <div>
+                  {{ report.name }}
+                </div>
+                <div>
+                  <button class="button is-small is-pulled-right">
+                    Edit
+                  </button>
+                </div>
+              </div>
+            </div>
           </template>
           <template v-else>
             <div class="content"><p>No reports</p></div>
