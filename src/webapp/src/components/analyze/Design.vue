@@ -60,10 +60,10 @@ export default {
       'currentDesignLabel',
       'currentExtractor',
       'currentModelLabel',
-      'getNonDateFiltersCount',
       'formattedSql',
+      'getDateAttributes',
+      'getNonDateFiltersCount',
       'getSelectedAttributesCount',
-      'getAttributesOfDate',
       'hasChartableResults',
       'hasJoins',
       'hasNonDateFilters',
@@ -392,9 +392,9 @@ export default {
 
       <div class="column">
         <div class="field is-grouped is-grouped-right">
-          <p v-if="getAttributesOfDate.length" class="control">
+          <p v-if="getDateAttributes.length" class="control">
             <DateRangePicker
-              :attributes="getAttributesOfDate"
+              :attributes="getDateAttributes"
               :column-filters="filters.columns"
             />
           </p>

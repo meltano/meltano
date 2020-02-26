@@ -182,7 +182,7 @@ const getters = {
     }
   },
 
-  getAttributesOfDate(_, getters) {
+  getDateAttributes(_, getters) {
     return getters
       .getAttributes(['columns'])
       .filter(attribute => getters.getIsDateAttribute(attribute))

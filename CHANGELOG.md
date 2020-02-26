@@ -10,7 +10,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#1783](https://gitlab.com/meltano/meltano/issues/1873) Add Shopify extractor as a hidden plugin
-- [#1499](https://gitlab.com/meltano/meltano/issues/1499) Add date range selector to Analyze UI (requires a `type=date` in each model needing this functionality)
 - [#1499](https://gitlab.com/meltano/meltano/issues/1499) Add date range selector to Analyze UI (requires a `type=date` or `type=time` in each model needing this functionality)
 
 ### Changes
