@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
@@ -13,8 +13,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-### Breaks
+- [#1809](https://gitlab.com/meltano/meltano/issues/1809) Fix LogModal padding render issue and `TypeError` with proper conditional check prior to dereferencing
 
+### Breaks
 
 ## 1.22.1 - (2020-02-26)
 
@@ -35,7 +36,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1798](https://gitlab.com/meltano/meltano/issues/1798) Add OK button to toasts that couldn't be dismissed previously, to prevent them from getting in the way of modal buttons
 - [#1803](https://gitlab.com/meltano/meltano/issues/1803) Ensure SMTP credentials can be set via environment variables
 - [#1778](https://gitlab.com/meltano/meltano/issues/1778) Fix missing pipeline date when visiting page directly from URL
-
 
 ## 1.22.0 - (2020-02-24)
 

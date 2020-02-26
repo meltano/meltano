@@ -62,7 +62,7 @@ export default {
         : '...'
     },
     isUITrigger() {
-      return this.jobStatus.trigger == 'ui'
+      return this.jobStatus && this.jobStatus.trigger === 'ui'
     },
     relatedPipeline() {
       return this.pipelines.find(pipeline => pipeline.name === this.jobId)
@@ -264,7 +264,6 @@ export default {
 
 .modal-card-body-log {
   height: 100%;
-  padding: 0;
 }
 
 .modal-card.modal-card-log {
