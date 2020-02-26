@@ -103,7 +103,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('designs', ['addFilter', 'removeFilter', 'updateFilter']),
+    ...mapActions('designs', ['addFilter', 'removeFilter']),
     onChangeAttributePairInFocus(attributePair) {
       this.attributePairInFocusIndex = this.attributePairsModel.indexOf(
         attributePair
@@ -131,31 +131,26 @@ export default {
           value: dateRange.end
         }
 
-        // Apply filters as a pair of add|remove|update
+        // Apply filters as a pair
         const filters = this.getFiltersForAttribute(attribute)
-        const isAdd = filters.length === 0
-        const isNullRange =
-          partialStart.value === null && partialEnd.value === null
-        if (isAdd && !isNullRange) {
+        const startFilter = filters.find(
+          filter => filter.expression === partialStart.expression
+        )
+        const endFilter = filters.find(
+          filter => filter.expression === partialEnd.expression
+        )
+
+        // Always remove before conditionally adding for simplicity (removes need for an `updateFilter()` at negligable perf cost)
+        const hasFilters = filters.length > 0
+        if (hasFilters) {
+          this.removeFilter(startFilter)
+          this.removeFilter(endFilter)
+        }
+
+        const isAdd = partialStart.value !== null && partialEnd.value !== null
+        if (isAdd) {
           this.addFilter(Object.assign(partialStart, partialShared))
           this.addFilter(Object.assign(partialEnd, partialShared))
-        } else {
-          const startFilter = filters.find(
-            filter => filter.expression === partialStart.expression
-          )
-          const endFilter = filters.find(
-            filter => filter.expression === partialEnd.expression
-          )
-          if (isNullRange) {
-            this.removeFilter(startFilter)
-            this.removeFilter(endFilter)
-          } else {
-            this.updateFilter({
-              filter: startFilter,
-              value: partialStart.value
-            })
-            this.updateFilter({ filter: endFilter, value: partialEnd.value })
-          }
         }
       })
     }
