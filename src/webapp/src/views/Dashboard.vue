@@ -29,6 +29,7 @@ export default {
       'isLoadingActiveDashboard',
       'reports'
     ]),
+    ...mapActions('orchestration', ['getPipelineSchedules']),
     displayedReports() {
       return this.isEditable || this.isUpdated
         ? this.editableDashboardReports
@@ -52,6 +53,7 @@ export default {
   },
   created() {
     this.initialize(this.$route.params.slug)
+    this.getPipelineSchedules()
   },
   methods: {
     ...mapActions('dashboards', [
