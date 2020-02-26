@@ -356,7 +356,7 @@ const getters = {
 }
 
 const actions = {
-  addFilter({ commit }, payload) {
+  addFilter({ commit, dispatch }, payload) {
     const filter = new FilterModel(payload)
     commit('addFilter', filter)
 
@@ -366,6 +366,8 @@ const actions = {
     if (filter.filterType === 'aggregate' && isValidToggleSelection) {
       commit('toggleSelected', filter.attribute)
     }
+
+    dispatch('tryAutoRun')
   },
 
   cleanFiltering({ commit, getters }, { attribute, type }) {
@@ -581,8 +583,9 @@ const actions = {
     commit('setLimit', limit)
   },
 
-  removeFilter({ commit }, filter) {
+  removeFilter({ commit, dispatch }, filter) {
     commit('removeFilter', filter)
+    dispatch('tryAutoRun')
   },
 
   resetDefaults: ({ commit }) => commit('resetDefaults'),
