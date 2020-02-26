@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1777](https://gitlab.com/meltano/meltano/issues/1777) Update Meltano Analyze to only preselect the first column and aggregate attributes when no attributes have a `require`d setting
+
 ### Fixes
 
 - [#1798](https://gitlab.com/meltano/meltano/issues/1798) Add OK button to toasts that couldn't be dismissed previously, to prevent them from getting in the way of modal buttons
