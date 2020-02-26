@@ -3,6 +3,7 @@ import logging
 import datetime
 
 from meltano.core.utils import truthy
+from meltano.api.headers import *
 
 
 # Flask
@@ -25,9 +26,6 @@ MELTANO_UI_URL = os.getenv("MELTANO_UI_URL", "/")
 API_ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 TEMP_FOLDER = os.path.join(API_ROOT_DIR, "static/tmp")
 PROJECT_ROOT_DIR = os.path.dirname(API_ROOT_DIR)
-
-JSON_SCHEME_HEADER = "X-JSON-SCHEME"
-VERSION_HEADER = "X-MELTANO-VERSION"
 
 # Flask-SQLAlchemy
 # -----------------
@@ -62,10 +60,15 @@ SECURITY_MSG_USERNAME_ALREADY_TAKEN = ("This username is already taken.", "error
 # -----------------
 
 # Change these configuration for your SMTP server
-# This is currently setup for development
-MAIL_SERVER = "localhost"
-MAIL_PORT = 1025
-MAIL_DEFAULT_SENDER = '"Meltano" <bot@meltano.com>'
+#
+# The default setup should work for development
+MAIL_SERVER = os.getenv("MAIL_SERVER", "localhost")
+MAIL_PORT = int(os.getenv("MAIL_PORT", 1025))
+MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", '"Meltano" <bot@meltano.com>')
+MAIL_USE_TLS = truthy(os.getenv("MAIL_USE_TLS"))
+MAIL_USERNAME = os.getenv("MAIL_USERNAME")
+MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
+MAIL_DEBUG = truthy(os.getenv("MAIL_DEBUG"))
 
 # Flask-Authlib
 # -----------------

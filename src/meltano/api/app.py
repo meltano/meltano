@@ -3,20 +3,20 @@ import logging
 import logging.handlers
 import os
 import atexit
+import importlib
 from flask import Flask, request, g
 from flask_login import current_user
 from flask_cors import CORS
 from urllib.parse import urlsplit
+from werkzeug.wsgi import DispatcherMiddleware
 
-import meltano
+import meltano.api.config
+from meltano.api.headers import *
 from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.db import project_engine
-from meltano.api.config import VERSION_HEADER
-
-from werkzeug.wsgi import DispatcherMiddleware
 from meltano.oauth.app import app as oauth_service
 
 
@@ -29,6 +29,9 @@ def create_app(config={}):
     app = Flask(
         __name__, instance_path=str(project.root), instance_relative_config=True
     )
+
+    # make sure we have the latest environment loaded
+    importlib.reload(meltano.api.config)
 
     app.config.from_object("meltano.api.config")
     app.config.from_pyfile("ui.cfg", silent=True)
