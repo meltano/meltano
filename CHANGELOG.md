@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1777](https://gitlab.com/meltano/meltano/issues/1777) Update Meltano Analyze to only preselect the first column and aggregate attributes when no attributes have a `require`d setting
+- [#1796](https://gitlab.com/meltano/meltano/issues/1796) Update date range and filter changes to trigger autorun if enabled
 
 ### Fixes
 
