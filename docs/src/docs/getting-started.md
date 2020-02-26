@@ -48,15 +48,16 @@ Congratulations! Now that you have connected a data source, and run a successful
 
 After clicking one of the aforementioned data model buttons, you will be on the **Analyze** page which contains an interactive user interface to allow you to dynamically build queries and visualize your data. By default, it will run a standard report.
 
-You can explore and analyze the data by clicking on different Attributes in the **Query** side menu on the left hand side. This will trigger live changes to the SQL queries which will update the chart dynamically.
+You can explore and analyze the data by clicking on different Attributes in the **Query** side menu on the left hand side. Autorun is enabled by default to trigger live changes to the SQL queries which will update the chart dynamically.
 
 ![Screenshot of Analyze page for GitLab](/images/getting-started-guide/gsg-04.png)
 
-While exploring the Analyze page, you can also check out:
+While exploring the Analyze page, you can also modify:
 
-- Filters
-- Different chart types which can be found in the upper right
-- Exploring table data and sorting data via column properties like ascending or descending
+- Date Ranges (upper right)
+- Filters (upper left of Query panel)
+- Different chart (upper right of Results panel)
+- Exploring table data and sorting data via column properties like ascending or descending (bottom right)
 
 ## Create Reports
 

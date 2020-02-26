@@ -87,16 +87,14 @@ export default {
   methods: {
     close() {
       this.isOpen = false
+      this.$emit('dropdown:close')
     },
     open() {
       this.isOpen = true
+      this.$emit('dropdown:open')
     },
     toggleDropdown() {
-      if (!this.isOpen) {
-        this.$emit('dropdown:open')
-      }
-
-      this.isOpen = !this.isOpen
+      this.isOpen ? this.close() : this.open()
     },
     onBubbleClose(e) {
       if ('dropdownAutoClose' in e.target.dataset) {

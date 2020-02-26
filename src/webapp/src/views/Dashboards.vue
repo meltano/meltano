@@ -78,7 +78,7 @@ export default {
           </div>
         </div>
 
-        <div v-if="getSortedDashboards.length > 0" class="box table-container">
+        <div v-if="getSortedDashboards.length > 0" class="box">
           <table class="table is-fullwidth is-narrow is-hoverable">
             <thead>
               <tr>

@@ -1,6 +1,5 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import _ from 'lodash'
 
 export default {
   name: 'QueryFilters',
@@ -20,30 +19,30 @@ export default {
   },
   computed: {
     ...mapState('designs', ['filterOptions', 'filters']),
-    ...mapGetters('designs', ['getFilterAttributes', 'hasFilters']),
-    getFlattenedFilters() {
-      return this.hasFilters
-        ? _.sortBy(this.filters.columns.concat(this.filters.aggregates), 'name')
-        : []
-    },
+    ...mapGetters('designs', [
+      'getIsDateAttribute',
+      'getNonDateFlattenedFilters',
+      'getTableSources',
+      'hasNonDateFilters'
+    ]),
     getFilterInputType() {
       return filterType => (filterType === 'aggregate' ? 'number' : 'text')
     },
     getHasAtLeastOneLikeFilter() {
       const likeExpression = 'like'
-      const filteredAttributes = [
+      const filtersByAttribute = [
         ...this.filters.aggregates,
         ...this.filters.columns
       ]
-      const filterModelHasLike = filteredAttributes.find(
-        attribute => attribute.expression === likeExpression
+      const filterModelHasLike = filtersByAttribute.find(
+        filter => filter.expression === likeExpression
       )
       return (
         filterModelHasLike || this.addFilterModel.expression === likeExpression
       )
     },
     getHasMultipleFilters() {
-      return this.getFlattenedFilters.length > 1
+      return this.getNonDateFlattenedFilters.length > 1
     },
     getHasValidatedOptionals() {
       return (expression, value) =>
@@ -57,9 +56,19 @@ export default {
       return filter =>
         this.getHasValidatedOptionals(filter.expression, filter.value)
     },
+    getSourcesWithoutDateAttributes() {
+      return this.getTableSources
+        ? this.getTableSources.map(source => ({
+            ...source,
+            columns: source.columns.filter(
+              attribute => !this.getIsDateAttribute(attribute)
+            )
+          }))
+        : []
+    },
     isFirstFilterMatch() {
       return filter => {
-        const match = this.getFlattenedFilters.find(
+        const match = this.getNonDateFlattenedFilters.find(
           tempFilter =>
             tempFilter.sourceName === filter.sourceName &&
             tempFilter.name === filter.name
@@ -81,11 +90,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions('designs', ['removeFilter']),
-    addFilter() {
+    ...mapActions('designs', ['addFilter', 'removeFilter']),
+    addNewFilter() {
       const vm = this.addFilterModel
-      this.$store.dispatch('designs/addFilter', {
-        sourceName: vm.attributeHelper.sourceName,
+      this.addFilter({
         attribute: vm.attributeHelper.attribute,
         filterType: vm.attributeHelper.type,
         expression: vm.expression,
@@ -161,17 +169,17 @@ export default {
               <span class="select is-fullwidth is-small">
                 <select v-model="addFilterModel.attributeHelper">
                   <optgroup
-                    v-for="attribute in getFilterAttributes"
-                    :key="attribute.tableLabel"
-                    :label="attribute.tableLabel"
+                    v-for="source in getSourcesWithoutDateAttributes"
+                    :key="source.label"
+                    :label="source.label"
                   >
                     <option disabled>Columns</option>
                     <option
-                      v-for="column in attribute.columns"
+                      v-for="column in source.columns"
                       :key="column.label"
                       :value="{
                         attribute: column,
-                        sourceName: attribute.sourceName,
+                        sourceName: source.name,
                         type: 'column'
                       }"
                     >
@@ -179,11 +187,11 @@ export default {
                     </option>
                     <option disabled>Aggregates</option>
                     <option
-                      v-for="aggregate in attribute.aggregates"
+                      v-for="aggregate in source.aggregates"
                       :key="aggregate.label"
                       :value="{
                         attribute: aggregate,
-                        sourceName: attribute.sourceName,
+                        sourceName: source.name,
                         type: 'aggregate'
                       }"
                     >
@@ -230,7 +238,7 @@ export default {
               <button
                 class="button is-small is-fullwidth is-interactive-primary is-outlined"
                 :disabled="!isValidAdd"
-                @click="addFilter"
+                @click="addNewFilter"
               >
                 Add
               </button>
@@ -238,11 +246,11 @@ export default {
           </td>
         </tr>
 
-        <template v-if="hasFilters">
+        <template v-if="hasNonDateFilters">
           <br />
 
           <tr
-            v-for="(filter, index) in getFlattenedFilters"
+            v-for="(filter, index) in getNonDateFlattenedFilters"
             :key="`${filter.sourceName}-${filter.name}-${index}`"
           >
             <td>

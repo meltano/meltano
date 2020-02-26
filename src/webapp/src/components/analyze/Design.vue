@@ -6,6 +6,7 @@ import lodash from 'lodash'
 
 import capitalize from '@/filters/capitalize'
 import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
+import DateRangePicker from '@/components/analyze/date-range-picker/DateRangePicker'
 import Dropdown from '@/components/generic/Dropdown'
 import EmbedShareButton from '@/components/generic/EmbedShareButton'
 import LoadingOverlay from '@/components/generic/LoadingOverlay'
@@ -23,6 +24,7 @@ export default {
   },
   components: {
     CreateDashboardModal,
+    DateRangePicker,
     Dropdown,
     EmbedShareButton,
     LoadingOverlay,
@@ -45,6 +47,7 @@ export default {
       'currentSQL',
       'design',
       'filterOptions',
+      'filters',
       'hasCompletedFirstQueryRun',
       'hasSQLError',
       'isAutoRunQuery',
@@ -57,12 +60,13 @@ export default {
       'currentDesignLabel',
       'currentExtractor',
       'currentModelLabel',
-      'filtersCount',
       'formattedSql',
+      'getDateAttributes',
+      'getNonDateFiltersCount',
       'getSelectedAttributesCount',
       'hasChartableResults',
-      'hasFilters',
       'hasJoins',
+      'hasNonDateFilters',
       'hasResults',
       'resultsCount',
       'showAttributesHeader'
@@ -108,6 +112,10 @@ export default {
         (this.isAutoRunQuery && !this.hasCompletedFirstQueryRun) ||
         this.isLoadingQuery
       )
+    },
+
+    getKey() {
+      return utils.key
     },
 
     limit: {
@@ -194,6 +202,20 @@ export default {
       if (slug) {
         this.getDashboards()
       }
+    },
+
+    jumpToDateFilters() {
+      utils.scrollToTop()
+      /*
+        TODO likely refactor to use Ben's recommeded GlobalEvents approach (https://github.com/shentao/vue-global-events#readme)
+        In doing so, likely refactor all dropdowns to auto generate their own `ref` so this global event approach can ensure
+        only one dropdown is open at a time
+      */
+      const childComponent = this.$children.find(
+        child => child.$refs['date-range-dropdown']
+      )
+      const dateRangeDropdown = childComponent.$refs['date-range-dropdown']
+      dateRangeDropdown.open()
     },
 
     jumpToFilters() {
@@ -345,12 +367,6 @@ export default {
       this.$store.dispatch('designs/updateReport').then(() => {
         Vue.toasted.global.success(`Report Updated - ${this.activeReport.name}`)
       })
-    },
-
-    $key(...attrs) {
-      const extractKey = obj => obj['name'] || String(obj)
-
-      return attrs.map(extractKey).join(':')
     }
   }
 }
@@ -376,15 +392,101 @@ export default {
 
       <div class="column">
         <div class="field is-grouped is-grouped-right">
+          <p v-if="getDateAttributes.length" class="control">
+            <DateRangePicker
+              :attributes="getDateAttributes"
+              :column-filters="filters.columns"
+            />
+          </p>
+          <div
+            class="control field"
+            :class="{ 'has-addons': hasActiveReport }"
+            data-test-id="dropdown-save-report"
+          >
+            <p class="control">
+              <button
+                v-if="hasActiveReport"
+                class="button is-interactive-primary"
+                :disabled="!hasChartableResults"
+                @click="updateReport()"
+              >
+                <span>Save Report</span>
+              </button>
+            </p>
+            <p class="control">
+              <Dropdown
+                :disabled="!hasChartableResults"
+                :label="hasActiveReport ? '' : 'Save Report'"
+                button-classes="is-interactive-primary"
+                is-right-aligned
+                @dropdown:open="setReportName(`report-${new Date().getTime()}`)"
+              >
+                <div class="dropdown-content">
+                  <div class="dropdown-item">
+                    <div class="field">
+                      <label class="label"
+                        >Save {{ hasActiveReport ? 'as' : '' }}</label
+                      >
+                      <div class="control">
+                        <input
+                          :value="saveReportSettings.name"
+                          class="input"
+                          type="text"
+                          placeholder="Name your report"
+                          @input="setReportName($event.target.value)"
+                        />
+                      </div>
+                    </div>
+                    <div class="buttons is-right">
+                      <button class="button is-text" data-dropdown-auto-close>
+                        Cancel
+                      </button>
+                      <button
+                        data-test-id="button-save-report"
+                        class="button"
+                        :disabled="!saveReportSettings.name"
+                        data-dropdown-auto-close
+                        @click="saveReport"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                  <template v-if="reports.length">
+                    <hr class="dropdown-divider" />
+                    <div class="dropdown-item">
+                      <div class="field">
+                        <label class="label">Load Report</label>
+                      </div>
+                    </div>
+                    <a
+                      v-for="report in reports"
+                      :key="report.name"
+                      :class="{
+                        'is-active': activeReport.id === report.id
+                      }"
+                      class="dropdown-item"
+                      data-dropdown-auto-close
+                      @click="changeReport(report)"
+                    >
+                      {{ report.name }}
+                    </a>
+                  </template>
+                </div>
+              </Dropdown>
+            </p>
+          </div>
+        </div>
+        <div class="field is-grouped is-grouped-right">
           <p
-            v-if="hasActiveReport"
             class="control"
             data-test-id="dropdown-add-to-dashboard"
             @click="getDashboards"
           >
             <Dropdown
               label="Add to Dashboard"
-              :disabled="!hasChartableResults"
+              :disabled="!hasChartableResults || !hasActiveReport"
+              button-classes="is-small"
               is-right-aligned
             >
               <div class="dropdown-content">
@@ -435,86 +537,14 @@ export default {
             </Dropdown>
           </p>
 
-          <div
-            class="control field"
-            :class="{ 'has-addons': hasActiveReport }"
-            data-test-id="dropdown-save-report"
-          >
-            <p class="control">
-              <button
-                v-if="hasActiveReport"
-                class="button"
-                :disabled="!hasChartableResults"
-                @click="updateReport()"
-              >
-                <span>Save Report</span>
-              </button>
-            </p>
-            <p class="control">
-              <Dropdown
-                :disabled="!hasChartableResults"
-                :label="hasActiveReport ? '' : 'Save Report'"
-                is-right-aligned
-                @dropdown:open="setReportName(`report-${new Date().getTime()}`)"
-              >
-                <div class="dropdown-content">
-                  <div class="dropdown-item">
-                    <div class="field">
-                      <label v-if="hasActiveReport" class="label"
-                        >Save as</label
-                      >
-                      <div class="control">
-                        <input
-                          :value="saveReportSettings.name"
-                          class="input"
-                          type="text"
-                          placeholder="Name your report"
-                          @input="setReportName($event.target.value)"
-                        />
-                      </div>
-                    </div>
-                    <div class="buttons is-right">
-                      <button class="button is-text" data-dropdown-auto-close>
-                        Cancel
-                      </button>
-                      <button
-                        data-test-id="button-save-report"
-                        class="button"
-                        :disabled="!saveReportSettings.name"
-                        data-dropdown-auto-close
-                        @click="saveReport"
-                      >
-                        Save
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </Dropdown>
-            </p>
+          <div class="control">
+            <EmbedShareButton
+              button-classes="is-small"
+              :is-disabled="!hasActiveReport"
+              :resource="activeReport"
+              resource-type="report"
+            />
           </div>
-
-          <p class="control">
-            <Dropdown
-              :disabled="!reports.length"
-              label="Reports"
-              is-right-aligned
-            >
-              <div class="dropdown-content">
-                <a
-                  v-for="report in reports"
-                  :key="report.name"
-                  :class="{
-                    'is-active': activeReport.id === report.id
-                  }"
-                  class="dropdown-item"
-                  data-dropdown-auto-close
-                  @click="changeReport(report)"
-                >
-                  {{ report.name }}
-                </a>
-              </div>
-            </Dropdown>
-          </p>
         </div>
       </div>
     </div>
@@ -615,18 +645,20 @@ export default {
                   <label class="label">
                     <span>Filters</span>
                     <span
-                      v-if="filtersCount > 0"
+                      v-if="hasNonDateFilters"
                       class="has-text-weight-light has-text-grey-light is-size-7"
-                      >({{ filtersCount }})</span
+                      >({{ getNonDateFiltersCount }})</span
                     >
                   </label>
                   <div class="control is-expanded">
                     <Dropdown
                       ref="filter-dropdown"
-                      :label="hasFilters ? 'Edit' : 'None'"
+                      :label="hasNonDateFilters ? 'Edit' : 'None'"
                       :button-classes="
                         `is-small ${
-                          hasFilters ? 'has-text-interactive-secondary' : ''
+                          hasNonDateFilters
+                            ? 'has-text-interactive-secondary'
+                            : ''
                         }`
                       "
                       :menu-classes="'dropdown-menu-600'"
@@ -695,7 +727,7 @@ export default {
                     <TableAttributeButton
                       v-if="!column.hidden"
                       :key="
-                        $key(
+                        getKey(
                           design.relatedTable,
                           getAttributeTypeColumn,
                           column
@@ -707,6 +739,7 @@ export default {
                       :design="design"
                       :is-disabled="Boolean(column.required)"
                       @attribute-selected="columnSelected(column)"
+                      @calendar-click="jumpToDateFilters"
                       @filter-click="jumpToFilters"
                     />
                   </template>
@@ -724,7 +757,7 @@ export default {
                     <TableAttributeButton
                       v-if="!timeframe.hidden"
                       :key="
-                        $key(
+                        getKey(
                           design.relatedTable,
                           getAttributeTypeTimeframe,
                           timeframe
@@ -761,7 +794,7 @@ export default {
                     <TableAttributeButton
                       v-if="!aggregate.hidden"
                       :key="
-                        $key(
+                        getKey(
                           design.relatedTable,
                           getAttributeTypeAggregate,
                           aggregate
@@ -784,7 +817,7 @@ export default {
                 <template v-if="hasJoins">
                   <template v-for="join in design.joins">
                     <a
-                      :key="$key(join.relatedTable)"
+                      :key="getKey(join.relatedTable)"
                       class="panel-block
                       table-heading
                       analyze-join-table
@@ -816,7 +849,7 @@ export default {
                         <TableAttributeButton
                           v-if="!column.hidden"
                           :key="
-                            $key(
+                            getKey(
                               join.relatedTable,
                               getAttributeTypeColumn,
                               column
@@ -828,6 +861,7 @@ export default {
                           :design="join"
                           :is-disabled="Boolean(column.required)"
                           @attribute-selected="joinColumnSelected(join, column)"
+                          @calendar-click="jumpToDateFilters"
                           @filter-click="jumpToFilters"
                         />
                       </template>
@@ -850,7 +884,7 @@ export default {
                         <TableAttributeButton
                           v-if="!timeframe.hidden"
                           :key="
-                            $key(
+                            getKey(
                               join.relatedTable,
                               getAttributeTypeTimeframe,
                               timeframe
@@ -865,7 +899,7 @@ export default {
                           <template v-for="period in timeframe.periods">
                             <a
                               :key="
-                                $key(
+                                getKey(
                                   join.relatedTable,
                                   'timeframe',
                                   timeframe,
@@ -903,7 +937,7 @@ export default {
                         <TableAttributeButton
                           v-if="!aggregate.hidden"
                           :key="
-                            $key(
+                            getKey(
                               join.relatedTable,
                               getAttributeTypeAggregate,
                               aggregate
@@ -1011,12 +1045,6 @@ export default {
                       <font-awesome-icon icon="dot-circle"></font-awesome-icon>
                     </span>
                   </button>
-                </div>
-                <div v-if="hasActiveReport" class="control">
-                  <EmbedShareButton
-                    :resource="activeReport"
-                    resource-type="report"
-                  />
                 </div>
               </div>
             </div>

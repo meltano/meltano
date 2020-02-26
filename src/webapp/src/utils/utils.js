@@ -152,6 +152,10 @@ export default {
     }
     return this.hyphenate(name, `js-${type.toLowerCase()}`)
   },
+  key(...attrs) {
+    const extractKey = obj => obj['name'] || String(obj)
+    return attrs.map(extractKey).join(':')
+  },
   pretty(value) {
     try {
       return JSON.stringify(JSON.parse(value), null, 2)

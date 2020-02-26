@@ -1,4 +1,5 @@
 import Router from 'vue-router'
+import VCalendar from 'v-calendar'
 import Vue from 'vue'
 
 import { Service } from 'axios-middleware'
@@ -17,6 +18,7 @@ import Upgrade from '@/middleware/upgrade'
 
 Vue.config.productionTip = false
 
+Vue.use(VCalendar)
 Vue.use(FontAwesome)
 Vue.use(Router)
 
