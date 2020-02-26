@@ -18,7 +18,7 @@ export default {
     isDisabled: { type: Boolean, required: false }
   },
   computed: {
-    ...mapGetters('designs', ['getIsAttributeInFilters']),
+    ...mapGetters('designs', ['getIsAttributeInFilters', 'getIsDateAttribute']),
     getHasSelectedPeriods() {
       return (
         this.getIsTimeframe && lodash.some(this.attribute.periods, selected)
@@ -29,8 +29,20 @@ export default {
         ? this.attribute.selected || this.getHasSelectedPeriods
         : this.attribute.selected
     },
+    getIsColumn() {
+      return this.attributeType === QUERY_ATTRIBUTE_TYPES.COLUMN
+    },
     getIsTimeframe() {
       return this.attributeType === QUERY_ATTRIBUTE_TYPES.TIMEFRAME
+    },
+    getFilterIcon() {
+      return this.getIsDateAttribute(this.attribute) ? 'calendar' : 'filter'
+    },
+    getFilterTooltip() {
+      const label = this.getIsDateAttribute(this.attribute)
+        ? 'Date Ranges'
+        : 'Filters'
+      return `Jump to ${label}`
     },
     getTimeframeIcon() {
       return `chevron-${this.attribute.selected ? 'up' : 'down'}`
@@ -41,7 +53,10 @@ export default {
       this.$emit('attribute-selected')
     },
     onFilterClick() {
-      this.$emit('filter-click')
+      const eventName = this.getIsDateAttribute(this.attribute)
+        ? 'calendar-click'
+        : 'filter-click'
+      this.$emit(eventName)
     }
   }
 }
@@ -63,7 +78,7 @@ export default {
 
     <!-- Right side of space-between -->
     <div class="is-flex is-vcentered">
-      <!-- Timeframe vs. Column or Aggregate -->
+      <!-- Timeframe -->
       <div v-if="getIsTimeframe" class="mr-05r">
         <span
           class="icon"
@@ -72,21 +87,25 @@ export default {
           <font-awesome-icon :icon="getTimeframeIcon"></font-awesome-icon>
         </span>
       </div>
+      <!-- Column or Aggregate -->
       <template v-else>
+        <!-- Disabled -->
         <div v-if="isDisabled" class="mr-05r">
           <span class="icon">
             <font-awesome-icon icon="lock"></font-awesome-icon>
           </span>
         </div>
+        <!-- Filter -->
         <button
           v-if="
             getIsAttributeInFilters(design.name, attribute.name, attributeType)
           "
-          class="button is-small"
+          class="button is-small tooltip is-tooltip-right"
+          :data-tooltip="getFilterTooltip"
           @click.stop="onFilterClick"
         >
           <span class="icon has-text-interactive-secondary">
-            <font-awesome-icon icon="filter"></font-awesome-icon>
+            <font-awesome-icon :icon="getFilterIcon"></font-awesome-icon>
           </span>
         </button>
       </template>

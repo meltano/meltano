@@ -12,6 +12,7 @@ export default {
   },
   props: {
     buttonClasses: { type: String, default: '' },
+    isDisabled: { type: Boolean, default: false },
     resource: { type: Object, required: true },
     resourceType: {
       type: String,
@@ -61,7 +62,7 @@ export default {
     label="Share"
     :button-classes="`button ${buttonClasses}`"
     menu-classes="dropdown-menu-300"
-    :disabled="isAwaitingEmbed"
+    :disabled="isAwaitingEmbed || isDisabled"
     is-right-aligned
     @dropdown:open="getResourceEmbed(resource)"
   >

@@ -5,8 +5,10 @@ import sqlFormatter from 'sql-formatter'
 import SSF from 'ssf'
 
 import designApi from '@/api/design'
+import FilterModel from '@/store/models/FilterModel'
 import sqlApi from '@/api/sql'
 import utils from '@/utils/utils'
+import { QUERY_ATTRIBUTE_DATA_TYPES } from '@/api/design'
 import { selected } from '@/utils/predicates'
 import { namer } from '@/utils/mappers'
 
@@ -157,10 +159,6 @@ const getters = {
     return utils.titleCase(state.currentModel)
   },
 
-  filtersCount(state) {
-    return state.filters.columns.length + state.filters.aggregates.length
-  },
-
   formattedSql(state) {
     return sqlFormatter.format(state.currentSQL)
   },
@@ -184,6 +182,18 @@ const getters = {
     }
   },
 
+  getDateAttributes(_, getters) {
+    return getters
+      .getAttributes(['columns'])
+      .filter(attribute => getters.getIsDateAttribute(attribute))
+  },
+
+  getIsDateAttribute() {
+    return attribute =>
+      attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.DATE ||
+      attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.TIME
+  },
+
   getOrderableAttributesIndex(state, getters) {
     const attributes = getters.getAttributes()
 
@@ -203,7 +213,6 @@ const getters = {
     return attributesIndex
   },
 
-  // eslint-disable-next-line no-shadow
   getAttributeByQueryAttribute(_, getters) {
     return queryAttribute => {
       const finder = attr =>
@@ -214,25 +223,24 @@ const getters = {
     }
   },
 
-  // eslint-disable-next-line no-shadow
-  getFilter(_, getters) {
-    // eslint-disable-next-line
+  getFilters(_, getters) {
     return (sourceName, name, filterType) =>
       getters
         .getFiltersByType(filterType)
-        .find(
+        .filter(
           filter => filter.name === name && filter.sourceName === sourceName
         )
   },
 
-  getFilterAttributes(state) {
+  getTableSources(state) {
     const sources = []
     const design = state.design
-    const attributeFilter = attr => !attr.hidden
+    const attributeFilter = attribute => !attribute.hidden
+
     if (design.label) {
       sources.push({
-        tableLabel: design.label,
-        sourceName: design.name,
+        name: design.name,
+        label: design.label,
         columns: design.relatedTable.columns
           ? design.relatedTable.columns.filter(attributeFilter)
           : [],
@@ -241,11 +249,12 @@ const getters = {
           : []
       })
     }
+
     if (design.joins) {
       design.joins.forEach(join => {
         sources.push({
-          tableLabel: join.label,
-          sourceName: join.name,
+          name: join.name,
+          label: join.label,
           columns: join.relatedTable.columns
             ? join.relatedTable.columns.filter(attributeFilter)
             : [],
@@ -254,8 +263,9 @@ const getters = {
             : []
         })
       })
+
+      return sources
     }
-    return sources
   },
 
   getFiltersByType(state) {
@@ -265,11 +275,9 @@ const getters = {
 
   getFormattedValue: () => (fmt, value) => SSF.format(fmt, Number(value)),
 
-  // eslint-disable-next-line no-shadow
   getIsAttributeInFilters(_, getters) {
-    // eslint-disable-next-line
     return (sourceName, name, filterType) =>
-      !!getters.getFilter(sourceName, name, filterType)
+      getters.getFilters(sourceName, name, filterType).length > 0
   },
 
   // Timeframes are not sortable
@@ -282,7 +290,20 @@ const getters = {
     return orderableAttribute => orderableAttribute.direction === 'asc'
   },
 
-  // eslint-disable-next-line no-shadow
+  getNonDateFiltersCount(_, getters) {
+    return getters.getNonDateFlattenedFilters.length
+  },
+
+  getNonDateFlattenedFilters(state, getters) {
+    const nonDateFilterColumns = state.filters.columns.filter(
+      filter => !getters.getIsDateAttribute(filter.attribute)
+    )
+    return lodash.sortBy(
+      nonDateFilterColumns.concat(state.filters.aggregates),
+      'name'
+    )
+  },
+
   getOrderableAttributeFromCollectionByAttribute(state) {
     return (orderCollection, attribute) => {
       const finder = orderableAttribute => {
@@ -292,28 +313,24 @@ const getters = {
     }
   },
 
-  // eslint-disable-next-line no-shadow
   getSelectedAttributes(_, getters) {
     return getters.getAttributes().filter(selected)
   },
 
-  // eslint-disable-next-line no-shadow
   getSelectedAttributesCount(_, getters) {
     return getters.getSelectedAttributes.length
   },
 
-  // eslint-disable-next-line
   hasChartableResults(state, getters) {
     return getters.hasResults && state.resultAggregates.length
   },
 
-  // eslint-disable-next-line
-  hasFilters(_, getters) {
-    return getters.filtersCount > 0
-  },
-
   hasJoins(state) {
     return !!(state.design.joins && state.design.joins.length)
+  },
+
+  hasNonDateFilters(_, getters) {
+    return getters.getNonDateFiltersCount > 0
   },
 
   hasResults(state) {
@@ -339,51 +356,31 @@ const getters = {
 }
 
 const actions = {
-  // eslint-disable-next-line
-  addFilter(
-    { commit },
-    {
-      sourceName,
-      attribute,
-      filterType,
-      expression = '',
-      value = '',
-      isActive = true
-    }
-  ) {
-    const filter = {
-      sourceName,
-      name: attribute.name,
-      expression,
-      value,
-      attribute,
-      filterType,
-      isActive
-    }
+  addFilter({ commit }, payload) {
+    const filter = new FilterModel(payload)
     commit('addFilter', filter)
 
+    // Aggregates must be selected if they're used as a filter target where columns do not
     const isValidToggleSelection =
-      !attribute.hasOwnProperty('selected') || !attribute.selected
-    if (filterType === 'aggregate' && isValidToggleSelection) {
-      commit('toggleSelected', attribute)
+      !filter.attribute.hasOwnProperty('selected') || !filter.attribute.selected
+    if (filter.filterType === 'aggregate' && isValidToggleSelection) {
+      commit('toggleSelected', filter.attribute)
     }
   },
 
-  // eslint-disable-next-line no-shadow
   cleanFiltering({ commit, getters }, { attribute, type }) {
     if (!attribute.selected) {
-      const filter = getters.getFilter(
+      const filters = getters.getFilters(
         attribute.sourceName,
         attribute.name,
         type
       )
-      if (filter) {
-        commit('removeFilter', filter)
+      if (filters.length > 0) {
+        filters.forEach(filter => commit('removeFilter', filter))
       }
     }
   },
 
-  // eslint-disable-next-line no-shadow
   cleanOrdering({ commit, getters, state }, attribute) {
     if (!attribute.selected) {
       const matchAssigned = getters.getOrderableAttributeFromCollectionByAttribute(
@@ -681,7 +678,6 @@ const actions = {
     })
   },
 
-  // eslint-disable-next-line no-shadow
   updateSortAttribute({ commit, getters }, queryAttribute) {
     const attribute = getters.getAttributeByQueryAttribute(queryAttribute)
     const matchInAssigned = getters.getOrderableAttributeFromCollectionByAttribute(
@@ -771,7 +767,6 @@ const mutations = {
 
   setCurrentReport(state, report) {
     state.activeReport = report
-
     state.chartType = report.chartType
     state.filters = report.filters
     state.order = report.order
