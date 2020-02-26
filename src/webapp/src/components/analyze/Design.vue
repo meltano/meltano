@@ -151,6 +151,9 @@ export default {
     // the route parameters are updated.
     this.reinitialize()
   },
+  created() {
+    this.getPipelineSchedules()
+  },
   methods: {
     ...mapActions('dashboards', ['getDashboards']),
     ...mapActions('designs', [
@@ -158,6 +161,7 @@ export default {
       'runQuery',
       'toggleIsAutoRunQuery'
     ]),
+    ...mapActions('orchestration', ['getPipelineSchedules']),
     ...mapActions('reports', ['updateSaveReportSettings']),
     ...mapMutations('designs', ['setIsAutoRunQuery']),
 
