@@ -61,7 +61,7 @@ SECURITY_MSG_USERNAME_ALREADY_TAKEN = ("This username is already taken.", "error
 
 # Change these configuration for your SMTP server
 #
-# The default setup is should work for development
+# The default setup should work for development
 MAIL_SERVER = os.getenv("MAIL_SERVER", "localhost")
 MAIL_PORT = int(os.getenv("MAIL_PORT", 1025))
 MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", '"Meltano" <bot@meltano.com>')

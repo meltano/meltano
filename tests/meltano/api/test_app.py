@@ -20,22 +20,19 @@ class TestApp:
 
 
 class TestAppSMTPDefault:
+    DEFAULTS = {
+        "MAIL_SERVER": "localhost",
+        "MAIL_PORT": 1025,
+        "MAIL_DEFAULT_SENDER": '"Meltano" <bot@meltano.com>',
+        "MAIL_USE_TLS": False,
+        "MAIL_USERNAME": None,
+        "MAIL_PASSWORD": None,
+        "MAIL_DEBUG": False,
+    }
+
     def test_config_smtp_default(self, app):
-        defaults = {
-            "MAIL_SERVER": "localhost",
-            "MAIL_PORT": 1025,
-            "MAIL_DEFAULT_SENDER": '"Meltano" <bot@meltano.com>',
-            "MAIL_USE_TLS": False,
-            "MAIL_USERNAME": None,
-            "MAIL_PASSWORD": None,
-            "MAIL_DEBUG": False,
-        }
-
-        for k, v in defaults.items():
-            assert app.config[k] == v
-
         # ensure it is the defaults when not set
-        assert defaults.items() <= app.config.items()
+        assert self.DEFAULTS.items() <= app.config.items()
 
 
 class TestAppSMTP:
@@ -68,7 +65,4 @@ class TestAppSMTP:
         return create_app()
 
     def test_config_smtp(self, app):
-        for k, v in self.EXPECTED.items():
-            assert app.config[k] == v
-
         assert self.EXPECTED.items() <= app.config.items()
