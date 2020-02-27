@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1794](https://gitlab.com/meltano/meltano/issues/1794) Remove the notification field when notifications are disabled.
+
 ### Breaks
 
 

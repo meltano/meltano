@@ -136,6 +136,7 @@ def create_app(config={}):
             g.jsContext["isSendAnonymousUsageStats"] = True
             g.jsContext["projectId"] = tracker.project_id
 
+        g.jsContext["isNotificationEnabled"] = app.config["MELTANO_NOTIFICATION"]
         g.jsContext["version"] = meltano.__version__
 
         # setup the oauthServiceUrl

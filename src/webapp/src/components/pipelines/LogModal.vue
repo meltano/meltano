@@ -64,6 +64,9 @@ export default {
     isUITrigger() {
       return this.jobStatus && this.jobStatus.trigger === 'ui'
     },
+    isNotificationEnabled() {
+      return !!this.$flask['isNotificationEnabled']
+    },
     relatedPipeline() {
       return this.pipelines.find(pipeline => pipeline.name === this.jobId)
     }
@@ -152,7 +155,7 @@ export default {
                 right of this view) to analyze the imported data.
               </li>
             </ul>
-            <p v-if="isUITrigger">
+            <p v-if="isUITrigger && isNotificationEnabled">
               <SubscribeButton
                 event-type="pipeline_manual_run"
                 source-type="pipeline"
