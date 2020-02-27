@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import Vue from 'vue'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
