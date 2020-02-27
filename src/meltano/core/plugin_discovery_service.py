@@ -181,10 +181,20 @@ class PluginDiscoveryService(Versioned):
     def custom_plugins(self) -> Iterator[Plugin]:
         # some plugins in the Meltano file might be custom, thus they
         # serve both as `PluginInstall` and `Plugin`
-        custom_plugins = (
-            Plugin(custom_plugin.type, custom_plugin.name, **custom_plugin._extras)
+        custom_plugin_type_defs = (
+            (custom_plugin.type, custom_plugin.canonical())
             for custom_plugin in self.config_service.plugins()
             if custom_plugin.is_custom()
+        )
+
+        custom_plugins = (
+            Plugin(
+                plugin_type,
+                custom_plugin_def.pop("name"),
+                custom_plugin_def.pop("namespace"),
+                **custom_plugin_def,
+            )
+            for plugin_type, custom_plugin_def in custom_plugin_type_defs
         )
 
         yield from custom_plugins
