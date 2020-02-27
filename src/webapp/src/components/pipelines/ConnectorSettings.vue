@@ -176,6 +176,12 @@ export default {
     isOAuthEnabled() {
       return !!this.$flask['oauthServiceUrl']
     },
+    getIsOAuthProviderEnabled() {
+      const providers = this.$flask['oauthServiceProviders']
+
+      return provider =>
+        providers.includes('all') || providers.includes(provider)
+    },
     isTapGitLab() {
       return this.plugin.name === 'tap-gitlab'
     },
@@ -525,7 +531,13 @@ export default {
                   </div>
 
                   <!-- OAuth helper -->
-                  <div v-if="getIsOfKindOAuth(setting.kind)" class="control">
+                  <div
+                    v-if="
+                      getIsOfKindOAuth(setting.kind) &&
+                        getIsOAuthProviderEnabled(setting.oauth.provider)
+                    "
+                    class="control"
+                  >
                     <button
                       class="button is-small is-primary"
                       @click.prevent="openOAuthPopup(setting.oauth.provider)"

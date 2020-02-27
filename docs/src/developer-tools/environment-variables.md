@@ -165,6 +165,12 @@ MELTANO_OAUTH_SERVICE_URL=https://oauth.svc.meltanodata.com
 
 # use the local OAuth Service
 MELTANO_OAUTH_SERVICE_URL=http://localhost:5000/-/oauth
+
+# to enable specific providers, (use the `oauth.provider` setting in discovery.yml)
+MELTANO_OAUTH_SERVICE_PROVIDERS=facebook[,…]
+
+# to enable all providers (some might be experimental)
+MELTANO_OAUTH_SERVICE_PROVIDERS=all
 ```
 
 ## Meltano OAuth Service
