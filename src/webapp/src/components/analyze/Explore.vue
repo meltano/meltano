@@ -116,6 +116,7 @@ export default {
       <div class="column">
         <div class="content">
           <h3 id="dashboards" class="title">Dashboards</h3>
+          <p class="subtitle">Report collections</p>
         </div>
         <div class="box">
           <progress
@@ -163,6 +164,7 @@ export default {
       <div class="column">
         <div class="content">
           <h3 id="reports" class="title">Reports</h3>
+          <p class="subtitle">Saved analysis</p>
         </div>
         <div class="box">
           <progress
@@ -202,6 +204,7 @@ export default {
       <div class="column">
         <div class="content">
           <h3 id="report-templates" class="title">Report Templates</h3>
+          <p class="subtitle">Analysis starters</p>
         </div>
         <div class="box">
           <progress v-if="!topic" class="progress is-small is-info"></progress>
