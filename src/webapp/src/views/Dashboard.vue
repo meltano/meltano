@@ -29,7 +29,6 @@ export default {
       'isLoadingActiveDashboard',
       'reports'
     ]),
-    ...mapActions('orchestration', ['getPipelineSchedules']),
     displayedReports() {
       return this.isEditable || this.isUpdated
         ? this.editableDashboardReports
@@ -62,6 +61,7 @@ export default {
       'updateActiveDashboardReportsWithQueryResults',
       'updateDashboard'
     ]),
+    ...mapActions('orchestration', ['getPipelineSchedules']),
     updateDashboardReportPositions() {
       if (this.isUpdated) {
         this.updateDashboard({
