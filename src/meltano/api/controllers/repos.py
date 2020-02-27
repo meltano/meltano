@@ -195,7 +195,7 @@ def model_index():
     return jsonify(topics)
 
 
-@reposBP.route("/models/<path:namespace>/<topic_name>", methods=["GET"])
+@reposBP.route("/<path:namespace>/<topic_name>", methods=["GET"])
 def model_topic(namespace, topic_name):
     permit("view:topic", topic_name)
 

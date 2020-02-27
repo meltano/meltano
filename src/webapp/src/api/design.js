@@ -19,7 +19,7 @@ export default {
   },
 
   getTopic(namespace, model) {
-    return axios.get(utils.apiUrl('repos/models', `${namespace}/${model}`))
+    return axios.get(utils.apiUrl('repos', `${namespace}/${model}`))
   },
 
   index(namespace, model, design) {

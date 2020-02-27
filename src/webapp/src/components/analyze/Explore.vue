@@ -10,7 +10,6 @@ export default {
       hasLoadedDashboards: false,
       hasLoadedReports: false,
       namespace: '',
-      title: 'Explore',
       topic: null
     }
   },
@@ -23,6 +22,13 @@ export default {
     },
     getFilteredReports() {
       return this.reports.filter(report => report.namespace === this.namespace)
+    },
+    getTitle() {
+      let title = 'Explore'
+      if (this.topic) {
+        title += ` ${this.topic.label}`
+      }
+      return title
     }
   },
   created() {
@@ -56,7 +62,7 @@ export default {
 
 <template>
   <div>
-    <h2 id="explore" class="title">{{ title }}</h2>
+    <h2 id="explore" class="title">{{ getTitle }}</h2>
 
     <div class="columns">
       <!-- Report Templates -->
@@ -66,8 +72,24 @@ export default {
         </div>
         <div class="box">
           <progress v-if="!topic" class="progress is-small is-info"></progress>
-          <template v-else-if="topic">
-            {{ topic }}
+          <template v-else-if="topic.designs">
+            <div class="list is-hoverable is-shadowless">
+              <div
+                v-for="reportTemplate in topic.designs"
+                :key="reportTemplate.name"
+                class="is-flex h-space-between list-item is-list-tight has-cursor-pointer"
+                @click="goToReport(reportTemplate)"
+              >
+                <div>
+                  {{ reportTemplate.label }}
+                </div>
+                <div>
+                  <button class="button is-small is-pulled-right">
+                    Edit
+                  </button>
+                </div>
+              </div>
+            </div>
           </template>
           <template v-else>
             <div class="content"><p>No report templates</p></div>
