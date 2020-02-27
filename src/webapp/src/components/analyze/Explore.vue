@@ -18,10 +18,10 @@ export default {
   },
   created() {
     this.namespace = this.$route.params.namespace
-    this.loadReports().then(() => (this.hasLoadedReports = true))
+    this.getReports().then(() => (this.hasLoadedReports = true))
   },
   methods: {
-    ...mapActions('reports', ['loadReports']),
+    ...mapActions('reports', ['getReports']),
     goToReport(report) {
       this.$router.push({ name: 'report', params: report })
     }
