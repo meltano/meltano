@@ -149,8 +149,8 @@ export default {
                 this view.
               </li>
               <li>
-                Once extraction is complete, use the "Reports" button (lower
-                right of this view) to analyze the imported data.
+                Once extraction is complete, use the "Explore" button (lower
+                right of this view) to explore the imported data.
               </li>
             </ul>
             <p v-if="isUITrigger && isNotificationEnabled">
