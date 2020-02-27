@@ -83,7 +83,7 @@ const router = new Router({
         },
         {
           path: '/analyze/:namespace+/:model/:design',
-          name: 'analyzeDesign',
+          name: 'design',
           component: Design,
           meta: {
             title: 'Meltano: Analyze - Report Builder'

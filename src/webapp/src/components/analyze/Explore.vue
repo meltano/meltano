@@ -13,6 +13,7 @@ export default {
     return {
       hasLoadedDashboards: false,
       hasLoadedReports: false,
+      model: '',
       namespace: '',
       topic: null
     }
@@ -30,25 +31,45 @@ export default {
     getFilteredReports() {
       return this.reports.filter(report => report.namespace === this.namespace)
     },
+    getReportTemplateAttributesCount() {
+      return reportTemplate => {
+        const filterer = attribute => !attribute.hidden
+        const reducer = (acc, curr) =>
+          acc +
+          curr.columns.filter(filterer).length +
+          curr.aggregates.filter(filterer).length +
+          curr.timeframes.filter(filterer).length
+        const joins = reportTemplate.joins
+          ? reportTemplate.joins.map(join => join.relatedTable)
+          : []
+        const tables = [reportTemplate.relatedTable].concat(joins)
+        return this.topic ? tables.reduce(reducer, 0) : 0
+      }
+    },
+    getReportTemplateLabelByDesign() {
+      return designName =>
+        this.topic
+          ? this.topic.designs.find(design => design.name === designName).label
+          : ''
+    },
     getTitle() {
       return this.topic ? this.topic.label : ''
     }
   },
   created() {
-    const { namespace, model } = this.$route.params
-    this.namespace = namespace
+    this.namespace = this.$route.params.namespace
+    this.model = this.$route.params.model
 
-    const onError = e => console.log(e)
     designApi
-      .getTopic(namespace, model)
+      .getTopic(this.namespace, this.model)
       .then(response => (this.topic = response.data))
-      .catch(onError)
+      .catch(this.$error.handle)
     this.getDashboards()
       .then(() => (this.hasLoadedDashboards = true))
-      .catch(onError)
+      .catch(this.$error.handle)
     this.getReports()
       .then(() => (this.hasLoadedReports = true))
-      .catch(onError)
+      .catch(this.$error.handle)
   },
   methods: {
     ...mapActions('dashboards', ['getDashboards']),
@@ -58,6 +79,17 @@ export default {
     },
     goToReport(report) {
       this.$router.push({ name: 'report', params: report })
+    },
+    goToReportTemplate(reportTemplate) {
+      const params = {
+        design: reportTemplate.name,
+        model: this.model,
+        namespace: this.namespace
+      }
+      this.$router.push({
+        name: 'design',
+        params
+      })
     }
   }
 }
@@ -99,14 +131,22 @@ export default {
                 @click="goToDashboard(dashboard)"
               >
                 <div>
-                  <span>{{ dashboard.name }}</span>
+                  <strong>{{ dashboard.name }}</strong>
                   <template v-if="dashboard.description">
                     <br />
                     <small>{{ dashboard.description }}</small>
                   </template>
+                  <template v-if="dashboard.reportIds">
+                    <br />
+                    <small class="is-italic has-text-grey"
+                      >{{ dashboard.reportIds.length }} Reports</small
+                    >
+                  </template>
                 </div>
                 <div>
-                  <button class="button is-interactive-primary is-pulled-right">
+                  <button
+                    class="button is-interactive-primary is-pulled-right ml-05r"
+                  >
                     View
                   </button>
                 </div>
@@ -138,10 +178,14 @@ export default {
                 @click="goToReport(report)"
               >
                 <div>
-                  {{ report.name }}
+                  <strong>{{ report.name }}</strong>
+                  <br />
+                  <small class="is-italic has-text-grey">{{
+                    getReportTemplateLabelByDesign(report.design)
+                  }}</small>
                 </div>
                 <div>
-                  <button class="button is-small is-pulled-right">
+                  <button class="button is-small is-pulled-right ml-05r">
                     Edit
                   </button>
                 </div>
@@ -167,13 +211,22 @@ export default {
                 v-for="reportTemplate in topic.designs"
                 :key="reportTemplate.name"
                 class="is-flex h-space-between list-item is-list-tight has-cursor-pointer"
-                @click="goToReport(reportTemplate)"
+                @click="goToReportTemplate(reportTemplate)"
               >
                 <div>
-                  {{ reportTemplate.label }}
+                  <strong>{{ reportTemplate.label }}</strong>
+                  <template v-if="reportTemplate.description">
+                    <br />
+                    <small>{{ reportTemplate.description }}</small>
+                  </template>
+                  <br />
+                  <small class="is-italic has-text-grey"
+                    >{{ getReportTemplateAttributesCount(reportTemplate) }} Data
+                    Attributes</small
+                  >
                 </div>
                 <div>
-                  <button class="button is-small is-pulled-right">
+                  <button class="button is-small is-pulled-right ml-05r">
                     Analyze
                   </button>
                 </div>
