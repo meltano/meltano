@@ -1,10 +1,14 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 
+import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import designApi from '@/api/design'
 
 export default {
   name: 'Explore',
+  components: {
+    ConnectorLogo
+  },
   data() {
     return {
       hasLoadedDashboards: false,
@@ -16,6 +20,9 @@ export default {
   computed: {
     ...mapState('dashboards', ['dashboards']),
     ...mapState('reports', ['reports']),
+    getExtractorName() {
+      return this.topic ? `tap-${this.topic.name}` : ''
+    },
     getFilteredDashboards() {
       // TODO in order for filtering to work we need to do a dashboard version/migration and provide a namespace key
       return this.dashboards //.filter(dashboard => dashboard.namespace === this.namespace)
@@ -24,11 +31,7 @@ export default {
       return this.reports.filter(report => report.namespace === this.namespace)
     },
     getTitle() {
-      let title = 'Explore'
-      if (this.topic) {
-        title += ` ${this.topic.label}`
-      }
-      return title
+      return this.topic ? this.topic.label : ''
     }
   },
   created() {
@@ -62,37 +65,56 @@ export default {
 
 <template>
   <div>
-    <h2 id="explore" class="title">{{ getTitle }}</h2>
+    <h2 id="explore" class="title is-flex is-vcentered">
+      <div class="media is-paddingless">
+        <figure class="media-left">
+          <div class="image level-item is-48x48">
+            <ConnectorLogo
+              v-if="getExtractorName"
+              :connector="getExtractorName"
+            />
+          </div>
+        </figure>
+      </div>
+      <span>Explore {{ getTitle }}</span>
+    </h2>
 
     <div class="columns">
-      <!-- Report Templates -->
+      <!-- Dashboards -->
       <div class="column">
         <div class="content">
-          <h3 id="report-templates" class="title">Report Templates</h3>
+          <h3 id="dashboards" class="title">Dashboards</h3>
         </div>
         <div class="box">
-          <progress v-if="!topic" class="progress is-small is-info"></progress>
-          <template v-else-if="topic.designs">
+          <progress
+            v-if="!hasLoadedDashboards"
+            class="progress is-small is-info"
+          ></progress>
+          <template v-else-if="dashboards.length">
             <div class="list is-hoverable is-shadowless">
               <div
-                v-for="reportTemplate in topic.designs"
-                :key="reportTemplate.name"
+                v-for="dashboard in getFilteredDashboards"
+                :key="dashboard.name"
                 class="is-flex h-space-between list-item is-list-tight has-cursor-pointer"
-                @click="goToReport(reportTemplate)"
+                @click="goToDashboard(dashboard)"
               >
                 <div>
-                  {{ reportTemplate.label }}
+                  <span>{{ dashboard.name }}</span>
+                  <template v-if="dashboard.description">
+                    <br />
+                    <small>{{ dashboard.description }}</small>
+                  </template>
                 </div>
                 <div>
-                  <button class="button is-small is-pulled-right">
-                    Edit
+                  <button class="button is-interactive-primary is-pulled-right">
+                    View
                   </button>
                 </div>
               </div>
             </div>
           </template>
           <template v-else>
-            <div class="content"><p>No report templates</p></div>
+            <div class="content"><p>No dashboards</p></div>
           </template>
         </div>
       </div>
@@ -132,37 +154,34 @@ export default {
         </div>
       </div>
 
-      <!-- Dashboards -->
+      <!-- Report Templates -->
       <div class="column">
         <div class="content">
-          <h3 id="dashboards" class="title">Dashboards</h3>
+          <h3 id="report-templates" class="title">Report Templates</h3>
         </div>
         <div class="box">
-          <progress
-            v-if="!hasLoadedDashboards"
-            class="progress is-small is-info"
-          ></progress>
-          <template v-else-if="dashboards.length">
+          <progress v-if="!topic" class="progress is-small is-info"></progress>
+          <template v-else-if="topic.designs">
             <div class="list is-hoverable is-shadowless">
               <div
-                v-for="dashboard in getFilteredDashboards"
-                :key="dashboard.name"
+                v-for="reportTemplate in topic.designs"
+                :key="reportTemplate.name"
                 class="is-flex h-space-between list-item is-list-tight has-cursor-pointer"
-                @click="goToDashboard(dashboard)"
+                @click="goToReport(reportTemplate)"
               >
                 <div>
-                  {{ dashboard.name }}
+                  {{ reportTemplate.label }}
                 </div>
                 <div>
                   <button class="button is-small is-pulled-right">
-                    View
+                    Analyze
                   </button>
                 </div>
               </div>
             </div>
           </template>
           <template v-else>
-            <div class="content"><p>No dashboards</p></div>
+            <div class="content"><p>No report templates</p></div>
           </template>
         </div>
       </div>
