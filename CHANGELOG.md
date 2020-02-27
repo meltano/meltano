@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
@@ -15,9 +15,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1811](https://gitlab.com/meltano/meltano/issues/1811) Fix an issue when installing a custom plugin.
 - [#1794](https://gitlab.com/meltano/meltano/issues/1794) Remove the notification field when notifications are disabled.
+- [#1815](https://gitlab.com/meltano/meltano/issues/1815) Fix `mapActions` misplacement in `computed` vs. `methods`
 
 ### Breaks
-
 
 ## 1.22.2 - (2020-02-27)
 
@@ -27,7 +27,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1809](https://gitlab.com/meltano/meltano/issues/1809) Fix LogModal padding render issue and `TypeError` with proper conditional check prior to dereferencing
 - [#1810](https://gitlab.com/meltano/meltano/issues/1810) Fix an issue where Notifications would not be sent when the application used multiple workers
-
 
 ## 1.22.1 - (2020-02-26)
 
