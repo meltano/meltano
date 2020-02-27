@@ -59,7 +59,7 @@ class Project(Versioned):
         except FileExistsError:
             pass
 
-        load_dotenv(dotenv_path=project.root.joinpath(".env"))
+        load_dotenv(dotenv_path=project.root.joinpath(".env"), override=True)
         logging.debug(f"Activated project at {project.root}")
 
         # set the default project

@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1809](https://gitlab.com/meltano/meltano/issues/1809) Fix LogModal padding render issue and `TypeError` with proper conditional check prior to dereferencing
+- [#1810](https://gitlab.com/meltano/meltano/issues/1810) Fix an issue where Notifications would not be sent when the application used multiple workers
 
 ### Breaks
 

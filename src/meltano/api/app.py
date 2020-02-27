@@ -12,15 +12,17 @@ from werkzeug.wsgi import DispatcherMiddleware
 
 import meltano.api.config
 from meltano.api.headers import *
+from meltano.core.compiler.project_compiler import ProjectCompiler
+from meltano.core.db import project_engine
+from meltano.core.logging.utils import current_log_level, FORMAT
 from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.db import project_engine
 from meltano.oauth.app import app as oauth_service
 
 
-logger = logging.getLogger(__name__)
+# the logger we setup here is for the `meltano.api` module
+logger = logging.getLogger("meltano.api")
 
 
 def create_app(config={}):
@@ -48,22 +50,15 @@ def create_app(config={}):
         project, engine_uri=app.config["SQLALCHEMY_DATABASE_URI"], default=True
     )
 
-    # Initial compilation
-    compiler = ProjectCompiler(project)
-    try:
-        compiler.compile()
-    except Exception as e:
-        pass
-
-    # Logging
+    # File logging
+    formatter = logging.Formatter(fmt=FORMAT)
     file_handler = logging.handlers.RotatingFileHandler(
         str(project.run_dir("meltano-ui.log")), backupCount=3
     )
-    stdout_handler = logging.StreamHandler()
+    file_handler.setFormatter(formatter)
 
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(current_log_level())
     logger.addHandler(file_handler)
-    logger.addHandler(stdout_handler)
 
     # 1) Extensions
     security_options = {}
@@ -121,10 +116,12 @@ def create_app(config={}):
 
     # Notifications
     if app.config["MELTANO_NOTIFICATION"]:
-        from meltano.api.events import NotificationEvents
+        from .events import notifications
 
-        notifications = NotificationEvents(project)
-        notifications.init(app)
+        notifications.init_app(app)
+        logger.info("Notifications are enabled.")
+    else:
+        logger.info("Notifications are disabled.")
 
     # Google Analytics setup
     tracker = GoogleAnalyticsTracker(project)
