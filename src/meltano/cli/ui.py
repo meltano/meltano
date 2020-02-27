@@ -69,7 +69,12 @@ def start(ctx, reload, bind_port, bind):
     if not truthy(os.getenv("MELTANO_DISABLE_AIRFLOW", False)):
         workers.append(AirflowWorker(project))
 
-    workers.append(MeltanoCompilerWorker(project))
+    try:
+        compiler_worker = MeltanoCompilerWorker(project)
+        compiler_worker.compiler.compile()
+        workers.append(compiler_worker)
+    except Exception as e:
+        logger.error(f"Initial compilation failed.")
 
     workers.append(UIAvailableWorker("http://localhost:{bind_port}"))
     workers.append(

@@ -12,6 +12,7 @@ from meltano.core.project import Project
 
 
 executor = Executor()
+logger = logging.getLogger(__name__)
 
 
 def setup_executor(app, project):
@@ -57,6 +58,7 @@ def defer_run_elt(schedule_payload: dict):
 def run_elt(project: Project, schedule_payload: dict):
     job_id = schedule_payload["name"]
     executor.submit(defer_run_elt, schedule_payload)
+    logger.debug(f"Defered `run_elt` to the executor with {schedule_payload}.")
 
     return job_id
 

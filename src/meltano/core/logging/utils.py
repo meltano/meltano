@@ -1,15 +1,30 @@
 import asyncio
 import logging
+import os
 import re
 import sys
 
 
-def setup_logging(log_level=logging.INFO):
-    logging.basicConfig(
-        stream=sys.stderr,
-        format="[%(threadName)10s][%(levelname)s][%(asctime)s] %(message)s",
-        level=log_level,
-    )
+LEVELS = {
+    "debug": logging.DEBUG,
+    "info": logging.INFO,
+    "warning": logging.WARNING,
+    "error": logging.ERROR,
+    "critical": logging.CRITICAL,
+}
+CURRENT_LEVEL = os.getenv("MELTANO_LOG_LEVEL", "info")
+FORMAT = "[%(asctime)s|%(levelname).1s|%(threadName)10s|%(name)s] %(message)s"
+
+
+def current_log_level():
+    return LEVELS[CURRENT_LEVEL]
+
+
+def setup_logging(log_level=CURRENT_LEVEL):
+    # setting that for any subprocess started by this process
+    os.environ["MELTANO_LOG_LEVEL"] = log_level
+
+    logging.basicConfig(stream=sys.stderr, format=FORMAT, level=LEVELS[log_level])
 
 
 def remove_ansi_escape_sequences(line):
