@@ -1,19 +1,19 @@
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 
-import AnalyzeList from '@/components/analyze/AnalyzeList'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import Dropdown from '@/components/generic/Dropdown'
+import ExploreButton from '@/components/analyze/ExploreButton'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
 import utils from '@/utils/utils'
 
 export default {
   name: 'PipelineSchedules',
   components: {
-    AnalyzeList,
     ConnectorLogo,
     Dropdown,
+    ExploreButton,
     ScheduleTableHead
   },
   props: {
@@ -221,22 +221,7 @@ export default {
             </td>
             <td>
               <div class="buttons is-right">
-                <Dropdown
-                  label="Reports"
-                  button-classes="is-interactive-primary"
-                  :tooltip="{
-                    classes: 'is-tooltip-left',
-                    message: 'Analyze related reports of this pipeline'
-                  }"
-                  menu-classes="dropdown-menu-300"
-                  icon-open="chart-line"
-                  icon-close="caret-down"
-                  is-right-aligned
-                >
-                  <div class="dropdown-content is-unselectable">
-                    <AnalyzeList :pipeline="pipeline"></AnalyzeList>
-                  </div>
-                </Dropdown>
+                <ExploreButton :pipeline="pipeline" />
                 <Dropdown
                   :button-classes="
                     `is-danger is-outlined ${
