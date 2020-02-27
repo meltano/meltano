@@ -1,6 +1,8 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 
+import designApi from '@/api/design'
+
 export default {
   name: 'Explore',
   data() {
@@ -8,7 +10,8 @@ export default {
       hasLoadedDashboards: false,
       hasLoadedReports: false,
       namespace: '',
-      title: 'Explore'
+      title: 'Explore',
+      topic: null
     }
   },
   computed: {
@@ -16,16 +19,27 @@ export default {
     ...mapState('reports', ['reports']),
     getFilteredDashboards() {
       // TODO in order for filtering to work we need to do a dashboard version/migration and provide a namespace key
-      return this.dashboards//.filter(dashboard => dashboard.namespace === this.namespace)
+      return this.dashboards //.filter(dashboard => dashboard.namespace === this.namespace)
     },
     getFilteredReports() {
       return this.reports.filter(report => report.namespace === this.namespace)
     }
   },
   created() {
-    this.namespace = this.$route.params.namespace
-    this.getDashboards().then(() => (this.hasLoadedDashboards = true))
-    this.getReports().then(() => (this.hasLoadedReports = true))
+    const { namespace, model } = this.$route.params
+    this.namespace = namespace
+
+    const onError = e => console.log(e)
+    designApi
+      .getTopic(namespace, model)
+      .then(response => (this.topic = response.data))
+      .catch(onError)
+    this.getDashboards()
+      .then(() => (this.hasLoadedDashboards = true))
+      .catch(onError)
+    this.getReports()
+      .then(() => (this.hasLoadedReports = true))
+      .catch(onError)
   },
   methods: {
     ...mapActions('dashboards', ['getDashboards']),
@@ -51,9 +65,12 @@ export default {
           <h3 id="report-templates" class="title">Report Templates</h3>
         </div>
         <div class="box">
-          <progress v-if="true" class="progress is-small is-info"></progress>
+          <progress v-if="!topic" class="progress is-small is-info"></progress>
+          <template v-else-if="topic">
+            {{ topic }}
+          </template>
           <template v-else>
-            ...
+            <div class="content"><p>No report templates</p></div>
           </template>
         </div>
       </div>
@@ -116,7 +133,7 @@ export default {
                 </div>
                 <div>
                   <button class="button is-small is-pulled-right">
-                    Edit
+                    View
                   </button>
                 </div>
               </div>
@@ -125,7 +142,6 @@ export default {
           <template v-else>
             <div class="content"><p>No dashboards</p></div>
           </template>
-        </div>
         </div>
       </div>
     </div>

@@ -66,11 +66,11 @@ const router = new Router({
       },
       children: [
         {
-          path: '/analyze/:namespace',
+          path: '/analyze/:namespace+/:model',
           name: 'explore',
           component: Explore,
           meta: {
-            title: 'Meltano: Analyze - Data Source'
+            title: 'Meltano: Analyze - Explore'
           }
         },
         {

@@ -1,0 +1,14 @@
+import json
+
+from meltano.core.project import Project
+
+
+class ReposHelper:
+    def get_topic(self, namespace, topic_name):
+        project = Project.find()
+        topic = project.run_dir("models", namespace, f"{topic_name}.topic.m5oc")
+
+        with topic.open() as f:
+            topic = json.load(f)
+
+        return topic
