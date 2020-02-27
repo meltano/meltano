@@ -10,19 +10,10 @@ warnings.filterwarnings("ignore", category=UserWarning, module="psycopg2")
 import meltano
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.behavior.versioned import IncompatibleVersionError
-from meltano.core.logging import setup_logging
+from meltano.core.logging import setup_logging, LEVELS
 
 
 logger = logging.getLogger(__name__)
-
-
-LEVELS = {
-    "debug": logging.DEBUG,
-    "info": logging.INFO,
-    "warning": logging.WARNING,
-    "error": logging.ERROR,
-    "critical": logging.CRITICAL,
-}
 
 
 @click.group(invoke_without_command=True, no_args_is_help=True)
@@ -34,7 +25,7 @@ def cli(ctx, log_level, verbose):
     """
     Get help at https://www.meltano.com/developer-tools/command-line-interface.html#command-line-interface
     """
-    setup_logging(log_level=LEVELS[log_level])
+    setup_logging(log_level=log_level)
 
     ctx.ensure_object(dict)
     ctx.obj["verbosity"] = verbose

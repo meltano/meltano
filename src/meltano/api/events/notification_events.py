@@ -14,6 +14,8 @@ from meltano.core.plugin_discovery_service import PluginDiscoveryService
 SUCCESS = True
 FAILURE = False
 
+logger = logging.getLogger(__name__)
+
 
 class NotificationEvents:
     def __init__(
@@ -28,9 +30,7 @@ class NotificationEvents:
             plugin_discovery_service or PluginDiscoveryService(project)
         )
 
-    def init(self, app):
-        self._app = app
-
+    def init_app(self, app):
         # wire the signal handlers
         PipelineSignals.completed.connect(self.handle_pipeline_completed, ANY)
 
@@ -69,7 +69,6 @@ class NotificationEvents:
         """
         Handles the `Manual Run` pipeline email notification
         """
-
         if success is None:
             raise ValueError("'success' must be set.")
 
@@ -96,12 +95,16 @@ class NotificationEvents:
             source_type="pipeline",
             source_id=job_id,
         ).all()
+        logger.debug(f"Found {len(subscriptions)} subscriptions for source '{job_id}'.")
 
         messages = set()
         sent_recipients = set()
         for subscription in subscriptions:
             # ensure it is not a duplicate mail
             if subscription.recipient in sent_recipients:
+                logger.debug(
+                    f"Skipping duplicate notification for recipient '{subscription.recipient}'."
+                )
                 continue
 
             msg = self.mail_service.create_message(
@@ -113,3 +116,4 @@ class NotificationEvents:
         with mail.connect() as conn:
             for msg in messages:
                 conn.send(msg)
+                logger.debug(f"Notification sent to '{msg.recipients}'.")
