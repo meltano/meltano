@@ -181,7 +181,7 @@ export default {
                 </div>
                 <div>
                   <button class="button is-small is-pulled-right ml-05r">
-                    Edit
+                    View
                   </button>
                 </div>
               </div>
