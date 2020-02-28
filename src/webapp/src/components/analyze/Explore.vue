@@ -231,7 +231,10 @@ export default {
                 </div>
                 <div>
                   <button class="button is-small is-pulled-right ml-05r">
-                    Analyze
+                    <span>Analyze</span>
+                    <span class="icon is-small">
+                      <font-awesome-icon icon="chart-line"></font-awesome-icon>
+                    </span>
                   </button>
                 </div>
               </div>
