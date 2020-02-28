@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1601](https://gitlab.com/meltano/meltano/issues/1601) Change "Reports" CTA in each Pipeline and the JobLog modal to link to its corresponding and newly added Explore page
+- [#1698](https://gitlab.com/meltano/meltano/issues/1698) Change information architecture to separate Connections and Pipelines into distinct pages
 
 ### Fixes
 
