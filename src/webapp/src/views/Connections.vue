@@ -5,7 +5,7 @@ import ExtractorList from '@/components/pipelines/ExtractorList'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
-  name: 'DataSources',
+  name: 'Connections',
   components: {
     ExtractorList,
     RouterViewLayout
@@ -58,7 +58,7 @@ export default {
 <template>
   <router-view-layout>
     <div class="container view-body is-widescreen">
-      <h2 id="data" class="title">Data Sources</h2>
+      <h2 id="data" class="title">Connections</h2>
       <p class="subtitle">Integrations and custom data connections</p>
 
       <div class="columns">

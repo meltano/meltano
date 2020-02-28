@@ -90,22 +90,20 @@ export default {
     >
       <div class="navbar-start">
         <router-link
-          :to="{ name: 'data-sources' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/data-sources') }"
+          :to="{ name: 'connections' }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/connections') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
           <a
             class="button has-background-transparent is-borderless is-paddingless"
             :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf(
-                '/data-sources'
-              )
+              'has-text-interactive-navigation': getIsSubRouteOf('/connections')
             }"
           >
-            <span class="icon is-small" :class="getIconColor('/data-sources')">
+            <span class="icon is-small" :class="getIconColor('/connections')">
               <font-awesome-icon icon="database"></font-awesome-icon>
             </span>
-            <span>Data Sources</span>
+            <span>Connections</span>
           </a>
         </router-link>
 

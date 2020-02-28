@@ -8,7 +8,7 @@ import LogModal from '@/components/pipelines/LogModal'
 import Analyze from '@/views/Analyze'
 import Dashboards from '@/views/Dashboards'
 import Dashboard from '@/views/Dashboard'
-import DataSources from '@/views/DataSources'
+import Connections from '@/views/Connections'
 import Pipelines from '@/views/Pipelines'
 import NotFound from '@/views/NotFound'
 
@@ -25,18 +25,18 @@ const router = new Router({
     },
     {
       path: '/',
-      redirect: '/data-sources'
+      redirect: '/connections'
     },
     {
-      path: '/data-sources/',
-      name: 'data-sources',
-      component: DataSources,
+      path: '/connections/',
+      name: 'connections',
+      component: Connections,
       children: [
         {
           path: ':extractor',
           name: 'extractorSettings',
           components: {
-            default: DataSources,
+            default: Connections,
             extractorSettings: ExtractorSettingsModal
           },
           meta: {

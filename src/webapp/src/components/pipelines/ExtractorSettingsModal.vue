@@ -145,7 +145,7 @@ export default {
       }
     },
     close() {
-      this.$router.push({ name: 'data-sources' })
+      this.$router.push({ name: 'connections' })
     },
     createEditableConfiguration() {
       this.localConfiguration = Object.assign(
