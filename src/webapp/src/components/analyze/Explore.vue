@@ -23,6 +23,27 @@ export default {
   computed: {
     ...mapState('dashboards', ['dashboards']),
     ...mapState('reports', ['reports']),
+    getDesignAttributesCount() {
+      return design => {
+        const filterer = attribute => !attribute.hidden
+        const reducer = (acc, curr) =>
+          acc +
+          curr.columns.filter(filterer).length +
+          curr.aggregates.filter(filterer).length +
+          curr.timeframes.filter(filterer).length
+        const joins = design.joins
+          ? design.joins.map(join => join.relatedTable)
+          : []
+        const tables = [design.relatedTable].concat(joins)
+        return this.topic ? tables.reduce(reducer, 0) : 0
+      }
+    },
+    getDesignLabel() {
+      return designName =>
+        this.topic
+          ? this.topic.designs.find(design => design.name === designName).label
+          : ''
+    },
     getExtractorName() {
       return this.topic ? `tap-${this.topic.name}` : ''
     },
@@ -38,27 +59,6 @@ export default {
     },
     getFilteredReports() {
       return this.reports.filter(report => report.namespace === this.namespace)
-    },
-    getReportTemplateAttributesCount() {
-      return reportTemplate => {
-        const filterer = attribute => !attribute.hidden
-        const reducer = (acc, curr) =>
-          acc +
-          curr.columns.filter(filterer).length +
-          curr.aggregates.filter(filterer).length +
-          curr.timeframes.filter(filterer).length
-        const joins = reportTemplate.joins
-          ? reportTemplate.joins.map(join => join.relatedTable)
-          : []
-        const tables = [reportTemplate.relatedTable].concat(joins)
-        return this.topic ? tables.reduce(reducer, 0) : 0
-      }
-    },
-    getReportTemplateLabelByDesign() {
-      return designName =>
-        this.topic
-          ? this.topic.designs.find(design => design.name === designName).label
-          : ''
     },
     getTitle() {
       return this.topic ? this.topic.label : ''
@@ -85,12 +85,9 @@ export default {
     goToDashboard(dashboard) {
       this.$router.push({ name: 'dashboard', params: dashboard })
     },
-    goToReport(report) {
-      this.$router.push({ name: 'report', params: report })
-    },
-    goToReportTemplate(reportTemplate) {
+    goToDesign(design) {
       const params = {
-        design: reportTemplate.name,
+        design: design.name,
         model: this.model,
         namespace: this.namespace
       }
@@ -98,6 +95,9 @@ export default {
         name: 'design',
         params
       })
+    },
+    goToReport(report) {
+      this.$router.push({ name: 'report', params: report })
     }
   }
 }
@@ -191,7 +191,7 @@ export default {
                   <strong>{{ report.name }}</strong>
                   <br />
                   <small class="is-italic has-text-grey">{{
-                    getReportTemplateLabelByDesign(report.design)
+                    getDesignLabel(report.design)
                   }}</small>
                 </div>
                 <div>
@@ -219,20 +219,20 @@ export default {
           <template v-else-if="topic.designs">
             <div class="list is-hoverable is-shadowless">
               <div
-                v-for="reportTemplate in topic.designs"
-                :key="reportTemplate.name"
+                v-for="design in topic.designs"
+                :key="design.name"
                 class="is-flex h-space-between list-item is-list-tight has-cursor-pointer"
-                @click="goToReportTemplate(reportTemplate)"
+                @click="goToDesign(design)"
               >
                 <div>
-                  <strong>{{ reportTemplate.label }}</strong>
-                  <template v-if="reportTemplate.description">
+                  <strong>{{ design.label }}</strong>
+                  <template v-if="design.description">
                     <br />
-                    <small>{{ reportTemplate.description }}</small>
+                    <small>{{ design.description }}</small>
                   </template>
                   <br />
                   <small class="is-italic has-text-grey"
-                    >{{ getReportTemplateAttributesCount(reportTemplate) }} Data
+                    >{{ getDesignAttributesCount(design) }} Data
                     Attributes</small
                   >
                 </div>
