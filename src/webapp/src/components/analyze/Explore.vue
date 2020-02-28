@@ -23,21 +23,6 @@ export default {
   computed: {
     ...mapState('dashboards', ['dashboards']),
     ...mapState('reports', ['reports']),
-    getDesignAttributesCount() {
-      return design => {
-        const filterer = attribute => !attribute.hidden
-        const reducer = (acc, curr) =>
-          acc +
-          curr.columns.filter(filterer).length +
-          curr.aggregates.filter(filterer).length +
-          curr.timeframes.filter(filterer).length
-        const joins = design.joins
-          ? design.joins.map(join => join.relatedTable)
-          : []
-        const tables = [design.relatedTable].concat(joins)
-        return this.topic ? tables.reduce(reducer, 0) : 0
-      }
-    },
     getDesignLabel() {
       return designName =>
         this.topic
@@ -230,11 +215,6 @@ export default {
                     <br />
                     <small>{{ design.description }}</small>
                   </template>
-                  <br />
-                  <small class="is-italic has-text-grey"
-                    >{{ getDesignAttributesCount(design) }} Data
-                    Attributes</small
-                  >
                 </div>
                 <div>
                   <button class="button is-small is-pulled-right ml-05r">
