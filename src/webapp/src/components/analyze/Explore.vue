@@ -1,6 +1,8 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 
+import lodash from 'lodash'
+
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import designApi from '@/api/design'
 
@@ -25,9 +27,14 @@ export default {
       return this.topic ? `tap-${this.topic.name}` : ''
     },
     getFilteredDashboards() {
-      // TODO in order for filtering to work we need to do a dashboard version/migration and provide a namespace key
-      // Issue here https://gitlab.com/meltano/meltano/issues/1817
-      return this.dashboards //.filter(dashboard => dashboard.namespace === this.namespace)
+      const filteredReportIds = this.getFilteredReports.map(report => report.id)
+      return this.dashboards.filter(dashboard => {
+        const intersections = lodash.intersection(
+          dashboard.reportIds,
+          filteredReportIds
+        )
+        return intersections.length
+      })
     },
     getFilteredReports() {
       return this.reports.filter(report => report.namespace === this.namespace)
