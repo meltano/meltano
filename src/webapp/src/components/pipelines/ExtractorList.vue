@@ -1,11 +1,14 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
+
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
+import ExploreButton from '@/components/analyze/ExploreButton'
 
 export default {
   name: 'ExtractorList',
   components: {
-    ConnectorLogo
+    ConnectorLogo,
+    ExploreButton
   },
   computed: {
     ...mapGetters('plugins', [
@@ -57,6 +60,9 @@ export default {
         const pipeline = this.getPipelineWithExtractor(extractorName)
         return pipeline && pipeline.isRunning
       }
+    },
+    getPipeline() {
+      return extractorName => this.getPipelineWithExtractor(extractorName)
     }
   },
   methods: {
@@ -110,6 +116,11 @@ export default {
                 </template>
               </p>
               <div class="buttons">
+                <ExploreButton
+                  v-if="getHasPipelineWithExtractor(extractor.name)"
+                  :pipeline="getPipeline(extractor.name)"
+                />
+
                 <router-link
                   v-if="getHasPipelineWithExtractor(extractor.name)"
                   class="button tooltip"
