@@ -78,7 +78,7 @@ const router = new Router({
           name: 'report',
           component: Design,
           meta: {
-            title: 'Meltano: Analyze - Report Editor'
+            title: 'Meltano: Analyze - Report'
           }
         },
         {
