@@ -2,18 +2,15 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 import ExtractorList from '@/components/pipelines/ExtractorList'
-import PipelineSchedules from '@/components/pipelines/PipelineSchedules'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
-  name: 'Datasets',
+  name: 'DataSources',
   components: {
     ExtractorList,
-    PipelineSchedules,
     RouterViewLayout
   },
   computed: {
-    ...mapGetters('orchestration', ['getHasPipelines', 'getSortedPipelines']),
     ...mapGetters('plugins', ['getIsLoadingPluginsOfType']),
     ...mapState('plugins', ['installedPlugins']),
     getModalName() {
@@ -61,26 +58,11 @@ export default {
 <template>
   <router-view-layout>
     <div class="container view-body is-widescreen">
-      <h2 id="data" class="title">Data</h2>
-
-      <template v-if="getHasPipelines" class="columns">
-        <div class="columns">
-          <div class="column">
-            <div class="content">
-              <h3 id="pipelines" class="title">Pipelines</h3>
-              <p class="subtitle">Scheduled data collection</p>
-            </div>
-            <PipelineSchedules :pipelines="getSortedPipelines" />
-          </div>
-        </div>
-      </template>
+      <h2 id="data" class="title">Data Sources</h2>
+      <p class="subtitle">Integrations and custom data connections</p>
 
       <div class="columns">
         <div class="column">
-          <div class="content">
-            <h3 id="integrations" class="title">Integrations</h3>
-            <p class="subtitle">Integrations and custom data connections</p>
-          </div>
           <div class="box">
             <progress
               v-if="getIsLoadingPluginsOfType('extractors')"

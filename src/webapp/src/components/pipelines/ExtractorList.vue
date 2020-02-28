@@ -21,7 +21,7 @@ export default {
     getConnectionLabel() {
       return extractorName => {
         const connectLabel = this.getHasPipelineWithExtractor(extractorName)
-          ? 'View Connection'
+          ? 'Connection'
           : 'Connect'
         return this.getExtractorConfigurationNeedsFixing(extractorName)
           ? 'Fix Connection'
@@ -108,15 +108,15 @@ export default {
       </div>
       <div class="column">
         <div class="buttons is-right">
-          <a
+          <router-link
             v-if="getHasPipelineWithExtractor(extractor.name)"
-            href="#pipelines"
             class="button tooltip is-tooltip-left"
-            data-tooltip="A pipeline for this data source already exists"
-            @click.stop="() => {}"
+            data-tooltip="View the pipeline for this data source"
+            tag="button"
+            to="pipelines"
+            >Pipeline</router-link
           >
-            <span>View Pipeline</span>
-          </a>
+
           <button
             class="button tooltip is-tooltip-left"
             :class="getConnectionStyle(extractor.name)"
