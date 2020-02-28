@@ -26,6 +26,7 @@ export default {
     },
     getFilteredDashboards() {
       // TODO in order for filtering to work we need to do a dashboard version/migration and provide a namespace key
+      // Issue here https://gitlab.com/meltano/meltano/issues/1817
       return this.dashboards //.filter(dashboard => dashboard.namespace === this.namespace)
     },
     getFilteredReports() {

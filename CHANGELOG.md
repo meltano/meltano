@@ -9,7 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#1601](https://gitlab.com/meltano/meltano/issues/1601) Add Explore landing pages per data source to act as a aggregate jump-off point to related dashboards, reports, report templates, and more
+- [#1601](https://gitlab.com/meltano/meltano/issues/1601) Add Explore landing pages per data source to act as an aggregate jump-off point to related dashboards, reports, report templates, and more
 
 ### Changes
 
