@@ -9,24 +9,36 @@ export default {
   },
   computed: {
     ...mapGetters('plugins', ['getInstalledPlugin']),
-    ...mapState('repos', ['models'])
+    ...mapState('repos', ['models']),
+    getExploreModel() {
+      let targetModel
+      for (const prop in this.models) {
+        const model = this.models[prop]
+        if (model.plugin_namespace === this.getNamespace) {
+          targetModel = model
+          break
+        }
+      }
+      return targetModel
+    },
+    getExtractor() {
+      // Split based on '@' profiles convention
+      return this.pipeline.extractor.split('@')[0]
+    },
+    getIsExplorable() {
+      return Boolean(this.getExploreModel)
+    },
+    getNamespace() {
+      return this.getInstalledPlugin('extractors', this.getExtractor).namespace
+    }
   },
   methods: {
     goToExplore() {
-      // Split based on '@' profiles convention
-      const extractor = this.pipeline.extractor.split('@')[0]
-      const namespace = this.getInstalledPlugin('extractors', extractor)
-        .namespace
-      for (const prop in this.models) {
-        const model = this.models[prop]
-        if (model.plugin_namespace === namespace) {
-          const { name, namespace } = model
-          this.$router.push({
-            name: 'explore',
-            params: { model: name, namespace }
-          })
-        }
-      }
+      const { name, namespace } = this.getExploreModel
+      this.$router.push({
+        name: 'explore',
+        params: { model: name, namespace }
+      })
     }
   }
 }
@@ -36,7 +48,7 @@ export default {
   <button
     class="button is-interactive-primary tooltip is-tooltip-left"
     :class="{ 'is-loading': isDisabled }"
-    :disabled="isDisabled"
+    :disabled="isDisabled || !getIsExplorable"
     data-tooltip="Explore dashboards, reports, report templates, and more"
     @click="goToExplore"
   >
