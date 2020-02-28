@@ -42,7 +42,7 @@ export default {
   >
     <span>Explore</span>
     <span class="icon is-small">
-      <font-awesome-icon icon="chart-line"></font-awesome-icon>
+      <font-awesome-icon icon="compass"></font-awesome-icon>
     </span>
   </button>
 </template>
