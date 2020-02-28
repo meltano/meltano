@@ -18,6 +18,14 @@ export default {
       'getPipelineWithExtractor'
     ]),
     ...mapState('orchestration', ['pipelines']),
+    getColumns() {
+      const length = this.visibleExtractors.length
+      const halfLength = length / 2
+      const columnOneLength = Math.ceil(halfLength)
+      const columnOne = this.visibleExtractors.slice(0, columnOneLength)
+      const columnTwo = this.visibleExtractors.slice(columnOneLength, length)
+      return [columnOne, columnTwo]
+    },
     getConnectionLabel() {
       return extractorName => {
         const connectLabel = this.getHasPipelineWithExtractor(extractorName)
@@ -64,13 +72,12 @@ export default {
 </script>
 
 <template>
-  <div>
-    <div
-      v-for="(extractor, index) in visibleExtractors"
-      :key="`${extractor.name}-${index}`"
-      class="columns is-vcentered"
-    >
-      <div class="column">
+  <div class="columns">
+    <div v-for="(column, idx) in getColumns" :key="idx" class="column">
+      <div
+        v-for="(extractor, index) in column"
+        :key="`${extractor.name}-${index}`"
+      >
         <article
           class="media"
           :data-test-id="`${extractor.name}-extractor-card`"
@@ -102,31 +109,29 @@ export default {
                   </a>
                 </template>
               </p>
+              <div class="buttons">
+                <router-link
+                  v-if="getHasPipelineWithExtractor(extractor.name)"
+                  class="button tooltip"
+                  data-tooltip="View the pipeline for this data source"
+                  tag="button"
+                  to="pipelines"
+                  >Pipeline</router-link
+                >
+
+                <button
+                  class="button tooltip"
+                  :class="getConnectionStyle(extractor.name)"
+                  :disabled="getIsRelatedPipelineRunning(extractor.name)"
+                  data-tooltip="Install and connect to this data source"
+                  @click="updateExtractorSettings(extractor)"
+                >
+                  <span>{{ getConnectionLabel(extractor.name) }}</span>
+                </button>
+              </div>
             </div>
           </div>
         </article>
-      </div>
-      <div class="column">
-        <div class="buttons is-right">
-          <router-link
-            v-if="getHasPipelineWithExtractor(extractor.name)"
-            class="button tooltip is-tooltip-left"
-            data-tooltip="View the pipeline for this data source"
-            tag="button"
-            to="pipelines"
-            >Pipeline</router-link
-          >
-
-          <button
-            class="button tooltip is-tooltip-left"
-            :class="getConnectionStyle(extractor.name)"
-            :disabled="getIsRelatedPipelineRunning(extractor.name)"
-            data-tooltip="Install and connect to this data source"
-            @click="updateExtractorSettings(extractor)"
-          >
-            <span>{{ getConnectionLabel(extractor.name) }}</span>
-          </button>
-        </div>
       </div>
     </div>
   </div>
