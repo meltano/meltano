@@ -55,7 +55,7 @@ requires = [
 conflicts = [
     'aenum==2.1.2',
     'idna==2.7',
-    'asn1crypto==0.24.0',
+    'asn1crypto==1.3.0',
 ]
 
 dev_requires = [

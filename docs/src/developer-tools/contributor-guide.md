@@ -10,7 +10,7 @@ sidebarDepth: 2
 
 In order to contribute to Meltano, you will need the following:
 
-1. [Python 3.6.1+](https://www.python.org/downloads/)
+1. [Python 3.6.1+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/developer-tools/self-hosted-installation.html#requirements) of the self-hosted installation instructions, that also apply here.
 2. [Node 8.11.0+](https://nodejs.org/)
 3. [Yarn](https://yarnpkg.com/)
 
@@ -53,8 +53,7 @@ source ~/.venv/meltano-development/bin/activate
 pip install -r requirements.txt
 
 # Install dev dependencies with the edit flag on to detect changes
-# Note: you may have to escape the .`[dev]` argument on some shells, like zsh
-pip install -e .[dev]
+pip install -e '.[dev]'
 
 # Bundle the Meltano UI into the `meltano` package
 make bundle
