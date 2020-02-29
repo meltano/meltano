@@ -30,12 +30,6 @@ Before you install Meltano, make sure you have the following requirements instal
 
 #### Unix-like environment
 
-::: warning
-There is currently a known issue with macOS 10.15 and Python 3. The current fix for this is to use Python 3.7+ to run all of your commands (e.g., `python3` vs `python`).
-
-For more information on this issue, visit [issue #1468](https://gitlab.com/meltano/meltano/issues/1468).
-:::
-
 Recent versions of Linux and macOS are both fully supported, but Windows is not.
 
 If you'd like to run Meltano on Windows, you can install it inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about). You may also try [installing Meltano on Docker](#installing-on-docker), although Docker on Windows is known to have [some idiosyncrasies](https://gitlab.com/meltano/meltano/issues/1261#note_240256080) that might hinder Meltano's ability to function.
@@ -54,7 +48,9 @@ To check if you have the correct Python version, open your terminal and use the 
 python --version
 ```
 
+::: tip
 If you've installed Python 3, but are not getting the result you expect, you may have installed Python 3 alongside an existing Python 2 installation. In this case, please use `python3` and `pip3` wherever this guide refers to the `python` and `pip` commands.
+:::
 
 #### pip
 
