@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1811](https://gitlab.com/meltano/meltano/issues/1811) Fix an issue when installing a custom plugin.
 - [#1794](https://gitlab.com/meltano/meltano/issues/1794) Remove the notification field when notifications are disabled.
 - [#1815](https://gitlab.com/meltano/meltano/issues/1815) Fix `mapActions` misplacement in `computed` vs. `methods`
+- [#1468](https://gitlab.com/meltano/meltano/issues/1468) Update asn1crypto to get Meltano to work on macOS Catalina
 
 ### Breaks
 
