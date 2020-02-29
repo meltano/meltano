@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 import lodash from 'lodash'
 
@@ -21,7 +21,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('plugins', ['getInstalledPlugin']),
     ...mapState('dashboards', ['dashboards']),
+    ...mapState('plugins', ['installedPlugins']),
     ...mapState('reports', ['reports']),
     getDesignLabel() {
       return designName =>
@@ -50,22 +52,32 @@ export default {
     }
   },
   created() {
-    this.namespace = this.$route.params.namespace
-    this.model = this.$route.params.model
+    this.getInstalledPlugins().then(() => {
+      const extractorName = this.$route.params.extractor
+      const extractor = this.getInstalledPlugin('extractors', extractorName)
+      const namespace = extractor.namespace
+      const model = this.installedPlugins.models.find(
+        plugin => plugin.namespace === namespace
+      )
 
-    designApi
-      .getTopic(this.namespace, this.model)
-      .then(response => (this.topic = response.data))
-      .catch(this.$error.handle)
-    this.getDashboards()
-      .then(() => (this.hasLoadedDashboards = true))
-      .catch(this.$error.handle)
-    this.getReports()
-      .then(() => (this.hasLoadedReports = true))
-      .catch(this.$error.handle)
+      this.namespace = model.name
+      this.model = model.name.replace('model-', '')
+
+      designApi
+        .getTopic(this.namespace, this.model)
+        .then(response => (this.topic = response.data))
+        .catch(this.$error.handle)
+      this.getDashboards()
+        .then(() => (this.hasLoadedDashboards = true))
+        .catch(this.$error.handle)
+      this.getReports()
+        .then(() => (this.hasLoadedReports = true))
+        .catch(this.$error.handle)
+    })
   },
   methods: {
     ...mapActions('dashboards', ['getDashboards']),
+    ...mapActions('plugins', ['getInstalledPlugins']),
     ...mapActions('reports', ['getReports']),
     goToDashboard(dashboard) {
       this.$router.push({ name: 'dashboard', params: dashboard })

@@ -34,10 +34,9 @@ export default {
   },
   methods: {
     goToExplore() {
-      const { name, namespace } = this.getExploreModel
       this.$router.push({
         name: 'explore',
-        params: { model: name, namespace }
+        params: { extractor: this.getExtractor }
       })
     }
   }

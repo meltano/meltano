@@ -66,7 +66,7 @@ const router = new Router({
       },
       children: [
         {
-          path: '/analyze/:namespace+/:model',
+          path: '/analyze/:extractor',
           name: 'explore',
           component: Explore,
           meta: {
