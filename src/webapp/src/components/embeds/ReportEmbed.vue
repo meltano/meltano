@@ -1,5 +1,5 @@
 <script>
-import Chart from '@/components/analyze/Chart'
+import Chart from '@/components/analyze/charts/Chart'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 
 export default {

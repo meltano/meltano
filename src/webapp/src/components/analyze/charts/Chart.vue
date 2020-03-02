@@ -1,13 +1,20 @@
 <script>
-import { AreaChart, BarChart, LineChart, ScatterChart } from './charts'
+import {
+  AreaChart,
+  BarChart,
+  LineChart,
+  ScatterChart,
+  VerticalBarChart
+} from '@/components/analyze/charts'
 
 export default {
-  name: 'Bar',
+  name: 'Chart',
   components: {
+    AreaChart,
     BarChart,
     LineChart,
-    AreaChart,
-    ScatterChart
+    ScatterChart,
+    VerticalBarChart
   },
   props: {
     chartType: {

@@ -3,18 +3,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
 
+- [#1820](https://gitlab.com/meltano/meltano/issues/1820) Add Vertical Bar chart type to Report chart options
+
 ### Changes
+
+- [#1820](https://gitlab.com/meltano/meltano/issues/1820) Updated chart type selection as a dropdown for improved UX (ensures the chart icon is adorned with its label)
 
 ### Fixes
 
 ### Breaks
-
 
 ## 1.23.0 - (2020-03-02)
 
@@ -35,7 +38,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1794](https://gitlab.com/meltano/meltano/issues/1794) Remove the notification field when notifications are disabled.
 - [#1815](https://gitlab.com/meltano/meltano/issues/1815) Fix `mapActions` misplacement in `computed` vs. `methods`
 - [#1468](https://gitlab.com/meltano/meltano/issues/1468) Update asn1crypto to get Meltano to work on macOS Catalina
-
 
 ## 1.22.2 - (2020-02-27)
 

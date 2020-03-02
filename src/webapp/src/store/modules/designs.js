@@ -8,13 +8,14 @@ import designApi from '@/api/design'
 import FilterModel from '@/store/models/FilterModel'
 import sqlApi from '@/api/sql'
 import utils from '@/utils/utils'
+import { CHART_MODELS } from '@/components/analyze/charts/ChartModels'
 import { QUERY_ATTRIBUTE_DATA_TYPES } from '@/api/design'
 import { selected } from '@/utils/predicates'
 import { namer } from '@/utils/mappers'
 
 const defaultState = utils.deepFreeze({
   activeReport: {},
-  chartType: 'BarChart',
+  chartType: CHART_MODELS.HORIZONTAL_BAR.type,
   currentDesign: '',
   currentModel: '',
   currentNamespace: '',

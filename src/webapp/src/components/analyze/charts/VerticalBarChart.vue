@@ -3,10 +3,10 @@ import chartMixin from './chartMixin'
 import { CHART_MODELS } from '@/components/analyze/charts/ChartModels'
 
 export default {
-  name: 'ScatterChart',
+  name: 'VerticalBarChart',
   mixins: [chartMixin],
   mounted() {
-    this.config.type = CHART_MODELS.SCATTER.configType
+    this.config.type = CHART_MODELS.VERTICAL_BAR.configType
     this.createChart()
   }
 }
