@@ -205,7 +205,7 @@ export default {
         </div>
       </div>
 
-      <!-- Report Templates -->
+      <!-- Report Builder -->
       <div class="column">
         <div class="content">
           <h3 id="report-builder" class="title">Report Builder</h3>

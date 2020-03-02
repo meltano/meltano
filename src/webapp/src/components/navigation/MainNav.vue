@@ -90,26 +90,20 @@ export default {
     >
       <div class="navbar-start">
         <router-link
-          :to="{ name: 'datasets' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/data') }"
+          :to="{ name: 'connections' }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/connections') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
           <a
             class="button has-background-transparent is-borderless is-paddingless"
             :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/data')
+              'has-text-interactive-navigation': getIsSubRouteOf('/connections')
             }"
           >
-            <span class="icon is-small" :class="getIconColor('/data')">
+            <span class="icon is-small" :class="getIconColor('/connections')">
               <font-awesome-icon icon="database"></font-awesome-icon>
             </span>
-            <span>Data</span>
-            <span
-              v-if="getRunningPipelines.length > 0"
-              class="tag ml-05r is-rounded is-info"
-            >
-              {{ getRunningPipelines.length }}
-            </span>
+            <span>Connections</span>
           </a>
         </router-link>
 
@@ -166,6 +160,30 @@ export default {
               <font-awesome-icon icon="th-large"></font-awesome-icon>
             </span>
             <span>Dashboards</span>
+          </a>
+        </router-link>
+
+        <router-link
+          :to="{ name: 'pipelines' }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/pipelines') }"
+          class="navbar-item navbar-child has-text-weight-semibold"
+        >
+          <a
+            class="button has-background-transparent is-borderless is-paddingless"
+            :class="{
+              'has-text-interactive-navigation': getIsSubRouteOf('/pipelines')
+            }"
+          >
+            <span class="icon is-small" :class="getIconColor('/pipelines')">
+              <font-awesome-icon icon="stream"></font-awesome-icon>
+            </span>
+            <span>Pipelines</span>
+            <span
+              v-if="getRunningPipelines.length > 0"
+              class="tag ml-05r is-rounded is-info"
+            >
+              {{ getRunningPipelines.length }}
+            </span>
           </a>
         </router-link>
       </div>
