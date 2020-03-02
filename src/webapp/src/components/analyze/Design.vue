@@ -5,6 +5,7 @@ import Vue from 'vue'
 import lodash from 'lodash'
 
 import capitalize from '@/filters/capitalize'
+import ChartTypePicker from '@/components/analyze/charts/ChartTypePicker'
 import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
 import DateRangePicker from '@/components/analyze/date-range-picker/DateRangePicker'
 import Dropdown from '@/components/generic/Dropdown'
@@ -23,6 +24,7 @@ export default {
     capitalize
   },
   components: {
+    ChartTypePicker,
     CreateDashboardModal,
     DateRangePicker,
     Dropdown,
@@ -989,68 +991,10 @@ export default {
             </div>
             <div class="column">
               <div class="field is-grouped is-grouped-right">
-                <div class="control buttons has-addons">
-                  <button
-                    class="button tooltip"
-                    data-tooltip="Bar chart"
-                    :class="{
-                      'has-text-grey-light': chartType !== 'BarChart',
-                      'is-active has-text-interactive-secondary':
-                        chartType === 'BarChart'
-                    }"
-                    :disabled="!hasChartableResults"
-                    @click.stop="setChartType('BarChart')"
-                  >
-                    <span class="icon is-small">
-                      <font-awesome-icon icon="chart-bar"></font-awesome-icon>
-                    </span>
-                  </button>
-                  <button
-                    class="button tooltip"
-                    data-tooltip="Line chart"
-                    :class="{
-                      'has-text-grey-light': chartType !== 'LineChart',
-                      'is-active has-text-interactive-secondary':
-                        chartType === 'LineChart'
-                    }"
-                    :disabled="!hasChartableResults"
-                    @click.stop="setChartType('LineChart')"
-                  >
-                    <span class="icon is-small">
-                      <font-awesome-icon icon="chart-line"></font-awesome-icon>
-                    </span>
-                  </button>
-                  <button
-                    class="button tooltip"
-                    data-tooltip="Area chart"
-                    :class="{
-                      'has-text-grey-light': chartType !== 'AreaChart',
-                      'is-active has-text-interactive-secondary':
-                        chartType === 'AreaChart'
-                    }"
-                    :disabled="!hasChartableResults"
-                    @click.stop="setChartType('AreaChart')"
-                  >
-                    <span class="icon is-small">
-                      <font-awesome-icon icon="chart-area"></font-awesome-icon>
-                    </span>
-                  </button>
-                  <button
-                    class="button tooltip"
-                    data-tooltip="Scatter chart"
-                    :class="{
-                      'has-text-grey-light': chartType !== 'ScatterChart',
-                      'is-active has-text-interactive-secondary':
-                        chartType === 'ScatterChart'
-                    }"
-                    :disabled="!hasChartableResults"
-                    @click.stop="setChartType('ScatterChart')"
-                  >
-                    <span class="icon is-small">
-                      <font-awesome-icon icon="dot-circle"></font-awesome-icon>
-                    </span>
-                  </button>
-                </div>
+                <ChartTypePicker
+                  :chart-type="chartType"
+                  @chart-type-change="setChartType"
+                />
               </div>
             </div>
           </div>
