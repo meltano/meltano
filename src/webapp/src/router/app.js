@@ -6,10 +6,11 @@ import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModa
 import LogModal from '@/components/pipelines/LogModal'
 
 import Analyze from '@/views/Analyze'
-import Dashboards from '@/views/Dashboards'
+import Connections from '@/views/Connections'
 import Dashboard from '@/views/Dashboard'
-import Datasets from '@/views/Datasets'
+import Dashboards from '@/views/Dashboards'
 import NotFound from '@/views/NotFound'
+import Pipelines from '@/views/Pipelines'
 
 const router = new Router({
   mode: 'history',
@@ -24,30 +25,37 @@ const router = new Router({
     },
     {
       path: '/',
-      redirect: '/data'
+      redirect: '/connections'
     },
     {
-      path: '/data/',
-      name: 'datasets',
-      component: Datasets,
+      path: '/connections/',
+      name: 'connections',
+      component: Connections,
       children: [
         {
-          path: 'extract/:extractor',
+          path: ':extractor',
           name: 'extractorSettings',
           components: {
-            default: Datasets,
+            default: Connections,
             extractorSettings: ExtractorSettingsModal
           },
           meta: {
             isModal: true,
             title: 'Meltano: Data Extractor Configuration'
           }
-        },
+        }
+      ]
+    },
+    {
+      path: '/pipelines/',
+      name: 'pipelines',
+      component: Pipelines,
+      children: [
         {
-          path: 'schedule/:jobId',
+          path: ':jobId',
           name: 'runLog',
           components: {
-            default: Datasets,
+            default: Pipelines,
             runLog: LogModal
           },
           meta: {

@@ -221,7 +221,7 @@ export default {
             </td>
             <td>
               <div class="buttons is-right">
-                <ExploreButton :pipeline="pipeline" />
+                <ExploreButton :pipeline="pipeline" is-tooltip-left />
                 <Dropdown
                   :button-classes="
                     `is-danger is-outlined ${

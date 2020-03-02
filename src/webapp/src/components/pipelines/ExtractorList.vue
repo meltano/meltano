@@ -1,11 +1,14 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
+
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
+import ExploreButton from '@/components/analyze/ExploreButton'
 
 export default {
   name: 'ExtractorList',
   components: {
-    ConnectorLogo
+    ConnectorLogo,
+    ExploreButton
   },
   computed: {
     ...mapGetters('plugins', [
@@ -18,10 +21,18 @@ export default {
       'getPipelineWithExtractor'
     ]),
     ...mapState('orchestration', ['pipelines']),
+    getColumns() {
+      const length = this.visibleExtractors.length
+      const halfLength = length / 2
+      const columnOneLength = Math.ceil(halfLength)
+      const columnOne = this.visibleExtractors.slice(0, columnOneLength)
+      const columnTwo = this.visibleExtractors.slice(columnOneLength, length)
+      return [columnOne, columnTwo]
+    },
     getConnectionLabel() {
       return extractorName => {
         const connectLabel = this.getHasPipelineWithExtractor(extractorName)
-          ? 'View Connection'
+          ? 'Connection'
           : 'Connect'
         return this.getExtractorConfigurationNeedsFixing(extractorName)
           ? 'Fix Connection'
@@ -49,6 +60,9 @@ export default {
         const pipeline = this.getPipelineWithExtractor(extractorName)
         return pipeline && pipeline.isRunning
       }
+    },
+    getPipeline() {
+      return extractorName => this.getPipelineWithExtractor(extractorName)
     }
   },
   methods: {
@@ -64,13 +78,12 @@ export default {
 </script>
 
 <template>
-  <div>
-    <div
-      v-for="(extractor, index) in visibleExtractors"
-      :key="`${extractor.name}-${index}`"
-      class="columns is-vcentered"
-    >
-      <div class="column">
+  <div class="columns">
+    <div v-for="(column, idx) in getColumns" :key="idx" class="column">
+      <div
+        v-for="(extractor, index) in column"
+        :key="`${extractor.name}-${index}`"
+      >
         <article
           class="media"
           :data-test-id="`${extractor.name}-extractor-card`"
@@ -102,31 +115,34 @@ export default {
                   </a>
                 </template>
               </p>
+              <div class="buttons">
+                <ExploreButton
+                  v-if="getHasPipelineWithExtractor(extractor.name)"
+                  :pipeline="getPipeline(extractor.name)"
+                />
+
+                <router-link
+                  v-if="getHasPipelineWithExtractor(extractor.name)"
+                  class="button tooltip"
+                  data-tooltip="View the pipeline for this data source"
+                  tag="button"
+                  to="pipelines"
+                  >Pipeline</router-link
+                >
+
+                <button
+                  class="button tooltip"
+                  :class="getConnectionStyle(extractor.name)"
+                  :disabled="getIsRelatedPipelineRunning(extractor.name)"
+                  data-tooltip="Install and connect to this data source"
+                  @click="updateExtractorSettings(extractor)"
+                >
+                  <span>{{ getConnectionLabel(extractor.name) }}</span>
+                </button>
+              </div>
             </div>
           </div>
         </article>
-      </div>
-      <div class="column">
-        <div class="buttons is-right">
-          <a
-            v-if="getHasPipelineWithExtractor(extractor.name)"
-            href="#pipelines"
-            class="button tooltip is-tooltip-left"
-            data-tooltip="A pipeline for this data source already exists"
-            @click.stop="() => {}"
-          >
-            <span>View Pipeline</span>
-          </a>
-          <button
-            class="button tooltip is-tooltip-left"
-            :class="getConnectionStyle(extractor.name)"
-            :disabled="getIsRelatedPipelineRunning(extractor.name)"
-            data-tooltip="Install and connect to this data source"
-            @click="updateExtractorSettings(extractor)"
-          >
-            <span>{{ getConnectionLabel(extractor.name) }}</span>
-          </button>
-        </div>
       </div>
     </div>
   </div>

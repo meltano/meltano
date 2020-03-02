@@ -79,7 +79,7 @@ export default {
   methods: {
     ...mapActions('orchestration', ['getJobLog']),
     close() {
-      this.$router.push({ name: 'datasets' })
+      this.$router.push({ name: 'pipelines' })
     },
     initJobPoller() {
       const pollFn = () => {

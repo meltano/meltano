@@ -5,7 +5,8 @@ export default {
   name: 'ExploreButton',
   props: {
     pipeline: { type: Object, required: true },
-    isDisabled: { type: Boolean, required: false }
+    isDisabled: { type: Boolean, required: false },
+    isTooltipLeft: { type: Boolean, required: false }
   },
   computed: {
     ...mapGetters('plugins', ['getInstalledPlugin']),
@@ -45,10 +46,10 @@ export default {
 
 <template>
   <button
-    class="button is-interactive-primary tooltip is-tooltip-left"
-    :class="{ 'is-loading': isDisabled }"
+    class="button is-interactive-primary tooltip"
+    :class="{ 'is-loading': isDisabled, 'is-tooltip-left': isTooltipLeft }"
     :disabled="isDisabled || !getIsExplorable"
-    data-tooltip="Explore dashboards, reports, report templates, and more"
+    data-tooltip="Explore dashboards, reports, templates, and more"
     @click="goToExplore"
   >
     <span>Explore</span>
