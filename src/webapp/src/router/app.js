@@ -6,9 +6,9 @@ import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModa
 import LogModal from '@/components/pipelines/LogModal'
 
 import Analyze from '@/views/Analyze'
-import Dashboards from '@/views/Dashboards'
-import Dashboard from '@/views/Dashboard'
 import Connections from '@/views/Connections'
+import Dashboard from '@/views/Dashboard'
+import Dashboards from '@/views/Dashboards'
 import Pipelines from '@/views/Pipelines'
 import NotFound from '@/views/NotFound'
 
