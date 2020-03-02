@@ -1,11 +1,12 @@
 <script>
 import chartMixin from './chartMixin'
+import { CHART_MODELS } from '@/components/analyze/charts/ChartModels'
 
 export default {
   name: 'VerticalBarChart',
   mixins: [chartMixin],
   mounted() {
-    this.config.type = 'bar'
+    this.config.type = CHART_MODELS.VERTICAL_BAR.configType
     this.createChart()
   }
 }
