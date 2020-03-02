@@ -1,7 +1,7 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 
-import Chart from '@/components/analyze/Chart'
+import Chart from '@/components/analyze/charts/Chart'
 import LoadingOverlay from '@/components/generic/LoadingOverlay'
 import { selected } from '@/utils/predicates'
 
