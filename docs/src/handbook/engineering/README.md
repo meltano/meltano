@@ -71,7 +71,7 @@ Both releases are owned by engineers on a rotating schedule:
 | 2020-02-10   | Micael        |
 | 2020-02-17   | Yannis        |
 | 2020-02-24   | Derek         |
-| 2020-03-02   | Ben           |
+| 2020-03-02   | Douwe         |
 | 2020-03-09   | Micael        |
 | 2020-03-16   | Yannis        |
 | 2020-03-23   | Derek         |
