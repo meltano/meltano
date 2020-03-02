@@ -9,8 +9,8 @@ import Analyze from '@/views/Analyze'
 import Connections from '@/views/Connections'
 import Dashboard from '@/views/Dashboard'
 import Dashboards from '@/views/Dashboards'
-import Pipelines from '@/views/Pipelines'
 import NotFound from '@/views/NotFound'
+import Pipelines from '@/views/Pipelines'
 
 const router = new Router({
   mode: 'history',
