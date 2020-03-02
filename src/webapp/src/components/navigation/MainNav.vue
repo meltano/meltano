@@ -107,30 +107,6 @@ export default {
           </a>
         </router-link>
 
-        <router-link
-          :to="{ name: 'pipelines' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/pipelines') }"
-          class="navbar-item navbar-child has-text-weight-semibold"
-        >
-          <a
-            class="button has-background-transparent is-borderless is-paddingless"
-            :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/pipelines')
-            }"
-          >
-            <span class="icon is-small" :class="getIconColor('/pipelines')">
-              <font-awesome-icon icon="stream"></font-awesome-icon>
-            </span>
-            <span>Pipelines</span>
-            <span
-              v-if="getRunningPipelines.length > 0"
-              class="tag ml-05r is-rounded is-info"
-            >
-              {{ getRunningPipelines.length }}
-            </span>
-          </a>
-        </router-link>
-
         <div class="navbar-item navbar-child has-dropdown is-hoverable">
           <a
             :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
@@ -184,6 +160,30 @@ export default {
               <font-awesome-icon icon="th-large"></font-awesome-icon>
             </span>
             <span>Dashboards</span>
+          </a>
+        </router-link>
+
+        <router-link
+          :to="{ name: 'pipelines' }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/pipelines') }"
+          class="navbar-item navbar-child has-text-weight-semibold"
+        >
+          <a
+            class="button has-background-transparent is-borderless is-paddingless"
+            :class="{
+              'has-text-interactive-navigation': getIsSubRouteOf('/pipelines')
+            }"
+          >
+            <span class="icon is-small" :class="getIconColor('/pipelines')">
+              <font-awesome-icon icon="stream"></font-awesome-icon>
+            </span>
+            <span>Pipelines</span>
+            <span
+              v-if="getRunningPipelines.length > 0"
+              class="tag ml-05r is-rounded is-info"
+            >
+              {{ getRunningPipelines.length }}
+            </span>
           </a>
         </router-link>
       </div>
