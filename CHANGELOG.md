@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.23.0 - (2020-03-02)
 
 ---
 
@@ -23,7 +36,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1815](https://gitlab.com/meltano/meltano/issues/1815) Fix `mapActions` misplacement in `computed` vs. `methods`
 - [#1468](https://gitlab.com/meltano/meltano/issues/1468) Update asn1crypto to get Meltano to work on macOS Catalina
 
-### Breaks
 
 ## 1.22.2 - (2020-02-27)
 
