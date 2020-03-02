@@ -30,9 +30,9 @@ const getters = {
 }
 
 const actions = {
-  loadReports({ commit }) {
+  getReports({ commit }) {
     return reportsApi
-      .loadReports()
+      .getReports()
       .then(response => commit('setReports', response.data))
   },
   saveReport({ commit }, payload) {

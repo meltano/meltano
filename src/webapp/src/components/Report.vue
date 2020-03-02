@@ -54,7 +54,7 @@ export default {
         model: report.model,
         namespace: report.namespace
       }
-      this.$router.push({ name: 'analyzeDesign', params })
+      this.$router.push({ name: 'design', params })
     },
     goToReport(report) {
       this.$router.push({ name: 'report', params: report })

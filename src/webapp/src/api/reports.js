@@ -2,7 +2,7 @@ import axios from 'axios'
 import utils from '@/utils/utils'
 
 export default {
-  loadReports() {
+  getReports() {
     return axios.get(utils.apiUrl('reports'))
   },
 

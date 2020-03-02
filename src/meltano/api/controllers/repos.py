@@ -5,10 +5,15 @@ from pathlib import Path
 
 import markdown
 from flask import jsonify, request
+from flask_principal import Need
 
+from .repos_helper import ReposHelper
+from meltano.api.api_blueprint import APIBlueprint
+from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin
+from meltano.api.security.auth import permit
+from meltano.api.json import freeze_keys
 from meltano.core.project import Project
 from meltano.core.compiler.project_compiler import ProjectCompiler
-from meltano.api.api_blueprint import APIBlueprint
 from meltano.core.m5o.m5o_file_parser import (
     MeltanoAnalysisFileParser,
     MeltanoAnalysisMissingTopicFilesError,
@@ -18,10 +23,6 @@ from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParser,
     M5oCollectionParserTypes,
 )
-from flask_principal import Need
-from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin
-from meltano.api.security.auth import permit
-from meltano.api.json import freeze_keys
 
 
 reposBP = APIBlueprint("repos", __name__)
@@ -165,8 +166,21 @@ def sync():
     return lint_all(True)
 
 
+@reposBP.route("/designs/<path:namespace>/<topic_name>/<design_name>", methods=["GET"])
+def model_design(namespace, topic_name, design_name):
+    permit("view:design", design_name)
+
+    repos_helper = ReposHelper()
+    topic = repos_helper.get_topic(namespace, topic_name)
+
+    designs = topic["designs"]
+    design = next(e for e in designs if e["name"] == design_name)
+
+    return jsonify(design)
+
+
 @reposBP.route("/models", methods=["GET"])
-def models():
+def model_index():
     project = Project.find()
     topicsFile = project.run_dir("models", "topics.index.m5oc")
     path = Path(topicsFile)
@@ -181,15 +195,11 @@ def models():
     return jsonify(topics)
 
 
-@reposBP.route("/designs/<path:namespace>/<topic_name>/<design_name>", methods=["GET"])
-def design_read(namespace, topic_name, design_name):
-    permit("view:design", design_name)
+@reposBP.route("/<path:namespace>/<topic_name>", methods=["GET"])
+def model_topic(namespace, topic_name):
+    permit("view:topic", topic_name)
 
-    project = Project.find()
-    topic = project.run_dir("models", namespace, f"{topic_name}.topic.m5oc")
+    repos_helper = ReposHelper()
+    topic = repos_helper.get_topic(namespace, topic_name)
 
-    with topic.open() as f:
-        topic = json.load(f)
-    designs = topic["designs"]
-    design = next(e for e in designs if e["name"] == design_name)
-    return jsonify(design)
+    return jsonify(topic)

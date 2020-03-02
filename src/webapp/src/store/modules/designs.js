@@ -436,7 +436,7 @@ const actions = {
     commit('resetSQLResults')
     commit('setCurrentMetadata', { namespace, model, design })
 
-    const uponLoadReports = dispatch('reports/loadReports', null, {
+    const uponGetReports = dispatch('reports/getReports', null, {
       root: true
     })
 
@@ -445,7 +445,7 @@ const actions = {
       .then(response => {
         commit('setDesign', response.data)
       })
-      .then(uponLoadReports)
+      .then(uponGetReports)
       .then(() => {
         if (slug) {
           const reportMatch = rootGetters['reports/getReportBySlug']({

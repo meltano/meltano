@@ -1,6 +1,7 @@
 import Router from 'vue-router'
 
 import Design from '@/components/analyze/Design'
+import Explore from '@/components/analyze/Explore'
 import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModal'
 import LogModal from '@/components/pipelines/LogModal'
 
@@ -65,6 +66,14 @@ const router = new Router({
       },
       children: [
         {
+          path: '/analyze/:extractor',
+          name: 'explore',
+          component: Explore,
+          meta: {
+            title: 'Meltano: Analyze - Explore'
+          }
+        },
+        {
           path: '/analyze/:namespace+/:model/:design/reports/:slug',
           name: 'report',
           component: Design,
@@ -74,10 +83,10 @@ const router = new Router({
         },
         {
           path: '/analyze/:namespace+/:model/:design',
-          name: 'analyzeDesign',
+          name: 'design',
           component: Design,
           meta: {
-            title: 'Meltano: Analyze - Model Design'
+            title: 'Meltano: Analyze - Report Builder'
           }
         }
       ]

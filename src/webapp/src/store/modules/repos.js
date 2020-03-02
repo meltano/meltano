@@ -1,6 +1,6 @@
 import lodash from 'lodash'
 
-import repoApi from '../../api/repo'
+import repoApi from '@/api/repo'
 import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
