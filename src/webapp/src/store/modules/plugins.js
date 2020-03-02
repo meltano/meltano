@@ -156,7 +156,7 @@ const actions = {
     return pluginsApi.installBatch(installConfig).then(() => {
       dispatch('getPlugins')
       dispatch('dashboards/getDashboards', null, { root: true })
-      dispatch('reports/loadReports', null, { root: true })
+      dispatch('reports/getReports', null, { root: true })
       dispatch('repos/getModels', null, { root: true })
     })
   }

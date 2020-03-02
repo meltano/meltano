@@ -1,9 +1,8 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
 
-import AnalyzeList from '@/components/analyze/AnalyzeList'
 import DownloadButton from '@/components/generic/DownloadButton'
-import Dropdown from '@/components/generic/Dropdown'
+import ExploreButton from '@/components/analyze/ExploreButton'
 import SubscribeButton from '@/components/generic/SubscribeButton'
 import orchestrationsApi from '@/api/orchestrations'
 import poller from '@/utils/poller'
@@ -12,9 +11,8 @@ import utils from '@/utils/utils'
 export default {
   name: 'LogModal',
   components: {
-    AnalyzeList,
-    Dropdown,
     DownloadButton,
+    ExploreButton,
     SubscribeButton
   },
   data() {
@@ -151,8 +149,8 @@ export default {
                 this view.
               </li>
               <li>
-                Once extraction is complete, use the "Reports" button (lower
-                right of this view) to analyze the imported data.
+                Once extraction is complete, use the "Explore" button (lower
+                right of this view) to explore the imported data.
               </li>
             </ul>
             <p v-if="isUITrigger && isNotificationEnabled">
@@ -235,23 +233,11 @@ export default {
           <button v-if="hasError" class="button is-danger" @click="getHelp">
             Get Help
           </button>
-          <Dropdown
-            v-else
-            label="Reports"
-            :disabled="isPolling"
-            :button-classes="
-              `is-interactive-primary ${isPolling ? 'is-loading' : ''}`
-            "
-            menu-classes="dropdown-menu-300"
-            icon-open="chart-line"
-            icon-close="caret-down"
-            is-right-aligned
-            is-up
-          >
-            <div class="dropdown-content is-unselectable">
-              <AnalyzeList :pipeline="relatedPipeline" />
-            </div>
-          </Dropdown>
+          <ExploreButton
+            v-else-if="relatedPipeline"
+            :pipeline="relatedPipeline"
+            :is-disabled="isPolling"
+          />
         </div>
       </footer>
     </div>

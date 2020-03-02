@@ -71,11 +71,11 @@ const actions = {
 
   initialize({ commit, dispatch }, slug) {
     commit('setIsInitializing', true)
-    const uponLoadReports = dispatch('reports/loadReports', null, {
+    const uponGetReports = dispatch('reports/getReports', null, {
       root: true
     })
     const uponGetDashboards = dispatch('getDashboards')
-    return Promise.all([uponLoadReports, uponGetDashboards])
+    return Promise.all([uponGetReports, uponGetDashboards])
       .then(() => {
         if (slug) {
           dispatch('preloadDashboard', slug)

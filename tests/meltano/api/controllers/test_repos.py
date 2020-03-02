@@ -20,9 +20,9 @@ class TestRepos:
         assert_has_items(payload["dashboards"], 0)
         assert_has_items(payload["documents"], 1)
 
-    def test_models(self, api, app):
+    def test_model_index(self, api, app):
         with app.test_request_context():
-            res = api.get(url_for("repos.models"))
+            res = api.get(url_for("repos.model_index"))
 
         payload = res.json
 
@@ -38,11 +38,11 @@ class TestRepos:
             assert topic_def["name"]
             assert topic_def["designs"]
 
-    def test_design_read(self, api, app):
+    def test_model_design(self, api, app):
         with app.test_request_context():
             res = api.get(
                 url_for(
-                    "repos.design_read",
+                    "repos.model_design",
                     namespace="model-carbon-intensity",
                     topic_name="carbon",
                     design_name="region",
