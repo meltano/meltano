@@ -7,7 +7,7 @@ export const CHART_MODELS = Object.freeze({
   },
   HORIZONTAL_BAR: {
     configType: 'horizontalBar',
-    icon: 'chart-horizontal-bar',
+    icon: 'meltano-custom-chart-horizontal-bar',
     label: 'Horizontal Bar',
     type: 'BarChart'
   },
@@ -19,7 +19,7 @@ export const CHART_MODELS = Object.freeze({
   },
   SCATTER: {
     configType: 'line',
-    icon: 'chart-scatter',
+    icon: 'meltano-custom-chart-scatter',
     label: 'Scatter',
     type: 'ScatterChart'
   },

@@ -3,7 +3,8 @@ import {
   AreaChart,
   BarChart,
   LineChart,
-  ScatterChart
+  ScatterChart,
+  VerticalBarChart
 } from '@/components/analyze/charts'
 
 export default {
@@ -12,7 +13,8 @@ export default {
     AreaChart,
     BarChart,
     LineChart,
-    ScatterChart
+    ScatterChart,
+    VerticalBarChart
   },
   props: {
     chartType: {
