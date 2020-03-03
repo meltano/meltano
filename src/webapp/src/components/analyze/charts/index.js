@@ -1,6 +1,7 @@
+import AreaChart from './AreaChart'
 import BarChart from './BarChart'
 import LineChart from './LineChart'
-import AreaChart from './AreaChart'
 import ScatterChart from './ScatterChart'
+import VerticalBarChart from './VerticalBarChart'
 
-export { BarChart, LineChart, AreaChart, ScatterChart }
+export { AreaChart, BarChart, LineChart, ScatterChart, VerticalBarChart }

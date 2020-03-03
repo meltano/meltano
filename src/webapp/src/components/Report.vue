@@ -1,7 +1,7 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import Chart from '@/components/analyze/Chart'
+import Chart from '@/components/analyze/charts/Chart'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import EmbedShareButton from '@/components/generic/EmbedShareButton'
 

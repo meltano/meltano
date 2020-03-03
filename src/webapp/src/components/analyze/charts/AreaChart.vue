@@ -1,11 +1,12 @@
 <script>
 import chartMixin from './chartMixin'
+import { CHART_MODELS } from '@/components/analyze/charts/ChartModels'
 
 export default {
   name: 'AreaChart',
   mixins: [chartMixin],
   mounted() {
-    this.config.type = 'line'
+    this.config.type = CHART_MODELS.AREA.configType
     this.createChart()
   }
 }

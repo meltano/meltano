@@ -58,6 +58,10 @@ import {
   FontAwesomeLayersText
 } from '@fortawesome/vue-fontawesome'
 
+// Temp custom icons until we have a robust icon set
+import { meltanoCustomChartHorizontalBar } from '@/components/analyze/charts/icons/meltanoCustomChartHorizontalBar'
+import { meltanoCustomChartScatter } from '@/components/analyze/charts/icons/meltanoCustomChartScatter'
+
 export default {
   install(Vue) {
     library.add(faAngleDown)
@@ -111,6 +115,9 @@ export default {
     library.add(faThList)
     library.add(faTrashAlt)
     library.add(faUser)
+
+    library.add(meltanoCustomChartHorizontalBar)
+    library.add(meltanoCustomChartScatter)
 
     Vue.component('font-awesome-icon', FontAwesomeIcon)
     Vue.component('font-awesome-layers', FontAwesomeLayers)
