@@ -563,10 +563,9 @@ extractors:
       - name: port
         value: 27017
       - name: user
-        env: MONGODB_USERNAME
       - name: password
         kind: password
-      - name: dbname
+      - name: database
         label: Database Name
   - name: tap-shopify
     label: Shopify
