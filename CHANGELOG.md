@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1836](https://gitlab.com/meltano/meltano/issues/1820) Don't crash when gunicorn is sent HUP signal to reload Meltano service
+
 ### Breaks
 
 
