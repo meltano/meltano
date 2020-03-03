@@ -39,9 +39,9 @@ export TAP_MONGODB_HOST=""
 # MongoDB database port
 export TAP_MONGODB_PORT=""
 # MongoDB database username
-export MONGODB_USERNAME=""
+export TAP_MONGODB_USER=""
 # MongoDB database password
 export TAP_MONGODB_PASSWORD=""
 # MongoDB database name
-export TAP_MONGODB_DBNAME=""
+export TAP_MONGODB_DATABASE=""
 ```
