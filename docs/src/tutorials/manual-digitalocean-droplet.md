@@ -59,10 +59,10 @@ python --version
 
 ### pip3
 
-Next up, we need to install our package manager, pip3.
+Next up, we need to install our package manager, pip.
 
 ```bash
-apt install python3-pip3
+apt install python3-pip
 ```
 
 ### Virtual Environment

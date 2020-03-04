@@ -50,11 +50,11 @@ python --version
 
 #### pip3
 
-`pip3 ` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip3 ` that may be of interest:
+`pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
 
 ```bash
- Check for current version of pip3
- to ensure that it is using the Python3 pip3
+ Check for current version of pip
+ to ensure that it is using Python 3
 pip3 --version
 
  Update pip3
