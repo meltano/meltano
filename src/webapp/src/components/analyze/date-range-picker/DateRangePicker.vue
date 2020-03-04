@@ -45,8 +45,8 @@ export default {
           filter => filter.expression === 'less_or_equal_than'
         )
         const dateRange = {
-          start: start ? new Date(start.value) : null,
-          end: end ? new Date(end.value) : null
+          start: start ? utils.getDateFromYYYYMMDDString(start.value) : null,
+          end: end ? utils.getDateFromYYYYMMDDString(end.value) : null
         }
         return { attribute, dateRange }
       })
@@ -125,10 +125,14 @@ export default {
         const partialStart = {
           expression: 'greater_or_equal_than', // TODO refactor `filterOptions` and/or constants approach
           value: dateRange.start
+            ? utils.formatDateStringYYYYMMDD(dateRange.start)
+            : null
         }
         const partialEnd = {
           expression: 'less_or_equal_than', // TODO refactor `filterOptions` and/or constants approach
           value: dateRange.end
+            ? utils.formatDateStringYYYYMMDD(dateRange.end)
+            : null
         }
 
         // Apply filters as a pair
