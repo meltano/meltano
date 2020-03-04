@@ -1,6 +1,7 @@
 <script>
 import { mapGetters } from 'vuex'
 
+import { EVENTS } from '@/components/analyze/date-range-picker/events'
 import {
   getDateLabel,
   getHasValidDateRange
@@ -53,10 +54,10 @@ export default {
           attributePair.attribute.sourceName === sourceName &&
           attributePair.attribute.name === name
       )
-      this.$emit('attribute-pair-change', targetAttributePair)
+      this.$emit(EVENTS.ATTRIBUTE_PAIR_CHANGE, targetAttributePair)
     },
     onClearDateRange() {
-      this.$emit('clear-date-range', this.attributePair)
+      this.$emit(EVENTS.CLEAR_DATE_RANGE, this.attributePair)
     }
   }
 }

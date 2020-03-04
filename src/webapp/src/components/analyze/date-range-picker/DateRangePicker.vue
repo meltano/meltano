@@ -5,6 +5,7 @@ import lodash from 'lodash'
 
 import DateRangePickerHeader from '@/components/analyze/date-range-picker/DateRangePickerHeader'
 import Dropdown from '@/components/generic/Dropdown'
+import { EVENTS } from '@/components/analyze/date-range-picker/events'
 import {
   getDateLabel,
   getHasValidDateRange
@@ -102,6 +103,9 @@ export default {
       )
     }
   },
+  created() {
+    this.$root.$on(EVENTS.CHANGE_DATE_RANGE_TYPE, this.onChangeDateRangeType)
+  },
   methods: {
     ...mapActions('designs', ['addFilter', 'removeFilter']),
     onChangeAttributePairInFocus(attributePair) {
@@ -111,6 +115,9 @@ export default {
     },
     onClearDateRange(attributePair) {
       attributePair.dateRange = { start: null, end: null }
+    },
+    onChangeDateRangeType(payload) {
+      console.log('update cal', payload)
     },
     onDropdownOpen() {
       this.attributePairsModel = lodash.cloneDeep(this.getAttributePairsInitial)

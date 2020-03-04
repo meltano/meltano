@@ -1,4 +1,6 @@
 <script>
+import { EVENTS } from '@/components/analyze/date-range-picker/events'
+
 export default {
   name: 'DateRangeCustomVsRelative',
   props: {},
@@ -7,10 +9,24 @@ export default {
       isCustom: true
     }
   },
-  computed: {},
+  computed: {
+    getValue() {
+      // TODO parse input combo to to a start and end pair
+      return new Date()
+    }
+  },
   methods: {
+    emitDateRangeTypeChange() {
+      this.$root.$emit(EVENTS.CHANGE_DATE_RANGE_TYPE, {
+        isCustom: this.isCustom,
+        value: this.getValue
+      })
+    },
     onIsCustomChange(value) {
-      this.isCustom = value
+      if (this.isCustom !== value) {
+        this.isCustom = value
+        this.emitDateRangeTypeChange()
+      }
     }
   }
 }
