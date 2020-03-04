@@ -45,8 +45,8 @@ export default {
           filter => filter.expression === 'less_or_equal_than'
         )
         const dateRange = {
-          start: start ? new Date(start.value) : null,
-          end: end ? new Date(end.value) : null
+          start: start ? utils.getDateFromYYYYMMDDString(start.value) : null,
+          end: end ? utils.getDateFromYYYYMMDDString(end.value) : null
         }
         return { attribute, dateRange }
       })
