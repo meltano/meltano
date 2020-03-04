@@ -20,6 +20,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1836](https://gitlab.com/meltano/meltano/issues/1820) Don't crash when gunicorn is sent HUP signal to reload Meltano service
 - [#1837](https://gitlab.com/meltano/meltano/issues/1837) Fix tap-mongodb database name setting
 - [#1838](https://gitlab.com/meltano/meltano/issues/1838) Properly handle dates and timezones in date range picker
+- [#1838](https://gitlab.com/meltano/meltano/issues/1838) Ensure records on boundary dates are included when using date range picker with column of type "time"
 
 ### Breaks
 
