@@ -249,7 +249,12 @@ export default {
   },
 
   formatDateStringYYYYMMDD(date) {
-    return new Date(date).toISOString().split('T')[0]
+    const dateInLocalTimezone = new Date(date)
+    const dateInUTC = new Date(
+      dateInLocalTimezone.getTime() -
+        dateInLocalTimezone.getTimezoneOffset() * 60000
+    )
+    return dateInUTC.toISOString().split('T')[0]
   },
 
   // Time Utils
