@@ -189,6 +189,9 @@ export default {
       attributePair.priorCustomDateRange = getNullDateRange()
       attributePair.isRelative = false
     },
+    onChangeDateRangeType(payload) {
+      console.log('update cal', payload)
+    },
     onDropdownOpen() {
       this.attributePairsModel = lodash.cloneDeep(this.getAttributePairsInitial)
     },
