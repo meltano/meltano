@@ -68,7 +68,7 @@ The `add` command allows you to add an extractor, loader, or transform to your M
 When you add a extractor or loader to a Meltano instance, Meltano will:
 
 1. Add it to the `meltano.yml` file
-1. Installs it in the `.meltano` directory with `venv` and `pip`
+1. Installs it in the `.meltano` directory with `venv` and `pip3`
 
 You can run `meltano add` with `--include-related` to automatically install all transform, model, and dashboard plugins related to an extractor.
 
@@ -154,7 +154,7 @@ Meltano uses configuration layers to resolve a plugin's configuration:
 1. Default values set in the setting definition in **discovery.yml**
 
 ::: info
-Sensitive settings such as _passwords_ or _keys_ should not be configured using `meltano.yml`, 
+Sensitive settings such as _passwords_ or _keys_ should not be configured using `meltano.yml`,
 since the entire contents of this file are available to the Meltano UI and its users.
 
 Instead, these sensitive values should be stored in environment variables, or the system database (using `meltano config` or the UI).
@@ -539,7 +539,7 @@ Regenerating secrets will cause the following:
 
   - All passwords will be invalid
   - All sessions will be expired
-  
+
 Use with caution!
 :::
 
@@ -553,7 +553,7 @@ Specify the size of the secrets, default to 256.
 This command is only relevant when Meltano is run with authentication enabled.
 :::
 
-### `add` 
+### `add`
 
 Create a Meltano user account, active and ready to be used.
 

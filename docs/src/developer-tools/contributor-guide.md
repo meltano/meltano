@@ -36,11 +36,11 @@ git clone git@gitlab.com:meltano/meltano.git
 # Change directory into the Meltano project
 cd meltano
 
-# Optional, but it's best to have the latest pip
-pip install --upgrade pip
+# Optional, but it's best to have the latest pip3
+pip3 install --upgrade pip3
 
 # Optional, but it's best to have the latest setuptools
-pip install --upgrade setuptools
+pip3 install --upgrade setuptools
 
 # Optional, but it's recommended to create a virtual environment
 # in order to minimize side effects from unknown environment variable
@@ -50,10 +50,10 @@ python -m venv ~/.venv/meltano-development
 source ~/.venv/meltano-development/bin/activate
 
 # Install all the dependencies
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 
 # Install dev dependencies with the edit flag on to detect changes
-pip install -e '.[dev]'
+pip3 install -e '.[dev]'
 
 # Bundle the Meltano UI into the `meltano` package
 make bundle
@@ -120,7 +120,7 @@ yarn setup
 yarn serve
 ```
 
-The development build of the Meltano UI will now be available at <http://localhost:8080/>. 
+The development build of the Meltano UI will now be available at <http://localhost:8080/>.
 
 A production build of the API will be available at <http://localhost:5000/> to support the UI, but you will not need to interact with this directly.
 
@@ -243,7 +243,7 @@ Try to run the tap with the `--discover` switch, which should output a catalog o
 
 ##### Tables are lacking primary keys
 
-This might be a configuration issue with the catalog file that is sent to the tap. Take a look at the tap's documentation and look for custom metadata on the catalog. 
+This might be a configuration issue with the catalog file that is sent to the tap. Take a look at the tap's documentation and look for custom metadata on the catalog.
 
 ### For taps/targets we create
 
@@ -379,7 +379,7 @@ import poller from '@/utils/poller'          // 1: local, 2: default, 3: @/[u]ti
 import { Medal } from '@/component/globals'  // 1: local, 2: partial, 3: @/[c]omponent/globals
 import { bar, thing } from '@/utils/utils'   // 1: local, 2: partial, 3: @/[u]tils/utils
 ¶
-¶  // 2 blank lines to split the imports from the code 
+¶  // 2 blank lines to split the imports from the code
 ```
 
 ```python
@@ -392,8 +392,8 @@ import meltano                                      # 1: local, 2: default, 3: [
 import meltano.migrations                           # 1: local, 2: default, 3: [meltano.m]igrations
 from meltano.core.plugin import Plugin, PluginType  # 1: local, 2: partial, 3: [meltano.core.pl]ugin
 from meltano.core.project import Project            # 1: local, 2: partial, 3: [meltano.core.pr]oject
-¶ 
-¶  # 2 blank lines to split the imports from the code 
+¶
+¶  # 2 blank lines to split the imports from the code
 ```
 
 #### Definitions
