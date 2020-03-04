@@ -5,9 +5,13 @@ import {
   getDateLabel,
   getHasValidDateRange
 } from '@/components/analyze/date-range-picker/utils'
+import DateRangeCustomVsRelative from '@/components/analyze/date-range-picker/DateRangeCustomVsRelative'
 
 export default {
   name: 'DateRangePickerHeader',
+  components: {
+    DateRangeCustomVsRelative
+  },
   props: {
     attributePair: { type: Object, required: true },
     attributePairsModel: { type: Array, required: true }
@@ -59,11 +63,11 @@ export default {
 </script>
 
 <template>
-  <div class="columns is-vcentered">
-    <div class="column">
+  <div>
+    <div class="mb1r">
       <div class="field">
         <div class="control">
-          <span class="select is-small">
+          <span class="select is-fullwidth">
             <select
               :value="getValue(attributePair)"
               :class="{
@@ -84,22 +88,28 @@ export default {
       </div>
     </div>
 
-    <div class="column">
-      <div class="is-flex is-vcentered is-pulled-right">
-        <span
-          class="is-size-7"
-          :class="{
-            'mr-05r': getHasValidDateRange(attributePair.dateRange)
-          }"
-          >{{ getDateLabel(attributePair) }}</span
-        >
-        <button
-          v-if="getHasValidDateRange(attributePair.dateRange)"
-          class="button is-small"
-          @click="onClearDateRange"
-        >
-          Clear
-        </button>
+    <div class="columns is-vcentered">
+      <div class="column">
+        <DateRangeCustomVsRelative />
+      </div>
+
+      <div class="column">
+        <div class="is-flex is-vcentered is-pulled-right">
+          <span
+            class="is-size-7"
+            :class="{
+              'mr-05r': getHasValidDateRange(attributePair.dateRange)
+            }"
+            >{{ getDateLabel(attributePair) }}</span
+          >
+          <button
+            v-if="getHasValidDateRange(attributePair.dateRange)"
+            class="button is-small"
+            @click="onClearDateRange"
+          >
+            Clear
+          </button>
+        </div>
       </div>
     </div>
   </div>
