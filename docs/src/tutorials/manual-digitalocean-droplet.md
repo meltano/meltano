@@ -57,17 +57,17 @@ python --version
 #Python 3.6.8
 ```
 
-### pip
+### pip3
 
-Next up, we need to install our package manager, pip.
+Next up, we need to install our package manager, pip3.
 
 ```bash
-apt install python3-pip
+apt install python3-pip3
 ```
 
 ### Virtual Environment
 
-Now that you have Python configured system wide and pip3 installed, we'll use pip to install your virtual environment management tools:
+Now that you have Python configured system wide and pip3 installed, we'll use pip3 to install your virtual environment management tools:
 
 ```bash
 pip3 install virtualenv
