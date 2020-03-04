@@ -122,17 +122,29 @@ export default {
           attribute: attribute,
           filterType: QUERY_ATTRIBUTE_TYPES.COLUMN
         }
+
+        let startValue = dateRange.start || null
+        if (startValue) {
+          startValue = utils.formatDateStringYYYYMMDD(startValue)
+          if (attribute.type === 'time') {
+            startValue += 'T00:00:00.000Z'
+          }
+        }
+        let endValue = dateRange.end || null
+        if (endValue) {
+          endValue = utils.formatDateStringYYYYMMDD(endValue)
+          if (attribute.type === 'time') {
+            endValue += 'T23:59:59.999Z'
+          }
+        }
+
         const partialStart = {
           expression: 'greater_or_equal_than', // TODO refactor `filterOptions` and/or constants approach
-          value: dateRange.start
-            ? utils.formatDateStringYYYYMMDD(dateRange.start)
-            : null
+          value: startValue
         }
         const partialEnd = {
           expression: 'less_or_equal_than', // TODO refactor `filterOptions` and/or constants approach
-          value: dateRange.end
-            ? utils.formatDateStringYYYYMMDD(dateRange.end)
-            : null
+          value: endValue
         }
 
         // Apply filters as a pair
