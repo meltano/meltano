@@ -49,20 +49,20 @@ python --version
 ```
 
 ::: tip
-If you've installed Python 3, but are not getting the result you expect, you may have installed Python 3 alongside an existing Python 2 installation. In this case, please use `python3` and `pip3` wherever this guide refers to the `python` and `pip` commands.
+If you've installed Python 3, but are not getting the result you expect, you may have installed Python 3 alongside an existing Python 2 installation. In this case, please use `python3` and `pip3` wherever this guide refers to the `python` and `pip3 ` commands.
 :::
 
-#### pip
+#### pip3
 
-`pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
+`pip3 ` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip3 ` that may be of interest:
 
 ```bash
- Check for current version of pip
- to ensure that it is using the Python3 pip
+ Check for current version of pip3
+ to ensure that it is using the Python3 pip3
 pip3 --version
 
- Update pip
-pip3 install --upgrade pip
+ Update pip3
+pip3 install --upgrade pip3
 ```
 
 #### Virtual Environment

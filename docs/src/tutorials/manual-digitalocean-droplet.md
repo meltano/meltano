@@ -57,12 +57,12 @@ python --version
 #Python 3.6.8
 ```
 
-### pip
+### pip3
 
-Next up, we need to install our package manager, pip.
+Next up, we need to install our package manager, pip3 .
 
 ```bash
-apt install python3-pip
+apt install python3-pip3
 ```
 
 ### Virtual Environment

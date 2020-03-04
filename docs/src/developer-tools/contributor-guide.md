@@ -36,8 +36,8 @@ git clone git@gitlab.com:meltano/meltano.git
 # Change directory into the Meltano project
 cd meltano
 
-# Optional, but it's best to have the latest pip
-pip3 install --upgrade pip
+# Optional, but it's best to have the latest pip3
+pip3 install --upgrade pip3
 
 # Optional, but it's best to have the latest setuptools
 pip3 install --upgrade setuptools
