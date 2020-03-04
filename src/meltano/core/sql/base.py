@@ -288,6 +288,15 @@ class MeltanoColumn(MeltanoBase):
         self.hidden = other_column.hidden
         self.sql = other_column.sql
 
+    def field_for_filter(self, field, filter):
+        if self.type == "time" and filter.expression_type in (
+            MeltanoFilterExpressionType.LessOrEqualThan,
+            MeltanoFilterExpressionType.GreaterOrEqualThan,
+        ):
+            return fn.Date(field)
+
+        return field
+
     def __getattr__(self, attr: str):
         try:
             return self._attributes[attr]
@@ -1037,12 +1046,11 @@ class MeltanoQuery(MeltanoBase):
 
             # Add the WHERE clauses using the column filters for this table
             for c in table.columns() + table.unselected_columns_with_filters():
-                matching_criteria = [
-                    f.criterion(Field(c.column_name(), table=pika_table))
-                    for f in self.column_filters
-                    if f.match(table.find_source_name(), c.name)
-                ]
-                where.extend(matching_criteria)
+                for f in self.column_filters:
+                    if f.match(table.find_source_name(), c.name):
+                        field = Field(c.column_name(), table=pika_table)
+                        field = c.field_for_filter(field, f)
+                        where.append(f.criterion(field))
 
             # Add the timeframe columns in the SELECT clause and as group_by attributes
             for t in table.timeframes():
@@ -1187,12 +1195,11 @@ class MeltanoQuery(MeltanoBase):
 
             # Add the WHERE clauses using the column filters for this table
             for c in table.columns() + table.unselected_columns_with_filters():
-                matching_criteria = [
-                    f.criterion(Field(c.column_name(), table=pika_table))
-                    for f in self.column_filters
-                    if f.match(table.find_source_name(), c.name)
-                ]
-                where.extend(matching_criteria)
+                for f in self.column_filters:
+                    if f.match(table.find_source_name(), c.name):
+                        field = Field(c.column_name(), table=pika_table)
+                        field = c.field_for_filter(field, f)
+                        where.append(f.criterion(field))
 
             if not (table.columns() or table.aggregates() or table.timeframes()):
                 # Skip tables that don't have at least a Column, Aggregate or
