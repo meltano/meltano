@@ -20,7 +20,7 @@ In this tutorial, we are going to present how to connect [Jupyter Notebook](http
 
 If you have Jupyter already installed in your system, you can skip this step.
 
-The most common options for [installing Jupyter Notebook](https://jupyter.org/install) are by either using Anaconda or pip. We are going to use pip in this tutorial, as Meltano also uses pip for its installation.
+The most common options for [installing Jupyter Notebook](https://jupyter.org/install) are by either using Anaconda or pip. We are going to use pip3 in this tutorial, as Meltano also uses pip3 for its installation.
 
 ::: tip Remember
 If you used a virtual environment (`venv`) to install and run Meltano, don't forget to first navigate to the directory with your `venv` and run `source venv/bin/activate` to enable it.

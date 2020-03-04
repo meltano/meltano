@@ -59,10 +59,10 @@ If you've installed Python 3, but are not getting the result you expect, you may
 ```bash
  Check for current version of pip
  to ensure that it is using the Python3 pip
-pip --version
+pip3 --version
 
  Update pip
-pip install --upgrade pip
+pip3 install --upgrade pip
 ```
 
 #### Virtual Environment
@@ -118,7 +118,7 @@ You can deactivate a virtual environment by typing `deactivate` in your shell.
 Now that you have your virtual environment set up and running, run the following command to install the Meltano package:
 
 ```bash
-pip install meltano
+pip3 install meltano
 ```
 
 Once the installation completes, you can check if it was successful by running:
