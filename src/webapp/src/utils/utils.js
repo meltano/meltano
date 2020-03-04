@@ -248,8 +248,27 @@ export default {
     return result
   },
 
+  getDateFromYYYYMMDDString(dateString) {
+    // When provided with YYYY-MM-DD date or ISO8601 timestamp string,
+    // returns Date object representing 00:00 on the year/month/day date in
+    // question, in the local timezone, as opposed to  `new Date(dateString)`,
+    // which would return a Date object representing 00:00 in UTC, which could
+    // take place on a different date in the local timezone.
+    const dateSegment = dateString.slice(0, 10)
+    if (this.getIsDateStringInFormatYYYYMMDD(dateSegment)) {
+      const [year, month, day] = dateSegment.split('-')
+      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    }
+    return null
+  },
+
   formatDateStringYYYYMMDD(date) {
-    return new Date(date).toISOString().split('T')[0]
+    const dateInLocalTimezone = new Date(date)
+    const dateInUTC = new Date(
+      dateInLocalTimezone.getTime() -
+        dateInLocalTimezone.getTimezoneOffset() * 60000
+    )
+    return dateInUTC.toISOString().split('T')[0]
   },
 
   // Time Utils
