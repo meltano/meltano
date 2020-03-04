@@ -22,7 +22,8 @@ export default {
       <div class="field has-addons">
         <div class="control">
           <button
-            class="button is-small is-outlined"
+            class="button is-small is-outlined tooltip"
+            data-tooltip="Date range is absolute"
             :class="{ 'is-interactive-secondary is-active': isCustom }"
             @click="onIsCustomChange(true)"
           >
@@ -31,7 +32,8 @@ export default {
         </div>
         <div class="control">
           <div
-            class="button is-small is-outlined"
+            class="button is-small is-outlined tooltip"
+            data-tooltip="Date range is relative to today"
             :class="{
               'is-interactive-secondary is-active has-nested-control': !isCustom
             }"
@@ -48,8 +50,8 @@ export default {
         <div class="control">
           <span class="select is-small">
             <select value="Past">
-              <option>Past</option>
-              <option>Future</option>
+              <option>Last</option>
+              <option>Next</option>
             </select>
           </span>
         </div>
@@ -57,7 +59,8 @@ export default {
           <input
             class="input is-small max-width-3r"
             type="number"
-            placeholder="7"
+            min="1"
+            value="7"
           />
         </div>
         <div class="control">
