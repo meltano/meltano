@@ -59,7 +59,7 @@ python --version
 
 ### pip3
 
-Next up, we need to install our package manager, pip3 .
+Next up, we need to install our package manager, pip3.
 
 ```bash
 apt install python3-pip3
