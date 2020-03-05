@@ -12,8 +12,8 @@ export default {
       isRelative: false,
       model: {
         number: 7,
-        period: RELATIVE_DATE_RANGE_MODELS.PERIODS.DAYS.name,
-        sign: RELATIVE_DATE_RANGE_MODELS.SIGNS.LAST.name
+        period: RELATIVE_DATE_RANGE_MODELS.PERIODS.DAYS.NAME,
+        sign: RELATIVE_DATE_RANGE_MODELS.SIGNS.LAST.NAME
       }
     }
   },
@@ -26,7 +26,7 @@ export default {
     },
     getRelativeDateRange() {
       const isLast =
-        this.model.sign === RELATIVE_DATE_RANGE_MODELS.SIGNS.LAST.name
+        this.model.sign === RELATIVE_DATE_RANGE_MODELS.SIGNS.LAST.NAME
       const method = isLast ? 'subtract' : 'add'
 
       // Anchor setup
@@ -120,8 +120,8 @@ export default {
               <option
                 v-for="(sign, key) in getSigns"
                 :key="key"
-                :value="sign.name"
-                >{{ sign.label }}</option
+                :value="sign.NAME"
+                >{{ sign.LABEL }}</option
               >
             </select>
           </span>
@@ -141,8 +141,8 @@ export default {
               <option
                 v-for="(period, key) in getPeriods"
                 :key="key"
-                :value="period.name"
-                >{{ period.label }}</option
+                :value="period.NAME"
+                >{{ period.LABEL }}</option
               >
             </select>
           </span>

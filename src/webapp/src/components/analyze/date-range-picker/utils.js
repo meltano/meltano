@@ -2,13 +2,13 @@ import utils from '@/utils/utils'
 
 export const RELATIVE_DATE_RANGE_MODELS = Object.freeze({
   PERIODS: {
-    DAYS: { name: 'days', label: 'Days' },
-    MONTHS: { name: 'months', label: 'Months' },
-    YEARS: { name: 'years', label: 'Years' }
+    DAYS: { NAME: 'days', LABEL: 'Days' },
+    MONTHS: { NAME: 'months', LABEL: 'Months' },
+    YEARS: { NAME: 'years', LABEL: 'Years' }
   },
   SIGNS: {
-    LAST: { name: '-', label: 'Last' },
-    NEXT: { name: '+', label: 'Next' }
+    LAST: { NAME: '-', LABEL: 'Last' },
+    NEXT: { NAME: '+', LABEL: 'Next' }
   }
 })
 
