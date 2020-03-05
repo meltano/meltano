@@ -29,6 +29,9 @@ export default {
     getIsPeriodDisabled() {
       return period => period.IS_DISABLED
     },
+    getIsPeriodDisabled() {
+      return period => period.IS_DISABLED
+    },
     getPeriods() {
       return RELATIVE_DATE_RANGE_MODELS.PERIODS
     },
