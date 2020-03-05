@@ -29,6 +29,9 @@ export default {
     getIsPeriodDisabled() {
       return period => period.IS_DISABLED
     },
+    getIsLast() {
+      return this.model.sign === RELATIVE_DATE_RANGE_MODELS.SIGNS.LAST.NAME
+    },
     getIsPeriodDisabled() {
       return period => period.IS_DISABLED
     },
