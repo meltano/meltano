@@ -1,7 +1,8 @@
 <script>
+import moment from 'moment'
+
 import { EVENTS } from '@/components/analyze/date-range-picker/events'
 import { RELATIVE_DATE_RANGE_MODELS } from '@/components/analyze/date-range-picker/utils'
-import utils from '@/utils/utils'
 
 export default {
   name: 'DateRangeCustomVsRelative',
@@ -24,26 +25,38 @@ export default {
       return RELATIVE_DATE_RANGE_MODELS.PERIODS
     },
     getRelativeDateRange() {
-      const relative = `${this.model.sign}${this.model.number} ${this.model.period}`
-      console.log(relative)
-
-      // TODO relative map
-      const today = new Date()
-      const offset = new Date('2020-03-04') // TODO relative map value here
       const isLast =
         this.model.sign === RELATIVE_DATE_RANGE_MODELS.SIGNS.LAST.name
-      const start = isLast ? offset : today
-      const end = isLast ? today : offset
+      const method = isLast ? 'subtract' : 'add'
+
+      // Anchor setup
+      const momentAnchor = moment()[method](1, 'days')
+      const anchor = momentAnchor.toDate()
+
+      // Relative setup
+      const momentRelative = moment()[method](
+        this.model.number,
+        this.model.period
+      )
+      const relative = momentRelative.toDate()
+
+      // Date range setup
+      const start = isLast ? relative : anchor
+      const end = isLast ? anchor : relative
       return { start, end }
     },
     getSigns() {
       return RELATIVE_DATE_RANGE_MODELS.SIGNS
+    },
+    getRelativeDateRangeString() {
+      return `${this.model.sign}${this.model.number} ${this.model.period}`
     }
   },
   methods: {
     emitDateRangeTypeChange() {
       this.$root.$emit(EVENTS.CHANGE_DATE_RANGE_TYPE, {
         isRelative: this.isRelative,
+        relativeString: this.getRelativeDateRangeString,
         dateRange: this.isRelative
           ? this.getRelativeDateRange
           : this.getEmptyDateRange
