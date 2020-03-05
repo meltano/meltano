@@ -2,6 +2,7 @@ import pytest
 import json
 import os
 import shutil
+from datetime import datetime, timedelta
 from pathlib import Path
 from os.path import join
 
@@ -410,3 +411,77 @@ class TestQueryGeneration:
             )
 
         assert "Requested column users_table.UNAVAILABLE_AGGREGATE" in str(e.value)
+
+    def test_meltano_date_filters(self,gitflix):
+        # Test normal date and time filters
+        normal_dates = (
+            PayloadBuilder("dynamic_dates")
+            .columns("report_date", "updated_at")
+            .column_filter("dynamic_dates", "report_date", "greater_or_equal_than", "2020-03-01")
+            .column_filter("dynamic_dates", "report_date", "less_or_equal_than", "2020-03-31")
+            .column_filter("dynamic_dates", "updated_at", "greater_or_equal_than", "2020-03-01")
+            .column_filter("dynamic_dates", "updated_at", "less_or_equal_than", "2020-03-31")
+            .aggregates("count")
+        )
+
+        q = MeltanoQuery(
+            definition=normal_dates.payload,
+            design_helper=gitflix.design("dynamic_dates"),
+        )
+
+        # Generating the query
+        (sql, query_attributes, aggregate_columns) = q.get_query()
+
+        # Check that all the WHERE filters were added correctly
+        assert '"dynamic_dates"."report_date">=\'2020-03-01\'' in sql
+        assert '"dynamic_dates"."report_date"<=\'2020-03-31\'' in sql
+        assert '"dynamic_dates"."updated_at">=\'2020-03-01\'' in sql
+        assert '"dynamic_dates"."updated_at"<=\'2020-03-31\'' in sql
+
+        # Test dynamic date filters
+        dynamic_date_range = (
+            PayloadBuilder("dynamic_dates")
+            .columns("report_date")
+            .column_filter("dynamic_dates", "report_date", "greater_or_equal_than", "-7d")
+            .column_filter("dynamic_dates", "report_date", "less_or_equal_than", "+0d")
+            .aggregates("count")
+        )
+
+        q = MeltanoQuery(
+            definition=dynamic_date_range.payload,
+            design_helper=gitflix.design("dynamic_dates"),
+        )
+
+        # Generating the query
+        (sql, query_attributes, aggregate_columns) = q.get_query()
+
+        today = datetime.today().strftime('%Y-%m-%d')
+        last_week = (datetime.today() - timedelta(days=7)).strftime('%Y-%m-%d')
+
+        # Check that all the WHERE filters were added correctly
+        assert f'"dynamic_dates"."report_date">=\'{last_week}\'' in sql
+        assert f'"dynamic_dates"."report_date"<=\'{today}\'' in sql
+
+        # Test dynamic time filters
+        dynamic_time_range = (
+            PayloadBuilder("dynamic_dates")
+            .columns("updated_at")
+            .column_filter("dynamic_dates", "updated_at", "greater_or_equal_than", "-15d")
+            .column_filter("dynamic_dates", "updated_at", "less_or_equal_than", "+0y")
+            .aggregates("count")
+        )
+
+        q = MeltanoQuery(
+            definition=dynamic_time_range.payload,
+            design_helper=gitflix.design("dynamic_dates"),
+        )
+
+        # Generating the query
+        (sql, query_attributes, aggregate_columns) = q.get_query()
+
+        today = f"{datetime.today().strftime('%Y-%m-%d')} 23:59:59"
+        fifteen_days_ago = f"{(datetime.today() - timedelta(days=15)).strftime('%Y-%m-%d')} 00:00:00"
+
+        # Check that all the WHERE filters were added correctly
+        assert f'"dynamic_dates"."updated_at">=\'{fifteen_days_ago}\'' in sql
+        assert f'"dynamic_dates"."updated_at"<=\'{today}\'' in sql
