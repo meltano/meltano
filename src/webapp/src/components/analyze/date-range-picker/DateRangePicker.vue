@@ -272,6 +272,7 @@ export default {
 
         const isAdd = partialStart.value !== null && partialEnd.value !== null
         if (isAdd) {
+          // TODO start, end needs to be set based on relative values or absolute
           this.addFilter(Object.assign(partialStart, partialShared))
           this.addFilter(Object.assign(partialEnd, partialShared))
         }
