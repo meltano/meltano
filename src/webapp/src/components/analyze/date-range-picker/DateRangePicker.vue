@@ -117,7 +117,8 @@ export default {
       attributePair.dateRange = { start: null, end: null }
     },
     onChangeDateRangeType(payload) {
-      console.log('update cal', payload)
+      const attributePairInFocus = this.getAttributePairInFocus
+      attributePairInFocus.dateRange = payload.dateRange
     },
     onDropdownOpen() {
       this.attributePairsModel = lodash.cloneDeep(this.getAttributePairsInitial)

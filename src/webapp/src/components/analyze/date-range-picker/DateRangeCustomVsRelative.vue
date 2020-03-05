@@ -1,32 +1,62 @@
 <script>
 import { EVENTS } from '@/components/analyze/date-range-picker/events'
+import { RELATIVE_DATE_RANGE_MODELS } from '@/components/analyze/date-range-picker/utils'
+import utils from '@/utils/utils'
 
 export default {
   name: 'DateRangeCustomVsRelative',
   props: {},
   data() {
     return {
-      isCustom: true
+      isRelative: false,
+      model: {
+        number: 7,
+        period: RELATIVE_DATE_RANGE_MODELS.PERIODS.DAYS.name,
+        sign: RELATIVE_DATE_RANGE_MODELS.SIGNS.LAST.name
+      }
     }
   },
   computed: {
-    getValue() {
-      // TODO parse input combo to to a start and end pair
-      return new Date()
+    getEmptyDateRange() {
+      return { start: null, end: null }
+    },
+    getPeriods() {
+      return RELATIVE_DATE_RANGE_MODELS.PERIODS
+    },
+    getRelativeDateRange() {
+      const relative = `${this.model.sign}${this.model.number} ${this.model.period}`
+      console.log(relative)
+
+      // TODO relative map
+      const today = new Date()
+      const offset = new Date('2020-03-04') // TODO relative map value here
+      const isLast =
+        this.model.sign === RELATIVE_DATE_RANGE_MODELS.SIGNS.LAST.name
+      const start = isLast ? offset : today
+      const end = isLast ? today : offset
+      return { start, end }
+    },
+    getSigns() {
+      return RELATIVE_DATE_RANGE_MODELS.SIGNS
     }
   },
   methods: {
     emitDateRangeTypeChange() {
       this.$root.$emit(EVENTS.CHANGE_DATE_RANGE_TYPE, {
-        isCustom: this.isCustom,
-        value: this.getValue
+        isRelative: this.isRelative,
+        dateRange: this.isRelative
+          ? this.getRelativeDateRange
+          : this.getEmptyDateRange
       })
     },
-    onIsCustomChange(value) {
-      if (this.isCustom !== value) {
-        this.isCustom = value
+    onIsRelativeChange(value) {
+      if (this.isRelative !== value) {
+        this.isRelative = value
         this.emitDateRangeTypeChange()
       }
+    },
+    onChangeRelativeInput() {
+      this.emitDateRangeTypeChange()
     }
   }
 }
@@ -40,8 +70,8 @@ export default {
           <button
             class="button is-small is-outlined tooltip"
             data-tooltip="Date range is absolute"
-            :class="{ 'is-interactive-secondary is-active': isCustom }"
-            @click="onIsCustomChange(true)"
+            :class="{ 'is-interactive-secondary is-active': !isRelative }"
+            @click="onIsRelativeChange(false)"
           >
             Custom
           </button>
@@ -51,9 +81,9 @@ export default {
             class="button is-small is-outlined tooltip"
             data-tooltip="Date range is relative to today"
             :class="{
-              'is-interactive-secondary is-active has-nested-control': !isCustom
+              'is-interactive-secondary is-active has-nested-control': isRelative
             }"
-            @click="onIsCustomChange(false)"
+            @click="onIsRelativeChange(true)"
           >
             <span>Relative</span>
           </div>
@@ -61,30 +91,38 @@ export default {
       </div>
     </div>
 
-    <div v-if="!isCustom" class="control">
+    <div v-if="isRelative" class="control">
       <div class="field has-addons">
         <div class="control">
           <span class="select is-small">
-            <select value="Past">
-              <option>Last</option>
-              <option>Next</option>
+            <select v-model="model.sign" @change="onChangeRelativeInput">
+              <option
+                v-for="(sign, key) in getSigns"
+                :key="key"
+                :value="sign.name"
+                >{{ sign.label }}</option
+              >
             </select>
           </span>
         </div>
         <div class="control">
           <input
+            v-model="model.number"
             class="input is-small max-width-3r"
             type="number"
             min="1"
-            value="7"
+            @change="onChangeRelativeInput"
           />
         </div>
         <div class="control">
           <span class="select is-small">
-            <select value="Days">
-              <option>Days</option>
-              <option>Months</option>
-              <option>Years</option>
+            <select v-model="model.period" @change="onChangeRelativeInput">
+              <option
+                v-for="(period, key) in getPeriods"
+                :key="key"
+                :value="period.name"
+                >{{ period.label }}</option
+              >
             </select>
           </span>
         </div>
