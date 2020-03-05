@@ -52,6 +52,18 @@ export default {
         return { attribute, dateRange }
       })
     },
+    getCalendarAttributes() {
+      return [
+        {
+          key: 'today',
+          bar: true,
+          popover: {
+            label: 'Today'
+          },
+          dates: new Date()
+        }
+      ]
+    },
     getDateFilters() {
       return this.columnFilters.filter(filter =>
         this.getIsDateAttribute(filter.attribute)
@@ -228,6 +240,7 @@ export default {
             is-expanded
             is-inline
             :columns="2"
+            :attributes="getCalendarAttributes"
           />
         </div>
       </template>
