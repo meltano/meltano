@@ -3,19 +3,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
-
 ## Unreleased
+
 ---
 
 ### New
 
 ### Changes
 
+- [#1831](https://gitlab.com/meltano/meltano/issues/1831) Change main navigation "Reports" to "Explore" and update its nested CTAs to link to a landing page per data source
+
 ### Fixes
 
 ### Breaks
-
 
 ## 1.23.2 - (2020-03-05)
 
@@ -35,14 +35,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1838](https://gitlab.com/meltano/meltano/issues/1838) Properly handle dates and timezones in date range picker
 - [#1838](https://gitlab.com/meltano/meltano/issues/1838) Ensure records on boundary dates are included when using date range picker with column of type "time"
 
-
 ## 1.23.1 - (2020-03-04)
+
 ---
 
 ### Fixes
 
 - [#1836](https://gitlab.com/meltano/meltano/issues/1820) Don't crash when gunicorn is sent HUP signal to reload Meltano service
-
 
 ## 1.23.0 - (2020-03-02)
 

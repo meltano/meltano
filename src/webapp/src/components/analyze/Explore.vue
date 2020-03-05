@@ -51,29 +51,14 @@ export default {
       return this.topic ? this.topic.label : ''
     }
   },
-  created() {
-    this.getInstalledPlugins().then(() => {
-      const extractorName = this.$route.params.extractor
-      const extractor = this.getInstalledPlugin('extractors', extractorName)
-      const namespace = extractor.namespace
-      const model = this.installedPlugins.models.find(
-        plugin => plugin.namespace === namespace
-      )
-
-      this.namespace = model.name
-      this.model = model.name.replace('model-', '')
-
-      designApi
-        .getTopic(this.namespace, this.model)
-        .then(response => (this.topic = response.data))
-        .catch(this.$error.handle)
-      this.getDashboards()
-        .then(() => (this.hasLoadedDashboards = true))
-        .catch(this.$error.handle)
-      this.getReports()
-        .then(() => (this.hasLoadedReports = true))
-        .catch(this.$error.handle)
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.reinitialize()
     })
+  },
+  beforeRouteUpdate(to, from, next) {
+    this.reinitialize()
+    next()
   },
   methods: {
     ...mapActions('dashboards', ['getDashboards']),
@@ -95,6 +80,36 @@ export default {
     },
     goToReport(report) {
       this.$router.push({ name: 'report', params: report })
+    },
+    reinitialize() {
+      // Reset flags
+      this.topic = null
+      this.hasLoadedDashboards = false
+      this.hasLoadedReports = false
+
+      // Initialize
+      this.getInstalledPlugins().then(() => {
+        const extractorName = this.$route.params.extractor
+        const extractor = this.getInstalledPlugin('extractors', extractorName)
+        const namespace = extractor.namespace
+        const model = this.installedPlugins.models.find(
+          plugin => plugin.namespace === namespace
+        )
+
+        this.namespace = model.name
+        this.model = model.name.replace('model-', '')
+
+        designApi
+          .getTopic(this.namespace, this.model)
+          .then(response => (this.topic = response.data))
+          .catch(this.$error.handle)
+        this.getDashboards()
+          .then(() => (this.hasLoadedDashboards = true))
+          .catch(this.$error.handle)
+        this.getReports()
+          .then(() => (this.hasLoadedReports = true))
+          .catch(this.$error.handle)
+      })
     }
   }
 }
