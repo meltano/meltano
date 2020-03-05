@@ -6,7 +6,9 @@ import { RELATIVE_DATE_RANGE_MODELS } from '@/components/analyze/date-range-pick
 
 export default {
   name: 'DateRangeCustomVsRelative',
-  props: {},
+  props: {
+    // TODO I think I want to consume the attributeInFocus, and setting value into relative vs. absolute
+  },
   data() {
     return {
       isRelative: false,
@@ -43,7 +45,7 @@ export default {
       // Date range setup
       const start = isLast ? relative : anchor
       const end = isLast ? anchor : relative
-      return { start, end }
+      return { start, end } // TODO new shape? { start, end, relativeStart, relativeEnd, relativeString }
     },
     getSigns() {
       return RELATIVE_DATE_RANGE_MODELS.SIGNS
