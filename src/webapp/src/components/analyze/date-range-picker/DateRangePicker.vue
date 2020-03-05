@@ -191,7 +191,23 @@ export default {
     },
     onChangeDateRangeType(payload) {
       const attributePairInFocus = this.getAttributePairInFocus
-      attributePairInFocus.dateRange = payload.dateRange
+
+      // Conditionally apply relative range if isRelative or priorCustomDateRange per attributePair if applicable
+      if (payload.isRelative) {
+        if (!attributePairInFocus.priorCustomDateRange) {
+          attributePairInFocus.priorCustomDateRange = Object.assign(
+            {},
+            attributePairInFocus.dateRange
+          )
+        }
+        attributePairInFocus.dateRange = payload.dateRange
+      } else if (attributePairInFocus.priorCustomDateRange) {
+        attributePairInFocus.dateRange = Object.assign(
+          {},
+          attributePairInFocus.priorCustomDateRange
+        )
+        attributePairInFocus.priorCustomDateRange = null
+      }
     },
     onDropdownOpen() {
       this.attributePairsModel = lodash.cloneDeep(this.getAttributePairsInitial)
