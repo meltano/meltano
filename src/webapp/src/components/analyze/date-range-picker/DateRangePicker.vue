@@ -129,6 +129,9 @@ export default {
   created() {
     this.$root.$on(EVENTS.CHANGE_DATE_RANGE, this.onChangeDateRange)
   },
+  beforeDestroy() {
+    this.$root.$off(EVENTS.CHANGE_DATE_RANGE, this.onChangeDateRange)
+  },
   methods: {
     ...mapActions('designs', ['addFilter', 'removeFilter']),
     onDayClick() {
