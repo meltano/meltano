@@ -189,7 +189,7 @@ export default {
       attributePair.priorCustomDateRange = getNullDateRange()
       attributePair.isRelative = false
     },
-    onChangeDateRangeType(payload) {
+    onChangeDateRange(payload) {
       const attributePairInFocus = this.getAttributePairInFocus
 
       // Conditionally apply relative range if isRelative or priorCustomDateRange per attributePair if applicable

@@ -63,7 +63,7 @@ export default {
     }
   },
   created() {
-    this.$root.$on(EVENTS.CHANGE_DATE_RANGE_TYPE, this.onChangeDateRangeType)
+    this.$root.$on(EVENTS.CHANGE_DATE_RANGE, this.onChangeDateRangeType)
   },
   methods: {
     emitChangeDateRange(value) {
