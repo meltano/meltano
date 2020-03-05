@@ -6,6 +6,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.23.2 - (2020-03-05)
 
 ---
 
@@ -23,7 +35,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1838](https://gitlab.com/meltano/meltano/issues/1838) Properly handle dates and timezones in date range picker
 - [#1838](https://gitlab.com/meltano/meltano/issues/1838) Ensure records on boundary dates are included when using date range picker with column of type "time"
 
-### Breaks
 
 ## 1.23.1 - (2020-03-04)
 ---
