@@ -23,38 +23,40 @@ export default {
     getEmptyDateRange() {
       return { start: null, end: null }
     },
+    getIsLast() {
+      return this.model.sign === RELATIVE_DATE_RANGE_MODELS.SIGNS.LAST.NAME
+    },
     getIsPeriodDisabled() {
       return period => period.IS_DISABLED
     },
     getPeriods() {
       return RELATIVE_DATE_RANGE_MODELS.PERIODS
     },
-    getRelativeDateRange() {
-      const isLast =
-        this.model.sign === RELATIVE_DATE_RANGE_MODELS.SIGNS.LAST.NAME
-      const method = isLast ? 'subtract' : 'add'
-
-      // Anchor setup
+    getAbsoluteDateRange() {
+      const method = this.getIsLast ? 'subtract' : 'add'
       const momentAnchor = moment()[method](1, 'days')
       const anchor = momentAnchor.toDate()
-
-      // Relative setup
-      const momentRelative = moment()[method](
+      const momentOffset = moment()[method](
         this.model.number,
         this.model.period
       )
-      const relative = momentRelative.toDate()
-
-      // Date range setup
-      const start = isLast ? relative : anchor
-      const end = isLast ? anchor : relative
-      return { start, end } // TODO new shape? { start, end, relativeStart, relativeEnd, relativeString }
+      const offset = momentOffset.toDate()
+      return this.getDateRange(anchor, offset)
+    },
+    getDateRange() {
+      return (anchor, offset) => {
+        const start = this.getIsLast ? offset : anchor
+        const end = this.getIsLast ? anchor : offset
+        return { start, end }
+      }
     },
     getSigns() {
       return RELATIVE_DATE_RANGE_MODELS.SIGNS
     },
-    getRelativeDateRangeString() {
-      return `${this.model.sign}${this.model.number} ${this.model.period}`
+    getRelativeDateRange() {
+      const anchor = `${this.model.sign}1 ${this.model.period}`
+      const offset = `${this.model.sign}${this.model.number} ${this.model.period}`
+      return this.getDateRange(anchor, offset)
     }
   },
   created() {
@@ -62,15 +64,13 @@ export default {
   },
   methods: {
     emitChangeDateRange() {
-      this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, {
-        isRelative: this.isRelative,
-        relativeDateRange: this.isRelative
-          ? this.getRelativeDateRangeString
-          : null,
-        dateRange: this.isRelative
-          ? this.getRelativeDateRange
-          : this.getEmptyDateRange
-      })
+      const isRelative = this.isRelative
+      const relativeDateRange = isRelative ? this.getRelativeDateRange : null
+      const dateRange = isRelative
+        ? this.getAbsoluteDateRange
+        : this.getEmptyDateRange
+      const payload = { isRelative, relativeDateRange, dateRange }
+      this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, payload)
     },
     onChangeDateRangeType(payload) {
       this.isRelative = payload.isRelative
