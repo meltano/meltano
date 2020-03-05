@@ -116,12 +116,12 @@ export default {
     }
   },
   created() {
-    this.$root.$on(EVENTS.CHANGE_DATE_RANGE_TYPE, this.onChangeDateRangeType)
+    this.$root.$on(EVENTS.CHANGE_DATE_RANGE, this.onChangeDateRange)
   },
   methods: {
     ...mapActions('designs', ['addFilter', 'removeFilter']),
     onDayClick() {
-      this.$root.$emit(EVENTS.CHANGE_DATE_RANGE_TYPE, {
+      this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, {
         isRelative: false,
         relativeString: null,
         dateRange: { start: null, end: null }
@@ -135,7 +135,7 @@ export default {
     onClearDateRange(attributePair) {
       attributePair.dateRange = { start: null, end: null }
     },
-    onChangeDateRangeType(payload) {
+    onChangeDateRange(payload) {
       const attributePairInFocus = this.getAttributePairInFocus
 
       // Conditionally apply relative range if isRelative or priorCustomDateRange per attributePair if applicable

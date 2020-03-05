@@ -58,13 +58,13 @@ export default {
     }
   },
   created() {
-    this.$root.$on(EVENTS.CHANGE_DATE_RANGE_TYPE, this.onChangeDateRangeType)
+    this.$root.$on(EVENTS.CHANGE_DATE_RANGE, this.onChangeDateRangeType)
   },
   methods: {
-    emitDateRangeTypeChange() {
-      this.$root.$emit(EVENTS.CHANGE_DATE_RANGE_TYPE, {
+    emitChangeDateRange() {
+      this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, {
         isRelative: this.isRelative,
-        relativeString: this.isRelative
+        relativeDateRange: this.isRelative
           ? this.getRelativeDateRangeString
           : null,
         dateRange: this.isRelative
@@ -78,11 +78,11 @@ export default {
     onIsRelativeChange(value) {
       if (this.isRelative !== value) {
         this.isRelative = value
-        this.emitDateRangeTypeChange()
+        this.emitChangeDateRange()
       }
     },
     onChangeRelativeInput() {
-      this.emitDateRangeTypeChange()
+      this.emitChangeDateRange()
     }
   }
 }
