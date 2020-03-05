@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-- [#1831](https://gitlab.com/meltano/meltano/issues/1831) Change main navigation "Reports" to "Explore" and update its nested CTAs to lead to a landing page per each data source
+- [#1831](https://gitlab.com/meltano/meltano/issues/1831) Change main navigation "Reports" to "Explore" and update its nested CTAs to link to a landing page per data source
 
 ### Fixes
 
