@@ -52,15 +52,23 @@ export default {
       return `${this.model.sign}${this.model.number} ${this.model.period}`
     }
   },
+  created() {
+    this.$root.$on(EVENTS.CHANGE_DATE_RANGE_TYPE, this.onChangeDateRangeType)
+  },
   methods: {
     emitDateRangeTypeChange() {
       this.$root.$emit(EVENTS.CHANGE_DATE_RANGE_TYPE, {
         isRelative: this.isRelative,
-        relativeString: this.getRelativeDateRangeString,
+        relativeString: this.isRelative
+          ? this.getRelativeDateRangeString
+          : null,
         dateRange: this.isRelative
           ? this.getRelativeDateRange
           : this.getEmptyDateRange
       })
+    },
+    onChangeDateRangeType(payload) {
+      this.isRelative = payload.isRelative
     },
     onIsRelativeChange(value) {
       if (this.isRelative !== value) {
