@@ -91,7 +91,7 @@ export default {
 
     <div class="columns is-vcentered">
       <div class="column">
-        <DateRangeCustomVsRelative />
+        <DateRangeCustomVsRelative :attribute-pair="attributePair" />
       </div>
 
       <div class="column">

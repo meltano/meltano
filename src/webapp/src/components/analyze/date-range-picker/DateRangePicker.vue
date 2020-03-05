@@ -49,7 +49,18 @@ export default {
           start: start ? utils.getDateFromYYYYMMDDString(start.value) : null,
           end: end ? utils.getDateFromYYYYMMDDString(end.value) : null
         }
-        return { attribute, dateRange }
+        const isRelative = false
+        const absoluteDateRange = { start: null, end: null }
+        const relativeDateRange = { start: null, end: null }
+        const priorCustomDateRange = { start: null, end: null }
+        return {
+          attribute,
+          isRelative,
+          dateRange,
+          absoluteDateRange,
+          relativeDateRange,
+          priorCustomDateRange
+        }
       })
     },
     getCalendarAttributes() {
@@ -160,6 +171,8 @@ export default {
     },
     onClearDateRange(attributePair) {
       attributePair.dateRange = { start: null, end: null }
+      attributePair.priorCustomDateRange = { start: null, end: null }
+      attributePair.isRelative = false
     },
     onDropdownOpen() {
       this.attributePairsModel = lodash.cloneDeep(this.getAttributePairsInitial)

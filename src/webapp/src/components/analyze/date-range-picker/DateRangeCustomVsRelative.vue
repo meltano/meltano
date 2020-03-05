@@ -7,11 +7,10 @@ import { RELATIVE_DATE_RANGE_MODELS } from '@/components/analyze/date-range-pick
 export default {
   name: 'DateRangeCustomVsRelative',
   props: {
-    // TODO I think I want to consume the attributeInFocus, and setting value into relative vs. absolute
+    attributePair: { type: Object, required: true }
   },
   data() {
     return {
-      isRelative: false,
       model: {
         number: 7,
         period: RELATIVE_DATE_RANGE_MODELS.PERIODS.DAYS.NAME,
@@ -59,12 +58,9 @@ export default {
       return this.getDateRange(anchor, offset)
     }
   },
-  created() {
-    this.$root.$on(EVENTS.CHANGE_DATE_RANGE, this.onChangeDateRangeType)
-  },
   methods: {
-    emitChangeDateRange() {
-      const isRelative = this.isRelative
+    emitChangeDateRange(value) {
+      const isRelative = value
       const relativeDateRange = isRelative ? this.getRelativeDateRange : null
       const absoluteDateRange = isRelative
         ? this.getAbsoluteDateRange
@@ -72,17 +68,13 @@ export default {
       const payload = { isRelative, relativeDateRange, absoluteDateRange }
       this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, payload)
     },
-    onChangeDateRangeType(payload) {
-      this.isRelative = payload.isRelative
-    },
     onIsRelativeChange(value) {
-      if (this.isRelative !== value) {
-        this.isRelative = value
-        this.emitChangeDateRange()
+      if (this.attributePair.isRelative !== value) {
+        this.emitChangeDateRange(value)
       }
     },
     onChangeRelativeInput() {
-      this.emitChangeDateRange()
+      this.emitChangeDateRange(true)
     }
   }
 }
@@ -96,7 +88,9 @@ export default {
           <button
             class="button is-small is-outlined tooltip"
             data-tooltip="Date range is absolute"
-            :class="{ 'is-interactive-secondary is-active': !isRelative }"
+            :class="{
+              'is-interactive-secondary is-active': !attributePair.isRelative
+            }"
             @click="onIsRelativeChange(false)"
           >
             Custom
@@ -107,7 +101,8 @@ export default {
             class="button is-small is-outlined tooltip"
             data-tooltip="Date range is relative to today"
             :class="{
-              'is-interactive-secondary is-active has-nested-control': isRelative
+              'is-interactive-secondary is-active has-nested-control':
+                attributePair.isRelative
             }"
             @click="onIsRelativeChange(true)"
           >
@@ -117,7 +112,7 @@ export default {
       </div>
     </div>
 
-    <div v-if="isRelative" class="control">
+    <div v-if="attributePair.isRelative" class="control">
       <div class="field has-addons">
         <div class="control">
           <span class="select is-small">
