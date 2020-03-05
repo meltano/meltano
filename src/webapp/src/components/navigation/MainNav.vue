@@ -1,16 +1,16 @@
 <script>
 import { mapGetters, mapState, mapActions } from 'vuex'
 
-import AnalyzeList from '@/components/analyze/AnalyzeList'
 import Dropdown from '@/components/generic/Dropdown'
+import ExploreList from '@/components/analyze/ExploreList'
 import Logo from '@/components/navigation/Logo'
 import utils from '@/utils/utils'
 
 export default {
   name: 'MainNav',
   components: {
-    AnalyzeList,
     Dropdown,
+    ExploreList,
     Logo
   },
   data() {
@@ -119,25 +119,30 @@ export default {
               }"
             >
               <span class="icon is-small" :class="getIconColor('/analyze')">
-                <font-awesome-icon icon="chart-line"></font-awesome-icon>
+                <font-awesome-icon icon="compass"></font-awesome-icon>
               </span>
-              <span>Reports</span>
+              <span>Explore</span>
             </a>
           </a>
 
           <div class="navbar-dropdown navbar-dropdown-scrollable">
             <template v-if="hasModels">
-              <AnalyzeList></AnalyzeList>
+              <ExploreList />
             </template>
             <template v-else>
               <div class="box is-borderless is-shadowless is-marginless">
-                <div class="content no-report-models-message">
+                <div class="content explore-dropdown-shell">
                   <h3 class="is-size-6">
-                    No Report Models Installed
+                    No Connections
                   </h3>
                   <p>
-                    Report Models are inferred and automatically installed for
-                    you based off your connected data sources.
+                    You must install and connect to at least one data source
+                    first.
+                  </p>
+                  <p>
+                    <router-link to="connections" class="has-text-underlined"
+                      >Go to Connections</router-link
+                    >
                   </p>
                 </div>
               </div>
@@ -331,7 +336,7 @@ export default {
     &.has-dropdown {
       border-bottom: none;
 
-      .no-report-models-message {
+      .explore-dropdown-shell {
         min-width: 300px;
       }
     }
@@ -340,21 +345,6 @@ export default {
       overflow-y: scroll;
       max-height: 80vh;
     }
-  }
-
-  .navbar-start .navbar-link::after {
-    border-color: $interactive-navigation-inactive;
-  }
-  .navbar-start .navbar-link:hover::after {
-    border-color: $interactive-navigation;
-  }
-
-  .navbar-brand > a.navbar-item:hover,
-  .navbar-start > a.navbar-item.is-active,
-  .navbar-start > a.navbar-item:hover {
-    background: transparent;
-    color: $interactive-navigation;
-    border-bottom: 1px solid $interactive-navigation-inactive;
   }
 }
 </style>
