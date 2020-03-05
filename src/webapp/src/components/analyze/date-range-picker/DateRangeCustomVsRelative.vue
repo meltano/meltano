@@ -65,9 +65,6 @@ export default {
       return this.getDateRange(anchor, offset)
     }
   },
-  created() {
-    this.$root.$on(EVENTS.CHANGE_DATE_RANGE, this.onChangeDateRangeType)
-  },
   methods: {
     emitChangeDateRange(value) {
       const isRelative = value
@@ -79,9 +76,6 @@ export default {
         : getNullDateRange()
       const payload = { isRelative, relativeDateRange, absoluteDateRange }
       this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, payload)
-    },
-    onChangeDateRangeType(payload) {
-      this.isRelative = payload.isRelative
     },
     onIsRelativeChange(value) {
       if (this.attributePair.isRelative !== value) {
