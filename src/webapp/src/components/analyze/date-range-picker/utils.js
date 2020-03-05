@@ -4,9 +4,15 @@ import utils from '@/utils/utils'
 
 export const RELATIVE_DATE_RANGE_MODELS = Object.freeze({
   PERIODS: {
+<<<<<<< HEAD
     DAYS: { NAME: 'd', LABEL: 'Days' },
     MONTHS: { NAME: 'm', LABEL: 'Months', IS_DISABLED: true },
     YEARS: { NAME: 'y', LABEL: 'Years', IS_DISABLED: true }
+=======
+    DAYS: { NAME: 'days', LABEL: 'Days' },
+    MONTHS: { NAME: 'months', LABEL: 'Months' },
+    YEARS: { NAME: 'years', LABEL: 'Years' }
+>>>>>>> updated const keys to reflect constant convention
   },
   SIGNS: {
     LAST: { NAME: '-', LABEL: 'Last' },
