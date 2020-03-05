@@ -2,7 +2,6 @@ import pytest
 import json
 import os
 import shutil
-from datetime import datetime, timedelta
 from pathlib import Path
 from os.path import join
 
@@ -419,8 +418,8 @@ class TestQueryGeneration:
             .columns("report_date", "updated_at")
             .column_filter("dynamic_dates", "report_date", "greater_or_equal_than", "2020-03-01")
             .column_filter("dynamic_dates", "report_date", "less_or_equal_than", "2020-03-31")
-            .column_filter("dynamic_dates", "updated_at", "greater_or_equal_than", "2020-03-01")
-            .column_filter("dynamic_dates", "updated_at", "less_or_equal_than", "2020-03-31")
+            .column_filter("dynamic_dates", "updated_at", "greater_or_equal_than", "2020-03-01T00:00:00.000Z")
+            .column_filter("dynamic_dates", "updated_at", "less_or_equal_than", "2020-03-31T23:59:59.999Z")
             .aggregates("count")
         )
 
@@ -435,8 +434,8 @@ class TestQueryGeneration:
         # Check that all the WHERE filters were added correctly
         assert '"dynamic_dates"."report_date">=\'2020-03-01\'' in sql
         assert '"dynamic_dates"."report_date"<=\'2020-03-31\'' in sql
-        assert '"dynamic_dates"."updated_at">=\'2020-03-01\'' in sql
-        assert '"dynamic_dates"."updated_at"<=\'2020-03-31\'' in sql
+        assert '"dynamic_dates"."updated_at">=\'2020-03-01T00:00:00.000Z\'' in sql
+        assert '"dynamic_dates"."updated_at"<=\'2020-03-31T23:59:59.999Z\'' in sql
 
         # Test dynamic date filters
         dynamic_date_range = (
@@ -455,18 +454,18 @@ class TestQueryGeneration:
         # Generating the query
         (sql, query_attributes, aggregate_columns) = q.get_query()
 
-        today = datetime.today().strftime('%Y-%m-%d')
-        last_week = (datetime.today() - timedelta(days=7)).strftime('%Y-%m-%d')
+        start_date = "(NOW()::date + interval '-7 days')::date"
+        end_date = "(NOW()::date + interval '+0 days')::date"
 
         # Check that all the WHERE filters were added correctly
-        assert f'"dynamic_dates"."report_date">=\'{last_week}\'' in sql
-        assert f'"dynamic_dates"."report_date"<=\'{today}\'' in sql
+        assert f'"dynamic_dates"."report_date">={start_date}' in sql
+        assert f'"dynamic_dates"."report_date"<={end_date}' in sql
 
         # Test dynamic time filters
         dynamic_time_range = (
             PayloadBuilder("dynamic_dates")
             .columns("updated_at")
-            .column_filter("dynamic_dates", "updated_at", "greater_or_equal_than", "-15d")
+            .column_filter("dynamic_dates", "updated_at", "greater_or_equal_than", "-3m")
             .column_filter("dynamic_dates", "updated_at", "less_or_equal_than", "+0y")
             .aggregates("count")
         )
@@ -479,9 +478,9 @@ class TestQueryGeneration:
         # Generating the query
         (sql, query_attributes, aggregate_columns) = q.get_query()
 
-        today = f"{datetime.today().strftime('%Y-%m-%d')} 23:59:59"
-        fifteen_days_ago = f"{(datetime.today() - timedelta(days=15)).strftime('%Y-%m-%d')} 00:00:00"
+        start_date_time = "(NOW()::date + interval '-3 months')::timestamp"
+        end_date_time = "(NOW()::date + interval '+0 years' + interval '23 hours 59 minutes 59 seconds')::timestamp"
 
         # Check that all the WHERE filters were added correctly
-        assert f'"dynamic_dates"."updated_at">=\'{fifteen_days_ago}\'' in sql
-        assert f'"dynamic_dates"."updated_at"<=\'{today}\'' in sql
+        assert f'"dynamic_dates"."updated_at">={start_date_time}' in sql
+        assert f'"dynamic_dates"."updated_at"<={end_date_time}' in sql
