@@ -121,24 +121,27 @@ export default {
   methods: {
     ...mapActions('designs', ['addFilter', 'removeFilter']),
     onDayClick() {
-      this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, {
-        isRelative: false,
-        relativeString: null,
-        dateRange: { start: null, end: null }
-      })
+      if (this.getAttributePairInFocus.isRelative) {
+        this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, {
+          isRelative: false,
+          relativeDateRange: null,
+          absoluteDateRange: { start: null, end: null }
+        })
+      }
     },
     onChangeAttributePairInFocus(attributePair) {
       this.attributePairInFocusIndex = this.attributePairsModel.indexOf(
         attributePair
       )
     },
-    onClearDateRange(attributePair) {
-      attributePair.dateRange = { start: null, end: null }
-    },
     onChangeDateRange(payload) {
       const attributePairInFocus = this.getAttributePairInFocus
+      attributePairInFocus.isRelative = payload.isRelative
+      attributePairInFocus.absoluteDateRange = payload.absoluteDateRange
+      attributePairInFocus.relativeDateRange = payload.relativeDateRange
 
-      // Conditionally apply relative range if isRelative or priorCustomDateRange per attributePair if applicable
+      // Conditionally apply priorCustomDateRange and update dateRange if applicable
+      // TODO maybe dateRange refactors to absoluteDateRange?
       if (payload.isRelative) {
         if (!attributePairInFocus.priorCustomDateRange) {
           attributePairInFocus.priorCustomDateRange = Object.assign(
@@ -146,7 +149,7 @@ export default {
             attributePairInFocus.dateRange
           )
         }
-        attributePairInFocus.dateRange = payload.dateRange
+        attributePairInFocus.dateRange = payload.absoluteDateRange
       } else if (attributePairInFocus.priorCustomDateRange) {
         attributePairInFocus.dateRange = Object.assign(
           {},
@@ -155,11 +158,15 @@ export default {
         attributePairInFocus.priorCustomDateRange = null
       }
     },
+    onClearDateRange(attributePair) {
+      attributePair.dateRange = { start: null, end: null }
+    },
     onDropdownOpen() {
       this.attributePairsModel = lodash.cloneDeep(this.getAttributePairsInitial)
     },
     saveDateRanges() {
       this.attributePairsModel.forEach(attributePair => {
+        // TODO properly check isRelative and update filters accordingly
         const { attribute, dateRange } = attributePair
         const partialShared = {
           attribute: attribute,
@@ -208,7 +215,6 @@ export default {
 
         const isAdd = partialStart.value !== null && partialEnd.value !== null
         if (isAdd) {
-          // TODO start, end needs to be set based on relative values or absolute
           this.addFilter(Object.assign(partialStart, partialShared))
           this.addFilter(Object.assign(partialEnd, partialShared))
         }

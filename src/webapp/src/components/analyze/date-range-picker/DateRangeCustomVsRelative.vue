@@ -66,10 +66,10 @@ export default {
     emitChangeDateRange() {
       const isRelative = this.isRelative
       const relativeDateRange = isRelative ? this.getRelativeDateRange : null
-      const dateRange = isRelative
+      const absoluteDateRange = isRelative
         ? this.getAbsoluteDateRange
         : this.getEmptyDateRange
-      const payload = { isRelative, relativeDateRange, dateRange }
+      const payload = { isRelative, relativeDateRange, absoluteDateRange }
       this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, payload)
     },
     onChangeDateRangeType(payload) {
