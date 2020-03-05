@@ -23,6 +23,9 @@ export default {
     getEmptyDateRange() {
       return { start: null, end: null }
     },
+    getIsPeriodDisabled() {
+      return period => period.IS_DISABLED
+    },
     getPeriods() {
       return RELATIVE_DATE_RANGE_MODELS.PERIODS
     },
@@ -144,6 +147,7 @@ export default {
                 v-for="(period, key) in getPeriods"
                 :key="key"
                 :value="period.NAME"
+                :disabled="getIsPeriodDisabled(period)"
                 >{{ period.LABEL }}</option
               >
             </select>

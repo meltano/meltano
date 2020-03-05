@@ -3,8 +3,8 @@ import utils from '@/utils/utils'
 export const RELATIVE_DATE_RANGE_MODELS = Object.freeze({
   PERIODS: {
     DAYS: { NAME: 'days', LABEL: 'Days' },
-    MONTHS: { NAME: 'months', LABEL: 'Months' },
-    YEARS: { NAME: 'years', LABEL: 'Years' }
+    MONTHS: { NAME: 'months', LABEL: 'Months', IS_DISABLED: true },
+    YEARS: { NAME: 'years', LABEL: 'Years', IS_DISABLED: true }
   },
   SIGNS: {
     LAST: { NAME: '-', LABEL: 'Last' },
