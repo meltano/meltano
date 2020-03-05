@@ -190,7 +190,8 @@ export default {
       attributePair.isRelative = false
     },
     onChangeDateRangeType(payload) {
-      console.log('update cal', payload)
+      const attributePairInFocus = this.getAttributePairInFocus
+      attributePairInFocus.dateRange = payload.dateRange
     },
     onDropdownOpen() {
       this.attributePairsModel = lodash.cloneDeep(this.getAttributePairsInitial)
