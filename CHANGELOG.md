@@ -15,6 +15,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1840](https://gitlab.com/meltano/meltano/-/issues/1840) Format InputDateIso8601 value as YYYY-MM-DD since a full timestamp value could represent a different date in UTC and local timezone
+
 ### Breaks
 
 ## 1.23.2 - (2020-03-05)
