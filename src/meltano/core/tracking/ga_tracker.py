@@ -180,17 +180,6 @@ class GoogleAnalyticsTracker:
             debug=debug,
         )
 
-    def track_meltano_permissions_grant(
-        self, db: str, dry: bool, debug: bool = False
-    ) -> None:
-        action = f"meltano permissions grant --db {db}"
-        if dry:
-            action = action + " --dry"
-
-        event = self.track_event(
-            category="meltano permissions grant", action=action, debug=debug
-        )
-
     def track_meltano_select(
         self,
         extractor: str,
