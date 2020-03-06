@@ -53,8 +53,8 @@ export default {
       return RELATIVE_DATE_RANGE_MODELS.SIGNS
     },
     getRelativeDateRange() {
-      const anchor = `${this.model.sign}1 ${this.model.period}`
-      const offset = `${this.model.sign}${this.model.number} ${this.model.period}`
+      const anchor = `${this.model.sign}1${this.model.period}`
+      const offset = `${this.model.sign}${this.model.number}${this.model.period}`
       return this.getDateRange(anchor, offset)
     }
   },

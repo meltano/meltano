@@ -7,8 +7,10 @@ import DateRangePickerHeader from '@/components/analyze/date-range-picker/DateRa
 import Dropdown from '@/components/generic/Dropdown'
 import { EVENTS } from '@/components/analyze/date-range-picker/events'
 import {
+  getAbsoluteDate,
   getDateLabel,
-  getHasValidDateRange
+  getHasValidDateRange,
+  getIsRelativeDateRangeFormat
 } from '@/components/analyze/date-range-picker/utils'
 import { QUERY_ATTRIBUTE_TYPES } from '@/api/design'
 import utils from '@/utils/utils'
@@ -45,14 +47,25 @@ export default {
         const end = filters.find(
           filter => filter.expression === 'less_or_equal_than'
         )
-        const dateRange = {
-          start: start ? utils.getDateFromYYYYMMDDString(start.value) : null,
-          end: end ? utils.getDateFromYYYYMMDDString(end.value) : null
-        }
-        const isRelative = false
-        const absoluteDateRange = { start: null, end: null }
-        const relativeDateRange = { start: null, end: null }
+
+        // TODO refactor dateRange to absoluteDateRange to reduce redundancy
+        // TODO `attributePair` term refactor?
+
+        const isRelative =
+          start &&
+          getIsRelativeDateRangeFormat(start.value) &&
+          end &&
+          getIsRelativeDateRangeFormat(end.value)
+        const relativeStart = isRelative ? start.value : null
+        const relativeEnd = isRelative ? end.value : null
+        const absoluteStart = start ? getAbsoluteDate(start.value) : null
+        const absoluteEnd = end ? getAbsoluteDate(end.value) : null
+
+        const dateRange = { start: absoluteStart, end: absoluteEnd }
+        const absoluteDateRange = { start: absoluteStart, end: absoluteEnd }
+        const relativeDateRange = { start: relativeStart, end: relativeEnd }
         const priorCustomDateRange = { start: null, end: null }
+
         return {
           attribute,
           isRelative,
@@ -138,7 +151,7 @@ export default {
       if (this.getAttributePairInFocus.isRelative) {
         this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, {
           isRelative: false,
-          relativeDateRange: null,
+          relativeDateRange: { start: null, end: null },
           absoluteDateRange: { start: null, end: null }
         })
       }
@@ -155,7 +168,6 @@ export default {
       attributePairInFocus.relativeDateRange = payload.relativeDateRange
 
       // Conditionally apply priorCustomDateRange and update dateRange if applicable
-      // TODO maybe dateRange refactors to absoluteDateRange?
       if (payload.isRelative) {
         if (!attributePairInFocus.priorCustomDateRange) {
           attributePairInFocus.priorCustomDateRange = Object.assign(
@@ -182,25 +194,34 @@ export default {
     },
     saveDateRanges() {
       this.attributePairsModel.forEach(attributePair => {
-        // TODO properly check isRelative and update filters accordingly
-        const { attribute, dateRange } = attributePair
+        const {
+          attribute,
+          dateRange,
+          isRelative,
+          relativeDateRange
+        } = attributePair
         const partialShared = {
           attribute: attribute,
           filterType: QUERY_ATTRIBUTE_TYPES.COLUMN
         }
 
         let startValue = dateRange.start || null
-        if (startValue) {
-          startValue = utils.formatDateStringYYYYMMDD(startValue)
-          if (attribute.type === 'time') {
-            startValue += 'T00:00:00.000Z'
-          }
-        }
         let endValue = dateRange.end || null
-        if (endValue) {
-          endValue = utils.formatDateStringYYYYMMDD(endValue)
-          if (attribute.type === 'time') {
-            endValue += 'T23:59:59.999Z'
+        if (isRelative) {
+          startValue = relativeDateRange.start
+          endValue = relativeDateRange.end
+        } else {
+          if (startValue) {
+            startValue = utils.formatDateStringYYYYMMDD(startValue)
+            if (attribute.type === 'time') {
+              startValue += 'T00:00:00.000Z'
+            }
+          }
+          if (endValue) {
+            endValue = utils.formatDateStringYYYYMMDD(endValue)
+            if (attribute.type === 'time') {
+              endValue += 'T23:59:59.999Z'
+            }
           }
         }
 
