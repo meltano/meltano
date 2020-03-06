@@ -19,9 +19,6 @@ export default {
     }
   },
   computed: {
-    getEmptyDateRange() {
-      return { start: null, end: null }
-    },
     getIsLast() {
       return this.model.sign === RELATIVE_DATE_RANGE_MODELS.SIGNS.LAST.NAME
     },
@@ -61,10 +58,12 @@ export default {
   methods: {
     emitChangeDateRange(value) {
       const isRelative = value
-      const relativeDateRange = isRelative ? this.getRelativeDateRange : null
+      const relativeDateRange = isRelative
+        ? this.getRelativeDateRange
+        : { start: null, end: null }
       const absoluteDateRange = isRelative
         ? this.getAbsoluteDateRange
-        : this.getEmptyDateRange
+        : { start: null, end: null }
       const payload = { isRelative, relativeDateRange, absoluteDateRange }
       this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, payload)
     },

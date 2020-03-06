@@ -99,12 +99,12 @@ export default {
           <span
             class="is-size-7"
             :class="{
-              'mr-05r': getHasValidDateRange(attributePair.dateRange)
+              'mr-05r': getHasValidDateRange(attributePair.absoluteDateRange)
             }"
             >{{ getDateLabel(attributePair) }}</span
           >
           <button
-            v-if="getHasValidDateRange(attributePair.dateRange)"
+            v-if="getHasValidDateRange(attributePair.absoluteDateRange)"
             class="button is-small"
             @click="onClearDateRange"
           >

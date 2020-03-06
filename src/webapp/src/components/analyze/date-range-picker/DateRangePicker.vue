@@ -48,7 +48,6 @@ export default {
           filter => filter.expression === 'less_or_equal_than'
         )
 
-        // TODO refactor dateRange to absoluteDateRange to reduce redundancy
         // TODO `attributePair` term refactor?
 
         const isRelative =
@@ -61,7 +60,6 @@ export default {
         const absoluteStart = start ? getAbsoluteDate(start.value) : null
         const absoluteEnd = end ? getAbsoluteDate(end.value) : null
 
-        const dateRange = { start: absoluteStart, end: absoluteEnd }
         const absoluteDateRange = { start: absoluteStart, end: absoluteEnd }
         const relativeDateRange = { start: relativeStart, end: relativeEnd }
         const priorCustomDateRange = { start: null, end: null }
@@ -69,7 +67,6 @@ export default {
         return {
           attribute,
           isRelative,
-          dateRange,
           absoluteDateRange,
           relativeDateRange,
           priorCustomDateRange
@@ -113,7 +110,7 @@ export default {
         this.attributePairsModel[this.attributePairInFocusIndex]
     },
     getIsSavable() {
-      const mapper = attributePair => attributePair.dateRange
+      const mapper = attributePair => attributePair.absoluteDateRange
       const initialDateRanges = this.getAttributePairsInitial.map(mapper)
       const modelDateRanges = this.attributePairsModel.map(mapper)
       return !lodash.isEqual(initialDateRanges, modelDateRanges)
@@ -135,7 +132,7 @@ export default {
     },
     getValidDateRangesInitial() {
       return this.getAttributePairsInitial.filter(attributePair =>
-        this.getHasValidDateRange(attributePair.dateRange)
+        this.getHasValidDateRange(attributePair.absoluteDateRange)
       )
     }
   },
@@ -165,28 +162,29 @@ export default {
     onChangeDateRange(payload) {
       const attributePairInFocus = this.getAttributePairInFocus
       attributePairInFocus.isRelative = payload.isRelative
-      attributePairInFocus.absoluteDateRange = payload.absoluteDateRange
       attributePairInFocus.relativeDateRange = payload.relativeDateRange
 
-      // Conditionally apply priorCustomDateRange and update dateRange if applicable
+      // Conditionally apply priorCustomDateRange and update absoluteDateRange if applicable
       if (payload.isRelative) {
-        if (!attributePairInFocus.priorCustomDateRange) {
+        const hasPrior =
+          attributePairInFocus.priorCustomDateRange.start !== null
+        if (!hasPrior) {
           attributePairInFocus.priorCustomDateRange = Object.assign(
             {},
-            attributePairInFocus.dateRange
+            attributePairInFocus.absoluteDateRange
           )
         }
-        attributePairInFocus.dateRange = payload.absoluteDateRange
-      } else if (attributePairInFocus.priorCustomDateRange) {
-        attributePairInFocus.dateRange = Object.assign(
+        attributePairInFocus.absoluteDateRange = payload.absoluteDateRange
+      } else {
+        attributePairInFocus.absoluteDateRange = Object.assign(
           {},
           attributePairInFocus.priorCustomDateRange
         )
-        attributePairInFocus.priorCustomDateRange = null
+        attributePairInFocus.priorCustomDateRange = { start: null, end: null }
       }
     },
     onClearDateRange(attributePair) {
-      attributePair.dateRange = { start: null, end: null }
+      attributePair.absoluteDateRange = { start: null, end: null }
       attributePair.priorCustomDateRange = { start: null, end: null }
       attributePair.isRelative = false
     },
@@ -197,8 +195,8 @@ export default {
       this.attributePairsModel.forEach(attributePair => {
         const {
           attribute,
-          dateRange,
           isRelative,
+          absoluteDateRange,
           relativeDateRange
         } = attributePair
         const partialShared = {
@@ -206,8 +204,8 @@ export default {
           filterType: QUERY_ATTRIBUTE_TYPES.COLUMN
         }
 
-        let startValue = dateRange.start || null
-        let endValue = dateRange.end || null
+        let startValue = absoluteDateRange.start || null
+        let endValue = absoluteDateRange.end || null
         if (isRelative) {
           startValue = relativeDateRange.start
           endValue = relativeDateRange.end
@@ -302,7 +300,7 @@ export default {
           class="dropdown-item"
         >
           <v-date-picker
-            v-model="attributePair.dateRange"
+            v-model="attributePair.absoluteDateRange"
             class="v-calendar-theme"
             mode="range"
             is-expanded
