@@ -11,7 +11,6 @@ from . import (
     invoke,
     ui,
     upgrade,
-    permissions,
     schedule,
     select,
     repl,

@@ -44,7 +44,6 @@ When anonymous usage tracking is enabled, Meltano tracks the following events:
 - `meltano invoke {plugin_name} {plugin_args}`
 - `meltano select {extractor} {entities_filter} {attributes_filter}`
 - `meltano schedule add {name} {extractor} {loader} {interval}`
-- `meltano permissions grant --db {postgres, snowflake} --dry`
 
 Beyond the invocation of these commands and the identified command line arguments, Meltano does not track any other event metadata, plugin configuration, or processed data.
 
