@@ -17,10 +17,19 @@ export default {
   },
   methods: {
     formatDateStringYYYYMMDD(val) {
-      return val && utils.formatDateStringYYYYMMDD(val)
+      if (!val) {
+        return null
+      }
+
+      // Depending on what was saved before, val may either hold a
+      // YYYY-MM-DD date string or a full ISO8601 timestamp string.
+      // We always need a YYYY-MM-DD date string, so let's convert.
+      const date = utils.getDateFromYYYYMMDDString(val)
+      return utils.formatDateStringYYYYMMDD(date)
     },
     updateValue(val) {
-      this.$emit('input', utils.dateIso8601Nullable(val))
+      // Val is already formatted as YYYY-MM-DD
+      this.$emit('input', val || null)
     }
   }
 }
