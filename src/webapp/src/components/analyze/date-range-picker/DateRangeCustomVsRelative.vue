@@ -2,7 +2,10 @@
 import moment from 'moment'
 
 import { EVENTS } from '@/components/analyze/date-range-picker/events'
-import { RELATIVE_DATE_RANGE_MODELS } from '@/components/analyze/date-range-picker/utils'
+import {
+  getNullDateRange,
+  RELATIVE_DATE_RANGE_MODELS
+} from '@/components/analyze/date-range-picker/utils'
 
 export default {
   name: 'DateRangeCustomVsRelative',
@@ -60,10 +63,10 @@ export default {
       const isRelative = value
       const relativeDateRange = isRelative
         ? this.getRelativeDateRange
-        : { start: null, end: null }
+        : getNullDateRange()
       const absoluteDateRange = isRelative
         ? this.getAbsoluteDateRange
-        : { start: null, end: null }
+        : getNullDateRange()
       const payload = { isRelative, relativeDateRange, absoluteDateRange }
       this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, payload)
     },

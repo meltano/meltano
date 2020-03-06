@@ -10,6 +10,7 @@ import {
   getAbsoluteDate,
   getDateLabel,
   getHasValidDateRange,
+  getNullDateRange,
   getIsRelativeDateRangeFormat
 } from '@/components/analyze/date-range-picker/utils'
 import { QUERY_ATTRIBUTE_TYPES } from '@/api/design'
@@ -62,7 +63,7 @@ export default {
 
         const absoluteDateRange = { start: absoluteStart, end: absoluteEnd }
         const relativeDateRange = { start: relativeStart, end: relativeEnd }
-        const priorCustomDateRange = { start: null, end: null }
+        const priorCustomDateRange = getNullDateRange()
 
         return {
           attribute,
@@ -149,8 +150,8 @@ export default {
         this.onClearDateRange(this.getAttributePairInFocus)
         this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, {
           isRelative: false,
-          relativeDateRange: { start: null, end: null },
-          absoluteDateRange: { start: null, end: null }
+          relativeDateRange: getNullDateRange(),
+          absoluteDateRange: getNullDateRange()
         })
       }
     },
@@ -180,12 +181,12 @@ export default {
           {},
           attributePairInFocus.priorCustomDateRange
         )
-        attributePairInFocus.priorCustomDateRange = { start: null, end: null }
+        attributePairInFocus.priorCustomDateRange = getNullDateRange()
       }
     },
     onClearDateRange(attributePair) {
-      attributePair.absoluteDateRange = { start: null, end: null }
-      attributePair.priorCustomDateRange = { start: null, end: null }
+      attributePair.absoluteDateRange = getNullDateRange()
+      attributePair.priorCustomDateRange = getNullDateRange()
       attributePair.isRelative = false
     },
     onDropdownOpen() {

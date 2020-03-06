@@ -36,6 +36,10 @@ export function getIsRelativeDateRangeFormat(value) {
   return /[+-]\d*[dmy]/.test(value)
 }
 
+export function getNullDateRange() {
+  return { start: null, end: null }
+}
+
 function getRelativeToAbsoluteDate(value) {
   // TODO conversion
   return value
