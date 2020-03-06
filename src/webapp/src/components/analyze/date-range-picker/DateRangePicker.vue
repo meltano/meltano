@@ -149,6 +149,7 @@ export default {
     ...mapActions('designs', ['addFilter', 'removeFilter']),
     onDayClick() {
       if (this.getAttributePairInFocus.isRelative) {
+        this.onClearDateRange(this.getAttributePairInFocus)
         this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, {
           isRelative: false,
           relativeDateRange: { start: null, end: null },
