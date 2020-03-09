@@ -225,14 +225,10 @@ export default {
     return dateString ? this.dateIso8601(dateString) : null
   },
 
-  getFirstOfMonthAsIso8601() {
+  getFirstOfMonthAsYYYYMMDD() {
     const date = new Date()
-    const firstOfThisMonth = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      1
-    ).toString()
-    return this.dateIso8601(firstOfThisMonth)
+    const firstOfThisMonth = new Date(date.getFullYear(), date.getMonth(), 1)
+    return this.formatDateStringYYYYMMDD(firstOfThisMonth)
   },
 
   getInputDateMeta() {
@@ -263,6 +259,12 @@ export default {
   },
 
   formatDateStringYYYYMMDD(date) {
+    // When provided with a Date object in the local timezone,
+    // (like `new Date()` or `new Date(year, monthIndex, day)`),
+    // returns the YYYY-MM-DD representation of the local date,
+    // as opposed to `date.toISOString().split('T')[0]`, which
+    // would return the YYYY-MM-DD representation of the equivalent
+    // moment in UTC, which could take place on a different date.
     const dateInLocalTimezone = new Date(date)
     const dateInUTC = new Date(
       dateInLocalTimezone.getTime() -

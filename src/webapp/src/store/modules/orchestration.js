@@ -323,7 +323,7 @@ const mutations = {
           profile.config.hasOwnProperty(setting.name) &&
           profile.config[setting.name] === null
         if (isIso8601Date && isDefaultNeeded) {
-          profile.config[setting.name] = utils.getFirstOfMonthAsIso8601()
+          profile.config[setting.name] = utils.getFirstOfMonthAsYYYYMMDD()
         }
       })
     })
