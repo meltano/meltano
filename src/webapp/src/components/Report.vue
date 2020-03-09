@@ -90,7 +90,7 @@ export default {
             <p>
               <strong>{{ report.name }}</strong>
               <br />
-              <small class="has-text-grey"
+              <small class="has-text-grey is-size-7"
                 >Last updated: {{ dataLastUpdatedDate }}</small
               >
             </p>
