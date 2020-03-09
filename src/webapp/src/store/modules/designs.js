@@ -264,9 +264,9 @@ const getters = {
             : []
         })
       })
-
-      return sources
     }
+
+    return sources
   },
 
   getFiltersByType(state) {
