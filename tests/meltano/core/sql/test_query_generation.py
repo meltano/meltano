@@ -516,7 +516,7 @@ class TestQueryGeneration:
             .column_filter(
                 "dynamic_dates", "updated_at", "greater_or_equal_than", "-3m"
             )
-            .column_filter("dynamic_dates", "updated_at", "less_or_equal_than", "+0y")
+            .column_filter("dynamic_dates", "updated_at", "less_or_equal_than", "-1d")
             .aggregates("count")
         )
 
@@ -529,14 +529,14 @@ class TestQueryGeneration:
         (sql, query_attributes, aggregate_columns) = q.get_query()
 
         # Check that all the WHERE filters were added correctly
-        start_date = "('2020-03-05'::date + interval '-7 days')::date"
-        end_date = "('2020-03-05'::date + interval '+0 days')::date"
+        start_date = "DATE(DATE('2020-03-05')-INTERVAL '7 DAY')"
+        end_date = "DATE('2020-03-05')"
 
         assert f'"dynamic_dates"."report_date">={start_date}' in sql
         assert f'"dynamic_dates"."report_date"<={end_date}' in sql
 
-        start_date_time = "('2020-03-05'::date + interval '-3 months')::timestamp"
-        end_date_time = "('2020-03-05'::date + interval '+0 years' + interval '23 hours 59 minutes 59 seconds')::timestamp"
+        start_date_time = "DATE('2020-03-05')-INTERVAL '3 MONTH'"
+        end_date_time = "DATE('2020-03-05')-INTERVAL '1 DAY'+INTERVAL '23 HOUR'+INTERVAL '59 MINUTE'+INTERVAL '59 SECOND'+INTERVAL '999999 MICROSECOND'"
 
         assert f'"dynamic_dates"."updated_at">={start_date_time}' in sql
         assert f'"dynamic_dates"."updated_at"<={end_date_time}' in sql

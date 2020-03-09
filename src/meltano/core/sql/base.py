@@ -1,5 +1,6 @@
 import re
 
+from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Tuple
 import networkx as nx
@@ -552,11 +553,13 @@ class MeltanoFilter(MeltanoBase):
       {type, source_name, name, expression, value}
     """
 
-    def __init__(self, definition: Dict = {}, design: MeltanoDesign = None) -> None:
+    def __init__(self, definition: Dict = {}, design: MeltanoDesign = None, pivot_date: str = None) -> None:
         # The design is used for filters in queries against specific designs
         #  to validate that all the tables and attributes (columns/aggregates)
         #  are properly defined in the design
         self.design = design
+
+        self.pivot_date = pivot_date
 
         self.expression_type = MeltanoFilterExpressionType.parse(
             definition["expression"]
@@ -634,7 +637,11 @@ class MeltanoFilter(MeltanoBase):
 
                 old_value = definition.get("value", None)
 
-                pivot_date = fn.Date(fn.Now())
+                if self.pivot_date:
+                    pivot_date = fn.Date(self.pivot_date)
+                else:
+                    pivot_date = fn.Date(fn.Now())
+
                 interval_days = int(old_value[1:-1])
 
                 if interval_days == 0:
@@ -820,11 +827,20 @@ class MeltanoQuery(MeltanoBase):
         if timeframes and not isinstance(timeframes, list):
             raise ParseError(f"Query definition property `timeframes` must be a list")
 
+        if definition.get("today", None):
+            try:
+                datetime.strptime(definition.get("today", None), '%Y-%m-%d')
+            except ValueError:
+                raise ValueError("Incorrect pivot_date format, should be YYYY-MM-DD")
+
     def parse_definition(self, definition: Dict) -> None:
         """
         Parse the Query definition and generate the Tables, join_order, etc for
          easy access and lookups.
         """
+
+        # Parse and store the pivot date provided in the Query definition
+        pivot_date = definition.get("today", None)
 
         # Parse and store the provided filters
         filters = definition.get("filters", None)
@@ -832,12 +848,12 @@ class MeltanoQuery(MeltanoBase):
         if filters:
             for column_filter in filters.get("columns", []):
                 # Generate (and automaticaly validate) the filter and then store it
-                mf = MeltanoFilter(definition=column_filter, design=self.design)
+                mf = MeltanoFilter(definition=column_filter, design=self.design, pivot_date=pivot_date)
                 self.column_filters.append(mf)
 
             for aggregate_filter in filters.get("aggregates", []):
                 # Generate (and automaticaly validate) the filter and then store it
-                mf = MeltanoFilter(definition=aggregate_filter, design=self.design)
+                mf = MeltanoFilter(definition=aggregate_filter, design=self.design, pivot_date=pivot_date)
                 self.aggregate_filters.append(mf)
 
         # Find the tables defined in the Query and add them as Table Objects
