@@ -219,10 +219,10 @@ We should be good citizen about these, and use the default workflow to contribut
 
 We qualify taps with the capabilities it supports:
 
-  - properties: the tap uses the old `--properties` format for the catalog
-  - catalog: the tap uses the new `--catalog` format for the catalog
-  - discover: the tap supports catalog extraction
-  - state: the tap supports incremental extraction
+- properties: the tap uses the old `--properties` format for the catalog
+- catalog: the tap uses the new `--catalog` format for the catalog
+- discover: the tap supports catalog extraction
+- state: the tap supports incremental extraction
 
 ##### Properties/Catalog
 
@@ -234,10 +234,10 @@ Try to run the tap with the `--discover` switch, which should output a catalog o
 
 ##### State
 
-  1. Try to run the tap connect and extract data first, watching for `STATE` messages.
-  1. Do two ELT run with `target-postgres`, then validate that:
-    1. All the tables in the schema created have a PRIMARY KEY constraint. (this is important for incremental updates)
-    1. There is no duplicates after multiple extractions
+1. Try to run the tap connect and extract data first, watching for `STATE` messages.
+1. Do two ELT run with `target-postgres`, then validate that:
+   1. All the tables in the schema created have a PRIMARY KEY constraint. (this is important for incremental updates)
+   1. There is no duplicates after multiple extractions
 
 #### Troubleshooting
 
@@ -254,6 +254,47 @@ This might be a configuration issue with the catalog file that is sent to the ta
 1. Publish PyPI packages of these package (not for now)
 1. We could mirror this repo on GitHub if we want (not for now)
 
+## Transform & Models Development
+
+When you need to expose data to the user through Meltano UI, this often will require updating the transforms and models. At a high level:
+
+- **Transforms** will allow you to create the necessary PostgreSQL tables for users to query against
+- **Models** will determine the structure of what is exposed on the UI side
+
+### Transforms
+
+You can test local transforms in a project by adding them in a Meltano project's `transform` > `models` > `my_meltano_project` directory.
+
+Every transform file is a SQL file that will determine how the table is created. Some caveats include:
+
+- Rather than referring to the tables directly (i.e., `analytics.gitlab_issues`), the syntax uses `ref` to refer to tables
+- When joining two tables together, `*` seems to crash dbt. Instead, you should explicitly define every column. For example:
+
+```sql
+users.user_id as user_id,
+users.user_name as user_name,
+issues.month_closed as month_closed,
+issues.year_closed as year_closed,
+```
+
+Once you've created your transforms, you can run it with the following command:
+
+```bash
+# Replace your extractors / targets with the appropriate ones
+meltano elt tap-gitlab target-postgres --transform only
+```
+
+### Models
+
+When updating the models that will appear in the UI, you can follow these steps:
+
+1. Create `table.m5o` file that defines the UI columns that will appear on the UI
+1. Update `topic.m5o` file to include the newly created model table
+1. Compile model repo with ``python3 setup.py sdist`
+1. Go to project's `meltano.yml` file and replace `pip_url` with the file path to the targz file created
+1. Stop project's server and run `meltano install` to fetch new settings
+1. You should now see your changes in the UI
+
 ## Dashboard Development
 
 To create a dashboard plugin like https://gitlab.com/meltano/dashboard-google-analytics, follow these steps:
@@ -266,7 +307,7 @@ To create a dashboard plugin like https://gitlab.com/meltano/dashboard-google-an
 1. Copy over `setup.py`, `README.md`, and `LICENSE` from https://gitlab.com/meltano/dashboard-google-analytics and edit these files as appropriate.
 1. Move your newly created dashboards and reports from your local Meltano project's `analyze/dashboards` and `analyze/reports` to `dashboards` and `reports` inside the new plugin repository.
 1. Push your new plugin repository to GitLab.com. Official dashboard plugins live at `https://gitlab.com/meltano/dashboard-...`.
-1. Add an entry to `src/meltano/core/bundle/discovery.yml`  under `dashboards`. Set `namespace` to the `namespace` of the extractor and model plugins the dashboard(s) and reports are related to (e.g. `tap_google_analytics`), and set `name` and `pip_url` set as appropriate.
+1. Add an entry to `src/meltano/core/bundle/discovery.yml` under `dashboards`. Set `namespace` to the `namespace` of the extractor and model plugins the dashboard(s) and reports are related to (e.g. `tap_google_analytics`), and set `name` and `pip_url` set as appropriate.
 1. Delete the dashboard(s) and reports from your local Meltano project's `analyze` directory.
 1. Ensure that your local Meltano instance uses the recently modified `discovery.yml` by following the steps under ["Local changes to discovery.yml](#local-changes-to-discovery-yml).
 1. Run `meltano add --include-related extractor <extractor name>` to automatically install all plugins related to the extractor, including our new dashboard plugin. Related plugins are also installed automatically when installing an extractor using the UI, but we can't use that flow here because the extractor has already been installed.
@@ -359,9 +400,9 @@ In the spirit of GitLab's "boring solutions" with the above tools and mantra, th
 
 `import`s are sorted using the following pattern:
 
-  1. Code source location: third-party → local (separate each group with a single blank line)
-  1. Import scheme: Default imports → Partial imports
-  1. Name of the module, alphabetically: 'lodash' → 'vue'
+1. Code source location: third-party → local (separate each group with a single blank line)
+1. Import scheme: Default imports → Partial imports
+1. Name of the module, alphabetically: 'lodash' → 'vue'
 
 ::: tip
 There should be only 2 blocks of imports with a single blank line between both blocks.
