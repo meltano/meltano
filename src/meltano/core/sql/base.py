@@ -553,19 +553,31 @@ class MeltanoFilter(MeltanoBase):
       {type, source_name, name, expression, value}
     """
 
-    def __init__(self, definition: Dict = {}, design: MeltanoDesign = None, pivot_date: str = None) -> None:
+    def __init__(
+        self,
+        definition: Dict = {},
+        design: MeltanoDesign = None,
+        pivot_date: str = None,
+    ) -> None:
         # The design is used for filters in queries against specific designs
         #  to validate that all the tables and attributes (columns/aggregates)
         #  are properly defined in the design
         self.design = design
-
-        self.pivot_date = pivot_date
 
         self.expression_type = MeltanoFilterExpressionType.parse(
             definition["expression"]
         )
 
         self.validate(definition)
+
+        # Some Query definitions may have a pivot_date set in the `today` param
+        # We use that pivot_date to define relative date filter
+        #  arounf that date and not NOW()
+        self.pivot_date = pivot_date
+
+        # Check if there are relative date filter definitions, parse them
+        #  and generate the proper SQL clauses
+        self.parse_relative_date_filters(definition)
 
         super().__init__(definition)
 
@@ -635,64 +647,84 @@ class MeltanoFilter(MeltanoBase):
                         f"[+-]N[dmy] filter expressions require a column atribute of type date or time"
                     )
 
-                old_value = definition.get("value", None)
+    def parse_relative_date_filters(self, definition: Dict) -> None:
+        """
+        Check if there are relative date filter definitions: [+-]N[dmy]
 
-                if self.pivot_date:
-                    pivot_date = fn.Date(self.pivot_date)
+        If so, parse them and generate the proper SQL clauses
+        """
+        if definition.get("value", None) is None or not re.match(
+            "^[+-][0-9]+[dmy]$", f"{definition.get('value', None)}"
+        ):
+            # We only care about filter definitions of the type: [+-]N[dmy]
+            return
+
+        source_name = definition.get("source_name", None)
+        attribute_name = definition.get("name", None)
+
+        table_def = self.design.find_table(source_name)
+        column_def = table_def.get_column(attribute_name)
+
+        old_value = definition.get("value", None)
+
+        # Start from the Pivot Date: It can be a preset date or NOW()
+        if self.pivot_date:
+            pivot_date = fn.Date(self.pivot_date)
+        else:
+            pivot_date = fn.Date(fn.Now())
+
+        # Then add/substract the Interval days (N) provided in [+-]N[dmy]
+        interval_days = int(old_value[1:-1])
+
+        if interval_days == 0:
+            # If we have no interval days, we can really simplify the expression
+            if column_def.type == "date":
+                new_value = pivot_date
+            elif column_def.type == "time":
+                if self.expression_type == MeltanoFilterExpressionType.LessOrEqualThan:
+                    new_value = (
+                        pivot_date
+                        + Interval(hours=23)
+                        + Interval(minutes=59)
+                        + Interval(seconds=59)
+                        + Interval(microseconds=999_999)
+                    )
                 else:
-                    pivot_date = fn.Date(fn.Now())
+                    new_value = pivot_date
+        else:
+            # If there is an interval set, use the [dmy] to generate the interval
+            if "d" in old_value:
+                interval = Interval(days=interval_days)
+            elif "m" in old_value:
+                interval = Interval(months=interval_days)
+            elif "y" in old_value:
+                interval = Interval(years=interval_days)
 
-                interval_days = int(old_value[1:-1])
-
-                if interval_days == 0:
-                    if column_def.type == "date":
-                        new_value = pivot_date
-                    elif column_def.type == "time":
-                        if (
-                            self.expression_type
-                            == MeltanoFilterExpressionType.LessOrEqualThan
-                        ):
-                            new_value = (
-                                pivot_date
-                                + Interval(hours=23)
-                                + Interval(minutes=59)
-                                + Interval(seconds=59)
-                                + Interval(microseconds=999_999)
-                            )
-                        else:
-                            new_value = pivot_date
+            # End then add or substract accordingly
+            if column_def.type == "date":
+                # Dates are simple as they are always set as they are
+                # We just have to convert the timestamp expression to a Date
+                if "+" in old_value:
+                    new_value = fn.Date(pivot_date + interval)
                 else:
-                    if "d" in old_value:
-                        interval = Interval(days=interval_days)
-                    elif "m" in old_value:
-                        interval = Interval(months=interval_days)
-                    elif "y" in old_value:
-                        interval = Interval(years=interval_days)
+                    new_value = fn.Date(pivot_date - interval)
+            elif column_def.type == "time":
+                # Timestamps are a little bit more involved in case of <= expressions
+                if "+" in old_value:
+                    new_value = pivot_date + interval
+                else:
+                    new_value = pivot_date - interval
 
-                    if column_def.type == "date":
-                        if "+" in old_value:
-                            new_value = fn.Date(pivot_date + interval)
-                        else:
-                            new_value = fn.Date(pivot_date - interval)
-                    elif column_def.type == "time":
-                        if "+" in old_value:
-                            new_value = pivot_date + interval
-                        else:
-                            new_value = pivot_date - interval
+                if self.expression_type == MeltanoFilterExpressionType.LessOrEqualThan:
+                    new_value = (
+                        new_value
+                        + Interval(hours=23)
+                        + Interval(minutes=59)
+                        + Interval(seconds=59)
+                        + Interval(microseconds=999_999)
+                    )
 
-                        if (
-                            self.expression_type
-                            == MeltanoFilterExpressionType.LessOrEqualThan
-                        ):
-                            new_value = (
-                                new_value
-                                + Interval(hours=23)
-                                + Interval(minutes=59)
-                                + Interval(seconds=59)
-                                + Interval(microseconds=999_999)
-                            )
-
-                definition["value"] = new_value
+        definition["value"] = new_value
 
     def match(self, source_name: str, attribute_name: str) -> bool:
         """
@@ -829,7 +861,7 @@ class MeltanoQuery(MeltanoBase):
 
         if definition.get("today", None):
             try:
-                datetime.strptime(definition.get("today", None), '%Y-%m-%d')
+                datetime.strptime(definition.get("today", None), "%Y-%m-%d")
             except ValueError:
                 raise ValueError("Incorrect pivot_date format, should be YYYY-MM-DD")
 
@@ -848,12 +880,18 @@ class MeltanoQuery(MeltanoBase):
         if filters:
             for column_filter in filters.get("columns", []):
                 # Generate (and automaticaly validate) the filter and then store it
-                mf = MeltanoFilter(definition=column_filter, design=self.design, pivot_date=pivot_date)
+                mf = MeltanoFilter(
+                    definition=column_filter, design=self.design, pivot_date=pivot_date
+                )
                 self.column_filters.append(mf)
 
             for aggregate_filter in filters.get("aggregates", []):
                 # Generate (and automaticaly validate) the filter and then store it
-                mf = MeltanoFilter(definition=aggregate_filter, design=self.design, pivot_date=pivot_date)
+                mf = MeltanoFilter(
+                    definition=aggregate_filter,
+                    design=self.design,
+                    pivot_date=pivot_date,
+                )
                 self.aggregate_filters.append(mf)
 
         # Find the tables defined in the Query and add them as Table Objects
