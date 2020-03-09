@@ -5,7 +5,7 @@ from typing import Dict, List, Tuple
 import networkx as nx
 
 from pypika import functions as fn
-from pypika import AliasedQuery, Query, Order, Table, Field, Criterion
+from pypika import AliasedQuery, Query, Order, Table, Field, Criterion, Interval
 
 from networkx.readwrite import json_graph
 
@@ -627,37 +627,65 @@ class MeltanoFilter(MeltanoBase):
                     raise ParseError(
                         f"[+-]N[dmy] filter expressions require a column atribute of type date or time"
                     )
-
-                new_value = re.sub(
-                    "d",
-                    " days",
-                    re.sub(
-                        "m",
-                        " months",
-                        re.sub("y", " years", definition.get("value", None)),
-                    ),
-                )
-
-                if column_def.type == "date":
-                    definition[
-                        "value"
-                    ] = f"(NOW()::date + interval '{new_value}')::date"
-                elif column_def.type == "time":
-                    if (
-                        self.expression_type
-                        == MeltanoFilterExpressionType.LessOrEqualThan
-                    ):
-                        definition[
-                            "value"
-                        ] = f"(NOW()::date + interval '{new_value}' + interval '23 hours 59 minutes 59 seconds')::timestamp"
-                    else:
-                        definition[
-                            "value"
-                        ] = f"(NOW()::date + interval '{new_value}')::timestamp"
-                else:
+                elif column_def.type not in ["date", "time"]:
                     raise ParseError(
                         f"[+-]N[dmy] filter expressions require a column atribute of type date or time"
                     )
+
+                old_value = definition.get("value", None)
+
+                pivot_date = fn.Date(fn.Now())
+                interval_days = int(old_value[1:-1])
+
+                if interval_days == 0:
+                    if column_def.type == "date":
+                        new_value = pivot_date
+                    elif column_def.type == "time":
+                        if (
+                            self.expression_type
+                            == MeltanoFilterExpressionType.LessOrEqualThan
+                        ):
+                            new_value = (
+                                pivot_date
+                                + Interval(hours=23)
+                                + Interval(minutes=59)
+                                + Interval(seconds=59)
+                                + Interval(microseconds=999_999)
+                            )
+                        else:
+                            new_value = pivot_date
+                else:
+                    if "d" in old_value:
+                        interval = Interval(days=interval_days)
+                    elif "m" in old_value:
+                        interval = Interval(months=interval_days)
+                    elif "y" in old_value:
+                        interval = Interval(years=interval_days)
+
+                    if column_def.type == "date":
+                        if "+" in old_value:
+                            new_value = fn.Date(pivot_date + interval)
+                        else:
+                            new_value = fn.Date(pivot_date - interval)
+                    elif column_def.type == "time":
+                        if "+" in old_value:
+                            new_value = pivot_date + interval
+                        else:
+                            new_value = pivot_date - interval
+
+                        if (
+                            self.expression_type
+                            == MeltanoFilterExpressionType.LessOrEqualThan
+                        ):
+                            new_value = (
+                                new_value
+                                + Interval(hours=23)
+                                + Interval(minutes=59)
+                                + Interval(seconds=59)
+                                + Interval(microseconds=999_999)
+                            )
+
+                definition["value"] = new_value
 
     def match(self, source_name: str, attribute_name: str) -> bool:
         """

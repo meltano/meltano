@@ -472,8 +472,8 @@ class TestQueryGeneration:
         # Generating the query
         (sql, query_attributes, aggregate_columns) = q.get_query()
 
-        start_date = "(NOW()::date + interval '-7 days')::date"
-        end_date = "(NOW()::date + interval '+0 days')::date"
+        start_date = "DATE(DATE(NOW())-INTERVAL '7 DAY')"
+        end_date = "DATE(NOW())"
 
         # Check that all the WHERE filters were added correctly
         assert f'"dynamic_dates"."report_date">={start_date}' in sql
@@ -486,7 +486,7 @@ class TestQueryGeneration:
             .column_filter(
                 "dynamic_dates", "updated_at", "greater_or_equal_than", "-3m"
             )
-            .column_filter("dynamic_dates", "updated_at", "less_or_equal_than", "+0y")
+            .column_filter("dynamic_dates", "updated_at", "less_or_equal_than", "-2d")
             .aggregates("count")
         )
 
@@ -498,8 +498,8 @@ class TestQueryGeneration:
         # Generating the query
         (sql, query_attributes, aggregate_columns) = q.get_query()
 
-        start_date_time = "(NOW()::date + interval '-3 months')::timestamp"
-        end_date_time = "(NOW()::date + interval '+0 years' + interval '23 hours 59 minutes 59 seconds')::timestamp"
+        start_date_time = "DATE(NOW())-INTERVAL '3 MONTH'"
+        end_date_time = "DATE(NOW())-INTERVAL '2 DAY'+INTERVAL '23 HOUR'+INTERVAL '59 MINUTE'+INTERVAL '59 SECOND'+INTERVAL '999999 MICROSECOND'"
 
         # Check that all the WHERE filters were added correctly
         assert f'"dynamic_dates"."updated_at">={start_date_time}' in sql
