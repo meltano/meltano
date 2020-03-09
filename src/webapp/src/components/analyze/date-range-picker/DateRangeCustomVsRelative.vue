@@ -3,7 +3,6 @@ import moment from 'moment'
 
 import { EVENTS } from '@/components/analyze/date-range-picker/events'
 import {
-  getIsRelativeLast,
   getNullDateRange,
   RELATIVE_DATE_RANGE_MODELS
 } from '@/components/analyze/date-range-picker/utils'
@@ -24,7 +23,7 @@ export default {
   },
   computed: {
     getIsLast() {
-      return getIsRelativeLast(this.model.sign)
+      return this.model.sign === RELATIVE_DATE_RANGE_MODELS.SIGNS.LAST.NAME
     },
     getIsPeriodDisabled() {
       return period => period.IS_DISABLED

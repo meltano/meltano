@@ -1,5 +1,3 @@
-import moment from 'moment'
-
 import utils from '@/utils/utils'
 
 export const RELATIVE_DATE_RANGE_MODELS = Object.freeze({
@@ -16,9 +14,7 @@ export const RELATIVE_DATE_RANGE_MODELS = Object.freeze({
 
 export function getAbsoluteDate(value) {
   const isRelative = getIsRelativeDateRangeFormat(value)
-  const targetValue = isRelative
-    ? getRelativeToAbsoluteDateString(value)
-    : value
+  const targetValue = isRelative ? getRelativeToAbsoluteDate(value) : value
   return utils.getDateFromYYYYMMDDString(targetValue)
 }
 
@@ -40,24 +36,11 @@ export function getIsRelativeDateRangeFormat(value) {
   return /[+-]\d*[dmy]/.test(value)
 }
 
-export function getIsRelativeLast(value) {
-  return value === RELATIVE_DATE_RANGE_MODELS.SIGNS.LAST.NAME
-}
-
 export function getNullDateRange() {
   return { start: null, end: null }
 }
 
-function getRelativeToAbsoluteDateString(value) {
-  const match = value.match(/([+-])(\d*)([dmy])/)
-  const sign = match[1]
-  const number = match[2]
-  const period = match[3]
-
-  const method = getIsRelativeLast(sign) ? 'subtract' : 'add'
-  const absoluteMoment = moment()[method](number, period)
-
-  // TODO may or may not have to account and refactor for type time vs. type date
-
-  return utils.formatDateStringYYYYMMDD(absoluteMoment.toDate())
+function getRelativeToAbsoluteDate(value) {
+  // TODO conversion
+  return value
 }
