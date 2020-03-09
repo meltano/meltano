@@ -384,16 +384,21 @@ export default {
     <div class="columns is-vcentered v-min-4-5r">
       <div class="column">
         <div class="is-grouped">
-          <div
-            class="has-text-weight-bold"
-            :class="{ 'is-italic': !hasActiveReport }"
-          >
-            <span>{{
-              hasActiveReport ? activeReport.name : 'Untitled Report'
-            }}</span>
-          </div>
-          <div v-if="design.description">{{ design.description }}</div>
-          <p class="has-text-grey">Data starting from: {{ dataStartDate }}</p>
+          <h2 class="title">Report Builder</h2>
+          <p class="subtitle">
+            <span
+              :class="{ 'is-italic': !hasActiveReport }"
+              class="has-text-weight-bold"
+              >{{
+                hasActiveReport ? activeReport.name : 'Untitled Report'
+              }}</span
+            >
+            <span v-if="design.description"> - {{ design.description }}</span>
+            <br />
+            <span class="has-text-grey is-size-7">
+              Data starting from: {{ dataStartDate }}
+            </span>
+          </p>
         </div>
       </div>
 
@@ -985,7 +990,7 @@ export default {
                   ({{ resultsCount }})</span
                 >
               </h2>
-              <div class="has-text-grey is-size-6">
+              <div class="has-text-grey is-size-7">
                 Last updated: {{ dataLastUpdatedDate }}
               </div>
             </div>

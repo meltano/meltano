@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1831](https://gitlab.com/meltano/meltano/issues/1831) Change main navigation "Reports" to "Explore" and update its nested CTAs to link to a landing page per data source
 - [#1705](https://gitlab.com/meltano/meltano/issues/1705) Remove `meltano permissions` feature now that it has been extracted into https://gitlab.com/gitlab-data/permifrost.
+- Updated "Report Builder" page with a header to better communicate what the page is for.
 
 ### Fixes
 
