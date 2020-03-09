@@ -3,11 +3,22 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-## Unreleased
 
+## Unreleased
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.24.0 - (2020-03-09)
+
+---
 
 ### Changes
 
@@ -20,7 +31,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1840](https://gitlab.com/meltano/meltano/-/issues/1840) Format InputDateIso8601 value as YYYY-MM-DD since a full timestamp value could represent a different date in UTC and local timezone
 - [#1842](https://gitlab.com/meltano/meltano/issues/1842) Fix empty filter attributes bug for non-join designs
 
-### Breaks
 
 ## 1.23.2 - (2020-03-05)
 
