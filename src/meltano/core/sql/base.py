@@ -596,6 +596,15 @@ class MeltanoFilter(MeltanoBase):
                 f"Filter expression: {self.expression_type} needs a non-empty value."
             )
 
+        if (
+            definition.get("value", None) is not None
+            and re.match("^[+-][0-9]+[dmy]$", f"{definition.get('value', None)}")
+            and not self.design
+        ):
+            raise ParseError(
+                f"[+-]N[dmy] filter expressions require a design to be set for MeltanoFilter"
+            )
+
         if self.design:
             table_def = self.design.find_table(source_name)
 
@@ -606,6 +615,49 @@ class MeltanoFilter(MeltanoBase):
                 raise ParseError(
                     f"Requested column {table_def.name}.{attribute_name} in filter '{definition}' is not defined in the design"
                 )
+
+            if definition.get("value", None) is not None and re.match(
+                "^[+-][0-9]+[dmy]$", f"{definition.get('value', None)}"
+            ):
+                if aggregate_def:
+                    raise ParseError(
+                        f"You can't use '[+-]N[dmy]' filter expressions with aggregate attributes"
+                    )
+                elif not column_def:
+                    raise ParseError(
+                        f"[+-]N[dmy] filter expressions require a column atribute of type date or time"
+                    )
+
+                new_value = re.sub(
+                    "d",
+                    " days",
+                    re.sub(
+                        "m",
+                        " months",
+                        re.sub("y", " years", definition.get("value", None)),
+                    ),
+                )
+
+                if column_def.type == "date":
+                    definition[
+                        "value"
+                    ] = f"(NOW()::date + interval '{new_value}')::date"
+                elif column_def.type == "time":
+                    if (
+                        self.expression_type
+                        == MeltanoFilterExpressionType.LessOrEqualThan
+                    ):
+                        definition[
+                            "value"
+                        ] = f"(NOW()::date + interval '{new_value}' + interval '23 hours 59 minutes 59 seconds')::timestamp"
+                    else:
+                        definition[
+                            "value"
+                        ] = f"(NOW()::date + interval '{new_value}')::timestamp"
+                else:
+                    raise ParseError(
+                        f"[+-]N[dmy] filter expressions require a column atribute of type date or time"
+                    )
 
     def match(self, source_name: str, attribute_name: str) -> bool:
         """
