@@ -323,12 +323,16 @@ extractors:
             - adGroupID
             - keywordID
             - day
+            - network
+            - device
           AD_PERFORMANCE_REPORT:
             - customerID
             - campaignID
             - adGroupID
             - adID
             - day
+            - network
+            - device
         kind: hidden
         description: Primary Keys for the selected Entities (Streams)
   - name: tap-google-analytics
