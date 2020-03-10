@@ -9,6 +9,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [!1523](https://gitlab.com/meltano/meltano/merge_requests/1523) Add support for relative date filter definitions to Meltano Filters. That means that filters over dates and times can have a `[+-]N[dmy]` format instead of a fixed date. That allows Meltano to generate a date relative to a pivot date provided by in the query definition or `NOW()`.
+- [#1843](https://gitlab.com/meltano/meltano/issues/1843) Update the Google Ads Extractor selected attributes definition to also extract the Ad Network and Device segments for the Ads Performance Reports.
+
 ### Changes
 
 - [#1852](https://gitlab.com/meltano/meltano/-/issues/1852) Move Pipelines after Connections in navbar
