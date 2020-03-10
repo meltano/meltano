@@ -618,7 +618,7 @@ class MeltanoFilter(MeltanoBase):
             )
 
         if (
-            self.is_relative_date_expression(definition.get('value', None))
+            self.is_relative_date_expression(definition.get("value", None))
             and not self.design
         ):
             raise ParseError(
@@ -636,7 +636,7 @@ class MeltanoFilter(MeltanoBase):
                     f"Requested column {table_def.name}.{attribute_name} in filter '{definition}' is not defined in the design"
                 )
 
-            if self.is_relative_date_expression(definition.get('value', None)):
+            if self.is_relative_date_expression(definition.get("value", None)):
                 if aggregate_def:
                     raise ParseError(
                         f"You can't use '[+-]N[dmy]' filter expressions with aggregate attributes"
@@ -656,7 +656,7 @@ class MeltanoFilter(MeltanoBase):
 
         If so, parse them and generate the proper SQL clauses
         """
-        if not self.is_relative_date_expression(definition.get('value', None)):
+        if not self.is_relative_date_expression(definition.get("value", None)):
             # We only care about filter definitions of the type: [+-]N[dmy]
             return
 
