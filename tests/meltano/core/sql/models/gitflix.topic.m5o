@@ -43,5 +43,11 @@
         }
       }
     }
+
+    dynamic_dates {
+      label = Dynamic Dates Test
+      from = dynamic_dates
+      description = Dynamic Dates Test
+    }
   }
 }

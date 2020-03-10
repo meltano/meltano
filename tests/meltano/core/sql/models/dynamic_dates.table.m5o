@@ -1,0 +1,32 @@
+{
+  version = 1
+  name = dynamic_dates
+  sql_table_name = dynamic_dates
+  columns {
+    id {
+      primary_key = true
+      hidden = true
+      type = int
+      sql = "{{table}}.id"
+    }
+    report_date {
+      label = Report Date
+      description = Report Date
+      type = date
+      sql = "{{table}}.report_date"
+    }
+    updated_at {
+      label = Update Date
+      type = time
+      sql = "{{table}}.updated_at"
+    }
+  }
+  aggregates {
+    count {
+      label = Row Count
+      description = Row Count
+      type = count
+      sql = "{{table}}.id"
+    }
+  }
+}
