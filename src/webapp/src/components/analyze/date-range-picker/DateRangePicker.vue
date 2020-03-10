@@ -162,6 +162,7 @@ export default {
     },
     onChangeDateRange(payload) {
       const attributePairInFocus = this.getAttributePairInFocus
+      const priorIsRelative = attributePairInFocus.isRelative
       attributePairInFocus.isRelative = payload.isRelative
       attributePairInFocus.relativeDateRange = payload.relativeDateRange
 
@@ -169,7 +170,8 @@ export default {
       if (payload.isRelative) {
         const hasPrior =
           attributePairInFocus.priorCustomDateRange.start !== null
-        if (!hasPrior) {
+        // Only apply a priorCustomDateRange update when returning to custom from relative mode and only if no prior value exists
+        if (!hasPrior && !priorIsRelative) {
           attributePairInFocus.priorCustomDateRange = Object.assign(
             {},
             attributePairInFocus.absoluteDateRange
