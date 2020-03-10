@@ -581,6 +581,12 @@ class MeltanoFilter(MeltanoBase):
 
         super().__init__(definition)
 
+    def is_relative_date_expression(self, value: str) -> bool:
+        """
+        Check if a value is a relative date expression: [+-]N[dmy]
+        """
+        return value is not None and re.match("^[+-][0-9]+[dmy]$", f"{value}")
+
     def validate(self, definition: Dict) -> None:
         """
         Validate the Filter definition
@@ -612,8 +618,7 @@ class MeltanoFilter(MeltanoBase):
             )
 
         if (
-            definition.get("value", None) is not None
-            and re.match("^[+-][0-9]+[dmy]$", f"{definition.get('value', None)}")
+            self.is_relative_date_expression(definition.get('value', None))
             and not self.design
         ):
             raise ParseError(
@@ -631,9 +636,7 @@ class MeltanoFilter(MeltanoBase):
                     f"Requested column {table_def.name}.{attribute_name} in filter '{definition}' is not defined in the design"
                 )
 
-            if definition.get("value", None) is not None and re.match(
-                "^[+-][0-9]+[dmy]$", f"{definition.get('value', None)}"
-            ):
+            if self.is_relative_date_expression(definition.get('value', None)):
                 if aggregate_def:
                     raise ParseError(
                         f"You can't use '[+-]N[dmy]' filter expressions with aggregate attributes"
@@ -653,9 +656,7 @@ class MeltanoFilter(MeltanoBase):
 
         If so, parse them and generate the proper SQL clauses
         """
-        if definition.get("value", None) is None or not re.match(
-            "^[+-][0-9]+[dmy]$", f"{definition.get('value', None)}"
-        ):
+        if not self.is_relative_date_expression(definition.get('value', None)):
             # We only care about filter definitions of the type: [+-]N[dmy]
             return
 
@@ -673,11 +674,11 @@ class MeltanoFilter(MeltanoBase):
         else:
             pivot_date = fn.Date(fn.Now())
 
-        # Then add/substract the Interval days (N) provided in [+-]N[dmy]
-        interval_days = int(old_value[1:-1])
+        # Then add/substract the Interval period (N) provided in [+-]N[dmy]
+        interval_period = int(old_value[1:-1])
 
-        if interval_days == 0:
-            # If we have no interval days, we can really simplify the expression
+        if interval_period == 0:
+            # If we have no interval period, we can really simplify the expression
             if column_def.type == "date":
                 new_value = pivot_date
             elif column_def.type == "time":
@@ -694,11 +695,11 @@ class MeltanoFilter(MeltanoBase):
         else:
             # If there is an interval set, use the [dmy] to generate the interval
             if "d" in old_value:
-                interval = Interval(days=interval_days)
+                interval = Interval(days=interval_period)
             elif "m" in old_value:
-                interval = Interval(months=interval_days)
+                interval = Interval(months=interval_period)
             elif "y" in old_value:
-                interval = Interval(years=interval_days)
+                interval = Interval(years=interval_period)
 
             # End then add or substract accordingly
             if column_def.type == "date":
