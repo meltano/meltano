@@ -49,6 +49,18 @@ export function getNullDateRange() {
   return { start: null, end: null }
 }
 
+export function getRelativeOffsetFromDateRange(dateRange) {
+  const { start, end } = dateRange
+  const startMatches = getRelativeSignNumberPeriod(start)
+  const endMatches = getRelativeSignNumberPeriod(end)
+  const absStartNumber = Math.abs(startMatches.number)
+  const absEndNumber = Math.abs(endMatches.number)
+
+  // If the numbers are equal it doesn't matter which key we pick, otherwise we want the key associated with the greater value
+  const key = absStartNumber > absEndNumber ? 'start' : 'end'
+  return dateRange[key]
+}
+
 export function getRelativeSignNumberPeriod(value) {
   const match = value.match(/([+-])(\d*)([dmy])/)
   const sign = match[1]

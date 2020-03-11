@@ -5,6 +5,7 @@ import { EVENTS } from '@/components/analyze/date-range-picker/events'
 import {
   getIsRelativeLast,
   getNullDateRange,
+  getRelativeOffsetFromDateRange,
   getRelativeSignNumberPeriod,
   RELATIVE_DATE_RANGE_MODELS
 } from '@/components/analyze/date-range-picker/utils'
@@ -48,8 +49,7 @@ export default {
       return (anchor, offset) => {
         const start = this.getIsLast ? offset : anchor
         const end = this.getIsLast ? anchor : offset
-        const offsetKey = start === offset ? 'start' : 'end'
-        return { start, end, offsetKey }
+        return { start, end }
       }
     },
     getSigns() {
@@ -64,8 +64,7 @@ export default {
   watch: {
     attributePair: function(val) {
       if (val.relativeDateRange.start && val.relativeDateRange.end) {
-        const key = val.relativeDateRange.offsetKey
-        const offset = val.relativeDateRange[key]
+        const offset = getRelativeOffsetFromDateRange(val.relativeDateRange)
         this.model = getRelativeSignNumberPeriod(offset)
       }
     }
