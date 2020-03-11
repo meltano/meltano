@@ -63,11 +63,11 @@ export default {
   },
   watch: {
     attributePair: function(val) {
-      if (val.relativeDateRange.start && val.relativeDateRange.end) {
-        const offset = getRelativeOffsetFromDateRange(val.relativeDateRange)
-        this.model = getRelativeSignNumberPeriod(offset)
-      }
+      this.setModel(val.relativeDateRange)
     }
+  },
+  created() {
+    this.setModel(this.attributePair.relativeDateRange)
   },
   methods: {
     emitChangeDateRange(value) {
@@ -87,6 +87,12 @@ export default {
     onIsRelativeChange(value) {
       if (this.attributePair.isRelative !== value) {
         this.emitChangeDateRange(value)
+      }
+    },
+    setModel(dateRange) {
+      if (dateRange.start && dateRange.end) {
+        const offset = getRelativeOffsetFromDateRange(dateRange)
+        this.model = getRelativeSignNumberPeriod(offset)
       }
     }
   }
