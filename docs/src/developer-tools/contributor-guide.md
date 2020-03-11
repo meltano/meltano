@@ -288,8 +288,8 @@ meltano elt tap-gitlab target-postgres --transform only
 
 When updating the models that will appear in the UI, you can follow these steps:
 
-1. Create `table.m5o` file that defines the UI columns that will appear on the UI
-1. Update `topic.m5o` file to include the newly created model table
+1. Create [`table.m5o` file](/developer-tools/architecture.html#table) that defines the UI columns that will appear on the UI
+1. Update [`topic.m5o` file](developer-tools/architecture.html#topic) to include the newly created model table
 1. Compile model repo with ``python3 setup.py sdist`
 1. Go to project's `meltano.yml` file and replace `pip_url` with the file path to the targz file created
 1. Run `meltano install` to fetch new settings
