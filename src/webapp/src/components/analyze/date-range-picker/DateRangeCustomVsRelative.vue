@@ -5,6 +5,7 @@ import { EVENTS } from '@/components/analyze/date-range-picker/events'
 import {
   getIsRelativeLast,
   getNullDateRange,
+  getRelativeSignNumberPeriod,
   RELATIVE_DATE_RANGE_MODELS
 } from '@/components/analyze/date-range-picker/utils'
 
@@ -47,7 +48,8 @@ export default {
       return (anchor, offset) => {
         const start = this.getIsLast ? offset : anchor
         const end = this.getIsLast ? anchor : offset
-        return { start, end }
+        const offsetKey = start === offset ? 'start' : 'end'
+        return { start, end, offsetKey }
       }
     },
     getSigns() {
@@ -57,6 +59,15 @@ export default {
       const anchor = `${this.model.sign}1${this.model.period}`
       const offset = `${this.model.sign}${this.model.number}${this.model.period}`
       return this.getDateRange(anchor, offset)
+    }
+  },
+  watch: {
+    attributePair: function(val) {
+      if (val.relativeDateRange.start && val.relativeDateRange.end) {
+        const key = val.relativeDateRange.offsetKey
+        const offset = val.relativeDateRange[key]
+        this.model = getRelativeSignNumberPeriod(offset)
+      }
     }
   },
   methods: {
@@ -71,13 +82,13 @@ export default {
       const payload = { isRelative, relativeDateRange, absoluteDateRange }
       this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, payload)
     },
+    onChangeRelativeInput() {
+      this.emitChangeDateRange(true)
+    },
     onIsRelativeChange(value) {
       if (this.attributePair.isRelative !== value) {
         this.emitChangeDateRange(value)
       }
-    },
-    onChangeRelativeInput() {
-      this.emitChangeDateRange(true)
     }
   }
 }

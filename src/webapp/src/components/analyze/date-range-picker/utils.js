@@ -49,12 +49,16 @@ export function getNullDateRange() {
   return { start: null, end: null }
 }
 
-function getRelativeToAbsoluteDateString(value) {
+export function getRelativeSignNumberPeriod(value) {
   const match = value.match(/([+-])(\d*)([dmy])/)
   const sign = match[1]
   const number = match[2]
   const period = match[3]
+  return { sign, number, period }
+}
 
+function getRelativeToAbsoluteDateString(value) {
+  const { sign, number, period } = getRelativeSignNumberPeriod(value)
   const method = getIsRelativeLast(sign) ? 'subtract' : 'add'
   const absoluteMoment = moment()[method](number, period)
 
