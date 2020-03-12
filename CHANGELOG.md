@@ -3,20 +3,22 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
 
 - [!1523](https://gitlab.com/meltano/meltano/merge_requests/1523) Add support for relative date filter definitions to Meltano Filters. That means that filters over dates and times can have a `[+-]N[dmy]` format instead of a fixed date. That allows Meltano to generate a date relative to a pivot date provided by in the query definition or `NOW()`.
+- [#1830](https://gitlab.com/meltano/meltano/issues/1830) Add relative vs. absolute date ranges to date range picker of Report Builder
 
 ### Changes
+
+- [#1830](https://gitlab.com/meltano/meltano/issues/1830) Update date ranges calendars with "Today" marker for improved UX
 
 ### Fixes
 
 ### Breaks
-
 
 ## 1.24.0 - (2020-03-09)
 
@@ -32,7 +34,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1840](https://gitlab.com/meltano/meltano/-/issues/1840) Format InputDateIso8601 value as YYYY-MM-DD since a full timestamp value could represent a different date in UTC and local timezone
 - [#1842](https://gitlab.com/meltano/meltano/issues/1842) Fix empty filter attributes bug for non-join designs
-
 
 ## 1.23.2 - (2020-03-05)
 
