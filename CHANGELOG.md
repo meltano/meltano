@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.24.1 - (2020-03-12)
 
 ---
 
@@ -16,9 +29,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1830](https://gitlab.com/meltano/meltano/issues/1830) Update date ranges calendars with "Today" marker for improved UX
 
-### Fixes
-
-### Breaks
 
 ## 1.24.0 - (2020-03-09)
 
