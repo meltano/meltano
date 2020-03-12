@@ -5,9 +5,13 @@ import lodash from 'lodash'
 
 import DateRangePickerHeader from '@/components/analyze/date-range-picker/DateRangePickerHeader'
 import Dropdown from '@/components/generic/Dropdown'
+import { EVENTS } from '@/components/analyze/date-range-picker/events'
 import {
+  getAbsoluteDate,
   getDateLabel,
-  getHasValidDateRange
+  getHasValidDateRange,
+  getNullDateRange,
+  getIsRelativeDateRangeFormat
 } from '@/components/analyze/date-range-picker/utils'
 import { QUERY_ATTRIBUTE_TYPES } from '@/api/design'
 import utils from '@/utils/utils'
@@ -44,12 +48,43 @@ export default {
         const end = filters.find(
           filter => filter.expression === 'less_or_equal_than'
         )
-        const dateRange = {
-          start: start ? utils.getDateFromYYYYMMDDString(start.value) : null,
-          end: end ? utils.getDateFromYYYYMMDDString(end.value) : null
+
+        // TODO `attributePair` term refactor?
+
+        const isRelative =
+          start &&
+          getIsRelativeDateRangeFormat(start.value) &&
+          end &&
+          getIsRelativeDateRangeFormat(end.value)
+        const relativeStart = isRelative ? start.value : null
+        const relativeEnd = isRelative ? end.value : null
+        const absoluteStart = start ? getAbsoluteDate(start.value) : null
+        const absoluteEnd = end ? getAbsoluteDate(end.value) : null
+
+        const absoluteDateRange = { start: absoluteStart, end: absoluteEnd }
+        const relativeDateRange = { start: relativeStart, end: relativeEnd }
+        const priorCustomDateRange = getNullDateRange()
+
+        return {
+          attribute,
+          isRelative,
+          absoluteDateRange,
+          relativeDateRange,
+          priorCustomDateRange
         }
-        return { attribute, dateRange }
       })
+    },
+    getCalendarAttributes() {
+      return [
+        {
+          key: 'today',
+          bar: true,
+          popover: {
+            label: 'Today'
+          },
+          dates: new Date()
+        }
+      ]
     },
     getDateFilters() {
       return this.columnFilters.filter(filter =>
@@ -76,7 +111,7 @@ export default {
         this.attributePairsModel[this.attributePairInFocusIndex]
     },
     getIsSavable() {
-      const mapper = attributePair => attributePair.dateRange
+      const mapper = attributePair => attributePair.absoluteDateRange
       const initialDateRanges = this.getAttributePairsInitial.map(mapper)
       const modelDateRanges = this.attributePairsModel.map(mapper)
       return !lodash.isEqual(initialDateRanges, modelDateRanges)
@@ -98,43 +133,97 @@ export default {
     },
     getValidDateRangesInitial() {
       return this.getAttributePairsInitial.filter(attributePair =>
-        this.getHasValidDateRange(attributePair.dateRange)
+        this.getHasValidDateRange(attributePair.absoluteDateRange)
       )
     }
   },
+  created() {
+    this.$root.$on(EVENTS.CHANGE_DATE_RANGE, this.onChangeDateRange)
+  },
+  beforeDestroy() {
+    this.$root.$off(EVENTS.CHANGE_DATE_RANGE, this.onChangeDateRange)
+  },
   methods: {
     ...mapActions('designs', ['addFilter', 'removeFilter']),
+    onDayClick() {
+      if (this.getAttributePairInFocus.isRelative) {
+        this.onClearDateRange(this.getAttributePairInFocus)
+        this.$root.$emit(EVENTS.CHANGE_DATE_RANGE, {
+          isRelative: false,
+          relativeDateRange: getNullDateRange(),
+          absoluteDateRange: getNullDateRange()
+        })
+      }
+    },
     onChangeAttributePairInFocus(attributePair) {
       this.attributePairInFocusIndex = this.attributePairsModel.indexOf(
         attributePair
       )
     },
+    onChangeDateRange(payload) {
+      const attributePairInFocus = this.getAttributePairInFocus
+      const priorIsRelative = attributePairInFocus.isRelative
+      attributePairInFocus.isRelative = payload.isRelative
+      attributePairInFocus.relativeDateRange = payload.relativeDateRange
+
+      // Conditionally apply priorCustomDateRange and update absoluteDateRange if applicable
+      if (payload.isRelative) {
+        const hasPrior =
+          attributePairInFocus.priorCustomDateRange.start !== null
+        // Only apply a priorCustomDateRange update when returning to custom from relative mode and only if no prior value exists
+        if (!hasPrior && !priorIsRelative) {
+          attributePairInFocus.priorCustomDateRange = Object.assign(
+            {},
+            attributePairInFocus.absoluteDateRange
+          )
+        }
+        attributePairInFocus.absoluteDateRange = payload.absoluteDateRange
+      } else {
+        attributePairInFocus.absoluteDateRange = Object.assign(
+          {},
+          attributePairInFocus.priorCustomDateRange
+        )
+        attributePairInFocus.priorCustomDateRange = getNullDateRange()
+      }
+    },
     onClearDateRange(attributePair) {
-      attributePair.dateRange = { start: null, end: null }
+      attributePair.absoluteDateRange = getNullDateRange()
+      attributePair.priorCustomDateRange = getNullDateRange()
+      attributePair.isRelative = false
     },
     onDropdownOpen() {
       this.attributePairsModel = lodash.cloneDeep(this.getAttributePairsInitial)
     },
     saveDateRanges() {
       this.attributePairsModel.forEach(attributePair => {
-        const { attribute, dateRange } = attributePair
+        const {
+          attribute,
+          isRelative,
+          absoluteDateRange,
+          relativeDateRange
+        } = attributePair
         const partialShared = {
           attribute: attribute,
           filterType: QUERY_ATTRIBUTE_TYPES.COLUMN
         }
 
-        let startValue = dateRange.start || null
-        if (startValue) {
-          startValue = utils.formatDateStringYYYYMMDD(startValue)
-          if (attribute.type === 'time') {
-            startValue += 'T00:00:00.000Z'
+        let startValue = absoluteDateRange.start || null
+        let endValue = absoluteDateRange.end || null
+        if (isRelative) {
+          startValue = relativeDateRange.start
+          endValue = relativeDateRange.end
+        } else {
+          if (startValue) {
+            startValue = utils.formatDateStringYYYYMMDD(startValue)
+            if (attribute.type === 'time') {
+              startValue += 'T00:00:00.000Z'
+            }
           }
-        }
-        let endValue = dateRange.end || null
-        if (endValue) {
-          endValue = utils.formatDateStringYYYYMMDD(endValue)
-          if (attribute.type === 'time') {
-            endValue += 'T23:59:59.999Z'
+          if (endValue) {
+            endValue = utils.formatDateStringYYYYMMDD(endValue)
+            if (attribute.type === 'time') {
+              endValue += 'T23:59:59.999Z'
+            }
           }
         }
 
@@ -214,12 +303,14 @@ export default {
           class="dropdown-item"
         >
           <v-date-picker
-            v-model="attributePair.dateRange"
+            v-model="attributePair.absoluteDateRange"
             class="v-calendar-theme"
             mode="range"
             is-expanded
             is-inline
             :columns="2"
+            :attributes="getCalendarAttributes"
+            @dayclick="onDayClick"
           />
         </div>
       </template>
