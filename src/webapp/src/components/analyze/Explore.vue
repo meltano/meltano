@@ -103,7 +103,7 @@ export default {
           .then(() => {
             for (let modelKey in this.models) {
               const modelSpec = this.models[modelKey]
-              if (modelSpec.namespace == this.namespace) {
+              if (modelSpec.namespace === this.namespace) {
                 this.model = modelSpec.name
                 break
               }
