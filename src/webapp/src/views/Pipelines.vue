@@ -32,7 +32,6 @@ export default {
   <router-view-layout>
     <div class="container view-body is-widescreen">
       <h2 id="data" class="title">Pipelines</h2>
-      <p class="subtitle">Scheduled data collection</p>
 
       <template v-if="getHasPipelines" class="columns">
         <div class="columns">
