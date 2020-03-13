@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1867](https://gitlab.com/meltano/meltano/-/issues/1867) Make timeframe table headings more human-friendly
+
 ### Fixes
 
 - [#1848](https://gitlab.com/meltano/meltano/-/issues/1848) Fix Explore page "Report Builder" column loading when model name and model topic name do not match
