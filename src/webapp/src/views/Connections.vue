@@ -59,7 +59,6 @@ export default {
   <router-view-layout>
     <div class="container view-body is-widescreen">
       <h2 id="data" class="title">Connections</h2>
-      <p class="subtitle">Integrations and custom data connections</p>
 
       <div class="columns">
         <div class="column">
