@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1852](https://gitlab.com/meltano/meltano/-/issues/1852) Move Pipelines after Connections in navbar
+- [#1850](https://gitlab.com/meltano/meltano/-/issues/1850) Rename Connections tab "Connection" and "Pipeline" buttons to "Edit Connection", and "View Pipeline"
 
 ### Fixes
 

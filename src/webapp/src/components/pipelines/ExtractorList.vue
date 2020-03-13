@@ -32,11 +32,18 @@ export default {
     getConnectionLabel() {
       return extractorName => {
         const connectLabel = this.getHasPipelineWithExtractor(extractorName)
-          ? 'Connection'
+          ? 'Edit Connection'
           : 'Connect'
         return this.getExtractorConfigurationNeedsFixing(extractorName)
           ? 'Fix Connection'
           : connectLabel
+      }
+    },
+    getConnectionTooltip() {
+      return extractorName => {
+        return this.getHasPipelineWithExtractor(extractorName)
+          ? 'Edit the connection details for this data source'
+          : 'Install this data source and set up the connection'
       }
     },
     getConnectionStyle() {
@@ -127,14 +134,14 @@ export default {
                   data-tooltip="View the pipeline for this data source"
                   tag="button"
                   to="pipelines"
-                  >Pipeline</router-link
+                  >View Pipeline</router-link
                 >
 
                 <button
                   class="button tooltip"
                   :class="getConnectionStyle(extractor.name)"
                   :disabled="getIsRelatedPipelineRunning(extractor.name)"
-                  data-tooltip="Install and connect to this data source"
+                  :data-tooltip="getConnectionTooltip(extractor.name)"
                   @click="updateExtractorSettings(extractor)"
                 >
                   <span>{{ getConnectionLabel(extractor.name) }}</span>
