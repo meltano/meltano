@@ -25,6 +25,7 @@ export default {
     ...mapState('dashboards', ['dashboards']),
     ...mapState('plugins', ['installedPlugins']),
     ...mapState('reports', ['reports']),
+    ...mapState('repos', ['models']),
     getDesignLabel() {
       return designName =>
         this.topic
@@ -64,6 +65,7 @@ export default {
     ...mapActions('dashboards', ['getDashboards']),
     ...mapActions('plugins', ['getInstalledPlugins']),
     ...mapActions('reports', ['getReports']),
+    ...mapActions('repos', ['getModels']),
     goToDashboard(dashboard) {
       this.$router.push({ name: 'dashboard', params: dashboard })
     },
@@ -92,17 +94,25 @@ export default {
         const extractorName = this.$route.params.extractor
         const extractor = this.getInstalledPlugin('extractors', extractorName)
         const namespace = extractor.namespace
-        const model = this.installedPlugins.models.find(
+        const modelPlugin = this.installedPlugins.models.find(
           plugin => plugin.namespace === namespace
         )
+        this.namespace = modelPlugin.name
 
-        this.namespace = model.name
-        this.model = model.name.replace('model-', '')
-
-        designApi
-          .getTopic(this.namespace, this.model)
+        this.getModels()
+          .then(() => {
+            for (let modelKey in this.models) {
+              const modelSpec = this.models[modelKey]
+              if (modelSpec.namespace == this.namespace) {
+                this.model = modelSpec.name
+                break
+              }
+            }
+          })
+          .then(() => designApi.getTopic(this.namespace, this.model))
           .then(response => (this.topic = response.data))
           .catch(this.$error.handle)
+
         this.getDashboards()
           .then(() => (this.hasLoadedDashboards = true))
           .catch(this.$error.handle)
