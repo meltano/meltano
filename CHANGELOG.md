@@ -4,7 +4,20 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.25.0 - (2020-03-16)
 ---
 
 ### New
@@ -21,8 +34,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1848](https://gitlab.com/meltano/meltano/-/issues/1848) Fix Explore page "Report Builder" column loading when model name and model topic name do not match
-
-### Breaks
 
 
 ## 1.24.1 - (2020-03-12)
