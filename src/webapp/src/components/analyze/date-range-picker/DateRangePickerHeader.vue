@@ -29,7 +29,14 @@ export default {
       return targetAttributePair => {
         const attribute = targetAttributePair.attribute
         const source = this.getSourceTableByAttribute(attribute)
-        return `${source.label} - ${attribute.label}`
+        let label = `${source.label} - ${attribute.label}`
+
+        if (targetAttributePair.absoluteDateRange.start !== null) {
+          const dateLabel = this.getDateLabel(targetAttributePair)
+          label += ` (${dateLabel})`
+        }
+
+        return label
       }
     },
     getSourceTableByAttribute() {
