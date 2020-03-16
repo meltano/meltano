@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1843](https://gitlab.com/meltano/meltano/issues/1843) Update the Google Ads Extractor selected attributes definition to also extract the Ad Network and Device segments for the Ads Performance Reports.
+
 ### Changes
 
 - [#1852](https://gitlab.com/meltano/meltano/-/issues/1852) Move Pipelines after Connections in navbar

@@ -104,6 +104,8 @@ extractors:
       - KEYWORDS_PERFORMANCE_REPORT.adGroupID
       - KEYWORDS_PERFORMANCE_REPORT.adGroupState
       - KEYWORDS_PERFORMANCE_REPORT.day
+      - KEYWORDS_PERFORMANCE_REPORT.network
+      - KEYWORDS_PERFORMANCE_REPORT.device
       - KEYWORDS_PERFORMANCE_REPORT.clicks
       - KEYWORDS_PERFORMANCE_REPORT.cost
       - KEYWORDS_PERFORMANCE_REPORT.impressions
@@ -138,13 +140,7 @@ extractors:
       - KEYWORDS_PERFORMANCE_REPORT.avgCPE
       - KEYWORDS_PERFORMANCE_REPORT.avgCPM
       - KEYWORDS_PERFORMANCE_REPORT.avgCPV
-      - KEYWORDS_PERFORMANCE_REPORT.pagesSession
       - KEYWORDS_PERFORMANCE_REPORT.avgPosition
-      - KEYWORDS_PERFORMANCE_REPORT.avgSessionDurationSeconds
-      - KEYWORDS_PERFORMANCE_REPORT.bounceRate
-      - KEYWORDS_PERFORMANCE_REPORT.clickAssistedConv
-      - KEYWORDS_PERFORMANCE_REPORT.clickAssistedConvLastClickConv
-      - KEYWORDS_PERFORMANCE_REPORT.clickAssistedConvValue
       - KEYWORDS_PERFORMANCE_REPORT.convRate
       - KEYWORDS_PERFORMANCE_REPORT.totalConvValue
       - KEYWORDS_PERFORMANCE_REPORT.costAllConv
@@ -155,12 +151,8 @@ extractors:
       - KEYWORDS_PERFORMANCE_REPORT.conversionsCurrentModel
       - KEYWORDS_PERFORMANCE_REPORT.convValueCurrentModel
       - KEYWORDS_PERFORMANCE_REPORT.engagementRate
-      - KEYWORDS_PERFORMANCE_REPORT.imprAssistedConv
-      - KEYWORDS_PERFORMANCE_REPORT.imprAssistedConvLastClickConv
-      - KEYWORDS_PERFORMANCE_REPORT.imprAssistedConvValue
       - KEYWORDS_PERFORMANCE_REPORT.interactionRate
       - KEYWORDS_PERFORMANCE_REPORT.interactionTypes
-      - KEYWORDS_PERFORMANCE_REPORT.newSessions
       - KEYWORDS_PERFORMANCE_REPORT.imprTop
       - KEYWORDS_PERFORMANCE_REPORT.valueAllConv
       - KEYWORDS_PERFORMANCE_REPORT.valueConv
@@ -171,10 +163,6 @@ extractors:
       - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo75
       - KEYWORDS_PERFORMANCE_REPORT.viewRate
       - KEYWORDS_PERFORMANCE_REPORT.viewThroughConv
-      - KEYWORDS_PERFORMANCE_REPORT.adRelevanceHist
-      - KEYWORDS_PERFORMANCE_REPORT.landingPageExperienceHist
-      - KEYWORDS_PERFORMANCE_REPORT.qualScoreHist
-      - KEYWORDS_PERFORMANCE_REPORT.expectedClickthroughRateHist
       - KEYWORDS_PERFORMANCE_REPORT.searchAbsTopIS
       - KEYWORDS_PERFORMANCE_REPORT.searchLostAbsTopISBudget
       - KEYWORDS_PERFORMANCE_REPORT.searchLostTopISBudget
@@ -196,6 +184,8 @@ extractors:
       - AD_PERFORMANCE_REPORT.adGroupID
       - AD_PERFORMANCE_REPORT.adGroupState
       - AD_PERFORMANCE_REPORT.day
+      - AD_PERFORMANCE_REPORT.network
+      - AD_PERFORMANCE_REPORT.device
       - AD_PERFORMANCE_REPORT.clicks
       - AD_PERFORMANCE_REPORT.cost
       - AD_PERFORMANCE_REPORT.impressions
@@ -254,13 +244,7 @@ extractors:
       - AD_PERFORMANCE_REPORT.avgCPE
       - AD_PERFORMANCE_REPORT.avgCPM
       - AD_PERFORMANCE_REPORT.avgCPV
-      - AD_PERFORMANCE_REPORT.pagesSession
       - AD_PERFORMANCE_REPORT.avgPosition
-      - AD_PERFORMANCE_REPORT.avgSessionDurationSeconds
-      - AD_PERFORMANCE_REPORT.bounceRate
-      - AD_PERFORMANCE_REPORT.clickAssistedConv
-      - AD_PERFORMANCE_REPORT.clickAssistedConvLastClickConv
-      - AD_PERFORMANCE_REPORT.clickAssistedConvValue
       - AD_PERFORMANCE_REPORT.convRate
       - AD_PERFORMANCE_REPORT.totalConvValue
       - AD_PERFORMANCE_REPORT.costAllConv
@@ -271,12 +255,8 @@ extractors:
       - AD_PERFORMANCE_REPORT.conversionsCurrentModel
       - AD_PERFORMANCE_REPORT.convValueCurrentModel
       - AD_PERFORMANCE_REPORT.engagementRate
-      - AD_PERFORMANCE_REPORT.imprAssistedConv
-      - AD_PERFORMANCE_REPORT.imprAssistedConvLastClickConv
-      - AD_PERFORMANCE_REPORT.imprAssistedConvValue
       - AD_PERFORMANCE_REPORT.interactionRate
       - AD_PERFORMANCE_REPORT.interactionTypes
-      - AD_PERFORMANCE_REPORT.newSessions
       - AD_PERFORMANCE_REPORT.imprTop
       - AD_PERFORMANCE_REPORT.valueAllConv
       - AD_PERFORMANCE_REPORT.valueConv
@@ -343,12 +323,16 @@ extractors:
             - adGroupID
             - keywordID
             - day
+            - network
+            - device
           AD_PERFORMANCE_REPORT:
             - customerID
             - campaignID
             - adGroupID
             - adID
             - day
+            - network
+            - device
         kind: hidden
         description: Primary Keys for the selected Entities (Streams)
   - name: tap-google-analytics
