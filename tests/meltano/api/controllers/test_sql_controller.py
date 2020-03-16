@@ -148,13 +148,7 @@ class TestSqlController:
         # tests label
         assertListEquivalence(
             [attr["attribute_label"] for attr in res.json["query_attributes"]],
-            [
-                "Region Name",
-                "Forecast",
-                "Week (entry.from)",
-                "Percent (%)",
-                "Fuel Type",
-            ],
+            ["Region Name", "Forecast", "From: Week", "Percent (%)", "Fuel Type"],
         )
 
         # tests column name
