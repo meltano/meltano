@@ -129,7 +129,8 @@ export default {
           rangeLabel += ` (+${validDateRangeLength - 1})`
         }
       }
-      return hasValidDateRanges ? rangeLabel : 'Date Ranges'
+      const fallbackLabel = `Date Range${this.attributes.length > 1 ? 's' : ''}`
+      return hasValidDateRanges ? rangeLabel : fallbackLabel
     },
     getValidDateRangesInitial() {
       return this.getAttributePairsInitial.filter(attributePair =>

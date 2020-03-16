@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1799](https://gitlab.com/meltano/meltano/issues/1799) Update "Date Range(s)" button label to account for pluralization
+
 ### Fixes
 
 ### Breaks
