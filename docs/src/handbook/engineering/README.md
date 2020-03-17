@@ -59,26 +59,6 @@ Every Monday, we do a minor release (1.x) that is accompanied by a blog post.
 
 Additionally, we do a patch (1.x.y) or minor release every Thursday, to not leave users waiting to see improvements longer than necessary.
 
-#### Release schedule
-
-Both releases are owned by engineers on a rotating schedule:
-
-| Release Week | Release Owner |
-| ------------ | ------------- |
-| 2020-01-20   | Yannis        |
-| 2020-01-27   | Ben           |
-| 2020-02-03   | Derek         |
-| 2020-02-10   | Micael        |
-| 2020-02-17   | Yannis        |
-| 2020-02-24   | Derek         |
-| 2020-03-02   | Douwe         |
-| 2020-03-09   | Micael        |
-| 2020-03-16   | Yannis        |
-| 2020-03-23   | Derek         |
-| 2020-03-30   | Micael        |
-
-If you are unable to cover an assigned week, please find someone to cover for you and submit an MR to this page with the new owner.
-
 ### Versioning
 
 Meltano uses [semver](https://semver.org/) as its version number scheme.
@@ -183,22 +163,9 @@ Then, head to the DigitalOcean vendor portal at <https://marketplace.digitalocea
 
 Both https://www.meltano.com and https://meltano.meltanodata.com are automatically monitored using Pingdom, with notifications of downtime posted to:
 - the #meltano Slack channel,
-- Zendesk, through our `hello@` email address,
-- Douwe, by email and SMS, and
-- Danielle, by email.
+- Zendesk, through our `hello@` email address, and
+- Douwe, by email and SMS.
 
-Other `*.meltanodata.com` instances are not currently monitored. 
+Other `*.meltanodata.com` instances are not currently monitored.
 
 When any instance managed by us is reported to be down, through Pingdom or any other means, resolving this becomes the team's top priority.
-
-If anyone is online at the time of the report, they can attempt to investigate and resolve the problem themselves. If they are out of their depth, get blocked, or if no progress is made after 30 minutes, they are expected to escalate the issue to one of the following people:
-
-- During the North American day: Micael
-- During the European day: Yannis or Douwe
-- During any other time, or if no one else is available: Douwe
-
-Phone numbers can be found in Slack profiles, and everyone can be reached by WhatsApp message or call.
-
-If the person being escalated to does not respond within 15 minutes, or if they cannot be available to help reasonably quickly (within 30 min or so), someone who would not ordinarily be available at this time can be reached out to by WhatsApp message.
-
-**If all else fails, any issue can always be escalated to Douwe.**
