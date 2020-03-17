@@ -198,20 +198,36 @@ export default {
       attributePair.priorCustomDateRange = getNullDateRange()
       attributePair.isRelative = false
     },
-    onDropdownOpen() {
+    onDropdownOpen(payload) {
       this.attributePairsModel = lodash.cloneDeep(this.getAttributePairsInitial)
-      if (!this.hasSetAttributePairInFocusIndex) {
+
+      // Set the target index based on an optional payload or first date range match condition
+      if (payload) {
+        this.setInitialAttributePairInFocusIndex(payload)
+      } else if (!this.hasSetAttributePairInFocusIndex) {
         this.setInitialAttributePairInFocusIndex()
       }
     },
-    setInitialAttributePairInFocusIndex() {
-      const firstMatch = this.attributePairsModel.find(
-        attributePair => attributePair.absoluteDateRange.start !== null
-      )
-      this.attributePairInFocusIndex = firstMatch
-        ? this.attributePairsModel.indexOf(firstMatch)
-        : 0
+    setInitialAttributePairInFocusIndex(payload) {
+      let match
+      let idx
+      if (payload) {
+        match = this.attributePairsModel.find(attributePair => {
+          const attribute = attributePair.attribute
+          return (
+            attribute.sourceName === payload.sourceName &&
+            attribute.name === payload.name
+          )
+        })
+        idx = this.attributePairsModel.indexOf(match)
+      } else {
+        match = this.attributePairsModel.find(
+          attributePair => attributePair.absoluteDateRange.start !== null
+        )
+        idx = match ? this.attributePairsModel.indexOf(match) : 0
+      }
 
+      this.attributePairInFocusIndex = idx
       this.hasSetAttributePairInFocusIndex = true
     },
     saveDateRanges() {

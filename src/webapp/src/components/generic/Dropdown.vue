@@ -89,9 +89,9 @@ export default {
       this.isOpen = false
       this.$emit('dropdown:close')
     },
-    open() {
+    open(payload) {
       this.isOpen = true
-      this.$emit('dropdown:open')
+      this.$emit('dropdown:open', payload)
     },
     toggleDropdown() {
       this.isOpen ? this.close() : this.open()
