@@ -22,6 +22,9 @@ export default {
     getHasValidDateRange() {
       return getHasValidDateRange
     },
+    getHasMultipleDateRanges() {
+      return this.attributePairsModel.length > 1
+    },
     getLabel() {
       return targetAttributePair => {
         const attribute = targetAttributePair.attribute
@@ -72,7 +75,7 @@ export default {
     <div class="mb1r">
       <div class="field">
         <div class="control">
-          <span class="select is-fullwidth">
+          <span v-if="getHasMultipleDateRanges" class="select is-fullwidth">
             <select
               :value="getValue(attributePair)"
               :class="{
@@ -89,6 +92,7 @@ export default {
               >
             </select>
           </span>
+          <span v-else>{{ getLabel(attributePairsModel[0]) }}</span>
         </div>
       </div>
     </div>
