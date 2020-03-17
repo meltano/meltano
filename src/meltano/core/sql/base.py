@@ -412,61 +412,22 @@ class MeltanoTimeframe(MeltanoBase):
         # Used for manually setting the metadata attributes
         #  {name, periods:[], label, description, sql}
         self._attributes = {}
+        self._periods = definition.get("periods", [])
 
         super().__init__(definition)
+
+    def periods(self) -> List[MeltanoBase]:
+        return [
+            MeltanoTimeframePeriod(definition=definition, timeframe=self)
+            for definition in self._periods
+        ]
 
     def column_name(self) -> str:
         (table, column) = self.sql.split(".")
         return column
 
-    def alias(self, period) -> str:
-        return self.period_alias(period)
-
-    def period_column_name(self, period) -> str:
-        period_name = period.get("name", None)
-
-        if not period_name:
-            raise ParseError(f"Requested period {period} has no name.")
-
-        return f"{self.column_name()}.{period_name}"
-
-    def period_alias(self, period) -> str:
-        return f"{self.table.sql_table_name}.{self.period_column_name(period)}"
-
-    def period_label(self, period) -> str:
-        label = period.get("label", period.get("name", None))
-
-        if not label:
-            raise ParseError(f"Requested period {period} has no name.")
-
-        return f"{self.label}: {label}"
-
-    def period_sql(
-        self, period, base_table: str = None, pika_table=None
-    ) -> fn.Coalesce:
-        """
-        Return the period as a fully qualified SQL clause defined as a pypika Extract clause
-
-        The base_table defines whether the Extract is evaluated over its
-          own table or an intermediary table (e.g. resulting from a with clause)
-
-        Check MeltanoAggregate.qualified_sql() for more details
-        """
-        if pika_table:
-            field = Field(self.column_name(), table=pika_table)
-        elif base_table and base_table != self.table.sql_table_name:
-            sql = re.sub(
-                "\{\{TABLE\}\}",
-                self.table.sql_table_name,
-                self.sql,
-                flags=re.IGNORECASE,
-            )
-            field = Field(sql, table=Table(base_table))
-        else:
-            table = Table(self.table.sql_table_name)
-            field = Field(self.column_name(), table=table)
-
-        return fn.Extract(period["part"], field, alias=self.period_alias(period))
+    def alias(self) -> str:
+        return f"{self.table.sql_table_name}.{self.column_name()}"
 
     def copy_metadata(self, other_timeframe, requested_periods=None) -> None:
         """
@@ -480,15 +441,18 @@ class MeltanoTimeframe(MeltanoBase):
 
         # Careful cause requested periods could be []
         if requested_periods is not None:
-            self.periods = [
+            self._periods = [
                 period
-                for period in other_timeframe.periods
                 for request in requested_periods
-                if (period["label"] == request["label"])
-                and request.get("selected", True)
+                for period in other_timeframe._periods
+                if (
+                    (period["label"] == request["label"])
+                    if "label" in request
+                    else (period["name"] == request["name"])
+                )
             ]
         else:
-            self.periods = other_timeframe.periods
+            self._periods = other_timeframe._periods
 
         self.label = other_timeframe.label
         self.description = other_timeframe.description
@@ -501,10 +465,80 @@ class MeltanoTimeframe(MeltanoBase):
             return super().__getattr__(attr)
 
     def __setattr__(self, name, value):
-        if name in ["name", "periods", "label", "description", "sql"]:
+        if name in ["name", "label", "description", "sql"]:
             self._attributes[name] = value
         else:
             super(MeltanoTimeframe, self).__setattr__(name, value)
+
+
+class MeltanoTimeframePeriod(MeltanoBase):
+    """
+    An internal representation of a Timeframe period defined in a Table.
+
+    It provides access to the metada for the Timeframe period:
+      {name, label, part}
+    """
+
+    def __init__(self, timeframe: MeltanoTimeframe, definition: Dict = {}) -> None:
+        self.timeframe = timeframe
+        self.table = timeframe.table
+
+        # Used for manually setting the metadata attributes
+        #  {name, label, part}
+        self._attributes = {}
+
+        super().__init__(definition)
+
+    def column_name(self) -> str:
+        return f"{self.timeframe.column_name()}.{self.name}"
+
+    def alias(self) -> str:
+        return f"{self.timeframe.alias()}.{self.name}"
+
+    def attribute_label(self) -> str:
+        label = self.label or self.name
+
+        if not label:
+            raise ParseError(f"Requested period {period} has no name.")
+
+        return f"{self.timeframe.label}: {label}"
+
+    def qualified_sql(self, base_table: str = None, pika_table=None) -> fn.Coalesce:
+        """
+        Return the period as a fully qualified SQL clause defined as a pypika Extract clause
+
+        The base_table defines whether the Extract is evaluated over its
+          own table or an intermediary table (e.g. resulting from a with clause)
+
+        Check MeltanoAggregate.qualified_sql() for more details
+        """
+        if pika_table:
+            field = Field(self.timeframe.column_name(), table=pika_table)
+        elif base_table and base_table != self.table.sql_table_name:
+            sql = re.sub(
+                "\{\{TABLE\}\}",
+                self.table.sql_table_name,
+                self.timeframe.sql,
+                flags=re.IGNORECASE,
+            )
+            field = Field(sql, table=Table(base_table))
+        else:
+            table = Table(self.table.sql_table_name)
+            field = Field(self.timeframe.column_name(), table=table)
+
+        return fn.Extract(self.part, field, alias=self.alias())
+
+    def __getattr__(self, attr: str):
+        try:
+            return self._attributes[attr]
+        except KeyError:
+            return super().__getattr__(attr)
+
+    def __setattr__(self, name, value):
+        if name in ["name", "label", "part"]:
+            self._attributes[name] = value
+        else:
+            super(MeltanoTimeframePeriod, self).__setattr__(name, value)
 
 
 class MeltanoJoin(MeltanoBase):
@@ -1180,22 +1214,20 @@ class MeltanoQuery(MeltanoBase):
                 where.extend(matching_criteria)
 
             # Add the timeframe columns in the SELECT clause and as group_by attributes
-            for t in table.timeframes():
-                for period in t.periods:
-                    select.append(t.period_sql(period, pika_table=pika_table))
-                    group_by_attributes.append(Field(t.period_alias(period)))
+            for tp in table.timeframe_periods():
+                select.append(tp.qualified_sql(pika_table=pika_table))
+                group_by_attributes.append(Field(tp.alias()))
 
-                    query_attributes.append(
-                        {
-                            "key": t.alias(period),
-                            "table_name": table.name,
-                            "source_name": table.find_source_name(),
-                            "attribute_name": t.period_column_name(period),
-                            "attribute_label": t.period_label(period),
-                            "attribute_type": t.type,
-                            "attribute_class": "timeframes",
-                        }
-                    )
+                query_attributes.append(
+                    {
+                        "key": tp.alias(),
+                        "table_name": table.name,
+                        "source_name": table.find_source_name(),
+                        "attribute_name": tp.column_name(),
+                        "attribute_label": tp.attribute_label(),
+                        "attribute_type": tp.type,
+                    }
+                )
 
             # Generate the Aggregate Clauses
             for a in table.aggregates():
@@ -1360,22 +1392,20 @@ class MeltanoQuery(MeltanoBase):
                 )
                 aggregate_columns_selected.add(a.column_name())
 
-            for t in table.timeframes():
-                for period in t.periods:
-                    select.append(t.period_sql(period, pika_table=pika_table))
-                    group_by_attributes.append(t.period_alias(period))
+            for tp in table.timeframe_periods():
+                select.append(tp.qualified_sql(pika_table=pika_table))
+                group_by_attributes.append(tp.alias())
 
-                    query_attributes.append(
-                        {
-                            "key": t.alias(period),
-                            "table_name": table.name,
-                            "source_name": table.find_source_name(),
-                            "attribute_name": period["name"],
-                            "attribute_label": t.period_label(period),
-                            "attribute_type": t.type,
-                            "attribute_class": "timeframes",
-                        }
-                    )
+                query_attributes.append(
+                    {
+                        "key": tp.alias(),
+                        "table_name": table.name,
+                        "source_name": table.find_source_name(),
+                        "attribute_name": tp.column_name(),
+                        "attribute_label": tp.attribute_label(),
+                        "attribute_type": tp.type,
+                    }
+                )
 
         base_join_query = base_join_query.select(*select)
 
