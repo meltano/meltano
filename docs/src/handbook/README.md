@@ -16,12 +16,7 @@ As Meltano is part of [GitLab](https://about.gitlab.com/), those parts of the [G
 
 ## Team
 
-- [Danielle](https://about.gitlab.com/company/team/#dmor) - General Manager
-- [Douwe](https://about.gitlab.com/company/team/#DouweM) - Engineering Lead
-- [Micaël](https://about.gitlab.com/company/team/#mbergeron) - Sr. Backend Engineer
-- [Yannis](https://about.gitlab.com/company/team/#iroussos) - Sr. Backend Engineer
-- [Derek](https://about.gitlab.com/company/team/#derek-knox) - Sr. Frontend Engineer
-- [Ben](https://about.gitlab.com/company/team/#bencodezen) - Sr. Frontend Engineer
+- [Douwe](https://about.gitlab.com/company/team/#DouweM) - Lead
 
 ## Customer Support
 
@@ -33,7 +28,7 @@ Login info for each member of the Meltano team has been sent out, and the master
 
 #### Responsible Disclosure of Security Vulnerabilities
 
-Emails to `security@meltano.com` also forward to our Zendesk inbox, and are automatically assigned to the Security group which consists of Danielle, Douwe, Micael, and Yannis. As documented in our [Responsible Disclosure Policy](/docs/responsible-disclosure.md), we will acknowledge receipt of a vulnerability report the next business day and strive to send the reporter regular updates about our progress.
+Emails to `security@meltano.com` also forward to our Zendesk inbox, and are automatically assigned to the Security group. As documented in our [Responsible Disclosure Policy](/docs/responsible-disclosure.md), we will acknowledge receipt of a vulnerability report the next business day and strive to send the reporter regular updates about our progress.
 
 ### Live Chat powered by Intercom.io
 
