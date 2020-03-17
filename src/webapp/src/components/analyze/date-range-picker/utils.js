@@ -24,7 +24,7 @@ export function getAbsoluteDate(value) {
 }
 
 export function getDateLabel(attributePair) {
-  return this.getHasValidDateRange(attributePair.absoluteDateRange)
+  return getHasValidDateRange(attributePair.absoluteDateRange)
     ? `${utils.formatDateStringYYYYMMDD(
         attributePair.absoluteDateRange.start
       )} - ${utils.formatDateStringYYYYMMDD(

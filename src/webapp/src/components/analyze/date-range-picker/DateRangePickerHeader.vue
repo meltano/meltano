@@ -19,9 +19,6 @@ export default {
   },
   computed: {
     ...mapGetters('designs', ['getTableSources']),
-    getDateLabel() {
-      return getDateLabel
-    },
     getHasValidDateRange() {
       return getHasValidDateRange
     },
@@ -32,7 +29,7 @@ export default {
         let label = `${source.label} - ${attribute.label}`
 
         if (targetAttributePair.absoluteDateRange.start !== null) {
-          const dateLabel = this.getDateLabel(targetAttributePair)
+          const dateLabel = getDateLabel(targetAttributePair)
           label += ` (${dateLabel})`
         }
 
@@ -103,13 +100,6 @@ export default {
 
       <div class="column">
         <div class="is-flex is-vcentered is-pulled-right">
-          <span
-            class="is-size-7"
-            :class="{
-              'mr-05r': getHasValidDateRange(attributePair.absoluteDateRange)
-            }"
-            >{{ getDateLabel(attributePair) }}</span
-          >
           <button
             v-if="getHasValidDateRange(attributePair.absoluteDateRange)"
             class="button is-small"

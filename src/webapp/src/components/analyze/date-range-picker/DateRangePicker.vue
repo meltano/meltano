@@ -116,6 +116,9 @@ export default {
       const modelDateRanges = this.attributePairsModel.map(mapper)
       return !lodash.isEqual(initialDateRanges, modelDateRanges)
     },
+    getHasMultipleDateRanges() {
+      return this.attributes.length > 1
+    },
     getKey() {
       return utils.key
     },
@@ -129,7 +132,9 @@ export default {
           rangeLabel += ` (+${validDateRangeLength - 1})`
         }
       }
-      const fallbackLabel = `Date Range${this.attributes.length > 1 ? 's' : ''}`
+      const fallbackLabel = `Date Range${
+        this.getHasMultipleDateRanges ? 's' : ''
+      }`
       return hasValidDateRanges ? rangeLabel : fallbackLabel
     },
     getValidDateRangesInitial() {
