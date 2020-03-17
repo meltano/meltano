@@ -200,17 +200,12 @@ export default {
     },
     onDropdownOpen(payload) {
       this.attributePairsModel = lodash.cloneDeep(this.getAttributePairsInitial)
-
-      // Set the target index based on an optional payload or first date range match condition
-      if (payload) {
-        this.setInitialAttributePairInFocusIndex(payload)
-      } else if (!this.hasSetAttributePairInFocusIndex) {
-        this.setInitialAttributePairInFocusIndex()
-      }
+      this.setInitialAttributePairInFocusIndex(payload)
     },
     setInitialAttributePairInFocusIndex(payload) {
       let match
       let idx
+      // Set the target index based on an optional and payload or first date range match condition
       if (payload) {
         match = this.attributePairsModel.find(attributePair => {
           const attribute = attributePair.attribute
@@ -219,16 +214,14 @@ export default {
             attribute.name === payload.name
           )
         })
-        idx = this.attributePairsModel.indexOf(match)
-      } else {
+      } else if (!this.hasSetAttributePairInFocusIndex) {
         match = this.attributePairsModel.find(
           attributePair => attributePair.absoluteDateRange.start !== null
         )
-        idx = match ? this.attributePairsModel.indexOf(match) : 0
+        this.hasSetAttributePairInFocusIndex = true
       }
-
+      idx = match ? this.attributePairsModel.indexOf(match) : 0
       this.attributePairInFocusIndex = idx
-      this.hasSetAttributePairInFocusIndex = true
     },
     saveDateRanges() {
       this.attributePairsModel.forEach(attributePair => {
