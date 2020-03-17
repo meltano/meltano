@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1799](https://gitlab.com/meltano/meltano/issues/1799) Update "Date Range(s)" button label to account for pluralization
+- [#1799](https://gitlab.com/meltano/meltano/issues/1799) Fallback to inline text and only display the date range `<select>` if there are two or more date ranges to filter on
+- [#1799](https://gitlab.com/meltano/meltano/issues/1799) Update date range picker to initialize at the first attribute with a valid date range
 
 ### Fixes
 

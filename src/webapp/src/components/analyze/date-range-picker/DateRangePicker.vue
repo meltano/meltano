@@ -28,7 +28,8 @@ export default {
   },
   data: () => ({
     attributePairsModel: [],
-    attributePairInFocusIndex: 0
+    attributePairInFocusIndex: 0,
+    hasSetAttributePairInFocusIndex: false
   }),
   computed: {
     ...mapGetters('designs', [
@@ -199,6 +200,19 @@ export default {
     },
     onDropdownOpen() {
       this.attributePairsModel = lodash.cloneDeep(this.getAttributePairsInitial)
+      if (!this.hasSetAttributePairInFocusIndex) {
+        this.setInitialAttributePairInFocusIndex()
+      }
+    },
+    setInitialAttributePairInFocusIndex() {
+      const firstMatch = this.attributePairsModel.find(
+        attributePair => attributePair.absoluteDateRange.start !== null
+      )
+      this.attributePairInFocusIndex = firstMatch
+        ? this.attributePairsModel.indexOf(firstMatch)
+        : 0
+
+      this.hasSetAttributePairInFocusIndex = true
     },
     saveDateRanges() {
       this.attributePairsModel.forEach(attributePair => {
