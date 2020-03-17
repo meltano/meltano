@@ -205,7 +205,7 @@ export default {
     setInitialAttributePairInFocusIndex(payload) {
       let match
       let idx
-      // Set the target index based on an optional and payload or first date range match condition
+      // Set the target index based on an optional payload or first date range match condition or 0 index fallback
       if (payload) {
         match = this.attributePairsModel.find(attributePair => {
           const attribute = attributePair.attribute
