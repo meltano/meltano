@@ -441,12 +441,13 @@ const actions = {
       root: true
     })
 
-    return designApi
+    const uponGetDesign = designApi
       .index(namespace, model, design)
       .then(response => {
         commit('setDesign', response.data)
       })
-      .then(uponGetReports)
+
+    return Promise.all([uponGetDesign, uponGetReports])
       .then(() => {
         if (slug) {
           const reportMatch = rootGetters['reports/getReportBySlug']({
