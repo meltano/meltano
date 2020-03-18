@@ -3,14 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
-
 ## Unreleased
+
 ---
 
 ### New
 
+- [#1799](https://gitlab.com/meltano/meltano/issues/1799) Improve date range UX by displaying the date range associated with each attribute in the `<select>` (previously the user had to manually check each one-by-one to see if it had an associated date range filter)
+
 ### Changes
+
+- [#1799](https://gitlab.com/meltano/meltano/issues/1799) Update "Date Range(s)" button label to account for pluralization
+- [#1799](https://gitlab.com/meltano/meltano/issues/1799) Fallback to inline text and only display the date range `<select>` if there are two or more date ranges to filter on
+- [#1799](https://gitlab.com/meltano/meltano/issues/1799) Update date range picker to initialize at the first attribute with a valid date range
+- [#1799](https://gitlab.com/meltano/meltano/issues/1799) Update the Report Builder's "jump to date range dropdown" buttons (small calendar icon button associated with the left pane's attribute items) to automatically focus the date range that's associated
 
 ### Fixes
 
@@ -18,8 +24,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Breaks
 
-
 ## 1.25.0 - (2020-03-16)
+
 ---
 
 ### New
@@ -37,7 +43,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1848](https://gitlab.com/meltano/meltano/-/issues/1848) Fix Explore page "Report Builder" column loading when model name and model topic name do not match
 
-
 ## 1.24.1 - (2020-03-12)
 
 ---
@@ -50,7 +55,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1830](https://gitlab.com/meltano/meltano/issues/1830) Update date ranges calendars with "Today" marker for improved UX
-
 
 ## 1.24.0 - (2020-03-09)
 
