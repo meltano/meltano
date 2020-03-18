@@ -84,7 +84,7 @@ const helpers = {
             .filter(selected)
             .map(({ name, periods }) => ({
               name,
-              periods: periods.filter(selected)
+              periods: periods.filter(selected).map(({ name }) => ({ name }))
             }))
             .filter(tf => tf.periods.length)
         }
@@ -97,9 +97,9 @@ const helpers = {
     // in the ma_file_parser to set proper defaults
     // if user's exclude certain properties in their models
     const timeframes = (baseTable.timeframes || [])
-      .map(tf => ({
-        name: tf.name,
-        periods: tf.periods.filter(selected)
+      .map(({ name, periods }) => ({
+        name: name,
+        periods: periods.filter(selected).map(({ name }) => ({ name }))
       }))
       .filter(tf => tf.periods.length)
 
