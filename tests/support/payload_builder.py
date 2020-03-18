@@ -3,6 +3,7 @@ class PayloadBuilder:
         self._name = source_name
         self._columns = set()
         self._aggregates = set()
+        self._timeframes = []
         self._joins = {}
         self._column_filters = []
         self._aggregate_filters = []
@@ -28,6 +29,14 @@ class PayloadBuilder:
             self.join(join).aggregates(*aggregates)
         else:
             self._aggregates.update(aggregates)
+
+        return self
+
+    def timeframes(self, *timeframes, join=None):
+        if join:
+            self.join(join).timeframes(*timeframes)
+        else:
+            self._timeframes.extend(timeframes)
 
         return self
 
@@ -95,7 +104,7 @@ class PayloadBuilder:
             "name": self._name,
             "columns": list(self._columns),
             "aggregates": list(self._aggregates),
-            "timeframes": [],
+            "timeframes": self._timeframes,
             "joins": [join.as_join() for join in self._joins.values()],
             "order": self._order_by_clauses,
             "limit": "50",

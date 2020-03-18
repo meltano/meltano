@@ -204,25 +204,6 @@ const getters = {
       attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.TIME
   },
 
-  getOrderableAttributesIndex(state, getters) {
-    const attributes = getters.getAttributes()
-
-    let attributesIndex = {}
-    attributes.forEach(attribute => {
-      if (
-        !getters.getIsOrderableAttribute({ attributeClass: attribute.class })
-      ) {
-        return
-      }
-
-      attributesIndex[
-        helpers.buildKey(attribute.sourceName, attribute.name)
-      ] = attribute
-    })
-
-    return attributesIndex
-  },
-
   getFilters(state) {
     return attribute =>
       state.filters.filter(filter => filter.attribute.key === attribute.key)
@@ -268,12 +249,6 @@ const getters = {
 
   getIsAttributeInFilters(_, getters) {
     return attribute => getters.getFilters(attribute).length > 0
-  },
-
-  // Timeframes are not sortable
-  // https://gitlab.com/meltano/meltano/issues/1188
-  getIsOrderableAttribute() {
-    return queryAttribute => queryAttribute.attributeClass != 'timeframes'
   },
 
   getIsOrderableAttributeAscending() {

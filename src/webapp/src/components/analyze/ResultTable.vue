@@ -26,7 +26,6 @@ export default {
     ...mapGetters('designs', [
       'getAttributes',
       'getFormattedValue',
-      'getIsOrderableAttribute',
       'hasResults',
       'isColumnSelectedAggregate'
     ]),
@@ -61,10 +60,6 @@ export default {
   methods: {
     ...mapActions('designs', ['updateSortAttribute']),
     handleHeaderClick(queryAttribute) {
-      if (!this.getIsOrderableAttribute(queryAttribute)) {
-        return
-      }
-
       this.updateSortAttribute(queryAttribute)
     }
   }
@@ -109,7 +104,6 @@ export default {
                     }`
                   "
                   :menu-classes="'dropdown-menu-300'"
-                  :disabled="!getIsOrderableAttribute(queryAttribute)"
                   icon-open="sort"
                   icon-close="caret-down"
                   is-right-aligned

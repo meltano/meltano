@@ -67,6 +67,12 @@ class TestQueryGeneration:
         return (
             PayloadBuilder("streams_design")
             .columns("day", "month", "year")
+            .timeframes(
+                {
+                    "name": "streamed_at",
+                    "periods": [{"name": "year"}, {"label": "Month"}, {"name": "dom"}],
+                }
+            )
             .aggregates("count", "sum_minutes", "count_days")
             .columns("gender", join="users_join")
             .aggregates("count", "avg_age", "sum_clv", "max_clv", join="users_join")
@@ -247,6 +253,18 @@ class TestQueryGeneration:
         assert any(attr["id"] == "users_join.sum_clv" for attr in aggregate_columns)
 
         assert "WITH base_join AS (SELECT" in sql
+        assert (
+            'EXTRACT(\'YEAR\' FROM "streams_design"."streamed_at") "streams_design.streamed_at.year"'
+            in sql
+        )
+        assert (
+            'EXTRACT(\'MONTH\' FROM "streams_design"."streamed_at") "streams_design.streamed_at.month"'
+            in sql
+        )
+        assert (
+            'EXTRACT(\'DAY\' FROM "streams_design"."streamed_at") "streams_design.streamed_at.dom"'
+            in sql
+        )
         assert "base_streams_design AS (SELECT DISTINCT" in sql
         assert "users_join_stats AS (" in sql
         assert 'COALESCE(AVG("episodes_join.rating"),0)' in sql
@@ -559,3 +577,36 @@ class TestQueryGeneration:
 
         assert f'"dynamic_dates"."updated_at">={start_date_time}' in sql
         assert f'"dynamic_dates"."updated_at"<={end_date_time}' in sql
+
+    def test_meltano_order_by_timeframe_periods(self, gitflix):
+        # Test normal date and time filters
+        order_by_timeframe_periods = (
+            PayloadBuilder("dynamic_dates")
+            .timeframes(
+                {"name": "updated_at", "periods": [{"name": "month"}, {"name": "dom"}]}
+            )
+            .aggregates("count")
+            .order_by("dynamic_dates.updated_at.month", "asc")
+            .order_by("dynamic_dates.updated_at.dom", "asc")
+        )
+
+        q = MeltanoQuery(
+            definition=order_by_timeframe_periods.payload,
+            design_helper=gitflix.design("dynamic_dates"),
+        )
+
+        # Generating the query
+        (sql, query_attributes, aggregate_columns) = q.get_query()
+
+        assert (
+            'EXTRACT(\'MONTH\' FROM "dynamic_dates"."updated_at") "dynamic_dates.updated_at.month"'
+            in sql
+        )
+        assert (
+            'EXTRACT(\'DAY\' FROM "dynamic_dates"."updated_at") "dynamic_dates.updated_at.dom"'
+            in sql
+        )
+        assert (
+            'ORDER BY "dynamic_dates.updated_at.month" ASC,"dynamic_dates.updated_at.dom" ASC'
+            in sql
+        )
