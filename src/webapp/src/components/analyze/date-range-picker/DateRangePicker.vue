@@ -28,7 +28,8 @@ export default {
   },
   data: () => ({
     attributePairsModel: [],
-    attributePairInFocusIndex: 0
+    attributePairInFocusIndex: 0,
+    hasSetAttributePairInFocusIndex: false
   }),
   computed: {
     ...mapGetters('designs', [
@@ -116,6 +117,9 @@ export default {
       const modelDateRanges = this.attributePairsModel.map(mapper)
       return !lodash.isEqual(initialDateRanges, modelDateRanges)
     },
+    getHasMultipleDateRanges() {
+      return this.attributes.length > 1
+    },
     getKey() {
       return utils.key
     },
@@ -129,7 +133,10 @@ export default {
           rangeLabel += ` (+${validDateRangeLength - 1})`
         }
       }
-      return hasValidDateRanges ? rangeLabel : 'Date Ranges'
+      const fallbackLabel = `Date Range${
+        this.getHasMultipleDateRanges ? 's' : ''
+      }`
+      return hasValidDateRanges ? rangeLabel : fallbackLabel
     },
     getValidDateRangesInitial() {
       return this.getAttributePairsInitial.filter(attributePair =>
@@ -191,8 +198,30 @@ export default {
       attributePair.priorCustomDateRange = getNullDateRange()
       attributePair.isRelative = false
     },
-    onDropdownOpen() {
+    onDropdownOpen(payload) {
       this.attributePairsModel = lodash.cloneDeep(this.getAttributePairsInitial)
+      this.setInitialAttributePairInFocusIndex(payload)
+    },
+    setInitialAttributePairInFocusIndex(payload) {
+      let match
+      let idx
+      // Set the target index based on an optional payload or first date range match condition or 0 index fallback
+      if (payload) {
+        match = this.attributePairsModel.find(attributePair => {
+          const attribute = attributePair.attribute
+          return (
+            attribute.sourceName === payload.sourceName &&
+            attribute.name === payload.name
+          )
+        })
+      } else if (!this.hasSetAttributePairInFocusIndex) {
+        match = this.attributePairsModel.find(
+          attributePair => attributePair.absoluteDateRange.start !== null
+        )
+        this.hasSetAttributePairInFocusIndex = true
+      }
+      idx = match ? this.attributePairsModel.indexOf(match) : 0
+      this.attributePairInFocusIndex = idx
     },
     saveDateRanges() {
       this.attributePairsModel.forEach(attributePair => {

@@ -210,7 +210,7 @@ export default {
       }
     },
 
-    jumpToDateFilters() {
+    jumpToDateFilters(column) {
       utils.scrollToTop()
       /*
         TODO likely refactor to use Ben's recommeded GlobalEvents approach (https://github.com/shentao/vue-global-events#readme)
@@ -221,7 +221,7 @@ export default {
         child => child.$refs['date-range-dropdown']
       )
       const dateRangeDropdown = childComponent.$refs['date-range-dropdown']
-      dateRangeDropdown.open()
+      dateRangeDropdown.open(column)
     },
 
     jumpToFilters() {
@@ -751,7 +751,7 @@ export default {
                       :design="design"
                       :is-disabled="Boolean(column.required)"
                       @attribute-selected="columnSelected(column)"
-                      @calendar-click="jumpToDateFilters"
+                      @calendar-click="jumpToDateFilters(column)"
                       @filter-click="jumpToFilters"
                     />
                   </template>
@@ -873,7 +873,7 @@ export default {
                           :design="join"
                           :is-disabled="Boolean(column.required)"
                           @attribute-selected="joinColumnSelected(join, column)"
-                          @calendar-click="jumpToDateFilters"
+                          @calendar-click="jumpToDateFilters(column)"
                           @filter-click="jumpToFilters"
                         />
                       </template>

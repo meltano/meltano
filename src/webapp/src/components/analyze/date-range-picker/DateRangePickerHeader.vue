@@ -19,17 +19,24 @@ export default {
   },
   computed: {
     ...mapGetters('designs', ['getTableSources']),
-    getDateLabel() {
-      return getDateLabel
-    },
     getHasValidDateRange() {
       return getHasValidDateRange
+    },
+    getHasMultipleDateRanges() {
+      return this.attributePairsModel.length > 1
     },
     getLabel() {
       return targetAttributePair => {
         const attribute = targetAttributePair.attribute
         const source = this.getSourceTableByAttribute(attribute)
-        return `${source.label} - ${attribute.label}`
+        let label = `${source.label} - ${attribute.label}`
+
+        if (targetAttributePair.absoluteDateRange.start !== null) {
+          const dateLabel = getDateLabel(targetAttributePair)
+          label += ` (${dateLabel})`
+        }
+
+        return label
       }
     },
     getSourceTableByAttribute() {
@@ -68,7 +75,7 @@ export default {
     <div class="mb1r">
       <div class="field">
         <div class="control">
-          <span class="select is-fullwidth">
+          <span v-if="getHasMultipleDateRanges" class="select is-fullwidth">
             <select
               :value="getValue(attributePair)"
               :class="{
@@ -85,6 +92,7 @@ export default {
               >
             </select>
           </span>
+          <span v-else>{{ getLabel(attributePairsModel[0]) }}</span>
         </div>
       </div>
     </div>
@@ -96,13 +104,6 @@ export default {
 
       <div class="column">
         <div class="is-flex is-vcentered is-pulled-right">
-          <span
-            class="is-size-7"
-            :class="{
-              'mr-05r': getHasValidDateRange(attributePair.absoluteDateRange)
-            }"
-            >{{ getDateLabel(attributePair) }}</span
-          >
           <button
             v-if="getHasValidDateRange(attributePair.absoluteDateRange)"
             class="button is-small"
