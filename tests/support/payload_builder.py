@@ -31,7 +31,7 @@ class PayloadBuilder:
 
         return self
 
-    def column_filter(self, source_name, name, expression, value):
+    def legacy_column_filter(self, source_name, name, expression, value):
         filter = {
             "source_name": source_name,
             "name": name,
@@ -42,7 +42,13 @@ class PayloadBuilder:
 
         return self
 
-    def aggregate_filter(self, source_name, name, expression, value):
+    def column_filter(self, key, expression, value):
+        filter = {"key": key, "expression": expression, "value": value}
+        self._column_filters.append(filter)
+
+        return self
+
+    def legacy_aggregate_filter(self, source_name, name, expression, value):
         filter = {
             "source_name": source_name,
             "name": name,
@@ -53,12 +59,24 @@ class PayloadBuilder:
 
         return self
 
-    def order_by(self, source_name, attribute_name, direction):
+    def aggregate_filter(self, key, expression, value):
+        filter = {"key": key, "expression": expression, "value": value}
+        self._aggregate_filters.append(filter)
+
+        return self
+
+    def legacy_order_by(self, source_name, attribute_name, direction):
         order_by_clause = {
             "source_name": source_name,
             "attribute_name": attribute_name,
             "direction": direction,
         }
+        self._order_by_clauses.append(order_by_clause)
+
+        return self
+
+    def order_by(self, key, direction):
+        order_by_clause = {"key": key, "direction": direction}
         self._order_by_clauses.append(order_by_clause)
 
         return self

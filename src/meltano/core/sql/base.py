@@ -96,6 +96,14 @@ class MeltanoDesign(MeltanoBase):
         except StopIteration:
             raise ParseError(f"Table {name} not found in design {self.name}")
 
+    def find_attribute(self, key: str) -> MeltanoBase:
+        try:
+            return next(
+                qa for t in self.tables() for qa in t.attributes() if qa.alias() == key
+            )
+        except StopIteration:
+            raise ParseError(f"Attribute {key} not found in design {self.name}")
+
     def find_source_name(self, table_name: str) -> str:
         """
         Given the name of a table, get its source name:
@@ -173,6 +181,17 @@ class MeltanoTable(MeltanoBase):
             MeltanoTimeframe(definition=definition, table=self)
             for definition in self._definition.get("timeframes", [])
         ] + self._timeframes
+
+    def timeframe_periods(self) -> List[MeltanoBase]:
+        return [tp for timeframe in self.timeframes() for tp in timeframe.periods()]
+
+    def attributes(self) -> List[MeltanoBase]:
+        return (
+            self.columns()
+            + self.aggregates()
+            + self.timeframes()
+            + self.timeframe_periods()
+        )
 
     def get_column(self, name: str) -> MeltanoBase:
         return next((c for c in self.columns() if c.name == name), None)
@@ -265,6 +284,7 @@ class MeltanoColumn(MeltanoBase):
 
     def __init__(self, table: MeltanoTable, definition: Dict = {}) -> None:
         self.table = table
+        self.attribute_type = "column"
 
         # Used for manually setting the metadata attributes {label, name, type, primary_key, hidden, sql}
         self._attributes = {}
@@ -319,6 +339,7 @@ class MeltanoAggregate(MeltanoBase):
 
     def __init__(self, table: MeltanoTable, definition: Dict = {}) -> None:
         self.table = table
+        self.attribute_type = "aggregate"
 
         # Used for manually setting the metadata attributes {name, type, label, description, sql}
         self._attributes = {}
@@ -409,6 +430,7 @@ class MeltanoTimeframe(MeltanoBase):
 
     def __init__(self, table: MeltanoTable, definition: Dict = {}) -> None:
         self.table = table
+        self.attribute_type = "timeframe"
 
         # Used for manually setting the metadata attributes
         #  {name, periods:[], label, description, sql}
@@ -483,6 +505,7 @@ class MeltanoTimeframePeriod(MeltanoBase):
     def __init__(self, timeframe: MeltanoTimeframe, definition: Dict = {}) -> None:
         self.timeframe = timeframe
         self.table = timeframe.table
+        self.attribute_type = "timeframe_period"
 
         # Used for manually setting the metadata attributes
         #  {name, label, part}
@@ -560,7 +583,8 @@ class MeltanoFilter(MeltanoBase):
     An internal representation of a Filter (WHERE or HAVING clause)
     defined in a MeltanoQuery.
 
-    definition: {"source_name", "name", "expression", "value"}
+    definition: {key, "expression", "value"}
+    legacy definition: {"source_name", "name", "expression", "value"}
 
     Where:
     + "source name" is the way we call a table in a design:
@@ -585,7 +609,7 @@ class MeltanoFilter(MeltanoBase):
      (the Pypika Field knows at run time the table, the clause is evaluated against)
 
     It provides access to the metada for the Filter:
-      {type, source_name, name, expression, value}
+      {key, expression, value}
     """
 
     def __init__(
@@ -626,21 +650,23 @@ class MeltanoFilter(MeltanoBase):
         """
         Validate the Filter definition
         """
-        source_name = definition.get("source_name", None)
-        attribute_name = definition.get("name", None)
+
+        source_name = definition.pop("source_name", None)
+        attribute_name = definition.pop("name", None)
+        if self.design and source_name is not None and attribute_name is not None:
+            table_def = self.design.find_table(source_name)
+            query_attribute = table_def.get_attribute(attribute_name)
+            definition["key"] = query_attribute.alias()
+
+        key = definition.get("key", None)
+        if key is None:
+            raise ParseError(
+                f"An attribute key was not provided for filter '{definition}'."
+            )
 
         if self.expression_type == MeltanoFilterExpressionType.Unknown:
             raise NotImplementedError(
                 f"Unknown filter expression: {definition['expression']}."
-            )
-
-        if source_name is None:
-            raise ParseError(
-                f"A source name for a table was not provided for filter '{definition}'."
-            )
-        elif attribute_name is None:
-            raise ParseError(
-                f"An (attribute) name was not provided for filter '{definition}'."
             )
 
         if (
@@ -661,26 +687,15 @@ class MeltanoFilter(MeltanoBase):
             )
 
         if self.design:
-            table_def = self.design.find_table(source_name)
-
-            column_def = table_def.get_column(attribute_name)
-            aggregate_def = table_def.get_aggregate(attribute_name)
-
-            if not any((column_def, aggregate_def)):
-                raise ParseError(
-                    f"Requested column {table_def.name}.{attribute_name} in filter '{definition}' is not defined in the design"
-                )
+            # Will raise ParseError if not found
+            attribute_def = self.design.find_attribute(key)
 
             if self.is_relative_date_expression(definition.get("value", None)):
-                if aggregate_def:
+                if attribute_def.attribute_type == "aggregate":
                     raise ParseError(
                         f"You can't use '[+-]N[dmy]' filter expressions with aggregate attributes"
                     )
-                elif not column_def:
-                    raise ParseError(
-                        f"[+-]N[dmy] filter expressions require a column atribute of type date or time"
-                    )
-                elif column_def.type not in ["date", "time"]:
+                elif attribute_def.type not in ["date", "time"]:
                     raise ParseError(
                         f"[+-]N[dmy] filter expressions require a column atribute of type date or time"
                     )
@@ -695,11 +710,7 @@ class MeltanoFilter(MeltanoBase):
             # We only care about filter definitions of the type: [+-]N[dmy]
             return
 
-        source_name = definition.get("source_name", None)
-        attribute_name = definition.get("name", None)
-
-        table_def = self.design.find_table(source_name)
-        column_def = table_def.get_column(attribute_name)
+        attribute_def = self.design.find_attribute(definition.get("key", None))
 
         old_value = definition.get("value", None)
 
@@ -714,9 +725,9 @@ class MeltanoFilter(MeltanoBase):
 
         if interval_period == 0:
             # If we have no interval period, we can really simplify the expression
-            if column_def.type == "date":
+            if attribute_def.type == "date":
                 new_value = pivot_date
-            elif column_def.type == "time":
+            elif attribute_def.type == "time":
                 if self.expression_type == MeltanoFilterExpressionType.LessOrEqualThan:
                     new_value = (
                         pivot_date
@@ -737,14 +748,14 @@ class MeltanoFilter(MeltanoBase):
                 interval = Interval(years=interval_period)
 
             # End then add or substract accordingly
-            if column_def.type == "date":
+            if attribute_def.type == "date":
                 # Dates are simple as they are always set as they are
                 # We just have to convert the timestamp expression to a Date
                 if "+" in old_value:
                     new_value = fn.Date(pivot_date + interval)
                 else:
                     new_value = fn.Date(pivot_date - interval)
-            elif column_def.type == "time":
+            elif attribute_def.type == "time":
                 # Timestamps are a little bit more involved in case of <= expressions
                 if "+" in old_value:
                     new_value = pivot_date + interval
@@ -762,15 +773,11 @@ class MeltanoFilter(MeltanoBase):
 
         definition["value"] = new_value
 
-    def match(self, source_name: str, attribute_name: str) -> bool:
+    def match(self, attribute: MeltanoBase) -> bool:
         """
-        Return True if this filter is defined for the given source_name and attribute
+        Return True if this filter is defined for the given attribute
         """
-        return (
-            True
-            if (self.source_name == source_name and self.name == attribute_name)
-            else False
-        )
+        return self.key == attribute.alias()
 
     def criterion(self, field: Field) -> Criterion:
         """
@@ -971,19 +978,18 @@ class MeltanoQuery(MeltanoBase):
                 # (1) Know that a join is required for a table with no selected columns
                 # (2) Make available the missing column_def in get_query()
                 for column_filter in self.column_filters:
+                    # Will raise ParseError if not found
+                    attribute_def = self.design.find_attribute(column_filter.key)
                     if (
-                        column_filter.source_name == table.source_name
-                        and column_filter.name not in related_def.get("columns", [])
+                        attribute_def.attribute_type == "column"
+                        and attribute_def.table.find_source_name()
+                        == table.find_source_name()
+                        and attribute_def.column_name()
+                        not in related_def.get("columns", [])
                     ):
-                        column_def = table_def.get_column(column_filter.name)
-                        if column_def:
-                            c = MeltanoColumn(table=table)
-                            c.copy_metadata(column_def)
-                            table.add_column_with_filter(c)
-                        else:
-                            raise ParseError(
-                                f"Requested column {table.name}.{column_filter.name} is not defined in the design"
-                            )
+                        c = MeltanoColumn(table=table)
+                        c.copy_metadata(attribute_def)
+                        table.add_column_with_filter(c)
 
                 # Add the aggregates
                 for aggregate in related_def.get("aggregates", []):
@@ -1209,7 +1215,7 @@ class MeltanoQuery(MeltanoBase):
                 matching_criteria = [
                     f.criterion(Field(c.column_name(), table=pika_table))
                     for f in self.column_filters
-                    if f.match(table.find_source_name(), c.name)
+                    if f.match(c)
                 ]
                 where.extend(matching_criteria)
 
@@ -1251,7 +1257,7 @@ class MeltanoQuery(MeltanoBase):
                 # Also check if there is a filter for this aggregate and add it
                 #  in the HAVING clase
                 for f in self.aggregate_filters:
-                    if f.match(table.find_source_name(), a.name):
+                    if f.match(a):
                         field = a.qualified_sql(pika_table=pika_table)
                         # remove the alias before adding it to the having clause
                         field.alias = None
@@ -1273,17 +1279,25 @@ class MeltanoQuery(MeltanoBase):
         # Add the Order By clause(s) for the final query
         if self.order:
             for order_clause in self.order:
-                source_name = order_clause.get("source_name")
-                attribute_name = order_clause.get("attribute_name", None)
                 if order_clause.get("direction", None) == "desc":
                     order = Order.desc
                 else:
                     order = Order.asc
 
-                table_def = self.design.find_table(source_name)
+                key = order_clause.get("key", None)
+                if key is not None:
+                    # Will raise ParseError if not found
+                    query_attribute = self.design.find_attribute(key)
+                else:
+                    source_name = order_clause.get("source_name")
+                    attribute_name = order_clause.get("attribute_name")
+
+                    # Will raise ParseError if not found
+                    table_def = self.design.find_table(source_name)
+                    query_attribute = table_def.get_attribute(attribute_name)
 
                 # this only works if the field is present in the Select statement
-                orderby_field = Field(table_def.get_attribute(attribute_name).alias())
+                orderby_field = Field(query_attribute.alias())
 
                 no_join_query = no_join_query.orderby(orderby_field, order=order)
         else:
@@ -1358,7 +1372,7 @@ class MeltanoQuery(MeltanoBase):
                 matching_criteria = [
                     f.criterion(Field(c.column_name(), table=pika_table))
                     for f in self.column_filters
-                    if f.match(table.find_source_name(), c.name)
+                    if f.match(c)
                 ]
                 where.extend(matching_criteria)
 
@@ -1465,7 +1479,7 @@ class MeltanoQuery(MeltanoBase):
 
             for a in table.aggregates():
                 for f in self.aggregate_filters:
-                    if f.match(table.find_source_name(), a.name):
+                    if f.match(a):
                         field = a.qualified_sql(base_db_table)
                         # remove the alias before adding it to the having clause
                         field.alias = None
@@ -1553,18 +1567,25 @@ class MeltanoQuery(MeltanoBase):
         # Add the Order By clause(s) for the final query
         if self.order:
             for order_clause in self.order:
-                source_name = order_clause.get("source_name")
-                attribute_name = order_clause.get("attribute_name", None)
                 if order_clause.get("direction", None) == "desc":
                     order = Order.desc
                 else:
                     order = Order.asc
 
-                table_def = self.design.find_table(source_name)
-                orderby_field = Field(
-                    table_def.get_attribute(attribute_name).alias(),
-                    table=results_pika_table,
-                )
+                key = order_clause.get("key", None)
+                if key is not None:
+                    # Will raise ParseError if not found
+                    query_attribute = self.design.find_attribute(key)
+                else:
+                    source_name = order_clause.get("source_name")
+                    attribute_name = order_clause.get("attribute_name")
+
+                    # Will raise ParseError if not found
+                    table_def = self.design.find_table(source_name)
+                    query_attribute = table_def.get_attribute(attribute_name)
+
+                # this only works if the field is present in the Select statement
+                orderby_field = Field(query_attribute.alias(), table=results_pika_table)
 
                 hda_query = hda_query.orderby(orderby_field, order=order)
         else:
