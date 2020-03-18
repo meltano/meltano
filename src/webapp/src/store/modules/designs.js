@@ -637,7 +637,7 @@ const actions = {
     })
   },
 
-  updateSortAttribute({ commit, getters }, queryAttribute) {
+  updateSortAttribute({ commit, dispatch, getters }, queryAttribute) {
     const matchInAssigned = getters.getOrderableAttributeFromCollectionByAttribute(
       'assigned',
       queryAttribute
@@ -660,7 +660,16 @@ const actions = {
       commit('assignSortableAttribute', queryAttribute)
     }
 
-    this.dispatch('designs/runQuery')
+    dispatch('runQuery')
+  },
+
+  setOrderAssigned({ commit, dispatch }, value) {
+    commit('setOrderAssigned', value)
+    dispatch('runQuery')
+  },
+
+  setOrderUnassigned({ commit }, value) {
+    commit('setOrderUnassigned', value)
   }
 }
 

@@ -16,7 +16,7 @@ export default {
         return this.order.assigned
       },
       set(value) {
-        this.$store.commit('designs/setOrderAssigned', value)
+        this.setOrderAssigned(value)
       }
     },
     draggableOptions() {
@@ -32,7 +32,7 @@ export default {
         return this.order.unassigned
       },
       set(value) {
-        this.$store.commit('designs/setOrderUnassigned', value)
+        this.setOrderUnassigned(value)
       }
     }
   },
@@ -40,7 +40,9 @@ export default {
     ...mapActions('designs', [
       'resetSortAttributes',
       'tryAutoRun',
-      'updateSortAttribute'
+      'updateSortAttribute',
+      'setOrderAssigned',
+      'setOrderUnassigned'
     ])
   }
 }
