@@ -434,7 +434,7 @@ const actions = {
     })
   },
 
-  getSQL({ commit, getters, state }, { run, payload }) {
+  getSQL({ commit, dispatch, state }, { run, payload }) {
     this.dispatch('designs/resetErrorMessage')
     commit('setIsLoadingQuery', !!run)
 
@@ -459,9 +459,7 @@ const actions = {
           commit('setHasCompletedFirstQueryRun', true)
           commit('setQueryResults', response.data)
           commit('setSQLResults', response.data)
-          commit('setSorting', {
-            attributesIndex: getters.getOrderableAttributesIndex
-          })
+          dispatch('setSorting', postData.order)
         } else {
           commit('setSQLResults', response.data)
         }
@@ -472,7 +470,7 @@ const actions = {
       .finally(() => commit('setIsLoadingQuery', false))
   },
 
-  loadReport({ state, commit }, report) {
+  loadReport({ state, commit, dispatch }, report) {
     const nameMatcher = (source, target) => source.name === target.name
 
     // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
@@ -534,10 +532,12 @@ const actions = {
       })
     })
 
+    dispatch('setFiltersFromQuery', queryPayload.filters)
+
     commit('setCurrentReport', report)
     this.dispatch('designs/getSQL', {
       run: true,
-      payload: report.queryPayload
+      payload: queryPayload
     })
   },
 
@@ -670,6 +670,90 @@ const actions = {
 
   setOrderUnassigned({ commit }, value) {
     commit('setOrderUnassigned', value)
+  },
+
+  setSorting({ commit, state }, queryOrder) {
+    const orderAssigned = []
+    queryOrder.forEach(queryOrderAttribute => {
+      const queryAttribute = state.queryAttributes.find(queryAttribute =>
+        queryOrderAttribute.key
+          ? queryOrderAttribute.key === queryAttribute.key
+          : queryOrderAttribute.sourceName === queryAttribute.sourceName &&
+            queryOrderAttribute.attributeName === queryAttribute.attributeName
+      )
+      if (queryAttribute) {
+        orderAssigned.push({
+          attribute: queryAttribute,
+          direction: queryOrderAttribute.direction
+        })
+      }
+    })
+
+    const orderUnassigned = []
+    state.queryAttributes.forEach(queryAttribute => {
+      if (
+        !orderAssigned.find(
+          orderable => orderable.attribute.key === queryAttribute.key
+        )
+      ) {
+        orderUnassigned.push({
+          attribute: queryAttribute,
+          direction: 'asc'
+        })
+      }
+    })
+
+    commit('setOrderAssigned', orderAssigned)
+    commit('setOrderUnassigned', orderUnassigned)
+  },
+
+  setFiltersFromQuery({ commit, getters }, queryFilters) {
+    commit('resetFilters')
+
+    const filterTypes = [
+      QUERY_ATTRIBUTE_TYPES.COLUMN,
+      QUERY_ATTRIBUTE_TYPES.AGGREGATE
+    ]
+    filterTypes.forEach(filterType => {
+      const filterTypePlural = helpers.getFilterTypePlural(filterType)
+      queryFilters[filterTypePlural].forEach(queryFilter => {
+        let attribute
+        if (queryFilter.key) {
+          for (let source of getters.getTableSources) {
+            attribute = source[filterTypePlural].find(
+              attribute => attribute.key === queryFilter.key
+            )
+
+            if (attribute) {
+              break
+            }
+          }
+        } else {
+          const source = getters.getTableSources.find(
+            source => source.name === queryFilter.sourceName
+          )
+          if (!source) {
+            return
+          }
+
+          attribute = source[filterTypePlural].find(
+            attribute => attribute.name === queryFilter.name
+          )
+        }
+
+        if (!attribute) {
+          return
+        }
+
+        const filter = new FilterModel({
+          attribute,
+          filterType,
+          expression: queryFilter.expression,
+          value: queryFilter.value
+        })
+        commit('addFilter', filter)
+      })
+    })
   }
 }
 
@@ -737,8 +821,6 @@ const mutations = {
   setCurrentReport(state, report) {
     state.activeReport = report
     state.chartType = report.chartType
-    state.filters = report.filters
-    state.order = report.order
     state.limit = report.queryPayload.limit
   },
 
@@ -818,36 +900,6 @@ const mutations = {
 
   setSortableAttributeDirection(_, { orderableAttribute, direction }) {
     orderableAttribute.direction = direction
-  },
-
-  setSorting(state, { attributesIndex }) {
-    state.queryAttributes.forEach(queryAttribute => {
-      const attribute =
-        attributesIndex[
-          helpers.buildKey(
-            queryAttribute.sourceName,
-            queryAttribute.attributeName
-          )
-        ]
-
-      // the index only contains attributes that are Orderable
-      if (!attribute) {
-        return
-      }
-
-      const finder = orderableAttribute =>
-        orderableAttribute.attribute === attribute
-
-      const accounted = state.order.assigned.concat(state.order.unassigned)
-      const isAccountedFor = lodash.some(accounted, finder)
-
-      if (!isAccountedFor) {
-        state.order.unassigned.push({
-          attribute,
-          direction: 'asc'
-        })
-      }
-    })
   },
 
   setSqlErrorMessage(state, e) {
