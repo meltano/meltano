@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1872](https://gitlab.com/meltano/meltano/-/issues/1872) Delete state left over from different pipeline run for same extractor
+
 ### Breaks
 
 

@@ -119,6 +119,12 @@ class SingerRunner(Runner):
         else:
             logging.warning("No state was found, complete import.")
 
+            # Delete state left over from different pipeline run for same extractor
+            try:
+                os.remove(tap.files["state"])
+            except OSError:
+                pass
+
     def bookmark_state(self, new_state: str):
         if self.context.job is None:
             logging.info(
