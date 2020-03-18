@@ -63,22 +63,19 @@ class PypikaJoinExecutor:
         left = self.parse_identifier(node.left)
         right = self.parse_identifier(node.right)
 
-        left_alias = self.join["name"] if left.table == self.join["name"] else None
-        right_alias = self.join["name"] if right.table == self.join["name"] else None
-
         left_table = self.design.find_table(left.table)
         right_table = self.design.find_table(right.table)
 
         left_field = getattr(
             AnalysisHelper.db_table(
-                left_table.sql_table_name, alias=left_table.sql_table_name
+                left_table.sql_table_name, alias=left_table.find_source_name()
             ),
             left.field,
         )
 
         right_field = getattr(
             AnalysisHelper.db_table(
-                right_table.sql_table_name, alias=right_table.sql_table_name
+                right_table.sql_table_name, alias=right_table.find_source_name()
             ),
             right.field,
         )

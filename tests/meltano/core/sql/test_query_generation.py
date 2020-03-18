@@ -143,7 +143,7 @@ class TestQueryGeneration:
 
         # Test Meltano Tables and Columns
         assert "id" in [c.column_name() for c in table.primary_keys()]
-        assert "streams.month" in [c.alias() for c in table.columns()]
+        assert "streams_join.month" in [c.alias() for c in table.columns()]
 
         assert len(table.columns()) == 6
         new_c = MeltanoColumn(table)
@@ -155,11 +155,11 @@ class TestQueryGeneration:
 
         # Test Meltano Tables and Aggregates
         assert "minutes" in [a.column_name() for a in table.aggregates()]
-        assert "streams.id" in [a.column_alias() for a in table.aggregates()]
-        assert "streams.sum_minutes" in [a.alias() for a in table.aggregates()]
-        assert "streams.count_days" in [a.alias() for a in table.aggregates()]
-        assert "streams.min_minutes" in [a.alias() for a in table.aggregates()]
-        assert "streams.max_minutes" in [a.alias() for a in table.aggregates()]
+        assert "streams_join.id" in [a.column_alias() for a in table.aggregates()]
+        assert "streams_join.sum_minutes" in [a.alias() for a in table.aggregates()]
+        assert "streams_join.count_days" in [a.alias() for a in table.aggregates()]
+        assert "streams_join.min_minutes" in [a.alias() for a in table.aggregates()]
+        assert "streams_join.max_minutes" in [a.alias() for a in table.aggregates()]
 
         # There are 3 aggregates defined over the minutes column (SUM, MIN, MAX)
         assert (
@@ -201,18 +201,20 @@ class TestQueryGeneration:
             attr["attribute_label"] == "Average Age" for attr in query_attributes
         )
         assert any(attr["attribute_name"] == "sum_minutes" for attr in query_attributes)
-        assert any(attr["id"] == "users.sum_clv" for attr in aggregate_columns)
-        assert any(attr["id"] == "users.max_clv" for attr in aggregate_columns)
-        assert any(attr["id"] == "episodes.min_rating" for attr in aggregate_columns)
+        assert any(attr["id"] == "users_design.sum_clv" for attr in aggregate_columns)
+        assert any(attr["id"] == "users_design.max_clv" for attr in aggregate_columns)
+        assert any(
+            attr["id"] == "episodes_join.min_rating" for attr in aggregate_columns
+        )
 
         assert "WITH base_join AS (SELECT" in sql
-        assert "base_streams_table AS (SELECT DISTINCT" in sql
-        assert "users_table_stats AS (" in sql
-        assert 'COALESCE(AVG("episodes.rating"),0)' in sql
-        assert 'COALESCE(COUNT("users.id"),0)' in sql
-        assert 'COALESCE(SUM("users.clv"),0)' in sql
-        assert 'COALESCE(MIN("episodes.rating"),0)' in sql
-        assert 'COALESCE(MAX("users.clv"),0)' in sql
+        assert "base_streams_join AS (SELECT DISTINCT" in sql
+        assert "users_design_stats AS (" in sql
+        assert 'COALESCE(AVG("episodes_join.rating"),0)' in sql
+        assert 'COALESCE(COUNT("users_design.id"),0)' in sql
+        assert 'COALESCE(SUM("users_design.clv"),0)' in sql
+        assert 'COALESCE(MIN("episodes_join.rating"),0)' in sql
+        assert 'COALESCE(MAX("users_design.clv"),0)' in sql
         assert 'SELECT * FROM "result"' in sql
         assert 'JOIN "streams"' in sql
         assert 'JOIN "episodes"' in sql
@@ -220,8 +222,8 @@ class TestQueryGeneration:
         # Check that the attribute used both as a column and as an aggregate
         # 1. Only appears once in the select clause of the base query
         # 2. Properly appears as an aggregate
-        assert sql.count('"streams"."day" "streams.day"') == 1
-        assert 'COALESCE(COUNT("streams.day"),0)' in sql
+        assert sql.count('"streams_join"."day" "streams_join.day"') == 1
+        assert 'COALESCE(COUNT("streams_join.day"),0)' in sql
 
     def test_meltano_disjointed_query(self, streams, gitflix):
         # Test parsing a json payload using a Design generated from a m5oc file
@@ -242,14 +244,14 @@ class TestQueryGeneration:
             attr["attribute_label"] == "Average Age" for attr in query_attributes
         )
         assert any(attr["attribute_name"] == "sum_minutes" for attr in query_attributes)
-        assert any(attr["id"] == "users.sum_clv" for attr in aggregate_columns)
+        assert any(attr["id"] == "users_join.sum_clv" for attr in aggregate_columns)
 
         assert "WITH base_join AS (SELECT" in sql
-        assert "base_streams_table AS (SELECT DISTINCT" in sql
-        assert "users_table_stats AS (" in sql
-        assert 'COALESCE(AVG("episodes.rating"),0)' in sql
-        assert 'COALESCE(COUNT("users.id"),0)' in sql
-        assert 'COALESCE(SUM("users.clv"),0)' in sql
+        assert "base_streams_design AS (SELECT DISTINCT" in sql
+        assert "users_join_stats AS (" in sql
+        assert 'COALESCE(AVG("episodes_join.rating"),0)' in sql
+        assert 'COALESCE(COUNT("users_join.id"),0)' in sql
+        assert 'COALESCE(SUM("users_join.clv"),0)' in sql
         assert 'SELECT * FROM "result"' in sql
         assert 'JOIN "users"' in sql
         assert 'JOIN "episodes"' in sql
@@ -257,8 +259,8 @@ class TestQueryGeneration:
         # Check that the attribute used both as a column and as an aggregate
         # 1. Only appears once in the select clause of the base query
         # 2. Properly appears as an aggregate
-        assert sql.count('"streams"."day" "streams.day"') == 1
-        assert 'COALESCE(COUNT("streams.day"),0)' in sql
+        assert sql.count('"streams_design"."day" "streams_design.day"') == 1
+        assert 'COALESCE(COUNT("streams_design.day"),0)' in sql
 
     def test_meltano_no_join_query_filters(self, no_join_with_filters, gitflix):
         # Test a no-join query with filters
@@ -275,21 +277,21 @@ class TestQueryGeneration:
         assert sql.count("HAVING") == 1
 
         # Check that all the WHERE filters were added correctly
-        assert 'NOT "users"."name" IS NULL' in sql
-        assert '"users"."name" LIKE \'%yannis%\'' in sql
-        assert '"users"."gender" IS NULL' in sql
+        assert 'NOT "users_design"."name" IS NULL' in sql
+        assert '"users_design"."name" LIKE \'%yannis%\'' in sql
+        assert '"users_design"."gender" IS NULL' in sql
 
         # Check that all the HAVING filters were added correctly
-        assert 'COALESCE(SUM("users"."clv"),0)>=100' in sql
-        assert 'COALESCE(SUM("users"."clv"),0)<=500' in sql
-        assert 'COALESCE(COUNT("users"."id"),0)=10' in sql
-        assert 'COALESCE(AVG("users"."age"),0)>20' in sql
-        assert 'COALESCE(AVG("users"."age"),0)<40' in sql
-        assert 'COALESCE(MAX("users"."clv"),0)>10' in sql
+        assert 'COALESCE(SUM("users_design"."clv"),0)>=100' in sql
+        assert 'COALESCE(SUM("users_design"."clv"),0)<=500' in sql
+        assert 'COALESCE(COUNT("users_design"."id"),0)=10' in sql
+        assert 'COALESCE(AVG("users_design"."age"),0)>20' in sql
+        assert 'COALESCE(AVG("users_design"."age"),0)<40' in sql
+        assert 'COALESCE(MAX("users_design"."clv"),0)>10' in sql
 
         # Check that the correct order by clauses have been generated
         assert (
-            'ORDER BY "users.name" ASC,"users.avg_age" DESC,"users.sum_clv" ASC,"users.max_clv" DESC'
+            'ORDER BY "users_design.name" ASC,"users_design.avg_age" DESC,"users_design.sum_clv" ASC,"users_design.max_clv" DESC'
             in sql
         )
 
@@ -308,25 +310,25 @@ class TestQueryGeneration:
         assert sql.count("HAVING") == 2
 
         # Check that all the WHERE filters were added correctly
-        assert '"users"."gender"=\'male\'' in sql
-        assert '"streams"."year">=\'2017\'' in sql
-        assert '"episodes"."tv_series" LIKE \'Marvel\'' in sql
-        assert '"episodes"."title" LIKE \'%Wolverine%\'' in sql
+        assert '"users_design"."gender"=\'male\'' in sql
+        assert '"streams_join"."year">=\'2017\'' in sql
+        assert '"episodes_join"."tv_series" LIKE \'Marvel\'' in sql
+        assert '"episodes_join"."title" LIKE \'%Wolverine%\'' in sql
 
         # Check that all the HAVING filters were added correctly
-        assert 'HAVING COALESCE(SUM("users.clv"),0)<50' in sql
-        assert 'COALESCE(AVG("episodes.rating"),0)>8' in sql
-        assert 'COALESCE(MIN("episodes.rating"),0)>6' in sql
+        assert 'HAVING COALESCE(SUM("users_design.clv"),0)<50' in sql
+        assert 'COALESCE(AVG("episodes_join.rating"),0)>8' in sql
+        assert 'COALESCE(MIN("episodes_join.rating"),0)>6' in sql
 
         # Check that the correct order by clauses have been generated
         #  and that they are in the correct order
         order_by_clause = (
-            'ORDER BY "result"."users.gender" ASC,'
-            '"result"."users.avg_age" ASC,'
-            '"result"."streams.year" DESC,'
-            '"result"."streams.sum_minutes" DESC,'
-            '"result"."episodes.tv_series" ASC,'
-            '"result"."episodes.avg_rating" ASC'
+            'ORDER BY "result"."users_design.gender" ASC,'
+            '"result"."users_design.avg_age" ASC,'
+            '"result"."streams_join.year" DESC,'
+            '"result"."streams_join.sum_minutes" DESC,'
+            '"result"."episodes_join.tv_series" ASC,'
+            '"result"."episodes_join.avg_rating" ASC'
         )
         assert order_by_clause in sql
 

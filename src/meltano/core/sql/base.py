@@ -68,11 +68,15 @@ class MeltanoDesign(MeltanoBase):
         super().__init__(definition)
 
     def tables(self) -> List[MeltanoBase]:
-        related_tables = [self._definition.get("related_table", None)]
-        related_tables += [
-            j["related_table"] for j in self._definition.get("joins", [])
+        tables = [
+            MeltanoTable(self._definition.get("related_table", None), design=self)
         ]
-        return [MeltanoTable(definition, design=self) for definition in related_tables]
+        for join in self._definition.get("joins", []):
+            table = MeltanoTable(join["related_table"], design=self)
+            table.source_name = join["name"]
+            tables.append(table)
+
+        return tables
 
     def joins(self) -> List[MeltanoBase]:
         return [
@@ -87,18 +91,10 @@ class MeltanoDesign(MeltanoBase):
         return next(t for t in self.joins() if t.name == name)
 
     def find_table(self, name: str) -> MeltanoBase:
-        table_def = None
-
-        if name == self.name:
-            table_def = self._definition["related_table"]
-        else:
-            try:
-                join = self.get_join(name)
-                table_def = join.related_table
-            except StopIteration:
-                raise ParseError(f"{name} not found in design {self.name}")
-
-        return MeltanoTable(table_def, design=self)
+        try:
+            return next(t for t in self.tables() if t.find_source_name() == name)
+        except StopIteration:
+            raise ParseError(f"Table {name} not found in design {self.name}")
 
     def find_source_name(self, table_name: str) -> str:
         """
@@ -230,6 +226,11 @@ class MeltanoTable(MeltanoBase):
         else:
             return self.name
 
+    def copy_metadata(self, other_table) -> None:
+        self.name = other_table.name
+        self.sql_table_name = other_table.sql_table_name
+        self.source_name = other_table.source_name
+
     def __getattr__(self, attr: str):
         try:
             return self._attributes[attr]
@@ -271,7 +272,7 @@ class MeltanoColumn(MeltanoBase):
         super().__init__(definition)
 
     def alias(self) -> str:
-        return f"{self.table.sql_table_name}.{self.column_name()}"
+        return f"{self.table.find_source_name()}.{self.column_name()}"
 
     def column_name(self) -> str:
         if self.sql:
@@ -325,7 +326,7 @@ class MeltanoAggregate(MeltanoBase):
         super().__init__(definition)
 
     def alias(self) -> str:
-        return f"{self.table.sql_table_name}.{self.name}"
+        return f"{self.table.find_source_name()}.{self.name}"
 
     def qualified_sql(self, base_table: str = None, pika_table=None) -> fn.Coalesce:
         """
@@ -348,16 +349,16 @@ class MeltanoAggregate(MeltanoBase):
         """
         if pika_table:
             field = Field(self.column_name(), table=pika_table)
-        elif base_table and base_table != self.table.sql_table_name:
+        elif base_table and base_table != self.table.find_source_name():
             sql = re.sub(
                 "\{\{TABLE\}\}",
-                self.table.sql_table_name,
+                self.table.find_source_name(),
                 self.sql,
                 flags=re.IGNORECASE,
             )
             field = Field(sql, table=Table(base_table))
         else:
-            table = Table(self.table.sql_table_name)
+            table = Table(self.table.find_source_name())
             field = Field(self.column_name(), table=table)
 
         if self.type == "sum":
@@ -376,7 +377,7 @@ class MeltanoAggregate(MeltanoBase):
         return column
 
     def column_alias(self) -> str:
-        return f"{self.table.sql_table_name}.{self.column_name()}"
+        return f"{self.table.find_source_name()}.{self.column_name()}"
 
     def copy_metadata(self, other_aggregate) -> None:
         self.name = other_aggregate.name
@@ -427,7 +428,7 @@ class MeltanoTimeframe(MeltanoBase):
         return column
 
     def alias(self) -> str:
-        return f"{self.table.sql_table_name}.{self.column_name()}"
+        return f"{self.table.find_source_name()}.{self.column_name()}"
 
     def copy_metadata(self, other_timeframe, requested_periods=None) -> None:
         """
@@ -514,16 +515,16 @@ class MeltanoTimeframePeriod(MeltanoBase):
         """
         if pika_table:
             field = Field(self.timeframe.column_name(), table=pika_table)
-        elif base_table and base_table != self.table.sql_table_name:
+        elif base_table and base_table != self.table.find_source_name():
             sql = re.sub(
                 "\{\{TABLE\}\}",
-                self.table.sql_table_name,
+                self.table.find_source_name(),
                 self.timeframe.sql,
                 flags=re.IGNORECASE,
             )
             field = Field(sql, table=Table(base_table))
         else:
-            table = Table(self.table.sql_table_name)
+            table = Table(self.table.find_source_name())
             field = Field(self.timeframe.column_name(), table=table)
 
         return fn.Extract(self.part, field, alias=self.alias())
@@ -949,10 +950,8 @@ class MeltanoQuery(MeltanoBase):
             table_def = self.design.find_table(related_def["name"])
 
             if table_def:
-                table = MeltanoTable()
-                table.name = table_def.name
-                table.sql_table_name = table_def.sql_table_name
-                table.source_name = table_def.find_source_name()
+                table = MeltanoTable(design=self.design)
+                table.copy_metadata(table_def)
 
                 # Add the columns
                 for column in related_def.get("columns", []):
@@ -1177,10 +1176,11 @@ class MeltanoQuery(MeltanoBase):
         # Start By building the Join
         for join in self.join_order:
             table = next(
-                iter([t for t in self.tables if t.name == join["table"]]), None
+                iter([t for t in self.tables if t.find_source_name() == join["name"]]),
+                None,
             )
             # Create a pypika Table based on the Table's name
-            pika_table = Table(table.sql_table_name, alias=table.sql_table_name)
+            pika_table = Table(table.sql_table_name, alias=table.find_source_name())
 
             if join["on"] is None:
                 base_query = base_query.from_(pika_table)
@@ -1330,11 +1330,12 @@ class MeltanoQuery(MeltanoBase):
         # Start By building the Join
         for join in self.join_order:
             table = next(
-                iter([t for t in self.tables if t.name == join["table"]]), None
+                iter([t for t in self.tables if t.find_source_name() == join["name"]]),
+                None,
             )
 
             # Create a pypika Table based on the Table's name
-            db_table = Table(table.sql_table_name, alias=table.sql_table_name)
+            db_table = Table(table.sql_table_name, alias=table.find_source_name())
 
             if join["on"] is None:
                 base_join_query = base_join_query.from_(db_table)
@@ -1350,7 +1351,7 @@ class MeltanoQuery(MeltanoBase):
         #  timeframes and the primary keys in case they are not already included
         select = []
         for table in self.tables:
-            pika_table = Table(table.sql_table_name, alias=table.sql_table_name)
+            pika_table = Table(table.sql_table_name, alias=table.find_source_name())
 
             # Add the WHERE clauses using the column filters for this table
             for c in table.columns() + table.unselected_columns_with_filters():
@@ -1421,7 +1422,9 @@ class MeltanoQuery(MeltanoBase):
         result_query_base_table = None
         for j in self.join_order:
             # Find the table definition in the Query
-            table = next((t for t in self.tables if t.name == j["table"]), None)
+            table = next(
+                (t for t in self.tables if t.find_source_name() == j["name"]), None
+            )
 
             # Skip tables that don't have at least a Column, Aggregate or
             #  Timeframe requested in the Query definition
@@ -1429,7 +1432,7 @@ class MeltanoQuery(MeltanoBase):
                 continue
 
             # Generate the base_XXX with clause
-            base_db_table = f"base_{j['table']}"
+            base_db_table = f"base_{j['name']}"
 
             select = list(
                 set(
@@ -1443,7 +1446,7 @@ class MeltanoQuery(MeltanoBase):
             hda_query = hda_query.with_(base_query, base_db_table)
 
             # Generate the XXX_stats with clause
-            stats_db_table = f"{j['table']}_stats"
+            stats_db_table = f"{j['name']}_stats"
 
             select = group_by_attributes
             select_aggregates = [
@@ -1601,7 +1604,9 @@ class MeltanoQuery(MeltanoBase):
 
         schema_query = query
         for join in self.join_order:
-            table = next((t for t in self.tables if t.name == join["table"]), None)
+            table = next(
+                (t for t in self.tables if t.find_source_name() == join["name"]), None
+            )
 
             if join["on"] is None:
                 schema_query = schema_query.replace(
