@@ -9,7 +9,7 @@ import FilterModel from '@/store/models/FilterModel'
 import sqlApi from '@/api/sql'
 import utils from '@/utils/utils'
 import { CHART_MODELS } from '@/components/analyze/charts/ChartModels'
-import { QUERY_ATTRIBUTE_DATA_TYPES } from '@/api/design'
+import { QUERY_ATTRIBUTE_TYPES, QUERY_ATTRIBUTE_DATA_TYPES } from '@/api/design'
 import { selected } from '@/utils/predicates'
 import { namer } from '@/utils/mappers'
 
@@ -24,10 +24,7 @@ const defaultState = utils.deepFreeze({
     relatedTable: {}
   },
   filterOptions: [],
-  filters: {
-    aggregates: [],
-    columns: []
-  },
+  filters: [],
   isLastRunResultsEmpty: false,
   hasCompletedFirstQueryRun: false,
   hasSQLError: false,
@@ -113,15 +110,30 @@ const helpers = {
     }))
 
     // Filtering setup - Enforce number type for aggregates as v-model approach overwrites as string
-    const filters = lodash.cloneDeep(state.filters)
-    if (filters && filters.aggregates) {
-      filters.aggregates = filters.aggregates
-        .filter(aggregate => aggregate.isActive)
-        .map(aggregate => {
-          aggregate.value = Number(aggregate.value)
-          return aggregate
-        })
+    const activeFilters = state.filters.filter(({ isActive }) => isActive)
+
+    const filters = {
+      columns: [],
+      aggregates: []
     }
+
+    filters.columns = activeFilters
+      .filter(({ filterType }) => filterType === QUERY_ATTRIBUTE_TYPES.COLUMN)
+      .map(({ attribute, expression, value }) => ({
+        key: attribute.key,
+        expression,
+        value
+      }))
+
+    filters.aggregates = activeFilters
+      .filter(
+        ({ filterType }) => filterType === QUERY_ATTRIBUTE_TYPES.AGGREGATE
+      )
+      .map(({ attribute, expression, value }) => ({
+        key: attribute.key,
+        expression,
+        value: Number(value)
+      }))
 
     return {
       name: state.design.name,
@@ -211,13 +223,9 @@ const getters = {
     return attributesIndex
   },
 
-  getFilters(_, getters) {
-    return (sourceName, name, filterType) =>
-      getters
-        .getFiltersByType(filterType)
-        .filter(
-          filter => filter.name === name && filter.sourceName === sourceName
-        )
+  getFilters(state) {
+    return attribute =>
+      state.filters.filter(filter => filter.attribute.key === attribute.key)
   },
 
   getTableSources(state) {
@@ -256,16 +264,10 @@ const getters = {
     return sources
   },
 
-  getFiltersByType(state) {
-    return filterType =>
-      state.filters[helpers.getFilterTypePlural(filterType)] || []
-  },
-
   getFormattedValue: () => (fmt, value) => SSF.format(fmt, Number(value)),
 
   getIsAttributeInFilters(_, getters) {
-    return (sourceName, name, filterType) =>
-      getters.getFilters(sourceName, name, filterType).length > 0
+    return attribute => getters.getFilters(attribute).length > 0
   },
 
   // Timeframes are not sortable
@@ -279,17 +281,14 @@ const getters = {
   },
 
   getNonDateFiltersCount(_, getters) {
-    return getters.getNonDateFlattenedFilters.length
+    return getters.getNonDateFilters.length
   },
 
-  getNonDateFlattenedFilters(state, getters) {
-    const nonDateFilterColumns = state.filters.columns.filter(
+  getNonDateFilters(state, getters) {
+    const nonDateFilters = state.filters.filter(
       filter => !getters.getIsDateAttribute(filter.attribute)
     )
-    return lodash.sortBy(
-      nonDateFilterColumns.concat(state.filters.aggregates),
-      'name'
-    )
+    return lodash.sortBy(nonDateFilters, 'name')
   },
 
   getOrderableAttributeFromCollectionByAttribute(state) {
@@ -351,20 +350,19 @@ const actions = {
     // Aggregates must be selected if they're used as a filter target where columns do not
     const isValidToggleSelection =
       !filter.attribute.hasOwnProperty('selected') || !filter.attribute.selected
-    if (filter.filterType === 'aggregate' && isValidToggleSelection) {
+    if (
+      filter.filterType === QUERY_ATTRIBUTE_TYPES.AGGREGATE &&
+      isValidToggleSelection
+    ) {
       commit('toggleSelected', filter.attribute)
     }
 
     dispatch('tryAutoRun')
   },
 
-  cleanFiltering({ commit, getters }, { attribute, type }) {
+  cleanFiltering({ commit, getters }, attribute) {
     if (!attribute.selected) {
-      const filters = getters.getFilters(
-        attribute.sourceName,
-        attribute.name,
-        type
-      )
+      const filters = getters.getFilters(attribute)
       if (filters.length > 0) {
         filters.forEach(filter => commit('removeFilter', filter))
       }
@@ -621,7 +619,7 @@ const actions = {
   toggleAggregate({ commit, dispatch }, aggregate) {
     commit('toggleSelected', aggregate)
     dispatch('cleanOrdering', aggregate)
-    dispatch('cleanFiltering', { attribute: aggregate, type: 'aggregate' })
+    dispatch('cleanFiltering', aggregate)
     dispatch('tryAutoRun')
   },
 
@@ -693,7 +691,7 @@ const actions = {
 
 const mutations = {
   addFilter(state, filter) {
-    state.filters[helpers.getFilterTypePlural(filter.filterType)].push(filter)
+    state.filters.push(filter)
   },
 
   assignSortableAttribute(state, queryAttribute) {
@@ -707,10 +705,8 @@ const mutations = {
 
   removeFilter(state, filter) {
     if (filter) {
-      const filtersByType =
-        state.filters[helpers.getFilterTypePlural(filter.filterType)]
-      const idx = filtersByType.indexOf(filter)
-      Vue.delete(filtersByType, idx)
+      const idx = state.filters.indexOf(filter)
+      Vue.delete(state.filters, idx)
     }
   },
 
@@ -721,6 +717,10 @@ const mutations = {
 
   resetDefaults(state) {
     lodash.assign(state, lodash.cloneDeep(defaultState))
+  },
+
+  resetFilters(state) {
+    state.filters = []
   },
 
   resetQueryResults(state) {

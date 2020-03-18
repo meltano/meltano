@@ -20,7 +20,7 @@ export default {
     ...mapState('designs', ['filterOptions', 'filters']),
     ...mapGetters('designs', [
       'getIsDateAttribute',
-      'getNonDateFlattenedFilters',
+      'getNonDateFilters',
       'getTableSources',
       'hasNonDateFilters'
     ]),
@@ -29,11 +29,7 @@ export default {
     },
     getHasAtLeastOneLikeFilter() {
       const likeExpression = 'like'
-      const filtersByAttribute = [
-        ...this.filters.aggregates,
-        ...this.filters.columns
-      ]
-      const filterModelHasLike = filtersByAttribute.find(
+      const filterModelHasLike = this.filters.find(
         filter => filter.expression === likeExpression
       )
       return (
@@ -41,7 +37,7 @@ export default {
       )
     },
     getHasMultipleFilters() {
-      return this.getNonDateFlattenedFilters.length > 1
+      return this.getNonDateFilters.length > 1
     },
     getHasValidatedOptionals() {
       return (expression, value) =>
@@ -67,10 +63,10 @@ export default {
     },
     isFirstFilterMatch() {
       return filter => {
-        const match = this.getNonDateFlattenedFilters.find(
+        const firstFilter = this.getNonDateFilters.find(
           tempFilter => tempFilter.attribute.key === filter.attribute.key
         )
-        return match === filter
+        return firstFilter === filter
       }
     },
     isValidAdd() {

@@ -400,7 +400,7 @@ export default {
           <p v-if="getDateAttributes.length" class="control">
             <DateRangePicker
               :attributes="getDateAttributes"
-              :column-filters="filters.columns"
+              :filters="filters"
             />
           </p>
           <div
