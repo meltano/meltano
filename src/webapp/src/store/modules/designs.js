@@ -107,13 +107,10 @@ const helpers = {
       .filter(tf => tf.periods.length)
 
     // Ordering setup
-    const order = state.order.assigned.map(orderable => {
-      return {
-        direction: orderable.direction,
-        sourceName: orderable.attribute.sourceName,
-        attributeName: orderable.attribute.name
-      }
-    })
+    const order = state.order.assigned.map(({ direction, attribute }) => ({
+      key: attribute.key,
+      direction: direction
+    }))
 
     // Filtering setup - Enforce number type for aggregates as v-model approach overwrites as string
     const filters = lodash.cloneDeep(state.filters)
@@ -214,16 +211,6 @@ const getters = {
     return attributesIndex
   },
 
-  getAttributeByQueryAttribute(_, getters) {
-    return queryAttribute => {
-      const finder = attr =>
-        attr.sourceName === queryAttribute.sourceName &&
-        attr.name == queryAttribute.attributeName &&
-        attr.class === queryAttribute.attributeClass
-      return getters.getAttributes().find(finder)
-    }
-  },
-
   getFilters(_, getters) {
     return (sourceName, name, filterType) =>
       getters
@@ -307,8 +294,8 @@ const getters = {
 
   getOrderableAttributeFromCollectionByAttribute(state) {
     return (orderCollection, attribute) => {
-      const finder = orderableAttribute => {
-        return orderableAttribute.attribute === attribute
+      const finder = orderable => {
+        return orderable.attribute.key === attribute.key
       }
       return state.order[orderCollection].find(finder)
     }
@@ -649,9 +636,9 @@ const actions = {
     helpers.debouncedAutoRun()
   },
 
-  toggleColumn({ commit, dispatch }, column) {
-    commit('toggleSelected', column)
-    dispatch('cleanOrdering', column)
+  toggleAttribute({ commit, dispatch }, attribute) {
+    commit('toggleSelected', attribute)
+    dispatch('cleanOrdering', attribute)
     dispatch('tryAutoRun')
   },
 
@@ -667,12 +654,6 @@ const actions = {
     commit('toggleSelected', timeframe)
   },
 
-  toggleTimeframePeriod({ commit, dispatch }, { timeframe, period }) {
-    commit('toggleSelected', period)
-    dispatch('cleanOrdering', timeframe)
-    dispatch('tryAutoRun')
-  },
-
   updateReport({ commit, dispatch, rootGetters, state }) {
     commit('updateActiveReport')
     return dispatch('reports/updateReport', state.activeReport, {
@@ -684,14 +665,13 @@ const actions = {
   },
 
   updateSortAttribute({ commit, getters }, queryAttribute) {
-    const attribute = getters.getAttributeByQueryAttribute(queryAttribute)
     const matchInAssigned = getters.getOrderableAttributeFromCollectionByAttribute(
       'assigned',
-      attribute
+      queryAttribute
     )
     const matchInUnassigned = getters.getOrderableAttributeFromCollectionByAttribute(
       'unassigned',
-      attribute
+      queryAttribute
     )
     if (matchInAssigned) {
       const direction = getters.getIsOrderableAttributeAscending(
@@ -704,7 +684,7 @@ const actions = {
         direction
       })
     } else if (matchInUnassigned) {
-      commit('assignSortableAttribute', attribute)
+      commit('assignSortableAttribute', queryAttribute)
     }
 
     this.dispatch('designs/runQuery')
@@ -716,9 +696,9 @@ const mutations = {
     state.filters[helpers.getFilterTypePlural(filter.filterType)].push(filter)
   },
 
-  assignSortableAttribute(state, attribute) {
+  assignSortableAttribute(state, queryAttribute) {
     const orderableAttribute = state.order.unassigned.find(
-      orderableAttr => orderableAttr.attribute === attribute
+      orderable => orderable.attribute.key === queryAttribute.key
     )
     const idx = state.order.unassigned.indexOf(orderableAttribute)
     Vue.delete(state.order.unassigned, idx)
@@ -787,8 +767,6 @@ const mutations = {
         if (table[attributeType]) {
           table[attributeType].forEach(attribute => {
             attribute.sourceName = source.name
-            attribute.sourceLabel = source.label
-            attribute.class = attributeType
           })
         }
       })

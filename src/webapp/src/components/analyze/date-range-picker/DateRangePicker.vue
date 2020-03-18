@@ -207,13 +207,9 @@ export default {
       let idx
       // Set the target index based on an optional payload or first date range match condition or 0 index fallback
       if (payload) {
-        match = this.attributePairsModel.find(attributePair => {
-          const attribute = attributePair.attribute
-          return (
-            attribute.sourceName === payload.sourceName &&
-            attribute.name === payload.name
-          )
-        })
+        match = this.attributePairsModel.find(
+          attributePair => attributePair.attribute.key === payload.key
+        )
       } else if (!this.hasSetAttributePairInFocusIndex) {
         match = this.attributePairsModel.find(
           attributePair => attributePair.absoluteDateRange.start !== null
@@ -323,12 +319,7 @@ export default {
       <template v-for="attributePair in attributePairsModel">
         <div
           v-if="getIsAttributePairInFocus(attributePair)"
-          :key="
-            getKey(
-              attributePair.attribute.sourceName,
-              attributePair.attribute.name
-            )
-          "
+          :key="attributePair.attribute.key"
           class="dropdown-item"
         >
           <v-date-picker

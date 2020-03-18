@@ -27,17 +27,6 @@ export default {
         group: 'sortBy'
       }
     },
-    label() {
-      return attribute => {
-        let label = attribute.label
-        if (attribute.periods) {
-          label += ` - ${
-            attribute.periods.find(period => period.selected).label
-          }`
-        }
-        return label
-      }
-    },
     unassigned: {
       get() {
         return this.order.unassigned
@@ -69,16 +58,14 @@ export default {
         <transition-group>
           <div
             v-for="(orderable, idx) in unassigned"
-            :key="
-              `${orderable.attribute.sourceName}-${orderable.attribute.name}-${idx}`
-            "
+            :key="`${orderable.attribute.key}-${idx}`"
             class="drag-list-item has-background-white"
           >
             <div class="drag-handle has-text-weight-normal">
               <span class="icon is-small">
                 <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
               </span>
-              <span>{{ label(orderable.attribute) }}</span>
+              <span>{{ orderable.attribute.attributeLabel }}</span>
             </div>
           </div>
         </transition-group>
@@ -109,9 +96,7 @@ export default {
         <transition-group>
           <div
             v-for="(orderable, idx) in assigned"
-            :key="
-              `${orderable.attribute.sourceName}-${orderable.attribute.name}-${idx}`
-            "
+            :key="`${orderable.attribute.key}-${idx}`"
             class="h-space-between drag-list-item has-background-white has-text-interactive-secondary"
           >
             <div
@@ -120,11 +105,13 @@ export default {
               <span class="icon is-small">
                 <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
               </span>
-              <span>{{ idx + 1 }}. {{ label(orderable.attribute) }}</span>
+              <span
+                >{{ idx + 1 }}. {{ orderable.attribute.attributeLabel }}</span
+              >
             </div>
             <button
               class="button is-small"
-              @click="updateSortAttribute(orderable)"
+              @click="updateSortAttribute(orderable.attribute)"
             >
               <span class="icon is-small has-text-interactive-secondary">
                 <font-awesome-icon
