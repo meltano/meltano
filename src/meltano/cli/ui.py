@@ -74,7 +74,7 @@ def start(ctx, reload, bind_port, bind):
         compiler_worker.compiler.compile()
         workers.append(compiler_worker)
     except Exception as e:
-        logger.error(f"Initial compilation failed.")
+        logger.error(f"Initial compilation failed: {e}")
 
     workers.append(UIAvailableWorker("http://localhost:{bind_port}"))
     workers.append(
