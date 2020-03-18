@@ -21,6 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1872](https://gitlab.com/meltano/meltano/-/issues/1872) Delete state left over from different pipeline run for same extractor
+- [#1779](https://gitlab.com/meltano/meltano/-/issues/1779) Fix loading report directly by URL when design request completes before reports request
 
 ### Breaks
 
