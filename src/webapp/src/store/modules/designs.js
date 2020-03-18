@@ -571,11 +571,9 @@ const actions = {
     const postData = {
       chartType: state.chartType,
       design: state.currentDesign,
-      filters: state.filters,
       model: state.currentModel,
       namespace: state.currentNamespace,
       name,
-      order: state.order,
       queryPayload: helpers.getQueryPayloadFromDesign(state)
     }
     return dispatch('reports/saveReport', postData, { root: true }).then(
@@ -822,6 +820,12 @@ const mutations = {
     state.activeReport = report
     state.chartType = report.chartType
     state.limit = report.queryPayload.limit
+
+    // state.{order,filters} is now set based on
+    // report.queryPayload.{order,filters}, not
+    // report.{order,filters}
+    delete report.order
+    delete report.filters
   },
 
   setDesign(state, designData) {
