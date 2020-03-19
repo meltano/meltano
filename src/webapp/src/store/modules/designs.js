@@ -70,28 +70,26 @@ const helpers = {
     if (!state.design.joins) {
       state.design.joins = []
     }
-    const joins = state.design.joins
-      .map(j => {
-        const table = j.relatedTable
-        const newJoin = {}
+    const joins = state.design.joins.map(j => {
+      const table = j.relatedTable
+      const newJoin = {}
 
-        newJoin.name = j.name
-        newJoin.columns = namesOfSelected(table.columns) || []
-        newJoin.aggregates = namesOfSelected(table.aggregates) || []
+      newJoin.name = j.name
+      newJoin.columns = namesOfSelected(table.columns) || []
+      newJoin.aggregates = namesOfSelected(table.aggregates) || []
 
-        if (table.timeframes) {
-          newJoin.timeframes = table.timeframes
-            .filter(selected)
-            .map(({ name, periods }) => ({
-              name,
-              periods: periods.filter(selected).map(({ name }) => ({ name }))
-            }))
-            .filter(tf => tf.periods.length)
-        }
+      if (table.timeframes) {
+        newJoin.timeframes = table.timeframes
+          .filter(selected)
+          .map(({ name, periods }) => ({
+            name,
+            periods: periods.filter(selected).map(({ name }) => ({ name }))
+          }))
+          .filter(tf => tf.periods.length)
+      }
 
-        return newJoin
-      })
-      .filter(j => !!(j.columns || j.aggregates))
+      return newJoin
+    })
 
     // TODO update default empty array likely
     // in the ma_file_parser to set proper defaults
