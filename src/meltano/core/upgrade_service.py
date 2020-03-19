@@ -1,6 +1,7 @@
 import os
 import logging
 import psutil
+import importlib
 import meltano
 import subprocess
 import signal
@@ -9,6 +10,7 @@ from typing import Optional
 
 from meltano.core.project import Project
 from meltano.core.migration_service import MigrationService
+import meltano.core.compiler.project_compiler
 import meltano.core.bundle as bundle
 
 
@@ -77,8 +79,18 @@ class UpgradeService:
             except Exception as err:
                 logging.error(f"Meltano could not update {dst}: {err}")
 
+    def compile_models(self):
+        # Make sure we load the _new_ Meltano version's ProjectCompiler
+        importlib.reload(meltano.core.compiler.project_compiler)
+        from meltano.core.compiler.project_compiler import ProjectCompiler
+
+        ProjectCompiler(self.project).compile()
+
     def upgrade(self, **kwargs):
         self.upgrade_package(**kwargs)
         self.upgrade_files()
+
         self.migration_service.upgrade()
         self.migration_service.seed(self.project)
+
+        self.compile_models()

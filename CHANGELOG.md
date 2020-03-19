@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1878](https://gitlab.com/meltano/meltano/-/issues/1878) Recompile models when meltano is upgraded
+
 ### Fixes
 
 ### Breaks
