@@ -21,6 +21,36 @@
       sql = "{{table}}.updated_at"
     }
   }
+  timeframes {
+    report_date {
+      label = "Report Date"
+      sql = "{{table}}.report_date"
+      type = date
+      periods = [
+        { name = dow, label = Day (week), part = DOW },
+        { name = dom, label = Day (month), part = DAY },
+        { name = doy, label = Day (year), part = DOY },
+        { name = week, label = Week, part = WEEK },
+        { name = month, label = Month, part = MONTH },
+        { name = year, label = Year, part = YEAR },
+        { name = quarter, label = Quarter, part = QUARTER }
+      ]
+    }
+    updated_at {
+      label = "Updated At"
+      sql = "{{table}}.updated_at"
+      type = time
+      periods = [
+        { name = dow, label = Day (week), part = DOW },
+        { name = dom, label = Day (month), part = DAY },
+        { name = doy, label = Day (year), part = DOY },
+        { name = week, label = Week, part = WEEK },
+        { name = month, label = Month, part = MONTH },
+        { name = year, label = Year, part = YEAR },
+        { name = quarter, label = Quarter, part = QUARTER }
+      ]
+    }
+  }
   aggregates {
     count {
       label = Row Count

@@ -176,8 +176,8 @@ export default {
       this.$router.push({ name: 'report', params: report })
     },
 
-    columnSelected(column) {
-      this.$store.dispatch('designs/toggleColumn', column)
+    attributeSelected(column) {
+      this.$store.dispatch('designs/toggleAttribute', column)
     },
 
     goToDashboard(dashboard) {
@@ -233,8 +233,8 @@ export default {
       this.$store.dispatch('designs/toggleAggregate', aggregate)
     },
 
-    joinColumnSelected(join, column) {
-      this.$store.dispatch('designs/toggleColumn', column)
+    joinAttributeSelected(join, attribute) {
+      this.$store.dispatch('designs/toggleAttribute', attribute)
     },
 
     joinRowClicked(join) {
@@ -267,13 +267,6 @@ export default {
 
     tableRowClicked(relatedTable) {
       this.$store.dispatch('designs/expandRow', relatedTable)
-    },
-
-    timeframePeriodSelected(timeframe, period) {
-      this.$store.dispatch('designs/toggleTimeframePeriod', {
-        timeframe,
-        period
-      })
     },
 
     timeframeSelected(timeframe) {
@@ -335,7 +328,7 @@ export default {
 
       const column = finder('columns')
       if (column) {
-        this.columnSelected(column)
+        this.attributeSelected(column)
       }
 
       const aggregate = finder('aggregates')
@@ -363,7 +356,7 @@ export default {
       if (hasRequireds) {
         requireds.forEach(columnAttribute => {
           if (!columnAttribute.selected) {
-            this.columnSelected(columnAttribute)
+            this.attributeSelected(columnAttribute)
           }
         })
       }
@@ -407,7 +400,7 @@ export default {
           <p v-if="getDateAttributes.length" class="control">
             <DateRangePicker
               :attributes="getDateAttributes"
-              :column-filters="filters.columns"
+              :filters="filters"
             />
           </p>
           <div
@@ -738,19 +731,13 @@ export default {
                   <template v-for="column in design.relatedTable.columns">
                     <TableAttributeButton
                       v-if="!column.hidden"
-                      :key="
-                        getKey(
-                          design.relatedTable,
-                          getAttributeTypeColumn,
-                          column
-                        )
-                      "
+                      :key="getKey('column', column.key)"
                       :data-test-id="`column-${column.label}`.toLowerCase()"
                       :attribute="column"
                       :attribute-type="getAttributeTypeColumn"
                       :design="design"
                       :is-disabled="Boolean(column.required)"
-                      @attribute-selected="columnSelected(column)"
+                      @attribute-selected="attributeSelected(column)"
                       @calendar-click="jumpToDateFilters(column)"
                       @filter-click="jumpToFilters"
                     />
@@ -768,13 +755,7 @@ export default {
                   <template v-for="timeframe in design.relatedTable.timeframes">
                     <TableAttributeButton
                       v-if="!timeframe.hidden"
-                      :key="
-                        getKey(
-                          design.relatedTable,
-                          getAttributeTypeTimeframe,
-                          timeframe
-                        )
-                      "
+                      :key="getKey('timeframe', timeframe.key)"
                       :attribute="timeframe"
                       :attribute-type="getAttributeTypeTimeframe"
                       :design="design"
@@ -783,10 +764,10 @@ export default {
                     <template v-for="period in timeframe.periods">
                       <a
                         v-if="timeframe.selected"
-                        :key="period.label"
+                        :key="getKey('period', period.key)"
                         class="panel-block indented"
                         :class="{ 'is-active': period.selected }"
-                        @click="timeframePeriodSelected(timeframe, period)"
+                        @click="attributeSelected(period)"
                       >
                         {{ period.label }}
                       </a>
@@ -805,13 +786,7 @@ export default {
                   <template v-for="aggregate in design.relatedTable.aggregates">
                     <TableAttributeButton
                       v-if="!aggregate.hidden"
-                      :key="
-                        getKey(
-                          design.relatedTable,
-                          getAttributeTypeAggregate,
-                          aggregate
-                        )
-                      "
+                      :key="getKey('aggregate', aggregate.key)"
                       :data-test-id="
                         `aggregate-${aggregate.label}`.toLowerCase()
                       "
@@ -829,7 +804,7 @@ export default {
                 <template v-if="hasJoins">
                   <template v-for="join in design.joins">
                     <a
-                      :key="getKey(join.relatedTable)"
+                      :key="join.relatedTable.sourceName"
                       class="panel-block
                       table-heading
                       analyze-join-table
@@ -860,19 +835,15 @@ export default {
                       <template v-for="column in join.relatedTable.columns">
                         <TableAttributeButton
                           v-if="!column.hidden"
-                          :key="
-                            getKey(
-                              join.relatedTable,
-                              getAttributeTypeColumn,
-                              column
-                            )
-                          "
+                          :key="getKey('column', column.key)"
                           :data-test-id="`column-${column.label}`.toLowerCase()"
                           :attribute="column"
                           :attribute-type="getAttributeTypeColumn"
                           :design="join"
                           :is-disabled="Boolean(column.required)"
-                          @attribute-selected="joinColumnSelected(join, column)"
+                          @attribute-selected="
+                            joinAttributeSelected(join, column)
+                          "
                           @calendar-click="jumpToDateFilters(column)"
                           @filter-click="jumpToFilters"
                         />
@@ -895,13 +866,7 @@ export default {
                       >
                         <TableAttributeButton
                           v-if="!timeframe.hidden"
-                          :key="
-                            getKey(
-                              join.relatedTable,
-                              getAttributeTypeTimeframe,
-                              timeframe
-                            )
-                          "
+                          :key="getKey('timeframe', timeframe.key)"
                           :attribute="timeframe"
                           :attribute-type="getAttributeTypeTimeframe"
                           :design="join"
@@ -910,20 +875,10 @@ export default {
                         <template v-if="timeframe.selected">
                           <template v-for="period in timeframe.periods">
                             <a
-                              :key="
-                                getKey(
-                                  join.relatedTable,
-                                  'timeframe',
-                                  timeframe,
-                                  'period',
-                                  period
-                                )
-                              "
+                              :key="getKey('period', period.key)"
                               class="panel-block indented"
                               :class="{ 'is-active': period.selected }"
-                              @click="
-                                timeframePeriodSelected(timeframe, period)
-                              "
+                              @click="joinAttributeSelected(join, period)"
                             >
                               {{ period.label }}
                             </a>
@@ -948,13 +903,7 @@ export default {
                       >
                         <TableAttributeButton
                           v-if="!aggregate.hidden"
-                          :key="
-                            getKey(
-                              join.relatedTable,
-                              getAttributeTypeAggregate,
-                              aggregate
-                            )
-                          "
+                          :key="getKey('aggregate', aggregate.key)"
                           :data-test-id="
                             `aggregate-${aggregate.label}`.toLowerCase()
                           "

@@ -11,6 +11,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1188](https://gitlab.com/meltano/meltano/-/issues/1188) Allow sorting by timeframe period columns (e.g. "Creation Date: Month", "Creation Date: Year")
+- [#1873](https://gitlab.com/meltano/meltano/-/issues/1873) Display error message when viewing model/design/report before pipeline has run
+- [#1874](https://gitlab.com/meltano/meltano/-/issues/1874) Print full error when initial model compilation fails
+- [#1875](https://gitlab.com/meltano/meltano/-/issues/1875) Automatically run query when sorting is changed
+- [#1876](https://gitlab.com/meltano/meltano/-/issues/1876) Don't store Analyze UI state in report file
+- [#1877](https://gitlab.com/meltano/meltano/-/issues/1877) Allow designs to reference the same table more than once
+
 ### Fixes
 
 ### Breaks

@@ -9,7 +9,7 @@ import FilterModel from '@/store/models/FilterModel'
 import sqlApi from '@/api/sql'
 import utils from '@/utils/utils'
 import { CHART_MODELS } from '@/components/analyze/charts/ChartModels'
-import { QUERY_ATTRIBUTE_DATA_TYPES } from '@/api/design'
+import { QUERY_ATTRIBUTE_TYPES, QUERY_ATTRIBUTE_DATA_TYPES } from '@/api/design'
 import { selected } from '@/utils/predicates'
 import { namer } from '@/utils/mappers'
 
@@ -24,10 +24,7 @@ const defaultState = utils.deepFreeze({
     relatedTable: {}
   },
   filterOptions: [],
-  filters: {
-    aggregates: [],
-    columns: []
-  },
+  filters: [],
   isLastRunResultsEmpty: false,
   hasCompletedFirstQueryRun: false,
   hasSQLError: false,
@@ -73,58 +70,68 @@ const helpers = {
     if (!state.design.joins) {
       state.design.joins = []
     }
-    const joins = state.design.joins
-      .map(j => {
-        const table = j.relatedTable
-        const newJoin = {}
+    const joins = state.design.joins.map(j => {
+      const table = j.relatedTable
+      const newJoin = {}
 
-        newJoin.name = j.name
-        newJoin.columns = namesOfSelected(table.columns) || []
-        newJoin.aggregates = namesOfSelected(table.aggregates) || []
+      newJoin.name = j.name
+      newJoin.columns = namesOfSelected(table.columns) || []
+      newJoin.aggregates = namesOfSelected(table.aggregates) || []
 
-        if (table.timeframes) {
-          newJoin.timeframes = table.timeframes
-            .filter(selected)
-            .map(({ name, periods }) => ({
-              name,
-              periods: periods.filter(selected)
-            }))
-            .filter(tf => tf.periods.length)
-        }
+      if (table.timeframes) {
+        newJoin.timeframes = table.timeframes
+          .filter(selected)
+          .map(({ name, periods }) => ({
+            name,
+            periods: periods.filter(selected).map(({ name }) => ({ name }))
+          }))
+          .filter(tf => tf.periods.length)
+      }
 
-        return newJoin
-      })
-      .filter(j => !!(j.columns || j.aggregates))
+      return newJoin
+    })
 
     // TODO update default empty array likely
     // in the ma_file_parser to set proper defaults
     // if user's exclude certain properties in their models
     const timeframes = (baseTable.timeframes || [])
-      .map(tf => ({
-        name: tf.name,
-        periods: tf.periods.filter(selected)
+      .map(({ name, periods }) => ({
+        name: name,
+        periods: periods.filter(selected).map(({ name }) => ({ name }))
       }))
       .filter(tf => tf.periods.length)
 
     // Ordering setup
-    const order = state.order.assigned.map(orderable => {
-      return {
-        direction: orderable.direction,
-        sourceName: orderable.attribute.sourceName,
-        attributeName: orderable.attribute.name
-      }
-    })
+    const order = state.order.assigned.map(({ direction, attribute }) => ({
+      key: attribute.key,
+      direction: direction
+    }))
 
     // Filtering setup - Enforce number type for aggregates as v-model approach overwrites as string
-    const filters = lodash.cloneDeep(state.filters)
-    if (filters && filters.aggregates) {
-      filters.aggregates = filters.aggregates
-        .filter(aggregate => aggregate.isActive)
-        .map(aggregate => {
-          aggregate.value = Number(aggregate.value)
-          return aggregate
-        })
+    const activeFilters = state.filters.filter(({ isActive }) => isActive)
+
+    const filters = {
+      columns: [],
+      aggregates: []
     }
+
+    filters.columns = activeFilters
+      .filter(({ filterType }) => filterType === QUERY_ATTRIBUTE_TYPES.COLUMN)
+      .map(({ attribute, expression, value }) => ({
+        key: attribute.key,
+        expression,
+        value
+      }))
+
+    filters.aggregates = activeFilters
+      .filter(
+        ({ filterType }) => filterType === QUERY_ATTRIBUTE_TYPES.AGGREGATE
+      )
+      .map(({ attribute, expression, value }) => ({
+        key: attribute.key,
+        expression,
+        value: Number(value)
+      }))
 
     return {
       name: state.design.name,
@@ -195,42 +202,9 @@ const getters = {
       attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.TIME
   },
 
-  getOrderableAttributesIndex(state, getters) {
-    const attributes = getters.getAttributes()
-
-    let attributesIndex = {}
-    attributes.forEach(attribute => {
-      if (
-        !getters.getIsOrderableAttribute({ attributeClass: attribute.class })
-      ) {
-        return
-      }
-
-      attributesIndex[
-        helpers.buildKey(attribute.sourceName, attribute.name)
-      ] = attribute
-    })
-
-    return attributesIndex
-  },
-
-  getAttributeByQueryAttribute(_, getters) {
-    return queryAttribute => {
-      const finder = attr =>
-        attr.sourceName === queryAttribute.sourceName &&
-        attr.name == queryAttribute.attributeName &&
-        attr.class === queryAttribute.attributeClass
-      return getters.getAttributes().find(finder)
-    }
-  },
-
-  getFilters(_, getters) {
-    return (sourceName, name, filterType) =>
-      getters
-        .getFiltersByType(filterType)
-        .filter(
-          filter => filter.name === name && filter.sourceName === sourceName
-        )
+  getFilters(state) {
+    return attribute =>
+      state.filters.filter(filter => filter.attribute.key === attribute.key)
   },
 
   getTableSources(state) {
@@ -269,22 +243,10 @@ const getters = {
     return sources
   },
 
-  getFiltersByType(state) {
-    return filterType =>
-      state.filters[helpers.getFilterTypePlural(filterType)] || []
-  },
-
   getFormattedValue: () => (fmt, value) => SSF.format(fmt, Number(value)),
 
   getIsAttributeInFilters(_, getters) {
-    return (sourceName, name, filterType) =>
-      getters.getFilters(sourceName, name, filterType).length > 0
-  },
-
-  // Timeframes are not sortable
-  // https://gitlab.com/meltano/meltano/issues/1188
-  getIsOrderableAttribute() {
-    return queryAttribute => queryAttribute.attributeClass != 'timeframes'
+    return attribute => getters.getFilters(attribute).length > 0
   },
 
   getIsOrderableAttributeAscending() {
@@ -292,23 +254,20 @@ const getters = {
   },
 
   getNonDateFiltersCount(_, getters) {
-    return getters.getNonDateFlattenedFilters.length
+    return getters.getNonDateFilters.length
   },
 
-  getNonDateFlattenedFilters(state, getters) {
-    const nonDateFilterColumns = state.filters.columns.filter(
+  getNonDateFilters(state, getters) {
+    const nonDateFilters = state.filters.filter(
       filter => !getters.getIsDateAttribute(filter.attribute)
     )
-    return lodash.sortBy(
-      nonDateFilterColumns.concat(state.filters.aggregates),
-      'name'
-    )
+    return lodash.sortBy(nonDateFilters, 'name')
   },
 
   getOrderableAttributeFromCollectionByAttribute(state) {
     return (orderCollection, attribute) => {
-      const finder = orderableAttribute => {
-        return orderableAttribute.attribute === attribute
+      const finder = orderable => {
+        return orderable.attribute.key === attribute.key
       }
       return state.order[orderCollection].find(finder)
     }
@@ -364,20 +323,19 @@ const actions = {
     // Aggregates must be selected if they're used as a filter target where columns do not
     const isValidToggleSelection =
       !filter.attribute.hasOwnProperty('selected') || !filter.attribute.selected
-    if (filter.filterType === 'aggregate' && isValidToggleSelection) {
+    if (
+      filter.filterType === QUERY_ATTRIBUTE_TYPES.AGGREGATE &&
+      isValidToggleSelection
+    ) {
       commit('toggleSelected', filter.attribute)
     }
 
     dispatch('tryAutoRun')
   },
 
-  cleanFiltering({ commit, getters }, { attribute, type }) {
+  cleanFiltering({ commit, getters }, attribute) {
     if (!attribute.selected) {
-      const filters = getters.getFilters(
-        attribute.sourceName,
-        attribute.name,
-        type
-      )
+      const filters = getters.getFilters(attribute)
       if (filters.length > 0) {
         filters.forEach(filter => commit('removeFilter', filter))
       }
@@ -474,7 +432,7 @@ const actions = {
     })
   },
 
-  getSQL({ commit, getters, state }, { run, payload }) {
+  getSQL({ commit, dispatch, state }, { run, payload }) {
     this.dispatch('designs/resetErrorMessage')
     commit('setIsLoadingQuery', !!run)
 
@@ -499,9 +457,7 @@ const actions = {
           commit('setHasCompletedFirstQueryRun', true)
           commit('setQueryResults', response.data)
           commit('setSQLResults', response.data)
-          commit('setSorting', {
-            attributesIndex: getters.getOrderableAttributesIndex
-          })
+          dispatch('setSorting', postData.order)
         } else {
           commit('setSQLResults', response.data)
         }
@@ -512,7 +468,7 @@ const actions = {
       .finally(() => commit('setIsLoadingQuery', false))
   },
 
-  loadReport({ state, commit }, report) {
+  loadReport({ state, commit, dispatch }, report) {
     const nameMatcher = (source, target) => source.name === target.name
 
     // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
@@ -561,23 +517,27 @@ const actions = {
       // joins - columns
       const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup))
 
-      setSelected(joinGroup.columns, targetJoin.columns)
-      setSelected(joinGroup.aggregates, targetJoin.aggregates)
-      setSelected(joinGroup.timeframes, targetJoin.timeframes.map(namer))
+      if (targetJoin) {
+        setSelected(joinGroup.columns, targetJoin.columns)
+        setSelected(joinGroup.aggregates, targetJoin.aggregates)
+        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(namer))
 
-      // timeframes periods
-      targetJoin.timeframes.forEach(queryTimeframe => {
-        const timeframe = joinGroup.timeframes.find(tf =>
-          nameMatcher(tf, queryTimeframe)
-        )
-        setSelected(timeframe.periods, queryTimeframe.periods.map(namer))
-      })
+        // timeframes periods
+        targetJoin.timeframes.forEach(queryTimeframe => {
+          const timeframe = joinGroup.timeframes.find(tf =>
+            nameMatcher(tf, queryTimeframe)
+          )
+          setSelected(timeframe.periods, queryTimeframe.periods.map(namer))
+        })
+      }
     })
+
+    dispatch('setFiltersFromQuery', queryPayload.filters)
 
     commit('setCurrentReport', report)
     this.dispatch('designs/getSQL', {
       run: true,
-      payload: report.queryPayload
+      payload: queryPayload
     })
   },
 
@@ -611,11 +571,9 @@ const actions = {
     const postData = {
       chartType: state.chartType,
       design: state.currentDesign,
-      filters: state.filters,
       model: state.currentModel,
       namespace: state.currentNamespace,
       name,
-      order: state.order,
       queryPayload: helpers.getQueryPayloadFromDesign(state)
     }
     return dispatch('reports/saveReport', postData, { root: true }).then(
@@ -634,7 +592,7 @@ const actions = {
   toggleAggregate({ commit, dispatch }, aggregate) {
     commit('toggleSelected', aggregate)
     dispatch('cleanOrdering', aggregate)
-    dispatch('cleanFiltering', { attribute: aggregate, type: 'aggregate' })
+    dispatch('cleanFiltering', aggregate)
     dispatch('tryAutoRun')
   },
 
@@ -649,9 +607,9 @@ const actions = {
     helpers.debouncedAutoRun()
   },
 
-  toggleColumn({ commit, dispatch }, column) {
-    commit('toggleSelected', column)
-    dispatch('cleanOrdering', column)
+  toggleAttribute({ commit, dispatch }, attribute) {
+    commit('toggleSelected', attribute)
+    dispatch('cleanOrdering', attribute)
     dispatch('tryAutoRun')
   },
 
@@ -667,12 +625,6 @@ const actions = {
     commit('toggleSelected', timeframe)
   },
 
-  toggleTimeframePeriod({ commit, dispatch }, { timeframe, period }) {
-    commit('toggleSelected', period)
-    dispatch('cleanOrdering', timeframe)
-    dispatch('tryAutoRun')
-  },
-
   updateReport({ commit, dispatch, rootGetters, state }) {
     commit('updateActiveReport')
     return dispatch('reports/updateReport', state.activeReport, {
@@ -683,15 +635,14 @@ const actions = {
     })
   },
 
-  updateSortAttribute({ commit, getters }, queryAttribute) {
-    const attribute = getters.getAttributeByQueryAttribute(queryAttribute)
+  updateSortAttribute({ commit, dispatch, getters }, queryAttribute) {
     const matchInAssigned = getters.getOrderableAttributeFromCollectionByAttribute(
       'assigned',
-      attribute
+      queryAttribute
     )
     const matchInUnassigned = getters.getOrderableAttributeFromCollectionByAttribute(
       'unassigned',
-      attribute
+      queryAttribute
     )
     if (matchInAssigned) {
       const direction = getters.getIsOrderableAttributeAscending(
@@ -704,21 +655,114 @@ const actions = {
         direction
       })
     } else if (matchInUnassigned) {
-      commit('assignSortableAttribute', attribute)
+      commit('assignSortableAttribute', queryAttribute)
     }
 
-    this.dispatch('designs/runQuery')
+    dispatch('runQuery')
+  },
+
+  setOrderAssigned({ commit, dispatch }, value) {
+    commit('setOrderAssigned', value)
+    dispatch('runQuery')
+  },
+
+  setOrderUnassigned({ commit }, value) {
+    commit('setOrderUnassigned', value)
+  },
+
+  setSorting({ commit, state }, queryOrder) {
+    const orderAssigned = []
+    queryOrder.forEach(queryOrderAttribute => {
+      const queryAttribute = state.queryAttributes.find(queryAttribute =>
+        queryOrderAttribute.key
+          ? queryOrderAttribute.key === queryAttribute.key
+          : queryOrderAttribute.sourceName === queryAttribute.sourceName &&
+            queryOrderAttribute.attributeName === queryAttribute.attributeName
+      )
+      if (queryAttribute) {
+        orderAssigned.push({
+          attribute: queryAttribute,
+          direction: queryOrderAttribute.direction
+        })
+      }
+    })
+
+    const orderUnassigned = []
+    state.queryAttributes.forEach(queryAttribute => {
+      if (
+        !orderAssigned.find(
+          orderable => orderable.attribute.key === queryAttribute.key
+        )
+      ) {
+        orderUnassigned.push({
+          attribute: queryAttribute,
+          direction: 'asc'
+        })
+      }
+    })
+
+    commit('setOrderAssigned', orderAssigned)
+    commit('setOrderUnassigned', orderUnassigned)
+  },
+
+  setFiltersFromQuery({ commit, getters }, queryFilters) {
+    commit('resetFilters')
+
+    const filterTypes = [
+      QUERY_ATTRIBUTE_TYPES.COLUMN,
+      QUERY_ATTRIBUTE_TYPES.AGGREGATE
+    ]
+    filterTypes.forEach(filterType => {
+      const filterTypePlural = helpers.getFilterTypePlural(filterType)
+      queryFilters[filterTypePlural].forEach(queryFilter => {
+        let attribute
+        if (queryFilter.key) {
+          for (let source of getters.getTableSources) {
+            attribute = source[filterTypePlural].find(
+              attribute => attribute.key === queryFilter.key
+            )
+
+            if (attribute) {
+              break
+            }
+          }
+        } else {
+          const source = getters.getTableSources.find(
+            source => source.name === queryFilter.sourceName
+          )
+          if (!source) {
+            return
+          }
+
+          attribute = source[filterTypePlural].find(
+            attribute => attribute.name === queryFilter.name
+          )
+        }
+
+        if (!attribute) {
+          return
+        }
+
+        const filter = new FilterModel({
+          attribute,
+          filterType,
+          expression: queryFilter.expression,
+          value: queryFilter.value
+        })
+        commit('addFilter', filter)
+      })
+    })
   }
 }
 
 const mutations = {
   addFilter(state, filter) {
-    state.filters[helpers.getFilterTypePlural(filter.filterType)].push(filter)
+    state.filters.push(filter)
   },
 
-  assignSortableAttribute(state, attribute) {
+  assignSortableAttribute(state, queryAttribute) {
     const orderableAttribute = state.order.unassigned.find(
-      orderableAttr => orderableAttr.attribute === attribute
+      orderable => orderable.attribute.key === queryAttribute.key
     )
     const idx = state.order.unassigned.indexOf(orderableAttribute)
     Vue.delete(state.order.unassigned, idx)
@@ -727,10 +771,8 @@ const mutations = {
 
   removeFilter(state, filter) {
     if (filter) {
-      const filtersByType =
-        state.filters[helpers.getFilterTypePlural(filter.filterType)]
-      const idx = filtersByType.indexOf(filter)
-      Vue.delete(filtersByType, idx)
+      const idx = state.filters.indexOf(filter)
+      Vue.delete(state.filters, idx)
     }
   },
 
@@ -741,6 +783,10 @@ const mutations = {
 
   resetDefaults(state) {
     lodash.assign(state, lodash.cloneDeep(defaultState))
+  },
+
+  resetFilters(state) {
+    state.filters = []
   },
 
   resetQueryResults(state) {
@@ -773,9 +819,13 @@ const mutations = {
   setCurrentReport(state, report) {
     state.activeReport = report
     state.chartType = report.chartType
-    state.filters = report.filters
-    state.order = report.order
     state.limit = report.queryPayload.limit
+
+    // state.{order,filters} is now set based on
+    // report.queryPayload.{order,filters}, not
+    // report.{order,filters}
+    delete report.order
+    delete report.filters
   },
 
   setDesign(state, designData) {
@@ -787,8 +837,6 @@ const mutations = {
         if (table[attributeType]) {
           table[attributeType].forEach(attribute => {
             attribute.sourceName = source.name
-            attribute.sourceLabel = source.label
-            attribute.class = attributeType
           })
         }
       })
@@ -856,36 +904,6 @@ const mutations = {
 
   setSortableAttributeDirection(_, { orderableAttribute, direction }) {
     orderableAttribute.direction = direction
-  },
-
-  setSorting(state, { attributesIndex }) {
-    state.queryAttributes.forEach(queryAttribute => {
-      const attribute =
-        attributesIndex[
-          helpers.buildKey(
-            queryAttribute.sourceName,
-            queryAttribute.attributeName
-          )
-        ]
-
-      // the index only contains attributes that are Orderable
-      if (!attribute) {
-        return
-      }
-
-      const finder = orderableAttribute =>
-        orderableAttribute.attribute === attribute
-
-      const accounted = state.order.assigned.concat(state.order.unassigned)
-      const isAccountedFor = lodash.some(accounted, finder)
-
-      if (!isAccountedFor) {
-        state.order.unassigned.push({
-          attribute,
-          direction: 'asc'
-        })
-      }
-    })
   },
 
   setSqlErrorMessage(state, e) {

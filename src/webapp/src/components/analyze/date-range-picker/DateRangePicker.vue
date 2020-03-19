@@ -24,7 +24,7 @@ export default {
   },
   props: {
     attributes: { type: Array, required: true },
-    columnFilters: { type: Array, required: true }
+    filters: { type: Array, default: () => [] }
   },
   data: () => ({
     attributePairsModel: [],
@@ -32,17 +32,13 @@ export default {
     hasSetAttributePairInFocusIndex: false
   }),
   computed: {
-    ...mapGetters('designs', [
-      'getFilters',
-      'getIsAttributeInFilters',
-      'getIsDateAttribute'
-    ]),
+    ...mapGetters('designs', ['getFilters', 'getIsDateAttribute']),
     getAttributePairInFocus() {
       return this.attributePairsModel[this.attributePairInFocusIndex]
     },
     getAttributePairsInitial() {
       return this.attributes.map(attribute => {
-        const filters = this.getFiltersForAttribute(attribute)
+        const filters = this.getFilters(attribute)
         const start = filters.find(
           filter => filter.expression === 'greater_or_equal_than'
         )
@@ -88,7 +84,7 @@ export default {
       ]
     },
     getDateFilters() {
-      return this.columnFilters.filter(filter =>
+      return this.filters.filter(filter =>
         this.getIsDateAttribute(filter.attribute)
       )
     },
@@ -97,14 +93,6 @@ export default {
     },
     getHasValidDateRange() {
       return getHasValidDateRange
-    },
-    getFiltersForAttribute() {
-      return attribute =>
-        this.getFilters(
-          attribute.sourceName,
-          attribute.name,
-          QUERY_ATTRIBUTE_TYPES.COLUMN
-        )
     },
     getIsAttributePairInFocus() {
       return attributePair =>
@@ -207,13 +195,9 @@ export default {
       let idx
       // Set the target index based on an optional payload or first date range match condition or 0 index fallback
       if (payload) {
-        match = this.attributePairsModel.find(attributePair => {
-          const attribute = attributePair.attribute
-          return (
-            attribute.sourceName === payload.sourceName &&
-            attribute.name === payload.name
-          )
-        })
+        match = this.attributePairsModel.find(
+          attributePair => attributePair.attribute.key === payload.key
+        )
       } else if (!this.hasSetAttributePairInFocusIndex) {
         match = this.attributePairsModel.find(
           attributePair => attributePair.absoluteDateRange.start !== null
@@ -266,7 +250,7 @@ export default {
         }
 
         // Apply filters as a pair
-        const filters = this.getFiltersForAttribute(attribute)
+        const filters = this.getFilters(attribute)
         const startFilter = filters.find(
           filter => filter.expression === partialStart.expression
         )
@@ -323,12 +307,7 @@ export default {
       <template v-for="attributePair in attributePairsModel">
         <div
           v-if="getIsAttributePairInFocus(attributePair)"
-          :key="
-            getKey(
-              attributePair.attribute.sourceName,
-              attributePair.attribute.name
-            )
-          "
+          :key="attributePair.attribute.key"
           class="dropdown-item"
         >
           <v-date-picker

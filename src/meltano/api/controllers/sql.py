@@ -10,7 +10,7 @@ from .settings_helper import SettingsHelper
 from .sql_helper import SqlHelper, ConnectionNotFound, UnsupportedConnectionDialect
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.core.project import Project
-from meltano.core.schedule_service import ScheduleService
+from meltano.core.schedule_service import ScheduleService, ScheduleNotFoundError
 from meltano.core.utils import find_named, NotFound
 from meltano.core.sql.filter import FilterOptions
 from meltano.core.sql.base import ParseError, EmptyQuery
@@ -52,6 +52,19 @@ def _handle(ex):
             {"error": True, "code": ex.code, "orig": str(ex), "statement": ex.statement}
         ),
         500,
+    )
+
+
+@sqlBP.errorhandler(ScheduleNotFoundError)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"A pipeline for data source '{ex.namespace}' has not run yet. Please set up your connection.",
+            }
+        ),
+        404,
     )
 
 

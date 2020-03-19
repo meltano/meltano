@@ -97,9 +97,7 @@ export default {
         </div>
         <!-- Filter -->
         <button
-          v-if="
-            getIsAttributeInFilters(design.name, attribute.name, attributeType)
-          "
+          v-if="getIsAttributeInFilters(attribute)"
           class="button is-small tooltip is-tooltip-right"
           :data-tooltip="getFilterTooltip"
           @click.stop="onFilterClick"

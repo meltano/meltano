@@ -47,19 +47,15 @@ export default {
     },
     getValue() {
       return targetAttributePair => {
-        const attribute = targetAttributePair.attribute
-        return `${attribute.sourceName}.${attribute.name}`
+        return targetAttributePair.attribute.key
       }
     }
   },
   methods: {
     onChangeAttributePair(option) {
-      const value = option.srcElement.selectedOptions[0].value
-      const [sourceName, name] = value.split('.')
+      const key = option.srcElement.selectedOptions[0].value
       const targetAttributePair = this.attributePairsModel.find(
-        attributePair =>
-          attributePair.attribute.sourceName === sourceName &&
-          attributePair.attribute.name === name
+        attributePair => attributePair.attribute.key === key
       )
       this.$emit(EVENTS.ATTRIBUTE_PAIR_CHANGE, targetAttributePair)
     },

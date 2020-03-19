@@ -98,8 +98,7 @@ class TestSqlController:
         assertIsSQL(res.json["sql"])
 
         assert any(
-            attr["id"] == "carbon_intensity_region.count"
-            for attr in res.json["aggregates"]
+            attr["id"] == "region.count" for attr in res.json["aggregates"]
         ), res.json
 
         assertListEquivalence(
