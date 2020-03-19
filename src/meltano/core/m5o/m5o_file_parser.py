@@ -19,6 +19,13 @@ from meltano.core.sql.design_helper import PypikaJoinExecutor
 from meltano.core.project import Project
 from meltano.core.plugin.model import Package
 from meltano.core.utils import slugify, find_named, NotFound
+from meltano.core.sql.base import (
+    MeltanoTable,
+    MeltanoColumn,
+    MeltanoAggregate,
+    MeltanoTimeframe,
+    MeltanoTimeframePeriod,
+)
 
 
 class MeltanoAnalysisFileParserError(Exception):
@@ -296,6 +303,27 @@ class MeltanoAnalysisFileParser:
                 prop, table_name, cls, file_name
             )
 
+    def add_keys_to_table_def(self, table_def, source_name):
+        mtable = MeltanoTable(table_def)
+        mtable.source_name = source_name
+
+        for column_def in table_def["columns"]:
+            mcolumn = MeltanoColumn(definition=column_def, table=mtable)
+            column_def["key"] = mcolumn.alias()
+
+        for aggregate_def in table_def["aggregates"]:
+            maggregate = MeltanoAggregate(definition=aggregate_def, table=mtable)
+            aggregate_def["key"] = maggregate.alias()
+
+        for timeframe_def in table_def["timeframes"]:
+            mtimeframe = MeltanoTimeframe(definition=timeframe_def, table=mtable)
+            timeframe_def["key"] = mtimeframe.alias()
+            for period_def in timeframe_def.get("periods", []):
+                mperiod = MeltanoTimeframePeriod(
+                    definition=period_def, timeframe=mtimeframe
+                )
+                period_def["key"] = mperiod.alias()
+
     def designs(self, ma_file_designs_dict, file_name):
         topic_designs = []
         for design_name, design_def in ma_file_designs_dict.items():
@@ -312,9 +340,15 @@ class MeltanoAnalysisFileParser:
             for prop_name, prop_def in design_def.items():
                 temp_design[prop_name] = prop_def
                 if prop_name == "from":
-                    temp_design["related_table"] = self.table_conf_by_name(
-                        temp_design[prop_name], "design", prop_name, file_name
+                    related_table = deepcopy(
+                        self.table_conf_by_name(
+                            temp_design[prop_name], "design", prop_name, file_name
+                        )
                     )
+
+                    self.add_keys_to_table_def(related_table, design_name)
+
+                    temp_design["related_table"] = related_table
                 if prop_name == "joins":
                     temp_design[prop_name] = self.joins(prop_def, file_name)
 
@@ -327,10 +361,16 @@ class MeltanoAnalysisFileParser:
         for join_name, join_def in ma_file_joins_dict.items():
             temp_join = {}
             temp_join["name"] = join_name
+
             related_table_name = join_def.get("from", join_name)
-            temp_join["related_table"] = self.table_conf_by_name(
-                related_table_name, "join", "name", file_name
+            related_table = deepcopy(
+                self.table_conf_by_name(related_table_name, "join", "name", file_name)
             )
+
+            self.add_keys_to_table_def(related_table, join_name)
+
+            temp_join["related_table"] = related_table
+
             missing_properties = self.missing_properties(
                 self.required_join_properties, join_def
             )

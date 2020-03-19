@@ -26,14 +26,13 @@ export default {
     ...mapGetters('designs', [
       'getAttributes',
       'getFormattedValue',
-      'getIsOrderableAttribute',
       'hasResults',
       'isColumnSelectedAggregate'
     ]),
     getAssignedOrderable() {
-      return attributeName =>
+      return attribute =>
         this.order.assigned.find(
-          orderable => orderable.attribute.name === attributeName
+          orderable => orderable.attribute.key === attribute.key
         )
     },
     getHasMinimalSelectionRequirements() {
@@ -42,14 +41,14 @@ export default {
       return hasColumn || hasAggregate
     },
     getIsOrderableAssigned() {
-      return attributeName => Boolean(this.getAssignedOrderable(attributeName))
+      return attribute => Boolean(this.getAssignedOrderable(attribute))
     },
     getOrderables() {
       return this.order.unassigned.concat(this.order.assigned)
     },
     getOrderableStatusLabel() {
       return queryAttribute => {
-        const match = this.getAssignedOrderable(queryAttribute.attributeName)
+        const match = this.getAssignedOrderable(queryAttribute)
         const idx = this.order.assigned.indexOf(match)
         return match ? `${idx + 1}. ${match.direction}` : ''
       }
@@ -61,10 +60,6 @@ export default {
   methods: {
     ...mapActions('designs', ['updateSortAttribute']),
     handleHeaderClick(queryAttribute) {
-      if (!this.getIsOrderableAttribute(queryAttribute)) {
-        return
-      }
-
       this.updateSortAttribute(queryAttribute)
     }
   }
@@ -89,9 +84,7 @@ export default {
           <tr>
             <th
               v-for="(queryAttribute, idx) in queryAttributes"
-              :key="
-                `${queryAttribute.sourceName}-${queryAttribute.attributeName}-${idx}`
-              "
+              :key="`${queryAttribute.key}-${idx}`"
             >
               <div class="is-flex">
                 <div
@@ -105,13 +98,12 @@ export default {
                   :label="getOrderableStatusLabel(queryAttribute)"
                   :button-classes="
                     `is-small ${
-                      getIsOrderableAssigned(queryAttribute.attributeName)
+                      getIsOrderableAssigned(queryAttribute)
                         ? 'has-text-interactive-secondary'
                         : ''
                     }`
                   "
                   :menu-classes="'dropdown-menu-300'"
-                  :disabled="!getIsOrderableAttribute(queryAttribute)"
                   icon-open="sort"
                   icon-close="caret-down"
                   is-right-aligned

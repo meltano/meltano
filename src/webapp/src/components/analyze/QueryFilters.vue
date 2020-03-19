@@ -8,8 +8,7 @@ export default {
       addFilterModel: {
         attributeHelper: {
           attribute: null,
-          type: '',
-          sourceName: ''
+          type: ''
         },
         expression: '',
         value: '',
@@ -21,7 +20,7 @@ export default {
     ...mapState('designs', ['filterOptions', 'filters']),
     ...mapGetters('designs', [
       'getIsDateAttribute',
-      'getNonDateFlattenedFilters',
+      'getNonDateFilters',
       'getTableSources',
       'hasNonDateFilters'
     ]),
@@ -30,11 +29,7 @@ export default {
     },
     getHasAtLeastOneLikeFilter() {
       const likeExpression = 'like'
-      const filtersByAttribute = [
-        ...this.filters.aggregates,
-        ...this.filters.columns
-      ]
-      const filterModelHasLike = filtersByAttribute.find(
+      const filterModelHasLike = this.filters.find(
         filter => filter.expression === likeExpression
       )
       return (
@@ -42,7 +37,7 @@ export default {
       )
     },
     getHasMultipleFilters() {
-      return this.getNonDateFlattenedFilters.length > 1
+      return this.getNonDateFilters.length > 1
     },
     getHasValidatedOptionals() {
       return (expression, value) =>
@@ -68,20 +63,15 @@ export default {
     },
     isFirstFilterMatch() {
       return filter => {
-        const match = this.getNonDateFlattenedFilters.find(
-          tempFilter =>
-            tempFilter.sourceName === filter.sourceName &&
-            tempFilter.name === filter.name
+        const firstFilter = this.getNonDateFilters.find(
+          tempFilter => tempFilter.attribute.key === filter.attribute.key
         )
-        return match === filter
+        return firstFilter === filter
       }
     },
     isValidAdd() {
       const vm = this.addFilterModel
-      const hasRequiredValues =
-        vm.attributeHelper.attribute &&
-        vm.attributeHelper.sourceName &&
-        vm.expression
+      const hasRequiredValues = vm.attributeHelper.attribute && vm.expression
       const hasValidatedOptionals = this.getHasValidatedOptionals(
         vm.expression,
         vm.value
@@ -179,7 +169,6 @@ export default {
                       :key="column.label"
                       :value="{
                         attribute: column,
-                        sourceName: source.name,
                         type: 'column'
                       }"
                     >
@@ -191,7 +180,6 @@ export default {
                       :key="aggregate.label"
                       :value="{
                         attribute: aggregate,
-                        sourceName: source.name,
                         type: 'aggregate'
                       }"
                     >
@@ -250,8 +238,8 @@ export default {
           <br />
 
           <tr
-            v-for="(filter, index) in getNonDateFlattenedFilters"
-            :key="`${filter.sourceName}-${filter.name}-${index}`"
+            v-for="(filter, index) in getNonDateFilters"
+            :key="`${filter.attribute.key}-${index}`"
           >
             <td>
               <p class="is-small">
