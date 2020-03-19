@@ -517,17 +517,19 @@ const actions = {
       // joins - columns
       const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup))
 
-      setSelected(joinGroup.columns, targetJoin.columns)
-      setSelected(joinGroup.aggregates, targetJoin.aggregates)
-      setSelected(joinGroup.timeframes, targetJoin.timeframes.map(namer))
+      if (targetJoin) {
+        setSelected(joinGroup.columns, targetJoin.columns)
+        setSelected(joinGroup.aggregates, targetJoin.aggregates)
+        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(namer))
 
-      // timeframes periods
-      targetJoin.timeframes.forEach(queryTimeframe => {
-        const timeframe = joinGroup.timeframes.find(tf =>
-          nameMatcher(tf, queryTimeframe)
-        )
-        setSelected(timeframe.periods, queryTimeframe.periods.map(namer))
-      })
+        // timeframes periods
+        targetJoin.timeframes.forEach(queryTimeframe => {
+          const timeframe = joinGroup.timeframes.find(tf =>
+            nameMatcher(tf, queryTimeframe)
+          )
+          setSelected(timeframe.periods, queryTimeframe.periods.map(namer))
+        })
+      }
     })
 
     dispatch('setFiltersFromQuery', queryPayload.filters)
