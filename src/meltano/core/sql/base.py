@@ -1206,7 +1206,6 @@ class MeltanoQuery(MeltanoBase):
                         "attribute_name": c.name,
                         "attribute_label": c.label,
                         "attribute_type": c.type,
-                        "attribute_class": "columns",
                     }
                 )
 
@@ -1250,7 +1249,6 @@ class MeltanoQuery(MeltanoBase):
                         "attribute_name": a.name,
                         "attribute_label": a.label,
                         "attribute_type": a.type,
-                        "attribute_class": "aggregates",
                     }
                 )
 
@@ -1523,7 +1521,6 @@ class MeltanoQuery(MeltanoBase):
                                 "attribute_name": c.name,
                                 "attribute_label": c.label,
                                 "attribute_type": c.type,
-                                "attribute_class": "columns",
                             }
                         )
 
@@ -1548,7 +1545,6 @@ class MeltanoQuery(MeltanoBase):
                         "attribute_name": a.name,
                         "attribute_label": a.label,
                         "attribute_type": a.type,
-                        "attribute_class": "aggregates",
                     }
                 )
 
