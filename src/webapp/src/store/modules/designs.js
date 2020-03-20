@@ -54,12 +54,17 @@ const helpers = {
   },
 
   getQueryPayloadFromDesign(state) {
+    const selectedAttributeKeys = []
+
     // Inline fn helpers
     const namesOfSelected = arr => {
       if (!Array.isArray(arr)) {
         return null
       }
-      return arr.filter(selected).map(namer)
+      return arr.filter(selected).map(({ name, key }) => {
+        selectedAttributeKeys.push(key)
+        return name
+      })
     }
 
     const baseTable = state.design.relatedTable
@@ -83,7 +88,7 @@ const helpers = {
           .filter(selected)
           .map(({ name, periods }) => ({
             name,
-            periods: periods.filter(selected).map(({ name }) => ({ name }))
+            periods: namesOfSelected(periods).map(name => ({ name }))
           }))
           .filter(tf => tf.periods.length)
       }
@@ -97,15 +102,20 @@ const helpers = {
     const timeframes = (baseTable.timeframes || [])
       .map(({ name, periods }) => ({
         name: name,
-        periods: periods.filter(selected).map(({ name }) => ({ name }))
+        periods: namesOfSelected(periods).map(name => ({ name }))
       }))
       .filter(tf => tf.periods.length)
 
     // Ordering setup
-    const order = state.order.assigned.map(({ direction, attribute }) => ({
-      key: attribute.key,
-      direction: direction
-    }))
+    // We need to filter out attributes that are not actually selected,
+    // since the ordering state is partially dependent on the most recent query
+    // results, which could have included more selected attributes.
+    const order = state.order.assigned
+      .filter(({ attribute }) => selectedAttributeKeys.includes(attribute.key))
+      .map(({ direction, attribute }) => ({
+        key: attribute.key,
+        direction: direction
+      }))
 
     // Filtering setup - Enforce number type for aggregates as v-model approach overwrites as string
     const activeFilters = state.filters.filter(({ isActive }) => isActive)
