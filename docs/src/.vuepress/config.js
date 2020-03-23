@@ -1,7 +1,7 @@
 const docsSidebar = [
   "/docs/",
   "/docs/getting-started",
-  "/plugins/",
+  "/docs/data-sources",
   "/docs/getting-help",
   "/docs/responsible-disclosure",
   "/developer-tools/",
@@ -13,10 +13,11 @@ const devToolsSidebar = [
   "/developer-tools/self-hosted-installation.html",
   "/developer-tools/command-line-interface.html",
   "/developer-tools/environment-variables.html",
+  "/plugins/extractors/",
+  "/plugins/loaders/",
   "/tutorials/",
   "/developer-tools/orchestration.html",
   "/developer-tools/transforms.html",
-  "/developer-tools/reporting-database-options.html",
   "/developer-tools/role-based-access-control.html",
   "/developer-tools/contributor-guide.html",
   "/developer-tools/architecture.html"
@@ -91,9 +92,9 @@ module.exports = {
     ],
     sidebar: {
       "/docs": docsSidebar,
-      "/plugins": docsSidebar,
       "/developer-tools": devToolsSidebar,
       "/tutorials": devToolsSidebar,
+      "/plugins": devToolsSidebar,
       "/handbook/engineering/meltanodata-guide": [
         "/handbook/engineering/meltanodata-guide/",
         "/handbook/engineering/meltanodata-guide/controller-node.html"
