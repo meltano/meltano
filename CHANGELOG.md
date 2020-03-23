@@ -4,10 +4,21 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
 
+
 ## Unreleased
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.26.0 - (2020-03-23)
+---
 
 ### Changes
 
@@ -18,10 +29,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1876](https://gitlab.com/meltano/meltano/-/issues/1876) Don't store Analyze UI state in report file
 - [#1877](https://gitlab.com/meltano/meltano/-/issues/1877) Allow designs to reference the same table more than once
 - [#1878](https://gitlab.com/meltano/meltano/-/issues/1878) Recompile models when meltano is upgraded
-
-### Fixes
-
-### Breaks
 
 
 ## 1.25.1 - (2020-03-19)
