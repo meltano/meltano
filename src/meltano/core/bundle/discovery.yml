@@ -37,45 +37,6 @@ extractors:
         value: 0
         kind: hidden
         description: How many Days before the Start Date to fetch Ads Insights for
-  - name: tap-gitlab
-    label: GitLab
-    description: Single application for the entire DevOps lifecycle
-    namespace: tap_gitlab
-    docs: 'https://meltano.com/plugins/extractors/gitlab.html'
-    pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
-    capabilities:
-      - discover
-      - state
-    settings_group_validation:
-      - ['api_url', 'private_token', 'groups', 'start_date']
-      - ['api_url', 'private_token', 'projects', 'start_date']
-    settings:
-      - name: api_url
-        label: GitLab Instance
-        value: 'https://gitlab.com'
-        protected: true
-      - name: private_token
-        label: Access Token
-        kind: password
-        placeholder: Ex. *****************
-        env: GITLAB_API_TOKEN
-      - name: groups
-        label: Group
-        value: ''
-        placeholder: Ex. my-organization
-        env: GITLAB_API_GROUPS
-      - name: projects
-        label: Project
-        value: ''
-        placeholder: Ex. my-organization/project-1
-        env: GITLAB_API_PROJECTS
-      - name: ultimate_license
-        value: false
-        kind: boolean
-        env: GITLAB_API_ULTIMATE_LICENSE
-      - name: start_date
-        env: GITLAB_API_START_DATE
-        kind: date_iso8601
   - name: tap-adwords
     label: Google Ads
     description: Advertising Platform
@@ -438,32 +399,6 @@ extractors:
       - name: start_date
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
-  - name: tap-zendesk
-    label: Zendesk
-    description: Support ticketing system & customer service platform
-    namespace: tap_zendesk
-    docs: 'https://meltano.com/plugins/extractors/zendesk.html'
-    pip_url: 'tap-zendesk'
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings:
-      - name: email
-        placeholder: Ex. me@my-organization.com
-        kind: email
-      - name: api_token
-        label: API Token
-        placeholder: Ex. *****************
-        kind: password
-        documentation: https://support.zendesk.com/hc/en-us/articles/226022787-Generating-a-new-API-token-
-      - name: subdomain
-        label: Zendesk Subdomain
-        placeholder: Ex. my-subdomain.zendesk.com
-        documentation: https://support.zendesk.com/hc/en-us/articles/221682747-Where-can-I-find-my-Zendesk-subdomain-
-      - name: start_date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-        kind: date_iso8601
 
   # Hidden taps:
   - name: tap-carbon-intensity
@@ -509,6 +444,46 @@ extractors:
         placeholder: Ex. *****************
       - name: start_date
         label: Start Date
+        kind: date_iso8601
+  - name: tap-gitlab
+    label: GitLab
+    description: Single application for the entire DevOps lifecycle
+    namespace: tap_gitlab
+    hidden: true
+    docs: 'https://meltano.com/plugins/extractors/gitlab.html'
+    pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
+    capabilities:
+      - discover
+      - state
+    settings_group_validation:
+      - ['api_url', 'private_token', 'groups', 'start_date']
+      - ['api_url', 'private_token', 'projects', 'start_date']
+    settings:
+      - name: api_url
+        label: GitLab Instance
+        value: 'https://gitlab.com'
+        protected: true
+      - name: private_token
+        label: Access Token
+        kind: password
+        placeholder: Ex. *****************
+        env: GITLAB_API_TOKEN
+      - name: groups
+        label: Group
+        value: ''
+        placeholder: Ex. my-organization
+        env: GITLAB_API_GROUPS
+      - name: projects
+        label: Project
+        value: ''
+        placeholder: Ex. my-organization/project-1
+        env: GITLAB_API_PROJECTS
+      - name: ultimate_license
+        value: false
+        kind: boolean
+        env: GITLAB_API_ULTIMATE_LICENSE
+      - name: start_date
+        env: GITLAB_API_START_DATE
         kind: date_iso8601
   - name: tap-marketo
     label: Marketo
@@ -570,6 +545,33 @@ extractors:
       - name: shop
         label: Shop
         placeholder: Ex. my-first-shop
+      - name: start_date
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+        kind: date_iso8601
+  - name: tap-zendesk
+    label: Zendesk
+    description: Support ticketing system & customer service platform
+    namespace: tap_zendesk
+    hidden: true
+    docs: 'https://meltano.com/plugins/extractors/zendesk.html'
+    pip_url: 'tap-zendesk'
+    capabilities:
+      - catalog
+      - discover
+      - state
+    settings:
+      - name: email
+        placeholder: Ex. me@my-organization.com
+        kind: email
+      - name: api_token
+        label: API Token
+        placeholder: Ex. *****************
+        kind: password
+        documentation: https://support.zendesk.com/hc/en-us/articles/226022787-Generating-a-new-API-token-
+      - name: subdomain
+        label: Zendesk Subdomain
+        placeholder: Ex. my-subdomain.zendesk.com
+        documentation: https://support.zendesk.com/hc/en-us/articles/221682747-Where-can-I-find-my-Zendesk-subdomain-
       - name: start_date
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
