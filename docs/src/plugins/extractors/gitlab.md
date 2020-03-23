@@ -121,32 +121,6 @@ If you want to configure this, the format for it is `group/project`. Here are a 
 
 This property allows you to configure where you want your data set to start from. Otherwise, if left blank, it will try to fetch the entire history of the groups or projects specified.
 
-## Meltano Setup
-
-### Prerequisites
-
-- [Running instance of Meltano](/docs/getting-started.html)
-
-### Configure the Extractor
-
-Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data sources.
-
-![Screenshot of Meltano UI with all extractors not installed and GitLab Extractor highlighted](/images/gitlab-tutorial/01-gitlab-extractor-selection.png)
-
-Let's install `tap-gitlab` by clicking on the `Install` button inside its card.
-
-On the configuration modal we want to enter the Private Token the GitLab extractor will use to connect to GitLab, the Groups and Projects we are going to extract from and the Start Date we want the extracted data set to start from.
-
-![Screenshot of GitLab Extractor Configuration](/images/gitlab-tutorial/02-gitlab-configuration.png)
-
-::: tip
-
-**Ready to do more with data from GitLab?**
-
-Check out our [GitLab API + Postgres tutorial](/tutorials/gitlab-and-postgres.html) to learn how you can create an analytics database from within Meltano, and start analyzing your GitLab data.
-
-:::
-
 ## Advanced: Command Line Installation
 
 1. Navigate to your Meltano project in the terminal
