@@ -11,13 +11,10 @@ To connect your data sources to Meltano you will use plugins called Extractors, 
 Hosted Meltano accounts currently support extracting data from:
 
 * [Facebook Ads](/plugins/extractors/facebook.html)
-* [Fastly](/plugins/extractors/fastly.html)
-* [GitLab](/plugins/extractors/gitlab.html)
 * [Google Ads](/plugins/extractors/adwords.html)
 * [Google Analytics](/plugins/extractors/google-analytics.html)
 * [Salesforce](/plugins/extractors/salesforce.html)
 * [Stripe](/plugins/extractors/stripe.html)
-* [Zendesk](/plugins/extractors/zendesk.html)
 
 ::: tip
 If you don't see the extractor you need here, we have a [tutorial for creating your extractor](/tutorials/create-a-custom-extractor.html). We are constantly working to build new extractors, and our current roadmap includes: Google Ads, Shopify and Segment as next on the list.
@@ -26,5 +23,3 @@ If you don't see the extractor you need here, we have a [tutorial for creating y
 #### Reporting Database
 
 Meltano hosted accounts come with a pre-configured [Postgres](/plugins/loaders/postgres.html) database, which acts as the reporting database where all your extracted data from the sources above will live.
-
-
