@@ -61,11 +61,6 @@
           </a>
         </div>
 
-        <p class="description ta-c">
-          For more information, check out our
-          <a href="/plugins/extractors/">plugins documentation</a>
-        </p>
-
         <p style="text-align:center; font-size:12px;">
           <em
             >All trademarks and logos are owned by their respective owners.</em
