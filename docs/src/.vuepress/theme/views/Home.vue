@@ -39,30 +39,27 @@
         </p>
 
         <div class="plugin-logos">
-          <a href="/plugins/extractors/stripe.html"
-            ><img src="../assets/logo-stripe.png" alt="Stripe Logo"
+          <a href="/plugins/extractors/facebook.html"
+            ><img src="../assets/logo-facebook.png" alt="Facebook Ads Logo"
+          /></a>
+
+          <a href="/plugins/extractors/adwords.html"
+            ><img src="../assets/logo-adwords.png" alt="Google Ads Logo"
+          /></a>
+
+          <a href="/plugins/extractors/google-analytics.html"
+            ><img src="../assets/logo-google-analytics.png" alt="Google Analytics Logo"
           /></a>
 
           <a href="/plugins/extractors/salesforce.html"
             ><img src="../assets/logo-salesforce.png" alt="Salesforce Logo"
           /></a>
 
-          <a href="/plugins/extractors/zendesk.html"
-            ><img src="../assets/logo-zendesk.png" alt="Zendesk Logo"
+          <a href="/plugins/extractors/stripe.html"
+            ><img src="../assets/logo-stripe.png" alt="Stripe Logo"
           /></a>
-
-          <a href="/plugins/extractors/google-analytics.html"
-            ><img
-              src="../assets/logo-googleanalytics.png"
-              alt="Google Analytics Logo"
-            />
           </a>
         </div>
-
-        <p class="description ta-c">
-          For more information, check out our
-          <a href="/plugins/extractors/">plugins documentation</a>
-        </p>
 
         <p style="text-align:center; font-size:12px;">
           <em
@@ -160,7 +157,8 @@
                 <a href="https://www.getdbt.com/">dbt</a>
               </td>
               <td class="meltano-uses-secondary">
-                <a href="https://meltano.com/developer-tools/architecture.html#meltano-ui"
+                <a
+                  href="https://meltano.com/developer-tools/architecture.html#meltano-ui"
                   >Meltano UI</a
                 >
               </td>
@@ -433,17 +431,17 @@
 </template>
 
 <script>
-import NavLink from '../components/NavLink.vue'
+import NavLink from "../components/NavLink.vue";
 
 export default {
   components: { NavLink },
 
   computed: {
     data() {
-      return this.$page.frontmatter
+      return this.$page.frontmatter;
     }
   }
-}
+};
 </script>
 
 <style lang="stylus">
@@ -803,7 +801,7 @@ export default {
   }
 
   img {
-    max-width: 200px;
+    max-width: 120px;
     margin: 0 auto;
     filter: grayscale(1);
     transition: filter 0.2s ease-in-out;
@@ -822,10 +820,10 @@ export default {
 
 @media (min-width: 768px) {
   .plugin-logos {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 
     img {
-      max-width: 200px;
+      max-width: 120px;
       margin: 0 auto;
     }
   }
