@@ -50,7 +50,7 @@ Designs are defined inside their corresponding `Topic` file.
 
 A `Join` represent the relationship between two `Sources`.
 
-Each `Join` is also a `Source` so it can be refered to in by another `Join` defined in the same `Design`.
+Each `Join` is also a `Source` so it can be referred to in by another `Join` defined in the same `Design`.
 
 ```
 sample {
