@@ -1,8 +1,9 @@
 import logging
+from datetime import datetime
 
 from flask import Blueprint
 from flask_login import current_user
-from meltano.api.security import api_auth_required
+from meltano.api.security import api_auth_required, users
 
 
 VERSION = 1
@@ -28,3 +29,6 @@ class APIBlueprint(Blueprint):
     @api_auth_required
     def auth_filter():
         logging.debug(f"Authenticated as {current_user}")
+
+        current_user.last_activity_at = datetime.utcnow()
+        users.db.session.commit()
