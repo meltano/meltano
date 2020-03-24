@@ -117,4 +117,5 @@ def _user_logged_in_hook(sender, user):
     Update the audit columns for the User
     """
     user.last_login_at = datetime.utcnow()
+    user.last_activity_at = datetime.utcnow()
     user.login_count += 1

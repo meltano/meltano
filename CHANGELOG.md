@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1854](https://gitlab.com/meltano/meltano/-/issues/1854) Remove non-marketing-sales data sources from UI
+- [#1881](https://gitlab.com/meltano/meltano/-/issues/1881) Store in system database when user was last active
 
 ### Fixes
 
