@@ -76,7 +76,7 @@ module.exports = {
   themeConfig: {
     nav: [
       {
-        text: "How It Works",
+        text: "Getting Started",
         link: "/docs/getting-started.html"
       },
       {

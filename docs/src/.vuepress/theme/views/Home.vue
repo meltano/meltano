@@ -4,10 +4,15 @@
       <div class="hero homepage-cta feature-section-wrapper">
         <div class="hero-left">
           <h2 class="hero-header" style="border-bottom:0px;">
-            Data dashboards<br /><strong>for startup founders</strong>
+            Your startup sales funnel,<br /><strong>analyzed.</strong>
           </h2>
           <p class="hero-tagline">
-            Analytics software to visualize your business operations
+            A single set of dashboards and reports for the entire journey<br />
+            from <strong>ad impression</strong> to <strong>website visitor</strong> to <strong>successful sale</strong>.
+          </p>
+          <p class="hero-tagline">
+            Connect your data sources and let Meltano help you figure out<br />
+            <strong>what works</strong>, what doesn’t, <strong>what to scale up</strong>, and what to ramp down.
           </p>
 
           <p class="action">
@@ -35,7 +40,8 @@
         style="background-color:#fffbe4; padding-top:20px; padding-bottom:20px;"
       >
         <p class="description">
-          Connect to data from popular services to build powerful dashboards
+          By bringing together data from all relevant sources,<br />
+          Meltano unlocks <strong>high level insights</strong> you couldn't get from any individual service.
         </p>
 
         <div class="plugin-logos">
@@ -60,6 +66,11 @@
           /></a>
           </a>
         </div>
+
+        <p class="description ta-c">
+          If Meltano does not yet integrate with your favorite marketing or sales data source, please
+          <a href="/docs/getting-help.html">let us know</a>!
+        </p>
 
         <p style="text-align:center; font-size:12px;">
           <em
@@ -103,7 +114,7 @@
     <div class="feature-section-wrapper is-shorter is-white">
       <section class="section">
         <h2 class="section__title" style="padding-bottom:20px;">
-          We'd Love to Hear From You
+          Stay up to date and get in touch
         </h2>
         <a
           :href="$site.themeConfig.data.slackChannelUrl"
@@ -404,7 +415,7 @@ export default {
     line-height: 1.2em;
   }
   .hero-left {
-    max-width: 50%;
+    max-width: 60%;
   }
   .hero-tagline {
     padding-right: 80px;
