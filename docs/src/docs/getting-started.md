@@ -17,7 +17,7 @@ To create your Meltano account [fill out the signup form](https://meltano.typefo
 
 ## Connect Data Sources
 
-Once you've logged into Meltano, you'll begin on the **Data** page to connect your [data sources](/plugins/).
+Once you've logged into Meltano, you'll begin on the **Data** page to connect your [data sources](/docs/data-sources.html).
 
 ![Meltano UI with all extractors not installed initial loading screen](/images/getting-started-guide/gsg-01.png)
 
@@ -40,7 +40,7 @@ Some of our popular data source connectors include:
 - [Stripe](/plugins/extractors/stripe.html#stripe)
 - [Salesforce](/plugins/extractors/salesforce.html#salesforce)
 
-See a [full list of data sources here](/plugins/).
+See a [full list of data sources here](/docs/data-sources.html).
 
 ## Analyze Your Data
 
