@@ -7,11 +7,10 @@ import DateRangePickerHeader from '@/components/analyze/date-range-picker/DateRa
 import Dropdown from '@/components/generic/Dropdown'
 import { EVENTS } from '@/components/analyze/date-range-picker/events'
 import {
-  getAbsoluteDate,
   getDateLabel,
   getHasValidDateRange,
   getNullDateRange,
-  getIsRelativeDateRangeFormat
+  getDateRangesForAttributeFilters
 } from '@/components/analyze/date-range-picker/utils'
 import { QUERY_ATTRIBUTE_TYPES } from '@/api/design'
 import utils from '@/utils/utils'
@@ -39,35 +38,9 @@ export default {
     getAttributePairsInitial() {
       return this.attributes.map(attribute => {
         const filters = this.getFilters(attribute)
-        const start = filters.find(
-          filter => filter.expression === 'greater_or_equal_than'
-        )
-        const end = filters.find(
-          filter => filter.expression === 'less_or_equal_than'
-        )
-
-        // TODO `attributePair` term refactor?
-
-        const isRelative =
-          start &&
-          getIsRelativeDateRangeFormat(start.value) &&
-          end &&
-          getIsRelativeDateRangeFormat(end.value)
-        const relativeStart = isRelative ? start.value : null
-        const relativeEnd = isRelative ? end.value : null
-        const absoluteStart = start ? getAbsoluteDate(start.value) : null
-        const absoluteEnd = end ? getAbsoluteDate(end.value) : null
-
-        const absoluteDateRange = { start: absoluteStart, end: absoluteEnd }
-        const relativeDateRange = { start: relativeStart, end: relativeEnd }
-        const priorCustomDateRange = getNullDateRange()
-
         return {
           attribute,
-          isRelative,
-          absoluteDateRange,
-          relativeDateRange,
-          priorCustomDateRange
+          ...getDateRangesForAttributeFilters(filters)
         }
       })
     },
@@ -116,7 +89,9 @@ export default {
       const hasValidDateRanges = validDateRangeLength > 0
       let rangeLabel
       if (hasValidDateRanges) {
-        rangeLabel = this.getDateLabel(this.getValidDateRangesInitial[0])
+        rangeLabel = this.getDateLabel(
+          this.getValidDateRangesInitial[0].absoluteDateRange
+        )
         if (validDateRangeLength > 1) {
           rangeLabel += ` (+${validDateRangeLength - 1})`
         }

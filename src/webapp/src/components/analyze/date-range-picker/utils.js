@@ -14,23 +14,54 @@ export const RELATIVE_DATE_RANGE_MODELS = Object.freeze({
   }
 })
 
-export function getAbsoluteDate(value) {
+export function getDateRangesForAttributeFilters(filters, today) {
+  const startFilter = filters.find(
+    filter => filter.expression === 'greater_or_equal_than'
+  )
+  const endFilter = filters.find(
+    filter => filter.expression === 'less_or_equal_than'
+  )
+
+  const isRelative =
+    startFilter &&
+    getIsRelativeDateRangeFormat(startFilter.value) &&
+    endFilter &&
+    getIsRelativeDateRangeFormat(endFilter.value)
+  const relativeStart = isRelative ? startFilter.value : null
+  const relativeEnd = isRelative ? endFilter.value : null
+  const absoluteStart = startFilter
+    ? getAbsoluteDate(startFilter.value, today)
+    : null
+  const absoluteEnd = endFilter ? getAbsoluteDate(endFilter.value, today) : null
+
+  const absoluteDateRange = { start: absoluteStart, end: absoluteEnd }
+  const relativeDateRange = { start: relativeStart, end: relativeEnd }
+  const priorCustomDateRange = getNullDateRange()
+
+  return {
+    isRelative,
+    absoluteDateRange,
+    relativeDateRange,
+    priorCustomDateRange
+  }
+}
+
+export function getAbsoluteDate(value, today) {
   const isRelative = getIsRelativeDateRangeFormat(value)
   const targetValue = isRelative
-    ? getRelativeToAbsoluteDateString(value)
+    ? getRelativeToAbsoluteDateString(value, today)
     : value
 
   return utils.getDateFromYYYYMMDDString(targetValue)
 }
 
-export function getDateLabel(attributePair) {
-  return getHasValidDateRange(attributePair.absoluteDateRange)
-    ? `${utils.formatDateStringYYYYMMDD(
-        attributePair.absoluteDateRange.start
-      )} - ${utils.formatDateStringYYYYMMDD(
-        attributePair.absoluteDateRange.end
-      )}`
-    : 'None'
+export function getDateLabel(dateRange) {
+  if (!getHasValidDateRange(dateRange)) {
+    return 'None'
+  }
+  const start = utils.formatDateStringYYYYMMDD(dateRange.start)
+  const end = utils.formatDateStringYYYYMMDD(dateRange.end)
+  return `${start} - ${end}`
 }
 
 export function getHasValidDateRange(dateRange) {
@@ -69,10 +100,10 @@ export function getRelativeSignNumberPeriod(value) {
   return { sign, number, period }
 }
 
-function getRelativeToAbsoluteDateString(value) {
+function getRelativeToAbsoluteDateString(value, today) {
   const { sign, number, period } = getRelativeSignNumberPeriod(value)
   const method = getIsRelativeLast(sign) ? 'subtract' : 'add'
-  const absoluteMoment = moment()[method](number, period)
+  const absoluteMoment = moment(today)[method](number, period)
 
   // TODO may or may not have to account and refactor for type time vs. type date
 

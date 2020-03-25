@@ -32,7 +32,7 @@ export default {
         let label = `${source.label} - ${attribute.label}`
 
         if (targetAttributePair.absoluteDateRange.start !== null) {
-          const dateLabel = getDateLabel(targetAttributePair)
+          const dateLabel = getDateLabel(targetAttributePair.absoluteDateRange)
           label += ` (${dateLabel})`
         }
 

@@ -80,7 +80,7 @@ export default {
     dataLastUpdatedDate() {
       const date = this.lastUpdatedDate(this.currentExtractor)
 
-      return date ? date : 'Missing data'
+      return date ? date : 'Unknown'
     },
 
     dataStartDate() {

@@ -1,6 +1,7 @@
 <script>
 import Chart from '@/components/analyze/charts/Chart'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
+import reportDateRangeMixin from '@/components/analyze/reportDateRangeMixin'
 
 export default {
   name: 'ReportEmbed',
@@ -8,6 +9,7 @@ export default {
     Chart,
     ConnectorLogo
   },
+  mixins: [reportDateRangeMixin],
   props: {
     report: { type: Object, default: null }
   },
@@ -29,9 +31,14 @@ export default {
           <ConnectorLogo :connector="extractorName" />
         </p>
       </figure>
-      <h3 class="title is-5">
-        {{ report.name }}
-      </h3>
+      <div class="media-content">
+        <h3 class="title is-5">{{ report.name }}</h3>
+      </div>
+      <div v-if="hasDateRange" class="media-right">
+        <div class="field is-pulled-right is-inline-block">
+          <small class="has-text-grey is-size-7">{{ dateRangeLabel }}</small>
+        </div>
+      </div>
     </article>
 
     <Chart

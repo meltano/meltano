@@ -4,6 +4,7 @@ import { mapGetters } from 'vuex'
 import Chart from '@/components/analyze/charts/Chart'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import EmbedShareButton from '@/components/generic/EmbedShareButton'
+import reportDateRangeMixin from '@/components/analyze/reportDateRangeMixin'
 
 export default {
   components: {
@@ -11,6 +12,7 @@ export default {
     ConnectorLogo,
     EmbedShareButton
   },
+  mixins: [reportDateRangeMixin],
   props: {
     edit: {
       type: Boolean,
@@ -35,9 +37,8 @@ export default {
     dataLastUpdatedDate() {
       const date = this.lastUpdatedDate(this.extractorName)
 
-      return date ? date : 'Not available'
+      return date ? date : 'Unknown'
     },
-
     extractorName() {
       return this.report.namespace
         ? this.report.namespace.replace('model', 'tap')
@@ -89,10 +90,14 @@ export default {
           <div class="content">
             <p>
               <strong>{{ report.name }}</strong>
-              <br />
-              <small class="has-text-grey is-size-7"
-                >Last updated: {{ dataLastUpdatedDate }}</small
-              >
+              <small v-if="hasDateRange" class="has-text-grey is-size-7">
+                <br />
+                Date range: {{ dateRangeLabel }}
+              </small>
+              <small class="has-text-grey is-size-7">
+                <br />
+                Last updated: {{ dataLastUpdatedDate }}
+              </small>
             </p>
           </div>
         </div>

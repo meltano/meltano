@@ -8,8 +8,9 @@ import designApi from '@/api/design'
 import FilterModel from '@/store/models/FilterModel'
 import sqlApi from '@/api/sql'
 import utils from '@/utils/utils'
+import { isDateAttribute } from '@/components/analyze/utils'
 import { CHART_MODELS } from '@/components/analyze/charts/ChartModels'
-import { QUERY_ATTRIBUTE_TYPES, QUERY_ATTRIBUTE_DATA_TYPES } from '@/api/design'
+import { QUERY_ATTRIBUTE_TYPES } from '@/api/design'
 import { selected } from '@/utils/predicates'
 import { namer } from '@/utils/mappers'
 
@@ -207,9 +208,7 @@ const getters = {
   },
 
   getIsDateAttribute() {
-    return attribute =>
-      attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.DATE ||
-      attribute.type === QUERY_ATTRIBUTE_DATA_TYPES.TIME
+    return isDateAttribute
   },
 
   getFilters(state) {
