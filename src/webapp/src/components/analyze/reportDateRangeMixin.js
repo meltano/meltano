@@ -48,7 +48,11 @@ const reportDateRangeMixin = {
           filter => filter.expression === 'less_or_equal_than'
         )
 
-        return getDateRangesForFilters(startFilter, endFilter).absoluteDateRange
+        return getDateRangesForFilters(
+          startFilter,
+          endFilter,
+          this.report.queryPayload.today
+        ).absoluteDateRange
       })
     },
     dateRange() {

@@ -14,7 +14,7 @@ export const RELATIVE_DATE_RANGE_MODELS = Object.freeze({
   }
 })
 
-export function getDateRangesForFilters(startFilter, endFilter) {
+export function getDateRangesForFilters(startFilter, endFilter, today) {
   const isRelative =
     startFilter &&
     getIsRelativeDateRangeFormat(startFilter.value) &&
@@ -22,8 +22,10 @@ export function getDateRangesForFilters(startFilter, endFilter) {
     getIsRelativeDateRangeFormat(endFilter.value)
   const relativeStart = isRelative ? startFilter.value : null
   const relativeEnd = isRelative ? endFilter.value : null
-  const absoluteStart = startFilter ? getAbsoluteDate(startFilter.value) : null
-  const absoluteEnd = endFilter ? getAbsoluteDate(endFilter.value) : null
+  const absoluteStart = startFilter
+    ? getAbsoluteDate(startFilter.value, today)
+    : null
+  const absoluteEnd = endFilter ? getAbsoluteDate(endFilter.value, today) : null
 
   const absoluteDateRange = { start: absoluteStart, end: absoluteEnd }
   const relativeDateRange = { start: relativeStart, end: relativeEnd }
@@ -37,10 +39,10 @@ export function getDateRangesForFilters(startFilter, endFilter) {
   }
 }
 
-export function getAbsoluteDate(value) {
+export function getAbsoluteDate(value, today) {
   const isRelative = getIsRelativeDateRangeFormat(value)
   const targetValue = isRelative
-    ? getRelativeToAbsoluteDateString(value)
+    ? getRelativeToAbsoluteDateString(value, today)
     : value
 
   return utils.getDateFromYYYYMMDDString(targetValue)
@@ -91,10 +93,10 @@ export function getRelativeSignNumberPeriod(value) {
   return { sign, number, period }
 }
 
-function getRelativeToAbsoluteDateString(value) {
+function getRelativeToAbsoluteDateString(value, today) {
   const { sign, number, period } = getRelativeSignNumberPeriod(value)
   const method = getIsRelativeLast(sign) ? 'subtract' : 'add'
-  const absoluteMoment = moment()[method](number, period)
+  const absoluteMoment = moment(today)[method](number, period)
 
   // TODO may or may not have to account and refactor for type time vs. type date
 
