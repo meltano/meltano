@@ -14,6 +14,29 @@ export const RELATIVE_DATE_RANGE_MODELS = Object.freeze({
   }
 })
 
+export function getDateRangesForFilters(startFilter, endFilter) {
+  const isRelative =
+    startFilter &&
+    getIsRelativeDateRangeFormat(startFilter.value) &&
+    endFilter &&
+    getIsRelativeDateRangeFormat(endFilter.value)
+  const relativeStart = isRelative ? startFilter.value : null
+  const relativeEnd = isRelative ? endFilter.value : null
+  const absoluteStart = startFilter ? getAbsoluteDate(startFilter.value) : null
+  const absoluteEnd = endFilter ? getAbsoluteDate(endFilter.value) : null
+
+  const absoluteDateRange = { start: absoluteStart, end: absoluteEnd }
+  const relativeDateRange = { start: relativeStart, end: relativeEnd }
+  const priorCustomDateRange = getNullDateRange()
+
+  return {
+    isRelative,
+    absoluteDateRange,
+    relativeDateRange,
+    priorCustomDateRange
+  }
+}
+
 export function getAbsoluteDate(value) {
   const isRelative = getIsRelativeDateRangeFormat(value)
   const targetValue = isRelative
@@ -23,14 +46,13 @@ export function getAbsoluteDate(value) {
   return utils.getDateFromYYYYMMDDString(targetValue)
 }
 
-export function getDateLabel(attributePair) {
-  return getHasValidDateRange(attributePair.absoluteDateRange)
-    ? `${utils.formatDateStringYYYYMMDD(
-        attributePair.absoluteDateRange.start
-      )} - ${utils.formatDateStringYYYYMMDD(
-        attributePair.absoluteDateRange.end
-      )}`
-    : 'None'
+export function getDateLabel(dateRange) {
+  if (!getHasValidDateRange(dateRange)) {
+    return 'None'
+  }
+  const start = utils.formatDateStringYYYYMMDD(dateRange.start)
+  const end = utils.formatDateStringYYYYMMDD(dateRange.end)
+  return `${start} - ${end}`
 }
 
 export function getHasValidDateRange(dateRange) {

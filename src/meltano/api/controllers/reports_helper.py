@@ -21,16 +21,18 @@ class ReportsHelper:
         self, report, schedule_service, sql_helper, today=None
     ):
         m5oc = sql_helper.get_m5oc_topic(report["namespace"], report["model"])
-        design = m5oc.design(report["design"])
+        design_helper = m5oc.design(report["design"])
         schedule = schedule_service.find_namespace_schedule(
             m5oc.content["plugin_namespace"]
         )
+
+        report["full_design"] = design_helper.design
 
         query_payload = report["query_payload"]
         if today:
             query_payload["today"] = today
 
-        sql_dict = sql_helper.get_sql(design, query_payload)
+        sql_dict = sql_helper.get_sql(design_helper, query_payload)
         outgoing_sql = sql_dict["sql"]
         aggregates = sql_dict["aggregates"]
 
