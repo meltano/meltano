@@ -4,6 +4,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Tuple
 import networkx as nx
+from copy import deepcopy
 
 from pypika import functions as fn
 from pypika import AliasedQuery, Query, Order, Table, Field, Criterion, Interval
@@ -618,6 +619,8 @@ class MeltanoFilter(MeltanoBase):
         design: MeltanoDesign = None,
         pivot_date: str = None,
     ) -> None:
+        definition = deepcopy(definition)
+
         # The design is used for filters in queries against specific designs
         #  to validate that all the tables and attributes (columns/aggregates)
         #  are properly defined in the design

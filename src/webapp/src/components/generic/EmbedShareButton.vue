@@ -34,7 +34,11 @@ export default {
     getResourceEmbed(resource) {
       this.isAwaitingEmbed = true
       embedsApi
-        .generate({ resourceId: resource.id, resourceType: this.resourceType })
+        .generate({
+          resourceId: resource.id,
+          resourceType: this.resourceType,
+          today: utils.formatDateStringYYYYMMDD(new Date())
+        })
         .then(response => {
           this.$refs[`link-${resource.id}`].value = response.data.url
           this.$refs[`embed-${resource.id}`].value = response.data.snippet
@@ -44,7 +48,9 @@ export default {
         })
         .catch(error => {
           Vue.toasted.global.error(
-            `${resource.name} embed error. [Error code: ${error.response.data.code}]`
+            `${resource.name} embed error. [Error code: ${
+              error.response.data.code
+            }]`
           )
         })
         .finally(() => (this.isAwaitingEmbed = false))
