@@ -12,7 +12,7 @@ const router = new Router({
       meta: {
         title: 'Meltano Resource Embed'
       },
-      props: true
+      props: route => ({ ...route.params, today: route.query.today })
     }
   ]
 })

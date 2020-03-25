@@ -6,7 +6,7 @@ from .sql_helper import SqlHelper
 
 
 class DashboardsHelper:
-    def get_dashboard_reports_with_query_results(self, reports):
+    def get_dashboard_reports_with_query_results(self, reports, today=None):
         project = Project.find()
         schedule_service = ScheduleService(project)
         sql_helper = SqlHelper()
@@ -14,7 +14,7 @@ class DashboardsHelper:
 
         for report in reports:
             reports_helper.update_report_with_query_results(
-                report, schedule_service, sql_helper
+                report, schedule_service, sql_helper, today=today
             )
 
         return reports

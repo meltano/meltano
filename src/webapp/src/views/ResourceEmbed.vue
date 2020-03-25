@@ -14,7 +14,8 @@ export default {
     RouterViewLayout
   },
   props: {
-    token: { type: String, default: null }
+    token: { type: String, default: null },
+    today: { type: String, default: null }
   },
   data() {
     return {
@@ -38,7 +39,7 @@ export default {
   methods: {
     initialize() {
       embedsApi
-        .load(this.token)
+        .load(this.token, this.today)
         .then(response => {
           this.resource = response.data.resource
           this.resourceType = response.data.resourceType

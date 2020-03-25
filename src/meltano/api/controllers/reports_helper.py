@@ -7,24 +7,30 @@ from .sql_helper import SqlHelper
 class ReportsHelper:
     VERSION = "1.0.0"
 
-    def get_report_with_query_results(self, report):
+    def get_report_with_query_results(self, report, today=None):
         project = Project.find()
         schedule_service = ScheduleService(project)
         sql_helper = SqlHelper()
         report_with_query_results = self.update_report_with_query_results(
-            report, schedule_service, sql_helper
+            report, schedule_service, sql_helper, today=today
         )
 
         return report_with_query_results
 
-    def update_report_with_query_results(self, report, schedule_service, sql_helper):
+    def update_report_with_query_results(
+        self, report, schedule_service, sql_helper, today=None
+    ):
         m5oc = sql_helper.get_m5oc_topic(report["namespace"], report["model"])
         design = m5oc.design(report["design"])
         schedule = schedule_service.find_namespace_schedule(
             m5oc.content["plugin_namespace"]
         )
 
-        sql_dict = sql_helper.get_sql(design, report["query_payload"])
+        query_payload = report["query_payload"]
+        if today:
+            query_payload["today"] = today
+
+        sql_dict = sql_helper.get_sql(design, query_payload)
         outgoing_sql = sql_dict["sql"]
         aggregates = sql_dict["aggregates"]
 
