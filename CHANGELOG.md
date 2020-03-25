@@ -15,6 +15,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1854](https://gitlab.com/meltano/meltano/-/issues/1854) Remove non-marketing-sales data sources from UI
 - [#1881](https://gitlab.com/meltano/meltano/-/issues/1881) Store in system database when user was last active
 - [#1846](https://gitlab.com/meltano/meltano/-/issues/1846) Freeze reports with relative date filters in time when shared or embedded
+- [#1847](https://gitlab.com/meltano/meltano/-/issues/1847) Show date range on embedded reports and dashboards
+- [#1847](https://gitlab.com/meltano/meltano/-/issues/1847) Show date range on reports on dashboards
 
 ### Fixes
 
