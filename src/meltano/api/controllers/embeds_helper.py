@@ -17,7 +17,7 @@ class InvalidEmbedToken(Exception):
 
 
 class EmbedsHelper:
-    def generate_embed_snippet(self, session, resource_id, resource_type):
+    def generate_embed_snippet(self, session, resource_id, resource_type, today=None):
         try:
             embed_token = (
                 session.query(EmbedToken).filter_by(resource_id=resource_id).one()
@@ -40,8 +40,10 @@ class EmbedsHelper:
             min_width = "100%"
             min_height = "100vh"
         inline_styles = f"margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; min-width: {min_width}; min-height: {min_height};"
-        embed_url = url_for("root.embed", token=embed_token.token, _external=True)
-        snippet = f"<iframe src='{embed_url}' style='{inline_styles}' />"
+        embed_url = url_for(
+            "root.embed", token=embed_token.token, today=today, _external=True
+        )
+        snippet = f'<iframe src="{embed_url}" style="{inline_styles}" />'
 
         return {
             "is_new": is_new,
