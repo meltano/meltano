@@ -23,8 +23,10 @@ def _handle(ex):
 
 @embedsBP.route("/embed/<token>", methods=["GET"])
 def get_embed(token):
+    today = request.args.get("today", None)
+
     embeds_helper = EmbedsHelper()
-    response_data = embeds_helper.get_embed_from_token(db.session, token)
+    response_data = embeds_helper.get_embed_from_token(db.session, token, today=today)
 
     return jsonify(response_data)
 

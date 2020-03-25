@@ -10,7 +10,11 @@ export default {
   generate(payload) {
     return axios.post(utils.apiUrl('embeds', 'embed'), payload)
   },
-  load(token) {
-    return axios.get(utils.apiUrl('embeds/embed', token))
+  load(token, today) {
+    let url = utils.apiUrl('embeds/embed', token)
+    if (today) {
+      url += `?today=${today}`
+    }
+    return axios.get(url)
   }
 }

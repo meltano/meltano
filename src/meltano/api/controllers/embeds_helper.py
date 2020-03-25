@@ -50,7 +50,7 @@ class EmbedsHelper:
             "snippet": snippet,
         }
 
-    def get_embed_from_token(self, session, token):
+    def get_embed_from_token(self, session, token, today=None):
         try:
             embed_token = session.query(EmbedToken).filter_by(token=token).one()
         except sqlalchemy.orm.exc.NoResultFound:
@@ -60,16 +60,16 @@ class EmbedsHelper:
         resource_id = embed_token.resource_id
 
         if resource_type is ResourceType.REPORT:
-            resource_payload = self.get_report_resource(resource_id)
+            resource_payload = self.get_report_resource(resource_id, today=today)
         elif resource_type is ResourceType.DASHBOARD:
-            resource_payload = self.get_dashboard_resource(resource_id)
+            resource_payload = self.get_dashboard_resource(resource_id, today=today)
 
         return {
             "resource": resource_payload,
             "resource_type": embed_token.resource_type,
         }
 
-    def get_dashboard_resource(self, resource_id):
+    def get_dashboard_resource(self, resource_id, today=None):
         project = Project.find()
         reports_service = ReportsService(project)
         dashboards_service = DashboardsService(project)
@@ -81,17 +81,17 @@ class EmbedsHelper:
         ]
         dashboards_helper = DashboardsHelper()
         reports_with_query_results = dashboards_helper.get_dashboard_reports_with_query_results(
-            reports
+            reports, today=today
         )
         return {
             "dashboard": dashboard,
             "reports_with_query_results": reports_with_query_results,
         }
 
-    def get_report_resource(self, resource_id):
+    def get_report_resource(self, resource_id, today=None):
         project = Project.find()
         reports_service = ReportsService(project)
 
         report = reports_service.get_report(resource_id)
         reports_helper = ReportsHelper()
-        return reports_helper.get_report_with_query_results(report)
+        return reports_helper.get_report_with_query_results(report, today=today)
