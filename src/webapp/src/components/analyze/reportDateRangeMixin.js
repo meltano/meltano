@@ -1,5 +1,5 @@
 import {
-  getDateRangesForFilters,
+  getDateRangesForAttributeFilters,
   getDateLabel,
   getHasValidDateRange
 } from '@/components/analyze/date-range-picker/utils'
@@ -41,16 +41,8 @@ const reportDateRangeMixin = {
     dateRanges() {
       return this.dateAttributes.map(attribute => {
         const filters = this.getFilters(attribute)
-        const startFilter = filters.find(
-          filter => filter.expression === 'greater_or_equal_than'
-        )
-        const endFilter = filters.find(
-          filter => filter.expression === 'less_or_equal_than'
-        )
-
-        return getDateRangesForFilters(
-          startFilter,
-          endFilter,
+        return getDateRangesForAttributeFilters(
+          filters,
           this.report.queryPayload.today
         ).absoluteDateRange
       })

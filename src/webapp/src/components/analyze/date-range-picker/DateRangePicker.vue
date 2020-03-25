@@ -10,7 +10,7 @@ import {
   getDateLabel,
   getHasValidDateRange,
   getNullDateRange,
-  getDateRangesForFilters
+  getDateRangesForAttributeFilters
 } from '@/components/analyze/date-range-picker/utils'
 import { QUERY_ATTRIBUTE_TYPES } from '@/api/design'
 import utils from '@/utils/utils'
@@ -38,16 +38,9 @@ export default {
     getAttributePairsInitial() {
       return this.attributes.map(attribute => {
         const filters = this.getFilters(attribute)
-        const startFilter = filters.find(
-          filter => filter.expression === 'greater_or_equal_than'
-        )
-        const endFilter = filters.find(
-          filter => filter.expression === 'less_or_equal_than'
-        )
-
         return {
           attribute,
-          ...getDateRangesForFilters(startFilter, endFilter)
+          ...getDateRangesForAttributeFilters(filters)
         }
       })
     },

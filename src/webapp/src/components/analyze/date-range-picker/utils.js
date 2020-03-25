@@ -14,7 +14,14 @@ export const RELATIVE_DATE_RANGE_MODELS = Object.freeze({
   }
 })
 
-export function getDateRangesForFilters(startFilter, endFilter, today) {
+export function getDateRangesForAttributeFilters(filters, today) {
+  const startFilter = filters.find(
+    filter => filter.expression === 'greater_or_equal_than'
+  )
+  const endFilter = filters.find(
+    filter => filter.expression === 'less_or_equal_than'
+  )
+
   const isRelative =
     startFilter &&
     getIsRelativeDateRangeFormat(startFilter.value) &&
