@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1883](https://gitlab.com/meltano/meltano/-/issues/1883) Fix dashboard and embedded reports failing to load when design has no joins
+
 ### Breaks
 
 
