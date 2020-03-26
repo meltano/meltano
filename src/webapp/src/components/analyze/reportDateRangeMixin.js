@@ -16,7 +16,8 @@ const reportDateRangeMixin = {
     dateAttributes() {
       const attributes = []
       const design = this.report.fullDesign
-      const tables = [design, ...design.joins].map(t => t.relatedTable)
+      const joins = design.joins || []
+      const tables = [design, ...joins].map(t => t.relatedTable)
       tables.forEach(({ name: sourceName, columns }) => {
         columns.forEach(column => {
           if (this.getIsDateAttribute(column)) {
