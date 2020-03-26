@@ -14,9 +14,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#1883](https://gitlab.com/meltano/meltano/-/issues/1883) Fix dashboard and embedded reports failing to load when design has no joins
-
 ### Breaks
+
+
+## 1.26.2 - (2020-03-26)
+---
+
+### Fixes
+
+- [#1883](https://gitlab.com/meltano/meltano/-/issues/1883) Fix dashboard and embedded reports failing to load when design has no joins
 
 
 ## 1.26.1 - (2020-03-26)
