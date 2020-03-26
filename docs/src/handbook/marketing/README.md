@@ -93,7 +93,7 @@ Tutorials: https://meltano.com/tutorials/
 
 SUBSCRIBE for more videos: http://www.youtube.com/subscription_center?add_user=meltano
 
-Join Us On Slack: https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLTZhY2QzYzkwNjYzNWY5Zjk5ZTE1ZGExNzE1NTFmMWJiM2E2ODVhMDFlYjc5YzVjMjllZTZlZDVjNWU2ZjNjNzQ
+Join Us On Slack: https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw
 Blog: https://meltano.com/blog/
 GitLab: https://gitlab.com/meltano/meltano
 Twitter: https://twitter.com/meltanodata
