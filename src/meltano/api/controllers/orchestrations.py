@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import sqlalchemy
+import shutil
 from flask import request, url_for, jsonify, make_response, Response, send_file
 from flask_restful import Api, Resource, fields, marshal, marshal_with
 from werkzeug.exceptions import Conflict, UnprocessableEntity
@@ -222,14 +223,40 @@ def upload_plugin_configuration_file(plugin_ref) -> Response:
     Endpoint for uploading a file for a specific plugin's configuration profile
     """
 
-    project = Project.find()
     file = request.files["file"]
     setting_name = enforce_secure_filename(request.form["setting_name"])
-    directory = project.extract_dir(plugin_ref.full_name, setting_name)
+    tmp = request.form.get("tmp", False)
+
+    project = Project.find()
+    directory = project.extract_dir(
+        plugin_ref.full_name, ("tmp" if tmp else ""), setting_name
+    )
     upload_helper = UploadHelper()
     file_path = upload_helper.upload_file(directory, file)
 
     return jsonify({"path": file_path, "setting_name": setting_name}), 200
+
+
+@orchestrationsBP.route(
+    "/<plugin_ref:plugin_ref>/configuration/delete-uploaded-file", methods=["POST"]
+)
+@readonly_killswitch
+def delete_plugin_configuration_file(plugin_ref) -> Response:
+    """
+    Endpoint for deleting a file for a specific plugin's configuration profile
+    """
+
+    payload = request.get_json()
+    setting_name = enforce_secure_filename(payload["setting_name"])
+    tmp = payload.get("tmp", False)
+
+    project = Project.find()
+    directory = project.extract_dir(
+        plugin_ref.full_name, ("tmp" if tmp else ""), setting_name
+    )
+    shutil.rmtree(directory)
+
+    return jsonify({"setting_name": setting_name}), 200
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["GET"])
