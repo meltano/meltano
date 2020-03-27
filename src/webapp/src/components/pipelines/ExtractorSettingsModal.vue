@@ -182,7 +182,7 @@ export default {
             name: this.extractor.name,
             profileName: this.currentProfile.name,
             type: 'extractors',
-            formData: this.uploadFormData
+            payload: this.uploadFormData
           })
         : Promise.resolve()
 
@@ -231,26 +231,63 @@ export default {
     testConnection() {
       this.isTesting = true
 
-      this.testPluginConfiguration({
-        name: this.extractor.name,
-        type: 'extractors',
-        payload: {
-          profile: this.currentProfile.name,
-          config: this.currentProfile.config
+      // 1. Prepare conditional upload as response is needed to properly save config settings
+      let uponConditionalUpload = this.uploadFormData
+        ? this.$store.dispatch('orchestration/uploadPluginConfigurationFile', {
+            name: this.extractor.name,
+            profileName: this.currentProfile.name,
+            type: 'extractors',
+            payload: { ...this.uploadFormData, tmp: true }
+          })
+        : Promise.resolve()
+
+      // 2. Initialize conditional request
+      uponConditionalUpload.then(response => {
+        // 2.a Update setting value with updated and secure file path
+        if (response) {
+          const payload = response.data
+          this.currentProfile.config[payload.settingName] = payload.path
         }
-      })
-        .then(response => {
-          if (response.data.isSuccess) {
-            Vue.toasted.global.success(
-              `Valid Extractor Connection - ${this.extractor.name}`
-            )
-          } else {
-            Vue.toasted.global.error(
-              `Invalid Extractor Connection - ${this.extractor.name}`
-            )
+
+        // 3. Save config settings
+        this.testPluginConfiguration({
+          name: this.extractor.name,
+          type: 'extractors',
+          payload: {
+            profile: this.currentProfile.name,
+            config: this.currentProfile.config
           }
         })
-        .finally(() => (this.isTesting = false))
+          .then(response => {
+            if (response.data.isSuccess) {
+              Vue.toasted.global.success(
+                `Valid Extractor Connection - ${this.extractor.name}`
+              )
+            } else {
+              Vue.toasted.global.error(
+                `Invalid Extractor Connection - ${this.extractor.name}`
+              )
+            }
+          })
+          .then(() => {
+            if (this.uploadFormData) {
+              return this.$store.dispatch(
+                'orchestration/deleteUploadedPluginConfigurationFile',
+                {
+                  name: this.extractor.name,
+                  profileName: this.currentProfile.name,
+                  type: 'extractors',
+                  payload: {
+                    ...this.uploadFormData,
+                    file: null,
+                    tmp: true
+                  }
+                }
+              )
+            }
+          })
+          .finally(() => (this.isTesting = false))
+      })
     }
   }
 }

@@ -88,7 +88,13 @@ export default {
     )
   },
 
-  uploadPluginConfigurationFile({ type, name, profileName, formData }) {
+  uploadPluginConfigurationFile({ type, name, profileName, payload }) {
+    const formData = new FormData()
+    for (let key in payload) {
+      const value = payload[key]
+      formData.append(key, value)
+    }
+
     return axios.post(
       utils.apiUrl(
         'orchestrations',
@@ -100,6 +106,16 @@ export default {
           'Content-Type': 'multipart/form-data'
         }
       }
+    )
+  },
+
+  deleteUploadedPluginConfigurationFile({ type, name, profileName, payload }) {
+    return axios.post(
+      utils.apiUrl(
+        'orchestrations',
+        `${type}/${name}@${profileName}/configuration/delete-uploaded-file`
+      ),
+      payload
     )
   }
 }
