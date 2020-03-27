@@ -177,27 +177,27 @@ const actions = {
       .getPolledPipelineJobStatus({ jobIds: getters.getRunningPipelineJobIds })
       .then(response => {
         response.data.jobs.forEach(jobStatus => {
+          const targetPoller = state.pipelinePollers.find(
+            pipelinePoller =>
+              pipelinePoller.getMetadata().jobId === jobStatus.jobId
+          )
           if (jobStatus.isComplete) {
-            const targetPoller = state.pipelinePollers.find(
-              pipelinePoller =>
-                pipelinePoller.getMetadata().jobId === jobStatus.jobId
-            )
             commit('removePipelinePoller', targetPoller)
-
-            const targetPipeline = state.pipelines.find(
-              pipeline => pipeline.name === jobStatus.jobId
-            )
-
-            commit('setPipelineStatus', {
-              pipeline: targetPipeline,
-              ...targetPipeline,
-              hasError: jobStatus.hasError,
-              hasEverSucceeded: jobStatus.hasEverSucceeded,
-              isRunning: !jobStatus.isComplete,
-              startedAt: jobStatus.startedAt,
-              endedAt: jobStatus.endedAt
-            })
           }
+
+          const targetPipeline = state.pipelines.find(
+            pipeline => pipeline.name === jobStatus.jobId
+          )
+
+          commit('setPipelineStatus', {
+            pipeline: targetPipeline,
+            ...targetPipeline,
+            hasError: jobStatus.hasError,
+            hasEverSucceeded: jobStatus.hasEverSucceeded,
+            isRunning: !jobStatus.isComplete,
+            startedAt: jobStatus.startedAt,
+            endedAt: jobStatus.endedAt
+          })
         })
       })
   },

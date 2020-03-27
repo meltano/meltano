@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1920](https://gitlab.com/meltano/meltano/-/issues/1920) Fix extractor logo on Google Analytics Explore page
+- [#1895](https://gitlab.com/meltano/meltano/-/issues/1895) Fix bug causing newly created pipeline not to show as running when it is
 
 ### Breaks
 
