@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1920](https://gitlab.com/meltano/meltano/-/issues/1920) Fix extractor logo on Google Analytics Explore page
+
 ### Breaks
 
 
