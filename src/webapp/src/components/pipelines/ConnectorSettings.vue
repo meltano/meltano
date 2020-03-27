@@ -39,7 +39,7 @@ export default {
       required: true
     },
     uploadFormData: {
-      type: FormData,
+      type: Object,
       required: false,
       default: () => null
     }
@@ -240,10 +240,10 @@ export default {
       if (file) {
         // Queue file upload vs. greedy upload
         // Refactor needed if a setting requires multiple files and/or 2+ settings are `kind: file`
-        const uploadFormData = new FormData()
-        uploadFormData.append('file', file)
-        uploadFormData.append('setting_name', setting.name)
-        this.$emit('onChangeUploadFormData', uploadFormData)
+        this.$emit('onChangeUploadFormData', {
+          file,
+          setting_name: setting.name
+        })
 
         // Model update as v-model on `<input type="file">` not supported
         const profile = this.configSettings.profiles[

@@ -288,8 +288,12 @@ const actions = {
     })
   },
 
-  uploadPluginConfigurationFile(_, configPayload) {
-    return orchestrationsApi.uploadPluginConfigurationFile(configPayload)
+  uploadPluginConfigurationFile(_, payload) {
+    return orchestrationsApi.uploadPluginConfigurationFile(payload)
+  },
+
+  deleteUploadedPluginConfigurationFile(_, payload) {
+    return orchestrationsApi.deleteUploadedPluginConfigurationFile(payload)
   }
 }
 
