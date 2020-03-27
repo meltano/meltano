@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1920](https://gitlab.com/meltano/meltano/-/issues/1920) Fix extractor logo on Google Analytics Explore page
 - [#1906](https://gitlab.com/meltano/meltano/-/issues/1906) Fix "Test Connection" for extractors that require a file to be uploaded, like Google Analytics
+- [#1931](https://gitlab.com/meltano/meltano/-/issues/1931) Validate uploaded file path when saving or testing connection settings
 
 ### Breaks
 
