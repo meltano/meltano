@@ -33,7 +33,7 @@ export default {
           : ''
     },
     getExtractorName() {
-      return this.topic ? `tap-${this.topic.name}` : ''
+      return this.namespace ? this.namespace.replace('model', 'tap') : ''
     },
     getFilteredDashboards() {
       const filteredReportIds = this.getFilteredReports.map(report => report.id)
