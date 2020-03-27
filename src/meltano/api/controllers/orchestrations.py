@@ -48,6 +48,34 @@ def freeze_profile_config_keys(profile):
     profile["config_sources"] = freeze_keys(profile.get("config_sources", {}))
 
 
+def validate_plugin_config(
+    plugin: PluginRef, name, value, project: Project, settings: PluginSettingsService
+):
+    setting_def = settings.find_setting(plugin, name)
+    # we want to prevent the edition of protected settings from the UI
+    if setting_def.protected:
+        logging.warning("Cannot set a 'protected' configuration externally.")
+        return False
+
+    if setting_def.kind == "file" and value and value != "":
+        uploads_directory = project.extract_dir(plugin.full_name)
+        resolved_file_path = project.root_dir(value).resolve()
+        if not str(resolved_file_path).startswith(str(uploads_directory) + "/"):
+            logging.warning(
+                "Cannot set a file configuration to a path outside the project directory"
+            )
+            return False
+
+    old_value, source = settings.get_value(db.session, plugin, name)
+    if source in (PluginSettingValueSource.ENV, PluginSettingValueSource.MELTANO_YML):
+        logging.warning(
+            "Cannot override a configuration set in the environment or meltano.yml."
+        )
+        return False
+
+    return True
+
+
 orchestrationsBP = APIBlueprint("orchestrations", __name__)
 orchestrationsAPI = Api(
     orchestrationsBP,
@@ -329,19 +357,7 @@ def save_plugin_configuration(plugin_ref) -> Response:
         plugin.use_profile(plugin.get_profile(name))
 
         for name, value in profile["config"].items():
-            # we want to prevent the edition of protected settings from the UI
-            if settings.find_setting(plugin, name).protected:
-                logging.warning("Cannot set a 'protected' configuration externally.")
-                continue
-
-            old_value, source = settings.get_value(db.session, plugin_ref, name)
-            if source in (
-                PluginSettingValueSource.ENV,
-                PluginSettingValueSource.MELTANO_YML,
-            ):
-                logging.warning(
-                    "Cannot override a configuration set in the environment or meltano.yml."
-                )
+            if not validate_plugin_config(plugin, name, value, project, settings):
                 continue
 
             if value == "":
@@ -368,6 +384,15 @@ def test_plugin_configuration(plugin_ref) -> Response:
 
     # load the correct profile
     plugin.use_profile(plugin.get_profile(payload.get("profile")))
+
+    settings = PluginSettingsService(project, show_hidden=False)
+
+    config = payload.get("config", {})
+    valid_config = {
+        name: value
+        for name, value in config.items()
+        if validate_plugin_config(plugin, name, value, project, settings)
+    }
 
     async def test_stream(tap_stream) -> bool:
         while not tap_stream.at_eof():
@@ -401,7 +426,7 @@ def test_plugin_configuration(plugin_ref) -> Response:
                 logging.debug(err)
 
     loop = asyncio.get_event_loop()
-    success = loop.run_until_complete(test_extractor(payload.get("config")))
+    success = loop.run_until_complete(test_extractor(valid_config))
 
     return jsonify({"is_success": success}), 200
 
