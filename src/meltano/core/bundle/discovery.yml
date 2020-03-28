@@ -322,7 +322,7 @@ extractors:
       - name: reports
         label: Reports
         placeholder: Ex. my_report_definition.json
-        kind: file
+        kind: hidden
         env: GOOGLE_ANALYTICS_API_REPORTS
       - name: start_date
         env: GOOGLE_ANALYTICS_API_START_DATE
