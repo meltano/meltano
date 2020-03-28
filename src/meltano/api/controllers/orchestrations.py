@@ -15,7 +15,10 @@ from meltano.core.plugin.settings_service import (
     PluginSettingsService,
     PluginSettingValueSource,
 )
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin_discovery_service import (
+    PluginDiscoveryService,
+    PluginNotFoundError,
+)
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.project import Project
@@ -297,6 +300,13 @@ def get_plugin_configuration(plugin_ref) -> Response:
     settings = PluginSettingsService(project, show_hidden=False)
     plugin = ConfigService(project).get_plugin(plugin_ref)
 
+    discovery_service = PluginDiscoveryService(project)
+    try:
+        plugin_def = discovery_service.find_plugin(plugin.type, plugin.name)
+        settings_group_validation = plugin_def.settings_group_validation
+    except PluginNotFoundError:
+        settings_group_validation = []
+
     profiles = settings.profiles_with_config(db.session, plugin, redacted=True)
     for profile in profiles:
         freeze_profile_config_keys(profile)
@@ -305,6 +315,7 @@ def get_plugin_configuration(plugin_ref) -> Response:
         {
             "profiles": profiles,
             "settings": Canonical.as_canonical(settings.definitions(plugin)),
+            "settings_group_validation": settings_group_validation,
         }
     )
 
