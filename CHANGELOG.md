@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1909](https://gitlab.com/meltano/meltano/-/issues/1909) Suggest disabling ad blocker if request related to an Ads or Analytics extractor was blocked by browser
+
 ### Fixes
 
 - [#1920](https://gitlab.com/meltano/meltano/-/issues/1920) Fix extractor logo on Google Analytics Explore page
