@@ -55,10 +55,16 @@ export default {
     },
     setAddedProfileDefaults(profile) {
       const config = profile.config
+      const requiredSettingsKeys = utils.requiredConnectorSettingsKeys(
+        this.configSettings.settings,
+        this.connector.settingsGroupValidation
+      )
       this.configSettings.settings.forEach(setting => {
         const isIso8601Date = setting.kind && setting.kind === 'date_iso8601'
         const isDefaultNeeded =
-          config.hasOwnProperty(setting.name) && config[setting.name] === null
+          config.hasOwnProperty(setting.name) &&
+          config[setting.name] === null &&
+          requiredSettingsKeys.includes(setting.name)
         if (isIso8601Date && isDefaultNeeded) {
           config[setting.name] = utils.getFirstOfMonthAsYYYYMMDD()
         }
@@ -137,7 +143,9 @@ export default {
       <span
         class="icon has-text-grey-light tooltip is-tooltip-multiline"
         :data-tooltip="
-          `Profiles enable a single connector (${connector.name} for example) to be reused with multiple accounts or configurations.`
+          `Profiles enable a single connector (${
+            connector.name
+          } for example) to be reused with multiple accounts or configurations.`
         "
       >
         <font-awesome-icon icon="info-circle"></font-awesome-icon>

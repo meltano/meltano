@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1886](https://gitlab.com/meltano/meltano/-/issues/1886) Don't prepopulate date fields that are not required and are better left blank
+
 ### Fixes
 
 - [#1920](https://gitlab.com/meltano/meltano/-/issues/1920) Fix extractor logo on Google Analytics Explore page
