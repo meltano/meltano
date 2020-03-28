@@ -320,12 +320,17 @@ const mutations = {
   },
 
   setInFocusConfiguration(state, { configuration, target }) {
+    const requiredSettingsKeys = utils.requiredConnectorSettingsKeys(
+      configuration.settings,
+      configuration.settingsGroupValidation
+    )
     configuration.settings.forEach(setting => {
       const isIso8601Date = setting.kind && setting.kind === 'date_iso8601'
       configuration.profiles.forEach(profile => {
         const isDefaultNeeded =
           profile.config.hasOwnProperty(setting.name) &&
-          profile.config[setting.name] === null
+          profile.config[setting.name] === null &&
+          requiredSettingsKeys.includes(setting.name)
         if (isIso8601Date && isDefaultNeeded) {
           profile.config[setting.name] = utils.getFirstOfMonthAsYYYYMMDD()
         }
