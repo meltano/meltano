@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1909](https://gitlab.com/meltano/meltano/-/issues/1909) Suggest disabling ad blocker if request related to an Ads or Analytics extractor was blocked by browser
+- [#1905](https://gitlab.com/meltano/meltano/-/issues/1905) Hide Google Analytics Reports field from UI since startup founder end-users will stick with default
 
 ### Fixes
 
