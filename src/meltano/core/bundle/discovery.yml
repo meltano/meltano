@@ -31,7 +31,7 @@ extractors:
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
       - name: end_date
-        kind: date_iso8601
+        kind: hidden
       - name: insights_buffer_days
         label: Ads Insights Buffer Days
         value: 0
@@ -239,7 +239,7 @@ extractors:
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
       - name: end_date
-        kind: date_iso8601
+        kind: hidden
       - name: developer_token
         description: Your Developer Token for Google AdWord Application
         env: OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN
@@ -329,7 +329,7 @@ extractors:
         kind: date_iso8601
       - name: end_date
         env: GOOGLE_ANALYTICS_API_END_DATE
-        kind: date_iso8601
+        kind: hidden
   - name: tap-salesforce
     label: Salesforce
     description: Customer-relationship management & customer success platform

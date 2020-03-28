@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1909](https://gitlab.com/meltano/meltano/-/issues/1909) Suggest disabling ad blocker if request related to an Ads or Analytics extractor was blocked by browser
+- [#1887](https://gitlab.com/meltano/meltano/-/issues/1887) Hide End Date fields in connection setup since our end-users will want to import everything
 
 ### Fixes
 
