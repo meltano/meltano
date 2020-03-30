@@ -12,6 +12,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+### Fixes
+
+### Breaks
+
+
+## 1.27.0 - (2020-03-30)
+---
+
+### Changes
+
 - [#1909](https://gitlab.com/meltano/meltano/-/issues/1909) Suggest disabling ad blocker if request related to an Ads or Analytics extractor was blocked by browser
 - [#1886](https://gitlab.com/meltano/meltano/-/issues/1886) Don't prepopulate date fields that are not required and are better left blank
 - [#1887](https://gitlab.com/meltano/meltano/-/issues/1887) Hide End Date fields in connection setup since our end-users will want to import everything
@@ -23,8 +33,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1895](https://gitlab.com/meltano/meltano/-/issues/1895) Fix bug causing newly created pipeline not to show as running when it is
 - [#1906](https://gitlab.com/meltano/meltano/-/issues/1906) Fix "Test Connection" for extractors that require a file to be uploaded, like Google Analytics
 - [#1931](https://gitlab.com/meltano/meltano/-/issues/1931) Validate uploaded file path when saving or testing connection settings
-
-### Breaks
 
 
 ## 1.26.2 - (2020-03-26)
