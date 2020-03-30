@@ -59,7 +59,7 @@ class ScheduleService:
         start_date: Optional[datetime] = None,
         **env,
     ):
-        start_date = coerce_datetime(start_date) or self.default_start_date(
+        start_date = coerce_datetime(start_date) or self.default_start_date(  # TODO
             session, extractor
         )
 

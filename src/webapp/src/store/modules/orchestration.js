@@ -102,9 +102,7 @@ const getters = {
     return extractor => {
       const pipelineExtractor = getters.getPipelineWithExtractor(extractor)
 
-      return pipelineExtractor
-        ? utils.formatDateStringYYYYMMDD(pipelineExtractor.startDate)
-        : ''
+      return pipelineExtractor ? pipelineExtractor.startDate : ''
     }
   }
 }
@@ -369,7 +367,6 @@ const mutations = {
 
   setPipelines(state, pipelines) {
     pipelines.forEach(pipeline => {
-      pipeline.startDate = utils.dateIso8601(pipeline.startDate)
       if (pipeline.startedAt) {
         pipeline.startedAt = utils.dateIso8601(pipeline.startedAt)
       }
@@ -385,7 +382,6 @@ const mutations = {
   },
 
   updatePipelines(state, pipeline) {
-    pipeline.startDate = utils.dateIso8601(pipeline.startDate)
     state.pipelines.push(pipeline)
   }
 }
