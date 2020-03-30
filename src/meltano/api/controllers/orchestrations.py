@@ -465,6 +465,12 @@ def get_pipeline_schedules():
             state_job_success.is_success() if state_job_success else None
         )
 
+        schedule["start_date"] = (
+            schedule["start_date"].date().isoformat()
+            if schedule["start_date"]
+            else None
+        )
+
     return jsonify(schedules)
 
 
@@ -489,7 +495,13 @@ def save_pipeline_schedule() -> Response:
     schedule = schedule_service.add(
         db.session, slug, extractor, loader, transform, interval
     )
-    return jsonify(dict(schedule)), 201
+
+    schedule = dict(schedule)
+    schedule["start_date"] = (
+        schedule["start_date"].date().isoformat() if schedule["start_date"] else None
+    )
+
+    return jsonify(schedule), 201
 
 
 @orchestrationsBP.route("/pipeline-schedules", methods=["PUT"])
@@ -508,7 +520,12 @@ def update_pipeline_schedule() -> Response:
     schedule.interval = interval
     schedule_service.update_schedule(schedule)
 
-    return jsonify(dict(schedule)), 201
+    schedule = dict(schedule)
+    schedule["start_date"] = (
+        schedule["start_date"].date().isoformat() if schedule["start_date"] else None
+    )
+
+    return jsonify(schedule), 201
 
 
 @orchestrationsBP.route("/pipeline-schedules", methods=["DELETE"])

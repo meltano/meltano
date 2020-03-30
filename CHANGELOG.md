@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1911](https://gitlab.com/meltano/meltano/-/issues/1911) Display "Last updated: Updating..." instead of "Last updated: 1969-12-31" on reports while pipeline is running
+- [#1910](https://gitlab.com/meltano/meltano/-/issues/1910) Fix pipeline "Start date" and report "Data starting from" off-by-1 errors caused by timezone differences
 
 ### Breaks
 
