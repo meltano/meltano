@@ -15,7 +15,7 @@ Meltano provides a command line interface (CLI) that allows you to manage the co
 
 Once you have successfully installed Meltano from the command line, you will need to create a project before you launch the Meltano UI.
 
-## Create your first project
+### Create your first project
 
 To initialize a new project, open your terminal and navigate to the directory that you'd like to store your Meltano projects in.
 
@@ -29,21 +29,15 @@ This will create a new directory named `myprojectname` in the current directory 
 
 Inside the Meltano project directory, all plugin configuration (which may include tokens and passwords) is stored inside the `.meltano` directory, which is automatically added to the project's `.gitignore` file to prevent this potentially sensitive information from accidentally being pushed up to a hosted Git repository.
 
-## Setup your loader
+### Setup your loader
 
-Self-hosted Meltano instances require you to configure your reporting database, which we call the Meltano **Loader**, from the command line. To do this, you will supply your database configuration through a `.env` file.
+Self-hosted Meltano instances require you to set up a reporting database and configure Meltano to use it by installing a **Loader**.
 
-Once you create the file, you will need to paste in the configuration for your database. For example, PostgreSQL configurations can [be found here](/plugins/loaders/postgres.html#intermediate-connecting-meltano-to-an-existing-postgresql-database).
+Meltano has basic support for a [few different loaders](/plugins/loaders/), but dashboards and reports are only supported with [PostgreSQL](/plugins/loaders/postgres.html).
 
-After saving your configurations, you can load your configurations by running:
+You will find detailed instructions in the docs for your loader of choice.
 
-```bash
-source .env
-```
-
-And just like that, your loader is configured!
-
-## Start the application
+### Start the application
 
 Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
 
@@ -54,7 +48,7 @@ meltano ui
 
 Meltano is now running and should open a new tab at [http://localhost:5000](http://localhost:5000).
 
-Now that you have access to the Meltano UI, [use our Getting Started guide](http://localhost:8080/docs/getting-started.html#create-your-meltano-account) to learn more about how to use the software.
+Now that you have access to the Meltano UI, [use our Getting Started guide](/docs/getting-started.html#connect-data-sources) to learn more about how to use the software.
 
 
 ## Glossary of Command Line Concepts
