@@ -92,8 +92,14 @@ const getters = {
     return extractor => {
       const pipelineExtractor = getters.getPipelineWithExtractor(extractor)
 
-      return pipelineExtractor
+      if (!pipelineExtractor) {
+        return ''
+      }
+
+      return pipelineExtractor.endedAt
         ? utils.formatDateStringYYYYMMDD(pipelineExtractor.endedAt)
+        : pipelineExtractor.isRunning
+        ? 'Updating...'
         : ''
     }
   },
@@ -363,18 +369,18 @@ const mutations = {
     Vue.set(pipeline, 'isDeleting', isDeleting || false)
     Vue.set(pipeline, 'isRunning', isRunning || false)
     Vue.set(pipeline, 'isSaving', isSaving || false)
-    Vue.set(pipeline, 'startedAt', utils.dateIso8601(startedAt))
-    Vue.set(pipeline, 'endedAt', utils.dateIso8601(endedAt))
+    Vue.set(pipeline, 'startedAt', utils.dateIso8601Nullable(startedAt))
+    Vue.set(pipeline, 'endedAt', utils.dateIso8601Nullable(endedAt))
   },
 
   setPipelines(state, pipelines) {
     pipelines.forEach(pipeline => {
       pipeline.startDate = utils.dateIso8601(pipeline.startDate)
       if (pipeline.startedAt) {
-        pipeline.startedAt = utils.dateIso8601(pipeline.startedAt)
+        pipeline.startedAt = utils.dateIso8601Nullable(pipeline.startedAt)
       }
       if (pipeline.endedAt) {
-        pipeline.endedAt = utils.dateIso8601(pipeline.endedAt)
+        pipeline.endedAt = utils.dateIso8601Nullable(pipeline.endedAt)
       }
     })
     state.pipelines = pipelines
