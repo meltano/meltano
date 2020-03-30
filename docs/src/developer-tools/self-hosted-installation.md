@@ -129,7 +129,7 @@ Now that you've installed Meltano and its requirements, you can [create your fir
 
 [Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
 
-#### Using Pre-built Docker Images
+### Using Pre-built Docker Images
 
 We provide the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docker image with Meltano pre-installed and ready to use.
 
@@ -145,11 +145,13 @@ docker pull meltano/meltano
 docker run meltano/meltano --version
 ```
 
-#### Initialize Your Project
+### Initialize Your Project
 
 Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our [Getting Started Guide](/docs/getting-started.html). However, the command line syntax is slightly different. For example, let's create a new Meltano project:
 
-```
+```sh
+cd /your/projects/directory
+
 docker run -v $(pwd):/projects \
              -w /projects \
              meltano/meltano init yourprojectname
@@ -157,13 +159,13 @@ docker run -v $(pwd):/projects \
 
 Then you can `cd` into your new project:
 
-```
+```sh
 cd yourprojectname
 ```
 
 We can then start the Meltano UI. Since `ui` is the default command, we can omit it.
 
-```
+```sh
 docker run -v $(pwd):/project \
              -w /project \
              -p 5000:5000 \
@@ -172,9 +174,9 @@ docker run -v $(pwd):/project \
 
 You can now visit [http://localhost:5000](http://localhost:5000) to access the Meltano UI.
 
-If you are a Meltano end-user who is not going to be contributing code to our open source repository, you should be able to use Meltano entirely from the UI at this point.
+Now that you're succesfully running Meltano, you can [set up your loader](/developer-tools/command-line-interface.html#setup-your-loader).
 
-Follow the steps in our [Getting Started Guide](/docs/getting-started.html) to get started.
+Note that wherever you are asked to run the `meltano` command, you will want to run it through `docker run` as in the snippet above.
 
 ## Amazon Web Services (AWS)
 
@@ -184,7 +186,7 @@ This guide assumes that you have a functioning Docker image where your Meltano p
 
 In this section, we will be going over how you can deploy a Meltano Docker image to AWS.
 
-## Setting Up Elastic Container Service (ECS)
+### Setting Up Elastic Container Service (ECS)
 
 1. Login to [AWS Console](https://console.aws.amazon.com)
 1. Search for [ECS](https://console.aws.amazon.com/ecs) and click on the link
@@ -218,7 +220,7 @@ In this section, we will be going over how you can deploy a Meltano Docker image
 
 1. Click `Next` to move to the next step
 
-## Review service properties
+### Review service properties
 
 ![](/screenshots/aws-ecs-review-service.png)
 
@@ -231,7 +233,7 @@ In this section, we will be going over how you can deploy a Meltano Docker image
 
 1. Click `Next` to move on to the next step
 
-## Configure Your Cluster
+### Configure Your Cluster
 
 The main configuration here is the **Cluster name**. We provide a suggestion below, but feel free to name it as you wish.
 
@@ -239,36 +241,11 @@ The main configuration here is the **Cluster name**. We provide a suggestion bel
 - **VPC ID**: Automatically create new
 - **Subnets**: Automatically create new
 
-## Review Cluster Configuration
+### Review Cluster Configuration
 
 After you click `Next`, you will have the opportunity to review all of the properties that you set. Once you confirm that the settings are correct, click `Create` to setup your ECS.
 
 You should now see a page where Amazon prepares the services we configured. There will be spinning icons on the right of each service that will live update as it finished. Once you see everything has setup properly, you're cluster has been successfully deployed!
-
-## Final steps
-
-![](/screenshots/aws-ecs-final-steps.png)
-
-1. Open the page with your cluster
-1. Click on the _Tasks_ tab
-1. You should see a task that has a status of `RUNNING` for _Last Status_
-1. Click on the _Task ID_ link (e.g., 0b35dea-3ca..)
-1. Under _Network_, you can find the URL for your instance under _Public IP_ (e.g., 18.18.134.18)
-1. Open a new tab in your browser and visit this new URL on port 5000 (e.g., http://18.18.134.18:5000)
-
-::: tip
-The IP address can be mapped to a domain using Route53. We will be writing up a guide on how to do this. You can follow along at [meltano#625](https://gitlab.com/meltano/meltano/issues/625).
-:::
-
-### Next Steps
-
-Once you have successfully installed Meltano from the command line, you will need to [create your first project from the command line]/developer-tools/command-line-interface.html#create-your-first-project).
-
-## Troubleshooting Installation
-
-::: tip
-Are you having installation or deployment problems? We are here to help you. Check out [Getting Help](/docs/getting-help.html) on the different ways to get in touch with us.
-:::
 
 ## Configure network access
 
@@ -299,6 +276,31 @@ Once you complete the cluster setup, you should be brought to the detail page fo
 - **Source**: Custom 0.0.0.0/0
 
 1. Click `Save rules`
+
+### Final steps
+
+![](/screenshots/aws-ecs-final-steps.png)
+
+1. Open the page with your cluster
+1. Click on the _Tasks_ tab
+1. You should see a task that has a status of `RUNNING` for _Last Status_
+1. Click on the _Task ID_ link (e.g., 0b35dea-3ca..)
+1. Under _Network_, you can find the URL for your instance under _Public IP_ (e.g., 18.18.134.18)
+1. Open a new tab in your browser and visit this new URL on port 5000 (e.g., http://18.18.134.18:5000)
+
+::: tip
+The IP address can be mapped to a domain using Route53. We will be writing up a guide on how to do this. You can follow along at [meltano#625](https://gitlab.com/meltano/meltano/issues/625).
+:::
+
+### Next Steps
+
+Once you have successfully installed Meltano from the command line, you will need to [create your first project from the command line](/developer-tools/command-line-interface.html#create-your-first-project).
+
+## Troubleshooting Installation
+
+::: tip
+Are you having installation or deployment problems? We are here to help you. Check out [Getting Help](/docs/getting-help.html) on the different ways to get in touch with us.
+:::
 
 ## Upgrading Meltano Version
 

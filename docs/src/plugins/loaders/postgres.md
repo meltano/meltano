@@ -44,18 +44,20 @@ In this section, we provide a tutorial for installing Postgres and setting up a 
 
 ### Intermediate: Connecting Meltano to an Existing PostgreSQL Database
 
-Once you have identified a PostgreSQL database where Meltano should load the data it extracts from your source(s), go to Meltano UI and complete Step 3 of the pipeline creation process.
+Once you have identified a PostgreSQL database where Meltano should load the data it extracts from your source(s), add the `target-postgres` loader to Meltano:
 
-![Meltano UI pipeline select PostgreSQL loader](/screenshots/meltano-ui-load-postgres.png)
+```shell
+cd my_project
+meltano add loader target-postgres
+```
 
-Fill in the configuration fields with the necessary information to connect with your PostgreSQL database and click "Save". The Schema field is optional.
-
-![Meltano UI configuring the Postgres loader](/screenshots/meltano-postgres-loader-config.png)
+You can now configure target-postgres to use your PostgreSQL database 
 
 ### Advanced: Command Line (CLI) Configuration
 
-In this section we provide additional information for configuring Meltano to connect with your PostgreSQL databae from the Meltano command line interface (CLI).
+In this section we provide additional information for configuring Meltano to connect with your PostgreSQL database from the Meltano command line interface (CLI).
 
+1. Create a `.env` file in your project directory if it doesn't exist already
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
 
@@ -65,8 +67,11 @@ export PG_USERNAME=""
 export PG_PORT=""
 export PG_PASSWORD=""
 export PG_DATABASE=""
-export PG_SCHEMA=""
 ```
+
+Enter the appropriate values for each variable inside the quotes.
+
+If you are running Meltano UI (`meltano ui`), you will need to restart it for the changes to take effect.
 
 ## Contributor Info
 
