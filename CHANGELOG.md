@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1896](https://gitlab.com/meltano/meltano/-/issues/1896) Set pipeline update interval to daily by default, to start after first successful manual run
+- [#1890](https://gitlab.com/meltano/meltano/-/issues/1890) Clarify that changing Start Date requires a new pipeline to be set up
 
 ### Fixes
 
