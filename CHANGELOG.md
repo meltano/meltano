@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1896](https://gitlab.com/meltano/meltano/-/issues/1896) Set pipeline update interval to daily by default, to start after first successful manual run
+
 ### Fixes
 
 - [#1911](https://gitlab.com/meltano/meltano/-/issues/1911) Display "Last updated: Updating..." instead of "Last updated: 1969-12-31" on reports while pipeline is running

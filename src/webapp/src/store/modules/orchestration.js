@@ -258,7 +258,7 @@ const actions = {
       extractor: extractorName,
       loader: 'target-postgres', // Refactor vs. hard code when we again want to display in the UI
       transform: hasDefaultTransforms ? 'run' : 'skip',
-      interval: '@once', // Refactor vs. hard code when we again want to display in the UI
+      interval: '@daily', // Refactor vs. hard code when we again want to display in the UI
       isRunning: false
     }
     return orchestrationsApi.savePipelineSchedule(pipeline).then(response => {
