@@ -1,6 +1,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
 
+import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import DownloadButton from '@/components/generic/DownloadButton'
 import ExploreButton from '@/components/analyze/ExploreButton'
 import SubscribeButton from '@/components/generic/SubscribeButton'
@@ -11,6 +12,7 @@ import utils from '@/utils/utils'
 export default {
   name: 'LogModal',
   components: {
+    ConnectorLogo,
     DownloadButton,
     ExploreButton,
     SubscribeButton
@@ -28,6 +30,7 @@ export default {
   computed: {
     ...mapGetters('orchestration', ['getRunningPipelineJobIds']),
     ...mapState('orchestration', ['pipelines']),
+    ...mapGetters('plugins', ['getPluginLabel']),
     getDownloadPromise() {
       return orchestrationsApi.downloadJobLog
     },
@@ -67,6 +70,11 @@ export default {
     },
     relatedPipeline() {
       return this.pipelines.find(pipeline => pipeline.name === this.jobId)
+    },
+    dataSourceLabel() {
+      return this.relatedPipeline
+        ? this.getPluginLabel('extractors', this.relatedPipeline.extractor)
+        : ''
     }
   },
   created() {
@@ -119,9 +127,12 @@ export default {
     <div class="modal-background" @click="close"></div>
     <div class="modal-card is-wide" :class="{ 'modal-card-log': jobLog }">
       <header class="modal-card-head">
-        <p class="modal-card-title">
-          Run Log: <span class="is-family-code">{{ jobId }}</span>
-        </p>
+        <figure v-if="relatedPipeline" class="media-left">
+          <p class="image level-item is-24x24 container">
+            <ConnectorLogo :connector="relatedPipeline.extractor" />
+          </p>
+        </figure>
+        <p class="modal-card-title">{{ dataSourceLabel }} Pipeline Run Log</p>
         <div
           class=" tooltip is-tooltip-left"
           data-tooltip="The pipeline still runs when closed"
@@ -132,7 +143,7 @@ export default {
       <section v-if="relatedPipeline" class="modal-card-body">
         <article class="message is-small is-info">
           <p class="message-header">
-            Your data source is being extracted.
+            Your data is being extracted from {{ dataSourceLabel }}.
           </p>
           <div class="message-body content">
             <p>
