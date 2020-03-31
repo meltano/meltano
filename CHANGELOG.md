@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1477](https://gitlab.com/meltano/meltano/-/issues/1477) Allow read-only mode and authentication to be used at the same time, to allow anonymous read-only access and only require authentication for write actions.
+
 ### Changes
 
 - [#1896](https://gitlab.com/meltano/meltano/-/issues/1896) Set pipeline update interval to daily by default, to start after first successful manual run

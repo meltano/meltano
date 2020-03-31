@@ -1,6 +1,7 @@
 import subprocess
 import requests
 import logging
+from functools import wraps
 from urllib.parse import urlsplit
 from flask import (
     Blueprint,
@@ -13,17 +14,28 @@ from flask import (
     current_app,
 )
 from flask_login import current_user
-from flask_security import login_required, roles_required, logout_user
+from flask_security import roles_required, logout_user
 from jinja2 import TemplateNotFound
 
 import meltano
-from meltano.api.security import api_auth_required
 from flask_security import roles_required
 from meltano.api.api_blueprint import APIBlueprint
+from meltano.api.security.auth import is_unauthorized
 from meltano.core.utils import truthy
 
 logger = logging.getLogger(__name__)
 root = Blueprint("root", __name__)
+
+
+def redirect_to_login_if_auth_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not is_unauthorized():
+            return f(*args, **kwargs)
+
+        return current_app.login_manager.unauthorized()
+
+    return decorated
 
 
 @root.errorhandler(500)
@@ -46,7 +58,7 @@ def embed(token):
 # to the front-end.
 @root.route("/", defaults={"path": ""})
 @root.route("/<path:path>")
-@login_required
+@redirect_to_login_if_auth_required
 def default(path):
     try:
         return render_template("webapp.html", jsContext=g.jsContext)
@@ -74,7 +86,7 @@ def version():
 
 
 @root.route("/bootstrap")
-@login_required
+@redirect_to_login_if_auth_required
 def bootstrap():
     return redirect(current_app.config["MELTANO_UI_URL"])
 
@@ -92,6 +104,14 @@ api_root = APIBlueprint("api_root", __name__, url_prefix="/api/v1/")
 @api_root.route("/identity")
 def identity():
     if current_user.is_anonymous:
-        return "", 204
+        return jsonify(
+            {
+                "username": "Anonymous",
+                "anonymous": True,
+                "can_sign_in": current_app.config["MELTANO_AUTHENTICATION"],
+            }
+        )
 
-    return jsonify({"username": current_user.username})
+    return jsonify(
+        {"username": current_user.username, "anonymous": False, "can_sign_in": False}
+    )

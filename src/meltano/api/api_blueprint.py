@@ -3,7 +3,7 @@ from datetime import datetime
 
 from flask import Blueprint
 from flask_login import current_user
-from meltano.api.security import api_auth_required, users
+from meltano.api.security import block_if_api_auth_required, users
 
 
 VERSION = 1
@@ -26,7 +26,7 @@ class APIBlueprint(Blueprint):
 
         self.before_request(self.__class__.auth_filter)
 
-    @api_auth_required
+    @block_if_api_auth_required
     def auth_filter():
         logging.debug(f"Authenticated as {current_user}")
 
