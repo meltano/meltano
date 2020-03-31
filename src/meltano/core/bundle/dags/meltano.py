@@ -14,6 +14,8 @@ from datetime import datetime, time, timedelta, MINYEAR
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.project import Project
 from meltano.core.utils import coerce_datetime
+from meltano.core.job import JobFinder
+from meltano.core.db import project_engine
 
 
 project = Project.find()
@@ -30,17 +32,28 @@ default_args = {
     "concurrency": 1,
 }
 
+engine_uri = f"sqlite:///{os.getcwd()}/.meltano/meltano.db"
+engine, Session = project_engine(project, engine_uri, default=True)
+session = Session()
+
 for schedule in schedule_service.schedules():
-    args = default_args.copy()
-
-    if schedule.start_date:
-        args["start_date"] = coerce_datetime(schedule.start_date)
-
     if schedule.interval == "@once":
         logging.info(
-            f"No DAG created for schedule '{schedule.name}' because it is set to `@once`."
+            f"No DAG created for schedule '{schedule.name}' because its interval is set to `@once`."
         )
         continue
+
+    finder = JobFinder(schedule.name)
+    last_successful_run = finder.latest_success(session)
+    if not last_successful_run:
+        logging.info(
+            f"No DAG created for schedule '{schedule.name}' because it hasn't had a successful (manual) run yet."
+        )
+        continue
+
+    args = default_args.copy()
+    if schedule.start_date:
+        args["start_date"] = coerce_datetime(schedule.start_date)
 
     dag_id = f"meltano_{schedule.name}"
 
