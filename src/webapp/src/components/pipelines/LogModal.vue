@@ -87,11 +87,8 @@ export default {
           .then(response => {
             this.jobStatus = response.data
             this.hasError = this.jobStatus.hasError
-            if (this.jobStatus.hasLogExceededMaxSize) {
-              this.hasLogExceededMaxSize = this.jobStatus.hasLogExceededMaxSize
-            } else {
-              this.jobLog = this.jobStatus.log
-            }
+            this.hasLogExceededMaxSize = this.jobStatus.hasLogExceededMaxSize
+            this.jobLog = this.jobStatus.log
           })
           .catch(error => {
             this.jobLog = error.response.data.code
@@ -191,9 +188,9 @@ export default {
           </div>
         </article>
         <DownloadButton
+          v-if="hasLogExceededMaxSize || !isPolling"
           label="Download Log"
           :file-name="`${jobId}-job-log.txt`"
-          :is-disabled="isPolling"
           :trigger-promise="getDownloadPromise"
           :trigger-payload="{ jobId }"
         ></DownloadButton>
