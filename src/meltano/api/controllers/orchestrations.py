@@ -384,6 +384,7 @@ def save_plugin_configuration(plugin_ref) -> Response:
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration/test", methods=["POST"])
+@readonly_killswitch
 def test_plugin_configuration(plugin_ref) -> Response:
     """
     Endpoint for testing a plugin configuration's valid connection
