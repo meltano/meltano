@@ -4,7 +4,6 @@ import utils from '@/utils/utils'
 export default {
   name: 'DownloadButton',
   props: {
-    isDisabled: { type: Boolean, required: false, default: true },
     fileName: { type: String, required: true },
     label: { type: String, required: false, default: 'Download' },
     triggerPromise: { type: Function, required: true },
@@ -28,12 +27,7 @@ export default {
 </script>
 
 <template>
-  <button
-    class="button"
-    :class="{ 'is-loading': isLoading }"
-    :disabled="isDisabled"
-    @click="download"
-  >
+  <button class="button" :class="{ 'is-loading': isLoading }" @click="download">
     <span class="icon">
       <font-awesome-icon icon="file-download" />
     </span>
