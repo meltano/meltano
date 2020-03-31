@@ -336,13 +336,29 @@ export default {
     <div class="columns">
       <div class="column" :class="{ 'is-two-fifths': isShowDocs }">
         <article v-if="isShowConfigWarning" class="message is-warning is-small">
-          <div class="message-body">
-            <div class="content">
-              <p>
-                Take note that changing non-date related settings of an existing
-                configuration can result in overwritten or merged data.
-              </p>
-            </div>
+          <div class="message-body content">
+            <p>
+              Please note:
+            </p>
+            <ul>
+              <li>
+                Changing these settings does not result in the deletion of data
+                that has already been imported.
+              </li>
+              <li>
+                If the
+                <strong>context (e.g. the account or project)</strong> data is
+                imported from is changed, the result of merging this new data
+                with the existing data may be unexpected.
+              </li>
+              <li>
+                Before moving the <strong>start date</strong> further into the
+                past, be sure to delete the existing pipeline, since the start
+                date is only taken into account by the initial run of a
+                pipeline, and subsequent runs start off where the previous run
+                ended.
+              </li>
+            </ul>
           </div>
         </article>
         <form>
