@@ -10,6 +10,11 @@ export default {
     PipelineSchedules,
     RouterViewLayout
   },
+  data() {
+    return {
+      isLoading: false
+    }
+  },
   computed: {
     ...mapGetters('orchestration', ['getHasPipelines', 'getSortedPipelines']),
     getModalName() {
@@ -20,7 +25,8 @@ export default {
     }
   },
   created() {
-    this.getPipelineSchedules()
+    this.isLoading = true
+    this.getPipelineSchedules().then(() => (this.isLoading = false))
   },
   methods: {
     ...mapActions('orchestration', ['getPipelineSchedules'])
@@ -33,13 +39,31 @@ export default {
     <div class="container view-body is-widescreen">
       <h2 id="data" class="title">Pipelines</h2>
 
-      <template v-if="getHasPipelines" class="columns">
-        <div class="columns">
-          <div class="column">
-            <PipelineSchedules :pipelines="getSortedPipelines" />
+      <div class="columns">
+        <div class="column">
+          <PipelineSchedules
+            v-if="getHasPipelines"
+            :pipelines="getSortedPipelines"
+          />
+          <div v-else class="box">
+            <progress
+              v-if="isLoading"
+              class="progress is-small is-info"
+            ></progress>
+            <div v-else>
+              <div class="content">
+                <p>
+                  No pipelines have been set up yet.
+                  <router-link to="connections"
+                    >Connect a data source</router-link
+                  >
+                  first.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-      </template>
+      </div>
 
       <div v-if="isModal">
         <router-view :name="getModalName"></router-view>

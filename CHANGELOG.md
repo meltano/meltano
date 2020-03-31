@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1892](https://gitlab.com/meltano/meltano/-/issues/1892) Clarify in Run Log modal that the "Explore" button can also be found on the Connections page
 - [#1891](https://gitlab.com/meltano/meltano/-/issues/1891) Show data source logo and label in Run Log modal header insteadof pipeline ID
 - [#1893](https://gitlab.com/meltano/meltano/-/issues/1893) Hide "Download Log" button while pipeline is running instead of disabling it
+- [#1894](https://gitlab.com/meltano/meltano/-/issues/1894) Suggest connecting a data source on Pipelines page when there are no pipelines yet
 
 ### Fixes
 
