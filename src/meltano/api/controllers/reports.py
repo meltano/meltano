@@ -8,7 +8,7 @@ from meltano.core.m5o.reports_service import ReportAlreadyExistsError, ReportsSe
 
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin, Need
-from meltano.api.security.readonly_killswitch import readonly_killswitch
+from flask_security import roles_required
 
 reportsBP = APIBlueprint("reports", __name__)
 
@@ -64,7 +64,7 @@ def index():
 
 
 @reportsBP.route("/save", methods=["POST"])
-@readonly_killswitch
+@roles_required("admin")
 def save_report():
     post_data = request.get_json()
     response_data = reports_service().save_report(post_data)
@@ -72,7 +72,7 @@ def save_report():
 
 
 @reportsBP.route("/update", methods=["POST"])
-@readonly_killswitch
+@roles_required("admin")
 def update_report():
     post_data = request.get_json()
     response_data = reports_service().update_report(post_data)

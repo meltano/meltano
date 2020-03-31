@@ -73,6 +73,19 @@ class FreeUser:
         return None
 
 
+class ReadOnlyUser(FreeUser):
+    """
+    ReadOnlyUser is free to read, but not write
+    """
+
+    def has_role(*args):
+        return False
+
+    @property
+    def roles(self):
+        return set()
+
+
 def create_dev_user():
     for user in SEED_USERS:
         user = user.copy()

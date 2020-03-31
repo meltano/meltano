@@ -40,7 +40,7 @@ from meltano.api.models import db
 from meltano.api.models.subscription import Subscription
 from meltano.api.json import freeze_keys
 from meltano.api.executor import run_elt
-from meltano.api.security.readonly_killswitch import readonly_killswitch
+from flask_security import roles_required
 from .errors import InvalidFileNameError
 from .upload_helper import InvalidFileTypeError, InvalidFileSizeError, UploadHelper
 from .utils import enforce_secure_filename
@@ -248,7 +248,7 @@ def run():
 @orchestrationsBP.route(
     "/<plugin_ref:plugin_ref>/configuration/upload-file", methods=["POST"]
 )
-@readonly_killswitch
+@roles_required("admin")
 def upload_plugin_configuration_file(plugin_ref) -> Response:
     """
     Endpoint for uploading a file for a specific plugin's configuration profile
@@ -271,7 +271,7 @@ def upload_plugin_configuration_file(plugin_ref) -> Response:
 @orchestrationsBP.route(
     "/<plugin_ref:plugin_ref>/configuration/delete-uploaded-file", methods=["POST"]
 )
-@readonly_killswitch
+@roles_required("admin")
 def delete_plugin_configuration_file(plugin_ref) -> Response:
     """
     Endpoint for deleting a file for a specific plugin's configuration profile
@@ -323,7 +323,7 @@ def get_plugin_configuration(plugin_ref) -> Response:
 @orchestrationsBP.route(
     "/<plugin_ref:plugin_ref>/configuration/profiles", methods=["POST"]
 )
-@readonly_killswitch
+@roles_required("admin")
 def add_plugin_configuration_profile(plugin_ref) -> Response:
     """
     Endpoint for adding a configuration profile to a plugin
@@ -349,7 +349,7 @@ def add_plugin_configuration_profile(plugin_ref) -> Response:
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["PUT"])
-@readonly_killswitch
+@roles_required("admin")
 def save_plugin_configuration(plugin_ref) -> Response:
     """
     Endpoint for persisting a plugin configuration
@@ -384,7 +384,7 @@ def save_plugin_configuration(plugin_ref) -> Response:
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration/test", methods=["POST"])
-@readonly_killswitch
+@roles_required("admin")
 def test_plugin_configuration(plugin_ref) -> Response:
     """
     Endpoint for testing a plugin configuration's valid connection
@@ -476,7 +476,7 @@ def get_pipeline_schedules():
 
 
 @orchestrationsBP.route("/pipeline-schedules", methods=["POST"])
-@readonly_killswitch
+@roles_required("admin")
 def save_pipeline_schedule() -> Response:
     """
     Endpoint for persisting a pipeline schedule
@@ -506,7 +506,7 @@ def save_pipeline_schedule() -> Response:
 
 
 @orchestrationsBP.route("/pipeline-schedules", methods=["PUT"])
-@readonly_killswitch
+@roles_required("admin")
 def update_pipeline_schedule() -> Response:
     """
     Endpoint for updating a pipeline schedule
@@ -530,7 +530,7 @@ def update_pipeline_schedule() -> Response:
 
 
 @orchestrationsBP.route("/pipeline-schedules", methods=["DELETE"])
-@readonly_killswitch
+@roles_required("admin")
 def delete_pipeline_schedule() -> Response:
     """
     Endpoint for deleting a pipeline schedule

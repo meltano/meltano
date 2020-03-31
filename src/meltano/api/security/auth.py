@@ -3,13 +3,15 @@ from fnmatch import fnmatch
 from functools import wraps
 from datetime import datetime
 
-from flask import request
+from flask import current_app, request
 from flask_security import auth_required
 from flask_login import current_user
 from flask_principal import Permission, Need
 from werkzeug.exceptions import Forbidden
 from .identity import FreeUser
 from meltano.api.models import db
+
+HTTP_READONLY_CODE = 499
 
 
 class ResourcePermission(Permission):
@@ -88,7 +90,10 @@ def unauthorized_callback():
     instead of redirecting anywhere.
     """
 
-    return "You do not have the required permissions.", 403
+    if current_app.config["MELTANO_READONLY"]:
+        return "Meltano is currently running in read-only mode.", HTTP_READONLY_CODE
+    else:
+        return "You do not have the required permissions.", 403
 
 
 def _identity_loaded_hook(sender, identity):

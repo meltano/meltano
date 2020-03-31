@@ -7,7 +7,7 @@ from flask_security import Security, login_required
 from flask_security.utils import login_user
 from flask_principal import identity_loaded, Identity
 
-from .identity import users, FreeUser, create_dev_user
+from .identity import users, FreeUser, ReadOnlyUser, create_dev_user
 from .forms import MeltanoLoginForm, MeltanoRegisterFrom, MeltanoConfirmRegisterForm
 from .auth import (
     unauthorized_callback,
@@ -30,9 +30,13 @@ def setup_security(app, project):
     }
 
     if not app.config["MELTANO_AUTHENTICATION"]:
-        # the FreeUser is free to do everything and has all
-        # roles and permissions automatically.
-        options["anonymous_user"] = FreeUser
+        if app.config["MELTANO_READONLY"]:
+            # the ReadOnlyUser is free to read, but not write
+            options["anonymous_user"] = ReadOnlyUser
+        else:
+            # the FreeUser is free to do everything and has all
+            # roles and permissions automatically.
+            options["anonymous_user"] = FreeUser
 
     security.init_app(app, users, **options)
     security.unauthorized_handler(unauthorized_callback)
