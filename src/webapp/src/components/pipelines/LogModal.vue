@@ -149,8 +149,9 @@ export default {
                 this view.
               </li>
               <li>
-                Once extraction is complete, use the "Explore" button (lower
-                right of this view) to explore the imported data.
+                Once extraction is complete, you can explore the imported data
+                using the "Explore" button that will appear on the bottom right
+                of this view and on the Connections page.
               </li>
             </ul>
             <p v-if="isUITrigger && isNotificationEnabled">
