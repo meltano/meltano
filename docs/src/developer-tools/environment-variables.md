@@ -143,6 +143,20 @@ docker run --rm -p 1025:1025 -p 8025:8025 --name mailhog mailhog/mailhog
 
 All emails sent by Meltano should now be available at `http://localhost:8025/`
 
+### Authentication
+
+You can enable authentication and disallow anonymous usage of your Meltano instance by setting the `MELTANO_AUTHENTICATION` flag:
+
+```bash
+export MELTANO_AUTHENTICATION=1
+```
+
+Additionally, you will need to:
+1. Run [`meltano ui setup`](./command-line-interface.html#setup), and
+2. Create at least one user using [`meltano user add`](./command-line-interface.html#user).
+
+If read-only mode is enabled (`MELTANO_READONLY=1`), authentication will only be required for write actions.
+
 ### Read-Only mode
 
 The disable all modifications to the Meltano UI, you can run Meltano using the *read-only* mode.
@@ -151,6 +165,8 @@ The disable all modifications to the Meltano UI, you can run Meltano using the *
 # Meltano read-only mode
 export MELTANO_READONLY=1
 ```
+
+If authentication is enabled (`MELTANO_AUTHENTICATION=1`), read-only mode will only apply to unauthenticated users.
 
 ### OAuth Service
 

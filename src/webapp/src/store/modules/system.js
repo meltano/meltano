@@ -69,6 +69,10 @@ const actions = {
     window.location.href = utils.root('/auth/logout')
   },
 
+  login() {
+    window.location.href = utils.root('/auth/login')
+  },
+
   fetchIdentity({ commit }) {
     systemApi
       .identity()

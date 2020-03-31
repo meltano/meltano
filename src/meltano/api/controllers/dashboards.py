@@ -8,7 +8,7 @@ from meltano.core.m5o.dashboards_service import (
 )
 from .errors import InvalidFileNameError
 from meltano.api.api_blueprint import APIBlueprint
-from meltano.api.security.readonly_killswitch import readonly_killswitch
+from flask_security import roles_required
 
 
 dashboardsBP = APIBlueprint("dashboards", __name__)
@@ -70,7 +70,7 @@ def get_dashboard(dashboard_id):
 
 
 @dashboardsBP.route("/dashboard/save", methods=["POST"])
-@readonly_killswitch
+@roles_required("admin")
 def save_dashboard():
     """
     Endpoint for saving a dashboard
@@ -81,7 +81,7 @@ def save_dashboard():
 
 
 @dashboardsBP.route("/dashboard/delete", methods=["DELETE"])
-@readonly_killswitch
+@roles_required("admin")
 def delete_dashboard():
     """
     Endpoint for deleting a dashboard
@@ -92,7 +92,7 @@ def delete_dashboard():
 
 
 @dashboardsBP.route("/dashboard/update", methods=["POST"])
-@readonly_killswitch
+@roles_required("admin")
 def update_dashboard():
     """
     Endpoint for updating a dashboard
@@ -103,7 +103,7 @@ def update_dashboard():
 
 
 @dashboardsBP.route("/dashboard/report/add", methods=["POST"])
-@readonly_killswitch
+@roles_required("admin")
 def add_report_to_dashboard():
     post_data = request.get_json()
     response_data = dashboards_service().add_report_to_dashboard(post_data)
@@ -111,7 +111,7 @@ def add_report_to_dashboard():
 
 
 @dashboardsBP.route("/dashboard/report/remove", methods=["POST"])
-@readonly_killswitch
+@roles_required("admin")
 def remove_report_from_dashboard():
     post_data = request.get_json()
     response_data = dashboards_service().remove_report_from_dashboard(post_data)
