@@ -338,7 +338,7 @@ export default {
         <article v-if="isShowConfigWarning" class="message is-warning is-small">
           <div class="message-body content">
             <p>
-              Note that:
+              Please note:
             </p>
             <ul>
               <li>
