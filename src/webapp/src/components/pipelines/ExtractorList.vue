@@ -41,7 +41,9 @@ export default {
     },
     getConnectionTooltip() {
       return extractorName => {
-        return this.getHasPipelineWithExtractor(extractorName)
+        return this.getIsRelatedPipelineRunning(extractorName)
+          ? 'Connection details cannot be changed while pipeline is running'
+          : this.getHasPipelineWithExtractor(extractorName)
           ? 'Edit the connection details for this data source'
           : 'Install this data source and set up the connection'
       }
