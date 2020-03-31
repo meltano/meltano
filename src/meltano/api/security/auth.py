@@ -3,13 +3,15 @@ from fnmatch import fnmatch
 from functools import wraps
 from datetime import datetime
 
-from flask import request
+from flask import current_app, request
 from flask_security import auth_required
 from flask_login import current_user
 from flask_principal import Permission, Need
 from werkzeug.exceptions import Forbidden
 from .identity import FreeUser
 from meltano.api.models import db
+
+HTTP_READONLY_CODE = 499
 
 
 class ResourcePermission(Permission):
@@ -60,22 +62,29 @@ def permit(permission_type, context):
         raise Forbidden()
 
 
-def api_auth_required(f):
+def is_unauthorized():
+    if current_app.config["MELTANO_READONLY"]:
+        # If we're in read-only mode, the `@roles_required("admin")` checks
+        # will take care of enforcing authentication as appropriate
+        logging.debug(f"Authentication not required because of read-only mode")
+        return False
+
+    if not current_app.config["MELTANO_AUTHENTICATION"]:
+        logging.debug(f"Authentication not required because it's disabled")
+        return False
+
+    if current_user.is_authenticated:
+        logging.debug(f"Authenticated as @{current_user.username}")
+        return False
+
+    return True
+
+
+def block_if_api_auth_required(f):
     @wraps(f)
-    def decorated():
-        if request.method == "OPTIONS":
-            return f()
-
-        # bypass check for the FreeUser
-        session_user = current_user._get_current_object()
-        if isinstance(session_user, FreeUser):
-            logging.debug(f"Authentication bypassed`")
-            return f()
-
-        # authentify the user
-        if session_user.is_authenticated:
-            logging.debug(f"@{session_user.username} authenticated via `session`")
-            return f()
+    def decorated(*args, **kwargs):
+        if request.method == "OPTIONS" or not is_unauthorized():
+            return f(*args, **kwargs)
 
         return "Authentication is required to access this resource.", 401
 
@@ -88,7 +97,10 @@ def unauthorized_callback():
     instead of redirecting anywhere.
     """
 
-    return "You do not have the required permissions.", 403
+    if current_app.config["MELTANO_READONLY"]:
+        return "Meltano is currently running in read-only mode.", HTTP_READONLY_CODE
+    else:
+        return "You do not have the required permissions.", 403
 
 
 def _identity_loaded_hook(sender, identity):

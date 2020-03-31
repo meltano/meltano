@@ -49,7 +49,7 @@ export default {
     this.$store.dispatch('repos/getModels')
   },
   methods: {
-    ...mapActions('system', ['logout']),
+    ...mapActions('system', ['logout', 'login']),
     closeMobileMenu() {
       this.isMobileMenuOpen = false
     },
@@ -281,12 +281,22 @@ export default {
                   v{{ version }}
                 </a>
                 <a
-                  v-if="identity"
+                  v-if="identity && !identity.anonymous"
                   class="button is-small has-background-transparent tooltip is-tooltip-left"
                   :data-tooltip="`Sign out: ${identity.username}`"
                   @click="logout"
                 >
                   <span>Sign Out</span>
+                  <span class="icon">
+                    <font-awesome-icon icon="user"></font-awesome-icon>
+                  </span>
+                </a>
+                <a
+                  v-if="identity && identity.canSignIn"
+                  class="button is-small has-background-transparent"
+                  @click="login"
+                >
+                  <span>Sign In</span>
                   <span class="icon">
                     <font-awesome-icon icon="user"></font-awesome-icon>
                   </span>
