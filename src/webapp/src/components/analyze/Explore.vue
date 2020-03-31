@@ -16,12 +16,13 @@ export default {
       hasLoadedDashboards: false,
       hasLoadedReports: false,
       model: '',
+      pluginNamespace: '',
       namespace: '',
       topic: null
     }
   },
   computed: {
-    ...mapGetters('plugins', ['getInstalledPlugin']),
+    ...mapGetters('plugins', ['getInstalledPlugin', 'getHasDefaultDashboards']),
     ...mapState('dashboards', ['dashboards']),
     ...mapState('plugins', ['installedPlugins']),
     ...mapState('reports', ['reports']),
@@ -50,6 +51,9 @@ export default {
     },
     getTitle() {
       return this.topic ? this.topic.label : ''
+    },
+    hasDefaultDashboards() {
+      return this.getHasDefaultDashboards(this.pluginNamespace)
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -93,9 +97,9 @@ export default {
       this.getInstalledPlugins().then(() => {
         const extractorName = this.$route.params.extractor
         const extractor = this.getInstalledPlugin('extractors', extractorName)
-        const namespace = extractor.namespace
+        this.pluginNamespace = extractor.namespace
         const modelPlugin = this.installedPlugins.models.find(
-          plugin => plugin.namespace === namespace
+          plugin => plugin.namespace === this.pluginNamespace
         )
         this.namespace = modelPlugin.name
 
@@ -228,6 +232,12 @@ export default {
             <div class="content"><p>No reports</p></div>
           </template>
         </div>
+
+        <p v-if="hasDefaultDashboards" class="has-text-centered is-italic">
+          If the report you're looking for is not yet included with Meltano by
+          default, please
+          <a href="https://meltano.com/docs/getting-help.html">let us know</a>!
+        </p>
       </div>
 
       <!-- Report Builder -->

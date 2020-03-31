@@ -32,6 +32,13 @@ const getters = {
         transform => transform.namespace === namespace
       )
   },
+  getHasDefaultDashboards(state) {
+    return namespace =>
+      state.plugins.dashboards &&
+      state.plugins.dashboards.find(
+        dashboard => dashboard.namespace === namespace
+      )
+  },
 
   getHasInstalledPluginsOfType(state) {
     return pluginType => {
