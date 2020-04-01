@@ -17,7 +17,6 @@ from meltano.core.db import project_engine
 from meltano.core.logging.utils import current_log_level, FORMAT
 from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.oauth.app import app as oauth_service
 
 
@@ -134,6 +133,8 @@ def create_app(config={}):
 
         if tracker.send_anonymous_usage_stats:
             g.jsContext["isSendAnonymousUsageStats"] = True
+            g.jsContext["trackingId"] = app.config["MELTANO_UI_TRACKING_ID"]
+            g.jsContext["embedTrackingId"] = app.config["MELTANO_EMBED_TRACKING_ID"]
             g.jsContext["projectId"] = tracker.project_id
 
         g.jsContext["isNotificationEnabled"] = app.config["MELTANO_NOTIFICATION"]

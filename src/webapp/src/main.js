@@ -50,7 +50,7 @@ Vue.prototype.$flask = Object.freeze(flaskContext())
 
 // Conditional analytics using flask context
 if (Vue.prototype.$flask.isSendAnonymousUsageStats) {
-  setupAnalytics({ id: 'UA-132758957-2', router })
+  setupAnalytics({ id: Vue.prototype.$flask.trackingID, router })
 }
 
 /* eslint-disable no-new */
