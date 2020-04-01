@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1477](https://gitlab.com/meltano/meltano/-/issues/1477) Allow read-only mode and authentication to be used at the same time, to allow anonymous read-only access and only require authentication for write actions.
 - [#1914](https://gitlab.com/meltano/meltano/-/issues/1914) Allow default dashboards and reports to be updated in place if package contains snapshots of older versions
+- [#1933](https://gitlab.com/meltano/meltano/-/issues/1933) Allow Meltano UI Google Analytics ID to be overridden using environment variable
 
 ### Changes
 

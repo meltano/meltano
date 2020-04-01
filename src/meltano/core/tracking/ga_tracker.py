@@ -10,7 +10,9 @@ from typing import Dict
 from meltano.core.utils import truthy
 
 REQUEST_TIMEOUT = 2.0
-MELTANO_TRACKING_ID = "UA-132758957-3"
+MELTANO_UI_TRACKING_ID = "UA-132758957-2"
+MELTANO_CLI_TRACKING_ID = "UA-132758957-3"
+MELTANO_EMBED_TRACKING_ID = "UA-132758957-6"
 MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/collect"
 DEBUG_MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/debug/collect"
 
@@ -18,7 +20,7 @@ DEBUG_MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/debug/collect
 class GoogleAnalyticsTracker:
     def __init__(self, project, tracking_id: str = None, request_timeout: float = None):
         self.project = project
-        self.tracking_id = tracking_id or MELTANO_TRACKING_ID
+        self.tracking_id = tracking_id or MELTANO_CLI_TRACKING_ID
         self.request_timeout = request_timeout or REQUEST_TIMEOUT
 
         self.send_anonymous_usage_stats = (
