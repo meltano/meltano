@@ -4,7 +4,10 @@ import datetime
 
 from meltano.core.utils import truthy
 from meltano.api.headers import *
-
+from meltano.core.tracking.ga_tracker import (
+    MELTANO_UI_TRACKING_ID,
+    MELTANO_EMBED_TRACKING_ID,
+)
 
 # Flask
 # -----------------
@@ -27,6 +30,11 @@ MELTANO_OAUTH_SERVICE_PROVIDERS = [
 ]
 MELTANO_READONLY = truthy(os.getenv("MELTANO_READONLY"))
 MELTANO_UI_URL = os.getenv("MELTANO_UI_URL", "/")
+
+MELTANO_UI_TRACKING_ID = os.getenv("MELTANO_UI_TRACKING_ID", MELTANO_UI_TRACKING_ID)
+MELTANO_EMBED_TRACKING_ID = os.getenv(
+    "MELTANO_EMBED_TRACKING_ID", MELTANO_EMBED_TRACKING_ID
+)
 
 API_ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 TEMP_FOLDER = os.path.join(API_ROOT_DIR, "static/tmp")
