@@ -14,7 +14,7 @@ class M5oCollectionParserError(Exception):
         )
 
 
-class M5oCollectionParserTypes(Enum):
+class M5oCollectionParserTypes(str, Enum):
     Dashboard = "dashboard"
     Report = "report"
 
