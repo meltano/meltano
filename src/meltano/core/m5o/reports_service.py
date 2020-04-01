@@ -76,7 +76,7 @@ class ReportsService:
         if not is_same_file and os.path.exists(new_file_path):
             with new_file_path.open() as f:
                 existing_report = json.load(f)
-            raise ReportAlreadyExistsError(existing_report)
+            raise ReportAlreadyExistsError(existing_report, "slug")
 
         os.remove(file_path)
 
