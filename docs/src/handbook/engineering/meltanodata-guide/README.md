@@ -154,7 +154,7 @@ If you are getting an error, give it a few more minutes since the records needs 
 ### Step 3: Create Database Cluster
 
 1. Open the profile/team dropdown in the top right corner
-1. Select the first "MeltanoData DBs" team that is not marked "(full)"
+1. Select the first "Meltano" or "MeltanoData DBs" team that is not marked "(full)"
 1. Select `Databases` link in the left side menu
 1. In the upper right, click on `Create` button
 1. Select `Databases` from the dropdown
@@ -162,7 +162,7 @@ If you are getting an error, give it a few more minutes since the records needs 
 ::: info
 **DigitalOcean database cluster limit**
 
-Each "MeltanoData DBs" team currently has a limit of 60 database clusters.
+The "Meltano" team and each "MeltanoData DBs" team currently has a limit of 60 database clusters.
 
 If you hit the limit when trying to create a new database cluster, please:
 
