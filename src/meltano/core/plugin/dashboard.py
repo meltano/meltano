@@ -50,19 +50,56 @@ class RecordImporter:
             )
 
             record = existing_record
+            record = self.update_record_data(record, importable_record)
+
             save_func = self._update_record
         else:
             record = importable_record
             save_func = self._save_record
 
-        original_name = record["name"]
-        counter = 1
-
-        self.save_record(record, save_func)
+        record = self.save_record(record, save_func)
 
         logging.debug(
             f"Successfully imported {self.record_type} with ID '{record['id']}', name '{record['name']}'"
         )
+
+    def update_record_data(self, record, importable_record):
+        snapshots = self.snapshots_for_record(importable_record["id"])
+        if not snapshots:
+            logging.debug(
+                f"No snapshots found: not overwriting anything with importable values"
+            )
+            return record
+
+        for attribute in self.__class__.UPDATABLE_ATTRIBUTES:
+            existing_value = record.get(attribute, None)
+            importable_value = importable_record.get(attribute, None)
+
+            if not importable_value:
+                continue
+
+            if importable_value == existing_value:
+                logging.debug(
+                    f"Existing '{attribute}' value matches importable value: nothing to do"
+                )
+                continue
+
+            snapshot_values = [s.get(attribute, None) for s in snapshots]
+
+            if existing_value in snapshot_values:
+                logging.debug(
+                    f"Existing '{attribute}' value matches a snapshot: overwriting with importable value"
+                )
+                record[attribute] = importable_value
+            else:
+                logging.debug(
+                    f"Existing '{attribute}' value does not match any snapshots: not overwriting with importable value"
+                )
+
+        return record
+
+    def snapshots_for_record(self, id):
+        return [s for s in self.get_package_records("snapshots", id) if s["id"] == id]
 
     def save_record(self, record, save_func):
         original_name = record["name"]
@@ -104,7 +141,7 @@ class RecordImporter:
 class ReportImporter(RecordImporter):
     RECORD_TYPE = M5oCollectionParserTypes.Report
     ALREADY_EXISTS_ERROR = ReportAlreadyExistsError
-    UPGRADEABLE_ATTRIBUTES = [
+    UPDATABLE_ATTRIBUTES = [
         "chart_type",
         "design",
         "model",
@@ -131,7 +168,7 @@ class ReportImporter(RecordImporter):
 class DashboardImporter(RecordImporter):
     RECORD_TYPE = M5oCollectionParserTypes.Dashboard
     ALREADY_EXISTS_ERROR = DashboardAlreadyExistsError
-    UPGRADEABLE_ATTRIBUTES = ["name", "description", "report_ids"]
+    UPDATABLE_ATTRIBUTES = ["name", "description", "report_ids"]
 
     def __init__(self, *args):
         super().__init__(*args)

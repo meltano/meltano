@@ -115,8 +115,7 @@ class DashboardsService:
         dashboard["path"] = str(new_file_path.relative_to(self.project.root))
 
         if "report_ids" in new_settings:
-            if set(new_settings["report_ids"]) == set(dashboard["report_ids"]):
-                dashboard["report_ids"] = new_settings["report_ids"]
+            dashboard["report_ids"] = new_settings["report_ids"]
 
         with new_file_path.open("w") as f:
             json.dump(dashboard, f)
