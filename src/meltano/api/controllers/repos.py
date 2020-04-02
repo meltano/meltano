@@ -67,9 +67,8 @@ def index():
     dashboardsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Dashboard)
     reportsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Report)
 
-    items = reportsParser.parse()
+    reportsFiles = reportsParser.parse()
     dashboardFiles = dashboardsParser.parse()
-    reportsFiles = ReportIndexFilter().filter_all("view:reports", items)
 
     sortedM5oFiles = {
         "dashboards": {"label": "Dashboards", "items": dashboardFiles},
@@ -168,8 +167,6 @@ def sync():
 
 @reposBP.route("/designs/<path:namespace>/<topic_name>/<design_name>", methods=["GET"])
 def model_design(namespace, topic_name, design_name):
-    permit("view:design", design_name)
-
     repos_helper = ReposHelper()
     topic = repos_helper.get_topic(namespace, topic_name)
 
@@ -186,7 +183,6 @@ def model_index():
     path = Path(topicsFile)
 
     topics = json.load(open(path, "r")) if path.is_file() else {}
-    topics = next(M5ocFilter().filter("view:topic", [topics]))
 
     # for now let's freeze the keys, so the we can re-use the
     # key name as the design's name, but this should probably
@@ -197,8 +193,6 @@ def model_index():
 
 @reposBP.route("/<path:namespace>/<topic_name>", methods=["GET"])
 def model_topic(namespace, topic_name):
-    permit("view:topic", topic_name)
-
     repos_helper = ReposHelper()
     topic = repos_helper.get_topic(namespace, topic_name)
 
