@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1937](https://gitlab.com/meltano/meltano/-/issues/1937) Add optional `plugin_type` argument to `meltano install` to only (re)install plugins of a certain type
+
 ### Changes
 
 ### Fixes
