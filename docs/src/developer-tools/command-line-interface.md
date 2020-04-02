@@ -264,12 +264,18 @@ meltano init [project_name] [--no_usage_stats]
 
 Installs all the dependencies of your project based on the **meltano.yml** file.
 
+Optionally, provide a plugin type argument to only (re)install plugins of a certain type.
+
 Use `--include-related` to automatically install transform, model, and dashboard plugins related to installed extractor plugins.
 
 ### How to Use
 
 ```bash
 meltano install
+
+meltano install extractors
+
+meltano install models
 
 meltano install --include-related
 ```

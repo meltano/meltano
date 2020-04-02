@@ -8,6 +8,7 @@ from meltano.core.plugin_discovery_service import (
     PluginNotFoundError,
 )
 from meltano.core.config_service import ConfigService
+from meltano.core.plugin import PluginType
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.tracking import GoogleAnalyticsTracker
@@ -27,15 +28,19 @@ def install_status_update(data):
 
 
 @cli.command()
+@click.argument(
+    "plugin_type", type=click.Choice([*list(PluginType), "all"]), default="all"
+)
 @click.option("--include-related", is_flag=True)
 @project(migrate=True)
-def install(project, include_related):
+def install(project, plugin_type, include_related):
     """
     Installs all the dependencies of your project based on the meltano.yml file.
     Read more at https://www.meltano.com/docs/command-line-interface.html#command-line-interface.
     """
+    config_service = ConfigService(project)
+
     if include_related:
-        config_service = ConfigService(project)
         discovery_service = PluginDiscoveryService(project)
         add_service = ProjectAddService(
             project,
@@ -59,9 +64,14 @@ def install(project, include_related):
                     fg="green",
                 )
 
+    if plugin_type == "all":
+        plugins = config_service.plugins()
+    else:
+        plugins = config_service.get_plugins_of_type(PluginType(plugin_type))
+
     install_service = PluginInstallService(project)
-    install_status = install_service.install_all_plugins(
-        status_cb=install_status_update
+    install_status = install_service.install_plugins(
+        plugins, status_cb=install_status_update
     )
     num_installed = len(install_status["installed"])
     num_failed = len(install_status["errors"])

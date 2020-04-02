@@ -64,23 +64,26 @@ class ConfigService:
         except StopIteration as stop:
             raise PluginMissingError(plugin_ref.name) from stop
 
+    def get_plugins_of_type(self, plugin_type):
+        return filter(lambda p: p.type == plugin_type, self.plugins())
+
     def get_extractors(self):
-        return filter(lambda p: p.type == PluginType.EXTRACTORS, self.plugins())
+        return self.get_plugins_of_type(PluginType.EXTRACTORS)
 
     def get_loaders(self):
-        return filter(lambda p: p.type == PluginType.LOADERS, self.plugins())
+        return self.get_plugins_of_type(PluginType.LOADERS)
 
     def get_transforms(self):
-        return filter(lambda p: p.type == PluginType.TRANSFORMS, self.plugins())
+        return self.get_plugins_of_type(PluginType.TRANSFORMS)
 
     def get_models(self):
-        return filter(lambda p: p.type == PluginType.MODELS, self.plugins())
+        return self.get_plugins_of_type(PluginType.MODELS)
 
     def get_dashboards(self):
-        return filter(lambda p: p.type == PluginType.DASHBOARDS, self.plugins())
+        return self.get_plugins_of_type(PluginType.DASHBOARDS)
 
     def get_transformers(self):
-        return filter(lambda p: p.type == PluginType.TRANSFORMERS, self.plugins())
+        return self.get_plugins_of_type(PluginType.TRANSFORMERS)
 
     def update_plugin(self, plugin: PluginInstall):
         with self.project.meltano_update() as meltano:
