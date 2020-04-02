@@ -14,9 +14,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#1938](https://gitlab.com/meltano/meltano/-/issues/1938) Fix regression causing dashboards and reports not to load when readonly mode is enabled (like on the demo instance)
-
 ### Breaks
+
+
+## 1.27.3 - (2020-04-02)
+---
+
+### Fixes
+
+- [#1938](https://gitlab.com/meltano/meltano/-/issues/1938) Fix regression causing dashboards and reports not to load when readonly mode is enabled (like on the demo instance)
 
 
 ## 1.27.2 - (2020-04-02)
