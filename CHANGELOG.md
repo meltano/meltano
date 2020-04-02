@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.27.1 - (2020-04-02)
+---
+
+### New
+
 - [#1477](https://gitlab.com/meltano/meltano/-/issues/1477) Allow read-only mode and authentication to be used at the same time, to allow anonymous read-only access and only require authentication for write actions.
 - [#1914](https://gitlab.com/meltano/meltano/-/issues/1914) Allow default dashboards and reports to be updated in place if package contains snapshots of older versions
 - [#1933](https://gitlab.com/meltano/meltano/-/issues/1933) Allow Meltano UI Google Analytics ID to be overridden using environment variable
@@ -29,8 +41,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1911](https://gitlab.com/meltano/meltano/-/issues/1911) Display "Last updated: Updating..." instead of "Last updated: 1969-12-31" on reports while pipeline is running
 - [#1910](https://gitlab.com/meltano/meltano/-/issues/1910) Fix pipeline "Start date" and report "Data starting from" off-by-1 errors caused by timezone differences
-
-### Breaks
 
 
 ## 1.27.0 - (2020-03-30)
