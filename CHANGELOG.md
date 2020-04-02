@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1936](https://gitlab.com/meltano/meltano/-/issues/1936) Fix regression causing UI to fail when analytics/tracking is enabled
+
 ### Breaks
 
 
