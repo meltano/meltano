@@ -59,7 +59,6 @@ def _handle(ex):
 @reportsBP.route("/", methods=["GET"])
 def index():
     reports = reports_service().get_reports()
-    reports = ReportFilter().filter_all("view:reports", reports)
     return jsonify(reports)
 
 

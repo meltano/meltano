@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1938](https://gitlab.com/meltano/meltano/-/issues/1938) Fix regression causing dashboards and reports not to load when readonly mode is enabled (like on the demo instance)
+
 ### Breaks
 
 
