@@ -15,201 +15,7 @@ This will be the single source of truth for team members when it comes to creati
 - Client's tenant name (i.e., company name, etc.)
 - Access to the [Controller Node](/handbook/engineering/meltanodata-guide/controller-node.html)
 
-### Step 1: Create a New Droplet
-
-1. Login to DigitalOcean
-1. Verify that you are in the "Meltano" project (see the top left) inside the "Meltano" team (see the top right)
-1. In the upper right, click on the `Create` button
-1. Select `Droplets` from the dropdown menu
-
-::: info
-**DigitalOcean droplet limit**
-
-The "Meltano" team currently has a limit of 500 droplets.
-
-When we get close to hitting this limit, we can get it increased by sending an email to one of our contacts at DigitalOcean.
-:::
-
-#### Choose an image
-
-1. Select the `Snapshots` tab
-1. Select the first image in the upper left corner (e.g., `Ubuntu meltano-123456789`)
-
-#### Choose a plan
-
-1. Leave it on `Standard`
-1. Change machine plan cost to:
-   - \$15 / month
-   - 2 GB / 2 CPUs
-   - 60 GB SSD Disk
-   - 3 TB transfer
-
-#### Add block storage
-
-1. Leave empty
-
-#### Choose a datacenter region
-
-1. You can leave the default (e.g., New York 3), but make note which it is since you'll need it later on
-
-#### Select additional options
-
-1. Leave everything unselected
-
-#### Authentication
-
-1. Select `SSH keys` if it is not selected by default
-1. Click `Select all` to provide all team members ability to access the droplet
-
-::: warning
-If your SSH key is not included in the list above, make sure to add it now through the `New SSH Key` button.
-:::
-
-#### Finalize and create
-
-1. Leave droplet at `1 droplet`
-1. For the hostname, use the desired URL for this client (i.e., `$TENANT_NAME.meltanodata.com`)
-1. Under tags, add `production`
-
-#### Select Project
-
-1. Leave the default as `Meltano`
-
-#### Add backups
-
-1. Leave `Enable backups` unchecked
-
-#### Create droplet
-
-1. Click on `Create droplet` to start the process.
-
-Once the droplet has completed setting up, you should see it in your `Droplets` table with an assigned IP address.
-Make note of this IP address, you'll need it later.
-
-#### Verify droplet is working
-
-1. Open your terminal
-1. Ping the IP address with the command:
-
-```bash
-ping 123.456.789.01
-```
-
-If successful, you should see a message similar to:
-
-```
-PING 123.456.789.01: 56 data bytes
-64 bytes from 123.456.789.01: icmp_seq=0 ttl=56 time=14.539 ms
-64 bytes from 123.456.789.01: icmp_seq=1 ttl=56 time=13.931 ms
-64 bytes from 123.456.789.01: icmp_seq=2 ttl=56 time=12.279 ms
-64 bytes from 123.456.789.01: icmp_seq=3 ttl=56 time=19.898 ms
-64 bytes from 123.456.789.01: icmp_seq=4 ttl=56 time=19.096 ms
-64 bytes from 123.456.789.01: icmp_seq=5 ttl=56 time=18.507 ms
-^C
---- 123.456.789.01 ping statistics ---
-6 packets transmitted, 6 packets received, 0.0% packet loss
-round-trip min/avg/max/stddev = 12.279/16.375/19.898/2.901 ms
-```
-
-### Step 2: Configure Network
-
-1. Click on the `Networking` link on the left side menu
-1. Under the **Domains** tab, click on `meltanodata.com` to access the DNS records dashboard
-
-#### Create a new record for the client
-
-1. The current tab should be `A` records
-1. Under **Hostname**, fill in your client's `$TENANT_NAME`
-1. Under **Will Direct To**, use the autocomplete to locate the new droplet you created (or paste in the IP address from the Droplets table if it is not appearing)
-1. Leave **TTL (seconds)** with the default of `3600`
-1. Click `Create Record`
-
-#### Make sure everything works
-
-1. Open your Terminal
-1. Ping the URL with the command:
-
-```bash
-ping $TENANT_NAME.meltanodata.com
-```
-
-If everything works, you should see a message similar to before:
-
-```bash
-PING $TENANT_NAME.meltanodata.com (123.456.789.01): 56 data bytes
-64 bytes from 123.456.789.01: icmp_seq=0 ttl=56 time=14.539 ms
-64 bytes from 123.456.789.01: icmp_seq=1 ttl=56 time=13.931 ms
-64 bytes from 123.456.789.01: icmp_seq=2 ttl=56 time=12.279 ms
-64 bytes from 123.456.789.01: icmp_seq=3 ttl=56 time=19.898 ms
-64 bytes from 123.456.789.01: icmp_seq=4 ttl=56 time=19.096 ms
-64 bytes from 123.456.789.01: icmp_seq=5 ttl=56 time=18.507 ms
-^C
---- $TENANT_NAME.meltanodata.com ping statistics ---
-6 packets transmitted, 6 packets received, 0.0% packet loss
-round-trip min/avg/max/stddev = 12.279/16.375/19.898/2.901 ms
-```
-
-If you are getting an error, give it a few more minutes since the records needs to propogate. If it is not working after 30 minutes though, please raise an issue with the team.
-
-### Step 3: Create Database Cluster
-
-1. Open the profile/team dropdown in the top right corner
-1. Select the first "Meltano" or "MeltanoData DBs" team that is not marked "(full)"
-1. Select `Databases` link in the left side menu
-1. In the upper right, click on `Create` button
-1. Select `Databases` from the dropdown
-
-::: info
-**DigitalOcean database cluster limit**
-
-The "Meltano" team and each "MeltanoData DBs" team currently has a limit of 60 database clusters.
-
-If you hit the limit when trying to create a new database cluster, please:
-
-1. Select `Team` in the left menu under `Account`
-1. Click the `Edit Team Profile` button
-1. Add `(full)` to the end of the Team name
-1. Click the `Update Team Profile` button
-1. Follow the steps above to create the cluster in the next team not marked "(full)"
-
-When we get close to running out of "MeltanoData DBs" teams not marked "(full)", we can
-[create a batch of new teams](https://www.digitalocean.com/docs/accounts/teams/quickstart/#create-teams)
-from the Meltano DigitalOcean account (credentials are in 1Password)
-and request for their database cluster limits to be increased from 10 to 50 by sending an email to one of our contacts at DigitalOcean.
-:::
-
-#### Choose a database engine
-
-1. Leave default as `PostgreSQL 11`
-
-#### Choose a cluster configuration
-
-1. Leave default on `$15/mo: 1 GB RAM / 1 vCPU / 10 GB Disk` plan
-
-#### Choose a datacenter
-
-1. Choose the same geolocation as the droplet if possible
-
-#### Finalize and create
-
-1. Under **Choose a unique database cluster name**, append the automatically generated name with `-$TENANT_NAME` (e.g., `db-postgresql-nyc3-52483-$TENANT_NAME`)
-1. Under **Select project**, leave it as the default `Meltano`
-1. Click `Add Tags` and add `production`
-1. Click on `Create a Database Cluster`
-
-#### Configure the database
-
-1. Click the `Get Started` button
-1. Restrict inbound connections by adding (the IP address of) the recently created droplet under **Add trusted sources**
-1. Click `Allow these inbound sources only` button
-1. Click `Continue` to move past "Connection details"
-1. Click `Great, I'm done` for "Next Steps" section
-
-You should see `Connection details` on the right side of the page which is important for later on. It contains your database credentials and will be needed in the next section.
-
-### Step 4: Configure Droplet
-
-#### Run Ansible Playbooks
+### Step 1: Create new instance (droplet, domain record, and database)
 
 1. Make sure ssh-agent is registered
 2. [Access the Controller Node](/handbook/engineering/meltanodata-guide/controller-node.html#accessing-the-controller-node)
@@ -221,32 +27,23 @@ You should see `Connection details` on the right side of the page which is impor
 cd /var/meltano/infrastructure
 ```
 
-5. Run the SSL, Caddy, and Meltano playbooks. To speed up the process, you can use `--limit=$TENANT_NAME.meltanodata.com`.
+5. Run the `create_instances` script. You can provide multiple subdomains in multiple arguments.
+
+```sh
+./scripts/create_instances.sh $TENANT_NAME
+```
+
+### Step 2: Configure instance
+
+1. Ensure you are still SSHed into the controller node, in the `/var/meltano/infrastructure` directory
+
+1. Run the SSL, Caddy, and Meltano playbooks. To speed up the process, you can use `--limit=$TENANT_NAME.meltanodata.com`. You can provide multiple hostnames separated using commas.
 
 ```sh
 ansible-playbook playbooks/ssl.yml playbooks/caddy.yml playbooks/meltano.yml --limit=$TENANT_NAME.meltanodata.com
 ```
 
-#### Change Login Password
-
-1. SSH into the droplet
-
-```bash
-ssh root@$TENANT_NAME.meltanodata.com
-```
-
-::: info
-**Troubleshooting**
-
-If you can't connect, make sure the SSH key you registered on you DigitalOcean account is loaded by using:
-
-```bash
-# by default, only `~/.ssh/id_rsa` is loaded into SSH agent
-ssh-add /path/to/your/ssh-key
-```
-
-For more informations about using `ssh`, take a look at https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys#basic-connection-instructions
-:::
+### Step 3: Create UI users
 
 1. Create a new login in 1Password under the `meltanodata.com` vault
    - **Title** should be the URL `$TENANT_NAME.meltanodata.com`
@@ -262,7 +59,14 @@ For more informations about using `ssh`, take a look at https://www.digitalocean
    - **Website** should be `$TENANT_NAME.meltanodata.com`
    - Save the newly created login
    - Leave this open because you will need the password shortly
-1. In the terminal, run the following commands with the variables replaced as appropriate:
+
+1. SSH into the droplet
+
+```bash
+ssh root@$TENANT_NAME.meltanodata.com
+```
+
+1. Run the following commands with the variables replaced as appropriate:
 
 ::: warning
 Make sure to quote the password using single quotes (`'`) as it might contain unescaped shell characters.
@@ -284,31 +88,13 @@ meltano user add meltano '$MELTANO_PASSWORD' --role admin
 ^D
 ```
 
-### Step 5: Configure PostgreSQL Database
-
-#### Get credentials for database ready
-
-1. Login to DigitalOcean
-1. Click on `Database` in left side menu
-1. Select database instance for `db-postgresql-nyc1-01234-$TENANT_NAME`
-
-You should now be on the **Overview** tab and should see the **Connection Details** on the right side. It will contain critical information such as:
-
-- username
-- password
-- host
-- port
-- database
-
-Keep this tab open because you'll need to refer to it shortly.
-
-#### Setup the Meltano environment variables
+### Step 4: Configure PostgreSQL loader
 
 Because we manage the database instance for each tenant, we use environment variables to configure `target-postgres` as a simple and secure way of configuring the plugin.
 
 To do this, you need to:
 
-1. SSH into the droplet
+1. Ensure you are still SSHed into the droplet
 
 2. Open (or create) the `/etc/meltano/environment.d/postgres` file as the `meltano` user
 
@@ -317,7 +103,7 @@ su meltano
 nano /etc/meltano/environment.d/postgres
 ```
 
-4. Copy and paste the following template into the file
+4. Copy and paste the credentials output by the `create_instances` script
 
 ```bash
 PG_USERNAME=doadmin
@@ -327,28 +113,29 @@ PG_PORT=25060
 PG_DATABASE=defaultdb
 ```
 
-5. Replace each field with the credentials from DigitalOcean
-
-6. Secure the file by running the following commands:
+5. Secure the file by running the following commands:
 
 ```bash
 # make the file only readable by `meltano`
 chmod 600 /etc/meltano/environment.d/postgres
+
+# exit out of the meltano user and back to root using Ctrl+D
+^D
 ```
 
-7. Reload the environment variables into Meltano by restarting the service
+6. Reload the environment variables into Meltano by restarting the service
 
 ```bash
 systemctl restart meltano
 ```
 
-8. Verify that the `meltano` service is working properly by checking:
+7. Verify that the `meltano` service is working properly by checking:
 
 ```bash
 systemctl status meltano
 ```
 
-### Step 6: Validate Meltano UI
+### Step 5: Validate Meltano UI
 
 #### Ensure everything works
 
@@ -606,9 +393,21 @@ You'll get a `Privacy Error: NET::ERR_CERT_AUTHORITY_INVALID`, but choose to `Pr
 
 When a client no longer needs a hosted instance of Meltano on meltanodata.com, you need to:
 
-1. Login to DigitalOcean
-1. Delete the client's droplet
-1. Delete the client's A record in networking
-1. Delete the client's database cluster
-   1. If the database cluster was created in a "MeltanoData DBs" team that is currently marked "(full)", edit the team name to indicate it is no longer full
+1. Make sure ssh-agent is registered
+2. [Access the Controller Node](/handbook/engineering/meltanodata-guide/controller-node.html#accessing-the-controller-node)
+3. Ensure you can [connect to DigitalOcean](/handbook/engineering/meltanodata-guide/controller-node.html#connecting-to-digitalocean)
+
+4. Change directory into `/var/meltano/infrastructure`
+
+```sh
+cd /var/meltano/infrastructure
+```
+
+5. Run the `delete_instances` script. You can provide multiple subdomains in multiple arguments.
+
+```sh
+./scripts/delete_instances.sh $TENANT_NAME
+```
+
+1. If the database cluster was created in a "MeltanoData DBs" team that is currently marked "(full)", edit the team name to indicate it is no longer full
 1. Delete the client's passwords in 1Password

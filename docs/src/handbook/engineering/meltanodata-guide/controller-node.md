@@ -26,7 +26,7 @@ ssh-add ~/.ssh/id_rsa
 ssh-add -L
 ```
 
-2. [DigitalOcean API Key](https://www.digitalocean.com/docs/api/create-personal-access-token/)  with Read Access
+2. [DigitalOcean API Key](https://www.digitalocean.com/docs/api/create-personal-access-token/) for the "Meltano" and "MeltanoData DBs" DO accounts with Read and Write Access
 
 ### Tools
 
@@ -90,10 +90,16 @@ This will enable us to target:
 - All the nodes with `*.meltanodata.com`
 - and more
 
-To do that, you will need to export your DigitalOcean API Token as `DO_API_TOKEN`.
+To do that, you will need to export the DigitalOcean API Token for the "Meltano" project as `DO_API_TOKEN`:
 
 ```bash
 export DO_API_TOKEN=<access_token>
+```
+
+Additionally, you will need to export the DigitalOcean API Token for the "MeltanoData DBs" projects as `DO_DATABASE_API_TOKENS`.
+
+```bash
+export DO_DATABASE_API_TOKENS=<access_token>,<access_token>,...
 ```
 
 ::: tip
