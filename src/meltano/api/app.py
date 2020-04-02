@@ -133,8 +133,8 @@ def create_app(config={}):
 
         if tracker.send_anonymous_usage_stats:
             g.jsContext["isSendAnonymousUsageStats"] = True
-            g.jsContext["trackingId"] = app.config["MELTANO_UI_TRACKING_ID"]
-            g.jsContext["embedTrackingId"] = app.config["MELTANO_EMBED_TRACKING_ID"]
+            g.jsContext["trackingID"] = app.config["MELTANO_UI_TRACKING_ID"]
+            g.jsContext["embedTrackingID"] = app.config["MELTANO_EMBED_TRACKING_ID"]
             g.jsContext["projectId"] = tracker.project_id
 
         g.jsContext["isNotificationEnabled"] = app.config["MELTANO_NOTIFICATION"]
