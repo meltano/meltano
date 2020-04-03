@@ -78,7 +78,7 @@ const actions = {
     return Promise.all([uponGetReports, uponGetDashboards])
       .then(() => {
         if (slug) {
-          dispatch('preloadDashboard', slug)
+          return dispatch('preloadDashboard', slug)
         }
       })
       .finally(() => commit('setIsInitializing', false))
@@ -91,10 +91,10 @@ const actions = {
         dashboard => dashboard.slug === slug
       )
       if (dashboardMatch) {
-        dispatch('updateActiveDashboard', dashboardMatch)
+        return dispatch('updateActiveDashboard', dashboardMatch)
       }
     } else if (getters.activeReportIds) {
-      dispatch('getActiveDashboardReportsWithQueryResults')
+      return dispatch('getActiveDashboardReportsWithQueryResults')
     }
   },
 
@@ -143,7 +143,7 @@ const actions = {
 
   updateActiveDashboard({ commit, dispatch }, dashboard) {
     commit('setActiveDashboard', dashboard)
-    dispatch('getActiveDashboardReportsWithQueryResults')
+    return dispatch('getActiveDashboardReportsWithQueryResults')
   },
 
   updateDashboard({ commit }, payload) {
