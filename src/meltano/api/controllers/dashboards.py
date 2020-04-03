@@ -6,6 +6,7 @@ from meltano.core.m5o.dashboards_service import (
     DashboardDoesNotExistError,
     DashboardsService,
 )
+from meltano.core.schedule_service import ScheduleNotFoundError
 from .errors import InvalidFileNameError
 from meltano.api.api_blueprint import APIBlueprint
 from flask_security import roles_required
@@ -54,6 +55,19 @@ def _handle(ex):
             }
         ),
         400,
+    )
+
+
+@dashboardsBP.errorhandler(ScheduleNotFoundError)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"A pipeline for data source '{ex.namespace}' has not run yet. Please set up your connection.",
+            }
+        ),
+        404,
     )
 
 

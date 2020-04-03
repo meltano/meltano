@@ -51,7 +51,7 @@ export default {
     this.$store.dispatch('dashboards/resetActiveDashboardReports')
   },
   created() {
-    this.initialize(this.$route.params.slug)
+    this.initialize(this.$route.params.slug).catch(this.$error.handle)
     this.getPipelineSchedules()
   },
   methods: {
