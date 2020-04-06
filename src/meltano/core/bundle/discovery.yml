@@ -267,6 +267,8 @@ extractors:
           provider: google-adwords
       - name: user_agent
         label: User Agent for your OAuth Client
+        value: Meltano
+        kind: hidden
         placeholder: Ex. Meltano
         description: The User Agent for your OAuth Client (used in requests made to the AdWords API)
       - name: conversion_window_days
