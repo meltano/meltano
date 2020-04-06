@@ -74,7 +74,9 @@ class ProjectInitService:
         self.initialize_file = bundle.find("initialize.yml")
         self.project_name = project_name.lower()
 
-    def init(self) -> Project:
+    def init(
+        self, install_default_plugins=True, create_system_database=True, activate=True
+    ) -> Project:
         try:
             os.mkdir(self.project_name)
         except Exception as e:
@@ -85,12 +87,14 @@ class ProjectInitService:
         self.project = Project(self.project_name)
         self.create_files()
 
-        Project.activate(self.project)
-        os.chdir(self.project.root)
+        if activate:
+            Project.activate(self.project)
 
-        self.create_system_database()
+        if create_system_database:
+            self.create_system_database()
 
-        self.install_default_plugins()
+        if install_default_plugins:
+            self.install_default_plugins()
 
         return self.project
 

@@ -228,16 +228,14 @@ def job_logging_service(project):
 
 @pytest.fixture(scope="class")
 def project(test_dir, project_init_service):
-    project = project_init_service.init()
+    project = project_init_service.init(
+        install_default_plugins=False, create_system_database=False
+    )
     logging.debug(f"Created new project at {project.root}")
 
     # empty out the `plugins`
     with project.meltano_update() as meltano:
         meltano.plugins = Canonical()
-
-    # not setting the project as default to limit
-    # the side effect in tests
-    Project.activate(project)
 
     # cd into the new project root
     os.chdir(project.root)
