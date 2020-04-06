@@ -10,6 +10,7 @@ from meltano.core.project_init_service import (
 )
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.error import SubprocessError
 from . import cli
 
 EXTRACTORS = "extractors"
@@ -45,4 +46,11 @@ def init(ctx, project_name, no_usage_stats):
             tracker.track_meltano_init(project_name=project_name)
     except ProjectInitServiceError as e:
         click.secho(f"Directory {project_name} already exists!", fg="red")
+        raise click.Abort()
+    except SubprocessError as proc_err:
+        click.secho(str(proc_err), fg="red")
+        stderr = proc_err.process.stderr
+        if not isinstance(stderr, str):
+            stderr = stderr.read()
+        click.secho(stderr, err=True)
         raise click.Abort()

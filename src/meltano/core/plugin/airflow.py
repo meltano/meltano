@@ -108,7 +108,10 @@ class Airflow(PluginInstall):
             # for the Airflow plugin
             invoker.prepare(session)
             handle = invoker.invoke(
-                "initdb", stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                "initdb",
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
             )
             initdb = handle.wait()
 
