@@ -7,7 +7,7 @@
             Your startup sales funnel,<br /><strong>analyzed.</strong>
           </h2>
           <p class="hero-tagline">
-            A single set of dashboards and reports for the entire journey<br />
+            A single set of <a href="#default-dashboards">dashboards and reports</a> for the entire journey<br />
             from <strong>ad impression</strong> to <strong>website visitor</strong> to <strong>successful sale</strong>.
           </p>
           <p class="hero-tagline">
@@ -91,21 +91,169 @@
       </div>
     </div>
 
-    <div class="feature-section-wrapper is-white">
+    <section class="section" style="padding: 4rem 0" id="default-dashboards">
+      <h2 class="section__title">
+        From data to dashboard in minutes
+      </h2>
+      <p class="section__text">
+        Meltano comes out of the box with a curated set of reports and dashboards for each data source,
+        to get you from setup to insights in no time.
+      </p>
+
+      <p class="action">
+        <NavLink class="action-button" :item="$frontmatter.primaryAction" />
+        <NavLink
+          class="action-button secondary"
+          :item="$frontmatter.secondaryAction"
+        />
+      </p>
+
+      <div class="feature-section" style="margin: 30px auto">
+        <div class="feature-left" style="max-width: 50%">
+          <a href="https://meltano.meltanodata.com/dashboards/facebook-ads-daily-account-overview" target="_blank">
+            <img
+              style="max-width: 100%; margin: 0 auto; display: block;"
+              src="/screenshots/homepage/dashboard-facebook.png"
+              alt="Screenshot of Facebook Ads Dashboard"
+            />
+          </a>
+        </div>
+        <div class="feature-right" style="max-width: 50%">
+          <a href="https://meltano.meltanodata.com/dashboards/google-ads-monthly-account-overview" target="_blank">
+            <img
+              style="max-width: 100%; margin: 0 auto; display: block;"
+              src="/screenshots/homepage/dashboard-adwords.png"
+              alt="Screenshot of Google Ads Dashboard"
+            />
+          </a>
+        </div>
+      </div>
+
+      <div class="feature-section">
+        <div class="feature-left" style="max-width: 50%">
+          <a href="https://meltano.meltanodata.com/dashboards/google-analytics" target="_blank">
+            <img
+              style="max-width: 100%; margin: 0 auto; display: block;"
+              src="/screenshots/homepage/dashboard-google-analytics.png"
+              alt="Screenshot of Google Analytics Dashboard"
+            />
+          </a>
+        </div>
+        <div class="feature-right" style="max-width: 50%">
+          <a href="https://meltano.meltanodata.com/dashboards/stripe-dashboard" target="_blank">
+            <img
+              style="max-width: 100%; margin: 0 auto; display: block;"
+              src="/screenshots/homepage/dashboard-stripe.png"
+              alt="Screenshot of Stripe Dashboard"
+            />
+          </a>
+        </div>
+      </div>
+
+      <p class="description ta-c">
+        <em>
+          If the report you're looking for is not yet included with Meltano by default, <br />
+          you can build it yourself using the <a href="#report-builder">report builder</a> or
+          <a href="/docs/getting-help.html">let us know</a> and we'll build it for you!
+        </em>
+      </p>
+    </section>
+
+    <div class="feature-section-wrapper is-white" id="custom-dashboard">
+      <div class="feature-section">
+        <div class="feature-left">
+          <a href="https://meltano.meltanodata.com/dashboards/overview" target="_blank">
+            <img
+              style="max-width: 100%; margin: 0 auto; display: block;"
+              src="/screenshots/homepage/dashboard-overview.png"
+              alt="Screenshot of Overview dashboard"
+            />
+          </a>
+        </div>
+        <div class="feature-right">
+          <h2 class="section-title">
+            A dashboard for every occasion
+          </h2>
+          <p class="hero-tagline">
+            Select your favorite <a href="#default-dashboards">default reports</a> or
+            use the <a href="#report-builder">report builder</a> to create your own, 
+            and add them to a <a href="https://meltano.meltanodata.com/dashboards/overview" target="_blank">new dashboard</a>
+            to use as your homepage, <a href="#share-and-embed">share with your team</a>, or track a specific project.
+          </p>
+
+          <p class="action">
+            <NavLink class="action-button" :item="$frontmatter.primaryAction" />
+            <NavLink
+              class="action-button secondary"
+              :item="$frontmatter.secondaryAction"
+            />
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <section class="section" style="padding: 4rem 0" id="share-and-embed">
+      <h2 class="section__title">
+        Share with your team and stakeholders
+      </h2>
+      <p class="section__text">
+        Once you've set up your perfect dashboard, you can easily share it with anyone you like by generating a 
+        <a href="https://meltano.meltanodata.com/-/embed/CwFPa2ESM6OwrSjvACmc6MkasA05QWQSJ9g2yeuMMPs" target="_blank">read-only link</a>,
+        or embedding it (or any of its reports) right into your website, internal handbook, or a blog post:
+      </p>
+
+      <iframe src="https://meltano.meltanodata.com/-/embed/CwFPa2ESM6OwrSjvACmc6MkasA05QWQSJ9g2yeuMMPs" style="margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; min-width: 100%; min-height: 100vh;" />
+
+      <!-- <div class="feature-section" style="margin-top: 30px">
+        <div class="feature-left" style="max-width: 50%; width: 50%">
+          <iframe src="https://meltano.meltanodata.com/-/embed/0lzLVxW7AnWnEgIetoRIBHF2l87AVZPox8HcE3CtGiU" style="display: block; margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; width: 100%; min-height: 500px;" />
+        </div>
+        <div class="feature-right" style="max-width: 50%; width: 50%; margin-left: 10px">
+          <iframe src="https://meltano.meltanodata.com/-/embed/INfx7r6IDJNWySOMN_RiA9445k8N2Hw6VE7lfEmzoW4" style="display: block; margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; width: 100%; min-height: 500px;" />
+        </div>
+      </div>
+
+      <div class="feature-section" style="margin-top: 10px">
+        <div class="feature-left" style="max-width: 50%; width: 50%">
+          <iframe src="https://meltano.meltanodata.com/-/embed/ukczGngUuHLneFfxSeMPdhhME48tZNoaXoTknqDgXXc" style="display: block; margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; width: 100%; min-height: 500px;" />
+        </div>
+        <div class="feature-right" style="max-width: 50%; width: 50%; margin-left: 10px">
+          <iframe src="https://meltano.meltanodata.com/-/embed/1pMYpdRwA5xFhqSJDsuU9T_T0qka8QlNXEohs-UaAX0" style="display: block; margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; width: 100%; min-height: 500px;" />
+        </div>
+      </div> -->
+    </section>
+
+    <div class="feature-section-wrapper is-white" id="report-builder">
       <div class="feature-section">
         <div class="feature-left">
           <img
             style="max-width: 100%; margin: 0 auto; display: block;"
-            src="/screenshots/meltano-queries.png"
-            alt="Screenshot of Meltano Analyze page"
+            src="/screenshots/homepage/report-builder-facebook.png"
+            alt="Screenshot of Report Builder"
           />
         </div>
         <div class="feature-right">
           <h2 class="section-title">
-            No queries required
+            Your metrics, your reports
           </h2>
           <p class="hero-tagline">
-            Go from data to dashboard in minutes, without writing any code.
+            Use the point-and-click report builder to dig deeper into your data 
+            and create custom reports for the metrics you care about most.
+          </p>
+
+          <p class="action">
+            <NavLink class="action-button" :item="$frontmatter.primaryAction" />
+            <NavLink
+              class="action-button secondary"
+              :item="$frontmatter.secondaryAction"
+            />
+          </p>
+
+          <p>
+            <em>
+              If the report you're looking for cannot easily be created using the report builder, 
+              please <a href="/docs/getting-help.html">let us know</a> and we'll build it for you!
+            </em>
           </p>
         </div>
       </div>
@@ -347,6 +495,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 0 30px;
 }
 
 .feature-section-wrapper {
@@ -364,11 +513,11 @@ export default {
 }
 
 .feature-left {
-  max-width: 80%;
+  max-width: 60%;
 }
 
 .feature-right {
-  max-width: 80%;
+  max-width: 60%;
 }
 
 @media (min-width: $MQNarrow) {
@@ -379,10 +528,6 @@ export default {
     align-items: center;
     max-width: $contentWidthWide;
     margin: 0 auto;
-  }
-
-  .feature-left {
-    padding-left: 30px;
   }
 
   .feature-right {
@@ -447,31 +592,31 @@ export default {
       font-size 1.6rem
       line-height 1.3
       color lighten($textColor, 40%)
-    .action-button
-      display inline-block
-      font-size 1.2rem
-      font-weight bold
+  .action-button
+    display inline-block
+    font-size 1.2rem
+    font-weight bold
+    color #fff
+    background-color #464ACB;
+    padding 0.8rem 1.6rem
+    border-radius 4px
+    transition background-color .2s ease
+    letter-spacing 0.1rem
+    box-sizing border-box
+    margin-right: 0.4rem;
+    margin-bottom: 1rem;
+    svg
       color #fff
-      background-color #464ACB;
-      padding 0.8rem 1.6rem
-      border-radius 4px
-      transition background-color .2s ease
-      letter-spacing 0.1rem
-      box-sizing border-box
-      margin-right: 0.4rem;
-      margin-bottom: 1rem;
+    &.secondary
+      background none
+      box-shadow inset 0 0 0 2px #464ACB
+      color #464ACB
       svg
-        color #fff
-      &.secondary
-        background none
-        box-shadow inset 0 0 0 2px #464ACB
         color #464ACB
-        svg
-          color #464ACB
-        &:hover
-          background-color lighten(#464ACB, 80%)
       &:hover
-        background-color lighten(#464ACB, 10%)
+        background-color lighten(#464ACB, 80%)
+    &:hover
+      background-color lighten(#464ACB, 10%)
 
   .features
     border-top 1px solid $borderColor
@@ -516,9 +661,9 @@ export default {
         margin 1.2rem auto 0
       .description
         font-size 1.2rem
-      .action-button
-        font-size 1rem
-        padding 0.6rem 1.2rem
+    .action-button
+      font-size 1rem
+      padding 0.6rem 1.2rem
     .feature
       h2
         font-size 1.25rem
