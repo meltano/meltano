@@ -10,15 +10,24 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#1937](https://gitlab.com/meltano/meltano/-/issues/1937) Add optional `plugin_type` argument to `meltano install` to only (re)install plugins of a certain type
-
 ### Changes
 
 ### Fixes
 
-- [#1938](https://gitlab.com/meltano/meltano/-/issues/1938) Display error message when viewing dashboard before pipeline has run
-
 ### Breaks
+
+
+## 1.28.0 - (2020-04-06)
+---
+
+### New
+
+- [#1937](https://gitlab.com/meltano/meltano/-/issues/1937) Add optional `plugin_type` argument to `meltano install` to only (re)install plugins of a certain type
+
+
+### Fixes
+
+- [#1938](https://gitlab.com/meltano/meltano/-/issues/1938) Display error message when viewing dashboard before pipeline has run
 
 
 ## 1.27.3 - (2020-04-02)
