@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1940](https://gitlab.com/meltano/meltano/-/issues/1940) Show Google Ads extractor in UI
+
 ### Changes
 
 ### Fixes
