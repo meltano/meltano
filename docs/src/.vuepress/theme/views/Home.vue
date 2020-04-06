@@ -237,7 +237,7 @@
             Your metrics, your reports
           </h2>
           <p class="hero-tagline">
-            User the point-and-click report builder to dig deeper into your data 
+            Use the point-and-click report builder to dig deeper into your data 
             and create custom reports for the metrics you care about most.
           </p>
 
