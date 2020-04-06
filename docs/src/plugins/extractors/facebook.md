@@ -26,7 +26,6 @@ In order to access your Facebook Ads data, you will need the following:
 - Account ID
 - Access Token
 - Start Date
-- End Date
 
 <h3 id="account-id">Account ID</h3>
 
@@ -52,8 +51,11 @@ Examples:
 
 <h3 id="access-token">Access Token</h3>
 
-::: tip Get it now!
-You can also use the <OAuthServiceLink provider="facebook">Meltano OAuth Service</OAuthServiceLink> to acquire this token.
+::: tip Using hosted Meltano on MeltanoData.com?
+
+<p>
+  <OAuthServiceLink provider="facebook">Connect your Facebook Ads account</OAuthServiceLink> to acquire this token right away.
+</p>
 :::
 
 #### Create App
@@ -117,10 +119,6 @@ This property allows you to configure where you want your extracted data set to 
 - Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
 :::
-
-<h3 id="end-date">End Date</h3>
-
-This property allows you to configure where you want your extracted data set to end. Otherwise, if left blank, it will try to fetch all the Ads data from the Start Date until the date you run the Extractor.
 
 ## Meltano Setup
 

@@ -29,7 +29,7 @@ def root():
                 "logo": url_for("static", filename="logos/facebook-logo.png"),
             },
             {
-                "label": "Google Adwords",
+                "label": "Google Ads",
                 "url": url_for("OAuth.GoogleAdwords.login"),
                 "logo": url_for("static", filename="logos/adwords-logo.png"),
             },
