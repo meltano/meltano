@@ -15,22 +15,54 @@ The Google Ads extractor pulls raw data from Google's [AdWords API](https://deve
 - [Ad Performance Report](https://developers.google.com/adwords/api/docs/appendix/reports/ad-performance-report)
 - [Keywords Performance Report](https://developers.google.com/adwords/api/docs/appendix/reports/keywords-performance-report)
 
+Note that [Smart Campaigns](https://support.google.com/google-ads/answer/7652860) are not supported, and their performance data is not available to Meltano.
+
 For more information you can check [the documentation for tap-adwords](https://gitlab.com/meltano/tap-adwords).
 
 ## Google Ads Setup
 
 In order to access your Google Ads data, you will need the following:
 
-- The Account IDs to replicate data from
-- Your Developer Token for Google AdWords
-- The Client ID and Secret for a valid Google OAuth Client
-- A Refresh Token generated through the OAuth flow by using your OAuth Client and your Developer Token.
+- Account ID(s)
+- Access Token
+- Start Date
 
-<h3 id="customer-ids">Account IDs</h3>
+<h3 id="customer-ids">Account ID(s)</h3>
 
-A comma-separated list of AdWords account IDs to replicate data from.
+One or more Google Ads Account IDs to extract data from.
 
-For example: `1234567890, 1234567891, 1234567892`
+To get your Account ID(s):
+
+1. Visit the Google Ads management interface: <https://ads.google.com/>
+2. Log in if you haven't already.
+3. Make sure the correct account is selected in the top left corner.
+
+![Screenshot of account selector](/images/tap-adwords/account-selector.png)
+
+4. You will see the Account ID displayed inside the selector to the right of the account name, with added dashes for readability.
+
+Remove the dashes before you enter the ID in Meltano: `205-667-8813` becomes `2056678813`.
+
+If you want to extract data from multiple Ad Accounts, repeat the steps above to find the IDs (without dashes), and enter them in Meltano separated by commas (`,`).
+
+For example:
+- One Account ID: `1234567890`
+- Multiple Account IDs: `1234567890,1234567891,1234567892`
+
+<h3 id="refresh-token">Access Token</h3>
+
+::: tip Using hosted Meltano on MeltanoData.com?
+
+<p>
+  <OAuthServiceLink provider="google-adwords">Connect your Google Ads account</OAuthServiceLink> to acquire this token right away.
+</p>
+:::
+
+The Refresh Token generated through the OAuth flow run using your OAuth Client and your Developer Token.
+
+The Google account you connect needs to have access to your Ads Account.
+
+If you want to manually generate a Refresh Token, check out  [Google's documentation](https://developers.google.com/adwords/api/docs/guides/first-api-call#get_an_oauth2_refresh_token_and_configure_your_client).
 
 <h3 id="start-date">Start Date</h3>
 
@@ -42,28 +74,6 @@ This property allows you to configure where you want your extracted data set to 
 - Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
 :::
-
-<h3 id="end-date">End Date</h3>
-
-This property allows you to configure where you want your extracted data set to end. Otherwise, if left blank, it will try to fetch all the Ads data from the Start Date until the date you run the Extractor.
-
-<h3 id="refresh-token">OAuth Refresh Token</h3>
-
-::: tip Get it now!
-You can also use the <OAuthServiceLink provider="google-adwords">Meltano OAuth Service</OAuthServiceLink> to acquire this token.
-:::
-
-The Refresh Token generated through the OAuth flow run using your OAuth Client and your Developer Token.
-
-You have to give access to your Ads Account (your google Account that manages your Google Ads).
-
-You can check [Google's documentation on how to generate a Refresh Token](https://developers.google.com/adwords/api/docs/guides/first-api-call#get_an_oauth2_refresh_token_and_configure_your_client)
-
-<h3 id="user-agent">User Agent for your OAuth Client</h3>
-
-The User Agent for your OAuth Client (used in requests made to the AdWords API).
-
-For example: `Meltano`
 
 ## Meltano Setup
 

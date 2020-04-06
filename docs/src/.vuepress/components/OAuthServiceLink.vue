@@ -24,6 +24,6 @@ export default {
 
 <template>
   <a :href="url" @click.prevent="open" target="_blank">
-    Meltano OAuth Service
+    <slot></slot>
   </a>
 </template>
