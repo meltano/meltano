@@ -41,7 +41,6 @@ extractors:
     label: Google Ads
     description: Advertising Platform
     namespace: tap_adwords
-    hidden: true
     docs: 'https://meltano.com/plugins/extractors/adwords.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-adwords.git'
     capabilities:
@@ -232,12 +231,22 @@ extractors:
       - ['developer_token', 'oauth_client_id', 'oauth_client_secret', 'refresh_token', 'user_agent', 'customer_ids', 'start_date']
     settings:
       - name: customer_ids
-        label: AdWords Account IDs
-        placeholder: Ex. 1234567890, 1234567891, 1234567892
-        description: A comma-separated list of AdWords account IDs to replicate data from
+        label: Account ID(s)
+        placeholder: Ex. 1234567890,1234567891,1234567892
+        description: A comma-separated list of Ad Account IDs to replicate data from
+      - name: refresh_token
+        label: Access Token
+        placeholder: Ex. *****************
+        description: The Refresh Token generated through the OAuth flow run using your OAuth Client and your Developer Token
+        kind: oauth
+        oauth:
+          # https://oauth.svc.meltanodata.com/google-adwords/
+          provider: google-adwords
       - name: start_date
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
+
+      # Hidden fields
       - name: end_date
         kind: hidden
       - name: developer_token
@@ -258,16 +267,10 @@ extractors:
         kind: hidden
         label: OAuth Client Secret
         placeholder: Ex. *****************
-      - name: refresh_token
-        label: OAuth Refresh Token
-        placeholder: Ex. *****************
-        description: The Refresh Token generated through the OAuth flow run using your OAuth Client and your Developer Token
-        kind: oauth
-        oauth:
-          # https://oauth.svc.meltanodata.com/google-adwords/
-          provider: google-adwords
       - name: user_agent
         label: User Agent for your OAuth Client
+        value: Meltano
+        kind: hidden
         placeholder: Ex. Meltano
         description: The User Agent for your OAuth Client (used in requests made to the AdWords API)
       - name: conversion_window_days
