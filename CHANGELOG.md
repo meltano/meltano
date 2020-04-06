@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1667](https://gitlab.com/meltano/meltano/-/issues/1667) Have 'meltano init' create system database and install airflow, dbt, and target-postgres plugins
+
 ### Fixes
 
 - [#1942](https://gitlab.com/meltano/meltano/-/issues/1942) Ensure navigation bar is hidden in production when docs are viewed inline

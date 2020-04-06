@@ -23,34 +23,10 @@ export default {
   created() {
     this.getPipelineSchedules()
     this.getPlugins()
-    // Until we want to reintroduce a "Loader" UI, we will default to loading target-postgres as the default loader
-    this.getInstalledPlugins().then(this.tryInstallLoaderPostgres)
   },
   methods: {
     ...mapActions('orchestration', ['getPipelineSchedules']),
-    ...mapActions('plugins', [
-      'addPlugin',
-      'getPlugins',
-      'getInstalledPlugins',
-      'installPlugin'
-    ]),
-    tryInstallLoaderPostgres() {
-      const loaderPostgres = 'target-postgres'
-      const isInstalled =
-        this.installedPlugins.loaders &&
-        this.installedPlugins.loaders.find(
-          plugin => plugin.name === loaderPostgres
-        )
-      if (!isInstalled) {
-        const config = {
-          pluginType: 'loaders',
-          name: loaderPostgres
-        }
-        this.addPlugin(config).then(() => {
-          this.installPlugin(config)
-        })
-      }
-    }
+    ...mapActions('plugins', ['getPlugins'])
   }
 }
 </script>

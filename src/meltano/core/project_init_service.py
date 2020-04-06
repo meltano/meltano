@@ -7,7 +7,14 @@ from functools import singledispatch
 from typing import List, Dict
 from pathlib import Path
 
+from meltano.core.utils import truthy
 import meltano.core.bundle as bundle
+from meltano.core.plugin import PluginType
+from meltano.core.project_add_service import ProjectAddService
+from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.config_service import ConfigService, PluginMissingError
+from meltano.core.db import project_engine
+from meltano.core.migration_service import MigrationService
 from .project import Project
 from .venv_service import VenvService
 
@@ -68,20 +75,73 @@ class ProjectInitService:
         self.project_name = project_name.lower()
 
     def init(self) -> Project:
-        default_project_yaml = yaml.safe_load(open(self.initialize_file))
         try:
             os.mkdir(self.project_name)
         except Exception as e:
             raise ProjectInitServiceError
+        click.secho(f"Created", fg="blue", nl=False)
+        click.echo(f" {self.project_name}")
 
-        new_project = Project(self.project_name)
+        self.project = Project(self.project_name)
+        self.create_files()
+
+        Project.activate(self.project)
+        os.chdir(self.project.root)
+
+        self.create_system_database()
+
+        self.install_default_plugins()
+
+        return self.project
+
+    def create_files(self):
+        click.secho(f"Creating project files...", fg="blue")
+        default_project_yaml = yaml.safe_load(open(self.initialize_file))
         for path in visit(default_project_yaml, Path(self.project_name)):
-            click.secho(f"\tCreated", fg="blue", nl=False)
+            click.secho(f"Created", fg="blue", nl=False)
             click.echo(f" {path}")
 
-        return new_project
+    def create_system_database(self):
+        click.secho(f"Creating system database...", fg="blue")
+        # register the system database connection
+        engine_uri = f"sqlite:///{self.project.root}/.meltano/meltano.db"
+        engine, _ = project_engine(self.project, engine_uri, default=True)
+
+        migration_service = MigrationService(engine)
+        migration_service.upgrade()
+        migration_service.seed(self.project)
+
+    def install_default_plugins(self):
+        self.config_service = ConfigService(self.project)
+        self.add_service = ProjectAddService(
+            self.project, config_service=self.config_service
+        )
+        self.install_service = PluginInstallService(
+            self.project, config_service=self.config_service
+        )
+
+        if not truthy(os.getenv("MELTANO_DISABLE_AIRFLOW", False)):
+            click.secho(f"Installing orchestrator 'airflow'...", fg="blue")
+            self.install_plugin(PluginType.ORCHESTRATORS, "airflow")
+            click.secho(f"Installed 'airflow'", fg="blue")
+
+        click.secho(f"Installing transformer 'dbt'...", fg="blue")
+        self.install_plugin(PluginType.TRANSFORMERS, "dbt")
+        click.secho(f"Installed 'dbt'", fg="blue")
+
+        click.secho(f"Installing loader 'target-postgres'...", fg="blue")
+        self.install_plugin(PluginType.LOADERS, "target-postgres")
+        click.secho(f"Installed 'target-postgres'", fg="blue")
+
+    def install_plugin(self, plugin_type, plugin_name):
+        try:
+            self.config_service.find_plugin(plugin_name)
+        except PluginMissingError:
+            plugin = self.add_service.add(plugin_type, plugin_name)
+            self.install_service.install_plugin(plugin)
 
     def echo_instructions(self):
+        click.echo()
         click.secho("Project", nl=False)
         click.secho(f" {self.project_name}", fg="green", nl=False)
         click.echo(" has been created.")
@@ -93,6 +153,7 @@ class ProjectInitService:
             "\tVisit https://meltano.com/docs/getting-started.html in order to try us out"
         )
 
+        click.echo()
         click.secho("> ", fg="bright_black", nl=False)
 
         click.secho("Meltano sends anonymous usage data that help improve the product.")
