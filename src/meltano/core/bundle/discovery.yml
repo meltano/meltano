@@ -41,7 +41,6 @@ extractors:
     label: Google Ads
     description: Advertising Platform
     namespace: tap_adwords
-    hidden: true
     docs: 'https://meltano.com/plugins/extractors/adwords.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-adwords.git'
     capabilities:
