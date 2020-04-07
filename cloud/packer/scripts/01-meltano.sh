@@ -6,6 +6,9 @@
 # remove the scripts from your build system after they have run
 # if you use the build_image task.
 #
+# fail on any error
+set -e
+
 MELTANO_USER=meltano
 MELTANO_ROOT=/var/meltano
 MELTANO_VENV=$MELTANO_ROOT/.venv
