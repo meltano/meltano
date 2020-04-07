@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1941](https://gitlab.com/meltano/meltano/-/issues/1941) Suggest disabling ad blocker if inline docs iframe for an Ads or Analytics extractor failed to load
+
 ### Fixes
 
 - [#1942](https://gitlab.com/meltano/meltano/-/issues/1942) Ensure navigation bar is hidden in production when docs are viewed inline
