@@ -6,6 +6,9 @@
 # remove the scripts from your build system after they have run
 # if you use the build_image task.
 #
+# fail on any error
+set -e
+
 MELTANO_USER=meltano
 MELTANO_ROOT=/var/meltano
 MELTANO_VENV=$MELTANO_ROOT/.venv
@@ -20,7 +23,7 @@ sudo -H -u $MELTANO_USER $MELTANO_VENV/bin/pip install meltano
 
 # create the Meltano project
 cd $MELTANO_ROOT
-sudo -u $MELTANO_USER $MELTANO_VENV/bin/meltano init project
+sudo -H -u $MELTANO_USER $MELTANO_VENV/bin/meltano init project
 sudo -u $MELTANO_USER $MELTANO_VENV/bin/meltano --version
 
 # remove the project id so a new one is generated

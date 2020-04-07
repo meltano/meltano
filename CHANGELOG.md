@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1941](https://gitlab.com/meltano/meltano/-/issues/1941) Suggest disabling ad blocker if inline docs iframe for an Ads or Analytics extractor failed to load
+- [#1667](https://gitlab.com/meltano/meltano/-/issues/1667) Have 'meltano init' create system database and install airflow, dbt, and target-postgres plugins
 
 ### Fixes
 

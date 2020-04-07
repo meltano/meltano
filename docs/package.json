@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/meltano/meltano.git"
+    "url": "git+https://gitlab.com/meltano/meltano.git"
   },
   "keywords": [
     "meltano"
