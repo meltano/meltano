@@ -4,10 +4,8 @@ import time
 import psutil
 
 from meltano.core.project import Project
-from meltano.core.plugin import PluginInstall, PluginType
-from meltano.core.project_add_service import ProjectAddService
-from meltano.core.plugin_install_service import PluginInstallService
-from meltano.core.config_service import ConfigService, PluginMissingError
+from meltano.core.plugin import PluginInstall
+from meltano.core.config_service import ConfigService
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.db import project_engine
 from meltano.core.utils.pidfile import PIDFile, UnknownProcessError
@@ -19,12 +17,6 @@ class AirflowWorker(threading.Thread):
 
         self.project = project
         self.config_service = ConfigService(project)
-        self.add_service = ProjectAddService(
-            project, config_service=self.config_service
-        )
-        self.install_service = PluginInstallService(
-            project, config_service=self.config_service
-        )
         self._plugin = None
         self.pid_file = PIDFile(self.project.run_dir("airflow", "scheduler.pid"))
 
@@ -78,11 +70,7 @@ class AirflowWorker(threading.Thread):
             session.close()
 
     def run(self):
-        try:
-            self._plugin = self.config_service.find_plugin("airflow")
-        except PluginMissingError as err:
-            self._plugin = self.add_service.add(PluginType.ORCHESTRATORS, "airflow")
-            self.install_service.install_plugin(self._plugin)
+        self._plugin = self.config_service.find_plugin("airflow")
 
         self.kill_stale_workers()
         self.start_all()

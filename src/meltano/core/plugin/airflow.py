@@ -6,6 +6,7 @@ import time
 import os
 from . import PluginInstall, PluginType
 
+from meltano.core.error import SubprocessError
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.config_service import PluginConfigService
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -107,7 +108,10 @@ class Airflow(PluginInstall):
             # for the Airflow plugin
             invoker.prepare(session)
             handle = invoker.invoke(
-                "initdb", stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                "initdb",
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
             )
             initdb = handle.wait()
 

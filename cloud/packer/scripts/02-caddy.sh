@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# fail on any error
+set -e
+
 # install htpasswd
 sudo apt-get install -qqy apache2-utils
 
