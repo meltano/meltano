@@ -45,7 +45,11 @@ export default {
     }
   },
   data: () => ({
-    source: ''
+    source: '',
+    docsIframeLoadTimer: null,
+    isDocsIframeLoading: true,
+    isDocsIframeLoaded: false,
+    isDocsIframeError: false
   }),
   computed: {
     computedSettings() {
@@ -218,6 +222,12 @@ export default {
   mounted() {
     this.focusInputIntelligently()
     this.isTapGitLab ? this.setGitLabSource() : null
+    if (this.isShowDocs) {
+      this.docsIframeLoadTimer = setTimeout(this.onDocsIframeTimeout, 3000)
+    }
+  },
+  beforeDestroy() {
+    this.cancelDocsIframeLoadTimer()
   },
   methods: {
     clearUploadFormData() {
@@ -234,6 +244,28 @@ export default {
           targetInput.focus()
         }
       })
+    },
+    cancelDocsIframeLoadTimer() {
+      if (this.docsIframeLoadTimer) {
+        clearTimeout(this.docsIframeLoadTimer)
+        this.docsIframeLoadTimer = null
+      }
+    },
+    onDocsIframeLoad() {
+      this.cancelDocsIframeLoadTimer()
+      this.isDocsIframeLoading = false
+      this.isDocsIframeLoaded = true
+      this.isDocsIframeError = false
+
+      this.focusInputIntelligently()
+    },
+    onDocsIframeError() {
+      this.cancelDocsIframeLoadTimer()
+      this.isDocsIframeLoading = false
+      this.isDocsIframeError = true
+    },
+    onDocsIframeTimeout() {
+      this.isDocsIframeError = true
     },
     onFileChange(event, setting) {
       const file = event.target.files[0]
@@ -322,6 +354,7 @@ export default {
             </div>
             <div class="column">
               <a
+                v-if="isDocsIframeLoaded"
                 :href="plugin.docs"
                 target="_blank"
                 class="is-size-7 has-text-underlined is-pulled-right"
@@ -580,11 +613,41 @@ export default {
       >
         <div class="docs-container">
           <iframe
+            v-show="isDocsIframeLoaded"
             ref="docs"
             class="docs"
             :src="getInlineDocsUrl"
-            @load="focusInputIntelligently"
+            @load="onDocsIframeLoad"
+            @error="onDocsIframeError"
           />
+          <div v-if="isDocsIframeError" class="docs-placeholder content">
+            <p>
+              The inline documentation failed to load.
+            </p>
+            <p v-if="/adwords|ads|analytics/.test(getInlineDocsUrl)">
+              If you are using an extension to block ads or tracking tools, it
+              may have been triggered accidentally. Consider disabling it for
+              this domain, and try again.
+            </p>
+            <p>
+              <a :href="plugin.docs" target="_blank" class="button is-primary"
+                >View the documentation externally</a
+              >
+            </p>
+          </div>
+          <div v-else-if="isDocsIframeLoading" class="docs-placeholder content">
+            <p>
+              Loading inline documentation...
+            </p>
+            <p>
+              <em>
+                If this is taking too long, you can
+                <a :href="plugin.docs" target="_blank"
+                  >view the documentation externally</a
+                >.
+              </em>
+            </p>
+          </div>
         </div>
       </div>
     </div>
