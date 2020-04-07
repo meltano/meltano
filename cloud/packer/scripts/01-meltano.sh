@@ -23,7 +23,7 @@ sudo -H -u $MELTANO_USER $MELTANO_VENV/bin/pip install meltano
 
 # create the Meltano project
 cd $MELTANO_ROOT
-sudo -u $MELTANO_USER $MELTANO_VENV/bin/meltano init project
+sudo -H -u $MELTANO_USER $MELTANO_VENV/bin/meltano init project
 sudo -u $MELTANO_USER $MELTANO_VENV/bin/meltano --version
 
 # remove the project id so a new one is generated
