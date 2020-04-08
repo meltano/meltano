@@ -7,7 +7,7 @@
             Your startup sales funnel,<br /><strong>analyzed.</strong>
           </h2>
           <p class="hero-tagline">
-            A single set of <a href="#default-dashboards">dashboards and reports</a> for the entire journey<br />
+            A single set of <router-link to="#default-dashboards">dashboards and reports</router-link> for the entire journey<br />
             from <strong>ad impression</strong> to <strong>website visitor</strong> to <strong>successful sale</strong>.
           </p>
           <p class="hero-tagline">
@@ -69,7 +69,7 @@
 
         <p class="description ta-c">
           If Meltano does not yet integrate with your favorite marketing or sales data source, please
-          <a href="/docs/getting-help.html">let us know</a>!
+          <router-link to="/docs/getting-help.html">let us know</router-link>!
         </p>
 
         <p style="text-align:center; font-size:12px;">
@@ -153,8 +153,8 @@
       <p class="description ta-c">
         <em>
           If the report you're looking for is not yet included with Meltano by default, <br />
-          you can build it yourself using the <a href="#report-builder">report builder</a> or
-          <a href="/docs/getting-help.html">let us know</a> and we'll build it for you!
+          you can build it yourself using the <router-link to="#report-builder">report builder</router-link> or
+          <router-link to="/docs/getting-help.html">let us know</router-link> and we'll build it for you!
         </em>
       </p>
     </section>
@@ -175,10 +175,10 @@
             A dashboard for every occasion
           </h2>
           <p class="hero-tagline">
-            Select your favorite <a href="#default-dashboards">default reports</a> or
-            use the <a href="#report-builder">report builder</a> to create your own, 
+            Select your favorite <router-link to="#default-dashboards">default reports</router-link> or
+            use the <router-link to="#report-builder">report builder</router-link> to create your own, 
             and add them to a <a href="https://meltano.meltanodata.com/dashboards/overview" target="_blank">new dashboard</a>
-            to use as your homepage, <a href="#share-and-embed">share with your team</a>, or track a specific project.
+            to use as your homepage, <router-link to="#share-and-embed">share with your team</router-link>, or track a specific project.
           </p>
 
           <p class="action">
@@ -252,7 +252,7 @@
           <p>
             <em>
               If the report you're looking for cannot easily be created using the report builder, 
-              please <a href="/docs/getting-help.html">let us know</a> and we'll build it for you!
+              please <router-link to="/docs/getting-help.html">let us know</router-link> and we'll build it for you!
             </em>
           </p>
         </div>
@@ -288,7 +288,7 @@
 
         <p class="description ta-c">
           If you're looking for help with a problem, check out
-          <a href="/docs/getting-help.html">Getting Help</a>
+          <router-link to="/docs/getting-help.html">Getting Help</router-link>
         </p>
       </section>
     </div>
