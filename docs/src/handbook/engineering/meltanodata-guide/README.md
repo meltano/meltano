@@ -15,7 +15,7 @@ This will be the single source of truth for team members when it comes to creati
 - Client's tenant name (i.e., company name, etc.)
 - Access to the [Controller Node](/handbook/engineering/meltanodata-guide/controller-node.html)
 
-### Step 1: Generate Meltano UI admin credentials
+### Step 1: Generate and store Meltano UI admin credentials
 
 1. Clone the https://gitlab.com/meltano/infrastructure repository if you haven't already
 2. Change directory into your local copy of the `meltano/infrastructure` repository
@@ -67,64 +67,40 @@ cd /var/meltano/infrastructure
 ./scripts/create_instances.sh $TENANT_NAME
 ```
 
-### Step 2: Configure instance
+### Step 3: Store Postgres connection details
+
+1. Ensure you are still in your local copy of the `meltano/infrastructure` repository
+
+2. Run the `set_postgres_creds` script, where `$URI` is the database connection URI output by the `create_instances` script
+
+```sh
+./scripts/set_postgres_creds.py $TENANT_NAME $URI
+```
+
+8. Commit the result and push to the server
+
+```sh
+git commit -am "Add Postgres connection details for new instance"
+git push
+```
+
+### Step 4: Configure instance
 
 1. Ensure you are still SSHed into the controller node, in the `/var/meltano/infrastructure` directory
 
-1. Run the Setup playbook. You can provide multiple hostnames to `--limit` separated using commas.
+2. Run the Setup playbook. You can provide multiple hostnames to `--limit` separated using commas.
 
 ```sh
 ansible-playbook playbooks/setup.yml --limit=$TENANT_NAME.meltanodata.com
 ```
 
-### Step 3: Configure PostgreSQL loader
-
-Because we manage the database instance for each tenant, we use environment variables to configure `target-postgres` as a simple and secure way of configuring the plugin.
-
-To do this, you need to:
-
-1. Ensure you are still SSHed into the droplet
-
-2. Open (or create) the `/etc/meltano/environment.d/postgres` file as the `meltano` user
-
-```sh
-su meltano
-nano /etc/meltano/environment.d/postgres
-```
-
-4. Copy and paste the credentials output by the `create_instances` script
-
-```bash
-PG_USERNAME=doadmin
-PG_PASSWORD=<password>
-PG_ADDRESS=<host>
-PG_PORT=25060
-PG_DATABASE=defaultdb
-```
-
-5. Secure the file by running the following commands:
-
-```bash
-# make the file only readable by `meltano`
-chmod 600 /etc/meltano/environment.d/postgres
-
-# exit out of the meltano user and back to root using Ctrl+D
-^D
-```
-
-6. Reload the environment variables into Meltano by restarting the service
-
-```bash
-systemctl restart meltano
-```
-
-7. Verify that the `meltano` service is working properly by checking:
+3. Verify that the `meltano` service is working properly
 
 ```bash
 systemctl status meltano
 ```
 
-### Step 4: Validate Meltano UI
+### Step 5: Validate Meltano UI
 
 #### Ensure everything works
 
