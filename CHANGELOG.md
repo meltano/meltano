@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.28.1 - (2020-04-09)
+---
+
+### New
+
 - [#1940](https://gitlab.com/meltano/meltano/-/issues/1940) Show Google Ads extractor in UI
 
 ### Changes
@@ -20,8 +32,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1942](https://gitlab.com/meltano/meltano/-/issues/1942) Ensure navigation bar is hidden in production when docs are viewed inline
-
-### Breaks
 
 
 ## 1.28.0 - (2020-04-06)
