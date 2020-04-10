@@ -8,48 +8,11 @@ This will be the single source of truth for team members when it comes to creati
 
 ## Creating a New Instance
 
-### Prerequisites
+::: warning
+These steps (should) have been completed automatically after a user signs up on TypeForm, through the Zapier integration which calls an endpoint on the controller node which triggers the setup script.
 
-- DigitalOcean Account
-- Access to DigitalOcean teams "Meltano" and "MeltanoData DBs" 1 through 10
-- Client's tenant name (i.e., company name, etc.)
-- Access to the [Controller Node](/handbook/engineering/meltanodata-guide/controller-node.html)
-
-### Step 1: Generate and store Meltano UI admin credentials
-
-1. Clone the https://gitlab.com/meltano/infrastructure repository if you haven't already
-2. Change directory into your local copy of the `meltano/infrastructure` repository
-3. Ensure your local copy is up to date with the server
-
-```sh
-git checkout master
-git pull
-```
-
-4. Run the `add_admin` script to add a new `$TENANT_NAME` admin user
-
-```sh
-./scripts/add_admin.py $TENANT_NAME $TENANT_NAME
-```
-
-5. Add the credentials to the 1Password `meltanodata.com` vault with title `$TENANT_NAME.meltanodata.com`
-
-6. Run the `add_admin` script to add a new `meltano` admin user
-
-```sh
-./scripts/add_admin.py $TENANT_NAME meltano
-```
-
-7. Add the credentials to the 1Password `meltanodata.com` vault with title `meltano@$TENANT_NAME.meltanodata.com`
-
-8. Commit the result and push to the server
-
-```sh
-git commit -am "Add admin users for new instance"
-git push
-```
-
-### Step 2: Create new instance (droplet, domain record, and database)
+Only follow these steps manually if automatic setup appears to have failed.
+:::
 
 1. Make sure ssh-agent is registered
 2. [Access the Controller Node](/handbook/engineering/meltanodata-guide/controller-node.html#accessing-the-controller-node)
@@ -61,53 +24,13 @@ git push
 cd /var/meltano/infrastructure
 ```
 
-5. Run the `create_instances` script. You can provide multiple subdomains in multiple arguments.
+5. Run the `setup` script. 
 
 ```sh
-./scripts/create_instances.sh $TENANT_NAME
+./scripts/setup.sh "$FULL_NAME" "$EMAIL" "$SUBDOMAIN"
 ```
 
-### Step 3: Store Postgres connection details
-
-1. Ensure you are still in your local copy of the `meltano/infrastructure` repository
-
-2. Run the `set_postgres_creds` script, where `$URI` is the database connection URI output by the `create_instances` script
-
-```sh
-./scripts/set_postgres_creds.py $TENANT_NAME $URI
-```
-
-8. Commit the result and push to the server
-
-```sh
-git commit -am "Add Postgres connection details for new instance"
-git push
-```
-
-### Step 4: Configure instance
-
-1. Ensure you are still SSHed into the controller node, in the `/var/meltano/infrastructure` directory
-
-2. Run the Setup playbook. You can provide multiple hostnames to `--limit` separated using commas.
-
-```sh
-ansible-playbook playbooks/setup.yml --limit=$TENANT_NAME.meltanodata.com
-```
-
-3. Verify that the `meltano` service is working properly
-
-```bash
-systemctl status meltano
-```
-
-### Step 5: Validate Meltano UI
-
-#### Ensure everything works
-
-1. Visit `https://$TENANT_NAME.meltanodata.com` in your browser
-1. Log in with credentials for the `meltano` user output by the `add_admin` script
-
-And with that, we're good to go! 🎉
+That's it! The script will automatically set up the instance and send the user their login info by email.
 
 ## Maintaining an Existing Instance
 
