@@ -1,6 +1,7 @@
 import Router from 'vue-router'
 import VCalendar from 'v-calendar'
 import Vue from 'vue'
+import VueIntercom from 'vue-intercom'
 
 import { Service } from 'axios-middleware'
 import axios from 'axios'
@@ -21,6 +22,7 @@ Vue.config.productionTip = false
 Vue.use(VCalendar)
 Vue.use(FontAwesome)
 Vue.use(Router)
+Vue.use(VueIntercom, { appId: 'ir946q00' })
 
 // Toast setup
 setupToasted()
