@@ -89,13 +89,9 @@ If you have other third-party applications integrated with Salesforce and you re
 
 ### Start Date
 
-:::tip Configuration Notes
+This property determines how much historical data will be extracted.
 
-- Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-
-:::
-
-This property allows you to configure where you want your data set to start from. Otherwise, if left blank, it will try to fetch the entire history of the groups or projects specified.
+Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
 ## Meltano Setup
 

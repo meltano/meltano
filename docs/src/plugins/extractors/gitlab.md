@@ -113,13 +113,9 @@ If you want to configure this, the format for it is `group/project`. Here are a 
 
 ### Start Date
 
-:::tip Configuration Notes
+This property determines how much historical data will be extracted.
 
-- Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-
-:::
-
-This property allows you to configure where you want your data set to start from. Otherwise, if left blank, it will try to fetch the entire history of the groups or projects specified.
+Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
 ## Advanced: Command Line Installation
 

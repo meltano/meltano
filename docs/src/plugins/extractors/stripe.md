@@ -70,24 +70,9 @@ To get your client secret:
 
 ### Start Date
 
-:::tip Configuration Notes
+This property determines how much historical data will be extracted.
 
-- Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-
-:::
-
-This property allows you to configure where you want your data set to start from. Otherwise, if left blank, it will try to fetch the entire history of the groups or projects specified.
-
-#### Web Application
-
-1. On `Pipeline: Extract` page, find the `Zendesk` card and click on `Install`
-1. When it is complete, you should see the following modal
-
-![Screenshot of tap-stripe modal](/images/tap-stripe/07-stripe-docs.png)
-
-3. Fill out the form with your [account ID](/plugins/extractors/stripe.html#account-id) and [secret key](/plugins/extractors/stripe.html#secret-key)
-1. Click `Test Connection` to make sure that everything works correctly
-1. Click `Save` to finish installation!
+Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
 ## Advanced: Command Line Installation
 
