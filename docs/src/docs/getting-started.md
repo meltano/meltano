@@ -6,110 +6,114 @@ description: Create your first data analysis project, build a pipeline, and anal
 # Getting Started
 
 ::: tip
-We recommend using Meltano as hosted software (SaaS), but if you prefer to host Meltano yourself please see our [open source installation instructions](/developer-tools/self-hosted-installation.html).
+We recommend using Meltano as hosted software (SaaS), but if you'd like to use Meltano with a different data source than those listed under [Data Sources](/docs/data-sources.html), you can consider [self-hosting Meltano](/developer-tools/self-hosted-installation.md). 
+
+Self-hosted installations require more manual set up, but support [additional data sources](/plugins/extractors/) and give you the option to [create custom extractors](/tutorials/create-a-custom-extractor.html) to pull in data from arbitrary data sources.
+
 :::
 
 ## Create Your Account
 
-To create your Meltano account [fill out the signup form](https://meltano.typeform.com/to/NJPwxv) and we will email you login information.
+To get your own hosted Meltano instance, [fill out the signup form](https://meltano.typeform.com/to/NJPwxv) and you'll receive an email with your login details within a few minutes.
 
-<a href="https://meltano.typeform.com/to/NJPwxv" class="button is-purple is-filled">Get started with your free hosted Meltano dashboard</a>
+<a href="https://meltano.typeform.com/to/NJPwxv" class="button is-purple is-filled">Sign up and go from data to dashboard in minutes!</a>
 
 ## Connect Data Sources
 
-Once you've logged into Meltano, you'll begin on the **Data** page to connect your [data sources](/docs/data-sources.html).
+Once you've logged into Meltano, you'll begin on the **Connections** page to connect your [data sources](/docs/data-sources.html).
 
-![Meltano UI with all extractors not installed initial loading screen](/images/getting-started-guide/gsg-01.png)
+![Meltano UI with all extractors not installed initial loading screen](/images/getting-started-guide/1-connections.png)
 
-Choose a data source to connect, fill in the form with your authentication details, and then save.
+Choose a data source to connect (we'll use [Google Ads](/plugins/extractors/adwords.html) in this example), fill in the form with your authentication details, **Test Connection** to ensure everything is on order, and then hit **Save**.
 
-![Example of GitLab docs appearing next to configuration form](/images/getting-started-guide/gsg-02.png)
+![Example of Google Ads docs appearing next to configuration form](/images/getting-started-guide/2-connection-setup-populated.png)
 
-Once saved, we automatically start data extraction for you. The extraction time varies based on the data source and Start Date setting that you previously selected. Once complete you can click one of the related data model buttons from which to build reports.
+Once saved, we automatically start data extraction for you. The extraction time varies based on the data source and Start Date setting that you previously selected. You can follow along with the progress through the **Run Log** modal that will appear, but extraction will continue in the background even if you close this view. Once complete you can click the **Explore** button to start exploring the imported data.
 
-![Example of GitLab extraction log and data model buttons](/images/getting-started-guide/gsg-03.png)
+![Example of Google Ads extraction log and explore button](/images/getting-started-guide/3-run-log-complete.png)
 
-These buttons are also available via the **Reports** main navigation dropdown or via the **Data** page which now shows the corresponding data pipeline that was automatically created when you saved your connection.
+On the **Explore** page for the data source in question, you will find all of the **Dashboards**, **Reports**, and **Report Builders** that come with it out of the box. How to use these will be covered in more detail in the next section.
 
-![Example of GitLab data model buttons on data page](/images/getting-started-guide/gsg-03b.png)
+![Example of Google Ads explore page](/images/getting-started-guide/4-explore.png)
 
-Some of our popular data source connectors include:
+On the **Pipelines** page, you can see the pipeline that was automatically created for the data source you have added. You can modify its update interval to ensure the data in your dashboards and reports is always up to date, trigger a manual run, or access the log for the latest update run to troubleshoot potential issues.
 
-- [Facebook Ads](/plugins/extractors/facebook.html)
-- [Google Analytics](/plugins/extractors/google-analytics.html#google-analytics)
-- [Stripe](/plugins/extractors/stripe.html#stripe)
-- [Salesforce](/plugins/extractors/salesforce.html#salesforce)
+![Pipelines page](/images/getting-started-guide/5-pipelines.png)
 
-See a [full list of data sources here](/docs/data-sources.html).
+In this example, we have used [Google Ads](/plugins/extractors/adwords.html), but the process looks the same for all of the [supported data sources](/docs/data-sources.html).
 
-## Analyze Your Data
+## Explore Your Data
 
-Congratulations! Now that you have connected a data source, and run a successful pipeline for the dataset, we are now ready to analyze the data!
+Congratulations! Now that you have connected a data source and successfully imported the initial dataset, we are now ready to explore and analyze the data!
 
-After clicking one of the aforementioned data model buttons, you will be on the **Analyze** page which contains an interactive user interface to allow you to dynamically build queries and visualize your data. By default, it will run a standard report.
+On the **Explore** page for the data source in question, you will find all of the **Dashboards**, **Reports**, and **Report Builders** that come with Meltano out of the box. Once you start creating your own reports and dashboards, they will show up here as well.
 
-You can explore and analyze the data by clicking on different Attributes in the **Query** side menu on the left hand side. Autorun is enabled by default to trigger live changes to the SQL queries which will update the chart dynamically.
+![Example of Google Ads explore page](/images/getting-started-guide/4-explore.png)
 
-![Screenshot of Analyze page for GitLab](/images/getting-started-guide/gsg-04.png)
+To help you get started, the Meltano team has used the report builders to build a number of reports for common metrics and dimensions, that can be found on the dashboards.
 
-While exploring the Analyze page, you can also modify:
+![Example of Google Ads dashboard](/images/getting-started-guide/6-default-dashboard.png)
 
-- Date Ranges (upper right)
-- Filters (upper left of Query panel)
-- Different chart (upper right of Results panel)
-- Exploring table data and sorting data via column properties like ascending or descending (bottom right)
+Of course, these may not be the exact reports you're interested in, and you can dig deeper into your data by using the Report Builder, which allows you to dynamically build queries and visualize your data. You can access it either by choosing a specific Report Builder on the Explore page, or by hitting the "Edit" button on an existing report.
 
-## Create Reports
+![Report Builder](/images/getting-started-guide/7-report-builder.png)
 
-When we find an analysis that we want to reference in the future, we can easily do this by creating a report. This can be accomplished by clicking on the `Save Report` dropdown in the Analyze toolbar. This will open a dropdown with a default report name that is dynamically populated, but can be easily changed.
+In the **Query** panel on the left, you can select the columns (dimensions) and aggregates (metrics) you would like to show in the table and graph. You can also specify a limit (the maximum number of rows/data points), set one or more filter, or view the generated SQL for the query in question.
 
-![Save Report dialogue for naming the report you want to save](/images/getting-started-guide/gsg-05.png)
+![Report Builder with extra aggregates](/images/getting-started-guide/8-report-builder-modified.png)
 
-Once we click `Save`, we should see the upper left "Untitled Report" change to our new report name.
+You can also change the date range using the date picker in the top right.
 
-![Saved report with a designated report name](/images/getting-started-guide/gsg-06.png)
+![Report Builder with date picker](/images/getting-started-guide/9-report-builder-date-picker.png)
 
-And with that, our analysis has been saved!
+Additionally, you can change the chart type using the button on the top right of the chart, and change the sorting of your data using the header cells in the table below the graph.
 
-## Create Dashboards
+## Save Reports
 
-As you acquire more reports, you will probably want to organize them via dashboards. This can be done by clicking on the new `Add to Dashboard` dropdown in the toolbar.
+When we find an analysis that we want to reference in the future, we can easily do this by saving the analysis as a report using the **Save Report** button in the top right.
 
-![Dropdown menu for adding report to dashboard](/images/getting-started-guide/gsg-07.png)
+Note that if you are editing an existing report, clicking "Save Report" will update the report in question. To create a _new_ report with the changes, click the arrow to the right of "Save Report". In the dropdown that will open up, you can choose a new name for the report.
 
-Since we have never created a dashboard, click on `New Dashboard`, which will trigger a modal that contains a dynamically generated dashboard name that can be customized as desired.
+![Save Report dialogue for naming the report you want to save](/images/getting-started-guide/10-report-builder-save-as.png)
 
-![New dashboard dialog for configuring the dashboard](/images/getting-started-guide/gsg-08.png)
+Once we click **Save**, you should see the new name reflected in the top left of the report builder interface, and our analysis has been saved!
 
-Once we click `Create`, we can now verify that our report has been added to the Dashboard by clicking on the `Add to Dashboard` menu.
+You can now find the report on the "Explore" page for the data source in question.
 
-![Confirmation that our report is added to the dashboard](/images/getting-started-guide/gsg-09.png)
+## Add Reports to Dashboards
 
-We can also visit the Dashboard directly by clicking on the `Dashboard` navigation item in the header, which shows our newly created Dashboard.
+As you acquire more reports, you will probably want to organize them via dashboards. This can be done by clicking on the **Add to Dashboard** button in the toolbar. You will see all existing dashboards listed here, as well as the option to create a new one.
 
-![Dashboard page with newly created dashboard](/images/getting-started-guide/gsg-10.png)
+![Dropdown menu for adding report to dashboard](/images/getting-started-guide/11-report-builder-add-to-dashboard.png)
+
+To add a report to an existing dashboard, simply click the checkmark by the appropriate name. To create a new dashboard, click the **Create Dashboard** button. In the dropdown that will open up, you can choose a new name for the dashboard.
+
+![New dashboard dialog for configuring the dashboard](/images/getting-started-guide/12-report-builder-create-dashboard.png)
+
+Once we click **Create**, we can verify that our report has been added to the Dashboard by opening the **Add to Dashboard** menu.
+
+![Confirmation that our report is added to the dashboard](/images/getting-started-guide/13-report-builder-dashboard-saved.png)
+
+We can find the newly created dashboard on the **Dashboards** page you can find in the navigation bar.
+
+![Dashboard page with newly created dashboard](/images/getting-started-guide/14-dashboards.png)
 
 Once we select it, you will see the dashboard you created. You can repeat the above process to add more reports to the same and/or different dashboards.
 
-![Dashboard with the saved Report](/images/getting-started-guide/gsg-11.png)
+![Dashboard with the saved Report](/images/getting-started-guide/15-overview-dashboard.png)
 
 ## Share Reports and Dashboards
 
-Once you've created reports and dashboards, you can share them publicly. Click the share dropdown at either the dashboard or report level. The share options for each are:
+Once you've created reports and dashboards, you can easily generate a **read-only** link or embed snippet using the **Share** button on the top right of the report or dashboard.
 
-- Link (dedicated landing page)
-- Embed (code snippet to embed in a website)
+![Sharing reports and dashboards](/images/getting-started-guide/16-share-dashboard.png)
 
-![Sharing reports and dashboards](/images/getting-started-guide/gsg-12.png)
-
-## Choose Data Update Schedule
-
-To keep your data updated, you can change the update interval of a particular data pipeline on the **Data** page. This is how you automate data collection. Additionally, your reports and the dashboards that contain them will be dynamically updated based off this fresh data.
-
-![Changing update schedule](/images/getting-started-guide/gsg-13.png)
+Using this link, anyone will be able to view the report or dashboard in question without needing to sign in to your Meltano instance, but they will not be able to make any changes. If you update the dashboard or report after the fact, or if new data is loaded into Meltano, the content at the shared link will automatically be updated as well.
 
 ### Next Steps
 
-Now you have now setup a complete end-to-end data analysis solution with Meltano! 🎉
+You have now set up a complete end-to-end data to dashboard sales funnel analysis solution with Meltano! 🎉
 
-To learn about more Meltano recipes and functionality with our [tutorials](/tutorials/).
+Next, you'll want to make sure that all of your [data sources](/docs/data-sources.html) are connected to Meltano, so that you can build your own high-level dashboards with reports for those metrics you care most about.
+
+And if the report you’re looking for is not yet included with Meltano by default and cannot easily be created using the report builder, please [let us know](/docs/getting-help.html) and we'll gladly build it for you!
