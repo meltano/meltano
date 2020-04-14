@@ -25,11 +25,9 @@ In order to access your Fastly data, you will need:
 
 ### Start Date
 
-:::tip Configuration Notes
+This property determines how much historical data will be extracted.
 
-- Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take
-
-:::
+Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
 ## Info
 

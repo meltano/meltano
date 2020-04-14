@@ -111,14 +111,9 @@ To prevent any interruption of your data pipeline, we recommend that you generat
 
 <h3 id="start-date">Start Date</h3>
 
-This property allows you to configure where you want your extracted data set to start from.
+This property determines how much historical data will be extracted.
 
-:::tip Configuration Notes
-
-- Determines how much historical data will be extracted.
-- Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-
-:::
+Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
 ## Meltano Setup
 
