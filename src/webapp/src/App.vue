@@ -9,6 +9,9 @@ export default {
     PromoBanner
   },
   computed: {
+    isMeltanoDataInstance() {
+      return window.location.host.indexOf('meltanodata.com') > -1
+    },
     isMeltanoDemoSite() {
       return window.location.host === 'meltano.meltanodata.com'
     }
@@ -17,6 +20,11 @@ export default {
     this.$store.dispatch('system/check')
     this.$store.dispatch('system/fetchIdentity')
     this.tryAcknowledgeAnalyticsTracking()
+  },
+  mounted() {
+    if (this.isMeltanoDataInstance) {
+      this.$intercom.boot()
+    }
   },
   methods: {
     tryAcknowledgeAnalyticsTracking() {
