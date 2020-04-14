@@ -15,14 +15,14 @@ description: Use Meltano to extract raw data from Stripe and insert it into Post
 In order to access your Stripe data, you will need:
 
 - Account ID
-- Client Secret
+- Secret API key
 - Start Date
 
 ### Account ID
 
 :::tip Configuration Notes
 
-- The account ID (e.g., `acct_152Bdedkol54`) attained from your Stripe account profile
+- The account ID (e.g., `acct_152Bdedkol54`) is attained from your Stripe account profile
 
 :::
 
@@ -40,15 +40,15 @@ To get your account ID:
 
 3. Copy and paste it somewhere you can refer later on when configuring the tap.
 
-### Client Secret
+<h3 id="client-secret">Secret API Key</h3>
 
 :::tip Configuration Notes
 
-- The client secret (e.g., `sk_live_eis72wonf921pqjdf`) is accessible in your Stripe account when signed in
+- The secret API key (e.g., `sk_live_eis72wonf921pqjdf`) is accessible in your Stripe account when signed in
 
 :::
 
-To get your client secret:
+To get your secret API key:
 
 1. Visit your Developer API Keys page: [https://dashboard.stripe.com/apikeys](https://dashboard.stripe.com/apikeys)
 
@@ -58,36 +58,28 @@ To get your client secret:
 
 2. Under the `Standard keys` section, click on the button to `Create secret key`
 
+:::tip No button?
+
+If the "Create secret key" button is not available, a secret key may already have been generated before.
+In this case, use the "Reveal live key token" button under "Token" and to the right of "Secret key". The token that appears is the secret key you can copy and paste into the data source configuration.
+
+:::
+
 ![Screenshot of where Create secret key button is](/images/tap-stripe/04-stripe-docs.png)
 
 3. To make things easy to track, assign the secret key a name of `Meltano` so you know why you created the key
 
 ![Screenshot of naming secret key](/images/tap-stripe/05-stripe-docs.png)
 
-4. Once you click on `Create`, you should be greeted with you new API key which you'll copy and paste into the tap configuration.
+4. Once you click on `Create`, you should be greeted with you new API key which you'll copy and paste into the data source configuration.
 
 ![Screenshot of the new API key](/images/tap-stripe/06-stripe-docs.png)
 
 ### Start Date
 
-:::tip Configuration Notes
+This property determines how much historical data will be extracted.
 
-- Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-
-:::
-
-This property allows you to configure where you want your data set to start from. Otherwise, if left blank, it will try to fetch the entire history of the groups or projects specified.
-
-#### Web Application
-
-1. On `Pipeline: Extract` page, find the `Zendesk` card and click on `Install`
-1. When it is complete, you should see the following modal
-
-![Screenshot of tap-stripe modal](/images/tap-stripe/07-stripe-docs.png)
-
-3. Fill out the form with your [account ID](/plugins/extractors/stripe.html#account-id) and [secret key](/plugins/extractors/stripe.html#secret-key)
-1. Click `Test Connection` to make sure that everything works correctly
-1. Click `Save` to finish installation!
+Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
 ## Advanced: Command Line Installation
 
