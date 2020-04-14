@@ -10599,6 +10599,11 @@ vue-hot-reload-api@^2.3.0:
   resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.3.4.tgz#532955cc1eb208a3d990b3a9f9a70574657e08f2"
   integrity sha512-BXq3jwIagosjgNVae6tkHzzIk6a8MHFtzAdwhnV5VlvPTFxDCvIttgSiHWjdGoTJvXtmRu5HacExfdarRcFhog==
 
+vue-intercom@^1.0.14:
+  version "1.0.14"
+  resolved "https://registry.yarnpkg.com/vue-intercom/-/vue-intercom-1.0.14.tgz#faa80335b43cb17e9913a2951182e98e057dd2c0"
+  integrity sha512-Cv9TT/REVdI9UAydDA5NLacKktrQcwwuCjR6KoZ1SwXwx7sBDzE3+Ge6uvgL/WKqq7fEqKqjA4jMnaVwIHDveg==
+
 vue-jest@^3.0.4:
   version "3.0.5"
   resolved "https://registry.yarnpkg.com/vue-jest/-/vue-jest-3.0.5.tgz#d6f124b542dcbff207bf9296c19413f4c40b70c9"

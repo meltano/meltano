@@ -106,7 +106,7 @@ export default {
 
   mounted() {
     // Intercom.io chat
-    if(!this.isEmbedded) {
+    if (!this.isEmbedded) {
       this.$intercom.boot()
     }
 
