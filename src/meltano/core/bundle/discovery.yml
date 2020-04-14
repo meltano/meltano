@@ -312,16 +312,16 @@ extractors:
     settings_group_validation:
       - ['key_file_location', 'view_id', 'start_date']
     settings:
-      - name: key_file_location
-        label: Key File Location
-        placeholder: Ex. client_secrets.json
-        kind: file
-        env: GOOGLE_ANALYTICS_API_CLIENT_SECRETS
       - name: view_id
         label: View ID
         placeholder: Ex. 198343027
         env: GOOGLE_ANALYTICS_API_VIEW_ID
         label: View ID
+      - name: key_file_location
+        label: Client Secrets
+        placeholder: Ex. client_secrets.json
+        kind: file
+        env: GOOGLE_ANALYTICS_API_CLIENT_SECRETS
       - name: reports
         label: Reports
         placeholder: Ex. my_report_definition.json
