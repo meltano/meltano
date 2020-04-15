@@ -14,7 +14,7 @@ export default {
   },
   mixins: [reportDateRangeMixin],
   props: {
-    edit: {
+    isEditing: {
       type: Boolean,
       required: true
     },
@@ -28,7 +28,6 @@ export default {
     }
   },
   data: () => ({
-    isEditable: false,
     position: 0
   }),
   computed: {
@@ -43,6 +42,9 @@ export default {
       return this.report.namespace
         ? this.report.namespace.replace('model', 'tap')
         : ''
+    },
+    positionChanged() {
+      return this.position != this.index + 1
     }
   },
   mounted() {
@@ -61,24 +63,20 @@ export default {
       this.$router.push({ name: 'report', params: report })
     },
     updatePosition() {
-      const oldPosition = this.index
-      const newPosition = this.position - 1
-      const isUpdated = oldPosition !== newPosition
+      const oldIndex = this.index
+      const newIndex = this.position - 1
 
-      if (isUpdated) {
-        this.$emit('update-report-position', {
-          oldPosition,
-          newPosition,
-          isUpdated
-        })
-      }
+      this.$emit('update-report-index', {
+        oldIndex,
+        newIndex
+      })
     }
   }
 }
 </script>
 
 <template>
-  <div class="column is-half" :class="edit ? 'wireframe' : ''">
+  <div class="column is-half" :class="isEditing ? 'wireframe' : ''">
     <div class="box">
       <article class="media is-paddingless">
         <figure class="media-left">
@@ -102,7 +100,7 @@ export default {
           </div>
         </div>
         <div class="media-right">
-          <div v-if="edit" class="field is-pulled-right is-inline-block">
+          <div v-if="isEditing" class="field is-pulled-right is-inline-block">
             <div>
               <label :for="`report-position-${index}`">Report Position: </label>
               <input
@@ -110,11 +108,11 @@ export default {
                 v-model.number="position"
                 type="text"
                 style="has-text-centered mb-05r"
-                @focus="isEditable = true"
+                @focus="positionChanged = true"
               />
             </div>
             <div
-              v-show="isEditable"
+              v-if="positionChanged"
               class="field is-pulled-right is-inline-block"
             >
               <button
@@ -142,7 +140,7 @@ export default {
       <br />
 
       <Chart
-        :class="edit ? 'is-transparent-50' : ''"
+        :class="isEditing ? 'is-transparent-50' : ''"
         :chart-type="report.chartType"
         :results="report.queryResults"
         :result-aggregates="report.queryResultAggregates"
