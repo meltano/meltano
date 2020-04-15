@@ -3,6 +3,7 @@ import { mapGetters } from 'vuex'
 
 import Chart from '@/components/analyze/charts/Chart'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
+import Dropdown from '@/components/generic/Dropdown'
 import EmbedShareButton from '@/components/generic/EmbedShareButton'
 import reportDateRangeMixin from '@/components/analyze/reportDateRangeMixin'
 
@@ -10,11 +11,12 @@ export default {
   components: {
     Chart,
     ConnectorLogo,
+    Dropdown,
     EmbedShareButton
   },
   mixins: [reportDateRangeMixin],
   props: {
-    edit: {
+    isEditing: {
       type: Boolean,
       required: true
     },
@@ -28,7 +30,6 @@ export default {
     }
   },
   data: () => ({
-    isEditable: false,
     position: 0
   }),
   computed: {
@@ -43,6 +44,9 @@ export default {
       return this.report.namespace
         ? this.report.namespace.replace('model', 'tap')
         : ''
+    },
+    positionChanged() {
+      return this.position != this.index + 1
     }
   },
   mounted() {
@@ -61,24 +65,23 @@ export default {
       this.$router.push({ name: 'report', params: report })
     },
     updatePosition() {
-      const oldPosition = this.index
-      const newPosition = this.position - 1
-      const isUpdated = oldPosition !== newPosition
+      const oldIndex = this.index
+      const newIndex = this.position - 1
 
-      if (isUpdated) {
-        this.$emit('update-report-position', {
-          oldPosition,
-          newPosition,
-          isUpdated
-        })
-      }
+      this.$emit('update-report-index', {
+        oldIndex,
+        newIndex
+      })
+    },
+    removeFromDashboard() {
+      this.$emit('remove-from-dashboard', this.index)
     }
   }
 }
 </script>
 
 <template>
-  <div class="column is-half" :class="edit ? 'wireframe' : ''">
+  <div class="column is-half" :class="isEditing ? 'wireframe' : ''">
     <div class="box">
       <article class="media is-paddingless">
         <figure class="media-left">
@@ -102,27 +105,79 @@ export default {
           </div>
         </div>
         <div class="media-right">
-          <div v-if="edit" class="field is-pulled-right is-inline-block">
-            <div>
-              <label :for="`report-position-${index}`">Report Position: </label>
-              <input
-                :id="`report-position-${index}`"
-                v-model.number="position"
-                type="text"
-                style="has-text-centered mb-05r"
-                @focus="isEditable = true"
-              />
-            </div>
-            <div
-              v-show="isEditable"
-              class="field is-pulled-right is-inline-block"
-            >
-              <button
-                class="button is-small is-primary"
-                @click="updatePosition"
+          <div v-if="isEditing" class="field is-pulled-right is-inline-block">
+            <div class="field is-grouped">
+              <Dropdown
+                label="Move"
+                class="control"
+                button-classes="is-small"
+                menu-classes="dropdown-menu-300"
+                is-right-aligned
               >
-                Update Position
-              </button>
+                <div class="dropdown-content">
+                  <div class="dropdown-item">
+                    <div class="field">
+                      <label class="label">Move to position</label>
+                      <div class="control">
+                        <input
+                          v-model.number="position"
+                          class="input"
+                          type="text"
+                        />
+                      </div>
+                    </div>
+                    <div class="buttons is-right">
+                      <button class="button is-text" data-dropdown-auto-close>
+                        Cancel
+                      </button>
+                      <button
+                        class="button"
+                        :disabled="!positionChanged"
+                        data-dropdown-auto-close
+                        @click="updatePosition"
+                      >
+                        Update
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </Dropdown>
+
+              <Dropdown
+                button-classes="is-danger is-outlined is-small"
+                class="control"
+                :tooltip="{
+                  classes: 'is-tooltip-left',
+                  message: 'Remove report from dashboard'
+                }"
+                menu-classes="dropdown-menu-300"
+                icon-open="trash-alt"
+                icon-close="caret-up"
+                is-right-aligned
+              >
+                <div class="dropdown-content is-unselectable">
+                  <div class="dropdown-item">
+                    <div class="content">
+                      <p>
+                        Are you sure you want to remove this report from the
+                        dashboard?
+                      </p>
+                    </div>
+                    <div class="buttons is-right">
+                      <button class="button is-text" data-dropdown-auto-close>
+                        Cancel
+                      </button>
+                      <button
+                        class="button is-danger"
+                        data-dropdown-auto-close
+                        @click="removeFromDashboard"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </Dropdown>
             </div>
           </div>
 
@@ -142,7 +197,7 @@ export default {
       <br />
 
       <Chart
-        :class="edit ? 'is-transparent-50' : ''"
+        :class="isEditing ? 'is-transparent-50' : ''"
         :chart-type="report.chartType"
         :results="report.queryResults"
         :result-aggregates="report.queryResultAggregates"

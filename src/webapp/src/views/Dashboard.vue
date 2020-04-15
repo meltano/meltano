@@ -15,9 +15,9 @@ export default {
   },
   data() {
     return {
-      editableDashboardReports: [],
-      isEditable: false,
-      isUpdated: false
+      editableReports: [],
+      isEditing: false,
+      reportsChanged: false
     }
   },
   computed: {
@@ -30,19 +30,22 @@ export default {
       'reports'
     ]),
     displayedReports() {
-      return this.isEditable || this.isUpdated
-        ? this.editableDashboardReports
+      return this.isEditing
+        ? this.editableReports
         : this.activeDashboardReportsWithQueryResults
     }
   },
   watch: {
-    isEditable() {
-      if (this.isEditable) {
-        this.editableDashboardReports = []
+    isEditing() {
+      if (this.isEditing) {
+        this.editableReports = []
 
         this.activeDashboardReportsWithQueryResults.forEach(report => {
-          this.editableDashboardReports.push(report)
+          this.editableReports.push(report)
         })
+      } else {
+        this.editableReports = []
+        this.reportsChanged = false
       }
     }
   },
@@ -62,39 +65,38 @@ export default {
       'updateDashboard'
     ]),
     ...mapActions('orchestration', ['getPipelineSchedules']),
-    updateDashboardReportPositions() {
-      if (this.isUpdated) {
+    updateDashboardReports() {
+      if (this.reportsChanged) {
+        const changedReports = this.editableReports
         this.updateDashboard({
           dashboard: this.activeDashboard,
           newSettings: {
             ...this.activeDashboard,
-            reportIds: this.editableDashboardReports.map(report => {
-              return report.id
-            })
+            reportIds: changedReports.map(report => report.id)
           }
         })
           .then(() => {
-            this.updateActiveDashboardReportsWithQueryResults(
-              this.editableDashboardReports
-            )
-            Vue.toasted.global.success(
-              `Dashboard reports order successfully saved!`
-            )
+            this.updateActiveDashboardReportsWithQueryResults(changedReports)
+            this.isEditing = false
+
+            Vue.toasted.global.success('Dashboard reports successfully saved!')
           })
           .catch(error => {
             Vue.toasted.global.error(
-              `Dashboard reports order did not save correctly - ${error}`
+              `Dashboard reports did not save correctly - ${error}`
             )
           })
       }
-
-      this.isEditable = !this.isEditable
     },
-    updateReportPosition({ isUpdated, oldPosition, newPosition }) {
-      const report = this.editableDashboardReports[oldPosition]
-      this.editableDashboardReports.splice(oldPosition, 1)
-      this.editableDashboardReports.splice(newPosition, 0, report)
-      this.isUpdated = isUpdated
+    updateReportIndex({ oldIndex, newIndex }) {
+      const report = this.editableReports[oldIndex]
+      this.editableReports.splice(oldIndex, 1)
+      this.editableReports.splice(newIndex, 0, report)
+      this.reportsChanged = true
+    },
+    removeReport(index) {
+      this.editableReports.splice(index, 1)
+      this.reportsChanged = true
     }
   }
 }
@@ -112,19 +114,23 @@ export default {
             </h3>
           </div>
           <div class="column">
-            <div v-if="isEditable" class="buttons is-right">
-              <button class="button" @click="updateDashboardReportPositions">
+            <div v-if="isEditing" class="buttons is-right">
+              <button
+                class="button is-interactive-primary"
+                :disabled="!reportsChanged"
+                @click="updateDashboardReports"
+              >
                 Save
               </button>
-              <button class="button" @click="isEditable = !isEditable">
+              <button class="button" @click="isEditing = !isEditing">
                 Cancel
               </button>
             </div>
             <div v-else class="buttons is-pulled-right">
               <button
-                v-if="!isEditable"
+                v-if="!isEditing"
                 class="button"
-                @click="isEditable = !isEditable"
+                @click="isEditing = !isEditing"
               >
                 Edit
               </button>
@@ -142,8 +148,9 @@ export default {
             :key="`${report.id}-${index}`"
             :report="report"
             :index="index"
-            :edit="isEditable"
-            @update-report-position="updateReportPosition"
+            :is-editing="isEditing"
+            @update-report-index="updateReportIndex"
+            @remove-from-dashboard="removeReport"
           />
         </div>
 
