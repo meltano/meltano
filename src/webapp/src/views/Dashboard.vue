@@ -30,7 +30,7 @@ export default {
       'reports'
     ]),
     displayedReports() {
-      return this.isEditing || this.reportsChanged
+      return this.isEditing
         ? this.editableReports
         : this.activeDashboardReportsWithQueryResults
     }
@@ -43,6 +43,9 @@ export default {
         this.activeDashboardReportsWithQueryResults.forEach(report => {
           this.editableReports.push(report)
         })
+      } else {
+        this.editableReports = []
+        this.reportsChanged = false
       }
     }
   },
@@ -62,36 +65,37 @@ export default {
       'updateDashboard'
     ]),
     ...mapActions('orchestration', ['getPipelineSchedules']),
-    updateDashboardReportIndexes() {
+    updateDashboardReports() {
       if (this.reportsChanged) {
+        const changedReports = this.editableReports
         this.updateDashboard({
           dashboard: this.activeDashboard,
           newSettings: {
             ...this.activeDashboard,
-            reportIds: this.editableReports.map(report => report.id)
+            reportIds: changedReports.map(report => report.id)
           }
         })
           .then(() => {
-            this.updateActiveDashboardReportsWithQueryResults(
-              this.editableReports
-            )
-            Vue.toasted.global.success(
-              `Dashboard reports order successfully saved!`
-            )
+            this.updateActiveDashboardReportsWithQueryResults(changedReports)
+            this.isEditing = false
+
+            Vue.toasted.global.success('Dashboard reports successfully saved!')
           })
           .catch(error => {
             Vue.toasted.global.error(
-              `Dashboard reports order did not save correctly - ${error}`
+              `Dashboard reports did not save correctly - ${error}`
             )
           })
       }
-
-      this.isEditing = !this.isEditing
     },
     updateReportIndex({ oldIndex, newIndex }) {
       const report = this.editableReports[oldIndex]
       this.editableReports.splice(oldIndex, 1)
       this.editableReports.splice(newIndex, 0, report)
+      this.reportsChanged = true
+    },
+    removeReport(index) {
+      this.editableReports.splice(index, 1)
       this.reportsChanged = true
     }
   }
@@ -111,7 +115,11 @@ export default {
           </div>
           <div class="column">
             <div v-if="isEditing" class="buttons is-right">
-              <button class="button" @click="updateDashboardReportIndexes">
+              <button
+                class="button is-interactive-primary"
+                :disabled="!reportsChanged"
+                @click="updateDashboardReports"
+              >
                 Save
               </button>
               <button class="button" @click="isEditing = !isEditing">
@@ -142,6 +150,7 @@ export default {
             :index="index"
             :is-editing="isEditing"
             @update-report-index="updateReportIndex"
+            @remove-from-dashboard="removeReport"
           />
         </div>
 
