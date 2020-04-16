@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [!1611](https://gitlab.com/meltano/meltano/-/merge_requests/1611) Only show design description if it is different from design label
+
 ### Fixes
 
 ### Breaks
