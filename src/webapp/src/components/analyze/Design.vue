@@ -799,7 +799,6 @@ export default {
                       :attribute="column"
                       :attribute-type="getAttributeTypeColumn"
                       :design="design"
-                      :is-disabled="Boolean(column.required)"
                       @attribute-selected="attributeSelected(column)"
                       @calendar-click="jumpToDateFilters(column)"
                       @filter-click="jumpToFilters"
@@ -903,7 +902,6 @@ export default {
                           :attribute="column"
                           :attribute-type="getAttributeTypeColumn"
                           :design="join"
-                          :is-disabled="Boolean(column.required)"
                           @attribute-selected="
                             joinAttributeSelected(join, column)
                           "
