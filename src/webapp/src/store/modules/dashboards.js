@@ -164,6 +164,7 @@ const actions = {
   updateDashboard({ commit }, payload) {
     return dashboardsApi.updateDashboard(payload).then(response => {
       commit('setDashboard', response.data)
+      commit('setActiveDashboard', response.data)
     })
   }
 }

@@ -2,6 +2,7 @@
 import { mapActions, mapState } from 'vuex'
 import Vue from 'vue'
 
+import CreateDashboardModal from '@/components/dashboards/CreateDashboardModal'
 import EmbedShareButton from '@/components/generic/EmbedShareButton'
 import Report from '@/components/Report'
 import RouterViewLayout from '@/views/RouterViewLayout'
@@ -9,12 +10,14 @@ import RouterViewLayout from '@/views/RouterViewLayout'
 export default {
   name: 'Dashboard',
   components: {
+    CreateDashboardModal,
     EmbedShareButton,
     Report,
     RouterViewLayout
   },
   data() {
     return {
+      isEditModalOpen: false,
       editableReports: [],
       isEditing: false,
       reportsChanged: false
@@ -65,6 +68,12 @@ export default {
       'updateDashboard'
     ]),
     ...mapActions('orchestration', ['getPipelineSchedules']),
+    openEditModal() {
+      this.isEditModalOpen = true
+    },
+    closeEditModal() {
+      this.isEditModalOpen = false
+    },
     updateDashboardReports() {
       if (this.reportsChanged) {
         const changedReports = this.editableReports
@@ -108,7 +117,17 @@ export default {
       <section>
         <div class="columns is-vcentered">
           <div class="column">
-            <h2 class="title">{{ activeDashboard.name }}</h2>
+            <h2 class="title">
+              {{ activeDashboard.name }}
+
+              <button
+                v-show="isEditing"
+                class="button is-small"
+                @click="openEditModal"
+              >
+                <font-awesome-icon icon="edit"></font-awesome-icon>
+              </button>
+            </h2>
             <h3 v-if="activeDashboard.description" class="subtitle">
               {{ activeDashboard.description }}
             </h3>
@@ -168,8 +187,20 @@ export default {
           </div>
         </div>
       </section>
+
+      <CreateDashboardModal
+        v-if="isEditModalOpen"
+        :dashboard="activeDashboard"
+        @close="closeEditModal"
+      />
     </div>
   </router-view-layout>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+h2.title {
+  button {
+    vertical-align: bottom;
+  }
+}
+</style>
