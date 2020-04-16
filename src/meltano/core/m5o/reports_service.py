@@ -5,6 +5,7 @@ from meltano.core.utils import slugify
 
 from .m5o_collection_parser import M5oCollectionParser, M5oCollectionParserTypes
 from .m5o_file_parser import MeltanoAnalysisFileParser
+from .dashboards_service import DashboardsService
 
 
 class ReportAlreadyExistsError(Exception):
@@ -17,6 +18,13 @@ class ReportAlreadyExistsError(Exception):
     @property
     def record(self):
         return self.report
+
+
+class ReportDoesNotExistError(Exception):
+    """Occurs when a report does not exist."""
+
+    def __init__(self, report):
+        self.report = report
 
 
 class ReportsService:
@@ -59,6 +67,19 @@ class ReportsService:
 
         with file_path.open("w") as f:
             json.dump(data, f)
+
+        return data
+
+    def delete_report(self, data):
+        report = self.get_report(data["id"])
+        slug = report["slug"]
+        file_path = self.project.analyze_dir("reports", f"{slug}.report.m5o")
+        if not os.path.exists(file_path):
+            raise ReportDoesNotExistError(data)
+
+        DashboardsService(self.project).remove_report_from_dashboards(report["id"])
+
+        os.remove(file_path)
 
         return data
 
