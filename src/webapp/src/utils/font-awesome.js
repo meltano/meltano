@@ -25,6 +25,7 @@ import {
   faDatabase,
   faDotCircle,
   faDraftingCompass,
+  faEdit,
   faEnvelope,
   faExclamationTriangle,
   faExternalLinkSquareAlt,
@@ -89,6 +90,7 @@ export default {
     library.add(faDatabase)
     library.add(faDotCircle)
     library.add(faDraftingCompass)
+    library.add(faEdit)
     library.add(faEnvelope)
     library.add(faExclamationTriangle)
     library.add(faExternalLinkSquareAlt)
