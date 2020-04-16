@@ -40,7 +40,7 @@ export default {
       this.$router.push({ name: 'dashboard', params: dashboard })
     },
     openCreateDashboardModal() {
-      this.isCreateDashboardModalOpen = open
+      this.isCreateDashboardModalOpen = true
     },
     removeDashboard(dashboard) {
       this.deleteDashboard(dashboard)

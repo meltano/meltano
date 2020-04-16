@@ -35,15 +35,17 @@ const actions = {
       .getReports()
       .then(response => commit('setReports', response.data))
   },
-  deleteReport({ commit }, report) {
+  deleteReport({ commit, dispatch }, report) {
     let status = {
       report,
       isDeleting: true
     }
     commit('setReportStatus', status)
 
-    return reportsApi
-      .deleteReport(report)
+    return dispatch('dashboards/removeReportFromDashboards', report.id, {
+      root: true
+    })
+      .then(() => reportsApi.deleteReport(report))
       .then(() => {
         return commit('deleteReport', report)
       })
