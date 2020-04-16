@@ -371,6 +371,20 @@ const actions = {
     }
   },
 
+  deleteReport({ commit, dispatch, state }) {
+    return dispatch(
+      'dashboards/removeReportFromDashboards',
+      state.activeReport.id,
+      { root: true }
+    )
+      .then(() =>
+        dispatch('reports/deleteReport', state.activeReport, {
+          root: true
+        })
+      )
+      .then(() => commit('setCurrentReport', null))
+  },
+
   expandJoinRow({ commit }, join) {
     // already fetched columns
     commit('toggleCollapsed', join)
@@ -826,15 +840,19 @@ const mutations = {
   },
 
   setCurrentReport(state, report) {
-    state.activeReport = report
-    state.chartType = report.chartType
-    state.limit = report.queryPayload.limit
+    if (report) {
+      state.activeReport = report
+      state.chartType = report.chartType
+      state.limit = report.queryPayload.limit
 
-    // state.{order,filters} is now set based on
-    // report.queryPayload.{order,filters}, not
-    // report.{order,filters}
-    delete report.order
-    delete report.filters
+      // state.{order,filters} is now set based on
+      // report.queryPayload.{order,filters}, not
+      // report.{order,filters}
+      delete report.order
+      delete report.filters
+    } else {
+      state.activeReport = {}
+    }
   },
 
   setDesign(state, designData) {

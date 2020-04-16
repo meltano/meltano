@@ -367,6 +367,12 @@ export default {
       this.$store.dispatch('designs/updateReport').then(() => {
         Vue.toasted.global.success(`Report Updated - ${this.activeReport.name}`)
       })
+    },
+    deleteReport() {
+      const name = this.activeReport.name
+      this.$store.dispatch('designs/deleteReport').then(() => {
+        Vue.toasted.global.success(`Report Deleted - ${name}`)
+      })
     }
   }
 }
@@ -393,12 +399,52 @@ export default {
 
       <div class="column">
         <div class="field is-grouped is-grouped-right">
+          <div v-if="hasActiveReport" class="control">
+            <Dropdown
+              :button-classes="
+                `is-danger ${activeReport.isDeleting ? 'is-loading' : ''}`
+              "
+              :disabled="activeReport.isDeleting"
+              :tooltip="{
+                classes: 'is-tooltip-left',
+                message: 'Delete this report'
+              }"
+              menu-classes="dropdown-menu-300"
+              icon-open="trash-alt"
+              icon-close="caret-up"
+              is-right-aligned
+            >
+              <div class="dropdown-content is-unselectable">
+                <div class="dropdown-item">
+                  <div class="content">
+                    <p>
+                      Are you sure you want to delete this report and remove it
+                      from all dashboards it appears on?
+                    </p>
+                  </div>
+                  <div class="buttons is-right">
+                    <button class="button is-text" data-dropdown-auto-close>
+                      Cancel
+                    </button>
+                    <button
+                      class="button is-danger"
+                      data-dropdown-auto-close
+                      @click="deleteReport"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Dropdown>
+          </div>
+
           <div
             class="control field"
             :class="{ 'has-addons': hasActiveReport }"
             data-test-id="dropdown-save-report"
           >
-            <p class="control">
+            <div class="control">
               <button
                 v-if="hasActiveReport"
                 class="button is-interactive-primary"
@@ -407,8 +453,8 @@ export default {
               >
                 <span>Save Report</span>
               </button>
-            </p>
-            <p class="control">
+            </div>
+            <div class="control">
               <Dropdown
                 :disabled="!hasChartableResults"
                 :label="hasActiveReport ? '' : 'Save Report'"
@@ -469,7 +515,7 @@ export default {
                   </template>
                 </div>
               </Dropdown>
-            </p>
+            </div>
           </div>
         </div>
         <div class="field is-grouped is-grouped-right">
@@ -480,7 +526,7 @@ export default {
           >
             <Dropdown
               label="Add to Dashboard"
-              :disabled="!hasChartableResults || !hasActiveReport"
+              :disabled="!hasActiveReport"
               button-classes="is-small"
               is-right-aligned
             >
