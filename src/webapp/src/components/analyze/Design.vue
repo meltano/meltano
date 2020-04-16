@@ -387,22 +387,12 @@ export default {
               }}</span
             >
             <span v-if="design.description"> - {{ design.description }}</span>
-            <br />
-            <span class="has-text-grey is-size-7">
-              Data starting from: {{ dataStartDate }}
-            </span>
           </p>
         </div>
       </div>
 
       <div class="column">
         <div class="field is-grouped is-grouped-right">
-          <p v-if="getDateAttributes.length" class="control">
-            <DateRangePicker
-              :attributes="getDateAttributes"
-              :filters="filters"
-            />
-          </p>
           <div
             class="control field"
             :class="{ 'has-addons': hasActiveReport }"
@@ -940,11 +930,20 @@ export default {
                 >
               </h2>
               <div class="has-text-grey is-size-7">
+                Data set start date: {{ dataStartDate }}
+                <br />
                 Last updated: {{ dataLastUpdatedDate }}
               </div>
             </div>
             <div class="column">
               <div class="field is-grouped is-grouped-right">
+                <div v-if="getDateAttributes.length" class="control">
+                  <DateRangePicker
+                    :attributes="getDateAttributes"
+                    :filters="filters"
+                  />
+                </div>
+
                 <ChartTypePicker
                   :chart-type="chartType"
                   @chart-type-change="setChartType"
