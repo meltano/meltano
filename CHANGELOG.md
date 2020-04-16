@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1948](https://gitlab.com/meltano/meltano/-/issues/1948) Show Intercom button in bottom right on MeltanoData.com instances
 - [#1930](https://gitlab.com/meltano/meltano/-/issues/1930) Add button to remove report from dashboard when editing dashboard
 - [#1845](https://gitlab.com/meltano/meltano/-/issues/1845) Add button to delete report to report builder interface
+- [#1849](https://gitlab.com/meltano/meltano/-/issues/1849) Add button to rename report to report builder interface
 
 ### Changes
 

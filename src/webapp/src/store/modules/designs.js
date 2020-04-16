@@ -648,14 +648,18 @@ const actions = {
     commit('toggleSelected', timeframe)
   },
 
-  updateReport({ commit, dispatch, rootGetters, state }) {
+  updateReport({ commit, dispatch, rootGetters, state }, payload) {
     commit('updateActiveReport')
-    return dispatch('reports/updateReport', state.activeReport, {
-      root: true
-    }).then(response => {
-      const report = rootGetters['reports/getReportById'](response.data.id)
-      commit('setCurrentReport', report)
-    })
+    const postData = {
+      ...state.activeReport,
+      ...payload
+    }
+    return dispatch('reports/updateReport', postData, { root: true }).then(
+      response => {
+        const report = rootGetters['reports/getReportById'](response.data.id)
+        return commit('setCurrentReport', report)
+      }
+    )
   },
 
   updateSortAttribute({ commit, dispatch, getters }, queryAttribute) {

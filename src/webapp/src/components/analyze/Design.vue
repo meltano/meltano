@@ -363,8 +363,11 @@ export default {
       return hasRequireds
     },
 
-    updateReport() {
-      this.$store.dispatch('designs/updateReport').then(() => {
+    updateReportName() {
+      this.updateReport(this.saveReportSettings)
+    },
+    updateReport(payload) {
+      this.$store.dispatch('designs/updateReport', payload).then(() => {
         Vue.toasted.global.success(`Report Updated - ${this.activeReport.name}`)
       })
     },
@@ -385,6 +388,46 @@ export default {
         <div class="is-grouped">
           <h2 :class="{ 'is-italic': !hasActiveReport }" class="title">
             {{ hasActiveReport ? activeReport.name : 'Untitled Report' }}
+            <Dropdown
+              v-if="hasActiveReport"
+              button-classes="is-small"
+              menu-classes="dropdown-menu-300"
+              icon-open="edit"
+              icon-close="caret-up"
+              is-right-aligned
+              @dropdown:open="setReportName(activeReport.name)"
+            >
+              <div class="dropdown-content">
+                <div class="dropdown-item">
+                  <div class="field">
+                    <label class="label">Change name to</label>
+                    <div class="control">
+                      <input
+                        :value="saveReportSettings.name"
+                        class="input"
+                        type="text"
+                        placeholder="Name your report"
+                        @input="setReportName($event.target.value)"
+                      />
+                    </div>
+                  </div>
+                  <div class="buttons is-right">
+                    <button class="button is-text" data-dropdown-auto-close>
+                      Cancel
+                    </button>
+                    <button
+                      data-test-id="button-save-report"
+                      class="button"
+                      :disabled="!saveReportSettings.name"
+                      data-dropdown-auto-close
+                      @click="updateReportName"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Dropdown>
           </h2>
           <h3 class="subtitle">
             Report Builder:
@@ -456,8 +499,15 @@ export default {
                 :disabled="!hasChartableResults"
                 :label="hasActiveReport ? '' : 'Save Report'"
                 button-classes="is-interactive-primary"
+                menu-classes="dropdown-menu-300"
                 is-right-aligned
-                @dropdown:open="setReportName(`report-${new Date().getTime()}`)"
+                @dropdown:open="
+                  setReportName(
+                    hasActiveReport
+                      ? `Copy of ${activeReport.name}`
+                      : `report-${new Date().getTime()}`
+                  )
+                "
               >
                 <div class="dropdown-content">
                   <div class="dropdown-item">
@@ -490,26 +540,6 @@ export default {
                       </button>
                     </div>
                   </div>
-                  <template v-if="reports.length">
-                    <hr class="dropdown-divider" />
-                    <div class="dropdown-item">
-                      <div class="field">
-                        <label class="label">Load Report</label>
-                      </div>
-                    </div>
-                    <a
-                      v-for="report in reports"
-                      :key="report.name"
-                      :class="{
-                        'is-active': activeReport.id === report.id
-                      }"
-                      class="dropdown-item"
-                      data-dropdown-auto-close
-                      @click="changeReport(report)"
-                    >
-                      {{ report.name }}
-                    </a>
-                  </template>
                 </div>
               </Dropdown>
             </div>
@@ -1093,6 +1123,12 @@ export default {
 // Temporary hack due to Bulma specificity
 .title.mb-05r {
   margin-bottom: 0.5rem;
+}
+
+h2.title {
+  .dropdown-trigger > button {
+    vertical-align: bottom;
+  }
 }
 
 textarea {
