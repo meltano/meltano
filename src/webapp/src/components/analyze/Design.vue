@@ -434,7 +434,15 @@ export default {
             <span class="has-text-weight-bold">{{ design.label }}</span>
           </h3>
         </div>
-        <p v-if="design.description">{{ design.description }}</p>
+        <p
+          v-if="
+            design.description &&
+              design.description.length &&
+              design.description != design.label
+          "
+        >
+          {{ design.description }}
+        </p>
       </div>
 
       <div class="column">
@@ -799,7 +807,6 @@ export default {
                       :attribute="column"
                       :attribute-type="getAttributeTypeColumn"
                       :design="design"
-                      :is-disabled="Boolean(column.required)"
                       @attribute-selected="attributeSelected(column)"
                       @calendar-click="jumpToDateFilters(column)"
                       @filter-click="jumpToFilters"
@@ -903,7 +910,6 @@ export default {
                           :attribute="column"
                           :attribute-type="getAttributeTypeColumn"
                           :design="join"
-                          :is-disabled="Boolean(column.required)"
                           @attribute-selected="
                             joinAttributeSelected(join, column)
                           "

@@ -258,7 +258,13 @@ export default {
               >
                 <div>
                   <strong>{{ design.label }}</strong>
-                  <template v-if="design.description">
+                  <template
+                    v-if="
+                      design.description &&
+                        design.description.length &&
+                        design.description != design.label
+                    "
+                  >
                     <br />
                     <small>{{ design.description }}</small>
                   </template>

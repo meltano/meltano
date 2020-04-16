@@ -14,8 +14,7 @@ export default {
       required: true,
       validator: value => Object.values(QUERY_ATTRIBUTE_TYPES).includes(value)
     },
-    design: { type: Object, required: true }, // The base table's design or the design of a join table (`.name` and `.relatedTable` use)
-    isDisabled: { type: Boolean, required: false }
+    design: { type: Object, required: true } // The base table's design or the design of a join table (`.name` and `.relatedTable` use)
   },
   computed: {
     ...mapGetters('designs', ['getIsAttributeInFilters', 'getIsDateAttribute']),
@@ -23,6 +22,21 @@ export default {
       return (
         this.getIsTimeframe && lodash.some(this.attribute.periods, selected)
       )
+    },
+    hasTooltip() {
+      return (
+        this.attribute.required ||
+        (this.attribute.description &&
+          this.attribute.description.length &&
+          this.attribute.description != this.attribute.label)
+      )
+    },
+    tooltip() {
+      if (this.attribute.required) {
+        return 'This column is required to generate the intended results'
+      } else {
+        return this.attribute.description
+      }
     },
     getIsActive() {
       return this.getIsTimeframe
@@ -67,10 +81,10 @@ export default {
     class="panel-block panel-block-button button is-small is-fullwidth space-between has-text-weight-medium"
     :class="{
       'is-active': getIsActive,
-      'tooltip is-tooltip-right': attribute.required
+      'tooltip is-tooltip-right is-tooltip-multiline': hasTooltip
     }"
-    data-tooltip="This column is required to generate the intended results"
-    :disabled="isDisabled"
+    :data-tooltip="tooltip"
+    :disabled="attribute.required"
     @click="onAttributeSelected"
   >
     <!-- Left side of space-between -->
@@ -90,7 +104,7 @@ export default {
       <!-- Column or Aggregate -->
       <template v-else>
         <!-- Disabled -->
-        <div v-if="isDisabled" class="mr-05r">
+        <div v-if="attribute.required" class="mr-05r">
           <span class="icon">
             <font-awesome-icon icon="lock"></font-awesome-icon>
           </span>

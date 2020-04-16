@@ -10,7 +10,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1953](https://gitlab.com/meltano/meltano/-/issues/1953) Show design attribute descriptions in tooltips in report builder
+
 ### Changes
+
+- [!1611](https://gitlab.com/meltano/meltano/-/merge_requests/1611) Only show design description if it is different from design label
 
 ### Fixes
 
