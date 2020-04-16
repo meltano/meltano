@@ -372,17 +372,9 @@ const actions = {
   },
 
   deleteReport({ commit, dispatch, state }) {
-    return dispatch(
-      'dashboards/removeReportFromDashboards',
-      state.activeReport.id,
-      { root: true }
-    )
-      .then(() =>
-        dispatch('reports/deleteReport', state.activeReport, {
-          root: true
-        })
-      )
-      .then(() => commit('setCurrentReport', null))
+    return dispatch('reports/deleteReport', state.activeReport, {
+      root: true
+    }).then(() => commit('setCurrentReport', null))
   },
 
   expandJoinRow({ commit }, join) {
