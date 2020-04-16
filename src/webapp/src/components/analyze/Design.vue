@@ -383,18 +383,15 @@ export default {
     <div class="columns is-vcentered v-min-4-5r">
       <div class="column">
         <div class="is-grouped">
-          <h2 class="title">Report Builder</h2>
-          <p class="subtitle">
-            <span
-              :class="{ 'is-italic': !hasActiveReport }"
-              class="has-text-weight-bold"
-              >{{
-                hasActiveReport ? activeReport.name : 'Untitled Report'
-              }}</span
-            >
-            <span v-if="design.description"> - {{ design.description }}</span>
-          </p>
+          <h2 :class="{ 'is-italic': !hasActiveReport }" class="title">
+            {{ hasActiveReport ? activeReport.name : 'Untitled Report' }}
+          </h2>
+          <h3 class="subtitle">
+            Report Builder:
+            <span class="has-text-weight-bold">{{ design.label }}</span>
+          </h3>
         </div>
+        <p v-if="design.description">{{ design.description }}</p>
       </div>
 
       <div class="column">

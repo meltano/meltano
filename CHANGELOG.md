@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [!1607](https://gitlab.com/meltano/meltano/-/merge_requests/1607) Move date range picker into results area of report builder interface
+- [!1608](https://gitlab.com/meltano/meltano/-/merge_requests/1608) Make report title more prominent in report builder
 
 ### Fixes
 
