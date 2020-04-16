@@ -148,3 +148,9 @@ class DashboardsService:
                 json.dump(dashboard, f)
 
         return dashboard
+
+    def remove_report_from_dashboards(self, report_id):
+        for dashboard in self.get_dashboards():
+            self.remove_report_from_dashboard(
+                {"dashboard_id": dashboard["id"], "report_id": report_id}
+            )

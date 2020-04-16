@@ -2,6 +2,10 @@ import axios from 'axios'
 import utils from '@/utils/utils'
 
 export default {
+  deleteReport(report) {
+    return axios.delete(utils.apiUrl('reports', 'delete'), { data: report })
+  },
+
   getReports() {
     return axios.get(utils.apiUrl('reports'))
   },

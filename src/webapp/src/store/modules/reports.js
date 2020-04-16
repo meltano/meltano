@@ -35,6 +35,22 @@ const actions = {
       .getReports()
       .then(response => commit('setReports', response.data))
   },
+  deleteReport({ commit }, report) {
+    let status = {
+      report,
+      isDeleting: true
+    }
+    commit('setReportStatus', status)
+
+    return reportsApi
+      .deleteReport(report)
+      .then(() => {
+        return commit('deleteReport', report)
+      })
+      .finally(() => {
+        commit('setReportStatus', Object.assign(status, { isDeleting: false }))
+      })
+  },
   saveReport({ commit }, payload) {
     return reportsApi.saveReport(payload).then(response => {
       commit('addReport', response.data)
@@ -58,6 +74,10 @@ const mutations = {
   addReport(state, report) {
     state.reports.push(report)
   },
+  deleteReport(state, report) {
+    const idx = state.reports.indexOf(report)
+    Vue.delete(state.reports, idx)
+  },
   resetSaveReportSettings(state) {
     state.saveReportSettings = { name: null }
   },
@@ -68,6 +88,10 @@ const mutations = {
   },
   setReports(state, reports) {
     state.reports = reports
+  },
+
+  setReportStatus(_, { report, isDeleting = false }) {
+    Vue.set(report, 'isDeleting', isDeleting)
   },
   setSaveReportSettingsName(state, name) {
     state.saveReportSettings.name = name

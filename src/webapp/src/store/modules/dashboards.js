@@ -106,6 +106,21 @@ const actions = {
     })
   },
 
+  removeReportFromDashboards({ state, dispatch }, reportId) {
+    let promises = []
+    state.dashboards.forEach(dashboard => {
+      if (dashboard.reportIds.includes(reportId)) {
+        promises.push(
+          dispatch('removeReportFromDashboard', {
+            reportId,
+            dashboardId: dashboard.id
+          })
+        )
+      }
+    })
+    return Promise.all(promises)
+  },
+
   reorderDashboardReports({ dispatch }, payload) {
     dashboardsApi.reorderDashboardReports(payload).then(response => {
       dispatch('updateActiveDashboard', response.data)

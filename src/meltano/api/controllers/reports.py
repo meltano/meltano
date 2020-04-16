@@ -4,7 +4,11 @@ from flask import jsonify, request
 from .errors import InvalidFileNameError
 
 from meltano.core.project import Project
-from meltano.core.m5o.reports_service import ReportAlreadyExistsError, ReportsService
+from meltano.core.m5o.reports_service import (
+    ReportAlreadyExistsError,
+    ReportDoesNotExistError,
+    ReportsService,
+)
 
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin, Need
@@ -43,6 +47,15 @@ def _handle(ex):
     )
 
 
+@reportsBP.errorhandler(ReportDoesNotExistError)
+def _handle(ex):
+    report_name = ex.report["name"]
+    return (
+        jsonify({"error": True, "code": f"The report '{report_name}' does not exist."}),
+        404,
+    )
+
+
 @reportsBP.errorhandler(InvalidFileNameError)
 def _handle(ex):
     return (
@@ -67,6 +80,14 @@ def index():
 def save_report():
     post_data = request.get_json()
     response_data = reports_service().save_report(post_data)
+    return jsonify(response_data)
+
+
+@reportsBP.route("/delete", methods=["DELETE"])
+@roles_required("admin")
+def delete_report():
+    post_data = request.get_json()
+    response_data = reports_service().delete_report(post_data)
     return jsonify(response_data)
 
 
