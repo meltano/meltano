@@ -535,11 +535,24 @@ extractors:
     namespace: tap_shopify
     hidden: true
     docs: 'https://meltano.com/plugins/extractors/shopify.html'
-    pip_url: tap-shopify==1.1.17
+    pip_url: tap-shopify==1.2.0
     capabilities:
       - catalog
       - discover
       - state
+    select:
+      # Select everything except for `metafields.*`.
+      # Selecting `*.*` and `!metafields.*` doesn't work because `*.*` takes
+      # precedence at the stream level, so we would still get `metafields.id`
+      # and `metafields.updated_at` since these are `inclusion: available`
+      - abandoned_checkouts.*
+      - collects.*
+      - custom_collections.*
+      - customers.*
+      - order_refunds.*
+      - orders.*
+      - products.*
+      - transactions.*
     settings:
       - name: api_key
         label: API key
@@ -725,6 +738,11 @@ transforms:
     pip_url: 'https://gitlab.com/meltano/dbt-tap-google-analytics.git'
     vars:
       schema: "{{ env_var('MELTANO_LOAD_SCHEMA') }}"
+  - name: tap-shopify
+    namespace: tap_shopify
+    pip_url: 'https://gitlab.com/meltano/dbt-tap-shopify.git'
+    vars:
+      schema: "{{ env_var('MELTANO_LOAD_SCHEMA') }}"
 models:
   - name: model-adwords
     namespace: tap_adwords
@@ -756,6 +774,9 @@ models:
   - name: model-google-analytics
     namespace: tap_google_analytics
     pip_url: 'git+https://gitlab.com/meltano/model-google-analytics.git'
+  - name: model-shopify
+    namespace: tap_shopify
+    pip_url: 'git+https://gitlab.com/meltano/model-shopify.git'
 dashboards:
   - name: dashboard-adwords
     namespace: tap_adwords
@@ -772,6 +793,9 @@ dashboards:
   - name: dashboard-stripe
     namespace: tap_stripe
     pip_url: 'git+https://gitlab.com/meltano/dashboard-stripe.git'
+  - name: dashboard-shopify
+    namespace: tap_shopify
+    pip_url: 'git+https://gitlab.com/meltano/dashboard-shopify.git'
 orchestrators:
   - name: airflow
     namespace: airflow
