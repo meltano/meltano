@@ -12,6 +12,7 @@ Hosted Meltano accounts currently support extracting data from:
 * [Google Ads](/plugins/extractors/adwords.html)
 * [Google Analytics](/plugins/extractors/google-analytics.html)
 * [Salesforce](/plugins/extractors/salesforce.html)
+* [Shopify](/plugins/extractors/shopify.html)
 * [Stripe](/plugins/extractors/stripe.html)
 
 ::: tip

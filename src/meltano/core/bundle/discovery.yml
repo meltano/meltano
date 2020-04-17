@@ -554,13 +554,13 @@ extractors:
       - products.*
       - transactions.*
     settings:
-      - name: api_key
-        label: API key
-        kind: password
-        placeholder: Ex. *****************
       - name: shop
-        label: Shop
-        placeholder: Ex. my-first-shop
+        label: Store Subdomain
+        placeholder: Ex. my-first-store
+      - name: api_key
+        label: Private App API Password
+        kind: password
+        placeholder: Ex. shppa_1a2b3c4d5e6f
       - name: start_date
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
