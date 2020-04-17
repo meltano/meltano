@@ -40,30 +40,42 @@
         style="background-color:#fffbe4; padding-top:20px; padding-bottom:20px;"
       >
         <p class="description">
-          By bringing together data from all relevant sources,<br />
+          By bringing together data from all relevant sources<br />
+          &mdash;
+          <router-link to="/plugins/extractors/facebook.html">Facebook Ads</router-link>,
+          <router-link to="/plugins/extractors/adwords.html">Google Ads</router-link>,
+          <router-link to="/plugins/extractors/google-analytics.html">Google Analytics</router-link>,
+          <router-link to="/plugins/extractors/salesforce.html">Salesforce</router-link>,
+          <router-link to="/plugins/extractors/shopify.html">Shopify</router-link> &amp;
+          <router-link to="/plugins/extractors/stripe.html">Stripe</router-link>
+          &mdash;<br />
           Meltano unlocks <strong>high level insights</strong> you couldn't get from any individual service.
         </p>
 
         <div class="plugin-logos">
-          <a href="/plugins/extractors/facebook.html"
+          <router-link to="/plugins/extractors/facebook.html"
             ><img src="../assets/logo-facebook.png" alt="Facebook Ads Logo"
-          /></a>
+          /></router-link>
 
-          <a href="/plugins/extractors/adwords.html"
+          <router-link to="/plugins/extractors/adwords.html"
             ><img src="../assets/logo-adwords.png" alt="Google Ads Logo"
-          /></a>
+          /></router-link>
 
-          <a href="/plugins/extractors/google-analytics.html"
+          <router-link to="/plugins/extractors/google-analytics.html"
             ><img src="../assets/logo-google-analytics.png" alt="Google Analytics Logo"
-          /></a>
+          /></router-link>
 
-          <a href="/plugins/extractors/salesforce.html"
+          <router-link to="/plugins/extractors/salesforce.html"
             ><img src="../assets/logo-salesforce.png" alt="Salesforce Logo"
-          /></a>
+          /></router-link>
 
-          <a href="/plugins/extractors/stripe.html"
+          <router-link to="/plugins/extractors/shopify.html"
+            ><img src="../assets/logo-shopify.png" alt="Shopify Logo"
+          /></router-link>
+
+          <router-link to="/plugins/extractors/stripe.html"
             ><img src="../assets/logo-stripe.png" alt="Stripe Logo"
-          /></a>
+          /></router-link>
           </a>
         </div>
 
@@ -334,31 +346,30 @@ export default {
 </script>
 
 <style lang="stylus">
-@import '../styles/config.styl'
+@import '../styles/config.styl';
 
 .button {
-    display: inline-block;
-    font-size: 1.2rem;
-    color: $accentColor;
-    padding: 0.8rem 1.6rem 0.9rem;
-    border-radius: 4px;
-    transition: background-color 0.1s ease;
-    background-color: white;
-    box-sizing: border-box;
-    border: 2px solid $accentColor;
-    transition: all 0.2s ease-in;l
+  display: inline-block;
+  font-size: 1.2rem;
+  color: $accentColor;
+  padding: 0.8rem 1.6rem 0.9rem;
+  border-radius: 4px;
+  transition: background-color 0.1s ease;
+  background-color: white;
+  box-sizing: border-box;
+  border: 2px solid $accentColor;
+  transition: all 0.2s ease-in;
 
-    &:hover,
-    &:focus {
-      color: #fff;
-      background-color: $accentColor;
-    }
+  l, &:hover, &:focus {
+    color: #fff;
+    background-color: $accentColor;
+  }
 
-    &.is-purple.is-filled {
-      background-color: $purpleColor;
-      border-color: $purpleColor;
-      color: white;
-    }
+  &.is-purple.is-filled {
+    background-color: $purpleColor;
+    border-color: $purpleColor;
+    color: white;
+  }
 }
 
 .quote {
@@ -368,8 +379,8 @@ export default {
   padding-top: 5rem;
   display: block;
   margin-bottom: 1rem;
-  font-weight:400;
-  font-size:36px;
+  font-weight: 400;
+  font-size: 36px;
 }
 
 .description {
@@ -384,7 +395,7 @@ export default {
 .meltano-stages-table {
   display: block;
   margin: 1rem auto 0rem;
-  font-size:14px;
+  font-size: 14px;
   overflow: scroll;
   width: 100%;
 
@@ -404,12 +415,12 @@ export default {
 }
 
 .meltano-uses {
-  background-color:#3e3c8e;
-  width:10%;
+  background-color: #3e3c8e;
+  width: 10%;
 }
 
 .meltano-uses-secondary {
-  background-color:#5959a7;
+  background-color: #5959a7;
 }
 
 .meltano-use-row {
@@ -436,7 +447,8 @@ export default {
 }
 
 .meltano-replace-row {
-  font-size:11px;
+  font-size: 11px;
+
   td:first-child {
     background: #eee;
     font-weight: bold;
@@ -461,7 +473,7 @@ export default {
   }
 
   .button {
-    margin-bottom: .25rem;
+    margin-bottom: 0.25rem;
   }
 }
 
@@ -559,9 +571,11 @@ export default {
     padding-top: 40px;
     line-height: 1.2em;
   }
+
   .hero-left {
     max-width: 60%;
   }
+
   .hero-tagline {
     padding-right: 80px;
   }
@@ -573,100 +587,150 @@ export default {
   margin-top: 0;
 }
 
-.home
-  padding $navbarHeight 0 0
-  margin 0px auto
-  .hero
-    width 100%
-    text-align center
-    padding 0 0 4rem
-    img
-      max-width 100%
-    h1
-      font-size 3rem
-    h1, .description, .action
-      margin 1.8rem auto 0
+.home {
+  padding: $navbarHeight 0 0;
+  margin: 0px auto;
+
+  .hero {
+    width: 100%;
+    text-align: center;
+    padding: 0 0 4rem;
+
+    img {
+      max-width: 100%;
+    }
+
+    h1 {
+      font-size: 3rem;
+    }
+
+    h1, .description, .action {
+      margin: 1.8rem auto 0;
       text-align: left;
-    .description
-      max-width 35rem
-      font-size 1.6rem
-      line-height 1.3
-      color lighten($textColor, 40%)
-  .action-button
-    display inline-block
-    font-size 1.2rem
-    font-weight bold
-    color #fff
-    background-color #464ACB;
-    padding 0.8rem 1.6rem
-    border-radius 4px
-    transition background-color .2s ease
-    letter-spacing 0.1rem
-    box-sizing border-box
+    }
+
+    .description {
+      max-width: 35rem;
+      font-size: 1.6rem;
+      line-height: 1.3;
+      color: lighten($textColor, 40%);
+    }
+  }
+
+  .action-button {
+    display: inline-block;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #464ACB;
+    padding: 0.8rem 1.6rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    letter-spacing: 0.1rem;
+    box-sizing: border-box;
     margin-right: 0.4rem;
     margin-bottom: 1rem;
-    svg
-      color #fff
-    &.secondary
-      background none
-      box-shadow inset 0 0 0 2px #464ACB
-      color #464ACB
-      svg
-        color #464ACB
-      &:hover
-        background-color lighten(#464ACB, 80%)
-    &:hover
-      background-color lighten(#464ACB, 10%)
 
-  .features
-    border-top 1px solid $borderColor
-    padding 1.2rem 0
-    margin-top 2.5rem
-    display flex
-    flex-wrap wrap
-    align-items flex-start
-    align-content stretch
-    justify-content space-between
-  .feature
-    flex-grow 1
-    flex-basis 30%
-    max-width 30%
-    h2
-      font-size 1.4rem
-      font-weight 500
-      border-bottom none
-      padding-bottom 0
-      color lighten($textColor, 10%)
-    p
-      color lighten($textColor, 25%)
+    svg {
+      color: #fff;
+    }
 
-@media (max-width: $MQMobile)
-  .home
-    .features
-      flex-direction column
-    .feature
-      max-width 100%
-      padding 0 2.5rem
+    &.secondary {
+      background: none;
+      box-shadow: inset 0 0 0 2px #464ACB;
+      color: #464ACB;
 
-@media (min-width: $MQMobileNarrow)
-  .home
-    .hero
-      img
-        max-height 480px
-        display block
-        margin-right: -33px
-      h1
-        font-size 2rem
-      h1, .description, .action
-        margin 1.2rem auto 0
-      .description
-        font-size 1.2rem
-    .action-button
-      font-size 1rem
-      padding 0.6rem 1.2rem
-    .feature
-      h2
-        font-size 1.25rem
+      svg {
+        color: #464ACB;
+      }
+
+      &:hover {
+        background-color: lighten(#464ACB, 80%);
+      }
+    }
+
+    &:hover {
+      background-color: lighten(#464ACB, 10%);
+    }
+  }
+
+  .features {
+    border-top: 1px solid $borderColor;
+    padding: 1.2rem 0;
+    margin-top: 2.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: stretch;
+    justify-content: space-between;
+  }
+
+  .feature {
+    flex-grow: 1;
+    flex-basis: 30%;
+    max-width: 30%;
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 500;
+      border-bottom: none;
+      padding-bottom: 0;
+      color: lighten($textColor, 10%);
+    }
+
+    p {
+      color: lighten($textColor, 25%);
+    }
+  }
+}
+
+@media (max-width: $MQMobile) {
+  .home {
+    .features {
+      flex-direction: column;
+    }
+
+    .feature {
+      max-width: 100%;
+      padding: 0 2.5rem;
+    }
+  }
+}
+
+@media (min-width: $MQMobileNarrow) {
+  .home {
+    .hero {
+      img {
+        max-height: 480px;
+        display: block;
+        margin-right: -33px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      h1, .description, .action {
+        margin: 1.2rem auto 0;
+      }
+
+      .description {
+        font-size: 1.2rem;
+      }
+    }
+
+    .action-button {
+      font-size: 1rem;
+      padding: 0.6rem 1.2rem;
+    }
+
+    .feature {
+      h2 {
+        font-size: 1.25rem;
+      }
+    }
+  }
+}
 
 .mb0 {
   margin-bottom: 0;
@@ -700,13 +764,13 @@ export default {
 
 @media (min-width: 425px) {
   .plugin-logos {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
   }
 }
 
 @media (min-width: 768px) {
   .plugin-logos {
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
 
     img {
       max-width: 120px;
@@ -732,9 +796,11 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-conent: center;
+
   .jump-in-message {
     margin-bottom: 1.8rem;
   }
+
   .language-bash {
     padding-right: 1.5rem;
   }
@@ -751,11 +817,7 @@ export default {
   padding: 0;
   overflow: hidden;
 
-  .embed-responsive-item,
-  iframe,
-  embed,
-  object,
-  video {
+  .embed-responsive-item, iframe, embed, object, video {
     position: absolute;
     top: 0;
     bottom: 0;
