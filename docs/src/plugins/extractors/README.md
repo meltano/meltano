@@ -19,6 +19,7 @@ Meltano currently supports importing data from the following sources:
 - [Marketo](/plugins/extractors/marketo.html)
 - [MongoDB](/plugins/extractors/mongodb.html)
 - [Salesforce](/plugins/extractors/salesforce.html)
+* [Shopify](/plugins/extractors/shopify.html)
 - [Stripe](/plugins/extractors/stripe.html)
 - [Zendesk](/plugins/extractors/zendesk.html)
 
