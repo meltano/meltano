@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#1953](https://gitlab.com/meltano/meltano/-/issues/1953) Show design attribute descriptions in tooltips in report builder
+- [#1787](https://gitlab.com/meltano/meltano/-/issues/1787) Show Shopify extractor in UI
 
 ### Changes
 

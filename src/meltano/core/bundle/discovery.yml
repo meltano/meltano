@@ -377,6 +377,40 @@ extractors:
       - name: start_date
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
+  - name: tap-shopify
+    label: Shopify
+    description: Ecommerce platform
+    namespace: tap_shopify
+    docs: 'https://meltano.com/plugins/extractors/shopify.html'
+    pip_url: tap-shopify==1.2.0
+    capabilities:
+      - catalog
+      - discover
+      - state
+    select:
+      # Select everything except for `metafields.*`.
+      # Selecting `*.*` and `!metafields.*` doesn't work because `*.*` takes
+      # precedence at the stream level, so we would still get `metafields.id`
+      # and `metafields.updated_at` since these are `inclusion: available`
+      - abandoned_checkouts.*
+      - collects.*
+      - custom_collections.*
+      - customers.*
+      - order_refunds.*
+      - orders.*
+      - products.*
+      - transactions.*
+    settings:
+      - name: shop
+        label: Store Subdomain
+        placeholder: Ex. my-first-store
+      - name: api_key
+        label: Private App API Password
+        kind: password
+        placeholder: Ex. shppa_1a2b3c4d5e6f
+      - name: start_date
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+        kind: date_iso8601
   - name: tap-stripe
     label: Stripe
     description: Online payment processing for internet businesses
@@ -529,41 +563,6 @@ extractors:
         kind: password
       - name: database
         label: Database Name
-  - name: tap-shopify
-    label: Shopify
-    description: Ecommerce platform
-    namespace: tap_shopify
-    hidden: true
-    docs: 'https://meltano.com/plugins/extractors/shopify.html'
-    pip_url: tap-shopify==1.2.0
-    capabilities:
-      - catalog
-      - discover
-      - state
-    select:
-      # Select everything except for `metafields.*`.
-      # Selecting `*.*` and `!metafields.*` doesn't work because `*.*` takes
-      # precedence at the stream level, so we would still get `metafields.id`
-      # and `metafields.updated_at` since these are `inclusion: available`
-      - abandoned_checkouts.*
-      - collects.*
-      - custom_collections.*
-      - customers.*
-      - order_refunds.*
-      - orders.*
-      - products.*
-      - transactions.*
-    settings:
-      - name: api_key
-        label: API key
-        kind: password
-        placeholder: Ex. *****************
-      - name: shop
-        label: Shop
-        placeholder: Ex. my-first-shop
-      - name: start_date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-        kind: date_iso8601
   - name: tap-zendesk
     label: Zendesk
     description: Support ticketing system & customer service platform
