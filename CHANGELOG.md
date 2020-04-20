@@ -10,16 +10,24 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.30.0 - (2020-04-20)
+---
+
+### New
+
 - [#1953](https://gitlab.com/meltano/meltano/-/issues/1953) Show design attribute descriptions in tooltips in report builder
 - [#1787](https://gitlab.com/meltano/meltano/-/issues/1787) Show Shopify extractor in UI
 
 ### Changes
 
 - [!1611](https://gitlab.com/meltano/meltano/-/merge_requests/1611) Only show design description if it is different from design label
-
-### Fixes
-
-### Breaks
 
 
 ## 1.29.1 - (2020-04-16)
