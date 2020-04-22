@@ -13,7 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 ### Fixes
-- [#1985](https://gitlab.com/meltano/meltano/-/issues/1985)
+- [#1985](https://gitlab.com/meltano/meltano/-/issues/1985) Fixed bug with Airflow installs WTForms 2.3.0 instead of 2.2.1, which is incompatible
 
 ### Breaks
 
