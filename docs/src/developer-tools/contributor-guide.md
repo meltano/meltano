@@ -110,8 +110,8 @@ cd $PROJECT_NAME
 # Start the Meltano API and a production build of Meltano UI that you can ignore
 meltano ui
 
-# Open a new terminal tab and go to your meltano directory
-cd $PROJECT_NAME
+# Open a new terminal tab and go to the directory you cloned meltano into
+cd $WHEREVER_YOU_CLONED_MELTANO
 
 # Install frontend infrastructure at the root directory
 yarn setup
