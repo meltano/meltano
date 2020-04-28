@@ -27,6 +27,8 @@ module.exports = {
   },
 
   devServer: {
+    // allow the dev server to accept external requests (useful if you are not developing locally)
+    disableHostCheck: true,
     index: process.env.MELTANO_EMBED == '1' ? 'index-embed.html' : 'index.html',
     historyApiFallback: {
       verbose: true,
