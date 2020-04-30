@@ -68,16 +68,6 @@ Where `files_def.json` is the json file described in the Setup section.
 
 Check the [README](https://gitlab.com/meltano/tap-csv#run) for details.
 
-### In the Meltano UI
-
-Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data source. There will now be an additional tile for configuring your CSV extactor:
-
-![Screenshot of Meltano UI with all extractors not installed and the CSV Extractor highlighted](/images/csv-tutorial/01-csv-extractor-selection.png)
-
-On the configuration modal leave the default value for the CSV files definition location (`extract/files-def.json`) and click `Save` to finish configuring the extractor and progress to the next step: the Loaders page.
-
-![Screenshot of the CSV Extractor Configuration](/images/csv-tutorial/02-csv-configuration.png)
-
 ::: tip
 
 **Ready to do more with data from CSV files?** 
