@@ -51,11 +51,13 @@ Examples:
 
 <h3 id="access-token">Access Token</h3>
 
-::: tip Using hosted Meltano on MeltanoData.com?
+::: tip Don't feel like going through the Facebook App setup process?
 
 <p>
   <OAuthServiceLink provider="facebook">Connect your Facebook Ads account</OAuthServiceLink> to acquire this token right away.
 </p>
+
+Once you authorize Meltano to access your Facebook Ads data, Facebook will generate an access token and provide it to Meltano OAuth Service. The OAuth Service will not store or use the token, and will only display it to you once so that you can copy and paste it into your local Meltano configuration.
 :::
 
 #### Create App
