@@ -9,7 +9,6 @@ description: Use Meltano to extract raw data from numerous sources including CSV
 
 Meltano currently supports importing data from the following sources:
 
-- [Carbon Emissions Intensity](/plugins/extractors/carbon-intensity.html)
 - [Comma Separated Values (CSV)](/plugins/extractors/csv.html)
 - [Facebook Ads](/plugins/extractors/facebook.html)
 - [Fastly](/plugins/extractors/fastly.html)
