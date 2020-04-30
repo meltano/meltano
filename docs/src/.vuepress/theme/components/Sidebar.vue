@@ -1,8 +1,8 @@
 <template>
   <div class="sidebar">
-    <a href="https://meltano.typeform.com/to/NJPwxv" class="sidebar-cta">
-      Create Account
-    </a>
+    <router-link to="/docs/getting-started.html" class="sidebar-cta">
+      Install
+    </router-link>
     <NavLinks />
     <slot name="top" />
     <ul class="sidebar-links" v-if="items.length">

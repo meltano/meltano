@@ -2,8 +2,8 @@
 home: true
 heroImage: /meltano-logo.svg
 primaryAction:
-  text: Try It Out For Free!
-  link: https://meltano.typeform.com/to/NJPwxv
+  text: Get Started
+  link: /docs/getting-started.html
 secondaryAction:
   text: Live Demo
   link: https://meltano.meltanodata.com/dashboards

@@ -5,22 +5,17 @@ description: Create your first data analysis project, build a pipeline, and anal
 
 # Getting Started
 
-::: tip
-We recommend using Meltano as hosted software (SaaS), but if you'd like to use Meltano with a different data source than those listed under [Data Sources](/docs/data-sources.html), you can consider [self-hosting Meltano](/developer-tools/self-hosted-installation.md). 
+## Install Meltano
 
-Self-hosted installations require more manual set up, but support [additional data sources](/plugins/extractors/) and give you the option to [create custom extractors](/tutorials/create-a-custom-extractor.html) to pull in data from arbitrary data sources.
+Follow the steps under [Self-hosted Installation](/developer-tools/self-hosted-installation.html) to install Meltano locally or in the cloud.
 
-:::
+## Set up Meltano
 
-## Create Your Account
-
-To get your own hosted Meltano instance, [fill out the signup form](https://meltano.typeform.com/to/NJPwxv) and you'll receive an email with your login details within a few minutes.
-
-<a href="https://meltano.typeform.com/to/NJPwxv" class="button is-purple is-filled">Sign up and go from data to dashboard in minutes!</a>
+Follow the steps under [Getting Started with Meltano on the Command Line](/developer-tools/command-line-interface.html#getting-started-with-meltano-on-the-command-line) to create your first project, set up a loader, and start the UI.
 
 ## Connect Data Sources
 
-Once you've logged into Meltano, you'll begin on the **Connections** page to connect your [data sources](/docs/data-sources.html).
+Once you're inside the Meltano UI, you'll begin on the **Connections** page to connect your [data sources](/docs/data-sources.html).
 
 ![Meltano UI with all extractors not installed initial loading screen](/images/getting-started-guide/1-connections.png)
 
