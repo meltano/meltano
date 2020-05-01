@@ -25,7 +25,7 @@ const devToolsSidebar = [
 
 module.exports = {
   title: "Meltano",
-  description: "Open source data dashboarding",
+  description: "Open source data integration",
   head: [
     [
       "link",
