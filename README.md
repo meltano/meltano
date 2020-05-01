@@ -1,18 +1,14 @@
 [![pipeline status](https://gitlab.com/meltano/meltano/badges/master/pipeline.svg)](https://gitlab.com/meltano/meltano/commits/master)
 
-# Meltano
+# Meltano: Open source data integration
 
-Meltano [(www.meltano.com)](https://meltano.com/) is an open source convention-over-configuration product for the whole data lifecycle, all the way from loading data to analyzing it. It is delivered as self-hosted software which can be [installed locally or to the cloud](/developer-tools/self-hosted-installation.html).
+[Meltano](https://meltano.com) is an open source platform for building, running & orchestrating [Singer](https://www.singer.io/)-based ELT pipelines, that you can [run locally or host on any cloud](https://meltano.com/developer-tools/self-hosted-installation.html).
 
-It does [data ops](https://en.wikipedia.org/wiki/DataOps), data engineering, analytics, business intelligence, and data science. It leverages open source software and software development best practices including version control, CI, CD, and review apps.
-
-Meltano stands for the [steps of the data science life-cycle](#data-science-lifecycle): Model, Extract, Load, Transform, Analyze, Notebook, and Orchestrate.
+Use existing Singer [taps](https://meltano.com/plugins/extractors/) and [targets](https://meltano.com/plugins/loaders/) or [easily write your own](https://meltano.com/tutorials/create-a-custom-extractor.html) to extract data from any SaaS tool or database and load it into any data warehouse.
 
 ## Documentation
 
 You can find our documentation at [https://www.meltano.com/docs/](https://www.meltano.com/docs/).
-
-For more information on the source code for the docs and running it locally, you can find them in the [docs directory on this project](https://gitlab.com/meltano/meltano/tree/master/docs).
 
 ## Contributing to Meltano
 
@@ -25,5 +21,3 @@ Please refer to the [responsible disclosure policy](https://meltano.com/docs/res
 ## License
 
 This code is distributed under the MIT license, see the [LICENSE](LICENSE) file.
-
-[docker-compose]: https://docs.docker.com/compose/

@@ -1,19 +1,14 @@
 <script>
 import MainNav from '@/components/navigation/MainNav'
-import PromoBanner from '@/components/generic/PromoBanner'
 
 export default {
   name: 'App',
   components: {
-    MainNav,
-    PromoBanner
+    MainNav
   },
   computed: {
     isMeltanoDataInstance() {
       return window.location.host.indexOf('meltanodata.com') > -1
-    },
-    isMeltanoDemoSite() {
-      return window.location.host === 'meltano.meltanodata.com'
     }
   },
   created() {
@@ -43,7 +38,6 @@ export default {
 
 <template>
   <div id="app">
-    <PromoBanner v-if="isMeltanoDemoSite"></PromoBanner>
     <main-nav></main-nav>
     <router-view />
   </div>

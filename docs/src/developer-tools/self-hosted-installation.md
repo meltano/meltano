@@ -12,10 +12,6 @@ This section provides guides for getting set up with a self-hosted instance of M
 - [Docker](#installing-on-docker)
 - [Amazon Web Services (AWS)](#amazon-web-services-aws)
 
-::: tip
-Are you trying Meltano for the first time? You can skip the installation process and we'll set you up with a free 30-day trial of Meltano as a hosted service. If you decide you want to switch to self-hosted later we can clone your instance so you can take it with you. [Sign up here.](https://meltano.typeform.com/to/NJPwxv)
-:::
-
 ## Local Installation
 
 In this section, we will install Meltano as a local application on your computer that you can access from your browser and on the command line.

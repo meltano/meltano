@@ -5,7 +5,13 @@ description: Learn where to use Meltano, how Meltano is built, and where to get 
 
 # What Is Meltano?
 
-Meltano enables anyone with access to SaaS APIs and spreadsheets to generate dashboards summarizing the status of their business operations.
+Meltano is an open source platform for building, running & orchestrating [Singer](https://www.singer.io/)-based ELT pipelines, that you can [run locally or host on any cloud](/developer-tools/self-hosted-installation.html).
+
+Use existing Singer [taps](/plugins/extractors/) and [targets](/plugins/loaders/) or [easily write your own](/tutorials/create-a-custom-extractor.html) to extract data from any SaaS tool or database and load it into any data warehouse.
+
+::: warning
+The information below is out of date. It will be updated soon, as tracked in [this issue](https://gitlab.com/meltano/meltano/-/issues/1857).
+:::
 
 ## Mission
 

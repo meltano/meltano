@@ -4,15 +4,27 @@
       <div class="hero homepage-cta feature-section-wrapper">
         <div class="hero-left">
           <h2 class="hero-header" style="border-bottom:0px;">
-            Your startup sales funnel,<br /><strong>analyzed.</strong>
+            Open source data integration
           </h2>
           <p class="hero-tagline">
-            A single set of <router-link to="#default-dashboards">dashboards and reports</router-link> for the entire journey<br />
-            from <strong>ad impression</strong> to <strong>website visitor</strong> to <strong>successful sale</strong>.
+            Meltano is an
+            <a href="https://gitlab.com/meltano/meltano" target="_blank"
+              >open source</a
+            >
+            platform for building, running &amp; orchestrating
+            <a href="https://www.singer.io/" target="_blank">Singer</a>-based
+            ELT pipelines, that you can <router-link to="developer-tools/self-hosted-installation.html">run locally or host on any cloud</router-link>.
           </p>
           <p class="hero-tagline">
-            Connect your data sources and let Meltano help you figure out<br />
-            <strong>what works</strong>, what doesn’t, <strong>what to scale up</strong>, and what to ramp down.
+            Use existing Singer
+            <router-link to="/plugins/extractors/">taps</router-link> and
+            <router-link to="/plugins/loaders/">targets</router-link>
+            or
+            <router-link to="/tutorials/create-a-custom-extractor.html"
+              >easily write your own</router-link
+            >
+            to extract data from any SaaS tool or database and load it into any
+            data warehouse.
           </p>
 
           <p class="action">
@@ -28,245 +40,7 @@
           <img
             src="../assets/meltano-founder.jpg"
             alt="Happy Meltano User Says Hi"
-            width="500px"
           />
-        </div>
-      </div>
-    </div>
-
-    <div class="feature-section-wrapper">
-      <div
-        class="content-width-wide"
-        style="background-color:#fffbe4; padding-top:20px; padding-bottom:20px;"
-      >
-        <p class="description">
-          By bringing together data from all relevant sources<br />
-          &mdash;
-          <router-link to="/plugins/extractors/facebook.html">Facebook Ads</router-link>,
-          <router-link to="/plugins/extractors/adwords.html">Google Ads</router-link>,
-          <router-link to="/plugins/extractors/google-analytics.html">Google Analytics</router-link>,
-          <router-link to="/plugins/extractors/salesforce.html">Salesforce</router-link>,
-          <router-link to="/plugins/extractors/shopify.html">Shopify</router-link> &amp;
-          <router-link to="/plugins/extractors/stripe.html">Stripe</router-link>
-          &mdash;<br />
-          Meltano unlocks <strong>high level insights</strong> you couldn't get from any individual service.
-        </p>
-
-        <div class="plugin-logos">
-          <router-link to="/plugins/extractors/facebook.html"
-            ><img src="../assets/logo-facebook.png" alt="Facebook Ads Logo"
-          /></router-link>
-
-          <router-link to="/plugins/extractors/adwords.html"
-            ><img src="../assets/logo-adwords.png" alt="Google Ads Logo"
-          /></router-link>
-
-          <router-link to="/plugins/extractors/google-analytics.html"
-            ><img src="../assets/logo-google-analytics.png" alt="Google Analytics Logo"
-          /></router-link>
-
-          <router-link to="/plugins/extractors/salesforce.html"
-            ><img src="../assets/logo-salesforce.png" alt="Salesforce Logo"
-          /></router-link>
-
-          <router-link to="/plugins/extractors/shopify.html"
-            ><img src="../assets/logo-shopify.png" alt="Shopify Logo"
-          /></router-link>
-
-          <router-link to="/plugins/extractors/stripe.html"
-            ><img src="../assets/logo-stripe.png" alt="Stripe Logo"
-          /></router-link>
-          </a>
-        </div>
-
-        <p class="description ta-c">
-          If Meltano does not yet integrate with your favorite marketing or sales data source, please
-          <router-link to="/docs/getting-help.html">let us know</router-link>!
-        </p>
-
-        <p style="text-align:center; font-size:12px;">
-          <em
-            >All trademarks and logos are owned by their respective owners.</em
-          >
-        </p>
-      </div>
-    </div>
-
-    <div class="features" v-if="data.features && data.features.length">
-      <div
-        class="feature"
-        v-for="(feature, index) in data.features"
-        :key="index"
-      >
-        <h2>{{ feature.title }}</h2>
-        <p>{{ feature.details }}</p>
-      </div>
-    </div>
-
-    <section class="section" style="padding: 4rem 0" id="default-dashboards">
-      <h2 class="section__title">
-        From data to dashboard in minutes
-      </h2>
-      <p class="section__text">
-        Meltano comes out of the box with a curated set of reports and dashboards for each data source,
-        to get you from setup to insights in no time.
-      </p>
-
-      <p class="action">
-        <NavLink class="action-button" :item="$frontmatter.primaryAction" />
-        <NavLink
-          class="action-button secondary"
-          :item="$frontmatter.secondaryAction"
-        />
-      </p>
-
-      <div class="feature-section" style="margin: 30px auto">
-        <div class="feature-left" style="max-width: 50%">
-          <a href="https://meltano.meltanodata.com/dashboards/facebook-ads-daily-account-overview" target="_blank">
-            <img
-              style="max-width: 100%; margin: 0 auto; display: block;"
-              src="/screenshots/homepage/dashboard-facebook.png"
-              alt="Screenshot of Facebook Ads Dashboard"
-            />
-          </a>
-        </div>
-        <div class="feature-right" style="max-width: 50%">
-          <a href="https://meltano.meltanodata.com/dashboards/google-ads-monthly-account-overview" target="_blank">
-            <img
-              style="max-width: 100%; margin: 0 auto; display: block;"
-              src="/screenshots/homepage/dashboard-adwords.png"
-              alt="Screenshot of Google Ads Dashboard"
-            />
-          </a>
-        </div>
-      </div>
-
-      <div class="feature-section">
-        <div class="feature-left" style="max-width: 50%">
-          <a href="https://meltano.meltanodata.com/dashboards/google-analytics" target="_blank">
-            <img
-              style="max-width: 100%; margin: 0 auto; display: block;"
-              src="/screenshots/homepage/dashboard-google-analytics.png"
-              alt="Screenshot of Google Analytics Dashboard"
-            />
-          </a>
-        </div>
-        <div class="feature-right" style="max-width: 50%">
-          <a href="https://meltano.meltanodata.com/dashboards/stripe-dashboard" target="_blank">
-            <img
-              style="max-width: 100%; margin: 0 auto; display: block;"
-              src="/screenshots/homepage/dashboard-stripe.png"
-              alt="Screenshot of Stripe Dashboard"
-            />
-          </a>
-        </div>
-      </div>
-
-      <p class="description ta-c">
-        <em>
-          If the report you're looking for is not yet included with Meltano by default, <br />
-          you can build it yourself using the <router-link to="#report-builder">report builder</router-link> or
-          <router-link to="/docs/getting-help.html">let us know</router-link> and we'll build it for you!
-        </em>
-      </p>
-    </section>
-
-    <div class="feature-section-wrapper is-white" id="custom-dashboard">
-      <div class="feature-section">
-        <div class="feature-left">
-          <a href="https://meltano.meltanodata.com/dashboards/overview" target="_blank">
-            <img
-              style="max-width: 100%; margin: 0 auto; display: block;"
-              src="/screenshots/homepage/dashboard-overview.png"
-              alt="Screenshot of Overview dashboard"
-            />
-          </a>
-        </div>
-        <div class="feature-right">
-          <h2 class="section-title">
-            A dashboard for every occasion
-          </h2>
-          <p class="hero-tagline">
-            Select your favorite <router-link to="#default-dashboards">default reports</router-link> or
-            use the <router-link to="#report-builder">report builder</router-link> to create your own, 
-            and add them to a <a href="https://meltano.meltanodata.com/dashboards/overview" target="_blank">new dashboard</a>
-            to use as your homepage, <router-link to="#share-and-embed">share with your team</router-link>, or track a specific project.
-          </p>
-
-          <p class="action">
-            <NavLink class="action-button" :item="$frontmatter.primaryAction" />
-            <NavLink
-              class="action-button secondary"
-              :item="$frontmatter.secondaryAction"
-            />
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <section class="section" style="padding: 4rem 0" id="share-and-embed">
-      <h2 class="section__title">
-        Share with your team and stakeholders
-      </h2>
-      <p class="section__text">
-        Once you've set up your perfect dashboard, you can easily share it with anyone you like by generating a 
-        <a href="https://meltano.meltanodata.com/-/embed/CwFPa2ESM6OwrSjvACmc6MkasA05QWQSJ9g2yeuMMPs" target="_blank">read-only link</a>,
-        or embedding it (or any of its reports) right into your website, internal handbook, or a blog post:
-      </p>
-
-      <iframe src="https://meltano.meltanodata.com/-/embed/CwFPa2ESM6OwrSjvACmc6MkasA05QWQSJ9g2yeuMMPs" style="margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; min-width: 100%; min-height: 100vh;" />
-
-      <!-- <div class="feature-section" style="margin-top: 30px">
-        <div class="feature-left" style="max-width: 50%; width: 50%">
-          <iframe src="https://meltano.meltanodata.com/-/embed/0lzLVxW7AnWnEgIetoRIBHF2l87AVZPox8HcE3CtGiU" style="display: block; margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; width: 100%; min-height: 500px;" />
-        </div>
-        <div class="feature-right" style="max-width: 50%; width: 50%; margin-left: 10px">
-          <iframe src="https://meltano.meltanodata.com/-/embed/INfx7r6IDJNWySOMN_RiA9445k8N2Hw6VE7lfEmzoW4" style="display: block; margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; width: 100%; min-height: 500px;" />
-        </div>
-      </div>
-
-      <div class="feature-section" style="margin-top: 10px">
-        <div class="feature-left" style="max-width: 50%; width: 50%">
-          <iframe src="https://meltano.meltanodata.com/-/embed/ukczGngUuHLneFfxSeMPdhhME48tZNoaXoTknqDgXXc" style="display: block; margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; width: 100%; min-height: 500px;" />
-        </div>
-        <div class="feature-right" style="max-width: 50%; width: 50%; margin-left: 10px">
-          <iframe src="https://meltano.meltanodata.com/-/embed/1pMYpdRwA5xFhqSJDsuU9T_T0qka8QlNXEohs-UaAX0" style="display: block; margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; width: 100%; min-height: 500px;" />
-        </div>
-      </div> -->
-    </section>
-
-    <div class="feature-section-wrapper is-white" id="report-builder">
-      <div class="feature-section">
-        <div class="feature-left">
-          <img
-            style="max-width: 100%; margin: 0 auto; display: block;"
-            src="/screenshots/homepage/report-builder-facebook.png"
-            alt="Screenshot of Report Builder"
-          />
-        </div>
-        <div class="feature-right">
-          <h2 class="section-title">
-            Your metrics, your reports
-          </h2>
-          <p class="hero-tagline">
-            Use the point-and-click report builder to dig deeper into your data 
-            and create custom reports for the metrics you care about most.
-          </p>
-
-          <p class="action">
-            <NavLink class="action-button" :item="$frontmatter.primaryAction" />
-            <NavLink
-              class="action-button secondary"
-              :item="$frontmatter.secondaryAction"
-            />
-          </p>
-
-          <p>
-            <em>
-              If the report you're looking for cannot easily be created using the report builder, 
-              please <router-link to="/docs/getting-help.html">let us know</router-link> and we'll build it for you!
-            </em>
-          </p>
         </div>
       </div>
     </div>
@@ -308,12 +82,11 @@
     <div class="feature-section-wrapper is-shorter">
       <div class="content-width-wide">
         <section class="section">
-          <h2 class="section__title">Sign up for our newsletter!</h2>
+          <h2 class="section__title">Sign up for our newsletter</h2>
           <p class="section__text">
-            Get the latest updates on Meltano delivered right to your inbox! We
-            will only use your email to provide you with updates and will never
-            sell your information!
+            Get the latest updates on Meltano delivered right to your inbox!
           </p>
+
           <a href="https://meltano.substack.com" class="button" target="_blank"
             >Subscribe</a
           >
@@ -340,8 +113,8 @@ export default {
   computed: {
     data() {
       return this.$page.frontmatter;
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -456,7 +229,7 @@ export default {
 }
 
 .section {
-  padding: 6rem 0;
+  padding: 2rem 0;
   text-align: center;
 
   &__text {
@@ -485,7 +258,6 @@ export default {
 }
 
 .homepage-cta {
-  min-height: 500px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -516,7 +288,7 @@ export default {
   padding-bottom: 4rem;
 
   &.is-shorter {
-    padding: 3rem 0;
+    padding: 2rem 0;
   }
 
   &.is-white {
@@ -594,7 +366,7 @@ export default {
   .hero {
     width: 100%;
     text-align: center;
-    padding: 0 0 4rem;
+    padding: 3rem 0;
 
     img {
       max-width: 100%;
@@ -701,7 +473,7 @@ export default {
   .home {
     .hero {
       img {
-        max-height: 480px;
+        max-height: 420px;
         display: block;
         margin-right: -33px;
       }

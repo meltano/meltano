@@ -28,8 +28,7 @@ export default {
         '@weekly': 'Weekly',
         '@monthly': 'Monthly',
         '@yearly': 'Yearly'
-      },
-      meltanoDataInstance: false
+      }
     }
   },
   computed: {
@@ -50,11 +49,6 @@ export default {
     },
     getMomentFromNow() {
       return val => utils.momentFromNow(val)
-    }
-  },
-  mounted() {
-    if (window.location.href.indexOf('meltanodata.com') > -1) {
-      this.meltanoDataInstance = true
     }
   },
   methods: {
@@ -269,11 +263,6 @@ export default {
         </template>
       </tbody>
     </table>
-    <p v-if="meltanoDataInstance" class="has-text-centered is-italic">
-      Want to delete your data from your MeltanoData.com instance? Visit
-      <a href="https://meltano.com/docs/getting-help.html">our help page</a> for
-      more information.
-    </p>
   </div>
 </template>
 

@@ -122,14 +122,3 @@ Users will find this link on the [Meltano Installation Docs page](/developer-too
 #### Following the DigitalOcecan Brand Guidelines
 
 It is important that we be a good partner, creating a win-win for each of us. Please refer to the [DigitalOcean Marketplace Vendor Guide](https://marketplace.digitalocean.com/vendors/getting-started-as-a-digitalocean-marketplace-vendor) for instructions on proper use of logos, language, etc.
-
-## Automation
-
-### Requested Accounts
-
-Meltano provides free hosted accounts to anyone who requests one by filling out a Typeform asking questions about their use case and details needed for setup. After the user provides this information, the form is completed, and a set of automation steps are kicked off via Zapier:
-
-- Zapier receives a notification in realtime that the Typeform has been completed
-- Zapier immediately creates a new issue in `meltano/account-management` (private) with the details of the request via the `Typeform Signup to GitLab Issue` Zap. The issue is auto-assigned to the EM and labeled appropriately according to the issue template in the repo.
-- Zapier immediately creates a new Contact in ActiveCampaign with the user's name and email address, and adds the Contact to the `Meltano Hosted Applicants` list via the `Typeform Signup to ActiveCampaign Workflow` Zap
-- ActiveCampaign immediately sends an email via the `Hosted Applicant Email` automation to the user with instructions on how to schedule a setup call so a walkthrough can occur. This email is sent from `hello@meltano.com` which, when replied to, forwards to the team's support inbox.
