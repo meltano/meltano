@@ -13,7 +13,7 @@
             >
             platform for building, running &amp; orchestrating
             <a href="https://www.singer.io/" target="_blank">Singer</a>-based
-            ELT pipelines, that you can run locally or host on any cloud.
+            ELT pipelines, that you can <router-link to="developer-tools/self-hosted-installation.html">run locally or host on any cloud</router-link>.
           </p>
           <p class="hero-tagline">
             Use existing Singer
