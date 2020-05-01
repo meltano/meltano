@@ -6,7 +6,7 @@ sidebarDepth: 2
 
 # Data Sources
 
-Hosted Meltano accounts currently support extracting data from:
+The following data sources are fully supported by Meltano UI, from setting up your connection to creating reports and sharing dashboards:
 
 * [Facebook Ads](/plugins/extractors/facebook.html)
 * [Google Ads](/plugins/extractors/adwords.html)
@@ -15,6 +15,4 @@ Hosted Meltano accounts currently support extracting data from:
 * [Shopify](/plugins/extractors/shopify.html)
 * [Stripe](/plugins/extractors/stripe.html)
 
-::: tip
-If you'd like to use Meltano with a different data source than those listed here, you can consider [self-hosting Meltano](/developer-tools/self-hosted-installation.md). Self-hosted installations require more manual set up, but support [additional data sources](/plugins/extractors/) and give you the option to [create custom extractors](/tutorials/create-a-custom-extractor.html) to pull in data from arbitrary data sources.
-:::
+When using the [CLI](/developer-tools/command-line-interface.html), [additional data sources](/plugins/extractors/) are supported, as is [creating your own custom extractors](/tutorials/create-a-custom-extractor.html) to pull in data from arbitrary data sources.

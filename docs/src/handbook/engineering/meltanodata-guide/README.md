@@ -4,6 +4,10 @@ sidebarDepth: 2
 
 # MeltanoData Guide
 
+::: warning
+We no longer offer hosted Meltano instances on MeltanoData.com, but the documentation below is preserved for historical context as long as some instances are still online.
+:::
+
 This will be the single source of truth for team members when it comes to creating and managing Meltano instances on MeltanoData.com.
 
 ## Creating a New Instance

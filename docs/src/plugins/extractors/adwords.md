@@ -51,13 +51,6 @@ For example:
 
 <h3 id="refresh-token">Access Token</h3>
 
-::: tip Using hosted Meltano on MeltanoData.com?
-
-<p>
-  <OAuthServiceLink provider="google-adwords">Connect your Google Ads account</OAuthServiceLink> to acquire this token right away.
-</p>
-:::
-
 The Refresh Token generated through the OAuth flow run using your OAuth Client and your Developer Token.
 
 The Google account you connect needs to have access to your Ads Account.
