@@ -38,7 +38,7 @@ If you'd like to run Meltano on Windows, you can install it inside the [Windows 
 You may refer to [https://realpython.com/installing-python/](https://realpython.com/installing-python/) for platform specific installation instructions.
 :::
 
-To check if you have the correct Python version, open your terminal and use the following commands to check the version:
+To check if you have the correct Python version, open your terminal and use the following command to check the version:
 
 ```bash
 python --version
@@ -49,11 +49,10 @@ python --version
 `pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
 
 ```bash
- Check for current version of pip
- to ensure that it is using Python 3
+# check for current version of pip to ensure that it is using Python 3
 pip3 --version
 
- Update pip3
+# update pip3
 pip3 install --upgrade pip
 ```
 
@@ -94,10 +93,10 @@ Once a virtual environment is activated, it stays active until the current shell
 To streamline this process, you can define a [shell alias](https://shapeshed.com/unix-alias/) that'll be easier to remember than the entire activation invocation:
 
 ```bash
- Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
+# add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
 alias meltano!="source $MELTANO_PROJECT_PATH/.venv/meltano/bin/activate"
 
- Use as follows, after creating a new shell:
+# use as follows, after creating a new shell:
 meltano!
 ```
 
@@ -134,10 +133,10 @@ We provide the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docke
 This image contains everything you need to get started with Meltano.
 
 ```bash
- download or update to the latest version
+# download or update to the latest version
 docker pull meltano/meltano
 
- look the currently installed version
+# check the currently installed version
 docker run meltano/meltano --version
 ```
 
