@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2008](2008-clarify-that-pipelines-ui-only-supports-target-postgres) Clarify that pipelines UI only supports target-postgres
+
 ### Fixes
 
 ### Breaks
