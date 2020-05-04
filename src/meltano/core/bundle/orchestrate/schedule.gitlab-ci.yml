@@ -1,0 +1,23 @@
+schedule-pipelines:
+  stage: schedule
+
+  image: python:3.6
+
+  before_script:
+  - pip install -r requirements.txt
+  - meltano install orchestrators
+  script:
+  - orchestrate/schedule.py > schedule.yml
+  - meltano invoke gitlab-ci-scheduler schedule-pipelines schedule.yml
+
+  artifacts:
+    paths:
+    - schedule.yml
+    when: always
+
+  only:
+    refs:
+    - master
+  except:
+    variables:
+    - $CI_SCHEDULE_NAME

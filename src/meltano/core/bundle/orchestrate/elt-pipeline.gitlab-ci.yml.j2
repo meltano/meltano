@@ -1,0 +1,26 @@
+image: python:3.6
+
+variables: {{ env_vars('CI_SCHEDULE_NAME', 'MELTANO_ELT_EXTRACTOR', 'MELTANO_ELT_LOADER', 'MELTANO_ELT_TRANSFORM') }}
+
+before_script:
+- pip install -r requirements.txt
+- meltano install
+
+stages:
+- elt
+
+{{ env_var('CI_SCHEDULE_FULL_NAME') }}:
+  stage: elt
+
+  before_script:
+  - meltano invoke gitlab-ci-scheduler download-latest-artifacts .meltano/meltano.db output/* || true
+  - mkdir -p output
+  script:
+  - meltano elt $MELTANO_ELT_EXTRACTOR $MELTANO_ELT_LOADER --job_id=$CI_SCHEDULE_NAME --transform=$MELTANO_ELT_TRANSFORM
+
+  artifacts:
+    paths:
+    - .meltano/meltano.db
+    - .meltano/run/elt
+    - output
+    when: always

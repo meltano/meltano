@@ -1,0 +1,8 @@
+stages:
+- schedule
+- build
+- run
+
+include:
+- orchestrate/schedule.gitlab-ci.yml
+- orchestrate/elt.gitlab-ci.yml

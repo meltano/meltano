@@ -1,4 +1,5 @@
-requirements.txt: ""
+requirements.txt: |
+  meltano
 meltano.yml: |
   version: 1
   send_anonymous_usage_stats: True
@@ -13,6 +14,7 @@ extract/.gitkeep: ""
 load/.gitkeep: ""
 docker-compose.yml: "bundle://docker-compose.yml"
 transform/:
+  # Only for transformer 'dbt':
   dbt_project.yml: "bundle://transform/dbt_project.yml"
   profile/profiles.yml: "bundle://transform/profile/profiles.yml"
   models/my_meltano_project/.gitkeep: ""
@@ -22,4 +24,18 @@ transform/:
     logs/
 analyze/.gitkeep: ""
 notebook/.gitkeep: ""
-orchestrate/dags: "bundle://dags"
+orchestrate/:
+  # Only for orchestrator 'gitlab-ci-scheduler':
+  schedule.py: "bundle://orchestrate/schedule.py"
+  schedule.gitlab-ci.yml: "bundle://orchestrate/schedule.gitlab-ci.yml"
+  elt.gitlab-ci.yml: "bundle://orchestrate/elt.gitlab-ci.yml"
+  elt-pipeline.gitlab-ci.yml.j2: "bundle://orchestrate/elt-pipeline.gitlab-ci.yml.j2"
+
+  # Only for orchestrator 'airflow':
+  dags/:
+    meltano.py: "bundle://orchestrate/dags/meltano.py"
+    .gitignore: |
+      __pycache__
+
+# Only for orchestrator 'gitlab-ci-scheduler':
+.gitlab-ci.yml: "bundle://.gitlab-ci.yml"

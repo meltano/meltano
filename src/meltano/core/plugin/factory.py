@@ -17,12 +17,24 @@ def plugin_factory(plugin_type: PluginType, plugin_def: Dict):
         PluginType.TRANSFORMS: lazy_import(".dbt", "DbtTransformPlugin"),
         PluginType.MODELS: lazy_import(".model", "ModelPlugin"),
         PluginType.DASHBOARDS: lazy_import(".dashboard", "DashboardPlugin"),
-        PluginType.ORCHESTRATORS: lazy_import(".airflow", "Airflow"),
-        PluginType.TRANSFORMERS: lazy_import(".dbt", "DbtPlugin"),
+        PluginType.ORCHESTRATORS: {
+            "airflow": lazy_import(".airflow", "Airflow"),
+            "gitlab-ci-scheduler": lazy_import(
+                ".gitlab_ci_scheduler", "GitlabCiScheduler"
+            ),
+        },
+        PluginType.TRANSFORMERS: {"dbt": lazy_import(".dbt", "DbtPlugin")},
     }
+
+    name = plugin_def.pop("name")
 
     # this will parse the discovery file and create an instance of the
     # corresponding `plugin_class` for all the plugins.
-    plugin_cls = plugin_class[plugin_type]()
+    plugin_cls_factory = plugin_class[plugin_type]
 
-    return plugin_cls(plugin_def.pop("name"), **plugin_def)
+    if isinstance(plugin_cls_factory, dict):
+        plugin_cls_factory = plugin_cls_factory[name]
+
+    plugin_cls = plugin_cls_factory()
+
+    return plugin_cls(name, **plugin_def)

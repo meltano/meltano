@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/developer-tools/contributor-guide.html#discovery-yml-version for more information.
-version: 10
+version: 11
 
 extractors:
   - name: tap-facebook
@@ -621,7 +621,9 @@ loaders:
     namespace: target_csv
     hidden: true
     docs: 'https://meltano.com/plugins/loaders/csv.html'
-    pip_url: git+https://gitlab.com/meltano/target-csv.git
+    pip_url: target-csv
+    settings_group_validation:
+      - ['delimiter', 'quotechar']
     settings:
       - name: delimiter
         kind: options
@@ -645,6 +647,9 @@ loaders:
             value: '"'
         value: "'"
         description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
+      - name: destination_path
+        value: ""
+        description: "Path to directory to output CSV files into"
   - name: target-snowflake
     label: Snowflake
     description: Snowflake database loader
@@ -812,3 +817,10 @@ orchestrators:
       - name: core.dags_are_paused_at_creation
         env: AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION
         value: False
+  - name: gitlab-ci-scheduler
+    namespace: gitlab_ci_scheduler
+    label: GitLab CI Scheduler
+    pip_url: git+https://gitlab.com/meltano/gitlab-ci-scheduler.git
+    settings:
+      - name: api_token
+        env: GITLAB_API_TOKEN

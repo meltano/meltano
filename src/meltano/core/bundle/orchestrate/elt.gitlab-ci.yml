@@ -1,0 +1,33 @@
+build-elt:
+  stage: build
+
+  image: python:3.6
+
+  before_script:
+  - pip install -r requirements.txt
+  - meltano install orchestrators
+  script:
+  - meltano invoke gitlab-ci-scheduler compile-pipeline-template orchestrate/elt-pipeline.gitlab-ci.yml.j2
+
+  artifacts:
+    paths:
+    - pipeline.gitlab-ci.yml
+
+  only:
+    variables:
+    - $CI_SCHEDULE_NAMESPACE == "elt"
+
+run-elt:
+  stage: run
+
+  needs: ["build-elt"]
+
+  trigger:
+    include:
+    - artifact: pipeline.gitlab-ci.yml
+      job: build-elt
+    strategy: depend
+
+  only:
+    variables:
+    - $CI_SCHEDULE_NAMESPACE == "elt"
