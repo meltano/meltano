@@ -43,7 +43,49 @@ export default {
               v-if="getIsLoadingPluginsOfType('extractors')"
               class="progress is-small is-info"
             ></progress>
-            <ExtractorList v-else />
+            <template v-else>
+              <ExtractorList />
+              <hr />
+              <div class="columns is-vcentered">
+                <div class="column">
+                  <article class="media">
+                    <figure class="media-left">
+                      <p class="image level-item container">
+                        <span class="icon is-large fa-2x has-text-grey-light">
+                          <font-awesome-icon icon="plus"></font-awesome-icon>
+                        </span>
+                      </p>
+                    </figure>
+                    <div class="media-content">
+                      <div class="content">
+                        <p>
+                          <span class="has-text-weight-bold"
+                            >Don't see your data source here?</span
+                          >
+                          <br />
+                          <small>
+                            Additional data sources are available when using the
+                            command line interface. You can also easily add any
+                            existing Singer tap as a custom extractor or create
+                            your own from scratch.
+                          </small>
+                        </p>
+                        <div class="buttons">
+                          <a
+                            href="https://www.meltano.com/docs/data-sources.html"
+                            target="_blank"
+                            class="button is-interactive-primary tooltip is-tooltip-left"
+                            data-tooltip="Create your own data source"
+                            >Learn More</a
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+                <div class="column"></div>
+              </div>
+            </template>
           </div>
         </div>
       </div>

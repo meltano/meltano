@@ -15,4 +15,6 @@ The following data sources are fully supported by Meltano UI, from setting up yo
 * [Shopify](/plugins/extractors/shopify.html)
 * [Stripe](/plugins/extractors/stripe.html)
 
-When using the [CLI](/developer-tools/command-line-interface.html), [additional data sources](/plugins/extractors/) are supported, as is [creating your own custom extractors](/tutorials/create-a-custom-extractor.html) to pull in data from arbitrary data sources.
+::: tip Don't see your data source here?
+[Additional data sources](/plugins/extractors/) are available when using the [command line interface](/developer-tools/command-line-interface.html). You can also easily add [any existing Singer tap](https://www.singer.io/#taps) as a [custom extractor](/tutorials/create-a-custom-extractor.html#add-the-plugin-to-your-meltano-project-custom) or [create your own from scratch](/tutorials/create-a-custom-extractor.html).
+:::
