@@ -25,5 +25,5 @@ Meltano currently supports importing data from the following sources out of the 
 **Please note, all trademarks and logos are owned by their respective owners.**
 
 ::: tip Don't see your data source here?
-You can easily add [any existing Singer tap](https://www.singer.io/#taps) as a [custom extractor](/tutorials/create-a-custom-extractor.html#add-the-plugin-to-your-meltano-project-custom) or [create your own extractor from scratch](/tutorials/create-a-custom-extractor.html).
+You can easily add [any existing Singer tap](https://www.singer.io/#taps) as a [custom extractor](/tutorials/create-a-custom-extractor.html#add-the-plugin-to-your-meltano-project-custom) or [create your own from scratch](/tutorials/create-a-custom-extractor.html).
 :::
