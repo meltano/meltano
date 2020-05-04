@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1987](https://gitlab.com/meltano/meltano/-/issues/1987) Restore GitLab and Zendesk data sources in UI
+
 ### Fixes
 
 ### Breaks
