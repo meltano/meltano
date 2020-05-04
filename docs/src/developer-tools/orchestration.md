@@ -10,11 +10,7 @@ If you're using SaaS tools to manage support, sales, marketing, revenue and othe
 
 When a new pipeline schedule is created using the [UI](/docs/getting-started.html#create-a-pipeline-schedule) or [CLI](/developer-tools/command-line-interface.html#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 
-Airflow is automatically installed when the Meltano UI is launched for the first time, and the scheduler automatically runs in the background while Meltano UI is running.
-
 ### Installing Airflow
-
-If you're not using Meltano UI, you'll need to install Airflow manually:
 
 Change directories so that you are inside your Meltano project, and then run the following command to make Airflow available to use via `meltano invoke`
 
@@ -23,6 +19,8 @@ meltano add orchestrator airflow
 ```
 
 Now you have Airflow installed, let's create a simple example schedule to confirm everything is working correctly.
+
+Note that the Airflow scheduler automatically runs in the background while Meltano UI is running, unless the `MELTANO_DISABLE_AIRFLOW` environment variable is set.
 
 ### Create a Schedule
 

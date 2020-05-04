@@ -23,11 +23,17 @@ sudo -H -u $MELTANO_USER $MELTANO_VENV/bin/pip install meltano
 
 # create the Meltano project
 cd $MELTANO_ROOT
-sudo -H -u $MELTANO_USER $MELTANO_VENV/bin/meltano init project
 sudo -u $MELTANO_USER $MELTANO_VENV/bin/meltano --version
 
+sudo -H -u $MELTANO_USER $MELTANO_VENV/bin/meltano init project
+cd project
+
 # remove the project id so a new one is generated
-sudo -u $MELTANO_USER sed -i 's/project_id:.*$/project_id:/' project/meltano.yml
+sudo -u $MELTANO_USER sed -i 's/project_id:.*$/project_id:/' meltano.yml
+
+sudo -H -u $MELTANO_USER $MELTANO_VENV/bin/meltano add orchestrator airflow
+sudo -H -u $MELTANO_USER $MELTANO_VENV/bin/meltano add transformer dbt
+sudo -H -u $MELTANO_USER $MELTANO_VENV/bin/meltano add loader target-postgres
 
 # start and enable Meltano
 systemctl enable meltano

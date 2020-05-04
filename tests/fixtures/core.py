@@ -228,9 +228,7 @@ def job_logging_service(project):
 
 @pytest.fixture(scope="class")
 def project(test_dir, project_init_service):
-    project = project_init_service.init(
-        install_default_plugins=False, create_system_database=False
-    )
+    project = project_init_service.init(create_system_database=False)
     logging.debug(f"Created new project at {project.root}")
 
     # empty out the `plugins`
