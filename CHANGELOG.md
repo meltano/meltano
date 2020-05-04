@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1987](https://gitlab.com/meltano/meltano/-/issues/1987) Restore GitLab and Zendesk data sources in UI
 - [#2005](https://gitlab.com/meltano/meltano/-/issues/2005) Add "Don't see your data source here?" option in UI
+- [#2008](2008-clarify-that-pipelines-ui-only-supports-target-postgres) Clarify that pipelines UI only supports target-postgres
 
 ### Fixes
 
