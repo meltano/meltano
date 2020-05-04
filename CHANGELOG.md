@@ -12,16 +12,22 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+### Fixes
+
+### Breaks
+
+
+## 1.31.0 - (2020-05-04)
+---
+
+### Changes
+
 - [#1987](https://gitlab.com/meltano/meltano/-/issues/1987) Restore GitLab and Zendesk data sources in UI
 - [#2005](https://gitlab.com/meltano/meltano/-/issues/2005) Add "Don't see your data source here?" option in UI
 - [#2008](https://gitlab.com/meltano/meltano/-/issues/2008) Clarify that pipelines UI only supports target-postgres
 - [#2007](https://gitlab.com/meltano/meltano/-/issues/2007) Don't install airflow, dbt and target-postgres by default as part of 'meltano init'
 - [#2007](https://gitlab.com/meltano/meltano/-/issues/2007) Only run 'airflow scheduler' as part of 'meltano ui' when airflow is installed
 - [#2007](https://gitlab.com/meltano/meltano/-/issues/2007) Install airflow, dbt, and target-postgres on DigitalOcean images
-
-### Fixes
-
-### Breaks
 
 
 ## 1.30.1 - (2020-04-23)
