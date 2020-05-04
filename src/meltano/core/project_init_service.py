@@ -74,9 +74,7 @@ class ProjectInitService:
         self.initialize_file = bundle.find("initialize.yml")
         self.project_name = project_name.lower()
 
-    def init(
-        self, install_default_plugins=True, create_system_database=True, activate=True
-    ) -> Project:
+    def init(self, create_system_database=True, activate=True) -> Project:
         try:
             os.mkdir(self.project_name)
         except Exception as e:
@@ -92,9 +90,6 @@ class ProjectInitService:
 
         if create_system_database:
             self.create_system_database()
-
-        if install_default_plugins:
-            self.install_default_plugins()
 
         return self.project
 
@@ -114,28 +109,6 @@ class ProjectInitService:
         migration_service = MigrationService(engine)
         migration_service.upgrade()
         migration_service.seed(self.project)
-
-    def install_default_plugins(self):
-        self.config_service = ConfigService(self.project)
-        self.add_service = ProjectAddService(
-            self.project, config_service=self.config_service
-        )
-        self.install_service = PluginInstallService(
-            self.project, config_service=self.config_service
-        )
-
-        if not truthy(os.getenv("MELTANO_DISABLE_AIRFLOW", False)):
-            click.secho(f"Installing orchestrator 'airflow'...", fg="blue")
-            self.install_plugin(PluginType.ORCHESTRATORS, "airflow")
-            click.secho(f"Installed 'airflow'", fg="blue")
-
-        click.secho(f"Installing transformer 'dbt'...", fg="blue")
-        self.install_plugin(PluginType.TRANSFORMERS, "dbt")
-        click.secho(f"Installed 'dbt'", fg="blue")
-
-        click.secho(f"Installing loader 'target-postgres'...", fg="blue")
-        self.install_plugin(PluginType.LOADERS, "target-postgres")
-        click.secho(f"Installed 'target-postgres'", fg="blue")
 
     def install_plugin(self, plugin_type, plugin_name):
         try:
