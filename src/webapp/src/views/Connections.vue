@@ -74,8 +74,7 @@ export default {
                           <a
                             href="https://www.meltano.com/docs/data-sources.html"
                             target="_blank"
-                            class="button is-interactive-primary tooltip is-tooltip-left"
-                            data-tooltip="Create your own data source"
+                            class="button is-interactive-primary"
                             >Learn More</a
                           >
                         </div>
