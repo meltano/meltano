@@ -9,6 +9,8 @@ from click_default_group import DefaultGroup
 
 from . import cli
 from .params import project
+from meltano.core.config_service import ConfigService
+from meltano.core.plugin.error import PluginMissingError
 from meltano.core.db import project_engine
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import truthy
@@ -66,8 +68,15 @@ def start(ctx, reload, bind_port, bind):
     tracker.track_meltano_ui()
 
     workers = []
+
     if not truthy(os.getenv("MELTANO_DISABLE_AIRFLOW", False)):
-        workers.append(AirflowWorker(project))
+        try:
+            config_service = ConfigService(project)
+            config_service.find_plugin("airflow")
+
+            workers.append(AirflowWorker(project))
+        except PluginMissingError:
+            pass
 
     try:
         compiler_worker = MeltanoCompilerWorker(project)
