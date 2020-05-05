@@ -38,7 +38,10 @@ If you'd like to run Meltano on Windows, you can install it inside the [Windows 
 You may refer to [https://realpython.com/installing-python/](https://realpython.com/installing-python/) for platform specific installation instructions.
 :::
 
-To check if you have the correct Python version, open your terminal and use the following command to check the version:
+::: tip
+If you have installation issues, check your version of Python.  For example, Python 3.6.8 is [known to not work](https://gitlab.com/meltano/meltano/-/issues/1956#note_326479470), while Python 3.6.10 is known to work.  :::
+
+Use the following command to check that you have the correct Python version installed:
 
 ```bash
 python --version
@@ -144,7 +147,7 @@ docker run meltano/meltano --version
 
 Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our [Getting Started Guide](/docs/getting-started.html). However, the command line syntax is slightly different. For example, let's create a new Meltano project:
 
-```sh
+```bash
 cd /your/projects/directory
 
 docker run -v $(pwd):/projects \
@@ -154,13 +157,13 @@ docker run -v $(pwd):/projects \
 
 Then you can `cd` into your new project:
 
-```sh
+```bash
 cd yourprojectname
 ```
 
 We can then start the Meltano UI. Since `ui` is the default command, we can omit it.
 
-```sh
+```bash
 docker run -v $(pwd):/project \
              -w /project \
              -p 5000:5000 \
