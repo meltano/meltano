@@ -6,7 +6,7 @@
 
         <p class="action">
           <NavLink class="action-button" :item="$frontmatter.installation.primaryAction" />
-          <SlackChannelLink class="action-button secondary">Join the Slack community</SlackChannelLink>
+          <SlackChannelLink class="action-button secondary">Join us on Slack</SlackChannelLink>
         </p>
       </div>
 
@@ -288,13 +288,12 @@ export default {
 }
 
 .hero-left {
-  width: 55%;
+  max-width: 80%;
   text-align: left;
 }
 
 .hero-right {
-  min-width: 400px;
-  width: 35%;
+  width: 100%;
 }
 
 .feature-section {
@@ -347,6 +346,11 @@ export default {
   margin: 0 !important;
 }
 
+.hero .content div[class*="language-"] {
+  margin-left: 0;
+  margin-right: 0;
+}
+
 .hero .content p {
   font-size: 1.2rem !important;
   padding-right: 20px !important;
@@ -355,6 +359,7 @@ export default {
 }
 
 .hero .content h1 {
+  padding-top: 0 !important;
   padding-right: 40px !important;
   font-weight: 400 !important;
   font-size: 36px !important;
@@ -381,7 +386,12 @@ export default {
   }
 
   .hero-left {
-    max-width: 60%;
+    width: 55%;
+  }
+
+  .hero-right {
+    min-width: 400px;
+    width: 35%;
   }
 
   .hero .content p {
