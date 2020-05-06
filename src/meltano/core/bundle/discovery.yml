@@ -47,8 +47,8 @@ extractors:
       - discover
       - state
     settings_group_validation:
-      - ['api_url', 'private_token', 'groups', 'start_date']
-      - ['api_url', 'private_token', 'projects', 'start_date']
+      - ['api_url', 'groups', 'start_date']
+      - ['api_url', 'projects', 'start_date']
     settings:
       - name: api_url
         label: GitLab Instance
@@ -58,6 +58,7 @@ extractors:
         label: Access Token
         kind: password
         placeholder: Ex. *****************
+        value: ""
         env: GITLAB_API_TOKEN
       - name: groups
         label: Group
