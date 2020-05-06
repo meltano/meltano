@@ -44,11 +44,10 @@ extractors:
     docs: 'https://meltano.com/plugins/extractors/gitlab.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
     capabilities:
-      - discover
       - state
     settings_group_validation:
-      - ['api_url', 'private_token', 'groups', 'start_date']
-      - ['api_url', 'private_token', 'projects', 'start_date']
+      - ['api_url', 'groups', 'start_date']
+      - ['api_url', 'projects', 'start_date']
     settings:
       - name: api_url
         label: GitLab Instance
@@ -58,6 +57,7 @@ extractors:
         label: Access Token
         kind: password
         placeholder: Ex. *****************
+        value: ""
         env: GITLAB_API_TOKEN
       - name: groups
         label: Group
@@ -613,6 +613,57 @@ loaders:
         label: Database Name
         env: PG_DATABASE
         value: warehouse
+  - name: target-jsonl
+    label: JSONL
+    description: JSONL loader
+    namespace: target_jsonl
+    pip_url: target-jsonl
+    settings:
+      - name: destination_path
+        description: Directory to write the resulting .jsonl files to
+        value: output
+      - name: do_timestamp_file
+        label: Include timestamp in file names
+        description: Specifies if the file should get timestamped
+        value: false
+  - name: target-snowflake
+    label: Snowflake
+    description: Snowflake database loader
+    namespace: snowflake
+    docs: 'https://meltano.com/plugins/loaders/snowflake.html'
+    pip_url: 'git+https://gitlab.com/meltano/target-snowflake.git'
+    signup_url: 'https://trial.snowflake.com?referrer=meltano'
+    settings:
+      - name: account
+        env: SF_ACCOUNT
+        description: This is automatically provided by Snowflake and can be found in the URL.
+      - name: username
+        env: SF_USER
+        description: The username you use for logging in
+      - name: password
+        env: SF_PASSWORD
+        kind: password
+        description: The password you use for logging in
+      - name: role
+        env: SF_ROLE
+        description: The role that you have assigned privileges for database access
+      - name: database
+        env: SF_DATABASE
+        description: The name of the Snowflake database you want to use
+      - name: warehouse
+        env: SF_WAREHOUSE
+        description: The name of the Snowflake warehouse you want to use
+  - name: target-sqlite
+    label: SQLite
+    description: SQLite database loader
+    namespace: sqlite
+    docs: 'https://meltano.com/plugins/loaders/sqlite.html'
+    pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
+    settings:
+      - name: database
+        label: Database Name
+        description: '"warehouse" is the default name of the SQLite loader database generated at the project root. Feel free to rename it.'
+        value: warehouse
 
   # Hidden loaders:
   - name: target-csv
@@ -645,46 +696,6 @@ loaders:
             value: '"'
         value: "'"
         description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
-  - name: target-snowflake
-    label: Snowflake
-    description: Snowflake database loader
-    namespace: snowflake
-    hidden: true
-    docs: 'https://meltano.com/plugins/loaders/snowflake.html'
-    pip_url: 'git+https://gitlab.com/meltano/target-snowflake.git'
-    signup_url: 'https://trial.snowflake.com?referrer=meltano'
-    settings:
-      - name: account
-        env: SF_ACCOUNT
-        description: This is automatically provided by Snowflake and can be found in the URL.
-      - name: username
-        env: SF_USER
-        description: The username you use for logging in
-      - name: password
-        env: SF_PASSWORD
-        kind: password
-        description: The password you use for logging in
-      - name: role
-        env: SF_ROLE
-        description: The role that you have assigned privileges for database access
-      - name: database
-        env: SF_DATABASE
-        description: The name of the Snowflake database you want to use
-      - name: warehouse
-        env: SF_WAREHOUSE
-        description: The name of the Snowflake warehouse you want to use
-  - name: target-sqlite
-    label: SQLite
-    description: SQLite database loader
-    namespace: sqlite
-    hidden: true
-    docs: 'https://meltano.com/plugins/loaders/sqlite.html'
-    pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
-    settings:
-      - name: database
-        label: Database Name
-        description: '"warehouse" is the default name of the SQLite loader database generated at the project root. Feel free to rename it.'
-        value: warehouse
 transformers:
   - name: dbt
     namespace: dbt

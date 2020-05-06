@@ -1,48 +1,74 @@
 <template>
   <div class="home">
-    <div>
-      <div class="hero homepage-cta feature-section-wrapper">
-        <div class="hero-left">
-          <h2 class="hero-header" style="border-bottom:0px;">
-            Open source data integration
-          </h2>
-          <p class="hero-tagline">
-            Meltano is an
-            <a href="https://gitlab.com/meltano/meltano" target="_blank"
-              >open source</a
-            >
-            platform for building, running &amp; orchestrating
-            <a href="https://www.singer.io/" target="_blank">Singer</a>-based
-            ELT pipelines, that you can <router-link to="developer-tools/self-hosted-installation.html">run locally or host on any cloud</router-link>.
-          </p>
-          <p class="hero-tagline">
-            Use existing Singer
-            <router-link to="/plugins/extractors/">taps</router-link> and
-            <router-link to="/plugins/loaders/">targets</router-link>
-            or
-            <router-link to="/tutorials/create-a-custom-extractor.html"
-              >easily write your own</router-link
-            >
-            to extract data from any SaaS tool or database and load it into any
-            data warehouse.
-          </p>
+    <div class="hero homepage-cta feature-section-wrapper">
+      <div class="hero-left">
+        <Content slot-key="installation" />
 
-          <p class="action">
-            <NavLink class="action-button" :item="$frontmatter.primaryAction" />
-            <NavLink
-              class="action-button secondary"
-              :item="$frontmatter.secondaryAction"
-            />
-          </p>
-        </div>
-
-        <div class="hero-right">
-          <img
-            src="../assets/meltano-founder.jpg"
-            alt="Happy Meltano User Says Hi"
-          />
-        </div>
+        <p class="action">
+          <NavLink class="action-button" :item="$frontmatter.installation.primaryAction" />
+          <SlackChannelLink class="action-button secondary">Join the Slack community</SlackChannelLink>
+        </p>
       </div>
+
+      <div class="hero-right">
+        <Content slot-key="installation-code" />
+      </div>
+    </div>
+
+    <div class="hero homepage-cta feature-section-wrapper">
+      <div class="hero-left">
+        <Content slot-key="integration" />
+
+        <p class="action">
+          <NavLink class="action-button" :item="$frontmatter.integration.primaryAction" />
+        </p>
+      </div>
+
+      <div class="hero-right">
+        <Content slot-key="integration-code" />
+      </div>
+    </div>
+
+    <div class="hero homepage-cta feature-section-wrapper">
+      <div class="hero-left">
+        <Content slot-key="transformation" />
+
+        <p class="action">
+          <NavLink class="action-button" :item="$frontmatter.transformation.primaryAction" />
+        </p>
+      </div>
+
+      <div class="hero-right">
+        <Content slot-key="transformation-code" />
+      </div>
+    </div>
+
+    <div class="hero homepage-cta feature-section-wrapper">
+      <div class="hero-left">
+        <Content slot-key="orchestration" />
+
+        <p class="action">
+          <NavLink class="action-button" :item="$frontmatter.orchestration.primaryAction" />
+        </p>
+      </div>
+
+      <div class="hero-right">
+        <Content slot-key="orchestration-code" />
+
+        <a href="https://airflow.apache.org/docs/stable/ui.html#dags-view" target="_blank">
+          <img class="screenshot" alt="Screenshot of Airflow Webserver" src="../assets/airflow-webserver.png" />
+        </a>
+      </div>
+    </div>
+
+    <div class="feature-section-wrapper is-shorter is-white">
+      <section class="section">
+        <h2 class="section__title" style="padding-bottom:20px;">
+          Intrigued?
+        </h2>
+
+        <NavLink class="button is-purple is-filled" :item="$frontmatter.installation.primaryAction" />
+      </section>
     </div>
 
     <div class="feature-section-wrapper is-shorter is-white">
@@ -56,14 +82,14 @@
           target="_blank"
           >Slack</a
         >
-        <a href="https://www.youtube.com/meltano" class="button" target="_blank"
-          >YouTube</a
+        <a href="https://meltano.com/blog/" class="button" target="_blank"
+          >Blog</a
         >
         <a href="https://twitter.com/meltanodata" class="button" target="_blank"
           >Twitter</a
         >
-        <a href="https://meltano.com/blog/" class="button" target="_blank"
-          >Blog</a
+        <a href="https://www.youtube.com/meltano" class="button" target="_blank"
+          >YouTube</a
         >
         <a
           href="https://gitlab.com/meltano/meltano"
@@ -77,21 +103,6 @@
           <router-link to="/docs/getting-help.html">Getting Help</router-link>
         </p>
       </section>
-    </div>
-
-    <div class="feature-section-wrapper is-shorter">
-      <div class="content-width-wide">
-        <section class="section">
-          <h2 class="section__title">Sign up for our newsletter</h2>
-          <p class="section__text">
-            Get the latest updates on Meltano delivered right to your inbox!
-          </p>
-
-          <a href="https://meltano.substack.com" class="button" target="_blank"
-            >Subscribe</a
-          >
-        </section>
-      </div>
     </div>
 
     <GlobalFooter
@@ -261,7 +272,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column-reverse;
+  flex-direction: column;
 }
 
 @media (min-width: $MQNarrow) {
@@ -270,9 +281,20 @@ export default {
   }
 }
 
+.hero .content {
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 .hero-left {
-  max-width: 80%;
+  width: 55%;
   text-align: left;
+}
+
+.hero-right {
+  min-width: 400px;
+  width: 35%;
 }
 
 .feature-section {
@@ -321,35 +343,49 @@ export default {
   }
 }
 
-.hero-tagline {
-  font-size: 1.2rem;
-  padding-right: 20px;
-  padding-bottom: 10px;
-  color: #474C4F;
+.hero .content > :first-child {
+  margin: 0 !important;
 }
 
-.hero-header {
-  padding-right: 40px;
-  font-weight: 400;
-  font-size: 36px;
-  color: #1D1D1D;
-  margin: 0;
+.hero .content p {
+  font-size: 1.2rem !important;
+  padding-right: 20px !important;
+  padding-bottom: 10px !important;
+  color: #474C4F !important;
+}
+
+.hero .content h1 {
+  padding-right: 40px !important;
+  font-weight: 400 !important;
+  font-size: 36px !important;
+  color: #1D1D1D !important;
+  margin: 0 !important;
+}
+
+.hero .content h2 {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
 }
 
 @media (min-width: $MQNarrow) {
-  .hero-header {
-    font-size: 54px;
-    text-align: left;
-    padding-top: 40px;
-    line-height: 1.2em;
+  .hero .content h1 {
+    font-size: 54px !important;
+    text-align: left !important;
+    padding-top: 0 !important;
+    line-height: 1.2em !important;
+  }
+
+  .hero .content h2 {
+    font-size: 2rem !important;
   }
 
   .hero-left {
     max-width: 60%;
   }
 
-  .hero-tagline {
-    padding-right: 80px;
+  .hero .content p {
+    padding-right: 80px !important;
   }
 }
 
@@ -370,6 +406,12 @@ export default {
 
     img {
       max-width: 100%;
+    }
+
+    img.screenshot {
+      border: 3px solid #282c34;
+      border-radius: 6px;
+      max-width: calc(100% - 6px);
     }
 
     h1 {
@@ -473,7 +515,6 @@ export default {
   .home {
     .hero {
       img {
-        max-height: 420px;
         display: block;
         margin-right: -33px;
       }
