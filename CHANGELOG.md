@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#2011](https://gitlab.com/meltano/meltano/-/issues/2011) Make tap-gitlab private_token setting optional for easier extraction of public groups and projects
+- [#2012](https://gitlab.com/meltano/meltano/-/issues/2012) Add target-jsonl loader
 
 ### Fixes
 

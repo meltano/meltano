@@ -646,6 +646,20 @@ loaders:
             value: '"'
         value: "'"
         description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
+  - name: target-jsonl
+    label: JSONL
+    description: JSONL loader
+    namespace: target_jsonl
+    hidden: true
+    pip_url: target-jsonl
+    settings:
+      - name: destination_path
+        description: Directory to write the resulting .jsonl files to
+        value: output
+      - name: do_timestamp_file
+        label: Include timestamp in file names
+        description: Specifies if the file should get timestamped
+        value: false
   - name: target-snowflake
     label: Snowflake
     description: Snowflake database loader
