@@ -30,16 +30,11 @@ Recent versions of Linux and macOS are both fully supported, but Windows is not.
 
 If you'd like to run Meltano on Windows, you can install it inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about). You may also try [installing Meltano on Docker](#installing-on-docker), although Docker on Windows is known to have [some idiosyncrasies](https://gitlab.com/meltano/meltano/issues/1261#note_240256080) that might hinder Meltano's ability to function.
 
-#### Python 3+
-
-- [Python 3.6.1+](https://realpython.com/installing-python/)
+#### Python 3.6 or Python 3.7
 
 ::: tip
 You may refer to [https://realpython.com/installing-python/](https://realpython.com/installing-python/) for platform specific installation instructions.
 :::
-
-::: tip
-If you have installation issues, check your version of Python.  For example, Python 3.6.8 is [known to not work](https://gitlab.com/meltano/meltano/-/issues/1956#note_326479470), while Python 3.6.10 is known to work.  :::
 
 Use the following command to check that you have the correct Python version installed:
 
