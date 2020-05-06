@@ -44,7 +44,6 @@ extractors:
     docs: 'https://meltano.com/plugins/extractors/gitlab.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
     capabilities:
-      - discover
       - state
     settings_group_validation:
       - ['api_url', 'groups', 'start_date']
