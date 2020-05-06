@@ -5,11 +5,12 @@ description: Use Meltano to load raw data from numerous sources into Postgres, S
 
 # Reporting Databases (Loaders)
 
-**L**oading data is the **L** in the term **ELT**. After Meltano pulls data from your sources during the **E**xtract step, it uses Loader plugins (that are also known as [targets](/developer-tools/architecture.html#taps)) to load the data into a reporting database for further manipulation and analysis.
+**L**oading data is the **L** in the term **ELT**. After Meltano pulls data from your sources during the **E**xtract step, it uses Loader plugins (that are also known as [targets](/developer-tools/architecture.html#targets)) to load the data into a reporting database for further manipulation and analysis.
 
 Meltano currently supports the following loader destinations:
 
-- [Comma Separated Values (CSV)](/plugins/loaders/csv.html)
+- [Comma Separated Values (CSV) file](/plugins/loaders/csv.html)
+- [JSON Lines (JSON) file](/plugins/loaders/jsonl.html)
 - [Snowflake Data Warehouse](/plugins/loaders/snowflake.html)
 - [PostgreSQL Database](/plugins/loaders/postgres.html)
 - [SQLite Database](/plugins/loaders/sqlite.html)
