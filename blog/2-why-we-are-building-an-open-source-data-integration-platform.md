@@ -1,6 +1,6 @@
 # Why we are building an open source data integration platform
 
-This is part 1 of a 2 part series. If you've been following the Meltano project for a while or would like to have some historical context, start with part 1. If you're new to the Meltano project and mostly interested in what's next, start here.
+This is part 2 of a 2 part series. If you're new to the Meltano project and mostly interested in what's next, feel free to start here and skip part 1. If you've been following the Meltano project for a while or would like to have some historical context, start with [part 1](#).
 
 ---
 
@@ -66,7 +66,7 @@ The only ones who have something to lose here are the current reigning champions
 
 If you don't believe me, just look at the DevOps space and the impact that GitLab has had on the industry and the strategy and offering of the previously dominant players, GitHub and Bitbucket. If an industry has effectively become "pay to play" because every software engineer in that industry needs to use one of a handful of paid tools in order to be productive, there is a massive opportunity for an open source alternative "for the people, by the people" to level the playing field, and disrupt the established players from the bottom.
 
-It works out for GitLab (the company) that _eventually_, a business opportunity may arise out of such an open source project, community, and ecosystem, because there will always be people who do want a hosted version with great support and enterprise features and don't mind paying for it.
+It works out for GitLab (the company) that _eventually_, a business opportunity may arise out of such an open source project, community, and ecosystem, because there will always be people who do want a hosted version with great support and enterprise features and don't mind paying for it. 
 
 But for everyone else, there will always be a Community Edition, and data integration will therefore always be a commodity.
 
