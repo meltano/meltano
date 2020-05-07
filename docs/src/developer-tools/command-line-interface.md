@@ -62,7 +62,7 @@ The `add` command allows you to add an extractor, loader, or transform to your M
 When you add a extractor or loader to a Meltano instance, Meltano will:
 
 1. Add it to the `meltano.yml` file
-1. Installs it in the `.meltano` directory with `venv` and `pip3`
+1. Install it in the `.meltano` directory with `venv` and `pip3`
 
 You can run `meltano add` with `--include-related` to automatically install all transform, model, and dashboard plugins related to an extractor.
 
@@ -86,9 +86,9 @@ meltano add loader target-postgres
 
 When you add a transform to a Meltano instance, Meltano will:
 
-1. Installs dbt transformer to enable transformations (if needed)
+1. Install dbt transformer to enable transformations (if needed)
 1. Add transform to `meltano.yml file`
-1. Updates the dbt packages and project configuration
+1. Update the dbt packages and project configuration
 
 #### Example
 
@@ -102,7 +102,7 @@ meltano add [transform] [name_of_transform]
 When you add a model to a Meltano instance, Meltano will:
 
 1. Add a model bundle to your `meltano.yml` file to help you interactively generate SQL
-1. Install the model inside the `.meltano` directory which are then available to use in the Meltano webapp
+1. Install the model inside the `.meltano` directory which is then available to use in the Meltano webapp
 
 #### Example
 
@@ -127,8 +127,8 @@ meltano add dashboard [name_of_dashboard]
 
 When you add an orchestrator to a Meltano instance, Meltano will:
 
-1. Adds an orchestrator plugin to your **meltano.yml**
-1. Installs it
+1. Add an orchestrator plugin to your **meltano.yml**
+1. Install it
 
 #### Example
 
