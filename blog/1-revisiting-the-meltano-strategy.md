@@ -1,6 +1,10 @@
 # Revisiting the Meltano strategy, direction, and focus: a return to our roots
 
-This is part 1 of a 2 part series. If you've been following the Meltano project for a while or would like to have some historical context, start here. If you're new to the Meltano project and mostly interested in what's next, start with [part 2](#).
+This is part 1 of a 2-part series.
+
+If you've been following the Meltano project for a while or would like to have some historical context, start here.
+
+If you're new to the Meltano project and mostly interested in what's next, feel free to skip this post and start with part 2: [Why we are building an open source platform for data integration and transformation (ELT) pipelines](#).
 
 ---
 
@@ -90,4 +94,4 @@ With everything I know now, I couldn't agree more.
 
 To learn why the opportunity to build an open source platform for data integration and transformation (ELT) pipelines gets us just as excited as we have been about the end-to-end vision in the past, check out part 2:
 
-[**Why we are building an open source data integration platform**](#)
+[**Why we are building an open source platform for data integration and transformation (ELT) pipelines**](#)
