@@ -5,7 +5,7 @@ description: Learn where to use Meltano, how Meltano is built, and where to get 
 
 # What Is Meltano?
 
-Meltano is an open source platform for building, running & orchestrating [Singer](https://www.singer.io/)-based ELT pipelines, that you can [run locally or host on any cloud](/developer-tools/self-hosted-installation.html).
+Meltano is an open source platform for building, running & orchestrating [Singer](https://www.singer.io/)-based ELT pipelines, that you can [run locally or host on any cloud](/docs/self-hosted-installation.html).
 
 Use existing Singer [taps](/plugins/extractors/) and [targets](/plugins/loaders/) or [easily write your own](/tutorials/create-a-custom-extractor.html) to extract data from any SaaS tool or database and load it into any data warehouse.
 
@@ -93,8 +93,8 @@ Read the [October 2019 recap post on the Meltano blog](https://meltano.com/blog/
 We track the leading indicators upstream of MAUI in the funnel to understand the health of our user adoption funnel from first impression to fully onboarded user:
 
 1. [Meltano.com Website](https://meltano.com)
-2. [Meltano Command Line Interface - CLI](https://meltano.com/developer-tools/command-line-interface.html)
-3. [Meltano UI](https://meltano.com/developer-tools/architecture.html#meltano-ui)
+2. [Meltano Command Line Interface - CLI](https://meltano.com/docs/command-line-interface.html)
+3. [Meltano UI](https://meltano.com/docs/architecture.html#meltano-ui)
 
 Internal metrics:
 

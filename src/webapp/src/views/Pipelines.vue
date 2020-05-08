@@ -58,7 +58,7 @@ export default {
               >
               are available when using the
               <a
-                href="https://meltano.com/developer-tools/command-line-interface.html#schedule"
+                href="https://meltano.com/docs/command-line-interface.html#schedule"
                 target="_blank"
                 >command line interface</a
               >.

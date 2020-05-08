@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 @click.pass_context
 def cli(ctx, log_level, verbose):
     """
-    Get help at https://www.meltano.com/developer-tools/command-line-interface.html#command-line-interface
+    Get help at https://www.meltano.com/docs/command-line-interface.html#command-line-interface
     """
     setup_logging(log_level=log_level)
 
@@ -40,6 +40,6 @@ def cli(ctx, log_level, verbose):
             fg="yellow",
         )
         click.echo(
-            "Visit http://meltano.com/developer-tools/self-hosted-installation.html#upgrading-meltano-version for more details."
+            "Visit http://meltano.com/docs/self-hosted-installation.html#upgrading-meltano-version for more details."
         )
         sys.exit(3)

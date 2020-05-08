@@ -8,11 +8,11 @@ lastUpdatedSignificantly: 2020-04-30
 
 ## Install Meltano
 
-Follow the steps under [Self-hosted Installation](/developer-tools/self-hosted-installation.html) to install Meltano locally or in the cloud.
+Follow the steps under [Self-hosted Installation](/docs/self-hosted-installation.html) to install Meltano locally or in the cloud.
 
 ## Set up Meltano
 
-Follow the steps under [Getting Started with Meltano on the Command Line](/developer-tools/command-line-interface.html#getting-started-with-meltano-on-the-command-line) to create your first project, set up a loader, and start the UI.
+Follow the steps under [Getting Started with Meltano on the Command Line](/docs/command-line-interface.html#getting-started-with-meltano-on-the-command-line) to create your first project, set up a loader, and start the UI.
 
 ## Connect Data Sources
 

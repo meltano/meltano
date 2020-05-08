@@ -102,7 +102,7 @@ meltano config target-postgres
 
 This step is required if you don't want to export everything from the source db. You can skip it if you just want to export all tables.
 
-We can use `meltano select` to select which entities will be exported by the Tap from the Source DB. You can find more info on how meltano select works on [the Meltano cli commands Documentation](/developer-tools/command-line-interface.html#select).
+We can use `meltano select` to select which entities will be exported by the Tap from the Source DB. You can find more info on how meltano select works on [the Meltano cli commands Documentation](/docs/command-line-interface.html#select).
 
 In the case of `tap-postgres`, the names of the Entities (or streams as they are called in the Singer.io Specification) are the same as the table names in the Source DB, prefixed by the DB name and the schema they are defined into: `{DB NAME}-{SCHEMA NAME}-{TABLE NAME}`.
 

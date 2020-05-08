@@ -14,11 +14,11 @@ integration:
 transformation:
   primaryAction:
     text: Learn More
-    link: /developer-tools/transforms.html
+    link: /docs/transforms.html
 orchestration:
   primaryAction:
     text: Learn More
-    link: /developer-tools/orchestration.html
+    link: /docs/orchestration.html
 ---
 
 ::: slot installation
@@ -26,7 +26,7 @@ orchestration:
 # Open source data pipelines
 
 Meltano is an [open source](https://gitlab.com/meltano/meltano) platform for
-building, running & orchestrating ELT pipelines built out of [Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com) models, that you can [run locally or host on any cloud](/developer-tools/self-hosted-installation.html).
+building, running & orchestrating ELT pipelines built out of [Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com) models, that you can [run locally or host on any cloud](/docs/self-hosted-installation.html).
 
 Scroll down for details on [integration](/#integration-just-a-few-keystrokes-away), [transformation](/#transformation-as-a-first-class-citizen), and [orchestration](/#orchestration-right-out-of-the-box).
 

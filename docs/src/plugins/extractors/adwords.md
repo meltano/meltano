@@ -74,7 +74,7 @@ If you do not have (1) a developer token for your Google Ads Account and (2) an 
 
 ### Prerequisites
 
-- [Running instance of Meltano](/developer-tools/self-hosted-installation.html#local-installation)
+- [Running instance of Meltano](/docs/self-hosted-installation.html#local-installation)
 - A valid [Google OAuth 2.0 Client](https://console.cloud.google.com/apis/credentials), including:
   - [Your Developer Token for Google AdWords](https://developers.google.com/adwords/api/docs/guides/first-api-call#request_a_developer_token)
   - [Your Google OAuth Client ID](https://developers.google.com/adwords/api/docs/guides/first-api-call#set_up_oauth2_authentication)

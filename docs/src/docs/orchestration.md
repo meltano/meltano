@@ -9,7 +9,7 @@ lastUpdatedSignificantly: 2020-05-04
 
 If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using [Apache Airflow](https://apache.airflow.org).
 
-When a new pipeline schedule is created using the [UI](/docs/analysis.html#create-a-pipeline-schedule) or [CLI](/developer-tools/command-line-interface.html#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
+When a new pipeline schedule is created using the [UI](/docs/analysis.html#create-a-pipeline-schedule) or [CLI](/docs/command-line-interface.html#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 
 ## Installing Airflow
 

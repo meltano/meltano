@@ -2,6 +2,7 @@
 metaTitle: Meltano Data Sources
 description: Meltano Extractors connect to external services to extract for analysis.
 sidebarDepth: 2
+lastUpdatedSignificantly: 2020-05-04
 ---
 
 # Data Sources
@@ -18,7 +19,7 @@ The following data sources are fully supported by Meltano UI, from setting up yo
 * [Zendesk](/plugins/extractors/zendesk.html)
 
 ::: tip Don't see your data source here?
-[Additional data sources](/plugins/extractors/) are available when using the [command line interface](/developer-tools/command-line-interface.html).
+[Additional data sources](/plugins/extractors/) are available when using the [command line interface](/docs/command-line-interface.html).
 
 You can also easily add [any existing Singer tap](https://www.singer.io/#taps) as a [custom extractor](/tutorials/create-a-custom-extractor.html#add-the-plugin-to-your-meltano-project-custom) or [create your own from scratch](/tutorials/create-a-custom-extractor.html).
 :::

@@ -142,7 +142,7 @@ class ProjectInitService:
         click.secho("> ", fg="bright_black", nl=False)
 
         click.secho(
-            "https://meltano.com/developer-tools/environment-variables.html#anonymous-usage-data",
+            "https://meltano.com/docs/environment-variables.html#anonymous-usage-data",
             fg="cyan",
         )
 
