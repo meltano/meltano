@@ -354,8 +354,6 @@ export default {
 
 .hero .content p {
   font-size: 1.2rem !important;
-  padding-right: 20px !important;
-  padding-bottom: 10px !important;
   color: #474C4F !important;
 }
 
@@ -395,8 +393,9 @@ export default {
     width: 35%;
   }
 
-  .hero .content p {
+  .hero-left .content p {
     padding-right: 80px !important;
+    padding-bottom: 10px;
   }
 }
 
@@ -451,7 +450,6 @@ export default {
     padding: 0.8rem 1.6rem;
     border-radius: 4px;
     transition: background-color 0.2s ease;
-    letter-spacing: 0.1rem;
     box-sizing: border-box;
     margin-right: 0.4rem;
     margin-bottom: 1rem;
@@ -544,7 +542,7 @@ export default {
     }
 
     .action-button {
-      font-size: 1rem;
+      font-size: 1.1rem;
       padding: 0.6rem 1.2rem;
     }
 
