@@ -1,6 +1,6 @@
 const docsSidebar = [
   "/docs/",
-  "/docs/self-hosted-installation",
+  "/docs/installation",
   "/docs/getting-started",
   "/docs/command-line-interface",
   "/docs/environment-variables",

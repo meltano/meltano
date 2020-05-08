@@ -122,7 +122,7 @@ Please be aware that the larger the time period and amount of data, the longer t
 
 ### Prerequisites
 
-- [Running instance of Meltano](/docs/self-hosted-installation.html#local-installation)
+- [Running instance of Meltano](/docs/installation.html#local-installation)
 
 ### Configure the Extractor
 

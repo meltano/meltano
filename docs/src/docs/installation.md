@@ -5,7 +5,7 @@ sidebarDepth: 2
 lastUpdatedSignificantly: 2020-05-06
 ---
 
-# Self-Hosted Installation
+# Installation
 
 This section provides guides for getting set up with a self-hosted instance of Meltano's open source data analytics software on your local computer or using popular hosting solutions:
 

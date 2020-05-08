@@ -7,7 +7,7 @@ lastUpdatedSignificantly: 2020-05-07
 
 # Getting Started
 
-Once you have successfully [installed Meltano](/docs/self-hosted-installation.html) from the command line, you will need to create a project before you launch the Meltano UI.
+Once you have successfully [installed Meltano](/docs/installation.html) from the command line, you will need to create a project before you launch the Meltano UI.
 
 ## Create your first project
 

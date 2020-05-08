@@ -2,6 +2,7 @@
 sidebar: auto
 metaTitle: Meltano Tutorial - Transform and Analyze Postgres Data
 description: Learn how to use Meltano to load data from postgres, then analyze it without modifying the raw data.
+lastUpdatedSignificantly: 2020-02-20
 ---
 
 # Tutorial: Postgres Extractor with Postgres Loader

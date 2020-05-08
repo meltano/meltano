@@ -1,11 +1,12 @@
 ---
 metaTitle: Introduction to Meltano
 description: Learn where to use Meltano, how Meltano is built, and where to get started. 
+lastUpdatedSignificantly: 2020-02-20
 ---
 
 # What Is Meltano?
 
-Meltano is an open source platform for building, running & orchestrating [Singer](https://www.singer.io/)-based ELT pipelines, that you can [run locally or host on any cloud](/docs/self-hosted-installation.html).
+Meltano is an open source platform for building, running & orchestrating [Singer](https://www.singer.io/)-based ELT pipelines, that you can [run locally or host on any cloud](/docs/installation.html).
 
 Use existing Singer [taps](/plugins/extractors/) and [targets](/plugins/loaders/) or [easily write your own](/tutorials/create-a-custom-extractor.html) to extract data from any SaaS tool or database and load it into any data warehouse.
 

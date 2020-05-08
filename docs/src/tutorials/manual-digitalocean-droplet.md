@@ -2,6 +2,7 @@
 sidebar: auto
 metaTitle: Meltano Tutorial - Create a Meltano Digital Ocean Droplet
 description: Learn how to create a Digital Ocean Droplet ready to use to host a Meltano instance.
+lastUpdatedSignificantly: 2020-02-20
 ---
 
 # Manually Creating a DigitalOcean Droplet
@@ -26,7 +27,7 @@ ssh root@YOUR_DROPLET_IP_ADDRESS
 
 ## Requirements
 
-Your new server will not have any of [Meltano's requirements](/docs/self-hosted-installation.html#requirements) installed by default, so you will need to install them.
+Your new server will not have any of [Meltano's requirements](/docs/installation.html#requirements) installed by default, so you will need to install them.
 
 ### Python
 
@@ -103,7 +104,7 @@ source venv/.venv/meltano/bin/activate
 
 ### Installing Meltano on your DigitalOcean Droplet
 
-Now that you are inside your virtual environment, follow the [Meltano installation instructions](/docs/self-hosted-installation.html#installing-meltano)
+Now that you are inside your virtual environment, follow the [Meltano installation instructions](/docs/installation.html#installing-meltano)
 
 Initialize Meltano:
 

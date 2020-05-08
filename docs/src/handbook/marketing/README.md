@@ -1,5 +1,6 @@
 ---
 sidebarDepth: 2
+lastUpdatedSignificantly: 2020-04-30
 ---
 
 # Marketing Handbook
@@ -88,7 +89,7 @@ Sign up for our free newsletter: https://meltano.substack.com/
 GET STARTED WITH MELTANO
 Project Home: https://meltano.com
 GitLab: https://gitlab.com/meltano/meltano
-Install Meltano: https://meltano.com/docs/self-hosted-installation.html
+Install Meltano: https://meltano.com/docs/installation.html
 Tutorials: https://meltano.com/tutorials/
 
 SUBSCRIBE for more videos: http://www.youtube.com/subscription_center?add_user=meltano
@@ -117,7 +118,7 @@ It is important to form links to our listing in the following way:
 
 This link contains the "deploy" command which allows existing DigitalOcean users to skip the marketplace listing page and go straight to deploying their Droplet. It also includes our referral code, which gets all new DigitalOcean users $50 of free credit over 30 days through the [referral program](https://www.digitalocean.com/referral-program/). We also receive $25 of credit for each new user who spends over $25, which offsets our DigitalOcean bill each month and helps us keep our operating costs low.
 
-Users will find this link on the [Meltano Installation Docs page](/docs/self-hosted-installation.html#digitalocean-marketplace)
+Users will find this link on the [Meltano Installation Docs page](/docs/installation.html#digitalocean-marketplace)
 
 #### Following the DigitalOcecan Brand Guidelines
 
