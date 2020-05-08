@@ -12,7 +12,6 @@ const docsSidebar = [
   "/docs/contributor-guide.html",
   "/docs/architecture.html",
   "/docs/analysis",
-  "/docs/data-sources",
   "/docs/getting-help",
   "/docs/responsible-disclosure",
   "/handbook/",

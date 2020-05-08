@@ -72,7 +72,7 @@ export default {
                         </p>
                         <div class="buttons">
                           <a
-                            href="https://www.meltano.com/docs/data-sources.html"
+                            href="https://www.meltano.com/plugins/extractors/"
                             target="_blank"
                             class="button is-interactive-primary"
                             >Learn More</a

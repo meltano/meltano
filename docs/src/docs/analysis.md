@@ -16,9 +16,30 @@ Follow the steps under [Getting Started with Meltano on the Command Line](/docs/
 
 ## Connect Data Sources
 
-Once you're inside the Meltano UI, you'll begin on the **Connections** page to connect your [data sources](/docs/data-sources.html).
+Once you're inside the Meltano UI, you'll begin on the **Connections** page to connect your data sources.
 
 ![Meltano UI with all extractors not installed initial loading screen](/images/getting-started-guide/1-connections.png)
+
+### Supported data sources
+
+The following data sources are fully supported by Meltano UI, from setting up your connection to creating reports and sharing dashboards:
+
+* [Facebook Ads](/plugins/extractors/facebook.html)
+* [GitLab](/plugins/extractors/gitlab.html)
+* [Google Ads](/plugins/extractors/adwords.html)
+* [Google Analytics](/plugins/extractors/google-analytics.html)
+* [Salesforce](/plugins/extractors/salesforce.html)
+* [Shopify](/plugins/extractors/shopify.html)
+* [Stripe](/plugins/extractors/stripe.html)
+* [Zendesk](/plugins/extractors/zendesk.html)
+
+::: tip Don't see your data source here?
+[Additional data sources](/plugins/extractors/) are available when using the [command line interface](/docs/command-line-interface.html).
+
+You can also easily add [any existing Singer tap](https://www.singer.io/#taps) as a [custom extractor](/tutorials/create-a-custom-extractor.html#add-the-plugin-to-your-meltano-project-custom) or [create your own from scratch](/tutorials/create-a-custom-extractor.html).
+:::
+
+### Connecting a data source
 
 Choose a data source to connect (we'll use [Google Ads](/plugins/extractors/adwords.html) in this example), fill in the form with your authentication details, **Test Connection** to ensure everything is on order, and then hit **Save**.
 
@@ -36,7 +57,7 @@ On the **Pipelines** page, you can see the pipeline that was automatically creat
 
 ![Pipelines page](/images/getting-started-guide/5-pipelines.png)
 
-In this example, we have used [Google Ads](/plugins/extractors/adwords.html), but the process looks the same for all of the [supported data sources](/docs/data-sources.html).
+In this example, we have used [Google Ads](/plugins/extractors/adwords.html), but the process looks the same for all of the [supported data sources](#supported-data-sources).
 
 ## Explore Your Data
 
@@ -110,6 +131,6 @@ Using this link, anyone will be able to view the report or dashboard in question
 
 You have now set up a complete end-to-end data to dashboard sales funnel analysis solution with Meltano! 🎉
 
-Next, you'll want to make sure that all of your [data sources](/docs/data-sources.html) are connected to Meltano, so that you can build your own high-level dashboards with reports for those metrics you care most about.
+Next, you'll want to make sure that all of your [data sources](#supported-data-sources) are connected to Meltano, so that you can build your own high-level dashboards with reports for those metrics you care most about.
 
 And if the report you’re looking for is not yet included with Meltano by default and cannot easily be created using the report builder, please [let us know](/docs/getting-help.html) and we'll gladly build it for you!
