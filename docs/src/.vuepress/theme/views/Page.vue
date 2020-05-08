@@ -120,7 +120,7 @@
 </template>
 
 <script>
-const POSSIBLY_OUTDATED_IF_LAST_UPDATED_BEFORE = new Date("2020-05-09");
+const POSSIBLY_OUTDATED_IF_LAST_UPDATED_BEFORE = new Date("2020-05-08");
 
 import { resolvePage, normalize, outboundRE, endingSlashRE } from "../util";
 
