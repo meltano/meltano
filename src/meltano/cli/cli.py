@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 @click.pass_context
 def cli(ctx, log_level, verbose):
     """
-    Get help at https://www.meltano.com/docs/command-line-interface.html#command-line-interface
+    Get help at https://www.meltano.com/docs/command-line-interface.html
     """
     setup_logging(log_level=log_level)
 

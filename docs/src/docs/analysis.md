@@ -4,7 +4,7 @@ description: Create your first data analysis project, build a pipeline, and anal
 lastUpdatedSignificantly: 2020-04-30
 ---
 
-# Getting Started with Data Analysis
+# Analysis
 
 ## Install Meltano
 

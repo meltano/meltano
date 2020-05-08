@@ -3,7 +3,7 @@ metaTitle: Extracting Data with Meltano
 description: Use Meltano to extract raw data from numerous sources including CSV, Google Analytics, Stripe, and more. 
 ---
 
-# Data Sources (Extractors)
+# Extractors: Data Sources
 
 **E**xtracting data is the **E** in the term **ELT**. To pull data from your sources, Meltano uses Extractor plugins that are also known as [taps](/docs/architecture.html#taps).
 

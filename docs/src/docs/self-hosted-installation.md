@@ -10,7 +10,7 @@ lastUpdatedSignificantly: 2020-05-06
 This section provides guides for getting set up with a self-hosted instance of Meltano's open source data analytics software on your local computer or using popular hosting solutions:
 
 - [Local Installation](#local-installation)
-- [Docker](#installing-on-docker)
+- [Installing on Docker](#installing-on-docker)
 - [Amazon Web Services (AWS)](#amazon-web-services-aws)
 
 ## Local Installation
@@ -117,7 +117,7 @@ Once the installation completes, you can check if it was successful by running:
 meltano --version
 ```
 
-Now that you've installed Meltano and its requirements, you can [create your first project](/docs/command-line-interface.html#create-your-first-project).
+Now that you've installed Meltano and its requirements, you can [create your first project](/docs/getting-started.html#create-your-first-project).
 
 ## Installing on Docker
 
@@ -141,7 +141,7 @@ docker run meltano/meltano --version
 
 ### Initialize Your Project
 
-Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our [Getting Started Guide](/docs/command-line-interface.html#getting-started-with-meltano-on-the-command-line). However, the command line syntax is slightly different. For example, let's create a new Meltano project:
+Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our [Getting Started Guide](/docs/getting-started.html). However, the command line syntax is slightly different. For example, let's create a new Meltano project:
 
 ```bash
 cd /your/projects/directory
@@ -168,7 +168,7 @@ docker run -v $(pwd):/project \
 
 You can now visit [http://localhost:5000](http://localhost:5000) to access the Meltano UI.
 
-Now that you're succesfully running Meltano, you can [set up your loader](/docs/command-line-interface.html#setup-your-loader).
+Now that you're succesfully running Meltano, you can [set up your loader](/docs/getting-started.html#setup-your-loader).
 
 Note that wherever you are asked to run the `meltano` command, you will want to run it through `docker run` as in the snippet above.
 
@@ -288,7 +288,7 @@ The IP address can be mapped to a domain using Route53. We will be writing up a 
 
 ### Next Steps
 
-Once you have successfully installed Meltano from the command line, you will need to [create your first project from the command line](/docs/command-line-interface.html#create-your-first-project).
+Once you have successfully installed Meltano from the command line, you will need to [create your first project from the command line](/docs/getting-started.html#create-your-first-project).
 
 ## Troubleshooting Installation
 
