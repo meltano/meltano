@@ -3,9 +3,9 @@ metaTitle: Loading Data with Meltano
 description: Use Meltano to load raw data from numerous sources into Postgres, Snowflake, and more. 
 ---
 
-# Reporting Databases (Loaders)
+# Loaders: Data Destinations
 
-**L**oading data is the **L** in the term **ELT**. After Meltano pulls data from your sources during the **E**xtract step, it uses Loader plugins (that are also known as [targets](/developer-tools/architecture.html#targets)) to load the data into a reporting database for further manipulation and analysis.
+**L**oading data is the **L** in the term **ELT**. After Meltano pulls data from your sources during the **E**xtract step, it uses Loader plugins (that are also known as [targets](/docs/architecture.html#targets)) to load the data into a reporting database for further manipulation and analysis.
 
 Meltano currently supports the following loader destinations:
 

@@ -2,6 +2,7 @@
 metaTitle: Contributing to Meltano
 description: Meltano is open source software built by an internal team at GitLab as well as the larger Meltano community.
 sidebarDepth: 2
+lastUpdatedSignificantly: 2020-04-27
 ---
 
 # Contributor Guide
@@ -10,7 +11,7 @@ sidebarDepth: 2
 
 In order to contribute to Meltano, you will need the following:
 
-1. [Python 3.6.1+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/developer-tools/self-hosted-installation.html#requirements) of the self-hosted installation instructions, that also apply here.
+1. [Python 3.6.1+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/docs/installation.html#requirements) of the Installation instructions, that also apply here.
 2. [Node 8.11.0+](https://nodejs.org/)
 3. [Yarn](https://yarnpkg.com/)
 
@@ -20,7 +21,7 @@ We welcome contributions, idea submissions, and improvements. In fact we may alr
 
 ### Metrics (anonymous usage data) tracking
 
-As you contribute to Meltano, you may want to disable [metrics tracking](/developer-tools/environment-variables.html#anonymous-usage-data) globally rather than by project. You can do this by setting the environment variable `MELTANO_DISABLE_TRACKING` to `True`:
+As you contribute to Meltano, you may want to disable [metrics tracking](/docs/environment-variables.html#anonymous-usage-data) globally rather than by project. You can do this by setting the environment variable `MELTANO_DISABLE_TRACKING` to `True`:
 
 ```bash
 # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
@@ -288,8 +289,8 @@ meltano elt tap-gitlab target-postgres --transform only
 
 When updating the models that will appear in the UI, you can follow these steps:
 
-1. Create [`table.m5o` file](/developer-tools/architecture.html#table) that defines the UI columns that will appear on the UI
-1. Update [`topic.m5o` file](/developer-tools/architecture.html#topic) to include the newly created model table
+1. Create [`table.m5o` file](/docs/architecture.html#table) that defines the UI columns that will appear on the UI
+1. Update [`topic.m5o` file](/docs/architecture.html#topic) to include the newly created model table
 1. Compile model repo with `python3 setup.py sdist`
 1. Go to project's `meltano.yml` file and replace `pip_url` with the file path to the targz file created
 1. Run `meltano install` to fetch new settings

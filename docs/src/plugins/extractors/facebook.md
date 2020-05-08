@@ -2,6 +2,7 @@
 sidebar: auto
 metaTitle: Extract Facebook Ads Data
 description: Use Meltano to extract Facebook Ads data from the Facebook Marketing API and insert it into Postgres, Snowflake, and more.
+lastUpdatedSignificantly: 2020-04-30
 ---
 
 # Facebook Ads
@@ -121,7 +122,7 @@ Please be aware that the larger the time period and amount of data, the longer t
 
 ### Prerequisites
 
-- [Running instance of Meltano](/docs/getting-started.html)
+- [Running instance of Meltano](/docs/installation.html#local-installation)
 
 ### Configure the Extractor
 

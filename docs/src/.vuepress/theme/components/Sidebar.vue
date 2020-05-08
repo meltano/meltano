@@ -1,6 +1,6 @@
 <template>
   <div class="sidebar">
-    <router-link to="/docs/getting-started.html" class="sidebar-cta">
+    <router-link to="/docs/installation.html" class="sidebar-cta">
       Install
     </router-link>
     <NavLinks />
@@ -23,61 +23,61 @@
 </template>
 
 <script>
-import SidebarGroup from './SidebarGroup.vue'
-import SidebarLink from './SidebarLink.vue'
-import NavLinks from './NavLinks.vue'
-import { isActive } from '../util'
+import SidebarGroup from "./SidebarGroup.vue";
+import SidebarLink from "./SidebarLink.vue";
+import NavLinks from "./NavLinks.vue";
+import { isActive } from "../util";
 
 export default {
   components: { SidebarGroup, SidebarLink, NavLinks },
 
-  props: ['items'],
+  props: ["items"],
 
   data() {
     return {
-      openGroupIndex: 0
-    }
+      openGroupIndex: 0,
+    };
   },
 
   created() {
-    this.refreshIndex()
+    this.refreshIndex();
   },
 
   watch: {
     $route() {
-      this.refreshIndex()
-    }
+      this.refreshIndex();
+    },
   },
 
   methods: {
     refreshIndex() {
-      const index = resolveOpenGroupIndex(this.$route, this.items)
+      const index = resolveOpenGroupIndex(this.$route, this.items);
       if (index > -1) {
-        this.openGroupIndex = index
+        this.openGroupIndex = index;
       }
     },
 
     toggleGroup(index) {
-      this.openGroupIndex = index === this.openGroupIndex ? -1 : index
+      this.openGroupIndex = index === this.openGroupIndex ? -1 : index;
     },
 
     isActive(page) {
-      return isActive(this.$route, page.path)
-    }
-  }
-}
+      return isActive(this.$route, page.path);
+    },
+  },
+};
 
 function resolveOpenGroupIndex(route, items) {
   for (let i = 0; i < items.length; i++) {
-    const item = items[i]
+    const item = items[i];
     if (
-      item.type === 'group' &&
-      item.children.some(c => isActive(route, c.path))
+      item.type === "group" &&
+      item.children.some((c) => isActive(route, c.path))
     ) {
-      return i
+      return i;
     }
   }
-  return -1
+  return -1;
 }
 </script>
 

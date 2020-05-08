@@ -2,6 +2,7 @@
 sidebar: auto
 metaTitle: Meltano Tutorial - Create Custom Transforms & Models
 description: Learn how to use Meltano to create a custom Transforms and Models.
+lastUpdatedSignificantly: 2020-02-20
 ---
 
 # Creating Custom Transforms and Models
@@ -95,7 +96,7 @@ Number of won opportunities by quarter, year, deal type, deal size and company s
 
 Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations (i.e. `sfdc-project/transform`). When `meltano elt tap-salesforce target-postgres --transform run` is executed, both default and custom dbt transformations in the `transform/` directory are being performed.
 
-If you are not familiar with dbt, please visit [dbt's documentation](https://docs.getdbt.com/). You can also check the section in Meltano's documentation on [Transforms](/developer-tools/transforms.html) for more details.
+If you are not familiar with dbt, please visit [dbt's documentation](https://docs.getdbt.com/). You can also check the section in Meltano's documentation on [Transforms](/docs/transforms.html) for more details.
 
 Let's generate two additional transformations, which will produce:
 
@@ -236,7 +237,7 @@ meltano elt tap-salesforce target-postgres --transform only
 
 ## Adding Custom Models
 
-In order to access the newly transformed data from the Analyze Section in Meltano UI, a `table.m5o` file, which defines the available columns and aggregates for each table should be created. A `topic.m5o` file for representing how the tables are connected is also required. The files will be stored in the `model/` directory. For more details on how `.m5o` files are structured, please refer to the documentation on [Meltano Models](https://www.meltano.com/developer-tools/architecture.html#meltano-model).
+In order to access the newly transformed data from the Analyze Section in Meltano UI, a `table.m5o` file, which defines the available columns and aggregates for each table should be created. A `topic.m5o` file for representing how the tables are connected is also required. The files will be stored in the `model/` directory. For more details on how `.m5o` files are structured, please refer to the documentation on [Meltano Models](https://www.meltano.com/docs/architecture.html#meltano-model).
 
 Account Category Table
 `sfdc-project/model/account_category.table.m5o`

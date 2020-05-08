@@ -126,9 +126,7 @@ class ProjectInitService:
         click.echo("\nNext steps:")
         click.secho("\tcd ", nl=False)
         click.secho(self.project_name, fg="green")
-        click.echo(
-            "\tVisit https://meltano.com/docs/getting-started.html in order to try us out"
-        )
+        click.echo("\tVisit https://meltano.com/ to learn where to go from here")
 
         click.echo()
         click.secho("> ", fg="bright_black", nl=False)
@@ -142,7 +140,7 @@ class ProjectInitService:
         click.secho("> ", fg="bright_black", nl=False)
 
         click.secho(
-            "https://meltano.com/developer-tools/environment-variables.html#anonymous-usage-data",
+            "https://meltano.com/docs/environment-variables.html#anonymous-usage-data",
             fg="cyan",
         )
 

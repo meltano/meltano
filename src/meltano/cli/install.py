@@ -36,7 +36,7 @@ def install_status_update(data):
 def install(project, plugin_type, include_related):
     """
     Installs all the dependencies of your project based on the meltano.yml file.
-    Read more at https://www.meltano.com/docs/command-line-interface.html#command-line-interface.
+    Read more at https://www.meltano.com/docs/command-line-interface.html.
     """
     config_service = ConfigService(project)
 

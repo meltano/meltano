@@ -1,114 +1,45 @@
 ---
-metaTitle: Getting Started With Data Analysis
-description: Create your first data analysis project, build a pipeline, and analyze your data after installing Meltano.
+metaTitle: Getting Started with the Meltano CLI
+description: The Meltano command line interface makes it easy to develop, run, and debug every step of the data analysis lifecycle.
+sidebarDepth: 2
+lastUpdatedSignificantly: 2020-05-07
 ---
 
 # Getting Started
 
-## Install Meltano
+Once you have successfully [installed Meltano](/docs/installation.html) from the command line, you will need to create a project before you launch the Meltano UI.
 
-Follow the steps under [Self-hosted Installation](/developer-tools/self-hosted-installation.html) to install Meltano locally or in the cloud.
+## Create your first project
 
-## Set up Meltano
+To initialize a new project, open your terminal and navigate to the directory that you'd like to store your Meltano projects in.
 
-Follow the steps under [Getting Started with Meltano on the Command Line](/developer-tools/command-line-interface.html#getting-started-with-meltano-on-the-command-line) to create your first project, set up a loader, and start the UI.
+Use the `meltano init` command, which takes a `PROJECT_NAME` that is of your own choosing. For this guide, let's create a project called "myprojectname".
 
-## Connect Data Sources
+```bash
+meltano init myprojectname
+```
 
-Once you're inside the Meltano UI, you'll begin on the **Connections** page to connect your [data sources](/docs/data-sources.html).
+This will create a new directory named `myprojectname` in the current directory and initialize Meltano's basic directory structure inside it.
 
-![Meltano UI with all extractors not installed initial loading screen](/images/getting-started-guide/1-connections.png)
+Inside the Meltano project directory, all plugin configuration (which may include tokens and passwords) is stored inside the `.meltano` directory, which is automatically added to the project's `.gitignore` file to prevent this potentially sensitive information from accidentally being pushed up to a hosted Git repository.
 
-Choose a data source to connect (we'll use [Google Ads](/plugins/extractors/adwords.html) in this example), fill in the form with your authentication details, **Test Connection** to ensure everything is on order, and then hit **Save**.
+## Setup your loader
 
-![Example of Google Ads docs appearing next to configuration form](/images/getting-started-guide/2-connection-setup-populated.png)
+Self-hosted Meltano instances require you to set up a reporting database and configure Meltano to use it by installing a **Loader**.
 
-Once saved, we automatically start data extraction for you. The extraction time varies based on the data source and Start Date setting that you previously selected. You can follow along with the progress through the **Run Log** modal that will appear, but extraction will continue in the background even if you close this view. Once complete you can click the **Explore** button to start exploring the imported data.
+Meltano has basic support for a [few different loaders](/plugins/loaders/), but dashboards and reports are only supported with [PostgreSQL](/plugins/loaders/postgres.html).
 
-![Example of Google Ads extraction log and explore button](/images/getting-started-guide/3-run-log-complete.png)
+You will find detailed instructions in the docs for your loader of choice.
 
-On the **Explore** page for the data source in question, you will find all of the **Dashboards**, **Reports**, and **Report Builders** that come with it out of the box. How to use these will be covered in more detail in the next section.
+## Start the application
 
-![Example of Google Ads explore page](/images/getting-started-guide/4-explore.png)
+Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
 
-On the **Pipelines** page, you can see the pipeline that was automatically created for the data source you have added. You can modify its update interval to ensure the data in your dashboards and reports is always up to date, trigger a manual run, or access the log for the latest update run to troubleshoot potential issues.
+```bash
+cd myprojectname
+meltano ui
+```
 
-![Pipelines page](/images/getting-started-guide/5-pipelines.png)
+Meltano is now running and should open a new tab at [http://localhost:5000](http://localhost:5000).
 
-In this example, we have used [Google Ads](/plugins/extractors/adwords.html), but the process looks the same for all of the [supported data sources](/docs/data-sources.html).
-
-## Explore Your Data
-
-Congratulations! Now that you have connected a data source and successfully imported the initial dataset, we are now ready to explore and analyze the data!
-
-On the **Explore** page for the data source in question, you will find all of the **Dashboards**, **Reports**, and **Report Builders** that come with Meltano out of the box. Once you start creating your own reports and dashboards, they will show up here as well.
-
-![Example of Google Ads explore page](/images/getting-started-guide/4-explore.png)
-
-To help you get started, the Meltano team has used the report builders to build a number of reports for common metrics and dimensions, that can be found on the dashboards.
-
-![Example of Google Ads dashboard](/images/getting-started-guide/6-default-dashboard.png)
-
-Of course, these may not be the exact reports you're interested in, and you can dig deeper into your data by using the Report Builder, which allows you to dynamically build queries and visualize your data. You can access it either by choosing a specific Report Builder on the Explore page, or by hitting the "Edit" button on an existing report.
-
-![Report Builder](/images/getting-started-guide/7-report-builder.png)
-
-In the **Query** panel on the left, you can select the columns (dimensions) and aggregates (metrics) you would like to show in the table and graph. You can also specify a limit (the maximum number of rows/data points), set one or more filter, or view the generated SQL for the query in question.
-
-![Report Builder with extra aggregates](/images/getting-started-guide/8-report-builder-modified.png)
-
-You can also change the date range using the date picker in the top right.
-
-![Report Builder with date picker](/images/getting-started-guide/9-report-builder-date-picker.png)
-
-Additionally, you can change the chart type using the button on the top right of the chart, and change the sorting of your data using the header cells in the table below the graph.
-
-## Save Reports
-
-When we find an analysis that we want to reference in the future, we can easily do this by saving the analysis as a report using the **Save Report** button in the top right.
-
-Note that if you are editing an existing report, clicking "Save Report" will update the report in question. To create a _new_ report with the changes, click the arrow to the right of "Save Report". In the dropdown that will open up, you can choose a new name for the report.
-
-![Save Report dialogue for naming the report you want to save](/images/getting-started-guide/10-report-builder-save-as.png)
-
-Once we click **Save**, you should see the new name reflected in the top left of the report builder interface, and our analysis has been saved!
-
-You can now find the report on the "Explore" page for the data source in question.
-
-## Add Reports to Dashboards
-
-As you acquire more reports, you will probably want to organize them via dashboards. This can be done by clicking on the **Add to Dashboard** button in the toolbar. You will see all existing dashboards listed here, as well as the option to create a new one.
-
-![Dropdown menu for adding report to dashboard](/images/getting-started-guide/11-report-builder-add-to-dashboard.png)
-
-To add a report to an existing dashboard, simply click the checkmark by the appropriate name. To create a new dashboard, click the **Create Dashboard** button. In the dropdown that will open up, you can choose a new name for the dashboard.
-
-![New dashboard dialog for configuring the dashboard](/images/getting-started-guide/12-report-builder-create-dashboard.png)
-
-Once we click **Create**, we can verify that our report has been added to the Dashboard by opening the **Add to Dashboard** menu.
-
-![Confirmation that our report is added to the dashboard](/images/getting-started-guide/13-report-builder-dashboard-saved.png)
-
-We can find the newly created dashboard on the **Dashboards** page you can find in the navigation bar.
-
-![Dashboard page with newly created dashboard](/images/getting-started-guide/14-dashboards.png)
-
-Once we select it, you will see the dashboard you created. You can repeat the above process to add more reports to the same and/or different dashboards.
-
-![Dashboard with the saved Report](/images/getting-started-guide/15-overview-dashboard.png)
-
-## Share Reports and Dashboards
-
-Once you've created reports and dashboards, you can easily generate a **read-only** link or embed snippet using the **Share** button on the top right of the report or dashboard.
-
-![Sharing reports and dashboards](/images/getting-started-guide/16-share-dashboard.png)
-
-Using this link, anyone will be able to view the report or dashboard in question without needing to sign in to your Meltano instance, but they will not be able to make any changes. If you update the dashboard or report after the fact, or if new data is loaded into Meltano, the content at the shared link will automatically be updated as well.
-
-### Next Steps
-
-You have now set up a complete end-to-end data to dashboard sales funnel analysis solution with Meltano! 🎉
-
-Next, you'll want to make sure that all of your [data sources](/docs/data-sources.html) are connected to Meltano, so that you can build your own high-level dashboards with reports for those metrics you care most about.
-
-And if the report you’re looking for is not yet included with Meltano by default and cannot easily be created using the report builder, please [let us know](/docs/getting-help.html) and we'll gladly build it for you!
+Now that you have access to the Meltano UI, [use our Getting Started with Data Analysis guide](/docs/analysis.html#connect-data-sources) to learn more about how to use the software.

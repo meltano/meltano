@@ -2,7 +2,7 @@
 
 # Meltano: Open source data pipelines
 
-[Meltano](https://meltano.com) is an open source platform for building, running & orchestrating [Singer](https://www.singer.io/)- and [dbt](https://www.getdbt.com)-based ELT pipelines, that you can [run locally or host on any cloud](https://meltano.com/developer-tools/self-hosted-installation.html).
+[Meltano](https://meltano.com) is an open source platform for building, running & orchestrating [Singer](https://www.singer.io/)- and [dbt](https://www.getdbt.com)-based ELT pipelines, that you can [run locally or host on any cloud](https://meltano.com/docs/installation.html).
 
 ## Documentation
 
@@ -10,7 +10,7 @@ You can find our documentation at [https://www.meltano.com/docs/](https://www.me
 
 ## Contributing to Meltano
 
-We welcome contributions and improvements, please see the [contribution guidelines](https://meltano.com/developer-tools/contributor-guide.html)
+We welcome contributions and improvements, please see the [contribution guidelines](https://meltano.com/docs/contributor-guide.html)
 
 ## Responsible Disclosure Policy
 

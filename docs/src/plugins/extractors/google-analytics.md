@@ -2,6 +2,7 @@
 sidebar: auto
 metaTitle: Extract Data from Google Analytics
 description: Use Meltano to extract raw data from Google Analytics and insert it into Postgres, Snowflake, and more.
+lastUpdatedSignificantly: 2020-04-14
 ---
 
 # Google Analytics
@@ -117,7 +118,7 @@ Please be aware that the larger the time period and amount of data, the longer t
 
 ### Prerequisites
 
-- [Running instance of Meltano](/docs/getting-started.html)
+- [Running instance of Meltano](/docs/installation.html#local-installation)
 
 ### Configuration
 

@@ -8,7 +8,7 @@ export default {
   <footer class="footer">
     <slot></slot>
     <a
-      href="https://meltano.com/developer-tools/contributor-guide.html"
+      href="https://meltano.com/docs/contributor-guide.html"
       target="_blank"
       >Meltano is open source. Contribute to the project! <OutboundLink
     /></a>
