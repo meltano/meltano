@@ -14,8 +14,12 @@ docs:
     - ssh-add $SSH_PRIVATE_KEY > /dev/null
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
+    - LATEST_TAG_NAME=$(git describe --abbrev=0 --tags)
+    - LATEST_TAG_SHA=$(git rev-parse $LATEST_TAG_NAME)
   script:
     - cd docs
+    - sed -i "s/LATEST_TAG_NAME/$LATEST_TAG_NAME/g" src/README.md
+    - sed -i "s/LATEST_TAG_SHA/$LATEST_TAG_SHA/g" src/README.md
     - yarn
     - yarn build:docs
     - $REMOTE_EXEC "mkdir -p $SSH_BACKUP_DIRECTORY; tar zcvf $SSH_BACKUP_DIRECTORY-$(date +%Y-%m-%dT%H:%M).tar.gz $SSH_DIRECTORY/$SSH_WWW_DIRECTORY"

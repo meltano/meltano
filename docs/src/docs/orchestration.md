@@ -2,15 +2,16 @@
 metaTitle: Orchestration with Meltano
 description: Using Airflow with Meltano for orchestration
 sidebarDepth: 2
+lastUpdatedSignificantly: 2020-05-04
 ---
 
-## Orchestration
+# Orchestration
 
 If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using [Apache Airflow](https://apache.airflow.org).
 
-When a new pipeline schedule is created using the [UI](/docs/getting-started.html#create-a-pipeline-schedule) or [CLI](/developer-tools/command-line-interface.html#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
+When a new pipeline schedule is created using the [UI](/docs/analysis.html#create-a-pipeline-schedule) or [CLI](/docs/command-line-interface.html#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 
-### Installing Airflow
+## Installing Airflow
 
 Change directories so that you are inside your Meltano project, and then run the following command to make Airflow available to use via `meltano invoke`
 
@@ -22,9 +23,9 @@ Now you have Airflow installed, let's create a simple example schedule to confir
 
 Note that the Airflow scheduler automatically runs in the background while Meltano UI is running, unless the `MELTANO_DISABLE_AIRFLOW` environment variable is set.
 
-### Create a Schedule
+## Create a Schedule
 
-To regularly schedule your ELT to run, use the ["Pipeline" interface in the UI](/docs/getting-started.html#create-a-pipeline-schedule), or the following command:
+To regularly schedule your ELT to run, use the ["Pipeline" interface in the UI](/docs/analysis.html#create-a-pipeline-schedule), or the following command:
 
 ```bash
 meltano schedule [SCHEDULE_NAME] [EXTRACTOR_NAME] [TARGET_NAME] [INTERVAL]
@@ -38,7 +39,7 @@ meltano schedule carbon__sqlite tap-carbon-intensity target-sqlite @daily
 
 Now that you've scheduled your first DAG, you can load the "Pipeline" page in the UI and see it show up.
 
-### Using Airflow directly
+## Using Airflow directly
 
 You are free to interact with Airflow directly through its own UI. You can start the web like this:
 
@@ -52,7 +53,7 @@ You can use the bundled Airflow with custom DAGs by putting them inside the `orc
 
 Meltano's use of Airflow will be unaffected by other usage of Airflow as long as `orchestrate/dags/meltano.py` remains untouched and pipelines are managed through the dedicated interface.
 
-#### Other things you can do with Airflow
+### Other things you can do with Airflow
 
 Currently, `meltano invoke` gives you raw access to the underlying plugin after any configuration hooks.
 

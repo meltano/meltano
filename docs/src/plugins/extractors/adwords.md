@@ -2,6 +2,7 @@
 sidebar: auto
 metaTitle: Extract Google Ads Data
 description: Use Meltano to extract Google Ads data from the AdWords API and insert it into Postgres, Snowflake, and more.
+lastUpdatedSignificantly: 2020-04-30
 ---
 
 # Google Ads
@@ -73,7 +74,7 @@ If you do not have (1) a developer token for your Google Ads Account and (2) an 
 
 ### Prerequisites
 
-- [Running instance of Meltano](/docs/getting-started.html)
+- [Running instance of Meltano](/docs/installation.html#local-installation)
 - A valid [Google OAuth 2.0 Client](https://console.cloud.google.com/apis/credentials), including:
   - [Your Developer Token for Google AdWords](https://developers.google.com/adwords/api/docs/guides/first-api-call#request_a_developer_token)
   - [Your Google OAuth Client ID](https://developers.google.com/adwords/api/docs/guides/first-api-call#set_up_oauth2_authentication)

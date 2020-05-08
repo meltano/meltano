@@ -2,6 +2,7 @@
 sidebar: auto
 metaTitle: Meltano Tutorial - Load data from GitLab groups and projects into Postgres
 description: Learn how to use Meltano to analyze your GitLab data by automatically loading it into Postgres.
+lastUpdatedSignificantly: 2020-02-13
 ---
 
 # Tutorial: GitLab API + Postgres
@@ -18,7 +19,7 @@ In this tutorial we'll explain how to get the [GitLab Extractor](https://gitlab.
 
 For this tutorial, you can use a new or existing Meltano project.
 
-If you need help getting started, we recommend reviewing the [Installation documentation](/developer-tools/self-hosted-installation.html) and [Getting Started Guide](/docs/getting-started.html) to set up your first project.
+If you need help getting started, we recommend reviewing the [Installation documentation](/docs/installation.html) and [Getting Started guide](/docs/getting-started.html) to set up your first project.
 
 If this is your first time using GitLab with Meltano, you will need to enable access to GitLab's API and get your GitLab Private Token by following the instructions found in the [GitLab Extractor documentation](/plugins/extractors/gitlab.html#gitlab-api-token).
 

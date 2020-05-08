@@ -5,20 +5,20 @@ metaTitle: "Meltano: open source data pipelines"
 description: Meltano is an open source platform for building, running & orchestrating Singer- and dbt-based ELT pipelines, that you can run locally or host on any cloud. Use existing Singer taps and targets or easily write your own to extract data from any SaaS tool or database and load it into any data warehouse or file format.
 installation:
   primaryAction:
-    text: Get Started
-    link: /docs/getting-started.html
+    text: Install now
+    link: /docs/installation.html
 integration:
   primaryAction:
-    text: Learn More
+    text: Learn more
     link: /plugins/extractors/
 transformation:
   primaryAction:
-    text: Learn More
-    link: /developer-tools/transforms.html
+    text: Learn more
+    link: /docs/transforms.html
 orchestration:
   primaryAction:
-    text: Learn More
-    link: /developer-tools/orchestration.html
+    text: Learn more
+    link: /docs/orchestration.html
 ---
 
 ::: slot installation
@@ -26,7 +26,7 @@ orchestration:
 # Open source data pipelines
 
 Meltano is an [open source](https://gitlab.com/meltano/meltano) platform for
-building, running & orchestrating [Singer](https://www.singer.io/)- and [dbt](https://www.getdbt.com)-based ELT pipelines, that you can [run locally or host on any cloud](/developer-tools/self-hosted-installation.html).
+building, running & orchestrating ELT pipelines built out of [Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com) models, that you can [run locally or host on any cloud](/docs/installation.html).
 
 Scroll down for details on [integration](/#integration-just-a-few-keystrokes-away), [transformation](/#transformation-as-a-first-class-citizen), and [orchestration](/#orchestration-right-out-of-the-box).
 
@@ -53,8 +53,9 @@ pip3 install meltano
 
 # Initialize Meltano project "demo-project"
 meltano init demo-project
-cd demo-project
 ```
+
+Your Meltano project is now ready!
 
 :::
 
@@ -73,7 +74,14 @@ the previous run left off.
 :::
 
 ::: slot integration-code
+
 ```bash
+# Before you use any `meltano` command, ensure that:
+# - you have navigated to your Meltano project directory
+cd demo-project
+# - you have activated the virtual environment
+source ../.venv/bin/activate
+
 # Add GitLab extractor to your project
 meltano add extractor tap-gitlab
 
@@ -93,8 +101,10 @@ head -n 1 output/tags.jsonl
 ```
 
 ```json
-{"name": "v1.31.0", "message": "", "target": "c1682bf6de3f166a1305c03520674880a3a4e809", "commit_id": "c1682bf6de3f166a1305c03520674880a3a4e809", "project_id": 7603319}
+{"name": "LATEST_TAG_NAME", "message": "", "target": "LATEST_TAG_SHA", "commit_id": "LATEST_TAG_SHA", "project_id": 7603319}
 ```
+
+Your data has now been extracted and loaded!
 
 :::
 
@@ -152,9 +162,11 @@ SELECT * FROM analytics.gitlab_tags LIMIT 1;
 ```
  project_id |                commit_id                 | tag_name |                  target                  | message
 ------------+------------------------------------------+----------+------------------------------------------+---------
-    7603319 | c1682bf6de3f166a1305c03520674880a3a4e809 | v1.31.0  | c1682bf6de3f166a1305c03520674880a3a4e809 |
+    7603319 | LATEST_TAG_SHA | LATEST_TAG_NAME  | LATEST_TAG_SHA |
 (1 row)
 ```
+
+Your data has now been extracted, loaded, and transformed!
 
 :::
 
@@ -191,6 +203,9 @@ meltano invoke airflow scheduler -D
 
 # Optional: start the Airflow web interface (add -D to move to background)
 meltano invoke airflow webserver
+open http://localhost:8080
 ```
+
+Your pipelines have now been scheduled!
 
 :::

@@ -2,6 +2,7 @@
 sidebar: auto
 metaTitle: Meltano Tutorial - Using Jupyter Notebooks with Meltano
 description: Learn how to use a Jupyter Notebook as a part of a Meltano analysis workflow.
+lastUpdatedSignificantly: 2020-02-20
 ---
 
 # Using Jupyter Notebooks
@@ -12,7 +13,7 @@ In this tutorial, we are going to present how to connect [Jupyter Notebook](http
 
 ## Prerequisites
 
-- Meltano's minimum and [optional requirements](/developer-tools/self-hosted-installation.html#requirements) installed
+- Meltano's minimum and [optional requirements](/docs/installation.html#requirements) installed
 - Docker started
 - You have successfully extracted and loaded data from an API by following the steps described in the previous Tutorials.
 

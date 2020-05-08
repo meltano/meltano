@@ -2,6 +2,7 @@
 sidebar: auto
 metaTitle: Meltano Tutorial - Transform and Analyze Postgres Data
 description: Learn how to use Meltano to load data from postgres, then analyze it without modifying the raw data.
+lastUpdatedSignificantly: 2020-02-20
 ---
 
 # Tutorial: Postgres Extractor with Postgres Loader
@@ -102,7 +103,7 @@ meltano config target-postgres
 
 This step is required if you don't want to export everything from the source db. You can skip it if you just want to export all tables.
 
-We can use `meltano select` to select which entities will be exported by the Tap from the Source DB. You can find more info on how meltano select works on [the Meltano cli commands Documentation](/developer-tools/command-line-interface.html#select).
+We can use `meltano select` to select which entities will be exported by the Tap from the Source DB. You can find more info on how meltano select works on [the Meltano cli commands Documentation](/docs/command-line-interface.html#select).
 
 In the case of `tap-postgres`, the names of the Entities (or streams as they are called in the Singer.io Specification) are the same as the table names in the Source DB, prefixed by the DB name and the schema they are defined into: `{DB NAME}-{SCHEMA NAME}-{TABLE NAME}`.
 

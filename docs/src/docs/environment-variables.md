@@ -2,6 +2,7 @@
 metaTitle: Configuring Meltano Environment Variables
 description: Manage a Meltano configuration globally with environment variables.
 sidebarDepth: 2
+lastUpdatedSignificantly: 2020-03-31
 ---
 
 # Environment Variables
