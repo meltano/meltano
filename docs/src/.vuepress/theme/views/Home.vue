@@ -7,6 +7,7 @@
         <p class="action">
           <NavLink class="action-button" :item="$frontmatter.installation.primaryAction" />
           <SlackChannelLink class="action-button secondary">Join us on Slack</SlackChannelLink>
+          <a class="action-button secondary" href="https://gitlab.com/meltano/meltano" target="_blank">Show me the code!</a>
         </p>
       </div>
 
