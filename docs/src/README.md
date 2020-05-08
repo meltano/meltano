@@ -93,7 +93,7 @@ head -n 1 output/tags.jsonl
 ```
 
 ```json
-{"name": "v1.31.0", "message": "", "target": "c1682bf6de3f166a1305c03520674880a3a4e809", "commit_id": "c1682bf6de3f166a1305c03520674880a3a4e809", "project_id": 7603319}
+{"name": "LATEST_TAG_NAME", "message": "", "target": "LATEST_TAG_SHA", "commit_id": "LATEST_TAG_SHA", "project_id": 7603319}
 ```
 
 :::
@@ -152,7 +152,7 @@ SELECT * FROM analytics.gitlab_tags LIMIT 1;
 ```
  project_id |                commit_id                 | tag_name |                  target                  | message
 ------------+------------------------------------------+----------+------------------------------------------+---------
-    7603319 | c1682bf6de3f166a1305c03520674880a3a4e809 | v1.31.0  | c1682bf6de3f166a1305c03520674880a3a4e809 |
+    7603319 | LATEST_TAG_SHA | LATEST_TAG_NAME  | LATEST_TAG_SHA |
 (1 row)
 ```
 
