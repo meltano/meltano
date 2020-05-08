@@ -2,6 +2,7 @@
 metaTitle: Using the Meltano CLI
 description: The Meltano command line interface makes it easy to develop, run, and debug every step of the data analysis lifecycle.
 sidebarDepth: 2
+lastUpdatedSignificantly: 2020-05-07
 ---
 
 # Command Line Interface
@@ -48,7 +49,7 @@ meltano ui
 
 Meltano is now running and should open a new tab at [http://localhost:5000](http://localhost:5000).
 
-Now that you have access to the Meltano UI, [use our Getting Started guide](/docs/getting-started.html#connect-data-sources) to learn more about how to use the software.
+Now that you have access to the Meltano UI, [use our Getting Started with Data Analysis guide](/docs/analysis.html#connect-data-sources) to learn more about how to use the software.
 
 
 ## Glossary of Command Line Concepts

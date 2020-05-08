@@ -2,6 +2,7 @@
 metaTitle: How to Install Meltano
 description: Meltano is easy to install on your local machine or in the cloud, including on AWS, Digital Ocean, and other cloud services.
 sidebarDepth: 2
+lastUpdatedSignificantly: 2020-05-06
 ---
 
 # Self-Hosted Installation
@@ -140,7 +141,7 @@ docker run meltano/meltano --version
 
 ### Initialize Your Project
 
-Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our [Getting Started Guide](/docs/getting-started.html). However, the command line syntax is slightly different. For example, let's create a new Meltano project:
+Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our [Getting Started Guide](/developer-tools/command-line-interface.html#getting-started-with-meltano-on-the-command-line). However, the command line syntax is slightly different. For example, let's create a new Meltano project:
 
 ```bash
 cd /your/projects/directory

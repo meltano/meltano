@@ -1,9 +1,10 @@
 ---
 metaTitle: Getting Started With Data Analysis
 description: Create your first data analysis project, build a pipeline, and analyze your data after installing Meltano.
+lastUpdatedSignificantly: 2020-04-30
 ---
 
-# Getting Started
+# Getting Started with Data Analysis
 
 ## Install Meltano
 

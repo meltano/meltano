@@ -2,6 +2,7 @@
 sidebar: auto
 metaTitle: Meltano Tutorial - Load a CSV into Postgres
 description: Learn how to use Meltano to load multiple CSV files into a Postgres database.
+lastUpdatedSignificantly: 2020-02-20
 ---
 
 # Tutorial: Loading CSV Files to a Postgres Database
@@ -106,7 +107,7 @@ We'll use Meltano to:
 
 For this tutorial, you can use a new or existing Meltano project. Throughout the rest of this tutorial, we'll assume that your Meltano project is called `csv-project`.
 
-If you need help getting started, we recommend reviewing the [Installation documentation](/developer-tools/self-hosted-installation.html) and [Getting Started Guide](/docs/getting-started.html) to set up your first project. 
+If you need help getting started, we recommend reviewing the [Installation documentation](/developer-tools/self-hosted-installation.html) and [Getting Started Guide](/developer-tools/command-line-interface.html#getting-started-with-meltano-on-the-command-line) to set up your first project. 
 
 To speed up the process, download the example CSV files to the `extract/` directory of your Meltano project (e.g. `csv-project/extract/`):
 

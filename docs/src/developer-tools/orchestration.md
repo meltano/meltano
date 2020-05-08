@@ -2,13 +2,14 @@
 metaTitle: Orchestration with Meltano
 description: Using Airflow with Meltano for orchestration
 sidebarDepth: 2
+lastUpdatedSignificantly: 2020-05-04
 ---
 
 # Orchestration
 
 If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using [Apache Airflow](https://apache.airflow.org).
 
-When a new pipeline schedule is created using the [UI](/docs/getting-started.html#create-a-pipeline-schedule) or [CLI](/developer-tools/command-line-interface.html#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
+When a new pipeline schedule is created using the [UI](/docs/analysis.html#create-a-pipeline-schedule) or [CLI](/developer-tools/command-line-interface.html#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 
 ## Installing Airflow
 
@@ -24,7 +25,7 @@ Note that the Airflow scheduler automatically runs in the background while Melta
 
 ## Create a Schedule
 
-To regularly schedule your ELT to run, use the ["Pipeline" interface in the UI](/docs/getting-started.html#create-a-pipeline-schedule), or the following command:
+To regularly schedule your ELT to run, use the ["Pipeline" interface in the UI](/docs/analysis.html#create-a-pipeline-schedule), or the following command:
 
 ```bash
 meltano schedule [SCHEDULE_NAME] [EXTRACTOR_NAME] [TARGET_NAME] [INTERVAL]

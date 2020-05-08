@@ -1,6 +1,6 @@
 const docsSidebar = [
   "/docs/",
-  "/docs/getting-started",
+  "/docs/analysis",
   "/docs/data-sources",
   "/docs/getting-help",
   "/docs/responsible-disclosure",

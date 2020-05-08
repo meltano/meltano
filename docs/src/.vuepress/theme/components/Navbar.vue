@@ -30,7 +30,7 @@
       <NavLinks class="can-hide" />
       <router-link
         style="margin-left:20px;"
-        to="/docs/getting-started.html"
+        to="/docs/analysis.html"
         class="nav-cta"
       >
         Install
