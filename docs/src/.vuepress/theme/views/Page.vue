@@ -2,7 +2,53 @@
   <div class="page">
     <slot name="top"/>
 
-    <Content :custom="false"/>
+    <div
+      class="content content-possibly-outdated"
+      v-if="contentPossiblyOutdated"
+    >
+      <div class="warning custom-block">
+        <p class="custom-block-title">
+          This page
+          {{ lastUpdatedSignificantly ? "received its last significant update" : "was last updated" }}
+          on <strong>{{ lastUpdatedSignificantly || lastUpdated }}</strong>
+        </p>
+
+        <p>
+          Since then, there have been some
+          <a
+            href="https://gitlab.com/meltano/meltano/-/merge_requests/1628"
+            target="_blank"
+          >significant changes to our strategy, direction, and focus</a>,
+          so statements and recommendations may be outdated and not all examples may work.
+        </p>
+
+        <p>
+          The most up to date information can be found on the
+          <router-link to="/">homepage</router-link>,
+          and on any pages that don't show this warning.
+        </p>
+
+        <p v-if="editLink">
+          If you encounter any inaccuracies,
+          we welcome you to
+          <a
+            :href="editLink"
+            target="_blank"
+            rel="noopener noreferrer"
+          >help us improve this page</a>
+
+          or
+
+          <a
+            href="https://gitlab.com/meltano/meltano/issues/new"
+            target="_blank"
+            rel="noopener noreferrer"
+          >submit an issue</a>.
+        </p>
+      </div>
+    </div>
+
+    <Content :class="{'after-content-possibly-outdated': contentPossiblyOutdated}" :custom="false"/>
 
     <div class="page-nav" v-if="prev || next">
       <p class="inner">
@@ -74,133 +120,160 @@
 </template>
 
 <script>
-import { resolvePage, normalize, outboundRE, endingSlashRE } from '../util'
+const POSSIBLY_OUTDATED_IF_LAST_UPDATED_BEFORE = new Date("2020-05-09");
+
+import { resolvePage, normalize, outboundRE, endingSlashRE } from "../util";
 
 export default {
-  props: ['sidebarItems'],
+  props: ["sidebarItems"],
 
   computed: {
-    lastUpdated () {
+    possiblyOutdatedIfLastUpdatedBefore() {
+      return POSSIBLY_OUTDATED_IF_LAST_UPDATED_BEFORE.toLocaleDateString(
+        this.$lang
+      );
+    },
+    lastUpdated() {
       if (this.$page.lastUpdated) {
-        return new Date(this.$page.lastUpdated).toLocaleString(this.$lang)
+        return new Date(this.$page.lastUpdated).toLocaleDateString(this.$lang);
       }
     },
 
-    lastUpdatedText () {
-      if (typeof this.$themeLocaleConfig.lastUpdated === 'string') {
-        return this.$themeLocaleConfig.lastUpdated
+    lastUpdatedSignificantly() {
+      const lastUpdatedSignificantly = this.$frontmatter
+        .lastUpdatedSignificantly;
+      if (lastUpdatedSignificantly) {
+        return new Date(lastUpdatedSignificantly).toLocaleDateString(
+          this.$lang
+        );
       }
-      if (typeof this.$site.themeConfig.lastUpdated === 'string') {
-        return this.$site.themeConfig.lastUpdated
-      }
-      return 'Last Updated'
     },
 
-    prev () {
-      const prev = this.$page.frontmatter.prev
+    lastUpdatedText() {
+      if (typeof this.$themeLocaleConfig.lastUpdated === "string") {
+        return this.$themeLocaleConfig.lastUpdated;
+      }
+      if (typeof this.$site.themeConfig.lastUpdated === "string") {
+        return this.$site.themeConfig.lastUpdated;
+      }
+      return "Last Updated";
+    },
+
+    contentPossiblyOutdated() {
+      if (this.$frontmatter.contentOutdated === false) {
+        return false;
+      }
+
+      const lastUpdated = this.lastUpdatedSignificantly || this.lastUpdated;
+      return (
+        lastUpdated &&
+        new Date(lastUpdated) < POSSIBLY_OUTDATED_IF_LAST_UPDATED_BEFORE
+      );
+    },
+
+    prev() {
+      const prev = this.$page.frontmatter.prev;
       if (prev === false) {
-        return
+        return;
       } else if (prev) {
-        return resolvePage(this.$site.pages, prev, this.$route.path)
+        return resolvePage(this.$site.pages, prev, this.$route.path);
       } else {
-        return resolvePrev(this.$page, this.sidebarItems)
+        return resolvePrev(this.$page, this.sidebarItems);
       }
     },
 
-    next () {
-      const next = this.$page.frontmatter.next
+    next() {
+      const next = this.$page.frontmatter.next;
       if (next === false) {
-        return
+        return;
       } else if (next) {
-        return resolvePage(this.$site.pages, next, this.$route.path)
+        return resolvePage(this.$site.pages, next, this.$route.path);
       } else {
-        return resolveNext(this.$page, this.sidebarItems)
+        return resolveNext(this.$page, this.sidebarItems);
       }
     },
 
-    editLink () {
+    editLink() {
       if (this.$page.frontmatter.editLink === false) {
-        return
+        return;
       }
       const {
         repo,
         editLinks,
-        docsDir = '',
-        docsBranch = 'master',
-        docsRepo = repo
-      } = this.$site.themeConfig
+        docsDir = "",
+        docsBranch = "master",
+        docsRepo = repo,
+      } = this.$site.themeConfig;
 
-      let path = normalize(this.$page.path)
+      let path = normalize(this.$page.path);
       if (endingSlashRE.test(path)) {
-        path += 'README.md'
+        path += "README.md";
       } else {
-        path += '.md'
+        path += ".md";
       }
       if (docsRepo && editLinks) {
-        return this.createEditLink(repo, docsRepo, docsDir, docsBranch, path)
+        return this.createEditLink(repo, docsRepo, docsDir, docsBranch, path);
       }
     },
 
-    editLinkText () {
+    editLinkText() {
       return (
         this.$themeLocaleConfig.editLinkText ||
         this.$site.themeConfig.editLinkText ||
         `Edit this page`
-      )
-    }
+      );
+    },
   },
 
   methods: {
-    createEditLink (repo, docsRepo, docsDir, docsBranch, path) {
-      const bitbucket = /bitbucket.org/
+    createEditLink(repo, docsRepo, docsDir, docsBranch, path) {
+      const bitbucket = /bitbucket.org/;
       if (bitbucket.test(repo)) {
-        const base = outboundRE.test(docsRepo)
-          ? docsRepo
-          : repo
+        const base = outboundRE.test(docsRepo) ? docsRepo : repo;
         return (
-          base.replace(endingSlashRE, '') +
-           `/${docsBranch}` +
-           (docsDir ? '/' + docsDir.replace(endingSlashRE, '') : '') +
-           path +
-           `?mode=edit&spa=0&at=${docsBranch}&fileviewer=file-view-default`
-        )
+          base.replace(endingSlashRE, "") +
+          `/${docsBranch}` +
+          (docsDir ? "/" + docsDir.replace(endingSlashRE, "") : "") +
+          path +
+          `?mode=edit&spa=0&at=${docsBranch}&fileviewer=file-view-default`
+        );
       }
 
       const base = outboundRE.test(docsRepo)
         ? docsRepo
-        : `https://github.com/${docsRepo}`
+        : `https://github.com/${docsRepo}`;
 
       return (
-        base.replace(endingSlashRE, '') +
+        base.replace(endingSlashRE, "") +
         `/edit/${docsBranch}/docs` +
-        (docsDir ? '/' + docsDir.replace(endingSlashRE, '') : '') +
+        (docsDir ? "/" + docsDir.replace(endingSlashRE, "") : "") +
         path
-      )
-    }
-  }
+      );
+    },
+  },
+};
+
+function resolvePrev(page, items) {
+  return find(page, items, -1);
 }
 
-function resolvePrev (page, items) {
-  return find(page, items, -1)
+function resolveNext(page, items) {
+  return find(page, items, 1);
 }
 
-function resolveNext (page, items) {
-  return find(page, items, 1)
-}
-
-function find (page, items, offset) {
-  const res = []
-  items.forEach(item => {
-    if (item.type === 'group') {
-      res.push(...item.children || [])
+function find(page, items, offset) {
+  const res = [];
+  items.forEach((item) => {
+    if (item.type === "group") {
+      res.push(...(item.children || []));
     } else {
-      res.push(item)
+      res.push(item);
     }
-  })
+  });
   for (let i = 0; i < res.length; i++) {
-    const cur = res[i]
-    if (cur.type === 'page' && cur.path === page.path) {
-      return res[i + offset]
+    const cur = res[i];
+    if (cur.type === "page" && cur.path === page.path) {
+      return res[i + offset];
     }
   }
 }
@@ -268,4 +341,19 @@ function find (page, items, offset) {
     flex-direction column
   .last-updated
     order 1
+
+.content.content-possibly-outdated {
+  padding-bottom: 0 !important;
+}
+
+.content.after-content-possibly-outdated {
+  > :first-child {
+    margin-top: 0 !important;
+  }
+
+  > h1:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+}
 </style>
