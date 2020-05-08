@@ -26,7 +26,7 @@ orchestration:
 # Open source data pipelines
 
 Meltano is an [open source](https://gitlab.com/meltano/meltano) platform for
-building, running & orchestrating [Singer](https://www.singer.io/)- and [dbt](https://www.getdbt.com)-based ELT pipelines, that you can [run locally or host on any cloud](/developer-tools/self-hosted-installation.html).
+building, running & orchestrating ELT pipelines built out of [Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com) models, that you can [run locally or host on any cloud](/developer-tools/self-hosted-installation.html).
 
 Scroll down for details on [integration](/#integration-just-a-few-keystrokes-away), [transformation](/#transformation-as-a-first-class-citizen), and [orchestration](/#orchestration-right-out-of-the-box).
 
@@ -55,6 +55,8 @@ pip3 install meltano
 meltano init demo-project
 ```
 
+Your Meltano project is now ready!
+
 :::
 
 ::: slot integration
@@ -72,6 +74,7 @@ the previous run left off.
 :::
 
 ::: slot integration-code
+
 ```bash
 # Before you use any `meltano` command, ensure that:
 # - you have navigated to your Meltano project directory
@@ -100,6 +103,8 @@ head -n 1 output/tags.jsonl
 ```json
 {"name": "LATEST_TAG_NAME", "message": "", "target": "LATEST_TAG_SHA", "commit_id": "LATEST_TAG_SHA", "project_id": 7603319}
 ```
+
+Your data has now been extracted and loaded!
 
 :::
 
@@ -161,6 +166,8 @@ SELECT * FROM analytics.gitlab_tags LIMIT 1;
 (1 row)
 ```
 
+Your data has now been extracted, loaded, and transformed!
+
 :::
 
 ::: slot orchestration
@@ -196,6 +203,9 @@ meltano invoke airflow scheduler -D
 
 # Optional: start the Airflow web interface (add -D to move to background)
 meltano invoke airflow webserver
+open http://localhost:8080
 ```
+
+Your pipelines have now been scheduled!
 
 :::
