@@ -53,7 +53,6 @@ pip3 install meltano
 
 # Initialize Meltano project "demo-project"
 meltano init demo-project
-cd demo-project
 ```
 
 :::
@@ -74,6 +73,12 @@ the previous run left off.
 
 ::: slot integration-code
 ```bash
+# Before you use any `meltano` command, ensure that:
+# - you have navigated to your Meltano project directory
+cd demo-project
+# - you have activated the virtual environment
+source ../.venv/bin/activate
+
 # Add GitLab extractor to your project
 meltano add extractor tap-gitlab
 
