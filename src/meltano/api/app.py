@@ -128,7 +128,7 @@ def create_app(config={}):
     @app.before_request
     def setup_js_context():
         # setup the appUrl
-        appUrl = urlsplit(request.host_url)
+        appUrl = urlsplit(request.url_root)
         g.jsContext = {"appUrl": appUrl.geturl()[:-1]}
 
         if tracker.send_anonymous_usage_stats:
