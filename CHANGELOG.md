@@ -17,6 +17,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2020](https://gitlab.com/meltano/meltano/-/issues/2020) Fix bug that caused `meltano select` to add `select` option to every plugin in `meltano.yml` instead of just the specified one
+
 ### Breaks
 
 
