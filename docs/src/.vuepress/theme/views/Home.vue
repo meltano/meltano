@@ -5,9 +5,19 @@
         <Content slot-key="installation" />
 
         <p class="action">
-          <NavLink class="action-button" :item="$frontmatter.installation.primaryAction" />
-          <SlackChannelLink class="action-button secondary">Join us on Slack</SlackChannelLink>
-          <a class="action-button secondary" href="https://gitlab.com/meltano/meltano" target="_blank">Show me the code!</a>
+          <NavLink
+            class="action-button"
+            :item="$frontmatter.installation.primaryAction"
+          />
+          <SlackChannelLink class="action-button secondary"
+            >Join us on Slack</SlackChannelLink
+          >
+          <a
+            class="action-button secondary"
+            href="https://gitlab.com/meltano/meltano"
+            target="_blank"
+            >Show me the code!</a
+          >
         </p>
       </div>
 
@@ -21,7 +31,10 @@
         <Content slot-key="integration" />
 
         <p class="action">
-          <NavLink class="action-button" :item="$frontmatter.integration.primaryAction" />
+          <NavLink
+            class="action-button"
+            :item="$frontmatter.integration.primaryAction"
+          />
         </p>
       </div>
 
@@ -35,7 +48,10 @@
         <Content slot-key="transformation" />
 
         <p class="action">
-          <NavLink class="action-button" :item="$frontmatter.transformation.primaryAction" />
+          <NavLink
+            class="action-button"
+            :item="$frontmatter.transformation.primaryAction"
+          />
         </p>
       </div>
 
@@ -49,15 +65,25 @@
         <Content slot-key="orchestration" />
 
         <p class="action">
-          <NavLink class="action-button" :item="$frontmatter.orchestration.primaryAction" />
+          <NavLink
+            class="action-button"
+            :item="$frontmatter.orchestration.primaryAction"
+          />
         </p>
       </div>
 
       <div class="hero-right">
         <Content slot-key="orchestration-code" />
 
-        <a href="https://airflow.apache.org/docs/stable/ui.html#dags-view" target="_blank">
-          <img class="screenshot" alt="Screenshot of Airflow Webserver" src="../assets/airflow-webserver.png" />
+        <a
+          href="https://airflow.apache.org/docs/stable/ui.html#dags-view"
+          target="_blank"
+        >
+          <img
+            class="screenshot"
+            alt="Screenshot of Airflow Webserver"
+            src="../assets/airflow-webserver.png"
+          />
         </a>
       </div>
     </div>
@@ -68,8 +94,21 @@
           Intrigued?
         </h2>
 
-        <NavLink class="button is-purple is-filled" :item="$frontmatter.installation.primaryAction" />
+        <NavLink
+          class="button is-purple is-filled"
+          :item="$frontmatter.installation.primaryAction"
+        />
       </section>
+    </div>
+
+    <div class="hero homepage-cta feature-section-wrapper">
+      <div class="hero-left">
+        <Content slot-key="meltano-add" />
+      </div>
+
+      <div class="hero-right">
+        <Content slot-key="meltano-add-code" />
+      </div>
     </div>
 
     <div class="feature-section-wrapper is-shorter is-white">
@@ -272,8 +311,11 @@ export default {
 .homepage-cta {
   display: flex;
   justify-content: center;
-  align-items: center;
   flex-direction: column;
+
+  &:first-child {
+    align-items: center;
+  }
 }
 
 @media (min-width: $MQNarrow) {
@@ -343,33 +385,41 @@ export default {
   }
 }
 
-.hero .content > :first-child {
-  margin: 0 !important;
+.hero .content {
+  > :first-child {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  div[class*='language-'] {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  p, ul {
+    font-size: 1.2rem !important;
+    color: #474C4F !important;
+  }
+
+  h1 {
+    padding-top: 0 !important;
+    padding-right: 40px !important;
+    font-weight: 400 !important;
+    font-size: 36px !important;
+    color: #1D1D1D !important;
+    margin: 0 !important;
+  }
+
+  h2 {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
 }
 
-.hero .content div[class*="language-"] {
-  margin-left: 0;
-  margin-right: 0;
-}
-
-.hero .content p {
-  font-size: 1.2rem !important;
-  color: #474C4F !important;
-}
-
-.hero .content h1 {
-  padding-top: 0 !important;
-  padding-right: 40px !important;
-  font-weight: 400 !important;
-  font-size: 36px !important;
-  color: #1D1D1D !important;
-  margin: 0 !important;
-}
-
-.hero .content h2 {
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
+.hero-right .content ol {
+  text-align: left;
+  padding-left: 1.5rem;
 }
 
 @media (min-width: $MQNarrow) {
