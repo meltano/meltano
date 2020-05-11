@@ -2,6 +2,7 @@
 sidebar: auto
 metaTitle: Meltano Tutorial - Create a Custom Extractor
 description: Learn how to use Meltano to create a custom data extractor.
+lastUpdatedSignificantly: 2020-01-20
 ---
 
 # Create a Custom Extractor
