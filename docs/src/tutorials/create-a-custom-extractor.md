@@ -42,11 +42,13 @@ cookiecutter gh:singer-io/singer-tap-template
 Now that your plugin is part of your Meltano project, you need to add your plugin configuration in the `meltano.yml`'s plugin definition.
 
 ::: tip
-Using `-e` will install the plugin as editable so any change you make is readily available.
+Using `-e` in the `pip_url` will install the plugin as editable so any change you make is readily available.
 :::
 
 ```bash
 meltano add --custom extractor tap-gitlab-custom
+# If you're running Meltano using Docker, ensure you run `docker run` with `--interactive` to allow `namespace` etc to be set:
+# docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-gitlab-custom
 ...
 > namespace: gitlab
 > pip_url: -e tap-gitlab-custom
