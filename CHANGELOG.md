@@ -17,6 +17,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2010](https://gitlab.com/meltano/meltano/-/issues/2010) Fix bug causing dot-separated config keys to not be nested in generated tap or target config
+
 ### Breaks
 
 
