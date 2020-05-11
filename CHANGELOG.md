@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.32.0 - (2020-05-11)
+---
+
+### New
+
 - [#2019](https://gitlab.com/meltano/meltano/-/issues/2019) Ask for setting names when adding a new custom plugin
 
 ### Changes
@@ -22,8 +34,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2010](https://gitlab.com/meltano/meltano/-/issues/2010) Fix bug causing dot-separated config keys to not be nested in generated tap or target config
 - [#2020](https://gitlab.com/meltano/meltano/-/issues/2020) Fix bug that caused `meltano select` to add `select` option to every plugin in `meltano.yml` instead of just the specified one
 - [#2021](https://gitlab.com/meltano/meltano/-/issues/2021) Only ask for capabilities when adding a custom extractor, not a loader or other plugin
-
-### Breaks
 
 
 ## 1.31.0 - (2020-05-04)
