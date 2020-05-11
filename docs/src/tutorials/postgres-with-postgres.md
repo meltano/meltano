@@ -34,6 +34,7 @@ meltano add --custom extractor tap-postgres
   (pip_url): tap-postgres==0.0.61
   (executable) [tap-postgres]: tap-postgres
   (capabilities): discover,properties,state
+  (settings): dbname,host,password,port,user
 ```
 
 We should then update `meltano.yml` and add the configuration parameters this tap needs in order to run:
