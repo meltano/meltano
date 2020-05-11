@@ -147,7 +147,7 @@ class PluginInstall(HookObject, Canonical, PluginRef):
 
         self.config = copy.deepcopy(config)
         self.profiles = set(map(Profile.parse, profiles))
-        self.select = select
+        self.select = set(select)
         self.pip_url = pip_url
         self.executable = executable
         self._extras = attrs
