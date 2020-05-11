@@ -67,8 +67,9 @@ Use existing Singer [taps](/plugins/extractors/) and [targets](/plugins/loaders/
 or [easily write your own](/tutorials/create-a-custom-extractor.html) to extract
 data from any SaaS tool or database and load it into any data warehouse or file format.
 
-Meltano [manages you tap and target configuration](#managing-plugin-configuration) for you, makes it easy to [select which entities and properties to extract](#selecting-entities-to-extract), and keeps track of [the state of your extraction](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file),
-so that subsequent pipeline runs with the same job ID will always pick up right where
+Meltano manages your [tap and target configuration](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file)
+for you and keeps track of [the state of your extraction](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file),
+so that subsequent ELT runs with the same job ID will always pick up right where
 the previous run left off.
 
 Scroll down to learn more about [adding extractors and loaders to your project](#how-to-add-extractors-and-loaders-to-your-project).
