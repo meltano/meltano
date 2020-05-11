@@ -53,6 +53,17 @@ class ProjectAddCustomService:
             value_proc=lambda value: [c.strip() for c in value.split(",")],
         )
 
+        settings = click.prompt(
+            "\nThe `settings` refer to the configuration keys the plugin supports.\n"
+            "In the case of Singer taps and targets, these correspond to supported keys in `config.json`.\n"
+            'Nesting can be represented using the `.` seperator, e.g. `auth.username` for `{ "auth": { "username": value } }`.\n'
+            "Multiple setting names/keys can be specified using a comma-separated string.\n\n"
+            "(settings)",
+            type=list,
+            default=[],
+            value_proc=lambda value: [c.strip() for c in value.split(",")],
+        )
+
         # manually create the generic PluginInstall to save it
         # as a custom plugin
         install = PluginInstall(
@@ -62,14 +73,14 @@ class ProjectAddCustomService:
             capabilities=capabilities,
             namespace=namespace,
             executable=executable,
+            settings=[{"name": name} for name in settings],
         )
 
         installed = self.config_service.add_to_file(install)
         click.secho(
             "The plugin has been added to your `meltano.yml`.\n"
-            "If your plugin requires configuration options, you must add them directly "
-            "in the created plugin definition under the `settings` section.\n\n"
-            "Then, run `meltano install` to update the plugin configuration.",
+            "If your plugin requires configuration options, you can add them directly "
+            "in the created plugin definition under the `settings` or `config` section.",
             fg="yellow",
         )
 

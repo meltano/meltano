@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2019](https://gitlab.com/meltano/meltano/-/issues/2019) Ask for setting names when adding a new custom plugin
+
 ### Changes
 
 - [#2011](https://gitlab.com/meltano/meltano/-/issues/2011) Make tap-gitlab private_token setting optional for easier extraction of public groups and projects
