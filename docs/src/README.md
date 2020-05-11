@@ -52,10 +52,10 @@ source .venv/bin/activate
 pip3 install meltano
 
 # Initialize Meltano project "demo-project"
-meltano init demo-project
+meltano init demo-project # --no_usage_stats
 ```
 
-Your Meltano project is now ready!
+Your Meltano project is now ready for [integration](/#integration-just-a-few-keystrokes-away), [transformation](/#transformation-as-a-first-class-citizen), and [orchestration](/#orchestration-right-out-of-the-box)!
 
 :::
 
@@ -68,19 +68,21 @@ or [easily write your own](/tutorials/create-a-custom-extractor.html) to extract
 data from any SaaS tool or database and load it into any data warehouse or file format.
 
 Meltano manages your [tap and target configuration](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file)
-for you and keeps track of [the state of you extraction](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file),
+for you and keeps track of [the state of your extraction](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file),
 so that subsequent ELT runs with the same job ID will always pick up right where
 the previous run left off.
+
+Scroll down to learn more about [adding extractors and loaders to your project](#how-to-add-extractors-and-loaders-to-your-project).
 :::
 
 ::: slot integration-code
 
 ```bash
 # Before you use any `meltano` command, ensure that:
-# - you have navigated to your Meltano project directory
-cd demo-project
 # - you have activated the virtual environment
 source ../.venv/bin/activate
+# - you have navigated to your Meltano project directory
+cd demo-project
 
 # Add GitLab extractor to your project
 meltano add extractor tap-gitlab
@@ -92,8 +94,10 @@ meltano config tap-gitlab set start_date 2018-01-01
 # Add JSONL loader
 meltano add loader target-jsonl
 
-# Run data integration pipeline
+# Ensure target-jsonl output directory exists
 mkdir -p output
+
+# Run data integration pipeline
 meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
 
 # Read latest tag
@@ -138,7 +142,7 @@ meltano add loader target-postgres
 
 # Configure target-postgres through the environment
 export PG_ADDRESS=localhost
-export PG_PORT=5502
+export PG_PORT=5432
 export PG_USERNAME=meltano
 export PG_PASSWORD=meltano
 export PG_DATABASE=demo-warehouse
@@ -159,7 +163,7 @@ PGPASSWORD=$PG_PASSWORD psql -U $PG_USERNAME -h $PG_ADDRESS -p $PG_PORT -d $PG_D
 SELECT * FROM analytics.gitlab_tags LIMIT 1;
 ```
 
-```
+```output
  project_id |                commit_id                 | tag_name |                  target                  | message
 ------------+------------------------------------------+----------+------------------------------------------+---------
     7603319 | LATEST_TAG_SHA | LATEST_TAG_NAME  | LATEST_TAG_SHA |
@@ -207,5 +211,68 @@ open http://localhost:8080
 ```
 
 Your pipelines have now been scheduled!
+
+:::
+
+::: slot meltano-add
+
+## How to: add extractors and loaders to your project
+
+Like all types of plugins, extractors and loaders can be added to a Meltano project using [`meltano add`](/docs/command-line-interface.html#add).
+Plugins that are already known to Meltano can be added by simply specifying their `type` and `name`, while adding a plugin that Meltano isn't familiar with yet requires adding the `--custom` flag.
+
+To find out what plugins are already known to Meltano and supported out of the box, you can use [`meltano discover`](/docs/command-line-interface.html#discover), with an optional pluralized `plugin type` argument.
+You can also check out the lists of supported [extractors](/plugins/extractors/) and [loaders](/plugins/loaders/) on this website.
+
+If the Singer tap or target you'd like to use with Meltano doesn't show up in any of these places, you're going to want to add a custom plugin.
+When you run `meltano add --custom [type] [name]`, Meltano will ask you some additional questions to learn where the package can be found, how to interact with it, and how it can be expected to behave.
+
+If the tap or target in question is listed on Singer's [index of taps](https://www.singer.io/#taps) or [targets](https://www.singer.io/#targets), simply providing the package name as `name`, `pip_url`, and `executable` should suffice. If it's a tap or target you have developed or are developing yourself, you'll want to set `pip_url` to either a Git URL or local directory path. To find out what `settings` a tap or target supports, reference its documentation. If the `capabilities` a tap supports are not described in its documentation, try [one of these tricks](/docs/contributor-guide.html#how-to-test-a-tap).
+
+Once your plugin has been added, it will be ready for [configuration](/docs/command-line-interface.html#config)!
+:::
+
+::: slot meltano-add-code
+
+```bash
+# List extractors and loaders known to Meltano
+meltano discover extractors
+meltano discover loaders
+
+# Add a known extractor or loader by name
+meltano add extractor tap-salesforce
+meltano add loader target-snowflake
+
+# Add an unknown (custom) extractor or loader
+meltano add --custom extractor tap-covid-19
+```
+
+```bash
+# Specify namespace, which will serve as the:
+# - target database schema when used with
+#   loader target-postgres or target-snowflake
+# - prefix for configuration environment variables
+# - identifier to find related/compatible plugins
+(namespace): tap_covid_19
+
+# Specify `pip install` argument, for example:
+# - PyPI package name:
+(pip_url): tap-covid-19
+# - VCS URL:
+(pip_url): git+https://github.com/singer-io/tap-covid-19.git
+# - local directory, in editable/development mode:
+(pip_url): -e extract/tap-covid-19
+
+# Specify executable name
+(executable): tap-covid-19
+
+# Specify supported Singer features (executable flags)
+(capabilities): catalog,discover,state
+
+# Specify supported settings (`config.json` keys)
+(settings): api_token,user_agent,start_date
+```
+
+Your extractor or loader is now ready for [configuration](/docs/command-line-interface.html#config)!
 
 :::

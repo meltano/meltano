@@ -18,5 +18,5 @@ Meltano currently supports the following loader destinations:
 Note that Meltano dashboards and reports are only supported when PostgreSQL is used.
 
 ::: tip Don't see your reporting database here?
-You can easily add [any existing Singer target](https://www.singer.io/#targets) as a [custom loader](/tutorials/create-a-custom-extractor.html#add-the-plugin-to-your-meltano-project-custom) or [create your own from scratch]([/tutorials/create-a-custom-extractor.html](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target)).
+You can easily add [any existing Singer target](https://www.singer.io/#targets) as a [custom loader](/#how-to-add-extractors-and-loaders-to-your-project) or [create your own from scratch]([/tutorials/create-a-custom-extractor.html](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target)).
 :::
