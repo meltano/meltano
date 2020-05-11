@@ -132,10 +132,6 @@ Once the settings are exposed, you can use any of the following to set the prope
 - Meltano UI
 - `value` of the setting's definition
 
-::: warning
-Due to an outstanding [bug (#521)](https://gitlab.com/meltano/meltano/issues/521) you must run `meltano install` after modifying the `settings` section of a plugin.
-:::
-
 ## Interacting with your new plugin
 
 Now that your plugin is installed and configured, you are ready to interact with it using Meltano.
