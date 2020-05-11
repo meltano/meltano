@@ -17,6 +17,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2021](https://gitlab.com/meltano/meltano/-/issues/2021) Only ask for capabilities when adding a custom extractor, not a loader or other plugin
+
 ### Breaks
 
 

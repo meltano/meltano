@@ -39,19 +39,22 @@ class ProjectAddCustomService:
             "(executable)",
             default=plugin_name,
         )
-        capabilities = click.prompt(
-            "\nThe `capabilities` refer to the optional features the executable supports.\n"
-            "Possible capabilities of extractors (taps) are:\n"
-            "\t`catalog`: supports the `--catalog` flag\n"
-            "\t`discover`: supports the `--discover` flag\n"
-            "\t`properties`: supports the `--properties` flag\n"
-            "\t`state`: supports the `--state` flag\n"
-            "Multiple capabilities can be specified using a comma-separated string.\n\n"
-            "(capabilities)",
-            type=list,
-            default=[],
-            value_proc=lambda value: [c.strip() for c in value.split(",")],
-        )
+
+        capabilities = []
+        if plugin_type == PluginType.EXTRACTORS:
+            capabilities = click.prompt(
+                "\nThe `capabilities` refer to the optional features the executable supports.\n"
+                "Possible capabilities of extractors (taps) are:\n"
+                "\t`catalog`: supports the `--catalog` flag\n"
+                "\t`discover`: supports the `--discover` flag\n"
+                "\t`properties`: supports the `--properties` flag\n"
+                "\t`state`: supports the `--state` flag\n"
+                "Multiple capabilities can be specified using a comma-separated string.\n\n"
+                "(capabilities)",
+                type=list,
+                default=[],
+                value_proc=lambda value: [c.strip() for c in value.split(",")],
+            )
 
         # manually create the generic PluginInstall to save it
         # as a custom plugin
