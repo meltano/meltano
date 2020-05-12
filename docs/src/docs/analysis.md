@@ -36,7 +36,7 @@ The following data sources are fully supported by Meltano UI, from setting up yo
 ::: tip Don't see your data source here?
 [Additional data sources](/plugins/extractors/) are available when using the [command line interface](/docs/command-line-interface.html).
 
-You can also easily add [any existing Singer tap](https://www.singer.io/#taps) as a [custom extractor](/#how-to-add-extractors-and-loaders-to-your-project) or [create your own from scratch](/tutorials/create-a-custom-extractor.html).
+You can also easily add [any existing Singer tap](https://www.singer.io/#taps) as a [custom extractor](/#meltano-add) or [create your own from scratch](/tutorials/create-a-custom-extractor.html).
 :::
 
 ### Connecting a data source
