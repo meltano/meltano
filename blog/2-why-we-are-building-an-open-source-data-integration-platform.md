@@ -130,12 +130,23 @@ While we've come a long way already, there's still plenty of work to be done on 
 
 ### Let's get to work!
 
-If any of the above has resonated with you, or perhaps even inspired you, we'd love your help in making this vision for Meltano (and the future state of the data integration space) a reality. We literally won't be able to do it without you.
+If any of the above has resonated with you, or perhaps even inspired you, we'd love your help in realizing this vision for Meltano, the Singer ecosystem, and the data integration space in general. We literally won't be able to do it without you.
 
 Before anything else, you'll want to see what Meltano can already do today by following the [examples on the homepage](https://meltano.com/). They can be copy-pasted right onto your command line, and in a matter of minutes will take you all the way through [installation](https://meltano.com/#installation), [integration](https://meltano.com/#integration), [transformation](https://meltano.com/#transformation), and [orchestration](https://meltano.com/#orchestration) with the [`tap-gitlab` extractor](https://meltano.com/plugins/extractors/gitlab.html) and [`target-jsonl`](https://meltano.com/plugins/loaders/jsonl.html) and [`target-postgres`](https://meltano.com/plugins/loaders/postgres.html) loaders.
 
-Once you've got that working, you'll probably want to try Meltano with a different, more realistic data source and destination combination, which will require you to add a new extractor (Singer tap) and/or loader (Singer target) to your Meltano project. To learn how to do this, the homepage once again [has got you covered](https://meltano.com/#meltano-add).
+Once you've got that working, you'll probably want to try Meltano with a different, more realistic data source and destination combination, which will require you to add a new [extractor](https://meltano.com/plugins/extractors/) ([Singer tap](https://www.singer.io/#taps)) and/or [loader](https://meltano.com/plugins/loaders/) ([Singer target](https://www.singer.io/#targets)) to your Meltano project. To learn how to do this, the homepage once again [has got you covered](https://meltano.com/#meltano-add).
 
-To do:
-- [ ] Suggest contributing to taps and targets
-- [ ] Refer to new contributing section on homepage?
+And that's about as far as you'll be able to get right now, with Meltano's existing tooling and documentation. Running a Meltano pipeline locally (with or without Airflow) is one thing, but actually deploying one to production is another. As we've identified, this is one of the places where the Singer ecosystem and documentation currently fall short, and for the moment, Meltano is no different.
+
+For this reason, the first people we would love to get involved with the Meltano project are **those who are already part of the Singer community**, and in particular **those who have already managed to get Singer-based ELT pipelines running in production**. We want to make it so that all future Singer community members and Meltano users will be able to accomplish what they did, and no one knows better what that will take (and how close or far off Meltano currently is) than they do.
+
+If you're one of those people, or simply anyone with similarly relevant feedback, ideas, or experience, please:
+- [give Meltano a try](https://meltano.com/) (with your existing taps and targets?),
+- [join us on Slack](https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw) to receive (and provide) community support,
+- [follow us on Twitter](https://twitter.com/meltanodata) to stay up to date on new releases and other developments,
+- [file new issues on GitLab](https://gitlab.com/meltano/meltano/-/issues/new) for any ideas you have or bugs you run into,
+- [participate in existing issues](https://gitlab.com/meltano/meltano/-/issues) that may benefit from your perspective,
+- [check out the Python codebase](https://gitlab.com/meltano/meltano) if you're curious, and last but not least:
+- **consider [contributing to Meltano](https://meltano.com/#contributing), its documentation, and its [extractors](https://meltano.com/plugins/extractors/) and [loaders](https://meltano.com/plugins/loaders/)**, so that your and everyone else's suggestions and dreams may come true.
+
+I can't wait to see what we'll be able to accomplish together.
