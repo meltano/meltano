@@ -2,9 +2,11 @@
 
 This is part 2 of a 2-part series to announce and provide context on the new direction of [Meltano](https://meltano.com).
 
+If you've been following Meltano for a while or would like to have some historical context, start with part 1: [Revisiting the Meltano strategy: a return to our roots](#).
+
 If you're new to Meltano or are mostly interested in what's coming, feel free to start here and skip part 1.
 
-If you've been following Meltano for a while or would like to have some historical context, start with part 1: [Revisiting the Meltano strategy: a return to our roots](#).
+If you're worried reading this entire post will take a lot of time, feel free to jump right to the conclusion: [Where Meltano fits in](#where-meltano-fits-in).
 
 ## Introduction
 
@@ -122,7 +124,7 @@ Our goal is to **make the power of data integration available to all** by turnin
 
 Luckily, we're not starting from zero: Meltano already speaks the Singer language and [uses taps and targets for its extractors and loaders](https://meltano.com/#integration). Its support goes beyond simply piping two commands together, as it also manages [configuration](https://meltano.com/docs/command-line-interface.html#config), [entity selection](https://meltano.com/docs/command-line-interface.html#select) and [extractor state](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) for you. It also makes it super easy to [set up pipeline schedules](https://meltano.com/#orchestration) that can be run on top of a supported orchestrator like [Airflow](https://airflow.apache.org/).
 
-Additionally, Meltano supports [dbt](https://www.getdbt.com/)-based [transformation as part of every ELT pipeline](https://meltano.com/#transformation), and has [basic point-and-click analytics functionality](https://meltano.com/docs/analysis.html) built in, enabling you to go from data to dashboard using a single tool, that you can [run locally or host on any cloud](https://meltano.com/docs/installation.html).
+Additionally, Meltano supports [dbt](https://www.getdbt.com/)-based [transformation as part of every ELT pipeline](https://meltano.com/#transformation), and comes with a basic web interface for [data source connection and pipeline management](https://meltano.com/docs/analysis.html#connect-data-sources) and [point-and-click analytics and report and dashboard creation](https://meltano.com/docs/analysis.html#explore-your-data), enabling you to go from data to dashboard using a single tool, that you can [run locally or host on any cloud](https://meltano.com/docs/installation.html).
 
 For the foreseeable future, though, our focus will primarily be on [data integration](https://meltano.com/#integration), not transformation or analysis.
 
@@ -136,17 +138,20 @@ Before anything else, you'll want to see what Meltano can already do today by fo
 
 Once you've got that working, you'll probably want to try Meltano with a different, more realistic data source and destination combination, which will require you to add a new [extractor](https://meltano.com/plugins/extractors/) ([Singer tap](https://www.singer.io/#taps)) and/or [loader](https://meltano.com/plugins/loaders/) ([Singer target](https://www.singer.io/#targets)) to your Meltano project. To learn how to do this, the homepage once again [has got you covered](https://meltano.com/#meltano-add).
 
-And that's about as far as you'll be able to get right now, with Meltano's existing tooling and documentation. Running a Meltano pipeline locally (with or without Airflow) is one thing, but actually deploying one to production is another. As we've identified, this is one of the places where the Singer ecosystem and documentation currently fall short, and for the moment, Meltano is no different.
+And that's about as far as you'll be able to get right now, with Meltano's existing tooling and documentation. Running a Meltano pipeline locally (with or without Airflow) is one thing, but actually deploying one to production is another. As we've identified, this is one of the places where the Singer ecosystem and documentation currently fall short, and for the moment, [Meltano is no different](https://gitlab.com/groups/meltano/-/epics/79).
 
 For this reason, the first people we would love to get involved with the Meltano project are **those who are already part of the Singer community**, and in particular **those who have already managed to get Singer-based ELT pipelines running in production**. We want to make it so that all future Singer community members and Meltano users will be able to accomplish what they did, and no one knows better what that will take (and how close or far off Meltano currently is) than they do.
 
-If you're one of those people, or simply anyone with similarly relevant feedback, ideas, or experience, please:
-- [give Meltano a try](https://meltano.com/) (with your existing taps and targets?),
+If you're one of these people, or simply anyone with similarly relevant feedback, ideas, or experience, please:
+
+- [give Meltano a try](https://meltano.com/) and compare it to the tools you are using today,
 - [join us on Slack](https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw) to receive (and provide) community support,
 - [follow us on Twitter](https://twitter.com/meltanodata) to stay up to date on new releases and other developments,
-- [file new issues on GitLab](https://gitlab.com/meltano/meltano/-/issues/new) for any ideas you have or bugs you run into,
+- [file new issues on GitLab.com](https://gitlab.com/meltano/meltano/-/issues/new) for any ideas you have or bugs you run into,
 - [participate in existing issues](https://gitlab.com/meltano/meltano/-/issues) that may benefit from your perspective,
-- [check out the Python codebase](https://gitlab.com/meltano/meltano) if you're curious, and last but not least:
-- **consider [contributing to Meltano](https://meltano.com/#contributing), its documentation, and its [extractors](https://meltano.com/plugins/extractors/) and [loaders](https://meltano.com/plugins/loaders/)**, so that your and everyone else's suggestions and dreams may come true.
+- [check out the Python codebase](https://gitlab.com/meltano/meltano) if you're curious, and _last but not least_:
+- **consider [contributing to Meltano](https://meltano.com/#contributing), its [documentation](https://meltano.com/docs/), and its [extractors](https://meltano.com/plugins/extractors/) and [loaders](https://meltano.com/plugins/loaders/)**, so that your, our, and everyone else's ideas for Meltano may actually come true.
 
 I can't wait to see what we'll be able to accomplish together.
+
+See you soon on [Slack](https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw) or [GitLab.com](https://gitlab.com/meltano/meltano)!

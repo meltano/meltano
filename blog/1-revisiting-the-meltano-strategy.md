@@ -6,6 +6,8 @@ If you've been following Meltano for a while or would like to have some historic
 
 If you're new to Meltano or are mostly interested in what's coming, feel free to skip this post and start with part 2: [Why we are building an open source platform for ELT pipelines](#).
 
+If you're worried reading these entire posts will take a lot of time, feel free to jump right to the conclusion of part 2: [Where Meltano fits in](#).
+
 ## Background
 
 Meltano, originally called BizOps, was founded inside [GitLab](https://about.gitlab.com) [about 2 years ago](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) to serve the [GitLab Data Team](https://about.gitlab.com/handbook/business-ops/data-team/). The goal was to build a complete open source solution for the entire data lifecycle from extraction to dashboarding, that would allow data engineers, analytics engineers, analysts, data scientists, and business end-users looking for insights to come together and collaborate within the context of a single version controlled Meltano project.
