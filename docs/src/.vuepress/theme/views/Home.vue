@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <div class="hero homepage-cta feature-section-wrapper">
+    <div class="hero homepage-cta feature-section-wrapper" id="installation">
       <div class="hero-left">
         <Content slot-key="installation" />
 
@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <div class="hero homepage-cta feature-section-wrapper">
+    <div class="hero homepage-cta feature-section-wrapper" id="integration">
       <div class="hero-left">
         <Content slot-key="integration" />
 
@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <div class="hero homepage-cta feature-section-wrapper">
+    <div class="hero homepage-cta feature-section-wrapper" id="transformation">
       <div class="hero-left">
         <Content slot-key="transformation" />
 
@@ -60,7 +60,7 @@
       </div>
     </div>
 
-    <div class="hero homepage-cta feature-section-wrapper">
+    <div class="hero homepage-cta feature-section-wrapper" id="orchestration">
       <div class="hero-left">
         <Content slot-key="orchestration" />
 
@@ -101,7 +101,7 @@
       </section>
     </div>
 
-    <div class="hero homepage-cta feature-section-wrapper">
+    <div class="hero homepage-cta feature-section-wrapper" id="meltano-add">
       <div class="hero-left">
         <Content slot-key="meltano-add" />
       </div>

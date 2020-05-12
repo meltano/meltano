@@ -6,7 +6,7 @@ If you've been following Meltano for a while or would like to have some historic
 
 If you're new to Meltano or are mostly interested in what's coming, feel free to skip this post and start with part 2: [Why we are building an open source platform for ELT pipelines](#).
 
----
+## Background
 
 Meltano, originally called BizOps, was founded inside [GitLab](https://about.gitlab.com) [about 2 years ago](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) to serve the [GitLab Data Team](https://about.gitlab.com/handbook/business-ops/data-team/). The goal was to build a complete open source solution for the entire data lifecycle from extraction to dashboarding, that would allow data engineers, analytics engineers, analysts, data scientists, and business end-users looking for insights to come together and collaborate within the context of a single version controlled Meltano project.
 
@@ -20,6 +20,8 @@ That didn't deter the Meltano team, however, who continued to work to realize th
 
 Since every next stage of the data lifecycle depends on the result of the one that came before it (we're talking about data pipelines after all), our prioritization process had a cyclical nature. We would start with the first stage (extraction and loading), and keep iterating on Meltano's capabilities in that area right up to the point where they would unlock further improvements in the next stage (transformation). Then we'd move on and direct our focus there, until it once again became time to move on to the next stage (orchestration), and so on. Once the final stage (analysis) was reached, we would go all the way back to the first stage and the journey through the stages would start again.
 
+## Version 1 and the startup founder persona
+
 In October 2019, we released [Meltano Version 1](https://meltano.com/blog/2019/10/07/meltano-graduates-to-version-1-0/), which marked the completion of one such journey through the stages, and the realization of the end-to-end vision in principle. Assuming a data warehouse or simple [PostgreSQL](https://www.postgresql.org/) database had already been set up, you could now [install Meltano on your local machine](https://meltano.com/docs/self-hosted-installation.html), [initialize a project](https://meltano.com/docs/getting-started.html#create-your-first-project), [spin up the web-based UI](https://meltano.com/docs/getting-started.html#start-the-application), [install a data source](https://meltano.com/docs/analysis.html#connect-data-sources) (which adds the relevant extractor, loader, transformation, and model plugins to your project), enter your connection details, hit the Connect button, and find yourself looking at [reports and dashboards visualizing your data](https://meltano.com/docs/analysis.html#explore-your-data) a few minutes later. A most impressive demo, if you ask me!
 
 In spite of our aspirations, though, we had not yet managed to attract an open source community to build this tool (and its plugins!) with us, and while there had been a lot of interest in the project from the beginning, no data teams were jumping at the chance to replace their existing stack with Meltano yet. While we had certainly proven the concept, we had not yet gotten it to a place where the value it could bring was significant or obvious enough that new or existing data teams would actually consider it an alternative to more traditional stacks.
@@ -28,7 +30,7 @@ To address that, we decided to focus on the user who ultimately gets the most va
 
 What this meant is going all-in on turning Meltano into a UI-first analytics and dashboarding tool with built-in support for those data sources most commonly used at early startups, that could be connected with a click and would come with a set of default dashboards and reports to save the user having to build these all from scratch.
 
-Since this user could not be expected to be comfortable [installing a Python package](https://meltano.com/developer-tools/self-hosted-installation.html#requirements) or [setting up a PostgreSQL database](https://www.meltano.com/plugins/loaders/postgres.html), we decided to make installation as easy as clicking a button, by offering [hosted Meltano instances](https://meltano.com/blog/2019/11/26/were-going-saas-let-us-set-you-up-with-free-hosted-dashboards/).
+Since this user could not be expected to be comfortable [installing a Python package](https://meltano.com/docs/installation.html#requirements) or [setting up a PostgreSQL database](https://www.meltano.com/plugins/loaders/postgres.html), we decided to make installation as easy as clicking a button, by offering [hosted Meltano instances](https://meltano.com/blog/2019/11/26/were-going-saas-let-us-set-you-up-with-free-hosted-dashboards/).
 
 Similarly, these users could not be expected to implement extractors, transformations, or models, so we took on this responsibility ourselves. We were, after all, attempting to prove the value that Meltano could bring by showing that _assuming that plugins exist_, it is really powerful to have a single tool take care of everything from extraction to analysis, so that an end-user can forget about the nitty gritty details and simply go straight from connecting their data source to viewing a dashboard.
 
@@ -40,11 +42,11 @@ This past March, about 6 months into this adventure, we found ourselves in a muc
 
 Since the value that hosted Meltano could bring was a function of both the actual functionality the Meltano tool offered, and the extent of its out-of-the-box data source support, improving the experience for our non-technical end-users would come down to us taking on the significant burden of developing and maintaining all of the plugins they would ever want to use, ourselves.
 
-By then, the 6 month experiment had certainly proven the point that "Meltano can bring significant value to non-technical end-users as an integrated tool to go from data to dashboard", and from that perspective should be seen as a great success. It had also made us realize, however, that as a way of demonstrating the value of Meltano to the data teams that might one day adopt it and offer its analytics interface to _their own_ non-technical end-users, the approach of simply compensating for its current lack of data source support by trying to implement all of the plugins ourselves was not going to scale.
+By then, the 6 month experiment had certainly proven the point that "**Meltano can bring significant value to non-technical end-users as an integrated tool to go from data to dashboard**", and from that perspective should be seen as a great success. It had also made us realize, however, that as a way of demonstrating the value of Meltano to the data teams that might one day adopt it and offer its analytics interface to _their own_ non-technical end-users, the approach of simply compensating for its current lack of data source support by trying to implement all of the plugins ourselves was not going to scale.
 
 We had built a pretty useful hosted analytics tool for startup founders looking to learn from their sales funnel performance, and we had learned a lot along the way, but continuing further on this path would not bring us closer to our overarching goal of building an end-to-end tool for all data teams and all data-related use cases.
 
-So what's next, then?
+## So what's next, then?
 
 If the non-technical user experience of Meltano will only ever be as good as the quantity and quality of its plugins, we need to get more people involved in writing them, so it's time to pivot back and return our focus to open source, the self-hosted experience, and the technical end-user!
 
@@ -62,6 +64,8 @@ To figure out what that could look like, and where Meltano might go from here, I
 
 The most significant conclusion came pretty quickly: **As an open source project, Meltano's scope is simply too broad and ambitious.**
 
+## Open source and scope
+
 At first glance, it may seem like a broader scope would be a good thing: if the project intends to solve more different problems for more different people, it'll get more people excited, and therefore more people will contribute, right?
 
 If only it were that simple. Excited people do not always convert into users and contributors, and there's a difference between being excited about a vision and the prospect of one day getting to use the tool, and being excited about contributing to actually make that vision a reality.
@@ -76,11 +80,13 @@ If you had separated the team and asked the data engineer(s), analytics engineer
 
 Hence, Meltano's scope is simply too broad and ambitious to attract open source contributors in any significant numbers at this relatively early stage. So, if we can't go straight for end-to-end, where _do_ we start?
 
+## Meltano's open source opportunity
+
 The plugins that will make Meltano's end-to-end vision come true for any given data source will have to be written in order, by people with different roles and skillsets, so if we want to make that vision a reality _eventually_, we have to start with data engineers writing extractors and loaders, so that _later_ analytics engineers can write transformations and models, so that _after that_ data analysts and business end-users can use the models to create reports and dashboards and gain better insights.
 
 The hope is that if we build a community around open source data integration and get data engineers to collaborate on extractors and loaders, analytics engineers who come across the project will be empowered to also write transformations because dbt is supported out of the box. Once Meltano ships with extractors and transformations for various data sources, analytics engineers and analysts would also be motivated to give its built-in analytics functionality a try and write some models, and once those are done for a handful of data sources, we're ready for the non-technical end-user who won't need to contribute at all, because the plugins they need will have been written already.
 
-All of this is to say that while the end-to-end vision of Meltano has been realized in principle and is still our long-term aspiration, getting there requires us not be distracted by it in the short-to-medium term. Instead, we will go all-in on positioning Meltano as an open source self-hosted platform for running data integration and transformation (ELT) pipelines, trusting that the rest will follow in due time.
+All of this is to say that while the end-to-end vision of Meltano has been realized in principle and is still our long-term aspiration, getting there requires us to not be distracted by it in the short-to-medium term. Instead, we will [go all-in](https://gitlab.com/groups/meltano/-/epics/77) on positioning Meltano as an **open source self-hosted platform for running data integration and transformation (ELT) pipelines**, trusting that if it gains traction in this area, the rest will follow in due time.
 
 The goal is to turn Meltano into a true open source alternative to existing proprietary hosted ELT solutions like [Alooma](https://www.alooma.com/), [Blendo](https://www.blendo.co/), [Hevo](https://hevodata.com/), [Matillion](https://www.matillion.com/products/etl-software/), [Pentaho](https://www.hitachivantara.com/en-us/products/data-management-analytics/pentaho-platform.html), and [Xplenty](https://www.xplenty.com/), in terms of ease of use, reliability, and quantity and quality of supported data sources, since without it, an open source tool for the entire data lifecycle can never exist.
 
@@ -90,6 +96,6 @@ And everything that's old is new again, since GitLab Staff Data Engineer [Taylor
 
 With all of the benefits of hindsight, I couldn't agree more.
 
-To learn why the opportunity to build an open source platform for data integration and transformation (ELT) pipelines gets us just as excited as we have been about the end-to-end vision up to this point, check out part 2:
+To learn why the opportunity to build an open source platform for ELT pipelines gets us just as excited as we have been about the end-to-end vision up to this point, check out part 2:
 
-[**Why we are building an open source platform for data integration and transformation (ELT) pipelines**](#)
+[**Why we are building an open source platform for ELT pipelines**](#)

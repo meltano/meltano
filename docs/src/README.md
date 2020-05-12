@@ -28,7 +28,7 @@ orchestration:
 Meltano is an [open source](https://gitlab.com/meltano/meltano) platform for
 building, running & orchestrating ELT pipelines built out of [Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com) models, that you can [run locally or host on any cloud](/docs/installation.html).
 
-Scroll down for details on [integration](/#integration-just-a-few-keystrokes-away), [transformation](/#transformation-as-a-first-class-citizen), and [orchestration](/#orchestration-right-out-of-the-box).
+Scroll down for details on [integration](/#integration), [transformation](/#transformation), and [orchestration](/#orchestration).
 
 :::
 
@@ -55,7 +55,7 @@ pip3 install meltano
 meltano init demo-project # --no_usage_stats
 ```
 
-Your Meltano project is now ready for [integration](/#integration-just-a-few-keystrokes-away), [transformation](/#transformation-as-a-first-class-citizen), and [orchestration](/#orchestration-right-out-of-the-box)!
+Your Meltano project is now ready for [integration](/#integration), [transformation](/#transformation), and [orchestration](/#orchestration)!
 
 :::
 
@@ -72,7 +72,7 @@ for you and keeps track of [the state of your extraction](https://github.com/sin
 so that subsequent ELT runs with the same job ID will always pick up right where
 the previous run left off.
 
-Scroll down to learn more about [adding extractors and loaders to your project](#how-to-add-extractors-and-loaders-to-your-project).
+Scroll down to learn more about [adding extractors and loaders to your project](#meltano-add).
 :::
 
 ::: slot integration-code
