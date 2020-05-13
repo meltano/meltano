@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <div class="hero homepage-cta feature-section-wrapper">
+    <div class="hero homepage-cta feature-section-wrapper" id="installation">
       <div class="hero-left">
         <Content slot-key="installation" />
 
@@ -26,16 +26,16 @@
       </div>
     </div>
 
-    <div class="hero homepage-cta feature-section-wrapper">
+    <div class="hero homepage-cta feature-section-wrapper" id="integration">
       <div class="hero-left">
         <Content slot-key="integration" />
 
-        <p class="action">
+        <!-- <p class="action">
           <NavLink
             class="action-button"
             :item="$frontmatter.integration.primaryAction"
           />
-        </p>
+        </p> -->
       </div>
 
       <div class="hero-right">
@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <div class="hero homepage-cta feature-section-wrapper">
+    <div class="hero homepage-cta feature-section-wrapper" id="transformation">
       <div class="hero-left">
         <Content slot-key="transformation" />
 
@@ -60,7 +60,7 @@
       </div>
     </div>
 
-    <div class="hero homepage-cta feature-section-wrapper">
+    <div class="hero homepage-cta feature-section-wrapper" id="orchestration">
       <div class="hero-left">
         <Content slot-key="orchestration" />
 
@@ -98,16 +98,40 @@
           class="button is-purple is-filled"
           :item="$frontmatter.installation.primaryAction"
         />
+
+        <p class="description ta-c">
+          Or keep scrolling to learn more!
+        </p>
       </section>
     </div>
 
-    <div class="hero homepage-cta feature-section-wrapper">
+    <div class="hero homepage-cta feature-section-wrapper" id="meltano-add">
       <div class="hero-left">
         <Content slot-key="meltano-add" />
       </div>
 
       <div class="hero-right">
         <Content slot-key="meltano-add-code" />
+      </div>
+    </div>
+
+    <div class="hero homepage-cta feature-section-wrapper" id="meltano-config">
+      <div class="hero-left">
+        <Content slot-key="meltano-config" />
+      </div>
+
+      <div class="hero-right">
+        <Content slot-key="meltano-config-code" />
+      </div>
+    </div>
+
+    <div class="hero homepage-cta feature-section-wrapper" id="meltano-select">
+      <div class="hero-left">
+        <Content slot-key="meltano-select" />
+      </div>
+
+      <div class="hero-right">
+        <Content slot-key="meltano-select-code" />
       </div>
     </div>
 
@@ -396,7 +420,7 @@ export default {
     margin-right: 0;
   }
 
-  p, ul {
+  p, ul, ol {
     font-size: 1.2rem !important;
     color: #474C4F !important;
   }
@@ -443,9 +467,11 @@ export default {
     width: 35%;
   }
 
-  .hero-left .content p {
-    padding-right: 80px !important;
-    padding-bottom: 10px;
+  .hero-left .content {
+    p, ul, ol {
+      padding-right: 80px !important;
+      padding-bottom: 10px;
+    }
   }
 }
 
