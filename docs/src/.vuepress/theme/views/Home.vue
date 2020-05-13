@@ -169,6 +169,21 @@
       </section>
     </div>
 
+    <div class="feature-section-wrapper is-shorter">
+      <div class="content-width-wide">
+        <section class="section">
+          <h2 class="section__title">Subscribe to our newsletter</h2>
+          <p class="section__text">
+            Get the most significant news about Meltano delivered right to your inbox!
+          </p>
+
+          <a href="https://meltano.substack.com" class="button" target="_blank"
+            >Subscribe</a
+          >
+        </section>
+      </div>
+    </div>
+
     <GlobalFooter
       ><a
         href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/views/Home.vue"
