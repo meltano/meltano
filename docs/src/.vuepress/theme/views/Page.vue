@@ -16,16 +16,17 @@
         <p>
           Since then, there have been some
           <a
-            href="https://gitlab.com/meltano/meltano/-/merge_requests/1628"
+            href="https://meltano.com/blog/2020/05/13/revisiting-the-meltano-strategy-a-return-to-our-roots/"
             target="_blank"
-          >significant changes to our strategy, direction, and focus</a>,
+          >significant changes</a> to our
+          <a href="https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/" target="_blank">strategy, direction, and focus</a>,
           so statements and recommendations may be outdated and not all examples may work.
         </p>
 
         <p>
           The most up to date information can be found on the
           <router-link to="/">homepage</router-link>,
-          and on any pages that don't show this warning.
+          as well as any pages that don't show this warning.
         </p>
 
         <p v-if="editLink">
