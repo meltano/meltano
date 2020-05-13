@@ -351,15 +351,17 @@ export default {
   display: flex;
   justify-content: center;
   flex-direction: column;
-
-  &:first-child {
-    align-items: center;
-  }
+  align-items: center;
 }
 
 @media (min-width: $MQNarrow) {
   .homepage-cta {
     flex-direction: row;
+    align-items: start;
+
+    &:first-child {
+      align-items: center;
+    }
   }
 }
 
