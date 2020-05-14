@@ -4,6 +4,7 @@ import logging
 import subprocess
 import time
 import os
+import sys
 from . import PluginInstall, PluginType
 
 from meltano.core.error import SubprocessError
@@ -25,6 +26,23 @@ class AirflowInvoker(PluginInvoker):
         env["PATH"] = os.pathsep.join([str(venv_dir.joinpath("bin")), env["PATH"]])
         env["VIRTUAL_ENV"] = str(venv_dir)
         env["AIRFLOW_HOME"] = str(self.config_service.run_dir)
+
+        # we want Airflow to inherit our current venv so that the `meltano`
+        # module can be used from inside `orchestrate/dags/meltano.py`
+        sys_paths = []
+        for path in sys.path:
+            # the current venv if any
+            if path.endswith("site-packages"):
+                sys_paths.append(path)
+
+            # when meltano is installed as editable
+            if path.endswith(os.path.join("meltano", "src")):
+                sys_paths.append(path)
+
+        if "PYTHONPATH" in env:
+            sys_paths.append(env["PYTHONPATH"])
+
+        env["PYTHONPATH"] = os.pathsep.join(sys_paths)
 
         options = super().Popen_options()
         options_env = nest(options, "env")
