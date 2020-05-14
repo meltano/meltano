@@ -67,23 +67,6 @@ class VenvService:
                 f"Could not create of the virtualenv for '{namespace}/{name}'", run
             )
 
-        # we want the plugin to inherit our current venv
-        sys_paths = []
-        for path in sys.path:
-            # the current venv if any
-            if path.endswith("site-packages"):
-                sys_paths.append(path)
-
-            # when meltano is installed as editable
-            if path.endswith(os.path.join("meltano", "src")):
-                sys_paths.append(path)
-
-        # inject a .pth to add these PYTHONPATHs
-        meltano_pth_path = venv.site_packages_dir.joinpath("meltano_venv.pth")
-        with meltano_pth_path.open("w") as pth:
-            for path in sys_paths:
-                pth.write(path + "\n")
-
         return run
 
     def install(self, pip_url, namespace="", name=""):
@@ -95,27 +78,20 @@ class VenvService:
 
         venv = VirtualEnv(self.project.venvs_dir(namespace, name))
         pip_install_path = venv.bin_dir.joinpath("pip")
+
         meltano_pth_path = venv.site_packages_dir.joinpath("meltano_venv.pth")
-        meltano_pth_disable_path = meltano_pth_path.with_suffix(".pth.disable")
+        if meltano_pth_path.exists():
+            os.remove(meltano_pth_path)
 
-        try:
-            # disable the `meltano venv`
-            if meltano_pth_path.exists():
-                meltano_pth_path.rename(meltano_pth_disable_path)
+        run = subprocess.run(
+            [str(pip_install_path), "install", *pip_url.split(" ")],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+        )
 
-            run = subprocess.run(
-                [str(pip_install_path), "install", *pip_url.split(" ")],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                universal_newlines=True,
-            )
-
-            if run.returncode != 0:
-                raise SubprocessError(f"Failed to install plugin '{name}'.", run)
-        finally:
-            # re-enable the `meltano venv`
-            if meltano_pth_disable_path.exists():
-                meltano_pth_disable_path.rename(meltano_pth_path)
+        if run.returncode != 0:
+            raise SubprocessError(f"Failed to install plugin '{name}'.", run)
 
         return run
 
