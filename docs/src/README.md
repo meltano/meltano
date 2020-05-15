@@ -209,15 +209,18 @@ meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily --transfor
 # Add Airflow orchestrator
 meltano add orchestrator airflow
 
-# Start the Airflow scheduler in the background
-meltano invoke airflow scheduler -D
-
-# Optional: start the Airflow web interface (add -D to move to background)
-meltano invoke airflow webserver
-open http://localhost:8080
+# Start the Airflow scheduler (add `-D` to background)
+meltano invoke airflow scheduler
 ```
 
-Your pipelines have now been scheduled!
+Your pipelines will now run on a schedule!
+
+```bash
+# Start the Airflow web interface (add `-D` to background)
+meltano invoke airflow webserver
+```
+
+Airflow is now available at <http://localhost:8080>!
 
 :::
 
