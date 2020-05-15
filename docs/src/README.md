@@ -161,7 +161,7 @@ meltano add transform tap-gitlab
 # Run data integration and transformation pipeline
 meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
 
-# Connect to database
+# Start `psql` shell connected to warehouse database
 PGPASSWORD=$PG_PASSWORD psql -U $PG_USERNAME -h $PG_ADDRESS -p $PG_PORT -d $PG_DATABASE
 ```
 
