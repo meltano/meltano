@@ -135,6 +135,16 @@
       </div>
     </div>
 
+    <div class="hero homepage-cta feature-section-wrapper" id="contributing">
+      <div class="hero-left">
+        <Content slot-key="contributing" />
+      </div>
+
+      <div class="hero-right">
+        <Content slot-key="contributing-code" />
+      </div>
+    </div>
+
     <div class="feature-section-wrapper is-shorter is-white">
       <section class="section">
         <h2 class="section__title" style="padding-bottom:20px;">

@@ -422,3 +422,82 @@ Selected properties:
 Your entities and properties have now been selected for [extraction](/#integration)!
 
 :::
+
+::: slot contributing
+
+## Contributing to Meltano
+
+The Meltano [open source project](https://gitlab.com/meltano/meltano) was [founded inside GitLab in 2018](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/),
+and has been built by [the Meltano team](https://about.gitlab.com/handbook/meltano/) at GitLab [completely out in the open](https://gitlab.com/meltano/meltano/activity) by [the Meltano team](https://about.gitlab.com/handbook/meltano/) at GitLab since then.
+
+It was released under the [MIT License](https://gitlab.com/meltano/meltano/-/blob/master/LICENSE), and is being built and maintained by the Meltano community under the stewardship of the Meltano team at GitLab.
+
+:::
+
+::: slot contributing-code
+
+1. Visit <https://gitlab.com/meltano/meltano>
+2. [Fork the project](https://docs.gitlab.com/ee/gitlab-basics/fork-project.html) into your own namespace
+3. Set up your local Meltano development environment:
+
+```bash
+# For these instructions to work, ensure that:
+# - you are running Linux or macOS
+# - Python 3.6 or 3.7 has been installed
+python3 --version
+# - Node 8.11.0+ has been installed
+node --version
+# - Yarn has been installed
+yarn --version
+
+# Navigate to your development projects directory
+cd development-projects
+
+# Clone your fork of the Meltano repository
+git clone https://gitlab.com/<your_namespace>/meltano.git
+cd meltano
+
+# Add a remote for the upstream Meltano repository
+git remote add upstream https://gitlab.com/meltano/meltano.git
+
+# Ensure you are running the latest pip and setuptools
+pip3 install --upgrade pip setuptools
+
+# Create and activate development virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install pinned dependencies
+pip3 install -r requirements.txt
+
+# Install Meltano (and its development dependencies)
+# from the local directory in editable/development mode
+# so that local changes are automatically picked up
+pip3 install -e '.[dev]'
+
+# Run any `meltano` command you please
+# meltano ...
+```
+
+Your local Meltano development environment is now ready!
+
+4. Make any changes you like to your local copy of Meltano
+5. Try them out with a local Meltano project:
+
+```bash
+# Ensure that:
+# - you have activated the development virtual environment
+source /path/to/development-projects/meltano/.venv/bin/activate
+# - you have navigated to your Meltano project directory
+cd /path/to/meltano-projects/demo-project
+
+# Run any `meltano` command you please
+# meltano ...
+```
+
+6. Once your changes are ready, commit them to a new feature branch and push the branch up to your fork
+7. [Create a merge request](https://gitlab.com/meltano/meltano/-/merge_requests/new) from your fork to the main Meltano project
+
+Your contribution has now been submitted and will be reviewed shortly!
+
+:::
