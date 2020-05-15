@@ -94,9 +94,11 @@ cd demo-project
 # Add GitLab extractor to your project
 meltano add extractor tap-gitlab
 
-# Configure tap-gitlab
+# Configure tap-gitlab to extract data from...
+# - the https://gitlab.com/meltano/meltano project
 meltano config tap-gitlab set projects meltano/meltano
-meltano config tap-gitlab set start_date 2018-01-01
+# - going back to May 1st, 2020
+meltano config tap-gitlab set start_date 2020-05-01
 
 # Add JSONL loader
 meltano add loader target-jsonl
