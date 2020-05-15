@@ -366,9 +366,9 @@ which lets you define inclusion and exclusion rules using [glob](https://en.wiki
 
 Whenever an extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt), Meltano will automatically run the tap in discovery mode, apply the rules to the resulting catalog file, and pass it to the tap in sync mode.
 
-Note that exclusion has precedence over inclusion.
-If an entity or property is matched by an exclusion pattern, there is no way to get it back using an inclusion pattern unless the exclusion pattern is manually removed from your project's `meltano.yml` file first.
+Note that exclusion takes precedence over inclusion: if an entity or property is matched by an exclusion pattern, there is no way to get it back using an inclusion pattern unless the exclusion pattern is manually removed from your project's `meltano.yml` file first.
 
+If no rules are defined using `meltano select`, Meltano will fall back on catch-all rule `*.*` so that all entities and properties are selected.
 
 :::
 
