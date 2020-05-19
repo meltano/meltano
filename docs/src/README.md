@@ -2,7 +2,7 @@
 home: true
 heroImage: /meltano-logo.svg
 metaTitle: "Meltano: open source data pipelines"
-description: Meltano is an open source platform for building, running & orchestrating ELT pipelines built out of Singer taps and targets and dbt models, that you can run locally or host on any cloud. Our goal is to make the power of data integration available to all by turning Meltano into a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
+description: Meltano is an open source platform for building, running & orchestrating ELT pipelines built out of Singer taps and targets and dbt models, that you can run locally or host on any cloud. Our goal is to make the power of data integration available to all by building a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
 installation:
   primaryAction:
     text: Install now
@@ -29,13 +29,15 @@ Meltano is an [open source](https://gitlab.com/meltano/meltano) platform for
 building, running & orchestrating ELT pipelines built out of [Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com) models, that you can [run locally or host on any cloud](/docs/installation.html).
 
 Our goal is to [make the power of data integration available to all](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/)
-by turning Meltano into a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
+by building a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
 
-Scroll down for details on [integration](/#integration), [transformation](/#transformation), and [orchestration](/#orchestration).
+Scroll down for details on [Meltano projects](/#meltano-init), [integration](/#integration), [transformation](/#transformation), and [orchestration](/#orchestration).
 
 :::
 
 ::: slot installation-code
+
+**Give it a try and be up and running in minutes!**
 
 ```bash
 # For these examples to work, ensure that:
@@ -53,9 +55,79 @@ source .venv/bin/activate
 
 # Install Meltano
 pip3 install meltano
+```
 
-# Initialize Meltano project "demo-project"
-meltano init demo-project # --no_usage_stats
+Meltano is now ready for its [first project](/#meltano-init)!
+
+:::
+
+::: slot meltano-init
+
+## The Meltano project: your single source of truth
+
+At the core of the Meltano experience is the Meltano project,
+which respresents the single source of truth regarding your data pipelines:
+how data should be [integrated](/#integration) and [transformed](/#transformation),
+how the pipelines should be [orchestrated](/#orchestration),
+and how the various components should be [configured](/#meltano-config).
+
+Since a Meltano project is just a directory on your filesystem containing
+text-based files, you can use it like any other software development project
+and benefit from DevOps best practices such as version control, code review,
+and continuous integration and delivery.
+
+You can initialize a new Meltano project using [`meltano init`](/docs/command-line-interface.html#init),
+which will create a new directory with:
+
+- a `meltano.yml` file that will list any [`plugins` you'll add](/#meltano-add) and [pipeline `schedules` you'll create](/#orchestration),
+- a `transform` directory containing a full-fleged [dbt project](https://docs.getdbt.com/docs/building-a-dbt-project/projects) (that you're free to delete if you don't plan on using the [`dbt` transformer](/#transformation)),
+- an [`orchestrate/dags/meltano.py`](https://gitlab.com/meltano/meltano/blob/master/src/meltano/core/bundle/dags/meltano.py) file defining [Airflow DAGs](https://airflow.apache.org/docs/stable/concepts.html#dags) to run your [scheduled pipelines](/#orchestration) (that you're free to delete if you don't plan on using the [`airflow` orchestrator](/#orchestration)),
+- stubs for `.gitignore`, `docker-compose.yml`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
+- empty `model`, `extract`, `load`, `analyze`, and `notebook` directories for you to use (or delete) as you please.
+
+Note that whenever you [add a new plugin](/#meltano-add), it will be installed into your project's (gitignored) `.meltano` directory automatically.
+However, when you clone or pull an existing Meltano project from version control, you'll want to explicitly run [`meltano install`](/docs/command-line-interface.html#install) before any other `meltano` commands to install (or update) all plugins specified in `meltano.yml`.
+:::
+
+::: slot meltano-init-code
+
+```bash
+# Initialize a new Meltano project in the
+# "demo-project" directory, and...
+# - share anonymous usage data with the Meltano team
+#   to help them gauge interest in Meltano and its
+#   features and drive development time accordingly:
+meltano init demo-project
+# - OR don't share anything with the Meltano team
+#   about this specific project:
+meltano init demo-project --no_usage_stats
+# - OR don't share anything with the Meltano team
+#   about any project I initialize ever:
+SHELLRC=~/.$(basename $SHELL)rc # ~/.bashrc, ~/.zshrc, etc
+echo "export MELTANO_DISABLE_TRACKING=1" >> $SHELLRC
+meltano init demo-project # --no_usage_stats is implied
+```
+
+```output
+Project demo-project has been created.
+
+Next steps:
+  cd demo-project
+  Visit https://meltano.com/ to learn where to go from here
+```
+
+Your Meltano project has now been initialized in the `demo-project` directory!
+
+```shell
+# Before you use any `meltano` command, ensure that:
+# - you have activated the virtual environment
+source ../.venv/bin/activate
+# - you have navigated to your Meltano project directory
+cd demo-project
+
+# If this were an existing Meltano project you just
+# cloned or pulled, install any missing plugins
+# meltano install
 ```
 
 Your Meltano project is now ready for [integration](/#integration), [transformation](/#transformation), and [orchestration](/#orchestration)!
@@ -66,7 +138,7 @@ Your Meltano project is now ready for [integration](/#integration), [transformat
 
 ## Integration just a few keystrokes away
 
-Use existing Singer [taps](/plugins/extractors/) and [targets](/plugins/loaders/)
+You can use existing Singer [taps](/plugins/extractors/) and [targets](/plugins/loaders/)
 or [easily write your own](/tutorials/create-a-custom-extractor.html) to extract
 data from any SaaS tool or database and load it into any data warehouse or file format.
 
@@ -85,12 +157,6 @@ Scroll down to learn more about [transformation](/#transformation) and [orchestr
 ::: slot integration-code
 
 ```bash
-# Before you use any `meltano` command, ensure that:
-# - you have activated the virtual environment
-source ../.venv/bin/activate
-# - you have navigated to your Meltano project directory
-cd demo-project
-
 # Add GitLab extractor to your project
 meltano add extractor tap-gitlab
 
@@ -329,7 +395,7 @@ meltano config tap-covid-19 set user_agent "tap-covid-19 via meltano <api_user_e
 # Store sensitive plugin configuration in...
 # - the current shell environment, for one-off use:
 export TAP_COVID_19_API_TOKEN="<your_github_api_token>"
-# - your project's `.env`, for repeated use:
+# - OR your project's `.env`, for repeated use:
 touch .env
 echo "TAP_COVID_19_API_TOKEN=<your_github_api_token>" >> .env
 
