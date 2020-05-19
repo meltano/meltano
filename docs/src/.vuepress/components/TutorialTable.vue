@@ -1,7 +1,7 @@
 <script>
 export default {
-  name: 'TutorialTable'
-}
+  name: "TutorialTable",
+};
 </script>
 
 <template>
@@ -98,6 +98,18 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
+        <a href="/tutorials/install-on-aws.html">
+          Installing Meltano on Amazon Web Services (AWS)
+        </a>
+      </div>
+      <div>
+        <p>
+          Learn how to install Meltano on AWS
+        </p>
+      </div>
+    </div>
+    <div class="tutorial-item">
+      <div class="tutorial-header">
         <a href="/tutorials/create-a-custom-extractor.html">
           Create a Custom Extractor
         </a>
@@ -113,14 +125,14 @@ export default {
 
 <style scoped>
 .tutorial-container {
-  display: flex;
+  /* display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: wrap; */
 }
 .tutorial-item {
-  display: flex;
+  /* display: flex;
   flex: 1 1 auto;
-  flex-direction: column;
+  flex-direction: column; */
   padding-left: 0.5rem;
   padding-right: 0.5rem;
 }
