@@ -6,6 +6,15 @@ sidebarDepth: 2
 
 # Installation
 
+::: tip
+The quickest way to try out Meltano is to follow the [examples on the homepage](/).
+
+They can be copy-pasted right onto your command line, and in a matter of minutes will take you all the way through [installation](/#installation), [integration](/#integration), [transformation](/#transformation), and [orchestration](/#orchestration) with the [`tap-gitlab` extractor](/plugins/extractors/gitlab.html) and [`target-jsonl`](/plugins/loaders/jsonl.html) and [`target-postgres`](/plugins/loaders/postgres.html) loaders.
+
+:::
+
+If the instructions on the homepage did not work on your environment, or if you'd like to learn more about how to manage your Meltano installation, you've come to the right place.
+
 ## Local Installation
 
 In this section, we will install Meltano as a local application on your computer that you can access from your browser and on the command line.
