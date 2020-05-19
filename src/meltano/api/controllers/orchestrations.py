@@ -456,7 +456,7 @@ def get_pipeline_schedules():
         state_job = finder.latest(db.session)
         schedule["has_error"] = state_job.has_error() if state_job else False
         schedule["is_running"] = state_job.is_running() if state_job else False
-        schedule["job_id"] = state_job.job_id if state_job else None
+        schedule["job_id"] = schedule["name"]
         schedule["started_at"] = state_job.started_at if state_job else None
         schedule["ended_at"] = state_job.ended_at if state_job else None
         schedule["trigger"] = state_job.trigger if state_job else None

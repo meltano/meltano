@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2042](https://gitlab.com/meltano/meltano/-/issues/2042) Fix bug causing Connection Setup UI to fail when plugin docs URL is not set
 - [#2045](https://gitlab.com/meltano/meltano/-/issues/2045) Hide plugin logo in UI if image file could not be found
 - [#2043](https://gitlab.com/meltano/meltano/-/issues/2043) Use plugin name in UI when label is not set, instead of not showing anything
+- [#2044](https://gitlab.com/meltano/meltano/-/issues/2044) Don't show button to open Log Modal on Pipelines page if pipeline has never run
 
 ### Breaks
 
