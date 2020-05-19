@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2044](https://gitlab.com/meltano/meltano/-/issues/2044) Don't show button to open Log Modal on Pipelines page if pipeline has never run
+
 ### Breaks
 
 

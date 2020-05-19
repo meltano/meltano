@@ -43,7 +43,7 @@ export default {
       return pipeline => {
         const label = pipeline.endedAt
           ? utils.momentFromNow(pipeline.endedAt)
-          : 'Log'
+          : 'Never'
         return pipeline.isRunning ? 'Running...' : label
       }
     },
@@ -179,6 +179,7 @@ export default {
             <td>
               <p>
                 <button
+                  v-if="pipeline.isRunning || pipeline.endedAt"
                   class="button is-outlined is-fullwidth h-space-between"
                   :class="{
                     'tooltip is-tooltip-left': pipeline.hasEverSucceeded
@@ -196,7 +197,7 @@ export default {
                     {{ getLastRunLabel(pipeline) }}
                   </span>
                   <span
-                    v-if="!pipeline.isRunning"
+                    v-if="pipeline.endedAt"
                     class="icon"
                     :class="
                       `has-text-${pipeline.hasError ? 'danger' : 'success'}`
@@ -211,6 +212,7 @@ export default {
                     ></font-awesome-icon>
                   </span>
                 </button>
+                <span v-else>Never</span>
               </p>
             </td>
             <td>
