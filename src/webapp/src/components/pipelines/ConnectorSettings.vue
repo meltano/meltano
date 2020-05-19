@@ -286,7 +286,7 @@ export default {
     },
     onFocusInput(el) {
       const anchorName = el.id
-      if (anchorName) {
+      if (anchorName && this.isShowDocs) {
         this.$refs.docs.contentWindow.postMessage(
           {
             source: 'meltano',
