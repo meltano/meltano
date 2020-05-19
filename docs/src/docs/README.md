@@ -1,132 +1,51 @@
 ---
 metaTitle: Introduction to Meltano
 description: Learn where to use Meltano, how Meltano is built, and where to get started. 
-lastUpdatedSignificantly: 2020-02-20
 ---
 
 # What Is Meltano?
 
-Meltano is an open source platform for building, running & orchestrating [Singer](https://www.singer.io/)-based ELT pipelines, that you can [run locally or host on any cloud](/docs/installation.html).
-
-Use existing Singer [taps](/plugins/extractors/) and [targets](/plugins/loaders/) or [easily write your own](/tutorials/create-a-custom-extractor.html) to extract data from any SaaS tool or database and load it into any data warehouse.
-
-::: warning
-The information below is out of date. It will be updated soon, as tracked in [this issue](https://gitlab.com/meltano/meltano/-/issues/1857).
-:::
+Meltano is an [open source](https://gitlab.com/meltano/meltano) platform for
+building, running & orchestrating ELT pipelines built out of
+[Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com)
+models, that you can [run locally or host on any cloud](/docs/installation.html).
 
 ## Mission
 
-Provide a simple way to connect data source(s) and generate reports in minutes. through an all-in-one bundled solution, which is optimized for [breadth over depth](https://about.gitlab.com/company/strategy/#breadth-over-depth) to offer basic functionality at each step of the data pipeline.
+Our goal is to **make the power of data integration available to all** by building
+a true open source alternative to existing proprietary hosted EL(T) solutions,
+in terms of ease of use, reliability, and quantity and quality of supported data sources.
 
-Meltano is an open source convention over configuration product for the whole data life cycle, all the way from loading data to analyzing it. To learn more about our progress, check out the [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md) and our weekly [milestones and roadmap](https://gitlab.com/groups/meltano/-/milestones).
-
-We leverage open source and software development best practices including:
-
-- Version control
-- Consistent primitives and naming schema
-- Clear and powerful command line interface
-- Continuous integration and deployment
-- Making it easy to get started with up to date documentation
-
-[![Meltano Diagram](/meltano-diagram.png)](/meltano-diagram.png)
-
-## Vision
-
-Meltano's mission aligns with the GitLab mission, which is "to change all creative work from read-only to read-write so that everyone can contribute". When everyone can contribute, consumers become contributors and we greatly increase the rate of human progress.
-
-Our contribution to this progress comes through the democratization of data throughout organizations. We help our customers integrate a wide range of data sets to create a single source of truth.
-
-Meltano stands for the steps of the data life cycle:
-
-- Model
-- Extract
-- Load
-- Transform
-- Analyze
-- Notebook
-- Orchestrate
-
-## Persona
-
-Meltano is a small startup within GitLab, and in order to be successful we have chosen to ruthlessly focus on serving a single person.
-
-### Target Persona Type: Founder
-
-Our target persona has the following traits:
-*  One busy person at a startup *using Meltano in single player mode*
-*  They have access to all systems and data across the company
-*  New to data (does not write code, queries, etc.)
-*  Need to do analysis to run the business 
-*  Needs to do both engineering tasks and analyst tasks because there is nobody else
-
-What they are **not**:
-*  **Don't have "analyst" in their job title.** They perform that function because they have to, and likely are CEO/founder running a department that has a lot of SaaS tools and data, likes sales or marketing. They are setting up the foundational systems in the company.
-*  **Don't have technical know-how or the time** for setting up a server, using the command line, writing code, creating custom taps, targets, transforms or models. They are running their company, and have a thousand other things to do.
-
-### Other Persona Types
-
-There are other personas we are **explicitly NOT building Meltano for** who may discover our tools and become users or contributors:
-
-* Data Analysts
-* Data Engineers
-* Machine Learning Engineers
+For more context, read the following blog post: [Why we are building an open source platform for ELT pipelines](/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/).
 
 ## Focus
 
-The focus of our team is to grow [MAUI](#maui) by 10% every week.
-A week is measured from Sunday to Saturday.
-Every improvement we make should be optimized by that.
-This means sometimes we should prioritize promotion (blog, twitter, video, talk) and usability (docs, UX) over new features.
+We have decided to focus on the following personas and use cases, in order of priority, to help us determine what improvements to prioritize building, and what [community contributions](/docs/contributor-guide.html) to accept:
 
-### MAUI
+1. Data engineers already using [Singer](https://www.singer.io/) taps and targets
+   - They are running Singer-based data pipelines in production already, likely using a hand-rolled hard-to-reproduce deployment/orchestration strategy.
+   - They have experience building and maintaining taps and targets.
+   - They are comfortable using a CLI and want to manage their Meltano project like a software engineering project, with all of the benefits of version control and CI/CD.
+   - They want to have the option of using a web-based UI to monitor (and possibly manage) their pipelines.
+   - Meltano can learn from their experience and provide tooling and documentation to make it easier for them and new users to manage and deploy Singer-based data pipelines and build and maintain new and existing Singer taps and targets.
 
-Meltano's primary KPI is Monthly Active UI Users (MAUI). MAUI is pronounced like [the island](https://en.wikipedia.org/wiki/Maui).
+2. Data engineers or one-person data teams new to open source data pipelines
+   - They may have come across Singer already, but haven't run Singer taps and targets in production yet.
+   - Initially, they are primarily interested in using existing taps and targets instead of writing and maintaining their own, but if they run into issues, they would be comfortable attempting to fix bugs themselves and contributing the fixes upstream.
+   - Later, they would not want to be limited by existing taps and targets and will want to learn how to build and maintain their own.
+   - They are comfortable using a CLI and want to manage their Meltano project like a software engineering project, with all of the benefits of version control and CI/CD.
+   - They want to have the option of using a web-based UI to monitor (and possibly manage) their pipelines.
+   - They may also be interested in using Meltano to run [dbt](https://www.getdbt.com) model-based transformations as part of their data pipelines.
 
-The graph below shows our MAUI growth progress at the end of October 2019. At the target pace (in red) we will have 1,000 MAUI by the end of 2019. While we experienced significant month-over-month growth of MAUI relative to September (+90%), we are still behind pace.
+3. Hobbyists
+   - They are capable of programming and comfortable using a CLI, but may not be data engineers.
+   - They want to pull data from general or personal sources into a local database for personal use, e.g. basic analytics.
+   - They want to run Meltano locally or in a non-production self-hosted environment.
+   - They are primarily interested in using one or more specific existing extractors and loaders, but if they run into issues, they would be comfortable attempting to fix bugs themselves and contributing the fixes upstream.
+   - They may also be interested in using Meltano's [built-in analytics functionality](/docs/analysis.html), and may look into building the transformation and model plugins that support it.
 
-<img src="https://meltano.com/blog/wp-content/uploads/2019/11/Meltano-MAUI-Growth_-Actual-vs.-10-WoW-Goal.png">
+## History
 
-Read the [October 2019 recap post on the Meltano blog](https://meltano.com/blog/2019/11/04/meltano-month-in-review-october-2019/).
+Meltano, originally called BizOps, was founded inside [GitLab](https://about.gitlab.com/) [in 2018](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) to serve the GitLab Data Team. It is maintained primarily by [the Meltano team](https://about.gitlab.com/handbook/meltano/) at GitLab, which continues to sponsor its development.
 
-
-### Other Metrics
-
-We track the leading indicators upstream of MAUI in the funnel to understand the health of our user adoption funnel from first impression to fully onboarded user:
-
-1. [Meltano.com Website](https://meltano.com)
-2. [Meltano Command Line Interface - CLI](https://meltano.com/docs/command-line-interface.html)
-3. [Meltano UI](https://meltano.com/docs/architecture.html#meltano-ui)
-
-Internal metrics:
-
-- [Google Analytics for CLI MAU](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192718180p188392047/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D/)
-- [Google Analytics for Meltano.com Website MAU](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192515807p188274549/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D)
-
-### MAUI
-
-We also track the Monthly Active UI Users (MAUI). MAUI is pronounced like [the island](https://en.wikipedia.org/wiki/Maui).
-
-Internal metrics:
-
-- [Google Analytics for MAUI](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192645310p188384771/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D/)
-
-## Business Model
-
-Meltano is a free and open source project, and the team is employed by GitLab. In the future, we are likely to introduce proprietary features as we work toward a sustainable business model. At this time, we do not have specific plans in that regard.
-
- ## Cadence
-
- ### Release Schedule
-
-Meltano currently follows a weekly release schedule on Mondays.
-
-For our recent changes, you can check [our CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md#unreleased).
-
-You can track our weekly progress and forward-looking plans in greater detail through [our milestones](https://gitlab.com/groups/meltano/-/milestones).
-
-The release process is covered in more detail in [the Handbook](/handbook/engineering/#release-process).
-
-### History
-
-Meltano was [launched in August 2018](https://about.gitlab.com/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) by the GitLab Data & Analytics team, and is now an internal startup within GitLab.
-
+To learn more about Meltano's history from 2018 through 2020, read the following blog post: [Revisiting the Meltano strategy: a return to our roots](https://meltano.com/blog/2020/05/13/revisiting-the-meltano-strategy-a-return-to-our-roots/).
