@@ -105,7 +105,9 @@ export default {
           <div class="media-content">
             <div class="content">
               <p>
-                <span class="has-text-weight-bold">{{ extractor.label }}</span>
+                <span class="has-text-weight-bold">{{
+                  extractor.label || extractor.name
+                }}</span>
                 <br />
                 <small>{{ extractor.description }}</small>
                 <template

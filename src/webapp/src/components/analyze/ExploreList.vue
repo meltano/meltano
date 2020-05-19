@@ -30,7 +30,7 @@ export default {
       class="navbar-item"
       @click="goToExplore(extractor.name)"
     >
-      {{ extractor.label }}
+      {{ extractor.label || extractor.name }}
     </a>
   </div>
 </template>

@@ -301,7 +301,9 @@ export default {
         <div class="modal-card-head-image image is-64x64 level-item">
           <ConnectorLogo :connector="extractorName" />
         </div>
-        <p class="modal-card-title">Connection Setup</p>
+        <p class="modal-card-title">
+          {{ extractor.label || extractor.name }} Connection Setup
+        </p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body is-overflow-y-scroll">
