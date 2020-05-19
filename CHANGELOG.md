@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2043](https://gitlab.com/meltano/meltano/-/issues/2043) Use plugin name in UI when label is not set, instead of not showing anything
+
 ### Breaks
 
 

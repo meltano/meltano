@@ -96,7 +96,7 @@ const getters = {
         ? pluginList.find(plugin => plugin.name === name)
         : {}
 
-      return targetPlugin ? targetPlugin.label : 'Undefined label'
+      return targetPlugin ? targetPlugin.label || targetPlugin.name : 'Unknown'
     }
   },
 
