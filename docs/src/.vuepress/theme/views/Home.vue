@@ -26,6 +26,23 @@
       </div>
     </div>
 
+    <div class="hero homepage-cta feature-section-wrapper" id="meltano-init">
+      <div class="hero-left">
+        <Content slot-key="meltano-init" />
+
+        <!-- <p class="action">
+          <NavLink
+            class="action-button"
+            :item="$frontmatter.meltano-init.primaryAction"
+          />
+        </p> -->
+      </div>
+
+      <div class="hero-right">
+        <Content slot-key="meltano-init-code" />
+      </div>
+    </div>
+
     <div class="hero homepage-cta feature-section-wrapper" id="integration">
       <div class="hero-left">
         <Content slot-key="integration" />
