@@ -37,6 +37,8 @@ Scroll down for details on [Meltano projects](/#meltano-init), [integration](/#i
 
 ::: slot installation-code
 
+**Give it a try and be up and running in minutes!**
+
 ```bash
 # For these examples to work, ensure that:
 # - you are running Linux or macOS
