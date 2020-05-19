@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2042](https://gitlab.com/meltano/meltano/-/issues/2042) Fix bug causing Connection Setup UI to fail when plugin docs URL is not set
+
 ### Breaks
 
 
@@ -22,7 +24,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-* [#2024](https://gitlab.com/meltano/meltano/-/issues/2024) Have plugin venvs not inherit Meltano venv to prevent wrong versions of modules from being loaded
+- [#2024](https://gitlab.com/meltano/meltano/-/issues/2024) Have plugin venvs not inherit Meltano venv to prevent wrong versions of modules from being loaded
 
 
 ## 1.32.0 - (2020-05-11)
