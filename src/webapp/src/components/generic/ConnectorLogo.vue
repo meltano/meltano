@@ -16,11 +16,7 @@ export default {
 </script>
 
 <template>
-  <img
-    :class="{ grayscale: isGrayscale }"
-    :src="connectorLogoUrl"
-    :alt="`${connector} logo`"
-  />
+  <img :class="{ grayscale: isGrayscale }" :src="connectorLogoUrl" alt="" />
 </template>
 
 <style lang="scss"></style>
