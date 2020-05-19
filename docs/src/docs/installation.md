@@ -2,24 +2,13 @@
 metaTitle: How to Install Meltano
 description: Meltano is easy to install on your local machine or in the cloud, including on AWS, Digital Ocean, and other cloud services.
 sidebarDepth: 2
-lastUpdatedSignificantly: 2020-05-06
 ---
 
 # Installation
 
-This section provides guides for getting set up with a self-hosted instance of Meltano's open source data analytics software on your local computer or using popular hosting solutions:
-
-- [Local Installation](#local-installation)
-- [Installing on Docker](#installing-on-docker)
-- [Amazon Web Services (AWS)](#amazon-web-services-aws)
-
 ## Local Installation
 
 In this section, we will install Meltano as a local application on your computer that you can access from your browser and on the command line.
-
-::: tip
-We do not have a double click installer at this time, but [it is on our roadmap](https://gitlab.com/meltano/meltano/issues/1107) and we will be sure to update this page when we do!
-:::
 
 ### Requirements
 
@@ -117,6 +106,8 @@ Once the installation completes, you can check if it was successful by running:
 meltano --version
 ```
 
+## Next Steps
+
 Now that you've installed Meltano and its requirements, you can [create your first project](/docs/getting-started.html#create-your-first-project).
 
 ## Installing on Docker
@@ -180,7 +171,15 @@ Are you having installation or deployment problems? We are here to help you. Che
 
 ## Upgrading Meltano Version
 
-We release a new version of Meltano every week. To keep tabs on the latest releases, follow along on the [Meltano blog](https://meltano.com/blog/), or have a look at our [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
+We release new versions of Meltano every week. To keep tabs on the latest releases, follow along on the [Meltano blog](https://meltano.com/blog/), or have a look at our [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
+
+### Using the command line
+
+You can update Meltano to the latest version by running the following command in your terminal from inside a Meltano project:
+
+```
+meltano upgrade
+```
 
 ### Using Meltano UI
 
@@ -193,11 +192,3 @@ Clicking this button will show more information and give you the option to insta
 ![](/screenshots/update-available-popup.png)
 
 The Meltano UI will refresh automatically once installation is complete.
-
-### Using the command line
-
-If you're not using Meltano UI, you can update Meltano to the latest version by running the following command in your terminal:
-
-```
-meltano upgrade
-```
