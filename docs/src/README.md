@@ -120,10 +120,10 @@ Your Meltano project has now been initialized in the `demo-project` directory!
 
 ```shell
 # Before you use any `meltano` command, ensure that:
-# - you have activated the virtual environment
-source ../.venv/bin/activate
 # - you have navigated to your Meltano project directory
 cd demo-project
+# - you have activated the virtual environment
+source ../.venv/bin/activate
 
 # If this were an existing Meltano project you just
 # cloned or pulled, install any missing plugins
