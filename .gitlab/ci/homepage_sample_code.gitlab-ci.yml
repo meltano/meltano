@@ -14,6 +14,9 @@ homepage_sample_code:
     # TAP_COVID_19_API_TOKEN: set through https://gitlab.com/meltano/meltano/-/settings/ci_cd
   services:
     - postgres:11
+  before_script:
+    - apt-get update
+    - apt-get install postgresql-client
   script:
     ### https://meltano.com/#installation
 
