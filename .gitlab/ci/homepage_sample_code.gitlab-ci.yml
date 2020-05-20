@@ -15,8 +15,8 @@ homepage_sample_code:
   services:
     - postgres:11
   before_script:
-    - apt-get update
-    - apt-get install postgresql-client
+    - apt-get update -y
+    - apt-get install -y postgresql-client
   script:
     ### https://meltano.com/#installation
 
