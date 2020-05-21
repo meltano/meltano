@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2028](https://gitlab.com/meltano/meltano/-/issues/2028) Improve descriptions and default values of `meltano add --custom` prompts
+
 ### Fixes
 
 - [#2042](https://gitlab.com/meltano/meltano/-/issues/2042) Fix bug causing Connection Setup UI to fail when plugin docs URL is not set
