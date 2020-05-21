@@ -50,11 +50,12 @@ Using `-e` in the `pip_url` will install the plugin as editable so any change yo
 meltano add --custom extractor tap-gitlab-custom
 # If you're running Meltano using Docker, ensure you run `docker run` with `--interactive` to allow `namespace` etc to be set:
 # docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-gitlab-custom
-...
-> namespace: gitlab
-> pip_url: -e tap-gitlab-custom
-> executable: tap-gitlab-custom
-> capabilities: catalog,discover,state
+
+(namespace): tap_gitlab_custom
+(pip_url): -e tap-gitlab-custom
+(executable): tap-gitlab-custom
+(capabilities): catalog,discover,state
+(settings): username,password,start_date
 ```
 
 Meltano exposes each plugin configuration in the plugin definition, located in the `meltano.yml` file.
@@ -63,7 +64,7 @@ Meltano exposes each plugin configuration in the plugin definition, located in t
 Meltano manages converting the plugin's configuration to the appropriate definition for the plugin. You can find the generated file in `.meltano/run/tap-gitlab-custom/tap.config.json`.
 :::
 
-Looking at the `tap-gitlab-custom` definition, we should see the following (notice the `settings` section is missing):
+Looking at the `tap-gitlab-custom` definition, we should see the following:
 
 **meltano.yml**
 
@@ -78,9 +79,13 @@ plugins:
       name: tap-gitlab-custom
       namespace: gitlab
       pip_url: -e tap-gitlab-custom
+      settings:
+        - name: username
+        - name: password
+        - name: start_date
 ```
 
-Let's include the default configuration for a sample tap:
+Let's include some additional settings properties:
 
 **meltano.yml**
 

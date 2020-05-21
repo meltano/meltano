@@ -16,56 +16,116 @@ class ProjectAddCustomService:
         self.config_service = config_service or ConfigService(project)
 
     def add(self, plugin_type: PluginType, plugin_name: str):
+        click.secho(
+            f"Adding new custom {plugin_type.cli_command} plugin with name '{plugin_name}'...",
+            fg="green",
+        )
+        click.echo()
+
+        click.echo(
+            f"Specify the plugin's {click.style('namespace', fg='blue')}, which will serve as the:"
+        )
+        click.echo("- prefix for configuration environment variables")
+        click.echo("- identifier to find related/compatible plugins")
+        click.echo("- target database schema when used with")
+        click.echo("  loader target-postgres or target-snowflake")
+        click.echo()
+        click.echo(
+            "Hit Return to accept the default: plugin name with underscores instead of dashes"
+        )
+        click.echo()
+
+        default_namespace = plugin_name.replace("-", "_")
         namespace = click.prompt(
-            "The `namespace` refers to the data source name.\n"
-            "It is used to infer compatibility between components.\n\n"
-            "(namespace)",
-            type=str,
+            click.style("(namespace)", fg="blue"), type=str, default=default_namespace
         )
+
+        click.echo()
+        click.echo(
+            f"Specify the plugin's {click.style('`pip install` argument', fg='blue')}, for example:"
+        )
+        click.echo("- PyPI package name:")
+        click.echo(f"\t{plugin_name}")
+        click.echo("- VCS repository URL:")
+        click.echo(f"\tgit+https://gitlab.com/meltano/{plugin_name}.git")
+        click.echo("- local directory, in editable/development mode:")
+        click.echo(f"\t-e extract/{plugin_name}")
+        click.echo()
+        click.echo("Default: plugin name as PyPI package name")
+        click.echo()
+
         pip_url = click.prompt(
-            "\nThe `pip URL` refers to the pip installation specification.\n"
-            "You may provide any pip-compatible entry:\n"
-            "\tfrom VCS: git+https://gitlab.com/meltano/tap-carbon-intensity.git\n"
-            "\tfrom PyPI: tap-something\n"
-            "\tfrom Source: [-e] /path/to/plugin/source\n\n"
-            "(pip_url)",
-            type=str,
+            click.style("(pip_url)", fg="blue"), type=str, default=plugin_name
         )
+
+        click.echo()
+        click.echo(f"Specify the package's {click.style('executable name', fg='blue')}")
+        click.echo()
+        click.echo("Default: package name derived from `pip_url`")
+        click.echo()
+
+        package_name, _ = os.path.splitext(os.path.basename(pip_url))
         executable = click.prompt(
-            "\nThe `executable` refers to the entry point of the plugin.\n"
-            "By convention, plugins should use their package name as executable, "
-            "but it might be useful to override it to have multiple flavors of the same "
-            "plugin installed.\n\n"
-            "(executable)",
-            default=plugin_name,
+            click.style("(executable)", fg="blue"), default=package_name
         )
 
         capabilities = []
         if plugin_type == PluginType.EXTRACTORS:
+            click.echo()
+            click.echo(
+                f"Specify the tap's {click.style('supported Singer features', fg='blue')} (executable flags), for example:"
+            )
+            click.echo("\t`catalog`: supports the `--catalog` flag")
+            click.echo("\t`discover`: supports the `--discover` flag")
+            click.echo("\t`properties`: supports the `--properties` flag")
+            click.echo("\t`state`: supports the `--state` flag")
+            click.echo()
+            click.echo(
+                "To find out what features a tap supports, reference its documentation or try one"
+            )
+            click.echo(
+                "of the tricks under https://meltano.com/docs/contributor-guide.html#how-to-test-a-tap."
+            )
+            click.echo()
+            click.echo("Multiple capabilities can be separated using commas.")
+            click.echo()
+            click.echo("Default: no capabilities")
+            click.echo()
+
             capabilities = click.prompt(
-                "\nThe `capabilities` refer to the optional features the executable supports.\n"
-                "Possible capabilities of extractors (taps) are:\n"
-                "\t`catalog`: supports the `--catalog` flag\n"
-                "\t`discover`: supports the `--discover` flag\n"
-                "\t`properties`: supports the `--properties` flag\n"
-                "\t`state`: supports the `--state` flag\n"
-                "Multiple capabilities can be specified using a comma-separated string.\n\n"
-                "(capabilities)",
+                click.style("(capabilities)", fg="blue"),
                 type=list,
                 default=[],
                 value_proc=lambda value: [c.strip() for c in value.split(",")],
             )
 
-        settings = click.prompt(
-            "\nThe `settings` refer to the configuration keys the plugin supports.\n"
-            "In the case of Singer taps and targets, these correspond to supported keys in `config.json`.\n"
-            'Nesting can be represented using the `.` seperator, e.g. `auth.username` for `{ "auth": { "username": value } }`.\n'
-            "Multiple setting names/keys can be specified using a comma-separated string.\n\n"
-            "(settings)",
-            type=list,
-            default=[],
-            value_proc=lambda value: [c.strip() for c in value.split(",")],
-        )
+        settings = []
+        if plugin_type in (PluginType.EXTRACTORS, PluginType.LOADERS):
+            singer_type = "tap" if plugin_type == PluginType.EXTRACTORS else "target"
+
+            click.echo()
+            click.echo(
+                f"Specify the {singer_type}'s {click.style('supported settings', fg='blue')} (`config.json` keys)"
+            )
+            click.echo()
+            click.echo("Nested properties can be represented using the `.` seperator,")
+            click.echo('e.g. `auth.username` for `{ "auth": { "username": value } }`.')
+            click.echo()
+            click.echo(
+                f"To find out what settings a {singer_type} supports, reference its documentation."
+            )
+            click.echo()
+            click.echo("Multiple setting names (keys) can be separated using commas.")
+            click.echo()
+            click.echo("Default: no settings")
+            click.echo()
+
+            settings = click.prompt(
+                click.style("(settings)", fg="blue"),
+                type=list,
+                default=[],
+                value_proc=lambda value: [c.strip() for c in value.split(",")],
+            )
 
         # manually create the generic PluginInstall to save it
         # as a custom plugin

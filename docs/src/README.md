@@ -305,7 +305,7 @@ You can also check out the lists of supported [extractors](/plugins/extractors/)
 If the Singer tap or target you'd like to use with Meltano doesn't show up in any of these places, you're going to want to add a custom plugin.
 When you run `meltano add --custom <type> <name>`, Meltano will ask you some additional questions to learn where the package can be found, how to interact with it, and how it can be expected to behave.
 
-If the tap or target in question is listed on Singer's [index of taps](https://www.singer.io/#taps) or [targets](https://www.singer.io/#targets), simply providing the package name as `name`, `pip_url`, and `executable` should suffice. If it's a tap or target you have developed or are developing yourself, you'll want to set `pip_url` to either a Git URL or local directory path. To find out what `settings` a tap or target supports, reference its documentation. If the `capabilities` a tap supports are not described in its documentation, try [one of these tricks](/docs/contributor-guide.html#how-to-test-a-tap).
+If the tap or target in question is listed on Singer's [index of taps](https://www.singer.io/#taps) or [targets](https://www.singer.io/#targets), simply providing the package name as `name`, `pip_url`, and `executable` should suffice. If it's a tap or target you have developed or are developing yourself, you'll want to set `pip_url` to either a VCS repository URL or local directory path. To find out what `settings` a tap or target supports, reference its documentation. If the `capabilities` a tap supports are not described in its documentation, try [one of these tricks](/docs/contributor-guide.html#how-to-test-a-tap).
 
 Once your plugin has been added, it will be ready for [configuration](/#meltano-config)!
 :::
@@ -327,21 +327,21 @@ meltano add --custom extractor tap-covid-19
 
 ```bash
 # Specify namespace, which will serve as the:
-# - target database schema when used with
-#   loader target-postgres or target-snowflake
 # - prefix for configuration environment variables
 # - identifier to find related/compatible plugins
+# - target database schema when used with
+#   loader target-postgres or target-snowflake
 (namespace): tap_covid_19
 
 # Specify `pip install` argument, for example:
 # - PyPI package name:
 (pip_url): tap-covid-19
-# - VCS URL:
+# - VCS repository URL:
 (pip_url): git+https://github.com/singer-io/tap-covid-19.git
 # - local directory, in editable/development mode:
 (pip_url): -e extract/tap-covid-19
 
-# Specify executable name
+# Specify the package's executable name
 (executable): tap-covid-19
 
 # Specify supported Singer features (executable flags)
