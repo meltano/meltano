@@ -65,6 +65,12 @@ homepage_sample_code:
     # meltano install
 
 
+    ### ---
+    # Always use the latest discovery file
+    - ln -s ../src/meltano/core/bundle/discovery.yml
+    ### ---
+
+
     ### https://meltano.com/#integration
 
     # Add GitLab extractor to your project
