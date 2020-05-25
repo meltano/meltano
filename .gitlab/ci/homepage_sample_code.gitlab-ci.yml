@@ -67,7 +67,7 @@ homepage_sample_code:
 
     ### ---
     # Always use the latest discovery file
-    - ln -s ../src/meltano/core/bundle/discovery.yml
+    - ln -s ../../src/meltano/core/bundle/discovery.yml
     ### ---
 
 
