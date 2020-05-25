@@ -1,0 +1,8 @@
+demo_project:
+  stage: test
+  variables:
+    MELTANO_IMAGE_NAME: $CI_REGISTRY_IMAGE
+    MELTANO_IMAGE_TAG: $CI_COMMIT_SHA
+  trigger: 
+    project: meltano/demo-project
+    strategy: depend
