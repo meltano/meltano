@@ -8,7 +8,6 @@ from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
-from meltano.core.dbt_service import DbtService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.job import Job
 
@@ -83,17 +82,13 @@ def test_elt_transform_only(
     args = ["elt", tap.name, target.name, "--transform", "only"]
 
     # fmt: off
-    with patch("meltano.core.runner.dbt.DbtService", autospec=True) as DbtService, \
-      patch("meltano.cli.elt.add_plugin", return_value=None) as add_plugin, \
+    with patch("meltano.cli.elt.add_plugin", return_value=None) as add_plugin, \
       patch("meltano.cli.elt.PluginDiscoveryService", return_value=plugin_discovery_service), \
       patch("meltano.core.elt_context.PluginDiscoveryService", return_value=plugin_discovery_service), \
       patch("meltano.core.elt_context.PluginSettingsService", return_value=plugin_settings_service), \
       patch.object(DbtRunner, "run", return_value=None):
-        dbt_service = DbtService.return_value
-
         result = cli_runner.invoke(cli, args)
         assert_cli_runner(result)
 
-        dbt_service.deps.assert_called
         add_plugin.assert_called
     # fmt: on
