@@ -52,7 +52,6 @@ class PluginInvoker:
     ):
         self.project = project
         self.plugin = plugin
-        self._plugin_config = plugin_config
         self.venv_service = venv_service or VenvService(project)
         self.config_service = plugin_config_service or PluginConfigService(
             plugin,
@@ -69,6 +68,8 @@ class PluginInvoker:
             self.plugin.type, self.plugin.name
         )
         self._prepared = False
+        self.plugin_config = {}
+        self.plugin_config_env = {}
 
     @property
     def capabilities(self):
@@ -88,24 +89,9 @@ class PluginInvoker:
             for _key, filename in plugin_files.items()
         }
 
-    @property
-    def plugin_config(self):
-        return self._plugin_config
-
-    @plugin_config.setter
-    def plugin_config(self, value):
-        self._plugin_config = copy.deepcopy(value)
-        # make sure to retrigger the 'configure' hook when
-        # the plugin configuration has changed
-        self._prepared = False
-
-    def load_plugin_config(self, session):
-        self._plugin_config = self._plugin_config or self.settings_service.as_config(
-            session, self.plugin
-        )
-
     def prepare(self, session):
-        self.load_plugin_config(session)
+        self.plugin_config = self.settings_service.as_config(session, self.plugin)
+        self.plugin_config_env = self.settings_service.as_env(session, self.plugin)
 
         with self.plugin.trigger_hooks("configure", self):
             self.config_service.configure()
@@ -123,22 +109,26 @@ class PluginInvoker:
 
         return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
 
+    def env(self):
+        return {**self.settings_service.env, **self.plugin_config_env}
+
     def Popen_options(self):
         return {}
 
-    def invoke(self, *args, **Popen):
+    def invoke(self, *args, env={}, **Popen):
         if not self._prepared:
             raise InvokerNotPreparedError()
-
-        Popen_options = self.Popen_options()
-        Popen_options.update(Popen)
 
         process = None
         try:
             with self.plugin.trigger_hooks("invoke", self, args):
                 popen_args = self.exec_args(*args)
+                popen_options = {**self.Popen_options(), **Popen}
+                popen_env = {**self.env(), **env}
                 logging.debug(f"Invoking: {popen_args}")
-                process = subprocess.Popen(popen_args, **Popen_options)
+                logging.debug(f"Env: {popen_env}")
+
+                process = subprocess.Popen(popen_args, **popen_options, env=popen_env)
         except SubprocessError as perr:
             logging.error(f"{self.plugin.name} has failed: {str(perr)}")
             raise
@@ -148,18 +138,21 @@ class PluginInvoker:
 
         return process
 
-    async def invoke_async(self, *args, prepare=True, **Popen):
+    async def invoke_async(self, *args, env={}, **Popen):
         if not self._prepared:
             raise InvokerNotPreparedError()
-
-        Popen_options = self.Popen_options()
-        Popen_options.update(Popen)
 
         process = None
         try:
             with self.plugin.trigger_hooks("invoke", self, args):
+                popen_args = self.exec_args(*args)
+                popen_options = {**self.Popen_options(), **Popen}
+                popen_env = {**self.env(), **env}
+                logging.debug(f"Invoking: {popen_args}")
+                logging.debug(f"Env: {popen_env}")
+
                 process = await asyncio.create_subprocess_exec(
-                    *self.exec_args(*args), **Popen_options
+                    *popen_args, **popen_options, env=popen_env
                 )
         except SubprocessError as perr:
             logging.error(f"{self.plugin.name} has failed: {str(perr)}")

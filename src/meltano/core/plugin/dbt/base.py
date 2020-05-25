@@ -5,15 +5,8 @@ from meltano.core.behavior.hookable import hook
 
 
 class DbtInvoker(PluginInvoker):
-    def __init__(self, project, plugin, **kwargs):
-        kwargs["run_dir"] = project.root_dir("transform")
-        return super().__init__(project, plugin, **kwargs)
-
     def Popen_options(self):
-        options = super().Popen_options()
-        options["cwd"] = str(self.project.root_dir("transform"))
-
-        return options
+        return {**super().Popen_options(), "cwd": self.plugin_config["project_dir"]}
 
 
 class DbtPlugin(PluginInstall):

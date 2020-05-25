@@ -34,7 +34,7 @@ class TestCliAdd:
             install_plugin_mock.return_value = mock.Mock(
                 stdout=f"Mocked {plugin_name} install."
             )
-            res = cli_runner.invoke(cli, ["add", plugin_type.cli_command, plugin_name])
+            res = cli_runner.invoke(cli, ["add", plugin_type.singular, plugin_name])
 
         assert res.exit_code == 0, res.stdout
         assert f"Installed '{plugin_name}'." in res.stdout

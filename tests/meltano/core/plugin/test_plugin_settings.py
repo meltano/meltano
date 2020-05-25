@@ -110,7 +110,7 @@ class TestPluginSettingsService:
             extractor.get_profile("profile").config = {}
 
         # overriden via ENV
-        monkeypatch.setenv(env_var(tap, "test"), "N33DC0F33")
+        subject = subject.with_env_override({env_var(tap, "test"): "N33DC0F33"})
 
         assert subject.get_value(session, tap, "test") == (
             "N33DC0F33",
@@ -121,15 +121,27 @@ class TestPluginSettingsService:
             PluginSettingValueSource.ENV,
         )
 
+        # overridden via config override
+        subject = subject.with_config_override({"test": "foo"})
+
+        assert subject.get_value(session, tap, "test") == (
+            "foo",
+            PluginSettingValueSource.CONFIG_OVERRIDE,
+        )
+        assert subject.get_value(session, tap_with_profile, "test") == (
+            "foo",
+            PluginSettingValueSource.CONFIG_OVERRIDE,
+        )
+
         # Verify that boolean settings set in env are cast correctly
-        monkeypatch.setenv(env_var(tap, "boolean"), "on")
+        subject = subject.with_env_override({env_var(tap, "boolean"): "on"})
 
         assert subject.get_value(session, tap, "boolean") == (
             True,
             PluginSettingValueSource.ENV,
         )
 
-        monkeypatch.setenv(env_var(tap, "boolean"), "0")
+        subject = subject.with_env_override({env_var(tap, "boolean"): "0"})
 
         assert subject.get_value(session, tap, "boolean") == (
             False,
@@ -173,8 +185,8 @@ class TestPluginSettingsService:
         config = subject.as_env(session, tap)
 
         assert config.get(env_var(tap, "test")) == "mock"
-        assert config.get(env_var(tap, "start_date")) == "None"
-        assert config.get(env_var(tap, "secure")) == "None"
+        assert config.get(env_var(tap, "start_date")) == None
+        assert config.get(env_var(tap, "secure")) == None
 
     def test_unset(self, session, subject, tap):
         # overriden by an PluginSetting db value when set
@@ -183,3 +195,29 @@ class TestPluginSettingsService:
 
         subject.unset(session, tap, "test")
         assert session.query(PluginSetting).count() == 0
+
+    def test_env_var_substitution(self, session, subject, project, tap):
+        with project.meltano_update() as meltano:
+            extractor = meltano.plugins.extractors[0]
+            extractor.config = {
+                "var": "$VAR",
+                "foo": "${FOO}",
+                "missing": "$MISSING",
+                "multiple": "$A ${B} $C",
+            }
+
+        env = {
+            "VAR": "hello world!",
+            "FOO": 42,
+            "A": "rock",
+            "B": "paper",
+            "C": "scissors",
+        }
+
+        subject = subject.with_env_override(env)
+
+        config = subject.as_config(session, tap)
+        assert config["var"] == env["VAR"]
+        assert config["foo"] == str(env["FOO"])
+        assert config["missing"] == None
+        assert config["multiple"] == "rock paper scissors"

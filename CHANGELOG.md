@@ -10,7 +10,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Automatically populate `env` properties on newly added custom plugin `settings` in `meltano.yml`
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Have `meltano config <plugin> list` print default value along with setting name and env var
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Pass configuration environment variables when invoking plugins
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `MELTANO_EXTRACTOR_NAME`, `MELTANO_EXTRACTOR_NAMESPACE`, and `MELTANO_EXTRACT_{SETTING...}` environment variables when invoking loader or transformer
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `MELTANO_LOADER_NAME`, `MELTANO_LOADER_NAMESPACE`, and `MELTANO_LOAD_{SETTING...}` environment variables when invoking transformer
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Allow dbt project dir, profiles dir, target, source schema, target schema, and models to be configured like any other plugin, with defaults based on pipeline-specific environment variables
+- [#2029](https://gitlab.com/meltano/meltano/-/issues/2029) Allow target-postgres and target-snowflake schema to be overridden through config, with default based on pipeline's extractor's namespace
+
 ### Changes
+
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Infer compatibility between extractor and transform based on namespace rather than name
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Determine transform dbt model name based on namespace instead of than replacing `-` with `_` in name
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Don't pass environment variables with "None" values to plugins if variables were unset
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Determine Meltano Analyze schema based on transformer's `target_schema` or loader's `schema` instead of `MELTANO_ANALYZE_SCHEMA` env var
 
 ### Fixes
 

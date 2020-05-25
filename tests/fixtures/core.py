@@ -195,6 +195,12 @@ def target(config_service):
 
 
 @pytest.fixture(scope="class")
+def dbt(config_service):
+    dbt = PluginInstall(PluginType.TRANSFORMERS, "dbt", "dbt")
+    return config_service.add_to_file(dbt)
+
+
+@pytest.fixture(scope="class")
 def schedule_service(project, plugin_settings_service):
     return ScheduleService(project, plugin_settings_service=plugin_settings_service)
 
@@ -213,9 +219,12 @@ def schedule(project, tap, target, schedule_service):
 
 
 @pytest.fixture(scope="class")
-def elt_context_builder(project, plugin_settings_service, plugin_discovery_service):
+def elt_context_builder(
+    project, config_service, plugin_settings_service, plugin_discovery_service
+):
     return ELTContextBuilder(
         project,
+        config_service=config_service,
         plugin_settings_service=plugin_settings_service,
         plugin_discovery_service=plugin_discovery_service,
     )

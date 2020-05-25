@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-version: 10
+version: 11
 
 extractors:
   - name: tap-facebook
@@ -613,6 +613,9 @@ loaders:
         label: Database Name
         env: PG_DATABASE
         value: warehouse
+      - name: schema
+        env: PG_SCHEMA
+        value: $MELTANO_EXTRACTOR_NAMESPACE
   - name: target-jsonl
     label: JSONL
     description: JSONL loader
@@ -653,6 +656,9 @@ loaders:
       - name: warehouse
         env: SF_WAREHOUSE
         description: The name of the Snowflake warehouse you want to use
+      - name: schema
+        env: SF_SCHEMA
+        value: $MELTANO_EXTRACTOR_NAMESPACE
   - name: target-sqlite
     label: SQLite
     description: SQLite database loader
@@ -700,56 +706,75 @@ transformers:
   - name: dbt
     namespace: dbt
     pip_url: dbt==0.14.4
+    settings:
+    - name: project_dir
+      env: DBT_PROJECT_DIR
+      value: $MELTANO_PROJECT_ROOT/transform
+    - name: profiles_dir
+      env: DBT_PROFILES_DIR
+      value: $MELTANO_PROJECT_ROOT/transform/profile
+    - name: target
+      env: DBT_TARGET
+      value: $MELTANO_LOADER_NAMESPACE
+    - name: source_schema
+      env: DBT_SOURCE_SCHEMA
+      value: $MELTANO_LOAD_SCHEMA
+    - name: target_schema
+      env: DBT_TARGET_SCHEMA
+      value: analytics
+    - name: models
+      env: DBT_MODELS
+      value: $MELTANO_EXTRACTOR_NAMESPACE my_meltano_project
 transforms:
   - name: tap-adwords
     namespace: tap_adwords
     pip_url: 'https://gitlab.com/meltano/dbt-tap-adwords.git'
     vars:
-      schema: "{{ env_var('MELTANO_LOAD_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-carbon-intensity
     namespace: tap_carbon
     pip_url: 'https://gitlab.com/meltano/dbt-tap-carbon-intensity.git'
     vars:
-      entry_table: "{{ env_var('MELTANO_LOAD_SCHEMA') }}.entry"
-      generationmix_table: "{{ env_var('MELTANO_LOAD_SCHEMA') }}.generationmix"
-      region_table: "{{ env_var('MELTANO_LOAD_SCHEMA') }}.region"
+      entry_table: "{{ env_var('DBT_SOURCE_SCHEMA') }}.entry"
+      generationmix_table: "{{ env_var('DBT_SOURCE_SCHEMA') }}.generationmix"
+      region_table: "{{ env_var('DBT_SOURCE_SCHEMA') }}.region"
   - name: tap-salesforce
     namespace: tap_salesforce
     pip_url: 'https://gitlab.com/meltano/dbt-tap-salesforce.git'
     vars:
-      schema: "{{ env_var('MELTANO_LOAD_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-facebook
     namespace: tap_facebook
     pip_url: 'https://gitlab.com/meltano/dbt-tap-facebook.git'
     vars:
-      schema: "{{ env_var('MELTANO_LOAD_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-gitlab
     namespace: tap_gitlab
     pip_url: 'https://gitlab.com/meltano/dbt-tap-gitlab.git'
     vars:
-      schema: "{{ env_var('MELTANO_LOAD_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
       ultimate_license: "{{ env_var('GITLAB_API_ULTIMATE_LICENSE', False) }}"
   - name: tap-stripe
     namespace: tap_stripe
     pip_url: 'https://gitlab.com/meltano/dbt-tap-stripe.git'
     vars:
       livemode: false
-      schema: "{{ env_var('MELTANO_LOAD_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-zendesk
     namespace: tap_zendesk
     pip_url: 'https://gitlab.com/meltano/dbt-tap-zendesk.git'
     vars:
-      schema: "{{ env_var('MELTANO_LOAD_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-google-analytics
     namespace: tap_google_analytics
     pip_url: 'https://gitlab.com/meltano/dbt-tap-google-analytics.git'
     vars:
-      schema: "{{ env_var('MELTANO_LOAD_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-shopify
     namespace: tap_shopify
     pip_url: 'https://gitlab.com/meltano/dbt-tap-shopify.git'
     vars:
-      schema: "{{ env_var('MELTANO_LOAD_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
 models:
   - name: model-adwords
     namespace: tap_adwords
