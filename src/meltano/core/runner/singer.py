@@ -14,7 +14,6 @@ from meltano.core.job import Job, JobFinder
 from meltano.core.plugin_invoker import invoker_factory, PluginInvoker
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin.singer import SingerTap, SingerTarget, PluginType
-from meltano.core.connection_service import ConnectionService
 from meltano.core.utils import file_has_data
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.elt_context import ELTContext
@@ -26,16 +25,11 @@ class SingerPayload(IntFlag):
 
 class SingerRunner(Runner):
     def __init__(
-        self,
-        elt_context: ELTContext,
-        config_service: ConfigService = None,
-        connection_service: ConnectionService = None,
-        **config,
+        self, elt_context: ELTContext, config_service: ConfigService = None, **config
     ):
         self.context = elt_context
         self.config = config
         self.config_service = config_service or ConfigService(elt_context.project)
-        self.connection_service = connection_service or ConnectionService(elt_context)
 
         self.tap_config_dir = Path(config.get("tap_config_dir", "/etc/singer/tap"))
         self.target_config_dir = Path(
@@ -165,10 +159,6 @@ class SingerRunner(Runner):
 
         if dry_run:
             return self.dry_run(tap, target)
-
-        # Sets the proper `schema` for the target from the ELTContext
-        target_elt_params = self.connection_service.load_params()
-        target.plugin_config.update(target_elt_params)
 
         tap.prepare(session)
         target.prepare(session)
