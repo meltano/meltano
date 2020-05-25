@@ -91,25 +91,18 @@ class PluginSettingsService:
         sources: List[PluginSettingValueSource] = None,
         redacted=False,
     ):
-        # defaults to the meltano.yml for extraneous settings
-        plugin_install = self.get_install(plugin)
-        config = {
-            key: {"value": value, "source": PluginSettingValueSource.MELTANO_YML}
-            for key, value in deepcopy(plugin_install.current_config).items()
-        }
+        setting_names = [
+            *(setting.name for setting in self.definitions(plugin)),
+            *(key for key in self.get_install(plugin).current_config.keys()),
+        ]
 
-        # definition settings
-        for setting in self.definitions(plugin):
-            value, source = self.get_value(session, plugin, setting.name)
+        config = {}
+        for name in setting_names:
+            value, source = self.get_value(session, plugin, name, redacted=redacted)
             if sources and source not in sources:
                 continue
 
-            # we don't want to leak secure informations
-            # so we redact all `passwords`
-            if redacted and value and self.is_kind_redacted(setting.kind):
-                value = REDACTED_VALUE
-
-            config[setting.name] = {"value": value, "source": source}
+            config[name] = {"value": value, "source": source}
 
         return config
 
@@ -194,12 +187,19 @@ class PluginSettingsService:
 
         return value
 
-    def get_value(self, session, plugin: PluginRef, name: str):
+    def get_value(self, session, plugin: PluginRef, name: str, redacted=False):
         plugin_install = self.get_install(plugin)
         plugin_def = self.get_definition(plugin)
-        setting_def = self.find_setting(plugin, name)
+
+        try:
+            setting_def = self.find_setting(plugin, name)
+        except PluginSettingMissingError:
+            setting_def = None
 
         def env_getter():
+            if not setting_def:
+                return None
+
             env_key = self.setting_env(setting_def, plugin_def)
 
             try:
@@ -229,6 +229,8 @@ class PluginSettingsService:
                 return None
 
         def default_getter():
+            if not setting_def:
+                return None
             return setting_def.value
 
         config_getters = {
@@ -243,6 +245,12 @@ class PluginSettingsService:
             if value is not None:
                 break
 
-        value = self.cast_value(setting_def, value)
+        if setting_def:
+            value = self.cast_value(setting_def, value)
+
+            # we don't want to leak secure informations
+            # so we redact all `passwords`
+            if redacted and value and self.is_kind_redacted(setting_def.kind):
+                value = REDACTED_VALUE
 
         return value, source
