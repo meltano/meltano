@@ -713,6 +713,9 @@ transformers:
     - name: profiles_dir
       env: DBT_PROFILES_DIR
       value: $MELTANO_PROJECT_ROOT/transform/profile
+    - name: target
+      env: DBT_TARGET
+      value: $MELTANO_LOADER_NAMESPACE
     - name: models
       env: DBT_MODELS
       value: $MELTANO_EXTRACTOR_NAMESPACE my_meltano_project

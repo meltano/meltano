@@ -3,6 +3,7 @@ import json
 import yaml
 import logging
 import click
+import re
 
 from .project import Project
 from .plugin import PluginType, Plugin
@@ -28,15 +29,22 @@ class ProjectAddCustomService:
         )
         click.echo("- prefix for configuration environment variables")
         click.echo("- identifier to find related/compatible plugins")
-        click.echo("- default value for the `schema` setting when used")
-        click.echo("  with loader target-postgres or target-snowflake")
+        if plugin_type == PluginType.EXTRACTORS:
+            click.echo("- default value for the `schema` setting when used")
+            click.echo("  with loader target-postgres or target-snowflake")
+        elif plugin_type == PluginType.LOADERS:
+            click.echo("- default value for the `target` setting when used")
+            click.echo("  with transformer dbt")
         click.echo()
-        click.echo(
-            "Hit Return to accept the default: plugin name with underscores instead of dashes"
-        )
+        if plugin_type == PluginType.LOADERS:
+            default_namespace = re.sub(r"^.*target-", "", plugin_name)
+            default_description = "plugin name without `target-` prefix"
+        else:
+            default_namespace = plugin_name.replace("-", "_")
+            default_description = "plugin name with underscores instead of dashes"
+        click.echo(f"Hit Return to accept the default: {default_description}")
         click.echo()
 
-        default_namespace = plugin_name.replace("-", "_")
         namespace = click.prompt(
             click.style("(namespace)", fg="blue"), type=str, default=default_namespace
         )
