@@ -22,8 +22,9 @@ meltano_base:
       - requirements.txt
 
 # Manages:
-#  - meltano/meltano/base:<base_sha>
+#  - <fork namespace>/meltano/base:<base_sha>
 meltano_base_forks:
   extends: .build_base
   except:
     - branches@meltano/meltano
+    - tags@meltano/meltano
