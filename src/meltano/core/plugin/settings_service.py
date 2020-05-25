@@ -4,6 +4,7 @@ import logging
 from typing import Iterable, Dict, Tuple, List
 from copy import deepcopy
 from enum import Enum
+import re
 
 from meltano.core.utils import nest, find_named, setting_env, NotFound, truthy
 from meltano.core.config_service import ConfigService
@@ -253,7 +254,8 @@ class PluginSettingsService:
 
         def meltano_yml_getter():
             try:
-                return plugin_install.current_config[name]
+                value = plugin_install.current_config[name]
+                return self.expand_env_vars(value)
             except KeyError:
                 return None
 
@@ -271,7 +273,7 @@ class PluginSettingsService:
         def default_getter():
             if not setting_def:
                 return None
-            return setting_def.value
+            return self.expand_env_vars(setting_def.value)
 
         config_getters = {
             PluginSettingValueSource.CONFIG_OVERRIDE: config_override_getter,
@@ -295,3 +297,39 @@ class PluginSettingsService:
                 value = REDACTED_VALUE
 
         return value, source
+
+    def expand_env_vars(self, raw_value):
+        if not isinstance(raw_value, str):
+            return raw_value
+
+        # find viable substitutions
+        var_matcher = re.compile(
+            """
+            \$                 # starts with a '$'
+            (?:                # either $VAR or ${VAR}
+                {(\w+)}|(\w+)  # capture the variable name as group[0] or group[1]
+            )
+            """,
+            re.VERBOSE,
+        )
+
+        def subst(match) -> str:
+            try:
+                # the variable can be in either group
+                var = next(var for var in match.groups() if var)
+                val = str(self.env[var])
+
+                if not val:
+                    logging.warning(f"Variable {var} is empty.")
+
+                return val
+            except KeyError as e:
+                logging.warning(f"Variable {var} is missing from the environment.")
+                return None
+
+        fullmatch = re.fullmatch(var_matcher, raw_value)
+        if fullmatch:
+            # If the entire value is an env var reference, return None if it isn't set
+            return subst(fullmatch)
+
+        return re.sub(var_matcher, subst, raw_value)

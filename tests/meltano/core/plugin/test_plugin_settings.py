@@ -195,3 +195,29 @@ class TestPluginSettingsService:
 
         subject.unset(session, tap, "test")
         assert session.query(PluginSetting).count() == 0
+
+    def test_env_var_substitution(self, session, subject, project, tap):
+        with project.meltano_update() as meltano:
+            extractor = meltano.plugins.extractors[0]
+            extractor.config = {
+                "var": "$VAR",
+                "foo": "${FOO}",
+                "missing": "$MISSING",
+                "multiple": "$A ${B} $C",
+            }
+
+        env = {
+            "VAR": "hello world!",
+            "FOO": 42,
+            "A": "rock",
+            "B": "paper",
+            "C": "scissors",
+        }
+
+        subject = subject.with_env_override(env)
+
+        config = subject.as_config(session, tap)
+        assert config["var"] == env["VAR"]
+        assert config["foo"] == str(env["FOO"])
+        assert config["missing"] == None
+        assert config["multiple"] == "rock paper scissors"
