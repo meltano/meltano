@@ -372,9 +372,9 @@ If you're [adding a custom plugin](/#meltano-add), on the other hand, you will b
 To determine the values of these settings, Meltano will look in 4 places, with each taking precedence over the next:
 
 1. **Environment variables**, set through your project's `.env` file or any other method. You can use `meltano config <plugin> list` to list the available variable names.
-2. **The plugin's `config` object** in your project's `meltano.yml` file.
+2. **The plugin's `config` object** in your project's `meltano.yml` file. Inside values, [environment variables](/docs/command-line-interface.html#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
 3. **Your project's SQLite database** at `.meltano/meltano.db`, which stores configuration set using [`meltano config`](/docs/command-line-interface.html#config) among other things.
-4. **The default `value`s** set on the plugin's `settings` object in your project's `meltano.yml` file (in the case of custom plugins) or the global `discovery.yml` (in the case of [known plugins](/docs/contributor-guide.html#known-plugins)).
+4. **The default `value`s** set on the plugin's `settings` object in the global `discovery.yml` (in the case of [known plugins](/docs/contributor-guide.html#known-plugins)) or your project's `meltano.yml` file (in the case of custom plugins). `meltano config <plugin> list` will list the default values.
 
 Since `.env` and `.meltano/meltano.db` are both included in your project's `.gitignore` file by default, sensitive values like passwords and tokens are more appropriately stored in either of these places than in `meltano.yml`.
 
