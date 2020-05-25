@@ -124,7 +124,7 @@ def nest(d: dict, path: str, value={}):
 
 
 def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
-    """Wrapper arround `flatten_dict.flatten` that adds `dot` reducer."""
+    """Wrapper arround `flatten_dict.flatten` that adds `dot` and `env_var` reducers."""
 
     def dot_reducer(*xs):
         if xs[0] is None:
@@ -132,10 +132,22 @@ def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
         else:
             return ".".join(xs)
 
+    def env_var_reducer(*xs):
+        xs = [x.replace(".", "__").upper() for x in xs if x]
+        return "_".join(xs)
+
     if reducer == "dot":
         reducer = dot_reducer
+    if reducer == "env_var":
+        reducer = env_var_reducer
 
     return flatten_dict.flatten(d, reducer, **kwargs)
+
+
+def setting_env(plugin_namespace, setting_name):
+    env_struct = {plugin_namespace: {setting_name: "value"}}
+    env = flatten(env_struct, "env_var")
+    return next(iter(env))  # get key
 
 
 def compact(xs: Iterable) -> Iterable:

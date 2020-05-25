@@ -5,7 +5,7 @@ from typing import Iterable, Dict, Tuple, List
 from copy import deepcopy
 from enum import Enum
 
-from meltano.core.utils import nest, flatten, find_named, NotFound, truthy
+from meltano.core.utils import nest, find_named, setting_env, NotFound, truthy
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.error import Error
@@ -186,12 +186,7 @@ class PluginSettingsService:
         return self.config_service.get_plugin(plugin)
 
     def setting_env(self, setting_def, plugin_def):
-        if setting_def.env:
-            return setting_def.env
-
-        parts = (plugin_def.namespace, setting_def["name"])
-        process = lambda s: s.replace(".", "__").upper()
-        return "_".join(map(process, parts))
+        return setting_def.env or setting_env(plugin_def.namespace, setting_def.name)
 
     def get_value(self, session, plugin: PluginRef, name: str):
         plugin_install = self.get_install(plugin)
