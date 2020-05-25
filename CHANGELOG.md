@@ -28,6 +28,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `dbt` target based on `DBT_TARGET` env var, defaulting to `$MELTANO_LOADER_NAMESPACE`
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `dbt` source schema based on `DBT_SOURCE_SCHEMA` env var, defaulting to `$MELTANO_LOAD_SCHEMA`
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `dbt` source target based on `DBT_TARGET_SCHEMA` env var, defaulting to `analytics`
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Determine Meltano Analyze schema based on transformer's `target_schema` or loader's `schema`
 
 ### Fixes
 
