@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Add `env` properties to custom plugin `settings` in `meltano.yml`
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Have `meltano config <plugin>` print default value along with setting name and env var
 
 ### Fixes
 

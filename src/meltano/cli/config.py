@@ -76,8 +76,15 @@ def list(ctx):
     plugin_def = settings.get_definition(plugin)
 
     for setting_def in settings.definitions(plugin):
+        click.secho(setting_def.name, fg="blue", nl=False)
+
         env_key = settings.setting_env(setting_def, plugin_def)
-        description_marker = (
-            f": {setting_def.description}" if setting_def.description else ""
-        )
-        click.secho(f"{setting_def.name} [{env_key}]{description_marker}")
+        click.echo(f" [{env_key}]", nl=False)
+
+        if setting_def.value is not None:
+            click.echo(" (default: %r)" % setting_def.value, nl=False)
+
+        if setting_def.description:
+            click.echo(f": {setting_def.description}", nl=False)
+
+        click.echo()
