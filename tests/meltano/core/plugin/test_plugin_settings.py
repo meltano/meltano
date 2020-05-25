@@ -185,8 +185,8 @@ class TestPluginSettingsService:
         config = subject.as_env(session, tap)
 
         assert config.get(env_var(tap, "test")) == "mock"
-        assert config.get(env_var(tap, "start_date")) == "None"
-        assert config.get(env_var(tap, "secure")) == "None"
+        assert config.get(env_var(tap, "start_date")) == None
+        assert config.get(env_var(tap, "secure")) == None
 
     def test_unset(self, session, subject, tap):
         # overriden by an PluginSetting db value when set

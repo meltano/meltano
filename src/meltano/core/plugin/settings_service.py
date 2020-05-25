@@ -159,6 +159,9 @@ class PluginSettingsService:
                 logging.debug(f"Setting {setting.name} is not in sources: {sources}.")
                 continue
 
+            if value is None:
+                continue
+
             env_key = self.setting_env(setting, plugin_def)
             env[env_key] = str(value)
 

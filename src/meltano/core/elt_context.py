@@ -144,7 +144,7 @@ class ELTContextBuilder:
             }
             env_vars = flatten(env_struct, "env_var").items()
 
-            return {k: str(v) for k, v in env_vars}
+            return {k: str(v) for k, v in env_vars if v is not None}
 
         extractor = None
         if self._extractor:
