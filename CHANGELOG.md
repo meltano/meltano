@@ -24,6 +24,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Determine transform dbt model name based on namespace instead of than replacing `-` with `_` in name
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Don't pass environment variables with "None" values to plugins if variables were unset
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Determine Meltano Analyze schema based on transformer's `target_schema` or loader's `schema` instead of `MELTANO_ANALYZE_SCHEMA` env var
+- [#2053](https://gitlab.com/meltano/meltano/-/issues/2053) Bump dbt version to 0.16.1
 
 ### Fixes
 

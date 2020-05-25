@@ -705,7 +705,7 @@ loaders:
 transformers:
   - name: dbt
     namespace: dbt
-    pip_url: dbt==0.14.4
+    pip_url: dbt==0.16.1
     settings:
     - name: project_dir
       env: DBT_PROJECT_DIR
