@@ -52,7 +52,6 @@ class PluginInvoker:
     ):
         self.project = project
         self.plugin = plugin
-        self._plugin_config = plugin_config
         self.venv_service = venv_service or VenvService(project)
         self.config_service = plugin_config_service or PluginConfigService(
             plugin,
@@ -69,6 +68,7 @@ class PluginInvoker:
             self.plugin.type, self.plugin.name
         )
         self._prepared = False
+        self.plugin_config = {}
         self.plugin_config_env = {}
 
     @property
@@ -89,24 +89,8 @@ class PluginInvoker:
             for _key, filename in plugin_files.items()
         }
 
-    @property
-    def plugin_config(self):
-        return self._plugin_config
-
-    @plugin_config.setter
-    def plugin_config(self, value):
-        self._plugin_config = copy.deepcopy(value)
-        # make sure to retrigger the 'configure' hook when
-        # the plugin configuration has changed
-        self._prepared = False
-
-    def load_plugin_config(self, session):
-        self._plugin_config = self._plugin_config or self.settings_service.as_config(
-            session, self.plugin
-        )
-
     def prepare(self, session):
-        self.load_plugin_config(session)
+        self.plugin_config = self.settings_service.as_config(session, self.plugin)
         self.plugin_config_env = self.settings_service.as_env(session, self.plugin)
 
         with self.plugin.trigger_hooks("configure", self):
