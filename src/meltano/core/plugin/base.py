@@ -81,7 +81,7 @@ class PluginType(YAMLEnum):
         return self.value
 
     @property
-    def cli_command(self):
+    def singular(self):
         """Makes it singular for `meltano add PLUGIN_TYPE`"""
         return self.value[:-1]
 
