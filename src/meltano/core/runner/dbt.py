@@ -55,7 +55,7 @@ class DbtRunner(Runner):
         loop.run_until_complete(self.dbt_service.deps())
 
         if models is not None:
-            models = models.replace("-", "_")
+            models = self.plugin.config["models"]
 
         if dry_run:
             loop.run_until_complete(self.dbt_service.compile(models, env=env))

@@ -77,7 +77,7 @@ def elt(project, extractor, loader, dry, transform, job_id):
                     # Use a new session for the Transform Part to address the last
                     # update for Job state not being saved in the DB
                     transform_session = Session()
-                    run_transform(elt_context, transform_session, dry_run=dry, models=elt_context.extractor.ref.name)
+                    run_transform(elt_context, transform_session, dry_run=dry)
                 finally:
                     transform_session.close()
             else:
@@ -104,7 +104,7 @@ def run_extract_load(elt_context, session, **kwargs):
 def run_transform(elt_context, session, **kwargs):
     dbt_runner = DbtRunner(elt_context)
     click.echo("Running transformation...")
-    dbt_runner.run(session, **kwargs)  # TODO: models from elt_context?
+    dbt_runner.run(session, **kwargs)
     click.secho("Transformation complete!", fg="green")
 
 
