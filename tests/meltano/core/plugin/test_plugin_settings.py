@@ -110,7 +110,7 @@ class TestPluginSettingsService:
             extractor.get_profile("profile").config = {}
 
         # overriden via ENV
-        monkeypatch.setenv(env_var(tap, "test"), "N33DC0F33")
+        subject = subject.with_env_override({env_var(tap, "test"): "N33DC0F33"})
 
         assert subject.get_value(session, tap, "test") == (
             "N33DC0F33",
@@ -122,14 +122,14 @@ class TestPluginSettingsService:
         )
 
         # Verify that boolean settings set in env are cast correctly
-        monkeypatch.setenv(env_var(tap, "boolean"), "on")
+        subject = subject.with_env_override({env_var(tap, "boolean"): "on"})
 
         assert subject.get_value(session, tap, "boolean") == (
             True,
             PluginSettingValueSource.ENV,
         )
 
-        monkeypatch.setenv(env_var(tap, "boolean"), "0")
+        subject = subject.with_env_override({env_var(tap, "boolean"): "0"})
 
         assert subject.get_value(session, tap, "boolean") == (
             False,

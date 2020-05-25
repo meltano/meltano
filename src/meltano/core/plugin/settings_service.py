@@ -35,6 +35,7 @@ class PluginSettingsService:
         config_service: ConfigService = None,
         plugin_discovery_service: PluginDiscoveryService = None,
         show_hidden=True,
+        env_override={},
     ):
         self.project = project
         self.config_service = config_service or ConfigService(project)
@@ -42,6 +43,9 @@ class PluginSettingsService:
             project
         )
         self.show_hidden = show_hidden
+        self.env_override = env_override
+
+        self._env = None
 
     @classmethod
     def unredact(cls, values: dict) -> Dict:
@@ -54,6 +58,23 @@ class PluginSettingsService:
     @classmethod
     def is_kind_redacted(cls, kind) -> bool:
         return kind in ("password", "oauth")
+
+    def with_env_override(self, env_override):
+        return self.__class__(
+            self.project,
+            self.config_service,
+            self.discovery_service,
+            self.show_hidden,
+            {**self.env_override, **env_override},
+            self.config_override,
+        )
+
+    @property
+    def env(self):
+        if not self._env:
+            self._env = {**os.environ, **self.env_override}
+
+        return self._env
 
     def profile_with_config(
         self, session, plugin: PluginRef, profile: Profile, redacted=False
@@ -135,7 +156,7 @@ class PluginSettingsService:
             setting_def = self.find_setting(plugin, name)
             env_key = self.setting_env(setting_def, plugin_def)
 
-            if env_key in os.environ:
+            if env_key in self.env:
                 logging.warning(f"Setting `{name}` is currently set via ${env_key}.")
                 return
 
@@ -203,7 +224,7 @@ class PluginSettingsService:
             env_key = self.setting_env(setting_def, plugin_def)
 
             try:
-                return os.environ[env_key]
+                return self.env[env_key]
             except KeyError:
                 return None
             else:
