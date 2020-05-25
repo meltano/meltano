@@ -26,6 +26,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Determine transform dbt model name based on namespace
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `MELTANO_LOADER_NAME`, `MELTANO_LOADER_NAMESPACE`, and `MELTANO_LOAD_{SETTING...}` environment variables when invoking transformer
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `dbt` target based on `DBT_TARGET` env var, defaulting to `$MELTANO_LOADER_NAMESPACE`
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `dbt` source schema based on `DBT_SOURCE_SCHEMA` env var, defaulting to `$MELTANO_LOAD_SCHEMA`
 
 ### Fixes
 
