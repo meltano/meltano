@@ -99,7 +99,7 @@ Enables you to change a plugin's configuration.
 Meltano uses configuration layers to resolve a plugin's configuration:
 
 1. Environment variables
-1. Plugin definition's `config:` attribute in **meltano.yml**
+1. Plugin definition's `config:` attribute in **meltano.yml**. Inside values, [environment variables](#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
 1. Settings set via `meltano config` or in the UI (stored in the system database)
 1. Default values set in the setting definition in **discovery.yml**
 
@@ -175,26 +175,37 @@ meltano elt <extractor> <loader> [--job_id TEXT] [--transform run] [--dry]
   - `skip`: skip the Transforms (Default)
   - `only`: only run the Transforms (skip the Extract and Load steps)
 
+### Pipeline environment variables
+
+To allow loaders and transformers to adapt their configuration and behavior based on the extractor and loader they are run with,
+`meltano elt` dynamically sets a number of pipeline-specific environment variables before compiling their configuration and invoking their executables.
+
+In addition to variables set through the environment or your project's `.env` file, the following variables describing the extractor are available to loaders _and_ transformers:
+
+- `MELTANO_EXTRACTOR_NAME`: the extractor's `name`, e.g. `tap-gitlab`
+- `MELTANO_EXTRACTOR_NAMESPACE`: the extractor's `namespace`, e.g. `tap_gitlab`
+- `MELTANO_EXTRACT_<SETTING_NAME>`: one environment variable for each of the extractor's settings, e.g. `MELTANO_EXTRACT_PRIVATE_TOKEN` for the `private_token` setting
+- `<SETTING_ENV>`: all of the extractor's regular configuration environment variables, as listed by `meltano config <plugin> list`, e.g. `TAP_GITLAB_API_URL` for the `api_url` setting
+
+Additionally, the following variables describing the loader are available to transformers:
+
+- `MELTANO_LOADER_NAME`: the loader's `name`, e.g. `target-postgres`
+- `MELTANO_LOADER_NAMESPACE`: the loader's `namespace`, e.g. `postgres`
+- `MELTANO_LOAD_<SETTING_NAME>`: one environment variable for each of the loader's settings, e.g. `MELTANO_LOAD_SCHEMA` for the `schema` setting
+- `<SETTING_ENV>`: all of the loader's regular configuration environment variables, as listed by `meltano config <plugin> list`, e.g. `PG_ADDRESS` for the `host` setting
+
+Inside your loader or transformer's `config` object in `meltano.yml`, you can reference these (and other) environment variables as `$VAR` (as a single word) or `${VAR}` (inside a word). Inside your plugin, you can reference these through `os.environ` (if using Python) as usual.
+
+This feature is used to dynamically configure the `target-postgres` and `target-snowflake` loaders and `dbt` transformer as appropriate, independent of the specific extractor and loader used:
+- `target-postgres` and `target-snowflake` default value for `schema`: `$MELTANO_EXTRACTOR_NAMESPACE`, e.g. `tap_gitlab`
+- `dbt` default value for `target`: `$MELTANO_LOADER_NAMESPACE`, e.g. `postgres` or `snowflake`, which correspond to the target names in `transform/profile/profiles.yml`
+- `dbt` default value for `source_schema`: `$MELTANO_LOAD_SCHEMA`, e.g. `tap_gitlab`
+- `dbt` default value for `models`: `$MELTANO_EXTRACTOR_NAMESPACE my_meltano_model`, e.g. `tap_gitlab my_meltano_model`
+
 ### Examples
 
 ```bash
-meltano select --exclude tap-carbon-intensity '*' 'longitude'
-```
-
-```bash
-meltano select --exclude tap-carbon-intensity '*' 'latitude'
-```
-
-This will exclude all `longitude` and `latitude` attributes.
-
-## `extract`
-
-Extract data to a loader and optionally transform the data
-
-### How to Use
-
-```bash
-meltano extract [name of extractor] --to [name of loader]`
+meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
 ```
 
 ## `init`
@@ -315,6 +326,18 @@ Attributes that are `automatic` are always included, even if they match an exclu
 ::: info
 Exclusion has precedence over inclusion. If an attribute is excluded, there is no way to include it back without removing the exclusion pattern first.
 :::
+
+#### Examples
+
+```bash
+meltano select --exclude tap-carbon-intensity '*' 'longitude'
+```
+
+```bash
+meltano select --exclude tap-carbon-intensity '*' 'latitude'
+```
+
+This will exclude all `longitude` and `latitude` attributes.
 
 ## `ui`
 

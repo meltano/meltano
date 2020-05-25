@@ -8,16 +8,6 @@ from .elt_context import ELTContext
 from .plugin_discovery_service import PluginDiscoveryService
 
 
-DEFAULT_ANALYZE_SCHEMA = "analytics"
-MELTANO_SCHEMA_SUFFIX = os.getenv("MELTANO_SCHEMA_SUFFIX", "")
-MELTANO_LOAD_SCHEMA_SUFFIX = os.getenv(
-    "MELTANO_LOAD_SCHEMA_SUFFIX", MELTANO_SCHEMA_SUFFIX
-)
-MELTANO_ANALYZE_SCHEMA_SUFFIX = os.getenv(
-    "MELTANO_ANALYZE_SCHEMA_SUFFIX", MELTANO_SCHEMA_SUFFIX
-)
-
-
 class DialectNotSupportedError(Exception):
     pass
 
@@ -30,35 +20,16 @@ class ConnectionService:
     def dialect(self):
         return self.context.loader.namespace
 
-    def load_params(self):
-        schema = (
-            os.getenv("MELTANO_LOAD_SCHEMA", self.context.extractor.namespace)
-            + MELTANO_LOAD_SCHEMA_SUFFIX
-        )
-
-        dialect_params = {
-            "postgres": {"schema": schema},
-            "snowflake": {"schema": schema.upper()},
-        }
-
-        return dialect_params.get(self.dialect, {})
-
     def analyze_params(self):
-        schema = (
-            os.getenv("MELTANO_ANALYZE_SCHEMA", DEFAULT_ANALYZE_SCHEMA)
-            + MELTANO_ANALYZE_SCHEMA_SUFFIX
-        )
+        if self.dialect not in ("postgres", "snowflake"):
+            return {}
 
-        dialect_params = {
-            "postgres": {"schema": schema},
-            "snowflake": {"schema": schema.upper()},
-        }
+        if self.context.transformer:
+            schema = self.context.transformer.config["target_schema"]
+        else:
+            schema = self.context.loader.config["schema"]
 
-        return dialect_params.get(self.dialect, {})
-
-    def load_uri(self):
-        params = self.load_params()
-        return self.dialect_engine_uri(params)
+        return {"schema": schema}
 
     def analyze_uri(self):
         params = self.analyze_params()

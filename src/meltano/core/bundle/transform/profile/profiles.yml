@@ -16,7 +16,7 @@ meltano:
       role: "{{ env_var('SF_ROLE') }}"
       database: "{{ env_var('SF_DATABASE') }}"
       warehouse: "{{ env_var('SF_WAREHOUSE') }}"
-      schema: "{{ env_var('MELTANO_ANALYZE_SCHEMA', 'ANALYTICS') }}"
+      schema: "{{ env_var('DBT_TARGET_SCHEMA') }}"
     postgres:
       type: postgres
       threads: 2
@@ -25,4 +25,4 @@ meltano:
       user: "{{ env_var('PG_USERNAME') }}"
       pass: "{{ env_var('PG_PASSWORD') }}"
       dbname: "{{ env_var('PG_DATABASE') }}"
-      schema: "{{ env_var('MELTANO_ANALYZE_SCHEMA', 'analytics') }}"
+      schema: "{{ env_var('DBT_TARGET_SCHEMA') }}"

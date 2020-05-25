@@ -417,14 +417,15 @@ def test_plugin_configuration(plugin_ref) -> Response:
 
     async def test_extractor(config={}):
         try:
-            invoker = invoker_factory(project, plugin, prepare_with_session=db.session)
-            # overlay the config on top of the loaded configuration
-            invoker.plugin_config = {
-                **invoker.plugin_config,
-                **PluginSettingsService.unredact(config),  # remove all redacted values
-            }
-
-            invoker.prepare(db.session)
+            settings_service = settings.with_config_override(
+                PluginSettingsService.unredact(config)
+            )
+            invoker = invoker_factory(
+                project,
+                plugin,
+                prepare_with_session=db.session,
+                plugin_settings_service=settings_service,
+            )
             process = await invoker.invoke_async(stdout=asyncio.subprocess.PIPE)
             return await test_stream(process.stdout)
         except Exception as err:

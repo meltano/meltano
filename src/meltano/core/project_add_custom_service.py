@@ -3,11 +3,13 @@ import json
 import yaml
 import logging
 import click
+import re
 
 from .project import Project
-from .plugin import PluginType, PluginInstall
+from .plugin import PluginType, Plugin
 from .plugin.factory import plugin_factory
 from .config_service import ConfigService
+from .utils import setting_env
 
 
 class ProjectAddCustomService:
@@ -17,7 +19,7 @@ class ProjectAddCustomService:
 
     def add(self, plugin_type: PluginType, plugin_name: str):
         click.secho(
-            f"Adding new custom {plugin_type.cli_command} plugin with name '{plugin_name}'...",
+            f"Adding new custom {plugin_type.singular} plugin with name '{plugin_name}'...",
             fg="green",
         )
         click.echo()
@@ -27,15 +29,22 @@ class ProjectAddCustomService:
         )
         click.echo("- prefix for configuration environment variables")
         click.echo("- identifier to find related/compatible plugins")
-        click.echo("- target database schema when used with")
-        click.echo("  loader target-postgres or target-snowflake")
+        if plugin_type == PluginType.EXTRACTORS:
+            click.echo("- default value for the `schema` setting when used")
+            click.echo("  with loader target-postgres or target-snowflake")
+        elif plugin_type == PluginType.LOADERS:
+            click.echo("- default value for the `target` setting when used")
+            click.echo("  with transformer dbt")
         click.echo()
-        click.echo(
-            "Hit Return to accept the default: plugin name with underscores instead of dashes"
-        )
+        if plugin_type == PluginType.LOADERS:
+            default_namespace = re.sub(r"^.*target-", "", plugin_name)
+            default_description = "plugin name without `target-` prefix"
+        else:
+            default_namespace = plugin_name.replace("-", "_")
+            default_description = "plugin name with underscores instead of dashes"
+        click.echo(f"Hit Return to accept the default: {default_description}")
         click.echo()
 
-        default_namespace = plugin_name.replace("-", "_")
         namespace = click.prompt(
             click.style("(namespace)", fg="blue"), type=str, default=default_namespace
         )
@@ -127,18 +136,19 @@ class ProjectAddCustomService:
                 value_proc=lambda value: [c.strip() for c in value.split(",")],
             )
 
-        # manually create the generic PluginInstall to save it
-        # as a custom plugin
-        install = PluginInstall(
+        plugin = Plugin(
             plugin_type,
             plugin_name,
-            pip_url,
+            namespace,
+            pip_url=pip_url,
             capabilities=capabilities,
-            namespace=namespace,
             executable=executable,
-            settings=[{"name": name} for name in settings],
+            settings=[
+                {"name": name, "env": setting_env(namespace, name)} for name in settings
+            ],
         )
 
+        install = plugin.as_installed(custom=True)
         installed = self.config_service.add_to_file(install)
         click.secho(
             "The plugin has been added to your `meltano.yml`.\n"
