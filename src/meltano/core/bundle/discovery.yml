@@ -719,6 +719,9 @@ transformers:
     - name: source_schema
       env: DBT_SOURCE_SCHEMA
       value: $MELTANO_LOAD_SCHEMA
+    - name: target_schema
+      env: DBT_TARGET_SCHEMA
+      value: analytics
     - name: models
       env: DBT_MODELS
       value: $MELTANO_EXTRACTOR_NAMESPACE my_meltano_project
