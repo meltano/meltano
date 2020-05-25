@@ -140,8 +140,6 @@ def install_missing_plugins(
             add_plugin(add_service, project, PluginType.LOADERS, loader)
 
     if transform != "skip":
-        # load the extractor_plugin because we infer the plugin name from it
-
         try:
             config_service.find_plugin("dbt", plugin_type=PluginType.TRANSFORMERS)
         except PluginMissingError as e:
@@ -150,28 +148,34 @@ def install_missing_plugins(
             )
             add_plugin(add_service, project, PluginType.TRANSFORMERS, "dbt")
 
+        discovery_service = PluginDiscoveryService(project)
+        extractor_plugin_def = discovery_service.find_plugin(
+            PluginType.EXTRACTORS, extractor
+        )
         try:
-            # the extractor name should match the transform name
-            plugin = config_service.find_plugin(
-                extractor, plugin_type=PluginType.TRANSFORMS
+            transform_plugin = config_service.find_plugin_by_namespace(
+                extractor_plugin_def.namespace, PluginType.TRANSFORMS
             )
 
             # Update dbt_project.yml in case the vars values have changed in meltano.yml
             transform_add_service = TransformAddService(project)
-            transform_add_service.update_dbt_project(plugin)
+            transform_add_service.update_dbt_project(transform_plugin)
         except PluginMissingError:
             try:
                 # Check if there is a default transform for this extractor
-                transform_def = PluginDiscoveryService(project).find_plugin(
-                    PluginType.TRANSFORMS, extractor
+                transform_plugin_def = discovery_service.find_plugin_by_namespace(
+                    extractor_plugin_def.namespace, PluginType.TRANSFORMS
                 )
 
                 click.secho(
-                    f"Transform '{transform_def.name}' is missing, trying to install it...",
+                    f"Transform '{transform_plugin_def.name}' is missing, trying to install it...",
                     fg="yellow",
                 )
                 add_plugin(
-                    add_service, project, PluginType.TRANSFORMS, transform_def.name
+                    add_service,
+                    project,
+                    PluginType.TRANSFORMS,
+                    transform_plugin_def.name,
                 )
             except PluginNotFoundError:
                 # There is no default transform for this extractor..
