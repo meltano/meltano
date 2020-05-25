@@ -7,6 +7,7 @@ from pathlib import Path
 from .project import Project
 from .config_service import ConfigService
 from .plugin.settings_service import PluginSettingsService
+from .plugin_discovery_service import PluginDiscoveryService
 from .plugin import Plugin, PluginType, PluginInstall
 from .db import project_engine
 
@@ -49,10 +50,13 @@ class TransformAddService:
             f.write(yaml.dump(package_yaml, default_flow_style=False))
 
     def update_dbt_project(self, plugin: PluginInstall):
-        transform_name = plugin.name.replace("-", "_")
+        discovery_service = PluginDiscoveryService(self.project)
+        plugin_def = discovery_service.find_plugin(plugin.type, plugin.name)
+        model_name = plugin_def.namespace
+
         dbt_project_yaml = yaml.safe_load(self.dbt_project_file.open())
 
-        dbt_project_yaml["models"][transform_name] = plugin._extras
+        dbt_project_yaml["models"][model_name] = plugin._extras
 
         with open(self.dbt_project_file, "w") as f:
             f.write(yaml.dump(dbt_project_yaml, default_flow_style=False))

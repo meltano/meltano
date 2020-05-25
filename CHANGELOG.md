@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `dbt` project dir based on `DBT_PROJECT_DIR` env var, defaulting to `$MELTANO_PROJECT_ROOT/transform`
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `dbt` profiles dir based on `DBT_PROFILES_DIR` env var, defaulting to `$MELTANO_PROJECT_ROOT/transform/profile`
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `dbt` models based on `DBT_MODELS` env var, defaulting to `$MELTANO_EXTRACTOR_NAMESPACE my_meltano_project`
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Determine transform dbt model name based on namespace
 
 ### Fixes
 
