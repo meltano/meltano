@@ -22,10 +22,11 @@ class PluginSettingMissingError(Error):
 
 
 class PluginSettingValueSource(str, Enum):
-    ENV = "env"  # 0
-    MELTANO_YML = "meltano_yml"  # 1
-    DB = "db"  # 2
-    DEFAULT = "default"  # 3
+    CONFIG_OVERRIDE = "config_override"  # 0
+    ENV = "env"  # 1
+    MELTANO_YML = "meltano_yml"  # 2
+    DB = "db"  # 3
+    DEFAULT = "default"  # 4
 
 
 class PluginSettingsService:
@@ -36,6 +37,7 @@ class PluginSettingsService:
         plugin_discovery_service: PluginDiscoveryService = None,
         show_hidden=True,
         env_override={},
+        config_override={},
     ):
         self.project = project
         self.config_service = config_service or ConfigService(project)
@@ -44,6 +46,7 @@ class PluginSettingsService:
         )
         self.show_hidden = show_hidden
         self.env_override = env_override
+        self.config_override = config_override
 
         self._env = None
 
@@ -67,6 +70,16 @@ class PluginSettingsService:
             self.show_hidden,
             {**self.env_override, **env_override},
             self.config_override,
+        )
+
+    def with_config_override(self, config_override):
+        return self.__class__(
+            self.project,
+            self.config_service,
+            self.discovery_service,
+            self.show_hidden,
+            self.env_override,
+            {**self.config_override, **config_override},
         )
 
     @property
@@ -217,6 +230,12 @@ class PluginSettingsService:
         except PluginSettingMissingError:
             setting_def = None
 
+        def config_override_getter():
+            try:
+                return self.config_override[name]
+            except KeyError:
+                return None
+
         def env_getter():
             if not setting_def:
                 return None
@@ -255,6 +274,7 @@ class PluginSettingsService:
             return setting_def.value
 
         config_getters = {
+            PluginSettingValueSource.CONFIG_OVERRIDE: config_override_getter,
             PluginSettingValueSource.ENV: env_getter,
             PluginSettingValueSource.MELTANO_YML: meltano_yml_getter,
             PluginSettingValueSource.DB: db_getter,

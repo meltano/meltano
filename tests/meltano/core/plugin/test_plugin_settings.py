@@ -121,6 +121,18 @@ class TestPluginSettingsService:
             PluginSettingValueSource.ENV,
         )
 
+        # overridden via config override
+        subject = subject.with_config_override({"test": "foo"})
+
+        assert subject.get_value(session, tap, "test") == (
+            "foo",
+            PluginSettingValueSource.CONFIG_OVERRIDE,
+        )
+        assert subject.get_value(session, tap_with_profile, "test") == (
+            "foo",
+            PluginSettingValueSource.CONFIG_OVERRIDE,
+        )
+
         # Verify that boolean settings set in env are cast correctly
         subject = subject.with_env_override({env_var(tap, "boolean"): "on"})
 
