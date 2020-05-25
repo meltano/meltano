@@ -706,6 +706,10 @@ transformers:
   - name: dbt
     namespace: dbt
     pip_url: dbt==0.14.4
+    settings:
+    - name: project_dir
+      env: DBT_PROJECT_DIR
+      value: $MELTANO_PROJECT_ROOT/transform
 transforms:
   - name: tap-adwords
     namespace: tap_adwords
