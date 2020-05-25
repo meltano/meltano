@@ -8,6 +8,7 @@ from .project import Project
 from .plugin import PluginType, PluginInstall
 from .plugin.factory import plugin_factory
 from .config_service import ConfigService
+from .utils import setting_env
 
 
 class ProjectAddCustomService:
@@ -136,7 +137,9 @@ class ProjectAddCustomService:
             capabilities=capabilities,
             namespace=namespace,
             executable=executable,
-            settings=[{"name": name} for name in settings],
+            settings=[
+                {"name": name, "env": setting_env(namespace, name)} for name in settings
+            ],
         )
 
         installed = self.config_service.add_to_file(install)
