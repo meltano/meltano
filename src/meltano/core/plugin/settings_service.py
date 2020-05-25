@@ -188,44 +188,61 @@ class PluginSettingsService:
     def setting_env(self, setting_def, plugin_def):
         return setting_def.env or setting_env(plugin_def.namespace, setting_def.name)
 
+    def cast_value(self, setting_def, value):
+        if isinstance(value, str) and setting_def.kind == "boolean":
+            value = truthy(value)
+
+        return value
+
     def get_value(self, session, plugin: PluginRef, name: str):
         plugin_install = self.get_install(plugin)
         plugin_def = self.get_definition(plugin)
         setting_def = self.find_setting(plugin, name)
 
-        try:
+        def env_getter():
             env_key = self.setting_env(setting_def, plugin_def)
 
-            # priority 1: environment variable
-            if env_key in os.environ:
+            try:
+                return os.environ[env_key]
+            except KeyError:
+                return None
+            else:
                 logging.debug(
                     f"Found ENV variable {env_key} for {plugin_def.namespace}:{name}"
                 )
 
-                value = os.environ[env_key]
-                if setting_def.kind == "boolean":
-                    value = truthy(value)
+        def meltano_yml_getter():
+            try:
+                return plugin_install.current_config[name]
+            except KeyError:
+                return None
 
-                return (value, PluginSettingValueSource.ENV)
-
-            # priority 2: installed configuration
-            if setting_def.name in plugin_install.current_config:
+        def db_getter():
+            try:
                 return (
-                    plugin_install.current_config[setting_def.name],
-                    PluginSettingValueSource.MELTANO_YML,
-                )
-
-            # priority 3: settings database
-            return (
-                (
                     session.query(PluginSetting)
                     .filter_by(namespace=plugin.qualified_name, name=name, enabled=True)
                     .one()
                     .value
-                ),
-                PluginSettingValueSource.DB,
-            )
-        except sqlalchemy.orm.exc.NoResultFound:
-            # priority 4: setting default value
-            # that means it was not overriden
-            return setting_def.value, PluginSettingValueSource.DEFAULT
+                )
+            except sqlalchemy.orm.exc.NoResultFound:
+                return None
+
+        def default_getter():
+            return setting_def.value
+
+        config_getters = {
+            PluginSettingValueSource.ENV: env_getter,
+            PluginSettingValueSource.MELTANO_YML: meltano_yml_getter,
+            PluginSettingValueSource.DB: db_getter,
+            PluginSettingValueSource.DEFAULT: default_getter,
+        }
+
+        for source, getter in config_getters.items():
+            value = getter()
+            if value is not None:
+                break
+
+        value = self.cast_value(setting_def, value)
+
+        return value, source
