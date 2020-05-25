@@ -93,15 +93,7 @@ def elt(project, extractor, loader, dry, transform, job_id):
 
 
 def run_extract_load(elt_context, session, **kwargs):
-    project = elt_context.project
-    loader = elt_context.loader.ref
-    extractor = elt_context.extractor.ref
-
-    singer_runner = SingerRunner(
-        elt_context,
-        target_config_dir=project.meltano_dir(loader.type, loader.name),
-        tap_config_dir=project.meltano_dir(extractor.type, extractor.name),
-    )
+    singer_runner = SingerRunner(elt_context)
 
     click.echo("Running extract & load...")
     singer_runner.run(session, **kwargs)

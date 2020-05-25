@@ -48,13 +48,19 @@ class TestSingerRunner:
         )
 
     @pytest.fixture()
-    def subject(self, session, mkdtemp, elt_context):
+    def tap_config_dir(self, mkdtemp, elt_context):
         tap_config_dir = mkdtemp()
-        target_config_dir = mkdtemp()
-
         create_plugin_files(tap_config_dir, elt_context.extractor.install)
-        create_plugin_files(target_config_dir, elt_context.loader.install)
+        return tap_config_dir
 
+    @pytest.fixture()
+    def target_config_dir(self, mkdtemp, elt_context):
+        target_config_dir = mkdtemp()
+        create_plugin_files(target_config_dir, elt_context.loader.install)
+        return target_config_dir
+
+    @pytest.fixture()
+    def subject(self, session, elt_context):
         Job(
             job_id=TEST_JOB_ID,
             state=State.SUCCESS,
@@ -62,12 +68,7 @@ class TestSingerRunner:
             payload={"singer_state": {"bookmarks": []}},
         ).save(session)
 
-        return SingerRunner(
-            elt_context,
-            TEST_JOB_ID,
-            tap_config_dir=tap_config_dir,
-            target_config_dir=target_config_dir,
-        )
+        return SingerRunner(elt_context)
 
     @pytest.fixture()
     def process_mock_factory(self):
@@ -90,25 +91,36 @@ class TestSingerRunner:
         target = process_mock_factory(target)
         return target
 
-    def test_prepare_job(self, session, subject, tap, target, plugin_invoker_factory):
+    def test_prepare_job(
+        self,
+        session,
+        subject,
+        tap_config_dir,
+        target_config_dir,
+        tap,
+        target,
+        plugin_invoker_factory,
+    ):
         tap_invoker = plugin_invoker_factory(
-            tap, config_dir=subject.tap_config_dir, prepare_with_session=session
+            tap, config_dir=tap_config_dir, prepare_with_session=session
         )
         target_invoker = plugin_invoker_factory(
-            target, config_dir=subject.target_config_dir, prepare_with_session=session
+            target, config_dir=target_config_dir, prepare_with_session=session
         )
 
         for f in tap.config_files.values():
-            assert subject.tap_config_dir.joinpath(f).exists()
+            assert tap_config_dir.joinpath(f).exists()
 
         for f in target.config_files.values():
-            assert subject.target_config_dir.joinpath(f).exists()
+            assert target_config_dir.joinpath(f).exists()
 
     @pytest.mark.asyncio
     async def test_invoke(
         self,
         session,
         subject,
+        tap_config_dir,
+        target_config_dir,
         tap,
         target,
         tap_process,
@@ -116,10 +128,10 @@ class TestSingerRunner:
         plugin_invoker_factory,
     ):
         tap_invoker = plugin_invoker_factory(
-            tap, config_dir=subject.tap_config_dir, prepare_with_session=session
+            tap, config_dir=tap_config_dir, prepare_with_session=session
         )
         target_invoker = plugin_invoker_factory(
-            target, config_dir=subject.target_config_dir, prepare_with_session=session
+            target, config_dir=target_config_dir, prepare_with_session=session
         )
 
         invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
