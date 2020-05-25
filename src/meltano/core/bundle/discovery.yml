@@ -710,6 +710,9 @@ transformers:
     - name: project_dir
       env: DBT_PROJECT_DIR
       value: $MELTANO_PROJECT_ROOT/transform
+    - name: profiles_dir
+      env: DBT_PROFILES_DIR
+      value: $MELTANO_PROJECT_ROOT/transform/profile
 transforms:
   - name: tap-adwords
     namespace: tap_adwords

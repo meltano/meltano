@@ -21,6 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Don't pass environment variables with "None" values to plugins if variables were unset
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `target-postgres` and `target-snowflake` schema based on `MELTANO_EXTRACTOR_NAMESPACE` env var
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `dbt` project dir based on `DBT_PROJECT_DIR` env var, defaulting to `$MELTANO_PROJECT_ROOT/transform`
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `dbt` profiles dir based on `DBT_PROFILES_DIR` env var, defaulting to `$MELTANO_PROJECT_ROOT/transform/profile`
 
 ### Fixes
 
