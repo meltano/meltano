@@ -12,15 +12,30 @@ stages:
 
 include:
   - local: .gitlab/ci/global.gitlab-ci.yml
+  - local: .gitlab/ci/docker.gitlab-ci.yml
+
+  # build-base
+  - local: .gitlab/ci/docker_base.gitlab-ci.yml
+
+  # build-meltano
+  - local: .gitlab/ci/docker_prod.gitlab-ci.yml
+
+  # docs
   - local: .gitlab/ci/docs.gitlab-ci.yml
+
+  # test
   - local: .gitlab/ci/test.gitlab-ci.yml
   - local: .gitlab/ci/test_webapp.gitlab-ci.yml
   - local: .gitlab/ci/homepage_sample_code.gitlab-ci.yml
+  - local: .gitlab/ci/demo_project.gitlab-ci.yml
+
+  # publish
   - local: .gitlab/ci/publish.gitlab-ci.yml
+
+  # distribute
   - local: .gitlab/ci/distribute.gitlab-ci.yml
-  - local: .gitlab/ci/docker.gitlab-ci.yml
-  - local: .gitlab/ci/docker_base.gitlab-ci.yml
-  - local: .gitlab/ci/docker_prod.gitlab-ci.yml
+
+  # SAST
   - template: SAST.gitlab-ci.yml
 
 sast:
