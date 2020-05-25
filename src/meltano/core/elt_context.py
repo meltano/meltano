@@ -43,12 +43,14 @@ class ELTContext:
         job: Optional[Job] = None,
         extractor: Optional[PluginContext] = None,
         loader: Optional[PluginContext] = None,
+        transformer: Optional[PluginContext] = None,
         plugin_discovery_service: PluginDiscoveryService = None,
     ):
         self.project = project
         self.job = job
         self.extractor = extractor
         self.loader = loader
+        self.transformer = transformer
         self.plugin_discovery_service = (
             plugin_discovery_service or PluginDiscoveryService(project)
         )
@@ -76,6 +78,14 @@ class ELTContext:
             plugin_discovery_service=self.plugin_discovery_service,
         )
 
+    def transformer_invoker(self):
+        return invoker_factory(
+            self.project,
+            self.transformer.install,
+            plugin_settings_service=self.transformer.settings_service,
+            plugin_discovery_service=self.plugin_discovery_service,
+        )
+
 
 class ELTContextBuilder:
     def __init__(
@@ -98,6 +108,7 @@ class ELTContextBuilder:
         )
         self._extractor = None
         self._loader = None
+        self._transformer = None
         self._job = None
 
     def with_extractor(self, extractor_name: str):
@@ -107,6 +118,17 @@ class ELTContextBuilder:
 
     def with_loader(self, loader_name: str):
         self._loader = PluginRef(PluginType.LOADERS, loader_name)
+
+        return self
+
+    def with_transform(self, transform: str):
+        if transform == "skip":
+            return self
+
+        return self.with_transformer("dbt")
+
+    def with_transformer(self, transformer_name: str):
+        self._transformer = PluginRef(PluginType.TRANSFORMERS, transformer_name)
 
         return self
 
@@ -156,11 +178,17 @@ class ELTContextBuilder:
             loader = self.plugin_context(session, self._loader, env)
             env.update(env_for_plugin(loader))
 
+        transformer = None
+        if self._transformer:
+            transformer = self.plugin_context(session, self._transformer, env)
+            env.update(env_for_plugin(transformer))
+
         return ELTContext(
             self.project,
             session,
             job=self._job,
             extractor=extractor,
             loader=loader,
+            transformer=transformer,
             plugin_discovery_service=self.plugin_discovery_service,
         )

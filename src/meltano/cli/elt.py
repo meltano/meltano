@@ -63,6 +63,7 @@ def elt(project, extractor, loader, dry, transform, job_id):
                 .with_job(job)
                 .with_extractor(extractor)
                 .with_loader(loader)
+                .with_transform(transform)
                 .context(session)
             )
 
@@ -71,7 +72,7 @@ def elt(project, extractor, loader, dry, transform, job_id):
             else:
                 click.secho("Extract & load skipped.", fg="yellow")
 
-            if transform != "skip":
+            if elt_context.transformer:
                 try:
                     # Use a new session for the Transform Part to address the last
                     # update for Job state not being saved in the DB

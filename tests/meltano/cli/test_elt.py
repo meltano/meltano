@@ -73,6 +73,7 @@ def test_elt_transform_only(
     project,
     tap,
     target,
+    dbt,
     plugin_discovery_service,
     plugin_settings_service,
 ):
@@ -84,6 +85,7 @@ def test_elt_transform_only(
     # fmt: off
     with patch("meltano.core.runner.dbt.DbtService", autospec=True) as DbtService, \
       patch("meltano.cli.elt.add_plugin", return_value=None) as add_plugin, \
+      patch("meltano.cli.elt.PluginDiscoveryService", return_value=plugin_discovery_service), \
       patch("meltano.core.elt_context.PluginDiscoveryService", return_value=plugin_discovery_service), \
       patch("meltano.core.elt_context.PluginSettingsService", return_value=plugin_settings_service), \
       patch.object(DbtRunner, "run", return_value=None):
