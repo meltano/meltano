@@ -8,9 +8,12 @@ from meltano.core.plugin import Plugin, PluginType, PluginRef
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin_invoker import invoker_factory
+from meltano.core.utils import flatten
 
 
-class PluginContext(namedtuple("PluginContext", "ref install definition config")):
+class PluginContext(
+    namedtuple("PluginContext", "ref install definition settings_service session")
+):
     @property
     def namespace(self):
         return self.definition.namespace
@@ -19,22 +22,33 @@ class PluginContext(namedtuple("PluginContext", "ref install definition config")
     def name(self):
         return self.install.name
 
+    @property
+    def type(self):
+        return self.ref.type
+
+    @property
+    def config(self):
+        return self.settings_service.as_config(self.session, self.ref)
+
+    @property
+    def config_env(self):
+        return self.settings_service.as_env(self.session, self.ref)
+
 
 class ELTContext:
     def __init__(
         self,
         project,
-        loader: PluginContext,
+        session,
         job: Optional[Job] = None,
         extractor: Optional[PluginContext] = None,
-        plugin_settings_service: PluginSettingsService = None,
+        loader: Optional[PluginContext] = None,
         plugin_discovery_service: PluginDiscoveryService = None,
     ):
         self.project = project
         self.job = job
-        self.loader = loader
         self.extractor = extractor
-        self.plugin_settings_service = plugin_settings_service
+        self.loader = loader
         self.plugin_discovery_service = (
             plugin_discovery_service or PluginDiscoveryService(project)
         )
@@ -49,8 +63,7 @@ class ELTContext:
             self.project,
             self.extractor.install,
             run_dir=self.elt_run_dir,
-            plugin_config=self.extractor.config,
-            plugin_settings_service=self.plugin_settings_service,
+            plugin_settings_service=self.extractor.settings_service,
             plugin_discovery_service=self.plugin_discovery_service,
         )
 
@@ -59,8 +72,7 @@ class ELTContext:
             self.project,
             self.loader.install,
             run_dir=self.elt_run_dir,
-            plugin_config=self.loader.config,
-            plugin_settings_service=self.plugin_settings_service,
+            plugin_settings_service=self.loader.settings_service,
             plugin_discovery_service=self.plugin_discovery_service,
         )
 
@@ -103,7 +115,7 @@ class ELTContextBuilder:
 
         return self
 
-    def plugin_context(self, session, plugin: PluginRef):
+    def plugin_context(self, session, plugin: PluginRef, env={}):
         return PluginContext(
             ref=plugin,
             install=self.config_service.find_plugin(
@@ -112,17 +124,43 @@ class ELTContextBuilder:
             definition=self.plugin_discovery_service.find_plugin(
                 plugin_name=plugin.name, plugin_type=plugin.type
             ),
-            config=self.plugin_settings_service.as_config(session, plugin),
+            settings_service=self.plugin_settings_service.with_env_override(env),
+            session=session,
         )
 
     def context(self, session) -> ELTContext:
+        env = {}
+
+        def env_for_plugin(plugin):
+            env_struct = {
+                "meltano": {
+                    plugin.type.singular: {  # MELTANO_EXTRACTOR_...
+                        "name": plugin.name,
+                        "namespace": plugin.namespace,
+                    },
+                    plugin.type.singular[0:-2]: plugin.config,  # MELTANO_EXTRACT_...
+                },
+                **plugin.config_env,  # TAP_...
+            }
+            env_vars = flatten(env_struct, "env_var").items()
+
+            return {k: str(v) for k, v in env_vars}
+
+        extractor = None
+        if self._extractor:
+            extractor = self.plugin_context(session, self._extractor, env)
+            env.update(env_for_plugin(extractor))
+
+        loader = None
+        if self._loader:
+            loader = self.plugin_context(session, self._loader, env)
+            env.update(env_for_plugin(loader))
+
         return ELTContext(
             self.project,
-            self.plugin_context(session, self._loader),
+            session,
             job=self._job,
-            extractor=self.plugin_context(session, self._extractor)
-            if self._extractor
-            else None,
-            plugin_settings_service=self.plugin_settings_service,
+            extractor=extractor,
+            loader=loader,
             plugin_discovery_service=self.plugin_discovery_service,
         )
