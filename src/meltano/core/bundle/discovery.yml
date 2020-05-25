@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-version: 10
+version: 11
 
 extractors:
   - name: tap-facebook
@@ -613,6 +613,9 @@ loaders:
         label: Database Name
         env: PG_DATABASE
         value: warehouse
+      - name: schema
+        env: PG_SCHEMA
+        value: $MELTANO_EXTRACTOR_NAMESPACE
   - name: target-jsonl
     label: JSONL
     description: JSONL loader
@@ -653,6 +656,9 @@ loaders:
       - name: warehouse
         env: SF_WAREHOUSE
         description: The name of the Snowflake warehouse you want to use
+      - name: schema
+        env: SF_SCHEMA
+        value: $MELTANO_EXTRACTOR_NAMESPACE
   - name: target-sqlite
     label: SQLite
     description: SQLite database loader

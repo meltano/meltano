@@ -28,8 +28,8 @@ class ProjectAddCustomService:
         )
         click.echo("- prefix for configuration environment variables")
         click.echo("- identifier to find related/compatible plugins")
-        click.echo("- target database schema when used with")
-        click.echo("  loader target-postgres or target-snowflake")
+        click.echo("- default value for the `schema` setting when used")
+        click.echo("  with loader target-postgres or target-snowflake")
         click.echo()
         click.echo(
             "Hit Return to accept the default: plugin name with underscores instead of dashes"

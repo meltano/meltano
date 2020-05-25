@@ -329,8 +329,8 @@ meltano add --custom extractor tap-covid-19
 # Specify namespace, which will serve as the:
 # - prefix for configuration environment variables
 # - identifier to find related/compatible plugins
-# - target database schema when used with
-#   loader target-postgres or target-snowflake
+# - default value for the `schema` setting when used
+#   with loader target-postgres or target-snowflake
 (namespace): tap_covid_19
 
 # Specify `pip install` argument, for example:

@@ -19,6 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Pass config enviroment variables when invoking plugins
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `MELTANO_EXTRACTOR_NAME`, `MELTANO_EXTRACTOR_NAMESPACE`, and `MELTANO_EXTRACT_{SETTING...}` environment variables when invoking loader
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Don't pass environment variables with "None" values to plugins if variables were unset
+- [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `target-postgres` and `target-snowflake` schema based on `MELTANO_EXTRACTOR_NAMESPACE` env var
 
 ### Fixes
 

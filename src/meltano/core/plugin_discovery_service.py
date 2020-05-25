@@ -36,7 +36,7 @@ MELTANO_DISCOVERY_URL = "https://www.meltano.com/discovery.yml"
 
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-VERSION = 10
+VERSION = 11
 
 
 class DiscoveryFile(Canonical):

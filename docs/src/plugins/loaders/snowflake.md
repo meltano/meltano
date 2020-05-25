@@ -49,6 +49,7 @@ export SF_PASSWORD=""
 export SF_ROLE=""       # in UPPERCASE
 export SF_DATABASE=""   # in UPPERCASE
 export SF_WAREHOUSE=""  # in UPPERCASE
+# export SF_SCHEMA=""   # override if the default (see below) is not appropriate
 ```
 
 - **SF_ACCOUNT** - This is the account name which is derived from the URL. More info can be found on the [Snowflake docs](https://docs.snowflake.net/manuals/user-guide/connecting.html#your-snowflake-account-name-and-url)
@@ -57,3 +58,4 @@ export SF_WAREHOUSE=""  # in UPPERCASE
 - **SF_ROLE** - This is the role you want to use for your account for loading the data
 - **SF_DATABASE** - The name of the Snowflake database you want to use
 - **SF_WAREHOUSE** - The name of the Snowflake warehouse you want to use
+- **SF_SCHEMA** - The name of the Snowflake schema you want to use. The default value is `$MELTANO_EXTRACTOR_NAMESPACE`, which will expand to the `namespace` of the `extractor` used in the pipeline, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html).
