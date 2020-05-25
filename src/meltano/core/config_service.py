@@ -55,6 +55,16 @@ class ConfigService:
         except StopIteration as stop:
             raise PluginMissingError(name) from stop
 
+    def find_plugin_by_namespace(self, plugin_type: PluginType, namespace: str):
+        try:
+            return next(
+                plugin
+                for plugin in self.plugins()
+                if (plugin.type == plugin_type and plugin.namespace == namespace)
+            )
+        except StopIteration as stop:
+            raise PluginMissingError(namespace) from stop
+
     def get_plugin(self, plugin_ref: PluginRef) -> PluginInstall:
         try:
             plugin = next(plugin for plugin in self.plugins() if plugin == plugin_ref)
