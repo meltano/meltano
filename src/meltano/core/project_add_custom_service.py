@@ -5,7 +5,7 @@ import logging
 import click
 
 from .project import Project
-from .plugin import PluginType, PluginInstall
+from .plugin import PluginType, Plugin
 from .plugin.factory import plugin_factory
 from .config_service import ConfigService
 from .utils import setting_env
@@ -128,20 +128,19 @@ class ProjectAddCustomService:
                 value_proc=lambda value: [c.strip() for c in value.split(",")],
             )
 
-        # manually create the generic PluginInstall to save it
-        # as a custom plugin
-        install = PluginInstall(
+        plugin = Plugin(
             plugin_type,
             plugin_name,
-            pip_url,
+            namespace,
+            pip_url=pip_url,
             capabilities=capabilities,
-            namespace=namespace,
             executable=executable,
             settings=[
                 {"name": name, "env": setting_env(namespace, name)} for name in settings
             ],
         )
 
+        install = plugin.as_installed(custom=True)
         installed = self.config_service.add_to_file(install)
         click.secho(
             "The plugin has been added to your `meltano.yml`.\n"

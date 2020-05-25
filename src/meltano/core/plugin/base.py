@@ -48,7 +48,7 @@ class SettingDefinition(NameEq, Canonical):
         options: list = [],
         oauth: dict = {},
         placeholder: str = None,
-        protected=False,
+        protected: bool = None,
         **attrs,
     ):
         super().__init__(
@@ -244,11 +244,17 @@ class Plugin(Canonical, PluginRef):
         self.select = set(select)
         self._extras = attrs
 
-    def as_installed(self) -> PluginInstall:
+    def as_installed(self, custom=False) -> PluginInstall:
+        extras = self._extras.copy()
+        if custom:
+            extras.update(
+                {
+                    "namespace": self.namespace,
+                    "capabilities": self.capabilities,
+                    "settings": self.settings,
+                }
+            )
+
         return PluginInstall(
-            self.type,
-            self.name,
-            pip_url=self.pip_url,
-            select=self.select,
-            **self._extras,
+            self.type, self.name, pip_url=self.pip_url, select=self.select, **extras
         )
