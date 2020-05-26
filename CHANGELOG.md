@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Set `MELTANO_LOADER_NAME`, `MELTANO_LOADER_NAMESPACE`, and `MELTANO_LOAD_{SETTING...}` environment variables when invoking transformer
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Allow dbt project dir, profiles dir, target, source schema, target schema, and models to be configured like any other plugin, with defaults based on pipeline-specific environment variables
 - [#2029](https://gitlab.com/meltano/meltano/-/issues/2029) Allow target-postgres and target-snowflake schema to be overridden through config, with default based on pipeline's extractor's namespace
+- [#2062](https://gitlab.com/meltano/meltano/-/issues/2062) Support `--database-uri` option and `MELTANO_DATABASE_URI` env var on `meltano init`
 
 ### Changes
 

@@ -10,7 +10,7 @@ from meltano.cli import cli
 @pytest.fixture(scope="class")
 def project(test_dir, project_init_service):
     """This fixture returns the non-activated project."""
-    project = project_init_service.init(create_system_database=False, activate=False)
+    project = project_init_service.init(activate=False)
 
     yield project
 
