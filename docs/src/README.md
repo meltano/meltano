@@ -373,8 +373,8 @@ To determine the values of these settings, Meltano will look in 4 places, with e
 
 1. **Environment variables**, set through your project's `.env` file, a [scheduled pipeline](/#orchestration)'s `env` object in `meltano.yml`, or any other method. You can use `meltano config <plugin> list` to list the available variable names.
 2. **The plugin's `config` object** in your project's `meltano.yml` file. Inside values, [environment variables](/docs/command-line-interface.html#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
-3. **Your project's SQLite database** at `.meltano/meltano.db`, which stores configuration set using [`meltano config`](/docs/command-line-interface.html#config) among other things.
-4. **The default `value`s** set on the plugin's `settings` object in the global `discovery.yml` (in the case of [known plugins](/docs/contributor-guide.html#known-plugins)) or your project's `meltano.yml` file (in the case of custom plugins). `meltano config <plugin> list` will list the default values.
+3. **Your project's [**system database**](/docs/environment-variables.html#system-database)** at `.meltano/meltano.db` (by default), which stores configuration set using [`meltano config`](/docs/command-line-interface.html#config) among other things.
+4. **The default `value`s** set on the plugin's `settings` object in the global `discovery.yml` file (in the case of [known plugins](/docs/contributor-guide.html#known-plugins)) or your project's `meltano.yml` file (in the case of custom plugins). `meltano config <plugin> list` will list the default values.
 
 Since `.env` and `.meltano/meltano.db` are both included in your project's `.gitignore` file by default, sensitive values like passwords and tokens are more appropriately stored in either of these places than in `meltano.yml`.
 
@@ -388,7 +388,7 @@ Since `.env` and `.meltano/meltano.db` are both included in your project's `.git
 meltano config tap-covid-19 list
 
 # Store non-sensitive plugin configuration in
-# your project's `.meltano/meltano.db`
+# your project's system DB at `.meltano/meltano.db`
 meltano config tap-covid-19 set start_date "2020-01-01T00:00:00Z"
 meltano config tap-covid-19 set user_agent "tap-covid-19 via meltano <api_user_email@your_company.com>"
 
