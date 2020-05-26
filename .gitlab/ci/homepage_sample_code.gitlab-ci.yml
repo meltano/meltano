@@ -184,7 +184,7 @@ homepage_sample_code:
     ### https://meltano.com/#meltano-select
 
     # List all available entities and properties
-    - meltano select --list --all tap-covid-19
+    - "[[ $TAP_COVID_19_API_TOKEN ]] && meltano select --list --all tap-covid-19 || echo '$TAP_COVID_19_API_TOKEN is not set'"
 
     # Include all properties of an entity
     - meltano select tap-covid-19 "eu_ecdc_daily" "*"
@@ -199,7 +199,7 @@ homepage_sample_code:
     - meltano select tap-covid-19 --exclude "*" "git_*"
 
     # List selected (enabled) entities and properties
-    - meltano select --list tap-covid-19
+    - "[[ $TAP_COVID_19_API_TOKEN ]] && meltano select --list tap-covid-19 || echo '$TAP_COVID_19_API_TOKEN is not set'"
   artifacts:
     paths:
       - meltano-projects/demo-project/meltano.yml
