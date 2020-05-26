@@ -15,7 +15,7 @@ def db_options(func):
     @click.option(
         "--database-uri",
         envvar="MELTANO_DATABASE_URI",
-        default=lambda: f"sqlite:///{os.getcwd()}/.meltano/meltano.db",
+        default=lambda: f"sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db",
         help="System database URI",
     )
     def decorate(*args, **kwargs):
@@ -46,6 +46,7 @@ class project:
                 )
 
             # register the system database connection
+            engine_uri = engine_uri.replace("$MELTANO_PROJECT_ROOT", str(project.root))
             engine, _ = project_engine(project, engine_uri, default=True)
 
             if self.migrate:

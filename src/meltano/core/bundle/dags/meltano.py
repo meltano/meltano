@@ -32,7 +32,7 @@ default_args = {
     "concurrency": 1,
 }
 
-engine_uri = f"sqlite:///{os.getcwd()}/.meltano/meltano.db"
+engine_uri = f"sqlite:///{project.root}/.meltano/meltano.db"
 engine, Session = project_engine(project, engine_uri, default=True)
 session = Session()
 

@@ -12,6 +12,7 @@ from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.error import SubprocessError
 from . import cli
+from .params import db_options
 
 EXTRACTORS = "extractors"
 LOADERS = "loaders"
@@ -24,7 +25,8 @@ ALL = "all"
 @click.option(
     "--no_usage_stats", help="Do not send anonymous usage stats.", is_flag=True
 )
-def init(ctx, project_name, no_usage_stats):
+@db_options
+def init(engine_uri, ctx, project_name, no_usage_stats):
     """
     Creates a new Meltano project
     """
@@ -36,7 +38,7 @@ def init(ctx, project_name, no_usage_stats):
 
     init_service = ProjectInitService(project_name)
     try:
-        project = init_service.init()
+        project = init_service.init(engine_uri=engine_uri)
         init_service.echo_instructions()
 
         tracker = GoogleAnalyticsTracker(project)

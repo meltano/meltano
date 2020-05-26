@@ -74,7 +74,7 @@ class ProjectInitService:
         self.initialize_file = bundle.find("initialize.yml")
         self.project_name = project_name.lower()
 
-    def init(self, create_system_database=True, activate=True) -> Project:
+    def init(self, activate=True, engine_uri=None) -> Project:
         try:
             os.mkdir(self.project_name)
         except Exception as e:
@@ -88,8 +88,11 @@ class ProjectInitService:
         if activate:
             Project.activate(self.project)
 
-        if create_system_database:
-            self.create_system_database()
+        if engine_uri:
+            engine_uri = engine_uri.replace(
+                "$MELTANO_PROJECT_ROOT", str(self.project.root)
+            )
+            self.create_system_database(engine_uri)
 
         return self.project
 
@@ -100,10 +103,9 @@ class ProjectInitService:
             click.secho(f"Created", fg="blue", nl=False)
             click.echo(f" {path}")
 
-    def create_system_database(self):
+    def create_system_database(self, engine_uri):
         click.secho(f"Creating system database...", fg="blue")
         # register the system database connection
-        engine_uri = f"sqlite:///{self.project.root}/.meltano/meltano.db"
         engine, _ = project_engine(self.project, engine_uri, default=True)
 
         migration_service = MigrationService(engine)
