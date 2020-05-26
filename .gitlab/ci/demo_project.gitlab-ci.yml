@@ -6,3 +6,22 @@ demo_project:
   trigger: 
     project: meltano/demo-project
     strategy: depend
+  only:
+    - branches@meltano/meltano
+    - tags@meltano/meltano
+
+demo_project_forks:
+  stage: test
+  script: 
+    - >
+      curl
+      --request POST
+      --form "token=$CI_JOB_TOKEN"
+      --form "variables[MELTANO_IMAGE_NAME]=$CI_REGISTRY_IMAGE"
+      --form "variables[MELTANO_IMAGE_TAG]=$CI_COMMIT_SHA"
+      --form ref=master
+      https://gitlab.com/api/v4/projects/meltano%2fdemo-project/trigger/pipeline
+  except:
+    - branches@meltano/meltano
+    - tags@meltano/meltano
+  when: manual
