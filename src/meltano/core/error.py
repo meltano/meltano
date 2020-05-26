@@ -31,6 +31,14 @@ class SubprocessError(Exception):
         self.process = process
         super().__init__(message)
 
+    @property
+    def stderr(self):
+        stderr = self.process.stderr
+        if not isinstance(stderr, str):
+            stderr = stderr.read()
+
+        return stderr
+
 
 class PluginInstallError(SubprocessError):
     """Happens when a plugin fails to install."""
