@@ -59,7 +59,7 @@ jedi==0.16.0
 Jinja2==2.11.1
 jmespath==0.9.4
 json-merge-patch==0.2
-jsonschema==2.6.0
+jsonschema==3.2.0
 lazy-object-proxy==1.4.3
 Mako==1.1.1
 Markdown==3.0.1
@@ -108,7 +108,7 @@ six==1.14.0
 snowflake-connector-python==1.6.10
 snowflake-sqlalchemy==1.1.2
 speaklater==1.3
-SQLAlchemy==1.2.12
+SQLAlchemy==1.3.17
 sqlparse==0.3.0
 stringcase==1.2.0
 tabulate==0.8.3
