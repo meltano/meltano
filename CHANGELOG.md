@@ -14,7 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#2063] Require `psycopg2-binary` instead of `psycopg2` so that build dependency `pg_config` doesn't need to be present on system
+- [#2063](https://gitlab.com/meltano/meltano/-/merge_requests/2063) Require `psycopg2-binary` instead of `psycopg2` so that build dependency `pg_config` doesn't need to be present on system
 
 ### Breaks
 
