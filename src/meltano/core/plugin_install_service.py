@@ -54,7 +54,7 @@ class PluginInstallService:
             except PluginInstallError as err:
                 status["status"] = "error"
                 status["message"] = str(err)
-                status["details"] = err.process.stderr
+                status["details"] = err.stderr
                 errors.append(status)
             except PluginInstallWarning as warn:
                 status["status"] = "warning"
@@ -75,13 +75,18 @@ class PluginInstallService:
         if not plugin.is_installable():
             raise PluginNotInstallable()
 
-        with plugin.trigger_hooks("install", self.project):
-            run = installer_factory(self.project, plugin).install()
+        try:
+            with plugin.trigger_hooks("install", self.project):
+                run = installer_factory(self.project, plugin).install()
 
-            if compile_models and plugin.type is PluginType.MODELS:
-                self.compile_models()
+                if compile_models and plugin.type is PluginType.MODELS:
+                    self.compile_models()
 
-            return run
+                return run
+        except SubprocessError as err:
+            raise PluginInstallError(
+                f"{plugin.name} could not be installed: {err}", err.process
+            ) from err
 
     def compile_models(self):
         compiler = ProjectCompiler(self.project)
@@ -97,14 +102,9 @@ class PipPluginInstaller:
         self.venv_service = venv_service or VenvService(project)
 
     def install(self):
-        try:
-            self.venv_service.create(namespace=self.plugin.type, name=self.plugin.name)
-            return self.venv_service.install(
-                namespace=self.plugin.type,
-                name=self.plugin.name,
-                pip_url=self.plugin.pip_url,
-            )
-        except SubprocessError as err:
-            raise PluginInstallError(
-                f"{self.plugin.name} has an installation issue. {err}", err.process
-            )
+        self.venv_service.create(namespace=self.plugin.type, name=self.plugin.name)
+        return self.venv_service.install(
+            namespace=self.plugin.type,
+            name=self.plugin.name,
+            pip_url=self.plugin.pip_url,
+        )

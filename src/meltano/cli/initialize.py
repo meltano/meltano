@@ -49,8 +49,5 @@ def init(ctx, project_name, no_usage_stats):
         raise click.Abort()
     except SubprocessError as proc_err:
         click.secho(str(proc_err), fg="red")
-        stderr = proc_err.process.stderr
-        if not isinstance(stderr, str):
-            stderr = stderr.read()
-        click.secho(stderr, err=True)
+        click.secho(proc_err.stderr, err=True)
         raise click.Abort()
