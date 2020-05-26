@@ -18,8 +18,8 @@ from meltano.core.utils import nest, map_dict
 
 
 class AirflowInvoker(PluginInvoker):
-    def Popen_options(self):
-        env = os.environ.copy()
+    def env(self):
+        env = super().env()
         venv_dir = self.project.venvs_dir(self.plugin.type, self.plugin.name)
 
         # add the Airflow virtualenv because it contains `gunicorn`
@@ -44,11 +44,7 @@ class AirflowInvoker(PluginInvoker):
 
         env["PYTHONPATH"] = os.pathsep.join(sys_paths)
 
-        options = super().Popen_options()
-        options_env = nest(options, "env")
-        options_env.update(env)
-
-        return options
+        return env
 
 
 class Airflow(PluginInstall):

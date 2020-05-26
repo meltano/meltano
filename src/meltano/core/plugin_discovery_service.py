@@ -36,7 +36,7 @@ MELTANO_DISCOVERY_URL = "https://www.meltano.com/discovery.yml"
 
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-VERSION = 10
+VERSION = 11
 
 
 class DiscoveryFile(Canonical):
@@ -209,6 +209,16 @@ class PluginDiscoveryService(Versioned):
             )
         except StopIteration:
             raise PluginNotFoundError(name)
+
+    def find_plugin_by_namespace(self, plugin_type: PluginType, namespace: str):
+        try:
+            return next(
+                plugin
+                for plugin in self.plugins()
+                if (plugin.type == plugin_type and plugin.namespace == namespace)
+            )
+        except StopIteration as stop:
+            raise PluginNotFoundError(namespace) from stop
 
     def discover(self, plugin_type: PluginType = None):
         """Return a pretty printed list of available plugins."""

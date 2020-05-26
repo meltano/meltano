@@ -4,7 +4,7 @@ from typing import Optional
 from datetime import datetime, date
 
 from .plugin.settings_service import PluginSettingsService, PluginSettingMissingError
-from .plugin_discovery_service import PluginDiscoveryService
+from .plugin_discovery_service import PluginDiscoveryService, PluginNotFoundError
 from .project import Project
 from .plugin import PluginType, PluginRef
 from .db import project_engine
@@ -135,11 +135,8 @@ class ScheduleService:
         """
 
         try:
-            extractor = next(
-                extractor
-                for extractor in self.plugin_discovery_service.plugins()
-                if extractor.type == PluginType.EXTRACTORS
-                and extractor.namespace == namespace
+            extractor = self.plugin_discovery_service.find_plugin_by_namespace(
+                PluginType.EXTRACTORS, namespace
             )
 
             return next(
@@ -147,8 +144,8 @@ class ScheduleService:
                 for schedule in self.schedules()
                 if schedule.extractor == extractor.name
             )
-        except StopIteration:
-            raise ScheduleNotFoundError(namespace)
+        except PluginNotFoundError as err:
+            raise ScheduleNotFoundError(namespace) from err
 
     def schedules(self):
         return self.project.meltano.schedules

@@ -52,9 +52,15 @@ class SqlHelper(SqlUtils):
         m5oc_file = project.run_dir("models", namespace, f"{topic_name}.topic.m5oc")
         return M5ocFile.load(m5oc_file)
 
-    def get_db_engine(self, loader):
+    def get_db_engine(self, extractor, loader, transform):
         project = Project.find()
-        context = ELTContextBuilder(project).with_loader(loader).context(db.session)
+        context = (
+            ELTContextBuilder(project)
+            .with_extractor(extractor)
+            .with_loader(loader)
+            .with_transform(transform)
+            .context(db.session)
+        )
         connection_service = ConnectionService(context)
 
         engine_hooks = []
@@ -91,8 +97,8 @@ class SqlHelper(SqlUtils):
 
     # we need to `freeze` each result to make sure
     # the attribute name will be correct for the lookup
-    def get_query_results(self, loader, sql):
-        engine = self.get_db_engine(loader)
+    def get_query_results(self, extractor, loader, transform, sql):
+        engine = self.get_db_engine(extractor, loader, transform)
         results = engine.execute(sqlalchemy.text(sql))
         results = [freeze_keys(OrderedDict(row)) for row in results]
         return results

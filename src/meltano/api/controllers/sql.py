@@ -119,7 +119,9 @@ def get_sql(namespace, topic_name, design_name):
         m5oc.content["plugin_namespace"]
     )
 
-    results = sqlHelper.get_query_results(schedule.loader, outgoing_sql)
+    results = sqlHelper.get_query_results(
+        schedule.extractor, schedule.loader, schedule.transform, outgoing_sql
+    )
     base_dict["results"] = results
     base_dict["empty"] = len(results) == 0
 

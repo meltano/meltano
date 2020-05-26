@@ -37,7 +37,7 @@ class ReportsHelper:
         aggregates = sql_dict["aggregates"]
 
         report["query_results"] = sql_helper.get_query_results(
-            schedule.loader, outgoing_sql
+            schedule.extractor, schedule.loader, schedule.transform, outgoing_sql
         )
         report["query_result_aggregates"] = aggregates
 

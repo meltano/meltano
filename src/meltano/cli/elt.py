@@ -63,6 +63,7 @@ def elt(project, extractor, loader, dry, transform, job_id):
                 .with_job(job)
                 .with_extractor(extractor)
                 .with_loader(loader)
+                .with_transform(transform)
                 .context(session)
             )
 
@@ -71,12 +72,12 @@ def elt(project, extractor, loader, dry, transform, job_id):
             else:
                 click.secho("Extract & load skipped.", fg="yellow")
 
-            if transform != "skip":
+            if elt_context.transformer:
                 try:
                     # Use a new session for the Transform Part to address the last
                     # update for Job state not being saved in the DB
                     transform_session = Session()
-                    run_transform(elt_context, transform_session, dry_run=dry, models=elt_context.extractor.ref.name)
+                    run_transform(elt_context, transform_session, dry_run=dry)
                 finally:
                     transform_session.close()
             else:
@@ -93,15 +94,7 @@ def elt(project, extractor, loader, dry, transform, job_id):
 
 
 def run_extract_load(elt_context, session, **kwargs):
-    project = elt_context.project
-    loader = elt_context.loader.ref
-    extractor = elt_context.extractor.ref
-
-    singer_runner = SingerRunner(
-        elt_context,
-        target_config_dir=project.meltano_dir(loader.type, loader.name),
-        tap_config_dir=project.meltano_dir(extractor.type, extractor.name),
-    )
+    singer_runner = SingerRunner(elt_context)
 
     click.echo("Running extract & load...")
     singer_runner.run(session, **kwargs)
@@ -111,7 +104,7 @@ def run_extract_load(elt_context, session, **kwargs):
 def run_transform(elt_context, session, **kwargs):
     dbt_runner = DbtRunner(elt_context)
     click.echo("Running transformation...")
-    dbt_runner.run(session, **kwargs)  # TODO: models from elt_context?
+    dbt_runner.run(session, **kwargs)
     click.secho("Transformation complete!", fg="green")
 
 
@@ -140,8 +133,6 @@ def install_missing_plugins(
             add_plugin(add_service, project, PluginType.LOADERS, loader)
 
     if transform != "skip":
-        # load the extractor_plugin because we infer the plugin name from it
-
         try:
             config_service.find_plugin("dbt", plugin_type=PluginType.TRANSFORMERS)
         except PluginMissingError as e:
@@ -150,28 +141,34 @@ def install_missing_plugins(
             )
             add_plugin(add_service, project, PluginType.TRANSFORMERS, "dbt")
 
+        discovery_service = PluginDiscoveryService(project)
+        extractor_plugin_def = discovery_service.find_plugin(
+            PluginType.EXTRACTORS, extractor
+        )
         try:
-            # the extractor name should match the transform name
-            plugin = config_service.find_plugin(
-                extractor, plugin_type=PluginType.TRANSFORMS
+            transform_plugin = config_service.find_plugin_by_namespace(
+                extractor_plugin_def.namespace, PluginType.TRANSFORMS
             )
 
             # Update dbt_project.yml in case the vars values have changed in meltano.yml
             transform_add_service = TransformAddService(project)
-            transform_add_service.update_dbt_project(plugin)
+            transform_add_service.update_dbt_project(transform_plugin)
         except PluginMissingError:
             try:
                 # Check if there is a default transform for this extractor
-                transform_def = PluginDiscoveryService(project).find_plugin(
-                    PluginType.TRANSFORMS, extractor
+                transform_plugin_def = discovery_service.find_plugin_by_namespace(
+                    extractor_plugin_def.namespace, PluginType.TRANSFORMS
                 )
 
                 click.secho(
-                    f"Transform '{transform_def.name}' is missing, trying to install it...",
+                    f"Transform '{transform_plugin_def.name}' is missing, trying to install it...",
                     fg="yellow",
                 )
                 add_plugin(
-                    add_service, project, PluginType.TRANSFORMS, transform_def.name
+                    add_service,
+                    project,
+                    PluginType.TRANSFORMS,
+                    transform_plugin_def.name,
                 )
             except PluginNotFoundError:
                 # There is no default transform for this extractor..
