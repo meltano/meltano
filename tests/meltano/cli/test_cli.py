@@ -27,7 +27,7 @@ def test_activate_project(project, cli_runner, pushd):
         env.write("CLI_TEST_ACTIVATE_PROJECT=1")
 
     # run any cli command - that should activate the project
-    cli_runner.invoke(cli, ["install"])
+    cli_runner.invoke(cli, ["discover"])
 
     assert os.getenv("CLI_TEST_ACTIVATE_PROJECT") == "1"
 
