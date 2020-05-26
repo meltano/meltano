@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.34.0 - (2020-05-26)
+---
+
+### New
+
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Automatically populate `env` properties on newly added custom plugin `settings` in `meltano.yml`
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Have `meltano config <plugin> list` print default value along with setting name and env var
 - [!1664](https://gitlab.com/meltano/meltano/-/merge_requests/1664) Pass configuration environment variables when invoking plugins
@@ -31,8 +43,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#2059](https://gitlab.com/meltano/meltano/-/issues/2059) Properly handle errors in before/after install hooks
-
-### Breaks
 
 
 ## 1.33.0 - (2020-05-21)
