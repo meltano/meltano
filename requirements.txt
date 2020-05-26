@@ -79,7 +79,7 @@ pexpect==4.8.0
 pickleshare==0.7.5
 prompt-toolkit==2.0.10
 psutil==5.6.3
-psycopg2==2.8.5
+psycopg2-binary==2.8.5
 ptyprocess==0.6.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8

@@ -3,10 +3,6 @@ import click
 import logging
 import warnings
 
-# disable the psycopg2 warning
-# this needs to run before `psycopg2` is imported
-warnings.filterwarnings("ignore", category=UserWarning, module="psycopg2")
-
 import meltano
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.behavior.versioned import IncompatibleVersionError
