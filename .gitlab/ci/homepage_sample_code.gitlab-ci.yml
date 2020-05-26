@@ -14,9 +14,6 @@ homepage_sample_code:
     # TAP_COVID_19_API_TOKEN: set through https://gitlab.com/meltano/meltano/-/settings/ci_cd
   services:
     - postgres:11
-  before_script:
-    - apt-get update -y
-    - apt-get install -y postgresql-client
   script:
     ### https://meltano.com/#installation
 
@@ -120,6 +117,8 @@ homepage_sample_code:
     - meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
 
     # Start `psql` shell connected to warehouse database
+    - apt-get update -y
+    - apt-get install -y postgresql-client # Only do this now to ensure Meltano can be installed without PostgreSQL
     - PGPASSWORD=$PG_PASSWORD psql -U $PG_USERNAME -h $PG_ADDRESS -p $PG_PORT -d $PG_DATABASE -c "SELECT * FROM analytics.gitlab_tags LIMIT 1;"
 
 
