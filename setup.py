@@ -23,7 +23,7 @@ requires = [
     "jsonschema==2.6.0",
     "markdown==3.0.1",
     "networkx==2.2",
-    "psycopg2==2.8.5",
+    "psycopg2-binary==2.8.5",
     "psutil==5.6.3",
     "pyhumps==1.2.2",
     "pypika==0.25.1",
