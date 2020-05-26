@@ -25,7 +25,7 @@ from meltano.core.plugin_install_service import (
 from meltano.core.plugin import PluginType, Plugin
 from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.error import SubprocessError
+from meltano.core.error import PluginInstallError
 from meltano.core.db import project_engine
 
 
@@ -93,9 +93,9 @@ def add_plugin(
         click.secho(f"Added and installed {plugin_type} '{plugin_name}'.", fg="green")
     except PluginNotInstallable as install_err:
         logging.info(f"{plugin_type} is not installable, skipping install.")
-    except SubprocessError as proc_err:
+    except PluginInstallError as proc_err:
         click.secho(str(proc_err), fg="red")
-        click.secho(proc_err.process.stderr, err=True)
+        click.secho(proc_err.stderr, err=True)
         raise click.Abort()
 
     docs_link = plugin._extras.get("docs")

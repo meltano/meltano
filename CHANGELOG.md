@@ -27,6 +27,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2059](https://gitlab.com/meltano/meltano/-/issues/2059) Properly handle errors in before/after install hooks
+
 ### Breaks
 
 
