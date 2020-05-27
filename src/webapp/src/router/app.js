@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Design from '@/components/analyze/Design'
 import Explore from '@/components/analyze/Explore'
 import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModal'
+import LoaderSettingsModal from '@/components/pipelines/LoaderSettingsModal'
 import LogModal from '@/components/pipelines/LogModal'
 
 import Analyze from '@/views/Analyze'
@@ -46,6 +47,26 @@ const router = new Router({
         }
       ]
     },
+    {
+      path: '/loaders/',
+      name: 'loaders',
+      component: Loaders,
+      children: [
+        {
+          path: ':loader',
+          name: 'loaderSettings',
+          components: {
+            default: Loaders,
+            extractorSettings: LoaderSettingsModal
+          },
+          meta: {
+            isModal: true,
+            title: 'Meltano: Data Loader Configuration'
+          }
+        }
+      ]
+    },
+
     {
       path: '/pipelines/',
       name: 'pipelines',
