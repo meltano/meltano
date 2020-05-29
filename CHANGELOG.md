@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2076](https://gitlab.com/meltano/meltano/-/issues/2076) Fix bug that caused Airflow to look for DAGs in plugins dir instead of dags dir
+
 ### Breaks
 
 
