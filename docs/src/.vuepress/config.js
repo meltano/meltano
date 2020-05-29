@@ -4,6 +4,7 @@ const docsSidebar = [
   "/docs/getting-started",
   "/docs/command-line-interface",
   "/docs/environment-variables",
+  "/docs/production",
   "/docs/transforms",
   "/docs/orchestration",
   "/docs/analysis",

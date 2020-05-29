@@ -2,7 +2,7 @@
 home: true
 heroImage: /meltano-logo.svg
 metaTitle: "Meltano: open source data pipelines"
-description: Meltano is an open source platform for building, running & orchestrating ELT pipelines built out of Singer taps and targets and dbt models, that you can run locally or host on any cloud. Our goal is to make the power of data integration available to all by building a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
+description: Meltano is an open source platform for building, running & orchestrating ELT pipelines built out of Singer taps and targets and dbt models, that you can run locally or easily deploy in production. Our goal is to make the power of data integration available to all by building a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
 installation:
   primaryAction:
     text: Install now
@@ -26,7 +26,7 @@ orchestration:
 # Open source data pipelines
 
 Meltano is an [open source](https://gitlab.com/meltano/meltano) platform for
-building, running & orchestrating ELT pipelines built out of [Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com) models, that you can [run locally or host on any cloud](/docs/installation.html).
+building, running & orchestrating ELT pipelines built out of [Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com) models, that you can [run locally](/docs/installation.html) or [easily deploy in production](/docs/production.html).
 
 Our goal is to [make the power of data integration available to all](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/)
 by building a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
@@ -72,7 +72,7 @@ how the pipelines should be [orchestrated](/#orchestration),
 and how the various components should be [configured](/#meltano-config).
 
 Since a Meltano project is just a directory on your filesystem containing
-text-based files, you can use it like any other software development project
+text-based files, you can treat it like any other software development project
 and benefit from DevOps best practices such as version control, code review,
 and continuous integration and delivery.
 
@@ -85,8 +85,12 @@ which will create a new directory with:
 - stubs for `.gitignore`, `docker-compose.yml`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
 - empty `model`, `extract`, `load`, `analyze`, and `notebook` directories for you to use (or delete) as you please.
 
-Note that whenever you [add a new plugin](/#meltano-add), it will be installed into your project's (gitignored) `.meltano` directory automatically.
-However, when you clone or pull an existing Meltano project from version control, you'll want to explicitly run [`meltano install`](/docs/command-line-interface.html#install) before any other `meltano` commands to install (or update) all plugins specified in `meltano.yml`.
+Whenever you [add a new plugin](/#meltano-add) to a Meltano project, it will be
+installed into your project's `.meltano` directory automatically.
+However, since this directory is included in your project's `.gitignore` file
+by default, you'll need to explicitly run [`meltano install`](/docs/command-line-interface.html#install)
+before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
+to install (or update) all plugins specified in `meltano.yml`.
 :::
 
 ::: slot meltano-init-code
