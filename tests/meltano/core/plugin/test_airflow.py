@@ -21,7 +21,7 @@ class TestAirflow:
         ) as install_plugin:
             return project_add_service.add(PluginType.ORCHESTRATORS, "airflow")
 
-    def test_after_install(self, subject, project, session):
+    def test_before_configure(self, subject, project, session, plugin_invoker_factory):
         handle_mock = mock.Mock()
         handle_mock.wait.return_value = 0
 
@@ -43,7 +43,10 @@ class TestAirflow:
         # fmt: off
         with mock.patch.object(AirflowInvoker, "invoke", side_effect=invoke_mock) as invoke, \
           mock.patch("meltano.core.plugin_invoker.PluginConfigService.configure") as configure:
-            subject.after_install(project)
+            invoker = plugin_invoker_factory(subject)
+            # This ends up calling subject.before_configure
+            invoker.prepare(session)
+
             commands = [args[0]
                         for name, args, kwargs in invoke.mock_calls]
             assert commands == ["--help", "initdb"]

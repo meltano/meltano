@@ -15,7 +15,7 @@ class SingerPlugin(PluginInstall):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
 
     @hook("before_configure")
-    def install_config_stub(self, invoker):
+    def before_configure(self, invoker, session):
         project = invoker.project
         plugin_dir = project.plugin_dir(self)
 
