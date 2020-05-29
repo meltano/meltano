@@ -93,7 +93,7 @@ class PluginInvoker:
         self.plugin_config = self.settings_service.as_config(session, self.plugin)
         self.plugin_config_env = self.settings_service.as_env(session, self.plugin)
 
-        with self.plugin.trigger_hooks("configure", self):
+        with self.plugin.trigger_hooks("configure", self, session):
             self.config_service.configure()
             self._prepared = True
 
@@ -115,8 +115,8 @@ class PluginInvoker:
     def Popen_options(self):
         return {}
 
-    def invoke(self, *args, env={}, **Popen):
-        if not self._prepared:
+    def invoke(self, *args, require_preparation=True, env={}, **Popen):
+        if require_preparation and not self._prepared:
             raise InvokerNotPreparedError()
 
         process = None
@@ -138,8 +138,8 @@ class PluginInvoker:
 
         return process
 
-    async def invoke_async(self, *args, env={}, **Popen):
-        if not self._prepared:
+    async def invoke_async(self, *args, require_preparation=True, env={}, **Popen):
+        if require_preparation and not self._prepared:
             raise InvokerNotPreparedError()
 
         process = None
