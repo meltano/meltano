@@ -394,13 +394,7 @@ meltano user add admin securepassword --role admin
 
 ## `upgrade`
 
-Upgrade Meltano to the latest version.
-
-This function will following process to upgrade Meltano:
-
-- Run `pip3 install --upgrade meltano`
-- Run the database migrations
-- Send a [SIGHUP](http://docs.gunicorn.org/en/stable/signals.html#reload-the-configuration) to the process running under the `.meltano/run/gunicorn.pid`, thus restarting the workers
+Upgrade Meltano and the Meltano project to the latest version.
 
 ## `version`
 

@@ -24,6 +24,7 @@ class UpgradeError(Exception):
 @cli.command()
 @click.option("--pip_url", type=str, envvar="MELTANO_UPGRADE_PIP_URL")
 @click.option("--force", is_flag=True, default=False, envvar="MELTANO_UPGRADE_FORCE")
+@click.option("--skip-package", is_flag=True, default=False)
 @project()
 @click.pass_context
 def upgrade(ctx, project, **kwargs):
