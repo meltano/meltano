@@ -72,7 +72,7 @@ how the pipelines should be [orchestrated](/#orchestration),
 and how the various components should be [configured](/#meltano-config).
 
 Since a Meltano project is just a directory on your filesystem containing
-text-based files, you can use it like any other software development project
+text-based files, you can treat it like any other software development project
 and benefit from DevOps best practices such as version control, code review,
 and continuous integration and delivery.
 
@@ -85,8 +85,12 @@ which will create a new directory with:
 - stubs for `.gitignore`, `docker-compose.yml`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
 - empty `model`, `extract`, `load`, `analyze`, and `notebook` directories for you to use (or delete) as you please.
 
-Note that whenever you [add a new plugin](/#meltano-add), it will be installed into your project's (gitignored) `.meltano` directory automatically.
-However, when you clone or pull an existing Meltano project from version control, you'll want to explicitly run [`meltano install`](/docs/command-line-interface.html#install) before any other `meltano` commands to install (or update) all plugins specified in `meltano.yml`.
+Whenever you [add a new plugin](/#meltano-add) to a Meltano project, it will be
+installed into your project's `.meltano` directory automatically.
+However, since this directory is included in your project's `.gitignore` file
+by default, you'll need to explicitly run [`meltano install`](/docs/command-line-interface.html#install)
+before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
+to install (or update) all plugins specified in `meltano.yml`.
 :::
 
 ::: slot meltano-init-code
