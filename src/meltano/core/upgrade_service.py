@@ -1,4 +1,5 @@
 import os
+import click
 import logging
 import psutil
 import importlib
@@ -27,7 +28,7 @@ class UpgradeService:
         self.project = project
         self.migration_service = migration_service or MigrationService(engine)
 
-    def reload(self):
+    def reload_ui(self):
         pid_file_path = self.project.run_dir("gunicorn.pid")
         try:
             with pid_file_path.open("r") as pid_file:
@@ -35,28 +36,47 @@ class UpgradeService:
 
                 process = psutil.Process(pid)
                 process.send_signal(signal.SIGHUP)
+        except FileNotFoundError:
+            pass
         except Exception as ex:
             logging.error(f"Cannot restart from `{pid_file_path}`: {ex}")
 
     def upgrade_package(self, pip_url: Optional[str] = None, force=False):
-        # we need to find out if the `meltano` module is installed as editable
-        editable = meltano.__file__.endswith("src/meltano/__init__.py")
+        meltano_file_path = "/src/meltano/__init__.py"
+        editable = meltano.__file__.endswith(meltano_file_path)
         editable = editable and not force
-
         if editable:
-            logging.info(
-                f"Skipping `meltano` upgrade because Meltano is installed as editable."
+            meltano_dir = meltano.__file__[0 : -len(meltano_file_path)]
+            click.echo(
+                f"{click.style('The `meltano` package could not be upgraded automatically', fg='red')} because it is installed from source."
             )
-        else:
-            pip_url = pip_url or "meltano"
-            run = subprocess.run(
-                ["pip", "install", "--upgrade", pip_url],
-                stderr=subprocess.PIPE,
-                universal_newlines=True,
+            click.echo(
+                f"To upgrade manually, navigate to `{meltano_dir}` and run `git pull`."
             )
+            return False
 
-            if run.returncode != 0:
-                raise UpgradeError(f"Failed to upgrade `meltano`.", run)
+        in_docker = os.path.exists("/.dockerenv")
+        if in_docker:
+            click.echo(
+                f"{click.style('The `meltano` package could not be upgraded automatically', fg='red')} because it is installed inside Docker."
+            )
+            click.echo(
+                f"To upgrade manually, pull the latest Docker image using `docker pull meltano/meltano` and recreate any containers you may have created."
+            )
+            return False
+
+        pip_url = pip_url or "meltano"
+        run = subprocess.run(
+            ["pip", "install", "--upgrade", pip_url],
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+        )
+
+        if run.returncode != 0:
+            raise UpgradeError(f"Failed to upgrade `meltano`.", run)
+
+        click.echo("The `meltano` package has been upgraded.")
+        return True
 
     def upgrade_files(self):
         """
@@ -69,13 +89,12 @@ class UpgradeService:
             bundle.find("transform/profile/profiles.yml"): self.project.root_dir(
                 "transform/profile/profiles.yml"
             ),
-            bundle.find(".gitignore"): self.project.root_dir(".gitignore"),
         }
 
         for src, dst in files_map.items():
             try:
                 shutil.copy(src, dst)
-                logging.info(f"{dst} has been updated.")
+                click.echo(f"Updated {dst}")
             except Exception as err:
                 logging.error(f"Meltano could not update {dst}: {err}")
 
@@ -86,11 +105,40 @@ class UpgradeService:
 
         ProjectCompiler(self.project).compile()
 
-    def upgrade(self, **kwargs):
-        self.upgrade_package(**kwargs)
+    def upgrade(self, skip_package=False, **kwargs):
+        package_upgraded = False
+        if not skip_package:
+            click.secho("Upgrading `meltano` package...", fg="blue")
+            package_upgraded = self.upgrade_package(**kwargs)
+
+            if not package_upgraded:
+                click.echo(
+                    "Then, run `meltano upgrade --skip-package` to upgrade your project based on the latest version."
+                )
+                return
+
+            click.echo()
+
+        click.secho("Applying updates to Meltano-managed files...", fg="blue")
         self.upgrade_files()
 
+        click.echo()
+        click.secho("Applying migrations to system database...", fg="blue")
         self.migration_service.upgrade()
         self.migration_service.seed(self.project)
 
+        click.echo()
+        click.secho("Recompiling models...", fg="blue")
         self.compile_models()
+
+        click.echo()
+        click.secho("Reloading UI if running...", fg="blue")
+        self.reload_ui()
+
+        click.echo()
+        if package_upgraded:
+            click.secho(
+                "Meltano and your Meltano project have been upgraded!", fg="green"
+            )
+        else:
+            click.secho("Your Meltano project has been upgraded!", fg="green")

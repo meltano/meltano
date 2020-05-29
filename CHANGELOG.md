@@ -12,7 +12,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2064](https://gitlab.com/meltano/meltano/-/issues/2064) Print environment-specific instructions when `meltano upgrade` is run from inside Docker
+
 ### Fixes
+
+- [#2080](https://gitlab.com/meltano/meltano/-/issues/2080) Don't try to overwrite .gitignore when upgrading Meltano and project
+- [#2065](https://gitlab.com/meltano/meltano/-/issues/2065) Don't have `meltano upgrade` complain when `meltano ui`'s `gunicorn` isn't running
 
 ### Breaks
 
