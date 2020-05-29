@@ -63,75 +63,62 @@ class Airflow(PluginInstall):
         # to make airflow installables without GPL dependency
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
-    @hook("after_install")
-    def after_install(self, project, args=[]):
-        _, Session = project_engine(project)
-        session = Session()
+    @hook("before_configure")
+    def before_configure(self, invoker, session):
+        project = invoker.project
 
-        plugin_config_service = PluginConfigService(
-            self,
-            config_dir=project.plugin_dir(self),
-            run_dir=project.run_dir(self.name),
+        stub_path = project.plugin_dir(self).joinpath("airflow.cfg")
+
+        # generate the default `airflow.cfg`
+        handle = invoker.invoke(
+            "--help",
+            require_preparation=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
+        handle.wait()
 
-        plugin_settings_service = PluginSettingsService(project)
-        airflow_cfg_path = plugin_config_service.run_dir.joinpath("airflow.cfg")
-        stub_path = plugin_config_service.config_dir.joinpath("airflow.cfg")
-        invoker = invoker_factory(
-            project,
-            self,
-            prepare_with_session=session,
-            plugin_config_service=plugin_config_service,
+        airflow_cfg_path = invoker.files["config"]
+        logging.debug(f"Generated default '{str(airflow_cfg_path)}'")
+
+        # move it to the config dir
+        shutil.move(airflow_cfg_path, stub_path)
+        airflow_cfg_path = stub_path
+        logging.debug(f"Moved to '{str(stub_path)}'")
+
+        # open the configuration and update it
+        # now we let's update the config to use our stubs
+        airflow_cfg = configparser.ConfigParser()
+
+        with airflow_cfg_path.open() as cfg:
+            airflow_cfg.read_file(cfg)
+            logging.debug(f"Loaded '{str(airflow_cfg_path)}'")
+
+        config = {}
+        for key, value in invoker.plugin_config.items():
+            nest(config, key, str(value))
+
+        for section, cfg in config.items():
+            airflow_cfg[section].update(cfg)
+            logging.debug(f"\tUpdated section [{section}] with {cfg}")
+
+        with airflow_cfg_path.open("w") as cfg:
+            airflow_cfg.write(cfg)
+            logging.debug(f"Saved '{str(airflow_cfg_path)}'")
+
+        # we've changed the configuration here, so we need to call
+        # prepare again on the invoker so it re-reads the configuration
+        # for the Airflow plugin
+        invoker.prepare(session)
+        handle = invoker.invoke(
+            "initdb",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
         )
+        initdb = handle.wait()
 
-        try:
-            # generate the default `airflow.cfg`
-            handle = invoker.invoke(
-                "--help", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-            )
-            handle.wait()
-            logging.debug(f"Generated default '{str(airflow_cfg_path)}'")
+        if initdb:
+            raise SubprocessError("airflow initdb failed", handle)
 
-            # move it to the config dir
-            shutil.move(airflow_cfg_path, stub_path)
-            airflow_cfg_path = stub_path
-            logging.debug(f"Moved to '{str(stub_path)}'")
-
-            # open the configuration and update it
-            # now we let's update the config to use our stubs
-            airflow_cfg = configparser.ConfigParser()
-
-            with airflow_cfg_path.open() as cfg:
-                airflow_cfg.read_file(cfg)
-                logging.debug(f"Loaded '{str(airflow_cfg_path)}'")
-
-            config = {}
-            for key, value in plugin_settings_service.as_config(session, self).items():
-                nest(config, key, str(value))
-
-            for section, cfg in config.items():
-                airflow_cfg[section].update(cfg)
-                logging.debug(f"\tUpdated section [{section}] with {cfg}")
-
-            with airflow_cfg_path.open("w") as cfg:
-                airflow_cfg.write(cfg)
-                logging.debug(f"Saved '{str(airflow_cfg_path)}'")
-
-            # we've changed the configuration here, so we need to call
-            # prepare again on the invoker so it re-reads the configuration
-            # for the Airflow plugin
-            invoker.prepare(session)
-            handle = invoker.invoke(
-                "initdb",
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                universal_newlines=True,
-            )
-            initdb = handle.wait()
-
-            if initdb:
-                raise SubprocessError("airflow initdb failed", handle)
-
-            logging.debug(f"Completed `airflow initdb`")
-        finally:
-            session.close()
+        logging.debug(f"Completed `airflow initdb`")

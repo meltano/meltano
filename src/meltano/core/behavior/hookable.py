@@ -52,13 +52,26 @@ class HookObject(metaclass=Hookable):
     derived classes hooks are called after their base class.
     """
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     @contextlib.contextmanager
     def trigger_hooks(self, hook_name, *args, **kwargs):
-        self.__class__.trigger(self, f"before_{hook_name}", *args, **kwargs)
+        try:
+            already_triggering = hook_name in self._triggering_hooks
+        except AttributeError:
+            self._triggering_hooks = set()
+            already_triggering = False
+
+        if not already_triggering:
+            self._triggering_hooks.add(hook_name)
+            self.__class__.trigger(self, f"before_{hook_name}", *args, **kwargs)
 
         yield
 
-        self.__class__.trigger(self, f"after_{hook_name}", *args, **kwargs)
+        if not already_triggering:
+            self.__class__.trigger(self, f"after_{hook_name}", *args, **kwargs)
+            self._triggering_hooks.remove(hook_name)
 
     @classmethod
     def trigger(cls, target, hook_name, *args, **kwargs):
