@@ -110,7 +110,9 @@ class PluginInvoker:
         return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
 
     def env(self):
-        return {**self.settings_service.env, **self.plugin_config_env}
+        env = {**self.settings_service.env, **self.plugin_config_env}
+        env.pop("PYTHONPATH", None)  # Ensure Meltano venv is not inherited
+        return env
 
     def Popen_options(self):
         return {}

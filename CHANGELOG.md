@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2077](https://gitlab.com/meltano/meltano/-/issues/2077) Fix potential dependency version conflicts by ensuring Meltano venv is not inherited by invoked plugins other than Airflow
+
 ### Breaks
 
 
