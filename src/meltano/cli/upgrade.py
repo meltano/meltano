@@ -32,7 +32,6 @@ def upgrade(ctx, project, **kwargs):
 
     try:
         upgrade_service.upgrade(**kwargs)
-        upgrade_service.reload()
     except UpgradeError as up:
         click.secho(str(up), fg="red")
         raise click.Abort()

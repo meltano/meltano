@@ -27,7 +27,7 @@ class UpgradeService:
         self.project = project
         self.migration_service = migration_service or MigrationService(engine)
 
-    def reload(self):
+    def reload_ui(self):
         pid_file_path = self.project.run_dir("gunicorn.pid")
         try:
             with pid_file_path.open("r") as pid_file:
@@ -35,6 +35,8 @@ class UpgradeService:
 
                 process = psutil.Process(pid)
                 process.send_signal(signal.SIGHUP)
+        except FileNotFoundError:
+            pass
         except Exception as ex:
             logging.error(f"Cannot restart from `{pid_file_path}`: {ex}")
 
@@ -93,3 +95,5 @@ class UpgradeService:
         self.migration_service.seed(self.project)
 
         self.compile_models()
+
+        self.reload_ui()
