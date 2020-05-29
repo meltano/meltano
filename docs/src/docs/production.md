@@ -1,10 +1,10 @@
 ---
-metaTitle: How to deploy Meltano to production
+metaTitle: How to deploy Meltano in production
 description: Learn how to run Meltano pipelines in production
 sidebarDepth: 2
 ---
 
-# Deploying To Production
+# Deployment in Production
 
 Once you've [set up a Meltano project](/#meltano-init) and
 [run some pipelines](/#integration) on your local machine,
