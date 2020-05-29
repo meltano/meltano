@@ -43,6 +43,8 @@ def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessio
     engine_session = (engine, create_session)
 
     if default:
+        os.environ["MELTANO_DATABASE_URI"] = engine_uri
+
         # register the default engine
         _engines[project] = engine_session
     else:

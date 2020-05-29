@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2076](https://gitlab.com/meltano/meltano/-/issues/2076) Fix bug that caused Airflow to look for DAGs in plugins dir instead of dags dir
 - [#2077](https://gitlab.com/meltano/meltano/-/issues/2077) Fix potential dependency version conflicts by ensuring Meltano venv is not inherited by invoked plugins other than Airflow
 - [#2075](https://gitlab.com/meltano/meltano/-/issues/2075) Update Airflow configand run `initdb` every time it is invoked
+- [#2078](https://gitlab.com/meltano/meltano/-/issues/2078) Have Airflow DAG respect non-default system database URI set through `MELTANO_DATABASE_URI` env var or `--database-uri` option
 
 ### Breaks
 
