@@ -39,7 +39,7 @@ class AirflowInvoker(PluginInvoker):
             if path.endswith(os.path.join("meltano", "src")):
                 sys_paths.append(path)
 
-        if "PYTHONPATH" in env:
+        if "PYTHONPATH" in env and env["PYTHONPATH"]:
             sys_paths.append(env["PYTHONPATH"])
 
         env["PYTHONPATH"] = os.pathsep.join(sys_paths)
