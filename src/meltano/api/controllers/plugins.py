@@ -108,7 +108,7 @@ def install_batch():
     related_plugins = add_service.add_related(plugin)
 
     install_service = PluginInstallService(project)
-    install_service.install_plugins(related_plugins)
+    install_service.install_plugins(related_plugins, newly_added=True)
 
     return jsonify([plugin.canonical() for plugin in related_plugins])
 
@@ -126,6 +126,6 @@ def install():
     plugin = config_service.find_plugin(plugin_name, plugin_type=plugin_type)
 
     install_service = PluginInstallService(project)
-    install_service.install_plugin(plugin)
+    install_service.install_plugin(plugin, newly_added=True)
 
     return jsonify(plugin.canonical())

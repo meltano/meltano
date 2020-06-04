@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-version: 11
+version: 12
 
 extractors:
   - name: tap-facebook
@@ -848,3 +848,21 @@ orchestrators:
       - name: core.dags_are_paused_at_creation
         env: AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION
         value: False
+files:
+  - name: airflow
+    namespace: airflow
+    pip_url: /Users/douwemaan/Development/meltano-plugins/files-airflow
+    settings:
+      - name: update.orchestrate/dags/meltano.py
+        kind: boolean
+        value: True
+  - name: dbt
+    namespace: dbt
+    pip_url: /Users/douwemaan/Development/meltano-plugins/files-dbt
+    settings:
+      - name: update.transform/profile/profiles.yml
+        kind: boolean
+        value: True
+  - name: docker-compose
+    namespace: docker-compose
+    pip_url: /Users/douwemaan/Development/meltano-plugins/files-docker-compose

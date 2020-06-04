@@ -1,21 +1,35 @@
 import click
+import json
+from click_default_group import DefaultGroup
+
 from . import cli
 from .params import project
 
 from meltano.core.db import project_engine
 from meltano.core.project import Project
+from meltano.core.plugin import PluginType
 from meltano.core.config_service import ConfigService
-from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin.settings_service import (
+    PluginSettingsService,
+    PluginSettingValueStore,
+)
 
 
 @cli.group(invoke_without_command=True)
+@click.option(
+    "--plugin-type",
+    type=click.Choice([type.singular for type in PluginType]),
+    default=None,
+)
 @click.argument("plugin_name")
-@click.option("--format", default="json")
+@click.option("--format", type=click.Choice(["json", "env"]), default="json")
 @project(migrate=True)
 @click.pass_context
-def config(ctx, project, plugin_name, format):
+def config(ctx, project, plugin_type, plugin_name, format):
+    plugin_type = PluginType(f"{plugin_type}s") if plugin_type else None
+
     config = ConfigService(project)
-    plugin = config.find_plugin(plugin_name)
+    plugin = config.find_plugin(plugin_name, plugin_type=plugin_type, configurable=True)
 
     _, Session = project_engine(project)
     session = Session()
@@ -27,9 +41,9 @@ def config(ctx, project, plugin_name, format):
 
     if ctx.invoked_subcommand is None:
         if format == "json":
-            print(settings.as_config(session, plugin))
-
-        if format == "env":
+            config = settings.as_config(session, plugin)
+            print(json.dumps(config))
+        elif format == "env":
             for env, value in settings.as_env(session, plugin).items():
                 print(f"{env}={value}")
 
@@ -37,35 +51,49 @@ def config(ctx, project, plugin_name, format):
 @config.command()
 @click.argument("setting_name")
 @click.argument("value")
+@click.option(
+    "--store",
+    type=click.Choice(list(PluginSettingValueStore)),
+    default=PluginSettingValueStore.MELTANO_YML,
+)
 @click.pass_context
-def set(ctx, setting_name, value):
+def set(ctx, setting_name, value, store):
     settings = ctx.obj["settings"]
     plugin = ctx.obj["plugin"]
     session = ctx.obj["session"]
 
-    settings.set(session, plugin, setting_name, value)
+    settings.set(session, plugin, setting_name, value, store)
 
 
 @config.command()
 @click.argument("setting_name")
+@click.option(
+    "--store",
+    type=click.Choice(list(PluginSettingValueStore)),
+    default=PluginSettingValueStore.MELTANO_YML,
+)
 @click.pass_context
-def unset(ctx, setting_name):
+def unset(ctx, setting_name, store):
     settings = ctx.obj["settings"]
     plugin = ctx.obj["plugin"]
     session = ctx.obj["session"]
 
-    settings.unset(session, plugin, setting_name)
+    settings.unset(session, plugin, setting_name, store)
 
 
 @config.command()
+@click.option(
+    "--store",
+    type=click.Choice(list(PluginSettingValueStore)),
+    default=PluginSettingValueStore.MELTANO_YML,
+)
 @click.pass_context
-def reset(ctx):
+def reset(ctx, store):
     settings = ctx.obj["settings"]
     plugin = ctx.obj["plugin"]
     session = ctx.obj["session"]
 
-    for setting in settings.definitions(plugin):
-        settings.unset(session, plugin, setting.name)
+    settings.reset(session, plugin, store)
 
 
 @config.command()

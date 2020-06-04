@@ -4,7 +4,7 @@ from datetime import datetime, date
 
 
 from typing import Iterable, List
-from meltano.core.plugin import PluginInstall
+from meltano.core.plugin import PluginInstall, PluginType
 from meltano.core.plugin.factory import plugin_factory
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior import NameEq
@@ -39,10 +39,10 @@ class MeltanoFile(Canonical):
     def __init__(self, **attrs):
         super().__init__(
             version=int(attrs.pop("version", VERSION)),
-            plugins=self.load_plugins(attrs.pop("plugins", {})),
-            schedules=self.load_schedules(attrs.pop("schedules", [])),
             send_anonymous_usage_stats=attrs.pop("send_anonymous_usage_stats", None),
             project_id=attrs.pop("project_id", None),
+            plugins=self.load_plugins(attrs.pop("plugins", {})),
+            schedules=self.load_schedules(attrs.pop("schedules", [])),
             **attrs
         )
 
@@ -50,14 +50,15 @@ class MeltanoFile(Canonical):
         """Parse the meltano.yml file and return it as `PluginInstall` instances."""
         plugin_type_plugins = Canonical()
 
+        for plugin_type in PluginType:
+            plugin_type_plugins[plugin_type] = []
+
         # this will parse the meltano.yml file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
         for plugin_type, plugin_defs in plugins.items():
-            plugin_type_plugins[plugin_type] = []
-
             for plugin_def in plugin_defs:
                 plugin = plugin_factory(plugin_type, plugin_def)
-                plugin_type_plugins[plugin_type].append(plugin)
+                plugin_type_plugins[plugin.type].append(plugin)
 
         return plugin_type_plugins
 

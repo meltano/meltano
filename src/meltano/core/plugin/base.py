@@ -76,6 +76,7 @@ class PluginType(YAMLEnum):
     DASHBOARDS = "dashboards"
     ORCHESTRATORS = "orchestrators"
     TRANSFORMERS = "transformers"
+    FILES = "files"
 
     def __str__(self):
         return self.value
@@ -136,30 +137,48 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         self,
         plugin_type: PluginType,
         name: str,
+        label: Optional[str] = None,
+        namespace: Optional[str] = None,
         pip_url: Optional[str] = None,
-        select=set(),
+        capabilities: list = [],
+        select: list = [],
         config={},
-        profiles=set(),
+        settings: list = [],
+        profiles: list = [],
         executable: str = None,
         **attrs,
     ):
-        super().__init__(plugin_type, name, **attrs)
+        super().__init__(
+            plugin_type,
+            name,
+            label=label,
+            namespace=namespace,
+            pip_url=pip_url,
+            executable=executable,
+            capabilities=list(capabilities),
+            settings=list(map(SettingDefinition.parse, settings)),
+            select=list(select),
+            config=copy.deepcopy(config),
+            profiles=list(map(Profile.parse, profiles)),
+            **attrs,
+        )
 
-        self.config = copy.deepcopy(config)
-        self.profiles = set(map(Profile.parse, profiles))
-        self.select = set(select)
-        self.pip_url = pip_url
-        self.executable = executable
         self._extras = attrs
 
     def is_installable(self):
         return self.pip_url is not None
 
+    def is_invokable(self):
+        return self.is_installable()
+
+    def is_configurable(self):
+        return True
+
+    def should_add_to_file(self, project):
+        return True
+
     def is_custom(self):
-        try:
-            return bool(self.namespace)
-        except AttributeError:
-            return False
+        return self.namespace is not None
 
     def get_profile(self, profile_name: str) -> Profile:
         if profile_name == Profile.DEFAULT.name:
@@ -201,12 +220,12 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         return dict()
 
     def add_select_filter(self, filter: str):
-        self.select.add(filter)
+        self.select.append(filter)
 
     def add_profile(self, name: str, config: dict = None, label: str = None):
         profile = Profile(name=name, config=config, label=label)
 
-        self.profiles.add(profile)
+        self.profiles.append(profile)
         return profile
 
 
@@ -223,25 +242,31 @@ class Plugin(Canonical, PluginRef):
         plugin_type: PluginType,
         name: str,
         namespace: str,
+        label: Optional[str] = None,
         pip_url: Optional[str] = None,
         settings: list = [],
         settings_group_validation: list = [],
         docs=None,
         description=None,
-        capabilities=set(),
-        select=set(),
+        capabilities: list = [],
+        select: list = [],
         **attrs,
     ):
-        super().__init__(plugin_type, name, **attrs)
+        super().__init__(
+            plugin_type,
+            name,
+            label=label,
+            namespace=namespace,
+            pip_url=pip_url,
+            description=description,
+            docs=docs,
+            capabilities=list(capabilities),
+            settings_group_validation=list(settings_group_validation),
+            settings=list(map(SettingDefinition.parse, settings)),
+            select=list(select),
+            **attrs,
+        )
 
-        self.namespace = namespace
-        self.pip_url = pip_url
-        self.settings = list(map(SettingDefinition.parse, settings))
-        self.settings_group_validation = list(settings_group_validation)
-        self.docs = docs
-        self.description = description
-        self.capabilities = set(capabilities)
-        self.select = set(select)
         self._extras = attrs
 
     def as_installed(self, custom=False) -> PluginInstall:
