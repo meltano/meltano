@@ -89,7 +89,7 @@ class PluginInstallService:
                 return run
         except SubprocessError as err:
             raise PluginInstallError(
-                f"{plugin.type.singular} '{plugin.name}' could not be installed: {err}",
+                f"{plugin.type.descriptor} '{plugin.name}' could not be installed: {err}",
                 err.process,
             ) from err
 

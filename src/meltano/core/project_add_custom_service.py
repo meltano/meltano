@@ -19,7 +19,7 @@ class ProjectAddCustomService:
 
     def add(self, plugin_type: PluginType, plugin_name: str):
         click.secho(
-            f"Adding new custom {plugin_type.singular} plugin with name '{plugin_name}'...",
+            f"Adding new custom {plugin_type.descriptor} plugin with name '{plugin_name}'...",
             fg="green",
         )
         click.echo()

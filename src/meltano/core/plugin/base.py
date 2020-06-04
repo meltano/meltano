@@ -82,13 +82,37 @@ class PluginType(YAMLEnum):
         return self.value
 
     @property
+    def descriptor(self):
+        if self is self.__class__.FILES:
+            return "file plugin"
+
+        return self.singular
+
+    @property
     def singular(self):
         """Makes it singular for `meltano add PLUGIN_TYPE`"""
         return self.value[:-1]
 
+    @property
+    def verb(self):
+        return self.value[:-3]
+
     @classmethod
     def value_exists(cls, value):
         return value in cls._value2member_map_
+
+    @classmethod
+    def cli_arguments(cls):
+        args = [type.singular for type in cls]
+        args.extend([type for type in cls])
+        return args
+
+    @classmethod
+    def from_cli_argument(cls, value):
+        if not value.endswith("s"):
+            value += "s"
+
+        return cls(value)
 
 
 class PluginRef:

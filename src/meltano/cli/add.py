@@ -31,17 +31,21 @@ from meltano.core.db import project_engine
 
 
 @cli.command()
-@click.argument(
-    "plugin_type", type=click.Choice([type.singular for type in PluginType])
-)
+@click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_name")
 @click.option("--custom", is_flag=True)
 @click.option("--include-related", is_flag=True)
 @project()
 @click.pass_context
 def add(ctx, project, plugin_type, plugin_name, **flags):
+    plugin_type = PluginType.from_cli_argument(plugin_type)
+
     if flags["custom"]:
-        if plugin_type in ("transformer", "transform", "orchestrator"):
+        if plugin_type in (
+            PluginType.TRANSFORMER,
+            PluginType.TRANSFORM,
+            PluginType.ORCHESTRATOR,
+        ):
             click.secho(f"--custom is not supported for {ctx.invoked_subcommand}")
             raise click.Abort()
 
@@ -52,7 +56,7 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
     add_plugin(
         add_service,
         project,
-        PluginType(f"{plugin_type}s"),
+        plugin_type,
         plugin_name,
         include_related=flags["include_related"],
     )
@@ -72,24 +76,25 @@ def add_plugin(
         plugin = add_service.add(plugin_type, plugin_name)
         if plugin.should_add_to_file(project):
             click.secho(
-                f"Added {plugin_type.singular} '{plugin_name}' to your Meltano project",
+                f"Added {plugin_type.descriptor} '{plugin_name}' to your Meltano project",
                 fg="green",
             )
         else:
             click.secho(
-                f"Adding {plugin_type.singular} '{plugin_name}' to your Meltano project...",
+                f"Adding {plugin_type.descriptor} '{plugin_name}' to your Meltano project...",
                 fg="green",
             )
     except PluginAlreadyAddedException as err:
         click.secho(
-            f"{plugin_type.singular} '{plugin_name}' is already in your Meltano project".capitalize(),
+            f"{plugin_type.descriptor} '{plugin_name}' is already in your Meltano project".capitalize(),
             fg="yellow",
             err=True,
         )
         plugin = err.plugin
     except (PluginNotSupportedException, PluginNotFoundError):
         click.secho(
-            f"Error: {plugin_type.singular} '{plugin_name}' is not supported", fg="red"
+            f"Error: {plugin_type.descriptor} '{plugin_name}' is not supported",
+            fg="red",
         )
         raise click.Abort()
 
@@ -106,12 +111,12 @@ def add_plugin(
     for related_plugin in related_plugins:
         if related_plugin.should_add_to_file(project):
             click.secho(
-                f"Added related {related_plugin.type.singular} '{related_plugin.name}' to your Meltano project",
+                f"Added related {related_plugin.type.descriptor} '{related_plugin.name}' to your Meltano project",
                 fg="green",
             )
         else:
             click.secho(
-                f"Adding related {related_plugin.type.singular} '{related_plugin.name}' to your Meltano project...",
+                f"Adding related {related_plugin.type.descriptor} '{related_plugin.name}' to your Meltano project...",
                 fg="green",
             )
 
@@ -122,5 +127,5 @@ def add_plugin(
     docs_link = plugin._extras.get("docs")
     if docs_link:
         click.echo(
-            f"For more details about {plugin.type.singular} '{plugin.name}', visit {docs_link}"
+            f"For more details about {plugin.type.descriptor} '{plugin.name}', visit {docs_link}"
         )

@@ -13,15 +13,13 @@ from meltano.core.db import project_engine
 
 @cli.command(context_settings=dict(ignore_unknown_options=True))
 @click.option(
-    "--plugin-type",
-    type=click.Choice([type.singular for type in PluginType]),
-    default=None,
+    "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
 )
 @click.argument("plugin_name")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
 @project(migrate=True)
 def invoke(project, plugin_type, plugin_name, plugin_args):
-    plugin_type = PluginType(f"{plugin_type}s") if plugin_type else None
+    plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
     _, Session = project_engine(project)
 
