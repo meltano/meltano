@@ -89,7 +89,8 @@ class PluginInstallService:
                 return run
         except SubprocessError as err:
             raise PluginInstallError(
-                f"{plugin.name} could not be installed: {err}", err.process
+                f"{plugin.type.singular} '{plugin.name}' could not be installed: {err}",
+                err.process,
             ) from err
 
     def compile_models(self):

@@ -148,16 +148,8 @@ class ProjectAddCustomService:
             ],
         )
 
-        install = plugin.as_installed(custom=True)
-        installed = self.config_service.add_to_file(install)
-        click.secho(
-            "The plugin has been added to your `meltano.yml`.\n"
-            "If your plugin requires configuration options, you can add them directly "
-            "in the created plugin definition under the `settings` or `config` section.",
-            fg="yellow",
-        )
-
-        return installed
+        installed = plugin.as_installed(custom=True)
+        return self.config_service.add_to_file(installed)
 
     def add_related(self, *args, **kwargs):
         return []

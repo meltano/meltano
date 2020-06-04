@@ -10,6 +10,12 @@ from .plugin.factory import plugin_factory
 from .plugin.error import PluginMissingError
 
 
+class PluginAlreadyAddedException(Exception):
+    def __init__(self, plugin: PluginRef):
+        self.plugin = plugin
+        super().__init__()
+
+
 class ConfigService:
     def __init__(self, project: Project):
         self.project = project
@@ -24,15 +30,13 @@ class ConfigService:
             return plugin
 
         with self.project.meltano_update() as meltano_yml:
-            if not plugin in self.plugins():
-                if not plugin.type in meltano_yml.plugins:
-                    meltano_yml.plugins[plugin.type] = []
+            if plugin in self.plugins():
+                raise PluginAlreadyAddedException(plugin)
 
-                meltano_yml.plugins[plugin.type].append(plugin)
-            else:
-                logging.warning(
-                    f"{plugin.name} is already present, use `meltano install` to install it."
-                )
+            if not plugin.type in meltano_yml.plugins:
+                meltano_yml.plugins[plugin.type] = []
+
+            meltano_yml.plugins[plugin.type].append(plugin)
 
         return plugin
 

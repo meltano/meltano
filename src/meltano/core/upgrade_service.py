@@ -98,7 +98,7 @@ class UpgradeService:
         """
         Update the files managed by Meltano inside the current project.
         """
-        click.secho("Updating plugin-provided files...", fg="blue")
+        click.secho("Updating files managed by plugins...", fg="blue")
 
         file_plugins = ConfigService(self.project).get_files()
         for plugin in file_plugins:

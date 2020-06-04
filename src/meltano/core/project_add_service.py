@@ -8,17 +8,11 @@ from .project import Project
 from .plugin import PluginType, PluginInstall, PluginRef
 from .plugin_discovery_service import PluginDiscoveryService
 from .plugin.factory import plugin_factory
-from .config_service import ConfigService
+from .config_service import ConfigService, PluginAlreadyAddedException
 
 
 class PluginNotSupportedException(Exception):
     pass
-
-
-class PluginAlreadyAddedException(Exception):
-    def __init__(self, plugin: PluginRef):
-        self.plugin = plugin
-        super().__init__()
 
 
 class MissingPluginException(Exception):

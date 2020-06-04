@@ -33,20 +33,21 @@ class FilePlugin(PluginInstall):
             and path != bundle_dir.joinpath("__init__.py")
         }
 
+    def update_file_header(self, relative_path):
+        return "\n".join(
+            [
+                f"# This file is managed by the '{self.name}' plugin and updated automatically when `meltano upgrade` is run.",
+                "# To prevent any manual changes from being overwritten, disable automatic updates first:",
+                f"#     meltano config --plugin-type=file {self.name} set update.{relative_path} false",
+            ]
+        )
+
     def project_file_contents(self, project):
         def prepend_update_header(content, relative_path):
-            if not self.should_update_file(project, relative_path):
-                return content
+            if self.should_update_file(project, relative_path):
+                content = "\n\n".join([self.update_file_header(relative_path), content])
 
-            return "\n".join(
-                [
-                    "# This file is managed by Meltano and updated automatically when `meltano upgrade` is run.",
-                    "# To prevent any manual changes from being overwritten, disable automatic updates first:",
-                    f"#     meltano config --plugin-type=file {self.name} set update.{relative_path} false",
-                    "",
-                    content,
-                ]
-            )
+            return content
 
         return {
             relative_path: prepend_update_header(content, relative_path)
