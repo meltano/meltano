@@ -126,10 +126,13 @@ class PluginSettingsService:
         sources: List[PluginSettingValueSource] = None,
         redacted=False,
     ):
-        setting_names = [
-            *(setting.name for setting in self.definitions(plugin)),
-            *(key for key in self.get_install(plugin).current_config.keys()),
-        ]
+        setting_names = [setting.name for setting in self.definitions(plugin)]
+
+        try:
+            plugin_install = self.get_install(plugin)
+            setting_names.extend(self.get_install(plugin).current_config.keys())
+        except PluginMissingError:
+            pass
 
         config = {}
         for name in setting_names:
@@ -226,13 +229,17 @@ class PluginSettingsService:
         return value
 
     def get_value(self, session, plugin: PluginRef, name: str, redacted=False):
-        plugin_install = self.get_install(plugin)
         plugin_def = self.get_definition(plugin)
 
         try:
             setting_def = self.find_setting(plugin, name)
         except PluginSettingMissingError:
             setting_def = None
+
+        try:
+            plugin_install = self.get_install(plugin)
+        except PluginMissingError:
+            plugin_install = None
 
         def config_override_getter():
             try:
@@ -256,6 +263,9 @@ class PluginSettingsService:
                 )
 
         def meltano_yml_getter():
+            if not plugin_install:
+                return None
+
             try:
                 value = plugin_install.current_config[name]
                 return self.expand_env_vars(value)
