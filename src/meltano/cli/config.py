@@ -1,4 +1,6 @@
 import click
+import json
+
 from . import cli
 from .params import project
 
@@ -10,7 +12,7 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 
 @cli.group(invoke_without_command=True)
 @click.argument("plugin_name")
-@click.option("--format", default="json")
+@click.option("--format", type=click.Choice(["json", "env"]), default="json")
 @project(migrate=True)
 @click.pass_context
 def config(ctx, project, plugin_name, format):
@@ -27,9 +29,9 @@ def config(ctx, project, plugin_name, format):
 
     if ctx.invoked_subcommand is None:
         if format == "json":
-            print(settings.as_config(session, plugin))
-
-        if format == "env":
+            config = settings.as_config(session, plugin)
+            print(json.dumps(config))
+        elif format == "env":
             for env, value in settings.as_env(session, plugin).items():
                 print(f"{env}={value}")
 
