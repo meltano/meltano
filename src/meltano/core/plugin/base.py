@@ -89,6 +89,14 @@ class PluginType(YAMLEnum):
     def value_exists(cls, value):
         return value in cls._value2member_map_
 
+    @classmethod
+    def cli_arguments(cls):
+        return [type.singular for type in cls]
+
+    @classmethod
+    def from_cli_argument(cls, value):
+        return cls(f"{value}s")
+
 
 class PluginRef:
     def __init__(self, plugin_type: Union[str, PluginType], name: str):

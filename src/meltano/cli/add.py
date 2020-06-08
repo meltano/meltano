@@ -30,17 +30,21 @@ from meltano.core.db import project_engine
 
 
 @cli.command()
-@click.argument(
-    "plugin_type", type=click.Choice([type.singular for type in list(PluginType)])
-)
+@click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_name")
 @click.option("--custom", is_flag=True)
 @click.option("--include-related", is_flag=True)
 @project()
 @click.pass_context
 def add(ctx, project, plugin_type, plugin_name, **flags):
+    plugin_type = PluginType.from_cli_argument(plugin_type)
+
     if flags["custom"]:
-        if plugin_type in ("transformer", "transform", "orchestrator"):
+        if plugin_type in (
+            PluginType.TRANSFORMERS,
+            PluginType.TRANSFORMS,
+            PluginType.ORCHESTRATORS,
+        ):
             click.secho(f"--custom is not supported for {ctx.invoked_subcommand}")
             raise click.Abort()
 
@@ -51,7 +55,7 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
     add_plugin(
         add_service,
         project,
-        PluginType(f"{plugin_type}s"),
+        plugin_type,
         plugin_name,
         include_related=flags["include_related"],
     )
