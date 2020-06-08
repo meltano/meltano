@@ -115,7 +115,7 @@ class Project(Versioned):
             try:
                 with atomic_write(self.meltanofile, overwrite=True) as meltanofile:
                     # update if everything is fine
-                    yaml.dump(meltano_update, meltanofile, default_flow_style=False)
+                    yaml.dump(meltano_update, meltanofile, default_flow_style=False, sort_keys=False)
             except Exception as err:
                 logging.critical(f"Could not update meltano.yml: {err}")
                 raise
