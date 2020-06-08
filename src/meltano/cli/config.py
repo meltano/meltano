@@ -4,18 +4,24 @@ from .params import project
 
 from meltano.core.db import project_engine
 from meltano.core.project import Project
+from meltano.core.plugin import PluginType
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin.settings_service import PluginSettingsService
 
 
 @cli.group(invoke_without_command=True)
+@click.option(
+    "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
+)
 @click.argument("plugin_name")
 @click.option("--format", default="json")
 @project(migrate=True)
 @click.pass_context
-def config(ctx, project, plugin_name, format):
+def config(ctx, project, plugin_type, plugin_name, format):
+    plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
+
     config = ConfigService(project)
-    plugin = config.find_plugin(plugin_name)
+    plugin = config.find_plugin(plugin_name, plugin_type=plugin_type)
 
     _, Session = project_engine(project)
     session = Session()
