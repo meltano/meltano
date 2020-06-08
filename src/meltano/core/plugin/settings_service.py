@@ -244,6 +244,32 @@ class PluginSettingsService:
     ):
         return self.set(session, plugin, name, None, store)
 
+    def reset(self, session, plugin: PluginRef, store=PluginSettingValueStore.DB):
+        plugin_install = self.get_install(plugin)
+        plugin_def = self.get_definition(plugin)
+
+        def meltano_yml_resetter():
+            plugin_install.current_config.clear()
+            self.config_service.update_plugin(plugin_install)
+            return True
+
+        def db_resetter():
+            session.query(PluginSetting).filter_by(
+                namespace=plugin.qualified_name
+            ).delete()
+            session.commit()
+            return True
+
+        config_resetters = {
+            PluginSettingValueStore.MELTANO_YML: meltano_yml_resetter,
+            PluginSettingValueStore.DB: db_resetter,
+        }
+
+        if not config_resetters[store]():
+            return False
+
+        return True
+
     def get_definition(self, plugin: PluginRef) -> Plugin:
         return self.discovery_service.find_plugin(plugin.type, plugin.name)
 
