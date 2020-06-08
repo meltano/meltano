@@ -72,22 +72,6 @@ class TestPluginSettingsService:
             PluginSettingValueSource.DB,
         )
 
-        # but only if enabled
-        setting.enabled = False
-        setting_with_profile.enabled = False
-        session.merge(setting)
-        session.merge(setting_with_profile)
-        session.commit()
-
-        assert subject.get_value(session, tap, "test") == (
-            "mock",
-            PluginSettingValueSource.DEFAULT,
-        )
-        assert subject.get_value(session, tap_with_profile, "test") == (
-            "mock",
-            PluginSettingValueSource.DEFAULT,
-        )
-
         # overriden via the `meltano.yml` configuration
         with project.meltano_update() as meltano:
             extractor = meltano.plugins.extractors[0]
