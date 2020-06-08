@@ -18,7 +18,7 @@ class TestCliAdd:
             (PluginType.LOADERS, "target-sqlite"),
             (PluginType.TRANSFORMS, "tap-carbon-intensity"),
             (PluginType.MODELS, "model-carbon-intensity"),
-            (PluginType.DASHBOARDS, "dashboard-google-analytics"),
+            (PluginType.DASHBOARDS, "dashboard-gitlab"),
             (PluginType.ORCHESTRATORS, "airflow"),
             (PluginType.TRANSFORMERS, "dbt"),
         ],
@@ -28,20 +28,20 @@ class TestCliAdd:
         with pytest.raises(PluginMissingError):
             config_service.find_plugin(plugin_name, plugin_type=plugin_type)
 
-        with mock.patch(
-            "meltano.cli.add.PluginInstallService.install_plugin"
-        ) as install_plugin_mock:
-            install_plugin_mock.return_value = mock.Mock(
-                stdout=f"Mocked {plugin_name} install."
-            )
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
             res = cli_runner.invoke(cli, ["add", plugin_type.singular, plugin_name])
 
         assert res.exit_code == 0, res.stdout
-        assert f"Installed '{plugin_name}'." in res.stdout
+        assert f"Added {plugin_type.descriptor} '{plugin_name}'" in res.stdout
 
         assert config_service.find_plugin(plugin_name, plugin_type)
 
     def test_add_transform(self, project, cli_runner):
+        # Add dbt and transform/ files
+        cli_runner.invoke(cli, ["add", "transformer", "dbt"])
+        cli_runner.invoke(cli, ["add", "files", "dbt"])
+
         res = cli_runner.invoke(cli, ["add", "transform", "tap-google-analytics"])
 
         assert res.exit_code == 0
@@ -81,10 +81,12 @@ class TestCliAdd:
         assert len(reports_service.get_reports()) == reports_count
 
     def test_add_related(self, project, cli_runner, config_service):
-        with mock.patch(
-            "meltano.cli.add.PluginInstallService.install_plugin"
-        ) as install_plugin_mock:
-            install_plugin_mock.return_value = mock.Mock(stdout=f"Mocked install.")
+        # Add dbt and transform/ files
+        cli_runner.invoke(cli, ["add", "transformer", "dbt"])
+        cli_runner.invoke(cli, ["add", "files", "dbt"])
+
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
             res = cli_runner.invoke(
                 cli, ["add", "--include-related", "extractor", "tap-google-analytics"]
             )
@@ -122,27 +124,22 @@ class TestCliAdd:
         with pytest.raises(PluginMissingError):
             config_service.find_plugin("tap-mock", PluginType.EXTRACTORS)
 
-    @mock.patch("meltano.cli.add.PluginInstallService", autospec=True)
-    def test_add_custom(
-        self, PluginInstallService, project, cli_runner, config_service
-    ):
-        service = PluginInstallService.return_value
-
-        # it's important to have a stdout
-        service.install_plugin.return_value.stdout = "Mocked install_plugin() called."
-        service.test = 100
-
+    def test_add_custom(self, project, cli_runner, config_service):
         stdin = os.linesep.join(
             # namespace, executable, pip_url
             ["custom", "-e path/to/tap-custom", "tap-custom-bin"]
         )
 
-        res = cli_runner.invoke(
-            cli, ["add", "--custom", "extractor", "tap-custom"], input=stdin
-        )
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            res = cli_runner.invoke(
+                cli, ["add", "--custom", "extractor", "tap-custom"], input=stdin
+            )
 
-        plugin = config_service.find_plugin("tap-custom", PluginType.EXTRACTORS)
-        assert plugin.name == "tap-custom"
-        assert plugin.executable == "tap-custom-bin"
+            plugin = config_service.find_plugin("tap-custom", PluginType.EXTRACTORS)
+            assert plugin.name == "tap-custom"
+            assert plugin.executable == "tap-custom-bin"
 
-        service.install_plugin.assert_called_once_with(plugin)
+            install_plugin_mock.assert_called_once_with(
+                project, [plugin], newly_added=True
+            )

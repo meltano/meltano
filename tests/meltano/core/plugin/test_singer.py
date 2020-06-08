@@ -5,6 +5,7 @@ from unittest import mock
 from pathlib import Path
 from copy import deepcopy
 
+from meltano.core.config_service import PluginAlreadyAddedException
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin_invoker import PluginInvoker
@@ -695,7 +696,10 @@ class TestListExecutor:
 class TestSingerTarget:
     @pytest.fixture
     def subject(self, project_add_service):
-        return project_add_service.add(PluginType.LOADERS, "target-mock")
+        try:
+            return project_add_service.add(PluginType.LOADERS, "target-mock")
+        except PluginAlreadyAddedException as err:
+            return err.plugin
 
     def test_exec_args(self, subject, session, plugin_invoker_factory):
         invoker = plugin_invoker_factory(subject, prepare_with_session=session)

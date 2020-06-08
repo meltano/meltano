@@ -2,22 +2,17 @@ import os
 import json
 import yaml
 import logging
+from typing import List
 
 from .project import Project
 from .plugin import PluginType, PluginInstall, PluginRef
 from .plugin_discovery_service import PluginDiscoveryService
 from .plugin.factory import plugin_factory
-from .config_service import ConfigService
+from .config_service import ConfigService, PluginAlreadyAddedException
 
 
 class PluginNotSupportedException(Exception):
     pass
-
-
-class PluginAlreadyAddedException(Exception):
-    def __init__(self, plugin: PluginRef):
-        self.plugin = plugin
-        super().__init__()
 
 
 class MissingPluginException(Exception):
@@ -42,22 +37,30 @@ class ProjectAddService:
         installed = plugin.as_installed()
         return self.config_service.add_to_file(installed)
 
-    def add_related(self, target_plugin: PluginInstall):
-        related_plugins = (
+    def add_related(
+        self,
+        target_plugin: PluginInstall,
+        plugin_types: List[PluginType] = list(PluginType),
+    ):
+        try:
+            plugin_types.remove(target_plugin.type)
+        except ValueError:
+            pass
+
+        related_plugins = [
             plugin
             for plugin in self.discovery_service.plugins()
             if plugin.namespace == target_plugin.namespace
-            and plugin.type != target_plugin.type
-        )
+            and plugin.type in plugin_types
+        ]
 
-        installed_plugins = self.config_service.plugins()
-
-        added = []
+        added_plugins = []
         for plugin in related_plugins:
-            if plugin in installed_plugins:
-                continue
+            try:
+                plugin_install = self.add(plugin.type, plugin.name)
 
-            plugin_install = self.add(plugin.type, plugin.name)
-            added.append(plugin_install)
+                added_plugins.append(plugin_install)
+            except PluginAlreadyAddedException:
+                pass
 
-        return added
+        return added_plugins

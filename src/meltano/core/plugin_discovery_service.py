@@ -36,7 +36,7 @@ MELTANO_DISCOVERY_URL = "https://www.meltano.com/discovery.yml"
 
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-VERSION = 11
+VERSION = 12
 
 
 class DiscoveryFile(Canonical):
@@ -45,9 +45,10 @@ class DiscoveryFile(Canonical):
 
         super().__init__(version=version)
 
-        for plugin_type, plugin_defs in attrs.items():
+        for plugin_type in PluginType:
             self[plugin_type] = []
 
+        for plugin_type, plugin_defs in attrs.items():
             for plugin_def in plugin_defs:
                 plugin = Plugin(
                     plugin_type,

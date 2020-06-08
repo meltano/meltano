@@ -10,6 +10,12 @@ from .plugin.factory import plugin_factory
 from .plugin.error import PluginMissingError
 
 
+class PluginAlreadyAddedException(Exception):
+    def __init__(self, plugin: PluginRef):
+        self.plugin = plugin
+        super().__init__()
+
+
 class ConfigService:
     def __init__(self, project: Project):
         self.project = project
@@ -18,18 +24,21 @@ class ConfigService:
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
 
     def add_to_file(self, plugin: PluginInstall):
+        plugin = plugin_factory(plugin.type, plugin.canonical())
+
+        if not plugin.should_add_to_file(self.project):
+            return plugin
+
         with self.project.meltano_update() as meltano_yml:
-            if not plugin in self.plugins():
-                if not plugin.type in meltano_yml.plugins:
-                    meltano_yml.plugins[plugin.type] = []
+            if plugin in self.plugins():
+                raise PluginAlreadyAddedException(plugin)
 
-                meltano_yml.plugins[plugin.type].append(plugin)
-            else:
-                logging.warning(
-                    f"{plugin.name} is already present, use `meltano install` to install it."
-                )
+            if not plugin.type in meltano_yml.plugins:
+                meltano_yml.plugins[plugin.type] = []
 
-        return plugin_factory(plugin.type, plugin.canonical())
+            meltano_yml.plugins[plugin.type].append(plugin)
+
+        return plugin
 
     def has_plugin(self, plugin_name: str):
         try:
@@ -38,7 +47,13 @@ class ConfigService:
         except PluginMissingError:
             return False
 
-    def find_plugin(self, plugin_name: str, plugin_type: Optional[PluginType] = None):
+    def find_plugin(
+        self,
+        plugin_name: str,
+        plugin_type: Optional[PluginType] = None,
+        invokable=None,
+        configurable=None,
+    ):
         name, profile_name = PluginRef.parse_name(plugin_name)
         try:
             plugin = next(
@@ -47,6 +62,10 @@ class ConfigService:
                 if (
                     plugin.name == name
                     and (plugin_type is None or plugin.type == plugin_type)
+                    and (invokable is None or plugin.is_invokable() == invokable)
+                    and (
+                        configurable is None or plugin.is_configurable() == configurable
+                    )
                 )
             )
             plugin.use_profile(profile_name)
@@ -75,7 +94,7 @@ class ConfigService:
             raise PluginMissingError(plugin_ref.name) from stop
 
     def get_plugins_of_type(self, plugin_type):
-        return filter(lambda p: p.type == plugin_type, self.plugins())
+        return self.project.meltano.plugins[plugin_type]
 
     def get_extractors(self):
         return self.get_plugins_of_type(PluginType.EXTRACTORS)
@@ -95,6 +114,9 @@ class ConfigService:
     def get_transformers(self):
         return self.get_plugins_of_type(PluginType.TRANSFORMERS)
 
+    def get_files(self):
+        return self.get_plugins_of_type(PluginType.FILES)
+
     def update_plugin(self, plugin: PluginInstall):
         with self.project.meltano_update() as meltano:
             # find the proper plugin to update
@@ -109,5 +131,8 @@ class ConfigService:
             return outdated
 
     def plugins(self) -> Iterable[PluginInstall]:
-        for plugin_type, plugins in self.project.meltano.plugins:
-            yield from plugins
+        yield from (
+            plugin
+            for plugin_type in PluginType
+            for plugin in self.project.meltano.plugins[plugin_type]
+        )

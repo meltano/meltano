@@ -1,13 +1,17 @@
 import pytest
 import os
 
+from meltano.core.config_service import PluginAlreadyAddedException
 from meltano.core.plugin import PluginType
 
 
 class TestELTContext:
     @pytest.fixture
     def target_postgres(self, project_add_service):
-        return project_add_service.add(PluginType.LOADERS, "target-postgres")
+        try:
+            return project_add_service.add(PluginType.LOADERS, "target-postgres")
+        except PluginAlreadyAddedException as err:
+            return err.plugin
 
     @pytest.fixture
     def elt_context(self, elt_context_builder, session, tap, target_postgres, dbt):

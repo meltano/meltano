@@ -47,7 +47,7 @@ class TransformAddService:
         package_yaml["packages"].append({"git": plugin.pip_url})
 
         with open(self.packages_file, "w") as f:
-            f.write(yaml.dump(package_yaml, default_flow_style=False))
+            f.write(yaml.dump(package_yaml, default_flow_style=False, sort_keys=False))
 
     def update_dbt_project(self, plugin: PluginInstall):
         discovery_service = PluginDiscoveryService(self.project)
@@ -59,4 +59,6 @@ class TransformAddService:
         dbt_project_yaml["models"][model_name] = plugin._extras
 
         with open(self.dbt_project_file, "w") as f:
-            f.write(yaml.dump(dbt_project_yaml, default_flow_style=False))
+            f.write(
+                yaml.dump(dbt_project_yaml, default_flow_style=False, sort_keys=False)
+            )

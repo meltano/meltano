@@ -32,9 +32,9 @@ class PluginInstallService:
 
     def install_all_plugins(self, status_cb=noop):
         # TODO: config service returns PluginInstall, not Plugin
-        return self.install_plugins(self.config_service.plugins())
+        return self.install_plugins(self.config_service.plugins(), status_cb=status_cb)
 
-    def install_plugins(self, plugins, status_cb=noop):
+    def install_plugins(self, plugins, status_cb=noop, newly_added=False):
         errors = []
         installed = []
         has_model = False
@@ -44,7 +44,9 @@ class PluginInstallService:
             status_cb(status)
 
             try:
-                self.install_plugin(plugin, compile_models=False)
+                self.install_plugin(
+                    plugin, compile_models=False, newly_added=newly_added
+                )
 
                 if plugin.type is PluginType.MODELS:
                     has_model = True
@@ -71,21 +73,26 @@ class PluginInstallService:
 
         return {"errors": errors, "installed": installed}
 
-    def install_plugin(self, plugin: PluginInstall, compile_models=True):
+    def install_plugin(
+        self, plugin: PluginInstall, compile_models=True, newly_added=False
+    ):
         if not plugin.is_installable():
             raise PluginNotInstallable()
 
         try:
-            with plugin.trigger_hooks("install", self.project):
+            with plugin.trigger_hooks("install", self.project, newly_added):
                 run = installer_factory(self.project, plugin).install()
 
                 if compile_models and plugin.type is PluginType.MODELS:
                     self.compile_models()
 
                 return run
+        except PluginInstallError:
+            raise
         except SubprocessError as err:
             raise PluginInstallError(
-                f"{plugin.name} could not be installed: {err}", err.process
+                f"{plugin.type.descriptor} '{plugin.name}' could not be installed: {err}".capitalize(),
+                err.process,
             ) from err
 
     def compile_models(self):

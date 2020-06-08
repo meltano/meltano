@@ -59,7 +59,7 @@ class Airflow(PluginInstall):
         return {"config": "airflow.cfg"}
 
     @hook("before_install")
-    def setup_env(self, project, args=[]):
+    def setup_env(self, project, newly_added):
         # to make airflow installables without GPL dependency
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
