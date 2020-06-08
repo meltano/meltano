@@ -45,9 +45,10 @@ class DiscoveryFile(Canonical):
 
         super().__init__(version=version)
 
-        for plugin_type, plugin_defs in attrs.items():
+        for plugin_type in PluginType:
             self[plugin_type] = []
 
+        for plugin_type, plugin_defs in attrs.items():
             for plugin_def in plugin_defs:
                 plugin = Plugin(
                     plugin_type,
