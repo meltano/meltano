@@ -1,5 +1,6 @@
 import pytest
 
+from meltano.core.config_service import PluginAlreadyAddedException
 from meltano.core.plugin import PluginType
 from meltano.core.connection_service import ConnectionService
 
@@ -24,7 +25,10 @@ class TestConnectionService:
         loader,
         analyze_params,
     ):
-        project_add_service.add(PluginType.LOADERS, loader)
+        try:
+            project_add_service.add(PluginType.LOADERS, loader)
+        except PluginAlreadyAddedException:
+            pass
 
         elt_context = (
             elt_context_builder.with_extractor(tap.name)
@@ -55,7 +59,10 @@ class TestConnectionService:
         loader,
         analyze_params,
     ):
-        project_add_service.add(PluginType.LOADERS, loader)
+        try:
+            project_add_service.add(PluginType.LOADERS, loader)
+        except PluginAlreadyAddedException:
+            pass
 
         elt_context = (
             elt_context_builder.with_extractor(tap.name)

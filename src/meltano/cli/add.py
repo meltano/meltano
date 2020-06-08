@@ -42,9 +42,9 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
 
     if flags["custom"]:
         if plugin_type in (
-            PluginType.TRANSFORMER,
-            PluginType.TRANSFORM,
-            PluginType.ORCHESTRATOR,
+            PluginType.TRANSFORMERS,
+            PluginType.TRANSFORMS,
+            PluginType.ORCHESTRATORS,
         ):
             click.secho(f"--custom is not supported for {ctx.invoked_subcommand}")
             raise click.Abort()
@@ -122,10 +122,13 @@ def add_plugin(
 
     plugins = [plugin, *related_plugins]
 
-    install_plugins(project, plugins, newly_added=True)
+    success = install_plugins(project, plugins, newly_added=True)
 
     docs_link = plugin._extras.get("docs")
     if docs_link:
         click.echo(
             f"For more details about {plugin.type.descriptor} '{plugin.name}', visit {docs_link}"
         )
+
+    if not success:
+        raise click.Abort()

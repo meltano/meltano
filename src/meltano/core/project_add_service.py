@@ -47,18 +47,20 @@ class ProjectAddService:
         except ValueError:
             pass
 
-        related_plugins = (
+        related_plugins = [
             plugin
             for plugin in self.discovery_service.plugins()
             if plugin.namespace == target_plugin.namespace
             and plugin.type in plugin_types
-        )
+        ]
 
-        installed_plugins = self.config_service.plugins()
-        plugins_to_add = [p for p in related_plugins if p not in installed_plugins]
         added_plugins = []
-        for plugin in plugins_to_add:
-            plugin_install = self.add(plugin.type, plugin.name)
-            added_plugins.append(plugin_install)
+        for plugin in related_plugins:
+            try:
+                plugin_install = self.add(plugin.type, plugin.name)
+
+                added_plugins.append(plugin_install)
+            except PluginAlreadyAddedException:
+                pass
 
         return added_plugins

@@ -1,5 +1,6 @@
 import pytest
 
+from meltano.core.config_service import PluginAlreadyAddedException
 from meltano.core.plugin import PluginRef, PluginType, PluginInstall
 from meltano.core.plugin.setting import PluginSetting
 from meltano.core.plugin.settings_service import (
@@ -33,7 +34,10 @@ def env_var(plugin_discovery_service, plugin_settings_service):
 
 @pytest.fixture
 def subject(session, project_add_service, tap, plugin_settings_service):
-    plugin = project_add_service.add("extractors", tap.name)
+    try:
+        project_add_service.add("extractors", tap.name)
+    except PluginAlreadyAddedException:
+        pass
 
     return plugin_settings_service
 
@@ -70,22 +74,6 @@ class TestPluginSettingsService:
         assert subject.get_value(session, tap_with_profile, "test") == (
             "THIS_IS_FROM_DB_WITH_PROFILE",
             PluginSettingValueSource.DB,
-        )
-
-        # but only if enabled
-        setting.enabled = False
-        setting_with_profile.enabled = False
-        session.merge(setting)
-        session.merge(setting_with_profile)
-        session.commit()
-
-        assert subject.get_value(session, tap, "test") == (
-            "mock",
-            PluginSettingValueSource.DEFAULT,
-        )
-        assert subject.get_value(session, tap_with_profile, "test") == (
-            "mock",
-            PluginSettingValueSource.DEFAULT,
         )
 
         # overriden via the `meltano.yml` configuration

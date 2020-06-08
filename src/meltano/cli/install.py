@@ -50,6 +50,8 @@ def install_plugins(project, plugins, **kwargs):
             f"Installed {num_installed}/{num_installed+num_failed} plugins", fg=fg
         )
 
+    return num_failed == 0
+
 
 @cli.command()
 @click.argument(
@@ -96,7 +98,10 @@ def install(project, plugin_type, include_related):
 
     click.echo(f"Installing {len(plugins)} plugins...")
 
-    install_plugins(project, plugins)
+    success = install_plugins(project, plugins)
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_install()
+
+    if not success:
+        raise click.Abort()
