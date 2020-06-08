@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#2064](https://gitlab.com/meltano/meltano/-/issues/2064) Print environment-specific instructions when `meltano upgrade` is run from inside Docker
+- [#2087](https://gitlab.com/meltano/meltano/-/issues/2087) Skip plugins that are not configurable or invokable when finding plugin by name in `meltano config` and `meltano invoke`
 
 ### Fixes
 

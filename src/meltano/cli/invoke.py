@@ -26,7 +26,9 @@ def invoke(project, plugin_type, plugin_name, plugin_args):
     try:
         session = Session()
         config_service = ConfigService(project)
-        plugin = config_service.find_plugin(plugin_name, plugin_type=plugin_type)
+        plugin = config_service.find_plugin(
+            plugin_name, plugin_type=plugin_type, invokable=True
+        )
         service = invoker_factory(project, plugin, prepare_with_session=session)
         handle = service.invoke(*plugin_args)
 

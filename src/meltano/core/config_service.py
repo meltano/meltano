@@ -38,7 +38,13 @@ class ConfigService:
         except PluginMissingError:
             return False
 
-    def find_plugin(self, plugin_name: str, plugin_type: Optional[PluginType] = None):
+    def find_plugin(
+        self,
+        plugin_name: str,
+        plugin_type: Optional[PluginType] = None,
+        invokable=None,
+        configurable=None,
+    ):
         name, profile_name = PluginRef.parse_name(plugin_name)
         try:
             plugin = next(
@@ -47,6 +53,10 @@ class ConfigService:
                 if (
                     plugin.name == name
                     and (plugin_type is None or plugin.type == plugin_type)
+                    and (invokable is None or plugin.is_invokable() == invokable)
+                    and (
+                        configurable is None or plugin.is_configurable() == configurable
+                    )
                 )
             )
             plugin.use_profile(profile_name)

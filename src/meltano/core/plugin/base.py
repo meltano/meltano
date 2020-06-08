@@ -163,6 +163,12 @@ class PluginInstall(HookObject, Canonical, PluginRef):
     def is_installable(self):
         return self.pip_url is not None
 
+    def is_invokable(self):
+        return self.is_installable()
+
+    def is_configurable(self):
+        return True
+
     def is_custom(self):
         try:
             return bool(self.namespace)

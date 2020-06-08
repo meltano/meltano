@@ -21,7 +21,7 @@ def config(ctx, project, plugin_type, plugin_name, format):
     plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
     config = ConfigService(project)
-    plugin = config.find_plugin(plugin_name, plugin_type=plugin_type)
+    plugin = config.find_plugin(plugin_name, plugin_type=plugin_type, configurable=True)
 
     _, Session = project_engine(project)
     session = Session()
