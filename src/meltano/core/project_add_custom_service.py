@@ -141,8 +141,8 @@ class ProjectAddCustomService:
             plugin_name,
             namespace,
             pip_url=pip_url,
-            capabilities=capabilities,
             executable=executable,
+            capabilities=capabilities,
             settings=[
                 {"name": name, "env": setting_env(namespace, name)} for name in settings
             ],
