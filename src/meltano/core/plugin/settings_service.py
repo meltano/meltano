@@ -30,6 +30,11 @@ class PluginSettingValueSource(str, Enum):
     DEFAULT = "default"  # 4
 
 
+class PluginSettingValueStore(str, Enum):
+    MELTANO_YML = "meltano_yml"
+    DB = "db"
+
+
 class PluginSettingsService:
     def __init__(
         self,
@@ -126,10 +131,13 @@ class PluginSettingsService:
         sources: List[PluginSettingValueSource] = None,
         redacted=False,
     ):
-        setting_names = [
-            *(setting.name for setting in self.definitions(plugin)),
-            *(key for key in self.get_install(plugin).current_config.keys()),
-        ]
+        setting_names = [setting.name for setting in self.definitions(plugin)]
+
+        try:
+            plugin_install = self.get_install(plugin)
+            setting_names.extend(self.get_install(plugin).current_config.keys())
+        except PluginMissingError:
+            pass
 
         config = {}
         for name in setting_names:
@@ -167,35 +175,100 @@ class PluginSettingsService:
 
         return env
 
-    def set(self, session, plugin: PluginRef, name: str, value, enabled=True):
+    def set(
+        self,
+        session,
+        plugin: PluginRef,
+        name: str,
+        value,
+        store=PluginSettingValueStore.DB,
+    ):
+        if value == REDACTED_VALUE:
+            return
+
+        plugin_install = self.get_install(plugin)
+        plugin_def = self.get_definition(plugin)
+
         try:
-            plugin_def = self.get_definition(plugin)
             setting_def = self.find_setting(plugin, name)
+        except PluginSettingMissingError:
+            setting_def = None
+
+        if setting_def:
+            value = self.cast_value(setting_def, value)
+
             env_key = self.setting_env(setting_def, plugin_def)
 
             if env_key in self.env:
                 logging.warning(f"Setting `{name}` is currently set via ${env_key}.")
-                return
 
-            if value == REDACTED_VALUE:
-                return
+        def meltano_yml_setter():
+            config = plugin_install.current_config
+            if value is None:
+                config.pop(name, None)
+            else:
+                config[name] = value
 
-            setting = PluginSetting(
-                namespace=plugin.qualified_name, name=name, value=value, enabled=enabled
-            )
+            self.config_service.update_plugin(plugin_install)
+            return True
 
-            session.merge(setting)
+        def db_setter():
+            if value is None:
+                session.query(PluginSetting).filter_by(
+                    namespace=plugin.qualified_name, name=name
+                ).delete()
+            else:
+                setting = PluginSetting(
+                    namespace=plugin.qualified_name,
+                    name=name,
+                    value=value,
+                    enabled=True,
+                )
+                session.merge(setting)
+
             session.commit()
+            return True
 
-            return setting
-        except StopIteration:
-            logging.warning(f"Setting `{name}` not found.")
+        config_setters = {
+            PluginSettingValueStore.MELTANO_YML: meltano_yml_setter,
+            PluginSettingValueStore.DB: db_setter,
+        }
 
-    def unset(self, session, plugin: PluginRef, name: str):
-        session.query(PluginSetting).filter_by(
-            namespace=plugin.qualified_name, name=name
-        ).delete()
-        session.commit()
+        if not config_setters[store]():
+            return
+
+        return value
+
+    def unset(
+        self, session, plugin: PluginRef, name: str, store=PluginSettingValueStore.DB
+    ):
+        return self.set(session, plugin, name, None, store)
+
+    def reset(self, session, plugin: PluginRef, store=PluginSettingValueStore.DB):
+        plugin_install = self.get_install(plugin)
+        plugin_def = self.get_definition(plugin)
+
+        def meltano_yml_resetter():
+            plugin_install.current_config.clear()
+            self.config_service.update_plugin(plugin_install)
+            return True
+
+        def db_resetter():
+            session.query(PluginSetting).filter_by(
+                namespace=plugin.qualified_name
+            ).delete()
+            session.commit()
+            return True
+
+        config_resetters = {
+            PluginSettingValueStore.MELTANO_YML: meltano_yml_resetter,
+            PluginSettingValueStore.DB: db_resetter,
+        }
+
+        if not config_resetters[store]():
+            return False
+
+        return True
 
     def get_definition(self, plugin: PluginRef) -> Plugin:
         return self.discovery_service.find_plugin(plugin.type, plugin.name)
@@ -226,13 +299,17 @@ class PluginSettingsService:
         return value
 
     def get_value(self, session, plugin: PluginRef, name: str, redacted=False):
-        plugin_install = self.get_install(plugin)
         plugin_def = self.get_definition(plugin)
 
         try:
             setting_def = self.find_setting(plugin, name)
         except PluginSettingMissingError:
             setting_def = None
+
+        try:
+            plugin_install = self.get_install(plugin)
+        except PluginMissingError:
+            plugin_install = None
 
         def config_override_getter():
             try:
@@ -256,6 +333,9 @@ class PluginSettingsService:
                 )
 
         def meltano_yml_getter():
+            if not plugin_install:
+                return None
+
             try:
                 value = plugin_install.current_config[name]
                 return self.expand_env_vars(value)

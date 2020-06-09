@@ -9,16 +9,19 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+- [#2013](https://gitlab.com/meltano/meltano/-/issues/2013) Add `--store` option to `meltano config` with possible values `db` and `meltano_yml`
 
 ### Changes
 
 - [#2064](https://gitlab.com/meltano/meltano/-/issues/2064) Print environment-specific instructions when `meltano upgrade` is run from inside Docker
+- [#2013](https://gitlab.com/meltano/meltano/-/issues/2013) Have `meltano config` store in meltano.yml instead of system database by default
 
 ### Fixes
 
 - [#2080](https://gitlab.com/meltano/meltano/-/issues/2080) Don't try to overwrite .gitignore when upgrading Meltano and project
 - [#2065](https://gitlab.com/meltano/meltano/-/issues/2065) Don't have `meltano upgrade` complain when `meltano ui`'s `gunicorn` isn't running
 - [#2085](https://gitlab.com/meltano/meltano/-/issues/2085) Don't change order of object and set values when meltano.yml is updated programatically
+- [#2086](https://gitlab.com/meltano/meltano/-/issues/2086) Ensure "meltano config --format=json" prints actual JSON instead of Python object
 
 ### Breaks
 

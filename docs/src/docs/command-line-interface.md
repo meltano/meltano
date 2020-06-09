@@ -99,15 +99,15 @@ Enables you to change a plugin's configuration.
 Meltano uses configuration layers to resolve a plugin's configuration:
 
 1. Environment variables
-1. Plugin definition's `config:` attribute in **meltano.yml**. Inside values, [environment variables](#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
-1. Settings set via `meltano config` or in the UI (stored in the system database)
+1. Plugin's `config` attribute in **meltano.yml**, set manually or using `meltano config <plugin_name> set`. Inside values, [environment variables](#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
+1. System database, which holds settings set via the UI or `meltano config <plugin_name> set --store=db`
 1. Default values set in the setting definition in **discovery.yml**
 
 ::: info
-Sensitive settings such as _passwords_ or _keys_ should not be configured using `meltano.yml`,
+Sensitive settings such as _passwords_ or _keys_ should not be stored in `meltano.yml`,
 since the entire contents of this file are available to the Meltano UI and its users.
 
-Instead, these sensitive values should be stored in environment variables, or the system database (using `meltano config` or the UI).
+Instead, these sensitive values should be stored in environment variables or the system database.
 
 You can use `meltano config <plugin_name> list` to find the environment variable associated with a setting.
 
@@ -124,13 +124,16 @@ meltano config <plugin_name>
 meltano config <plugin_name> list
 
 # Sets the configuration's setting `<name>` to `<value>`.
-meltano config <plugin_name> set <name> <value>
+meltano config <plugin_name> set <name> <value> # store in `meltano.yml`
+meltano config <plugin_name> set --store=db <name> <value> # store in system database
 
 # Remove the configuration's setting `<name>`.
-meltano config <plugin_name> unset <name>
+meltano config <plugin_name> unset <name> # remove from `meltano.yml`
+meltano config <plugin_name> unset --store=db <name> # remove from system database
 
 # Clear the configuration (back to defaults).
-meltano config <plugin_name> reset
+meltano config <plugin_name> reset # remove from `meltano.yml`
+meltano config <plugin_name> reset --store=db # remove from system database
 ```
 
 ## `discover`
