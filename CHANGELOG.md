@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.35.0 - (2020-06-09)
+---
+
+### New
+
 - [#2013](https://gitlab.com/meltano/meltano/-/issues/2013) Add `--store` option to `meltano config` with possible values `db` and `meltano_yml`
 - [#2087](https://gitlab.com/meltano/meltano/-/issues/2087) Add `--plugin-type` option to `meltano config` and `meltano invoke`
 - [#2088](https://gitlab.com/meltano/meltano/-/issues/2088) Add `meltano upgrade` subcommands `package`, `files`, `database`, and `models`
@@ -26,8 +38,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2065](https://gitlab.com/meltano/meltano/-/issues/2065) Don't have `meltano upgrade` complain when `meltano ui`'s `gunicorn` isn't running
 - [#2085](https://gitlab.com/meltano/meltano/-/issues/2085) Don't change order of object and set values when meltano.yml is updated programatically
 - [#2086](https://gitlab.com/meltano/meltano/-/issues/2086) Ensure "meltano config --format=json" prints actual JSON instead of Python object
-
-### Breaks
 
 
 ## 1.34.2 - (2020-05-29)
