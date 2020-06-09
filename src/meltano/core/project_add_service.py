@@ -2,6 +2,7 @@ import os
 import json
 import yaml
 import logging
+from typing import List
 
 from .project import Project
 from .plugin import PluginType, PluginInstall, PluginRef
