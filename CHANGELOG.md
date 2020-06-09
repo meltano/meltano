@@ -9,10 +9,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
 - [#2013](https://gitlab.com/meltano/meltano/-/issues/2013) Add `--store` option to `meltano config` with possible values `db` and `meltano_yml`
-
 - [#2087](https://gitlab.com/meltano/meltano/-/issues/2087) Add `--plugin-type` option to `meltano config` and `meltano invoke`
-
 - [#2088](https://gitlab.com/meltano/meltano/-/issues/2088) Add `meltano upgrade` subcommands `package`, `files`, `database`, and `models`
 
 ### Changes
