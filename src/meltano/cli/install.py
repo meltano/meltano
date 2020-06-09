@@ -66,6 +66,11 @@ def install(project, plugin_type, include_related):
     """
     config_service = ConfigService(project)
 
+    if plugin_type == "all":
+        plugins = list(config_service.plugins())
+    else:
+        plugins = config_service.get_plugins_of_type(PluginType(plugin_type))
+
     if include_related:
         discovery_service = PluginDiscoveryService(project)
         add_service = ProjectAddService(
@@ -74,8 +79,7 @@ def install(project, plugin_type, include_related):
             plugin_discovery_service=discovery_service,
         )
 
-        installed_plugins = config_service.plugins()
-        for plugin_install in installed_plugins:
+        for plugin_install in plugins:
             try:
                 plugin_def = discovery_service.find_plugin(
                     plugin_install.type, plugin_install.name
@@ -90,10 +94,7 @@ def install(project, plugin_type, include_related):
                     fg="green",
                 )
 
-    if plugin_type == "all":
-        plugins = config_service.plugins()
-    else:
-        plugins = config_service.get_plugins_of_type(PluginType(plugin_type))
+            plugins.extend(related_plugins)
 
     click.echo(f"Installing {len(plugins)} plugins...")
 
