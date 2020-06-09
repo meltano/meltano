@@ -37,3 +37,9 @@ class DbtTransformPlugin(PluginInstall):
 
     def __init__(self, *args, **kwargs):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
+
+    def is_invokable(self):
+        return False
+
+    def is_configurable(self):
+        return False
