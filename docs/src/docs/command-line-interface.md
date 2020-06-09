@@ -396,6 +396,24 @@ meltano user add admin securepassword --role admin
 
 Upgrade Meltano and the Meltano project to the latest version.
 
+When called without arguments, this will:
+- Upgrade the `meltano` package
+- Update files managed by plugins
+- Apply migrations to system database
+- Recompile models
+
+### How to use
+
+```bash
+meltano upgrade
+meltano upgrade --skip-package # Skip upgrading the Meltano package
+
+meltano upgrade package # Only upgrade Meltano package
+meltano upgrade files # Only update files managed by plugins
+meltano upgrade database # Only apply migrations to system database
+meltano upgrade models # Only recompile models
+```
+
 ## `version`
 
 It is used to check which version of Meltano currently installed.
