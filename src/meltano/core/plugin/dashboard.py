@@ -217,3 +217,6 @@ class DashboardPlugin(PluginInstall):
 
         ReportImporter(packages_dir, project).import_records()
         DashboardImporter(packages_dir, project).import_records()
+
+    def is_invokable(self):
+        return False

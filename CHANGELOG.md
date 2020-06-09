@@ -11,10 +11,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 - [#2013](https://gitlab.com/meltano/meltano/-/issues/2013) Add `--store` option to `meltano config` with possible values `db` and `meltano_yml`
 
+- [#2087](https://gitlab.com/meltano/meltano/-/issues/2087) Add `--plugin-type` option to `meltano config` and `meltano invoke`
+
 ### Changes
 
 - [#2064](https://gitlab.com/meltano/meltano/-/issues/2064) Print environment-specific instructions when `meltano upgrade` is run from inside Docker
 - [#2013](https://gitlab.com/meltano/meltano/-/issues/2013) Have `meltano config` store in meltano.yml instead of system database by default
+- [#2087](https://gitlab.com/meltano/meltano/-/issues/2087) Skip plugins that are not configurable or invokable when finding plugin by name in `meltano config` and `meltano invoke`
 
 ### Fixes
 

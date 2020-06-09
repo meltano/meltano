@@ -90,6 +90,14 @@ class PluginType(YAMLEnum):
     def value_exists(cls, value):
         return value in cls._value2member_map_
 
+    @classmethod
+    def cli_arguments(cls):
+        return [type.singular for type in cls]
+
+    @classmethod
+    def from_cli_argument(cls, value):
+        return cls(f"{value}s")
+
 
 class PluginRef:
     def __init__(self, plugin_type: Union[str, PluginType], name: str):
@@ -168,6 +176,12 @@ class PluginInstall(HookObject, Canonical, PluginRef):
 
     def is_installable(self):
         return self.pip_url is not None
+
+    def is_invokable(self):
+        return self.is_installable()
+
+    def is_configurable(self):
+        return True
 
     def is_custom(self):
         return self.namespace is not None
