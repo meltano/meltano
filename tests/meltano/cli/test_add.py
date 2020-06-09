@@ -38,6 +38,8 @@ class TestCliAdd:
         assert config_service.find_plugin(plugin_name, plugin_type)
 
     def test_add_transform(self, project, cli_runner):
+        # Add dbt and transform/ files
+        cli_runner.invoke(cli, ["add", "transformer", "dbt"])
         res = cli_runner.invoke(cli, ["add", "transform", "tap-google-analytics"])
 
         assert res.exit_code == 0
@@ -77,6 +79,8 @@ class TestCliAdd:
         assert len(reports_service.get_reports()) == reports_count
 
     def test_add_related(self, project, cli_runner, config_service):
+        # Add dbt and transform/ files
+        cli_runner.invoke(cli, ["add", "transformer", "dbt"])
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
