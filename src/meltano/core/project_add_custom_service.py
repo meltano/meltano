@@ -158,3 +158,6 @@ class ProjectAddCustomService:
         )
 
         return installed
+
+    def add_related(self, *args, **kwargs):
+        return []

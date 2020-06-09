@@ -88,18 +88,23 @@ def add_plugin(
 
     plugins = [plugin]
 
+    related_plugin_types = []
     if include_related:
-        discovery_service = PluginDiscoveryService(project)
-        plugin_def = discovery_service.find_plugin(plugin.type, plugin.name)
+        related_plugin_types = list(PluginType)
 
-        related_plugins = add_service.add_related(plugin_def)
-        for plugin in related_plugins:
-            click.secho(
-                f"Added related plugin '{plugin.name}' to your Meltano project.",
-                fg="green",
-            )
+    discovery_service = PluginDiscoveryService(project)
+    plugin_def = discovery_service.find_plugin(plugin.type, plugin.name)
 
-        plugins.extend(related_plugins)
+    related_plugins = add_service.add_related(
+        plugin_def, plugin_types=related_plugin_types
+    )
+    for related_plugin in related_plugins:
+        click.secho(
+            f"Adding related plugin '{related_plugin.name}' to your Meltano project...",
+            fg="green",
+        )
+
+    plugins.extend(related_plugins)
 
     success = install_plugins(project, plugins)
 
