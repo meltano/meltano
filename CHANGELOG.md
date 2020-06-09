@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2087](https://gitlab.com/meltano/meltano/-/issues/2087) Add `--plugin-type` option to `meltano config` and `meltano invoke`
 
+- [#2088](https://gitlab.com/meltano/meltano/-/issues/2088) Add `meltano upgrade` subcommands `package`, `files`, `database`, and `models`
+
 ### Changes
 
 - [#2064](https://gitlab.com/meltano/meltano/-/issues/2064) Print environment-specific instructions when `meltano upgrade` is run from inside Docker

@@ -29,6 +29,8 @@ class UpgradeService:
         self.migration_service = migration_service or MigrationService(engine)
 
     def reload_ui(self):
+        click.secho("Reloading UI if running...", fg="blue")
+
         pid_file_path = self.project.run_dir("gunicorn.pid")
         try:
             with pid_file_path.open("r") as pid_file:
@@ -41,7 +43,7 @@ class UpgradeService:
         except Exception as ex:
             logging.error(f"Cannot restart from `{pid_file_path}`: {ex}")
 
-    def upgrade_package(self, pip_url: Optional[str] = None, force=False):
+    def _upgrade_package(self, pip_url: Optional[str] = None, force=False):
         meltano_file_path = "/src/meltano/__init__.py"
         editable = meltano.__file__.endswith(meltano_file_path)
         editable = editable and not force
@@ -78,10 +80,25 @@ class UpgradeService:
         click.echo("The `meltano` package has been upgraded.")
         return True
 
-    def upgrade_files(self):
+    def upgrade_package(self, *args, **kwargs):
+        click.secho("Upgrading `meltano` package...", fg="blue")
+        package_upgraded = self._upgrade_package(*args, **kwargs)
+
+        if not package_upgraded:
+            click.echo(
+                "Then, run `meltano upgrade --skip-package` to upgrade your project based on the latest version."
+            )
+        else:
+            self.reload_ui()
+
+        return package_upgraded
+
+    def update_files(self):
         """
         Update the files managed by Meltano inside the current project.
         """
+        click.secho("Updating files managed by plugins...", fg="blue")
+
         files_map = {
             bundle.find("dags/meltano.py"): self.project.root_dir(
                 "orchestrate/dags/meltano.py"
@@ -98,7 +115,14 @@ class UpgradeService:
             except Exception as err:
                 logging.error(f"Meltano could not update {dst}: {err}")
 
+    def migrate_database(self):
+        click.secho("Applying migrations to system database...", fg="blue")
+        self.migration_service.upgrade()
+        self.migration_service.seed(self.project)
+
     def compile_models(self):
+        click.secho("Recompiling models...", fg="blue")
+
         # Make sure we load the _new_ Meltano version's ProjectCompiler
         importlib.reload(meltano.core.compiler.project_compiler)
         from meltano.core.compiler.project_compiler import ProjectCompiler
@@ -108,32 +132,18 @@ class UpgradeService:
     def upgrade(self, skip_package=False, **kwargs):
         package_upgraded = False
         if not skip_package:
-            click.secho("Upgrading `meltano` package...", fg="blue")
             package_upgraded = self.upgrade_package(**kwargs)
 
             if not package_upgraded:
-                click.echo(
-                    "Then, run `meltano upgrade --skip-package` to upgrade your project based on the latest version."
-                )
                 return
 
             click.echo()
 
-        click.secho("Applying updates to Meltano-managed files...", fg="blue")
-        self.upgrade_files()
-
+        self.update_files()
         click.echo()
-        click.secho("Applying migrations to system database...", fg="blue")
-        self.migration_service.upgrade()
-        self.migration_service.seed(self.project)
-
+        self.migrate_database()
         click.echo()
-        click.secho("Recompiling models...", fg="blue")
         self.compile_models()
-
-        click.echo()
-        click.secho("Reloading UI if running...", fg="blue")
-        self.reload_ui()
 
         click.echo()
         if package_upgraded:
