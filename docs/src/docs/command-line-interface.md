@@ -133,6 +133,12 @@ meltano config <plugin_name> unset <name>
 meltano config <plugin_name> reset
 ```
 
+If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
+
+```bash
+meltano config --plugin-type=<plugin_type> <plugin_name> ...
+```
+
 ## `discover`
 
 Lists the available plugins you are interested in.
@@ -249,7 +255,19 @@ meltano install --include-related
 
 ## `invoke`
 
-- `meltano invoke <plugin_name> PLUGIN_ARGS...`: Invoke the plugin manually.
+Invoke the plugin's executable with specified arguments.
+
+### How to use
+
+```bash
+meltano invoke <plugin_name> PLUGIN_ARGS...
+```
+
+If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
+
+```bash
+meltano invoke --plugin-type=<plugin_type> <plugin_name> PLUGIN_ARGS...
+```
 
 ## `list`
 
