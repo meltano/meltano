@@ -13,6 +13,7 @@ from .utils import add_plugin, add_related_plugins, install_plugins
 from meltano.core.plugin import PluginType
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_add_custom_service import ProjectAddCustomService
+from meltano.core.plugin_install_service import PluginInstallReason
 
 
 @cli.command()
@@ -53,7 +54,7 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
     )
     plugins.extend(related_plugins)
 
-    success = install_plugins(project, plugins)
+    success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
 
     for plugin in plugins:  # TODO: Only works on Plugin from discovery...
         docs_link = plugin._extras.get("docs")

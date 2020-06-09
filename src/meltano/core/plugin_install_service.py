@@ -1,4 +1,5 @@
 import logging
+from enum import Enum
 
 from .compiler.project_compiler import ProjectCompiler
 from .plugin_discovery_service import PluginDiscoveryService
@@ -16,6 +17,12 @@ from .error import (
 )
 
 
+class PluginInstallReason(str, Enum):
+    ADD = "add"
+    INSTALL = "install"
+    UPGRADE = "upgrade"
+
+
 def installer_factory(project, plugin, *args, **kwargs):
     cls = PipPluginInstaller
 
@@ -30,21 +37,25 @@ class PluginInstallService:
         self.project = project
         self.config_service = config_service or ConfigService(project)
 
-    def install_all_plugins(self, status_cb=noop):
+    def install_all_plugins(self, reason=PluginInstallReason.INSTALL, status_cb=noop):
         # TODO: config service returns PluginInstall, not Plugin
-        return self.install_plugins(self.config_service.plugins())
+        return self.install_plugins(
+            self.config_service.plugins(), reason=reason, status_cb=status_cb
+        )
 
-    def install_plugins(self, plugins, status_cb=noop):
+    def install_plugins(
+        self, plugins, reason=PluginInstallReason.INSTALL, status_cb=noop
+    ):
         errors = []
         installed = []
         has_model = False
 
         for plugin in plugins:
             status = {"plugin": plugin, "status": "running"}
-            status_cb(status)
+            status_cb(status, reason)
 
             try:
-                self.install_plugin(plugin, compile_models=False)
+                self.install_plugin(plugin, compile_models=False, reason=reason)
 
                 if plugin.type is PluginType.MODELS:
                     has_model = True
@@ -64,19 +75,24 @@ class PluginInstallService:
                 # let's totally ignore these plugins
                 pass
 
-            status_cb(status)
+            status_cb(status, reason)
 
         if has_model:
             self.compile_models()
 
         return {"errors": errors, "installed": installed}
 
-    def install_plugin(self, plugin: PluginInstall, compile_models=True):
+    def install_plugin(
+        self,
+        plugin: PluginInstall,
+        reason=PluginInstallReason.INSTALL,
+        compile_models=True,
+    ):
         if not plugin.is_installable():
             raise PluginNotInstallable()
 
         try:
-            with plugin.trigger_hooks("install", self.project):
+            with plugin.trigger_hooks("install", self.project, reason):
                 run = installer_factory(self.project, plugin).install()
 
                 if compile_models and plugin.type is PluginType.MODELS:

@@ -5,6 +5,7 @@ from unittest import mock
 
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
+from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.m5o.dashboards_service import DashboardsService
 from meltano.core.m5o.reports_service import ReportsService
@@ -70,7 +71,9 @@ class TestCliAdd:
             assert tap_facebook
 
             install_plugin_mock.assert_called_once_with(
-                project, [tap_gitlab, tap_adwords, tap_facebook]
+                project,
+                [tap_gitlab, tap_adwords, tap_facebook],
+                reason=PluginInstallReason.ADD,
             )
 
     def test_add_transform(self, project, cli_runner):
@@ -136,7 +139,9 @@ class TestCliAdd:
             assert dashboard
 
             install_plugin_mock.assert_called_once_with(
-                project, [tap, transform, model, dashboard]
+                project,
+                [tap, transform, model, dashboard],
+                reason=PluginInstallReason.ADD,
             )
 
     def test_add_missing(self, project, cli_runner, config_service):
@@ -178,4 +183,6 @@ class TestCliAdd:
             assert plugin.name == "tap-custom"
             assert plugin.executable == "tap-custom-bin"
 
-            install_plugin_mock.assert_called_once_with(project, [plugin])
+            install_plugin_mock.assert_called_once_with(
+                project, [plugin], reason=PluginInstallReason.ADD
+            )
