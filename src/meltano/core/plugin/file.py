@@ -19,6 +19,9 @@ class FilePlugin(PluginInstall):
     def is_invokable(self):
         return False
 
+    def should_add_to_file(self, project):
+        return "update" in self.plugin_config(project)
+
     def file_contents(self, project):
         venv = VirtualEnv(project.plugin_dir(self, "venv"))
         bundle_dir = venv.site_packages_dir.joinpath("bundle")

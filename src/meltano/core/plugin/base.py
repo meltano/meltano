@@ -200,6 +200,9 @@ class PluginInstall(HookObject, Canonical, PluginRef):
     def is_configurable(self):
         return True
 
+    def should_add_to_file(self, project):
+        return True
+
     def is_custom(self):
         return self.namespace is not None
 

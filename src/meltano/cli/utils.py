@@ -28,10 +28,16 @@ def add_plugin(
 
     try:
         plugin = add_service.add(plugin_type, plugin_name)
-        click.secho(
-            f"Added {plugin_type.descriptor} '{plugin_name}' to your Meltano project",
-            fg="green",
-        )
+        if plugin.should_add_to_file(project):
+            click.secho(
+                f"Added {plugin_type.descriptor} '{plugin_name}' to your Meltano project",
+                fg="green",
+            )
+        else:
+            click.secho(
+                f"Adding {plugin_type.descriptor} '{plugin_name}' to your Meltano project...",
+                fg="green",
+            )
     except PluginAlreadyAddedException as err:
         click.secho(
             f"{plugin_type.descriptor.capitalize()} '{plugin_name}' is already in your Meltano project",
@@ -68,10 +74,16 @@ def add_related_plugins(
 
         related_plugins = add_service.add_related(plugin_def, plugin_types=plugin_types)
         for related_plugin in related_plugins:
-            click.secho(
-                f"Added related {related_plugin.type.descriptor} '{related_plugin.name}' to your Meltano project",
-                fg="green",
-            )
+            if related_plugin.should_add_to_file(project):
+                click.secho(
+                    f"Added related {related_plugin.type.descriptor} '{related_plugin.name}' to your Meltano project",
+                    fg="green",
+                )
+            else:
+                click.secho(
+                    f"Adding related {related_plugin.type.descriptor} '{related_plugin.name}' to your Meltano project...",
+                    fg="green",
+                )
 
         added_plugins.extend(related_plugins)
 

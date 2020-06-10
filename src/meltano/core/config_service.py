@@ -26,6 +26,9 @@ class ConfigService:
     def add_to_file(self, plugin: PluginInstall):
         plugin = plugin_factory(plugin.type, plugin.canonical())
 
+        if not plugin.should_add_to_file(self.project):
+            return plugin
+
         with self.project.meltano_update() as meltano_yml:
             if plugin in self.plugins():
                 raise PluginAlreadyAddedException(plugin)
