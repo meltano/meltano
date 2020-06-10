@@ -77,12 +77,16 @@ class PluginType(YAMLEnum):
     DASHBOARDS = "dashboards"
     ORCHESTRATORS = "orchestrators"
     TRANSFORMERS = "transformers"
+    FILES = "files"
 
     def __str__(self):
         return self.value
 
     @property
     def descriptor(self):
+        if self is self.__class__.FILES:
+            return "file bundle"
+
         return self.singular
 
     @property

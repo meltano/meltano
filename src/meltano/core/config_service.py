@@ -111,6 +111,9 @@ class ConfigService:
     def get_transformers(self):
         return self.get_plugins_of_type(PluginType.TRANSFORMERS)
 
+    def get_files(self):
+        return self.get_plugins_of_type(PluginType.FILES)
+
     def update_plugin(self, plugin: PluginInstall):
         with self.project.meltano_update() as meltano:
             # find the proper plugin to update
