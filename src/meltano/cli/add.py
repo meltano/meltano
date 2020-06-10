@@ -45,7 +45,7 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
         for plugin_name in plugin_names
     ]
 
-    related_plugin_types = []
+    related_plugin_types = [PluginType.FILES]
     if flags["include_related"]:
         related_plugin_types = list(PluginType)
 
