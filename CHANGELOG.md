@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2095](https://gitlab.com/meltano/meltano/-/issues/2089) Support singular and plural plugin types in CLI arguments
+
 ### Changes
 
 ### Fixes
