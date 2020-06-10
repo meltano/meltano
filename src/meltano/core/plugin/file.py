@@ -3,6 +3,7 @@ from pathlib import Path
 
 from meltano.core.db import project_engine
 from meltano.core.plugin import PluginInstall, PluginType
+from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.behavior.hookable import hook
 from meltano.core.venv_service import VirtualEnv
@@ -29,6 +30,45 @@ class FilePlugin(PluginInstall):
             and "__pycache__" not in path.parts
             and path != bundle_dir.joinpath("__init__.py")
         }
+
+    def update_file_header(self, relative_path):
+        return "\n".join(
+            [
+                f"# This file is managed by the '{self.name}' {self.type.descriptor} and updated automatically when `meltano upgrade` is run.",
+                f"# To prevent any manual changes from being overwritten, remove the {self.type.descriptor} from `meltano.yml` or disable automatic updates:",
+                f"#     meltano config --plugin-type={self.type} {self.name} set update.{relative_path} false",
+            ]
+        )
+
+    def project_file_contents(self, project):
+        def prepend_update_header(content, relative_path):
+            if self.should_update_file(project, relative_path):
+                content = "\n\n".join([self.update_file_header(relative_path), content])
+
+            return content
+
+        return {
+            relative_path: prepend_update_header(content, relative_path)
+            for relative_path, content in self.file_contents(project).items()
+        }
+
+    def plugin_config(self, project):
+        _, Session = project_engine(project)
+        session = Session()
+
+        plugin_settings_service = PluginSettingsService(project)
+
+        config = {}
+        for key, value in plugin_settings_service.as_config(session, self).items():
+            nest(config, key, value, maxsplit=1)
+
+        return config
+
+    def should_update_file(self, project, relative_path):
+        try:
+            return self.plugin_config(project)["update"][str(relative_path)]
+        except KeyError:
+            return False
 
     def file_exists(self, project, relative_path):
         return project.root_dir(relative_path).exists()
@@ -64,18 +104,39 @@ class FilePlugin(PluginInstall):
 
         return {
             rename_if_exists(relative_path): content
-            for relative_path, content in self.file_contents(project).items()
+            for relative_path, content in self.project_file_contents(project).items()
+        }
+
+    def files_to_update(self, project):
+        return {
+            relative_path: content
+            for relative_path, content in self.project_file_contents(project).items()
+            if self.should_update_file(project, relative_path)
         }
 
     def create_files(self, project):
         return self.write_files(project, self.files_to_create(project))
 
+    def update_files(self, project):
+        return self.write_files(project, self.files_to_update(project))
+
     @hook("after_install")
-    def after_install(self, project, newly_added):
-        if newly_added:
+    def after_install(self, project, reason):
+        if reason is PluginInstallReason.ADD:
             print(f"Adding '{self.name}' files to project...")
+
             for path in self.create_files(project):
                 print(f"Created {path}")
+        elif reason is PluginInstallReason.UPGRADE:
+            print(f"Updating '{self.name}' files in project...")
+
+            updated_paths = self.update_files(project)
+            if not updated_paths:
+                print("Nothing to update")
+                return
+
+            for path in updated_paths:
+                print(f"Updated {path}")
         else:
             print(
                 f"Run `meltano upgrade files` to update your project's '{self.name}' files"

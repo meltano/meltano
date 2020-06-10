@@ -11,6 +11,9 @@ from typing import Optional
 
 from meltano.core.project import Project
 from meltano.core.migration_service import MigrationService
+from meltano.core.config_service import ConfigService
+from meltano.cli.install import install_plugins
+from meltano.core.plugin_install_service import PluginInstallReason
 import meltano.core.compiler.project_compiler
 import meltano.core.bundle as bundle
 
@@ -99,21 +102,12 @@ class UpgradeService:
         """
         click.secho("Updating files managed by plugins...", fg="blue")
 
-        files_map = {
-            bundle.find("dags/meltano.py"): self.project.root_dir(
-                "orchestrate/dags/meltano.py"
-            ),
-            bundle.find("transform/profile/profiles.yml"): self.project.root_dir(
-                "transform/profile/profiles.yml"
-            ),
-        }
+        file_plugins = ConfigService(self.project).get_files()
+        if not file_plugins:
+            click.echo("Nothing to update")
+            return
 
-        for src, dst in files_map.items():
-            try:
-                shutil.copy(src, dst)
-                click.echo(f"Updated {dst}")
-            except Exception as err:
-                logging.error(f"Meltano could not update {dst}: {err}")
+        install_plugins(self.project, file_plugins, reason=PluginInstallReason.UPGRADE)
 
     def migrate_database(self):
         click.secho("Applying migrations to system database...", fg="blue")
