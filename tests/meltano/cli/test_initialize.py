@@ -28,13 +28,7 @@ def test_init(request, cli_runner, tmp_path_factory, pushd):
 
     files = (
         project.root.joinpath(file).resolve()
-        for file in (
-            "meltano.yml",
-            "README.md",
-            ".gitignore",
-            "transform/dbt_project.yml",
-            "transform/profile/profiles.yml",
-        )
+        for file in ("meltano.yml", "README.md", ".gitignore", "requirements.txt")
     )
 
     dirs = (
@@ -44,7 +38,6 @@ def test_init(request, cli_runner, tmp_path_factory, pushd):
             "extract",
             "load",
             "transform",
-            "transform/profile",
             "analyze",
             "notebook",
             "orchestrate",

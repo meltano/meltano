@@ -13,18 +13,26 @@ from meltano.core.m5o.reports_service import ReportsService
 
 class TestCliAdd:
     @pytest.mark.parametrize(
-        "plugin_type,plugin_name",
+        "plugin_type,plugin_name,file_plugin_name",
         [
-            (PluginType.EXTRACTORS, "tap-carbon-intensity"),
-            (PluginType.LOADERS, "target-sqlite"),
-            (PluginType.TRANSFORMS, "tap-carbon-intensity"),
-            (PluginType.MODELS, "model-carbon-intensity"),
-            (PluginType.DASHBOARDS, "dashboard-google-analytics"),
-            (PluginType.ORCHESTRATORS, "airflow"),
-            (PluginType.TRANSFORMERS, "dbt"),
+            (PluginType.EXTRACTORS, "tap-carbon-intensity", None),
+            (PluginType.LOADERS, "target-sqlite", None),
+            (PluginType.TRANSFORMS, "tap-carbon-intensity", None),
+            (PluginType.MODELS, "model-carbon-intensity", None),
+            (PluginType.DASHBOARDS, "dashboard-google-analytics", None),
+            (PluginType.ORCHESTRATORS, "airflow", "airflow"),
+            (PluginType.TRANSFORMERS, "dbt", "dbt"),
         ],
     )
-    def test_add(self, plugin_type, plugin_name, project, cli_runner, config_service):
+    def test_add(
+        self,
+        plugin_type,
+        plugin_name,
+        file_plugin_name,
+        project,
+        cli_runner,
+        config_service,
+    ):
         # ensure the plugin is not present
         with pytest.raises(PluginMissingError):
             config_service.find_plugin(plugin_name, plugin_type=plugin_type)
@@ -38,8 +46,20 @@ class TestCliAdd:
 
             plugin = config_service.find_plugin(plugin_name, plugin_type)
             assert plugin
+            plugins = [plugin]
 
-            install_plugin_mock.assert_called_once_with(project, [plugin])
+            if file_plugin_name:
+                assert f"Added related file bundle '{file_plugin_name}'" in res.stdout
+
+                file_plugin = config_service.find_plugin(
+                    file_plugin_name, PluginType.FILES
+                )
+                assert file_plugin
+                plugins.append(file_plugin)
+
+            install_plugin_mock.assert_called_once_with(
+                project, plugins, reason=PluginInstallReason.ADD
+            )
 
     def test_add_multiple(self, project, cli_runner, config_service):
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
@@ -79,6 +99,8 @@ class TestCliAdd:
     def test_add_transform(self, project, cli_runner):
         # Add dbt and transform/ files
         cli_runner.invoke(cli, ["add", "transformer", "dbt"])
+        cli_runner.invoke(cli, ["add", "files", "dbt"])
+
         res = cli_runner.invoke(cli, ["add", "transform", "tap-google-analytics"])
 
         assert res.exit_code == 0
@@ -120,6 +142,8 @@ class TestCliAdd:
     def test_add_related(self, project, cli_runner, config_service):
         # Add dbt and transform/ files
         cli_runner.invoke(cli, ["add", "transformer", "dbt"])
+        cli_runner.invoke(cli, ["add", "files", "dbt"])
+
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(

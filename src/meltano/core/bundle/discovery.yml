@@ -848,3 +848,13 @@ orchestrators:
       - name: core.dags_are_paused_at_creation
         env: AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION
         value: False
+files:
+  - name: airflow
+    namespace: airflow
+    pip_url: git+https://gitlab.com/meltano/files-airflow.git
+  - name: dbt
+    namespace: dbt
+    pip_url: git+https://gitlab.com/meltano/files-dbt.git
+  - name: docker-compose
+    namespace: docker-compose
+    pip_url: git+https://gitlab.com/meltano/files-docker-compose.git
