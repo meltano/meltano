@@ -43,7 +43,15 @@ class SubprocessError(Exception):
 class PluginInstallError(SubprocessError):
     """Happens when a plugin fails to install."""
 
-    pass
+    def __init__(self, message: str, process=None):
+        super().__init__(message, process)
+
+    @property
+    def stderr(self):
+        if not self.process:
+            return None
+
+        return super().stderr
 
 
 class PluginInstallWarning(Exception):
