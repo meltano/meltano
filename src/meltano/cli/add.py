@@ -74,32 +74,43 @@ def add_plugin(
 ):
     try:
         plugin = add_service.add(plugin_type, plugin_name)
-        click.secho(f"Added '{plugin_name}' to your Meltano project.", fg="green")
+        click.secho(
+            f"Added {plugin_type.descriptor} '{plugin_name}' to your Meltano project",
+            fg="green",
+        )
     except PluginAlreadyAddedException as err:
         click.secho(
-            f"'{plugin_name}' was found in your Meltano project. Use `meltano install` to install it.",
+            f"{plugin_type.descriptor} '{plugin_name}' is already in your Meltano project".capitalize(),
             fg="yellow",
             err=True,
         )
         plugin = err.plugin
     except (PluginNotSupportedException, PluginNotFoundError):
-        click.secho(f"Error: {plugin_type} '{plugin_name}' is not supported.", fg="red")
+        click.secho(
+            f"Error: {plugin_type.descriptor} '{plugin_name}' is not supported",
+            fg="red",
+        )
         raise click.Abort()
 
     plugins = [plugin]
 
+    related_plugin_types = []
     if include_related:
-        discovery_service = PluginDiscoveryService(project)
-        plugin_def = discovery_service.find_plugin(plugin.type, plugin.name)
+        related_plugin_types = list(PluginType)
 
-        related_plugins = add_service.add_related(plugin_def)
-        for plugin in related_plugins:
-            click.secho(
-                f"Added related plugin '{plugin.name}' to your Meltano project.",
-                fg="green",
-            )
+    discovery_service = PluginDiscoveryService(project)
+    plugin_def = discovery_service.find_plugin(plugin.type, plugin.name)
 
-        plugins.extend(related_plugins)
+    related_plugins = add_service.add_related(
+        plugin_def, plugin_types=related_plugin_types
+    )
+    for related_plugin in related_plugins:
+        click.secho(
+            f"Added related {related_plugin.type.descriptor} '{related_plugin.name}' to your Meltano project",
+            fg="green",
+        )
+
+    plugins.extend(related_plugins)
 
     success = install_plugins(project, plugins)
 

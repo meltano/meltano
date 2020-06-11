@@ -19,7 +19,7 @@ class ProjectAddCustomService:
 
     def add(self, plugin_type: PluginType, plugin_name: str):
         click.secho(
-            f"Adding new custom {plugin_type.singular} plugin with name '{plugin_name}'...",
+            f"Adding new custom {plugin_type.descriptor} with name '{plugin_name}'...",
             fg="green",
         )
         click.echo()
@@ -148,13 +148,8 @@ class ProjectAddCustomService:
             ],
         )
 
-        install = plugin.as_installed(custom=True)
-        installed = self.config_service.add_to_file(install)
-        click.secho(
-            "The plugin has been added to your `meltano.yml`.\n"
-            "If your plugin requires configuration options, you can add them directly "
-            "in the created plugin definition under the `settings` or `config` section.",
-            fg="yellow",
-        )
+        installed = plugin.as_installed(custom=True)
+        return self.config_service.add_to_file(installed)
 
-        return installed
+    def add_related(self, *args, **kwargs):
+        return []
