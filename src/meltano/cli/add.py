@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 
 from . import cli
 from .params import project
+from .install import install_plugins
 from meltano.core.project_add_service import (
     ProjectAddService,
     PluginNotSupportedException,
@@ -85,54 +86,28 @@ def add_plugin(
         click.secho(f"Error: {plugin_type} '{plugin_name}' is not supported.", fg="red")
         raise click.Abort()
 
-    install_service = PluginInstallService(project)
-
-    try:
-        click.secho(f"Installing '{plugin_name}'...")
-        run = install_service.install_plugin(plugin)
-        if run:
-            click.secho(run.stdout)
-        click.secho(f"Installed '{plugin_name}'.", fg="green")
-
-        click.secho(f"Added and installed {plugin_type} '{plugin_name}'.", fg="green")
-    except PluginNotInstallable as install_err:
-        logging.info(f"{plugin_type} is not installable, skipping install.")
-    except PluginInstallError as proc_err:
-        click.secho(str(proc_err), fg="red")
-        click.secho(proc_err.stderr, err=True)
-        raise click.Abort()
-
-    docs_link = plugin._extras.get("docs")
-    if docs_link:
-        click.secho(f"Visit {docs_link} for more details about '{plugin.name}'.")
+    plugins = [plugin]
 
     if include_related:
         discovery_service = PluginDiscoveryService(project)
         plugin_def = discovery_service.find_plugin(plugin.type, plugin.name)
 
         related_plugins = add_service.add_related(plugin_def)
-        if len(related_plugins) == 0:
-            click.secho("No related plugins found that are not already installed.")
-        else:
-            for plugin in related_plugins:
-                click.secho(
-                    f"Added related plugin '{plugin.name}' to your Meltano project.",
-                    fg="green",
-                )
-
-            click.secho(f"Installing {len(related_plugins)} related plugins...")
-            install_status = install_service.install_plugins(related_plugins)
-
-            num_installed = len(install_status["installed"])
-            num_failed = len(install_status["errors"])
-
-            fg = "green"
-            if num_failed >= 0 and num_installed == 0:
-                fg = "red"
-            elif num_failed > 0 and num_installed > 0:
-                fg = "yellow"
-
+        for plugin in related_plugins:
             click.secho(
-                f"Installed {num_installed}/{num_installed+num_failed} related plugins.",
-                fg=fg,
+                f"Added related plugin '{plugin.name}' to your Meltano project.",
+                fg="green",
             )
+
+        plugins.extend(related_plugins)
+
+    success = install_plugins(project, plugins)
+
+    docs_link = plugin._extras.get("docs")
+    if docs_link:
+        click.echo(
+            f"For more details about {plugin.type.descriptor} '{plugin.name}', visit {docs_link}"
+        )
+
+    if not success:
+        raise click.Abort()
