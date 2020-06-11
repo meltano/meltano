@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#2092](https://gitlab.com/meltano/meltano/-/issues/2092) Only install plugins related to plugins of the specified type when running `meltano install <plugin_type> --include-related`
+- [#2093](https://gitlab.com/meltano/meltano/-/issues/2093) Print error when transform plugin is installed before dbt
 
 ### Breaks
 

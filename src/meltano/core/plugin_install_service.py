@@ -83,6 +83,8 @@ class PluginInstallService:
                     self.compile_models()
 
                 return run
+        except PluginInstallError:
+            raise
         except SubprocessError as err:
             raise PluginInstallError(
                 f"{plugin.name} could not be installed: {err}", err.process
