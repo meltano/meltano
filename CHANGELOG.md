@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2094](https://gitlab.com/meltano/meltano/-/issues/2094) Consistently refer to plugin types and names in CLI output
+
 ### Fixes
 
 - [#2092](https://gitlab.com/meltano/meltano/-/issues/2092) Only install plugins related to plugins of the specified type when running `meltano install <plugin_type> --include-related`

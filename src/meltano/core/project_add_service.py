@@ -37,13 +37,22 @@ class ProjectAddService:
         installed = plugin.as_installed()
         return self.config_service.add_to_file(installed)
 
-    def add_related(self, target_plugin: PluginInstall):
-        related_plugins = (
+    def add_related(
+        self,
+        target_plugin: PluginInstall,
+        plugin_types: List[PluginType] = list(PluginType),
+    ):
+        try:
+            plugin_types.remove(target_plugin.type)
+        except ValueError:
+            pass
+
+        related_plugins = [
             plugin
             for plugin in self.discovery_service.plugins()
             if plugin.namespace == target_plugin.namespace
-            and plugin.type != target_plugin.type
-        )
+            and plugin.type in plugin_types
+        ]
 
         added_plugins = []
         for plugin in related_plugins:

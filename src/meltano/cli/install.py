@@ -20,14 +20,14 @@ def install_status_update(data):
 
     if data["status"] == "running":
         click.echo()
-        click.secho(f"Installing '{plugin.name}'...")
+        click.secho(f"Installing {plugin.type.descriptor} '{plugin.name}'...")
     elif data["status"] == "error":
         click.secho(data["message"], fg="red")
         click.secho(data["details"], err=True)
     elif data["status"] == "warning":
         click.secho(f"Warning! {data['message']}.", fg="yellow")
     elif data["status"] == "success":
-        click.secho(f"Installed '{plugin.name}'", fg="green")
+        click.secho(f"Installed {plugin.type.descriptor} '{plugin.name}'", fg="green")
 
 
 def install_plugins(project, plugins, **kwargs):
@@ -90,7 +90,7 @@ def install(project, plugin_type, include_related):
             related_plugins = add_service.add_related(plugin_def)
             for plugin in related_plugins:
                 click.secho(
-                    f"Added '{plugin.name}' to your Meltano project because it is related to '{plugin_def.name}'.",
+                    f"Added {plugin.type.descriptor} '{plugin.name}' to your Meltano project because it is related to {plugin_def.type.descriptor} '{plugin_def.name}'.",
                     fg="green",
                 )
 
