@@ -33,7 +33,7 @@ class TestCliAdd:
             res = cli_runner.invoke(cli, ["add", plugin_type.singular, plugin_name])
 
         assert res.exit_code == 0, res.stdout
-        assert f"Added '{plugin_name}'" in res.stdout
+        assert f"Added {plugin_type.descriptor} '{plugin_name}'" in res.stdout
 
         assert config_service.find_plugin(plugin_name, plugin_type)
 

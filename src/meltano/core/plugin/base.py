@@ -82,9 +82,17 @@ class PluginType(YAMLEnum):
         return self.value
 
     @property
+    def descriptor(self):
+        return self.singular
+
+    @property
     def singular(self):
         """Makes it singular for `meltano add PLUGIN_TYPE`"""
         return self.value[:-1]
+
+    @property
+    def verb(self):
+        return self.value[:-3]
 
     @classmethod
     def value_exists(cls, value):

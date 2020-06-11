@@ -74,16 +74,22 @@ def add_plugin(
 ):
     try:
         plugin = add_service.add(plugin_type, plugin_name)
-        click.secho(f"Added '{plugin_name}' to your Meltano project.", fg="green")
+        click.secho(
+            f"Added {plugin_type.descriptor} '{plugin_name}' to your Meltano project",
+            fg="green",
+        )
     except PluginAlreadyAddedException as err:
         click.secho(
-            f"'{plugin_name}' was found in your Meltano project. Use `meltano install` to install it.",
+            f"{plugin_type.descriptor} '{plugin_name}' is already in your Meltano project".capitalize(),
             fg="yellow",
             err=True,
         )
         plugin = err.plugin
     except (PluginNotSupportedException, PluginNotFoundError):
-        click.secho(f"Error: {plugin_type} '{plugin_name}' is not supported.", fg="red")
+        click.secho(
+            f"Error: {plugin_type.descriptor} '{plugin_name}' is not supported",
+            fg="red",
+        )
         raise click.Abort()
 
     plugins = [plugin]
@@ -100,7 +106,7 @@ def add_plugin(
     )
     for related_plugin in related_plugins:
         click.secho(
-            f"Adding related plugin '{related_plugin.name}' to your Meltano project...",
+            f"Added related {related_plugin.type.descriptor} '{related_plugin.name}' to your Meltano project",
             fg="green",
         )
 
