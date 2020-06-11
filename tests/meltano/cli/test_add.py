@@ -3,6 +3,7 @@ import pytest
 import functools
 from unittest import mock
 
+from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -138,6 +139,63 @@ class TestCliAdd:
 
         assert len(dashboards_service.get_dashboards()) == dashboards_count
         assert len(reports_service.get_reports()) == reports_count
+
+    def test_add_files_with_updates(
+        self, session, project, cli_runner, config_service, plugin_settings_service
+    ):
+        result = cli_runner.invoke(cli, ["add", "files", "airflow"])
+        assert_cli_runner(result)
+
+        # Plugin has been added to meltano.yml
+        plugin = config_service.find_plugin("airflow", PluginType.FILES)
+        assert plugin
+
+        # Automatic updating is enabled
+        value, _ = plugin_settings_service.get_value(
+            session, plugin, "update.orchestrate/dags/meltano.py"
+        )
+        assert value == True
+
+        # File has been created
+        assert "Created orchestrate/dags/meltano.py" in result.output
+
+        file_path = project.root_dir("orchestrate/dags/meltano.py")
+        assert file_path.is_file()
+
+        # File has "managed" header
+        assert (
+            "This file is managed by the 'airflow' file bundle" in file_path.read_text()
+        )
+
+    def test_add_files_without_updates(self, project, cli_runner, config_service):
+        result = cli_runner.invoke(cli, ["add", "files", "docker-compose"])
+        assert_cli_runner(result)
+
+        # Plugin has not been added to meltano.yml
+        with pytest.raises(PluginMissingError):
+            config_service.find_plugin("docker-compose", PluginType.FILES)
+
+        # File has been created
+        assert "Created docker-compose.yml" in result.output
+
+        file_path = project.root_dir("docker-compose.yml")
+        assert file_path.is_file()
+
+        # File does not have "managed" header
+        assert "This file is managed" not in file_path.read_text()
+
+    def test_add_files_that_already_exists(self, project, cli_runner, config_service):
+        project.root_dir("transform/dbt_project.yml").write_text("Exists!")
+
+        result = cli_runner.invoke(cli, ["add", "files", "dbt"])
+        assert_cli_runner(result)
+
+        assert (
+            "File transform/dbt_project.yml already exists, keeping both versions"
+            in result.output
+        )
+        assert "Created transform/dbt_project (dbt).yml" in result.output
+        assert project.root_dir("transform/dbt_project (dbt).yml").is_file()
 
     def test_add_related(self, project, cli_runner, config_service):
         # Add dbt and transform/ files
