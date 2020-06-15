@@ -30,7 +30,7 @@ class MigrationService:
             if rev.revision == target_revision:
                 raise MigrationUneededException
 
-    def upgrade(self):
+    def upgrade(self, silent=False):
         conn = self.engine.connect()
         cfg = Config()
 
@@ -39,21 +39,32 @@ class MigrationService:
         cfg.set_main_option("script_location", str(MIGRATION_DIR))
         script = ScriptDirectory.from_config(cfg)
         # let's make sure we actually need to migrate
+
+        migration_logger = logging.getLogger("alembic.runtime.migration")
+        original_log_level = migration_logger.getEffectiveLevel()
+        if silent:
+            migration_logger.setLevel(logging.ERROR)
+
         context = MigrationContext.configure(conn)
+
+        if silent:
+            migration_logger.setLevel(original_log_level)
 
         try:
             # try to find the locked version
             HEAD = LOCK_PATH.open().read().strip()
             self.ensure_migration_needed(script, context, HEAD)
 
-            click.secho(f"Upgrading database to {HEAD}")
+            if not silent:
+                click.secho(f"Upgrading database to {HEAD}")
             command.upgrade(cfg, HEAD)
         except FileNotFoundError:
             raise click.ClickException(
                 "Cannot upgrade the system database, revision lock not found."
             )
         except MigrationUneededException:
-            click.secho(f"System database up-to-date.")
+            if not silent:
+                click.secho(f"System database up-to-date.")
         except Exception as err:
             click.secho(
                 f"Cannot upgrade the system database. It might be corrupted or was created before database migrations where introduced (v0.34.0)",
