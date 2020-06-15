@@ -15,7 +15,9 @@ THREADS_PER_PAGE = 1
 PROFILE = truthy(os.getenv("FLASK_PROFILE"))
 
 ## Change this value in production
-SECRET_KEY = "thisisnotapropersecretkey"
+DEFAULT_SECRET_KEY = "thisisnotapropersecretkey"
+SECRET_KEY = os.getenv("SECRET_KEY", DEFAULT_SECRET_KEY)
+
 
 # Meltano
 # -----------------
@@ -51,7 +53,10 @@ SQLALCHEMY_DATABASE_URI = os.getenv("MELTANO_DATABASE_URI")
 
 # Change this value in production
 # A better approach would be to have individual salts hashed resource
-SECURITY_PASSWORD_SALT = "b4c124932584ad6e69f2774a0ae5c138"
+DEFAULT_SECURITY_PASSWORD_SALT = "b4c124932584ad6e69f2774a0ae5c138"
+SECURITY_PASSWORD_SALT = os.getenv(
+    "SECURITY_PASSWORD_SALT", DEFAULT_SECURITY_PASSWORD_SALT
+)
 SECURITY_PASSWORD_HASH = "bcrypt"
 SECURITY_REGISTERABLE = False
 SECURITY_CHANGEABLE = True
@@ -113,13 +118,17 @@ class Production(object):
 
 
 def ensure_secure_setup(app):
-    secure_variables = ["SERVER_NAME", "SECRET_KEY", "SECURITY_PASSWORD_SALT"]
+    secure_variables = [
+        ("SERVER_NAME", None),
+        ("SECRET_KEY", DEFAULT_SECRET_KEY),
+        ("SECURITY_PASSWORD_SALT", DEFAULT_SECURITY_PASSWORD_SALT),
+    ]
 
     facts = []
-    for var in secure_variables:
+    for (var, default) in secure_variables:
         if app.config[var] is None:
             facts.append(f"\t- '{var}': variable is unset.")
-        elif app.config[var] == globals().get(var):
+        elif app.config[var] == default:
             facts.append(f"\t- '{var}': variable has test value.")
 
     if facts:
@@ -127,5 +136,5 @@ def ensure_secure_setup(app):
         logging.warning(
             "The following variables are insecure and should be regenerated:\n"
             f"{facts_msg}\n\n"
-            "Use `meltano ui setup` command to generate new secrets."
+            "Use `meltano ui setup` command to generate new secrets or set them via environment variables."
         )

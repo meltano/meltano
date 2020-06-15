@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2090](https://gitlab.com/meltano/meltano/-/issues/2090) Allow SERVER_NAME, SECRET_KEY, and SECURITY_PASSWORD_SALT to be set using environment instead of ui.cfg
+
 ### Changes
 
 ### Fixes
