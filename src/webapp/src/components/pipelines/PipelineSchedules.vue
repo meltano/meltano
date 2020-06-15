@@ -93,16 +93,15 @@ export default {
 
 <template>
   <div class="box">
-    <table class="table is-fullwidth is-hoverable">
+    <table class="table is-fullwidth is-hoverable pipelines-table">
       <ScheduleTableHead has-actions has-start-date />
-
       <tbody>
         <template v-for="pipeline in pipelines">
           <tr :key="pipeline.name">
             <td>
               <article class="media">
                 <figure class="media-left">
-                  <p class="image level-item is-48x48 container">
+                  <p class="image level-item is-32x32 container">
                     <ConnectorLogo :connector="pipeline.extractor" />
                   </p>
                 </figure>
@@ -118,6 +117,16 @@ export default {
                   </div>
                 </div>
               </article>
+            </td>
+            <td>
+              <p>
+                {{ pipeline.name }}
+              </p>
+            </td>
+            <td>
+              <p>
+                {{ pipeline.loader }}
+              </p>
             </td>
             <td>
               <div class="is-flex is-vcentered">
@@ -174,6 +183,11 @@ export default {
                     }}
                   </span>
                 </span>
+              </p>
+            </td>
+            <td>
+              <p>
+                {{ pipeline.transform }}
               </p>
             </td>
             <td>
@@ -268,4 +282,12 @@ export default {
   </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.pipelines-table {
+  font-size: 14px;
+  .control,
+  .button {
+    font-size: inherit;
+  }
+}
+</style>

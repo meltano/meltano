@@ -21,6 +21,24 @@ export default {
         </span>
       </th>
       <th>
+        <span>Name</span>
+        <span
+          class="icon has-text-grey-light tooltip is-tooltip-right"
+          data-tooltip="The pipeline's name"
+        >
+          <font-awesome-icon icon="info-circle"></font-awesome-icon>
+        </span>
+      </th>
+      <th>
+        <span>Loader</span>
+        <span
+          class="icon has-text-grey-light tooltip is-tooltip-left"
+          data-tooltip="The pipeline's loader"
+        >
+          <font-awesome-icon icon="info-circle"></font-awesome-icon>
+        </span>
+      </th>
+      <th>
         <span>Update Interval</span>
         <span
           class="icon has-text-grey-light tooltip is-tooltip-left"
@@ -35,6 +53,15 @@ export default {
           class="icon has-text-grey-light tooltip is-tooltip-left"
           :class="{ 'is-tooltip-left': !hasActions }"
           data-tooltip="The pipeline's first date to extract data from"
+        >
+          <font-awesome-icon icon="info-circle"></font-awesome-icon>
+        </span>
+      </th>
+      <th>
+        <span>Transform</span>
+        <span
+          class="icon has-text-grey-light tooltip is-tooltip-left"
+          data-tooltip="The pipeline's transform type: 'Run','Only', 'Skip'"
         >
           <font-awesome-icon icon="info-circle"></font-awesome-icon>
         </span>
