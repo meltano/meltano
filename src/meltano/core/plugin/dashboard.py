@@ -211,7 +211,7 @@ class DashboardPlugin(PluginInstall):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
 
     @hook("after_install")
-    def after_install(self, project, args=[]):
+    def after_install(self, project, reason):
         venv = VirtualEnv(project.plugin_dir(self, "venv"))
         packages_dir = venv.site_packages_dir
 

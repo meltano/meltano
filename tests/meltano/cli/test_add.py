@@ -3,8 +3,10 @@ import pytest
 import functools
 from unittest import mock
 
+from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
+from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.m5o.dashboards_service import DashboardsService
 from meltano.core.m5o.reports_service import ReportsService
@@ -12,18 +14,26 @@ from meltano.core.m5o.reports_service import ReportsService
 
 class TestCliAdd:
     @pytest.mark.parametrize(
-        "plugin_type,plugin_name",
+        "plugin_type,plugin_name,file_plugin_name",
         [
-            (PluginType.EXTRACTORS, "tap-carbon-intensity"),
-            (PluginType.LOADERS, "target-sqlite"),
-            (PluginType.TRANSFORMS, "tap-carbon-intensity"),
-            (PluginType.MODELS, "model-carbon-intensity"),
-            (PluginType.DASHBOARDS, "dashboard-google-analytics"),
-            (PluginType.ORCHESTRATORS, "airflow"),
-            (PluginType.TRANSFORMERS, "dbt"),
+            (PluginType.EXTRACTORS, "tap-carbon-intensity", None),
+            (PluginType.LOADERS, "target-sqlite", None),
+            (PluginType.TRANSFORMS, "tap-carbon-intensity", None),
+            (PluginType.MODELS, "model-carbon-intensity", None),
+            (PluginType.DASHBOARDS, "dashboard-google-analytics", None),
+            (PluginType.ORCHESTRATORS, "airflow", "airflow"),
+            (PluginType.TRANSFORMERS, "dbt", "dbt"),
         ],
     )
-    def test_add(self, plugin_type, plugin_name, project, cli_runner, config_service):
+    def test_add(
+        self,
+        plugin_type,
+        plugin_name,
+        file_plugin_name,
+        project,
+        cli_runner,
+        config_service,
+    ):
         # ensure the plugin is not present
         with pytest.raises(PluginMissingError):
             config_service.find_plugin(plugin_name, plugin_type=plugin_type)
@@ -37,8 +47,20 @@ class TestCliAdd:
 
             plugin = config_service.find_plugin(plugin_name, plugin_type)
             assert plugin
+            plugins = [plugin]
 
-            install_plugin_mock.assert_called_once_with(project, [plugin])
+            if file_plugin_name:
+                assert f"Added related file bundle '{file_plugin_name}'" in res.stdout
+
+                file_plugin = config_service.find_plugin(
+                    file_plugin_name, PluginType.FILES
+                )
+                assert file_plugin
+                plugins.append(file_plugin)
+
+            install_plugin_mock.assert_called_once_with(
+                project, plugins, reason=PluginInstallReason.ADD
+            )
 
     def test_add_multiple(self, project, cli_runner, config_service):
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
@@ -70,12 +92,16 @@ class TestCliAdd:
             assert tap_facebook
 
             install_plugin_mock.assert_called_once_with(
-                project, [tap_gitlab, tap_adwords, tap_facebook]
+                project,
+                [tap_gitlab, tap_adwords, tap_facebook],
+                reason=PluginInstallReason.ADD,
             )
 
     def test_add_transform(self, project, cli_runner):
         # Add dbt and transform/ files
         cli_runner.invoke(cli, ["add", "transformer", "dbt"])
+        cli_runner.invoke(cli, ["add", "files", "dbt"])
+
         res = cli_runner.invoke(cli, ["add", "transform", "tap-google-analytics"])
 
         assert res.exit_code == 0
@@ -114,9 +140,68 @@ class TestCliAdd:
         assert len(dashboards_service.get_dashboards()) == dashboards_count
         assert len(reports_service.get_reports()) == reports_count
 
+    def test_add_files_with_updates(
+        self, session, project, cli_runner, config_service, plugin_settings_service
+    ):
+        result = cli_runner.invoke(cli, ["add", "files", "airflow"])
+        assert_cli_runner(result)
+
+        # Plugin has been added to meltano.yml
+        plugin = config_service.find_plugin("airflow", PluginType.FILES)
+        assert plugin
+
+        # Automatic updating is enabled
+        value, _ = plugin_settings_service.get_value(
+            session, plugin, "update.orchestrate/dags/meltano.py"
+        )
+        assert value == True
+
+        # File has been created
+        assert "Created orchestrate/dags/meltano.py" in result.output
+
+        file_path = project.root_dir("orchestrate/dags/meltano.py")
+        assert file_path.is_file()
+
+        # File has "managed" header
+        assert (
+            "This file is managed by the 'airflow' file bundle" in file_path.read_text()
+        )
+
+    def test_add_files_without_updates(self, project, cli_runner, config_service):
+        result = cli_runner.invoke(cli, ["add", "files", "docker-compose"])
+        assert_cli_runner(result)
+
+        # Plugin has not been added to meltano.yml
+        with pytest.raises(PluginMissingError):
+            config_service.find_plugin("docker-compose", PluginType.FILES)
+
+        # File has been created
+        assert "Created docker-compose.yml" in result.output
+
+        file_path = project.root_dir("docker-compose.yml")
+        assert file_path.is_file()
+
+        # File does not have "managed" header
+        assert "This file is managed" not in file_path.read_text()
+
+    def test_add_files_that_already_exists(self, project, cli_runner, config_service):
+        project.root_dir("transform/dbt_project.yml").write_text("Exists!")
+
+        result = cli_runner.invoke(cli, ["add", "files", "dbt"])
+        assert_cli_runner(result)
+
+        assert (
+            "File transform/dbt_project.yml already exists, keeping both versions"
+            in result.output
+        )
+        assert "Created transform/dbt_project (dbt).yml" in result.output
+        assert project.root_dir("transform/dbt_project (dbt).yml").is_file()
+
     def test_add_related(self, project, cli_runner, config_service):
         # Add dbt and transform/ files
         cli_runner.invoke(cli, ["add", "transformer", "dbt"])
+        cli_runner.invoke(cli, ["add", "files", "dbt"])
+
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
@@ -136,7 +221,9 @@ class TestCliAdd:
             assert dashboard
 
             install_plugin_mock.assert_called_once_with(
-                project, [tap, transform, model, dashboard]
+                project,
+                [tap, transform, model, dashboard],
+                reason=PluginInstallReason.ADD,
             )
 
     def test_add_missing(self, project, cli_runner, config_service):
@@ -178,4 +265,6 @@ class TestCliAdd:
             assert plugin.name == "tap-custom"
             assert plugin.executable == "tap-custom-bin"
 
-            install_plugin_mock.assert_called_once_with(project, [plugin])
+            install_plugin_mock.assert_called_once_with(
+                project, [plugin], reason=PluginInstallReason.ADD
+            )

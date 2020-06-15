@@ -10,7 +10,10 @@ from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
     PluginNotFoundError,
 )
-from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.plugin_install_service import (
+    PluginInstallService,
+    PluginInstallReason,
+)
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
@@ -25,10 +28,16 @@ def add_plugin(
 
     try:
         plugin = add_service.add(plugin_type, plugin_name)
-        click.secho(
-            f"Added {plugin_type.descriptor} '{plugin_name}' to your Meltano project",
-            fg="green",
-        )
+        if plugin.should_add_to_file(project):
+            click.secho(
+                f"Added {plugin_type.descriptor} '{plugin_name}' to your Meltano project",
+                fg="green",
+            )
+        else:
+            click.secho(
+                f"Adding {plugin_type.descriptor} '{plugin_name}' to your Meltano project...",
+                fg="green",
+            )
     except PluginAlreadyAddedException as err:
         click.secho(
             f"{plugin_type.descriptor.capitalize()} '{plugin_name}' is already in your Meltano project",
@@ -65,35 +74,43 @@ def add_related_plugins(
 
         related_plugins = add_service.add_related(plugin_def, plugin_types=plugin_types)
         for related_plugin in related_plugins:
-            click.secho(
-                f"Added related {related_plugin.type.descriptor} '{related_plugin.name}' to your Meltano project",
-                fg="green",
-            )
+            if related_plugin.should_add_to_file(project):
+                click.secho(
+                    f"Added related {related_plugin.type.descriptor} '{related_plugin.name}' to your Meltano project",
+                    fg="green",
+                )
+            else:
+                click.secho(
+                    f"Adding related {related_plugin.type.descriptor} '{related_plugin.name}' to your Meltano project...",
+                    fg="green",
+                )
 
         added_plugins.extend(related_plugins)
 
     return added_plugins
 
 
-def install_status_update(data):
+def install_status_update(data, reason):
     plugin = data["plugin"]
 
     if data["status"] == "running":
         click.echo()
-        click.secho(f"Installing {plugin.type.descriptor} '{plugin.name}'...")
+        verb = "Updating" if reason == PluginInstallReason.UPGRADE else "Installing"
+        click.secho(f"{verb} {plugin.type.descriptor} '{plugin.name}'...")
     elif data["status"] == "error":
         click.secho(data["message"], fg="red")
         click.secho(data["details"], err=True)
     elif data["status"] == "warning":
         click.secho(f"Warning! {data['message']}.", fg="yellow")
     elif data["status"] == "success":
-        click.secho(f"Installed {plugin.type.descriptor} '{plugin.name}'", fg="green")
+        verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
+        click.secho(f"{verb} {plugin.type.descriptor} '{plugin.name}'", fg="green")
 
 
-def install_plugins(project, plugins, **kwargs):
+def install_plugins(project, plugins, reason=PluginInstallReason.INSTALL):
     install_service = PluginInstallService(project)
     install_status = install_service.install_plugins(
-        plugins, status_cb=install_status_update, **kwargs
+        plugins, status_cb=install_status_update, reason=reason
     )
     num_installed = len(install_status["installed"])
     num_failed = len(install_status["errors"])
@@ -106,8 +123,7 @@ def install_plugins(project, plugins, **kwargs):
 
     if len(plugins) > 1:
         click.echo()
-        click.secho(
-            f"Installed {num_installed}/{num_installed+num_failed} plugins", fg=fg
-        )
+        verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
+        click.secho(f"{verb} {num_installed}/{num_installed+num_failed} plugins", fg=fg)
 
     return num_failed == 0
