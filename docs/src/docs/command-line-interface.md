@@ -7,18 +7,18 @@ lastUpdatedSignificantly: 2020-05-07
 
 # Command Line Interface
 
-Meltano provides a command line interface (CLI) that allows you to manage the configuration and orchestration of Meltano instances. It provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run, and debug every step of the data life cycle.
+Meltano provides a command line interface (CLI) that allows you to manage the configuration and orchestration of Meltano projects. It provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run, and debug every step of the data life cycle.
 
 ## `add`
 
-The `add` command allows you to add plugins to your Meltano instance.
+The `add` command allows you to add plugins to your Meltano project.
 
 ### Extractor / Loader
 
-When you add a extractor or loader to a Meltano instance, Meltano will:
+When you add an extractor or loader to a Meltano project, Meltano will:
 
-1. Add it to the `meltano.yml` file
-1. Install it in the `.meltano` directory with `venv` and `pip3`
+1. Add the plugin to `meltano.yml`
+1. Install it into its own virtual environment in the `.meltano` directory using `pip3`
 
 You can run `meltano add` with `--include-related` to automatically install all transform, model, and dashboard plugins related to an extractor.
 
@@ -42,56 +42,86 @@ meltano add loader target-postgres
 
 ### Transform
 
-When you add a transform to a Meltano instance, Meltano will:
+When you add a transform to a Meltano project, Meltano will:
 
-1. Install dbt transformer to enable transformations (if needed)
-1. Add transform to `meltano.yml file`
+1. Add the plugin to `meltano.yml`
 1. Update the dbt packages and project configuration
 
 #### Example
 
 ```bash
 # Transform Template
-meltano add [transform] [name_of_transform]
+meltano add transform [name_of_transform]
+meltano add transforms [name_of_transform...]
 ```
 
 ### Model
 
-When you add a model to a Meltano instance, Meltano will:
+When you add a model to a Meltano project, Meltano will:
 
-1. Add a model bundle to your `meltano.yml` file to help you interactively generate SQL
-1. Install the model inside the `.meltano` directory which is then available to use in the Meltano webapp
+1. Add the plugin to `meltano.yml`
+1. Install the model inside the `.meltano` directory which is then available to use in the Meltano webapp  file to help you interactively generate SQL
 
 #### Example
 
 ```bash
 meltano add model [name_of_model]
+meltano add models [name_of_model...]
 ```
 
 ### Dashboard
 
-When you add a dashboard to a Meltano instance, Meltano will:
+When you add a dashboard plugin to a Meltano project, Meltano will:
 
-1. Add a dashboard bundle to your `meltano.yml` file
+1. Add the plugin to `meltano.yml`
 1. Install the dashboard and reports inside the `analyze` directory which are then available to use in the Meltano webapp
 
 #### Example
 
 ```bash
 meltano add dashboard [name_of_dashboard]
+meltano add dashboards [name_of_dashboard...]
 ```
 
-### Orchestration
+### Orchestrator
 
-When you add an orchestrator to a Meltano instance, Meltano will:
+When you add an orchestrator to a Meltano project, Meltano will:
 
-1. Add an orchestrator plugin to your **meltano.yml**
-1. Install it
+1. Add the plugin to `meltano.yml`
+1. Install it into its own virtual environment in the `.meltano` directory using `pip3`
+1. Install any related [file bundles](#file-bundle) to add orchestrator-specific files to your Meltano project
 
 #### Example
 
 ```bash
 meltano add orchestrator [name_of_orchestrator]
+```
+
+### Transformer
+
+When you add an transformer to a Meltano project, Meltano will:
+
+1. Add the plugin to `meltano.yml`
+1. Install it into its own virtual environment in the `.meltano` directory using `pip3`
+1. Install any related [file bundles](#file-bundle) to add transformer-specific files to your Meltano project
+
+#### Example
+
+```bash
+meltano add transformer [name_of_transformer]
+```
+
+### File bundle
+
+When you add a file bundle to a Meltano project, Meltano will:
+
+1. Add the plugin to `meltano.yml` if any of the files it contains are managed by the file bundle and to be updated automatically when [`meltano upgrade`](#upgrade) is run.
+2. Add the bundled files to your Meltano project
+
+#### Example
+
+```bash
+meltano add files [name_of_file_bundle...]
 ```
 
 ## `config`
@@ -424,7 +454,7 @@ Upgrade Meltano and the Meltano project to the latest version.
 
 When called without arguments, this will:
 - Upgrade the `meltano` package
-- Update files managed by plugins
+- Update files managed by [file bundles](#file-bundle)
 - Apply migrations to system database
 - Recompile models
 
@@ -435,7 +465,7 @@ meltano upgrade
 meltano upgrade --skip-package # Skip upgrading the Meltano package
 
 meltano upgrade package # Only upgrade Meltano package
-meltano upgrade files # Only update files managed by plugins
+meltano upgrade files # Only update files managed by file bundles
 meltano upgrade database # Only apply migrations to system database
 meltano upgrade models # Only recompile models
 ```

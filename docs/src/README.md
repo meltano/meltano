@@ -80,10 +80,8 @@ You can initialize a new Meltano project using [`meltano init`](/docs/command-li
 which will create a new directory with:
 
 - a `meltano.yml` file that will list any [`plugins` you'll add](/#meltano-add) and [pipeline `schedules` you'll create](/#orchestration),
-- a `transform` directory containing a full-fleged [dbt project](https://docs.getdbt.com/docs/building-a-dbt-project/projects) (that you're free to delete if you don't plan on using the [`dbt` transformer](/#transformation)),
-- an [`orchestrate/dags/meltano.py`](https://gitlab.com/meltano/meltano/blob/master/src/meltano/core/bundle/dags/meltano.py) file defining [Airflow DAGs](https://airflow.apache.org/docs/stable/concepts.html#dags) to run your [scheduled pipelines](/#orchestration) (that you're free to delete if you don't plan on using the [`airflow` orchestrator](/#orchestration)),
-- stubs for `.gitignore`, `docker-compose.yml`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
-- empty `model`, `extract`, `load`, `analyze`, and `notebook` directories for you to use (or delete) as you please.
+- stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
+- empty `model`, `extract`, `load`, `transform`, `analyze`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
 
 Whenever you [add a new plugin](/#meltano-add) to a Meltano project, it will be
 installed into your project's `.meltano` directory automatically.
@@ -201,9 +199,12 @@ need to be transformed to be more appropriate for analysis.
 Meltano helps you out here as well, with built-in (but optional!) support for running
 [dbt](https://www.getdbt.com/) models as part of your pipeline.
 
-A Meltano project's `transform` directory contains a full-fledged
-[dbt project](https://docs.getdbt.com/docs/building-a-dbt-project/projects),
-so you can easily install [existing dbt models from packages](https://hub.getdbt.com/)
+When you add the `dbt` transformer to your project, a full-fledged
+[dbt project](https://docs.getdbt.com/docs/building-a-dbt-project/projects)
+will automatically be initialized in the `transform` directory.
+Any transform plugins added to your Meltano project will automatically be
+added to the dbt project as well, but you can easily install
+[existing dbt models from packages](https://hub.getdbt.com/)
 or [write your own](/tutorials/create-custom-transforms-and-models.html#adding-custom-transforms).
 
 :::
@@ -226,8 +227,10 @@ export PG_USERNAME=meltano
 export PG_PASSWORD=meltano
 export PG_DATABASE=demo-warehouse
 
-# Add PostgreSQL-compatible dbt models for tap-gitlab
+# Add dbt transformer and initialize dbt project
 meltano add transformer dbt
+
+# Add PostgreSQL-compatible dbt models for tap-gitlab
 meltano add transform tap-gitlab
 
 # Run data integration and transformation pipeline
@@ -263,11 +266,12 @@ want to run it again, and again, and again.
 Meltano lets you set up pipeline schedules that can then automatically be fed
 to and run by a supported orchestrator like [Apache Airflow](https://airflow.apache.org/).
 
-Airflow will look for [DAGs](https://airflow.apache.org/docs/stable/concepts.html#dags)
-in a Meltano project's `orchestrate/dags` directory, so if the
-[default Meltano DAG](https://gitlab.com/meltano/meltano/blob/master/src/meltano/core/bundle/dags/meltano.py)'s
-behavior of simply running [`meltano elt`](/docs/command-line-interface.html#elt) on a schedule is not going to cut it,
-you can easily modify it or add your own.
+When you add the `airflow` orchestrator to your project, a
+[Meltano DAG generator](https://gitlab.com/meltano/files-airflow/-/blob/master/bundle/orchestrate/dags/meltano.py)
+will automatically be added to the `orchestrate/dags` directory, where Airflow
+will look for [DAGs](https://airflow.apache.org/docs/stable/concepts.html#dags) by default.
+If the default behavior of simply running [`meltano elt`](/docs/command-line-interface.html#elt) on a
+schedule is not going to cut it, you can easily modify the DAG generator or add your own.
 
 :::
 
@@ -278,7 +282,7 @@ you can easily modify it or add your own.
 meltano schedule gitlab-to-jsonl tap-gitlab target-jsonl @hourly
 meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily --transform=run
 
-# Add Airflow orchestrator
+# Add Airflow orchestrator and default DAG generator
 meltano add orchestrator airflow
 
 # Start the Airflow scheduler (add `-D` to background)
@@ -370,7 +374,7 @@ This means that you do not need to manually craft the
 [`config.json` files](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file) expected by Singer taps and targets,
 because Meltano will generate them on the fly whenever an extractor or loader is used through [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 
-If the plugin you'd like to use and configure is already known to Meltano (that is, it shows up when you run [`meltano discover`](/docs/command-line-interface.html#discover)), Meltano already knows what settings it supports.
+If the plugin you'd like to use and configure is already [known to Meltano](/docs/contributor-guide.html#known-plugins) (that is, it shows up when you run [`meltano discover`](/docs/command-line-interface.html#discover)), Meltano already knows what settings it supports.
 If you're [adding a custom plugin](/#meltano-add), on the other hand, you will be asked to specify the names of the supported configuration options yourself.
 
 To determine the values of these settings, Meltano will look in 4 places, with each taking precedence over the next:

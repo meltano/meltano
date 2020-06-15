@@ -77,12 +77,16 @@ class PluginType(YAMLEnum):
     DASHBOARDS = "dashboards"
     ORCHESTRATORS = "orchestrators"
     TRANSFORMERS = "transformers"
+    FILES = "files"
 
     def __str__(self):
         return self.value
 
     @property
     def descriptor(self):
+        if self is self.__class__.FILES:
+            return "file bundle"
+
         return self.singular
 
     @property
@@ -194,6 +198,9 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         return self.is_installable()
 
     def is_configurable(self):
+        return True
+
+    def should_add_to_file(self, project):
         return True
 
     def is_custom(self):

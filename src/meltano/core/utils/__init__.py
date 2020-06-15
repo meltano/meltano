@@ -87,7 +87,7 @@ def get_all(keys, d: dict, default=None):
     return dict(map(lambda k: (k, d.get(k, default)), keys))
 
 
-def nest(d: dict, path: str, value={}):
+def nest(d: dict, path: str, value={}, maxsplit=-1):
     """
     Create a hierarchical dictionary path and return the leaf dict.
 
@@ -107,7 +107,7 @@ def nest(d: dict, path: str, value={}):
     """
     cursor = d
 
-    *initial, tail = path.split(".")
+    *initial, tail = path.split(".", maxsplit=maxsplit)
 
     # create the list of dicts
     for key in initial:

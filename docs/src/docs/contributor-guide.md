@@ -214,13 +214,15 @@ Each extractor (tap) and loader (target) in the `discovery.yml` has a `settings`
       env: SOME_API_KEY # Optional (use to delegate to an environment variable for overriding this setting's value)
 ```
 
-## Taps & Targets Development
+## Plugin Development
+
+### Taps & Targets Development
 
 Watch ["How taps are built"](https://www.youtube.com/watch?v=aImidnW8nsU) for an explanation of how Singer taps (which form the basis for Meltano extractors) work, and what goes into building new ones or verifying and modifying existing ones for various types of APIs.
 
 Then watch ["How transforms are built"](https://www.youtube.com/watch?v=QRaCSKQC_74) for an explanation of how DBT transforms work, and what goes into building new ones for new data sources.
 
-### For existing taps/targets
+#### For existing taps/targets
 
 We should be good citizen about these, and use the default workflow to contribute. Most of these are on GitHub so:
 
@@ -229,7 +231,7 @@ We should be good citizen about these, and use the default workflow to contribut
 1. Modify and submits PRs
 1. If there is resistance, fork as our tap (2)
 
-#### How to test a tap?
+##### How to test a tap?
 
 We qualify taps with the capabilities it supports:
 
@@ -238,28 +240,28 @@ We qualify taps with the capabilities it supports:
 - discover: the tap supports catalog extraction
 - state: the tap supports incremental extraction
 
-##### Properties/Catalog
+###### Properties/Catalog
 
 You should look at the tap's documentation to see which one is supported.
 
-##### Discover
+###### Discover
 
 Try to run the tap with the `--discover` switch, which should output a catalog on STDOUT.
 
-##### State
+###### State
 
 1. Try to run the tap connect and extract data first, watching for `STATE` messages.
 1. Do two ELT run with `target-postgres`, then validate that:
    1. All the tables in the schema created have a PRIMARY KEY constraint. (this is important for incremental updates)
    1. There is no duplicates after multiple extractions
 
-#### Troubleshooting
+##### Troubleshooting
 
-##### Tables are lacking primary keys
+###### Tables are lacking primary keys
 
 This might be a configuration issue with the catalog file that is sent to the tap. Take a look at the tap's documentation and look for custom metadata on the catalog.
 
-### For taps/targets we create
+#### For taps/targets we create
 
 1. For tap development please use the [tap cookiecutter template](https://github.com/singer-io/singer-tap-template).
 1. For target development please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
@@ -268,14 +270,14 @@ This might be a configuration issue with the catalog file that is sent to the ta
 1. Publish PyPI packages of these package (not for now)
 1. We could mirror this repo on GitHub if we want (not for now)
 
-## Transform & Models Development
+### Transform & Models Development
 
 When you need to expose data to the user through Meltano UI, this often will require updating the transforms and models. At a high level:
 
 - **Transforms** will allow you to create the necessary PostgreSQL tables for users to query against
 - **Models** will determine the structure of what is exposed on the UI side
 
-### Transforms
+#### Transforms
 
 You can test local transforms in a project by adding them in a Meltano project's `transform` > `models` > `my_meltano_project` directory.
 
@@ -298,7 +300,7 @@ Once you've created your transforms, you can run it with the following command:
 meltano elt tap-gitlab target-postgres --transform only
 ```
 
-### Models
+#### Models
 
 When updating the models that will appear in the UI, you can follow these steps:
 
@@ -309,16 +311,16 @@ When updating the models that will appear in the UI, you can follow these steps:
 1. Run `meltano install` to fetch new settings
 1. Refresh browser and you should now see your changes in the UI
 
-## Dashboard Development
+### Dashboard Development
 
-To create a dashboard plugin like https://gitlab.com/meltano/dashboard-google-analytics, follow these steps:
+To create a dashboard plugin like <https://gitlab.com/meltano/dashboard-google-analytics>, follow these steps:
 
 1. Set up the extractor and model you are creating dashboard(s) and reports for in your local Meltano instance.
 1. Start Meltano UI.
 1. Use the UI to create the desired reports based on the model's designs. Name the reports appropriately, but don't include the extractor name or label.
 1. Create one or more new dashboard and add the reports to it. If you're creating just one dashboard, name it after the extractor label (e.g. "Google Analytics", not `tap-google-analytics`). If you're creating multiple dashboards, add an appropriate subtitle after a colon (e.g. "Google Analytics: My Dashboard").
 1. Create a new plugin repository named `dashboard-<data source>` (e.g. `dashboard-google-analytics`).
-1. Copy over `setup.py`, `README.md`, and `LICENSE` from https://gitlab.com/meltano/dashboard-google-analytics and edit these files as appropriate.
+1. Copy over `setup.py`, `README.md`, and `LICENSE` from <https://gitlab.com/meltano/dashboard-google-analytics> and edit these files as appropriate.
 1. Move your newly created dashboards and reports from your local Meltano project's `analyze/dashboards` and `analyze/reports` to `dashboards` and `reports` inside the new plugin repository.
 1. Push your new plugin repository to GitLab.com. Official dashboard plugins live at `https://gitlab.com/meltano/dashboard-...`.
 1. Add an entry to `src/meltano/core/bundle/discovery.yml` under `dashboards`. Set `namespace` to the `namespace` of the extractor and model plugins the dashboard(s) and reports are related to (e.g. `tap_google_analytics`), and set `name` and `pip_url` set as appropriate.
@@ -326,6 +328,20 @@ To create a dashboard plugin like https://gitlab.com/meltano/dashboard-google-an
 1. Ensure that your local Meltano instance uses the recently modified `discovery.yml` by following the steps under ["Local changes to discovery.yml](#local-changes-to-discovery-yml).
 1. Run `meltano add --include-related extractor <extractor name>` to automatically install all plugins related to the extractor, including our new dashboard plugin. Related plugins are also installed automatically when installing an extractor using the UI, but we can't use that flow here because the extractor has already been installed.
 1. Verify that the dashboard(s) and reports have automatically been added to your local Meltano project's `analyze` directory and show up under "Dashboards" in the UI.
+1. Success! You can now submit a merge request to Meltano containing the changes to `discovery.yml` (and an appropriate `CHANGELOG` item, of course).
+
+### File Bundle Development
+
+To create a file bundle plugin like <https://gitlab.com/meltano/files-dbt>, follow these steps:
+
+1. Create a new plugin repository named `files-<service/tool>` (e.g. `files-airflow` or `files-docker`).
+1. Copy over `setup.py`, `README.md`, and `LICENSE` from <https://gitlab.com/meltano/files.dbt> and edit these files as appropriate.
+1. Create a `bundle` directory with an empty `__init__.py` file.
+1. Add all desired directories and files to the `bundle` directory. All of these files will be copied over into the Meltano project directory when the file bundle is added to the project.
+1. Add all file paths under `bundle` to the `package_data["bundle"]` array in `setup.py`
+1. Push your new plugin repository to GitLab.com. Official file bundle plugins live at `https://gitlab.com/meltano/files-...`.
+1. Add an entry to `src/meltano/core/bundle/discovery.yml` under `files`. Set `name` and `pip_url` as appropriate, and if applicable, set `namespace` to the `namespace` of the plugin the file bundle is related to (e.g. `dbt`).
+1. If any files are to be updated automatically when [`meltano upgrade`](/docs/command-line-interface.html#upgrade) is run, add `settings` entries with `name` `update.[file path]`, `kind` `boolean` and `value` `True`.
 1. Success! You can now submit a merge request to Meltano containing the changes to `discovery.yml` (and an appropriate `CHANGELOG` item, of course).
 
 ## System Database
