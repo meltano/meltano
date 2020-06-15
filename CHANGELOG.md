@@ -19,6 +19,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2096](https://gitlab.com/meltano/meltano/-/issues/2096) Remove noisy migration-related logging from CLI command output
+
 ### Breaks
 
 
