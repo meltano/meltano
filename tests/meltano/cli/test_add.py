@@ -32,10 +32,46 @@ class TestCliAdd:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(cli, ["add", plugin_type.singular, plugin_name])
 
-        assert res.exit_code == 0, res.stdout
-        assert f"Added {plugin_type.descriptor} '{plugin_name}'" in res.stdout
+            assert res.exit_code == 0, res.stdout
+            assert f"Added {plugin_type.descriptor} '{plugin_name}'" in res.stdout
 
-        assert config_service.find_plugin(plugin_name, plugin_type)
+            plugin = config_service.find_plugin(plugin_name, plugin_type)
+            assert plugin
+
+            install_plugin_mock.assert_called_once_with(project, [plugin])
+
+    def test_add_multiple(self, project, cli_runner, config_service):
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            cli_runner.invoke(cli, ["add", "extractors", "tap-gitlab"])
+
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            res = cli_runner.invoke(
+                cli, ["add", "extractors", "tap-gitlab", "tap-adwords", "tap-facebook"]
+            )
+
+            assert res.exit_code == 0, res.stdout
+            assert (
+                f"Extractor 'tap-gitlab' is already in your Meltano project"
+                in res.stderr
+            )
+            assert f"Added extractor 'tap-adwords'" in res.stdout
+            assert f"Added extractor 'tap-facebook'" in res.stdout
+
+            tap_gitlab = config_service.find_plugin("tap-gitlab", PluginType.EXTRACTORS)
+            assert tap_gitlab
+            tap_adwords = config_service.find_plugin(
+                "tap-adwords", PluginType.EXTRACTORS
+            )
+            assert tap_adwords
+            tap_facebook = config_service.find_plugin(
+                "tap-facebook", PluginType.EXTRACTORS
+            )
+            assert tap_facebook
+
+            install_plugin_mock.assert_called_once_with(
+                project, [tap_gitlab, tap_adwords, tap_facebook]
+            )
 
     def test_add_transform(self, project, cli_runner):
         # Add dbt and transform/ files
@@ -84,24 +120,30 @@ class TestCliAdd:
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
-                cli, ["add", "--include-related", "extractor", "tap-google-analytics"]
+                cli, ["add", "--include-related", "extractor", "tap-gitlab"]
             )
+            assert res.exit_code == 0
 
-        assert res.exit_code == 0
+            tap = config_service.find_plugin("tap-gitlab", PluginType.EXTRACTORS)
+            assert tap
+            transform = config_service.find_plugin("tap-gitlab", PluginType.TRANSFORMS)
+            assert transform
+            model = config_service.find_plugin("model-gitlab", PluginType.MODELS)
+            assert model
+            dashboard = config_service.find_plugin(
+                "dashboard-gitlab", PluginType.DASHBOARDS
+            )
+            assert dashboard
 
-        # Verify that all related plugins are installed
-        assert config_service.find_plugin("tap-google-analytics", PluginType.EXTRACTORS)
-        assert config_service.find_plugin("tap-google-analytics", PluginType.TRANSFORMS)
-        assert config_service.find_plugin("model-google-analytics", PluginType.MODELS)
-        assert config_service.find_plugin(
-            "dashboard-google-analytics", PluginType.DASHBOARDS
-        )
+            install_plugin_mock.assert_called_once_with(
+                project, [tap, transform, model, dashboard]
+            )
 
     def test_add_missing(self, project, cli_runner, config_service):
         res = cli_runner.invoke(cli, ["add", "extractor", "tap-unknown"])
 
         assert res.exit_code == 1
-        assert "'tap-unknown' is not supported" in res.stdout
+        assert "extractor 'tap-unknown' is not known to Meltano" in res.stdout
         assert res.stderr
 
         # ensure the plugin is not present

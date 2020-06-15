@@ -5,7 +5,7 @@ import os
 import sys
 
 from . import cli
-from .add import add_plugin
+from .utils import add_plugin, install_plugins
 from .params import project
 from meltano.core.config_service import ConfigService
 from meltano.core.runner.singer import SingerRunner
@@ -56,7 +56,10 @@ def elt(project, extractor, loader, dry, transform, job_id):
         OutputLogger(log_file):
 
         try:
-            install_missing_plugins(project, extractor, loader, transform)
+            success = install_missing_plugins(project, extractor, loader, transform)
+
+            if not success:
+                raise click.Abort()
 
             elt_context = (
                 ELTContextBuilder(project)
@@ -114,6 +117,7 @@ def install_missing_plugins(
     add_service = ProjectAddService(project)
     config_service = ConfigService(project)
 
+    plugins = []
     if transform != "only":
         try:
             config_service.find_plugin(extractor, plugin_type=PluginType.EXTRACTORS)
@@ -122,7 +126,10 @@ def install_missing_plugins(
                 f"Extractor '{extractor}' is missing, trying to install it...",
                 fg="yellow",
             )
-            add_plugin(add_service, project, PluginType.EXTRACTORS, extractor)
+            plugin = add_plugin(
+                project, PluginType.EXTRACTORS, extractor, add_service=add_service
+            )
+            plugins.append(plugin)
 
         try:
             config_service.find_plugin(loader, plugin_type=PluginType.LOADERS)
@@ -130,7 +137,10 @@ def install_missing_plugins(
             click.secho(
                 f"Loader '{loader}' is missing, trying to install it...", fg="yellow"
             )
-            add_plugin(add_service, project, PluginType.LOADERS, loader)
+            plugin = add_plugin(
+                project, PluginType.LOADERS, loader, add_service=add_service
+            )
+            plugins.append(plugin)
 
     if transform != "skip":
         try:
@@ -139,7 +149,10 @@ def install_missing_plugins(
             click.secho(
                 f"Transformer 'dbt' is missing, trying to install it...", fg="yellow"
             )
-            add_plugin(add_service, project, PluginType.TRANSFORMERS, "dbt")
+            plugin = add_plugin(
+                project, PluginType.TRANSFORMERS, "dbt", add_service=add_service
+            )
+            plugins.append(plugin)
 
         discovery_service = PluginDiscoveryService(project)
         extractor_plugin_def = discovery_service.find_plugin(
@@ -165,12 +178,15 @@ def install_missing_plugins(
                     fg="yellow",
                 )
                 add_plugin(
-                    add_service,
                     project,
                     PluginType.TRANSFORMS,
                     transform_plugin_def.name,
+                    add_service=add_service,
                 )
+                plugins.append(plugin)
             except PluginNotFoundError:
                 # There is no default transform for this extractor..
                 # Don't panic, everything is cool - just run custom transforms
                 pass
+
+    return install_plugins(project, plugins)

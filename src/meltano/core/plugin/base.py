@@ -100,11 +100,16 @@ class PluginType(YAMLEnum):
 
     @classmethod
     def cli_arguments(cls):
-        return [type.singular for type in cls]
+        args = [type.singular for type in cls]
+        args.extend([type for type in cls])
+        return args
 
     @classmethod
     def from_cli_argument(cls, value):
-        return cls(f"{value}s")
+        if not value.endswith("s"):
+            value += "s"
+
+        return cls(value)
 
 
 class PluginRef:

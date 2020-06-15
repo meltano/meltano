@@ -5,40 +5,26 @@ import click
 import sys
 import logging
 from urllib.parse import urlparse
+from typing import List
 
 from . import cli
 from .params import project
-from .install import install_plugins
-from meltano.core.project_add_service import (
-    ProjectAddService,
-    PluginNotSupportedException,
-    PluginAlreadyAddedException,
-)
-from meltano.core.plugin_discovery_service import (
-    PluginDiscoveryService,
-    PluginNotFoundError,
-)
+from .utils import add_plugin, add_related_plugins, install_plugins
+from meltano.core.plugin import PluginType
+from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_add_custom_service import ProjectAddCustomService
-from meltano.core.plugin_install_service import (
-    PluginInstallService,
-    PluginNotInstallable,
-)
-from meltano.core.plugin import PluginType, Plugin
-from meltano.core.project import Project
-from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.error import PluginInstallError
-from meltano.core.db import project_engine
 
 
 @cli.command()
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
-@click.argument("plugin_name")
+@click.argument("plugin_name", nargs=-1, required=True)
 @click.option("--custom", is_flag=True)
 @click.option("--include-related", is_flag=True)
 @project()
 @click.pass_context
 def add(ctx, project, plugin_type, plugin_name, **flags):
     plugin_type = PluginType.from_cli_argument(plugin_type)
+    plugin_names = plugin_name  # nargs=-1
 
     if flags["custom"]:
         if plugin_type in (
@@ -53,72 +39,28 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
     else:
         add_service = ProjectAddService(project)
 
-    add_plugin(
-        add_service,
-        project,
-        plugin_type,
-        plugin_name,
-        include_related=flags["include_related"],
-    )
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
-
-
-def add_plugin(
-    add_service,
-    project: Project,
-    plugin_type: PluginType,
-    plugin_name: str,
-    include_related=False,
-):
-    try:
-        plugin = add_service.add(plugin_type, plugin_name)
-        click.secho(
-            f"Added {plugin_type.descriptor} '{plugin_name}' to your Meltano project",
-            fg="green",
-        )
-    except PluginAlreadyAddedException as err:
-        click.secho(
-            f"{plugin_type.descriptor} '{plugin_name}' is already in your Meltano project".capitalize(),
-            fg="yellow",
-            err=True,
-        )
-        plugin = err.plugin
-    except (PluginNotSupportedException, PluginNotFoundError):
-        click.secho(
-            f"Error: {plugin_type.descriptor} '{plugin_name}' is not supported",
-            fg="red",
-        )
-        raise click.Abort()
-
-    plugins = [plugin]
+    plugins = [
+        add_plugin(project, plugin_type, plugin_name, add_service=add_service)
+        for plugin_name in plugin_names
+    ]
 
     related_plugin_types = []
-    if include_related:
+    if flags["include_related"]:
         related_plugin_types = list(PluginType)
 
-    discovery_service = PluginDiscoveryService(project)
-    plugin_def = discovery_service.find_plugin(plugin.type, plugin.name)
-
-    related_plugins = add_service.add_related(
-        plugin_def, plugin_types=related_plugin_types
+    related_plugins = add_related_plugins(
+        project, plugins, add_service=add_service, plugin_types=related_plugin_types
     )
-    for related_plugin in related_plugins:
-        click.secho(
-            f"Added related {related_plugin.type.descriptor} '{related_plugin.name}' to your Meltano project",
-            fg="green",
-        )
-
     plugins.extend(related_plugins)
 
     success = install_plugins(project, plugins)
 
-    docs_link = plugin._extras.get("docs")
-    if docs_link:
-        click.echo(
-            f"For more details about {plugin.type.descriptor} '{plugin.name}', visit {docs_link}"
-        )
+    for plugin in plugins:  # TODO: Only works on Plugin from discovery...
+        docs_link = plugin._extras.get("docs")
+        if docs_link:
+            click.echo(
+                f"For more details about {plugin.type.descriptor} '{plugin.name}', visit {docs_link}"
+            )
 
     if not success:
         raise click.Abort()
