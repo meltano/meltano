@@ -11,7 +11,7 @@ Meltano provides a command line interface (CLI) that allows you to manage the co
 
 ## `add`
 
-The `add` command allows you to add an extractor, loader, or transform to your Meltano instance.
+The `add` command allows you to add plugins to your Meltano instance.
 
 ### Extractor / Loader
 
@@ -27,9 +27,11 @@ You can run `meltano add` with `--include-related` to automatically install all 
 ```bash
 # Extractor / Loader Template
 meltano add [extractor | loader] [name_of_plugin]
+meltano add [extractors | loaders] [name_of_plugin...]
 
 # Extractor Example
 meltano add extractor tap-gitlab
+meltano add extractors tap-gitlab tap-google-analytics
 
 # Extractor Example including related plugins
 meltano add --include-related extractor tap-google-analytics
@@ -238,9 +240,10 @@ meltano init [project_name] [--no_usage_stats]
 
 ## `install`
 
-Installs all the dependencies of your project based on the **meltano.yml** file.
+Installs dependencies of your project based on the **meltano.yml** file.
 
 Optionally, provide a plugin type argument to only (re)install plugins of a certain type.
+Additionally, plugin names can be provided to only (re)install those specific plugins.
 
 Use `--include-related` to automatically install transform, model, and dashboard plugins related to installed extractor plugins.
 
@@ -250,6 +253,8 @@ Use `--include-related` to automatically install transform, model, and dashboard
 meltano install
 
 meltano install extractors
+meltano install extractor tap-gitlab
+meltano install extractors tap-gitlab tap-adwords
 
 meltano install models
 

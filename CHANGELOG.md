@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2095](https://gitlab.com/meltano/meltano/-/issues/2089) Support singular and plural plugin types in CLI arguments
+- [#2095](https://gitlab.com/meltano/meltano/-/issues/2089) Allow list of plugin names of same type to be provided to `meltano add` and `meltano install`
 
 ### Changes
 
