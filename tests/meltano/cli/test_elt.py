@@ -33,7 +33,7 @@ def test_elt(
     # exit cleanly when everything is fine
     # fmt: off
     with patch.object(SingerRunner, "run", return_value=None), \
-      patch("meltano.cli.elt.install_missing_plugins", return_value=None), \
+      patch("meltano.cli.elt.install_missing_plugins", return_value=True), \
       patch("meltano.core.elt_context.PluginDiscoveryService", return_value=plugin_discovery_service), \
       patch("meltano.core.elt_context.PluginSettingsService", return_value=plugin_settings_service):
         result = cli_runner.invoke(cli, args)
