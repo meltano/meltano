@@ -81,7 +81,9 @@ Update your `.env` file in your project directory with the desired customization
 
 ```bash
 export FLASK_PROFILE = ""
-export FLASK_ENV = ""
+export FLASK_ENV = "production"
+export FLASK_SERVER_NAME = ""
+export FLASK_SECRET_KEY = "thisisnotapropersecretkey"
 ```
 
 #### Service Listen Configuration
