@@ -108,7 +108,7 @@ export default {
         <template v-for="pipeline in pipelines">
           <tr :key="pipeline.name">
             <td>
-              <article class="media">
+              <article class="media is-vcentered">
                 <figure class="media-left">
                   <p class="image level-item is-32x32 container">
                     <ConnectorLogo :connector="pipeline.extractor" />
