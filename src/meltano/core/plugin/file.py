@@ -58,11 +58,14 @@ class FilePlugin(PluginInstall):
     def plugin_config(self, project):
         _, Session = project_engine(project)
         session = Session()
-
-        plugin_settings_service = PluginSettingsService(project)
+        try:
+            plugin_settings_service = PluginSettingsService(project)
+            raw_config = plugin_settings_service.as_config(session, self)
+        finally:
+            session.close()
 
         config = {}
-        for key, value in plugin_settings_service.as_config(session, self).items():
+        for key, value in raw_config.items():
             nest(config, key, value, maxsplit=1)
 
         return config

@@ -94,8 +94,8 @@ def show(project, extractor, show_all=False):
     _, Session = project_engine(project)
     select_service = SelectService(project, extractor)
 
+    session = Session()
     try:
-        session = Session()
         list_all = select_service.list_all(session)
     finally:
         session.close()
