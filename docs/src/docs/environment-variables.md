@@ -81,7 +81,19 @@ Update your `.env` file in your project directory with the desired customization
 
 ```bash
 export FLASK_PROFILE = ""
-export FLASK_ENV = ""
+export FLASK_ENV = "production"
+```
+
+#### Production Configuration
+
+`SERVER_NAME`, `SECRET_KEY`, and `SECURITY_PASSWORD_SALT` should be set in production, and will
+generate a security warning if they are missing. These can be set in `ui.cfg` with `meltano ui setup`
+but can be overridden with these environment variables:
+
+```bash
+MELTANO_UI_SERVER_NAME=""
+MELTANO_UI_SECRET_KEY=""
+MELTANO_UI_PASSWORD_SALT=""
 ```
 
 #### Service Listen Configuration
