@@ -1,3 +1,4 @@
+import logging
 import pytest
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
@@ -14,10 +15,11 @@ def vacuum_db(engine_sessionmaker):
 
     yield
 
-    # ensure we delete all the tables
+    logging.debug(f"Cleaning system database...")
     metadata = MetaData(bind=engine)
     metadata.reflect()
     metadata.drop_all()
+    logging.debug(f"Cleaned system database")
 
 
 @pytest.fixture(scope="class")
