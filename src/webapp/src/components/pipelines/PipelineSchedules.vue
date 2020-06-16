@@ -97,11 +97,14 @@ export default {
 
 <template>
   <div class="box">
-    <table class="table is-fullwidth is-hoverable pipelines-table">
+    <table class="table is-fullwidth is-hoverable is-size-7">
       <ScheduleTableHead has-actions has-start-date />
       <tbody>
         <template v-for="pipeline in pipelines">
           <tr :key="pipeline.name">
+            <td>
+              {{ pipeline.name }}
+            </td>
             <td>
               <article class="media is-vcentered">
                 <figure class="media-left">
@@ -121,17 +124,17 @@ export default {
               </article>
             </td>
             <td>
-              {{ pipeline.name }}
+              {{ getPluginLabel('loaders', pipeline.loader) }}
             </td>
             <td>
-              {{ getPluginLabel('loaders', pipeline.loader) }}
+              {{ pipeline.transform | capitalize }}
             </td>
             <td>
               <div class="is-flex is-vcentered">
                 <div class="field has-addons">
                   <div class="control is-expanded">
                     <span
-                      class="select is-fullwidth"
+                      class="select is-fullwidth is-size-7"
                       :class="{
                         'is-loading': getIsDisabled(pipeline)
                       }"
@@ -153,7 +156,7 @@ export default {
 
                   <div class="control">
                     <button
-                      class="button tooltip is-tooltip-right"
+                      class="button is-small tooltip is-tooltip-right"
                       :class="{ 'is-loading': pipeline.isRunning }"
                       :disabled="getIsDisabled(pipeline)"
                       data-tooltip="Manually run this pipeline once"
@@ -184,13 +187,10 @@ export default {
               </p>
             </td>
             <td>
-              {{ pipeline.transform | capitalize }}
-            </td>
-            <td>
               <p>
                 <button
                   v-if="pipeline.isRunning || pipeline.endedAt"
-                  class="button is-outlined is-fullwidth h-space-between"
+                  class="button is-small is-outlined is-fullwidth h-space-between"
                   :class="{
                     'tooltip is-tooltip-left': pipeline.hasEverSucceeded
                   }"
@@ -227,10 +227,14 @@ export default {
             </td>
             <td>
               <div class="buttons is-right">
-                <ExploreButton :pipeline="pipeline" is-tooltip-left />
+                <ExploreButton
+                  :pipeline="pipeline"
+                  is-tooltip-left
+                  custom-class="is-small"
+                />
                 <Dropdown
                   :button-classes="
-                    `is-danger is-outlined ${
+                    `is-small is-danger is-outlined ${
                       pipeline.isDeleting ? 'is-loading' : ''
                     }`
                   "
@@ -250,7 +254,7 @@ export default {
                           >.
                         </p>
                       </div>
-                      <div class="buttons is-right">
+                      <div class="buttons is-right ">
                         <button class="button is-text" data-dropdown-auto-close>
                           Cancel
                         </button>
@@ -273,13 +277,3 @@ export default {
     </table>
   </div>
 </template>
-
-<style lang="scss">
-.pipelines-table {
-  font-size: 14px;
-  .control,
-  .button {
-    font-size: inherit;
-  }
-}
-</style>

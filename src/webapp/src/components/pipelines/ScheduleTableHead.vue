@@ -12,10 +12,10 @@ export default {
   <thead>
     <tr>
       <th>
-        Data Source
+        Name
       </th>
       <th>
-        Name
+        Data Source
       </th>
       <th>
         Loader
