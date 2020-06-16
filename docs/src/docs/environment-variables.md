@@ -93,7 +93,7 @@ but can be overridden with these environment variables:
 ```bash
 MELTANO_UI_SERVER_NAME=""
 MELTANO_UI_SECRET_KEY=""
-SECURITY_PASSWORD_SALT=""
+MELTANO_UI_PASSWORD_SALT=""
 ```
 
 #### Service Listen Configuration

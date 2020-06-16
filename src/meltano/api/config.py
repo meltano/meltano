@@ -112,8 +112,8 @@ class EnvVarOverrides(object):
         SERVER_NAME = os.getenv("MELTANO_UI_SERVER_NAME")
     if "MELTANO_UI_SECRET_KEY" in os.environ:
         SECRET_KEY = os.getenv("MELTANO_UI_SECRET_KEY")
-    if "SECURITY_PASSWORD_SALT" in os.environ:
-        SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT")
+    if "MELTANO_UI_PASSWORD_SALT" in os.environ:
+        SECURITY_PASSWORD_SALT = os.getenv("MELTANO_UI_PASSWORD_SALT")
 
 
 class Production(object):
@@ -125,7 +125,7 @@ def ensure_secure_setup(app):
     secure_variables = [
         ("SERVER_NAME", None, "MELTANO_UI_SERVER_NAME"),
         ("SECRET_KEY", SECRET_KEY, "MELTANO_UI_SECRET_KEY"),
-        ("SECURITY_PASSWORD_SALT", SECURITY_PASSWORD_SALT, "SECURITY_PASSWORD_SALT"),
+        ("SECURITY_PASSWORD_SALT", SECURITY_PASSWORD_SALT, "MELTANO_UI_PASSWORD_SALT"),
     ]
 
     facts = []
