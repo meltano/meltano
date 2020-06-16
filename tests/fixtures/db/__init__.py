@@ -11,15 +11,15 @@ def engine_uri_env(monkeypatch, engine_uri):
 
 @pytest.fixture(scope="class", autouse=True)
 def vacuum_db(engine_sessionmaker):
-    engine, _ = engine_sessionmaker
-
     yield
 
     logging.debug(f"Cleaning system database...")
+
+    engine, Session = engine_sessionmaker
+    Session.close_all()
     metadata = MetaData(bind=engine)
     metadata.reflect()
     metadata.drop_all()
-    logging.debug(f"Cleaned system database")
 
 
 @pytest.fixture(scope="class")
