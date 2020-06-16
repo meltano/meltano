@@ -10,19 +10,29 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2095](https://gitlab.com/meltano/meltano/-/issues/2089) Support singular and plural plugin types in CLI arguments
-- [#2095](https://gitlab.com/meltano/meltano/-/issues/2089) Allow list of plugin names of same type to be provided to `meltano add` and `meltano install`
-
-- [#2089](https://gitlab.com/meltano/meltano/-/issues/2089) Add new 'files' plugin type to allow plugin-specific files to be added to a Meltano project automatically
-- [#2090](https://gitlab.com/meltano/meltano/-/issues/2090) Allow SERVER_NAME, SECRET_KEY, and SECURITY_PASSWORD_SALT to be set using environment instead of ui.cfg
-
 ### Changes
 
 ### Fixes
 
-- [#2096](https://gitlab.com/meltano/meltano/-/issues/2096) Remove noisy migration-related logging from CLI command output
-
 ### Breaks
+
+
+## 1.36.0 - (2020-06-15)
+---
+
+### New
+
+- [#2095](https://gitlab.com/meltano/meltano/-/issues/2089) Support singular and plural plugin types in CLI arguments
+- [#2095](https://gitlab.com/meltano/meltano/-/issues/2089) Allow list of plugin names of same type to be provided to `meltano add` and `meltano install`
+- [#2089](https://gitlab.com/meltano/meltano/-/issues/2089) Add new 'files' plugin type to allow plugin-specific files to be added to a Meltano project automatically
+- [#2090](https://gitlab.com/meltano/meltano/-/issues/2090) Allow SERVER_NAME, SECRET_KEY, and SECURITY_PASSWORD_SALT to be set using environment instead of ui.cfg
+
+
+### Fixes
+
+- [#2096](https://gitlab.com/meltano/meltano/-/issues/2096) Remove noisy migration-related logging from CLI command output
+- [#2089](https://gitlab.com/meltano/meltano/-/issues/2089) Don't add Airflow and dbt-specific files to Meltano project until plugins are added explicitly
+- [#2089](https://gitlab.com/meltano/meltano/-/issues/2089) Don't add docker-compose.yml to Meltano project by default
 
 
 ## 1.35.1 - (2020-06-11)
@@ -36,8 +46,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2092](https://gitlab.com/meltano/meltano/-/issues/2092) Only install plugins related to plugins of the specified type when running `meltano install <plugin_type> --include-related`
 - [#2093](https://gitlab.com/meltano/meltano/-/issues/2093) Print error when transform plugin is installed before dbt
-- [#2089](https://gitlab.com/meltano/meltano/-/issues/2089) Don't add Airflow and dbt-specific files to Meltano project until plugins are added explicitly
-- [#2089](https://gitlab.com/meltano/meltano/-/issues/2089) Don't add docker-compose.yml to Meltano project by default
 
 
 ## 1.35.0 - (2020-06-09)
