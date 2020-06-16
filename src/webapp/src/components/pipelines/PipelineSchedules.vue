@@ -51,6 +51,15 @@ export default {
       return val => utils.momentFromNow(val)
     }
   },
+  filters: {
+    capitalize: function(value) {
+      if (!value) {
+        return ''
+      }
+      value = value.toString()
+      return value.charAt(0).toUpperCase() + value.slice(1)
+    }
+  },
   methods: {
     ...mapActions('orchestration', [
       'deletePipelineSchedule',
@@ -111,22 +120,16 @@ export default {
                       <strong>
                         {{ getPluginLabel('extractors', pipeline.extractor) }}
                       </strong>
-                      <br />
-                      <small>Default</small>
                     </p>
                   </div>
                 </div>
               </article>
             </td>
             <td>
-              <p>
-                {{ pipeline.name }}
-              </p>
+              {{ pipeline.name }}
             </td>
             <td>
-              <p>
-                {{ pipeline.loader }}
-              </p>
+              {{ getPluginLabel('loaders', pipeline.loader) }}
             </td>
             <td>
               <div class="is-flex is-vcentered">
@@ -186,9 +189,7 @@ export default {
               </p>
             </td>
             <td>
-              <p>
-                {{ pipeline.transform }}
-              </p>
+              {{ pipeline.transform | capitalize }}
             </td>
             <td>
               <p>
@@ -239,10 +240,6 @@ export default {
                     }`
                   "
                   :disabled="getIsDisabled(pipeline)"
-                  :tooltip="{
-                    classes: 'is-tooltip-left',
-                    message: 'Delete this pipeline'
-                  }"
                   menu-classes="dropdown-menu-300"
                   icon-open="trash-alt"
                   icon-close="caret-up"

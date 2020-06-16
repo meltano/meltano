@@ -12,73 +12,30 @@ export default {
   <thead>
     <tr>
       <th>
-        <span>Data Source</span>
-        <span
-          class="icon has-text-grey-light tooltip is-tooltip-right"
-          data-tooltip="The pipeline's data source"
-        >
-          <font-awesome-icon icon="info-circle"></font-awesome-icon>
-        </span>
+        Data Source
       </th>
       <th>
-        <span>Name</span>
-        <span
-          class="icon has-text-grey-light tooltip is-tooltip-right"
-          data-tooltip="The pipeline's name"
-        >
-          <font-awesome-icon icon="info-circle"></font-awesome-icon>
-        </span>
+        Name
       </th>
       <th>
-        <span>Loader</span>
-        <span
-          class="icon has-text-grey-light tooltip is-tooltip-left"
-          data-tooltip="The pipeline's loader"
-        >
-          <font-awesome-icon icon="info-circle"></font-awesome-icon>
-        </span>
+        Loader
       </th>
       <th>
-        <span>Update Interval</span>
-        <span
-          class="icon has-text-grey-light tooltip is-tooltip-left"
-          data-tooltip="The pipeline's data refresh interval"
-        >
-          <font-awesome-icon icon="info-circle"></font-awesome-icon>
-        </span>
+        Update Interval
       </th>
       <th v-if="hasStartDate">
-        <span>Start Date</span>
-        <span
-          class="icon has-text-grey-light tooltip is-tooltip-left"
-          :class="{ 'is-tooltip-left': !hasActions }"
-          data-tooltip="The pipeline's first date to extract data from"
-        >
-          <font-awesome-icon icon="info-circle"></font-awesome-icon>
-        </span>
+        Start Date
       </th>
       <th>
-        <span>Transform</span>
-        <span
-          class="icon has-text-grey-light tooltip is-tooltip-left"
-          data-tooltip="The pipeline's transform type: 'Run','Only', 'Skip'"
-        >
-          <font-awesome-icon icon="info-circle"></font-awesome-icon>
-        </span>
+        Transform
       </th>
 
       <template v-if="hasActions">
         <th>
-          <span>Last Run</span>
-          <span
-            class="icon has-text-grey-light tooltip is-tooltip-left"
-            data-tooltip="The status of the last data refresh"
-          >
-            <font-awesome-icon icon="info-circle"></font-awesome-icon>
-          </span>
+          Last Run
         </th>
         <th class="has-text-right">
-          <span>Actions</span>
+          Actions
         </th>
       </template>
     </tr>
