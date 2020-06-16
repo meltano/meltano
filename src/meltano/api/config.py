@@ -13,9 +13,9 @@ from meltano.core.tracking.ga_tracker import (
 # -----------------
 THREADS_PER_PAGE = 1
 PROFILE = truthy(os.getenv("FLASK_PROFILE"))
+
 ## Change this value in production
 SECRET_KEY = "thisisnotapropersecretkey"
-
 
 # Meltano
 # -----------------
