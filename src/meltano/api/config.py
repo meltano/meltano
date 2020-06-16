@@ -107,25 +107,43 @@ CORS_EXPOSE_HEADERS = [VERSION_HEADER]
 CORS_ALLOW_HEADERS = ["CONTENT-TYPE", JSON_SCHEME_HEADER]
 
 
+class EnvVarOverrides(object):
+    if "MELTANO_UI_SERVER_NAME" in os.environ:
+        SERVER_NAME = os.getenv("MELTANO_UI_SERVER_NAME")
+    if "MELTANO_UI_SECRET_KEY" in os.environ:
+        SECRET_KEY = os.getenv("MELTANO_UI_SECRET_KEY")
+    if "MELTANO_UI_PASSWORD_SALT" in os.environ:
+        SECURITY_PASSWORD_SALT = os.getenv("MELTANO_UI_PASSWORD_SALT")
+
+
 class Production(object):
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
 
 
 def ensure_secure_setup(app):
-    secure_variables = ["SERVER_NAME", "SECRET_KEY", "SECURITY_PASSWORD_SALT"]
+    secure_variables = [
+        ("SERVER_NAME", None, "MELTANO_UI_SERVER_NAME"),
+        ("SECRET_KEY", SECRET_KEY, "MELTANO_UI_SECRET_KEY"),
+        ("SECURITY_PASSWORD_SALT", SECURITY_PASSWORD_SALT, "MELTANO_UI_PASSWORD_SALT"),
+    ]
 
     facts = []
-    for var in secure_variables:
+    env_vars = []
+    for (var, default, env_var) in secure_variables:
         if app.config[var] is None:
             facts.append(f"\t- '{var}': variable is unset.")
-        elif app.config[var] == globals().get(var):
+            env_vars.append(f"\t- {env_var}")
+        elif app.config[var] == default:
             facts.append(f"\t- '{var}': variable has test value.")
+            env_vars.append(f"\t- {env_var}")
 
     if facts:
         facts_msg = "\n".join(facts)
+        variable_names = "\n".join(env_vars)
         logging.warning(
             "The following variables are insecure and should be regenerated:\n"
             f"{facts_msg}\n\n"
-            "Use `meltano ui setup` command to generate new secrets."
+            "Use `meltano ui setup` command to generate new secrets, or set them via environment variables:\n"
+            f"{variable_names}"
         )
