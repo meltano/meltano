@@ -23,7 +23,7 @@ class ProjectInitService:
     def __init__(self, project_name):
         self.project_name = project_name.lower()
 
-    def init(self, activate=True, engine_uri=None) -> Project:
+    def init(self, activate=True, engine_uri=None, add_discovery=False) -> Project:
         try:
             os.mkdir(self.project_name)
         except Exception as e:
@@ -32,7 +32,7 @@ class ProjectInitService:
         click.echo(f" {self.project_name}")
 
         self.project = Project(self.project_name)
-        self.create_files()
+        self.create_files(add_discovery=add_discovery)
 
         if activate:
             Project.activate(self.project)
@@ -45,10 +45,10 @@ class ProjectInitService:
 
         return self.project
 
-    def create_files(self):
+    def create_files(self, add_discovery=False):
         click.secho(f"Creating project files...", fg="blue")
 
-        plugin = MeltanoFilePlugin("meltano")
+        plugin = MeltanoFilePlugin("meltano", discovery=add_discovery)
         for path in plugin.create_files(self.project):
             click.secho(f"Created", fg="blue", nl=False)
             click.echo(f" {self.project_name}/{path}")
