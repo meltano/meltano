@@ -13,10 +13,11 @@ from meltano.core.tracking.ga_tracker import (
 # -----------------
 THREADS_PER_PAGE = 1
 PROFILE = truthy(os.getenv("FLASK_PROFILE"))
-
+# Treat empty string as unset
+SERVER_NAME = os.getenv("FLASK_SERVER_NAME", "") or None
 ## Change this value in production
 DEFAULT_SECRET_KEY = "thisisnotapropersecretkey"
-SECRET_KEY = os.getenv("SECRET_KEY", DEFAULT_SECRET_KEY)
+SECRET_KEY = os.getenv("FLASK_SECRET_KEY", DEFAULT_SECRET_KEY)
 
 
 # Meltano
