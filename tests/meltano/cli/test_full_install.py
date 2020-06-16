@@ -11,12 +11,7 @@ class TestFullInstall:
     @pytest.mark.slow
     @pytest.mark.backend("postgresql")
     def test_carbon_intensity_postgres_dbt(
-        request,
-        cli_runner,
-        monkeypatch,
-        project,
-        elt_context_builder,
-        project_add_service,
+        self, cli_runner, monkeypatch, project, elt_context_builder, project_add_service
     ):
         with mock.patch(
             "meltano.cli.add.ProjectAddService", return_value=project_add_service

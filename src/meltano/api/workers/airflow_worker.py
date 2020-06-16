@@ -55,8 +55,8 @@ class AirflowWorker(threading.Thread):
         _, Session = project_engine(self.project)
         logs_path = self.project.run_dir("airflow", "logs", "scheduler.log")
 
+        session = Session()
         try:
-            session = Session()
             invoker = invoker_factory(
                 self.project, self._plugin, prepare_with_session=session
             )

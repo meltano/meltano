@@ -16,11 +16,8 @@ from meltano.core.db import project_engine
 @click.pass_context
 @project(migrate=True)
 def schedule(project, ctx):
-    _, Session = project_engine(project)
-    session = Session()
-
+    ctx.obj["project"] = project
     ctx.obj["schedule_service"] = schedule_service = ScheduleService(project)
-    ctx.obj["session"] = session
 
 
 @schedule.command(short_help="[default] Add a new schedule")
@@ -42,9 +39,11 @@ def add(ctx, name, extractor, loader, transform, interval, start_date):
     INTERVAL:\tCron-like syntax to specify the schedule interval (@daily, @hourly, etc…)
     """
 
+    project = ctx.obj["project"]
     schedule_service = ctx.obj["schedule_service"]
-    session = ctx.obj["session"]
 
+    _, Session = project_engine(project)
+    session = Session()
     try:
         tracker = GoogleAnalyticsTracker(schedule_service.project)
         schedule = schedule_service.add(
@@ -58,6 +57,8 @@ def add(ctx, name, extractor, loader, transform, interval, start_date):
     except Exception as err:
         click.secho(f"Scheduling failed: {err}", fg="red", err=True)
         raise click.Abort()
+    finally:
+        session.close()
 
 
 @schedule.command()

@@ -1,7 +1,7 @@
+import logging
 import pytest
 from sqlalchemy import create_engine, MetaData
-from meltano.core.migration_service import MigrationService
-from meltano.core.db import project_engine
+from sqlalchemy.orm import sessionmaker
 
 
 @pytest.fixture(autouse=True)
@@ -10,26 +10,25 @@ def engine_uri_env(monkeypatch, engine_uri):
 
 
 @pytest.fixture(scope="class", autouse=True)
-def vacuum_db(engine_sessionmaker, project):
-    engine, _ = engine_sessionmaker
+def vacuum_db(engine_sessionmaker):
+    yield
 
-    # ensure we delete all the tables
+    logging.debug(f"Cleaning system database...")
+
+    engine, Session = engine_sessionmaker
+    Session.close_all()
     metadata = MetaData(bind=engine)
     metadata.reflect()
     metadata.drop_all()
 
-    # migrate back up
-    migration_service = MigrationService(engine)
-    migration_service.upgrade()
-    migration_service.seed(project)
-
 
 @pytest.fixture(scope="class")
-def engine_sessionmaker(project, engine_uri):
+def engine_sessionmaker(engine_uri):
     # create the engine
-    engine, sessionmaker = project_engine(project, engine_uri, default=True)
+    engine = create_engine(engine_uri)
+    create_session = sessionmaker(bind=engine)
 
-    return (engine, sessionmaker)
+    return (engine, create_session)
 
 
 @pytest.fixture()

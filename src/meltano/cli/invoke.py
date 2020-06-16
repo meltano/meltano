@@ -22,9 +22,8 @@ def invoke(project, plugin_type, plugin_name, plugin_args):
     plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
     _, Session = project_engine(project)
-
+    session = Session()
     try:
-        session = Session()
         config_service = ConfigService(project)
         plugin = config_service.find_plugin(
             plugin_name, plugin_type=plugin_type, invokable=True

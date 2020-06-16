@@ -77,10 +77,8 @@ class MigrationService:
 
     def seed(self, project):
         _, Session = project_engine(project)
-
+        session = Session()
         try:
-            session = Session()
-
             if not session.query(Role).filter_by(name="admin").first():
                 session.add(
                     Role(
