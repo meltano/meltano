@@ -25,6 +25,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2095](https://gitlab.com/meltano/meltano/-/issues/2089) Support singular and plural plugin types in CLI arguments
 - [#2095](https://gitlab.com/meltano/meltano/-/issues/2089) Allow list of plugin names of same type to be provided to `meltano add` and `meltano install`
 - [#2089](https://gitlab.com/meltano/meltano/-/issues/2089) Add new 'files' plugin type to allow plugin-specific files to be added to a Meltano project automatically
+- [#2090](https://gitlab.com/meltano/meltano/-/issues/2090) Allow SERVER_NAME, SECRET_KEY, and SECURITY_PASSWORD_SALT to be set using environment instead of ui.cfg
 
 
 ### Fixes

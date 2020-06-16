@@ -36,6 +36,7 @@ def create_app(config={}):
 
     app.config.from_object("meltano.api.config")
     app.config.from_pyfile("ui.cfg", silent=True)
+    app.config.from_object("meltano.api.config.EnvVarOverrides")
     app.config.update(**config)
 
     if app.env == "production":
