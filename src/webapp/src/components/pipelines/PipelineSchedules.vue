@@ -7,6 +7,7 @@ import Dropdown from '@/components/generic/Dropdown'
 import ExploreButton from '@/components/analyze/ExploreButton'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
 import utils from '@/utils/utils'
+import capitalize from '@/filters/capitalize'
 
 export default {
   name: 'PipelineSchedules',
@@ -15,6 +16,9 @@ export default {
     Dropdown,
     ExploreButton,
     ScheduleTableHead
+  },
+  filters: {
+    capitalize
   },
   props: {
     pipelines: { type: Array, required: true, default: () => [] }
@@ -49,15 +53,6 @@ export default {
     },
     getMomentFromNow() {
       return val => utils.momentFromNow(val)
-    }
-  },
-  filters: {
-    capitalize: function(value) {
-      if (!value) {
-        return ''
-      }
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
     }
   },
   methods: {
