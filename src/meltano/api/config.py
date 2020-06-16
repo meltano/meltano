@@ -13,11 +13,8 @@ from meltano.core.tracking.ga_tracker import (
 # -----------------
 THREADS_PER_PAGE = 1
 PROFILE = truthy(os.getenv("FLASK_PROFILE"))
-# Treat empty string as unset
-SERVER_NAME = os.getenv("FLASK_SERVER_NAME", "") or None
 ## Change this value in production
-DEFAULT_SECRET_KEY = "thisisnotapropersecretkey"
-SECRET_KEY = os.getenv("FLASK_SECRET_KEY", DEFAULT_SECRET_KEY)
+SECRET_KEY = "thisisnotapropersecretkey"
 
 
 # Meltano
@@ -54,10 +51,7 @@ SQLALCHEMY_DATABASE_URI = os.getenv("MELTANO_DATABASE_URI")
 
 # Change this value in production
 # A better approach would be to have individual salts hashed resource
-DEFAULT_SECURITY_PASSWORD_SALT = "b4c124932584ad6e69f2774a0ae5c138"
-SECURITY_PASSWORD_SALT = os.getenv(
-    "SECURITY_PASSWORD_SALT", DEFAULT_SECURITY_PASSWORD_SALT
-)
+SECURITY_PASSWORD_SALT = "b4c124932584ad6e69f2774a0ae5c138"
 SECURITY_PASSWORD_HASH = "bcrypt"
 SECURITY_REGISTERABLE = False
 SECURITY_CHANGEABLE = True
@@ -113,6 +107,15 @@ CORS_EXPOSE_HEADERS = [VERSION_HEADER]
 CORS_ALLOW_HEADERS = ["CONTENT-TYPE", JSON_SCHEME_HEADER]
 
 
+class EnvVarOverrides(object):
+    if "MELTANO_UI_SERVER_NAME" in os.environ:
+        SERVER_NAME = os.getenv("MELTANO_UI_SERVER_NAME")
+    if "MELTANO_UI_SECRET_KEY" in os.environ:
+        SECRET_KEY = os.getenv("MELTANO_UI_SECRET_KEY")
+    if "SECURITY_PASSWORD_SALT" in os.environ:
+        SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT")
+
+
 class Production(object):
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
@@ -120,22 +123,27 @@ class Production(object):
 
 def ensure_secure_setup(app):
     secure_variables = [
-        ("SERVER_NAME", None),
-        ("SECRET_KEY", DEFAULT_SECRET_KEY),
-        ("SECURITY_PASSWORD_SALT", DEFAULT_SECURITY_PASSWORD_SALT),
+        ("SERVER_NAME", None, "MELTANO_UI_SERVER_NAME"),
+        ("SECRET_KEY", SECRET_KEY, "MELTANO_UI_SECRET_KEY"),
+        ("SECURITY_PASSWORD_SALT", SECURITY_PASSWORD_SALT, "SECURITY_PASSWORD_SALT"),
     ]
 
     facts = []
-    for (var, default) in secure_variables:
+    env_vars = []
+    for (var, default, env_var) in secure_variables:
         if app.config[var] is None:
             facts.append(f"\t- '{var}': variable is unset.")
+            env_vars.append(f"\t- {env_var}")
         elif app.config[var] == default:
             facts.append(f"\t- '{var}': variable has test value.")
+            env_vars.append(f"\t- {env_var}")
 
     if facts:
         facts_msg = "\n".join(facts)
+        variable_names = "\n".join(env_vars)
         logging.warning(
             "The following variables are insecure and should be regenerated:\n"
             f"{facts_msg}\n\n"
-            "Use `meltano ui setup` command to generate new secrets or set them via environment variables."
+            "Use `meltano ui setup` command to generate new secrets, or set them via environment variables:\n"
+            f"{variable_names}"
         )
