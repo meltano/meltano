@@ -11,7 +11,7 @@ def cli_runner():
     return CliRunner()
 
 
-def test_init(request, cli_runner, tmp_path_factory, pushd):
+def test_init(cli_runner, tmp_path_factory, pushd):
     new_project_root = tmp_path_factory.mktemp("new_meltano_root")
     pushd(new_project_root)
     Project._default = None
@@ -22,6 +22,7 @@ def test_init(request, cli_runner, tmp_path_factory, pushd):
 
     # create one with the CLI
     cli_runner.invoke(cli, ["init", "test_project", "--no_usage_stats"])
+
     pushd("test_project")
 
     project = Project.find()
