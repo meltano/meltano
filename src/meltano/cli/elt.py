@@ -43,53 +43,54 @@ def elt(project, extractor, loader, dry, transform, job_id):
     loader_name: Which loader should be used in this extraction
     """
 
-    _, Session = project_engine(project)
-    session = Session()
     job_logging_service = JobLoggingService(project)
     job = Job(
         job_id=job_id or f'job_{datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S.%f")}'
     )
 
-    # fmt: off
-    with job.run(session), \
-        job_logging_service.create_log(job.job_id, job.run_id) as log_file, \
-        OutputLogger(log_file):
+    _, Session = project_engine(project)
+    session = Session()
+    try:
+        with job.run(session), job_logging_service.create_log(
+            job.job_id, job.run_id
+        ) as log_file, OutputLogger(log_file):
+            try:
+                success = install_missing_plugins(project, extractor, loader, transform)
 
-        try:
-            success = install_missing_plugins(project, extractor, loader, transform)
+                if not success:
+                    raise click.Abort()
 
-            if not success:
-                raise click.Abort()
+                elt_context = (
+                    ELTContextBuilder(project)
+                    .with_job(job)
+                    .with_extractor(extractor)
+                    .with_loader(loader)
+                    .with_transform(transform)
+                    .context(session)
+                )
 
-            elt_context = (
-                ELTContextBuilder(project)
-                .with_job(job)
-                .with_extractor(extractor)
-                .with_loader(loader)
-                .with_transform(transform)
-                .context(session)
-            )
+                if transform != "only":
+                    run_extract_load(elt_context, session, dry_run=dry)
+                else:
+                    click.secho("Extract & load skipped.", fg="yellow")
 
-            if transform != "only":
-                run_extract_load(elt_context, session, dry_run=dry)
-            else:
-                click.secho("Extract & load skipped.", fg="yellow")
-
-            if elt_context.transformer:
-                try:
+                if elt_context.transformer:
                     # Use a new session for the Transform Part to address the last
                     # update for Job state not being saved in the DB
                     transform_session = Session()
-                    run_transform(elt_context, transform_session, dry_run=dry)
-                finally:
-                    transform_session.close()
-            else:
-                click.secho("Transformation skipped.", fg="yellow")
-        except Exception as err:
-            logging.error(f"ELT could not complete, an error happened during the process: {err}")
-            raise click.Abort()
-        finally:
-            session.close()
+                    try:
+                        run_transform(elt_context, transform_session, dry_run=dry)
+                    finally:
+                        transform_session.close()
+                else:
+                    click.secho("Transformation skipped.", fg="yellow")
+            except Exception as err:
+                logging.error(
+                    f"ELT could not complete, an error happened during the process: {err}"
+                )
+                raise click.Abort()
+    finally:
+        session.close()
     # fmt: on
 
     tracker = GoogleAnalyticsTracker(project)

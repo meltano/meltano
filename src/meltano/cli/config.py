@@ -30,19 +30,22 @@ def config(ctx, project, plugin_type, plugin_name, format):
 
     _, Session = project_engine(project)
     session = Session()
-    settings = PluginSettingsService(project)
+    try:
+        settings = PluginSettingsService(project)
 
-    ctx.obj["settings"] = settings
-    ctx.obj["plugin"] = plugin
-    ctx.obj["session"] = session
+        ctx.obj["settings"] = settings
+        ctx.obj["plugin"] = plugin
+        ctx.obj["session"] = session
 
-    if ctx.invoked_subcommand is None:
-        if format == "json":
-            config = settings.as_config(session, plugin)
-            print(json.dumps(config))
-        elif format == "env":
-            for env, value in settings.as_env(session, plugin).items():
-                print(f"{env}={value}")
+        if ctx.invoked_subcommand is None:
+            if format == "json":
+                config = settings.as_config(session, plugin)
+                print(json.dumps(config))
+            elif format == "env":
+                for env, value in settings.as_env(session, plugin).items():
+                    print(f"{env}={value}")
+    finally:
+        session.close()
 
 
 @config.command()
