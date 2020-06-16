@@ -7,16 +7,12 @@ from meltano.core.project import Project, ProjectNotFound
 
 
 class TestCliInit:
-    @pytest.fixture()
-    def cli_runner(self):
-        return CliRunner()
-
     def test_init(self, cli_runner, tmp_path_factory, pushd):
         new_project_root = tmp_path_factory.mktemp("new_meltano_root")
         pushd(new_project_root)
-        Project._default = None
 
         # there are no project actually
+        assert Project._default is None
         with pytest.raises(ProjectNotFound):
             Project.find()
 
@@ -26,6 +22,9 @@ class TestCliInit:
         pushd("test_project")
 
         project = Project.find()
+
+        # Deactivate project
+        Project._default = None
 
         files = (
             project.root.joinpath(file).resolve()

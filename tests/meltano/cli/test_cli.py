@@ -15,7 +15,6 @@ class TestCli:
 
         yield project
 
-        os.chdir(test_dir)
         shutil.rmtree(project.root)
 
     def test_activate_project(self, project, cli_runner, pushd):
