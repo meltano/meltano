@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2102](https://gitlab.com/meltano/meltano/-/issues/2102) Fix potential `meltano upgrade` failures by having it invoke itself with `--skip-package` after upgrading the package to ensure it always uses the latest code.
+
 ### Breaks
 
 
