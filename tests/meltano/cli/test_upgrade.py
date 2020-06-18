@@ -1,6 +1,6 @@
 import yaml
 import pytest
-from unittest.mock import Mock, patch
+from unittest import mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
@@ -11,13 +11,37 @@ class TestCliUpgrade:
         result = cli_runner.invoke(cli, ["upgrade"])
         assert_cli_runner(result)
 
+        assert (
+            "The `meltano` package could not be upgraded automatically" in result.output
+        )
+        assert "run `meltano upgrade --skip-package`" in result.output
+
+        with mock.patch(
+            "meltano.cli.upgrade.UpgradeService._upgrade_package"
+        ) as upgrade_package_mock:
+            upgrade_package_mock.return_value = True
+
+            result = cli_runner.invoke(cli, ["upgrade"])
+            assert_cli_runner(result)
+
+            assert (
+                "Meltano and your Meltano project have been upgraded!" in result.output
+            )
+
     def test_upgrade_skip_package(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "--skip-package"])
         assert_cli_runner(result)
 
+        assert "Your Meltano project has been upgraded!" in result.output
+
     def test_upgrade_package(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "package"])
         assert_cli_runner(result)
+
+        assert (
+            "The `meltano` package could not be upgraded automatically" in result.output
+        )
+        assert "run `meltano upgrade --skip-package`" not in result.output
 
     def test_upgrade_files(
         self, session, project, cli_runner, config_service, plugin_settings_service
