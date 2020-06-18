@@ -21,15 +21,14 @@ export default {
         Loader
       </th>
       <th>
+        Transform
+      </th>
+      <th>
         Update Interval
       </th>
       <th v-if="hasStartDate">
         Start Date
       </th>
-      <th>
-        Transform
-      </th>
-
       <template v-if="hasActions">
         <th>
           Last Run
