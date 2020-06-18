@@ -6,9 +6,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## Unreleased
----
 
 ### New
+
+- [#2067](https://gitlab.com/meltano/meltano/-/issues/2067) Add pipeline name, loader, and transform columns to Pipelines table
 
 ### Changes
 
