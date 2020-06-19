@@ -78,7 +78,7 @@ class PluginInvoker:
 
     @property
     def select(self):
-        return self.plugin.select or self.plugin_def.select or {"*.*"}
+        return self.plugin.select or self.plugin_def.select or ["*.*"]
 
     @property
     def files(self):

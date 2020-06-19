@@ -56,6 +56,9 @@ def test_set_at_path():
     set_at_path(subject, "a.b.c", "value")
     assert subject == {"a": {"b": {"c": "value"}}}
 
+    set_at_path(subject, "a.b.d", "value")
+    assert subject == {"a": {"b": {"c": "value", "d": "value"}}}
+
     set_at_path(subject, "a.b", "value")
     assert subject == {"a": {"b": "value"}}
 
@@ -65,5 +68,5 @@ def test_set_at_path():
     set_at_path(subject, "a.b.c", "value")
     assert subject == {"a": {"b": {"c": "value"}}}
 
-    set_at_path(subject, ["a", "b.c"], "value")
-    assert subject == {"a": {"b.c": "value"}}
+    set_at_path(subject, ["a", "d.e"], "value")
+    assert subject == {"a": {"b": {"c": "value"}, "d.e": "value"}}

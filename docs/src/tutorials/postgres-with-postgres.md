@@ -134,7 +134,7 @@ Enabled patterns:
   warehouse-tap_gitlab-issues.author_id
   warehouse-tap_gitlab-users.*
 
-Selected properties:
+Selected attributes:
   [selected ] warehouse-tap_gitlab-issues.title
   [automatic] warehouse-tap_gitlab-issues.id
   [selected ] warehouse-tap_gitlab-issues.assignee_id

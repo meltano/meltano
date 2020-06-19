@@ -118,10 +118,10 @@ def nest(d: dict, path: str, value={}, maxsplit=-1, force=False):
 
         cursor = cursor[key]
 
-    # We need to copy the value to make sure
-    # the `value` parameter is not mutated.
-    value = deepcopy(value)
-    cursor[tail] = value if force else cursor.get(tail, value)
+    if not tail in cursor or (type(cursor[tail]) is not type(value) and force):
+        # We need to copy the value to make sure
+        # the `value` parameter is not mutated.
+        cursor[tail] = deepcopy(value)
 
     return cursor[tail]
 
