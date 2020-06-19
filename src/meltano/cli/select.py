@@ -69,13 +69,13 @@ def select(project, extractor, entities_filter, attributes_filter, **flags):
     except PluginLacksCapabilityError as e:
         logging.exception(e)
         raise click.ClickException(
-            f"Cannot list the selected properties: "
+            f"Cannot list the selected attributes: "
             "the tap does not support schema discovery or selection."
         ) from e
     except PluginExecutionError as e:
         logging.exception(e)
         raise click.ClickException(
-            f"Cannot list the selected properties: "
+            f"Cannot list the selected attributes: "
             "there was a problem running the tap with `--discover`. "
             "Make sure the tap supports `--discover` and run "
             "`meltano invoke {extractor} --discover` to make "
@@ -111,7 +111,7 @@ def show(project, extractor, show_all=False):
         color = "red" if select.negated else "white"
         click.secho(f"\t{select.raw}", fg=color)
 
-    click.secho("\nSelected properties:")
+    click.secho("\nSelected attributes:")
     for stream, prop in (
         (stream, prop)
         for stream in list_all.streams
