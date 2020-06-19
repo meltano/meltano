@@ -10,6 +10,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2067](https://gitlab.com/meltano/meltano/-/issues/2067) Add pipeline name, loader, and transform columns to Pipelines table
+- [#2103](https://gitlab.com/meltano/meltano/-/issues/2103) Support nested objects in `meltano.yml` `config` objects
+- [#2103](https://gitlab.com/meltano/meltano/-/issues/2103) Allow nested properties to be set using `meltano config` by specifying a list of property names: `meltano config <plugin_name> set <property> <subproperty> <value>`
+
 
 ### Changes
 

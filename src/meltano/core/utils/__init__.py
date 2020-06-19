@@ -87,7 +87,7 @@ def get_all(keys, d: dict, default=None):
     return dict(map(lambda k: (k, d.get(k, default)), keys))
 
 
-def nest(d: dict, path: str, value={}, maxsplit=-1):
+def nest(d: dict, path: str, value={}, maxsplit=-1, force=False):
     """
     Create a hierarchical dictionary path and return the leaf dict.
 
@@ -105,20 +105,23 @@ def nest(d: dict, path: str, value={}, maxsplit=-1):
     >>> d
     {'foo': {'bar': {'test': {'a': 1}}, 'list': ["works"]}}
     """
-    cursor = d
+    if isinstance(path, str):
+        path = path.split(".", maxsplit=maxsplit)
 
-    *initial, tail = path.split(".", maxsplit=maxsplit)
+    *initial, tail = path
 
     # create the list of dicts
+    cursor = d
     for key in initial:
-        if key not in cursor:
+        if key not in cursor or (not isinstance(cursor[key], dict) and force):
             cursor[key] = {}
 
         cursor = cursor[key]
 
     # We need to copy the value to make sure
     # the `value` parameter is not mutated.
-    cursor[tail] = cursor.get(tail, deepcopy(value))
+    value = deepcopy(value)
+    cursor[tail] = value if force else cursor.get(tail, value)
 
     return cursor[tail]
 
@@ -234,3 +237,38 @@ def makedirs(func):
 
 def is_email_valid(value: str):
     return re.match(REGEX_EMAIL, value)
+
+
+def pop_at_path(d, path, default=None):
+    if isinstance(path, str):
+        path = path.split(".")
+
+    *initial, tail = path
+
+    cursor = d
+    cursors = []
+    for key in initial:
+        cursors.append((cursor, key))
+
+        try:
+            cursor = cursor[key]
+        except KeyError:
+            return default
+
+    popped = cursor.pop(tail, default)
+
+    for (cursor, key) in reversed(cursors):
+        if len(cursor[key]) == 0:
+            cursor.pop(key, None)
+
+    return popped
+
+
+def set_at_path(d, path, value):
+    if isinstance(path, str):
+        path = path.split(".")
+
+    *initial, tail = path
+
+    final = nest(d, initial, force=True) if initial else d
+    final[tail] = value

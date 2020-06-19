@@ -24,5 +24,8 @@ class SingerPlugin(PluginInstall):
             for key, value in invoker.plugin_config.items():
                 nest(config, key, value)
 
+            # Metadata configuration is handled by SingerTap.apply_metadata_rules
+            config.pop("metadata", None)
+
             json.dump(config, config_stub)
             logging.debug(f"Created configuration stub at {config_stub}")

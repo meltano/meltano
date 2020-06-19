@@ -1,6 +1,6 @@
 import pytest
 
-from meltano.core.utils import nest
+from meltano.core.utils import nest, pop_at_path, set_at_path
 
 
 def test_nest():
@@ -24,3 +24,46 @@ def test_nest():
     assert isinstance(arr, list)
     # make sure it is a copy
     assert val == VALUE and not val is VALUE
+
+
+def test_pop_at_path():
+    subject = {}
+    pop_at_path(subject, "a.b.c")
+    assert subject == {}
+
+    subject = {"a": {"b": {"c": "value"}}}
+    pop_at_path(subject, "a.b.c")
+    assert subject == {}
+
+    subject = {"a": {"b.c": "value"}}
+    pop_at_path(subject, ["a", "b.c"])
+    assert subject == {}
+
+    subject = {"a": {"b": {"c": "value", "d": "value"}, "e": "value"}}
+    pop_at_path(subject, "a.b.c")
+    assert subject == {"a": {"b": {"d": "value"}, "e": "value"}}
+
+    pop_at_path(subject, "a.b.d")
+    assert subject == {"a": {"e": "value"}}
+
+    pop_at_path(subject, "a.e")
+    assert subject == {}
+
+
+def test_set_at_path():
+    subject = {}
+
+    set_at_path(subject, "a.b.c", "value")
+    assert subject == {"a": {"b": {"c": "value"}}}
+
+    set_at_path(subject, "a.b", "value")
+    assert subject == {"a": {"b": "value"}}
+
+    set_at_path(subject, "a.b", "newvalue")
+    assert subject == {"a": {"b": "newvalue"}}
+
+    set_at_path(subject, "a.b.c", "value")
+    assert subject == {"a": {"b": {"c": "value"}}}
+
+    set_at_path(subject, ["a", "b.c"], "value")
+    assert subject == {"a": {"b.c": "value"}}
