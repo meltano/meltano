@@ -501,14 +501,17 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     @pytest.mark.parametrize(
         "catalog,attrs",
         [
-            ("CATALOG", {"id", "code", "name", "code", "created_at"}),
+            (
+                "CATALOG",
+                {"id", "code", "name", "code", "created_at", "payload.content"},
+            ),
             ("JSON_SCHEMA", CATALOG_PROPERTIES),
         ],
         indirect=["catalog"],
     )
     def test_select(self, catalog, attrs):
         selector = SelectExecutor(
-            ["UniqueEntitiesName.name", "UniqueEntitiesName.code"]
+            ["UniqueEntitiesName.name", "UniqueEntitiesName.code", "*.payload.content"]
         )
         visit(catalog, selector)
 
@@ -522,15 +525,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         [
             (
                 "CATALOG",
-                {
-                    "id",
-                    "balance",
-                    "created_at",
-                    "active",
-                    "payload",
-                    "payload.content",
-                    "payload.hash",
-                },
+                {"id", "balance", "created_at", "active", "payload", "payload.content"},
             ),
             ("JSON_SCHEMA", CATALOG_PROPERTIES),
         ],
@@ -538,7 +533,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     )
     def test_select_negated(self, catalog, attrs):
         selector = SelectExecutor(
-            ["*.*", "!UniqueEntitiesName.code", "!UniqueEntitiesName.name"]
+            ["*.*", "!UniqueEntitiesName.code", "!UniqueEntitiesName.name", "!*.*.hash"]
         )
         visit(catalog, selector)
 

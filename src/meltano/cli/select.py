@@ -108,9 +108,8 @@ def show(project, extractor, show_all=False):
     # report
     click.secho("\nEnabled patterns:")
     for select in map(parse_select_pattern, select_service.extractor.select):
-        click.secho(
-            f"\t{select.property_pattern}", fg="red" if select.negated else "white"
-        )
+        color = "red" if select.negated else "white"
+        click.secho(f"\t{select.raw}", fg=color)
 
     click.secho("\nSelected properties:")
     for stream, prop in (
