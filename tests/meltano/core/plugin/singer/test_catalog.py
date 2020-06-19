@@ -13,6 +13,7 @@ from meltano.core.plugin.singer.catalog import (
     visit,
     SelectExecutor,
     MetadataExecutor,
+    MetadataRule,
     ListExecutor,
     ListSelectedExecutor,
     path_property,
@@ -542,6 +543,45 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         visit(catalog, lister)
 
         assert lister.selected_properties["UniqueEntitiesName"] == attrs
+
+
+class TestMetadataExecutor:
+    @pytest.fixture
+    def catalog(self, request):
+        return json.loads(globals()[request.param])
+
+    @pytest.mark.parametrize(
+        "catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"]
+    )
+    def test_visit(self, catalog):
+        executor = MetadataExecutor(
+            [
+                MetadataRule("UniqueEntitiesName", [], "replication-key", "created_at"),
+                MetadataRule(
+                    "UniqueEntitiesName",
+                    ["properties", "created_at"],
+                    "is-replication-key",
+                    True,
+                ),
+            ]
+        )
+        visit(catalog, executor)
+
+        stream_node = next(
+            s for s in catalog["streams"] if s["tap_stream_id"] == "UniqueEntitiesName"
+        )
+        stream_metadata_node = next(
+            m for m in stream_node["metadata"] if len(m["breadcrumb"]) == 0
+        )
+        property_metadata_node = next(
+            m
+            for m in stream_node["metadata"]
+            if m["breadcrumb"] == ["properties", "created_at"]
+        )
+
+        assert stream_node["replication_key"] == "created_at"
+        assert stream_metadata_node["metadata"]["replication-key"] == "created_at"
+        assert property_metadata_node["metadata"]["is-replication-key"] == True
 
 
 class TestListExecutor:
