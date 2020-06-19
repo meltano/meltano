@@ -4,12 +4,17 @@ import subprocess
 from typing import Dict
 from jsonschema import Draft4Validator
 
-from meltano.core.utils import file_has_data
+from meltano.core.utils import file_has_data, truthy
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 
 from . import SingerPlugin, PluginType
-from .catalog import SelectExecutor
+from .catalog import (
+    SelectExecutor,
+    SetMetadataExecutor,
+    SetMetadataRule,
+    property_breadcrumb,
+)
 
 
 class SingerTap(SingerPlugin):
@@ -116,10 +121,39 @@ class SingerTap(SingerPlugin):
                 schema = json.load(catalog)
 
             reset_executor = SelectExecutor(["!*.*"])
-            select_executor = SelectExecutor(plugin_invoker.select)
-
             reset_executor.visit(schema)
-            select_executor.visit(schema)
+
+            if plugin_invoker.select:
+                select_executor = SelectExecutor(plugin_invoker.select)
+                select_executor.visit(schema)
+
+            metadata_rules = []
+            for key, value in plugin_invoker.plugin_config.items():
+                if not key.startswith("metadata."):
+                    continue
+
+                # metadata.<tap_stream_id>.<key>
+                # metadata.<tap_stream_id>.<prop>.<key>
+                # metadata.<tap_stream_id>.<prop>.<subprop>.<key>
+                # metadata.<tap_stream_id>.properties.<prop>.<key>
+                # metadata.<tap_stream_id>.properties.<prop>.properties.<subprop>.<key>
+                _, tap_stream_id, *props, key = key.split(".")
+
+                if key == "selected":
+                    value = truthy(value)
+
+                metadata_rules.append(
+                    SetMetadataRule(
+                        tap_stream_id=tap_stream_id,
+                        breadcrumb=property_breadcrumb(props),
+                        key=key,
+                        value=value,
+                    )
+                )
+
+            if metadata_rules:
+                metadata_executor = SetMetadataExecutor(metadata_rules)
+                metadata_executor.visit(schema)
 
             with properties_file.open("w") as catalog:
                 json.dump(schema, catalog)

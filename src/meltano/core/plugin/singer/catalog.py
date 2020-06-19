@@ -55,8 +55,7 @@ def path_property(path: str):
     return ".".join(components)
 
 
-def property_breadcrumb(prop_path):
-    props = prop_path.split(".")
+def property_breadcrumb(props):
     if len(props) >= 2 and props[0] == "properties":
         breadcrumb = props
     else:
@@ -244,10 +243,11 @@ class SelectExecutor(SetMetadataExecutor):
                     )
                 )
 
+            props = pattern.property_pattern.split(".")
             rules.append(
                 SetMetadataRule(
                     tap_stream_id=pattern.stream_pattern,
-                    breadcrumb=property_breadcrumb(pattern.property_pattern),
+                    breadcrumb=property_breadcrumb(props),
                     key="selected",
                     value=selected,
                 )
