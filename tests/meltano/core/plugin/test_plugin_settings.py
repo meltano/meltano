@@ -262,7 +262,19 @@ class TestPluginSettingsService:
         assert yml["metadata"]["stream"]["replication-key"] == "created_at"
         assert final_config()["metadata.stream.replication-key"] == "created_at"
 
+        set_config(["metadata", "stream", "replication-method"], "INCREMENTAL")
+
+        yml = yml_config()
+        assert "metadata.stream.replication-key" not in yml
+        assert "metadata.stream.replication-method" not in yml
+        assert yml["metadata"]["stream"]["replication-key"] == "created_at"
+        assert yml["metadata"]["stream"]["replication-method"] == "INCREMENTAL"
+        final = final_config()
+        assert final["metadata.stream.replication-key"] == "created_at"
+        assert final["metadata.stream.replication-method"] == "INCREMENTAL"
+
         set_config(["metadata.stream.replication-key"], "created_at")
+        set_config(["metadata.stream.replication-method"], None)
 
         yml = yml_config()
         assert "metadata" not in yml
