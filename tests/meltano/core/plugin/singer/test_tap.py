@@ -71,36 +71,41 @@ class TestSingerTap:
                 "catalog"
             ].exists(), "Catalog should not be present."
 
-    def test_apply_select(self, session, plugin_invoker_factory, subject):
+    def test_apply_metadata_rules(self, session, plugin_invoker_factory, subject):
         invoker = plugin_invoker_factory(subject, prepare_with_session=session)
 
         properties_file = invoker.files["catalog"]
 
         def reset_properties():
-            properties_file.open("w").write('{"patterns": []}')
+            properties_file.open("w").write('{"rules": []}')
 
-        def assert_patterns(*patterns):
+        def assert_rules(*rules):
             with properties_file.open() as catalog:
                 schema = json.load(catalog)
 
-            assert schema["patterns"] == list(patterns)
+            assert schema["rules"] == list(rules)
 
-        def mock_select_executor(patterns):
+        def mock_metadata_executor(rules):
             def visit(schema):
-                schema["patterns"].append(patterns)
+                schema["rules"].extend(rules)
 
             return mock.Mock(visit=visit)
 
         with mock.patch(
-            "meltano.core.plugin.singer.tap.SelectExecutor",
-            side_effect=mock_select_executor,
+            "meltano.core.plugin.singer.tap.MetadataExecutor",
+            side_effect=mock_metadata_executor,
         ):
             reset_properties()
 
-            subject.apply_select(invoker)
+            subject.apply_metadata_rules(invoker)
 
             # When `select` isn't set in meltano.yml or discovery.yml, select all
-            assert_patterns(["!*.*"], ["*.*"])
+            assert_rules(
+                ["*", [], "selected", False],
+                ["*", ["properties", "*"], "selected", False],
+                ["*", [], "selected", True],
+                ["*", ["properties", "*"], "selected", True],
+            )
 
             reset_properties()
 
@@ -108,10 +113,15 @@ class TestSingerTap:
             with mock.patch.object(
                 invoker.plugin_def, "select", ["UniqueEntitiesName.name"]
             ):
-                subject.apply_select(invoker)
+                subject.apply_metadata_rules(invoker)
 
                 # When `select` is set in discovery.yml, use the selection
-                assert_patterns(["!*.*"], ["UniqueEntitiesName.name"])
+                assert_rules(
+                    ["*", [], "selected", False],
+                    ["*", ["properties", "*"], "selected", False],
+                    ["UniqueEntitiesName", [], "selected", True],
+                    ["UniqueEntitiesName", ["properties", "name"], "selected", True],
+                )
 
                 reset_properties()
 
@@ -119,12 +129,17 @@ class TestSingerTap:
                 with mock.patch.object(
                     invoker.plugin, "select", ["UniqueEntitiesName.code"]
                 ):
-                    subject.apply_select(invoker)
+                    subject.apply_metadata_rules(invoker)
 
                 # `select` set in meltano.yml takes precedence over discovery.yml
-                assert_patterns(["!*.*"], ["UniqueEntitiesName.code"])
+                assert_rules(
+                    ["*", [], "selected", False],
+                    ["*", ["properties", "*"], "selected", False],
+                    ["UniqueEntitiesName", [], "selected", True],
+                    ["UniqueEntitiesName", ["properties", "code"], "selected", True],
+                )
 
-    def test_apply_select_catalog_invalid(
+    def test_apply_metadata_rules_catalog_invalid(
         self, session, plugin_invoker_factory, subject
     ):
         invoker = plugin_invoker_factory(subject, prepare_with_session=session)
@@ -132,4 +147,4 @@ class TestSingerTap:
         invoker.files["catalog"].open("w").write("this is invalid json")
 
         with pytest.raises(PluginExecutionError, match=r"invalid"):
-            subject.apply_select(invoker, [])
+            subject.apply_metadata_rules(invoker, [])

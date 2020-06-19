@@ -9,8 +9,8 @@ from typing import List
 from meltano.core.behavior.visitor import visit_with
 
 
-class SetMetadataRule(
-    namedtuple("SetMetadataRule", ("tap_stream_id", "breadcrumb", "key", "value"))
+class MetadataRule(
+    namedtuple("MetadataRule", ("tap_stream_id", "breadcrumb", "key", "value"))
 ):
     def match(self, tap_stream_id, breadcrumb):
         return fnmatch(tap_stream_id, self.tap_stream_id) and fnmatch(
@@ -21,6 +21,40 @@ class SetMetadataRule(
 SelectPattern = namedtuple(
     "SelectPattern", ("stream_pattern", "property_pattern", "negated", "raw")
 )
+
+
+def select_metadata_rules(patterns):
+    include_rules = []
+    exclude_rules = []
+
+    for pattern in patterns:
+        pattern = parse_select_pattern(pattern)
+
+        selected = not pattern.negated
+
+        rules = include_rules if selected else exclude_rules
+
+        if selected or pattern.property_pattern == "*":
+            rules.append(
+                MetadataRule(
+                    tap_stream_id=pattern.stream_pattern,
+                    breadcrumb=[],
+                    key="selected",
+                    value=selected,
+                )
+            )
+
+        props = pattern.property_pattern.split(".")
+        rules.append(
+            MetadataRule(
+                tap_stream_id=pattern.stream_pattern,
+                breadcrumb=property_breadcrumb(props),
+                key="selected",
+                value=selected,
+            )
+        )
+
+    return include_rules + exclude_rules
 
 
 def parse_select_pattern(pattern: str):
@@ -162,8 +196,8 @@ class CatalogExecutor:
         return self.execute(node_type, node, path)
 
 
-class SetMetadataExecutor(CatalogExecutor):
-    def __init__(self, rules: List[SetMetadataRule]):
+class MetadataExecutor(CatalogExecutor):
+    def __init__(self, rules: List[MetadataRule]):
         self._stream = None
         self._stream_path = None
         self._rules = rules
@@ -222,38 +256,9 @@ class SetMetadataExecutor(CatalogExecutor):
         logging.debug(f"Setting '{path}.{key}' to '{value}'")
 
 
-class SelectExecutor(SetMetadataExecutor):
+class SelectExecutor(MetadataExecutor):
     def __init__(self, patterns: List[str]):
-        include_rules = []
-        exclude_rules = []
-
-        patterns = list(map(parse_select_pattern, patterns))
-        for pattern in patterns:
-            selected = not pattern.negated
-
-            rules = include_rules if selected else exclude_rules
-
-            if selected or pattern.property_pattern == "*":
-                rules.append(
-                    SetMetadataRule(
-                        tap_stream_id=pattern.stream_pattern,
-                        breadcrumb=[],
-                        key="selected",
-                        value=selected,
-                    )
-                )
-
-            props = pattern.property_pattern.split(".")
-            rules.append(
-                SetMetadataRule(
-                    tap_stream_id=pattern.stream_pattern,
-                    breadcrumb=property_breadcrumb(props),
-                    key="selected",
-                    value=selected,
-                )
-            )
-
-        super().__init__(include_rules + exclude_rules)
+        super().__init__(select_metadata_rules(patterns))
 
 
 class ListExecutor(CatalogExecutor):

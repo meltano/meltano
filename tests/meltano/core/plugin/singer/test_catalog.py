@@ -12,6 +12,7 @@ from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin.singer.catalog import (
     visit,
     SelectExecutor,
+    MetadataExecutor,
     ListExecutor,
     ListSelectedExecutor,
     path_property,

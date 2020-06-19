@@ -10,11 +10,39 @@ from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilit
 
 from . import SingerPlugin, PluginType
 from .catalog import (
-    SelectExecutor,
-    SetMetadataExecutor,
-    SetMetadataRule,
+    MetadataExecutor,
+    MetadataRule,
     property_breadcrumb,
+    select_metadata_rules,
 )
+
+
+def config_metadata_rules(config):
+    rules = []
+    for key, value in config.items():
+        if not key.startswith("metadata."):
+            continue
+
+        # metadata.<tap_stream_id>.<key>
+        # metadata.<tap_stream_id>.<prop>.<key>
+        # metadata.<tap_stream_id>.<prop>.<subprop>.<key>
+        # metadata.<tap_stream_id>.properties.<prop>.<key>
+        # metadata.<tap_stream_id>.properties.<prop>.properties.<subprop>.<key>
+        _, tap_stream_id, *props, key = key.split(".")
+
+        if key == "selected":
+            value = truthy(value)
+
+        rules.append(
+            MetadataRule(
+                tap_stream_id=tap_stream_id,
+                breadcrumb=property_breadcrumb(props),
+                key=key,
+                value=value,
+            )
+        )
+
+    return rules
 
 
 class SingerTap(SingerPlugin):
@@ -96,22 +124,22 @@ class SingerTap(SingerPlugin):
             ) from err
 
     @hook("before_invoke", can_fail=True)
-    def apply_select_hook(self, plugin_invoker, exec_args=[]):
+    def apply_metadata_rules_hook(self, plugin_invoker, exec_args=[]):
         if "--discover" in exec_args:
             return
 
         try:
-            self.apply_select(plugin_invoker, exec_args)
+            self.apply_metadata_rules(plugin_invoker, exec_args)
         except PluginLacksCapabilityError:
             return
 
-    def apply_select(self, plugin_invoker, exec_args=[]):
+    def apply_metadata_rules(self, plugin_invoker, exec_args=[]):
         if (
             not "catalog" in plugin_invoker.capabilities
             and not "properties" in plugin_invoker.capabilities
         ):
             raise PluginLacksCapabilityError(
-                f"Extractor '{self.name}' does not support selection"
+                f"Extractor '{self.name}' does not support entity selection or metadata rules"
             )
 
         properties_file = plugin_invoker.files["catalog"]
@@ -120,49 +148,23 @@ class SingerTap(SingerPlugin):
             with properties_file.open() as catalog:
                 schema = json.load(catalog)
 
-            reset_executor = SelectExecutor(["!*.*"])
-            reset_executor.visit(schema)
+            metadata_rules = [
+                *select_metadata_rules(["!*.*"]),
+                *select_metadata_rules(plugin_invoker.select),
+                *config_metadata_rules(plugin_invoker.plugin_config),
+            ]
 
-            if plugin_invoker.select:
-                select_executor = SelectExecutor(plugin_invoker.select)
-                select_executor.visit(schema)
-
-            metadata_rules = []
-            for key, value in plugin_invoker.plugin_config.items():
-                if not key.startswith("metadata."):
-                    continue
-
-                # metadata.<tap_stream_id>.<key>
-                # metadata.<tap_stream_id>.<prop>.<key>
-                # metadata.<tap_stream_id>.<prop>.<subprop>.<key>
-                # metadata.<tap_stream_id>.properties.<prop>.<key>
-                # metadata.<tap_stream_id>.properties.<prop>.properties.<subprop>.<key>
-                _, tap_stream_id, *props, key = key.split(".")
-
-                if key == "selected":
-                    value = truthy(value)
-
-                metadata_rules.append(
-                    SetMetadataRule(
-                        tap_stream_id=tap_stream_id,
-                        breadcrumb=property_breadcrumb(props),
-                        key=key,
-                        value=value,
-                    )
-                )
-
-            if metadata_rules:
-                metadata_executor = SetMetadataExecutor(metadata_rules)
-                metadata_executor.visit(schema)
+            metadata_executor = MetadataExecutor(metadata_rules)
+            metadata_executor.visit(schema)
 
             with properties_file.open("w") as catalog:
                 json.dump(schema, catalog)
         except FileNotFoundError as err:
             raise PluginExecutionError(
-                f"Selection failed: catalog file is missing."
+                f"Applying metadata rules failed: catalog file is missing."
             ) from err
         except Exception as err:
             properties_file.unlink()
             raise PluginExecutionError(
-                f"Selection failed: catalog file is invalid: {properties_file}"
+                f"Applying metadata rules failed: catalog file is invalid: {properties_file}"
             ) from err
