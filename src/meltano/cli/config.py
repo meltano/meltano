@@ -49,7 +49,7 @@ def config(ctx, project, plugin_type, plugin_name, format):
 
 
 @config.command()
-@click.argument("setting_name")
+@click.argument("setting_name", nargs=-1, required=True)
 @click.argument("value")
 @click.option(
     "--store",
@@ -62,11 +62,12 @@ def set(ctx, setting_name, value, store):
     plugin = ctx.obj["plugin"]
     session = ctx.obj["session"]
 
-    settings.set(session, plugin, setting_name, value, store)
+    path = list(setting_name)
+    settings.set(session, plugin, path, value, store)
 
 
 @config.command()
-@click.argument("setting_name")
+@click.argument("setting_name", nargs=-1, required=True)
 @click.option(
     "--store",
     type=click.Choice(list(PluginSettingValueStore)),
@@ -78,7 +79,8 @@ def unset(ctx, setting_name, store):
     plugin = ctx.obj["plugin"]
     session = ctx.obj["session"]
 
-    settings.unset(session, plugin, setting_name, store)
+    path = list(setting_name)
+    settings.unset(session, plugin, path, store)
 
 
 @config.command()
@@ -96,9 +98,9 @@ def reset(ctx, store):
     settings.reset(session, plugin, store)
 
 
-@config.command()
+@config.command("list")
 @click.pass_context
-def list(ctx):
+def list_settings(ctx):
     settings = ctx.obj["settings"]
     plugin = ctx.obj["plugin"]
     plugin_def = settings.get_definition(plugin)

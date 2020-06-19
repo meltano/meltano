@@ -6,7 +6,16 @@ from copy import deepcopy
 from enum import Enum
 import re
 
-from meltano.core.utils import nest, find_named, setting_env, NotFound, truthy
+from meltano.core.utils import (
+    nest,
+    find_named,
+    setting_env,
+    NotFound,
+    truthy,
+    flatten,
+    set_at_path,
+    pop_at_path,
+)
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.error import Error
@@ -135,7 +144,8 @@ class PluginSettingsService:
 
         try:
             plugin_install = self.get_install(plugin)
-            setting_names.extend(self.get_install(plugin).current_config.keys())
+            flat_config = flatten(plugin_install.current_config, "dot")
+            setting_names.extend(flat_config.keys())
         except PluginMissingError:
             pass
 
@@ -179,10 +189,15 @@ class PluginSettingsService:
         self,
         session,
         plugin: PluginRef,
-        name: str,
+        path: List[str],
         value,
         store=PluginSettingValueStore.DB,
     ):
+        if isinstance(path, str):
+            path = [path]
+
+        name = ".".join(path)
+
         if value == REDACTED_VALUE:
             return
 
@@ -204,10 +219,19 @@ class PluginSettingsService:
 
         def meltano_yml_setter():
             config = plugin_install.current_config
+
             if value is None:
                 config.pop(name, None)
+                pop_at_path(config, name, None)
+                pop_at_path(config, path, None)
             else:
-                config[name] = value
+                if len(path) > 1:
+                    config.pop(name, None)
+
+                if name.split(".") != path:
+                    pop_at_path(config, name, None)
+
+                set_at_path(config, path, value)
 
             self.config_service.update_plugin(plugin_install)
             return True
@@ -240,9 +264,13 @@ class PluginSettingsService:
         return value
 
     def unset(
-        self, session, plugin: PluginRef, name: str, store=PluginSettingValueStore.DB
+        self,
+        session,
+        plugin: PluginRef,
+        path: List[str],
+        store=PluginSettingValueStore.DB,
     ):
-        return self.set(session, plugin, name, None, store)
+        return self.set(session, plugin, path, None, store)
 
     def reset(self, session, plugin: PluginRef, store=PluginSettingValueStore.DB):
         plugin_install = self.get_install(plugin)
@@ -337,7 +365,8 @@ class PluginSettingsService:
                 return None
 
             try:
-                value = plugin_install.current_config[name]
+                flat_config = flatten(plugin_install.current_config, "dot")
+                value = flat_config[name]
                 return self.expand_env_vars(value)
             except KeyError:
                 return None
