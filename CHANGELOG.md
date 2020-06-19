@@ -6,6 +6,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.36.1 - (2020-06-19)
 
 ### New
 
@@ -14,13 +26,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2103](https://gitlab.com/meltano/meltano/-/issues/2103) Allow nested properties to be set using `meltano config` by specifying a list of property names: `meltano config <plugin_name> set <property> <subproperty> <value>`
 - [#2026](https://gitlab.com/meltano/meltano/-/issues/2026) Allow Singer stream and property metadata to be configured using special nested `config` properties `metadata.<entity>.<key>` and `metadata.<entity>.<attribute>.<key>`.
 
-### Changes
 
 ### Fixes
 
 - [#2102](https://gitlab.com/meltano/meltano/-/issues/2102) Fix potential `meltano upgrade` failures by having it invoke itself with `--skip-package` after upgrading the package to ensure it always uses the latest code.
-
-### Breaks
 
 
 ## 1.36.0 - (2020-06-15)
