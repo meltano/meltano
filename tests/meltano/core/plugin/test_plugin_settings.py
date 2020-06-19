@@ -1,4 +1,5 @@
 import pytest
+from contextlib import contextmanager
 
 from meltano.core.config_service import PluginAlreadyAddedException
 from meltano.core.plugin import PluginRef, PluginType, PluginInstall
@@ -236,3 +237,48 @@ class TestPluginSettingsService:
         assert config["foo"] == str(env["FOO"])
         assert config["missing"] == None
         assert config["multiple"] == "rock paper scissors"
+
+    def test_nested_keys(self, session, subject, project, tap):
+        def set_config(path, value):
+            subject.set(session, tap, path, value, PluginSettingValueStore.MELTANO_YML)
+
+        def yml_config():
+            with project.meltano_update() as meltano:
+                extractor = meltano.plugins.extractors[0]
+                return extractor.config
+
+        def final_config():
+            return subject.as_config(session, tap)
+
+        set_config("metadata.stream.replication-key", "created_at")
+
+        assert yml_config()["metadata.stream.replication-key"] == "created_at"
+        assert final_config()["metadata.stream.replication-key"] == "created_at"
+
+        set_config(["metadata", "stream", "replication-key"], "created_at")
+
+        yml = yml_config()
+        assert "metadata.stream.replication-key" not in yml
+        assert yml["metadata"]["stream"]["replication-key"] == "created_at"
+        assert final_config()["metadata.stream.replication-key"] == "created_at"
+
+        set_config(["metadata.stream.replication-key"], "created_at")
+
+        yml = yml_config()
+        assert "metadata" not in yml
+        assert yml["metadata.stream.replication-key"] == "created_at"
+        assert final_config()["metadata.stream.replication-key"] == "created_at"
+
+        set_config(["metadata", "stream.replication-key"], "created_at")
+
+        yml = yml_config()
+        assert "metadata.stream.replication-key" not in yml
+        assert yml["metadata"]["stream.replication-key"] == "created_at"
+        assert final_config()["metadata.stream.replication-key"] == "created_at"
+
+        set_config(["metadata", "stream.replication-key"], None)
+
+        yml = yml_config()
+        assert "metadata.stream.replication-key" not in yml
+        assert "metadata" not in yml
+        assert "metadata.stream.replication-key" not in final_config()
