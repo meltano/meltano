@@ -9,22 +9,66 @@ from typing import List
 from meltano.core.behavior.visitor import visit_with
 
 
+class MetadataRule(
+    namedtuple("MetadataRule", ("tap_stream_id", "breadcrumb", "key", "value"))
+):
+    def match(self, tap_stream_id, breadcrumb):
+        return fnmatch(tap_stream_id, self.tap_stream_id) and fnmatch(
+            ".".join(breadcrumb), ".".join(self.breadcrumb)
+        )
+
+
 SelectPattern = namedtuple(
-    "SelectPattern", ("stream_pattern", "property_pattern", "negated")
+    "SelectPattern", ("stream_pattern", "property_pattern", "negated", "raw")
 )
 
 
-def parse_select_pattern(pattern: str):
-    negated = False
+def select_metadata_rules(patterns):
+    include_rules = []
+    exclude_rules = []
 
+    for pattern in patterns:
+        pattern = parse_select_pattern(pattern)
+
+        selected = not pattern.negated
+
+        rules = include_rules if selected else exclude_rules
+
+        if selected or pattern.property_pattern == "*":
+            rules.append(
+                MetadataRule(
+                    tap_stream_id=pattern.stream_pattern,
+                    breadcrumb=[],
+                    key="selected",
+                    value=selected,
+                )
+            )
+
+        props = pattern.property_pattern.split(".")
+        rules.append(
+            MetadataRule(
+                tap_stream_id=pattern.stream_pattern,
+                breadcrumb=property_breadcrumb(props),
+                key="selected",
+                value=selected,
+            )
+        )
+
+    return include_rules + exclude_rules
+
+
+def parse_select_pattern(pattern: str):
+    raw = pattern
+
+    negated = False
     if pattern.startswith("!"):
         negated = True
         pattern = pattern[1:]
 
-    stream, *_ = pattern.split(".")
+    stream, prop = pattern.split(".", maxsplit=1)
 
     return SelectPattern(
-        stream_pattern=stream, property_pattern=pattern, negated=negated
+        stream_pattern=stream, property_pattern=prop, negated=negated, raw=raw
     )
 
 
@@ -45,11 +89,21 @@ def path_property(path: str):
     return ".".join(components)
 
 
+def property_breadcrumb(props):
+    if len(props) >= 2 and props[0] == "properties":
+        breadcrumb = props
+    else:
+        breadcrumb = []
+        for prop in props:
+            breadcrumb.extend(["properties", prop])
+
+    return breadcrumb
+
+
 class CatalogNode(Enum):
     STREAM = auto()
-    STREAM_METADATA = auto()
-    STREAM_PROPERTY = auto()
-    STREAM_PROPERTY_METADATA = auto()
+    PROPERTY = auto()
+    METADATA = auto()
 
 
 class SelectionType(str, Enum):
@@ -83,20 +137,17 @@ def _(node: dict, executor, path=""):
         node_type = CatalogNode.STREAM
 
     if re.search(r"schema(\.properties\.\w*)+$", path):
-        node_type = CatalogNode.STREAM_PROPERTY
+        node_type = CatalogNode.PROPERTY
 
     if re.search(r"metadata\[\d+\]$", path) and "breadcrumb" in node:
-        if len(node["breadcrumb"]) == 0:
-            node_type = CatalogNode.STREAM_METADATA
-        else:
-            node_type = CatalogNode.STREAM_PROPERTY_METADATA
+        node_type = CatalogNode.METADATA
 
     if node_type:
         logging.debug(f"Visiting {node_type} at '{path}'.")
         executor(node_type, node, path)
 
     for child_path, child_node in node.items():
-        if node_type is CatalogNode.STREAM_PROPERTY and child_path in ["anyOf", "type"]:
+        if node_type is CatalogNode.PROPERTY and child_path in ["anyOf", "type"]:
             continue
 
         # TODO mbergeron: refactor this to use a dynamic visitor per CatalogNode
@@ -114,9 +165,8 @@ class CatalogExecutor:
     def execute(self, node_type: CatalogNode, node, path):
         dispatch = {
             CatalogNode.STREAM: self.stream_node,
-            CatalogNode.STREAM_METADATA: self.stream_metadata_node,
-            CatalogNode.STREAM_PROPERTY_METADATA: self.property_metadata_node,
-            CatalogNode.STREAM_PROPERTY: self.property_node,
+            CatalogNode.PROPERTY: self.property_node,
+            CatalogNode.METADATA: self.metadata_node,
         }
 
         try:
@@ -130,6 +180,12 @@ class CatalogExecutor:
     def property_node(self, node, path: str):
         pass
 
+    def metadata_node(self, node, path: str):
+        if len(node["breadcrumb"]) == 0:
+            self.stream_metadata_node(node, path)
+        else:
+            self.property_metadata_node(node, path)
+
     def stream_metadata_node(self, node, path: str):
         pass
 
@@ -140,106 +196,69 @@ class CatalogExecutor:
         return self.execute(node_type, node, path)
 
 
-class SelectExecutor(CatalogExecutor):
-    def __init__(self, patterns: List[str]):
+class MetadataExecutor(CatalogExecutor):
+    def __init__(self, rules: List[MetadataRule]):
         self._stream = None
-        self._patterns = list(map(parse_select_pattern, patterns))
+        self._stream_path = None
+        self._rules = rules
 
-    @property
-    def current_stream(self):
-        return self._stream["tap_stream_id"]
-
-    @classmethod
-    def _match_patterns(cls, value, include=[], exclude=[]):
-        included = any(fnmatch(value, pattern) for pattern in include)
-        excluded = any(fnmatch(value, pattern) for pattern in exclude)
-
-        return included and not excluded
-
-    def update_node_selection(self, node, path: str, selected: bool):
-        node["selected"] = selected
-        if selected:
-            logging.debug(f"{path} has been selected.")
-        else:
-            logging.debug(f"{path} has been deselected.")
-
-    def stream_match_patterns(self, stream):
-        return self._match_patterns(
-            stream,
-            include=(
-                pattern.stream_pattern
-                for pattern in self._patterns
-                if not pattern.negated
-            ),
-            exclude=(
-                pattern.stream_pattern
-                for pattern in self._patterns
-                if pattern.negated and pattern.property_pattern == "*"
-            ),
-        )
-
-    def property_match_patterns(self, prop):
-        return self._match_patterns(
-            prop,
-            include=(
-                pattern.property_pattern
-                for pattern in self._patterns
-                if not pattern.negated
-            ),
-            exclude=(
-                pattern.property_pattern
-                for pattern in self._patterns
-                if pattern.negated
-            ),
-        )
+    def ensure_metadata(self, breadcrumb):
+        metadata_list = self._stream["metadata"]
+        try:
+            next(
+                metadata
+                for metadata in metadata_list
+                if metadata["breadcrumb"] == breadcrumb
+            )
+        except StopIteration:
+            # This is to support legacy catalogs
+            metadata_list.append(
+                {"breadcrumb": breadcrumb, "metadata": {"inclusion": "automatic"}}
+            )
 
     def stream_node(self, node, path):
         self._stream = node
-        selected = self.stream_match_patterns(self.current_stream)
-        stream_metadata = {"breadcrumb": [], "metadata": {"inclusion": "automatic"}}
+        self._stream_path = path
 
-        try:
-            metadata = next(
-                metadata
-                for metadata in node["metadata"]
-                if len(metadata["breadcrumb"]) == 0
-            )
-            self.update_node_selection(metadata["metadata"], path, selected)
-        except KeyError:
-            node["metadata"] = [stream_metadata]
-        except StopIteration:
-            # This is to support legacy catalogs
-            node["metadata"].insert(0, stream_metadata)
+        if not "metadata" in node:
+            node["metadata"] = []
 
-        # the node itself has a `selected` key
-        self.update_node_selection(node, path, selected)
+        self.ensure_metadata([])
 
-    def stream_metadata_node(self, node, path):
-        metadata = node["metadata"]
-        selected = self.stream_match_patterns(self.current_stream)
-        self.update_node_selection(metadata, path, selected)
+        for rule in self.find_rules(self._stream["tap_stream_id"], []):
+            # Legacy catalogs have underscorized keys on the streams themselves
+            self.set_metadata(node, path, rule.key.replace("-", "_"), rule.value)
 
     def property_node(self, node, path):
         breadcrumb_idx = path.index("properties")
         breadcrumb = path[breadcrumb_idx:].split(".")
 
-        try:
-            next(
-                metadata
-                for metadata in self._stream["metadata"]
-                if metadata["breadcrumb"] == breadcrumb
-            )
-        except StopIteration:
-            # This is to support legacy catalogs
-            self._stream["metadata"].append(
-                {"breadcrumb": breadcrumb, "metadata": {"inclusion": "automatic"}}
+        self.ensure_metadata(breadcrumb)
+
+    def metadata_node(self, node, path):
+        tap_stream_id = self._stream["tap_stream_id"]
+        breadcrumb = node["breadcrumb"]
+
+        logging.debug(
+            f"Visiting metadata node for tap_stream_id '{tap_stream_id}', breadcrumb '{breadcrumb}'"
+        )
+
+        for rule in self.find_rules(tap_stream_id, breadcrumb):
+            self.set_metadata(
+                node["metadata"], f"{path}.metadata", rule.key, rule.value
             )
 
-    def property_metadata_node(self, node, path):
-        property_path = ".".join(node["breadcrumb"])
-        prop = f"{self.current_stream}.{path_property(property_path)}"
-        selected = self.property_match_patterns(prop)
-        self.update_node_selection(node["metadata"], path, selected)
+    def find_rules(self, tap_stream_id, breadcrumb):
+        return [rule for rule in self._rules if rule.match(tap_stream_id, breadcrumb)]
+
+    def set_metadata(self, node, path, key, value):
+        node[key] = value
+        logging.debug(f"Setting '{path}.{key}' to '{value}'")
+
+
+class SelectExecutor(MetadataExecutor):
+    def __init__(self, patterns: List[str]):
+        super().__init__(select_metadata_rules(patterns))
 
 
 class ListExecutor(CatalogExecutor):

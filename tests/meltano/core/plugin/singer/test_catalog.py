@@ -12,6 +12,8 @@ from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin.singer.catalog import (
     visit,
     SelectExecutor,
+    MetadataExecutor,
+    MetadataRule,
     ListExecutor,
     ListSelectedExecutor,
     path_property,
@@ -411,127 +413,6 @@ def test_path_property(path, prop):
     assert path_property(path) == prop
 
 
-class TestSingerTap:
-    @pytest.fixture(scope="class")
-    def subject(self, project_add_service):
-        return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
-
-    def test_exec_args(self, subject, session, plugin_invoker_factory, tmpdir):
-        invoker = plugin_invoker_factory(subject, prepare_with_session=session)
-
-        assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
-
-        # when `catalog` has data
-        invoker.files["catalog"].open("w").write("...")
-        assert subject.exec_args(invoker) == [
-            "--config",
-            invoker.files["config"],
-            "--catalog",
-            invoker.files["catalog"],
-        ]
-
-        # when `state` has data
-        invoker.files["state"].open("w").write("...")
-        assert subject.exec_args(invoker) == [
-            "--config",
-            invoker.files["config"],
-            "--catalog",
-            invoker.files["catalog"],
-            "--state",
-            invoker.files["state"],
-        ]
-
-    def test_run_discovery(self, session, plugin_invoker_factory, subject):
-        invoker = plugin_invoker_factory(subject, prepare_with_session=session)
-
-        def mock_discovery():
-            invoker.files["catalog"].open("w").write(CATALOG)
-            return ("", "")
-
-        process_mock = mock.Mock()
-        process_mock.communicate = mock_discovery
-        process_mock.returncode = 0
-
-        with mock.patch.object(
-            PluginInvoker, "invoke", return_value=process_mock
-        ) as invoke:
-            subject.run_discovery(invoker, [])
-
-            assert invoke.called_with(["--discover"])
-
-    def test_run_discovery_fails(self, session, plugin_invoker_factory, subject):
-        process_mock = mock.Mock()
-        process_mock.communicate.return_value = ("", "")
-        process_mock.returncode = 1  # something went wrong
-
-        invoker = plugin_invoker_factory(subject, prepare_with_session=session)
-
-        with mock.patch.object(
-            PluginInvoker, "invoke", return_value=process_mock
-        ) as invoke, pytest.raises(PluginExecutionError, match="returned 1"):
-            subject.run_discovery(invoker, [])
-
-            assert not invoker.files[
-                "catalog"
-            ].exists(), "Catalog should not be present."
-
-    def test_apply_select(self, session, plugin_invoker_factory, subject):
-        invoker = plugin_invoker_factory(subject, prepare_with_session=session)
-
-        properties_file = invoker.files["catalog"]
-
-        def reset_properties():
-            properties_file.open("w").write(CATALOG)
-
-        def assert_properties(properties):
-            with properties_file.open() as catalog:
-                schema = json.load(catalog)
-
-            lister = ListSelectedExecutor()
-            visit(schema, lister)
-
-            assert lister.selected_properties["UniqueEntitiesName"] == properties
-
-        reset_properties()
-
-        subject.apply_select(invoker)
-
-        # When `select` isn't set in meltano.yml or discovery.yml, select all
-        assert_properties(CATALOG_PROPERTIES)
-
-        reset_properties()
-
-        # Pretend `select` is set in discovery.yml
-        with mock.patch.object(
-            invoker.plugin_def, "select", {"UniqueEntitiesName.name"}
-        ):
-            subject.apply_select(invoker)
-
-            # When `select` is set in discovery.yml, use the selection
-            assert_properties({"id", "created_at", "name"})
-
-            reset_properties()
-
-            # Pretend `select` is set in meltano.yml
-            with mock.patch.object(
-                invoker.plugin, "select", {"UniqueEntitiesName.code"}
-            ):
-                subject.apply_select(invoker)
-
-            # `select` set in meltano.yml takes precedence over discovery.yml
-            assert_properties({"id", "created_at", "code"})
-
-    def test_apply_select_catalog_invalid(
-        self, session, plugin_invoker_factory, subject
-    ):
-        invoker = plugin_invoker_factory(subject, prepare_with_session=session)
-
-        invoker.files["catalog"].open("w").write("this is invalid json")
-
-        with pytest.raises(PluginExecutionError, match=r"invalid"):
-            subject.apply_select(invoker, [])
-
-
 class TestLegacyCatalogSelectVisitor:
     @pytest.fixture
     def catalog(self):
@@ -622,14 +503,17 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     @pytest.mark.parametrize(
         "catalog,attrs",
         [
-            ("CATALOG", {"id", "code", "name", "code", "created_at"}),
+            (
+                "CATALOG",
+                {"id", "code", "name", "code", "created_at", "payload.content"},
+            ),
             ("JSON_SCHEMA", CATALOG_PROPERTIES),
         ],
         indirect=["catalog"],
     )
     def test_select(self, catalog, attrs):
         selector = SelectExecutor(
-            ["UniqueEntitiesName.name", "UniqueEntitiesName.code"]
+            ["UniqueEntitiesName.name", "UniqueEntitiesName.code", "*.payload.content"]
         )
         visit(catalog, selector)
 
@@ -643,15 +527,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         [
             (
                 "CATALOG",
-                {
-                    "id",
-                    "balance",
-                    "created_at",
-                    "active",
-                    "payload",
-                    "payload.content",
-                    "payload.hash",
-                },
+                {"id", "balance", "created_at", "active", "payload", "payload.content"},
             ),
             ("JSON_SCHEMA", CATALOG_PROPERTIES),
         ],
@@ -659,7 +535,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     )
     def test_select_negated(self, catalog, attrs):
         selector = SelectExecutor(
-            ["*.*", "!UniqueEntitiesName.code", "!UniqueEntitiesName.name"]
+            ["*.*", "!UniqueEntitiesName.code", "!UniqueEntitiesName.name", "!*.*.hash"]
         )
         visit(catalog, selector)
 
@@ -667,6 +543,45 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         visit(catalog, lister)
 
         assert lister.selected_properties["UniqueEntitiesName"] == attrs
+
+
+class TestMetadataExecutor:
+    @pytest.fixture
+    def catalog(self, request):
+        return json.loads(globals()[request.param])
+
+    @pytest.mark.parametrize(
+        "catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"]
+    )
+    def test_visit(self, catalog):
+        executor = MetadataExecutor(
+            [
+                MetadataRule("UniqueEntitiesName", [], "replication-key", "created_at"),
+                MetadataRule(
+                    "UniqueEntitiesName",
+                    ["properties", "created_at"],
+                    "is-replication-key",
+                    True,
+                ),
+            ]
+        )
+        visit(catalog, executor)
+
+        stream_node = next(
+            s for s in catalog["streams"] if s["tap_stream_id"] == "UniqueEntitiesName"
+        )
+        stream_metadata_node = next(
+            m for m in stream_node["metadata"] if len(m["breadcrumb"]) == 0
+        )
+        property_metadata_node = next(
+            m
+            for m in stream_node["metadata"]
+            if m["breadcrumb"] == ["properties", "created_at"]
+        )
+
+        assert stream_node["replication_key"] == "created_at"
+        assert stream_metadata_node["metadata"]["replication-key"] == "created_at"
+        assert property_metadata_node["metadata"]["is-replication-key"] == True
 
 
 class TestListExecutor:
@@ -691,17 +606,3 @@ class TestListExecutor:
                 "payload.hash",
             }
         }
-
-
-class TestSingerTarget:
-    @pytest.fixture
-    def subject(self, project_add_service):
-        try:
-            return project_add_service.add(PluginType.LOADERS, "target-mock")
-        except PluginAlreadyAddedException as err:
-            return err.plugin
-
-    def test_exec_args(self, subject, session, plugin_invoker_factory):
-        invoker = plugin_invoker_factory(subject, prepare_with_session=session)
-
-        assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]

@@ -174,6 +174,70 @@ If multiple plugins share the same name, you can provide an additional `--plugin
 meltano config --plugin-type=<plugin_type> <plugin_name> ...
 ```
 
+#### Nested properties
+
+Nested properties can be set (and unset) by specifying a list of property names:
+
+```bash
+meltano config <plugin_name> set <property> <subproperty> <value>
+meltano config <plugin_name> set <property> <deep> <nesting> <value>
+
+meltano config <plugin_name> unset <property> <subproperty>
+```
+
+This will result in the following configuration being passed on to the plugin:
+
+```json
+{"<property>": {"<subproperty>": "<value>", "<deep>": {"<nesting>": "<value>"}}}
+```
+
+##### Dot seperator
+
+Note that `meltano config <plugin_name>` always displays a flattened object
+with nesting represented by the `.` seperator, matching the internal representation:
+
+```bash
+meltano config <plugin_name>
+# => {"<property>.<subproperty>": "<value>", "<property>.<deep>.<nesting>": "<value>"}
+```
+
+You can also set nested properties using the `.` seperator, but specifying a list of names is preferred
+since this will result in the nesting being reflected in the plugin's `config` object in `meltano.yml`:
+
+```bash
+meltano config <plugin_name> set <property> <deep> <nesting> <value>
+# `meltano.yml`:
+#  config:
+#    <property>:
+#      <deep>:
+#        <nesting>: <value>
+
+meltano config <plugin_name> set <property>.<deep>.<nesting> <value>
+# `meltano.yml`:
+#  config:
+#    <property>.<deep>.<nesting>: <value>
+```
+
+### Singer metadata
+
+On extractors (Singer taps), [stream and property metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata)
+can be configured using special [nested properties](#nested-properties) `metadata.<entity>.<key>` and `metadata.<entity>.<attribute>.<key>`,
+where `<entity>` refers to a stream's `tap_stream_id` value, and `<attribute>` to one of the stream's properties.
+
+Like [`meltano select`](#select) rules, metadata rules allow for [glob](https://en.wikipedia.org/wiki/Glob_(programming))-like
+patterns in the entity and attribute identifiers.
+
+```bash
+meltano config <plugin_name> set metadata <entity> <key> <value>
+meltano config <plugin_name> set metadata <entity> <attribute> <key> <value>
+
+# For example:
+meltano config tap-postgres set metadata "some_schema-*" replication-method INCREMENTAL
+meltano config tap-postgres set metadata "some_schema-*" replication-key created_at
+
+meltano config tap-postgres set metadata some_schema-some_table some_column custom-metadata custom-value
+```
+
 ## `discover`
 
 Lists the available plugins you are interested in.

@@ -39,7 +39,7 @@ class FilePlugin(PluginInstall):
             [
                 f"# This file is managed by the '{self.name}' {self.type.descriptor} and updated automatically when `meltano upgrade` is run.",
                 f"# To prevent any manual changes from being overwritten, remove the {self.type.descriptor} from `meltano.yml` or disable automatic updates:",
-                f"#     meltano config --plugin-type={self.type} {self.name} set update.{relative_path} false",
+                f"#     meltano config --plugin-type={self.type} {self.name} set update {relative_path} false",
             ]
         )
 
