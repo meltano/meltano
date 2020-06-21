@@ -2,17 +2,21 @@
 import { mapActions, mapGetters } from 'vuex'
 
 import PipelineSchedules from '@/components/pipelines/PipelineSchedules'
+import CreatePipelineScheduleModal from '@/components/pipelines/CreatePipelineScheduleModal.vue'
+
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
   name: 'Pipelines',
   components: {
     PipelineSchedules,
-    RouterViewLayout
+    RouterViewLayout,
+    CreatePipelineScheduleModal
   },
   data() {
     return {
-      isLoading: false
+      isLoading: false,
+      isCreatePipelineModalOpen: false
     }
   },
   computed: {
@@ -29,7 +33,10 @@ export default {
     this.getPipelineSchedules().then(() => (this.isLoading = false))
   },
   methods: {
-    ...mapActions('orchestration', ['getPipelineSchedules'])
+    ...mapActions('orchestration', ['getPipelineSchedules']),
+    toggleCreatePipelineModal() {
+      this.isCreatePipelineModalOpen = !this.isCreatePipelineModalOpen
+    }
   }
 }
 </script>
@@ -37,8 +44,19 @@ export default {
 <template>
   <router-view-layout>
     <div class="container view-body is-widescreen">
-      <h2 id="data" class="title">Pipelines</h2>
-
+      <div class="columns">
+        <div class="column">
+          <h2 id="data" class="title">Pipelines</h2>
+        </div>
+        <div class="column is-one-quarter has-text-right">
+          <button
+            class="button is-interactive-primary"
+            @click.stop="toggleCreatePipelineModal"
+          >
+            Create
+          </button>
+        </div>
+      </div>
       <div class="columns">
         <div class="column">
           <div v-if="getHasPipelines">
@@ -88,6 +106,10 @@ export default {
         <router-view :name="getModalName"></router-view>
       </div>
     </div>
+    <create-pipeline-schedule-modal 
+      v-if="isCreatePipelineModalOpen" 
+      @close="toggleCreatePipelineModal"
+    />
   </router-view-layout>
 </template>
 
