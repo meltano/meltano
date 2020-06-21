@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2068](https://gitlab.com/meltano/meltano/-/issues/2068) Add interface to schedule new pipelines to Pipelines page
+
 ### Changes
 
 ### Fixes
