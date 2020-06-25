@@ -28,9 +28,9 @@ const getters = {
     return (configSettings, settingsGroupValidation = null) => {
       return settingsGroupValidation
         ? getters.getHasGroupValidationConfigSettings(
-            configSettings,
-            settingsGroupValidation
-          )
+          configSettings,
+          settingsGroupValidation
+        )
         : getters.getHasDefaultValidationConfigSettings(configSettings)
     }
   },
@@ -99,8 +99,8 @@ const getters = {
       return pipelineExtractor.endedAt
         ? utils.formatDateStringYYYYMMDD(pipelineExtractor.endedAt)
         : pipelineExtractor.isRunning
-        ? 'Updating...'
-        : ''
+          ? 'Updating...'
+          : ''
     }
   },
 
@@ -252,18 +252,23 @@ const actions = {
     })
   },
 
-  savePipelineSchedule({ commit }, { hasDefaultTransforms, extractorName }) {
-    let pipeline = {
-      name: `pipeline-${new Date().getTime()}`,
-      extractor: extractorName,
-      loader: 'target-postgres', // Refactor vs. hard code when we again want to display in the UI
-      transform: hasDefaultTransforms ? 'run' : 'skip',
-      interval: '@daily', // Refactor vs. hard code when we again want to display in the UI
-      isRunning: false
+  savePipelineSchedule({ commit }, { hasDefaultTransforms, extractorName, pipeline }) {
+    let newPipeline = {}
+    if (!pipeline) {
+      Object.assign(newPipeline, {
+        name: `pipeline-${new Date().getTime()}`,
+        extractor: extractorName,
+        loader: 'target-postgres', // Refactor vs. hard code when we again want to display in the UI
+        transform: hasDefaultTransforms ? 'run' : 'skip',
+        interval: '@daily', // Refactor vs. hard code when we again want to display in the UI
+        isRunning: false
+      })
+    } else {
+      Object.assign(newPipeline, pipeline)
     }
-    return orchestrationsApi.savePipelineSchedule(pipeline).then(response => {
-      pipeline = Object.assign(pipeline, response.data)
-      commit('updatePipelines', pipeline)
+    return orchestrationsApi.savePipelineSchedule(newPipeline).then(response => {
+      newPipeline = Object.assign(newPipeline, response.data)
+      commit('updatePipelines', newPipeline)
     })
   },
 

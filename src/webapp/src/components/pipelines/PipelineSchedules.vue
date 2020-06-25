@@ -6,6 +6,7 @@ import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import Dropdown from '@/components/generic/Dropdown'
 import ExploreButton from '@/components/analyze/ExploreButton'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
+import { PIPELINE_INTERVAL_OPTIONS } from '@/utils/constants'
 import utils from '@/utils/utils'
 import capitalize from '@/filters/capitalize'
 
@@ -23,20 +24,11 @@ export default {
   props: {
     pipelines: { type: Array, required: true, default: () => [] }
   },
-  data() {
-    return {
-      intervalOptions: {
-        '@once': 'Once (Manual)',
-        '@hourly': 'Hourly',
-        '@daily': 'Daily',
-        '@weekly': 'Weekly',
-        '@monthly': 'Monthly',
-        '@yearly': 'Yearly'
-      }
-    }
-  },
   computed: {
     ...mapGetters('plugins', ['getInstalledPlugin', 'getPluginLabel']),
+    intervalOptions() {
+      return PIPELINE_INTERVAL_OPTIONS
+    },
     getIsDisabled() {
       return pipeline => pipeline.isRunning || pipeline.isSaving
     },
