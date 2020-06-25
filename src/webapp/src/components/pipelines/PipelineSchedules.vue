@@ -24,13 +24,11 @@ export default {
   props: {
     pipelines: { type: Array, required: true, default: () => [] }
   },
-  data() {
-    return {
-      intervalOptions: PIPELINE_INTERVAL_OPTIONS
-    }
-  },
   computed: {
     ...mapGetters('plugins', ['getInstalledPlugin', 'getPluginLabel']),
+    intervalOptions() {
+      return PIPELINE_INTERVAL_OPTIONS
+    },
     getIsDisabled() {
       return pipeline => pipeline.isRunning || pipeline.isSaving
     },

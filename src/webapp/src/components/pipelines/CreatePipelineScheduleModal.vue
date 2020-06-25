@@ -3,7 +3,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 import _ from 'lodash'
 
-import { PIPELINE_INTERVAL_OPTIONS } from '@/utils/constants'
+import { PIPELINE_INTERVAL_OPTIONS, TRANSFORM_OPTIONS } from '@/utils/constants'
 import capitalize from '@/filters/capitalize'
 
 export default {
@@ -15,8 +15,6 @@ export default {
     return {
       isLoaded: false,
       isSaving: false,
-      transformOptions: ['run', 'only', 'skip'],
-      intervalOptions: PIPELINE_INTERVAL_OPTIONS,
       pipeline: {
         name: '',
         extractor: '',
@@ -28,12 +26,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('plugins', [
-      'getIsPluginInstalled',
-      'getPluginLabel',
-      'getHasDefaultTransforms'
-    ]),
+    ...mapGetters('plugins', ['getPluginLabel', 'getHasDefaultTransforms']),
     ...mapState('plugins', ['installedPlugins']),
+    transformOptions() {
+      return TRANSFORM_OPTIONS
+    },
+    intervalOptions() {
+      return PIPELINE_INTERVAL_OPTIONS
+    },
     isSaveable() {
       const hasOwns = []
       _.forOwn(this.pipeline, val => hasOwns.push(val))
@@ -70,18 +70,21 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('plugins/getInstalledPlugins').then(this.prepareForm)
+    this.$store
+      .dispatch('plugins/getInstalledPlugins')
+      .then(() => (this.isLoaded = true))
   },
   methods: {
     ...mapActions('orchestration', ['savePipelineSchedule']),
-    prepareForm() {
-      this.isLoaded = true
-    },
     onExtractorLoaderChange() {
+      if (!this.pipeline.extractor || !this.pipeline.loader) {
+        return
+      }
+
       this.pipeline.name =
-        this.pipeline.extractor.substring(4) +
+        this.pipeline.extractor.replace('tap-', '') +
         '-to-' +
-        this.pipeline.loader.substring(7)
+        this.pipeline.loader.replace('target-', '')
     },
     save() {
       this.isSaving = true
