@@ -67,7 +67,7 @@ export PG_USERNAME=""
 export PG_PORT=""
 export PG_PASSWORD=""
 export PG_DATABASE=""
-# export PG_URL="" # alternatively specify a postgres connection url
+# export PG_URL="" # alternatively specify a postgresql:// connection URL
 
 # export PG_SCHEMA="" # override if the default (see below) is not appropriate
 ```
