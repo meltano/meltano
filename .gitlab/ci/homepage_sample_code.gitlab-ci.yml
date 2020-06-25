@@ -19,7 +19,7 @@ homepage_sample_code:
 
     # For these examples to work, ensure that:
     # - you are running Linux or macOS
-    # - Python 3.6 or 3.7 has been installed
+    # - Python 3.6 or 3.7 (NOT 3.8) has been installed
     - python3 --version
 
     # Create directory for Meltano projects
@@ -128,6 +128,9 @@ homepage_sample_code:
     - meltano schedule gitlab-to-jsonl tap-gitlab target-jsonl @hourly
     - meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily --transform=run
 
+    # List scheduled pipelines
+    - meltano schedule list
+
     # Add Airflow orchestrator
     - meltano add orchestrator airflow
 
@@ -135,8 +138,62 @@ homepage_sample_code:
     # meltano invoke airflow scheduler
 
     # Start the Airflow web interface (add `-D` to background)
-    # - meltano invoke airflow webserver
+    # meltano invoke airflow webserver
 
+
+    ### https://meltano.com/#containerization
+
+    # For these examples to work, ensure that
+    # Docker has been installed
+    # docker --version
+
+    # Add Docker files to your project
+    - meltano add files docker
+
+    # Build Docker image "demo-project:dev" containing
+    # Meltano, your project, and all of its plugins
+    # docker build --tag demo-project:dev .
+
+    # View Meltano version
+    # docker run demo-project --version
+
+    # Run gitlab-to-jsonl pipeline with
+    # mounted volume to exfiltrate target-jsonl output
+    # docker run \
+    #   --volume $(pwd)/output:/project/output \
+    #   demo-project \
+    #   elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
+
+    # Run gitlab-to-postgres pipeline with
+    # target-postgres configuration in environment
+    # docker run \
+    #   --env PG_ADDRESS=host.docker.internal \
+    #   --env PG_PORT=5432 \
+    #   --env PG_USERNAME=meltano \
+    #   --env PG_PASSWORD=meltano \
+    #   --env PG_DATABASE=demo-warehouse \
+    #   demo-project \
+    #   elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
+
+    # For these examples to work, ensure that
+    # you have an account on GitLab.com or
+    # a self-hosted GitLab instance with
+    # GitLab CI/CD and Container Registry enabled
+
+    # Add GitLab CI/CD files to your project
+    - meltano add files gitlab-ci
+
+    # Initialize Git repository, if you haven't already
+    # git init
+
+    # Add and commit all files
+    # git add -A
+    # git commit -m "Set up Meltano project with Docker and GitLab CI"
+
+    # Push to GitLab, which will automatically create
+    # a new private project at the specified path
+    # NAMESPACE="<your-gitlab-username-or-group>"
+    # git push git@gitlab.com:$NAMESPACE/meltano-demo-project.git master
 
     ### https://meltano.com/#meltano-add
 

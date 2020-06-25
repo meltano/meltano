@@ -105,6 +105,23 @@
       </div>
     </div>
 
+    <div class="hero homepage-cta feature-section-wrapper" id="containerization">
+      <div class="hero-left">
+        <Content slot-key="containerization" />
+
+        <p class="action">
+          <NavLink
+            class="action-button"
+            :item="$frontmatter.containerization.primaryAction"
+          />
+        </p>
+      </div>
+
+      <div class="hero-right">
+        <Content slot-key="containerization-code" />
+      </div>
+    </div>
+
     <div class="feature-section-wrapper is-shorter is-white">
       <section class="section">
         <h2 class="section__title" style="padding-bottom:20px;">

@@ -864,5 +864,11 @@ files:
         kind: boolean
         value: True
   - name: docker-compose
-    namespace: docker-compose
+    namespace: docker_compose
     pip_url: git+https://gitlab.com/meltano/files-docker-compose.git
+  - name: docker
+    namespace: docker
+    pip_url: git+https://gitlab.com/meltano/files-docker.git
+  - name: gitlab-ci
+    namespace: gitlab_ci
+    pip_url: git+https://gitlab.com/meltano/files-gitlab-ci.git
