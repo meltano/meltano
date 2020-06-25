@@ -42,7 +42,7 @@ Scroll down for details on [Meltano projects](/#meltano-init), [integration](/#i
 ```bash
 # For these examples to work, ensure that:
 # - you are running Linux or macOS
-# - Python 3.6 or 3.7 has been installed
+# - Python 3.6 or 3.7 (NOT 3.8) has been installed
 python3 --version
 
 # Create directory for Meltano projects
