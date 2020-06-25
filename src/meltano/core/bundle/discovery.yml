@@ -594,7 +594,12 @@ loaders:
     namespace: postgres
     docs: 'https://meltano.com/plugins/loaders/postgres.html'
     pip_url: 'git+https://github.com/meltano/target-postgres.git'
+    settings_group_validation:
+      - ['url', 'schema']
+      - ['user', 'password', 'host', 'port', 'dbname', 'schema']
     settings:
+      - name: url
+        env: PG_URL
       - name: user
         env: PG_USERNAME
         value: warehouse
