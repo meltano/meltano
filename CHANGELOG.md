@@ -10,16 +10,22 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2048](https://gitlab.com/meltano/meltano/-/issues/2048) Add `docker` and `gitlab-ci` file bundles to allow instant containerization
-- [#2068](https://gitlab.com/meltano/meltano/-/issues/2068) Add interface to schedule new pipelines to Pipelines page
-- [#2081](https://gitlab.com/meltano/meltano/-/issues/2081) Add `url` config option to `target-postgres`
-- [#2060](https://gitlab.com/meltano/meltano/-/issues/2060) Add `--format=json` option to `meltano schedule list` so that a project's schedules can be processed programmatically
-
 ### Changes
 
 ### Fixes
 
 ### Breaks
+
+
+## 1.37.0 - (2020-06-25)
+---
+
+### New
+
+- [#2048](https://gitlab.com/meltano/meltano/-/issues/2048) Add `docker` and `gitlab-ci` file bundles to allow instant containerization
+- [#2068](https://gitlab.com/meltano/meltano/-/issues/2068) Add interface to schedule new pipelines to Pipelines page
+- [#2081](https://gitlab.com/meltano/meltano/-/issues/2081) Add `url` config option to `target-postgres`
+- [#2060](https://gitlab.com/meltano/meltano/-/issues/2060) Add `--format=json` option to `meltano schedule list` so that a project's schedules can be processed programmatically
 
 
 ## 1.36.1 - (2020-06-19)
