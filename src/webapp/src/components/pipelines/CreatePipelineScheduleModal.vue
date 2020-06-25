@@ -3,22 +3,20 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 import _ from 'lodash'
 
+import { PIPELINE_INTERVAL_OPTIONS } from '@/utils/constants'
 import capitalize from '@/filters/capitalize'
 
 export default {
   name: 'CreatePipelineScheduleModal',
-  components: {},
   filters: {
     capitalize
   },
   data() {
     return {
       isLoaded: false,
-      extractorInFocus: null,
       isSaving: false,
-      isValidConfig: false,
       transformOptions: ['run', 'only', 'skip'],
-      hasDefaultTransforms: true,
+      intervalOptions: PIPELINE_INTERVAL_OPTIONS,
       pipeline: {
         name: '',
         extractor: '',
@@ -36,16 +34,39 @@ export default {
       'getHasDefaultTransforms'
     ]),
     ...mapState('plugins', ['installedPlugins']),
-    ...mapState('orchestration', ['intervalOptions']),
     isSaveable() {
       const hasOwns = []
       _.forOwn(this.pipeline, val => hasOwns.push(val))
       const isValidPipeline =
         hasOwns.find(val => val === '' || val === null) === undefined
-        
-      const isTransformValid =
-        this.hasDefaultTransforms || this.pipeline.transform === 'skip'
-      return isValidPipeline && isTransformValid
+
+      return isValidPipeline
+    },
+    hasDefaultTransforms() {
+      const pipelineExtractor = this.pipeline.extractor
+      if (!pipelineExtractor) {
+        return true
+      }
+      const extractor = this.installedPlugins.extractors.find(
+        plugin => plugin.name === pipelineExtractor
+      )
+      return this.getHasDefaultTransforms(extractor.namespace)
+    },
+    showTransformWarning() {
+      return (
+        !this.hasDefaultTransforms &&
+        (this.pipeline.transform === 'run' ||
+          this.pipeline.transform === 'only')
+      )
+    }
+  },
+  watch: {
+    hasDefaultTransforms(newVal) {
+      if (!newVal) {
+        this.pipeline.transform = 'skip'
+      } else {
+        this.pipeline.transform = 'run'
+      }
     }
   },
   created() {
@@ -53,30 +74,15 @@ export default {
   },
   methods: {
     ...mapActions('orchestration', ['savePipelineSchedule']),
-    onSelected(extractor) {
-      this.extractorInFocus = extractor
-      this.pipeline.extractor = this.extractorInFocus.name
-      this.checkConfiguration(this.pipeline.extractor)
-    },
     prepareForm() {
-      this.pipeline.name = `pipeline-${new Date().getTime()}`
-      this.pipeline.extractor = ''
-      this.pipeline.isRunning = false
       this.isLoaded = true
     },
-    onExtractorChange() {
-      const extractor = this.installedPlugins.extractors.find(
-        el => el.name == this.pipeline.extractor
-      )
-      this.hasDefaultTransforms = this.getHasDefaultTransforms(
-        extractor.namespace
-      )
-      if (!this.hasDefaultTransforms) {
-        this.pipeline.transform = 'skip'
-      } else {
-        this.pipeline.transform = 'run'
-      }
-    }, 
+    onExtractorLoaderChange() {
+      this.pipeline.name =
+        this.pipeline.extractor.substring(4) +
+        '-to-' +
+        this.pipeline.loader.substring(7)
+    },
     save() {
       this.isSaving = true
       this.savePipelineSchedule({
@@ -84,13 +90,13 @@ export default {
       })
         .then(() => {
           Vue.toasted.global.success(`Pipeline Saved - ${this.pipeline.name}`)
+          this.close()
         })
         .catch(error => {
           Vue.toasted.global.error(error.response.data.code)
         })
         .finally(() => {
           this.isSaving = false
-          this.close()
         })
     },
     close() {
@@ -121,7 +127,7 @@ export default {
                 <select
                   v-model="pipeline.extractor"
                   class="select is-fullwidth"
-                  @change="onExtractorChange($event)"
+                  @change="onExtractorLoaderChange"
                 >
                   <option value="">Select extractor</option>
                   <option
@@ -142,7 +148,11 @@ export default {
             <h4>Loader</h4>
             <div class="control is-expanded">
               <span class="select is-fullwidth">
-                <select v-model="pipeline.loader" class="select is-fullwidth">
+                <select
+                  v-model="pipeline.loader"
+                  class="select is-fullwidth"
+                  @change="onExtractorLoaderChange"
+                >
                   <option value="">Select loader</option>
                   <option
                     v-for="(loader, index) in installedPlugins.loaders"
@@ -178,7 +188,7 @@ export default {
             </div>
           </div>
           <div class="column is-half">
-            <small class="has-text-interactive-navigation">Step 3</small>
+            <small class="has-text-interactive-navigation">Step 4</small>
             <h4>Interval</h4>
             <div class="control is-expanded">
               <span class="select is-fullwidth">
@@ -194,12 +204,22 @@ export default {
               </span>
             </div>
           </div>
+          <div class="column is-half">
+            <small class="has-text-interactive-navigation">Step 5</small>
+            <h4>Name</h4>
+            <div class="control is-expanded">
+              <input
+                v-model="pipeline.name"
+                class="input is-fullwidth"
+                type="text"
+              />
+            </div>
+          </div>
           <div class="column is-full">
-            <p 
-              v-if="!hasDefaultTransforms && pipeline.transform !== 'skip'"
-              class="has-text-grey"
-            >
-              Your Meltano project does not contain a transform plugin for this extractor. Only proceed with running transformations as part of your pipeline if you've added these manually.
+            <p v-if="showTransformWarning" class="has-text-grey">
+              Your Meltano project does not contain a transform plugin for this
+              extractor. Only proceed with running transformations as part of
+              your pipeline if you've added these manually.
             </p>
           </div>
         </div>

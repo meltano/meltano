@@ -1,11 +1,12 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import Vue from 'vue'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import Dropdown from '@/components/generic/Dropdown'
 import ExploreButton from '@/components/analyze/ExploreButton'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
+import { PIPELINE_INTERVAL_OPTIONS } from '@/utils/constants'
 import utils from '@/utils/utils'
 import capitalize from '@/filters/capitalize'
 
@@ -23,9 +24,13 @@ export default {
   props: {
     pipelines: { type: Array, required: true, default: () => [] }
   },
+  data() {
+    return {
+      intervalOptions: PIPELINE_INTERVAL_OPTIONS
+    }
+  },
   computed: {
     ...mapGetters('plugins', ['getInstalledPlugin', 'getPluginLabel']),
-    ...mapState('orchestration', ['intervalOptions']),
     getIsDisabled() {
       return pipeline => pipeline.isRunning || pipeline.isSaving
     },
