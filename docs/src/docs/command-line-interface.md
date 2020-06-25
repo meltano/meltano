@@ -371,12 +371,6 @@ If multiple plugins share the same name, you can provide an additional `--plugin
 meltano invoke --plugin-type=<plugin_type> <plugin_name> PLUGIN_ARGS...
 ```
 
-## `list`
-
-Use `--list` to list the current selected tap attributes.
-
-> Note: `--all` can be used to show all the tap attributes with their selected status.
-
 ## `schedule`
 
 ::: tip
@@ -386,17 +380,8 @@ An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Or
 Meltano provides a `schedule` method to run specified ELT pipelines at regular intervals. Schedules are defined inside the `meltano.yml` project as such:
 
 - `meltano schedule <schedule_name> <extractor> <loader> <interval> [--transform]`: Schedule an ELT pipeline to run using an orchestrator.
-  - `meltano schedule list`: List the project's schedules.
+- `meltano schedule list [--format=json]`: List the project's schedules.
 
-```yaml
-schedules:
-  - name: test
-    interval: '@daily'
-    extractor: tap-mock
-    loader: target-mock
-    transform: skip
-    env: {}
-```
 
 ## `select`
 
@@ -416,6 +401,10 @@ Meltano select patterns are inspired by the [glob](<https://en.wikipedia.org/wik
 - `?`: matches one character
 - `[abc]`: matches either `a`, `b`, or `c`
 - `[!abc]`: matches any character **but** `a`, `b`, or `c`
+
+Use `--list` to list the current selected tap attributes.
+
+> Note: `--all` can be used to show all the tap attributes with their selected status.
 
 ### Examples
 
