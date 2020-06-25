@@ -82,9 +82,9 @@ export default {
       }
 
       this.pipeline.name =
-        this.pipeline.extractor.replace('tap-', '') +
+        this.pipeline.extractor.replace(/^tap-/, '') +
         '-to-' +
-        this.pipeline.loader.replace('target-', '')
+        this.pipeline.loader.replace(/^target-/, '')
     },
     save() {
       this.isSaving = true
