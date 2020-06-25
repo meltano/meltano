@@ -9,23 +9,13 @@ from . import PluginInstall, PluginType
 
 from meltano.core.error import SubprocessError
 from meltano.core.behavior.hookable import hook
-from meltano.core.plugin.config_service import PluginConfigService
-from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_invoker import invoker_factory, PluginInvoker
-from meltano.core.db import project_engine
-from meltano.core.venv_service import VenvService
-from meltano.core.utils import nest, map_dict
+from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.utils import nest
 
 
 class AirflowInvoker(PluginInvoker):
     def env(self):
         env = super().env()
-        venv_dir = self.project.venvs_dir(self.plugin.type, self.plugin.name)
-
-        # add the Airflow virtualenv because it contains `gunicorn`
-        env["PATH"] = os.pathsep.join([str(venv_dir.joinpath("bin")), env["PATH"]])
-        env["VIRTUAL_ENV"] = str(venv_dir)
-        env["AIRFLOW_HOME"] = str(self.config_service.run_dir)
 
         # we want Airflow to inherit our current venv so that the `meltano`
         # module can be used from inside `orchestrate/dags/meltano.py`

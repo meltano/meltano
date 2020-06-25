@@ -11,7 +11,7 @@ from .plugin.error import PluginMissingError, PluginExecutionError
 from .plugin.config_service import PluginConfigService
 from .plugin.settings_service import PluginSettingsService
 from .plugin_discovery_service import PluginDiscoveryService
-from .venv_service import VenvService
+from .venv_service import VenvService, VirtualEnv
 from .error import Error, SubprocessError
 
 
@@ -111,7 +111,13 @@ class PluginInvoker:
 
     def env(self):
         env = {**self.settings_service.env, **self.plugin_config_env}
-        env.pop("PYTHONPATH", None)  # Ensure Meltano venv is not inherited
+
+        # Ensure Meltano venv is not inherited
+        venv = VirtualEnv(self.project.venvs_dir(self.plugin.type, self.plugin.name))
+        env["VIRTUAL_ENV"] = str(venv.root)
+        env["PATH"] = os.pathsep.join([str(venv.bin_dir), env["PATH"]])
+        env.pop("PYTHONPATH", None)
+
         return env
 
     def Popen_options(self):
