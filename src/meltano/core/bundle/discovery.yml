@@ -597,7 +597,6 @@ loaders:
     settings:
       - name: url
         env: PG_URL
-        value: null
       - name: user
         env: PG_USERNAME
         value: warehouse
