@@ -15,26 +15,7 @@ from meltano.core.utils import nest
 
 class AirflowInvoker(PluginInvoker):
     def env(self):
-        env = super().env()
-
-        # we want Airflow to inherit our current venv so that the `meltano`
-        # module can be used from inside `orchestrate/dags/meltano.py`
-        sys_paths = []
-        for path in sys.path:
-            # the current venv if any
-            if path.endswith("site-packages"):
-                sys_paths.append(path)
-
-            # when meltano is installed as editable
-            if path.endswith(os.path.join("meltano", "src")):
-                sys_paths.append(path)
-
-        if "PYTHONPATH" in env and env["PYTHONPATH"]:
-            sys_paths.append(env["PYTHONPATH"])
-
-        env["PYTHONPATH"] = os.pathsep.join(sys_paths)
-
-        return env
+        return {**super().env(), "AIRFLOW_HOME": str(self.config_service.run_dir)}
 
 
 class Airflow(PluginInstall):
