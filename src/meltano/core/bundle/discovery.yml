@@ -595,6 +595,9 @@ loaders:
     docs: 'https://meltano.com/plugins/loaders/postgres.html'
     pip_url: 'git+https://github.com/meltano/target-postgres.git'
     settings:
+      - name: url
+        env: PG_URL
+        value: null
       - name: user
         env: PG_USERNAME
         value: warehouse
