@@ -61,26 +61,6 @@ export default {
         <div class="column">
           <div v-if="getHasPipelines">
             <PipelineSchedules :pipelines="getSortedPipelines" />
-
-            <p class="has-text-centered is-italic">
-              The UI currently only supports setting up pipelines with the
-              <a
-                href="https://meltano.com/plugins/loaders/postgres.html"
-                target="_blank"
-                ><strong>target-postgres</strong></a
-              >
-              loader.
-
-              <a href="http://localhost:8081/plugins/loaders/" target="_blank"
-                >Additional loaders</a
-              >
-              are available when using the
-              <a
-                href="https://meltano.com/docs/command-line-interface.html"
-                target="_blank"
-                >command line interface</a
-              >.
-            </p>
           </div>
           <div v-else class="box">
             <progress

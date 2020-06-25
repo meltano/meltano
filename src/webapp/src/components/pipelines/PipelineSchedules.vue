@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
@@ -23,20 +23,9 @@ export default {
   props: {
     pipelines: { type: Array, required: true, default: () => [] }
   },
-  data() {
-    return {
-      intervalOptions: {
-        '@once': 'Once (Manual)',
-        '@hourly': 'Hourly',
-        '@daily': 'Daily',
-        '@weekly': 'Weekly',
-        '@monthly': 'Monthly',
-        '@yearly': 'Yearly'
-      }
-    }
-  },
   computed: {
     ...mapGetters('plugins', ['getInstalledPlugin', 'getPluginLabel']),
+    ...mapState('orchestration', ['intervalOptions']),
     getIsDisabled() {
       return pipeline => pipeline.isRunning || pipeline.isSaving
     },

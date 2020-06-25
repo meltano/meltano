@@ -10,7 +10,15 @@ const defaultState = utils.deepFreeze({
   extractorInFocusConfiguration: {},
   loaderInFocusConfiguration: {},
   pipelinePollers: [],
-  pipelines: []
+  pipelines: [],
+  intervalOptions: {
+    '@once': 'Once (Manual)',
+    '@hourly': 'Hourly',
+    '@daily': 'Daily',
+    '@weekly': 'Weekly',
+    '@monthly': 'Monthly',
+    '@yearly': 'Yearly'
+  }
 })
 
 const getters = {
