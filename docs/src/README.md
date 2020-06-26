@@ -374,22 +374,22 @@ docker --version
 # Add Docker files to your project
 meltano add files docker
 
-# Build Docker image "demo-project:dev" containing
+# Build Docker image containing
 # Meltano, your project, and all of its plugins
-docker build --tag demo-project:dev .
+docker build --tag meltano-demo-project:dev .
 ```
 
-Your `demo-project:dev` Docker image is now ready for its first container!
+Your `meltano-demo-project:dev` Docker image is now ready for its first container!
 
 ```bash
 # View Meltano version
-docker run demo-project --version
+docker run meltano-demo-project --version
 
 # Run gitlab-to-jsonl pipeline with
 # mounted volume to exfiltrate target-jsonl output
 docker run \
   --volume $(pwd)/output:/project/output \
-  demo-project \
+  meltano-demo-project \
   elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
 
 # Run gitlab-to-postgres pipeline with
@@ -400,7 +400,7 @@ docker run \
   --env PG_USERNAME=meltano \
   --env PG_PASSWORD=meltano \
   --env PG_DATABASE=demo-warehouse \
-  demo-project \
+  meltano-demo-project \
   elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
 ```
 
