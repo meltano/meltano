@@ -14,9 +14,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#2113](https://gitlab.com/meltano/meltano/-/issues/2113) Fix bug causing `meltano invoke airflow` to fail because `AIRFLOW_HOME` was not set correctly.
-
 ### Breaks
+
+
+## 1.37.1 - (2020-06-26)
+---
+
+### Fixes
+
+- [#2113](https://gitlab.com/meltano/meltano/-/issues/2113) Fix bug causing `meltano invoke airflow` to fail because `AIRFLOW_HOME` was not set correctly.
 
 
 ## 1.37.0 - (2020-06-25)
