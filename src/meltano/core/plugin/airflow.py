@@ -17,6 +17,8 @@ class AirflowInvoker(PluginInvoker):
     def env(self):
         env = super().env()
 
+        env["AIRFLOW_HOME"] = str(self.config_service.run_dir)
+
         # we want Airflow to inherit our current venv so that the `meltano`
         # module can be used from inside `orchestrate/dags/meltano.py`
         sys_paths = []
