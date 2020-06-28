@@ -7,7 +7,7 @@ import json
 
 from typing import Dict
 
-from meltano.core.utils import truthy
+from meltano.core.project_settings_service import ProjectSettingsService
 
 REQUEST_TIMEOUT = 2.0
 MELTANO_UI_TRACKING_ID = "UA-132758957-2"
@@ -20,20 +20,16 @@ DEBUG_MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/debug/collect
 class GoogleAnalyticsTracker:
     def __init__(self, project, tracking_id: str = None, request_timeout: float = None):
         self.project = project
+        self.settings_service = ProjectSettingsService(self.project)
+
         self.tracking_id = tracking_id or MELTANO_CLI_TRACKING_ID
         self.request_timeout = request_timeout or REQUEST_TIMEOUT
 
-        self.send_anonymous_usage_stats = (
-            not truthy(os.getenv("MELTANO_DISABLE_TRACKING"))
-            and self.project.meltano.send_anonymous_usage_stats == True
+        self.send_anonymous_usage_stats = self.settings_service.get(
+            "send_anonymous_usage_stats"
         )
         self.project_id = self.load_project_id()
         self.client_id = self.load_client_id()
-
-    def update_permission_to_track(self, send_anonymous_usage_stats: bool) -> None:
-        """Update the send_anonymous_usage_stats in meltano.yml."""
-        with self.project.meltano_update() as meltano_yml:
-            meltano_yml.send_anonymous_usage_stats = send_anonymous_usage_stats
 
     def load_project_id(self) -> uuid.UUID:
         """
@@ -43,8 +39,8 @@ class GoogleAnalyticsTracker:
         store it in the project config file.
         """
         try:
-            project_id_str = self.project.meltano.project_id or ""
-            project_id = uuid.UUID(project_id_str, version=4)
+            project_id_str = self.settings_service.get("project_id")
+            project_id = uuid.UUID(project_id_str or "", version=4)
         except ValueError:
             project_id = uuid.uuid4()
 
@@ -52,8 +48,7 @@ class GoogleAnalyticsTracker:
                 # If we are set to track Anonymous Usage stats, also store
                 #  the generated project_id back to the project config file
                 #  so that it persists between meltano runs.
-                with self.project.meltano_update() as meltano_yml:
-                    meltano_yml.project_id = str(project_id)
+                self.settings_service.set("project_id", str(project_id))
 
         return project_id
 

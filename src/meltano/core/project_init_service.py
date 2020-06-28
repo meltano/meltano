@@ -6,13 +6,12 @@ from functools import singledispatch
 from typing import List, Dict
 from pathlib import Path
 
-from meltano.core.utils import truthy
-from meltano.core.plugin import PluginType
-from meltano.core.plugin.meltano_file import MeltanoFilePlugin
-from meltano.core.db import project_engine
-from meltano.core.migration_service import MigrationService
+from .utils import truthy
+from .project_settings_service import ProjectSettingsService
 from .project import Project
-from .venv_service import VenvService
+from .plugin.meltano_file import MeltanoFilePlugin
+from .db import project_engine
+from .migration_service import MigrationService
 
 
 class ProjectInitServiceError(Exception):
@@ -33,6 +32,7 @@ class ProjectInitService:
 
         self.project = Project(self.project_name)
         self.create_files(add_discovery=add_discovery)
+        self.set_send_anonymous_usage_stats()
 
         if activate:
             Project.activate(self.project)
@@ -52,6 +52,12 @@ class ProjectInitService:
         for path in plugin.create_files(self.project):
             click.secho(f"Created", fg="blue", nl=False)
             click.echo(f" {self.project_name}/{path}")
+
+    def set_send_anonymous_usage_stats(self):
+        settings_service = ProjectSettingsService(self.project)
+
+        send_anonymous_usage_stats = settings_service.get("send_anonymous_usage_stats")
+        settings_service.set("send_anonymous_usage_stats", send_anonymous_usage_stats)
 
     def create_system_database(self, engine_uri):
         click.secho(f"Creating system database...", fg="blue")

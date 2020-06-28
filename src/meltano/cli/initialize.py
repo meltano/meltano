@@ -8,6 +8,7 @@ from meltano.core.project_init_service import (
     ProjectInitService,
     ProjectInitServiceError,
 )
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.error import SubprocessError
@@ -36,16 +37,16 @@ def init(engine_uri, ctx, project_name, no_usage_stats):
             "`meltano init` cannot run inside a Meltano project."
         )
 
+    if no_usage_stats:
+        ProjectSettingsService.config_override["send_anonymous_usage_stats"] = False
+
     init_service = ProjectInitService(project_name)
     try:
         project = init_service.init(engine_uri=engine_uri)
         init_service.echo_instructions()
 
         tracker = GoogleAnalyticsTracker(project)
-        if no_usage_stats:
-            tracker.update_permission_to_track(False)
-        else:
-            tracker.track_meltano_init(project_name=project_name)
+        tracker.track_meltano_init(project_name=project_name)
     except ProjectInitServiceError as e:
         click.secho(f"Directory {project_name} already exists!", fg="red")
         raise click.Abort()
