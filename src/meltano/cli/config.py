@@ -6,7 +6,9 @@ from .params import project
 
 from meltano.core.db import project_engine
 from meltano.core.project import Project
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.error import PluginMissingError
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin.settings_service import (
     PluginSettingsService,
@@ -24,15 +26,26 @@ from meltano.core.plugin.settings_service import (
 @project(migrate=True)
 @click.pass_context
 def config(ctx, project, plugin_type, plugin_name, format):
-    plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
+    try:
+        plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
-    config = ConfigService(project)
-    plugin = config.find_plugin(plugin_name, plugin_type=plugin_type, configurable=True)
+        config = ConfigService(project)
+        plugin = config.find_plugin(
+            plugin_name, plugin_type=plugin_type, configurable=True
+        )
+    except PluginMissingError:
+        if plugin_name == "meltano":
+            plugin = None
+        else:
+            raise
 
     _, Session = project_engine(project)
     session = Session()
     try:
-        settings = PluginSettingsService(project).build(plugin)
+        if plugin:
+            settings = PluginSettingsService(project).build(plugin)
+        else:
+            settings = ProjectSettingsService(project)
 
         ctx.obj["settings"] = settings
         ctx.obj["session"] = session
