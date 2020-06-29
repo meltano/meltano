@@ -10,7 +10,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin.settings_service import (
     PluginSettingsService,
-    PluginSettingValueStore,
+    SettingValueStore,
 )
 
 
@@ -53,8 +53,8 @@ def config(ctx, project, plugin_type, plugin_name, format):
 @click.argument("value")
 @click.option(
     "--store",
-    type=click.Choice(list(PluginSettingValueStore)),
-    default=PluginSettingValueStore.MELTANO_YML,
+    type=click.Choice(list(SettingValueStore)),
+    default=SettingValueStore.MELTANO_YML,
 )
 @click.pass_context
 def set(ctx, setting_name, value, store):
@@ -63,15 +63,15 @@ def set(ctx, setting_name, value, store):
     session = ctx.obj["session"]
 
     path = list(setting_name)
-    settings.set(session, plugin, path, value, store)
+    settings.set(session, plugin, path, value, store=store)
 
 
 @config.command()
 @click.argument("setting_name", nargs=-1, required=True)
 @click.option(
     "--store",
-    type=click.Choice(list(PluginSettingValueStore)),
-    default=PluginSettingValueStore.MELTANO_YML,
+    type=click.Choice(list(SettingValueStore)),
+    default=SettingValueStore.MELTANO_YML,
 )
 @click.pass_context
 def unset(ctx, setting_name, store):
@@ -80,14 +80,14 @@ def unset(ctx, setting_name, store):
     session = ctx.obj["session"]
 
     path = list(setting_name)
-    settings.unset(session, plugin, path, store)
+    settings.unset(session, plugin, path, store=store)
 
 
 @config.command()
 @click.option(
     "--store",
-    type=click.Choice(list(PluginSettingValueStore)),
-    default=PluginSettingValueStore.MELTANO_YML,
+    type=click.Choice(list(SettingValueStore)),
+    default=SettingValueStore.MELTANO_YML,
 )
 @click.pass_context
 def reset(ctx, store):
@@ -95,7 +95,7 @@ def reset(ctx, store):
     plugin = ctx.obj["plugin"]
     session = ctx.obj["session"]
 
-    settings.reset(session, plugin, store)
+    settings.reset(session, plugin, store=store)
 
 
 @config.command("list")

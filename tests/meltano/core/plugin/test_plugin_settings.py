@@ -2,24 +2,24 @@ import pytest
 from contextlib import contextmanager
 
 from meltano.core.config_service import PluginAlreadyAddedException
+from meltano.core.setting import Setting
 from meltano.core.plugin import PluginRef, PluginType, PluginInstall
-from meltano.core.plugin.setting import PluginSetting
 from meltano.core.plugin.settings_service import (
-    PluginSettingValueSource,
-    PluginSettingValueStore,
+    SettingValueSource,
+    SettingValueStore,
     REDACTED_VALUE,
 )
 
 
 def test_create(session):
-    setting = PluginSetting(
+    setting = Setting(
         name="api_key.test.test", namespace="gitlab", value="C4F3C4F3", enabled=True
     )
 
     session.add(setting)
     session.commit()
 
-    fetched = session.query(PluginSetting).first()
+    fetched = session.query(Setting).first()
     assert setting == fetched
 
 
@@ -56,55 +56,55 @@ class TestPluginSettingsService:
         # returns the default value when unset
         assert subject.get_value(session, tap, "test") == (
             "mock",
-            PluginSettingValueSource.DEFAULT,
+            SettingValueSource.DEFAULT,
         )
         assert subject.get_value(session, tap_with_profile, "test") == (
             "mock",
-            PluginSettingValueSource.DEFAULT,
+            SettingValueSource.DEFAULT,
         )
 
-        # overriden by an PluginSetting db value when set
+        # overriden by an Setting db value when set
         subject.set(session, tap, "test", "THIS_IS_FROM_DB")
         subject.set(session, tap_with_profile, "test", "THIS_IS_FROM_DB_WITH_PROFILE")
 
         assert subject.get_value(session, tap, "test") == (
             "THIS_IS_FROM_DB",
-            PluginSettingValueSource.DB,
+            SettingValueSource.DB,
         )
         assert subject.get_value(session, tap_with_profile, "test") == (
             "THIS_IS_FROM_DB_WITH_PROFILE",
-            PluginSettingValueSource.DB,
+            SettingValueSource.DB,
         )
 
         # overriden via the `meltano.yml` configuration
-        subject.set(session, tap, "test", 42, PluginSettingValueStore.MELTANO_YML)
+        subject.set(session, tap, "test", 42, store=SettingValueStore.MELTANO_YML)
         subject.set(
-            session, tap_with_profile, "test", 43, PluginSettingValueStore.MELTANO_YML
+            session, tap_with_profile, "test", 43, store=SettingValueStore.MELTANO_YML
         )
 
         assert subject.get_value(session, tap, "test") == (
             42,
-            PluginSettingValueSource.MELTANO_YML,
+            SettingValueSource.MELTANO_YML,
         )
         assert subject.get_value(session, tap_with_profile, "test") == (
             43,
-            PluginSettingValueSource.MELTANO_YML,
+            SettingValueSource.MELTANO_YML,
         )
 
         # revert back to the original
-        subject.reset(session, tap, PluginSettingValueStore.MELTANO_YML)
-        subject.reset(session, tap_with_profile, PluginSettingValueStore.MELTANO_YML)
+        subject.reset(session, tap, store=SettingValueStore.MELTANO_YML)
+        subject.reset(session, tap_with_profile, store=SettingValueStore.MELTANO_YML)
 
         # overriden via ENV
         subject = subject.with_env_override({env_var(tap, "test"): "N33DC0F33"})
 
         assert subject.get_value(session, tap, "test") == (
             "N33DC0F33",
-            PluginSettingValueSource.ENV,
+            SettingValueSource.ENV,
         )
         assert subject.get_value(session, tap_with_profile, "test") == (
             "N33DC0F33",
-            PluginSettingValueSource.ENV,
+            SettingValueSource.ENV,
         )
 
         # overridden via config override
@@ -112,11 +112,11 @@ class TestPluginSettingsService:
 
         assert subject.get_value(session, tap, "test") == (
             "foo",
-            PluginSettingValueSource.CONFIG_OVERRIDE,
+            SettingValueSource.CONFIG_OVERRIDE,
         )
         assert subject.get_value(session, tap_with_profile, "test") == (
             "foo",
-            PluginSettingValueSource.CONFIG_OVERRIDE,
+            SettingValueSource.CONFIG_OVERRIDE,
         )
 
         # Verify that boolean settings set in env are cast correctly
@@ -124,14 +124,14 @@ class TestPluginSettingsService:
 
         assert subject.get_value(session, tap, "boolean") == (
             True,
-            PluginSettingValueSource.ENV,
+            SettingValueSource.ENV,
         )
 
         subject = subject.with_env_override({env_var(tap, "boolean"): "0"})
 
         assert subject.get_value(session, tap, "boolean") == (
             False,
-            PluginSettingValueSource.ENV,
+            SettingValueSource.ENV,
         )
 
     def test_as_config_custom(self, subject, session, config_service):
@@ -178,34 +178,34 @@ class TestPluginSettingsService:
         subject.set(session, tap, "test_a", "THIS_IS_FROM_DB")
         subject.set(session, tap, "test_b", "THIS_IS_FROM_DB")
 
-        assert session.query(PluginSetting).count() == 2
+        assert session.query(Setting).count() == 2
 
         subject.unset(session, tap, "test_a")
 
-        assert session.query(PluginSetting).count() == 1
+        assert session.query(Setting).count() == 1
 
         subject.reset(session, tap)
 
-        assert session.query(PluginSetting).count() == 0
+        assert session.query(Setting).count() == 0
 
     def test_store_meltano_yml(self, session, subject, project, tap):
-        store = PluginSettingValueStore.MELTANO_YML
-        subject.set(session, tap, "test_a", "THIS_IS_FROM_YML", store)
-        subject.set(session, tap, "test_b", "THIS_IS_FROM_YML", store)
+        store = SettingValueStore.MELTANO_YML
+        subject.set(session, tap, "test_a", "THIS_IS_FROM_YML", store=store)
+        subject.set(session, tap, "test_b", "THIS_IS_FROM_YML", store=store)
 
         with project.meltano_update() as meltano:
             extractor = meltano.plugins.extractors[0]
             assert extractor.config["test_a"] == "THIS_IS_FROM_YML"
             assert extractor.config["test_b"] == "THIS_IS_FROM_YML"
 
-        subject.unset(session, tap, "test_a", store)
+        subject.unset(session, tap, "test_a", store=store)
 
         with project.meltano_update() as meltano:
             extractor = meltano.plugins.extractors[0]
             assert "test_a" not in extractor.config
             assert extractor.config["test_b"] == "THIS_IS_FROM_YML"
 
-        subject.reset(session, tap, store)
+        subject.reset(session, tap, store=store)
 
         with project.meltano_update() as meltano:
             extractor = meltano.plugins.extractors[0]
@@ -240,7 +240,7 @@ class TestPluginSettingsService:
 
     def test_nested_keys(self, session, subject, project, tap):
         def set_config(path, value):
-            subject.set(session, tap, path, value, PluginSettingValueStore.MELTANO_YML)
+            subject.set(session, tap, path, value, store=SettingValueStore.MELTANO_YML)
 
         def yml_config():
             with project.meltano_update() as meltano:

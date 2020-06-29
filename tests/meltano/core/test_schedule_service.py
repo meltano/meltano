@@ -7,7 +7,7 @@ from meltano.core.schedule_service import (
     Schedule,
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
-    PluginSettingMissingError,
+    SettingMissingError,
 )
 
 
@@ -108,7 +108,7 @@ class TestScheduleService:
         # or default to `utcnow()` if the plugin exposes no config
         with mock.patch(
             "meltano.core.schedule_service.PluginSettingsService.get_value",
-            side_effect=PluginSettingMissingError(tap, "start_date"),
+            side_effect=SettingMissingError("start_date"),
         ):
             schedule = add("with_no_start_date", None)
             assert schedule.start_date
