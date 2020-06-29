@@ -2,6 +2,7 @@ import os
 import sqlalchemy
 import logging
 from abc import ABC, abstractmethod
+from copy import deepcopy
 from typing import Iterable, Dict, List
 from enum import Enum
 import re
@@ -133,41 +134,35 @@ class SettingsService(ABC):
             config_override={**self.config_override, **config_override},
         )
 
-    def config_with_sources(self, sources: List[SettingValueSource] = None, **kwargs):
-        setting_names = [setting.name for setting in self.definitions()]
-        setting_names.extend(self.flat_current_config)
-
+    def config_with_metadata(self, sources: List[SettingValueSource] = None, **kwargs):
         config = {}
-        for name in setting_names:
-            value, source = self.get_value(name, **kwargs)
-            if sources and source not in sources:
-                continue
-
-            config[name] = {"value": value, "source": source}
-
-        return config
-
-    def as_config(self, *args, **kwargs) -> Dict:
-        full_config = self.config_with_sources(*args, **kwargs)
-
-        return {key: config["value"] for key, config in full_config.items()}
-
-    def as_env(self, sources: List[SettingValueSource] = None) -> Dict[str, str]:
-        env = {}
-
         for setting in self.definitions():
-            value, source = self.get_value(setting.name)
+            value, source = self.get_value(setting.name, **kwargs)
             if sources and source not in sources:
                 logging.debug(f"Setting {setting.name} is not in sources: {sources}.")
                 continue
 
-            if value is None:
-                continue
+            config[setting.name] = {
+                "value": value,
+                "source": source,
+                "setting": setting,
+            }
 
-            env_key = self.setting_env(setting)
-            env[env_key] = str(value)
+        return config
 
-        return env
+    def as_config(self, *args, **kwargs) -> Dict:
+        full_config = self.config_with_metadata(*args, **kwargs)
+
+        return {key: config["value"] for key, config in full_config.items()}
+
+    def as_env(self, *args, **kwargs) -> Dict[str, str]:
+        full_config = self.config_with_metadata(*args, **kwargs)
+
+        return {
+            self.setting_env(config["setting"]): str(config["value"])
+            for key, config in full_config.items()
+            if config["value"] is not None
+        }
 
     def get_value(self, name: str, redacted=False, session=None):
         try:
@@ -343,9 +338,25 @@ class SettingsService(ABC):
         return True
 
     def definitions(self) -> Iterable[Dict]:
-        settings = set()
-        only_visible = lambda s: s.kind != "hidden" or self.show_hidden
-        return list(filter(only_visible, self._definitions))
+        definitions = deepcopy(self._definitions)
+        definition_names = set(s.name for s in definitions)
+
+        definitions.extend(
+            (
+                SettingDefinition.from_key_value(k, v)
+                for k, v in self.flat_current_config.items()
+                if k not in definition_names
+            )
+        )
+
+        settings = []
+        for setting in definitions:
+            if setting.kind == "hidden" and not self.show_hidden:
+                continue
+
+            settings.append(setting)
+
+        return settings
 
     def find_setting(self, name: str) -> SettingDefinition:
         try:

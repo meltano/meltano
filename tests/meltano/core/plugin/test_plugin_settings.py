@@ -34,6 +34,21 @@ def env_var(plugin_discovery_service, plugin_settings_service):
     return _wrapper
 
 
+@pytest.fixture(scope="class")
+def custom_tap(config_service):
+    EXPECTED = {"test": "custom", "start_date": None, "secure": None}
+    tap = PluginInstall(
+        PluginType.EXTRACTORS,
+        name="tap-custom",
+        namespace="tap_custom",
+        config=EXPECTED,
+    )
+    try:
+        return config_service.add_to_file(tap)
+    except PluginAlreadyAddedException as err:
+        return err.plugin
+
+
 @pytest.fixture
 def subject(session, project_add_service, tap, plugin_settings_service):
     try:
@@ -134,18 +149,6 @@ class TestPluginSettingsService:
             SettingValueSource.ENV,
         )
 
-    def test_as_config_custom(self, subject, session, config_service):
-        EXPECTED = {"test": "custom", "start_date": None, "secure": None}
-        tap = PluginInstall(
-            PluginType.EXTRACTORS,
-            name="tap-custom",
-            namespace="tap_custom",
-            config=EXPECTED,
-        )
-        config_service.add_to_file(tap)
-
-        assert subject.as_config(session, tap) == EXPECTED
-
     def test_as_config(self, subject, session, tap):
         EXPECTED = {"test": "mock", "start_date": None, "secure": None}
         full_config = subject.as_config(session, tap)
@@ -154,6 +157,9 @@ class TestPluginSettingsService:
         for k, v in EXPECTED.items():
             assert full_config.get(k) == v
             assert redacted_config.get(k) == v
+
+    def test_as_config_custom(self, subject, session, custom_tap):
+        assert subject.as_config(session, custom_tap) == custom_tap.config
 
     def test_as_config_redacted(self, subject, session, tap):
         # ensure values are redacted when they are set
@@ -173,6 +179,11 @@ class TestPluginSettingsService:
         assert config.get(env_var(tap, "test")) == "mock"
         assert config.get(env_var(tap, "start_date")) == None
         assert config.get(env_var(tap, "secure")) == None
+
+    def test_as_env_custom(self, subject, session, custom_tap, env_var):
+        config = subject.as_env(session, custom_tap)
+        for k, v in custom_tap.config.items():
+            assert config.get(env_var(custom_tap, k)) == v
 
     def test_store_db(self, session, subject, tap):
         subject.set(session, tap, "test_a", "THIS_IS_FROM_DB")
@@ -294,3 +305,40 @@ class TestPluginSettingsService:
         assert "metadata.stream.replication-key" not in yml
         assert "metadata" not in yml
         assert "metadata.stream.replication-key" not in final_config()
+
+    def test_custom_setting(self, session, subject, tap, env_var):
+        subject.set(
+            session,
+            tap,
+            "custom_string",
+            "from_yml",
+            store=SettingValueStore.MELTANO_YML,
+        )
+        subject.set(
+            session, tap, "custom_bool", True, store=SettingValueStore.MELTANO_YML
+        )
+
+        assert subject.get_value(session, tap, "custom_string") == (
+            "from_yml",
+            SettingValueSource.MELTANO_YML,
+        )
+        assert subject.get_value(session, tap, "custom_bool") == (
+            True,
+            SettingValueSource.MELTANO_YML,
+        )
+
+        subject = subject.with_env_override(
+            {
+                env_var(tap, "custom_string"): "from_env",
+                env_var(tap, "custom_bool"): "off",
+            }
+        )
+
+        assert subject.get_value(session, tap, "custom_string") == (
+            "from_env",
+            SettingValueSource.ENV,
+        )
+        assert subject.get_value(session, tap, "custom_bool") == (
+            False,
+            SettingValueSource.ENV,
+        )

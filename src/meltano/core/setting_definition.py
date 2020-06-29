@@ -17,6 +17,7 @@ class SettingDefinition(NameEq, Canonical):
         oauth: dict = {},
         placeholder: str = None,
         protected: bool = None,
+        custom: bool = False,
         **attrs,
     ):
         super().__init__(
@@ -33,7 +34,16 @@ class SettingDefinition(NameEq, Canonical):
             oauth=oauth,
             placeholder=placeholder,
             protected=protected,
+            _custom=custom,
             **attrs,
         )
 
         self._verbatim.add("value")
+
+    @classmethod
+    def from_key_value(cls, key, value):
+        kind = None
+        if isinstance(value, bool):
+            kind = "boolean"
+
+        return cls(name=key, kind=kind, custom=True)

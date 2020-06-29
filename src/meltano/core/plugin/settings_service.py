@@ -56,8 +56,8 @@ class PluginSettingsService:
     def profiles_with_config(self, session, plugin: PluginRef, *args, **kwargs):
         return self.build(plugin).profiles_with_config(*args, **kwargs, session=session)
 
-    def config_with_sources(self, session, plugin: PluginRef, *args, **kwargs):
-        return self.build(plugin).config_with_sources(*args, **kwargs, session=session)
+    def config_with_metadata(self, session, plugin: PluginRef, *args, **kwargs):
+        return self.build(plugin).config_with_metadata(*args, **kwargs, session=session)
 
     def as_config(self, session, plugin: PluginRef, *args, **kwargs):
         return self.build(plugin).as_config(*args, **kwargs, session=session)
@@ -136,7 +136,7 @@ class SpecificPluginSettingsService(SettingsService):
     def profile_with_config(self, profile: Profile, **kwargs):
         self.plugin_install.use_profile(profile)
 
-        full_config = self.config_with_sources(**kwargs)
+        full_config = self.config_with_metadata(**kwargs)
 
         return {
             **profile.canonical(),
