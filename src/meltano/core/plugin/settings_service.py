@@ -1,5 +1,6 @@
 from typing import Iterable, Dict, List
 
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import (
     SettingsService,
     SettingMissingError,
@@ -116,6 +117,14 @@ class SpecificPluginSettingsService(SettingsService):
             self.plugin.type, self.plugin.name
         )
         self._plugin_install = None
+
+        project_settings_service = ProjectSettingsService(self.project)
+
+        self.env_override = {
+            **project_settings_service.env,
+            **project_settings_service.as_env(),
+            **self.env_override,
+        }
 
     @property
     def plugin_install(self):
