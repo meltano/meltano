@@ -72,6 +72,10 @@ class Canonical(object):
                     if v is not False:
                         continue
 
+            # empty canonicals should be skipped
+            if isinstance(v, Canonical) and not dict(v):
+                continue
+
             yield (k, v)
 
     def __len__(self):

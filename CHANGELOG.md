@@ -16,6 +16,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2121](https://gitlab.com/meltano/meltano/-/issues/2121) Don't include empty `plugins` object in new project `meltano.yml`
+
 ### Breaks
 
 - [#2105](https://gitlab.com/meltano/meltano/-/issues/2105) Stop automatically running Airflow scheduler as part of Meltano UI

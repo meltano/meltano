@@ -38,6 +38,12 @@ class TestCanonical:
             nested
         )
 
+    def test_nested_empty(self, subject):
+        nested = Canonical(test="")
+        subject.nested = nested
+
+        assert "nested" not in Canonical.as_canonical(subject)
+
 
 class TestMeltanoFile:
     def test_load(self, project, tap, target):
