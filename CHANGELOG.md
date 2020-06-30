@@ -16,6 +16,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Breaks
 
+- [#2105](https://gitlab.com/meltano/meltano/-/issues/2105) Stop automatically running Airflow scheduler as part of Meltano UI
+
 
 ## 1.37.1 - (2020-06-26)
 ---
