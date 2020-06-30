@@ -10,6 +10,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin.settings_service import (
     PluginSettingsService,
+    SettingValueSource,
     SettingValueStore,
 )
 
@@ -31,18 +32,17 @@ def config(ctx, project, plugin_type, plugin_name, format):
     _, Session = project_engine(project)
     session = Session()
     try:
-        settings = PluginSettingsService(project)
+        settings = PluginSettingsService(project).build(plugin)
 
         ctx.obj["settings"] = settings
-        ctx.obj["plugin"] = plugin
         ctx.obj["session"] = session
 
         if ctx.invoked_subcommand is None:
             if format == "json":
-                config = settings.as_config(session, plugin)
+                config = settings.as_config(session=session)
                 print(json.dumps(config))
             elif format == "env":
-                for env, value in settings.as_env(session, plugin).items():
+                for env, value in settings.as_env(session=session).items():
                     print(f"{env}={value}")
     finally:
         session.close()
@@ -59,11 +59,10 @@ def config(ctx, project, plugin_type, plugin_name, format):
 @click.pass_context
 def set(ctx, setting_name, value, store):
     settings = ctx.obj["settings"]
-    plugin = ctx.obj["plugin"]
     session = ctx.obj["session"]
 
     path = list(setting_name)
-    settings.set(session, plugin, path, value, store=store)
+    settings.set(path, value, store=store, session=session)
 
 
 @config.command()
@@ -76,11 +75,10 @@ def set(ctx, setting_name, value, store):
 @click.pass_context
 def unset(ctx, setting_name, store):
     settings = ctx.obj["settings"]
-    plugin = ctx.obj["plugin"]
     session = ctx.obj["session"]
 
     path = list(setting_name)
-    settings.unset(session, plugin, path, store=store)
+    settings.unset(path, store=store, session=session)
 
 
 @config.command()
@@ -92,29 +90,49 @@ def unset(ctx, setting_name, store):
 @click.pass_context
 def reset(ctx, store):
     settings = ctx.obj["settings"]
-    plugin = ctx.obj["plugin"]
     session = ctx.obj["session"]
 
-    settings.reset(session, plugin, store=store)
+    settings.reset(store=store, session=session)
 
 
 @config.command("list")
 @click.pass_context
 def list_settings(ctx):
     settings = ctx.obj["settings"]
-    plugin = ctx.obj["plugin"]
-    plugin_def = settings.get_definition(plugin)
+    session = ctx.obj["session"]
 
-    for setting_def in settings.definitions(plugin):
-        click.secho(setting_def.name, fg="blue", nl=False)
+    full_config = settings.config_with_metadata(session=session)
+    for name, config_metadata in full_config.items():
+        value = config_metadata["value"]
+        source = config_metadata["source"]
+        setting_def = config_metadata["setting"]
 
-        env_key = settings.setting_env(setting_def, plugin_def)
-        click.echo(f" [{env_key}]", nl=False)
+        if setting_def._custom:
+            click.echo("custom: ", nl=False)
 
-        if setting_def.value is not None:
-            click.echo(" (default: %r)" % setting_def.value, nl=False)
+        click.secho(name, fg="blue", nl=False)
+
+        env_key = settings.setting_env(setting_def)
+        click.echo(f" [env: {env_key}]", nl=False)
+
+        current_value = click.style(f"{value!r}", fg="green")
+        if source is SettingValueSource.DEFAULT:
+            click.echo(f" current value: {current_value}", nl=False)
+
+            # The default value and the current value may not match
+            # if env vars have been expanded
+            if setting_def.value == value:
+                click.echo(" (from default)")
+            else:
+                click.echo(f" (from default: {setting_def.value!r})")
+        else:
+            if setting_def.value is not None:
+                click.echo(f" (default: {setting_def.value!r})", nl=False)
+
+            click.echo(f" current value: {current_value} (from {source.label})")
 
         if setting_def.description:
-            click.echo(f": {setting_def.description}", nl=False)
-
-        click.echo()
+            click.echo("\t", nl=False)
+            if setting_def.label:
+                click.echo(f"{setting_def.label}: ", nl=False)
+            click.echo(f"{setting_def.description}")

@@ -37,6 +37,17 @@ class SettingValueSource(str, Enum):
     DB = "db"  # 3
     DEFAULT = "default"  # 4
 
+    @property
+    def label(self):
+        labels = {
+            self.CONFIG_OVERRIDE: "config override",
+            self.ENV: "environment",
+            self.MELTANO_YML: "meltano.yml",
+            self.DB: "system database",
+            self.DEFAULT: "default",
+        }
+        return labels[self]
+
 
 class SettingValueStore(str, Enum):
     MELTANO_YML = "meltano_yml"
