@@ -13,7 +13,7 @@ from meltano.core.plugin import PluginRef, Profile
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin.settings_service import (
     PluginSettingsService,
-    PluginSettingValueSource,
+    SettingValueSource,
 )
 from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
@@ -70,7 +70,7 @@ def validate_plugin_config(
             return False
 
     old_value, source = settings.get_value(db.session, plugin, name)
-    if source in (PluginSettingValueSource.ENV, PluginSettingValueSource.MELTANO_YML):
+    if source in (SettingValueSource.ENV, SettingValueSource.MELTANO_YML):
         logging.warning(
             "Cannot override a configuration set in the environment or meltano.yml."
         )

@@ -3,7 +3,7 @@ from collections import namedtuple
 from typing import Optional
 from datetime import datetime, date
 
-from .plugin.settings_service import PluginSettingsService, PluginSettingMissingError
+from .plugin.settings_service import PluginSettingsService, SettingMissingError
 from .plugin_discovery_service import PluginDiscoveryService, PluginNotFoundError
 from .project import Project
 from .plugin import PluginType, PluginRef
@@ -82,7 +82,7 @@ class ScheduleService:
             start_date, _ = self.plugin_settings_service.get_value(
                 session, extractor_ref, "start_date"
             )
-        except PluginSettingMissingError:
+        except SettingMissingError:
             logging.debug(f"`start_date` not found in {extractor}.")
 
         # TODO: this coercion should be handled by the `kind` attribute

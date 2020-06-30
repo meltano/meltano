@@ -2,24 +2,24 @@ import pytest
 from contextlib import contextmanager
 
 from meltano.core.config_service import PluginAlreadyAddedException
+from meltano.core.setting import Setting
 from meltano.core.plugin import PluginRef, PluginType, PluginInstall
-from meltano.core.plugin.setting import PluginSetting
 from meltano.core.plugin.settings_service import (
-    PluginSettingValueSource,
-    PluginSettingValueStore,
+    SettingValueSource,
+    SettingValueStore,
     REDACTED_VALUE,
 )
 
 
 def test_create(session):
-    setting = PluginSetting(
+    setting = Setting(
         name="api_key.test.test", namespace="gitlab", value="C4F3C4F3", enabled=True
     )
 
     session.add(setting)
     session.commit()
 
-    fetched = session.query(PluginSetting).first()
+    fetched = session.query(Setting).first()
     assert setting == fetched
 
 
@@ -32,6 +32,21 @@ def env_var(plugin_discovery_service, plugin_settings_service):
         return plugin_settings_service.setting_env(setting_def, plugin_def)
 
     return _wrapper
+
+
+@pytest.fixture(scope="class")
+def custom_tap(config_service):
+    EXPECTED = {"test": "custom", "start_date": None, "secure": None}
+    tap = PluginInstall(
+        PluginType.EXTRACTORS,
+        name="tap-custom",
+        namespace="tap_custom",
+        config=EXPECTED,
+    )
+    try:
+        return config_service.add_to_file(tap)
+    except PluginAlreadyAddedException as err:
+        return err.plugin
 
 
 @pytest.fixture
@@ -56,55 +71,55 @@ class TestPluginSettingsService:
         # returns the default value when unset
         assert subject.get_value(session, tap, "test") == (
             "mock",
-            PluginSettingValueSource.DEFAULT,
+            SettingValueSource.DEFAULT,
         )
         assert subject.get_value(session, tap_with_profile, "test") == (
             "mock",
-            PluginSettingValueSource.DEFAULT,
+            SettingValueSource.DEFAULT,
         )
 
-        # overriden by an PluginSetting db value when set
+        # overriden by an Setting db value when set
         subject.set(session, tap, "test", "THIS_IS_FROM_DB")
         subject.set(session, tap_with_profile, "test", "THIS_IS_FROM_DB_WITH_PROFILE")
 
         assert subject.get_value(session, tap, "test") == (
             "THIS_IS_FROM_DB",
-            PluginSettingValueSource.DB,
+            SettingValueSource.DB,
         )
         assert subject.get_value(session, tap_with_profile, "test") == (
             "THIS_IS_FROM_DB_WITH_PROFILE",
-            PluginSettingValueSource.DB,
+            SettingValueSource.DB,
         )
 
         # overriden via the `meltano.yml` configuration
-        subject.set(session, tap, "test", 42, PluginSettingValueStore.MELTANO_YML)
+        subject.set(session, tap, "test", 42, store=SettingValueStore.MELTANO_YML)
         subject.set(
-            session, tap_with_profile, "test", 43, PluginSettingValueStore.MELTANO_YML
+            session, tap_with_profile, "test", 43, store=SettingValueStore.MELTANO_YML
         )
 
         assert subject.get_value(session, tap, "test") == (
             42,
-            PluginSettingValueSource.MELTANO_YML,
+            SettingValueSource.MELTANO_YML,
         )
         assert subject.get_value(session, tap_with_profile, "test") == (
             43,
-            PluginSettingValueSource.MELTANO_YML,
+            SettingValueSource.MELTANO_YML,
         )
 
         # revert back to the original
-        subject.reset(session, tap, PluginSettingValueStore.MELTANO_YML)
-        subject.reset(session, tap_with_profile, PluginSettingValueStore.MELTANO_YML)
+        subject.reset(session, tap, store=SettingValueStore.MELTANO_YML)
+        subject.reset(session, tap_with_profile, store=SettingValueStore.MELTANO_YML)
 
         # overriden via ENV
         subject = subject.with_env_override({env_var(tap, "test"): "N33DC0F33"})
 
         assert subject.get_value(session, tap, "test") == (
             "N33DC0F33",
-            PluginSettingValueSource.ENV,
+            SettingValueSource.ENV,
         )
         assert subject.get_value(session, tap_with_profile, "test") == (
             "N33DC0F33",
-            PluginSettingValueSource.ENV,
+            SettingValueSource.ENV,
         )
 
         # overridden via config override
@@ -112,11 +127,11 @@ class TestPluginSettingsService:
 
         assert subject.get_value(session, tap, "test") == (
             "foo",
-            PluginSettingValueSource.CONFIG_OVERRIDE,
+            SettingValueSource.CONFIG_OVERRIDE,
         )
         assert subject.get_value(session, tap_with_profile, "test") == (
             "foo",
-            PluginSettingValueSource.CONFIG_OVERRIDE,
+            SettingValueSource.CONFIG_OVERRIDE,
         )
 
         # Verify that boolean settings set in env are cast correctly
@@ -124,27 +139,15 @@ class TestPluginSettingsService:
 
         assert subject.get_value(session, tap, "boolean") == (
             True,
-            PluginSettingValueSource.ENV,
+            SettingValueSource.ENV,
         )
 
         subject = subject.with_env_override({env_var(tap, "boolean"): "0"})
 
         assert subject.get_value(session, tap, "boolean") == (
             False,
-            PluginSettingValueSource.ENV,
+            SettingValueSource.ENV,
         )
-
-    def test_as_config_custom(self, subject, session, config_service):
-        EXPECTED = {"test": "custom", "start_date": None, "secure": None}
-        tap = PluginInstall(
-            PluginType.EXTRACTORS,
-            name="tap-custom",
-            namespace="tap_custom",
-            config=EXPECTED,
-        )
-        config_service.add_to_file(tap)
-
-        assert subject.as_config(session, tap) == EXPECTED
 
     def test_as_config(self, subject, session, tap):
         EXPECTED = {"test": "mock", "start_date": None, "secure": None}
@@ -154,6 +157,9 @@ class TestPluginSettingsService:
         for k, v in EXPECTED.items():
             assert full_config.get(k) == v
             assert redacted_config.get(k) == v
+
+    def test_as_config_custom(self, subject, session, custom_tap):
+        assert subject.as_config(session, custom_tap) == custom_tap.config
 
     def test_as_config_redacted(self, subject, session, tap):
         # ensure values are redacted when they are set
@@ -174,38 +180,43 @@ class TestPluginSettingsService:
         assert config.get(env_var(tap, "start_date")) == None
         assert config.get(env_var(tap, "secure")) == None
 
+    def test_as_env_custom(self, subject, session, custom_tap, env_var):
+        config = subject.as_env(session, custom_tap)
+        for k, v in custom_tap.config.items():
+            assert config.get(env_var(custom_tap, k)) == v
+
     def test_store_db(self, session, subject, tap):
         subject.set(session, tap, "test_a", "THIS_IS_FROM_DB")
         subject.set(session, tap, "test_b", "THIS_IS_FROM_DB")
 
-        assert session.query(PluginSetting).count() == 2
+        assert session.query(Setting).count() == 2
 
         subject.unset(session, tap, "test_a")
 
-        assert session.query(PluginSetting).count() == 1
+        assert session.query(Setting).count() == 1
 
         subject.reset(session, tap)
 
-        assert session.query(PluginSetting).count() == 0
+        assert session.query(Setting).count() == 0
 
     def test_store_meltano_yml(self, session, subject, project, tap):
-        store = PluginSettingValueStore.MELTANO_YML
-        subject.set(session, tap, "test_a", "THIS_IS_FROM_YML", store)
-        subject.set(session, tap, "test_b", "THIS_IS_FROM_YML", store)
+        store = SettingValueStore.MELTANO_YML
+        subject.set(session, tap, "test_a", "THIS_IS_FROM_YML", store=store)
+        subject.set(session, tap, "test_b", "THIS_IS_FROM_YML", store=store)
 
         with project.meltano_update() as meltano:
             extractor = meltano.plugins.extractors[0]
             assert extractor.config["test_a"] == "THIS_IS_FROM_YML"
             assert extractor.config["test_b"] == "THIS_IS_FROM_YML"
 
-        subject.unset(session, tap, "test_a", store)
+        subject.unset(session, tap, "test_a", store=store)
 
         with project.meltano_update() as meltano:
             extractor = meltano.plugins.extractors[0]
             assert "test_a" not in extractor.config
             assert extractor.config["test_b"] == "THIS_IS_FROM_YML"
 
-        subject.reset(session, tap, store)
+        subject.reset(session, tap, store=store)
 
         with project.meltano_update() as meltano:
             extractor = meltano.plugins.extractors[0]
@@ -240,7 +251,7 @@ class TestPluginSettingsService:
 
     def test_nested_keys(self, session, subject, project, tap):
         def set_config(path, value):
-            subject.set(session, tap, path, value, PluginSettingValueStore.MELTANO_YML)
+            subject.set(session, tap, path, value, store=SettingValueStore.MELTANO_YML)
 
         def yml_config():
             with project.meltano_update() as meltano:
@@ -294,3 +305,40 @@ class TestPluginSettingsService:
         assert "metadata.stream.replication-key" not in yml
         assert "metadata" not in yml
         assert "metadata.stream.replication-key" not in final_config()
+
+    def test_custom_setting(self, session, subject, tap, env_var):
+        subject.set(
+            session,
+            tap,
+            "custom_string",
+            "from_yml",
+            store=SettingValueStore.MELTANO_YML,
+        )
+        subject.set(
+            session, tap, "custom_bool", True, store=SettingValueStore.MELTANO_YML
+        )
+
+        assert subject.get_value(session, tap, "custom_string") == (
+            "from_yml",
+            SettingValueSource.MELTANO_YML,
+        )
+        assert subject.get_value(session, tap, "custom_bool") == (
+            True,
+            SettingValueSource.MELTANO_YML,
+        )
+
+        subject = subject.with_env_override(
+            {
+                env_var(tap, "custom_string"): "from_env",
+                env_var(tap, "custom_bool"): "off",
+            }
+        )
+
+        assert subject.get_value(session, tap, "custom_string") == (
+            "from_env",
+            SettingValueSource.ENV,
+        )
+        assert subject.get_value(session, tap, "custom_bool") == (
+            False,
+            SettingValueSource.ENV,
+        )
