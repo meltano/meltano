@@ -14,6 +14,7 @@ class Canonical(object):
     The attribute rules are:
       - All attributes that are Truthy
       - All attributes that are boolean (False is valid)
+      - All attributes that are listed in the `_verbatim` set and non-null
       - All attributes that start with "_" are excluded
     """
 
@@ -22,6 +23,8 @@ class Canonical(object):
 
         for attr, value in attrs.items():
             setattr(self, attr, value)
+
+        self._verbatim = set()
 
     @classmethod
     def as_canonical(cls, target):
@@ -60,9 +63,14 @@ class Canonical(object):
             if k.startswith("_"):
                 continue
 
-            # bool values are valid and should be forwarded
-            if v is not False and not v:
-                continue
+            if not v:
+                if k in self._verbatim:
+                    if v is None:
+                        continue
+                else:
+                    # bool values are valid and should be forwarded
+                    if v is not False:
+                        continue
 
             yield (k, v)
 

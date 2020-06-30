@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2102](https://gitlab.com/meltano/meltano/-/issues/2101) Improve `discovery.yml` incompatibility handling and error messages
+
 ### Fixes
 
 ### Breaks

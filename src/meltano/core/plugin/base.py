@@ -26,9 +26,7 @@ yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
 
 class Profile(NameEq, Canonical):
     def __init__(self, name: str = None, label: str = None, config={}):
-        self.name = name
-        self.label = label
-        self.config = config
+        super().__init__(name=name, label=label, config=config)
 
 
 Profile.DEFAULT = Profile(name="default", label="Default")
@@ -67,6 +65,8 @@ class SettingDefinition(NameEq, Canonical):
             protected=protected,
             **attrs,
         )
+
+        self._verbatim.add("value")
 
 
 class PluginType(YAMLEnum):
