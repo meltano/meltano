@@ -28,7 +28,7 @@ class TestOrchestration:
 
             # make sure that set `password` is still present
             # but redacted in the response
-            assert plugin_settings_service.get_value(session, tap, "secure") == (
+            assert plugin_settings_service.get_with_source(session, tap, "secure") == (
                 "thisisatest",
                 SettingValueSource.DB,
             )
@@ -36,7 +36,7 @@ class TestOrchestration:
 
             # make sure the `hidden` setting is still present
             # but hidden in the response
-            assert plugin_settings_service.get_value(session, tap, "hidden") == (
+            assert plugin_settings_service.get_with_source(session, tap, "hidden") == (
                 42,
                 SettingValueSource.DEFAULT,
             )
@@ -67,21 +67,20 @@ class TestOrchestration:
 
             # make sure that set `password` has been updated
             # but redacted in the response
-            assert plugin_settings_service.get_value(session, tap, "secure") == (
+            assert plugin_settings_service.get_with_source(session, tap, "secure") == (
                 "newvalue",
                 SettingValueSource.DB,
             )
             assert config["secure"] == REDACTED_VALUE
 
             # make sure the `readonly` field has not been updated
-            assert plugin_settings_service.get_value(session, tap, "protected") == (
-                "iwontchange",
-                SettingValueSource.DB,
-            )
+            assert plugin_settings_service.get_with_source(
+                session, tap, "protected"
+            ) == ("iwontchange", SettingValueSource.DB)
 
             # make sure the `hidden` setting is still present
             # but hidden in the response
-            assert plugin_settings_service.get_value(session, tap, "hidden") == (
+            assert plugin_settings_service.get_with_source(session, tap, "hidden") == (
                 42,
                 SettingValueSource.DEFAULT,
             )

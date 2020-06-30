@@ -81,8 +81,11 @@ class PluginSettingsService:
     ):
         return self.build(plugin).reset(*args, **kwargs, store=store, session=session)
 
-    def get_value(self, session, plugin: PluginRef, *args, **kwargs):
-        return self.build(plugin).get_value(*args, **kwargs, session=session)
+    def get_with_source(self, session, plugin: PluginRef, *args, **kwargs):
+        return self.build(plugin).get_with_source(*args, **kwargs, session=session)
+
+    def get(self, session, plugin: PluginRef, *args, **kwargs):
+        return self.build(plugin).get(*args, **kwargs, session=session)
 
     def definitions(self, plugin: PluginRef):
         return self.build(plugin).definitions()

@@ -122,7 +122,7 @@ class SettingsService(ABC):
     def config_with_metadata(self, sources: List[SettingValueSource] = None, **kwargs):
         config = {}
         for setting in self.definitions():
-            value, source = self.get_value(setting.name, **kwargs)
+            value, source = self.get_with_source(setting.name, **kwargs)
             if sources and source not in sources:
                 logging.debug(f"Setting {setting.name} is not in sources: {sources}.")
                 continue
@@ -149,7 +149,7 @@ class SettingsService(ABC):
             if config["value"] is not None
         }
 
-    def get_value(self, name: str, redacted=False, session=None):
+    def get_with_source(self, name: str, redacted=False, session=None):
         try:
             setting_def = self.find_setting(name)
         except SettingMissingError:
@@ -224,6 +224,10 @@ class SettingsService(ABC):
                 value = REDACTED_VALUE
 
         return value, source
+
+    def get(self, *args, **kwargs):
+        value, _ = self.get_with_source(*args, **kwargs)
+        return value
 
     def set(
         self, path: List[str], value, store=SettingValueStore.MELTANO_YML, session=None

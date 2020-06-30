@@ -151,7 +151,7 @@ class TestCliAdd:
         assert plugin
 
         # Automatic updating is enabled
-        value, _ = plugin_settings_service.get_value(
+        value = plugin_settings_service.get(
             session, plugin, "update.orchestrate/dags/meltano.py"
         )
         assert value == True

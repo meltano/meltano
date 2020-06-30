@@ -60,7 +60,7 @@ def subject(session, project_add_service, tap, plugin_settings_service):
 
 
 class TestPluginSettingsService:
-    def test_get_value(
+    def test_get_with_source(
         self, session, subject, project, tap, env_var, monkeypatch, config_service
     ):
         profile = tap.add_profile("profile", label="Profile")
@@ -69,11 +69,11 @@ class TestPluginSettingsService:
         tap_with_profile.use_profile(profile)
 
         # returns the default value when unset
-        assert subject.get_value(session, tap, "test") == (
+        assert subject.get_with_source(session, tap, "test") == (
             "mock",
             SettingValueSource.DEFAULT,
         )
-        assert subject.get_value(session, tap_with_profile, "test") == (
+        assert subject.get_with_source(session, tap_with_profile, "test") == (
             "mock",
             SettingValueSource.DEFAULT,
         )
@@ -82,11 +82,11 @@ class TestPluginSettingsService:
         subject.set(session, tap, "test", "THIS_IS_FROM_DB")
         subject.set(session, tap_with_profile, "test", "THIS_IS_FROM_DB_WITH_PROFILE")
 
-        assert subject.get_value(session, tap, "test") == (
+        assert subject.get_with_source(session, tap, "test") == (
             "THIS_IS_FROM_DB",
             SettingValueSource.DB,
         )
-        assert subject.get_value(session, tap_with_profile, "test") == (
+        assert subject.get_with_source(session, tap_with_profile, "test") == (
             "THIS_IS_FROM_DB_WITH_PROFILE",
             SettingValueSource.DB,
         )
@@ -97,11 +97,11 @@ class TestPluginSettingsService:
             session, tap_with_profile, "test", 43, store=SettingValueStore.MELTANO_YML
         )
 
-        assert subject.get_value(session, tap, "test") == (
+        assert subject.get_with_source(session, tap, "test") == (
             42,
             SettingValueSource.MELTANO_YML,
         )
-        assert subject.get_value(session, tap_with_profile, "test") == (
+        assert subject.get_with_source(session, tap_with_profile, "test") == (
             43,
             SettingValueSource.MELTANO_YML,
         )
@@ -113,11 +113,11 @@ class TestPluginSettingsService:
         # overriden via ENV
         subject = subject.with_env_override({env_var(tap, "test"): "N33DC0F33"})
 
-        assert subject.get_value(session, tap, "test") == (
+        assert subject.get_with_source(session, tap, "test") == (
             "N33DC0F33",
             SettingValueSource.ENV,
         )
-        assert subject.get_value(session, tap_with_profile, "test") == (
+        assert subject.get_with_source(session, tap_with_profile, "test") == (
             "N33DC0F33",
             SettingValueSource.ENV,
         )
@@ -125,11 +125,11 @@ class TestPluginSettingsService:
         # overridden via config override
         subject = subject.with_config_override({"test": "foo"})
 
-        assert subject.get_value(session, tap, "test") == (
+        assert subject.get_with_source(session, tap, "test") == (
             "foo",
             SettingValueSource.CONFIG_OVERRIDE,
         )
-        assert subject.get_value(session, tap_with_profile, "test") == (
+        assert subject.get_with_source(session, tap_with_profile, "test") == (
             "foo",
             SettingValueSource.CONFIG_OVERRIDE,
         )
@@ -137,14 +137,14 @@ class TestPluginSettingsService:
         # Verify that boolean settings set in env are cast correctly
         subject = subject.with_env_override({env_var(tap, "boolean"): "on"})
 
-        assert subject.get_value(session, tap, "boolean") == (
+        assert subject.get_with_source(session, tap, "boolean") == (
             True,
             SettingValueSource.ENV,
         )
 
         subject = subject.with_env_override({env_var(tap, "boolean"): "0"})
 
-        assert subject.get_value(session, tap, "boolean") == (
+        assert subject.get_with_source(session, tap, "boolean") == (
             False,
             SettingValueSource.ENV,
         )
@@ -318,11 +318,11 @@ class TestPluginSettingsService:
             session, tap, "custom_bool", True, store=SettingValueStore.MELTANO_YML
         )
 
-        assert subject.get_value(session, tap, "custom_string") == (
+        assert subject.get_with_source(session, tap, "custom_string") == (
             "from_yml",
             SettingValueSource.MELTANO_YML,
         )
-        assert subject.get_value(session, tap, "custom_bool") == (
+        assert subject.get_with_source(session, tap, "custom_bool") == (
             True,
             SettingValueSource.MELTANO_YML,
         )
@@ -334,11 +334,11 @@ class TestPluginSettingsService:
             }
         )
 
-        assert subject.get_value(session, tap, "custom_string") == (
+        assert subject.get_with_source(session, tap, "custom_string") == (
             "from_env",
             SettingValueSource.ENV,
         )
-        assert subject.get_value(session, tap, "custom_bool") == (
+        assert subject.get_with_source(session, tap, "custom_bool") == (
             False,
             SettingValueSource.ENV,
         )
