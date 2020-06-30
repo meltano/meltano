@@ -19,7 +19,6 @@ SECRET_KEY = "thisisnotapropersecretkey"
 
 # Meltano
 # -----------------
-AIRFLOW_DISABLED = truthy(os.getenv("MELTANO_DISABLE_AIRFLOW"))
 MELTANO_AUTHENTICATION = truthy(os.getenv("MELTANO_AUTHENTICATION"))
 MELTANO_NOTIFICATION = truthy(os.getenv("MELTANO_NOTIFICATION"))
 MELTANO_OAUTH_SERVICE_URL = os.getenv("MELTANO_OAUTH_SERVICE_URL", None)

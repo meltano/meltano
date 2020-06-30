@@ -15,12 +15,7 @@ from meltano.core.db import project_engine
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import truthy
 from meltano.core.migration_service import MigrationService
-from meltano.api.workers import (
-    MeltanoCompilerWorker,
-    AirflowWorker,
-    APIWorker,
-    UIAvailableWorker,
-)
+from meltano.api.workers import MeltanoCompilerWorker, APIWorker, UIAvailableWorker
 
 
 logger = logging.getLogger(__name__)
@@ -68,15 +63,6 @@ def start(ctx, reload, bind_port, bind):
     tracker.track_meltano_ui()
 
     workers = []
-
-    if not truthy(os.getenv("MELTANO_DISABLE_AIRFLOW", False)):
-        try:
-            config_service = ConfigService(project)
-            config_service.find_plugin("airflow")
-
-            workers.append(AirflowWorker(project))
-        except PluginMissingError:
-            pass
 
     try:
         compiler_worker = MeltanoCompilerWorker(project)
