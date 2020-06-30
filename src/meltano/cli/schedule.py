@@ -14,16 +14,6 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExistsError
 from meltano.core.db import project_engine
 from meltano.core.utils import coerce_datetime
-from meltano.core.job import JobFinder
-
-CRON_INTERVALS = {
-    "@once": None,
-    "@hourly": "0 * * * *",
-    "@daily": "0 0 * * *",
-    "@weekly": "0 0 * * 0",
-    "@monthly": "0 0 1 * *",
-    "@yearly": "0 0 1 1 *",
-}
 
 
 @cli.group(cls=DefaultGroup, default="add")
@@ -104,10 +94,7 @@ def list(ctx, format):
                 if start_date:
                     start_date = start_date.date().isoformat()
 
-                cron_interval = CRON_INTERVALS.get(schedule.interval, schedule.interval)
-
-                job_finder = JobFinder(schedule.name)
-                last_successful_run = job_finder.latest_success(session)
+                last_successful_run = schedule.last_successful_run(session)
                 last_successful_run_ended_at = (
                     last_successful_run.ended_at.isoformat()
                     if last_successful_run
@@ -123,14 +110,9 @@ def list(ctx, format):
                         "interval": schedule.interval,
                         "start_date": start_date,
                         "env": schedule.env,
-                        "cron_interval": cron_interval,
+                        "cron_interval": schedule.cron_interval,
                         "last_successful_run_ended_at": last_successful_run_ended_at,
-                        "elt_args": [
-                            schedule.extractor,
-                            schedule.loader,
-                            f"--job_id={schedule.name}",
-                            f"--transform={schedule.transform}",
-                        ],
+                        "elt_args": schedule.elt_args,
                     }
                 )
         finally:
