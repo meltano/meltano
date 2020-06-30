@@ -135,7 +135,7 @@ class SettingsService(ABC):
 
         return config
 
-    def as_config(self, *args, **kwargs) -> Dict:
+    def as_dict(self, *args, **kwargs) -> Dict:
         full_config = self.config_with_metadata(*args, **kwargs)
 
         return {key: config["value"] for key, config in full_config.items()}

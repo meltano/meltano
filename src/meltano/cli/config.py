@@ -39,7 +39,7 @@ def config(ctx, project, plugin_type, plugin_name, format):
 
         if ctx.invoked_subcommand is None:
             if format == "json":
-                config = settings.as_config(session=session)
+                config = settings.as_dict(session=session)
                 print(json.dumps(config))
             elif format == "env":
                 for env, value in settings.as_env(session=session).items():

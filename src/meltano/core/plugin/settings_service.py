@@ -60,8 +60,8 @@ class PluginSettingsService:
     def config_with_metadata(self, session, plugin: PluginRef, *args, **kwargs):
         return self.build(plugin).config_with_metadata(*args, **kwargs, session=session)
 
-    def as_config(self, session, plugin: PluginRef, *args, **kwargs):
-        return self.build(plugin).as_config(*args, **kwargs, session=session)
+    def as_dict(self, session, plugin: PluginRef, *args, **kwargs):
+        return self.build(plugin).as_dict(*args, **kwargs, session=session)
 
     def as_env(self, session, plugin: PluginRef, *args, **kwargs):
         return self.build(plugin).as_env(*args, **kwargs, session=session)

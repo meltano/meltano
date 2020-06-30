@@ -149,28 +149,28 @@ class TestPluginSettingsService:
             SettingValueSource.ENV,
         )
 
-    def test_as_config(self, subject, session, tap):
+    def test_as_dict(self, subject, session, tap):
         EXPECTED = {"test": "mock", "start_date": None, "secure": None}
-        full_config = subject.as_config(session, tap)
-        redacted_config = subject.as_config(session, tap, redacted=True)
+        full_config = subject.as_dict(session, tap)
+        redacted_config = subject.as_dict(session, tap, redacted=True)
 
         for k, v in EXPECTED.items():
             assert full_config.get(k) == v
             assert redacted_config.get(k) == v
 
-    def test_as_config_custom(self, subject, session, custom_tap):
-        assert subject.as_config(session, custom_tap) == custom_tap.config
+    def test_as_dict_custom(self, subject, session, custom_tap):
+        assert subject.as_dict(session, custom_tap) == custom_tap.config
 
-    def test_as_config_redacted(self, subject, session, tap):
+    def test_as_dict_redacted(self, subject, session, tap):
         # ensure values are redacted when they are set
         subject.set(session, tap, "secure", "thisisatest")
-        config = subject.as_config(session, tap, redacted=True)
+        config = subject.as_dict(session, tap, redacted=True)
 
         assert config["secure"] == REDACTED_VALUE
 
         # although setting the REDACTED_VALUE does nothing
         subject.set(session, tap, "secure", REDACTED_VALUE)
-        config = subject.as_config(session, tap)
+        config = subject.as_dict(session, tap)
         assert config["secure"] == "thisisatest"
 
     def test_as_env(self, subject, session, tap, env_var):
@@ -243,7 +243,7 @@ class TestPluginSettingsService:
 
         subject = subject.with_env_override(env)
 
-        config = subject.as_config(session, tap)
+        config = subject.as_dict(session, tap)
         assert config["var"] == env["VAR"]
         assert config["foo"] == str(env["FOO"])
         assert config["missing"] == None
@@ -259,7 +259,7 @@ class TestPluginSettingsService:
                 return extractor.config
 
         def final_config():
-            return subject.as_config(session, tap)
+            return subject.as_dict(session, tap)
 
         set_config("metadata.stream.replication-key", "created_at")
 
