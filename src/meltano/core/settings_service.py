@@ -92,16 +92,16 @@ class SettingsService(ABC):
 
     @property
     @abstractmethod
-    def _current_config(self) -> Dict:
+    def _meltano_yml_config(self) -> Dict:
         pass
 
     @abstractmethod
-    def _update_config(self):
+    def _update_meltano_yml_config(self):
         pass
 
     @property
-    def flat_current_config(self):
-        return flatten(self._current_config, "dot")
+    def flat_meltano_yml_config(self):
+        return flatten(self._meltano_yml_config, "dot")
 
     @property
     def env(self):
@@ -178,7 +178,7 @@ class SettingsService(ABC):
 
         def meltano_yml_getter():
             try:
-                value = self.flat_current_config[name]
+                value = self.flat_meltano_yml_config[name]
                 return self.expand_env_vars(value)
             except KeyError:
                 return None
@@ -254,7 +254,7 @@ class SettingsService(ABC):
                 logging.warning(f"Setting `{name}` is currently set via ${env_key}.")
 
         def meltano_yml_setter():
-            config = self._current_config
+            config = self._meltano_yml_config
 
             if value is None:
                 config.pop(name, None)
@@ -269,7 +269,7 @@ class SettingsService(ABC):
 
                 set_at_path(config, path, value)
 
-            self._update_config()
+            self._update_meltano_yml_config()
             return True
 
         def db_setter():
@@ -304,8 +304,8 @@ class SettingsService(ABC):
 
     def reset(self, store=SettingValueStore.MELTANO_YML, session=None):
         def meltano_yml_resetter():
-            self._current_config.clear()
-            self._update_config()
+            self._meltano_yml_config.clear()
+            self._update_meltano_yml_config()
             return True
 
         def db_resetter():
@@ -333,7 +333,7 @@ class SettingsService(ABC):
         definitions.extend(
             (
                 SettingDefinition.from_key_value(k, v)
-                for k, v in self.flat_current_config.items()
+                for k, v in self.flat_meltano_yml_config.items()
                 if k not in definition_names
             )
         )

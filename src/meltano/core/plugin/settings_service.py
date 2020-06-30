@@ -137,13 +137,13 @@ class SpecificPluginSettingsService(SettingsService):
         return self.plugin_def.settings
 
     @property
-    def _current_config(self):
+    def _meltano_yml_config(self):
         try:
             return self.plugin_install.current_config
         except PluginMissingError:
             return {}
 
-    def _update_config(self):
+    def _update_meltano_yml_config(self):
         self.config_service.update_plugin(self.plugin_install)
 
     def profile_with_config(self, profile: Profile, **kwargs):
