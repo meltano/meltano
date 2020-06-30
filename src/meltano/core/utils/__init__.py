@@ -136,7 +136,7 @@ def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
             return ".".join(xs)
 
     def env_var_reducer(*xs):
-        xs = [x.replace(".", "__").upper() for x in xs if x]
+        xs = [re.sub("[^A-Za-z0-9]", "_", x).upper() for x in xs if x]
         return "_".join(xs)
 
     if reducer == "dot":
