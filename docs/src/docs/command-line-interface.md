@@ -269,7 +269,7 @@ This allows you to run your ELT pipeline to Extract, Load, and Transform the dat
 ### How to use
 
 ```bash
-meltano elt <extractor> <loader> [--job_id TEXT] [--transform run] [--dry]
+meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT] [--dry]
 ```
 
 ### Parameters
@@ -377,11 +377,32 @@ meltano invoke --plugin-type=<plugin_type> <plugin_name> PLUGIN_ARGS...
 An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Orchestration](/docs/orchestration.html) documentation to get started with Meltano orchestration.
 :::
 
-Meltano provides a `schedule` method to run specified ELT pipelines at regular intervals. Schedules are defined inside the `meltano.yml` project as such:
+Use the `schedule` command to define ELT pipelines to be run by an orchestrator at regular intervals. These scheduled pipelines will be added to your project's `meltano.yml`.
 
-- `meltano schedule <schedule_name> <extractor> <loader> <interval> [--transform]`: Schedule an ELT pipeline to run using an orchestrator.
-- `meltano schedule list [--format=json]`: List the project's schedules.
+### How to use
 
+The interval argument can be a [cron expression](https://en.wikipedia.org/wiki/Cron#CRON_expression) or one of the following presets:
+`@hourly` (`0 * * * *`), `@daily` (`0 0 * * *`), `@weekly` (`0 0 * * 0`), `@monthly` (`0 0 1 * *`), `@yearly` (`0 0 1 1 *`), or `@once` (for schedules to be triggered manually through the UI).
+
+```bash
+# Add a schedule
+meltano schedule <schedule_name> <extractor> <loader> <interval> [--transform={run,skip,only}]
+
+# List all schedules
+meltano schedule list [--format=json]
+```
+
+### Examples
+
+```bash
+meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily --transform=run
+# This specifies that the following command is to be run once a day:
+# meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
+
+meltano schedule gitlab-to-jsonl tap-gitlab target-jsonl "* * * * *"
+# This specifies that the following command is to be run every minute:
+# meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
+```
 
 ## `select`
 

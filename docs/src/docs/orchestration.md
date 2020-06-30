@@ -23,7 +23,7 @@ Now you have Airflow installed, let's create a simple example schedule to confir
 
 ## Create a Schedule
 
-To regularly schedule your ELT to run, use the ["Pipeline" interface in the UI](/docs/analysis.html#create-a-pipeline-schedule), or the following command:
+To regularly schedule your ELT to run, use the ["Pipeline" interface in the UI](/docs/analysis.html#create-a-pipeline-schedule), or the [`meltano schedule`  command](/docs/command-line-interface.html#schedule):
 
 ```bash
 meltano schedule [SCHEDULE_NAME] [EXTRACTOR_NAME] [TARGET_NAME] [INTERVAL]

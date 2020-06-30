@@ -1,9 +1,9 @@
 import yaml
 import copy
-from datetime import datetime, date
 
 
 from typing import Iterable, List
+from meltano.core.schedule import Schedule
 from meltano.core.plugin import PluginInstall, PluginType
 from meltano.core.plugin.factory import plugin_factory
 from meltano.core.behavior.canonical import Canonical
@@ -11,29 +11,6 @@ from meltano.core.behavior import NameEq
 
 
 VERSION = 1
-
-
-class Schedule(NameEq, Canonical):
-    def __init__(
-        self,
-        name: str = None,
-        extractor: str = None,
-        loader: str = None,
-        transform: str = None,
-        interval: str = None,
-        start_date: datetime = None,
-        env={},
-    ):
-        super().__init__()
-
-        # Attributes will be listed in meltano.yml in this order:
-        self.name = name
-        self.extractor = extractor
-        self.loader = loader
-        self.transform = transform
-        self.interval = interval
-        self.start_date = start_date
-        self.env = env
 
 
 class MeltanoFile(Canonical):

@@ -9,7 +9,7 @@ from .project import Project
 from .plugin import PluginType, PluginRef
 from .db import project_engine
 from .utils import nest, iso8601_datetime, coerce_datetime, find_named, NotFound
-from .meltano_file import Schedule
+from .schedule import Schedule
 
 
 class ScheduleAlreadyExistsError(Exception):
