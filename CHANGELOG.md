@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.38.0 - (2020-06-30)
+---
+
+### New
+
 - [#2122](https://gitlab.com/meltano/meltano/-/issues/2122) Allow custom (`meltano.yml`-`config`-defined) settings to be overridden using environment
 - [#2123](https://gitlab.com/meltano/meltano/-/issues/2123) Show current values and their source in `meltano config <plugin> list`
 
