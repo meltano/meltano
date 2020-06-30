@@ -66,7 +66,7 @@ class Project(Versioned):
         cls._default = project
 
     @property
-    def backend_version(self):
+    def file_version(self):
         return self.meltano.version
 
     @classmethod

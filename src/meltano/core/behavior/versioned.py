@@ -4,10 +4,10 @@ from abc import ABC, abstractmethod
 class IncompatibleVersionError(Exception):
     """Occurs when a component is incompatible with its representation"""
 
-    def __init__(self, message, backend_version: int, version: int):
+    def __init__(self, message, file_version: int, version: int):
         super().__init__(message)
 
-        self.backend_version = backend_version
+        self.file_version = file_version
         self.version = version
 
 
@@ -16,7 +16,7 @@ class Versioned(ABC):
 
     @property
     @abstractmethod
-    def backend_version(self) -> int:
+    def file_version(self) -> int:
         pass
 
     def is_compatible(self, version: int = None):
@@ -28,11 +28,11 @@ class Versioned(ABC):
 
     def ensure_compatible(self, version: int = None):
         version = self.__class__.__version__ if version is None else version
-        backend_version = self.backend_version
+        file_version = self.file_version
 
-        if backend_version != version:
+        if file_version != version:
             raise IncompatibleVersionError(
-                f"Version {version} required, currently at {self.backend_version}",
-                backend_version,
+                f"Version {version} required, currently at {self.file_version}",
+                file_version,
                 version,
             )
