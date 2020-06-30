@@ -110,7 +110,7 @@ class PluginInvoker:
         return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
 
     def env(self):
-        env = {**self.settings_service.env, **self.plugin_config_env}
+        env = {**self.settings_service.env(self.plugin), **self.plugin_config_env}
 
         # Ensure Meltano venv is not inherited
         venv = VirtualEnv(self.project.venvs_dir(self.plugin.type, self.plugin.name))
