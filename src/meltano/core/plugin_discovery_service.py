@@ -58,6 +58,10 @@ class DiscoveryFile(Canonical):
                 )
                 self[plugin_type].append(plugin)
 
+    @classmethod
+    def version(cls, attrs):
+        return int(attrs.get("version", 1))
+
 
 class PluginDiscoveryService(Versioned):
     __version__ = VERSION
@@ -70,11 +74,16 @@ class PluginDiscoveryService(Versioned):
     ):
         self.project = project
         self.config_service = config_service or ConfigService(project)
-        self._discovery = DiscoveryFile.parse(discovery)
+
+        self._discovery_version = None
+        self._discovery = None
+        if discovery:
+            self._discovery_version = DiscoveryFile.version(discovery)
+            self._discovery = DiscoveryFile.parse(discovery)
 
     @property
-    def backend_version(self):
-        return int(self._discovery.version)
+    def file_version(self):
+        return self._discovery_version
 
     @property
     def discovery(self):
@@ -82,92 +91,120 @@ class PluginDiscoveryService(Versioned):
         Return first compatible discovery manifest from these locations:
 
         - project local `discovery.yml`
-        - http://meltano.com/discovery.yml
+        - MELTANO_DISCOVERY_URL
         - .meltano/cache/discovery.yml
         - meltano.core.bundle
         """
         if self._discovery:
             return self._discovery
 
+        loaders = [
+            (
+                self.load_local_discovery,
+                "your project's local `discovery.yml` manifest",
+            ),
+            (
+                self.load_remote_discovery,
+                f"the `discovery.yml` manifest received from {MELTANO_DISCOVERY_URL}",
+            ),
+            (self.load_cached_discovery, "the cached `discovery.yml` manifest"),
+            (self.load_bundled_discovery, "the bundled `discovery.yml` manifest"),
+        ]
+
+        errored = False
+        for loader, description in loaders:
+            if errored:
+                logging.warning(f"Falling back on {description}...")
+
+            try:
+                loader()
+            except IncompatibleVersionError as err:
+                errored = True
+
+                logging.warning(
+                    f"{description.capitalize()} has version {err.file_version}, while this version of Meltano requires version {err.version}."
+                )
+                if err.file_version > err.version:
+                    logging.warning(
+                        "Please install the latest compatible version of Meltano using `meltano upgrade`."
+                    )
+            except DiscoveryInvalidError as err:
+                errored = True
+                logging.error(f"{description.capitalize()} could not be parsed.")
+                logging.debug(str(err))
+
+            if self._discovery:
+                return self._discovery
+
+        raise DiscoveryInvalidError("No valid `discovery.yml` manifest could be found")
+
+    def load_local_discovery(self):
         try:
-            local_discovery = self.project.root.joinpath("discovery.yml")
+            with self.project.root_dir("discovery.yml").open() as local_discovery:
+                return self.load_discovery(local_discovery)
+        except FileNotFoundError:
+            pass
 
-            if local_discovery.is_file():
-                with local_discovery.open() as local:
-                    self._discovery = self.load_discovery(local)
-            else:
-                self._discovery = self.fetch_discovery()
-        except DiscoveryInvalidError as e:
-            # let's use the bundled one
-            logging.error(
-                "Meltano could not parse the `discovery.yml` returned by the server."
-            )
-            logging.debug(str(e))
-            self._discovery = self.cached_discovery
-
-        try:
-            self.ensure_compatible()
-        except IncompatibleVersionError as e:
-            logging.fatal(
-                "This version of Meltano cannot parse the plugins manifest, please update Meltano."
-            )
-            self._discovery = None
-            raise
-
-        return self._discovery
-
-    def fetch_discovery(self):
+    def load_remote_discovery(self):
         try:
             response = requests.get(MELTANO_DISCOVERY_URL)
             response.raise_for_status()
-            self._discovery = self.load_discovery(io.StringIO(response.text))
-            self.ensure_compatible()
 
-            with self.cached_discovery_file.open("w") as discovery_cache:
-                discovery_cache.write(response.text)
-            logging.debug(f"Discovery cache updated at {self.cached_discovery_file}")
+            remote_discovery = io.StringIO(response.text)
+            discovery = self.load_discovery(remote_discovery, cache=True)
+
+            return discovery
         except (
             requests.exceptions.ConnectionError,
             requests.exceptions.HTTPError,
-            yaml.YAMLError,
-        ) as e:
-            # let's try loading the cache instead
-            self._discovery = self.cached_discovery
-        except IncompatibleVersionError as e:
-            # let's default to the local cache
-            if e.backend_version > e.version:
-                logging.warning("You must update Meltano to get new plugins updates.")
-            self._discovery = self.cached_discovery
+        ) as err:
+            logging.debug("Remote `discovery.yml` manifest could not be downloaded.")
+            logging.debug(str(err))
+            pass
 
-        if not self._discovery:
-            raise DiscoveryInvalidError("Cannot parse discovery.yml.")
-
-        return self._discovery
-
-    @property
-    def cached_discovery(self) -> DiscoveryFile:
+    def load_cached_discovery(self):
         try:
-            with self.cached_discovery_file.open() as discovery_cache:
-                return self.load_discovery(discovery_cache)
-        except (yaml.YAMLError, FileNotFoundError, DiscoveryInvalidError):
-            logging.debug(
-                f"Discovery cache corrupted or missing, falling back on the bundled discovery."
-            )
-            shutil.copy(bundle.find("discovery.yml"), self.cached_discovery_file)
+            with self.cached_discovery_file.open() as cached_discovery:
+                return self.load_discovery(cached_discovery)
+        except FileNotFoundError:
+            pass
 
-            # load it back
-            with self.cached_discovery_file.open() as discovery_cache:
-                return self.load_discovery(discovery_cache)
+    def load_bundled_discovery(self):
+        with bundle.find("discovery.yml").open() as bundled_discovery:
+            discovery = self.load_discovery(bundled_discovery, cache=True)
+
+        return discovery
+
+    def load_discovery(self, discovery_file, cache=False):
+        try:
+            discovery_yaml = yaml.safe_load(discovery_file)
+
+            self._discovery_version = DiscoveryFile.version(discovery_yaml)
+            self.ensure_compatible()
+
+            self._discovery = DiscoveryFile.parse(discovery_yaml)
+
+            if cache:
+                self.cache_discovery()
+
+            return self._discovery
+        except IncompatibleVersionError:
+            raise
+        except (yaml.YAMLError, Exception) as err:
+            raise DiscoveryInvalidError(str(err))
+
+    def cache_discovery(self):
+        with self.cached_discovery_file.open("w") as cached_discovery:
+            yaml.dump(
+                self._discovery,
+                cached_discovery,
+                default_flow_style=False,
+                sort_keys=False,
+            )
 
     @property
     def cached_discovery_file(self):
         return self.project.meltano_dir("cache", "discovery.yml")
-
-    def load_discovery(self, discovery_file) -> DiscoveryFile:
-        try:
-            return DiscoveryFile.parse(yaml.safe_load(discovery_file))
-        except Exception as err:
-            raise DiscoveryInvalidError(str(err))
 
     def plugins(self) -> Iterator[Plugin]:
         discovery_plugins = (

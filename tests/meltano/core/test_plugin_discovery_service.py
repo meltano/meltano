@@ -4,6 +4,7 @@ import requests_mock
 import json
 import yaml
 import copy
+from contextlib import contextmanager
 from unittest import mock
 
 import meltano.core.bundle as bundle
@@ -13,6 +14,7 @@ from meltano.core.plugin_discovery_service import (
     DiscoveryFile,
     PluginDiscoveryService,
     MELTANO_DISCOVERY_URL,
+    VERSION,
 )
 from meltano.core.behavior.versioned import IncompatibleVersionError
 
@@ -77,54 +79,130 @@ class TestPluginDiscoveryService:
             assert sorted(discovery[plugin_type]) == sorted(plugin_names)
 
 
-class TestPluginDiscoveryServiceRemote:
-    def test_bundled_discovery(self, subject):
-        # load the bundled discovery file
-        with bundle.find("discovery.yml").open() as bundled:
-            bundled_discovery = DiscoveryFile.parse(yaml.safe_load(bundled))
+class TestPluginDiscoveryServiceDiscoveryManifest:
+    def build_discovery_yaml(self, namespace, version=VERSION):
+        return {
+            "version": version,
+            "extractors": [{"name": f"{namespace}-test", "namespace": namespace}],
+        }
 
-        assert subject.cached_discovery.version == bundled_discovery.version
+    def assert_discovery_yaml(self, subject, discovery_yaml):
+        subject._discovery = None
+        assert (
+            subject.discovery.extractors[0].namespace
+            == discovery_yaml["extractors"][0]["namespace"]
+        )
 
-    def test_cached_discovery(self, subject):
-        with mock.patch.object(
-            PluginDiscoveryService,
-            "cached_discovery",
-            new_callable=mock.PropertyMock,
-            return_value=subject._discovery,
-        ) as cached_discovery, requests_mock.Mocker() as r:
-            r.get(MELTANO_DISCOVERY_URL, status_code=500)
-            discovery = subject.fetch_discovery()
+    @contextmanager
+    def use_local_discovery(self, discovery_yaml, subject):
+        local_discovery_path = subject.project.root_dir("discovery.yml")
+        with local_discovery_path.open("w") as local_discovery:
+            yaml.dump(discovery_yaml, local_discovery)
 
-            assert cached_discovery.called
+        yield discovery_yaml
 
-        assert discovery == subject._discovery
+        local_discovery_path.unlink()
 
+    @contextmanager
+    def use_remote_discovery(self, discovery_yaml):
+        with requests_mock.Mocker() as m:
+            m.get(MELTANO_DISCOVERY_URL, text=yaml.dump(discovery_yaml))
 
-class TestIncompatiblePluginDiscoveryService:
+            yield discovery_yaml
+
+    @contextmanager
+    def use_cached_discovery(self, discovery_yaml, subject):
+        with subject.cached_discovery_file.open("w") as cached_discovery:
+            yaml.dump(discovery_yaml, cached_discovery)
+
+        yield discovery_yaml
+
+        subject.cached_discovery_file.unlink()
+
     @pytest.fixture
-    def subject(self, plugin_discovery_service):
-        return plugin_discovery_service
+    def local_discovery(self, subject):
+        with self.use_local_discovery(
+            self.build_discovery_yaml("local"), subject
+        ) as discovery_yaml:
+            yield discovery_yaml
 
-    @pytest.fixture(autouse=True)
-    def discovery_yaml(self, subject):
-        subject._discovery["version"] = 1000000
+    @pytest.fixture
+    def incompatible_local_discovery(self, subject):
+        with self.use_local_discovery(
+            self.build_discovery_yaml("local", version=VERSION - 1), subject
+        ) as discovery_yaml:
+            yield discovery_yaml
 
-    def test_discovery(self, subject):
-        with pytest.raises(IncompatibleVersionError):
-            subject.ensure_compatible()
+    @pytest.fixture
+    def remote_discovery(self, project):
+        with self.use_remote_discovery(
+            self.build_discovery_yaml("remote")
+        ) as discovery_yaml:
+            yield discovery_yaml
 
-    def test_remote_incompatible(self, subject):
-        compatible_discovery = copy.deepcopy(subject._discovery)
-        compatible_discovery["version"] = PluginDiscoveryService.__version__
+    @pytest.fixture
+    def incompatible_remote_discovery(self):
+        with self.use_remote_discovery(
+            self.build_discovery_yaml("remote", version=VERSION + 1)
+        ) as discovery_yaml:
+            yield discovery_yaml
 
-        # fmt:off
-        with mock.patch.object(PluginDiscoveryService,
-                               "cached_discovery",
-                               new_callable=mock.PropertyMock,
-                               return_value=compatible_discovery) as cached_discovery, \
-            requests_mock.Mocker() as r:
-        # fmt:on
-            r.get(MELTANO_DISCOVERY_URL, text=json.dumps(subject._discovery.canonical()))
-            subject.fetch_discovery()
+    @pytest.fixture
+    def cached_discovery(self, subject):
+        with self.use_cached_discovery(
+            self.build_discovery_yaml("cached"), subject
+        ) as discovery_yaml:
+            yield discovery_yaml
 
-            assert cached_discovery.called
+    @pytest.fixture
+    def invalid_cached_discovery(self, subject):
+        with self.use_cached_discovery(
+            {"version": VERSION, "invalid_key": "value"}, subject
+        ) as discovery_yaml:
+            yield discovery_yaml
+
+    @pytest.fixture
+    def bundled_discovery(self):
+        with bundle.find("discovery.yml").open() as bundled_discovery:
+            return yaml.safe_load(bundled_discovery)
+
+    def test_local_discovery(self, subject, local_discovery):
+        self.assert_discovery_yaml(subject, local_discovery)
+
+        assert not subject.cached_discovery_file.exists()
+
+    def test_incompatible_local_discovery(
+        self, subject, incompatible_local_discovery, remote_discovery
+    ):
+        self.assert_discovery_yaml(subject, remote_discovery)
+
+    def test_remote_discovery(self, subject, remote_discovery):
+        self.assert_discovery_yaml(subject, remote_discovery)
+
+        assert subject.cached_discovery_file.exists()
+
+    def test_incompatible_remote_discovery(
+        self, subject, incompatible_remote_discovery, cached_discovery
+    ):
+        self.assert_discovery_yaml(subject, cached_discovery)
+
+    def test_cached_discovery(
+        self, subject, incompatible_remote_discovery, cached_discovery
+    ):
+        self.assert_discovery_yaml(subject, cached_discovery)
+
+    def test_invalid_cached_discovery(
+        self,
+        subject,
+        incompatible_remote_discovery,
+        invalid_cached_discovery,
+        bundled_discovery,
+    ):
+        self.assert_discovery_yaml(subject, bundled_discovery)
+
+    def test_bundled_discovery(
+        self, subject, incompatible_remote_discovery, bundled_discovery
+    ):
+        self.assert_discovery_yaml(subject, bundled_discovery)
+
+        assert subject.cached_discovery_file.exists()
