@@ -581,6 +581,7 @@ extractors:
         value: localhost
         protected: true
       - name: port
+        kind: integer
         value: 27017
       - name: user
       - name: password
@@ -612,6 +613,7 @@ loaders:
         value: localhost
         protected: true
       - name: port
+        kind: integer
         env: PG_PORT
         value: 5502
       - name: dbname

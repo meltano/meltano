@@ -11,7 +11,6 @@ from meltano.core.utils import (
     find_named,
     setting_env,
     NotFound,
-    truthy,
     flatten,
     set_at_path,
     pop_at_path,
@@ -223,7 +222,7 @@ class SettingsService(ABC):
                 break
 
         if setting_def:
-            value = self.cast_value(setting_def, value)
+            value = setting_def.cast_value(value)
 
             # we don't want to leak secure informations
             # so we redact all `passwords`
@@ -253,7 +252,7 @@ class SettingsService(ABC):
             setting_def = None
 
         if setting_def:
-            value = self.cast_value(setting_def, value)
+            value = setting_def.cast_value(value)
 
             env_key = self.setting_env(setting_def)
 
@@ -362,12 +361,6 @@ class SettingsService(ABC):
 
     def setting_env(self, setting_def):
         return setting_def.env or setting_env(self._env_namespace, setting_def.name)
-
-    def cast_value(self, setting_def, value):
-        if isinstance(value, str) and setting_def.kind == "boolean":
-            value = truthy(value)
-
-        return value
 
     def expand_env_vars(self, raw_value):
         if not isinstance(raw_value, str):

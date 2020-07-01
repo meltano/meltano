@@ -134,6 +134,14 @@ class TestPluginSettingsService:
             SettingValueSource.CONFIG_OVERRIDE,
         )
 
+        # Verify that integer settings set in env are cast correctly
+        subject = subject.with_env_override({env_var(tap, "port"): "3333"})
+
+        assert subject.get_with_source(session, tap, "port") == (
+            3333,
+            SettingValueSource.ENV,
+        )
+
         # Verify that boolean settings set in env are cast correctly
         # Default
         assert subject.get_with_source(session, tap, "boolean") == (

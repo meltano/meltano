@@ -69,3 +69,12 @@ class SettingDefinition(NameEq, Canonical):
             getters[key] = getter
 
         return getters
+
+    def cast_value(self, value):
+        if isinstance(value, str):
+            if self.kind == "boolean":
+                return truthy(value)
+            elif self.kind == "integer":
+                return int(value)
+
+        return value
