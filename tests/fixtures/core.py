@@ -44,7 +44,11 @@ def discovery():
                 {"name": "protected", "protected": True},
                 {"name": "secure", "kind": "password"},
                 {"name": "hidden", "kind": "hidden", "value": 42},
-                {"name": "boolean", "kind": "boolean", "value": False},
+                {
+                    "name": "boolean",
+                    "kind": "boolean",
+                    "env_aliases": ["TAP_MOCK_ENABLED", "!TAP_MOCK_DISABLED"],
+                },
             ],
         }
     )

@@ -1,3 +1,6 @@
+from typing import List
+
+from meltano.core.utils import truthy
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior import NameEq
 
@@ -7,6 +10,7 @@ class SettingDefinition(NameEq, Canonical):
         self,
         name: str = None,
         env: str = None,
+        env_aliases: List[str] = [],
         kind: str = None,
         value=None,
         label: str = None,
@@ -24,6 +28,7 @@ class SettingDefinition(NameEq, Canonical):
             # Attributes will be listed in meltano.yml in this order:
             name=name,
             env=env,
+            env_aliases=env_aliases,
             kind=kind,
             value=value,
             label=label,
@@ -47,3 +52,20 @@ class SettingDefinition(NameEq, Canonical):
             kind = "boolean"
 
         return cls(name=key, kind=kind, custom=True)
+
+    @property
+    def env_alias_getters(self):
+        getters = {}
+
+        for alias in self.env_aliases:
+            key = alias
+
+            if alias.startswith("!") and self.kind == "boolean":
+                key = alias[1:]
+                getter = lambda env, key=key: str(not truthy(env[key]))
+            else:
+                getter = lambda env, key=alias: env[key]
+
+            getters[key] = getter
+
+        return getters

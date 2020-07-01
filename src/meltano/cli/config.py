@@ -112,8 +112,8 @@ def list_settings(ctx):
 
         click.secho(name, fg="blue", nl=False)
 
-        env_key = settings.setting_env(setting_def)
-        click.echo(f" [env: {env_key}]", nl=False)
+        env_keys = [settings.setting_env(setting_def), *setting_def.env_aliases]
+        click.echo(f" [env: {', '.join(env_keys)}]", nl=False)
 
         current_value = click.style(f"{value!r}", fg="green")
         if source is SettingValueSource.DEFAULT:

@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2128](https://gitlab.com/meltano/meltano/-/issues/2128) Allow alternative env vars to be specified for settings using `env_aliases` array
+- [#2128](https://gitlab.com/meltano/meltano/-/issues/2128) Allow negated env var to be defined for boolean settings using `!` prefix in `env_aliases` array
 ### Changes
 
 - [#2094](https://gitlab.com/meltano/meltano/-/issues/2069) Turn "Connections" page into "Extractors" management UI

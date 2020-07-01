@@ -166,15 +166,22 @@ class SettingsService(ABC):
                 return None
 
             env_key = self.setting_env(setting_def)
+            env_getters = {
+                env_key: lambda env: env[env_key],
+                **setting_def.env_alias_getters,
+            }
 
-            try:
-                return self.env[env_key]
-            except KeyError:
-                return None
-            else:
-                logging.debug(
-                    f"Found ENV variable {env_key} for {self._env_namespace}:{name}"
-                )
+            for key, getter in env_getters.items():
+                try:
+                    return getter(self.env)
+                except KeyError:
+                    pass
+                else:
+                    logging.debug(
+                        f"Found ENV variable {key} for {self._env_namespace}:{name}"
+                    )
+
+            return None
 
         def meltano_yml_getter():
             try:

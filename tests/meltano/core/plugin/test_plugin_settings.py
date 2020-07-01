@@ -135,13 +135,29 @@ class TestPluginSettingsService:
         )
 
         # Verify that boolean settings set in env are cast correctly
-        subject = subject.with_env_override({env_var(tap, "boolean"): "on"})
+        # Default
+        assert subject.get_with_source(session, tap, "boolean") == (
+            None,
+            SettingValueSource.DEFAULT,
+        )
+
+        # Negated alias
+        subject = subject.with_env_override({"TAP_MOCK_DISABLED": "true"})
+
+        assert subject.get_with_source(session, tap, "boolean") == (
+            False,
+            SettingValueSource.ENV,
+        )
+
+        # Regular alias
+        subject = subject.with_env_override({"TAP_MOCK_ENABLED": "on"})
 
         assert subject.get_with_source(session, tap, "boolean") == (
             True,
             SettingValueSource.ENV,
         )
 
+        # Preferred env var
         subject = subject.with_env_override({env_var(tap, "boolean"): "0"})
 
         assert subject.get_with_source(session, tap, "boolean") == (

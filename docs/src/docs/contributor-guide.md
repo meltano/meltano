@@ -212,6 +212,7 @@ Each extractor (tap) and loader (target) in the `discovery.yml` has a `settings`
       documentation: https://meltano.com/ # Optional (use to link to specific supplemental documentation)
       protected: true # Optional (use in combination with `value` to provide an uneditable default)
       env: SOME_API_KEY # Optional (use to delegate to an environment variable for overriding this setting's value)
+      env_aliases: [OTHER_ENV] # Optional (use to delegate alternative environment variables for overriding this setting's value)
 ```
 
 ## Plugin Development
