@@ -43,13 +43,14 @@ class Project(Versioned):
             self.run_dir("meltano.yml.lock")
         )
 
+    @property
+    def env(self):
+        return {"MELTANO_PROJECT_ROOT": str(self.root)}
+
     @classmethod
     @fasteners.locked(lock="_activate_lock")
     def activate(cls, project: "Project"):
         project.ensure_compatible()
-
-        # helpful to refer to the current absolute project path
-        os.environ["MELTANO_PROJECT_ROOT"] = str(project.root)
 
         # create a symlink to our current binary
         try:

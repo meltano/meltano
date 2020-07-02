@@ -7,6 +7,8 @@ class ProjectSettingsService(SettingsService):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.env_override = {**self.project.env, **self.env_override}
+
         self.config_override = {
             **self.__class__.config_override,
             **self.config_override,
