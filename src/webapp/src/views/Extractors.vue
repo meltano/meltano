@@ -1,18 +1,21 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions } from 'vuex'
 
 import ExtractorList from '@/components/pipelines/ExtractorList'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
-  name: 'Connections',
+  name: 'Extractors',
   components: {
     ExtractorList,
     RouterViewLayout
   },
+  data() {
+    return {
+      isLoading: true
+    }
+  },
   computed: {
-    ...mapGetters('plugins', ['getIsLoadingPluginsOfType']),
-    ...mapState('plugins', ['installedPlugins']),
     getModalName() {
       return this.$route.name
     },
@@ -21,12 +24,15 @@ export default {
     }
   },
   created() {
-    this.getPipelineSchedules()
-    this.getPlugins()
+    Promise.all([this.getInstalledPlugins(), this.getPipelineSchedules()]).then(
+      () => {
+        this.isLoading = false
+      }
+    )
   },
   methods: {
     ...mapActions('orchestration', ['getPipelineSchedules']),
-    ...mapActions('plugins', ['getPlugins'])
+    ...mapActions('plugins', ['getInstalledPlugins'])
   }
 }
 </script>
@@ -34,13 +40,13 @@ export default {
 <template>
   <router-view-layout>
     <div class="container view-body is-widescreen">
-      <h2 id="data" class="title">Connections</h2>
+      <h2 id="data" class="title">Extractors</h2>
 
       <div class="columns">
         <div class="column">
           <div class="box">
             <progress
-              v-if="getIsLoadingPluginsOfType('extractors')"
+              v-if="isLoading"
               class="progress is-small is-info"
             ></progress>
             <template v-else>
@@ -60,11 +66,11 @@ export default {
                       <div class="content">
                         <p>
                           <span class="has-text-weight-bold"
-                            >Don't see your data source here?</span
+                            >Don't see your extractor here?</span
                           >
                           <br />
                           <small>
-                            Additional data sources are available when using the
+                            Additional extractors are available when using the
                             command line interface. You can also easily add any
                             existing Singer tap as a custom extractor or create
                             your own from scratch.

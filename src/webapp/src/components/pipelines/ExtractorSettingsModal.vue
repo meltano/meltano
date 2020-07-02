@@ -26,7 +26,6 @@ export default {
   },
   computed: {
     ...mapGetters('plugins', [
-      'getHasDefaultTransforms',
       'getInstalledPlugin',
       'getIsPluginInstalled',
       'getIsInstallingPlugin'
@@ -134,8 +133,6 @@ export default {
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
     ...mapActions('orchestration', [
-      'run',
-      'savePipelineSchedule',
       'savePluginConfiguration',
       'testPluginConfiguration'
     ]),
@@ -145,7 +142,7 @@ export default {
       }
     },
     close() {
-      this.$router.push({ name: 'connections' })
+      this.$router.push({ name: 'extractors' })
     },
     createEditableConfiguration() {
       this.localConfiguration = Object.assign(
@@ -161,17 +158,6 @@ export default {
     },
     onChangeUploadFormData(uploadFormData) {
       this.uploadFormData = uploadFormData
-    },
-    runPipeline() {
-      const pipeline = this.getPipelineWithExtractor(this.extractor.name)
-      this.run(pipeline).then(() => {
-        Vue.toasted.global.success(`Pipeline saved - ${pipeline.name}`)
-        Vue.toasted.global.success(`Auto running pipeline - ${pipeline.name}`)
-        this.$router.push({
-          name: 'runLog',
-          params: { jobId: pipeline.jobId }
-        })
-      })
     },
     save() {
       this.isSaving = true
@@ -203,27 +189,12 @@ export default {
           .then(() => {
             const message = this.extractorLacksConfigSettings
               ? `No configuration needed for ${this.extractor.name}`
-              : `Connection saved - ${this.extractor.name}`
+              : `Configuration saved - ${this.extractor.name}`
             Vue.toasted.global.success(message)
-
-            // 4. Finally, run after conditionally saving the pipeline that's relient on valid config settings
-            if (!this.getHasPipelineWithExtractor(this.extractor.name)) {
-              const hasDefaultTransforms = this.getHasDefaultTransforms(
-                this.extractor.namespace
-              )
-              this.savePipelineSchedule({
-                hasDefaultTransforms,
-                extractorName: this.extractor.name
-              })
-                .then(this.runPipeline)
-                .catch(this.$error.handle)
-            } else {
-              this.runPipeline().catch(this.$error.handle)
-            }
+            this.close()
           })
           .catch(error => {
             this.$error.handle(error)
-            this.close()
           })
           .finally(() => (this.isSaving = false))
       })
@@ -302,7 +273,7 @@ export default {
           <ConnectorLogo :connector="extractorName" />
         </div>
         <p class="modal-card-title">
-          {{ extractor.label || extractor.name }} Connection Setup
+          {{ extractor.label || extractor.name }} Extractor Configuration
         </p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>

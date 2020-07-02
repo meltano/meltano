@@ -3,10 +3,11 @@ import Router from 'vue-router'
 import Design from '@/components/analyze/Design'
 import Explore from '@/components/analyze/Explore'
 import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModal'
+import CreatePipelineScheduleModal from '@/components/pipelines/CreatePipelineScheduleModal'
 import LogModal from '@/components/pipelines/LogModal'
 
 import Analyze from '@/views/Analyze'
-import Connections from '@/views/Connections'
+import Extractors from '@/views/Extractors'
 import Dashboard from '@/views/Dashboard'
 import Dashboards from '@/views/Dashboards'
 import NotFound from '@/views/NotFound'
@@ -25,18 +26,18 @@ const router = new Router({
     },
     {
       path: '/',
-      redirect: '/connections'
+      redirect: '/extractors'
     },
     {
-      path: '/connections/',
-      name: 'connections',
-      component: Connections,
+      path: '/extractors/',
+      name: 'extractors',
+      component: Extractors,
       children: [
         {
           path: ':extractor',
           name: 'extractorSettings',
           components: {
-            default: Connections,
+            default: Extractors,
             extractorSettings: ExtractorSettingsModal
           },
           meta: {
@@ -51,6 +52,18 @@ const router = new Router({
       name: 'pipelines',
       component: Pipelines,
       children: [
+        {
+          path: 'create',
+          name: 'createPipelineSchedule',
+          components: {
+            default: Pipelines,
+            createPipelineSchedule: CreatePipelineScheduleModal
+          },
+          meta: {
+            isModal: true,
+            title: 'Meltano: Create pipelines'
+          }
+        },
         {
           path: ':jobId',
           name: 'runLog',

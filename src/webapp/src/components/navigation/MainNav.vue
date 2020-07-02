@@ -90,20 +90,20 @@ export default {
     >
       <div class="navbar-start">
         <router-link
-          :to="{ name: 'connections' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/connections') }"
+          :to="{ name: 'extractors' }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/extractors') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
           <a
             class="button has-background-transparent is-borderless is-paddingless"
             :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/connections')
+              'has-text-interactive-navigation': getIsSubRouteOf('/extractors')
             }"
           >
-            <span class="icon is-small" :class="getIconColor('/connections')">
+            <span class="icon is-small" :class="getIconColor('/extractors')">
               <font-awesome-icon icon="database"></font-awesome-icon>
             </span>
-            <span>Connections</span>
+            <span>Extractors</span>
           </a>
         </router-link>
 
@@ -157,15 +157,14 @@ export default {
               <div class="box is-borderless is-shadowless is-marginless">
                 <div class="content explore-dropdown-shell">
                   <h3 class="is-size-6">
-                    No Connections
+                    No Extractors
                   </h3>
                   <p>
-                    You must install and connect to at least one data source
-                    first.
+                    You must add at least one extractor to your project
                   </p>
                   <p>
-                    <router-link to="connections" class="has-text-underlined"
-                      >Go to Connections</router-link
+                    <router-link to="extractors" class="has-text-underlined"
+                      >Go to Extractors</router-link
                     >
                   </p>
                 </div>

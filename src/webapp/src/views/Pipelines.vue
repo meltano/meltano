@@ -1,8 +1,7 @@
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 import PipelineSchedules from '@/components/pipelines/PipelineSchedules'
-import CreatePipelineScheduleModal from '@/components/pipelines/CreatePipelineScheduleModal.vue'
 
 import RouterViewLayout from '@/views/RouterViewLayout'
 
@@ -10,33 +9,39 @@ export default {
   name: 'Pipelines',
   components: {
     PipelineSchedules,
-    RouterViewLayout,
-    CreatePipelineScheduleModal
+    RouterViewLayout
   },
   data() {
     return {
-      isLoading: false,
-      isCreatePipelineModalOpen: false
+      isLoading: true
     }
   },
   computed: {
     ...mapGetters('orchestration', ['getHasPipelines', 'getSortedPipelines']),
+    ...mapState('plugins', ['installedPlugins']),
     getModalName() {
       return this.$route.name
+    },
+    hasExtractors() {
+      return (
+        this.installedPlugins.extractors &&
+        this.installedPlugins.extractors.length
+      )
     },
     isModal() {
       return this.$route.meta.isModal
     }
   },
   created() {
-    this.isLoading = true
-    this.getPipelineSchedules().then(() => (this.isLoading = false))
+    Promise.all([this.getPipelineSchedules(), this.getInstalledPlugins()]).then(
+      () => {
+        this.isLoading = false
+      }
+    )
   },
   methods: {
     ...mapActions('orchestration', ['getPipelineSchedules']),
-    toggleCreatePipelineModal() {
-      this.isCreatePipelineModalOpen = !this.isCreatePipelineModalOpen
-    }
+    ...mapActions('plugins', ['getInstalledPlugins'])
   }
 }
 </script>
@@ -49,34 +54,41 @@ export default {
           <h2 id="data" class="title">Pipelines</h2>
         </div>
         <div class="column is-one-quarter has-text-right">
-          <button
+          <router-link
+            :to="{
+              name: 'createPipelineSchedule'
+            }"
             class="button is-interactive-primary"
-            @click.stop="toggleCreatePipelineModal"
           >
             Create
-          </button>
+          </router-link>
         </div>
       </div>
       <div class="columns">
         <div class="column">
-          <div v-if="getHasPipelines">
-            <PipelineSchedules :pipelines="getSortedPipelines" />
+          <div v-if="isLoading" class="box">
+            <progress class="progress is-small is-info"></progress>
           </div>
-          <div v-else class="box">
-            <progress
-              v-if="isLoading"
-              class="progress is-small is-info"
-            ></progress>
-            <div v-else>
-              <div class="content">
-                <p>
-                  No pipelines have been set up yet.
-                  <router-link to="connections"
-                    >Connect a data source</router-link
-                  >
-                  first.
-                </p>
-              </div>
+          <div v-else>
+            <PipelineSchedules
+              v-if="getHasPipelines"
+              :pipelines="getSortedPipelines"
+            />
+            <div v-else class="box">
+              <p>
+                No pipelines have been set up yet.
+                <router-link
+                  v-if="hasExtractors"
+                  :to="{
+                    name: 'createPipelineSchedule'
+                  }"
+                >
+                  Create one now
+                </router-link>
+                <router-link v-else to="extractors"
+                  >Add an extractor</router-link
+                >
+              </p>
             </div>
           </div>
         </div>
@@ -86,10 +98,6 @@ export default {
         <router-view :name="getModalName"></router-view>
       </div>
     </div>
-    <create-pipeline-schedule-modal 
-      v-if="isCreatePipelineModalOpen" 
-      @close="toggleCreatePipelineModal"
-    />
   </router-view-layout>
 </template>
 
