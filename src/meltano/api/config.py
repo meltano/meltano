@@ -2,6 +2,8 @@ import os
 import logging
 import datetime
 
+from meltano.core.project import Project
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import truthy
 from meltano.api.headers import *
 from meltano.core.tracking.ga_tracker import (
@@ -43,7 +45,6 @@ PROJECT_ROOT_DIR = os.path.dirname(API_ROOT_DIR)
 # -----------------
 SQLALCHEMY_ECHO = False
 SQLALCHEMY_TRACK_MODIFICATIONS = False
-SQLALCHEMY_DATABASE_URI = os.getenv("MELTANO_DATABASE_URI")
 
 # Flask-security
 # -----------------
@@ -104,6 +105,19 @@ EXECUTOR_PROPAGATE_EXCEPTIONS = True
 
 CORS_EXPOSE_HEADERS = [VERSION_HEADER]
 CORS_ALLOW_HEADERS = ["CONTENT-TYPE", JSON_SCHEME_HEADER]
+
+
+class ProjectSettings(object):
+    settings_map = {"SQLALCHEMY_DATABASE_URI": "database_uri"}
+
+    def __init__(self, project: Project):
+        self.settings_service = ProjectSettingsService(project)
+
+    def as_dict(self):
+        return {
+            config_key: self.settings_service.get(setting_name)
+            for config_key, setting_name in self.settings_map.items()
+        }
 
 
 class EnvVarOverrides(object):

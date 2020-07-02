@@ -14,7 +14,7 @@ from meltano.core.db import project_engine
 from meltano.core.migration_service import MigrationService
 from meltano.core.upgrade_service import UpgradeService, UpgradeError
 from . import cli
-from .params import project, db_options
+from .params import project
 
 
 @cli.group(cls=DefaultGroup, default="all", default_if_no_args=True)

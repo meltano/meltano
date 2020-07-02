@@ -12,6 +12,7 @@ from werkzeug.wsgi import DispatcherMiddleware
 
 import meltano.api.config
 from meltano.api.headers import *
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.db import project_engine
 from meltano.core.logging.utils import current_log_level, FORMAT
@@ -26,6 +27,9 @@ logger = logging.getLogger("meltano.api")
 
 def create_app(config={}):
     project = Project.find()
+    settings_service = ProjectSettingsService(project)
+
+    project_engine(project, settings_service.get("database_uri"), default=True)
 
     app = Flask(
         __name__, instance_path=str(project.root), instance_relative_config=True
@@ -35,20 +39,16 @@ def create_app(config={}):
     importlib.reload(meltano.api.config)
 
     app.config.from_object("meltano.api.config")
+    app.config.from_mapping(**meltano.api.config.ProjectSettings(project).as_dict())
     app.config.from_pyfile("ui.cfg", silent=True)
     app.config.from_object("meltano.api.config.EnvVarOverrides")
-    app.config.update(**config)
+    app.config.from_mapping(**config)
 
     if app.env == "production":
         from meltano.api.config import ensure_secure_setup
 
         app.config.from_object("meltano.api.config.Production")
         ensure_secure_setup(app)
-
-    # register
-    project_engine(
-        project, engine_uri=app.config["SQLALCHEMY_DATABASE_URI"], default=True
-    )
 
     # File logging
     formatter = logging.Formatter(fmt=FORMAT)
