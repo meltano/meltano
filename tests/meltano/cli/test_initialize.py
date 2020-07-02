@@ -24,7 +24,7 @@ class TestCliInit:
         project = Project.find()
 
         # Deactivate project
-        Project._default = None
+        Project.deactivate()
 
         files = (
             project.root.joinpath(file).resolve()

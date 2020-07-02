@@ -264,7 +264,7 @@ def project(test_dir, project_init_service, engine_uri):
     yield project
 
     # clean-up
-    Project._default = None
+    Project.deactivate()
     os.chdir(test_dir)
     shutil.rmtree(project.root)
     logging.debug(f"Cleaned project at {project.root}")

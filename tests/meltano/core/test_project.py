@@ -5,7 +5,7 @@ import shutil
 import threading
 import time
 
-from meltano.core.project import Project, ProjectNotFound
+from meltano.core.project import Project, ProjectNotFound, PROJECT_ROOT_ENV
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from multiprocessing import Pool
 from multiprocessing.pool import ThreadPool
@@ -13,9 +13,9 @@ from multiprocessing.pool import ThreadPool
 
 @pytest.fixture
 def deactivate_project(project):
-    Project._default = None
+    Project.deactivate()
     yield
-    Project._default = project
+    Project.activate(project)
 
 
 def update(payload):
@@ -51,7 +51,7 @@ class ProjectReader(IndefiniteThread):
 
 class TestProject:
     @pytest.mark.usefixtures("deactivate_project")
-    def test_find(self, project, mkdtemp):
+    def test_find(self, project, mkdtemp, monkeypatch):
         # defaults to the cwd
         found = Project.find(activate=False)
         assert found == project
@@ -59,6 +59,14 @@ class TestProject:
         # or you can specify a path
         found = Project.find(project.root, activate=False)
         assert found == project
+
+        # or set the MELTANO_PROJECT_ROOT env var
+        with monkeypatch.context() as m:
+            m.chdir(project.root.joinpath("model"))
+            m.setenv(PROJECT_ROOT_ENV, "..")
+
+            found = Project.find(activate=False)
+            assert found == project
 
         # but it doens't recurse up, you have to be
         # at the meltano.yml level

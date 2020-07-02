@@ -17,11 +17,13 @@ from .behavior.versioned import Versioned
 from .utils import makedirs, slugify
 from .meltano_file import MeltanoFile
 
+PROJECT_ROOT_ENV = "MELTANO_PROJECT_ROOT"
+
 
 class ProjectNotFound(Error):
-    def __init__(self):
+    def __init__(self, project):
         super().__init__(
-            f"Cannot find `{os.getcwd()}/meltano.yml`. Are you in a meltano project?"
+            f"Cannot find `{project.meltanofile}`. Are you in a meltano project?"
         )
 
 
@@ -37,15 +39,15 @@ class Project(Versioned):
     _meltano_rw_lock = fasteners.ReaderWriterLock()
     _default = None
 
-    def __init__(self, root: Union[Path, str] = None):
-        self.root = Path(root or os.getcwd()).resolve()
+    def __init__(self, root: Union[Path, str]):
+        self.root = Path(root).resolve()
         self._meltano_ip_lock = fasteners.InterProcessLock(
             self.run_dir("meltano.yml.lock")
         )
 
     @property
     def env(self):
-        return {"MELTANO_PROJECT_ROOT": str(self.root)}
+        return {PROJECT_ROOT_ENV: str(self.root)}
 
     @classmethod
     @fasteners.locked(lock="_activate_lock")
@@ -66,20 +68,26 @@ class Project(Versioned):
         # set the default project
         cls._default = project
 
+    @classmethod
+    def deactivate(cls):
+        os.environ.pop(PROJECT_ROOT_ENV, None)
+        cls._default = None
+
     @property
     def file_version(self):
         return self.meltano.version
 
     @classmethod
     @fasteners.locked(lock="_find_lock")
-    def find(cls, from_dir: Union[Path, str] = None, activate=True):
+    def find(cls, project_root: Union[Path, str] = None, activate=True):
         if cls._default:
             return cls._default
 
-        project = Project(from_dir)
+        project_root = project_root or os.getenv(PROJECT_ROOT_ENV) or os.getcwd()
+        project = Project(project_root)
 
         if not project.meltanofile.exists():
-            raise ProjectNotFound()
+            raise ProjectNotFound(project)
 
         # if we activate a project using `find()`, it should
         # be set as the default project for future `find()`
