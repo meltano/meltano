@@ -6,7 +6,7 @@ import threading
 import yaml
 from copy import deepcopy
 from contextlib import contextmanager
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 from functools import wraps
 from pathlib import Path
 from typing import Union, Dict
@@ -47,7 +47,12 @@ class Project(Versioned):
 
     @property
     def env(self):
-        return {PROJECT_ROOT_ENV: str(self.root)}
+        return {**dotenv_values(self.dotenv), PROJECT_ROOT_ENV: str(self.root)}
+
+    def load_env(self):
+        for k, v in self.env.items():
+            if k not in os.environ and v is not None:
+                os.environ[k] = v
 
     @classmethod
     @fasteners.locked(lock="_activate_lock")
@@ -62,7 +67,10 @@ class Project(Versioned):
         except FileExistsError:
             pass
 
-        load_dotenv(dotenv_path=project.root.joinpath(".env"), override=True)
+        # To be removed once every call to `os.getenv` has been replaced with
+        # a call to `ProjectSettingsService.get`
+        project.load_env()
+
         logging.debug(f"Activated project at {project.root}")
 
         # set the default project
@@ -136,6 +144,10 @@ class Project(Versioned):
     @property
     def meltanofile(self):
         return self.root.joinpath("meltano.yml")
+
+    @property
+    def dotenv(self):
+        return self.root.joinpath(".env")
 
     @makedirs
     def meltano_dir(self, *joinpaths):

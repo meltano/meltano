@@ -84,7 +84,7 @@ class TestProject:
     def test_activate(self, project):
         assert os.getenv("MELTANO_PROJECT") is None
 
-        with open(".env", "w") as env:
+        with project.dotenv.open("w") as env:
             env.write(f"MELTANO_PROJECT={project.root}")
 
         # `Project.find()` always return the default instance
