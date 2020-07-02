@@ -80,8 +80,6 @@ class SettingsService(ABC):
         self.env_override = env_override
         self.config_override = config_override
 
-        self._env = None
-
     @property
     @abstractmethod
     def _env_namespace(self) -> str:
@@ -112,10 +110,7 @@ class SettingsService(ABC):
 
     @property
     def env(self):
-        if not self._env:
-            self._env = {**os.environ, **self.env_override}
-
-        return self._env
+        return {**os.environ, **self.env_override}
 
     @classmethod
     def is_kind_redacted(cls, kind) -> bool:
@@ -128,22 +123,6 @@ class SettingsService(ABC):
         """
 
         return {k: v for k, v in values.items() if v != REDACTED_VALUE}
-
-    def with_env_override(self, env_override):
-        return self.__class__(
-            *self._args,
-            **self._kwargs,
-            env_override={**self.env_override, **env_override},
-            config_override=self.config_override,
-        )
-
-    def with_config_override(self, config_override):
-        return self.__class__(
-            *self._args,
-            **self._kwargs,
-            env_override=self.env_override,
-            config_override={**self.config_override, **config_override},
-        )
 
     def config_with_metadata(self, sources: List[SettingValueSource] = None, **kwargs):
         config = {}
