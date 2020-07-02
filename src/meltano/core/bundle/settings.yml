@@ -22,3 +22,6 @@ settings:
   kind: integer
   value: 4
   env_aliases: [WORKERS]
+- name: ui.forwarded_allow_ips
+  value: "127.0.0.1"
+  env_aliases: [FORWARDED_ALLOW_IPS]
