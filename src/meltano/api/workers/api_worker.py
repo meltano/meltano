@@ -3,7 +3,7 @@ import threading
 import subprocess
 
 from meltano.core.project import Project
-from meltano.core.db import project_engine
+from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.utils.pidfile import PIDFile
 
 
@@ -17,19 +17,17 @@ class APIWorker(threading.Thread):
 
     def run(self):
         # fmt: off
-        cmd = ["gunicorn",
-               "--bind", self.bind_addr,
+        cmd = ["--bind", self.bind_addr,
                "--config", "python:meltano.api.wsgi",
                "--pid", str(self.pid_file)]
         # fmt: on
 
         if self.reload:
-            cmd += ["--reload"]
+            args += ["--reload"]
 
-        cmd += ["meltano.api.app:create_app()"]
+        args += ["meltano.api.app:create_app()"]
 
-        engine, _ = project_engine(self.project)
-        subprocess.run(cmd, env={**os.environ, "MELTANO_DATABASE_URI": str(engine.url)})
+        MeltanoInvoker(self.project).invoke(args, command="gunicorn")
 
     def pid_path(self):
         return self.project.run_dir(f"gunicorn.pid")

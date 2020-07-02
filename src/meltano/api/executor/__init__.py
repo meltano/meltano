@@ -9,6 +9,7 @@ from meltano.api.signals import PipelineSignals
 from meltano.api.models import db
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.project import Project
+from meltano.core.meltano_invoker import MeltanoInvoker
 
 
 executor = Executor()
@@ -20,27 +21,20 @@ def setup_executor(app, project):
 
 
 def defer_run_elt(schedule_payload: dict):
+    project = Project.find()
+
     job_id = schedule_payload["name"]
     extractor = schedule_payload["extractor"]
     loader = schedule_payload["loader"]
     transform = schedule_payload.get("transform")
 
-    cmd = [
-        "meltano",
-        "elt",
-        "--job_id",
-        job_id,
-        extractor,
-        loader,
-        "--transform",
-        transform,
-    ]
+    args = ["elt", "--job_id", job_id, extractor, loader, "--transform", transform]
 
-    result = subprocess.run(
-        cmd,
+    result = MeltanoInvoker(project).invoke(
+        args,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
-        env={**os.environ, "MELTANO_JOB_TRIGGER": "ui"},
+        env={"MELTANO_JOB_TRIGGER": "ui"},
     )
 
     # It would probably be better that we would use sqlalchemy ORM events
@@ -63,8 +57,13 @@ def run_elt(project: Project, schedule_payload: dict):
     return job_id
 
 
-def upgrade():
-    cmd = ["meltano", "upgrade"]
-    executor.submit(
-        subprocess.run, cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+def defer_upgrade():
+    project = Project.find()
+
+    MeltanoInvoker(project).invoke(
+        ["upgrade"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
     )
+
+
+def upgrade():
+    executor.submit(defer_upgrade)
