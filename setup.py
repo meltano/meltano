@@ -86,7 +86,6 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    setup_requires=["pytest-runner"],
     tests_require=dev_requires,
     # run `make requirements.txt` after editing
     install_requires=[*conflicts, *requires],
