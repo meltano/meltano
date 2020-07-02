@@ -47,3 +47,24 @@ class TestProjectSettingsService:
             "from_config_override",
             SettingValueSource.CONFIG_OVERRIDE,
         )
+
+    def test_get_with_source_ui_cfg(self, project, subject, monkeypatch):
+        def assert_value_source(value, source):
+            assert subject.get_with_source("ui.server_name") == (value, source)
+
+        assert_value_source(None, SettingValueSource.DEFAULT)
+
+        project.root_dir("ui.cfg").write_text("SERVER_NAME = None")
+
+        assert_value_source(None, SettingValueSource.DEFAULT)
+
+        project.root_dir("ui.cfg").write_text("SERVER_NAME = 'from_ui_cfg'")
+
+        assert_value_source("from_ui_cfg", SettingValueSource.ENV)
+
+        with monkeypatch.context() as m:
+            m.setenv(
+                subject.setting_env(subject.find_setting("ui.server_name")), "from_env"
+            )
+
+            assert_value_source("from_env", SettingValueSource.ENV)

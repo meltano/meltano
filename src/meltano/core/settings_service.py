@@ -123,7 +123,6 @@ class SettingsService(ABC):
         for setting in self.definitions():
             value, source = self.get_with_source(setting.name, **kwargs)
             if sources and source not in sources:
-                logging.debug(f"Setting {setting.name} is not in sources: {sources}.")
                 continue
 
             config[setting.name] = {

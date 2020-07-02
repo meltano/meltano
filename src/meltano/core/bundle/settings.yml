@@ -25,3 +25,9 @@ settings:
 - name: ui.forwarded_allow_ips
   value: "127.0.0.1"
   env_aliases: [FORWARDED_ALLOW_IPS]
+
+- name: ui.server_name
+- name: ui.secret_key
+  value: thisisnotapropersecretkey
+- name: ui.password_salt
+  value: b4c124932584ad6e69f2774a0ae5c138

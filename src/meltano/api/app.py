@@ -18,7 +18,7 @@ from meltano.core.db import project_engine
 from meltano.core.logging.utils import current_log_level, FORMAT
 from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.oauth.app import app as oauth_service
+from meltano.oauth.app import create_app as create_oauth_service
 
 
 # the logger we setup here is for the `meltano.api` module
@@ -40,15 +40,13 @@ def create_app(config={}):
 
     app.config.from_object("meltano.api.config")
     app.config.from_mapping(**meltano.api.config.ProjectSettings(project).as_dict())
-    app.config.from_pyfile("ui.cfg", silent=True)
-    app.config.from_object("meltano.api.config.EnvVarOverrides")
     app.config.from_mapping(**config)
 
     if app.env == "production":
         from meltano.api.config import ensure_secure_setup
 
         app.config.from_object("meltano.api.config.Production")
-        ensure_secure_setup(app)
+        ensure_secure_setup(settings_service)
 
     # File logging
     formatter = logging.Formatter(fmt=FORMAT)
@@ -153,6 +151,8 @@ def create_app(config={}):
         return res
 
     # create the dispatcher to host the `OAuthService`
-    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/-/oauth": oauth_service})
+    app.wsgi_app = DispatcherMiddleware(
+        app.wsgi_app, {"/-/oauth": create_oauth_service()}
+    )
 
     return app
