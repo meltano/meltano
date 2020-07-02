@@ -148,7 +148,7 @@ export default {
             </p>
             <ul>
               <li>
-                Depending on the specific data source, time period, and amount
+                Depending on the specific extractor, time period, and amount
                 of data, extraction can take as little as a
                 <em>few seconds</em>, or as long as <em>multiple hours</em>.
               </li>
@@ -159,7 +159,7 @@ export default {
               <li>
                 Once extraction is complete, you can explore the imported data
                 using the "Explore" button that will appear on the bottom right
-                of this view and on the Connections page.
+                of this view and on the Extractors page.
               </li>
             </ul>
             <p v-if="isUITrigger && isNotificationEnabled">

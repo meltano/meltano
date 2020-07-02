@@ -1,24 +1,19 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
+import pluralize from 'pluralize'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
-import ExploreButton from '@/components/analyze/ExploreButton'
 
 export default {
   name: 'ExtractorList',
   components: {
-    ConnectorLogo,
-    ExploreButton
+    ConnectorLogo
   },
   computed: {
-    ...mapGetters('plugins', [
-      'getIsLoadingPluginsOfType',
-      'getIsPluginInstalled',
-      'visibleExtractors'
-    ]),
+    ...mapGetters('plugins', ['getIsPluginInstalled', 'visibleExtractors']),
     ...mapGetters('orchestration', [
       'getHasPipelineWithExtractor',
-      'getPipelineWithExtractor'
+      'getPipelinesWithExtractor'
     ]),
     ...mapState('orchestration', ['pipelines']),
     getColumns() {
@@ -31,47 +26,53 @@ export default {
     },
     getConnectionLabel() {
       return extractorName => {
-        const connectLabel = this.getHasPipelineWithExtractor(extractorName)
-          ? 'Edit Connection'
-          : 'Connect'
-        return this.getExtractorConfigurationNeedsFixing(extractorName)
-          ? 'Fix Connection'
-          : connectLabel
-      }
-    },
-    getConnectionTooltip() {
-      return extractorName => {
-        return this.getIsRelatedPipelineRunning(extractorName)
-          ? 'Connection details cannot be changed while pipeline is running'
-          : this.getHasPipelineWithExtractor(extractorName)
-          ? 'Edit the connection details for this data source'
-          : 'Install this data source and set up the connection'
+        return this.getIsPluginInstalled('extractors', extractorName)
+          ? 'Configure'
+          : 'Add to project'
       }
     },
     getConnectionStyle() {
       return extractorName => {
-        const connectStyle = this.getHasPipelineWithExtractor(extractorName)
+        return this.getIsPluginInstalled('extractors', extractorName)
           ? ''
           : 'is-interactive-primary'
-        return this.getExtractorConfigurationNeedsFixing(extractorName)
-          ? 'is-danger'
-          : connectStyle
       }
     },
-    getExtractorConfigurationNeedsFixing() {
+
+    getPipelinesTooltip() {
       return extractorName => {
-        const pipeline = this.getPipelineWithExtractor(extractorName)
-        return pipeline && !pipeline.isRunning && !pipeline.hasEverSucceeded
+        const extractorPipelines = this.getPipelinesWithExtractor(extractorName)
+        if (extractorPipelines.length) {
+          const pipelineNames = extractorPipelines.map(el => el.name)
+          return pipelineNames.join(', ')
+        } else {
+          return 'Create a pipeline'
+        }
       }
     },
-    getIsRelatedPipelineRunning() {
+    getExtractorButtonLabel() {
       return extractorName => {
-        const pipeline = this.getPipelineWithExtractor(extractorName)
-        return pipeline && pipeline.isRunning
+        const pipelineAmount = this.getPipelinesWithExtractor(extractorName)
+          .length
+        return pluralize('pipeline', pipelineAmount, true)
       }
     },
-    getPipeline() {
-      return extractorName => this.getPipelineWithExtractor(extractorName)
+    getExtractorButtonRoute() {
+      return extractorName => {
+        const pipelineAmount = this.getPipelinesWithExtractor(extractorName)
+          .length
+        if (pipelineAmount) {
+          return {
+            name: 'pipelines'
+          }
+        }
+        return {
+          name: 'createPipelineSchedule',
+          query: {
+            extractor: extractorName
+          }
+        }
+      }
     }
   },
   methods: {
@@ -110,46 +111,42 @@ export default {
                 }}</span>
                 <br />
                 <small>{{ extractor.description }}</small>
-                <template
-                  v-if="getIsPluginInstalled('extractors', extractor.name)"
-                >
-                  <br />
-                  <a
-                    class="button is-static is-small is-borderless has-background-white"
-                  >
-                    <span class="icon" :class="`has-text-success`">
-                      <font-awesome-icon
-                        icon="check-circle"
-                      ></font-awesome-icon>
-                    </span>
-                    <span class="has-text-grey is-italic">Installed</span>
-                  </a>
-                </template>
               </p>
               <div class="buttons">
-                <ExploreButton
-                  v-if="getHasPipelineWithExtractor(extractor.name)"
-                  :pipeline="getPipeline(extractor.name)"
-                />
-
-                <router-link
-                  v-if="getHasPipelineWithExtractor(extractor.name)"
-                  class="button tooltip"
-                  data-tooltip="View the pipeline for this data source"
-                  tag="button"
-                  to="pipelines"
-                  >View Pipeline</router-link
-                >
-
                 <button
-                  class="button tooltip"
+                  class="button"
                   :class="getConnectionStyle(extractor.name)"
-                  :disabled="getIsRelatedPipelineRunning(extractor.name)"
-                  :data-tooltip="getConnectionTooltip(extractor.name)"
                   @click="updateExtractorSettings(extractor)"
                 >
                   <span>{{ getConnectionLabel(extractor.name) }}</span>
                 </button>
+                <router-link
+                  v-if="getIsPluginInstalled('extractors', extractor.name)"
+                  class="button tooltip is-borderless"
+                  :data-tooltip="getPipelinesTooltip(extractor.name)"
+                  tag="button"
+                  :to="getExtractorButtonRoute(extractor.name)"
+                >
+                  <span
+                    class="icon is-small"
+                    :class="
+                      getHasPipelineWithExtractor(extractor.name)
+                        ? 'has-text-success'
+                        : 'has-text-danger'
+                    "
+                  >
+                    <font-awesome-icon
+                      :icon="
+                        getHasPipelineWithExtractor(extractor.name)
+                          ? 'check-circle'
+                          : 'exclamation-triangle'
+                      "
+                    ></font-awesome-icon>
+                  </span>
+                  <span>
+                    {{ getExtractorButtonLabel(extractor.name) }}
+                  </span>
+                </router-link>
               </div>
             </div>
           </div>

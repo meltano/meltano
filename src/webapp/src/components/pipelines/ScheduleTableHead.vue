@@ -15,7 +15,7 @@ export default {
         Name
       </th>
       <th>
-        Data Source
+        Extractor
       </th>
       <th>
         Loader

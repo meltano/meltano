@@ -70,9 +70,14 @@ export default {
     }
   },
   created() {
-    this.$store
-      .dispatch('plugins/getInstalledPlugins')
-      .then(() => (this.isLoaded = true))
+    this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
+      this.isLoaded = true
+
+      const { extractor } = this.$route.query
+      if (extractor) {
+        this.pipeline.extractor = extractor
+      }
+    })
   },
   methods: {
     ...mapActions('orchestration', ['savePipelineSchedule']),
@@ -103,7 +108,7 @@ export default {
         })
     },
     close() {
-      this.$emit('close')
+      this.$router.push({ name: 'pipelines' })
     }
   }
 }
@@ -142,7 +147,10 @@ export default {
                 </select>
               </span>
             </div>
-            <router-link to="connections" class="has-text-underlined">
+            <router-link
+              :to="{ name: 'extractors' }"
+              class="has-text-underlined"
+            >
               Manage extractors
             </router-link>
           </div>
@@ -228,7 +236,7 @@ export default {
         </div>
       </section>
       <footer class="modal-card-foot buttons is-right">
-        <button class="button" @click="close">Cancel</button>
+        <router-link class="button" :to="{ name: 'pipelines' }">Cancel</router-link>
         <button
           class="button is-interactive-primary"
           :disabled="isSaving || !isSaveable"

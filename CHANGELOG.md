@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2094](https://gitlab.com/meltano/meltano/-/issues/2069) Turn "Connections" page into "Extractors" management UI
+
 ### Fixes
 
 ### Breaks

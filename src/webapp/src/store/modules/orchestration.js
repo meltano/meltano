@@ -69,6 +69,12 @@ const getters = {
       return state.pipelines.find(pipeline => pipeline.extractor === extractor)
     }
   },
+  
+  getPipelinesWithExtractor(state) {
+    return extractor => {
+      return state.pipelines.filter(pipeline => pipeline.extractor === extractor)
+    }
+  },
 
   getRunningPipelines(state) {
     return state.pipelines.filter(pipeline => pipeline.isRunning)
@@ -252,22 +258,9 @@ const actions = {
     })
   },
 
-  savePipelineSchedule({ commit }, { hasDefaultTransforms, extractorName, pipeline }) {
-    let newPipeline = {}
-    if (!pipeline) {
-      Object.assign(newPipeline, {
-        name: `pipeline-${new Date().getTime()}`,
-        extractor: extractorName,
-        loader: 'target-postgres', // Refactor vs. hard code when we again want to display in the UI
-        transform: hasDefaultTransforms ? 'run' : 'skip',
-        interval: '@daily', // Refactor vs. hard code when we again want to display in the UI
-        isRunning: false
-      })
-    } else {
-      Object.assign(newPipeline, pipeline)
-    }
-    return orchestrationsApi.savePipelineSchedule(newPipeline).then(response => {
-      newPipeline = Object.assign(newPipeline, response.data)
+  savePipelineSchedule({ commit }, { pipeline }) {
+    return orchestrationsApi.savePipelineSchedule(pipeline).then(response => {
+      const newPipeline = Object.assign(pipeline, response.data)
       commit('updatePipelines', newPipeline)
     })
   },
