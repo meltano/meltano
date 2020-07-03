@@ -18,6 +18,8 @@ from flask_security import roles_required, logout_user
 from jinja2 import TemplateNotFound
 
 import meltano
+from meltano.core.project import Project
+from meltano.core.project_settings_service import ProjectSettingsService
 from flask_security import roles_required
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.security.auth import is_unauthorized
@@ -103,12 +105,15 @@ api_root = APIBlueprint("api_root", __name__, url_prefix="/api/v1/")
 
 @api_root.route("/identity")
 def identity():
+    project = Project.find()
+    settings_service = ProjectSettingsService(project)
+
     if current_user.is_anonymous:
         return jsonify(
             {
                 "username": "Anonymous",
                 "anonymous": True,
-                "can_sign_in": current_app.config["MELTANO_AUTHENTICATION"],
+                "can_sign_in": settings_service.get("ui.authentication"),
             }
         )
 

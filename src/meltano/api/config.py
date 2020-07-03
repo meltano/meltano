@@ -18,8 +18,6 @@ PROFILE = truthy(os.getenv("FLASK_PROFILE"))
 
 # Meltano
 # -----------------
-MELTANO_AUTHENTICATION = truthy(os.getenv("MELTANO_AUTHENTICATION"))
-MELTANO_READONLY = truthy(os.getenv("MELTANO_READONLY"))
 MELTANO_UI_URL = os.getenv("MELTANO_UI_URL", "/")
 
 API_ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -31,7 +29,7 @@ PROJECT_ROOT_DIR = os.path.dirname(API_ROOT_DIR)
 SQLALCHEMY_ECHO = False
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-# Flask-security
+# Flask-Security
 # -----------------
 
 SECURITY_PASSWORD_HASH = "bcrypt"

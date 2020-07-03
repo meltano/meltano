@@ -44,6 +44,14 @@ settings:
   value: b4c124932584ad6e69f2774a0ae5c138
 
 # UI features
+- name: ui.readonly
+  kind: boolean
+  value: false
+  env_aliases: [MELTANO_READONLY]
+- name: ui.authentication
+  kind: boolean
+  value: false
+  env_aliases: [MELTANO_AUTHENTICATION]
 - name: ui.notification
   kind: boolean
   value: false

@@ -1,5 +1,6 @@
 import pytest
 from flask import url_for
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.api.security import users
 from meltano.api.models.security import db, Role
 
@@ -8,7 +9,12 @@ from meltano.api.models.security import db, Role
 class TestRoles:
     @pytest.fixture
     def app(self, create_app):
-        return create_app(MELTANO_AUTHENTICATION=True)
+        config_override = ProjectSettingsService.config_override
+        original_authentication = config_override.get("ui.authentication", None)
+
+        config_override["ui.authentication"] = True
+        yield create_app()
+        config_override["ui.authentication"] = original_authentication
 
     @pytest.mark.parametrize(
         "user,status_code", [("alice", 201), ("rob", 403), (None, 401)]
