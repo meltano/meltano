@@ -130,14 +130,17 @@ def create_app(config={}):
         appUrl = urlsplit(request.host_url)
         g.jsContext = {"appUrl": appUrl.geturl()[:-1]}
 
-        if tracker.send_anonymous_usage_stats:
-            g.jsContext["isSendAnonymousUsageStats"] = True
-            g.jsContext["trackingID"] = app.config["MELTANO_UI_TRACKING_ID"]
-            g.jsContext["embedTrackingID"] = app.config["MELTANO_EMBED_TRACKING_ID"]
-            g.jsContext["projectId"] = tracker.project_id
-
         g.jsContext["isNotificationEnabled"] = app.config["MELTANO_NOTIFICATION"]
         g.jsContext["version"] = meltano.__version__
+        setting_map = {
+            "isSendAnonymousUsageStats": "send_anonymous_usage_stats",
+            "projectId": "project_id",
+            "trackingID": "tracking_ids.ui",
+            "embedTrackingID": "tracking_ids.ui_embed",
+        }
+
+        for context_key, setting_name in setting_map.items():
+            g.jsContext[context_key] = settings_service.get(setting_name)
 
         # setup the oauthServiceUrl
         g.jsContext["oauthServiceUrl"] = app.config["MELTANO_OAUTH_SERVICE_URL"]

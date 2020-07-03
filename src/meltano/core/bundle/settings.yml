@@ -10,6 +10,17 @@ settings:
 - name: database_uri
   value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db
 
+# Analytics Tracking IDs
+- name: tracking_ids.cli
+  value: UA-132758957-3
+  env_aliases: [MELTANO_CLI_TRACKING_ID]
+- name: tracking_ids.ui
+  value: UA-132758957-2
+  env_aliases: [MELTANO_UI_TRACKING_ID]
+- name: tracking_ids.ui_embed
+  value: UA-132758957-6
+  env_aliases: [MELTANO_EMBED_TRACKING_ID]
+
 # UI settings
 - name: ui.bind_host
   value: "0.0.0.0"
