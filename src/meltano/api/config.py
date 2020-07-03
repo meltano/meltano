@@ -20,12 +20,6 @@ PROFILE = truthy(os.getenv("FLASK_PROFILE"))
 # -----------------
 MELTANO_AUTHENTICATION = truthy(os.getenv("MELTANO_AUTHENTICATION"))
 MELTANO_NOTIFICATION = truthy(os.getenv("MELTANO_NOTIFICATION"))
-MELTANO_OAUTH_SERVICE_URL = os.getenv("MELTANO_OAUTH_SERVICE_URL", None)
-MELTANO_OAUTH_SERVICE_PROVIDERS = [
-    provider
-    for provider in (os.getenv("MELTANO_OAUTH_SERVICE_PROVIDERS", "").split(","))
-    if provider
-]
 MELTANO_READONLY = truthy(os.getenv("MELTANO_READONLY"))
 MELTANO_UI_URL = os.getenv("MELTANO_UI_URL", "/")
 

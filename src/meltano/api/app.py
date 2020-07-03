@@ -137,15 +137,15 @@ def create_app(config={}):
             "projectId": "project_id",
             "trackingID": "tracking_ids.ui",
             "embedTrackingID": "tracking_ids.ui_embed",
+            "oauthServiceUrl": "ui.oauth_service.url",
         }
 
         for context_key, setting_name in setting_map.items():
             g.jsContext[context_key] = settings_service.get(setting_name)
 
-        # setup the oauthServiceUrl
-        g.jsContext["oauthServiceUrl"] = app.config["MELTANO_OAUTH_SERVICE_URL"]
-        g.jsContext["oauthServiceProviders"] = app.config[
-            "MELTANO_OAUTH_SERVICE_PROVIDERS"
+        providers = settings_service.get("ui.oauth_service.providers")
+        g.jsContext["oauthServiceProviders"] = [
+            provider for provider in providers.split(",") if provider
         ]
 
     @app.after_request
