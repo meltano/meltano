@@ -14,7 +14,7 @@ _bind_host = _settings_service.get("ui.bind_host")
 _bind_port = _settings_service.get("ui.bind_port")
 bind = f"{_bind_host}:{_bind_port}"
 
-workers = int(os.getenv("WORKERS", 4))
+workers = _settings_service.get("ui.workers")
 timeout = 600
 
 

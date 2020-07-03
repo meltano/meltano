@@ -18,3 +18,7 @@ settings:
   kind: integer
   value: 5000
   env_aliases: [MELTANO_API_PORT]
+- name: ui.workers
+  kind: integer
+  value: 4
+  env_aliases: [WORKERS]
