@@ -5,12 +5,14 @@ from meltano.api.config import ProjectSettings as APIProjectSettings
 
 # session are used internally to verify the tokens
 SECRET_KEY = token_hex(64)
-FACEBOOK_CLIENT_ID = os.getenv("OAUTH_FACEBOOK_CLIENT_ID")
-FACEBOOK_CLIENT_SECRET = os.getenv("OAUTH_FACEBOOK_CLIENT_SECRET")
-
-GOOGLE_ADWORDS_CLIENT_ID = os.getenv("OAUTH_GOOGLE_ADWORDS_CLIENT_ID")
-GOOGLE_ADWORDS_CLIENT_SECRET = os.getenv("OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET")
 
 
 class ProjectSettings(APIProjectSettings):
-    settings_map = {"SERVER_NAME": "ui.server_name"}
+    settings_map = {
+        "SERVER_NAME": "ui.server_name",
+        # Flask-Authlib
+        "FACEBOOK_CLIENT_ID": "oauth.facebook.client_id",
+        "FACEBOOK_CLIENT_SECRET": "oauth.facebook.client_secret",
+        "GOOGLE_ADWORDS_CLIENT_ID": "oauth.google_adwords.client_id",
+        "GOOGLE_ADWORDS_CLIENT_SECRET": "oauth.google_adwords.client_secret",
+    }

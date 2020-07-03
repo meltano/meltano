@@ -81,12 +81,6 @@ MAIL_USERNAME = os.getenv("MAIL_USERNAME")
 MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
 MAIL_DEBUG = truthy(os.getenv("MAIL_DEBUG"))
 
-# Flask-Authlib
-# -----------------
-
-GITLAB_CLIENT_ID = os.getenv("OAUTH_GITLAB_APPLICATION_ID")
-GITLAB_CLIENT_SECRET = os.getenv("OAUTH_GITLAB_SECRET")
-
 # Flask-RESTful
 # -----------------
 
@@ -107,10 +101,15 @@ CORS_ALLOW_HEADERS = ["CONTENT-TYPE", JSON_SCHEME_HEADER]
 
 class ProjectSettings(object):
     settings_map = {
-        "SQLALCHEMY_DATABASE_URI": "database_uri",
         "SERVER_NAME": "ui.server_name",
         "SECRET_KEY": "ui.secret_key",
+        # Flask-Security
         "SECURITY_PASSWORD_SALT": "ui.password_salt",
+        # Flask-SQLAlchemy
+        "SQLALCHEMY_DATABASE_URI": "database_uri",
+        # Flask-Authlib
+        "GITLAB_CLIENT_ID": "oauth.gitlab.client_id",
+        "GITLAB_CLIENT_SECRET": "oauth.gitlab.client_secret",
     }
 
     def __init__(self, project: Project):

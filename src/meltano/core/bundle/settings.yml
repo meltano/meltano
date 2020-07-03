@@ -31,3 +31,22 @@ settings:
   value: thisisnotapropersecretkey
 - name: ui.password_salt
   value: b4c124932584ad6e69f2774a0ae5c138
+
+# OAuth provider settings
+- name: oauth.gitlab.client_id
+  env: OAUTH_GITLAB_CLIENT_ID
+  env_aliases: [OAUTH_GITLAB_APPLICATION_ID]
+- name: oauth.gitlab.client_secret
+  kind: password
+  env: OAUTH_GITLAB_CLIENT_SECRET
+  env_aliases: [OAUTH_GITLAB_SECRET]
+- name: oauth.facebook.client_id
+  env: OAUTH_FACEBOOK_CLIENT_ID
+- name: oauth.facebook.client_secret
+  kind: password
+  env: OAUTH_FACEBOOK_CLIENT_SECRET
+- name: oauth.google_adwords.client_id
+  env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
+- name: oauth.google_adwords.client_secret
+  kind: password
+  env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
