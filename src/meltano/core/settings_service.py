@@ -40,12 +40,12 @@ class SettingValueSource(str, Enum):
     @property
     def label(self):
         labels = {
-            self.CONFIG_OVERRIDE: "command line flag",
-            self.ENV: "environment",
-            self.DOTENV: ".env",
-            self.MELTANO_YML: "meltano.yml",
-            self.DB: "system database",
-            self.DEFAULT: "default",
+            self.CONFIG_OVERRIDE: "a command line flag",
+            self.ENV: "the environment",
+            self.DOTENV: "`.env`",
+            self.MELTANO_YML: "`meltano.yml`",
+            self.DB: "the system database",
+            self.DEFAULT: "the default",
         }
         return labels[self]
 

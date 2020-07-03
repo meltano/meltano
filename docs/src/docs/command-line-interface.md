@@ -486,7 +486,10 @@ Start the Meltano UI.
 This command is only relevant for production-grade setup.
 :::
 
-Generate secure secrets in the `ui.cfg` so that the application is secure.
+Generate secrets for the `ui.secret_key` and `ui.password_salt` settings and
+store them and the provided `server_name` in a `.env` in your project directory so that the application is secure.
+
+These settings can also be set or overridden in [the environment](./environment-variables.html#production-configuration).
 
 ::: warning
 Regenerating secrets will cause the following:
@@ -497,9 +500,16 @@ Regenerating secrets will cause the following:
 Use with caution!
 :::
 
-#### --bits
+#### How to use
 
-Specify the size of the secrets, default to 256.
+The `--bits` flag can be used to specify the size of the secrets, default to 256.
+
+```bash
+# Format
+meltano ui setup [--bits=256] <server_name>
+
+meltano ui setup meltano.example.com
+```
 
 ## `user`
 
