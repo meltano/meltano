@@ -3,27 +3,34 @@ import requests
 import threading
 import time
 import webbrowser
-from colorama import Fore
+import click
+
+from meltano.core.project_settings_service import ProjectSettingsService
 
 
 class UIAvailableWorker(threading.Thread):
-    def __init__(self, url, open_browser=False):
+    def __init__(self, project, open_browser=False):
         super().__init__()
-        self._terminate = False
 
-        self.url = url
+        self.project = project
         self.open_browser = open_browser
 
+        self.settings_service = ProjectSettingsService(self.project)
+
+        self._terminate = False
+
     def run(self):
+        bind_port = self.settings_service.get("ui.bind_port")
+        url = f"http://localhost:{bind_port}"
+
         while not self._terminate:
             try:
-                response = requests.get(self.url)
+                response = requests.get(url)
                 if response.status_code == 200:
-                    print(f"{Fore.GREEN}Meltano is available at {self.url}{Fore.RESET}")
+                    click.secho(f"Meltano UI is now available at {url}", fg="green")
                     if self.open_browser:
-                        webbrowser.open(self.url)
+                        webbrowser.open(url)
                     self._terminate = True
-
             except:
                 pass
 

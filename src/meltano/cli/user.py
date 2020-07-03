@@ -5,7 +5,6 @@ from . import cli
 from .params import project
 from flask_security.utils import hash_password
 from meltano.api.app import create_app
-from meltano.core.db import project_engine
 from meltano.core.utils import identity
 
 
@@ -23,8 +22,7 @@ def user(ctx, project):
 @click.option("--role", "-G", multiple=True)
 @click.pass_context
 def add(ctx, username, password, role=[], **flags):
-    engine, _ = project_engine(ctx.obj["project"])
-    app = create_app({"SQLALCHEMY_DATABASE_URI": str(engine.url)})
+    app = create_app()
 
     from meltano.api.security import users
 

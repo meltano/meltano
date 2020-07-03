@@ -39,7 +39,7 @@ def config(ctx, project, plugin_type, plugin_name, format):
 
         if ctx.invoked_subcommand is None:
             if format == "json":
-                config = settings.as_config(session=session)
+                config = settings.as_dict(session=session)
                 print(json.dumps(config))
             elif format == "env":
                 for env, value in settings.as_env(session=session).items():
@@ -112,8 +112,8 @@ def list_settings(ctx):
 
         click.secho(name, fg="blue", nl=False)
 
-        env_key = settings.setting_env(setting_def)
-        click.echo(f" [env: {env_key}]", nl=False)
+        env_keys = [settings.setting_env(setting_def), *setting_def.env_aliases]
+        click.echo(f" [env: {', '.join(env_keys)}]", nl=False)
 
         current_value = click.style(f"{value!r}", fg="green")
         if source is SettingValueSource.DEFAULT:

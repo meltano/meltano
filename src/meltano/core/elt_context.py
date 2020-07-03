@@ -28,7 +28,7 @@ class PluginContext(
 
     @property
     def config(self):
-        return self.settings_service.as_config(self.session, self.ref)
+        return self.settings_service.as_dict(self.session, self.ref)
 
     @property
     def config_env(self):

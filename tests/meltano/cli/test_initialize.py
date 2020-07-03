@@ -24,7 +24,7 @@ class TestCliInit:
         project = Project.find()
 
         # Deactivate project
-        Project._default = None
+        Project.deactivate()
 
         files = (
             project.root.joinpath(file).resolve()
@@ -49,3 +49,7 @@ class TestCliInit:
 
         for dir in dirs:
             assert dir.is_dir()
+
+        meltano_yml = project.root_dir("meltano.yml").read_text()
+        assert "send_anonymous_usage_stats: false" in meltano_yml
+        assert "project_id:" not in meltano_yml

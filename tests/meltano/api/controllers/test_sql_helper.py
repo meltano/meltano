@@ -34,7 +34,7 @@ class TestSqlHelper:
             "with_env_override",
             return_value=plugin_settings_service,
         ), mock.patch.object(
-            plugin_settings_service, "as_config", return_value=sample_config
+            plugin_settings_service, "as_dict", return_value=sample_config
         ), mock.patch.object(
             plugin_settings_service, "as_env", return_value={}
         ), mock.patch(
@@ -72,7 +72,7 @@ class TestSqlHelper:
             "with_env_override",
             return_value=plugin_settings_service,
         ), mock.patch.object(
-            plugin_settings_service, "as_config", return_value=sample_config
+            plugin_settings_service, "as_dict", return_value=sample_config
         ), mock.patch.object(
             plugin_settings_service, "as_env", return_value={}
         ), mock.patch(

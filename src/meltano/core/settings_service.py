@@ -11,14 +11,12 @@ from meltano.core.utils import (
     find_named,
     setting_env,
     NotFound,
-    truthy,
     flatten,
     set_at_path,
     pop_at_path,
 )
 from .setting_definition import SettingDefinition
 from .setting import Setting
-from .plugin_discovery_service import PluginDiscoveryService
 from .config_service import ConfigService
 from .error import Error
 
@@ -62,7 +60,6 @@ class SettingsService(ABC):
     def __init__(
         self,
         project,
-        plugin_discovery_service: PluginDiscoveryService = None,
         config_service: ConfigService = None,
         show_hidden=True,
         env_override={},
@@ -70,17 +67,12 @@ class SettingsService(ABC):
     ):
         self.project = project
 
-        self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
-            project
-        )
         self.config_service = config_service or ConfigService(project)
 
         self.show_hidden = show_hidden
 
         self.env_override = env_override
         self.config_override = config_override
-
-        self._env = None
 
     @property
     @abstractmethod
@@ -99,23 +91,20 @@ class SettingsService(ABC):
 
     @property
     @abstractmethod
-    def _current_config(self) -> Dict:
+    def _meltano_yml_config(self) -> Dict:
         pass
 
     @abstractmethod
-    def _update_config(self):
+    def _update_meltano_yml_config(self):
         pass
 
     @property
-    def flat_current_config(self):
-        return flatten(self._current_config, "dot")
+    def flat_meltano_yml_config(self):
+        return flatten(self._meltano_yml_config, "dot")
 
     @property
     def env(self):
-        if not self._env:
-            self._env = {**os.environ, **self.env_override}
-
-        return self._env
+        return {**os.environ, **self.env_override}
 
     @classmethod
     def is_kind_redacted(cls, kind) -> bool:
@@ -129,28 +118,11 @@ class SettingsService(ABC):
 
         return {k: v for k, v in values.items() if v != REDACTED_VALUE}
 
-    def with_env_override(self, env_override):
-        return self.__class__(
-            *self._args,
-            **self._kwargs,
-            env_override={**self.env_override, **env_override},
-            config_override=self.config_override,
-        )
-
-    def with_config_override(self, config_override):
-        return self.__class__(
-            *self._args,
-            **self._kwargs,
-            env_override=self.env_override,
-            config_override={**self.config_override, **config_override},
-        )
-
     def config_with_metadata(self, sources: List[SettingValueSource] = None, **kwargs):
         config = {}
         for setting in self.definitions():
-            value, source = self.get_value(setting.name, **kwargs)
+            value, source = self.get_with_source(setting.name, **kwargs)
             if sources and source not in sources:
-                logging.debug(f"Setting {setting.name} is not in sources: {sources}.")
                 continue
 
             config[setting.name] = {
@@ -161,7 +133,7 @@ class SettingsService(ABC):
 
         return config
 
-    def as_config(self, *args, **kwargs) -> Dict:
+    def as_dict(self, *args, **kwargs) -> Dict:
         full_config = self.config_with_metadata(*args, **kwargs)
 
         return {key: config["value"] for key, config in full_config.items()}
@@ -175,7 +147,7 @@ class SettingsService(ABC):
             if config["value"] is not None
         }
 
-    def get_value(self, name: str, redacted=False, session=None):
+    def get_with_source(self, name: str, redacted=False, session=None):
         try:
             setting_def = self.find_setting(name)
         except SettingMissingError:
@@ -192,19 +164,26 @@ class SettingsService(ABC):
                 return None
 
             env_key = self.setting_env(setting_def)
+            env_getters = {
+                env_key: lambda env: env[env_key],
+                **setting_def.env_alias_getters,
+            }
 
-            try:
-                return self.env[env_key]
-            except KeyError:
-                return None
-            else:
-                logging.debug(
-                    f"Found ENV variable {env_key} for {self._env_namespace}:{name}"
-                )
+            for key, getter in env_getters.items():
+                try:
+                    return getter(self.env)
+                except KeyError:
+                    pass
+                else:
+                    logging.debug(
+                        f"Found ENV variable {key} for {self._env_namespace}:{name}"
+                    )
+
+            return None
 
         def meltano_yml_getter():
             try:
-                value = self.flat_current_config[name]
+                value = self.flat_meltano_yml_config[name]
                 return self.expand_env_vars(value)
             except KeyError:
                 return None
@@ -242,7 +221,7 @@ class SettingsService(ABC):
                 break
 
         if setting_def:
-            value = self.cast_value(setting_def, value)
+            value = setting_def.cast_value(value)
 
             # we don't want to leak secure informations
             # so we redact all `passwords`
@@ -250,6 +229,10 @@ class SettingsService(ABC):
                 value = REDACTED_VALUE
 
         return value, source
+
+    def get(self, *args, **kwargs):
+        value, _ = self.get_with_source(*args, **kwargs)
+        return value
 
     def set(
         self, path: List[str], value, store=SettingValueStore.MELTANO_YML, session=None
@@ -268,7 +251,7 @@ class SettingsService(ABC):
             setting_def = None
 
         if setting_def:
-            value = self.cast_value(setting_def, value)
+            value = setting_def.cast_value(value)
 
             env_key = self.setting_env(setting_def)
 
@@ -276,7 +259,7 @@ class SettingsService(ABC):
                 logging.warning(f"Setting `{name}` is currently set via ${env_key}.")
 
         def meltano_yml_setter():
-            config = self._current_config
+            config = self._meltano_yml_config
 
             if value is None:
                 config.pop(name, None)
@@ -291,7 +274,7 @@ class SettingsService(ABC):
 
                 set_at_path(config, path, value)
 
-            self._update_config()
+            self._update_meltano_yml_config()
             return True
 
         def db_setter():
@@ -326,8 +309,8 @@ class SettingsService(ABC):
 
     def reset(self, store=SettingValueStore.MELTANO_YML, session=None):
         def meltano_yml_resetter():
-            self._current_config.clear()
-            self._update_config()
+            self._meltano_yml_config.clear()
+            self._update_meltano_yml_config()
             return True
 
         def db_resetter():
@@ -355,7 +338,7 @@ class SettingsService(ABC):
         definitions.extend(
             (
                 SettingDefinition.from_key_value(k, v)
-                for k, v in self.flat_current_config.items()
+                for k, v in self.flat_meltano_yml_config.items()
                 if k not in definition_names
             )
         )
@@ -377,12 +360,6 @@ class SettingsService(ABC):
 
     def setting_env(self, setting_def):
         return setting_def.env or setting_env(self._env_namespace, setting_def.name)
-
-    def cast_value(self, setting_def, value):
-        if isinstance(value, str) and setting_def.kind == "boolean":
-            value = truthy(value)
-
-        return value
 
     def expand_env_vars(self, raw_value):
         if not isinstance(raw_value, str):

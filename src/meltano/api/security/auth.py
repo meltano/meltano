@@ -8,8 +8,11 @@ from flask_security import auth_required
 from flask_login import current_user
 from flask_principal import Permission, Need
 from werkzeug.exceptions import Forbidden
-from .identity import FreeUser
+
+from meltano.core.project import Project
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.api.models import db
+from .identity import FreeUser
 
 HTTP_READONLY_CODE = 499
 
@@ -63,13 +66,16 @@ def permit(permission_type, context):
 
 
 def is_unauthorized():
-    if current_app.config["MELTANO_READONLY"]:
+    project = Project.find()
+    settings_service = ProjectSettingsService(project)
+
+    if settings_service.get("ui.readonly"):
         # If we're in read-only mode, the `@roles_required("admin")` checks
         # will take care of enforcing authentication as appropriate
         logging.debug(f"Authentication not required because of read-only mode")
         return False
 
-    if not current_app.config["MELTANO_AUTHENTICATION"]:
+    if not settings_service.get("ui.authentication"):
         logging.debug(f"Authentication not required because it's disabled")
         return False
 
@@ -97,7 +103,9 @@ def unauthorized_callback():
     instead of redirecting anywhere.
     """
 
-    if current_app.config["MELTANO_READONLY"]:
+    project = Project.find()
+    settings_service = ProjectSettingsService(project)
+    if settings_service.get("ui.readonly"):
         return "Meltano is currently running in read-only mode.", HTTP_READONLY_CODE
     else:
         return "You do not have the required permissions.", 403

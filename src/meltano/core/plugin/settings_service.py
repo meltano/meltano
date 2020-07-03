@@ -1,5 +1,6 @@
 from typing import Iterable, Dict, List
 
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import (
     SettingsService,
     SettingMissingError,
@@ -7,6 +8,7 @@ from meltano.core.settings_service import (
     SettingValueStore,
     REDACTED_VALUE,
 )
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin import PluginRef, PluginType, Plugin, PluginInstall, Profile
 from meltano.core.plugin.error import PluginMissingError
 
@@ -59,8 +61,8 @@ class PluginSettingsService:
     def config_with_metadata(self, session, plugin: PluginRef, *args, **kwargs):
         return self.build(plugin).config_with_metadata(*args, **kwargs, session=session)
 
-    def as_config(self, session, plugin: PluginRef, *args, **kwargs):
-        return self.build(plugin).as_config(*args, **kwargs, session=session)
+    def as_dict(self, session, plugin: PluginRef, *args, **kwargs):
+        return self.build(plugin).as_dict(*args, **kwargs, session=session)
 
     def as_env(self, session, plugin: PluginRef, *args, **kwargs):
         return self.build(plugin).as_env(*args, **kwargs, session=session)
@@ -80,8 +82,11 @@ class PluginSettingsService:
     ):
         return self.build(plugin).reset(*args, **kwargs, store=store, session=session)
 
-    def get_value(self, session, plugin: PluginRef, *args, **kwargs):
-        return self.build(plugin).get_value(*args, **kwargs, session=session)
+    def get_with_source(self, session, plugin: PluginRef, *args, **kwargs):
+        return self.build(plugin).get_with_source(*args, **kwargs, session=session)
+
+    def get(self, session, plugin: PluginRef, *args, **kwargs):
+        return self.build(plugin).get(*args, **kwargs, session=session)
 
     def definitions(self, plugin: PluginRef):
         return self.build(plugin).definitions()
@@ -94,15 +99,32 @@ class PluginSettingsService:
 
 
 class SpecificPluginSettingsService(SettingsService):
-    def __init__(self, plugin: PluginRef, *args, **kwargs):
+    def __init__(
+        self,
+        plugin: PluginRef,
+        *args,
+        plugin_discovery_service: PluginDiscoveryService = None,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
 
         self.plugin = plugin
 
-        self.plugin_def = self.discovery_service.find_plugin(
+        discovery_service = plugin_discovery_service or PluginDiscoveryService(
+            self.project
+        )
+        self.plugin_def = discovery_service.find_plugin(
             self.plugin.type, self.plugin.name
         )
         self._plugin_install = None
+
+        project_settings_service = ProjectSettingsService(self.project)
+
+        self.env_override = {
+            **project_settings_service.env,
+            **project_settings_service.as_env(),
+            **self.env_override,
+        }
 
     @property
     def plugin_install(self):
@@ -124,13 +146,13 @@ class SpecificPluginSettingsService(SettingsService):
         return self.plugin_def.settings
 
     @property
-    def _current_config(self):
+    def _meltano_yml_config(self):
         try:
             return self.plugin_install.current_config
         except PluginMissingError:
             return {}
 
-    def _update_config(self):
+    def _update_meltano_yml_config(self):
         self.config_service.update_plugin(self.plugin_install)
 
     def profile_with_config(self, profile: Profile, **kwargs):

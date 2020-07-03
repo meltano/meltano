@@ -1,12 +1,18 @@
 import logging
 import pytest
+from _pytest.monkeypatch import MonkeyPatch
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
 
 
-@pytest.fixture(autouse=True)
-def engine_uri_env(monkeypatch, engine_uri):
+@pytest.fixture(scope="session", autouse=True)
+def engine_uri_env(engine_uri):
+    monkeypatch = MonkeyPatch()
     monkeypatch.setenv("MELTANO_DATABASE_URI", engine_uri)
+
+    yield
+
+    monkeypatch.undo()
 
 
 @pytest.fixture(scope="class", autouse=True)

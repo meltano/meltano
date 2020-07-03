@@ -69,7 +69,7 @@ def validate_plugin_config(
             )
             return False
 
-    old_value, source = settings.get_value(db.session, plugin, name)
+    old_value, source = settings.get_with_source(db.session, plugin, name)
     if source in (SettingValueSource.ENV, SettingValueSource.MELTANO_YML):
         logging.warning(
             "Cannot override a configuration set in the environment or meltano.yml."

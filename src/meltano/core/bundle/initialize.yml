@@ -1,6 +1,5 @@
 meltano.yml: |
   version: 1
-  send_anonymous_usage_stats: true
 README.md: ""
 requirements.txt: ""
 .gitignore: |

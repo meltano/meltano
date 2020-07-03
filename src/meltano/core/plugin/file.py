@@ -60,7 +60,7 @@ class FilePlugin(PluginInstall):
         session = Session()
         try:
             plugin_settings_service = PluginSettingsService(project)
-            raw_config = plugin_settings_service.as_config(session, self)
+            raw_config = plugin_settings_service.as_dict(session, self)
         finally:
             session.close()
 

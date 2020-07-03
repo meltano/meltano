@@ -6,13 +6,12 @@ from functools import singledispatch
 from typing import List, Dict
 from pathlib import Path
 
-from meltano.core.utils import truthy
-from meltano.core.plugin import PluginType
-from meltano.core.plugin.meltano_file import MeltanoFilePlugin
-from meltano.core.db import project_engine
-from meltano.core.migration_service import MigrationService
+from .utils import truthy
+from .project_settings_service import ProjectSettingsService
 from .project import Project
-from .venv_service import VenvService
+from .plugin.meltano_file import MeltanoFilePlugin
+from .db import project_engine
+from .migration_service import MigrationService
 
 
 class ProjectInitServiceError(Exception):
@@ -23,7 +22,7 @@ class ProjectInitService:
     def __init__(self, project_name):
         self.project_name = project_name.lower()
 
-    def init(self, activate=True, engine_uri=None, add_discovery=False) -> Project:
+    def init(self, activate=True, add_discovery=False) -> Project:
         try:
             os.mkdir(self.project_name)
         except Exception as e:
@@ -32,16 +31,15 @@ class ProjectInitService:
         click.echo(f" {self.project_name}")
 
         self.project = Project(self.project_name)
+        self.settings_service = ProjectSettingsService(self.project)
+
         self.create_files(add_discovery=add_discovery)
+        self.set_send_anonymous_usage_stats()
 
         if activate:
             Project.activate(self.project)
 
-        if engine_uri:
-            engine_uri = engine_uri.replace(
-                "$MELTANO_PROJECT_ROOT", str(self.project.root)
-            )
-            self.create_system_database(engine_uri)
+        self.create_system_database()
 
         return self.project
 
@@ -53,10 +51,19 @@ class ProjectInitService:
             click.secho(f"Created", fg="blue", nl=False)
             click.echo(f" {self.project_name}/{path}")
 
-    def create_system_database(self, engine_uri):
+    def set_send_anonymous_usage_stats(self):
+        # Ensure the value is explicitly stored in `meltano.yml`
+        self.settings_service.set(
+            "send_anonymous_usage_stats",
+            self.settings_service.get("send_anonymous_usage_stats"),
+        )
+
+    def create_system_database(self):
         click.secho(f"Creating system database...", fg="blue")
+
         # register the system database connection
-        engine, _ = project_engine(self.project, engine_uri, default=True)
+        database_uri = self.settings_service.get("database_uri")
+        engine, _ = project_engine(self.project, database_uri, default=True)
 
         migration_service = MigrationService(engine)
         migration_service.upgrade()

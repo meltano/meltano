@@ -9,11 +9,12 @@ from sqlalchemy import create_engine
 from click_default_group import DefaultGroup
 
 from meltano.core.project import Project
+from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.db import project_engine
 from meltano.core.migration_service import MigrationService
 from meltano.core.upgrade_service import UpgradeService, UpgradeError
 from . import cli
-from .params import project, db_options
+from .params import project
 
 
 @cli.group(cls=DefaultGroup, default="all", default_if_no_args=True)
@@ -31,6 +32,7 @@ def upgrade(ctx, project):
 @click.option("--skip-package", is_flag=True, default=False)
 @click.pass_context
 def all(ctx, pip_url, force, skip_package):
+    project = ctx.obj["project"]
     upgrade_service = ctx.obj["upgrade_service"]
 
     try:
@@ -54,9 +56,9 @@ def all(ctx, pip_url, force, skip_package):
                 # Shell out instead of calling `upgrade_service` methods to
                 # ensure the latest code is used.
                 click.echo()
-                run = subprocess.run(
-                    ["meltano", "upgrade", "--skip-package"],
-                    env={**os.environ, "MELTANO_PACKAGE_UPGRADED": "true"},
+                run = MeltanoInvoker(project).invoke(
+                    ["upgrade", "--skip-package"],
+                    env={"MELTANO_PACKAGE_UPGRADED": "true"},
                 )
 
                 if run.returncode == 0:

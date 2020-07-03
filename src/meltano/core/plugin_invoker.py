@@ -90,7 +90,7 @@ class PluginInvoker:
         }
 
     def prepare(self, session):
-        self.plugin_config = self.settings_service.as_config(session, self.plugin)
+        self.plugin_config = self.settings_service.as_dict(session, self.plugin)
         self.plugin_config_env = self.settings_service.as_env(session, self.plugin)
 
         with self.plugin.trigger_hooks("configure", self, session):

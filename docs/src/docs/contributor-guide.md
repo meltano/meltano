@@ -206,12 +206,13 @@ Each extractor (tap) and loader (target) in the `discovery.yml` has a `settings`
       label: Setting Name # Optional (human friendly text display of the setting name)
       value: '' # Optional (Use to set a default value)
       placeholder: Ex. format_like_this # Optional (Use to set the input's placeholder default)
-      kind: string # Optional (Use for a first-class input control. Default is `string`, others are `hidden`, `boolean`, `date_iso8601`, `password`, `options`, & `file`)
+      kind: string # Optional (Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `password`, `options`, `file`, and `hidden`)
       description: Setting description # Optional (Use to provide inline context)
       tooltip: Here is some more info... # Optional (use to provide additional inline context)
       documentation: https://meltano.com/ # Optional (use to link to specific supplemental documentation)
       protected: true # Optional (use in combination with `value` to provide an uneditable default)
       env: SOME_API_KEY # Optional (use to delegate to an environment variable for overriding this setting's value)
+      env_aliases: [OTHER_ENV] # Optional (use to delegate alternative environment variables for overriding this setting's value)
 ```
 
 ## Plugin Development

@@ -1,0 +1,109 @@
+settings:
+# Project settings
+- name: send_anonymous_usage_stats
+  kind: boolean
+  value: true
+  env_aliases: ["!MELTANO_DISABLE_TRACKING"]
+- name: project_id
+
+# Environment-specific project settings
+- name: database_uri
+  value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db
+
+# Analytics Tracking IDs
+- name: tracking_ids.cli
+  value: UA-132758957-3
+  env_aliases: [MELTANO_CLI_TRACKING_ID]
+- name: tracking_ids.ui
+  value: UA-132758957-2
+  env_aliases: [MELTANO_UI_TRACKING_ID]
+- name: tracking_ids.ui_embed
+  value: UA-132758957-6
+  env_aliases: [MELTANO_EMBED_TRACKING_ID]
+
+# UI settings
+- name: ui.bind_host
+  value: "0.0.0.0"
+  env_aliases: [MELTANO_API_HOSTNAME]
+- name: ui.bind_port
+  kind: integer
+  value: 5000
+  env_aliases: [MELTANO_API_PORT]
+- name: ui.workers
+  kind: integer
+  value: 4
+  env_aliases: [WORKERS]
+- name: ui.forwarded_allow_ips
+  value: "127.0.0.1"
+  env_aliases: [FORWARDED_ALLOW_IPS]
+
+- name: ui.server_name
+- name: ui.secret_key
+  value: thisisnotapropersecretkey
+- name: ui.password_salt
+  value: b4c124932584ad6e69f2774a0ae5c138
+
+# UI features
+- name: ui.readonly
+  kind: boolean
+  value: false
+  env_aliases: [MELTANO_READONLY]
+- name: ui.authentication
+  kind: boolean
+  value: false
+  env_aliases: [MELTANO_AUTHENTICATION]
+- name: ui.notification
+  kind: boolean
+  value: false
+  env_aliases: [MELTANO_NOTIFICATION]
+
+# OAuth service settings
+- name: ui.oauth_service.url
+  env_aliases: [MELTANO_OAUTH_SERVICE_URL]
+- name: ui.oauth_service.providers
+  value: all
+  env_aliases: [MELTANO_OAUTH_SERVICE_PROVIDERS]
+
+# Mail settings
+- name: mail.server
+  value: localhost
+  env: MAIL_SERVER
+- name: mail.port
+  kind: integer
+  value: 1025
+  env: MAIL_PORT
+- name: mail.default_sender
+  value: '"Meltano" <bot@meltano.com>'
+  env: MAIL_DEFAULT_SENDER
+- name: mail.use_tls
+  kind: boolean
+  value: false
+  env: MAIL_USE_TLS
+- name: mail.username
+  env: MAIL_USERNAME
+- name: mail.password
+  kind: password
+  env: MAIL_PASSWORD
+- name: mail.debug
+  kind: boolean
+  value: false
+  env: MAIL_DEBUG
+
+# OAuth provider settings
+- name: oauth.gitlab.client_id
+  env: OAUTH_GITLAB_CLIENT_ID
+  env_aliases: [OAUTH_GITLAB_APPLICATION_ID]
+- name: oauth.gitlab.client_secret
+  kind: password
+  env: OAUTH_GITLAB_CLIENT_SECRET
+  env_aliases: [OAUTH_GITLAB_SECRET]
+- name: oauth.facebook.client_id
+  env: OAUTH_FACEBOOK_CLIENT_ID
+- name: oauth.facebook.client_secret
+  kind: password
+  env: OAUTH_FACEBOOK_CLIENT_SECRET
+- name: oauth.google_adwords.client_id
+  env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
+- name: oauth.google_adwords.client_secret
+  kind: password
+  env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET

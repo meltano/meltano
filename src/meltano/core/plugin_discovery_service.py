@@ -9,6 +9,7 @@ from typing import Dict, Iterator, Optional
 from itertools import groupby, chain
 
 import meltano.core.bundle as bundle
+from .setting_definition import SettingDefinition
 from .behavior.versioned import Versioned, IncompatibleVersionError
 from .behavior.canonical import Canonical
 from .config_service import ConfigService
@@ -40,15 +41,13 @@ VERSION = 12
 
 
 class DiscoveryFile(Canonical):
-    def __init__(self, **attrs):
-        version = int(attrs.pop("version", 1))
-
-        super().__init__(version=version)
+    def __init__(self, version=1, **plugins):
+        super().__init__(version=int(version))
 
         for plugin_type in PluginType:
             self[plugin_type] = []
 
-        for plugin_type, plugin_defs in attrs.items():
+        for plugin_type, plugin_defs in plugins.items():
             for plugin_def in plugin_defs:
                 plugin = Plugin(
                     plugin_type,

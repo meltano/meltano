@@ -1,10 +1,13 @@
 import os
 import yaml
 import logging
+from copy import deepcopy
 from typing import Dict, List, Optional, Iterable
 
+import meltano.core.bundle as bundle
 from meltano.core.utils import nest, NotFound
 from .project import Project
+from .setting_definition import SettingDefinition
 from .plugin import Plugin, PluginInstall, PluginType, PluginRef, Profile
 from .plugin.factory import plugin_factory
 from .plugin.error import PluginMissingError
@@ -19,6 +22,30 @@ class PluginAlreadyAddedException(Exception):
 class ConfigService:
     def __init__(self, project: Project):
         self.project = project
+
+        self._settings = None
+
+        self._current_config = None
+
+    @property
+    def settings(self):
+        if not self._settings:
+            with bundle.find("settings.yml").open() as settings_yaml:
+                settings = yaml.safe_load(settings_yaml)
+            self._settings = list(map(SettingDefinition.parse, settings["settings"]))
+
+        return self._settings
+
+    @property
+    def current_config(self):
+        if not self._current_config:
+            self._current_config = deepcopy(self.project.meltano.config)
+
+        return self._current_config
+
+    def update_config(self):
+        with self.project.meltano_update() as meltano:
+            meltano.config = self.current_config
 
     def make_meltano_secret_dir(self):
         os.makedirs(self.project.meltano_dir(), exist_ok=True)

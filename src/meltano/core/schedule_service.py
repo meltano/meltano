@@ -79,7 +79,7 @@ class ScheduleService:
         extractor_ref = PluginRef(PluginType.EXTRACTORS, extractor)
         start_date = None
         try:
-            start_date, _ = self.plugin_settings_service.get_value(
+            start_date = self.plugin_settings_service.get(
                 session, extractor_ref, "start_date"
             )
         except SettingMissingError:
