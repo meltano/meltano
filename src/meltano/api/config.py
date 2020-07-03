@@ -2,38 +2,23 @@ import os
 import logging
 import datetime
 
+from meltano.core.project import Project
+from meltano.core.project_settings_service import (
+    ProjectSettingsService,
+    SettingValueSource,
+)
 from meltano.core.utils import truthy
 from meltano.api.headers import *
-from meltano.core.tracking.ga_tracker import (
-    MELTANO_UI_TRACKING_ID,
-    MELTANO_EMBED_TRACKING_ID,
-)
 
 # Flask
 # -----------------
 THREADS_PER_PAGE = 1
 PROFILE = truthy(os.getenv("FLASK_PROFILE"))
 
-## Change this value in production
-SECRET_KEY = "thisisnotapropersecretkey"
 
 # Meltano
 # -----------------
-MELTANO_AUTHENTICATION = truthy(os.getenv("MELTANO_AUTHENTICATION"))
-MELTANO_NOTIFICATION = truthy(os.getenv("MELTANO_NOTIFICATION"))
-MELTANO_OAUTH_SERVICE_URL = os.getenv("MELTANO_OAUTH_SERVICE_URL", None)
-MELTANO_OAUTH_SERVICE_PROVIDERS = [
-    provider
-    for provider in (os.getenv("MELTANO_OAUTH_SERVICE_PROVIDERS", "").split(","))
-    if provider
-]
-MELTANO_READONLY = truthy(os.getenv("MELTANO_READONLY"))
 MELTANO_UI_URL = os.getenv("MELTANO_UI_URL", "/")
-
-MELTANO_UI_TRACKING_ID = os.getenv("MELTANO_UI_TRACKING_ID", MELTANO_UI_TRACKING_ID)
-MELTANO_EMBED_TRACKING_ID = os.getenv(
-    "MELTANO_EMBED_TRACKING_ID", MELTANO_EMBED_TRACKING_ID
-)
 
 API_ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 TEMP_FOLDER = os.path.join(API_ROOT_DIR, "static/tmp")
@@ -43,14 +28,10 @@ PROJECT_ROOT_DIR = os.path.dirname(API_ROOT_DIR)
 # -----------------
 SQLALCHEMY_ECHO = False
 SQLALCHEMY_TRACK_MODIFICATIONS = False
-SQLALCHEMY_DATABASE_URI = os.getenv("MELTANO_DATABASE_URI")
 
-# Flask-security
+# Flask-Security
 # -----------------
 
-# Change this value in production
-# A better approach would be to have individual salts hashed resource
-SECURITY_PASSWORD_SALT = "b4c124932584ad6e69f2774a0ae5c138"
 SECURITY_PASSWORD_HASH = "bcrypt"
 SECURITY_REGISTERABLE = False
 SECURITY_CHANGEABLE = True
@@ -67,26 +48,6 @@ SECURITY_MSG_USERNAME_INVALID = (
     "error",
 )
 SECURITY_MSG_USERNAME_ALREADY_TAKEN = ("This username is already taken.", "error")
-
-# Flask-Mail
-# -----------------
-
-# Change these configuration for your SMTP server
-#
-# The default setup should work for development
-MAIL_SERVER = os.getenv("MAIL_SERVER", "localhost")
-MAIL_PORT = int(os.getenv("MAIL_PORT", 1025))
-MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", '"Meltano" <bot@meltano.com>')
-MAIL_USE_TLS = truthy(os.getenv("MAIL_USE_TLS"))
-MAIL_USERNAME = os.getenv("MAIL_USERNAME")
-MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
-MAIL_DEBUG = truthy(os.getenv("MAIL_DEBUG"))
-
-# Flask-Authlib
-# -----------------
-
-GITLAB_CLIENT_ID = os.getenv("OAUTH_GITLAB_APPLICATION_ID")
-GITLAB_CLIENT_SECRET = os.getenv("OAUTH_GITLAB_SECRET")
 
 # Flask-RESTful
 # -----------------
@@ -106,13 +67,35 @@ CORS_EXPOSE_HEADERS = [VERSION_HEADER]
 CORS_ALLOW_HEADERS = ["CONTENT-TYPE", JSON_SCHEME_HEADER]
 
 
-class EnvVarOverrides(object):
-    if "MELTANO_UI_SERVER_NAME" in os.environ:
-        SERVER_NAME = os.getenv("MELTANO_UI_SERVER_NAME")
-    if "MELTANO_UI_SECRET_KEY" in os.environ:
-        SECRET_KEY = os.getenv("MELTANO_UI_SECRET_KEY")
-    if "MELTANO_UI_PASSWORD_SALT" in os.environ:
-        SECURITY_PASSWORD_SALT = os.getenv("MELTANO_UI_PASSWORD_SALT")
+class ProjectSettings(object):
+    settings_map = {
+        "SERVER_NAME": "ui.server_name",
+        "SECRET_KEY": "ui.secret_key",
+        # Flask-Security
+        "SECURITY_PASSWORD_SALT": "ui.password_salt",
+        # Flask-SQLAlchemy
+        "SQLALCHEMY_DATABASE_URI": "database_uri",
+        # Flask-Authlib
+        "GITLAB_CLIENT_ID": "oauth.gitlab.client_id",
+        "GITLAB_CLIENT_SECRET": "oauth.gitlab.client_secret",
+        # Flask-Mail
+        "MAIL_SERVER": "mail.server",
+        "MAIL_PORT": "mail.port",
+        "MAIL_DEFAULT_SENDER": "mail.default_sender",
+        "MAIL_USE_TLS": "mail.use_tls",
+        "MAIL_USERNAME": "mail.username",
+        "MAIL_PASSWORD": "mail.password",
+        "MAIL_DEBUG": "mail.debug",
+    }
+
+    def __init__(self, project: Project):
+        self.settings_service = ProjectSettingsService(project)
+
+    def as_dict(self):
+        return {
+            config_key: self.settings_service.get(setting_name)
+            for config_key, setting_name in self.settings_map.items()
+        }
 
 
 class Production(object):
@@ -120,28 +103,28 @@ class Production(object):
     SESSION_COOKIE_HTTPONLY = True
 
 
-def ensure_secure_setup(app):
-    secure_variables = [
-        ("SERVER_NAME", None, "MELTANO_UI_SERVER_NAME"),
-        ("SECRET_KEY", SECRET_KEY, "MELTANO_UI_SECRET_KEY"),
-        ("SECURITY_PASSWORD_SALT", SECURITY_PASSWORD_SALT, "MELTANO_UI_PASSWORD_SALT"),
-    ]
+def ensure_secure_setup(settings_service: ProjectSettingsService):
+    secure_settings = ["ui.server_name", "ui.secret_key", "ui.password_salt"]
 
     facts = []
     env_vars = []
-    for (var, default, env_var) in secure_variables:
-        if app.config[var] is None:
-            facts.append(f"\t- '{var}': variable is unset.")
+    for setting_name in secure_settings:
+        setting_def = settings_service.find_setting(setting_name)
+        env_var = settings_service.setting_env(setting_def)
+
+        value, source = settings_service.get_with_source(setting_name)
+        if value is None:
+            facts.append(f"\t- '{setting_name}': setting is unset.")
             env_vars.append(f"\t- {env_var}")
-        elif app.config[var] == default:
-            facts.append(f"\t- '{var}': variable has test value.")
+        elif source is SettingValueSource.DEFAULT:
+            facts.append(f"\t- '{setting_name}': setting has default test value.")
             env_vars.append(f"\t- {env_var}")
 
     if facts:
         facts_msg = "\n".join(facts)
         variable_names = "\n".join(env_vars)
         logging.warning(
-            "The following variables are insecure and should be regenerated:\n"
+            "The following settings are insecure and should be regenerated:\n"
             f"{facts_msg}\n\n"
             "Use `meltano ui setup` command to generate new secrets, or set them via environment variables:\n"
             f"{variable_names}"

@@ -8,11 +8,12 @@ from meltano.core.project_init_service import (
     ProjectInitService,
     ProjectInitServiceError,
 )
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.error import SubprocessError
 from . import cli
-from .params import db_options
+from .params import database_uri_option
 
 EXTRACTORS = "extractors"
 LOADERS = "loaders"
@@ -25,8 +26,8 @@ ALL = "all"
 @click.option(
     "--no_usage_stats", help="Do not send anonymous usage stats.", is_flag=True
 )
-@db_options
-def init(engine_uri, ctx, project_name, no_usage_stats):
+@database_uri_option
+def init(ctx, project_name, no_usage_stats):
     """
     Creates a new Meltano project
     """
@@ -36,16 +37,16 @@ def init(engine_uri, ctx, project_name, no_usage_stats):
             "`meltano init` cannot run inside a Meltano project."
         )
 
+    if no_usage_stats:
+        ProjectSettingsService.config_override["send_anonymous_usage_stats"] = False
+
     init_service = ProjectInitService(project_name)
     try:
-        project = init_service.init(engine_uri=engine_uri)
+        project = init_service.init()
         init_service.echo_instructions()
 
         tracker = GoogleAnalyticsTracker(project)
-        if no_usage_stats:
-            tracker.update_permission_to_track(False)
-        else:
-            tracker.track_meltano_init(project_name=project_name)
+        tracker.track_meltano_init(project_name=project_name)
     except ProjectInitServiceError as e:
         click.secho(f"Directory {project_name} already exists!", fg="red")
         raise click.Abort()

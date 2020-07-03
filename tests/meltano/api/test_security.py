@@ -4,6 +4,8 @@ import urllib
 from datetime import datetime
 from unittest import mock
 from sqlalchemy.orm import joinedload
+
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.api.security import FreeUser, users
 from meltano.api.security.oauth import gitlab_token_identity, OAuthError
 from meltano.api.models.security import db, User
@@ -29,7 +31,12 @@ def gitlab_client():
 class TestSecurity:
     @pytest.fixture(scope="class")
     def app(self, create_app):
-        return create_app(MELTANO_AUTHENTICATION=True)
+        config_override = ProjectSettingsService.config_override
+        original_authentication = config_override.get("ui.authentication", None)
+
+        config_override["ui.authentication"] = True
+        yield create_app()
+        config_override["ui.authentication"] = original_authentication
 
     def test_auth_mode(self, app):
         with app.test_request_context("/"):
@@ -115,7 +122,12 @@ class TestSecurity:
 class TestSingleUser:
     @pytest.fixture(scope="class")
     def app(self, create_app):
-        return create_app(MELTANO_AUTHENTICATION=False)
+        config_override = ProjectSettingsService.config_override
+        original_authentication = config_override.get("ui.authentication", None)
+
+        config_override["ui.authentication"] = False
+        yield create_app()
+        config_override["ui.authentication"] = original_authentication
 
     def test_free_user_all_roles(self):
         assert len(FreeUser().roles) == 2

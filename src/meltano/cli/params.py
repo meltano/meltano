@@ -6,22 +6,19 @@ import os
 from pathlib import Path
 
 from meltano.core.project import Project
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import pop_all
 from meltano.core.migration_service import MigrationService
 from meltano.core.db import project_engine
 
 
-def db_options(func):
-    @click.option(
-        "--database-uri",
-        envvar="MELTANO_DATABASE_URI",
-        default=lambda: f"sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db",
-        help="System database URI",
-    )
-    def decorate(*args, **kwargs):
-        engine_uri = kwargs.pop("database_uri")
+def database_uri_option(func):
+    @click.option("--database-uri", help="System database URI")
+    def decorate(*args, database_uri=None, **kwargs):
+        if database_uri:
+            ProjectSettingsService.config_override["database_uri"] = database_uri
 
-        return func(engine_uri, *args, **kwargs)
+        return func(*args, **kwargs)
 
     return functools.update_wrapper(decorate, func)
 
@@ -33,8 +30,8 @@ class project:
         self.migrate = migrate
 
     def __call__(self, func):
-        @db_options
-        def decorate(engine_uri, *args, **kwargs):
+        @database_uri_option
+        def decorate(*args, **kwargs):
             ctx = click.globals.get_current_context()
 
             project = ctx.obj["project"]
@@ -46,8 +43,10 @@ class project:
                 )
 
             # register the system database connection
-            engine_uri = engine_uri.replace("$MELTANO_PROJECT_ROOT", str(project.root))
-            engine, _ = project_engine(project, engine_uri, default=True)
+            settings_service = ProjectSettingsService(project)
+            engine, _ = project_engine(
+                project, settings_service.get("database_uri"), default=True
+            )
 
             if self.migrate:
                 migration_service = MigrationService(engine)

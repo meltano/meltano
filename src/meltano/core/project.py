@@ -6,7 +6,7 @@ import threading
 import yaml
 from copy import deepcopy
 from contextlib import contextmanager
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 from functools import wraps
 from pathlib import Path
 from typing import Union, Dict
@@ -17,11 +17,13 @@ from .behavior.versioned import Versioned
 from .utils import makedirs, slugify
 from .meltano_file import MeltanoFile
 
+PROJECT_ROOT_ENV = "MELTANO_PROJECT_ROOT"
+
 
 class ProjectNotFound(Error):
-    def __init__(self):
+    def __init__(self, project):
         super().__init__(
-            f"Cannot find `{os.getcwd()}/meltano.yml`. Are you in a meltano project?"
+            f"Cannot find `{project.meltanofile}`. Are you in a meltano project?"
         )
 
 
@@ -37,19 +39,25 @@ class Project(Versioned):
     _meltano_rw_lock = fasteners.ReaderWriterLock()
     _default = None
 
-    def __init__(self, root: Union[Path, str] = None):
-        self.root = Path(root or os.getcwd()).resolve()
+    def __init__(self, root: Union[Path, str]):
+        self.root = Path(root).resolve()
         self._meltano_ip_lock = fasteners.InterProcessLock(
             self.run_dir("meltano.yml.lock")
         )
+
+    @property
+    def env(self):
+        return {**dotenv_values(self.dotenv), PROJECT_ROOT_ENV: str(self.root)}
+
+    def load_env(self):
+        for k, v in self.env.items():
+            if k not in os.environ and v is not None:
+                os.environ[k] = v
 
     @classmethod
     @fasteners.locked(lock="_activate_lock")
     def activate(cls, project: "Project"):
         project.ensure_compatible()
-
-        # helpful to refer to the current absolute project path
-        os.environ["MELTANO_PROJECT_ROOT"] = str(project.root)
 
         # create a symlink to our current binary
         try:
@@ -59,11 +67,19 @@ class Project(Versioned):
         except FileExistsError:
             pass
 
-        load_dotenv(dotenv_path=project.root.joinpath(".env"), override=True)
+        # To be removed once every call to `os.getenv` has been replaced with
+        # a call to `ProjectSettingsService.get`
+        project.load_env()
+
         logging.debug(f"Activated project at {project.root}")
 
         # set the default project
         cls._default = project
+
+    @classmethod
+    def deactivate(cls):
+        os.environ.pop(PROJECT_ROOT_ENV, None)
+        cls._default = None
 
     @property
     def file_version(self):
@@ -71,14 +87,15 @@ class Project(Versioned):
 
     @classmethod
     @fasteners.locked(lock="_find_lock")
-    def find(cls, from_dir: Union[Path, str] = None, activate=True):
+    def find(cls, project_root: Union[Path, str] = None, activate=True):
         if cls._default:
             return cls._default
 
-        project = Project(from_dir)
+        project_root = project_root or os.getenv(PROJECT_ROOT_ENV) or os.getcwd()
+        project = Project(project_root)
 
         if not project.meltanofile.exists():
-            raise ProjectNotFound()
+            raise ProjectNotFound(project)
 
         # if we activate a project using `find()`, it should
         # be set as the default project for future `find()`
@@ -127,6 +144,10 @@ class Project(Versioned):
     @property
     def meltanofile(self):
         return self.root.joinpath("meltano.yml")
+
+    @property
+    def dotenv(self):
+        return self.root.joinpath(".env")
 
     @makedirs
     def meltano_dir(self, *joinpaths):

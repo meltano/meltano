@@ -25,7 +25,7 @@ class TransformAddService:
         session = Session()
         try:
             plugin_settings_service = PluginSettingsService(project)
-            dbt_project_dir, _ = plugin_settings_service.get_value(
+            dbt_project_dir = plugin_settings_service.get(
                 session, dbt_plugin, "project_dir"
             )
             dbt_project_path = Path(dbt_project_dir)

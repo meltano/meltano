@@ -3,6 +3,7 @@ from flask_mail import Mail, Message
 from smtpapi import SMTPAPIHeader
 
 from meltano.core.project import Project
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.api.models.subscription import Subscription, SubscriptionEventType
 
 
@@ -21,7 +22,7 @@ class MailService:
 
     def __init__(self, project: Project):
         self.project = project
-        self.project_id = project.meltano.project_id
+        self.project_id = ProjectSettingsService(self.project).get("project_id")
 
     def get_unsubscribe_group(self, subscription) -> UnsubscribeGroup:
         try:

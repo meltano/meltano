@@ -12,12 +12,13 @@ from werkzeug.wsgi import DispatcherMiddleware
 
 import meltano.api.config
 from meltano.api.headers import *
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.db import project_engine
 from meltano.core.logging.utils import current_log_level, FORMAT
 from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.oauth.app import app as oauth_service
+from meltano.oauth.app import create_app as create_oauth_service
 
 
 # the logger we setup here is for the `meltano.api` module
@@ -26,6 +27,9 @@ logger = logging.getLogger("meltano.api")
 
 def create_app(config={}):
     project = Project.find()
+    settings_service = ProjectSettingsService(project)
+
+    project_engine(project, settings_service.get("database_uri"), default=True)
 
     app = Flask(
         __name__, instance_path=str(project.root), instance_relative_config=True
@@ -35,20 +39,14 @@ def create_app(config={}):
     importlib.reload(meltano.api.config)
 
     app.config.from_object("meltano.api.config")
-    app.config.from_pyfile("ui.cfg", silent=True)
-    app.config.from_object("meltano.api.config.EnvVarOverrides")
-    app.config.update(**config)
+    app.config.from_mapping(**meltano.api.config.ProjectSettings(project).as_dict())
+    app.config.from_mapping(**config)
 
     if app.env == "production":
         from meltano.api.config import ensure_secure_setup
 
         app.config.from_object("meltano.api.config.Production")
-        ensure_secure_setup(app)
-
-    # register
-    project_engine(
-        project, engine_uri=app.config["SQLALCHEMY_DATABASE_URI"], default=True
-    )
+        ensure_secure_setup(settings_service)
 
     # File logging
     formatter = logging.Formatter(fmt=FORMAT)
@@ -115,13 +113,13 @@ def create_app(config={}):
         init(app)
 
     # Notifications
-    if app.config["MELTANO_NOTIFICATION"]:
+    if settings_service.get("ui.notification"):
         from .events import notifications
 
         notifications.init_app(app)
-        logger.info("Notifications are enabled.")
+        logger.debug("Notifications are enabled.")
     else:
-        logger.info("Notifications are disabled.")
+        logger.debug("Notifications are disabled.")
 
     # Google Analytics setup
     tracker = GoogleAnalyticsTracker(project)
@@ -130,21 +128,23 @@ def create_app(config={}):
     def setup_js_context():
         # setup the appUrl
         appUrl = urlsplit(request.host_url)
-        g.jsContext = {"appUrl": appUrl.geturl()[:-1]}
+        g.jsContext = {"appUrl": appUrl.geturl()[:-1], "version": meltano.__version__}
 
-        if tracker.send_anonymous_usage_stats:
-            g.jsContext["isSendAnonymousUsageStats"] = True
-            g.jsContext["trackingID"] = app.config["MELTANO_UI_TRACKING_ID"]
-            g.jsContext["embedTrackingID"] = app.config["MELTANO_EMBED_TRACKING_ID"]
-            g.jsContext["projectId"] = tracker.project_id
+        setting_map = {
+            "isSendAnonymousUsageStats": "send_anonymous_usage_stats",
+            "projectId": "project_id",
+            "trackingID": "tracking_ids.ui",
+            "embedTrackingID": "tracking_ids.ui_embed",
+            "isNotificationEnabled": "ui.notification",
+            "oauthServiceUrl": "ui.oauth_service.url",
+        }
 
-        g.jsContext["isNotificationEnabled"] = app.config["MELTANO_NOTIFICATION"]
-        g.jsContext["version"] = meltano.__version__
+        for context_key, setting_name in setting_map.items():
+            g.jsContext[context_key] = settings_service.get(setting_name)
 
-        # setup the oauthServiceUrl
-        g.jsContext["oauthServiceUrl"] = app.config["MELTANO_OAUTH_SERVICE_URL"]
-        g.jsContext["oauthServiceProviders"] = app.config[
-            "MELTANO_OAUTH_SERVICE_PROVIDERS"
+        providers = settings_service.get("ui.oauth_service.providers")
+        g.jsContext["oauthServiceProviders"] = [
+            provider for provider in providers.split(",") if provider
         ]
 
     @app.after_request
@@ -153,6 +153,8 @@ def create_app(config={}):
         return res
 
     # create the dispatcher to host the `OAuthService`
-    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/-/oauth": oauth_service})
+    app.wsgi_app = DispatcherMiddleware(
+        app.wsgi_app, {"/-/oauth": create_oauth_service()}
+    )
 
     return app

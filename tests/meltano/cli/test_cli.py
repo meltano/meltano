@@ -22,7 +22,7 @@ class TestCli:
         pushd(project.root)
 
         # let's overwrite the `.env` to add a sentinel value
-        with project.root.joinpath(".env").open("w") as env:
+        with project.dotenv.open("w") as env:
             env.write("CLI_TEST_ACTIVATE_PROJECT=1")
 
         # run any cli command - that should activate the project

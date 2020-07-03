@@ -43,8 +43,13 @@ def discovery():
                 {"name": "start_date"},
                 {"name": "protected", "protected": True},
                 {"name": "secure", "kind": "password"},
+                {"name": "port", "kind": "integer", "value": 5000},
                 {"name": "hidden", "kind": "hidden", "value": 42},
-                {"name": "boolean", "kind": "boolean", "value": False},
+                {
+                    "name": "boolean",
+                    "kind": "boolean",
+                    "env_aliases": ["TAP_MOCK_ENABLED", "!TAP_MOCK_DISABLED"],
+                },
             ],
         }
     )
@@ -245,8 +250,8 @@ def job_logging_service(project):
 
 
 @pytest.fixture(scope="class")
-def project(test_dir, project_init_service, engine_uri):
-    project = project_init_service.init(engine_uri=engine_uri, add_discovery=True)
+def project(test_dir, project_init_service):
+    project = project_init_service.init(add_discovery=True)
     logging.debug(f"Created new project at {project.root}")
 
     # empty out the `plugins`
@@ -259,7 +264,7 @@ def project(test_dir, project_init_service, engine_uri):
     yield project
 
     # clean-up
-    Project._default = None
+    Project.deactivate()
     os.chdir(test_dir)
     shutil.rmtree(project.root)
     logging.debug(f"Cleaned project at {project.root}")
