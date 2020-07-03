@@ -32,6 +32,31 @@ settings:
 - name: ui.password_salt
   value: b4c124932584ad6e69f2774a0ae5c138
 
+# Mail settings
+- name: mail.server
+  value: localhost
+  env: MAIL_SERVER
+- name: mail.port
+  kind: integer
+  value: 1025
+  env: MAIL_PORT
+- name: mail.default_sender
+  value: '"Meltano" <bot@meltano.com>'
+  env: MAIL_DEFAULT_SENDER
+- name: mail.use_tls
+  kind: boolean
+  value: false
+  env: MAIL_USE_TLS
+- name: mail.username
+  env: MAIL_USERNAME
+- name: mail.password
+  kind: password
+  env: MAIL_PASSWORD
+- name: mail.debug
+  kind: boolean
+  value: false
+  env: MAIL_DEBUG
+
 # OAuth provider settings
 - name: oauth.gitlab.client_id
   env: OAUTH_GITLAB_CLIENT_ID

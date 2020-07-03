@@ -67,20 +67,6 @@ SECURITY_MSG_USERNAME_INVALID = (
 )
 SECURITY_MSG_USERNAME_ALREADY_TAKEN = ("This username is already taken.", "error")
 
-# Flask-Mail
-# -----------------
-
-# Change these configuration for your SMTP server
-#
-# The default setup should work for development
-MAIL_SERVER = os.getenv("MAIL_SERVER", "localhost")
-MAIL_PORT = int(os.getenv("MAIL_PORT", 1025))
-MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", '"Meltano" <bot@meltano.com>')
-MAIL_USE_TLS = truthy(os.getenv("MAIL_USE_TLS"))
-MAIL_USERNAME = os.getenv("MAIL_USERNAME")
-MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
-MAIL_DEBUG = truthy(os.getenv("MAIL_DEBUG"))
-
 # Flask-RESTful
 # -----------------
 
@@ -110,6 +96,14 @@ class ProjectSettings(object):
         # Flask-Authlib
         "GITLAB_CLIENT_ID": "oauth.gitlab.client_id",
         "GITLAB_CLIENT_SECRET": "oauth.gitlab.client_secret",
+        # Flask-Mail
+        "MAIL_SERVER": "mail.server",
+        "MAIL_PORT": "mail.port",
+        "MAIL_DEFAULT_SENDER": "mail.default_sender",
+        "MAIL_USE_TLS": "mail.use_tls",
+        "MAIL_USERNAME": "mail.username",
+        "MAIL_PASSWORD": "mail.password",
+        "MAIL_DEBUG": "mail.debug",
     }
 
     def __init__(self, project: Project):
