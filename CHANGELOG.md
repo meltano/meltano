@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2128](https://gitlab.com/meltano/meltano/-/issues/2128) Allow alternative env vars to be specified for settings using `env_aliases` array
 - [#2128](https://gitlab.com/meltano/meltano/-/issues/2128) Allow negated env var to be defined for boolean settings using `!` prefix in `env_aliases` array
 - [#2129](https://gitlab.com/meltano/meltano/-/issues/2129) Cast values of `kind: integer` settings set through environment variables
+- [#2132](https://gitlab.com/meltano/meltano/-/issues/2132) Support common `WEB_CONCURRENCY` env var to set `meltano ui` concurrency (workers)
+- [#2091](https://gitlab.com/meltano/meltano/-/issues/2091) Support common `PORT` env var to set `meltano ui` bind port
 
 ### Changes
 

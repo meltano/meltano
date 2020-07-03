@@ -107,7 +107,15 @@ To change the host/port configuration on which the API server listens, update yo
 ```bash
 # Meltano API configuration
 export MELTANO_API_HOSTNAME="0.0.0.0"
-export MELTANO_API_PORT="5000"
+export MELTANO_API_PORT="5000" # `PORT` is also supported
+```
+
+#### Concurrency
+
+You can specify the number of worker processes `meltano ui` will use to handle request using the `WEB_CONCURRENCY` environment variable. By default, 4 workers are used.
+
+```bash
+export WEB_CONCURRENCY=2
 ```
 
 #### Single Sign On
