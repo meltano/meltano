@@ -113,13 +113,13 @@ def create_app(config={}):
         init(app)
 
     # Notifications
-    if app.config["MELTANO_NOTIFICATION"]:
+    if settings_service.get("ui.notification"):
         from .events import notifications
 
         notifications.init_app(app)
-        logger.info("Notifications are enabled.")
+        logger.debug("Notifications are enabled.")
     else:
-        logger.info("Notifications are disabled.")
+        logger.debug("Notifications are disabled.")
 
     # Google Analytics setup
     tracker = GoogleAnalyticsTracker(project)
@@ -128,15 +128,14 @@ def create_app(config={}):
     def setup_js_context():
         # setup the appUrl
         appUrl = urlsplit(request.host_url)
-        g.jsContext = {"appUrl": appUrl.geturl()[:-1]}
+        g.jsContext = {"appUrl": appUrl.geturl()[:-1], "version": meltano.__version__}
 
-        g.jsContext["isNotificationEnabled"] = app.config["MELTANO_NOTIFICATION"]
-        g.jsContext["version"] = meltano.__version__
         setting_map = {
             "isSendAnonymousUsageStats": "send_anonymous_usage_stats",
             "projectId": "project_id",
             "trackingID": "tracking_ids.ui",
             "embedTrackingID": "tracking_ids.ui_embed",
+            "isNotificationEnabled": "ui.notification",
             "oauthServiceUrl": "ui.oauth_service.url",
         }
 

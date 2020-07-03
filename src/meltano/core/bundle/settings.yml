@@ -43,6 +43,12 @@ settings:
 - name: ui.password_salt
   value: b4c124932584ad6e69f2774a0ae5c138
 
+# UI features
+- name: ui.notification
+  kind: boolean
+  value: false
+  env_aliases: [MELTANO_NOTIFICATION]
+
 # OAuth service settings
 - name: ui.oauth_service.url
   env_aliases: [MELTANO_OAUTH_SERVICE_URL]

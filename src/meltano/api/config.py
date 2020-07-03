@@ -19,7 +19,6 @@ PROFILE = truthy(os.getenv("FLASK_PROFILE"))
 # Meltano
 # -----------------
 MELTANO_AUTHENTICATION = truthy(os.getenv("MELTANO_AUTHENTICATION"))
-MELTANO_NOTIFICATION = truthy(os.getenv("MELTANO_NOTIFICATION"))
 MELTANO_READONLY = truthy(os.getenv("MELTANO_READONLY"))
 MELTANO_UI_URL = os.getenv("MELTANO_UI_URL", "/")
 
