@@ -110,6 +110,14 @@ export MELTANO_API_HOSTNAME="0.0.0.0"
 export MELTANO_API_PORT="5000"
 ```
 
+#### Concurrency
+
+You can specify the number of worker processes `meltano ui` will use to handle request using the `WEB_CONCURRENCY` environment variable. By default, 4 workers are used.
+
+```bash
+export WEB_CONCURRENCY=2
+```
+
 #### Single Sign On
 
 These variables are specific to [Flask-OAuthlib](https://flask-oauthlib.readthedocs.io/en/latest/#) and work with [OAuth authentication with GitLab](https://docs.gitlab.com/ee/integration/oauth_provider.html).

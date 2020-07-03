@@ -32,7 +32,7 @@ settings:
 - name: ui.workers
   kind: integer
   value: 4
-  env_aliases: [WORKERS]
+  env_aliases: [WORKERS, WEB_CONCURRENCY]
 - name: ui.forwarded_allow_ips
   value: "127.0.0.1"
   env_aliases: [FORWARDED_ALLOW_IPS]
