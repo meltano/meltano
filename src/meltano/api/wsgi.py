@@ -4,6 +4,15 @@ import warnings
 import meltano
 import importlib
 
+from meltano.core.project import Project
+from meltano.core.project_settings_service import ProjectSettingsService
+
+_project = Project.find()
+_settings_service = ProjectSettingsService(_project)
+
+_bind_host = _settings_service.get("ui.bind_host")
+_bind_port = _settings_service.get("ui.bind_port")
+bind = f"{_bind_host}:{_bind_port}"
 
 workers = int(os.getenv("WORKERS", 4))
 timeout = 600

@@ -9,3 +9,12 @@ settings:
 # Environment-specific project settings
 - name: database_uri
   value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db
+
+# UI settings
+- name: ui.bind_host
+  value: "0.0.0.0"
+  env_aliases: [MELTANO_API_HOSTNAME]
+- name: ui.bind_port
+  kind: integer
+  value: 5000
+  env_aliases: [MELTANO_API_PORT]

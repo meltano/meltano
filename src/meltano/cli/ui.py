@@ -16,6 +16,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import truthy
 from meltano.core.migration_service import MigrationService
 from meltano.api.workers import MeltanoCompilerWorker, APIWorker, UIAvailableWorker
+from meltano.core.project_settings_service import ProjectSettingsService
 
 
 logger = logging.getLogger(__name__)
@@ -43,21 +44,15 @@ def ui(ctx, project):
 
 @ui.command()
 @click.option("--reload", is_flag=True, default=False)
-@click.option(
-    "--bind-port",
-    default=5000,
-    help="Port to run webserver on",
-    envvar="MELTANO_API_PORT",
-    type=int,
-)
-@click.option(
-    "--bind",
-    default="0.0.0.0",
-    help="The hostname (or IP address) to bind on",
-    envvar="MELTANO_API_HOSTNAME",
-)
+@click.option("--bind", help="The hostname (or IP address) to bind on")
+@click.option("--bind-port", help="Port to run webserver on", type=int)
 @click.pass_context
-def start(ctx, reload, bind_port, bind):
+def start(ctx, reload, bind, bind_port):
+    if bind:
+        ProjectSettingsService.config_override["ui.bind_host"] = bind
+    if bind_port:
+        ProjectSettingsService.config_override["ui.bind_port"] = bind_port
+
     project = ctx.obj["project"]
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_ui()
@@ -71,13 +66,9 @@ def start(ctx, reload, bind_port, bind):
     except Exception as e:
         logger.error(f"Initial compilation failed: {e}")
 
-    workers.append(UIAvailableWorker("http://localhost:{bind_port}"))
+    workers.append(UIAvailableWorker(project))
     workers.append(
-        APIWorker(
-            project,
-            f"{bind}:{bind_port}",
-            reload=reload or os.getenv("FLASK_ENV") == "development",
-        )
+        APIWorker(project, reload=reload or os.getenv("FLASK_ENV") == "development")
     )
 
     cleanup = start_workers(workers)
