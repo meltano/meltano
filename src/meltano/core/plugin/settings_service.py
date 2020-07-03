@@ -7,6 +7,7 @@ from meltano.core.settings_service import (
     SettingValueStore,
     REDACTED_VALUE,
 )
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin import PluginRef, PluginType, Plugin, PluginInstall, Profile
 from meltano.core.plugin.error import PluginMissingError
 
@@ -94,12 +95,21 @@ class PluginSettingsService:
 
 
 class SpecificPluginSettingsService(SettingsService):
-    def __init__(self, plugin: PluginRef, *args, **kwargs):
+    def __init__(
+        self,
+        plugin: PluginRef,
+        *args,
+        plugin_discovery_service: PluginDiscoveryService = None,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
 
         self.plugin = plugin
 
-        self.plugin_def = self.discovery_service.find_plugin(
+        discovery_service = plugin_discovery_service or PluginDiscoveryService(
+            self.project
+        )
+        self.plugin_def = discovery_service.find_plugin(
             self.plugin.type, self.plugin.name
         )
         self._plugin_install = None

@@ -18,7 +18,6 @@ from meltano.core.utils import (
 )
 from .setting_definition import SettingDefinition
 from .setting import Setting
-from .plugin_discovery_service import PluginDiscoveryService
 from .config_service import ConfigService
 from .error import Error
 
@@ -62,7 +61,6 @@ class SettingsService(ABC):
     def __init__(
         self,
         project,
-        plugin_discovery_service: PluginDiscoveryService = None,
         config_service: ConfigService = None,
         show_hidden=True,
         env_override={},
@@ -70,9 +68,6 @@ class SettingsService(ABC):
     ):
         self.project = project
 
-        self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
-            project
-        )
         self.config_service = config_service or ConfigService(project)
 
         self.show_hidden = show_hidden

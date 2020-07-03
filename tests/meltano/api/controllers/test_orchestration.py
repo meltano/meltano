@@ -16,7 +16,7 @@ class TestOrchestration:
         plugin_settings_service.set(session, tap, "secure", "thisisatest")
 
         with mock.patch(
-            "meltano.core.settings_service.PluginDiscoveryService",
+            "meltano.core.plugin.settings_service.PluginDiscoveryService",
             return_value=plugin_discovery_service,
         ), app.test_request_context():
             res = api.get(
@@ -49,7 +49,7 @@ class TestOrchestration:
         plugin_settings_service.set(session, tap, "protected", "iwontchange")
 
         with mock.patch(
-            "meltano.core.settings_service.PluginDiscoveryService",
+            "meltano.core.plugin.settings_service.PluginDiscoveryService",
             return_value=plugin_discovery_service,
         ), app.test_request_context():
             res = api.put(
