@@ -28,7 +28,7 @@ settings:
 - name: ui.bind_port
   kind: integer
   value: 5000
-  env_aliases: [MELTANO_API_PORT]
+  env_aliases: [MELTANO_API_PORT, PORT]
 - name: ui.workers
   kind: integer
   value: 4

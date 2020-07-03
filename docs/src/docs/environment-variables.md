@@ -107,7 +107,7 @@ To change the host/port configuration on which the API server listens, update yo
 ```bash
 # Meltano API configuration
 export MELTANO_API_HOSTNAME="0.0.0.0"
-export MELTANO_API_PORT="5000"
+export MELTANO_API_PORT="5000" # `PORT` is also supported
 ```
 
 #### Concurrency
