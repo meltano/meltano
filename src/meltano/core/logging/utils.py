@@ -14,7 +14,9 @@ LEVELS = {
     "critical": logging.CRITICAL,
 }
 DEFAULT_LEVEL = "info"
-FORMAT = "[%(asctime)s|%(levelname).1s|%(threadName)10s|%(name)s] %(message)s"
+FORMAT = (
+    "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"
+)
 
 
 def parse_log_level(log_level):
