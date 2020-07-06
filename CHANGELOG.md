@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2135](https://gitlab.com/meltano/meltano/-/issues/2135) Fix UI "Explore" page for custom (as opposed to plugin-based) topics and models
+
 ### Breaks
 
 
