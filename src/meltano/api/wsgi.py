@@ -4,11 +4,15 @@ import warnings
 import meltano
 import importlib
 
+from meltano.core.logging.utils import FORMAT
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 
 _project = Project.find()
 _settings_service = ProjectSettingsService(_project)
+
+logconfig_dict = {"formatters": {"generic": {"format": FORMAT}}}
+loglevel = _settings_service.get("log_level")
 
 _bind_host = _settings_service.get("ui.bind_host")
 _bind_port = _settings_service.get("ui.bind_port")

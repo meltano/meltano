@@ -9,6 +9,20 @@ settings:
 # Environment-specific project settings
 - name: database_uri
   value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db
+- name: log_level
+  kind: options
+  options:
+  - label: Debug
+    value: debug
+  - label: Info
+    value: info
+  - label: Warning
+    value: warning
+  - label: Error
+    value: error
+  - label: Critical
+    value: critical
+  value: info
 
 # Analytics Tracking IDs
 - name: tracking_ids.cli
