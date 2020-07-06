@@ -13,10 +13,11 @@ export default {
   },
   data() {
     return {
+      extractorName: '',
+      pluginNamespace: '',
       hasLoadedDashboards: false,
       hasLoadedReports: false,
       model: '',
-      pluginNamespace: '',
       namespace: '',
       topic: null
     }
@@ -32,9 +33,6 @@ export default {
         this.topic
           ? this.topic.designs.find(design => design.name === designName).label
           : ''
-    },
-    getExtractorName() {
-      return this.namespace ? this.namespace.replace('model', 'tap') : ''
     },
     getFilteredDashboards() {
       const filteredReportIds = this.getFilteredReports.map(report => report.id)
@@ -62,8 +60,11 @@ export default {
     })
   },
   beforeRouteUpdate(to, from, next) {
-    this.reinitialize()
     next()
+
+    // it is crucial to wait after `next` is called so
+    // the route parameters are updated.
+    this.reinitialize()
   },
   methods: {
     ...mapActions('dashboards', ['getDashboards']),
@@ -89,25 +90,29 @@ export default {
     },
     reinitialize() {
       // Reset flags
-      this.topic = null
       this.hasLoadedDashboards = false
       this.hasLoadedReports = false
+      this.pluginNamespace = ''
+      this.namespace = ''
+      this.model = ''
+      this.topic = null
+
+      this.extractorName = this.$route.params.extractor
 
       // Initialize
       this.getInstalledPlugins().then(() => {
-        const extractorName = this.$route.params.extractor
-        const extractor = this.getInstalledPlugin('extractors', extractorName)
-        this.pluginNamespace = extractor.namespace
-        const modelPlugin = this.installedPlugins.models.find(
-          plugin => plugin.namespace === this.pluginNamespace
+        const extractor = this.getInstalledPlugin(
+          'extractors',
+          this.extractorName
         )
-        this.namespace = modelPlugin.name
+        this.pluginNamespace = extractor.namespace
 
         this.getModels()
           .then(() => {
             for (let modelKey in this.models) {
               const modelSpec = this.models[modelKey]
-              if (modelSpec.namespace === this.namespace) {
+              if (modelSpec.plugin_namespace === this.pluginNamespace) {
+                this.namespace = modelSpec.namespace
                 this.model = modelSpec.name
                 break
               }
@@ -135,10 +140,7 @@ export default {
       <div class="media is-paddingless">
         <figure class="media-left">
           <div class="image level-item is-48x48">
-            <ConnectorLogo
-              v-if="getExtractorName"
-              :connector="getExtractorName"
-            />
+            <ConnectorLogo v-if="extractorName" :connector="extractorName" />
           </div>
         </figure>
       </div>

@@ -144,7 +144,7 @@ class ScheduleService:
                 for schedule in self.schedules()
                 if schedule.extractor == extractor.name
             )
-        except PluginNotFoundError as err:
+        except (PluginNotFoundError, StopIteration) as err:
             raise ScheduleNotFoundError(namespace) from err
 
     def schedules(self):
