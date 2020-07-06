@@ -36,13 +36,12 @@ class TestProjectSettingsService:
 
         assert_value_source("from_meltano_yml", SettingValueSource.MELTANO_YML)
 
-        env_key = subject.setting_env(subject.find_setting("project_id"))
-
-        subject.project.dotenv.write_text(f"{env_key}=from_dotenv")
+        subject.set("project_id", "from_dotenv", store=SettingValueStore.DOTENV)
 
         assert_value_source("from_dotenv", SettingValueSource.DOTENV)
 
         with monkeypatch.context() as m:
+            env_key = subject.setting_env(subject.find_setting("project_id"))
             m.setenv(env_key, "from_env")
 
             assert_value_source("from_env", SettingValueSource.ENV)

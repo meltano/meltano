@@ -157,14 +157,17 @@ meltano config <plugin_name> list
 
 # Sets the configuration's setting `<name>` to `<value>`.
 meltano config <plugin_name> set <name> <value> # store in `meltano.yml`
+meltano config <plugin_name> set --store=dotenv <name> <value> # store in `.env`
 meltano config <plugin_name> set --store=db <name> <value> # store in system database
 
 # Remove the configuration's setting `<name>`.
 meltano config <plugin_name> unset <name> # remove from `meltano.yml`
+meltano config <plugin_name> unset --store=dotenv <name> # remove from `.env`
 meltano config <plugin_name> unset --store=db <name> # remove from system database
 
 # Clear the configuration (back to defaults).
 meltano config <plugin_name> reset # remove from `meltano.yml`
+meltano config <plugin_name> reset --store=dotenv # remove from `.env`
 meltano config <plugin_name> reset --store=db # remove from system database
 ```
 

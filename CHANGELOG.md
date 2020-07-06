@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2100](https://gitlab.com/meltano/meltano/-/issues/2100) Let settings be stored directly in `.env` using `meltano config set --store=dotenv`
+
 ### Changes
 
 ### Fixes
