@@ -47,10 +47,11 @@ class Project(Versioned):
 
     @property
     def env(self):
-        return {**dotenv_values(self.dotenv), PROJECT_ROOT_ENV: str(self.root)}
+        return {PROJECT_ROOT_ENV: str(self.root)}
 
     def load_env(self):
-        for k, v in self.env.items():
+        full_env = {**dotenv_values(self.dotenv), **self.env}
+        for k, v in full_env.items():
             if k not in os.environ and v is not None:
                 os.environ[k] = v
 

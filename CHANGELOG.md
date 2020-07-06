@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2135](https://gitlab.com/meltano/meltano/-/issues/2135) Fix UI "Explore" page for custom (as opposed to plugin-based) topics and models
 - [#2136](https://gitlab.com/meltano/meltano/-/issues/2136) Show error message in Analyze UI when pipeline for extractor is missing, even if extractor is installed
+- [#2131](https://gitlab.com/meltano/meltano/-/issues/2131) Have "true" environment variables take precedence over those defined in `.env`
 
 ### Breaks
 
@@ -35,7 +36,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2094](https://gitlab.com/meltano/meltano/-/issues/2069) Turn "Connections" page into "Extractors" management UI
 - [#2130](https://gitlab.com/meltano/meltano/-/issues/2130) Have CLI respect `MELTANO_PROJECT_ROOT` env var when set instead of looking at current directory
-- [#2131](https://gitlab.com/meltano/meltano/-/issues/2131) Have "true" environment variables take precedence over those defined in `.env`
 
 
 ## 1.38.0 - (2020-06-30)
