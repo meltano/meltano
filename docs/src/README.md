@@ -35,7 +35,16 @@ building, running & orchestrating ELT pipelines built out of [Singer](https://ww
 Our goal is to [make the power of data integration available to all](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/)
 by building a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
 
-Scroll down for details on [Meltano projects](/#meltano-init), [integration](/#integration), [transformation](/#transformation), [orchestration](/#orchestration), and [containerization](/#containerization).
+Scroll down for details on
+[Meltano projects](/#meltano-init),
+[integration](/#integration),
+[transformation](/#transformation),
+[orchestration](/#orchestration), and
+[containerization](/#containerization),
+followed by instructions on
+[adding extractors and loaders to your project](/#meltano-add),
+[managing the configuration of your plugins](/#meltano-config), and
+[selecting entities and attributes to extract](/#meltano-select).
 
 :::
 
@@ -96,6 +105,8 @@ to install (or update) all plugins specified in `meltano.yml`.
 :::
 
 ::: slot meltano-init-code
+
+<small>Follow the [installation instructions above](/#installation) and then...</small>
 
 ```bash
 # Initialize a new Meltano project in the
@@ -162,6 +173,8 @@ Scroll down to learn more about [transformation](/#transformation) and [orchestr
 
 ::: slot integration-code
 
+<small>Follow the [project initialization instructions above](/#meltano-init) and then...</small>
+
 ```bash
 # Add GitLab extractor to your project
 meltano add extractor tap-gitlab
@@ -214,6 +227,8 @@ or [write your own](/tutorials/create-custom-transforms-and-models.html#adding-c
 :::
 
 ::: slot transformation-code
+
+<small>Follow the [integration instructions above](/#integration) and then...</small>
 
 ```bash
 # For these examples to work, ensure that:
@@ -280,6 +295,8 @@ schedule is not going to cut it, you can easily modify the DAG generator or add 
 :::
 
 ::: slot orchestration-code
+
+<small>Follow the [transformation instructions above](/#transformation) and then...</small>
 
 ```bash
 # Schedule pipelines
@@ -365,6 +382,8 @@ files to your project by adding the
 :::
 
 ::: slot containerization-code
+
+<small>Follow the [project initialization instructions above](/#meltano-init) and then...</small>
 
 ```bash
 # For these examples to work, ensure that
@@ -454,6 +473,8 @@ Once your plugin has been added, it will be ready for [configuration](/#meltano-
 
 ::: slot meltano-add-code
 
+<small>Follow the [project initialization instructions above](/#meltano-init) and then...</small>
+
 ```bash
 # List extractors and loaders known to Meltano
 meltano discover extractors
@@ -524,6 +545,8 @@ control. Sensitive values like passwords and tokens are most appropriately store
 :::
 
 ::: slot meltano-config-code
+
+<small>Follow the [custom extractor instructions above](/#meltano-add) and then...</small>
 
 ```bash
 # List all plugin settings with their names,
@@ -607,6 +630,8 @@ If no rules are defined using `meltano select`, Meltano will fall back on catch-
 :::
 
 ::: slot meltano-select-code
+
+<small>Follow the [configuration instructions above](/#meltano-config) and then...</small>
 
 ```bash
 # List all available entities and attributes
