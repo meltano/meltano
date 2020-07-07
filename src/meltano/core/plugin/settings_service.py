@@ -128,7 +128,7 @@ class SpecificPluginSettingsService(SettingsService):
 
     @property
     def plugin_install(self):
-        if not self._plugin_install:
+        if self._plugin_install is None:
             self._plugin_install = self.config_service.get_plugin(self.plugin)
 
         return self._plugin_install

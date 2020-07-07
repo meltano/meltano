@@ -29,7 +29,7 @@ class ConfigService:
 
     @property
     def settings(self):
-        if not self._settings:
+        if self._settings is None:
             with bundle.find("settings.yml").open() as settings_yaml:
                 settings = yaml.safe_load(settings_yaml)
             self._settings = list(map(SettingDefinition.parse, settings["settings"]))
@@ -38,7 +38,7 @@ class ConfigService:
 
     @property
     def current_config(self):
-        if not self._current_config:
+        if self._current_config is None:
             self._current_config = deepcopy(self.project.meltano.config)
 
         return self._current_config
