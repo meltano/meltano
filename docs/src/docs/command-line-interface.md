@@ -130,7 +130,7 @@ Enables you to change a plugin's configuration.
 
 Meltano uses configuration layers to resolve a plugin's configuration:
 
-1. Environment variables
+1. Environment variables, set through your shell, a [`.env` file](https://github.com/theskumar/python-dotenv#usages) in your project directory, a [scheduled pipeline](#schedule)'s `env` object in `meltano.yml`, or any other method.
 1. Plugin's `config` attribute in **meltano.yml**, set manually or using `meltano config <plugin_name> set`. Inside values, [environment variables](#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
 1. System database, which holds settings set via the UI or `meltano config <plugin_name> set --store=db`
 1. Default values set in the setting definition in **discovery.yml**
@@ -285,7 +285,7 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT] [
 To allow loaders and transformers to adapt their configuration and behavior based on the extractor and loader they are run with,
 `meltano elt` dynamically sets a number of pipeline-specific environment variables before compiling their configuration and invoking their executables.
 
-In addition to variables set through the environment or your project's `.env` file, the following variables describing the extractor are available to loaders _and_ transformers:
+In addition to variables set through the environment or a `.env` file in your project directory, the following variables describing the extractor are available to loaders _and_ transformers:
 
 - `MELTANO_EXTRACTOR_NAME`: the extractor's `name`, e.g. `tap-gitlab`
 - `MELTANO_EXTRACTOR_NAMESPACE`: the extractor's `namespace`, e.g. `tap_gitlab`

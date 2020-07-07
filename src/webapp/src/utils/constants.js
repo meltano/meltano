@@ -1,4 +1,5 @@
 export const ENV = 'env'
+export const DOTENV = 'dotenv'
 export const MELTANO_YML = 'meltano_yml'
 export const PIPELINE_INTERVAL_OPTIONS = {
   '@once': 'Once (Manual)',

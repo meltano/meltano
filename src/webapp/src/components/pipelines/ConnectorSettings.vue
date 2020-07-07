@@ -1,7 +1,7 @@
 <script>
 import axios from 'axios'
 
-import { ENV, MELTANO_YML } from '@/utils/constants'
+import { ENV, DOTENV, MELTANO_YML } from '@/utils/constants'
 import InputDateIso8601 from '@/components/generic/InputDateIso8601'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import utils from '@/utils/utils'
@@ -125,6 +125,7 @@ export default {
         return (
           setting.protected === true ||
           settingSource === ENV ||
+          settingSource === DOTENV ||
           settingSource === MELTANO_YML
         )
       }
@@ -200,8 +201,10 @@ export default {
 
         if (configSource === ENV) {
           return 'This setting is currently controlled by an environment variable.'
+        } else if (configSource === DOTENV) {
+          return 'This setting is currently controlled through `.env`.'
         } else if (configSource === MELTANO_YML) {
-          return 'This setting is currently controlled through meltano.yml.'
+          return 'This setting is currently controlled through `meltano.yml`.'
         } else {
           return 'This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more.'
         }

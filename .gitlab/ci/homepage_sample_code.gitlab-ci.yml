@@ -230,7 +230,7 @@ homepage_sample_code:
     # meltano config tap-covid-19 set --store=db api_token <your_github_api_token>
     # - OR the current shell environment:
     # export TAP_COVID_19_API_TOKEN="<your_github_api_token>"
-    # - OR your project's (gitignored) `.env` file:
+    # - OR a (gitignored) `.env` file:
     # touch .env
     # echo "TAP_COVID_19_API_TOKEN=<your_github_api_token>" >> .env
 
