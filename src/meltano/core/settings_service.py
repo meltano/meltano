@@ -40,17 +40,18 @@ class SettingValueSource(str, Enum):
     @property
     def label(self):
         labels = {
-            self.CONFIG_OVERRIDE: "command line flag",
-            self.ENV: "environment",
-            self.DOTENV: ".env",
-            self.MELTANO_YML: "meltano.yml",
-            self.DB: "system database",
-            self.DEFAULT: "default",
+            self.CONFIG_OVERRIDE: "a command line flag",
+            self.ENV: "the environment",
+            self.DOTENV: "`.env`",
+            self.MELTANO_YML: "`meltano.yml`",
+            self.DB: "the system database",
+            self.DEFAULT: "the default",
         }
         return labels[self]
 
 
 class SettingValueStore(str, Enum):
+    DOTENV = "dotenv"
     MELTANO_YML = "meltano_yml"
     DB = "db"
 
@@ -260,10 +261,28 @@ class SettingsService(ABC):
         if setting_def:
             value = setting_def.cast_value(value)
 
+        def dotenv_setter():
+            if not setting_def:
+                return None
+
             env_key = self.setting_env(setting_def)
 
-            if env_key in self.env:
-                logging.warning(f"Setting `{name}` is currently set via ${env_key}.")
+            dotenv_file = self.project.dotenv
+
+            if value is None:
+                if dotenv_file.exists():
+                    for key in [env_key, *setting_def.env_alias_getters.keys()]:
+                        dotenv.unset_key(dotenv_file, key)
+            else:
+                if dotenv_file.exists():
+                    for key in setting_def.env_alias_getters.keys():
+                        dotenv.unset_key(dotenv_file, key)
+                else:
+                    dotenv_file.touch()
+
+                dotenv.set_key(dotenv_file, env_key, str(value))
+
+            return True
 
         def meltano_yml_setter():
             config = self._meltano_yml_config
@@ -302,6 +321,7 @@ class SettingsService(ABC):
             return True
 
         config_setters = {
+            SettingValueStore.DOTENV: dotenv_setter,
             SettingValueStore.MELTANO_YML: meltano_yml_setter,
             SettingValueStore.DB: db_setter,
         }
@@ -315,6 +335,14 @@ class SettingsService(ABC):
         return self.set(path, None, **kwargs)
 
     def reset(self, store=SettingValueStore.MELTANO_YML, session=None):
+        def dotenv_resetter():
+            dotenv_file = self.project.dotenv
+
+            if dotenv_file.exists():
+                dotenv_file.unlink()
+
+            return True
+
         def meltano_yml_resetter():
             self._meltano_yml_config.clear()
             self._update_meltano_yml_config()
@@ -329,6 +357,7 @@ class SettingsService(ABC):
             return True
 
         config_resetters = {
+            SettingValueStore.DOTENV: dotenv_resetter,
             SettingValueStore.MELTANO_YML: meltano_yml_resetter,
             SettingValueStore.DB: db_resetter,
         }

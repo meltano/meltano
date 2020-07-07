@@ -1,4 +1,5 @@
 import pytest
+import dotenv
 from contextlib import contextmanager
 
 from meltano.core.config_service import PluginAlreadyAddedException
@@ -246,6 +247,54 @@ class TestPluginSettingsService:
             extractor = meltano.plugins.extractors[0]
             assert "test_a" not in extractor.config
             assert "test_b" not in extractor.config
+
+    def test_store_dotenv(self, session, subject, project, tap):
+        store = SettingValueStore.DOTENV
+
+        assert not project.dotenv.exists()
+
+        subject.set(session, tap, "test", "THIS_IS_FROM_DOTENV", store=store)
+        subject.set(session, tap, "start_date", "THIS_IS_FROM_DOTENV", store=store)
+
+        dotenv_contents = dotenv.dotenv_values(project.dotenv)
+        assert dotenv_contents["TAP_MOCK_TEST"] == "THIS_IS_FROM_DOTENV"
+        assert dotenv_contents["TAP_MOCK_START_DATE"] == "THIS_IS_FROM_DOTENV"
+        assert subject.get_with_source(session, tap, "test") == (
+            "THIS_IS_FROM_DOTENV",
+            SettingValueSource.DOTENV,
+        )
+        assert subject.get_with_source(session, tap, "start_date") == (
+            "THIS_IS_FROM_DOTENV",
+            SettingValueSource.DOTENV,
+        )
+
+        dotenv.set_key(project.dotenv, "TAP_MOCK_DISABLED", "true")
+        dotenv.set_key(project.dotenv, "TAP_MOCK_ENABLED", "false")
+        assert subject.get_with_source(session, tap, "boolean") == (
+            False,
+            SettingValueSource.DOTENV,
+        )
+
+        subject.set(session, tap, "boolean", True, store=store)
+
+        dotenv_contents = dotenv.dotenv_values(project.dotenv)
+        assert dotenv_contents["TAP_MOCK_BOOLEAN"] == "True"
+        assert "TAP_MOCK_DISABLED" not in dotenv_contents
+        assert "TAP_MOCK_ENABLED" not in dotenv_contents
+        assert subject.get_with_source(session, tap, "boolean") == (
+            True,
+            SettingValueSource.DOTENV,
+        )
+
+        subject.unset(session, tap, "test", store=store)
+
+        dotenv_contents = dotenv.dotenv_values(project.dotenv)
+        assert "TAP_MOCK_TEST" not in dotenv_contents
+        assert dotenv_contents["TAP_MOCK_START_DATE"] == "THIS_IS_FROM_DOTENV"
+        assert dotenv_contents["TAP_MOCK_BOOLEAN"] == "True"
+
+        subject.reset(session, tap, store=store)
+        assert not project.dotenv.exists()
 
     def test_env_var_substitution(self, session, subject, project, tap):
         with project.meltano_update() as meltano:

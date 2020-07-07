@@ -519,15 +519,15 @@ To determine the values of these settings, Meltano will look in 4 places, with e
 4. **The default `value`s** set on the plugin's `settings` object in the global `discovery.yml` file (in the case of [known plugins](/docs/contributor-guide.html#known-plugins)) or your project's `meltano.yml` file (in the case of custom plugins). `meltano config <plugin> list` will list the default values.
 
 Configuration that is _not_ environment-specific or sensitive should be stored in your project's `meltano.yml` file and checked into version
-control. Sensitive values like passwords and tokens are most appropriately stored in the environment or system database.
+control. Sensitive values like passwords and tokens are most appropriately stored in the environment, a (`.gitignore`d) `.env` file in your project directory, or the system database.
 
 :::
 
 ::: slot meltano-config-code
 
 ```bash
-# List available plugin settings
-# with their names and environment variables
+# List all plugin settings with their names,
+# environment variables, and current values
 meltano config tap-covid-19 list
 
 # Store non-sensitive plugin configuration in
@@ -536,27 +536,28 @@ meltano config tap-covid-19 set start_date "2020-01-01T00:00:00Z"
 meltano config tap-covid-19 set user_agent "tap-covid-19 via meltano <api_user_email@your_company.com>"
 
 # Store sensitive plugin configuration in...
-# - your project's system database:
-meltano config tap-covid-19 set --store=db api_token <your-github-api-token>
-# - OR the current shell environment:
+# - the current shell environment:
 export TAP_COVID_19_API_TOKEN="<your-github-api-token>"
 # - OR a (gitignored) `.env` file:
-touch .env
-echo "TAP_COVID_19_API_TOKEN=<your-github-api-token>" >> .env
+meltano config tap-covid-19 set --store=dotenv api_token <your-github-api-token>
+# - OR your project's system database:
+meltano config tap-covid-19 set --store=db api_token <your-github-api-token>
 
 # Unset configuration stored in `meltano.yml`
 # meltano config tap-covid-19 unset start_date
 
-# Unset configuration stored in system database
+# Unset configuration stored elsewhere
+# meltano config tap-covid-19 unset --store=dotenv api_token
 # meltano config tap-covid-19 unset --store=db api_token
 
 # Reset configuration stored in `meltano.yml`
 # meltano config tap-covid-19 reset
 
-# Reset configuration stored in system database
+# Reset configuration stored elsewhere
+# meltano config tap-covid-19 reset --store=dotenv
 # meltano config tap-covid-19 reset --store=db
 
-# View configuration, independent of storage method
+# View configuration, wherever it may be stored
 meltano config tap-covid-19
 ```
 

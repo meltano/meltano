@@ -16,7 +16,11 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import truthy
 from meltano.core.migration_service import MigrationService
 from meltano.api.workers import MeltanoCompilerWorker, APIWorker, UIAvailableWorker
-from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.project_settings_service import (
+    ProjectSettingsService,
+    SettingValueSource,
+    SettingValueStore,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -86,29 +90,38 @@ def start(ctx, reload, bind, bind_port):
 @click.pass_context
 def setup(ctx, server_name, **flags):
     """
-    Generates the `ui.cfg` file to keep the server secrets keys.
+    Generates and stores server name and secrets.
     """
     project = ctx.obj["project"]
-    ui_file_path = project.root_dir("ui.cfg")
+    settings_service = ProjectSettingsService(project)
 
-    if ui_file_path.exists():
-        logging.critical(
-            f"Found secrets in file `{ui_file_path}`, please delete this file to regenerate the secrets."
+    def set_setting_env(setting_name, value):
+        settings_service.set(setting_name, value, store=SettingValueStore.DOTENV)
+
+    set_setting_env("ui.server_name", server_name)
+
+    ui_cfg_path = project.root_dir("ui.cfg")
+    if ui_cfg_path.exists():
+        click.echo(
+            f"Found existing secrets in file '{ui_cfg_path}'. Please delete this file and rerun this command to regenerate the secrets."
         )
         raise click.Abort()
 
     generate_secret = lambda: secrets.token_hex(int(flags["bits"] / 8))  # in bytes
 
-    config = {
-        "SERVER_NAME": server_name,
-        "SECRET_KEY": generate_secret(),
-        "SECURITY_PASSWORD_SALT": generate_secret(),
-    }
+    secret_settings = ["ui.secret_key", "ui.password_salt"]
+    for setting_name in secret_settings:
+        value, source = settings_service.get_with_source(setting_name)
+        if source is not SettingValueSource.DEFAULT:
+            click.echo(
+                f"Setting '{setting_name}' has already been set in {source.label}. Please unset it manually and rerun this command to regenerate this secret."
+            )
+        else:
+            set_setting_env(setting_name, generate_secret())
 
-    # Flask doesn't support `configparser` or any other configuration format
-    # than plain Python files.
-    #
-    # Luckily the format is trivial to generate
-    with ui_file_path.open("w") as f:
-        for k, v in config.items():
-            f.write(f'{k} = "{v}"\n')
+    click.echo(
+        "The server name and generated secrets have been stored in a `.env` file in your project directory."
+    )
+    click.echo(
+        "In production, you will likely want to move these settings to actual environment variables, since `.env` is in `.gitignore` by default."
+    )

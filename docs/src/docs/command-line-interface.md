@@ -157,14 +157,17 @@ meltano config <plugin_name> list
 
 # Sets the configuration's setting `<name>` to `<value>`.
 meltano config <plugin_name> set <name> <value> # store in `meltano.yml`
+meltano config <plugin_name> set --store=dotenv <name> <value> # store in `.env`
 meltano config <plugin_name> set --store=db <name> <value> # store in system database
 
 # Remove the configuration's setting `<name>`.
 meltano config <plugin_name> unset <name> # remove from `meltano.yml`
+meltano config <plugin_name> unset --store=dotenv <name> # remove from `.env`
 meltano config <plugin_name> unset --store=db <name> # remove from system database
 
 # Clear the configuration (back to defaults).
 meltano config <plugin_name> reset # remove from `meltano.yml`
+meltano config <plugin_name> reset --store=dotenv # remove from `.env`
 meltano config <plugin_name> reset --store=db # remove from system database
 ```
 
@@ -483,7 +486,10 @@ Start the Meltano UI.
 This command is only relevant for production-grade setup.
 :::
 
-Generate secure secrets in the `ui.cfg` so that the application is secure.
+Generate secrets for the `ui.secret_key` and `ui.password_salt` settings and
+store them and the provided `server_name` in a `.env` in your project directory so that the application is secure.
+
+These settings can also be set or overridden in [the environment](./environment-variables.html#production-configuration).
 
 ::: warning
 Regenerating secrets will cause the following:
@@ -494,9 +500,16 @@ Regenerating secrets will cause the following:
 Use with caution!
 :::
 
-#### --bits
+#### How to use
 
-Specify the size of the secrets, default to 256.
+The `--bits` flag can be used to specify the size of the secrets, default to 256.
+
+```bash
+# Format
+meltano ui setup [--bits=256] <server_name>
+
+meltano ui setup meltano.example.com
+```
 
 ## `user`
 

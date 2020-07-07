@@ -6,7 +6,6 @@ requirements.txt: ""
   /venv
   /.meltano
   .env
-  ui.cfg
 model/.gitkeep: ""
 extract/.gitkeep: ""
 load/.gitkeep: ""
