@@ -15,18 +15,22 @@ from meltano.api.headers import *
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.db import project_engine
-from meltano.core.logging.utils import current_log_level, FORMAT
+from meltano.core.logging.utils import setup_logging, FORMAT
 from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.oauth.app import create_app as create_oauth_service
 
 
-# the logger we setup here is for the `meltano.api` module
+setup_logging()
+
+# the file logger we will set up below is for the `meltano.api` module
 logger = logging.getLogger("meltano.api")
 
 
 def create_app(config={}):
     project = Project.find()
+    setup_logging(project)
+
     settings_service = ProjectSettingsService(project)
 
     project_engine(project, settings_service.get("database_uri"), default=True)
@@ -49,13 +53,11 @@ def create_app(config={}):
         ensure_secure_setup(settings_service)
 
     # File logging
-    formatter = logging.Formatter(fmt=FORMAT)
     file_handler = logging.handlers.RotatingFileHandler(
         str(project.run_dir("meltano-ui.log")), backupCount=3
     )
+    formatter = logging.Formatter(fmt=FORMAT)
     file_handler.setFormatter(formatter)
-
-    logger.setLevel(current_log_level())
     logger.addHandler(file_handler)
 
     # 1) Extensions

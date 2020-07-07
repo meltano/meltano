@@ -4,6 +4,7 @@ import os
 import re
 import sys
 
+from meltano.core.project_settings_service import ProjectSettingsService
 
 LEVELS = {
     "debug": logging.DEBUG,
@@ -12,19 +13,32 @@ LEVELS = {
     "error": logging.ERROR,
     "critical": logging.CRITICAL,
 }
-CURRENT_LEVEL = os.getenv("MELTANO_LOG_LEVEL", "info")
-FORMAT = "[%(asctime)s|%(levelname).1s|%(threadName)10s|%(name)s] %(message)s"
+DEFAULT_LEVEL = "info"
+FORMAT = (
+    "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"
+)
 
 
-def current_log_level():
-    return LEVELS[CURRENT_LEVEL]
+def parse_log_level(log_level):
+    return LEVELS.get(log_level, LEVELS[DEFAULT_LEVEL])
 
 
-def setup_logging(log_level=CURRENT_LEVEL):
-    # setting that for any subprocess started by this process
-    os.environ["MELTANO_LOG_LEVEL"] = log_level
+def setup_logging(project=None, log_level=DEFAULT_LEVEL):
+    # Mimick Python 3.8's `force=True` kwarg to override any
+    # existing logger handlers
+    # See https://github.com/python/cpython/commit/cf67d6a934b51b1f97e72945b596477b271f70b8
+    root = logging.getLogger()
+    for h in root.handlers[:]:
+        root.removeHandler(h)
+        h.close()
 
-    logging.basicConfig(stream=sys.stderr, format=FORMAT, level=LEVELS[log_level])
+    if project:
+        settings_service = ProjectSettingsService(project)
+        log_level = settings_service.get("log_level")
+
+    logging.basicConfig(
+        stream=sys.stderr, format=FORMAT, level=parse_log_level(log_level)
+    )
 
 
 def remove_ansi_escape_sequences(line):
