@@ -1,11 +1,12 @@
 import os
 import sqlalchemy
 import logging
+import re
+import dotenv
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Iterable, Dict, List
 from enum import Enum
-import re
 
 from meltano.core.utils import (
     find_named,
@@ -31,15 +32,17 @@ class SettingMissingError(Error):
 class SettingValueSource(str, Enum):
     CONFIG_OVERRIDE = "config_override"  # 0
     ENV = "env"  # 1
-    MELTANO_YML = "meltano_yml"  # 2
-    DB = "db"  # 3
-    DEFAULT = "default"  # 4
+    DOTENV = "dotenv"  # 2
+    MELTANO_YML = "meltano_yml"  # 3
+    DB = "db"  # 4
+    DEFAULT = "default"  # 5
 
     @property
     def label(self):
         labels = {
-            self.CONFIG_OVERRIDE: "config override",
+            self.CONFIG_OVERRIDE: "command line flag",
             self.ENV: "environment",
+            self.DOTENV: ".env",
             self.MELTANO_YML: "meltano.yml",
             self.DB: "system database",
             self.DEFAULT: "default",
@@ -159,7 +162,7 @@ class SettingsService(ABC):
             except KeyError:
                 return None
 
-        def env_getter():
+        def env_getter(env=self.env):
             if not setting_def:
                 return None
 
@@ -171,7 +174,7 @@ class SettingsService(ABC):
 
             for key, getter in env_getters.items():
                 try:
-                    return getter(self.env)
+                    return getter(env)
                 except KeyError:
                     pass
                 else:
@@ -180,6 +183,9 @@ class SettingsService(ABC):
                     )
 
             return None
+
+        def dotenv_getter():
+            return env_getter(env=dotenv.dotenv_values(self.project.dotenv))
 
         def meltano_yml_getter():
             try:
@@ -210,6 +216,7 @@ class SettingsService(ABC):
         config_getters = {
             SettingValueSource.CONFIG_OVERRIDE: config_override_getter,
             SettingValueSource.ENV: env_getter,
+            SettingValueSource.DOTENV: dotenv_getter,
             SettingValueSource.MELTANO_YML: meltano_yml_getter,
             SettingValueSource.DB: db_getter,
             SettingValueSource.DEFAULT: default_getter,

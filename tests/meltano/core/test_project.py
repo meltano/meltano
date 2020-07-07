@@ -82,14 +82,12 @@ class TestProject:
                 shutil.rmtree(empty_dir)
 
     def test_activate(self, project):
-        assert os.getenv("MELTANO_PROJECT") is None
+        Project.deactivate()
+        assert Project._default is None
 
-        with project.dotenv.open("w") as env:
-            env.write(f"MELTANO_PROJECT={project.root}")
-
-        # `Project.find()` always return the default instance
         Project.activate(project)
-        assert os.getenv("MELTANO_PROJECT") == str(project.root)
+
+        assert Project._default is project
         assert Project.find() is project
 
     def test_find_threadsafe(self, project, concurrency):

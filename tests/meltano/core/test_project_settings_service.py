@@ -19,11 +19,6 @@ def config_override():
 
 
 @pytest.fixture
-def dotenv(project):
-    project.dotenv.write_text(f"MELTANO_PROJECT_ID=from_dotenv")
-
-
-@pytest.fixture
 def subject(project):
     return ProjectSettingsService(project)
 
@@ -41,22 +36,14 @@ class TestProjectSettingsService:
 
         assert_value_source("from_meltano_yml", SettingValueSource.MELTANO_YML)
 
-        with monkeypatch.context() as m:
-            m.setenv("MELTANO_PROJECT_ID", "from_env")
+        env_key = subject.setting_env(subject.find_setting("project_id"))
 
-            assert_value_source("from_env", SettingValueSource.ENV)
+        subject.project.dotenv.write_text(f"{env_key}=from_dotenv")
 
-    def test_get_with_source_dotenv(self, dotenv, project, subject, monkeypatch):
-        # Ensure .env is loaded again
-        Project.activate(project)
-
-        def assert_value_source(value, source):
-            assert subject.get_with_source("project_id") == (value, source)
-
-        assert_value_source("from_dotenv", SettingValueSource.ENV)
+        assert_value_source("from_dotenv", SettingValueSource.DOTENV)
 
         with monkeypatch.context() as m:
-            m.setenv("MELTANO_PROJECT_ID", "from_env")
+            m.setenv(env_key, "from_env")
 
             assert_value_source("from_env", SettingValueSource.ENV)
 
