@@ -49,12 +49,6 @@ class Project(Versioned):
     def env(self):
         return {PROJECT_ROOT_ENV: str(self.root)}
 
-    def load_env(self):
-        full_env = {**dotenv_values(self.dotenv), **self.env}
-        for k, v in full_env.items():
-            if k not in os.environ and v is not None:
-                os.environ[k] = v
-
     @classmethod
     @fasteners.locked(lock="_activate_lock")
     def activate(cls, project: "Project"):
@@ -68,10 +62,6 @@ class Project(Versioned):
         except FileExistsError:
             pass
 
-        # To be removed once every call to `os.getenv` has been replaced with
-        # a call to `ProjectSettingsService.get`
-        project.load_env()
-
         logging.debug(f"Activated project at {project.root}")
 
         # set the default project
@@ -79,7 +69,6 @@ class Project(Versioned):
 
     @classmethod
     def deactivate(cls):
-        os.environ.pop(PROJECT_ROOT_ENV, None)
         cls._default = None
 
     @property

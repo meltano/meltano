@@ -5,6 +5,7 @@ from copy import copy
 
 import meltano
 from meltano.cli import cli
+from meltano.core.project import Project
 
 
 class TestCli:
@@ -18,17 +19,16 @@ class TestCli:
         shutil.rmtree(project.root)
 
     def test_activate_project(self, project, cli_runner, pushd):
+        assert Project._default is None
+
         # `cd` into a project
         pushd(project.root)
-
-        # let's overwrite the `.env` to add a sentinel value
-        with project.dotenv.open("w") as env:
-            env.write("CLI_TEST_ACTIVATE_PROJECT=1")
 
         # run any cli command - that should activate the project
         cli_runner.invoke(cli, ["discover"])
 
-        assert os.getenv("CLI_TEST_ACTIVATE_PROJECT") == "1"
+        assert Project._default is not None
+        assert Project._default.root == project.root
 
     def test_version(self, cli_runner):
         cli_version = cli_runner.invoke(cli, ["--version"])
