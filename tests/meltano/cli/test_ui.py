@@ -2,21 +2,57 @@ import pytest
 from unittest import mock
 
 from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.project_settings_service import (
+    ProjectSettingsService,
+    SettingValueSource,
+)
 from meltano.cli import cli
 from asserts import assert_cli_runner
 
 
 class TestCliUi:
     def test_ui(self, project, cli_runner):
-        # fmt: off
-      with mock.patch("meltano.cli.ui.APIWorker.start") as start_api_worker, \
-        mock.patch("meltano.cli.ui.MeltanoCompilerWorker.start") as start_compiler, \
-        mock.patch("meltano.cli.ui.UIAvailableWorker.start") as start_ui_available_worker, \
-        mock.patch.object(GoogleAnalyticsTracker, "track_meltano_ui") as track:
-          cli_runner.invoke(cli, "ui")
+        with mock.patch(
+            "meltano.cli.ui.APIWorker.start"
+        ) as start_api_worker, mock.patch(
+            "meltano.cli.ui.MeltanoCompilerWorker.start"
+        ) as start_compiler, mock.patch(
+            "meltano.cli.ui.UIAvailableWorker.start"
+        ) as start_ui_available_worker, mock.patch.object(
+            GoogleAnalyticsTracker, "track_meltano_ui"
+        ) as track:
+            result = cli_runner.invoke(cli, "ui")
+            assert_cli_runner(result)
 
-          assert start_api_worker.called
-          assert start_ui_available_worker.called
-          assert start_compiler.called
-          assert track.called
-        # fmt: on
+            assert start_api_worker.called
+            assert start_ui_available_worker.called
+            assert start_compiler.called
+            assert track.called
+
+    def test_ui_setup(self, project, cli_runner, monkeypatch):
+        monkeypatch.setenv("MELTANO_UI_SECRET_KEY", "existing_secret_key")
+
+        with mock.patch("meltano.cli.ui.secrets.token_hex", return_value="fake_secret"):
+            result = cli_runner.invoke(cli, ["ui", "setup", "meltano.example.com"])
+
+        assert_cli_runner(result)
+
+        assert (
+            "Setting 'ui.secret_key' has already been set in the environment"
+            in result.stdout
+        )
+
+        settings_service = ProjectSettingsService(project)
+
+        assert settings_service.get_with_source("ui.server_name") == (
+            "meltano.example.com",
+            SettingValueSource.DOTENV,
+        )
+        assert settings_service.get_with_source("ui.secret_key") == (
+            "existing_secret_key",
+            SettingValueSource.ENV,
+        )
+        assert settings_service.get_with_source("ui.password_salt") == (
+            "fake_secret",
+            SettingValueSource.DOTENV,
+        )

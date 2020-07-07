@@ -86,14 +86,15 @@ export FLASK_ENV = "production"
 
 #### Production Configuration
 
-`SERVER_NAME`, `SECRET_KEY`, and `SECURITY_PASSWORD_SALT` should be set in production, and will
-generate a security warning if they are missing. These can be set in `ui.cfg` with `meltano ui setup`
-but can be overridden with these environment variables:
+The `ui.server_name`, `ui.secret_key`, and `ui.password_salt` settings should be set in production, and will
+generate a security warning if they are missing.
+These secrets can be generated and stored in a `.env` file in your project directory using [`meltano ui setup`](./command-line-interface.html#setup)
+but can also be set directly using these environment variables:
 
 ```bash
-MELTANO_UI_SERVER_NAME=""
-MELTANO_UI_SECRET_KEY=""
-MELTANO_UI_PASSWORD_SALT=""
+export MELTANO_UI_SERVER_NAME="meltano.example.com"
+export MELTANO_UI_SECRET_KEY=""
+export MELTANO_UI_PASSWORD_SALT=""
 ```
 
 #### Service Listen Configuration

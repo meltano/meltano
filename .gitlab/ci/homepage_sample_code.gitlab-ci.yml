@@ -216,8 +216,8 @@ homepage_sample_code:
 
     ### https://meltano.com/#meltano-config
 
-    # List available plugin settings
-    # with their names and environment variables
+    # List all plugin settings with their names,
+    # environment variables, and current values
     - meltano config tap-covid-19 list
 
     # Store non-sensitive plugin configuration in
@@ -226,27 +226,28 @@ homepage_sample_code:
     - meltano config tap-covid-19 set user_agent "tap-covid-19 via Meltano via GitLab CI"
 
     # Store sensitive plugin configuration in...
-    # - your project's system database:
-    # meltano config tap-covid-19 set --store=db api_token <your_github_api_token>
-    # - OR the current shell environment:
-    # export TAP_COVID_19_API_TOKEN="<your_github_api_token>"
+    # - the current shell environment:
+    # export TAP_COVID_19_API_TOKEN="<your-github-api-token>"
     # - OR a (gitignored) `.env` file:
-    # touch .env
-    # echo "TAP_COVID_19_API_TOKEN=<your_github_api_token>" >> .env
+    # meltano config tap-covid-19 set --store=dotenv api_token <your-github-api-token>
+    # - OR your project's system database:
+    # meltano config tap-covid-19 set --store=db api_token <your-github-api-token>
 
     # Unset configuration stored in `meltano.yml`
     # meltano config tap-covid-19 unset start_date
 
-    # Unset configuration stored in system database
+    # Unset configuration stored elsewhere
+    # meltano config tap-covid-19 unset --store=dotenv api_token
     # meltano config tap-covid-19 unset --store=db api_token
 
     # Reset configuration stored in `meltano.yml`
     # meltano config tap-covid-19 reset
 
-    # Reset configuration stored in system database
+    # Reset configuration stored elsewhere
+    # meltano config tap-covid-19 reset --store=dotenv
     # meltano config tap-covid-19 reset --store=db
 
-    # View configuration, independent of storage method
+    # View configuration, wherever it may be stored
     - meltano config tap-covid-19
 
 
