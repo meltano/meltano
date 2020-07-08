@@ -83,7 +83,9 @@ class ProjectInitService:
         click.echo()
         click.secho("> ", fg="bright_black", nl=False)
 
-        click.secho("Meltano sends anonymous usage data that help improve the product.")
+        click.secho(
+            "Meltano sends anonymous usage data that helps improve the product."
+        )
 
         click.secho("> ", fg="bright_black", nl=False)
 
@@ -92,7 +94,7 @@ class ProjectInitService:
         click.secho("> ", fg="bright_black", nl=False)
 
         click.secho(
-            "https://meltano.com/docs/environment-variables.html#anonymous-usage-data",
+            "https://meltano.com/docs/settings.html#send-anonymous-usage-stats",
             fg="cyan",
         )
 

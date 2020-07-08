@@ -1,15 +1,15 @@
 settings:
-# Project settings
+# Project
 - name: send_anonymous_usage_stats
   kind: boolean
   value: true
   env_aliases: ["!MELTANO_DISABLE_TRACKING"]
 - name: project_id
-
-# Environment-specific project settings
 - name: database_uri
   value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db
-- name: log_level
+
+# CLI
+- name: cli.log_level
   kind: options
   options:
   - label: Debug
@@ -24,18 +24,7 @@ settings:
     value: critical
   value: info
 
-# Analytics Tracking IDs
-- name: tracking_ids.cli
-  value: UA-132758957-3
-  env_aliases: [MELTANO_CLI_TRACKING_ID]
-- name: tracking_ids.ui
-  value: UA-132758957-2
-  env_aliases: [MELTANO_UI_TRACKING_ID]
-- name: tracking_ids.ui_embed
-  value: UA-132758957-6
-  env_aliases: [MELTANO_EMBED_TRACKING_ID]
-
-# UI settings
+# UI server
 - name: ui.bind_host
   value: "0.0.0.0"
   env_aliases: [MELTANO_API_HOSTNAME]
@@ -43,6 +32,11 @@ settings:
   kind: integer
   value: 5000
   env_aliases: [MELTANO_API_PORT, PORT]
+- name: ui.server_name
+- name: ui.secret_key
+  value: thisisnotapropersecretkey
+- name: ui.password_salt
+  value: b4c124932584ad6e69f2774a0ae5c138
 - name: ui.workers
   kind: integer
   value: 4
@@ -50,12 +44,6 @@ settings:
 - name: ui.forwarded_allow_ips
   value: "127.0.0.1"
   env_aliases: [FORWARDED_ALLOW_IPS]
-
-- name: ui.server_name
-- name: ui.secret_key
-  value: thisisnotapropersecretkey
-- name: ui.password_salt
-  value: b4c124932584ad6e69f2774a0ae5c138
 
 # UI features
 - name: ui.readonly
@@ -71,14 +59,7 @@ settings:
   value: false
   env_aliases: [MELTANO_NOTIFICATION]
 
-# OAuth service settings
-- name: ui.oauth_service.url
-  env_aliases: [MELTANO_OAUTH_SERVICE_URL]
-- name: ui.oauth_service.providers
-  value: all
-  env_aliases: [MELTANO_OAUTH_SERVICE_PROVIDERS]
-
-# Mail settings
+# Mail server
 - name: mail.server
   value: localhost
   env: MAIL_SERVER
@@ -103,7 +84,22 @@ settings:
   value: false
   env: MAIL_DEBUG
 
-# OAuth provider settings
+# OAuth Service
+- name: oauth_service.url
+- name: oauth_service.providers
+  value: all
+- name: oauth_service.facebook.client_id
+  env: OAUTH_FACEBOOK_CLIENT_ID
+- name: oauth_service.facebook.client_secret
+  kind: password
+  env: OAUTH_FACEBOOK_CLIENT_SECRET
+- name: oauth_service.google_adwords.client_id
+  env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
+- name: oauth_service.google_adwords.client_secret
+  kind: password
+  env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
+
+# OAuth Single-Sign-On
 - name: oauth.gitlab.client_id
   env: OAUTH_GITLAB_CLIENT_ID
   env_aliases: [OAUTH_GITLAB_APPLICATION_ID]
@@ -111,13 +107,14 @@ settings:
   kind: password
   env: OAUTH_GITLAB_CLIENT_SECRET
   env_aliases: [OAUTH_GITLAB_SECRET]
-- name: oauth.facebook.client_id
-  env: OAUTH_FACEBOOK_CLIENT_ID
-- name: oauth.facebook.client_secret
-  kind: password
-  env: OAUTH_FACEBOOK_CLIENT_SECRET
-- name: oauth.google_adwords.client_id
-  env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
-- name: oauth.google_adwords.client_secret
-  kind: password
-  env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
+
+# Analytics Tracking IDs
+- name: tracking_ids.cli
+  value: UA-132758957-3
+  env_aliases: [MELTANO_CLI_TRACKING_ID]
+- name: tracking_ids.ui
+  value: UA-132758957-2
+  env_aliases: [MELTANO_UI_TRACKING_ID]
+- name: tracking_ids.ui_embed
+  value: UA-132758957-6
+  env_aliases: [MELTANO_EMBED_TRACKING_ID]

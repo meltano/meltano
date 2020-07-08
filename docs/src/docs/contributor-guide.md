@@ -21,7 +21,7 @@ We welcome contributions, idea submissions, and improvements. In fact we may alr
 
 ### Metrics (anonymous usage data) tracking
 
-As you contribute to Meltano, you may want to disable [metrics tracking](/docs/environment-variables.html#anonymous-usage-data) globally rather than by project. You can do this by setting the environment variable `MELTANO_DISABLE_TRACKING` to `True`:
+As you contribute to Meltano, you may want to disable [metrics tracking](/docs/settings.html#send-anonymous-usage-stats) globally rather than by project. You can do this by setting the environment variable `MELTANO_DISABLE_TRACKING` to `True`:
 
 ```bash
 # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
@@ -214,6 +214,10 @@ Each extractor (tap) and loader (target) in the `discovery.yml` has a `settings`
       env: SOME_API_KEY # Optional (use to delegate to an environment variable for overriding this setting's value)
       env_aliases: [OTHER_ENV] # Optional (use to delegate alternative environment variables for overriding this setting's value)
 ```
+
+##### Protected settings
+
+Until role-based access control is implemented in Meltano, we need to prevent user editing of certain settings from the UI. View this [`tap-gitlab` environment variable setup example](/tutorials/gitlab-and-postgres.html#add-extractor) to learn how to work with this current limitation.
 
 ## Plugin Development
 

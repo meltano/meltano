@@ -54,7 +54,7 @@ export default function setup() {
           text: 'Learn more',
           onClick: () => {
             window.open(
-              'https://www.meltano.com/docs/environment-variables.html#anonymous-usage-data'
+              'https://www.meltano.com/docs/settings.html#send-anonymous-usage-stats'
             )
           }
         },

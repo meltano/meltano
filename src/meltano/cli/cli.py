@@ -22,7 +22,7 @@ def cli(ctx, log_level, verbose):
     Get help at https://www.meltano.com/docs/command-line-interface.html
     """
     if log_level:
-        ProjectSettingsService.config_override["log_level"] = log_level
+        ProjectSettingsService.config_override["cli.log_level"] = log_level
 
     ctx.ensure_object(dict)
     ctx.obj["verbosity"] = verbose

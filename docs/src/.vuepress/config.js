@@ -3,7 +3,7 @@ const docsSidebar = [
   "/docs/installation",
   "/docs/getting-started",
   "/docs/command-line-interface",
-  "/docs/environment-variables",
+  "/docs/settings",
   "/docs/production",
   "/docs/transforms",
   "/docs/orchestration",
