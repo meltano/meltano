@@ -126,13 +126,16 @@ meltano add files [name_of_file_bundle...]
 
 ## `config`
 
-Enables you to change a plugin's configuration.
+Enables you to manage the configuration of Meltano itself or any of its plugins.
 
 Meltano uses configuration layers to resolve a plugin's configuration:
 
 1. Environment variables, set through your shell, a [`.env` file](https://github.com/theskumar/python-dotenv#usages) in your project directory, a [scheduled pipeline](#schedule)'s `env` object in `meltano.yml`, or any other method.
-1. Plugin's `config` attribute in **meltano.yml**, set manually or using `meltano config <plugin_name> set`. Inside values, [environment variables](#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
-1. System database, which holds settings set via the UI or `meltano config <plugin_name> set --store=db`
+1. `meltano.yml`, under the plugin's `config` key, set manually or using `meltano config <plugin_name> set`.
+   - Inside values, [environment variables](#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
+   - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
+1. System database, which holds settings set via the UI or `meltano config <plugin_name> set --store=db`.
+   - Note that configuration for Meltano itself cannot be stored in the system database.
 1. Default values set in the setting definition in **discovery.yml**
 
 ::: info
@@ -148,12 +151,19 @@ Note that in each of these cases, Meltano stores the configuration as-is, withou
 
 ### How to use
 
-```bash
-# Displays the plugin's configuration.
-meltano config <plugin_name>
+To manage the configuration of Meltano itself, specify `meltano` as the plugin name.
 
-# List the available settings for the plugin.
+```bash
+# List all settings for Meltano itself with their names,
+# environment variables, and current values
+meltano config meltano list
+
+# List all settings for the specified plugin with their names,
+# environment variables, and current values
 meltano config <plugin_name> list
+
+# View the plugin's current configuration.
+meltano config <plugin_name>
 
 # Sets the configuration's setting `<name>` to `<value>`.
 meltano config <plugin_name> set <name> <value> # store in `meltano.yml`
@@ -486,10 +496,10 @@ Start the Meltano UI.
 This command is only relevant for production-grade setup.
 :::
 
-Generate secrets for the `ui.secret_key` and `ui.password_salt` settings and
-store them and the provided `server_name` in a `.env` in your project directory so that the application is secure.
-
-These settings can also be set or overridden in [the environment](./environment-variables.html#production-configuration).
+Generate secrets for the [`ui.secret_key`](/docs/settings.html#ui-secret-key)
+and [`ui.password_salt`](/docs/settings.html#ui-password-salt) settings, that
+will be stored in a `.env` file in your project directory along with the
+specified value for the [`ui.server_name` setting](/docs/settings.html#ui-server-name).
 
 ::: warning
 Regenerating secrets will cause the following:

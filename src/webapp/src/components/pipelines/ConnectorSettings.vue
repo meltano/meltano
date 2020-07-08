@@ -569,7 +569,7 @@ export default {
                 <template v-if="!getIsOfKindHidden(setting.kind)">
                   <div v-if="getIsProtected(setting)" class="control">
                     <a
-                      href="https://meltano.com/docs/environment-variables.html#connector-settings-configuration"
+                      href="https://meltano.com/docs/contributor-guide.html#protected-settings"
                       target="_blank"
                       class="button is-small"
                     >

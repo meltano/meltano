@@ -130,7 +130,7 @@ since `meltano install` is a step in its build process.
 ## Storing metadata
 
 Meltano stores pipeline state and other metadata in a project-specific
-[system database](/docs/environment-variables.html#system-database), which takes
+[system database](/docs/settings.html#database-uri), which takes
 the shape of a SQLite database stored inside the project at `.meltano/meltano.db`
 by default. Like all files stored in the `.meltano` directory (which you'll remember
 is included in your project's `.gitignore` file by default), the system database is
@@ -201,7 +201,7 @@ using `meltano invoke airflow scheduler`.
 Similarly, you can start [its web interface](https://airflow.apache.org/docs/stable/cli-ref.html#webserver)
 using `meltano invoke airflow webserver`.
 
-However, do take into account Airflow's own 
+However, do take into account Airflow's own
 [Best Practices on Deployment in Production](https://airflow.apache.org/docs/stable/best-practices.html#deployment-in-production). Specifically, you will want to configure Airflow to:
 
 - [use a PostgreSQL (or MySQL) metadata database](https://airflow.apache.org/docs/stable/best-practices.html#database-backend)
