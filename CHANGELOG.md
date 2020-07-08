@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2140](https://gitlab.com/meltano/meltano/-/issues/2140) Only have `meltano ui` complain about missing `ui.server_name`, `ui.secret_key` and `ui.password_salt` settings when `ui.authentication` is enabled
+
 ### Fixes
 
 ### Breaks
