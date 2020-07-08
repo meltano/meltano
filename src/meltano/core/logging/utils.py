@@ -34,7 +34,7 @@ def setup_logging(project=None, log_level=DEFAULT_LEVEL):
 
     if project:
         settings_service = ProjectSettingsService(project)
-        log_level = settings_service.get("log_level")
+        log_level = settings_service.get("cli.log_level")
 
     logging.basicConfig(
         stream=sys.stderr, format=FORMAT, level=parse_log_level(log_level)

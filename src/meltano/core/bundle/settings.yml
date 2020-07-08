@@ -9,7 +9,7 @@ settings:
 # Environment-specific project settings
 - name: database_uri
   value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db
-- name: log_level
+- name: cli.log_level
   kind: options
   options:
   - label: Debug

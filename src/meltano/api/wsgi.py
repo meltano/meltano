@@ -12,7 +12,7 @@ _project = Project.find()
 _settings_service = ProjectSettingsService(_project)
 
 logconfig_dict = {"formatters": {"generic": {"format": FORMAT}}}
-loglevel = _settings_service.get("log_level")
+loglevel = _settings_service.get("cli.log_level")
 
 _bind_host = _settings_service.get("ui.bind_host")
 _bind_port = _settings_service.get("ui.bind_port")
