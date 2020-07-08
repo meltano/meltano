@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2141](https://gitlab.com/meltano/meltano/-/issues/2141) Add `ui.session_cookie_domain` setting, to be used instead of `ui.server_name` when hostname matching is not desirable.
+
 ### Changes
 
 - [#2140](https://gitlab.com/meltano/meltano/-/issues/2140) Only have `meltano ui` complain about missing `ui.server_name`, `ui.secret_key` and `ui.password_salt` settings when `ui.authentication` is enabled
