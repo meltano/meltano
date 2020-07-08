@@ -142,10 +142,8 @@ it inappropriate for use in production. Since it's a simple file, it only suppor
 one concurrent connection, for example.
 
 Thus, it is is strongly recommended that you use a PostgreSQL system database in
-production instead. You can configure Meltano to use it by setting the
-`MELTANO_DATABASE_URI` environment variable to a
-[`postgresql://` URI](https://docs.sqlalchemy.org/en/13/core/engines.html#postgresql),
-or by passing it to the `meltano` command in the `--database-uri` option.
+production instead. You can configure Meltano to use it using the
+[`database_uri` setting](/docs/settings.html#database-uri).
 
 ### Containerized Meltano project
 
