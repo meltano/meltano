@@ -34,10 +34,11 @@ def config(ctx, project, plugin_type, plugin_name, format):
             plugin_name, plugin_type=plugin_type, configurable=True
         )
     except PluginMissingError:
+        plugin = None
         if plugin_name == "meltano":
-            plugin = None
+            path_prefix = []
         else:
-            raise
+            path_prefix = [plugin_name]
 
     _, Session = project_engine(project)
     session = Session()
@@ -45,7 +46,7 @@ def config(ctx, project, plugin_type, plugin_name, format):
         if plugin:
             settings = PluginSettingsService(project).build(plugin)
         else:
-            settings = ProjectSettingsService(project)
+            settings = ProjectSettingsService(project, path_prefix=path_prefix)
 
         ctx.obj["settings"] = settings
         ctx.obj["session"] = session

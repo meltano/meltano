@@ -66,6 +66,7 @@ class SettingsService(ABC):
         project,
         config_service: ConfigService = None,
         show_hidden=True,
+        path_prefix=[],
         env_override={},
         config_override={},
     ):
@@ -74,6 +75,7 @@ class SettingsService(ABC):
         self.config_service = config_service or ConfigService(project)
 
         self.show_hidden = show_hidden
+        self.path_prefix = path_prefix
 
         self.env_override = env_override
         self.config_override = config_override
@@ -110,6 +112,10 @@ class SettingsService(ABC):
     def env(self):
         return {**os.environ, **self.env_override}
 
+    @property
+    def name_prefix(self):
+        return ".".join([*self.path_prefix, ""])
+
     @classmethod
     def is_kind_redacted(cls, kind) -> bool:
         return kind in ("password", "oauth")
@@ -125,7 +131,7 @@ class SettingsService(ABC):
     def config_with_metadata(self, sources: List[SettingValueSource] = None, **kwargs):
         config = {}
         for setting in self.definitions():
-            value, source = self.get_with_source(setting.name, **kwargs)
+            value, source = self.get_with_source(setting.name, **kwargs, prefix=False)
             if sources and source not in sources:
                 continue
 
@@ -151,7 +157,10 @@ class SettingsService(ABC):
             if config["value"] is not None
         }
 
-    def get_with_source(self, name: str, redacted=False, session=None):
+    def get_with_source(self, name: str, redacted=False, session=None, prefix=True):
+        if prefix and self.name_prefix:
+            name = f"{self.name_prefix}{name}"
+
         try:
             setting_def = self.find_setting(name)
         except SettingMissingError:
@@ -243,10 +252,18 @@ class SettingsService(ABC):
         return value
 
     def set(
-        self, path: List[str], value, store=SettingValueStore.MELTANO_YML, session=None
+        self,
+        path: List[str],
+        value,
+        store=SettingValueStore.MELTANO_YML,
+        session=None,
+        prefix=True,
     ):
         if isinstance(path, str):
             path = [path]
+
+        if prefix and self.path_prefix:
+            path = [*self.path_prefix, *path]
 
         name = ".".join(path)
 
@@ -338,13 +355,36 @@ class SettingsService(ABC):
         def dotenv_resetter():
             dotenv_file = self.project.dotenv
 
+            if self.path_prefix:
+                config_keys = self.as_dict(
+                    sources=[SettingValueSource.ENV, SettingValueSource.DOTENV]
+                ).keys()
+                for setting_name in config_keys:
+                    self.unset(
+                        setting_name, store=SettingValueStore.DOTENV, prefix=False
+                    )
+
+                if dotenv.dotenv_values(dotenv_file):
+                    return True
+
             if dotenv_file.exists():
                 dotenv_file.unlink()
 
             return True
 
         def meltano_yml_resetter():
-            self._meltano_yml_config.clear()
+            config = self._meltano_yml_config
+
+            if self.path_prefix:
+                pop_at_path(config, self.path_prefix, None)
+                prefixed_keys = [
+                    key for key in config.keys() if key.startswith(self.name_prefix)
+                ]
+                for key in prefixed_keys:
+                    config.pop(key)
+            else:
+                config.clear()
+
             self._update_meltano_yml_config()
             return True
 
@@ -352,7 +392,12 @@ class SettingsService(ABC):
             if not session:
                 return None
 
-            session.query(Setting).filter_by(namespace=self._db_namespace).delete()
+            settings = session.query(Setting).filter_by(namespace=self._db_namespace)
+            if self.name_prefix:
+                settings = settings.filter(Setting.name.startswith(self.name_prefix))
+
+            settings.delete(synchronize_session="fetch")
+
             session.commit()
             return True
 
@@ -382,6 +427,8 @@ class SettingsService(ABC):
         settings = []
         for setting in definitions:
             if setting.kind == "hidden" and not self.show_hidden:
+                continue
+            if self.name_prefix and not setting.name.startswith(self.name_prefix):
                 continue
 
             settings.append(setting)
