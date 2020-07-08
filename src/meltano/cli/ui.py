@@ -32,15 +32,22 @@ def ensure_secure_setup(project):
     if not settings_service.get("ui.authentication"):
         return
 
-    secure_settings = ["ui.server_name", "ui.secret_key", "ui.password_salt"]
-
     facts = []
+    if (
+        settings_service.get("ui.server_name") is None
+        and settings_service.get("ui.session_cookie_domain") is None
+    ):
+        facts.append(
+            f"- Neither the 'ui.server_name' or 'ui.session_cookie_domain' setting has been set"
+        )
+
+    secure_settings = ["ui.secret_key", "ui.password_salt"]
     for setting_name in secure_settings:
         value, source = settings_service.get_with_source(setting_name)
-        if value is None:
-            facts.append(f"- '{setting_name}' setting is unset")
-        elif source is SettingValueSource.DEFAULT:
-            facts.append(f"- '{setting_name}' setting has default test value")
+        if source is SettingValueSource.DEFAULT:
+            facts.append(
+                f"- The '{setting_name}' setting has not been changed from the default test value"
+            )
 
     if facts:
         click.secho(

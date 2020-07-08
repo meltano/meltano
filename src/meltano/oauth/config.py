@@ -10,6 +10,7 @@ SECRET_KEY = token_hex(64)
 class ProjectSettings(APIProjectSettings):
     settings_map = {
         "SERVER_NAME": "ui.server_name",
+        "SESSION_COOKIE_DOMAIN": "ui.session_cookie_domain",
         # Flask-Authlib
         "FACEBOOK_CLIENT_ID": "oauth_service.facebook.client_id",
         "FACEBOOK_CLIENT_SECRET": "oauth_service.facebook.client_secret",

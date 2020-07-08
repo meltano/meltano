@@ -188,11 +188,19 @@ meltano ui --bind-port=80
 - Environment variable: `MELTANO_UI_SERVER_NAME`
 - Default: None
 
-The host and port Meltano is available at. Used as the session cookie domain and to generate external URLs.
+The host and port Meltano UI is available at.
+
+Unless the [`ui.session_cookie_domain` setting](#ui-session-cookie-domain) is set, this setting will be used as the session cookie domain.
+
+If the [`ui.notification` setting](#ui-notification) is enabled, this setting will be used to generate external URLs in notification emails.
+
+When set, Meltano UI will only respond to requests whose hostname (`Host` header) matches this setting.
+If this is undesirable, you can set the [`ui.session_cookie_domain` setting](#ui-session-cookie-domain) instead.
+This may be the case when Meltano UI is situated behind a load balancer performing health checks without specifying a hostname.
 
 If the [`ui.authentication` setting](#ui-authentication) is enabled,
 [`meltano ui`](/docs/command-line-interface.html#ui) will print a
-warning unless this setting has been set.
+security warning if neither this setting or the [`ui.session_cookie_domain` setting](#ui-session-cookie-domain) has been set.
 
 This setting corresponds to [Flask's `SERVER_NAME` setting](https://flask.palletsprojects.com/en/1.1.x/config/#SERVER_NAME).
 
@@ -213,6 +221,29 @@ file in your project directory along with the specified `server_name`.
 meltano ui setup meltano.example.com
 ```
 
+### `ui.session_cookie_domain`
+
+- Environment variable: `MELTANO_UI_SESSION_COOKIE_DOMAIN`
+- Default: None
+
+The domain match rule that the session cookie will be valid for.
+
+If not set, the cookie will be valid for all subdomains of the configured [`ui.server_name`](#ui-server-name).
+
+If the [`ui.authentication` setting](#ui-authentication) is enabled,
+[`meltano ui`](/docs/command-line-interface.html#ui) will print a
+security warning if neither this setting or the [`ui.server_name` setting](#ui-server-name) has been set.
+
+This setting corresponds to [Flask's `SESSION_COOKIE_DOMAIN` setting](https://flask.palletsprojects.com/en/1.1.x/config/#SESSION_COOKIE_DOMAIN).
+
+#### How to use
+
+```bash
+meltano config meltano set --store=dotenv ui session_cookie_domain meltano.example.com
+
+export MELTANO_UI_SESSION_COOKIE_DOMAIN=meltano.example.com
+```
+
 ### `ui.secret_key`
 
 - Environment variable: `MELTANO_UI_SECRET_KEY`
@@ -222,7 +253,7 @@ A secret key that will be used for securely signing the session cookie.
 
 If the [`ui.authentication` setting](#ui-authentication) is enabled,
 [`meltano ui`](/docs/command-line-interface.html#ui) will print a
-warning unless this setting has been changed from the default.
+security warning if this setting has not been changed from the default.
 
 This setting corresponds to [Flask's `SECRET_KEY` setting](https://flask.palletsprojects.com/en/1.1.x/config/#SECRET_KEY).
 
@@ -251,7 +282,7 @@ The HMAC salt to use when hashing passwords.
 
 If the [`ui.authentication` setting](#ui-authentication) is enabled,
 [`meltano ui`](/docs/command-line-interface.html#ui) will print a
-warning unless this setting has been changed from the default.
+security warning if this setting has not been changed from the default.
 
 This setting corresponds to [Flask-Security's `SECURITY_PASSWORD_SALT` setting](https://pythonhosted.org/Flask-Security/configuration.html).
 
