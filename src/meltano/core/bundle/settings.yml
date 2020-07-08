@@ -72,11 +72,9 @@ settings:
   env_aliases: [MELTANO_NOTIFICATION]
 
 # OAuth service settings
-- name: ui.oauth_service.url
-  env_aliases: [MELTANO_OAUTH_SERVICE_URL]
-- name: ui.oauth_service.providers
+- name: oauth_service.url
+- name: oauth_service.providers
   value: all
-  env_aliases: [MELTANO_OAUTH_SERVICE_PROVIDERS]
 
 # Mail settings
 - name: mail.server
