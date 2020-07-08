@@ -156,11 +156,11 @@ export MELTANO_UI_URL = ""
 Known plugins are those defined in a file called `discovery.yml`, which Meltano will look for in 4 places, in order of precedence:
 
 1. At the root of the project directory. By default, no `discovery.yml` will exist here, but you can create one yourself to experiment.
-2. <https://meltano.com/discovery.yml>
-3. `.meltano/cache/discovery.yml` inside your project directory. Downloads from <https://meltano.com/discovery.yml> will be cached here.
+2. The URL specified by the [`discovery_url` setting](/docs/settings.html#discovery-url): <https://www.meltano.com/discovery.yml> by default
+3. `.meltano/cache/discovery.yml` inside your project directory. Downloads from the discovery URL will be cached here.
 4. Inside the `meltano` package
 
-The versions on <https://meltano.com> and in the package can be found inside the Meltano repository at [`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
+The versions on <https://www.meltano.com> and in the package can be found inside the Meltano repository at [`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
 
 If you have a plugin you think should also be known to Meltano out of the box, you can contribute a change to that file.
 
