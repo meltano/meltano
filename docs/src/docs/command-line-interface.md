@@ -501,6 +501,8 @@ and [`ui.password_salt`](/docs/settings.html#ui-password-salt) settings, that
 will be stored in a `.env` file in your project directory along with the
 specified value for the [`ui.server_name` setting](/docs/settings.html#ui-server-name).
 
+In production, you will likely want to move these settings to actual environment variables, since `.env` is in `.gitignore` by default.
+
 ::: warning
 Regenerating secrets will cause the following:
 

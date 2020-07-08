@@ -101,31 +101,3 @@ class ProjectSettings(object):
 class Production(object):
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
-
-
-def ensure_secure_setup(settings_service: ProjectSettingsService):
-    secure_settings = ["ui.server_name", "ui.secret_key", "ui.password_salt"]
-
-    facts = []
-    env_vars = []
-    for setting_name in secure_settings:
-        setting_def = settings_service.find_setting(setting_name)
-        env_var = settings_service.setting_env(setting_def)
-
-        value, source = settings_service.get_with_source(setting_name)
-        if value is None:
-            facts.append(f"\t- '{setting_name}': setting is unset.")
-            env_vars.append(f"\t- {env_var}")
-        elif source is SettingValueSource.DEFAULT:
-            facts.append(f"\t- '{setting_name}': setting has default test value.")
-            env_vars.append(f"\t- {env_var}")
-
-    if facts:
-        facts_msg = "\n".join(facts)
-        variable_names = "\n".join(env_vars)
-        logging.warning(
-            "The following settings are insecure and should be regenerated:\n"
-            f"{facts_msg}\n\n"
-            "Use `meltano ui setup` command to generate new secrets, or set them via environment variables:\n"
-            f"{variable_names}"
-        )

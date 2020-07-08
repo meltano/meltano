@@ -190,6 +190,10 @@ meltano ui --bind-port=80
 
 The host and port Meltano is available at. Used as the session cookie domain and to generate external URLs.
 
+If the [`ui.authentication` setting](#ui-authentication) is enabled,
+[`meltano ui`](/docs/command-line-interface.html#ui) will print a
+warning unless this setting has been set.
+
 This setting corresponds to [Flask's `SERVER_NAME` setting](https://flask.palletsprojects.com/en/1.1.x/config/#SERVER_NAME).
 
 #### How to use
@@ -216,6 +220,10 @@ meltano ui setup meltano.example.com
 
 A secret key that will be used for securely signing the session cookie.
 
+If the [`ui.authentication` setting](#ui-authentication) is enabled,
+[`meltano ui`](/docs/command-line-interface.html#ui) will print a
+warning unless this setting has been changed from the default.
+
 This setting corresponds to [Flask's `SECRET_KEY` setting](https://flask.palletsprojects.com/en/1.1.x/config/#SECRET_KEY).
 
 #### How to use
@@ -240,6 +248,10 @@ meltano ui setup meltano.example.com
 - Default: `b4c124932584ad6e69f2774a0ae5c138`
 
 The HMAC salt to use when hashing passwords.
+
+If the [`ui.authentication` setting](#ui-authentication) is enabled,
+[`meltano ui`](/docs/command-line-interface.html#ui) will print a
+warning unless this setting has been changed from the default.
 
 This setting corresponds to [Flask-Security's `SECURITY_PASSWORD_SALT` setting](https://pythonhosted.org/Flask-Security/configuration.html).
 
@@ -330,7 +342,8 @@ export MELTANO_READONLY=true
 Use this setting to enable authentication and disallow anonymous usage of your Meltano instance.
 
 Additionally, you will need to:
-1. Set the [`ui.server_name`](#ui-server-name), [`ui.secret_key`](#ui-secret-key), and [`ui.password_salt`](#ui-password-salt) settings, manually or using [`meltano ui setup`](./command-line-interface.html#setup)
+1. Set the [`ui.server_name`](#ui-server-name), [`ui.secret_key`](#ui-secret-key), and [`ui.password_salt`](#ui-password-salt) settings, manually or using [`meltano ui setup <server_name>`](./command-line-interface.html#setup), without which your configuration will be insecure.
+
 2. Create at least one user using [`meltano user add`](./command-line-interface.html#user).
 
 If the [`ui.readonly` setting](#ui-readonly) is enabled, authentication will only be required for write actions.

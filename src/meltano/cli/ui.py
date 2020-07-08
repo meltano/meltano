@@ -26,6 +26,35 @@ from meltano.core.project_settings_service import (
 logger = logging.getLogger(__name__)
 
 
+def ensure_secure_setup(project):
+    settings_service = ProjectSettingsService(project)
+
+    if not settings_service.get("ui.authentication"):
+        return
+
+    secure_settings = ["ui.server_name", "ui.secret_key", "ui.password_salt"]
+
+    facts = []
+    for setting_name in secure_settings:
+        value, source = settings_service.get_with_source(setting_name)
+        if value is None:
+            facts.append(f"- '{setting_name}' setting is unset")
+        elif source is SettingValueSource.DEFAULT:
+            facts.append(f"- '{setting_name}' setting has default test value")
+
+    if facts:
+        click.secho(
+            "Authentication is enabled, but your configuration is currently insecure:",
+            fg="red",
+        )
+        for fact in facts:
+            click.echo(fact)
+        click.echo(
+            "See https://www.meltano.com/docs/settings.html#ui-authentication for more information about these settings and how to set them."
+        )
+        click.echo()
+
+
 def start_workers(workers):
     def stop_all():
         logger.info("Stopping all background workers...")
@@ -60,6 +89,8 @@ def start(ctx, reload, bind, bind_port):
     project = ctx.obj["project"]
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_ui()
+
+    ensure_secure_setup(project)
 
     workers = []
 

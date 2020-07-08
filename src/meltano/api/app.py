@@ -47,10 +47,7 @@ def create_app(config={}):
     app.config.from_mapping(**config)
 
     if app.env == "production":
-        from meltano.api.config import ensure_secure_setup
-
         app.config.from_object("meltano.api.config.Production")
-        ensure_secure_setup(settings_service)
 
     # File logging
     file_handler = logging.handlers.RotatingFileHandler(
