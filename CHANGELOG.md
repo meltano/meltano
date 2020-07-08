@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.39.0 - (2020-07-07)
+---
+
+### New
+
 - [#2100](https://gitlab.com/meltano/meltano/-/issues/2100) Let settings be stored directly in `.env` using `meltano config set --store=dotenv`
 - [#2099](https://gitlab.com/meltano/meltano/-/issues/2099) Let Meltano settings be configured using `meltano config meltano {list,set,unset,reset}`
 
@@ -22,8 +34,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2135](https://gitlab.com/meltano/meltano/-/issues/2135) Fix UI "Explore" page for custom (as opposed to plugin-based) topics and models
 - [#2136](https://gitlab.com/meltano/meltano/-/issues/2136) Show error message in Analyze UI when pipeline for extractor is missing, even if extractor is installed
 - [#2131](https://gitlab.com/meltano/meltano/-/issues/2131) Have "true" environment variables take precedence over those defined in `.env`
-
-### Breaks
 
 
 ## 1.38.1 - (2020-07-03)
