@@ -11,8 +11,8 @@ class ProjectSettings(APIProjectSettings):
     settings_map = {
         "SERVER_NAME": "ui.server_name",
         # Flask-Authlib
-        "FACEBOOK_CLIENT_ID": "oauth.facebook.client_id",
-        "FACEBOOK_CLIENT_SECRET": "oauth.facebook.client_secret",
-        "GOOGLE_ADWORDS_CLIENT_ID": "oauth.google_adwords.client_id",
-        "GOOGLE_ADWORDS_CLIENT_SECRET": "oauth.google_adwords.client_secret",
+        "FACEBOOK_CLIENT_ID": "oauth_service.facebook.client_id",
+        "FACEBOOK_CLIENT_SECRET": "oauth_service.facebook.client_secret",
+        "GOOGLE_ADWORDS_CLIENT_ID": "oauth_service.google_adwords.client_id",
+        "GOOGLE_ADWORDS_CLIENT_SECRET": "oauth_service.google_adwords.client_secret",
     }

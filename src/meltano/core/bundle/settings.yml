@@ -75,6 +75,16 @@ settings:
 - name: oauth_service.url
 - name: oauth_service.providers
   value: all
+- name: oauth_service.facebook.client_id
+  env: OAUTH_FACEBOOK_CLIENT_ID
+- name: oauth_service.facebook.client_secret
+  kind: password
+  env: OAUTH_FACEBOOK_CLIENT_SECRET
+- name: oauth_service.google_adwords.client_id
+  env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
+- name: oauth_service.google_adwords.client_secret
+  kind: password
+  env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
 
 # Mail settings
 - name: mail.server
@@ -109,13 +119,3 @@ settings:
   kind: password
   env: OAUTH_GITLAB_CLIENT_SECRET
   env_aliases: [OAUTH_GITLAB_SECRET]
-- name: oauth.facebook.client_id
-  env: OAUTH_FACEBOOK_CLIENT_ID
-- name: oauth.facebook.client_secret
-  kind: password
-  env: OAUTH_FACEBOOK_CLIENT_SECRET
-- name: oauth.google_adwords.client_id
-  env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
-- name: oauth.google_adwords.client_secret
-  kind: password
-  env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
