@@ -9,14 +9,20 @@ from unittest import mock
 
 import meltano.core.bundle as bundle
 
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_discovery_service import (
     DiscoveryFile,
     PluginDiscoveryService,
-    MELTANO_DISCOVERY_URL,
     VERSION,
 )
 from meltano.core.behavior.versioned import IncompatibleVersionError
+
+
+@pytest.fixture(scope="class")
+def project(project):
+    project.root_dir("discovery.yml").unlink()
+    return project
 
 
 @pytest.fixture
@@ -25,9 +31,9 @@ def subject(plugin_discovery_service):
 
 
 @pytest.fixture
-def discovery_url_mock():
+def discovery_url_mock(subject):
     with requests_mock.Mocker() as m:
-        m.get(MELTANO_DISCOVERY_URL, status_code=418)
+        m.get(subject.discovery_url, status_code=418)
 
         yield
 
@@ -35,8 +41,8 @@ def discovery_url_mock():
 @pytest.mark.usefixtures("discovery_url_mock")
 class TestPluginDiscoveryService:
     @pytest.mark.meta
-    def test_discovery_url_mock(self):
-        assert requests.get(MELTANO_DISCOVERY_URL).status_code == 418
+    def test_discovery_url_mock(self, subject):
+        assert requests.get(subject.discovery_url).status_code == 418
 
     @pytest.fixture
     def discovery_yaml(self, subject):
@@ -104,9 +110,9 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         local_discovery_path.unlink()
 
     @contextmanager
-    def use_remote_discovery(self, discovery_yaml):
+    def use_remote_discovery(self, discovery_yaml, subject):
         with requests_mock.Mocker() as m:
-            m.get(MELTANO_DISCOVERY_URL, text=yaml.dump(discovery_yaml))
+            m.get(subject.discovery_url, text=yaml.dump(discovery_yaml))
 
             yield discovery_yaml
 
@@ -134,18 +140,22 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
             yield discovery_yaml
 
     @pytest.fixture
-    def remote_discovery(self, project):
+    def remote_discovery(self, project, subject):
         with self.use_remote_discovery(
-            self.build_discovery_yaml("remote")
+            self.build_discovery_yaml("remote"), subject
         ) as discovery_yaml:
             yield discovery_yaml
 
     @pytest.fixture
-    def incompatible_remote_discovery(self):
+    def incompatible_remote_discovery(self, subject):
         with self.use_remote_discovery(
-            self.build_discovery_yaml("remote", version=VERSION + 1)
+            self.build_discovery_yaml("remote", version=VERSION + 1), subject
         ) as discovery_yaml:
             yield discovery_yaml
+
+    @pytest.fixture
+    def disabled_remote_discovery(self, project):
+        ProjectSettingsService(project).set("discovery_url", "false")
 
     @pytest.fixture
     def cached_discovery(self, subject):
@@ -183,6 +193,11 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
 
     def test_incompatible_remote_discovery(
         self, subject, incompatible_remote_discovery, cached_discovery
+    ):
+        self.assert_discovery_yaml(subject, cached_discovery)
+
+    def test_disabled_remote_discovery(
+        self, subject, disabled_remote_discovery, cached_discovery
     ):
         self.assert_discovery_yaml(subject, cached_discovery)
 
