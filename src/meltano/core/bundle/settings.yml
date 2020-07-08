@@ -33,6 +33,7 @@ settings:
   value: 5000
   env_aliases: [MELTANO_API_PORT, PORT]
 - name: ui.server_name
+- name: ui.session_cookie_domain
 - name: ui.secret_key
   value: thisisnotapropersecretkey
 - name: ui.password_salt
