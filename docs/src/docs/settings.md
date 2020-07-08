@@ -108,6 +108,26 @@ export MELTANO_DATABASE_URI=postgresql://username:password@host:port/database
 meltano elt --database-uri=postgresql://username:password@host:port/database ...
 ```
 
+### `discovery_url`
+
+- Environment variable: `MELTANO_DISCOVERY_URL`
+- Default: [`https://www.meltano.com/discovery.yml`](https://www.meltano.com/discovery.yml)
+
+Where Meltano can find the `discovery.yml` manifest that lists all [known plugins](/docs/contributor-guide.html#known-plugins).
+
+This manifest is used by [`meltano discover`](/docs/command-line-interface.md#discover) and [`meltano add`](/docs/command-line-interface.md#add), among others.
+
+To disable downloading the remote `discovery.yml` manifest and only use the project-local or packaged version,
+set this setting to `false` or any other string not starting with `http://` or `https://`.
+
+#### How to use
+
+```bash
+meltano config meltano set --store=dotenv discovery_url https://meltano.example.com/discovery.yml
+
+export MELTANO_DISCOVERY_URL=https://meltano.example.com/discovery.yml
+```
+
 ## `meltano` CLI
 
 These settings can be used to modify the behavior of the [`meltano` CLI](/docs/command-line-interface.html).

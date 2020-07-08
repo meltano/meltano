@@ -7,6 +7,8 @@ settings:
 - name: project_id
 - name: database_uri
   value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db
+- name: discovery_url
+  value: https://www.meltano.com/discovery.yml
 
 # CLI
 - name: cli.log_level

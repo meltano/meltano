@@ -4,11 +4,13 @@ import yaml
 import requests
 import logging
 import shutil
+import re
 from copy import deepcopy
 from typing import Dict, Iterator, Optional
 from itertools import groupby, chain
 
 import meltano.core.bundle as bundle
+from .project_settings_service import ProjectSettingsService
 from .setting_definition import SettingDefinition
 from .behavior.versioned import Versioned, IncompatibleVersionError
 from .behavior.canonical import Canonical
@@ -32,8 +34,6 @@ class DiscoveryUnavailableError(Exception):
 
     pass
 
-
-MELTANO_DISCOVERY_URL = "https://www.meltano.com/discovery.yml"
 
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
@@ -85,12 +85,21 @@ class PluginDiscoveryService(Versioned):
         return self._discovery_version
 
     @property
+    def discovery_url(self):
+        discovery_url = ProjectSettingsService(self.project).get("discovery_url")
+
+        if not discovery_url or not re.match(r"^https?://", discovery_url):
+            return None
+
+        return discovery_url
+
+    @property
     def discovery(self):
         """
         Return first compatible discovery manifest from these locations:
 
         - project local `discovery.yml`
-        - MELTANO_DISCOVERY_URL
+        - `discovery_url` project setting
         - .meltano/cache/discovery.yml
         - meltano.core.bundle
         """
@@ -104,7 +113,7 @@ class PluginDiscoveryService(Versioned):
             ),
             (
                 self.load_remote_discovery,
-                f"the `discovery.yml` manifest received from {MELTANO_DISCOVERY_URL}",
+                f"the `discovery.yml` manifest received from {self.discovery_url}",
             ),
             (self.load_cached_discovery, "the cached `discovery.yml` manifest"),
             (self.load_bundled_discovery, "the bundled `discovery.yml` manifest"),
@@ -145,8 +154,11 @@ class PluginDiscoveryService(Versioned):
             pass
 
     def load_remote_discovery(self):
+        if not self.discovery_url:
+            return
+
         try:
-            response = requests.get(MELTANO_DISCOVERY_URL)
+            response = requests.get(self.discovery_url)
             response.raise_for_status()
 
             remote_discovery = io.StringIO(response.text)
