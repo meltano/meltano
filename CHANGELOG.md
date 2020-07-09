@@ -22,6 +22,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#2151](https://gitlab.com/meltano/meltano/-/issues/2151) Fix `meltano ui` never printing `Meltano UI is now available at [URL]` if `ui.server_name` is set
+- [#2152](https://gitlab.com/meltano/meltano/-/issues/2152) Fix `meltano ui` printing all `gunicorn.error` logs twice
 
 ### Breaks
 
