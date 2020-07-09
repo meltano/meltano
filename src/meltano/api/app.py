@@ -137,6 +137,7 @@ def create_app(config={}):
             "isReadonlyEnabled": "ui.readonly",
             "isAnonymousReadonlyEnabled": "ui.anonymous_readonly",
             "isNotificationEnabled": "ui.notification",
+            "logoUrl": "ui.logo_url",
             "oauthServiceUrl": "oauth_service.url",
         }
 

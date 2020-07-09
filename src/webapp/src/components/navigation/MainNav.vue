@@ -52,6 +52,9 @@ export default {
       return this.$flask.isReadonlyEnabled
         ? 'https://meltano.com/docs/settings.html#ui-readonly'
         : 'https://meltano.com/docs/settings.html#ui-anonymous-readonly'
+    },
+    logoUrl() {
+      return this.$flask.logoUrl
     }
   },
   watch: {
@@ -87,7 +90,8 @@ export default {
   <nav class="navbar is-transparent">
     <div class="navbar-brand">
       <div class="navbar-item navbar-child">
-        <Logo />
+        <img v-if="logoUrl" :src="logoUrl" />
+        <Logo v-else />
       </div>
       <div
         class="navbar-burger burger"
@@ -364,6 +368,10 @@ export default {
 }
 .navbar-brand .navbar-item {
   padding: 0 1.75rem 0 1.25rem;
+
+  img {
+    max-height: 1.5rem;
+  }
 }
 .navbar.is-transparent {
   background-color: transparent;
