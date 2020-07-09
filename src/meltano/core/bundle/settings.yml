@@ -65,6 +65,9 @@ settings:
   value: false
   env_aliases: [MELTANO_NOTIFICATION]
 
+# UI customization
+- name: ui.logo_url
+
 # Mail server
 - name: mail.server
   value: localhost
