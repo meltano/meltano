@@ -4,6 +4,7 @@ import urllib
 from datetime import datetime
 from unittest import mock
 from sqlalchemy.orm import joinedload
+from _pytest.monkeypatch import MonkeyPatch
 
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.api.security import FreeUser, users
@@ -27,20 +28,132 @@ def gitlab_client():
     return client_mock
 
 
+class TestFreeUser:
+    def test_all_roles(self):
+        assert len(FreeUser().roles) == 2
+
+        role = users.find_or_create_role("this_is_a_test")
+
+        assert FreeUser().has_role(role)
+
+
 @pytest.mark.usefixtures("seed_users")
-class TestSecurity:
+class TestNothingEnabled:
     @pytest.fixture(scope="class")
     def app(self, create_app):
-        config_override = ProjectSettingsService.config_override
-        original_authentication = config_override.get("ui.authentication", None)
+        return create_app()
 
-        config_override["ui.authentication"] = True
-        yield create_app()
-        config_override["ui.authentication"] = original_authentication
-
-    def test_auth_mode(self, app):
+    def test_current_user(self, app):
         with app.test_request_context("/"):
-            assert isinstance(current_user._get_current_object(), AnonymousUser)
+            assert isinstance(current_user._get_current_object(), FreeUser)
+
+    def test_identity(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("api_root.identity"))
+
+            assert res.status_code == 200
+            assert res.json["anonymous"] == True
+            assert res.json["can_sign_in"] == False
+
+    def test_bootstrap(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("root.bootstrap"))
+
+            assert res.status_code == 302
+            assert res.location == url_for("root.default", _external=True)
+
+    def test_upgrade(self, app, api):
+        with app.test_request_context():
+            res = api.post(url_for("api_root.upgrade"))
+
+            assert res.status_code == 201
+            assert res.data == b"Meltano update in progress."
+
+    def test_plugins(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("plugins.all"))
+
+            assert res.status_code == 200
+            assert "extractors" in res.json
+
+    def test_plugins_add(self, app, api):
+        with app.test_request_context():
+            res = api.post(
+                url_for("plugins.add"),
+                json={"plugin_type": "extractors", "name": "tap-gitlab"},
+            )
+
+            assert res.status_code == 200
+            assert res.json["name"] == "tap-gitlab"
+
+
+@pytest.mark.usefixtures("seed_users")
+class TestReadonlyEnabled:
+    @pytest.fixture(scope="class")
+    def app(self, create_app):
+        monkeypatch = MonkeyPatch()
+        monkeypatch.setitem(ProjectSettingsService.config_override, "ui.readonly", True)
+
+        yield create_app()
+
+        monkeypatch.undo()
+
+    def test_current_user(self, app):
+        with app.test_request_context("/"):
+            assert isinstance(current_user._get_current_object(), FreeUser)
+
+    def test_identity(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("api_root.identity"))
+
+            assert res.status_code == 200
+            assert res.json["anonymous"] == True
+            assert res.json["can_sign_in"] == False
+
+    def test_bootstrap(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("root.bootstrap"))
+
+            assert res.status_code == 302
+            assert res.location == url_for("root.default", _external=True)
+
+    def test_upgrade(self, app, api):
+        with app.test_request_context():
+            res = api.post(url_for("api_root.upgrade"))
+
+            assert res.status_code == 499
+            assert res.data == b"Meltano is currently running in read-only mode."
+
+    def test_plugins(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("plugins.all"))
+
+            assert res.status_code == 200
+            assert "extractors" in res.json
+
+    def test_plugins_add(self, app, api):
+        with app.test_request_context():
+            res = api.post(
+                url_for("plugins.add"),
+                json={"plugin_type": "extractors", "name": "tap-gitlab"},
+            )
+
+            assert res.status_code == 499
+            assert res.data == b"Meltano is currently running in read-only mode."
+
+
+@pytest.mark.usefixtures("seed_users")
+class TestAuthenticationEnabled:
+    @pytest.fixture(scope="class")
+    def app(self, create_app):
+        monkeypatch = MonkeyPatch()
+        monkeypatch.setitem(
+            ProjectSettingsService.config_override, "ui.authentication", True
+        )
+
+        yield create_app()
+
+        monkeypatch.undo()
 
     @mock.patch("gitlab.Gitlab", return_value=gitlab_client())
     def test_gitlab_token_identity_creates_user(self, gitlab, app):
@@ -89,22 +202,6 @@ class TestSecurity:
             identity = gitlab_token_identity(token)
             assert identity.user == user
 
-    def test_bootstrap(self, app, api, impersonate):
-        with app.test_request_context():
-            with impersonate(users.get_user("alice")):
-                res = api.get(url_for("root.bootstrap"))
-
-                assert res.status_code == 302
-                assert res.location == url_for("root.default", _external=True)
-
-    def test_bootstrap_unauthenticated(self, app, api):
-        with app.test_request_context():
-            res = api.get(url_for("root.bootstrap"))
-            url = urllib.parse.urlparse(res.location)
-
-            assert res.status_code == 302
-            assert res.location.startswith(url_for("security.login", _external=True))
-
     @freeze_time("2000-01-01")
     def test_login_audit_columns(self, app):
         with app.test_request_context():
@@ -117,28 +214,231 @@ class TestSecurity:
             assert alice.last_login_at == datetime.utcnow()
             assert alice.login_count == login_count + 1
 
+    def test_current_user(self, app):
+        with app.test_request_context("/"):
+            assert isinstance(current_user._get_current_object(), AnonymousUser)
+
+    def test_identity(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("api_root.identity"))
+
+            assert res.status_code == 401
+            assert res.data == b"Authentication is required to access this resource."
+
+    def test_identity_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.get(url_for("api_root.identity"))
+
+                assert res.status_code == 200
+                assert res.json["username"] == "alice"
+                assert res.json["anonymous"] == False
+                assert res.json["can_sign_in"] == False
+
+    def test_bootstrap(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("root.bootstrap"))
+
+            assert res.status_code == 302
+            assert res.location.startswith(url_for("security.login", _external=True))
+
+    def test_bootstrap_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.get(url_for("root.bootstrap"))
+
+                assert res.status_code == 302
+                assert res.location == url_for("root.default", _external=True)
+
+    def test_upgrade(self, app, api):
+        with app.test_request_context():
+            res = api.post(url_for("api_root.upgrade"))
+
+            assert res.status_code == 401
+            assert res.data == b"Authentication is required to access this resource."
+
+    def test_upgrade_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.post(url_for("api_root.upgrade"))
+
+                assert res.status_code == 201
+                assert res.data == b"Meltano update in progress."
+
+    def test_plugins(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("plugins.all"))
+
+            assert res.status_code == 401
+            assert res.data == b"Authentication is required to access this resource."
+
+    def test_plugins_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.get(url_for("plugins.all"))
+
+                assert res.status_code == 200
+                assert "extractors" in res.json
+
+    def test_plugins_add(self, app, api):
+        with app.test_request_context():
+            res = api.post(
+                url_for("plugins.add"),
+                json={"plugin_type": "extractors", "name": "tap-gitlab"},
+            )
+
+            assert res.status_code == 401
+            assert res.data == b"Authentication is required to access this resource."
+
+    def test_plugins_add_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.post(
+                    url_for("plugins.add"),
+                    json={"plugin_type": "extractors", "name": "tap-gitlab"},
+                )
+
+                assert res.status_code == 200
+                assert res.json["name"] == "tap-gitlab"
+
 
 @pytest.mark.usefixtures("seed_users")
-class TestSingleUser:
+class TestAuthenticationAndReadonlyEnabled:
     @pytest.fixture(scope="class")
     def app(self, create_app):
+        monkeypatch = MonkeyPatch()
+
         config_override = ProjectSettingsService.config_override
-        original_authentication = config_override.get("ui.authentication", None)
+        monkeypatch.setitem(config_override, "ui.authentication", True)
+        monkeypatch.setitem(config_override, "ui.readonly", True)
 
-        config_override["ui.authentication"] = False
         yield create_app()
-        config_override["ui.authentication"] = original_authentication
 
-    def test_free_user_all_roles(self):
-        assert len(FreeUser().roles) == 2
+        monkeypatch.undo()
 
-        role = users.find_or_create_role("this_is_a_test")
-
-        assert role in FreeUser().roles
-
-    def test_auth_mode(self, app):
+    def test_current_user(self, app):
         with app.test_request_context("/"):
-            assert isinstance(current_user._get_current_object(), FreeUser)
+            assert isinstance(current_user._get_current_object(), AnonymousUser)
+
+    def test_identity(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("api_root.identity"))
+
+            assert res.status_code == 401
+            assert res.data == b"Authentication is required to access this resource."
+
+    def test_identity_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.get(url_for("api_root.identity"))
+
+                assert res.status_code == 200
+                assert res.json["username"] == "alice"
+                assert res.json["anonymous"] == False
+                assert res.json["can_sign_in"] == False
+
+    def test_bootstrap(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("root.bootstrap"))
+
+            assert res.status_code == 302
+            assert res.location.startswith(url_for("security.login", _external=True))
+
+    def test_bootstrap_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.get(url_for("root.bootstrap"))
+
+                assert res.status_code == 302
+                assert res.location == url_for("root.default", _external=True)
+
+    def test_upgrade(self, app, api):
+        with app.test_request_context():
+            res = api.post(url_for("api_root.upgrade"))
+
+            assert res.status_code == 401
+            assert res.data == b"Authentication is required to access this resource."
+
+    def test_upgrade_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.post(url_for("api_root.upgrade"))
+
+                assert res.status_code == 499
+                assert res.data == b"Meltano is currently running in read-only mode."
+
+    def test_plugins(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("plugins.all"))
+
+            assert res.status_code == 401
+            assert res.data == b"Authentication is required to access this resource."
+
+    def test_plugins_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.get(url_for("plugins.all"))
+
+                assert res.status_code == 200
+                assert "extractors" in res.json
+
+    def test_plugins_add(self, app, api):
+        with app.test_request_context():
+            res = api.post(
+                url_for("plugins.add"),
+                json={"plugin_type": "extractors", "name": "tap-gitlab"},
+            )
+
+            assert res.status_code == 401
+            assert res.data == b"Authentication is required to access this resource."
+
+    def test_plugins_add_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.post(
+                    url_for("plugins.add"),
+                    json={"plugin_type": "extractors", "name": "tap-gitlab"},
+                )
+
+                assert res.status_code == 499
+                assert res.data == b"Meltano is currently running in read-only mode."
+
+
+@pytest.mark.usefixtures("seed_users")
+class TestAuthenticationAndAnonymousReadonlyEnabled:
+    @pytest.fixture(scope="class")
+    def app(self, create_app):
+        monkeypatch = MonkeyPatch()
+
+        config_override = ProjectSettingsService.config_override
+        monkeypatch.setitem(config_override, "ui.authentication", True)
+        monkeypatch.setitem(config_override, "ui.anonymous_readonly", True)
+
+        yield create_app()
+
+        monkeypatch.undo()
+
+    def test_current_user(self, app):
+        with app.test_request_context("/"):
+            assert isinstance(current_user._get_current_object(), AnonymousUser)
+
+    def test_identity(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("api_root.identity"))
+
+            assert res.status_code == 200
+            assert res.json["anonymous"] == True
+            assert res.json["can_sign_in"] == True
+
+    def test_identity_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.get(url_for("api_root.identity"))
+
+                assert res.status_code == 200
+                assert res.json["username"] == "alice"
+                assert res.json["anonymous"] == False
+                assert res.json["can_sign_in"] == False
 
     def test_bootstrap(self, app, api):
         with app.test_request_context():
@@ -146,3 +446,65 @@ class TestSingleUser:
 
             assert res.status_code == 302
             assert res.location == url_for("root.default", _external=True)
+
+    def test_bootstrap_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.get(url_for("root.bootstrap"))
+
+                assert res.status_code == 302
+                assert res.location == url_for("root.default", _external=True)
+
+    def test_upgrade(self, app, api):
+        with app.test_request_context():
+            res = api.post(url_for("api_root.upgrade"))
+
+            assert res.status_code == 403
+            assert res.data == b"You do not have the required permissions."
+
+    def test_upgrade_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.post(url_for("api_root.upgrade"))
+
+                assert res.status_code == 201
+                assert res.data == b"Meltano update in progress."
+
+    def test_plugins(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("plugins.all"))
+
+            assert res.status_code == 200
+            assert "extractors" in res.json
+
+    def test_plugins_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.get(url_for("plugins.all"))
+
+                assert res.status_code == 200
+                assert "extractors" in res.json
+
+    def test_plugins_add(self, app, api):
+        with app.test_request_context():
+            res = api.post(
+                url_for("plugins.add"),
+                json={"plugin_type": "extractors", "name": "tap-gitlab"},
+            )
+
+            assert res.status_code == 499
+            assert (
+                res.data
+                == b"Meltano is currently running in read-only mode because you are not authenticated."
+            )
+
+    def test_plugins_add_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.post(
+                    url_for("plugins.add"),
+                    json={"plugin_type": "extractors", "name": "tap-gitlab"},
+                )
+
+                assert res.status_code == 200
+                assert res.json["name"] == "tap-gitlab"

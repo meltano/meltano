@@ -16,6 +16,7 @@ from meltano.core.plugin_install_service import (
 )
 from flask_security import roles_required
 from meltano.api.api_blueprint import APIBlueprint
+from meltano.api.security.auth import block_if_readonly
 
 
 pluginsBP = APIBlueprint("plugins", __name__)
@@ -80,7 +81,7 @@ def installed():
 
 
 @pluginsBP.route("/add", methods=["POST"])
-@roles_required("admin")
+@block_if_readonly
 def add():
     payload = request.get_json()
     plugin_type = PluginType(payload["plugin_type"])
@@ -94,7 +95,7 @@ def add():
 
 
 @pluginsBP.route("/install/batch", methods=["POST"])
-@roles_required("admin")
+@block_if_readonly
 def install_batch():
     payload = request.get_json()
     plugin_type = PluginType(payload["plugin_type"])
@@ -117,7 +118,7 @@ def install_batch():
 
 
 @pluginsBP.route("/install", methods=["POST"])
-@roles_required("admin")
+@block_if_readonly
 def install():
     payload = request.get_json()
     plugin_type = PluginType(payload["plugin_type"])

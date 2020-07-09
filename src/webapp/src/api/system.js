@@ -3,11 +3,11 @@ import utils from '@/utils/utils'
 
 export default {
   upgrade() {
-    return axios.post(utils.root('/upgrade'))
+    return axios.post(utils.apiRoot('/upgrade'))
   },
 
   version(params) {
-    return axios.get(utils.root('/version'), { params })
+    return axios.get(utils.apiRoot('/version'), { params })
   },
 
   identity() {
