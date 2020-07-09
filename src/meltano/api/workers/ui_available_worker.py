@@ -23,9 +23,12 @@ class UIAvailableWorker(threading.Thread):
         bind_port = self.settings_service.get("ui.bind_port")
         url = f"http://localhost:{bind_port}"
 
+        server_name = self.settings_service.get("ui.server_name")
+        headers = {"Host": server_name}
+
         while not self._terminate:
             try:
-                response = requests.get(url)
+                response = requests.get(url, headers=headers)
                 if response.status_code == 200:
                     click.secho(f"Meltano UI is now available at {url}", fg="green")
                     if self.open_browser:
