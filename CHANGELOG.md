@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2142](https://gitlab.com/meltano/meltano/-/issues/2142) Let `discovery.yml` manifest URL be overwritten using `discovery_url` setting.
 - [#2083](https://gitlab.com/meltano/meltano/-/issues/2083) Add `ui.anonymous_readonly` setting to allow anonymous users read-only access when `ui.authentication` is enabled.
 - [#2108](https://gitlab.com/meltano/meltano/-/issues/2108) Show icon with tooltip in UI when read-only mode is enabled
+- [#2120](https://gitlab.com/meltano/meltano/-/issues/2120) Add `ui.logo_url` setting to allow the customization of the logo shown in the top left of the Meltano UI interface.
 
 ### Changes
 

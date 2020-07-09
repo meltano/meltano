@@ -156,7 +156,7 @@ meltano --log-level=debug ...
 
 These settings can be used to configure the [Meltano UI](/docs/command-line-interface.html#ui) server.
 
-[Meltano UI feature settings](#meltano-ui-features) have their own section.
+[Meltano UI feature settings](#meltano-ui-features) and [customization settings](#meltano-ui-customization) have their own sections.
 
 ### `ui.bind_host`
 
@@ -365,7 +365,7 @@ This setting corresponds to [Gunicorn's `forwarded_allow_ips` setting](https://d
 
 These settings can be used to enable certain features of [Meltano UI](/docs/command-line-interface.html#ui).
 
-[Meltano UI server settings](#meltano-ui-server) have their own section.
+[Meltano UI server settings](#meltano-ui-server) and [customization settings](#meltano-ui-customization) have their own sectionss
 
 ### `ui.readonly`
 
@@ -453,6 +453,27 @@ meltano config meltano set --store=dotenv ui notification true
 
 export MELTANO_UI_NOTIFICATION=true
 export MELTANO_NOTIFICATION=true
+```
+
+## Meltano UI customization
+
+These settings can be used to customize certain aspects of [Meltano UI](/docs/command-line-interface.html#ui).
+
+[Meltano UI server settings](#meltano-ui-server) and [feature settings](#meltano-ui-features) have their own sections.
+
+### `ui.logo_url`
+
+- Environment variable: `MELTANO_UI_LOGO_URL`
+- Default: None
+
+Customize the logo shown in the top left of the Meltano UI interface.
+
+#### How to use
+
+```bash
+meltano config meltano set ui logo_url https://meltano.com/meltano-logo-with-text.svg
+
+export MELTANO_UI_LOGO_URL=https://meltano.com/meltano-logo-with-text.svg
 ```
 
 ## Mail server
