@@ -134,6 +134,8 @@ def create_app(config={}):
             "projectId": "project_id",
             "trackingID": "tracking_ids.ui",
             "embedTrackingID": "tracking_ids.ui_embed",
+            "isReadonlyEnabled": "ui.readonly",
+            "isAnonymousReadonlyEnabled": "ui.anonymous_readonly",
             "isNotificationEnabled": "ui.notification",
             "oauthServiceUrl": "oauth_service.url",
         }
