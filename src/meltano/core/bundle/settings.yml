@@ -55,6 +55,9 @@ settings:
   kind: boolean
   value: false
   env_aliases: [MELTANO_AUTHENTICATION]
+- name: ui.anonymous_readonly
+  kind: boolean
+  value: false
 - name: ui.notification
   kind: boolean
   value: false

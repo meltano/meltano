@@ -402,3 +402,109 @@ class TestAuthenticationAndReadonlyEnabled:
 
                 assert res.status_code == 499
                 assert res.data == b"Meltano is currently running in read-only mode."
+
+
+@pytest.mark.usefixtures("seed_users")
+class TestAuthenticationAndAnonymousReadonlyEnabled:
+    @pytest.fixture(scope="class")
+    def app(self, create_app):
+        monkeypatch = MonkeyPatch()
+
+        config_override = ProjectSettingsService.config_override
+        monkeypatch.setitem(config_override, "ui.authentication", True)
+        monkeypatch.setitem(config_override, "ui.anonymous_readonly", True)
+
+        yield create_app()
+
+        monkeypatch.undo()
+
+    def test_current_user(self, app):
+        with app.test_request_context("/"):
+            assert isinstance(current_user._get_current_object(), AnonymousUser)
+
+    def test_identity(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("api_root.identity"))
+
+            assert res.status_code == 200
+            assert res.json["anonymous"] == True
+            assert res.json["can_sign_in"] == True
+
+    def test_identity_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.get(url_for("api_root.identity"))
+
+                assert res.status_code == 200
+                assert res.json["username"] == "alice"
+                assert res.json["anonymous"] == False
+                assert res.json["can_sign_in"] == False
+
+    def test_bootstrap(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("root.bootstrap"))
+
+            assert res.status_code == 302
+            assert res.location == url_for("root.default", _external=True)
+
+    def test_bootstrap_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.get(url_for("root.bootstrap"))
+
+                assert res.status_code == 302
+                assert res.location == url_for("root.default", _external=True)
+
+    def test_upgrade(self, app, api):
+        with app.test_request_context():
+            res = api.post(url_for("api_root.upgrade"))
+
+            assert res.status_code == 403
+            assert res.data == b"You do not have the required permissions."
+
+    def test_upgrade_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.post(url_for("api_root.upgrade"))
+
+                assert res.status_code == 201
+                assert res.data == b"Meltano update in progress."
+
+    def test_plugins(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("plugins.all"))
+
+            assert res.status_code == 200
+            assert "extractors" in res.json
+
+    def test_plugins_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.get(url_for("plugins.all"))
+
+                assert res.status_code == 200
+                assert "extractors" in res.json
+
+    def test_plugins_add(self, app, api):
+        with app.test_request_context():
+            res = api.post(
+                url_for("plugins.add"),
+                json={"plugin_type": "extractors", "name": "tap-gitlab"},
+            )
+
+            assert res.status_code == 499
+            assert (
+                res.data
+                == b"Meltano is currently running in read-only mode because you are not authenticated."
+            )
+
+    def test_plugins_add_authenticated(self, app, api, impersonate):
+        with app.test_request_context():
+            with impersonate(users.get_user("alice")):
+                res = api.post(
+                    url_for("plugins.add"),
+                    json={"plugin_type": "extractors", "name": "tap-gitlab"},
+                )
+
+                assert res.status_code == 200
+                assert res.json["name"] == "tap-gitlab"

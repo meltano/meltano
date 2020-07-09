@@ -384,6 +384,27 @@ export MELTANO_UI_AUTHENTICATION=true
 export MELTANO_AUTHENTICATION=true
 ```
 
+### `ui.anonymous_readonly`
+
+- Environment variable: `MELTANO_UI_ANONYMOUS_READONLY`
+- Default: `false`
+
+When the [`ui.authentication` setting](#ui-authentication) is enabled,
+enabling this setting will allow anonymous users read-only access to Meltano UI.
+Once a user is authenticated, write actions will be available again.
+
+This setting is especially useful when setting up a publicly available demo
+instance of Meltano UI for anonymous users to interact with.
+These users will not be able to make any changes, but admins will once they sign in.
+
+#### How to use
+
+```bash
+meltano config meltano set --store=dotenv ui anonymous_readonly true
+
+export MELTANO_UI_ANONYMOUS_READONLY=true
+```
+
 ### `ui.notification`
 
 - Environment variable: `MELTANO_UI_NOTIFICATION`, alias: `MELTANO_NOTIFICATION`

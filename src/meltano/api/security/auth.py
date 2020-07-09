@@ -77,6 +77,14 @@ def passes_authentication_checks():
         logging.debug(f"Authenticated as '{current_user.username}'")
         return True
 
+    if settings_service.get("ui.anonymous_readonly") and current_user.is_anonymous:
+        # The `@roles_required("admin")` and `@block_if_readonly` checks
+        # will take care of enforcing authentication as appropriate
+        logging.debug(
+            f"Authentication not required because anonymous users have read-only access"
+        )
+        return True
+
     return False
 
 
@@ -96,8 +104,15 @@ def block_if_readonly(f):
     def decorated(*args, **kwargs):
         project = Project.find()
         settings_service = ProjectSettingsService(project)
+
         if settings_service.get("ui.readonly"):
             return "Meltano is currently running in read-only mode.", HTTP_READONLY_CODE
+
+        if settings_service.get("ui.anonymous_readonly") and current_user.is_anonymous:
+            return (
+                "Meltano is currently running in read-only mode because you are not authenticated.",
+                HTTP_READONLY_CODE,
+            )
 
         return f(*args, **kwargs)
 
