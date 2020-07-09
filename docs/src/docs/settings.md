@@ -355,9 +355,9 @@ export FORWARDED_ALLOW_IPS="*"
 - Environment variable: `MELTANO_UI_FORWARDED_ALLOW_IPS`, alias: `FORWARDED_ALLOW_IPS`
 - Default: `127.0.0.1`
 
-Comma-separated front-end proxy IPs that are allowed to set secure headers to indicate HTTPS requests.
+Comma-separated front-end (reverse) proxy IPs that are allowed to set secure headers to indicate HTTPS requests.
 
-Set to `*` to disable checking of Front-end IPs (useful for setups where you don't know in advance the IP address of Front-end, but you still trust the environment).
+Set to `*` to disable checking of front-end IPs, which can be useful for setups where you don't know in advance the IP address of front-end, but you still trust the environment.
 
 This setting corresponds to [Gunicorn's `forwarded_allow_ips` setting](https://docs.gunicorn.org/en/stable/settings.html#forwarded-allow-ips).
 

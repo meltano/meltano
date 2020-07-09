@@ -436,28 +436,3 @@ Meltano manages authorization using a role based access control scheme.
 - Roles have multiple permissions;
 
 A Permission has a context for with it is valid: anything that matches the context is permitted.
-
-## Meltano UI in Production
-
-Meltano UI consist of a Flask API and a Vue.js front-end application, which are both included in the `meltano` package. In other words, the Flask API is not exposed at a project level and any customizations needed must be done at the package level.
-
-To run Meltano in production, we recommend using [gunicorn](http://docs.gunicorn.org/en/stable/install.html) for setting up your HTTP Server.
-
-First, install gunicorn:
-
-```bash
-pip3 install gunicorn
-```
-
-You can then start Meltano UI:
-
-::: warning Note
-This is an example invocation of gunicorn, please refer to
-the [gunicorn documentation](http://docs.gunicorn.org/en/stable/settings.html) for more details.
-:::
-
-Start gunicorn with 4 workers, alternatively you can use `$(nproc)`:
-
-```bash
-gunicorn -c python:meltano.api.wsgi.config -w 4 meltano.api.wsgi:app
-```

@@ -19,6 +19,8 @@ This page will help you figure out:
 5. how to [manage your environment-specific and sensitive configuration](#managing-configuration), and finally
 6. how to [run your pipelines](#running-pipelines).
 
+Additionally, you may want to [run Meltano UI and configure it for production](#meltano-ui).
+
 ## Your Meltano project
 
 ### Off of your local machine...
@@ -220,3 +222,33 @@ will be [the `meltano` command](/docs/command-line-interface.html),
 meaning that you can provide `meltano` subcommands and arguments like `elt ...` and `invoke airflow ...` directly to
 [`docker run <image-name> ...`](https://docs.docker.com/engine/reference/commandline/run/)
 as trailing arguments.
+
+## Meltano UI
+
+Now that your pipelines are running, you may want to also spin up [Meltano UI](/docs/command-line-interface.html#ui),
+which lets you quickly check the status and most recent logs of your project's [scheduled pipelines](/#orchestration) right from your browser.
+
+You can start Meltano UI using [`meltano ui`](/docs/command-line-interface.html#ui) just like you would locally,
+but there are [a couple of settings](/docs/settings.html#meltano-ui-server) you'll want to consider changing in production:
+
+- By default, Meltano UI will bind to host `0.0.0.0` and port `5000`.
+  This can be changed using the [`ui.bind_host`](/docs/settings.html#ui-bind-host) and [`ui.bind_port`](/docs/settings.html#ui-bind-port) settings, and their respective environment variables and CLI flags.
+
+- If you'd like to require users to sign in before they can access the Meltano UI, enable the [`ui.authentication` setting](/docs/settings.html#ui-authentication).
+  As described behind that link, this will also require you to set the [`ui.secret_key`](/docs/settings.html#ui-secret-key) and [`ui.password_salt`](/docs/settings.html#ui-password-salt) settings, as well as [`ui.server_name`](/docs/settings.html#ui-server-name) or [`ui.session_cookie_domain`](/docs/settings.html#ui-session-cookie-domain). Users can be added using [`meltano user add`](./command-line-interface.html#user) and will be stored in the configured [system database](#storing-metadata).
+
+- Meltano UI can be used to make changes to your project, like adding and configuring plugins and scheduling pipelines,
+  which is very useful locally but may be undesirable in production if you'd prefer for all changes to [go through version control](#off-of-your-local-machine) instead.
+  To disallow all modifications through the UI, enable the [`ui.readonly` setting](/docs/settings.html#ui-readonly).
+
+- If you will be running Meltano UI behind a front-end (reverse) proxy that will be responsible for SSL termination,
+  you may need to change the [`ui.forwarded_allow_ips` setting](/docs/settings.html#ui-forwarded-allow-ips) to get
+  Meltano UI to realize it should use the `https` URL scheme rather than `http` in the URLs it builds.
+
+### Containerized Meltano project
+
+If you're [containerizing your Meltano project](#containerized-meltano-project),
+the [`ui.readonly` setting](/docs/settings.html#ui-readonly) will be
+[enabled by default](https://gitlab.com/meltano/files-docker/-/blob/master/bundle/Dockerfile#L17)
+using the `MELTANO_READONLY` environment variable,
+since any changes to your project's `meltano.yml` file would not be persisted outside the container.
