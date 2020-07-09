@@ -11,6 +11,7 @@ from meltano.core.m5o.reports_service import (
 )
 
 from meltano.api.api_blueprint import APIBlueprint
+from meltano.api.security.auth import block_if_readonly
 from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin, Need
 from flask_security import roles_required
 
@@ -76,7 +77,7 @@ def index():
 
 
 @reportsBP.route("/save", methods=["POST"])
-@roles_required("admin")
+@block_if_readonly
 def save_report():
     post_data = request.get_json()
     response_data = reports_service().save_report(post_data)
@@ -84,7 +85,7 @@ def save_report():
 
 
 @reportsBP.route("/delete", methods=["DELETE"])
-@roles_required("admin")
+@block_if_readonly
 def delete_report():
     post_data = request.get_json()
     response_data = reports_service().delete_report(post_data)
@@ -92,7 +93,7 @@ def delete_report():
 
 
 @reportsBP.route("/update", methods=["POST"])
-@roles_required("admin")
+@block_if_readonly
 def update_report():
     post_data = request.get_json()
     response_data = reports_service().update_report(post_data)

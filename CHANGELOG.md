@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#2140](https://gitlab.com/meltano/meltano/-/issues/2140) Only have `meltano ui` complain about missing `ui.server_name`, `ui.secret_key` and `ui.password_salt` settings when `ui.authentication` is enabled
+- [#2083](https://gitlab.com/meltano/meltano/-/issues/2083) Stop allowing anonymous users read-only access when `ui.authentication` and `ui.readonly` are both enabled.
 
 ### Fixes
 

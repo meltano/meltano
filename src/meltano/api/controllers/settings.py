@@ -5,6 +5,7 @@ from flask_principal import Permission, Need
 from werkzeug.exceptions import Forbidden
 from sqlalchemy.orm import joinedload
 from meltano.api.api_blueprint import APIBlueprint
+from meltano.api.security.auth import block_if_readonly
 from meltano.api.security import users
 from flask_security import roles_required
 from meltano.api.models.security import db, User, Role, RolesUsers, RolePermissions
@@ -24,7 +25,7 @@ def index():
 
 @settingsBP.route("/save", methods=["POST"])
 @roles_required("admin")
-@roles_required("admin")
+@block_if_readonly
 def save():
     settings_helper = SettingsHelper()
     connection = request.get_json()
@@ -34,6 +35,7 @@ def save():
 
 @settingsBP.route("/delete", methods=["POST"])
 @roles_required("admin")
+@block_if_readonly
 def delete():
     settings_helper = SettingsHelper()
     connection = request.get_json()
@@ -103,7 +105,7 @@ class AclResource(Resource):
 
 class RolesResource(Resource):
     @roles_required("admin")
-    @roles_required("admin")
+    @block_if_readonly
     @marshal_with(AclResource.RoleDefinition)
     def post(self):
         payload = request.get_json()
@@ -124,7 +126,7 @@ class RolesResource(Resource):
         return role, 201
 
     @roles_required("admin")
-    @roles_required("admin")
+    @block_if_readonly
     @marshal_with(AclResource.RoleDefinition)
     def delete(self):
         payload = request.get_json()
@@ -158,7 +160,7 @@ class RolePermissionsResource(Resource):
         return payload["role"], payload["permission_type"], payload["context"]
 
     @roles_required("admin")
-    @roles_required("admin")
+    @block_if_readonly
     @marshal_with(AclResource.RoleDefinition)
     def post(self):
         role, permission_type, context = self._parse_request()
@@ -184,7 +186,7 @@ class RolePermissionsResource(Resource):
         return role, 200
 
     @roles_required("admin")
-    @roles_required("admin")
+    @block_if_readonly
     @marshal_with(AclResource.RoleDefinition)
     def delete(self):
         role, permission_type, context = self._parse_request()

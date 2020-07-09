@@ -28,18 +28,20 @@ def gitlab_client():
     return client_mock
 
 
+class TestFreeUser:
+    def test_all_roles(self):
+        assert len(FreeUser().roles) == 2
+
+        role = users.find_or_create_role("this_is_a_test")
+
+        assert FreeUser().has_role(role)
+
+
 @pytest.mark.usefixtures("seed_users")
 class TestNothingEnabled:
     @pytest.fixture(scope="class")
     def app(self, create_app):
         return create_app()
-
-    def test_free_user_all_roles(self):
-        assert len(FreeUser().roles) == 2
-
-        role = users.find_or_create_role("this_is_a_test")
-
-        assert role in FreeUser().roles
 
     def test_current_user(self, app):
         with app.test_request_context("/"):
@@ -62,7 +64,7 @@ class TestNothingEnabled:
 
     def test_upgrade(self, app, api):
         with app.test_request_context():
-            res = api.post(url_for("root.upgrade"))
+            res = api.post(url_for("api_root.upgrade"))
 
             assert res.status_code == 201
             assert res.data == b"Meltano update in progress."
@@ -98,7 +100,7 @@ class TestReadonlyEnabled:
 
     def test_current_user(self, app):
         with app.test_request_context("/"):
-            assert isinstance(current_user._get_current_object(), AnonymousUser)
+            assert isinstance(current_user._get_current_object(), FreeUser)
 
     def test_identity(self, app, api):
         with app.test_request_context():
@@ -117,7 +119,7 @@ class TestReadonlyEnabled:
 
     def test_upgrade(self, app, api):
         with app.test_request_context():
-            res = api.post(url_for("root.upgrade"))
+            res = api.post(url_for("api_root.upgrade"))
 
             assert res.status_code == 499
             assert res.data == b"Meltano is currently running in read-only mode."
@@ -250,15 +252,15 @@ class TestAuthenticationEnabled:
 
     def test_upgrade(self, app, api):
         with app.test_request_context():
-            res = api.post(url_for("root.upgrade"))
+            res = api.post(url_for("api_root.upgrade"))
 
-            assert res.status_code == 403
-            assert res.data == b"You do not have the required permissions."
+            assert res.status_code == 401
+            assert res.data == b"Authentication is required to access this resource."
 
     def test_upgrade_authenticated(self, app, api, impersonate):
         with app.test_request_context():
             with impersonate(users.get_user("alice")):
-                res = api.post(url_for("root.upgrade"))
+                res = api.post(url_for("api_root.upgrade"))
 
                 assert res.status_code == 201
                 assert res.data == b"Meltano update in progress."
@@ -322,9 +324,8 @@ class TestAuthenticationAndReadonlyEnabled:
         with app.test_request_context():
             res = api.get(url_for("api_root.identity"))
 
-            assert res.status_code == 200
-            assert res.json["anonymous"] == True
-            assert res.json["can_sign_in"] == True
+            assert res.status_code == 401
+            assert res.data == b"Authentication is required to access this resource."
 
     def test_identity_authenticated(self, app, api, impersonate):
         with app.test_request_context():
@@ -341,7 +342,7 @@ class TestAuthenticationAndReadonlyEnabled:
             res = api.get(url_for("root.bootstrap"))
 
             assert res.status_code == 302
-            assert res.location == url_for("root.default", _external=True)
+            assert res.location.startswith(url_for("security.login", _external=True))
 
     def test_bootstrap_authenticated(self, app, api, impersonate):
         with app.test_request_context():
@@ -353,25 +354,25 @@ class TestAuthenticationAndReadonlyEnabled:
 
     def test_upgrade(self, app, api):
         with app.test_request_context():
-            res = api.post(url_for("root.upgrade"))
+            res = api.post(url_for("api_root.upgrade"))
 
-            assert res.status_code == 499
-            assert res.data == b"Meltano is currently running in read-only mode."
+            assert res.status_code == 401
+            assert res.data == b"Authentication is required to access this resource."
 
     def test_upgrade_authenticated(self, app, api, impersonate):
         with app.test_request_context():
             with impersonate(users.get_user("alice")):
-                res = api.post(url_for("root.upgrade"))
+                res = api.post(url_for("api_root.upgrade"))
 
-                assert res.status_code == 201
-                assert res.data == b"Meltano update in progress."
+                assert res.status_code == 499
+                assert res.data == b"Meltano is currently running in read-only mode."
 
     def test_plugins(self, app, api):
         with app.test_request_context():
             res = api.get(url_for("plugins.all"))
 
-            assert res.status_code == 200
-            assert "extractors" in res.json
+            assert res.status_code == 401
+            assert res.data == b"Authentication is required to access this resource."
 
     def test_plugins_authenticated(self, app, api, impersonate):
         with app.test_request_context():
@@ -388,8 +389,8 @@ class TestAuthenticationAndReadonlyEnabled:
                 json={"plugin_type": "extractors", "name": "tap-gitlab"},
             )
 
-            assert res.status_code == 499
-            assert res.data == b"Meltano is currently running in read-only mode."
+            assert res.status_code == 401
+            assert res.data == b"Authentication is required to access this resource."
 
     def test_plugins_add_authenticated(self, app, api, impersonate):
         with app.test_request_context():
@@ -399,5 +400,5 @@ class TestAuthenticationAndReadonlyEnabled:
                     json={"plugin_type": "extractors", "name": "tap-gitlab"},
                 )
 
-                assert res.status_code == 200
-                assert res.json["name"] == "tap-gitlab"
+                assert res.status_code == 499
+                assert res.data == b"Meltano is currently running in read-only mode."

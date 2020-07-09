@@ -22,7 +22,7 @@ from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from flask_security import roles_required
 from meltano.api.api_blueprint import APIBlueprint
-from meltano.api.security.auth import is_unauthorized
+from meltano.api.security.auth import passes_authentication_checks, block_if_readonly
 from meltano.core.utils import truthy
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ root = Blueprint("root", __name__)
 def redirect_to_login_if_auth_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if not is_unauthorized():
+        if passes_authentication_checks():
             return f(*args, **kwargs)
 
         return current_app.login_manager.unauthorized()
@@ -68,25 +68,6 @@ def default(path):
         return "Please run `make bundle` from src/webapp of the Meltano project."
 
 
-@root.route("/upgrade", methods=["POST"])
-@roles_required("admin")
-def upgrade():
-    meltano.api.executor.upgrade()
-    return "Meltano update in progress.", 201
-
-
-@root.route("/version")
-def version():
-    response_payload = {"version": meltano.__version__}
-
-    if truthy(request.args.get("include_latest")):
-        res = requests.get("https://pypi.org/pypi/meltano/json")
-        pypi_payload = res.json()
-        response_payload["latest_version"] = pypi_payload["info"]["version"]
-
-    return jsonify(response_payload)
-
-
 @root.route("/bootstrap")
 @redirect_to_login_if_auth_required
 def bootstrap():
@@ -101,6 +82,26 @@ def echo():
 
 
 api_root = APIBlueprint("api_root", __name__, url_prefix="/api/v1/")
+
+
+@api_root.route("/version")
+def version():
+    response_payload = {"version": meltano.__version__}
+
+    if truthy(request.args.get("include_latest")):
+        res = requests.get("https://pypi.org/pypi/meltano/json")
+        pypi_payload = res.json()
+        response_payload["latest_version"] = pypi_payload["info"]["version"]
+
+    return jsonify(response_payload)
+
+
+@api_root.route("/upgrade", methods=["POST"])
+@roles_required("admin")
+@block_if_readonly
+def upgrade():
+    meltano.api.executor.upgrade()
+    return "Meltano update in progress.", 201
 
 
 @api_root.route("/identity")

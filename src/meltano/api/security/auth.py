@@ -65,34 +65,41 @@ def permit(permission_type, context):
         raise Forbidden()
 
 
-def is_unauthorized():
+def passes_authentication_checks():
     project = Project.find()
     settings_service = ProjectSettingsService(project)
 
-    if settings_service.get("ui.readonly"):
-        # If we're in read-only mode, the `@roles_required("admin")` checks
-        # will take care of enforcing authentication as appropriate
-        logging.debug(f"Authentication not required because of read-only mode")
-        return False
-
     if not settings_service.get("ui.authentication"):
         logging.debug(f"Authentication not required because it's disabled")
-        return False
+        return True
 
     if current_user.is_authenticated:
-        logging.debug(f"Authenticated as @{current_user.username}")
-        return False
+        logging.debug(f"Authenticated as '{current_user.username}'")
+        return True
 
-    return True
+    return False
 
 
 def block_if_api_auth_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if request.method == "OPTIONS" or not is_unauthorized():
+        if request.method == "OPTIONS" or passes_authentication_checks():
             return f(*args, **kwargs)
 
         return "Authentication is required to access this resource.", 401
+
+    return decorated
+
+
+def block_if_readonly(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        project = Project.find()
+        settings_service = ProjectSettingsService(project)
+        if settings_service.get("ui.readonly"):
+            return "Meltano is currently running in read-only mode.", HTTP_READONLY_CODE
+
+        return f(*args, **kwargs)
 
     return decorated
 
@@ -103,12 +110,7 @@ def unauthorized_callback():
     instead of redirecting anywhere.
     """
 
-    project = Project.find()
-    settings_service = ProjectSettingsService(project)
-    if settings_service.get("ui.readonly"):
-        return "Meltano is currently running in read-only mode.", HTTP_READONLY_CODE
-    else:
-        return "You do not have the required permissions.", 403
+    return "You do not have the required permissions.", 403
 
 
 def _identity_loaded_hook(sender, identity):

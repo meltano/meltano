@@ -352,9 +352,7 @@ These settings can be used to enable certain features of [Meltano UI](/docs/comm
 - Environment variable: `MELTANO_UI_READONLY`, alias: `MELTANO_READONLY`
 - Default: `false`
 
-To disable all modifications to your project through the Meltano UI, you can run Meltano in *read-only* mode.
-
-If the [`ui.authentication` setting](#ui-authentication) is enabled, read-only mode will only apply to unauthenticated users.
+To disable all modifications to your project through the Meltano UI, you can run it in in *read-only* mode.
 
 #### How to use
 
@@ -376,8 +374,6 @@ Additionally, you will need to:
 1. Set the [`ui.server_name`](#ui-server-name), [`ui.secret_key`](#ui-secret-key), and [`ui.password_salt`](#ui-password-salt) settings, manually or using [`meltano ui setup <server_name>`](./command-line-interface.html#setup), without which your configuration will be insecure.
 
 2. Create at least one user using [`meltano user add`](./command-line-interface.html#user).
-
-If the [`ui.readonly` setting](#ui-readonly) is enabled, authentication will only be required for write actions.
 
 #### How to use
 
