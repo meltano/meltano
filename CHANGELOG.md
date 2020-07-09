@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.39.1 - (2020-07-09)
+---
+
+### New
+
 - [#2141](https://gitlab.com/meltano/meltano/-/issues/2141) Add `ui.session_cookie_domain` setting, to be used instead of `ui.server_name` when hostname matching is not desirable.
 - [#2142](https://gitlab.com/meltano/meltano/-/issues/2142) Let `discovery.yml` manifest URL be overwritten using `discovery_url` setting.
 - [#2083](https://gitlab.com/meltano/meltano/-/issues/2083) Add `ui.anonymous_readonly` setting to allow anonymous users read-only access when `ui.authentication` is enabled.
@@ -25,8 +37,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2151](https://gitlab.com/meltano/meltano/-/issues/2151) Fix `meltano ui` never printing `Meltano UI is now available at [URL]` if `ui.server_name` is set
 - [#2152](https://gitlab.com/meltano/meltano/-/issues/2152) Fix `meltano ui` printing all `gunicorn.error` logs twice
-
-### Breaks
 
 
 ## 1.39.0 - (2020-07-07)
