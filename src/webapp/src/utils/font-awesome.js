@@ -29,6 +29,7 @@ import {
   faEnvelope,
   faExclamationTriangle,
   faExternalLinkSquareAlt,
+  faEye,
   faFileAlt,
   faFileUpload,
   faFileDownload,
@@ -36,6 +37,7 @@ import {
   faGift,
   faGlobeAmericas,
   faHashtag,
+  faHistory,
   faInfoCircle,
   faLock,
   faPlus,
@@ -94,6 +96,7 @@ export default {
     library.add(faEnvelope)
     library.add(faExclamationTriangle)
     library.add(faExternalLinkSquareAlt)
+    library.add(faEye)
     library.add(faFileAlt)
     library.add(faFileUpload)
     library.add(faFileDownload)
@@ -101,6 +104,7 @@ export default {
     library.add(faGift)
     library.add(faGlobeAmericas)
     library.add(faHashtag)
+    library.add(faHistory)
     library.add(faInfoCircle)
     library.add(faLock)
     library.add(faPlus)

@@ -34,6 +34,24 @@ export default {
     },
     getIsSubRouteOf() {
       return parentPath => utils.getIsSubRouteOf(parentPath, this.$route.path)
+    },
+    isReadonly() {
+      return (
+        this.$flask.isReadonlyEnabled ||
+        (this.$flask.isAnonymousReadonlyEnabled &&
+          this.identity &&
+          this.identity.anonymous)
+      )
+    },
+    readonlyTooltip() {
+      return this.$flask.isReadonlyEnabled
+        ? 'Meltano is running in read-only mode'
+        : 'Meltano is running in read-only mode until you sign in'
+    },
+    readonlyUrl() {
+      return this.$flask.isReadonlyEnabled
+        ? 'https://meltano.com/docs/settings.html#ui-readonly'
+        : 'https://meltano.com/docs/settings.html#ui-anonymous-readonly'
     }
   },
   watch: {
@@ -271,35 +289,54 @@ export default {
             <div class="level-item">
               <div class="buttons">
                 <a
+                  v-if="isReadonly"
+                  class="button is-small is-text has-background-transparent tooltip is-tooltip-left"
+                  :data-tooltip="readonlyTooltip"
+                  :href="readonlyUrl"
+                  target="_blank"
+                >
+                  <span class="icon">
+                    <font-awesome-icon icon="eye"></font-awesome-icon>
+                  </span>
+                  <span>Read-only</span>
+                </a>
+
+                <a
                   v-if="!updateAvailable && version"
                   class="button is-small is-text has-background-transparent tooltip is-tooltip-left"
                   data-tooltip="View this version's additions, changes, & fixes"
                   href="https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md"
                   target="_blank"
                 >
-                  v{{ version }}
+                  <span class="icon">
+                    <font-awesome-icon icon="history"></font-awesome-icon>
+                  </span>
+                  <span>v{{ version }}</span>
                 </a>
+
                 <a
                   v-if="identity && !identity.anonymous"
                   class="button is-small has-background-transparent tooltip is-tooltip-left"
                   :data-tooltip="`Sign out: ${identity.username}`"
                   @click="logout"
                 >
-                  <span>Sign Out</span>
                   <span class="icon">
                     <font-awesome-icon icon="user"></font-awesome-icon>
                   </span>
+                  <span>Sign Out</span>
                 </a>
+
                 <a
                   v-if="identity && identity.canSignIn"
                   class="button is-small has-background-transparent"
                   @click="login"
                 >
-                  <span>Sign In</span>
                   <span class="icon">
                     <font-awesome-icon icon="user"></font-awesome-icon>
                   </span>
+                  <span>Sign In</span>
                 </a>
+
                 <a
                   class="button is-small has-background-transparent tooltip is-tooltip-left"
                   data-tooltip="I need help"
