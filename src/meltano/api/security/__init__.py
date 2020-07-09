@@ -31,10 +31,7 @@ def setup_security(app, project):
     }
 
     settings_service = ProjectSettingsService(project)
-    authentication = settings_service.get("ui.authentication")
-    readonly = settings_service.get("ui.readonly")
-
-    if not authentication and not readonly:
+    if not settings_service.get("ui.authentication"):
         # the FreeUser is free to do everything and has all
         # roles and permissions automatically.
         options["anonymous_user"] = FreeUser

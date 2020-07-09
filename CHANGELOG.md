@@ -12,10 +12,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2141](https://gitlab.com/meltano/meltano/-/issues/2141) Add `ui.session_cookie_domain` setting, to be used instead of `ui.server_name` when hostname matching is not desirable.
 - [#2142](https://gitlab.com/meltano/meltano/-/issues/2142) Let `discovery.yml` manifest URL be overwritten using `discovery_url` setting.
+- [#2083](https://gitlab.com/meltano/meltano/-/issues/2083) Add `ui.anonymous_readonly` setting to allow anonymous users read-only access when `ui.authentication` is enabled.
 
 ### Changes
 
 - [#2140](https://gitlab.com/meltano/meltano/-/issues/2140) Only have `meltano ui` complain about missing `ui.server_name`, `ui.secret_key` and `ui.password_salt` settings when `ui.authentication` is enabled
+- [#2083](https://gitlab.com/meltano/meltano/-/issues/2083) Stop allowing anonymous users read-only access when `ui.authentication` and `ui.readonly` are both enabled.
 
 ### Fixes
 
