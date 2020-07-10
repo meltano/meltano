@@ -43,9 +43,7 @@ class TestCliUpgrade:
         )
         assert "run `meltano upgrade --skip-package`" not in result.output
 
-    def test_upgrade_files(
-        self, session, project, cli_runner, config_service, plugin_settings_service
-    ):
+    def test_upgrade_files(self, session, project, cli_runner, config_service):
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         assert_cli_runner(result)
 

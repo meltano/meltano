@@ -133,21 +133,28 @@ def project_add_service(project, config_service, plugin_discovery_service):
 
 
 @pytest.fixture(scope="class")
-def plugin_settings_service(project, config_service, plugin_discovery_service):
-    return PluginSettingsService(
-        project,
-        config_service=config_service,
-        plugin_discovery_service=plugin_discovery_service,
-    )
+def plugin_settings_service_factory(project, config_service, plugin_discovery_service):
+    def _factory(plugin, **kwargs):
+        return PluginSettingsService(
+            project,
+            plugin,
+            config_service=config_service,
+            plugin_discovery_service=plugin_discovery_service,
+            **kwargs,
+        )
+
+    return _factory
 
 
 @pytest.fixture(scope="class")
-def plugin_invoker_factory(project, plugin_settings_service, plugin_discovery_service):
+def plugin_invoker_factory(
+    project, plugin_settings_service_factory, plugin_discovery_service
+):
     def _factory(plugin, **kwargs):
         return invoker_factory(
             project,
             plugin,
-            plugin_settings_service=plugin_settings_service,
+            plugin_settings_service=plugin_settings_service_factory(plugin),
             plugin_discovery_service=plugin_discovery_service,
             **kwargs,
         )
@@ -215,8 +222,8 @@ def dbt(config_service):
 
 
 @pytest.fixture(scope="class")
-def schedule_service(project, plugin_settings_service):
-    return ScheduleService(project, plugin_settings_service=plugin_settings_service)
+def schedule_service(project, plugin_discovery_service):
+    return ScheduleService(project, plugin_discovery_service=plugin_discovery_service)
 
 
 @pytest.fixture(scope="class")
@@ -233,13 +240,10 @@ def schedule(project, tap, target, schedule_service):
 
 
 @pytest.fixture(scope="class")
-def elt_context_builder(
-    project, config_service, plugin_settings_service, plugin_discovery_service
-):
+def elt_context_builder(project, config_service, plugin_discovery_service):
     return ELTContextBuilder(
         project,
         config_service=config_service,
-        plugin_settings_service=plugin_settings_service,
         plugin_discovery_service=plugin_discovery_service,
     )
 

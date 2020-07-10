@@ -24,10 +24,10 @@ class TransformAddService:
         _, Session = project_engine(project)
         session = Session()
         try:
-            plugin_settings_service = PluginSettingsService(project)
-            dbt_project_dir = plugin_settings_service.get(
-                session, dbt_plugin, "project_dir"
+            settings_service = PluginSettingsService(
+                project, dbt_plugin, config_service=config_service
             )
+            dbt_project_dir = settings_service.get("project_dir", session=session)
             dbt_project_path = Path(dbt_project_dir)
         finally:
             session.close()
