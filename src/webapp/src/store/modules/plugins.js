@@ -100,6 +100,20 @@ const getters = {
     }
   },
 
+  getPluginLogoUrl(state) {
+    return (type, name) => {
+      const pluginList = state.plugins[type]
+      const targetPlugin = pluginList
+        ? pluginList.find(plugin => plugin.name === name)
+        : {}
+
+      return (
+        (targetPlugin && targetPlugin.logoUrl) ||
+        utils.getConnectorLogoUrl(name)
+      )
+    }
+  },
+
   getPluginProfiles() {
     return plugin => {
       const pluginProfiles = lodash.map(
