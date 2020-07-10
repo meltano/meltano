@@ -1,15 +1,17 @@
 <script>
-import utils from '@/utils/utils'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'ConnectorLogo',
   props: {
     connector: { type: String, required: true, default: '' },
+    type: { type: String, default: 'extractors' },
     isGrayscale: { type: Boolean, default: false }
   },
   computed: {
+    ...mapGetters('plugins', ['getPluginLogoUrl']),
     connectorLogoUrl() {
-      return utils.getConnectorLogoUrl(this.connector)
+      return this.getPluginLogoUrl(this.type, this.connector)
     }
   }
 }

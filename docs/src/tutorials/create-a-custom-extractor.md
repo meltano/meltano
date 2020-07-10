@@ -108,6 +108,12 @@ plugins:
           value: '2015-09-21T04:00:00Z'
 ```
 
+You can further customize the appearance of your custom extractor in Meltano UI using the following options:
+
+- `label`
+- `logo_url`
+- `description`
+
 ### Plugin Setting
 
 When creating a new plugin, you'll often have to expose some settings to the user so that Meltano can generate the correct configuration to run your plugin.
