@@ -22,16 +22,23 @@ class TestSqlHelper:
         return SqlHelper()
 
     def test_get_db_engine_sqlite(
-        self, app, subject, project, tap, plugin_settings_service, elt_context_builder
+        self,
+        app,
+        subject,
+        project,
+        tap,
+        plugin_settings_service_factory,
+        elt_context_builder,
     ):
+        plugin_settings_service = plugin_settings_service_factory(tap)
+
         sample_config = {"database": "pytest"}
         engine_uri = f"sqlite:///pytest.db"
 
         with mock.patch(
             "sqlalchemy.create_engine", return_value=None
-        ) as create_engine_mock, mock.patch.object(
-            plugin_settings_service,
-            "with_env_override",
+        ) as create_engine_mock, mock.patch(
+            "meltano.core.elt_context.PluginSettingsService",
             return_value=plugin_settings_service,
         ), mock.patch.object(
             plugin_settings_service, "as_dict", return_value=sample_config
@@ -51,9 +58,10 @@ class TestSqlHelper:
         app,
         subject,
         tap,
-        plugin_settings_service,
+        plugin_settings_service_factory,
         elt_context_builder,
     ):
+        plugin_settings_service = plugin_settings_service_factory(tap)
         sample_config = {
             "user": "user",
             "password": "password",
@@ -67,9 +75,8 @@ class TestSqlHelper:
 
         with mock.patch(
             "sqlalchemy.create_engine", return_value=None
-        ) as create_engine_mock, mock.patch.object(
-            plugin_settings_service,
-            "with_env_override",
+        ) as create_engine_mock, mock.patch(
+            "meltano.core.elt_context.PluginSettingsService",
             return_value=plugin_settings_service,
         ), mock.patch.object(
             plugin_settings_service, "as_dict", return_value=sample_config

@@ -35,17 +35,11 @@ class ScheduleNotFoundError(Exception):
 
 class ScheduleService:
     def __init__(
-        self,
-        project: Project,
-        plugin_discovery_service: PluginDiscoveryService = None,
-        plugin_settings_service: PluginSettingsService = None,
+        self, project: Project, plugin_discovery_service: PluginDiscoveryService = None
     ):
         self.project = project
         self.plugin_discovery_service = (
             plugin_discovery_service or PluginDiscoveryService(project)
-        )
-        self.plugin_settings_service = plugin_settings_service or PluginSettingsService(
-            project
         )
 
     def add(
@@ -79,9 +73,12 @@ class ScheduleService:
         extractor_ref = PluginRef(PluginType.EXTRACTORS, extractor)
         start_date = None
         try:
-            start_date = self.plugin_settings_service.get(
-                session, extractor_ref, "start_date"
+            settings_service = PluginSettingsService(
+                self.project,
+                extractor_ref,
+                plugin_discovery_service=self.plugin_discovery_service,
             )
+            start_date = settings_service.get("start_date", session=session)
         except SettingMissingError:
             logging.debug(f"`start_date` not found in {extractor}.")
 

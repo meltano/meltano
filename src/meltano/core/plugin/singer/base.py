@@ -5,7 +5,6 @@ import logging
 from meltano.core.behavior.hookable import hook
 from meltano.core.project import Project
 from meltano.core.plugin import PluginInstall
-from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.db import project_engine
 from meltano.core.utils import nest
 

@@ -55,7 +55,7 @@ def freeze_profile_config_keys(profile):
 def validate_plugin_config(
     plugin: PluginRef, name, value, project: Project, settings: PluginSettingsService
 ):
-    setting_def = settings.find_setting(plugin, name)
+    setting_def = settings.find_setting(name)
     # we want to prevent the edition of protected settings from the UI
     if setting_def.protected:
         logging.warning("Cannot set a 'protected' configuration externally.")
@@ -70,7 +70,7 @@ def validate_plugin_config(
             )
             return False
 
-    old_value, source = settings.get_with_source(db.session, plugin, name)
+    old_value, source = settings.get_with_source(name, session=db.session)
     if source in (SettingValueSource.ENV, SettingValueSource.MELTANO_YML):
         logging.warning(
             "Cannot override a configuration set in the environment or meltano.yml."
@@ -298,24 +298,32 @@ def get_plugin_configuration(plugin_ref) -> Response:
     """
 
     project = Project.find()
-    settings = PluginSettingsService(project, show_hidden=False)
-    plugin = ConfigService(project).get_plugin(plugin_ref)
+    config_service = ConfigService(project)
+    plugin = config_service.get_plugin(plugin_ref)
 
-    discovery_service = PluginDiscoveryService(project)
+    discovery_service = PluginDiscoveryService(project, config_service=config_service)
+    settings = PluginSettingsService(
+        project,
+        plugin,
+        config_service=config_service,
+        plugin_discovery_service=discovery_service,
+        show_hidden=False,
+    )
+
     try:
         plugin_def = discovery_service.find_plugin(plugin.type, plugin.name)
         settings_group_validation = plugin_def.settings_group_validation
     except PluginNotFoundError:
         settings_group_validation = []
 
-    profiles = settings.profiles_with_config(db.session, plugin, redacted=True)
+    profiles = settings.profiles_with_config(redacted=True, session=db.session)
     for profile in profiles:
         freeze_profile_config_keys(profile)
 
     return jsonify(
         {
             "profiles": profiles,
-            "settings": Canonical.as_canonical(settings.definitions(plugin)),
+            "settings": Canonical.as_canonical(settings.definitions()),
             "settings_group_validation": settings_group_validation,
         }
     )
@@ -333,7 +341,7 @@ def add_plugin_configuration_profile(plugin_ref) -> Response:
     project = Project.find()
     config = ConfigService(project)
     plugin = config.get_plugin(plugin_ref)
-    settings = PluginSettingsService(project)
+    settings = PluginSettingsService(project, plugin, config_service=config)
 
     # create the new profile for this plugin
     name = payload["name"]
@@ -342,7 +350,7 @@ def add_plugin_configuration_profile(plugin_ref) -> Response:
     config.update_plugin(plugin)
 
     profile_config = settings.profile_with_config(
-        db.session, plugin, profile, redacted=True
+        profile, redacted=True, session=db.session
     )
     freeze_profile_config_keys(profile_config)
 
@@ -357,11 +365,14 @@ def save_plugin_configuration(plugin_ref) -> Response:
     """
     project = Project.find()
     payload = request.get_json()
-    plugin = ConfigService(project).get_plugin(plugin_ref)
+    config_service = ConfigService(project)
+    plugin = config_service.get_plugin(plugin_ref)
 
     # TODO iterate pipelines and save each, also set this connector's profile (reuse `pipelineInFocusIndex`?)
 
-    settings = PluginSettingsService(project, show_hidden=False)
+    settings = PluginSettingsService(
+        project, plugin, config_service=config_service, show_hidden=False
+    )
 
     for profile in payload:
         # select the correct profile
@@ -373,11 +384,11 @@ def save_plugin_configuration(plugin_ref) -> Response:
                 continue
 
             if value == "":
-                settings.unset(db.session, plugin, name)
+                settings.unset(name, session=db.session)
             else:
-                settings.set(db.session, plugin, name, value)
+                settings.set(name, value, session=db.session)
 
-    profiles = settings.profiles_with_config(db.session, plugin, redacted=True)
+    profiles = settings.profiles_with_config(redacted=True, session=db.session)
     for profile in profiles:
         freeze_profile_config_keys(profile)
 
@@ -398,7 +409,9 @@ def test_plugin_configuration(plugin_ref) -> Response:
     # load the correct profile
     plugin.use_profile(plugin.get_profile(payload.get("profile")))
 
-    settings = PluginSettingsService(project, show_hidden=False)
+    settings = PluginSettingsService(
+        project, plugin, config_service=config_service, show_hidden=False
+    )
 
     config = payload.get("config", {})
     valid_config = {
@@ -406,6 +419,7 @@ def test_plugin_configuration(plugin_ref) -> Response:
         for name, value in config.items()
         if validate_plugin_config(plugin, name, value, project, settings)
     }
+    settings.config_override = PluginSettingsService.unredact(valid_config)
 
     async def test_stream(tap_stream) -> bool:
         while not tap_stream.at_eof():
@@ -416,20 +430,19 @@ def test_plugin_configuration(plugin_ref) -> Response:
 
         return False
 
-    async def test_extractor(config={}):
+    async def test_extractor():
+        process = None
         try:
-            settings_service = settings.with_config_override(
-                PluginSettingsService.unredact(config)
-            )
             invoker = invoker_factory(
                 project,
                 plugin,
                 prepare_with_session=db.session,
-                plugin_settings_service=settings_service,
+                plugin_settings_service=settings,
             )
             process = await invoker.invoke_async(stdout=asyncio.subprocess.PIPE)
             return await test_stream(process.stdout)
         except Exception as err:
+            logging.debug(err)
             # if anything happens, this is not successful
             return False
         finally:
@@ -440,7 +453,7 @@ def test_plugin_configuration(plugin_ref) -> Response:
                 logging.debug(err)
 
     loop = asyncio.get_event_loop()
-    success = loop.run_until_complete(test_extractor(valid_config))
+    success = loop.run_until_complete(test_extractor())
 
     return jsonify({"is_success": success}), 200
 
