@@ -28,11 +28,11 @@ class PluginContext(
 
     @property
     def config(self):
-        return self.settings_service.as_dict(self.session, self.ref)
+        return self.settings_service.as_dict(session=self.session)
 
     @property
     def config_env(self):
-        return self.settings_service.as_env(self.session, self.ref)
+        return self.settings_service.as_env(session=self.session)
 
 
 class ELTContext:
@@ -92,7 +92,6 @@ class ELTContextBuilder:
         self,
         project: Project,
         config_service: ConfigService = None,
-        plugin_settings_service: PluginSettingsService = None,
         plugin_discovery_service: PluginDiscoveryService = None,
     ):
         self.project = project
@@ -100,11 +99,6 @@ class ELTContextBuilder:
         self.plugin_discovery_service = (
             plugin_discovery_service
             or PluginDiscoveryService(project, config_service=config_service)
-        )
-        self.plugin_settings_service = plugin_settings_service or PluginSettingsService(
-            project,
-            config_service=config_service,
-            plugin_discovery_service=plugin_discovery_service,
         )
         self._extractor = None
         self._loader = None
@@ -146,7 +140,13 @@ class ELTContextBuilder:
             definition=self.plugin_discovery_service.find_plugin(
                 plugin_name=plugin.name, plugin_type=plugin.type
             ),
-            settings_service=self.plugin_settings_service.with_env_override(env),
+            settings_service=PluginSettingsService(
+                self.project,
+                plugin,
+                config_service=self.config_service,
+                plugin_discovery_service=self.plugin_discovery_service,
+                env_override=env,
+            ),
             session=session,
         )
 

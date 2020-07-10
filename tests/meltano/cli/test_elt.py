@@ -22,7 +22,6 @@ class TestCliElt:
         project,
         tap,
         target,
-        plugin_settings_service,
         plugin_discovery_service,
         job_logging_service,
     ):
@@ -36,8 +35,7 @@ class TestCliElt:
         # fmt: off
         with patch.object(SingerRunner, "run", return_value=None), \
         patch("meltano.cli.elt.install_missing_plugins", return_value=True), \
-        patch("meltano.core.elt_context.PluginDiscoveryService", return_value=plugin_discovery_service), \
-        patch("meltano.core.elt_context.PluginSettingsService", return_value=plugin_settings_service):
+        patch("meltano.core.elt_context.PluginDiscoveryService", return_value=plugin_discovery_service):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
         # fmt: on
@@ -54,9 +52,6 @@ class TestCliElt:
         ), patch(
             "meltano.core.elt_context.PluginDiscoveryService",
             return_value=plugin_discovery_service,
-        ), patch(
-            "meltano.core.elt_context.PluginSettingsService",
-            return_value=plugin_settings_service,
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
@@ -76,7 +71,6 @@ class TestCliElt:
         target,
         dbt,
         plugin_discovery_service,
-        plugin_settings_service,
     ):
         # exit cleanly when `meltano elt ... --transform only` runs for
         # a tap with no default transforms
@@ -87,7 +81,6 @@ class TestCliElt:
         with patch("meltano.cli.elt.add_plugin", return_value=None) as add_plugin, \
         patch("meltano.cli.elt.PluginDiscoveryService", return_value=plugin_discovery_service), \
         patch("meltano.core.elt_context.PluginDiscoveryService", return_value=plugin_discovery_service), \
-        patch("meltano.core.elt_context.PluginSettingsService", return_value=plugin_settings_service), \
         patch.object(DbtRunner, "run", return_value=None):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)

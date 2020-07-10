@@ -11,12 +11,19 @@ from meltano.core.plugin.settings_service import (
 
 class TestOrchestration:
     def test_get_configuration(
-        self, app, api, tap, session, plugin_settings_service, plugin_discovery_service
+        self,
+        app,
+        api,
+        tap,
+        session,
+        plugin_settings_service_factory,
+        plugin_discovery_service,
     ):
-        plugin_settings_service.set(session, tap, "secure", "thisisatest")
+        plugin_settings_service = plugin_settings_service_factory(tap)
+        plugin_settings_service.set("secure", "thisisatest", session=session)
 
         with mock.patch(
-            "meltano.core.plugin.settings_service.PluginDiscoveryService",
+            "meltano.api.controllers.orchestrations.PluginDiscoveryService",
             return_value=plugin_discovery_service,
         ), app.test_request_context():
             res = api.get(
@@ -28,25 +35,30 @@ class TestOrchestration:
 
             # make sure that set `password` is still present
             # but redacted in the response
-            assert plugin_settings_service.get_with_source(session, tap, "secure") == (
-                "thisisatest",
-                SettingValueSource.DB,
-            )
+            assert plugin_settings_service.get_with_source(
+                "secure", session=session
+            ) == ("thisisatest", SettingValueSource.DB)
             assert default_config["secure"] == REDACTED_VALUE
 
             # make sure the `hidden` setting is still present
             # but hidden in the response
-            assert plugin_settings_service.get_with_source(session, tap, "hidden") == (
-                42,
-                SettingValueSource.DEFAULT,
-            )
+            assert plugin_settings_service.get_with_source(
+                "hidden", session=session
+            ) == (42, SettingValueSource.DEFAULT)
             assert "hidden" not in default_config
 
     def test_save_configuration(
-        self, app, api, tap, session, plugin_settings_service, plugin_discovery_service
+        self,
+        app,
+        api,
+        tap,
+        session,
+        plugin_settings_service_factory,
+        plugin_discovery_service,
     ):
-        plugin_settings_service.set(session, tap, "secure", "thisisatest")
-        plugin_settings_service.set(session, tap, "protected", "iwontchange")
+        plugin_settings_service = plugin_settings_service_factory(tap)
+        plugin_settings_service.set("secure", "thisisatest", session=session)
+        plugin_settings_service.set("protected", "iwontchange", session=session)
 
         with mock.patch(
             "meltano.core.plugin.settings_service.PluginDiscoveryService",
@@ -67,21 +79,19 @@ class TestOrchestration:
 
             # make sure that set `password` has been updated
             # but redacted in the response
-            assert plugin_settings_service.get_with_source(session, tap, "secure") == (
-                "newvalue",
-                SettingValueSource.DB,
-            )
+            assert plugin_settings_service.get_with_source(
+                "secure", session=session
+            ) == ("newvalue", SettingValueSource.DB)
             assert config["secure"] == REDACTED_VALUE
 
             # make sure the `readonly` field has not been updated
             assert plugin_settings_service.get_with_source(
-                session, tap, "protected"
+                "protected", session=session
             ) == ("iwontchange", SettingValueSource.DB)
 
             # make sure the `hidden` setting is still present
             # but hidden in the response
-            assert plugin_settings_service.get_with_source(session, tap, "hidden") == (
-                42,
-                SettingValueSource.DEFAULT,
-            )
+            assert plugin_settings_service.get_with_source(
+                "hidden", session=session
+            ) == (42, SettingValueSource.DEFAULT)
             assert "hidden" not in config

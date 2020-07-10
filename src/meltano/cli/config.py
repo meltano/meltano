@@ -43,7 +43,7 @@ def config(ctx, project, plugin_type, plugin_name, format):
     session = Session()
     try:
         if plugin:
-            settings = PluginSettingsService(project).build(plugin)
+            settings = PluginSettingsService(project, plugin)
         else:
             settings = ProjectSettingsService(project)
 

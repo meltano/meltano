@@ -58,11 +58,14 @@ class PluginInvoker:
             config_dir or self.project.plugin_dir(plugin),
             run_dir or self.project.run_dir(plugin.name),
         )
-        self.settings_service = plugin_settings_service or PluginSettingsService(
-            project
-        )
         self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
             project
+        )
+        self.settings_service = plugin_settings_service or PluginSettingsService(
+            project,
+            plugin,
+            config_service=self.discovery_service.config_service,
+            plugin_discovery_service=self.discovery_service,
         )
         self.plugin_def = self.discovery_service.find_plugin(
             self.plugin.type, self.plugin.name
@@ -90,8 +93,8 @@ class PluginInvoker:
         }
 
     def prepare(self, session):
-        self.plugin_config = self.settings_service.as_dict(session, self.plugin)
-        self.plugin_config_env = self.settings_service.as_env(session, self.plugin)
+        self.plugin_config = self.settings_service.as_dict(session=session)
+        self.plugin_config_env = self.settings_service.as_env(session=session)
 
         with self.plugin.trigger_hooks("configure", self, session):
             self.config_service.configure()
@@ -110,7 +113,7 @@ class PluginInvoker:
         return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
 
     def env(self):
-        env = {**self.settings_service.env(self.plugin), **self.plugin_config_env}
+        env = {**self.settings_service.env, **self.plugin_config_env}
 
         # Ensure Meltano venv is not inherited
         venv = VirtualEnv(self.project.venvs_dir(self.plugin.type, self.plugin.name))

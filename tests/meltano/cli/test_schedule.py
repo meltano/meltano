@@ -18,18 +18,21 @@ class TestCliSchedule:
         TEST_DATE = "2010-01-01"
         get.return_value = TEST_DATE
 
-        res = cli_runner.invoke(
-            cli,
-            [
-                "schedule",
-                "schedule-mock",
-                "tap-mock",
-                "target-mock",
-                "@eon",
-                "--transform",
-                "run",
-            ],
-        )
+        with mock.patch(
+            "meltano.cli.schedule.ScheduleService", return_value=schedule_service
+        ):
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "schedule",
+                    "schedule-mock",
+                    "tap-mock",
+                    "target-mock",
+                    "@eon",
+                    "--transform",
+                    "run",
+                ],
+            )
 
         assert_cli_runner(res)
         schedule = schedule_service.schedules()[0]
