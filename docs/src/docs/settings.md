@@ -391,7 +391,7 @@ export MELTANO_READONLY=true
 Use this setting to enable authentication and disallow anonymous usage of your Meltano instance.
 
 Additionally, you will need to:
-1. Set the [`ui.server_name`](#ui-server-name), [`ui.secret_key`](#ui-secret-key), and [`ui.password_salt`](#ui-password-salt) settings, manually or using [`meltano ui setup <server_name>`](./command-line-interface.html#setup), without which your configuration will be insecure.
+1. Ensure your configuration is secure by setting the [`ui.secret_key`](#ui-secret-key) and [`ui.password_salt`](#ui-password-salt) settings, as well as [`ui.server_name`](#ui-server-name) or [`ui.session_cookie_domain`](#ui-session-cookie-domain), manually or using [`meltano ui setup <server_name>`](./command-line-interface.html#setup).
 
 2. Create at least one user using [`meltano user add`](./command-line-interface.html#user).
 
