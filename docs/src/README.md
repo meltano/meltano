@@ -402,13 +402,13 @@ Your `meltano-demo-project:dev` Docker image is now ready for its first containe
 
 ```bash
 # View Meltano version
-docker run meltano-demo-project --version
+docker run meltano-demo-project:dev --version
 
 # Run gitlab-to-jsonl pipeline with
 # mounted volume to exfiltrate target-jsonl output
 docker run \
   --volume $(pwd)/output:/project/output \
-  meltano-demo-project \
+  meltano-demo-project:dev \
   elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
 
 # Run gitlab-to-postgres pipeline with
@@ -419,7 +419,7 @@ docker run \
   --env PG_USERNAME=meltano \
   --env PG_PASSWORD=meltano \
   --env PG_DATABASE=demo-warehouse \
-  meltano-demo-project \
+  meltano-demo-project:dev \
   elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
 ```
 
