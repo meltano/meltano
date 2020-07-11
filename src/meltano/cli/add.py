@@ -54,6 +54,11 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
     )
     plugins.extend(related_plugins)
 
+    # We will install the plugins in reverse order, since dependencies
+    # are listed after their dependents in `related_plugins`, but should
+    # be installed first.
+    plugins.reverse()
+
     success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
 
     for plugin in plugins:  # TODO: Only works on Plugin from discovery...

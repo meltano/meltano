@@ -169,6 +169,10 @@ class PluginInstall(HookObject, Canonical, PluginRef):
     def should_add_to_file(self, project):
         return True
 
+    @property
+    def runner(self):
+        return None
+
     def is_custom(self):
         return self.namespace is not None
 

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from meltano.core.plugin import PluginInstall, PluginType
+from meltano.core.plugin import PluginInstall, PluginRef, PluginType
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.plugin_invoker import PluginInvoker
@@ -58,3 +58,7 @@ class DbtTransformPlugin(PluginInstall):
 
     def is_configurable(self):
         return False
+
+    @property
+    def runner(self):
+        return PluginRef(PluginType.TRANSFORMERS, "dbt")

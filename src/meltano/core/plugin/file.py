@@ -16,6 +16,8 @@ class FilePlugin(PluginInstall):
     def __init__(self, *args, **kwargs):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
 
+        self._plugin_config = None
+
     def is_invokable(self):
         return False
 
@@ -56,19 +58,22 @@ class FilePlugin(PluginInstall):
         }
 
     def plugin_config(self, project):
-        _, Session = project_engine(project)
-        session = Session()
-        try:
-            plugin_settings_service = PluginSettingsService(project, self)
-            raw_config = plugin_settings_service.as_dict(session=session)
-        finally:
-            session.close()
+        if self._plugin_config is None:
+            _, Session = project_engine(project)
+            session = Session()
+            try:
+                plugin_settings_service = PluginSettingsService(project, self)
+                raw_config = plugin_settings_service.as_dict(session=session)
+            finally:
+                session.close()
 
-        config = {}
-        for key, value in raw_config.items():
-            nest(config, key, value, maxsplit=1)
+            config = {}
+            for key, value in raw_config.items():
+                nest(config, key, value, maxsplit=1)
 
-        return config
+            self._plugin_config = config
+
+        return self._plugin_config
 
     def should_update_file(self, project, relative_path):
         try:

@@ -35,6 +35,11 @@ def install(project, plugin_type, plugin_name, include_related):
         related_plugins = add_related_plugins(project, plugins, add_service=add_service)
         plugins.extend(related_plugins)
 
+    # We will install the plugins in reverse order, since dependencies
+    # are listed after their dependents in `related_plugins`, but should
+    # be installed first.
+    plugins.reverse()
+
     click.echo(f"Installing {len(plugins)} plugins...")
 
     success = install_plugins(project, plugins)

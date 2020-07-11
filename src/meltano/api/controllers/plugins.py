@@ -103,16 +103,24 @@ def install_batch():
 
     project = Project.find()
 
-    # We use the DiscoveryService rather than the ConfigService because the
-    # plugin may not actually be installed yet at this point.
-    discovery = PluginDiscoveryService(project)
-    plugin = discovery.find_plugin(plugin_type, plugin_name)
+    config_service = ConfigService(project)
+    plugin = config_service.find_plugin(plugin_name, plugin_type=plugin_type)
 
     add_service = ProjectAddService(project)
     related_plugins = add_service.add_related(plugin)
 
+    # We will install the plugins in reverse order, since dependencies
+    # are listed after their dependents in `related_plugins`, but should
+    # be installed first.
+    related_plugins.reverse()
+
     install_service = PluginInstallService(project)
-    install_service.install_plugins(related_plugins, reason=PluginInstallReason.ADD)
+    install_status = install_service.install_plugins(
+        related_plugins, reason=PluginInstallReason.ADD
+    )
+
+    for error in install_status["errors"]:
+        raise PluginInstallError(error["message"])
 
     return jsonify([plugin.canonical() for plugin in related_plugins])
 

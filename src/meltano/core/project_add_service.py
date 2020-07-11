@@ -47,20 +47,37 @@ class ProjectAddService:
         except ValueError:
             pass
 
-        related_plugins = [
+        related_plugins = []
+
+        runner = target_plugin.runner
+        if runner:
+            related_plugins.append(runner)
+
+        plugin_def = self.discovery_service.find_plugin(
+            target_plugin.type, target_plugin.name
+        )
+        related_plugins.extend(
             plugin
             for plugin in self.discovery_service.plugins()
-            if plugin.namespace == target_plugin.namespace
-            and plugin.type in plugin_types
-        ]
+            if plugin.namespace == plugin_def.namespace and plugin.type in plugin_types
+        )
 
         added_plugins = []
         for plugin in related_plugins:
             try:
                 plugin_install = self.add(plugin.type, plugin.name)
+            except PluginAlreadyAddedException as err:
+                continue
 
-                added_plugins.append(plugin_install)
-            except PluginAlreadyAddedException:
-                pass
+            added_plugins.append(plugin_install)
 
-        return added_plugins
+        added_plugins_with_related = []
+        for plugin_install in added_plugins:
+            added_plugins_with_related.extend(
+                [
+                    plugin_install,
+                    *self.add_related(plugin_install, plugin_types=plugin_types),
+                ]
+            )
+
+        return added_plugins_with_related
