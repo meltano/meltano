@@ -1,2 +1,2 @@
 # Managed by bumpversion
-__version__ = "1.39.1"
+__version__ = "1.40.0"
