@@ -10,13 +10,19 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2153](https://gitlab.com/meltano/meltano/-/issues/2153) Add `logo_url` property to custom extractor and loader definitions to show a custom logo in Meltano UI
-
 ### Changes
 
 ### Fixes
 
 ### Breaks
+
+
+## 1.40.0 - (2020-07-14)
+---
+
+### New
+
+- [#2153](https://gitlab.com/meltano/meltano/-/issues/2153) Add `logo_url` property to custom extractor and loader definitions to show a custom logo in Meltano UI
 
 
 ## 1.39.1 - (2020-07-09)
