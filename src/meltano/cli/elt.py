@@ -5,7 +5,7 @@ import os
 import sys
 
 from . import cli
-from .utils import add_plugin, install_plugins
+from .utils import add_plugin, add_related_plugins, install_plugins
 from .params import project
 from meltano.core.config_service import ConfigService
 from meltano.core.runner.singer import SingerRunner
@@ -22,6 +22,7 @@ from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
     PluginNotFoundError,
 )
+from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.logging import OutputLogger, JobLoggingService
 from meltano.core.elt_context import ELTContextBuilder
 
@@ -115,8 +116,13 @@ def run_transform(elt_context, session, **kwargs):
 def install_missing_plugins(
     project: Project, extractor: str, loader: str, transform: str
 ):
-    add_service = ProjectAddService(project)
     config_service = ConfigService(project)
+    discovery_service = PluginDiscoveryService(project, config_service=config_service)
+    add_service = ProjectAddService(
+        project,
+        plugin_discovery_service=discovery_service,
+        config_service=config_service,
+    )
 
     plugins = []
     if transform != "only":
@@ -124,7 +130,7 @@ def install_missing_plugins(
             config_service.find_plugin(extractor, plugin_type=PluginType.EXTRACTORS)
         except PluginMissingError:
             click.secho(
-                f"Extractor '{extractor}' is missing, trying to install it...",
+                f"Extractor '{extractor}' is missing, adding it to your project...",
                 fg="yellow",
             )
             plugin = add_plugin(
@@ -136,7 +142,8 @@ def install_missing_plugins(
             config_service.find_plugin(loader, plugin_type=PluginType.LOADERS)
         except PluginMissingError:
             click.secho(
-                f"Loader '{loader}' is missing, trying to install it...", fg="yellow"
+                f"Loader '{loader}' is missing, adding it to your project...",
+                fg="yellow",
             )
             plugin = add_plugin(
                 project, PluginType.LOADERS, loader, add_service=add_service
@@ -145,49 +152,56 @@ def install_missing_plugins(
 
     if transform != "skip":
         try:
-            config_service.find_plugin("dbt", plugin_type=PluginType.TRANSFORMERS)
-        except PluginMissingError as e:
-            click.secho(
-                f"Transformer 'dbt' is missing, trying to install it...", fg="yellow"
+            extractor_plugin_def = discovery_service.find_plugin(
+                PluginType.EXTRACTORS, extractor
             )
-            plugin = add_plugin(
-                project, PluginType.TRANSFORMERS, "dbt", add_service=add_service
-            )
-            plugins.append(plugin)
-
-        discovery_service = PluginDiscoveryService(project)
-        extractor_plugin_def = discovery_service.find_plugin(
-            PluginType.EXTRACTORS, extractor
-        )
-        try:
-            transform_plugin = config_service.find_plugin_by_namespace(
-                extractor_plugin_def.namespace, PluginType.TRANSFORMS
+            # Check if there is a default transform for this extractor
+            transform_plugin_def = discovery_service.find_plugin_by_namespace(
+                PluginType.TRANSFORMS, extractor_plugin_def.namespace
             )
 
-            # Update dbt_project.yml in case the vars values have changed in meltano.yml
-            transform_add_service = TransformAddService(project)
-            transform_add_service.update_dbt_project(transform_plugin)
-        except PluginMissingError:
             try:
-                # Check if there is a default transform for this extractor
-                transform_plugin_def = discovery_service.find_plugin_by_namespace(
-                    extractor_plugin_def.namespace, PluginType.TRANSFORMS
+                config_service.find_plugin(
+                    transform_plugin_def.name, plugin_type=PluginType.TRANSFORMS
                 )
-
+            except PluginMissingError:
                 click.secho(
-                    f"Transform '{transform_plugin_def.name}' is missing, trying to install it...",
+                    f"Transform '{transform_plugin_def.name}' is missing, adding it to your project...",
                     fg="yellow",
                 )
-                add_plugin(
+                plugin = add_plugin(
                     project,
                     PluginType.TRANSFORMS,
                     transform_plugin_def.name,
                     add_service=add_service,
                 )
                 plugins.append(plugin)
-            except PluginNotFoundError:
-                # There is no default transform for this extractor..
-                # Don't panic, everything is cool - just run custom transforms
-                pass
+        except PluginNotFoundError:
+            # There is no default transform for this extractor..
+            # Don't panic, everything is cool - just run custom transforms
+            try:
+                config_service.find_plugin("dbt", plugin_type=PluginType.TRANSFORMERS)
+            except PluginMissingError:
+                click.secho(
+                    f"Transformer 'dbt' is missing, adding it to your project...",
+                    fg="yellow",
+                )
+                plugin = add_plugin(
+                    project, PluginType.TRANSFORMERS, "dbt", add_service=add_service
+                )
+                plugins.append(plugin)
 
-    return install_plugins(project, plugins)
+    if not plugins:
+        return True
+
+    related_plugins = add_related_plugins(
+        project, plugins, add_service=add_service, plugin_types=[PluginType.FILES]
+    )
+    plugins.extend(related_plugins)
+
+    # We will install the plugins in reverse order, since dependencies
+    # are listed after their dependents in `related_plugins`, but should
+    # be installed first.
+    plugins.reverse()
+
+    return install_plugins(project, plugins, reason=PluginInstallReason.ADD)

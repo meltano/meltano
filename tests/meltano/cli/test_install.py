@@ -24,7 +24,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock.assert_called_once_with(
-                project, [tap, tap_gitlab, target, dbt]
+                project, [dbt, target, tap_gitlab, tap]
             )
 
     def test_install_type(self, project, tap, tap_gitlab, target, dbt, cli_runner):
@@ -34,7 +34,7 @@ class TestCliInstall:
             result = cli_runner.invoke(cli, ["install", "extractors"])
             assert_cli_runner(result)
 
-            install_plugin_mock.assert_called_once_with(project, [tap, tap_gitlab])
+            install_plugin_mock.assert_called_once_with(project, [tap_gitlab, tap])
 
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
@@ -70,4 +70,4 @@ class TestCliInstall:
             )
             assert_cli_runner(result)
 
-            install_plugin_mock.assert_called_once_with(project, [tap, tap_gitlab])
+            install_plugin_mock.assert_called_once_with(project, [tap_gitlab, tap])

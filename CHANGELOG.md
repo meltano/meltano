@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2109](https://gitlab.com/meltano/meltano/-/issues/2109) Fix bug causing adding extractor with related transform plugin to project in UI to fail when dbt hasn't yet been installed
+
 ### Breaks
 
 
