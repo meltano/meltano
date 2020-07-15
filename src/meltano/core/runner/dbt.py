@@ -60,5 +60,5 @@ class DbtRunner(Runner):
 
         cmd = "compile" if dry_run else "run"
         loop.run_until_complete(
-            self.invoke(dbt, cmd, "--models", str(self.plugin.config["models"]))
+            self.invoke(dbt, cmd, "--models", str(self.plugin.get_config("models")))
         )

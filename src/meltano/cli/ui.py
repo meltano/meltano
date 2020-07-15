@@ -18,7 +18,6 @@ from meltano.core.migration_service import MigrationService
 from meltano.api.workers import MeltanoCompilerWorker, APIWorker, UIAvailableWorker
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
-    SettingValueSource,
     SettingValueStore,
 )
 
@@ -44,7 +43,7 @@ def ensure_secure_setup(project):
     secure_settings = ["ui.secret_key", "ui.password_salt"]
     for setting_name in secure_settings:
         value, source = settings_service.get_with_source(setting_name)
-        if source is SettingValueSource.DEFAULT:
+        if source is SettingValueStore.DEFAULT:
             facts.append(
                 f"- The '{setting_name}' setting has not been changed from the default test value"
             )
@@ -150,7 +149,7 @@ def setup(ctx, server_name, **flags):
     secret_settings = ["ui.secret_key", "ui.password_salt"]
     for setting_name in secret_settings:
         value, source = settings_service.get_with_source(setting_name)
-        if source is not SettingValueSource.DEFAULT:
+        if source is not SettingValueStore.DEFAULT:
             click.echo(
                 f"Setting '{setting_name}' has already been set in {source.label}. Please unset it manually and rerun this command to regenerate this secret."
             )

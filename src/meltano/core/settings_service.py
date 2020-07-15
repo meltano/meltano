@@ -1,59 +1,17 @@
 import os
-import sqlalchemy
 import logging
 import re
-import dotenv
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Iterable, Dict, List
-from enum import Enum
 
-from meltano.core.utils import (
-    find_named,
-    setting_env,
-    NotFound,
-    flatten,
-    set_at_path,
-    pop_at_path,
-)
-from .setting_definition import SettingDefinition
-from .setting import Setting
+from meltano.core.utils import find_named, setting_env, NotFound, flatten
+from .setting_definition import SettingMissingError, SettingDefinition
+from .settings_store import StoreNotSupportedError, SettingValueStore
 from .config_service import ConfigService
-from .error import Error
 
 
-class SettingMissingError(Error):
-    """Occurs when a setting is missing."""
-
-    def __init__(self, name: str):
-        super().__init__(f"Cannot find setting {name}")
-
-
-class SettingValueSource(str, Enum):
-    CONFIG_OVERRIDE = "config_override"  # 0
-    ENV = "env"  # 1
-    DOTENV = "dotenv"  # 2
-    MELTANO_YML = "meltano_yml"  # 3
-    DB = "db"  # 4
-    DEFAULT = "default"  # 5
-
-    @property
-    def label(self):
-        labels = {
-            self.CONFIG_OVERRIDE: "a command line flag",
-            self.ENV: "the environment",
-            self.DOTENV: "`.env`",
-            self.MELTANO_YML: "`meltano.yml`",
-            self.DB: "the system database",
-            self.DEFAULT: "the default",
-        }
-        return labels[self]
-
-
-class SettingValueStore(str, Enum):
-    DOTENV = "dotenv"
-    MELTANO_YML = "meltano_yml"
-    DB = "db"
+logger = logging.getLogger(__name__)
 
 
 # sentinel value to use to prevent leaking sensitive data
@@ -111,10 +69,6 @@ class SettingsService(ABC):
         return {**os.environ, **self.env_override}
 
     @classmethod
-    def is_kind_redacted(cls, kind) -> bool:
-        return kind in ("password", "oauth")
-
-    @classmethod
     def unredact(cls, values: dict) -> Dict:
         """
         Removes any redacted values in a dictionary.
@@ -122,18 +76,16 @@ class SettingsService(ABC):
 
         return {k: v for k, v in values.items() if v != REDACTED_VALUE}
 
-    def config_with_metadata(self, sources: List[SettingValueSource] = None, **kwargs):
+    def config_with_metadata(self, sources: List[SettingValueStore] = None, **kwargs):
         config = {}
         for setting in self.definitions():
-            value, source = self.get_with_source(setting.name, **kwargs)
+            value, metadata = self.get_with_metadata(setting.name, **kwargs)
+
+            source = metadata["source"]
             if sources and source not in sources:
                 continue
 
-            config[setting.name] = {
-                "value": value,
-                "source": source,
-                "setting": setting,
-            }
+            config[setting.name] = {**metadata, "value": value, "setting": setting}
 
         return config
 
@@ -151,221 +103,107 @@ class SettingsService(ABC):
             if config["value"] is not None
         }
 
-    def get_with_source(self, name: str, redacted=False, session=None):
+    def get_with_metadata(
+        self, name: str, redacted=False, source=SettingValueStore.AUTO, **kwargs
+    ):
+        logger.debug(f"Getting setting '{name}'")
+
+        metadata = {"name": name, "source": source}
+
+        manager = source.manager(self, **kwargs)
+        value, get_metadata = manager.get(name)
+        metadata.update(get_metadata)
+
         try:
             setting_def = self.find_setting(name)
-        except SettingMissingError:
-            setting_def = None
 
-        def config_override_getter():
-            try:
-                return self.config_override[name]
-            except KeyError:
-                return None
-
-        def env_getter(env=self.env):
-            if not setting_def:
-                return None
-
-            env_key = self.setting_env(setting_def)
-            env_getters = {
-                env_key: lambda env: env[env_key],
-                **setting_def.env_alias_getters,
-            }
-
-            for key, getter in env_getters.items():
-                try:
-                    return getter(env)
-                except KeyError:
-                    pass
-                else:
-                    logging.debug(
-                        f"Found ENV variable {key} for {self._env_namespace}:{name}"
-                    )
-
-            return None
-
-        def dotenv_getter():
-            return env_getter(env=dotenv.dotenv_values(self.project.dotenv))
-
-        def meltano_yml_getter():
-            try:
-                value = self.flat_meltano_yml_config[name]
-                return self.expand_env_vars(value)
-            except KeyError:
-                return None
-
-        def db_getter():
-            if not session:
-                return None
-
-            try:
-                return (
-                    session.query(Setting)
-                    .filter_by(namespace=self._db_namespace, name=name, enabled=True)
-                    .one()
-                    .value
-                )
-            except sqlalchemy.orm.exc.NoResultFound:
-                return None
-
-        def default_getter():
-            if not setting_def:
-                return None
-            return self.expand_env_vars(setting_def.value)
-
-        config_getters = {
-            SettingValueSource.CONFIG_OVERRIDE: config_override_getter,
-            SettingValueSource.ENV: env_getter,
-            SettingValueSource.DOTENV: dotenv_getter,
-            SettingValueSource.MELTANO_YML: meltano_yml_getter,
-            SettingValueSource.DB: db_getter,
-            SettingValueSource.DEFAULT: default_getter,
-        }
-
-        for source, getter in config_getters.items():
-            value = getter()
-            if value is not None:
-                break
-
-        if setting_def:
-            value = setting_def.cast_value(value)
+            cast_value = setting_def.cast_value(value)
+            if cast_value != value:
+                metadata["uncast_value"] = value
+                value = cast_value
 
             # we don't want to leak secure informations
             # so we redact all `passwords`
-            if redacted and value and self.is_kind_redacted(setting_def.kind):
+            if redacted and value and setting_def.is_redacted:
+                metadata["redacted"] = True
                 value = REDACTED_VALUE
+        except SettingMissingError:
+            pass
 
-        return value, source
+        logger.debug(f"Got setting '{name}' with metadata: {metadata}")
+        return value, metadata
+
+    def get_with_source(self, *args, **kwargs):
+        value, metadata = self.get_with_metadata(*args, **kwargs)
+        return value, metadata["source"]
 
     def get(self, *args, **kwargs):
         value, _ = self.get_with_source(*args, **kwargs)
         return value
 
-    def set(
-        self, path: List[str], value, store=SettingValueStore.MELTANO_YML, session=None
+    def set_with_metadata(
+        self, path: List[str], value, store=SettingValueStore.MELTANO_YML, **kwargs
     ):
+        logger.debug(f"Setting setting '{path}'")
+
         if isinstance(path, str):
             path = [path]
 
         name = ".".join(path)
 
+        metadata = {"name": name, "path": path, "store": store}
+
         if value == REDACTED_VALUE:
-            return
+            metadata["redacted"] = True
+            return None, metadata
 
         try:
             setting_def = self.find_setting(name)
+
+            cast_value = setting_def.cast_value(value)
+            if cast_value != value:
+                metadata["uncast_value"] = value
+                value = cast_value
         except SettingMissingError:
-            setting_def = None
+            pass
 
-        if setting_def:
-            value = setting_def.cast_value(value)
+        manager = store.manager(self, **kwargs)
+        set_metadata = manager.set(name, path, value)
+        metadata.update(set_metadata)
 
-        def dotenv_setter():
-            if not setting_def:
-                return None
+        logger.debug(f"Set setting '{name}' with metadata: {metadata}")
+        return value, metadata
 
-            env_key = self.setting_env(setting_def)
-
-            dotenv_file = self.project.dotenv
-
-            if value is None:
-                if dotenv_file.exists():
-                    for key in [env_key, *setting_def.env_alias_getters.keys()]:
-                        dotenv.unset_key(dotenv_file, key)
-            else:
-                if dotenv_file.exists():
-                    for key in setting_def.env_alias_getters.keys():
-                        dotenv.unset_key(dotenv_file, key)
-                else:
-                    dotenv_file.touch()
-
-                dotenv.set_key(dotenv_file, env_key, str(value))
-
-            return True
-
-        def meltano_yml_setter():
-            config = self._meltano_yml_config
-
-            if value is None:
-                config.pop(name, None)
-                pop_at_path(config, name, None)
-                pop_at_path(config, path, None)
-            else:
-                if len(path) > 1:
-                    config.pop(name, None)
-
-                if name.split(".") != path:
-                    pop_at_path(config, name, None)
-
-                set_at_path(config, path, value)
-
-            self._update_meltano_yml_config()
-            return True
-
-        def db_setter():
-            if not session:
-                return None
-
-            if value is None:
-                session.query(Setting).filter_by(
-                    namespace=self._db_namespace, name=name
-                ).delete()
-            else:
-                setting = Setting(
-                    namespace=self._db_namespace, name=name, value=value, enabled=True
-                )
-                session.merge(setting)
-
-            session.commit()
-            return True
-
-        config_setters = {
-            SettingValueStore.DOTENV: dotenv_setter,
-            SettingValueStore.MELTANO_YML: meltano_yml_setter,
-            SettingValueStore.DB: db_setter,
-        }
-
-        if not config_setters[store]():
-            return
-
+    def set(self, *args, **kwargs):
+        value, _ = self.set_with_metadata(*args, **kwargs)
         return value
 
-    def unset(self, path: List[str], **kwargs):
-        return self.set(path, None, **kwargs)
+    def unset(self, path: List[str], store=SettingValueStore.MELTANO_YML, **kwargs):
+        logger.debug(f"Unsetting setting '{path}'")
 
-    def reset(self, store=SettingValueStore.MELTANO_YML, session=None):
-        def dotenv_resetter():
-            dotenv_file = self.project.dotenv
+        if isinstance(path, str):
+            path = [path]
 
-            if dotenv_file.exists():
-                dotenv_file.unlink()
+        name = ".".join(path)
 
-            return True
+        metadata = {"name": name, "path": path, "store": store}
 
-        def meltano_yml_resetter():
-            self._meltano_yml_config.clear()
-            self._update_meltano_yml_config()
-            return True
+        manager = store.manager(self, **kwargs)
+        unset_metadata = manager.unset(name, path)
+        metadata.update(unset_metadata)
 
-        def db_resetter():
-            if not session:
-                return None
+        logger.debug(f"Unset setting '{name}' with metadata: {metadata}")
+        return metadata
 
-            session.query(Setting).filter_by(namespace=self._db_namespace).delete()
-            session.commit()
-            return True
+    def reset(self, store=SettingValueStore.MELTANO_YML, **kwargs):
+        metadata = {"store": store}
 
-        config_resetters = {
-            SettingValueStore.DOTENV: dotenv_resetter,
-            SettingValueStore.MELTANO_YML: meltano_yml_resetter,
-            SettingValueStore.DB: db_resetter,
-        }
+        manager = store.manager(self, **kwargs)
+        reset_metadata = manager.reset()
+        metadata.update(reset_metadata)
 
-        if not config_resetters[store]():
-            return False
-
-        return True
+        logger.debug(f"Reset settings with metadata: {metadata}")
+        return metadata
 
     def definitions(self) -> Iterable[Dict]:
         definitions = deepcopy(self._definitions)
@@ -396,39 +234,3 @@ class SettingsService(ABC):
 
     def setting_env(self, setting_def):
         return setting_def.env or setting_env(self._env_namespace, setting_def.name)
-
-    def expand_env_vars(self, raw_value):
-        if not isinstance(raw_value, str):
-            return raw_value
-
-        # find viable substitutions
-        var_matcher = re.compile(
-            """
-            \$                 # starts with a '$'
-            (?:                # either $VAR or ${VAR}
-                {(\w+)}|(\w+)  # capture the variable name as group[0] or group[1]
-            )
-            """,
-            re.VERBOSE,
-        )
-
-        def subst(match) -> str:
-            try:
-                # the variable can be in either group
-                var = next(var for var in match.groups() if var)
-                val = str(self.env[var])
-
-                if not val:
-                    logging.warning(f"Variable {var} is empty.")
-
-                return val
-            except KeyError as e:
-                logging.warning(f"Variable {var} is missing from the environment.")
-                return None
-
-        fullmatch = re.fullmatch(var_matcher, raw_value)
-        if fullmatch:
-            # If the entire value is an env var reference, return None if it isn't set
-            return subst(fullmatch)
-
-        return re.sub(var_matcher, subst, raw_value)

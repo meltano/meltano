@@ -25,9 +25,9 @@ class ConnectionService:
             return {}
 
         if self.context.transformer:
-            schema = self.context.transformer.config["target_schema"]
+            schema = self.context.transformer.get_config("target_schema")
         else:
-            schema = self.context.loader.config["schema"]
+            schema = self.context.loader.get_config("schema")
 
         return {"schema": schema}
 
@@ -55,7 +55,7 @@ class ConnectionService:
 
         try:
             url = dialect_templates[self.dialect](
-                {**self.context.loader.config, **params}
+                {**self.context.loader.config_dict(), **params}
             )
 
             return url
