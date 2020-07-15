@@ -139,6 +139,10 @@ class Project(Versioned):
     def dotenv(self):
         return self.root.joinpath(".env")
 
+    @contextmanager
+    def dotenv_update(self):
+        yield self.dotenv
+
     @makedirs
     def meltano_dir(self, *joinpaths):
         return self.root.joinpath(".meltano", *joinpaths)

@@ -6,15 +6,12 @@ from .params import project
 
 from meltano.core.db import project_engine
 from meltano.core.project import Project
+from meltano.core.settings_service import SettingValueStore
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.config_service import ConfigService
-from meltano.core.plugin.settings_service import (
-    PluginSettingsService,
-    SettingValueSource,
-    SettingValueStore,
-)
+from meltano.core.plugin.settings_service import PluginSettingsService
 
 
 @cli.group(invoke_without_command=True)
@@ -66,11 +63,13 @@ def config(ctx, project, plugin_type, plugin_name, format):
 @click.argument("value")
 @click.option(
     "--store",
-    type=click.Choice(list(SettingValueStore)),
+    type=click.Choice(SettingValueStore.writables()),
     default=SettingValueStore.MELTANO_YML,
 )
 @click.pass_context
 def set(ctx, setting_name, value, store):
+    store = SettingValueStore(store)
+
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
 
@@ -82,11 +81,13 @@ def set(ctx, setting_name, value, store):
 @click.argument("setting_name", nargs=-1, required=True)
 @click.option(
     "--store",
-    type=click.Choice(list(SettingValueStore)),
+    type=click.Choice(SettingValueStore.writables()),
     default=SettingValueStore.MELTANO_YML,
 )
 @click.pass_context
 def unset(ctx, setting_name, store):
+    store = SettingValueStore(store)
+
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
 
@@ -97,11 +98,13 @@ def unset(ctx, setting_name, store):
 @config.command()
 @click.option(
     "--store",
-    type=click.Choice(list(SettingValueStore)),
+    type=click.Choice(SettingValueStore.writables()),
     default=SettingValueStore.MELTANO_YML,
 )
 @click.pass_context
 def reset(ctx, store):
+    store = SettingValueStore(store)
+
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
 
@@ -129,7 +132,7 @@ def list_settings(ctx):
         click.echo(f" [env: {', '.join(env_keys)}]", nl=False)
 
         current_value = click.style(f"{value!r}", fg="green")
-        if source is SettingValueSource.DEFAULT:
+        if source is SettingValueStore.DEFAULT:
             click.echo(f" current value: {current_value}", nl=False)
 
             # The default value and the current value may not match

@@ -7,7 +7,6 @@ from meltano.core.setting import Setting
 from meltano.core.plugin import PluginRef, PluginType, PluginInstall
 from meltano.core.plugin.settings_service import (
     PluginSettingsService,
-    SettingValueSource,
     SettingValueStore,
     REDACTED_VALUE,
 )
@@ -80,11 +79,11 @@ class TestPluginSettingsService:
         # returns the default value when unset
         assert subject.get_with_source("test", session=session) == (
             "mock",
-            SettingValueSource.DEFAULT,
+            SettingValueStore.DEFAULT,
         )
         assert subject_with_profile.get_with_source("test", session=session) == (
             "mock",
-            SettingValueSource.DEFAULT,
+            SettingValueStore.DEFAULT,
         )
 
         # overriden by an Setting db value when set
@@ -95,11 +94,11 @@ class TestPluginSettingsService:
 
         assert subject.get_with_source("test", session=session) == (
             "THIS_IS_FROM_DB",
-            SettingValueSource.DB,
+            SettingValueStore.DB,
         )
         assert subject_with_profile.get_with_source("test", session=session) == (
             "THIS_IS_FROM_DB_WITH_PROFILE",
-            SettingValueSource.DB,
+            SettingValueStore.DB,
         )
 
         # overriden via the `meltano.yml` configuration
@@ -110,11 +109,11 @@ class TestPluginSettingsService:
 
         assert subject.get_with_source("test", session=session) == (
             42,
-            SettingValueSource.MELTANO_YML,
+            SettingValueStore.MELTANO_YML,
         )
         assert subject_with_profile.get_with_source("test", session=session) == (
             43,
-            SettingValueSource.MELTANO_YML,
+            SettingValueStore.MELTANO_YML,
         )
 
         # revert back to the original
@@ -126,11 +125,11 @@ class TestPluginSettingsService:
 
         assert subject.get_with_source("test", session=session) == (
             "N33DC0F33",
-            SettingValueSource.ENV,
+            SettingValueStore.ENV,
         )
         assert subject_with_profile.get_with_source("test", session=session) == (
             "N33DC0F33",
-            SettingValueSource.ENV,
+            SettingValueStore.ENV,
         )
 
         # overridden via config override
@@ -139,11 +138,11 @@ class TestPluginSettingsService:
 
         assert subject.get_with_source("test", session=session) == (
             "foo",
-            SettingValueSource.CONFIG_OVERRIDE,
+            SettingValueStore.CONFIG_OVERRIDE,
         )
         assert subject_with_profile.get_with_source("test", session=session) == (
             "foo",
-            SettingValueSource.CONFIG_OVERRIDE,
+            SettingValueStore.CONFIG_OVERRIDE,
         )
 
         # Verify that integer settings set in env are cast correctly
@@ -151,14 +150,14 @@ class TestPluginSettingsService:
 
         assert subject.get_with_source("port", session=session) == (
             3333,
-            SettingValueSource.ENV,
+            SettingValueStore.ENV,
         )
 
         # Verify that boolean settings set in env are cast correctly
         # Default
         assert subject.get_with_source("boolean", session=session) == (
             None,
-            SettingValueSource.DEFAULT,
+            SettingValueStore.DEFAULT,
         )
 
         # Negated alias
@@ -166,7 +165,7 @@ class TestPluginSettingsService:
 
         assert subject.get_with_source("boolean", session=session) == (
             False,
-            SettingValueSource.ENV,
+            SettingValueStore.ENV,
         )
 
         # Regular alias
@@ -174,7 +173,7 @@ class TestPluginSettingsService:
 
         assert subject.get_with_source("boolean", session=session) == (
             True,
-            SettingValueSource.ENV,
+            SettingValueStore.ENV,
         )
 
         # Preferred env var
@@ -182,7 +181,7 @@ class TestPluginSettingsService:
 
         assert subject.get_with_source("boolean", session=session) == (
             False,
-            SettingValueSource.ENV,
+            SettingValueStore.ENV,
         )
 
     def test_as_dict(self, subject, session, tap):
@@ -278,16 +277,16 @@ class TestPluginSettingsService:
         assert dotenv_contents["TAP_MOCK_START_DATE"] == "THIS_IS_FROM_DOTENV"
         assert subject.get_with_source("test") == (
             "THIS_IS_FROM_DOTENV",
-            SettingValueSource.DOTENV,
+            SettingValueStore.DOTENV,
         )
         assert subject.get_with_source("start_date") == (
             "THIS_IS_FROM_DOTENV",
-            SettingValueSource.DOTENV,
+            SettingValueStore.DOTENV,
         )
 
         dotenv.set_key(project.dotenv, "TAP_MOCK_DISABLED", "true")
         dotenv.set_key(project.dotenv, "TAP_MOCK_ENABLED", "false")
-        assert subject.get_with_source("boolean") == (False, SettingValueSource.DOTENV)
+        assert subject.get_with_source("boolean") == (False, SettingValueStore.DOTENV)
 
         subject.set("boolean", True, store=store)
 
@@ -295,7 +294,7 @@ class TestPluginSettingsService:
         assert dotenv_contents["TAP_MOCK_BOOLEAN"] == "True"
         assert "TAP_MOCK_DISABLED" not in dotenv_contents
         assert "TAP_MOCK_ENABLED" not in dotenv_contents
-        assert subject.get_with_source("boolean") == (True, SettingValueSource.DOTENV)
+        assert subject.get_with_source("boolean") == (True, SettingValueStore.DOTENV)
 
         subject.unset("test", store=store)
 
@@ -337,6 +336,9 @@ class TestPluginSettingsService:
         def set_config(path, value):
             subject.set(path, value, store=SettingValueStore.MELTANO_YML)
 
+        def unset_config(path):
+            subject.unset(path, store=SettingValueStore.MELTANO_YML)
+
         def yml_config():
             with project.meltano_update() as meltano:
                 extractor = meltano.plugins.extractors[0]
@@ -369,7 +371,7 @@ class TestPluginSettingsService:
         assert final["metadata.stream.replication-method"] == "INCREMENTAL"
 
         set_config(["metadata.stream.replication-key"], "created_at")
-        set_config(["metadata.stream.replication-method"], None)
+        unset_config(["metadata.stream.replication-method"])
 
         yml = yml_config()
         assert "metadata" not in yml
@@ -383,7 +385,7 @@ class TestPluginSettingsService:
         assert yml["metadata"]["stream.replication-key"] == "created_at"
         assert final_config()["metadata.stream.replication-key"] == "created_at"
 
-        set_config(["metadata", "stream.replication-key"], None)
+        unset_config(["metadata", "stream.replication-key"])
 
         yml = yml_config()
         assert "metadata.stream.replication-key" not in yml
@@ -396,11 +398,11 @@ class TestPluginSettingsService:
 
         assert subject.get_with_source("custom_string", session=session) == (
             "from_yml",
-            SettingValueSource.MELTANO_YML,
+            SettingValueStore.MELTANO_YML,
         )
         assert subject.get_with_source("custom_bool", session=session) == (
             True,
-            SettingValueSource.MELTANO_YML,
+            SettingValueStore.MELTANO_YML,
         )
 
         subject.env_override = {
@@ -410,9 +412,9 @@ class TestPluginSettingsService:
 
         assert subject.get_with_source("custom_string", session=session) == (
             "from_env",
-            SettingValueSource.ENV,
+            SettingValueStore.ENV,
         )
         assert subject.get_with_source("custom_bool", session=session) == (
             False,
-            SettingValueSource.ENV,
+            SettingValueStore.ENV,
         )
