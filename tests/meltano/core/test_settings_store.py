@@ -21,6 +21,7 @@ class DummySettingsService(SettingsService):
         self.__definitions = [
             SettingDefinition("regular", value="from_default"),
             SettingDefinition("password", kind="password"),
+            SettingDefinition("env_specific", env_specific=True),
         ]
 
     @property
@@ -98,6 +99,7 @@ class TestAutoStoreManager:
             ("unknown", Store.MELTANO_YML),
             ("regular", Store.MELTANO_YML),
             ("password", Store.DOTENV),
+            ("env_specific", Store.DOTENV),
         ],
     )
     def test_auto_store(self, setting_name, preferred_store, subject, unsupported):
@@ -272,12 +274,14 @@ class TestAutoStoreManager:
         set_value_store("from_db", Store.DB)
         set_value_store("from_meltano_yml", Store.MELTANO_YML, name="unknown")
         set_value_store("from_dotenv", Store.DOTENV, name="password")
+        set_value_store("from_db", Store.DB, name="env_specific")
 
         subject.reset()
 
         assert_value_source("from_default", Store.DEFAULT)
         assert_value_source(None, Store.DEFAULT, name="unknown")
         assert_value_source(None, Store.DEFAULT, name="password")
+        assert_value_source(None, Store.DEFAULT, name="env_specific")
 
         # Fails silently when store is not supported
         set_value_store("from_dotenv", Store.DOTENV, name="password")

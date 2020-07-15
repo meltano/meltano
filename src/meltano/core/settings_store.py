@@ -401,7 +401,9 @@ class AutoStoreManager(SettingsStoreManager):
             except StoreNotSupportedError:
                 tried.add(store)
 
-                sensitive = setting_def and setting_def.is_redacted
+                sensitive = setting_def and (
+                    setting_def.is_redacted or setting_def.env_specific
+                )
 
                 if SettingValueStore.MELTANO_YML not in tried and not sensitive:
                     store = SettingValueStore.MELTANO_YML
