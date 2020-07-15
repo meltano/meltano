@@ -36,8 +36,6 @@ class TestSqlHelper:
         engine_uri = f"sqlite:///pytest.db"
 
         with mock.patch(
-            "sqlalchemy.create_engine", return_value=None
-        ) as create_engine_mock, mock.patch(
             "meltano.core.elt_context.PluginSettingsService",
             return_value=plugin_settings_service,
         ), mock.patch.object(
@@ -48,8 +46,8 @@ class TestSqlHelper:
             "meltano.api.controllers.sql_helper.ELTContextBuilder",
             return_value=elt_context_builder,
         ):
-            subject.get_db_engine(tap.name, "target-sqlite", "skip")
-            create_engine_mock.assert_called_with(engine_uri)
+            engine = subject.get_db_engine(tap.name, "target-sqlite", "skip")
+            assert str(engine.url) == engine_uri
 
     @mock.patch("meltano.api.controllers.sql_helper.listen")
     def test_get_db_engine_postgres(
@@ -66,16 +64,14 @@ class TestSqlHelper:
             "user": "user",
             "password": "password",
             "host": "host",
-            "port": "port",
+            "port": 5502,
             "dbname": "dbname",
             "schema": "tap_mock",
         }
 
-        engine_uri = "postgresql://user:password@host:port/dbname"
+        engine_uri = "postgresql://user:password@host:5502/dbname"
 
         with mock.patch(
-            "sqlalchemy.create_engine", return_value=None
-        ) as create_engine_mock, mock.patch(
             "meltano.core.elt_context.PluginSettingsService",
             return_value=plugin_settings_service,
         ), mock.patch.object(
@@ -86,10 +82,10 @@ class TestSqlHelper:
             "meltano.api.controllers.sql_helper.ELTContextBuilder",
             return_value=elt_context_builder,
         ):
-            subject.get_db_engine(tap.name, "target-postgres", "skip")
+            engine = subject.get_db_engine(tap.name, "target-postgres", "skip")
+            assert str(engine.url) == engine_uri
 
             assert listen_mock.called
-            create_engine_mock.assert_called_with(engine_uri)
 
     @pytest.mark.parametrize("loader", ["target-csv", "target-snowflake"])
     def test_get_db_engine_unsupported(

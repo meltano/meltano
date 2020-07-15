@@ -26,13 +26,14 @@ class PluginContext(
     def type(self):
         return self.ref.type
 
-    @property
-    def config(self):
-        return self.settings_service.as_dict(session=self.session)
+    def get_config(self, name, **kwargs):
+        return self.settings_service.get(name, session=self.session, **kwargs)
 
-    @property
-    def config_env(self):
-        return self.settings_service.as_env(session=self.session)
+    def config_dict(self, **kwargs):
+        return self.settings_service.as_dict(session=self.session, **kwargs)
+
+    def config_env(self, **kwargs):
+        return self.settings_service.as_env(session=self.session, **kwargs)
 
 
 class ELTContext:
@@ -151,8 +152,6 @@ class ELTContextBuilder:
         )
 
     def context(self, session) -> ELTContext:
-        env = {}
-
         def env_for_plugin(plugin):
             env_struct = {
                 "meltano": {
@@ -160,28 +159,31 @@ class ELTContextBuilder:
                         "name": plugin.name,
                         "namespace": plugin.namespace,
                     },
-                    plugin.type.verb: plugin.config,  # MELTANO_EXTRACT_...
+                    plugin.type.verb: plugin.config_dict(),  # MELTANO_EXTRACT_...
                 },
-                **plugin.config_env,  # TAP_...
+                **plugin.config_env(),  # TAP_...
             }
             env_vars = flatten(env_struct, "env_var").items()
 
             return {k: str(v) for k, v in env_vars if v is not None}
 
+        env = {}
+
         extractor = None
         if self._extractor:
-            extractor = self.plugin_context(session, self._extractor, env)
+            extractor = self.plugin_context(session, self._extractor)
+
             env.update(env_for_plugin(extractor))
 
         loader = None
         if self._loader:
-            loader = self.plugin_context(session, self._loader, env)
+            loader = self.plugin_context(session, self._loader, env.copy())
+
             env.update(env_for_plugin(loader))
 
         transformer = None
         if self._transformer:
-            transformer = self.plugin_context(session, self._transformer, env)
-            env.update(env_for_plugin(transformer))
+            transformer = self.plugin_context(session, self._transformer, env.copy())
 
         return ELTContext(
             self.project,

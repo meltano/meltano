@@ -1,15 +1,18 @@
 import base64
+import logging
 import re
 import sys
 import flatten_dict
 import os
 import functools
+
 from datetime import datetime, date, time
 from copy import deepcopy
 from typing import Union, Dict, Callable, Optional, Iterable
 from requests.auth import HTTPBasicAuth
 from pathlib import Path
 
+logger = logging.getLogger(__name__)
 
 TRUTHY = ("true", "1", "yes", "on")
 REGEX_EMAIL = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
@@ -272,3 +275,40 @@ def set_at_path(d, path, value):
 
     final = nest(d, initial, force=True) if initial else d
     final[tail] = value
+
+
+def expand_env_vars(raw_value, env: Dict):
+    if not isinstance(raw_value, str):
+        return raw_value
+
+    # find viable substitutions
+    var_matcher = re.compile(
+        """
+        \$                 # starts with a '$'
+        (?:                # either $VAR or ${VAR}
+            {(\w+)}|(\w+)  # capture the variable name as group[0] or group[1]
+        )
+        """,
+        re.VERBOSE,
+    )
+
+    def subst(match) -> str:
+        try:
+            # the variable can be in either group
+            var = next(var for var in match.groups() if var)
+            val = str(env[var])
+
+            if not val:
+                logger.debug(f"Variable {var} is empty.")
+
+            return val
+        except KeyError as e:
+            logger.debug(f"Variable {var} is missing from the environment.")
+            return None
+
+    fullmatch = re.fullmatch(var_matcher, raw_value)
+    if fullmatch:
+        # If the entire value is an env var reference, return None if it isn't set
+        return subst(fullmatch)
+
+    return re.sub(var_matcher, subst, raw_value)
