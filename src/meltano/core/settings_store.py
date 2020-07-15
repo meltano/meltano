@@ -360,11 +360,17 @@ class DefaultStoreManager(SettingsStoreManager):
 
 class AutoStoreManager(SettingsStoreManager):
     label = "the system database, `meltano.yml`, and `.env`"
+    writable = True
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, force=False, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.force_set = force
+
         self._kwargs = {"settings_service": self.settings_service, **kwargs}
+
+    def manager_for(self, store):
+        return store.manager(**self._kwargs)
 
     @property
     def sources(self):
@@ -372,13 +378,54 @@ class AutoStoreManager(SettingsStoreManager):
         sources.remove(SettingValueStore.AUTO)
         return sources
 
+    @property
+    def stores(self):
+        stores = SettingValueStore.writables()
+        stores.remove(SettingValueStore.AUTO)
+        return stores
+
+    def auto_store(self, name, source):
+        try:
+            setting_def = self.find_setting(name)
+        except SettingMissingError:
+            setting_def = None
+
+        store = source
+
+        tried = set()
+        while True:
+            try:
+                manager = self.manager_for(store)
+                manager.ensure_supported("set")
+                return store
+            except StoreNotSupportedError:
+                tried.add(store)
+
+                sensitive = setting_def and setting_def.is_redacted
+
+                if SettingValueStore.MELTANO_YML not in tried and not sensitive:
+                    store = SettingValueStore.MELTANO_YML
+                    continue
+
+                if SettingValueStore.DOTENV not in tried:
+                    store = SettingValueStore.DOTENV
+                    continue
+
+                if SettingValueStore.DB not in tried:
+                    store = SettingValueStore.DB
+                    continue
+
+                break
+
+        return None
+
     def get(self, name: str):
         metadata = {}
         value = None
 
         for source in self.sources:
             try:
-                manager = source.manager(**self._kwargs)
+                manager = self.manager_for(source)
                 value, metadata = manager.get(name)
             except StoreNotSupportedError:
                 continue
@@ -388,3 +435,62 @@ class AutoStoreManager(SettingsStoreManager):
 
         metadata["source"] = source
         return value, metadata
+
+    def set(self, name: str, path: List[str], value):
+        current_value, metadata = self.get(name)
+        source = metadata["source"]
+
+        if value == current_value and not self.force_set:
+            # No need to do anything
+            return {"store": source}
+
+        try:
+            setting_def = self.find_setting(name)
+
+            if value == setting_def.value:
+                # Unset everything so we fall down on default
+                self.unset(name, path)
+
+                return {"store": SettingValueStore.DEFAULT}
+        except SettingMissingError:
+            setting_def = None
+
+        store = self.auto_store(name, source)
+        if store is None:
+            raise StoreNotSupportedError("No storage method available")
+
+        # May raise StoreNotSupportedError, but that's good.
+        manager = self.manager_for(store)
+        metadata = manager.set(name, path, value)
+
+        metadata["store"] = store
+        return metadata
+
+    def unset(self, name: str, path: List[str]):
+        metadata = {}
+
+        for store in self.stores:
+            try:
+                manager = self.manager_for(store)
+                value, _ = manager.get(name)
+            except StoreNotSupportedError:
+                continue
+
+            if value is None:
+                continue
+
+            # May raise StoreNotSupportedError, but that's good.
+            metadata = manager.unset(name, path)
+            metadata["store"] = store
+
+        return metadata
+
+    def reset(self):
+        for store in self.stores:
+            try:
+                manager = self.manager_for(store)
+                manager.reset()
+            except StoreNotSupportedError:
+                pass
+
+        return {}

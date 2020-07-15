@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2171](https://gitlab.com/meltano/meltano/-/issues/2171) `meltano config <plugin> set` will now automatically store settings in `meltano.yml` or `.env` as appropriate.
+
 ### Fixes
 
 - [#2109](https://gitlab.com/meltano/meltano/-/issues/2109) Fix bug causing adding extractor with related transform plugin to project in UI to fail when dbt hasn't yet been installed

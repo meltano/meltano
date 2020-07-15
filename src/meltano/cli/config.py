@@ -64,7 +64,7 @@ def config(ctx, project, plugin_type, plugin_name, format):
 @click.option(
     "--store",
     type=click.Choice(SettingValueStore.writables()),
-    default=SettingValueStore.MELTANO_YML,
+    default=SettingValueStore.AUTO,
 )
 @click.pass_context
 def set(ctx, setting_name, value, store):
@@ -82,7 +82,7 @@ def set(ctx, setting_name, value, store):
 @click.option(
     "--store",
     type=click.Choice(SettingValueStore.writables()),
-    default=SettingValueStore.MELTANO_YML,
+    default=SettingValueStore.AUTO,
 )
 @click.pass_context
 def unset(ctx, setting_name, store):
@@ -99,7 +99,7 @@ def unset(ctx, setting_name, store):
 @click.option(
     "--store",
     type=click.Choice(SettingValueStore.writables()),
-    default=SettingValueStore.MELTANO_YML,
+    default=SettingValueStore.AUTO,
 )
 @click.pass_context
 def reset(ctx, store):

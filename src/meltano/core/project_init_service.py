@@ -56,6 +56,7 @@ class ProjectInitService:
         self.settings_service.set(
             "send_anonymous_usage_stats",
             self.settings_service.get("send_anonymous_usage_stats"),
+            force=True,
         )
 
     def create_system_database(self):
