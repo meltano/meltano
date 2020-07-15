@@ -40,7 +40,7 @@ class PluginSettingsService(SettingsService):
 
         self.env_override = {
             **project_settings_service.env,
-            **project_settings_service.as_env(),
+            **project_settings_service.as_env(redacted=True),
             **self.env_override,
         }
 

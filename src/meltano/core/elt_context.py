@@ -153,15 +153,17 @@ class ELTContextBuilder:
 
     def context(self, session) -> ELTContext:
         def env_for_plugin(plugin):
+            config_dict = plugin.config_dict(redacted=True)
+            config_env = plugin.config_env(redacted=True)
             env_struct = {
                 "meltano": {
                     plugin.type.singular: {  # MELTANO_EXTRACTOR_...
                         "name": plugin.name,
                         "namespace": plugin.namespace,
                     },
-                    plugin.type.verb: plugin.config_dict(),  # MELTANO_EXTRACT_...
+                    plugin.type.verb: config_dict,  # MELTANO_EXTRACT_...
                 },
-                **plugin.config_env(),  # TAP_...
+                **config_env,  # TAP_...
             }
             env_vars = flatten(env_struct, "env_var").items()
 
