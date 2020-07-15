@@ -108,7 +108,7 @@ class TestAutoStoreManager:
 
         # Not writable
         assert auto_store(Store.CONFIG_OVERRIDE) == preferred_store
-        assert auto_store(Store.ENV) == preferred_store
+        assert auto_store(Store.ENV) == Store.DOTENV
         assert auto_store(Store.DEFAULT) == preferred_store
 
         # Writable
