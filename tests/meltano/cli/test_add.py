@@ -5,7 +5,7 @@ from unittest import mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
-from meltano.core.plugin import PluginType
+from meltano.core.plugin import PluginType, PluginRef
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.m5o.dashboards_service import DashboardsService
@@ -14,22 +14,34 @@ from meltano.core.m5o.reports_service import ReportsService
 
 class TestCliAdd:
     @pytest.mark.parametrize(
-        "plugin_type,plugin_name,file_plugin_name",
+        "plugin_type,plugin_name,related_plugins",
         [
-            (PluginType.EXTRACTORS, "tap-carbon-intensity", None),
-            (PluginType.LOADERS, "target-sqlite", None),
-            (PluginType.TRANSFORMS, "tap-carbon-intensity", None),
-            (PluginType.MODELS, "model-carbon-intensity", None),
-            (PluginType.DASHBOARDS, "dashboard-google-analytics", None),
-            (PluginType.ORCHESTRATORS, "airflow", "airflow"),
-            (PluginType.TRANSFORMERS, "dbt", "dbt"),
+            (PluginType.EXTRACTORS, "tap-carbon-intensity", []),
+            (PluginType.LOADERS, "target-sqlite", []),
+            (
+                PluginType.TRANSFORMS,
+                "tap-carbon-intensity",
+                [
+                    PluginRef(PluginType.TRANSFORMERS, "dbt"),
+                    PluginRef(PluginType.FILES, "dbt"),
+                ],
+            ),
+            (PluginType.MODELS, "model-carbon-intensity", []),
+            (PluginType.DASHBOARDS, "dashboard-google-analytics", []),
+            (
+                PluginType.ORCHESTRATORS,
+                "airflow",
+                [PluginRef(PluginType.FILES, "airflow")],
+            ),
+            # Installed automatically because of transform 'tap-carbon-intensity'
+            # (PluginType.TRANSFORMERS, "dbt", [PluginRef(PluginType.FILES, "dbt")]),
         ],
     )
     def test_add(
         self,
         plugin_type,
         plugin_name,
-        file_plugin_name,
+        related_plugins,
         project,
         cli_runner,
         config_service,
@@ -49,14 +61,20 @@ class TestCliAdd:
             assert plugin
             plugins = [plugin]
 
-            if file_plugin_name:
-                assert f"Added related file bundle '{file_plugin_name}'" in res.stdout
-
-                file_plugin = config_service.find_plugin(
-                    file_plugin_name, PluginType.FILES
+            for related_plugin in related_plugins:
+                plugin_install = config_service.find_plugin(
+                    related_plugin.name, related_plugin.type
                 )
-                assert file_plugin
-                plugins.append(file_plugin)
+                assert plugin_install
+
+                assert (
+                    f"Added related {related_plugin.type.descriptor} '{related_plugin.name}'"
+                    in res.stdout
+                )
+
+                plugins.append(plugin_install)
+
+            plugins.reverse()
 
             install_plugin_mock.assert_called_once_with(
                 project, plugins, reason=PluginInstallReason.ADD
@@ -93,18 +111,16 @@ class TestCliAdd:
 
             install_plugin_mock.assert_called_once_with(
                 project,
-                [tap_gitlab, tap_adwords, tap_facebook],
+                [tap_facebook, tap_adwords, tap_gitlab],
                 reason=PluginInstallReason.ADD,
             )
 
     def test_add_transform(self, project, cli_runner):
-        # Add dbt and transform/ files
-        cli_runner.invoke(cli, ["add", "transformer", "dbt"])
         cli_runner.invoke(cli, ["add", "files", "dbt"])
+        cli_runner.invoke(cli, ["install", "files", "dbt"])
 
         res = cli_runner.invoke(cli, ["add", "transform", "tap-google-analytics"])
-
-        assert res.exit_code == 0
+        assert_cli_runner(res)
 
         assert (
             "dbt-tap-google-analytics"
@@ -228,7 +244,7 @@ class TestCliAdd:
 
             install_plugin_mock.assert_called_once_with(
                 project,
-                [tap, transform, model, dashboard],
+                [dashboard, model, transform, tap],
                 reason=PluginInstallReason.ADD,
             )
 

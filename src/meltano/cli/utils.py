@@ -25,7 +25,6 @@ def add_plugin(
     plugin_name: str,
     add_service: ProjectAddService,
 ):
-
     try:
         plugin = add_service.add(plugin_type, plugin_name)
         if plugin.should_add_to_file(project):
@@ -61,18 +60,11 @@ def add_plugin(
 def add_related_plugins(
     project, plugins, add_service: ProjectAddService, plugin_types=list(PluginType)
 ):
-    discovery_service = PluginDiscoveryService(project)
-
     added_plugins = []
     for plugin_install in plugins:
-        try:
-            plugin_def = discovery_service.find_plugin(
-                plugin_install.type, plugin_install.name
-            )
-        except PluginNotFoundError:
-            continue
-
-        related_plugins = add_service.add_related(plugin_def, plugin_types=plugin_types)
+        related_plugins = add_service.add_related(
+            plugin_install, plugin_types=plugin_types
+        )
         for related_plugin in related_plugins:
             if related_plugin.should_add_to_file(project):
                 click.secho(

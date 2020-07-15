@@ -169,8 +169,8 @@ const actions = {
     return pluginsApi
       .installPlugin(installConfig)
       .then(() => commit('installPluginComplete', installConfig))
-      .then(dispatch('getInstalledPlugins'))
-      .then(dispatch('getPlugins'))
+      .then(() => dispatch('getInstalledPlugins'))
+      .then(() => dispatch('getPlugins'))
   },
 
   installRelatedPlugins({ dispatch }, installConfig) {
