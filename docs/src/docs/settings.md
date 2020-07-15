@@ -8,17 +8,18 @@ sidebarDepth: 2
 
 To determine the values of these settings, Meltano will first look in **the environment**, then in a **[`.env` file](https://github.com/theskumar/python-dotenv#usages)** in your project directory, and then in your project's **`meltano.yml` file**, falling back to a default value if nothing was found.
 
-Configuration that is _not_ environment-specific or sensitive should be stored in your project's `meltano.yml` file and checked into version
-control. Sensitive values like passwords and tokens are most appropriately stored in the environment or a (`.gitignore`d) `.env` file in your project directory.
-
 You can use [`meltano config meltano list`](/docs/command-line-interface.html#config) to list all available settings with their names, environment variables, and current values.
-[`meltano config`](/docs/command-line-interface.html#config) can also be used to set, unset, and reset settings in `meltano.yml` (default) or `.env` (using `--store=dotenv`).
+
+Configuration that is _not_ environment-specific or sensitive should be stored in your project's `meltano.yml` file and checked into version
+control. Sensitive values like passwords and tokens are most appropriately stored in the environment, a (`.gitignore`d) `.env` file in your project directory, or the system database.
+
+[`meltano config meltano set <setting> <value>`](/docs/command-line-interface.html#config), which is used in the examples below, will automatically store settings in `meltano.yml` or `.env` as appropriate.
 
 ## Plugin settings
 
 For plugin settings, refer to the specific plugin's documentation
 ([extractors](/plugins/extractors/), [loaders](/plugins/loaders/)),
-or use [`meltano config <plugin_name> list`](/docs/command-line-interface.html#config)
+or use [`meltano config <plugin> list`](/docs/command-line-interface.html#config)
 to list all available settings with their names, environment variables, and current values.
 
 ## Your Meltano project
@@ -101,7 +102,7 @@ option of [`meltano` subcommands](/docs/command-line-interface.html), or the `ME
 #### How to use
 
 ```bash
-meltano config meltano set --store=dotenv database_uri postgresql://username:password@host:port/database
+meltano config meltano set database_uri postgresql://username:password@host:port/database
 
 export MELTANO_DATABASE_URI=postgresql://username:password@host:port/database
 
@@ -123,7 +124,7 @@ set this setting to `false` or any other string not starting with `http://` or `
 #### How to use
 
 ```bash
-meltano config meltano set --store=dotenv discovery_url https://meltano.example.com/discovery.yml
+meltano config meltano set discovery_url https://meltano.example.com/discovery.yml
 
 export MELTANO_DISCOVERY_URL=https://meltano.example.com/discovery.yml
 ```
@@ -144,7 +145,7 @@ The granularity of CLI logging.
 #### How to use
 
 ```bash
-meltano config meltano set --store=dotenv cli log_level debug
+meltano config meltano set cli log_level debug
 
 export MELTANO_CLI_LOG_LEVEL=debug
 export MELTANO_LOG_LEVEL=debug
@@ -172,7 +173,7 @@ Together with the [`ui.bind_port` setting](#ui-bind-port), this setting correspo
 #### How to use
 
 ```bash
-meltano config meltano set --store=dotenv ui bind_host 127.0.0.1
+meltano config meltano set ui bind_host 127.0.0.1
 
 export MELTANO_UI_BIND_HOST=127.0.0.1
 export MELTANO_API_HOSTNAME=127.0.0.1
@@ -194,7 +195,7 @@ Together with the [`ui.bind_host` setting](#ui-bind-host), this setting correspo
 #### How to use
 
 ```bash
-meltano config meltano set --store=dotenv ui bind_port 80
+meltano config meltano set ui bind_port 80
 
 export MELTANO_UI_BIND_PORT=80
 export MELTANO_API_PORT=80
@@ -227,7 +228,7 @@ This setting corresponds to [Flask's `SERVER_NAME` setting](https://flask.pallet
 #### How to use
 
 ```bash
-meltano config meltano set --store=dotenv ui server_name meltano.example.com
+meltano config meltano set ui server_name meltano.example.com
 
 export MELTANO_UI_SERVER_NAME=meltano.example.com
 ```
@@ -259,7 +260,7 @@ This setting corresponds to [Flask's `SESSION_COOKIE_DOMAIN` setting](https://fl
 #### How to use
 
 ```bash
-meltano config meltano set --store=dotenv ui session_cookie_domain meltano.example.com
+meltano config meltano set ui session_cookie_domain meltano.example.com
 
 export MELTANO_UI_SESSION_COOKIE_DOMAIN=meltano.example.com
 ```
@@ -280,7 +281,7 @@ This setting corresponds to [Flask's `SECRET_KEY` setting](https://flask.pallets
 #### How to use
 
 ```bash
-meltano config meltano set --store=dotenv ui secret_key <randomly-generated-secret>
+meltano config meltano set ui secret_key <randomly-generated-secret>
 
 export MELTANO_UI_SECRET_KEY=<randomly-generated-secret>
 ```
@@ -309,7 +310,7 @@ This setting corresponds to [Flask-Security's `SECURITY_PASSWORD_SALT` setting](
 #### How to use
 
 ```bash
-meltano config meltano set --store=dotenv ui password_salt <randomly-generated-secret>
+meltano config meltano set ui password_salt <randomly-generated-secret>
 
 export MELTANO_UI_PASSWORD_SALT=<randomly-generated-secret>
 ```
@@ -334,7 +335,7 @@ This setting corresponds to [Gunicorn's `workers` setting](https://docs.gunicorn
 #### How to use
 
 ```bash
-meltano config meltano set --store=dotenv ui workers 1
+meltano config meltano set ui workers 1
 
 export MELTANO_UI_WORKERS=1
 export WORKERS=1
@@ -344,7 +345,7 @@ export WEB_CONCURRENCY=1
 #### How to use
 
 ```bash
-meltano config meltano set --store=dotenv ui forwarded_allow_ips "*"
+meltano config meltano set ui forwarded_allow_ips "*"
 
 export MELTANO_UI_FORWARDED_ALLOW_IPS="*"
 export FORWARDED_ALLOW_IPS="*"
@@ -377,7 +378,7 @@ To disable all modifications to your project through the Meltano UI, you can run
 #### How to use
 
 ```bash
-meltano config meltano set --store=dotenv ui readonly true
+meltano config meltano set ui readonly true
 
 export MELTANO_UI_READONLY=true
 export MELTANO_READONLY=true
@@ -398,7 +399,7 @@ Additionally, you will need to:
 #### How to use
 
 ```bash
-meltano config meltano set --store=dotenv ui authentication true
+meltano config meltano set ui authentication true
 
 export MELTANO_UI_AUTHENTICATION=true
 export MELTANO_AUTHENTICATION=true
@@ -420,7 +421,7 @@ These users will not be able to make any changes, but admins will once they sign
 #### How to use
 
 ```bash
-meltano config meltano set --store=dotenv ui anonymous_readonly true
+meltano config meltano set ui anonymous_readonly true
 
 export MELTANO_UI_ANONYMOUS_READONLY=true
 ```
@@ -449,7 +450,7 @@ All emails sent by Meltano should now be available at `http://localhost:8025/`
 #### How to use
 
 ```bash
-meltano config meltano set --store=dotenv ui notification true
+meltano config meltano set ui notification true
 
 export MELTANO_UI_NOTIFICATION=true
 export MELTANO_NOTIFICATION=true
@@ -486,7 +487,7 @@ Meltano uses [Flask-Mail](https://pythonhosted.org/Flask-Mail/) to send emails. 
 - Default: `localhost`
 
 ```bash
-meltano config meltano set --store=dotenv mail server smtp.example.com
+meltano config meltano set mail server smtp.example.com
 
 export MAIL_SERVER=smtp.example.com
 ```
@@ -497,7 +498,7 @@ export MAIL_SERVER=smtp.example.com
 - Default: `1025`
 
 ```bash
-meltano config meltano set --store=dotenv mail port 25
+meltano config meltano set mail port 25
 
 export MAIL_PORT=25
 ```
@@ -508,7 +509,7 @@ export MAIL_PORT=25
 - Default: `"Meltano" <bot@meltano.com>`
 
 ```bash
-meltano config meltano set --store=dotenv mail default_sender '"Example Meltano" <bot@meltano.example.com>'
+meltano config meltano set mail default_sender '"Example Meltano" <bot@meltano.example.com>'
 
 export MAIL_DEFAULT_SENDER='"Example Meltano" <bot@meltano.example.com>'
 ```
@@ -519,7 +520,7 @@ export MAIL_DEFAULT_SENDER='"Example Meltano" <bot@meltano.example.com>'
 - Default: `false`
 
 ```bash
-meltano config meltano set --store=dotenv mail use_tls true
+meltano config meltano set mail use_tls true
 
 export MAIL_USE_TLS=true
 ```
@@ -530,7 +531,7 @@ export MAIL_USE_TLS=true
 - Default: None
 
 ```bash
-meltano config meltano set --store=dotenv mail username meltano
+meltano config meltano set mail username meltano
 
 export MAIL_USERNAME=meltano
 ```
@@ -541,7 +542,7 @@ export MAIL_USERNAME=meltano
 - Default: None
 
 ```bash
-meltano config meltano set --store=dotenv mail password meltano
+meltano config meltano set mail password meltano
 
 export MAIL_PASSWORD=meltano
 ```
@@ -552,7 +553,7 @@ export MAIL_PASSWORD=meltano
 - Default: `false`
 
 ```bash
-meltano config meltano set --store=dotenv mail debug true
+meltano config meltano set mail debug true
 
 export MAIL_DEBUG=true
 ```
@@ -615,7 +616,7 @@ export MELTANO_OAUTH_SERVICE_PROVIDERS=facebook,google_adwords
 - Default: None
 
 ```bash
-meltano config meltano set --store=dotenv oauth_service facebook client_id <facebook-client-id>
+meltano config meltano set oauth_service facebook client_id <facebook-client-id>
 
 export OAUTH_FACEBOOK_CLIENT_ID=<facebook-client-id>
 ```
@@ -626,7 +627,7 @@ export OAUTH_FACEBOOK_CLIENT_ID=<facebook-client-id>
 - Default: None
 
 ```bash
-meltano config meltano set --store=dotenv oauth_service facebook client_secret <facebook-client-secret>
+meltano config meltano set oauth_service facebook client_secret <facebook-client-secret>
 
 export OAUTH_FACEBOOK_CLIENT_SECRET=<facebook-client-secret>
 ```
@@ -637,7 +638,7 @@ export OAUTH_FACEBOOK_CLIENT_SECRET=<facebook-client-secret>
 - Default: None
 
 ```bash
-meltano config meltano set --store=dotenv oauth_service google_adwords client_id <google-adwords-client-id>
+meltano config meltano set oauth_service google_adwords client_id <google-adwords-client-id>
 
 export OAUTH_GOOGLE_ADWORDS_CLIENT_ID=<google-adwords-client-id>
 ```
@@ -648,7 +649,7 @@ export OAUTH_GOOGLE_ADWORDS_CLIENT_ID=<google-adwords-client-id>
 - Default: None
 
 ```bash
-meltano config meltano set --store=dotenv oauth_service google_adwords client_secret <google-adwords-client-secret>
+meltano config meltano set oauth_service google_adwords client_secret <google-adwords-client-secret>
 
 export OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET=<google-adwords-client-secret>
 ```
@@ -669,7 +670,7 @@ For more information on how to get these from your GitLab application, check out
 - Default: None
 
 ```bash
-meltano config meltano set --store=dotenv oauth gitlab client_id <gitlab-client-id>
+meltano config meltano set oauth gitlab client_id <gitlab-client-id>
 
 export OAUTH_GITLAB_CLIENT_ID=<gitlab-client-id>
 export OAUTH_GITLAB_APPLICATION_ID=<gitlab-client-id>
@@ -681,7 +682,7 @@ export OAUTH_GITLAB_APPLICATION_ID=<gitlab-client-id>
 - Default: None
 
 ```bash
-meltano config meltano set --store=dotenv oauth gitlab client_secret <gitlab-client-secret>
+meltano config meltano set oauth gitlab client_secret <gitlab-client-secret>
 
 export OAUTH_GITLAB_CLIENT_SECRET=<gitlab-client-secret>
 export OAUTH_GITLAB_SECRET=<gitlab-client-secret>
