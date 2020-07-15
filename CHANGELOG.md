@@ -10,7 +10,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2171](https://gitlab.com/meltano/meltano/-/issues/2171) Add better logging and error handling to `meltano config`
+
 ### Changes
+
+- [#2171](https://gitlab.com/meltano/meltano/-/issues/2171) `meltano config <plugin> set` will now automatically store settings in `meltano.yml` or `.env` as appropriate.
 
 ### Fixes
 

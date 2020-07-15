@@ -7,6 +7,7 @@ settings:
 - name: project_id
 - name: database_uri
   value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db
+  env_specific: true
 - name: discovery_url
   value: https://www.meltano.com/discovery.yml
 
@@ -25,45 +26,58 @@ settings:
   - label: Critical
     value: critical
   value: info
+  env_specific: true
 
 # UI server
 - name: ui.bind_host
   value: "0.0.0.0"
   env_aliases: [MELTANO_API_HOSTNAME]
+  env_specific: true
 - name: ui.bind_port
   kind: integer
   value: 5000
   env_aliases: [MELTANO_API_PORT, PORT]
+  env_specific: true
 - name: ui.server_name
+  env_specific: true
 - name: ui.session_cookie_domain
+  env_specific: true
 - name: ui.secret_key
   value: thisisnotapropersecretkey
+  env_specific: true
 - name: ui.password_salt
   value: b4c124932584ad6e69f2774a0ae5c138
+  env_specific: true
 - name: ui.workers
   kind: integer
   value: 4
   env_aliases: [WORKERS, WEB_CONCURRENCY]
+  env_specific: true
 - name: ui.forwarded_allow_ips
   value: "127.0.0.1"
   env_aliases: [FORWARDED_ALLOW_IPS]
+  env_specific: true
 
 # UI features
 - name: ui.readonly
   kind: boolean
   value: false
   env_aliases: [MELTANO_READONLY]
+  env_specific: true
 - name: ui.authentication
   kind: boolean
   value: false
   env_aliases: [MELTANO_AUTHENTICATION]
+  env_specific: true
 - name: ui.anonymous_readonly
   kind: boolean
   value: false
+  env_specific: true
 - name: ui.notification
   kind: boolean
   value: false
   env_aliases: [MELTANO_NOTIFICATION]
+  env_specific: true
 
 # UI customization
 - name: ui.logo_url
@@ -72,26 +86,33 @@ settings:
 - name: mail.server
   value: localhost
   env: MAIL_SERVER
+  env_specific: true
 - name: mail.port
   kind: integer
   value: 1025
   env: MAIL_PORT
+  env_specific: true
 - name: mail.default_sender
   value: '"Meltano" <bot@meltano.com>'
   env: MAIL_DEFAULT_SENDER
+  env_specific: true
 - name: mail.use_tls
   kind: boolean
   value: false
   env: MAIL_USE_TLS
+  env_specific: true
 - name: mail.username
   env: MAIL_USERNAME
+  env_specific: true
 - name: mail.password
   kind: password
   env: MAIL_PASSWORD
+  env_specific: true
 - name: mail.debug
   kind: boolean
   value: false
   env: MAIL_DEBUG
+  env_specific: true
 
 # OAuth Service
 - name: oauth_service.url
@@ -99,23 +120,29 @@ settings:
   value: all
 - name: oauth_service.facebook.client_id
   env: OAUTH_FACEBOOK_CLIENT_ID
+  env_specific: true
 - name: oauth_service.facebook.client_secret
   kind: password
   env: OAUTH_FACEBOOK_CLIENT_SECRET
+  env_specific: true
 - name: oauth_service.google_adwords.client_id
   env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
+  env_specific: true
 - name: oauth_service.google_adwords.client_secret
   kind: password
   env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
+  env_specific: true
 
 # OAuth Single-Sign-On
 - name: oauth.gitlab.client_id
   env: OAUTH_GITLAB_CLIENT_ID
+  env_specific: true
   env_aliases: [OAUTH_GITLAB_APPLICATION_ID]
 - name: oauth.gitlab.client_secret
   kind: password
   env: OAUTH_GITLAB_CLIENT_SECRET
   env_aliases: [OAUTH_GITLAB_SECRET]
+  env_specific: true
 
 # Analytics Tracking IDs
 - name: tracking_ids.cli

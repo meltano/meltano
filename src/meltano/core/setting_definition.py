@@ -29,6 +29,7 @@ class SettingDefinition(NameEq, Canonical):
         oauth: dict = {},
         placeholder: str = None,
         protected: bool = None,
+        env_specific: bool = None,
         custom: bool = False,
         **attrs,
     ):
@@ -47,6 +48,7 @@ class SettingDefinition(NameEq, Canonical):
             oauth=oauth,
             placeholder=placeholder,
             protected=protected,
+            env_specific=env_specific,
             _custom=custom,
             **attrs,
         )

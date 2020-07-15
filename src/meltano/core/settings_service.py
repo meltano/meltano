@@ -142,7 +142,7 @@ class SettingsService(ABC):
         return value
 
     def set_with_metadata(
-        self, path: List[str], value, store=SettingValueStore.MELTANO_YML, **kwargs
+        self, path: List[str], value, store=SettingValueStore.AUTO, **kwargs
     ):
         logger.debug(f"Setting setting '{path}'")
 
@@ -178,7 +178,7 @@ class SettingsService(ABC):
         value, _ = self.set_with_metadata(*args, **kwargs)
         return value
 
-    def unset(self, path: List[str], store=SettingValueStore.MELTANO_YML, **kwargs):
+    def unset(self, path: List[str], store=SettingValueStore.AUTO, **kwargs):
         logger.debug(f"Unsetting setting '{path}'")
 
         if isinstance(path, str):
@@ -195,7 +195,7 @@ class SettingsService(ABC):
         logger.debug(f"Unset setting '{name}' with metadata: {metadata}")
         return metadata
 
-    def reset(self, store=SettingValueStore.MELTANO_YML, **kwargs):
+    def reset(self, store=SettingValueStore.AUTO, **kwargs):
         metadata = {"store": store}
 
         manager = store.manager(self, **kwargs)

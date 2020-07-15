@@ -130,24 +130,23 @@ Enables you to manage the configuration of Meltano itself or any of its plugins.
 
 Meltano uses configuration layers to resolve a plugin's configuration:
 
-1. Environment variables, set through your shell, a [`.env` file](https://github.com/theskumar/python-dotenv#usages) in your project directory, a [scheduled pipeline](#schedule)'s `env` object in `meltano.yml`, or any other method.
-1. `meltano.yml`, under the plugin's `config` key, set manually or using `meltano config <plugin_name> set`.
+<!-- The following is reproduced from docs/src/README.md#meltano-config with minor edits. -->
+
+1. **Environment variables**, set through your shell, a [`.env` file](https://github.com/theskumar/python-dotenv#usages) in your project directory, a [scheduled pipeline](#schedule)'s `env` object in `meltano.yml`, or any other method. You can use `meltano config <plugin> list` to list the available variable names.
+2. **Your project's `meltano.yml` file**, under the plugin's `config` key.
    - Inside values, [environment variables](#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
-1. System database, which holds settings set via the UI or `meltano config <plugin_name> set --store=db`.
+3. **Your project's [**system database**](/docs/settings.html#database-uri)**, which lives at `.meltano/meltano.db` by default and (among other things) stores configuration set via [the UI](/docs/command-line-interface.html#ui) and [`meltano config <plugin> set --store=db`](/docs/command-line-interface.html#config).
    - Note that configuration for Meltano itself cannot be stored in the system database.
-1. Default values set in the setting definition in **discovery.yml**
+4. **The default `value`s** set on the plugin's `settings` object in the global `discovery.yml` file (in the case of [known plugins](/docs/contributor-guide.html#known-plugins)) or your project's `meltano.yml` file (in the case of custom plugins). `meltano config <plugin> list` will list the default values.
 
-::: info
-Sensitive settings such as _passwords_ or _keys_ should not be stored in `meltano.yml`,
-since the entire contents of this file are available to the Meltano UI and its users.
+Configuration that is _not_ environment-specific or sensitive should be stored in your project's `meltano.yml` file and checked into version
+control. Sensitive values like passwords and tokens are most appropriately stored in the environment, a (`.gitignore`d) `.env` file in your project directory, or the system database.
 
-Instead, these sensitive values should be stored in environment variables or the system database.
-
-You can use `meltano config <plugin_name> list` to find the environment variable associated with a setting.
-
-Note that in each of these cases, Meltano stores the configuration as-is, without encryption.
-:::
+When no explicit `--store` is specified, `meltano config <plugin> set` will automatically store the value in the most appropriate location:
+- The current location, if a setting's default value has already been overwritten;
+- `.env`, if a setting is sensitive or environment-specific (defined as `kind: password` or `env_specific: true`);
+- `meltano.yml` otherwise.
 
 ### How to use
 
@@ -166,19 +165,18 @@ meltano config <plugin_name> list
 meltano config <plugin_name>
 
 # Sets the configuration's setting `<name>` to `<value>`.
-meltano config <plugin_name> set <name> <value> # store in `meltano.yml`
-meltano config <plugin_name> set --store=dotenv <name> <value> # store in `.env`
-meltano config <plugin_name> set --store=db <name> <value> # store in system database
+meltano config <plugin_name> set <name> <value>
 
 # Remove the configuration's setting `<name>`.
-meltano config <plugin_name> unset <name> # remove from `meltano.yml`
-meltano config <plugin_name> unset --store=dotenv <name> # remove from `.env`
-meltano config <plugin_name> unset --store=db <name> # remove from system database
+meltano config <plugin_name> unset <name>
 
 # Clear the configuration (back to defaults).
-meltano config <plugin_name> reset # remove from `meltano.yml`
-meltano config <plugin_name> reset --store=dotenv # remove from `.env`
-meltano config <plugin_name> reset --store=db # remove from system database
+meltano config <plugin_name> reset
+
+# Set, unset, or reset in a specific location
+meltano config <plugin_name> set --store=meltano_yml <name> <value> # set in `meltano.yml`
+meltano config <plugin_name> unset --store=dotenv <name> # unset in `.env`
+meltano config <plugin_name> reset --store=db # reset in system database
 ```
 
 If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
