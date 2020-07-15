@@ -6,7 +6,7 @@ from .params import project
 
 from meltano.core.db import project_engine
 from meltano.core.project import Project
-from meltano.core.settings_service import SettingValueStore
+from meltano.core.settings_service import SettingValueStore, StoreNotSupportedError
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginMissingError
@@ -30,8 +30,11 @@ def config(ctx, project, plugin_type, plugin_name, format):
         plugin = config.find_plugin(
             plugin_name, plugin_type=plugin_type, configurable=True
         )
+
+        ctx.obj["subject"] = f"{plugin.type.descriptor} '{plugin.name}'"
     except PluginMissingError:
         if plugin_name == "meltano":
+            ctx.obj["subject"] = "Meltano"
             plugin = None
         else:
             raise
@@ -72,9 +75,33 @@ def set(ctx, setting_name, value, store):
 
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
+    subject = ctx.obj["subject"]
 
     path = list(setting_name)
-    settings.set(path, value, store=store, session=session)
+    try:
+        value, metadata = settings.set_with_metadata(
+            path, value, store=store, session=session
+        )
+    except StoreNotSupportedError as err:
+        click.secho(
+            f"{subject.capitalize()} setting '{path}' could not be set in {store.label}: {err}",
+            fg="red",
+        )
+        raise click.Abort()
+
+    name = metadata["name"]
+    store = metadata["store"]
+    click.secho(
+        f"{subject.capitalize()} setting '{name}' was set in {store.label}: {value!r}",
+        fg="green",
+    )
+
+    current_value, source = settings.get_with_source(name, session=session)
+    if source != store:
+        click.secho(
+            f"Current value is still: {current_value!r} (from {source.label})",
+            fg="yellow",
+        )
 
 
 @config.command()
@@ -90,9 +117,31 @@ def unset(ctx, setting_name, store):
 
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
+    subject = ctx.obj["subject"]
 
     path = list(setting_name)
-    settings.unset(path, store=store, session=session)
+    try:
+        metadata = settings.unset(path, store=store, session=session)
+    except StoreNotSupportedError as err:
+        click.secho(
+            f"{subject.capitalize()} setting '{path}' in {store.label} could not be unset: {err}",
+            fg="red",
+        )
+        raise click.Abort()
+
+    name = metadata["name"]
+    store = metadata["store"]
+    click.secho(
+        f"{subject.capitalize()} setting '{name}' in {store.label} was unset",
+        fg="green",
+    )
+
+    current_value, source = settings.get_with_source(name, session=session)
+    if source is not SettingValueStore.DEFAULT:
+        click.secho(
+            f"Current value is now: {current_value!r} (from {source.label})",
+            fg="yellow",
+        )
 
 
 @config.command()
@@ -107,8 +156,21 @@ def reset(ctx, store):
 
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
+    subject = ctx.obj["subject"]
 
-    settings.reset(store=store, session=session)
+    try:
+        metadata = settings.reset(store=store, session=session)
+    except StoreNotSupportedError as err:
+        click.secho(
+            f"{subject.capitalize()} settings in {store.label} could not be reset: {err}",
+            fg="red",
+        )
+        raise click.Abort()
+
+    store = metadata["store"]
+    click.secho(
+        f"{subject.capitalize()} settings in {store.label} were reset", fg="green"
+    )
 
 
 @config.command("list")
