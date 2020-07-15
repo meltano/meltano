@@ -534,13 +534,17 @@ If you're [adding a custom plugin](/#meltano-add), on the other hand, you will b
 
 To determine the values of these settings, Meltano will look in 4 places, with each taking precedence over the next:
 
+<!-- The following is reproduced in docs/src/docs/command-line-interface.md#config with minor edits -->
+
 1. **Environment variables**, set through your shell, a [`.env` file](https://github.com/theskumar/python-dotenv#usages) in your project directory, a [scheduled pipeline](/#orchestration)'s `env` object in `meltano.yml`, or any other method. You can use `meltano config <plugin> list` to list the available variable names.
-2. **Your project's `meltano.yml` file**, under the plugin's `config` key, set manually or using [`meltano config <plugin> set`](/docs/command-line-interface.html#config). Inside values, [environment variables](/docs/command-line-interface.html#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
+2. **Your project's `meltano.yml` file**, under the plugin's `config` key. Inside values, [environment variables](/docs/command-line-interface.html#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
 3. **Your project's [**system database**](/docs/settings.html#database-uri)**, which lives at `.meltano/meltano.db` by default and (among other things) stores configuration set via [the UI](/docs/command-line-interface.html#ui) and [`meltano config <plugin> set --store=db`](/docs/command-line-interface.html#config).
 4. **The default `value`s** set on the plugin's `settings` object in the global `discovery.yml` file (in the case of [known plugins](/docs/contributor-guide.html#known-plugins)) or your project's `meltano.yml` file (in the case of custom plugins). `meltano config <plugin> list` will list the default values.
 
 Configuration that is _not_ environment-specific or sensitive should be stored in your project's `meltano.yml` file and checked into version
 control. Sensitive values like passwords and tokens are most appropriately stored in the environment, a (`.gitignore`d) `.env` file in your project directory, or the system database.
+
+[`meltano config <plugin> set`](/docs/command-line-interface.html#config) will automatically store settings in `meltano.yml` or `.env` as appropriate.
 
 :::
 
@@ -562,25 +566,17 @@ meltano config tap-covid-19 set user_agent "tap-covid-19 via meltano <api_user_e
 # - the current shell environment:
 export TAP_COVID_19_API_TOKEN="<your-github-api-token>"
 # - OR a (gitignored) `.env` file:
-meltano config tap-covid-19 set --store=dotenv api_token <your-github-api-token>
+meltano config tap-covid-19 set api_token <your-github-api-token>
 # - OR your project's system database:
 meltano config tap-covid-19 set --store=db api_token <your-github-api-token>
 
-# Unset configuration stored in `meltano.yml`
+# Unset specific setting
 # meltano config tap-covid-19 unset start_date
 
-# Unset configuration stored elsewhere
-# meltano config tap-covid-19 unset --store=dotenv api_token
-# meltano config tap-covid-19 unset --store=db api_token
-
-# Reset configuration stored in `meltano.yml`
+# Reset configuration back to defaults
 # meltano config tap-covid-19 reset
 
-# Reset configuration stored elsewhere
-# meltano config tap-covid-19 reset --store=dotenv
-# meltano config tap-covid-19 reset --store=db
-
-# View configuration, wherever it may be stored
+# View current configuration
 meltano config tap-covid-19
 ```
 
