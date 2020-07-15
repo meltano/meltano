@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#2171](https://gitlab.com/meltano/meltano/-/issues/2171) `meltano config <plugin> set` will now automatically store settings in `meltano.yml` or `.env` as appropriate.
+- [#2127](https://gitlab.com/meltano/meltano/-/issues/2127) Config stored in `meltano.yml` or `.env` can now be edited in the UI when read-only mode is not enabled
 
 ### Fixes
 
