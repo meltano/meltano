@@ -1,8 +1,16 @@
 from typing import List
 
-from meltano.core.utils import truthy
-from meltano.core.behavior.canonical import Canonical
-from meltano.core.behavior import NameEq
+from .utils import truthy
+from .behavior.canonical import Canonical
+from .behavior import NameEq
+from .error import Error
+
+
+class SettingMissingError(Error):
+    """Occurs when a setting is missing."""
+
+    def __init__(self, name: str):
+        super().__init__(f"Cannot find setting {name}")
 
 
 class SettingDefinition(NameEq, Canonical):
@@ -52,6 +60,10 @@ class SettingDefinition(NameEq, Canonical):
             kind = "boolean"
 
         return cls(name=key, kind=kind, custom=True)
+
+    @property
+    def is_redacted(self):
+        return self.kind in ("password", "oauth")
 
     @property
     def env_alias_getters(self):

@@ -5,7 +5,7 @@ import datetime
 from meltano.core.project import Project
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
-    SettingValueSource,
+    SettingValueStore,
 )
 from meltano.core.utils import truthy
 from meltano.api.headers import *

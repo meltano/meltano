@@ -4,7 +4,7 @@ from unittest import mock
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
-    SettingValueSource,
+    SettingValueStore,
 )
 from meltano.cli import cli
 from asserts import assert_cli_runner
@@ -46,13 +46,13 @@ class TestCliUi:
 
         assert settings_service.get_with_source("ui.server_name") == (
             "meltano.example.com",
-            SettingValueSource.DOTENV,
+            SettingValueStore.DOTENV,
         )
         assert settings_service.get_with_source("ui.secret_key") == (
             "existing_secret_key",
-            SettingValueSource.ENV,
+            SettingValueStore.ENV,
         )
         assert settings_service.get_with_source("ui.password_salt") == (
             "fake_secret",
-            SettingValueSource.DOTENV,
+            SettingValueStore.DOTENV,
         )

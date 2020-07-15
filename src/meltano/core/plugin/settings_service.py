@@ -5,7 +5,6 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import (
     SettingsService,
     SettingMissingError,
-    SettingValueSource,
     SettingValueStore,
     REDACTED_VALUE,
 )
