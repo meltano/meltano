@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2109](https://gitlab.com/meltano/meltano/-/issues/2109) Fix bug causing adding extractor with related transform plugin to project in UI to fail when dbt hasn't yet been installed
 - [#2170](https://gitlab.com/meltano/meltano/-/issues/2170) Restore support for referencing arbitrary env vars defined in `.env` from `meltano.yml` using env var expansion
+- [#2115](https://gitlab.com/meltano/meltano/-/issues/2115) Stop `meltano` commands from leaving empty `.meltano/run` directory behind when run in non-project dir
 
 ### Breaks
 
