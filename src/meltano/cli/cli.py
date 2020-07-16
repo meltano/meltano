@@ -11,6 +11,8 @@ from meltano.core.logging import setup_logging, LEVELS
 
 setup_logging()
 
+logger = logging.getLogger(__name__)
+
 
 @click.group(invoke_without_command=True, no_args_is_help=True)
 @click.option("--log-level", type=click.Choice(LEVELS.keys()))
@@ -30,6 +32,13 @@ def cli(ctx, log_level, verbose):
     try:
         project = Project.find()
         setup_logging(project)
+
+        readonly = ProjectSettingsService(project).get("project_readonly")
+        if readonly:
+            project.readonly = True
+
+        if project.readonly:
+            logger.debug("Project is read-only.")
 
         ctx.obj["project"] = project
     except ProjectNotFound as err:

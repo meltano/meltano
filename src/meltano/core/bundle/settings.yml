@@ -8,6 +8,10 @@ settings:
 - name: database_uri
   value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db
   env_specific: true
+- name: project_readonly
+  kind: boolean
+  value: false
+  env_specific: true
 - name: discovery_url
   value: https://www.meltano.com/discovery.yml
 

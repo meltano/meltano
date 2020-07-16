@@ -14,10 +14,11 @@ from atomicwrites import atomic_write
 
 from .error import Error
 from .behavior.versioned import Versioned
-from .utils import makedirs, slugify
+from .utils import makedirs, slugify, truthy
 from .meltano_file import MeltanoFile
 
 PROJECT_ROOT_ENV = "MELTANO_PROJECT_ROOT"
+PROJECT_READONLY_ENV = "MELTANO_PROJECT_READONLY"
 
 
 class ProjectNotFound(Error):
@@ -25,6 +26,11 @@ class ProjectNotFound(Error):
         super().__init__(
             f"Cannot find `{project.meltanofile}`. Are you in a meltano project?"
         )
+
+
+class ProjectReadonly(Error):
+    def __init__(self):
+        super().__init__(f"This Meltano project is deployed as read-only")
 
 
 class Project(Versioned):
@@ -44,6 +50,8 @@ class Project(Versioned):
         self._meltano_ip_lock = fasteners.InterProcessLock(
             self.run_dir("meltano.yml.lock")
         )
+
+        self.readonly = False
 
     @property
     def env(self):
@@ -92,6 +100,9 @@ class Project(Versioned):
         if activate:
             cls.activate(project)
 
+        if truthy(os.getenv(PROJECT_READONLY_ENV, "false")):
+            project.readonly = True
+
         return project
 
     @property
@@ -109,6 +120,10 @@ class Project(Versioned):
         Yield the current meltano configuration and update the meltanofile
         if the context ends gracefully.
         """
+
+        if self.readonly:
+            raise ProjectReadonly
+
         # fmt: off
         with self._meltano_rw_lock.write_lock(), \
             self._meltano_ip_lock:
@@ -131,6 +146,13 @@ class Project(Versioned):
     def root_dir(self, *joinpaths):
         return self.root.joinpath(*joinpaths)
 
+    @contextmanager
+    def file_update(self):
+        if self.readonly:
+            raise ProjectReadonly
+
+        yield self.root
+
     @property
     def meltanofile(self):
         return self.root.joinpath("meltano.yml")
@@ -141,6 +163,9 @@ class Project(Versioned):
 
     @contextmanager
     def dotenv_update(self):
+        if self.readonly:
+            raise ProjectReadonly
+
         yield self.dotenv
 
     @makedirs

@@ -8,6 +8,7 @@ from contextlib import contextmanager
 
 from .utils import set_at_path, pop_at_path, expand_env_vars
 from .error import Error
+from .project import ProjectReadonly
 from .setting import Setting
 from .setting_definition import SettingMissingError
 
@@ -176,6 +177,10 @@ class DotEnvStoreManager(BaseEnvStoreManager):
     label = "`.env`"
     writable = True
 
+    def ensure_supported(self, method="get"):
+        if method != "get" and self.project.readonly:
+            raise StoreNotSupportedError(ProjectReadonly())
+
     @property
     def env(self):
         return dotenv.dotenv_values(self.project.dotenv)
@@ -229,13 +234,20 @@ class DotEnvStoreManager(BaseEnvStoreManager):
 
     @contextmanager
     def update_dotenv(self):
-        with self.project.dotenv_update() as dotenv_file:
-            yield dotenv_file
+        try:
+            with self.project.dotenv_update() as dotenv_file:
+                yield dotenv_file
+        except ProjectReadonly as err:
+            raise StoreNotSupportedError(err)
 
 
 class MeltanoYmlStoreManager(SettingsStoreManager):
     label = "`meltano.yml`"
     writable = True
+
+    def ensure_supported(self, method="get"):
+        if method != "get" and self.project.readonly:
+            raise StoreNotSupportedError(ProjectReadonly())
 
     def get(self, name: str):
         try:
@@ -289,7 +301,10 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
     def update_config(self):
         yield self.settings_service._meltano_yml_config
 
-        self.settings_service._update_meltano_yml_config()
+        try:
+            self.settings_service._update_meltano_yml_config()
+        except ProjectReadonly as err:
+            raise StoreNotSupportedError(err)
 
 
 class DbStoreManager(SettingsStoreManager):
@@ -480,12 +495,21 @@ class AutoStoreManager(SettingsStoreManager):
 
         # May raise StoreNotSupportedError, but that's good.
         manager = self.manager_for(store)
+
+        # Even if the global current value isn't equal,
+        # the value in this store might be
+        current_value, _ = manager.get(name)
+        if value == current_value:
+            # No need to do anything
+            return {"store": store}
+
         metadata = manager.set(name, path, value)
 
         metadata["store"] = store
         return metadata
 
     def unset(self, name: str, path: List[str]):
+        error = None
         metadata = {}
 
         for store in self.stores:
@@ -498,9 +522,14 @@ class AutoStoreManager(SettingsStoreManager):
             if value is None:
                 continue
 
-            # May raise StoreNotSupportedError, but that's good.
-            metadata = manager.unset(name, path)
-            metadata["store"] = store
+            try:
+                metadata = manager.unset(name, path)
+                metadata["store"] = store
+            except StoreNotSupportedError as err:
+                error = err
+
+        if error:
+            raise error
 
         return metadata
 

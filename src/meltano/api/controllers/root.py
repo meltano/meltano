@@ -18,7 +18,7 @@ from flask_security import roles_required, logout_user
 from jinja2 import TemplateNotFound
 
 import meltano
-from meltano.core.project import Project
+from meltano.core.project import Project, ProjectReadonly
 from meltano.core.project_settings_service import ProjectSettingsService
 from flask_security import roles_required
 from meltano.api.api_blueprint import APIBlueprint
@@ -38,12 +38,6 @@ def redirect_to_login_if_auth_required(f):
         return current_app.login_manager.unauthorized()
 
     return decorated
-
-
-@root.errorhandler(500)
-def internal_error(exception):
-    logger.info(f"[{request.remote_addr}], error: {exception}")
-    return jsonify({"error": str(exception)}), 500
 
 
 @root.route("/-/embed/", defaults={"token": ""})

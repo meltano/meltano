@@ -102,7 +102,9 @@ class TestAutoStoreManager:
             ("env_specific", Store.DOTENV),
         ],
     )
-    def test_auto_store(self, setting_name, preferred_store, subject, unsupported):
+    def test_auto_store(
+        self, setting_name, preferred_store, subject, project, unsupported, monkeypatch
+    ):
         def auto_store(source):
             return subject.auto_store(setting_name, source)
 
@@ -139,9 +141,19 @@ class TestAutoStoreManager:
                 assert auto_store(Store.MELTANO_YML) == None
                 assert auto_store(Store.DB) == None
 
+        monkeypatch.setattr(project, "readonly", True)
+
+        assert auto_store(Store.CONFIG_OVERRIDE) == Store.DB
+        assert auto_store(Store.ENV) == Store.DB
+        assert auto_store(Store.DOTENV) == Store.DB
+        assert auto_store(Store.MELTANO_YML) == Store.DB
+        assert auto_store(Store.DB) == Store.DB
+        assert auto_store(Store.DEFAULT) == Store.DB
+
     def test_get(
         self,
         subject,
+        project,
         dummy_settings_service,
         set_value_store,
         assert_value_source,
@@ -191,8 +203,21 @@ class TestAutoStoreManager:
         assert metadata["auto_store"] == Store.MELTANO_YML
         assert metadata["overwritable"] == False
 
+        monkeypatch.setattr(project, "readonly", True)
+        value, metadata = subject.get("regular")
+        assert value == "from_config_override"
+        assert metadata["source"] == Store.CONFIG_OVERRIDE
+        assert metadata["auto_store"] == Store.DB
+        assert metadata["overwritable"] == False
+
     def test_set(
-        self, subject, unsupported, set_value_store, assert_value_source, monkeypatch
+        self,
+        subject,
+        project,
+        unsupported,
+        set_value_store,
+        assert_value_source,
+        monkeypatch,
     ):
         def set_value(value):
             return subject.set("regular", ["regular"], value)
@@ -273,6 +298,14 @@ class TestAutoStoreManager:
                 set_value("nowhere")
 
             assert_value_source("from_dotenv_new", Store.DOTENV)
+
+        # Falls back on system database when project is readonly
+        monkeypatch.setattr(project, "readonly", True)
+        metadata = set_value("from_db")
+        assert metadata["store"] == Store.DB
+
+        # Even though `.env` can't be overwritten
+        assert_value_source("from_dotenv_new", Store.DOTENV)
 
     def test_unset(self, subject, unsupported, set_value_store, assert_value_source):
         set_value_store("from_dotenv", Store.DOTENV, name="password")

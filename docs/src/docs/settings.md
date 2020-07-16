@@ -109,6 +109,33 @@ export MELTANO_DATABASE_URI=postgresql://username:password@host:port/database
 meltano elt --database-uri=postgresql://username:password@host:port/database ...
 ```
 
+### `project_readonly`
+
+- Environment variable: `MELTANO_PROJECT_READONLY`
+- Default: `false`
+
+Enable this setting to indicate that your Meltano project is deployed as read-only,
+and to block all modifications to project files through the [CLI](/docs/command-line-interface.md) and [UI](/docs/command-line-interface.md#ui)
+in this environment.
+
+Specifically, this prevents [adding plugins](/docs/command-line-interface.md#add) or [pipeline schedules](/docs/command-line-interface.md#schedule) to `meltano.yml`, as well as [modifying plugin configuration](/docs/command-line-interface.md#config) stored in `meltano.yml` or `.env`.
+
+Note that [`meltano config <plugin> set`](/docs/command-line-interface.md#config) and [the UI](/docs/command-line-interface.md#ui)
+can still be used to store configuration in the [system database](#database-uri),
+but that settings that are already set in the environment or `meltano.yml` take precedence and cannot be overridden.
+
+This setting differs from the [`ui.readonly` setting](#ui-readonly) in two ways:
+1. it does not block write actions in the UI that do not modify project files, like storing settings in the system database, and
+2. it also affects the [CLI](/docs/command-line-interface.md).
+
+#### How to use
+
+```bash
+meltano config meltano set project_readonly true
+
+export MELTANO_PROJECT_READONLY=true
+```
+
 ### `discovery_url`
 
 - Environment variable: `MELTANO_DISCOVERY_URL`
@@ -373,7 +400,14 @@ These settings can be used to enable certain features of [Meltano UI](/docs/comm
 - Environment variable: `MELTANO_UI_READONLY`, alias: `MELTANO_READONLY`
 - Default: `false`
 
-To disable all modifications to your project through the Meltano UI, you can run it in in *read-only* mode.
+To block all write actions in the Meltano UI, you can run it in in *read-only* mode.
+
+If you're enabling the [`ui.authentication` setting](#ui-authentication) and would
+like to only use read-only mode for anonymous users, enable the [`ui.anonymous_readonly` setting](#ui-anonymous-readonly) instead.
+
+This setting differs from the [`project_readonly` setting](#project-readonly) in two ways:
+1. it also blocks write actions in the UI that do not modify project files, like storing settings in the system database, and
+2. it does not affect the [CLI](/docs/command-line-interface.md).
 
 #### How to use
 

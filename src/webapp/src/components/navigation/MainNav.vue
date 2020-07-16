@@ -6,6 +6,24 @@ import ExploreList from '@/components/analyze/ExploreList'
 import Logo from '@/components/navigation/Logo'
 import utils from '@/utils/utils'
 
+const READONLY_INFO = {
+  project_readonly: {
+    label: 'Read-only project',
+    tooltip: 'This Meltano project is deployed as read-only',
+    url: 'https://meltano.com/docs/settings.html#project-readonly'
+  },
+  'ui.readonly': {
+    label: 'Read-only UI',
+    tooltip: 'Meltano UI is running in read-only mode',
+    url: 'https://meltano.com/docs/settings.html#ui-readonly'
+  },
+  'ui.anonymous_readonly': {
+    label: 'Read-only UI',
+    tooltip: 'Meltano UI is running in read-only mode until you sign in',
+    url: 'https://meltano.com/docs/settings.html#ui-anonymous-readonly'
+  }
+}
+
 export default {
   name: 'MainNav',
   components: {
@@ -35,23 +53,28 @@ export default {
     getIsSubRouteOf() {
       return parentPath => utils.getIsSubRouteOf(parentPath, this.$route.path)
     },
-    isReadonly() {
-      return (
-        this.$flask.isReadonlyEnabled ||
-        (this.$flask.isAnonymousReadonlyEnabled &&
+    readonlySetting() {
+      return this.$flask.isReadonlyEnabled
+        ? 'ui.readonly'
+        : this.$flask.isAnonymousReadonlyEnabled &&
           this.identity &&
-          this.identity.anonymous)
-      )
+          this.identity.anonymous
+        ? 'ui.anonymous_readonly'
+        : this.$flask.isProjectReadonlyEnabled
+        ? 'project_readonly'
+        : null
+    },
+    isReadonly() {
+      return !!this.readonlySetting
+    },
+    readonlyLabel() {
+      return READONLY_INFO[this.readonlySetting].label
     },
     readonlyTooltip() {
-      return this.$flask.isReadonlyEnabled
-        ? 'Meltano is running in read-only mode'
-        : 'Meltano is running in read-only mode until you sign in'
+      return READONLY_INFO[this.readonlySetting].tooltip
     },
     readonlyUrl() {
-      return this.$flask.isReadonlyEnabled
-        ? 'https://meltano.com/docs/settings.html#ui-readonly'
-        : 'https://meltano.com/docs/settings.html#ui-anonymous-readonly'
+      return READONLY_INFO[this.readonlySetting].url
     },
     logoUrl() {
       return this.$flask.logoUrl
@@ -302,7 +325,7 @@ export default {
                   <span class="icon">
                     <font-awesome-icon icon="eye"></font-awesome-icon>
                   </span>
-                  <span>Read-only</span>
+                  <span>{{ readonlyLabel }}</span>
                 </a>
 
                 <a

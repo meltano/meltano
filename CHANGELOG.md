@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2171](https://gitlab.com/meltano/meltano/-/issues/2171) Add better logging and error handling to `meltano config`
+- [#2154](https://gitlab.com/meltano/meltano/-/issues/2154) Add 'project_readonly' setting to block changes to containerized project files, but still allow UI and CLI to store configuration in system database
 
 ### Changes
 

@@ -237,9 +237,9 @@ but there are [a couple of settings](/docs/settings.html#meltano-ui-server) you'
 - If you'd like to require users to sign in before they can access the Meltano UI, enable the [`ui.authentication` setting](/docs/settings.html#ui-authentication).
   As described behind that link, this will also require you to set the [`ui.secret_key`](/docs/settings.html#ui-secret-key) and [`ui.password_salt`](/docs/settings.html#ui-password-salt) settings, as well as [`ui.server_name`](/docs/settings.html#ui-server-name) or [`ui.session_cookie_domain`](/docs/settings.html#ui-session-cookie-domain). Users can be added using [`meltano user add`](./command-line-interface.html#user) and will be stored in the configured [system database](#storing-metadata).
 
-- Meltano UI can be used to make changes to your project, like adding and configuring plugins and scheduling pipelines,
+- Meltano UI can be used to make changes to your project, like adding plugins and scheduling pipelines,
   which is very useful locally but may be undesirable in production if you'd prefer for all changes to [go through version control](#off-of-your-local-machine) instead.
-  To disallow all modifications through the UI, enable the [`ui.readonly` setting](/docs/settings.html#ui-readonly).
+  To disallow all modifications to project files through the UI, enable the [`project_readonly` setting](/docs/settings.html#project-readonly).
 
 - If you will be running Meltano UI behind a front-end (reverse) proxy that will be responsible for SSL termination,
   you may need to change the [`ui.forwarded_allow_ips` setting](/docs/settings.html#ui-forwarded-allow-ips) to get
@@ -248,7 +248,7 @@ but there are [a couple of settings](/docs/settings.html#meltano-ui-server) you'
 ### Containerized Meltano project
 
 If you're [containerizing your Meltano project](#containerized-meltano-project),
-the [`ui.readonly` setting](/docs/settings.html#ui-readonly) will be
+the [`project_readonly` setting](/docs/settings.html#project-readonly) will be
 [enabled by default](https://gitlab.com/meltano/files-docker/-/blob/master/bundle/Dockerfile#L17)
-using the `MELTANO_READONLY` environment variable,
+using the `MELTANO_PROJECT_READONLY` environment variable,
 since any changes to your project's `meltano.yml` file would not be persisted outside the container.
