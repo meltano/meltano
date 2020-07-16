@@ -161,6 +161,10 @@ class Project(Versioned):
     def dotenv(self):
         return self.root.joinpath(".env")
 
+    @property
+    def dotenv_env(self):
+        return dotenv_values(self.dotenv)
+
     @contextmanager
     def dotenv_update(self):
         if self.readonly:
