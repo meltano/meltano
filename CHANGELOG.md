@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.40.1 - (2020-07-16)
+---
+
+### New
+
 - [#2171](https://gitlab.com/meltano/meltano/-/issues/2171) Add better logging and error handling to `meltano config`
 - [#2154](https://gitlab.com/meltano/meltano/-/issues/2154) Add 'project_readonly' setting to block changes to containerized project files, but still allow UI and CLI to store configuration in system database
 - [#2157](https://gitlab.com/meltano/meltano/-/issues/2157) Add `ui.analysis` setting which can be disabled to hide all functionality related to Analysis from the UI
@@ -25,8 +37,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2109](https://gitlab.com/meltano/meltano/-/issues/2109) Fix bug causing adding extractor with related transform plugin to project in UI to fail when dbt hasn't yet been installed
 - [#2170](https://gitlab.com/meltano/meltano/-/issues/2170) Restore support for referencing arbitrary env vars defined in `.env` from `meltano.yml` using env var expansion
 - [#2115](https://gitlab.com/meltano/meltano/-/issues/2115) Stop `meltano` commands from leaving empty `.meltano/run` directory behind when run in non-project dir
-
-### Breaks
 
 
 ## 1.40.0 - (2020-07-14)
