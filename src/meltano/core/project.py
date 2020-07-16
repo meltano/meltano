@@ -14,10 +14,11 @@ from atomicwrites import atomic_write
 
 from .error import Error
 from .behavior.versioned import Versioned
-from .utils import makedirs, slugify
+from .utils import makedirs, slugify, truthy
 from .meltano_file import MeltanoFile
 
 PROJECT_ROOT_ENV = "MELTANO_PROJECT_ROOT"
+PROJECT_READONLY_ENV = "MELTANO_PROJECT_READONLY"
 
 
 class ProjectNotFound(Error):
@@ -44,6 +45,8 @@ class Project(Versioned):
         self._meltano_ip_lock = fasteners.InterProcessLock(
             self.run_dir("meltano.yml.lock")
         )
+
+        self.readonly = False
 
     @property
     def env(self):
@@ -91,6 +94,9 @@ class Project(Versioned):
         # be set as the default project for future `find()`
         if activate:
             cls.activate(project)
+
+        if truthy(os.getenv(PROJECT_READONLY_ENV, "false")):
+            project.readonly = True
 
         return project
 
