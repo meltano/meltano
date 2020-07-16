@@ -47,9 +47,18 @@ from .upload_helper import InvalidFileTypeError, InvalidFileSizeError, UploadHel
 from .utils import enforce_secure_filename
 
 
-def freeze_profile_config_keys(profile):
+def decorate_profile_config(profile):
     profile["config"] = freeze_keys(profile.get("config", {}))
-    profile["config_sources"] = freeze_keys(profile.get("config_sources", {}))
+
+    config_metadata = profile.get("config_metadata", {})
+    for key, metadata in config_metadata.items():
+        try:
+            metadata["source_label"] = metadata["source"].label
+            metadata["auto_store_label"] = metadata["auto_store"].label
+        except KeyError:
+            pass
+
+    profile["config_metadata"] = freeze_keys(config_metadata)
 
 
 def validate_plugin_config(
@@ -58,7 +67,7 @@ def validate_plugin_config(
     setting_def = settings.find_setting(name)
     # we want to prevent the edition of protected settings from the UI
     if setting_def.protected:
-        logging.warning("Cannot set a 'protected' configuration externally.")
+        logging.warning("Cannot set a 'protected' setting externally.")
         return False
 
     if setting_def.kind == "file" and value and value != "":
@@ -70,11 +79,9 @@ def validate_plugin_config(
             )
             return False
 
-    old_value, source = settings.get_with_source(name, session=db.session)
-    if source in (SettingValueStore.ENV, SettingValueStore.MELTANO_YML):
-        logging.warning(
-            "Cannot override a configuration set in the environment or meltano.yml."
-        )
+    old_value, metadata = settings.get_with_metadata(name, session=db.session)
+    if not metadata["overwritable"]:
+        logging.warning("Cannot overwrite this setting.")
         return False
 
     return True
@@ -318,7 +325,7 @@ def get_plugin_configuration(plugin_ref) -> Response:
 
     profiles = settings.profiles_with_config(redacted=True, session=db.session)
     for profile in profiles:
-        freeze_profile_config_keys(profile)
+        decorate_profile_config(profile)
 
     return jsonify(
         {
@@ -352,7 +359,7 @@ def add_plugin_configuration_profile(plugin_ref) -> Response:
     profile_config = settings.profile_with_config(
         profile, redacted=True, session=db.session
     )
-    freeze_profile_config_keys(profile_config)
+    decorate_profile_config(profile_config)
 
     return jsonify(profile_config)
 
@@ -390,7 +397,7 @@ def save_plugin_configuration(plugin_ref) -> Response:
 
     profiles = settings.profiles_with_config(redacted=True, session=db.session)
     for profile in profiles:
-        freeze_profile_config_keys(profile)
+        decorate_profile_config(profile)
 
     return jsonify(profiles)
 

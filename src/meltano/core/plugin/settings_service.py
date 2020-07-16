@@ -76,14 +76,21 @@ class PluginSettingsService(SettingsService):
     def profile_with_config(self, profile: Profile, **kwargs):
         self.plugin_install.use_profile(profile)
 
-        full_config = self.config_with_metadata(**kwargs)
+        config_dict = {}
+        config_metadata = {}
+
+        config_with_metadata = self.config_with_metadata(**kwargs)
+        for key, metadata in config_with_metadata.items():
+            config_dict[key] = metadata.pop("value")
+
+            metadata.pop("setting", None)
+
+            config_metadata[key] = metadata
 
         return {
             **profile.canonical(),
-            "config": {key: config["value"] for key, config in full_config.items()},
-            "config_sources": {
-                key: config["source"] for key, config in full_config.items()
-            },
+            "config": config_dict,
+            "config_metadata": config_metadata,
         }
 
     def profiles_with_config(self, **kwargs) -> List[Dict]:
@@ -91,12 +98,3 @@ class PluginSettingsService(SettingsService):
             self.profile_with_config(profile, **kwargs)
             for profile in (Profile.DEFAULT, *self.plugin_install.profiles)
         ]
-
-    def set(self, *args, store=SettingValueStore.DB, **kwargs):
-        return super().set(*args, **kwargs, store=store)
-
-    def unset(self, *args, store=SettingValueStore.DB, **kwargs):
-        return super().unset(*args, **kwargs, store=store)
-
-    def reset(self, *args, store=SettingValueStore.DB, **kwargs):
-        return super().reset(*args, **kwargs, store=store)

@@ -108,7 +108,7 @@ class TestAutoStoreManager:
 
         # Not writable
         assert auto_store(Store.CONFIG_OVERRIDE) == preferred_store
-        assert auto_store(Store.ENV) == preferred_store
+        assert auto_store(Store.ENV) == Store.DOTENV
         assert auto_store(Store.DEFAULT) == preferred_store
 
         # Writable
@@ -147,25 +147,49 @@ class TestAutoStoreManager:
         assert_value_source,
         monkeypatch,
     ):
-        assert_value_source("from_default", Store.DEFAULT)
+        value, metadata = subject.get("regular")
+        assert value == "from_default"
+        assert metadata["source"] == Store.DEFAULT
+        assert metadata["auto_store"] == Store.MELTANO_YML
+        assert metadata["overwritable"] == True
 
         set_value_store("from_db", Store.DB)
-        assert_value_source("from_db", Store.DB)
+        value, metadata = subject.get("regular")
+        assert value == "from_db"
+        assert metadata["source"] == Store.DB
+        assert metadata["auto_store"] == Store.DB
+        assert metadata["overwritable"] == True
 
         set_value_store("from_meltano_yml", Store.MELTANO_YML)
-        assert_value_source("from_meltano_yml", Store.MELTANO_YML)
+        value, metadata = subject.get("regular")
+        assert value == "from_meltano_yml"
+        assert metadata["source"] == Store.MELTANO_YML
+        assert metadata["auto_store"] == Store.MELTANO_YML
+        assert metadata["overwritable"] == True
 
         set_value_store("from_dotenv", Store.DOTENV)
-        assert_value_source("from_dotenv", Store.DOTENV)
+        value, metadata = subject.get("regular")
+        assert value == "from_dotenv"
+        assert metadata["source"] == Store.DOTENV
+        assert metadata["auto_store"] == Store.DOTENV
+        assert metadata["overwritable"] == True
 
         setting_def = subject.find_setting("regular")
         monkeypatch.setenv(dummy_settings_service.setting_env(setting_def), "from_env")
-        assert_value_source("from_env", Store.ENV)
+        value, metadata = subject.get("regular")
+        assert value == "from_env"
+        assert metadata["source"] == Store.ENV
+        assert metadata["auto_store"] == Store.DOTENV
+        assert metadata["overwritable"] == False
 
         monkeypatch.setitem(
             dummy_settings_service.config_override, "regular", "from_config_override"
         )
-        assert_value_source("from_config_override", Store.CONFIG_OVERRIDE)
+        value, metadata = subject.get("regular")
+        assert value == "from_config_override"
+        assert metadata["source"] == Store.CONFIG_OVERRIDE
+        assert metadata["auto_store"] == Store.MELTANO_YML
+        assert metadata["overwritable"] == False
 
     def test_set(
         self, subject, unsupported, set_value_store, assert_value_source, monkeypatch

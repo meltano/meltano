@@ -87,9 +87,14 @@ class TestPluginSettingsService:
         )
 
         # overriden by an Setting db value when set
-        subject.set("test", "THIS_IS_FROM_DB", session=session)
+        subject.set(
+            "test", "THIS_IS_FROM_DB", store=SettingValueStore.DB, session=session
+        )
         subject_with_profile.set(
-            "test", "THIS_IS_FROM_DB_WITH_PROFILE", session=session
+            "test",
+            "THIS_IS_FROM_DB_WITH_PROFILE",
+            store=SettingValueStore.DB,
+            session=session,
         )
 
         assert subject.get_with_source("test", session=session) == (
@@ -200,14 +205,16 @@ class TestPluginSettingsService:
         assert subject.as_dict(session=session) == custom_tap.config
 
     def test_as_dict_redacted(self, subject, session, tap):
+        store = SettingValueStore.DB
+
         # ensure values are redacted when they are set
-        subject.set("secure", "thisisatest", session=session)
+        subject.set("secure", "thisisatest", store=store, session=session)
         config = subject.as_dict(redacted=True, session=session)
 
         assert config["secure"] == REDACTED_VALUE
 
         # although setting the REDACTED_VALUE does nothing
-        subject.set("secure", REDACTED_VALUE, session=session)
+        subject.set("secure", REDACTED_VALUE, store=store, session=session)
         config = subject.as_dict(session=session)
         assert config["secure"] == "thisisatest"
 
@@ -227,21 +234,24 @@ class TestPluginSettingsService:
             assert config.get(env_var(subject, k)) == v
 
     def test_store_db(self, session, subject, tap):
-        subject.set("test_a", "THIS_IS_FROM_DB", session=session)
-        subject.set("test_b", "THIS_IS_FROM_DB", session=session)
+        store = SettingValueStore.DB
+
+        subject.set("test_a", "THIS_IS_FROM_DB", store=store, session=session)
+        subject.set("test_b", "THIS_IS_FROM_DB", store=store, session=session)
 
         assert session.query(Setting).count() == 2
 
-        subject.unset("test_a", session=session)
+        subject.unset("test_a", store=store, session=session)
 
         assert session.query(Setting).count() == 1
 
-        subject.reset(session=session)
+        subject.reset(store=store, session=session)
 
         assert session.query(Setting).count() == 0
 
     def test_store_meltano_yml(self, subject, project, tap):
         store = SettingValueStore.MELTANO_YML
+
         subject.set("test_a", "THIS_IS_FROM_YML", store=store)
         subject.set("test_b", "THIS_IS_FROM_YML", store=store)
 
