@@ -480,6 +480,14 @@ class AutoStoreManager(SettingsStoreManager):
 
         # May raise StoreNotSupportedError, but that's good.
         manager = self.manager_for(store)
+
+        # Even if the global current value isn't equal,
+        # the value in this store might be
+        current_value, _ = manager.get(name)
+        if value == current_value:
+            # No need to do anything
+            return {"store": store}
+
         metadata = manager.set(name, path, value)
 
         metadata["store"] = store
