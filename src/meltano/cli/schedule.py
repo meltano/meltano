@@ -58,9 +58,6 @@ def add(ctx, name, extractor, loader, transform, interval, start_date):
         click.echo(f"Scheduled '{schedule.name}' at {schedule.interval}")
     except ScheduleAlreadyExistsError as serr:
         click.secho(f"Schedule '{serr.schedule.name}' already exists.", fg="yellow")
-    except Exception as err:
-        click.secho(f"Scheduling failed: {err}", fg="red", err=True)
-        raise click.Abort()
     finally:
         session.close()
 

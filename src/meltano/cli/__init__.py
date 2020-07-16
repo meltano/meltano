@@ -1,5 +1,7 @@
 import os
+import click
 
+from meltano.core.project import ProjectReadonly
 from .cli import cli
 from . import (
     elt,
@@ -24,4 +26,7 @@ def main():
     # mark the current process as executed via the `cli`
     os.environ["MELTANO_JOB_TRIGGER"] = os.getenv("MELTANO_JOB_TRIGGER", "cli")
 
-    cli(obj={"project": None})
+    try:
+        cli(obj={"project": None})
+    except ProjectReadonly as err:
+        click.secho(f"The requested action could not be completed: {err}", fg="red")
