@@ -48,6 +48,8 @@ class Project(Versioned):
     def __init__(self, root: Union[Path, str]):
         self.root = Path(root).resolve()
 
+        self.readonly = False
+
         self.__meltano_ip_lock = None
 
     @property
@@ -58,8 +60,6 @@ class Project(Versioned):
             )
 
         return self.__meltano_ip_lock
-
-        self.readonly = False
 
     @property
     def env(self):
