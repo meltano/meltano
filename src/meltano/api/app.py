@@ -4,7 +4,7 @@ import logging.handlers
 import os
 import atexit
 import importlib
-from flask import Flask, request, g
+from flask import Flask, request, g, jsonify
 from flask_login import current_user
 from flask_cors import CORS
 from urllib.parse import urlsplit
@@ -12,6 +12,8 @@ from werkzeug.wsgi import DispatcherMiddleware
 
 import meltano.api.config
 from meltano.api.headers import *
+from meltano.api.security.auth import HTTP_READONLY_CODE
+from meltano.core.project import ProjectReadonly
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.db import project_engine
@@ -134,6 +136,7 @@ def create_app(config={}):
             "projectId": "project_id",
             "trackingID": "tracking_ids.ui",
             "embedTrackingID": "tracking_ids.ui_embed",
+            "isProjectReadonlyEnabled": "project_readonly",
             "isReadonlyEnabled": "ui.readonly",
             "isAnonymousReadonlyEnabled": "ui.anonymous_readonly",
             "isNotificationEnabled": "ui.notification",
@@ -153,6 +156,15 @@ def create_app(config={}):
     def after_request(res):
         res.headers[VERSION_HEADER] = meltano.__version__
         return res
+
+    @app.errorhandler(500)
+    def internal_error(exception):
+        logger.info(f"Error: {exception}")
+        return jsonify({"error": True, "code": str(exception)}), 500
+
+    @app.errorhandler(ProjectReadonly)
+    def _handle(ex):
+        return (jsonify({"error": True, "code": str(ex)}), HTTP_READONLY_CODE)
 
     # create the dispatcher to host the `OAuthService`
     app.wsgi_app = DispatcherMiddleware(

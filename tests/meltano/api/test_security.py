@@ -6,6 +6,7 @@ from unittest import mock
 from sqlalchemy.orm import joinedload
 from _pytest.monkeypatch import MonkeyPatch
 
+from meltano.core.project import Project, PROJECT_READONLY_ENV
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.api.security import FreeUser, users
 from meltano.api.security.oauth import gitlab_token_identity, OAuthError
@@ -88,6 +89,95 @@ class TestNothingEnabled:
 
 
 @pytest.mark.usefixtures("seed_users")
+class TestProjectReadonlyEnabled:
+    @pytest.fixture(scope="class")
+    def project(self, project):
+        Project.deactivate()
+
+        monkeypatch = MonkeyPatch()
+        monkeypatch.setenv(PROJECT_READONLY_ENV, "true")
+
+        yield project
+
+        monkeypatch.undo()
+
+    def test_current_user(self, app):
+        with app.test_request_context("/"):
+            assert isinstance(current_user._get_current_object(), FreeUser)
+
+    def test_identity(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("api_root.identity"))
+
+            assert res.status_code == 200
+            assert res.json["anonymous"] == True
+            assert res.json["can_sign_in"] == False
+
+    def test_bootstrap(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("root.bootstrap"))
+
+            assert res.status_code == 302
+            assert res.location == url_for("root.default", _external=True)
+
+    def test_upgrade(self, app, api):
+        with app.test_request_context():
+            res = api.post(url_for("api_root.upgrade"))
+
+            assert res.status_code == 201
+            assert res.data == b"Meltano update in progress."
+
+    def test_plugins(self, app, api):
+        with app.test_request_context():
+            res = api.get(url_for("plugins.all"))
+
+            assert res.status_code == 200
+            assert "extractors" in res.json
+
+    def test_plugins_add(self, app, api):
+        with app.test_request_context():
+            res = api.post(
+                url_for("plugins.add"),
+                json={"plugin_type": "extractors", "name": "tap-gitlab"},
+            )
+
+            assert res.status_code == 499
+            assert b"deployed as read-only" in res.data
+
+    def test_pipeline_schedules_save(
+        self, app, api, tap, target, plugin_discovery_service
+    ):
+        with app.test_request_context():
+            with mock.patch(
+                "meltano.core.schedule_service.PluginDiscoveryService",
+                return_value=plugin_discovery_service,
+            ):
+                res = api.post(
+                    url_for("orchestrations.save_pipeline_schedule"),
+                    json={
+                        "name": "mock-to-mock",
+                        "extractor": "tap-mock",
+                        "loader": "target-mock",
+                        "transform": "skip",
+                        "interval": "@once",
+                    },
+                )
+
+                assert res.status_code == 499
+                assert b"deployed as read-only" in res.data
+
+    def test_dashboards_save(self, app, api):
+        with app.test_request_context():
+            res = api.post(
+                url_for("dashboards.save_dashboard"),
+                json={"name": "test-dashboard", "description": ""},
+            )
+
+            assert res.status_code == 499
+            assert b"deployed as read-only" in res.data
+
+
+@pytest.mark.usefixtures("seed_users")
 class TestReadonlyEnabled:
     @pytest.fixture(scope="class")
     def app(self, create_app):
@@ -122,7 +212,7 @@ class TestReadonlyEnabled:
             res = api.post(url_for("api_root.upgrade"))
 
             assert res.status_code == 499
-            assert res.data == b"Meltano is currently running in read-only mode."
+            assert b"read-only mode" in res.data
 
     def test_plugins(self, app, api):
         with app.test_request_context():
@@ -139,7 +229,7 @@ class TestReadonlyEnabled:
             )
 
             assert res.status_code == 499
-            assert res.data == b"Meltano is currently running in read-only mode."
+            assert b"read-only mode" in res.data
 
 
 @pytest.mark.usefixtures("seed_users")
@@ -365,7 +455,7 @@ class TestAuthenticationAndReadonlyEnabled:
                 res = api.post(url_for("api_root.upgrade"))
 
                 assert res.status_code == 499
-                assert res.data == b"Meltano is currently running in read-only mode."
+                assert b"read-only mode" in res.data
 
     def test_plugins(self, app, api):
         with app.test_request_context():
@@ -401,7 +491,7 @@ class TestAuthenticationAndReadonlyEnabled:
                 )
 
                 assert res.status_code == 499
-                assert res.data == b"Meltano is currently running in read-only mode."
+                assert b"read-only mode" in res.data
 
 
 @pytest.mark.usefixtures("seed_users")
@@ -493,10 +583,7 @@ class TestAuthenticationAndAnonymousReadonlyEnabled:
             )
 
             assert res.status_code == 499
-            assert (
-                res.data
-                == b"Meltano is currently running in read-only mode because you are not authenticated."
-            )
+            assert b"read-only mode until you sign in" in res.data
 
     def test_plugins_add_authenticated(self, app, api, impersonate):
         with app.test_request_context():

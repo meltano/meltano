@@ -13,6 +13,7 @@ export default function() {
         .split(',')
         .filter(Boolean),
       isNotificationEnabled: false,
+      isProjectReadonlyEnabled: false,
       isReadonlyEnabled: false,
       isAnonymousReadonlyEnabled: false,
       isSendAnonymousUsageStats: false,

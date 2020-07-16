@@ -134,10 +134,9 @@ export default function setup() {
   // Register the `read-only` killswitch notification
   Vue.toasted.register(
     'readonly',
-    'The requested action could not be completed because Meltano is running in read-only mode.',
+    message => `The requested action could not be completed: ${message}`,
     {
       type: 'warning',
-      duration: 1250,
       singleton: true
     }
   )

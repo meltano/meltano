@@ -12,7 +12,9 @@ export class FatalErrorMiddleware {
 
     if (err.response && err.response.status == 499) {
       err.handled = true
-      this.toasted.global.readonly()
+      const rawData = err.response.data
+      const data = JSON.parse(rawData)
+      this.toasted.global.readonly(data.code)
     }
 
     // Catch generic "Network Error"s that may indicate an Ad Blocker is in use

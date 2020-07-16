@@ -136,7 +136,7 @@ Meltano uses configuration layers to resolve a plugin's configuration:
 2. **Your project's `meltano.yml` file**, under the plugin's `config` key.
    - Inside values, [environment variables](#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
-3. **Your project's [**system database**](/docs/settings.html#database-uri)**, which lives at `.meltano/meltano.db` by default and (among other things) stores configuration set using [`meltano config <plugin> set --store=db`](#config) or [the UI](#ui) (if no other storage method is available)..
+3. **Your project's [**system database**](/docs/settings.html#database-uri)**, which lives at `.meltano/meltano.db` by default and (among other things) stores configuration set using [`meltano config <plugin> set`](#config) or [the UI](#ui) when the project is [deployed as read-only](/docs/settings.html#project-readonly).
    - Note that configuration for Meltano itself cannot be stored in the system database.
 4. **The default `value`s** set on the plugin's `settings` object in the global `discovery.yml` file (in the case of [known plugins](/docs/contributor-guide.html#known-plugins)) or your project's `meltano.yml` file (in the case of custom plugins). `meltano config <plugin> list` will list the default values.
 
@@ -144,7 +144,8 @@ Configuration that is _not_ environment-specific or sensitive should be stored i
 control. Sensitive values like passwords and tokens are most appropriately stored in the environment, a (`.gitignore`d) `.env` file in your project directory, or the system database.
 
 When no explicit `--store` is specified, `meltano config <plugin> set` will automatically store the value in the most appropriate location:
-- The current location, if a setting's default value has already been overwritten;
+- the system database, if the project is [deployed as read-only](/docs/settings.html#project-readonly);
+- the current location, if a setting's default value has already been overwritten;
 - `.env`, if a setting is sensitive or environment-specific (defined as `kind: password` or `env_specific: true`);
 - `meltano.yml` otherwise.
 

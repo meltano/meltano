@@ -3,7 +3,7 @@ from fnmatch import fnmatch
 from functools import wraps
 from datetime import datetime
 
-from flask import current_app, request
+from flask import current_app, request, jsonify
 from flask_security import auth_required
 from flask_login import current_user
 from flask_principal import Permission, Need
@@ -106,11 +106,21 @@ def block_if_readonly(f):
         settings_service = ProjectSettingsService(project)
 
         if settings_service.get("ui.readonly"):
-            return "Meltano is currently running in read-only mode.", HTTP_READONLY_CODE
+            return (
+                jsonify(
+                    {"error": True, "code": "Meltano UI is running in read-only mode"}
+                ),
+                HTTP_READONLY_CODE,
+            )
 
         if settings_service.get("ui.anonymous_readonly") and current_user.is_anonymous:
             return (
-                "Meltano is currently running in read-only mode because you are not authenticated.",
+                jsonify(
+                    {
+                        "error": True,
+                        "code": "Meltano UI is running in read-only mode until you sign in",
+                    }
+                ),
                 HTTP_READONLY_CODE,
             )
 
