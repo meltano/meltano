@@ -230,8 +230,6 @@ homepage_sample_code:
     # export TAP_COVID_19_API_TOKEN="<your-github-api-token>"
     # - OR a (gitignored) `.env` file:
     # meltano config tap-covid-19 set api_token <your-github-api-token>
-    # - OR your project's system database:
-    # meltano config tap-covid-19 set --store=db api_token <your-github-api-token>
 
     # Unset specific setting
     # meltano config tap-covid-19 unset start_date
