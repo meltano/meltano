@@ -47,9 +47,17 @@ class Project(Versioned):
 
     def __init__(self, root: Union[Path, str]):
         self.root = Path(root).resolve()
-        self._meltano_ip_lock = fasteners.InterProcessLock(
-            self.run_dir("meltano.yml.lock")
-        )
+
+        self.__meltano_ip_lock = None
+
+    @property
+    def _meltano_ip_lock(self):
+        if self.__meltano_ip_lock is None:
+            self.__meltano_ip_lock = fasteners.InterProcessLock(
+                self.run_dir("meltano.yml.lock")
+            )
+
+        return self.__meltano_ip_lock
 
         self.readonly = False
 
