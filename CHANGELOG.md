@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2171](https://gitlab.com/meltano/meltano/-/issues/2171) Add better logging and error handling to `meltano config`
+- [#2169](https://gitlab.com/meltano/meltano/-/issues/2169) Log warning when pipeline state was found but extractor does not advertise `state` capability
 
 ### Changes
 
