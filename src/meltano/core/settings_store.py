@@ -86,7 +86,9 @@ class SettingsStoreManager(ABC):
         return self.settings_service.find_setting(name)
 
     def expand_env_vars(self, value):
-        expanded_value = expand_env_vars(value, env=self.settings_service.env)
+        env = {**self.project.dotenv_env, **self.settings_service.env}
+
+        expanded_value = expand_env_vars(value, env=env)
         if expanded_value == value:
             return value, {}
 
@@ -168,7 +170,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
 
     @property
     def env(self):
-        return dotenv.dotenv_values(self.project.dotenv)
+        return self.project.dotenv_env
 
     def get(self, name: str):
         value, metadata = super().get(name)

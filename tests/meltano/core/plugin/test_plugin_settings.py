@@ -306,7 +306,7 @@ class TestPluginSettingsService:
         subject.reset(store=store)
         assert not project.dotenv.exists()
 
-    def test_env_var_substitution(self, session, subject, project, tap):
+    def test_env_var_expansion(self, session, subject, project, tap, monkeypatch):
         with project.meltano_update() as meltano:
             extractor = meltano.plugins.extractors[0]
             extractor.config = {
@@ -316,19 +316,17 @@ class TestPluginSettingsService:
                 "multiple": "$A ${B} $C",
             }
 
-        env = {
-            "VAR": "hello world!",
-            "FOO": 42,
-            "A": "rock",
-            "B": "paper",
-            "C": "scissors",
-        }
+        monkeypatch.setenv("VAR", "hello world!")
+        monkeypatch.setenv("FOO", "42")
 
-        subject.env_override = env
+        project.dotenv.touch()
+        dotenv.set_key(project.dotenv, "A", "rock")
+        dotenv.set_key(project.dotenv, "B", "paper")
+        dotenv.set_key(project.dotenv, "C", "scissors")
 
         config = subject.as_dict(session=session)
-        assert config["var"] == env["VAR"]
-        assert config["foo"] == str(env["FOO"])
+        assert config["var"] == "hello world!"
+        assert config["foo"] == "42"
         assert config["missing"] == None
         assert config["multiple"] == "rock paper scissors"
 
