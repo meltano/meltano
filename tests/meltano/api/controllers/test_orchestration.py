@@ -18,9 +18,14 @@ class TestOrchestration:
         session,
         plugin_settings_service_factory,
         plugin_discovery_service,
+        monkeypatch,
     ):
         plugin_settings_service = plugin_settings_service_factory(tap)
-        plugin_settings_service.set("secure", "thisisatest", session=session)
+        plugin_settings_service.set(
+            "secure", "thisisatest", store=SettingValueStore.DOTENV, session=session
+        )
+
+        monkeypatch.setenv("TAP_MOCK_BOOLEAN", "false")
 
         with mock.patch(
             "meltano.api.controllers.orchestrations.PluginDiscoveryService",
@@ -31,21 +36,36 @@ class TestOrchestration:
             )
 
             assert res.status_code == 200
-            default_config = res.json["profiles"][0]["config"]
+            default_profile = res.json["profiles"][0]
+            config = default_profile["config"]
+            config_metadata = default_profile["config_metadata"]
 
             # make sure that set `password` is still present
             # but redacted in the response
             assert plugin_settings_service.get_with_source(
                 "secure", session=session
-            ) == ("thisisatest", SettingValueStore.DB)
-            assert default_config["secure"] == REDACTED_VALUE
+            ) == ("thisisatest", SettingValueStore.DOTENV)
+            assert config["secure"] == REDACTED_VALUE
+            assert config_metadata["secure"]["redacted"] == True
+            assert config_metadata["secure"]["source"] == "dotenv"
+            assert config_metadata["secure"]["auto_store"] == "dotenv"
+            assert config_metadata["secure"]["overwritable"] == True
+
+            # make sure that `boolean` cannot be overwritten
+            assert plugin_settings_service.get_with_source(
+                "boolean", session=session
+            ) == (False, SettingValueStore.ENV)
+            assert config["boolean"] == False
+            assert config_metadata["boolean"]["source"] == "env"
+            assert config_metadata["boolean"]["auto_store"] == "dotenv"
+            assert config_metadata["boolean"]["overwritable"] == False
 
             # make sure the `hidden` setting is still present
             # but hidden in the response
             assert plugin_settings_service.get_with_source(
                 "hidden", session=session
             ) == (42, SettingValueStore.DEFAULT)
-            assert "hidden" not in default_config
+            assert "hidden" not in config
 
     def test_save_configuration(
         self,
@@ -57,8 +77,12 @@ class TestOrchestration:
         plugin_discovery_service,
     ):
         plugin_settings_service = plugin_settings_service_factory(tap)
-        plugin_settings_service.set("secure", "thisisatest", session=session)
-        plugin_settings_service.set("protected", "iwontchange", session=session)
+        plugin_settings_service.set(
+            "secure", "thisisatest", store=SettingValueStore.DOTENV, session=session
+        )
+        plugin_settings_service.set(
+            "protected", "iwontchange", store=SettingValueStore.DB, session=session
+        )
 
         with mock.patch(
             "meltano.core.plugin.settings_service.PluginDiscoveryService",
@@ -81,7 +105,7 @@ class TestOrchestration:
             # but redacted in the response
             assert plugin_settings_service.get_with_source(
                 "secure", session=session
-            ) == ("newvalue", SettingValueStore.DB)
+            ) == ("newvalue", SettingValueStore.DOTENV)
             assert config["secure"] == REDACTED_VALUE
 
             # make sure the `readonly` field has not been updated

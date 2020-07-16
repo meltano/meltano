@@ -56,6 +56,16 @@ class SettingValueStore(str, Enum):
     def writable(self):
         return self.manager.writable
 
+    def can_overwrite(self, source):
+        if not self.writable:
+            return False
+
+        if source is self:
+            return True
+
+        stores_list = list(self.__class__)
+        return stores_list.index(self) <= stores_list.index(source)
+
 
 class SettingsStoreManager(ABC):
     readable = True
@@ -401,11 +411,12 @@ class AutoStoreManager(SettingsStoreManager):
             except StoreNotSupportedError:
                 tried.add(store)
 
-                sensitive = setting_def and (
-                    setting_def.is_redacted or setting_def.env_specific
-                )
+                prefer_dotenv = (
+                    setting_def
+                    and (setting_def.is_redacted or setting_def.env_specific)
+                ) or source is SettingValueStore.ENV
 
-                if SettingValueStore.MELTANO_YML not in tried and not sensitive:
+                if SettingValueStore.MELTANO_YML not in tried and not prefer_dotenv:
                     store = SettingValueStore.MELTANO_YML
                     continue
 
@@ -436,6 +447,12 @@ class AutoStoreManager(SettingsStoreManager):
                 break
 
         metadata["source"] = source
+
+        auto_store = self.auto_store(name, source)
+        if auto_store:
+            metadata["auto_store"] = auto_store
+            metadata["overwritable"] = auto_store.can_overwrite(source)
+
         return value, metadata
 
     def set(self, name: str, path: List[str], value):

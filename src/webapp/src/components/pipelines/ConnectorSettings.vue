@@ -1,7 +1,6 @@
 <script>
 import axios from 'axios'
 
-import { ENV, DOTENV, MELTANO_YML } from '@/utils/constants'
 import InputDateIso8601 from '@/components/generic/InputDateIso8601'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import utils from '@/utils/utils'
@@ -120,13 +119,10 @@ export default {
     },
     getIsProtected() {
       return setting => {
-        const settingSource = this.connectorProfile.configSources[setting.name]
+        const metadata = this.connectorProfile.configMetadata[setting.name]
 
         return (
-          setting.protected === true ||
-          settingSource === ENV ||
-          settingSource === DOTENV ||
-          settingSource === MELTANO_YML
+          setting.protected === true || (metadata && !metadata.overwritable)
         )
       }
     },
@@ -194,19 +190,17 @@ export default {
       return this.fieldClass || 'is-normal'
     },
     protectedFieldMessage() {
-      let configSources = this.configSettings.profiles[0].configSources
+      let configMetadata = this.configSettings.profiles[0].configMetadata
 
       return setting => {
-        const configSource = configSources[setting.name]
+        const metadata = configMetadata[setting.name]
 
-        if (configSource === ENV) {
-          return 'This setting is currently controlled by an environment variable.'
-        } else if (configSource === DOTENV) {
-          return 'This setting is currently controlled through `.env`.'
-        } else if (configSource === MELTANO_YML) {
-          return 'This setting is currently controlled through `meltano.yml`.'
-        } else {
+        if (setting.protected) {
           return 'This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more.'
+        } else {
+          return `This setting is currently set in ${
+            metadata.source_label
+          } and cannot be overwritten.`
         }
       }
     },
@@ -574,7 +568,7 @@ export default {
                       class="button is-small"
                     >
                       <span
-                        class="icon has-text-grey-dark tooltip is-tooltip-left"
+                        class="icon has-text-grey-dark tooltip is-tooltip-left is-tooltip-multiline"
                         :data-tooltip="protectedFieldMessage(setting)"
                       >
                         <font-awesome-icon icon="lock"></font-awesome-icon>
