@@ -16,6 +16,8 @@ from .catalog import (
     select_metadata_rules,
 )
 
+logger = logging.getLogger(__name__)
+
 
 def config_metadata_rules(config):
     rules = []
@@ -58,12 +60,21 @@ class SingerTap(SingerPlugin):
         if file_has_data(catalog_path):
             if "catalog" in plugin_invoker.capabilities:
                 args += ["--catalog", catalog_path]
-            if "properties" in plugin_invoker.capabilities:
+            elif "properties" in plugin_invoker.capabilities:
                 args += ["--properties", catalog_path]
+            else:
+                logger.warn(
+                    "A catalog file was found, but it will be ignored as the extractor does not advertise the `catalog` or `properties` capability"
+                )
 
         state_path = plugin_invoker.files["state"]
-        if "state" in plugin_invoker.capabilities and file_has_data(state_path):
-            args += ["--state", state_path]
+        if file_has_data(state_path):
+            if "state" in plugin_invoker.capabilities:
+                args += ["--state", state_path]
+            else:
+                logger.warn(
+                    "A state file was found, but it will be ignored as the extractor does not advertise the `state` capability"
+                )
 
         return args
 

@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2171](https://gitlab.com/meltano/meltano/-/issues/2171) Add better logging and error handling to `meltano config`
 - [#2154](https://gitlab.com/meltano/meltano/-/issues/2154) Add 'project_readonly' setting to block changes to containerized project files, but still allow UI and CLI to store configuration in system database
 - [#2157](https://gitlab.com/meltano/meltano/-/issues/2157) Add `ui.analysis` setting which can be disabled to hide all functionality related to Analysis from the UI
+- [#2169](https://gitlab.com/meltano/meltano/-/issues/2169) Log warning when pipeline state was found but extractor does not advertise `state` capability
 
 ### Changes
 
