@@ -65,8 +65,9 @@ class ReportsService:
         )
         data["version"] = ReportsService.VERSION
 
-        with file_path.open("w") as f:
-            json.dump(data, f)
+        with self.project.file_update():
+            with file_path.open("w") as f:
+                json.dump(data, f)
 
         return data
 
@@ -79,7 +80,8 @@ class ReportsService:
 
         DashboardsService(self.project).remove_report_from_dashboards(report["id"])
 
-        os.remove(file_path)
+        with self.project.file_update():
+            os.remove(file_path)
 
         return data
 
@@ -99,11 +101,14 @@ class ReportsService:
                 existing_report = json.load(f)
             raise ReportAlreadyExistsError(existing_report, "slug")
 
-        os.remove(file_path)
+        with self.project.file_update():
+            os.remove(file_path)
 
         data["slug"] = new_slug
         data["path"] = str(new_file_path.relative_to(self.project.root))
-        with new_file_path.open("w") as f:
-            json.dump(data, f)
+
+        with self.project.file_update():
+            with new_file_path.open("w") as f:
+                json.dump(data, f)
 
         return data

@@ -71,8 +71,9 @@ class DashboardsService:
         data["description"] = data["description"] or ""
         data["report_ids"] = []
 
-        with file_path.open("w") as f:
-            json.dump(data, f)
+        with self.project.file_update():
+            with file_path.open("w") as f:
+                json.dump(data, f)
 
         return data
 
@@ -81,7 +82,8 @@ class DashboardsService:
         slug = dashboard["slug"]
         file_path = self.project.analyze_dir("dashboards", f"{slug}.dashboard.m5o")
         if os.path.exists(file_path):
-            os.remove(file_path)
+            with self.project.file_update():
+                os.remove(file_path)
         else:
             raise DashboardDoesNotExistError(data)
 
@@ -107,7 +109,8 @@ class DashboardsService:
                 existing_dashboard = json.load(f)
             raise DashboardAlreadyExistsError(existing_dashboard, "slug")
 
-        os.remove(file_path)
+        with self.project.file_update():
+            os.remove(file_path)
 
         dashboard["slug"] = new_slug
         dashboard["name"] = new_name
@@ -117,8 +120,9 @@ class DashboardsService:
         if "report_ids" in new_settings:
             dashboard["report_ids"] = new_settings["report_ids"]
 
-        with new_file_path.open("w") as f:
-            json.dump(dashboard, f)
+        with self.project.file_update():
+            with new_file_path.open("w") as f:
+                json.dump(dashboard, f)
 
         return dashboard
 
@@ -130,8 +134,9 @@ class DashboardsService:
             file_path = self.project.analyze_dir(
                 "dashboards", f"{dashboard['slug']}.dashboard.m5o"
             )
-            with file_path.open("w") as f:
-                json.dump(dashboard, f)
+            with self.project.file_update():
+                with file_path.open("w") as f:
+                    json.dump(dashboard, f)
 
         return dashboard
 
@@ -144,8 +149,9 @@ class DashboardsService:
                 "dashboards", f"{dashboard['slug']}.dashboard.m5o"
             )
 
-            with file_path.open("w") as f:
-                json.dump(dashboard, f)
+            with self.project.file_update():
+                with file_path.open("w") as f:
+                    json.dump(dashboard, f)
 
         return dashboard
 

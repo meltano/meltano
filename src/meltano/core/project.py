@@ -28,6 +28,11 @@ class ProjectNotFound(Error):
         )
 
 
+class ProjectReadonly(Error):
+    def __init__(self):
+        super().__init__(f"This Meltano project is deployed as read-only")
+
+
 class Project(Versioned):
     """
     Represent the current Meltano project from a file-system
@@ -115,6 +120,10 @@ class Project(Versioned):
         Yield the current meltano configuration and update the meltanofile
         if the context ends gracefully.
         """
+
+        if self.readonly:
+            raise ProjectReadonly
+
         # fmt: off
         with self._meltano_rw_lock.write_lock(), \
             self._meltano_ip_lock:
@@ -137,6 +146,13 @@ class Project(Versioned):
     def root_dir(self, *joinpaths):
         return self.root.joinpath(*joinpaths)
 
+    @contextmanager
+    def file_update(self):
+        if self.readonly:
+            raise ProjectReadonly
+
+        yield self.root
+
     @property
     def meltanofile(self):
         return self.root.joinpath("meltano.yml")
@@ -147,6 +163,9 @@ class Project(Versioned):
 
     @contextmanager
     def dotenv_update(self):
+        if self.readonly:
+            raise ProjectReadonly
+
         yield self.dotenv
 
     @makedirs
