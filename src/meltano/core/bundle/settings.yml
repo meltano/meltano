@@ -82,6 +82,9 @@ settings:
   value: false
   env_aliases: [MELTANO_NOTIFICATION]
   env_specific: true
+- name: ui.analysis
+  kind: boolean
+  value: true
 
 # UI customization
 - name: ui.logo_url
