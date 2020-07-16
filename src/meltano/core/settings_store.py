@@ -509,6 +509,7 @@ class AutoStoreManager(SettingsStoreManager):
         return metadata
 
     def unset(self, name: str, path: List[str]):
+        error = None
         metadata = {}
 
         for store in self.stores:
@@ -521,9 +522,14 @@ class AutoStoreManager(SettingsStoreManager):
             if value is None:
                 continue
 
-            # May raise StoreNotSupportedError, but that's good.
-            metadata = manager.unset(name, path)
-            metadata["store"] = store
+            try:
+                metadata = manager.unset(name, path)
+                metadata["store"] = store
+            except StoreNotSupportedError as err:
+                error = err
+
+        if error:
+            raise error
 
         return metadata
 
