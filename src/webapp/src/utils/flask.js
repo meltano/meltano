@@ -12,6 +12,7 @@ export default function() {
       oauthServiceProviders: (process.env.MELTANO_OAUTH_SERVICE_PROVIDERS || '')
         .split(',')
         .filter(Boolean),
+      isAnalysisEnabled: true,
       isNotificationEnabled: false,
       isReadonlyEnabled: false,
       isAnonymousReadonlyEnabled: false,

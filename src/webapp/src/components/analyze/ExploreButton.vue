@@ -12,6 +12,9 @@ export default {
   computed: {
     ...mapGetters('plugins', ['getInstalledPlugin']),
     ...mapState('repos', ['models']),
+    isAnalysisEnabled() {
+      return !!this.$flask.isAnalysisEnabled
+    },
     getExploreModel() {
       let targetModel
       for (const prop in this.models) {
@@ -47,6 +50,7 @@ export default {
 
 <template>
   <button
+    v-if="isAnalysisEnabled"
     class="button is-interactive-primary tooltip"
     :class="[
       { 'is-loading': isDisabled, 'is-tooltip-left': isTooltipLeft },

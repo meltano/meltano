@@ -23,6 +23,9 @@ export default {
     ...mapGetters('repos', ['hasModels']),
     ...mapGetters('system', ['updateAvailable']),
     ...mapState('system', ['latestVersion', 'updating', 'version', 'identity']),
+    isAnalysisEnabled() {
+      return !!this.$flask.isAnalysisEnabled
+    },
     getIconColor() {
       return parentPath =>
         this.getIsSubRouteOf(parentPath)
@@ -153,7 +156,10 @@ export default {
           </a>
         </router-link>
 
-        <div class="navbar-item navbar-child has-dropdown is-hoverable">
+        <div
+          v-if="isAnalysisEnabled"
+          class="navbar-item navbar-child has-dropdown is-hoverable"
+        >
           <a
             :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
             class="navbar-link has-text-weight-semibold"
@@ -196,6 +202,7 @@ export default {
         </div>
 
         <router-link
+          v-if="isAnalysisEnabled"
           :to="{ name: 'dashboards' }"
           :class="{ 'router-link-active': getIsSubRouteOf('/dashboard') }"
           class="navbar-item navbar-child has-text-weight-semibold"
