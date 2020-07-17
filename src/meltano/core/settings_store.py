@@ -389,10 +389,8 @@ class AutoStoreManager(SettingsStoreManager):
     label = "the system database, `meltano.yml`, and `.env`"
     writable = True
 
-    def __init__(self, *args, force=False, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        self.force_set = force
 
         self._kwargs = {"settings_service": self.settings_service, **kwargs}
 
@@ -476,7 +474,7 @@ class AutoStoreManager(SettingsStoreManager):
         current_value, metadata = self.get(name)
         source = metadata["source"]
 
-        if value == current_value and not self.force_set:
+        if value == current_value:
             # No need to do anything
             return {"store": source}
 
@@ -521,14 +519,13 @@ class AutoStoreManager(SettingsStoreManager):
             except StoreNotSupportedError:
                 continue
 
-            if value is None:
-                continue
-
             try:
                 metadata = manager.unset(name, path)
                 metadata["store"] = store
             except StoreNotSupportedError as err:
-                error = err
+                # Only raise if we're sure we were going to unset something
+                if value is not None:
+                    error = err
 
         if error:
             raise error
