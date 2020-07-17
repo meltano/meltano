@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2174](https://gitlab.com/meltano/meltano/-/issues/2174) Add `/api/health` health check route
+
 ### Changes
 
 ### Fixes
