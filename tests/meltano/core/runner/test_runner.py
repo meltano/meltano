@@ -175,6 +175,10 @@ class TestSingerRunner:
         assert tap_invoker.files["state"].exists()
         assert tap_invoker.files["state"].open().read() == state_json
 
+        # test full refresh
+        subject.restore_bookmark(session, tap_invoker, full_refresh=True)
+        assert not tap_invoker.files["state"].exists()
+
     def test_run(self, subject, session):
         async def invoke_mock(*args):
             pass
@@ -190,6 +194,6 @@ class TestSingerRunner:
             subject.run(session)
             AnyPluginInvoker = AnyInstanceOf(PluginInvoker)
 
-            restore_bookmark.assert_called_once_with(session, AnyPluginInvoker)
+            restore_bookmark.assert_called_once_with(session, AnyPluginInvoker, full_refresh=False)
             invoke.assert_called_once_with(AnyPluginInvoker, AnyPluginInvoker)
         # fmt: on

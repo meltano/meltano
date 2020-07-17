@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2174](https://gitlab.com/meltano/meltano/-/issues/2174) Add `/api/health` health check route
+- [#2125](https://gitlab.com/meltano/meltano/-/issues/2125) Add `--full-refresh` flag to `meltano elt` to perform a full refresh, ignoring the state left behind by any previous runs with the same job ID.
 
 ### Changes
 
