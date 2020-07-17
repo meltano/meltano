@@ -67,13 +67,8 @@ def select(project, extractor, entities_filter, attributes_filter, **flags):
             flags=flags,
         )
     except PluginLacksCapabilityError as e:
-        logging.exception(e)
-        raise click.ClickException(
-            f"Cannot list the selected attributes: "
-            "the tap does not support schema discovery or selection."
-        ) from e
+        raise click.ClickException(f"Cannot list the selected attributes: {e}") from e
     except PluginExecutionError as e:
-        logging.exception(e)
         raise click.ClickException(
             f"Cannot list the selected attributes: "
             "there was a problem running the tap with `--discover`. "
