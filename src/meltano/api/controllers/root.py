@@ -115,3 +115,8 @@ def identity():
     return jsonify(
         {"username": current_user.username, "anonymous": False, "can_sign_in": False}
     )
+
+
+@api_root.route("/health")
+def health():
+    return jsonify({"healthy": True})
