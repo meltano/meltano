@@ -103,7 +103,7 @@ class SingerTap(SingerPlugin):
     def run_discovery(self, plugin_invoker, exec_args=[]):
         if not "discover" in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
-                f"Extractor '{self.name}' does not support schema discovery"
+                f"Extractor '{self.name}' does not support schema discovery (the `discover` capability is not advertised)"
             )
 
         properties_file = plugin_invoker.files["catalog"]

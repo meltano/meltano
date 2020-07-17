@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2175](https://gitlab.com/meltano/meltano/-/issues/2175) Clarify that not supporting discovery mode means that the `state` capability is not advertised
+
 ### Fixes
 
 - [#2168](https://gitlab.com/meltano/meltano/-/issues/2168) Don't select entity attributes marked as unsupported

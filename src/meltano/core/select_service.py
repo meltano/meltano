@@ -29,7 +29,7 @@ class SelectService:
 
         # ensure we already have the discovery run at least once
         if not invoker.files["catalog"].exists():
-            logging.info("Catalog not found, trying to run the tap with --discover.")
+            logging.debug("Catalog not found, trying to run the tap with --discover.")
             self.extractor.run_discovery(invoker)
 
         # update the catalog accordingly
