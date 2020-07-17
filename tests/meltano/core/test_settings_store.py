@@ -327,6 +327,17 @@ class TestAutoStoreManager:
 
             assert_value_source("from_dotenv", Store.DOTENV, name="password")
 
+        # Unsets even when there is technically no setting with that exact full name
+        subject.manager_for(Store.MELTANO_YML).set(
+            "custom.nested", ["custom", "nested"], "from_meltano_yml"
+        )
+        assert_value_source(None, Store.DEFAULT, name="custom")
+        assert_value_source("from_meltano_yml", Store.MELTANO_YML, name="custom.nested")
+
+        subject.unset("custom", ["custom"])
+        assert_value_source(None, Store.DEFAULT, name="custom")
+        assert_value_source(None, Store.DEFAULT, name="custom.nested")
+
     def test_reset(self, subject, unsupported, set_value_store, assert_value_source):
         set_value_store("from_db", Store.DB)
         set_value_store("from_meltano_yml", Store.MELTANO_YML, name="unknown")

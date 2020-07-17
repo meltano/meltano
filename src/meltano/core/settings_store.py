@@ -521,14 +521,13 @@ class AutoStoreManager(SettingsStoreManager):
             except StoreNotSupportedError:
                 continue
 
-            if value is None:
-                continue
-
             try:
                 metadata = manager.unset(name, path)
                 metadata["store"] = store
             except StoreNotSupportedError as err:
-                error = err
+                # Only raise if we're sure we were going to unset something
+                if value is not None:
+                    error = err
 
         if error:
             raise error
