@@ -252,6 +252,14 @@ class MetadataExecutor(CatalogExecutor):
         return [rule for rule in self._rules if rule.match(tap_stream_id, breadcrumb)]
 
     def set_metadata(self, node, path, key, value):
+        # Unsupported fields cannot be selected
+        if (
+            key == "selected"
+            and value == True
+            and node.get("inclusion") == "unsupported"
+        ):
+            return
+
         node[key] = value
         logging.debug(f"Setting '{path}.{key}' to '{value}'")
 
