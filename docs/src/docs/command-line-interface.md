@@ -292,6 +292,8 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT] [
   - `skip`: skip the Transforms (Default)
   - `only`: only run the Transforms (skip the Extract and Load steps)
 
+- A `--full-refresh` flag can be passed to perform a full refresh, ignoring the state left behind by any previous runs with the same job ID.
+
 ### Pipeline environment variables
 
 To allow loaders and transformers to adapt their configuration and behavior based on the extractor and loader they are run with,

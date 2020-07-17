@@ -31,12 +31,17 @@ from meltano.core.elt_context import ELTContextBuilder
 @click.argument("extractor")
 @click.argument("loader")
 @click.option("--dry", help="Do not actually run.", is_flag=True)
+@click.option(
+    "--full-refresh",
+    help="Perform a full refresh (ignore state left behind by any previous runs)",
+    is_flag=True,
+)
 @click.option("--transform", type=click.Choice(["skip", "only", "run"]), default="skip")
 @click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
 @project(migrate=True)
-def elt(project, extractor, loader, dry, transform, job_id):
+def elt(project, extractor, loader, dry, full_refresh, transform, job_id):
     """
     meltano elt EXTRACTOR_NAME LOADER_NAME
 
@@ -71,7 +76,9 @@ def elt(project, extractor, loader, dry, transform, job_id):
                 )
 
                 if transform != "only":
-                    run_extract_load(elt_context, session, dry_run=dry)
+                    run_extract_load(
+                        elt_context, session, dry_run=dry, full_refresh=full_refresh
+                    )
                 else:
                     click.secho("Extract & load skipped.", fg="yellow")
 
