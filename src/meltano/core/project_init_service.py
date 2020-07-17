@@ -7,7 +7,7 @@ from typing import List, Dict
 from pathlib import Path
 
 from .utils import truthy
-from .project_settings_service import ProjectSettingsService
+from .project_settings_service import ProjectSettingsService, SettingValueStore
 from .project import Project
 from .plugin.meltano_file import MeltanoFilePlugin
 from .db import project_engine
@@ -56,7 +56,7 @@ class ProjectInitService:
         self.settings_service.set(
             "send_anonymous_usage_stats",
             self.settings_service.get("send_anonymous_usage_stats"),
-            force=True,
+            store=SettingValueStore.MELTANO_YML,
         )
 
     def create_system_database(self):

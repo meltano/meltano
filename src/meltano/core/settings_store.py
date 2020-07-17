@@ -389,10 +389,8 @@ class AutoStoreManager(SettingsStoreManager):
     label = "the system database, `meltano.yml`, and `.env`"
     writable = True
 
-    def __init__(self, *args, force=False, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        self.force_set = force
 
         self._kwargs = {"settings_service": self.settings_service, **kwargs}
 
@@ -476,7 +474,7 @@ class AutoStoreManager(SettingsStoreManager):
         current_value, metadata = self.get(name)
         source = metadata["source"]
 
-        if value == current_value and not self.force_set:
+        if value == current_value:
             # No need to do anything
             return {"store": source}
 
