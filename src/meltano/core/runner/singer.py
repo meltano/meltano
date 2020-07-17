@@ -85,7 +85,19 @@ class SingerRunner(Runner):
                 f"Subprocesses didn't exit cleanly: tap({tap_code}), target({target_code})"
             )
 
-    def restore_bookmark(self, session, tap: PluginInvoker):
+    def restore_bookmark(self, session, tap: PluginInvoker, full_refresh=False):
+        # Delete state left over from different pipeline run for same extractor
+        try:
+            os.remove(tap.files["state"])
+        except OSError:
+            pass
+
+        if full_refresh:
+            logging.info(
+                "Performing full refresh, ignoring state left behind by any previous runs."
+            )
+            return
+
         if self.context.job is None:
             logging.info(
                 f"Running outside a Job context: incremental state could not be loaded."
@@ -102,12 +114,6 @@ class SingerRunner(Runner):
                 json.dump(state_job.payload["singer_state"], state)
         else:
             logging.warning("No state was found, complete import.")
-
-            # Delete state left over from different pipeline run for same extractor
-            try:
-                os.remove(tap.files["state"])
-            except OSError:
-                pass
 
     def bookmark_state(self, new_state: str):
         if self.context.job is None:
@@ -143,7 +149,7 @@ class SingerRunner(Runner):
         logging.info(f"\textractor: {tap.plugin.name} at '{tap.exec_path()}'")
         logging.info(f"\tloader: {target.plugin.name} at '{target.exec_path()}'")
 
-    def run(self, session, dry_run=False):
+    def run(self, session, dry_run=False, full_refresh=False):
         tap = self.context.extractor_invoker()
         target = self.context.loader_invoker()
 
@@ -153,6 +159,6 @@ class SingerRunner(Runner):
         tap.prepare(session)
         target.prepare(session)
 
-        self.restore_bookmark(session, tap)
+        self.restore_bookmark(session, tap, full_refresh=full_refresh)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self.invoke(tap, target))
