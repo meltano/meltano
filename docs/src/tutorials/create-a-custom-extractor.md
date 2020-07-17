@@ -147,19 +147,22 @@ Once the settings are exposed, you can use any of the following to set the prope
 
 Now that your plugin is installed and configured, you are ready to interact with it using Meltano.
 
-use `meltano invoke` to run your plugin in isolation:
+Use `meltano invoke` to run your plugin in isolation:
 
 ```bash
 meltano invoke tap-gitlab-custom --discover
 ```
 
-Use `meltano select` to parse your `catalog`:
+If your custom tap doesn't support discovery mode, this may raise an error, but you will have verified that it was installed correctly and can be invoked through Meltano.
+
+Assuming your custom tap supports discovery mode and advertises the `discover` capabilitiy, 
+use `meltano select` to parse your `catalog` and list all available entities and attributes:
 
 ```bash
-meltano select --list tap-gitlab-custom '*' '*'
+meltano select --list --all tap-gitlab-custom
 ```
 
-Run an ELT using your new tap:
+Now, run an ELT pipeline using your new tap:
 
 ```bash
 meltano elt tap-gitlab-custom target-sqlite
