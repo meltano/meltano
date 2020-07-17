@@ -67,6 +67,9 @@ LEGACY_CATALOG = """
               "null"
             ]
           },
+          "unsupported": {
+            "type": "null"
+          },
           "payload": {
             "type": "object",
             "properties": {
@@ -130,6 +133,15 @@ LEGACY_CATALOG = """
           ],
           "metadata": {
             "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "unsupported"
+          ],
+          "metadata": {
+            "inclusion": "unsupported"
           }
         },
         {
@@ -215,6 +227,9 @@ CATALOG = """
               "null"
             ]
           },
+          "unsupported": {
+            "type": "null"
+          },
           "payload": {
             "type": "object",
             "properties": {
@@ -278,6 +293,15 @@ CATALOG = """
           ],
           "metadata": {
             "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "unsupported"
+          ],
+          "metadata": {
+            "inclusion": "unsupported"
           }
         },
         {
@@ -434,22 +458,27 @@ class TestLegacyCatalogSelectVisitor:
     def assert_catalog_is_selected(cls, catalog):
         streams = {stream["tap_stream_id"]: stream for stream in catalog["streams"]}
 
-        metadatas = {
-            stream["tap_stream_id"]: metadata
-            for _, stream in streams.items()
-            for metadata in stream["metadata"]
-        }
-
         # all streams are selected
         for name, stream in streams.items():
             assert cls.stream_is_selected(stream), f"{name} is not selected."
 
+        metadatas = [
+            (stream["tap_stream_id"], metadata)
+            for _, stream in streams.items()
+            for metadata in stream["metadata"]
+        ]
+
         # all fields are selected
-        for stream, metadata in metadatas.items():
+        for stream, metadata in metadatas:
             field_metadata = metadata["metadata"]
-            assert cls.metadata_is_selected(
-                field_metadata
-            ), f"{stream}.{metadata['breadcrumb']} is not selected"
+            if field_metadata.get("inclusion") == "unsupported":
+                assert not cls.metadata_is_selected(
+                    field_metadata
+                ), f"{stream}.{metadata['breadcrumb']} is selected"
+            else:
+                assert cls.metadata_is_selected(
+                    field_metadata
+                ), f"{stream}.{metadata['breadcrumb']} is not selected"
 
     def test_visit(self, catalog, select_all_executor):
         visit(catalog, select_all_executor)
@@ -601,6 +630,7 @@ class TestListExecutor:
                 "created_at",
                 "id",
                 "active",
+                "unsupported",
                 "payload",
                 "payload.content",
                 "payload.hash",
