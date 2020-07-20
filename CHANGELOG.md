@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2174](https://gitlab.com/meltano/meltano/-/issues/2174) Add `/api/health` health check route
 - [#2125](https://gitlab.com/meltano/meltano/-/issues/2125) Add `--full-refresh` flag to `meltano elt` to perform a full refresh, ignoring the state left behind by any previous runs with the same job ID.
+- [#2181](https://gitlab.com/meltano/meltano/-/issues/2181) Show custom Meltano UI logo (`ui.logo_url` setting) on sign-in page when authentication is enabled.
 
 ### Changes
 
