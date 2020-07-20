@@ -171,6 +171,10 @@ class PluginInstall(HookObject, Canonical, PluginRef):
     def runner(self):
         return None
 
+    @property
+    def extra_settings(self):
+        return []
+
     def is_custom(self):
         return self.namespace is not None
 
@@ -196,10 +200,19 @@ class PluginInstall(HookObject, Canonical, PluginRef):
 
     @property
     def current_config(self):
-        if self.current_profile is Profile.DEFAULT:
-            return self.config
+        return (
+            self.config
+            if self.current_profile is Profile.DEFAULT
+            else self.current_profile.config
+        )
 
-        return self.current_profile.config
+    @property
+    def current_extras(self):
+        return (
+            self.extras
+            if self.current_profile is Profile.DEFAULT
+            else self.current_profile.extras
+        )
 
     def exec_args(self, files: Dict):
         return []

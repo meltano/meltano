@@ -214,7 +214,7 @@ class TestPluginSettingsService:
         self, session, project, custom_tap, plugin_settings_service_factory
     ):
         subject = plugin_settings_service_factory(custom_tap)
-        assert subject.as_dict(session=session) == custom_tap.config
+        assert subject.as_dict(extras=False, session=session) == custom_tap.config
 
     def test_as_dict_redacted(self, subject, session, tap):
         store = SettingValueStore.DB

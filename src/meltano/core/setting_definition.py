@@ -64,6 +64,10 @@ class SettingDefinition(NameEq, Canonical):
         return cls(name=key, kind=kind, custom=True)
 
     @property
+    def is_extra(self):
+        return self.name.startswith("_")
+
+    @property
     def is_redacted(self):
         return self.kind in ("password", "oauth")
 

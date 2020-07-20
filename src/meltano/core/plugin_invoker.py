@@ -73,6 +73,7 @@ class PluginInvoker:
         self._prepared = False
         self.plugin_config = {}
         self.plugin_config_processed = {}
+        self.plugin_config_extras = {}
         self.plugin_config_env = {}
 
     @property
@@ -94,11 +95,18 @@ class PluginInvoker:
         }
 
     def prepare(self, session):
-        self.plugin_config = self.settings_service.as_dict(session=session)
-        self.plugin_config_processed = self.settings_service.as_dict(
-            process=True, session=session
+        self.plugin_config = self.settings_service.as_dict(
+            extras=False, session=session
         )
-        self.plugin_config_env = self.settings_service.as_env(session=session)
+        self.plugin_config_processed = self.settings_service.as_dict(
+            extras=False, process=True, session=session
+        )
+        self.plugin_config_extras = self.settings_service.as_dict(
+            extras=True, session=session
+        )
+        self.plugin_config_env = self.settings_service.as_env(
+            extras=False, session=session
+        )
 
         with self.plugin.trigger_hooks("configure", self, session):
             self.config_service.configure()
