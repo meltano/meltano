@@ -159,6 +159,14 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
+        # Verify that array settings set in env are cast correctly
+        monkeypatch.setenv(env_var(subject, "list"), '[1, 2, 3, "4"]')
+
+        assert subject.get_with_source("list", session=session) == (
+            [1, 2, 3, "4"],
+            SettingValueStore.ENV,
+        )
+
         # Verify that boolean settings set in env are cast correctly
         # Default
         assert subject.get_with_source("boolean", session=session) == (
