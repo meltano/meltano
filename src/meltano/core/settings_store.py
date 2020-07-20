@@ -2,6 +2,7 @@ import sqlalchemy
 import logging
 import dotenv
 from abc import ABC, abstractmethod
+from copy import deepcopy
 from enum import Enum
 from typing import List
 from contextlib import contextmanager
@@ -291,10 +292,11 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
 
     @contextmanager
     def update_config(self):
-        yield self.settings_service._meltano_yml_config
+        config = deepcopy(self.settings_service._meltano_yml_config)
+        yield config
 
         try:
-            self.settings_service._update_meltano_yml_config()
+            self.settings_service._update_meltano_yml_config(config)
         except ProjectReadonly as err:
             raise StoreNotSupportedError(err)
 

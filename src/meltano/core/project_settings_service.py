@@ -42,8 +42,8 @@ class ProjectSettingsService(SettingsService):
     def _meltano_yml_config(self):
         return self.config_service.current_config
 
-    def _update_meltano_yml_config(self):
-        self.config_service.update_config()
+    def _update_meltano_yml_config(self, config):
+        self.config_service.update_config(config)
 
     def get_with_metadata(self, name: str, *args, **kwargs):
         value, metadata = super().get_with_metadata(name, *args, **kwargs)

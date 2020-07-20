@@ -40,8 +40,8 @@ class DummySettingsService(SettingsService):
     def _meltano_yml_config(self):
         return self.__meltano_yml_config
 
-    def _update_meltano_yml_config(self):
-        pass
+    def _update_meltano_yml_config(self, config):
+        self.__meltano_yml_config = config
 
 
 @pytest.fixture()

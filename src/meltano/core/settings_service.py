@@ -57,7 +57,7 @@ class SettingsService(ABC):
         pass
 
     @abstractmethod
-    def _update_meltano_yml_config(self):
+    def _update_meltano_yml_config(self, config):
         pass
 
     @property

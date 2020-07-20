@@ -85,8 +85,17 @@ class PluginSettingsService(SettingsService):
         except PluginMissingError:
             return {}
 
-    def _update_meltano_yml_config(self):
-        self.config_service.update_plugin(self.plugin_install)
+    def _update_meltano_yml_config(self, config):
+        try:
+            plugin_install = self.plugin_install
+        except PluginMissingError:
+            return
+
+        current_config = plugin_install.current_config
+        current_config.clear()
+        current_config.update(config)
+
+        self.config_service.update_plugin(plugin_install)
 
     def profile_with_config(self, profile: Profile, **kwargs):
         self.plugin_install.use_profile(profile)
