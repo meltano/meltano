@@ -4,6 +4,7 @@ import logging
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginLacksCapabilityError
+from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
 from .project import Project
@@ -21,6 +22,13 @@ class SelectService:
     @property
     def extractor(self):
         return self._extractor
+
+    @property
+    def current_select(self):
+        plugin_settings_service = PluginSettingsService(
+            self.project, self.extractor, config_service=self.config
+        )
+        return plugin_settings_service.get("_select")
 
     def load_schema(self, session):
         invoker = invoker_factory(

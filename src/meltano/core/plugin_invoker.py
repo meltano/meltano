@@ -82,10 +82,6 @@ class PluginInvoker:
         return frozenset(self.plugin_def.capabilities)
 
     @property
-    def select(self):
-        return self.plugin.select or self.plugin_def.select or ["*.*"]
-
-    @property
     def files(self):
         plugin_files = {**self.plugin.config_files, **self.plugin.output_files}
 

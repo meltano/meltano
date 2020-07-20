@@ -8,7 +8,7 @@ from meltano.cli import cli
 
 
 class TestCliConfig:
-    def test_config_json(self, project, cli_runner, tap, plugin_discovery_service):
+    def test_config(self, project, cli_runner, tap, plugin_discovery_service):
         with mock.patch(
             "meltano.core.plugin.settings_service.PluginDiscoveryService",
             return_value=plugin_discovery_service,
@@ -18,6 +18,17 @@ class TestCliConfig:
 
             json_config = json.loads(result.stdout)
             assert json_config["test"] == "mock"
+
+    def test_config_extras(self, project, cli_runner, tap, plugin_discovery_service):
+        with mock.patch(
+            "meltano.core.plugin.settings_service.PluginDiscoveryService",
+            return_value=plugin_discovery_service,
+        ):
+            result = cli_runner.invoke(cli, ["config", "--extras", tap.name])
+            assert_cli_runner(result)
+
+            json_config = json.loads(result.stdout)
+            assert "_select" in json_config
 
     def test_config_env(self, project, cli_runner, tap, plugin_discovery_service):
         with mock.patch(

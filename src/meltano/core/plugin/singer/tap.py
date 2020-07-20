@@ -4,6 +4,7 @@ import subprocess
 from typing import Dict
 from jsonschema import Draft4Validator
 
+from meltano.core.setting_definition import SettingDefinition
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.utils import file_has_data, truthy, flatten
@@ -49,6 +50,10 @@ def config_metadata_rules(config):
 
 class SingerTap(SingerPlugin):
     __plugin_type__ = PluginType.EXTRACTORS
+
+    @property
+    def extra_settings(self):
+        return [SettingDefinition(name="_select", kind="array", value=["*.*"])]
 
     def exec_args(self, plugin_invoker):
         """
@@ -159,9 +164,11 @@ class SingerTap(SingerPlugin):
             with properties_file.open() as catalog:
                 schema = json.load(catalog)
 
+            config = plugin_invoker.plugin_config_extras
+
             metadata_rules = [
                 *select_metadata_rules(["!*.*"]),
-                *select_metadata_rules(plugin_invoker.select),
+                *select_metadata_rules(config["_select"]),
                 *config_metadata_rules(plugin_invoker.plugin_config),
             ]
 
