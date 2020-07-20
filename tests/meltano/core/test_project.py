@@ -111,7 +111,7 @@ class TestProject:
 
         meltano = project.meltano
         for key, val in ((k, v) for payload in payloads for k, v in payload.items()):
-            assert meltano.config[key] == val
+            assert meltano.extras[key] == val
 
 
 class TestIncompatibleProject:

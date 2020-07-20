@@ -62,7 +62,7 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
     success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
 
     for plugin in plugins:  # TODO: Only works on Plugin from discovery...
-        docs_link = plugin._extras.get("docs")
+        docs_link = plugin.extras.get("docs")
         if docs_link:
             click.echo(
                 f"For more details about {plugin.type.descriptor} '{plugin.name}', visit {docs_link}"

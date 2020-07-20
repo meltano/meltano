@@ -58,7 +58,7 @@ class TransformAddService:
 
         dbt_project_yaml = yaml.safe_load(self.dbt_project_file.open())
 
-        dbt_project_yaml["models"][model_name] = plugin._extras
+        dbt_project_yaml["models"][model_name] = plugin.extras or plugin_def.extras
 
         with open(self.dbt_project_file, "w") as f:
             f.write(

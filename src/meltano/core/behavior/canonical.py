@@ -76,7 +76,10 @@ class Canonical(object):
             if isinstance(v, Canonical) and not dict(v):
                 continue
 
-            yield (k, v)
+            if k == "extras":
+                yield from v.items()
+            else:
+                yield (k, v)
 
     def __len__(self):
         return len(self.__dict__)

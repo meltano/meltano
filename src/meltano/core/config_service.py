@@ -36,11 +36,11 @@ class ConfigService:
 
     @property
     def current_config(self):
-        return self.project.meltano.config
+        return self.project.meltano.extras
 
     def update_config(self, config):
         with self.project.meltano_update() as meltano:
-            meltano.config = config
+            meltano.extras = config
 
     def make_meltano_secret_dir(self):
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
