@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#2175](https://gitlab.com/meltano/meltano/-/issues/2175) Clarify that not supporting discovery mode means that the `state` capability is not advertised
+- [#2195](https://gitlab.com/meltano/meltano/-/issues/2195) Slightly increase size of custom Meltano UI logo (`ui.logo_url`) in navbar
 
 ### Fixes
 

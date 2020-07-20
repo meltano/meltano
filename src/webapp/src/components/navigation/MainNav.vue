@@ -398,10 +398,6 @@ export default {
 }
 .navbar-brand .navbar-item {
   padding: 0 1.75rem 0 1.25rem;
-
-  img {
-    max-height: 1.5rem;
-  }
 }
 .navbar.is-transparent {
   background-color: transparent;
