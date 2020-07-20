@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.41.0 - (2020-07-20)
+---
+
+### New
+
 - [#2174](https://gitlab.com/meltano/meltano/-/issues/2174) Add `/api/health` health check route
 - [#2125](https://gitlab.com/meltano/meltano/-/issues/2125) Add `--full-refresh` flag to `meltano elt` to perform a full refresh, ignoring the state left behind by any previous runs with the same job ID.
 - [#2181](https://gitlab.com/meltano/meltano/-/issues/2181) Show custom Meltano UI logo (`ui.logo_url` setting) on sign-in page when authentication is enabled.
@@ -22,8 +34,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#2168](https://gitlab.com/meltano/meltano/-/issues/2168) Don't select entity attributes marked as unsupported
-
-### Breaks
 
 
 ## 1.40.1 - (2020-07-16)
