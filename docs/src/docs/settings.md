@@ -519,7 +519,7 @@ These settings can be used to customize certain aspects of [Meltano UI](/docs/co
 - Environment variable: `MELTANO_UI_LOGO_URL`
 - Default: None
 
-Customize the logo shown in the top left of the Meltano UI interface.
+Customize the logo used by Meltano UI in the navigation bar and on the sign-in page (when the [`ui.authentication` setting](#ui-authentication) is enabled).
 
 #### How to use
 
