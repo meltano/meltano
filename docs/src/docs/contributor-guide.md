@@ -214,6 +214,7 @@ Each extractor (tap) and loader (target) in the `discovery.yml` has a `settings`
       protected: true # Optional (use in combination with `value` to provide an uneditable default)
       env: SOME_API_KEY # Optional (use to delegate to an environment variable for overriding this setting's value)
       env_aliases: [OTHER_ENV] # Optional (use to delegate alternative environment variables for overriding this setting's value)
+      value_processor: "nest_object" # Optional (use with `kind: object` to automatically nest flattened keys)
 ```
 
 ##### Protected settings
