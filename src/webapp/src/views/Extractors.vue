@@ -12,22 +12,15 @@ export default {
   },
   data() {
     return {
-      hasInstalled: false,
       isLoading: true
     }
   },
   computed: {
-    ...mapGetters('plugins', ['getIsPluginInstalled', 'visibleExtractors']),
-    getAvailableExtractors() {
-      return this.visibleExtractors.filter(
-        ({ name }) => !this.getIsPluginInstalled('extractors', name)
-      )
-    },
-    getInstalledExtractors() {
-      return this.visibleExtractors.filter(({ name }) =>
-        this.getIsPluginInstalled('extractors', name)
-      )
-    },
+    ...mapGetters('plugins', [
+      'availableExtractors',
+      'getIsPluginInstalled',
+      'installedExtractors'
+    ]),
     getModalName() {
       return this.$route.name
     },
@@ -56,20 +49,20 @@ export default {
 
       <div class="columns">
         <div class="column">
-          <div class="box">
+          <div class="box content">
             <progress
               v-if="isLoading"
               class="progress is-small is-info"
             ></progress>
             <template v-else>
-              <template v-if="getInstalledExtractors.length">
-                <h3 class="has-text-weight-bold">Installed</h3>
-                <hr />
-                <ExtractorList :items="getInstalledExtractors" />
+              <template v-if="installedExtractors.length">
+                <h3 class="title">Installed Extractors</h3>
+                <ExtractorList :items="installedExtractors" />
               </template>
-              <h3 class="has-text-weight-bold">Available</h3>
-              <hr />
-              <ExtractorList :items="getAvailableExtractors" />
+              <template v-if="availableExtractors.length">
+                <h3 class="title">Available Extractors</h3>
+                <ExtractorList :items="availableExtractors" />
+              </template>
               <hr />
               <div class="columns is-vcentered">
                 <div class="column">

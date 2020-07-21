@@ -26,6 +26,13 @@ const defaultState = utils.deepFreeze({
 })
 
 const getters = {
+  availableExtractors(state) {
+    return pluginUtils.filterAvailablePlugins({
+      installedPlugins: state.installedPlugins.extractors,
+      pluginList: state.plugins.extractors
+    })
+  },
+
   getHasDefaultTransforms(state) {
     return namespace =>
       state.plugins.transforms.find(
@@ -122,6 +129,10 @@ const getters = {
       )
       return [plugin.name, ...pluginProfiles]
     }
+  },
+
+  installedExtractors(state) {
+    return state.installedPlugins.extractors
   },
 
   visibleExtractors(state) {

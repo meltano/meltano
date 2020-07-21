@@ -6,11 +6,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## Unreleased
-- [#2070](https://gitlab.com/meltano/meltano/issues/2070) List installed and available extractors separately on Extractors page
+---
 
 ### New
 
 ### Changes
+- [#2070](https://gitlab.com/meltano/meltano/issues/2070) List installed and available extractors separately on Extractors page
 
 ### Fixes
 

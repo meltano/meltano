@@ -16,14 +16,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('plugins', ['getIsPluginInstalled', 'visibleExtractors']),
+    ...mapGetters('plugins', ['getIsPluginInstalled']),
     ...mapGetters('orchestration', [
       'getHasPipelineWithExtractor',
       'getPipelinesWithExtractor'
     ]),
     ...mapState('orchestration', ['pipelines']),
     getColumns() {
-      const length = this.visibleExtractors.length
+      const length = this.items.length
       const halfLength = length / 2
       const columnOneLength = Math.ceil(halfLength)
       const columnOne = this.items.slice(0, columnOneLength)
