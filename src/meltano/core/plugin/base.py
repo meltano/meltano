@@ -26,8 +26,8 @@ yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
 
 
 class Profile(NameEq, Canonical):
-    def __init__(self, name: str = None, label: str = None, config={}):
-        super().__init__(name=name, label=label, config=config)
+    def __init__(self, name: str = None, label: str = None, config={}, **extras):
+        super().__init__(name=name, label=label, config=config, extras=extras)
 
 
 Profile.DEFAULT = Profile(name="default", label="Default")
@@ -136,7 +136,7 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         select: list = [],
         config={},
         profiles: list = [],
-        **attrs,
+        **extras,
     ):
         super().__init__(
             plugin_type,
@@ -151,11 +151,9 @@ class PluginInstall(HookObject, Canonical, PluginRef):
             settings=list(map(SettingDefinition.parse, settings)),
             select=list(select),
             config=copy.deepcopy(config),
+            extras=extras,
             profiles=list(map(Profile.parse, profiles)),
-            **attrs,
         )
-
-        self._extras = attrs
 
     def is_installable(self):
         return self.pip_url is not None
@@ -247,7 +245,7 @@ class Plugin(Canonical, PluginRef):
         settings_group_validation: list = [],
         settings: list = [],
         select: list = [],
-        **attrs,
+        **extras,
     ):
         super().__init__(
             plugin_type,
@@ -263,22 +261,19 @@ class Plugin(Canonical, PluginRef):
             settings_group_validation=list(settings_group_validation),
             settings=list(map(SettingDefinition.parse, settings)),
             select=list(select),
-            **attrs,
+            extras=extras,
         )
 
-        self._extras = attrs
-
     def as_installed(self, custom=False) -> PluginInstall:
-        extras = self._extras.copy()
+        extras = {}
         if custom:
-            extras.update(
-                {
-                    "namespace": self.namespace,
-                    "capabilities": self.capabilities,
-                    "settings": self.settings,
-                }
-            )
+            extras = {
+                "namespace": self.namespace,
+                "capabilities": self.capabilities,
+                "settings": self.settings,
+                **self.extras,
+            }
 
         return PluginInstall(
-            self.type, self.name, pip_url=self.pip_url, select=self.select, **extras
+            self.type, self.name, select=self.select, pip_url=self.pip_url, **extras
         )

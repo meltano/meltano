@@ -26,12 +26,10 @@ class PluginSettingsService(SettingsService):
 
         self.plugin = plugin
 
-        discovery_service = plugin_discovery_service or PluginDiscoveryService(
+        self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
             self.project, config_service=self.config_service
         )
-        self.plugin_def = discovery_service.find_plugin(
-            self.plugin.type, self.plugin.name
-        )
+        self._plugin_def = None
         self._plugin_install = None
 
         project_settings_service = ProjectSettingsService(
@@ -45,9 +43,26 @@ class PluginSettingsService(SettingsService):
         }
 
     @property
+    def plugin_def(self):
+        if self._plugin_def is None:
+            self._plugin_def = (
+                self.plugin
+                if isinstance(self.plugin, Plugin)
+                else self.discovery_service.find_plugin(
+                    self.plugin.type, self.plugin.name
+                )
+            )
+
+        return self._plugin_def
+
+    @property
     def plugin_install(self):
         if self._plugin_install is None:
-            self._plugin_install = self.config_service.get_plugin(self.plugin)
+            self._plugin_install = (
+                self.plugin
+                if isinstance(self.plugin, PluginInstall)
+                else self.config_service.get_plugin(self.plugin)
+            )
 
         return self._plugin_install
 
@@ -70,8 +85,17 @@ class PluginSettingsService(SettingsService):
         except PluginMissingError:
             return {}
 
-    def _update_meltano_yml_config(self):
-        self.config_service.update_plugin(self.plugin_install)
+    def _update_meltano_yml_config(self, config):
+        try:
+            plugin_install = self.plugin_install
+        except PluginMissingError:
+            return
+
+        current_config = plugin_install.current_config
+        current_config.clear()
+        current_config.update(config)
+
+        self.config_service.update_plugin(plugin_install)
 
     def profile_with_config(self, profile: Profile, **kwargs):
         self.plugin_install.use_profile(profile)

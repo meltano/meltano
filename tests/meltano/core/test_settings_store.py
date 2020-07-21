@@ -40,8 +40,8 @@ class DummySettingsService(SettingsService):
     def _meltano_yml_config(self):
         return self.__meltano_yml_config
 
-    def _update_meltano_yml_config(self):
-        pass
+    def _update_meltano_yml_config(self, config):
+        self.__meltano_yml_config = config
 
 
 @pytest.fixture()
@@ -77,7 +77,9 @@ def unsupported():
 @pytest.fixture()
 def set_value_store(subject):
     def _set_value_store(value, store, name="regular"):
-        subject.manager_for(store).set(name, [name], value)
+        subject.manager_for(store).set(
+            name, [name], value, setting_def=subject.find_setting(name)
+        )
 
     return _set_value_store
 
@@ -85,7 +87,7 @@ def set_value_store(subject):
 @pytest.fixture()
 def assert_value_source(subject):
     def _assert_value_source(value, source, name="regular"):
-        value, metadata = subject.get(name)
+        value, metadata = subject.get(name, setting_def=subject.find_setting(name))
         assert value == value
         assert metadata["source"] == source
 

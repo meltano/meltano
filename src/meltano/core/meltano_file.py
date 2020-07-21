@@ -14,17 +14,15 @@ VERSION = 1
 
 
 class MeltanoFile(Canonical):
-    def __init__(self, **attrs):
-        version = int(attrs.pop("version", VERSION))
-        plugins = self.load_plugins(attrs.pop("plugins", {}))
-        schedules = self.load_schedules(attrs.pop("schedules", []))
-
+    def __init__(
+        self, version: int = VERSION, plugins={}, schedules: list = [], **extras
+    ):
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
             version=version,
-            config=attrs,
-            plugins=plugins,
-            schedules=schedules,
+            extras=extras,
+            plugins=self.load_plugins(plugins),
+            schedules=self.load_schedules(schedules),
         )
 
     def load_plugins(self, plugins) -> Canonical:
@@ -45,10 +43,3 @@ class MeltanoFile(Canonical):
 
     def load_schedules(self, schedules) -> List[Schedule]:
         return list(map(Schedule.parse, schedules))
-
-    def __iter__(self):
-        for k, v in super().__iter__():
-            if k == "config":
-                yield from v.items()
-            else:
-                yield (k, v)

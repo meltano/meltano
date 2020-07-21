@@ -25,8 +25,6 @@ class ConfigService:
 
         self._settings = None
 
-        self._current_config = None
-
     @property
     def settings(self):
         if self._settings is None:
@@ -38,14 +36,11 @@ class ConfigService:
 
     @property
     def current_config(self):
-        if self._current_config is None:
-            self._current_config = deepcopy(self.project.meltano.config)
+        return self.project.meltano.extras
 
-        return self._current_config
-
-    def update_config(self):
+    def update_config(self, config):
         with self.project.meltano_update() as meltano:
-            meltano.config = self.current_config
+            meltano.extras = config
 
     def make_meltano_secret_dir(self):
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
