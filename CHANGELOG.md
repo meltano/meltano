@@ -22,6 +22,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Replace `update.*` file bundle settings with `update` extra (aka `_update` setting)
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Replace `metadata.*` extractor settings with `metadata` extra (aka `_metadata` setting)
+- [#1764](https://gitlab.com/meltano/meltano/-/merge_requests/1764) Interpret `meltano config <plugin> set` value as JSON to allow non-string values to be set more easily
 
 ### Fixes
 
