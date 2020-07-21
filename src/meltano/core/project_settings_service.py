@@ -5,6 +5,7 @@ from meltano.core.settings_service import (
     SettingMissingError,
     SettingValueStore,
 )
+from meltano.core.utils import nest_object
 
 UI_CFG_SETTINGS = {
     "ui.server_name": "SERVER_NAME",
@@ -44,6 +45,9 @@ class ProjectSettingsService(SettingsService):
 
     def _update_meltano_yml_config(self, config):
         self.config_service.update_config(config)
+
+    def _process_config(self, config):
+        return nest_object(config)
 
     def get_with_metadata(self, name: str, *args, **kwargs):
         value, metadata = super().get_with_metadata(name, *args, **kwargs)

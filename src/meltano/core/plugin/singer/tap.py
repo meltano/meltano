@@ -4,9 +4,9 @@ import subprocess
 from typing import Dict
 from jsonschema import Draft4Validator
 
-from meltano.core.utils import file_has_data, truthy
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
+from meltano.core.utils import file_has_data, truthy, flatten
 
 from . import SingerPlugin, PluginType
 from .catalog import (

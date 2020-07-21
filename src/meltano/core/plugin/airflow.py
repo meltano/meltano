@@ -50,6 +50,12 @@ class Airflow(PluginInstall):
     def config_files(self):
         return {"config": "airflow.cfg"}
 
+    def process_config(self, flat_config):
+        config = {}
+        for key, value in flat_config.items():
+            nest(config, key, str(value))
+        return config
+
     @hook("before_install")
     def setup_env(self, project, reason):
         # to make airflow installables without GPL dependency
@@ -86,10 +92,7 @@ class Airflow(PluginInstall):
             airflow_cfg.read_file(cfg)
             logging.debug(f"Loaded '{str(airflow_cfg_path)}'")
 
-        config = {}
-        for key, value in invoker.plugin_config.items():
-            nest(config, key, str(value))
-
+        config = invoker.plugin_config_processed
         for section, cfg in config.items():
             airflow_cfg[section].update(cfg)
             logging.debug(f"\tUpdated section [{section}] with {cfg}")

@@ -97,6 +97,9 @@ class PluginSettingsService(SettingsService):
 
         self.config_service.update_plugin(plugin_install)
 
+    def _process_config(self, config):
+        return self.plugin_install.process_config(config)
+
     def profile_with_config(self, profile: Profile, **kwargs):
         self.plugin_install.use_profile(profile)
 

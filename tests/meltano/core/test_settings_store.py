@@ -43,6 +43,9 @@ class DummySettingsService(SettingsService):
     def _update_meltano_yml_config(self, config):
         self.__meltano_yml_config = config
 
+    def _process_config(self, config):
+        return config
+
 
 @pytest.fixture()
 def dummy_settings_service(project):
