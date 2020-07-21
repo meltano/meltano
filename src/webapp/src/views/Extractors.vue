@@ -1,5 +1,5 @@
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 import ExtractorList from '@/components/pipelines/ExtractorList'
 import RouterViewLayout from '@/views/RouterViewLayout'
@@ -12,10 +12,22 @@ export default {
   },
   data() {
     return {
+      hasInstalled: false,
       isLoading: true
     }
   },
   computed: {
+    ...mapGetters('plugins', ['getIsPluginInstalled', 'visibleExtractors']),
+    getAvailableExtractors() {
+      return this.visibleExtractors.filter(
+        ({ name }) => !this.getIsPluginInstalled('extractors', name)
+      )
+    },
+    getInstalledExtractors() {
+      return this.visibleExtractors.filter(({ name }) =>
+        this.getIsPluginInstalled('extractors', name)
+      )
+    },
     getModalName() {
       return this.$route.name
     },
@@ -50,7 +62,14 @@ export default {
               class="progress is-small is-info"
             ></progress>
             <template v-else>
-              <ExtractorList />
+              <template v-if="getInstalledExtractors.length">
+                <h3 class="has-text-weight-bold">Installed</h3>
+                <hr />
+                <ExtractorList :items="getInstalledExtractors" />
+              </template>
+              <h3 class="has-text-weight-bold">Available</h3>
+              <hr />
+              <ExtractorList :items="getAvailableExtractors" />
               <hr />
               <div class="columns is-vcentered">
                 <div class="column">

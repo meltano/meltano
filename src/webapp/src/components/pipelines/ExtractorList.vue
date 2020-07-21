@@ -9,6 +9,12 @@ export default {
   components: {
     ConnectorLogo
   },
+  props: {
+    items: {
+      type: Array,
+      required: true
+    }
+  },
   computed: {
     ...mapGetters('plugins', ['getIsPluginInstalled', 'visibleExtractors']),
     ...mapGetters('orchestration', [
@@ -20,8 +26,8 @@ export default {
       const length = this.visibleExtractors.length
       const halfLength = length / 2
       const columnOneLength = Math.ceil(halfLength)
-      const columnOne = this.visibleExtractors.slice(0, columnOneLength)
-      const columnTwo = this.visibleExtractors.slice(columnOneLength, length)
+      const columnOne = this.items.slice(0, columnOneLength)
+      const columnTwo = this.items.slice(columnOneLength, length)
       return [columnOne, columnTwo]
     },
     getConnectionLabel() {
