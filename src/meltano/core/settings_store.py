@@ -58,15 +58,12 @@ class SettingValueStore(str, Enum):
     def writable(self):
         return self.manager.writable
 
-    def can_overwrite(self, source):
-        if not self.writable:
-            return False
-
-        if source is self:
-            return True
-
+    def overrides(self, source):
         stores_list = list(self.__class__)
-        return stores_list.index(self) <= stores_list.index(source)
+        return stores_list.index(self) < stores_list.index(source)
+
+    def can_overwrite(self, source):
+        return self.writable and (source is self or self.overrides(source))
 
 
 class SettingsStoreManager(ABC):

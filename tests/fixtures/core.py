@@ -45,6 +45,11 @@ def discovery():
                 {"name": "secure", "kind": "password"},
                 {"name": "port", "kind": "integer", "value": 5000},
                 {"name": "list", "kind": "array", "value": []},
+                {
+                    "name": "object",
+                    "kind": "object",
+                    "value": {"nested": "from_default"},
+                },
                 {"name": "hidden", "kind": "hidden", "value": 42},
                 {
                     "name": "boolean",

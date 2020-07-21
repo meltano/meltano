@@ -95,6 +95,10 @@ class SettingDefinition(NameEq, Canonical):
                 return truthy(value)
             elif self.kind == "integer":
                 return int(value)
+            elif self.kind == "object":
+                value = json.loads(value)
+                if not isinstance(value, dict):
+                    raise ValueError(f"JSON value '{value}' is not an object")
             elif self.kind == "array":
                 value = json.loads(value)
                 if not isinstance(value, list):

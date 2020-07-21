@@ -167,6 +167,14 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
+        # Verify that object settings set in env are cast correctly
+        monkeypatch.setenv(env_var(subject, "object"), '{"1":{"2":3}}')
+
+        assert subject.get_with_source("object", session=session) == (
+            {"1": {"2": 3}},
+            SettingValueStore.ENV,
+        )
+
         # Verify that boolean settings set in env are cast correctly
         # Default
         assert subject.get_with_source("boolean", session=session) == (
@@ -445,6 +453,57 @@ class TestPluginSettingsService:
             False,
             SettingValueStore.ENV,
         )
+
+    def test_kind_object(self, subject, tap, monkeypatch, env_var):
+        assert subject.get_with_source("object") == (
+            {"nested": "from_default"},
+            SettingValueStore.DEFAULT,
+        )
+
+        subject.set("object.username", "from_meltano_yml")
+
+        assert subject.get_with_source("object") == (
+            {"username": "from_meltano_yml"},
+            SettingValueStore.MELTANO_YML,
+        )
+
+        subject.set(["object", "password"], "from_meltano_yml")
+
+        assert subject.get_with_source("object") == (
+            {"username": "from_meltano_yml", "password": "from_meltano_yml"},
+            SettingValueStore.MELTANO_YML,
+        )
+
+        subject.set(["object", "deep", "nesting"], "from_meltano_yml")
+
+        assert subject.get_with_source("object") == (
+            {
+                "username": "from_meltano_yml",
+                "password": "from_meltano_yml",
+                "deep.nesting": "from_meltano_yml",
+            },
+            SettingValueStore.MELTANO_YML,
+        )
+
+        monkeypatch.setenv(env_var(subject, "object.deep.nesting"), "from_env")
+
+        assert subject.get_with_source("object") == (
+            {
+                "username": "from_meltano_yml",
+                "password": "from_meltano_yml",
+                "deep.nesting": "from_env",
+            },
+            SettingValueStore.ENV,
+        )
+
+        monkeypatch.setenv(env_var(subject, "object"), '{"foo":"bar"}')
+
+        assert subject.get_with_source("object") == (
+            {"foo": "bar"},
+            SettingValueStore.ENV,
+        )
+
+        pass
 
     def test_extra(self, subject, tap, monkeypatch, env_var):
         assert "_select" in subject.as_dict()

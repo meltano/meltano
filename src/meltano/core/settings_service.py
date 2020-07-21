@@ -80,9 +80,7 @@ class SettingsService(ABC):
 
         return {k: v for k, v in values.items() if v != REDACTED_VALUE}
 
-    def config_with_metadata(
-        self, sources: List[SettingValueStore] = None, extras=None, **kwargs
-    ):
+    def config_with_metadata(self, prefix=None, extras=None, **kwargs):
         config = {}
         for setting_def in self.definitions():
             if (extras is True and not setting_def.is_extra) or (
@@ -90,15 +88,17 @@ class SettingsService(ABC):
             ):
                 continue
 
+            if prefix and not setting_def.name.startswith(prefix):
+                continue
+
             value, metadata = self.get_with_metadata(
                 setting_def.name, setting_def=setting_def, **kwargs
             )
 
-            source = metadata["source"]
-            if sources and source not in sources:
-                continue
-
             name = setting_def.name
+            if prefix:
+                name = name[len(prefix) :]
+
             config[name] = {**metadata, "value": value}
 
         return config
@@ -147,6 +147,25 @@ class SettingsService(ABC):
         metadata.update(get_metadata)
 
         if setting_def:
+            if (
+                setting_def.kind == "object"
+                and metadata["source"] is SettingValueStore.DEFAULT
+            ):
+                object_value = {}
+                object_source = SettingValueStore.DEFAULT
+                flat_config_metadata = self.config_with_metadata(
+                    source=source, prefix=f"{setting_def.name}."
+                )
+                for nested_key, config_metadata in flat_config_metadata.items():
+                    object_value[nested_key] = config_metadata["value"]
+
+                    nested_source = config_metadata["source"]
+                    if nested_source.overrides(object_source):
+                        object_source = nested_source
+
+                if object_value:
+                    value = object_value
+                    metadata["source"] = object_source
 
             cast_value = setting_def.cast_value(value)
             if cast_value != value:
