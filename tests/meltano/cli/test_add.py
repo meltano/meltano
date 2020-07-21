@@ -1,6 +1,7 @@
 import os
 import pytest
 import functools
+import yaml
 from unittest import mock
 
 from asserts import assert_cli_runner
@@ -122,14 +123,20 @@ class TestCliAdd:
         res = cli_runner.invoke(cli, ["add", "transform", "tap-google-analytics"])
         assert_cli_runner(res)
 
-        assert (
-            "dbt-tap-google-analytics"
-            in project.root_dir("transform/packages.yml").open().read()
-        )
-        assert (
-            "tap_google_analytics"
-            in project.root_dir("transform/dbt_project.yml").open().read()
-        )
+        with project.root_dir("transform/packages.yml").open() as packages_file:
+            packages_yaml = yaml.safe_load(packages_file)
+
+        with project.root_dir("transform/dbt_project.yml").open() as project_file:
+            project_yaml = yaml.safe_load(project_file)
+
+        assert {
+            "git": "https://gitlab.com/meltano/dbt-tap-google-analytics.git"
+        } in packages_yaml["packages"]
+
+        assert "tap_google_analytics" in project_yaml["models"]
+        assert project_yaml["models"]["tap_google_analytics"] == {
+            "vars": {"schema": "{{ env_var('DBT_SOURCE_SCHEMA') }}"}
+        }
 
     def test_add_dashboard(self, project, cli_runner):
         def install():

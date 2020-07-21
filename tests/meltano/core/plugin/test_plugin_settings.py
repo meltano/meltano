@@ -592,3 +592,67 @@ class TestPluginSettingsService:
             ["from_env"],
             SettingValueStore.ENV,
         )
+
+    def test_extra_object(
+        self,
+        subject,
+        monkeypatch,
+        env_var,
+        project_add_service,
+        plugin_settings_service_factory,
+    ):
+        try:
+            transform = project_add_service.add(
+                PluginType.TRANSFORMS, "tap-mock-transform"
+            )
+        except PluginAlreadyAddedException as err:
+            transform = err.plugin
+
+        subject = plugin_settings_service_factory(transform)
+        assert "_vars" in subject.as_dict()
+        assert "_vars" in subject.as_dict(extras=True)
+        assert "_vars" not in subject.as_dict(extras=False)
+
+        assert subject.get_with_source("_vars") == ({}, SettingValueStore.DEFAULT)
+
+        monkeypatch.setitem(
+            subject.plugin_def.extras,
+            "vars",
+            {"var": "from_default", "other": "from_default"},
+        )
+        subject._setting_defs = None
+
+        assert subject.get_with_source("_vars") == (
+            {"var": "from_default", "other": "from_default"},
+            SettingValueStore.DEFAULT,
+        )
+
+        monkeypatch.setitem(
+            subject.plugin_install.extras, "vars", {"var": "from_meltano_yml"}
+        )
+
+        assert subject.get_with_source("_vars") == (
+            {"var": "from_meltano_yml", "other": "from_default"},
+            SettingValueStore.MELTANO_YML,
+        )
+
+        subject.set("_vars", {"other": "from_meltano_yml"})
+
+        assert subject.get_with_source("_vars") == (
+            {"var": "from_default", "other": "from_meltano_yml"},
+            SettingValueStore.MELTANO_YML,
+        )
+
+        monkeypatch.setenv(env_var(subject, "_vars.var"), "from_env")
+
+        assert subject.get_with_source("_vars") == (
+            {"var": "from_env", "other": "from_meltano_yml"},
+            SettingValueStore.ENV,
+        )
+
+        monkeypatch.setenv(env_var(subject, "_vars"), '{"var": "from_env"}')
+
+        assert subject.get_with_source("_vars") == (
+            {"var": "from_env"},
+            SettingValueStore.ENV,
+        )
