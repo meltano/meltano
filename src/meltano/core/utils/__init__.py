@@ -129,6 +129,13 @@ def nest(d: dict, path: str, value={}, maxsplit=-1, force=False):
     return cursor[tail]
 
 
+def nest_object(flat_object):
+    obj = {}
+    for key, value in flat_object.items():
+        nest(obj, key, value)
+    return obj
+
+
 def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
     """Wrapper arround `flatten_dict.flatten` that adds `dot` and `env_var` reducers."""
 

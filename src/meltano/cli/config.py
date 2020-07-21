@@ -43,17 +43,17 @@ def config(ctx, project, plugin_type, plugin_name, format):
     session = Session()
     try:
         if plugin:
-            settings = PluginSettingsService(project, plugin)
+            settings = PluginSettingsService(project, plugin, config_service=config)
         else:
-            settings = ProjectSettingsService(project)
+            settings = ProjectSettingsService(project, config_service=config)
 
         ctx.obj["settings"] = settings
         ctx.obj["session"] = session
 
         if ctx.invoked_subcommand is None:
             if format == "json":
-                config = settings.as_dict(session=session)
-                print(json.dumps(config))
+                config = settings.as_dict(process=True, session=session)
+                print(json.dumps(config, indent=4))
             elif format == "env":
                 for env, value in settings.as_env(session=session).items():
                     print(f"{env}={value}")

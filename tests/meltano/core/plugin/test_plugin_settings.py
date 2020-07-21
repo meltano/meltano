@@ -199,6 +199,17 @@ class TestPluginSettingsService:
             assert full_config.get(k) == v
             assert redacted_config.get(k) == v
 
+    def test_as_dict_process(self, subject, tap):
+        subject.set("auth.username", "nested_value")
+
+        config = subject.as_dict()
+        assert config["auth.username"] == "nested_value"
+        assert "auth" not in config
+
+        config = subject.as_dict(process=True)
+        assert config["auth"]["username"] == "nested_value"
+        assert "auth.username" not in config
+
     def test_as_dict_custom(
         self, session, project, custom_tap, plugin_settings_service_factory
     ):

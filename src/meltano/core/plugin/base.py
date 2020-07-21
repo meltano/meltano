@@ -222,6 +222,9 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         self.profiles.append(profile)
         return profile
 
+    def process_config(self, config):
+        return config
+
 
 class Plugin(Canonical, PluginRef):
     """
