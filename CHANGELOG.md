@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Replace `update.*` file bundle settings with `update` extra (aka `_update` setting)
 ### Fixes
 
 ### Breaks

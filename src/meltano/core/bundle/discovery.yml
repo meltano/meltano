@@ -862,17 +862,13 @@ files:
   - name: airflow
     namespace: airflow
     pip_url: git+https://gitlab.com/meltano/files-airflow.git
-    settings:
-      - name: update.orchestrate/dags/meltano.py
-        kind: boolean
-        value: True
+    update:
+      orchestrate/dags/meltano.py: True
   - name: dbt
     namespace: dbt
     pip_url: git+https://gitlab.com/meltano/files-dbt.git
-    settings:
-      - name: update.transform/profile/profiles.yml
-        kind: boolean
-        value: True
+    update:
+      transform/profile/profiles.yml: True
   - name: docker-compose
     namespace: docker_compose
     pip_url: git+https://gitlab.com/meltano/files-docker-compose.git

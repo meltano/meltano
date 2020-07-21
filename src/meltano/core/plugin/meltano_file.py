@@ -20,5 +20,5 @@ class MeltanoFilePlugin(FilePlugin):
             file_contents["discovery.yml"] = bundle.find("discovery.yml").read_text()
         return file_contents
 
-    def plugin_config(self, project):
+    def update_config(self, project):
         return {}

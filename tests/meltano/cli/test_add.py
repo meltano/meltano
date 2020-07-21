@@ -164,12 +164,7 @@ class TestCliAdd:
         assert len(reports_service.get_reports()) == reports_count
 
     def test_add_files_with_updates(
-        self,
-        session,
-        project,
-        cli_runner,
-        config_service,
-        plugin_settings_service_factory,
+        self, project, cli_runner, config_service, plugin_settings_service_factory
     ):
         result = cli_runner.invoke(cli, ["add", "files", "airflow"])
         assert_cli_runner(result)
@@ -180,10 +175,8 @@ class TestCliAdd:
 
         # Automatic updating is enabled
         plugin_settings_service = plugin_settings_service_factory(plugin)
-        value = plugin_settings_service.get(
-            "update.orchestrate/dags/meltano.py", session=session
-        )
-        assert value == True
+        update_config = plugin_settings_service.get("_update")
+        assert update_config["orchestrate/dags/meltano.py"] == True
 
         # File has been created
         assert "Created orchestrate/dags/meltano.py" in result.output
