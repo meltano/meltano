@@ -2,6 +2,7 @@ import sqlalchemy
 import logging
 import dotenv
 from abc import ABC, abstractmethod
+from copy import deepcopy
 from enum import Enum
 from typing import List
 from contextlib import contextmanager
@@ -77,13 +78,13 @@ class SettingsStoreManager(ABC):
         self.project = self.settings_service.project
 
     @abstractmethod
-    def get(self, name: str):
+    def get(self, name: str, setting_def=None):
         pass
 
-    def set(self, name: str, path: List[str], value):
+    def set(self, name: str, path: List[str], value, setting_def=None):
         raise NotImplementedError
 
-    def unset(self, name: str, path: List[str]):
+    def unset(self, name: str, path: List[str], setting_def=None):
         raise NotImplementedError
 
     def reset(self):
@@ -92,9 +93,6 @@ class SettingsStoreManager(ABC):
     def ensure_supported(self, method="get"):
         if method != "get" and not self.writable:
             raise StoreNotSupportedError
-
-    def find_setting(self, name: str):
-        return self.settings_service.find_setting(name)
 
     def expand_env_vars(self, value):
         env = {**self.project.dotenv_env, **self.settings_service.env}
@@ -109,7 +107,7 @@ class SettingsStoreManager(ABC):
 class ConfigOverrideStoreManager(SettingsStoreManager):
     label = "a command line flag"
 
-    def get(self, name: str):
+    def get(self, name: str, setting_def=None):
         try:
             value = self.settings_service.config_override[name]
             logger.debug(f"Read key '{name}' from config override: {value!r}")
@@ -124,14 +122,9 @@ class BaseEnvStoreManager(SettingsStoreManager):
     def env(self):
         pass
 
-    def ensure_supported(self, method="get"):
-        if method == "get":
-            self.find_setting()
-        else:
-            super().ensure_supported(method)
-
-    def get(self, name: str):
-        setting_def = self.find_setting(name)
+    def get(self, name: str, setting_def=None):
+        if not setting_def:
+            raise StoreNotSupportedError
 
         env_key = self.setting_env(setting_def)
         env_getters = {
@@ -151,12 +144,6 @@ class BaseEnvStoreManager(SettingsStoreManager):
     def setting_env(self, setting_def):
         return self.settings_service.setting_env(setting_def)
 
-    def find_setting(self, *args):
-        try:
-            return super().find_setting(*args)
-        except SettingMissingError:
-            raise StoreNotSupportedError
-
 
 class EnvStoreManager(BaseEnvStoreManager):
     label = "the environment"
@@ -165,8 +152,8 @@ class EnvStoreManager(BaseEnvStoreManager):
     def env(self):
         return self.settings_service.env
 
-    def get(self, *args):
-        value, metadata = super().get(*args)
+    def get(self, *args, **kwargs):
+        value, metadata = super().get(*args, **kwargs)
 
         if value is not None:
             env_key = metadata["env_var"]
@@ -187,8 +174,8 @@ class DotEnvStoreManager(BaseEnvStoreManager):
     def env(self):
         return self.project.dotenv_env
 
-    def get(self, name: str):
-        value, metadata = super().get(name)
+    def get(self, *args, **kwargs):
+        value, metadata = super().get(*args, **kwargs)
 
         if value is not None:
             env_key = metadata["env_var"]
@@ -196,8 +183,10 @@ class DotEnvStoreManager(BaseEnvStoreManager):
 
         return value, metadata
 
-    def set(self, name: str, path: List[str], value):
-        setting_def = self.find_setting(name)
+    def set(self, name: str, path: List[str], value, setting_def=None):
+        if not setting_def:
+            raise StoreNotSupportedError
+
         env_key = self.setting_env(setting_def)
 
         with self.update_dotenv() as dotenv_file:
@@ -213,8 +202,10 @@ class DotEnvStoreManager(BaseEnvStoreManager):
         logger.debug(f"Set key '{env_key}' in `.env`: {value!r}")
         return {"env_var": env_key}
 
-    def unset(self, name: str, path: List[str]):
-        setting_def = self.find_setting(name)
+    def unset(self, name: str, path: List[str], setting_def=None):
+        if not setting_def:
+            raise StoreNotSupportedError
+
         env_key = self.setting_env(setting_def)
 
         with self.update_dotenv() as dotenv_file:
@@ -251,7 +242,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         if method != "get" and self.project.readonly:
             raise StoreNotSupportedError(ProjectReadonly())
 
-    def get(self, name: str):
+    def get(self, name: str, setting_def=None):
         try:
             value = self.flat_config[name]
             value, metadata = self.expand_env_vars(value)
@@ -261,7 +252,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         except KeyError:
             return None, {}
 
-    def set(self, name: str, path: List[str], value):
+    def set(self, name: str, path: List[str], value, setting_def=None):
         with self.update_config() as config:
             if len(path) > 1:
                 config.pop(name, None)
@@ -276,7 +267,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
 
         return {}
 
-    def unset(self, name: str, path: List[str]):
+    def unset(self, name: str, path: List[str], setting_def=None):
         with self.update_config() as config:
             config.pop(name, None)
             logger.debug(f"Popped key '{name}' in `meltano.yml`")
@@ -301,10 +292,11 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
 
     @contextmanager
     def update_config(self):
-        yield self.settings_service._meltano_yml_config
+        config = deepcopy(self.settings_service._meltano_yml_config)
+        yield config
 
         try:
-            self.settings_service._update_meltano_yml_config()
+            self.settings_service._update_meltano_yml_config(config)
         except ProjectReadonly as err:
             raise StoreNotSupportedError(err)
 
@@ -324,7 +316,7 @@ class DbStoreManager(SettingsStoreManager):
         if not self.session:
             raise StoreNotSupportedError("No database session provided")
 
-    def get(self, name: str):
+    def get(self, name: str, setting_def=None):
         try:
             value = (
                 self.session.query(Setting)
@@ -338,7 +330,7 @@ class DbStoreManager(SettingsStoreManager):
         except sqlalchemy.orm.exc.NoResultFound:
             return None, {}
 
-    def set(self, name: str, path: List[str], value):
+    def set(self, name: str, path: List[str], value, setting_def=None):
         setting = Setting(
             namespace=self.namespace, name=name, value=value, enabled=True
         )
@@ -348,7 +340,7 @@ class DbStoreManager(SettingsStoreManager):
         logger.debug(f"Set key '{name}' in system database: {value!r}")
         return {}
 
-    def unset(self, name: str, path: List[str]):
+    def unset(self, name: str, path: List[str], setting_def=None):
         self.session.query(Setting).filter_by(
             namespace=self.namespace, name=name
         ).delete()
@@ -371,14 +363,11 @@ class DbStoreManager(SettingsStoreManager):
 class DefaultStoreManager(SettingsStoreManager):
     label = "the default"
 
-    def get(self, name: str):
-        try:
-            setting_def = self.find_setting(name)
-        except SettingMissingError:
+    def get(self, name: str, setting_def=None):
+        if not setting_def:
             raise StoreNotSupportedError("Setting is missing")
 
         value = setting_def.value
-
         value, metadata = self.expand_env_vars(value)
 
         logger.debug(f"Read key '{name}' from default: {value!r}")
@@ -409,11 +398,8 @@ class AutoStoreManager(SettingsStoreManager):
         stores.remove(SettingValueStore.AUTO)
         return stores
 
-    def auto_store(self, name, source):
-        try:
-            setting_def = self.find_setting(name)
-        except SettingMissingError:
-            setting_def = None
+    def auto_store(self, name, source, setting_def=None):
+        setting_def = setting_def or self.find_setting(name)
 
         store = source
 
@@ -447,14 +433,16 @@ class AutoStoreManager(SettingsStoreManager):
 
         return None
 
-    def get(self, name: str):
+    def get(self, name: str, setting_def=None):
+        setting_def = setting_def or self.find_setting(name)
+
         metadata = {}
         value = None
 
         for source in self.sources:
             try:
                 manager = self.manager_for(source)
-                value, metadata = manager.get(name)
+                value, metadata = manager.get(name, setting_def=setting_def)
             except StoreNotSupportedError:
                 continue
 
@@ -463,33 +451,31 @@ class AutoStoreManager(SettingsStoreManager):
 
         metadata["source"] = source
 
-        auto_store = self.auto_store(name, source)
+        auto_store = self.auto_store(name, source, setting_def=setting_def)
         if auto_store:
             metadata["auto_store"] = auto_store
             metadata["overwritable"] = auto_store.can_overwrite(source)
 
         return value, metadata
 
-    def set(self, name: str, path: List[str], value):
-        current_value, metadata = self.get(name)
+    def set(self, name: str, path: List[str], value, setting_def=None):
+        setting_def = setting_def or self.find_setting(name)
+
+        current_value, metadata = self.get(name, setting_def=setting_def)
         source = metadata["source"]
 
         if value == current_value:
             # No need to do anything
             return {"store": source}
 
-        try:
-            setting_def = self.find_setting(name)
-
+        if setting_def:
             if value == setting_def.value:
                 # Unset everything so we fall down on default
-                self.unset(name, path)
+                self.unset(name, path, setting_def=setting_def)
 
                 return {"store": SettingValueStore.DEFAULT}
-        except SettingMissingError:
-            setting_def = None
 
-        store = self.auto_store(name, source)
+        store = self.auto_store(name, source, setting_def=setting_def)
         if store is None:
             raise StoreNotSupportedError("No storage method available")
 
@@ -498,29 +484,31 @@ class AutoStoreManager(SettingsStoreManager):
 
         # Even if the global current value isn't equal,
         # the value in this store might be
-        current_value, _ = manager.get(name)
+        current_value, _ = manager.get(name, setting_def=setting_def)
         if value == current_value:
             # No need to do anything
             return {"store": store}
 
-        metadata = manager.set(name, path, value)
+        metadata = manager.set(name, path, value, setting_def=setting_def)
 
         metadata["store"] = store
         return metadata
 
-    def unset(self, name: str, path: List[str]):
+    def unset(self, name: str, path: List[str], setting_def=None):
+        setting_def = setting_def or self.find_setting(name)
+
         error = None
         metadata = {}
 
         for store in self.stores:
             try:
                 manager = self.manager_for(store)
-                value, _ = manager.get(name)
+                value, _ = manager.get(name, setting_def=setting_def)
             except StoreNotSupportedError:
                 continue
 
             try:
-                metadata = manager.unset(name, path)
+                metadata = manager.unset(name, path, setting_def=setting_def)
                 metadata["store"] = store
             except StoreNotSupportedError as err:
                 # Only raise if we're sure we were going to unset something
@@ -541,3 +529,9 @@ class AutoStoreManager(SettingsStoreManager):
                 pass
 
         return {}
+
+    def find_setting(self, name: str):
+        try:
+            return self.settings_service.find_setting(name)
+        except SettingMissingError:
+            return None

@@ -1,5 +1,6 @@
 import pytest
 import dotenv
+from unittest import mock
 from contextlib import contextmanager
 
 from meltano.core.config_service import PluginAlreadyAddedException
@@ -317,15 +318,6 @@ class TestPluginSettingsService:
         assert not project.dotenv.exists()
 
     def test_env_var_expansion(self, session, subject, project, tap, monkeypatch):
-        with project.meltano_update() as meltano:
-            extractor = meltano.plugins.extractors[0]
-            extractor.config = {
-                "var": "$VAR",
-                "foo": "${FOO}",
-                "missing": "$MISSING",
-                "multiple": "$A ${B} $C",
-            }
-
         monkeypatch.setenv("VAR", "hello world!")
         monkeypatch.setenv("FOO", "42")
 
@@ -334,7 +326,15 @@ class TestPluginSettingsService:
         dotenv.set_key(project.dotenv, "B", "paper")
         dotenv.set_key(project.dotenv, "C", "scissors")
 
-        config = subject.as_dict(session=session)
+        config = {
+            "var": "$VAR",
+            "foo": "${FOO}",
+            "missing": "$MISSING",
+            "multiple": "$A ${B} $C",
+        }
+        with mock.patch.object(subject.plugin, "config", config):
+            config = subject.as_dict(session=session)
+
         assert config["var"] == "hello world!"
         assert config["foo"] == "42"
         assert config["missing"] == None
