@@ -133,7 +133,6 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         executable: str = None,
         capabilities: list = [],
         settings: list = [],
-        select: list = [],
         config={},
         profiles: list = [],
         **extras,
@@ -149,7 +148,6 @@ class PluginInstall(HookObject, Canonical, PluginRef):
             executable=executable,
             capabilities=list(capabilities),
             settings=list(map(SettingDefinition.parse, settings)),
-            select=list(select),
             config=copy.deepcopy(config),
             extras=extras,
             profiles=list(map(Profile.parse, profiles)),
@@ -170,6 +168,10 @@ class PluginInstall(HookObject, Canonical, PluginRef):
     @property
     def runner(self):
         return None
+
+    @property
+    def extra_settings(self):
+        return []
 
     def is_custom(self):
         return self.namespace is not None
@@ -196,10 +198,19 @@ class PluginInstall(HookObject, Canonical, PluginRef):
 
     @property
     def current_config(self):
-        if self.current_profile is Profile.DEFAULT:
-            return self.config
+        return (
+            self.config
+            if self.current_profile is Profile.DEFAULT
+            else self.current_profile.config
+        )
 
-        return self.current_profile.config
+    @property
+    def current_extras(self):
+        return (
+            self.extras
+            if self.current_profile is Profile.DEFAULT
+            else self.current_profile.extras
+        )
 
     def exec_args(self, files: Dict):
         return []
@@ -214,7 +225,9 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         return dict()
 
     def add_select_filter(self, filter: str):
-        self.select.append(filter)
+        select = self.extras.get("select", [])
+        select.append(filter)
+        self.extras["select"] = select
 
     def add_profile(self, name: str, config: dict = None, label: str = None):
         profile = Profile(name=name, config=config, label=label)
@@ -247,7 +260,6 @@ class Plugin(Canonical, PluginRef):
         capabilities: list = [],
         settings_group_validation: list = [],
         settings: list = [],
-        select: list = [],
         **extras,
     ):
         super().__init__(
@@ -263,7 +275,6 @@ class Plugin(Canonical, PluginRef):
             capabilities=list(capabilities),
             settings_group_validation=list(settings_group_validation),
             settings=list(map(SettingDefinition.parse, settings)),
-            select=list(select),
             extras=extras,
         )
 
@@ -277,6 +288,4 @@ class Plugin(Canonical, PluginRef):
                 **self.extras,
             }
 
-        return PluginInstall(
-            self.type, self.name, select=self.select, pip_url=self.pip_url, **extras
-        )
+        return PluginInstall(self.type, self.name, pip_url=self.pip_url, **extras)
