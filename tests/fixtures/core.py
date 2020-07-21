@@ -44,6 +44,7 @@ def discovery():
                 {"name": "protected", "protected": True},
                 {"name": "secure", "kind": "password"},
                 {"name": "port", "kind": "integer", "value": 5000},
+                {"name": "list", "kind": "array", "value": []},
                 {"name": "hidden", "kind": "hidden", "value": 42},
                 {
                     "name": "boolean",

@@ -1,3 +1,4 @@
+import json
 from typing import List
 
 from .utils import truthy
@@ -64,6 +65,10 @@ class SettingDefinition(NameEq, Canonical):
         return cls(name=key, kind=kind, custom=True)
 
     @property
+    def is_extra(self):
+        return self.name.startswith("_")
+
+    @property
     def is_redacted(self):
         return self.kind in ("password", "oauth")
 
@@ -90,5 +95,9 @@ class SettingDefinition(NameEq, Canonical):
                 return truthy(value)
             elif self.kind == "integer":
                 return int(value)
+            elif self.kind == "array":
+                value = json.loads(value)
+                if not isinstance(value, list):
+                    raise ValueError(f"JSON value '{value}' is not an array")
 
         return value

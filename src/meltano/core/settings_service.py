@@ -80,9 +80,16 @@ class SettingsService(ABC):
 
         return {k: v for k, v in values.items() if v != REDACTED_VALUE}
 
-    def config_with_metadata(self, sources: List[SettingValueStore] = None, **kwargs):
+    def config_with_metadata(
+        self, sources: List[SettingValueStore] = None, extras=None, **kwargs
+    ):
         config = {}
         for setting_def in self.definitions():
+            if (extras is True and not setting_def.is_extra) or (
+                extras is False and setting_def.is_extra
+            ):
+                continue
+
             value, metadata = self.get_with_metadata(
                 setting_def.name, setting_def=setting_def, **kwargs
             )

@@ -71,8 +71,8 @@ class TestSingerTap:
                 "catalog"
             ].exists(), "Catalog should not be present."
 
-    def test_apply_metadata_rules(self, session, plugin_invoker_factory, subject):
-        invoker = plugin_invoker_factory(subject, prepare_with_session=session)
+    def test_apply_select(self, session, plugin_invoker_factory, subject, monkeypatch):
+        invoker = plugin_invoker_factory(subject)
 
         properties_file = invoker.files["catalog"]
 
@@ -97,6 +97,7 @@ class TestSingerTap:
         ):
             reset_properties()
 
+            invoker.prepare(session)
             subject.apply_metadata_rules(invoker)
 
             # When `select` isn't set in meltano.yml or discovery.yml, select all
@@ -110,34 +111,37 @@ class TestSingerTap:
             reset_properties()
 
             # Pretend `select` is set in discovery.yml
-            with mock.patch.object(
-                invoker.plugin_def, "select", ["UniqueEntitiesName.name"]
-            ):
-                subject.apply_metadata_rules(invoker)
+            monkeypatch.setitem(
+                invoker.plugin_def.extras, "select", ["UniqueEntitiesName.name"]
+            )
+            invoker.prepare(session)
+            subject.apply_metadata_rules(invoker)
 
-                # When `select` is set in discovery.yml, use the selection
-                assert_rules(
-                    ["*", [], "selected", False],
-                    ["*", ["properties", "*"], "selected", False],
-                    ["UniqueEntitiesName", [], "selected", True],
-                    ["UniqueEntitiesName", ["properties", "name"], "selected", True],
-                )
+            # When `select` is set in discovery.yml, use the selection
+            assert_rules(
+                ["*", [], "selected", False],
+                ["*", ["properties", "*"], "selected", False],
+                ["UniqueEntitiesName", [], "selected", True],
+                ["UniqueEntitiesName", ["properties", "name"], "selected", True],
+            )
 
-                reset_properties()
+            reset_properties()
 
-                # Pretend `select` is set in meltano.yml
-                with mock.patch.object(
-                    invoker.plugin, "select", ["UniqueEntitiesName.code"]
-                ):
-                    subject.apply_metadata_rules(invoker)
+            # Pretend `select` is set in meltano.yml
+            monkeypatch.setitem(
+                invoker.plugin.extras, "select", ["UniqueEntitiesName.code"]
+            )
 
-                # `select` set in meltano.yml takes precedence over discovery.yml
-                assert_rules(
-                    ["*", [], "selected", False],
-                    ["*", ["properties", "*"], "selected", False],
-                    ["UniqueEntitiesName", [], "selected", True],
-                    ["UniqueEntitiesName", ["properties", "code"], "selected", True],
-                )
+            invoker.prepare(session)
+            subject.apply_metadata_rules(invoker)
+
+            # `select` set in meltano.yml takes precedence over discovery.yml
+            assert_rules(
+                ["*", [], "selected", False],
+                ["*", ["properties", "*"], "selected", False],
+                ["UniqueEntitiesName", [], "selected", True],
+                ["UniqueEntitiesName", ["properties", "code"], "selected", True],
+            )
 
     def test_apply_metadata_rules_catalog_invalid(
         self, session, plugin_invoker_factory, subject

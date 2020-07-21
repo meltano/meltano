@@ -67,6 +67,9 @@ class TestOrchestration:
             ) == (42, SettingValueStore.DEFAULT)
             assert "hidden" not in config
 
+            # Extras are excluded
+            assert "_select" not in config
+
     def test_save_configuration(
         self,
         app,
