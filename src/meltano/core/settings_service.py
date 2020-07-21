@@ -36,6 +36,8 @@ class SettingsService(ABC):
         self.env_override = env_override
         self.config_override = config_override
 
+        self._setting_defs = None
+
     @property
     @abstractmethod
     def _env_namespace(self) -> str:
@@ -260,25 +262,20 @@ class SettingsService(ABC):
         return metadata
 
     def definitions(self) -> Iterable[Dict]:
-        definitions = deepcopy(self._definitions)
-        definition_names = set(s.name for s in definitions)
+        if self._setting_defs is None:
+            setting_defs = [
+                s for s in self._definitions if s.kind != "hidden" or self.show_hidden
+            ]
 
-        definitions.extend(
-            (
-                SettingDefinition.from_key_value(k, v)
-                for k, v in self.flat_meltano_yml_config.items()
-                if k not in definition_names
+            setting_defs.extend(
+                SettingDefinition.from_missing(
+                    self._definitions, self.flat_meltano_yml_config
+                )
             )
-        )
 
-        settings = []
-        for setting in definitions:
-            if setting.kind == "hidden" and not self.show_hidden:
-                continue
+            self._setting_defs = setting_defs
 
-            settings.append(setting)
-
-        return settings
+        return self._setting_defs
 
     def find_setting(self, name: str) -> SettingDefinition:
         try:

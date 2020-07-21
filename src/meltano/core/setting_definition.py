@@ -1,7 +1,7 @@
 import json
 from typing import List
 
-from .utils import truthy
+from .utils import truthy, flatten
 from .behavior.canonical import Canonical
 from .behavior import NameEq
 from .error import Error
@@ -57,12 +57,32 @@ class SettingDefinition(NameEq, Canonical):
         self._verbatim.add("value")
 
     @classmethod
-    def from_key_value(cls, key, value):
+    def from_missing(cls, defs, config, **kwargs):
+        flat_config = flatten(config, "dot")
+
+        names = set(s.name for s in defs)
+
+        # Create custom setting definitions for unknown keys
+        return [
+            SettingDefinition.from_key_value(k, v, **kwargs)
+            for k, v in flat_config.items()
+            if k not in names
+        ]
+
+    @classmethod
+    def from_key_value(cls, key, value, custom=True, default=False):
         kind = None
         if isinstance(value, bool):
             kind = "boolean"
 
-        return cls(name=key, kind=kind, custom=True)
+        attrs = {
+            "name": key,
+            "kind": kind,
+            "custom": custom,
+            "value": value if default else None,
+        }
+
+        return cls(**attrs)
 
     @property
     def is_extra(self):
