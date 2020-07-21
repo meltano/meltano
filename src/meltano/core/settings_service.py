@@ -155,15 +155,19 @@ class SettingsService(ABC):
             ):
                 object_value = {}
                 object_source = SettingValueStore.DEFAULT
-                flat_config_metadata = self.config_with_metadata(
-                    source=source, prefix=f"{setting_def.name}."
-                )
-                for nested_key, config_metadata in flat_config_metadata.items():
-                    object_value[nested_key] = config_metadata["value"]
+                for setting_key in [setting_def.name, *setting_def.aliases]:
+                    flat_config_metadata = self.config_with_metadata(
+                        source=source, prefix=f"{setting_key}."
+                    )
+                    for nested_key, config_metadata in flat_config_metadata.items():
+                        if nested_key in object_value:
+                            continue
 
-                    nested_source = config_metadata["source"]
-                    if nested_source.overrides(object_source):
-                        object_source = nested_source
+                        object_value[nested_key] = config_metadata["value"]
+
+                        nested_source = config_metadata["source"]
+                        if nested_source.overrides(object_source):
+                            object_source = nested_source
 
                 if object_value:
                     value = object_value
@@ -279,8 +283,10 @@ class SettingsService(ABC):
 
     def find_setting(self, name: str) -> SettingDefinition:
         try:
-            return find_named(self.definitions(), name)
-        except NotFound as err:
+            return next(
+                s for s in self.definitions() if s.name == name or name in s.aliases
+            )
+        except StopIteration as err:
             raise SettingMissingError(name) from err
 
     def setting_env(self, setting_def):

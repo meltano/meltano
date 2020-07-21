@@ -240,24 +240,48 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
             raise StoreNotSupportedError(ProjectReadonly())
 
     def get(self, name: str, setting_def=None):
-        try:
-            value = self.flat_config[name]
-            value, metadata = self.expand_env_vars(value)
+        keys = [name]
+        if setting_def:
+            keys = [setting_def.name, *setting_def.aliases]
 
-            logger.debug(f"Read key '{name}' from `meltano.yml`: {value!r}")
-            return value, metadata
-        except KeyError:
-            return None, {}
+        flat_config = self.flat_config
+
+        for key in keys:
+            try:
+                value = flat_config[key]
+                value, metadata = self.expand_env_vars(value)
+
+                logger.debug(f"Read key '{key}' from `meltano.yml`: {value!r}")
+                return value, {"key": key, **metadata}
+            except KeyError:
+                pass
+
+        return None, {}
 
     def set(self, name: str, path: List[str], value, setting_def=None):
-        with self.update_config() as config:
-            if len(path) > 1:
-                config.pop(name, None)
-                logger.debug(f"Popped key '{name}' in `meltano.yml`")
+        keys_to_unset = [name]
+        if setting_def:
+            keys_to_unset = [setting_def.name, *setting_def.aliases]
 
-            if name.split(".") != path:
-                pop_at_path(config, name, None)
-                logger.debug(f"Popped path '{name}' in `meltano.yml`")
+        paths_to_unset = [k for k in keys_to_unset if "." in k]
+
+        if len(path) == 1:
+            # No need to unset `name`,
+            # since it will be overridden anyway
+            keys_to_unset.remove(name)
+        elif name.split(".") == path:
+            # No need to unset `name` as path,
+            # since it will be overridden anyway
+            paths_to_unset.remove(name)
+
+        with self.update_config() as config:
+            for key in keys_to_unset:
+                config.pop(key, None)
+                logger.debug(f"Popped key '{key}' in `meltano.yml`")
+
+            for path_to_unset in paths_to_unset:
+                pop_at_path(config, path_to_unset, None)
+                logger.debug(f"Popped path '{path_to_unset}' in `meltano.yml`")
 
             set_at_path(config, path, value)
             logger.debug(f"Set path '{path}' in `meltano.yml`: {value!r}")
@@ -265,12 +289,20 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         return {}
 
     def unset(self, name: str, path: List[str], setting_def=None):
-        with self.update_config() as config:
-            config.pop(name, None)
-            logger.debug(f"Popped key '{name}' in `meltano.yml`")
+        keys_to_unset = [name]
+        if setting_def:
+            keys_to_unset = [setting_def.name, *setting_def.aliases]
 
-            pop_at_path(config, name, None)
-            logger.debug(f"Popped path '{name}' in `meltano.yml`")
+        paths_to_unset = [k for k in keys_to_unset if "." in k]
+
+        with self.update_config() as config:
+            for key in keys_to_unset:
+                config.pop(key, None)
+                logger.debug(f"Popped key '{key}' in `meltano.yml`")
+
+            for path_to_unset in paths_to_unset:
+                pop_at_path(config, path_to_unset, None)
+                logger.debug(f"Popped path '{path_to_unset}' in `meltano.yml`")
 
             pop_at_path(config, path, None)
             logger.debug(f"Popped path '{path}' in `meltano.yml`")

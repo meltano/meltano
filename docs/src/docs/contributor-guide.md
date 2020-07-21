@@ -203,6 +203,7 @@ Each extractor (tap) and loader (target) in the `discovery.yml` has a `settings`
 ```yaml
 - settings:
     - name: setting_name # Required (must match the connector setting name)
+      aliases: [alternative_setting_name] # Optional (alternative names that can be used in `meltano.yml` and with `meltano config set`)
       label: Setting Name # Optional (human friendly text display of the setting name)
       value: '' # Optional (Use to set a default value)
       placeholder: Ex. format_like_this # Optional (Use to set the input's placeholder default)

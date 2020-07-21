@@ -18,6 +18,7 @@ class SettingDefinition(NameEq, Canonical):
     def __init__(
         self,
         name: str = None,
+        aliases: List[str] = [],
         env: str = None,
         env_aliases: List[str] = [],
         kind: str = None,
@@ -37,6 +38,7 @@ class SettingDefinition(NameEq, Canonical):
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
             name=name,
+            aliases=aliases,
             env=env,
             env_aliases=env_aliases,
             kind=kind,

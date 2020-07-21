@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2003](https://gitlab.com/meltano/meltano/-/issues/2003) Let extractor extra `select` be interacted with as `_select` setting
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Let transform extra `vars` be interacted with as `_vars` setting
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Add support for `kind: object` settings, which can gather nested values from across setting stores
+- [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Add support for `aliases: [...]` on setting definitions
 
 ### Changes
 

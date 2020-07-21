@@ -47,6 +47,7 @@ def discovery():
                 {"name": "list", "kind": "array", "value": []},
                 {
                     "name": "object",
+                    "aliases": ["data"],
                     "kind": "object",
                     "value": {"nested": "from_default"},
                 },

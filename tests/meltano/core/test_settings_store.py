@@ -8,6 +8,7 @@ from meltano.core.settings_store import (
     SettingValueStore,
     StoreNotSupportedError,
     AutoStoreManager,
+    MeltanoYmlStoreManager,
 )
 
 Store = SettingValueStore
@@ -19,7 +20,7 @@ class DummySettingsService(SettingsService):
 
         self.__meltano_yml_config = {}
         self.__definitions = [
-            SettingDefinition("regular", value="from_default"),
+            SettingDefinition("regular", aliases=["basic"], value="from_default"),
             SettingDefinition("password", kind="password"),
             SettingDefinition("env_specific", env_specific=True),
         ]
@@ -53,13 +54,6 @@ def dummy_settings_service(project):
 
 
 @pytest.fixture()
-def subject(dummy_settings_service, session):
-    manager = AutoStoreManager(dummy_settings_service, session=session)
-    yield manager
-    manager.reset()
-
-
-@pytest.fixture()
 def unsupported():
     @contextmanager
     def _unsupported(store):
@@ -77,27 +71,31 @@ def unsupported():
     return _unsupported
 
 
-@pytest.fixture()
-def set_value_store(subject):
-    def _set_value_store(value, store, name="regular"):
-        subject.manager_for(store).set(
-            name, [name], value, setting_def=subject.find_setting(name)
-        )
-
-    return _set_value_store
-
-
-@pytest.fixture()
-def assert_value_source(subject):
-    def _assert_value_source(value, source, name="regular"):
-        value, metadata = subject.get(name, setting_def=subject.find_setting(name))
-        assert value == value
-        assert metadata["source"] == source
-
-    return _assert_value_source
-
-
 class TestAutoStoreManager:
+    @pytest.fixture()
+    def subject(self, dummy_settings_service, session):
+        manager = AutoStoreManager(dummy_settings_service, session=session)
+        yield manager
+        manager.reset()
+
+    @pytest.fixture()
+    def set_value_store(self, subject):
+        def _set_value_store(value, store, name="regular"):
+            subject.manager_for(store).set(
+                name, [name], value, setting_def=subject.find_setting(name)
+            )
+
+        return _set_value_store
+
+    @pytest.fixture()
+    def assert_value_source(self, subject):
+        def _assert_value_source(value, source, name="regular"):
+            value, metadata = subject.get(name, setting_def=subject.find_setting(name))
+            assert value == value
+            assert metadata["source"] == source
+
+        return _assert_value_source
+
     @pytest.mark.parametrize(
         "setting_name,preferred_store",
         [
@@ -362,3 +360,70 @@ class TestAutoStoreManager:
             subject.reset()
 
             assert_value_source("from_dotenv", Store.DOTENV, name="password")
+
+
+class TestMeltanoYmlStoreManager:
+    @pytest.fixture()
+    def subject(self, dummy_settings_service):
+        manager = MeltanoYmlStoreManager(dummy_settings_service)
+        yield manager
+        manager.reset()
+
+    def test_get(self, subject):
+        def get():
+            return subject.get(
+                "regular", setting_def=subject.settings_service.find_setting("regular")
+            )
+
+        assert get() == (None, {})
+
+        subject.flat_config["basic"] = "alias_value"
+
+        assert get() == ("alias_value", {"key": "basic"})
+
+        subject.flat_config["regular"] = "value"
+
+        assert get() == ("value", {"key": "regular"})
+
+    def test_set(self, subject):
+        def set_value(key, value):
+            return subject.set(
+                key,
+                [key],
+                value,
+                setting_def=subject.settings_service.find_setting(key),
+            )
+
+        subject.flat_config["basic"] = "alias_value"
+
+        set_value("basic", "new_alias_value")
+
+        assert "regular" not in subject.flat_config
+        assert subject.flat_config["basic"] == "new_alias_value"
+
+        set_value("regular", "new_value")
+
+        assert "basic" not in subject.flat_config
+        assert subject.flat_config["regular"] == "new_value"
+
+    def test_unset(self, subject):
+        def unset_value(key):
+            return subject.unset(
+                key, [key], setting_def=subject.settings_service.find_setting(key)
+            )
+
+        def set_values():
+            subject.flat_config["regular"] = "value"
+            subject.flat_config["basic"] = "alias_value"
+
+        set_values()
+        unset_value("regular")
+
+        assert "regular" not in subject.flat_config
+        assert "basic" not in subject.flat_config
+
+        set_values()
+        unset_value("basic")
+
+        assert "regular" not in subject.flat_config
+        assert "basic" not in subject.flat_config

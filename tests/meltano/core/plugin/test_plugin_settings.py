@@ -499,6 +499,13 @@ class TestPluginSettingsService:
             SettingValueStore.MELTANO_YML,
         )
 
+        subject.set("data.password", "from_meltano_yml_alias")
+
+        assert subject.get_with_source("object") == (
+            {"username": "from_meltano_yml", "password": "from_meltano_yml_alias"},
+            SettingValueStore.MELTANO_YML,
+        )
+
         subject.set(["object", "password"], "from_meltano_yml")
 
         assert subject.get_with_source("object") == (
@@ -528,14 +535,19 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
-        monkeypatch.setenv(env_var(subject, "object"), '{"foo":"bar"}')
+        monkeypatch.setenv(env_var(subject, "data"), '{"foo":"from_env_alias"}')
 
         assert subject.get_with_source("object") == (
-            {"foo": "bar"},
+            {"foo": "from_env_alias"},
             SettingValueStore.ENV,
         )
 
-        pass
+        monkeypatch.setenv(env_var(subject, "object"), '{"foo":"from_env"}')
+
+        assert subject.get_with_source("object") == (
+            {"foo": "from_env"},
+            SettingValueStore.ENV,
+        )
 
     def test_extra(self, subject, tap, monkeypatch, env_var):
         assert "_select" in subject.as_dict()

@@ -602,6 +602,7 @@ loaders:
       - name: url
         env: PG_URL
       - name: user
+        aliases: [username]
         env: PG_USERNAME
         value: warehouse
       - name: password
@@ -609,6 +610,7 @@ loaders:
         env: PG_PASSWORD
         value: warehouse
       - name: host
+        aliases: [address]
         env: PG_ADDRESS
         value: localhost
         protected: true
@@ -617,6 +619,7 @@ loaders:
         env: PG_PORT
         value: 5502
       - name: dbname
+        aliases: [database]
         label: Database Name
         env: PG_DATABASE
         value: warehouse
