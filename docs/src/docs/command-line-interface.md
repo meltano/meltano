@@ -251,6 +251,68 @@ meltano config tap-postgres set metadata "some_schema-*" replication-key created
 meltano config tap-postgres set metadata some_schema-some_table some_column custom-metadata custom-value
 ```
 
+### Plugin extras
+
+`meltano config` can also be used to manage so-called plugin extras:
+additional configuration options specific to the type of plugin (e.g. extractors)
+that are handled by Meltano instead of the plugin itself.
+
+These extras are stored in `meltano.yml` among the plugin's other properties, _outside_ of the `config` object:
+
+```yaml
+extractors:
+- name: tap-example
+  pip_url: tap-example
+  config:
+    # Configuration goes here!
+    example_setting: value
+  # Extras go here!
+  example_extra: value
+```
+
+In the context of `meltano config`, extras are distinguished from regular settings using an underscore (`_`) prefix, e.g. `_example_extra`.
+
+By default, `meltano config <plugin>` and `meltano config <plugin> list` only include regular plugin settings.
+An `--extras` flag can be passed to view or list extras instead.
+
+```bash
+# List all extras for the specified plugin with their names,
+# environment variables, and current values
+meltano config <plugin> list --extras
+
+# View the plugin's current extras
+meltano config --extras <plugin>
+
+# Set value of extra `<extra>` to `<value>` through the `_<extra>` setting
+meltano config <plugin> set _<extra> <value>
+
+# Unset extra `<extra>`
+meltano config <plugin> unset _<extra>
+```
+
+#### Extractor `select`
+
+- Setting: `_select`
+- Environment variable: `<NAMESPACE>__SELECT`
+- Default: `["*.*"]`
+
+An extractor's `select` extra holds an array of [entity selection rules](/#meltano-select)
+to apply to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
+when the extractor is run using [`meltano elt`](#elt) or [`meltano invoke`](#invoke).
+
+While it can be managed using `meltano config` or environment variables like any other setting,
+selection rules are typically specified using [`meltano select`](#select).
+
+##### How to use
+
+```bash
+meltano config <plugin> set _select '["entity.attribute"]'
+
+export <NAMESPACE>__SELECT='["entity.attribute"]'
+
+meltano select <plugin> entity attribute
+```
+
 ## `discover`
 
 Lists the available plugins you are interested in.
