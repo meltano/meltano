@@ -87,7 +87,10 @@ class TestSingerTap:
 
         def mock_metadata_executor(rules):
             def visit(schema):
-                schema["rules"].extend(rules)
+                for rule in rules:
+                    schema["rules"].append(
+                        [rule.tap_stream_id, rule.breadcrumb, rule.key, rule.value]
+                    )
 
             return mock.Mock(visit=visit)
 
