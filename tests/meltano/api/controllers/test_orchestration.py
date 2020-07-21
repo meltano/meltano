@@ -70,6 +70,7 @@ class TestOrchestration:
             # Extras are excluded
             assert "_select" not in config
             assert "_metadata" not in config
+            assert "_schema" not in config
 
     def test_save_configuration(
         self,
