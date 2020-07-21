@@ -6,12 +6,15 @@ from meltano.core.behavior.hookable import hook
 from meltano.core.project import Project
 from meltano.core.plugin import PluginInstall
 from meltano.core.db import project_engine
-from meltano.core.utils import nest
+from meltano.core.utils import nest_object
 
 
 class SingerPlugin(PluginInstall):
     def __init__(self, *args, **kwargs):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
+
+    def process_config(self, flat_config):
+        return nest_object(flat_config)
 
     @hook("before_configure")
     def before_configure(self, invoker, session):
@@ -19,12 +22,10 @@ class SingerPlugin(PluginInstall):
         plugin_dir = project.plugin_dir(self)
 
         with open(plugin_dir.joinpath(self.config_files["config"]), "w") as config_stub:
-            config = {}
-            for key, value in invoker.plugin_config.items():
-                nest(config, key, value)
+            config = invoker.plugin_config_processed
 
             # Metadata configuration is handled by SingerTap.apply_metadata_rules
             config.pop("metadata", None)
 
-            json.dump(config, config_stub)
+            json.dump(config, config_stub, indent=4)
             logging.debug(f"Created configuration stub at {config_stub}")

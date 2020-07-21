@@ -205,12 +205,13 @@ This will result in the following configuration being passed on to the plugin:
 
 ##### Dot seperator
 
-Note that `meltano config <plugin_name>` always displays a flattened object
-with nesting represented by the `.` seperator, matching the internal representation:
+Note that `meltano config <plugin_name> list` always displays full config keys
+with nesting represented by the `.` seperator, matching the internal flattened representation:
 
 ```bash
-meltano config <plugin_name>
-# => {"<property>.<subproperty>": "<value>", "<property>.<deep>.<nesting>": "<value>"}
+meltano config <plugin_name> list
+# => <property>.<subproperty>
+# => <property>.<deep>.<nesting>
 ```
 
 You can also set nested properties using the `.` seperator, but specifying a list of names is preferred

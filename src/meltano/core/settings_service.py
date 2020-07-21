@@ -60,6 +60,10 @@ class SettingsService(ABC):
     def _update_meltano_yml_config(self, config):
         pass
 
+    @abstractmethod
+    def _process_config(self):
+        pass
+
     @property
     def flat_meltano_yml_config(self):
         return flatten(self._meltano_yml_config, "dot")
@@ -92,10 +96,15 @@ class SettingsService(ABC):
 
         return config
 
-    def as_dict(self, *args, **kwargs) -> Dict:
-        full_config = self.config_with_metadata(*args, **kwargs)
+    def as_dict(self, *args, process=False, **kwargs) -> Dict:
+        config_metadata = self.config_with_metadata(*args, **kwargs)
 
-        return {key: config["value"] for key, config in full_config.items()}
+        config = {key: metadata["value"] for key, metadata in config_metadata.items()}
+
+        if process:
+            config = self._process_config(config)
+
+        return config
 
     def as_env(self, *args, **kwargs) -> Dict[str, str]:
         full_config = self.config_with_metadata(*args, **kwargs)
