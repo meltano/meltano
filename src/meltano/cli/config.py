@@ -1,5 +1,8 @@
 import click
 import json
+import dotenv
+import tempfile
+from pathlib import Path
 
 from . import cli
 from .params import project
@@ -55,8 +58,16 @@ def config(ctx, project, plugin_type, plugin_name, format):
                 config = settings.as_dict(process=True, session=session)
                 print(json.dumps(config, indent=4))
             elif format == "env":
-                for env, value in settings.as_env(session=session).items():
-                    print(f"{env}={value}")
+                env = settings.as_env(session=session)
+
+                with tempfile.NamedTemporaryFile() as temp_dotenv:
+                    path = temp_dotenv.name
+                    for key, value in env.items():
+                        dotenv.set_key(path, key, value)
+
+                    dotenv_content = Path(temp_dotenv.name).read_text()
+
+                print(dotenv_content, end="")
     finally:
         session.close()
 
