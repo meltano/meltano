@@ -102,7 +102,7 @@ def show(project, extractor, show_all=False):
 
     # report
     click.secho("\nEnabled patterns:")
-    for select in map(parse_select_pattern, select_service.extractor.select):
+    for select in map(parse_select_pattern, select_service.current_select):
         color = "red" if select.negated else "white"
         click.secho(f"\t{select.raw}", fg=color)
 

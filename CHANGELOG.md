@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2196](https://gitlab.com/meltano/meltano/-/issues/2196) Pretty print and apply appropriate nesting to `meltano config` output
+- [#2003](https://gitlab.com/meltano/meltano/-/issues/2003) Let extractor extra `select` be interacted with as `_select` setting
 
 ### Changes
 

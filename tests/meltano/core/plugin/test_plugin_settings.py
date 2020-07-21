@@ -159,6 +159,14 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
+        # Verify that array settings set in env are cast correctly
+        monkeypatch.setenv(env_var(subject, "list"), '[1, 2, 3, "4"]')
+
+        assert subject.get_with_source("list", session=session) == (
+            [1, 2, 3, "4"],
+            SettingValueStore.ENV,
+        )
+
         # Verify that boolean settings set in env are cast correctly
         # Default
         assert subject.get_with_source("boolean", session=session) == (
@@ -214,7 +222,7 @@ class TestPluginSettingsService:
         self, session, project, custom_tap, plugin_settings_service_factory
     ):
         subject = plugin_settings_service_factory(custom_tap)
-        assert subject.as_dict(session=session) == custom_tap.config
+        assert subject.as_dict(extras=False, session=session) == custom_tap.config
 
     def test_as_dict_redacted(self, subject, session, tap):
         store = SettingValueStore.DB
@@ -435,5 +443,61 @@ class TestPluginSettingsService:
         )
         assert subject.get_with_source("custom_bool", session=session) == (
             False,
+            SettingValueStore.ENV,
+        )
+
+    def test_extra(self, subject, tap, monkeypatch, env_var):
+        assert "_select" in subject.as_dict()
+        assert "_select" in subject.as_dict(extras=True)
+        assert "_select" not in subject.as_dict(extras=False)
+
+        assert subject.get_with_source("_select") == (
+            ["*.*"],
+            SettingValueStore.DEFAULT,
+        )
+
+        monkeypatch.setitem(subject.plugin_def.extras, "select", ["from_default"])
+
+        assert subject.get_with_source("_select") == (
+            ["from_default"],
+            SettingValueStore.DEFAULT,
+        )
+
+        monkeypatch.setitem(
+            subject.plugin_install.config, "_select", ["from_meltano_yml_config"]
+        )
+
+        assert subject.get_with_source("_select") == (
+            ["from_meltano_yml_config"],
+            SettingValueStore.MELTANO_YML,
+        )
+
+        monkeypatch.setitem(
+            subject.plugin_install.extras, "select", ["from_meltano_yml_extra"]
+        )
+
+        assert subject.get_with_source("_select") == (
+            ["from_meltano_yml_extra"],
+            SettingValueStore.MELTANO_YML,
+        )
+
+        subject.set("_select", ["from_meltano_yml"])
+
+        assert subject.get_with_source("_select") == (
+            ["from_meltano_yml"],
+            SettingValueStore.MELTANO_YML,
+        )
+
+        subject.unset("_select")
+
+        assert subject.get_with_source("_select") == (
+            ["from_default"],
+            SettingValueStore.DEFAULT,
+        )
+
+        monkeypatch.setenv(env_var(subject, "_select"), '["from_env"]')
+
+        assert subject.get_with_source("_select") == (
+            ["from_env"],
             SettingValueStore.ENV,
         )

@@ -76,37 +76,58 @@ class PluginSettingsService(SettingsService):
 
     @property
     def _definitions(self):
-        return self.plugin_def.settings
+        extra_settings = self.plugin_install.extra_settings
+        if not self.plugin_install.is_custom():
+            for setting in extra_settings:
+                extra_name = setting.name[1:]
+                default_value = self.plugin_def.extras.get(extra_name)
+                if default_value is not None:
+                    setting.value = default_value
+
+        return [*self.plugin_def.settings, *extra_settings]
 
     @property
     def _meltano_yml_config(self):
         try:
-            return self.plugin_install.current_config
+            plugin_install = self.plugin_install
         except PluginMissingError:
             return {}
 
-    def _update_meltano_yml_config(self, config):
+        return {
+            **plugin_install.current_config,
+            **{f"_{k}": v for k, v in plugin_install.current_extras.items()},
+        }
+
+    def _update_meltano_yml_config(self, config_with_extras):
         try:
             plugin_install = self.plugin_install
         except PluginMissingError:
             return
 
-        current_config = plugin_install.current_config
-        current_config.clear()
-        current_config.update(config)
+        config = plugin_install.current_config
+        extras = plugin_install.current_extras
+
+        config.clear()
+        extras.clear()
+
+        for k, v in config_with_extras.items():
+            if k.startswith("_"):
+                extras[k[1:]] = v
+            else:
+                config[k] = v
 
         self.config_service.update_plugin(plugin_install)
 
     def _process_config(self, config):
         return self.plugin_install.process_config(config)
 
-    def profile_with_config(self, profile: Profile, **kwargs):
+    def profile_with_config(self, profile: Profile, extras=False, **kwargs):
         self.plugin_install.use_profile(profile)
 
         config_dict = {}
         config_metadata = {}
 
-        config_with_metadata = self.config_with_metadata(**kwargs)
+        config_with_metadata = self.config_with_metadata(extras=extras, **kwargs)
         for key, metadata in config_with_metadata.items():
             config_dict[key] = metadata.pop("value")
 

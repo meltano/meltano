@@ -23,9 +23,10 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 )
 @click.argument("plugin_name")
 @click.option("--format", type=click.Choice(["json", "env"]), default="json")
+@click.option("--extras", is_flag=True)
 @project(migrate=True)
 @click.pass_context
-def config(ctx, project, plugin_type, plugin_name, format):
+def config(ctx, project, plugin_type, plugin_name, format, extras):
     try:
         plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
@@ -55,10 +56,13 @@ def config(ctx, project, plugin_type, plugin_name, format):
 
         if ctx.invoked_subcommand is None:
             if format == "json":
-                config = settings.as_dict(process=True, session=session)
+                process = extras is not True
+                config = settings.as_dict(
+                    extras=extras, process=process, session=session
+                )
                 print(json.dumps(config, indent=4))
             elif format == "env":
-                env = settings.as_env(session=session)
+                env = settings.as_env(extras=extras, session=session)
 
                 with tempfile.NamedTemporaryFile() as temp_dotenv:
                     path = temp_dotenv.name
@@ -185,10 +189,14 @@ def reset(ctx, store):
 
 
 @config.command("list")
+@click.option("--extras", is_flag=True)
 @click.pass_context
-def list_settings(ctx):
+def list_settings(ctx, extras):
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
+
+    printed_custom_heading = False
+    printed_extra_heading = extras
 
     full_config = settings.config_with_metadata(session=session)
     for name, config_metadata in full_config.items():
@@ -196,8 +204,22 @@ def list_settings(ctx):
         source = config_metadata["source"]
         setting_def = config_metadata["setting"]
 
-        if setting_def._custom:
-            click.echo("custom: ", nl=False)
+        if extras:
+            if not setting_def.is_extra:
+                continue
+        else:
+            if setting_def.is_extra and not setting_def._custom:
+                continue
+
+        if setting_def._custom and not printed_custom_heading:
+            click.echo()
+            click.echo("Custom:")
+            printed_custom_heading = True
+
+        if setting_def.is_extra and not printed_extra_heading:
+            click.echo()
+            click.echo("Extra:")
+            printed_extra_heading = True
 
         click.secho(name, fg="blue", nl=False)
 
