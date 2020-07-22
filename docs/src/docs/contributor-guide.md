@@ -203,16 +203,18 @@ Each extractor (tap) and loader (target) in the `discovery.yml` has a `settings`
 ```yaml
 - settings:
     - name: setting_name # Required (must match the connector setting name)
+      aliases: [alternative_setting_name] # Optional (alternative names that can be used in `meltano.yml` and with `meltano config set`)
       label: Setting Name # Optional (human friendly text display of the setting name)
       value: '' # Optional (Use to set a default value)
       placeholder: Ex. format_like_this # Optional (Use to set the input's placeholder default)
-      kind: string # Optional (Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `password`, `options`, `file`, `array`, and `hidden`)
+      kind: string # Optional (Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `password`, `options`, `file`, `array`, `object`, and `hidden`)
       description: Setting description # Optional (Use to provide inline context)
       tooltip: Here is some more info... # Optional (use to provide additional inline context)
       documentation: https://meltano.com/ # Optional (use to link to specific supplemental documentation)
       protected: true # Optional (use in combination with `value` to provide an uneditable default)
       env: SOME_API_KEY # Optional (use to delegate to an environment variable for overriding this setting's value)
       env_aliases: [OTHER_ENV] # Optional (use to delegate alternative environment variables for overriding this setting's value)
+      value_processor: "nest_object" # Optional (use with `kind: object` to automatically nest flattened keys)
 ```
 
 ##### Protected settings
@@ -346,7 +348,7 @@ To create a file bundle plugin like <https://gitlab.com/meltano/files-dbt>, foll
 1. Add all file paths under `bundle` to the `package_data["bundle"]` array in `setup.py`
 1. Push your new plugin repository to GitLab.com. Official file bundle plugins live at `https://gitlab.com/meltano/files-...`.
 1. Add an entry to `src/meltano/core/bundle/discovery.yml` under `files`. Set `name` and `pip_url` as appropriate, and if applicable, set `namespace` to the `namespace` of the plugin the file bundle is related to (e.g. `dbt`).
-1. If any files are to be updated automatically when [`meltano upgrade`](/docs/command-line-interface.html#upgrade) is run, add `settings` entries with `name` `update.[file path]`, `kind` `boolean` and `value` `True`.
+1. If any files are to be updated automatically when [`meltano upgrade`](/docs/command-line-interface.html#upgrade) is run, add an `update` object with `[file path]: True` entries for each file.
 1. Success! You can now submit a merge request to Meltano containing the changes to `discovery.yml` (and an appropriate `CHANGELOG` item, of course).
 
 ## System Database

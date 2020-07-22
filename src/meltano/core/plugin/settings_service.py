@@ -1,7 +1,9 @@
+from copy import deepcopy
 from typing import Iterable, Dict, List
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import (
     SettingsService,
     SettingMissingError,
@@ -75,16 +77,35 @@ class PluginSettingsService(SettingsService):
         return self.plugin.qualified_name
 
     @property
-    def _definitions(self):
-        extra_settings = self.plugin_install.extra_settings
-        if not self.plugin_install.is_custom():
-            for setting in extra_settings:
-                extra_name = setting.name[1:]
-                default_value = self.plugin_def.extras.get(extra_name)
-                if default_value is not None:
-                    setting.value = default_value
+    def extra_setting_definitions(self):
+        extra_settings = deepcopy(self.plugin_install.extra_settings)
 
-        return [*self.plugin_def.settings, *extra_settings]
+        if self.plugin_install.is_custom():
+            # No need to set defaults, because values will already be picked up
+            # from `meltano.yml`
+            return extra_settings
+
+        # Set defaults from plugin definition
+        defaults = {f"_{k}": v for k, v in self.plugin_def.extras.items()}
+
+        for setting in extra_settings:
+            default_value = defaults.get(setting.name)
+            if default_value is not None:
+                setting.value = default_value
+
+        # Create setting definitions for unknown defaults,
+        # including flattened keys of default nested object items
+        extra_settings.extend(
+            SettingDefinition.from_missing(
+                extra_settings, defaults, custom=False, default=True
+            )
+        )
+
+        return extra_settings
+
+    @property
+    def _definitions(self):
+        return [*self.plugin_def.settings, *self.extra_setting_definitions]
 
     @property
     def _meltano_yml_config(self):

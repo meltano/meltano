@@ -58,15 +58,12 @@ class SettingValueStore(str, Enum):
     def writable(self):
         return self.manager.writable
 
-    def can_overwrite(self, source):
-        if not self.writable:
-            return False
-
-        if source is self:
-            return True
-
+    def overrides(self, source):
         stores_list = list(self.__class__)
-        return stores_list.index(self) <= stores_list.index(source)
+        return stores_list.index(self) < stores_list.index(source)
+
+    def can_overwrite(self, source):
+        return self.writable and (source is self or self.overrides(source))
 
 
 class SettingsStoreManager(ABC):
@@ -76,6 +73,8 @@ class SettingsStoreManager(ABC):
     def __init__(self, settings_service, **kwargs):
         self.settings_service = settings_service
         self.project = self.settings_service.project
+
+        self.expandible_env = {**self.project.dotenv_env, **self.settings_service.env}
 
     @abstractmethod
     def get(self, name: str, setting_def=None):
@@ -95,9 +94,7 @@ class SettingsStoreManager(ABC):
             raise StoreNotSupportedError
 
     def expand_env_vars(self, value):
-        env = {**self.project.dotenv_env, **self.settings_service.env}
-
-        expanded_value = expand_env_vars(value, env=env)
+        expanded_value = expand_env_vars(value, env=self.expandible_env)
         if expanded_value == value:
             return value, {}
 
@@ -166,13 +163,20 @@ class DotEnvStoreManager(BaseEnvStoreManager):
     label = "`.env`"
     writable = True
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._env = None
+
     def ensure_supported(self, method="get"):
         if method != "get" and self.project.readonly:
             raise StoreNotSupportedError(ProjectReadonly())
 
     @property
     def env(self):
-        return self.project.dotenv_env
+        if self._env is None:
+            self._env = self.project.dotenv_env
+        return self._env
 
     def get(self, *args, **kwargs):
         value, metadata = super().get(*args, **kwargs)
@@ -233,34 +237,65 @@ class DotEnvStoreManager(BaseEnvStoreManager):
         except ProjectReadonly as err:
             raise StoreNotSupportedError(err)
 
+        self._env = None
+
 
 class MeltanoYmlStoreManager(SettingsStoreManager):
     label = "`meltano.yml`"
     writable = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._flat_config = None
 
     def ensure_supported(self, method="get"):
         if method != "get" and self.project.readonly:
             raise StoreNotSupportedError(ProjectReadonly())
 
     def get(self, name: str, setting_def=None):
-        try:
-            value = self.flat_config[name]
-            value, metadata = self.expand_env_vars(value)
+        keys = [name]
+        if setting_def:
+            keys = [setting_def.name, *setting_def.aliases]
 
-            logger.debug(f"Read key '{name}' from `meltano.yml`: {value!r}")
-            return value, metadata
-        except KeyError:
-            return None, {}
+        flat_config = self.flat_config
+
+        for key in keys:
+            try:
+                value = flat_config[key]
+                value, metadata = self.expand_env_vars(value)
+
+                logger.debug(f"Read key '{key}' from `meltano.yml`: {value!r}")
+                return value, {"key": key, **metadata}
+            except KeyError:
+                pass
+
+        return None, {}
 
     def set(self, name: str, path: List[str], value, setting_def=None):
-        with self.update_config() as config:
-            if len(path) > 1:
-                config.pop(name, None)
-                logger.debug(f"Popped key '{name}' in `meltano.yml`")
+        keys_to_unset = [name]
+        if setting_def:
+            keys_to_unset = [setting_def.name, *setting_def.aliases]
 
-            if name.split(".") != path:
-                pop_at_path(config, name, None)
-                logger.debug(f"Popped path '{name}' in `meltano.yml`")
+        paths_to_unset = [k for k in keys_to_unset if "." in k]
+
+        if len(path) == 1:
+            # No need to unset `name`,
+            # since it will be overridden anyway
+            keys_to_unset.remove(name)
+        elif name.split(".") == path:
+            # No need to unset `name` as path,
+            # since it will be overridden anyway
+            paths_to_unset.remove(name)
+
+        with self.update_config() as config:
+            for key in keys_to_unset:
+                config.pop(key, None)
+                logger.debug(f"Popped key '{key}' in `meltano.yml`")
+
+            for path_to_unset in paths_to_unset:
+                pop_at_path(config, path_to_unset, None)
+                logger.debug(f"Popped path '{path_to_unset}' in `meltano.yml`")
 
             set_at_path(config, path, value)
             logger.debug(f"Set path '{path}' in `meltano.yml`: {value!r}")
@@ -268,12 +303,20 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         return {}
 
     def unset(self, name: str, path: List[str], setting_def=None):
-        with self.update_config() as config:
-            config.pop(name, None)
-            logger.debug(f"Popped key '{name}' in `meltano.yml`")
+        keys_to_unset = [name]
+        if setting_def:
+            keys_to_unset = [setting_def.name, *setting_def.aliases]
 
-            pop_at_path(config, name, None)
-            logger.debug(f"Popped path '{name}' in `meltano.yml`")
+        paths_to_unset = [k for k in keys_to_unset if "." in k]
+
+        with self.update_config() as config:
+            for key in keys_to_unset:
+                config.pop(key, None)
+                logger.debug(f"Popped key '{key}' in `meltano.yml`")
+
+            for path_to_unset in paths_to_unset:
+                pop_at_path(config, path_to_unset, None)
+                logger.debug(f"Popped path '{path_to_unset}' in `meltano.yml`")
 
             pop_at_path(config, path, None)
             logger.debug(f"Popped path '{path}' in `meltano.yml`")
@@ -288,7 +331,9 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
 
     @property
     def flat_config(self):
-        return self.settings_service.flat_meltano_yml_config
+        if self._flat_config is None:
+            self._flat_config = self.settings_service.flat_meltano_yml_config
+        return self._flat_config
 
     @contextmanager
     def update_config(self):
@@ -300,17 +345,26 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         except ProjectReadonly as err:
             raise StoreNotSupportedError(err)
 
+        self._flat_config = None
+
+        # This is not quite the right place for this, but we need to create
+        # setting defs for missing keys again when `meltano.yml` changes
+        self.settings_service._setting_defs = None
+
 
 class DbStoreManager(SettingsStoreManager):
     label = "the system database"
     writable = True
 
-    def __init__(self, *args, session=None, **kwargs):
+    def __init__(self, *args, bulk=False, session=None, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.session = session
 
         self.ensure_supported()
+
+        self.bulk = bulk
+        self._all_settings = None
 
     def ensure_supported(self, method="get"):
         if not self.session:
@@ -318,16 +372,19 @@ class DbStoreManager(SettingsStoreManager):
 
     def get(self, name: str, setting_def=None):
         try:
-            value = (
-                self.session.query(Setting)
-                .filter_by(namespace=self.namespace, name=name, enabled=True)
-                .one()
-                .value
-            )
+            if self.bulk:
+                value = self.all_settings[name]
+            else:
+                value = (
+                    self.session.query(Setting)
+                    .filter_by(namespace=self.namespace, name=name, enabled=True)
+                    .one()
+                    .value
+                )
 
             logger.debug(f"Read key '{name}' from system database: {value!r}")
             return value, {}
-        except sqlalchemy.orm.exc.NoResultFound:
+        except (sqlalchemy.orm.exc.NoResultFound, KeyError):
             return None, {}
 
     def set(self, name: str, path: List[str], value, setting_def=None):
@@ -336,6 +393,8 @@ class DbStoreManager(SettingsStoreManager):
         )
         self.session.merge(setting)
         self.session.commit()
+
+        self._all_settings = None
 
         logger.debug(f"Set key '{name}' in system database: {value!r}")
         return {}
@@ -346,6 +405,8 @@ class DbStoreManager(SettingsStoreManager):
         ).delete()
         self.session.commit()
 
+        self._all_settings = None
+
         logger.debug(f"Deleted key '{name}' from system database")
         return {}
 
@@ -353,11 +414,25 @@ class DbStoreManager(SettingsStoreManager):
         self.session.query(Setting).filter_by(namespace=self.namespace).delete()
         self.session.commit()
 
+        self._all_settings = None
+
         return {}
 
     @property
     def namespace(self):
         return self.settings_service._db_namespace
+
+    @property
+    def all_settings(self):
+        if self._all_settings is None:
+            self._all_settings = {
+                s.name: s.value
+                for s in self.session.query(Setting)
+                .filter_by(namespace=self.namespace, enabled=True)
+                .all()
+            }
+
+        return self._all_settings
 
 
 class DefaultStoreManager(SettingsStoreManager):
@@ -378,13 +453,19 @@ class AutoStoreManager(SettingsStoreManager):
     label = "the system database, `meltano.yml`, and `.env`"
     writable = True
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, cache=True, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.cache = cache
 
         self._kwargs = {"settings_service": self.settings_service, **kwargs}
 
+        self._managers = {}
+
     def manager_for(self, store):
-        return store.manager(**self._kwargs)
+        if not self.cache or store not in self._managers:
+            self._managers[store] = store.manager(**self._kwargs)
+        return self._managers[store]
 
     @property
     def sources(self):

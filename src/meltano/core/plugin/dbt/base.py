@@ -4,6 +4,7 @@ from meltano.core.plugin import PluginInstall, PluginRef, PluginType
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.setting_definition import SettingDefinition
 from meltano.core.transform_add_service import TransformAddService
 from meltano.core.behavior.hookable import hook
 
@@ -56,9 +57,10 @@ class DbtTransformPlugin(PluginInstall):
     def is_invokable(self):
         return False
 
-    def is_configurable(self):
-        return False
-
     @property
     def runner(self):
         return PluginRef(PluginType.TRANSFORMERS, "dbt")
+
+    @property
+    def extra_settings(self):
+        return [SettingDefinition(name="_vars", kind="object", value={})]
