@@ -41,7 +41,7 @@ class SelectService:
             self.extractor.run_discovery(invoker)
 
         # update the catalog accordingly
-        self.extractor.apply_metadata_rules(invoker)
+        self.extractor.apply_catalog_rules(invoker)
 
         # return the updated catalog
         with invoker.files["catalog"].open() as catalog:
