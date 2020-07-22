@@ -23,9 +23,5 @@ class SingerPlugin(PluginInstall):
 
         with open(plugin_dir.joinpath(self.config_files["config"]), "w") as config_stub:
             config = invoker.plugin_config_processed
-
-            # Metadata configuration is handled by SingerTap.apply_metadata_rules
-            config.pop("metadata", None)
-
             json.dump(config, config_stub, indent=4)
             logging.debug(f"Created configuration stub at {config_stub}")
