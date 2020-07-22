@@ -167,6 +167,14 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
+        # Verify that object settings set in env are cast correctly
+        monkeypatch.setenv(env_var(subject, "object"), '{"1":{"2":3}}')
+
+        assert subject.get_with_source("object", session=session) == (
+            {"1": {"2": 3}},
+            SettingValueStore.ENV,
+        )
+
         # Verify that boolean settings set in env are cast correctly
         # Default
         assert subject.get_with_source("boolean", session=session) == (
@@ -197,6 +205,38 @@ class TestPluginSettingsService:
             False,
             SettingValueStore.ENV,
         )
+
+    def test_definitions(self, subject, monkeypatch):
+        monkeypatch.setitem(subject.plugin_def.extras, "select", ["from_default"])
+        monkeypatch.setitem(subject.plugin_def.extras, "vars", {"foo": True})
+        subject.show_hidden = False
+        subject._setting_defs = None
+
+        subject.set("custom", "from_meltano_yml")
+        subject.set("nested.custom", True)
+
+        setting_defs_by_name = {s.name: s for s in subject.definitions()}
+
+        # Regular settings
+        assert "test" in setting_defs_by_name
+        assert "start_date" in setting_defs_by_name
+
+        # Expect hidden
+        assert "secret" not in setting_defs_by_name
+
+        # Extras
+        assert "_select" in setting_defs_by_name
+        assert setting_defs_by_name["_select"].value == ["from_default"]
+
+        # Custom settings
+        assert "custom" in setting_defs_by_name
+        assert "nested.custom" in setting_defs_by_name
+        assert setting_defs_by_name["nested.custom"].kind == "boolean"
+
+        # Unknown extras
+        assert "_vars.foo" in setting_defs_by_name
+        assert setting_defs_by_name["_vars.foo"].value == True
+        assert setting_defs_by_name["_vars.foo"].kind == "boolean"
 
     def test_as_dict(self, subject, session, tap):
         EXPECTED = {"test": "mock", "start_date": None, "secure": None}
@@ -446,6 +486,69 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
+    def test_kind_object(self, subject, tap, monkeypatch, env_var):
+        assert subject.get_with_source("object") == (
+            {"nested": "from_default"},
+            SettingValueStore.DEFAULT,
+        )
+
+        subject.set("object.username", "from_meltano_yml")
+
+        assert subject.get_with_source("object") == (
+            {"username": "from_meltano_yml"},
+            SettingValueStore.MELTANO_YML,
+        )
+
+        subject.set("data.password", "from_meltano_yml_alias")
+
+        assert subject.get_with_source("object") == (
+            {"username": "from_meltano_yml", "password": "from_meltano_yml_alias"},
+            SettingValueStore.MELTANO_YML,
+        )
+
+        subject.set(["object", "password"], "from_meltano_yml")
+
+        assert subject.get_with_source("object") == (
+            {"username": "from_meltano_yml", "password": "from_meltano_yml"},
+            SettingValueStore.MELTANO_YML,
+        )
+
+        subject.set(["object", "deep", "nesting"], "from_meltano_yml")
+
+        assert subject.get_with_source("object") == (
+            {
+                "username": "from_meltano_yml",
+                "password": "from_meltano_yml",
+                "deep.nesting": "from_meltano_yml",
+            },
+            SettingValueStore.MELTANO_YML,
+        )
+
+        monkeypatch.setenv(env_var(subject, "object.deep.nesting"), "from_env")
+
+        assert subject.get_with_source("object") == (
+            {
+                "username": "from_meltano_yml",
+                "password": "from_meltano_yml",
+                "deep.nesting": "from_env",
+            },
+            SettingValueStore.ENV,
+        )
+
+        monkeypatch.setenv(env_var(subject, "data"), '{"foo":"from_env_alias"}')
+
+        assert subject.get_with_source("object") == (
+            {"foo": "from_env_alias"},
+            SettingValueStore.ENV,
+        )
+
+        monkeypatch.setenv(env_var(subject, "object"), '{"foo":"from_env"}')
+
+        assert subject.get_with_source("object") == (
+            {"foo": "from_env"},
+            SettingValueStore.ENV,
+        )
+
     def test_extra(self, subject, tap, monkeypatch, env_var):
         assert "_select" in subject.as_dict()
         assert "_select" in subject.as_dict(extras=True)
@@ -457,6 +560,7 @@ class TestPluginSettingsService:
         )
 
         monkeypatch.setitem(subject.plugin_def.extras, "select", ["from_default"])
+        subject._setting_defs = None
 
         assert subject.get_with_source("_select") == (
             ["from_default"],
@@ -499,5 +603,69 @@ class TestPluginSettingsService:
 
         assert subject.get_with_source("_select") == (
             ["from_env"],
+            SettingValueStore.ENV,
+        )
+
+    def test_extra_object(
+        self,
+        subject,
+        monkeypatch,
+        env_var,
+        project_add_service,
+        plugin_settings_service_factory,
+    ):
+        try:
+            transform = project_add_service.add(
+                PluginType.TRANSFORMS, "tap-mock-transform"
+            )
+        except PluginAlreadyAddedException as err:
+            transform = err.plugin
+
+        subject = plugin_settings_service_factory(transform)
+        assert "_vars" in subject.as_dict()
+        assert "_vars" in subject.as_dict(extras=True)
+        assert "_vars" not in subject.as_dict(extras=False)
+
+        assert subject.get_with_source("_vars") == ({}, SettingValueStore.DEFAULT)
+
+        monkeypatch.setitem(
+            subject.plugin_def.extras,
+            "vars",
+            {"var": "from_default", "other": "from_default"},
+        )
+        subject._setting_defs = None
+
+        assert subject.get_with_source("_vars") == (
+            {"var": "from_default", "other": "from_default"},
+            SettingValueStore.DEFAULT,
+        )
+
+        monkeypatch.setitem(
+            subject.plugin_install.extras, "vars", {"var": "from_meltano_yml"}
+        )
+
+        assert subject.get_with_source("_vars") == (
+            {"var": "from_meltano_yml", "other": "from_default"},
+            SettingValueStore.MELTANO_YML,
+        )
+
+        subject.set("_vars", {"other": "from_meltano_yml"})
+
+        assert subject.get_with_source("_vars") == (
+            {"var": "from_default", "other": "from_meltano_yml"},
+            SettingValueStore.MELTANO_YML,
+        )
+
+        monkeypatch.setenv(env_var(subject, "_vars.var"), "from_env")
+
+        assert subject.get_with_source("_vars") == (
+            {"var": "from_env", "other": "from_meltano_yml"},
+            SettingValueStore.ENV,
+        )
+
+        monkeypatch.setenv(env_var(subject, "_vars"), '{"var": "from_env"}')
+
+        assert subject.get_with_source("_vars") == (
+            {"var": "from_env"},
             SettingValueStore.ENV,
         )

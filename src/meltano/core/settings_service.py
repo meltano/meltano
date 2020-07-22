@@ -36,6 +36,8 @@ class SettingsService(ABC):
         self.env_override = env_override
         self.config_override = config_override
 
+        self._setting_defs = None
+
     @property
     @abstractmethod
     def _env_namespace(self) -> str:
@@ -81,8 +83,10 @@ class SettingsService(ABC):
         return {k: v for k, v in values.items() if v != REDACTED_VALUE}
 
     def config_with_metadata(
-        self, sources: List[SettingValueStore] = None, extras=None, **kwargs
+        self, prefix=None, extras=None, source=SettingValueStore.AUTO, **kwargs
     ):
+        manager = source.manager(self, bulk=True, **kwargs)
+
         config = {}
         for setting_def in self.definitions():
             if (extras is True and not setting_def.is_extra) or (
@@ -90,15 +94,21 @@ class SettingsService(ABC):
             ):
                 continue
 
-            value, metadata = self.get_with_metadata(
-                setting_def.name, setting_def=setting_def, **kwargs
-            )
-
-            source = metadata["source"]
-            if sources and source not in sources:
+            if prefix and not setting_def.name.startswith(prefix):
                 continue
 
+            value, metadata = self.get_with_metadata(
+                setting_def.name,
+                setting_def=setting_def,
+                source=source,
+                source_manager=manager,
+                **kwargs,
+            )
+
             name = setting_def.name
+            if prefix:
+                name = name[len(prefix) :]
+
             config[name] = {**metadata, "value": value}
 
         return config
@@ -127,6 +137,7 @@ class SettingsService(ABC):
         name: str,
         redacted=False,
         source=SettingValueStore.AUTO,
+        source_manager=None,
         setting_def=None,
         **kwargs,
     ):
@@ -142,11 +153,34 @@ class SettingsService(ABC):
 
         metadata = {"name": name, "source": source, "setting": setting_def}
 
-        manager = source.manager(self, **kwargs)
+        manager = source_manager or source.manager(self, **kwargs)
         value, get_metadata = manager.get(name, setting_def=setting_def)
         metadata.update(get_metadata)
 
         if setting_def:
+            if (
+                setting_def.kind == "object"
+                and metadata["source"] is SettingValueStore.DEFAULT
+            ):
+                object_value = {}
+                object_source = SettingValueStore.DEFAULT
+                for setting_key in [setting_def.name, *setting_def.aliases]:
+                    flat_config_metadata = self.config_with_metadata(
+                        source=source, prefix=f"{setting_key}."
+                    )
+                    for nested_key, config_metadata in flat_config_metadata.items():
+                        if nested_key in object_value:
+                            continue
+
+                        object_value[nested_key] = config_metadata["value"]
+
+                        nested_source = config_metadata["source"]
+                        if nested_source.overrides(object_source):
+                            object_source = nested_source
+
+                if object_value:
+                    value = object_value
+                    metadata["source"] = object_source
 
             cast_value = setting_def.cast_value(value)
             if cast_value != value:
@@ -241,30 +275,27 @@ class SettingsService(ABC):
         return metadata
 
     def definitions(self) -> Iterable[Dict]:
-        definitions = deepcopy(self._definitions)
-        definition_names = set(s.name for s in definitions)
+        if self._setting_defs is None:
+            setting_defs = [
+                s for s in self._definitions if s.kind != "hidden" or self.show_hidden
+            ]
 
-        definitions.extend(
-            (
-                SettingDefinition.from_key_value(k, v)
-                for k, v in self.flat_meltano_yml_config.items()
-                if k not in definition_names
+            setting_defs.extend(
+                SettingDefinition.from_missing(
+                    self._definitions, self.flat_meltano_yml_config
+                )
             )
-        )
 
-        settings = []
-        for setting in definitions:
-            if setting.kind == "hidden" and not self.show_hidden:
-                continue
+            self._setting_defs = setting_defs
 
-            settings.append(setting)
-
-        return settings
+        return self._setting_defs
 
     def find_setting(self, name: str) -> SettingDefinition:
         try:
-            return find_named(self.definitions(), name)
-        except NotFound as err:
+            return next(
+                s for s in self.definitions() if s.name == name or name in s.aliases
+            )
+        except StopIteration as err:
             raise SettingMissingError(name) from err
 
     def setting_env(self, setting_def):

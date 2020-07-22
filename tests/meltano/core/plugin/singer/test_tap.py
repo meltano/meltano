@@ -114,6 +114,7 @@ class TestSingerTap:
             monkeypatch.setitem(
                 invoker.plugin_def.extras, "select", ["UniqueEntitiesName.name"]
             )
+            invoker.settings_service._setting_defs = None
             invoker.prepare(session)
             subject.apply_metadata_rules(invoker)
 

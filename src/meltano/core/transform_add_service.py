@@ -16,21 +16,22 @@ class TransformAddService:
     def __init__(self, project: Project):
         self.project = project
 
-        config_service = ConfigService(project)
-        dbt_plugin = config_service.find_plugin(
+        self.config_service = ConfigService(project)
+        dbt_plugin = self.config_service.find_plugin(
             plugin_name="dbt", plugin_type=PluginType.TRANSFORMERS
         )
 
-        _, Session = project_engine(project)
-        session = Session()
-        try:
-            settings_service = PluginSettingsService(
-                project, dbt_plugin, config_service=config_service
-            )
-            dbt_project_dir = settings_service.get("project_dir", session=session)
-            dbt_project_path = Path(dbt_project_dir)
-        finally:
-            session.close()
+        self.discovery_service = PluginDiscoveryService(
+            self.project, config_service=self.config_service
+        )
+        settings_service = PluginSettingsService(
+            project,
+            dbt_plugin,
+            config_service=self.config_service,
+            plugin_discovery_service=self.discovery_service,
+        )
+        dbt_project_dir = settings_service.get("project_dir")
+        dbt_project_path = Path(dbt_project_dir)
 
         self.packages_file = dbt_project_path.joinpath("packages.yml")
         self.dbt_project_file = dbt_project_path.joinpath("dbt_project.yml")
@@ -52,13 +53,23 @@ class TransformAddService:
             f.write(yaml.dump(package_yaml, default_flow_style=False, sort_keys=False))
 
     def update_dbt_project(self, plugin: PluginInstall):
-        discovery_service = PluginDiscoveryService(self.project)
-        plugin_def = discovery_service.find_plugin(plugin.type, plugin.name)
+        plugin_def = self.discovery_service.find_plugin(plugin.type, plugin.name)
         model_name = plugin_def.namespace
 
         dbt_project_yaml = yaml.safe_load(self.dbt_project_file.open())
+        model_def = {}
 
-        dbt_project_yaml["models"][model_name] = plugin.extras or plugin_def.extras
+        settings_service = PluginSettingsService(
+            self.project,
+            plugin,
+            config_service=self.config_service,
+            plugin_discovery_service=self.discovery_service,
+        )
+        vars = settings_service.get("_vars")
+        if vars:
+            model_def["vars"] = vars
+
+        dbt_project_yaml["models"][model_name] = model_def
 
         with open(self.dbt_project_file, "w") as f:
             f.write(
