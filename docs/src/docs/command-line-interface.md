@@ -231,26 +231,6 @@ meltano config <plugin_name> set <property>.<deep>.<nesting> <value>
 #    <property>.<deep>.<nesting>: <value>
 ```
 
-### Singer metadata
-
-On extractors (Singer taps), [stream and property metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata)
-can be configured using special [nested properties](#nested-properties) `metadata.<entity>.<key>` and `metadata.<entity>.<attribute>.<key>`,
-where `<entity>` refers to a stream's `tap_stream_id` value, and `<attribute>` to one of the stream's properties.
-
-Like [`meltano select`](#select) rules, metadata rules allow for [glob](https://en.wikipedia.org/wiki/Glob_(programming))-like
-patterns in the entity and attribute identifiers.
-
-```bash
-meltano config <plugin_name> set metadata <entity> <key> <value>
-meltano config <plugin_name> set metadata <entity> <attribute> <key> <value>
-
-# For example:
-meltano config tap-postgres set metadata "some_schema-*" replication-method INCREMENTAL
-meltano config tap-postgres set metadata "some_schema-*" replication-key created_at
-
-meltano config tap-postgres set metadata some_schema-some_table some_column custom-metadata custom-value
-```
-
 ### Plugin extras
 
 `meltano config` can also be used to manage so-called plugin extras:
@@ -290,27 +270,108 @@ meltano config <plugin> set _<extra> <value>
 meltano config <plugin> unset _<extra>
 ```
 
-#### Extractor `select`
+### Extractor extra: `select`
 
 - Setting: `_select`
 - Environment variable: `<NAMESPACE>__SELECT`
 - Default: `["*.*"]`
 
-An extractor's `select` extra holds an array of [entity selection rules](/#meltano-select)
+An extractor's `select` [extra](#plugin-extras) holds an array of [entity selection rules](/#meltano-select)
 to apply to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
 when the extractor is run using [`meltano elt`](#elt) or [`meltano invoke`](#invoke).
 
-While it can be managed using `meltano config` or environment variables like any other setting,
+While this extra can be managed using `meltano config` or environment variables like any other setting,
 selection rules are typically specified using [`meltano select`](#select).
 
-##### How to use
+#### How to use
 
 ```bash
-meltano config <plugin> set _select '["entity.attribute"]'
+meltano config <plugin> set _select '["<entity>.<attribute>"]'
 
-export <NAMESPACE>__SELECT='["entity.attribute"]'
+export <NAMESPACE>__SELECT='["<entity>.<attribute>"]'
 
-meltano select <plugin> entity attribute
+meltano select <plugin> <entity> <attribute>
+```
+
+### Extractor extra: `metadata`
+
+- Setting: `_metadata`, alias: `metadata`
+- Environment variable: `<NAMESPACE>__METADATA`
+- Default: `{}` (an empty object)
+
+An extractor's `metadata` [extra](#plugin-extras) holds an object describing
+[Singer stream and property metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata)
+rules to apply to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
+when the extractor is run using [`meltano elt`](#elt) or [`meltano invoke`](#invoke).
+
+Stream (entity) metadata `<key>: <value>` pairs are nested under top-level entity identifiers that correspond to Singer stream `tap_stream_id` values.
+These [nested properties](#nested-properties) can also be thought of and interacted with as settings named `_metadata.<entity>.<key>`.
+
+Property (attribute) metadata `<key>: <value>` pairs are nested under top-level entity identifiers and second-level attribute identifiers that correspond to Singer stream property names.
+These [nested properties](#nested-properties) can also be thought of and interacted with as settings named `_metadata.<entity>.<attribute>.<key>`.
+
+Entity and attribute names can be discovered using [`meltano select --list --all <plugin>`](#select).
+
+Like [entity selection rules](#select), metadata rules allow for [glob](https://en.wikipedia.org/wiki/Glob_(programming))-like
+patterns in the entity and attribute identifiers to match multiple entities and/or attributes at once.
+
+#### How to use
+
+```bash
+meltano config <plugin> set _metadata <entity> <key> <value>
+meltano config <plugin> set _metadata <entity> <attribute> <key> <value>
+
+export <NAMESPACE>__METADATA='{"<entity>": {"<attribute>": {"<key>": "<value>"}}}'
+
+# Once metadata has been set in `meltano.yml`, environment variables can be used
+# to override specific nested properties:
+export <NAMESPACE>__METADATA_<ENTITY>_<ATTRIBUTE>_<KEY>=<value>
+
+# For example:
+meltano config tap-postgres set _metadata some_table replication-method INCREMENTAL
+meltano config tap-postgres set _metadata some_table replication-key created_at
+meltano config tap-postgres set _metadata some_table created_at is-replication-key true
+
+export TAP_POSTGRES__METADATA_SOME_TABLE_REPLICATION_METHOD=FULL_TABLE
+```
+
+### Transform extra: `vars`
+
+- Setting: `_vars`
+- Environment variable: `<NAMESPACE>__VARS`
+- Default: `{}` (an empty object)
+
+A transform's `vars` [extra](#plugin-extras) holds an object representing [dbt model variables](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/using-variables)
+that can be referenced from a model using the [`var` function](https://docs.getdbt.com/reference/dbt-jinja-functions/var).
+
+When the transform is installed using [`meltano install`](#install), this object will be used as the dbt model's `vars` object in `transform/dbt_project.yml`.
+
+Because these variables are handled by dbt rather than Meltano, environment variables (including Meltano's [pipeline environment variables](#pipeline-environment-variables)) can be referenced using the [`env_var` function](https://docs.getdbt.com/reference/dbt-jinja-functions/env_var) instead of `$ENV_VAR` references.
+
+#### How to use
+
+```bash
+meltano config --plugin-type=transform <plugin> set _vars schema "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+
+export <NAMESPACE>__VARS='{"schema": "{{ env_var(''DBT_SOURCE_SCHEMA'') }}"}'
+```
+
+### File bundle extra: `update`
+
+- Setting: `_update`
+- Environment variable: `<NAMESPACE>__UPDATE`
+- Default: `{}` (an empty object)
+
+A file bundle's `update` [extra](#plugin-extras) holds an object mapping file paths (of files inside the bundle, relative to the project root) to booleans.
+
+When a file path's value is `True`, the file is considered to be managed by the file bundle and updated automatically when [`meltano upgrade`](#upgrade) is run.
+
+#### How to use
+
+```bash
+meltano config --plugin-type=files <plugin> set _update file/path false
+
+export <NAMESPACE>__UPDATE='{"file/path": false}'
 ```
 
 ## `discover`
