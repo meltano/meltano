@@ -13,6 +13,8 @@ from . import SingerPlugin, PluginType
 from .catalog import (
     MetadataExecutor,
     MetadataRule,
+    SchemaExecutor,
+    SchemaRule,
     property_breadcrumb,
     select_metadata_rules,
 )
@@ -44,6 +46,18 @@ def config_metadata_rules(config):
     return rules
 
 
+def config_schema_rules(config):
+    return [
+        SchemaRule(
+            tap_stream_id=tap_stream_id,
+            breadcrumb=["properties", prop],
+            payload=payload,
+        )
+        for tap_stream_id, stream_config in config.items()
+        for prop, payload in stream_config.items()
+    ]
+
+
 class SingerTap(SingerPlugin):
     __plugin_type__ = PluginType.EXTRACTORS
 
@@ -57,6 +71,9 @@ class SingerTap(SingerPlugin):
                 kind="object",
                 value={},
                 value_processor="nest_object",
+            ),
+            SettingDefinition(
+                name="_schema", kind="object", value={}, value_processor="nest_object"
             ),
         ]
 
@@ -145,16 +162,16 @@ class SingerTap(SingerPlugin):
             ) from err
 
     @hook("before_invoke", can_fail=True)
-    def apply_metadata_rules_hook(self, plugin_invoker, exec_args=[]):
+    def apply_catalog_rules_hook(self, plugin_invoker, exec_args=[]):
         if "--discover" in exec_args:
             return
 
         try:
-            self.apply_metadata_rules(plugin_invoker, exec_args)
+            self.apply_catalog_rules(plugin_invoker, exec_args)
         except PluginLacksCapabilityError:
             return
 
-    def apply_metadata_rules(self, plugin_invoker, exec_args=[]):
+    def apply_catalog_rules(self, plugin_invoker, exec_args=[]):
         if (
             not "catalog" in plugin_invoker.capabilities
             and not "properties" in plugin_invoker.capabilities
@@ -176,18 +193,19 @@ class SingerTap(SingerPlugin):
                 *select_metadata_rules(config["_select"]),
                 *config_metadata_rules(config["_metadata"]),
             ]
+            MetadataExecutor(metadata_rules).visit(schema)
 
-            metadata_executor = MetadataExecutor(metadata_rules)
-            metadata_executor.visit(schema)
+            schema_rules = config_schema_rules(config["_schema"])
+            SchemaExecutor(schema_rules).visit(schema)
 
             with properties_file.open("w") as catalog:
                 json.dump(schema, catalog)
         except FileNotFoundError as err:
             raise PluginExecutionError(
-                f"Applying metadata rules failed: catalog file is missing."
+                f"Applying metadata and schema rules failed: catalog file is missing."
             ) from err
         except Exception as err:
             properties_file.unlink()
             raise PluginExecutionError(
-                f"Applying metadata rules failed: catalog file is invalid: {properties_file}"
+                f"Applying metadata and schema rules failed: catalog file is invalid: {properties_file}"
             ) from err

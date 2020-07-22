@@ -87,7 +87,10 @@ class TestSingerTap:
 
         def mock_metadata_executor(rules):
             def visit(schema):
-                schema["rules"].extend(rules)
+                for rule in rules:
+                    schema["rules"].append(
+                        [rule.tap_stream_id, rule.breadcrumb, rule.key, rule.value]
+                    )
 
             return mock.Mock(visit=visit)
 
@@ -98,7 +101,7 @@ class TestSingerTap:
             reset_properties()
 
             invoker.prepare(session)
-            subject.apply_metadata_rules(invoker)
+            subject.apply_catalog_rules(invoker)
 
             # When `select` isn't set in meltano.yml or discovery.yml, select all
             assert_rules(
@@ -116,7 +119,7 @@ class TestSingerTap:
             )
             invoker.settings_service._setting_defs = None
             invoker.prepare(session)
-            subject.apply_metadata_rules(invoker)
+            subject.apply_catalog_rules(invoker)
 
             # When `select` is set in discovery.yml, use the selection
             assert_rules(
@@ -134,7 +137,7 @@ class TestSingerTap:
             )
 
             invoker.prepare(session)
-            subject.apply_metadata_rules(invoker)
+            subject.apply_catalog_rules(invoker)
 
             # `select` set in meltano.yml takes precedence over discovery.yml
             assert_rules(
@@ -144,7 +147,112 @@ class TestSingerTap:
                 ["UniqueEntitiesName", ["properties", "code"], "selected", True],
             )
 
-    def test_apply_metadata_rules_catalog_invalid(
+    def test_apply_catalog_rules(self, session, plugin_invoker_factory, subject):
+        invoker = plugin_invoker_factory(subject)
+
+        properties_file = invoker.files["catalog"]
+
+        def reset_properties():
+            properties_file.open("w").write('{"rules": []}')
+
+        def assert_rules(*rules):
+            with properties_file.open() as catalog:
+                schema = json.load(catalog)
+
+            assert schema["rules"] == list(rules)
+
+        def mock_metadata_executor(rules):
+            def visit(schema):
+                for rule in rules:
+                    schema["rules"].append(
+                        [rule.tap_stream_id, rule.breadcrumb, rule.key, rule.value]
+                    )
+
+            return mock.Mock(visit=visit)
+
+        def mock_schema_executor(rules):
+            def visit(schema):
+                for rule in rules:
+                    schema["rules"].append(
+                        [rule.tap_stream_id, rule.breadcrumb, rule.payload]
+                    )
+
+            return mock.Mock(visit=visit)
+
+        with mock.patch(
+            "meltano.core.plugin.singer.tap.MetadataExecutor",
+            side_effect=mock_metadata_executor,
+        ), mock.patch(
+            "meltano.core.plugin.singer.tap.SchemaExecutor",
+            side_effect=mock_schema_executor,
+        ):
+            reset_properties()
+
+            config = {
+                "_select": ["UniqueEntitiesName.code"],
+                "_metadata": {
+                    "UniqueEntitiesName": {"replication-key": "created_at"},
+                    "UniqueEntitiesName.created_at": {"is-replication-key": True},
+                },
+                "metadata.UniqueEntitiesName.properties.payload.properties.hash.custom-metadata": "custom-value",
+                "_schema": {
+                    "UniqueEntitiesName": {
+                        "code": {"anyOf": [{"type": "string"}, {"type": "null"}]}
+                    },
+                    "UniqueEntitiesName.payload.type": "object",
+                    "UniqueEntitiesName.payload.properties": {
+                        "content": {"type": ["string", "null"]},
+                        "hash": {"type": "string"},
+                    },
+                },
+            }
+
+            # Pretend `config` is set in meltano.yml
+            with mock.patch.object(invoker.plugin, "config", config):
+                invoker.prepare(session)
+                subject.apply_catalog_rules(invoker)
+
+            assert_rules(
+                # Clean slate selection metadata rules
+                ["*", [], "selected", False],
+                ["*", ["properties", "*"], "selected", False],
+                # Selection metadata rules
+                ["UniqueEntitiesName", [], "selected", True],
+                ["UniqueEntitiesName", ["properties", "code"], "selected", True],
+                # Metadata rules
+                ["UniqueEntitiesName", [], "replication-key", "created_at"],
+                [
+                    "UniqueEntitiesName",
+                    ["properties", "created_at"],
+                    "is-replication-key",
+                    True,
+                ],
+                [
+                    "UniqueEntitiesName",
+                    ["properties", "payload", "properties", "hash"],
+                    "custom-metadata",
+                    "custom-value",
+                ],
+                # Schema rules
+                [
+                    "UniqueEntitiesName",
+                    ["properties", "code"],
+                    {"anyOf": [{"type": "string"}, {"type": "null"}]},
+                ],
+                [
+                    "UniqueEntitiesName",
+                    ["properties", "payload"],
+                    {
+                        "type": "object",
+                        "properties": {
+                            "content": {"type": ["string", "null"]},
+                            "hash": {"type": "string"},
+                        },
+                    },
+                ],
+            )
+
+    def test_apply_catalog_rules_invalid(
         self, session, plugin_invoker_factory, subject
     ):
         invoker = plugin_invoker_factory(subject, prepare_with_session=session)
@@ -152,4 +260,4 @@ class TestSingerTap:
         invoker.files["catalog"].open("w").write("this is invalid json")
 
         with pytest.raises(PluginExecutionError, match=r"invalid"):
-            subject.apply_metadata_rules(invoker, [])
+            subject.apply_catalog_rules(invoker, [])

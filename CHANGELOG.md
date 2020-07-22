@@ -16,11 +16,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Add support for `kind: object` settings, which can gather nested values from across setting stores
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Add support for `aliases: [...]` on setting definitions
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Add support for `value_processor: 'nest_object'` on setting definitions
+- [#2145](https://gitlab.com/meltano/meltano/-/issues/2145) Let discovered catalog schema be modified using schema rules stored in extractor `schema` extra (aka `_schema` setting)
 
 ### Changes
 
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Replace `update.*` file bundle settings with `update` extra (aka `_update` setting)
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Replace `metadata.*` extractor settings with `metadata` extra (aka `_metadata` setting)
+- [#1764](https://gitlab.com/meltano/meltano/-/merge_requests/1764) Interpret `meltano config <plugin> set` value as JSON to allow non-string values to be set more easily
 
 ### Fixes
 

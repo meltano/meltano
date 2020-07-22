@@ -88,6 +88,11 @@ def config(ctx, project, plugin_type, plugin_name, format, extras):
 def set(ctx, setting_name, value, store):
     store = SettingValueStore(store)
 
+    try:
+        value = json.loads(value)
+    except json.JSONDecodeError:
+        pass
+
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
     subject = ctx.obj["subject"]
