@@ -9,13 +9,32 @@ from typing import List
 from meltano.core.behavior.visitor import visit_with
 
 
-class MetadataRule(
-    namedtuple("MetadataRule", ("tap_stream_id", "breadcrumb", "key", "value"))
-):
+class CatalogRule:
+    def __init__(self, tap_stream_id, breadcrumb):
+        self.tap_stream_id = tap_stream_id
+        self.breadcrumb = breadcrumb
+
+    @classmethod
+    def matching(cls, rules, tap_stream_id, breadcrumb):
+        return [rule for rule in rules if rule.match(tap_stream_id, breadcrumb)]
+
     def match(self, tap_stream_id, breadcrumb):
         return fnmatch(tap_stream_id, self.tap_stream_id) and fnmatch(
             ".".join(breadcrumb), ".".join(self.breadcrumb)
         )
+
+
+class MetadataRule(CatalogRule):
+    def __init__(self, tap_stream_id, breadcrumb, key, value):
+        super().__init__(tap_stream_id, breadcrumb)
+        self.key = key
+        self.value = value
+
+
+class SchemaRule(CatalogRule):
+    def __init__(self, tap_stream_id, breadcrumb, payload):
+        super().__init__(tap_stream_id, breadcrumb)
+        self.payload = payload
 
 
 SelectPattern = namedtuple(
@@ -199,7 +218,6 @@ class CatalogExecutor:
 class MetadataExecutor(CatalogExecutor):
     def __init__(self, rules: List[MetadataRule]):
         self._stream = None
-        self._stream_path = None
         self._rules = rules
 
     def ensure_metadata(self, breadcrumb):
@@ -218,14 +236,14 @@ class MetadataExecutor(CatalogExecutor):
 
     def stream_node(self, node, path):
         self._stream = node
-        self._stream_path = path
+        tap_stream_id = self._stream["tap_stream_id"]
 
         if not "metadata" in node:
             node["metadata"] = []
 
         self.ensure_metadata([])
 
-        for rule in self.find_rules(self._stream["tap_stream_id"], []):
+        for rule in MetadataRule.matching(self._rules, tap_stream_id, []):
             # Legacy catalogs have underscorized keys on the streams themselves
             self.set_metadata(node, path, rule.key.replace("-", "_"), rule.value)
 
@@ -243,13 +261,10 @@ class MetadataExecutor(CatalogExecutor):
             f"Visiting metadata node for tap_stream_id '{tap_stream_id}', breadcrumb '{breadcrumb}'"
         )
 
-        for rule in self.find_rules(tap_stream_id, breadcrumb):
+        for rule in MetadataRule.matching(self._rules, tap_stream_id, breadcrumb):
             self.set_metadata(
                 node["metadata"], f"{path}.metadata", rule.key, rule.value
             )
-
-    def find_rules(self, tap_stream_id, breadcrumb):
-        return [rule for rule in self._rules if rule.match(tap_stream_id, breadcrumb)]
 
     def set_metadata(self, node, path, key, value):
         # Unsupported fields cannot be selected
@@ -267,6 +282,29 @@ class MetadataExecutor(CatalogExecutor):
 class SelectExecutor(MetadataExecutor):
     def __init__(self, patterns: List[str]):
         super().__init__(select_metadata_rules(patterns))
+
+
+class SchemaExecutor(CatalogExecutor):
+    def __init__(self, rules: List[SchemaRule]):
+        self._stream = None
+        self._rules = rules
+
+    def stream_node(self, node, path):
+        self._stream = node
+
+    def property_node(self, node, path):
+        tap_stream_id = self._stream["tap_stream_id"]
+
+        breadcrumb_idx = path.index("properties")
+        breadcrumb = path[breadcrumb_idx:].split(".")
+
+        for rule in SchemaRule.matching(self._rules, tap_stream_id, breadcrumb):
+            self.set_payload(node, path, rule.payload)
+
+    def set_payload(self, node, path, payload):
+        node.clear()
+        node.update(payload)
+        logging.debug(f"Setting '{path}' to {payload!r}")
 
 
 class ListExecutor(CatalogExecutor):
