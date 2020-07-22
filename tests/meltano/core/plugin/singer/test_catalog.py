@@ -14,6 +14,8 @@ from meltano.core.plugin.singer.catalog import (
     SelectExecutor,
     MetadataExecutor,
     MetadataRule,
+    SchemaExecutor,
+    SchemaRule,
     ListExecutor,
     ListSelectedExecutor,
     path_property,
@@ -592,6 +594,12 @@ class TestMetadataExecutor:
                     "is-replication-key",
                     True,
                 ),
+                MetadataRule(
+                    "UniqueEntitiesName",
+                    ["properties", "payload", "properties", "hash"],
+                    "custom-metadata",
+                    "custom-value",
+                ),
             ]
         )
         visit(catalog, executor)
@@ -602,15 +610,74 @@ class TestMetadataExecutor:
         stream_metadata_node = next(
             m for m in stream_node["metadata"] if len(m["breadcrumb"]) == 0
         )
-        property_metadata_node = next(
+        created_at_property_metadata_node = next(
             m
             for m in stream_node["metadata"]
             if m["breadcrumb"] == ["properties", "created_at"]
         )
+        hash_property_metadata_node = next(
+            m
+            for m in stream_node["metadata"]
+            if m["breadcrumb"] == ["properties", "payload", "properties", "hash"]
+        )
 
         assert stream_node["replication_key"] == "created_at"
         assert stream_metadata_node["metadata"]["replication-key"] == "created_at"
-        assert property_metadata_node["metadata"]["is-replication-key"] == True
+        assert (
+            created_at_property_metadata_node["metadata"]["is-replication-key"] == True
+        )
+        assert (
+            hash_property_metadata_node["metadata"]["custom-metadata"] == "custom-value"
+        )
+
+
+class TestSchemaExecutor:
+    @pytest.fixture
+    def catalog(self, request):
+        return json.loads(globals()[request.param])
+
+    @pytest.mark.parametrize(
+        "catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"]
+    )
+    def test_visit(self, catalog):
+        executor = SchemaExecutor(
+            [
+                SchemaRule(
+                    "UniqueEntitiesName",
+                    ["properties", "code"],
+                    {"anyOf": [{"type": "string"}, {"type": "null"}]},
+                ),
+                SchemaRule(
+                    "UniqueEntitiesName",
+                    ["properties", "payload"],
+                    {
+                        "type": "object",
+                        "properties": {
+                            "content": {"type": ["string", "null"]},
+                            "hash": {"type": "string"},
+                        },
+                    },
+                ),
+                SchemaRule(
+                    "UniqueEntitiesName",
+                    ["properties", "payload", "properties", "hash"],
+                    {"type": ["string", "null"]},
+                ),
+            ]
+        )
+        visit(catalog, executor)
+
+        stream_node = next(
+            s for s in catalog["streams"] if s["tap_stream_id"] == "UniqueEntitiesName"
+        )
+        code_property_node = stream_node["schema"]["properties"]["code"]
+        hash_property_node = stream_node["schema"]["properties"]["payload"][
+            "properties"
+        ]["hash"]
+
+        assert code_property_node == {"anyOf": [{"type": "string"}, {"type": "null"}]}
+        assert "required" not in stream_node["schema"]["properties"]["payload"]
+        assert hash_property_node == {"type": ["string", "null"]}
 
 
 class TestListExecutor:
