@@ -21,20 +21,16 @@ logger = logging.getLogger(__name__)
 
 
 def config_metadata_rules(config):
+    flat_config = flatten(config, "dot")
+
     rules = []
-    for key, value in config.items():
-        if not key.startswith("metadata."):
-            continue
-
-        # metadata.<tap_stream_id>.<key>
-        # metadata.<tap_stream_id>.<prop>.<key>
-        # metadata.<tap_stream_id>.<prop>.<subprop>.<key>
-        # metadata.<tap_stream_id>.properties.<prop>.<key>
-        # metadata.<tap_stream_id>.properties.<prop>.properties.<subprop>.<key>
-        _, tap_stream_id, *props, key = key.split(".")
-
-        if key == "selected":
-            value = truthy(value)
+    for key, value in flat_config.items():
+        # <tap_stream_id>.<key>
+        # <tap_stream_id>.<prop>.<key>
+        # <tap_stream_id>.<prop>.<subprop>.<key>
+        # <tap_stream_id>.properties.<prop>.<key>
+        # <tap_stream_id>.properties.<prop>.properties.<subprop>.<key>
+        tap_stream_id, *props, key = key.split(".")
 
         rules.append(
             MetadataRule(
@@ -53,7 +49,16 @@ class SingerTap(SingerPlugin):
 
     @property
     def extra_settings(self):
-        return [SettingDefinition(name="_select", kind="array", value=["*.*"])]
+        return [
+            SettingDefinition(name="_select", kind="array", value=["*.*"]),
+            SettingDefinition(
+                name="_metadata",
+                aliases=["metadata"],
+                kind="object",
+                value={},
+                value_processor="nest_object",
+            ),
+        ]
 
     def exec_args(self, plugin_invoker):
         """
@@ -169,7 +174,7 @@ class SingerTap(SingerPlugin):
             metadata_rules = [
                 *select_metadata_rules(["!*.*"]),
                 *select_metadata_rules(config["_select"]),
-                *config_metadata_rules(plugin_invoker.plugin_config),
+                *config_metadata_rules(config["_metadata"]),
             ]
 
             metadata_executor = MetadataExecutor(metadata_rules)
