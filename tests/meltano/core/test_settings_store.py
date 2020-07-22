@@ -74,7 +74,7 @@ def unsupported():
 class TestAutoStoreManager:
     @pytest.fixture()
     def subject(self, dummy_settings_service, session):
-        manager = AutoStoreManager(dummy_settings_service, session=session)
+        manager = AutoStoreManager(dummy_settings_service, session=session, cache=False)
         yield manager
         manager.reset()
 

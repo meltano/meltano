@@ -560,6 +560,7 @@ class TestPluginSettingsService:
         )
 
         monkeypatch.setitem(subject.plugin_def.extras, "select", ["from_default"])
+        subject._setting_defs = None
 
         assert subject.get_with_source("_select") == (
             ["from_default"],

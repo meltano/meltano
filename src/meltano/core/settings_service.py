@@ -82,7 +82,11 @@ class SettingsService(ABC):
 
         return {k: v for k, v in values.items() if v != REDACTED_VALUE}
 
-    def config_with_metadata(self, prefix=None, extras=None, **kwargs):
+    def config_with_metadata(
+        self, prefix=None, extras=None, source=SettingValueStore.AUTO, **kwargs
+    ):
+        manager = source.manager(self, bulk=True, **kwargs)
+
         config = {}
         for setting_def in self.definitions():
             if (extras is True and not setting_def.is_extra) or (
@@ -94,7 +98,11 @@ class SettingsService(ABC):
                 continue
 
             value, metadata = self.get_with_metadata(
-                setting_def.name, setting_def=setting_def, **kwargs
+                setting_def.name,
+                setting_def=setting_def,
+                source=source,
+                source_manager=manager,
+                **kwargs,
             )
 
             name = setting_def.name
@@ -129,6 +137,7 @@ class SettingsService(ABC):
         name: str,
         redacted=False,
         source=SettingValueStore.AUTO,
+        source_manager=None,
         setting_def=None,
         **kwargs,
     ):
@@ -144,7 +153,7 @@ class SettingsService(ABC):
 
         metadata = {"name": name, "source": source, "setting": setting_def}
 
-        manager = source.manager(self, **kwargs)
+        manager = source_manager or source.manager(self, **kwargs)
         value, get_metadata = manager.get(name, setting_def=setting_def)
         metadata.update(get_metadata)
 

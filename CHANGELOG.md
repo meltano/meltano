@@ -24,6 +24,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Fix poor performance of setting lookups using more memoization
+
 ### Breaks
 
 
