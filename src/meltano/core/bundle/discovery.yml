@@ -602,7 +602,6 @@ loaders:
       - name: url
         env: PG_URL
       - name: user
-        aliases: [username]
         env: PG_USERNAME
         value: warehouse
       - name: password
@@ -610,7 +609,6 @@ loaders:
         env: PG_PASSWORD
         value: warehouse
       - name: host
-        aliases: [address]
         env: PG_ADDRESS
         value: localhost
         protected: true
@@ -619,7 +617,6 @@ loaders:
         env: PG_PORT
         value: 5502
       - name: dbname
-        aliases: [database]
         label: Database Name
         env: PG_DATABASE
         value: warehouse
@@ -862,13 +859,17 @@ files:
   - name: airflow
     namespace: airflow
     pip_url: git+https://gitlab.com/meltano/files-airflow.git
-    update:
-      orchestrate/dags/meltano.py: True
+    settings:
+      - name: update.orchestrate/dags/meltano.py
+        kind: boolean
+        value: True
   - name: dbt
     namespace: dbt
     pip_url: git+https://gitlab.com/meltano/files-dbt.git
-    update:
-      transform/profile/profiles.yml: True
+    settings:
+      - name: update.transform/profile/profiles.yml
+        kind: boolean
+        value: True
   - name: docker-compose
     namespace: docker_compose
     pip_url: git+https://gitlab.com/meltano/files-docker-compose.git
