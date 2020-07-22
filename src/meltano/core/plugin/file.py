@@ -7,7 +7,7 @@ from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.behavior.hookable import hook
 from meltano.core.venv_service import VirtualEnv
-from meltano.core.utils import nest
+from meltano.core.setting_definition import SettingDefinition
 
 
 class FilePlugin(PluginInstall):
@@ -16,13 +16,21 @@ class FilePlugin(PluginInstall):
     def __init__(self, *args, **kwargs):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
 
-        self._plugin_config = None
+        self._update_config = None
+
+    @property
+    def extra_settings(self):
+        return [
+            SettingDefinition(
+                name="_update", kind="object", aliases=["update"], value={}
+            )
+        ]
 
     def is_invokable(self):
         return False
 
     def should_add_to_file(self, project):
-        return "update" in self.plugin_config(project)
+        return len(self.update_config(project)) > 0
 
     def file_contents(self, project):
         venv = VirtualEnv(project.plugin_dir(self, "venv"))
@@ -41,7 +49,7 @@ class FilePlugin(PluginInstall):
             [
                 f"# This file is managed by the '{self.name}' {self.type.descriptor} and updated automatically when `meltano upgrade` is run.",
                 f"# To prevent any manual changes from being overwritten, remove the {self.type.descriptor} from `meltano.yml` or disable automatic updates:",
-                f"#     meltano config --plugin-type={self.type} {self.name} set update {relative_path} false",
+                f"#     meltano config --plugin-type={self.type} {self.name} set _update {relative_path} false",
             ]
         )
 
@@ -57,27 +65,16 @@ class FilePlugin(PluginInstall):
             for relative_path, content in self.file_contents(project).items()
         }
 
-    def plugin_config(self, project):
-        if self._plugin_config is None:
-            _, Session = project_engine(project)
-            session = Session()
-            try:
-                plugin_settings_service = PluginSettingsService(project, self)
-                raw_config = plugin_settings_service.as_dict(session=session)
-            finally:
-                session.close()
+    def update_config(self, project):
+        if self._update_config is None:
+            plugin_settings_service = PluginSettingsService(project, self)
+            self._update_config = plugin_settings_service.get("_update")
 
-            config = {}
-            for key, value in raw_config.items():
-                nest(config, key, value, maxsplit=1)
-
-            self._plugin_config = config
-
-        return self._plugin_config
+        return self._update_config
 
     def should_update_file(self, project, relative_path):
         try:
-            return self.plugin_config(project)["update"][str(relative_path)]
+            return self.update_config(project)[str(relative_path)]
         except KeyError:
             return False
 

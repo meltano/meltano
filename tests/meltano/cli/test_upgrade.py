@@ -88,7 +88,8 @@ class TestCliUpgrade:
                 "files",
                 "dbt",
                 "set",
-                "update.transform/profile/profiles.yml",
+                "update",
+                "transform/profile/profiles.yml",
                 "false",
             ],
         )
@@ -111,7 +112,8 @@ class TestCliUpgrade:
                 "files",
                 "dbt",
                 "set",
-                "update.transform/dbt_project.yml",
+                "update",
+                "transform/dbt_project.yml",
                 "true",
             ],
         )

@@ -12,7 +12,7 @@ class MeltanoInvoker:
     def invoke(self, args, command="meltano", env={}, **kwargs):
         base_env = self.settings_service.env
         overridden_config_env = self.settings_service.as_env(
-            sources=[SettingValueStore.CONFIG_OVERRIDE]
+            source=SettingValueStore.CONFIG_OVERRIDE
         )
 
         return subprocess.run(
