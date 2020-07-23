@@ -262,8 +262,8 @@ homepage_sample_code:
     - "[[ $TAP_COVID_19_API_TOKEN ]] && meltano select --list tap-covid-19 || echo '$TAP_COVID_19_API_TOKEN is not set'"
 
     # Set stream metadata for all matching entities
-    - meltano config tap-covid-19 set metadata "eu_*" replication-method INCREMENTAL
-    - meltano config tap-covid-19 set metadata "eu_*" replication-key date
+    - meltano config tap-covid-19 set _metadata "eu_*" replication-method INCREMENTAL
+    - meltano config tap-covid-19 set _metadata "eu_*" replication-key date
 
   artifacts:
     paths:

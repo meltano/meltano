@@ -617,10 +617,16 @@ Meltano makes it easy to select specific entities and attributes for inclusion o
 which lets you specify inclusion and exclusion rules using [glob](https://en.wikipedia.org/wiki/Glob_(programming))-like patterns with wildcards (`*`, `?`) and character groups (`[abc]`, `[!abc]`).
 
 Additional [Singer stream and property metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata)
-(like `replication-method` and `replication-key`) can be specified as if it were
-any other [plugin configuration](/#meltano-config), using special [nested `config` properties](/docs/command-line-interface.html#nested-attributes)
-`metadata.<entity>.<key>` and `metadata.<entity>.<attribute>.<key>`.
-Like selection rules, these metadata rules allow for [glob](https://en.wikipedia.org/wiki/Glob_(programming))-like
+(like `replication-method` and `replication-key`) can be specified like
+any other [plugin configuration](/#meltano-config), using a special
+[`_metadata` setting](/docs/command-line-interface.html#extractor-extra-metadata) with
+[nested properties](/docs/command-line-interface.html#nested-properties)
+`_metadata.<entity>.<key>` and `_metadata.<entity>.<attribute>.<key>`.
+
+Similarly, a special [`_schema` setting](/docs/command-line-interface.html#extractor-extra-schema)
+is available that lets you easily override
+[Singer stream schema](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#schemas) descriptions.
+Like selection rules, these metadata and schema rules allow for [glob](https://en.wikipedia.org/wiki/Glob_(programming))-like
 patterns in the entity and attribute identifiers.
 
 Whenever an extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt)
@@ -658,9 +664,15 @@ meltano select tap-covid-19 --exclude "*" "git_*"
 # List selected (enabled) entities and attributes
 meltano select --list tap-covid-19
 
+# (Optional)
 # Set stream metadata for all matching entities
-meltano config tap-covid-19 set metadata "eu_*" replication-method INCREMENTAL
-meltano config tap-covid-19 set metadata "eu_*" replication-key date
+# meltano config tap-covid-19 set _metadata "eu_*" replication-method INCREMENTAL
+# meltano config tap-covid-19 set _metadata "eu_*" replication-key date
+# meltano config tap-covid-19 set _metadata "eu_*" date is-replication-key true
+
+# Override schema for matching attributes
+# meltano config tap-covid-19 set _schema "eu_*" date type string
+# meltano config tap-covid-19 set _schema "eu_*" date format date
 ```
 
 ```output

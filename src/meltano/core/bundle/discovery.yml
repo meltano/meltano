@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-version: 12
+version: 13
 
 extractors:
   - name: tap-facebook
@@ -602,6 +602,7 @@ loaders:
       - name: url
         env: PG_URL
       - name: user
+        aliases: [username]
         env: PG_USERNAME
         value: warehouse
       - name: password
@@ -609,6 +610,7 @@ loaders:
         env: PG_PASSWORD
         value: warehouse
       - name: host
+        aliases: [address]
         env: PG_ADDRESS
         value: localhost
         protected: true
@@ -617,6 +619,7 @@ loaders:
         env: PG_PORT
         value: 5502
       - name: dbname
+        aliases: [database]
         label: Database Name
         env: PG_DATABASE
         value: warehouse
@@ -859,17 +862,13 @@ files:
   - name: airflow
     namespace: airflow
     pip_url: git+https://gitlab.com/meltano/files-airflow.git
-    settings:
-      - name: update.orchestrate/dags/meltano.py
-        kind: boolean
-        value: True
+    update:
+      orchestrate/dags/meltano.py: True
   - name: dbt
     namespace: dbt
     pip_url: git+https://gitlab.com/meltano/files-dbt.git
-    settings:
-      - name: update.transform/profile/profiles.yml
-        kind: boolean
-        value: True
+    update:
+      transform/profile/profiles.yml: True
   - name: docker-compose
     namespace: docker_compose
     pip_url: git+https://gitlab.com/meltano/files-docker-compose.git
