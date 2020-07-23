@@ -19,6 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2145](https://gitlab.com/meltano/meltano/-/issues/2145) Let discovered catalog schema be modified using schema rules stored in extractor `schema` extra (aka `_schema` setting)
 
 ### Changes
+- [#2070](https://gitlab.com/meltano/meltano/issues/2070) List installed and available extractors separately on Extractors page
 
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Replace `update.*` file bundle settings with `update` extra (aka `_update` setting)
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Replace `metadata.*` extractor settings with `metadata` extra (aka `_metadata` setting)
