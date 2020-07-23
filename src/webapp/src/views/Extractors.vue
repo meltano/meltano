@@ -16,11 +16,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('plugins', [
-      'availableExtractors',
-      'getIsPluginInstalled',
-      'installedExtractors'
-    ]),
+    ...mapGetters('plugins', ['availableExtractors', 'installedExtractors']),
     getModalName() {
       return this.$route.name
     },
@@ -56,11 +52,11 @@ export default {
             ></progress>
             <template v-else>
               <template v-if="installedExtractors.length">
-                <h3 class="title">Installed Extractors</h3>
+                <h3 class="title">Installed</h3>
                 <ExtractorList :items="installedExtractors" />
               </template>
               <template v-if="availableExtractors.length">
-                <h3 class="title">Available Extractors</h3>
+                <h3 class="title">Available</h3>
                 <ExtractorList :items="availableExtractors" />
               </template>
               <hr />

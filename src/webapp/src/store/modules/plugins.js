@@ -132,21 +132,7 @@ const getters = {
   },
 
   installedExtractors(state) {
-    return state.installedPlugins.extractors
-  },
-
-  visibleExtractors(state) {
-    return pluginUtils.filterVisiblePlugins({
-      installedPlugins: state.installedPlugins.extractors,
-      pluginList: state.plugins.extractors
-    })
-  },
-
-  visibleLoaders(state) {
-    return pluginUtils.filterVisiblePlugins({
-      installedPlugins: state.installedPlugins.loaders,
-      pluginList: state.plugins.loaders
-    })
+    return state.installedPlugins.extractors || []
   }
 }
 

@@ -4,12 +4,7 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'ExploreList',
   computed: {
-    ...mapGetters('plugins', ['getIsPluginInstalled', 'visibleExtractors']),
-    getExplorables() {
-      return this.visibleExtractors.filter(extractor =>
-        this.getIsPluginInstalled('extractors', extractor.name)
-      )
-    }
+    ...mapGetters('plugins', ['getIsPluginInstalled', 'installedExtractors'])
   },
   methods: {
     goToExplore(extractor) {
@@ -25,7 +20,7 @@ export default {
 <template>
   <div>
     <a
-      v-for="extractor in getExplorables"
+      v-for="extractor in installedExtractors"
       :key="extractor.name"
       class="navbar-item"
       @click="goToExplore(extractor.name)"
