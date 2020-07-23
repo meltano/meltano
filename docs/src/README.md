@@ -632,7 +632,7 @@ patterns in the entity and attribute identifiers.
 Whenever an extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt)
 or [`meltano invoke`](/docs/command-line-interface.html#invoke), Meltano will
 generate the desired catalog on the fly by running the tap in
-discovery mode and applying the selection and metadata rules to the resulting catalog file
+discovery mode and applying the selection, metadata, and schema rules to the resulting catalog file
 before passing it to the tap in sync mode.
 
 Note that exclusion takes precedence over inclusion: if an entity or attribute is matched by an exclusion pattern, there is no way to get it back using an inclusion pattern unless the exclusion pattern is manually removed from your project's `meltano.yml` file first.
