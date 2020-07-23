@@ -348,7 +348,7 @@ To create a file bundle plugin like <https://gitlab.com/meltano/files-dbt>, foll
 1. Add all file paths under `bundle` to the `package_data["bundle"]` array in `setup.py`
 1. Push your new plugin repository to GitLab.com. Official file bundle plugins live at `https://gitlab.com/meltano/files-...`.
 1. Add an entry to `src/meltano/core/bundle/discovery.yml` under `files`. Set `name` and `pip_url` as appropriate, and if applicable, set `namespace` to the `namespace` of the plugin the file bundle is related to (e.g. `dbt`).
-1. If any files are to be updated automatically when [`meltano upgrade`](/docs/command-line-interface.html#upgrade) is run, add `settings` entries with `name` `update.[file path]`, `kind` `boolean` and `value` `True`.
+1. If any files are to be updated automatically when [`meltano upgrade`](/docs/command-line-interface.html#upgrade) is run, add an `update` object with `[file path]: True` entries for each file.
 1. Success! You can now submit a merge request to Meltano containing the changes to `discovery.yml` (and an appropriate `CHANGELOG` item, of course).
 
 ## System Database

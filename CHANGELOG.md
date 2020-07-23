@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.41.1 - (2020-07-23)
+---
+
+### New
+
 - [#2196](https://gitlab.com/meltano/meltano/-/issues/2196) Pretty print and apply appropriate nesting to `meltano config` output
 - [#2003](https://gitlab.com/meltano/meltano/-/issues/2003) Let extractor extra `select` be interacted with as `_select` setting
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Let transform extra `vars` be interacted with as `_vars` setting
@@ -19,8 +31,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2145](https://gitlab.com/meltano/meltano/-/issues/2145) Let discovered catalog schema be modified using schema rules stored in extractor `schema` extra (aka `_schema` setting)
 
 ### Changes
-- [#2070](https://gitlab.com/meltano/meltano/issues/2070) List installed and available extractors separately on Extractors page
 
+- [#2070](https://gitlab.com/meltano/meltano/issues/2070) List installed and available extractors separately on Extractors page
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Replace `update.*` file bundle settings with `update` extra (aka `_update` setting)
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Replace `metadata.*` extractor settings with `metadata` extra (aka `_metadata` setting)
 - [#1764](https://gitlab.com/meltano/meltano/-/merge_requests/1764) Interpret `meltano config <plugin> set` value as JSON to allow non-string values to be set more easily
@@ -28,8 +40,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Fix poor performance of setting lookups using more memoization
-
-### Breaks
 
 
 ## 1.41.0 - (2020-07-20)
