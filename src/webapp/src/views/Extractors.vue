@@ -1,5 +1,5 @@
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 import ExtractorList from '@/components/pipelines/ExtractorList'
 import RouterViewLayout from '@/views/RouterViewLayout'
@@ -16,6 +16,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('plugins', ['availableExtractors', 'installedExtractors']),
     getModalName() {
       return this.$route.name
     },
@@ -44,13 +45,20 @@ export default {
 
       <div class="columns">
         <div class="column">
-          <div class="box">
+          <div class="box content">
             <progress
               v-if="isLoading"
               class="progress is-small is-info"
             ></progress>
             <template v-else>
-              <ExtractorList />
+              <template v-if="installedExtractors.length">
+                <h3 class="title">Installed</h3>
+                <ExtractorList :items="installedExtractors" />
+              </template>
+              <template v-if="availableExtractors.length">
+                <h3 class="title">Available</h3>
+                <ExtractorList :items="availableExtractors" />
+              </template>
               <hr />
               <div class="columns is-vcentered">
                 <div class="column">

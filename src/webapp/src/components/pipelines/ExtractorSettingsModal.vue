@@ -102,29 +102,28 @@ export default {
   },
   created() {
     this.extractorName = this.$route.params.extractor
-    this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
-      const needsInstallation = this.extractor.name !== this.extractorName
-      const addConfig = {
-        pluginType: 'extractors',
-        name: this.extractorName
-      }
+    const needsInstallation = this.extractor.name !== this.extractorName
+    const addConfig = {
+      pluginType: 'extractors',
+      name: this.extractorName
+    }
 
-      const uponPlugin = needsInstallation
-        ? this.addPlugin(addConfig).then(() => {
-            this.getExtractorConfiguration().then(
-              this.createEditableConfiguration
-            )
-            this.installPlugin(addConfig).then(this.tryAutoAdvance)
-          })
-        : this.getExtractorConfiguration().then(() => {
-            this.createEditableConfiguration()
-            this.tryAutoAdvance()
-          })
+    const uponPlugin = needsInstallation
+      ? this.addPlugin(addConfig).then(() => {
+          this.$store.dispatch('plugins/getInstalledPlugins')
+          this.getExtractorConfiguration().then(
+            this.createEditableConfiguration
+          )
+          this.installPlugin(addConfig).then(this.tryAutoAdvance)
+        })
+      : this.getExtractorConfiguration().then(() => {
+          this.createEditableConfiguration()
+          this.tryAutoAdvance()
+        })
 
-      uponPlugin.catch(err => {
-        this.$error.handle(err)
-        this.close()
-      })
+    uponPlugin.catch(err => {
+      this.$error.handle(err)
+      this.close()
     })
   },
   beforeDestroy() {

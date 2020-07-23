@@ -556,7 +556,15 @@ control. Sensitive values like passwords and tokens are most appropriately store
 # List all plugin settings with their names,
 # environment variables, and current values
 meltano config tap-covid-19 list
+```
 
+```yaml
+api_token [env: TAP_COVID_19_API_TOKEN] current value: None (from default)
+user_agent [env: TAP_COVID_19_USER_AGENT] current value: None (from default)
+start_date [env: TAP_COVID_19_START_DATE] current value: None (from default)
+```
+
+```bash
 # Store non-sensitive plugin configuration in
 # your project's `meltano.yml` file
 meltano config tap-covid-19 set start_date "2020-01-01T00:00:00Z"
@@ -579,7 +587,11 @@ meltano config tap-covid-19
 ```
 
 ```json
-{"api_token": "<your-github-api-token>", "user_agent": "tap-covid-19 via meltano <api_user_email@your_company.com>", "start_date": "2020-01-01T00:00:00Z"}
+{
+    "api_token": "<your-github-api-token>",
+    "user_agent": "tap-covid-19 via meltano <api_user_email@your_company.com>",
+    "start_date": "2020-01-01T00:00:00Z"
+}
 ```
 
 Your plugin has now been configured
