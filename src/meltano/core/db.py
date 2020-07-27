@@ -13,7 +13,7 @@ from sqlalchemy.engine import Engine
 from psycopg2.sql import Identifier, SQL
 
 
-SystemMetadata = MetaData()
+SystemMetadata = MetaData(schema=os.getenv('MELTANO_DATABASE_SCHEMA'))
 SystemModel = declarative_base(metadata=SystemMetadata)
 
 # Keep a Project → Engine mapping to serve
@@ -52,7 +52,10 @@ def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessio
 
 
 def init_hook(engine):
-    function_map = {"sqlite": init_sqlite_hook}
+    function_map = {
+        "sqlite": init_sqlite_hook,
+        "postgresql": init_postgresql_hook,
+    }
 
     try:
         function_map[engine.dialect.name](engine)
@@ -66,6 +69,12 @@ def init_hook(engine):
 def init_sqlite_hook(engine):
     # enable the WAL
     engine.execute("PRAGMA journal_mode=WAL")
+
+def init_postgresql_hook(engine):
+    try:
+        engine.execute(f"CREATE SCHEMA IF NOT EXISTS {os.environ['MELTANO_DATABASE_SCHEMA']}")
+    except KeyError:
+        pass
 
 
 class DB:

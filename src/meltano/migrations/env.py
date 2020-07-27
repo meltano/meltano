@@ -1,6 +1,8 @@
 from __future__ import with_statement
+import os
 from alembic import context
 from sqlalchemy import engine_from_config, pool
+from meltano.core.db import SystemMetadata
 
 
 config = context.config
@@ -19,7 +21,11 @@ def run_migrations_offline():
 
     """
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(url=url, literal_binds=True)
+    context.configure(url=url,
+        literal_binds=True,
+        target_metadata=SystemMetadata,
+        version_table_schema=os.getenv('MELTANO_DATABASE_SCHEMA'),
+    )
 
     with context.begin_transaction():
         context.run_migrations()
@@ -40,7 +46,11 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection)
+        context.configure(
+            connection=connection,
+            target_metadata=SystemMetadata,
+            version_table_schema=os.getenv('MELTANO_DATABASE_SCHEMA'),
+        )
 
         with context.begin_transaction():
             context.run_migrations()
