@@ -31,7 +31,11 @@ class MigrationService:
                 raise MigrationUneededException
 
     def upgrade(self, silent=False):
-        conn = self.engine.connect()
+        conn = self.engine.connect().execution_options(
+            schema_translate_map={
+                None: os.getenv('MELTANO_DATABASE_SCHEMA')
+            }
+        )
         cfg = Config()
 
         # this connection is used in `env.py` for the migrations
