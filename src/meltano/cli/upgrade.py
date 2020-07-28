@@ -8,13 +8,15 @@ from pathlib import Path
 from sqlalchemy import create_engine
 from click_default_group import DefaultGroup
 
+from . import cli
+from .params import project
+from .utils import CliError
+
 from meltano.core.project import Project
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.db import project_engine
 from meltano.core.migration_service import MigrationService
 from meltano.core.upgrade_service import UpgradeService, UpgradeError
-from . import cli
-from .params import project
 
 
 @cli.group(cls=DefaultGroup, default="all", default_if_no_args=True)
@@ -71,9 +73,8 @@ def all(ctx, pip_url, force, skip_package):
                 click.echo(
                     "Then, run `meltano upgrade --skip-package` to upgrade your project based on the latest version."
                 )
-    except UpgradeError as up:
-        click.secho(str(up), fg="red")
-        raise click.Abort()
+    except UpgradeError as err:
+        raise CliError(str(err)) from err
 
 
 @upgrade.command()
@@ -83,9 +84,8 @@ def all(ctx, pip_url, force, skip_package):
 def package(ctx, **kwargs):
     try:
         ctx.obj["upgrade_service"].upgrade_package(**kwargs)
-    except UpgradeError as up:
-        click.secho(str(up), fg="red")
-        raise click.Abort()
+    except UpgradeError as err:
+        raise CliError(str(err)) from err
 
 
 @upgrade.command()
@@ -93,9 +93,8 @@ def package(ctx, **kwargs):
 def files(ctx):
     try:
         ctx.obj["upgrade_service"].update_files()
-    except UpgradeError as up:
-        click.secho(str(up), fg="red")
-        raise click.Abort()
+    except UpgradeError as err:
+        raise CliError(str(err)) from err
 
 
 @upgrade.command()
@@ -103,9 +102,8 @@ def files(ctx):
 def database(ctx):
     try:
         ctx.obj["upgrade_service"].migrate_database()
-    except UpgradeError as up:
-        click.secho(str(up), fg="red")
-        raise click.Abort()
+    except UpgradeError as err:
+        raise CliError(str(err)) from err
 
 
 @upgrade.command()
@@ -113,6 +111,5 @@ def database(ctx):
 def models(ctx):
     try:
         ctx.obj["upgrade_service"].compile_models()
-    except UpgradeError as up:
-        click.secho(str(up), fg="red")
-        raise click.Abort()
+    except UpgradeError as err:
+        raise CliError(str(err)) from err

@@ -13,6 +13,10 @@ from meltano.core.db import project_engine
 from meltano.api.models.security import Role, RolePermissions
 
 
+class MigrationError(Exception):
+    pass
+
+
 class MigrationUneededException(Exception):
     """Occurs when no migrations are needed."""
 
@@ -59,19 +63,19 @@ class MigrationService:
                 click.secho(f"Upgrading database to {HEAD}")
             command.upgrade(cfg, HEAD)
         except FileNotFoundError:
-            raise click.ClickException(
+            raise MigrationError(
                 "Cannot upgrade the system database, revision lock not found."
             )
         except MigrationUneededException:
             if not silent:
                 click.secho(f"System database up-to-date.")
         except Exception as err:
+            logging.exception(str(err))
             click.secho(
                 f"Cannot upgrade the system database. It might be corrupted or was created before database migrations where introduced (v0.34.0)",
                 fg="yellow",
                 err=True,
             )
-            logging.exception(err)
         finally:
             conn.close()
 

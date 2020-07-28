@@ -21,7 +21,7 @@ def create_app():
 
     @app.errorhandler(Exception)
     def _handle(e):
-        logging.exception(e)
+        logging.exception("An error occurred")
         return error()
 
     @app.route("/")

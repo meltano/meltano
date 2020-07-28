@@ -9,6 +9,8 @@ from click_default_group import DefaultGroup
 
 from . import cli
 from .params import project
+from .utils import CliError
+
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.db import project_engine
@@ -139,10 +141,9 @@ def setup(ctx, server_name, **flags):
 
     ui_cfg_path = project.root_dir("ui.cfg")
     if ui_cfg_path.exists():
-        click.echo(
+        raise CliError(
             f"Found existing secrets in file '{ui_cfg_path}'. Please delete this file and rerun this command to regenerate the secrets."
         )
-        raise click.Abort()
 
     generate_secret = lambda: secrets.token_hex(int(flags["bits"] / 8))  # in bytes
 

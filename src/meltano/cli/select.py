@@ -6,6 +6,7 @@ import logging
 
 from . import cli
 from .params import project
+from .utils import CliError
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
@@ -67,17 +68,15 @@ def select(project, extractor, entities_filter, attributes_filter, **flags):
             flags=flags,
         )
     except PluginLacksCapabilityError as e:
-        raise click.ClickException(f"Cannot list the selected attributes: {e}") from e
+        raise CliError(f"Cannot list the selected attributes: {e}") from e
     except PluginExecutionError as e:
-        raise click.ClickException(
+        raise CliError(
             f"Cannot list the selected attributes: "
             "there was a problem running the tap with `--discover`. "
             "Make sure the tap supports `--discover` and run "
             "`meltano invoke {extractor} --discover` to make "
             "sure it runs correctly."
         ) from e
-    except Exception as e:
-        raise click.ClickException(str(e)) from e
 
 
 def add(project, extractor, entities_filter, attributes_filter, exclude=False):

@@ -252,8 +252,8 @@ class TestCliAdd:
         res = cli_runner.invoke(cli, ["add", "extractor", "tap-unknown"])
 
         assert res.exit_code == 1
-        assert "extractor 'tap-unknown' is not known to Meltano" in res.stdout
-        assert res.stderr
+        assert res.exception
+        assert str(res.exception) == "Extractor 'tap-unknown' is not known to Meltano"
 
         # ensure the plugin is not present
         with pytest.raises(PluginMissingError):

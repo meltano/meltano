@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2200](https://gitlab.com/meltano/meltano/-/issues/2200) Consistently handle CLI errors
+
 ### Fixes
 
 - [#2199](https://gitlab.com/meltano/meltano/-/issues/2199) Fix `meltano discover` only listing custom plugins, not known (discovered) ones

@@ -9,7 +9,7 @@ from pathlib import Path
 from datetime import datetime
 from enum import IntFlag
 
-from . import Runner
+from . import Runner, RunnerError
 from meltano.core.job import Job, JobFinder
 from meltano.core.plugin_invoker import invoker_factory, PluginInvoker
 from meltano.core.plugin.singer import SingerTap, SingerTarget, PluginType
@@ -60,7 +60,7 @@ class SingerRunner(Runner):
                 p_tap.kill()
             if p_target:
                 p_target.kill()
-            raise Exception(f"Cannot start tap or target: {err}")
+            raise RunnerError(f"Cannot start tap or target: {err}")
 
         # receive the target stdout and update the current job
         # for each line
@@ -81,7 +81,7 @@ class SingerRunner(Runner):
         tap_code = await p_tap.wait()
 
         if any((tap_code, target_code)):
-            raise Exception(
+            raise RunnerError(
                 f"Subprocesses didn't exit cleanly: tap({tap_code}), target({target_code})"
             )
 

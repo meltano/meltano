@@ -13,11 +13,14 @@ from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.error import SubprocessError
 from . import cli
+from .utils import CliError
 from .params import database_uri_option
 
 EXTRACTORS = "extractors"
 LOADERS = "loaders"
 ALL = "all"
+
+logger = logging.getLogger(__name__)
 
 
 @cli.command()
@@ -33,9 +36,7 @@ def init(ctx, project_name, no_usage_stats):
     """
     if ctx.obj["project"]:
         logging.warning(f"Found meltano project at: {ctx.obj['project'].root}")
-        raise click.ClickException(
-            "`meltano init` cannot run inside a Meltano project."
-        )
+        raise CliError("`meltano init` cannot run inside a Meltano project.")
 
     if no_usage_stats:
         ProjectSettingsService.config_override["send_anonymous_usage_stats"] = False
@@ -48,9 +49,7 @@ def init(ctx, project_name, no_usage_stats):
         tracker = GoogleAnalyticsTracker(project)
         tracker.track_meltano_init(project_name=project_name)
     except ProjectInitServiceError as e:
-        click.secho(f"Directory {project_name} already exists!", fg="red")
-        raise click.Abort()
-    except SubprocessError as proc_err:
-        click.secho(str(proc_err), fg="red")
-        click.secho(proc_err.stderr, err=True)
-        raise click.Abort()
+        raise CliError(str(e)) from e
+    except SubprocessError as err:
+        logger.error(err.stderr)
+        raise CliError(str(err)) from err

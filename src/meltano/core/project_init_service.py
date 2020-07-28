@@ -11,7 +11,7 @@ from .project_settings_service import ProjectSettingsService, SettingValueStore
 from .project import Project
 from .plugin.meltano_file import MeltanoFilePlugin
 from .db import project_engine
-from .migration_service import MigrationService
+from .migration_service import MigrationService, MigrationError
 
 
 class ProjectInitServiceError(Exception):
@@ -26,7 +26,9 @@ class ProjectInitService:
         try:
             os.mkdir(self.project_name)
         except Exception as e:
-            raise ProjectInitServiceError
+            raise ProjectInitServiceError(
+                f"Directory {self.project_name} already exists!"
+            )
         click.secho(f"Created", fg="blue", nl=False)
         click.echo(f" {self.project_name}")
 
@@ -66,9 +68,12 @@ class ProjectInitService:
         database_uri = self.settings_service.get("database_uri")
         engine, _ = project_engine(self.project, database_uri, default=True)
 
-        migration_service = MigrationService(engine)
-        migration_service.upgrade()
-        migration_service.seed(self.project)
+        try:
+            migration_service = MigrationService(engine)
+            migration_service.upgrade()
+            migration_service.seed(self.project)
+        except MigrationError as err:
+            raise ProjectInitServiceError(str(err)) from err
 
     def echo_instructions(self):
         click.echo()

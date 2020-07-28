@@ -39,9 +39,5 @@ def invoke(project, plugin_type, plugin_name, plugin_args):
         )
 
         sys.exit(exit_code)
-    except Exception as err:
-        logging.exception(err)
-        click.secho(f"An error occured: {err}.", fg="red")
-        raise click.Abort() from err
     finally:
         session.close()
