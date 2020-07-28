@@ -161,7 +161,7 @@ data from any SaaS tool or database and load it into any data warehouse or file 
 
 Meltano [manages your tap and target configuration](/#meltano-config) for you,
 makes it easy to [select which entities and attributes to extract](/#meltano-select),
-and keeps track of [the state of your extraction](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file),
+and keeps track of [the state of your extraction](/docs/command-line-interface.html#pipeline-state),
 so that subsequent pipeline runs with the same job ID will always pick up right where
 the previous run left off.
 

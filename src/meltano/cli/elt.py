@@ -83,13 +83,7 @@ def elt(project, extractor, loader, dry, full_refresh, transform, job_id):
                 click.secho("Extract & load skipped.", fg="yellow")
 
             if elt_context.transformer:
-                # Use a new session for the Transform Part to address the last
-                # update for Job state not being saved in the DB
-                transform_session = Session()
-                try:
-                    run_transform(elt_context, transform_session, dry_run=dry)
-                finally:
-                    transform_session.close()
+                run_transform(elt_context, session, dry_run=dry)
             else:
                 click.secho("Transformation skipped.", fg="yellow")
     except RunnerError as err:

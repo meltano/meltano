@@ -36,7 +36,7 @@ class SingerRunner(Runner):
                 process.kill()
                 logging.error(f"{process} was killed.")
 
-    async def invoke(self, tap: PluginInvoker, target: PluginInvoker):
+    async def invoke(self, tap: PluginInvoker, target: PluginInvoker, session):
         try:
             # use standard pipes here because we
             # don't need async processing between the
@@ -66,7 +66,7 @@ class SingerRunner(Runner):
         # for each line
         await asyncio.wait(
             [
-                self.bookmark(p_target.stdout),
+                self.bookmark(p_target.stdout, session),
                 capture_subprocess_output(p_tap.stderr, sys.stderr),
                 capture_subprocess_output(p_target.stderr, sys.stderr),
                 p_target.wait(),
@@ -115,7 +115,7 @@ class SingerRunner(Runner):
         else:
             logging.warning("No state was found, complete import.")
 
-    def bookmark_state(self, new_state: str):
+    def bookmark_state(self, new_state: str, session):
         if self.context.job is None:
             logging.info(
                 f"Running outside a Job context: incremental state could not be updated."
@@ -128,21 +128,22 @@ class SingerRunner(Runner):
 
             job.payload["singer_state"] = new_state
             job.payload_flags |= SingerPayload.STATE
-            job.ended_at = datetime.utcnow()
-            logging.info(f"Incremental state has been updated at {job.ended_at}.")
+            job.save(session)
+
+            logging.info(f"Incremental state has been updated at {datetime.utcnow()}.")
             logging.debug(f"Incremental state: {new_state}")
         except Exception as err:
             logging.warning(
                 "Received state is invalid, incremental state has not been updated"
             )
 
-    async def bookmark(self, target_stream):
+    async def bookmark(self, target_stream, session):
         while not target_stream.at_eof():
             last_state = await target_stream.readline()
             if not last_state:
                 continue
 
-            self.bookmark_state(last_state)
+            self.bookmark_state(last_state, session)
 
     def dry_run(self, tap: PluginInvoker, target: PluginInvoker):
         logging.info("Dry run:")
@@ -160,5 +161,6 @@ class SingerRunner(Runner):
         target.prepare(session)
 
         self.restore_bookmark(session, tap, full_refresh=full_refresh)
+
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.invoke(tap, target))
+        loop.run_until_complete(self.invoke(tap, target, session))

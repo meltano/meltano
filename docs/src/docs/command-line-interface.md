@@ -570,6 +570,22 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT] [
 
 - A `--full-refresh` flag can be passed to perform a full refresh, ignoring the state left behind by any previous runs with the same job ID.
 
+### Pipeline state
+
+Most extractors (Singer taps) generate [state](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) when they are run, that can be passed along with a subsequent invocation to have the extractor pick up where it left off the previous time.
+
+Loaders (Singer targets) take in data and state messages from extractors and are responsible for forwarding the extractor state to Meltano once the associated data has been successfully persisted in the destination.
+
+Meltano stores this pipeline state in its [system database](/docs/production.html#storing-metadata), identified by the ELT run's Job ID.
+
+When `meltano elt` is run a subsequent time, it will look for the most recent completed (successful or failed) pipeline run with the same job ID that generated some state. If found, this state is then passed along to the extractor.
+
+::: info Not seeing state picked up after a failed run?
+
+Some loaders only emit their state once their work is completely done, even if some data may have been persisted already, and if earlier state messages from the extractor could have been forwarded to Meltano. When a pipeline with such a loader fails or is otherwise interrupted, no state will have been emitted yet, and a subsequent ELT run will not be able to pick up where this run actually left off.
+
+:::
+
 ### Pipeline environment variables
 
 To allow loaders and transformers to adapt their configuration and behavior based on the extractor and loader they are run with,
