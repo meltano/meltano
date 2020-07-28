@@ -1,5 +1,8 @@
+import sys
 import pytest
 import uuid
+import psutil
+import signal
 from datetime import datetime
 from unittest import mock
 
@@ -61,6 +64,36 @@ class TestJob:
         assert subject.ended_at is not None
         assert subject.payload["original_state"] == 1
         assert subject.payload["error"] == "This is a test."
+
+    def test_run_interrupted(self, session):
+        subject = self.sample_job({"original_state": 1}).save(session)
+
+        with pytest.raises(KeyboardInterrupt) as e:
+            with subject.run(session):
+                psutil.Process().send_signal(signal.SIGINT)
+
+        assert subject.state is State.FAIL
+        assert subject.ended_at is not None
+        assert subject.payload["original_state"] == 1
+        assert subject.payload["error"] == "KeyboardInterrupt()"
+
+    def test_run_terminated(self, session):
+        subject = self.sample_job({"original_state": 1}).save(session)
+        exception = Exception("Terminated")
+
+        with pytest.raises(Exception) as er:
+            with mock.patch.object(sys, "exit", side_effect=exception) as exit_mock:
+                with subject.run(session):
+                    psutil.Process().terminate()
+
+                exit_mock.assert_called_once_with(143)
+
+            assert e is exception
+
+        assert subject.state is State.FAIL
+        assert subject.ended_at is not None
+        assert subject.payload["original_state"] == 1
+        assert subject.payload["error"] == "The process was terminated"
 
     def test_run_id(self, session):
         expected_uuid = uuid.uuid4()
