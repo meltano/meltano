@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2166](https://gitlab.com/meltano/meltano/-/issues/2166) Don't fail on large extractor state messages by increasing loader output buffer size from 64 to 128KB
+
 ### Breaks
 
 
