@@ -63,9 +63,21 @@ class TestPluginDiscoveryService:
         assert len(plugins) >= 6
 
     def test_discovery(self, subject):
+        discovery = subject.discover()
+        assert PluginType.EXTRACTORS in discovery
+        assert "tap-gitlab" in discovery[PluginType.EXTRACTORS]
+        assert "tap-mock" in discovery[PluginType.EXTRACTORS]
+
+        assert PluginType.LOADERS in discovery
+        assert "target-jsonl" in discovery[PluginType.LOADERS]
+        assert "target-mock" in discovery[PluginType.LOADERS]
+
         # test for a specific plugin type
         discovery = subject.discover(PluginType.EXTRACTORS)
         assert PluginType.EXTRACTORS in discovery
+        assert "tap-gitlab" in discovery[PluginType.EXTRACTORS]
+        assert "tap-mock" in discovery[PluginType.EXTRACTORS]
+
         assert PluginType.LOADERS not in discovery
 
     @pytest.mark.usefixtures("discovery_yaml")
