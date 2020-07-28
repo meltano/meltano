@@ -43,10 +43,10 @@ def cli(ctx, log_level, verbose):
         ctx.obj["project"] = None
     except IncompatibleVersionError as err:
         click.secho(
-            "This meltano project is incompatible with this version of `meltano`.",
+            "This Meltano project is incompatible with this version of `meltano`.",
             fg="yellow",
         )
         click.echo(
-            "Visit http://meltano.com/docs/installation.html#upgrading-meltano-version for more details."
+            "For more details, visit http://meltano.com/docs/installation.html#upgrading-meltano-version"
         )
         sys.exit(3)

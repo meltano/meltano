@@ -11,6 +11,8 @@ from . import cli
 from .params import project
 from .utils import CliError, add_plugin, add_related_plugins, install_plugins
 from meltano.core.plugin import PluginType
+from meltano.core.config_service import ConfigService
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_add_custom_service import ProjectAddCustomService
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -27,6 +29,9 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
     plugin_type = PluginType.from_cli_argument(plugin_type)
     plugin_names = plugin_name  # nargs=-1
 
+    config_service = ConfigService(project)
+    discovery_service = PluginDiscoveryService(project, config_service=config_service)
+
     if flags["custom"]:
         if plugin_type in (
             PluginType.TRANSFORMERS,
@@ -35,9 +40,13 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
         ):
             raise CliError(f"--custom is not supported for {ctx.invoked_subcommand}")
 
-        add_service = ProjectAddCustomService(project)
+        add_service = ProjectAddCustomService(project, config_service=config_service)
     else:
-        add_service = ProjectAddService(project)
+        add_service = ProjectAddService(
+            project,
+            plugin_discovery_service=discovery_service,
+            config_service=config_service,
+        )
 
     plugins = [
         add_plugin(project, plugin_type, plugin_name, add_service=add_service)
@@ -60,12 +69,14 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
 
     success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
 
-    for plugin in plugins:  # TODO: Only works on Plugin from discovery...
-        docs_link = plugin.extras.get("docs")
-        if docs_link:
-            click.echo(
-                f"For more details about {plugin.type.descriptor} '{plugin.name}', visit {docs_link}"
-            )
-
     if not success:
         raise CliError("Failed to install plugin(s)")
+
+    for plugin in plugins:
+        plugin_def = discovery_service.find_plugin(plugin.type, plugin.name)
+        docs_url = plugin_def.docs
+        if docs_url:
+            click.echo()
+            click.echo(
+                f"To learn more about {plugin.type.descriptor} '{plugin.name}', visit {docs_url}"
+            )

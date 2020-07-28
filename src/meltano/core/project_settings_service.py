@@ -28,6 +28,14 @@ class ProjectSettingsService(SettingsService):
         }
 
     @property
+    def label(self):
+        return "Meltano"
+
+    @property
+    def docs_url(self):
+        return "https://meltano.com/docs/settings.html"
+
+    @property
     def _env_namespace(self):
         return "meltano"
 

@@ -40,6 +40,16 @@ class SettingsService(ABC):
 
     @property
     @abstractmethod
+    def label(self):
+        pass
+
+    @property
+    @abstractmethod
+    def docs_url(self):
+        pass
+
+    @property
+    @abstractmethod
     def _env_namespace(self) -> str:
         pass
 

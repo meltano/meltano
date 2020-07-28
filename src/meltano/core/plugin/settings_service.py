@@ -69,6 +69,14 @@ class PluginSettingsService(SettingsService):
         return self._plugin_install
 
     @property
+    def label(self):
+        return f"{self.plugin.type.descriptor} '{self.plugin.name}'"
+
+    @property
+    def docs_url(self):
+        return self.plugin_def.docs
+
+    @property
     def _env_namespace(self):
         return self.plugin_def.namespace
 

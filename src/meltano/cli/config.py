@@ -35,11 +35,8 @@ def config(ctx, project, plugin_type, plugin_name, format, extras):
         plugin = config.find_plugin(
             plugin_name, plugin_type=plugin_type, configurable=True
         )
-
-        ctx.obj["subject"] = f"{plugin.type.descriptor} '{plugin.name}'"
     except PluginMissingError:
         if plugin_name == "meltano":
-            ctx.obj["subject"] = "Meltano"
             plugin = None
         else:
             raise
@@ -96,7 +93,6 @@ def set(ctx, setting_name, value, store):
 
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
-    subject = ctx.obj["subject"]
 
     path = list(setting_name)
     try:
@@ -105,13 +101,13 @@ def set(ctx, setting_name, value, store):
         )
     except StoreNotSupportedError as err:
         raise CliError(
-            f"{subject.capitalize()} setting '{path}' could not be set in {store.label}: {err}"
+            f"{settings.label.capitalize()} setting '{path}' could not be set in {store.label}: {err}"
         ) from err
 
     name = metadata["name"]
     store = metadata["store"]
     click.secho(
-        f"{subject.capitalize()} setting '{name}' was set in {store.label}: {value!r}",
+        f"{settings.label.capitalize()} setting '{name}' was set in {store.label}: {value!r}",
         fg="green",
     )
 
@@ -136,20 +132,19 @@ def unset(ctx, setting_name, store):
 
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
-    subject = ctx.obj["subject"]
 
     path = list(setting_name)
     try:
         metadata = settings.unset(path, store=store, session=session)
     except StoreNotSupportedError as err:
         raise CliError(
-            f"{subject.capitalize()} setting '{path}' in {store.label} could not be unset: {err}"
+            f"{settings.label.capitalize()} setting '{path}' in {store.label} could not be unset: {err}"
         ) from err
 
     name = metadata["name"]
     store = metadata["store"]
     click.secho(
-        f"{subject.capitalize()} setting '{name}' in {store.label} was unset",
+        f"{settings.label.capitalize()} setting '{name}' in {store.label} was unset",
         fg="green",
     )
 
@@ -173,18 +168,18 @@ def reset(ctx, store):
 
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
-    subject = ctx.obj["subject"]
 
     try:
         metadata = settings.reset(store=store, session=session)
     except StoreNotSupportedError as err:
         raise CliError(
-            f"{subject.capitalize()} settings in {store.label} could not be reset: {err}"
+            f"{settings.label.capitalize()} settings in {store.label} could not be reset: {err}"
         ) from err
 
     store = metadata["store"]
     click.secho(
-        f"{subject.capitalize()} settings in {store.label} were reset", fg="green"
+        f"{settings.label.capitalize()} settings in {store.label} were reset",
+        fg="green",
     )
 
 
@@ -247,3 +242,10 @@ def list_settings(ctx, extras):
             if setting_def.label:
                 click.echo(f"{setting_def.label}: ", nl=False)
             click.echo(f"{setting_def.description}")
+
+    docs_url = settings.docs_url
+    if docs_url:
+        click.echo()
+        click.echo(
+            f"To learn more about {settings.label} and its settings, visit {docs_url}"
+        )

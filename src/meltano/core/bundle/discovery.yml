@@ -630,6 +630,7 @@ loaders:
     label: JSONL
     description: JSONL loader
     namespace: target_jsonl
+    docs: https://github.com/andyh1203/target-jsonl
     pip_url: target-jsonl
     settings:
       - name: destination_path
@@ -715,6 +716,7 @@ loaders:
 transformers:
   - name: dbt
     namespace: dbt
+    docs: https://meltano.com/#transformation
     pip_url: dbt==0.16.1
     settings:
     - name: project_dir
@@ -841,6 +843,7 @@ dashboards:
 orchestrators:
   - name: airflow
     namespace: airflow
+    docs: https://meltano.com/#orchestration
     pip_url: 'wtforms==2.2.1 apache-airflow==1.10.2'
     settings:
       - name: core.dags_folder
