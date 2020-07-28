@@ -115,7 +115,7 @@ meltano add transformer [name_of_transformer]
 
 When you add a file bundle to a Meltano project, Meltano will:
 
-1. Add the plugin to `meltano.yml` if any of the files it contains are managed by the file bundle and to be updated automatically when [`meltano upgrade`](#upgrade) is run.
+1. Add the plugin to `meltano.yml` if any of the files it contains are [managed by the file bundle](#file-bundle-extra-update) and to be updated automatically when [`meltano upgrade`](#upgrade) is run.
 2. Add the bundled files to your Meltano project
 
 #### Example
@@ -303,7 +303,7 @@ meltano config <plugin> reset
 - Environment variable: `<NAMESPACE>__SELECT`
 - Default: `["*.*"]`
 
-An extractor's `select` [extra](#plugin-extras) holds an array of [entity selection rules](#select)
+An [extractor](#extractor--loader)'s `select` [extra](#plugin-extras) holds an array of [entity selection rules](#select)
 to apply to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
 when the extractor is run using [`meltano elt`](#elt) or [`meltano invoke`](#invoke).
 
@@ -347,7 +347,7 @@ extractors:
 - Environment variable: `<NAMESPACE>__METADATA`
 - Default: `{}` (an empty object)
 
-An extractor's `metadata` [extra](#plugin-extras) holds an object describing
+An [extractor](#extractor--loader)'s `metadata` [extra](#plugin-extras) holds an object describing
 [Singer stream and property metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata)
 rules to apply to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
 when the extractor is run using [`meltano elt`](#elt) or [`meltano invoke`](#invoke).
@@ -405,7 +405,7 @@ extractors:
 - Environment variable: `<NAMESPACE>__SCHEMA`
 - Default: `{}` (an empty object)
 
-An extractor's `schema` [extra](#plugin-extras) holds an object describing
+An [extractor](#extractor--loader)'s `schema` [extra](#plugin-extras) holds an object describing
 [Singer stream schema](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#schemas) override
 rules to apply to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
 when the extractor is run using [`meltano elt`](#elt) or [`meltano invoke`](#invoke).
@@ -458,7 +458,7 @@ extractors:
 - Environment variable: `<NAMESPACE>__VARS`
 - Default: `{}` (an empty object)
 
-A transform's `vars` [extra](#plugin-extras) holds an object representing [dbt model variables](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/using-variables)
+A [transform](#transform)'s `vars` [extra](#plugin-extras) holds an object representing [dbt model variables](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/using-variables)
 that can be referenced from a model using the [`var` function](https://docs.getdbt.com/reference/dbt-jinja-functions/var).
 
 When the transform is installed using [`meltano install`](#install), this object will be used as the dbt model's `vars` object in `transform/dbt_project.yml`.
@@ -497,7 +497,7 @@ transforms:
 - Environment variable: `<NAMESPACE>__UPDATE`
 - Default: `{}` (an empty object)
 
-A file bundle's `update` [extra](#plugin-extras) holds an object mapping file paths (of files inside the bundle, relative to the project root) to booleans.
+A [file bundle](#file-bundle)'s `update` [extra](#plugin-extras) holds an object mapping file paths (of files inside the bundle, relative to the project root) to booleans.
 
 When a file path's value is `True`, the file is considered to be managed by the file bundle and updated automatically when [`meltano upgrade`](#upgrade) is run.
 
@@ -846,7 +846,7 @@ Upgrade Meltano and the Meltano project to the latest version.
 
 When called without arguments, this will:
 - Upgrade the `meltano` package
-- Update files managed by [file bundles](#file-bundle)
+- Update files [managed by](#file-bundle-extra-update) [file bundles](#file-bundle)
 - Apply migrations to system database
 - Recompile models
 
