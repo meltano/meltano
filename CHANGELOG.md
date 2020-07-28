@@ -16,6 +16,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2180](https://gitlab.com/meltano/meltano/-/issues/2180) Mark pipeline job as failed when process is interrupted (SIGINT) or terminated (SIGTERM).
+
 ### Breaks
 
 

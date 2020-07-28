@@ -1,7 +1,9 @@
-import logging
+import sys
 import os
+import logging
 import sqlalchemy.types as types
 import uuid
+import signal
 from datetime import datetime
 from contextlib import contextmanager
 from enum import Enum
@@ -94,7 +96,18 @@ class Job(SystemModel):
 
     @contextmanager
     def run(self, session):
+        def handle_terminate(signal, frame):
+            if self.is_running():
+                self.fail(error="The process was terminated")
+                self.save(session)
+
+            sys.exit(143)
+
         try:
+            original_termination_handler = signal.signal(
+                signal.SIGTERM, handle_terminate
+            )
+
             self.start()
             self.save(session)
 
@@ -102,11 +115,21 @@ class Job(SystemModel):
 
             self.success()
             self.save(session)
-        except Exception as err:
-            logging.error(err)
-            self.fail(error=err)
-            self.save(session)
+        except:
+            if self.is_running():
+                err = sys.exc_info()[1]
+                if str(err):
+                    error = str(err)
+                else:
+                    error = repr(err)
+
+                self.fail(error=error)
+                self.save(session)
+
             raise
+        finally:
+            if original_termination_handler:
+                signal.signal(signal.SIGTERM, original_termination_handler)
 
     def start(self):
         self.started_at = datetime.utcnow()
