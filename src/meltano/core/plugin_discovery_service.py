@@ -271,7 +271,7 @@ class PluginDiscoveryService(Versioned):
 
     def discover(self, plugin_type: PluginType = None):
         """Return a pretty printed list of available plugins."""
-        enabled_plugin_types = (plugin_type,) if plugin_type else iter(PluginType)
+        enabled_plugin_types = [plugin_type] if plugin_type else list(PluginType)
 
         return {
             plugin_type: [p.name for p in plugins]
