@@ -93,7 +93,7 @@ class PluginInstallService:
 
         try:
             with plugin.trigger_hooks("install", self.project, reason):
-                run = installer_factory(self.project, plugin).install()
+                run = installer_factory(self.project, plugin).install(reason)
 
                 if compile_models and plugin.type is PluginType.MODELS:
                     self.compile_models()
@@ -120,7 +120,7 @@ class PipPluginInstaller:
         self.plugin = plugin
         self.venv_service = venv_service or VenvService(project)
 
-    def install(self):
+    def install(self, reason):
         self.venv_service.create(namespace=self.plugin.type, name=self.plugin.name)
         return self.venv_service.install(
             namespace=self.plugin.type,

@@ -147,5 +147,5 @@ class FilePlugin(PluginInstall):
                 print(f"Updated {path}")
         else:
             print(
-                f"Run `meltano upgrade files` to update your project's '{self.name}' files"
+                f"Run `meltano upgrade files` to update your project's '{self.name}' files."
             )
