@@ -40,7 +40,6 @@ class ELTContext:
     def __init__(
         self,
         project,
-        session,
         job: Optional[Job] = None,
         extractor: Optional[PluginContext] = None,
         loader: Optional[PluginContext] = None,
@@ -189,7 +188,6 @@ class ELTContextBuilder:
 
         return ELTContext(
             self.project,
-            session,
             job=self._job,
             extractor=extractor,
             loader=loader,

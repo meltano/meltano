@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#2200](https://gitlab.com/meltano/meltano/-/issues/2200) Consistently handle CLI errors
+- [#2147](https://gitlab.com/meltano/meltano/-/issues/2147) Continuously persist state messages output by loader (forwarded from extractor) so that subsequent runs can pick up where a failed run left off
 
 ### Fixes
 

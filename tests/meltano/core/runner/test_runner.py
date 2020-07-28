@@ -2,6 +2,7 @@ import pytest
 import os
 import json
 from asynctest import CoroutineMock
+from contextlib import contextmanager
 
 from unittest import mock
 from meltano.core.job import Job, State
@@ -140,7 +141,7 @@ class TestSingerRunner:
         with mock.patch.object(SingerRunner, "bookmark", new=CoroutineMock()), \
           mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async) as invoke_async:
             # async method
-            await subject.invoke(tap_invoker, target_invoker)
+            await subject.invoke(tap_invoker, target_invoker, session)
 
             # correct bins are called
             assert invoke_async.awaited_with(tap_invoker)
@@ -163,21 +164,88 @@ class TestSingerRunner:
         target_process.stdout.readline = CoroutineMock(side_effect=lines)
 
         with subject.context.job.run(session):
-            await subject.bookmark(target_process.stdout)
+            with mock.patch.object(
+                session, "add", side_effect=session.add
+            ) as add_mock, mock.patch.object(
+                session, "commit", side_effect=session.commit
+            ) as commit_mock:
+                await subject.bookmark(target_process.stdout, session)
 
-        # assert the STATE's `value` was saved
-        assert subject.context.job.payload["singer_state"] == {"line": 3}
+            assert add_mock.call_count == 3
+            assert commit_mock.call_count == 3
 
-        # test the restore
+            # assert the STATE's `value` was saved
+            assert subject.context.job.payload["singer_state"] == {"line": 3}
+
+    @pytest.mark.asyncio
+    async def test_restore_bookmark(
+        self, subject, session, tap, plugin_invoker_factory
+    ):
+        job_id = subject.context.job.job_id
         tap_invoker = plugin_invoker_factory(tap)
-        subject.restore_bookmark(session, tap_invoker)
-        state_json = json.dumps(subject.context.job.payload["singer_state"])
-        assert tap_invoker.files["state"].exists()
-        assert tap_invoker.files["state"].open().read() == state_json
 
-        # test full refresh
-        subject.restore_bookmark(session, tap_invoker, full_refresh=True)
-        assert not tap_invoker.files["state"].exists()
+        @contextmanager
+        def create_job():
+            job = Job(job_id=job_id)
+            job.start()
+            yield job
+            job.save(session)
+
+        def assert_state(state, **kwargs):
+            subject.restore_bookmark(session, tap_invoker, **kwargs)
+            if state:
+                assert tap_invoker.files["state"].exists()
+                assert json.load(tap_invoker.files["state"].open()) == state
+            else:
+                assert not tap_invoker.files["state"].exists()
+
+        # No state by default
+        assert_state(None)
+
+        # Running jobs with state are not considered
+        with create_job() as job:
+            job.payload["singer_state"] = {"success": True}
+            job.payload_flags = SingerPayload.STATE
+
+        assert_state(None)
+
+        # Successful jobs without state are not considered
+        with create_job() as job:
+            job.success()
+
+        assert_state(None)
+
+        # Successful jobs with state are considered
+        with create_job() as job:
+            job.payload["singer_state"] = {"success": True}
+            job.payload_flags = SingerPayload.STATE
+            job.success()
+
+        assert_state({"success": True})
+
+        # Running jobs with state are not considered
+        with create_job() as job:
+            job.payload["singer_state"] = {"success": True}
+            job.payload_flags = SingerPayload.STATE
+
+        assert_state({"success": True})
+
+        # Failed jobs without state are not considered
+        with create_job() as job:
+            job.fail("Whoops")
+
+        assert_state({"success": True})
+
+        # Failed jobs with state are considered
+        with create_job() as job:
+            job.payload["singer_state"] = {"failed": True}
+            job.payload_flags = SingerPayload.STATE
+            job.fail("Whoops")
+
+        assert_state({"failed": True})
+
+        # With a full refresh, no state is considered
+        assert_state(None, full_refresh=True)
 
     def test_run(self, subject, session):
         async def invoke_mock(*args):
@@ -195,5 +263,5 @@ class TestSingerRunner:
             AnyPluginInvoker = AnyInstanceOf(PluginInvoker)
 
             restore_bookmark.assert_called_once_with(session, AnyPluginInvoker, full_refresh=False)
-            invoke.assert_called_once_with(AnyPluginInvoker, AnyPluginInvoker)
+            invoke.assert_called_once_with(AnyPluginInvoker, AnyPluginInvoker, session)
         # fmt: on
