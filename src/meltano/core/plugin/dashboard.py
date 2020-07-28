@@ -1,6 +1,7 @@
 import logging
 
 from meltano.core.plugin import PluginInstall, PluginType
+from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.behavior.hookable import hook
 from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParser,
@@ -13,6 +14,8 @@ from meltano.core.m5o.dashboards_service import (
     DashboardsService,
 )
 
+logger = logging.getLogger(__name__)
+
 
 class RecordImporter:
     def __init__(self, packages_dir, project):
@@ -24,28 +27,28 @@ class RecordImporter:
         return self.__class__.RECORD_TYPE
 
     def import_records(self):
-        logging.debug(f"Importing {self.record_type}s...")
+        print(f"Importing {self.record_type}s...")
 
         records = self.records_to_import()
 
-        logging.debug(f"Found {len(records)} {self.record_type}s to import")
+        logger.debug(f"Found {len(records)} {self.record_type}s to import")
 
         for record in records:
             self.import_record(record)
 
-        logging.debug(f"Successfully imported {len(records)} {self.record_type}s")
+        logger.debug(f"Imported {len(records)} {self.record_type}s")
 
     def records_to_import(self):
         return self.get_package_records(f"{self.record_type}s")
 
     def import_record(self, importable_record):
-        logging.debug(
+        logger.debug(
             f"Importing {self.record_type} with name '{importable_record['name']}', ID '{importable_record['id']}'"
         )
 
         existing_record = self._get_record(importable_record["id"])
         if existing_record:
-            logging.debug(
+            logger.debug(
                 f"Found existing {self.record_type} with ID '{existing_record['id']}'"
             )
 
@@ -59,14 +62,12 @@ class RecordImporter:
 
         record = self.save_record(record, save_func)
 
-        logging.debug(
-            f"Successfully imported {self.record_type} with ID '{record['id']}', name '{record['name']}'"
-        )
+        print(f"Imported {self.record_type} '{record['name']}'")
 
     def update_record_data(self, record, importable_record):
         snapshots = self.snapshots_for_record(importable_record["id"])
         if not snapshots:
-            logging.debug(
+            logger.debug(
                 f"No snapshots found: not overwriting anything with importable values"
             )
             return record
@@ -79,7 +80,7 @@ class RecordImporter:
                 continue
 
             if importable_value == existing_value:
-                logging.debug(
+                logger.debug(
                     f"Existing '{attribute}' value matches importable value: nothing to do"
                 )
                 continue
@@ -87,12 +88,12 @@ class RecordImporter:
             snapshot_values = [s.get(attribute, None) for s in snapshots]
 
             if existing_value in snapshot_values:
-                logging.debug(
+                logger.debug(
                     f"Existing '{attribute}' value matches a snapshot: overwriting with importable value"
                 )
                 record[attribute] = importable_value
             else:
-                logging.debug(
+                logger.debug(
                     f"Existing '{attribute}' value does not match any snapshots: not overwriting with importable value"
                 )
 
@@ -188,7 +189,7 @@ class DashboardImporter(RecordImporter):
                 {"dashboard_id": dashboard["id"], "report_id": report_id}
             )
 
-            logging.debug(
+            logger.debug(
                 f"Added report with ID '{report_id}' to dashboard with ID '{dashboard['id']}'"
             )
 
@@ -212,11 +213,16 @@ class DashboardPlugin(PluginInstall):
 
     @hook("after_install")
     def after_install(self, project, reason):
-        venv = VirtualEnv(project.plugin_dir(self, "venv"))
-        packages_dir = venv.site_packages_dir
+        if reason in (PluginInstallReason.ADD, PluginInstallReason.UPGRADE):
+            venv = VirtualEnv(project.plugin_dir(self, "venv"))
+            packages_dir = venv.site_packages_dir
 
-        ReportImporter(packages_dir, project).import_records()
-        DashboardImporter(packages_dir, project).import_records()
+            ReportImporter(packages_dir, project).import_records()
+            DashboardImporter(packages_dir, project).import_records()
+        else:
+            print(
+                f"Run `meltano add dashboard {self.name}` to re-add this dashboard to your project."
+            )
 
     def is_invokable(self):
         return False
