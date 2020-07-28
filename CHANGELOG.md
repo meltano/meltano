@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2162](https://gitlab.com/meltano/meltano/-/issues/2162) Print link to plugin documentation in `meltano add <plugin>` and `meltano config <plugin> list` output
+
 ### Changes
 
 - [#2200](https://gitlab.com/meltano/meltano/-/issues/2200) Consistently handle CLI errors

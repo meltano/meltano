@@ -26,6 +26,14 @@ class DummySettingsService(SettingsService):
         ]
 
     @property
+    def label(self):
+        return "Dummy"
+
+    @property
+    def docs_url(self):
+        return "https://meltano.com/docs/"
+
+    @property
     def _env_namespace(self):
         return "dummy"
 
