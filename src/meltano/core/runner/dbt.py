@@ -4,7 +4,7 @@ import logging
 import sys
 from io import StringIO
 
-from . import Runner
+from . import Runner, RunnerError
 from meltano.core.error import SubprocessError
 from meltano.core.project import Project
 from meltano.core.plugin import PluginType
@@ -45,7 +45,7 @@ class DbtRunner(Runner):
         )
 
         if handle.returncode:
-            raise Exception(
+            raise RunnerError(
                 f"dbt {cmd} didn't exit cleanly. Exit code: {handle.returncode}"
             )
 

@@ -19,6 +19,10 @@ from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 
+class CliError(Exception):
+    pass
+
+
 def add_plugin(
     project: Project,
     plugin_type: PluginType,
@@ -45,11 +49,9 @@ def add_plugin(
         )
         plugin = err.plugin
     except (PluginNotSupportedException, PluginNotFoundError) as err:
-        click.secho(
-            f"Error: {plugin_type.descriptor} '{plugin_name}' is not known to Meltano",
-            fg="red",
-        )
-        raise click.Abort()
+        raise CliError(
+            f"{plugin_type.descriptor.capitalize()} '{plugin_name}' is not known to Meltano"
+        ) from err
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)

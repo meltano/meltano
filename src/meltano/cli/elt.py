@@ -5,9 +5,10 @@ import os
 import sys
 
 from . import cli
-from .utils import add_plugin, add_related_plugins, install_plugins
+from .utils import CliError, add_plugin, add_related_plugins, install_plugins
 from .params import project
 from meltano.core.config_service import ConfigService
+from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.project import Project, ProjectNotFound
@@ -60,46 +61,43 @@ def elt(project, extractor, loader, dry, full_refresh, transform, job_id):
         with job.run(session), job_logging_service.create_log(
             job.job_id, job.run_id
         ) as log_file, OutputLogger(log_file):
-            try:
-                success = install_missing_plugins(project, extractor, loader, transform)
+            success = install_missing_plugins(project, extractor, loader, transform)
 
-                if not success:
-                    raise click.Abort()
+            if not success:
+                raise RunnerError("Failed to install missing plugins")
 
-                elt_context = (
-                    ELTContextBuilder(project)
-                    .with_job(job)
-                    .with_extractor(extractor)
-                    .with_loader(loader)
-                    .with_transform(transform)
-                    .context(session)
+            elt_context = (
+                ELTContextBuilder(project)
+                .with_job(job)
+                .with_extractor(extractor)
+                .with_loader(loader)
+                .with_transform(transform)
+                .context(session)
+            )
+
+            if transform != "only":
+                run_extract_load(
+                    elt_context, session, dry_run=dry, full_refresh=full_refresh
                 )
+            else:
+                click.secho("Extract & load skipped.", fg="yellow")
 
-                if transform != "only":
-                    run_extract_load(
-                        elt_context, session, dry_run=dry, full_refresh=full_refresh
-                    )
-                else:
-                    click.secho("Extract & load skipped.", fg="yellow")
-
-                if elt_context.transformer:
-                    # Use a new session for the Transform Part to address the last
-                    # update for Job state not being saved in the DB
-                    transform_session = Session()
-                    try:
-                        run_transform(elt_context, transform_session, dry_run=dry)
-                    finally:
-                        transform_session.close()
-                else:
-                    click.secho("Transformation skipped.", fg="yellow")
-            except Exception as err:
-                logging.error(
-                    f"ELT could not complete, an error happened during the process: {err}"
-                )
-                raise click.Abort()
+            if elt_context.transformer:
+                # Use a new session for the Transform Part to address the last
+                # update for Job state not being saved in the DB
+                transform_session = Session()
+                try:
+                    run_transform(elt_context, transform_session, dry_run=dry)
+                finally:
+                    transform_session.close()
+            else:
+                click.secho("Transformation skipped.", fg="yellow")
+    except RunnerError as err:
+        raise CliError(
+            f"ELT could not complete, an error happened during the process: {err}"
+        ) from err
     finally:
         session.close()
-    # fmt: on
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)

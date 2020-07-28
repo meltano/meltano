@@ -24,16 +24,12 @@ def discover(project, plugin_type):
     if plugin_type == "all":
         plugin_type = None
 
-    try:
-        discovery_dict = discover_service.discover(plugin_type)
+    discovery_dict = discover_service.discover(plugin_type)
 
-        for plugin_type, plugins in discovery_dict.items():
-            click.secho(plugin_type, fg="green")
-            for plugin in plugins:
-                click.echo(plugin)
+    for plugin_type, plugins in discovery_dict.items():
+        click.secho(plugin_type, fg="green")
+        for plugin in plugins:
+            click.echo(plugin)
 
-        tracker = GoogleAnalyticsTracker(project)
-        tracker.track_meltano_discover(plugin_type=plugin_type)
-    except Exception as e:
-        click.secho("Cannot list available plugins.", fg="red")
-        raise click.ClickException(str(e))
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_discover(plugin_type=plugin_type)

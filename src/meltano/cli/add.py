@@ -9,7 +9,7 @@ from typing import List
 
 from . import cli
 from .params import project
-from .utils import add_plugin, add_related_plugins, install_plugins
+from .utils import CliError, add_plugin, add_related_plugins, install_plugins
 from meltano.core.plugin import PluginType
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_add_custom_service import ProjectAddCustomService
@@ -33,8 +33,7 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
             PluginType.TRANSFORMS,
             PluginType.ORCHESTRATORS,
         ):
-            click.secho(f"--custom is not supported for {ctx.invoked_subcommand}")
-            raise click.Abort()
+            raise CliError(f"--custom is not supported for {ctx.invoked_subcommand}")
 
         add_service = ProjectAddCustomService(project)
     else:
@@ -69,4 +68,4 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
             )
 
     if not success:
-        raise click.Abort()
+        raise CliError("Failed to install plugin(s)")

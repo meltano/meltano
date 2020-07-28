@@ -10,7 +10,7 @@ import shutil
 from typing import Optional
 
 from meltano.core.project import Project
-from meltano.core.migration_service import MigrationService
+from meltano.core.migration_service import MigrationService, MigrationError
 from meltano.core.config_service import ConfigService
 from meltano.cli.utils import install_plugins, PluginInstallReason
 from meltano.core.compiler.project_compiler import ProjectCompiler
@@ -112,9 +112,12 @@ class UpgradeService:
     def migrate_database(self):
         click.secho("Applying migrations to system database...", fg="blue")
 
-        migration_service = MigrationService(self.engine)
-        migration_service.upgrade()
-        migration_service.seed(self.project)
+        try:
+            migration_service = MigrationService(self.engine)
+            migration_service.upgrade()
+            migration_service.seed(self.project)
+        except MigrationError as err:
+            raise UpgradeError(str(err)) from err
 
     def compile_models(self):
         click.secho("Recompiling models...", fg="blue")

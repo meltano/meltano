@@ -48,4 +48,4 @@ def install(project, plugin_type, plugin_name, include_related):
     tracker.track_meltano_install()
 
     if not success:
-        raise click.Abort()
+        raise CliError("Failed to install plugin(s)")

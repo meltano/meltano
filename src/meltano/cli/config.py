@@ -6,6 +6,7 @@ from pathlib import Path
 
 from . import cli
 from .params import project
+from .utils import CliError
 
 from meltano.core.db import project_engine
 from meltano.core.project import Project
@@ -103,11 +104,9 @@ def set(ctx, setting_name, value, store):
             path, value, store=store, session=session
         )
     except StoreNotSupportedError as err:
-        click.secho(
-            f"{subject.capitalize()} setting '{path}' could not be set in {store.label}: {err}",
-            fg="red",
-        )
-        raise click.Abort()
+        raise CliError(
+            f"{subject.capitalize()} setting '{path}' could not be set in {store.label}: {err}"
+        ) from err
 
     name = metadata["name"]
     store = metadata["store"]
@@ -143,11 +142,9 @@ def unset(ctx, setting_name, store):
     try:
         metadata = settings.unset(path, store=store, session=session)
     except StoreNotSupportedError as err:
-        click.secho(
-            f"{subject.capitalize()} setting '{path}' in {store.label} could not be unset: {err}",
-            fg="red",
-        )
-        raise click.Abort()
+        raise CliError(
+            f"{subject.capitalize()} setting '{path}' in {store.label} could not be unset: {err}"
+        ) from err
 
     name = metadata["name"]
     store = metadata["store"]
@@ -181,11 +178,9 @@ def reset(ctx, store):
     try:
         metadata = settings.reset(store=store, session=session)
     except StoreNotSupportedError as err:
-        click.secho(
-            f"{subject.capitalize()} settings in {store.label} could not be reset: {err}",
-            fg="red",
-        )
-        raise click.Abort()
+        raise CliError(
+            f"{subject.capitalize()} settings in {store.label} could not be reset: {err}"
+        ) from err
 
     store = metadata["store"]
     click.secho(

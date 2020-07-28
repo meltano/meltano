@@ -59,8 +59,7 @@ def init_hook(engine):
     except KeyError:
         pass
     except Exception as e:
-        logging.exception(e)
-        logging.fatal(f"Can't initialize database.")
+        raise Exception(f"Can't initialize database: {str(e)}") from e
 
 
 def init_sqlite_hook(engine):

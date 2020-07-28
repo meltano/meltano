@@ -5,10 +5,12 @@ import click.globals
 import os
 from pathlib import Path
 
+from .utils import CliError
+
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import pop_all
-from meltano.core.migration_service import MigrationService
+from meltano.core.migration_service import MigrationService, MigrationError
 from meltano.core.db import project_engine
 
 
@@ -36,7 +38,7 @@ class project:
 
             project = ctx.obj["project"]
             if not project:
-                raise click.ClickException(
+                raise CliError(
                     f"`{ctx.command_path}` must be run inside a Meltano project."
                     "\nUse `meltano init <project_name>` to create one."
                     "\nIf you are in a project, you may be in a subfolder. Navigate to the root directory."
@@ -49,9 +51,12 @@ class project:
             )
 
             if self.migrate:
-                migration_service = MigrationService(engine)
-                migration_service.upgrade(silent=True)
-                migration_service.seed(project)
+                try:
+                    migration_service = MigrationService(engine)
+                    migration_service.upgrade(silent=True)
+                    migration_service.seed(project)
+                except MigrationError as err:
+                    raise CliError(str(err)) from err
 
             func(project, *args, **kwargs)
 

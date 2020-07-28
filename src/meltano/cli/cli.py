@@ -9,8 +9,6 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.logging import setup_logging, LEVELS
 
-setup_logging()
-
 logger = logging.getLogger(__name__)
 
 
