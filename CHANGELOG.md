@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.42.0 - (2020-07-28)
+---
+
+### New
+
 - [#2162](https://gitlab.com/meltano/meltano/-/issues/2162) Print link to plugin documentation in `meltano add <plugin>` and `meltano config <plugin> list` output
 
 ### Changes
@@ -23,8 +35,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2199](https://gitlab.com/meltano/meltano/-/issues/2199) Fix `meltano discover` only listing custom plugins, not known (discovered) ones
 - [#2166](https://gitlab.com/meltano/meltano/-/issues/2166) Don't fail on large extractor state messages by increasing loader output buffer size from 64 to 128KB
 - [#2180](https://gitlab.com/meltano/meltano/-/issues/2180) Mark pipeline job as failed when process is interrupted (SIGINT) or terminated (SIGTERM).
-
-### Breaks
 
 
 ## 1.41.1 - (2020-07-23)
