@@ -24,7 +24,7 @@ def run_migrations_offline():
     context.configure(url=url,
         literal_binds=True,
         target_metadata=SystemMetadata,
-        version_table_schema=os.getenv('MELTANO_DATABASE_SCHEMA'),
+        version_table_schema=SystemMetadata.schema,
     )
 
     with context.begin_transaction():
@@ -49,7 +49,7 @@ def run_migrations_online():
         context.configure(
             connection=connection,
             target_metadata=SystemMetadata,
-            version_table_schema=os.getenv('MELTANO_DATABASE_SCHEMA'),
+            version_table_schema=SystemMetadata.schema,
         )
 
         with context.begin_transaction():
