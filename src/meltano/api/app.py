@@ -35,7 +35,9 @@ def create_app(config={}):
 
     settings_service = ProjectSettingsService(project)
 
-    project_engine(project, settings_service.get("database_uri"), default=True)
+    database_uri = settings_service.get("database_uri")
+    database_schema = settings_service.get("database_schema")
+    project_engine(project, database_uri, database_schema, default=True)
 
     app = Flask(
         __name__, instance_path=str(project.root), instance_relative_config=True

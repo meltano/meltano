@@ -9,7 +9,7 @@ from alembic.runtime.migration import MigrationContext
 from alembic import command
 
 from meltano.migrations import MIGRATION_DIR, LOCK_PATH
-from meltano.core.db import project_engine
+from meltano.core.db import project_engine, SystemMetadata
 from meltano.api.models.security import Role, RolePermissions
 
 
@@ -32,9 +32,7 @@ class MigrationService:
 
     def upgrade(self, silent=False):
         conn = self.engine.connect().execution_options(
-            schema_translate_map={
-                None: os.getenv('MELTANO_DATABASE_SCHEMA')
-            }
+            schema_translate_map={ None: SystemMetadata.schema }
         )
         cfg = Config()
 

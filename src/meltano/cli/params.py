@@ -44,8 +44,10 @@ class project:
 
             # register the system database connection
             settings_service = ProjectSettingsService(project)
+            database_uri = settings_service.get("database_uri")
+            database_schema = settings_service.get("database_schema")
             engine, _ = project_engine(
-                project, settings_service.get("database_uri"), default=True
+                project, database_uri, database_schema, default=True
             )
 
             if self.migrate:

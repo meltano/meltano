@@ -12,8 +12,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine import Engine
 from psycopg2.sql import Identifier, SQL
 
-
-SystemMetadata = MetaData(schema=os.getenv('MELTANO_DATABASE_SCHEMA'))
+SystemMetadata = MetaData()
 SystemModel = declarative_base(metadata=SystemMetadata)
 
 # Keep a Project → Engine mapping to serve
@@ -21,7 +20,7 @@ SystemModel = declarative_base(metadata=SystemMetadata)
 _engines = dict()
 
 
-def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessionmaker):
+def project_engine(project, engine_uri=None, database_schema=None, default=False) -> ("Engine", sessionmaker):
     """Creates and register a SQLAlchemy engine for a Meltano project instance."""
 
     # return the default engine if it is registered
@@ -35,6 +34,8 @@ def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessio
         raise ValueError("No engine registered for this project.")
 
     logging.debug(f"Creating engine {project}@{engine_uri}")
+    SystemMetadata.schema = database_schema
+
     engine = create_engine(engine_uri)
 
     init_hook(engine)
@@ -71,10 +72,8 @@ def init_sqlite_hook(engine):
     engine.execute("PRAGMA journal_mode=WAL")
 
 def init_postgresql_hook(engine):
-    try:
-        engine.execute(f"CREATE SCHEMA IF NOT EXISTS {os.environ['MELTANO_DATABASE_SCHEMA']}")
-    except KeyError:
-        pass
+    if SystemMetadata.schema is not None:
+        engine.execute(f"CREATE SCHEMA IF NOT EXISTS {SystemMetadata.schema}")
 
 
 class DB:
