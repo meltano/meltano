@@ -32,7 +32,7 @@ class MigrationService:
 
     def upgrade(self, silent=False):
         conn = self.engine.connect().execution_options(
-            schema_translate_map={ None: SystemMetadata.schema }
+            schema_translate_map={None: SystemMetadata.schema}
         )
         cfg = Config()
 

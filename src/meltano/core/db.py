@@ -20,7 +20,9 @@ SystemModel = declarative_base(metadata=SystemMetadata)
 _engines = dict()
 
 
-def project_engine(project, engine_uri=None, database_schema=None, default=False) -> ("Engine", sessionmaker):
+def project_engine(
+    project, engine_uri=None, database_schema=None, default=False
+) -> ("Engine", sessionmaker):
     """Creates and register a SQLAlchemy engine for a Meltano project instance."""
 
     # return the default engine if it is registered
@@ -53,10 +55,7 @@ def project_engine(project, engine_uri=None, database_schema=None, default=False
 
 
 def init_hook(engine):
-    function_map = {
-        "sqlite": init_sqlite_hook,
-        "postgresql": init_postgresql_hook,
-    }
+    function_map = {"sqlite": init_sqlite_hook, "postgresql": init_postgresql_hook}
 
     try:
         function_map[engine.dialect.name](engine)
@@ -70,6 +69,7 @@ def init_hook(engine):
 def init_sqlite_hook(engine):
     # enable the WAL
     engine.execute("PRAGMA journal_mode=WAL")
+
 
 def init_postgresql_hook(engine):
     if SystemMetadata.schema is not None:
