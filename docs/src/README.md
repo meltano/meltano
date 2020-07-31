@@ -183,7 +183,7 @@ meltano add extractor tap-gitlab
 # - the https://gitlab.com/meltano/meltano project
 meltano config tap-gitlab set projects meltano/meltano
 # - going back to May 1st, 2020
-meltano config tap-gitlab set start_date 2020-05-01
+meltano config tap-gitlab set start_date 2020-05-01T00:00:00Z
 
 # Add JSONL loader
 meltano add loader target-jsonl
@@ -567,7 +567,7 @@ start_date [env: TAP_COVID_19_START_DATE] current value: None (from default)
 ```bash
 # Store non-sensitive plugin configuration in
 # your project's `meltano.yml` file
-meltano config tap-covid-19 set start_date "2020-01-01T00:00:00Z"
+meltano config tap-covid-19 set start_date 2020-01-01T00:00:00Z
 meltano config tap-covid-19 set user_agent "tap-covid-19 via meltano <api_user_email@your_company.com>"
 
 # Store sensitive plugin configuration in...
