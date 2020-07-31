@@ -9,8 +9,6 @@ settings:
   value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db
   env_specific: true
 - name: database_schema
-  value: null
-  env_aliases: [MELTANO_DATABASE_SCHEMA]
 
 - name: project_readonly
   kind: boolean
