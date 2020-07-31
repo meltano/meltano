@@ -73,7 +73,7 @@ def init_sqlite_hook(engine):
 
 def init_postgresql_hook(engine):
     if SystemMetadata.schema is not None:
-        engine.execute(f"CREATE SCHEMA IF NOT EXISTS {SystemMetadata.schema}")
+        DB.ensure_schema_exists(engine, SystemMetadata.schema)
 
 
 class DB:
