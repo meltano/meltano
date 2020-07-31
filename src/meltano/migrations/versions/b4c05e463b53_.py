@@ -8,6 +8,7 @@ Create Date: 2019-07-23 16:05:29.073296
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.dialects import postgresql
 from meltano.migrations import JSONEncodedDict, IntFlag
 from enum import Enum
 
@@ -29,6 +30,9 @@ class State(Enum):
 
 
 def upgrade():
+    if op.get_context().dialect.name == 'postgresql':
+        postgresql.ENUM(State, name='job_state').create(op.get_bind())
+
     op.create_table(
         "job",
         sa.Column("id", sa.Integer, primary_key=True),
@@ -53,5 +57,8 @@ def upgrade():
 
 
 def downgrade():
+    if op.get_context().dialect.name == 'postgresql':
+        postgresql.ENUM(State, name='job_state').drop(op.get_bind())
+
     op.drop_table("job")
     op.drop_table("plugin_settings")
