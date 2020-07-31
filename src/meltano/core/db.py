@@ -36,10 +36,10 @@ def project_engine(
         raise ValueError("No engine registered for this project.")
 
     logging.debug(f"Creating engine {project}@{engine_uri}")
+
     SystemMetadata.schema = database_schema
 
     engine = create_engine(engine_uri)
-
     init_hook(engine)
 
     create_session = sessionmaker(bind=engine)
