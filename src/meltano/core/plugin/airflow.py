@@ -114,6 +114,9 @@ class Airflow(PluginInstall):
         initdb = handle.wait()
 
         if initdb:
-            raise SubprocessError("airflow initdb failed", handle)
+            raise SubprocessError(
+                "Airflow metadata database could not be initialized: `airflow initdb` failed",
+                handle,
+            )
 
         logging.debug(f"Completed `airflow initdb`")
