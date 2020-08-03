@@ -3,12 +3,17 @@ import sys
 import logging
 from . import cli
 from .params import project
+from .utils import CliError
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.config_service import ConfigService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.db import project_engine
+from meltano.core.error import SubprocessError
+
+
+logger = logging.getLogger(__name__)
 
 
 @cli.command(context_settings=dict(ignore_unknown_options=True))
@@ -39,5 +44,8 @@ def invoke(project, plugin_type, plugin_name, plugin_args):
         )
 
         sys.exit(exit_code)
+    except SubprocessError as err:
+        logger.error(err.stderr)
+        raise CliError(str(err)) from err
     finally:
         session.close()

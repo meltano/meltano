@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2213](https://gitlab.com/meltano/meltano/-/issues/2213) Provide extra context when `meltano invoke airflow` fails because of `airflow initdb` failing
+
 ### Breaks
 
 
