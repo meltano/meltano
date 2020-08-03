@@ -72,6 +72,11 @@ class TestOrchestration:
             assert "_metadata" not in config
             assert "_schema" not in config
 
+            setting_names = [s["name"] for s in res.json["settings"]]
+            assert "_select" not in setting_names
+            assert "_metadata" not in setting_names
+            assert "_schema" not in setting_names
+
     def test_save_configuration(
         self,
         app,
