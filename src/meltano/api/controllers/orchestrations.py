@@ -330,7 +330,7 @@ def get_plugin_configuration(plugin_ref) -> Response:
     return jsonify(
         {
             "profiles": profiles,
-            "settings": Canonical.as_canonical(settings.definitions()),
+            "settings": Canonical.as_canonical(settings.definitions(extras=False)),
             "settings_group_validation": settings_group_validation,
         }
     )

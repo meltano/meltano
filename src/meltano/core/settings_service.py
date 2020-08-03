@@ -98,12 +98,7 @@ class SettingsService(ABC):
         manager = source.manager(self, bulk=True, **kwargs)
 
         config = {}
-        for setting_def in self.definitions():
-            if (extras is True and not setting_def.is_extra) or (
-                extras is False and setting_def.is_extra
-            ):
-                continue
-
+        for setting_def in self.definitions(extras=extras):
             if prefix and not setting_def.name.startswith(prefix):
                 continue
 
@@ -284,7 +279,7 @@ class SettingsService(ABC):
         logger.debug(f"Reset settings with metadata: {metadata}")
         return metadata
 
-    def definitions(self) -> Iterable[Dict]:
+    def definitions(self, extras=None) -> Iterable[Dict]:
         if self._setting_defs is None:
             setting_defs = [
                 s for s in self._definitions if s.kind != "hidden" or self.show_hidden
@@ -297,6 +292,14 @@ class SettingsService(ABC):
             )
 
             self._setting_defs = setting_defs
+
+        if extras is not None:
+            return [
+                s
+                for s in self._setting_defs
+                if (extras is True and s.is_extra)
+                or (extras is False and not s.is_extra)
+            ]
 
         return self._setting_defs
 
