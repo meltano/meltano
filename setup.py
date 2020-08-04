@@ -12,6 +12,7 @@ requires = [
     "alembic==1.0.11",
     "atomicwrites==1.2.1",
     "authlib==0.10",
+    "async_generator==1.10",
     "backoff==1.8.0",
     "bcrypt==3.1.6",
     "cerberus==1.2",
