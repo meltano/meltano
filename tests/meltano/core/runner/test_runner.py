@@ -278,4 +278,3 @@ class TestSingerRunner:
                 extractor_out=None,
                 loader_out=None,
             )
-
