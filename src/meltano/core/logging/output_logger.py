@@ -82,6 +82,7 @@ class Out(object):
         self.file = file
         self.stream = stream
 
+        self.last_line = ""
 
     @contextmanager
     def line_writer(self):
@@ -144,6 +145,8 @@ class Out(object):
                 yield
 
     def writeline(self, line):
+        self.last_line = line
+
         self.output_logger.write_prefix(self)
         self.write(line)
         self.flush()

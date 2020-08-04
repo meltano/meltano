@@ -46,10 +46,9 @@ class DbtRunner(Runner):
             return_when=asyncio.ALL_COMPLETED,
         )
 
-        if handle.returncode:
-            raise RunnerError(
-                f"dbt {cmd} didn't exit cleanly. Exit code: {handle.returncode}"
-            )
+        exitcode = handle.returncode
+        if exitcode:
+            raise RunnerError(f"`dbt {cmd}` failed", {"transformer": exitcode})
 
     async def run(self, session, dry_run=False, log=None):
         dbt = self.context.transformer_invoker()

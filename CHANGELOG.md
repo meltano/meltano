@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2116](https://gitlab.com/meltano/meltano/-/issues/2116) Prefix `meltano elt` output with `meltano`, `tap-foo`, `target-bar` and `dbt` labels as appropriate
+- [!1778](https://gitlab.com/meltano/meltano/-/merge_requests/1788) Clearly print reason that tap, target or dbt failed by repeating last output line
 
 ### Changes
 

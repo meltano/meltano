@@ -1,5 +1,7 @@
 class RunnerError(Exception):
-    pass
+    def __init__(self, message, exitcodes={}):
+        super().__init__(message)
+        self.exitcodes = exitcodes
 
 
 class Runner:

@@ -251,10 +251,12 @@ class TestCliEltScratchpadOne:
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
+            assert "Tap failed" in str(result.exception)
 
             assert_lines(
                 result.stdout,
                 "meltano     | Running extract & load...\x1b[0m\n",
+                "meltano     | \x1b[31mExtraction failed (1):\x1b[0m Failure\n",
             )
             assert_lines(
                 result.stderr,
@@ -300,10 +302,12 @@ class TestCliEltScratchpadOne:
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
+            assert "Target failed" in str(result.exception)
 
             assert_lines(
                 result.stdout,
                 "meltano     | Running extract & load...\x1b[0m\n",
+                "meltano     | \x1b[31mLoading failed (1):\x1b[0m Failure\n",
             )
             assert_lines(
                 result.stderr,
@@ -356,10 +360,13 @@ class TestCliEltScratchpadOne:
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
+            assert "Tap and target failed" in str(result.exception)
 
             assert_lines(
                 result.stdout,
                 "meltano     | Running extract & load...\x1b[0m\n",
+                "meltano     | \x1b[31mExtraction failed (1):\x1b[0m Failure\n",
+                "meltano     | \x1b[31mLoading failed (1):\x1b[0m Failure\n",
             )
             assert_lines(
                 result.stderr,
@@ -547,12 +554,14 @@ class TestCliEltScratchpadTwo:
         ) as install_plugin_mock:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
+            assert "`dbt run` failed" in str(result.exception)
 
             assert_lines(
                 result.stdout,
                 "meltano     | Running extract & load...\x1b[0m\n",
                 "meltano     | \x1b[32mExtract & load complete!\x1b[0m\n",
                 "meltano     | Running transformation...\x1b[0m\n",
+                "meltano     | \x1b[31mTransformation failed (1):\x1b[0m Failure\n",
             )
 
             assert_lines(

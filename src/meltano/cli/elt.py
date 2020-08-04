@@ -183,13 +183,36 @@ async def run_extract_load(elt_context, output_logger, session, **kwargs):
     logs("Running extract & load...")
 
     singer_runner = SingerRunner(elt_context)
-    with extractor_log.line_writer() as extractor_log_writer, loader_log.line_writer() as loader_log_writer:
-        await singer_runner.run(
-            session,
-            **kwargs,
-            extractor_log=extractor_log_writer,
-            loader_log=loader_log_writer,
-        )
+    try:
+        with extractor_log.line_writer() as extractor_log_writer, loader_log.line_writer() as loader_log_writer:
+            await singer_runner.run(
+                session,
+                **kwargs,
+                extractor_log=extractor_log_writer,
+                loader_log=loader_log_writer,
+                extractor_out=extractor_out_writer,
+                loader_out=loader_out_writer,
+            )
+    except RunnerError as err:
+        try:
+            code = err.exitcodes["extractor"]
+            message = extractor_log.last_line.rstrip() or "(see above)"
+            logger.error(
+                f"{click.style(f'Extraction failed ({code}):', fg='red')} {message}"
+            )
+        except KeyError:
+            pass
+
+        try:
+            code = err.exitcodes["loader"]
+            message = loader_log.last_line.rstrip() or "(see above)"
+            logger.error(
+                f"{click.style(f'Loading failed ({code}):', fg='red')} {message}"
+            )
+        except KeyError:
+            pass
+
+        raise
 
     logs("Extract & load complete!", fg="green")
 
@@ -200,8 +223,20 @@ async def run_transform(elt_context, output_logger, session, **kwargs):
     logs("Running transformation...")
 
     dbt_runner = DbtRunner(elt_context)
-    with transformer_log.line_writer() as transformer_log_writer:
-        await dbt_runner.run(session, **kwargs, log=transformer_log_writer)
+    try:
+        with transformer_log.line_writer() as transformer_log_writer:
+            await dbt_runner.run(session, **kwargs, log=transformer_log_writer)
+    except RunnerError as err:
+        try:
+            code = err.exitcodes["transformer"]
+            message = transformer_log.last_line.rstrip() or "(see above)"
+            logger.error(
+                f"{click.style(f'Transformation failed ({code}):', fg='red')} {message}"
+            )
+        except KeyError:
+            pass
+
+        raise
 
     logs("Transformation complete!", fg="green")
 

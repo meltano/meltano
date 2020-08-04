@@ -121,13 +121,17 @@ class SingerRunner(Runner):
 
         # at this point, something already stopped, the other component
         # should die soon because of a SIGPIPE
-        target_code = await p_target.wait()
         tap_code = await p_tap.wait()
+        target_code = await p_target.wait()
 
-        if any((tap_code, target_code)):
+        if tap_code and target_code:
             raise RunnerError(
-                f"Subprocesses didn't exit cleanly: tap({tap_code}), target({target_code})"
+                f"Tap and target failed", {"extractor": tap_code, "loader": target_code}
             )
+        elif tap_code:
+            raise RunnerError(f"Tap failed", {"extractor": tap_code})
+        elif target_code:
+            raise RunnerError(f"Target failed", {"loader": target_code})
 
     def restore_bookmark(self, session, tap: PluginInvoker, full_refresh=False):
         # Delete state left over from different pipeline run for same extractor
