@@ -19,6 +19,8 @@ REDACTED_VALUE = "(redacted)"
 
 
 class SettingsService(ABC):
+    LOGGING = False
+
     def __init__(
         self,
         project,
@@ -154,7 +156,7 @@ class SettingsService(ABC):
         if setting_def:
             name = setting_def.name
 
-        logger.debug(f"Getting setting '{name}'")
+        self.log(f"Getting setting '{name}'")
 
         metadata = {"name": name, "source": source, "setting": setting_def}
 
@@ -198,7 +200,7 @@ class SettingsService(ABC):
                 metadata["redacted"] = True
                 value = REDACTED_VALUE
 
-        logger.debug(f"Got setting '{name}' with metadata: {metadata}")
+        self.log(f"Got setting '{name}' with metadata: {metadata}")
         return value, metadata
 
     def get_with_source(self, *args, **kwargs):
@@ -212,7 +214,7 @@ class SettingsService(ABC):
     def set_with_metadata(
         self, path: List[str], value, store=SettingValueStore.AUTO, **kwargs
     ):
-        logger.debug(f"Setting setting '{path}'")
+        self.log(f"Setting setting '{path}'")
 
         if isinstance(path, str):
             path = [path]
@@ -240,7 +242,7 @@ class SettingsService(ABC):
         set_metadata = manager.set(name, path, value, setting_def=setting_def)
         metadata.update(set_metadata)
 
-        logger.debug(f"Set setting '{name}' with metadata: {metadata}")
+        self.log(f"Set setting '{name}' with metadata: {metadata}")
         return value, metadata
 
     def set(self, *args, **kwargs):
@@ -248,7 +250,7 @@ class SettingsService(ABC):
         return value
 
     def unset(self, path: List[str], store=SettingValueStore.AUTO, **kwargs):
-        logger.debug(f"Unsetting setting '{path}'")
+        self.log(f"Unsetting setting '{path}'")
 
         if isinstance(path, str):
             path = [path]
@@ -266,7 +268,7 @@ class SettingsService(ABC):
         unset_metadata = manager.unset(name, path, setting_def=setting_def)
         metadata.update(unset_metadata)
 
-        logger.debug(f"Unset setting '{name}' with metadata: {metadata}")
+        self.log(f"Unset setting '{name}' with metadata: {metadata}")
         return metadata
 
     def reset(self, store=SettingValueStore.AUTO, **kwargs):
@@ -276,7 +278,7 @@ class SettingsService(ABC):
         reset_metadata = manager.reset()
         metadata.update(reset_metadata)
 
-        logger.debug(f"Reset settings with metadata: {metadata}")
+        self.log(f"Reset settings with metadata: {metadata}")
         return metadata
 
     def definitions(self, extras=None) -> Iterable[Dict]:
@@ -313,3 +315,7 @@ class SettingsService(ABC):
 
     def setting_env(self, setting_def):
         return setting_def.env or setting_env(self._env_namespace, setting_def.name)
+
+    def log(self, message):
+        if self.LOGGING:
+            logger.debug(message)

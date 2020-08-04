@@ -1,7 +1,7 @@
 import click
 from . import cli
 from .params import project
-from .utils import add_related_plugins, install_plugins
+from .utils import CliError, add_related_plugins, install_plugins
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin import PluginType

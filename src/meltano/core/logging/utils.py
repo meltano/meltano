@@ -50,18 +50,22 @@ def remove_ansi_escape_sequences(line):
     return ansi_escape.sub("", line)
 
 
-async def capture_subprocess_output(stream_captured, output_stream):
+async def capture_subprocess_output(reader, *line_writers):
     """
     Capture in real time the output stream of a suprocess that is run async.
     The stream has been set to asyncio.subprocess.PIPE and is provided using
-     stream_captured to this function.
-    As new lines are captured for stream_captured, they are written to output_stream.
+     reader to this function.
+    As new lines are captured for reader, they are written to output_stream.
     This async function should be run with await asyncio.wait() while waiting
      for the subprocess to end.
     """
-    while not stream_captured.at_eof():
-        line = await stream_captured.readline()
+    while not reader.at_eof():
+        line = await reader.readline()
         if not line:
             continue
 
-        output_stream.write(line.decode())
+        for writer in line_writers:
+            try:
+                writer.writeline(line.decode())
+            except AttributeError:
+                writer.write(line)

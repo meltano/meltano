@@ -10,12 +10,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2116](https://gitlab.com/meltano/meltano/-/issues/2116) Prefix `meltano elt` output with `meltano`, `tap-foo`, `target-bar` and `dbt` labels as appropriate
+- [!1778](https://gitlab.com/meltano/meltano/-/merge_requests/1788) Clearly print reason that tap, target or dbt failed by repeating last output line
+- [#2214](https://gitlab.com/meltano/meltano/-/issues/2214) Log Singer messages output by tap and target when `meltano elt` is run with `--log-level` flag (or `cli.log_level` setting) set to `debug`
+
 ### Changes
+
+- [!1778](https://gitlab.com/meltano/meltano/-/merge_requests/1788) Change stored error message when job was interrupted by KeyboardInterrupt from 'KeyboardInterrupt()' to 'The process was interrupted'
+- [!1778](https://gitlab.com/meltano/meltano/-/merge_requests/1788) Disable noisy SettingsService logging when `cli.log_level` setting (or `--log-level` flag) is set to `debug`
 
 ### Fixes
 
 - [#2212](https://gitlab.com/meltano/meltano/-/issues/2212) Don't show extractor extras `_select`, `_metadata`, and `_schema` as required in UI configuration form
 - [#2213](https://gitlab.com/meltano/meltano/-/issues/2213) Provide extra context when `meltano invoke airflow` fails because of `airflow initdb` failing
+- [!1778](https://gitlab.com/meltano/meltano/-/merge_requests/1788) Fail gracefully when `meltano install` fails to install plugin(s)
 
 ### Breaks
 
