@@ -1,8 +1,11 @@
+import asyncio
 import click
 import datetime
 import logging
 import os
 import sys
+from contextlib import suppress, contextmanager
+from async_generator import asynccontextmanager
 
 from . import cli
 from .utils import CliError, add_plugin, add_related_plugins, install_plugins
@@ -28,6 +31,13 @@ from meltano.core.logging import OutputLogger, JobLoggingService
 from meltano.core.elt_context import ELTContextBuilder
 
 
+logger = logging.getLogger(__name__)
+
+
+def logs(*args, **kwargs):
+    logger.info(click.style(*args, **kwargs))
+
+
 @cli.command()
 @click.argument("extractor")
 @click.argument("loader")
@@ -50,21 +60,86 @@ def elt(project, extractor, loader, dry, full_refresh, transform, job_id):
     loader_name: Which loader should be used in this extraction
     """
 
-    job_logging_service = JobLoggingService(project)
     job = Job(
         job_id=job_id or f'job_{datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S.%f")}'
     )
 
     _, Session = project_engine(project)
     session = Session()
+
     try:
+        job_logging_service = JobLoggingService(project)
+
         with job.run(session), job_logging_service.create_log(
             job.job_id, job.run_id
-        ) as log_file, OutputLogger(log_file):
+        ) as log_file:
+            output_logger = OutputLogger(log_file)
+
+            run_async(
+                run_elt(
+                    project,
+                    job,
+                    extractor,
+                    loader,
+                    transform,
+                    output_logger=output_logger,
+                    session=session,
+                    dry_run=dry,
+                    full_refresh=full_refresh,
+                )
+            )
+    finally:
+        session.close()
+
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)
+
+
+def run_async(coro):
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(coro)
+    except asyncio.CancelledError:
+        pass
+    finally:
+        # The below is taken from https://stackoverflow.com/a/58532304
+        # and inspired by to Python 3.7's `asyncio.run`
+        all_tasks = asyncio.gather(
+            *asyncio.Task.all_tasks(loop), return_exceptions=True
+        )
+        all_tasks.cancel()
+        with suppress(asyncio.CancelledError):
+            loop.run_until_complete(all_tasks)
+        loop.run_until_complete(loop.shutdown_asyncgens())
+
+
+@asynccontextmanager
+async def redirect_output(output_logger):
+    meltano_stdout = output_logger.out("meltano", stream=sys.stdout, color="blue")
+    meltano_stderr = output_logger.out("meltano", color="blue")
+
+    with meltano_stdout.redirect_logging(ignore_errors=(CliError,)):
+        async with meltano_stdout.redirect_stdout(), meltano_stderr.redirect_stderr():
+            yield
+
+
+async def run_elt(
+    project,
+    job,
+    extractor,
+    loader,
+    transform,
+    output_logger,
+    session,
+    dry_run=False,
+    full_refresh=False,
+):
+    async with redirect_output(output_logger):
+        try:
             success = install_missing_plugins(project, extractor, loader, transform)
 
             if not success:
-                raise RunnerError("Failed to install missing plugins")
+                raise CliError("Failed to install missing plugins")
 
             elt_context = (
                 ELTContextBuilder(project)
@@ -76,40 +151,59 @@ def elt(project, extractor, loader, dry, full_refresh, transform, job_id):
             )
 
             if transform != "only":
-                run_extract_load(
-                    elt_context, session, dry_run=dry, full_refresh=full_refresh
+                await run_extract_load(
+                    elt_context,
+                    output_logger,
+                    session,
+                    dry_run=dry_run,
+                    full_refresh=full_refresh,
                 )
             else:
-                click.secho("Extract & load skipped.", fg="yellow")
+                logs("Extract & load skipped.", fg="yellow")
 
             if elt_context.transformer:
-                run_transform(elt_context, session, dry_run=dry)
+                await run_transform(
+                    elt_context, output_logger, session, dry_run=dry_run
+                )
             else:
-                click.secho("Transformation skipped.", fg="yellow")
-    except RunnerError as err:
-        raise CliError(
-            f"ELT could not complete, an error happened during the process: {err}"
-        ) from err
-    finally:
-        session.close()
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)
+                logs("Transformation skipped.", fg="yellow")
+        except RunnerError as err:
+            raise CliError(
+                f"ELT could not complete, an error happened during the process: {err}"
+            ) from err
 
 
-def run_extract_load(elt_context, session, **kwargs):
+async def run_extract_load(elt_context, output_logger, session, **kwargs):
+    extractor = elt_context.extractor.name
+    loader = elt_context.loader.name
+
+    extractor_log = output_logger.out(extractor, color="yellow")
+    loader_log = output_logger.out(loader, color="green")
+
+    logs("Running extract & load...")
+
     singer_runner = SingerRunner(elt_context)
+    with extractor_log.line_writer() as extractor_log_writer, loader_log.line_writer() as loader_log_writer:
+        await singer_runner.run(
+            session,
+            **kwargs,
+            extractor_log=extractor_log_writer,
+            loader_log=loader_log_writer,
+        )
 
-    click.echo("Running extract & load...")
-    singer_runner.run(session, **kwargs)
-    click.secho("Extract & load complete!", fg="green")
+    logs("Extract & load complete!", fg="green")
 
 
-def run_transform(elt_context, session, **kwargs):
+async def run_transform(elt_context, output_logger, session, **kwargs):
+    transformer_log = output_logger.out(elt_context.transformer.name, color="magenta")
+
+    logs("Running transformation...")
+
     dbt_runner = DbtRunner(elt_context)
-    click.echo("Running transformation...")
-    dbt_runner.run(session, **kwargs)
-    click.secho("Transformation complete!", fg="green")
+    with transformer_log.line_writer() as transformer_log_writer:
+        await dbt_runner.run(session, **kwargs, log=transformer_log_writer)
+
+    logs("Transformation complete!", fg="green")
 
 
 def install_missing_plugins(
@@ -128,7 +222,7 @@ def install_missing_plugins(
         try:
             config_service.find_plugin(extractor, plugin_type=PluginType.EXTRACTORS)
         except PluginMissingError:
-            click.secho(
+            logs(
                 f"Extractor '{extractor}' is missing, adding it to your project...",
                 fg="yellow",
             )
@@ -140,7 +234,7 @@ def install_missing_plugins(
         try:
             config_service.find_plugin(loader, plugin_type=PluginType.LOADERS)
         except PluginMissingError:
-            click.secho(
+            logs(
                 f"Loader '{loader}' is missing, adding it to your project...",
                 fg="yellow",
             )
@@ -164,7 +258,7 @@ def install_missing_plugins(
                     transform_plugin_def.name, plugin_type=PluginType.TRANSFORMS
                 )
             except PluginMissingError:
-                click.secho(
+                logs(
                     f"Transform '{transform_plugin_def.name}' is missing, adding it to your project...",
                     fg="yellow",
                 )
@@ -181,7 +275,7 @@ def install_missing_plugins(
             try:
                 config_service.find_plugin("dbt", plugin_type=PluginType.TRANSFORMERS)
             except PluginMissingError:
-                click.secho(
+                logs(
                     f"Transformer 'dbt' is missing, adding it to your project...",
                     fg="yellow",
                 )

@@ -26,7 +26,9 @@ class DbtRunner(Runner):
     def plugin(self):
         return self.context.transformer
 
-    async def invoke(self, dbt: PluginInvoker, cmd, *args, **kwargs):
+    async def invoke(self, dbt: PluginInvoker, cmd, *args, log=None, **kwargs):
+        log = log or sys.stderr
+
         handle = await dbt.invoke_async(
             cmd,
             *args,
@@ -37,8 +39,8 @@ class DbtRunner(Runner):
 
         await asyncio.wait(
             [
-                capture_subprocess_output(handle.stdout, sys.stdout),
-                capture_subprocess_output(handle.stderr, sys.stderr),
+                capture_subprocess_output(handle.stdout, log),
+                capture_subprocess_output(handle.stderr, log),
                 handle.wait(),
             ],
             return_when=asyncio.ALL_COMPLETED,
@@ -49,16 +51,14 @@ class DbtRunner(Runner):
                 f"dbt {cmd} didn't exit cleanly. Exit code: {handle.returncode}"
             )
 
-    def run(self, session, dry_run=False):
+    async def run(self, session, dry_run=False, log=None):
         dbt = self.context.transformer_invoker()
         dbt.prepare(session)
 
-        # Get an asyncio event loop and use it to run the dbt commands
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.invoke(dbt, "clean"))
-        loop.run_until_complete(self.invoke(dbt, "deps"))
+        await self.invoke(dbt, "clean", log=log)
+        await self.invoke(dbt, "deps", log=log)
 
         cmd = "compile" if dry_run else "run"
-        loop.run_until_complete(
-            self.invoke(dbt, cmd, "--models", str(self.plugin.get_config("models")))
+        await self.invoke(
+            dbt, cmd, "--models", str(self.plugin.get_config("models")), log=log
         )

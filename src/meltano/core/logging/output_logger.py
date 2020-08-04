@@ -1,77 +1,152 @@
-import click
-import functools
+import asyncio
 import logging
-import importlib
+import click
 import sys
+import os
+from contextlib import contextmanager, suppress, redirect_stderr, redirect_stdout
+from async_generator import asynccontextmanager
 
-from .utils import remove_ansi_escape_sequences
-
-
-# By default, click is automatically stripping ANSI color codes if the output
-#  stream is not connected to a terminal (which is the case with OutputLogger).
-# In order to force it to use colors, we have to add a `color=True` param to secho
-# But this turns off autodetection, so we now have to be careful not to force
-#  this for Windows or other unsupported platforms. Hence the check bellow:
-if sys.platform.startswith(("linux", "darwin")):
-    FORCE_COLOR = True
-else:
-    FORCE_COLOR = None
+from .utils import remove_ansi_escape_sequences, capture_subprocess_output
 
 
 class OutputLogger(object):
-    """
-    Context manager that takes over stdout and stderr and redirects anything
-     sent there to a log file as also to the real stdout and stderr
-
-    It also resets the handlers of the root logger to point to the newly set
-     stderr, so that logging messages are also send to the log file
-     even if it is not specified by the logger of a particular module.
-    """
-
     def __init__(self, file):
-        # Don't append, just log the last run for the same job_id
         self.file = file
         self.stdout = sys.stdout
         self.stderr = sys.stderr
 
-        self.log_handlers = logging.getLogger().handlers
+        self.outs = {}
+        self._max_name_length = None
 
-    def __enter__(self):
-        # assign the Tee class to stdout and stderr so that everything pass through it
-        sys.stdout = Tee(self.file, self.stdout)
-        sys.stderr = Tee(self.file, self.stderr)
+    def out(self, name, stream=None, color=None):
+        if stream in (None, sys.stderr):
+            stream = self.stderr
+        elif stream is sys.stdout:
+            stream = self.stdout
 
-        stdlog = logging.StreamHandler(sys.stderr)
-        logging.getLogger().handlers = [stdlog]
+        out = Out(self, name, file=self.file, stream=stream, color=color)
+        self.outs[name] = out
+        self._max_name_length = None
 
-        # monkeypatch `click.secho`, setting `color=FORCE_COLOR` by default
-        click.secho = functools.partial(click.secho, color=FORCE_COLOR)
+        return out
 
-    def __exit__(self, exc_type, exc_value, tb):
-        # log any Exception that caused this OutputLogger to exit prematurely
-        if isinstance(exc_value, Exception):
-            logging.error(str(exc_value))
+    @property
+    def max_name_length(self):
+        if self._max_name_length is None:
+            name_lengths = [len(name) for name in self.outs.keys()]
+            self._max_name_length = max(name_lengths, default=0)
 
-        sys.stdout.flush()
-        sys.stderr.flush()
+        return self._max_name_length
 
-        sys.stdout = self.stdout
-        sys.stderr = self.stderr
-        logging.getLogger().handlers = self.log_handlers
+    def write_prefix(self, out):
+        padding = max(self.max_name_length, 6)
+        padded_name = out.name.ljust(padding)
 
-        # revert back to the `click` implementation
-        importlib.reload(click)
+        click.secho(f"{padded_name} | ", fg=out.color, nl=False, file=out)
 
 
-class Tee(object):
+class LineWriter(object):
+    def __init__(self, out):
+        self.__out = out
+
+    def __getattr__(self, name):
+        return getattr(self.__out, name)
+
+    def write(self, line):
+        self.__out.writeline(line)
+
+
+class FileDescriptorWriter(object):
+    def __init__(self, out, fd):
+        self.__out = out
+        self.__writer = os.fdopen(fd, "w")
+
+    def __getattr__(self, name):
+        return getattr(self.__writer, name)
+
+    def isatty(self):
+        return self.__out.isatty()
+
+
+class Out(object):
     """
-    Simple Tee class to log anything written in a stream to a file
+    Simple Out class to log anything written in a stream to a file
      and then also write it to the stream.
     """
 
-    def __init__(self, file, stream):
+    def __init__(self, output_logger, name, file, stream, color="white"):
+        self.output_logger = output_logger
+        self.name = name
+        self.color = color
+
         self.file = file
         self.stream = stream
+
+
+    @contextmanager
+    def line_writer(self):
+        yield LineWriter(self)
+
+    @contextmanager
+    def redirect_logging(self, format=None, ignore_errors=()):
+        logger = logging.getLogger()
+        original_log_handlers = logger.handlers
+
+        line_writer = LineWriter(self)
+        handler = logging.StreamHandler(line_writer)
+
+        if not format:
+            if logger.getEffectiveLevel() == logging.DEBUG:
+                format = "%(levelname)s %(message)s"
+            else:
+                format = "%(message)s"
+
+        formatter = logging.Formatter(fmt=format)
+        handler.setFormatter(formatter)
+
+        logger.handlers = [handler]
+
+        try:
+            yield
+        except (KeyboardInterrupt, asyncio.CancelledError, *ignore_errors):
+            raise
+        except Exception as err:
+            logger.error(str(err), exc_info=True)
+            raise
+        finally:
+            logger.handlers = original_log_handlers
+
+    @asynccontextmanager
+    async def writer(self):
+        read_fd, write_fd = os.pipe()
+
+        reader = asyncio.ensure_future(self.read_from_fd(read_fd))
+        writer = FileDescriptorWriter(self, write_fd)
+
+        try:
+            yield writer
+        finally:
+            writer.close()
+
+            with suppress(asyncio.CancelledError):
+                await reader
+
+    @asynccontextmanager
+    async def redirect_stdout(self):
+        async with self.writer() as stdout:
+            with redirect_stdout(stdout):
+                yield
+
+    @asynccontextmanager
+    async def redirect_stderr(self):
+        async with self.writer() as stderr:
+            with redirect_stderr(stderr):
+                yield
+
+    def writeline(self, line):
+        self.output_logger.write_prefix(self)
+        self.write(line)
+        self.flush()
 
     def write(self, data):
         self.stream.write(data)
@@ -82,3 +157,19 @@ class Tee(object):
     def flush(self):
         self.stream.flush()
         self.file.flush()
+
+    def isatty(self):
+        # Explicitly claim we're connected to a TTY to stop Click
+        # from stripping ANSI codes
+        return self.stream.isatty()
+
+    async def read_from_fd(self, read_fd):
+        reader = asyncio.StreamReader()
+        read_protocol = asyncio.StreamReaderProtocol(reader)
+
+        loop = asyncio.get_event_loop()
+        read_transport, _ = await loop.connect_read_pipe(
+            lambda: read_protocol, os.fdopen(read_fd)
+        )
+
+        await capture_subprocess_output(reader, self)

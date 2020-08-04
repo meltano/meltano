@@ -3,6 +3,7 @@ import os
 import json
 from asynctest import CoroutineMock
 from contextlib import contextmanager
+from pathlib import Path
 
 from unittest import mock
 from meltano.core.job import Job, State
@@ -11,8 +12,8 @@ from meltano.core.plugin import Plugin, PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin.factory import plugin_factory
 from meltano.core.plugin.singer import SingerTap, SingerTarget
-from meltano.core.runner.singer import SingerRunner, SingerPayload
-from pathlib import Path
+from meltano.core.runner.singer import SingerRunner, SingerPayload, BookmarkWriter
+from meltano.core.logging.utils import capture_subprocess_output
 
 
 TEST_JOB_ID = "test_job"
@@ -137,9 +138,9 @@ class TestSingerRunner:
 
         invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
 
-        # fmt: off
-        with mock.patch.object(SingerRunner, "bookmark", new=CoroutineMock()), \
-          mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async) as invoke_async:
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async:
             # async method
             await subject.invoke(tap_invoker, target_invoker, session)
 
@@ -149,7 +150,6 @@ class TestSingerRunner:
 
             tap_process.wait.assert_awaited()
             target_process.wait.assert_awaited()
-        # fmt: on
 
     @pytest.mark.asyncio
     async def test_bookmark(
@@ -169,7 +169,8 @@ class TestSingerRunner:
             ) as add_mock, mock.patch.object(
                 session, "commit", side_effect=session.commit
             ) as commit_mock:
-                await subject.bookmark(target_process.stdout, session)
+                bookmark_writer = BookmarkWriter(subject.context.job, session)
+                await capture_subprocess_output(target_process.stdout, bookmark_writer)
 
             assert add_mock.call_count == 3
             assert commit_mock.call_count == 3
@@ -247,21 +248,32 @@ class TestSingerRunner:
         # With a full refresh, no state is considered
         assert_state(None, full_refresh=True)
 
-    def test_run(self, subject, session):
-        async def invoke_mock(*args):
+    @pytest.mark.asyncio
+    async def test_run(self, subject, session):
+        async def invoke_mock(*args, **kwargs):
             pass
 
-        # fmt: off
-        with mock.patch.object(SingerRunner, "restore_bookmark") as restore_bookmark, \
-          mock.patch.object(SingerRunner, "invoke", side_effect=invoke_mock) as invoke:
-            subject.run(session, dry_run=True)
+        with mock.patch.object(
+            SingerRunner, "restore_bookmark"
+        ) as restore_bookmark, mock.patch.object(
+            SingerRunner, "invoke", side_effect=invoke_mock
+        ) as invoke:
+            await subject.run(session, dry_run=True)
 
             assert not restore_bookmark.called
             assert not invoke.called
 
-            subject.run(session)
+            await subject.run(session)
             AnyPluginInvoker = AnyInstanceOf(PluginInvoker)
 
-            restore_bookmark.assert_called_once_with(session, AnyPluginInvoker, full_refresh=False)
-            invoke.assert_called_once_with(AnyPluginInvoker, AnyPluginInvoker, session)
-        # fmt: on
+            restore_bookmark.assert_called_once_with(
+                session, AnyPluginInvoker, full_refresh=False
+            )
+            invoke.assert_called_once_with(
+                AnyPluginInvoker,
+                AnyPluginInvoker,
+                session,
+                extractor_log=None,
+                loader_log=None,
+            )
+
