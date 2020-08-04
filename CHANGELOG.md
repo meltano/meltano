@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [!1778](https://gitlab.com/meltano/meltano/-/merge_requests/1788) Change stored error message when job was interrupted by KeyboardInterrupt from 'KeyboardInterrupt()' to 'The process was interrupted'
+- [!1778](https://gitlab.com/meltano/meltano/-/merge_requests/1788) Disable noisy SettingsService logging when `cli.log_level` setting (or `--log-level` flag) is set to `debug`
 
 ### Fixes
 

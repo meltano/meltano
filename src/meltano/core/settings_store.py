@@ -100,6 +100,9 @@ class SettingsStoreManager(ABC):
 
         return expanded_value, {"expanded": True, "unexpanded_value": value}
 
+    def log(self, message):
+        self.settings_service.log(message)
+
 
 class ConfigOverrideStoreManager(SettingsStoreManager):
     label = "a command line flag"
@@ -107,7 +110,7 @@ class ConfigOverrideStoreManager(SettingsStoreManager):
     def get(self, name: str, setting_def=None):
         try:
             value = self.settings_service.config_override[name]
-            logger.debug(f"Read key '{name}' from config override: {value!r}")
+            self.log(f"Read key '{name}' from config override: {value!r}")
             return value, {}
         except KeyError:
             return None, {}
@@ -154,7 +157,7 @@ class EnvStoreManager(BaseEnvStoreManager):
 
         if value is not None:
             env_key = metadata["env_var"]
-            logger.debug(f"Read key '{env_key}' from the environment: {value!r}")
+            self.log(f"Read key '{env_key}' from the environment: {value!r}")
 
         return value, metadata
 
@@ -183,7 +186,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
 
         if value is not None:
             env_key = metadata["env_var"]
-            logger.debug(f"Read key '{env_key}' from `.env`: {value!r}")
+            self.log(f"Read key '{env_key}' from `.env`: {value!r}")
 
         return value, metadata
 
@@ -197,13 +200,13 @@ class DotEnvStoreManager(BaseEnvStoreManager):
             if dotenv_file.exists():
                 for key in setting_def.env_alias_getters.keys():
                     dotenv.unset_key(dotenv_file, key)
-                    logger.debug(f"Unset key '{key}' in `.env`")
+                    self.log(f"Unset key '{key}' in `.env`")
             else:
                 dotenv_file.touch()
 
             dotenv.set_key(dotenv_file, env_key, str(value))
 
-        logger.debug(f"Set key '{env_key}' in `.env`: {value!r}")
+        self.log(f"Set key '{env_key}' in `.env`: {value!r}")
         return {"env_var": env_key}
 
     def unset(self, name: str, path: List[str], setting_def=None):
@@ -218,7 +221,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
 
             for key in [env_key, *setting_def.env_alias_getters.keys()]:
                 dotenv.unset_key(dotenv_file, key)
-                logger.debug(f"Unset key '{key}' in `.env`")
+                self.log(f"Unset key '{key}' in `.env`")
 
         return {}
 
@@ -265,7 +268,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
                 value = flat_config[key]
                 value, metadata = self.expand_env_vars(value)
 
-                logger.debug(f"Read key '{key}' from `meltano.yml`: {value!r}")
+                self.log(f"Read key '{key}' from `meltano.yml`: {value!r}")
                 return value, {"key": key, **metadata}
             except KeyError:
                 pass
@@ -291,14 +294,14 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         with self.update_config() as config:
             for key in keys_to_unset:
                 config.pop(key, None)
-                logger.debug(f"Popped key '{key}' in `meltano.yml`")
+                self.log(f"Popped key '{key}' in `meltano.yml`")
 
             for path_to_unset in paths_to_unset:
                 pop_at_path(config, path_to_unset, None)
-                logger.debug(f"Popped path '{path_to_unset}' in `meltano.yml`")
+                self.log(f"Popped path '{path_to_unset}' in `meltano.yml`")
 
             set_at_path(config, path, value)
-            logger.debug(f"Set path '{path}' in `meltano.yml`: {value!r}")
+            self.log(f"Set path '{path}' in `meltano.yml`: {value!r}")
 
         return {}
 
@@ -312,14 +315,14 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         with self.update_config() as config:
             for key in keys_to_unset:
                 config.pop(key, None)
-                logger.debug(f"Popped key '{key}' in `meltano.yml`")
+                self.log(f"Popped key '{key}' in `meltano.yml`")
 
             for path_to_unset in paths_to_unset:
                 pop_at_path(config, path_to_unset, None)
-                logger.debug(f"Popped path '{path_to_unset}' in `meltano.yml`")
+                self.log(f"Popped path '{path_to_unset}' in `meltano.yml`")
 
             pop_at_path(config, path, None)
-            logger.debug(f"Popped path '{path}' in `meltano.yml`")
+            self.log(f"Popped path '{path}' in `meltano.yml`")
 
         return {}
 
@@ -382,7 +385,7 @@ class DbStoreManager(SettingsStoreManager):
                     .value
                 )
 
-            logger.debug(f"Read key '{name}' from system database: {value!r}")
+            self.log(f"Read key '{name}' from system database: {value!r}")
             return value, {}
         except (sqlalchemy.orm.exc.NoResultFound, KeyError):
             return None, {}
@@ -396,7 +399,7 @@ class DbStoreManager(SettingsStoreManager):
 
         self._all_settings = None
 
-        logger.debug(f"Set key '{name}' in system database: {value!r}")
+        self.log(f"Set key '{name}' in system database: {value!r}")
         return {}
 
     def unset(self, name: str, path: List[str], setting_def=None):
@@ -407,7 +410,7 @@ class DbStoreManager(SettingsStoreManager):
 
         self._all_settings = None
 
-        logger.debug(f"Deleted key '{name}' from system database")
+        self.log(f"Deleted key '{name}' from system database")
         return {}
 
     def reset(self):
@@ -445,7 +448,7 @@ class DefaultStoreManager(SettingsStoreManager):
         value = setting_def.value
         value, metadata = self.expand_env_vars(value)
 
-        logger.debug(f"Read key '{name}' from default: {value!r}")
+        self.log(f"Read key '{name}' from default: {value!r}")
         return value, metadata
 
 
