@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.43.0 - (2020-08-04)
+---
+
+### New
+
 - [#2116](https://gitlab.com/meltano/meltano/-/issues/2116) Prefix `meltano elt` output with `meltano`, `tap-foo`, `target-bar` and `dbt` labels as appropriate
 - [!1778](https://gitlab.com/meltano/meltano/-/merge_requests/1788) Clearly print reason that tap, target or dbt failed by repeating last output line
 - [#2214](https://gitlab.com/meltano/meltano/-/issues/2214) Log Singer messages output by tap and target when `meltano elt` is run with `--log-level` flag (or `cli.log_level` setting) set to `debug`
@@ -24,8 +36,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2212](https://gitlab.com/meltano/meltano/-/issues/2212) Don't show extractor extras `_select`, `_metadata`, and `_schema` as required in UI configuration form
 - [#2213](https://gitlab.com/meltano/meltano/-/issues/2213) Provide extra context when `meltano invoke airflow` fails because of `airflow initdb` failing
 - [!1778](https://gitlab.com/meltano/meltano/-/merge_requests/1788) Fail gracefully when `meltano install` fails to install plugin(s)
-
-### Breaks
 
 
 ## 1.42.0 - (2020-07-28)
