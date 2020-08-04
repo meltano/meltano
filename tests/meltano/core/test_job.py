@@ -75,7 +75,7 @@ class TestJob:
         assert subject.state is State.FAIL
         assert subject.ended_at is not None
         assert subject.payload["original_state"] == 1
-        assert subject.payload["error"] == "KeyboardInterrupt()"
+        assert subject.payload["error"] == "The process was interrupted"
 
     def test_run_terminated(self, session):
         subject = self.sample_job({"original_state": 1}).save(session)

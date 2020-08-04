@@ -115,9 +115,14 @@ class Job(SystemModel):
 
             self.success()
             self.save(session)
-        except:
+        except KeyboardInterrupt:
             if self.is_running():
-                err = sys.exc_info()[1]
+                self.fail(error="The process was interrupted")
+                self.save(session)
+
+            raise
+        except BaseException as err:
+            if self.is_running():
                 if str(err):
                     error = str(err)
                 else:

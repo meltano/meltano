@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [!1778](https://gitlab.com/meltano/meltano/-/merge_requests/1788) Change stored error message when job was interrupted by KeyboardInterrupt from 'KeyboardInterrupt()' to 'The process was interrupted'
+
 ### Fixes
 
 - [#2212](https://gitlab.com/meltano/meltano/-/issues/2212) Don't show extractor extras `_select`, `_metadata`, and `_schema` as required in UI configuration form
