@@ -46,13 +46,27 @@ class OutputLogger(object):
 
 
 class LineWriter(object):
+    NEWLINE = "\n"
+
     def __init__(self, out):
         self.__out = out
+        self.__skip_next_newline = False
 
     def __getattr__(self, name):
         return getattr(self.__out, name)
 
     def write(self, line):
+        # Pre 3.7, `logging.StreamHandler.emit` will
+        # write the message and terminator separately
+        if self.__skip_next_newline:
+            self.__skip_next_newline = False
+            if line == self.NEWLINE:
+                return
+
+        if not line.endswith(self.NEWLINE):
+            line = line + self.NEWLINE
+            self.__skip_next_newline = True
+
         self.__out.writeline(line)
 
 

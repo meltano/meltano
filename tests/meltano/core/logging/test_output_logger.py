@@ -8,6 +8,11 @@ from pathlib import Path
 from meltano.core.logging.output_logger import OutputLogger
 
 
+def assert_lines(output, *lines):
+    for line in lines:
+        assert line in output
+
+
 class TestOutputLogger:
     @pytest.fixture
     def log(self, tmp_path):
@@ -58,19 +63,22 @@ class TestOutputLogger:
         log.seek(0)
         log_content = log.read()
 
-        assert "stdout  | STDOUT" in log_content
-        assert "stdout  | STDOUT 2" in log_content
-        assert "stderr  | STDERR" in log_content
-        assert "stderr  | STDERR 2" in log_content
-        assert "logging | INFO info" in log_content
-        assert "logging | WARNING warning" in log_content
-        assert "logging | ERROR error" in log_content
-        assert "writer  | WRITER" in log_content
-        assert "writer  | WRITER 2" in log_content
-        assert "lwriter | LINE" in log_content
-        assert "lwriter | LINE 2" in log_content
-        assert "basic   | LINE" in log_content
-        assert "basic   | LINE 2" in log_content
+        assert_lines(
+            log_content,
+            "stdout  | STDOUT\n",
+            "stdout  | STDOUT 2\n",
+            "stderr  | STDERR\n",
+            "stderr  | STDERR 2\n",
+            "logging | INFO info\n",
+            "logging | WARNING warning\n",
+            "logging | ERROR error\n",
+            "writer  | WRITER\n",
+            "writer  | WRITER 2\n",
+            "lwriter | LINE\n",
+            "lwriter | LINE 2\n",
+            "basic   | LINE\n",
+            "basic   | LINE 2\n",
+        )
 
     def test_logging_exception(self, log, subject):
         logging_out = subject.out("logging")
