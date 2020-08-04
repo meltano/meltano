@@ -275,5 +275,7 @@ class TestSingerRunner:
                 session,
                 extractor_log=None,
                 loader_log=None,
+                extractor_out=None,
+                loader_out=None,
             )
 

@@ -74,6 +74,8 @@ class SingerRunner(Runner):
         session,
         extractor_log=None,
         loader_log=None,
+        extractor_out=None,
+        loader_out=None,
     ):
         extractor_log = extractor_log or sys.stderr
         loader_log = loader_log or sys.stderr
@@ -99,9 +101,13 @@ class SingerRunner(Runner):
             raise RunnerError(f"Cannot start tap or target: {err}")
 
         tap_outputs = [p_target.stdin]
+        if extractor_out:
+            tap_outputs.insert(0, extractor_out)
 
         bookmark_writer = BookmarkWriter(self.context.job, session)
         target_outputs = [bookmark_writer]
+        if loader_out:
+            target_outputs.insert(0, loader_out)
 
         await asyncio.wait(
             [
@@ -175,6 +181,8 @@ class SingerRunner(Runner):
         full_refresh=False,
         extractor_log=None,
         loader_log=None,
+        extractor_out=None,
+        loader_out=None,
     ):
         tap = self.context.extractor_invoker()
         target = self.context.loader_invoker()
@@ -193,4 +201,6 @@ class SingerRunner(Runner):
             session,
             extractor_log=extractor_log,
             loader_log=loader_log,
+            extractor_out=extractor_out,
+            loader_out=loader_out,
         )

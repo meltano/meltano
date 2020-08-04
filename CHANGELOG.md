@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2116](https://gitlab.com/meltano/meltano/-/issues/2116) Prefix `meltano elt` output with `meltano`, `tap-foo`, `target-bar` and `dbt` labels as appropriate
 - [!1778](https://gitlab.com/meltano/meltano/-/merge_requests/1788) Clearly print reason that tap, target or dbt failed by repeating last output line
+- [#2214](https://gitlab.com/meltano/meltano/-/issues/2214) Log Singer messages output by tap and target when `meltano elt` is run with `--log-level` flag (or `cli.log_level` setting) set to `debug`
 
 ### Changes
 

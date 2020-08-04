@@ -219,6 +219,78 @@ class TestCliEltScratchpadOne:
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    def test_elt_debug_logging(
+        self,
+        google_tracker,
+        cli_runner,
+        project,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        plugin_discovery_service,
+        job_logging_service,
+        monkeypatch,
+    ):
+        job_id = "pytest_test_elt_debug"
+        args = ["elt", "--job_id", job_id, tap.name, target.name]
+
+        job_logging_service.delete_all_logs(job_id)
+
+        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.cli.elt.install_plugins", return_value=True
+        ) as install_plugin_mock, mock.patch(
+            "meltano.core.elt_context.PluginDiscoveryService",
+            return_value=plugin_discovery_service,
+        ):
+            monkeypatch.setenv("MELTANO_CLI_LOG_LEVEL", "debug")
+            result = cli_runner.invoke(cli, args)
+            assert_cli_runner(result)
+
+            stdout_lines = [
+                "meltano           | INFO Running extract & load...\x1b[0m\n",
+                "meltano           | DEBUG Created configuration stub at",  # followed by path
+                "meltano           | DEBUG Could not find tap.properties.json in",  # followed by path
+                "meltano           | DEBUG Could not find state.json in",  # followed by path
+                "meltano           | DEBUG Created configuration stub at",  # followed by path
+                "meltano           | WARNING No state was found, complete import.\n",
+                "meltano           | INFO Incremental state has been updated at",  # followed by timestamp
+                "meltano           | DEBUG Incremental state: {'line': 1}\n",
+                "meltano           | DEBUG Incremental state: {'line': 2}\n",
+                "meltano           | DEBUG Incremental state: {'line': 3}\n",
+                "meltano           | INFO \x1b[32mExtract & load complete!\x1b[0m\n",
+                "meltano           | INFO \x1b[33mTransformation skipped.\x1b[0m\n",
+            ]
+
+            stderr_lines = [
+                "tap-mock          | Starting\n",
+                "tap-mock          | Running\n",
+                "tap-mock (out)    | SCHEMA\n",
+                "tap-mock (out)    | RECORD\n",
+                "tap-mock (out)    | STATE\n",
+                "tap-mock          | Done\n",
+                "target-mock       | Starting\n",
+                "target-mock       | Running\n",
+                'target-mock (out) | {"line": 1}\n',
+                'target-mock (out) | {"line": 2}\n',
+                'target-mock (out) | {"line": 3}\n',
+                "target-mock       | Done\n",
+            ]
+
+            assert_lines(result.stdout, *stdout_lines)
+            assert_lines(result.stderr, *stderr_lines)
+
+            log = job_logging_service.get_latest_log(job_id)
+            assert_lines(
+                log,
+                *(remove_ansi_escape_sequences(l) for l in stdout_lines + stderr_lines)
+            )
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
     def test_elt_tap_failure(
         self,
         google_tracker,

@@ -180,19 +180,33 @@ async def run_extract_load(elt_context, output_logger, session, **kwargs):
     extractor_log = output_logger.out(extractor, color="yellow")
     loader_log = output_logger.out(loader, color="green")
 
+    @contextmanager
+    def nullcontext():
+        yield None
+
+    extractor_out_writer = nullcontext
+    loader_out_writer = nullcontext
+    if logger.getEffectiveLevel() == logging.DEBUG:
+        extractor_out = output_logger.out(f"{extractor} (out)", color="bright_yellow")
+        loader_out = output_logger.out(f"{loader} (out)", color="bright_green")
+
+        extractor_out_writer = extractor_out.line_writer
+        loader_out_writer = loader_out.line_writer
+
     logs("Running extract & load...")
 
     singer_runner = SingerRunner(elt_context)
     try:
         with extractor_log.line_writer() as extractor_log_writer, loader_log.line_writer() as loader_log_writer:
-            await singer_runner.run(
-                session,
-                **kwargs,
-                extractor_log=extractor_log_writer,
-                loader_log=loader_log_writer,
-                extractor_out=extractor_out_writer,
-                loader_out=loader_out_writer,
-            )
+            with extractor_out_writer() as extractor_out_writer, loader_out_writer() as loader_out_writer:
+                await singer_runner.run(
+                    session,
+                    **kwargs,
+                    extractor_log=extractor_log_writer,
+                    loader_log=loader_log_writer,
+                    extractor_out=extractor_out_writer,
+                    loader_out=loader_out_writer,
+                )
     except RunnerError as err:
         try:
             code = err.exitcodes["extractor"]
