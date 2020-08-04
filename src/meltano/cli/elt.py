@@ -168,9 +168,7 @@ async def run_elt(
             else:
                 logs("Transformation skipped.", fg="yellow")
         except RunnerError as err:
-            raise CliError(
-                f"ELT could not complete, an error happened during the process: {err}"
-            ) from err
+            raise CliError(f"ELT could not be completed: {err}") from err
 
 
 async def run_extract_load(elt_context, output_logger, session, **kwargs):
