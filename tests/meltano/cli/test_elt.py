@@ -115,13 +115,13 @@ class TestCliEltScratchpadOne:
 
             assert_lines(
                 result.output,
-                "meltano | \x1b[33mExtractor 'tap-mock' is missing, adding it to your project...\x1b[0m\n",
-                "meltano | \x1b[33mLoader 'target-mock' is missing, adding it to your project...\x1b[0m\n",
+                "meltano | Extractor 'tap-mock' is missing, adding it to your project...\n",
+                "meltano | Loader 'target-mock' is missing, adding it to your project...\n",
                 "meltano     | Added extractor 'tap-mock' to your Meltano project\n",
                 "meltano     | Added loader 'target-mock' to your Meltano project\n",
-                "meltano     | Running extract & load...\x1b[0m\n",
-                "meltano     | \x1b[32mExtract & load complete!\x1b[0m\n",
-                "meltano     | \x1b[33mTransformation skipped.\x1b[0m\n",
+                "meltano     | Running extract & load...\n",
+                "meltano     | Extract & load complete!\n",
+                "meltano     | Transformation skipped.\n",
             )
 
             install_plugin_mock.assert_called_once_with(
@@ -168,11 +168,11 @@ class TestCliEltScratchpadOne:
 
             assert_lines(
                 result.stdout,
-                "meltano     | Running extract & load...\x1b[0m\n",
+                "meltano     | Running extract & load...\n",
                 "meltano     | No state was found, complete import.\n",
                 "meltano     | Incremental state has been updated at",  # followed by timestamp
-                "meltano     | \x1b[32mExtract & load complete!\x1b[0m\n",
-                "meltano     | \x1b[33mTransformation skipped.\x1b[0m\n",
+                "meltano     | Extract & load complete!\n",
+                "meltano     | Transformation skipped.\n",
             )
 
             assert_lines(
@@ -205,7 +205,7 @@ class TestCliEltScratchpadOne:
             assert result.exception == exc
 
             lines = [
-                "meltano     | Running extract & load...\x1b[0m\n",
+                "meltano     | Running extract & load...\n",
                 "meltano     | This is a grave danger.\n",
                 "Traceback",
                 "Exception: This is a grave danger.\n",
@@ -251,7 +251,7 @@ class TestCliEltScratchpadOne:
             assert_cli_runner(result)
 
             stdout_lines = [
-                "meltano           | INFO Running extract & load...\x1b[0m\n",
+                "meltano           | INFO Running extract & load...\n",
                 "meltano           | DEBUG Created configuration stub at",  # followed by path
                 "meltano           | DEBUG Could not find tap.properties.json in",  # followed by path
                 "meltano           | DEBUG Could not find state.json in",  # followed by path
@@ -261,8 +261,8 @@ class TestCliEltScratchpadOne:
                 "meltano           | DEBUG Incremental state: {'line': 1}\n",
                 "meltano           | DEBUG Incremental state: {'line': 2}\n",
                 "meltano           | DEBUG Incremental state: {'line': 3}\n",
-                "meltano           | INFO \x1b[32mExtract & load complete!\x1b[0m\n",
-                "meltano           | INFO \x1b[33mTransformation skipped.\x1b[0m\n",
+                "meltano           | INFO Extract & load complete!\n",
+                "meltano           | INFO Transformation skipped.\n",
             ]
 
             stderr_lines = [
@@ -327,8 +327,8 @@ class TestCliEltScratchpadOne:
 
             assert_lines(
                 result.stdout,
-                "meltano     | Running extract & load...\x1b[0m\n",
-                "meltano     | \x1b[31mExtraction failed (1):\x1b[0m Failure\n",
+                "meltano     | Running extract & load...\n",
+                "meltano     | Extraction failed (1): Failure\n",
             )
             assert_lines(
                 result.stderr,
@@ -378,8 +378,8 @@ class TestCliEltScratchpadOne:
 
             assert_lines(
                 result.stdout,
-                "meltano     | Running extract & load...\x1b[0m\n",
-                "meltano     | \x1b[31mLoading failed (1):\x1b[0m Failure\n",
+                "meltano     | Running extract & load...\n",
+                "meltano     | Loading failed (1): Failure\n",
             )
             assert_lines(
                 result.stderr,
@@ -436,9 +436,9 @@ class TestCliEltScratchpadOne:
 
             assert_lines(
                 result.stdout,
-                "meltano     | Running extract & load...\x1b[0m\n",
-                "meltano     | \x1b[31mExtraction failed (1):\x1b[0m Failure\n",
-                "meltano     | \x1b[31mLoading failed (1):\x1b[0m Failure\n",
+                "meltano     | Running extract & load...\n",
+                "meltano     | Extraction failed (1): Failure\n",
+                "meltano     | Loading failed (1): Failure\n",
             )
             assert_lines(
                 result.stderr,
@@ -480,18 +480,18 @@ class TestCliEltScratchpadTwo:
 
             assert_lines(
                 result.output,
-                "meltano | \x1b[33mExtractor 'tap-mock' is missing, adding it to your project...\x1b[0m\n",
-                "meltano | \x1b[33mLoader 'target-mock' is missing, adding it to your project...\x1b[0m\n",
-                "meltano | \x1b[33mTransform 'tap-mock-transform' is missing, adding it to your project...\x1b[0m\n",
+                "meltano | Extractor 'tap-mock' is missing, adding it to your project...\n",
+                "meltano | Loader 'target-mock' is missing, adding it to your project...\n",
+                "meltano | Transform 'tap-mock-transform' is missing, adding it to your project...\n",
                 "meltano     | Added extractor 'tap-mock' to your Meltano project\n",
                 "meltano     | Added loader 'target-mock' to your Meltano project\n",
                 "meltano     | Added transform 'tap-mock-transform' to your Meltano project\n",
                 "meltano     | Added related transformer 'dbt' to your Meltano project\n",
                 "meltano     | Added related file bundle 'dbt' to your Meltano project\n",
-                "meltano     | Running extract & load...\x1b[0m\n",
-                "meltano     | \x1b[32mExtract & load complete!\x1b[0m\n",
-                "meltano     | Running transformation...\x1b[0m\n",
-                "meltano     | \x1b[32mTransformation complete!\x1b[0m\n",
+                "meltano     | Running extract & load...\n",
+                "meltano     | Extract & load complete!\n",
+                "meltano     | Running transformation...\n",
+                "meltano     | Transformation complete!\n",
             )
 
             install_plugin_mock.assert_called_once_with(
@@ -553,10 +553,10 @@ class TestCliEltScratchpadTwo:
 
             assert_lines(
                 result.stdout,
-                "meltano     | Running extract & load...\x1b[0m\n",
-                "meltano     | \x1b[32mExtract & load complete!\x1b[0m\n",
-                "meltano     | Running transformation...\x1b[0m\n",
-                "meltano     | \x1b[32mTransformation complete!\x1b[0m\n",
+                "meltano     | Running extract & load...\n",
+                "meltano     | Extract & load complete!\n",
+                "meltano     | Running transformation...\n",
+                "meltano     | Transformation complete!\n",
             )
 
             assert_lines(
@@ -630,10 +630,10 @@ class TestCliEltScratchpadTwo:
 
             assert_lines(
                 result.stdout,
-                "meltano     | Running extract & load...\x1b[0m\n",
-                "meltano     | \x1b[32mExtract & load complete!\x1b[0m\n",
-                "meltano     | Running transformation...\x1b[0m\n",
-                "meltano     | \x1b[31mTransformation failed (1):\x1b[0m Failure\n",
+                "meltano     | Running extract & load...\n",
+                "meltano     | Extract & load complete!\n",
+                "meltano     | Running transformation...\n",
+                "meltano     | Transformation failed (1): Failure\n",
             )
 
             assert_lines(
@@ -679,13 +679,13 @@ class TestCliEltScratchpadThree:
 
             assert_lines(
                 result.output,
-                "meltano | \x1b[33mTransform 'tap-mock-transform' is missing, adding it to your project...\x1b[0m\n",
+                "meltano | Transform 'tap-mock-transform' is missing, adding it to your project...\n",
                 "meltano | Added transform 'tap-mock-transform' to your Meltano project\n",
                 "meltano | Added related transformer 'dbt' to your Meltano project\n",
                 "meltano | Added related file bundle 'dbt' to your Meltano project\n",
-                "meltano | \x1b[33mExtract & load skipped.\x1b[0m\n",
-                "meltano | Running transformation...\x1b[0m\n",
-                "meltano | \x1b[32mTransformation complete!\x1b[0m\n",
+                "meltano | Extract & load skipped.\n",
+                "meltano | Running transformation...\n",
+                "meltano | Transformation complete!\n",
             )
 
             install_plugin_mock.assert_called_once_with(
@@ -732,9 +732,9 @@ class TestCliEltScratchpadThree:
 
             assert_lines(
                 result.output,
-                "meltano | \x1b[33mExtract & load skipped.\x1b[0m\n",
-                "meltano | Running transformation...\x1b[0m\n",
-                "meltano | \x1b[32mTransformation complete!\x1b[0m\n",
+                "meltano | Extract & load skipped.\n",
+                "meltano | Running transformation...\n",
+                "meltano | Transformation complete!\n",
             )
 
             install_plugin_mock.assert_not_called()
@@ -780,12 +780,12 @@ class TestCliEltScratchpadFour:
 
             assert_lines(
                 result.output,
-                "meltano | \x1b[33mTransformer 'dbt' is missing, adding it to your project...\x1b[0m\n",
+                "meltano | Transformer 'dbt' is missing, adding it to your project...\n",
                 "meltano | Added transformer 'dbt' to your Meltano project\n",
                 "meltano | Added related file bundle 'dbt' to your Meltano project\n",
-                "meltano | \x1b[33mExtract & load skipped.\x1b[0m\n",
-                "meltano | Running transformation...\x1b[0m\n",
-                "meltano | \x1b[32mTransformation complete!\x1b[0m\n",
+                "meltano | Extract & load skipped.\n",
+                "meltano | Running transformation...\n",
+                "meltano | Transformation complete!\n",
             )
 
             install_plugin_mock.assert_called_once_with(

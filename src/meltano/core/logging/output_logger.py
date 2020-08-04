@@ -38,12 +38,6 @@ class OutputLogger(object):
 
         return self._max_name_length
 
-    def write_prefix(self, out):
-        padding = max(self.max_name_length, 6)
-        padded_name = out.name.ljust(padding)
-
-        click.secho(f"{padded_name} | ", fg=out.color, nl=False, file=out)
-
 
 class LineWriter(object):
     NEWLINE = "\n"
@@ -97,6 +91,21 @@ class Out(object):
         self.stream = stream
 
         self.last_line = ""
+
+        self._prefix = None
+        self._max_name_length = None
+
+    @property
+    def prefix(self):
+        max_name_length = self.output_logger.max_name_length
+        if self._prefix is None or self._max_name_length != max_name_length:
+            self._max_name_length = max_name_length
+
+            padding = max(max_name_length, 6)
+            padded_name = self.name.ljust(padding)
+            self._prefix = click.style(f"{padded_name} | ", fg=self.color)
+
+        return self._prefix
 
     @contextmanager
     def line_writer(self):
@@ -161,8 +170,7 @@ class Out(object):
     def writeline(self, line):
         self.last_line = line
 
-        self.output_logger.write_prefix(self)
-        self.write(line)
+        click.echo(self.prefix + line, nl=False, file=self)
         self.flush()
 
     def write(self, data):
