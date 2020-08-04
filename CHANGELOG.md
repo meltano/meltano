@@ -19,6 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2212](https://gitlab.com/meltano/meltano/-/issues/2212) Don't show extractor extras `_select`, `_metadata`, and `_schema` as required in UI configuration form
 - [#2213](https://gitlab.com/meltano/meltano/-/issues/2213) Provide extra context when `meltano invoke airflow` fails because of `airflow initdb` failing
+- [!1778](https://gitlab.com/meltano/meltano/-/merge_requests/1788) Fail gracefully when `meltano install` fails to install plugin(s)
 
 ### Breaks
 
