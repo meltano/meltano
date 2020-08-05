@@ -560,7 +560,7 @@ This allows you to run your ELT pipeline to Extract, Load, and Transform the dat
 meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT] [--dry]
 ```
 
-### Parameters
+#### Parameters
 
 - The `--transform` option can be:
 
@@ -569,6 +569,12 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT] [
   - `only`: only run the Transforms (skip the Extract and Load steps)
 
 - A `--full-refresh` flag can be passed to perform a full refresh, ignoring the state left behind by any previous runs with the same job ID.
+
+#### Examples
+
+```bash
+meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
+```
 
 ### Pipeline state
 
@@ -580,11 +586,50 @@ Meltano stores this pipeline state in its [system database](/docs/production.htm
 
 When `meltano elt` is run a subsequent time, it will look for the most recent completed (successful or failed) pipeline run with the same job ID that generated some state. If found, this state is then passed along to the extractor.
 
-::: info Not seeing state picked up after a failed run?
+::: tip Not seeing state picked up after a failed run?
 
 Some loaders only emit their state once their work is completely done, even if some data may have been persisted already, and if earlier state messages from the extractor could have been forwarded to Meltano. When a pipeline with such a loader fails or is otherwise interrupted, no state will have been emitted yet, and a subsequent ELT run will not be able to pick up where this run actually left off.
 
 :::
+
+### Debugging
+
+If extraction, loading, or transformation is failing, or otherwise not behaving as expected,
+you can learn more about what's going on behind the scenes by setting Meltano's
+[`cli.log_level` setting](/docs/settings.html#cli-log-level) to `debug`,
+using the `MELTANO_CLI_LOG_LEVEL` environment variable or the `--log-level` CLI flag:
+
+```sh
+MELTANO_CLI_LOG_LEVEL=debug meltano elt ...
+
+meltano --log-level=debug elt ...
+```
+
+In debug mode, `meltano elt` will log the arguments and environment used to invoke the Singer tap and target executables (and `dbt`, when running transformations), including the paths to the generated config, catalog, and state files, for you to review:
+
+```sh
+$ meltano --log-level=debug elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
+meltano            | INFO Running extract & load...
+meltano            | INFO Found state from 2020-08-05 21:30:20.487312.
+meltano            | DEBUG Invoking: ['demo-project/.meltano/extractors/tap-gitlab/venv/bin/tap-gitlab', '--config', 'demo-project/.meltano/run/tap-gitlab/tap.config.json', '--state', 'demo-project/.meltano/run/tap-gitlab/state.json']
+meltano            | DEBUG Env: {'TAP_GITLAB_API_URL': 'https://gitlab.com', 'GITLAB_API_TOKEN': '', 'GITLAB_API_GROUPS': '', 'GITLAB_API_PROJECTS': 'meltano/meltano', 'GITLAB_API_ULTIMATE_LICENSE': 'False', 'GITLAB_API_START_DATE': '2020-05-01'}
+meltano            | DEBUG Invoking: ['demo-project/.meltano/loaders/target-jsonl/venv/bin/target-jsonl', '--config', 'demo-project/.meltano/run/target-jsonl/target.config.json']
+meltano            | DEBUG Env: {'MELTANO_EXTRACTOR_NAME': 'tap-gitlab', 'MELTANO_EXTRACTOR_NAMESPACE': 'tap_gitlab', 'MELTANO_EXTRACT_API_URL': 'https://gitlab.com', 'MELTANO_EXTRACT_PRIVATE_TOKEN': '', 'MELTANO_EXTRACT_GROUPS': '', 'MELTANO_EXTRACT_PROJECTS': 'meltano/meltano', 'MELTANO_EXTRACT_ULTIMATE_LICENSE': 'False', 'MELTANO_EXTRACT_START_DATE': '2020-05-01', 'TAP_GITLAB_API_URL': 'https://gitlab.com', 'GITLAB_API_TOKEN': '', 'GITLAB_API_GROUPS': '', 'GITLAB_API_PROJECTS': 'meltano/meltano', 'GITLAB_API_ULTIMATE_LICENSE': 'False', 'GITLAB_API_START_DATE': '2020-05-01', 'TARGET_JSONL_DESTINATION_PATH': 'output', 'TARGET_JSONL_DO_TIMESTAMP_FILE': 'False'}
+```
+
+Additionally, all [Singer messages](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md#output) output by the tap and target will be logged, identified by `<plugin name> (out)` prefixes:
+
+```
+tap-gitlab         | INFO Starting sync
+tap-gitlab (out)   | {"type": "SCHEMA", "stream": "projects", "schema": {"type": "object", "properties": {...}}, "key_properties": ["id"]}
+tap-gitlab (out)   | {"type": "RECORD", "stream": "projects", "record": {"id": 7603319, "name": "Meltano", ...}, "time_extracted": "2020-08-05T21:30:22.988250Z"}
+tap-gitlab (out)   | {"type": "STATE", "value": {"project_7603319": "2020-08-05T21:04:59.158000Z"}}
+tap-gitlab         | INFO Sync complete
+target-jsonl (out) | {"project_7603319": "2020-08-05T21:04:59.158000Z"}
+meltano            | INFO Incremental state has been updated at 2020-08-05 21:30:26.669170.
+meltano            | DEBUG Incremental state: {'project_7603319': '2020-08-05T21:04:59.158000Z'}
+meltano            | INFO Extract & load complete!
+```
 
 ### Pipeline environment variables
 
@@ -612,12 +657,6 @@ This feature is used to dynamically configure the `target-postgres` and `target-
 - `dbt` default value for `target`: `$MELTANO_LOADER_NAMESPACE`, e.g. `postgres` or `snowflake`, which correspond to the target names in `transform/profile/profiles.yml`
 - `dbt` default value for `source_schema`: `$MELTANO_LOAD_SCHEMA`, e.g. `tap_gitlab`
 - `dbt` default value for `models`: `$MELTANO_EXTRACTOR_NAMESPACE my_meltano_model`, e.g. `tap_gitlab my_meltano_model`
-
-### Examples
-
-```bash
-meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
-```
 
 ## `init`
 
@@ -736,13 +775,13 @@ Use `--list` to list the current selected tap attributes.
 ### Examples
 
 ```bash
-$ meltano select tap-carbon-intensity '*' 'name*'
+meltano select tap-carbon-intensity '*' 'name*'
 ```
 
 This will select all attributes starting with `name`.
 
 ```bash
-$ meltano select tap-carbon-intensity 'region'
+meltano select tap-carbon-intensity 'region'
 ```
 
 This will select all attributes of the `region` entity.
@@ -799,8 +838,8 @@ In production, you will likely want to move these settings to actual environment
 ::: warning
 Regenerating secrets will cause the following:
 
-  - All passwords will be invalid
-  - All sessions will be expired
+- All passwords will be invalid
+- All sessions will be expired
 
 Use with caution!
 :::
