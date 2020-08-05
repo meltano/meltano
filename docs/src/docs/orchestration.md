@@ -2,7 +2,6 @@
 metaTitle: Orchestration with Meltano
 description: Using Airflow with Meltano for orchestration
 sidebarDepth: 2
-lastUpdatedSignificantly: 2020-05-04
 ---
 
 # Orchestration
