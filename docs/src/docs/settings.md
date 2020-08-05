@@ -6,7 +6,7 @@ sidebarDepth: 2
 
 # Settings
 
-To determine the values of these settings, Meltano will first look in **the environment**, then in a **[`.env` file](https://github.com/theskumar/python-dotenv#usages)** in your project directory, and then in your project's **`meltano.yml` file**, falling back to a default value if nothing was found.
+Per the [`meltano config` rules](/docs/command-line-interface.html#config), Meltano will determine the values of these settings by first looking in **the environment**, then in a [**`.env` file**](https://github.com/theskumar/python-dotenv#usages) in your project directory, and finally in your project's **`meltano.yml` file**, falling back to a default value if nothing was found.
 
 You can use [`meltano config meltano list`](/docs/command-line-interface.html#config) to list all available settings with their names, environment variables, and current values.
 
