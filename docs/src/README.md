@@ -7,10 +7,10 @@ installation:
   primaryAction:
     text: Install now
     link: /docs/installation.html
-# integration:
-#   primaryAction:
-#     text: Learn more
-#     link: /#meltano-add
+integration:
+  primaryAction:
+    text: Learn more about `meltano elt`
+    link: /docs/command-line-interface.html#elt
 transformation:
   primaryAction:
     text: Learn more about transformation using dbt
@@ -23,6 +23,18 @@ containerization:
   primaryAction:
     text: Learn more about deployment in production
     link: /docs/production.html
+meltanoAdd:
+  primaryAction:
+    text: Learn more about `meltano add`
+    link: /docs/command-line-interface.html#add
+meltanoConfig:
+  primaryAction:
+    text: Learn more about `meltano config`
+    link: /docs/command-line-interface.html#config
+meltanoSelect:
+  primaryAction:
+    text: Learn more about `meltano select`
+    link: /docs/command-line-interface.html#select
 ---
 
 ::: slot installation
@@ -95,13 +107,6 @@ which will create a new directory with:
 - a `meltano.yml` file that will list any [`plugins` you'll add](/#meltano-add) and [pipeline `schedules` you'll create](/#orchestration),
 - stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
 - empty `model`, `extract`, `load`, `transform`, `analyze`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
-
-Whenever you [add a new plugin](/#meltano-add) to a Meltano project, it will be
-installed into your project's `.meltano` directory automatically.
-However, since this directory is included in your project's `.gitignore` file
-by default, you'll need to explicitly run [`meltano install`](/docs/command-line-interface.html#install)
-before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
-to install (or update) all plugins specified in `meltano.yml`.
 :::
 
 ::: slot meltano-init-code
@@ -141,10 +146,6 @@ Your Meltano project has now been initialized in the `demo-project` directory!
 cd demo-project
 # - you have activated the virtual environment
 source ../.venv/bin/activate
-
-# If this were an existing Meltano project you just
-# cloned or pulled, install any missing plugins
-# meltano install
 ```
 
 Your Meltano project is now ready for [integration](/#integration), [transformation](/#transformation), and [orchestration](/#orchestration)!
@@ -466,7 +467,7 @@ You can also check out the lists of supported [extractors](/plugins/extractors/)
 If the Singer tap or target you'd like to use with Meltano doesn't show up in any of these places, you're going to want to add a custom plugin.
 When you run `meltano add --custom <type> <name>`, Meltano will ask you some additional questions to learn where the package can be found, how to interact with it, and how it can be expected to behave.
 
-If the tap or target in question is listed on Singer's [index of taps](https://www.singer.io/#taps) or [targets](https://www.singer.io/#targets), simply providing the package name as `name`, `pip_url`, and `executable` should suffice. If it's a tap or target you have developed or are developing yourself, you'll want to set `pip_url` to either a VCS repository URL or local directory path. To find out what `settings` a tap or target supports, reference its documentation. If the `capabilities` a tap supports are not described in its documentation, try [one of these tricks](/docs/contributor-guide.html#how-to-test-a-tap).
+If the tap or target in question is listed on Singer's [index of taps](https://www.singer.io/#taps) or [targets](https://www.singer.io/#targets), simply providing the package name as `name`, `pip_url`, and `executable` should suffice. If it's a tap or target you have developed or are developing yourself, you'll want to set `pip_url` to either a Git repository URL or local directory path. To find out what `settings` a tap or target supports, reference its documentation. If the `capabilities` a tap supports are not described in its documentation, try [one of these tricks](/docs/contributor-guide.html#how-to-test-a-tap).
 
 Once your plugin has been added, it will be ready for [configuration](/#meltano-config)!
 :::
@@ -499,7 +500,7 @@ meltano add --custom extractor tap-covid-19
 # Specify `pip install` argument, for example:
 # - PyPI package name:
 (pip_url): tap-covid-19
-# - VCS repository URL:
+# - Git repository URL:
 (pip_url): git+https://github.com/singer-io/tap-covid-19.git
 # - local directory, in editable/development mode:
 (pip_url): -e extract/tap-covid-19

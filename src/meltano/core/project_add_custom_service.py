@@ -31,11 +31,12 @@ class ProjectAddCustomService:
         click.echo("- identifier to find related/compatible plugins")
         if plugin_type == PluginType.EXTRACTORS:
             click.echo("- default value for the `schema` setting when used")
-            click.echo("  with loader target-postgres or target-snowflake")
+            click.echo("  with loader 'target-postgres' or 'target-snowflake'")
         elif plugin_type == PluginType.LOADERS:
             click.echo("- default value for the `target` setting when used")
-            click.echo("  with transformer dbt")
+            click.echo("  with transformer 'dbt'")
         click.echo()
+
         if plugin_type == PluginType.LOADERS:
             default_namespace = re.sub(r"^.*target-", "", plugin_name)
             default_description = "plugin name without `target-` prefix"
@@ -55,7 +56,7 @@ class ProjectAddCustomService:
         )
         click.echo("- PyPI package name:")
         click.echo(f"\t{plugin_name}")
-        click.echo("- VCS repository URL:")
+        click.echo("- Git repository URL:")
         click.echo(f"\tgit+https://gitlab.com/meltano/{plugin_name}.git")
         click.echo("- local directory, in editable/development mode:")
         click.echo(f"\t-e extract/{plugin_name}")

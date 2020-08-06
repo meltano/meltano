@@ -11,118 +11,129 @@ Meltano provides a command line interface (CLI) that allows you to manage the co
 
 ## `add`
 
-The `add` command allows you to add plugins to your Meltano project.
+`meltano add` lets you add plugins (extractors, loaders, transforms, models, dashboards, orchestrators, transforms, and file bundles) to your Meltano project.
 
-### Extractor / Loader
+Specifically, it will:
+1. add the plugin to your project's `meltano.yml` file under `plugins: <type>s:`, e.g. `plugins: extractors:`,
+2. create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`, and
+3. install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>`.
 
-When you add an extractor or loader to a Meltano project, Meltano will:
+(Some plugin types have slightly different or additional behavior; see [plugin-specific behavior](#plugin-specific-behavior) below for more details.)
 
-1. Add the plugin to `meltano.yml`
-1. Install it into its own virtual environment in the `.meltano` directory using `pip3`
+Once the plugin has been added to your project, you can configure it using [`meltano config`](#config),
+invoke its executable using [`meltano invoke`](#invoke), and use it in a pipeline using [`meltano elt`](#elt).
 
-You can run `meltano add` with `--include-related` to automatically install all transform, model, and dashboard plugins related to an extractor.
+::: info
+Whenever you add a new plugin to a Meltano project, it will be
+installed into your project's `.meltano` directory automatically, as described above.
 
-#### Examples
+However, since this directory is included in your project's `.gitignore` file
+by default, you'll need to explicitly run [`meltano install`](#install)
+before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
+to install (or update) all plugins specified in `meltano.yml`.
+:::
 
-```bash
-# Extractor / Loader Template
-meltano add [extractor | loader] [name_of_plugin]
-meltano add [extractors | loaders] [name_of_plugin...]
+### How to use: Known plugins
 
-# Extractor Example
+Plugins that are already [known to Meltano](/docs/contributor-guide.html#known-plugins) will show up when you run [`meltano discover`](#discover),
+and can be added to your project by simply specifying their `type` and `name`:
+
+```shell
+meltano add <type> <name>
+meltano add extractor <name>
+meltano add loader <name>
+meltano add transform <name>
+meltano add model <name>
+meltano add dashboard <name>
+meltano add orchestrator <name>
+meltano add transformer <name>
+meltano add files <name>
+
+# For example:
 meltano add extractor tap-gitlab
-meltano add extractors tap-gitlab tap-google-analytics
-
-# Extractor Example including related plugins
-meltano add --include-related extractor tap-google-analytics
-
-# Loader Example
 meltano add loader target-postgres
 ```
 
-### Transform
+An `--include-related` flag can be passed to automatically install all transform, model, and dashboard plugins related to an extractor:
 
-When you add a transform to a Meltano project, Meltano will:
-
-1. Add the plugin to `meltano.yml`
-1. Update the dbt packages and project configuration
-
-#### Example
-
-```bash
-# Transform Template
-meltano add transform [name_of_transform]
-meltano add transforms [name_of_transform...]
+```shell
+meltano add --include-related extractor tap-gitlab
 ```
 
-### Model
+### How to use: Custom plugins
 
-When you add a model to a Meltano project, Meltano will:
+Plugins that Meltano isn't familiar with yet, like arbitrary Singer taps and targets, can be added using the `--custom` flag:
 
-1. Add the plugin to `meltano.yml`
-1. Install the model inside the `.meltano` directory which is then available to use in the Meltano webapp  file to help you interactively generate SQL
+```shell
+meltano add --custom <type> <name>
 
-#### Example
-
-```bash
-meltano add model [name_of_model]
-meltano add models [name_of_model...]
+# For example:
+meltano add --custom extractor tap-covid-19
+meltano add --custom loader pipelinewise-target-postgres
 ```
 
-### Dashboard
+Since no additional metadata about this plugin will be known to Meltano yet,
+it will ask you some additional questions to learn where the plugin's package can be found,
+how to interact with it, and how it can be expected to behave: (Note that more context is provided in the actual command prompts.)
 
-When you add a dashboard plugin to a Meltano project, Meltano will:
+```shell
+$ meltano add --custom extractor tap-covid-19
+# Specify namespace, which will serve as the:
+# - prefix for configuration environment variables
+# - identifier to find related/compatible plugins
+# - default value for the `schema` setting when used
+#   with loader target-postgres or target-snowflake
+(namespace): tap_covid_19
 
-1. Add the plugin to `meltano.yml`
-1. Install the dashboard and reports inside the `analyze` directory which are then available to use in the Meltano webapp
+# Specify `pip install` argument, for example:
+# - PyPI package name:
+(pip_url): tap-covid-19
+# - Git repository URL:
+(pip_url): git+https://github.com/singer-io/tap-covid-19.git
+# - local directory, in editable/development mode:
+(pip_url): -e extract/tap-covid-19
 
-#### Example
+# Specify the package's executable name
+(executable): tap-covid-19
 
-```bash
-meltano add dashboard [name_of_dashboard]
-meltano add dashboards [name_of_dashboard...]
+# Specify supported Singer features (executable flags)
+(capabilities): catalog,discover,state
+
+# Specify supported settings (`config.json` keys)
+(settings): api_token,user_agent,start_date
 ```
 
-### Orchestrator
+If you're adding a Singer tap or target that's listed on Singer's [index of taps](https://www.singer.io/#taps) or [targets](https://www.singer.io/#targets), simply providing the package name as `name`, `pip_url`, and `executable` should suffice. If it's a tap or target you have developed or are developing yourself, you'll want to set `pip_url` to either a Git repository URL or local directory path. If you add the `-e` flag ahead of the local path, the package will be installed in [editable mode](https://pip.pypa.io/en/stable/reference/pip_install/#editable-installs).
 
-When you add an orchestrator to a Meltano project, Meltano will:
+To find out what `settings` a tap or target supports, reference its README and/or documentation. If the `capabilities` (executable flags) a tap supports are not described there, try [one of these tricks](/docs/contributor-guide.html#how-to-test-a-tap).
 
-1. Add the plugin to `meltano.yml`
-1. Install it into its own virtual environment in the `.meltano` directory using `pip3`
-1. Install any related [file bundles](#file-bundle) to add orchestrator-specific files to your Meltano project
+::: tip
+Once you've succesfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
+:::
 
-#### Example
+### Plugin-specific behavior
 
-```bash
-meltano add orchestrator [name_of_orchestrator]
-```
+#### Transform
 
-### Transformer
+Transform plugins are not pip packages, but [dbt packages](https://docs.getdbt.com/docs/building-a-dbt-project/package-management) containing [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models).
 
-When you add an transformer to a Meltano project, Meltano will:
+As such, their `pip_url`s point at [dbt packages stored in Git](https://docs.getdbt.com/docs/building-a-dbt-project/package-management#git-packages), and they are installed by adding this `git` URL to your project's `transform/packages.yml` and enabling the packaged model in `transform/dbt_project.yml`.
 
-1. Add the plugin to `meltano.yml`
-1. Install it into its own virtual environment in the `.meltano` directory using `pip3`
-1. Install any related [file bundles](#file-bundle) to add transformer-specific files to your Meltano project
+#### Dashboard
 
-#### Example
+Dashboard plugins are pip packages bundling Meltano dashboards and reports.
 
-```bash
-meltano add transformer [name_of_transformer]
-```
+The bundled dashboards and reports will be added to your project's `analyze` directory automatically as part of installation.
 
-### File bundle
+#### Transformer and orchestrator
 
-When you add a file bundle to a Meltano project, Meltano will:
+Transformer and orchestrator plugins have related [file bundles](#file-bundle) that will be added to your project automatically as part of installation.
 
-1. Add the plugin to `meltano.yml` if any of the files it contains are [managed by the file bundle](#file-bundle-extra-update) and to be updated automatically when [`meltano upgrade`](#upgrade) is run.
-2. Add the bundled files to your Meltano project
+#### File bundle
 
-#### Example
+File bundle plugins are pip packages bundling files you may want in your Meltano project.
 
-```bash
-meltano add files [name_of_file_bundle...]
-```
+The bundled files will be added to your project automatically as part of installation. The file bundle plugin itself will not be added to `meltano.yml` unless it contains files that are [managed by the file bundle](#file-bundle-extra-update) and to be updated automatically when [`meltano upgrade`](#upgrade) is run.
 
 ## `config`
 
@@ -241,11 +252,11 @@ meltano config <plugin_name> set <property>.<deep>.<nesting> <value>
 #    <property>.<deep>.<nesting>: <value>
 ```
 
-### Custom (unknown) settings
+### Custom settings
 
 Meltano keeps track of the settings a plugin supports using [`settings` metadata](/docs/contributor-guide.html#connector-settings), and will list them all when you run `meltano config <plugin> list`.
 
-If you've [added a custom plugin](/#meltano-add) to your project, you will have been asked provide the names of the supported configuration options yourself.
+If you've [added a custom plugin](#how-to-use-custom-plugins) to your project, you will have been asked provide the names of the supported configuration options yourself.
 If the plugin was already [known to Meltano](/docs/contributor-guide.html#known-plugins) when you added it to your project, this metadata will already be known as well.
 
 If a plugin supports a setting that is not yet known to Meltano (because it may have been added after the `settings` metadata was specified, for example),

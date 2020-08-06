@@ -163,6 +163,7 @@ Known plugins are those defined in a file called `discovery.yml`, which Meltano 
 The versions on <https://www.meltano.com> and in the package can be found inside the Meltano repository at [`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
 
 If you have a plugin you think should also be known to Meltano out of the box, you can contribute a change to that file.
+All you'll need is the [custom plugin definition](/docs/command-line-interface.html#how-to-use-custom-plugins) from your project's `meltano.yml`, which has the same format as known plugin definitions in `discovery.yml`.
 
 ### Changing discovery.yml
 
