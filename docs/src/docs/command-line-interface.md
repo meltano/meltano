@@ -241,6 +241,37 @@ meltano config <plugin_name> set <property>.<deep>.<nesting> <value>
 #    <property>.<deep>.<nesting>: <value>
 ```
 
+### Custom (unknown) settings
+
+Meltano keeps track of the settings a plugin supports using [`settings` metadata](/docs/contributor-guide.html#connector-settings), and will list them all when you run `meltano config <plugin> list`.
+
+If you've [added a custom plugin](/#meltano-add) to your project, you will have been asked provide the names of the supported configuration options yourself.
+If the plugin was already [known to Meltano](/docs/contributor-guide.html#known-plugins) when you added it to your project, this metadata will already be known as well.
+
+If a plugin supports a setting that is not yet known to Meltano (because it may have been added after the `settings` metadata was specified, for example),
+you do not need to modify the `settings` metadata to be able to use it.
+
+Instead, you can define a custom setting by adding the setting name (key) to your project's `config` object in `meltano.yml` with the desired value (or simply `null`), by manually editing the file or using `meltano config <plugin> set <key> <value>`:
+
+```sh
+meltano config tap-example set custom_setting value
+```
+
+```yaml
+extractors:
+- name: tap-example
+  pip_url: tap-example
+  config:
+    known_setting: value
+    custom_setting: value
+```
+
+As long as the custom setting exists in `meltano.yml`, it will behave and can be interacted with just like any regular (known) setting. It will show up in `meltano config <plugin> list` and `meltano config <plugin>`, and the value that will be passed on to the plugin can be [overridden using an environment variable](#pipeline-specific-configuration):
+
+```sh
+export TAP_EXAMPLE_CUSTOM_SETTING=overridden_value
+```
+
 ### Plugin extras
 
 `meltano config` can also be used to manage so-called plugin extras:
@@ -272,7 +303,7 @@ extractors:
 
 Extras can be thought of and interacted with as a special kind of setting.
 
-In the context of `meltano config`, extras are distinguished from regular plugin-specific settings using an underscore (`_`) prefix, e.g. `_example_extra`. This also applies in the environment variables that can be used to override them at runtime: since setting names for extras are prefixed with underscores (`_`), they get an an extra underscore to separate them from the plugin namespace, e.g. `TAP_EXAMPLE__EXAMPLE_EXTRA`.
+In the context of `meltano config`, extras are distinguished from regular plugin-specific settings using an underscore (`_`) prefix, e.g. `_example_extra`. This also applies in the environment variables that can be used to override them at runtime: since setting names for extras are prefixed with underscores (`_`), they get an extra underscore to separate them from the plugin namespace, e.g. `TAP_EXAMPLE__EXAMPLE_EXTRA`.
 
 By default, `meltano config <plugin>` and `meltano config <plugin> list` only take into account regular plugin settings.
 An `--extras` flag can be passed to view or list only extras instead.

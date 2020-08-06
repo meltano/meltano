@@ -530,7 +530,7 @@ This means that you do not need to manually craft the
 because Meltano will generate them on the fly whenever an extractor or loader is used through [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 
 If the plugin you'd like to use and configure is already [known to Meltano](/docs/contributor-guide.html#known-plugins) (that is, it shows up when you run [`meltano discover`](/docs/command-line-interface.html#discover)), Meltano already knows what settings it supports.
-If you're [adding a custom plugin](/#meltano-add), on the other hand, you will be asked to specify the names of the supported configuration options yourself.
+If you're [adding a custom plugin](/#meltano-add), on the other hand, you will be asked to provide the names of the supported configuration options yourself.
 
 To determine the values of these settings, Meltano will look in 4 places, with each taking precedence over the next:
 
