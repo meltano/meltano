@@ -117,7 +117,7 @@ On the configuration modal we want to enter your username and password, the Secu
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
 
-```bash
+```shell
 meltano add extractor tap-salesforce
 ```
 
@@ -128,7 +128,7 @@ If you are successful, you should see `Added and installed extractors 'tap-sales
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
 
-```bash
+```shell
 export TAP_SALESFORCE_USERNAME="Your Salesforce Username"
 export TAP_SALESFORCE_PASSWORD="Your Salesforce Password"
 export TAP_SALESFORCE_SECURITY_TOKEN="Your Salesforce Security Token"

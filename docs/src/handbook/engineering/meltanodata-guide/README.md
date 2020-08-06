@@ -24,13 +24,13 @@ Only follow these steps manually if automatic setup appears to have failed.
 
 4. Change directory into `/var/meltano/infrastructure`
 
-```sh
+```shell
 cd /var/meltano/infrastructure
 ```
 
-5. Run the `setup` script. 
+5. Run the `setup` script.
 
-```sh
+```shell
 ./scripts/setup.sh "$FULL_NAME" "$EMAIL" "$SUBDOMAIN"
 ```
 
@@ -41,7 +41,7 @@ That's it! The script will automatically set up the instance and send the user t
 ::: warning
 Make sure to run all `meltano` commands using the `meltano` user account by doing
 
-```bash
+```shell
 su meltano
 ```
 
@@ -55,7 +55,7 @@ In the event you need to manually update the droplet's Meltano version:
 1. SSH into the droplet
 1. Switch to the `meltano` user
 
-```bash
+```shell
 su meltano
 ```
 
@@ -65,19 +65,19 @@ It is important to use the `meltano` user when upgrading because new files could
 
 1. Activate the virtual environment
 
-```bash
+```shell
 source /var/meltano/.venv/bin/activate
 ```
 
 3. Change into the Meltano project directory
 
-```bash
+```shell
 cd /var/meltano/project
 ```
 
 4. Run Meltano upgrade command
 
-```bash
+```shell
 meltano upgrade
 ```
 
@@ -102,7 +102,7 @@ And that's it. No need to restart the service at all!
 
    - If you get an error regarding a missing `psql` installation, you'll need to install `psql-client`
 
-   ```bash
+   ```shell
    # We are looking for the current version
    apt search psql-client
    # Add the current version, which is 10 right now
@@ -142,7 +142,7 @@ If you see this error, most likely this is due to an issue with Meltano itself. 
 1. SSH into the droplet
 1. Check system status and processes with
 
-```bash
+```shell
 systemctl status
 ```
 
@@ -159,7 +159,7 @@ Response: 500 OOPS: vsftpd: refusing to run with writable root inside chroot()
 
 This means that the permissions on the root directory you are trying to access need to be changed. This should not be an issue on future images, but in case it is, you'll need a command similar to:
 
-```bash
+```shell
 chmod g-w /var/meltano/project
 ```
 
@@ -206,7 +206,7 @@ This means that you have an old entry in the `known_hosts` file. To fix this, si
 
 If the `caddy.service` is not working, you'll get an error similar to the following during [Step 4: Restart Caddy](/handbook/engineering/meltanodata-guide/#restart-caddy):
 
-```bash
+```shell
 # systemctl status
 
 ● $TENANT_NAME
@@ -234,7 +234,7 @@ The reason may be that we have hit the [rate limit of 50 Certificates per Regist
 
 To investigate this, run caddy manually and check the output. If you get the following error, then the reason for the failure is that we have hit the 50 Certificates rate limit:
 
-```bash
+```shell
 # systemctl stop caddy
 # env $(< /etc/caddy/environment) /usr/local/bin/caddy -conf /etc/caddy/Caddyfile
 Activating privacy features... 2019/12/10 12:03:47 [INFO] [$TENANT_NAME.meltanodata.com] acme: Obtaining bundled SAN certificate
@@ -257,13 +257,13 @@ In the later case, the only option at the moment is to setup the instance with a
 
 (2) Add a :443 in the end of the /etc/caddy/environment
 
-```bash
+```shell
 HOSTNAME=$TENANT_NAME.meltanodata.com:443
 ```
 
 (3) Restart Caddy manually
 
-```bash
+```shell
 systemctl stop caddy
 systemctl daemon-reload
 systemctl start caddy
@@ -271,7 +271,7 @@ systemctl start caddy
 
 And verify that this worked, by running the following command:
 
-```bash
+```shell
 systemctl status
 ```
 
@@ -291,13 +291,13 @@ When a client no longer needs a hosted instance of Meltano on meltanodata.com, y
 
 4. Change directory into `/var/meltano/infrastructure`
 
-```sh
+```shell
 cd /var/meltano/infrastructure
 ```
 
 5. Run the `delete_instances` script. You can provide multiple subdomains in multiple arguments.
 
-```sh
+```shell
 ./scripts/delete_instances.sh $TENANT_NAME
 ```
 

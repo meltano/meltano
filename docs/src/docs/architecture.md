@@ -123,7 +123,7 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
 
 ##### Example `carbon.topic.m5o` file
 
-```bash
+```shell
 # Define a database, connection settings, and the table relationships (further defined in each `my-table.table.m5o` file) to inform Meltano how to connect for ELT, orchestration, and interactive SQL generation using the Meltano UI
 {
   # Define version metadata
@@ -165,7 +165,7 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
 
 ##### Example `entry.table.m5o` file
 
-```bash
+```shell
 # Define a database table for connecting to using Meltano's CLI and/or UI
 {
   # Define the schema.table-name pattern used for connecting to a specific table in a database

@@ -51,7 +51,7 @@ cd my_project
 meltano add loader target-postgres
 ```
 
-You can now configure target-postgres to use your PostgreSQL database 
+You can now configure target-postgres to use your PostgreSQL database
 
 ### Advanced: Command Line (CLI) Configuration
 
@@ -61,7 +61,7 @@ In this section we provide additional information for configuring Meltano to con
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
 
-```bash
+```shell
 export PG_ADDRESS=""
 export PG_USERNAME=""
 export PG_PORT=""

@@ -23,14 +23,14 @@ We welcome contributions, idea submissions, and improvements. In fact we may alr
 
 As you contribute to Meltano, you may want to disable [metrics tracking](/docs/settings.html#send-anonymous-usage-stats) globally rather than by project. You can do this by setting the environment variable `MELTANO_DISABLE_TRACKING` to `True`:
 
-```bash
+```shell
 # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
 export MELTANO_DISABLE_TRACKING=True
 ```
 
 ## Setting Up Your Environment
 
-```bash
+```shell
 # Clone the Meltano repo
 git clone git@gitlab.com:meltano/meltano.git
 
@@ -72,7 +72,7 @@ This section of the guide provides guidance on how to work with the Meltano API,
 
 After all of your dependencies installed, we recommend opening a new window/tab in your terminal so you can run the following commands:
 
-```bash
+```shell
 # Create a new Meltano project
 meltano init $PROJECT_NAME
 
@@ -101,7 +101,7 @@ import pdb; pdb.set_trace()
 
 In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
 
-```bash
+```shell
 # Create a new Meltano project
 meltano init $PROJECT_NAME
 
@@ -129,7 +129,7 @@ A production build of the API will be available at <http://localhost:5000/> to s
 
 If you're developing for the _Embed_ app (embeddable `iframe` for reports) you can toggle `MELTANO_EMBED`:
 
-```bash
+```shell
 # Develop for the embed app
 export MELTANO_EMBED=1
 
@@ -144,7 +144,7 @@ yarn serve
 
 If you need to change the URL of your development environment, you can do this by updating your `.env` in your project directory with the following configuration:
 
-```bash
+```shell
 # The URL where the web app will be located when working locally in development
 # since it provides the redirect after authentication.
 # Not require for production
@@ -302,7 +302,7 @@ issues.year_closed as year_closed,
 
 Once you've created your transforms, you can run it with the following command:
 
-```bash
+```shell
 # Replace your extractors / targets with the appropriate ones
 meltano elt tap-gitlab target-postgres --transform only
 ```
@@ -579,7 +579,7 @@ Meltano uses [changelog-cli](https://github.com/mc706/changelog-cli) to populate
 
 Use `changelog (new|change|fix|breaks) MESSAGE` to describe your current work in progress.
 
-```bash
+```shell
 $ changelog new "add an amazing feature"
 $ git add CHANGELOG.md
 ```
@@ -612,7 +612,7 @@ This config uses `$MELTANO_VENV` to source the virtual environment from. Set it 
 1. Make sure you know what directory your virtual environment is. It is normally `.venv` by default.
 1. Run the following commands. Keep in mind that the `.venv` in line 2 refers to your virtual environment directory in Step #1.
 
-```bash
+```shell
 cd path/to/meltano
 MELTANO_VENV=.venv tmuxinator local
 ```

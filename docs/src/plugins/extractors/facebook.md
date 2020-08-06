@@ -142,7 +142,7 @@ On the configuration modal we want to enter the Account ID and Access Token that
 1. Navigate to your Meltano project in the terminal
 1. Run the following command:
 
-```bash
+```shell
 meltano add extractor tap-facebook
 ```
 
@@ -155,7 +155,7 @@ If you are successful, you should see `Added and installed extractors 'tap-faceb
 
 Required:
 
-```bash
+```shell
 export TAP_FACEBOOK_ACCOUNT_ID="123456789012345"
 export TAP_FACEBOOK_ACCESS_TOKEN="YOUR ACCESS TOKEN"
 export TAP_FACEBOOK_START_DATE="2019-12-01T00:00:00Z"
@@ -163,7 +163,7 @@ export TAP_FACEBOOK_START_DATE="2019-12-01T00:00:00Z"
 
 Optional:
 
-```bash
+```shell
 export TAP_FACEBOOK_END_DATE="2019-12-31T00:00:00Z"
 export TAP_FACEBOOK_INSIGHTS_BUFFER_DAYS=0
 ```

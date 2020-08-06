@@ -1,7 +1,7 @@
 ---
 sidebar: auto
 metaTitle: Extract Data from MongoDB
-description: Use Meltano to extract raw data from MongoDB and insert it into Postgres, Snowflake, and more. 
+description: Use Meltano to extract raw data from MongoDB and insert it into Postgres, Snowflake, and more.
 ---
 
 # MongoDB
@@ -22,7 +22,7 @@ This tap is currently a proof of concept and may have limited utility, but feedb
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
 
-```bash
+```shell
 meltano add extractor tap-mongodb
 ```
 
@@ -33,7 +33,7 @@ If you are successful, you should see `Added and installed extractors 'tap-mongo
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
 
-```bash
+```shell
 # MongoDB databse host URI
 export TAP_MONGODB_HOST=""
 # MongoDB database port

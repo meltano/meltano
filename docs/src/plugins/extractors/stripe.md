@@ -86,7 +86,7 @@ Please be aware that the larger the time period and amount of data, the longer t
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
 
-```bash
+```shell
 meltano add extractor tap-stripe
 ```
 
@@ -97,7 +97,7 @@ If you are successful, you should see `Added and installed extractors 'tap-strip
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
 
-```bash
+```shell
 # Can be found in your Profile
 export STRIPE_ACCOUNT_ID="yourAccountId"
 # Create a new secret key for Meltano

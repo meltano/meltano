@@ -1,7 +1,7 @@
 ---
 sidebar: auto
 metaTitle: Extract Data from Marketo
-description: Use Meltano to extract raw data from Marketo and insert it into Postgres, Snowflake, and more. 
+description: Use Meltano to extract raw data from Marketo and insert it into Postgres, Snowflake, and more.
 ---
 
 # Marketo
@@ -18,7 +18,7 @@ description: Use Meltano to extract raw data from Marketo and insert it into Pos
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
 
-```bash
+```shell
 meltano add extractor tap-marketo
 ```
 
@@ -29,7 +29,7 @@ If you are successful, you should see `Added and installed extractors 'tap-marke
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
 
-```bash
+```shell
 export TAP_MARKETO_CLIENT_ID="Your Client Id"
 export TAP_MARKETO_CLIENT_SECRET="Your Client Secret"
 export TAP_MARKETO_ENDPOINT="Your Endpoint Url"
