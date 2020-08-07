@@ -10,7 +10,7 @@ Meltano provides a command line interface (CLI) that allows you to manage the co
 
 ## `add`
 
-`meltano add` lets you add plugins (extractors, loaders, transforms, models, dashboards, orchestrators, transforms, and file bundles) to your Meltano project.
+`meltano add` lets you add plugins (extractors, loaders, transforms, models, dashboards, orchestrators, transformers, and file bundles) to your Meltano project.
 
 Specifically, it will:
 1. add the plugin to your project's `meltano.yml` file under `plugins: <type>s:`, e.g. `plugins: extractors:`,
