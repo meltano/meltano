@@ -46,7 +46,7 @@ In this section, we provide a tutorial for installing Postgres and setting up a 
 
 Once you have identified a PostgreSQL database where Meltano should load the data it extracts from your source(s), add the `target-postgres` loader to Meltano:
 
-```shell
+```bash
 cd my_project
 meltano add loader target-postgres
 ```
@@ -61,7 +61,7 @@ In this section we provide additional information for configuring Meltano to con
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
 
-```shell
+```bash
 export PG_ADDRESS=""
 export PG_USERNAME=""
 export PG_PORT=""

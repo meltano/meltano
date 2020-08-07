@@ -63,7 +63,7 @@ Finally, Meltano also tracks anonymous web metrics when browsing the Meltano UI 
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set send_anonymous_usage_stats false
 
 export MELTANO_SEND_ANONYMOUS_USAGE_STATS=false
@@ -81,7 +81,7 @@ Used by Meltano to uniquely identify your project in Google Analytics if the [`s
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set project_id <randomly-generated-token>
 
 export MELTANO_PROJECT_ID=<randomly-generated-token>
@@ -101,7 +101,7 @@ option of [`meltano` subcommands](/docs/command-line-interface.html), or the `ME
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set database_uri postgresql://username:password@host:port/database
 
 export MELTANO_DATABASE_URI=postgresql://username:password@host:port/database
@@ -130,7 +130,7 @@ This setting differs from the [`ui.readonly` setting](#ui-readonly) in two ways:
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set project_readonly true
 
 export MELTANO_PROJECT_READONLY=true
@@ -150,7 +150,7 @@ set this setting to `false` or any other string not starting with `http://` or `
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set discovery_url https://meltano.example.com/discovery.yml
 
 export MELTANO_DISCOVERY_URL=https://meltano.example.com/discovery.yml
@@ -171,7 +171,7 @@ The granularity of CLI logging.
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set cli log_level debug
 
 export MELTANO_CLI_LOG_LEVEL=debug
@@ -199,7 +199,7 @@ Together with the [`ui.bind_port` setting](#ui-bind-port), this setting correspo
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set ui bind_host 127.0.0.1
 
 export MELTANO_UI_BIND_HOST=127.0.0.1
@@ -221,7 +221,7 @@ Together with the [`ui.bind_host` setting](#ui-bind-host), this setting correspo
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set ui bind_port 80
 
 export MELTANO_UI_BIND_PORT=80
@@ -254,7 +254,7 @@ This setting corresponds to [Flask's `SERVER_NAME` setting](https://flask.pallet
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set ui server_name meltano.example.com
 
 export MELTANO_UI_SERVER_NAME=meltano.example.com
@@ -265,7 +265,7 @@ used to generate secrets for the [`ui.secret_key`](#ui-secret-key) and
 [`ui.password_salt`](#ui-password-salt) settings, that will be stored in a `.env`
 file in your project directory along with the specified `server_name`.
 
-```shell
+```bash
 meltano ui setup meltano.example.com
 ```
 
@@ -286,7 +286,7 @@ This setting corresponds to [Flask's `SESSION_COOKIE_DOMAIN` setting](https://fl
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set ui session_cookie_domain meltano.example.com
 
 export MELTANO_UI_SESSION_COOKIE_DOMAIN=meltano.example.com
@@ -307,7 +307,7 @@ This setting corresponds to [Flask's `SECRET_KEY` setting](https://flask.pallets
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set ui secret_key <randomly-generated-secret>
 
 export MELTANO_UI_SECRET_KEY=<randomly-generated-secret>
@@ -317,7 +317,7 @@ export MELTANO_UI_SECRET_KEY=<randomly-generated-secret>
 used to generate secrets for the this setting and [`ui.password_salt`](#ui-password-salt),
 that will be stored in a `.env` file in your project directory along with the specified [`ui.server_name`](#ui-server-name).
 
-```shell
+```bash
 meltano ui setup meltano.example.com
 ```
 
@@ -336,7 +336,7 @@ This setting corresponds to [Flask-Security's `SECURITY_PASSWORD_SALT` setting](
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set ui password_salt <randomly-generated-secret>
 
 export MELTANO_UI_PASSWORD_SALT=<randomly-generated-secret>
@@ -346,7 +346,7 @@ export MELTANO_UI_PASSWORD_SALT=<randomly-generated-secret>
 used to generate secrets for the this setting and [`ui.secret_key`](#ui-secret-key),
 that will be stored in a `.env` file in your project directory along with the specified [`ui.server_name`](#ui-server-name).
 
-```shell
+```bash
 meltano ui setup meltano.example.com
 ```
 
@@ -361,7 +361,7 @@ This setting corresponds to [Gunicorn's `workers` setting](https://docs.gunicorn
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set ui workers 1
 
 export MELTANO_UI_WORKERS=1
@@ -371,7 +371,7 @@ export WEB_CONCURRENCY=1
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set ui forwarded_allow_ips "*"
 
 export MELTANO_UI_FORWARDED_ALLOW_IPS="*"
@@ -411,7 +411,7 @@ This setting differs from the [`project_readonly` setting](#project-readonly) in
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set ui readonly true
 
 export MELTANO_UI_READONLY=true
@@ -432,7 +432,7 @@ Additionally, you will need to:
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set ui authentication true
 
 export MELTANO_UI_AUTHENTICATION=true
@@ -454,7 +454,7 @@ These users will not be able to make any changes, but admins will once they sign
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set ui anonymous_readonly true
 
 export MELTANO_UI_ANONYMOUS_READONLY=true
@@ -474,7 +474,7 @@ To ease the development and testing, Meltano is preconfigured to use a local [Ma
 
 Use the following docker command to start it:
 
-```shell
+```bash
 docker run --rm -p 1025:1025 -p 8025:8025 --name mailhog mailhog/mailhog
 ```
 
@@ -483,7 +483,7 @@ All emails sent by Meltano should now be available at `http://localhost:8025/`
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set ui notification true
 
 export MELTANO_UI_NOTIFICATION=true
@@ -502,7 +502,7 @@ you can disable this setting to hide all functionality related to Analysis from 
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set ui analysis false
 
 export MELTANO_UI_ANALYSIS=true
@@ -523,7 +523,7 @@ Customize the logo used by Meltano UI in the navigation bar and on the sign-in p
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set ui logo_url https://meltano.com/meltano-logo-with-text.svg
 
 export MELTANO_UI_LOGO_URL=https://meltano.com/meltano-logo-with-text.svg
@@ -538,7 +538,7 @@ Meltano uses [Flask-Mail](https://pythonhosted.org/Flask-Mail/) to send emails. 
 - Environment variable: `MAIL_SERVER`
 - Default: `localhost`
 
-```shell
+```bash
 meltano config meltano set mail server smtp.example.com
 
 export MAIL_SERVER=smtp.example.com
@@ -549,7 +549,7 @@ export MAIL_SERVER=smtp.example.com
 - Environment variable: `MAIL_PORT`
 - Default: `1025`
 
-```shell
+```bash
 meltano config meltano set mail port 25
 
 export MAIL_PORT=25
@@ -560,7 +560,7 @@ export MAIL_PORT=25
 - Environment variable: `MAIL_DEFAULT_SENDER`
 - Default: `"Meltano" <bot@meltano.com>`
 
-```shell
+```bash
 meltano config meltano set mail default_sender '"Example Meltano" <bot@meltano.example.com>'
 
 export MAIL_DEFAULT_SENDER='"Example Meltano" <bot@meltano.example.com>'
@@ -571,7 +571,7 @@ export MAIL_DEFAULT_SENDER='"Example Meltano" <bot@meltano.example.com>'
 - Environment variable: `MAIL_USE_TLS`
 - Default: `false`
 
-```shell
+```bash
 meltano config meltano set mail use_tls true
 
 export MAIL_USE_TLS=true
@@ -582,7 +582,7 @@ export MAIL_USE_TLS=true
 - Environment variable: `MAIL_USERNAME`
 - Default: None
 
-```shell
+```bash
 meltano config meltano set mail username meltano
 
 export MAIL_USERNAME=meltano
@@ -593,7 +593,7 @@ export MAIL_USERNAME=meltano
 - Environment variable: `MAIL_PASSWORD`
 - Default: None
 
-```shell
+```bash
 meltano config meltano set mail password meltano
 
 export MAIL_PASSWORD=meltano
@@ -604,7 +604,7 @@ export MAIL_PASSWORD=meltano
 - Environment variable: `MAIL_DEBUG`
 - Default: `false`
 
-```shell
+```bash
 meltano config meltano set mail debug true
 
 export MAIL_DEBUG=true
@@ -626,7 +626,7 @@ The OAuth Service is bundled within Meltano, and is automatically started with [
 
 As it is a Flask application, it can also be run as a standalone using:
 
-```shell
+```bash
 FLASK_ENV=production FLASK_APP=meltano.oauth python -m flask run --port 9999
 ```
 
@@ -641,7 +641,7 @@ The local OAuth service for development purposes is available at `/-/oauth`.
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set oauth_service url https://oauth.svc.meltanodata.com
 
 export MELTANO_OAUTH_SERVICE_URL=https://oauth.svc.meltanodata.com
@@ -656,7 +656,7 @@ To enable specific providers, use comma-separated `oauth.provider` names from `d
 
 #### How to use
 
-```shell
+```bash
 meltano config meltano set oauth_service providers facebook,google_adwords
 
 export MELTANO_OAUTH_SERVICE_PROVIDERS=facebook,google_adwords
@@ -667,7 +667,7 @@ export MELTANO_OAUTH_SERVICE_PROVIDERS=facebook,google_adwords
 - Environment variable: `OAUTH_FACEBOOK_CLIENT_ID`
 - Default: None
 
-```shell
+```bash
 meltano config meltano set oauth_service facebook client_id <facebook-client-id>
 
 export OAUTH_FACEBOOK_CLIENT_ID=<facebook-client-id>
@@ -678,7 +678,7 @@ export OAUTH_FACEBOOK_CLIENT_ID=<facebook-client-id>
 - Environment variable: `OAUTH_FACEBOOK_CLIENT_SECRET`
 - Default: None
 
-```shell
+```bash
 meltano config meltano set oauth_service facebook client_secret <facebook-client-secret>
 
 export OAUTH_FACEBOOK_CLIENT_SECRET=<facebook-client-secret>
@@ -689,7 +689,7 @@ export OAUTH_FACEBOOK_CLIENT_SECRET=<facebook-client-secret>
 - Environment variable: `OAUTH_GOOGLE_ADWORDS_CLIENT_ID`
 - Default: None
 
-```shell
+```bash
 meltano config meltano set oauth_service google_adwords client_id <google-adwords-client-id>
 
 export OAUTH_GOOGLE_ADWORDS_CLIENT_ID=<google-adwords-client-id>
@@ -700,7 +700,7 @@ export OAUTH_GOOGLE_ADWORDS_CLIENT_ID=<google-adwords-client-id>
 - Environment variable: `OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET`
 - Default: None
 
-```shell
+```bash
 meltano config meltano set oauth_service google_adwords client_secret <google-adwords-client-secret>
 
 export OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET=<google-adwords-client-secret>
@@ -721,7 +721,7 @@ For more information on how to get these from your GitLab application, check out
 - Environment variable: `OAUTH_GITLAB_CLIENT_ID`, alias: `OAUTH_GITLAB_APPLICATION_ID`
 - Default: None
 
-```shell
+```bash
 meltano config meltano set oauth gitlab client_id <gitlab-client-id>
 
 export OAUTH_GITLAB_CLIENT_ID=<gitlab-client-id>
@@ -733,7 +733,7 @@ export OAUTH_GITLAB_APPLICATION_ID=<gitlab-client-id>
 - Environment variable: `OAUTH_GITLAB_CLIENT_SECRET`, alias: `OAUTH_GITLAB_SECRET`
 - Default: None
 
-```shell
+```bash
 meltano config meltano set oauth gitlab client_secret <gitlab-client-secret>
 
 export OAUTH_GITLAB_CLIENT_SECRET=<gitlab-client-secret>
@@ -751,7 +751,7 @@ Google Analytics Tracking IDs to be used if the [`send_anonymous_usage_stats` se
 
 Tracking ID for usage of the [`meltano` CLI](/docs/command-line-interface.html).
 
-```shell
+```bash
 meltano config meltano set tracking_ids cli UA-123456789-1
 
 export MELTANO_TRACKING_IDS_CLI=UA-123456789-1
@@ -765,7 +765,7 @@ export MELTANO_CLI_TRACKING_ID=UA-123456789-1
 
 Tracking ID for usage of [Meltano UI](/docs/command-line-interface.html#ui).
 
-```shell
+```bash
 meltano config meltano set tracking_ids ui UA-123456789-2
 
 export MELTANO_TRACKING_IDS_UI=UA-123456789-2
@@ -779,7 +779,7 @@ export MELTANO_UI_TRACKING_ID=UA-123456789-2
 
 Tracking ID for usage of [Meltano UI](/docs/command-line-interface.html#ui)'s [Embed feature](/docs/analysis.html#share-reports-and-dashboards).
 
-```shell
+```bash
 meltano config meltano set tracking_ids ui_embed UA-123456789-3
 
 export MELTANO_TRACKING_IDS_UI_EMBED=UA-123456789-3

@@ -29,7 +29,7 @@ If you used a virtual environment (`venv`) to install and run Meltano, don't for
 
 The following commands will install Jupyter Notebook and the most common python libraries required to connect to a Database (psycopg2, sqlalchemy), manipulate data (pandas) and generate some ad hoc plots (matplotlib):
 
-```shell
+```bash
 pip3 install jupyter
 pip3 install numpy
 pip3 install pandas
@@ -60,14 +60,14 @@ This is an optional step, but allows us to use the same credentials from inside 
 
 You can now navigate to Meltano's directory for storing your notebooks and [start Jupyter Notebook](https://jupyter.readthedocs.io/en/latest/running.html#running):
 
-```shell
+```bash
 cd notebook/
 jupyter notebook
 ```
 
 This will print some information about the notebook server in your terminal, including the URL of the web application (by default, http://localhost:8888):
 
-```shell
+```bash
 $ jupyter notebook
 [I 13:18:36.606 NotebookApp] Serving notebooks from local directory: /home/iroussos/work/code/my-projects/jupyter-tutorial/notebook
 [I 13:18:36.609 NotebookApp] The Jupyter Notebook is running at:

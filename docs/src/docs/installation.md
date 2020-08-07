@@ -37,7 +37,7 @@ You may refer to [https://realpython.com/installing-python/](https://realpython.
 
 Use the following command to check that you have the correct Python version installed:
 
-```shell
+```bash
 python --version
 ```
 
@@ -45,7 +45,7 @@ python --version
 
 `pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
 
-```shell
+```bash
 # check for current version of pip to ensure that it is using Python 3
 pip3 --version
 
@@ -69,7 +69,7 @@ We suggest you create a directory where you want your virtual environments to be
 
 Then create a new virtual environment inside that directory:
 
-```shell
+```bash
 mkdir .venv
 python -m venv .venv/meltano
 ```
@@ -78,7 +78,7 @@ python -m venv .venv/meltano
 
 Activate the virtual environment using:
 
-```shell
+```bash
 source .venv/meltano/bin/activate
 ```
 
@@ -89,7 +89,7 @@ Once a virtual environment is activated, it stays active until the current shell
 
 To streamline this process, you can define a [shell alias](https://shapeshed.com/unix-alias/) that'll be easier to remember than the entire activation invocation:
 
-```shell
+```bash
 # add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
 alias meltano!="source $MELTANO_PROJECT_PATH/.venv/meltano/bin/activate"
 
@@ -105,13 +105,13 @@ You can deactivate a virtual environment by typing `deactivate` in your shell.
 
 Now that you have your virtual environment set up and running, run the following command to install the Meltano package:
 
-```shell
+```bash
 pip3 install meltano
 ```
 
 Once the installation completes, you can check if it was successful by running:
 
-```shell
+```bash
 meltano --version
 ```
 
@@ -131,7 +131,7 @@ We provide the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docke
 
 This image contains everything you need to get started with Meltano.
 
-```shell
+```bash
 # download or update to the latest version
 docker pull meltano/meltano
 
@@ -143,7 +143,7 @@ docker run meltano/meltano --version
 
 Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our [Getting Started Guide](/docs/getting-started.html). However, the command line syntax is slightly different. For example, let's create a new Meltano project:
 
-```shell
+```bash
 cd /your/projects/directory
 
 docker run -v $(pwd):/projects \
@@ -153,13 +153,13 @@ docker run -v $(pwd):/projects \
 
 Then you can `cd` into your new project:
 
-```shell
+```bash
 cd yourprojectname
 ```
 
 We can then start the Meltano UI. Since `ui` is the default command, we can omit it.
 
-```shell
+```bash
 docker run -v $(pwd):/project \
              -w /project \
              -p 5000:5000 \

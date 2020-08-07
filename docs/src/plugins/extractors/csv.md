@@ -47,7 +47,7 @@ You can download the example csv files and the `files-def.json` file in the `ext
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
 
-```shell
+```bash
 meltano add extractor tap-csv
 ```
 
@@ -60,7 +60,7 @@ If you are successful, you should see `Added and installed extractors 'tap-csv'`
 
 **.env**
 
-```shell
+```bash
 export TAP_CSV_FILES_DEFINITION="extract/files_def.json"
 ```
 

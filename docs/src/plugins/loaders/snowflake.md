@@ -31,7 +31,7 @@ Once the loader has installed, a modal will appear that'll allow you to configur
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
 
-```shell
+```bash
 meltano add loader target-snowflake
 ```
 
@@ -42,7 +42,7 @@ If you are successful, you should see `Added and installed loaders 'target-snowf
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
 
-```shell
+```bash
 export SF_ACCOUNT=""
 export SF_USER=""
 export SF_PASSWORD=""

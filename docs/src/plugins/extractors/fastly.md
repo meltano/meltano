@@ -39,7 +39,7 @@ Please be aware that the larger the time period and amount of data, the longer t
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
 
-```shell
+```bash
 meltano add extractor tap-fastly
 ```
 
@@ -50,7 +50,7 @@ If you are successful, you should see `Added and installed extractors 'tap-fastl
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
 
-```shell
+```bash
 export TAP_FASTLY_API_TOKEN="yourFastlyApiToken"
 # The date uses ISO-8601 and supports time if desired
 export TAP_FASTLY_START_DATE="YYYY-MM-DD"

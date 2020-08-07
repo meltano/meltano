@@ -227,7 +227,7 @@ For example, `transform/dbt_project.yml` should be downloaded to the `csv-projec
 First step is to enable the option to run Custom Transforms for our project and set the results of the transforms to be stored as materialized tables:
 
 **[transform/dbt_project.yml](/files/gitflix/dbt_project.yml)**
-```shell
+```bash
 ... ... ...
 models:
     my_meltano_project:
@@ -435,7 +435,7 @@ We have to add 2 types of files:
 These files must be added under the `csv-project/model/` directory.
 
 **[model/gitflix_users.table.m5o](/files/gitflix/gitflix_users.table.m5o)**
-```shell
+```bash
 {
   version = 1
   sql_table_name = gitflix_users
@@ -514,7 +514,7 @@ These files must be added under the `csv-project/model/` directory.
 ```
 
 **[model/gitflix_episodes.table.m5o](/files/gitflix/gitflix_episodes.table.m5o)**
-```shell
+```bash
 {
   version = 1
   sql_table_name = gitflix_episodes
@@ -575,7 +575,7 @@ These files must be added under the `csv-project/model/` directory.
 ```
 
 **[model/gitflix_streams.table.m5o](/files/gitflix/gitflix_streams.table.m5o)**
-```shell
+```bash
 {
   version = 1
   sql_table_name = gitflix_streams
@@ -642,7 +642,7 @@ These files must be added under the `csv-project/model/` directory.
 ```
 
 **[model/gitflix.topic.m5o](/files/gitflix/gitflix.topic.m5o)**
-```shell
+```bash
 {
   version = 1
   name = gitflix

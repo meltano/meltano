@@ -27,7 +27,7 @@ meltano add loader target-postgres
 
 Next step is to add `tap-postgres` as a [custom extractor](/tutorials/create-a-custom-extractor.html). We'll use the [tap-postgres provided by the Singer.io community](https://github.com/singer-io/tap-postgres/) and fix its version to `0.0.61`, which has been tested and runs without issues with Meltano:
 
-```shell
+```bash
 meltano add --custom extractor tap-postgres
 
 (namespace): tap_postgres
@@ -74,7 +74,7 @@ And finally create a .env file in your project directory (i.e. tap-postgres). We
 
 **.env**
 
-```shell
+```bash
 export TAP_PG_DATABASE=my_source_db
 export TAP_PG_ADDRESS=localhost
 export TAP_PG_PORT=5432
@@ -90,7 +90,7 @@ export PG_PORT=5432
 
 Let's make sure that everything has been set correctly:
 
-```shell
+```bash
 meltano config tap-postgres
 
   {'default_replication_method': 'FULL_TABLE', 'include_schemas_in_destination_stream_name': True, 'dbname': 'my_source_db', 'host': 'localhost', 'password': '***', 'port': '5432', 'user': '***'}
@@ -110,7 +110,7 @@ In the case of `tap-postgres`, the names of the Entities (or streams as they are
 
 For example, assume that you want to export the `users` table and selected attributes from the `issues` table that reside in the `tap_gitlab` schema in `warehouse` DB. The following `meltano select` commands will only export those two tables and data for the selected attributes:
 
-```shell
+```bash
 meltano select tap-postgres "warehouse-tap_gitlab-users" "*"
 meltano select tap-postgres "warehouse-tap_gitlab-issues" "id"
 meltano select tap-postgres "warehouse-tap_gitlab-issues" "project_id"
@@ -122,7 +122,7 @@ meltano select tap-postgres "warehouse-tap_gitlab-issues" "state"
 
 Finally, you can use `meltano select <tap_name> --list` command to make sure that everything has been set correctly:
 
-```shell
+```bash
 meltano select tap-postgres --list
 
 Enabled patterns:
@@ -153,7 +153,7 @@ Selected attributes:
 
 In case you are not sure what the names of the streams are, you can use `meltano invoke` to run `tap-postgres` in isolation and generate a catalog file:
 
-```shell
+```bash
 meltano invoke tap-postgres --discover > .meltano/run/tap-postgres/tap.properties.json
 ```
 
@@ -163,7 +163,7 @@ You can then check that file and decide which Streams (tables in this case) shou
 
 Finally run `meltano elt` to export all the selected Entities and load them to the schema of the target DB defined by the custom tap's namespace (`tap-postgres` in this example)
 
-```shell
+```bash
 meltano elt tap-postgres target-postgres
 ```
 
