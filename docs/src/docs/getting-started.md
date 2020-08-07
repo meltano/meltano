@@ -15,7 +15,7 @@ To initialize a new project, open your terminal and navigate to the directory th
 
 Use the `meltano init` command, which takes a `PROJECT_NAME` that is of your own choosing. For this guide, let's create a project called "myprojectname".
 
-```bash
+```shell
 meltano init myprojectname
 ```
 
@@ -35,7 +35,7 @@ You will find detailed instructions in the docs for your loader of choice.
 
 Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
 
-```bash
+```shell
 cd myprojectname
 meltano ui
 ```

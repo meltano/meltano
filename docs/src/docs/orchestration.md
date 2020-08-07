@@ -14,13 +14,13 @@ When a new pipeline schedule is created using the [UI](/docs/analysis.html#creat
 
 To regularly schedule your ELT to run, use the ["Pipeline" interface in the UI](/docs/analysis.html#create-a-pipeline-schedule), or the [`meltano schedule`  command](/docs/command-line-interface.html#schedule):
 
-```bash
+```shell
 meltano schedule [SCHEDULE_NAME] [EXTRACTOR_NAME] [TARGET_NAME] [INTERVAL]
 ```
 
 Example:
 
-```bash
+```shell
 meltano schedule carbon__sqlite tap-carbon-intensity target-sqlite @daily
 ```
 
@@ -36,7 +36,7 @@ and then run the following command to add the
 [default DAG generator](https://gitlab.com/meltano/files-airflow/-/blob/master/bundle/orchestrate/dags/meltano.py)
 to your project and make Airflow available to use via `meltano invoke`:
 
-```bash
+```shell
 meltano add orchestrator airflow
 ```
 
@@ -51,7 +51,7 @@ and invoke the `airflow` executable with the provided arguments.
 
 You can add the Meltano DAG generator to your project without also installing the Airflow orchestrator plugin by adding the [`airflow` file bundle](https://gitlab.com/meltano/files-airflow):
 
-```bash
+```shell
 meltano add files airflow
 ```
 
@@ -71,7 +71,7 @@ with a [project-specific Docker image](/docs/production.html#containerized-melta
 
 Now that Airflow is installed and (automatically) configured to look at your project's Meltano DAG generator, let's start the scheduler:
 
-```bash
+```shell
 meltano invoke airflow scheduler
 ```
 
@@ -83,7 +83,7 @@ Airflow will now run your pipelines on a schedule as long as the scheduler is ru
 
 You are free to interact with Airflow directly through its own UI. You can start the web like this:
 
-```bash
+```shell
 meltano invoke airflow webserver
 ```
 
@@ -101,31 +101,31 @@ Currently, `meltano invoke` gives you raw access to the underlying plugin after 
 
 View 'meltano' dags:
 
-```bash
+```shell
 meltano invoke airflow list_dags
 ```
 
 Manually trigger a task to run:
 
-```bash
+```shell
 meltano invoke airflow run --raw meltano extract_load $(date -I)
 ```
 
 Start the Airflow UI: (will start in a separate browser)
 
-```bash
+```shell
 meltano invoke airflow webserver -D
 ```
 
 Start the Airflow scheduler, enabling background job processing if you're not already running Meltano UI:
 
-```bash
+```shell
 meltano invoke airflow scheduler -D
 ```
 
 Trigger a dag run:
 
-```bash
+```shell
 meltano invoke airflow trigger_dag meltano
 ```
 

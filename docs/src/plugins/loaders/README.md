@@ -1,6 +1,6 @@
 ---
 metaTitle: Loading Data with Meltano
-description: Use Meltano to load raw data from numerous sources into Postgres, Snowflake, and more. 
+description: Use Meltano to load raw data from numerous sources into Postgres, Snowflake, and more.
 ---
 
 # Loaders: Data Destinations
@@ -20,5 +20,7 @@ The following loaders are currently [known to Meltano](/docs/contributor-guide.h
 Note that Meltano dashboards and reports are only supported when PostgreSQL is used.
 
 ::: tip Don't see your reporting database here?
-You can easily add [any existing Singer target](https://www.singer.io/#targets) as a [custom loader](/#meltano-add) or [create your own from scratch]([/tutorials/create-a-custom-extractor.html](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target)).
+You can easily add [any existing Singer target](https://www.singer.io/#targets) as a [custom loader](/docs/command-line-interface.html#how-to-use-custom-plugins) or [create your own from scratch](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target).
+
+Don't forget to make your new plugin [known to Meltano](/docs/contributor-guide.html#known-plugins) if you'd like to make it available to other people!
 :::

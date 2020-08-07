@@ -10,118 +10,129 @@ Meltano provides a command line interface (CLI) that allows you to manage the co
 
 ## `add`
 
-The `add` command allows you to add plugins to your Meltano project.
+`meltano add` lets you add plugins (extractors, loaders, transforms, models, dashboards, orchestrators, transforms, and file bundles) to your Meltano project.
 
-### Extractor / Loader
+Specifically, it will:
+1. add the plugin to your project's `meltano.yml` file under `plugins: <type>s:`, e.g. `plugins: extractors:`,
+2. create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`, and
+3. install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>`.
 
-When you add an extractor or loader to a Meltano project, Meltano will:
+(Some plugin types have slightly different or additional behavior; see [plugin-specific behavior](#plugin-specific-behavior) below for more details.)
 
-1. Add the plugin to `meltano.yml`
-1. Install it into its own virtual environment in the `.meltano` directory using `pip3`
+Once the plugin has been added to your project, you can configure it using [`meltano config`](#config),
+invoke its executable using [`meltano invoke`](#invoke), and use it in a pipeline using [`meltano elt`](#elt).
 
-You can run `meltano add` with `--include-related` to automatically install all transform, model, and dashboard plugins related to an extractor.
+::: info
+Whenever you add a new plugin to a Meltano project, it will be
+installed into your project's `.meltano` directory automatically, as described above.
 
-#### Examples
+However, since this directory is included in your project's `.gitignore` file
+by default, you'll need to explicitly run [`meltano install`](#install)
+before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
+to install (or update) all plugins specified in `meltano.yml`.
+:::
 
-```bash
-# Extractor / Loader Template
-meltano add [extractor | loader] [name_of_plugin]
-meltano add [extractors | loaders] [name_of_plugin...]
+### How to use: Known plugins
 
-# Extractor Example
+Plugins that are already [known to Meltano](/docs/contributor-guide.html#known-plugins) will show up when you run [`meltano discover`](#discover),
+and can be added to your project by simply specifying their `type` and `name`:
+
+```shell
+meltano add <type> <name>
+meltano add extractor <name>
+meltano add loader <name>
+meltano add transform <name>
+meltano add model <name>
+meltano add dashboard <name>
+meltano add orchestrator <name>
+meltano add transformer <name>
+meltano add files <name>
+
+# For example:
 meltano add extractor tap-gitlab
-meltano add extractors tap-gitlab tap-google-analytics
-
-# Extractor Example including related plugins
-meltano add --include-related extractor tap-google-analytics
-
-# Loader Example
 meltano add loader target-postgres
 ```
 
-### Transform
+An `--include-related` flag can be passed to automatically install all transform, model, and dashboard plugins related to an extractor:
 
-When you add a transform to a Meltano project, Meltano will:
-
-1. Add the plugin to `meltano.yml`
-1. Update the dbt packages and project configuration
-
-#### Example
-
-```bash
-# Transform Template
-meltano add transform [name_of_transform]
-meltano add transforms [name_of_transform...]
+```shell
+meltano add --include-related extractor tap-gitlab
 ```
 
-### Model
+### How to use: Custom plugins
 
-When you add a model to a Meltano project, Meltano will:
+Plugins that Meltano isn't familiar with yet, like arbitrary Singer taps and targets, can be added using the `--custom` flag:
 
-1. Add the plugin to `meltano.yml`
-1. Install the model inside the `.meltano` directory which is then available to use in the Meltano webapp  file to help you interactively generate SQL
+```shell
+meltano add --custom <type> <name>
 
-#### Example
-
-```bash
-meltano add model [name_of_model]
-meltano add models [name_of_model...]
+# For example:
+meltano add --custom extractor tap-covid-19
+meltano add --custom loader pipelinewise-target-postgres
 ```
 
-### Dashboard
+Since no additional metadata about this plugin will be known to Meltano yet,
+it will ask you some additional questions to learn where the plugin's package can be found,
+how to interact with it, and how it can be expected to behave: (Note that more context is provided in the actual command prompts.)
 
-When you add a dashboard plugin to a Meltano project, Meltano will:
+```shell
+$ meltano add --custom extractor tap-covid-19
+# Specify namespace, which will serve as the:
+# - prefix for configuration environment variables
+# - identifier to find related/compatible plugins
+# - default value for the `schema` setting when used
+#   with loader target-postgres or target-snowflake
+(namespace): tap_covid_19
 
-1. Add the plugin to `meltano.yml`
-1. Install the dashboard and reports inside the `analyze` directory which are then available to use in the Meltano webapp
+# Specify `pip install` argument, for example:
+# - PyPI package name:
+(pip_url): tap-covid-19
+# - Git repository URL:
+(pip_url): git+https://github.com/singer-io/tap-covid-19.git
+# - local directory, in editable/development mode:
+(pip_url): -e extract/tap-covid-19
 
-#### Example
+# Specify the package's executable name
+(executable): tap-covid-19
 
-```bash
-meltano add dashboard [name_of_dashboard]
-meltano add dashboards [name_of_dashboard...]
+# Specify supported Singer features (executable flags)
+(capabilities): catalog,discover,state
+
+# Specify supported settings (`config.json` keys)
+(settings): api_token,user_agent,start_date
 ```
 
-### Orchestrator
+If you're adding a Singer tap or target that's listed on Singer's [index of taps](https://www.singer.io/#taps) or [targets](https://www.singer.io/#targets), simply providing the package name as `name`, `pip_url`, and `executable` should suffice. If it's a tap or target you have developed or are developing yourself, you'll want to set `pip_url` to either a Git repository URL or local directory path. If you add the `-e` flag ahead of the local path, the package will be installed in [editable mode](https://pip.pypa.io/en/stable/reference/pip_install/#editable-installs).
 
-When you add an orchestrator to a Meltano project, Meltano will:
+To find out what `settings` a tap or target supports, reference its README and/or documentation. If the `capabilities` (executable flags) a tap supports are not described there, try [one of these tricks](/docs/contributor-guide.html#how-to-test-a-tap).
 
-1. Add the plugin to `meltano.yml`
-1. Install it into its own virtual environment in the `.meltano` directory using `pip3`
-1. Install any related [file bundles](#file-bundle) to add orchestrator-specific files to your Meltano project
+::: tip
+Once you've succesfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
+:::
 
-#### Example
+### Plugin-specific behavior
 
-```bash
-meltano add orchestrator [name_of_orchestrator]
-```
+#### Transform
 
-### Transformer
+Transform plugins are not pip packages, but [dbt packages](https://docs.getdbt.com/docs/building-a-dbt-project/package-management) containing [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models).
 
-When you add an transformer to a Meltano project, Meltano will:
+As such, their `pip_url`s point at [dbt packages stored in Git](https://docs.getdbt.com/docs/building-a-dbt-project/package-management#git-packages), and they are installed by adding this `git` URL to your project's `transform/packages.yml` and enabling the packaged model in `transform/dbt_project.yml`.
 
-1. Add the plugin to `meltano.yml`
-1. Install it into its own virtual environment in the `.meltano` directory using `pip3`
-1. Install any related [file bundles](#file-bundle) to add transformer-specific files to your Meltano project
+#### Dashboard
 
-#### Example
+Dashboard plugins are pip packages bundling Meltano dashboards and reports.
 
-```bash
-meltano add transformer [name_of_transformer]
-```
+The bundled dashboards and reports will be added to your project's `analyze` directory automatically as part of installation.
 
-### File bundle
+#### Transformer and orchestrator
 
-When you add a file bundle to a Meltano project, Meltano will:
+Transformer and orchestrator plugins have related [file bundles](#file-bundle) that will be added to your project automatically as part of installation.
 
-1. Add the plugin to `meltano.yml` if any of the files it contains are [managed by the file bundle](#file-bundle-extra-update) and to be updated automatically when [`meltano upgrade`](#upgrade) is run.
-2. Add the bundled files to your Meltano project
+#### File bundle
 
-#### Example
+File bundle plugins are pip packages bundling files you may want in your Meltano project.
 
-```bash
-meltano add files [name_of_file_bundle...]
-```
+The bundled files will be added to your project automatically as part of installation. The file bundle plugin itself will not be added to `meltano.yml` unless it contains files that are [managed by the file bundle](#file-bundle-extra-update) and to be updated automatically when [`meltano upgrade`](#upgrade) is run.
 
 ## `config`
 
@@ -152,7 +163,7 @@ When no explicit `--store` is specified, `meltano config <plugin> set` will auto
 
 To manage the configuration of Meltano itself, specify `meltano` as the plugin name.
 
-```bash
+```shell
 # List all settings for Meltano itself with their names,
 # environment variables, and current values
 meltano config meltano list
@@ -191,7 +202,7 @@ meltano config <plugin_name> reset --store=db # reset in system database
 
 If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
 
-```bash
+```shell
 meltano config --plugin-type=<plugin_type> <plugin_name> ...
 ```
 
@@ -199,7 +210,7 @@ meltano config --plugin-type=<plugin_type> <plugin_name> ...
 
 Nested properties can be set (and unset) by specifying a list of property names:
 
-```bash
+```shell
 meltano config <plugin_name> set <property> <subproperty> <value>
 meltano config <plugin_name> set <property> <deep> <nesting> <value>
 
@@ -217,7 +228,7 @@ This will result in the following configuration being passed on to the plugin:
 Note that `meltano config <plugin_name> list` always displays full config keys
 with nesting represented by the `.` seperator, matching the internal flattened representation:
 
-```bash
+```shell
 meltano config <plugin_name> list
 # => <property>.<subproperty>
 # => <property>.<deep>.<nesting>
@@ -226,7 +237,7 @@ meltano config <plugin_name> list
 You can also set nested properties using the `.` seperator, but specifying a list of names is preferred
 since this will result in the nesting being reflected in the plugin's `config` object in `meltano.yml`:
 
-```bash
+```shell
 meltano config <plugin_name> set <property> <deep> <nesting> <value>
 # `meltano.yml`:
 #  config:
@@ -240,11 +251,11 @@ meltano config <plugin_name> set <property>.<deep>.<nesting> <value>
 #    <property>.<deep>.<nesting>: <value>
 ```
 
-### Custom (unknown) settings
+### Custom settings
 
 Meltano keeps track of the settings a plugin supports using [`settings` metadata](/docs/contributor-guide.html#connector-settings), and will list them all when you run `meltano config <plugin> list`.
 
-If you've [added a custom plugin](/#meltano-add) to your project, you will have been asked provide the names of the supported configuration options yourself.
+If you've [added a custom plugin](#how-to-use-custom-plugins) to your project, you will have been asked provide the names of the supported configuration options yourself.
 If the plugin was already [known to Meltano](/docs/contributor-guide.html#known-plugins) when you added it to your project, this metadata will already be known as well.
 
 If a plugin supports a setting that is not yet known to Meltano (because it may have been added after the `settings` metadata was specified, for example),
@@ -252,7 +263,7 @@ you do not need to modify the `settings` metadata to be able to use it.
 
 Instead, you can define a custom setting by adding the setting name (key) to your project's `config` object in `meltano.yml` with the desired value (or simply `null`), by manually editing the file or using `meltano config <plugin> set <key> <value>`:
 
-```sh
+```shell
 meltano config tap-example set custom_setting value
 ```
 
@@ -267,7 +278,7 @@ extractors:
 
 As long as the custom setting exists in `meltano.yml`, it will behave and can be interacted with just like any regular (known) setting. It will show up in `meltano config <plugin> list` and `meltano config <plugin>`, and the value that will be passed on to the plugin can be [overridden using an environment variable](#pipeline-specific-configuration):
 
-```sh
+```shell
 export TAP_EXAMPLE_CUSTOM_SETTING=overridden_value
 ```
 
@@ -309,7 +320,7 @@ An `--extras` flag can be passed to view or list only extras instead.
 
 Be aware that `meltano config <plugin> reset` resets both regular settings _and_ extras.
 
-```bash
+```shell
 # List all extras for the specified plugin with their names,
 # environment variables, and current values
 meltano config <plugin> list --extras
@@ -344,7 +355,7 @@ selection rules are typically specified using [`meltano select`](#select).
 
 ##### On the command line
 
-```bash
+```shell
 meltano config <plugin> set _select '["<entity>.<attribute>", ...]'
 
 export <NAMESPACE>__SELECT='["<entity>.<attribute>", ...]'
@@ -397,7 +408,7 @@ patterns in the entity and attribute identifiers to match multiple entities and/
 
 ##### On the command line
 
-```bash
+```shell
 meltano config <plugin> set _metadata <entity> <key> <value>
 meltano config <plugin> set _metadata <entity> <attribute> <key> <value>
 
@@ -452,7 +463,7 @@ patterns in the entity and attribute identifiers to match multiple entities and/
 
 ##### On the command line
 
-```bash
+```shell
 meltano config <plugin> set _schema <entity> <attribute> <schema description>
 meltano config <plugin> set _schema <entity> <attribute> <key> <value>
 
@@ -499,7 +510,7 @@ Because these variables are handled by dbt rather than Meltano, environment vari
 
 ##### On the command line
 
-```bash
+```shell
 meltano config <plugin> set _vars <key> <value>
 
 export <NAMESPACE>__VARS='{"<key>": "<value>"}'
@@ -535,7 +546,7 @@ When a file path's value is `True`, the file is considered to be managed by the 
 
 ##### On the command line
 
-```bash
+```shell
 meltano config <plugin> set _update <path> <true/false>
 
 export <NAMESPACE>__UPDATE='{"<path>": <true/false>}'
@@ -562,7 +573,7 @@ Lists the available plugins you are interested in.
 
 ### How to Use
 
-```bash
+```shell
 # List all available plugins
 meltano discover all
 
@@ -586,7 +597,7 @@ This allows you to run your ELT pipeline to Extract, Load, and Transform the dat
 
 ### How to use
 
-```bash
+```shell
 meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT] [--dry]
 ```
 
@@ -602,7 +613,7 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT] [
 
 #### Examples
 
-```bash
+```shell
 meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
 ```
 
@@ -620,7 +631,7 @@ This lets you use the same extractors and loaders (Singer taps and targets) in m
 
 On a shell, you can explicitly `export` environment variables, that will be passed along to every following command invocation, or you can specify them in-line with a specific invocation, ahead of the command:
 
-```sh
+```shell
 export TAP_FOO_BAR=bar
 export TAP_FOO_BAZ=baz
 meltano elt ...
@@ -683,7 +694,7 @@ you can learn more about what's going on behind the scenes by setting Meltano's
 [`cli.log_level` setting](/docs/settings.html#cli-log-level) to `debug`,
 using the `MELTANO_CLI_LOG_LEVEL` environment variable or the `--log-level` CLI flag:
 
-```sh
+```shell
 MELTANO_CLI_LOG_LEVEL=debug meltano elt ...
 
 meltano --log-level=debug elt ...
@@ -691,7 +702,7 @@ meltano --log-level=debug elt ...
 
 In debug mode, `meltano elt` will log the arguments and environment used to invoke the Singer tap and target executables (and `dbt`, when running transformations), including the paths to the generated config, catalog, and state files, for you to review:
 
-```sh
+```shell
 $ meltano --log-level=debug elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
 meltano            | INFO Running extract & load...
 meltano            | INFO Found state from 2020-08-05 21:30:20.487312.
@@ -748,7 +759,7 @@ Used to create a new meltano project with a basic infrastructure in place in the
 
 ### How to use
 
-```bash
+```shell
 # Format
 meltano init [project_name] [--no_usage_stats]
 ```
@@ -772,7 +783,7 @@ Use `--include-related` to automatically install transform, model, and dashboard
 
 ### How to Use
 
-```bash
+```shell
 meltano install
 
 meltano install extractors
@@ -790,13 +801,13 @@ Invoke the plugin's executable with specified arguments.
 
 ### How to use
 
-```bash
+```shell
 meltano invoke <plugin_name> PLUGIN_ARGS...
 ```
 
 If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
 
-```bash
+```shell
 meltano invoke --plugin-type=<plugin_type> <plugin_name> PLUGIN_ARGS...
 ```
 
@@ -813,7 +824,7 @@ Use the `schedule` command to define ELT pipelines to be run by an orchestrator 
 The interval argument can be a [cron expression](https://en.wikipedia.org/wiki/Cron#CRON_expression) or one of the following presets:
 `@hourly` (`0 * * * *`), `@daily` (`0 0 * * *`), `@weekly` (`0 0 * * 0`), `@monthly` (`0 0 1 * *`), `@yearly` (`0 0 1 1 *`), or `@once` (for schedules to be triggered manually through the UI).
 
-```bash
+```shell
 # Add a schedule
 meltano schedule <schedule_name> <extractor> <loader> <interval> [--transform={run,skip,only}]
 
@@ -823,7 +834,7 @@ meltano schedule list [--format=json]
 
 ### Examples
 
-```bash
+```shell
 meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily --transform=run
 # This specifies that the following command is to be run once a day:
 # meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
@@ -858,13 +869,13 @@ Use `--list` to list the current selected tap attributes.
 
 ### Examples
 
-```bash
+```shell
 meltano select tap-carbon-intensity '*' 'name*'
 ```
 
 This will select all attributes starting with `name`.
 
-```bash
+```shell
 meltano select tap-carbon-intensity 'region'
 ```
 
@@ -888,11 +899,11 @@ Exclusion has precedence over inclusion. If an attribute is excluded, there is n
 
 #### Examples
 
-```bash
+```shell
 meltano select --exclude tap-carbon-intensity '*' 'longitude'
 ```
 
-```bash
+```shell
 meltano select --exclude tap-carbon-intensity '*' 'latitude'
 ```
 
@@ -932,7 +943,7 @@ Use with caution!
 
 The `--bits` flag can be used to specify the size of the secrets, default to 256.
 
-```bash
+```shell
 # Format
 meltano ui setup [--bits=256] <server_name>
 
@@ -959,7 +970,7 @@ Add the user to the role. Meltano ships with two built-in roles: `admin` and `re
 
 #### How to use
 
-```bash
+```shell
 meltano user add admin securepassword --role admin
 ```
 
@@ -975,7 +986,7 @@ When called without arguments, this will:
 
 ### How to use
 
-```bash
+```shell
 meltano upgrade
 meltano upgrade --skip-package # Skip upgrading the Meltano package
 
@@ -991,6 +1002,6 @@ It is used to check which version of Meltano currently installed.
 
 ### How to use
 
-```bash
+```shell
 meltano --version
 ```

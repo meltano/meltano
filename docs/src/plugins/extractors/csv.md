@@ -1,12 +1,12 @@
 ---
 sidebar: auto
 metaTitle: Extract Data from CSV
-description: Use Meltano to extract raw data from any CSV and insert it into Postgres, Snowflake, and more. 
+description: Use Meltano to extract raw data from any CSV and insert it into Postgres, Snowflake, and more.
 ---
 
 # Comma Separated Values (CSV)
 
-The [CSV Extractor](https://gitlab.com/meltano/tap-csv) can be used to load CSV files to a Database or Data Warehouse. 
+The [CSV Extractor](https://gitlab.com/meltano/tap-csv) can be used to load CSV files to a Database or Data Warehouse.
 
 Each input CSV file used with the [CSV Extractor](https://gitlab.com/meltano/tap-csv) must be a traditionally-delimited CSV (comma separated columns, newlines indicate new rows, double quoted values).
 
@@ -47,7 +47,7 @@ You can download the example csv files and the `files-def.json` file in the `ext
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
 
-```bash
+```shell
 meltano add extractor tap-csv
 ```
 
@@ -60,7 +60,7 @@ If you are successful, you should see `Added and installed extractors 'tap-csv'`
 
 **.env**
 
-```bash
+```shell
 export TAP_CSV_FILES_DEFINITION="extract/files_def.json"
 ```
 
@@ -70,7 +70,7 @@ Check the [README](https://gitlab.com/meltano/tap-csv#run) for details.
 
 ::: tip
 
-**Ready to do more with data from CSV files?** 
+**Ready to do more with data from CSV files?**
 
 Check out our [Loading CSV files into a Postgres Database tutorial](/tutorials/csv-with-postgres.html) to learn how you can create an analytics database from within Meltano, and start analyzing your CSV data.
 

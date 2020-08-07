@@ -47,12 +47,12 @@
       <div class="hero-left">
         <Content slot-key="integration" />
 
-        <!-- <p class="action">
+        <p class="action">
           <NavLink
             class="action-button"
             :item="$frontmatter.integration.primaryAction"
           />
-        </p> -->
+        </p>
       </div>
 
       <div class="hero-right">
@@ -105,7 +105,10 @@
       </div>
     </div>
 
-    <div class="hero homepage-cta feature-section-wrapper" id="containerization">
+    <div
+      class="hero homepage-cta feature-section-wrapper"
+      id="containerization"
+    >
       <div class="hero-left">
         <Content slot-key="containerization" />
 
@@ -124,7 +127,7 @@
 
     <div class="feature-section-wrapper is-shorter is-white">
       <section class="section">
-        <h2 class="section__title" style="padding-bottom:20px;">
+        <h2 class="section__title" style="padding-bottom: 20px;">
           Intrigued?
         </h2>
 
@@ -142,6 +145,13 @@
     <div class="hero homepage-cta feature-section-wrapper" id="meltano-add">
       <div class="hero-left">
         <Content slot-key="meltano-add" />
+
+        <p class="action">
+          <NavLink
+            class="action-button"
+            :item="$frontmatter.meltanoAdd.primaryAction"
+          />
+        </p>
       </div>
 
       <div class="hero-right">
@@ -152,6 +162,13 @@
     <div class="hero homepage-cta feature-section-wrapper" id="meltano-config">
       <div class="hero-left">
         <Content slot-key="meltano-config" />
+
+        <p class="action">
+          <NavLink
+            class="action-button"
+            :item="$frontmatter.meltanoConfig.primaryAction"
+          />
+        </p>
       </div>
 
       <div class="hero-right">
@@ -162,6 +179,13 @@
     <div class="hero homepage-cta feature-section-wrapper" id="meltano-select">
       <div class="hero-left">
         <Content slot-key="meltano-select" />
+
+        <p class="action">
+          <NavLink
+            class="action-button"
+            :item="$frontmatter.meltanoSelect.primaryAction"
+          />
+        </p>
       </div>
 
       <div class="hero-right">
@@ -171,7 +195,7 @@
 
     <div class="feature-section-wrapper is-shorter is-white">
       <section class="section">
-        <h2 class="section__title" style="padding-bottom:20px;">
+        <h2 class="section__title" style="padding-bottom: 20px;">
           Stay up to date and get in touch
         </h2>
         <a
@@ -208,7 +232,8 @@
         <section class="section">
           <h2 class="section__title">Subscribe to our newsletter</h2>
           <p class="section__text">
-            Get the most significant news about Meltano delivered right to your inbox!
+            Get the most significant news about Meltano delivered right to your
+            inbox!
           </p>
 
           <a href="https://meltano.substack.com" class="button" target="_blank"

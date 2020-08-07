@@ -57,10 +57,6 @@ homepage_sample_code:
     # - you have activated the virtual environment
     - source ../.venv/bin/activate
 
-    # If this were an existing Meltano project you just
-    # cloned or pulled, install any missing plugins
-    # meltano install
-
 
     ### ---
     # Always use the latest discovery file

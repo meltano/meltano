@@ -67,7 +67,7 @@ Meltano uses [semver](https://semver.org/) as its version number scheme.
 
 Ensure you have the latest `master` branch locally before continuing.
 
-```bash
+```shell
 git fetch origin
 ```
 
@@ -77,7 +77,7 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 
 1. Meltano has a number of dependencies for the release toolchain that are required when performing a release. If you haven't already, please navigate to your meltano installation and run the following command to install all development dependencies:
 
-   ```bash
+   ```shell
    # activate your virtualenv
    source ./venv/bin/activate
 
@@ -87,7 +87,7 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 
 2. Execute the commands below:
 
-   ```bash
+   ```shell
    # create and checkout the `release-next` branch from `origin/master`
    git checkout -B release-next origin/master
 

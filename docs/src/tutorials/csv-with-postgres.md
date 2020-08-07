@@ -21,13 +21,13 @@ We are going to use the [CSV Extractor](https://gitlab.com/meltano/tap-csv) to e
 
 In contrast to loading data from an API, the attributes (schema) of the data included in a CSV file differ for each CSV file loaded.
 
-That means that Meltano can not include pre-bundled Transforms and Models for data loaded from CSV files. To make the most of your data and be able to run analyses, you have to add custom Transforms and Models. 
+That means that Meltano can not include pre-bundled Transforms and Models for data loaded from CSV files. To make the most of your data and be able to run analyses, you have to add custom Transforms and Models.
 
 You can check how [Transforms](/docs/architecture.html#meltano-transformations) and [Models](/docs/architecture.html#meltano-model) work in Meltano and the Tutorial on [how to add Custom Transforms and Models](/tutorials/create-custom-transforms-and-models.html) if you want more information on those topics.
 
 ## Motivation and Running example
 
-As a running example, we'll use GitFlix, a fictional git based video streaming service. 
+As a running example, we'll use GitFlix, a fictional git based video streaming service.
 
 We have all our data for GitFlix in CSV files: We export our user data from our CRM, the episode information from our CMS and the streaming data from our own custom streaming system.
 
@@ -147,8 +147,8 @@ This file allows us to define the CSV files that the CSV Extractor is going to e
 Meltano only supports importing CSV files for self-hosted users. This is a [known issue](https://gitlab.com/meltano/meltano/issues/1385).
 :::
 
-Add the CSV extractor which is hidden-by-default with `meltano add extractor tap-csv`. 
-Once it's successful, you should be able to reload the Meltano extractors page where you can configure it. 
+Add the CSV extractor which is hidden-by-default with `meltano add extractor tap-csv`.
+Once it's successful, you should be able to reload the Meltano extractors page where you can configure it.
 
 ![Screenshot of Meltano UI with all extractors not installed and the CSV Extractor highlighted](/images/csv-tutorial/01-csv-extractor-selection.png)
 
@@ -227,7 +227,7 @@ For example, `transform/dbt_project.yml` should be downloaded to the `csv-projec
 First step is to enable the option to run Custom Transforms for our project and set the results of the transforms to be stored as materialized tables:
 
 **[transform/dbt_project.yml](/files/gitflix/dbt_project.yml)**
-```bash
+```shell
 ... ... ...
 models:
     my_meltano_project:
@@ -409,11 +409,11 @@ Go back to your Meltano instance, select "Pipelines" in the top navigation bar a
 
 We have already loaded the data, so we want to run only the transforms that we just added: we are going to select `Only` and then click `Save`.
 
-You'll be presented with a new pipeline ready to run, with the **Transform** step set to `Only`. 
+You'll be presented with a new pipeline ready to run, with the **Transform** step set to `Only`.
 
 ![Create pipeline modal for the CSV Extractor](/images/csv-tutorial/05-csv-create-new-pipeline-transform-only.png)
 
-Meltano remembers the configuration for the Extractor and Loader, so there is nothing else required on our part; we can click `Save` and wait for the transform to run successfully: 
+Meltano remembers the configuration for the Extractor and Loader, so there is nothing else required on our part; we can click `Save` and wait for the transform to run successfully:
 
 ![Screenshot of run log of a completed pipeline for the CSV Extractor](/images/csv-tutorial/06-csv-log-of-completed-transform-only-pipeline.png)
 
@@ -435,7 +435,7 @@ We have to add 2 types of files:
 These files must be added under the `csv-project/model/` directory.
 
 **[model/gitflix_users.table.m5o](/files/gitflix/gitflix_users.table.m5o)**
-```bash
+```shell
 {
   version = 1
   sql_table_name = gitflix_users
@@ -514,7 +514,7 @@ These files must be added under the `csv-project/model/` directory.
 ```
 
 **[model/gitflix_episodes.table.m5o](/files/gitflix/gitflix_episodes.table.m5o)**
-```bash
+```shell
 {
   version = 1
   sql_table_name = gitflix_episodes
@@ -575,7 +575,7 @@ These files must be added under the `csv-project/model/` directory.
 ```
 
 **[model/gitflix_streams.table.m5o](/files/gitflix/gitflix_streams.table.m5o)**
-```bash
+```shell
 {
   version = 1
   sql_table_name = gitflix_streams
@@ -642,7 +642,7 @@ These files must be added under the `csv-project/model/` directory.
 ```
 
 **[model/gitflix.topic.m5o](/files/gitflix/gitflix.topic.m5o)**
-```bash
+```shell
 {
   version = 1
   name = gitflix

@@ -112,7 +112,7 @@ since it's built from the [`meltano/meltano`](https://hub.docker.com/r/meltano/m
 
 ## Installing plugins
 
-Whenever you [add a new plugin](/#meltano-add) to a Meltano project, it will be
+Whenever you [add a new plugin](/docs/command-line-interface.html#add) to a Meltano project, it will be
 installed into your project's `.meltano` directory automatically.
 However, since this directory is included in your project's `.gitignore` file
 by default, you'll need to explicitly run [`meltano install`](/docs/command-line-interface.html#install)
@@ -243,7 +243,7 @@ but there are [a couple of settings](/docs/settings.html#meltano-ui-server) you'
 
 - If you will be running Meltano UI behind a front-end (reverse) proxy that will be responsible for SSL termination,
   you may need to change the [`ui.forwarded_allow_ips` setting](/docs/settings.html#ui-forwarded-allow-ips) to get
-  Meltano UI to realize it should use the `https` URL scheme rather than `http` in the URLs it builds. 
+  Meltano UI to realize it should use the `https` URL scheme rather than `http` in the URLs it builds.
   If your reverse proxy uses a health check to determine if Meltano UI is ready to accept traffic, you can use the `/api/health` route, which will always respond with a 200 status code.
 
 ### Containerized Meltano project

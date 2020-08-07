@@ -18,7 +18,7 @@ description: Use Meltano to load data from numerous sources and insert it into a
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
 
-```bash
+```shell
 meltano add loader target-jsonl
 ```
 

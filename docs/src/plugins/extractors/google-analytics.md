@@ -139,7 +139,7 @@ Click `Save` to finish configuring the extractor and progress to the next step: 
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
 
-```bash
+```shell
 meltano add extractor tap-google-analytics
 ```
 
@@ -152,7 +152,7 @@ If you are successful, you should see `Added and installed extractors 'tap-googl
 
 Required:
 
-```bash
+```shell
 export GOOGLE_ANALYTICS_API_CLIENT_SECRETS="client_secrets.json"
 export GOOGLE_ANALYTICS_API_VIEW_ID="YOUR VIEW ID"
 export GOOGLE_ANALYTICS_API_START_DATE="2019-02-01T00:00:00Z"
@@ -160,7 +160,7 @@ export GOOGLE_ANALYTICS_API_START_DATE="2019-02-01T00:00:00Z"
 
 Optional:
 
-```bash
+```shell
 export GOOGLE_ANALYTICS_API_REPORTS="cli_reports.json"
 export GOOGLE_ANALYTICS_API_END_DATE="2019-06-01T00:00:00Z"
 ```
