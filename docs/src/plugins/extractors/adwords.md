@@ -90,7 +90,7 @@ The following variables are required for the authentication flow:
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
 
-```shell
+```bash
 export OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN=<developer_token>
 export OAUTH_GOOGLE_ADWORDS_CLIENT_ID=<client_id>
 export OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET=<client_secret>
@@ -113,7 +113,7 @@ On the configuration modal we want to enter all the fields descibed in the [Goog
 1. Navigate to your Meltano project in the terminal
 1. Run the following command:
 
-```shell
+```bash
 meltano add extractor tap-adwords
 ```
 
@@ -126,7 +126,7 @@ If you are successful, you should see `Added and installed extractors 'tap-adwor
 
 Required:
 
-```shell
+```bash
 export TAP_ADWORDS_REFRESH_TOKEN=""
 export TAP_ADWORDS_USER_AGENT=""
 export TAP_ADWORDS_CUSTOMER_IDS=""
@@ -135,7 +135,7 @@ export TAP_ADWORDS_START_DATE="2020-01-01T00:00:00Z"
 
 Optional:
 
-```shell
+```bash
 export TAP_ADWORDS_END_DATE="2020-02-17T00:00:00Z"
 export TAP_ADWORDS_CONVERSION_WINDOW_DAYS=""
 ```

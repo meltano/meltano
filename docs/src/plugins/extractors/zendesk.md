@@ -94,7 +94,7 @@ Please be aware that the larger the time period and amount of data, the longer t
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
 
-```shell
+```bash
 meltano add extractor tap-zendesk
 ```
 
@@ -105,7 +105,7 @@ If you are successful, you should see `Added and installed extractors 'tap-zende
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
 
-```shell
+```bash
 export TAP_ZENDESK_EMAIL="yourZendeskEmail"
 export TAP_ZENDESK_API_TOKEN="yourZendeskApiToken"
 export TAP_ZENDESK_SUBDOMAIN="yourZendeskSubdomain"

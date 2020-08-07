@@ -26,7 +26,7 @@ Once the loader has installed, a modal will appear with options for selecting th
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
 
-```shell
+```bash
 meltano add loader target-csv
 ```
 

@@ -73,7 +73,7 @@ Please be aware that the larger the time period and amount of data, the longer t
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
 
-```shell
+```bash
 meltano add extractor tap-shopify
 ```
 
@@ -84,7 +84,7 @@ If you are successful, you should see `Added and installed extractors 'tap-shopi
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
 
-```shell
+```bash
 # See above for steps on how to acquire "Store Subdomain"
 export TAP_SHOPIFY_SHOP="my-first-store"
 # See above for steps on how to acquire "Private App API Password"

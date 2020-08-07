@@ -32,7 +32,7 @@ Meltano uses [Singer](https://singer.io) taps and targets to extract and load da
 [cookiecutter](https://cookiecutter.readthedocs.io/en/latest/) is a python tool to scaffold projects quickly from an existing template.
 :::
 
-```shell
+```bash
 pip3 install cookiecutter
 cookiecutter gh:singer-io/singer-tap-template
 > project_name: tap-gitlab-custom
@@ -46,7 +46,7 @@ Now that your plugin is part of your Meltano project, you need to add your plugi
 Using `-e` in the `pip_url` will install the plugin as editable so any change you make is readily available.
 :::
 
-```shell
+```bash
 meltano add --custom extractor tap-gitlab-custom
 # If you're running Meltano using Docker, ensure you run `docker run` with `--interactive` to allow `namespace` etc to be set:
 # docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-gitlab-custom
@@ -149,7 +149,7 @@ Now that your plugin is installed and configured, you are ready to interact with
 
 Use `meltano invoke` to run your plugin in isolation:
 
-```shell
+```bash
 meltano invoke tap-gitlab-custom --discover
 ```
 
@@ -158,13 +158,13 @@ If your custom tap doesn't support discovery mode, this may raise an error, but 
 Assuming your custom tap supports discovery mode and advertises the `discover` capabilitiy,
 use `meltano select` to parse your `catalog` and list all available entities and attributes:
 
-```shell
+```bash
 meltano select --list --all tap-gitlab-custom
 ```
 
 Now, run an ELT pipeline using your new tap:
 
-```shell
+```bash
 meltano elt tap-gitlab-custom target-sqlite
 ```
 

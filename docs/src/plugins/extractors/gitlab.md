@@ -122,7 +122,7 @@ Please be aware that the larger the time period and amount of data, the longer t
 1. Navigate to your Meltano project in the terminal
 1. Run the following command:
 
-```shell
+```bash
 meltano add extractor tap-gitlab
 ```
 
@@ -135,7 +135,7 @@ If you are successful, you should see `Added and installed extractors 'tap-gitla
 
 Required:
 
-```shell
+```bash
 export GITLAB_API_TOKEN="private access token"
 export GITLAB_API_GROUPS="myorg mygroup"
 export GITLAB_API_PROJECTS="myorg/repo-a myorg/repo-b"
@@ -144,7 +144,7 @@ export GITLAB_API_START_DATE="YYYY-MM-DDTHH:MM:SSZ" # e.g. 2019-10-31T00:00:00Z
 
 Optional:
 
-```shell
+```bash
 export GITLAB_API_ULTIMATE_LICENSE="true"
 ```
 

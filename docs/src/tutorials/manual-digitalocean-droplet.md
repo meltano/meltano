@@ -21,7 +21,7 @@ Click on the three-dot dropdown menu to the right of your Droplet's name and sel
 
 You can also connect to your Droplet using SSH, from the command line:
 
-```shell
+```bash
 ssh root@YOUR_DROPLET_IP_ADDRESS
 ```
 
@@ -35,25 +35,25 @@ Your Ubuntu image will not come with Python 3.6+ set as the sysyem wide version 
 
 Get the most updated version of all packages:
 
-```shell
+```bash
 apt-get update
 ```
 
 And then install Python:
 
-```shell
+```bash
 apt install python
 ```
 
 Now, if you run `python --version`, you will see the system wide version is 2.7.15+ but Meltano requires 3.6+. Now we need to update the system wide version we want to be using with the command:
 
-```shell
+```bash
 update-alternatives --install /usr/bin/python python /usr/bin/python3.6 1
 ```
 
 To confirm the version is now correct, run `python --version` again
 
-```shell
+```bash
 python --version
 #Python 3.6.8
 ```
@@ -62,7 +62,7 @@ python --version
 
 Next up, we need to install our package manager, pip.
 
-```shell
+```bash
 apt install python3-pip
 ```
 
@@ -70,13 +70,13 @@ apt install python3-pip
 
 Now that you have Python configured system wide and pip3 installed, we'll use pip3 to install your virtual environment management tools:
 
-```shell
+```bash
 pip3 install virtualenv
 ```
 
 And then install it with:
 
-```shell
+```bash
 apt-get install python3-venv
 ```
 
@@ -86,19 +86,19 @@ You may be tempted to create your DigitalOcean Droplet without a virtual environ
 
 Create a directory where you want your virtual environments to be saved:
 
-```shell
+```bash
 mkdir venv
 ```
 
 Then create a new virtual environment inside that directory:
 
-```shell
+```bash
 python -m venv venv/.venv/meltano
 ```
 
 Activate the virtual environment using:
 
-```shell
+```bash
 source venv/.venv/meltano/bin/activate
 ```
 
@@ -108,13 +108,13 @@ Now that you are inside your virtual environment, follow the [Meltano installati
 
 Initialize Meltano:
 
-```shell
+```bash
 meltano init YOUR_PROJECT_NAME
 ```
 
 Launch the Meltano UI on your server:
 
-```shell
+```bash
 cd YOUR_PROJECT_NAME
 meltano ui
 ```

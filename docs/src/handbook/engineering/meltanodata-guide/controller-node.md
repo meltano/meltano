@@ -12,13 +12,13 @@ The purpose of this node is to provide tools to enable team members to leverage 
 
 1. Verify SSH Agent is populated locally
 
-```shell
+```bash
 ssh-add -L
 ```
 
 If you see `No registered agent found`, you'll need to add your key.
 
-```shell
+```bash
 # Register your id_rsa key as an agent
 ssh-add ~/.ssh/id_rsa
 
@@ -40,7 +40,7 @@ Access to this node is restricted to Meltano Team members.
 
 To access the controller, connect using SSH with your Meltano username (`<first initial><last name>`).
 
-```shell
+```bash
 ssh -A <username>@controller.int.meltanodata.com
 ```
 
@@ -62,13 +62,13 @@ Ansible is a configuration management and provisioning tool that enable infrastr
 
 The `meltano/infrastructure` project is located at `/var/meltano/infrastructure`.
 
-```shell
+```bash
 cd /var/meltano/infrastructure
 ```
 
 ### Ensure it works properly
 
-```shell
+```bash
 $ ansible controller -m ping
 
 # there might be some warnings, just ignore them for now.
@@ -92,13 +92,13 @@ This will enable us to target:
 
 To do that, you will need to export the DigitalOcean API Token for the "Meltano" project as `DO_API_TOKEN`:
 
-```shell
+```bash
 export DO_API_TOKEN=<access_token>
 ```
 
 Additionally, you will need to export the DigitalOcean API Token for the "MeltanoData DBs" projects as `DO_DATABASE_API_TOKENS`.
 
-```shell
+```bash
 export DO_DATABASE_API_TOKENS=<access_token>,<access_token>,...
 ```
 
@@ -108,7 +108,7 @@ To save yourself some time, you can also save this to your `.bashrc` file (`/hom
 
 You can test that it works using:
 
-```shell
+```bash
 ansible all --list-hosts
 # you should see a long list of IDs, these are the Droplet ID.
 ```
@@ -119,7 +119,7 @@ Playbooks describe the desired state of a node.
 
 To invoke a playbook, use:
 
-```shell
+```bash
 ansible-playbook /path/to/playbook
 
 # example, to run the `controller` playbook, use

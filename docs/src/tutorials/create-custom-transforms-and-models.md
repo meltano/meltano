@@ -107,7 +107,7 @@ These tables must be added as `dbt models`, i.e. `.sql` files under the `sfdc-pr
 
 In this case, we'll create a new `sfdc/transform` subdirectory and save the sql files there.
 
-```shell
+```bash
 cd sfdc-project/transform/models/my_meltano_project/
 mkdir sfdc
 cd sfdc
@@ -229,7 +229,7 @@ models:
 ... ... ...
 ```
 
-```shell
+```bash
 source .env
 #Runs transformation step only from the ELT step
 meltano elt tap-salesforce target-postgres --transform only
@@ -400,7 +400,7 @@ Please note, the name this model will be `custom_sfdc` in order to differentiate
 
 In order to start the Meltano UI, please go back into your terminal and run the following command:
 
-```shell
+```bash
 # Start up the Meltano UI web application!
 $ meltano ui
 ```
@@ -422,13 +422,13 @@ The same process for adding custom Transforms and Model(s) would be followed if 
 
 As described in the Salesforce Tutorial, this can be done by using the meltano select command
 
-```shell
+```bash
 meltano select tap-salesforce "Entity Name" "*"
 ```
 
 You can find the names for the supported entities by running:
 
-```shell
+```bash
 meltano select tap-salesforce --list --all
 ```
 
@@ -436,6 +436,6 @@ meltano select tap-salesforce --list --all
 
 (3) Run meltano elt to extract and transform the data.
 
-```shell
+```bash
 meltano elt tap-salesforce target-postgres --transform run
 ```

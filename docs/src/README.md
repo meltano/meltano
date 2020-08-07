@@ -64,7 +64,7 @@ followed by instructions on
 
 **Give it a try and be up and running in minutes!**
 
-```shell
+```bash
 # For these examples to work, ensure that:
 # - you are running Linux or macOS
 # - Python 3.6 or 3.7 (NOT 3.8) has been installed
@@ -113,7 +113,7 @@ which will create a new directory with:
 
 <small>Follow the [installation instructions above](/#installation) and then...</small>
 
-```shell
+```bash
 # Initialize a new Meltano project in the
 # "demo-project" directory, and...
 # - share anonymous usage data with the Meltano team
@@ -140,7 +140,7 @@ Next steps:
 
 Your Meltano project has now been initialized in the `demo-project` directory!
 
-```shell
+```bash
 # Before you use any `meltano` command, ensure that:
 # - you have navigated to your Meltano project directory
 cd demo-project
@@ -176,7 +176,7 @@ Scroll down to learn more about [transformation](/#transformation) and [orchestr
 
 <small>Follow the [project initialization instructions above](/#meltano-init) and then...</small>
 
-```shell
+```bash
 # Add GitLab extractor to your project
 meltano add extractor tap-gitlab
 
@@ -231,7 +231,7 @@ or [write your own](/tutorials/create-custom-transforms-and-models.html#adding-c
 
 <small>Follow the [integration instructions above](/#integration) and then...</small>
 
-```shell
+```bash
 # For these examples to work, ensure that:
 # - you have PostgreSQL running somewhere
 # - you have created a new database
@@ -299,7 +299,7 @@ schedule is not going to cut it, you can easily modify the DAG generator or add 
 
 <small>Follow the [transformation instructions above](/#transformation) and then...</small>
 
-```shell
+```bash
 # Schedule pipelines
 meltano schedule gitlab-to-jsonl tap-gitlab target-jsonl @hourly
 meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily --transform=run
@@ -316,7 +316,7 @@ meltano invoke airflow scheduler
 
 Your pipelines will now run on a schedule!
 
-```shell
+```bash
 # Start the Airflow web interface (add `-D` to background)
 meltano invoke airflow webserver
 ```
@@ -386,7 +386,7 @@ files to your project by adding the
 
 <small>Follow the [project initialization instructions above](/#meltano-init) and then...</small>
 
-```shell
+```bash
 # For these examples to work, ensure that
 # Docker has been installed
 docker --version
@@ -401,7 +401,7 @@ docker build --tag meltano-demo-project:dev .
 
 Your `meltano-demo-project:dev` Docker image is now ready for its first container!
 
-```shell
+```bash
 # View Meltano version
 docker run meltano-demo-project:dev --version
 
@@ -426,7 +426,7 @@ docker run \
 
 Your Meltano project can now be continuously delivered to a container registry!
 
-```shell
+```bash
 # For these examples to work, ensure that
 # you have an account on GitLab.com or
 # a self-hosted GitLab instance with
@@ -476,7 +476,7 @@ Once your plugin has been added, it will be ready for [configuration](/#meltano-
 
 <small>Follow the [project initialization instructions above](/#meltano-init) and then...</small>
 
-```shell
+```bash
 # List extractors and loaders known to Meltano
 meltano discover extractors
 meltano discover loaders
@@ -489,7 +489,7 @@ meltano add loader target-snowflake
 meltano add --custom extractor tap-covid-19
 ```
 
-```shell
+```bash
 # Specify namespace, which will serve as the:
 # - prefix for configuration environment variables
 # - identifier to find related/compatible plugins
@@ -553,7 +553,7 @@ control. Sensitive values like passwords and tokens are most appropriately store
 
 <small>Follow the [custom extractor instructions above](/#meltano-add) and then...</small>
 
-```shell
+```bash
 # List all plugin settings with their names,
 # environment variables, and current values
 meltano config tap-covid-19 list
@@ -565,7 +565,7 @@ user_agent [env: TAP_COVID_19_USER_AGENT] current value: None (from default)
 start_date [env: TAP_COVID_19_START_DATE] current value: None (from default)
 ```
 
-```shell
+```bash
 # Store non-sensitive plugin configuration in
 # your project's `meltano.yml` file
 meltano config tap-covid-19 set start_date 2020-01-01T00:00:00Z
@@ -646,7 +646,7 @@ If no rules are defined using `meltano select`, Meltano will fall back on catch-
 
 <small>Follow the [configuration instructions above](/#meltano-config) and then...</small>
 
-```shell
+```bash
 # List all available entities and attributes
 meltano select --list --all tap-covid-19
 

@@ -9,17 +9,17 @@ Before you move on, make sure you have [Node 8.x]((https://nodejs.org/)) or newe
 ## Instructions
 
 1. Clone the project
-```shell
+```bash
 git clone git@gitlab.com:meltano/meltano.git
 ```
 2. Navigate to the `docs/` folder and install all dependencies
 
-```shell
+```bash
 cd meltano/docs/
 npm install
 ```
 3. Build and run
-```shell
+```bash
 npm run dev:docs
 ```
 4. View changes at http://localhost:8080/
@@ -27,7 +27,7 @@ npm run dev:docs
 ## Build Artifacts
 
 To generate static assets for the `docs/` directory, run:
-```shell
+```bash
 npm run build:docs
 ```
 This will add the generated files in the `docs/public` directory.
