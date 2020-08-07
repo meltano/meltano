@@ -10,7 +10,7 @@ Meltano provides a command line interface (CLI) that allows you to manage the co
 
 ## `add`
 
-`meltano add` lets you add plugins (extractors, loaders, transforms, models, dashboards, orchestrators, transforms, and file bundles) to your Meltano project.
+`meltano add` lets you add plugins (extractors, loaders, transforms, models, dashboards, orchestrators, transformers, and file bundles) to your Meltano project.
 
 Specifically, it will:
 1. add the plugin to your project's `meltano.yml` file under `plugins: <type>s:`, e.g. `plugins: extractors:`,
@@ -170,40 +170,41 @@ meltano config meltano list
 
 # List all settings for the specified plugin with their names,
 # environment variables, and current values
-meltano config <plugin_name> list
+meltano config <plugin> list
 
 # View the plugin's current configuration.
-meltano config <plugin_name>
+meltano config <plugin>
 
 # Sets the configuration's setting `<name>` to `<value>`.
-meltano config <plugin_name> set <name> <value>
+meltano config <plugin> set <name> <value>
 
 # Values are parsed as JSON, and interpreted as simple strings when invalid
-meltano config <plugin_name> set <name> <json> # JSON that fits in a single word
-meltano config <plugin_name> set <name> '<json>' # JSON in a string argument
-meltano config <plugin_name> set <name> <string> # String with no meaning in JSON
-meltano config <plugin_name> set <name> '"<string>"' # JSON string
-meltano config <plugin_name> set <name> <number> # JSON number, e.g. 100 or 3.14
-meltano config <plugin_name> set <name> <true/false> # Boolean True or False
-meltano config <plugin_name> set <name> '[<elem1>, <elem2>]' # Array
-meltano config <plugin_name> set <name> '{"<key1>": <value1>, "<key2>": <value2>}' # JSON object
+meltano config <plugin> set <name> <string>             # String with no meaning in JSON
+meltano config <plugin> set <name> "<word> <word> ..."  # Multi-word string with no meaning in JSON
+meltano config <plugin> set <name> <json>               # JSON that fits in a single word
+meltano config <plugin> set <name> '<json>'             # JSON in a string argument
+meltano config <plugin> set <name> '"<string>"'         # JSON string
+meltano config <plugin> set <name> <number>             # JSON number, e.g. 100 or 3.14
+meltano config <plugin> set <name> <true/false>         # Boolean True or False
+meltano config <plugin> set <name> '[<elem>, ...]'      # Array
+meltano config <plugin> set <name> '{"<key>": <value>, ...}' # JSON object
 
 # Remove the configuration's setting `<name>`.
-meltano config <plugin_name> unset <name>
+meltano config <plugin> unset <name>
 
 # Clear the configuration (back to defaults).
-meltano config <plugin_name> reset
+meltano config <plugin> reset
 
 # Set, unset, or reset in a specific location
-meltano config <plugin_name> set --store=meltano_yml <name> <value> # set in `meltano.yml`
-meltano config <plugin_name> unset --store=dotenv <name> # unset in `.env`
-meltano config <plugin_name> reset --store=db # reset in system database
+meltano config <plugin> set --store=meltano_yml <name> <value> # set in `meltano.yml`
+meltano config <plugin> unset --store=dotenv <name> # unset in `.env`
+meltano config <plugin> reset --store=db # reset in system database
 ```
 
 If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
 
 ```bash
-meltano config --plugin-type=<plugin_type> <plugin_name> ...
+meltano config --plugin-type=<type> <plugin> ...
 ```
 
 #### Nested properties
@@ -211,10 +212,10 @@ meltano config --plugin-type=<plugin_type> <plugin_name> ...
 Nested properties can be set (and unset) by specifying a list of property names:
 
 ```bash
-meltano config <plugin_name> set <property> <subproperty> <value>
-meltano config <plugin_name> set <property> <deep> <nesting> <value>
+meltano config <plugin> set <property> <subproperty> <value>
+meltano config <plugin> set <property> <deep> <nesting> <value>
 
-meltano config <plugin_name> unset <property> <subproperty>
+meltano config <plugin> unset <property> <subproperty>
 ```
 
 This will result in the following configuration being passed on to the plugin:
@@ -225,11 +226,11 @@ This will result in the following configuration being passed on to the plugin:
 
 ##### Dot seperator
 
-Note that `meltano config <plugin_name> list` always displays full config keys
+Note that `meltano config <plugin> list` always displays full config keys
 with nesting represented by the `.` seperator, matching the internal flattened representation:
 
 ```bash
-meltano config <plugin_name> list
+meltano config <plugin> list
 # => <property>.<subproperty>
 # => <property>.<deep>.<nesting>
 ```
@@ -238,14 +239,14 @@ You can also set nested properties using the `.` seperator, but specifying a lis
 since this will result in the nesting being reflected in the plugin's `config` object in `meltano.yml`:
 
 ```bash
-meltano config <plugin_name> set <property> <deep> <nesting> <value>
+meltano config <plugin> set <property> <deep> <nesting> <value>
 # `meltano.yml`:
 #  config:
 #    <property>:
 #      <deep>:
 #        <nesting>: <value>
 
-meltano config <plugin_name> set <property>.<deep>.<nesting> <value>
+meltano config <plugin> set <property>.<deep>.<nesting> <value>
 # `meltano.yml`:
 #  config:
 #    <property>.<deep>.<nesting>: <value>
@@ -802,13 +803,13 @@ Invoke the plugin's executable with specified arguments.
 ### How to use
 
 ```bash
-meltano invoke <plugin_name> PLUGIN_ARGS...
+meltano invoke <plugin> PLUGIN_ARGS...
 ```
 
 If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
 
 ```bash
-meltano invoke --plugin-type=<plugin_type> <plugin_name> PLUGIN_ARGS...
+meltano invoke --plugin-type=<type> <plugin> PLUGIN_ARGS...
 ```
 
 ## `schedule`
