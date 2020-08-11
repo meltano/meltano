@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2215](https://gitlab.com/meltano/meltano/-/issues/2215) Have `meltano invoke <plugin> --help` pass `--help` flag to plugin, instead of showing `meltano invoke` help message
+
 ### Breaks
 
 
