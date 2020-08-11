@@ -6,7 +6,11 @@ import os
 from contextlib import contextmanager, suppress, redirect_stderr, redirect_stdout
 from async_generator import asynccontextmanager
 
-from .utils import remove_ansi_escape_sequences, capture_subprocess_output
+from .utils import (
+    OUTPUT_BUFFER_SIZE,
+    remove_ansi_escape_sequences,
+    capture_subprocess_output,
+)
 
 
 class OutputLogger(object):
@@ -189,7 +193,7 @@ class Out(object):
         return self.stream.isatty()
 
     async def read_from_fd(self, read_fd):
-        reader = asyncio.StreamReader()
+        reader = asyncio.StreamReader(limit=OUTPUT_BUFFER_SIZE)
         read_protocol = asyncio.StreamReaderProtocol(reader)
 
         loop = asyncio.get_event_loop()

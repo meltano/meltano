@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2219](https://gitlab.com/meltano/meltano/-/issues/2219) Don't fail on large (record) messages output by extractors (Singer taps) by increasing subprocess output buffer size from 64KB to 1MB.
+
 ### Breaks
 
 

@@ -13,6 +13,7 @@ from .plugin.settings_service import PluginSettingsService
 from .plugin_discovery_service import PluginDiscoveryService
 from .venv_service import VenvService, VirtualEnv
 from .error import Error, SubprocessError
+from .logging.utils import OUTPUT_BUFFER_SIZE
 
 
 def invoker_factory(project, plugin, *args, prepare_with_session=None, **kwargs):
@@ -171,7 +172,10 @@ class PluginInvoker:
                 logging.debug(f"Env: {popen_env}")
 
                 process = await asyncio.create_subprocess_exec(
-                    *popen_args, limit=1024 * 128, **popen_options, env=popen_env
+                    *popen_args,
+                    limit=OUTPUT_BUFFER_SIZE,
+                    **popen_options,
+                    env=popen_env,
                 )
         except SubprocessError as perr:
             logging.error(f"{self.plugin.name} has failed: {str(perr)}")
