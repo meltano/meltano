@@ -1,0 +1,295 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JSON Schema for Meltano",
+  "description": "Meltano is an open source platform for building, running & orchestrating ELT pipelines",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer"
+    },
+    "send_anonymous_usage_stats": {
+      "type": "boolean",
+      "description": "Share anonymous usage data with the Meltano team to help them gauge interest and allocate development time"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "A globally unique project identifier"
+    },
+    "discovery_url": {
+      "type": "string",
+      "description": "URL to remote manifest of Meltano plugins, used by meltano discover. Set to 'false' to disable.",
+      "default": "https://www.meltano.com/discovery.yml"
+    },
+    "plugins": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dashboards": {
+          "type": "array",
+          "items": { "$ref": "#/plugin_definitions/dashboard" }
+        },
+        "extractors": {
+          "type": "array",
+          "items": { "$ref": "#/plugin_definitions/extractor" }
+        },
+        "files": {
+          "type": "array",
+          "items": { "$ref": "#/plugin_definitions/file" }
+        },
+        "loaders": {
+          "type": "array",
+          "items": { "$ref": "#/plugin_definitions/loader" }
+        },
+        "models": {
+          "type": "array",
+          "items": { "$ref": "#/plugin_definitions/model" }
+        },
+        "orchestrators": {
+          "type": "array",
+          "items": { "$ref": "#/plugin_definitions/orchestrator" }
+        },
+        "transformers": {
+          "type": "array",
+          "items": { "$ref": "#/plugin_definitions/transform" }
+        }
+      }
+    },
+    "schedules": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/orchestration_schedule" }
+    }
+  },
+  "definitions": {
+    "base_plugin": {
+      "type": "object",
+      "required": ["name", "pip_url"],
+      "properties": {
+        "docs": {
+          "type": "string",
+          "description": "A URL to the documentation for this plugin"
+        },
+        "executable": {
+          "type": "string",
+          "description": "The plugin's executabele name, as defined in setup.py (if a Python based plugin)",
+          "examples": ["tap-stripe", "tap-covid-19"]
+        },
+        "label": {
+          "type": "string",
+          "description": "A user friendly label describing the plugin",
+          "examples": ["Stripe", "Facebook Ads"]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the plugin",
+          "examples": ["airflow"]
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "pip_url": {
+          "type": "string",
+          "description": "The pip hosted package name or URL",
+          "examples": ["wtforms==2.2.1 apache-airflow==1.10.2"]
+        },
+        "settings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/base_setting"
+          }
+        },
+        "settings_group_validation": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "base_setting": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "A description for what this setting does",
+          "examples": ["The unique account identifier for your Stripe Account"]
+        },
+        "env": {
+          "type": "string",
+          "description": "The environment variable name this setting can be configured with",
+          "examples": ["GITLAB_API_TOKEN", "FACEBOOK_ADS_ACCESS_TOKEN"]
+        },
+        "kind": {
+          "type": "string",
+          "description": "The type of value this setting contains",
+          "enum": [
+            "oauth",
+            "hidden",
+            "password",
+            "date_iso8601",
+            "file",
+            "email",
+            "integer",
+            "options"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "description": "A user friendly label for the setting",
+          "examples": ["Account ID"]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the setting",
+          "examples": ["account_id"]
+        },
+        "placeholder": {
+          "type": "string",
+          "description": "A placeholder value for this setting",
+          "examples": ["Ex. 18161"]
+        },
+        "protected": {
+          "type": "boolean",
+          "description": "A protected setting cannot be changed from the UI",
+          "default": false
+        },
+        "value": {
+          "description": "The default value of this setting if not otherwise defined"
+        }
+      }
+    },
+    "base_settings": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/base_setting" }
+    },
+    "oauth": {
+      "type": "object",
+      "required": ["provider"],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "The name of a Meltano-supported OAuth provider",
+          "examples": ["google-adwords"]
+        }
+      }
+    },
+    "orchestration_schedule": {
+      "type": "object",
+      "required": ["name", "extractor", "loader", "transform", "interval", "start_date"],
+      "description": "https://www.meltano.com/docs/orchestration.html#orchestration",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The schedule's unique name",
+          "examples": ["gitlab-to-jsonl-schedule"]
+        },
+        "extractor": {
+          "type": "string",
+          "description": "The name of the extractor plugin",
+          "examples": ["tap-gitlab"]
+        },
+        "loader": {
+          "type": "string",
+          "description": "The name of the loader plugin",
+          "examples": ["target-jsonl"]
+        },
+        "interval": {
+          "type": "string",
+          "description": "A UNIX cron expression to represent the frequency the scheduled job should execute",
+          "examples": ["@hourly", "@daily", "@weekly"],
+          "pattern": "^(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every (\\d+(ns|us|µs|ms|s|m|h))+)|((((\\d+,)+\\d+|(\\d+(\\\/|-)\\d+)|\\d+|\\*) ?){5,7})$"
+        },
+        "transform": {
+          "type": "string",
+          "description": "Describes if transforms should run, be skipped, or if only transforms should execute (skip extractors and loaders)",
+          "default": "skip",
+          "enum": ["run", "skip", "only"]
+        },
+        "start_date": {
+          "type": "string",
+          "description": "The date when the schedule should first execute",
+          "examples": ["2020-08-06 00:00:00"]
+        }
+      }
+    }
+  },
+  "plugin_definitions": {
+    "dashboard": { "$ref": "#/definitions/base_plugin" },
+    "extractor": {
+      "allOf": [
+        {"$ref": "#/definitions/base_plugin"},
+        {
+          "description": "https://www.meltano.com/plugins/extractors/#extractors-data-sources",
+          "properties": {
+            "capabilities": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "properties",
+                  "catalog",
+                  "discover",
+                  "state"
+                ]
+              }
+            },
+            "metadata": {
+              "type": "object"
+            },
+            "schema": {
+              "type": "object",
+              "default": {},
+              "description": "An object representing override rules for a Singer stream schema"
+            },
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "file": {
+      "allOf": [
+        {"$ref": "#/definitions/base_plugin"},
+        {
+          "properties": {
+            "update": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "loader": { "$ref": "#/definitions/base_plugin" },  
+    "model": { "$ref": "#/definitions/base_plugin" },
+    "orchestrator": {"$ref": "#/definitions/base_plugin"},
+    "transform": {
+      "allOf": [
+        {"$ref": "#/definitions/base_plugin"},
+        {
+          "properties": {
+            "vars": {
+              "type": "object",
+              "default": {},
+              "description": "An object containing dbt model variables",
+              "additionalProperties": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
