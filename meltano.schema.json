@@ -98,10 +98,14 @@
             "$ref": "#/definitions/base_setting"
           }
         },
+        "config": {
+          "type": "object"
+        },
         "settings_group_validation": {
           "type": "array",
           "items": {
             "type": "array",
+            "description": "A set consisting of one valid combination of required setting names",
             "items": {
               "type": "string"
             }
