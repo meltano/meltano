@@ -16,7 +16,9 @@ from meltano.core.error import SubprocessError
 logger = logging.getLogger(__name__)
 
 
-@cli.command(context_settings=dict(ignore_unknown_options=True))
+@cli.command(
+    context_settings=dict(ignore_unknown_options=True, allow_interspersed_args=False)
+)
 @click.option(
     "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
 )
