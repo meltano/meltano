@@ -14,7 +14,7 @@ The Google Analytics extractor pulls raw data from the [Google Analytics Reporti
 In order to access your Google Analytics data, you will need:
 
 - View ID
-- Client Secrets
+- Client Secrets _or_ OAuth Credentials
 - Start Date
 
 <div class="embed-responsive embed-responsive-16by9">
@@ -153,7 +153,6 @@ If you are successful, you should see `Added and installed extractors 'tap-googl
 Required:
 
 ```bash
-export GOOGLE_ANALYTICS_API_CLIENT_SECRETS="client_secrets.json"
 export GOOGLE_ANALYTICS_API_VIEW_ID="YOUR VIEW ID"
 export GOOGLE_ANALYTICS_API_START_DATE="2019-02-01T00:00:00Z"
 ```
@@ -163,6 +162,21 @@ Optional:
 ```bash
 export GOOGLE_ANALYTICS_API_REPORTS="cli_reports.json"
 export GOOGLE_ANALYTICS_API_END_DATE="2019-06-01T00:00:00Z"
+```
+
+If you are authenticating using `client_secrets.json`:
+
+```bash
+export GOOGLE_ANALYTICS_API_CLIENT_SECRETS="client_secrets.json"
+```
+
+If you are authenticating using OAuth credentials:
+
+```bash
+export GOOGLE_ANALYTICS_API_OAUTH_ACCESS_TOKEN="YOUR ACCESS TOKEN"
+export GOOGLE_ANALYTICS_API_OAUTH_REFRESH_TOKEN="YOUR REFRESH TOKEN"
+export GOOGLE_ANALYTICS_API_OAUTH_CLIENT_ID="YOUR CLIENT ID"
+export GOOGLE_ANALYTICS_API_OAUTH_CLIENT_SECRET="YOUR CLIENT SECRET"
 ```
 
 Check the [README](https://gitlab.com/meltano/tap-google-analytics#tap-google-analytics) for details.
