@@ -689,7 +689,7 @@ loaders:
     namespace: target_csv
     hidden: true
     docs: 'https://meltano.com/plugins/loaders/csv.html'
-    pip_url: git+https://gitlab.com/meltano/target-csv.git
+    pip_url: target-csv
     settings:
       - name: delimiter
         kind: options
@@ -713,6 +713,9 @@ loaders:
             value: '"'
         value: "'"
         description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
+      - name: destination_path
+        description: Sets the destination path the CSV is written to
+        value: output
 transformers:
   - name: dbt
     namespace: dbt

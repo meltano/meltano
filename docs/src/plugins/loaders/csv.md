@@ -11,7 +11,7 @@ Comma Separated Values, better known as spreadsheets, are the swiss army knife o
 ## Info
 
 - **Data Warehouse**: CSV Files
-- **Repository**: [https://gitlab.com/meltano/target-csv](https://gitlab.com/meltano/target-csv)
+- **Repository**: [https://github.com/singer-io/target-csv](https://github.com/singer-io/target-csv)
 
 ## Installing from the Meltano UI
 
@@ -34,12 +34,13 @@ If you are successful, you should see `Added and installed loaders 'target-csv'`
 
 ### CLI Configuration
 
-If you want to customize your delimited or quote character, open `meltano.yml` for your desired project and update the configuration there.
+If you want to customize your delimiter, quote character, or destination path, open `meltano.yml` for your desired project and update the configuration there.
 
 ```yaml{1-3}
-- config:
-    delimiter": "\t"
-    quotechar": "'"
-  name: target-csv
-  pip_url: git+https://gitlab.com/meltano/target-csv.git
+- name: target-csv
+  pip_url: git+https://github.com/singer-io/target-csv.git
+  config:
+    delimiter: "\t"
+    quotechar: "'"
+    destination_path: ""
 ```
