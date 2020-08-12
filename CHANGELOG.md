@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2222](https://gitlab.com/meltano/meltano/-/issues/2222) Add OAuth credentials settings to `tap-google-analytics`
+
 ### Changes
 
 ### Fixes

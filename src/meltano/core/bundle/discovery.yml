@@ -350,12 +350,12 @@ extractors:
       - state
     settings_group_validation:
       - ['key_file_location', 'view_id', 'start_date']
+      - ['oauth_credentials.access_token', 'oauth_credentials.refresh_token', 'oauth_credentials.client_id', 'oauth_credentials.client_secret', 'view_id', 'start_date']
     settings:
       - name: view_id
         label: View ID
         placeholder: Ex. 198343027
         env: GOOGLE_ANALYTICS_API_VIEW_ID
-        label: View ID
       - name: key_file_location
         label: Client Secrets
         placeholder: Ex. client_secrets.json
@@ -366,6 +366,22 @@ extractors:
         placeholder: Ex. my_report_definition.json
         kind: hidden
         env: GOOGLE_ANALYTICS_API_REPORTS
+      - name: oauth_credentials.access_token
+        label: OAuth Access Token
+        kind: hidden
+        env: GOOGLE_ANALYTICS_API_OAUTH_ACCESS_TOKEN
+      - name: oauth_credentials.refresh_token
+        label: OAuth Refresh Token
+        kind: hidden
+        env: GOOGLE_ANALYTICS_API_OAUTH_REFRESH_TOKEN
+      - name: oauth_credentials.client_id
+        label: OAuth Client ID
+        kind: hidden
+        env: GOOGLE_ANALYTICS_API_OAUTH_CLIENT_ID
+      - name: oauth_credentials.client_secret
+        label: OAuth Client Secret
+        kind: hidden
+        env: GOOGLE_ANALYTICS_API_OAUTH_CLIENT_SECRET
       - name: start_date
         env: GOOGLE_ANALYTICS_API_START_DATE
         kind: date_iso8601
@@ -463,13 +479,11 @@ extractors:
     settings:
       - name: account_id
         label: Account ID
-        placeholder: Ex. me@my-organization.com
         env: STRIPE_ACCOUNT_ID
         placeholder: Ex. acct_1a2b3c4d5e
       - name: client_secret
         label: Secret API Key
         kind: password
-        placeholder: Ex. *****************
         env: STRIPE_API_KEY
         placeholder: Ex. sk_live_1a2b3c4d5e
       - name: start_date
