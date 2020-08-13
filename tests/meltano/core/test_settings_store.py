@@ -1,3 +1,4 @@
+import builtins
 import pytest
 from unittest import mock
 from contextlib import contextmanager
@@ -9,6 +10,7 @@ from meltano.core.settings_store import (
     StoreNotSupportedError,
     AutoStoreManager,
     MeltanoYmlStoreManager,
+    EnvStoreManager
 )
 
 Store = SettingValueStore
@@ -23,6 +25,7 @@ class DummySettingsService(SettingsService):
             SettingDefinition("regular", aliases=["basic"], value="from_default"),
             SettingDefinition("password", kind="password"),
             SettingDefinition("env_specific", env_specific=True),
+            SettingDefinition("some_file", env_specific=True)
         ]
 
     @property
@@ -368,6 +371,57 @@ class TestAutoStoreManager:
             subject.reset()
 
             assert_value_source("from_dotenv", Store.DOTENV, name="password")
+
+
+class TestEnvStoreManager:
+    @pytest.fixture()
+    def subject(self, dummy_settings_service):
+        manager = EnvStoreManager(dummy_settings_service)
+        return manager
+
+    def test_get(self, subject, dummy_settings_service, monkeypatch):
+        setting_def = subject.settings_service.find_setting("regular")
+
+        # add NAMESPACE_FOO=<some_value>
+        env_var = dummy_settings_service.setting_env(setting_def)
+        monkeypatch.setenv(env_var, "from_env")
+
+        # test standard getter
+        value, metadata = subject.get("regular", setting_def)
+        assert value == "from_env"
+        assert metadata["env_var"] == env_var
+
+        # add NAMESPACE_FOO_FILE=/secrets/some_env
+        env_var_file = dummy_settings_service.setting_env(setting_def, env_from_file=True)
+
+        print("[T] Setting env, ", env_var_file, "=/secrets/some_nonexistant_env")
+        monkeypatch.setenv(env_var_file, "/secrets/some_nonexistant_env")
+
+        # test getting when <ENV>_FILE is set, but file doesn't really exist
+        # expected behavior: default to <ENV> not <ENV>_FILE
+        value, metadata = subject.get("regular", setting_def)
+        assert value == "from_env"
+        assert metadata["env_var"] == env_var
+
+        # mock /secrets/some_nonexistant_env=some_secret_env & test getting
+        mock_open = mock.mock_open(read_data="some_secret_env")
+        with mock.patch("builtins.open", mock_open) as mock_file:
+            value, metadata = subject.get("regular", setting_def)
+            mock_file.assert_called_with("/secrets/some_nonexistant_env", "r")
+            assert value == "some_secret_env"
+            assert metadata["env_var"] == env_var
+
+        # ensure a literal file env var is not mutated
+        file_setting_def = subject.settings_service.find_setting("some_file")
+        file_setting_env = dummy_settings_service.setting_env(file_setting_def)
+        monkeypatch.setenv(file_setting_env, "/some/real/file")
+
+        mock_open = mock.mock_open(read_data="some_secret_env")
+        with mock.patch("builtins.open", mock_open) as mock_file:
+            value, metadata = subject.get("some_file", file_setting_def)
+            assert not mock_file.called
+            assert value == "/some/real/file"
+            assert metadata["env_var"] == file_setting_env
 
 
 class TestMeltanoYmlStoreManager:

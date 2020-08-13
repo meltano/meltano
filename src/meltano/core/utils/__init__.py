@@ -157,8 +157,15 @@ def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
     return flatten_dict.flatten(d, reducer, **kwargs)
 
 
-def setting_env(namespace, setting_name):
-    env_struct = {namespace: {setting_name: "value"}}
+def setting_env(namespace=None, setting_name=None, defined_env=None, env_from_file=False):
+    if defined_env is not None:
+        return defined_env + "_FILE" if env_from_file else defined_env
+
+    if env_from_file == True:
+        env_struct = {namespace: {setting_name: {"file": {"value"}}}}
+    else:
+        env_struct = {namespace: {setting_name: "value"}}
+
     env = flatten(env_struct, "env_var")
     return next(iter(env))  # get key
 

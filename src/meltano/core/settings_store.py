@@ -117,16 +117,34 @@ class ConfigOverrideStoreManager(SettingsStoreManager):
 
 
 class BaseEnvStoreManager(SettingsStoreManager):
+    __env_file_cache = {}
+
     @property
     @abstractmethod
     def env(self):
         pass
 
-    def get(self, name: str, setting_def=None):
+    def get(self, name: str, setting_def=None, is_file_check=False):
         if not setting_def:
             raise StoreNotSupportedError
 
-        env_key = self.setting_env(setting_def)
+        env_key = self.setting_env(setting_def, env_from_file=is_file_check)
+
+        # if there is a <ENV>_FILE, read the value from such file
+        if not is_file_check:
+            env_file_name = self.setting_env(setting_def, env_from_file=True)
+            env_file_value, _ = self.get(name, setting_def, is_file_check=True)
+
+            if env_file_value is not None:
+                try:
+                    if env_file_value not in self.__env_file_cache:
+                        with open(env_file_value, "r") as f:
+                            self.__env_file_cache[env_file_value] = f.read()
+
+                    return self.__env_file_cache[env_file_value], {"env_var": env_key}
+                except EnvironmentError:
+                    pass
+
         env_getters = {
             env_key: lambda env: env[env_key],
             **setting_def.env_alias_getters,
@@ -141,8 +159,8 @@ class BaseEnvStoreManager(SettingsStoreManager):
 
         return None, {}
 
-    def setting_env(self, setting_def):
-        return self.settings_service.setting_env(setting_def)
+    def setting_env(self, setting_def, **kwargs):
+        return self.settings_service.setting_env(setting_def, **kwargs)
 
 
 class EnvStoreManager(BaseEnvStoreManager):
