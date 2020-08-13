@@ -393,8 +393,6 @@ class TestEnvStoreManager:
 
         # add NAMESPACE_FOO_FILE=/secrets/some_env
         env_var_file = dummy_settings_service.setting_env(setting_def, env_from_file=True)
-
-        print("[T] Setting env, ", env_var_file, "=/secrets/some_nonexistant_env")
         monkeypatch.setenv(env_var_file, "/secrets/some_nonexistant_env")
 
         # test getting when <ENV>_FILE is set, but file doesn't really exist
