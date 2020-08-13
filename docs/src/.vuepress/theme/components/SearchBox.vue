@@ -6,7 +6,7 @@
       :value="query"
       :class="{ 'focused': focused }"
       autocomplete="off"
-      spellcheck="false"
+      spellcheck="false"d
       @focus="focused = true"
       @blur="focused = false"
       @keyup.enter="go(focusIndex)"

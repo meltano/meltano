@@ -1,23 +1,21 @@
 <template>
   <header class="navbar">
-    <SidebarButton @toggle-sidebar="$emit('toggle-sidebar')"/>
+    <SidebarButton @toggle-sidebar="$emit('toggle-sidebar')" />
 
-    <router-link
-      :to="$localePath"
-      class="home-link"
-    >
+    <router-link :to="$localePath" class="home-link">
       <img
         class="logo"
         v-if="$site.themeConfig.logo"
         :src="$withBase($site.themeConfig.logo)"
         :alt="$siteTitle"
-      >
+      />
       <span
         ref="siteName"
         class="site-name"
         v-if="$siteTitle"
         :class="{ 'can-hide': $site.themeConfig.logo }"
-      >{{ $siteTitle }}</span>
+        >{{ $siteTitle }}</span
+      >
     </router-link>
 
     <div
@@ -26,62 +24,73 @@
         'max-width': linksWrapMaxWidth + 'px'
       }"
     >
-      <AlgoliaSearchBox
-        v-if="isAlgoliaSearch"
-        :options="algolia"
-      />
-      <SearchBox v-else-if="$site.themeConfig.search !== false"/>
-      <NavLinks class="can-hide"/>
+      <AlgoliaSearchBox v-if="isAlgoliaSearch" :options="algolia" />
+      <SearchBox v-else-if="$site.themeConfig.search !== false" />
+
+      <NavLinks class="can-hide" />
+      <router-link
+        style="margin-left:20px;"
+        to="/docs/installation.html"
+        class="nav-cta"
+      >
+        Install
+      </router-link>
     </div>
   </header>
 </template>
 
 <script>
-import SidebarButton from './SidebarButton.vue'
-import AlgoliaSearchBox from './AlgoliaSearchBox'
-import SearchBox from './SearchBox.vue'
-import NavLinks from './NavLinks.vue'
+import SidebarButton from "./SidebarButton.vue";
+import AlgoliaSearchBox from "./AlgoliaSearchBox";
+import SearchBox from "./SearchBox.vue";
+import NavLinks from "./NavLinks.vue";
 
 export default {
   components: { SidebarButton, NavLinks, SearchBox, AlgoliaSearchBox },
 
-  data () {
+  data() {
     return {
-      linksWrapMaxWidth: null
-    }
+      linksWrapMaxWidth: null,
+    };
   },
 
-  mounted () {
-    const MOBILE_DESKTOP_BREAKPOINT = 719 // refer to config.styl
-    const NAVBAR_VERTICAL_PADDING = parseInt(css(this.$el, 'paddingLeft')) + parseInt(css(this.$el, 'paddingRight'))
+  mounted() {
+    const MOBILE_DESKTOP_BREAKPOINT = 719; // refer to config.styl
+    const NAVBAR_VERTICAL_PADDING =
+      parseInt(css(this.$el, "paddingLeft")) +
+      parseInt(css(this.$el, "paddingRight"));
     const handleLinksWrapWidth = () => {
       if (document.documentElement.clientWidth < MOBILE_DESKTOP_BREAKPOINT) {
-        this.linksWrapMaxWidth = null
+        this.linksWrapMaxWidth = null;
       } else {
-        this.linksWrapMaxWidth = this.$el.offsetWidth - NAVBAR_VERTICAL_PADDING -
-          (this.$refs.siteName && this.$refs.siteName.offsetWidth || 0)
+        this.linksWrapMaxWidth =
+          this.$el.offsetWidth -
+          NAVBAR_VERTICAL_PADDING -
+          ((this.$refs.siteName && this.$refs.siteName.offsetWidth) || 0);
       }
-    }
-    handleLinksWrapWidth()
-    window.addEventListener('resize', handleLinksWrapWidth, false)
+    };
+    handleLinksWrapWidth();
+    window.addEventListener("resize", handleLinksWrapWidth, false);
   },
 
   computed: {
-    algolia () {
-      return this.$themeLocaleConfig.algolia || this.$site.themeConfig.algolia || {}
+    algolia() {
+      return (
+        this.$themeLocaleConfig.algolia || this.$site.themeConfig.algolia || {}
+      );
     },
 
-    isAlgoliaSearch () {
-      return this.algolia && this.algolia.apiKey && this.algolia.indexName
-    }
-  }
-}
+    isAlgoliaSearch() {
+      return this.algolia && this.algolia.apiKey && this.algolia.indexName;
+    },
+  },
+};
 
-function css (el, property) {
+function css(el, property) {
   // NOTE: Known bug, will return 'auto' if style value is 'auto'
-  const win = el.ownerDocument.defaultView
+  const win = el.ownerDocument.defaultView;
   // null means not to return pseudo styles
-  return win.getComputedStyle(el, null)[property]
+  return win.getComputedStyle(el, null)[property];
 }
 </script>
 
@@ -122,6 +131,17 @@ $navbar-horizontal-padding = 1.5rem
       vertical-align top
     .nav-links
       flex 1
+  .nav-cta
+    display: none;
+    background-color: $purpleColor;
+    color: white;
+    padding: 0 0.75rem;
+    border-radius: 5px;
+    margin-right: 1rem;
+
+@media (min-width: $MQTabletCTA)
+  .navbar .nav-cta
+    display: inline-block
 
 @media (max-width: $MQMobile)
   .navbar

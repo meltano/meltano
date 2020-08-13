@@ -6,9 +6,16 @@
     :exact="exact"
   >{{ item.text }}</router-link>
   <a
+    v-else-if="item.disableIcon"
+    :href="link"
+    class="nav-link"
+  >
+    {{ item.text }}
+  </a>
+  <a
     v-else
     :href="link"
-    class="nav-link external"
+    class="nav-link"
     :target="isMailto(link) || isTel(link) ? null : '_blank'"
     :rel="isMailto(link) || isTel(link) ? null : 'noopener noreferrer'"
   >

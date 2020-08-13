@@ -19,17 +19,29 @@
       />
     </div>
 
-    <!-- repo link -->
-    <a
-      v-if="repoLink"
-      :href="repoLink"
-      class="repo-link"
-      target="_blank"
-      rel="noopener noreferrer"
+    <div
+      class="nav-item nav-item--icon"
     >
-      {{ repoLabel }}
-      <OutboundLink/>
-    </a>
+      <a href="https://twitter.com/meltanodata" target="_blank">
+        <TwitterIcon />
+      </a>
+    </div>
+
+    <!-- repo link -->
+    <div
+      class="nav-item nav-item--repo"
+    >
+      <a
+        v-if="repoLink"
+        :href="repoLink"
+        class="repo-link"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {{ repoLabel }}
+        <OutboundLink/>
+      </a>
+    </div>
   </nav>
 </template>
 
@@ -37,9 +49,10 @@
 import DropdownLink from './DropdownLink.vue'
 import { resolveNavLinkItem } from '../util'
 import NavLink from './NavLink.vue'
+import TwitterIcon from '../../components/TwitterIcon'
 
 export default {
-  components: { NavLink, DropdownLink },
+  components: { NavLink, DropdownLink, TwitterIcon },
 
   computed: {
     userNav () {
@@ -119,7 +132,8 @@ export default {
 @import '../styles/config.styl'
 
 .nav-links
-  display inline-block
+  display flex
+  align-items center
   a
     line-height 1.4rem
     color inherit
@@ -132,6 +146,18 @@ export default {
     line-height 2rem
     &:first-child
       margin-left 0
+    &--icon
+      display flex
+      svg
+        margin-top 5px
+    &--repo
+      margin-left 0
+      a
+        display flex
+        align-items center
+      svg
+        margin-left 4px
+        margin-bottom 1px
   .repo-link
     margin-left 1.5rem
 
@@ -144,7 +170,7 @@ export default {
   .nav-links a
     &:hover, &.router-link-active
       color $textColor
-  .nav-item > a:not(.external)
+  .nav-item > a
     &:hover, &.router-link-active
       margin-bottom -2px
       border-bottom 2px solid lighten($accentColor, 8%)
