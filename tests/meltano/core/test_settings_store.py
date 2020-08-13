@@ -408,6 +408,9 @@ class TestEnvStoreManager:
             mock_file.assert_called_with("/secrets/some_nonexistant_env", "r")
             assert value == "some_secret_env"
             assert metadata["env_var"] == env_var
+            assert mock_file.call_count == 1
+            subject.get("regular", setting_def)
+            assert mock_file.call_count == 1
 
         # ensure a literal file env var is not mutated
         file_setting_def = subject.settings_service.find_setting("some_file")
