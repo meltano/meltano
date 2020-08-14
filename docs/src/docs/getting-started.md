@@ -2,10 +2,16 @@
 metaTitle: Getting Started with the Meltano CLI
 description: The Meltano command line interface makes it easy to develop, run, and debug every step of the data analysis lifecycle.
 sidebarDepth: 2
-lastUpdatedSignificantly: 2020-05-07
 ---
 
 # Getting Started
+
+::: tip
+The quickest way to try out Meltano is to follow the [examples on the homepage](/).
+
+They can be copy-pasted right onto your command line, and in a matter of minutes will take you all the way through [installation](/#installation), [integration](/#integration), [transformation](/#transformation), and [orchestration](/#orchestration) with the [`tap-gitlab` extractor](/plugins/extractors/gitlab.html) and [`target-jsonl`](/plugins/loaders/jsonl.html) and [`target-postgres`](/plugins/loaders/postgres.html) loaders.
+
+:::
 
 Once you have successfully [installed Meltano](/docs/installation.html) from the command line, you will need to create a project before you launch the Meltano UI.
 

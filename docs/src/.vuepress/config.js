@@ -120,8 +120,8 @@ module.exports = {
         link: "https://gitlab.com/meltano/meltano"
       },
       {
-        text: "Install",
-        link: "/docs/installation.html",
+        text: "Get started",
+        link: "/docs/getting-started.html",
         cta: true
       }
     ],
