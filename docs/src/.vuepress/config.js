@@ -1,20 +1,25 @@
 const docsSidebar = [
-  "/docs/",
-  "/docs/installation",
-  "/docs/getting-started",
-  "/docs/command-line-interface",
-  "/docs/settings",
-  "/docs/production",
-  "/docs/transforms",
-  "/docs/orchestration",
-  "/docs/analysis",
-  "/tutorials/",
-  "/docs/role-based-access-control",
-  "/docs/architecture",
-  "/docs/contributor-guide",
-  "/docs/getting-help",
-  "/docs/responsible-disclosure",
-  "/handbook/",
+  {
+    collapsable: false,
+    children: [
+      "/docs/",
+      "/docs/installation",
+      "/docs/getting-started",
+      "/docs/command-line-interface",
+      "/docs/settings",
+      "/docs/production",
+      "/docs/transforms",
+      "/docs/orchestration",
+      "/docs/analysis",
+      "/tutorials/",
+      "/docs/role-based-access-control",
+      "/docs/architecture",
+      "/docs/contributor-guide",
+      "/docs/getting-help",
+      "/docs/responsible-disclosure",
+      "/handbook/",
+    ]
+  }
 ];
 
 module.exports = {
@@ -81,12 +86,26 @@ module.exports = {
         text: "Documentation",
         link: "/docs/",
       },
-      { text: "Blog", link: "https://www.meltano.com/blog", disableIcon: true },
+      { text: "Blog", link: "https://www.meltano.com/blog", target: '_self' },
       {
         text: "Newsletter",
         link: "https://meltano.substack.com",
-        disableIcon: true,
+        target: '_self',
       },
+      {
+        text: "Twitter",
+        link: "https://twitter.com/meltanodata",
+        twitter: true
+      },
+      {
+        text: "Repo",
+        link: "https://gitlab.com/meltano/meltano"
+      },
+      {
+        text: "Install",
+        link: "/docs/installation.html",
+        cta: true
+      }
     ],
     sidebar: {
       "/docs": docsSidebar,
@@ -103,8 +122,6 @@ module.exports = {
       ],
     },
     logo: "/meltano-logo.svg",
-    repo: "https://gitlab.com/meltano/meltano",
-    repoLabel: "Repo",
     lastUpdated: "Last Updated",
     docsDir: "src",
     docsRepo: "https://gitlab.com/meltano/meltano",
@@ -120,6 +137,7 @@ module.exports = {
       slackChannelUrl:
         "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw",
     },
+    smoothScroll: true
   },
   plugins: [
     [

@@ -1,8 +1,8 @@
 <template>
-  <div class="home">
+  <main class="home">
     <div class="hero homepage-cta feature-section-wrapper" id="installation">
       <div class="hero-left">
-        <Content slot-key="installation" />
+        <Content class="theme-default-content custom" slot-key="installation" />
 
         <p class="action">
           <NavLink
@@ -22,13 +22,16 @@
       </div>
 
       <div class="hero-right">
-        <Content slot-key="installation-code" />
+        <Content
+          class="theme-default-content custom"
+          slot-key="installation-code"
+        />
       </div>
     </div>
 
     <div class="hero homepage-cta feature-section-wrapper" id="meltano-init">
       <div class="hero-left">
-        <Content slot-key="meltano-init" />
+        <Content class="theme-default-content custom" slot-key="meltano-init" />
 
         <!-- <p class="action">
           <NavLink
@@ -39,13 +42,16 @@
       </div>
 
       <div class="hero-right">
-        <Content slot-key="meltano-init-code" />
+        <Content
+          class="theme-default-content custom"
+          slot-key="meltano-init-code"
+        />
       </div>
     </div>
 
     <div class="hero homepage-cta feature-section-wrapper" id="integration">
       <div class="hero-left">
-        <Content slot-key="integration" />
+        <Content class="theme-default-content custom" slot-key="integration" />
 
         <p class="action">
           <NavLink
@@ -56,13 +62,19 @@
       </div>
 
       <div class="hero-right">
-        <Content slot-key="integration-code" />
+        <Content
+          class="theme-default-content custom"
+          slot-key="integration-code"
+        />
       </div>
     </div>
 
     <div class="hero homepage-cta feature-section-wrapper" id="transformation">
       <div class="hero-left">
-        <Content slot-key="transformation" />
+        <Content
+          class="theme-default-content custom"
+          slot-key="transformation"
+        />
 
         <p class="action">
           <NavLink
@@ -73,13 +85,19 @@
       </div>
 
       <div class="hero-right">
-        <Content slot-key="transformation-code" />
+        <Content
+          class="theme-default-content custom"
+          slot-key="transformation-code"
+        />
       </div>
     </div>
 
     <div class="hero homepage-cta feature-section-wrapper" id="orchestration">
       <div class="hero-left">
-        <Content slot-key="orchestration" />
+        <Content
+          class="theme-default-content custom"
+          slot-key="orchestration"
+        />
 
         <p class="action">
           <NavLink
@@ -90,7 +108,10 @@
       </div>
 
       <div class="hero-right">
-        <Content slot-key="orchestration-code" />
+        <Content
+          class="theme-default-content custom"
+          slot-key="orchestration-code"
+        />
 
         <a
           href="https://airflow.apache.org/docs/stable/ui.html#dags-view"
@@ -110,7 +131,10 @@
       id="containerization"
     >
       <div class="hero-left">
-        <Content slot-key="containerization" />
+        <Content
+          class="theme-default-content custom"
+          slot-key="containerization"
+        />
 
         <p class="action">
           <NavLink
@@ -121,7 +145,10 @@
       </div>
 
       <div class="hero-right">
-        <Content slot-key="containerization-code" />
+        <Content
+          class="theme-default-content"
+          slot-key="containerization-code"
+        />
       </div>
     </div>
 
@@ -132,7 +159,7 @@
         </h2>
 
         <NavLink
-          class="button is-purple is-filled"
+          class="button is-filled"
           :item="$frontmatter.installation.primaryAction"
         />
 
@@ -144,7 +171,7 @@
 
     <div class="hero homepage-cta feature-section-wrapper" id="meltano-add">
       <div class="hero-left">
-        <Content slot-key="meltano-add" />
+        <Content class="theme-default-content custom" slot-key="meltano-add" />
 
         <p class="action">
           <NavLink
@@ -155,13 +182,19 @@
       </div>
 
       <div class="hero-right">
-        <Content slot-key="meltano-add-code" />
+        <Content
+          class="theme-default-content custom"
+          slot-key="meltano-add-code"
+        />
       </div>
     </div>
 
     <div class="hero homepage-cta feature-section-wrapper" id="meltano-config">
       <div class="hero-left">
-        <Content slot-key="meltano-config" />
+        <Content
+          class="theme-default-content custom"
+          slot-key="meltano-config"
+        />
 
         <p class="action">
           <NavLink
@@ -172,13 +205,19 @@
       </div>
 
       <div class="hero-right">
-        <Content slot-key="meltano-config-code" />
+        <Content
+          class="theme-default-content custom"
+          slot-key="meltano-config-code"
+        />
       </div>
     </div>
 
     <div class="hero homepage-cta feature-section-wrapper" id="meltano-select">
       <div class="hero-left">
-        <Content slot-key="meltano-select" />
+        <Content
+          class="theme-default-content custom"
+          slot-key="meltano-select"
+        />
 
         <p class="action">
           <NavLink
@@ -189,7 +228,10 @@
       </div>
 
       <div class="hero-right">
-        <Content slot-key="meltano-select-code" />
+        <Content
+          class="theme-default-content custom"
+          slot-key="meltano-select-code"
+        />
       </div>
     </div>
 
@@ -228,19 +270,17 @@
     </div>
 
     <div class="feature-section-wrapper is-shorter">
-      <div class="content-width-wide">
-        <section class="section">
-          <h2 class="section__title">Subscribe to our newsletter</h2>
-          <p class="section__text">
-            Get the most significant news about Meltano delivered right to your
-            inbox!
-          </p>
+      <section class="section">
+        <h2 class="section__title">Subscribe to our newsletter</h2>
+        <p class="section__text">
+          Get the most significant news about Meltano delivered right to your
+          inbox!
+        </p>
 
-          <a href="https://meltano.substack.com" class="button" target="_blank"
-            >Subscribe</a
-          >
-        </section>
-      </div>
+        <a href="https://meltano.substack.com" class="button" target="_blank"
+          >Subscribe</a
+        >
+      </section>
     </div>
 
     <GlobalFooter
@@ -250,13 +290,15 @@
         >{{ $site.themeConfig.editLinkText }} <OutboundLink
       /></a>
     </GlobalFooter>
-  </div>
+  </main>
 </template>
 
 <script>
-import NavLink from "../components/NavLink.vue";
+import NavLink from "@theme/components/NavLink.vue";
 
 export default {
+  name: 'Home',
+
   components: { NavLink },
 
   computed: {
@@ -268,8 +310,6 @@ export default {
 </script>
 
 <style lang="stylus">
-@import '../styles/config.styl';
-
 .button {
   display: inline-block;
   font-size: 1.2rem;
@@ -282,15 +322,9 @@ export default {
   border: 2px solid $accentColor;
   transition: all 0.2s ease-in;
 
-  l, &:hover, &:focus {
+  l, &:hover, &:focus, &.is-filled {
     color: #fff;
     background-color: $accentColor;
-  }
-
-  &.is-purple.is-filled {
-    background-color: $purpleColor;
-    border-color: $purpleColor;
-    color: white;
   }
 }
 
@@ -424,7 +458,7 @@ export default {
   }
 }
 
-.hero .content {
+.hero .theme-default-content {
   max-width: none !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -485,7 +519,7 @@ export default {
   }
 }
 
-.hero .content {
+.hero .theme-default-content {
   > :first-child {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
@@ -517,20 +551,20 @@ export default {
   }
 }
 
-.hero-right .content ol {
+.hero-right .theme-default-content ol {
   text-align: left;
   padding-left: 1.5rem;
 }
 
 @media (min-width: $MQNarrow) {
-  .hero .content h1 {
+  .hero .theme-default-content h1 {
     font-size: 54px !important;
     text-align: left !important;
     padding-top: 0 !important;
     line-height: 1.2em !important;
   }
 
-  .hero .content h2 {
+  .hero .theme-default-content h2 {
     font-size: 2rem !important;
   }
 
@@ -543,7 +577,7 @@ export default {
     width: 35%;
   }
 
-  .hero-left .content {
+  .hero-left .theme-default-content {
     p, ul, ol {
       padding-right: 80px !important;
       padding-bottom: 10px;
@@ -598,7 +632,7 @@ export default {
     font-size: 1.2rem;
     font-weight: bold;
     color: #fff;
-    background-color: #464ACB;
+    background-color: $accentColor;
     padding: 0.8rem 1.6rem;
     border-radius: 4px;
     transition: background-color 0.2s ease;
@@ -612,20 +646,20 @@ export default {
 
     &.secondary {
       background: none;
-      box-shadow: inset 0 0 0 2px #464ACB;
-      color: #464ACB;
+      box-shadow: inset 0 0 0 2px $accentColor;
+      color: $accentColor;
 
       svg {
-        color: #464ACB;
+        color: $accentColor;
       }
 
       &:hover {
-        background-color: lighten(#464ACB, 80%);
+        background-color: lighten($accentColor, 80%);
       }
     }
 
     &:hover {
-      background-color: lighten(#464ACB, 10%);
+      background-color: $accentHighlightColor;
     }
   }
 
