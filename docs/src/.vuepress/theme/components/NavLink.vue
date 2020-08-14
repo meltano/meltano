@@ -38,7 +38,7 @@ export default {
 
     &:hover, &.router-link-active
       margin-bottom -2px
-      border-bottom 2px solid lighten($accentColor, 8%)
+      border-bottom 2px solid $accentHighlightColor
 
     &.nav-link--icon
       svg
@@ -59,7 +59,7 @@ export default {
         margin-bottom 0
         border-bottom none
 
-        background-color: lighten($accentColor, 10%);
+        background-color $accentHighlightColor
 
 @media (max-width: $MQMobile)
   .nav-links

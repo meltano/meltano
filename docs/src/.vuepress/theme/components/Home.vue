@@ -159,7 +159,7 @@
         </h2>
 
         <NavLink
-          class="button is-purple is-filled"
+          class="button is-filled"
           :item="$frontmatter.installation.primaryAction"
         />
 
@@ -322,15 +322,9 @@ export default {
   border: 2px solid $accentColor;
   transition: all 0.2s ease-in;
 
-  l, &:hover, &:focus {
+  l, &:hover, &:focus, &.is-filled {
     color: #fff;
     background-color: $accentColor;
-  }
-
-  &.is-purple.is-filled {
-    background-color: $purpleColor;
-    border-color: $purpleColor;
-    color: white;
   }
 }
 
@@ -638,7 +632,7 @@ export default {
     font-size: 1.2rem;
     font-weight: bold;
     color: #fff;
-    background-color: #464ACB;
+    background-color: $accentColor;
     padding: 0.8rem 1.6rem;
     border-radius: 4px;
     transition: background-color 0.2s ease;
@@ -652,20 +646,20 @@ export default {
 
     &.secondary {
       background: none;
-      box-shadow: inset 0 0 0 2px #464ACB;
-      color: #464ACB;
+      box-shadow: inset 0 0 0 2px $accentColor;
+      color: $accentColor;
 
       svg {
-        color: #464ACB;
+        color: $accentColor;
       }
 
       &:hover {
-        background-color: lighten(#464ACB, 80%);
+        background-color: lighten($accentColor, 80%);
       }
     }
 
     &:hover {
-      background-color: lighten(#464ACB, 10%);
+      background-color: $accentHighlightColor;
     }
   }
 
