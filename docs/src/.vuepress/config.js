@@ -1,21 +1,40 @@
 const docsSidebar = [
   {
     collapsable: false,
+    sidebarDepth: 2,
     children: [
       "/docs/",
-      "/docs/installation",
       "/docs/getting-started",
-      "/docs/command-line-interface",
-      "/docs/settings",
-      "/docs/production",
+      "/tutorials/",
+    ]
+  },
+  {
+    collapsable: false,
+    sidebarDepth: 2,
+    children: [
+      "/docs/installation",
       "/docs/transforms",
       "/docs/orchestration",
+      "/docs/production",
       "/docs/analysis",
-      "/tutorials/",
+    ]
+  },
+  {
+    collapsable: false,
+    sidebarDepth: 2,
+    children: [
+      "/docs/command-line-interface",
+      "/docs/settings",
       "/docs/role-based-access-control",
       "/docs/architecture",
-      "/docs/contributor-guide",
+    ]
+  },
+  {
+    collapsable: false,
+    sidebarDepth: 2,
+    children: [
       "/docs/getting-help",
+      "/docs/contributor-guide",
       "/docs/responsible-disclosure",
       "/handbook/",
     ]
