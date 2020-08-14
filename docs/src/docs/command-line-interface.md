@@ -22,7 +22,7 @@ Specifically, it will:
 Once the plugin has been added to your project, you can configure it using [`meltano config`](#config),
 invoke its executable using [`meltano invoke`](#invoke), and use it in a pipeline using [`meltano elt`](#elt).
 
-::: info
+::: tip
 Whenever you add a new plugin to a Meltano project, it will be
 installed into your project's `.meltano` directory automatically, as described above.
 
@@ -892,15 +892,11 @@ Most shells parse glob syntax: you must escape the special characters in the sel
 
 ### Exclude Parameter
 
-Use `--exclude` to exclude all attributes that match the filter. Note
+Use `--exclude` to exclude all attributes that match the filter.
 
-::: info
 Attributes that are `automatic` are always included, even if they match an exclude pattern. Only attributes that are `available` can be excluded.
-:::
 
-::: info
 Exclusion has precedence over inclusion. If an attribute is excluded, there is no way to include it back without removing the exclusion pattern first.
-:::
 
 #### Examples
 

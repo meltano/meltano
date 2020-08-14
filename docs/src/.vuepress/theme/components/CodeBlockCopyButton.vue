@@ -14,7 +14,7 @@ export default {
   right: 8px;
   width: 24px;
   height: 24px;
-  content: url(../public/copy-to-clipboard-icon.svg);
+  content: url(../../public/copy-to-clipboard-icon.svg);
   background-color: #282c34;
   transition: transform 0.2s;
   user-select: none;

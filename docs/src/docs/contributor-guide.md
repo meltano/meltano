@@ -411,7 +411,7 @@ This will kick off a Cypress application that will allow you to run tests as des
 
 ![Preview of Cypres app running](/images/cypress-tests/cypTest-01.png)
 
-::: info
+::: tip INFO
 In the near future, all tests can flow automatically; but there are some complications that require manual triggering due to an inability to read pipeline completion.
 :::
 
