@@ -43,6 +43,8 @@ import {
   faPlus,
   faProjectDiagram,
   faQuestionCircle,
+  faSignInAlt,
+  faSignOutAlt,
   faSync,
   faSearch,
   faSort,
@@ -112,6 +114,8 @@ export default {
     library.add(faQuestionCircle)
     library.add(faSync)
     library.add(faSearch)
+    library.add(faSignInAlt)
+    library.add(faSignOutAlt)
     library.add(faSort)
     library.add(faSortAmountDown)
     library.add(faSortAmountUp)

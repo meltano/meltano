@@ -7,8 +7,7 @@ import poller from '@/utils/poller'
 import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
-  extractorInFocusConfiguration: {},
-  loaderInFocusConfiguration: {},
+  pluginInFocusConfiguration: {},
   pipelinePollers: [],
   pipelines: []
 })
@@ -18,19 +17,18 @@ const getters = {
     return state.pipelines.length > 0
   },
 
-  getHasPipelineWithExtractor(_, getters) {
-    return extractorName => {
-      return Boolean(getters.getPipelineWithExtractor(extractorName))
-    }
+  getHasPipelineWithPlugin(_, getters) {
+    return (pluginType, pluginName) =>
+      Boolean(getters.getPipelineWithPlugin(pluginType, pluginName))
   },
 
   getHasValidConfigSettings(_, getters) {
     return (configSettings, settingsGroupValidation = null) => {
       return settingsGroupValidation
         ? getters.getHasGroupValidationConfigSettings(
-          configSettings,
-          settingsGroupValidation
-        )
+            configSettings,
+            settingsGroupValidation
+          )
         : getters.getHasDefaultValidationConfigSettings(configSettings)
     }
   },
@@ -64,16 +62,14 @@ const getters = {
     }
   },
 
-  getPipelineWithExtractor(state) {
-    return extractor => {
-      return state.pipelines.find(pipeline => pipeline.extractor === extractor)
-    }
+  getPipelineWithPlugin(state) {
+    return (pluginType, pluginName) =>
+      state.pipelines.find(pipeline => pipeline[pluginType] === pluginName)
   },
-  
-  getPipelinesWithExtractor(state) {
-    return extractor => {
-      return state.pipelines.filter(pipeline => pipeline.extractor === extractor)
-    }
+
+  getPipelinesWithPlugin(state) {
+    return (pluginType, pluginName) =>
+      state.pipelines.filter(pipeline => pipeline[pluginType] === pluginName)
   },
 
   getRunningPipelines(state) {
@@ -96,7 +92,10 @@ const getters = {
 
   lastUpdatedDate(_, getters) {
     return extractor => {
-      const pipelineExtractor = getters.getPipelineWithExtractor(extractor)
+      const pipelineExtractor = getters.getPipelineWithPlugin(
+        'extractor',
+        extractor
+      )
 
       if (!pipelineExtractor) {
         return ''
@@ -105,14 +104,17 @@ const getters = {
       return pipelineExtractor.endedAt
         ? utils.formatDateStringYYYYMMDD(pipelineExtractor.endedAt)
         : pipelineExtractor.isRunning
-          ? 'Updating...'
-          : ''
+        ? 'Updating...'
+        : ''
     }
   },
 
   startDate(_, getters) {
     return extractor => {
-      const pipelineExtractor = getters.getPipelineWithExtractor(extractor)
+      const pipelineExtractor = getters.getPipelineWithPlugin(
+        'extractor',
+        extractor
+      )
 
       return pipelineExtractor ? pipelineExtractor.startDate : ''
     }
@@ -142,19 +144,6 @@ const actions = {
     })
   },
 
-  getExtractorConfiguration({ commit, dispatch, state }, extractor) {
-    return dispatch('getPluginConfiguration', {
-      name: extractor,
-      type: 'extractors'
-    }).then(response => {
-      commit('setInFocusConfiguration', {
-        configuration: response.data,
-        target: 'extractorInFocusConfiguration'
-      })
-      return state.extractorInFocusConfiguration
-    })
-  },
-
   getJobLog(_, jobId) {
     return orchestrationsApi.getJobLog({ jobId })
   },
@@ -180,6 +169,16 @@ const actions = {
 
   getPluginConfiguration(_, pluginPayload) {
     return orchestrationsApi.getPluginConfiguration(pluginPayload)
+  },
+
+  getAndFocusOnPluginConfiguration({ commit, dispatch, state }, payload) {
+    return dispatch('getPluginConfiguration', payload).then(response => {
+      commit('setInFocusConfiguration', {
+        configuration: response.data,
+        target: 'pluginInFocusConfiguration'
+      })
+      return state.pluginInFocusConfiguration
+    })
   },
 
   getPolledPipelineJobStatus({ commit, getters, state }) {
@@ -236,11 +235,8 @@ const actions = {
     return Promise.all(pollersUponQueued)
   },
 
-  resetExtractorInFocusConfiguration: ({ commit }) =>
-    commit('reset', 'extractorInFocusConfiguration'),
-
-  resetLoaderInFocusConfiguration: ({ commit }) =>
-    commit('reset', 'loaderInFocusConfiguration'),
+  resetPluginInFocusConfiguration: ({ commit }) =>
+    commit('reset', 'pluginInFocusConfiguration'),
 
   run({ commit, dispatch }, pipeline) {
     commit('setPipelineStatus', {

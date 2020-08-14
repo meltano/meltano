@@ -9,7 +9,7 @@ description: Use Meltano to load raw data from numerous sources into Postgres, S
 
 Meltano currently supports the following loader destinations:
 
-The following loaders are currently [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box on the [CLI](/#meltano-add):
+The following loaders are currently [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box on the [CLI](/docs/command-line-interface.html#add) and [UI](/docs/analysis.html#set-up-meltano):
 
 - [Comma Separated Values (CSV) file](/plugins/loaders/csv.html)
 - [JSON Lines (JSON) file](/plugins/loaders/jsonl.html)

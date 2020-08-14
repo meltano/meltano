@@ -603,6 +603,50 @@ extractors:
       - name: database
         label: Database Name
 loaders:
+  - name: target-csv
+    label: CSV
+    description: CSV loader
+    namespace: target_csv
+    docs: 'https://meltano.com/plugins/loaders/csv.html'
+    pip_url: git+https://gitlab.com/meltano/target-csv.git
+    settings:
+      - name: delimiter
+        kind: options
+        options:
+          - label: Comma (,)
+            value: ','
+          - label: Tab (  )
+            value: '\t'
+          - label: Semi-colon (;)
+            value: ';'
+          - label: Pipes (|)
+            value: '|'
+        value: ','
+        description: A one-character string used to separate fields. It defaults to a comma (,).
+      - name: quotechar
+        kind: options
+        options:
+          - label: Single Quote (')
+            value: "'"
+          - label: Double Quote (")
+            value: '"'
+        value: "'"
+        description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
+  - name: target-jsonl
+    label: JSONL
+    description: JSONL loader
+    namespace: target_jsonl
+    docs: https://meltano.com/plugins/loaders/jsonl.html 
+    pip_url: target-jsonl
+    settings:
+      - name: destination_path
+        description: Directory to write the resulting .jsonl files to
+        value: output
+      - name: do_timestamp_file
+        kind: boolean
+        label: Include timestamp in file names
+        description: Specifies if the file should get timestamped
+        value: false
   - name: target-postgres
     label: PostgreSQL
     description: PostgreSQL database loader
@@ -640,20 +684,6 @@ loaders:
       - name: schema
         env: PG_SCHEMA
         value: $MELTANO_EXTRACTOR_NAMESPACE
-  - name: target-jsonl
-    label: JSONL
-    description: JSONL loader
-    namespace: target_jsonl
-    docs: https://github.com/andyh1203/target-jsonl
-    pip_url: target-jsonl
-    settings:
-      - name: destination_path
-        description: Directory to write the resulting .jsonl files to
-        value: output
-      - name: do_timestamp_file
-        label: Include timestamp in file names
-        description: Specifies if the file should get timestamped
-        value: false
   - name: target-snowflake
     label: Snowflake
     description: Snowflake database loader
@@ -695,41 +725,6 @@ loaders:
         label: Database Name
         description: '"warehouse" is the default name of the SQLite loader database generated at the project root. Feel free to rename it.'
         value: warehouse
-
-  # Hidden loaders:
-  - name: target-csv
-    label: CSV
-    description: CSV loader
-    namespace: target_csv
-    hidden: true
-    docs: 'https://meltano.com/plugins/loaders/csv.html'
-    pip_url: target-csv
-    settings:
-      - name: delimiter
-        kind: options
-        options:
-          - label: Comma (,)
-            value: ','
-          - label: Tab (  )
-            value: '\t'
-          - label: Semi-colon (;)
-            value: ';'
-          - label: Pipes (|)
-            value: '|'
-        value: ','
-        description: A one-character string used to separate fields. It defaults to a comma (,).
-      - name: quotechar
-        kind: options
-        options:
-          - label: Single Quote (')
-            value: "'"
-          - label: Double Quote (")
-            value: '"'
-        value: "'"
-        description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
-      - name: destination_path
-        description: Sets the destination path the CSV is written to
-        value: output
 transformers:
   - name: dbt
     namespace: dbt

@@ -4,7 +4,10 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'ExploreList',
   computed: {
-    ...mapGetters('plugins', ['getIsPluginInstalled', 'installedExtractors'])
+    ...mapGetters('plugins', ['installedPluginsOfType']),
+    installedExtractors() {
+      return this.installedPluginsOfType('extractors')
+    }
   },
   methods: {
     goToExplore(extractor) {

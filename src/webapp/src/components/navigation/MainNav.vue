@@ -149,9 +149,27 @@ export default {
             }"
           >
             <span class="icon is-small" :class="getIconColor('/extractors')">
-              <font-awesome-icon icon="database"></font-awesome-icon>
+              <font-awesome-icon icon="sign-out-alt"></font-awesome-icon>
             </span>
             <span>Extractors</span>
+          </a>
+        </router-link>
+
+        <router-link
+          :to="{ name: 'loaders' }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/loaders') }"
+          class="navbar-item navbar-child has-text-weight-semibold"
+        >
+          <a
+            class="button has-background-transparent is-borderless is-paddingless"
+            :class="{
+              'has-text-interactive-navigation': getIsSubRouteOf('/loaders')
+            }"
+          >
+            <span class="icon is-small" :class="getIconColor('/loaders')">
+              <font-awesome-icon icon="sign-in-alt"></font-awesome-icon>
+            </span>
+            <span>Loaders</span>
           </a>
         </router-link>
 
