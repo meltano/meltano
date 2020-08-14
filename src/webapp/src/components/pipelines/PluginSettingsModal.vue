@@ -10,11 +10,17 @@ import ConnectorSettingsDropdown from '@/components/pipelines/ConnectorSettingsD
 import utils from '@/utils/utils'
 
 export default {
-  name: 'ExtractorSettingsModal',
+  name: 'PluginSettingsModal',
   components: {
     ConnectorLogo,
     ConnectorSettings,
     ConnectorSettingsDropdown
+  },
+  props: {
+    pluginType: {
+      type: String,
+      required: true
+    }
   },
   data() {
     return {
@@ -31,32 +37,39 @@ export default {
       'getIsInstallingPlugin'
     ]),
     ...mapGetters('orchestration', [
-      'getHasPipelineWithExtractor',
-      'getHasValidConfigSettings',
-      'getPipelineWithExtractor'
+      'getHasPipelineWithPlugin',
+      'getHasValidConfigSettings'
     ]),
-    ...mapState('orchestration', ['extractorInFocusConfiguration']),
-    ...mapState('plugins', ['installedPlugins']),
+    ...mapState('orchestration', ['pluginInFocusConfiguration']),
 
     currentProfile() {
       return this.localConfiguration.profiles[
         this.localConfiguration.profileInFocusIndex
       ]
     },
-    extractorLacksConfigSettings() {
+    getHasPipeline() {
+      return this.getHasPipelineWithPlugin(
+        this.singularizedType,
+        this.plugin.name
+      )
+    },
+    pluginLacksConfigSettings() {
       return (
         this.localConfiguration.settings &&
         this.localConfiguration.settings.length === 0
       )
     },
-    extractor() {
-      return this.getInstalledPlugin('extractors', this.extractorName)
+    plugin() {
+      return this.getInstalledPlugin(this.pluginType, this.pluginName)
     },
     isInstalled() {
-      return this.getIsPluginInstalled('extractors', this.extractorName)
+      return this.getIsPluginInstalled(this.pluginType, this.pluginName)
     },
     isInstalling() {
-      return this.getIsInstallingPlugin('extractors', this.extractorName)
+      return this.getIsInstallingPlugin(this.pluginType, this.pluginName)
+    },
+    isLoader() {
+      return this.pluginType === 'loaders'
     },
     isLoadingConfigSettings() {
       return !Object.prototype.hasOwnProperty.call(
@@ -76,18 +89,27 @@ export default {
       }
       const isValid = this.getHasValidConfigSettings(
         configSettings,
-        this.extractor.settingsGroupValidation
+        this.plugin.settingsGroupValidation
       )
       return this.isInstalled && isValid
+    },
+    pluginName() {
+      return this.$route.params.plugin
     },
     requiredSettingsKeys() {
       return utils.requiredConnectorSettingsKeys(
         this.localConfiguration.settings,
-        this.extractor.settingsGroupValidation
+        this.plugin.settingsGroupValidation
       )
     },
+    singularizedType() {
+      return utils.singularize(this.pluginType)
+    },
+    singularizedTitledType() {
+      return utils.titleCase(this.singularizedType)
+    },
     submittedProfiles() {
-      if (this.extractor.name === 'tap-gitlab') {
+      if (this.plugin.name === 'tap-gitlab') {
         return this.localConfiguration.profiles.map(profile => {
           if (profile.config.hasOwnProperty('source')) {
             delete profile.config.source
@@ -101,33 +123,19 @@ export default {
     }
   },
   created() {
-    this.extractorName = this.$route.params.extractor
-    const needsInstallation = this.extractor.name !== this.extractorName
-    const addConfig = {
-      pluginType: 'extractors',
-      name: this.extractorName
-    }
-
-    const uponPlugin = needsInstallation
-      ? this.addPlugin(addConfig).then(() => {
-          this.$store.dispatch('plugins/getInstalledPlugins')
-          this.getExtractorConfiguration().then(
-            this.createEditableConfiguration
-          )
-          this.installPlugin(addConfig).then(this.tryAutoAdvance)
-        })
-      : this.getExtractorConfiguration().then(() => {
-          this.createEditableConfiguration()
-          this.tryAutoAdvance()
-        })
-
-    uponPlugin.catch(err => {
-      this.$error.handle(err)
-      this.close()
-    })
+    this.getPluginConfiguration()
+      .then(() => {
+        this.createEditableConfiguration()
+        this.tryAutoAdvance()
+      })
+      .catch(err => {
+        Vue.toasted.global.error(`Plugin ${this.pluginName} is not installed`)
+        this.close()
+        this.$error.handle(err)
+      })
   },
   beforeDestroy() {
-    this.$store.dispatch('orchestration/resetExtractorInFocusConfiguration')
+    this.$store.dispatch('orchestration/resetPluginInFocusConfiguration')
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
@@ -136,23 +144,23 @@ export default {
       'testPluginConfiguration'
     ]),
     tryAutoAdvance() {
-      if (this.extractorLacksConfigSettings) {
+      if (this.pluginLacksConfigSettings) {
         this.save()
       }
     },
     close() {
-      this.$router.push({ name: 'extractors' })
+      this.$router.push({ name: this.pluginType })
     },
     createEditableConfiguration() {
       this.localConfiguration = Object.assign(
         { profileInFocusIndex: 0 },
-        lodash.cloneDeep(this.extractorInFocusConfiguration)
+        lodash.cloneDeep(this.pluginInFocusConfiguration)
       )
     },
-    getExtractorConfiguration() {
+    getPluginConfiguration() {
       return this.$store.dispatch(
-        'orchestration/getExtractorConfiguration',
-        this.extractorName
+        'orchestration/getAndFocusOnPluginConfiguration',
+        { type: this.pluginType, name: this.pluginName }
       )
     },
     onChangeUploadFormData(uploadFormData) {
@@ -164,9 +172,9 @@ export default {
       // 1. Prepare conditional upload as response is needed to properly save config settings
       let uponConditionalUpload = this.uploadFormData
         ? this.$store.dispatch('orchestration/uploadPluginConfigurationFile', {
-            name: this.extractor.name,
+            name: this.plugin.name,
             profileName: this.currentProfile.name,
-            type: 'extractors',
+            type: this.pluginType,
             payload: this.uploadFormData
           })
         : Promise.resolve()
@@ -181,14 +189,14 @@ export default {
 
         // 3. Save config settings
         this.savePluginConfiguration({
-          name: this.extractor.name,
-          type: 'extractors',
+          name: this.plugin.name,
+          type: this.pluginType,
           profiles: this.submittedProfiles
         })
           .then(() => {
-            const message = this.extractorLacksConfigSettings
-              ? `No configuration needed for ${this.extractor.name}`
-              : `Configuration saved - ${this.extractor.name}`
+            const message = this.pluginLacksConfigSettings
+              ? `No configuration needed for ${this.plugin.name}`
+              : `Configuration saved - ${this.plugin.name}`
             Vue.toasted.global.success(message)
             this.close()
           })
@@ -204,9 +212,9 @@ export default {
       // 1. Prepare conditional upload as response is needed to properly save config settings
       let uponConditionalUpload = this.uploadFormData
         ? this.$store.dispatch('orchestration/uploadPluginConfigurationFile', {
-            name: this.extractor.name,
+            name: this.plugin.name,
             profileName: this.currentProfile.name,
-            type: 'extractors',
+            type: this.pluginType,
             payload: { ...this.uploadFormData, tmp: true }
           })
         : Promise.resolve()
@@ -221,8 +229,8 @@ export default {
 
         // 3. Save config settings
         this.testPluginConfiguration({
-          name: this.extractor.name,
-          type: 'extractors',
+          name: this.plugin.name,
+          type: this.pluginType,
           payload: {
             profile: this.currentProfile.name,
             config: this.currentProfile.config
@@ -231,11 +239,15 @@ export default {
           .then(response => {
             if (response.data.isSuccess) {
               Vue.toasted.global.success(
-                `Valid Extractor Connection - ${this.extractor.name}`
+                `Valid ${this.singularizedTitledType} Connection - ${
+                  this.plugin.name
+                }`
               )
             } else {
               Vue.toasted.global.error(
-                `Invalid Extractor Connection - ${this.extractor.name}`
+                `Invalid ${this.singularizedTitledType} Connection - ${
+                  this.plugin.name
+                }`
               )
             }
           })
@@ -244,9 +256,9 @@ export default {
               return this.$store.dispatch(
                 'orchestration/deleteUploadedPluginConfigurationFile',
                 {
-                  name: this.extractor.name,
+                  name: this.plugin.name,
                   profileName: this.currentProfile.name,
-                  type: 'extractors',
+                  type: this.pluginType,
                   payload: {
                     ...this.uploadFormData,
                     file: null,
@@ -266,23 +278,30 @@ export default {
 <template>
   <div class="modal is-active" @keyup.esc="close">
     <div class="modal-background" @click="close"></div>
-    <div :class="{ 'modal-card': true, 'is-wide': !!extractor.docs }">
+    <div :class="{ 'modal-card': true, 'is-wide': !!plugin.docs }">
       <header class="modal-card-head">
         <div class="modal-card-head-image image is-64x64 level-item">
-          <ConnectorLogo :connector="extractorName" />
+          <ConnectorLogo :connector="pluginName" />
         </div>
         <p class="modal-card-title">
-          {{ extractor.label || extractor.name }} Extractor Configuration
+          {{ plugin.label || plugin.name }}
+          {{ singularizedTitledType }} Configuration
         </p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body is-overflow-y-scroll">
         <progress
-          v-if="isLoadingConfigSettings || extractorLacksConfigSettings"
+          v-if="isLoadingConfigSettings || pluginLacksConfigSettings"
           class="progress is-small is-info"
         ></progress>
 
         <template v-if="!isLoadingConfigSettings">
+          <div v-if="plugin.signupUrl" class="mb1r">
+            <p>
+              This plugin requires an account. If you don't have one, you can
+              <a :href="plugin.signupUrl" target="_blank">sign up here</a>.
+            </p>
+          </div>
           <!--
             TEMP ConnectorSettingsDropdown removal from UI.
             Conditional removal so existing users with 2+ profiles already created still can access them
@@ -290,23 +309,22 @@ export default {
           -->
           <template v-if="localConfiguration.profiles.length > 1">
             <ConnectorSettingsDropdown
-              v-if="!extractorLacksConfigSettings"
-              :connector="extractor"
-              plugin-type="extractors"
+              v-if="!pluginLacksConfigSettings"
+              :connector="plugin"
+              :plugin-type="pluginType"
               :config-settings="localConfiguration"
             ></ConnectorSettingsDropdown>
           </template>
-
           <ConnectorSettings
-            v-if="!extractorLacksConfigSettings"
+            v-if="!pluginLacksConfigSettings"
             field-class="is-small"
             :config-settings="localConfiguration"
-            :plugin="extractor"
+            :plugin="plugin"
             :required-settings-keys="requiredSettingsKeys"
             :upload-form-data="uploadFormData"
-            :is-show-docs="!!extractor.docs"
+            :is-show-docs="!!plugin.docs"
             :is-show-config-warning="
-              getHasPipelineWithExtractor(extractor.name)
+              getHasPipeline && pluginType === 'extractors'
             "
             @onChangeUploadFormData="onChangeUploadFormData"
           />
@@ -318,8 +336,13 @@ export default {
           <div class="control">
             <button
               class="button"
-              :class="{ 'is-loading': isTesting }"
-              :disabled="!isSaveable || isTesting || isSaving"
+              :class="{
+                'is-loading': isTesting,
+                tooltip: isLoader,
+                'is-tooltip-top': isLoader
+              }"
+              :disabled="!isSaveable || isTesting || isSaving || isLoader"
+              data-tooltip="Not available for loaders"
               @click="testConnection"
             >
               Test Connection

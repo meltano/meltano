@@ -73,9 +73,12 @@ export default {
     this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
       this.isLoaded = true
 
-      const { extractor } = this.$route.query
+      const { extractor, loader } = this.$route.query
       if (extractor) {
         this.pipeline.extractor = extractor
+      }
+      if (loader) {
+        this.pipeline.loader = loader
       }
     })
   },
@@ -175,10 +178,9 @@ export default {
                 </select>
               </span>
             </div>
-            <!-- Uncomment when #2071 ready -->
-            <!-- <router-link to="loaders" class="has-text-underlined">
+            <router-link :to="{ name: 'loaders' }" class="has-text-underlined">
               Manage loaders
-            </router-link> -->
+            </router-link>
           </div>
           <div class="column is-half">
             <small class="has-text-interactive-navigation">Step 3</small>
@@ -236,7 +238,9 @@ export default {
         </div>
       </section>
       <footer class="modal-card-foot buttons is-right">
-        <router-link class="button" :to="{ name: 'pipelines' }">Cancel</router-link>
+        <router-link class="button" :to="{ name: 'pipelines' }"
+          >Cancel</router-link
+        >
         <button
           class="button is-interactive-primary"
           :disabled="isSaving || !isSaveable"

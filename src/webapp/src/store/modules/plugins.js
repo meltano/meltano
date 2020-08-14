@@ -26,11 +26,12 @@ const defaultState = utils.deepFreeze({
 })
 
 const getters = {
-  availableExtractors(state) {
-    return pluginUtils.filterAvailablePlugins({
-      installedPlugins: state.installedPlugins.extractors,
-      pluginList: state.plugins.extractors
-    })
+  availablePluginsOfType(state) {
+    return pluginType =>
+      pluginUtils.filterAvailablePlugins({
+        installedPlugins: state.installedPlugins[pluginType],
+        pluginList: state.plugins[pluginType]
+      })
   },
 
   getHasDefaultTransforms(state) {
@@ -87,13 +88,12 @@ const getters = {
 
   getIsPluginInstalled(state) {
     return (pluginType, pluginName) =>
-      state.installedPlugins[pluginType]
-        ? Boolean(
-            state.installedPlugins[pluginType].find(
-              item => item.name === pluginName
-            )
-          )
-        : false
+      state.installedPlugins[pluginType] &&
+      Boolean(
+        state.installedPlugins[pluginType].find(
+          item => item.name === pluginName
+        )
+      )
   },
 
   getPluginLabel(state) {
@@ -131,8 +131,8 @@ const getters = {
     }
   },
 
-  installedExtractors(state) {
-    return state.installedPlugins.extractors || []
+  installedPluginsOfType(state) {
+    return type => state.installedPlugins[type] || []
   }
 }
 

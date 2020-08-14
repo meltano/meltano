@@ -1,14 +1,21 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import utils from '@/utils/utils'
 
-import ExtractorList from '@/components/pipelines/ExtractorList'
+import PluginList from '@/components/pipelines/PluginList'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
-  name: 'Extractors',
+  name: 'Plugins',
   components: {
-    ExtractorList,
+    PluginList,
     RouterViewLayout
+  },
+  props: {
+    pluginType: {
+      type: String,
+      required: true
+    }
   },
   data() {
     return {
@@ -16,12 +23,27 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('plugins', ['availableExtractors', 'installedExtractors']),
+    ...mapGetters('plugins', [
+      'availablePluginsOfType',
+      'installedPluginsOfType'
+    ]),
+    availablePlugins() {
+      return this.availablePluginsOfType(this.pluginType)
+    },
+    installedPlugins() {
+      return this.installedPluginsOfType(this.pluginType)
+    },
     getModalName() {
       return this.$route.name
     },
+    getTitle() {
+      return utils.titleCase(this.pluginType)
+    },
     isModal() {
       return this.$route.meta.isModal
+    },
+    singularizedType() {
+      return utils.singularize(this.pluginType)
     }
   },
   created() {
@@ -41,7 +63,7 @@ export default {
 <template>
   <router-view-layout>
     <div class="container view-body is-widescreen">
-      <h2 id="data" class="title">Extractors</h2>
+      <h2 id="data" class="title">{{ getTitle }}</h2>
 
       <div class="columns">
         <div class="column">
@@ -51,13 +73,19 @@ export default {
               class="progress is-small is-info"
             ></progress>
             <template v-else>
-              <template v-if="installedExtractors.length">
+              <template v-if="installedPlugins.length">
                 <h3 class="title">Installed</h3>
-                <ExtractorList :items="installedExtractors" />
+                <PluginList
+                  :items="installedPlugins"
+                  :plugin-type="pluginType"
+                />
               </template>
-              <template v-if="availableExtractors.length">
+              <template v-if="availablePlugins.length">
                 <h3 class="title">Available</h3>
-                <ExtractorList :items="availableExtractors" />
+                <PluginList
+                  :items="availablePlugins"
+                  :plugin-type="pluginType"
+                />
               </template>
               <hr />
               <div class="columns is-vcentered">
@@ -74,19 +102,23 @@ export default {
                       <div class="content">
                         <p>
                           <span class="has-text-weight-bold"
-                            >Don't see your extractor here?</span
+                            >Don't see your {{ singularizedType }} here?</span
                           >
                           <br />
                           <small>
-                            Additional extractors are available when using the
-                            command line interface. You can also easily add any
-                            existing Singer tap as a custom extractor or create
-                            your own from scratch.
+                            Additional {{ pluginType }} are available when using
+                            the command line interface. You can also easily add
+                            any existing Singer
+                            {{ pluginType === 'extractors' ? 'tap' : 'target' }}
+                            as a custom {{ singularizedType }} or create your
+                            own from scratch.
                           </small>
                         </p>
                         <div class="buttons">
                           <a
-                            href="https://www.meltano.com/plugins/extractors/"
+                            :href="
+                              `https://www.meltano.com/plugins/${pluginType}/`
+                            "
                             target="_blank"
                             class="button is-interactive-primary"
                             >Learn More</a

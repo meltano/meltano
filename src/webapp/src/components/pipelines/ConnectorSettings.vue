@@ -391,7 +391,7 @@ export default {
             </ul>
           </div>
         </article>
-        <form>
+        <form @submit.prevent>
           <div
             v-for="setting in computedSettings"
             :key="setting.name"

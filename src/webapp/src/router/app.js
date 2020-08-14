@@ -2,16 +2,16 @@ import Router from 'vue-router'
 
 import Design from '@/components/analyze/Design'
 import Explore from '@/components/analyze/Explore'
-import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModal'
 import CreatePipelineScheduleModal from '@/components/pipelines/CreatePipelineScheduleModal'
 import LogModal from '@/components/pipelines/LogModal'
+import PluginSettingsModal from '@/components/pipelines/PluginSettingsModal'
 
 import Analyze from '@/views/Analyze'
-import Extractors from '@/views/Extractors'
 import Dashboard from '@/views/Dashboard'
 import Dashboards from '@/views/Dashboards'
 import NotFound from '@/views/NotFound'
 import Pipelines from '@/views/Pipelines'
+import Plugins from '@/views/Plugins'
 
 const router = new Router({
   mode: 'history',
@@ -31,18 +31,41 @@ const router = new Router({
     {
       path: '/extractors/',
       name: 'extractors',
-      component: Extractors,
+      component: Plugins,
+      props: { pluginType: 'extractors' },
       children: [
         {
-          path: ':extractor',
+          path: ':plugin',
           name: 'extractorSettings',
           components: {
-            default: Extractors,
-            extractorSettings: ExtractorSettingsModal
+            default: Plugins,
+            extractorSettings: PluginSettingsModal
           },
+          props: { extractorSettings: { pluginType: 'extractors' } },
           meta: {
             isModal: true,
             title: 'Meltano: Data Extractor Configuration'
+          }
+        }
+      ]
+    },
+    {
+      path: '/loaders/',
+      name: 'loaders',
+      component: Plugins,
+      props: { pluginType: 'loaders' },
+      children: [
+        {
+          path: ':plugin',
+          name: 'loaderSettings',
+          components: {
+            default: Plugins,
+            loaderSettings: PluginSettingsModal
+          },
+          props: { loaderSettings: { pluginType: 'loaders' } },
+          meta: {
+            isModal: true,
+            title: 'Meltano: Data Loader Configuration'
           }
         }
       ]

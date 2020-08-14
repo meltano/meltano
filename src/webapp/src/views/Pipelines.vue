@@ -28,6 +28,11 @@ export default {
         this.installedPlugins.extractors.length
       )
     },
+    hasLoaders() {
+      return (
+        this.installedPlugins.loaders && this.installedPlugins.loaders.length
+      )
+    },
     isModal() {
       return this.$route.meta.isModal
     }
@@ -78,16 +83,28 @@ export default {
               <p>
                 No pipelines have been set up yet.
                 <router-link
-                  v-if="hasExtractors"
+                  v-if="hasExtractors && hasLoaders"
                   :to="{
                     name: 'createPipelineSchedule'
                   }"
                 >
                   Create one now
                 </router-link>
-                <router-link v-else to="extractors"
-                  >Add an extractor</router-link
-                >
+                <span v-else>
+                  Add
+                  <span v-if="!hasExtractors">
+                    an
+                    <router-link to="extractors">extractor</router-link>
+                  </span>
+                  <span v-if="!hasLoaders">
+                    <span v-if="!hasExtractors">
+                      and
+                    </span>
+                    a
+                    <router-link to="loaders">loader</router-link>
+                  </span>
+                  first.
+                </span>
               </p>
             </div>
           </div>
