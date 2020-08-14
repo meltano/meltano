@@ -25,7 +25,6 @@ const docsSidebar = [
     children: [
       "/docs/command-line-interface",
       "/docs/settings",
-      "/docs/role-based-access-control",
       "/docs/architecture",
     ]
   },
