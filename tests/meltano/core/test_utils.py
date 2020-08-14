@@ -49,11 +49,13 @@ def test_pop_at_path():
     pop_at_path(subject, "a.e")
     assert subject == {}
 
+
 def test_setting_env():
     assert setting_env("namespace", "env") == "NAMESPACE_ENV"
     assert setting_env("namespace", "env", env_from_file=True) == "NAMESPACE_ENV_FILE"
     assert setting_env(defined_env="FOO_BAR", env_from_file=False) == "FOO_BAR"
     assert setting_env(defined_env="FOO_BAR", env_from_file=True) == "FOO_BAR_FILE"
+
 
 def test_set_at_path():
     subject = {}
@@ -75,4 +77,3 @@ def test_set_at_path():
 
     set_at_path(subject, ["a", "d.e"], "value")
     assert subject == {"a": {"b": {"c": "value"}, "d.e": "value"}}
-

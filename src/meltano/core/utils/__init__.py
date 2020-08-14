@@ -157,7 +157,9 @@ def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
     return flatten_dict.flatten(d, reducer, **kwargs)
 
 
-def setting_env(namespace=None, setting_name=None, defined_env=None, env_from_file=False):
+def setting_env(
+    namespace=None, setting_name=None, defined_env=None, env_from_file=False
+):
     if defined_env is not None:
         return defined_env + "_FILE" if env_from_file else defined_env
 

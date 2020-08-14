@@ -10,7 +10,7 @@ from meltano.core.settings_store import (
     StoreNotSupportedError,
     AutoStoreManager,
     MeltanoYmlStoreManager,
-    EnvStoreManager
+    EnvStoreManager,
 )
 
 Store = SettingValueStore
@@ -25,7 +25,7 @@ class DummySettingsService(SettingsService):
             SettingDefinition("regular", aliases=["basic"], value="from_default"),
             SettingDefinition("password", kind="password"),
             SettingDefinition("env_specific", env_specific=True),
-            SettingDefinition("some_file", env_specific=True)
+            SettingDefinition("some_file", env_specific=True),
         ]
 
     @property
@@ -392,7 +392,9 @@ class TestEnvStoreManager:
         assert metadata["env_var"] == env_var
 
         # add NAMESPACE_FOO_FILE=/secrets/some_env
-        env_var_file = dummy_settings_service.setting_env(setting_def, env_from_file=True)
+        env_var_file = dummy_settings_service.setting_env(
+            setting_def, env_from_file=True
+        )
         monkeypatch.setenv(env_var_file, "/secrets/some_nonexistant_env")
 
         # test getting when <ENV>_FILE is set, but file doesn't really exist
