@@ -132,6 +132,7 @@ export default {
 .page-edit
   padding-top 0
   padding-bottom 0
+  margin-bottom: 1rem;
 
   .inner
     line-height 2rem
@@ -146,6 +147,10 @@ export default {
 
     .prefix
       color #888
+
+.page-nav
+  padding-top 0 !important
+  margin-top 1rem !important
 
 @media (max-width: $MQMobile)
   .page-edit
