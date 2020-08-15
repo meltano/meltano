@@ -1,9 +1,9 @@
 ---
 metaTitle: Introduction to Meltano
-description: Learn where to use Meltano, how Meltano is built, and where to get started. 
+description: Learn where to use Meltano, how Meltano is built, and where to get started.
 ---
 
-# What Is Meltano?
+# Introduction
 
 Meltano is an [open source](https://gitlab.com/meltano/meltano) platform for
 building, running & orchestrating ELT pipelines built out of
