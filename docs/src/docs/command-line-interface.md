@@ -4,7 +4,7 @@ description: The Meltano command line interface makes it easy to develop, run, a
 sidebarDepth: 2
 ---
 
-# Command Line Interface
+# CLI reference
 
 Meltano provides a command line interface (CLI) that allows you to manage the configuration and orchestration of Meltano projects. It provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run, and debug every step of the data life cycle.
 

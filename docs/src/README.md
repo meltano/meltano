@@ -5,8 +5,8 @@ metaTitle: "Meltano: open source data pipelines"
 description: Meltano is an open source platform for building, running & orchestrating ELT pipelines built out of Singer taps and targets and dbt models, that you can run locally or easily deploy in production. Our goal is to make the power of data integration available to all by building a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
 installation:
   primaryAction:
-    text: Install now
-    link: /docs/installation.html
+    text: Get started
+    link: /docs/getting-started.html
 integration:
   primaryAction:
     text: Learn more about `meltano elt`

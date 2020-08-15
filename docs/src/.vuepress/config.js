@@ -1,21 +1,39 @@
 const docsSidebar = [
   {
     collapsable: false,
+    sidebarDepth: 2,
     children: [
       "/docs/",
-      "/docs/installation",
       "/docs/getting-started",
-      "/docs/command-line-interface",
-      "/docs/settings",
-      "/docs/production",
+      "/tutorials/",
+    ]
+  },
+  {
+    collapsable: false,
+    sidebarDepth: 2,
+    children: [
+      "/docs/installation",
       "/docs/transforms",
       "/docs/orchestration",
+      "/docs/production",
       "/docs/analysis",
-      "/tutorials/",
-      "/docs/role-based-access-control",
+    ]
+  },
+  {
+    collapsable: false,
+    sidebarDepth: 2,
+    children: [
+      "/docs/command-line-interface",
+      "/docs/settings",
       "/docs/architecture",
-      "/docs/contributor-guide",
+    ]
+  },
+  {
+    collapsable: false,
+    sidebarDepth: 2,
+    children: [
       "/docs/getting-help",
+      "/docs/contributor-guide",
       "/docs/responsible-disclosure",
       "/handbook/",
     ]
@@ -102,8 +120,8 @@ module.exports = {
         link: "https://gitlab.com/meltano/meltano"
       },
       {
-        text: "Install",
-        link: "/docs/installation.html",
+        text: "Get started",
+        link: "/docs/getting-started.html",
         cta: true
       }
     ],
