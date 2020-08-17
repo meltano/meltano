@@ -29,7 +29,7 @@ We have decided to focus on the following personas and use cases, in order of pr
    - They want to have the option of using a web-based UI to monitor (and possibly manage) their pipelines.
    - Meltano can learn from their experience and provide tooling and documentation to make it easier for them and new users to manage and deploy Singer-based data pipelines and build and maintain new and existing Singer taps and targets.
 
-2. Data engineers or one-person data teams new to open source data pipelines
+2. Data engineers or one-person data teams new to open source ELT
    - They may have come across Singer already, but haven't run Singer taps and targets in production yet.
    - Initially, they are primarily interested in using existing taps and targets instead of writing and maintaining their own, but if they run into issues, they would be comfortable attempting to fix bugs themselves and contributing the fixes upstream.
    - Later, they would not want to be limited by existing taps and targets and will want to learn how to build and maintain their own.
