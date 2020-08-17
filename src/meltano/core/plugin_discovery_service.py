@@ -6,8 +6,7 @@ import logging
 import shutil
 import re
 from copy import deepcopy
-from typing import Dict, Iterator, Optional
-from itertools import groupby, chain
+from typing import Dict, Iterable, Optional
 
 import meltano.core.bundle as bundle
 from .project_settings_service import ProjectSettingsService
@@ -217,44 +216,52 @@ class PluginDiscoveryService(Versioned):
     def cached_discovery_file(self):
         return self.project.meltano_dir("cache", "discovery.yml")
 
-    def plugins(self) -> Iterator[Plugin]:
-        discovery_plugins = (
-            plugin
-            for plugin_type in PluginType
-            for plugin in self.discovery[plugin_type]
-        )
+    def get_discovery_plugins_of_type(self, plugin_type):
+        return self.discovery[plugin_type]
 
-        yield from self.custom_plugins()
-        yield from discovery_plugins
-
-    def custom_plugins(self) -> Iterator[Plugin]:
-        # some plugins in the Meltano file might be custom, thus they
-        # serve both as `PluginInstall` and `Plugin`
-        custom_plugin_type_defs = (
-            (custom_plugin.type, custom_plugin.canonical())
-            for custom_plugin in self.config_service.plugins()
-            if custom_plugin.is_custom()
-        )
-
-        custom_plugins = (
-            Plugin(
+    def get_custom_plugins_of_type(self, plugin_type):
+        def custom_plugin_def(plugin_install):
+            custom_plugin_def = plugin_install.canonical()
+            return Plugin(
                 plugin_type,
                 custom_plugin_def.pop("name"),
                 custom_plugin_def.pop("namespace"),
                 **custom_plugin_def,
             )
-            for plugin_type, custom_plugin_def in custom_plugin_type_defs
-        )
 
-        yield from custom_plugins
+        # some plugins in the Meltano file might be custom, thus they
+        # serve both as `PluginInstall` and `Plugin`
+        return [
+            custom_plugin_def(plugin_install)
+            for plugin_install in self.config_service.get_plugins_of_type(plugin_type)
+            if plugin_install.is_custom()
+        ]
+
+    def get_plugins_of_type(self, plugin_type):
+        return self.get_custom_plugins_of_type(
+            plugin_type
+        ) + self.get_discovery_plugins_of_type(plugin_type)
+
+    def plugins_by_type(self):
+        return {
+            plugin_type: self.get_plugins_of_type(plugin_type)
+            for plugin_type in PluginType
+        }
+
+    def plugins(self) -> Iterable[PluginInstall]:
+        yield from (
+            plugin
+            for plugin_type, plugins in self.plugins_by_type().items()
+            for plugin in plugins
+        )
 
     def find_plugin(self, plugin_type: PluginType, plugin_name: str):
         name, _ = PluginRef.parse_name(plugin_name)
         try:
             return next(
                 plugin
-                for plugin in self.plugins()
-                if (plugin.type == plugin_type and plugin.name == name)
+                for plugin in self.get_plugins_of_type(plugin_type)
+                if plugin.name == name
             )
         except StopIteration:
             raise PluginNotFoundError(name)
@@ -263,8 +270,8 @@ class PluginDiscoveryService(Versioned):
         try:
             return next(
                 plugin
-                for plugin in self.plugins()
-                if (plugin.type == plugin_type and plugin.namespace == namespace)
+                for plugin in self.get_plugins_of_type(plugin_type)
+                if plugin.namespace == namespace
             )
         except StopIteration as stop:
             raise PluginNotFoundError(namespace) from stop
@@ -274,12 +281,6 @@ class PluginDiscoveryService(Versioned):
         enabled_plugin_types = [plugin_type] if plugin_type else list(PluginType)
 
         return {
-            plugin_type: [p.name for p in plugins]
-            for plugin_type, plugins in groupby(self.plugins(), lambda p: p.type)
-            if plugin_type in enabled_plugin_types
+            plugin_type: [p.name for p in self.get_plugins_of_type(plugin_type)]
+            for plugin_type in enabled_plugin_types
         }
-
-    def list_discovery(self, discovery):
-        return "\n".join(
-            plugin.name for plugin in self.plugins() if plugin.type == discovery
-        )

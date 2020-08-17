@@ -23,6 +23,8 @@ def discover(project, plugin_type):
     discover_service = PluginDiscoveryService(project)
     if plugin_type == "all":
         plugin_type = None
+    else:
+        plugin_type = PluginType.from_cli_argument(plugin_type)
 
     discovery_dict = discover_service.discover(plugin_type)
 

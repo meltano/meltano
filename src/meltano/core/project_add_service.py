@@ -5,7 +5,7 @@ import logging
 from typing import List
 
 from .project import Project
-from .plugin import PluginType, PluginInstall, PluginRef
+from .plugin import PluginType, Plugin, PluginInstall, PluginRef
 from .plugin_discovery_service import PluginDiscoveryService
 from .plugin.factory import plugin_factory
 from .config_service import ConfigService, PluginAlreadyAddedException
@@ -37,6 +37,13 @@ class ProjectAddService:
         installed = plugin.as_installed()
         return self.config_service.add_to_file(installed)
 
+    def add_custom(
+        self, plugin_type: PluginType, plugin_name: str, namespace: str, **kwargs
+    ) -> PluginInstall:
+        plugin = Plugin(plugin_type, plugin_name, namespace, **kwargs)
+        installed = plugin.as_installed(custom=True)
+        return self.config_service.add_to_file(installed)
+
     def add_related(
         self,
         target_plugin: PluginInstall,
@@ -58,8 +65,9 @@ class ProjectAddService:
         )
         related_plugins.extend(
             plugin
-            for plugin in self.discovery_service.plugins()
-            if plugin.namespace == plugin_def.namespace and plugin.type in plugin_types
+            for plugin_type in plugin_types
+            for plugin in self.discovery_service.get_plugins_of_type(plugin_type)
+            if plugin.namespace == plugin_def.namespace
         )
 
         added_plugins = []

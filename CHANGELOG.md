@@ -19,6 +19,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2268](https://gitlab.com/meltano/meltano/-/issues/2268) Fix bug causing custom plugins not to show up in `meltano discover` and have "Unknown" label in UI
+
 ### Breaks
 
 

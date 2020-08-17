@@ -1,4 +1,3 @@
-from itertools import groupby
 from flask import request, jsonify, g
 
 from meltano.core.error import PluginInstallError
@@ -31,20 +30,20 @@ def _handle(ex):
 def all():
     project = Project.find()
     discovery = PluginDiscoveryService(project)
-    ordered_plugins = {}
 
-    for type, plugins in groupby(discovery.plugins(), key=lambda p: p.type):
-        canonical_plugins = []
-        for plugin in plugins:
-            canonical_plugin = plugin.canonical()
+    def canonical_plugin(plugin):
+        canonical_plugin = plugin.canonical()
 
-            # let's remove all the settings related data
-            canonical_plugin.pop("settings", None)
-            canonical_plugin.pop("settings_group_validation", None)
+        # let's remove all the settings related data
+        canonical_plugin.pop("settings", None)
+        canonical_plugin.pop("settings_group_validation", None)
 
-            canonical_plugins.append(canonical_plugin)
+        return canonical_plugin
 
-        ordered_plugins[type] = canonical_plugins
+    ordered_plugins = {
+        plugin_type: [canonical_plugin(plugin) for plugin in plugins]
+        for plugin_type, plugins in discovery.plugins_by_type().items()
+    }
 
     return jsonify(ordered_plugins)
 
@@ -59,23 +58,25 @@ def installed():
     project = Project.find()
     config = ConfigService(project)
     discovery = PluginDiscoveryService(project)
-    installed_plugins = {}
 
-    # merge definitions
-    for plugin in sorted(config.plugins(), key=lambda x: x.name):
+    def canonical_plugin(plugin):
         try:
             definition = discovery.find_plugin(plugin.type, plugin.name)
-            merged_plugin_definition = {**definition.canonical(), **plugin.canonical()}
+            canonical_plugin = {**definition.canonical(), **plugin.canonical()}
         except PluginNotFoundError:
-            merged_plugin_definition = {**plugin.canonical()}
+            canonical_plugin = {**plugin.canonical()}
 
-        merged_plugin_definition.pop("settings", None)
-        merged_plugin_definition.pop("select", None)
+        canonical_plugin.pop("settings", None)
+        canonical_plugin.pop("select", None)
 
-        if not plugin.type in installed_plugins:
-            installed_plugins[plugin.type] = []
+        return canonical_plugin
 
-        installed_plugins[plugin.type].append(merged_plugin_definition)
+    installed_plugins = {
+        plugin_type: [
+            canonical_plugin(plugin) for plugin in sorted(plugins, key=lambda x: x.name)
+        ]
+        for plugin_type, plugins in config.plugins_by_type().items()
+    }
 
     return jsonify({**project.meltano.canonical(), "plugins": installed_plugins})
 

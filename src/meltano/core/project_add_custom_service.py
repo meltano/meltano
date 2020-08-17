@@ -6,17 +6,12 @@ import click
 import re
 
 from .project import Project
-from .plugin import PluginType, Plugin
-from .plugin.factory import plugin_factory
-from .config_service import ConfigService
+from .plugin import PluginType
+from .project_add_service import ProjectAddService
 from .utils import setting_env
 
 
-class ProjectAddCustomService:
-    def __init__(self, project: Project, config_service: ConfigService = None):
-        self.project = project
-        self.config_service = config_service or ConfigService(project)
-
+class ProjectAddCustomService(ProjectAddService):
     def add(self, plugin_type: PluginType, plugin_name: str):
         click.secho(
             f"Adding new custom {plugin_type.descriptor} with name '{plugin_name}'...",
@@ -137,10 +132,10 @@ class ProjectAddCustomService:
                 value_proc=lambda value: [c.strip() for c in value.split(",")],
             )
 
-        plugin = Plugin(
+        return self.add_custom(
             plugin_type,
             plugin_name,
-            namespace,
+            namespace=namespace,
             pip_url=pip_url,
             executable=executable,
             capabilities=capabilities,
@@ -148,9 +143,3 @@ class ProjectAddCustomService:
                 {"name": name, "env": setting_env(namespace, name)} for name in settings
             ],
         )
-
-        installed = plugin.as_installed(custom=True)
-        return self.config_service.add_to_file(installed)
-
-    def add_related(self, *args, **kwargs):
-        return []
