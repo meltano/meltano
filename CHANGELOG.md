@@ -9,8 +9,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-- [#2071](https://gitlab.com/meltano/meltano/-/issues/2071) Add new "Loaders" page to UI
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.45.0 - (2020-08-17)
+---
+
+### New
+
+- [#2071](https://gitlab.com/meltano/meltano/-/issues/2071) Add new "Loaders" page to UI
 - [#2222](https://gitlab.com/meltano/meltano/-/issues/2222) Add OAuth credentials settings to `tap-google-analytics`
 
 ### Changes
@@ -20,8 +32,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#2268](https://gitlab.com/meltano/meltano/-/issues/2268) Fix bug causing custom plugins not to show up in `meltano discover` and have "Unknown" label in UI
-
-### Breaks
 
 
 ## 1.44.0 - (2020-08-11)
