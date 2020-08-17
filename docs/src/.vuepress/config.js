@@ -110,14 +110,14 @@ module.exports = {
       },
       { text: "Blog", link: "https://www.meltano.com/blog", target: '_self' },
       {
-        text: "Newsletter",
-        link: "https://meltano.substack.com",
-        target: '_self',
+        text: "Join us on Slack",
+        link: "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw",
+        icon: "SlackIcon"
       },
       {
-        text: "Twitter",
+        text: "Follow us on Twitter",
         link: "https://twitter.com/meltanodata",
-        twitter: true
+        icon: "TwitterIcon"
       },
       {
         text: "Repo",
