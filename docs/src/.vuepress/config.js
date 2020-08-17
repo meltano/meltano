@@ -104,20 +104,25 @@ module.exports = {
         text: "Documentation",
         link: "/docs/",
       },
+      {
+        text: "Getting Help",
+        link: "/docs/getting-help",
+      },
       { text: "Blog", link: "https://www.meltano.com/blog", target: '_self' },
       {
-        text: "Newsletter",
-        link: "https://meltano.substack.com",
-        target: '_self',
+        text: "Join us on Slack",
+        link: "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw",
+        icon: "SlackIcon"
       },
       {
-        text: "Twitter",
+        text: "Follow us on Twitter",
         link: "https://twitter.com/meltanodata",
-        twitter: true
+        icon: "TwitterIcon"
       },
       {
-        text: "Repo",
-        link: "https://gitlab.com/meltano/meltano"
+        text: "Repository on GitLab",
+        link: "https://gitlab.com/meltano/meltano",
+        icon: "GitLabIcon"
       },
       {
         text: "Get started",
@@ -139,7 +144,7 @@ module.exports = {
         "/handbook/product/",
       ],
     },
-    logo: "/meltano-logo.svg",
+    logo: "/meltano-logo-with-text.svg",
     lastUpdated: "Last Updated",
     docsDir: "src",
     docsRepo: "https://gitlab.com/meltano/meltano",

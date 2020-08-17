@@ -6,11 +6,7 @@ contentOutdated: false
 
 # Getting Help
 
-We would love to help, and you can reach us anytime at `hello@meltano.com`.
-
-## Feedback / Bugs
-
-If you ran into a bug or other problem or have any kind of feedback, you can:
+If you have a question about Meltano, are having trouble getting it to work, ran into a bug or other problem, or have any kind of feedback, you can:
 
 1. Check out the [Meltano issue tracker][issues] to see if someone else has already reported the same issue or made the same request. Feel free to weigh in with extra information, or just to make sure the issue gets the attention it deserves.
 2. Join the <SlackChannelLink>Meltano Slack workspace</SlackChannelLink>, which is frequented by the team and the rest of the community. You can ask any questions you may have in here, or just chat with fellow users.

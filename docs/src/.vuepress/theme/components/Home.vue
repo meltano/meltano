@@ -9,15 +9,18 @@
             class="action-button"
             :item="$frontmatter.installation.primaryAction"
           />
-          <SlackChannelLink class="action-button secondary"
-            >Join us on Slack</SlackChannelLink
-          >
+          <SlackChannelLink class="action-button secondary">
+            <SlackIcon /> Join us on Slack
+          </SlackChannelLink>
           <a
             class="action-button secondary"
             href="https://gitlab.com/meltano/meltano"
             target="_blank"
-            >Show me the code!</a
           >
+            <GitLabIcon />
+            Show me the code!
+            <OutboundLink />
+          </a>
         </p>
       </div>
 
@@ -205,13 +208,13 @@
           :href="$site.themeConfig.data.slackChannelUrl"
           class="button"
           target="_blank"
-          >Slack</a
+          ><SlackIcon /> Slack</a
         >
         <a href="https://meltano.com/blog/" class="button" target="_blank"
           >Blog</a
         >
         <a href="https://twitter.com/meltanodata" class="button" target="_blank"
-          >Twitter</a
+          ><TwitterIcon /> Twitter</a
         >
         <a href="https://www.youtube.com/meltano" class="button" target="_blank"
           >YouTube</a
@@ -220,7 +223,7 @@
           href="https://gitlab.com/meltano/meltano"
           class="button"
           target="_blank"
-          >Repo</a
+          ><GitLabIcon /> Repo</a
         >
 
         <p class="description ta-c">
@@ -286,6 +289,10 @@ export default {
   l, &:hover, &:focus, &.is-filled {
     color: #fff;
     background-color: $accentColor;
+  }
+
+  svg {
+    vertical-align: text-top
   }
 }
 
@@ -603,6 +610,10 @@ export default {
 
     svg {
       color: #fff;
+
+      &:not(.outbound) {
+        vertical-align: text-top;
+      }
     }
 
     &.secondary {
