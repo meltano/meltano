@@ -143,7 +143,7 @@ module.exports = {
         "/handbook/product/",
       ],
     },
-    logo: "/meltano-logo.svg",
+    logo: "/meltano-logo-with-text.svg",
     lastUpdated: "Last Updated",
     docsDir: "src",
     docsRepo: "https://gitlab.com/meltano/meltano",
