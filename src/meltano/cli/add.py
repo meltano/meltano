@@ -40,13 +40,15 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
         ):
             raise CliError(f"--custom is not supported for {ctx.invoked_subcommand}")
 
-        add_service = ProjectAddCustomService(project, config_service=config_service)
+        add_service_class = ProjectAddCustomService
     else:
-        add_service = ProjectAddService(
-            project,
-            plugin_discovery_service=discovery_service,
-            config_service=config_service,
-        )
+        add_service_class = ProjectAddService
+
+    add_service = add_service_class(
+        project,
+        plugin_discovery_service=discovery_service,
+        config_service=config_service,
+    )
 
     plugins = [
         add_plugin(project, plugin_type, plugin_name, add_service=add_service)

@@ -105,8 +105,8 @@ class ConfigService:
         try:
             return next(
                 plugin
-                for plugin in self.plugins()
-                if (plugin.type == plugin_type and plugin.namespace == namespace)
+                for plugin in self.get_plugins_of_type(plugin_type)
+                if plugin.namespace == namespace
             )
         except StopIteration as stop:
             raise PluginMissingError(namespace) from stop
@@ -122,6 +122,19 @@ class ConfigService:
 
     def get_plugins_of_type(self, plugin_type):
         return self.project.meltano.plugins[plugin_type]
+
+    def plugins_by_type(self):
+        return {
+            plugin_type: self.get_plugins_of_type(plugin_type)
+            for plugin_type in PluginType
+        }
+
+    def plugins(self) -> Iterable[PluginInstall]:
+        yield from (
+            plugin
+            for plugin_type, plugins in self.plugins_by_type().items()
+            for plugin in plugins
+        )
 
     def get_extractors(self):
         return self.get_plugins_of_type(PluginType.EXTRACTORS)
@@ -156,10 +169,3 @@ class ConfigService:
             meltano.plugins[plugin.type][idx] = plugin
 
             return outdated
-
-    def plugins(self) -> Iterable[PluginInstall]:
-        yield from (
-            plugin
-            for plugin_type in PluginType
-            for plugin in self.project.meltano.plugins[plugin_type]
-        )

@@ -10,7 +10,7 @@ from unittest import mock
 import meltano.core.bundle as bundle
 
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.plugin import PluginType
+from meltano.core.plugin import PluginType, Plugin
 from meltano.core.plugin_discovery_service import (
     DiscoveryFile,
     PluginDiscoveryService,
@@ -36,6 +36,20 @@ def discovery_url_mock(subject):
         m.get(subject.discovery_url, status_code=418)
 
         yield
+
+
+@pytest.fixture(scope="class")
+def tap_covid_19(project_add_service):
+    try:
+        return project_add_service.add_custom(
+            PluginType.EXTRACTORS,
+            "tap-covid-19",
+            namespace="tap-covid_19",
+            pip_url="tap-covid-19",
+            executable="tap-covid-19",
+        )
+    except PluginAlreadyAddedException as err:
+        return err.plugin
 
 
 @pytest.mark.usefixtures("discovery_url_mock")
@@ -95,6 +109,10 @@ class TestPluginDiscoveryService:
 
             assert plugin_type in discovery
             assert sorted(discovery[plugin_type]) == sorted(plugin_names)
+
+    def test_discovery_custom(self, subject, tap_covid_19):
+        discovery = subject.discover()
+        assert "tap-covid-19" in discovery[PluginType.EXTRACTORS]
 
 
 class TestPluginDiscoveryServiceDiscoveryManifest:

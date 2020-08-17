@@ -200,11 +200,8 @@ class MeltanoAnalysisFileParser:
             index_file.write(json.dumps(indices))
 
     def parse_packages(self):
-
         discovery = PluginDiscoveryService(self.project)
-        model_plugins = [
-            plugin for plugin in discovery.plugins() if plugin.type is PluginType.MODELS
-        ]
+        model_plugins = discovery.get_plugins_of_type(PluginType.MODELS)
 
         for package in self.packages():
             if not package.topics and package.tables:
