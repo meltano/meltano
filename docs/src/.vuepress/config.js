@@ -104,6 +104,10 @@ module.exports = {
         text: "Documentation",
         link: "/docs/",
       },
+      {
+        text: "Getting Help",
+        link: "/docs/getting-help",
+      },
       { text: "Blog", link: "https://www.meltano.com/blog", target: '_self' },
       {
         text: "Newsletter",
