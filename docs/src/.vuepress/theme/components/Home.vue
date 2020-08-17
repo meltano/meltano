@@ -2,7 +2,7 @@
   <main class="home">
     <div class="hero homepage-cta feature-section-wrapper" id="installation">
       <div class="hero-left">
-        <Content class="theme-default-content custom" slot-key="installation" />
+        <Content class="theme-default-content" slot-key="installation" />
 
         <p class="action">
           <NavLink
@@ -22,16 +22,13 @@
       </div>
 
       <div class="hero-right">
-        <Content
-          class="theme-default-content custom"
-          slot-key="installation-code"
-        />
+        <Content class="theme-default-content" slot-key="installation-code" />
       </div>
     </div>
 
     <div class="hero homepage-cta feature-section-wrapper" id="meltano-init">
       <div class="hero-left">
-        <Content class="theme-default-content custom" slot-key="meltano-init" />
+        <Content class="theme-default-content" slot-key="meltano-init" />
 
         <!-- <p class="action">
           <NavLink
@@ -42,16 +39,13 @@
       </div>
 
       <div class="hero-right">
-        <Content
-          class="theme-default-content custom"
-          slot-key="meltano-init-code"
-        />
+        <Content class="theme-default-content" slot-key="meltano-init-code" />
       </div>
     </div>
 
     <div class="hero homepage-cta feature-section-wrapper" id="integration">
       <div class="hero-left">
-        <Content class="theme-default-content custom" slot-key="integration" />
+        <Content class="theme-default-content" slot-key="integration" />
 
         <p class="action">
           <NavLink
@@ -62,19 +56,13 @@
       </div>
 
       <div class="hero-right">
-        <Content
-          class="theme-default-content custom"
-          slot-key="integration-code"
-        />
+        <Content class="theme-default-content" slot-key="integration-code" />
       </div>
     </div>
 
     <div class="hero homepage-cta feature-section-wrapper" id="transformation">
       <div class="hero-left">
-        <Content
-          class="theme-default-content custom"
-          slot-key="transformation"
-        />
+        <Content class="theme-default-content" slot-key="transformation" />
 
         <p class="action">
           <NavLink
@@ -85,19 +73,13 @@
       </div>
 
       <div class="hero-right">
-        <Content
-          class="theme-default-content custom"
-          slot-key="transformation-code"
-        />
+        <Content class="theme-default-content" slot-key="transformation-code" />
       </div>
     </div>
 
     <div class="hero homepage-cta feature-section-wrapper" id="orchestration">
       <div class="hero-left">
-        <Content
-          class="theme-default-content custom"
-          slot-key="orchestration"
-        />
+        <Content class="theme-default-content" slot-key="orchestration" />
 
         <p class="action">
           <NavLink
@@ -108,10 +90,7 @@
       </div>
 
       <div class="hero-right">
-        <Content
-          class="theme-default-content custom"
-          slot-key="orchestration-code"
-        />
+        <Content class="theme-default-content" slot-key="orchestration-code" />
 
         <a
           href="https://airflow.apache.org/docs/stable/ui.html#dags-view"
@@ -131,10 +110,7 @@
       id="containerization"
     >
       <div class="hero-left">
-        <Content
-          class="theme-default-content custom"
-          slot-key="containerization"
-        />
+        <Content class="theme-default-content" slot-key="containerization" />
 
         <p class="action">
           <NavLink
@@ -171,7 +147,7 @@
 
     <div class="hero homepage-cta feature-section-wrapper" id="meltano-add">
       <div class="hero-left">
-        <Content class="theme-default-content custom" slot-key="meltano-add" />
+        <Content class="theme-default-content" slot-key="meltano-add" />
 
         <p class="action">
           <NavLink
@@ -182,19 +158,13 @@
       </div>
 
       <div class="hero-right">
-        <Content
-          class="theme-default-content custom"
-          slot-key="meltano-add-code"
-        />
+        <Content class="theme-default-content" slot-key="meltano-add-code" />
       </div>
     </div>
 
     <div class="hero homepage-cta feature-section-wrapper" id="meltano-config">
       <div class="hero-left">
-        <Content
-          class="theme-default-content custom"
-          slot-key="meltano-config"
-        />
+        <Content class="theme-default-content" slot-key="meltano-config" />
 
         <p class="action">
           <NavLink
@@ -205,19 +175,13 @@
       </div>
 
       <div class="hero-right">
-        <Content
-          class="theme-default-content custom"
-          slot-key="meltano-config-code"
-        />
+        <Content class="theme-default-content" slot-key="meltano-config-code" />
       </div>
     </div>
 
     <div class="hero homepage-cta feature-section-wrapper" id="meltano-select">
       <div class="hero-left">
-        <Content
-          class="theme-default-content custom"
-          slot-key="meltano-select"
-        />
+        <Content class="theme-default-content" slot-key="meltano-select" />
 
         <p class="action">
           <NavLink
@@ -228,10 +192,7 @@
       </div>
 
       <div class="hero-right">
-        <Content
-          class="theme-default-content custom"
-          slot-key="meltano-select-code"
-        />
+        <Content class="theme-default-content" slot-key="meltano-select-code" />
       </div>
     </div>
 

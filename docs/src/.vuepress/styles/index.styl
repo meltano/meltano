@@ -7,13 +7,17 @@ h4
 h5
   font-size: 1rem
 
-@media (max-width: $MQMobileNarrow)
-  {$contentClass}
-    word-break break-word
-
-.custom-block.tip
-  border-color $accentHighlightColor
-
 .theme-container.no-navbar
   .navbar
     display none
+
+{$contentClass}
+  a code
+    color inherit
+
+  .custom-block.tip
+    border-color $accentHighlightColor
+
+@media (max-width: $MQMobileNarrow)
+  {$contentClass}
+    word-break break-word
