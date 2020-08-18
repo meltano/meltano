@@ -24,6 +24,7 @@ const docsSidebar = [
       "/docs/installation",
       "/docs/plugin-management",
       "/docs/configuration",
+      "/docs/integration",
       "/docs/transforms",
       "/docs/orchestration",
       "/docs/production",

@@ -186,31 +186,6 @@ homepage_sample_code:
     # NAMESPACE="<your-gitlab-username-or-group>"
     # git push git@gitlab.com:$NAMESPACE/meltano-demo-project.git master
 
-
-    ### https://meltano.com/#meltano-select
-
-    # List all available entities and attributes
-    - "[[ $TAP_COVID_19_API_TOKEN ]] && meltano select --list --all tap-covid-19 || echo '$TAP_COVID_19_API_TOKEN is not set'"
-
-    # Include all attributes of an entity
-    - meltano select tap-covid-19 eu_ecdc_daily "*"
-
-    # Include specific attributes of an entity
-    - meltano select tap-covid-19 eu_daily date
-    - meltano select tap-covid-19 eu_daily country
-    - meltano select tap-covid-19 eu_daily cases
-    - meltano select tap-covid-19 eu_daily deaths
-
-    # Exclude matching attributes of all entities
-    - meltano select tap-covid-19 --exclude "*" "git_*"
-
-    # List selected (enabled) entities and attributes
-    - "[[ $TAP_COVID_19_API_TOKEN ]] && meltano select --list tap-covid-19 || echo '$TAP_COVID_19_API_TOKEN is not set'"
-
-    # Set stream metadata for all matching entities
-    - meltano config tap-covid-19 set _metadata "eu_*" replication-method INCREMENTAL
-    - meltano config tap-covid-19 set _metadata "eu_*" replication-key date
-
   artifacts:
     paths:
       - meltano-projects/demo-project/meltano.yml

@@ -7,7 +7,7 @@ sidebarDepth: 2
 # Deployment in Production
 
 Once you've [set up a Meltano project](/docs/project.html) and
-[run some pipelines](/#integration) on your local machine,
+[run some pipelines](/docs/integration.html) on your local machine,
 it'll be time to repeat this trick in production!
 
 This page will help you figure out:

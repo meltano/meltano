@@ -13,8 +13,8 @@ meltanoInit:
     link: /docs/project.html
 integration:
   primaryAction:
-    text: Learn more about `meltano elt`
-    link: /docs/command-line-interface.html#elt
+    text: Learn more about data integration using Meltano
+    link: /docs/integration.html
 transformation:
   primaryAction:
     text: Learn more about transformation using dbt
@@ -27,10 +27,6 @@ containerization:
   primaryAction:
     text: Learn more about deployment in production
     link: /docs/production.html
-meltanoSelect:
-  primaryAction:
-    text: Learn more about `meltano select`
-    link: /docs/command-line-interface.html#select
 ---
 
 ::: slot installation
@@ -48,9 +44,7 @@ Scroll down for details on
 [integration](/#integration),
 [transformation](/#transformation),
 [orchestration](/#orchestration), and
-[containerization](/#containerization),
-followed by instructions on
-[selecting entities and attributes to extract](/#meltano-select).
+[containerization](/#containerization).
 
 :::
 
@@ -132,13 +126,12 @@ or [easily write your own](/tutorials/create-a-custom-extractor.html) to extract
 data from any SaaS tool or database and load it into any data warehouse or file format.
 
 Meltano [manages your tap and target configuration](/docs/configuration.html) for you,
-makes it easy to [select which entities and attributes to extract](/#meltano-select),
+makes it easy to [select which entities and attributes to extract](/docs/integration.html#selecting-entities-and-attributes-for-extraction),
 and keeps track of [the state of your extraction](/docs/command-line-interface.html#pipeline-state),
 so that subsequent pipeline runs with the same job ID will always pick up right where
 the previous run left off.
 
-Scroll down to learn more about [transformation](/#transformation) and [orchestration](/#orchestration), or jump straight to:
-- [Selecting entities and attributes to extract](/#meltano-select)
+Scroll down to learn more about [transformation](/#transformation) and [orchestration](/#orchestration).
 :::
 
 ::: slot integration-code
@@ -420,108 +413,5 @@ git push git@gitlab.com:$NAMESPACE/meltano-demo-project.git master
 GitLab CI/CD is now building your Meltano project's dedicated Docker image,
 which will be available at `registry.gitlab.com/$NAMESPACE/meltano-demo-project:latest`
 once the CI/CD pipeline completes!
-
-:::
-
-::: slot meltano-select
-
-## Selecting entities and attributes for extraction
-
-Extractors are often capable of extracting many more entities and attributes than your use case may require.
-To save on bandwidth and storage, it's usually a good idea to instruct your extractor to only select those entities and attributes you actually plan on using.
-
-With stock Singer taps, entity selection (and specification of other [metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata)) involves a few steps. First, you run a tap in
-[discovery mode](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
-to generate a `catalog.json` file describing all available entities and attributes.
-Then, you edit this file and add `"selected": true` (and any other metadata) to the `metadata` objects for all of the desired entities and attributes.
-Finally, you pass this file to the tap using the `--catalog` flag when you run it in [sync mode](https://github.com/singer-io/getting-started/blob/master/docs/SYNC_MODE.md).
-Because these catalog files can be very large and can get outdated as data sources evolve, this process can be tedious and error-prone.
-
-Meltano makes it easy to select specific entities and attributes for inclusion or exclusion using [`meltano select`](/docs/command-line-interface.html#select),
-which lets you specify inclusion and exclusion rules using [glob](https://en.wikipedia.org/wiki/Glob_(programming))-like patterns with wildcards (`*`, `?`) and character groups (`[abc]`, `[!abc]`).
-
-Additional [Singer stream and property metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata)
-(like `replication-method` and `replication-key`) can be specified like
-any other [plugin configuration](/docs/configuration.html), using a special
-[`_metadata` setting](/docs/command-line-interface.html#extractor-extra-metadata) with
-[nested properties](/docs/command-line-interface.html#nested-properties)
-`_metadata.<entity>.<key>` and `_metadata.<entity>.<attribute>.<key>`.
-
-Similarly, a special [`_schema` setting](/docs/command-line-interface.html#extractor-extra-schema)
-is available that lets you easily override
-[Singer stream schema](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#schemas) descriptions.
-Like selection rules, these metadata and schema rules allow for [glob](https://en.wikipedia.org/wiki/Glob_(programming))-like
-patterns in the entity and attribute identifiers.
-
-Whenever an extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt)
-or [`meltano invoke`](/docs/command-line-interface.html#invoke), Meltano will
-generate the desired catalog on the fly by running the tap in
-discovery mode and applying the selection, metadata, and schema rules to the resulting catalog file
-before passing it to the tap in sync mode.
-
-Note that exclusion takes precedence over inclusion: if an entity or attribute is matched by an exclusion pattern, there is no way to get it back using an inclusion pattern unless the exclusion pattern is manually removed from your project's `meltano.yml` file first.
-
-If no rules are defined using `meltano select`, Meltano will fall back on catch-all rule `*.*` so that all entities and attributes are selected.
-
-:::
-
-::: slot meltano-select-code
-
-```bash
-# List all available entities and attributes
-meltano select --list --all tap-covid-19
-
-# Include all attributes of an entity
-meltano select tap-covid-19 eu_ecdc_daily "*"
-
-# Include specific attributes of an entity
-meltano select tap-covid-19 eu_daily date
-meltano select tap-covid-19 eu_daily country
-meltano select tap-covid-19 eu_daily cases
-meltano select tap-covid-19 eu_daily deaths
-
-# Exclude matching attributes of all entities
-meltano select tap-covid-19 --exclude "*" "git_*"
-
-# List selected (enabled) entities and attributes
-meltano select --list tap-covid-19
-
-# (Optional)
-# Set stream metadata for all matching entities
-# meltano config tap-covid-19 set _metadata "eu_*" replication-method INCREMENTAL
-# meltano config tap-covid-19 set _metadata "eu_*" replication-key date
-# meltano config tap-covid-19 set _metadata "eu_*" date is-replication-key true
-
-# Override schema for matching attributes
-# meltano config tap-covid-19 set _schema "eu_*" date type string
-# meltano config tap-covid-19 set _schema "eu_*" date format date
-```
-
-```output
-Enabled patterns:
-    eu_ecdc_daily.*
-    eu_daily.date
-    eu_daily.country
-    eu_daily.cases
-    eu_daily.deaths
-    !*.git_*
-
-Selected attributes:
-    [automatic] eu_daily.__sdc_row_number
-    [automatic] eu_daily.git_path
-    [selected ] eu_daily.date
-    [selected ] eu_daily.country
-    [selected ] eu_daily.cases
-    [selected ] eu_daily.deaths
-    [automatic] eu_ecdc_daily.__sdc_row_number
-    [automatic] eu_ecdc_daily.git_path
-    [selected ] eu_ecdc_daily.date
-    [selected ] eu_ecdc_daily.datetime
-    [selected ] eu_ecdc_daily.country
-    [selected ] eu_ecdc_daily.cases
-    [selected ] eu_ecdc_daily.deaths
-```
-
-Your entities and attributes have now been selected for [extraction](/#integration)!
 
 :::

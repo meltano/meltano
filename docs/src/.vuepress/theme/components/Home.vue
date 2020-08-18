@@ -150,28 +150,7 @@
           class="button is-filled"
           :item="$frontmatter.installation.primaryAction"
         />
-
-        <p class="description ta-c">
-          Or keep scrolling to learn more!
-        </p>
       </section>
-    </div>
-
-    <div class="hero homepage-cta feature-section-wrapper" id="meltano-select">
-      <div class="hero-left">
-        <Content class="theme-default-content" slot-key="meltano-select" />
-
-        <p class="action">
-          <NavLink
-            class="action-button"
-            :item="$frontmatter.meltanoSelect.primaryAction"
-          />
-        </p>
-      </div>
-
-      <div class="hero-right">
-        <Content class="theme-default-content" slot-key="meltano-select-code" />
-      </div>
     </div>
 
     <div class="feature-section-wrapper is-shorter is-white">

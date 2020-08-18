@@ -887,16 +887,51 @@ Use `--list` to list the current selected tap attributes.
 ### Examples
 
 ```bash
-meltano select tap-carbon-intensity '*' 'name*'
+# List all available entities and attributes
+meltano select --list --all tap-covid-19
+
+# Include all attributes of an entity
+meltano select tap-covid-19 eu_ecdc_daily "*"
+
+# Include specific attributes of an entity
+meltano select tap-covid-19 eu_daily date
+meltano select tap-covid-19 eu_daily country
+meltano select tap-covid-19 eu_daily cases
+meltano select tap-covid-19 eu_daily deaths
+
+# Exclude matching attributes of all entities
+meltano select tap-covid-19 --exclude "*" "git_*"
+
+# List selected (enabled) entities and attributes
+meltano select --list tap-covid-19
 ```
 
-This will select all attributes starting with `name`.
+Example output:
 
-```bash
-meltano select tap-carbon-intensity 'region'
 ```
+Enabled patterns:
+    eu_ecdc_daily.*
+    eu_daily.date
+    eu_daily.country
+    eu_daily.cases
+    eu_daily.deaths
+    !*.git_*
 
-This will select all attributes of the `region` entity.
+Selected attributes:
+    [automatic] eu_daily.__sdc_row_number
+    [automatic] eu_daily.git_path
+    [selected ] eu_daily.date
+    [selected ] eu_daily.country
+    [selected ] eu_daily.cases
+    [selected ] eu_daily.deaths
+    [automatic] eu_ecdc_daily.__sdc_row_number
+    [automatic] eu_ecdc_daily.git_path
+    [selected ] eu_ecdc_daily.date
+    [selected ] eu_ecdc_daily.datetime
+    [selected ] eu_ecdc_daily.country
+    [selected ] eu_ecdc_daily.cases
+    [selected ] eu_ecdc_daily.deaths
+```
 
 ::: tip
 Most shells parse glob syntax: you must escape the special characters in the select pattern by quoting the pattern.
