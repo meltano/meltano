@@ -157,23 +157,6 @@
       </section>
     </div>
 
-    <div class="hero homepage-cta feature-section-wrapper" id="meltano-add">
-      <div class="hero-left">
-        <Content class="theme-default-content" slot-key="meltano-add" />
-
-        <p class="action">
-          <NavLink
-            class="action-button"
-            :item="$frontmatter.meltanoAdd.primaryAction"
-          />
-        </p>
-      </div>
-
-      <div class="hero-right">
-        <Content class="theme-default-content" slot-key="meltano-add-code" />
-      </div>
-    </div>
-
     <div class="hero homepage-cta feature-section-wrapper" id="meltano-config">
       <div class="hero-left">
         <Content class="theme-default-content" slot-key="meltano-config" />

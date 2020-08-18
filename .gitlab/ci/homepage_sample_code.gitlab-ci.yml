@@ -186,19 +186,6 @@ homepage_sample_code:
     # NAMESPACE="<your-gitlab-username-or-group>"
     # git push git@gitlab.com:$NAMESPACE/meltano-demo-project.git master
 
-    ### https://meltano.com/#meltano-add
-
-    # List extractors and loaders known to Meltano
-    - meltano discover extractors
-    - meltano discover loaders
-
-    # Add a known extractor or loader by name
-    - meltano add extractor tap-salesforce
-    - meltano add loader target-snowflake
-
-    # Add an unknown (custom) extractor or loader
-    - printf "tap_covid_19\ntap-covid-19\ntap-covid-19\ncatalog,discover,state\napi_token,user_agent,start_date\n" | meltano add --custom extractor tap-covid-19
-
 
     ### https://meltano.com/#meltano-config
 

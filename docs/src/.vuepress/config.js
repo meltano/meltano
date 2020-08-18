@@ -22,6 +22,7 @@ const docsSidebar = [
     sidebarDepth: 2,
     children: [
       "/docs/installation",
+      "/docs/plugin-management",
       "/docs/transforms",
       "/docs/orchestration",
       "/docs/production",

@@ -27,10 +27,6 @@ containerization:
   primaryAction:
     text: Learn more about deployment in production
     link: /docs/production.html
-meltanoAdd:
-  primaryAction:
-    text: Learn more about `meltano add`
-    link: /docs/command-line-interface.html#add
 meltanoConfig:
   primaryAction:
     text: Learn more about `meltano config`
@@ -58,7 +54,6 @@ Scroll down for details on
 [orchestration](/#orchestration), and
 [containerization](/#containerization),
 followed by instructions on
-[adding extractors and loaders to your project](/#meltano-add),
 [managing the configuration of your plugins](/#meltano-config), and
 [selecting entities and attributes to extract](/#meltano-select).
 
@@ -148,7 +143,6 @@ so that subsequent pipeline runs with the same job ID will always pick up right 
 the previous run left off.
 
 Scroll down to learn more about [transformation](/#transformation) and [orchestration](/#orchestration), or jump straight to:
-- [Adding extractors and loaders to your project](/#meltano-add)
 - [Managing the configuration of your plugins](/#meltano-config)
 - [Selecting entities and attributes to extract](/#meltano-select)
 :::
@@ -435,71 +429,6 @@ once the CI/CD pipeline completes!
 
 :::
 
-::: slot meltano-add
-
-## Adding extractors and loaders to your project
-
-Like all types of plugins, extractors and loaders can be added to a Meltano project using [`meltano add`](/docs/command-line-interface.html#add).
-Plugins that are already [known to Meltano](/docs/contributor-guide.html#known-plugins) can be added by simply specifying their `type` and `name`, while adding a plugin that Meltano isn't familiar with yet requires adding the `--custom` flag.
-
-To find out what plugins are already known to Meltano and supported out of the box, you can use [`meltano discover`](/docs/command-line-interface.html#discover), with an optional pluralized `plugin type` argument.
-You can also check out the lists of supported [extractors](/plugins/extractors/) and [loaders](/plugins/loaders/) on this website.
-
-If the Singer tap or target you'd like to use with Meltano doesn't show up in any of these places, you're going to want to add a custom plugin.
-When you run `meltano add --custom <type> <name>`, Meltano will ask you some additional questions to learn where the package can be found, how to interact with it, and how it can be expected to behave.
-
-If the tap or target in question is listed on Singer's [index of taps](https://www.singer.io/#taps) or [targets](https://www.singer.io/#targets), simply providing the package name as `name`, `pip_url`, and `executable` should suffice. If it's a tap or target you have developed or are developing yourself, you'll want to set `pip_url` to either a Git repository URL or local directory path. To find out what `settings` a tap or target supports, reference its documentation. If the `capabilities` a tap supports are not described in its documentation, try [one of these tricks](/docs/contributor-guide.html#how-to-test-a-tap).
-
-Once your plugin has been added, it will be ready for [configuration](/#meltano-config)!
-:::
-
-::: slot meltano-add-code
-
-<small>Follow the [project initialization instructions above](/#meltano-init) and then...</small>
-
-```bash
-# List extractors and loaders known to Meltano
-meltano discover extractors
-meltano discover loaders
-
-# Add a known extractor or loader by name
-meltano add extractor tap-salesforce
-meltano add loader target-snowflake
-
-# Add an unknown (custom) extractor or loader
-meltano add --custom extractor tap-covid-19
-```
-
-```bash
-# Specify namespace, which will serve as the:
-# - prefix for configuration environment variables
-# - identifier to find related/compatible plugins
-# - default value for the `schema` setting when used
-#   with loader target-postgres or target-snowflake
-(namespace): tap_covid_19
-
-# Specify `pip install` argument, for example:
-# - PyPI package name:
-(pip_url): tap-covid-19
-# - Git repository URL:
-(pip_url): git+https://github.com/singer-io/tap-covid-19.git
-# - local directory, in editable/development mode:
-(pip_url): -e extract/tap-covid-19
-
-# Specify the package's executable name
-(executable): tap-covid-19
-
-# Specify supported Singer features (executable flags)
-(capabilities): catalog,discover,state
-
-# Specify supported settings (`config.json` keys)
-(settings): api_token,user_agent,start_date
-```
-
-Your extractor or loader is now ready for [configuration](/#meltano-config)!
-
-:::
-
 ::: slot meltano-config
 
 ## Managing the configuration of your plugins
@@ -512,7 +441,7 @@ This means that you do not need to manually craft the
 because Meltano will generate them on the fly whenever an extractor or loader is used through [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 
 If the plugin you'd like to use and configure is already [known to Meltano](/docs/contributor-guide.html#known-plugins) (that is, it shows up when you run [`meltano discover`](/docs/command-line-interface.html#discover)), Meltano already knows what settings it supports.
-If you're [adding a custom plugin](/#meltano-add), on the other hand, you will be asked to provide the names of the supported configuration options yourself.
+If you're [adding a custom plugin](/docs/command-line-interface.html#how-to-use-custom-plugins), on the other hand, you will be asked to provide the names of the supported configuration options yourself.
 
 To determine the values of these settings, Meltano will look in 4 places, with each taking precedence over the next:
 
@@ -531,8 +460,6 @@ control. Sensitive values like passwords and tokens are most appropriately store
 :::
 
 ::: slot meltano-config-code
-
-<small>Follow the [custom extractor instructions above](/#meltano-add) and then...</small>
 
 ```bash
 # List all plugin settings with their names,

@@ -764,7 +764,7 @@ Used to create a new Meltano project directory inside the current working direct
 
 The new project directory will contain:
 
-- a `meltano.yml` file that will list any [`plugins` you'll add](/#meltano-add) and [pipeline `schedules` you'll create](/#orchestration),
+- a `meltano.yml` file that will list any [`plugins` you'll add](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project) and [pipeline `schedules` you'll create](/#orchestration),
 - stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
 - empty `model`, `extract`, `load`, `transform`, `analyze`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
 
