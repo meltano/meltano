@@ -42,7 +42,7 @@ const docsSidebar = [
 
 module.exports = {
   title: "Meltano",
-  description: "Open source data pipelines",
+  description: "Meltano: Open source ELT",
   head: [
     [
       "link",

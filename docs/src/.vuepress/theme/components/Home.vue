@@ -5,10 +5,19 @@
         <Content class="theme-default-content" slot-key="installation" />
 
         <p class="action">
-          <NavLink
-            class="action-button"
-            :item="$frontmatter.installation.primaryAction"
-          />
+          <a
+            :href="$frontmatter.installation.primaryAction.link"
+            :title="$frontmatter.installation.primaryAction.text"
+            class="nav-link action-button"
+          >
+            <img
+              src="/meltano-logo-white.svg"
+              width="25"
+              height="25"
+              style="vertical-align: text-bottom;"
+            />
+            {{ $frontmatter.installation.primaryAction.text }}
+          </a>
           <SlackChannelLink class="action-button secondary">
             <SlackIcon /> Join us on Slack
           </SlackChannelLink>
@@ -616,6 +625,10 @@ export default {
       }
     }
 
+    img {
+      vertical-align: text-top;
+    }
+
     &.secondary {
       background: none;
       box-shadow: inset 0 0 0 2px $accentColor;
@@ -681,11 +694,6 @@ export default {
 @media (min-width: $MQMobileNarrow) {
   .home {
     .hero {
-      img {
-        display: block;
-        margin-right: -33px;
-      }
-
       h1 {
         font-size: 2rem;
       }

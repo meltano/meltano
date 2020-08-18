@@ -1,6 +1,6 @@
 [![pipeline status](https://gitlab.com/meltano/meltano/badges/master/pipeline.svg)](https://gitlab.com/meltano/meltano/commits/master)
 
-# Meltano: Open source data pipelines
+# Meltano: open source ELT
 
 [Meltano](https://meltano.com) is an open source platform for
 building, running & orchestrating ELT pipelines built out of
