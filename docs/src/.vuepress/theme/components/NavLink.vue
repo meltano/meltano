@@ -9,9 +9,13 @@
     <component :is="item.icon" />
     <span>{{item.text}}</span>
   </a>
-  <a v-else-if="item.cta" :href="item.link" class="nav-link nav-link--cta">
+  <router-link
+    v-else-if="item.cta"
+    :to="item.link"
+    class="nav-link nav-link--cta"
+  >
     {{item.text}}
-  </a>
+  </router-link>
   <ParentNavLink v-else :item="item" />
 </template>
 
