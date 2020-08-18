@@ -19,6 +19,7 @@ The following extractors are currently [known to Meltano](/docs/contributor-guid
 - [MongoDB](/plugins/extractors/mongodb.html)
 - [Salesforce](/plugins/extractors/salesforce.html)
 - [Shopify](/plugins/extractors/shopify.html)
+- [Spreadsheets Anywhere](/plugins/extractors/spreadsheets-anywhere.html) (Excel or CSVs on localhost or Cloud storage)
 - [Stripe](/plugins/extractors/stripe.html)
 - [Zendesk](/plugins/extractors/zendesk.html)
 

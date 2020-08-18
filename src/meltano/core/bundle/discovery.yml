@@ -602,6 +602,21 @@ extractors:
         kind: password
       - name: database
         label: Database Name
+  - name: tap-spreadsheets-anywhere
+    label: Spreadsheets Anywhere
+    description: Data extractor for CSV and Excel files from any smart_open supported transport (S3, SFTP, localhost, etc...)
+    docs: 'https://meltano.com/plugins/extractors/spreadsheets-anywhere.html'
+    namespace: tap_spreadsheets_anywhere
+    hidden: true
+    pip_url: git+https://github.com/ets/tap-spreadsheets-anywhere.git
+    capabilities:
+      - catalog
+      - discover
+      - state
+    settings:
+      - name: tables
+        kind: array
+        label: An array holding json objects that each describe a set of targeted source files. See docs for details.
 loaders:
   - name: target-csv
     label: CSV
