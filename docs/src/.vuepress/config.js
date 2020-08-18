@@ -14,6 +14,7 @@ const docsSidebar = [
     sidebarDepth: 2,
     children: [
       "/docs/project",
+      "/docs/plugins",
     ]
   },
   {
