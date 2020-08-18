@@ -5,8 +5,8 @@
         <Content class="theme-default-content" slot-key="installation" />
 
         <p class="action">
-          <a
-            :href="$frontmatter.installation.primaryAction.link"
+          <router-link
+            :to="$frontmatter.installation.primaryAction.link"
             :title="$frontmatter.installation.primaryAction.text"
             class="nav-link action-button"
           >
@@ -17,10 +17,12 @@
               style="vertical-align: text-bottom;"
             />
             {{ $frontmatter.installation.primaryAction.text }}
-          </a>
+          </router-link>
+
           <SlackChannelLink class="action-button secondary">
             <SlackIcon /> Join us on Slack
           </SlackChannelLink>
+
           <a
             class="action-button secondary"
             href="https://gitlab.com/meltano/meltano"
