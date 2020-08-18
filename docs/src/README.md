@@ -25,8 +25,8 @@ orchestration:
     link: /docs/orchestration.html
 containerization:
   primaryAction:
-    text: Learn more about deployment in production
-    link: /docs/production.html
+    text: Learn more about containerization using Docker
+    link: /docs/containerization.html
 ---
 
 ::: slot installation
@@ -294,21 +294,7 @@ Airflow is now available at <http://localhost:8080>!
 Now that you've got your pipelines running locally, it'll be time to repeat this trick in production!
 
 Since your Meltano project is your [single source of truth](/#meltano-init),
-moving your data pipelines to a new environment is as easy as
-[getting your project onto the environment](/docs/production.html#your-meltano-project),
-[installing Meltano](/docs/production.html#installing-meltano), and
-[installing your project's plugins](/docs/production.html#installing-plugins).
-Then, after you decide
-[where to store your pipeline state and other metadata](/docs/production.html#storing-metadata) and
-[how to manage your environment-specific and sensitive configuration](/docs/production.html#managing-configuration),
-you'll be able to use [the `meltano` command](/docs/command-line-interface.html) to
-[run your ELT pipelines](/docs/production.html#meltano-elt) or
-[start an orchestrator](/docs/production.html#airflow-orchestrator)
-just like you did locally.
-
-<!-- The following is reproduced in docs/src/docs/production.md#containerized-meltano-project with minor edits -->
-
-While you can get Meltano, your project, and all of its plugins onto a new environment one-by-one,
+[deploying your data pipelines in production](/docs/production.html) is pretty straightforward, but
 you can greatly simplify this process (and prevent issues caused by inconsistencies between environments!)
 by wrapping them all up into a project-specific
 [Docker container image](https://www.docker.com/resources/what-container):
@@ -321,26 +307,6 @@ This image can then be used on any environment running [Docker](https://www.dock
 [`meltano` commands](/docs/command-line-interface.html)
 in the context of your project, without needing to separately manage the installation of
 Meltano, your project's plugins, or any of their dependencies.
-
-If you're storing your Meltano project in version control on a
-platform like [GitLab](https://about.gitlab.com) or [GitHub](https://github.com),
-you can set up a CI/CD pipeline to run every time a change is made to your project,
-which can automatically [build](https://docs.docker.com/engine/reference/commandline/build/)
-a new version of the image and [push](https://docs.docker.com/engine/reference/commandline/push/)
-it to a container registry.
-The image can then be [pulled](https://docs.docker.com/engine/reference/commandline/pull/)
-from that registry onto any local or cloud environment on which you'd like to run your project's pipelines.
-
-If you'd like to containerize your Meltano project, you can easily add the
-appropriate `Dockerfile` and `.dockerignore` files to your project by adding the
-[`docker` file bundle](https://gitlab.com/meltano/files-docker).
-
-If you'd like to use [GitLab CI/CD](https://docs.gitlab.com/ee/ci/) to continuously
-build your Meltano project's Docker image and push it to GitLab's built-in
-[Container Registry](https://docs.gitlab.com/ee/user/packages/container_registry/),
-you can add the appropriate `.gitlab-ci.yml` and `.gitlab/ci/docker.gitlab-ci.yml`
-files to your project by adding the
-[`gitlab-ci` file bundle](https://gitlab.com/meltano/files-gitlab-ci).
 
 :::
 
@@ -373,45 +339,8 @@ docker run \
   --volume $(pwd)/output:/project/output \
   meltano-demo-project:dev \
   elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
-
-# Run gitlab-to-postgres pipeline with
-# target-postgres configuration in environment
-docker run \
-  --env PG_ADDRESS=host.docker.internal \
-  --env PG_PORT=5432 \
-  --env PG_USERNAME=meltano \
-  --env PG_PASSWORD=meltano \
-  --env PG_DATABASE=demo-warehouse \
-  meltano-demo-project:dev \
-  elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
 ```
 
-Your Meltano project can now be continuously delivered to a container registry!
-
-```bash
-# For these examples to work, ensure that
-# you have an account on GitLab.com or
-# a self-hosted GitLab instance with
-# GitLab CI/CD and Container Registry enabled
-
-# Add GitLab CI/CD files to your project
-meltano add files gitlab-ci
-
-# Initialize Git repository, if you haven't already
-git init
-
-# Add and commit all files
-git add -A
-git commit -m "Set up Meltano project with Docker and GitLab CI"
-
-# Push to GitLab, which will automatically create
-# a new private project at the specified path
-NAMESPACE="<your-gitlab-username-or-group>"
-git push git@gitlab.com:$NAMESPACE/meltano-demo-project.git master
-```
-
-GitLab CI/CD is now building your Meltano project's dedicated Docker image,
-which will be available at `registry.gitlab.com/$NAMESPACE/meltano-demo-project:latest`
-once the CI/CD pipeline completes!
+Your data has now been extracted and loaded!
 
 :::

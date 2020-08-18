@@ -27,6 +27,7 @@ const docsSidebar = [
       "/docs/integration",
       "/docs/transforms",
       "/docs/orchestration",
+      "/docs/containerization",
       "/docs/production",
       "/docs/analysis",
     ]

@@ -155,37 +155,6 @@ homepage_sample_code:
     #   meltano-demo-project:dev \
     #   elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
 
-    # Run gitlab-to-postgres pipeline with
-    # target-postgres configuration in environment
-    # docker run \
-    #   --env PG_ADDRESS=host.docker.internal \
-    #   --env PG_PORT=5432 \
-    #   --env PG_USERNAME=meltano \
-    #   --env PG_PASSWORD=meltano \
-    #   --env PG_DATABASE=demo-warehouse \
-    #   meltano-demo-project:dev \
-    #   elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
-
-    # For these examples to work, ensure that
-    # you have an account on GitLab.com or
-    # a self-hosted GitLab instance with
-    # GitLab CI/CD and Container Registry enabled
-
-    # Add GitLab CI/CD files to your project
-    - meltano add files gitlab-ci
-
-    # Initialize Git repository, if you haven't already
-    # git init
-
-    # Add and commit all files
-    # git add -A
-    # git commit -m "Set up Meltano project with Docker and GitLab CI"
-
-    # Push to GitLab, which will automatically create
-    # a new private project at the specified path
-    # NAMESPACE="<your-gitlab-username-or-group>"
-    # git push git@gitlab.com:$NAMESPACE/meltano-demo-project.git master
-
   artifacts:
     paths:
       - meltano-projects/demo-project/meltano.yml
