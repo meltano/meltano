@@ -120,7 +120,7 @@ module.exports = {
         icon: "TwitterIcon"
       },
       {
-        text: "Repository on GitLab",
+        text: "View code on GitLab",
         link: "https://gitlab.com/meltano/meltano",
         icon: "GitLabIcon"
       },

@@ -27,7 +27,7 @@
             target="_blank"
           >
             <GitLabIcon />
-            Show me the code!
+            View code on GitLab
             <OutboundLink />
           </a>
         </p>
