@@ -9,6 +9,5 @@ export default {};
     rel="noopener noreferrer"
   >
     <slot></slot>
-    <OutboundLink />
   </a>
 </template>

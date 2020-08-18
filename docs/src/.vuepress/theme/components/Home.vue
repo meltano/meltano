@@ -28,7 +28,6 @@
           >
             <GitLabIcon />
             View code on GitLab
-            <OutboundLink />
           </a>
         </p>
       </div>
