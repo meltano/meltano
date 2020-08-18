@@ -6,8 +6,8 @@ sidebarDepth: 2
 
 # Deployment in Production
 
-Once you've [set up a Meltano project](/#meltano-init) and
-[run some pipelines](/#integration) on your local machine,
+Once you've [set up a Meltano project](/docs/project.html) and
+[run some pipelines](/docs/integration.html) on your local machine,
 it'll be time to repeat this trick in production!
 
 This page will help you figure out:
@@ -21,6 +21,9 @@ This page will help you figure out:
 7. how to [run your pipelines](#running-pipelines).
 
 Additionally, you may want to [run Meltano UI and configure it for production](#meltano-ui).
+
+If you're [containerizing your Meltano project](/docs/containerization.md),
+you can skip steps 1 through 3 and refer primarily to the "Containerized Meltano project" subsections on this page.
 
 ## Your Meltano project
 
@@ -57,42 +60,8 @@ and/or later whenever changes are made.
 
 ### Containerized Meltano project
 
-<!-- The following is reproduced from docs/src/README.md#containerization with minor edits in the first paragraph. -->
-
-While you can get your Meltano project, [Meltano itself](#installing-meltano), and
-[all of your project's plugins](#installing-plugins) onto a new environment one-by-one,
-you can greatly simplify this process (and prevent issues caused by inconsistencies between environments!)
-by wrapping them all up into a project-specific
-[Docker container image](https://www.docker.com/resources/what-container):
-"a lightweight, standalone, executable package of software that includes everything
-needed to run an application: code, runtime, system tools, system libraries and settings."
-
-This image can then be used on any environment running [Docker](https://www.docker.com/)
-(or a compatible tool like [Kubernetes](https://kubernetes.io/)) to directly
-[run](https://docs.docker.com/engine/reference/commandline/run/)
-[`meltano` commands](/docs/command-line-interface.html)
-in the context of your project, without needing to separately manage the installation of
-Meltano, your project's plugins, or any of their dependencies.
-
-If you're storing your Meltano project in version control on a
-platform like [GitLab](https://about.gitlab.com) or [GitHub](https://github.com),
-you can set up a CI/CD pipeline to run every time a change is made to your project,
-which can automatically [build](https://docs.docker.com/engine/reference/commandline/build/)
-a new version of the image and [push](https://docs.docker.com/engine/reference/commandline/push/)
-it to a container registry.
-The image can then be [pulled](https://docs.docker.com/engine/reference/commandline/pull/)
-from that registry onto any local or cloud environment on which you'd like to run your project's pipelines.
-
-If you'd like to containerize your Meltano project, you can easily add the
-appropriate `Dockerfile` and `.dockerignore` files to your project by adding the
-[`docker` file bundle](https://gitlab.com/meltano/files-docker).
-
-If you'd like to use [GitLab CI/CD](https://docs.gitlab.com/ee/ci/) to continuously
-build your Meltano project's Docker image and push it to GitLab's built-in
-[Container Registry](https://docs.gitlab.com/ee/user/packages/container_registry/),
-you can add the appropriate `.gitlab-ci.yml` and `.gitlab/ci/docker.gitlab-ci.yml`
-files to your project by adding the
-[`gitlab-ci` file bundle](https://gitlab.com/meltano/files-gitlab-ci).
+If you're [containerizing your Meltano project](/docs/containerization.md),
+your project-specific Docker image will already contain all of your project files.
 
 ## Installing Meltano
 
@@ -107,7 +76,7 @@ on the latest (or requested) version.
 
 ### Containerized Meltano project
 
-If you're [containerizing your Meltano project](#containerized-meltano-project),
+If you're [containerizing your Meltano project](/docs/containerization.md),
 your project-specific Docker image will already contain a Meltano installation
 since it's built from the [`meltano/meltano`](https://hub.docker.com/r/meltano/meltano) base image.
 
@@ -126,7 +95,7 @@ using the correct versions of plugins.
 
 ### Containerized Meltano project
 
-If you're [containerizing your Meltano project](#containerized-meltano-project),
+If you're [containerizing your Meltano project](/docs/containerization.md),
 your project-specific Docker image will already contain all of your project's plugins
 since `meltano install` is a step in its build process.
 
@@ -150,7 +119,7 @@ production instead. You can configure Meltano to use it using the
 
 ### Containerized Meltano project
 
-If you're [containerizing your Meltano project](#containerized-meltano-project),
+If you're [containerizing your Meltano project](/docs/containerization.md),
 you will _definitely_ want to use an external system database, since changes to
 `.meltano/meltano.db` would not be persisted outside the container.
 
@@ -165,7 +134,7 @@ If you'd like to store these logs elsewhere, you can symlink the `.meltano/run/e
 
 ### Containerized Meltano project
 
-If you're [containerizing your Meltano project](#containerized-meltano-project),
+If you're [containerizing your Meltano project](/docs/containerization.md),
 these logs will not be persisted outside the container [running your pipelines](#running-pipelines)
 unless you exfiltrate them by [mounting a volume](https://docs.docker.com/engine/reference/commandline/run/#mount-volume--v---read-only)
 inside the container at `/project/.meltano/run/elt`.
@@ -193,7 +162,7 @@ like `meltano`.
 
 ### Containerized Meltano project
 
-If you're [containerizing your Meltano project](#containerized-meltano-project),
+If you're [containerizing your Meltano project](/docs/containerization.md),
 you will want to manage sensitive configuration using the mechanism provided
 by your container runner, e.g.
 [Docker Secrets](https://docs.docker.com/engine/swarm/secrets/) or
@@ -236,7 +205,7 @@ However, do take into account Airflow's own
 
 ### Containerized Meltano project
 
-If you're [containerizing your Meltano project](#containerized-meltano-project),
+If you're [containerizing your Meltano project](/docs/containerization.md),
 the built image's [entrypoint](https://docs.docker.com/engine/reference/builder/#entrypoint)
 will be [the `meltano` command](/docs/command-line-interface.html),
 meaning that you can provide `meltano` subcommands and arguments like `elt ...` and `invoke airflow ...` directly to
@@ -268,7 +237,7 @@ but there are [a couple of settings](/docs/settings.html#meltano-ui-server) you'
 
 ### Containerized Meltano project
 
-If you're [containerizing your Meltano project](#containerized-meltano-project),
+If you're [containerizing your Meltano project](/docs/containerization.md),
 the [`project_readonly` setting](/docs/settings.html#project-readonly) will be
 [enabled by default](https://gitlab.com/meltano/files-docker/-/blob/master/bundle/Dockerfile#L17)
 using the `MELTANO_PROJECT_READONLY` environment variable,

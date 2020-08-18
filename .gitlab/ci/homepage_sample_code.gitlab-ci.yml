@@ -12,6 +12,8 @@ homepage_sample_code:
 
     # `tap-covid-19` extractor configuration
     # TAP_COVID_19_API_TOKEN: set through https://gitlab.com/meltano/meltano/-/settings/ci_cd
+
+    MELTANO_DISABLE_TRACKING: "true"
   services:
     - postgres:11
   script:
@@ -36,23 +38,11 @@ homepage_sample_code:
 
     ### https://meltano.com/#meltano-init
 
-    # Initialize a new Meltano project in the
-    # "demo-project" directory, and...
-    # - share anonymous usage data with the Meltano team
-    #   to help them gauge interest in Meltano and its
-    #   features and drive development time accordingly:
-    # meltano init demo-project
-    # - OR don't share anything with the Meltano team
-    #   about this specific project:
-    - meltano init demo-project --no_usage_stats
-    # - OR don't share anything with the Meltano team
-    #   about any project I initialize ever:
-    # SHELLRC=~/.$(basename $SHELL)rc # ~/.bashrc, ~/.zshrc, etc
-    # echo "export MELTANO_DISABLE_TRACKING=1" >> $SHELLRC
-    # meltano init demo-project # --no_usage_stats is implied
+    # Initialize a new Meltano project
+    - meltano init demo-project
 
-    # Before you use any `meltano` command, ensure that:
-    # - you have navigated to your Meltano project directory
+    # Before using a `meltano` command, ensure that:
+    # - you have navigated to your Meltano project
     - cd demo-project
     # - you have activated the virtual environment
     - source ../.venv/bin/activate
@@ -164,102 +154,6 @@ homepage_sample_code:
     #   --volume $(pwd)/output:/project/output \
     #   meltano-demo-project:dev \
     #   elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
-
-    # Run gitlab-to-postgres pipeline with
-    # target-postgres configuration in environment
-    # docker run \
-    #   --env PG_ADDRESS=host.docker.internal \
-    #   --env PG_PORT=5432 \
-    #   --env PG_USERNAME=meltano \
-    #   --env PG_PASSWORD=meltano \
-    #   --env PG_DATABASE=demo-warehouse \
-    #   meltano-demo-project:dev \
-    #   elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
-
-    # For these examples to work, ensure that
-    # you have an account on GitLab.com or
-    # a self-hosted GitLab instance with
-    # GitLab CI/CD and Container Registry enabled
-
-    # Add GitLab CI/CD files to your project
-    - meltano add files gitlab-ci
-
-    # Initialize Git repository, if you haven't already
-    # git init
-
-    # Add and commit all files
-    # git add -A
-    # git commit -m "Set up Meltano project with Docker and GitLab CI"
-
-    # Push to GitLab, which will automatically create
-    # a new private project at the specified path
-    # NAMESPACE="<your-gitlab-username-or-group>"
-    # git push git@gitlab.com:$NAMESPACE/meltano-demo-project.git master
-
-    ### https://meltano.com/#meltano-add
-
-    # List extractors and loaders known to Meltano
-    - meltano discover extractors
-    - meltano discover loaders
-
-    # Add a known extractor or loader by name
-    - meltano add extractor tap-salesforce
-    - meltano add loader target-snowflake
-
-    # Add an unknown (custom) extractor or loader
-    - printf "tap_covid_19\ntap-covid-19\ntap-covid-19\ncatalog,discover,state\napi_token,user_agent,start_date\n" | meltano add --custom extractor tap-covid-19
-
-
-    ### https://meltano.com/#meltano-config
-
-    # List all plugin settings with their names,
-    # environment variables, and current values
-    - meltano config tap-covid-19 list
-
-    # Store non-sensitive plugin configuration in
-    # your project's `meltano.yml` file
-    - meltano config tap-covid-19 set start_date 2020-01-01T00:00:00Z
-    - meltano config tap-covid-19 set user_agent "tap-covid-19 via Meltano via GitLab CI"
-
-    # Store sensitive plugin configuration in...
-    # - the current shell environment:
-    # export TAP_COVID_19_API_TOKEN="<your-github-api-token>"
-    # - OR a (gitignored) `.env` file:
-    # meltano config tap-covid-19 set api_token <your-github-api-token>
-
-    # Unset specific setting
-    # meltano config tap-covid-19 unset start_date
-
-    # Reset configuration back to defaults
-    # meltano config tap-covid-19 reset
-
-    # View current configuration
-    - meltano config tap-covid-19
-
-
-    ### https://meltano.com/#meltano-select
-
-    # List all available entities and attributes
-    - "[[ $TAP_COVID_19_API_TOKEN ]] && meltano select --list --all tap-covid-19 || echo '$TAP_COVID_19_API_TOKEN is not set'"
-
-    # Include all attributes of an entity
-    - meltano select tap-covid-19 eu_ecdc_daily "*"
-
-    # Include specific attributes of an entity
-    - meltano select tap-covid-19 eu_daily date
-    - meltano select tap-covid-19 eu_daily country
-    - meltano select tap-covid-19 eu_daily cases
-    - meltano select tap-covid-19 eu_daily deaths
-
-    # Exclude matching attributes of all entities
-    - meltano select tap-covid-19 --exclude "*" "git_*"
-
-    # List selected (enabled) entities and attributes
-    - "[[ $TAP_COVID_19_API_TOKEN ]] && meltano select --list tap-covid-19 || echo '$TAP_COVID_19_API_TOKEN is not set'"
-
-    # Set stream metadata for all matching entities
-    - meltano config tap-covid-19 set _metadata "eu_*" replication-method INCREMENTAL
-    - meltano config tap-covid-19 set _metadata "eu_*" replication-key date
 
   artifacts:
     paths:

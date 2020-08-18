@@ -27,8 +27,6 @@ meltano init myprojectname
 
 This will create a new directory named `myprojectname` in the current directory and initialize Meltano's basic directory structure inside it.
 
-Inside the Meltano project directory, all plugin configuration (which may include tokens and passwords) is stored inside the `.meltano` directory, which is automatically added to the project's `.gitignore` file to prevent this potentially sensitive information from accidentally being pushed up to a hosted Git repository.
-
 ## Setup your loader
 
 Self-hosted Meltano instances require you to set up a reporting database and configure Meltano to use it by installing a **Loader**.

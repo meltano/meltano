@@ -9,17 +9,31 @@ const docsSidebar = [
     ]
   },
   {
+    title: "Concepts",
+    collapsable: false,
+    sidebarDepth: 2,
+    children: [
+      "/docs/project",
+    ]
+  },
+  {
+    title: "Guide",
     collapsable: false,
     sidebarDepth: 2,
     children: [
       "/docs/installation",
+      "/docs/plugin-management",
+      "/docs/configuration",
+      "/docs/integration",
       "/docs/transforms",
       "/docs/orchestration",
+      "/docs/containerization",
       "/docs/production",
       "/docs/analysis",
     ]
   },
   {
+    title: "Reference",
     collapsable: false,
     sidebarDepth: 2,
     children: [
@@ -29,6 +43,7 @@ const docsSidebar = [
     ]
   },
   {
+    title: "More",
     collapsable: false,
     sidebarDepth: 2,
     children: [
@@ -120,7 +135,7 @@ module.exports = {
         icon: "TwitterIcon"
       },
       {
-        text: "Repository on GitLab",
+        text: "View code on GitLab",
         link: "https://gitlab.com/meltano/meltano",
         icon: "GitLabIcon"
       },

@@ -136,24 +136,9 @@ The bundled files will be added to your project automatically as part of install
 
 ## `config`
 
-Enables you to manage the configuration of Meltano itself or any of its plugins, as well as [plugin extras](#plugin-extras).
+Enables you to manage the [configuration](/docs/configuration.html) of Meltano itself or any of its plugins, as well as [plugin extras](#plugin-extras).
 
-Meltano uses configuration layers to resolve a plugin's configuration:
-
-<!-- The following is reproduced from docs/src/README.md#meltano-config with minor edits. -->
-
-1. **Environment variables**, set through [your shell at `meltano elt` runtime](/docs/command-line-interface.html#pipeline-specific-configuration), a [`.env` file](https://github.com/theskumar/python-dotenv#usages) in your project directory, a [scheduled pipeline](#schedule)'s `env` dictionary in `meltano.yml`, or any other method. You can use `meltano config <plugin> list` to list the available variable names.
-2. **Your project's `meltano.yml` file**, under the plugin's `config` key.
-   - Inside values, [environment variables](#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
-   - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
-3. **Your project's [**system database**](/docs/settings.html#database-uri)**, which lives at `.meltano/meltano.db` by default and (among other things) stores configuration set using [`meltano config <plugin> set`](#config) or [the UI](#ui) when the project is [deployed as read-only](/docs/settings.html#project-readonly).
-   - Note that configuration for Meltano itself cannot be stored in the system database.
-4. **The default `value`s** set on the plugin's `settings` object in the global `discovery.yml` file (in the case of [known plugins](/docs/contributor-guide.html#known-plugins)) or your project's `meltano.yml` file (in the case of custom plugins). `meltano config <plugin> list` will list the default values.
-
-Configuration that is _not_ environment-specific or sensitive should be stored in your project's `meltano.yml` file and checked into version
-control. Sensitive values like passwords and tokens are most appropriately stored in the environment, a (`.gitignore`d) `.env` file in your project directory, or the system database.
-
-When no explicit `--store` is specified, `meltano config <plugin> set` will automatically store the value in the most appropriate location:
+When no explicit `--store` is specified, `meltano config <plugin> set` will automatically store the value in the [most appropriate location](/docs/configuration.html#configuration-layers):
 - the system database, if the project is [deployed as read-only](/docs/settings.html#project-readonly);
 - the current location, if a setting's default value has already been overwritten;
 - `.env`, if a setting is sensitive or environment-specific (defined as `kind: password` or `env_specific: true`);
@@ -640,7 +625,7 @@ Some loaders only emit their state once their work is completely done, even if s
 
 ### Plugin configuration
 
-Per the [`meltano config` rules](/docs/command-line-interface.html#config), `meltano elt` will determine the configuration of the extractor, loader, and (optionally) transformer by looking in **the environment**, a [**`.env` file**](https://github.com/theskumar/python-dotenv#usages) in your project directory, the [system database](/docs/settings.html#database-uri), and finally your project's **`meltano.yml` file**, falling back to a default value if nothing was found.
+As described in the [configuration guide](/docs/configuration.html#configuration-layers), `meltano elt` will determine the configuration of the extractor, loader, and (optionally) transformer by looking in **the environment**, a [**`.env` file**](https://github.com/theskumar/python-dotenv#usages) in your project directory, the [system database](/docs/settings.html#database-uri), and finally your project's **`meltano.yml` file**, falling back to a default value if nothing was found.
 
 You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#config) to list all available settings with their names, environment variables, and current values. [`meltano config <plugin>`](/docs/command-line-interface.html#config) will print the current configuration in JSON format.
 
@@ -760,7 +745,15 @@ This feature is used to dynamically configure the `target-postgres` and `target-
 
 ## `init`
 
-Used to create a new meltano project with a basic infrastructure in place in the current directory that the user is in.
+Used to create a new Meltano project directory inside the current working directory.
+
+The new project directory will contain:
+
+- a `meltano.yml` file that will list any [`plugins` you'll add](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project) and [pipeline `schedules` you'll create](/#orchestration),
+- stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
+- empty `model`, `extract`, `load`, `transform`, `analyze`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
+
+The [`send_anonymous_usage_stats` setting](/docs/settings.html#send-anonymous-usage-stats) will be enabled by default, unless the `--no_usage_stats` flag is provided or the `MELTANO_DISABLE_TRACKING` environment variable is enabled.
 
 ### How to use
 
@@ -769,13 +762,32 @@ Used to create a new meltano project with a basic infrastructure in place in the
 meltano init [project_name] [--no_usage_stats]
 ```
 
-### Parameters
+#### Parameters
 
 - **project_name** - This determines the folder name for the project
 
-### Options
+#### Options
 
-- **no_usage_stats** - This flag disables sending anonymous usage data when creating a new project.
+- **no_usage_stats** - This flag disables the [`send_anonymous_usage_stats` setting](/docs/settings.html#send-anonymous-usage-stats).
+
+#### Examples
+
+```bash
+# Initialize a new Meltano project in the
+# "demo-project" directory, and...
+# - share anonymous usage data with the Meltano team
+#   to help them gauge interest in Meltano and its
+#   features and drive development time accordingly:
+meltano init demo-project
+# - OR don't share anything with the Meltano team
+#   about this specific project:
+meltano init demo-project --no_usage_stats
+# - OR don't share anything with the Meltano team
+#   about any project I initialize ever:
+SHELLRC=~/.$(basename $SHELL)rc # ~/.bashrc, ~/.zshrc, etc
+echo "export MELTANO_DISABLE_TRACKING=1" >> $SHELLRC
+meltano init demo-project # --no_usage_stats is implied
+```
 
 ## `install`
 
@@ -875,16 +887,51 @@ Use `--list` to list the current selected tap attributes.
 ### Examples
 
 ```bash
-meltano select tap-carbon-intensity '*' 'name*'
+# List all available entities and attributes
+meltano select --list --all tap-covid-19
+
+# Include all attributes of an entity
+meltano select tap-covid-19 eu_ecdc_daily "*"
+
+# Include specific attributes of an entity
+meltano select tap-covid-19 eu_daily date
+meltano select tap-covid-19 eu_daily country
+meltano select tap-covid-19 eu_daily cases
+meltano select tap-covid-19 eu_daily deaths
+
+# Exclude matching attributes of all entities
+meltano select tap-covid-19 --exclude "*" "git_*"
+
+# List selected (enabled) entities and attributes
+meltano select --list tap-covid-19
 ```
 
-This will select all attributes starting with `name`.
+Example output:
 
-```bash
-meltano select tap-carbon-intensity 'region'
 ```
+Enabled patterns:
+    eu_ecdc_daily.*
+    eu_daily.date
+    eu_daily.country
+    eu_daily.cases
+    eu_daily.deaths
+    !*.git_*
 
-This will select all attributes of the `region` entity.
+Selected attributes:
+    [automatic] eu_daily.__sdc_row_number
+    [automatic] eu_daily.git_path
+    [selected ] eu_daily.date
+    [selected ] eu_daily.country
+    [selected ] eu_daily.cases
+    [selected ] eu_daily.deaths
+    [automatic] eu_ecdc_daily.__sdc_row_number
+    [automatic] eu_ecdc_daily.git_path
+    [selected ] eu_ecdc_daily.date
+    [selected ] eu_ecdc_daily.datetime
+    [selected ] eu_ecdc_daily.country
+    [selected ] eu_ecdc_daily.cases
+    [selected ] eu_ecdc_daily.deaths
+```
 
 ::: tip
 Most shells parse glob syntax: you must escape the special characters in the select pattern by quoting the pattern.

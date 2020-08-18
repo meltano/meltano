@@ -27,7 +27,7 @@
             target="_blank"
           >
             <GitLabIcon />
-            Show me the code!
+            View code on GitLab
             <OutboundLink />
           </a>
         </p>
@@ -42,12 +42,12 @@
       <div class="hero-left">
         <Content class="theme-default-content" slot-key="meltano-init" />
 
-        <!-- <p class="action">
+        <p class="action">
           <NavLink
             class="action-button"
-            :item="$frontmatter.meltano-init.primaryAction"
+            :item="$frontmatter.meltanoInit.primaryAction"
           />
-        </p> -->
+        </p>
       </div>
 
       <div class="hero-right">
@@ -150,62 +150,7 @@
           class="button is-filled"
           :item="$frontmatter.installation.primaryAction"
         />
-
-        <p class="description ta-c">
-          Or keep scrolling to learn more!
-        </p>
       </section>
-    </div>
-
-    <div class="hero homepage-cta feature-section-wrapper" id="meltano-add">
-      <div class="hero-left">
-        <Content class="theme-default-content" slot-key="meltano-add" />
-
-        <p class="action">
-          <NavLink
-            class="action-button"
-            :item="$frontmatter.meltanoAdd.primaryAction"
-          />
-        </p>
-      </div>
-
-      <div class="hero-right">
-        <Content class="theme-default-content" slot-key="meltano-add-code" />
-      </div>
-    </div>
-
-    <div class="hero homepage-cta feature-section-wrapper" id="meltano-config">
-      <div class="hero-left">
-        <Content class="theme-default-content" slot-key="meltano-config" />
-
-        <p class="action">
-          <NavLink
-            class="action-button"
-            :item="$frontmatter.meltanoConfig.primaryAction"
-          />
-        </p>
-      </div>
-
-      <div class="hero-right">
-        <Content class="theme-default-content" slot-key="meltano-config-code" />
-      </div>
-    </div>
-
-    <div class="hero homepage-cta feature-section-wrapper" id="meltano-select">
-      <div class="hero-left">
-        <Content class="theme-default-content" slot-key="meltano-select" />
-
-        <p class="action">
-          <NavLink
-            class="action-button"
-            :item="$frontmatter.meltanoSelect.primaryAction"
-          />
-        </p>
-      </div>
-
-      <div class="hero-right">
-        <Content class="theme-default-content" slot-key="meltano-select-code" />
-      </div>
     </div>
 
     <div class="feature-section-wrapper is-shorter is-white">

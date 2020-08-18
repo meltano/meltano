@@ -5,7 +5,7 @@ sidebarDepth: 2
 lastUpdatedSignificantly: 2020-02-20
 ---
 
-# Transforms
+# Data Transformation (T)
 
 Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations.
 
