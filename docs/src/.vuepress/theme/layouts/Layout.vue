@@ -31,3 +31,7 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+@require '../styles/vuepress-theme-default-prefers-color-scheme/components.styl'
+</style>

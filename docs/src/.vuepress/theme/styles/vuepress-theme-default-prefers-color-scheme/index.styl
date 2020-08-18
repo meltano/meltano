@@ -1,0 +1,316 @@
+@require './palette.styl'
+
+:root
+  --accentColor $accentColor
+  --textColor $textColor
+  --borderColor $borderColor
+  --codeBgColor $codeBgColor
+  --arrowBgColor $arrowBgColor
+  --badgeTipColor $badgeTipColor
+  --badgeWarningColor $badgeWarningColor
+  --badgeErrorColor $badgeErrorColor
+  --bgColor $bgColor
+  --kbdBgColor $kbdBgColor
+  --blockquoteTextColor $blockquoteTextColor
+  --blockquoteBorderColor $blockquoteBorderColor
+  --tableBorderColor $tableBorderColor
+  --tableStripeBgColor $tableStripeBgColor
+  --preTextColor $preTextColor
+  --highlightedBgColor $highlightedBgColor
+  --languageTextColor $languageTextColor
+  --lineNumbersColor $lineNumbersColor
+  --tipColor $tipColor
+  --tipBgColor $tipBgColor
+  --warningColor $warningColor
+  --warningBgColor $warningBgColor
+  --dangerColor $dangerColor
+  --dangerBgColor $dangerBgColor
+  --miniCodeBgColor $miniCodeBgColor
+  --searchBorderColor $searchBorderColor
+  --lighten10AccentColor lighten($accentColor, 10%)
+  --lighten10TextColor lighten($textColor, 10%)
+  --lighten20TextColor lighten($textColor, 20%)
+  --lighten25TextColor lighten($textColor, 25%)
+  --lighten35TextColor lighten($textColor, 35%)
+  --lighten40TextColor lighten($textColor, 40%)
+  --darken10AccentColor darken($accentColor, 10%)
+  --darken10BgColor darken($bgColor, 5%)
+  --darken10BorderColor darken($borderColor, 10%)
+
+  @media (prefers-color-scheme light)
+    --codeBgColor $codeBgLightColor
+    --preTextColor $preTextLightColor
+    --highlightedBgColor $highlightedBgLightColor
+    --languageTextColor $languageTextLightColor
+    --lineNumbersColor $lineNumbersLightColor
+
+  @media (prefers-color-scheme dark)
+    --accentColor $accentDarkColor
+    --textColor $textDarkColor
+    --borderColor $borderDarkColor
+    --arrowBgColor $arrowBgDarkColor
+    --badgeTipColor $badgeTipDarkColor
+    --badgeWarningColor $badgeWarningDarkColor
+    --badgeErrorColor $badgeErrorDarkColor
+    --bgColor $bgDarkColor
+    --kbdBgColor $kbdBgDarkColor
+    --blockquoteTextColor $blockquoteTextDarkColor
+    --blockquoteBorderColor $blockquoteBorderDarkColor
+    --tableBorderColor $tableBorderDarkColor
+    --tableStripeBgColor $tableStripeBgDarkColor
+    --tipColor $tipDarkColor
+    --tipBgColor $tipBgDarkColor
+    --warningColor $warningDarkColor
+    --warningBgColor $warningBgDarkColor
+    --dangerColor $dangerDarkColor
+    --dangerBgColor $dangerBgDarkColor
+    --miniCodeBgColor $miniCodeBgDarkColor
+    --searchBorderColor $searchBorderDarkColor
+    --lighten10AccentColor lighten($accentDarkColor, 10%)
+    --lighten10TextColor lighten($textDarkColor, 10%)
+    --lighten20TextColor lighten($textDarkColor, 20%)
+    --lighten25TextColor lighten($textDarkColor, 25%)
+    --lighten35TextColor lighten($textDarkColor, 35%)
+    --lighten40TextColor lighten($textDarkColor, 40%)
+    --darken10AccentColor darken($accentDarkColor, 10%)
+    --darken10BgColor lighten($bgDarkColor, 5%)
+    --darken10BorderColor darken($borderDarkColor, 10%)
+
+html[theme='light']
+  --accentColor $accentColor
+  --textColor $textColor
+  --borderColor $borderColor
+  --codeBgColor $codeBgLightColor
+  --arrowBgColor $arrowBgColor
+  --badgeTipColor $badgeTipColor
+  --badgeWarningColor $badgeWarningColor
+  --badgeErrorColor $badgeErrorColor
+  --bgColor $bgColor
+  --kbdBgColor $kbdBgColor
+  --blockquoteTextColor $blockquoteTextColor
+  --blockquoteBorderColor $blockquoteBorderColor
+  --tableBorderColor $tableBorderColor
+  --tableStripeBgColor $tableStripeBgColor
+  --preTextColor $preTextLightColor
+  --highlightedBgColor $highlightedBgLightColor
+  --languageTextColor $languageTextLightColor
+  --lineNumbersColor $lineNumbersLightColor
+  --tipColor $tipColor
+  --tipBgColor $tipBgColor
+  --warningColor $warningColor
+  --warningBgColor $warningBgColor
+  --dangerColor $dangerColor
+  --dangerBgColor $dangerBgColor
+  --miniCodeBgColor $miniCodeBgColor
+  --searchBorderColor $searchBorderColor
+  --lighten10AccentColor lighten($accentColor, 10%)
+  --lighten10TextColor lighten($textColor, 10%)
+  --lighten20TextColor lighten($textColor, 20%)
+  --lighten25TextColor lighten($textColor, 25%)
+  --lighten35TextColor lighten($textColor, 35%)
+  --lighten40TextColor lighten($textColor, 40%)
+  --darken10AccentColor darken($accentColor, 10%)
+  --darken10BgColor darken($bgColor, 5%)
+  --darken10BorderColor darken($borderColor, 10%)
+
+html[theme='dark']
+  --accentColor $accentDarkColor
+  --textColor $textDarkColor
+  --borderColor $borderDarkColor
+  --codeBgColor $codeBgColor
+  --arrowBgColor $arrowBgDarkColor
+  --badgeTipColor $badgeTipDarkColor
+  --badgeWarningColor $badgeWarningDarkColor
+  --badgeErrorColor $badgeErrorDarkColor
+  --bgColor $bgDarkColor
+  --kbdBgColor $kbdBgDarkColor
+  --blockquoteTextColor $blockquoteTextDarkColor
+  --blockquoteBorderColor $blockquoteBorderDarkColor
+  --tableBorderColor $tableBorderDarkColor
+  --tableStripeBgColor $tableStripeBgDarkColor
+  --preTextColor $preTextColor
+  --highlightedBgColor $highlightedBgColor
+  --languageTextColor $languageTextColor
+  --lineNumbersColor $lineNumbersColor
+  --tipColor $tipDarkColor
+  --tipBgColor $tipBgDarkColor
+  --warningColor $warningDarkColor
+  --warningBgColor $warningBgDarkColor
+  --dangerColor $dangerDarkColor
+  --dangerBgColor $dangerBgDarkColor
+  --miniCodeBgColor $miniCodeBgDarkColor
+  --searchBorderColor $searchBorderDarkColor
+  --lighten10AccentColor lighten($accentDarkColor, 10%)
+  --lighten10TextColor lighten($textDarkColor, 10%)
+  --lighten20TextColor lighten($textDarkColor, 20%)
+  --lighten25TextColor lighten($textDarkColor, 25%)
+  --lighten35TextColor lighten($textDarkColor, 35%)
+  --lighten40TextColor lighten($textDarkColor, 40%)
+  --darken10AccentColor darken($accentDarkColor, 10%)
+  --darken10BgColor darken($bgDarkColor, 5%)
+  --darken10BorderColor darken($borderDarkColor, 10%)
+
+html
+body
+.navbar
+.sidebar
+  background-color var(--bgColor)
+
+body
+  color var(--textColor)
+
+.navbar
+h2
+.sidebar .nav-links
+  border-bottom-color var(--borderColor)
+
+.sidebar
+  border-right-color var(--borderColor)
+
+{$contentClass}:not(.custom) p.demo
+kbd
+  border-color var(--borderColor)
+
+kbd
+  background var(--kbdBgColor)
+
+blockquote
+  color var(--blockquoteTextColor)
+  border-left-color var(--blockquoteBorderColor)
+
+a
+p a code
+  color var(--accentColor)
+
+hr
+.page-nav .inner
+  border-top-color var(--borderColor) !important
+
+tr
+  border-top-color var(--tableBorderColor)
+
+  &:nth-child(2n)
+    background-color var(--tableStripeBgColor)
+
+th
+td
+  border-color var(--tableBorderColor)
+
+.arrow.up
+  border-bottom-color var(--arrowBgColor)
+
+.arrow.down
+  border-top-color var(--arrowBgColor)
+
+.arrow.right
+border-left-color var(--arrowBgColor)
+.arrow.left
+  border-right-color var(--arrowBgColor)
+
+// code
+{$contentClass} code
+  color var(--lighten20TextColor)
+  background-color var(--miniCodeBgColor)
+
+  .token.inserted
+    color var(--accentColor)
+
+{$contentClass} pre
+
+{$contentClass} pre[class*='language-']
+div[class*='language-']
+div[class*='language-'].line-numbers-mode::after
+  background-color var(--codeBgColor)
+
+{$contentClass}
+  pre
+  pre[class*='language-']
+    code
+      color var(--preTextColor)
+
+div[class*='language-'] .highlight-lines .highlighted
+div[class*='language-'].line-numbers-mode .highlight-lines .highlighted::before
+  background-color var(--highlightedBgColor)
+
+div[class*='language-'].line-numbers-mode::after
+  background-color var(--codeBgColor)
+  border-right-color var(--highlightedBgColor)
+
+div[class*='language-']::before
+  color var(--languageTextColor)
+
+div[class*='language-'].line-numbers-mode .line-numbers-wrapper
+  color var(--lineNumbersColor)
+
+// custom-block
+.custom-block.tip
+  border-color var(--badgeTipColor)
+  background-color var(--tipBgColor)
+
+  .custom-block-title
+  a
+    color var(--tipColor)
+
+.custom-block.warning
+  border-color var(--badgeWarningColor)
+  background-color var(--warningBgColor)
+
+  .custom-block-title
+  a
+    color var(--warningColor)
+
+.custom-block.danger
+  border-color var(--badgeErrorColor)
+  background-color var(--dangerBgColor)
+
+  .custom-block-title
+  a
+    color var(--dangerColor)
+
+.custom-block.warning
+.custom-block.danger
+  color var(--textColor)
+
+.custom-block.details
+  background-color var(--tipBgColor)
+
+// badge
+.badge
+  background-color var(--badgeTipColor) !important
+
+  &.tip
+  &.green
+    background-color var(--badgeTipColor) !important
+
+  &.error
+    background-color var(--badgeErrorColor) !important
+
+  &.warning
+  &.warn
+  &.yellow
+    background-color var(--badgeWarningColor) !important
+
+// pwa
+.global-ui
+  .sw-update-popup
+    border-color var(--accentColors) !important
+    background-color var(--bgColor) !important
+    color var(--textColor) !important
+
+    button
+      border-color var(--darken10AccentColor) !important
+      background-color var(--accentColor) !important
+      color #fff !important
+
+      &:hover
+        background-color var(--lighten10AccentColor) !important
+
+// scroll bar
+@media (min-width $MQMobile)
+  ::-webkit-scrollbar
+    max-width 6px
+    max-height 12px
+
+  ::-webkit-scrollbar-thumb
+    background-color var(--languageTextColor)
+    border-radius 6px

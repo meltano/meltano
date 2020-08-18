@@ -402,16 +402,11 @@ export default {
 }
 
 .feature-section-wrapper {
-  background-color: white;
   padding-top: 0rem;
   padding-bottom: 4rem;
 
   &.is-shorter {
     padding: 2rem 0;
-  }
-
-  &.is-white {
-    background-color: #fff;
   }
 }
 
@@ -453,7 +448,6 @@ export default {
 
   p, ul, ol {
     font-size: 1.2rem !important;
-    color: #474C4F !important;
   }
 
   h1 {
@@ -461,7 +455,6 @@ export default {
     padding-right: 40px !important;
     font-weight: 400 !important;
     font-size: 36px !important;
-    color: #1D1D1D !important;
     margin: 0 !important;
   }
 
@@ -546,49 +539,51 @@ export default {
       line-height: 1.3;
       color: lighten($textColor, 40%);
     }
-  }
 
-  .action-button {
-    display: inline-block;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #fff;
-    background-color: $accentColor;
-    padding: 0.8rem 1.6rem;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-    box-sizing: border-box;
-    margin-right: 0.4rem;
-    margin-bottom: 1rem;
-
-    svg {
+    .action-button {
+      display: inline-block;
+      font-size: 1.2rem;
+      font-weight: bold;
       color: #fff;
-
-      &:not(.outbound) {
-        vertical-align: text-top;
-      }
-    }
-
-    img {
-      vertical-align: text-top;
-    }
-
-    &.secondary {
-      background: none;
-      box-shadow: inset 0 0 0 2px $accentColor;
-      color: $accentColor;
+      background-color: $accentColor;
+      padding: 0.8rem 1.6rem;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
+      box-sizing: border-box;
+      margin-right: 0.4rem;
+      margin-bottom: 1rem;
 
       svg {
-        color: $accentColor;
+        color: #fff;
+
+        &:not(.outbound) {
+          vertical-align: text-top;
+        }
+      }
+
+      img {
+        vertical-align: text-top;
+      }
+
+      @media (prefers-color-scheme light) {
+        &.secondary {
+          background: none;
+          box-shadow: inset 0 0 0 2px $accentColor;
+          color: $accentColor;
+
+          svg {
+            color: $accentColor;
+          }
+
+          &:hover {
+            background-color: lighten($accentColor, 80%);
+          }
+        }
       }
 
       &:hover {
-        background-color: lighten($accentColor, 80%);
+        background-color: $accentHighlightColor;
       }
-    }
-
-    &:hover {
-      background-color: $accentHighlightColor;
     }
   }
 
@@ -649,11 +644,11 @@ export default {
       .description {
         font-size: 1.2rem;
       }
-    }
 
-    .action-button {
-      font-size: 1.1rem;
-      padding: 0.6rem 1.2rem;
+      .action-button {
+        font-size: 1.1rem;
+        padding: 0.6rem 1.2rem;
+      }
     }
 
     .feature {

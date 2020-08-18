@@ -1,0 +1,168 @@
+// search
+.search-box
+  input
+    color var(--lighten25TextColor)
+    border-color var(--darken10BorderColor)
+    background-color var(--bgColor)
+
+    &:focus
+      border-color var(--accentColor)
+
+  .suggestions
+    background var(--bgColor)
+    border-color var(--darken10BorderColor)
+
+  .suggestion
+    a
+      color var(--lighten35TextColor)
+
+    &.focused
+      background-color var(--darken10BgColor)
+
+      a
+        color var(--accentColor)
+
+.algolia-search-wrapper
+  .algolia-autocomplete
+    .ds-dropdown-menu
+      background var(--bgColor)
+      border-color var(--searchBorderColor)
+
+      &::before
+        border-color var(--searchBorderColor)
+
+      .ds-suggestion
+        border-bottom-color var(--borderColor)
+
+    // .algolia-docsearch-suggestion--highlight
+    // color #2c815b
+    .algolia-docsearch-suggestion
+      border-color var(--borderColor)
+
+      .algolia-docsearch-suggestion--category-header
+        background var(--accentColor)
+        // color #fff
+        // .algolia-docsearch-suggestion--highlight
+        // background rgba(255, 255, 255, 0.6)
+
+      .algolia-docsearch-suggestion--title
+        color var(--textColor)
+
+      .algolia-docsearch-suggestion--subcategory-column
+        border-color var(--borderColor)
+        // background #f1f3f5
+
+    .algolia-docsearch-footer
+      border-color var(--borderColor)
+
+    .ds-cursor .algolia-docsearch-suggestion--content
+      // background-color #e7edf3 !important
+      color var(--textColor)
+
+.dropdown-wrapper
+  .dropdown-title
+    color var(--textColor)
+
+  .nav-dropdown
+    .dropdown-item
+      h4
+        border-top-color var(--kbdBgColor)
+
+      a
+        &:hover
+          color var(--accentColor)
+
+        &.router-link-active
+          color var(--accentColor)
+
+          &::after
+            border-left-color var(--accentColor)
+
+@media (max-width: $MQMobile)
+  .dropdown-wrapper .dropdown-title:hover
+    color var(--accentColor)
+
+@media (min-width: $MQMobile)
+  .dropdown-wrapper .dropdown-title .arrow
+    border-top-color var(--arrowBgColor)
+
+  .dropdown-wrapper .nav-dropdown
+    background-color var(--bgColor)
+    border-color var(--borderColor)
+
+// home
+.home
+  .hero
+    .description
+      color var(--lighten40TextColor)
+
+    .action-button
+      // color #fff
+      background-color var(--accentColor)
+      border-bottom-color var(--darken10AccentColor)
+
+      &:hover
+        background-color var(--lighten10AccentColor)
+
+  .features
+    border-top-color var(--borderColor)
+
+  .feature
+    h2
+      color var(--lighten10TextColor)
+
+    p
+      color var(--lighten25TextColor)
+
+  .footer
+    border-top-color var(--borderColor)
+    color var(--lighten25TextColor)
+
+// navbar
+.navbar .site-name
+  color var(--textColor)
+  white-space nowrap
+
+.navbar .links
+  background var(--bgColor)
+
+.nav-links a
+  &:hover
+  &.router-link-active
+    color var(--accentColor)
+
+    @media (min-width: $MQMobile)
+      color var(--textColor)
+
+@media (min-width: $MQMobile)
+  .nav-item > a:not(.external)
+    &:hover
+    &.router-link-active
+      border-bottom-color var(--accentColor)
+
+// page-edit
+.page-edit .edit-link a
+.page-edit .last-updated .prefix
+  color var(--lighten25TextColor)
+
+// sidebar
+.sidebar-heading
+  color var(--textColor)
+
+  &.clickable
+    &.active
+      color var(--accentColor)
+      border-left-color var(--accentColor)
+
+    &:hover
+      color var(--accentColor)
+
+a.sidebar-link
+  color var(--textColor)
+
+  &:hover
+    color var(--accentColor)
+
+  &.active
+    color var(--accentColor)
+    border-left-color var(--accentColor)
