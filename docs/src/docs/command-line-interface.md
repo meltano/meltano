@@ -112,7 +112,7 @@ Once you've succesfully added your custom plugin to your Meltano project, don't 
 
 ## `config`
 
-Enables you to manage the [configuration](/docs/configuration.html) of Meltano itself or any of its plugins, as well as [plugin extras](#plugin-extras).
+Enables you to manage the [configuration](/docs/configuration.html) of Meltano itself or any of its plugins, as well as [plugin extras](#how-to-use-plugin-extras).
 
 When no explicit `--store` is specified, `meltano config <plugin> set` will automatically store the value in the [most appropriate location](/docs/configuration.html#configuration-layers):
 - the system database, if the project is [deployed as read-only](/docs/settings.html#project-readonly);
@@ -298,235 +298,6 @@ meltano config <plugin> unset _<extra>
 
 # Reset regular settings _and_ extras
 meltano config <plugin> reset
-```
-
-### Extractor extra: `select`
-
-- Setting: `_select`
-- Environment variable: `<NAMESPACE>__SELECT`
-- Default: `["*.*"]`
-
-An [extractor](#extractor--loader)'s `select` [extra](#plugin-extras) holds an array of [entity selection rules](#select)
-to apply to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
-when the extractor is run using [`meltano elt`](#elt) or [`meltano invoke`](#invoke).
-
-While this extra can be managed using `meltano config` or environment variables like any other setting,
-selection rules are typically specified using [`meltano select`](#select).
-
-#### How to use
-
-##### On the command line
-
-```bash
-meltano config <plugin> set _select '["<entity>.<attribute>", ...]'
-
-export <NAMESPACE>__SELECT='["<entity>.<attribute>", ...]'
-
-meltano select <plugin> <entity> <attribute>
-
-# For example:
-meltano config tap-gitlab set _select '["project_members.*", "commits.*"]'
-
-export TAP_GITLAB__SELECT='["project_members.*", "commits.*"]'
-
-meltano select tap-gitlab project_members "*"
-meltano select tap-gitlab commits "*"
-```
-
-##### In `meltano.yml`
-
-```yaml
-extractors:
-- name: tap-gitlab
-  pip_url: tap-gitlab
-  select:
-  - project_members.*
-  - commits.*
-```
-
-### Extractor extra: `metadata`
-
-- Setting: `_metadata`, alias: `metadata`
-- Environment variable: `<NAMESPACE>__METADATA`
-- Default: `{}` (an empty object)
-
-An [extractor](#extractor--loader)'s `metadata` [extra](#plugin-extras) holds an object describing
-[Singer stream and property metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata)
-rules to apply to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
-when the extractor is run using [`meltano elt`](#elt) or [`meltano invoke`](#invoke).
-
-Stream (entity) metadata `<key>: <value>` pairs (e.g. `{"replication-method": "INCREMENTAL"}`) are nested under top-level entity identifiers that correspond to Singer stream `tap_stream_id` values.
-These [nested properties](#nested-properties) can also be thought of and interacted with as settings named `_metadata.<entity>.<key>`.
-
-Property (attribute) metadata `<key>: <value>` pairs (e.g. `{"is-replication-key": true}`) are nested under top-level entity identifiers and second-level attribute identifiers that correspond to Singer stream property names.
-These [nested properties](#nested-properties) can also be thought of and interacted with as settings named `_metadata.<entity>.<attribute>.<key>`.
-
-Entity and attribute names can be discovered using [`meltano select --list --all <plugin>`](#select).
-
-Like [entity selection rules](#select), metadata rules allow for [glob](https://en.wikipedia.org/wiki/Glob_(programming))-like
-patterns in the entity and attribute identifiers to match multiple entities and/or attributes at once.
-
-#### How to use
-
-##### On the command line
-
-```bash
-meltano config <plugin> set _metadata <entity> <key> <value>
-meltano config <plugin> set _metadata <entity> <attribute> <key> <value>
-
-export <NAMESPACE>__METADATA='{"<entity>": {"<key>": "<value>", "<attribute>": {"<key>": "<value>"}}}'
-
-# Once metadata has been set in `meltano.yml`, environment variables can be used
-# to override specific nested properties:
-export <NAMESPACE>__METADATA_<ENTITY>_<ATTRIBUTE>_<KEY>=<value>
-
-# For example:
-meltano config tap-postgres set _metadata some_table replication-method INCREMENTAL
-meltano config tap-postgres set _metadata some_table replication-key created_at
-meltano config tap-postgres set _metadata some_table created_at is-replication-key true
-
-export TAP_POSTGRES__METADATA_SOME_TABLE_REPLICATION_METHOD=FULL_TABLE
-```
-
-##### In `meltano.yml`
-
-```yaml
-extractors:
-- name: tap-postgres
-  pip_url: tap-postgres
-  metadata:
-    some_table:
-      replication-method: INCREMENTAL
-      replication-key: created_at
-      created_at:
-        is-replication-key: true
-```
-
-### Extractor extra: `schema`
-
-- Setting: `_schema`
-- Environment variable: `<NAMESPACE>__SCHEMA`
-- Default: `{}` (an empty object)
-
-An [extractor](#extractor--loader)'s `schema` [extra](#plugin-extras) holds an object describing
-[Singer stream schema](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#schemas) override
-rules to apply to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
-when the extractor is run using [`meltano elt`](#elt) or [`meltano invoke`](#invoke).
-
-[JSON Schema](https://json-schema.org/) descriptions for specific properties (attributes) (e.g. `{"type": ["string", "null"], "format": "date-time"}`) are nested under top-level entity identifiers that correspond to Singer stream `tap_stream_id` values, and second-level attribute identifiers that correspond to Singer stream property names.
-These [nested properties](#nested-properties) can also be thought of and interacted with as settings named `_schema.<entity>.<attribute>` and `_schema.<entity>.<attribute>.<key>`.
-
-Entity and attribute names can be discovered using [`meltano select --list --all <plugin>`](#select).
-
-Like [entity selection rules](#select), schema rules allow for [glob](https://en.wikipedia.org/wiki/Glob_(programming))-like
-patterns in the entity and attribute identifiers to match multiple entities and/or attributes at once.
-
-#### How to use
-
-##### On the command line
-
-```bash
-meltano config <plugin> set _schema <entity> <attribute> <schema description>
-meltano config <plugin> set _schema <entity> <attribute> <key> <value>
-
-export <NAMESPACE>__SCHEMA='{"<entity>": {"<attribute>": {"<key>": "<value>"}}}'
-
-# Once schema descriptions have been set in `meltano.yml`, environment variables can be used
-# to override specific nested properties:
-export <NAMESPACE>__SCHEMA_<ENTITY>_<ATTRIBUTE>_<KEY>=<value>
-
-# For example:
-meltano config tap-postgres set _metadata some_table created_at type '["string", "null"]'
-meltano config tap-postgres set _metadata some_table created_at format date-time
-
-export TAP_POSTGRES__SCHEMA_SOME_TABLE_CREATED_AT_FORMAT=date
-```
-
-##### In `meltano.yml`
-
-```yaml
-extractors:
-- name: tap-postgres
-  pip_url: tap-postgres
-  schema:
-    some_table:
-      created_at:
-        type: ["string", "null"]
-        format: date-time
-```
-
-### Transform extra: `vars`
-
-- Setting: `_vars`
-- Environment variable: `<NAMESPACE>__VARS`
-- Default: `{}` (an empty object)
-
-A [transform](#transform)'s `vars` [extra](#plugin-extras) holds an object representing [dbt model variables](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/using-variables)
-that can be referenced from a model using the [`var` function](https://docs.getdbt.com/reference/dbt-jinja-functions/var).
-
-When the transform is installed using [`meltano install`](#install), this object will be used as the dbt model's `vars` object in `transform/dbt_project.yml`.
-
-Because these variables are handled by dbt rather than Meltano, environment variables (including Meltano's [pipeline environment variables](#pipeline-environment-variables)) can be referenced using the [`env_var` function](https://docs.getdbt.com/reference/dbt-jinja-functions/env_var) instead of `$VAR` or `${VAR}`.
-
-#### How to use
-
-##### On the command line
-
-```bash
-meltano config <plugin> set _vars <key> <value>
-
-export <NAMESPACE>__VARS='{"<key>": "<value>"}'
-
-# For example
-meltano config --plugin-type=transform tap-gitlab set _vars schema "{{ env_var('DBT_SOURCE_SCHEMA') }}"
-
-export TAP_GITLAB__VARS='{"schema": "{{ env_var(''DBT_SOURCE_SCHEMA'') }}"}'
-
-```
-
-##### In `meltano.yml`
-
-```yaml
-transforms:
-- name: tap-gitlab
-  pip_url: dbt-tap-gitlab
-  vars:
-    schema: '{{ env_var(''DBT_SOURCE_SCHEMA'') }}'
-```
-
-### File bundle extra: `update`
-
-- Setting: `_update`
-- Environment variable: `<NAMESPACE>__UPDATE`
-- Default: `{}` (an empty object)
-
-A [file bundle](#file-bundle)'s `update` [extra](#plugin-extras) holds an object mapping file paths (of files inside the bundle, relative to the project root) to booleans.
-
-When a file path's value is `True`, the file is considered to be managed by the file bundle and updated automatically when [`meltano upgrade`](#upgrade) is run.
-
-#### How to use
-
-##### On the command line
-
-```bash
-meltano config <plugin> set _update <path> <true/false>
-
-export <NAMESPACE>__UPDATE='{"<path>": <true/false>}'
-
-# For example:
-meltano config --plugin-type=files dbt set _update transform/dbt_project.yml false
-
-export DBT__UPDATE='{"transform/dbt_project.yml": false}'
-```
-
-##### In `meltano.yml`
-
-```yaml
-files:
-- name: dbt
-  pip_url: files-dbt
-  update:
-    transform/dbt_project.yml: false
 ```
 
 ## `discover`
@@ -841,7 +612,10 @@ meltano schedule gitlab-to-jsonl tap-gitlab target-jsonl "* * * * *"
 
 Use the `select` command to add select patterns to a specific extractor in your Meltano project.
 
+
 - `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attributes for a specific tap.
+
+Selection rules will be stored in the extractor's [`select` extra](/docs/plugins.html#select-extra).
 
 ::: warning
 Not all taps support this feature. In addition, taps needs to support the `--discover` switch. You can use `meltano invoke tap-... --discover` to see if the tap supports it.
@@ -1004,7 +778,7 @@ Upgrade Meltano and the Meltano project to the latest version.
 
 When called without arguments, this will:
 - Upgrade the `meltano` package
-- Update files [managed by](#file-bundle-extra-update) [file bundles](#file-bundle)
+- Update files [managed by](/docs/plugins.html#update-extra) [file bundles](/docs/plugins.html#file-bundles)
 - Apply migrations to system database
 - Recompile models
 
