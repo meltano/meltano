@@ -10,14 +10,14 @@ Meltano provides a command line interface (CLI) that allows you to manage the co
 
 ## `add`
 
-`meltano add` lets you add plugins (extractors, loaders, transforms, models, dashboards, orchestrators, transformers, and file bundles) to your Meltano project.
+`meltano add` lets you add [plugins](/docs/plugins.html) to your Meltano project.
 
 Specifically, it will:
 1. add the plugin to your project's `meltano.yml` file under `plugins: <type>s:`, e.g. `plugins: extractors:`,
 2. create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`, and
 3. install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>`.
 
-(Some plugin types have slightly different or additional behavior; see [plugin-specific behavior](#plugin-specific-behavior) below for more details.)
+(Some plugin types have slightly different or additional behavior; refer to the [plugin type documentation](/docs/plugins.html) for more details.)
 
 Once the plugin has been added to your project, you can configure it using [`meltano config`](#config),
 invoke its executable using [`meltano invoke`](#invoke), and use it in a pipeline using [`meltano elt`](#elt).
@@ -109,30 +109,6 @@ To find out what `settings` a tap or target supports, reference its README and/o
 ::: tip
 Once you've succesfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
 :::
-
-### Plugin-specific behavior
-
-#### Transform
-
-Transform plugins are not pip packages, but [dbt packages](https://docs.getdbt.com/docs/building-a-dbt-project/package-management) containing [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models).
-
-As such, their `pip_url`s point at [dbt packages stored in Git](https://docs.getdbt.com/docs/building-a-dbt-project/package-management#git-packages), and they are installed by adding this `git` URL to your project's `transform/packages.yml` and enabling the packaged model in `transform/dbt_project.yml`.
-
-#### Dashboard
-
-Dashboard plugins are pip packages bundling Meltano dashboards and reports.
-
-The bundled dashboards and reports will be added to your project's `analyze` directory automatically as part of installation.
-
-#### Transformer and orchestrator
-
-Transformer and orchestrator plugins have related [file bundles](#file-bundle) that will be added to your project automatically as part of installation.
-
-#### File bundle
-
-File bundle plugins are pip packages bundling files you may want in your Meltano project.
-
-The bundled files will be added to your project automatically as part of installation. The file bundle plugin itself will not be added to `meltano.yml` unless it contains files that are [managed by the file bundle](#file-bundle-extra-update) and to be updated automatically when [`meltano upgrade`](#upgrade) is run.
 
 ## `config`
 
