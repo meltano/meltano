@@ -187,33 +187,6 @@ homepage_sample_code:
     # git push git@gitlab.com:$NAMESPACE/meltano-demo-project.git master
 
 
-    ### https://meltano.com/#meltano-config
-
-    # List all plugin settings with their names,
-    # environment variables, and current values
-    - meltano config tap-covid-19 list
-
-    # Store non-sensitive plugin configuration in
-    # your project's `meltano.yml` file
-    - meltano config tap-covid-19 set start_date 2020-01-01T00:00:00Z
-    - meltano config tap-covid-19 set user_agent "tap-covid-19 via Meltano via GitLab CI"
-
-    # Store sensitive plugin configuration in...
-    # - the current shell environment:
-    # export TAP_COVID_19_API_TOKEN="<your-github-api-token>"
-    # - OR a (gitignored) `.env` file:
-    # meltano config tap-covid-19 set api_token <your-github-api-token>
-
-    # Unset specific setting
-    # meltano config tap-covid-19 unset start_date
-
-    # Reset configuration back to defaults
-    # meltano config tap-covid-19 reset
-
-    # View current configuration
-    - meltano config tap-covid-19
-
-
     ### https://meltano.com/#meltano-select
 
     # List all available entities and attributes

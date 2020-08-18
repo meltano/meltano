@@ -136,24 +136,9 @@ The bundled files will be added to your project automatically as part of install
 
 ## `config`
 
-Enables you to manage the configuration of Meltano itself or any of its plugins, as well as [plugin extras](#plugin-extras).
+Enables you to manage the [configuration](/docs/configuration.html) of Meltano itself or any of its plugins, as well as [plugin extras](#plugin-extras).
 
-Meltano uses configuration layers to resolve a plugin's configuration:
-
-<!-- The following is reproduced from docs/src/README.md#meltano-config with minor edits. -->
-
-1. **Environment variables**, set through [your shell at `meltano elt` runtime](/docs/command-line-interface.html#pipeline-specific-configuration), a [`.env` file](https://github.com/theskumar/python-dotenv#usages) in your project directory, a [scheduled pipeline](#schedule)'s `env` dictionary in `meltano.yml`, or any other method. You can use `meltano config <plugin> list` to list the available variable names.
-2. **Your project's `meltano.yml` file**, under the plugin's `config` key.
-   - Inside values, [environment variables](#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
-   - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
-3. **Your project's [**system database**](/docs/settings.html#database-uri)**, which lives at `.meltano/meltano.db` by default and (among other things) stores configuration set using [`meltano config <plugin> set`](#config) or [the UI](#ui) when the project is [deployed as read-only](/docs/settings.html#project-readonly).
-   - Note that configuration for Meltano itself cannot be stored in the system database.
-4. **The default `value`s** set on the plugin's `settings` object in the global `discovery.yml` file (in the case of [known plugins](/docs/contributor-guide.html#known-plugins)) or your project's `meltano.yml` file (in the case of custom plugins). `meltano config <plugin> list` will list the default values.
-
-Configuration that is _not_ environment-specific or sensitive should be stored in your project's `meltano.yml` file and checked into version
-control. Sensitive values like passwords and tokens are most appropriately stored in the environment, a (`.gitignore`d) `.env` file in your project directory, or the system database.
-
-When no explicit `--store` is specified, `meltano config <plugin> set` will automatically store the value in the most appropriate location:
+When no explicit `--store` is specified, `meltano config <plugin> set` will automatically store the value in the [most appropriate location](/docs/configuration.html#configuration-layers):
 - the system database, if the project is [deployed as read-only](/docs/settings.html#project-readonly);
 - the current location, if a setting's default value has already been overwritten;
 - `.env`, if a setting is sensitive or environment-specific (defined as `kind: password` or `env_specific: true`);
@@ -640,7 +625,7 @@ Some loaders only emit their state once their work is completely done, even if s
 
 ### Plugin configuration
 
-Per the [`meltano config` rules](/docs/command-line-interface.html#config), `meltano elt` will determine the configuration of the extractor, loader, and (optionally) transformer by looking in **the environment**, a [**`.env` file**](https://github.com/theskumar/python-dotenv#usages) in your project directory, the [system database](/docs/settings.html#database-uri), and finally your project's **`meltano.yml` file**, falling back to a default value if nothing was found.
+As described in the [configuration guide](/docs/configuration.html#configuration-layers), `meltano elt` will determine the configuration of the extractor, loader, and (optionally) transformer by looking in **the environment**, a [**`.env` file**](https://github.com/theskumar/python-dotenv#usages) in your project directory, the [system database](/docs/settings.html#database-uri), and finally your project's **`meltano.yml` file**, falling back to a default value if nothing was found.
 
 You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#config) to list all available settings with their names, environment variables, and current values. [`meltano config <plugin>`](/docs/command-line-interface.html#config) will print the current configuration in JSON format.
 

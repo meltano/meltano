@@ -11,7 +11,7 @@ At the core of the Meltano experience is the Meltano project,
 which represents the single source of truth regarding your data pipelines:
 how data should be [integrated](/#integration) and [transformed](/#transformation),
 how the pipelines should be [orchestrated](/#orchestration),
-and how the various components should be [configured](/#meltano-config).
+and how the various components should be [configured](/docs/configuration.html).
 
 Since a Meltano project is just a directory on your filesystem containing
 text-based files, you can treat it like any other software development project
