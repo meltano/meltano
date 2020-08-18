@@ -9,13 +9,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+- [!1820](https://gitlab.com/meltano/meltano/-/merge_requests/1820) Add 'tap-spreadsheets-anywhere' as an extractor 
 
 ### Changes
 
 ### Fixes
 
 ### Breaks
-
 
 ## 1.45.0 - (2020-08-17)
 ---
