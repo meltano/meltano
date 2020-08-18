@@ -9,11 +9,11 @@ installation:
     link: /docs/getting-started.html
 meltanoInit:
   primaryAction:
-    text: Learn more about the Meltano project
+    text: Learn more about Meltano projects
     link: /docs/project.html
 integration:
   primaryAction:
-    text: Learn more about data integration using Meltano
+    text: Learn more about data integration using Singer
     link: /docs/integration.html
 transformation:
   primaryAction:
