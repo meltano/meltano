@@ -24,7 +24,7 @@ to list all available settings with their names, environment variables, and curr
 
 ## Your Meltano project
 
-These are settings specific to [your Meltano project](/#meltano-init).
+These are settings specific to [your Meltano project](/docs/project.html).
 
 ### `send_anonymous_usage_stats`
 

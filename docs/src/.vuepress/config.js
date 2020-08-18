@@ -9,6 +9,14 @@ const docsSidebar = [
     ]
   },
   {
+    title: "Concepts",
+    collapsable: false,
+    sidebarDepth: 2,
+    children: [
+      "/docs/project",
+    ]
+  },
+  {
     title: "Guide",
     collapsable: false,
     sidebarDepth: 2,

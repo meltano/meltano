@@ -7,6 +7,10 @@ installation:
   primaryAction:
     text: Get started
     link: /docs/getting-started.html
+meltanoInit:
+  primaryAction:
+    text: Learn more about the Meltano project
+    link: /docs/project.html
 integration:
   primaryAction:
     text: Learn more about `meltano elt`
@@ -90,6 +94,8 @@ Meltano is now ready for its [first project](/#meltano-init)!
 
 ## The Meltano project: your single source of truth
 
+<!-- The following is reproduced from docs/src/project.md -->
+
 At the core of the Meltano experience is the Meltano project,
 which represents the single source of truth regarding your data pipelines:
 how data should be [integrated](/#integration) and [transformed](/#transformation),
@@ -101,12 +107,7 @@ text-based files, you can treat it like any other software development project
 and benefit from DevOps best practices such as version control, code review,
 and continuous integration and deployment (CI/CD).
 
-You can initialize a new Meltano project using [`meltano init`](/docs/command-line-interface.html#init),
-which will create a new directory with:
-
-- a `meltano.yml` file that will list any [`plugins` you'll add](/#meltano-add) and [pipeline `schedules` you'll create](/#orchestration),
-- stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
-- empty `model`, `extract`, `load`, `transform`, `analyze`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
+You can initialize a new Meltano project using [`meltano init`](/docs/command-line-interface.html#init).
 :::
 
 ::: slot meltano-init-code
@@ -114,35 +115,15 @@ which will create a new directory with:
 <small>Follow the [installation instructions above](/#installation) and then...</small>
 
 ```bash
-# Initialize a new Meltano project in the
-# "demo-project" directory, and...
-# - share anonymous usage data with the Meltano team
-#   to help them gauge interest in Meltano and its
-#   features and drive development time accordingly:
+# Initialize a new Meltano project
 meltano init demo-project
-# - OR don't share anything with the Meltano team
-#   about this specific project:
-meltano init demo-project --no_usage_stats
-# - OR don't share anything with the Meltano team
-#   about any project I initialize ever:
-SHELLRC=~/.$(basename $SHELL)rc # ~/.bashrc, ~/.zshrc, etc
-echo "export MELTANO_DISABLE_TRACKING=1" >> $SHELLRC
-meltano init demo-project # --no_usage_stats is implied
-```
-
-```output
-Project demo-project has been created.
-
-Next steps:
-  cd demo-project
-  Visit https://meltano.com/ to learn where to go from here
 ```
 
 Your Meltano project has now been initialized in the `demo-project` directory!
 
 ```bash
-# Before you use any `meltano` command, ensure that:
-# - you have navigated to your Meltano project directory
+# Before using a `meltano` command, ensure that:
+# - you have navigated to your Meltano project
 cd demo-project
 # - you have activated the virtual environment
 source ../.venv/bin/activate

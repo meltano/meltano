@@ -42,12 +42,12 @@
       <div class="hero-left">
         <Content class="theme-default-content" slot-key="meltano-init" />
 
-        <!-- <p class="action">
+        <p class="action">
           <NavLink
             class="action-button"
-            :item="$frontmatter.meltano-init.primaryAction"
+            :item="$frontmatter.meltanoInit.primaryAction"
           />
-        </p> -->
+        </p>
       </div>
 
       <div class="hero-right">

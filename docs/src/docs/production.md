@@ -6,7 +6,7 @@ sidebarDepth: 2
 
 # Deployment in Production
 
-Once you've [set up a Meltano project](/#meltano-init) and
+Once you've [set up a Meltano project](/docs/project.html) and
 [run some pipelines](/#integration) on your local machine,
 it'll be time to repeat this trick in production!
 

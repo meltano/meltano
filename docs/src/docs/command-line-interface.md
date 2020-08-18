@@ -760,7 +760,15 @@ This feature is used to dynamically configure the `target-postgres` and `target-
 
 ## `init`
 
-Used to create a new meltano project with a basic infrastructure in place in the current directory that the user is in.
+Used to create a new Meltano project directory inside the current working directory.
+
+The new project directory will contain:
+
+- a `meltano.yml` file that will list any [`plugins` you'll add](/#meltano-add) and [pipeline `schedules` you'll create](/#orchestration),
+- stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
+- empty `model`, `extract`, `load`, `transform`, `analyze`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
+
+The [`send_anonymous_usage_stats` setting](/docs/settings.html#send-anonymous-usage-stats) will be enabled by default, unless the `--no_usage_stats` flag is provided or the `MELTANO_DISABLE_TRACKING` environment variable is enabled.
 
 ### How to use
 
@@ -769,13 +777,32 @@ Used to create a new meltano project with a basic infrastructure in place in the
 meltano init [project_name] [--no_usage_stats]
 ```
 
-### Parameters
+#### Parameters
 
 - **project_name** - This determines the folder name for the project
 
-### Options
+#### Options
 
-- **no_usage_stats** - This flag disables sending anonymous usage data when creating a new project.
+- **no_usage_stats** - This flag disables the [`send_anonymous_usage_stats` setting](/docs/settings.html#send-anonymous-usage-stats).
+
+#### Examples
+
+```bash
+# Initialize a new Meltano project in the
+# "demo-project" directory, and...
+# - share anonymous usage data with the Meltano team
+#   to help them gauge interest in Meltano and its
+#   features and drive development time accordingly:
+meltano init demo-project
+# - OR don't share anything with the Meltano team
+#   about this specific project:
+meltano init demo-project --no_usage_stats
+# - OR don't share anything with the Meltano team
+#   about any project I initialize ever:
+SHELLRC=~/.$(basename $SHELL)rc # ~/.bashrc, ~/.zshrc, etc
+echo "export MELTANO_DISABLE_TRACKING=1" >> $SHELLRC
+meltano init demo-project # --no_usage_stats is implied
+```
 
 ## `install`
 
