@@ -9,6 +9,7 @@ const docsSidebar = [
     ]
   },
   {
+    title: "Guide",
     collapsable: false,
     sidebarDepth: 2,
     children: [
@@ -20,6 +21,7 @@ const docsSidebar = [
     ]
   },
   {
+    title: "Reference",
     collapsable: false,
     sidebarDepth: 2,
     children: [
@@ -29,6 +31,7 @@ const docsSidebar = [
     ]
   },
   {
+    title: "More",
     collapsable: false,
     sidebarDepth: 2,
     children: [
