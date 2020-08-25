@@ -5,6 +5,60 @@ description: Learn how to use Meltano to select specific entities and attributes
 
 # Data Integration (EL)
 
+## Plugin configuration
+
+As described in the [configuration guide](/docs/configuration.html#configuration-layers), [`meltano elt`](/docs/command-line-interface.html#elt) will determine the configuration of the extractor, loader, and (optionally) transformer by looking in **the environment**, a [**`.env` file**](https://github.com/theskumar/python-dotenv#usages) in your project directory, the [system database](/docs/settings.html#database-uri), and finally your project's **`meltano.yml` file**, falling back to a default value if nothing was found.
+
+You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#config) to list all available settings with their names, environment variables, and current values. [`meltano config <plugin>`](/docs/command-line-interface.html#config) will print the current configuration in JSON format.
+
+### Pipeline-specific configuration
+
+If you'd like to specify (or override) the values of certain settings at runtime, on a per-pipeline basis, you can set them in the [`meltano elt`](/docs/command-line-interface.html#elt) execution environment using [environment variables](https://en.wikipedia.org/wiki/Environment_variable).
+
+This lets you use the same extractors and loaders (Singer taps and targets) in multiple pipelines, configured differently each time.
+
+On a shell, you can explicitly `export` environment variables, that will be passed along to every following command invocation, or you can specify them in-line with a specific invocation, ahead of the command:
+
+```bash
+export TAP_FOO_BAR=bar
+export TAP_FOO_BAZ=baz
+meltano elt ...
+
+TAP_FOO_BAR=bar TAP_FOO_BAZ=baz meltano elt ...
+```
+
+To verify that these environment variables will be picked up by Meltano as you intented, you can test them with `meltano config <plugin>` before running `meltano elt`.
+
+If you're using [`meltano schedule`](/docs/command-line-interface.html#schedule) to [schedule your pipelines](/#orchestration), you can specify environment variables for each pipeline in `meltano.yml`, where each entry in the `schedules` array can have an `env` dictionary:
+
+```yaml
+schedules:
+- name: foo-to-bar
+  extractor: tap-foo
+  loader: target-bar
+  transform: skip
+  interval: '@hourly'
+  start_date: 2020-01-01 00:00:00
+  env:
+    TAP_FOO_BAR: bar
+    TAP_FOO_BAZ: baz
+```
+
+Different runners and execution/orchestration platforms will have their own way of specifying environment variables along with a command invocation.
+
+Airflow's [`BashOperator`](https://airflow.apache.org/docs/stable/_api/airflow/operators/bash_operator/index.html#airflow.operators.bash_operator.BashOperator), for example, supports an `env` parameter:
+
+```python
+BashOperator(
+    # ...
+    bash_command="meltano elt ...",
+    env={
+        "TAP_FOO_BAR": "bar",
+        "TAP_FOO_BAZ": "baz",
+    },
+)
+```
+
 ## Selecting entities and attributes for extraction
 
 Extractors are often capable of extracting many more entities and attributes than your use case may require.
@@ -42,3 +96,46 @@ before passing it to the tap in sync mode.
 Note that exclusion takes precedence over inclusion: if an entity or attribute is matched by an exclusion pattern, there is no way to get it back using an inclusion pattern unless the exclusion pattern is manually removed from your project's `meltano.yml` file first.
 
 If no rules are defined using `meltano select`, Meltano will fall back on catch-all rule `*.*` so that all entities and attributes are selected.
+
+## Pipeline state
+
+Most extractors (Singer taps) generate [state](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) when they are run, that can be passed along with a subsequent invocation to have the extractor pick up where it left off the previous time.
+
+Loaders (Singer targets) take in data and state messages from extractors and are responsible for forwarding the extractor state to Meltano once the associated data has been successfully persisted in the destination.
+
+Meltano stores this pipeline state in its [system database](/docs/production.html#storing-metadata), identified by the [`meltano elt`](/docs/command-line-interface.html#elt) run's Job ID.
+
+When `meltano elt` is run a subsequent time, it will look for the most recent completed (successful or failed) pipeline run with the same job ID that generated some state. If found, this state is then passed along to the extractor.
+
+::: tip Not seeing state picked up after a failed run?
+
+Some loaders only emit their state once their work is completely done, even if some data may have been persisted already, and if earlier state messages from the extractor could have been forwarded to Meltano. When a pipeline with such a loader fails or is otherwise interrupted, no state will have been emitted yet, and a subsequent ELT run will not be able to pick up where this run actually left off.
+
+:::
+
+## Pipeline environment variables
+
+To allow loaders and transformers to adapt their configuration and behavior based on the extractor and loader they are run with,
+[`meltano elt`](/docs/command-line-interface.html#elt) dynamically sets a number of pipeline-specific environment variables before compiling their configuration and invoking their executables.
+
+In addition to variables [set through the environment](#pipeline-specific-configuration) or a `.env` file in your project directory, the following variables describing the extractor are available to loaders _and_ transformers:
+
+- `MELTANO_EXTRACTOR_NAME`: the extractor's `name`, e.g. `tap-gitlab`
+- `MELTANO_EXTRACTOR_NAMESPACE`: the extractor's `namespace`, e.g. `tap_gitlab`
+- `MELTANO_EXTRACT_<SETTING_NAME>`: one environment variable for each of the extractor's settings, e.g. `MELTANO_EXTRACT_PRIVATE_TOKEN` for the `private_token` setting
+- `<SETTING_ENV>`: all of the extractor's regular configuration environment variables, as listed by `meltano config <plugin> list`, e.g. `TAP_GITLAB_API_URL` for the `api_url` setting
+
+Additionally, the following variables describing the loader are available to transformers:
+
+- `MELTANO_LOADER_NAME`: the loader's `name`, e.g. `target-postgres`
+- `MELTANO_LOADER_NAMESPACE`: the loader's `namespace`, e.g. `postgres`
+- `MELTANO_LOAD_<SETTING_NAME>`: one environment variable for each of the loader's settings, e.g. `MELTANO_LOAD_SCHEMA` for the `schema` setting
+- `<SETTING_ENV>`: all of the loader's regular configuration environment variables, as listed by `meltano config <plugin> list`, e.g. `PG_ADDRESS` for the `host` setting
+
+Inside your loader or transformer's `config` object in `meltano.yml`, you can reference these (and other) environment variables as `$VAR` (as a single word) or `${VAR}` (inside a word). Inside your plugin, you can reference these through `os.environ` (if using Python) as usual.
+
+This feature is used to dynamically configure the `target-postgres` and `target-snowflake` loaders and `dbt` transformer as appropriate, independent of the specific extractor and loader used:
+- `target-postgres` and `target-snowflake` default value for `schema`: `$MELTANO_EXTRACTOR_NAMESPACE`, e.g. `tap_gitlab`
+- `dbt` default value for `target`: `$MELTANO_LOADER_NAMESPACE`, e.g. `postgres` or `snowflake`, which correspond to the target names in `transform/profile/profiles.yml`
+- `dbt` default value for `source_schema`: `$MELTANO_LOAD_SCHEMA`, e.g. `tap_gitlab`
+- `dbt` default value for `models`: `$MELTANO_EXTRACTOR_NAMESPACE my_meltano_model`, e.g. `tap_gitlab my_meltano_model`

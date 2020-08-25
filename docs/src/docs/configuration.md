@@ -19,9 +19,9 @@ If you're [adding a custom plugin](/docs/command-line-interface.html#how-to-use-
 
 To determine the values of these settings, Meltano will look in 4 places, with each taking precedence over the next:
 
-1. **Environment variables**, set through [your shell at `meltano elt` runtime](/docs/command-line-interface.html#pipeline-specific-configuration), a [`.env` file](https://github.com/theskumar/python-dotenv#usages) in your project directory, a [scheduled pipeline](/#orchestration)'s `env` dictionary in `meltano.yml`, or any other method. You can use `meltano config <plugin> list` to list the available variable names.
+1. **Environment variables**, set through [your shell at `meltano elt` runtime](/docs/integration.html#pipeline-specific-configuration), a [`.env` file](https://github.com/theskumar/python-dotenv#usages) in your project directory, a [scheduled pipeline](/#orchestration)'s `env` dictionary in `meltano.yml`, or any other method. You can use `meltano config <plugin> list` to list the available variable names.
 2. **Your project's `meltano.yml` file**, under the plugin's `config` key.
-   - Inside values, [environment variables](#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
+   - Inside values, [environment variables](/docs/integration.html#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
 3. **Your project's [**system database**](/docs/settings.html#database-uri)**, which lives at `.meltano/meltano.db` by default and (among other things) stores configuration set using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) or [the UI](/docs/command-line-interface.html#ui) when the project is [deployed as read-only](/docs/settings.html#project-readonly).
    - Note that configuration for Meltano itself cannot be stored in the system database.
@@ -57,7 +57,7 @@ extractors:
     custom_setting: value
 ```
 
-As long as the custom setting exists in `meltano.yml`, it will behave and can be interacted with just like any regular (known) setting. It will show up in `meltano config <plugin> list` and `meltano config <plugin>`, and the value that will be passed on to the plugin can be [overridden using an environment variable](/docs/command-line-interface.html#pipeline-specific-configuration):
+As long as the custom setting exists in `meltano.yml`, it will behave and can be interacted with just like any regular (known) setting. It will show up in `meltano config <plugin> list` and `meltano config <plugin>`, and the value that will be passed on to the plugin can be [overridden using an environment variable](/docs/integration.html#pipeline-specific-configuration):
 
 ```bash
 export TAP_EXAMPLE_CUSTOM_SETTING=overridden_value

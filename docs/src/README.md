@@ -127,7 +127,7 @@ data from any SaaS tool or database and load it into any data warehouse or file 
 
 Meltano [manages your tap and target configuration](/docs/configuration.html) for you,
 makes it easy to [select which entities and attributes to extract](/docs/integration.html#selecting-entities-and-attributes-for-extraction),
-and keeps track of [the state of your extraction](/docs/command-line-interface.html#pipeline-state),
+and keeps track of [the state of your extraction](/docs/integration.html#pipeline-state),
 so that subsequent pipeline runs with the same job ID will always pick up right where
 the previous run left off.
 
