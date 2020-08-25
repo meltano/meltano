@@ -22,16 +22,6 @@ Specifically, it will:
 Once the plugin has been added to your project, you can configure it using [`meltano config`](#config),
 invoke its executable using [`meltano invoke`](#invoke), and use it in a pipeline using [`meltano elt`](#elt).
 
-::: tip
-Whenever you add a new plugin to a Meltano project, it will be
-installed into your project's `.meltano` directory automatically, as described above.
-
-However, since this directory is included in your project's `.gitignore` file
-by default, you'll need to explicitly run [`meltano install`](#install)
-before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
-to install (or update) all plugins specified in `meltano.yml`.
-:::
-
 ### How to use: Known plugins
 
 Plugins that are already [known to Meltano](/docs/contributor-guide.html#known-plugins) will show up when you run [`meltano discover`](#discover),

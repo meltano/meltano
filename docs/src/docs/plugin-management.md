@@ -28,3 +28,13 @@ meltano add loader target-snowflake
 # Add an unknown (custom) extractor or loader
 meltano add --custom extractor tap-covid-19
 ```
+
+## Installing your project's plugins
+
+Whenever you add a new plugin to a Meltano project using [`meltano add`](/docs/command-line-interface.html#add),
+it will be installed into your project's `.meltano` directory automatically.
+
+However, since this directory is included in your project's `.gitignore` file
+by default, you'll need to explicitly run [`meltano install`](/docs/command-line-interface.html#install)
+before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
+to install (or update) all plugins specified in `meltano.yml`.
