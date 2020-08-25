@@ -115,4 +115,4 @@ def list(ctx, format):
         finally:
             session.close()
 
-        print(json.dumps(schedules))
+        print(json.dumps(schedules, indent=2))

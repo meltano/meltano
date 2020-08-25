@@ -9,9 +9,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-- [!1820](https://gitlab.com/meltano/meltano/-/merge_requests/1820) Add 'tap-spreadsheets-anywhere' as an extractor 
+
+- [!1820](https://gitlab.com/meltano/meltano/-/merge_requests/1820) Add 'tap-spreadsheets-anywhere' as an extractor
 
 ### Changes
+
+- [#2309](https://gitlab.com/meltano/meltano/-/issues/2309) Pretty print `meltano schedule list --format=json` output
 
 ### Fixes
 

@@ -23,5 +23,5 @@ class SingerPlugin(PluginInstall):
 
         with open(plugin_dir.joinpath(self.config_files["config"]), "w") as config_stub:
             config = invoker.plugin_config_processed
-            json.dump(config, config_stub, indent=4)
+            json.dump(config, config_stub, indent=2)
             logging.debug(f"Created configuration stub at {config_stub}")
