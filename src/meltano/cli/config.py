@@ -58,7 +58,7 @@ def config(ctx, project, plugin_type, plugin_name, format, extras):
                 config = settings.as_dict(
                     extras=extras, process=process, session=session
                 )
-                print(json.dumps(config, indent=4))
+                print(json.dumps(config, indent=2))
             elif format == "env":
                 env = settings.as_env(extras=extras, session=session)
 
