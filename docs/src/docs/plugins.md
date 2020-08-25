@@ -210,7 +210,7 @@ that can be referenced from a model using the [`var` function](https://docs.getd
 
 When a transform is added to your project using [`meltano add`](/docs/command-line-interface.html#add), this object will be used as the dbt model's `vars` object in `transform/dbt_project.yml`.
 
-Because these variables are handled by dbt rather than Meltano, environment variables (including Meltano's [pipeline environment variables](/docs/command-line-interface.html#pipeline-environment-variables)) can be referenced using the [`env_var` function](https://docs.getdbt.com/reference/dbt-jinja-functions/env_var) instead of `$VAR` or `${VAR}`.
+Because these variables are handled by dbt rather than Meltano, environment variables (including Meltano's [pipeline environment variables](/docs/integration.html#pipeline-environment-variables)) can be referenced using the [`env_var` function](https://docs.getdbt.com/reference/dbt-jinja-functions/env_var) instead of `$VAR` or `${VAR}`.
 
 #### How to use
 
