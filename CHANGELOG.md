@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#2309](https://gitlab.com/meltano/meltano/-/issues/2309) Pretty print `meltano schedule list --format=json` output
+- [#2312](https://gitlab.com/meltano/meltano/-/issues/2312) Don't unnecessarily run discovery and generate catalog when running `meltano invoke <extractor> --help`, making it less likely to fail
 
 ### Fixes
 

@@ -119,7 +119,7 @@ class SingerTap(SingerPlugin):
 
     @hook("before_invoke", can_fail=True)
     def run_discovery_hook(self, plugin_invoker, exec_args=[]):
-        if "--discover" in exec_args:
+        if "--discover" in exec_args or "--help" in exec_args:
             return
 
         try:
@@ -163,7 +163,7 @@ class SingerTap(SingerPlugin):
 
     @hook("before_invoke", can_fail=True)
     def apply_catalog_rules_hook(self, plugin_invoker, exec_args=[]):
-        if "--discover" in exec_args:
+        if "--discover" in exec_args or "--help" in exec_args:
             return
 
         try:
