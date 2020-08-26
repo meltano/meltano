@@ -50,7 +50,7 @@ Scroll down for details on
 
 ::: slot installation-code
 
-**Give it a try and be up and running in minutes!**
+**Experience it for yourself in just a few minutes!**
 
 ```bash
 # For these examples to work, ensure that:

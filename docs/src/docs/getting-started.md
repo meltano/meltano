@@ -1,49 +1,413 @@
 ---
-metaTitle: Getting Started with the Meltano CLI
-description: The Meltano command line interface makes it easy to develop, run, and debug every step of the data analysis lifecycle.
-sidebarDepth: 2
+metaTitle: "Getting Started with Meltano: open source ELT"
+description: If you're ready to get started with Meltano and run an EL(T) pipeline with a data source and destination of your choosing, you've come to the right place!
 ---
 
 # Getting Started
 
-::: tip
-The quickest way to try out Meltano is to follow the [examples on the homepage](/).
+Welcome! If you're ready to get started with Meltano and [run an EL(T) pipeline](#run-a-data-integration-el-pipeline)
+with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destination](#add-a-loader-to-send-data-to-a-destination) of your choosing, you've come to the right place!
 
-They can be copy-pasted right onto your command line, and in a matter of minutes will take you all the way through [installation](/#installation), [integration](/#integration), [transformation](/#transformation), and [orchestration](/#orchestration) with the [`tap-gitlab` extractor](/plugins/extractors/gitlab.html) and [`target-jsonl`](/plugins/loaders/jsonl.html) and [`target-postgres`](/plugins/loaders/postgres.html) loaders.
+::: tip Short on time, or just curious what the fuss is about?
+
+To get a sense of the Meltano experience in just a few minutes, follow the [examples on the homepage](/).
+
+They can be copy-pasted right into your terminal and will take you all the way through
+[installation](/#installation), [data integration (EL)](/#integration), [data transformation (T)](/#transformation), [orchestration](/#orchestration), and [containerization](/#containerization)
+with the [`tap-gitlab` extractor](/plugins/extractors/gitlab.html)
+and the [`target-jsonl`](/plugins/loaders/jsonl.html) and [`target-postgres`](/plugins/loaders/postgres.html) loaders.
 
 :::
 
-Once you have successfully [installed Meltano](/docs/installation.html) from the command line, you will need to create a project before you launch the Meltano UI.
+## Install Meltano
 
-## Create your first project
+Before you can get started with Meltano and the [`meltano` CLI](/docs/command-line-interface.html), you'll need to install it onto your system.
 
-To initialize a new project, open your terminal and navigate to the directory that you'd like to store your Meltano projects in.
+*To learn more about different installation methods, refer to the [Installation guide](/docs/installation.html).*
 
-Use the `meltano init` command, which takes a `PROJECT_NAME` that is of your own choosing. For this guide, let's create a project called "myprojectname".
+### Local installation
+
+If you're running Linux or macOS and have [Python](https://www.python.org/) 3.6 or 3.7 installed (Python 3.8 is [not currently supported](https://gitlab.com/meltano/meltano/-/issues/1956)),
+we recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment)
+inside the directory that will hold your [Meltano projects](/docs/project.html).
+
+1. First, create and navigate to a directory to hold your Meltano projects:
+
+    ```bash
+    mkdir meltano-projects
+    cd meltano-projects
+    ```
+
+1. Then, create and activate a virtual environment for Meltano inside the `.venv` directory:
+
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate
+    ```
+
+1. Install the [`meltano` package from PyPI](https://pypi.org/project/meltano/):
+
+    ```bash
+    pip3 install meltano
+    ```
+
+1. Finally, you can verify that the [`meltano` CLI](/docs/command-line-interface.html) is now available by viewing the version:
+
+    ```bash
+    meltano --version
+    ```
+
+If anything's not behaving as expected, refer to the ["Local Installation" section](/docs/installation.html#local-installation) of the [Installation guide](/docs/installation.html) for more details.
+
+### Docker installation
+
+Alternatively, and assuming you already have [Docker](https://www.docker.com/) installed and running,
+you can use the [`meltano/meltano` Docker image](https://hub.docker.com/r/meltano/meltano) which exposes the [`meltano` CLI command](/docs/command-line-interface.html) as its [entrypoint](https://docs.docker.com/engine/reference/builder/#entrypoint).
+
+1. First, pull or update the latest version of the Meltano Docker image:
+
+    ```bash
+    docker pull meltano/meltano:latest
+    ```
+
+1. Then, verify that the [`meltano` CLI](/docs/command-line-interface.html) is now available by viewing the version:
+
+    ```bash
+    docker run meltano/meltano --version
+    ```
+
+If anything's not behaving as expected, refer to the ["Installing on Docker" section](/docs/installation.html#installing-on-docker) of the [Installation guide](/docs/installation.html) for more details.
+
+## Create your Meltano project
+
+Now that you have a way of running the [`meltano` CLI](/docs/command-line-interface.html),
+it's time to create a new [Meltano project](/docs/project.html) that (among other things)
+will hold the [plugins](/docs/plugins.html) that implement the various details of your data pipelines.
+
+*To learn more about Meltano projects, refer to the ["The Meltano project" concept guide](/docs/project.html).*
+
+1. First, navigate to the directory that you'd like to hold your Meltano projects, if you didn't already do so above:
+
+    ```bash
+    mkdir meltano-projects
+    cd meltano-projects
+    ```
+
+1. Then, initialize a new project in a directory of your choosing using [`meltano init`](/docs/command-line-interface.html#init):
+
+    ```bash
+    meltano init <project directory name>
+
+    # For example:
+    meltano init my-meltano-project
+
+    # If you're using Docker, don't forget to mount the current working directory:
+    docker run -v $(pwd):/projects -w /projects meltano/meltano init my-meltano-project
+    ```
+
+1. Finally, navigate to the newly created project directory to unlock the next chapter of this adventure:
+
+    ```bash
+    cd <project directory>
+
+    # For example:
+    cd my-meltano-project
+    ```
+
+## Add an extractor to pull data from a source
+
+Now that you have your very own Meltano project, it's time to add some [plugins](/docs/plugins.html) to it!
+
+The first plugin you'll want to add is an [extractor](/docs/plugins.html#extractors),
+which will be responsible for pulling data out of your data source.
+
+*To learn more about adding plugins to your project, refer to the [Plugin management guide](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project).*
+
+1. First, find out if an extractor for your data source is already [known to Meltano](/docs/contributor-guide.html#known-plugins)
+by checking the [Extractors list](/plugins/extractors/) on this website, or using [`meltano discover`](/docs/command-line-interface.html#discover):
+
+    ```bash
+    meltano discover extractors
+    ```
+
+1. Then, depending on the result, pick your next step:
+
+    - If a known extractor is **available**, add it to your project using [`meltano add`](/docs/command-line-interface.html#add):
+
+      ```bash
+      meltano add extractor <plugin name>
+
+      # For example:
+      meltano add extractor tap-gitlab
+
+      # If you're using Docker, don't forget to mount the project directory:
+      docker run -v $(pwd):/project -w /project meltano/meltano add extractor tap-gitlab
+      ```
+
+      You can now continue to step 4.
+
+    - If an extractor is **not yet known** to Meltano, find out if a Singer tap for your data source already exists by checking [Singer's index of taps](https://www.singer.io/#taps) and/or doing a web search for `Singer tap <data source>`, e.g. `Singer tap COVID-19`.
+
+1. Depending on the result, pick your next step:
+
+    - If a Singer tap for your data source is **available**, add it to your project as a [custom plugin](/docs/command-line-interface.html#how-to-use-custom-plugins) using [`meltano add --custom`](/docs/command-line-interface.html#add):
+
+        ```bash
+        meltano add --custom extractor <tap name>
+
+        # For example:
+        meltano add --custom extractor tap-covid-19
+
+        # If you're using Docker, don't forget to mount the project directory,
+        # and ensure that interactive mode is enabled so that Meltano can ask you
+        # additional questions about the plugin and get your answers over STDIN:
+        docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-covid-19
+        ```
+
+        Meltano will now ask you some additional questions to learn more about the plugin.
+
+        *To learn more about adding custom plugins, refer to the ["How to use: Custom plugins" section](/docs/command-line-interface.html#how-to-use-custom-plugins) of the [`meltano add` CLI reference](/docs/command-line-interface.html#add).*
+
+        ::: tip
+        Once you've succesfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
+        :::
+
+    - If a Singer tap for your data source **doesn't exist yet**, learn how to build your own tap by following the ["Create a Custom Extractor" tutorial](/tutorials/create-a-custom-extractor.html) or [Singer's "Developing a Tap" guide](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-tap).
+
+        Once you've got your new tap project set up, you can add it to your Meltano project
+        as a custom plugin by following the `meltano add --custom` instructions above.
+        When asked to provide a `pip install` argument, you can provide a local directory path or Git repository URL.
+
+1. Finally, you can verify that the extractor was installed successfully and that its executable can be invoked using [`meltano invoke`](/docs/command-line-interface.html#invoke):
+
+    ```bash
+    meltano invoke <plugin> --help
+
+    # For example:
+    meltano invoke tap-gitlab --help
+    ```
+
+    If you see the extractor's help message printed, the plugin was definitely installed successfully,
+    but an error message related to missing configuration or an unimplemented `--help` flag
+    would also confirm that Meltano can invoke the plugin's executable.
+
+### Configure the extractor
+
+Chances are that the extractor you just added to your project will require some amount of [configuration](/docs/configuration.html) before it can start extracting data.
+
+*To learn more about managing the configuration of your plugins, refer to the [Configuration guide](/docs/configuration.html).*
+
+1. First, find out what settings your extractor supports using [`meltano config <plugin> list`](/docs/command-line-interface.html#config):
+
+    ```bash
+    meltano config <plugin> list
+
+    # For example:
+    meltano config tap-gitlab list
+    ```
+
+1. Then, assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/docs/command-line-interface.html#config):
+
+    ```bash
+    meltano config <plugin> set <setting> <value>
+
+    # For example:
+    meltano config tap-gitlab set projects meltano/meltano
+    meltano config tap-gitlab set start_date 2020-05-01T00:00:00Z
+    ```
+
+1. Finally, you can verify that the configuration looks like what the Singer tap expects according to its documentation using [`meltano config <plugin>`](/docs/command-line-interface.html#config):
+
+    ```bash
+    meltano config <plugin>
+
+    # For example:
+    meltano config tap-gitlab
+    ```
+
+### Select entities and attributes to extract
+
+Now that the extractor has been configured, it'll know where and how to find your data,
+but not yet which specific entities and attributes (tables and columns) you're interested in.
+
+By default, Meltano will instruct extractors to extract all supported entities and attributes,
+but it's recommended that you [specify the specific entities and attributes you'd like to extract](/docs/integration.html#selecting-entities-and-attributes-for-extraction),
+to improve performance and save on bandwidth and storage.
+
+*To learn more about selecting entities and attributes for extraction, refer to the [Data Integration (EL) guide](/docs/integration.html#selecting-entities-and-attributes-for-extraction).*
+
+1. First, find out whether the extractor supports entity selection, and if so, what entities and attributes are available, using [`meltano select --list --all`](/docs/command-line-interface.html#select):
+
+    ```bash
+    meltano select --list --all <plugin>
+
+    # For example:
+    meltano select --list --all tap-covid-19
+    ```
+
+    If this command fails with an error, this usually means that the Singer tap does not support [schema discovery mode](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#discovery-mode), and will always extract all supported entities and attributes.
+
+1. Then, assuming the previous command succeeded, select the desired entities and attributes for extraction using [`meltano select`](/docs/command-line-interface.html#select):
+
+    ```bash
+    meltano select <plugin> <entity> <attribute>
+    meltano select <plugin> --exclude <entity> <attribute>
+
+    # For example:
+    meltano select tap-covid-19 eu_daily date
+    meltano select tap-covid-19 eu_daily country
+    meltano select tap-covid-19 eu_daily cases
+    meltano select tap-covid-19 eu_daily deaths
+
+    # Include all attributes of an entity
+    meltano select tap-covid-19 eu_ecdc_daily "*"
+
+    # Exclude matching attributes of all entities
+    meltano select tap-covid-19 --exclude "*" "git_*"
+    ```
+
+    As you can see in the example, entity and attribute identifiers can contain wildcards (`*`) to match multiple entities or attributes at once.
+
+1. Finally, you can verify that only the intended entities and attributes are now selected using [`meltano select --list`](/docs/command-line-interface.html#select):
+
+    ```bash
+    meltano select --list <plugin>
+
+    # For example:
+    meltano select --list tap-covid-19
+    ```
+
+## Add a loader to send data to a destination
+
+Now that your Meltano project has everything it needs to pull data from your source,
+it's time to tell it where that data should go!
+
+This is where the [loader](/docs/plugins.html#loaders) comes in,
+which will be responsible for taking extracted data and putting it in an arbitrary data destination.
+
+*To learn more about adding plugins to your project, refer to the [Plugin management guide](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project).*
+
+1. First, find out if a loader for your data destination is already [known to Meltano](/docs/contributor-guide.html#known-plugins)
+by checking the [Loaders list](/plugins/loaders/) on this website, or using [`meltano discover`](/docs/command-line-interface.html#discover):
+
+    ```bash
+    meltano discover loaders
+    ```
+
+1. Then, depending on the result, pick your next step:
+
+    - If a known loader is **available**, add it to your project using [`meltano add`](/docs/command-line-interface.html#add):
+
+      ```bash
+      meltano add loader <plugin name>
+
+      # For example:
+      meltano add loader target-postgres
+
+      # If you're using Docker, don't forget to mount the project directory:
+      docker run -v $(pwd):/project -w /project meltano/meltano add loader target-postgres
+      ```
+
+      You can now continue to step 4.
+
+    - If a loader is **not yet known** to Meltano, find out if a Singer target for your data source already exists by checking [Singer's index of targets](https://www.singer.io/#targets) and/or doing a web search for `Singer target <data destination>`, e.g. `Singer target BigQuery`.
+
+1. Depending on the result, pick your next step:
+
+    - If a Singer target for your data destination is **available**, add it to your project as a [custom plugin](/docs/command-line-interface.html#how-to-use-custom-plugins) using [`meltano add --custom`](/docs/command-line-interface.html#add):
+
+        ```bash
+        meltano add --custom loader <target name>
+
+        # For example:
+        meltano add --custom loader target-bigquery
+
+        # If you're using Docker, don't forget to mount the project directory,
+        # and ensure that interactive mode is enabled so that Meltano can ask you
+        # additional questions about the plugin and get your answers over STDIN:
+        docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom loader target-bigquery
+        ```
+
+        Meltano will now ask you some additional questions to learn more about the plugin.
+
+        *To learn more about adding custom plugins, refer to the ["How to use: Custom plugins" section](/docs/command-line-interface.html#how-to-use-custom-plugins) of the [`meltano add` CLI reference](/docs/command-line-interface.html#add).*
+
+        ::: tip
+        Once you've succesfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
+        :::
+
+    - If a Singer target for your data source **doesn't exist yet**, learn how to build your own target by following [Singer's "Developing a Target" guide](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target).
+
+        Once you've got your new target project set up, you can add it to your Meltano project
+        as a custom plugin by following the `meltano add --custom` instructions above.
+        When asked to provide a `pip install` argument, you can provide a local directory path or Git repository URL.
+
+1. Finally, you can verify that the loader was installed successfully and that its executable can be invoked using [`meltano invoke`](/docs/command-line-interface.html#invoke):
+
+    ```bash
+    meltano invoke <plugin> --help
+
+    # For example:
+    meltano invoke target-postgres --help
+    ```
+
+    If you see the loader's help message printed, the plugin was definitely installed successfully,
+    but an error message related to missing configuration or an unimplemented `--help` flag
+    would also confirm that Meltano can invoke the plugin's executable.
+
+### Configure the loader
+
+Chances are that the loader you just added to your project will require some amount of [configuration](/docs/configuration.html) before it can start loading data.
+
+*To learn more about managing the configuration of your plugins, refer to the [Configuration guide](/docs/configuration.html).*
+
+1. First, find out what settings your loader supports using [`meltano config <plugin> list`](/docs/command-line-interface.html#config):
+
+    ```bash
+    meltano config <plugin> list
+
+    # For example:
+    meltano config target-postgres list
+    ```
+
+1. Then, assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/docs/command-line-interface.html#config):
+
+    ```bash
+    meltano config <plugin> set <setting> <value>
+
+    # For example:
+    meltano config target-postgres user <username>
+    meltano config target-postgres password <password>
+    meltano config target-postgres host <host>
+    meltano config target-postgres port <port>
+    meltano config target-postgres dbname <dbname>
+    ```
+
+1. Finally, you can verify that the configuration looks like what the Singer target expects according to its documentation using [`meltano config <plugin>`](/docs/command-line-interface.html#config):
+
+    ```bash
+    meltano config <plugin>
+
+    # For example:
+    meltano config target-postgres
+    ```
+
+## Run a data integration (EL) pipeline
+
+Now that [your Meltano project](#create-your-meltano-project), [extractor](#add-an-extractor-to-pull-data-from-a-source), and [loader](#add-a-loader-to-send-data-to-a-destination) are all set up, we've reached the final chapter of this adventure, and it's time to run your first data integration (EL) pipeline!
+
+*To learn more about data integration, refer to the [Data Integration (EL) guide](/docs/integration.html#selecting-entities-and-attributes-for-extraction).*
+
+There's just one step here: run your newly added extractor and loader in a pipeline using [`meltano elt`](/docs/command-line-interface.html#elt):
 
 ```bash
-meltano init myprojectname
+meltano elt <extractor> <loader> --job_id=<pipeline name>
+
+# For example:
+meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres
 ```
 
-This will create a new directory named `myprojectname` in the current directory and initialize Meltano's basic directory structure inside it.
+If everything was configured correctly, you should now see your data flow from your source into your destination!
 
-## Setup your loader
+If the command failed, but it's not obvious how to resolve the issue, consider enabling [debug mode](/docs/command-line-interface.html#debugging) to get some more insight into what's going on behind the scenes. If that doesn't get you closer to a solution, learn how to [get help with your issue](/docs/getting-help.md).
 
-Self-hosted Meltano instances require you to set up a reporting database and configure Meltano to use it by installing a **Loader**.
-
-Meltano has basic support for a [few different loaders](/plugins/loaders/), but dashboards and reports are only supported with [PostgreSQL](/plugins/loaders/postgres.html).
-
-You will find detailed instructions in the docs for your loader of choice.
-
-## Start the application
-
-Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
-
-```bash
-cd myprojectname
-meltano ui
-```
-
-Meltano is now running and should open a new tab at [http://localhost:5000](http://localhost:5000).
-
-Now that you have access to the Meltano UI, [use our Getting Started with Data Analysis guide](/docs/analysis.html#connect-data-sources) to learn more about how to use the software.

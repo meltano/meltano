@@ -6,13 +6,17 @@ lastUpdatedSignificantly: 2020-04-30
 
 # Analysis
 
-## Install Meltano
+If you haven't already, install Meltano and create your first project by following the [Getting Started guide](/docs/getting-started.html). You can come back here before adding an extractor and loader using the CLI, and use the UI instead.
 
-Follow the steps under [Installation](/docs/installation.html) to install Meltano locally or in the cloud.
+## Start Meltano UI
 
-## Set up Meltano
+Start the Meltano UI web server using [`meltano ui`](/docs/command-line-interface.html#ui):
 
-Follow the steps under [Getting Started](/docs/getting-started.html) to create your first project, set up a loader, and start the UI.
+```bash
+meltano ui
+```
+
+By default, the UI will be available at <http://localhost:5000>.
 
 ## Connect Data Sources
 
