@@ -6,10 +6,14 @@ sidebarDepth: 2
 
 # Installation
 
-::: tip
-The quickest way to try out Meltano is to follow the [examples on the homepage](/).
+::: tip Short on time, or just curious what the fuss is about?
 
-They can be copy-pasted right onto your command line, and in a matter of minutes will take you all the way through [installation](/#installation), [integration](/#integration), [transformation](/#transformation), and [orchestration](/#orchestration) with the [`tap-gitlab` extractor](/plugins/extractors/gitlab.html) and [`target-jsonl`](/plugins/loaders/jsonl.html) and [`target-postgres`](/plugins/loaders/postgres.html) loaders.
+To get a sense of the Meltano experience in just a few minutes, follow the [examples on the homepage](/).
+
+They can be copy-pasted right onto your command shell and will take you all the way through
+[installation](/#installation), [data integration (EL)](/#integration), [data transformation (T)](/#transformation), [orchestration](/#orchestration), and [containerization](/#containerization)
+with the [`tap-gitlab` extractor](/plugins/extractors/gitlab.html)
+and the [`target-jsonl`](/plugins/loaders/jsonl.html) and [`target-postgres`](/plugins/loaders/postgres.html) loaders.
 
 :::
 
@@ -115,9 +119,9 @@ Once the installation completes, you can check if it was successful by running:
 meltano --version
 ```
 
-## Next Steps
+### Next Steps
 
-Now that you've installed Meltano and its requirements, you can [create your first project](/docs/getting-started.html#create-your-first-project).
+Now that you've installed Meltano and its requirements, you can continue setting up your Meltano project by following the [Getting Started guide](/docs/getting-started.html#create-your-meltano-project).
 
 ## Installing on Docker
 
@@ -168,7 +172,7 @@ docker run -v $(pwd):/project \
 
 You can now visit [http://localhost:5000](http://localhost:5000) to access the Meltano UI.
 
-Now that you're succesfully running Meltano, you can [set up your loader](/docs/getting-started.html#setup-your-loader).
+Now that you're succesfully running Meltano, you can continue setting up your Meltano project by following the [Getting Started guide](/docs/getting-started.html).
 
 Note that wherever you are asked to run the `meltano` command, you will want to run it through `docker run` as in the snippet above.
 

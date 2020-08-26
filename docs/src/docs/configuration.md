@@ -48,7 +48,7 @@ Instead, you can define a custom setting by adding the setting name (key) to you
 meltano config tap-example set custom_setting value
 ```
 
-```yaml
+```yaml{6}
 extractors:
 - name: tap-example
   pip_url: tap-example
