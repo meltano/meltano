@@ -97,7 +97,7 @@ If you're adding a Singer tap or target that's listed on Singer's [index of taps
 To find out what `settings` a tap or target supports, reference its README and/or documentation. If the `capabilities` (executable flags) a tap supports are not described there, try [one of these tricks](/docs/contributor-guide.html#how-to-test-a-tap).
 
 ::: tip
-Once you've succesfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
+Once you've successfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
 :::
 
 ## `config`
@@ -274,7 +274,7 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT] [
   - `skip`: skip the Transforms (Default)
   - `only`: only run the Transforms (skip the Extract and Load steps)
 
-- The `--job_id` flag identifies related ELT runs when storing and looking up [pipeline state](/docs/integration.html#pipeline-state).
+- The `--job_id` flag identifies related EL(T) runs when storing and looking up [pipeline state](/docs/integration.html#pipeline-state).
 
 - A `--full-refresh` flag can be passed to perform a full refresh, ignoring state left behind by any previous runs with the same job ID.
 

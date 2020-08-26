@@ -23,7 +23,7 @@ and the [`target-jsonl`](/plugins/loaders/jsonl.html) and [`target-postgres`](/p
 
 Before you can get started with Meltano and the [`meltano` CLI](/docs/command-line-interface.html), you'll need to install it onto your system.
 
-*To learn more about different installation methods, refer to the [Installation guide](/docs/installation.html).*
+*To learn more about the different installation methods, refer to the [Installation guide](/docs/installation.html).*
 
 ### Local installation
 
@@ -31,14 +31,14 @@ If you're running Linux or macOS and have [Python](https://www.python.org/) 3.6 
 we recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment)
 inside the directory that will hold your [Meltano projects](/docs/project.html).
 
-1. First, create and navigate to a directory to hold your Meltano projects:
+1. Create and navigate to a directory to hold your Meltano projects:
 
     ```bash
     mkdir meltano-projects
     cd meltano-projects
     ```
 
-1. Then, create and activate a virtual environment for Meltano inside the `.venv` directory:
+1. Create and activate a virtual environment for Meltano inside the `.venv` directory:
 
     ```bash
     python3 -m venv .venv
@@ -51,7 +51,7 @@ inside the directory that will hold your [Meltano projects](/docs/project.html).
     pip3 install meltano
     ```
 
-1. Finally, you can verify that the [`meltano` CLI](/docs/command-line-interface.html) is now available by viewing the version:
+1. Optionally, verify that the [`meltano` CLI](/docs/command-line-interface.html) is now available by viewing the version:
 
     ```bash
     meltano --version
@@ -64,13 +64,13 @@ If anything's not behaving as expected, refer to the ["Local Installation" secti
 Alternatively, and assuming you already have [Docker](https://www.docker.com/) installed and running,
 you can use the [`meltano/meltano` Docker image](https://hub.docker.com/r/meltano/meltano) which exposes the [`meltano` CLI command](/docs/command-line-interface.html) as its [entrypoint](https://docs.docker.com/engine/reference/builder/#entrypoint).
 
-1. First, pull or update the latest version of the Meltano Docker image:
+1. Pull or update the latest version of the Meltano Docker image:
 
     ```bash
     docker pull meltano/meltano:latest
     ```
 
-1. Then, verify that the [`meltano` CLI](/docs/command-line-interface.html) is now available by viewing the version:
+1. Optionally, verify that the [`meltano` CLI](/docs/command-line-interface.html) is now available by viewing the version:
 
     ```bash
     docker run meltano/meltano --version
@@ -86,14 +86,14 @@ will hold the [plugins](/docs/plugins.html) that implement the various details o
 
 *To learn more about Meltano projects, refer to the ["The Meltano project" concept guide](/docs/project.html).*
 
-1. First, navigate to the directory that you'd like to hold your Meltano projects, if you didn't already do so above:
+1. Navigate to the directory that you'd like to hold your Meltano projects, if you didn't already do so earlier:
 
     ```bash
     mkdir meltano-projects
     cd meltano-projects
     ```
 
-1. Then, initialize a new project in a directory of your choosing using [`meltano init`](/docs/command-line-interface.html#init):
+1. Initialize a new project in a directory of your choosing using [`meltano init`](/docs/command-line-interface.html#init):
 
     ```bash
     meltano init <project directory name>
@@ -105,7 +105,7 @@ will hold the [plugins](/docs/plugins.html) that implement the various details o
     docker run -v $(pwd):/projects -w /projects meltano/meltano init my-meltano-project
     ```
 
-1. Finally, navigate to the newly created project directory to unlock the next chapter of this adventure:
+1. Navigate to the newly created project directory:
 
     ```bash
     cd <project directory>
@@ -113,6 +113,18 @@ will hold the [plugins](/docs/plugins.html) that implement the various details o
     # For example:
     cd my-meltano-project
     ```
+
+1. Optionally, if you'd like to version control your changes, initialize a [Git](https://git-scm.com/) repository and create an initial commit:
+
+    ```bash
+    git init
+    git add --all
+    git commit -m 'Initial Meltano project'
+    ```
+
+    This will allow you to use [`git diff`](https://git-scm.com/docs/git-diff)
+    to easily check the impact of the [`meltano` commands](/docs/command-line-interface.html)
+    you'll run below on your project files, most notably `meltano.yml`.
 
 ## Add an extractor to pull data from a source
 
@@ -123,14 +135,14 @@ which will be responsible for pulling data out of your data source.
 
 *To learn more about adding plugins to your project, refer to the [Plugin management guide](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project).*
 
-1. First, find out if an extractor for your data source is already [known to Meltano](/docs/contributor-guide.html#known-plugins)
+1. Find out if an extractor for your data source is already [known to Meltano](/docs/contributor-guide.html#known-plugins)
 by checking the [Extractors list](/plugins/extractors/) on this website, or using [`meltano discover`](/docs/command-line-interface.html#discover):
 
     ```bash
     meltano discover extractors
     ```
 
-1. Then, depending on the result, pick your next step:
+1. Depending on the result, pick your next step:
 
     - If a known extractor is **available**, add it to your project using [`meltano add`](/docs/command-line-interface.html#add):
 
@@ -169,7 +181,7 @@ by checking the [Extractors list](/plugins/extractors/) on this website, or usin
         *To learn more about adding custom plugins, refer to the ["How to use: Custom plugins" section](/docs/command-line-interface.html#how-to-use-custom-plugins) of the [`meltano add` CLI reference](/docs/command-line-interface.html#add).*
 
         ::: tip
-        Once you've succesfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
+        Once you've successfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
         :::
 
     - If a Singer tap for your data source **doesn't exist yet**, learn how to build your own tap by following the ["Create a Custom Extractor" tutorial](/tutorials/create-a-custom-extractor.html) or [Singer's "Developing a Tap" guide](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-tap).
@@ -178,7 +190,7 @@ by checking the [Extractors list](/plugins/extractors/) on this website, or usin
         as a custom plugin by following the `meltano add --custom` instructions above.
         When asked to provide a `pip install` argument, you can provide a local directory path or Git repository URL.
 
-1. Finally, you can verify that the extractor was installed successfully and that its executable can be invoked using [`meltano invoke`](/docs/command-line-interface.html#invoke):
+1. Optionally, verify that the extractor was installed successfully and that its executable can be invoked using [`meltano invoke`](/docs/command-line-interface.html#invoke):
 
     ```bash
     meltano invoke <plugin> --help
@@ -197,7 +209,7 @@ Chances are that the extractor you just added to your project will require some 
 
 *To learn more about managing the configuration of your plugins, refer to the [Configuration guide](/docs/configuration.html).*
 
-1. First, find out what settings your extractor supports using [`meltano config <plugin> list`](/docs/command-line-interface.html#config):
+1. Find out what settings your extractor supports using [`meltano config <plugin> list`](/docs/command-line-interface.html#config):
 
     ```bash
     meltano config <plugin> list
@@ -206,7 +218,7 @@ Chances are that the extractor you just added to your project will require some 
     meltano config tap-gitlab list
     ```
 
-1. Then, assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/docs/command-line-interface.html#config):
+1. Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/docs/command-line-interface.html#config):
 
     ```bash
     meltano config <plugin> set <setting> <value>
@@ -216,7 +228,7 @@ Chances are that the extractor you just added to your project will require some 
     meltano config tap-gitlab set start_date 2020-05-01T00:00:00Z
     ```
 
-1. Finally, you can verify that the configuration looks like what the Singer tap expects according to its documentation using [`meltano config <plugin>`](/docs/command-line-interface.html#config):
+1. Optionally, verify that the configuration looks like what the Singer tap expects according to its documentation using [`meltano config <plugin>`](/docs/command-line-interface.html#config):
 
     ```bash
     meltano config <plugin>
@@ -236,7 +248,7 @@ to improve performance and save on bandwidth and storage.
 
 *To learn more about selecting entities and attributes for extraction, refer to the [Data Integration (EL) guide](/docs/integration.html#selecting-entities-and-attributes-for-extraction).*
 
-1. First, find out whether the extractor supports entity selection, and if so, what entities and attributes are available, using [`meltano select --list --all`](/docs/command-line-interface.html#select):
+1. Find out whether the extractor supports entity selection, and if so, what entities and attributes are available, using [`meltano select --list --all`](/docs/command-line-interface.html#select):
 
     ```bash
     meltano select --list --all <plugin>
@@ -247,7 +259,7 @@ to improve performance and save on bandwidth and storage.
 
     If this command fails with an error, this usually means that the Singer tap does not support [schema discovery mode](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#discovery-mode), and will always extract all supported entities and attributes.
 
-1. Then, assuming the previous command succeeded, select the desired entities and attributes for extraction using [`meltano select`](/docs/command-line-interface.html#select):
+1. Assuming the previous command succeeded, select the desired entities and attributes for extraction using [`meltano select`](/docs/command-line-interface.html#select):
 
     ```bash
     meltano select <plugin> <entity> <attribute>
@@ -268,7 +280,7 @@ to improve performance and save on bandwidth and storage.
 
     As you can see in the example, entity and attribute identifiers can contain wildcards (`*`) to match multiple entities or attributes at once.
 
-1. Finally, you can verify that only the intended entities and attributes are now selected using [`meltano select --list`](/docs/command-line-interface.html#select):
+1. Optionally, verify that only the intended entities and attributes are now selected using [`meltano select --list`](/docs/command-line-interface.html#select):
 
     ```bash
     meltano select --list <plugin>
@@ -287,14 +299,14 @@ which will be responsible for taking extracted data and putting it in an arbitra
 
 *To learn more about adding plugins to your project, refer to the [Plugin management guide](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project).*
 
-1. First, find out if a loader for your data destination is already [known to Meltano](/docs/contributor-guide.html#known-plugins)
+1. Find out if a loader for your data destination is already [known to Meltano](/docs/contributor-guide.html#known-plugins)
 by checking the [Loaders list](/plugins/loaders/) on this website, or using [`meltano discover`](/docs/command-line-interface.html#discover):
 
     ```bash
     meltano discover loaders
     ```
 
-1. Then, depending on the result, pick your next step:
+1. Depending on the result, pick your next step:
 
     - If a known loader is **available**, add it to your project using [`meltano add`](/docs/command-line-interface.html#add):
 
@@ -303,9 +315,6 @@ by checking the [Loaders list](/plugins/loaders/) on this website, or using [`me
 
       # For example:
       meltano add loader target-postgres
-
-      # If you're using Docker, don't forget to mount the project directory:
-      docker run -v $(pwd):/project -w /project meltano/meltano add loader target-postgres
       ```
 
       You can now continue to step 4.
@@ -333,7 +342,7 @@ by checking the [Loaders list](/plugins/loaders/) on this website, or using [`me
         *To learn more about adding custom plugins, refer to the ["How to use: Custom plugins" section](/docs/command-line-interface.html#how-to-use-custom-plugins) of the [`meltano add` CLI reference](/docs/command-line-interface.html#add).*
 
         ::: tip
-        Once you've succesfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
+        Once you've successfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
         :::
 
     - If a Singer target for your data source **doesn't exist yet**, learn how to build your own target by following [Singer's "Developing a Target" guide](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target).
@@ -342,7 +351,7 @@ by checking the [Loaders list](/plugins/loaders/) on this website, or using [`me
         as a custom plugin by following the `meltano add --custom` instructions above.
         When asked to provide a `pip install` argument, you can provide a local directory path or Git repository URL.
 
-1. Finally, you can verify that the loader was installed successfully and that its executable can be invoked using [`meltano invoke`](/docs/command-line-interface.html#invoke):
+1. Optionally, verify that the loader was installed successfully and that its executable can be invoked using [`meltano invoke`](/docs/command-line-interface.html#invoke):
 
     ```bash
     meltano invoke <plugin> --help
@@ -361,7 +370,7 @@ Chances are that the loader you just added to your project will require some amo
 
 *To learn more about managing the configuration of your plugins, refer to the [Configuration guide](/docs/configuration.html).*
 
-1. First, find out what settings your loader supports using [`meltano config <plugin> list`](/docs/command-line-interface.html#config):
+1. Find out what settings your loader supports using [`meltano config <plugin> list`](/docs/command-line-interface.html#config):
 
     ```bash
     meltano config <plugin> list
@@ -370,7 +379,7 @@ Chances are that the loader you just added to your project will require some amo
     meltano config target-postgres list
     ```
 
-1. Then, assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/docs/command-line-interface.html#config):
+1. Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/docs/command-line-interface.html#config):
 
     ```bash
     meltano config <plugin> set <setting> <value>
@@ -383,7 +392,7 @@ Chances are that the loader you just added to your project will require some amo
     meltano config target-postgres dbname <dbname>
     ```
 
-1. Finally, you can verify that the configuration looks like what the Singer target expects according to its documentation using [`meltano config <plugin>`](/docs/command-line-interface.html#config):
+1. Optionally, verify that the configuration looks like what the Singer target expects according to its documentation using [`meltano config <plugin>`](/docs/command-line-interface.html#config):
 
     ```bash
     meltano config <plugin>
@@ -409,5 +418,88 @@ meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres
 
 If everything was configured correctly, you should now see your data flow from your source into your destination!
 
-If the command failed, but it's not obvious how to resolve the issue, consider enabling [debug mode](/docs/command-line-interface.html#debugging) to get some more insight into what's going on behind the scenes. If that doesn't get you closer to a solution, learn how to [get help with your issue](/docs/getting-help.md).
+If the command failed, but it's not obvious how to resolve the issue, consider enabling [debug mode](/docs/command-line-interface.html#debugging) to get some more insight into what's going on behind the scenes.
+If that doesn't get you closer to a solution, learn how to [get help with your issue](/docs/getting-help.md).
 
+## Next steps
+
+Now that you've successfully run your first data integration (EL) pipeline using Meltano,
+you have a few possible next steps:
+
+- [Schedule pipelines to run regularly](#schedule-pipelines-to-run-regularly)
+- [Transform loaded data for analysis](#transform-data-for-analysis)
+- [Containerize your project](#containerize-your-project)
+- [Deploy your pipelines in production](#deploy-your-pipelines-in-production)
+
+### Schedule pipelines to run regularly
+
+Most pipelines aren't run just once, but over and over again, to make sure additions and changes in the source eventually make their way to the destination.
+
+To help you realize this, Meltano supports scheduled pipelines that can be orchestrated using [Apache Airflow](https://apache.airflow.org/).
+
+*To learn more about orchestration, refer to the [Orchestration guide](/docs/orchestration.html).*
+
+1. Schedule a new [`meltano elt`](/docs/command-line-interface.html#elt) pipeline to be invoked on an interval using [`meltano schedule`](/docs/command-line-interface.html#schedule):
+
+    ```bash
+    meltano schedule <pipeline name> <extractor> <loader> <interval>
+
+    # For example:
+    meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily
+    ```
+
+    The `pipeline name` argument corresponds to the `--job_id` flag on `meltano elt`, which identifies related EL(T) runs when storing and looking up [pipeline state](/docs/integration.html#pipeline-state).
+    To have scheduled runs pick up where your [earlier manual run](#run-a-data-integration-el-pipeline) left off, ensure you use the same pipeline name.
+
+1. Optionally, verify that the schedule was created successfully using [`meltano schedule list`](/docs/command-line-interface.html#schedule):
+
+    ```bash
+    meltano schedule list
+    ```
+
+1. Add the [Apache Airflow](https://apache.airflow.org/) orchestrator to your project using [`meltano add`](/docs/command-line-interface.html#add), which will be responsible for managing the schedule and executing the appropriate `meltano elt` commands:
+
+    ```bash
+    meltano add orchestrator airflow
+    ```
+
+    This will automatically add a
+[`meltano elt` DAG generator](https://gitlab.com/meltano/files-airflow/-/blob/master/bundle/orchestrate/dags/meltano.py)
+to your project's `orchestrate/dags` directory, where Airflow
+will be configured to look for [DAGs](https://airflow.apache.org/docs/stable/concepts.html#dags) by default.
+
+1. Start the [Airflow scheduler](https://airflow.apache.org/docs/stable/cli-ref.html#scheduler) using [`meltano invoke`](/docs/command-line-interface.html#invoke):
+
+    ```bash
+    meltano invoke airflow scheduler
+
+    # Add `-D` to run the scheduler in the background:
+    meltano invoke airflow scheduler -D
+    ```
+
+1. Optionally, verify that a [DAG](https://airflow.apache.org/docs/stable/concepts.html#dags) was automatically created for each scheduled pipeline by starting the [Airflow web interface](https://airflow.apache.org/docs/stable/cli-ref.html#webserver):
+
+    ```bash
+    meltano invoke airflow webserver
+
+    # Add `-D` to run the scheduler in the background:
+    meltano invoke airflow webserver -D
+    ```
+
+    The web interface and DAG overview will be available at <http://localhost:8080>.
+
+### Transform loaded data for analysis
+
+Once your raw data has arrived in your data warehouse, its schema will likely need to be transformed to be more appropriate for analysis.
+
+To help you realize this, Meltano supports transformation using [`dbt`](https://www.getdbt.com/).
+
+To learn about data transformation, refer to the [Data Transformation (T) guide](/docs/transforms.html).
+
+### Containerize your project
+
+To learn how to containerize your project, refer to the [Containerization guide](/docs/containerization.html).
+
+### Deploy your pipelines in production
+
+To learn how to deploy your pipelines in production, refer to the [Deployment in Production guide](/docs/production.html).

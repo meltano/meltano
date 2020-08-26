@@ -17,7 +17,7 @@ and the [`target-jsonl`](/plugins/loaders/jsonl.html) and [`target-postgres`](/p
 
 :::
 
-If the instructions on the homepage did not work on your environment, or if you'd like to learn more about how to manage your Meltano installation, you've come to the right place.
+If the instructions on the [homepage](/) or the [Getting Started guide](/docs/getting-started.html#install-meltano) did not work on your environment, or if you'd like to learn more about how to manage your Meltano installation, you've come to the right place.
 
 ## Local Installation
 
