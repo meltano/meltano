@@ -1,12 +1,12 @@
 ---
 metaTitle: Meltano Plugins
-description: A Meltano project is primarily comprised of plugins, that implement the various details of your data pipelines.
+description: A Meltano project's primary components are its plugins, that implement the various details of your ELT pipelines.
 ---
 
 # Meltano Plugins
 
-A [Meltano project](/docs/project.html) is primarily comprised of plugins,
-that implement the various details of your data pipelines.
+A [Meltano project](/docs/project.html)'s primary components are its plugins,
+that implement the various details of your ELT pipelines.
 
 Meltano knows the following types of plugins:
 
@@ -18,6 +18,8 @@ Meltano knows the following types of plugins:
 - [Orchestrators](#orchestrators)
 - [Transformers](#transformers)
 - [File bundles](#file-bundles)
+
+To learn how to manage your project's plugins, refer to the [Plugin Management guide](/docs/plugin-management.html).
 
 ## Extractors
 
