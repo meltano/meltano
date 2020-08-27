@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.46.0 - (2020-08-27)
+---
+
+### New
+
 - [!1820](https://gitlab.com/meltano/meltano/-/merge_requests/1820) Add 'tap-spreadsheets-anywhere' as an extractor
 
 ### Changes
@@ -17,9 +29,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2309](https://gitlab.com/meltano/meltano/-/issues/2309) Pretty print `meltano schedule list --format=json` output
 - [#2312](https://gitlab.com/meltano/meltano/-/issues/2312) Don't unnecessarily run discovery and generate catalog when running `meltano invoke <extractor> --help`, making it less likely to fail
 
-### Fixes
-
-### Breaks
 
 ## 1.45.0 - (2020-08-17)
 ---
