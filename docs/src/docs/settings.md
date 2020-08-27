@@ -1,12 +1,14 @@
 ---
 metaTitle: Configuring Meltano Settings
-description: Manage a Meltano project's configuration using environment variables or `meltano.yml`.
-sidebarDepth: 2
+description: Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
 ---
 
 # Settings Reference
 
-As described in the [configuration guide](/docs/configuration.html#configuration-layers), Meltano will determine the values of these settings by first looking in **the environment**, then in a [**`.env` file**](https://github.com/theskumar/python-dotenv#usages) in your project directory, and finally in your project's **`meltano.yml` file**, falling back to a default value if nothing was found.
+Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
+To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
+
+As described in the [Configuration guide](/docs/configuration.html#configuration-layers), Meltano will determine the values of these settings by first looking in **the environment**, then in a [**`.env` file**](https://github.com/theskumar/python-dotenv#usages) in your project directory, and finally in your project's **`meltano.yml` file**, falling back to a default value if nothing was found.
 
 You can use [`meltano config meltano list`](/docs/command-line-interface.html#config) to list all available settings with their names, environment variables, and current values.
 
