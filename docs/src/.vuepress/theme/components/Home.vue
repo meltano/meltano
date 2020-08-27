@@ -29,7 +29,7 @@
             target="_blank"
           >
             <GitLabIcon />
-            View code on GitLab
+            Contribute on GitLab
           </a>
         </p>
       </div>
