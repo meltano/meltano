@@ -6,7 +6,7 @@ description: Learn where to use Meltano, how Meltano is built, and where to get 
 # Introduction
 
 Meltano is an [open source](https://gitlab.com/meltano/meltano) platform for
-building, running & orchestrating ELT pipelines built out of
+building, running & orchestrating ELT pipelines made up of
 [Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com)
 models, that you can [run locally](/docs/installation.html) or [easily deploy in production](/docs/production.html).
 
