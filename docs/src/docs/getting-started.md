@@ -84,7 +84,7 @@ Now that you have a way of running the [`meltano` CLI](/docs/command-line-interf
 it's time to create a new [Meltano project](/docs/project.html) that (among other things)
 will hold the [plugins](/docs/plugins.html) that implement the various details of your data pipelines.
 
-*To learn more about Meltano projects, refer to the ["The Meltano project" concept guide](/docs/project.html).*
+*To learn more about Meltano projects, refer to the ["The Meltano Project" concept guide](/docs/project.html).*
 
 1. Navigate to the directory that you'd like to hold your Meltano projects, if you didn't already do so earlier:
 
@@ -133,7 +133,7 @@ Now that you have your very own Meltano project, it's time to add some [plugins]
 The first plugin you'll want to add is an [extractor](/docs/plugins.html#extractors),
 which will be responsible for pulling data out of your data source.
 
-*To learn more about adding plugins to your project, refer to the [Plugin management guide](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project).*
+*To learn more about adding plugins to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project).*
 
 1. Find out if an extractor for your data source is already [known to Meltano](/docs/contributor-guide.html#known-plugins)
 by checking the [Extractors list](/plugins/extractors/) on this website, or using [`meltano discover`](/docs/command-line-interface.html#discover):
@@ -178,7 +178,7 @@ by checking the [Extractors list](/plugins/extractors/) on this website, or usin
 
         Meltano will now ask you some additional questions to learn more about the plugin.
 
-        *To learn more about adding custom plugins, refer to the ["How to use: Custom plugins" section](/docs/command-line-interface.html#how-to-use-custom-plugins) of the [`meltano add` CLI reference](/docs/command-line-interface.html#add).*
+        *To learn more about adding custom plugins, refer to the ["`meltano add`: How to use: Custom plugins" section](/docs/command-line-interface.html#how-to-use-custom-plugins) of the [CLI Reference](/docs/command-line-interface.html#add).*
 
         ::: tip
         Once you've successfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
@@ -297,7 +297,7 @@ it's time to tell it where that data should go!
 This is where the [loader](/docs/plugins.html#loaders) comes in,
 which will be responsible for taking extracted data and putting it in an arbitrary data destination.
 
-*To learn more about adding plugins to your project, refer to the [Plugin management guide](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project).*
+*To learn more about adding plugins to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project).*
 
 1. Find out if a loader for your data destination is already [known to Meltano](/docs/contributor-guide.html#known-plugins)
 by checking the [Loaders list](/plugins/loaders/) on this website, or using [`meltano discover`](/docs/command-line-interface.html#discover):
@@ -339,7 +339,7 @@ by checking the [Loaders list](/plugins/loaders/) on this website, or using [`me
 
         Meltano will now ask you some additional questions to learn more about the plugin.
 
-        *To learn more about adding custom plugins, refer to the ["How to use: Custom plugins" section](/docs/command-line-interface.html#how-to-use-custom-plugins) of the [`meltano add` CLI reference](/docs/command-line-interface.html#add).*
+        *To learn more about adding custom plugins, refer to the ["`meltano add`: How to use: Custom plugins" section](/docs/command-line-interface.html#how-to-use-custom-plugins) of the [CLI Reference](/docs/command-line-interface.html#add).*
 
         ::: tip
         Once you've successfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!

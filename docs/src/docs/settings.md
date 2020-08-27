@@ -4,7 +4,7 @@ description: Manage a Meltano project's configuration using environment variable
 sidebarDepth: 2
 ---
 
-# Settings reference
+# Settings Reference
 
 As described in the [configuration guide](/docs/configuration.html#configuration-layers), Meltano will determine the values of these settings by first looking in **the environment**, then in a [**`.env` file**](https://github.com/theskumar/python-dotenv#usages) in your project directory, and finally in your project's **`meltano.yml` file**, falling back to a default value if nothing was found.
 
