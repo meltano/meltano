@@ -5,8 +5,9 @@ description: Learn how to extract and load data using Meltano and Singer taps an
 
 # Data Integration (EL)
 
-Meltano lets you easily extract and load data using [Singer](https://www.singer.io/) taps and targets,
-which take the role of its [extractors](/docs/plugins.html#extractors) and [loaders](/docs/plugins.html#loaders).
+Meltano lets you easily extract and load data from and to databases, SaaS APIs, and file formats
+using [Singer](https://www.singer.io/) [taps](https://www.singer.io/#taps) and [targets](https://www.singer.io/#targets),
+which take the role of [your project](/docs/project.html)'s [extractors](/docs/plugins.html#extractors) and [loaders](/docs/plugins.html#loaders).
 
 Meltano [manages your tap and target configuration](#plugin-configuration) for you,
 makes it easy to [select which entities and attributes to extract](#selecting-entities-and-attributes-for-extraction),

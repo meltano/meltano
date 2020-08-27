@@ -41,8 +41,8 @@ by building a true open source alternative to existing proprietary hosted EL(T) 
 
 Scroll down for details on
 [Meltano projects](/#meltano-init),
-[integration](/#integration),
-[transformation](/#transformation),
+[integration (EL)](/#integration),
+[transformation (T)](/#transformation),
 [orchestration](/#orchestration), and
 [containerization](/#containerization).
 
@@ -294,7 +294,7 @@ Airflow is now available at <http://localhost:8080>!
 Now that you've got your pipelines running locally, it'll be time to repeat this trick in production!
 
 Since your Meltano project is your [single source of truth](/#meltano-init),
-[deploying your data pipelines in production](/docs/production.html) is pretty straightforward, but
+[deploying your pipelines in production](/docs/production.html) is pretty straightforward, but
 you can greatly simplify this process (and prevent issues caused by inconsistencies between environments!)
 by wrapping them all up into a project-specific
 [Docker container image](https://www.docker.com/resources/what-container):

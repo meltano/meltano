@@ -295,7 +295,7 @@ Now that your Meltano project has everything it needs to pull data from your sou
 it's time to tell it where that data should go!
 
 This is where the [loader](/docs/plugins.html#loaders) comes in,
-which will be responsible for taking extracted data and putting it in an arbitrary data destination.
+which will be responsible for loading [extracted](#add-an-extractor-to-pull-data-from-a-source) data into an arbitrary data destination.
 
 *To learn more about adding plugins to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project).*
 
@@ -405,7 +405,7 @@ Chances are that the loader you just added to your project will require some amo
 
 Now that [your Meltano project](#create-your-meltano-project), [extractor](#add-an-extractor-to-pull-data-from-a-source), and [loader](#add-a-loader-to-send-data-to-a-destination) are all set up, we've reached the final chapter of this adventure, and it's time to run your first data integration (EL) pipeline!
 
-*To learn more about data integration, refer to the [Data Integration (EL) guide](/docs/integration.html#selecting-entities-and-attributes-for-extraction).*
+*To learn more about data integration, refer to the [Data Integration (EL) guide](/docs/integration.html).*
 
 There's just one step here: run your newly added extractor and loader in a pipeline using [`meltano elt`](/docs/command-line-interface.html#elt):
 

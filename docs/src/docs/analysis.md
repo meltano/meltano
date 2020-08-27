@@ -37,10 +37,12 @@ The following data sources are fully supported by Meltano UI, from setting up yo
 * [Stripe](/plugins/extractors/stripe.html)
 * [Zendesk](/plugins/extractors/zendesk.html)
 
-::: tip Don't see your data source here?
-[Additional data sources](/plugins/extractors/) are available when using the [command line interface](/docs/command-line-interface.html).
+Note that only [the PostgreSQL database](/plugins/loaders/postgres.html) is currently supported as a data destination.
 
-You can also easily add [any existing Singer tap](https://www.singer.io/#taps) as a [custom extractor](/docs/command-line-interface.html#how-to-use-custom-plugins) or [create your own from scratch](/tutorials/create-a-custom-extractor.html).
+::: tip Don't see your data source listed here?
+
+[Additional data sources](/plugins/extractors/) (including [arbitrary Singer taps](https://www.singer.io/#taps)) are available when using the [command line interface](/docs/command-line-interface.html).
+
 :::
 
 ### Connecting a data source

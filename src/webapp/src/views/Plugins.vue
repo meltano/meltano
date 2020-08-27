@@ -101,17 +101,23 @@ export default {
                     <div class="media-content">
                       <div class="content">
                         <p>
-                          <span class="has-text-weight-bold"
-                            >Don't see your {{ singularizedType }} here?</span
-                          >
+                          <span class="has-text-weight-bold">
+                            Don't see your data
+                            {{
+                              pluginType === 'extractors'
+                                ? 'source'
+                                : 'destination'
+                            }}
+                            listed here?
+                          </span>
                           <br />
                           <small>
-                            Additional {{ pluginType }} are available when using
-                            the command line interface. You can also easily add
-                            any existing Singer
-                            {{ pluginType === 'extractors' ? 'tap' : 'target' }}
-                            as a custom {{ singularizedType }} or create your
-                            own from scratch.
+                            Additional {{ pluginType }} (including arbitrary
+                            Singer
+                            {{
+                              pluginType === 'extractors' ? 'taps' : 'targets'
+                            }}) are available when using the command line
+                            interface.
                           </small>
                         </p>
                         <div class="buttons">
@@ -121,7 +127,7 @@ export default {
                             "
                             target="_blank"
                             class="button is-interactive-primary"
-                            >Learn More</a
+                            >Learn more</a
                           >
                         </div>
                       </div>
