@@ -3,7 +3,7 @@ metaTitle: Managing your Meltano plugins
 description: Learn how to add extractors and loaders to your project
 ---
 
-# Plugin management
+# Plugin Management
 
 ## Adding extractors and loaders to your project
 

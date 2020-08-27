@@ -1,9 +1,9 @@
 ---
-metaTitle: The Meltano project
+metaTitle: The Meltano Project
 description: At the core of the Meltano experience is the Meltano project, which represents the single source of truth regarding your data pipelines.
 ---
 
-# The Meltano project
+# The Meltano Project
 
 <!-- The following is reproduced in docs/src/README.md#meltano-init -->
 

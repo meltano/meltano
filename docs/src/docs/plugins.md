@@ -1,9 +1,9 @@
 ---
-metaTitle: Meltano plugins
+metaTitle: Meltano Plugins
 description: A Meltano project is primarily comprised of plugins, that implement the various details of your data pipelines.
 ---
 
-# Meltano plugins
+# Meltano Plugins
 
 A [Meltano project](/docs/project.html) is primarily comprised of plugins,
 that implement the various details of your data pipelines.
