@@ -6,6 +6,8 @@ sidebarDepth: 2
 
 # Installation
 
+If the installation instructions on the [homepage](/) or the [Getting Started guide](/docs/getting-started.html#install-meltano) did not work on your environment, or if you'd like to learn more about how to manage your Meltano installation, you've come to the right place.
+
 ::: tip Short on time, or just curious what the fuss is about?
 
 To get a sense of the Meltano experience in just a few minutes, follow the [examples on the homepage](/).
@@ -16,8 +18,6 @@ with the [`tap-gitlab` extractor](/plugins/extractors/gitlab.html)
 and the [`target-jsonl`](/plugins/loaders/jsonl.html) and [`target-postgres`](/plugins/loaders/postgres.html) loaders.
 
 :::
-
-If the instructions on the [homepage](/) or the [Getting Started guide](/docs/getting-started.html#install-meltano) did not work on your environment, or if you'd like to learn more about how to manage your Meltano installation, you've come to the right place.
 
 ## Local Installation
 
