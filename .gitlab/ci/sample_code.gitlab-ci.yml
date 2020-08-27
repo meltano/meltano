@@ -1,4 +1,4 @@
-homepage_sample_code:
+.sample_code:
   stage: test
   image: python:3.6
   variables:
@@ -16,6 +16,9 @@ homepage_sample_code:
     MELTANO_DISABLE_TRACKING: "true"
   services:
     - postgres:11
+
+homepage_sample_code:
+  extends: .sample_code
   script:
     ### https://meltano.com/#installation
 
@@ -159,4 +162,118 @@ homepage_sample_code:
     paths:
       - meltano-projects/demo-project/meltano.yml
       - meltano-projects/demo-project/output
+    when: always
+
+getting_started_sample_code:
+  extends: .sample_code
+  script:
+    ### https://meltano.com/docs/getting-started.html#install-meltano
+
+    - mkdir meltano-projects
+    - cd meltano-projects
+
+    - python3 -m venv .venv
+    - source .venv/bin/activate
+
+    - pip3 install ..
+
+    - meltano --version
+
+    # docker pull meltano/meltano:latest
+
+    # docker run meltano/meltano --version
+
+
+    ### https://meltano.com/docs/getting-started.html#create-your-meltano-project
+
+    - meltano init my-meltano-project
+
+    - cd my-meltano-project
+
+    # git init
+    # git add --all
+    # git commit -m 'Initial Meltano project'
+
+    ### ---
+    # Always use the latest discovery file
+    - ln -s ../../src/meltano/core/bundle/discovery.yml
+    ### ---
+
+
+    ### https://meltano.com/docs/getting-started.html#add-an-extractor-to-pull-data-from-a-source
+
+    - meltano discover extractors
+
+    - meltano add extractor tap-gitlab
+
+    - printf "tap_covid_19\ntap-covid-19\ntap-covid-19\ncatalog,discover,state\napi_token,user_agent,start_date\n" | meltano add --custom extractor tap-covid-19
+
+    - meltano invoke tap-gitlab --help
+
+    - meltano config tap-gitlab list
+
+    - meltano config tap-gitlab set projects meltano/meltano
+    - meltano config tap-gitlab set start_date 2020-05-01T00:00:00Z
+
+    - meltano config tap-gitlab
+
+    - meltano select --list --all tap-covid-19
+
+    - meltano select tap-covid-19 eu_daily date
+    - meltano select tap-covid-19 eu_daily country
+    - meltano select tap-covid-19 eu_daily cases
+    - meltano select tap-covid-19 eu_daily deaths
+    - meltano select tap-covid-19 eu_ecdc_daily "*"
+    - meltano select tap-covid-19 --exclude "*" "git_*"
+
+    - meltano select --list tap-covid-19
+
+
+    ### https://meltano.com/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination
+
+    - meltano discover loaders
+
+    - meltano add loader target-postgres
+
+    - printf "bigquery\ntarget-bigquery\ntarget-bigquery\nproject_id,dataset_id,table_id,validate_records\n" | meltano add --custom loader target-bigquery
+
+    - meltano invoke target-postgres --help
+
+    - meltano config target-postgres list
+
+    - meltano config target-postgres set user $POSTGRES_USER
+    - meltano config target-postgres set password $POSTGRES_PASSWORD
+    - meltano config target-postgres set host $POSTGRES_ADDRESS
+    - meltano config target-postgres set port $POSTGRES_PORT
+    - meltano config target-postgres set dbname $POSTGRES_DB
+
+    - meltano config target-postgres
+
+
+    ### https://meltano.com/docs/getting-started.html#run-a-data-integration-el-pipeline
+
+    - meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres
+
+
+    ### https://meltano.com/docs/getting-started.html#run-a-data-integration-el-pipeline
+
+    - meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily
+
+    - meltano schedule list
+
+    - meltano add orchestrator airflow
+
+    ### ---
+    - meltano invoke airflow version
+    ### ---
+
+    # meltano invoke airflow scheduler
+    # meltano invoke airflow scheduler -D
+
+    # meltano invoke airflow webserver
+    # meltano invoke airflow webserver -D
+
+  artifacts:
+    paths:
+      - meltano-projects/my-meltano-project/meltano.yml
     when: always

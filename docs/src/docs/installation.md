@@ -172,7 +172,7 @@ docker run -v $(pwd):/project \
 
 You can now visit [http://localhost:5000](http://localhost:5000) to access the Meltano UI.
 
-Now that you're succesfully running Meltano, you can continue setting up your Meltano project by following the [Getting Started guide](/docs/getting-started.html).
+Now that you're successfully running Meltano, you can continue setting up your Meltano project by following the [Getting Started guide](/docs/getting-started.html).
 
 Note that wherever you are asked to run the `meltano` command, you will want to run it through `docker run` as in the snippet above.
 

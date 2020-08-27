@@ -385,11 +385,11 @@ Chances are that the loader you just added to your project will require some amo
     meltano config <plugin> set <setting> <value>
 
     # For example:
-    meltano config target-postgres user <username>
-    meltano config target-postgres password <password>
-    meltano config target-postgres host <host>
-    meltano config target-postgres port <port>
-    meltano config target-postgres dbname <dbname>
+    meltano config target-postgres set user meltano
+    meltano config target-postgres set password meltano
+    meltano config target-postgres set host localhost
+    meltano config target-postgres set port 5432
+    meltano config target-postgres set dbname warehouse
     ```
 
 1. Optionally, verify that the configuration looks like what the Singer target expects according to its documentation using [`meltano config <plugin>`](/docs/command-line-interface.html#config):
