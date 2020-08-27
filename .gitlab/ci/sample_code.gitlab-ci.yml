@@ -190,9 +190,9 @@ getting_started_sample_code:
 
     - cd my-meltano-project
 
-    - git init
-    - git add --all
-    - git commit -m 'Initial Meltano project'
+    # git init
+    # git add --all
+    # git commit -m 'Initial Meltano project'
 
     ### ---
     # Always use the latest discovery file
