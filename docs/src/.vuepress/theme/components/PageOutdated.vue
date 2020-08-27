@@ -26,12 +26,6 @@
         examples may work.
       </p>
 
-      <p>
-        The most up to date information can be found on the
-        <router-link to="/">homepage</router-link>, as well as any pages that
-        don't show this warning.
-      </p>
-
       <p v-if="editLink">
         If you encounter any inaccuracies, we welcome you to
         <a :href="editLink" target="_blank" rel="noopener noreferrer"
