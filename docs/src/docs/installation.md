@@ -1,7 +1,6 @@
 ---
 metaTitle: How to Install Meltano
-description: Meltano is easy to install on your local machine or in the cloud, including on AWS, Digital Ocean, and other cloud services.
-sidebarDepth: 2
+description: Learn how to install Meltano locally or using Docker.
 ---
 
 # Installation
@@ -21,7 +20,7 @@ and the [`target-jsonl`](/plugins/loaders/jsonl.html) and [`target-postgres`](/p
 
 ## Local Installation
 
-In this section, we will install Meltano as a local application on your computer that you can access from your browser and on the command line.
+In this section, we will install Meltano locally on your system, so that you can use it [on the command line](/docs/command-line-interface.html) and [from your browser](/docs/command-line-interface.html#ui).
 
 ### Requirements
 
