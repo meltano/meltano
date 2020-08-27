@@ -31,7 +31,7 @@ const docsSidebar = [
       "/docs/containerization",
       "/docs/production",
       "/docs/analysis",
-    ]
+    ],
   },
   {
     title: "Reference",
@@ -39,9 +39,10 @@ const docsSidebar = [
     sidebarDepth: 2,
     children: [
       "/docs/command-line-interface",
+      "/docs/meltano-yml",
       "/docs/settings",
       "/docs/architecture",
-    ]
+    ],
   },
   {
     title: "More",
@@ -52,8 +53,8 @@ const docsSidebar = [
       "/docs/contributor-guide",
       "/docs/responsible-disclosure",
       "/handbook/",
-    ]
-  }
+    ],
+  },
 ];
 
 module.exports = {
