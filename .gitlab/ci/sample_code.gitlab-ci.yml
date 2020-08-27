@@ -241,11 +241,11 @@ getting_started_sample_code:
 
     - meltano config target-postgres list
 
-    - meltano config target-postgres user $POSTGRES_USER
-    - meltano config target-postgres password $POSTGRES_PASSWORD
-    - meltano config target-postgres host $POSTGRES_ADDRESS
-    - meltano config target-postgres port $POSTGRES_PORT
-    - meltano config target-postgres dbname $POSTGRES_DB
+    - meltano config target-postgres set user $POSTGRES_USER
+    - meltano config target-postgres set password $POSTGRES_PASSWORD
+    - meltano config target-postgres set host $POSTGRES_ADDRESS
+    - meltano config target-postgres set port $POSTGRES_PORT
+    - meltano config target-postgres set dbname $POSTGRES_DB
 
     - meltano config target-postgres
 
