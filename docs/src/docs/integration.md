@@ -1,13 +1,24 @@
 ---
 metaTitle: Data integration using Meltano
-description: Learn how to use Meltano to select specific entities and attributes for extraction
+description: Learn how to extract and load data using Meltano and Singer taps and targets
 ---
 
 # Data Integration (EL)
 
+Meltano lets you easily extract and load data using [Singer](https://www.singer.io/) taps and targets,
+which take the role of its [extractors](/docs/plugins.html#extractors) and [loaders](/docs/plugins.html#loaders).
+
+Meltano [manages your tap and target configuration](#plugin-configuration) for you,
+makes it easy to [select which entities and attributes to extract](#selecting-entities-and-attributes-for-extraction),
+and keeps track of [the state of your extraction](#pipeline-state),
+so that subsequent pipeline runs with the same job ID will always pick up right where
+the previous run left off.
+
+You can run EL(T) pipelines using [`meltano elt`](/docs/command-line-interface.html#elt).
+
 ## Plugin configuration
 
-As described in the [configuration guide](/docs/configuration.html#configuration-layers), [`meltano elt`](/docs/command-line-interface.html#elt) will determine the configuration of the extractor, loader, and (optionally) transformer by looking in **the environment**, a [**`.env` file**](https://github.com/theskumar/python-dotenv#usages) in your project directory, the [system database](/docs/settings.html#database-uri), and finally your project's **`meltano.yml` file**, falling back to a default value if nothing was found.
+As described in the [Configuration guide](/docs/configuration.html#configuration-layers), [`meltano elt`](/docs/command-line-interface.html#elt) will determine the configuration of the extractor, loader, and (optionally) transformer by looking in **the environment**, a [**`.env` file**](https://github.com/theskumar/python-dotenv#usages) in your project directory, the [system database](/docs/settings.html#database-uri), and finally your project's **`meltano.yml` file**, falling back to a default value if nothing was found.
 
 You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#config) to list all available settings with their names, environment variables, and current values. [`meltano config <plugin>`](/docs/command-line-interface.html#config) will print the current configuration in JSON format.
 
@@ -136,6 +147,6 @@ When `meltano elt` is run a subsequent time, it will look for the most recent co
 
 ::: tip Not seeing state picked up after a failed run?
 
-Some loaders only emit their state once their work is completely done, even if some data may have been persisted already, and if earlier state messages from the extractor could have been forwarded to Meltano. When a pipeline with such a loader fails or is otherwise interrupted, no state will have been emitted yet, and a subsequent ELT run will not be able to pick up where this run actually left off.
+Some loaders only emit state once their work is completely done, even if some data may have been persisted already, and if earlier state messages from the extractor could have been forwarded to Meltano. When a pipeline with such a loader fails or is otherwise interrupted, no state will have been emitted yet, and a subsequent ELT run will not be able to pick up where this run actually left off.
 
 :::
