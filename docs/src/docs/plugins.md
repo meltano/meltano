@@ -26,6 +26,8 @@ They are responsible for pulling data out of an arbitrary data source: a databas
 
 Meltano supports [Singer taps](https://singer.io): executables that implement the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
 
+To learn which extractors are [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box, refer to the [Extractors page](/plugins/extractors/).
+
 ### `select` extra
 
 - Setting: `_select`
@@ -187,6 +189,8 @@ Loaders are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt
 They are responsible for taking extracted data and putting it in an arbitrary data destination: a database, SaaS API, or file with a specific format.
 
 Meltano supports [Singer targets](https://singer.io): executables that implement the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
+
+To learn which loaders are [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box, refer to the [Loaders page](/plugins/loaders/).
 
 ## Transforms
 
