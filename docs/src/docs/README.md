@@ -23,11 +23,11 @@ For more context, read the following blog post: [Why we are building an open sou
 We have decided to focus on the following personas and use cases, in order of priority, to help us determine what improvements to prioritize building, and what [community contributions](/docs/contributor-guide.html) to accept:
 
 1. Data engineers already using [Singer](https://www.singer.io/) taps and targets
-   - They are running Singer-based data pipelines in production already, likely using a hand-rolled hard-to-reproduce deployment/orchestration strategy.
+   - They are running Singer-based EL(T) pipelines in production already, likely using a hand-rolled hard-to-reproduce deployment/orchestration strategy.
    - They have experience building and maintaining taps and targets.
    - They are comfortable using a CLI and want to manage their Meltano project like a software engineering project, with all of the benefits of version control and CI/CD.
    - They want to have the option of using a web-based UI to monitor (and possibly manage) their pipelines.
-   - Meltano can learn from their experience and provide tooling and documentation to make it easier for them and new users to manage and deploy Singer-based data pipelines and build and maintain new and existing Singer taps and targets.
+   - Meltano can learn from their experience and provide tooling and documentation to make it easier for them and new users to manage and deploy Singer-based EL(T) pipelines and build and maintain new and existing Singer taps and targets.
 
 2. Data engineers or one-person data teams new to open source ELT
    - They may have come across Singer already, but haven't run Singer taps and targets in production yet.
@@ -35,7 +35,7 @@ We have decided to focus on the following personas and use cases, in order of pr
    - Later, they would not want to be limited by existing taps and targets and will want to learn how to build and maintain their own.
    - They are comfortable using a CLI and want to manage their Meltano project like a software engineering project, with all of the benefits of version control and CI/CD.
    - They want to have the option of using a web-based UI to monitor (and possibly manage) their pipelines.
-   - They may also be interested in using Meltano to run [dbt](https://www.getdbt.com) model-based transformations as part of their data pipelines.
+   - They may also be interested in using Meltano to run [dbt](https://www.getdbt.com) model-based transformations as part of their pipelines.
 
 3. Hobbyists
    - They are capable of programming and comfortable using a CLI, but may not be data engineers.

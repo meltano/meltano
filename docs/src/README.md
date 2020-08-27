@@ -81,7 +81,7 @@ Meltano is now ready for its [first project](/#meltano-init)!
 <!-- The following is reproduced from docs/src/project.md -->
 
 At the core of the Meltano experience is the Meltano project,
-which represents the single source of truth regarding your data pipelines:
+which represents the single source of truth regarding your ELT pipelines:
 how data should be [integrated](/#integration) and [transformed](/#transformation),
 how the pipelines should be [orchestrated](/#orchestration),
 and how the various components should be [configured](/docs/configuration.html).
