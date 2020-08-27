@@ -1,9 +1,17 @@
 ---
 metaTitle: Managing your Meltano plugins
-description: Learn how to add extractors and loaders to your project
+description: Learn how to manage your Meltano project's plugins
 ---
 
 # Plugin Management
+
+A [Meltano project](/docs/project.html)'s primary components are its [plugins](/docs/plugins.html),
+that implement the various details of your ELT pipelines.
+
+Your project's plugins are defined in `meltano.yml`, and [installed](#installing-your-project-s-plugins) inside the `.meltano` directory.
+They can be managed using various [CLI commands](/docs/command-line-interface.html) as well as the [UI](/docs/command-line-interface.html#ui).
+
+## Known and custom plugins
 
 ## Adding extractors and loaders to your project
 

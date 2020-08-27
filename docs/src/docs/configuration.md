@@ -1,23 +1,27 @@
 ---
 metaTitle: Meltano project and plugin configuration
-description: Meltano is responsible for managing the configuration of all of a project's plugins, including its extractors and loaders.
+description: Learn how to use Meltano to manage the configuration of your project's plugins.
 ---
 
 # Configuration
 
-Meltano is responsible for managing the configuration of all of a project's plugins, including its extractors and loaders.
+Meltano is responsible for managing the configuration of all of a [project](/docs/project.html)'s [plugins](/docs/plugins.html).
 It knows what settings are supported by each plugin, and how and when different types of plugins expect to be fed that configuration.
 
-This means that you do not need to manually craft the
+Since this also goes for [extractors](/docs/plugins.html#extractors) and [loaders](/docs/plugins.html#loaders), you do not need to manually craft the
 [`config.json` files](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file) expected by Singer taps and targets,
 because Meltano will generate them on the fly whenever an extractor or loader is used through [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 
 If the plugin you'd like to use and configure is already [known to Meltano](/docs/contributor-guide.html#known-plugins) (that is, it shows up when you run [`meltano discover`](/docs/command-line-interface.html#discover)), Meltano already knows what settings it supports.
 If you're [adding a custom plugin](/docs/command-line-interface.html#how-to-use-custom-plugins), on the other hand, you will be asked to provide the names of the supported configuration options yourself.
 
+You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#config) to list all available settings for a plugin with their names, environment variables, and current values. [`meltano config <plugin>`](/docs/command-line-interface.html#config) will print the current configuration in JSON format.
+
+Meltano itself can be configured as well. To learn more, refer to the [Settings Reference](/docs/settings.html).
+
 ## Configuration layers
 
-To determine the values of these settings, Meltano will look in 4 places, with each taking precedence over the next:
+To determine the values of settings, Meltano will look in 4 places, with each taking precedence over the next:
 
 1. **Environment variables**, set through [your shell at `meltano elt` runtime](/docs/integration.html#pipeline-specific-configuration), a [`.env` file](https://github.com/theskumar/python-dotenv#usages) in your project directory, a [scheduled pipeline](/#orchestration)'s `env` dictionary in `meltano.yml`, or any other method. You can use `meltano config <plugin> list` to list the available variable names.
 2. **Your project's `meltano.yml` file**, under the plugin's `config` key.

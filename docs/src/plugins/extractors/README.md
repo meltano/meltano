@@ -1,13 +1,15 @@
 ---
 metaTitle: Extracting Data with Meltano
-description: Use Meltano to extract raw data from numerous sources including CSV, Google Analytics, Stripe, and more.
+description: Use Meltano to easily extract data out of arbitrary data sources (databases, SaaS APIs, and file formats) using Singer taps.
 ---
 
 # Extractors: Data Sources
 
-**E**xtracting data is the **E** in the term **ELT**. To pull data from your sources, Meltano uses Extractor plugins that are also known as [taps](/docs/architecture.html#taps).
+Meltano lets you easily extract data out of arbitrary data sources (databases, SaaS APIs, and file formats) using [Singer taps](https://www.singer.io/), which take the role of [your project](/docs/project.html)'s [extractor plugins](/docs/plugins.html#extractors).
 
-The following extractors are currently [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box on both the [CLI](/docs/command-line-interface.html#add) and [UI](/docs/analysis.html#set-up-meltano):
+To learn more about extracting and [loading](/plugins/loaders/) data using Meltano, refer to the [Data Integration (EL) guide](/docs/integration.html).
+
+Extractors for the following sources are currently [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box:
 
 - [Comma Separated Values (CSV)](/plugins/extractors/csv.html)
 - [Facebook Ads](/plugins/extractors/facebook.html)
@@ -23,10 +25,12 @@ The following extractors are currently [known to Meltano](/docs/contributor-guid
 - [Stripe](/plugins/extractors/stripe.html)
 - [Zendesk](/plugins/extractors/zendesk.html)
 
-**Please note, all trademarks and logos are owned by their respective owners.**
+::: tip Don't see your data source listed here?
 
-::: tip Don't see your data source here?
-You can easily add [any existing Singer tap](https://www.singer.io/#taps) as a [custom extractor](/docs/command-line-interface.html#how-to-use-custom-plugins) or [create your own from scratch](/tutorials/create-a-custom-extractor.html).
+If a [Singer tap](https://www.singer.io/#taps) for your source already exists,
+it can easily be [added to your project as a custom extractor](/docs/command-line-interface.html#how-to-use-custom-plugins).
+If not, you can learn how to [create your own from scratch](/tutorials/create-a-custom-extractor.html).
 
-Don't forget to make your new plugin [known to Meltano](/docs/contributor-guide.html#known-plugins) if you'd like to make it available to other people!
+Once you've successfully added a previously unknown extractor to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
+
 :::

@@ -1,12 +1,14 @@
 ---
 metaTitle: Configuring Meltano Settings
-description: Manage a Meltano project's configuration using environment variables or `meltano.yml`.
-sidebarDepth: 2
+description: Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
 ---
 
 # Settings Reference
 
-As described in the [configuration guide](/docs/configuration.html#configuration-layers), Meltano will determine the values of these settings by first looking in **the environment**, then in a [**`.env` file**](https://github.com/theskumar/python-dotenv#usages) in your project directory, and finally in your project's **`meltano.yml` file**, falling back to a default value if nothing was found.
+Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
+To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
+
+As described in the [Configuration guide](/docs/configuration.html#configuration-layers), Meltano will determine the values of these settings by first looking in **the environment**, then in a [**`.env` file**](https://github.com/theskumar/python-dotenv#usages) in your project directory, and finally in your project's **`meltano.yml` file**, falling back to a default value if nothing was found.
 
 You can use [`meltano config meltano list`](/docs/command-line-interface.html#config) to list all available settings with their names, environment variables, and current values.
 
@@ -369,15 +371,6 @@ export WORKERS=1
 export WEB_CONCURRENCY=1
 ```
 
-#### How to use
-
-```bash
-meltano config meltano set ui forwarded_allow_ips "*"
-
-export MELTANO_UI_FORWARDED_ALLOW_IPS="*"
-export FORWARDED_ALLOW_IPS="*"
-```
-
 ### `ui.forwarded_allow_ips`
 
 - Environment variable: `MELTANO_UI_FORWARDED_ALLOW_IPS`, alias: `FORWARDED_ALLOW_IPS`
@@ -388,6 +381,15 @@ Comma-separated front-end (reverse) proxy IPs that are allowed to set secure hea
 Set to `*` to disable checking of front-end IPs, which can be useful for setups where you don't know in advance the IP address of front-end, but you still trust the environment.
 
 This setting corresponds to [Gunicorn's `forwarded_allow_ips` setting](https://docs.gunicorn.org/en/stable/settings.html#forwarded-allow-ips).
+
+#### How to use
+
+```bash
+meltano config meltano set ui forwarded_allow_ips "*"
+
+export MELTANO_UI_FORWARDED_ALLOW_IPS="*"
+export FORWARDED_ALLOW_IPS="*"
+```
 
 ## Meltano UI features
 

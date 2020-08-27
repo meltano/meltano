@@ -2,7 +2,7 @@
 home: true
 heroImage: /meltano-logo.svg
 metaTitle: "Meltano: open source ELT"
-description: Meltano is an open source platform for building, running & orchestrating ELT pipelines built out of Singer taps and targets and dbt models, that you can run locally or easily deploy in production. Our goal is to make the power of data integration available to all by building a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
+description: Meltano is an open source platform for building, running & orchestrating ELT pipelines made up of Singer taps and targets and dbt models, that you can run locally or easily deploy in production. Our goal is to make the power of data integration available to all by building a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
 installation:
   primaryAction:
     text: Get started
@@ -34,15 +34,15 @@ containerization:
 # Meltano: open source ELT
 
 Meltano is an [open source](https://gitlab.com/meltano/meltano) platform for
-building, running & orchestrating ELT pipelines built out of [Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com) models, that you can [run locally](/docs/installation.html) or [easily deploy in production](/docs/production.html).
+building, running & orchestrating ELT pipelines made up of [Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com) models, that you can [run locally](/docs/installation.html) or [easily deploy in production](/docs/production.html).
 
 Our goal is to [make the power of data integration available to all](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/)
 by building a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
 
 Scroll down for details on
 [Meltano projects](/#meltano-init),
-[integration](/#integration),
-[transformation](/#transformation),
+[integration (EL)](/#integration),
+[transformation (T)](/#transformation),
 [orchestration](/#orchestration), and
 [containerization](/#containerization).
 
@@ -81,7 +81,7 @@ Meltano is now ready for its [first project](/#meltano-init)!
 <!-- The following is reproduced from docs/src/project.md -->
 
 At the core of the Meltano experience is the Meltano project,
-which represents the single source of truth regarding your data pipelines:
+which represents the single source of truth regarding your ELT pipelines:
 how data should be [integrated](/#integration) and [transformed](/#transformation),
 how the pipelines should be [orchestrated](/#orchestration),
 and how the various components should be [configured](/docs/configuration.html).
@@ -294,7 +294,7 @@ Airflow is now available at <http://localhost:8080>!
 Now that you've got your pipelines running locally, it'll be time to repeat this trick in production!
 
 Since your Meltano project is your [single source of truth](/#meltano-init),
-[deploying your data pipelines in production](/docs/production.html) is pretty straightforward, but
+[deploying your pipelines in production](/docs/production.html) is pretty straightforward, but
 you can greatly simplify this process (and prevent issues caused by inconsistencies between environments!)
 by wrapping them all up into a project-specific
 [Docker container image](https://www.docker.com/resources/what-container):

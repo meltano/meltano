@@ -19,7 +19,7 @@ meltano elt tap-gitlab target-postgres --transform run
 
 After the Extract and Load steps are successfully completed and data have been extracted from the GitLab API and loaded to a Postgres DB, the dbt transform runs.
 
-Meltano uses the convention that the transform has the same name as the extractor it is for. Transforms are automatically added the first time an elt operation that requires them runs, but they can also be discovered and added to a Meltano project manually:
+Meltano uses the convention that the transform has the same namespace as the extractor it is for. Transforms are automatically added the first time an elt operation that requires them runs, but they can also be discovered and added to a Meltano project manually:
 
 ```
 (venv) $ meltano discover transforms

@@ -1,15 +1,15 @@
 ---
 metaTitle: Loading Data with Meltano
-description: Use Meltano to load raw data from numerous sources into Postgres, Snowflake, and more.
+description: Use Meltano to easily load extracted data into arbitrary data destinations (databases, SaaS APIs, and file formats) using Singer targets.
 ---
 
 # Loaders: Data Destinations
 
-**L**oading data is the **L** in the term **ELT**. After Meltano pulls data from your sources during the **E**xtract step, it uses Loader plugins (that are also known as [targets](/docs/architecture.html#targets)) to load the data into a reporting database for further manipulation and analysis.
+Meltano lets you easily load [extracted](/plugins/extractors/) data into arbitrary data destinations (databases, SaaS APIs, and file formats) using [Singer targets](https://www.singer.io/), which take the role of [your project](/docs/project.html)'s [loader plugins](/docs/plugins.html#loaders).
 
-Meltano currently supports the following loader destinations:
+To learn more about [extracting](/plugins/loaders/) and loading data using Meltano, refer to the [Data Integration (EL) guide](/docs/integration.html).
 
-The following loaders are currently [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box on the [CLI](/docs/command-line-interface.html#add) and [UI](/docs/analysis.html#set-up-meltano):
+Loaders for the following destinations are currently [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box:
 
 - [Comma Separated Values (CSV) file](/plugins/loaders/csv.html)
 - [JSON Lines (JSON) file](/plugins/loaders/jsonl.html)
@@ -17,10 +17,12 @@ The following loaders are currently [known to Meltano](/docs/contributor-guide.h
 - [PostgreSQL Database](/plugins/loaders/postgres.html)
 - [SQLite Database](/plugins/loaders/sqlite.html)
 
-Note that Meltano dashboards and reports are only supported when PostgreSQL is used.
+::: tip Don't see your data destination listed here?
 
-::: tip Don't see your reporting database here?
-You can easily add [any existing Singer target](https://www.singer.io/#targets) as a [custom loader](/docs/command-line-interface.html#how-to-use-custom-plugins) or [create your own from scratch](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target).
+If a [Singer target](https://www.singer.io/#targets) for your destination already exists,
+it can easily be [added to your project as a custom loader](/docs/command-line-interface.html#how-to-use-custom-plugins).
+If not, you can learn how to [create your own from scratch](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target).
 
-Don't forget to make your new plugin [known to Meltano](/docs/contributor-guide.html#known-plugins) if you'd like to make it available to other people!
+Once you've successfully added a previously unknown loader to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
+
 :::

@@ -1,12 +1,12 @@
 ---
 metaTitle: Meltano Plugins
-description: A Meltano project is primarily comprised of plugins, that implement the various details of your data pipelines.
+description: A Meltano project's primary components are its plugins, that implement the various details of your ELT pipelines.
 ---
 
 # Meltano Plugins
 
-A [Meltano project](/docs/project.html) is primarily comprised of plugins,
-that implement the various details of your data pipelines.
+A [Meltano project](/docs/project.html)'s primary components are its plugins,
+that implement the various details of your ELT pipelines.
 
 Meltano knows the following types of plugins:
 
@@ -19,12 +19,16 @@ Meltano knows the following types of plugins:
 - [Transformers](#transformers)
 - [File bundles](#file-bundles)
 
+To learn how to manage your project's plugins, refer to the [Plugin Management guide](/docs/plugin-management.html).
+
 ## Extractors
 
 Extractors are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt`](/docs/command-line-interface.html#elt) as part of [data integration](/docs/integration.md).
-They are responsible for pulling data out of an arbitrary data source: a database, SaaS API, or file with a specific format.
+They are responsible for pulling data out of arbitrary data sources: databases, SaaS APIs, or file formats.
 
 Meltano supports [Singer taps](https://singer.io): executables that implement the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
+
+To learn which extractors are [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box, refer to the [Extractors page](/plugins/extractors/).
 
 ### `select` extra
 
@@ -184,9 +188,11 @@ export TAP_POSTGRES__SCHEMA_SOME_TABLE_CREATED_AT_FORMAT=date
 ## Loaders
 
 Loaders are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt`](/docs/command-line-interface.html#elt) as part of [data integration](/docs/integration.md).
-They are responsible for taking extracted data and putting it in an arbitrary data destination: a database, SaaS API, or file with a specific format.
+They are responsible for loading [extracted](#extractors) data into arbitrary data destinations: databases, SaaS APIs, or file formats.
 
 Meltano supports [Singer targets](https://singer.io): executables that implement the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
+
+To learn which loaders are [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box, refer to the [Loaders page](/plugins/loaders/).
 
 ## Transforms
 

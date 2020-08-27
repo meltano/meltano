@@ -3,7 +3,7 @@
 # Meltano: open source ELT
 
 [Meltano](https://meltano.com) is an open source platform for
-building, running & orchestrating ELT pipelines built out of
+building, running & orchestrating ELT pipelines made up of
 [Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com)
 models, that you can [run locally](https://meltano.com/docs/installation.html) or
 [easily deploy in production](https://meltano.com/docs/production.html).
