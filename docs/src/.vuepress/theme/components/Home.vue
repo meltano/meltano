@@ -216,7 +216,7 @@
 import NavLink from "@theme/components/NavLink.vue";
 
 export default {
-  name: 'Home',
+  name: "Home",
 
   components: { NavLink },
 
@@ -247,7 +247,7 @@ export default {
   }
 
   svg {
-    vertical-align: text-top
+    vertical-align: text-top;
   }
 }
 
@@ -335,7 +335,6 @@ export default {
 }
 
 .section {
-  padding: 2rem 0;
   text-align: center;
 
   &__text {
@@ -367,7 +366,6 @@ export default {
   display: flex;
   justify-content: center;
   flex-direction: column;
-  align-items: center;
 }
 
 @media (min-width: $MQNarrow) {
@@ -388,18 +386,12 @@ export default {
 }
 
 .hero-left {
-  max-width: 80%;
   text-align: left;
-}
-
-.hero-right {
-  width: 100%;
 }
 
 .feature-section {
   display: flex;
   flex-direction: column;
-  align-items: center;
   padding: 0 30px;
 }
 
@@ -448,22 +440,8 @@ export default {
     margin-bottom: 0 !important;
   }
 
-  div[class*='language-'] {
-    margin-left: 0;
-    margin-right: 0;
-  }
-
-  p, ul, ol {
-    font-size: 1.2rem !important;
-    color: #474C4F !important;
-  }
-
   h1 {
     padding-top: 0 !important;
-    padding-right: 40px !important;
-    font-weight: 400 !important;
-    font-size: 36px !important;
-    color: #1D1D1D !important;
     margin: 0 !important;
   }
 
@@ -474,35 +452,46 @@ export default {
   }
 }
 
+.hero-right {
+  padding-top: 2.5rem;
+}
+
 .hero-right .theme-default-content ol {
   text-align: left;
   padding-left: 1.5rem;
 }
 
 @media (min-width: $MQNarrow) {
-  .hero .theme-default-content h1 {
-    font-size: 54px !important;
-    text-align: left !important;
-    padding-top: 0 !important;
-    line-height: 1.2em !important;
-  }
+  .hero .theme-default-content {
+    h1 {
+      font-size: 54px !important;
+      font-weight: 400 !important;
+      text-align: left !important;
+      padding-top: 0 !important;
+      line-height: 1.2em !important;
+    }
 
-  .hero .theme-default-content h2 {
-    font-size: 2rem !important;
+    h2 {
+      font-size: 2rem !important;
+    }
+
+    p, ul, ol {
+      font-size: 1.2rem !important;
+    }
   }
 
   .hero-left {
-    width: 55%;
+    padding: 0;
   }
 
   .hero-right {
-    min-width: 400px;
-    width: 35%;
+    padding: 0;
+    padding-left: 2.5rem;
+    max-width: 40%;
   }
 
   .hero-left .theme-default-content {
     p, ul, ol {
-      padding-right: 80px !important;
       padding-bottom: 10px;
     }
   }
@@ -519,9 +508,18 @@ export default {
   margin: 0px auto;
 
   .hero {
-    width: 100%;
     text-align: center;
-    padding: 3rem 0;
+    padding: 2rem 2.5rem 3rem;
+
+    @media (max-width: $MQNarrow) {
+      max-width: $contentWidth;
+      margin: 0 auto;
+      padding: 1.5rem 2rem 2.5rem;
+    }
+
+    @media (max-width: $MQMobileNarrow) {
+      padding: 1rem 1.5rem 2rem;
+    }
 
     img {
       max-width: 100%;
@@ -531,10 +529,6 @@ export default {
       border: 3px solid #282c34;
       border-radius: 6px;
       max-width: calc(100% - 6px);
-    }
-
-    h1 {
-      font-size: 3rem;
     }
 
     h1, .description, .action {
@@ -552,11 +546,11 @@ export default {
 
   .action-button {
     display: inline-block;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
     color: #fff;
     background-color: $accentColor;
-    padding: 0.8rem 1.6rem;
+    padding: 0.6rem 1.2rem;
     border-radius: 4px;
     transition: background-color 0.2s ease;
     box-sizing: border-box;
@@ -641,7 +635,7 @@ export default {
   .home {
     .hero {
       h1 {
-        font-size: 2rem;
+        font-size: 2.2rem;
       }
 
       h1, .description, .action {
@@ -651,11 +645,6 @@ export default {
       .description {
         font-size: 1.2rem;
       }
-    }
-
-    .action-button {
-      font-size: 1.1rem;
-      padding: 0.6rem 1.2rem;
     }
 
     .feature {
