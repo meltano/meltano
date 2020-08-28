@@ -43,6 +43,32 @@ We have decided to focus on the following personas and use cases, in order of pr
    - They are primarily interested in using one or more specific existing extractors and loaders, but if they run into issues, they would be comfortable attempting to fix bugs themselves and contributing the fixes upstream.
    - They may also be interested in using Meltano's [built-in analytics functionality](/docs/analysis.html), and may look into building the transformation and model plugins that support it.
 
+## Roadmap
+
+Meltano is developed completely in the open on GitLab: <https://gitlab.com/meltano/meltano>. Our [issue tracker](https://gitlab.com/meltano/meltano/-/issues), [epics](https://gitlab.com/groups/meltano/-/epics), and [weekly milestones](https://gitlab.com/groups/meltano/-/milestones) can be found there as well.
+
+To get an idea of what the team and community are currently working on, check out the upcoming milestone's [Development Flow board](https://gitlab.com/groups/meltano/-/boards/536761?scope=all&utf8=%E2%9C%93&milestone_title=%23upcoming).
+
+If you'd like to look further into the future, the [Milestones board](https://gitlab.com/groups/meltano/-/boards/1933232) has a column for each upcoming weekly milestone.
+
+Be aware that issue milestones serve more as a rough indication of relative priority than as hard deadlines,
+since short-term priorities can change quickly in response to community feedback, and it's hard to predict how much progress can be made in a week.
+Also note that issues labeled `flow::To Do` have higher priority and are more likely to be completed in a given week than those labeled `flow::Triage`, which are often moved to the next milestone at the end of the week, with issues already scheduled for the next week pushed out to make room for them.
+
+## Contributing
+
+Meltano is built for and by its community, and we welcome your contributions to our [GitLab repository](https://gitlab.com/meltano/meltano),
+which houses Meltano's
+[core](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/core),
+[CLI](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/cli),
+[UI](https://gitlab.com/meltano/meltano/-/tree/master/src/webapp),
+[UI API](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/api),
+[these docs](https://gitlab.com/meltano/meltano/-/tree/master/docs/src), and
+the [index of known plugins](/docs/contributor-guide.html#known-plugins),
+which feeds the lists of [Extractors](/plugins/extractors/) and [Loaders](/plugins/loaders/) that are supported out of the box.
+
+To learn more about contributing to Meltano, refer to the [Contributor Guide](/docs/contributor-guide.html).
+
 ## History
 
 Meltano, originally called BizOps, was founded inside [GitLab](https://about.gitlab.com/) [in 2018](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) to serve the GitLab Data Team. It is maintained primarily by [the Meltano team](https://about.gitlab.com/handbook/meltano/) at GitLab, which continues to sponsor its development.
