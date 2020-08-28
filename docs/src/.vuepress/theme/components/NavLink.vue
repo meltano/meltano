@@ -56,7 +56,6 @@ export default {
       color white
       padding 0 0.75rem
       border-radius 5px
-      margin-right 1rem
       line-height: 2.2rem;
 
       transition background-color .2s ease
