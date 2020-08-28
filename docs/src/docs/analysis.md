@@ -1,5 +1,5 @@
 ---
-description: Create your first data analysis project, build a pipeline, and analyze your data after installing Meltano.
+description: Learn how to analyze your data and create repotrs and dashboards.
 lastUpdatedSignificantly: 2020-04-30
 ---
 

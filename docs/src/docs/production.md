@@ -1,6 +1,5 @@
 ---
-description: Learn how to run Meltano pipelines in production
-sidebarDepth: 2
+description: Learn how to deploy your ELT pipelines in production.
 ---
 
 # Deployment in Production

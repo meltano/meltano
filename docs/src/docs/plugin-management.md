@@ -1,5 +1,5 @@
 ---
-description: Learn how to manage your Meltano project's plugins
+description: Learn how to manage your Meltano project's plugins.
 ---
 
 # Plugin Management

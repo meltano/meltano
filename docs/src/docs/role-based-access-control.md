@@ -1,5 +1,4 @@
 ---
-sidebarDepth: 2
 lastUpdatedSignificantly: 2020-02-20
 ---
 

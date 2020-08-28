@@ -1,6 +1,5 @@
 ---
 description: Meltano is open source software built by an internal team at GitLab as well as the larger Meltano community.
-sidebarDepth: 2
 ---
 
 # Contributor Guide

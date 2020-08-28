@@ -1,6 +1,5 @@
 ---
-description: Using DBT with Meltano for transformations
-sidebarDepth: 2
+description: Learn how to transform your loaded data for analysis using Meltano and dbt.
 lastUpdatedSignificantly: 2020-02-20
 ---
 
