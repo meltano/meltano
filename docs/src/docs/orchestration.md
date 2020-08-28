@@ -43,7 +43,7 @@ meltano add orchestrator airflow
 ### Using an existing Airflow installation
 
 You can also use the [Meltano DAG generator](https://gitlab.com/meltano/files-airflow/-/blob/master/bundle/orchestrate/dags/meltano.py)
-with an existing Airflow installation, as long as the `MELTANO_PROJECT_ROOT` environment variable is set to point at the Meltano project.
+with an existing Airflow installation, as long as the `MELTANO_PROJECT_ROOT` environment variable is set to point at your Meltano project.
 
 In fact, all `meltano invoke airflow ...` does is populate `MELTANO_PROJECT_ROOT`,
 set Airflow's `core.dags_folder` setting to `$MELTANO_PROJECT_ROOT/orchestrate/dags` (where the DAG generator lives by default),

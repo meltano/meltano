@@ -83,7 +83,7 @@ Now that you have a way of running the [`meltano` CLI](/docs/command-line-interf
 it's time to create a new [Meltano project](/docs/project.html) that (among other things)
 will hold the [plugins](/docs/plugins.html) that implement the various details of your ELT pipelines.
 
-*To learn more about Meltano projects, refer to the ["The Meltano Project" concept guide](/docs/project.html).*
+*To learn more about Meltano projects, refer to the [Projects concept doc](/docs/project.html).*
 
 1. Navigate to the directory that you'd like to hold your Meltano projects, if you didn't already do so earlier:
 

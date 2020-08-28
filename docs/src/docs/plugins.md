@@ -2,7 +2,7 @@
 description: A Meltano project's primary components are its plugins, that implement the various details of your ELT pipelines.
 ---
 
-# Meltano Plugins
+# Plugins
 
 A [Meltano project](/docs/project.html)'s primary components are its plugins,
 that implement the various details of your ELT pipelines.

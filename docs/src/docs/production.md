@@ -69,7 +69,7 @@ onto a production environment is to
 
 If you add `meltano` (or `meltano==<version>`) to your project's `requirements.txt`
 file, you can choose to automatically run `pip install -r requirements.txt` on your
-production environment whenever the Meltano project is updated to ensure you're always
+production environment whenever your Meltano project is updated to ensure you're always
 on the latest (or requested) version.
 
 ### Containerized Meltano project
@@ -88,7 +88,7 @@ before any other `meltano` commands whenever you clone or pull an existing Melta
 to install (or update) all plugins specified in `meltano.yml`.
 
 Thus, it is strongly recommended that you automatically run `meltano install` on your
-production environment whenever the Meltano project is updated to ensure you're always
+production environment whenever your Meltano project is updated to ensure you're always
 using the correct versions of plugins.
 
 ### Containerized Meltano project
