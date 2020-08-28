@@ -606,7 +606,7 @@ meltano user add admin securepassword --role admin
 
 ## `upgrade`
 
-Upgrade Meltano and the Meltano project to the latest version.
+Upgrade Meltano and your Meltano project to the latest version.
 
 When called without arguments, this will:
 - Upgrade the `meltano` package

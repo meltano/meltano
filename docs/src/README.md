@@ -76,11 +76,11 @@ Meltano is now ready for its [first project](/#meltano-init)!
 
 ::: slot meltano-init
 
-## The Meltano project: your single source of truth
+## Your Meltano project: a single source of truth
 
 <!-- The following is reproduced from docs/src/project.md -->
 
-At the core of the Meltano experience is the Meltano project,
+At the core of the Meltano experience is your Meltano project,
 which represents the single source of truth regarding your ELT pipelines:
 how data should be [integrated](/#integration) and [transformed](/#transformation),
 how the pipelines should be [orchestrated](/#orchestration),
