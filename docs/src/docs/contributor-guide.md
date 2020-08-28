@@ -4,17 +4,24 @@ description: Meltano is open source software built by an internal team at GitLab
 
 # Contributor Guide
 
-## Prerequisites
-
-In order to contribute to Meltano, you will need the following:
-
-1. [Python 3.6.1+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/docs/installation.html#requirements) of the Installation instructions, that also apply here.
-2. [Node 8.11.0+](https://nodejs.org/)
-3. [Yarn](https://yarnpkg.com/)
+Meltano is built for and by its community, and we welcome your contributions to our [GitLab repository](https://gitlab.com/meltano/meltano),
+which houses Meltano's
+[core](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/core),
+[CLI](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/cli),
+[UI](https://gitlab.com/meltano/meltano/-/tree/master/src/webapp),
+[UI API](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/api),
+[these docs](https://gitlab.com/meltano/meltano/-/tree/master/docs/src), and
+the [index of known plugins](/docs/contributor-guide.html#known-plugins),
+which feeds the lists of [Extractors](/plugins/extractors/) and [Loaders](/plugins/loaders/) that are supported out of the box.
 
 ## Where to start?
 
-We welcome contributions, idea submissions, and improvements. In fact we may already have open issues labeled [Accepting Merge Requests] if you don't know where to start. Please see the contribution guidelines below for source code related contributions.
+If you'd like to contribute, but you're not sure _what_, check out the list of open issues labeled [Accepting Merge Requests].
+Any other improvements are welcome too, of course, so simply asking yourself "What about Meltano didn't work quite as smoothly as I would've liked?" is another good way to come up with ideas.
+
+If an issue for your problem or suggested improvement doesn't exist yet on our [issue tracker](https://gitlab.com/meltano/meltano/-/issues),
+please file a new one before submitting a [merge request](#merge-requests),
+so that the team and community are aware of your plan and can help you figure out the best way to realize it.
 
 ### Metrics (anonymous usage data) tracking
 
@@ -24,6 +31,14 @@ As you contribute to Meltano, you may want to disable [metrics tracking](/docs/s
 # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
 export MELTANO_DISABLE_TRACKING=True
 ```
+
+## Prerequisites
+
+In order to contribute to Meltano, you will need the following:
+
+1. [Python 3.6.1+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/docs/installation.html#requirements) of the Installation instructions, that also apply here.
+2. [Node 8.11.0+](https://nodejs.org/)
+3. [Yarn](https://yarnpkg.com/)
 
 ## Setting Up Your Environment
 

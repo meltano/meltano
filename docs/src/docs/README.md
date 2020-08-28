@@ -55,6 +55,20 @@ Be aware that issue milestones serve more as a rough indication of relative prio
 since short-term priorities can change quickly in response to community feedback, and it's hard to predict how much progress can be made in a week.
 Also note that issues labeled `flow::To Do` have higher priority and are more likely to be completed in a given week than those labeled `flow::Triage`, which are often moved to the next milestone at the end of the week, with issues already scheduled for the next week pushed out to make room for them.
 
+## Contributing
+
+Meltano is built for and by its community, and we welcome your contributions to our [GitLab repository](https://gitlab.com/meltano/meltano),
+which houses Meltano's
+[core](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/core),
+[CLI](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/cli),
+[UI](https://gitlab.com/meltano/meltano/-/tree/master/src/webapp),
+[UI API](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/api),
+[these docs](https://gitlab.com/meltano/meltano/-/tree/master/docs/src), and
+the [index of known plugins](/docs/contributor-guide.html#known-plugins),
+which feeds the lists of [Extractors](/plugins/extractors/) and [Loaders](/plugins/loaders/) that are supported out of the box.
+
+To learn more about contributing to Meltano, refer to the [Contributor Guide](/docs/contributor-guide.html).
+
 ## History
 
 Meltano, originally called BizOps, was founded inside [GitLab](https://about.gitlab.com/) [in 2018](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) to serve the GitLab Data Team. It is maintained primarily by [the Meltano team](https://about.gitlab.com/handbook/meltano/) at GitLab, which continues to sponsor its development.
