@@ -1,5 +1,4 @@
 ---
-metaTitle: Meltano Tutorials, Guides, and Walkthroughs
 description: Learn how to use Meltano for data analysis of CSVs, Postgres, Google Analytics, GitLab, and much more.
 ---
 

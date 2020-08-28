@@ -1,5 +1,4 @@
 ---
-metaTitle: Meltano Plugins
 description: A Meltano project's primary components are its plugins, that implement the various details of your ELT pipelines.
 ---
 

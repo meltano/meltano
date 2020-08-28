@@ -1,5 +1,4 @@
 ---
-metaTitle: "Getting Started with Meltano: open source ELT"
 description: If you're ready to get started with Meltano and run an EL(T) pipeline with a data source and destination of your choosing, you've come to the right place!
 ---
 

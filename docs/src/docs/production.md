@@ -1,5 +1,4 @@
 ---
-metaTitle: How to deploy Meltano in production
 description: Learn how to run Meltano pipelines in production
 sidebarDepth: 2
 ---

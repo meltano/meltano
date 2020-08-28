@@ -1,5 +1,4 @@
 ---
-metaTitle: Containerizing your Meltano project
 description: You can greatly simplify the deployment process (and prevent issues caused by inconsistencies between environments!) by wrapping your Meltano project up into a project-specific Docker container image.
 ---
 

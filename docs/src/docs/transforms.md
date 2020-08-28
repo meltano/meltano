@@ -1,5 +1,4 @@
 ---
-metaTitle: Transforms in Meltano
 description: Using DBT with Meltano for transformations
 sidebarDepth: 2
 lastUpdatedSignificantly: 2020-02-20

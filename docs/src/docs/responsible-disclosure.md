@@ -1,7 +1,5 @@
 ---
-metaTitle: Meltano Responsible Disclosure Policy
 description: Learn how to report security vulnerabilities
-contentOutdated: false
 ---
 
 # Responsible Disclosure Policy
