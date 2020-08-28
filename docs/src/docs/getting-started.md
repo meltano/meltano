@@ -427,7 +427,7 @@ Now that you've successfully run your first data integration (EL) pipeline using
 you have a few possible next steps:
 
 - [Schedule pipelines to run regularly](#schedule-pipelines-to-run-regularly)
-- [Transform loaded data for analysis](#transform-data-for-analysis)
+- [Transform loaded data for analysis](#transform-loaded-data-for-analysis)
 - [Containerize your project](#containerize-your-project)
 - [Deploy your pipelines in production](#deploy-your-pipelines-in-production)
 
