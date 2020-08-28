@@ -8,11 +8,11 @@ Most EL(T) pipelines aren't run just once, but over and over again, to make sure
 
 To help you realize this, Meltano supports scheduled pipelines that can be orchestrated using [Apache Airflow](https://apache.airflow.org/).
 
-When a new pipeline schedule is created using the [UI](/docs/analysis.html#create-a-pipeline-schedule) or [CLI](/docs/command-line-interface.html#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
+When a new pipeline schedule is created using the [UI](/docs/command-line-interface.html#ui) or [CLI](/docs/command-line-interface.html#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 
 ## Create a Schedule
 
-To regularly schedule your ELT to run, use the ["Pipeline" interface in the UI](/docs/analysis.html#create-a-pipeline-schedule), or the [`meltano schedule`  command](/docs/command-line-interface.html#schedule):
+To regularly schedule your ELT to run, use the ["Pipeline" interface in the UI](/docs/command-line-interface.html#ui), or the [`meltano schedule`  command](/docs/command-line-interface.html#schedule):
 
 ```bash
 meltano schedule [SCHEDULE_NAME] [EXTRACTOR_NAME] [TARGET_NAME] [INTERVAL]

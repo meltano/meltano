@@ -104,7 +104,7 @@ source venv/.venv/meltano/bin/activate
 
 ### Installing Meltano on your DigitalOcean Droplet
 
-Now that you are inside your virtual environment, follow the [Meltano installation instructions](/docs/installation.html#installing-meltano)
+Now that you are inside your virtual environment, follow the [Meltano installation instructions](/docs/installation.html#install-meltano)
 
 Initialize Meltano:
 
