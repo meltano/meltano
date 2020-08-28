@@ -1,5 +1,4 @@
 ---
-metaTitle: Data integration using Meltano
 description: Learn how to extract and load data using Meltano and Singer taps and targets
 ---
 

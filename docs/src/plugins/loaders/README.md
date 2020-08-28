@@ -1,5 +1,4 @@
 ---
-metaTitle: Loading Data with Meltano
 description: Use Meltano to easily load extracted data into arbitrary data destinations (databases, SaaS APIs, and file formats) using Singer targets.
 ---
 

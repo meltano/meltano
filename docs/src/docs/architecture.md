@@ -1,7 +1,5 @@
 ---
-metaTitle: Meltano Software Architecture
 description: Meltano utilizes a taps and targets architecture, making it easy to implement in any ELT pipeline.
-sidebarDepth: 2
 lastUpdatedSignificantly: 2020-03-24
 ---
 

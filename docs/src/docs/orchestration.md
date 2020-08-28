@@ -1,6 +1,5 @@
 ---
-metaTitle: Orchestration with Meltano
-description: Learn how to use Meltano with Airflow to orchestrate your pipelines
+description: Learn how to schedule and orchestrate your pipelines using Meltano and Airflow.
 ---
 
 # Orchestration

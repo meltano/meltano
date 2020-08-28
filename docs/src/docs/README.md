@@ -1,5 +1,4 @@
 ---
-metaTitle: Introduction to Meltano
 description: Learn where to use Meltano, how Meltano is built, and where to get started.
 ---
 

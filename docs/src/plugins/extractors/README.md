@@ -1,5 +1,4 @@
 ---
-metaTitle: Extracting Data with Meltano
 description: Use Meltano to easily extract data out of arbitrary data sources (databases, SaaS APIs, and file formats) using Singer taps.
 ---
 

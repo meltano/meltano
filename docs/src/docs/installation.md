@@ -1,5 +1,4 @@
 ---
-metaTitle: How to Install Meltano
 description: Learn how to install Meltano locally or using Docker.
 ---
 

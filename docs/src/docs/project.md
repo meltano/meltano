@@ -1,5 +1,4 @@
 ---
-metaTitle: The Meltano Project
 description: At the core of the Meltano experience is the Meltano project, which represents the single source of truth regarding your ELT pipelines.
 ---
 

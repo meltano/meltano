@@ -1,12 +1,11 @@
 ---
-metaTitle: Using the Meltano CLI
-description: The Meltano command line interface makes it easy to develop, run, and debug every step of the data analysis lifecycle.
-sidebarDepth: 2
+description: Meltano provides a command line interface (CLI) that makes it easy to manage your project, plugins, and EL(T) pipelines.
 ---
 
 # CLI Reference
 
-Meltano provides a command line interface (CLI) that allows you to manage the configuration and orchestration of Meltano projects. It provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run, and debug every step of the data life cycle.
+Meltano provides a command line interface (CLI) that makes it easy to manage your [project](/docs/project.html), [plugins](/docs/plugin-management.html), and [EL(T) pipelines](/docs/integration.html).
+To quickly find the `meltano` subcommand you're looking for, use the Table of Contents in the sidebar.
 
 ## `add`
 

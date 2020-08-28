@@ -1,6 +1,5 @@
 ---
-metaTitle: Meltano project and plugin configuration
-description: Learn how to use Meltano to manage the configuration of your project's plugins.
+description: Learn how to manage the configuration of your project's plugins.
 ---
 
 # Configuration

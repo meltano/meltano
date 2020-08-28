@@ -1,7 +1,5 @@
 ---
-metaTitle: Meltano Support & Help
 description: Learn where to file bugs, track issues, and how to get support from the Meltano Slack and other channels.
-contentOutdated: false
 ---
 
 # Getting Help
