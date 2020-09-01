@@ -280,7 +280,7 @@ File bundles are [pip packages](https://pip.pypa.io/en/stable/) bundling files y
 
 When a file bundle is added to your project using [`meltano add`](/docs/command-line-interface.html#add),
 the bundled files will automatically be added as well.
-The file bundle itself will not be added to `meltano.yml` unless it contains files that are
+The file bundle itself will not be added to your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) unless it contains files that are
 [managed by the file bundle](#update-extra) and to be updated automatically when [`meltano upgrade`](/docs/command-line-interface.html#upgrade) is run.
 
 ### `update` extra

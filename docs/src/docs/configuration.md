@@ -22,18 +22,18 @@ Meltano itself can be configured as well. To learn more, refer to the [Settings 
 
 To determine the values of settings, Meltano will look in 4 places, with each taking precedence over the next:
 
-1. **Environment variables**, set through [your shell at `meltano elt` runtime](/docs/integration.html#pipeline-specific-configuration), a [`.env` file](https://github.com/theskumar/python-dotenv#usages) in your project directory, a [scheduled pipeline](/#orchestration)'s `env` dictionary in `meltano.yml`, or any other method. You can use `meltano config <plugin> list` to list the available variable names.
-2. **Your project's `meltano.yml` file**, under the plugin's `config` key.
+1. **Environment variables**, set through [your shell at `meltano elt` runtime](/docs/integration.html#pipeline-specific-configuration), your project's [`.env` file](/docs/project.html#env), a [scheduled pipeline's `env` dictionary](/docs/project.html#schedules), or any other method. You can use `meltano config <plugin> list` to list the available variable names.
+2. **your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file)**, under the plugin's `config` key.
    - Inside values, [environment variables](/docs/integration.html#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
-3. **Your project's [**system database**](/docs/settings.html#database-uri)**, which lives at `.meltano/meltano.db` by default and (among other things) stores configuration set using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) or [the UI](/docs/command-line-interface.html#ui) when the project is [deployed as read-only](/docs/settings.html#project-readonly).
+3. **Your project's [**system database**](/docs/project.html#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) or [the UI](/docs/command-line-interface.html#ui) when the project is [deployed as read-only](/docs/settings.html#project-readonly).
    - Note that configuration for Meltano itself cannot be stored in the system database.
-4. **The default `value`s** set on the plugin's `settings` object in the global `discovery.yml` file (in the case of [known plugins](/docs/contributor-guide.html#known-plugins)) or your project's `meltano.yml` file (in the case of custom plugins). `meltano config <plugin> list` will list the default values.
+4. **The default `value`s** set on the plugin's `settings` object in the global `discovery.yml` file (in the case of [known plugins](/docs/contributor-guide.html#known-plugins)) or [`meltano.yml`](/docs/project.html#meltano-yml-project-file) (in the case of custom plugins). `meltano config <plugin> list` will list the default values.
 
-Configuration that is _not_ environment-specific or sensitive should be stored in your project's `meltano.yml` file and checked into version
-control. Sensitive values like passwords and tokens are most appropriately stored in the environment, a (`.gitignore`d) `.env` file in your project directory, or the system database.
+Configuration that is _not_ environment-specific or sensitive should be stored in `meltano.yml` and checked into version
+control. Sensitive values like passwords and tokens are most appropriately stored in the environment, `.env`, or the system database.
 
-[`meltano config <plugin> set`](/docs/command-line-interface.html#config) will automatically store settings in `meltano.yml` or `.env` as appropriate.
+[`meltano config <plugin> set`](/docs/command-line-interface.html#config) will automatically store configuration in `meltano.yml` or `.env` as appropriate.
 
 ## Custom settings
 
@@ -45,7 +45,7 @@ If the plugin was already [known to Meltano](/docs/contributor-guide.html#known-
 If a plugin supports a setting that is not yet known to Meltano (because it may have been added after the `settings` metadata was specified, for example),
 you do not need to modify the `settings` metadata to be able to use it.
 
-Instead, you can define a custom setting by adding the setting name (key) to your project's `config` object in `meltano.yml` with the desired value (or simply `null`), by manually editing the file or using `meltano config <plugin> set <key> <value>`:
+Instead, you can define a custom setting by adding the setting name (key) to your plugin's `config` object in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) with the desired value (or simply `null`), by manually editing the file or using `meltano config <plugin> set <key> <value>`:
 
 ```bash
 meltano config tap-example set custom_setting value
@@ -81,7 +81,7 @@ Meltano currently knows these extras for these plugin types:
 - [File bundles](/docs/plugins.html#file-bundles)
   - [`update`](/docs/plugins.html#update-extra)
 
-The values of these extras are stored in `meltano.yml` among the plugin's other properties, _outside_ of the `config` object:
+The values of these extras are stored in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) among the plugin's other properties, _outside_ of the `config` object:
 
 ```yaml{7-8}
 extractors:
