@@ -487,7 +487,8 @@ export default {
   .hero-right {
     padding: 0;
     padding-left: 2.5rem;
-    max-width: 40%;
+    width: 40%;
+    flex-shrink: 0;
   }
 
   .hero-left .theme-default-content {
