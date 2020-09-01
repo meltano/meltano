@@ -21,7 +21,7 @@ If you think a new extractor is popular or useful enough for others, you can:
 First things first, you'll need a data source to integrate: in this example, let's say we want to create a tap to fetch data from `GitLab`.
 
 ::: warning Heads-up!
-If you are looking to integrate GitLab's data into your warehouse, please use tap official [https://gitlab.com/meltano/tap-gitlab](tap-gitlab).
+If you are looking to integrate GitLab's data into your warehouse, please use the existing [`tap-gitlab`](/plugins/extractors/gitlab.html) rather than your own.
 :::
 
 ## Create the Plugin's Package

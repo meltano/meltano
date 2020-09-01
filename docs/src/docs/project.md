@@ -8,7 +8,7 @@ description: At the core of the Meltano experience is your Meltano project, whic
 
 At the core of the Meltano experience is your Meltano project,
 which represents the single source of truth regarding your ELT pipelines:
-how data should be [integrated](/docs/integration.html) and [transformed](/docs/transformation.html),
+how data should be [integrated](/docs/integration.html) and [transformed](/docs/transforms.html),
 how the pipelines should be [orchestrated](/docs/orchestration.html),
 and how the various components should be [configured](/docs/configuration.html).
 

@@ -21,7 +21,7 @@ For this tutorial, you can use a new or existing Meltano project.
 
 If you need help getting started, we recommend reviewing the [Installation documentation](/docs/installation.html) and [Getting Started guide](/docs/getting-started.html) to set up your first project.
 
-If this is your first time using GitLab with Meltano, you will need to enable access to GitLab's API and get your GitLab Private Token by following the instructions found in the [GitLab Extractor documentation](/plugins/extractors/gitlab.html#gitlab-api-token).
+If this is your first time using GitLab with Meltano, you will need to enable access to GitLab's API and get your GitLab Private Token by following the instructions found in the [GitLab Extractor documentation](/plugins/extractors/gitlab.html#private-token).
 
 ## Setup the Postgres Loader
 

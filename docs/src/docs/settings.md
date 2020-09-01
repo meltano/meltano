@@ -261,7 +261,7 @@ meltano config meltano set ui server_name meltano.example.com
 export MELTANO_UI_SERVER_NAME=meltano.example.com
 ```
 
-[`meltano ui setup <server_name>`](/command-line-interface.html#setup) can be
+[`meltano ui setup <server_name>`](/docs/command-line-interface.html#setup) can be
 used to generate secrets for the [`ui.secret_key`](#ui-secret-key) and
 [`ui.password_salt`](#ui-password-salt) settings, that will be stored in a `.env`
 file in your project directory along with the specified `server_name`.
@@ -314,7 +314,7 @@ meltano config meltano set ui secret_key <randomly-generated-secret>
 export MELTANO_UI_SECRET_KEY=<randomly-generated-secret>
 ```
 
-[`meltano ui setup <server_name>`](/command-line-interface.html#setup) can be
+[`meltano ui setup <server_name>`](/docs/command-line-interface.html#setup) can be
 used to generate secrets for the this setting and [`ui.password_salt`](#ui-password-salt),
 that will be stored in a `.env` file in your project directory along with the specified [`ui.server_name`](#ui-server-name).
 
@@ -343,7 +343,7 @@ meltano config meltano set ui password_salt <randomly-generated-secret>
 export MELTANO_UI_PASSWORD_SALT=<randomly-generated-secret>
 ```
 
-[`meltano ui setup <server_name>`](/command-line-interface.html#setup) can be
+[`meltano ui setup <server_name>`](/docs/command-line-interface.html#setup) can be
 used to generate secrets for the this setting and [`ui.secret_key`](#ui-secret-key),
 that will be stored in a `.env` file in your project directory along with the specified [`ui.server_name`](#ui-server-name).
 
