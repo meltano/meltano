@@ -123,7 +123,7 @@ will hold the [plugins](/docs/plugins.html) that implement the various details o
 
     This will allow you to use [`git diff`](https://git-scm.com/docs/git-diff)
     to easily check the impact of the [`meltano` commands](/docs/command-line-interface.html)
-    you'll run below on your project files, most notably `meltano.yml`.
+    you'll run below on your project files, most notably your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
 
 ## Add an extractor to pull data from a source
 

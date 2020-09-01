@@ -144,7 +144,7 @@ While you would usually not want to modify files in this directory directly, kno
 
 ## System database
 
-Meltano stores pipeline state and other metadata in a project-specific system database,
+Meltano stores various types of metadata in a project-specific system database,
 that takes the shape of a `meltano.db` SQLite database stored inside the [`.meltano` directory](#meltano-directory) by default.
 Like all files stored in the `.meltano` directory, the system database is also environment-specific.
 

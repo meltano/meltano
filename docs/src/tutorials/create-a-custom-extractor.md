@@ -58,7 +58,7 @@ meltano add --custom extractor tap-gitlab-custom
 (settings): username,password,start_date
 ```
 
-Meltano exposes each plugin configuration in the plugin definition, located in the `meltano.yml` file.
+Meltano exposes each plugin configuration in the plugin definition, located in the [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
 
 ::: tip
 Meltano manages converting the plugin's configuration to the appropriate definition for the plugin. You can find the generated file in `.meltano/run/tap-gitlab-custom/tap.config.json`.

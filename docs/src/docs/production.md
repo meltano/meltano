@@ -38,7 +38,7 @@ platform like [GitLab](https://about.gitlab.com) or [GitHub](https://github.com)
 
 By default, your Meltano project comes with a `.gitignore` file to ensure that
 environment-specific and potentially sensitive configuration stored inside the
-`.meltano` directory and `.env` file is not leaked accidentally. All other files
+[`.meltano` directory](/docs/project.html#meltano-directory) and [`.env` file](/docs/project.html#env) is not leaked accidentally. All other files
 are recommended to be checked into the repository and shared between all users
 and environments that may use the project.
 
@@ -81,11 +81,11 @@ since it's built from the [`meltano/meltano`](https://hub.docker.com/r/meltano/m
 ## Installing plugins
 
 Whenever you [add a new plugin](/docs/command-line-interface.html#add) to a Meltano project, it will be
-installed into your project's `.meltano` directory automatically.
+installed into your project's [`.meltano` directory](/docs/project.html#meltano-directory) automatically.
 However, since this directory is included in your project's `.gitignore` file
 by default, you'll need to explicitly run [`meltano install`](/docs/command-line-interface.html#install)
 before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
-to install (or update) all plugins specified in `meltano.yml`.
+to install (or update) all plugins specified in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
 
 Thus, it is strongly recommended that you automatically run `meltano install` on your
 production environment whenever your Meltano project is updated to ensure you're always
@@ -99,11 +99,11 @@ since `meltano install` is a step in its build process.
 
 ## Storing metadata
 
-Meltano stores pipeline state and other metadata in a project-specific
-[system database](/docs/settings.html#database-uri), which takes
+Meltano stores various types of metadata in a project-specific
+[system database](/docs/project.html#system-database), that takes
 the shape of a SQLite database stored inside the project at `.meltano/meltano.db`
-by default. Like all files stored in the `.meltano` directory (which you'll remember
-is included in your project's `.gitignore` file by default), the system database is
+by default. Like all files stored in the [`.meltano` directory](/docs/project.html#meltano-directory)
+(which you'll remember is included in your project's `.gitignore` file by default), the system database is
 also environment-specific.
 
 While SQLite is great for use during local development and testing since it
@@ -143,7 +143,7 @@ that runs [Meltano UI](#meltano-ui) if you'd like to use it to view the pipeline
 ## Managing configuration
 
 All of your Meltano project's configuration that is _not_ environment-specific
-or sensitive should be stored in its `meltano.yml` file and checked into version
+or sensitive should be stored in its [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) and checked into version
 control.
 
 Configuration that _is_ environment-specific or sensitive is [most appropriately
@@ -239,4 +239,4 @@ If you're [containerizing your Meltano project](/docs/containerization.md),
 the [`project_readonly` setting](/docs/settings.html#project-readonly) will be
 [enabled by default](https://gitlab.com/meltano/files-docker/-/blob/master/bundle/Dockerfile#L17)
 using the `MELTANO_PROJECT_READONLY` environment variable,
-since any changes to your project's `meltano.yml` file would not be persisted outside the container.
+since any changes to your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) would not be persisted outside the container.

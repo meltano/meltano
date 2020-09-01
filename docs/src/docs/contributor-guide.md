@@ -169,13 +169,13 @@ Known plugins are those defined in a file called `discovery.yml`, which Meltano 
 
 1. At the root of the project directory. By default, no `discovery.yml` will exist here, but you can create one yourself to experiment.
 2. The URL specified by the [`discovery_url` setting](/docs/settings.html#discovery-url): <https://www.meltano.com/discovery.yml> by default
-3. `.meltano/cache/discovery.yml` inside your project directory. Downloads from the discovery URL will be cached here.
+3. `.meltano/cache/discovery.yml` inside your project's [`.meltano` directory](/docs/project.html#meltano-directory). Downloads from the discovery URL will be cached here.
 4. Inside the `meltano` package
 
 The versions on <https://www.meltano.com> and in the package can be found inside the Meltano repository at [`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
 
 If you have a plugin you think should also be known to Meltano out of the box, you can contribute a change to that file.
-All you'll need is the [custom plugin definition](/docs/command-line-interface.html#how-to-use-custom-plugins) from your project's `meltano.yml`, which has the same format as known plugin definitions in `discovery.yml`.
+All you'll need is the [custom plugin definition](/docs/command-line-interface.html#how-to-use-custom-plugins) from your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), which has the same format as known plugin definitions in `discovery.yml`.
 
 ### Changing discovery.yml
 
@@ -327,7 +327,7 @@ When updating the models that will appear in the UI, you can follow these steps:
 1. Create [`table.m5o` file](/docs/architecture.html#table) that defines the UI columns that will appear on the UI
 1. Update [`topic.m5o` file](/docs/architecture.html#topic) to include the newly created model table
 1. Compile model repo with `python3 setup.py sdist`
-1. Go to project's `meltano.yml` file and replace `pip_url` with the file path to the targz file created
+1. Go to your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) and replace `pip_url` with the file path to the targz file created
 1. Run `meltano install` to fetch new settings
 1. Refresh browser and you should now see your changes in the UI
 
