@@ -18,6 +18,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2328](https://gitlab.com/meltano/meltano/-/issues/2328) Always convert `target-snowflake` `schema` setting value to uppercase before passing it to plugin
+
 ### Breaks
 
 

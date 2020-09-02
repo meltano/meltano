@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-version: 13
+version: 14
 
 extractors:
   - name: tap-facebook
@@ -729,6 +729,7 @@ loaders:
       - name: schema
         env: SF_SCHEMA
         value: $MELTANO_EXTRACTOR_NAMESPACE
+        value_processor: upcase_string
   - name: target-sqlite
     label: SQLite
     description: SQLite database loader
