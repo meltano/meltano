@@ -74,11 +74,18 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
     if not success:
         raise CliError("Failed to install plugin(s)")
 
+    printed_empty_line = False
     for plugin in plugins:
         plugin_def = discovery_service.find_plugin(plugin.type, plugin.name)
-        docs_url = plugin_def.docs
-        if docs_url:
+
+        docs_url = plugin_def.docs or plugin_def.repo
+        if not docs_url:
+            continue
+
+        if not printed_empty_line:
             click.echo()
-            click.echo(
-                f"To learn more about {plugin.type.descriptor} '{plugin.name}', visit {docs_url}"
-            )
+            printed_empty_line = True
+
+        click.echo(
+            f"To learn more about {plugin.type.descriptor} '{plugin.name}', visit {docs_url}"
+        )
