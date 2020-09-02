@@ -23,6 +23,31 @@ class CliError(Exception):
     pass
 
 
+def print_added_plugin(project, plugin, plugin_def=None, related=False):
+    descriptor = plugin.type.descriptor
+    if related:
+        descriptor = f"related {descriptor}"
+
+    if plugin.should_add_to_file(project):
+        click.secho(
+            f"Added {descriptor} '{plugin.name}' to your Meltano project", fg="green"
+        )
+    else:
+        click.secho(
+            f"Adding {descriptor} '{plugin.name}' to your Meltano project...",
+            fg="green",
+        )
+
+    if plugin_def:
+        repo_url = plugin_def.repo
+        if repo_url:
+            click.echo(f"Repository:\t{repo_url}")
+
+        docs_url = plugin_def.docs
+        if docs_url:
+            click.echo(f"Documentation:\t{docs_url}")
+
+
 def add_plugin(
     project: Project,
     plugin_type: PluginType,
@@ -31,16 +56,8 @@ def add_plugin(
 ):
     try:
         plugin = add_service.add(plugin_type, plugin_name)
-        if plugin.should_add_to_file(project):
-            click.secho(
-                f"Added {plugin_type.descriptor} '{plugin_name}' to your Meltano project",
-                fg="green",
-            )
-        else:
-            click.secho(
-                f"Adding {plugin_type.descriptor} '{plugin_name}' to your Meltano project...",
-                fg="green",
-            )
+        plugin_def = add_service.discovery_service.find_plugin(plugin.type, plugin.name)
+        print_added_plugin(project, plugin, plugin_def)
     except PluginAlreadyAddedException as err:
         click.secho(
             f"{plugin_type.descriptor.capitalize()} '{plugin_name}' is already in your Meltano project",
@@ -52,6 +69,8 @@ def add_plugin(
         raise CliError(
             f"{plugin_type.descriptor.capitalize()} '{plugin_name}' is not known to Meltano"
         ) from err
+
+    click.echo()
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
@@ -68,16 +87,13 @@ def add_related_plugins(
             plugin_install, plugin_types=plugin_types
         )
         for related_plugin in related_plugins:
-            if related_plugin.should_add_to_file(project):
-                click.secho(
-                    f"Added related {related_plugin.type.descriptor} '{related_plugin.name}' to your Meltano project",
-                    fg="green",
-                )
-            else:
-                click.secho(
-                    f"Adding related {related_plugin.type.descriptor} '{related_plugin.name}' to your Meltano project...",
-                    fg="green",
-                )
+            related_plugin_def = add_service.discovery_service.find_plugin(
+                related_plugin.type, related_plugin.name
+            )
+            print_added_plugin(
+                project, related_plugin, related_plugin_def, related=True
+            )
+            click.echo()
 
         added_plugins.extend(related_plugins)
 
@@ -88,7 +104,6 @@ def install_status_update(data, reason):
     plugin = data["plugin"]
 
     if data["status"] == "running":
-        click.echo()
         verb = "Updating" if reason == PluginInstallReason.UPGRADE else "Installing"
         click.secho(f"{verb} {plugin.type.descriptor} '{plugin.name}'...")
     elif data["status"] == "error":
@@ -99,6 +114,7 @@ def install_status_update(data, reason):
     elif data["status"] == "success":
         verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
         click.secho(f"{verb} {plugin.type.descriptor} '{plugin.name}'", fg="green")
+        click.echo()
 
 
 def install_plugins(project, plugins, reason=PluginInstallReason.INSTALL):
@@ -116,7 +132,6 @@ def install_plugins(project, plugins, reason=PluginInstallReason.INSTALL):
         fg = "yellow"
 
     if len(plugins) > 1:
-        click.echo()
         verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
         click.secho(f"{verb} {num_installed}/{num_installed+num_failed} plugins", fg=fg)
 

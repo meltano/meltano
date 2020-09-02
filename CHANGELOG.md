@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2210](https://gitlab.com/meltano/meltano/-/issues/2210) Print documentation and repository URLs when adding a new plugin to the project
+
 ### Changes
 
 - [#2216](https://gitlab.com/meltano/meltano/-/issues/2216) Add stream properties defined in an extractor's `schema` extra to catalog if they do not exist in the discovered stream schema yet
