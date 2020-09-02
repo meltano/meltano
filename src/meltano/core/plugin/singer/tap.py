@@ -188,15 +188,15 @@ class SingerTap(SingerPlugin):
 
             config = plugin_invoker.plugin_config_extras
 
+            schema_rules = config_schema_rules(config["_schema"])
+            SchemaExecutor(schema_rules).visit(schema)
+
             metadata_rules = [
                 *select_metadata_rules(["!*.*"]),
                 *select_metadata_rules(config["_select"]),
                 *config_metadata_rules(config["_metadata"]),
             ]
             MetadataExecutor(metadata_rules).visit(schema)
-
-            schema_rules = config_schema_rules(config["_schema"])
-            SchemaExecutor(schema_rules).visit(schema)
 
             with properties_file.open("w") as catalog:
                 json.dump(schema, catalog)

@@ -150,6 +150,9 @@ Entity and attribute names can be discovered using [`meltano select --list --all
 Like [entity selection rules](/docs/command-line-interface.html#select), schema rules allow for [glob](https://en.wikipedia.org/wiki/Glob_(programming))-like
 patterns in the entity and attribute identifiers to match multiple entities and/or attributes at once.
 
+If a schema is specified for a property that does not yet exist in the discovered stream's schema, the property (and its schema) will be added to the catalog.
+This allows you to define a full schema for taps such as [`tap-dynamo-db`](https://github.com/singer-io/tap-dynamodb) that do not themselves have the ability to discover the schema of their streams.
+
 #### How to use
 
 ##### In `meltano.yml`
