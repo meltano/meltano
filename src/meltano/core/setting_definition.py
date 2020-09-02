@@ -6,7 +6,7 @@ from .behavior.canonical import Canonical
 from .behavior import NameEq
 from .error import Error
 
-VALUE_PROCESSORS = {"nest_object": nest_object}
+VALUE_PROCESSORS = {"nest_object": nest_object, "upcase_string": lambda s: s.upper()}
 
 
 class SettingMissingError(Error):
