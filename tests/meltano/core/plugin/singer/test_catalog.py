@@ -409,6 +409,20 @@ JSON_SCHEMA = """
 }
 """
 
+EMPTY_STREAM_SCHEMA = """
+{
+  "streams": [
+    {
+      "tap_stream_id": "UniqueEntitiesName",
+      "stream": "entities",
+      "schema": {
+        "type": "object"
+      }
+    }
+  ]
+}
+"""
+
 CATALOG_PROPERTIES = {
     "id",
     "code",
@@ -637,7 +651,9 @@ class TestSchemaExecutor:
         return json.loads(globals()[request.param])
 
     @pytest.mark.parametrize(
-        "catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"]
+        "catalog",
+        ["CATALOG", "JSON_SCHEMA", "EMPTY_STREAM_SCHEMA"],
+        indirect=["catalog"],
     )
     def test_visit(self, catalog):
         executor = SchemaExecutor(
@@ -646,6 +662,11 @@ class TestSchemaExecutor:
                     "UniqueEntitiesName",
                     ["properties", "code"],
                     {"anyOf": [{"type": "string"}, {"type": "null"}]},
+                ),
+                SchemaRule(
+                    "UniqueEntitiesName",
+                    ["properties", "*_at"],
+                    {"type": "string", "format": "date"},
                 ),
                 SchemaRule(
                     "UniqueEntitiesName",
@@ -660,7 +681,7 @@ class TestSchemaExecutor:
                 ),
                 SchemaRule(
                     "UniqueEntitiesName",
-                    ["properties", "payload", "properties", "hash"],
+                    ["properties", "*load", "properties", "hash"],
                     {"type": ["string", "null"]},
                 ),
             ]
@@ -670,14 +691,26 @@ class TestSchemaExecutor:
         stream_node = next(
             s for s in catalog["streams"] if s["tap_stream_id"] == "UniqueEntitiesName"
         )
-        code_property_node = stream_node["schema"]["properties"]["code"]
-        hash_property_node = stream_node["schema"]["properties"]["payload"][
-            "properties"
-        ]["hash"]
+        properties_node = stream_node["schema"]["properties"]
 
-        assert code_property_node == {"anyOf": [{"type": "string"}, {"type": "null"}]}
-        assert "required" not in stream_node["schema"]["properties"]["payload"]
-        assert hash_property_node == {"type": ["string", "null"]}
+        assert properties_node["code"] == {
+            "anyOf": [{"type": "string"}, {"type": "null"}]
+        }
+
+        if "created_at" in properties_node:
+            assert properties_node["created_at"] == {"type": "string", "format": "date"}
+        else:
+            # If no matching properties were found for a glob-like pattern,
+            # no new property is created
+            assert "*_at" not in properties_node
+
+        assert properties_node["payload"] == {
+            "type": "object",
+            "properties": {
+                "content": {"type": ["string", "null"]},
+                "hash": {"type": ["string", "null"]},
+            },
+        }
 
 
 class TestListExecutor:

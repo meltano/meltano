@@ -213,6 +213,23 @@ class TestSingerTap:
                 subject.apply_catalog_rules(invoker)
 
             assert_rules(
+                # Schema rules
+                [
+                    "UniqueEntitiesName",
+                    ["properties", "code"],
+                    {"anyOf": [{"type": "string"}, {"type": "null"}]},
+                ],
+                [
+                    "UniqueEntitiesName",
+                    ["properties", "payload"],
+                    {
+                        "type": "object",
+                        "properties": {
+                            "content": {"type": ["string", "null"]},
+                            "hash": {"type": "string"},
+                        },
+                    },
+                ],
                 # Clean slate selection metadata rules
                 ["*", [], "selected", False],
                 ["*", ["properties", "*"], "selected", False],
@@ -232,23 +249,6 @@ class TestSingerTap:
                     ["properties", "payload", "properties", "hash"],
                     "custom-metadata",
                     "custom-value",
-                ],
-                # Schema rules
-                [
-                    "UniqueEntitiesName",
-                    ["properties", "code"],
-                    {"anyOf": [{"type": "string"}, {"type": "null"}]},
-                ],
-                [
-                    "UniqueEntitiesName",
-                    ["properties", "payload"],
-                    {
-                        "type": "object",
-                        "properties": {
-                            "content": {"type": ["string", "null"]},
-                            "hash": {"type": "string"},
-                        },
-                    },
                 ],
             )
 

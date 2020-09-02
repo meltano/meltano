@@ -1,6 +1,6 @@
 import logging
 import re
-from fnmatch import fnmatch
+import fnmatch
 from collections import OrderedDict, namedtuple
 from enum import Enum, auto
 from functools import singledispatch
@@ -15,12 +15,13 @@ class CatalogRule:
         self.breadcrumb = breadcrumb
 
     @classmethod
-    def matching(cls, rules, tap_stream_id, breadcrumb):
+    def matching(cls, rules, tap_stream_id, breadcrumb=None):
         return [rule for rule in rules if rule.match(tap_stream_id, breadcrumb)]
 
-    def match(self, tap_stream_id, breadcrumb):
-        return fnmatch(tap_stream_id, self.tap_stream_id) and fnmatch(
-            ".".join(breadcrumb), ".".join(self.breadcrumb)
+    def match(self, tap_stream_id, breadcrumb=None):
+        return fnmatch.fnmatch(tap_stream_id, self.tap_stream_id) and (
+            breadcrumb is None
+            or fnmatch.fnmatch(".".join(breadcrumb), ".".join(self.breadcrumb))
         )
 
 
@@ -289,8 +290,39 @@ class SchemaExecutor(CatalogExecutor):
         self._stream = None
         self._rules = rules
 
+    def ensure_property(self, breadcrumb):
+        next_node = self._stream["schema"]
+
+        for idx, key in enumerate(breadcrumb):
+            # If the key contains shell-style wildcards,
+            # ensure property nodes exist for matching breadcrumbs.
+            if re.match(r"[*?\[\]]", key):
+                node_keys = next_node.keys()
+                matching_keys = fnmatch.filter(node_keys, key)
+
+                if matching_keys:
+                    matching_breadcrumb = breadcrumb.copy()
+                    for key in matching_keys:
+                        matching_breadcrumb[idx] = key
+                        self.ensure_property(matching_breadcrumb)
+
+                break
+
+            # If a property node for this breadcrumb doesn't exist yet, create it.
+            if not key in next_node:
+                next_node[key] = {}
+
+            next_node = next_node[key]
+
     def stream_node(self, node, path):
         self._stream = node
+        tap_stream_id = self._stream["tap_stream_id"]
+
+        if not "schema" in node:
+            node["schema"] = {"type": "object"}
+
+        for rule in SchemaRule.matching(self._rules, tap_stream_id):
+            self.ensure_property(rule.breadcrumb)
 
     def property_node(self, node, path):
         tap_stream_id = self._stream["tap_stream_id"]
