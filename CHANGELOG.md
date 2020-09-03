@@ -18,6 +18,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2338](https://gitlab.com/meltano/meltano/-/issues/2338) Once again change `target-csv` to use `singer-io/target-csv` instead of the Meltano fork
+
 ### Breaks
 
 
