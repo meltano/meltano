@@ -10,6 +10,7 @@ To learn more about extracting and [loading](/plugins/loaders/) data using Melta
 
 Extractors for the following sources are currently [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box:
 
+- [Bing Ads](/plugins/extractors/bing-ads.html)
 - [Comma Separated Values (CSV)](/plugins/extractors/csv.html)
 - [Facebook Ads](/plugins/extractors/facebook.html)
 - [Fastly](/plugins/extractors/fastly.html)
