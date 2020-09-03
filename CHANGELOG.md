@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2210](https://gitlab.com/meltano/meltano/-/issues/2210) Print documentation and repository URLs when adding a new plugin to the project
 - [#2277](https://gitlab.com/meltano/meltano/-/issues/2277) Add `tap-bing-ads` as a known extractor
+- [#2328](https://gitlab.com/meltano/meltano/-/issues/2328) Add new `upcase_string` setting `value_processor` that will convert string values to uppercase
 
 ### Changes
 
@@ -21,6 +22,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2338](https://gitlab.com/meltano/meltano/-/issues/2338) Once again change `target-csv` to use `singer-io/target-csv` instead of the Meltano fork
 - [#2235](https://gitlab.com/meltano/meltano/-/issues/2235) Make embed links accessible when not authenticated
+- [#2328](https://gitlab.com/meltano/meltano/-/issues/2328) Always convert `target-snowflake` `schema` setting value to uppercase before passing it to plugin
 
 ### Breaks
 

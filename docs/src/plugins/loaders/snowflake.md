@@ -58,4 +58,4 @@ export SF_WAREHOUSE=""  # in UPPERCASE
 - **SF_ROLE** - This is the role you want to use for your account for loading the data
 - **SF_DATABASE** - The name of the Snowflake database you want to use
 - **SF_WAREHOUSE** - The name of the Snowflake warehouse you want to use
-- **SF_SCHEMA** - The name of the Snowflake schema you want to use. The default value is `$MELTANO_EXTRACTOR_NAMESPACE`, which will expand to the `namespace` of the `extractor` used in the pipeline, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html).
+- **SF_SCHEMA** - The name of the Snowflake schema you want to use. The default value is `$MELTANO_EXTRACTOR_NAMESPACE`, which will expand to the `namespace` of the `extractor` used in the pipeline, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html). Values are automatically converted to uppercase before they're passed on to the plugin, so `tap_gitlab` becomes `TAP_GITLAB`.

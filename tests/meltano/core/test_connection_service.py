@@ -10,7 +10,7 @@ class TestConnectionService:
         "loader,analyze_params",
         [
             ("target-postgres", {"schema": "tap_mock"}),
-            ("target-snowflake", {"schema": "tap_mock"}),
+            ("target-snowflake", {"schema": "TAP_MOCK"}),
             ("target-csv", {}),
             ("target-sqlite", {}),
         ],
