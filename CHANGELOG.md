@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2210](https://gitlab.com/meltano/meltano/-/issues/2210) Print documentation and repository URLs when adding a new plugin to the project
+- [#2277](https://gitlab.com/meltano/meltano/-/issues/2277) Add `tap-bing-ads` as a known extractor
 
 ### Changes
 
