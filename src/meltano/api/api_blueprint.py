@@ -18,13 +18,14 @@ class APIBlueprint(Blueprint):
     def url_prefix(cls, name, version=VERSION):
         return f"/api/v{version}/{name}"
 
-    def __init__(self, name, *args, **kwargs):
+    def __init__(self, name, *args, require_authentication=True, **kwargs):
         # make sure the `url_prefix` is set
         url_prefix = kwargs.pop("url_prefix", self.url_prefix(name))
 
         super().__init__(name, *args, url_prefix=url_prefix, **kwargs)
 
-        self.before_request(self.__class__.auth_filter)
+        if require_authentication:
+            self.before_request(self.__class__.auth_filter)
 
     @block_if_api_auth_required
     def auth_filter():

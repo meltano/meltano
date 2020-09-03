@@ -3,9 +3,10 @@ from flask import jsonify, request
 from .embeds_helper import EmbedsHelper, InvalidEmbedToken
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.models import db
+from meltano.api.security import block_if_api_auth_required
 
 
-embedsBP = APIBlueprint("embeds", __name__)
+embedsBP = APIBlueprint("embeds", __name__, require_authentication=False)
 
 
 @embedsBP.errorhandler(InvalidEmbedToken)
@@ -32,6 +33,7 @@ def get_embed(token):
 
 
 @embedsBP.route("/embed", methods=["POST"])
+@block_if_api_auth_required
 def embed():
     post_data = request.get_json()
     resource_id = post_data["resource_id"]
