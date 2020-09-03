@@ -2,7 +2,6 @@
 sidebar: auto
 metaTitle: Extract Bing Ads Data
 description: Use Meltano to extract Bing Ads data from the AdWords API and insert it into Postgres, Snowflake, and more.
-lastUpdatedSignificantly: 2020-04-30
 ---
 
 # Bing Ads
