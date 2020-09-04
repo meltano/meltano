@@ -45,6 +45,10 @@ def current_trigger():
     return os.getenv("MELTANO_JOB_TRIGGER")
 
 
+class Payload(IntFlag):
+    STATE = 1
+
+
 class Job(SystemModel):
     __tablename__ = "job"
 

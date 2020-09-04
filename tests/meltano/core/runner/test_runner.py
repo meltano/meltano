@@ -12,7 +12,7 @@ from meltano.core.plugin import Plugin, PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin.factory import plugin_factory
 from meltano.core.plugin.singer import SingerTap, SingerTarget
-from meltano.core.runner.singer import SingerRunner, SingerPayload, BookmarkWriter
+from meltano.core.runner.singer import SingerRunner, Payload, BookmarkWriter
 from meltano.core.logging.utils import capture_subprocess_output
 
 
@@ -66,7 +66,7 @@ class TestSingerRunner:
         Job(
             job_id=TEST_JOB_ID,
             state=State.SUCCESS,
-            payload_flags=SingerPayload.STATE,
+            payload_flags=Payload.STATE,
             payload={"singer_state": {"bookmarks": []}},
         ).save(session)
 
@@ -206,7 +206,7 @@ class TestSingerRunner:
         # Running jobs with state are not considered
         with create_job() as job:
             job.payload["singer_state"] = {"success": True}
-            job.payload_flags = SingerPayload.STATE
+            job.payload_flags = Payload.STATE
 
         assert_state(None)
 
@@ -219,7 +219,7 @@ class TestSingerRunner:
         # Successful jobs with state are considered
         with create_job() as job:
             job.payload["singer_state"] = {"success": True}
-            job.payload_flags = SingerPayload.STATE
+            job.payload_flags = Payload.STATE
             job.success()
 
         assert_state({"success": True})
@@ -227,7 +227,7 @@ class TestSingerRunner:
         # Running jobs with state are not considered
         with create_job() as job:
             job.payload["singer_state"] = {"success": True}
-            job.payload_flags = SingerPayload.STATE
+            job.payload_flags = Payload.STATE
 
         assert_state({"success": True})
 
@@ -240,7 +240,7 @@ class TestSingerRunner:
         # Failed jobs with state are considered
         with create_job() as job:
             job.payload["singer_state"] = {"failed": True}
-            job.payload_flags = SingerPayload.STATE
+            job.payload_flags = Payload.STATE
             job.fail("Whoops")
 
         assert_state({"failed": True})
