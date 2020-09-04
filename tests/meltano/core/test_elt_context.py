@@ -19,6 +19,7 @@ class TestELTContext:
             elt_context_builder.with_extractor(tap.name)
             .with_loader(target_postgres.name)
             .with_transform("run")
+            .with_select_filter(["entity", "!other_entity"])
             .context(session)
         )
 
@@ -75,3 +76,12 @@ class TestELTContext:
         assert env["DBT_TARGET_SCHEMA"] == "analytics"
         assert env["DBT_SOURCE_SCHEMA"] == env["MELTANO_EXTRACTOR_NAMESPACE"]
         assert env["DBT_MODELS"].startswith(env["MELTANO_EXTRACTOR_NAMESPACE"])
+
+    def test_select_filter(self, elt_context, session):
+        assert elt_context.select_filter
+
+        invoker = elt_context.extractor_invoker()
+        invoker.prepare(session)
+        assert (
+            invoker.plugin_config_extras["_select_filter"] == elt_context.select_filter
+        )

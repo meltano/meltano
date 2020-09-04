@@ -41,24 +41,42 @@ def logs(*args, **kwargs):
 @cli.command()
 @click.argument("extractor")
 @click.argument("loader")
+@click.option("--transform", type=click.Choice(["skip", "only", "run"]), default="skip")
 @click.option("--dry", help="Do not actually run.", is_flag=True)
 @click.option(
     "--full-refresh",
     help="Perform a full refresh (ignore state left behind by any previous runs)",
     is_flag=True,
 )
-@click.option("--transform", type=click.Choice(["skip", "only", "run"]), default="skip")
+@click.option(
+    "--select",
+    "-s",
+    help="Select only these specific entities for extraction",
+    multiple=True,
+    default=[],
+)
+@click.option(
+    "--exclude",
+    "-e",
+    help="Exclude these specific entities from extraction",
+    multiple=True,
+    default=[],
+)
 @click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
 @project(migrate=True)
-def elt(project, extractor, loader, dry, full_refresh, transform, job_id):
+def elt(
+    project, extractor, loader, transform, dry, full_refresh, select, exclude, job_id
+):
     """
     meltano elt EXTRACTOR_NAME LOADER_NAME
 
     extractor_name: Which extractor should be used in this extraction
     loader_name: Which loader should be used in this extraction
     """
+
+    select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
     job = Job(
         job_id=job_id
@@ -87,6 +105,7 @@ def elt(project, extractor, loader, dry, full_refresh, transform, job_id):
                     session=session,
                     dry_run=dry,
                     full_refresh=full_refresh,
+                    select_filter=select_filter,
                 )
             )
     finally:
@@ -134,6 +153,7 @@ async def run_elt(
     session,
     dry_run=False,
     full_refresh=False,
+    select_filter=[],
 ):
     async with redirect_output(output_logger):
         try:
@@ -150,6 +170,7 @@ async def run_elt(
                 .with_transform(transform)
                 .with_dry_run(dry_run)
                 .with_full_refresh(full_refresh)
+                .with_select_filter(select_filter)
                 .context(session)
             )
 

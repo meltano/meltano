@@ -206,6 +206,9 @@ Selection filter rules use entity identifiers that correspond to Singer stream `
 
 Entity names can be discovered using [`meltano select --list --all <plugin>`](/docs/command-line-interface.html#select).
 
+While this extra can be managed using [`meltano config`](/docs/command-line-interface.html#config) or environment variables like any other setting,
+selection filers are typically specified using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--select` and `--exclude` options.
+
 #### How to use
 
 ##### In `meltano.yml`
@@ -230,12 +233,18 @@ meltano config <plugin> set _select_filter '["!<entity>", ...]'
 export <NAMESPACE>__SELECT_FILTER='["<entity>", ...]'
 export <NAMESPACE>__SELECT_FILTER='["!<entity>", ...]'
 
+meltano elt <extractor> <loader> --select <entity>
+meltano elt <extractor> <loader> --exclude <entity>
+
 # For example:
 meltano config tap-gitlab set _select_filter '["commits"]'
 meltano config tap-gitlab set _select_filter '["!project_members"]'
 
 export TAP_GITLAB__SELECT_FILTER='["commits"]'
 export TAP_GITLAB__SELECT_FILTER='["!project_members"]'
+
+meltano elt tap-gitlab target-jsonl --select commits
+meltano elt tap-gitlab target-jsonl --exclude project_members
 ```
 
 ## Loaders

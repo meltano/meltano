@@ -46,6 +46,7 @@ class ELTContext:
         transformer: Optional[PluginContext] = None,
         dry_run: Optional[bool] = False,
         full_refresh: Optional[bool] = False,
+        select_filter: Optional[list] = [],
         plugin_discovery_service: PluginDiscoveryService = None,
     ):
         self.project = project
@@ -55,6 +56,7 @@ class ELTContext:
         self.transformer = transformer
         self.dry_run = dry_run
         self.full_refresh = full_refresh
+        self.select_filter = select_filter
 
         self.plugin_discovery_service = (
             plugin_discovery_service or PluginDiscoveryService(project)
@@ -112,6 +114,7 @@ class ELTContextBuilder:
         self._job = None
         self._dry_run = False
         self._full_refresh = False
+        self._select_filter = None
 
     def with_extractor(self, extractor_name: str):
         self._extractor = PluginRef(PluginType.EXTRACTORS, extractor_name)
@@ -149,7 +152,12 @@ class ELTContextBuilder:
 
         return self
 
-    def plugin_context(self, session, plugin: PluginRef, env={}):
+    def with_select_filter(self, select_filter):
+        self._select_filter = select_filter
+
+        return self
+
+    def plugin_context(self, session, plugin: PluginRef, env={}, config={}):
         return PluginContext(
             ref=plugin,
             install=self.config_service.find_plugin(
@@ -164,6 +172,7 @@ class ELTContextBuilder:
                 config_service=self.config_service,
                 plugin_discovery_service=self.plugin_discovery_service,
                 env_override=env,
+                config_override=config,
             ),
             session=session,
         )
@@ -190,19 +199,25 @@ class ELTContextBuilder:
 
         extractor = None
         if self._extractor:
-            extractor = self.plugin_context(session, self._extractor)
+            config = {}
+            if self._select_filter:
+                config["_select_filter"] = self._select_filter
+
+            extractor = self.plugin_context(session, self._extractor, config=config)
 
             env.update(env_for_plugin(extractor))
 
         loader = None
         if self._loader:
-            loader = self.plugin_context(session, self._loader, env.copy())
+            loader = self.plugin_context(session, self._loader, env=env.copy())
 
             env.update(env_for_plugin(loader))
 
         transformer = None
         if self._transformer:
-            transformer = self.plugin_context(session, self._transformer, env.copy())
+            transformer = self.plugin_context(
+                session, self._transformer, env=env.copy()
+            )
 
         return ELTContext(
             self.project,
@@ -212,5 +227,6 @@ class ELTContextBuilder:
             transformer=transformer,
             dry_run=self._dry_run,
             full_refresh=self._full_refresh,
+            select_filter=self._select_filter,
             plugin_discovery_service=self.plugin_discovery_service,
         )
