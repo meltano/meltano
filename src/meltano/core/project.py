@@ -15,7 +15,7 @@ from werkzeug.utils import secure_filename
 
 from .error import Error
 from .behavior.versioned import Versioned
-from .utils import makedirs, slugify, truthy
+from .utils import makedirs, truthy
 from .meltano_file import MeltanoFile
 
 PROJECT_ROOT_ENV = "MELTANO_PROJECT_ROOT"
@@ -202,16 +202,16 @@ class Project(Versioned):
         return self.meltano_dir("run", *joinpaths)
 
     @makedirs
+    def logs_dir(self, *joinpaths):
+        return self.meltano_dir("logs", *joinpaths)
+
+    @makedirs
     def job_dir(self, job_id, *joinpaths):
-        elt_dir = self.run_dir("elt")
+        return self.run_dir("elt", secure_filename(job_id), *joinpaths)
 
-        # If this job ID was already used when we sluggified job IDs,
-        # keep using that path.
-        job_dir = elt_dir.joinpath(slugify(job_id))
-        if not job_dir.exists():
-            job_dir = elt_dir.joinpath(secure_filename(job_id))
-
-        return job_dir.joinpath(*joinpaths)
+    @makedirs
+    def job_logs_dir(self, job_id, *joinpaths):
+        return self.logs_dir("elt", secure_filename(job_id), *joinpaths)
 
     @makedirs
     def model_dir(self, *joinpaths):
