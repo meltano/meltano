@@ -130,7 +130,7 @@ class SingerTap(SingerPlugin):
     def run_discovery(self, plugin_invoker, exec_args=[]):
         if not "discover" in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
-                f"Extractor '{self.name}' does not support schema discovery (the `discover` capability is not advertised)"
+                f"Extractor '{self.name}' does not support catalog discovery (the `discover` capability is not advertised)"
             )
 
         properties_file = plugin_invoker.files["catalog"]
@@ -148,17 +148,18 @@ class SingerTap(SingerPlugin):
         if exit_code != 0:
             properties_file.unlink()
             raise PluginExecutionError(
-                f"Schema discovery failed: command {plugin_invoker.exec_args('--discover')} returned {exit_code}: {stderr.rstrip()}"
+                f"Catalog discovery failed: command {plugin_invoker.exec_args('--discover')} returned {exit_code}: {stderr.rstrip()}"
             )
 
         # test for the schema to be a valid catalog
         try:
             with properties_file.open("r") as catalog:
-                schema_valid = Draft4Validator.check_schema(json.load(catalog))
+                catalog_json = json.load(catalog)
+                schema_valid = Draft4Validator.check_schema(catalog_json)
         except Exception as err:
             properties_file.unlink()
             raise PluginExecutionError(
-                "Schema discovery failed: invalid catalog output by --discovery."
+                f"Catalog discovery failed: invalid catalog output by --discover: {err}"
             ) from err
 
     @hook("before_invoke", can_fail=True)
@@ -177,7 +178,7 @@ class SingerTap(SingerPlugin):
             and not "properties" in plugin_invoker.capabilities
         ):
             raise PluginLacksCapabilityError(
-                f"Extractor '{self.name}' does not support entity selection or metadata rules"
+                f"Extractor '{self.name}' does not support entity selection or catalog metadata and schema rules"
             )
 
         properties_file = plugin_invoker.files["catalog"]
@@ -202,10 +203,10 @@ class SingerTap(SingerPlugin):
                 json.dump(schema, catalog)
         except FileNotFoundError as err:
             raise PluginExecutionError(
-                f"Applying metadata and schema rules failed: catalog file is missing."
+                f"Applying catalog rules failed: catalog file is missing."
             ) from err
         except Exception as err:
             properties_file.unlink()
             raise PluginExecutionError(
-                f"Applying metadata and schema rules failed: catalog file is invalid: {properties_file}"
+                f"Applying catalog rules failed: catalog file is invalid: {err}"
             ) from err

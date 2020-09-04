@@ -256,7 +256,7 @@ to improve performance and save on bandwidth and storage.
     meltano select --list --all tap-covid-19
     ```
 
-    If this command fails with an error, this usually means that the Singer tap does not support [schema discovery mode](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#discovery-mode), and will always extract all supported entities and attributes.
+    If this command fails with an error, this usually means that the Singer tap does not support [catalog discovery mode](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#discovery-mode), and will always extract all supported entities and attributes.
 
 1. Assuming the previous command succeeded, select the desired entities and attributes for extraction using [`meltano select`](/docs/command-line-interface.html#select):
 
