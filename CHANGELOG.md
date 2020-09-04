@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2340](https://gitlab.com/meltano/meltano/-/issues/2340) Print full error message when extractor catalog discovery fails
+
 ### Changes
 
 ### Fixes

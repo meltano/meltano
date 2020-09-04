@@ -67,16 +67,8 @@ def select(project, extractor, entities_filter, attributes_filter, **flags):
             attributes_filter=attributes_filter,
             flags=flags,
         )
-    except PluginLacksCapabilityError as e:
-        raise CliError(f"Cannot list the selected attributes: {e}") from e
-    except PluginExecutionError as e:
-        raise CliError(
-            f"Cannot list the selected attributes: "
-            "there was a problem running the tap with `--discover`. "
-            "Make sure the tap supports `--discover` and run "
-            "`meltano invoke {extractor} --discover` to make "
-            "sure it runs correctly."
-        ) from e
+    except (PluginLacksCapabilityError, PluginExecutionError) as err:
+        raise CliError(f"Cannot list the selected attributes: {err}") from err
 
 
 def add(project, extractor, entities_filter, attributes_filter, exclude=False):
