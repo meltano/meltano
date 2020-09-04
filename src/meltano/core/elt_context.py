@@ -44,6 +44,8 @@ class ELTContext:
         extractor: Optional[PluginContext] = None,
         loader: Optional[PluginContext] = None,
         transformer: Optional[PluginContext] = None,
+        dry_run: Optional[bool] = False,
+        full_refresh: Optional[bool] = False,
         plugin_discovery_service: PluginDiscoveryService = None,
     ):
         self.project = project
@@ -51,6 +53,9 @@ class ELTContext:
         self.extractor = extractor
         self.loader = loader
         self.transformer = transformer
+        self.dry_run = dry_run
+        self.full_refresh = full_refresh
+
         self.plugin_discovery_service = (
             plugin_discovery_service or PluginDiscoveryService(project)
         )
@@ -100,10 +105,13 @@ class ELTContextBuilder:
             plugin_discovery_service
             or PluginDiscoveryService(project, config_service=config_service)
         )
+
         self._extractor = None
         self._loader = None
         self._transformer = None
         self._job = None
+        self._dry_run = False
+        self._full_refresh = False
 
     def with_extractor(self, extractor_name: str):
         self._extractor = PluginRef(PluginType.EXTRACTORS, extractor_name)
@@ -128,6 +136,16 @@ class ELTContextBuilder:
 
     def with_job(self, job: Job):
         self._job = job
+
+        return self
+
+    def with_dry_run(self, dry_run):
+        self._dry_run = dry_run
+
+        return self
+
+    def with_full_refresh(self, full_refresh):
+        self._full_refresh = full_refresh
 
         return self
 
@@ -192,5 +210,7 @@ class ELTContextBuilder:
             extractor=extractor,
             loader=loader,
             transformer=transformer,
+            dry_run=self._dry_run,
+            full_refresh=self._full_refresh,
             plugin_discovery_service=self.plugin_discovery_service,
         )

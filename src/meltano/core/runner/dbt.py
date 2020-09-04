@@ -50,14 +50,14 @@ class DbtRunner(Runner):
         if exitcode:
             raise RunnerError(f"`dbt {cmd}` failed", {"transformer": exitcode})
 
-    async def run(self, session, dry_run=False, log=None):
+    async def run(self, session, log=None):
         dbt = self.context.transformer_invoker()
         dbt.prepare(session)
 
         await self.invoke(dbt, "clean", log=log)
         await self.invoke(dbt, "deps", log=log)
 
-        cmd = "compile" if dry_run else "run"
+        cmd = "compile" if self.context.dry_run else "run"
         await self.invoke(
             dbt, cmd, "--models", str(self.plugin.get_config("models")), log=log
         )

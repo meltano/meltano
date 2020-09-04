@@ -192,8 +192,8 @@ class TestSingerRunner:
             yield job
             job.save(session)
 
-        def assert_state(state, **kwargs):
-            subject.restore_bookmark(session, tap_invoker, **kwargs)
+        def assert_state(state):
+            subject.restore_bookmark(session, tap_invoker)
             if state:
                 assert tap_invoker.files["state"].exists()
                 assert json.load(tap_invoker.files["state"].open()) == state
@@ -246,7 +246,8 @@ class TestSingerRunner:
         assert_state({"failed": True})
 
         # With a full refresh, no state is considered
-        assert_state(None, full_refresh=True)
+        subject.context.full_refresh = True
+        assert_state(None)
 
     @pytest.mark.asyncio
     async def test_run(self, subject, session):
@@ -258,17 +259,17 @@ class TestSingerRunner:
         ) as restore_bookmark, mock.patch.object(
             SingerRunner, "invoke", side_effect=invoke_mock
         ) as invoke:
-            await subject.run(session, dry_run=True)
+            subject.context.dry_run = True
+            await subject.run(session)
 
             assert not restore_bookmark.called
             assert not invoke.called
 
+            subject.context.dry_run = False
             await subject.run(session)
             AnyPluginInvoker = AnyInstanceOf(PluginInvoker)
 
-            restore_bookmark.assert_called_once_with(
-                session, AnyPluginInvoker, full_refresh=False
-            )
+            restore_bookmark.assert_called_once_with(session, AnyPluginInvoker)
             invoke.assert_called_once_with(
                 AnyPluginInvoker,
                 AnyPluginInvoker,

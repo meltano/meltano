@@ -139,14 +139,14 @@ class SingerRunner(Runner):
         elif target_code:
             raise RunnerError(f"Target failed", {"loader": target_code})
 
-    def restore_bookmark(self, session, tap: PluginInvoker, full_refresh=False):
+    def restore_bookmark(self, session, tap: PluginInvoker):
         # Delete state left over from different pipeline run for same extractor
         try:
             os.remove(tap.files["state"])
         except OSError:
             pass
 
-        if full_refresh:
+        if self.context.full_refresh:
             logging.info(
                 "Performing full refresh, ignoring state left behind by any previous runs."
             )
@@ -177,8 +177,6 @@ class SingerRunner(Runner):
     async def run(
         self,
         session,
-        dry_run=False,
-        full_refresh=False,
         extractor_log=None,
         loader_log=None,
         extractor_out=None,
@@ -187,13 +185,13 @@ class SingerRunner(Runner):
         tap = self.context.extractor_invoker()
         target = self.context.loader_invoker()
 
-        if dry_run:
+        if self.context.dry_run:
             return self.dry_run(tap, target)
 
         tap.prepare(session)
         target.prepare(session)
 
-        self.restore_bookmark(session, tap, full_refresh=full_refresh)
+        self.restore_bookmark(session, tap)
 
         await self.invoke(
             tap,

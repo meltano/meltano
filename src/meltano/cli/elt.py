@@ -147,24 +147,18 @@ async def run_elt(
                 .with_extractor(extractor)
                 .with_loader(loader)
                 .with_transform(transform)
+                .with_dry_run(dry_run)
+                .with_full_refresh(full_refresh)
                 .context(session)
             )
 
             if transform != "only":
-                await run_extract_load(
-                    elt_context,
-                    output_logger,
-                    session,
-                    dry_run=dry_run,
-                    full_refresh=full_refresh,
-                )
+                await run_extract_load(elt_context, output_logger, session)
             else:
                 logs("Extract & load skipped.", fg="yellow")
 
             if elt_context.transformer:
-                await run_transform(
-                    elt_context, output_logger, session, dry_run=dry_run
-                )
+                await run_transform(elt_context, output_logger, session)
             else:
                 logs("Transformation skipped.", fg="yellow")
         except RunnerError as err:
