@@ -47,6 +47,7 @@ def current_trigger():
 
 class Payload(IntFlag):
     STATE = 1
+    INCOMPLETE_STATE = 2
 
 
 class Job(SystemModel):

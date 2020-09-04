@@ -149,8 +149,26 @@ class TestSingerRunner:
                 target_process.wait.assert_awaited()
 
     @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "full_refresh,select_filter,payload_flag",
+        [
+            (False, [], Payload.STATE),
+            (True, [], Payload.STATE),
+            (False, ["entity"], Payload.STATE),
+            (True, ["entity"], Payload.INCOMPLETE_STATE),
+        ],
+    )
     async def test_bookmark(
-        self, subject, session, tap, tap_process, target_process, plugin_invoker_factory
+        self,
+        subject,
+        session,
+        tap,
+        tap_process,
+        target_process,
+        plugin_invoker_factory,
+        full_refresh,
+        select_filter,
+        payload_flag,
     ):
         lines = (b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
 
@@ -160,20 +178,25 @@ class TestSingerRunner:
         target_process.stdout.at_eof.side_effect = (False, False, False, True)
         target_process.stdout.readline = CoroutineMock(side_effect=lines)
 
+        subject.context.full_refresh = full_refresh
+        subject.context.select_filter = select_filter
+
         with subject.context.job.run(session):
             with mock.patch.object(
                 session, "add", side_effect=session.add
             ) as add_mock, mock.patch.object(
                 session, "commit", side_effect=session.commit
             ) as commit_mock:
-                bookmark_writer = BookmarkWriter(subject.context.job, session)
+                bookmark_writer = subject.bookmark_writer(session)
                 await capture_subprocess_output(target_process.stdout, bookmark_writer)
 
             assert add_mock.call_count == 3
             assert commit_mock.call_count == 3
 
             # assert the STATE's `value` was saved
-            assert subject.context.job.payload["singer_state"] == {"line": 3}
+            job = subject.context.job
+            assert job.payload["singer_state"] == {"line": 3}
+            assert job.payload_flags == payload_flag
 
     @pytest.mark.asyncio
     async def test_restore_bookmark(

@@ -19,9 +19,10 @@ from meltano.core.elt_context import ELTContext
 
 
 class BookmarkWriter:
-    def __init__(self, job, session):
+    def __init__(self, job, session, payload_flag=Payload.STATE):
         self.job = job
         self.session = session
+        self.payload_flag = payload_flag
 
     def writeline(self, line):
         if self.job is None:
@@ -35,7 +36,7 @@ class BookmarkWriter:
             job = self.job
 
             job.payload["singer_state"] = new_state
-            job.payload_flags |= Payload.STATE
+            job.payload_flags |= self.payload_flag
             job.save(self.session)
 
             logging.info(f"Incremental state has been updated at {datetime.utcnow()}.")
@@ -100,8 +101,7 @@ class SingerRunner(Runner):
         if extractor_out:
             tap_outputs.insert(0, extractor_out)
 
-        bookmark_writer = BookmarkWriter(self.context.job, session)
-        target_outputs = [bookmark_writer]
+        target_outputs = [self.bookmark_writer(session)]
         if loader_out:
             target_outputs.insert(0, loader_out)
 
@@ -134,6 +134,11 @@ class SingerRunner(Runner):
             raise RunnerError(f"Tap failed", {"extractor": tap_code})
         elif target_code:
             raise RunnerError(f"Target failed", {"loader": target_code})
+
+    def bookmark_writer(self, session):
+        incomplete_state = self.context.full_refresh and self.context.select_filter
+        payload_flag = Payload.INCOMPLETE_STATE if incomplete_state else Payload.STATE
+        return BookmarkWriter(self.context.job, session, payload_flag=payload_flag)
 
     def restore_bookmark(self, session, tap: PluginInvoker):
         # Delete state left over from different pipeline run for same extractor
