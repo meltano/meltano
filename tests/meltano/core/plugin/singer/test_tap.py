@@ -213,6 +213,7 @@ class TestSingerTap:
                         "hash": {"type": "string"},
                     },
                 },
+                "_select_filter": ["UniqueEntitiesName", "!OtherEntitiesName"],
             }
 
             # Pretend `config` is set in meltano.yml
@@ -258,6 +259,10 @@ class TestSingerTap:
                     "custom-metadata",
                     "custom-value",
                 ],
+                # Selection filter metadata rules
+                ["*", [], "selected", False],
+                ["UniqueEntitiesName", [], "selected", True],
+                ["OtherEntitiesName", [], "selected", False],
             )
 
     def test_apply_catalog_rules_invalid(

@@ -50,11 +50,12 @@ def select_metadata_rules(patterns):
     for pattern in patterns:
         pattern = parse_select_pattern(pattern)
 
+        prop_pattern = pattern.property_pattern
         selected = not pattern.negated
 
         rules = include_rules if selected else exclude_rules
 
-        if selected or pattern.property_pattern == "*":
+        if selected or not prop_pattern or prop_pattern == "*":
             rules.append(
                 MetadataRule(
                     tap_stream_id=pattern.stream_pattern,
@@ -64,15 +65,17 @@ def select_metadata_rules(patterns):
                 )
             )
 
-        props = pattern.property_pattern.split(".")
-        rules.append(
-            MetadataRule(
-                tap_stream_id=pattern.stream_pattern,
-                breadcrumb=property_breadcrumb(props),
-                key="selected",
-                value=selected,
+        if prop_pattern:
+            props = prop_pattern.split(".")
+
+            rules.append(
+                MetadataRule(
+                    tap_stream_id=pattern.stream_pattern,
+                    breadcrumb=property_breadcrumb(props),
+                    key="selected",
+                    value=selected,
+                )
             )
-        )
 
     return include_rules + exclude_rules
 
@@ -340,7 +343,7 @@ class SchemaExecutor(CatalogExecutor):
 
 
 class ListExecutor(CatalogExecutor):
-    def __init__(self, selected_only=False):
+    def __init__(self):
         # properties per stream
         self.properties = OrderedDict()
 

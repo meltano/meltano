@@ -455,7 +455,7 @@ Not all taps support this feature. In addition, taps needs to support the `--dis
 
 ### How to use
 
-Meltano select patterns are inspired by the [glob](https://en.wikipedia.org/wiki/Glob_(programming)) syntax you might find in your operating system.
+[Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in selection patterns to match multiple entities or attributes at once:
 
 - `*`: matches any sequence of characters
 - `?`: matches one character

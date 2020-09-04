@@ -59,6 +59,26 @@ def config_schema_rules(config):
     ]
 
 
+def select_filter_metadata_rules(tap_stream_ids):
+    if not tap_stream_ids:
+        return []
+
+    metadata_rules = select_metadata_rules(
+        [f"{tap_stream_id}." for tap_stream_id in tap_stream_ids]
+    )
+
+    has_include_rules = any(rule.value for rule in metadata_rules)
+    if has_include_rules:
+        metadata_rules = [
+            # First deselect all stream nodes, without touching their property nodes
+            *select_metadata_rules(["!*."]),
+            # Then (de)select only the specified stream nodes
+            *metadata_rules,
+        ]
+
+    return metadata_rules
+
+
 class SingerTap(SingerPlugin):
     __plugin_type__ = PluginType.EXTRACTORS
 
@@ -76,6 +96,7 @@ class SingerTap(SingerPlugin):
             SettingDefinition(
                 name="_schema", kind="object", value={}, value_processor="nest_object"
             ),
+            SettingDefinition(name="_select_filter", kind="array", value=[]),
         ]
 
     def exec_args(self, plugin_invoker):
@@ -201,6 +222,7 @@ class SingerTap(SingerPlugin):
                 *select_metadata_rules(["!*.*"]),
                 *select_metadata_rules(config["_select"]),
                 *config_metadata_rules(config["_metadata"]),
+                *select_filter_metadata_rules(config["_select_filter"]),
             ]
             MetadataExecutor(metadata_rules).visit(schema)
 
