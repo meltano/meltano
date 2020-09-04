@@ -61,7 +61,8 @@ def elt(project, extractor, loader, dry, full_refresh, transform, job_id):
     """
 
     job = Job(
-        job_id=job_id or f'job_{datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S.%f")}'
+        job_id=job_id
+        or f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--{extractor}--{loader}'
     )
 
     _, Session = project_engine(project)
