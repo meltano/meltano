@@ -6,7 +6,7 @@ from .params import project
 from .utils import CliError
 
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_invoker import invoker_factory
+from meltano.core.plugin_invoker import invoker_factory, InvokerError
 from meltano.core.config_service import ConfigService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.db import project_engine
@@ -46,6 +46,8 @@ def invoke(project, plugin_type, plugin_name, plugin_args):
         )
 
         sys.exit(exit_code)
+    except InvokerError as err:
+        raise CliError(str(err)) from err
     except SubprocessError as err:
         logger.error(err.stderr)
         raise CliError(str(err)) from err

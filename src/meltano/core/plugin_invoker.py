@@ -30,7 +30,21 @@ def invoker_factory(project, plugin, *args, prepare_with_session=None, **kwargs)
     return invoker
 
 
-class InvokerNotPreparedError(Error):
+class InvokerError(Error):
+    pass
+
+
+class ExecutableNotFoundError(InvokerError):
+    """Occurs when the executable could not be found"""
+
+    def __init__(self, plugin, executable):
+        super().__init__(
+            f"Executable '{executable}' could not be found. "
+            f"{plugin.type.descriptor.capitalize()} '{plugin.name}' may not have been installed yet using `meltano install {plugin.type.singular} {plugin.name}`, or the executable name may be incorrect."
+        )
+
+
+class InvokerNotPreparedError(InvokerError):
     """Occurs when `invoke` is called before `prepare`"""
 
     pass
@@ -109,11 +123,13 @@ class PluginInvoker:
             self.config_service.configure()
             self._prepared = True
 
+    @property
+    def executable(self):
+        return self.plugin.executable or self.plugin.name
+
     def exec_path(self):
         return self.venv_service.exec_path(
-            self.plugin.executable or self.plugin.name,
-            name=self.plugin.name,
-            namespace=self.plugin.type,
+            self.executable, name=self.plugin.name, namespace=self.plugin.type
         )
 
     def exec_args(self, *args):
@@ -140,21 +156,17 @@ class PluginInvoker:
             raise InvokerNotPreparedError()
 
         process = None
-        try:
-            with self.plugin.trigger_hooks("invoke", self, args):
-                popen_args = self.exec_args(*args)
-                popen_options = {**self.Popen_options(), **Popen}
-                popen_env = {**self.env(), **env}
-                logging.debug(f"Invoking: {popen_args}")
-                logging.debug(f"Env: {popen_env}")
+        with self.plugin.trigger_hooks("invoke", self, args):
+            popen_args = self.exec_args(*args)
+            popen_options = {**self.Popen_options(), **Popen}
+            popen_env = {**self.env(), **env}
+            logging.debug(f"Invoking: {popen_args}")
+            logging.debug(f"Env: {popen_env}")
 
+            try:
                 process = subprocess.Popen(popen_args, **popen_options, env=popen_env)
-        except SubprocessError as perr:
-            logging.error(f"{self.plugin.name} has failed: {str(perr)}")
-            raise
-        except Exception as err:
-            logging.error(f"Failed to start plugin {self.plugin}.")
-            raise
+            except FileNotFoundError as err:
+                raise ExecutableNotFoundError(self.plugin, self.executable) from err
 
         return process
 
@@ -163,25 +175,21 @@ class PluginInvoker:
             raise InvokerNotPreparedError()
 
         process = None
-        try:
-            with self.plugin.trigger_hooks("invoke", self, args):
-                popen_args = self.exec_args(*args)
-                popen_options = {**self.Popen_options(), **Popen}
-                popen_env = {**self.env(), **env}
-                logging.debug(f"Invoking: {popen_args}")
-                logging.debug(f"Env: {popen_env}")
+        with self.plugin.trigger_hooks("invoke", self, args):
+            popen_args = self.exec_args(*args)
+            popen_options = {**self.Popen_options(), **Popen}
+            popen_env = {**self.env(), **env}
+            logging.debug(f"Invoking: {popen_args}")
+            logging.debug(f"Env: {popen_env}")
 
+            try:
                 process = await asyncio.create_subprocess_exec(
                     *popen_args,
                     limit=OUTPUT_BUFFER_SIZE,
                     **popen_options,
                     env=popen_env,
                 )
-        except SubprocessError as perr:
-            logging.error(f"{self.plugin.name} has failed: {str(perr)}")
-            raise
-        except Exception as err:
-            logging.error(f"Failed to start plugin {self.plugin}.")
-            raise
+            except FileNotFoundError as err:
+                raise ExecutableNotFoundError(self.plugin, self.executable) from err
 
         return process
