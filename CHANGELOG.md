@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Breaks
 
 - [#2344](https://gitlab.com/meltano/meltano/-/issues/2344) Move `meltano elt` output logs from `.meltano/run/elt` to `.meltano/logs/elt`
+- [#2342](https://gitlab.com/meltano/meltano/-/issues/2342) Store pipeline-specific generated plugin config files (`tap.config.json`, `tap.properties.json`, etc) under `.meltano/run/elt/<job_id>/<run_id>` instead of `.meltano/run/<plugin_name>`. Users who were explicitly putting a catalog file at `.meltano/run/<plugin_name>/tap.properties.json` should use `.meltano/extractors/<plugin_name>/tap.properties.json` instead.
 
 
 ## 1.47.0 - (2020-09-03)
