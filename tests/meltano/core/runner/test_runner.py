@@ -12,7 +12,7 @@ from meltano.core.plugin import Plugin, PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin.factory import plugin_factory
 from meltano.core.plugin.singer import SingerTap, SingerTarget
-from meltano.core.runner.singer import SingerRunner, SingerPayload, BookmarkWriter
+from meltano.core.runner.singer import SingerRunner, Payload, BookmarkWriter
 from meltano.core.logging.utils import capture_subprocess_output
 
 
@@ -66,7 +66,7 @@ class TestSingerRunner:
         Job(
             job_id=TEST_JOB_ID,
             state=State.SUCCESS,
-            payload_flags=SingerPayload.STATE,
+            payload_flags=Payload.STATE,
             payload={"singer_state": {"bookmarks": []}},
         ).save(session)
 
@@ -192,8 +192,8 @@ class TestSingerRunner:
             yield job
             job.save(session)
 
-        def assert_state(state, **kwargs):
-            subject.restore_bookmark(session, tap_invoker, **kwargs)
+        def assert_state(state):
+            subject.restore_bookmark(session, tap_invoker)
             if state:
                 assert tap_invoker.files["state"].exists()
                 assert json.load(tap_invoker.files["state"].open()) == state
@@ -206,7 +206,7 @@ class TestSingerRunner:
         # Running jobs with state are not considered
         with create_job() as job:
             job.payload["singer_state"] = {"success": True}
-            job.payload_flags = SingerPayload.STATE
+            job.payload_flags = Payload.STATE
 
         assert_state(None)
 
@@ -219,7 +219,7 @@ class TestSingerRunner:
         # Successful jobs with state are considered
         with create_job() as job:
             job.payload["singer_state"] = {"success": True}
-            job.payload_flags = SingerPayload.STATE
+            job.payload_flags = Payload.STATE
             job.success()
 
         assert_state({"success": True})
@@ -227,7 +227,7 @@ class TestSingerRunner:
         # Running jobs with state are not considered
         with create_job() as job:
             job.payload["singer_state"] = {"success": True}
-            job.payload_flags = SingerPayload.STATE
+            job.payload_flags = Payload.STATE
 
         assert_state({"success": True})
 
@@ -240,13 +240,14 @@ class TestSingerRunner:
         # Failed jobs with state are considered
         with create_job() as job:
             job.payload["singer_state"] = {"failed": True}
-            job.payload_flags = SingerPayload.STATE
+            job.payload_flags = Payload.STATE
             job.fail("Whoops")
 
         assert_state({"failed": True})
 
         # With a full refresh, no state is considered
-        assert_state(None, full_refresh=True)
+        subject.context.full_refresh = True
+        assert_state(None)
 
     @pytest.mark.asyncio
     async def test_run(self, subject, session):
@@ -258,17 +259,17 @@ class TestSingerRunner:
         ) as restore_bookmark, mock.patch.object(
             SingerRunner, "invoke", side_effect=invoke_mock
         ) as invoke:
-            await subject.run(session, dry_run=True)
+            subject.context.dry_run = True
+            await subject.run(session)
 
             assert not restore_bookmark.called
             assert not invoke.called
 
+            subject.context.dry_run = False
             await subject.run(session)
             AnyPluginInvoker = AnyInstanceOf(PluginInvoker)
 
-            restore_bookmark.assert_called_once_with(
-                session, AnyPluginInvoker, full_refresh=False
-            )
+            restore_bookmark.assert_called_once_with(session, AnyPluginInvoker)
             invoke.assert_called_once_with(
                 AnyPluginInvoker,
                 AnyPluginInvoker,

@@ -10,16 +10,12 @@ from datetime import datetime
 from enum import IntFlag
 
 from . import Runner, RunnerError
-from meltano.core.job import Job, JobFinder
+from meltano.core.job import Job, Payload, JobFinder
 from meltano.core.plugin_invoker import invoker_factory, PluginInvoker
 from meltano.core.plugin.singer import SingerTap, SingerTarget, PluginType
 from meltano.core.utils import file_has_data
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.elt_context import ELTContext
-
-
-class SingerPayload(IntFlag):
-    STATE = 1
 
 
 class BookmarkWriter:
@@ -39,7 +35,7 @@ class BookmarkWriter:
             job = self.job
 
             job.payload["singer_state"] = new_state
-            job.payload_flags |= SingerPayload.STATE
+            job.payload_flags |= Payload.STATE
             job.save(self.session)
 
             logging.info(f"Incremental state has been updated at {datetime.utcnow()}.")
@@ -139,14 +135,14 @@ class SingerRunner(Runner):
         elif target_code:
             raise RunnerError(f"Target failed", {"loader": target_code})
 
-    def restore_bookmark(self, session, tap: PluginInvoker, full_refresh=False):
+    def restore_bookmark(self, session, tap: PluginInvoker):
         # Delete state left over from different pipeline run for same extractor
         try:
             os.remove(tap.files["state"])
         except OSError:
             pass
 
-        if full_refresh:
+        if self.context.full_refresh:
             logging.info(
                 "Performing full refresh, ignoring state left behind by any previous runs."
             )
@@ -160,7 +156,7 @@ class SingerRunner(Runner):
 
         # the `state.json` is stored in the database
         finder = JobFinder(self.context.job.job_id)
-        state_job = finder.latest_with_payload(session, flags=SingerPayload.STATE)
+        state_job = finder.latest_with_payload(session, flags=Payload.STATE)
 
         if state_job and "singer_state" in state_job.payload:
             logging.info(f"Found state from {state_job.started_at}.")
@@ -177,8 +173,6 @@ class SingerRunner(Runner):
     async def run(
         self,
         session,
-        dry_run=False,
-        full_refresh=False,
         extractor_log=None,
         loader_log=None,
         extractor_out=None,
@@ -187,13 +181,13 @@ class SingerRunner(Runner):
         tap = self.context.extractor_invoker()
         target = self.context.loader_invoker()
 
-        if dry_run:
+        if self.context.dry_run:
             return self.dry_run(tap, target)
 
         tap.prepare(session)
         target.prepare(session)
 
-        self.restore_bookmark(session, tap, full_refresh=full_refresh)
+        self.restore_bookmark(session, tap)
 
         await self.invoke(
             tap,
