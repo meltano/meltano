@@ -227,7 +227,7 @@ class SingerTap(SingerPlugin):
             MetadataExecutor(metadata_rules).visit(schema)
 
             with properties_file.open("w") as catalog:
-                json.dump(schema, catalog)
+                json.dump(schema, catalog, indent=2)
         except FileNotFoundError as err:
             raise PluginExecutionError(
                 f"Applying catalog rules failed: catalog file is missing."
