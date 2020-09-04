@@ -31,17 +31,17 @@ class JobLoggingService:
         self.project = project
 
     @makedirs
-    def elt_dir(self, job_id, run_id, *joinpaths):
-        return self.project.job_dir(job_id, str(run_id), *joinpaths)
+    def logs_dir(self, job_id, *joinpaths):
+        return self.project.job_logs_dir(job_id, *joinpaths)
 
     @contextmanager
     def create_log(self, job_id, run_id, file_name="elt.log"):
         """
         Open a new log file for logging and yield it.
 
-        Log will be created inside the elt_dir, which is .meltano/run/elt/:job_id/:run_id
+        Log will be created inside the logs_dir, which is .meltano/logs/elt/:job_id/:run_id
         """
-        log_file_name = self.elt_dir(job_id, run_id, file_name)
+        log_file_name = self.logs_dir(job_id, str(run_id), file_name)
 
         try:
             log_file = open(log_file_name, "w")
@@ -105,7 +105,10 @@ class JobLoggingService:
 
         The result is ordered so that the most recent is first on the list
         """
-        log_files = list(self.project.job_dir(job_id).glob("**/*.log"))
+        log_files = []
+        for logs_dir in self.logs_dirs(job_id):
+            log_files.extend(list(logs_dir.glob("**/*.log")))
+
         log_files.sort(key=lambda path: os.stat(path).st_ctime_ns, reverse=True)
 
         return log_files
@@ -115,8 +118,19 @@ class JobLoggingService:
         Delete all the log files for any ELT job that ran with the provided job_id
         """
 
-        try:
-            shutil.rmtree(self.project.job_dir(job_id))
-        except OSError:
-            # If there already are no log files for this job_id, we're done.
-            return
+        for log_path in self.get_all_logs(job_id):
+            log_path.unlink()
+
+    def legacy_logs_dir(self, job_id, *joinpaths):
+        job_dir = self.project.run_dir("elt").joinpath(slugify(job_id), *joinpaths)
+        return job_dir if job_dir.exists() else None
+
+    def logs_dirs(self, job_id, *joinpaths):
+        logs_dir = self.logs_dir(job_id, *joinpaths)
+        legacy_logs_dir = self.legacy_logs_dir(job_id, *joinpaths)
+
+        dirs = [logs_dir]
+        if legacy_logs_dir:
+            dirs.append(legacy_logs_dir)
+
+        return dirs
