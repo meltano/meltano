@@ -88,9 +88,11 @@ class HookObject(metaclass=Hookable):
             try:
                 hook_func(target, *args, **kwargs)
             except Exception as err:
-                logger.debug(str(err), exc_info=True)
-                logger.warning(
-                    f"{hook_name} hook '{hook_func.__name__}' has failed: {err}"
-                )
-                if not hook_func.__hook__.can_fail:
+                can_fail = hook_func.__hook__.can_fail
+                if can_fail and (can_fail is True or isinstance(err, can_fail)):
+                    logger.debug(str(err), exc_info=True)
+                    logger.warning(
+                        f"{hook_name} hook '{hook_func.__name__}' has failed: {err}"
+                    )
+                else:
                     raise err

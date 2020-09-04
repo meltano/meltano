@@ -7,6 +7,7 @@ from jsonschema import Draft4Validator
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
+from meltano.core.plugin_invoker import InvokerError
 from meltano.core.utils import file_has_data, truthy, flatten
 
 from . import SingerPlugin, PluginType
@@ -117,7 +118,7 @@ class SingerTap(SingerPlugin):
     def output_files(self):
         return {"output": "tap.out"}
 
-    @hook("before_invoke", can_fail=True)
+    @hook("before_invoke", can_fail=PluginExecutionError)
     def run_discovery_hook(self, plugin_invoker, exec_args=[]):
         if "--discover" in exec_args or "--help" in exec_args:
             return
@@ -125,7 +126,7 @@ class SingerTap(SingerPlugin):
         try:
             self.run_discovery(plugin_invoker, exec_args)
         except PluginLacksCapabilityError:
-            return
+            pass
 
     def run_discovery(self, plugin_invoker, exec_args=[]):
         if not "discover" in plugin_invoker.capabilities:
@@ -135,15 +136,19 @@ class SingerTap(SingerPlugin):
 
         properties_file = plugin_invoker.files["catalog"]
 
-        with properties_file.open("w") as catalog:
-            result = plugin_invoker.invoke(
-                "--discover",
-                stdout=catalog,
-                stderr=subprocess.PIPE,
-                universal_newlines=True,
-            )
-            stdout, stderr = result.communicate()
-            exit_code = result.returncode
+        try:
+            with properties_file.open("w") as catalog:
+                result = plugin_invoker.invoke(
+                    "--discover",
+                    stdout=catalog,
+                    stderr=subprocess.PIPE,
+                    universal_newlines=True,
+                )
+                stdout, stderr = result.communicate()
+                exit_code = result.returncode
+        except Exception:
+            properties_file.unlink()
+            raise
 
         if exit_code != 0:
             properties_file.unlink()
@@ -162,7 +167,7 @@ class SingerTap(SingerPlugin):
                 f"Catalog discovery failed: invalid catalog output by --discover: {err}"
             ) from err
 
-    @hook("before_invoke", can_fail=True)
+    @hook("before_invoke", can_fail=PluginExecutionError)
     def apply_catalog_rules_hook(self, plugin_invoker, exec_args=[]):
         if "--discover" in exec_args or "--help" in exec_args:
             return
@@ -170,7 +175,7 @@ class SingerTap(SingerPlugin):
         try:
             self.apply_catalog_rules(plugin_invoker, exec_args)
         except PluginLacksCapabilityError:
-            return
+            pass
 
     def apply_catalog_rules(self, plugin_invoker, exec_args=[]):
         if (

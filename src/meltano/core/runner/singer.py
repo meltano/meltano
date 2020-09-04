@@ -94,7 +94,7 @@ class SingerRunner(Runner):
                 p_tap.kill()
             if p_target:
                 p_target.kill()
-            raise RunnerError(f"Cannot start tap or target: {err}")
+            raise RunnerError(f"Cannot start tap or target: {err}") from err
 
         tap_outputs = [p_target.stdin]
         if extractor_out:

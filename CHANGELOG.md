@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2340](https://gitlab.com/meltano/meltano/-/issues/2340) Print full error message when extractor catalog discovery fails
+- [#2223](https://gitlab.com/meltano/meltano/-/issues/2223) Print clear error message when `meltano invoke` or `meltano elt` attempts to execute a plugin that hasn't been installed yet
 
 ### Changes
 

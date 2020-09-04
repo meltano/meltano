@@ -29,13 +29,18 @@ class DbtRunner(Runner):
     async def invoke(self, dbt: PluginInvoker, cmd, *args, log=None, **kwargs):
         log = log or sys.stderr
 
-        handle = await dbt.invoke_async(
-            cmd,
-            *args,
-            **kwargs,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
+        try:
+            handle = await dbt.invoke_async(
+                cmd,
+                *args,
+                **kwargs,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+        except Exception as err:
+            if handle:
+                handle.kill()
+            raise RunnerError(f"Cannot start dbt: {err}") from err
 
         await asyncio.wait(
             [
