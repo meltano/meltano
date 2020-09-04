@@ -58,7 +58,7 @@ class ELTContext:
     @property
     def elt_run_dir(self):
         if self.job:
-            self.project.job_dir(self.job.job_id, str(self.job.run_id))
+            return self.project.job_dir(self.job.job_id, str(self.job.run_id))
 
     def extractor_invoker(self):
         return invoker_factory(
