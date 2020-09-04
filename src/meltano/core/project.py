@@ -11,6 +11,7 @@ from functools import wraps
 from pathlib import Path
 from typing import Union, Dict
 from atomicwrites import atomic_write
+from werkzeug.utils import secure_filename
 
 from .error import Error
 from .behavior.versioned import Versioned
@@ -202,7 +203,15 @@ class Project(Versioned):
 
     @makedirs
     def job_dir(self, job_id, *joinpaths):
-        return self.run_dir("elt", slugify(job_id), *joinpaths)
+        elt_dir = self.run_dir("elt")
+
+        # If this job ID was already used when we sluggified job IDs,
+        # keep using that path.
+        job_dir = elt_dir.joinpath(slugify(job_id))
+        if not job_dir.exists():
+            job_dir = elt_dir.joinpath(secure_filename(job_id))
+
+        return job_dir.joinpath(*joinpaths)
 
     @makedirs
     def model_dir(self, *joinpaths):
