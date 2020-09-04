@@ -1,6 +1,7 @@
 import yaml
 import pytest
 from unittest.mock import Mock, patch
+from contextlib import contextmanager
 
 from meltano.cli import cli
 from meltano.core.project_add_service import ProjectAddService
@@ -47,6 +48,12 @@ class TestCliInvoke:
 
         invoker_mock = Mock()
         invoker_mock.invoke.return_value = process_mock
+
+        @contextmanager
+        def prepared(session):
+            yield
+
+        invoker_mock.prepared = prepared
 
         # fmt: off
         with patch.object(GoogleAnalyticsTracker, "track_data", return_value=None), \

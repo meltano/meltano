@@ -18,6 +18,7 @@ class AirflowInvoker(PluginInvoker):
         env = super().env()
 
         env["AIRFLOW_HOME"] = str(self.config_service.run_dir)
+        env["AIRFLOW_CONFIG"] = str(self.files["config"])
 
         # we want Airflow to inherit our current venv so that the `meltano`
         # module can be used from inside `orchestrate/dags/meltano.py`
@@ -63,10 +64,6 @@ class Airflow(PluginInstall):
 
     @hook("before_configure")
     def before_configure(self, invoker, session):
-        project = invoker.project
-
-        stub_path = project.plugin_dir(self).joinpath("airflow.cfg")
-
         # generate the default `airflow.cfg`
         handle = invoker.invoke(
             "--help",
@@ -78,11 +75,6 @@ class Airflow(PluginInstall):
 
         airflow_cfg_path = invoker.files["config"]
         logging.debug(f"Generated default '{str(airflow_cfg_path)}'")
-
-        # move it to the config dir
-        shutil.move(airflow_cfg_path, stub_path)
-        airflow_cfg_path = stub_path
-        logging.debug(f"Moved to '{str(stub_path)}'")
 
         # open the configuration and update it
         # now we let's update the config to use our stubs
@@ -120,3 +112,9 @@ class Airflow(PluginInstall):
             )
 
         logging.debug(f"Completed `airflow initdb`")
+
+    @hook("before_cleanup")
+    def before_cleanup(self, invoker):
+        config_file = invoker.files["config"]
+        config_file.unlink()
+        logging.debug(f"Deleted configuration at {config_file}")

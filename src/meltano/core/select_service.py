@@ -31,21 +31,21 @@ class SelectService:
         return plugin_settings_service.get("_select")
 
     def load_schema(self, session):
-        invoker = invoker_factory(
-            self.project, self.extractor, prepare_with_session=session
-        )
+        invoker = invoker_factory(self.project, self.extractor)
+        with invoker.prepared(session):
+            # ensure we already have the discovery run at least once
+            if not invoker.files["catalog"].exists():
+                logging.debug(
+                    "Catalog not found, trying to run the tap with --discover."
+                )
+                self.extractor.run_discovery(invoker)
 
-        # ensure we already have the discovery run at least once
-        if not invoker.files["catalog"].exists():
-            logging.debug("Catalog not found, trying to run the tap with --discover.")
-            self.extractor.run_discovery(invoker)
+            # update the catalog accordingly
+            self.extractor.apply_catalog_rules(invoker)
 
-        # update the catalog accordingly
-        self.extractor.apply_catalog_rules(invoker)
-
-        # return the updated catalog
-        with invoker.files["catalog"].open() as catalog:
-            return json.load(catalog)
+            # return the updated catalog
+            with invoker.files["catalog"].open() as catalog:
+                return json.load(catalog)
 
     def list_all(self, session) -> ListSelectedExecutor:
         list_all = ListSelectedExecutor()

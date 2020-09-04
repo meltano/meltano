@@ -57,12 +57,11 @@ class DbtRunner(Runner):
 
     async def run(self, session, log=None):
         dbt = self.context.transformer_invoker()
-        dbt.prepare(session)
+        with dbt.prepared(session):
+            await self.invoke(dbt, "clean", log=log)
+            await self.invoke(dbt, "deps", log=log)
 
-        await self.invoke(dbt, "clean", log=log)
-        await self.invoke(dbt, "deps", log=log)
-
-        cmd = "compile" if self.context.dry_run else "run"
-        await self.invoke(
-            dbt, cmd, "--models", str(self.plugin.get_config("models")), log=log
-        )
+            cmd = "compile" if self.context.dry_run else "run"
+            await self.invoke(
+                dbt, cmd, "--models", str(self.plugin.get_config("models")), log=log
+            )

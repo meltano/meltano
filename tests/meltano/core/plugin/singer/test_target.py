@@ -12,6 +12,6 @@ class TestSingerTarget:
             return err.plugin
 
     def test_exec_args(self, subject, session, plugin_invoker_factory):
-        invoker = plugin_invoker_factory(subject, prepare_with_session=session)
-
-        assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
+        invoker = plugin_invoker_factory(subject)
+        with invoker.prepared(session):
+            assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]

@@ -440,14 +440,10 @@ def test_plugin_configuration(plugin_ref) -> Response:
     async def test_extractor():
         process = None
         try:
-            invoker = invoker_factory(
-                project,
-                plugin,
-                prepare_with_session=db.session,
-                plugin_settings_service=settings,
-            )
-            process = await invoker.invoke_async(stdout=asyncio.subprocess.PIPE)
-            return await test_stream(process.stdout)
+            invoker = invoker_factory(project, plugin, plugin_settings_service=settings)
+            with invoker.prepared(db.session):
+                process = await invoker.invoke_async(stdout=asyncio.subprocess.PIPE)
+                return await test_stream(process.stdout)
         except Exception as err:
             logging.debug(err)
             # if anything happens, this is not successful
