@@ -236,6 +236,14 @@ class TestSingerRunner:
 
         assert_state(None)
 
+        # Successful jobs with incomplete state are considered
+        with create_job() as job:
+            job.payload["singer_state"] = {"incomplete_success": True}
+            job.payload_flags = Payload.INCOMPLETE_STATE
+            job.success()
+
+        assert_state({"incomplete_success": True})
+
         # Successful jobs with state are considered
         with create_job() as job:
             job.payload["singer_state"] = {"success": True}
@@ -264,6 +272,24 @@ class TestSingerRunner:
             job.fail("Whoops")
 
         assert_state({"failed": True})
+
+        # Successful jobs with incomplete state are considered
+        with create_job() as job:
+            job.payload["singer_state"] = {"success": True}
+            job.payload_flags = Payload.INCOMPLETE_STATE
+            job.success()
+
+        # Incomplete state is merged into complete state
+        assert_state({"failed": True, "success": True})
+
+        # Failed jobs with incomplete state are considered
+        with create_job() as job:
+            job.payload["singer_state"] = {"failed_again": True}
+            job.payload_flags = Payload.INCOMPLETE_STATE
+            job.fail("Whoops")
+
+        # Incomplete state is merged into complete state
+        assert_state({"failed": True, "success": True, "failed_again": True})
 
         # With a full refresh, no state is considered
         subject.context.full_refresh = True

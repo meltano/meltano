@@ -13,7 +13,7 @@ from . import Runner, RunnerError
 from meltano.core.job import Job, Payload, JobFinder
 from meltano.core.plugin_invoker import invoker_factory, PluginInvoker
 from meltano.core.plugin.singer import SingerTap, SingerTarget, PluginType
-from meltano.core.utils import file_has_data
+from meltano.core.utils import file_has_data, merge
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.elt_context import ELTContext
 
@@ -160,13 +160,28 @@ class SingerRunner(Runner):
             return
 
         # the `state.json` is stored in the database
+        state = {}
+        incomplete_since = None
         finder = JobFinder(self.context.job.job_id)
-        state_job = finder.latest_with_payload(session, flags=Payload.STATE)
 
-        if state_job and "singer_state" in state_job.payload:
+        state_job = finder.latest_with_payload(session, flags=Payload.STATE)
+        if state_job:
             logging.info(f"Found state from {state_job.started_at}.")
-            with tap.files["state"].open("w+") as state:
-                json.dump(state_job.payload["singer_state"], state)
+            incomplete_since = state_job.ended_at
+            if "singer_state" in state_job.payload:
+                merge(state_job.payload["singer_state"], state)
+
+        incomplete_state_jobs = finder.with_payload(
+            session, flags=Payload.INCOMPLETE_STATE, since=incomplete_since
+        )
+        for state_job in incomplete_state_jobs:
+            logging.info(f"Found incomplete state from {state_job.started_at}.")
+            if "singer_state" in state_job.payload:
+                merge(state_job.payload["singer_state"], state)
+
+        if state:
+            with tap.files["state"].open("w+") as state_file:
+                json.dump(state, state_file, indent=2)
         else:
             logging.warning("No state was found, complete import.")
 
