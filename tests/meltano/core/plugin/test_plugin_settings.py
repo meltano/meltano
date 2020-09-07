@@ -279,11 +279,19 @@ class TestPluginSettingsService:
         assert config["secure"] == "thisisatest"
 
     def test_as_env(self, subject, session, tap, env_var):
+        subject.set("boolean", True, store=SettingValueStore.DOTENV)
+        subject.set("list", [1, 2, 3, "4"], store=SettingValueStore.DOTENV)
+        subject.set("object", {"1": {"2": 3}}, store=SettingValueStore.DOTENV)
+
         config = subject.as_env(session=session)
+        subject.reset(store=SettingValueStore.DOTENV)
 
         assert config.get(env_var(subject, "test")) == "mock"
         assert config.get(env_var(subject, "start_date")) == None
         assert config.get(env_var(subject, "secure")) == None
+        assert config.get(env_var(subject, "boolean")) == "true"
+        assert config.get(env_var(subject, "list")) == '[1, 2, 3, "4"]'
+        assert config.get(env_var(subject, "object")) == '{"1": {"2": 3}}'
 
     def test_as_env_custom(
         self, project, session, custom_tap, env_var, plugin_settings_service_factory
@@ -361,17 +369,35 @@ class TestPluginSettingsService:
         subject.set("boolean", True, store=store)
 
         dotenv_contents = dotenv.dotenv_values(project.dotenv)
-        assert dotenv_contents["TAP_MOCK_BOOLEAN"] == "True"
+        assert dotenv_contents["TAP_MOCK_BOOLEAN"] == "true"
         assert "TAP_MOCK_DISABLED" not in dotenv_contents
         assert "TAP_MOCK_ENABLED" not in dotenv_contents
         assert subject.get_with_source("boolean") == (True, SettingValueStore.DOTENV)
+
+        subject.set("list", [1, 2, 3, "4"], store=store)
+
+        dotenv_contents = dotenv.dotenv_values(project.dotenv)
+        assert dotenv_contents["TAP_MOCK_LIST"] == '[1, 2, 3, "4"]'
+        assert subject.get_with_source("list") == (
+            [1, 2, 3, "4"],
+            SettingValueStore.DOTENV,
+        )
+
+        subject.set("object", {"1": {"2": 3}}, store=store)
+
+        dotenv_contents = dotenv.dotenv_values(project.dotenv)
+        assert dotenv_contents["TAP_MOCK_OBJECT"] == '{"1": {"2": 3}}'
+        assert subject.get_with_source("object") == (
+            {"1": {"2": 3}},
+            SettingValueStore.DOTENV,
+        )
 
         subject.unset("test", store=store)
 
         dotenv_contents = dotenv.dotenv_values(project.dotenv)
         assert "TAP_MOCK_TEST" not in dotenv_contents
         assert dotenv_contents["TAP_MOCK_START_DATE"] == "THIS_IS_FROM_DOTENV"
-        assert dotenv_contents["TAP_MOCK_BOOLEAN"] == "True"
+        assert dotenv_contents["TAP_MOCK_BOOLEAN"] == "true"
 
         subject.reset(store=store)
         assert not project.dotenv.exists()

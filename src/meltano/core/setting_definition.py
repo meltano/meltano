@@ -137,3 +137,12 @@ class SettingDefinition(NameEq, Canonical):
             value = processor(value)
 
         return value
+
+    def stringify_value(self, value):
+        if isinstance(value, str):
+            return value
+
+        if self.kind == "string":
+            return str(value)
+
+        return json.dumps(value)
