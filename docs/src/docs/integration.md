@@ -109,7 +109,7 @@ Finally, you pass this file to the tap using the `--catalog` flag when you run i
 Because these catalog files can be very large and can get outdated as data sources evolve, this process can be tedious and error-prone.
 
 Meltano makes it easy to select specific entities and attributes for inclusion or exclusion using [`meltano select`](/docs/command-line-interface.html#select),
-which lets you specify inclusion and exclusion rules using [glob](https://en.wikipedia.org/wiki/Glob_(programming))-like patterns with wildcards (`*`, `?`) and character groups (`[abc]`, `[!abc]`).
+which lets you specify inclusion and exclusion rules that can contain [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) to match multiple entities and/or attributes at once.
 
 Additional [Singer stream and property metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata)
 (like `replication-method` and `replication-key`) can be specified like
@@ -121,8 +121,7 @@ any other [plugin configuration](/docs/configuration.html), using a special
 Similarly, a special [`_schema` setting](/docs/plugins.html#schema-extra)
 is available that lets you easily override
 [Singer stream schema](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#schemas) descriptions.
-Like selection rules, these metadata and schema rules allow for [glob](https://en.wikipedia.org/wiki/Glob_(programming))-like
-patterns in the entity and attribute identifiers.
+Here too, [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used to match multiple entities and/or attributes at once.
 
 Whenever an extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt)
 or [`meltano invoke`](/docs/command-line-interface.html#invoke), Meltano will

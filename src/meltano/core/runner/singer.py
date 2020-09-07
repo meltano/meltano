@@ -13,15 +13,16 @@ from . import Runner, RunnerError
 from meltano.core.job import Job, Payload, JobFinder
 from meltano.core.plugin_invoker import invoker_factory, PluginInvoker
 from meltano.core.plugin.singer import SingerTap, SingerTarget, PluginType
-from meltano.core.utils import file_has_data
+from meltano.core.utils import file_has_data, merge
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.elt_context import ELTContext
 
 
 class BookmarkWriter:
-    def __init__(self, job, session):
+    def __init__(self, job, session, payload_flag=Payload.STATE):
         self.job = job
         self.session = session
+        self.payload_flag = payload_flag
 
     def writeline(self, line):
         if self.job is None:
@@ -35,7 +36,7 @@ class BookmarkWriter:
             job = self.job
 
             job.payload["singer_state"] = new_state
-            job.payload_flags |= Payload.STATE
+            job.payload_flags |= self.payload_flag
             job.save(self.session)
 
             logging.info(f"Incremental state has been updated at {datetime.utcnow()}.")
@@ -100,8 +101,7 @@ class SingerRunner(Runner):
         if extractor_out:
             tap_outputs.insert(0, extractor_out)
 
-        bookmark_writer = BookmarkWriter(self.context.job, session)
-        target_outputs = [bookmark_writer]
+        target_outputs = [self.bookmark_writer(session)]
         if loader_out:
             target_outputs.insert(0, loader_out)
 
@@ -135,6 +135,11 @@ class SingerRunner(Runner):
         elif target_code:
             raise RunnerError(f"Target failed", {"loader": target_code})
 
+    def bookmark_writer(self, session):
+        incomplete_state = self.context.full_refresh and self.context.select_filter
+        payload_flag = Payload.INCOMPLETE_STATE if incomplete_state else Payload.STATE
+        return BookmarkWriter(self.context.job, session, payload_flag=payload_flag)
+
     def restore_bookmark(self, session, tap: PluginInvoker):
         # Delete state left over from different pipeline run for same extractor
         try:
@@ -155,13 +160,28 @@ class SingerRunner(Runner):
             return
 
         # the `state.json` is stored in the database
+        state = {}
+        incomplete_since = None
         finder = JobFinder(self.context.job.job_id)
-        state_job = finder.latest_with_payload(session, flags=Payload.STATE)
 
-        if state_job and "singer_state" in state_job.payload:
+        state_job = finder.latest_with_payload(session, flags=Payload.STATE)
+        if state_job:
             logging.info(f"Found state from {state_job.started_at}.")
-            with tap.files["state"].open("w+") as state:
-                json.dump(state_job.payload["singer_state"], state)
+            incomplete_since = state_job.ended_at
+            if "singer_state" in state_job.payload:
+                merge(state_job.payload["singer_state"], state)
+
+        incomplete_state_jobs = finder.with_payload(
+            session, flags=Payload.INCOMPLETE_STATE, since=incomplete_since
+        )
+        for state_job in incomplete_state_jobs:
+            logging.info(f"Found incomplete state from {state_job.started_at}.")
+            if "singer_state" in state_job.payload:
+                merge(state_job.payload["singer_state"], state)
+
+        if state:
+            with tap.files["state"].open("w+") as state_file:
+                json.dump(state, state_file, indent=2)
         else:
             logging.warning("No state was found, complete import.")
 

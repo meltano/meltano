@@ -73,9 +73,10 @@ that are handled by Meltano instead of the plugin itself.
 
 Meltano currently knows these extras for these plugin types:
 - [Extractors](/docs/plugins.html#extractors)
-  - [`select`](/docs/plugins.html#select-extra)
   - [`metadata`](/docs/plugins.html#metadata-extra)
   - [`schema`](/docs/plugins.html#schema-extra)
+  - [`select`](/docs/plugins.html#select-extra)
+  - [`select_filter`](/docs/plugins.html#select-filter-extra)
 - [Transforms](/docs/plugins.html#transforms)
   - [`vars`](/docs/plugins.html#vars-extra)
 - [File bundles](/docs/plugins.html#file-bundles)

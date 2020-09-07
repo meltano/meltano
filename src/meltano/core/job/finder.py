@@ -28,8 +28,8 @@ class JobFinder:
     def latest_success(self, session):
         return self.successful(session).order_by(Job.ended_at.desc()).first()
 
-    def latest_with_payload(self, session, flags=0):
-        return (
+    def with_payload(self, session, flags=0, since=None):
+        query = (
             session.query(Job)
             .filter(
                 (Job.job_id == self.job_id)
@@ -37,6 +37,18 @@ class JobFinder:
                 & (Job.payload_flags.op("&")(flags) == flags)
                 & Job.ended_at.isnot(None)
             )
+            .order_by(Job.ended_at.asc())
+        )
+
+        if since:
+            query = query.filter(Job.ended_at > since)
+
+        return query
+
+    def latest_with_payload(self, session, **kwargs):
+        return (
+            self.with_payload(session, **kwargs)
+            .order_by(None)  # Reset ascending order
             .order_by(Job.ended_at.desc())
             .first()
         )
