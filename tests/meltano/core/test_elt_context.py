@@ -28,8 +28,8 @@ class TestELTContext:
         assert extractor.name == tap.name
 
         invoker = elt_context.extractor_invoker()
-        invoker.prepare(session)
-        env = invoker.env()
+        with invoker.prepared(session):
+            env = invoker.env()
 
         assert env["TAP_MOCK_TEST"] == "mock"
 
@@ -39,8 +39,8 @@ class TestELTContext:
         assert loader.name == target_postgres.name
 
         invoker = elt_context.loader_invoker()
-        invoker.prepare(session)
-        env = invoker.env()
+        with invoker.prepared(session):
+            env = invoker.env()
 
         assert env["MELTANO_EXTRACTOR_NAME"] == elt_context.extractor.name
         assert env["MELTANO_EXTRACTOR_NAMESPACE"] == elt_context.extractor.namespace
@@ -56,8 +56,8 @@ class TestELTContext:
         assert transformer.name == dbt.name
 
         invoker = elt_context.transformer_invoker()
-        invoker.prepare(session)
-        env = invoker.env()
+        with invoker.prepared(session):
+            env = invoker.env()
 
         assert env["MELTANO_EXTRACTOR_NAME"] == elt_context.extractor.name
         assert env["MELTANO_EXTRACTOR_NAMESPACE"] == elt_context.extractor.namespace

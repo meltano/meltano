@@ -4,6 +4,7 @@ import asyncio
 import os
 import copy
 from typing import Optional
+from contextlib import contextmanager
 
 from .project import Project
 from .plugin import PluginInstall
@@ -16,16 +17,13 @@ from .error import Error, SubprocessError
 from .logging.utils import OUTPUT_BUFFER_SIZE
 
 
-def invoker_factory(project, plugin, *args, prepare_with_session=None, **kwargs):
+def invoker_factory(project, plugin, *args, **kwargs):
     cls = PluginInvoker
 
     if hasattr(plugin.__class__, "__invoker_cls__"):
         cls = plugin.__class__.__invoker_cls__
 
     invoker = cls(project, plugin, *args, **kwargs)
-
-    if prepare_with_session:
-        invoker.prepare(prepare_with_session)
 
     return invoker
 
@@ -122,6 +120,23 @@ class PluginInvoker:
         with self.plugin.trigger_hooks("configure", self, session):
             self.config_service.configure()
             self._prepared = True
+
+    def cleanup(self):
+        self.plugin_config = {}
+        self.plugin_config_processed = {}
+        self.plugin_config_extras = {}
+        self.plugin_config_env = {}
+
+        with self.plugin.trigger_hooks("cleanup", self):
+            self._prepared = False
+
+    @contextmanager
+    def prepared(self, session):
+        try:
+            self.prepare(session)
+            yield
+        finally:
+            self.cleanup()
 
     @property
     def executable(self):

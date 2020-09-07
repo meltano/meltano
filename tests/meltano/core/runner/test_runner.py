@@ -103,18 +103,20 @@ class TestSingerRunner:
         target,
         plugin_invoker_factory,
     ):
-        tap_invoker = plugin_invoker_factory(
-            tap, config_dir=tap_config_dir, prepare_with_session=session
-        )
-        target_invoker = plugin_invoker_factory(
-            target, config_dir=target_config_dir, prepare_with_session=session
-        )
+        tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
+        target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
 
-        for f in tap.config_files.values():
-            assert tap_config_dir.joinpath(f).exists()
+        with tap_invoker.prepared(session):
+            for name in tap.config_files.keys():
+                assert tap_invoker.files[name].exists()
 
-        for f in target.config_files.values():
-            assert target_config_dir.joinpath(f).exists()
+        assert not tap_invoker.files["config"].exists()
+
+        with target_invoker.prepared(session):
+            for name in target.config_files.keys():
+                assert target_invoker.files[name].exists()
+
+        assert not target_invoker.files["config"].exists()
 
     @pytest.mark.asyncio
     async def test_invoke(
@@ -129,27 +131,22 @@ class TestSingerRunner:
         target_process,
         plugin_invoker_factory,
     ):
-        tap_invoker = plugin_invoker_factory(
-            tap, config_dir=tap_config_dir, prepare_with_session=session
-        )
-        target_invoker = plugin_invoker_factory(
-            target, config_dir=target_config_dir, prepare_with_session=session
-        )
+        tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
+        target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
+        with tap_invoker.prepared(session), target_invoker.prepared(session):
+            invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+            with mock.patch.object(
+                PluginInvoker, "invoke_async", new=invoke_async
+            ) as invoke_async:
+                # async method
+                await subject.invoke(tap_invoker, target_invoker, session)
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+                # correct bins are called
+                assert invoke_async.awaited_with(tap_invoker)
+                assert invoke_async.awaited_with(target_invoker)
 
-        with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
-        ) as invoke_async:
-            # async method
-            await subject.invoke(tap_invoker, target_invoker, session)
-
-            # correct bins are called
-            assert invoke_async.awaited_with(tap_invoker)
-            assert invoke_async.awaited_with(target_invoker)
-
-            tap_process.wait.assert_awaited()
-            target_process.wait.assert_awaited()
+                tap_process.wait.assert_awaited()
+                target_process.wait.assert_awaited()
 
     @pytest.mark.asyncio
     async def test_bookmark(

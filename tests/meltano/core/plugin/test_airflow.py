@@ -50,20 +50,29 @@ class TestAirflow:
 
             return handle_mock
 
-        # fmt: off
-        with mock.patch.object(subprocess, "Popen", side_effect=popen_mock) as popen, \
-          mock.patch("meltano.core.plugin_invoker.PluginConfigService.configure") as configure:
+        with mock.patch.object(
+            subprocess, "Popen", side_effect=popen_mock
+        ) as popen, mock.patch(
+            "meltano.core.plugin_invoker.PluginConfigService.configure"
+        ) as configure:
             invoker = plugin_invoker_factory(subject)
             # This ends up calling subject.before_configure
-            invoker.prepare(session)
+            with invoker.prepared(session):
+                commands = [
+                    popen_args[1]
+                    for _, (popen_args, *_), kwargs in popen.mock_calls
+                    if isinstance(popen_args, list)
+                ]
+                assert commands == ["--help", "initdb"]
+                assert configure.call_count == 2
 
-            commands = [popen_args[1] for _, (popen_args, *_), kwargs in popen.mock_calls if isinstance(popen_args, list)]
-            assert commands == ["--help", "initdb"]
-            assert configure.call_count == 2
+                assert run_dir.joinpath("airflow.cfg").exists()
+                assert project.plugin_dir(subject, "airflow.db").exists()
 
-            airflow_cfg = ConfigParser()
-            with project.plugin_dir(subject, "airflow.cfg").open() as cfg:
-                airflow_cfg.read_file(cfg)
+                airflow_cfg = ConfigParser()
+                with run_dir.joinpath("airflow.cfg").open() as cfg:
+                    airflow_cfg.read_file(cfg)
 
-            assert airflow_cfg['core']['dags_folder']
-        # fmt: on
+                assert airflow_cfg["core"]["dags_folder"]
+
+            assert not run_dir.joinpath("airflow.cfg").exists()

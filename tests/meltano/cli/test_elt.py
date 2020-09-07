@@ -252,10 +252,10 @@ class TestCliEltScratchpadOne:
 
             stdout_lines = [
                 "meltano           | INFO Running extract & load...\n",
-                "meltano           | DEBUG Created configuration stub at",  # followed by path
+                "meltano           | DEBUG Created configuration at",  # followed by path
                 "meltano           | DEBUG Could not find tap.properties.json in",  # followed by path
                 "meltano           | DEBUG Could not find state.json in",  # followed by path
-                "meltano           | DEBUG Created configuration stub at",  # followed by path
+                "meltano           | DEBUG Created configuration at",  # followed by path
                 "meltano           | WARNING No state was found, complete import.\n",
                 "meltano           | INFO Incremental state has been updated at",  # followed by timestamp
                 "meltano           | DEBUG Incremental state: {'line': 1}\n",

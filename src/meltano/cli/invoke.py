@@ -35,10 +35,10 @@ def invoke(project, plugin_type, plugin_name, plugin_args):
         plugin = config_service.find_plugin(
             plugin_name, plugin_type=plugin_type, invokable=True
         )
-        service = invoker_factory(project, plugin, prepare_with_session=session)
-        handle = service.invoke(*plugin_args)
-
-        exit_code = handle.wait()
+        invoker = invoker_factory(project, plugin)
+        with invoker.prepared(session):
+            handle = invoker.invoke(*plugin_args)
+            exit_code = handle.wait()
 
         tracker = GoogleAnalyticsTracker(project)
         tracker.track_meltano_invoke(

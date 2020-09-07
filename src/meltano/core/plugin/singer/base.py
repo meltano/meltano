@@ -18,10 +18,15 @@ class SingerPlugin(PluginInstall):
 
     @hook("before_configure")
     def before_configure(self, invoker, session):
-        project = invoker.project
-        plugin_dir = project.plugin_dir(self)
-
-        with open(plugin_dir.joinpath(self.config_files["config"]), "w") as config_stub:
+        config_path = invoker.files["config"]
+        with open(config_path, "w") as config_file:
             config = invoker.plugin_config_processed
-            json.dump(config, config_stub, indent=2)
-            logging.debug(f"Created configuration stub at {config_stub}")
+            json.dump(config, config_file, indent=2)
+
+        logging.debug(f"Created configuration at {config_path}")
+
+    @hook("before_cleanup")
+    def before_cleanup(self, invoker):
+        config_path = invoker.files["config"]
+        config_path.unlink()
+        logging.debug(f"Deleted configuration at {config_path}")

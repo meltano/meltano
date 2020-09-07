@@ -184,17 +184,15 @@ class SingerRunner(Runner):
         if self.context.dry_run:
             return self.dry_run(tap, target)
 
-        tap.prepare(session)
-        target.prepare(session)
+        with tap.prepared(session), target.prepared(session):
+            self.restore_bookmark(session, tap)
 
-        self.restore_bookmark(session, tap)
-
-        await self.invoke(
-            tap,
-            target,
-            session,
-            extractor_log=extractor_log,
-            loader_log=loader_log,
-            extractor_out=extractor_out,
-            loader_out=loader_out,
-        )
+            await self.invoke(
+                tap,
+                target,
+                session,
+                extractor_log=extractor_log,
+                loader_log=loader_log,
+                extractor_out=extractor_out,
+                loader_out=loader_out,
+            )
