@@ -488,6 +488,7 @@ class TestPluginSettingsService:
     def test_custom_setting(self, session, subject, tap, env_var):
         subject.set("custom_string", "from_yml", store=SettingValueStore.MELTANO_YML)
         subject.set("custom_bool", True, store=SettingValueStore.MELTANO_YML)
+        subject.set("custom_array", [1, 2, 3, "4"], store=SettingValueStore.MELTANO_YML)
 
         assert subject.get_with_source("custom_string", session=session) == (
             "from_yml",
@@ -497,10 +498,15 @@ class TestPluginSettingsService:
             True,
             SettingValueStore.MELTANO_YML,
         )
+        assert subject.get_with_source("custom_array", session=session) == (
+            [1, 2, 3, "4"],
+            SettingValueStore.MELTANO_YML,
+        )
 
         subject.env_override = {
             env_var(subject, "custom_string"): "from_env",
             env_var(subject, "custom_bool"): "off",
+            env_var(subject, "custom_array"): '["foo"]',
         }
 
         assert subject.get_with_source("custom_string", session=session) == (
@@ -509,6 +515,10 @@ class TestPluginSettingsService:
         )
         assert subject.get_with_source("custom_bool", session=session) == (
             False,
+            SettingValueStore.ENV,
+        )
+        assert subject.get_with_source("custom_array", session=session) == (
+            ["foo"],
             SettingValueStore.ENV,
         )
 

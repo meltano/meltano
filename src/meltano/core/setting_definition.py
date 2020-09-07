@@ -80,6 +80,12 @@ class SettingDefinition(NameEq, Canonical):
         kind = None
         if isinstance(value, bool):
             kind = "boolean"
+        elif isinstance(value, int):
+            kind = "integer"
+        elif isinstance(value, dict):
+            kind = "object"
+        elif isinstance(value, list):
+            kind = "array"
 
         attrs = {
             "name": key,
