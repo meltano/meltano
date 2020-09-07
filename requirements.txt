@@ -110,7 +110,7 @@ pytest==4.3.1
 pytest-asyncio==0.10.0
 pytest-cov==2.6.1
 python-dateutil==2.8.1
-python-dotenv==0.10.1
+python-dotenv==0.14.0
 python-editor==1.0.4
 python-gitlab==1.8.0
 pytz==2019.3
