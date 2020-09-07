@@ -704,12 +704,18 @@ extractors:
     capabilities:
       - discover
       - state
+    settings_group_validation:
+    - ['csv_files_definition']
+    - ['files']
     settings:
       - name: csv_files_definition
         env: TAP_CSV_FILES_DEFINITION
         label: CSV Files Definition
         placeholder: Ex. files-def.json
         documentation: https://gitlab.com/meltano/tap-csv#run
+      - name: files
+        kind: array
+        description: Array of objects with `entity`, `file`, and `keys` keys
   - name: tap-fastly
     label: Fastly
     description: Edge cloud computing services provider
