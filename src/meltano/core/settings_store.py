@@ -204,7 +204,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
             else:
                 dotenv_file.touch()
 
-            dotenv.set_key(dotenv_file, env_key, str(value))
+            dotenv.set_key(dotenv_file, env_key, setting_def.stringify_value(value))
 
         self.log(f"Set key '{env_key}' in `.env`: {value!r}")
         return {"env_var": env_key}

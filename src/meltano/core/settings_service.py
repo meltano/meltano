@@ -134,7 +134,9 @@ class SettingsService(ABC):
         full_config = self.config_with_metadata(*args, **kwargs)
 
         return {
-            self.setting_env(config["setting"]): str(config["value"])
+            self.setting_env(config["setting"]): config["setting"].stringify_value(
+                config["value"]
+            )
             for key, config in full_config.items()
             if config["value"] is not None
         }
