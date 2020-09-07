@@ -29,50 +29,6 @@ Meltano supports [Singer taps](https://singer.io): executables that implement th
 
 To learn which extractors are [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box, refer to the [Extractors page](/plugins/extractors/).
 
-### `select` extra
-
-- Setting: `_select`
-- Environment variable: `<NAMESPACE>__SELECT`
-- Default: `["*.*"]`
-
-An extractor's `select` [extra](/docs/configuration.html#plugin-extras) holds an array of [entity selection rules](/docs/command-line-interface.html#select)
-to apply to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
-when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
-
-While this extra can be managed using [`meltano config`](/docs/command-line-interface.html#config) or environment variables like any other setting,
-selection rules are typically specified using [`meltano select`](/docs/command-line-interface.html#select).
-
-#### How to use
-
-##### In `meltano.yml`
-
-```yaml{4-6}
-extractors:
-- name: tap-gitlab
-  pip_url: tap-gitlab
-  select:
-  - project_members.*
-  - commits.*
-```
-
-##### On the command line
-
-```bash
-meltano config <plugin> set _select '["<entity>.<attribute>", ...]'
-
-export <NAMESPACE>__SELECT='["<entity>.<attribute>", ...]'
-
-meltano select <plugin> <entity> <attribute>
-
-# For example:
-meltano config tap-gitlab set _select '["project_members.*", "commits.*"]'
-
-export TAP_GITLAB__SELECT='["project_members.*", "commits.*"]'
-
-meltano select tap-gitlab project_members "*"
-meltano select tap-gitlab commits "*"
-```
-
 ### `metadata` extra
 
 - Setting: `_metadata`, alias: `metadata`
@@ -185,6 +141,50 @@ meltano config tap-postgres set _metadata some_table created_at type '["string",
 meltano config tap-postgres set _metadata some_table created_at format date-time
 
 export TAP_POSTGRES__SCHEMA_SOME_TABLE_CREATED_AT_FORMAT=date
+```
+
+### `select` extra
+
+- Setting: `_select`
+- Environment variable: `<NAMESPACE>__SELECT`
+- Default: `["*.*"]`
+
+An extractor's `select` [extra](/docs/configuration.html#plugin-extras) holds an array of [entity selection rules](/docs/command-line-interface.html#select)
+to apply to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
+when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
+
+While this extra can be managed using [`meltano config`](/docs/command-line-interface.html#config) or environment variables like any other setting,
+selection rules are typically specified using [`meltano select`](/docs/command-line-interface.html#select).
+
+#### How to use
+
+##### In `meltano.yml`
+
+```yaml{4-6}
+extractors:
+- name: tap-gitlab
+  pip_url: tap-gitlab
+  select:
+  - project_members.*
+  - commits.*
+```
+
+##### On the command line
+
+```bash
+meltano config <plugin> set _select '["<entity>.<attribute>", ...]'
+
+export <NAMESPACE>__SELECT='["<entity>.<attribute>", ...]'
+
+meltano select <plugin> <entity> <attribute>
+
+# For example:
+meltano config tap-gitlab set _select '["project_members.*", "commits.*"]'
+
+export TAP_GITLAB__SELECT='["project_members.*", "commits.*"]'
+
+meltano select tap-gitlab project_members "*"
+meltano select tap-gitlab commits "*"
 ```
 
 ## Loaders
