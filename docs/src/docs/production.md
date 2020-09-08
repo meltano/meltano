@@ -135,7 +135,7 @@ If you'd like to store these logs elsewhere, you can symlink the `.meltano/logs`
 If you're [containerizing your Meltano project](/docs/containerization.md),
 these logs will not be persisted outside the container [running your pipelines](#running-pipelines)
 unless you exfiltrate them by [mounting a volume](https://docs.docker.com/engine/reference/commandline/run/#mount-volume--v---read-only)
-inside the container at `/project/.meltano/run/elt`.
+inside the container at `/project/.meltano/logs/elt`.
 
 You will want to mount this same volume (or directory) into the container
 that runs [Meltano UI](#meltano-ui) if you'd like to use it to view the pipelines' most recent logs.
