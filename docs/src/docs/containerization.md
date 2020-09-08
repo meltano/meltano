@@ -49,6 +49,29 @@ meltano add files docker
 docker build --tag meltano-demo-project:dev .
 ```
 
+## Docker Compose
+
+If you'd like to use [Docker Compose](https://docs.docker.com/compose/) to experiment with
+a [production-grade](/docs/production.html) setup of your containerized project,
+you can add the appropriate `docker-compose.prod.yml` file to your project by adding the
+[`docker-compose` file bundle](https://gitlab.com/meltano/files-docker-compose):
+
+```bash
+# For these examples to work, ensure that
+# Docker Compose has been installed
+docker-compose --version
+
+# Add Docker Compose files to your project
+meltano add files docker-compose
+
+# Start the `meltano-ui` and `meltano-system-db` services in the background
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+Meltano UI will now be available at <http://localhost:5000>.
+
+For more details and instructions, refer to [README](https://gitlab.com/meltano/files-docker-compose/-/blob/master/bundle/README.md) contained in the file bundle.
+
 ## GitLab CI/CD
 
 If you'd like to use [GitLab CI/CD](https://docs.gitlab.com/ee/ci/) to continuously
