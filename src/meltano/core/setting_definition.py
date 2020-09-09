@@ -1,12 +1,37 @@
 import json
 from typing import List
+from collections import OrderedDict
 
-from .utils import truthy, flatten, nest_object
+from .utils import truthy, flatten, nest_object, to_env_var
 from .behavior.canonical import Canonical
 from .behavior import NameEq
 from .error import Error
 
 VALUE_PROCESSORS = {"nest_object": nest_object, "upcase_string": lambda s: s.upper()}
+
+
+class EnvVar:
+    def __init__(self, definition):
+        key = definition
+        negated = False
+
+        if definition.startswith("!"):
+            key = definition[1:]
+            negated = True
+
+        self.key = key
+        self.negated = negated
+
+    @property
+    def definition(self):
+        prefix = "!" if self.negated else ""
+        return f"{prefix}{self.key}"
+
+    def get(self, env):
+        if self.negated:
+            return str(not truthy(env[self.key]))
+        else:
+            return env[self.key]
 
 
 class SettingMissingError(Error):
@@ -104,22 +129,15 @@ class SettingDefinition(NameEq, Canonical):
     def is_redacted(self):
         return self.kind in ("password", "oauth")
 
-    @property
-    def env_alias_getters(self):
-        getters = {}
+    def env_vars(self, namespace: str):
+        env_keys = [self.env or to_env_var(namespace, self.name)]
 
-        for alias in self.env_aliases:
-            key = alias
+        env_keys.extend(alias for alias in self.env_aliases)
 
-            if alias.startswith("!") and self.kind == "boolean":
-                key = alias[1:]
-                getter = lambda env, key=key: str(not truthy(env[key]))
-            else:
-                getter = lambda env, key=alias: env[key]
+        # Drop duplicate keys
+        env_keys = list(OrderedDict.fromkeys(env_keys))
 
-            getters[key] = getter
-
-        return getters
+        return [EnvVar(key) for key in env_keys]
 
     def cast_value(self, value):
         if isinstance(value, str):

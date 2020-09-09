@@ -326,8 +326,11 @@ class SettingsService(ABC):
         except StopIteration as err:
             raise SettingMissingError(name) from err
 
+    def setting_env_vars(self, setting_def):
+        return setting_def.env_vars(self._env_namespace)
+
     def setting_env(self, setting_def):
-        return setting_def.env or to_env_var(self._env_namespace, setting_def.name)
+        return self.setting_env_vars(setting_def)[0].key
 
     def log(self, message):
         if self.LOGGING:

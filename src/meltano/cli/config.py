@@ -222,7 +222,7 @@ def list_settings(ctx, extras):
 
         click.secho(name, fg="blue", nl=False)
 
-        env_keys = [settings.setting_env(setting_def), *setting_def.env_aliases]
+        env_keys = [var.definition for var in settings.setting_env_vars(setting_def)]
         click.echo(f" [env: {', '.join(env_keys)}]", nl=False)
 
         current_value = click.style(f"{value!r}", fg="green")
