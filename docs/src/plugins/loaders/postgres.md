@@ -74,7 +74,7 @@ export PG_DATABASE=""
 
 Enter the appropriate values for each variable inside the quotes.
 
-The default value for `PG_SCHEMA` is `$MELTANO_EXTRACTOR_NAMESPACE`, which will expand to the `namespace` of the `extractor` used in the pipeline, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html).
+The default value for `PG_SCHEMA` is `$MELTANO_EXTRACT__PREFERRED_SCHEMA`, which will expand to the value of the [`preferred_schema` extra](/docs/plugins.html#preferred-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html).
 
 If you are running Meltano UI (`meltano ui`), you will need to restart it for the changes to take effect.
 

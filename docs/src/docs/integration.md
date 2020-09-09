@@ -80,7 +80,7 @@ In addition to variables [set through the environment](#pipeline-specific-config
 
 - `MELTANO_EXTRACTOR_NAME`: the extractor's `name`, e.g. `tap-gitlab`
 - `MELTANO_EXTRACTOR_NAMESPACE`: the extractor's `namespace`, e.g. `tap_gitlab`
-- `MELTANO_EXTRACT_<SETTING_NAME>`: one environment variable for each of the extractor's settings, e.g. `MELTANO_EXTRACT_PRIVATE_TOKEN` for the `private_token` setting
+- `MELTANO_EXTRACT_<SETTING_NAME>`: one environment variable for each of the extractor's settings and [extras](/docs/configuration.html#plugin-extras), e.g. `MELTANO_EXTRACT_PRIVATE_TOKEN` for the `private_token` setting, and `MELTANO_EXTRACT__PREFERRED_SCHEMA` for the [`preferred_schema` extra](/docs/plugins.html#preferred-schema-extra)
 - `<SETTING_ENV>`: all of the extractor's regular configuration environment variables, as listed by `meltano config <plugin> list`, e.g. `TAP_GITLAB_API_URL` for the `api_url` setting
 
 #### Loader variables
@@ -104,7 +104,8 @@ Additionally, the following variables describing the [transform](/docs/plugins.h
 Inside your loader or transformer's `config` object in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), you can reference these (and other) environment variables as `$VAR` (as a single word) or `${VAR}` (inside a word). Inside your plugin, you can reference these through `os.environ` (if using Python) as usual.
 
 This feature is used to dynamically configure the `target-postgres` and `target-snowflake` loaders and `dbt` transformer as appropriate, independent of the specific extractor and loader used:
-- `target-postgres` and `target-snowflake` default value for `schema`: `$MELTANO_EXTRACTOR_NAMESPACE`, e.g. `tap_gitlab`
+- Default value for the `target-postgres` and `target-snowflake` `schema` settings:
+  - [`$MELTANO_EXTRACT__PREFERRED_SCHEMA`](/docs/plugins.html#preferred-schema-extra), e.g. `tap_gitlab` for `tap-gitlab`
 - `dbt` default value for `target`: `$MELTANO_LOADER_NAMESPACE`, e.g. `postgres` or `snowflake`, which correspond to the target names in `transform/profile/profiles.yml`
 - `dbt` default value for `source_schema`: `$MELTANO_LOAD_SCHEMA`, e.g. `tap_gitlab`
 - `dbt` default value for `models`: `$MELTANO_EXTRACTOR_NAMESPACE my_meltano_model`, e.g. `tap_gitlab my_meltano_model`

@@ -27,6 +27,7 @@ def assert_loader_env(loader, env):
     assert (
         env["MELTANO_LOAD_SCHEMA"]
         == env["PG_SCHEMA"]
+        == env["MELTANO_EXTRACT__PREFERRED_SCHEMA"]
         == env["MELTANO_EXTRACTOR_NAMESPACE"]
     )
 

@@ -69,8 +69,8 @@ extractors:
 ##### On the command line
 
 ```bash
-meltano config <plugin> set _metadata <entity> <key> <value>
-meltano config <plugin> set _metadata <entity> <attribute> <key> <value>
+meltano config <extractor> set _metadata <entity> <key> <value>
+meltano config <extractor> set _metadata <entity> <attribute> <key> <value>
 
 export <EXTRACTOR>__METADATA='{"<entity>": {"<key>": "<value>", "<attribute>": {"<key>": "<value>"}}}'
 
@@ -84,6 +84,44 @@ meltano config tap-postgres set _metadata some_table replication-key created_at
 meltano config tap-postgres set _metadata some_table created_at is-replication-key true
 
 export TAP_POSTGRES__METADATA_SOME_TABLE_REPLICATION_METHOD=FULL_TABLE
+```
+
+### `preferred_schema` extra
+
+- Setting: `_preferred_schema`
+- Environment variable: `<EXTRACTOR>__PREFERRED_SCHEMA`, e.g. `TAP_GITLAB__PREFERRED_SCHEMA`
+- Default: `$MELTANO_EXTRACTOR_NAMESPACE`, which will expand to the extractor's `namespace`, e.g. `tap_gitlab` for `tap-gitlab`
+
+An extractor's `preferred_schema` [extra](/docs/configuration.html#plugin-extras)
+holds the name of the database schema extracted data should be loaded into,
+when this extractor is used in a pipeline with a [loader](#loaders) for a database that supports schemas, like [PostgreSQL](https://www.postgresql.org/docs/current/ddl-schemas.html) or [Snowflake](https://docs.snowflake.com/en/sql-reference/ddl-database.html).
+
+The value of this extra can be referenced from a loader's configuration using the `MELTANO_EXTRACT__PREFERRED_SCHEMA`
+[pipeline environment variable](/docs/integration.html#pipeline-environment-variables).
+It is used as the default value for the [`target-postgres`](/plugins/loaders/postgres.html) and [`target-snowflake`](/plugins/loaders/snowflake.html) `schema` settings.
+
+#### How to use
+
+##### In `meltano.yml`
+
+```yaml{4}
+extractors:
+- name: tap-gitlab
+  pip_url: tap-gitlab
+  preferred_schema: gitlab_data
+```
+
+##### On the command line
+
+```bash
+meltano config <extractor> set _preferred_schema <schema>
+
+export <EXTRACTOR>__PREFERRED_SCHEMA=<schema>
+
+# For example:
+meltano config tap-gitlab set _preferred_schema gitlab_data
+
+export TAP_GITLAB__PREFERRED_SCHEMA=gitlab_data
 ```
 
 ### `schema` extra
@@ -125,8 +163,8 @@ extractors:
 ##### On the command line
 
 ```bash
-meltano config <plugin> set _schema <entity> <attribute> <schema description>
-meltano config <plugin> set _schema <entity> <attribute> <key> <value>
+meltano config <extractor> set _schema <entity> <attribute> <schema description>
+meltano config <extractor> set _schema <entity> <attribute> <key> <value>
 
 export <EXTRACTOR>__SCHEMA='{"<entity>": {"<attribute>": {"<key>": "<value>"}}}'
 
@@ -174,11 +212,11 @@ extractors:
 ##### On the command line
 
 ```bash
-meltano config <plugin> set _select '["<entity>.<attribute>", ...]'
+meltano config <extractor> set _select '["<entity>.<attribute>", ...]'
 
 export <EXTRACTOR>__SELECT='["<entity>.<attribute>", ...]'
 
-meltano select <plugin> <entity> <attribute>
+meltano select <extractor> <entity> <attribute>
 
 # For example:
 meltano config tap-gitlab set _select '["project_members.*", "commits.*"]'
@@ -227,8 +265,8 @@ extractors:
 ##### On the command line
 
 ```bash
-meltano config <plugin> set _select_filter '["<entity>", ...]'
-meltano config <plugin> set _select_filter '["!<entity>", ...]'
+meltano config <extractor> set _select_filter '["<entity>", ...]'
+meltano config <extractor> set _select_filter '["!<entity>", ...]'
 
 export <EXTRACTOR>__SELECT_FILTER='["<entity>", ...]'
 export <EXTRACTOR>__SELECT_FILTER='["!<entity>", ...]'
@@ -295,7 +333,7 @@ transforms:
 ##### On the command line
 
 ```bash
-meltano config <plugin> set _vars <key> <value>
+meltano config <transform> set _vars <key> <value>
 
 export <TRANSFORM>__VARS='{"<key>": "<value>"}'
 
@@ -371,7 +409,7 @@ files:
 ##### On the command line
 
 ```bash
-meltano config <plugin> set _update <path> <true/false>
+meltano config <bundle> set _update <path> <true/false>
 
 export <BUNDLE>__UPDATE='{"<path>": <true/false>}'
 

@@ -883,7 +883,7 @@ loaders:
         value: warehouse
       - name: schema
         env: PG_SCHEMA
-        value: $MELTANO_EXTRACTOR_NAMESPACE
+        value: $MELTANO_EXTRACT__PREFERRED_SCHEMA
   - name: target-snowflake
     label: Snowflake
     description: Snowflake database loader
@@ -914,7 +914,7 @@ loaders:
         description: The name of the Snowflake warehouse you want to use
       - name: schema
         env: SF_SCHEMA
-        value: $MELTANO_EXTRACTOR_NAMESPACE
+        value: $MELTANO_EXTRACT__PREFERRED_SCHEMA
         value_processor: upcase_string
   - name: target-sqlite
     label: SQLite
