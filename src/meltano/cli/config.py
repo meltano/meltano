@@ -193,7 +193,11 @@ def list_settings(ctx, extras):
     printed_custom_heading = False
     printed_extra_heading = extras
 
-    full_config = settings.config_with_metadata(session=session)
+    # If `--extras` is not specified (`False`), we still want to load both
+    # regular and extra settings, since we show custom extras.
+    load_extras = True if extras else None
+
+    full_config = settings.config_with_metadata(session=session, extras=load_extras)
     for name, config_metadata in full_config.items():
         value = config_metadata["value"]
         source = config_metadata["source"]
