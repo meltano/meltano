@@ -95,9 +95,17 @@ class SettingsService(ABC):
         return {k: v for k, v in values.items() if v != REDACTED_VALUE}
 
     def config_with_metadata(
-        self, prefix=None, extras=None, source=SettingValueStore.AUTO, **kwargs
+        self,
+        prefix=None,
+        extras=None,
+        source=SettingValueStore.AUTO,
+        source_manager=None,
+        **kwargs,
     ):
-        manager = source.manager(self, bulk=True, **kwargs)
+        if source_manager:
+            source_manager.bulk = True
+        else:
+            source_manager = source.manager(self, bulk=True, **kwargs)
 
         config = {}
         for setting_def in self.definitions(extras=extras):
@@ -108,7 +116,7 @@ class SettingsService(ABC):
                 setting_def.name,
                 setting_def=setting_def,
                 source=source,
-                source_manager=manager,
+                source_manager=source_manager,
                 **kwargs,
             )
 
@@ -175,7 +183,10 @@ class SettingsService(ABC):
                 object_source = SettingValueStore.DEFAULT
                 for setting_key in [setting_def.name, *setting_def.aliases]:
                     flat_config_metadata = self.config_with_metadata(
-                        source=source, prefix=f"{setting_key}."
+                        prefix=f"{setting_key}.",
+                        redacted=redacted,
+                        source=source,
+                        source_manager=source_manager,
                     )
                     for nested_key, config_metadata in flat_config_metadata.items():
                         if nested_key in object_value:
