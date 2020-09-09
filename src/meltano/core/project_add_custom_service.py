@@ -8,7 +8,7 @@ import re
 from .project import Project
 from .plugin import PluginType
 from .project_add_service import ProjectAddService
-from .utils import setting_env
+from .utils import to_env_var
 
 
 class ProjectAddCustomService(ProjectAddService):
@@ -140,6 +140,7 @@ class ProjectAddCustomService(ProjectAddService):
             executable=executable,
             capabilities=capabilities,
             settings=[
-                {"name": name, "env": setting_env(namespace, name)} for name in settings
+                {"name": name, "env": to_env_var(plugin_name, name)}
+                for name in settings
             ],
         )

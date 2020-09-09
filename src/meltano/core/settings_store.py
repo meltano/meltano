@@ -126,23 +126,17 @@ class BaseEnvStoreManager(SettingsStoreManager):
         if not setting_def:
             raise StoreNotSupportedError
 
-        env_key = self.setting_env(setting_def)
-        env_getters = {
-            env_key: lambda env: env[env_key],
-            **setting_def.env_alias_getters,
-        }
-
-        for key, getter in env_getters.items():
+        for env_var in self.setting_env_vars(setting_def):
             try:
-                value = getter(self.env)
-                return value, {"env_var": key}
+                value = env_var.get(self.env)
+                return value, {"env_var": env_var.key}
             except KeyError:
                 pass
 
         return None, {}
 
-    def setting_env(self, setting_def):
-        return self.settings_service.setting_env(setting_def)
+    def setting_env_vars(self, *args, **kwargs):
+        return self.settings_service.setting_env_vars(*args, **kwargs)
 
 
 class EnvStoreManager(BaseEnvStoreManager):
@@ -194,32 +188,35 @@ class DotEnvStoreManager(BaseEnvStoreManager):
         if not setting_def:
             raise StoreNotSupportedError
 
-        env_key = self.setting_env(setting_def)
+        primary_var, *other_vars = self.setting_env_vars(setting_def)
+        primary_key = primary_var.key
+        other_keys = [var.key for var in other_vars]
 
         with self.update_dotenv() as dotenv_file:
             if dotenv_file.exists():
-                for key in setting_def.env_alias_getters.keys():
+                for key in other_keys:
                     dotenv.unset_key(dotenv_file, key)
                     self.log(f"Unset key '{key}' in `.env`")
             else:
                 dotenv_file.touch()
 
-            dotenv.set_key(dotenv_file, env_key, setting_def.stringify_value(value))
+            dotenv.set_key(dotenv_file, primary_key, setting_def.stringify_value(value))
 
-        self.log(f"Set key '{env_key}' in `.env`: {value!r}")
-        return {"env_var": env_key}
+        self.log(f"Set key '{primary_key}' in `.env`: {value!r}")
+        return {"env_var": primary_key}
 
     def unset(self, name: str, path: List[str], setting_def=None):
         if not setting_def:
             raise StoreNotSupportedError
 
-        env_key = self.setting_env(setting_def)
+        env_vars = self.setting_env_vars(setting_def)
+        env_keys = [var.key for var in env_vars]
 
         with self.update_dotenv() as dotenv_file:
             if not dotenv_file.exists():
                 return {}
 
-            for key in [env_key, *setting_def.env_alias_getters.keys()]:
+            for key in env_keys:
                 dotenv.unset_key(dotenv_file, key)
                 self.log(f"Unset key '{key}' in `.env`")
 
