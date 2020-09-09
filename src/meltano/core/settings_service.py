@@ -183,8 +183,19 @@ class SettingsService(ABC):
 
         metadata = {"name": name, "source": source, "setting": setting_def}
 
+        expandible_env = {}
+        if setting_def and setting_def.is_extra:
+            expandible_env = self.as_env(
+                extras=False,
+                redacted=redacted,
+                source=source,
+                source_manager=source_manager,
+            )
+
         manager = source_manager or source.manager(self, **kwargs)
-        value, get_metadata = manager.get(name, setting_def=setting_def)
+        value, get_metadata = manager.get(
+            name, setting_def=setting_def, expandible_env=expandible_env
+        )
         metadata.update(get_metadata)
 
         if setting_def:
