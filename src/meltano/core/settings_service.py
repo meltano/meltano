@@ -56,6 +56,10 @@ class SettingsService(ABC):
         pass
 
     @property
+    def _generic_env_namespace(self) -> str:
+        return None
+
+    @property
     @abstractmethod
     def _db_namespace(self) -> str:
         pass
@@ -150,7 +154,7 @@ class SettingsService(ABC):
             setting_def = config["setting"]
             value = setting_def.stringify_value(value)
 
-            for env_var in self.setting_env_vars(setting_def):
+            for env_var in self.setting_env_vars(setting_def, include_generic=True):
                 if env_var.negated:
                     continue
 
@@ -335,8 +339,12 @@ class SettingsService(ABC):
         except StopIteration as err:
             raise SettingMissingError(name) from err
 
-    def setting_env_vars(self, setting_def):
-        return setting_def.env_vars(self._env_namespace)
+    def setting_env_vars(self, setting_def, include_generic=False):
+        namespaces = [self._env_namespace]
+        if include_generic and self._generic_env_namespace:
+            namespaces.append(self._generic_env_namespace)
+
+        return setting_def.env_vars(namespaces)
 
     def setting_env(self, setting_def):
         return self.setting_env_vars(setting_def)[0].key
