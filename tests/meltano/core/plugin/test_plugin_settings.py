@@ -286,12 +286,21 @@ class TestPluginSettingsService:
         config = subject.as_env(session=session)
         subject.reset(store=SettingValueStore.DOTENV)
 
-        assert config.get(env_var(subject, "test")) == "mock"
-        assert config.get(env_var(subject, "start_date")) == None
-        assert config.get(env_var(subject, "secure")) == None
-        assert config.get(env_var(subject, "boolean")) == "true"
-        assert config.get(env_var(subject, "list")) == '[1, 2, 3, "4"]'
-        assert config.get(env_var(subject, "object")) == '{"1": {"2": 3}}'
+        # Settings with values are present
+        assert config[env_var(subject, "test")] == "mock"
+        assert config[env_var(subject, "list")] == '[1, 2, 3, "4"]'
+        assert config[env_var(subject, "object")] == '{"1": {"2": 3}}'
+        assert config[env_var(subject, "boolean")] == "true"
+
+        # Settings without values are not
+        assert env_var(subject, "start_date") not in config
+        assert env_var(subject, "secure") not in config
+
+        # Env aliases are present
+        assert config["TAP_MOCK_ENABLED"] == "true"
+
+        # Negated aliases are not
+        assert "TAP_MOCK_DISABLED" not in config
 
     def test_as_env_custom(
         self, project, session, custom_tap, env_var, plugin_settings_service_factory

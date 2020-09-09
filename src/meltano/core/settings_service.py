@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Iterable, Dict, List
 
-from meltano.core.utils import find_named, to_env_var, NotFound, flatten
+from meltano.core.utils import find_named, NotFound, flatten
 from .setting_definition import SettingMissingError, SettingDefinition
 from .settings_store import StoreNotSupportedError, SettingValueStore
 from .config_service import ConfigService
@@ -141,13 +141,22 @@ class SettingsService(ABC):
     def as_env(self, *args, **kwargs) -> Dict[str, str]:
         full_config = self.config_with_metadata(*args, **kwargs)
 
-        return {
-            self.setting_env(config["setting"]): config["setting"].stringify_value(
-                config["value"]
-            )
-            for key, config in full_config.items()
-            if config["value"] is not None
-        }
+        env = {}
+        for key, config in full_config.items():
+            value = config["value"]
+            if value is None:
+                continue
+
+            setting_def = config["setting"]
+            value = setting_def.stringify_value(value)
+
+            for env_var in self.setting_env_vars(setting_def):
+                if env_var.negated:
+                    continue
+
+                env[env_var.key] = value
+
+        return env
 
     def get_with_metadata(
         self,
