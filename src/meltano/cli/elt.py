@@ -16,7 +16,7 @@ from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.job import Job
-from meltano.core.plugin import PluginType
+from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.transform_add_service import TransformAddService
@@ -155,9 +155,35 @@ async def run_elt(
     full_refresh=False,
     select_filter=[],
 ):
+    config_service = ConfigService(project)
+    discovery_service = PluginDiscoveryService(project, config_service=config_service)
+
+    plugin_refs = []
+    if transform != "only":
+        plugin_refs.append(PluginRef(PluginType.EXTRACTORS, extractor))
+        plugin_refs.append(PluginRef(PluginType.LOADERS, loader))
+
+    transform_name = None
+    if transform != "skip":
+        transform_name = find_transform_for_extractor(
+            extractor, discovery_service=discovery_service
+        )
+
+        if transform_name:
+            plugin_refs.append(PluginRef(PluginType.TRANSFORMS, transform_name))
+        else:
+            # There is no default transform for this extractor..
+            # Don't panic, everything is cool - just run custom transforms
+            plugin_refs.append(PluginRef(PluginType.TRANSFORMERS, "dbt"))
+
     async with redirect_output(output_logger):
         try:
-            success = install_missing_plugins(project, extractor, loader, transform)
+            success = install_missing_plugins(
+                project,
+                plugin_refs,
+                config_service=config_service,
+                discovery_service=discovery_service,
+            )
 
             if not success:
                 raise CliError("Failed to install missing plugins")
@@ -167,7 +193,7 @@ async def run_elt(
                 .with_job(job)
                 .with_extractor(extractor)
                 .with_loader(loader)
-                .with_transform(transform)
+                .with_transform(transform_name or transform)
                 .with_dry_run(dry_run)
                 .with_full_refresh(full_refresh)
                 .with_select_filter(select_filter)
@@ -269,11 +295,45 @@ async def run_transform(elt_context, output_logger, session, **kwargs):
     logs("Transformation complete!", fg="green")
 
 
-def install_missing_plugins(
-    project: Project, extractor: str, loader: str, transform: str
+def find_transform_for_extractor(extractor: str, discovery_service):
+    try:
+        extractor_plugin_def = discovery_service.find_plugin(
+            PluginType.EXTRACTORS, extractor
+        )
+        # Check if there is a default transform for this extractor
+        transform_plugin_def = discovery_service.find_plugin_by_namespace(
+            PluginType.TRANSFORMS, extractor_plugin_def.namespace
+        )
+
+        return transform_plugin_def.name
+    except PluginNotFoundError:
+        return None
+
+
+def add_plugin_if_missing(
+    project: Project,
+    plugin_type,
+    name,
+    config_service: ConfigService,
+    add_service: ProjectAddService,
 ):
-    config_service = ConfigService(project)
-    discovery_service = PluginDiscoveryService(project, config_service=config_service)
+    try:
+        config_service.find_plugin(name, plugin_type=plugin_type)
+        return None
+    except PluginMissingError:
+        logs(
+            f"{plugin_type.descriptor.capitalize()} '{name}' is missing, adding it to your project...",
+            fg="yellow",
+        )
+        return add_plugin(project, plugin_type, name, add_service=add_service)
+
+
+def install_missing_plugins(
+    project: Project,
+    plugin_refs: [PluginRef],
+    config_service: ConfigService,
+    discovery_service: PluginDiscoveryService,
+):
     add_service = ProjectAddService(
         project,
         plugin_discovery_service=discovery_service,
@@ -281,71 +341,16 @@ def install_missing_plugins(
     )
 
     plugins = []
-    if transform != "only":
-        try:
-            config_service.find_plugin(extractor, plugin_type=PluginType.EXTRACTORS)
-        except PluginMissingError:
-            logs(
-                f"Extractor '{extractor}' is missing, adding it to your project...",
-                fg="yellow",
-            )
-            plugin = add_plugin(
-                project, PluginType.EXTRACTORS, extractor, add_service=add_service
-            )
+    for plugin_ref in plugin_refs:
+        plugin = add_plugin_if_missing(
+            project,
+            plugin_ref.type,
+            plugin_ref.name,
+            config_service=config_service,
+            add_service=add_service,
+        )
+        if plugin:
             plugins.append(plugin)
-
-        try:
-            config_service.find_plugin(loader, plugin_type=PluginType.LOADERS)
-        except PluginMissingError:
-            logs(
-                f"Loader '{loader}' is missing, adding it to your project...",
-                fg="yellow",
-            )
-            plugin = add_plugin(
-                project, PluginType.LOADERS, loader, add_service=add_service
-            )
-            plugins.append(plugin)
-
-    if transform != "skip":
-        try:
-            extractor_plugin_def = discovery_service.find_plugin(
-                PluginType.EXTRACTORS, extractor
-            )
-            # Check if there is a default transform for this extractor
-            transform_plugin_def = discovery_service.find_plugin_by_namespace(
-                PluginType.TRANSFORMS, extractor_plugin_def.namespace
-            )
-
-            try:
-                config_service.find_plugin(
-                    transform_plugin_def.name, plugin_type=PluginType.TRANSFORMS
-                )
-            except PluginMissingError:
-                logs(
-                    f"Transform '{transform_plugin_def.name}' is missing, adding it to your project...",
-                    fg="yellow",
-                )
-                plugin = add_plugin(
-                    project,
-                    PluginType.TRANSFORMS,
-                    transform_plugin_def.name,
-                    add_service=add_service,
-                )
-                plugins.append(plugin)
-        except PluginNotFoundError:
-            # There is no default transform for this extractor..
-            # Don't panic, everything is cool - just run custom transforms
-            try:
-                config_service.find_plugin("dbt", plugin_type=PluginType.TRANSFORMERS)
-            except PluginMissingError:
-                logs(
-                    f"Transformer 'dbt' is missing, adding it to your project...",
-                    fg="yellow",
-                )
-                plugin = add_plugin(
-                    project, PluginType.TRANSFORMERS, "dbt", add_service=add_service
-                )
-                plugins.append(plugin)
 
     if not plugins:
         return True

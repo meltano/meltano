@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2349](https://gitlab.com/meltano/meltano/-/issues/2349) Allow plugin setting (default) values to reference pipeline plugin extras using generic env vars, e.g. `MELTANO_EXTRACT__<EXTRA>`
 - [#2281](https://gitlab.com/meltano/meltano/-/issues/2281) Allow plugin extra (default) values to reference plugin name, namespace, profile using generic env vars, e.g. `MELTANO_EXTRACTOR_NAMESPACE`
 - [#2280](https://gitlab.com/meltano/meltano/-/issues/2280) Allow plugin extra (default) values to reference plugin settings using env vars, e.g. `target_schema: $PG_SCHEMA`
+- [#2350](https://gitlab.com/meltano/meltano/-/issues/2350) Add `MELTANO_TRANSFORM_*` transform pipeline env vars for transformer (configuration) to access
 
 ### Changes
 

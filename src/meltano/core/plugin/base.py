@@ -60,6 +60,9 @@ class PluginType(YAMLEnum):
 
     @property
     def verb(self):
+        if self is self.__class__.TRANSFORMS:
+            return self.singular
+
         return self.value[:-3]
 
     @classmethod

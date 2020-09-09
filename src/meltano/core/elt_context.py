@@ -50,6 +50,7 @@ class ELTContext:
         job: Optional[Job] = None,
         extractor: Optional[PluginContext] = None,
         loader: Optional[PluginContext] = None,
+        transform: Optional[PluginContext] = None,
         transformer: Optional[PluginContext] = None,
         dry_run: Optional[bool] = False,
         full_refresh: Optional[bool] = False,
@@ -60,6 +61,7 @@ class ELTContext:
         self.job = job
         self.extractor = extractor
         self.loader = loader
+        self.transform = transform
         self.transformer = transformer
         self.dry_run = dry_run
         self.full_refresh = full_refresh
@@ -117,6 +119,7 @@ class ELTContextBuilder:
 
         self._extractor = None
         self._loader = None
+        self._transform = None
         self._transformer = None
         self._job = None
         self._dry_run = False
@@ -136,6 +139,9 @@ class ELTContextBuilder:
     def with_transform(self, transform: str):
         if transform == "skip":
             return self
+
+        if transform not in ("run", "only"):
+            self._transform = PluginRef(PluginType.TRANSFORMS, transform)
 
         return self.with_transformer("dbt")
 
@@ -203,6 +209,12 @@ class ELTContextBuilder:
 
             env.update(loader.env)
 
+        transform = None
+        if self._transform:
+            transform = self.plugin_context(session, self._transform, env=env.copy())
+
+            env.update(transform.env)
+
         transformer = None
         if self._transformer:
             transformer = self.plugin_context(
@@ -214,6 +226,7 @@ class ELTContextBuilder:
             job=self._job,
             extractor=extractor,
             loader=loader,
+            transform=transform,
             transformer=transformer,
             dry_run=self._dry_run,
             full_refresh=self._full_refresh,
