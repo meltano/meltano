@@ -155,6 +155,11 @@ def nest_object(flat_object):
     return obj
 
 
+def to_env_var(*xs):
+    xs = [re.sub("[^A-Za-z0-9]", "_", x).upper() for x in xs if x]
+    return "_".join(xs)
+
+
 def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
     """Wrapper arround `flatten_dict.flatten` that adds `dot` and `env_var` reducers."""
 
@@ -164,22 +169,12 @@ def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
         else:
             return ".".join(xs)
 
-    def env_var_reducer(*xs):
-        xs = [re.sub("[^A-Za-z0-9]", "_", x).upper() for x in xs if x]
-        return "_".join(xs)
-
     if reducer == "dot":
         reducer = dot_reducer
     if reducer == "env_var":
-        reducer = env_var_reducer
+        reducer = to_env_var
 
     return flatten_dict.flatten(d, reducer, **kwargs)
-
-
-def setting_env(namespace, setting_name):
-    env_struct = {namespace: {setting_name: "value"}}
-    env = flatten(env_struct, "env_var")
-    return next(iter(env))  # get key
 
 
 def compact(xs: Iterable) -> Iterable:

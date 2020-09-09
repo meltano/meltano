@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Iterable, Dict, List
 
-from meltano.core.utils import find_named, setting_env, NotFound, flatten
+from meltano.core.utils import find_named, to_env_var, NotFound, flatten
 from .setting_definition import SettingMissingError, SettingDefinition
 from .settings_store import StoreNotSupportedError, SettingValueStore
 from .config_service import ConfigService
@@ -316,7 +316,7 @@ class SettingsService(ABC):
             raise SettingMissingError(name) from err
 
     def setting_env(self, setting_def):
-        return setting_def.env or setting_env(self._env_namespace, setting_def.name)
+        return setting_def.env or to_env_var(self._env_namespace, setting_def.name)
 
     def log(self, message):
         if self.LOGGING:
