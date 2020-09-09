@@ -79,4 +79,9 @@ class DbtTransformPlugin(PluginInstall):
 
     @property
     def extra_settings(self):
-        return [SettingDefinition(name="_vars", kind="object", value={})]
+        return [
+            SettingDefinition(
+                name="_package_name", value="$MELTANO_TRANSFORM_NAMESPACE"
+            ),
+            SettingDefinition(name="_vars", kind="object", value={}),
+        ]

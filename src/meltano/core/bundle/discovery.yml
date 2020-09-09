@@ -957,7 +957,7 @@ transformers:
       value: analytics
     - name: models
       env: DBT_MODELS
-      value: $MELTANO_EXTRACTOR_NAMESPACE my_meltano_project
+      value: $MELTANO_TRANSFORM__PACKAGE_NAME $MELTANO_EXTRACTOR_NAMESPACE my_meltano_project
 transforms:
   - name: tap-adwords
     namespace: tap_adwords

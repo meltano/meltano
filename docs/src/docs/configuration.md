@@ -83,6 +83,7 @@ Meltano currently knows these extras for these plugin types:
   - [`dialect`](/docs/plugins.html#dialect-extra)
   - [`target_schema`](/docs/plugins.html#target-schema-extra)
 - [Transforms](/docs/plugins.html#transforms)
+  - [`package_name`](/docs/plugins.html#package-name-extra)
   - [`vars`](/docs/plugins.html#vars-extra)
 - [File bundles](/docs/plugins.html#file-bundles)
   - [`update`](/docs/plugins.html#update-extra)

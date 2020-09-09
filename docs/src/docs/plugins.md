@@ -391,6 +391,46 @@ When a transform is added to your project using [`meltano add`](/docs/command-li
 the [dbt package Git repository](https://docs.getdbt.com/docs/building-a-dbt-project/package-management#git-packages) referenced by its `pip_url`
 will be added to your project's `transform/packages.yml` and the package will be enabled in `transform/dbt_project.yml`.
 
+### `package_name` extra
+
+- Setting: `_package_name`
+- Environment variable: `<TRANSFORM>__PACKAGE_NAME`, e.g. `TAP_GITLAB__PACKAGE_NAME`
+- Default: `$MELTANO_TRANSFORM_NAMESPACE`, which will expand to the transform's `namespace`, e.g. `tap_gitlab` for `tap-gitlab`
+
+A transform's `package_name` [extra](/docs/configuration.html#plugin-extras)
+holds the name of the dbt package's internal dbt project: the value of `name` in `dbt_project.yml`.
+
+When a transform is added to your project using [`meltano add`](/docs/command-line-interface.html#add), this name will be added to the `models` dictionary in `transform/dbt_project.yml`.
+
+The value of this extra can be referenced from a transformer's configuration using the `MELTANO_TRANSFORM__PACKAGE_NAME`
+[pipeline environment variable](/docs/integration.html#pipeline-environment-variables).
+It is included in the default value for `dbt`'s `models` setting: `$MELTANO_TRANSFORM__PACKAGE_NAME $MELTANO_EXTRACTOR_NAMESPACE my_meltano_model`.
+
+#### How to use
+
+##### In `meltano.yml`
+
+```yaml{5}
+transforms:
+- name: dbt-facebook-ads
+  namespace: tap_facebook
+  pip_url: https://github.com/fishtown-analytics/facebook-ads
+  package_name: facebook_ads
+```
+
+##### On the command line
+
+```bash
+meltano config <transform> set _package_name <name>
+
+export <TRANSFORM>__PACKAGE_NAME=<name>
+
+# For example:
+meltano config dbt-facebook-ads set _package_name facebook_ads
+
+export DBT_FACEBOOK_ADS__PACKGE_NAME=facebook_ads
+```
+
 ### `vars` extra
 
 - Setting: `_vars`

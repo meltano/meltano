@@ -98,6 +98,7 @@ Additionally, the following variables describing the [transform](/docs/plugins.h
 
 - `MELTANO_TRANSFORM_NAME`: the loader's `name`, e.g. `tap-gitlab`
 - `MELTANO_TRANSFORM_NAMESPACE`: the loader's `namespace`, e.g. `tap_gitlab`
+- `MELTANO_TRANSFORM_<SETTING_NAME>`: one environment variable for each of the transform's settings and [extras](/docs/configuration.html#plugin-extras), e.g. `MELTANO_TRANSFORM__PACKAGE_NAME` for the [`package_name` extra](/docs/plugins.html#package-name-extra)
 
 #### How to use
 
@@ -110,7 +111,8 @@ This feature is used to dynamically configure the `target-postgres` and `target-
   - [`$MELTANO_LOAD__DIALECT`](/docs/plugins.html#dialect-extra), e.g. `postgres` for `target-postgres` and `snowflake` for `target-snowflake`, which correspond to the target names in `transform/profile/profiles.yml`
 - Default value for `dbt`'s `source_schema` setting:
   - [`$MELTANO_LOAD__TARGET_SCHEMA`](/docs/plugins.html#target-schema-extra), the value of the `schema` setting for `target-postgres` and `target-snowflake`
-- `dbt` default value for `models`: `$MELTANO_EXTRACTOR_NAMESPACE my_meltano_model`, e.g. `tap_gitlab my_meltano_model`
+- Default value for `dbt`'s `models` setting:
+  - [`$MELTANO_TRANSFORM__PACKAGE_NAME`](/docs/plugins.html#package-name-extra)`$MELTANO_EXTRACTOR_NAMESPACE my_meltano_model`, e.g. `tap_gitlab tap_gitlab my_meltano_model` for the `tap-gitlab` transform and `tap-gitlab` extractor
 
 ## Selecting entities and attributes for extraction
 
