@@ -1,7 +1,7 @@
 import pytest
 from unittest import mock
 
-from meltano.core.plugin import PluginType
+from meltano.core.plugin import PluginType, PluginRef
 from meltano.api.controllers.sql_helper import SqlHelper, UnsupportedConnectionDialect
 
 
@@ -30,19 +30,14 @@ class TestSqlHelper:
         plugin_settings_service_factory,
         elt_context_builder,
     ):
-        plugin_settings_service = plugin_settings_service_factory(tap)
+        target_sqlite = PluginRef(PluginType.LOADERS, "target-sqlite")
+        plugin_settings_service = plugin_settings_service_factory(target_sqlite)
+        plugin_settings_service.set("database", "pytest")
 
-        sample_config = {"database": "pytest"}
-        engine_uri = f"sqlite:///pytest.db"
+        config = plugin_settings_service.as_dict()
+        engine_uri = f"sqlite:///{config['database']}.db"
 
         with mock.patch(
-            "meltano.core.elt_context.PluginSettingsService",
-            return_value=plugin_settings_service,
-        ), mock.patch.object(
-            plugin_settings_service, "as_dict", return_value=sample_config
-        ), mock.patch.object(
-            plugin_settings_service, "as_env", return_value={}
-        ), mock.patch(
             "meltano.api.controllers.sql_helper.ELTContextBuilder",
             return_value=elt_context_builder,
         ):
@@ -59,26 +54,18 @@ class TestSqlHelper:
         plugin_settings_service_factory,
         elt_context_builder,
     ):
-        plugin_settings_service = plugin_settings_service_factory(tap)
-        sample_config = {
-            "user": "user",
-            "password": "password",
-            "host": "host",
-            "port": 5502,
-            "dbname": "dbname",
-            "schema": "tap_mock",
-        }
+        target_postgres = PluginRef(PluginType.LOADERS, "target-postgres")
+        plugin_settings_service = plugin_settings_service_factory(target_postgres)
+        plugin_settings_service.set("user", "user")
+        plugin_settings_service.set("password", "password")
+        plugin_settings_service.set("host", "host")
+        plugin_settings_service.set("port", 5502)
+        plugin_settings_service.set("dbname", "dbname")
 
-        engine_uri = "postgresql://user:password@host:5502/dbname"
+        config = plugin_settings_service.as_dict()
+        engine_uri = f"postgresql://{config['user']}:{config['password']}@{config['host']}:{config['port']}/{config['dbname']}"
 
         with mock.patch(
-            "meltano.core.elt_context.PluginSettingsService",
-            return_value=plugin_settings_service,
-        ), mock.patch.object(
-            plugin_settings_service, "as_dict", return_value=sample_config
-        ), mock.patch.object(
-            plugin_settings_service, "as_env", return_value={}
-        ), mock.patch(
             "meltano.api.controllers.sql_helper.ELTContextBuilder",
             return_value=elt_context_builder,
         ):

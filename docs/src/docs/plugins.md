@@ -294,6 +294,45 @@ Meltano supports [Singer targets](https://singer.io): executables that implement
 
 To learn which loaders are [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box, refer to the [Loaders page](/plugins/loaders/).
 
+### `dialect` extra
+
+- Setting: `_dialect`
+- Environment variable: `<LOADER>__DIALECT`, e.g. `TARGET_POSTGRES__DIALECT`
+- Default: `$MELTANO_LOADER_NAMESPACE`, which will expand to the loader's `namespace`, e.g. `postgres` for `target-postgres` and `snowflake` for `target-snowflake`
+
+A loader's `dialect` [extra](/docs/configuration.html#plugin-extras)
+holds the name of the dialect of the target database, so that
+[transformers](#transformers) in the same pipeline and [Meltano UI](/docs/command-line-interface.html#ui)'s [Analysis feature](/docs/analysis.html)
+can determine the type of database to connect to.
+
+The value of this extra can be referenced from a transformer's configuration using the `MELTANO_LOAD__DIALECT`
+[pipeline environment variable](/docs/integration.html#pipeline-environment-variables).
+It is used as the default value for `dbt`'s `target` setting, and should therefore correspond to a target name in `transform/profile/profiles.yml`.
+
+#### How to use
+
+##### In `meltano.yml`
+
+```yaml{4}
+loaders:
+- name: target-example-db
+  pip_url: target-example-db
+  dialect: example-db
+```
+
+##### On the command line
+
+```bash
+meltano config <loader> set _dialect <dialect>
+
+export <LOADER>__DIALECT=<dialect>
+
+# For example:
+meltano config target-example-db set _dialect example-db
+
+export TARGET_EXAMPLE_DB__DIALECT=example-db
+```
+
 ## Transforms
 
 Transforms are [dbt packages](https://docs.getdbt.com/docs/building-a-dbt-project/package-management) containing [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models),

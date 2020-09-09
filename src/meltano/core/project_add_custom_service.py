@@ -26,8 +26,8 @@ class ProjectAddCustomService(ProjectAddService):
             click.echo("- preferred database schema (`preferred_schema` extra),")
             click.echo("  for use by loaders that support a target schema")
         elif plugin_type == PluginType.LOADERS:
-            click.echo("- default value for the `target` setting when used")
-            click.echo("  with transformer 'dbt'")
+            click.echo("- target database dialect (`dialect` extra),")
+            click.echo("  for use by transformers that connect with the database")
         click.echo()
 
         if plugin_type == PluginType.LOADERS:

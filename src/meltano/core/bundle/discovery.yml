@@ -853,6 +853,7 @@ loaders:
     docs: 'https://meltano.com/plugins/loaders/postgres.html'
     repo: https://github.com/meltano/target-postgres
     pip_url: 'git+https://github.com/meltano/target-postgres.git'
+    dialect: postgres
     settings_group_validation:
       - ['url', 'schema']
       - ['user', 'password', 'host', 'port', 'dbname', 'schema']
@@ -892,6 +893,7 @@ loaders:
     repo: https://gitlab.com/meltano/target-snowflake
     pip_url: 'git+https://gitlab.com/meltano/target-snowflake.git'
     signup_url: 'https://trial.snowflake.com?referrer=meltano'
+    dialect: snowflake
     settings:
       - name: account
         env: SF_ACCOUNT
@@ -923,6 +925,7 @@ loaders:
     docs: 'https://meltano.com/plugins/loaders/sqlite.html'
     repo: https://gitlab.com/meltano/target-sqlite
     pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
+    dialect: sqlite
     settings:
       - name: database
         label: Database Name
@@ -943,7 +946,7 @@ transformers:
       value: $MELTANO_PROJECT_ROOT/transform/profile
     - name: target
       env: DBT_TARGET
-      value: $MELTANO_LOADER_NAMESPACE
+      value: $MELTANO_LOAD__DIALECT
     - name: source_schema
       env: DBT_SOURCE_SCHEMA
       value: $MELTANO_LOAD_SCHEMA

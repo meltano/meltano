@@ -89,7 +89,7 @@ Additionally, the following variables describing the [loader](/docs/plugins.html
 
 - `MELTANO_LOADER_NAME`: the loader's `name`, e.g. `target-postgres`
 - `MELTANO_LOADER_NAMESPACE`: the loader's `namespace`, e.g. `postgres`
-- `MELTANO_LOAD_<SETTING_NAME>`: one environment variable for each of the loader's settings, e.g. `MELTANO_LOAD_SCHEMA` for the `schema` setting
+- `MELTANO_LOAD_<SETTING_NAME>`: one environment variable for each of the loader's settings and [extras](/docs/configuration.html#plugin-extras), e.g. `MELTANO_LOAD_SCHEMA` for the `schema` setting, and `MELTANO_LOAD__DIALECT` for the [`dialect` extra](/docs/plugins.html#dialect-extra)
 - `<SETTING_ENV>`: all of the loader's regular configuration environment variables, as listed by `meltano config <plugin> list`, e.g. `PG_ADDRESS` for the `host` setting
 
 #### Transform variables
@@ -106,7 +106,8 @@ Inside your loader or transformer's `config` object in your [`meltano.yml` proje
 This feature is used to dynamically configure the `target-postgres` and `target-snowflake` loaders and `dbt` transformer as appropriate, independent of the specific extractor and loader used:
 - Default value for the `target-postgres` and `target-snowflake` `schema` settings:
   - [`$MELTANO_EXTRACT__PREFERRED_SCHEMA`](/docs/plugins.html#preferred-schema-extra), e.g. `tap_gitlab` for `tap-gitlab`
-- `dbt` default value for `target`: `$MELTANO_LOADER_NAMESPACE`, e.g. `postgres` or `snowflake`, which correspond to the target names in `transform/profile/profiles.yml`
+- Default value for `dbt`'s `target` setting:
+  - [`$MELTANO_LOAD__DIALECT`](/docs/plugins.html#dialect-extra), e.g. `postgres` for `target-postgres` and `snowflake` for `target-snowflake`, which correspond to the target names in `transform/profile/profiles.yml`
 - `dbt` default value for `source_schema`: `$MELTANO_LOAD_SCHEMA`, e.g. `tap_gitlab`
 - `dbt` default value for `models`: `$MELTANO_EXTRACTOR_NAMESPACE my_meltano_model`, e.g. `tap_gitlab my_meltano_model`
 
