@@ -26,13 +26,13 @@ ENABLED_DIALECTS = ["postgres", "sqlite"]
 class ConnectionNotFound(Exception):
     def __init__(self, connection_name: str):
         self.connection_name = connection_name
-        super().__init__("{connection_name} is missing.")
+        super().__init__(f"{connection_name} is missing.")
 
 
 class UnsupportedConnectionDialect(Exception):
     def __init__(self, connection_dialect: str):
         self.connection_dialect = connection_dialect
-        super().__init__("Dialect {connection_dialect} is not supported.")
+        super().__init__(f"Dialect {connection_dialect} is not supported.")
 
 
 class SqlHelper(SqlUtils):
