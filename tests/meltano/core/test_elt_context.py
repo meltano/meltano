@@ -34,6 +34,7 @@ class TestELTContext:
 
         # Extractor
         assert env["MELTANO_EXTRACT_TEST"] == env["TAP_MOCK_TEST"] == "mock"
+        assert env["MELTANO_EXTRACT__SELECT"] == env["TAP_MOCK__SELECT"] == '["*.*"]'
 
     def test_loader(self, elt_context, session, target_postgres):
         loader = elt_context.loader
@@ -49,6 +50,7 @@ class TestELTContext:
         assert env["MELTANO_EXTRACTOR_NAMESPACE"] == elt_context.extractor.namespace
 
         assert env["MELTANO_EXTRACT_TEST"] == env["TAP_MOCK_TEST"] == "mock"
+        assert env["MELTANO_EXTRACT__SELECT"] == env["TAP_MOCK__SELECT"] == '["*.*"]'
 
         # Loader
         assert (
@@ -76,6 +78,7 @@ class TestELTContext:
         assert env["MELTANO_EXTRACTOR_NAMESPACE"] == elt_context.extractor.namespace
 
         assert env["MELTANO_EXTRACT_TEST"] == env["TAP_MOCK_TEST"] == "mock"
+        assert env["MELTANO_EXTRACT__SELECT"] == env["TAP_MOCK__SELECT"] == '["*.*"]'
 
         # Loader
         assert env["MELTANO_LOADER_NAME"] == elt_context.loader.name

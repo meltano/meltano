@@ -186,7 +186,7 @@ class ELTContextBuilder:
                         "namespace": plugin.namespace,
                     }
                 },
-                **plugin.config_env(extras=False),
+                **plugin.config_env(),
             }
             env_vars = flatten(env_struct, "env_var")
 
