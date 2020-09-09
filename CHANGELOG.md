@@ -25,6 +25,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2279](https://gitlab.com/meltano/meltano/-/issues/2279) Fall back on setting values from `<PLUGIN_NAME>_<SETTING_NAME>` and `<PLUGIN_NAMESPACE>_<SETTING_NAME>` env vars if a custom `env` is defined but not used
 - [#2278](https://gitlab.com/meltano/meltano/-/issues/2278) Stop unnecessarily prepopulating `env` on a newly added custom plugin's settings definitions
+- [#2208](https://gitlab.com/meltano/meltano/-/issues/2208) Standardize on setting env vars prefixed with plugin name, not namespace or custom `env`
 
 ### Fixes
 

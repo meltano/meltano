@@ -134,22 +134,24 @@ settings:
   env_specific: true
 - name: oauth_service.google_adwords.client_id
   env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
+  env_aliases: [TAP_ADWORDS_OAUTH_CLIENT_ID]
   env_specific: true
 - name: oauth_service.google_adwords.client_secret
   kind: password
   env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
+  env_aliases: [TAP_ADWORDS_OAUTH_CLIENT_SECRET]
   env_specific: true
 
 # OAuth Single-Sign-On
 - name: oauth.gitlab.client_id
   env: OAUTH_GITLAB_CLIENT_ID
-  env_specific: true
   env_aliases: [OAUTH_GITLAB_APPLICATION_ID]
+  env_specific: true
 - name: oauth.gitlab.client_secret
   kind: password
   env: OAUTH_GITLAB_CLIENT_SECRET
-  env_aliases: [OAUTH_GITLAB_SECRET]
   env_specific: true
+  env_aliases: [OAUTH_GITLAB_SECRET]
 
 # Analytics Tracking IDs
 - name: tracking_ids.cli
