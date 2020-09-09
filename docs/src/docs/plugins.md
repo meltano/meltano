@@ -333,6 +333,53 @@ meltano config target-example-db set _dialect example-db
 export TARGET_EXAMPLE_DB__DIALECT=example-db
 ```
 
+### `target_schema` extra
+
+- Setting: `_target_schema`
+- Environment variable: `<LOADER>__TARGET_SCHEMA`, e.g. `TARGET_POSTGRES__TARGET_SCHEMA`
+- Default: `$MELTANO_LOAD_SCHEMA`, which will expand to the value of the loader's `schema` setting
+
+A loader's `target_schema` [extra](/docs/configuration.html#plugin-extras)
+holds the name of the database schema the loader has been configured to load data into (assuming the destination supports schemas), so that
+[transformers](#transformers) in the same pipeline and [Meltano UI](/docs/command-line-interface.html#ui)'s [Analysis feature](/docs/analysis.html)
+can determine the database schema to load data from.
+
+The value of this extra is usually not set explicitly, since its should correspond to the value of the loader's own "target schema" setting.
+If the name of this setting is not `schema`, its value can be referenced from the extra's value using `$MELTANO_LOAD_<TARGET_SCHEMA_SETTING>`, e.g. `$MELTANO_LOAD_DESTINATION_SCHEMA` for setting `destination_schema`.
+
+The value of this extra can be referenced from a transformer's configuration using the `MELTANO_LOAD__TARGET_SCHEMA`
+[pipeline environment variable](/docs/integration.html#pipeline-environment-variables).
+It is used as the default value for `dbt`'s `source_schema` setting.
+
+#### How to use
+
+##### In `meltano.yml`
+
+```yaml{6}
+loaders:
+- name: target-example-db
+  pip_url: target-example-db
+  settings:
+  - name: destination_schema
+  target_schema: $MELTANO_LOAD_DESTINATION_SCHEMA # Value of `destination_schema` setting
+```
+
+##### On the command line
+
+```bash
+meltano config <loader> set _target_schema <schema>
+
+export <LOADER>__TARGET_SCHEMA=<schema>
+
+# For example:
+meltano config target-example-db set _target_schema '$MELTANO_LOAD_DESTINATION_SCHEMA'
+
+# If the target schema cannot be determined dynamically using a setting reference:
+meltano config target-example-db set _target_schema explicit_target_schema
+
+export TARGET_EXAMPLE_DB__TARGET_SCHEMA=explicit_target_schema
+```
+
 ## Transforms
 
 Transforms are [dbt packages](https://docs.getdbt.com/docs/building-a-dbt-project/package-management) containing [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models),

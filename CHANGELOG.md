@@ -18,7 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2350](https://gitlab.com/meltano/meltano/-/issues/2350) Add `MELTANO_TRANSFORM_*` transform pipeline env vars for transformer (configuration) to access
 - [#2282](https://gitlab.com/meltano/meltano/-/issues/2282) Add new extractor extra `preferred_schema` and use it as default loader `schema` instead of namespace
 - [#2284](https://gitlab.com/meltano/meltano/-/issues/2284) Add new loader extra `dialect` and use it as default dbt `target` and Meltano UI SQL dialect instead of namespace
-- [#2284](https://gitlab.com/meltano/meltano/-/issues/2284) Add new loader extra `dialect` and use it as default dbt `target` and Meltano UI SQL dialect instead of namespace
+- [#2283](https://gitlab.com/meltano/meltano/-/issues/2283) Add new loader extra `target_schema` and use it as default dbt `source_schema` instead of loader `schema`
 
 ### Changes
 

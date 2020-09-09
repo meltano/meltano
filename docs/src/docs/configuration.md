@@ -81,6 +81,7 @@ Meltano currently knows these extras for these plugin types:
   - [`select_filter`](/docs/plugins.html#select-filter-extra)
 - [Loaders](/docs/plugins.html#loaders)
   - [`dialect`](/docs/plugins.html#dialect-extra)
+  - [`target_schema`](/docs/plugins.html#target-schema-extra)
 - [Transforms](/docs/plugins.html#transforms)
   - [`vars`](/docs/plugins.html#vars-extra)
 - [File bundles](/docs/plugins.html#file-bundles)

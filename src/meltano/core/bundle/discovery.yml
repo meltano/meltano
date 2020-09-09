@@ -854,6 +854,7 @@ loaders:
     repo: https://github.com/meltano/target-postgres
     pip_url: 'git+https://github.com/meltano/target-postgres.git'
     dialect: postgres
+    target_schema: $TARGET_POSTGRES_SCHEMA
     settings_group_validation:
       - ['url', 'schema']
       - ['user', 'password', 'host', 'port', 'dbname', 'schema']
@@ -894,6 +895,7 @@ loaders:
     pip_url: 'git+https://gitlab.com/meltano/target-snowflake.git'
     signup_url: 'https://trial.snowflake.com?referrer=meltano'
     dialect: snowflake
+    target_schema: $TARGET_SNOWFLAKE_SCHEMA
     settings:
       - name: account
         env: SF_ACCOUNT
@@ -949,7 +951,7 @@ transformers:
       value: $MELTANO_LOAD__DIALECT
     - name: source_schema
       env: DBT_SOURCE_SCHEMA
-      value: $MELTANO_LOAD_SCHEMA
+      value: $MELTANO_LOAD__TARGET_SCHEMA
     - name: target_schema
       env: DBT_TARGET_SCHEMA
       value: analytics

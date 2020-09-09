@@ -108,7 +108,8 @@ This feature is used to dynamically configure the `target-postgres` and `target-
   - [`$MELTANO_EXTRACT__PREFERRED_SCHEMA`](/docs/plugins.html#preferred-schema-extra), e.g. `tap_gitlab` for `tap-gitlab`
 - Default value for `dbt`'s `target` setting:
   - [`$MELTANO_LOAD__DIALECT`](/docs/plugins.html#dialect-extra), e.g. `postgres` for `target-postgres` and `snowflake` for `target-snowflake`, which correspond to the target names in `transform/profile/profiles.yml`
-- `dbt` default value for `source_schema`: `$MELTANO_LOAD_SCHEMA`, e.g. `tap_gitlab`
+- Default value for `dbt`'s `source_schema` setting:
+  - [`$MELTANO_LOAD__TARGET_SCHEMA`](/docs/plugins.html#target-schema-extra), the value of the `schema` setting for `target-postgres` and `target-snowflake`
 - `dbt` default value for `models`: `$MELTANO_EXTRACTOR_NAMESPACE my_meltano_model`, e.g. `tap_gitlab my_meltano_model`
 
 ## Selecting entities and attributes for extraction
