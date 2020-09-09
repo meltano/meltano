@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2279](https://gitlab.com/meltano/meltano/-/issues/2279) Populate primary setting env var and aliases when invoking plugin or expanding env vars
 - [#2349](https://gitlab.com/meltano/meltano/-/issues/2349) Allow plugin setting (default) values to reference pipeline plugin extras using generic env vars, e.g. `MELTANO_EXTRACT__<EXTRA>`
+- [#2281](https://gitlab.com/meltano/meltano/-/issues/2281) Allow plugin extra (default) values to reference plugin name, namespace, profile using generic env vars, e.g. `MELTANO_EXTRACTOR_NAMESPACE`
 
 ### Changes
 

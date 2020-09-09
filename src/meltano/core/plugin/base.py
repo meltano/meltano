@@ -10,7 +10,7 @@ from meltano.core.setting_definition import SettingDefinition
 from meltano.core.behavior.hookable import HookObject
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior import NameEq
-from meltano.core.utils import compact, find_named, NotFound
+from meltano.core.utils import compact, find_named, NotFound, flatten
 
 
 class YAMLEnum(str, Enum):
@@ -113,6 +113,15 @@ class PluginRef:
         parts = (self.type, self.name, self.current_profile_name)
 
         return ".".join(compact(parts))
+
+    @property
+    def info(self):
+        return {"name": self.name, "profile": self.current_profile_name}
+
+    @property
+    def info_env(self):
+        # MELTANO_EXTRACTOR_...
+        return flatten({"meltano": {self.type.singular: self.info}}, "env_var")
 
     def __eq__(self, other):
         return self.name == other.name and self.type == other.type
@@ -279,6 +288,10 @@ class Plugin(Canonical, PluginRef):
             settings=list(map(SettingDefinition.parse, settings)),
             extras=extras,
         )
+
+    @property
+    def info(self):
+        return {**super().info, "namespace": self.namespace}
 
     def as_installed(self, custom=False) -> PluginInstall:
         extras = {}

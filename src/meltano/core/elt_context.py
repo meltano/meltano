@@ -8,7 +8,6 @@ from meltano.core.plugin import Plugin, PluginType, PluginRef
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin_invoker import invoker_factory
-from meltano.core.utils import flatten
 
 
 class PluginContext(
@@ -34,6 +33,14 @@ class PluginContext(
 
     def config_env(self, **kwargs):
         return self.settings_service.as_env(session=self.session, **kwargs)
+
+    @property
+    def env(self):
+        return {
+            **self.definition.info_env,
+            **self.install.info_env,
+            **self.config_env(),
+        }
 
 
 class ELTContext:
@@ -178,20 +185,6 @@ class ELTContextBuilder:
         )
 
     def context(self, session) -> ELTContext:
-        def env_for_plugin(plugin):
-            env_struct = {
-                "meltano": {
-                    plugin.type.singular: {  # MELTANO_EXTRACTOR_...
-                        "name": plugin.name,
-                        "namespace": plugin.namespace,
-                    }
-                },
-                **plugin.config_env(),
-            }
-            env_vars = flatten(env_struct, "env_var")
-
-            return {k: str(v) for k, v in env_vars.items() if v is not None}
-
         env = {}
 
         extractor = None
@@ -202,13 +195,13 @@ class ELTContextBuilder:
 
             extractor = self.plugin_context(session, self._extractor, config=config)
 
-            env.update(env_for_plugin(extractor))
+            env.update(extractor.env)
 
         loader = None
         if self._loader:
             loader = self.plugin_context(session, self._loader, env=env.copy())
 
-            env.update(env_for_plugin(loader))
+            env.update(loader.env)
 
         transformer = None
         if self._transformer:
