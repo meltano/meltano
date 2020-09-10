@@ -129,13 +129,13 @@ class SettingDefinition(NameEq, Canonical):
     def is_redacted(self):
         return self.kind in ("password", "oauth")
 
-    def env_vars(self, namespaces: [str]):
+    def env_vars(self, prefixes: [str]):
         env_keys = []
 
         if self.env:
             env_keys.append(self.env)
 
-        env_keys.extend(to_env_var(namespace, self.name) for namespace in namespaces)
+        env_keys.extend(to_env_var(prefix, self.name) for prefix in prefixes)
 
         env_keys.extend(alias for alias in self.env_aliases)
 

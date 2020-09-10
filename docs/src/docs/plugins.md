@@ -32,7 +32,7 @@ To learn which extractors are [known to Meltano](/docs/contributor-guide.html#kn
 ### `metadata` extra
 
 - Setting: `_metadata`, alias: `metadata`
-- Environment variable: `<NAMESPACE>__METADATA`
+- Environment variable: `<EXTRACTOR>__METADATA`, e.g. `TAP_GITLAB__METADATA`
 - Default: `{}` (an empty object)
 
 An extractor's `metadata` [extra](/docs/configuration.html#plugin-extras) holds an object describing
@@ -72,11 +72,11 @@ extractors:
 meltano config <plugin> set _metadata <entity> <key> <value>
 meltano config <plugin> set _metadata <entity> <attribute> <key> <value>
 
-export <NAMESPACE>__METADATA='{"<entity>": {"<key>": "<value>", "<attribute>": {"<key>": "<value>"}}}'
+export <EXTRACTOR>__METADATA='{"<entity>": {"<key>": "<value>", "<attribute>": {"<key>": "<value>"}}}'
 
 # Once metadata has been set in `meltano.yml`, environment variables can be used
 # to override specific nested properties:
-export <NAMESPACE>__METADATA_<ENTITY>_<ATTRIBUTE>_<KEY>=<value>
+export <EXTRACTOR>__METADATA_<ENTITY>_<ATTRIBUTE>_<KEY>=<value>
 
 # For example:
 meltano config tap-postgres set _metadata some_table replication-method INCREMENTAL
@@ -89,7 +89,7 @@ export TAP_POSTGRES__METADATA_SOME_TABLE_REPLICATION_METHOD=FULL_TABLE
 ### `schema` extra
 
 - Setting: `_schema`
-- Environment variable: `<NAMESPACE>__SCHEMA`
+- Environment variable: `<EXTRACTOR>__SCHEMA`, e.g. `TAP_GITLAB__SCHEMA`
 - Default: `{}` (an empty object)
 
 An extractor's `schema` [extra](/docs/configuration.html#plugin-extras) holds an object describing
@@ -128,11 +128,11 @@ extractors:
 meltano config <plugin> set _schema <entity> <attribute> <schema description>
 meltano config <plugin> set _schema <entity> <attribute> <key> <value>
 
-export <NAMESPACE>__SCHEMA='{"<entity>": {"<attribute>": {"<key>": "<value>"}}}'
+export <EXTRACTOR>__SCHEMA='{"<entity>": {"<attribute>": {"<key>": "<value>"}}}'
 
 # Once schema descriptions have been set in `meltano.yml`, environment variables can be used
 # to override specific nested properties:
-export <NAMESPACE>__SCHEMA_<ENTITY>_<ATTRIBUTE>_<KEY>=<value>
+export <EXTRACTOR>__SCHEMA_<ENTITY>_<ATTRIBUTE>_<KEY>=<value>
 
 # For example:
 meltano config tap-postgres set _metadata some_table created_at type '["string", "null"]'
@@ -144,7 +144,7 @@ export TAP_POSTGRES__SCHEMA_SOME_TABLE_CREATED_AT_FORMAT=date
 ### `select` extra
 
 - Setting: `_select`
-- Environment variable: `<NAMESPACE>__SELECT`
+- Environment variable: `<EXTRACTOR>__SELECT`, e.g. `TAP_GITLAB__SELECT`
 - Default: `["*.*"]`
 
 An extractor's `select` [extra](/docs/configuration.html#plugin-extras) holds an array of [entity selection rules](/docs/command-line-interface.html#select)
@@ -176,7 +176,7 @@ extractors:
 ```bash
 meltano config <plugin> set _select '["<entity>.<attribute>", ...]'
 
-export <NAMESPACE>__SELECT='["<entity>.<attribute>", ...]'
+export <EXTRACTOR>__SELECT='["<entity>.<attribute>", ...]'
 
 meltano select <plugin> <entity> <attribute>
 
@@ -192,7 +192,7 @@ meltano select tap-gitlab commits "*"
 ### `select_filter` extra
 
 - Setting: `_select_filter`
-- Environment variable: `<NAMESPACE>__SELECT_FILTER`
+- Environment variable: `<EXTRACTOR>__SELECT_FILTER`, e.g. `TAP_GITLAB__SELECT_FILTER`
 - Default: `[]`
 
 An extractor's `select_filter` [extra](/docs/configuration.html#plugin-extras) holds an array of [entity selection](#select-extra) filter rules
@@ -230,8 +230,8 @@ extractors:
 meltano config <plugin> set _select_filter '["<entity>", ...]'
 meltano config <plugin> set _select_filter '["!<entity>", ...]'
 
-export <NAMESPACE>__SELECT_FILTER='["<entity>", ...]'
-export <NAMESPACE>__SELECT_FILTER='["!<entity>", ...]'
+export <EXTRACTOR>__SELECT_FILTER='["<entity>", ...]'
+export <EXTRACTOR>__SELECT_FILTER='["!<entity>", ...]'
 
 meltano elt <extractor> <loader> --select <entity>
 meltano elt <extractor> <loader> --exclude <entity>
@@ -270,7 +270,7 @@ will be added to your project's `transform/packages.yml` and the package will be
 ### `vars` extra
 
 - Setting: `_vars`
-- Environment variable: `<NAMESPACE>__VARS`
+- Environment variable: `<TRANSFORM>__VARS`, e.g. `TAP_GITLAB__VARS`
 - Default: `{}` (an empty object)
 
 A transform's `vars` [extra](/docs/configuration.html#plugin-extras) holds an object representing [dbt model variables](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/using-variables)
@@ -297,7 +297,7 @@ transforms:
 ```bash
 meltano config <plugin> set _vars <key> <value>
 
-export <NAMESPACE>__VARS='{"<key>": "<value>"}'
+export <TRANSFORM>__VARS='{"<key>": "<value>"}'
 
 # For example
 meltano config --plugin-type=transform tap-gitlab set _vars schema "{{ env_var('DBT_SOURCE_SCHEMA') }}"
@@ -349,7 +349,7 @@ The file bundle itself will not be added to your [`meltano.yml` project file](/d
 ### `update` extra
 
 - Setting: `_update`
-- Environment variable: `<NAMESPACE>__UPDATE`
+- Environment variable: `<BUNDLE>__UPDATE`, e.g. `DBT__UPDATE`
 - Default: `{}` (an empty object)
 
 A file bundle's `update` [extra](/docs/configuration.html#plugin-extras) holds an object mapping file paths (of files inside the bundle, relative to the project root) to booleans.
@@ -373,7 +373,7 @@ files:
 ```bash
 meltano config <plugin> set _update <path> <true/false>
 
-export <NAMESPACE>__UPDATE='{"<path>": <true/false>}'
+export <BUNDLE>__UPDATE='{"<path>": <true/false>}'
 
 # For example:
 meltano config --plugin-type=files dbt set _update transform/dbt_project.yml false

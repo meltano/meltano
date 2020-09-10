@@ -22,7 +22,8 @@ Meltano itself can be configured as well. To learn more, refer to the [Settings 
 
 To determine the values of settings, Meltano will look in 4 places, with each taking precedence over the next:
 
-1. **Environment variables**, set through [your shell at `meltano elt` runtime](/docs/integration.html#pipeline-specific-configuration), your project's [`.env` file](/docs/project.html#env), a [scheduled pipeline's `env` dictionary](/docs/project.html#schedules), or any other method. You can use `meltano config <plugin> list` to list the available variable names.
+1. **Environment variables**, set through [your shell at `meltano elt` runtime](/docs/integration.html#pipeline-specific-configuration), your project's [`.env` file](/docs/project.html#env), a [scheduled pipeline's `env` dictionary](/docs/project.html#schedules), or any other method.
+   - You can use `meltano config <plugin> list` to list the available variable names, which typically have the format `<PLUGIN_NAME>_<SETTING_NAME>`.
 2. **your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file)**, under the plugin's `config` key.
    - Inside values, [environment variables](/docs/integration.html#pipeline-environment-variables) can be referenced as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.

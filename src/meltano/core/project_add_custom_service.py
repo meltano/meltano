@@ -21,7 +21,6 @@ class ProjectAddCustomService(ProjectAddService):
         click.echo(
             f"Specify the plugin's {click.style('namespace', fg='blue')}, which will serve as the:"
         )
-        click.echo("- prefix for configuration environment variables")
         click.echo("- identifier to find related/compatible plugins")
         if plugin_type == PluginType.EXTRACTORS:
             click.echo("- default value for the `schema` setting when used")

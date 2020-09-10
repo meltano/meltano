@@ -316,6 +316,49 @@ class TestPluginSettingsService:
         for k, v in custom_tap.config.items():
             assert config.get(env_var(subject, k)) == v
 
+    def test_namespace_as_env_prefix(
+        self, project, session, target, env_var, plugin_settings_service_factory
+    ):
+        subject = plugin_settings_service_factory(target)
+
+        def assert_env_value(value, env_var):
+            value, metadata = subject.get_with_metadata("schema")
+            assert value == value
+            assert metadata["env_var"] == env_var
+
+        assert subject.get("schema") is None
+
+        subject.set("schema", "default", store=SettingValueStore.DOTENV)
+        value, metadata = subject.get_with_metadata("schema")
+
+        # Custom `env` is the default
+        assert_env_value("default", "MOCKED_SCHEMA")
+
+        subject.unset("schema")
+
+        # Namespace prefix
+        dotenv.set_key(project.dotenv, "MOCK_SCHEMA", "namespace_prefix")
+        assert_env_value("namespace_prefix", "MOCK_SCHEMA")
+
+        # Name prefix
+        dotenv.set_key(project.dotenv, "TARGET_MOCK_SCHEMA", "name_prefix")
+        assert_env_value("name_prefix", "TARGET_MOCK_SCHEMA")
+
+        # Custom `env`
+        dotenv.set_key(project.dotenv, "MOCKED_SCHEMA", "custom_env")
+        assert_env_value("custom_env", "MOCKED_SCHEMA")
+
+        config = subject.as_env(session=session)
+        subject.reset(store=SettingValueStore.DOTENV)
+
+        assert (
+            config["MOCKED_SCHEMA"]  # Custom `env`
+            == config["TARGET_MOCK_SCHEMA"]  # Name prefix
+            == config["MOCK_SCHEMA"]  # Namespace prefix
+            == config["MELTANO_LOAD_SCHEMA"]  # Generic prefix, read-only
+            == "custom_env"
+        )
+
     def test_store_db(self, session, subject, tap):
         store = SettingValueStore.DB
 

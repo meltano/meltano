@@ -62,7 +62,12 @@ def discovery():
     )
 
     discovery[PluginType.LOADERS].append(
-        {"name": "target-mock", "namespace": "target_mock", "pip_url": "target-mock"}
+        {
+            "name": "target-mock",
+            "namespace": "mock",
+            "pip_url": "target-mock",
+            "settings": [{"name": "schema", "env": "MOCKED_SCHEMA"}],
+        }
     )
 
     discovery[PluginType.TRANSFORMS].append(

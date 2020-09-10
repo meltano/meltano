@@ -79,11 +79,11 @@ class PluginSettingsService(SettingsService):
         return self.plugin_def.docs
 
     @property
-    def _env_namespace(self):
-        return self.plugin_def.namespace
+    def _env_prefixes(self):
+        return [self.plugin.name, self.plugin_def.namespace]
 
     @property
-    def _generic_env_namespace(self):
+    def _generic_env_prefix(self):
         return f"meltano_{self.plugin.type.verb}"
 
     @property
