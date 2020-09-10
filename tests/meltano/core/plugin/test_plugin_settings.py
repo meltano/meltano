@@ -431,6 +431,7 @@ class TestPluginSettingsService:
             "foo": "${FOO}",
             "missing": "$MISSING",
             "multiple": "$A ${B} $C",
+            "info": "$MELTANO_EXTRACTOR_NAME",
         }
         with mock.patch.object(subject.plugin, "config", config):
             config = subject.as_dict(session=session)
@@ -439,6 +440,7 @@ class TestPluginSettingsService:
         assert config["foo"] == "42"
         assert config["missing"] == None
         assert config["multiple"] == "rock paper scissors"
+        assert config["info"] == "tap-mock"
 
     def test_nested_keys(self, session, subject, project, tap):
         def set_config(path, value):
