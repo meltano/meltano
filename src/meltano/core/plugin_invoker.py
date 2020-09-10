@@ -113,9 +113,7 @@ class PluginInvoker:
         self.plugin_config_extras = self.settings_service.as_dict(
             extras=True, session=session
         )
-        self.plugin_config_env = self.settings_service.as_env(
-            extras=False, session=session
-        )
+        self.plugin_config_env = self.settings_service.as_env(session=session)
 
         with self.plugin.trigger_hooks("configure", self, session):
             self.config_service.configure()

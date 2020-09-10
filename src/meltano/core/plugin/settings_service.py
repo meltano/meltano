@@ -81,6 +81,10 @@ class PluginSettingsService(SettingsService):
         return self.plugin_def.namespace
 
     @property
+    def _generic_env_namespace(self):
+        return f"meltano_{self.plugin.type.verb}"
+
+    @property
     def _db_namespace(self):
         return self.plugin.qualified_name
 

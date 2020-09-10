@@ -302,6 +302,12 @@ class TestPluginSettingsService:
         # Negated aliases are not
         assert "TAP_MOCK_DISABLED" not in config
 
+        # Generic env vars are present
+        assert config["MELTANO_EXTRACT_TEST"] == "mock"
+        assert config["MELTANO_EXTRACT_LIST"] == '[1, 2, 3, "4"]'
+        assert config["MELTANO_EXTRACT_OBJECT"] == '{"1": {"2": 3}}'
+        assert config["MELTANO_EXTRACT_BOOLEAN"] == "true"
+
     def test_as_env_custom(
         self, project, session, custom_tap, env_var, plugin_settings_service_factory
     ):
