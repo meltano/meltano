@@ -71,22 +71,35 @@ BashOperator(
 
 ### Pipeline environment variables
 
-To allow loaders and transformers to adapt their configuration and behavior based on the extractor and loader they are run with,
+To allow [loaders](/docs/plugins.html#loaders) and [transformers](/docs/plugins.html#transformers) to adapt their configuration and behavior based on the extractor and loader they are run with,
 [`meltano elt`](/docs/command-line-interface.html#elt) dynamically sets a number of pipeline-specific environment variables before compiling their configuration and invoking their executables.
 
-In addition to variables [set through the environment](#pipeline-specific-configuration) or your project's [`.env` file](/docs/project.html#env), the following variables describing the extractor are available to loaders _and_ transformers:
+#### Extractor variables
+
+In addition to variables [set through the environment](#pipeline-specific-configuration) or your project's [`.env` file](/docs/project.html#env), the following variables describing the [extractor](/docs/plugins.html#extractors) are available to loaders _and_ transformers:
 
 - `MELTANO_EXTRACTOR_NAME`: the extractor's `name`, e.g. `tap-gitlab`
 - `MELTANO_EXTRACTOR_NAMESPACE`: the extractor's `namespace`, e.g. `tap_gitlab`
 - `MELTANO_EXTRACT_<SETTING_NAME>`: one environment variable for each of the extractor's settings, e.g. `MELTANO_EXTRACT_PRIVATE_TOKEN` for the `private_token` setting
 - `<SETTING_ENV>`: all of the extractor's regular configuration environment variables, as listed by `meltano config <plugin> list`, e.g. `TAP_GITLAB_API_URL` for the `api_url` setting
 
-Additionally, the following variables describing the loader are available to transformers:
+#### Loader variables
+
+Additionally, the following variables describing the [loader](/docs/plugins.html#loaders) are available to transformers:
 
 - `MELTANO_LOADER_NAME`: the loader's `name`, e.g. `target-postgres`
 - `MELTANO_LOADER_NAMESPACE`: the loader's `namespace`, e.g. `postgres`
 - `MELTANO_LOAD_<SETTING_NAME>`: one environment variable for each of the loader's settings, e.g. `MELTANO_LOAD_SCHEMA` for the `schema` setting
 - `<SETTING_ENV>`: all of the loader's regular configuration environment variables, as listed by `meltano config <plugin> list`, e.g. `PG_ADDRESS` for the `host` setting
+
+#### Transform variables
+
+Additionally, the following variables describing the [transform](/docs/plugins.html#transforms) are available to transformers:
+
+- `MELTANO_TRANSFORM_NAME`: the loader's `name`, e.g. `tap-gitlab`
+- `MELTANO_TRANSFORM_NAMESPACE`: the loader's `namespace`, e.g. `tap_gitlab`
+
+#### How to use
 
 Inside your loader or transformer's `config` object in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), you can reference these (and other) environment variables as `$VAR` (as a single word) or `${VAR}` (inside a word). Inside your plugin, you can reference these through `os.environ` (if using Python) as usual.
 

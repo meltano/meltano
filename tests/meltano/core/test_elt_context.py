@@ -31,6 +31,12 @@ def assert_loader_env(loader, env):
     )
 
 
+def assert_transform_env(transform, env):
+    assert env["MELTANO_TRANSFORM_NAME"] == transform.name
+    assert env["MELTANO_TRANSFORM_NAMESPACE"] == transform.namespace
+    assert env["MELTANO_TRANSFORM_PROFILE"] == "default"
+
+
 def assert_transformer_env(transformer, env):
     assert env["MELTANO_TRANSFORMER_NAME"] == transformer.name
     assert env["MELTANO_TRANSFORMER_NAMESPACE"] == transformer.namespace
@@ -64,11 +70,26 @@ class TestELTContext:
             return err.plugin
 
     @pytest.fixture
-    def elt_context(self, elt_context_builder, session, tap, target_postgres, dbt):
+    def tap_mock_transform(self, project_add_service):
+        try:
+            return project_add_service.add(PluginType.TRANSFORMS, "tap-mock-transform")
+        except PluginAlreadyAddedException as err:
+            return err.plugin
+
+    @pytest.fixture
+    def elt_context(
+        self,
+        elt_context_builder,
+        session,
+        tap,
+        target_postgres,
+        tap_mock_transform,
+        dbt,
+    ):
         return (
             elt_context_builder.with_extractor(tap.name)
             .with_loader(target_postgres.name)
-            .with_transform("run")
+            .with_transform(tap_mock_transform.name)
             .with_select_filter(["entity", "!other_entity"])
             .context(session)
         )
@@ -96,10 +117,16 @@ class TestELTContext:
         assert_extractor_env(elt_context.extractor, env)
         assert_loader_env(loader, env)
 
-    def test_transformer(self, elt_context, session, dbt):
+    def test_transformer(
+        self, elt_context, session, target_postgres, tap_mock_transform, dbt
+    ):
         transformer = elt_context.transformer
         assert transformer.type == PluginType.TRANSFORMERS
         assert transformer.name == dbt.name
+
+        transform = elt_context.transform
+        assert transform.type == PluginType.TRANSFORMS
+        assert transform.name == tap_mock_transform.name
 
         invoker = elt_context.transformer_invoker()
         with invoker.prepared(session):
@@ -107,6 +134,8 @@ class TestELTContext:
 
         assert_extractor_env(elt_context.extractor, env)
         assert_loader_env(elt_context.loader, env)
+
+        assert_transform_env(transform, env)
         assert_transformer_env(transformer, env)
 
     def test_select_filter(self, elt_context, session):
