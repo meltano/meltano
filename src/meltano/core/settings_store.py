@@ -77,7 +77,7 @@ class SettingsStoreManager(ABC):
         self.expandible_env = {**self.project.dotenv_env, **self.settings_service.env}
 
     @abstractmethod
-    def get(self, name: str, setting_def=None):
+    def get(self, name: str, setting_def=None, expandible_env={}):
         pass
 
     def set(self, name: str, path: List[str], value, setting_def=None):
@@ -93,8 +93,8 @@ class SettingsStoreManager(ABC):
         if method != "get" and not self.writable:
             raise StoreNotSupportedError
 
-    def expand_env_vars(self, value):
-        expanded_value = expand_env_vars(value, env=self.expandible_env)
+    def expand_env_vars(self, value, env={}):
+        expanded_value = expand_env_vars(value, env={**self.expandible_env, **env})
         if expanded_value == value:
             return value, {}
 
@@ -107,7 +107,7 @@ class SettingsStoreManager(ABC):
 class ConfigOverrideStoreManager(SettingsStoreManager):
     label = "a command line flag"
 
-    def get(self, name: str, setting_def=None):
+    def get(self, name: str, setting_def=None, expandible_env={}):
         try:
             value = self.settings_service.config_override[name]
             self.log(f"Read key '{name}' from config override: {value!r}")
@@ -122,7 +122,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
     def env(self):
         pass
 
-    def get(self, name: str, setting_def=None):
+    def get(self, name: str, setting_def=None, expandible_env={}):
         if not setting_def:
             raise StoreNotSupportedError
 
@@ -253,7 +253,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         if method != "get" and self.project.readonly:
             raise StoreNotSupportedError(ProjectReadonly())
 
-    def get(self, name: str, setting_def=None):
+    def get(self, name: str, setting_def=None, expandible_env={}):
         keys = [name]
         if setting_def:
             keys = [setting_def.name, *setting_def.aliases]
@@ -263,7 +263,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         for key in keys:
             try:
                 value = flat_config[key]
-                value, metadata = self.expand_env_vars(value)
+                value, metadata = self.expand_env_vars(value, env=expandible_env)
 
                 self.log(f"Read key '{key}' from `meltano.yml`: {value!r}")
                 return value, {"key": key, **metadata}
@@ -370,7 +370,7 @@ class DbStoreManager(SettingsStoreManager):
         if not self.session:
             raise StoreNotSupportedError("No database session provided")
 
-    def get(self, name: str, setting_def=None):
+    def get(self, name: str, setting_def=None, expandible_env={}):
         try:
             if self.bulk:
                 value = self.all_settings[name]
@@ -438,12 +438,12 @@ class DbStoreManager(SettingsStoreManager):
 class DefaultStoreManager(SettingsStoreManager):
     label = "the default"
 
-    def get(self, name: str, setting_def=None):
+    def get(self, name: str, setting_def=None, expandible_env={}):
         if not setting_def:
             raise StoreNotSupportedError("Setting is missing")
 
         value = setting_def.value
-        value, metadata = self.expand_env_vars(value)
+        value, metadata = self.expand_env_vars(value, env=expandible_env)
 
         self.log(f"Read key '{name}' from default: {value!r}")
         return value, metadata
@@ -514,7 +514,7 @@ class AutoStoreManager(SettingsStoreManager):
 
         return None
 
-    def get(self, name: str, setting_def=None):
+    def get(self, name: str, setting_def=None, **kwargs):
         setting_def = setting_def or self.find_setting(name)
 
         metadata = {}
@@ -523,7 +523,7 @@ class AutoStoreManager(SettingsStoreManager):
         for source in self.sources:
             try:
                 manager = self.manager_for(source)
-                value, metadata = manager.get(name, setting_def=setting_def)
+                value, metadata = manager.get(name, setting_def=setting_def, **kwargs)
             except StoreNotSupportedError:
                 continue
 
