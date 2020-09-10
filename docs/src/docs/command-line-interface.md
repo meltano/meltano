@@ -67,7 +67,6 @@ how to interact with it, and how it can be expected to behave: (Note that more c
 ```bash
 $ meltano add --custom extractor tap-covid-19
 # Specify namespace, which will serve as the:
-# - prefix for configuration environment variables
 # - identifier to find related/compatible plugins
 # - default value for the `schema` setting when used
 #   with loader target-postgres or target-snowflake

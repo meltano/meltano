@@ -52,11 +52,11 @@ class SettingsService(ABC):
 
     @property
     @abstractmethod
-    def _env_namespace(self) -> str:
+    def _env_prefixes(self) -> [str]:
         pass
 
     @property
-    def _generic_env_namespace(self) -> str:
+    def _generic_env_prefix(self) -> str:
         return None
 
     @property
@@ -351,11 +351,11 @@ class SettingsService(ABC):
             raise SettingMissingError(name) from err
 
     def setting_env_vars(self, setting_def, include_generic=False):
-        namespaces = [self._env_namespace]
-        if include_generic and self._generic_env_namespace:
-            namespaces.append(self._generic_env_namespace)
+        prefixes = self._env_prefixes.copy()
+        if include_generic and self._generic_env_prefix:
+            prefixes.append(self._generic_env_prefix)
 
-        return setting_def.env_vars(namespaces)
+        return setting_def.env_vars(prefixes)
 
     def setting_env(self, setting_def):
         return self.setting_env_vars(setting_def)[0].key

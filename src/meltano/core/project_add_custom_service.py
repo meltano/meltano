@@ -8,7 +8,6 @@ import re
 from .project import Project
 from .plugin import PluginType
 from .project_add_service import ProjectAddService
-from .utils import to_env_var
 
 
 class ProjectAddCustomService(ProjectAddService):
@@ -22,7 +21,6 @@ class ProjectAddCustomService(ProjectAddService):
         click.echo(
             f"Specify the plugin's {click.style('namespace', fg='blue')}, which will serve as the:"
         )
-        click.echo("- prefix for configuration environment variables")
         click.echo("- identifier to find related/compatible plugins")
         if plugin_type == PluginType.EXTRACTORS:
             click.echo("- default value for the `schema` setting when used")
@@ -139,8 +137,5 @@ class ProjectAddCustomService(ProjectAddService):
             pip_url=pip_url,
             executable=executable,
             capabilities=capabilities,
-            settings=[
-                {"name": name, "env": to_env_var(plugin_name, name)}
-                for name in settings
-            ],
+            settings=[{"name": name} for name in settings],
         )

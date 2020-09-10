@@ -34,8 +34,8 @@ class DummySettingsService(SettingsService):
         return "https://meltano.com/docs/"
 
     @property
-    def _env_namespace(self):
-        return "dummy"
+    def _env_prefixes(self):
+        return ["dummy"]
 
     @property
     def _db_namespace(self):

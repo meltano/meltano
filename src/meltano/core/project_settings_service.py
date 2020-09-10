@@ -36,8 +36,8 @@ class ProjectSettingsService(SettingsService):
         return "https://meltano.com/docs/settings.html"
 
     @property
-    def _env_namespace(self):
-        return "meltano"
+    def _env_prefixes(self):
+        return ["meltano"]
 
     @property
     def _db_namespace(self):
