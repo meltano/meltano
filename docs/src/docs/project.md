@@ -43,7 +43,9 @@ are stored under the `plugins` key, nested under a key named after the plugin ty
 
 At a minimum, a plugin definition must have a `name` and a `pip_url` (its [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument).
 
-A plugin definition _without_ a `namespace` is a reference to a [known plugin](/docs/contributor-guide.html#known-plugins) with the same `name`, and inherits its definition:
+#### Known plugin references
+
+A plugin definition _without_ a `namespace` is a reference to a [known plugin](/docs/contributor-guide.html#known-plugins) with the same `name`:
 
 ```yaml
 plugins:
@@ -51,6 +53,10 @@ plugins:
   - name: tap-gitlab
     pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
 ```
+
+These plugins inherit their metadata (`executable`, `capabilities`, and `settings`; see below) from the known plugin definition.
+
+#### Custom plugins
 
 When a `namespace` is specified, we're dealing with a [custom plugin definition](/docs/command-line-interface.html#how-to-use-custom-plugins) instead, and additional properties `executable`, `capabilities`, and `settings` are available:
 
@@ -71,7 +77,20 @@ plugins:
     - name: start_date
 ```
 
-A plugin's [configuration](/docs/configuration.html) is stored under a `config` key. Values for [plugin extras](/docs/configuration.html#plugin-extras) are stored among the plugin's other properties, outside of the `config` object.
+#### Plugin configuration
+
+A plugin's [configuration](/docs/configuration.html) is stored under a `config` key. Values for [plugin extras](/docs/configuration.html#plugin-extras) are stored among the plugin's other properties, outside of the `config` object:
+
+```yaml{7-8}
+extractors:
+- name: tap-example
+  pip_url: tap-example
+  config:
+    # Configuration goes here!
+    example_setting: value
+  # Extras go here!
+  example_extra: value
+```
 
 ### Schedules
 
@@ -155,4 +174,4 @@ While you would usually not want to modify the system database directly, knowing
 
 - `job` table: One row for each [`meltano elt`](/docs/command-line-interface.html#elt) pipeline run, holding started/ended timestamps and [pipeline state](/docs/integration.html#pipeline-state).
 - `plugin_settings` table: [Plugin configuration](/docs/configuration.html#configuration-layers) set using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) or [the UI](/docs/command-line-interface.html#ui) when the project is [deployed as read-only](/docs/settings.html#project-readonly).
-- `user` table: Users for [Meltano UI](/docs/command-line-interface.html#ui) created using [`meltano user add`](docs/command-line-interface.html#user).
+- `user` table: Users for [Meltano UI](/docs/command-line-interface.html#ui) created using [`meltano user add`](/docs/command-line-interface.html#user).

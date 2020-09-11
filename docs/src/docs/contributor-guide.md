@@ -154,7 +154,7 @@ yarn serve
 
 :::
 
-If you need to change the URL of your development environment, you can do this by updating your `.env` in your project directory with the following configuration:
+If you need to change the URL of your development environment, you can do this by updating your project's `.env` file with the following configuration:
 
 ```bash
 # The URL where the web app will be located when working locally in development

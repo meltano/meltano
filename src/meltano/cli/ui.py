@@ -158,7 +158,7 @@ def setup(ctx, server_name, **flags):
             set_setting_env(setting_name, generate_secret())
 
     click.echo(
-        "The server name and generated secrets have been stored in a `.env` file in your project directory."
+        "The server name and generated secrets have been stored in your project's `.env` file."
     )
     click.echo(
         "In production, you will likely want to move these settings to actual environment variables, since `.env` is in `.gitignore` by default."

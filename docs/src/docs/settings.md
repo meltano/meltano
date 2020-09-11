@@ -7,7 +7,7 @@ description: Meltano supports a number of settings that allow you to fine tune i
 Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
 To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
 
-As described in the [Configuration guide](/docs/configuration.html#configuration-layers), Meltano will determine the values of these settings by first looking in **the environment**, then in a [**`.env` file**](/docs/project.html#env) in your project directory, and finally in your [**`meltano.yml` project file**](/docs/project.html#meltano-yml-project-file), falling back to a default value if nothing was found.
+As described in the [Configuration guide](/docs/configuration.html#configuration-layers), Meltano will determine the values of these settings by first looking in **the environment**, then in your project's [**`.env` file**](/docs/project.html#env), and finally in your [**`meltano.yml` project file**](/docs/project.html#meltano-yml-project-file), falling back to a default value if nothing was found.
 
 You can use [`meltano config meltano list`](/docs/command-line-interface.html#config) to list all available settings with their names, environment variables, and current values.
 
@@ -264,7 +264,7 @@ export MELTANO_UI_SERVER_NAME=meltano.example.com
 [`meltano ui setup <server_name>`](/docs/command-line-interface.html#setup) can be
 used to generate secrets for the [`ui.secret_key`](#ui-secret-key) and
 [`ui.password_salt`](#ui-password-salt) settings, that will be stored in a
-[`.env` file](/docs/project.html#env) in your project directory along with the specified `server_name`.
+your project's [`.env` file](/docs/project.html#env) along with the specified `server_name`.
 
 ```bash
 meltano ui setup meltano.example.com
@@ -316,8 +316,8 @@ export MELTANO_UI_SECRET_KEY=<randomly-generated-secret>
 
 [`meltano ui setup <server_name>`](/docs/command-line-interface.html#setup) can be
 used to generate secrets for the this setting and [`ui.password_salt`](#ui-password-salt),
-that will be stored in a [`.env` file](/docs/project.html#env)
-in your project directory along with the specified [`ui.server_name`](#ui-server-name).
+that will be stored in your project's [`.env` file](/docs/project.html#env)
+along with the specified [`ui.server_name`](#ui-server-name).
 
 ```bash
 meltano ui setup meltano.example.com
@@ -346,8 +346,8 @@ export MELTANO_UI_PASSWORD_SALT=<randomly-generated-secret>
 
 [`meltano ui setup <server_name>`](/docs/command-line-interface.html#setup) can be
 used to generate secrets for the this setting and [`ui.secret_key`](#ui-secret-key),
-that will be stored in a [`.env` file](/docs/project.html#env)
-in your project directory along with the specified [`ui.server_name`](#ui-server-name).
+that will be stored in your project's [`.env` file](/docs/project.html#env)
+along with the specified [`ui.server_name`](#ui-server-name).
 
 ```bash
 meltano ui setup meltano.example.com
