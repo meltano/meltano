@@ -44,7 +44,7 @@ const docsSidebar = [
     ]
   },
   {
-    title: "More",
+    title: "The Project",
     collapsable: false,
     sidebarDepth: 2,
     children: [

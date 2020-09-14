@@ -32,7 +32,7 @@ To learn which extractors are [known to Meltano](/docs/contributor-guide.html#kn
 ### `metadata` extra
 
 - Setting: `_metadata`, alias: `metadata`
-- Environment variable: `<EXTRACTOR>__METADATA`, e.g. `TAP_GITLAB__METADATA`
+- [Environment variable](/docs/configuration.html#configuring-settings): `<EXTRACTOR>__METADATA`, e.g. `TAP_GITLAB__METADATA`
 - Default: `{}` (an empty object)
 
 An extractor's `metadata` [extra](/docs/configuration.html#plugin-extras) holds an object describing
@@ -89,8 +89,8 @@ export TAP_POSTGRES__METADATA_SOME_TABLE_REPLICATION_METHOD=FULL_TABLE
 ### `preferred_schema` extra
 
 - Setting: `_preferred_schema`
-- Environment variable: `<EXTRACTOR>__PREFERRED_SCHEMA`, e.g. `TAP_GITLAB__PREFERRED_SCHEMA`
-- Default: `$MELTANO_EXTRACTOR_NAMESPACE`, which will expand to the extractor's `namespace`, e.g. `tap_gitlab` for `tap-gitlab`
+- [Environment variable](/docs/configuration.html#configuring-settings): `<EXTRACTOR>__PREFERRED_SCHEMA`, e.g. `TAP_GITLAB__PREFERRED_SCHEMA`
+- Default: `$MELTANO_EXTRACTOR_NAMESPACE`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the extractor's `namespace`, e.g. `tap_gitlab` for `tap-gitlab`
 
 An extractor's `preferred_schema` [extra](/docs/configuration.html#plugin-extras)
 holds the name of the database schema extracted data should be loaded into,
@@ -127,7 +127,7 @@ export TAP_GITLAB__PREFERRED_SCHEMA=gitlab_data
 ### `schema` extra
 
 - Setting: `_schema`
-- Environment variable: `<EXTRACTOR>__SCHEMA`, e.g. `TAP_GITLAB__SCHEMA`
+- [Environment variable](/docs/configuration.html#configuring-settings): `<EXTRACTOR>__SCHEMA`, e.g. `TAP_GITLAB__SCHEMA`
 - Default: `{}` (an empty object)
 
 An extractor's `schema` [extra](/docs/configuration.html#plugin-extras) holds an object describing
@@ -182,7 +182,7 @@ export TAP_POSTGRES__SCHEMA_SOME_TABLE_CREATED_AT_FORMAT=date
 ### `select` extra
 
 - Setting: `_select`
-- Environment variable: `<EXTRACTOR>__SELECT`, e.g. `TAP_GITLAB__SELECT`
+- [Environment variable](/docs/configuration.html#configuring-settings): `<EXTRACTOR>__SELECT`, e.g. `TAP_GITLAB__SELECT`
 - Default: `["*.*"]`
 
 An extractor's `select` [extra](/docs/configuration.html#plugin-extras) holds an array of [entity selection rules](/docs/command-line-interface.html#select)
@@ -230,7 +230,7 @@ meltano select tap-gitlab commits "*"
 ### `select_filter` extra
 
 - Setting: `_select_filter`
-- Environment variable: `<EXTRACTOR>__SELECT_FILTER`, e.g. `TAP_GITLAB__SELECT_FILTER`
+- [Environment variable](/docs/configuration.html#configuring-settings): `<EXTRACTOR>__SELECT_FILTER`, e.g. `TAP_GITLAB__SELECT_FILTER`
 - Default: `[]`
 
 An extractor's `select_filter` [extra](/docs/configuration.html#plugin-extras) holds an array of [entity selection](#select-extra) filter rules
@@ -297,8 +297,8 @@ To learn which loaders are [known to Meltano](/docs/contributor-guide.html#known
 ### `dialect` extra
 
 - Setting: `_dialect`
-- Environment variable: `<LOADER>__DIALECT`, e.g. `TARGET_POSTGRES__DIALECT`
-- Default: `$MELTANO_LOADER_NAMESPACE`, which will expand to the loader's `namespace`, e.g. `postgres` for `target-postgres` and `snowflake` for `target-snowflake`
+- [Environment variable](/docs/configuration.html#configuring-settings): `<LOADER>__DIALECT`, e.g. `TARGET_POSTGRES__DIALECT`
+- Default: `$MELTANO_LOADER_NAMESPACE`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the loader's `namespace`, e.g. `postgres` for `target-postgres` and `snowflake` for `target-snowflake`
 
 A loader's `dialect` [extra](/docs/configuration.html#plugin-extras)
 holds the name of the dialect of the target database, so that
@@ -336,8 +336,8 @@ export TARGET_EXAMPLE_DB__DIALECT=example-db
 ### `target_schema` extra
 
 - Setting: `_target_schema`
-- Environment variable: `<LOADER>__TARGET_SCHEMA`, e.g. `TARGET_POSTGRES__TARGET_SCHEMA`
-- Default: `$MELTANO_LOAD_SCHEMA`, which will expand to the value of the loader's `schema` setting
+- [Environment variable](/docs/configuration.html#configuring-settings): `<LOADER>__TARGET_SCHEMA`, e.g. `TARGET_POSTGRES__TARGET_SCHEMA`
+- Default: `$MELTANO_LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the loader's `schema` setting
 
 A loader's `target_schema` [extra](/docs/configuration.html#plugin-extras)
 holds the name of the database schema the loader has been configured to load data into (assuming the destination supports schemas), so that
@@ -394,8 +394,8 @@ will be added to your project's `transform/packages.yml` and the package will be
 ### `package_name` extra
 
 - Setting: `_package_name`
-- Environment variable: `<TRANSFORM>__PACKAGE_NAME`, e.g. `TAP_GITLAB__PACKAGE_NAME`
-- Default: `$MELTANO_TRANSFORM_NAMESPACE`, which will expand to the transform's `namespace`, e.g. `tap_gitlab` for `tap-gitlab`
+- [Environment variable](/docs/configuration.html#configuring-settings): `<TRANSFORM>__PACKAGE_NAME`, e.g. `TAP_GITLAB__PACKAGE_NAME`
+- Default: `$MELTANO_TRANSFORM_NAMESPACE`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the transform's `namespace`, e.g. `tap_gitlab` for `tap-gitlab`
 
 A transform's `package_name` [extra](/docs/configuration.html#plugin-extras)
 holds the name of the dbt package's internal dbt project: the value of `name` in `dbt_project.yml`.
@@ -434,7 +434,7 @@ export DBT_FACEBOOK_ADS__PACKGE_NAME=facebook_ads
 ### `vars` extra
 
 - Setting: `_vars`
-- Environment variable: `<TRANSFORM>__VARS`, e.g. `TAP_GITLAB__VARS`
+- [Environment variable](/docs/configuration.html#configuring-settings): `<TRANSFORM>__VARS`, e.g. `TAP_GITLAB__VARS`
 - Default: `{}` (an empty object)
 
 A transform's `vars` [extra](/docs/configuration.html#plugin-extras) holds an object representing [dbt model variables](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/using-variables)
@@ -442,7 +442,7 @@ that can be referenced from a model using the [`var` function](https://docs.getd
 
 When a transform is added to your project using [`meltano add`](/docs/command-line-interface.html#add), this object will be used as the dbt model's `vars` object in `transform/dbt_project.yml`.
 
-Because these variables are handled by dbt rather than Meltano, environment variables (including Meltano's [pipeline environment variables](/docs/integration.html#pipeline-environment-variables)) can be referenced using the [`env_var` function](https://docs.getdbt.com/reference/dbt-jinja-functions/env_var) instead of `$VAR` or `${VAR}`.
+Because these variables are handled by dbt rather than Meltano, [environment variables](/docs/configuration.html#expansion-in-setting-values) can be referenced using the [`env_var` function](https://docs.getdbt.com/reference/dbt-jinja-functions/env_var) instead of `$VAR` or `${VAR}`.
 
 #### How to use
 
@@ -513,7 +513,7 @@ The file bundle itself will not be added to your [`meltano.yml` project file](/d
 ### `update` extra
 
 - Setting: `_update`
-- Environment variable: `<BUNDLE>__UPDATE`, e.g. `DBT__UPDATE`
+- [Environment variable](/docs/configuration.html#configuring-settings): `<BUNDLE>__UPDATE`, e.g. `DBT__UPDATE`
 - Default: `{}` (an empty object)
 
 A file bundle's `update` [extra](/docs/configuration.html#plugin-extras) holds an object mapping file paths (of files inside the bundle, relative to the project root) to booleans.

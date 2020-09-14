@@ -18,13 +18,13 @@ You can run EL(T) pipelines using [`meltano elt`](/docs/command-line-interface.h
 
 ## Plugin configuration
 
-As described in the [Configuration guide](/docs/configuration.html#configuration-layers), [`meltano elt`](/docs/command-line-interface.html#elt) will determine the configuration of the extractor, loader, and (optionally) transformer by looking in **the environment**, your project's [**`.env` file**](/docs/project.html#env), the [system database](/docs/project.html#system-database), and finally your [**`meltano.yml` project file**](/docs/project.html#meltano-yml-project-file), falling back to a default value if nothing was found.
+As described in the [Configuration guide](/docs/configuration.html#configuration-layers), [`meltano elt`](/docs/command-line-interface.html#elt) will determine the configuration of the extractor, loader, and (optionally) transformer by looking in [**the environment**](/docs/configuration.html#configuring-settings), your project's [**`.env` file**](/docs/project.html#env), the [system database](/docs/project.html#system-database), and finally your [**`meltano.yml` project file**](/docs/project.html#meltano-yml-project-file), falling back to a default value if nothing was found.
 
 You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#config) to list all available settings with their names, environment variables, and current values. [`meltano config <plugin>`](/docs/command-line-interface.html#config) will print the current configuration in JSON format.
 
 ### Pipeline-specific configuration
 
-If you'd like to specify (or override) the values of certain settings at runtime, on a per-pipeline basis, you can set them in the [`meltano elt`](/docs/command-line-interface.html#elt) execution environment using [environment variables](https://en.wikipedia.org/wiki/Environment_variable).
+If you'd like to specify (or override) the values of certain settings at runtime, on a per-pipeline basis, you can set them in the [`meltano elt`](/docs/command-line-interface.html#elt) execution environment using [environment variables](/docs/configuration.html#configuring-settings).
 
 This lets you use the same extractors and loaders (Singer taps and targets) in multiple pipelines, configured differently each time.
 
@@ -38,7 +38,7 @@ meltano elt ...
 TAP_FOO_BAR=bar TAP_FOO_BAZ=baz meltano elt ...
 ```
 
-To verify that these environment variables will be picked up by Meltano as you intented, you can test them with `meltano config <plugin>` before running `meltano elt`.
+To verify that these environment variables will be picked up by Meltano as you intented, you can test them with [`meltano config <plugin>`](/docs/command-line-interface.html#config) before running `meltano elt`.
 
 If you're using [`meltano schedule`](/docs/command-line-interface.html#schedule) to [schedule your pipelines](/#orchestration), you can specify environment variables for each pipeline in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), where each entry in the `schedules` array can have an `env` dictionary:
 
@@ -72,11 +72,11 @@ BashOperator(
 ### Pipeline environment variables
 
 To allow [loaders](/docs/plugins.html#loaders) and [transformers](/docs/plugins.html#transformers) to adapt their configuration and behavior based on the extractor and loader they are run with,
-[`meltano elt`](/docs/command-line-interface.html#elt) dynamically sets a number of pipeline-specific environment variables before compiling their configuration and invoking their executables.
+[`meltano elt`](/docs/command-line-interface.html#elt) dynamically sets a number of pipeline-specific [environment variables](/docs/configuration.html#environment-variables) before [compiling their configuration](/docs/configuration.html#expansion-in-setting-values) and [invoking their executables](/docs/configuration.html#accessing-from-plugins).
 
 #### Extractor variables
 
-In addition to variables [set through the environment](#pipeline-specific-configuration) or your project's [`.env` file](/docs/project.html#env), the following variables describing the [extractor](/docs/plugins.html#extractors) are available to loaders _and_ transformers:
+In addition to [variables available to all plugins](/docs/configuration.html#available-environment-variables), the following variables describing the [extractor](/docs/plugins.html#extractors) are available to loaders _and_ transformers:
 
 - `MELTANO_EXTRACTOR_NAME`: the extractor's `name`, e.g. `tap-gitlab`
 - `MELTANO_EXTRACTOR_NAMESPACE`: the extractor's `namespace`, e.g. `tap_gitlab`
@@ -102,7 +102,7 @@ Additionally, the following variables describing the [transform](/docs/plugins.h
 
 #### How to use
 
-Inside your loader or transformer's `config` object in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), you can reference these (and other) environment variables as `$VAR` (as a single word) or `${VAR}` (inside a word). Inside your plugin, you can reference these through `os.environ` (if using Python) as usual.
+Inside your loader or transformer's `config` object in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), you can reference these (and other) environment variables as `$VAR` (as a single word) or `${VAR}` (inside a word). Inside your plugin, you can reference them through `os.environ` as usual (assuming you're using Python).
 
 This feature is used to dynamically configure the `target-postgres` and `target-snowflake` loaders and `dbt` transformer as appropriate, independent of the specific extractor and loader used:
 - Default value for the `target-postgres` and `target-snowflake` `schema` settings:

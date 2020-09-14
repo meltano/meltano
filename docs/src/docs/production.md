@@ -147,7 +147,7 @@ or sensitive should be stored in its [`meltano.yml` project file](/docs/project.
 control.
 
 Configuration that _is_ environment-specific or sensitive is [most appropriately
-managed using environment variables](https://12factor.net/config). How these can
+managed using environment variables](/docs/configuration.html#configuring-settings). How these can
 be best administered will depend on your deployment strategy and destination.
 
 If you'd like to store sensitive configuration in a secrets store, you can

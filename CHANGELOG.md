@@ -19,7 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2282](https://gitlab.com/meltano/meltano/-/issues/2282) Add new extractor extra `preferred_schema` and use it as default loader `schema` instead of namespace
 - [#2284](https://gitlab.com/meltano/meltano/-/issues/2284) Add new loader extra `dialect` and use it as default dbt `target` and Meltano UI SQL dialect instead of namespace
 - [#2283](https://gitlab.com/meltano/meltano/-/issues/2283) Add new loader extra `target_schema` and use it as default dbt `source_schema` instead of loader `schema`
-- [#2285](https://gitlab.com/meltano/meltano/-/issues/2285) Add new transform extra `package_name` and use it in dbt's `packages.yml` and `--models` argument instead of namespace
+- [#2285](https://gitlab.com/meltano/meltano/-/issues/2285) Add new transform extra `package_name` and use it in dbt's `dbt_project.yml` and `--models` argument instead of namespace
 
 ### Changes
 

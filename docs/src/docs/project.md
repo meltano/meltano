@@ -108,7 +108,7 @@ schedules:
   interval: '@hourly'
 ```
 
-[Pipeline-specific configuration](/docs/integration.html#pipeline-specific-configuration) can be specified using [environment variables](https://en.wikipedia.org/wiki/Environment_variable) in an `env` dictionary:
+[Pipeline-specific configuration](/docs/integration.html#pipeline-specific-configuration) can be specified using [environment variables](/docs/configuration.html#configuring-settings) in an `env` dictionary:
 
 ```yaml{7-9}
 schedules:
@@ -136,8 +136,8 @@ and environments that may use the project.
 ## `.env`
 
 Optionally, your project can contain a [`.env` file](https://github.com/theskumar/python-dotenv#usages) specifying
-[environment variables](https://en.wikipedia.org/wiki/Environment_variable)
-used to [configure](/docs/configuration.html#configuration-layers) Meltano and its plugins.
+[environment variables](/docs/configuration.html#environment-variables)
+used to [configure Meltano and its plugins](/docs/configuration.html#configuring-settings).
 
 Typically, this file is used to store configuration that is environment-specific or sensitive,
 and should not be stored in [`meltano.yml`](#meltano-yml-project-file) and checked into version control.
