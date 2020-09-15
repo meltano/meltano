@@ -80,7 +80,7 @@ In addition to [variables available to all plugins](/docs/configuration.html#ava
 
 - `MELTANO_EXTRACTOR_NAME`: the extractor's `name`, e.g. `tap-gitlab`
 - `MELTANO_EXTRACTOR_NAMESPACE`: the extractor's `namespace`, e.g. `tap_gitlab`
-- `MELTANO_EXTRACT_<SETTING_NAME>`: one environment variable for each of the extractor's settings and [extras](/docs/configuration.html#plugin-extras), e.g. `MELTANO_EXTRACT_PRIVATE_TOKEN` for the `private_token` setting, and `MELTANO_EXTRACT__LOAD_SCHEMA` for the [`load_schema` extra](/docs/plugins.html#preferred-schema-extra)
+- `MELTANO_EXTRACT_<SETTING_NAME>`: one environment variable for each of the extractor's settings and [extras](/docs/configuration.html#plugin-extras), e.g. `MELTANO_EXTRACT_PRIVATE_TOKEN` for the `private_token` setting, and `MELTANO_EXTRACT__LOAD_SCHEMA` for the [`load_schema` extra](/docs/plugins.html#load-schema-extra)
 - `<SETTING_ENV>`: all of the extractor's regular configuration environment variables, as listed by `meltano config <plugin> list`, e.g. `TAP_GITLAB_API_URL` for the `api_url` setting
 
 #### Loader variables
@@ -106,7 +106,7 @@ Inside your loader or transformer's `config` object in your [`meltano.yml` proje
 
 This feature is used to dynamically configure the `target-postgres` and `target-snowflake` loaders and `dbt` transformer as appropriate, independent of the specific extractor and loader used:
 - Default value for the `target-postgres` and `target-snowflake` `schema` settings:
-  - [`$MELTANO_EXTRACT__LOAD_SCHEMA`](/docs/plugins.html#preferred-schema-extra), e.g. `tap_gitlab` for `tap-gitlab`
+  - [`$MELTANO_EXTRACT__LOAD_SCHEMA`](/docs/plugins.html#load-schema-extra), e.g. `tap_gitlab` for `tap-gitlab`
 - Default value for `dbt`'s `target` setting:
   - [`$MELTANO_LOAD__DIALECT`](/docs/plugins.html#dialect-extra), e.g. `postgres` for `target-postgres` and `snowflake` for `target-snowflake`, which correspond to the target names in `transform/profile/profiles.yml`
 - Default value for `dbt`'s `source_schema` setting:
