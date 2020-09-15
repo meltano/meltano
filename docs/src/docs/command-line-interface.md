@@ -68,7 +68,7 @@ how to interact with it, and how it can be expected to behave: (Note that more c
 $ meltano add --custom extractor tap-covid-19
 # Specify namespace, which will serve as the:
 # - identifier to find related/compatible plugins
-# - preferred database schema (`preferred_schema` extra)
+# - preferred database schema (`load_schema` extra)
 #   for use by loaders that support a target schema
 (namespace): tap_covid_19
 

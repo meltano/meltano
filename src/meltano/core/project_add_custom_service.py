@@ -23,7 +23,7 @@ class ProjectAddCustomService(ProjectAddService):
         )
         click.echo("- identifier to find related/compatible plugins")
         if plugin_type == PluginType.EXTRACTORS:
-            click.echo("- preferred database schema (`preferred_schema` extra),")
+            click.echo("- preferred database schema (`load_schema` extra),")
             click.echo("  for use by loaders that support a target schema")
         elif plugin_type == PluginType.LOADERS:
             click.echo("- target database dialect (`dialect` extra),")

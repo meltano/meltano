@@ -27,7 +27,7 @@ def assert_loader_env(loader, env):
     assert (
         env["MELTANO_LOAD_SCHEMA"]
         == env["PG_SCHEMA"]
-        == env["MELTANO_EXTRACT__PREFERRED_SCHEMA"]
+        == env["MELTANO_EXTRACT__LOAD_SCHEMA"]
         == env["MELTANO_EXTRACTOR_NAMESPACE"]
     )
 
@@ -61,7 +61,7 @@ def assert_transformer_env(transformer, env):
         == env["DBT_SOURCE_SCHEMA"]
         == env["MELTANO_LOAD__TARGET_SCHEMA"]
         == env["PG_SCHEMA"]
-        == env["MELTANO_EXTRACT__PREFERRED_SCHEMA"]
+        == env["MELTANO_EXTRACT__LOAD_SCHEMA"]
         == env["MELTANO_EXTRACTOR_NAMESPACE"]
     )
     assert env["MELTANO_TRANSFORM_MODELS"] == env["DBT_MODELS"]

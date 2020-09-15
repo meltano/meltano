@@ -86,7 +86,7 @@ class SingerTap(SingerPlugin):
     def extra_settings(self):
         return [
             SettingDefinition(
-                name="_preferred_schema", value="$MELTANO_EXTRACTOR_NAMESPACE"
+                name="_load_schema", value="$MELTANO_EXTRACTOR_NAMESPACE"
             ),
             SettingDefinition(name="_select", kind="array", value=["*.*"]),
             SettingDefinition(
