@@ -7,9 +7,9 @@ description: Meltano supports a number of settings that allow you to fine tune i
 Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
 To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
 
-As described in the [Configuration guide](/docs/configuration.html#configuration-layers), Meltano will determine the values of these settings by first looking in **the environment**, then in your project's [**`.env` file**](/docs/project.html#env), and finally in your [**`meltano.yml` project file**](/docs/project.html#meltano-yml-project-file), falling back to a default value if nothing was found.
+As described in the [Configuration guide](/docs/configuration.html#configuration-layers), Meltano will determine the values of these settings by first looking in [**the environment**](/docs/configuration.html#configuring-settings), then in your project's [**`.env` file**](/docs/project.html#env), and finally in your [**`meltano.yml` project file**](/docs/project.html#meltano-yml-project-file), falling back to a default value if nothing was found.
 
-You can use [`meltano config meltano list`](/docs/command-line-interface.html#config) to list all available settings with their names, environment variables, and current values.
+You can use [`meltano config meltano list`](/docs/command-line-interface.html#config) to list all available settings with their names, [environment variables](/docs/configuration.html#configuring-settings), and current values.
 
 Configuration that is _not_ environment-specific or sensitive should be stored in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) and checked into version
 control. Sensitive values like passwords and tokens are most appropriately stored in the environment or your project's [`.env` file](/docs/project.html#env).
@@ -29,7 +29,7 @@ These are settings specific to [your Meltano project](/docs/project.html).
 
 ### `send_anonymous_usage_stats`
 
-- Environment variable: `MELTANO_SEND_ANONYMOUS_USAGE_STATS`, alias: `!MELTANO_DISABLE_TRACKING` (implies value `false`)
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_SEND_ANONYMOUS_USAGE_STATS`, alias: `!MELTANO_DISABLE_TRACKING` (implies value `false`)
 - [`meltano init`](/docs/command-line-interface.html#init) CLI flag: `--no_usage_stats` (implies value `false`)
 - Default: `true`
 
@@ -75,7 +75,7 @@ meltano init --no_usage_stats demo-project
 
 ### `project_id`
 
-- Environment variable: `MELTANO_PROJECT_ID`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_PROJECT_ID`
 - Default: None
 
 Used by Meltano to uniquely identify your project in Google Analytics if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled.
@@ -90,7 +90,7 @@ export MELTANO_PROJECT_ID=<randomly-generated-token>
 
 ### `database_uri`
 
-- Environment variable: `MELTANO_DATABASE_URI`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_DATABASE_URI`
 - `meltano *` CLI flag: `--database-uri`
 - Default: `sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db`
 
@@ -112,7 +112,7 @@ meltano elt --database-uri=postgresql://username:password@host:port/database ...
 
 ### `project_readonly`
 
-- Environment variable: `MELTANO_PROJECT_READONLY`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_PROJECT_READONLY`
 - Default: `false`
 
 Enable this setting to indicate that your Meltano project is deployed as read-only,
@@ -123,7 +123,7 @@ Specifically, this prevents [adding plugins](/docs/command-line-interface.md#add
 
 Note that [`meltano config <plugin> set`](/docs/command-line-interface.md#config) and [the UI](/docs/command-line-interface.md#ui)
 can still be used to store configuration in the [system database](/docs/project.html#system-database),
-but that settings that are already set in the environment or `meltano.yml` take precedence and cannot be overridden.
+but that settings that are already [set in the environment](/docs/configuration.html#configuring-settings) or `meltano.yml` take precedence and cannot be overridden.
 
 This setting differs from the [`ui.readonly` setting](#ui-readonly) in two ways:
 1. it does not block write actions in the UI that do not modify project files, like storing settings in the [system database](/docs/project.html#system-database), and
@@ -139,7 +139,7 @@ export MELTANO_PROJECT_READONLY=true
 
 ### `discovery_url`
 
-- Environment variable: `MELTANO_DISCOVERY_URL`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_DISCOVERY_URL`
 - Default: [`https://www.meltano.com/discovery.yml`](https://www.meltano.com/discovery.yml)
 
 Where Meltano can find the `discovery.yml` manifest that lists all [known plugins](/docs/contributor-guide.html#known-plugins).
@@ -163,7 +163,7 @@ These settings can be used to modify the behavior of the [`meltano` CLI](/docs/c
 
 ### `cli.log_level`
 
-- Environment variable: `MELTANO_CLI_LOG_LEVEL`, alias: `MELTANO_LOG_LEVEL`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_CLI_LOG_LEVEL`, alias: `MELTANO_LOG_LEVEL`
 - `meltano` CLI flag: `--log-level`
 - Options: `debug`, `info`, `warning`, `error`, `critical`
 - Default: `info`
@@ -189,7 +189,7 @@ These settings can be used to configure the [Meltano UI](/docs/command-line-inte
 
 ### `ui.bind_host`
 
-- Environment variable: `MELTANO_UI_BIND_HOST`, alias: `MELTANO_API_HOSTNAME`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_BIND_HOST`, alias: `MELTANO_API_HOSTNAME`
 - [`meltano ui`](/docs/command-line-interface.html#ui) CLI flag: `--bind`
 - Default: `0.0.0.0`
 
@@ -211,7 +211,7 @@ meltano ui --bind=127.0.0.1
 
 ### `ui.bind_port`
 
-- Environment variable: `MELTANO_UI_BIND_PORT`, alias: `MELTANO_API_PORT`, `PORT`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_BIND_PORT`, alias: `MELTANO_API_PORT`, `PORT`
 - [`meltano ui`](/docs/command-line-interface.html#ui) CLI flag: `--bind-port`
 - Default: `5000`
 
@@ -234,7 +234,7 @@ meltano ui --bind-port=80
 
 ### `ui.server_name`
 
-- Environment variable: `MELTANO_UI_SERVER_NAME`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_SERVER_NAME`
 - Default: None
 
 The host and port Meltano UI is available at.
@@ -272,7 +272,7 @@ meltano ui setup meltano.example.com
 
 ### `ui.session_cookie_domain`
 
-- Environment variable: `MELTANO_UI_SESSION_COOKIE_DOMAIN`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_SESSION_COOKIE_DOMAIN`
 - Default: None
 
 The domain match rule that the session cookie will be valid for.
@@ -295,7 +295,7 @@ export MELTANO_UI_SESSION_COOKIE_DOMAIN=meltano.example.com
 
 ### `ui.secret_key`
 
-- Environment variable: `MELTANO_UI_SECRET_KEY`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_SECRET_KEY`
 - Default: `thisisnotapropersecretkey`
 
 A secret key that will be used for securely signing the session cookie.
@@ -325,7 +325,7 @@ meltano ui setup meltano.example.com
 
 ### `ui.password_salt`
 
-- Environment variable: `MELTANO_UI_PASSWORD_SALT`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_PASSWORD_SALT`
 - Default: `b4c124932584ad6e69f2774a0ae5c138`
 
 The HMAC salt to use when hashing passwords.
@@ -355,7 +355,7 @@ meltano ui setup meltano.example.com
 
 ### `ui.workers`
 
-- Environment variable: `MELTANO_UI_WORKERS`, alias: `WORKERS`, `WEB_CONCURRENCY`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_WORKERS`, alias: `WORKERS`, `WEB_CONCURRENCY`
 - Default: `4`
 
 The number of worker processes `meltano ui` will use to handle requests.
@@ -374,7 +374,7 @@ export WEB_CONCURRENCY=1
 
 ### `ui.forwarded_allow_ips`
 
-- Environment variable: `MELTANO_UI_FORWARDED_ALLOW_IPS`, alias: `FORWARDED_ALLOW_IPS`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_FORWARDED_ALLOW_IPS`, alias: `FORWARDED_ALLOW_IPS`
 - Default: `127.0.0.1`
 
 Comma-separated front-end (reverse) proxy IPs that are allowed to set secure headers to indicate HTTPS requests.
@@ -400,7 +400,7 @@ These settings can be used to enable certain features of [Meltano UI](/docs/comm
 
 ### `ui.readonly`
 
-- Environment variable: `MELTANO_UI_READONLY`, alias: `MELTANO_READONLY`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_READONLY`, alias: `MELTANO_READONLY`
 - Default: `false`
 
 To block all write actions in the Meltano UI, you can run it in in *read-only* mode.
@@ -423,7 +423,7 @@ export MELTANO_READONLY=true
 
 ### `ui.authentication`
 
-- Environment variable: `MELTANO_UI_AUTHENTICATION`, alias: `MELTANO_AUTHENTICATION`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_AUTHENTICATION`, alias: `MELTANO_AUTHENTICATION`
 - Default: `false`
 
 Use this setting to enable authentication and disallow anonymous usage of your Meltano instance.
@@ -444,7 +444,7 @@ export MELTANO_AUTHENTICATION=true
 
 ### `ui.anonymous_readonly`
 
-- Environment variable: `MELTANO_UI_ANONYMOUS_READONLY`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_ANONYMOUS_READONLY`
 - Default: `false`
 
 When the [`ui.authentication` setting](#ui-authentication) is enabled,
@@ -465,7 +465,7 @@ export MELTANO_UI_ANONYMOUS_READONLY=true
 
 ### `ui.notification`
 
-- Environment variable: `MELTANO_UI_NOTIFICATION`, alias: `MELTANO_NOTIFICATION`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_NOTIFICATION`, alias: `MELTANO_NOTIFICATION`
 - Default: `false`
 
 Meltano can send email notifications upon certain events.
@@ -495,7 +495,7 @@ export MELTANO_NOTIFICATION=true
 
 ### `ui.analysis`
 
-- Environment variable: `MELTANO_UI_ANALYSIS`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_ANALYSIS`
 - Default: `true`
 
 If you are only using Meltano for data integration (and transformation),
@@ -519,7 +519,7 @@ These settings can be used to customize certain aspects of [Meltano UI](/docs/co
 
 ### `ui.logo_url`
 
-- Environment variable: `MELTANO_UI_LOGO_URL`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_LOGO_URL`
 - Default: None
 
 Customize the logo used by Meltano UI in the navigation bar and on the sign-in page (when the [`ui.authentication` setting](#ui-authentication) is enabled).
@@ -538,7 +538,7 @@ Meltano uses [Flask-Mail](https://pythonhosted.org/Flask-Mail/) to send emails. 
 
 ### `mail.server`
 
-- Environment variable: `MAIL_SERVER`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MAIL_SERVER`
 - Default: `localhost`
 
 ```bash
@@ -549,7 +549,7 @@ export MAIL_SERVER=smtp.example.com
 
 ### `mail.port`
 
-- Environment variable: `MAIL_PORT`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MAIL_PORT`
 - Default: `1025`
 
 ```bash
@@ -560,7 +560,7 @@ export MAIL_PORT=25
 
 ### `mail.default_sender`
 
-- Environment variable: `MAIL_DEFAULT_SENDER`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MAIL_DEFAULT_SENDER`
 - Default: `"Meltano" <bot@meltano.com>`
 
 ```bash
@@ -571,7 +571,7 @@ export MAIL_DEFAULT_SENDER='"Example Meltano" <bot@meltano.example.com>'
 
 ### `mail.use_tls`
 
-- Environment variable: `MAIL_USE_TLS`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MAIL_USE_TLS`
 - Default: `false`
 
 ```bash
@@ -582,7 +582,7 @@ export MAIL_USE_TLS=true
 
 ### `mail.username`
 
-- Environment variable: `MAIL_USERNAME`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MAIL_USERNAME`
 - Default: None
 
 ```bash
@@ -593,7 +593,7 @@ export MAIL_USERNAME=meltano
 
 ### `mail.password`
 
-- Environment variable: `MAIL_PASSWORD`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MAIL_PASSWORD`
 - Default: None
 
 ```bash
@@ -604,7 +604,7 @@ export MAIL_PASSWORD=meltano
 
 ### `mail.debug`
 
-- Environment variable: `MAIL_DEBUG`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MAIL_DEBUG`
 - Default: `false`
 
 ```bash
@@ -635,7 +635,7 @@ FLASK_ENV=production FLASK_APP=meltano.oauth python -m flask run --port 9999
 
 ### `oauth_service.url`
 
-- Environment variable: `MELTANO_OAUTH_SERVICE_URL`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_OAUTH_SERVICE_URL`
 - Default: None
 
 Meltano provides a public hosted solution at <https://oauth.svc.meltanodata.com>.
@@ -652,7 +652,7 @@ export MELTANO_OAUTH_SERVICE_URL=https://oauth.svc.meltanodata.com
 
 ### `oauth_service.providers`
 
-- Environment variable: `MELTANO_OAUTH_SERVICE_PROVIDERS`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_OAUTH_SERVICE_PROVIDERS`
 - Default: `all`
 
 To enable specific providers, use comma-separated `oauth.provider` names from `discovery.yml`. To enable all providers, use `all`.
@@ -667,7 +667,7 @@ export MELTANO_OAUTH_SERVICE_PROVIDERS=facebook,google_adwords
 
 ### `oauth_service.facebook.client_id`
 
-- Environment variable: `OAUTH_FACEBOOK_CLIENT_ID`
+- [Environment variable](/docs/configuration.html#configuring-settings): `OAUTH_FACEBOOK_CLIENT_ID`
 - Default: None
 
 ```bash
@@ -678,7 +678,7 @@ export OAUTH_FACEBOOK_CLIENT_ID=<facebook-client-id>
 
 ### `oauth_service.facebook.client_secret`
 
-- Environment variable: `OAUTH_FACEBOOK_CLIENT_SECRET`
+- [Environment variable](/docs/configuration.html#configuring-settings): `OAUTH_FACEBOOK_CLIENT_SECRET`
 - Default: None
 
 ```bash
@@ -689,7 +689,7 @@ export OAUTH_FACEBOOK_CLIENT_SECRET=<facebook-client-secret>
 
 ### `oauth_service.google_adwords.client_id`
 
-- Environment variable: `OAUTH_GOOGLE_ADWORDS_CLIENT_ID`
+- [Environment variable](/docs/configuration.html#configuring-settings): `OAUTH_GOOGLE_ADWORDS_CLIENT_ID`
 - Default: None
 
 ```bash
@@ -700,7 +700,7 @@ export OAUTH_GOOGLE_ADWORDS_CLIENT_ID=<google-adwords-client-id>
 
 ### `oauth_service.google_adwords.client_secret`
 
-- Environment variable: `OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET`
+- [Environment variable](/docs/configuration.html#configuring-settings): `OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET`
 - Default: None
 
 ```bash
@@ -721,7 +721,7 @@ For more information on how to get these from your GitLab application, check out
 
 ### `oauth.gitlab.client_id`
 
-- Environment variable: `OAUTH_GITLAB_CLIENT_ID`, alias: `OAUTH_GITLAB_APPLICATION_ID`
+- [Environment variable](/docs/configuration.html#configuring-settings): `OAUTH_GITLAB_CLIENT_ID`, alias: `OAUTH_GITLAB_APPLICATION_ID`
 - Default: None
 
 ```bash
@@ -733,7 +733,7 @@ export OAUTH_GITLAB_APPLICATION_ID=<gitlab-client-id>
 
 ### `oauth.gitlab.client_secret`
 
-- Environment variable: `OAUTH_GITLAB_CLIENT_SECRET`, alias: `OAUTH_GITLAB_SECRET`
+- [Environment variable](/docs/configuration.html#configuring-settings): `OAUTH_GITLAB_CLIENT_SECRET`, alias: `OAUTH_GITLAB_SECRET`
 - Default: None
 
 ```bash
@@ -749,7 +749,7 @@ Google Analytics Tracking IDs to be used if the [`send_anonymous_usage_stats` se
 
 ### `tracking_ids.cli`
 
-- Environment variable: `MELTANO_TRACKING_IDS_CLI`, alias: `MELTANO_CLI_TRACKING_ID`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_TRACKING_IDS_CLI`, alias: `MELTANO_CLI_TRACKING_ID`
 - Default: `UA-132758957-3`
 
 Tracking ID for usage of the [`meltano` CLI](/docs/command-line-interface.html).
@@ -763,7 +763,7 @@ export MELTANO_CLI_TRACKING_ID=UA-123456789-1
 
 ### `tracking_ids.ui`
 
-- Environment variable: `MELTANO_TRACKING_IDS_UI`, alias: `MELTANO_UI_TRACKING_ID`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_TRACKING_IDS_UI`, alias: `MELTANO_UI_TRACKING_ID`
 - Default: `UA-132758957-2`
 
 Tracking ID for usage of [Meltano UI](/docs/command-line-interface.html#ui).
@@ -777,7 +777,7 @@ export MELTANO_UI_TRACKING_ID=UA-123456789-2
 
 ### `tracking_ids.ui_embed`
 
-- Environment variable: `MELTANO_TRACKING_IDS_UI_EMBED`, alias: `MELTANO_EMBED_TRACKING_ID`
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_TRACKING_IDS_UI_EMBED`, alias: `MELTANO_EMBED_TRACKING_ID`
 - Default: `UA-132758957-6`
 
 Tracking ID for usage of [Meltano UI](/docs/command-line-interface.html#ui)'s [Embed feature](/docs/analysis.html#share-reports-and-dashboards).

@@ -203,7 +203,7 @@ meltano config <plugin> set <property>.<deep>.<nesting> <value>
 
 ### How to use: Plugin extras
 
-In the context of `meltano config`, [plugin extras](/docs/configuration.html#plugin-extras) are distinguished from regular plugin-specific settings using an underscore (`_`) prefix, e.g. `_example_extra`. This also applies in the environment variables that can be used to override them at runtime: since setting names for extras are prefixed with underscores (`_`), they get an extra underscore to separate them from the plugin namespace, e.g. `TAP_EXAMPLE__EXAMPLE_EXTRA`.
+In the context of `meltano config`, [plugin extras](/docs/configuration.html#plugin-extras) are distinguished from regular plugin-specific settings using an underscore (`_`) prefix, e.g. `_example_extra`. This also applies in the [environment variables](/docs/configuration.html#configuring-settings) that can be used to override them at runtime: since setting names for extras are prefixed with underscores (`_`), they get an extra underscore to separate them from the plugin name, e.g. `TAP_EXAMPLE__EXAMPLE_EXTRA`.
 
 By default, `meltano config <plugin>` and `meltano config <plugin> list` only take into account regular plugin settings.
 An `--extras` flag can be passed to view or list only extras instead.
@@ -304,7 +304,7 @@ MELTANO_CLI_LOG_LEVEL=debug meltano elt ...
 meltano --log-level=debug elt ...
 ```
 
-In debug mode, `meltano elt` will log the arguments and environment used to invoke the Singer tap and target executables (and `dbt`, when running transformations), including the paths to the generated config, catalog, and state files, for you to review:
+In debug mode, `meltano elt` will log the arguments and [environment](/docs/configuration.html#accessing-from-plugins) used to invoke the Singer tap and target executables (and `dbt`, when running transformations), including the paths to the generated config, catalog, and state files, for you to review:
 
 ```bash
 $ meltano --log-level=debug elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
