@@ -39,7 +39,7 @@ An extractor's `load_schema` [extra](/docs/configuration.html#plugin-extras)
 holds the name of the database schema extracted data should be loaded into,
 when this extractor is used in a pipeline with a [loader](#loaders) for a database that supports schemas, like [PostgreSQL](https://www.postgresql.org/docs/current/ddl-schemas.html) or [Snowflake](https://docs.snowflake.com/en/sql-reference/ddl-database.html).
 
-The value of this extra [[can be referenced](/docs/configuration.html#expansion-in-setting-values)](/docs/configuration.html#expansion-in-setting-values) from a loader's configuration using the `MELTANO_EXTRACT__LOAD_SCHEMA`
+The value of this extra [can be referenced](/docs/configuration.html#expansion-in-setting-values) from a loader's configuration using the `MELTANO_EXTRACT__LOAD_SCHEMA`
 [pipeline environment variable](/docs/integration.html#pipeline-environment-variables).
 It is used as the default value for the [`target-postgres`](/plugins/loaders/postgres.html) and [`target-snowflake`](/plugins/loaders/snowflake.html) `schema` settings.
 
@@ -305,7 +305,7 @@ holds the name of the dialect of the target database, so that
 [transformers](#transformers) in the same pipeline and [Meltano UI](/docs/command-line-interface.html#ui)'s [Analysis feature](/docs/analysis.html)
 can determine the type of database to connect to.
 
-The value of this extra [[can be referenced](/docs/configuration.html#expansion-in-setting-values)](/docs/configuration.html#expansion-in-setting-values) from a transformer's configuration using the `MELTANO_LOAD__DIALECT`
+The value of this extra [can be referenced](/docs/configuration.html#expansion-in-setting-values) from a transformer's configuration using the `MELTANO_LOAD__DIALECT`
 [pipeline environment variable](/docs/integration.html#pipeline-environment-variables).
 It is used as the default value for `dbt`'s `target` setting, and should therefore correspond to a target name in `transform/profile/profiles.yml`.
 
