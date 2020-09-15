@@ -29,6 +29,44 @@ Meltano supports [Singer taps](https://singer.io): executables that implement th
 
 To learn which extractors are [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box, refer to the [Extractors page](/plugins/extractors/).
 
+### `load_schema` extra
+
+- Setting: `_load_schema`
+- [Environment variable](/docs/configuration.html#configuring-settings): `<EXTRACTOR>__LOAD_SCHEMA`, e.g. `TAP_GITLAB__LOAD_SCHEMA`
+- Default: `$MELTANO_EXTRACTOR_NAMESPACE`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the extractor's `namespace`, e.g. `tap_gitlab` for `tap-gitlab`
+
+An extractor's `load_schema` [extra](/docs/configuration.html#plugin-extras)
+holds the name of the database schema extracted data should be loaded into,
+when this extractor is used in a pipeline with a [loader](#loaders) for a database that supports schemas, like [PostgreSQL](https://www.postgresql.org/docs/current/ddl-schemas.html) or [Snowflake](https://docs.snowflake.com/en/sql-reference/ddl-database.html).
+
+The value of this extra [[can be referenced](/docs/configuration.html#expansion-in-setting-values)](/docs/configuration.html#expansion-in-setting-values) from a loader's configuration using the `MELTANO_EXTRACT__LOAD_SCHEMA`
+[pipeline environment variable](/docs/integration.html#pipeline-environment-variables).
+It is used as the default value for the [`target-postgres`](/plugins/loaders/postgres.html) and [`target-snowflake`](/plugins/loaders/snowflake.html) `schema` settings.
+
+#### How to use
+
+##### In `meltano.yml`
+
+```yaml{4}
+extractors:
+- name: tap-gitlab
+  pip_url: tap-gitlab
+  load_schema: gitlab_data
+```
+
+##### On the command line
+
+```bash
+meltano config <extractor> set _load_schema <schema>
+
+export <EXTRACTOR>__LOAD_SCHEMA=<schema>
+
+# For example:
+meltano config tap-gitlab set _load_schema gitlab_data
+
+export TAP_GITLAB__LOAD_SCHEMA=gitlab_data
+```
+
 ### `metadata` extra
 
 - Setting: `_metadata`, alias: `metadata`
@@ -84,44 +122,6 @@ meltano config tap-postgres set _metadata some_table replication-key created_at
 meltano config tap-postgres set _metadata some_table created_at is-replication-key true
 
 export TAP_POSTGRES__METADATA_SOME_TABLE_REPLICATION_METHOD=FULL_TABLE
-```
-
-### `load_schema` extra
-
-- Setting: `_load_schema`
-- [Environment variable](/docs/configuration.html#configuring-settings): `<EXTRACTOR>__LOAD_SCHEMA`, e.g. `TAP_GITLAB__LOAD_SCHEMA`
-- Default: `$MELTANO_EXTRACTOR_NAMESPACE`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the extractor's `namespace`, e.g. `tap_gitlab` for `tap-gitlab`
-
-An extractor's `load_schema` [extra](/docs/configuration.html#plugin-extras)
-holds the name of the database schema extracted data should be loaded into,
-when this extractor is used in a pipeline with a [loader](#loaders) for a database that supports schemas, like [PostgreSQL](https://www.postgresql.org/docs/current/ddl-schemas.html) or [Snowflake](https://docs.snowflake.com/en/sql-reference/ddl-database.html).
-
-The value of this extra [[can be referenced](/docs/configuration.html#expansion-in-setting-values)](/docs/configuration.html#expansion-in-setting-values) from a loader's configuration using the `MELTANO_EXTRACT__LOAD_SCHEMA`
-[pipeline environment variable](/docs/integration.html#pipeline-environment-variables).
-It is used as the default value for the [`target-postgres`](/plugins/loaders/postgres.html) and [`target-snowflake`](/plugins/loaders/snowflake.html) `schema` settings.
-
-#### How to use
-
-##### In `meltano.yml`
-
-```yaml{4}
-extractors:
-- name: tap-gitlab
-  pip_url: tap-gitlab
-  load_schema: gitlab_data
-```
-
-##### On the command line
-
-```bash
-meltano config <extractor> set _load_schema <schema>
-
-export <EXTRACTOR>__LOAD_SCHEMA=<schema>
-
-# For example:
-meltano config tap-gitlab set _load_schema gitlab_data
-
-export TAP_GITLAB__LOAD_SCHEMA=gitlab_data
 ```
 
 ### `schema` extra
