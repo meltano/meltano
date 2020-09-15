@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.49.0 - (2020-09-15)
+---
+
+### New
+
 - [#2279](https://gitlab.com/meltano/meltano/-/issues/2279) Populate primary setting env var and aliases when invoking plugin or expanding env vars
 - [#2349](https://gitlab.com/meltano/meltano/-/issues/2349) Allow plugin setting (default) values to reference pipeline plugin extras using generic env vars, e.g. `MELTANO_EXTRACT__<EXTRA>`
 - [#2281](https://gitlab.com/meltano/meltano/-/issues/2281) Allow plugin extra (default) values to reference plugin name, namespace, profile using generic env vars, e.g. `MELTANO_EXTRACTOR_NAMESPACE`
@@ -26,10 +38,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2279](https://gitlab.com/meltano/meltano/-/issues/2279) Fall back on setting values from `<PLUGIN_NAME>_<SETTING_NAME>` and `<PLUGIN_NAMESPACE>_<SETTING_NAME>` env vars if a custom `env` is defined but not used
 - [#2278](https://gitlab.com/meltano/meltano/-/issues/2278) Stop unnecessarily prepopulating `env` on a newly added custom plugin's settings definitions
 - [#2208](https://gitlab.com/meltano/meltano/-/issues/2208) Standardize on setting env vars prefixed with plugin name, not namespace or custom `env`
-
-### Fixes
-
-### Breaks
 
 
 ## 1.48.0 - (2020-09-07)
