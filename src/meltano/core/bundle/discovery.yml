@@ -219,23 +219,23 @@ extractors:
         kind: password
         placeholder: Ex. *****************
         value: ""
-        env: GITLAB_API_TOKEN
+        env_aliases: [GITLAB_API_TOKEN]
       - name: groups
         label: Group
         value: ''
         placeholder: Ex. my-organization
-        env: GITLAB_API_GROUPS
+        env_aliases: [GITLAB_API_GROUPS]
       - name: projects
         label: Project
         value: ''
         placeholder: Ex. my-organization/project-1
-        env: GITLAB_API_PROJECTS
+        env_aliases: [GITLAB_API_PROJECTS]
       - name: ultimate_license
         value: false
         kind: boolean
-        env: GITLAB_API_ULTIMATE_LICENSE
+        env_aliases: [GITLAB_API_ULTIMATE_LICENSE]
       - name: start_date
-        env: GITLAB_API_START_DATE
+        env_aliases: [GITLAB_API_START_DATE]
         kind: date_iso8601
   - name: tap-adwords
     label: Google Ads
@@ -518,38 +518,38 @@ extractors:
       - name: view_id
         label: View ID
         placeholder: Ex. 198343027
-        env: GOOGLE_ANALYTICS_API_VIEW_ID
+        env_aliases: [GOOGLE_ANALYTICS_API_VIEW_ID]
       - name: key_file_location
         label: Client Secrets
         placeholder: Ex. client_secrets.json
         kind: file
-        env: GOOGLE_ANALYTICS_API_CLIENT_SECRETS
+        env_aliases: [GOOGLE_ANALYTICS_API_CLIENT_SECRETS]
       - name: reports
         label: Reports
         placeholder: Ex. my_report_definition.json
         kind: hidden
-        env: GOOGLE_ANALYTICS_API_REPORTS
+        env_aliases: [GOOGLE_ANALYTICS_API_REPORTS]
       - name: oauth_credentials.access_token
         label: OAuth Access Token
         kind: hidden
-        env: GOOGLE_ANALYTICS_API_OAUTH_ACCESS_TOKEN
+        env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_ACCESS_TOKEN]
       - name: oauth_credentials.refresh_token
         label: OAuth Refresh Token
         kind: hidden
-        env: GOOGLE_ANALYTICS_API_OAUTH_REFRESH_TOKEN
+        env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_REFRESH_TOKEN]
       - name: oauth_credentials.client_id
         label: OAuth Client ID
         kind: hidden
-        env: GOOGLE_ANALYTICS_API_OAUTH_CLIENT_ID
+        env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_CLIENT_ID]
       - name: oauth_credentials.client_secret
         label: OAuth Client Secret
         kind: hidden
-        env: GOOGLE_ANALYTICS_API_OAUTH_CLIENT_SECRET
+        env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_CLIENT_SECRET]
       - name: start_date
-        env: GOOGLE_ANALYTICS_API_START_DATE
+        env_aliases: [GOOGLE_ANALYTICS_API_START_DATE]
         kind: date_iso8601
       - name: end_date
-        env: GOOGLE_ANALYTICS_API_END_DATE
+        env_aliases: [GOOGLE_ANALYTICS_API_END_DATE]
         kind: hidden
   - name: tap-salesforce
     label: Salesforce
@@ -645,12 +645,12 @@ extractors:
     settings:
       - name: account_id
         label: Account ID
-        env: STRIPE_ACCOUNT_ID
+        env_aliases: [STRIPE_ACCOUNT_ID]
         placeholder: Ex. acct_1a2b3c4d5e
       - name: client_secret
         label: Secret API Key
         kind: password
-        env: STRIPE_API_KEY
+        env_aliases: [STRIPE_API_KEY]
         placeholder: Ex. sk_live_1a2b3c4d5e
       - name: start_date
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
@@ -709,7 +709,7 @@ extractors:
     - ['files']
     settings:
       - name: csv_files_definition
-        env: TAP_CSV_FILES_DEFINITION
+        env_aliases: [TAP_CSV_FILES_DEFINITION]
         label: CSV Files Definition
         placeholder: Ex. files-def.json
         documentation: https://gitlab.com/meltano/tap-csv#run
@@ -860,31 +860,31 @@ loaders:
       - ['user', 'password', 'host', 'port', 'dbname', 'schema']
     settings:
       - name: url
-        env: PG_URL
+        env_aliases: [PG_URL]
       - name: user
         aliases: [username]
-        env: PG_USERNAME
+        env_aliases: [PG_USERNAME]
         value: warehouse
       - name: password
         kind: password
-        env: PG_PASSWORD
+        env_aliases: [PG_PASSWORD]
         value: warehouse
       - name: host
         aliases: [address]
-        env: PG_ADDRESS
+        env_aliases: [PG_ADDRESS]
         value: localhost
         protected: true
       - name: port
         kind: integer
-        env: PG_PORT
+        env_aliases: [PG_PORT]
         value: 5502
       - name: dbname
         aliases: [database]
         label: Database Name
-        env: PG_DATABASE
+        env_aliases: [PG_DATABASE]
         value: warehouse
       - name: schema
-        env: PG_SCHEMA
+        env_aliases: [PG_SCHEMA]
         value: $MELTANO_EXTRACT__PREFERRED_SCHEMA
   - name: target-snowflake
     label: Snowflake
@@ -898,26 +898,26 @@ loaders:
     target_schema: $TARGET_SNOWFLAKE_SCHEMA
     settings:
       - name: account
-        env: SF_ACCOUNT
+        env_aliases: [SF_ACCOUNT]
         description: This is automatically provided by Snowflake and can be found in the URL.
       - name: username
-        env: SF_USER
+        env_aliases: [SF_USER]
         description: The username you use for logging in
       - name: password
-        env: SF_PASSWORD
+        env_aliases: [SF_PASSWORD]
         kind: password
         description: The password you use for logging in
       - name: role
-        env: SF_ROLE
+        env_aliases: [SF_ROLE]
         description: The role that you have assigned privileges for database access
       - name: database
-        env: SF_DATABASE
+        env_aliases: [SF_DATABASE]
         description: The name of the Snowflake database you want to use
       - name: warehouse
-        env: SF_WAREHOUSE
+        env_aliases: [SF_WAREHOUSE]
         description: The name of the Snowflake warehouse you want to use
       - name: schema
-        env: SF_SCHEMA
+        env_aliases: [SF_SCHEMA]
         value: $MELTANO_EXTRACT__PREFERRED_SCHEMA
         value_processor: upcase_string
   - name: target-sqlite
@@ -941,22 +941,17 @@ transformers:
     pip_url: dbt==0.16.1
     settings:
     - name: project_dir
-      env: DBT_PROJECT_DIR
       value: $MELTANO_PROJECT_ROOT/transform
     - name: profiles_dir
       env: DBT_PROFILES_DIR
       value: $MELTANO_PROJECT_ROOT/transform/profile
     - name: target
-      env: DBT_TARGET
       value: $MELTANO_LOAD__DIALECT
     - name: source_schema
-      env: DBT_SOURCE_SCHEMA
       value: $MELTANO_LOAD__TARGET_SCHEMA
     - name: target_schema
-      env: DBT_TARGET_SCHEMA
       value: analytics
     - name: models
-      env: DBT_MODELS
       value: $MELTANO_TRANSFORM__PACKAGE_NAME $MELTANO_EXTRACTOR_NAMESPACE my_meltano_project
 transforms:
   - name: tap-adwords
