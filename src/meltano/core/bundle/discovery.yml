@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-version: 14
+version: 15
 
 extractors:
   - name: tap-bing-ads
@@ -853,6 +853,8 @@ loaders:
     docs: 'https://meltano.com/plugins/loaders/postgres.html'
     repo: https://github.com/meltano/target-postgres
     pip_url: 'git+https://github.com/meltano/target-postgres.git'
+    dialect: postgres
+    target_schema: $TARGET_POSTGRES_SCHEMA
     settings_group_validation:
       - ['url', 'schema']
       - ['user', 'password', 'host', 'port', 'dbname', 'schema']
@@ -883,7 +885,7 @@ loaders:
         value: warehouse
       - name: schema
         env: PG_SCHEMA
-        value: $MELTANO_EXTRACTOR_NAMESPACE
+        value: $MELTANO_EXTRACT__PREFERRED_SCHEMA
   - name: target-snowflake
     label: Snowflake
     description: Snowflake database loader
@@ -892,6 +894,8 @@ loaders:
     repo: https://gitlab.com/meltano/target-snowflake
     pip_url: 'git+https://gitlab.com/meltano/target-snowflake.git'
     signup_url: 'https://trial.snowflake.com?referrer=meltano'
+    dialect: snowflake
+    target_schema: $TARGET_SNOWFLAKE_SCHEMA
     settings:
       - name: account
         env: SF_ACCOUNT
@@ -914,7 +918,7 @@ loaders:
         description: The name of the Snowflake warehouse you want to use
       - name: schema
         env: SF_SCHEMA
-        value: $MELTANO_EXTRACTOR_NAMESPACE
+        value: $MELTANO_EXTRACT__PREFERRED_SCHEMA
         value_processor: upcase_string
   - name: target-sqlite
     label: SQLite
@@ -923,6 +927,7 @@ loaders:
     docs: 'https://meltano.com/plugins/loaders/sqlite.html'
     repo: https://gitlab.com/meltano/target-sqlite
     pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
+    dialect: sqlite
     settings:
       - name: database
         label: Database Name
@@ -943,16 +948,16 @@ transformers:
       value: $MELTANO_PROJECT_ROOT/transform/profile
     - name: target
       env: DBT_TARGET
-      value: $MELTANO_LOADER_NAMESPACE
+      value: $MELTANO_LOAD__DIALECT
     - name: source_schema
       env: DBT_SOURCE_SCHEMA
-      value: $MELTANO_LOAD_SCHEMA
+      value: $MELTANO_LOAD__TARGET_SCHEMA
     - name: target_schema
       env: DBT_TARGET_SCHEMA
       value: analytics
     - name: models
       env: DBT_MODELS
-      value: $MELTANO_EXTRACTOR_NAMESPACE my_meltano_project
+      value: $MELTANO_TRANSFORM__PACKAGE_NAME $MELTANO_EXTRACTOR_NAMESPACE my_meltano_project
 transforms:
   - name: tap-adwords
     namespace: tap_adwords

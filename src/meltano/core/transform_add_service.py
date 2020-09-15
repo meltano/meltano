@@ -53,23 +53,22 @@ class TransformAddService:
             f.write(yaml.dump(package_yaml, default_flow_style=False, sort_keys=False))
 
     def update_dbt_project(self, plugin: PluginInstall):
-        plugin_def = self.discovery_service.find_plugin(plugin.type, plugin.name)
-        model_name = plugin_def.namespace
-
-        dbt_project_yaml = yaml.safe_load(self.dbt_project_file.open())
-        model_def = {}
-
         settings_service = PluginSettingsService(
             self.project,
             plugin,
             config_service=self.config_service,
             plugin_discovery_service=self.discovery_service,
         )
+
+        package_name = settings_service.get("_package_name")
         vars = settings_service.get("_vars")
+
+        model_def = {}
         if vars:
             model_def["vars"] = vars
 
-        dbt_project_yaml["models"][model_name] = model_def
+        dbt_project_yaml = yaml.safe_load(self.dbt_project_file.open())
+        dbt_project_yaml["models"][package_name] = model_def
 
         with open(self.dbt_project_file, "w") as f:
             f.write(

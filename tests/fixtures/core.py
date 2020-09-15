@@ -75,6 +75,7 @@ def discovery():
             "name": "tap-mock-transform",
             "namespace": "tap_mock",
             "pip_url": "tap-mock-transform",
+            "package_name": "dbt_mock",
         }
     )
 

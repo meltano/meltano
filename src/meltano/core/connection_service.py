@@ -18,7 +18,7 @@ class ConnectionService:
 
     @property
     def dialect(self):
-        return self.context.loader.namespace
+        return self.context.loader.get_config("_dialect")
 
     def analyze_params(self):
         if self.dialect not in ("postgres", "snowflake"):
@@ -27,7 +27,7 @@ class ConnectionService:
         if self.context.transformer:
             schema = self.context.transformer.get_config("target_schema")
         else:
-            schema = self.context.loader.get_config("schema")
+            schema = self.context.loader.get_config("_target_schema")
 
         return {"schema": schema}
 

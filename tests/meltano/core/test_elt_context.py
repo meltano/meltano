@@ -27,6 +27,7 @@ def assert_loader_env(loader, env):
     assert (
         env["MELTANO_LOAD_SCHEMA"]
         == env["PG_SCHEMA"]
+        == env["MELTANO_EXTRACT__PREFERRED_SCHEMA"]
         == env["MELTANO_EXTRACTOR_NAMESPACE"]
     )
 
@@ -35,6 +36,8 @@ def assert_transform_env(transform, env):
     assert env["MELTANO_TRANSFORM_NAME"] == transform.name
     assert env["MELTANO_TRANSFORM_NAMESPACE"] == transform.namespace
     assert env["MELTANO_TRANSFORM_PROFILE"] == "default"
+
+    assert env["MELTANO_TRANSFORM__PACKAGE_NAME"] == "dbt_mock"
 
 
 def assert_transformer_env(transformer, env):
@@ -45,6 +48,7 @@ def assert_transformer_env(transformer, env):
     assert (
         env["MELTANO_TRANSFORM_TARGET"]
         == env["DBT_TARGET"]
+        == env["MELTANO_LOAD__DIALECT"]
         == env["MELTANO_LOADER_NAMESPACE"]
     )
     assert (
@@ -55,10 +59,16 @@ def assert_transformer_env(transformer, env):
     assert (
         env["MELTANO_TRANSFORM_SOURCE_SCHEMA"]
         == env["DBT_SOURCE_SCHEMA"]
+        == env["MELTANO_LOAD__TARGET_SCHEMA"]
+        == env["PG_SCHEMA"]
+        == env["MELTANO_EXTRACT__PREFERRED_SCHEMA"]
         == env["MELTANO_EXTRACTOR_NAMESPACE"]
     )
     assert env["MELTANO_TRANSFORM_MODELS"] == env["DBT_MODELS"]
-    assert env["DBT_MODELS"].startswith(env["MELTANO_EXTRACTOR_NAMESPACE"])
+
+    assert env["MELTANO_TRANSFORM__PACKAGE_NAME"] in env["DBT_MODELS"]
+    assert env["MELTANO_EXTRACTOR_NAMESPACE"] in env["DBT_MODELS"]
+    assert "my_meltano_project" in env["DBT_MODELS"]
 
 
 class TestELTContext:

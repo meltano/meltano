@@ -69,8 +69,8 @@ extractors:
 ##### On the command line
 
 ```bash
-meltano config <plugin> set _metadata <entity> <key> <value>
-meltano config <plugin> set _metadata <entity> <attribute> <key> <value>
+meltano config <extractor> set _metadata <entity> <key> <value>
+meltano config <extractor> set _metadata <entity> <attribute> <key> <value>
 
 export <EXTRACTOR>__METADATA='{"<entity>": {"<key>": "<value>", "<attribute>": {"<key>": "<value>"}}}'
 
@@ -84,6 +84,44 @@ meltano config tap-postgres set _metadata some_table replication-key created_at
 meltano config tap-postgres set _metadata some_table created_at is-replication-key true
 
 export TAP_POSTGRES__METADATA_SOME_TABLE_REPLICATION_METHOD=FULL_TABLE
+```
+
+### `preferred_schema` extra
+
+- Setting: `_preferred_schema`
+- Environment variable: `<EXTRACTOR>__PREFERRED_SCHEMA`, e.g. `TAP_GITLAB__PREFERRED_SCHEMA`
+- Default: `$MELTANO_EXTRACTOR_NAMESPACE`, which will expand to the extractor's `namespace`, e.g. `tap_gitlab` for `tap-gitlab`
+
+An extractor's `preferred_schema` [extra](/docs/configuration.html#plugin-extras)
+holds the name of the database schema extracted data should be loaded into,
+when this extractor is used in a pipeline with a [loader](#loaders) for a database that supports schemas, like [PostgreSQL](https://www.postgresql.org/docs/current/ddl-schemas.html) or [Snowflake](https://docs.snowflake.com/en/sql-reference/ddl-database.html).
+
+The value of this extra can be referenced from a loader's configuration using the `MELTANO_EXTRACT__PREFERRED_SCHEMA`
+[pipeline environment variable](/docs/integration.html#pipeline-environment-variables).
+It is used as the default value for the [`target-postgres`](/plugins/loaders/postgres.html) and [`target-snowflake`](/plugins/loaders/snowflake.html) `schema` settings.
+
+#### How to use
+
+##### In `meltano.yml`
+
+```yaml{4}
+extractors:
+- name: tap-gitlab
+  pip_url: tap-gitlab
+  preferred_schema: gitlab_data
+```
+
+##### On the command line
+
+```bash
+meltano config <extractor> set _preferred_schema <schema>
+
+export <EXTRACTOR>__PREFERRED_SCHEMA=<schema>
+
+# For example:
+meltano config tap-gitlab set _preferred_schema gitlab_data
+
+export TAP_GITLAB__PREFERRED_SCHEMA=gitlab_data
 ```
 
 ### `schema` extra
@@ -125,8 +163,8 @@ extractors:
 ##### On the command line
 
 ```bash
-meltano config <plugin> set _schema <entity> <attribute> <schema description>
-meltano config <plugin> set _schema <entity> <attribute> <key> <value>
+meltano config <extractor> set _schema <entity> <attribute> <schema description>
+meltano config <extractor> set _schema <entity> <attribute> <key> <value>
 
 export <EXTRACTOR>__SCHEMA='{"<entity>": {"<attribute>": {"<key>": "<value>"}}}'
 
@@ -174,11 +212,11 @@ extractors:
 ##### On the command line
 
 ```bash
-meltano config <plugin> set _select '["<entity>.<attribute>", ...]'
+meltano config <extractor> set _select '["<entity>.<attribute>", ...]'
 
 export <EXTRACTOR>__SELECT='["<entity>.<attribute>", ...]'
 
-meltano select <plugin> <entity> <attribute>
+meltano select <extractor> <entity> <attribute>
 
 # For example:
 meltano config tap-gitlab set _select '["project_members.*", "commits.*"]'
@@ -227,8 +265,8 @@ extractors:
 ##### On the command line
 
 ```bash
-meltano config <plugin> set _select_filter '["<entity>", ...]'
-meltano config <plugin> set _select_filter '["!<entity>", ...]'
+meltano config <extractor> set _select_filter '["<entity>", ...]'
+meltano config <extractor> set _select_filter '["!<entity>", ...]'
 
 export <EXTRACTOR>__SELECT_FILTER='["<entity>", ...]'
 export <EXTRACTOR>__SELECT_FILTER='["!<entity>", ...]'
@@ -256,6 +294,92 @@ Meltano supports [Singer targets](https://singer.io): executables that implement
 
 To learn which loaders are [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box, refer to the [Loaders page](/plugins/loaders/).
 
+### `dialect` extra
+
+- Setting: `_dialect`
+- Environment variable: `<LOADER>__DIALECT`, e.g. `TARGET_POSTGRES__DIALECT`
+- Default: `$MELTANO_LOADER_NAMESPACE`, which will expand to the loader's `namespace`, e.g. `postgres` for `target-postgres` and `snowflake` for `target-snowflake`
+
+A loader's `dialect` [extra](/docs/configuration.html#plugin-extras)
+holds the name of the dialect of the target database, so that
+[transformers](#transformers) in the same pipeline and [Meltano UI](/docs/command-line-interface.html#ui)'s [Analysis feature](/docs/analysis.html)
+can determine the type of database to connect to.
+
+The value of this extra can be referenced from a transformer's configuration using the `MELTANO_LOAD__DIALECT`
+[pipeline environment variable](/docs/integration.html#pipeline-environment-variables).
+It is used as the default value for `dbt`'s `target` setting, and should therefore correspond to a target name in `transform/profile/profiles.yml`.
+
+#### How to use
+
+##### In `meltano.yml`
+
+```yaml{4}
+loaders:
+- name: target-example-db
+  pip_url: target-example-db
+  dialect: example-db
+```
+
+##### On the command line
+
+```bash
+meltano config <loader> set _dialect <dialect>
+
+export <LOADER>__DIALECT=<dialect>
+
+# For example:
+meltano config target-example-db set _dialect example-db
+
+export TARGET_EXAMPLE_DB__DIALECT=example-db
+```
+
+### `target_schema` extra
+
+- Setting: `_target_schema`
+- Environment variable: `<LOADER>__TARGET_SCHEMA`, e.g. `TARGET_POSTGRES__TARGET_SCHEMA`
+- Default: `$MELTANO_LOAD_SCHEMA`, which will expand to the value of the loader's `schema` setting
+
+A loader's `target_schema` [extra](/docs/configuration.html#plugin-extras)
+holds the name of the database schema the loader has been configured to load data into (assuming the destination supports schemas), so that
+[transformers](#transformers) in the same pipeline and [Meltano UI](/docs/command-line-interface.html#ui)'s [Analysis feature](/docs/analysis.html)
+can determine the database schema to load data from.
+
+The value of this extra is usually not set explicitly, since its should correspond to the value of the loader's own "target schema" setting.
+If the name of this setting is not `schema`, its value can be referenced from the extra's value using `$MELTANO_LOAD_<TARGET_SCHEMA_SETTING>`, e.g. `$MELTANO_LOAD_DESTINATION_SCHEMA` for setting `destination_schema`.
+
+The value of this extra can be referenced from a transformer's configuration using the `MELTANO_LOAD__TARGET_SCHEMA`
+[pipeline environment variable](/docs/integration.html#pipeline-environment-variables).
+It is used as the default value for `dbt`'s `source_schema` setting.
+
+#### How to use
+
+##### In `meltano.yml`
+
+```yaml{6}
+loaders:
+- name: target-example-db
+  pip_url: target-example-db
+  settings:
+  - name: destination_schema
+  target_schema: $MELTANO_LOAD_DESTINATION_SCHEMA # Value of `destination_schema` setting
+```
+
+##### On the command line
+
+```bash
+meltano config <loader> set _target_schema <schema>
+
+export <LOADER>__TARGET_SCHEMA=<schema>
+
+# For example:
+meltano config target-example-db set _target_schema '$MELTANO_LOAD_DESTINATION_SCHEMA'
+
+# If the target schema cannot be determined dynamically using a setting reference:
+meltano config target-example-db set _target_schema explicit_target_schema
+
+export TARGET_EXAMPLE_DB__TARGET_SCHEMA=explicit_target_schema
+```
+
 ## Transforms
 
 Transforms are [dbt packages](https://docs.getdbt.com/docs/building-a-dbt-project/package-management) containing [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models),
@@ -266,6 +390,46 @@ Together with the [dbt](https://www.getdbt.com) [transformer](#transformers), th
 When a transform is added to your project using [`meltano add`](/docs/command-line-interface.html#add),
 the [dbt package Git repository](https://docs.getdbt.com/docs/building-a-dbt-project/package-management#git-packages) referenced by its `pip_url`
 will be added to your project's `transform/packages.yml` and the package will be enabled in `transform/dbt_project.yml`.
+
+### `package_name` extra
+
+- Setting: `_package_name`
+- Environment variable: `<TRANSFORM>__PACKAGE_NAME`, e.g. `TAP_GITLAB__PACKAGE_NAME`
+- Default: `$MELTANO_TRANSFORM_NAMESPACE`, which will expand to the transform's `namespace`, e.g. `tap_gitlab` for `tap-gitlab`
+
+A transform's `package_name` [extra](/docs/configuration.html#plugin-extras)
+holds the name of the dbt package's internal dbt project: the value of `name` in `dbt_project.yml`.
+
+When a transform is added to your project using [`meltano add`](/docs/command-line-interface.html#add), this name will be added to the `models` dictionary in `transform/dbt_project.yml`.
+
+The value of this extra can be referenced from a transformer's configuration using the `MELTANO_TRANSFORM__PACKAGE_NAME`
+[pipeline environment variable](/docs/integration.html#pipeline-environment-variables).
+It is included in the default value for `dbt`'s `models` setting: `$MELTANO_TRANSFORM__PACKAGE_NAME $MELTANO_EXTRACTOR_NAMESPACE my_meltano_model`.
+
+#### How to use
+
+##### In `meltano.yml`
+
+```yaml{5}
+transforms:
+- name: dbt-facebook-ads
+  namespace: tap_facebook
+  pip_url: https://github.com/fishtown-analytics/facebook-ads
+  package_name: facebook_ads
+```
+
+##### On the command line
+
+```bash
+meltano config <transform> set _package_name <name>
+
+export <TRANSFORM>__PACKAGE_NAME=<name>
+
+# For example:
+meltano config dbt-facebook-ads set _package_name facebook_ads
+
+export DBT_FACEBOOK_ADS__PACKGE_NAME=facebook_ads
+```
 
 ### `vars` extra
 
@@ -295,7 +459,7 @@ transforms:
 ##### On the command line
 
 ```bash
-meltano config <plugin> set _vars <key> <value>
+meltano config <transform> set _vars <key> <value>
 
 export <TRANSFORM>__VARS='{"<key>": "<value>"}'
 
@@ -371,7 +535,7 @@ files:
 ##### On the command line
 
 ```bash
-meltano config <plugin> set _update <path> <true/false>
+meltano config <bundle> set _update <path> <true/false>
 
 export <BUNDLE>__UPDATE='{"<path>": <true/false>}'
 

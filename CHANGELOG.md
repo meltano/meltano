@@ -16,6 +16,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2280](https://gitlab.com/meltano/meltano/-/issues/2280) Allow plugin extra (default) values to reference plugin settings using env vars, e.g. `target_schema: $PG_SCHEMA`
 - [#2278](https://gitlab.com/meltano/meltano/-/issues/2278) Read setting values from `<PLUGIN_NAME>_<SETTING_NAME>` env vars, taking precedence over `<PLUGIN_NAMESPACE>_<SETTING_NAME>` but not custom `env`
 - [#2350](https://gitlab.com/meltano/meltano/-/issues/2350) Add `MELTANO_TRANSFORM_*` transform pipeline env vars for transformer (configuration) to access
+- [#2282](https://gitlab.com/meltano/meltano/-/issues/2282) Add new extractor extra `preferred_schema` and use it as default loader `schema` instead of namespace
+- [#2284](https://gitlab.com/meltano/meltano/-/issues/2284) Add new loader extra `dialect` and use it as default dbt `target` and Meltano UI SQL dialect instead of namespace
+- [#2283](https://gitlab.com/meltano/meltano/-/issues/2283) Add new loader extra `target_schema` and use it as default dbt `source_schema` instead of loader `schema`
+- [#2285](https://gitlab.com/meltano/meltano/-/issues/2285) Add new transform extra `package_name` and use it in dbt's `packages.yml` and `--models` argument instead of namespace
 
 ### Changes
 
