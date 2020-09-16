@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2352](https://gitlab.com/meltano/meltano/-/issues/2352) `meltano elt` `--select` and `--exclude` no longer unexpectedly select entities for extraction that match the wildcard pattern but weren't selected originally.
+
 ### Breaks
 
 

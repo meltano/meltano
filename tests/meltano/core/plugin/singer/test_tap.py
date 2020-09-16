@@ -5,6 +5,7 @@ from unittest import mock
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.plugin.singer.catalog import ListSelectedExecutor
 
 
 class TestSingerTap:
@@ -172,9 +173,15 @@ class TestSingerTap:
         def mock_metadata_executor(rules):
             def visit(schema):
                 for rule in rules:
-                    schema["rules"].append(
-                        [rule.tap_stream_id, rule.breadcrumb, rule.key, rule.value]
-                    )
+                    rule_list = [
+                        rule.tap_stream_id,
+                        rule.breadcrumb,
+                        rule.key,
+                        rule.value,
+                    ]
+                    if rule.negated:
+                        rule_list.append({"negated": True})
+                    schema["rules"].append(rule_list)
 
             return mock.Mock(visit=visit)
 
@@ -213,7 +220,12 @@ class TestSingerTap:
                         "hash": {"type": "string"},
                     },
                 },
-                "_select_filter": ["UniqueEntitiesName", "!OtherEntitiesName"],
+                "_select_filter": [
+                    "UniqueEntitiesName",
+                    "!OtherEntitiesName",
+                    "SelectAnother",
+                    "!ExcludeAnother",
+                ],
             }
 
             # Pretend `config` is set in meltano.yml
@@ -260,10 +272,92 @@ class TestSingerTap:
                     "custom-value",
                 ],
                 # Selection filter metadata rules
-                ["*", [], "selected", False],
-                ["UniqueEntitiesName", [], "selected", True],
-                ["OtherEntitiesName", [], "selected", False],
+                [
+                    ["UniqueEntitiesName", "SelectAnother"],
+                    [],
+                    "selected",
+                    False,
+                    {"negated": True},
+                ],
+                [["OtherEntitiesName", "ExcludeAnother"], [], "selected", False],
             )
+
+    def test_apply_catalog_rules_select_filter(
+        self, session, plugin_invoker_factory, subject
+    ):
+        invoker = plugin_invoker_factory(subject)
+
+        stream_metadata = {
+            "metadata": [{"breadcrumb": [], "metadata": {"inclusion": "available"}}]
+        }
+
+        base_catalog = {
+            "streams": [
+                {"tap_stream_id": "one", **stream_metadata},
+                {"tap_stream_id": "two", **stream_metadata},
+                {"tap_stream_id": "three", **stream_metadata},
+                {"tap_stream_id": "four", **stream_metadata},
+                {"tap_stream_id": "five", **stream_metadata},
+            ]
+        }
+
+        def selected_entities():
+            catalog_path = invoker.files["catalog"]
+
+            with catalog_path.open("w") as catalog_file:
+                json.dump(base_catalog, catalog_file)
+
+            with invoker.prepared(session):
+                subject.apply_catalog_rules(invoker, [])
+
+            with catalog_path.open() as catalog_file:
+                catalog = json.load(catalog_file)
+
+            lister = ListSelectedExecutor()
+            lister.visit(catalog)
+
+            return list(lister.selected_properties.keys())
+
+        config_override = invoker.settings_service.config_override
+
+        config_override["_select"] = ["one.*", "three.*", "five.*"]
+        assert selected_entities() == ["one", "three", "five"]
+
+        # Simple inclusion
+        config_override["_select_filter"] = ["three"]
+        assert selected_entities() == ["three"]
+
+        # Simple exclusion
+        config_override["_select_filter"] = ["!three"]
+        assert selected_entities() == ["one", "five"]
+
+        # Wildcard inclusion
+        config_override["_select_filter"] = ["t*"]
+        assert selected_entities() == ["three"]
+
+        # Wildcard exclusion
+        config_override["_select_filter"] = ["!t*"]
+        assert selected_entities() == ["one", "five"]
+
+        # Multiple inclusion
+        config_override["_select_filter"] = ["three", "five"]
+        assert selected_entities() == ["three", "five"]
+
+        # Multiple exclusion
+        config_override["_select_filter"] = ["!three", "!five"]
+        assert selected_entities() == ["one"]
+
+        # Multiple wildcard inclusion
+        config_override["_select_filter"] = ["t*", "f*"]
+        assert selected_entities() == ["three", "five"]
+
+        # Multiple wildcard exclusion
+        config_override["_select_filter"] = ["!t*", "!f*"]
+        assert selected_entities() == ["one"]
+
+        # Mixed inclusion and exclusion
+        config_override["_select_filter"] = ["*e", "!*ee"]
+        assert selected_entities() == ["one", "five"]
 
     def test_apply_catalog_rules_invalid(
         self, session, plugin_invoker_factory, subject
