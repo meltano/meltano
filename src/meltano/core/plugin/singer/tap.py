@@ -18,6 +18,7 @@ from .catalog import (
     SchemaRule,
     property_breadcrumb,
     select_metadata_rules,
+    select_filter_metadata_rules,
 )
 
 logger = logging.getLogger(__name__)
@@ -57,26 +58,6 @@ def config_schema_rules(config):
         for tap_stream_id, stream_config in config.items()
         for prop, payload in stream_config.items()
     ]
-
-
-def select_filter_metadata_rules(tap_stream_ids):
-    if not tap_stream_ids:
-        return []
-
-    metadata_rules = select_metadata_rules(
-        [f"{tap_stream_id}." for tap_stream_id in tap_stream_ids]
-    )
-
-    has_include_rules = any(rule.value for rule in metadata_rules)
-    if has_include_rules:
-        metadata_rules = [
-            # First deselect all stream nodes, without touching their property nodes
-            *select_metadata_rules(["!*."]),
-            # Then (de)select only the specified stream nodes
-            *metadata_rules,
-        ]
-
-    return metadata_rules
 
 
 class SingerTap(SingerPlugin):
@@ -219,7 +200,8 @@ class SingerTap(SingerPlugin):
             config = plugin_invoker.plugin_config_extras
 
             schema_rules = config_schema_rules(config["_schema"])
-            SchemaExecutor(schema_rules).visit(schema)
+            if schema_rules:
+                SchemaExecutor(schema_rules).visit(schema)
 
             metadata_rules = [
                 *select_metadata_rules(["!*.*"]),

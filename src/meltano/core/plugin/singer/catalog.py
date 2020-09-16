@@ -10,31 +10,45 @@ from meltano.core.behavior.visitor import visit_with
 
 
 class CatalogRule:
-    def __init__(self, tap_stream_id, breadcrumb):
+    def __init__(self, tap_stream_id, breadcrumb=[], negated=False):
         self.tap_stream_id = tap_stream_id
         self.breadcrumb = breadcrumb
+        self.negated = negated
 
     @classmethod
     def matching(cls, rules, tap_stream_id, breadcrumb=None):
         return [rule for rule in rules if rule.match(tap_stream_id, breadcrumb)]
 
     def match(self, tap_stream_id, breadcrumb=None):
-        return fnmatch.fnmatch(tap_stream_id, self.tap_stream_id) and (
-            breadcrumb is None
-            or fnmatch.fnmatch(".".join(breadcrumb), ".".join(self.breadcrumb))
+        patterns = (
+            self.tap_stream_id
+            if isinstance(self.tap_stream_id, list)
+            else [self.tap_stream_id]
         )
+
+        matches = any(fnmatch.fnmatch(tap_stream_id, pattern) for pattern in patterns)
+
+        if breadcrumb is not None:
+            matches = matches and fnmatch.fnmatch(
+                ".".join(breadcrumb), ".".join(self.breadcrumb)
+            )
+
+        if self.negated:
+            matches = not matches
+
+        return matches
 
 
 class MetadataRule(CatalogRule):
-    def __init__(self, tap_stream_id, breadcrumb, key, value):
-        super().__init__(tap_stream_id, breadcrumb)
+    def __init__(self, tap_stream_id, breadcrumb, key, value, negated=False):
+        super().__init__(tap_stream_id, breadcrumb, negated=negated)
         self.key = key
         self.value = value
 
 
 class SchemaRule(CatalogRule):
-    def __init__(self, tap_stream_id, breadcrumb, payload):
-        super().__init__(tap_stream_id, breadcrumb)
+    def __init__(self, tap_stream_id, breadcrumb, payload, negated=False):
+        super().__init__(tap_stream_id, breadcrumb, negated=negated)
         self.payload = payload
 
 
@@ -80,6 +94,32 @@ def select_metadata_rules(patterns):
     return include_rules + exclude_rules
 
 
+def select_filter_metadata_rules(patterns):
+    # We set `selected: false` if the `tap_stream_id`
+    # does NOT match any of the selection/inclusion patterns
+    include_rule = MetadataRule(
+        negated=True, tap_stream_id=[], breadcrumb=[], key="selected", value=False
+    )
+    # Or if it matches one of the exclusion patterns
+    exclude_rule = MetadataRule(
+        tap_stream_id=[], breadcrumb=[], key="selected", value=False
+    )
+
+    for pattern in patterns:
+        pattern = parse_select_pattern(pattern)
+
+        rule = exclude_rule if pattern.negated else include_rule
+        rule.tap_stream_id.append(pattern.stream_pattern)
+
+    rules = []
+    if include_rule.tap_stream_id:
+        rules.append(include_rule)
+    if exclude_rule.tap_stream_id:
+        rules.append(exclude_rule)
+
+    return rules
+
+
 def parse_select_pattern(pattern: str):
     raw = pattern
 
@@ -88,7 +128,11 @@ def parse_select_pattern(pattern: str):
         negated = True
         pattern = pattern[1:]
 
-    stream, prop = pattern.split(".", maxsplit=1)
+    if "." in pattern:
+        stream, prop = pattern.split(".", maxsplit=1)
+    else:
+        stream = pattern
+        prop = None
 
     return SelectPattern(
         stream_pattern=stream, property_pattern=prop, negated=negated, raw=raw

@@ -11,6 +11,7 @@ from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin.singer.catalog import (
     visit,
+    CatalogRule,
     SelectExecutor,
     MetadataExecutor,
     MetadataRule,
@@ -451,6 +452,76 @@ def select_all_executor():
 )
 def test_path_property(path, prop):
     assert path_property(path) == prop
+
+
+class TestCatalogRule:
+    def test_match(self):
+        rule = CatalogRule("tap_stream_id")
+        assert rule.match("tap_stream_id")
+        assert rule.match("tap_stream_id", [])
+        assert not rule.match("tap_stream_id", ["property"])
+        assert not rule.match("tap_stream")
+
+    def test_match_wildcard(self):
+        rule = CatalogRule("tap_stream*")
+        assert rule.match("tap_stream_id")
+        assert rule.match("tap_stream_foo")
+        assert rule.match("tap_stream")
+        assert not rule.match("tap_strea")
+
+    def test_match_multiple(self):
+        rule = CatalogRule(["tap_stream_id", "other*"])
+        assert rule.match("tap_stream_id")
+        assert rule.match("other_stream")
+        assert rule.match("other_foo")
+        assert rule.match("other")
+        assert not rule.match("tap_stream")
+        assert not rule.match("othe")
+
+    def test_match_negated(self):
+        rule = CatalogRule("tap_stream_id", negated=True)
+        assert rule.match("tap_stream")
+        assert not rule.match("tap_stream_id")
+
+    def test_match_negated_wildcard(self):
+        rule = CatalogRule("tap_stream*", negated=True)
+        assert rule.match("tap_strea")
+        assert not rule.match("tap_stream_id")
+        assert not rule.match("tap_stream_foo")
+        assert not rule.match("tap_stream")
+
+    def test_match_negated_multiple(self):
+        rule = CatalogRule(["tap_stream_id", "other*"], negated=True)
+        assert rule.match("tap_stream")
+        assert rule.match("othe")
+        assert not rule.match("tap_stream_id")
+        assert not rule.match("other_stream")
+        assert not rule.match("other_foo")
+        assert not rule.match("other")
+
+    def test_match_breadcrumb(self):
+        rule = CatalogRule("tap_stream_id", ["property"])
+        assert rule.match("tap_stream_id")
+        assert rule.match("tap_stream_id", ["property"])
+        assert not rule.match("tap_stream_id", [])
+        assert not rule.match("tap_stream_id", ["property", "nested"])
+
+    def test_match_wildcard_breadcrumb(self):
+        rule = CatalogRule("tap_stream_id", ["proper*"])
+        assert rule.match("tap_stream_id")
+        assert rule.match("tap_stream_id", ["property"])
+        assert rule.match("tap_stream_id", ["proper_foo"])
+        assert rule.match("tap_stream_id", ["proper"])
+        assert rule.match("tap_stream_id", ["property", "bar"])
+        assert not rule.match("tap_stream_id", [])
+        assert not rule.match("tap_stream_id", ["other"])
+
+    def test_match_negated_breadcrumb(self):
+        rule = CatalogRule("tap_stream_id", ["property"], negated=True)
+        assert rule.match("tap_stream_id", [])
+        assert rule.match("tap_stream_id", ["property", "nested"])
+        assert not rule.match("tap_stream_id")
+        assert not rule.match("tap_stream_id", ["property"])
 
 
 class TestLegacyCatalogSelectVisitor:
