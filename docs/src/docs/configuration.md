@@ -163,6 +163,7 @@ Meltano currently knows these extras for these plugin types:
   - [`schema`](/docs/plugins.html#schema-extra)
   - [`select`](/docs/plugins.html#select-extra)
   - [`select_filter`](/docs/plugins.html#select-filter-extra)
+  - [`state`](/docs/plugins.html#state-extra)
 - [Loaders](/docs/plugins.html#loaders)
   - [`dialect`](/docs/plugins.html#dialect-extra)
   - [`target_schema`](/docs/plugins.html#target-schema-extra)

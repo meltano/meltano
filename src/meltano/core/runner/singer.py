@@ -4,6 +4,7 @@ import logging
 import asyncio
 import os
 import sys
+import shutil
 
 from pathlib import Path
 from datetime import datetime
@@ -150,6 +151,22 @@ class SingerRunner(Runner):
             )
             return
 
+        state_path = tap.files["state"]
+
+        custom_state_filename = tap.plugin_config_extras["_state"]
+        if custom_state_filename:
+            custom_state_path = tap.project.root.joinpath(custom_state_filename)
+
+            try:
+                shutil.copy(custom_state_path, state_path)
+                logging.info(f"Found state in {custom_state_filename}")
+            except FileNotFoundError as err:
+                raise RunnerError(
+                    f"Could not find state file {custom_state_path}"
+                ) from err
+
+            return
+
         if self.context.job is None:
             logging.info(
                 f"Running outside a Job context: incremental state could not be loaded."
@@ -177,7 +194,7 @@ class SingerRunner(Runner):
                 merge(state_job.payload["singer_state"], state)
 
         if state:
-            with tap.files["state"].open("w+") as state_file:
+            with state_path.open("w+") as state_file:
                 json.dump(state, state_file, indent=2)
         else:
             logging.warning("No state was found, complete import.")

@@ -63,6 +63,7 @@ def logs(*args, **kwargs):
     default=[],
 )
 @click.option("--catalog", help="Extractor catalog file")
+@click.option("--state", help="Extractor state file")
 @click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
@@ -77,6 +78,7 @@ def elt(
     select,
     exclude,
     catalog,
+    state,
     job_id,
 ):
     """
@@ -117,6 +119,7 @@ def elt(
                     full_refresh=full_refresh,
                     select_filter=select_filter,
                     catalog=catalog,
+                    state=state,
                 )
             )
     finally:
@@ -166,6 +169,7 @@ async def run_elt(
     full_refresh=False,
     select_filter=[],
     catalog=None,
+    state=None,
 ):
     config_service = ConfigService(project)
     discovery_service = PluginDiscoveryService(project, config_service=config_service)
@@ -210,6 +214,7 @@ async def run_elt(
                 .with_full_refresh(full_refresh)
                 .with_select_filter(select_filter)
                 .with_catalog(catalog)
+                .with_state(state)
                 .context(session)
             )
 

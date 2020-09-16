@@ -276,8 +276,11 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
 
 - A `--full-refresh` flag can be passed to perform a full refresh, ignoring state left behind by any previous runs with the same job ID.
 
-- A `--catalog` option can be passed to manually provide a [catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) for the extractor, as an alternative to letting one be [generated](/docs/integration.html#extractor-catalog-generation) on the fly.
+- A `--catalog` option can be passed to manually provide a [catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) for the extractor, as an alternative to letting one be [generated on the fly](/docs/integration.html#extractor-catalog-generation).
   This is equivalent to setting the [`catalog` extractor extra](/docs/plugins.html#catalog-extra).
+
+- A `--state` option can be passed to manually provide a [state file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) for the extractor, as an alternative to letting state be [looked up based on the Job ID](/docs/integration.html#pipeline-state).
+  This is equivalent to setting the [`state` extractor extra](/docs/plugins.html#state-extra).
 
 - One or more `--select <entity>` options can be passed to only extract records for matching [selected entities](#select).
   Similarly, `--exclude <entity>` can be used to extract records for all selected entities _except_ for those specified.

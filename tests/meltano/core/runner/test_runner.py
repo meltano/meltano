@@ -200,7 +200,7 @@ class TestSingerRunner:
 
     @pytest.mark.asyncio
     async def test_restore_bookmark(
-        self, subject, session, tap, plugin_invoker_factory
+        self, subject, project, session, tap, plugin_invoker_factory, monkeypatch
     ):
         job_id = subject.context.job.job_id
         tap_invoker = plugin_invoker_factory(tap)
@@ -213,7 +213,9 @@ class TestSingerRunner:
             job.save(session)
 
         def assert_state(state):
-            subject.restore_bookmark(session, tap_invoker)
+            with tap_invoker.prepared(session):
+                subject.restore_bookmark(session, tap_invoker)
+
             if state:
                 assert tap_invoker.files["state"].exists()
                 assert json.load(tap_invoker.files["state"].open()) == state
@@ -290,6 +292,19 @@ class TestSingerRunner:
 
         # Incomplete state is merged into complete state
         assert_state({"failed": True, "success": True, "failed_again": True})
+
+        # Custom state takes precedence
+        custom_state_filename = "custom_state.json"
+        custom_state_path = project.root.joinpath(custom_state_filename)
+        custom_state_path.write_text('{"custom": true}')
+
+        monkeypatch.setitem(
+            tap_invoker.settings_service.config_override,
+            "_state",
+            custom_state_filename,
+        )
+
+        assert_state({"custom": True})
 
         # With a full refresh, no state is considered
         subject.context.full_refresh = True
