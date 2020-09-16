@@ -10,6 +10,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2291](https://gitlab.com/meltano/meltano/-/issues/2291) Add `catalog` extractor extra to allow a catalog to be provided manually
+- [#2291](https://gitlab.com/meltano/meltano/-/issues/2291) Add `--catalog` option to `meltano elt` to allow a catalog to be provided manually
+
 ### Changes
 
 ### Fixes

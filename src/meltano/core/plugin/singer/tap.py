@@ -1,8 +1,10 @@
 import json
 import logging
 import subprocess
+import shutil
 from typing import Dict
 from jsonschema import Draft4Validator
+from pathlib import Path
 
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.behavior.hookable import hook
@@ -66,6 +68,7 @@ class SingerTap(SingerPlugin):
     @property
     def extra_settings(self):
         return [
+            SettingDefinition(name="_catalog"),
             SettingDefinition(
                 name="_load_schema", value="$MELTANO_EXTRACTOR_NAMESPACE"
             ),
@@ -123,26 +126,53 @@ class SingerTap(SingerPlugin):
     def output_files(self):
         return {"output": "tap.out"}
 
-    @hook("before_invoke", can_fail=PluginExecutionError)
-    def run_discovery_hook(self, plugin_invoker, exec_args=[]):
+    @hook("before_invoke")
+    def discover_catalog_hook(self, plugin_invoker, exec_args=[]):
         if "--discover" in exec_args or "--help" in exec_args:
             return
 
         try:
-            self.run_discovery(plugin_invoker, exec_args)
+            self.discover_catalog(plugin_invoker, exec_args)
         except PluginLacksCapabilityError:
             pass
 
-    def run_discovery(self, plugin_invoker, exec_args=[]):
+    def discover_catalog(self, plugin_invoker, exec_args=[]):
+        catalog_path = plugin_invoker.files["catalog"]
+
+        custom_catalog_filename = plugin_invoker.plugin_config_extras["_catalog"]
+        if custom_catalog_filename:
+            custom_catalog_path = plugin_invoker.project.root.joinpath(
+                custom_catalog_filename
+            )
+
+            try:
+                shutil.copy(custom_catalog_path, catalog_path)
+            except FileNotFoundError as err:
+                raise PluginExecutionError(
+                    f"Could not find catalog file {custom_catalog_path}"
+                ) from err
+        else:
+            self.run_discovery(plugin_invoker, catalog_path)
+
+        # test for the result to be a valid catalog
+        try:
+            with catalog_path.open("r") as catalog_file:
+                catalog = json.load(catalog_file)
+                schema_valid = Draft4Validator.check_schema(catalog)
+        except Exception as err:
+            catalog_path.unlink()
+            raise PluginExecutionError(
+                f"Catalog discovery failed: invalid catalog: {err}"
+            ) from err
+
+    def run_discovery(self, plugin_invoker, catalog_path):
         if not "discover" in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
                 f"Extractor '{self.name}' does not support catalog discovery (the `discover` capability is not advertised)"
             )
 
-        properties_file = plugin_invoker.files["catalog"]
-
         try:
-            with properties_file.open("w") as catalog:
+            with catalog_path.open("w") as catalog:
                 result = plugin_invoker.invoke(
                     "--discover",
                     stdout=catalog,
@@ -152,27 +182,16 @@ class SingerTap(SingerPlugin):
                 stdout, stderr = result.communicate()
                 exit_code = result.returncode
         except Exception:
-            properties_file.unlink()
+            catalog_path.unlink()
             raise
 
         if exit_code != 0:
-            properties_file.unlink()
+            catalog_path.unlink()
             raise PluginExecutionError(
                 f"Catalog discovery failed: command {plugin_invoker.exec_args('--discover')} returned {exit_code}: {stderr.rstrip()}"
             )
 
-        # test for the schema to be a valid catalog
-        try:
-            with properties_file.open("r") as catalog:
-                catalog_json = json.load(catalog)
-                schema_valid = Draft4Validator.check_schema(catalog_json)
-        except Exception as err:
-            properties_file.unlink()
-            raise PluginExecutionError(
-                f"Catalog discovery failed: invalid catalog output by --discover: {err}"
-            ) from err
-
-    @hook("before_invoke", can_fail=PluginExecutionError)
+    @hook("before_invoke")
     def apply_catalog_rules_hook(self, plugin_invoker, exec_args=[]):
         if "--discover" in exec_args or "--help" in exec_args:
             return
@@ -191,34 +210,44 @@ class SingerTap(SingerPlugin):
                 f"Extractor '{self.name}' does not support entity selection or catalog metadata and schema rules"
             )
 
-        properties_file = plugin_invoker.files["catalog"]
+        config = plugin_invoker.plugin_config_extras
 
+        schema_rules = []
+        metadata_rules = []
+
+        # If a custom catalog is provided, don't apply catalog rules
+        if not config["_catalog"]:
+            schema_rules.extend(config_schema_rules(config["_schema"]))
+
+            metadata_rules.extend(select_metadata_rules(["!*.*"]))
+            metadata_rules.extend(select_metadata_rules(config["_select"]))
+            metadata_rules.extend(config_metadata_rules(config["_metadata"]))
+
+        # Always apply select filters (`meltano elt` `--select` and `--exclude` options)
+        metadata_rules.extend(select_filter_metadata_rules(config["_select_filter"]))
+
+        if not schema_rules and not metadata_rules:
+            return
+
+        catalog_path = plugin_invoker.files["catalog"]
         try:
-            with properties_file.open() as catalog:
-                schema = json.load(catalog)
+            with catalog_path.open() as catalog_file:
+                catalog = json.load(catalog_file)
 
-            config = plugin_invoker.plugin_config_extras
-
-            schema_rules = config_schema_rules(config["_schema"])
             if schema_rules:
-                SchemaExecutor(schema_rules).visit(schema)
+                SchemaExecutor(schema_rules).visit(catalog)
 
-            metadata_rules = [
-                *select_metadata_rules(["!*.*"]),
-                *select_metadata_rules(config["_select"]),
-                *config_metadata_rules(config["_metadata"]),
-                *select_filter_metadata_rules(config["_select_filter"]),
-            ]
-            MetadataExecutor(metadata_rules).visit(schema)
+            if metadata_rules:
+                MetadataExecutor(metadata_rules).visit(catalog)
 
-            with properties_file.open("w") as catalog:
-                json.dump(schema, catalog, indent=2)
+            with catalog_path.open("w") as catalog_file:
+                json.dump(catalog, catalog_file, indent=2)
         except FileNotFoundError as err:
             raise PluginExecutionError(
                 f"Applying catalog rules failed: catalog file is missing."
             ) from err
         except Exception as err:
-            properties_file.unlink()
+            catalog_path.unlink()
             raise PluginExecutionError(
                 f"Applying catalog rules failed: catalog file is invalid: {err}"
             ) from err
