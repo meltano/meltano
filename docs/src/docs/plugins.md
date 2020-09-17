@@ -45,7 +45,7 @@ by running the extractor in [discovery mode](https://github.com/singer-io/gettin
 [Selection filter rules](#select-filter-extra) are always applied to manually provided catalogs as well as discovered ones.
 
 While this extra can be managed using [`meltano config`](/docs/command-line-interface.html#config) or environment variables like any other setting,
-a catalog file is typically specified using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option.
+a catalog file is typically provided using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option.
 
 #### How to use
 
@@ -333,6 +333,49 @@ export TAP_GITLAB__SELECT_FILTER='["!project_members"]'
 
 meltano elt tap-gitlab target-jsonl --select commits
 meltano elt tap-gitlab target-jsonl --exclude project_members
+```
+
+### `state` extra
+
+- Setting: `_state`
+- [Environment variable](/docs/configuration.html#configuring-settings): `<EXTRACTOR>__STATE`, e.g. `TAP_GITLAB__STATE`
+- [`meltano elt`](/docs/command-line-interface.html#elt) CLI option: `--state`
+- Default: None
+
+An extractor's `state` [extra](/docs/configuration.html#plugin-extras) holds a path to a [state file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) (relative to the [project directory](/docs/project.html)) to be provided to the extractor
+when it is run as part of a pipeline using [`meltano elt`](/docs/command-line-interface.html#elt).
+
+If a state path is not set, the state will be [looked up automatically](/docs/integration.html#pipeline-state) based on the ELT run's Job ID.
+
+While this extra can be managed using [`meltano config`](/docs/command-line-interface.html#config) or environment variables like any other setting,
+a state file is typically provided using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--state` option.
+
+#### How to use
+
+##### In `meltano.yml`
+
+```yaml{4}
+extractors:
+- name: tap-gitlab
+  pip_url: tap-gitlab
+  state: extract/tap-gitlab.state.json
+```
+
+##### On the command line
+
+```bash
+meltano config <extractor> set _state <path>
+
+export <EXTRACTOR>__STATE=<path>
+
+meltano elt <extractor> <loader> --state <path>
+
+# For example:
+meltano config tap-gitlab set _state extract/tap-gitlab.state.json
+
+export TAP_GITLAB__STATE=extract/tap-gitlab.state.json
+
+meltano elt tap-gitlab target-jsonl --state extract/tap-gitlab.state.json
 ```
 
 ## Loaders

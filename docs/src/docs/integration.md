@@ -169,6 +169,8 @@ Meltano stores this pipeline state in its [system database](/docs/project.html#s
 
 When `meltano elt` is run a subsequent time, it will look for the most recent completed (successful or failed) pipeline run with the same job ID that generated some state. If found, this state is then passed along to the extractor.
 
+Note that if you already have a state file you'd like to use, it can be provided explicitly using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--state` option or the [`state` extractor extra](/docs/plugins.html#state-extra).
+
 ::: tip Not seeing state picked up after a failed run?
 
 Some loaders only emit state once their work is completely done, even if some data may have been persisted already, and if earlier state messages from the extractor could have been forwarded to Meltano. When a pipeline with such a loader fails or is otherwise interrupted, no state will have been emitted yet, and a subsequent ELT run will not be able to pick up where this run actually left off.

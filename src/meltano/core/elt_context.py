@@ -56,6 +56,7 @@ class ELTContext:
         full_refresh: Optional[bool] = False,
         select_filter: Optional[list] = [],
         catalog: Optional[str] = None,
+        state: Optional[str] = None,
         plugin_discovery_service: PluginDiscoveryService = None,
     ):
         self.project = project
@@ -68,6 +69,7 @@ class ELTContext:
         self.full_refresh = full_refresh
         self.select_filter = select_filter
         self.catalog = catalog
+        self.state = state
 
         self.plugin_discovery_service = (
             plugin_discovery_service or PluginDiscoveryService(project)
@@ -128,6 +130,7 @@ class ELTContextBuilder:
         self._full_refresh = False
         self._select_filter = None
         self._catalog = None
+        self._state = None
 
     def with_extractor(self, extractor_name: str):
         self._extractor = PluginRef(PluginType.EXTRACTORS, extractor_name)
@@ -178,6 +181,11 @@ class ELTContextBuilder:
 
         return self
 
+    def with_state(self, state):
+        self._state = state
+
+        return self
+
     def plugin_context(self, session, plugin: PluginRef, env={}, config={}):
         return PluginContext(
             ref=plugin,
@@ -208,6 +216,8 @@ class ELTContextBuilder:
                 config["_select_filter"] = self._select_filter
             if self._catalog:
                 config["_catalog"] = self._catalog
+            if self._state:
+                config["_state"] = self._state
 
             extractor = self.plugin_context(session, self._extractor, config=config)
 
@@ -242,5 +252,6 @@ class ELTContextBuilder:
             full_refresh=self._full_refresh,
             select_filter=self._select_filter,
             catalog=self._catalog,
+            state=self._state,
             plugin_discovery_service=self.plugin_discovery_service,
         )
