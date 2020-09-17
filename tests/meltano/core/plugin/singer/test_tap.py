@@ -45,26 +45,49 @@ class TestSingerTap:
 
         assert not invoker.files["config"].exists()
 
-    def test_run_discovery(self, session, plugin_invoker_factory, subject):
+    def test_discover_catalog(self, session, plugin_invoker_factory, subject):
         invoker = plugin_invoker_factory(subject)
+
+        catalog_path = invoker.files["catalog"]
+
+        def mock_discovery():
+            catalog_path.open("w").write('{"discovered": true}')
+            return ("", "")
+
+        process_mock = mock.Mock()
+        process_mock.communicate = mock_discovery
+        process_mock.returncode = 0
+
+        with invoker.prepared(session), mock.patch.object(
+            PluginInvoker, "invoke", return_value=process_mock
+        ) as invoke:
+            subject.discover_catalog(invoker, [])
+
+            assert invoke.called_with(["--discover"])
+
+            assert catalog_path.read_text() == '{"discovered": true}'
+
+    def test_discover_catalog_custom(
+        self, project, session, plugin_invoker_factory, subject, monkeypatch
+    ):
+        invoker = plugin_invoker_factory(subject)
+
+        custom_catalog_filename = "custom_catalog.json"
+        custom_catalog_path = project.root.joinpath(custom_catalog_filename)
+        custom_catalog_path.write_text('{"custom": true}')
+
+        monkeypatch.setitem(
+            invoker.settings_service.config_override,
+            "_catalog",
+            custom_catalog_filename,
+        )
+
         with invoker.prepared(session):
+            subject.discover_catalog(invoker, [])
 
-            def mock_discovery():
-                invoker.files["catalog"].open("w").write("{}")
-                return ("", "")
+        assert invoker.files["catalog"].read_text() == '{"custom": true}'
 
-            process_mock = mock.Mock()
-            process_mock.communicate = mock_discovery
-            process_mock.returncode = 0
-
-            with mock.patch.object(
-                PluginInvoker, "invoke", return_value=process_mock
-            ) as invoke:
-                subject.run_discovery(invoker, [])
-
-                assert invoke.called_with(["--discover"])
-
-    def test_run_discovery_fails(self, session, plugin_invoker_factory, subject):
+    def test_discover_catalog_fails(self, session, plugin_invoker_factory, subject):
         process_mock = mock.Mock()
         process_mock.communicate.return_value = ("", "")
         process_mock.returncode = 1  # something went wrong
@@ -74,7 +97,7 @@ class TestSingerTap:
             with mock.patch.object(
                 PluginInvoker, "invoke", return_value=process_mock
             ) as invoke, pytest.raises(PluginExecutionError, match="returned 1"):
-                subject.run_discovery(invoker, [])
+                subject.discover_catalog(invoker, [])
 
                 assert not invoker.files[
                     "catalog"
@@ -83,21 +106,21 @@ class TestSingerTap:
     def test_apply_select(self, session, plugin_invoker_factory, subject, monkeypatch):
         invoker = plugin_invoker_factory(subject)
 
-        properties_file = invoker.files["catalog"]
+        catalog_path = invoker.files["catalog"]
 
-        def reset_properties():
-            properties_file.open("w").write('{"rules": []}')
+        def reset_catalog():
+            catalog_path.open("w").write('{"rules": []}')
 
         def assert_rules(*rules):
-            with properties_file.open() as catalog:
-                schema = json.load(catalog)
+            with catalog_path.open() as catalog_file:
+                catalog = json.load(catalog_file)
 
-            assert schema["rules"] == list(rules)
+            assert catalog["rules"] == list(rules)
 
         def mock_metadata_executor(rules):
-            def visit(schema):
+            def visit(catalog):
                 for rule in rules:
-                    schema["rules"].append(
+                    catalog["rules"].append(
                         [rule.tap_stream_id, rule.breadcrumb, rule.key, rule.value]
                     )
 
@@ -107,7 +130,7 @@ class TestSingerTap:
             "meltano.core.plugin.singer.tap.MetadataExecutor",
             side_effect=mock_metadata_executor,
         ):
-            reset_properties()
+            reset_catalog()
 
             with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker)
@@ -120,7 +143,7 @@ class TestSingerTap:
                 ["*", ["properties", "*"], "selected", True],
             )
 
-            reset_properties()
+            reset_catalog()
 
             # Pretend `select` is set in discovery.yml
             monkeypatch.setitem(
@@ -138,7 +161,7 @@ class TestSingerTap:
                 ["UniqueEntitiesName", ["properties", "name"], "selected", True],
             )
 
-            reset_properties()
+            reset_catalog()
 
             # Pretend `select` is set in meltano.yml
             monkeypatch.setitem(
@@ -156,22 +179,24 @@ class TestSingerTap:
                 ["UniqueEntitiesName", ["properties", "code"], "selected", True],
             )
 
-    def test_apply_catalog_rules(self, session, plugin_invoker_factory, subject):
+    def test_apply_catalog_rules(
+        self, session, plugin_invoker_factory, subject, monkeypatch
+    ):
         invoker = plugin_invoker_factory(subject)
 
-        properties_file = invoker.files["catalog"]
+        catalog_path = invoker.files["catalog"]
 
-        def reset_properties():
-            properties_file.open("w").write('{"rules": []}')
+        def reset_catalog():
+            catalog_path.open("w").write('{"rules": []}')
 
         def assert_rules(*rules):
-            with properties_file.open() as catalog:
-                schema = json.load(catalog)
+            with catalog_path.open() as catalog_file:
+                catalog = json.load(catalog_file)
 
-            assert schema["rules"] == list(rules)
+            assert catalog["rules"] == list(rules)
 
         def mock_metadata_executor(rules):
-            def visit(schema):
+            def visit(catalog):
                 for rule in rules:
                     rule_list = [
                         rule.tap_stream_id,
@@ -181,14 +206,14 @@ class TestSingerTap:
                     ]
                     if rule.negated:
                         rule_list.append({"negated": True})
-                    schema["rules"].append(rule_list)
+                    catalog["rules"].append(rule_list)
 
             return mock.Mock(visit=visit)
 
         def mock_schema_executor(rules):
-            def visit(schema):
+            def visit(catalog):
                 for rule in rules:
-                    schema["rules"].append(
+                    catalog["rules"].append(
                         [rule.tap_stream_id, rule.breadcrumb, rule.payload]
                     )
 
@@ -201,7 +226,7 @@ class TestSingerTap:
             "meltano.core.plugin.singer.tap.SchemaExecutor",
             side_effect=mock_schema_executor,
         ):
-            reset_properties()
+            reset_catalog()
 
             config = {
                 "_select": ["UniqueEntitiesName.code"],
@@ -282,8 +307,31 @@ class TestSingerTap:
                 [["OtherEntitiesName", "ExcludeAnother"], [], "selected", False],
             )
 
+            reset_catalog()
+
+            # If a custom catalog is provided, only selection filters are applied
+            config_override = invoker.settings_service.config_override
+            monkeypatch.setitem(config_override, "_catalog", "custom_catalog.json")
+
+            # Pretend `config` is set in meltano.yml
+            with mock.patch.object(invoker.plugin, "config", config):
+                with invoker.prepared(session):
+                    subject.apply_catalog_rules(invoker)
+
+            assert_rules(
+                # Selection filter metadata rules
+                [
+                    ["UniqueEntitiesName", "SelectAnother"],
+                    [],
+                    "selected",
+                    False,
+                    {"negated": True},
+                ],
+                [["OtherEntitiesName", "ExcludeAnother"], [], "selected", False],
+            )
+
     def test_apply_catalog_rules_select_filter(
-        self, session, plugin_invoker_factory, subject
+        self, session, plugin_invoker_factory, subject, monkeypatch
     ):
         invoker = plugin_invoker_factory(subject)
 
@@ -320,43 +368,43 @@ class TestSingerTap:
 
         config_override = invoker.settings_service.config_override
 
-        config_override["_select"] = ["one.*", "three.*", "five.*"]
+        monkeypatch.setitem(config_override, "_select", ["one.*", "three.*", "five.*"])
         assert selected_entities() == ["one", "three", "five"]
 
         # Simple inclusion
-        config_override["_select_filter"] = ["three"]
+        monkeypatch.setitem(config_override, "_select_filter", ["three"])
         assert selected_entities() == ["three"]
 
         # Simple exclusion
-        config_override["_select_filter"] = ["!three"]
+        monkeypatch.setitem(config_override, "_select_filter", ["!three"])
         assert selected_entities() == ["one", "five"]
 
         # Wildcard inclusion
-        config_override["_select_filter"] = ["t*"]
+        monkeypatch.setitem(config_override, "_select_filter", ["t*"])
         assert selected_entities() == ["three"]
 
         # Wildcard exclusion
-        config_override["_select_filter"] = ["!t*"]
+        monkeypatch.setitem(config_override, "_select_filter", ["!t*"])
         assert selected_entities() == ["one", "five"]
 
         # Multiple inclusion
-        config_override["_select_filter"] = ["three", "five"]
+        monkeypatch.setitem(config_override, "_select_filter", ["three", "five"])
         assert selected_entities() == ["three", "five"]
 
         # Multiple exclusion
-        config_override["_select_filter"] = ["!three", "!five"]
+        monkeypatch.setitem(config_override, "_select_filter", ["!three", "!five"])
         assert selected_entities() == ["one"]
 
         # Multiple wildcard inclusion
-        config_override["_select_filter"] = ["t*", "f*"]
+        monkeypatch.setitem(config_override, "_select_filter", ["t*", "f*"])
         assert selected_entities() == ["three", "five"]
 
         # Multiple wildcard exclusion
-        config_override["_select_filter"] = ["!t*", "!f*"]
+        monkeypatch.setitem(config_override, "_select_filter", ["!t*", "!f*"])
         assert selected_entities() == ["one"]
 
         # Mixed inclusion and exclusion
-        config_override["_select_filter"] = ["*e", "!*ee"]
+        monkeypatch.setitem(config_override, "_select_filter", ["*e", "!*ee"])
         assert selected_entities() == ["one", "five"]
 
     def test_apply_catalog_rules_invalid(

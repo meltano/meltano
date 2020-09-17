@@ -62,12 +62,22 @@ def logs(*args, **kwargs):
     multiple=True,
     default=[],
 )
+@click.option("--catalog", help="Extractor catalog file")
 @click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
 @project(migrate=True)
 def elt(
-    project, extractor, loader, transform, dry, full_refresh, select, exclude, job_id
+    project,
+    extractor,
+    loader,
+    transform,
+    dry,
+    full_refresh,
+    select,
+    exclude,
+    catalog,
+    job_id,
 ):
     """
     meltano elt EXTRACTOR_NAME LOADER_NAME
@@ -106,6 +116,7 @@ def elt(
                     dry_run=dry,
                     full_refresh=full_refresh,
                     select_filter=select_filter,
+                    catalog=catalog,
                 )
             )
     finally:
@@ -154,6 +165,7 @@ async def run_elt(
     dry_run=False,
     full_refresh=False,
     select_filter=[],
+    catalog=None,
 ):
     config_service = ConfigService(project)
     discovery_service = PluginDiscoveryService(project, config_service=config_service)
@@ -197,6 +209,7 @@ async def run_elt(
                 .with_dry_run(dry_run)
                 .with_full_refresh(full_refresh)
                 .with_select_filter(select_filter)
+                .with_catalog(catalog)
                 .context(session)
             )
 

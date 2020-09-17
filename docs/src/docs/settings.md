@@ -30,7 +30,7 @@ These are settings specific to [your Meltano project](/docs/project.html).
 ### `send_anonymous_usage_stats`
 
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_SEND_ANONYMOUS_USAGE_STATS`, alias: `!MELTANO_DISABLE_TRACKING` (implies value `false`)
-- [`meltano init`](/docs/command-line-interface.html#init) CLI flag: `--no_usage_stats` (implies value `false`)
+- [`meltano init`](/docs/command-line-interface.html#init) CLI option: `--no_usage_stats` (implies value `false`)
 - Default: `true`
 
 By default, Meltano shares anonymous usage data with the Meltano team using Google Analytics. We use this data to learn about the size of our user base and the specific Meltano features they are (not yet) using, which helps us determine the highest impact changes we can make in each weekly release to make Meltano even more useful for you and others like you.
@@ -91,7 +91,7 @@ export MELTANO_PROJECT_ID=<randomly-generated-token>
 ### `database_uri`
 
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_DATABASE_URI`
-- `meltano *` CLI flag: `--database-uri`
+- `meltano *` CLI option: `--database-uri`
 - Default: `sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db`
 
 Meltano stores various types of metadata in a project-specific [system database](/docs/project.html#system-database),
@@ -164,7 +164,7 @@ These settings can be used to modify the behavior of the [`meltano` CLI](/docs/c
 ### `cli.log_level`
 
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_CLI_LOG_LEVEL`, alias: `MELTANO_LOG_LEVEL`
-- `meltano` CLI flag: `--log-level`
+- `meltano` CLI option: `--log-level`
 - Options: `debug`, `info`, `warning`, `error`, `critical`
 - Default: `info`
 
@@ -190,7 +190,7 @@ These settings can be used to configure the [Meltano UI](/docs/command-line-inte
 ### `ui.bind_host`
 
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_BIND_HOST`, alias: `MELTANO_API_HOSTNAME`
-- [`meltano ui`](/docs/command-line-interface.html#ui) CLI flag: `--bind`
+- [`meltano ui`](/docs/command-line-interface.html#ui) CLI option: `--bind`
 - Default: `0.0.0.0`
 
 The host to bind to.
@@ -212,7 +212,7 @@ meltano ui --bind=127.0.0.1
 ### `ui.bind_port`
 
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_BIND_PORT`, alias: `MELTANO_API_PORT`, `PORT`
-- [`meltano ui`](/docs/command-line-interface.html#ui) CLI flag: `--bind-port`
+- [`meltano ui`](/docs/command-line-interface.html#ui) CLI option: `--bind-port`
 - Default: `5000`
 
 The port to bind to.

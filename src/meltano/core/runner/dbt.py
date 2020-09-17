@@ -38,8 +38,6 @@ class DbtRunner(Runner):
                 stderr=asyncio.subprocess.PIPE,
             )
         except Exception as err:
-            if handle:
-                handle.kill()
             raise RunnerError(f"Cannot start dbt: {err}") from err
 
         await asyncio.wait(

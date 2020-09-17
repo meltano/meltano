@@ -38,7 +38,7 @@ class SelectService:
                 logging.debug(
                     "Catalog not found, trying to run the tap with --discover."
                 )
-                self.extractor.run_discovery(invoker)
+                self.extractor.discover_catalog(invoker)
 
             # update the catalog accordingly
             self.extractor.apply_catalog_rules(invoker)

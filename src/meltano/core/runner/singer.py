@@ -78,24 +78,21 @@ class SingerRunner(Runner):
         loader_log = loader_log or sys.stderr
 
         try:
-            p_target, p_tap = None, None
-
             p_tap = await tap.invoke_async(
                 stdout=asyncio.subprocess.PIPE,  # Singer messages
                 stderr=asyncio.subprocess.PIPE,  # Log
             )
+        except Exception as err:
+            raise RunnerError(f"Cannot start tap: {err}") from err
 
+        try:
             p_target = await target.invoke_async(
                 stdin=asyncio.subprocess.PIPE,  # Singer messages
                 stdout=asyncio.subprocess.PIPE,  # Singer state
                 stderr=asyncio.subprocess.PIPE,  # Log
             )
         except Exception as err:
-            if p_tap:
-                p_tap.kill()
-            if p_target:
-                p_target.kill()
-            raise RunnerError(f"Cannot start tap or target: {err}") from err
+            raise RunnerError(f"Cannot start target: {err}") from err
 
         tap_outputs = [p_target.stdin]
         if extractor_out:
