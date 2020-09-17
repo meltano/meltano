@@ -250,8 +250,8 @@ meltano discover models
 
 ## `elt`
 
-This allows you to run your ELT pipeline to Extract, Load, and Transform data using an extractor and loader of your choosing,
-and optional transformations.
+This allows you to run your ELT pipeline to Extract, Load, and Transform data using an [extractor](/docs/plugins.html#extractors) and [loader](/docs/plugins.html#loaders) of your choosing,
+and optional [transformations](/docs/plugins.html#transformers).
 
 To allow subsequent pipeline runs with the same extractor/loader/transform combination to pick up right where the previous run left off,
 each ELT run has a Job ID that is used to store and look up the incremental [pipeline state](/docs/integration.html#pipeline-state) in the [system database](/docs/production.html#storing-metadata). If no stable identifier is provided using the `--job_id` flag or the `MELTANO_JOB_ID` environment variable, extraction will always start from scratch and a one-off Job ID is automatically generated using the current date and time.
@@ -272,9 +272,12 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
   - `skip`: skip the Transforms (Default)
   - `only`: only run the Transforms (skip the Extract and Load steps)
 
-- The `--job_id` flag identifies related EL(T) runs when storing and looking up [pipeline state](/docs/integration.html#pipeline-state).
+- The `--job_id` option identifies related EL(T) runs when storing and looking up [pipeline state](/docs/integration.html#pipeline-state).
 
 - A `--full-refresh` flag can be passed to perform a full refresh, ignoring state left behind by any previous runs with the same job ID.
+
+- A `--catalog` option can be passed to manually provide a [catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) for the extractor, as an alternative to letting one be [generated](/docs/integration.html#extractor-catalog-generation) on the fly.
+  This is equivalent to setting the [`catalog` extractor extra](/docs/plugins.html#catalog-extra).
 
 - One or more `--select <entity>` options can be passed to only extract records for matching [selected entities](#select).
   Similarly, `--exclude <entity>` can be used to extract records for all selected entities _except_ for those specified.
@@ -289,6 +292,13 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
 
 ```bash
 meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
+
+meltano elt tap-gitlab target-postgres --full-refresh
+
+meltano elt tap-gitlab target-postgres --catalog extract/tap-gitlab.catalog.json
+
+meltano elt tap-gitlab target-postgres --select commits
+meltano elt tap-gitlab target-postgres --exclude project_members
 ```
 
 ### Debugging
@@ -296,7 +306,7 @@ meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgr
 If extraction, loading, or transformation is failing, or otherwise not behaving as expected,
 you can learn more about what's going on behind the scenes by setting Meltano's
 [`cli.log_level` setting](/docs/settings.html#cli-log-level) to `debug`,
-using the `MELTANO_CLI_LOG_LEVEL` environment variable or the `--log-level` CLI flag:
+using the `MELTANO_CLI_LOG_LEVEL` environment variable or the `--log-level` CLI option:
 
 ```bash
 MELTANO_CLI_LOG_LEVEL=debug meltano elt ...

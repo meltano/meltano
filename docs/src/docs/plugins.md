@@ -29,6 +29,52 @@ Meltano supports [Singer taps](https://singer.io): executables that implement th
 
 To learn which extractors are [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box, refer to the [Extractors page](/plugins/extractors/).
 
+### `catalog` extra
+
+- Setting: `_catalog`
+- [Environment variable](/docs/configuration.html#configuring-settings): `<EXTRACTOR>__CATALOG`, e.g. `TAP_GITLAB__CATALOG`
+- [`meltano elt`](/docs/command-line-interface.html#elt) CLI option: `--catalog`
+- Default: None
+
+An extractor's `catalog` [extra](/docs/configuration.html#plugin-extras) holds a path to a [catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) (relative to the [project directory](/docs/project.html)) to be provided to the extractor
+when it is run in [sync mode](https://github.com/singer-io/getting-started/blob/master/docs/SYNC_MODE.md) using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
+
+If a catalog path is not set, the catalog will be [generated on the fly](/docs/integration.html#extractor-catalog-generation)
+by running the extractor in [discovery mode](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md) and applying the [schema](#schema-extra), [selection](#select-extra), and [metadata](#metadata-extra) rules to the discovered file.
+
+[Selection filter rules](#select-filter-extra) are always applied to manually provided catalogs as well as discovered ones.
+
+While this extra can be managed using [`meltano config`](/docs/command-line-interface.html#config) or environment variables like any other setting,
+a catalog file is typically specified using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option.
+
+#### How to use
+
+##### In `meltano.yml`
+
+```yaml{4}
+extractors:
+- name: tap-gitlab
+  pip_url: tap-gitlab
+  catalog: extract/tap-gitlab.catalog.json
+```
+
+##### On the command line
+
+```bash
+meltano config <extractor> set _catalog <path>
+
+export <EXTRACTOR>__CATALOG=<path>
+
+meltano elt <extractor> <loader> --catalog <path>
+
+# For example:
+meltano config tap-gitlab set _catalog extract/tap-gitlab.catalog.json
+
+export TAP_GITLAB__CATALOG=extract/tap-gitlab.catalog.json
+
+meltano elt tap-gitlab target-jsonl --catalog extract/tap-gitlab.catalog.json
+```
+
 ### `load_schema` extra
 
 - Setting: `_load_schema`
@@ -77,6 +123,7 @@ An extractor's `metadata` [extra](/docs/configuration.html#plugin-extras) holds 
 [Singer stream and property metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata)
 rules that are applied to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
 when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
+These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
 Stream (entity) metadata `<key>: <value>` pairs (e.g. `{"replication-method": "INCREMENTAL"}`) are nested under top-level entity identifiers that correspond to Singer stream `tap_stream_id` values.
 These [nested properties](/docs/command-line-interface.html#nested-properties) can also be thought of and interacted with as settings named `_metadata.<entity>.<key>`.
@@ -134,6 +181,7 @@ An extractor's `schema` [extra](/docs/configuration.html#plugin-extras) holds an
 [Singer stream schema](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#schemas) override
 rules that are applied to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
 when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
+These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
 [JSON Schema](https://json-schema.org/) descriptions for specific properties (attributes) (e.g. `{"type": ["string", "null"], "format": "date-time"}`) are nested under top-level entity identifiers that correspond to Singer stream `tap_stream_id` values, and second-level attribute identifiers that correspond to Singer stream property names.
 These [nested properties](/docs/command-line-interface.html#nested-properties) can also be thought of and interacted with as settings named `_schema.<entity>.<attribute>` and `_schema.<entity>.<attribute>.<key>`.
@@ -188,6 +236,7 @@ export TAP_POSTGRES__SCHEMA_SOME_TABLE_CREATED_AT_FORMAT=date
 An extractor's `select` [extra](/docs/configuration.html#plugin-extras) holds an array of [entity selection rules](/docs/command-line-interface.html#select)
 that are applied to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
 when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
+These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
 A selection rule is comprised of an entity identifier that corresponds to a Singer stream's `tap_stream_id` value, and an attribute identifier that that corresponds to a Singer stream property name, separated by a period (`.`). Rules indicating that an entity or attribute should be excluded are prefixed with an exclamation mark (`!`). [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in entity and attribute identifiers to match multiple entities and/or attributes at once.
 
@@ -231,10 +280,11 @@ meltano select tap-gitlab commits "*"
 
 - Setting: `_select_filter`
 - [Environment variable](/docs/configuration.html#configuring-settings): `<EXTRACTOR>__SELECT_FILTER`, e.g. `TAP_GITLAB__SELECT_FILTER`
+- [`meltano elt`](/docs/command-line-interface.html#elt) CLI options: `--select` and `--exclude`
 - Default: `[]`
 
 An extractor's `select_filter` [extra](/docs/configuration.html#plugin-extras) holds an array of [entity selection](#select-extra) filter rules
-that are applied to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
+that are applied to the extractor's [discovered](/docs/integration.html#extractor-catalog-generation) or [provided](#catalog-extra) catalog file
 when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke),
 after [schema](#schema-extra), [selection](#select-extra), and [metadata](#metadata-extra) rules are applied.
 

@@ -157,6 +157,7 @@ that are handled by Meltano instead of the plugin itself.
 
 Meltano currently knows these extras for these plugin types:
 - [Extractors](/docs/plugins.html#extractors)
+  - [`catalog`](/docs/plugins.html#catalog-extra)
   - [`load_schema`](/docs/plugins.html#load-schema-extra)
   - [`metadata`](/docs/plugins.html#metadata-extra)
   - [`schema`](/docs/plugins.html#schema-extra)
