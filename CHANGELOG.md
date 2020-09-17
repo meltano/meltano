@@ -10,18 +10,27 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.50.0 - (2020-09-17)
+---
+
+### New
+
 - [#2291](https://gitlab.com/meltano/meltano/-/issues/2291) Add `catalog` extractor extra to allow a catalog to be provided manually
 - [#2291](https://gitlab.com/meltano/meltano/-/issues/2291) Add `--catalog` option to `meltano elt` to allow a catalog to be provided manually
 - [#2289](https://gitlab.com/meltano/meltano/-/issues/2289) Add `state` extractor extra to allow state file to be provided manually
 - [#2289](https://gitlab.com/meltano/meltano/-/issues/2289) Add `--state` option to `meltano elt` to allow state file to be provided manually
 
-### Changes
 
 ### Fixes
 
 - [#2352](https://gitlab.com/meltano/meltano/-/issues/2352) `meltano elt` `--select` and `--exclude` no longer unexpectedly select entities for extraction that match the wildcard pattern but weren't selected originally.
-
-### Breaks
 
 
 ## 1.49.0 - (2020-09-15)
