@@ -86,31 +86,32 @@ class ELTContext:
         if self.job:
             return self.project.job_dir(self.job.job_id, str(self.job.run_id))
 
-    def extractor_invoker(self):
+    def invoker_for(self, plugin_type):
+        plugins = {
+            PluginType.EXTRACTORS: self.extractor,
+            PluginType.LOADERS: self.loader,
+            PluginType.TRANSFORMERS: self.transformer,
+        }
+
+        plugin = plugins[plugin_type]
+
         return invoker_factory(
             self.project,
-            self.extractor.install,
+            plugin.install,
+            context=self,
             run_dir=self.elt_run_dir,
-            plugin_settings_service=self.extractor.settings_service,
+            plugin_settings_service=plugin.settings_service,
             plugin_discovery_service=self.plugin_discovery_service,
         )
+
+    def extractor_invoker(self):
+        return self.invoker_for(PluginType.EXTRACTORS)
 
     def loader_invoker(self):
-        return invoker_factory(
-            self.project,
-            self.loader.install,
-            run_dir=self.elt_run_dir,
-            plugin_settings_service=self.loader.settings_service,
-            plugin_discovery_service=self.plugin_discovery_service,
-        )
+        return self.invoker_for(PluginType.LOADERS)
 
     def transformer_invoker(self):
-        return invoker_factory(
-            self.project,
-            self.transformer.install,
-            plugin_settings_service=self.transformer.settings_service,
-            plugin_discovery_service=self.plugin_discovery_service,
-        )
+        return self.invoker_for(PluginType.TRANSFORMERS)
 
 
 class ELTContextBuilder:

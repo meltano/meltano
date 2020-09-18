@@ -55,7 +55,7 @@ class PluginInvoker:
         self,
         project: Project,
         plugin: PluginInstall,
-        plugin_config: Optional[dict] = None,
+        context: Optional[object] = None,
         run_dir=None,
         config_dir=None,
         venv_service: VenvService = None,
@@ -65,6 +65,8 @@ class PluginInvoker:
     ):
         self.project = project
         self.plugin = plugin
+        self.context = context
+
         self.venv_service = venv_service or VenvService(project)
         self.config_service = plugin_config_service or PluginConfigService(
             plugin,
@@ -80,9 +82,11 @@ class PluginInvoker:
             config_service=self.discovery_service.config_service,
             plugin_discovery_service=self.discovery_service,
         )
+
         self.plugin_def = self.discovery_service.find_plugin(
             self.plugin.type, self.plugin.name
         )
+
         self._prepared = False
         self.plugin_config = {}
         self.plugin_config_processed = {}
