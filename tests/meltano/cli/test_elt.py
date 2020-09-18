@@ -11,6 +11,7 @@ from meltano.core.project_add_service import PluginAlreadyAddedException
 from meltano.core.plugin import PluginType, PluginRef
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin.dbt import DbtPlugin
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
@@ -154,15 +155,21 @@ class TestCliEltScratchpadOne:
         args = ["elt", "--job_id", job_id, tap.name, target.name]
 
         # exit cleanly when everything is fine
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
-        with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
-        ) as invoke_async, mock.patch(
+        create_subprocess_exec = CoroutineMock(
+            side_effect=(tap_process, target_process)
+        )
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock, mock.patch(
             "meltano.cli.elt.install_plugins", return_value=True
         ) as install_plugin_mock, mock.patch(
             "meltano.core.elt_context.PluginDiscoveryService",
             return_value=plugin_discovery_service,
         ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
@@ -237,15 +244,21 @@ class TestCliEltScratchpadOne:
 
         job_logging_service.delete_all_logs(job_id)
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
-        with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
-        ) as invoke_async, mock.patch(
+        create_subprocess_exec = CoroutineMock(
+            side_effect=(tap_process, target_process)
+        )
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock, mock.patch(
             "meltano.cli.elt.install_plugins", return_value=True
         ) as install_plugin_mock, mock.patch(
             "meltano.core.elt_context.PluginDiscoveryService",
             return_value=plugin_discovery_service,
         ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+
             monkeypatch.setenv("MELTANO_CLI_LOG_LEVEL", "debug")
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)

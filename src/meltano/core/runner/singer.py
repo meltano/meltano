@@ -11,11 +11,11 @@ from datetime import datetime
 from enum import IntFlag
 
 from . import Runner, RunnerError
-from meltano.core.job import Job, Payload, JobFinder
+from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import invoker_factory, PluginInvoker
 from meltano.core.plugin.singer import SingerTap, SingerTarget, PluginType
-from meltano.core.utils import file_has_data, merge
+from meltano.core.utils import file_has_data
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.elt_context import ELTContext
 
@@ -141,69 +141,6 @@ class SingerRunner(Runner):
             self.context.job, self.context.session, payload_flag=payload_flag
         )
 
-    def restore_bookmark(self, tap: PluginInvoker):
-        # Delete state left over from different pipeline run for same extractor
-        try:
-            os.remove(tap.files["state"])
-        except OSError:
-            pass
-
-        if self.context.full_refresh:
-            logging.info(
-                "Performing full refresh, ignoring state left behind by any previous runs."
-            )
-            return
-
-        state_path = tap.files["state"]
-
-        custom_state_filename = tap.plugin_config_extras["_state"]
-        if custom_state_filename:
-            custom_state_path = tap.project.root.joinpath(custom_state_filename)
-
-            try:
-                shutil.copy(custom_state_path, state_path)
-                logging.info(f"Found state in {custom_state_filename}")
-            except FileNotFoundError as err:
-                raise RunnerError(
-                    f"Could not find state file {custom_state_path}"
-                ) from err
-
-            return
-
-        if self.context.job is None:
-            logging.info(
-                f"Running outside a Job context: incremental state could not be loaded."
-            )
-            return
-
-        # the `state.json` is stored in the database
-        state = {}
-        incomplete_since = None
-        finder = JobFinder(self.context.job.job_id)
-
-        state_job = finder.latest_with_payload(
-            self.context.session, flags=Payload.STATE
-        )
-        if state_job:
-            logging.info(f"Found state from {state_job.started_at}.")
-            incomplete_since = state_job.ended_at
-            if "singer_state" in state_job.payload:
-                merge(state_job.payload["singer_state"], state)
-
-        incomplete_state_jobs = finder.with_payload(
-            self.context.session, flags=Payload.INCOMPLETE_STATE, since=incomplete_since
-        )
-        for state_job in incomplete_state_jobs:
-            logging.info(f"Found incomplete state from {state_job.started_at}.")
-            if "singer_state" in state_job.payload:
-                merge(state_job.payload["singer_state"], state)
-
-        if state:
-            with state_path.open("w+") as state_file:
-                json.dump(state, state_file, indent=2)
-        else:
-            logging.warning("No state was found, complete import.")
-
     def dry_run(self, tap: PluginInvoker, target: PluginInvoker):
         logging.info("Dry run:")
         logging.info(f"\textractor: {tap.plugin.name} at '{tap.exec_path()}'")
@@ -219,8 +156,6 @@ class SingerRunner(Runner):
             return self.dry_run(tap, target)
 
         with tap.prepared(self.context.session), target.prepared(self.context.session):
-            self.restore_bookmark(tap)
-
             await self.invoke(
                 tap,
                 target,

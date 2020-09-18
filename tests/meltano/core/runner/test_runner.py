@@ -2,17 +2,16 @@ import pytest
 import os
 import json
 from asynctest import CoroutineMock
-from contextlib import contextmanager
 from pathlib import Path
 
 from unittest import mock
-from meltano.core.job import Job, State
+from meltano.core.job import Job, State, Payload
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.plugin import Plugin, PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin.factory import plugin_factory
 from meltano.core.plugin.singer import SingerTap, SingerTarget
-from meltano.core.runner.singer import SingerRunner, Payload, BookmarkWriter
+from meltano.core.runner.singer import SingerRunner, BookmarkWriter
 from meltano.core.logging.utils import capture_subprocess_output
 
 
@@ -200,138 +199,22 @@ class TestSingerRunner:
             assert job.payload_flags == payload_flag
 
     @pytest.mark.asyncio
-    async def test_restore_bookmark(
-        self, subject, project, session, tap, plugin_invoker_factory, monkeypatch
-    ):
-        job_id = subject.context.job.job_id
-        tap_invoker = plugin_invoker_factory(tap)
-
-        @contextmanager
-        def create_job():
-            job = Job(job_id=job_id)
-            job.start()
-            yield job
-            job.save(session)
-
-        def assert_state(state):
-            with tap_invoker.prepared(session):
-                subject.restore_bookmark(tap_invoker)
-
-            if state:
-                assert tap_invoker.files["state"].exists()
-                assert json.load(tap_invoker.files["state"].open()) == state
-            else:
-                assert not tap_invoker.files["state"].exists()
-
-        # No state by default
-        assert_state(None)
-
-        # Running jobs with state are not considered
-        with create_job() as job:
-            job.payload["singer_state"] = {"success": True}
-            job.payload_flags = Payload.STATE
-
-        assert_state(None)
-
-        # Successful jobs without state are not considered
-        with create_job() as job:
-            job.success()
-
-        assert_state(None)
-
-        # Successful jobs with incomplete state are considered
-        with create_job() as job:
-            job.payload["singer_state"] = {"incomplete_success": True}
-            job.payload_flags = Payload.INCOMPLETE_STATE
-            job.success()
-
-        assert_state({"incomplete_success": True})
-
-        # Successful jobs with state are considered
-        with create_job() as job:
-            job.payload["singer_state"] = {"success": True}
-            job.payload_flags = Payload.STATE
-            job.success()
-
-        assert_state({"success": True})
-
-        # Running jobs with state are not considered
-        with create_job() as job:
-            job.payload["singer_state"] = {"success": True}
-            job.payload_flags = Payload.STATE
-
-        assert_state({"success": True})
-
-        # Failed jobs without state are not considered
-        with create_job() as job:
-            job.fail("Whoops")
-
-        assert_state({"success": True})
-
-        # Failed jobs with state are considered
-        with create_job() as job:
-            job.payload["singer_state"] = {"failed": True}
-            job.payload_flags = Payload.STATE
-            job.fail("Whoops")
-
-        assert_state({"failed": True})
-
-        # Successful jobs with incomplete state are considered
-        with create_job() as job:
-            job.payload["singer_state"] = {"success": True}
-            job.payload_flags = Payload.INCOMPLETE_STATE
-            job.success()
-
-        # Incomplete state is merged into complete state
-        assert_state({"failed": True, "success": True})
-
-        # Failed jobs with incomplete state are considered
-        with create_job() as job:
-            job.payload["singer_state"] = {"failed_again": True}
-            job.payload_flags = Payload.INCOMPLETE_STATE
-            job.fail("Whoops")
-
-        # Incomplete state is merged into complete state
-        assert_state({"failed": True, "success": True, "failed_again": True})
-
-        # Custom state takes precedence
-        custom_state_filename = "custom_state.json"
-        custom_state_path = project.root.joinpath(custom_state_filename)
-        custom_state_path.write_text('{"custom": true}')
-
-        monkeypatch.setitem(
-            tap_invoker.settings_service.config_override,
-            "_state",
-            custom_state_filename,
-        )
-
-        assert_state({"custom": True})
-
-        # With a full refresh, no state is considered
-        subject.context.full_refresh = True
-        assert_state(None)
-
-    @pytest.mark.asyncio
     async def test_run(self, subject):
         async def invoke_mock(*args, **kwargs):
             pass
 
         with mock.patch.object(
-            SingerRunner, "restore_bookmark"
-        ) as restore_bookmark, mock.patch.object(
             SingerRunner, "invoke", side_effect=invoke_mock
         ) as invoke:
             subject.context.dry_run = True
             await subject.run()
 
-            assert not restore_bookmark.called
             assert not invoke.called
 
             subject.context.dry_run = False
             await subject.run()
             AnyPluginInvoker = AnyInstanceOf(PluginInvoker)
 
-            restore_bookmark.assert_called_once_with(session, AnyPluginInvoker)
             invoke.assert_called_once_with(
                 AnyPluginInvoker,
                 AnyPluginInvoker,
