@@ -10,7 +10,8 @@ from meltano.core.setting_definition import SettingDefinition
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin_invoker import InvokerError
-from meltano.core.utils import file_has_data, truthy, flatten
+from meltano.core.job import Payload, JobFinder
+from meltano.core.utils import file_has_data, truthy, flatten, merge
 
 from . import SingerPlugin, PluginType
 from .catalog import (
@@ -128,6 +129,85 @@ class SingerTap(SingerPlugin):
         return {"output": "tap.out"}
 
     @hook("before_invoke")
+    def look_up_state_hook(self, plugin_invoker, exec_args=[]):
+        if "--discover" in exec_args or "--help" in exec_args:
+            return
+
+        try:
+            self.look_up_state(plugin_invoker, exec_args)
+        except PluginLacksCapabilityError:
+            pass
+
+    def look_up_state(self, plugin_invoker, exec_args=[]):
+        if "state" not in plugin_invoker.capabilities:
+            raise PluginLacksCapabilityError(
+                f"Extractor '{self.name}' does not support incremental state"
+            )
+
+        state_path = plugin_invoker.files["state"]
+
+        try:
+            # Delete state left over from different pipeline run for same extractor
+            state_path.unlink()
+        except FileNotFoundError:
+            pass
+
+        elt_context = plugin_invoker.context
+        if not elt_context or not elt_context.job:
+            # Running outside pipeline context: incremental state could not be loaded
+            return
+
+        if elt_context.full_refresh:
+            logger.info(
+                "Performing full refresh, ignoring state left behind by any previous runs."
+            )
+            return
+
+        custom_state_filename = plugin_invoker.plugin_config_extras["_state"]
+        if custom_state_filename:
+            custom_state_path = plugin_invoker.project.root.joinpath(
+                custom_state_filename
+            )
+
+            try:
+                shutil.copy(custom_state_path, state_path)
+                logger.info(f"Found state in {custom_state_filename}")
+            except FileNotFoundError as err:
+                raise PluginExecutionError(
+                    f"Could not find state file {custom_state_path}"
+                ) from err
+
+            return
+
+        # the `state.json` is stored in the database
+        state = {}
+        incomplete_since = None
+        finder = JobFinder(elt_context.job.job_id)
+
+        state_job = finder.latest_with_payload(elt_context.session, flags=Payload.STATE)
+        if state_job:
+            logger.info(f"Found state from {state_job.started_at}.")
+            incomplete_since = state_job.ended_at
+            if "singer_state" in state_job.payload:
+                merge(state_job.payload["singer_state"], state)
+
+        incomplete_state_jobs = finder.with_payload(
+            elt_context.session, flags=Payload.INCOMPLETE_STATE, since=incomplete_since
+        )
+        for state_job in incomplete_state_jobs:
+            logger.info(
+                f"Found and merged incomplete state from {state_job.started_at}."
+            )
+            if "singer_state" in state_job.payload:
+                merge(state_job.payload["singer_state"], state)
+
+        if state:
+            with state_path.open("w") as state_file:
+                json.dump(state, state_file, indent=2)
+        else:
+            logger.warning("No state was found, complete import.")
+
+    @hook("before_invoke")
     def discover_catalog_hook(self, plugin_invoker, exec_args=[]):
         if "--discover" in exec_args or "--help" in exec_args:
             return
@@ -148,6 +228,7 @@ class SingerTap(SingerPlugin):
 
             try:
                 shutil.copy(custom_catalog_path, catalog_path)
+                logger.info(f"Found catalog in {custom_catalog_path}")
             except FileNotFoundError as err:
                 raise PluginExecutionError(
                     f"Could not find catalog file {custom_catalog_path}"

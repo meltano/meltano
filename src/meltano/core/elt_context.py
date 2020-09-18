@@ -48,10 +48,12 @@ class ELTContext:
         self,
         project,
         job: Optional[Job] = None,
+        session=None,
         extractor: Optional[PluginContext] = None,
         loader: Optional[PluginContext] = None,
         transform: Optional[PluginContext] = None,
         transformer: Optional[PluginContext] = None,
+        only_transform: Optional[bool] = False,
         dry_run: Optional[bool] = False,
         full_refresh: Optional[bool] = False,
         select_filter: Optional[list] = [],
@@ -61,10 +63,14 @@ class ELTContext:
     ):
         self.project = project
         self.job = job
+        self.session = session
+
         self.extractor = extractor
         self.loader = loader
         self.transform = transform
         self.transformer = transformer
+
+        self.only_transform = only_transform
         self.dry_run = dry_run
         self.full_refresh = full_refresh
         self.select_filter = select_filter
@@ -80,31 +86,32 @@ class ELTContext:
         if self.job:
             return self.project.job_dir(self.job.job_id, str(self.job.run_id))
 
-    def extractor_invoker(self):
+    def invoker_for(self, plugin_type):
+        plugins = {
+            PluginType.EXTRACTORS: self.extractor,
+            PluginType.LOADERS: self.loader,
+            PluginType.TRANSFORMERS: self.transformer,
+        }
+
+        plugin = plugins[plugin_type]
+
         return invoker_factory(
             self.project,
-            self.extractor.install,
+            plugin.install,
+            context=self,
             run_dir=self.elt_run_dir,
-            plugin_settings_service=self.extractor.settings_service,
+            plugin_settings_service=plugin.settings_service,
             plugin_discovery_service=self.plugin_discovery_service,
         )
+
+    def extractor_invoker(self):
+        return self.invoker_for(PluginType.EXTRACTORS)
 
     def loader_invoker(self):
-        return invoker_factory(
-            self.project,
-            self.loader.install,
-            run_dir=self.elt_run_dir,
-            plugin_settings_service=self.loader.settings_service,
-            plugin_discovery_service=self.plugin_discovery_service,
-        )
+        return self.invoker_for(PluginType.LOADERS)
 
     def transformer_invoker(self):
-        return invoker_factory(
-            self.project,
-            self.transformer.install,
-            plugin_settings_service=self.transformer.settings_service,
-            plugin_discovery_service=self.plugin_discovery_service,
-        )
+        return self.invoker_for(PluginType.TRANSFORMERS)
 
 
 class ELTContextBuilder:
@@ -121,16 +128,30 @@ class ELTContextBuilder:
             or PluginDiscoveryService(project, config_service=config_service)
         )
 
+        self._session = None
+        self._job = None
+
         self._extractor = None
         self._loader = None
         self._transform = None
         self._transformer = None
-        self._job = None
+
+        self._only_transform = False
         self._dry_run = False
         self._full_refresh = False
         self._select_filter = None
         self._catalog = None
         self._state = None
+
+    def with_session(self, session):
+        self._session = session
+
+        return self
+
+    def with_job(self, job: Job):
+        self._job = job
+
+        return self
 
     def with_extractor(self, extractor_name: str):
         self._extractor = PluginRef(PluginType.EXTRACTORS, extractor_name)
@@ -156,8 +177,8 @@ class ELTContextBuilder:
 
         return self
 
-    def with_job(self, job: Job):
-        self._job = job
+    def with_only_transform(self, only_transform):
+        self._only_transform = only_transform
 
         return self
 
@@ -186,7 +207,24 @@ class ELTContextBuilder:
 
         return self
 
-    def plugin_context(self, session, plugin: PluginRef, env={}, config={}):
+    @property
+    def plugin_refs(self):
+        refs = []
+
+        if self._extractor:
+            refs.append(self._extractor)
+
+        if self._loader:
+            refs.append(self._loader)
+
+        if self._transform:
+            refs.append(self._transform)
+        elif self._transformer:
+            refs.append(self._transformer)
+
+        return refs
+
+    def plugin_context(self, plugin: PluginRef, env={}, config={}):
         return PluginContext(
             ref=plugin,
             install=self.config_service.find_plugin(
@@ -203,10 +241,10 @@ class ELTContextBuilder:
                 env_override=env,
                 config_override=config,
             ),
-            session=session,
+            session=self._session,
         )
 
-    def context(self, session) -> ELTContext:
+    def context(self) -> ELTContext:
         env = {}
 
         extractor = None
@@ -219,35 +257,35 @@ class ELTContextBuilder:
             if self._state:
                 config["_state"] = self._state
 
-            extractor = self.plugin_context(session, self._extractor, config=config)
+            extractor = self.plugin_context(self._extractor, config=config)
 
             env.update(extractor.env)
 
         loader = None
         if self._loader:
-            loader = self.plugin_context(session, self._loader, env=env.copy())
+            loader = self.plugin_context(self._loader, env=env.copy())
 
             env.update(loader.env)
 
         transform = None
         if self._transform:
-            transform = self.plugin_context(session, self._transform, env=env.copy())
+            transform = self.plugin_context(self._transform, env=env.copy())
 
             env.update(transform.env)
 
         transformer = None
         if self._transformer:
-            transformer = self.plugin_context(
-                session, self._transformer, env=env.copy()
-            )
+            transformer = self.plugin_context(self._transformer, env=env.copy())
 
         return ELTContext(
             self.project,
             job=self._job,
+            session=self._session,
             extractor=extractor,
             loader=loader,
             transform=transform,
             transformer=transformer,
+            only_transform=self._only_transform,
             dry_run=self._dry_run,
             full_refresh=self._full_refresh,
             select_filter=self._select_filter,

@@ -96,11 +96,9 @@ class TestJob:
         assert subject.payload["error"] == "The process was terminated"
 
     def test_run_id(self, session):
-        expected_uuid = uuid.uuid4()
         job = Job()
+        run_id = job.run_id
+        assert isinstance(run_id, uuid.UUID)
 
-        with mock.patch("uuid.uuid4", return_value=expected_uuid):
-            assert job.run_id is None
-            job.save(session)
-
-            assert isinstance(job.run_id, uuid.UUID)
+        job.save(session)
+        assert job.run_id == run_id

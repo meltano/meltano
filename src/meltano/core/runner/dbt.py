@@ -51,11 +51,14 @@ class DbtRunner(Runner):
 
         exitcode = handle.returncode
         if exitcode:
-            raise RunnerError(f"`dbt {cmd}` failed", {"transformer": exitcode})
+            raise RunnerError(
+                f"`dbt {cmd}` failed", {PluginType.TRANSFORMERS: exitcode}
+            )
 
-    async def run(self, session, log=None):
+    async def run(self, log=None):
         dbt = self.context.transformer_invoker()
-        with dbt.prepared(session):
+
+        with dbt.prepared(self.context.session):
             await self.invoke(dbt, "clean", log=log)
             await self.invoke(dbt, "deps", log=log)
 

@@ -97,8 +97,27 @@ def elt(
 
     _, Session = project_engine(project)
     session = Session()
-
     try:
+        config_service = ConfigService(project)
+        discovery_service = PluginDiscoveryService(
+            project, config_service=config_service
+        )
+
+        context_builder = elt_context_builder(
+            project,
+            job,
+            session,
+            extractor,
+            loader,
+            transform,
+            dry_run=dry,
+            full_refresh=full_refresh,
+            select_filter=select_filter,
+            catalog=catalog,
+            state=state,
+            discovery_service=discovery_service,
+        )
+
         job_logging_service = JobLoggingService(project)
 
         with job.run(session), job_logging_service.create_log(
@@ -109,17 +128,10 @@ def elt(
             run_async(
                 run_elt(
                     project,
-                    job,
-                    extractor,
-                    loader,
-                    transform,
-                    output_logger=output_logger,
-                    session=session,
-                    dry_run=dry,
-                    full_refresh=full_refresh,
-                    select_filter=select_filter,
-                    catalog=catalog,
-                    state=state,
+                    context_builder,
+                    output_logger,
+                    config_service=config_service,
+                    discovery_service=discovery_service,
                 )
             )
     finally:
@@ -127,6 +139,42 @@ def elt(
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)
+
+
+def elt_context_builder(
+    project,
+    job,
+    session,
+    extractor,
+    loader,
+    transform,
+    dry_run=False,
+    full_refresh=False,
+    select_filter=[],
+    catalog=None,
+    state=None,
+    discovery_service=None,
+):
+    transform_name = None
+    if transform != "skip":
+        transform_name = find_transform_for_extractor(
+            extractor, discovery_service=discovery_service
+        )
+
+    return (
+        ELTContextBuilder(project)
+        .with_session(session)
+        .with_job(job)
+        .with_extractor(extractor)
+        .with_loader(loader)
+        .with_transform(transform_name or transform)
+        .with_dry_run(dry_run)
+        .with_only_transform(transform == "only")
+        .with_full_refresh(full_refresh)
+        .with_select_filter(select_filter)
+        .with_catalog(catalog)
+        .with_state(state)
+    )
 
 
 def run_async(coro):
@@ -158,45 +206,13 @@ async def redirect_output(output_logger):
 
 
 async def run_elt(
-    project,
-    job,
-    extractor,
-    loader,
-    transform,
-    output_logger,
-    session,
-    dry_run=False,
-    full_refresh=False,
-    select_filter=[],
-    catalog=None,
-    state=None,
+    project, context_builder, output_logger, config_service, discovery_service
 ):
-    config_service = ConfigService(project)
-    discovery_service = PluginDiscoveryService(project, config_service=config_service)
-
-    plugin_refs = []
-    if transform != "only":
-        plugin_refs.append(PluginRef(PluginType.EXTRACTORS, extractor))
-        plugin_refs.append(PluginRef(PluginType.LOADERS, loader))
-
-    transform_name = None
-    if transform != "skip":
-        transform_name = find_transform_for_extractor(
-            extractor, discovery_service=discovery_service
-        )
-
-        if transform_name:
-            plugin_refs.append(PluginRef(PluginType.TRANSFORMS, transform_name))
-        else:
-            # There is no default transform for this extractor..
-            # Don't panic, everything is cool - just run custom transforms
-            plugin_refs.append(PluginRef(PluginType.TRANSFORMERS, "dbt"))
-
     async with redirect_output(output_logger):
         try:
             success = install_missing_plugins(
                 project,
-                plugin_refs,
+                context_builder.plugin_refs,
                 config_service=config_service,
                 discovery_service=discovery_service,
             )
@@ -204,34 +220,22 @@ async def run_elt(
             if not success:
                 raise CliError("Failed to install missing plugins")
 
-            elt_context = (
-                ELTContextBuilder(project)
-                .with_job(job)
-                .with_extractor(extractor)
-                .with_loader(loader)
-                .with_transform(transform_name or transform)
-                .with_dry_run(dry_run)
-                .with_full_refresh(full_refresh)
-                .with_select_filter(select_filter)
-                .with_catalog(catalog)
-                .with_state(state)
-                .context(session)
-            )
+            elt_context = context_builder.context()
 
-            if transform != "only":
-                await run_extract_load(elt_context, output_logger, session)
+            if not elt_context.only_transform:
+                await run_extract_load(elt_context, output_logger)
             else:
                 logs("Extract & load skipped.", fg="yellow")
 
             if elt_context.transformer:
-                await run_transform(elt_context, output_logger, session)
+                await run_transform(elt_context, output_logger)
             else:
                 logs("Transformation skipped.", fg="yellow")
         except RunnerError as err:
             raise CliError(f"ELT could not be completed: {err}") from err
 
 
-async def run_extract_load(elt_context, output_logger, session, **kwargs):
+async def run_extract_load(elt_context, output_logger, **kwargs):
     extractor = elt_context.extractor.name
     loader = elt_context.loader.name
 
@@ -258,7 +262,6 @@ async def run_extract_load(elt_context, output_logger, session, **kwargs):
         with extractor_log.line_writer() as extractor_log_writer, loader_log.line_writer() as loader_log_writer:
             with extractor_out_writer() as extractor_out_writer, loader_out_writer() as loader_out_writer:
                 await singer_runner.run(
-                    session,
                     **kwargs,
                     extractor_log=extractor_log_writer,
                     loader_log=loader_log_writer,
@@ -267,7 +270,7 @@ async def run_extract_load(elt_context, output_logger, session, **kwargs):
                 )
     except RunnerError as err:
         try:
-            code = err.exitcodes["extractor"]
+            code = err.exitcodes[PluginType.EXTRACTORS]
             message = extractor_log.last_line.rstrip() or "(see above)"
             logger.error(
                 f"{click.style(f'Extraction failed ({code}):', fg='red')} {message}"
@@ -276,7 +279,7 @@ async def run_extract_load(elt_context, output_logger, session, **kwargs):
             pass
 
         try:
-            code = err.exitcodes["loader"]
+            code = err.exitcodes[PluginType.LOADERS]
             message = loader_log.last_line.rstrip() or "(see above)"
             logger.error(
                 f"{click.style(f'Loading failed ({code}):', fg='red')} {message}"
@@ -289,7 +292,7 @@ async def run_extract_load(elt_context, output_logger, session, **kwargs):
     logs("Extract & load complete!", fg="green")
 
 
-async def run_transform(elt_context, output_logger, session, **kwargs):
+async def run_transform(elt_context, output_logger, **kwargs):
     transformer_log = output_logger.out(elt_context.transformer.name, color="magenta")
 
     logs("Running transformation...")
@@ -297,10 +300,10 @@ async def run_transform(elt_context, output_logger, session, **kwargs):
     dbt_runner = DbtRunner(elt_context)
     try:
         with transformer_log.line_writer() as transformer_log_writer:
-            await dbt_runner.run(session, **kwargs, log=transformer_log_writer)
+            await dbt_runner.run(**kwargs, log=transformer_log_writer)
     except RunnerError as err:
         try:
-            code = err.exitcodes["transformer"]
+            code = err.exitcodes[PluginType.TRANSFORMERS]
             message = transformer_log.last_line.rstrip() or "(see above)"
             logger.error(
                 f"{click.style(f'Transformation failed ({code}):', fg='red')} {message}"
