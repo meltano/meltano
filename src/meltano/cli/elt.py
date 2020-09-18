@@ -97,8 +97,27 @@ def elt(
 
     _, Session = project_engine(project)
     session = Session()
-
     try:
+        config_service = ConfigService(project)
+        discovery_service = PluginDiscoveryService(
+            project, config_service=config_service
+        )
+
+        context_builder = elt_context_builder(
+            project,
+            job,
+            session,
+            extractor,
+            loader,
+            transform,
+            dry_run=dry,
+            full_refresh=full_refresh,
+            select_filter=select_filter,
+            catalog=catalog,
+            state=state,
+            discovery_service=discovery_service,
+        )
+
         job_logging_service = JobLoggingService(project)
 
         with job.run(session), job_logging_service.create_log(
@@ -109,17 +128,10 @@ def elt(
             run_async(
                 run_elt(
                     project,
-                    job,
-                    extractor,
-                    loader,
-                    transform,
-                    output_logger=output_logger,
-                    session=session,
-                    dry_run=dry,
-                    full_refresh=full_refresh,
-                    select_filter=select_filter,
-                    catalog=catalog,
-                    state=state,
+                    context_builder,
+                    output_logger,
+                    config_service=config_service,
+                    discovery_service=discovery_service,
                 )
             )
     finally:
@@ -127,6 +139,42 @@ def elt(
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)
+
+
+def elt_context_builder(
+    project,
+    job,
+    session,
+    extractor,
+    loader,
+    transform,
+    dry_run=False,
+    full_refresh=False,
+    select_filter=[],
+    catalog=None,
+    state=None,
+    discovery_service=None,
+):
+    transform_name = None
+    if transform != "skip":
+        transform_name = find_transform_for_extractor(
+            extractor, discovery_service=discovery_service
+        )
+
+    return (
+        ELTContextBuilder(project)
+        .with_session(session)
+        .with_job(job)
+        .with_extractor(extractor)
+        .with_loader(loader)
+        .with_transform(transform_name or transform)
+        .with_dry_run(dry_run)
+        .with_only_transform(transform == "only")
+        .with_full_refresh(full_refresh)
+        .with_select_filter(select_filter)
+        .with_catalog(catalog)
+        .with_state(state)
+    )
 
 
 def run_async(coro):
@@ -158,45 +206,13 @@ async def redirect_output(output_logger):
 
 
 async def run_elt(
-    project,
-    job,
-    extractor,
-    loader,
-    transform,
-    output_logger,
-    session,
-    dry_run=False,
-    full_refresh=False,
-    select_filter=[],
-    catalog=None,
-    state=None,
+    project, context_builder, output_logger, config_service, discovery_service
 ):
-    config_service = ConfigService(project)
-    discovery_service = PluginDiscoveryService(project, config_service=config_service)
-
-    plugin_refs = []
-    if transform != "only":
-        plugin_refs.append(PluginRef(PluginType.EXTRACTORS, extractor))
-        plugin_refs.append(PluginRef(PluginType.LOADERS, loader))
-
-    transform_name = None
-    if transform != "skip":
-        transform_name = find_transform_for_extractor(
-            extractor, discovery_service=discovery_service
-        )
-
-        if transform_name:
-            plugin_refs.append(PluginRef(PluginType.TRANSFORMS, transform_name))
-        else:
-            # There is no default transform for this extractor..
-            # Don't panic, everything is cool - just run custom transforms
-            plugin_refs.append(PluginRef(PluginType.TRANSFORMERS, "dbt"))
-
     async with redirect_output(output_logger):
         try:
             success = install_missing_plugins(
                 project,
-                plugin_refs,
+                context_builder.plugin_refs,
                 config_service=config_service,
                 discovery_service=discovery_service,
             )
@@ -204,22 +220,9 @@ async def run_elt(
             if not success:
                 raise CliError("Failed to install missing plugins")
 
-            elt_context = (
-                ELTContextBuilder(project)
-                .with_context(session)
-                .with_job(job)
-                .with_extractor(extractor)
-                .with_loader(loader)
-                .with_transform(transform_name or transform)
-                .with_dry_run(dry_run)
-                .with_full_refresh(full_refresh)
-                .with_select_filter(select_filter)
-                .with_catalog(catalog)
-                .with_state(state)
-                .context()
-            )
+            elt_context = context_builder.context()
 
-            if transform != "only":
+            if not elt_context.only_transform:
                 await run_extract_load(elt_context, output_logger)
             else:
                 logs("Extract & load skipped.", fg="yellow")

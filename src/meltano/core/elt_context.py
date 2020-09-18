@@ -53,6 +53,7 @@ class ELTContext:
         loader: Optional[PluginContext] = None,
         transform: Optional[PluginContext] = None,
         transformer: Optional[PluginContext] = None,
+        only_transform: Optional[bool] = False,
         dry_run: Optional[bool] = False,
         full_refresh: Optional[bool] = False,
         select_filter: Optional[list] = [],
@@ -68,6 +69,8 @@ class ELTContext:
         self.loader = loader
         self.transform = transform
         self.transformer = transformer
+
+        self.only_transform = only_transform
         self.dry_run = dry_run
         self.full_refresh = full_refresh
         self.select_filter = select_filter
@@ -132,6 +135,7 @@ class ELTContextBuilder:
         self._transform = None
         self._transformer = None
 
+        self._only_transform = False
         self._dry_run = False
         self._full_refresh = False
         self._select_filter = None
@@ -172,6 +176,11 @@ class ELTContextBuilder:
 
         return self
 
+    def with_only_transform(self, only_transform):
+        self._only_transform = only_transform
+
+        return self
+
     def with_dry_run(self, dry_run):
         self._dry_run = dry_run
 
@@ -196,6 +205,23 @@ class ELTContextBuilder:
         self._state = state
 
         return self
+
+    @property
+    def plugin_refs(self):
+        refs = []
+
+        if self._extractor:
+            refs.append(self._extractor)
+
+        if self._loader:
+            refs.append(self._loader)
+
+        if self._transform:
+            refs.append(self._transform)
+        elif self._transformer:
+            refs.append(self._transformer)
+
+        return refs
 
     def plugin_context(self, plugin: PluginRef, env={}, config={}):
         return PluginContext(
@@ -258,6 +284,7 @@ class ELTContextBuilder:
             loader=loader,
             transform=transform,
             transformer=transformer,
+            only_transform=self._only_transform,
             dry_run=self._dry_run,
             full_refresh=self._full_refresh,
             select_filter=self._select_filter,
