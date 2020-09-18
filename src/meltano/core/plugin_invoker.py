@@ -168,11 +168,11 @@ class PluginInvoker:
     def Popen_options(self):
         return {}
 
-    def invoke(self, *args, require_preparation=True, env={}, **Popen):
+    @contextmanager
+    def _invoke(self, *args, require_preparation=True, env={}, **Popen):
         if require_preparation and not self._prepared:
             raise InvokerNotPreparedError()
 
-        process = None
         with self.plugin.trigger_hooks("invoke", self, args):
             popen_args = self.exec_args(*args)
             popen_options = {**self.Popen_options(), **Popen}
@@ -181,32 +181,16 @@ class PluginInvoker:
             logging.debug(f"Env: {popen_env}")
 
             try:
-                process = subprocess.Popen(popen_args, **popen_options, env=popen_env)
+                yield (popen_args, popen_options, popen_env)
             except FileNotFoundError as err:
                 raise ExecutableNotFoundError(self.plugin, self.executable) from err
 
-        return process
+    def invoke(self, *args, **kwargs):
+        with self._invoke(*args, **kwargs) as (popen_args, popen_options, popen_env):
+            return subprocess.Popen(popen_args, **popen_options, env=popen_env)
 
-    async def invoke_async(self, *args, require_preparation=True, env={}, **Popen):
-        if require_preparation and not self._prepared:
-            raise InvokerNotPreparedError()
-
-        process = None
-        with self.plugin.trigger_hooks("invoke", self, args):
-            popen_args = self.exec_args(*args)
-            popen_options = {**self.Popen_options(), **Popen}
-            popen_env = {**self.env(), **env}
-            logging.debug(f"Invoking: {popen_args}")
-            logging.debug(f"Env: {popen_env}")
-
-            try:
-                process = await asyncio.create_subprocess_exec(
-                    *popen_args,
-                    limit=OUTPUT_BUFFER_SIZE,
-                    **popen_options,
-                    env=popen_env,
-                )
-            except FileNotFoundError as err:
-                raise ExecutableNotFoundError(self.plugin, self.executable) from err
-
-        return process
+    async def invoke_async(self, *args, **kwargs):
+        with self._invoke(*args, **kwargs) as (popen_args, popen_options, popen_env):
+            return await asyncio.create_subprocess_exec(
+                *popen_args, limit=OUTPUT_BUFFER_SIZE, **popen_options, env=popen_env
+            )
