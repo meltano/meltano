@@ -48,6 +48,7 @@ class ELTContext:
         self,
         project,
         job: Optional[Job] = None,
+        session=None,
         extractor: Optional[PluginContext] = None,
         loader: Optional[PluginContext] = None,
         transform: Optional[PluginContext] = None,
@@ -61,6 +62,8 @@ class ELTContext:
     ):
         self.project = project
         self.job = job
+        self.session = session
+
         self.extractor = extractor
         self.loader = loader
         self.transform = transform
@@ -121,16 +124,29 @@ class ELTContextBuilder:
             or PluginDiscoveryService(project, config_service=config_service)
         )
 
+        self._session = None
+        self._job = None
+
         self._extractor = None
         self._loader = None
         self._transform = None
         self._transformer = None
-        self._job = None
+
         self._dry_run = False
         self._full_refresh = False
         self._select_filter = None
         self._catalog = None
         self._state = None
+
+    def with_session(self, session):
+        self._session = session
+
+        return self
+
+    def with_job(self, job: Job):
+        self._job = job
+
+        return self
 
     def with_extractor(self, extractor_name: str):
         self._extractor = PluginRef(PluginType.EXTRACTORS, extractor_name)
@@ -153,11 +169,6 @@ class ELTContextBuilder:
 
     def with_transformer(self, transformer_name: str):
         self._transformer = PluginRef(PluginType.TRANSFORMERS, transformer_name)
-
-        return self
-
-    def with_job(self, job: Job):
-        self._job = job
 
         return self
 
@@ -186,7 +197,7 @@ class ELTContextBuilder:
 
         return self
 
-    def plugin_context(self, session, plugin: PluginRef, env={}, config={}):
+    def plugin_context(self, plugin: PluginRef, env={}, config={}):
         return PluginContext(
             ref=plugin,
             install=self.config_service.find_plugin(
@@ -203,10 +214,10 @@ class ELTContextBuilder:
                 env_override=env,
                 config_override=config,
             ),
-            session=session,
+            session=self._session,
         )
 
-    def context(self, session) -> ELTContext:
+    def context(self) -> ELTContext:
         env = {}
 
         extractor = None
@@ -219,31 +230,30 @@ class ELTContextBuilder:
             if self._state:
                 config["_state"] = self._state
 
-            extractor = self.plugin_context(session, self._extractor, config=config)
+            extractor = self.plugin_context(self._extractor, config=config)
 
             env.update(extractor.env)
 
         loader = None
         if self._loader:
-            loader = self.plugin_context(session, self._loader, env=env.copy())
+            loader = self.plugin_context(self._loader, env=env.copy())
 
             env.update(loader.env)
 
         transform = None
         if self._transform:
-            transform = self.plugin_context(session, self._transform, env=env.copy())
+            transform = self.plugin_context(self._transform, env=env.copy())
 
             env.update(transform.env)
 
         transformer = None
         if self._transformer:
-            transformer = self.plugin_context(
-                session, self._transformer, env=env.copy()
-            )
+            transformer = self.plugin_context(self._transformer, env=env.copy())
 
         return ELTContext(
             self.project,
             job=self._job,
+            session=self._session,
             extractor=extractor,
             loader=loader,
             transform=transform,

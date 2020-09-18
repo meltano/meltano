@@ -55,10 +55,11 @@ class SqlHelper(SqlUtils):
         project = Project.find()
         context = (
             ELTContextBuilder(project)
+            .with_session(db.session)
             .with_extractor(extractor)
             .with_loader(loader)
             .with_transform(transform)
-            .context(db.session)
+            .context()
         )
         connection_service = ConnectionService(context)
 

@@ -206,6 +206,7 @@ async def run_elt(
 
             elt_context = (
                 ELTContextBuilder(project)
+                .with_context(session)
                 .with_job(job)
                 .with_extractor(extractor)
                 .with_loader(loader)
@@ -215,23 +216,23 @@ async def run_elt(
                 .with_select_filter(select_filter)
                 .with_catalog(catalog)
                 .with_state(state)
-                .context(session)
+                .context()
             )
 
             if transform != "only":
-                await run_extract_load(elt_context, output_logger, session)
+                await run_extract_load(elt_context, output_logger)
             else:
                 logs("Extract & load skipped.", fg="yellow")
 
             if elt_context.transformer:
-                await run_transform(elt_context, output_logger, session)
+                await run_transform(elt_context, output_logger)
             else:
                 logs("Transformation skipped.", fg="yellow")
         except RunnerError as err:
             raise CliError(f"ELT could not be completed: {err}") from err
 
 
-async def run_extract_load(elt_context, output_logger, session, **kwargs):
+async def run_extract_load(elt_context, output_logger, **kwargs):
     extractor = elt_context.extractor.name
     loader = elt_context.loader.name
 
@@ -258,7 +259,6 @@ async def run_extract_load(elt_context, output_logger, session, **kwargs):
         with extractor_log.line_writer() as extractor_log_writer, loader_log.line_writer() as loader_log_writer:
             with extractor_out_writer() as extractor_out_writer, loader_out_writer() as loader_out_writer:
                 await singer_runner.run(
-                    session,
                     **kwargs,
                     extractor_log=extractor_log_writer,
                     loader_log=loader_log_writer,
@@ -289,7 +289,7 @@ async def run_extract_load(elt_context, output_logger, session, **kwargs):
     logs("Extract & load complete!", fg="green")
 
 
-async def run_transform(elt_context, output_logger, session, **kwargs):
+async def run_transform(elt_context, output_logger, **kwargs):
     transformer_log = output_logger.out(elt_context.transformer.name, color="magenta")
 
     logs("Running transformation...")
@@ -297,7 +297,7 @@ async def run_transform(elt_context, output_logger, session, **kwargs):
     dbt_runner = DbtRunner(elt_context)
     try:
         with transformer_log.line_writer() as transformer_log_writer:
-            await dbt_runner.run(session, **kwargs, log=transformer_log_writer)
+            await dbt_runner.run(**kwargs, log=transformer_log_writer)
     except RunnerError as err:
         try:
             code = err.exitcodes[PluginType.TRANSFORMERS]

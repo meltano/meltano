@@ -31,10 +31,11 @@ class TestConnectionService:
             pass
 
         elt_context = (
-            elt_context_builder.with_extractor(tap.name)
+            elt_context_builder.with_session(session)
+            .with_extractor(tap.name)
             .with_loader(loader)
             .with_transform("skip")
-            .context(session)
+            .context()
         )
         subject = ConnectionService(elt_context)
 
@@ -65,10 +66,11 @@ class TestConnectionService:
             pass
 
         elt_context = (
-            elt_context_builder.with_extractor(tap.name)
+            elt_context_builder.with_session(session)
+            .with_extractor(tap.name)
             .with_loader(loader)
             .with_transform("run")
-            .context(session)
+            .context()
         )
         subject = ConnectionService(elt_context)
 

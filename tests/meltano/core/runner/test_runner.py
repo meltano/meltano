@@ -43,10 +43,11 @@ class TestSingerRunner:
         job = Job(job_id="pytest_test_runner")
 
         return (
-            elt_context_builder.with_extractor(tap.name)
+            elt_context_builder.with_session(session)
+            .with_extractor(tap.name)
             .with_job(job)
             .with_loader(target.name)
-            .context(session)
+            .context()
         )
 
     @pytest.fixture()
@@ -187,7 +188,7 @@ class TestSingerRunner:
             ) as add_mock, mock.patch.object(
                 session, "commit", side_effect=session.commit
             ) as commit_mock:
-                bookmark_writer = subject.bookmark_writer(session)
+                bookmark_writer = subject.bookmark_writer()
                 await capture_subprocess_output(target_process.stdout, bookmark_writer)
 
             assert add_mock.call_count == 3
@@ -214,7 +215,7 @@ class TestSingerRunner:
 
         def assert_state(state):
             with tap_invoker.prepared(session):
-                subject.restore_bookmark(session, tap_invoker)
+                subject.restore_bookmark(tap_invoker)
 
             if state:
                 assert tap_invoker.files["state"].exists()
@@ -311,7 +312,7 @@ class TestSingerRunner:
         assert_state(None)
 
     @pytest.mark.asyncio
-    async def test_run(self, subject, session):
+    async def test_run(self, subject):
         async def invoke_mock(*args, **kwargs):
             pass
 
@@ -321,20 +322,19 @@ class TestSingerRunner:
             SingerRunner, "invoke", side_effect=invoke_mock
         ) as invoke:
             subject.context.dry_run = True
-            await subject.run(session)
+            await subject.run()
 
             assert not restore_bookmark.called
             assert not invoke.called
 
             subject.context.dry_run = False
-            await subject.run(session)
+            await subject.run()
             AnyPluginInvoker = AnyInstanceOf(PluginInvoker)
 
             restore_bookmark.assert_called_once_with(session, AnyPluginInvoker)
             invoke.assert_called_once_with(
                 AnyPluginInvoker,
                 AnyPluginInvoker,
-                session,
                 extractor_log=None,
                 loader_log=None,
                 extractor_out=None,

@@ -97,11 +97,12 @@ class TestELTContext:
         dbt,
     ):
         return (
-            elt_context_builder.with_extractor(tap.name)
+            elt_context_builder.with_session(session)
+            .with_extractor(tap.name)
             .with_loader(target_postgres.name)
             .with_transform(tap_mock_transform.name)
             .with_select_filter(["entity", "!other_entity"])
-            .context(session)
+            .context()
         )
 
     def test_extractor(self, elt_context, session, tap):

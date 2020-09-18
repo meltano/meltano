@@ -70,7 +70,6 @@ class SingerRunner(Runner):
         self,
         tap: PluginInvoker,
         target: PluginInvoker,
-        session,
         extractor_log=None,
         loader_log=None,
         extractor_out=None,
@@ -100,7 +99,7 @@ class SingerRunner(Runner):
         if extractor_out:
             tap_outputs.insert(0, extractor_out)
 
-        target_outputs = [self.bookmark_writer(session)]
+        target_outputs = [self.bookmark_writer()]
         if loader_out:
             target_outputs.insert(0, loader_out)
 
@@ -135,12 +134,14 @@ class SingerRunner(Runner):
         elif target_code:
             raise RunnerError(f"Target failed", {PluginType.LOADERS: target_code})
 
-    def bookmark_writer(self, session):
+    def bookmark_writer(self):
         incomplete_state = self.context.full_refresh and self.context.select_filter
         payload_flag = Payload.INCOMPLETE_STATE if incomplete_state else Payload.STATE
-        return BookmarkWriter(self.context.job, session, payload_flag=payload_flag)
+        return BookmarkWriter(
+            self.context.job, self.context.session, payload_flag=payload_flag
+        )
 
-    def restore_bookmark(self, session, tap: PluginInvoker):
+    def restore_bookmark(self, tap: PluginInvoker):
         # Delete state left over from different pipeline run for same extractor
         try:
             os.remove(tap.files["state"])
@@ -180,7 +181,9 @@ class SingerRunner(Runner):
         incomplete_since = None
         finder = JobFinder(self.context.job.job_id)
 
-        state_job = finder.latest_with_payload(session, flags=Payload.STATE)
+        state_job = finder.latest_with_payload(
+            self.context.session, flags=Payload.STATE
+        )
         if state_job:
             logging.info(f"Found state from {state_job.started_at}.")
             incomplete_since = state_job.ended_at
@@ -188,7 +191,7 @@ class SingerRunner(Runner):
                 merge(state_job.payload["singer_state"], state)
 
         incomplete_state_jobs = finder.with_payload(
-            session, flags=Payload.INCOMPLETE_STATE, since=incomplete_since
+            self.context.session, flags=Payload.INCOMPLETE_STATE, since=incomplete_since
         )
         for state_job in incomplete_state_jobs:
             logging.info(f"Found incomplete state from {state_job.started_at}.")
@@ -207,12 +210,7 @@ class SingerRunner(Runner):
         logging.info(f"\tloader: {target.plugin.name} at '{target.exec_path()}'")
 
     async def run(
-        self,
-        session,
-        extractor_log=None,
-        loader_log=None,
-        extractor_out=None,
-        loader_out=None,
+        self, extractor_log=None, loader_log=None, extractor_out=None, loader_out=None
     ):
         tap = self.context.extractor_invoker()
         target = self.context.loader_invoker()
@@ -220,13 +218,12 @@ class SingerRunner(Runner):
         if self.context.dry_run:
             return self.dry_run(tap, target)
 
-        with tap.prepared(session), target.prepared(session):
-            self.restore_bookmark(session, tap)
+        with tap.prepared(self.context.session), target.prepared(self.context.session):
+            self.restore_bookmark(tap)
 
             await self.invoke(
                 tap,
                 target,
-                session,
                 extractor_log=extractor_log,
                 loader_log=loader_log,
                 extractor_out=extractor_out,
