@@ -12,6 +12,7 @@ from enum import IntFlag
 
 from . import Runner, RunnerError
 from meltano.core.job import Job, Payload, JobFinder
+from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import invoker_factory, PluginInvoker
 from meltano.core.plugin.singer import SingerTap, SingerTarget, PluginType
 from meltano.core.utils import file_has_data, merge
@@ -126,12 +127,13 @@ class SingerRunner(Runner):
 
         if tap_code and target_code:
             raise RunnerError(
-                f"Tap and target failed", {"extractor": tap_code, "loader": target_code}
+                f"Tap and target failed",
+                {PluginType.EXTRACTORS: tap_code, PluginType.LOADERS: target_code},
             )
         elif tap_code:
-            raise RunnerError(f"Tap failed", {"extractor": tap_code})
+            raise RunnerError(f"Tap failed", {PluginType.EXTRACTORS: tap_code})
         elif target_code:
-            raise RunnerError(f"Target failed", {"loader": target_code})
+            raise RunnerError(f"Target failed", {PluginType.LOADERS: target_code})
 
     def bookmark_writer(self, session):
         incomplete_state = self.context.full_refresh and self.context.select_filter

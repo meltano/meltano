@@ -267,7 +267,7 @@ async def run_extract_load(elt_context, output_logger, session, **kwargs):
                 )
     except RunnerError as err:
         try:
-            code = err.exitcodes["extractor"]
+            code = err.exitcodes[PluginType.EXTRACTORS]
             message = extractor_log.last_line.rstrip() or "(see above)"
             logger.error(
                 f"{click.style(f'Extraction failed ({code}):', fg='red')} {message}"
@@ -276,7 +276,7 @@ async def run_extract_load(elt_context, output_logger, session, **kwargs):
             pass
 
         try:
-            code = err.exitcodes["loader"]
+            code = err.exitcodes[PluginType.LOADERS]
             message = loader_log.last_line.rstrip() or "(see above)"
             logger.error(
                 f"{click.style(f'Loading failed ({code}):', fg='red')} {message}"
@@ -300,7 +300,7 @@ async def run_transform(elt_context, output_logger, session, **kwargs):
             await dbt_runner.run(session, **kwargs, log=transformer_log_writer)
     except RunnerError as err:
         try:
-            code = err.exitcodes["transformer"]
+            code = err.exitcodes[PluginType.TRANSFORMERS]
             message = transformer_log.last_line.rstrip() or "(see above)"
             logger.error(
                 f"{click.style(f'Transformation failed ({code}):', fg='red')} {message}"
