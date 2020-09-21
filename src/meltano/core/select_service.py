@@ -3,7 +3,7 @@ import logging
 
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.error import PluginLacksCapabilityError
+from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
@@ -30,34 +30,24 @@ class SelectService:
         )
         return plugin_settings_service.get("_select")
 
-    def load_schema(self, session):
+    def load_catalog(self, session):
         invoker = invoker_factory(self.project, self.extractor)
+
         with invoker.prepared(session):
-            # ensure we already have the discovery run at least once
-            if not invoker.files["catalog"].exists():
-                logging.debug(
-                    "Catalog not found, trying to run the tap with --discover."
-                )
-                self.extractor.discover_catalog(invoker)
+            catalog_json = invoker.dump("catalog")
 
-            # update the catalog accordingly
-            self.extractor.apply_catalog_rules(invoker)
-
-            # return the updated catalog
-            with invoker.files["catalog"].open() as catalog:
-                return json.load(catalog)
+        return json.loads(catalog_json)
 
     def list_all(self, session) -> ListSelectedExecutor:
-        list_all = ListSelectedExecutor()
-
         try:
-            schema = self.load_schema(session)
-            list_all.visit(schema)
-        except FileNotFoundError as e:
-            logging.error(
-                "Cannot find catalog: make sure the tap runs correctly with --discover; `meltano invoke TAP --discover`"
-            )
-            raise e
+            catalog = self.load_catalog(session)
+        except FileNotFoundError as err:
+            raise PluginExecutionError(
+                f"Could not find catalog. Verify that the tap supports discovery mode and advertises the `discover` capability as well as either `catalog` or `properties`"
+            ) from err
+
+        list_all = ListSelectedExecutor()
+        list_all.visit(catalog)
 
         return list_all
 

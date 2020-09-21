@@ -174,6 +174,7 @@ class TestSingerTap:
         invoker = plugin_invoker_factory(subject)
 
         catalog_path = invoker.files["catalog"]
+        catalog_cache_key_path = invoker.files["catalog_cache_key"]
 
         def mock_discovery():
             catalog_path.open("w").write('{"discovered": true}')
@@ -183,14 +184,55 @@ class TestSingerTap:
         process_mock.communicate = mock_discovery
         process_mock.returncode = 0
 
-        with invoker.prepared(session), mock.patch.object(
-            PluginInvoker, "invoke", return_value=process_mock
-        ) as invoke:
-            subject.discover_catalog(invoker, [])
+        with invoker.prepared(session):
+            with mock.patch.object(
+                PluginInvoker, "invoke", return_value=process_mock
+            ) as invoke:
+                subject.discover_catalog(invoker, [])
 
-            assert invoke.called_with(["--discover"])
+                assert invoke.called_with(["--discover"])
 
-            assert catalog_path.read_text() == '{"discovered": true}'
+            assert json.loads(catalog_path.read_text()) == {"discovered": True}
+            assert not catalog_cache_key_path.exists()
+
+            # If there is no cache key, discovery is invoked again
+            with mock.patch.object(
+                PluginInvoker, "invoke", return_value=process_mock
+            ) as invoke:
+                subject.discover_catalog(invoker, [])
+
+                assert invoke.called_with(["--discover"])
+
+            assert json.loads(catalog_path.read_text()) == {"discovered": True}
+            assert not catalog_cache_key_path.exists()
+
+            # Apply catalog rules to store the cache key
+            subject.apply_catalog_rules(invoker, [])
+            assert catalog_cache_key_path.exists()
+
+            # If the cache key hasn't changed, discovery isn't invoked again
+            with mock.patch.object(
+                PluginInvoker, "invoke", return_value=process_mock
+            ) as invoke:
+                subject.discover_catalog(invoker, [])
+
+                invoke.assert_not_called()
+
+            assert json.loads(catalog_path.read_text()) == {"discovered": True}
+            assert catalog_cache_key_path.exists()
+
+            # If the cache key no longer matches, discovery is invoked again
+            catalog_cache_key_path.write_text("bogus")
+
+            with mock.patch.object(
+                PluginInvoker, "invoke", return_value=process_mock
+            ) as invoke:
+                subject.discover_catalog(invoker, [])
+
+                assert invoke.called_with(["--discover"])
+
+            assert json.loads(catalog_path.read_text()) == {"discovered": True}
+            assert not catalog_cache_key_path.exists()
 
     def test_discover_catalog_custom(
         self, project, session, plugin_invoker_factory, subject, monkeypatch
@@ -310,6 +352,7 @@ class TestSingerTap:
         invoker = plugin_invoker_factory(subject)
 
         catalog_path = invoker.files["catalog"]
+        catalog_cache_key_path = invoker.files["catalog_cache_key"]
 
         def reset_catalog():
             catalog_path.open("w").write('{"rules": []}')
@@ -383,6 +426,11 @@ class TestSingerTap:
                 with invoker.prepared(session):
                     subject.apply_catalog_rules(invoker)
 
+                    cache_key = invoker.plugin.catalog_cache_key(invoker)
+
+            # Stores the cache key
+            assert catalog_cache_key_path.read_text() == cache_key
+
             assert_rules(
                 # Schema rules
                 [
@@ -443,6 +491,8 @@ class TestSingerTap:
                 with invoker.prepared(session):
                     subject.apply_catalog_rules(invoker)
 
+                    cache_key = invoker.plugin.catalog_cache_key(invoker)
+
             assert_rules(
                 # Selection filter metadata rules
                 [
@@ -454,6 +504,10 @@ class TestSingerTap:
                 ],
                 [["OtherEntitiesName", "ExcludeAnother"], [], "selected", False],
             )
+
+            # Doesn't store a cache key when a custom catalog is provided
+            assert not catalog_cache_key_path.exists()
+            assert cache_key is None
 
     def test_apply_catalog_rules_select_filter(
         self, session, plugin_invoker_factory, subject, monkeypatch
@@ -586,3 +640,64 @@ class TestSingerTap:
 
             with pytest.raises(PluginExecutionError, match=r"invalid"):
                 subject.apply_catalog_rules(invoker, [])
+
+    def test_catalog_cache_key(
+        self, session, plugin_invoker_factory, subject, monkeypatch
+    ):
+        invoker = plugin_invoker_factory(subject)
+        config_override = invoker.settings_service.config_override
+
+        def cache_key():
+            with invoker.prepared(session):
+                return subject.catalog_cache_key(invoker)
+
+        # No key if _catalog is set
+        monkeypatch.setitem(config_override, "_catalog", "catalog.json")
+        assert cache_key() is None
+
+        # Key is set if _catalog is not set
+        monkeypatch.setitem(config_override, "_catalog", None)
+        key = cache_key()
+        assert key is not None
+
+        # Key doesn't change if nothing has changed
+        assert cache_key() == key
+
+        # Key changes if config changes
+        monkeypatch.setitem(config_override, "test", "foo")
+
+        new_key = cache_key()
+        assert new_key != key
+        key = new_key
+
+        # Key changes if _schema changes
+        monkeypatch.setitem(
+            config_override, "_schema", {"stream": {"property": {"type": "string"}}}
+        )
+
+        new_key = cache_key()
+        assert new_key != key
+        key = new_key
+
+        # Key changes if _metadata changes
+        monkeypatch.setitem(
+            config_override,
+            "_metadata",
+            {"stream": {"property": {"is-replication-key": True}}},
+        )
+
+        new_key = cache_key()
+        assert new_key != key
+        key = new_key
+
+        # Key does not change if _select changes
+        monkeypatch.setitem(config_override, "_select", ["stream"])
+        assert cache_key() == key
+
+        # Key does not change if _select_filter changes
+        monkeypatch.setitem(config_override, "_select_filter", ["stream"])
+        assert cache_key() == key
+
+        # No key if pip_url is editable
+        monkeypatch.setattr(invoker.plugin_def, "pip_url", "-e local")
+        assert cache_key() is None
