@@ -5,6 +5,7 @@ import shutil
 from typing import Dict
 from jsonschema import Draft4Validator
 from pathlib import Path
+from hashlib import sha1
 
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.behavior.hookable import hook
@@ -121,6 +122,7 @@ class SingerTap(SingerPlugin):
         return {
             "config": "tap.config.json",
             "catalog": "tap.properties.json",
+            "catalog_cache_key": "tap.properties.cache_key",
             "state": "state.json",
         }
 
@@ -219,6 +221,26 @@ class SingerTap(SingerPlugin):
 
     def discover_catalog(self, plugin_invoker, exec_args=[]):
         catalog_path = plugin_invoker.files["catalog"]
+        catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
+
+        if catalog_path.exists():
+            try:
+                cached_key = catalog_cache_key_path.read_text()
+                new_cache_key = self.catalog_cache_key(plugin_invoker)
+
+                if cached_key == new_cache_key:
+                    logger.debug(f"Using cached catalog file")
+                    return
+            except FileNotFoundError:
+                pass
+
+            logging.debug("Cached catalog is outdated, running discovery...")
+
+        # We're gonna generate a new catalog, so delete the cache key.
+        try:
+            catalog_cache_key_path.unlink()
+        except FileNotFoundError:
+            pass
 
         custom_catalog_filename = plugin_invoker.plugin_config_extras["_catalog"]
         if custom_catalog_filename:
@@ -312,6 +334,8 @@ class SingerTap(SingerPlugin):
             return
 
         catalog_path = plugin_invoker.files["catalog"]
+        catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
+
         try:
             with catalog_path.open() as catalog_file:
                 catalog = json.load(catalog_file)
@@ -324,6 +348,15 @@ class SingerTap(SingerPlugin):
 
             with catalog_path.open("w") as catalog_file:
                 json.dump(catalog, catalog_file, indent=2)
+
+            cache_key = self.catalog_cache_key(plugin_invoker)
+            if cache_key:
+                catalog_cache_key_path.write_text(cache_key)
+            else:
+                try:
+                    catalog_cache_key_path.unlink()
+                except FileNotFoundError:
+                    pass
         except FileNotFoundError as err:
             raise PluginExecutionError(
                 f"Applying catalog rules failed: catalog file is missing."
@@ -333,3 +366,30 @@ class SingerTap(SingerPlugin):
             raise PluginExecutionError(
                 f"Applying catalog rules failed: catalog file is invalid: {err}"
             ) from err
+
+    def catalog_cache_key(self, plugin_invoker):
+        # If the extractor is installed as editable, don't cache because
+        # the result of discovery could change at any time.
+        if plugin_invoker.plugin_def.pip_url.startswith("-e"):
+            return None
+
+        extras = plugin_invoker.plugin_config_extras
+
+        # If a custom catalog is provided, there's no need to cache
+        if extras["_catalog"]:
+            return None
+
+        # The catalog should be regenerated, and the catalog cache invalidated,
+        # if any settings changed that could affect discovery, or if schema or
+        # metadata rules changed.
+        # Changes to selection rules and selection filter rules are ignored,
+        # since "selected" metadata is reset using the `!*.*` selection rule anyway.
+        key_dict = {
+            **plugin_invoker.plugin_config,
+            "_schema": extras["_schema"],
+            "_metadata": extras["_metadata"],
+        }
+
+        key_json = json.dumps(key_dict)
+
+        return sha1(key_json.encode()).hexdigest()

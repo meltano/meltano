@@ -9,7 +9,7 @@ from .params import project
 from .utils import CliError
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin_invoker import invoker_factory
-from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
+from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import parse_select_pattern, SelectionType
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
@@ -67,7 +67,7 @@ def select(project, extractor, entities_filter, attributes_filter, **flags):
             attributes_filter=attributes_filter,
             flags=flags,
         )
-    except (PluginLacksCapabilityError, PluginExecutionError) as err:
+    except PluginExecutionError as err:
         raise CliError(f"Cannot list the selected attributes: {err}") from err
 
 
