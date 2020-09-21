@@ -266,13 +266,13 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
 
 #### Parameters
 
+- The `--job_id` option identifies related EL(T) runs when storing and looking up [pipeline state](/docs/integration.html#pipeline-state).
+
 - The `--transform` option can be:
 
   - `run`: run the Transforms
   - `skip`: skip the Transforms (Default)
   - `only`: only run the Transforms (skip the Extract and Load steps)
-
-- The `--job_id` option identifies related EL(T) runs when storing and looking up [pipeline state](/docs/integration.html#pipeline-state).
 
 - A `--full-refresh` flag can be passed to perform a full refresh, ignoring state left behind by any previous runs with the same job ID.
 
@@ -291,17 +291,32 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
   - Exclusion using `--exclude` takes precedence over inclusion using `--select`.
   - Specifying `--select` and/or `--exclude` is equivalent to setting the [`select_filter` extractor extra](/docs/plugins.html#select-filter-extra).
 
+- A `--dump` option can be passed (along with any of the other options) to dump the content of a pipeline-specific generated file to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) instead of actually running the pipeline.
+  This can aid in debugging [extractor catalog generation](/docs/integration.html#extractor-catalog-generation), [pipeline state lookup](/docs/integration.html#pipeline-state), and [pipeline-specific configuration](/docs/integration.html#pipeline-specific-configuration).
+
+  Supported values are:
+
+  - `catalog`: Dump the extractor [catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) that would be passed to the tap's executable using the `--catalog` option.
+  - `state`: Dump the extractor [state file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) that would be passed to the tap's executable using the `--state` option.
+  - `extractor-config`: Dump the extractor [config file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file) that would be passed to the tap's executable using the `--config` option.
+  - `loader-config`: Dump the loader [config file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file) that would be passed to the target's executable using the `--config` option.
+
+  Like any standard output, the dumped content can be [redirected](https://en.wikipedia.org/wiki/Redirection_(computing)) to a file using `>`, e.g. `meltano elt ... --dump=state > state.json`.
+
 #### Examples
 
 ```bash
 meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
 
-meltano elt tap-gitlab target-postgres --full-refresh
+meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres --full-refresh
 
 meltano elt tap-gitlab target-postgres --catalog extract/tap-gitlab.catalog.json
+meltano elt tap-gitlab target-postgres --state extract/tap-gitlab.state.json
 
 meltano elt tap-gitlab target-postgres --select commits
 meltano elt tap-gitlab target-postgres --exclude project_members
+
+meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres --dump=state > extract/tap-gitlab.state.json
 ```
 
 ### Debugging
@@ -317,7 +332,10 @@ MELTANO_CLI_LOG_LEVEL=debug meltano elt ...
 meltano --log-level=debug elt ...
 ```
 
-In debug mode, `meltano elt` will log the arguments and [environment](/docs/configuration.html#accessing-from-plugins) used to invoke the Singer tap and target executables (and `dbt`, when running transformations), including the paths to the generated config, catalog, and state files, for you to review:
+In debug mode, `meltano elt` will log the arguments and [environment](/docs/configuration.html#accessing-from-plugins) used to invoke the Singer tap and target executables (and `dbt`, when running transformations), including the paths to the generated
+[config](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file),
+[catalog](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog), and
+[state](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) files, for you to review:
 
 ```bash
 $ meltano --log-level=debug elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
@@ -329,9 +347,11 @@ meltano            | DEBUG Invoking: ['demo-project/.meltano/loaders/target-json
 meltano            | DEBUG Env: {'MELTANO_EXTRACTOR_NAME': 'tap-gitlab', 'MELTANO_EXTRACTOR_NAMESPACE': 'tap_gitlab', 'MELTANO_EXTRACT_API_URL': 'https://gitlab.com', 'MELTANO_EXTRACT_PRIVATE_TOKEN': '', 'MELTANO_EXTRACT_GROUPS': '', 'MELTANO_EXTRACT_PROJECTS': 'meltano/meltano', 'MELTANO_EXTRACT_ULTIMATE_LICENSE': 'False', 'MELTANO_EXTRACT_START_DATE': '2020-05-01', 'TAP_GITLAB_API_URL': 'https://gitlab.com', 'GITLAB_API_TOKEN': '', 'GITLAB_API_GROUPS': '', 'GITLAB_API_PROJECTS': 'meltano/meltano', 'GITLAB_API_ULTIMATE_LICENSE': 'False', 'GITLAB_API_START_DATE': '2020-05-01', 'TARGET_JSONL_DESTINATION_PATH': 'output', 'TARGET_JSONL_DO_TIMESTAMP_FILE': 'False'}
 ```
 
+Note that the contents of these pipeline-specific generated files can also easily be dumped to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using the `--dump` option described above.
+
 Additionally, all [Singer messages](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md#output) output by the tap and target will be logged, identified by `<plugin name> (out)` prefixes:
 
-```
+```bash
 tap-gitlab         | INFO Starting sync
 tap-gitlab (out)   | {"type": "SCHEMA", "stream": "projects", "schema": {"type": "object", "properties": {...}}, "key_properties": ["id"]}
 tap-gitlab (out)   | {"type": "RECORD", "stream": "projects", "record": {"id": 7603319, "name": "Meltano", ...}, "time_extracted": "2020-08-05T21:30:22.988250Z"}

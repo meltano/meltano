@@ -31,6 +31,13 @@ from meltano.core.logging import OutputLogger, JobLoggingService
 from meltano.core.elt_context import ELTContextBuilder
 
 
+DUMPABLES = {
+    "catalog": (PluginType.EXTRACTORS, "catalog"),
+    "state": (PluginType.EXTRACTORS, "state"),
+    "extractor-config": (PluginType.EXTRACTORS, "config"),
+    "loader-config": (PluginType.LOADERS, "config"),
+}
+
 logger = logging.getLogger(__name__)
 
 
@@ -65,6 +72,11 @@ def logs(*args, **kwargs):
 @click.option("--catalog", help="Extractor catalog file")
 @click.option("--state", help="Extractor state file")
 @click.option(
+    "--dump",
+    type=click.Choice(DUMPABLES.keys()),
+    help="Dump content of pipeline-specific generated file",
+)
+@click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
 @project(migrate=True)
@@ -79,6 +91,7 @@ def elt(
     exclude,
     catalog,
     state,
+    dump,
     job_id,
 ):
     """
@@ -118,21 +131,16 @@ def elt(
             discovery_service=discovery_service,
         )
 
-        job_logging_service = JobLoggingService(project)
-
-        with job.run(session), job_logging_service.create_log(
-            job.job_id, job.run_id
-        ) as log_file:
-            output_logger = OutputLogger(log_file)
-
-            run_async(
-                run_elt(
-                    project,
-                    context_builder,
-                    output_logger,
-                    config_service=config_service,
-                    discovery_service=discovery_service,
-                )
+        if dump:
+            dump_file(context_builder, dump)
+        else:
+            run_job(
+                project,
+                job,
+                session,
+                context_builder,
+                config_service,
+                discovery_service,
             )
     finally:
         session.close()
@@ -175,6 +183,45 @@ def elt_context_builder(
         .with_catalog(catalog)
         .with_state(state)
     )
+
+
+def dump_file(context_builder, dumpable):
+    try:
+        elt_context = context_builder.context()
+    except PluginMissingError as err:
+        raise CliError(str(err)) from err
+
+    try:
+        plugin_type, file_id = DUMPABLES[dumpable]
+        invoker = elt_context.invoker_for(plugin_type)
+
+        with invoker.prepared(elt_context.session):
+            content = invoker.dump(file_id)
+
+        print(content)
+    except FileNotFoundError as err:
+        raise CliError(f"Could not find {dumpable} file for this pipeline") from err
+    except Exception as err:
+        raise CliError(f"Could not dump {dumpable}: {err}") from err
+
+
+def run_job(project, job, session, context_builder, config_service, discovery_service):
+    job_logging_service = JobLoggingService(project)
+
+    with job.run(session), job_logging_service.create_log(
+        job.job_id, job.run_id
+    ) as log_file:
+        output_logger = OutputLogger(log_file)
+
+        run_async(
+            run_elt(
+                project,
+                context_builder,
+                output_logger,
+                config_service=config_service,
+                discovery_service=discovery_service,
+            )
+        )
 
 
 def run_async(coro):

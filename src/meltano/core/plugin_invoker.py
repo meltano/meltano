@@ -194,3 +194,11 @@ class PluginInvoker:
             return await asyncio.create_subprocess_exec(
                 *popen_args, limit=OUTPUT_BUFFER_SIZE, **popen_options, env=popen_env
             )
+
+    def dump(self, file_id):
+        try:
+            with self._invoke():
+                return self.files[file_id].read_text()
+        except ExecutableNotFoundError as err:
+            # Unwrap FileNotFoundError
+            raise err.__cause__

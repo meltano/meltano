@@ -208,6 +208,26 @@ Chances are that the extractor you just added to your project will require some 
 
 *To learn more about managing the configuration of your plugins, refer to the [Configuration guide](/docs/configuration.html).*
 
+::: details What if I already have a config file for this extractor?
+
+If you've used this Singer tap before without Meltano, you may have a [config file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file) already.
+
+If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) under the [plugin's `config` key](/docs/project.html#plugin-configuration):
+
+```yaml{4-7}
+extractors:
+- name: tap-example
+  pip_url: tap-example
+  config: {
+    "setting": "value",
+    "another_setting": true
+  }
+```
+
+Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572), the object should be indented correctly, but formatting does not need to be changed.
+
+:::
+
 1. Find out what settings your extractor supports using [`meltano config <plugin> list`](/docs/command-line-interface.html#config):
 
     ```bash
@@ -246,6 +266,14 @@ but it's recommended that you [specify the specific entities and attributes you'
 to improve performance and save on bandwidth and storage.
 
 *To learn more about selecting entities and attributes for extraction, refer to the [Data Integration (EL) guide](/docs/integration.html#selecting-entities-and-attributes-for-extraction).*
+
+::: details What if I already have a catalog file for this extractor?
+
+If you've used this Singer tap before without Meltano, you may have generated a [catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) already.
+
+If you'd like Meltano to use it instead of [generating a catalog](/docs/integration.html#extractor-catalog-generation) based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the [`catalog` extractor extra](/docs/plugins.html#catalog-extra) or use [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option when [running the data integration (EL) pipeline](#run-a-data-integration-el-pipeline) later on in this guide.
+
+:::
 
 1. Find out whether the extractor supports entity selection, and if so, what entities and attributes are available, using [`meltano select --list --all`](/docs/command-line-interface.html#select):
 
@@ -369,6 +397,26 @@ Chances are that the loader you just added to your project will require some amo
 
 *To learn more about managing the configuration of your plugins, refer to the [Configuration guide](/docs/configuration.html).*
 
+::: details What if I already have a config file for this loader?
+
+If you've used this Singer target before without Meltano, you may have a [config file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file) already.
+
+If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) under the [plugin's `config` key](/docs/project.html#plugin-configuration):
+
+```yaml{4-7}
+loaders:
+- name: target-example
+  pip_url: target-example
+  config: {
+    "setting": "value",
+    "another_setting": true
+  }
+```
+
+Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572), the object should be indented correctly, but formatting does not need to be changed.
+
+:::
+
 1. Find out what settings your loader supports using [`meltano config <plugin> list`](/docs/command-line-interface.html#config):
 
     ```bash
@@ -419,6 +467,22 @@ If everything was configured correctly, you should now see your data flow from y
 
 If the command failed, but it's not obvious how to resolve the issue, consider enabling [debug mode](/docs/command-line-interface.html#debugging) to get some more insight into what's going on behind the scenes.
 If that doesn't get you closer to a solution, learn how to [get help with your issue](/docs/getting-help.md).
+
+If you run `meltano elt` another time with the same Job ID, you'll see it automatically pick up where the previous run left off, assuming the extractor supports [pipeline state](/docs/integration.html#pipeline-state).
+
+::: details What if I already have a state file for this extractor?
+
+If you've used this Singer tap before without Meltano, you may have a [state file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) already.
+
+If you'd like Meltano to use it instead of [looking up state based on the Job ID](/docs/integration.html#pipeline-state), you can either use [`meltano elt`](/docs/command-line-interface.html#elt)'s `--state` option or set the [`state` extractor extra](/docs/plugins.html#state-extra).
+
+If you'd like to dump the state generated by the most recent run into a file, so that you can explicitly pass it along to the next invocation, you can use [`meltano elt`](/docs/command-line-interface.html#elt)'s `--dump=state` option:
+
+```bash
+meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres --dump=state > state.json
+```
+
+:::
 
 ## Next steps
 

@@ -1,6 +1,8 @@
 import pytest
 import os
 import logging
+import json
+
 from unittest import mock
 from asynctest import CoroutineMock
 from functools import partial
@@ -16,7 +18,7 @@ from meltano.core.plugin.dbt import DbtPlugin
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.job import Job
+from meltano.core.job import Job, Payload
 from meltano.core.logging.utils import remove_ansi_escape_sequences
 
 
@@ -462,6 +464,145 @@ class TestCliEltScratchpadOne:
                 "target-mock | Running\n",
                 "target-mock | Failure\n",
             )
+
+    def test_dump_catalog(
+        self,
+        cli_runner,
+        project,
+        tap,
+        target,
+        plugin_discovery_service,
+        plugin_settings_service_factory,
+    ):
+        catalog = {"streams": []}
+        with project.root.joinpath("catalog.json").open("w") as catalog_file:
+            json.dump(catalog, catalog_file)
+
+        job_id = "pytest_test_elt"
+        args = [
+            "elt",
+            "--job_id",
+            job_id,
+            tap.name,
+            target.name,
+            "--catalog",
+            "catalog.json",
+            "--dump",
+            "catalog",
+        ]
+
+        with mock.patch(
+            "meltano.core.elt_context.PluginDiscoveryService",
+            return_value=plugin_discovery_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+            assert_cli_runner(result)
+
+            assert json.loads(result.stdout) == catalog
+
+    def test_dump_state(
+        self,
+        session,
+        cli_runner,
+        project,
+        tap,
+        target,
+        plugin_discovery_service,
+        plugin_settings_service_factory,
+    ):
+        state = {"success": True}
+        with project.root.joinpath("state.json").open("w") as state_file:
+            json.dump(state, state_file)
+
+        job_id = "pytest_test_elt"
+        args = [
+            "elt",
+            "--job_id",
+            job_id,
+            tap.name,
+            target.name,
+            "--state",
+            "state.json",
+            "--dump",
+            "state",
+        ]
+
+        with mock.patch(
+            "meltano.core.elt_context.PluginDiscoveryService",
+            return_value=plugin_discovery_service,
+        ), mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ):
+            result = cli_runner.invoke(cli, args)
+            assert_cli_runner(result)
+
+            assert json.loads(result.stdout) == state
+
+    def test_dump_extractor_config(
+        self,
+        cli_runner,
+        project,
+        tap,
+        target,
+        plugin_discovery_service,
+        plugin_settings_service_factory,
+    ):
+        job_id = "pytest_test_elt"
+        args = [
+            "elt",
+            "--job_id",
+            job_id,
+            tap.name,
+            target.name,
+            "--dump",
+            "extractor-config",
+        ]
+
+        settings_service = plugin_settings_service_factory(tap)
+
+        with mock.patch(
+            "meltano.core.elt_context.PluginDiscoveryService",
+            return_value=plugin_discovery_service,
+        ), mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ):
+            result = cli_runner.invoke(cli, args)
+            assert_cli_runner(result)
+
+            assert json.loads(result.stdout) == settings_service.as_dict(extras=False)
+
+    def test_dump_loader_config(
+        self,
+        cli_runner,
+        project,
+        tap,
+        target,
+        plugin_discovery_service,
+        plugin_settings_service_factory,
+    ):
+        job_id = "pytest_test_elt"
+        args = [
+            "elt",
+            "--job_id",
+            job_id,
+            tap.name,
+            target.name,
+            "--dump",
+            "loader-config",
+        ]
+
+        settings_service = plugin_settings_service_factory(target)
+
+        with mock.patch(
+            "meltano.core.elt_context.PluginDiscoveryService",
+            return_value=plugin_discovery_service,
+        ), mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ):
+            result = cli_runner.invoke(cli, args)
+            assert_cli_runner(result)
+
+            assert json.loads(result.stdout) == settings_service.as_dict(extras=False)
 
 
 class TestCliEltScratchpadTwo:

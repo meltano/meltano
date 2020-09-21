@@ -38,7 +38,7 @@ meltano elt ...
 TAP_FOO_BAR=bar TAP_FOO_BAZ=baz meltano elt ...
 ```
 
-To verify that these environment variables will be picked up by Meltano as you intented, you can test them with [`meltano config <plugin>`](/docs/command-line-interface.html#config) before running `meltano elt`.
+To verify that these environment variables will be picked up by Meltano as you intended, you can test them with [`meltano config <plugin>`](/docs/command-line-interface.html#config) before running `meltano elt`.
 
 If you're using [`meltano schedule`](/docs/command-line-interface.html#schedule) to [schedule your pipelines](/#orchestration), you can specify environment variables for each pipeline in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), where each entry in the `schedules` array can have an `env` dictionary:
 
