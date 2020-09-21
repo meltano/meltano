@@ -10,15 +10,24 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2355](https://gitlab.com/meltano/meltano/-/issues/2355) Add `meltano elt` `--dump` option with possible values `catalog`, `state`, `extractor-config`, and `loader-config` to dump content of pipeline-specific generated file
-
 ### Changes
 
 ### Fixes
 
-- [#2358](https://gitlab.com/meltano/meltano/-/issues/2358) Don't unintentionally deselect all attributes other than those marked `inclusion: automatic` when using extractor `select_filter` extra or `meltano elt`'s `--select <entity>` option
-
 ### Breaks
+
+
+## 1.51.0 - (2020-09-21)
+---
+
+### New
+
+- [#2355](https://gitlab.com/meltano/meltano/-/issues/2355) Add `meltano elt` `--dump` option with possible values `catalog`, `state`, `extractor-config`, and `loader-config` to dump content of pipeline-specific generated file
+
+
+### Fixes
+
+- [#2358](https://gitlab.com/meltano/meltano/-/issues/2358) Don't unintentionally deselect all attributes other than those marked `inclusion: automatic` when using extractor `select_filter` extra or `meltano elt`'s `--select <entity>` option
 
 
 ## 1.50.0 - (2020-09-17)
