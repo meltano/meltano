@@ -129,6 +129,8 @@ To save you a headache, Meltano can handle catalog generation for you, by lettin
 [entity selection](#selecting-entities-and-attributes-for-extraction), [metadata](#setting-metadata), and [schema](#overriding-schemas) rules that can be configured like any other setting,
 and are applied to the discovered catalog on the fly when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 
+If you'd like to manually inspect the generated catalog for debugging purposes, you can dump it to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--dump=catalog` option.
+
 Note that if you've already manually discovered a catalog and modified it to your liking, it can be provided explicitly using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option or the [`catalog` extractor extra](/docs/plugins.html#catalog-extra).
 
 ### Selecting entities and attributes for extraction
@@ -170,6 +172,8 @@ Meltano stores this pipeline state in its [system database](/docs/project.html#s
 When `meltano elt` is run a subsequent time, it will look for the most recent completed (successful or failed) pipeline run with the same job ID that generated some state. If found, this state is then passed along to the extractor.
 
 Note that if you already have a state file you'd like to use, it can be provided explicitly using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--state` option or the [`state` extractor extra](/docs/plugins.html#state-extra).
+
+If you'd like to manually inspect a pipeline's state for debugging purposes, or so that you can store it somewhere other than the system database and explicitly pass it along to the next invocation, you can dump it to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--dump=state` option.
 
 ::: tip Not seeing state picked up after a failed run?
 
