@@ -460,21 +460,43 @@ class TestSingerTap:
     ):
         invoker = plugin_invoker_factory(subject)
 
-        stream_metadata = {
-            "metadata": [{"breadcrumb": [], "metadata": {"inclusion": "available"}}]
+        stream_data = {
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "one": {"type": "string"},
+                    "two": {"type": "string"},
+                    "three": {"type": "string"},
+                },
+            },
+            "metadata": [
+                {"breadcrumb": [], "metadata": {"inclusion": "available"}},
+                {
+                    "breadcrumb": ["properties", "one"],
+                    "metadata": {"inclusion": "automatic"},
+                },
+                {
+                    "breadcrumb": ["properties", "two"],
+                    "metadata": {"inclusion": "available"},
+                },
+                {
+                    "breadcrumb": ["properties", "three"],
+                    "metadata": {"inclusion": "available"},
+                },
+            ],
         }
 
         base_catalog = {
             "streams": [
-                {"tap_stream_id": "one", **stream_metadata},
-                {"tap_stream_id": "two", **stream_metadata},
-                {"tap_stream_id": "three", **stream_metadata},
-                {"tap_stream_id": "four", **stream_metadata},
-                {"tap_stream_id": "five", **stream_metadata},
+                {"tap_stream_id": "one", **stream_data},
+                {"tap_stream_id": "two", **stream_data},
+                {"tap_stream_id": "three", **stream_data},
+                {"tap_stream_id": "four", **stream_data},
+                {"tap_stream_id": "five", **stream_data},
             ]
         }
 
-        def selected_entities():
+        def selected_properties():
             catalog_path = invoker.files["catalog"]
 
             with catalog_path.open("w") as catalog_file:
@@ -489,48 +511,71 @@ class TestSingerTap:
             lister = ListSelectedExecutor()
             lister.visit(catalog)
 
-            return list(lister.selected_properties.keys())
+            return lister.selected_properties
 
         config_override = invoker.settings_service.config_override
 
-        monkeypatch.setitem(config_override, "_select", ["one.*", "three.*", "five.*"])
-        assert selected_entities() == ["one", "three", "five"]
+        monkeypatch.setitem(
+            config_override, "_select", ["one.one", "three.three", "five.*"]
+        )
+
+        # `one` is always included because it has `inclusion: automatic`
+        assert selected_properties() == {
+            "one": {"one"},
+            "three": {"one", "three"},
+            "five": {"one", "two", "three"},
+        }
 
         # Simple inclusion
         monkeypatch.setitem(config_override, "_select_filter", ["three"])
-        assert selected_entities() == ["three"]
+        assert selected_properties() == {"three": {"one", "three"}}
 
         # Simple exclusion
         monkeypatch.setitem(config_override, "_select_filter", ["!three"])
-        assert selected_entities() == ["one", "five"]
+        assert selected_properties() == {
+            "one": {"one"},
+            "five": {"one", "two", "three"},
+        }
 
         # Wildcard inclusion
         monkeypatch.setitem(config_override, "_select_filter", ["t*"])
-        assert selected_entities() == ["three"]
+        assert selected_properties() == {"three": {"one", "three"}}
 
         # Wildcard exclusion
         monkeypatch.setitem(config_override, "_select_filter", ["!t*"])
-        assert selected_entities() == ["one", "five"]
+        assert selected_properties() == {
+            "one": {"one"},
+            "five": {"one", "two", "three"},
+        }
 
         # Multiple inclusion
         monkeypatch.setitem(config_override, "_select_filter", ["three", "five"])
-        assert selected_entities() == ["three", "five"]
+        assert selected_properties() == {
+            "three": {"one", "three"},
+            "five": {"one", "two", "three"},
+        }
 
         # Multiple exclusion
         monkeypatch.setitem(config_override, "_select_filter", ["!three", "!five"])
-        assert selected_entities() == ["one"]
+        assert selected_properties() == {"one": {"one"}}
 
         # Multiple wildcard inclusion
         monkeypatch.setitem(config_override, "_select_filter", ["t*", "f*"])
-        assert selected_entities() == ["three", "five"]
+        assert selected_properties() == {
+            "three": {"one", "three"},
+            "five": {"one", "two", "three"},
+        }
 
         # Multiple wildcard exclusion
         monkeypatch.setitem(config_override, "_select_filter", ["!t*", "!f*"])
-        assert selected_entities() == ["one"]
+        assert selected_properties() == {"one": {"one"}}
 
         # Mixed inclusion and exclusion
         monkeypatch.setitem(config_override, "_select_filter", ["*e", "!*ee"])
-        assert selected_entities() == ["one", "five"]
+        assert selected_properties() == {
+            "one": {"one"},
+            "five": {"one", "two", "three"},
+        }
 
     def test_apply_catalog_rules_invalid(
         self, session, plugin_invoker_factory, subject

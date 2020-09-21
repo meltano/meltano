@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2358](https://gitlab.com/meltano/meltano/-/issues/2358) Don't unintentionally deselect all attributes other than those marked `inclusion: automatic` when using extractor `select_filter` extra or `meltano elt`'s `--select <entity>` option
+
 ### Breaks
 
 

@@ -457,43 +457,79 @@ def test_path_property(path, prop):
 class TestCatalogRule:
     def test_match(self):
         rule = CatalogRule("tap_stream_id")
+
+        # Stream ID matches
         assert rule.match("tap_stream_id")
+
+        # Stream ID and breadcrumb match
         assert rule.match("tap_stream_id", [])
+
+        # Breadcrumb doesn't match
         assert not rule.match("tap_stream_id", ["property"])
+
+        # Stream ID doesn't match
         assert not rule.match("tap_stream")
 
     def test_match_wildcard(self):
         rule = CatalogRule("tap_stream*")
+
+        # Stream ID pattern matches
         assert rule.match("tap_stream_id")
         assert rule.match("tap_stream_foo")
         assert rule.match("tap_stream")
+
+        # Stream ID pattern doesn't match
         assert not rule.match("tap_strea")
 
     def test_match_multiple(self):
         rule = CatalogRule(["tap_stream_id", "other*"])
+
+        # Stream ID patterns match
         assert rule.match("tap_stream_id")
         assert rule.match("other_stream")
         assert rule.match("other_foo")
         assert rule.match("other")
+
+        # Stream ID patterns don't match
         assert not rule.match("tap_stream")
         assert not rule.match("othe")
 
     def test_match_negated(self):
         rule = CatalogRule("tap_stream_id", negated=True)
+
+        # Stream ID doesn't match, so the rule does
         assert rule.match("tap_stream")
+
+        # Stream ID doesn't match (good!) and breadcrumb does
+        assert rule.match("tap_stream", [])
+
+        # Stream ID matches, so the rule doesn't
         assert not rule.match("tap_stream_id")
+        assert not rule.match("tap_stream_id", [])
+        assert not rule.match("tap_stream_id", ["property"])
+
+        # Stream ID doesn't match (good!), but breadcrumb doesn't match
+        assert not rule.match("tap_stream", ["property"])
 
     def test_match_negated_wildcard(self):
         rule = CatalogRule("tap_stream*", negated=True)
+
+        # Stream ID pattern doesn't match, so the rule does
         assert rule.match("tap_strea")
+
+        # Stream ID pattern matches, so the rule doesn't
         assert not rule.match("tap_stream_id")
         assert not rule.match("tap_stream_foo")
         assert not rule.match("tap_stream")
 
     def test_match_negated_multiple(self):
         rule = CatalogRule(["tap_stream_id", "other*"], negated=True)
+
+        # Stream ID pattern doesn't match, so the rule does
         assert rule.match("tap_stream")
         assert rule.match("othe")
+
+        # Stream ID pattern matches, so the rule doesn't
         assert not rule.match("tap_stream_id")
         assert not rule.match("other_stream")
         assert not rule.match("other_foo")
@@ -501,27 +537,43 @@ class TestCatalogRule:
 
     def test_match_breadcrumb(self):
         rule = CatalogRule("tap_stream_id", ["property"])
+
+        # Stream ID matches and breadcrumb is not considered
         assert rule.match("tap_stream_id")
+
+        # Stream ID and breadcrumb match
         assert rule.match("tap_stream_id", ["property"])
+
+        # Stream ID matches, but breadcrumb doesn't
         assert not rule.match("tap_stream_id", [])
         assert not rule.match("tap_stream_id", ["property", "nested"])
 
     def test_match_wildcard_breadcrumb(self):
         rule = CatalogRule("tap_stream_id", ["proper*"])
+
+        # Stream ID and breadcrumb pattern match
         assert rule.match("tap_stream_id")
         assert rule.match("tap_stream_id", ["property"])
         assert rule.match("tap_stream_id", ["proper_foo"])
         assert rule.match("tap_stream_id", ["proper"])
         assert rule.match("tap_stream_id", ["property", "bar"])
+
+        # Breadcrumb pattern doesn't match
         assert not rule.match("tap_stream_id", [])
         assert not rule.match("tap_stream_id", ["other"])
 
     def test_match_negated_breadcrumb(self):
         rule = CatalogRule("tap_stream_id", ["property"], negated=True)
-        assert rule.match("tap_stream_id", [])
-        assert rule.match("tap_stream_id", ["property", "nested"])
-        assert not rule.match("tap_stream_id")
-        assert not rule.match("tap_stream_id", ["property"])
+
+        # Stream ID doesn't match (good!) and breadcrumb is not considered
+        assert rule.match("tap_stream")
+
+        # Stream ID doesn't match (good!) and breadcrumb does
+        assert rule.match("tap_stream", ["property"])
+
+        # Stream ID doesn't match (good!), but breadcrumb doesn't match
+        assert not rule.match("tap_stream", [])
+        assert not rule.match("tap_stream", ["property", "nested"])
 
 
 class TestLegacyCatalogSelectVisitor:
