@@ -26,17 +26,19 @@ class CatalogRule:
             else [self.tap_stream_id]
         )
 
-        matches = any(fnmatch.fnmatch(tap_stream_id, pattern) for pattern in patterns)
+        result = any(fnmatch.fnmatch(tap_stream_id, pattern) for pattern in patterns)
 
+        # A negated rule matches a stream ID when none of the patterns match
+        if self.negated:
+            result = not result
+
+        # If provided, the breadcrumb should still match, even on negated rules
         if breadcrumb is not None:
-            matches = matches and fnmatch.fnmatch(
+            result = result and fnmatch.fnmatch(
                 ".".join(breadcrumb), ".".join(self.breadcrumb)
             )
 
-        if self.negated:
-            matches = not matches
-
-        return matches
+        return result
 
 
 class MetadataRule(CatalogRule):
