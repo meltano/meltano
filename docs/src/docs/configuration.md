@@ -64,7 +64,7 @@ Plugins can also specify alternative variables (aliases) for their settings, to 
 
 Since environment variable values are always strings, Meltano will cast values to the appropriate type before passing them on to the plugin.
 
-To verify that any environment variables you've set will be picked up by Meltano as you intented, you can test them with [`meltano config <plugin>`](/docs/command-line-interface.html#config) before running [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
+To verify that any environment variables you've set will be picked up by Meltano as you intended, you can test them with [`meltano config <plugin>`](/docs/command-line-interface.html#config) before running [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 
 To learn how to use environment variables to specify pipeline-specific configuration, refer to the [Data Integration (EL) guide](/docs/integration.html#pipeline-specific-configuration).
 
