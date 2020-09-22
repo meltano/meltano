@@ -5,7 +5,7 @@ from contextlib import contextmanager
 
 from meltano.core.config_service import PluginAlreadyAddedException
 from meltano.core.setting import Setting
-from meltano.core.plugin import PluginRef, PluginType, PluginInstall
+from meltano.core.plugin import PluginRef, PluginType, ProjectPlugin
 from meltano.core.plugin.settings_service import (
     PluginSettingsService,
     SettingValueStore,
@@ -37,7 +37,7 @@ def env_var(plugin_discovery_service):
 @pytest.fixture(scope="class")
 def custom_tap(config_service):
     EXPECTED = {"test": "custom", "start_date": None, "secure": None}
-    tap = PluginInstall(
+    tap = ProjectPlugin(
         PluginType.EXTRACTORS,
         name="tap-custom",
         namespace="tap_custom",
@@ -478,7 +478,7 @@ class TestPluginSettingsService:
             "_extra": "$TAP_MOCK_MULTIPLE",
             "_extra_generic": "$MELTANO_EXTRACT_FOO",
         }
-        with mock.patch.object(subject.plugin, "config", config):
+        with mock.patch.object(subject.project_plugin, "config", config):
             config = subject.as_dict(session=session)
 
         assert config["var"] == "hello world!"
@@ -670,7 +670,7 @@ class TestPluginSettingsService:
         )
 
         monkeypatch.setitem(
-            subject.plugin_install.config, "_select", ["from_meltano_yml_config"]
+            subject.project_plugin.config, "_select", ["from_meltano_yml_config"]
         )
 
         assert subject.get_with_source("_select") == (
@@ -679,7 +679,7 @@ class TestPluginSettingsService:
         )
 
         monkeypatch.setitem(
-            subject.plugin_install.extras, "select", ["from_meltano_yml_extra"]
+            subject.project_plugin.extras, "select", ["from_meltano_yml_extra"]
         )
 
         assert subject.get_with_source("_select") == (
@@ -743,7 +743,7 @@ class TestPluginSettingsService:
         )
 
         monkeypatch.setitem(
-            subject.plugin_install.extras, "vars", {"var": "from_meltano_yml"}
+            subject.project_plugin.extras, "vars", {"var": "from_meltano_yml"}
         )
 
         assert subject.get_with_source("_vars") == (

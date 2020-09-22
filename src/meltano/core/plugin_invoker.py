@@ -7,7 +7,7 @@ from typing import Optional
 from contextlib import contextmanager
 
 from .project import Project
-from .plugin import PluginInstall
+from .plugin import PluginRef, ProjectPlugin
 from .plugin.error import PluginMissingError, PluginExecutionError
 from .plugin.config_service import PluginConfigService
 from .plugin.settings_service import PluginSettingsService
@@ -17,7 +17,7 @@ from .error import Error, SubprocessError
 from .logging.utils import OUTPUT_BUFFER_SIZE
 
 
-def invoker_factory(project, plugin, *args, **kwargs):
+def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
     cls = PluginInvoker
 
     if hasattr(plugin.__class__, "__invoker_cls__"):
@@ -35,7 +35,7 @@ class InvokerError(Error):
 class ExecutableNotFoundError(InvokerError):
     """Occurs when the executable could not be found"""
 
-    def __init__(self, plugin, executable):
+    def __init__(self, plugin: PluginRef, executable):
         super().__init__(
             f"Executable '{executable}' could not be found. "
             f"{plugin.type.descriptor.capitalize()} '{plugin.name}' may not have been installed yet using `meltano install {plugin.type.singular} {plugin.name}`, or the executable name may be incorrect."
@@ -49,12 +49,12 @@ class InvokerNotPreparedError(InvokerError):
 
 
 class PluginInvoker:
-    """This class handles the invocation of a `Plugin` instance."""
+    """This class handles the invocation of a `PluginDefinition` instance."""
 
     def __init__(
         self,
         project: Project,
-        plugin: PluginInstall,
+        plugin: ProjectPlugin,
         context: Optional[object] = None,
         run_dir=None,
         config_dir=None,

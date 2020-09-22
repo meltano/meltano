@@ -1,7 +1,7 @@
-from meltano.core.plugin import PluginInstall, PluginType
+from meltano.core.plugin import ProjectPlugin, PluginType
 
 
-class ModelPlugin(PluginInstall):
+class ModelPlugin(ProjectPlugin):
     __plugin_type__ = PluginType.MODELS
 
     def __init__(self, *args, **kwargs):

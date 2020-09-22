@@ -63,17 +63,17 @@ class TestCliAdd:
             plugins = [plugin]
 
             for related_plugin in related_plugins:
-                plugin_install = config_service.find_plugin(
+                project_plugin = config_service.find_plugin(
                     related_plugin.name, related_plugin.type
                 )
-                assert plugin_install
+                assert project_plugin
 
                 assert (
                     f"Added related {related_plugin.type.descriptor} '{related_plugin.name}'"
                     in res.stdout
                 )
 
-                plugins.append(plugin_install)
+                plugins.append(project_plugin)
 
             plugins.reverse()
 

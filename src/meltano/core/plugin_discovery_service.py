@@ -14,7 +14,7 @@ from .setting_definition import SettingDefinition
 from .behavior.versioned import Versioned, IncompatibleVersionError
 from .behavior.canonical import Canonical
 from .config_service import ConfigService
-from .plugin import Plugin, PluginInstall, PluginType, PluginRef
+from .plugin import PluginDefinition, ProjectPlugin, PluginType, PluginRef
 from .plugin.factory import plugin_factory
 
 
@@ -46,15 +46,15 @@ class DiscoveryFile(Canonical):
         for plugin_type in PluginType:
             self[plugin_type] = []
 
-        for plugin_type, plugin_defs in plugins.items():
-            for plugin_def in plugin_defs:
-                plugin = Plugin(
+        for plugin_type, raw_plugins in plugins.items():
+            for raw_plugin in raw_plugins:
+                plugin_def = PluginDefinition(
                     plugin_type,
-                    plugin_def.pop("name"),
-                    plugin_def.pop("namespace"),
-                    **plugin_def,
+                    raw_plugin.pop("name"),
+                    raw_plugin.pop("namespace"),
+                    **raw_plugin,
                 )
-                self[plugin_type].append(plugin)
+                self[plugin_type].append(plugin_def)
 
     @classmethod
     def version(cls, attrs):
@@ -220,21 +220,22 @@ class PluginDiscoveryService(Versioned):
         return self.discovery[plugin_type]
 
     def get_custom_plugins_of_type(self, plugin_type):
-        def custom_plugin_def(plugin_install):
-            custom_plugin_def = plugin_install.canonical()
-            return Plugin(
+        def custom_plugin_def(project_plugin):
+            raw_custom_plugin = project_plugin.canonical()
+            # TODO: Clean up conversion
+            return PluginDefinition(
                 plugin_type,
-                custom_plugin_def.pop("name"),
-                custom_plugin_def.pop("namespace"),
-                **custom_plugin_def,
+                raw_custom_plugin.pop("name"),
+                raw_custom_plugin.pop("namespace"),
+                **raw_custom_plugin,
             )
 
         # some plugins in the Meltano file might be custom, thus they
-        # serve both as `PluginInstall` and `Plugin`
+        # serve both as `ProjectPlugin` and `PluginDefinition`
         return [
-            custom_plugin_def(plugin_install)
-            for plugin_install in self.config_service.get_plugins_of_type(plugin_type)
-            if plugin_install.is_custom()
+            custom_plugin_def(project_plugin)
+            for project_plugin in self.config_service.get_plugins_of_type(plugin_type)
+            if project_plugin.is_custom()
         ]
 
     def get_plugins_of_type(self, plugin_type):
@@ -248,14 +249,16 @@ class PluginDiscoveryService(Versioned):
             for plugin_type in PluginType
         }
 
-    def plugins(self) -> Iterable[PluginInstall]:
+    def plugins(self) -> Iterable[PluginDefinition]:
         yield from (
             plugin
             for plugin_type, plugins in self.plugins_by_type().items()
             for plugin in plugins
         )
 
-    def find_plugin(self, plugin_type: PluginType, plugin_name: str):
+    def find_plugin(
+        self, plugin_type: PluginType, plugin_name: str
+    ) -> PluginDefinition:
         name, _ = PluginRef.parse_name(plugin_name)
         try:
             return next(
@@ -266,7 +269,9 @@ class PluginDiscoveryService(Versioned):
         except StopIteration:
             raise PluginNotFoundError(name)
 
-    def find_plugin_by_namespace(self, plugin_type: PluginType, namespace: str):
+    def find_plugin_by_namespace(
+        self, plugin_type: PluginType, namespace: str
+    ) -> PluginDefinition:
         try:
             return next(
                 plugin

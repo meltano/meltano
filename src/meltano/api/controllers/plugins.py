@@ -5,7 +5,7 @@ from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
     PluginNotFoundError,
 )
-from meltano.core.plugin import PluginType
+from meltano.core.plugin import PluginType, ProjectPlugin
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.config_service import ConfigService
@@ -31,8 +31,8 @@ def all():
     project = Project.find()
     discovery = PluginDiscoveryService(project)
 
-    def canonical_plugin(plugin):
-        canonical_plugin = plugin.canonical()
+    def canonical_plugin(plugin_def):
+        canonical_plugin = plugin_def.canonical()
 
         # let's remove all the settings related data
         canonical_plugin.pop("settings", None)
@@ -41,8 +41,8 @@ def all():
         return canonical_plugin
 
     ordered_plugins = {
-        plugin_type: [canonical_plugin(plugin) for plugin in plugins]
-        for plugin_type, plugins in discovery.plugins_by_type().items()
+        plugin_type: [canonical_plugin(plugin_def) for plugin_def in plugin_defs]
+        for plugin_type, plugin_defs in discovery.plugins_by_type().items()
     }
 
     return jsonify(ordered_plugins)
@@ -59,10 +59,10 @@ def installed():
     config = ConfigService(project)
     discovery = PluginDiscoveryService(project)
 
-    def canonical_plugin(plugin):
+    def canonical_plugin(plugin: ProjectPlugin):
         try:
-            definition = discovery.find_plugin(plugin.type, plugin.name)
-            canonical_plugin = {**definition.canonical(), **plugin.canonical()}
+            plugin_def = discovery.find_plugin(plugin.type, plugin.name)
+            canonical_plugin = {**plugin_def.canonical(), **plugin.canonical()}
         except PluginNotFoundError:
             canonical_plugin = {**plugin.canonical()}
 

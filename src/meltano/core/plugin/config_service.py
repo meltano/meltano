@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Union
 
 from meltano.core.project import Project
-from meltano.core.plugin import PluginInstall
+from meltano.core.plugin import ProjectPlugin
 
 
 class PluginConfigService:
@@ -17,7 +17,7 @@ class PluginConfigService:
 
     def __init__(
         self,
-        plugin: PluginInstall,
+        plugin: ProjectPlugin,
         config_dir: Union[str, Path],
         run_dir: Union[str, Path],
     ):

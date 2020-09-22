@@ -4,7 +4,7 @@ import os
 import shutil
 
 from meltano.core.config_service import ConfigService
-from meltano.core.plugin import Plugin, PluginType
+from meltano.core.plugin import PluginDefinition, PluginType
 
 
 class TestConfigService:

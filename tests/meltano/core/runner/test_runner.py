@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest import mock
 from meltano.core.job import Job, State, Payload
 from meltano.core.elt_context import ELTContextBuilder
-from meltano.core.plugin import Plugin, PluginType
+from meltano.core.plugin import ProjectPlugin, PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin.factory import plugin_factory
 from meltano.core.plugin.singer import SingerTap, SingerTarget
@@ -29,7 +29,7 @@ class AnyInstanceOf:
         return f"<Any({self._cls}>"
 
 
-def create_plugin_files(config_dir: Path, plugin: Plugin):
+def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
     for file in plugin.config_files.values():
         Path(os.path.join(config_dir, file)).touch()
 
@@ -52,13 +52,13 @@ class TestSingerRunner:
     @pytest.fixture()
     def tap_config_dir(self, mkdtemp, elt_context):
         tap_config_dir = mkdtemp()
-        create_plugin_files(tap_config_dir, elt_context.extractor.install)
+        create_plugin_files(tap_config_dir, elt_context.extractor.in_project)
         return tap_config_dir
 
     @pytest.fixture()
     def target_config_dir(self, mkdtemp, elt_context):
         target_config_dir = mkdtemp()
-        create_plugin_files(target_config_dir, elt_context.loader.install)
+        create_plugin_files(target_config_dir, elt_context.loader.in_project)
         return target_config_dir
 
     @pytest.fixture()

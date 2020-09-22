@@ -11,7 +11,13 @@ from meltano.core.settings_service import (
     REDACTED_VALUE,
 )
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
-from meltano.core.plugin import PluginRef, PluginType, Plugin, PluginInstall, Profile
+from meltano.core.plugin import (
+    PluginRef,
+    PluginType,
+    PluginDefinition,
+    ProjectPlugin,
+    Profile,
+)
 from meltano.core.plugin.error import PluginMissingError
 
 
@@ -19,20 +25,20 @@ class PluginSettingsService(SettingsService):
     def __init__(
         self,
         project: Project,
-        plugin: PluginRef,
+        plugin_ref: PluginRef,
         *args,
         plugin_discovery_service: PluginDiscoveryService = None,
         **kwargs,
     ):
         super().__init__(project, *args, **kwargs)
 
-        self.plugin = plugin
+        self.plugin_ref = plugin_ref
 
         self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
             self.project, config_service=self.config_service
         )
         self._plugin_def = None
-        self._plugin_install = None
+        self._project_plugin = None
 
         project_settings_service = ProjectSettingsService(
             self.project, config_service=self.config_service
@@ -43,36 +49,36 @@ class PluginSettingsService(SettingsService):
             **project_settings_service.as_env(),
             **self.env_override,
             **self.plugin_def.info_env,
-            **self.plugin_install.info_env,
+            **self.project_plugin.info_env,
         }
 
     @property
     def plugin_def(self):
         if self._plugin_def is None:
             self._plugin_def = (
-                self.plugin
-                if isinstance(self.plugin, Plugin)
+                self.plugin_ref
+                if isinstance(self.plugin_ref, PluginDefinition)
                 else self.discovery_service.find_plugin(
-                    self.plugin.type, self.plugin.name
+                    self.plugin_ref.type, self.plugin_ref.name
                 )
             )
 
         return self._plugin_def
 
     @property
-    def plugin_install(self):
-        if self._plugin_install is None:
-            self._plugin_install = (
-                self.plugin
-                if isinstance(self.plugin, PluginInstall)
-                else self.config_service.get_plugin(self.plugin)
+    def project_plugin(self):
+        if self._project_plugin is None:
+            self._project_plugin = (
+                self.plugin_ref
+                if isinstance(self.plugin_ref, ProjectPlugin)
+                else self.config_service.get_plugin(self.plugin_ref)
             )
 
-        return self._plugin_install
+        return self._project_plugin
 
     @property
     def label(self):
-        return f"{self.plugin.type.descriptor} '{self.plugin.name}'"
+        return f"{self.plugin_ref.type.descriptor} '{self.plugin_ref.name}'"
 
     @property
     def docs_url(self):
@@ -80,21 +86,21 @@ class PluginSettingsService(SettingsService):
 
     @property
     def _env_prefixes(self):
-        return [self.plugin.name, self.plugin_def.namespace]
+        return [self.plugin_ref.name, self.plugin_def.namespace]
 
     @property
     def _generic_env_prefix(self):
-        return f"meltano_{self.plugin.type.verb}"
+        return f"meltano_{self.plugin_ref.type.verb}"
 
     @property
     def _db_namespace(self):
-        return self.plugin.qualified_name
+        return self.plugin_ref.qualified_name
 
     @property
     def extra_setting_definitions(self):
-        extra_settings = deepcopy(self.plugin_install.extra_settings)
+        extra_settings = deepcopy(self.project_plugin.extra_settings)
 
-        if self.plugin_install.is_custom():
+        if self.project_plugin.is_custom():
             # No need to set defaults, because values will already be picked up
             # from `meltano.yml`
             return extra_settings
@@ -124,23 +130,23 @@ class PluginSettingsService(SettingsService):
     @property
     def _meltano_yml_config(self):
         try:
-            plugin_install = self.plugin_install
+            project_plugin = self.project_plugin
         except PluginMissingError:
             return {}
 
         return {
-            **plugin_install.current_config,
-            **{f"_{k}": v for k, v in plugin_install.current_extras.items()},
+            **project_plugin.current_config,
+            **{f"_{k}": v for k, v in project_plugin.current_extras.items()},
         }
 
     def _update_meltano_yml_config(self, config_with_extras):
         try:
-            plugin_install = self.plugin_install
+            project_plugin = self.project_plugin
         except PluginMissingError:
             return
 
-        config = plugin_install.current_config
-        extras = plugin_install.current_extras
+        config = project_plugin.current_config
+        extras = project_plugin.current_extras
 
         config.clear()
         extras.clear()
@@ -151,13 +157,13 @@ class PluginSettingsService(SettingsService):
             else:
                 config[k] = v
 
-        self.config_service.update_plugin(plugin_install)
+        self.config_service.update_plugin(project_plugin)
 
     def _process_config(self, config):
-        return self.plugin_install.process_config(config)
+        return self.project_plugin.process_config(config)
 
     def profile_with_config(self, profile: Profile, extras=False, **kwargs):
-        self.plugin_install.use_profile(profile)
+        self.project_plugin.use_profile(profile)
 
         config_dict = {}
         config_metadata = {}
@@ -179,5 +185,5 @@ class PluginSettingsService(SettingsService):
     def profiles_with_config(self, **kwargs) -> List[Dict]:
         return [
             self.profile_with_config(profile, **kwargs)
-            for profile in (Profile.DEFAULT, *self.plugin_install.profiles)
+            for profile in (Profile.DEFAULT, *self.project_plugin.profiles)
         ]

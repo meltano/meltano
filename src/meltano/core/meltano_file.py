@@ -4,7 +4,7 @@ import copy
 
 from typing import Iterable, List
 from meltano.core.schedule import Schedule
-from meltano.core.plugin import PluginInstall, PluginType
+from meltano.core.plugin import ProjectPlugin, PluginType
 from meltano.core.plugin.factory import plugin_factory
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior import NameEq
@@ -26,7 +26,7 @@ class MeltanoFile(Canonical):
         )
 
     def load_plugins(self, plugins) -> Canonical:
-        """Parse the meltano.yml file and return it as `PluginInstall` instances."""
+        """Parse the meltano.yml file and return it as `ProjectPlugin` instances."""
         plugin_type_plugins = Canonical()
 
         for plugin_type in PluginType:
@@ -34,9 +34,9 @@ class MeltanoFile(Canonical):
 
         # this will parse the meltano.yml file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
-        for plugin_type, plugin_defs in plugins.items():
-            for plugin_def in plugin_defs:
-                plugin = plugin_factory(plugin_type, plugin_def)
+        for plugin_type, raw_plugins in plugins.items():
+            for raw_plugin in raw_plugins:
+                plugin = plugin_factory(plugin_type, raw_plugin)
                 plugin_type_plugins[plugin.type].append(plugin)
 
         return plugin_type_plugins

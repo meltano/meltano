@@ -133,7 +133,7 @@ class PluginRef:
         return hash((self.type, self.name, self.current_profile_name))
 
 
-class PluginInstall(HookObject, Canonical, PluginRef):
+class ProjectPlugin(HookObject, Canonical, PluginRef):
     def __init__(
         self,
         plugin_type: PluginType,
@@ -251,7 +251,7 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         return config
 
 
-class Plugin(Canonical, PluginRef):
+class PluginDefinition(Canonical, PluginRef):
     """
     Args:
     name: The unique name for the installed plugin
@@ -296,7 +296,7 @@ class Plugin(Canonical, PluginRef):
     def info(self):
         return {**super().info, "namespace": self.namespace}
 
-    def as_installed(self, custom=False) -> PluginInstall:
+    def in_project(self, custom=False) -> ProjectPlugin:
         extras = {}
         if custom:
             extras = {
@@ -306,4 +306,5 @@ class Plugin(Canonical, PluginRef):
                 **self.extras,
             }
 
-        return PluginInstall(self.type, self.name, pip_url=self.pip_url, **extras)
+        # TODO: Clean up conversion
+        return ProjectPlugin(self.type, self.name, pip_url=self.pip_url, **extras)

@@ -7,7 +7,7 @@ from meltano.api.mail import mail, MailService
 from meltano.api.models.subscription import Subscription, SubscriptionEventType
 from meltano.api.signals import PipelineSignals
 from meltano.core.project import Project
-from meltano.core.plugin import PluginType, Plugin
+from meltano.core.plugin import PluginType, PluginDefinition
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 
 
@@ -39,17 +39,17 @@ class NotificationEvents:
         Returns the Data Source name for a Pipeline
         """
 
-        plugin = self.plugin_discovery_service.find_plugin(
+        plugin_def = self.plugin_discovery_service.find_plugin(
             PluginType.EXTRACTORS, pipeline["extractor"]
         )
-        return plugin.label
+        return plugin_def.label
 
     def pipeline_urls(self, pipeline) -> str:
         """
         Return external URLs to different point of interests for a Pipeline.
         """
 
-        plugin = self.plugin_discovery_service.find_plugin(
+        plugin_def = self.plugin_discovery_service.find_plugin(
             PluginType.EXTRACTORS, pipeline["extractor"]
         )
 
@@ -62,7 +62,7 @@ class NotificationEvents:
                 path=f"data/extract/{pipeline['extractor']}",
                 _external=True,
             ),
-            "docs": plugin.docs,
+            "docs": plugin_def.docs,
         }
 
     def handle_pipeline_completed(self, sender, success: bool = None):

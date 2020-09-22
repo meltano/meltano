@@ -10,7 +10,7 @@ from unittest import mock
 import meltano.core.bundle as bundle
 
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.plugin import PluginType, Plugin
+from meltano.core.plugin import PluginType, PluginDefinition
 from meltano.core.plugin_discovery_service import (
     DiscoveryFile,
     PluginDiscoveryService,

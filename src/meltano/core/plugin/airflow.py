@@ -5,7 +5,7 @@ import subprocess
 import time
 import os
 import sys
-from . import PluginInstall, PluginType
+from . import ProjectPlugin, PluginType
 
 from meltano.core.error import SubprocessError
 from meltano.core.behavior.hookable import hook
@@ -40,7 +40,7 @@ class AirflowInvoker(PluginInvoker):
         return env
 
 
-class Airflow(PluginInstall):
+class Airflow(ProjectPlugin):
     __plugin_type__ = PluginType.ORCHESTRATORS
     __invoker_cls__ = AirflowInvoker
 

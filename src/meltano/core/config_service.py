@@ -8,7 +8,7 @@ import meltano.core.bundle as bundle
 from meltano.core.utils import nest, NotFound
 from .project import Project
 from .setting_definition import SettingDefinition
-from .plugin import Plugin, PluginInstall, PluginType, PluginRef, Profile
+from .plugin import PluginDefinition, ProjectPlugin, PluginType, PluginRef, Profile
 from .plugin.factory import plugin_factory
 from .plugin.error import PluginMissingError
 
@@ -50,7 +50,7 @@ class ConfigService:
     def make_meltano_secret_dir(self):
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
 
-    def add_to_file(self, plugin: PluginInstall):
+    def add_to_file(self, plugin: ProjectPlugin):
         plugin = plugin_factory(plugin.type, plugin.canonical())
 
         if not plugin.should_add_to_file(self.project):
@@ -80,7 +80,7 @@ class ConfigService:
         plugin_type: Optional[PluginType] = None,
         invokable=None,
         configurable=None,
-    ):
+    ) -> ProjectPlugin:
         name, profile_name = PluginRef.parse_name(plugin_name)
         try:
             plugin = next(
@@ -101,7 +101,7 @@ class ConfigService:
         except StopIteration as stop:
             raise PluginMissingError(name) from stop
 
-    def get_plugin(self, plugin_ref: PluginRef) -> PluginInstall:
+    def get_plugin(self, plugin_ref: PluginRef) -> ProjectPlugin:
         try:
             plugin = next(plugin for plugin in self.plugins() if plugin == plugin_ref)
             plugin.use_profile(plugin_ref.current_profile_name)
@@ -119,7 +119,7 @@ class ConfigService:
             for plugin_type in PluginType
         }
 
-    def plugins(self) -> Iterable[PluginInstall]:
+    def plugins(self) -> Iterable[ProjectPlugin]:
         yield from (
             plugin
             for plugin_type, plugins in self.plugins_by_type().items()
@@ -147,7 +147,7 @@ class ConfigService:
     def get_files(self):
         return self.get_plugins_of_type(PluginType.FILES)
 
-    def update_plugin(self, plugin: PluginInstall):
+    def update_plugin(self, plugin: ProjectPlugin):
         with self.project.meltano_update() as meltano:
             # find the proper plugin to update
             idx, outdated = next(

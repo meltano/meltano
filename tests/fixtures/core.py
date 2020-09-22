@@ -18,7 +18,7 @@ from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.config_service import ConfigService, PluginAlreadyAddedException
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.compiler.project_compiler import ProjectCompiler
-from meltano.core.plugin import PluginRef, PluginType, PluginInstall
+from meltano.core.plugin import PluginRef, PluginType, ProjectPlugin
 from meltano.core.plugin.factory import plugin_factory
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.logging.job_logging_service import JobLoggingService
@@ -209,7 +209,7 @@ def config_service(project):
 
 @pytest.fixture(scope="class")
 def tap(config_service):
-    tap = PluginInstall(PluginType.EXTRACTORS, "tap-mock", "tap-mock")
+    tap = ProjectPlugin(PluginType.EXTRACTORS, "tap-mock", "tap-mock")
     try:
         return config_service.add_to_file(tap)
     except PluginAlreadyAddedException as err:
@@ -218,7 +218,7 @@ def tap(config_service):
 
 @pytest.fixture(scope="class")
 def target(config_service):
-    target = PluginInstall(PluginType.LOADERS, "target-mock", "target-mock")
+    target = ProjectPlugin(PluginType.LOADERS, "target-mock", "target-mock")
     try:
         return config_service.add_to_file(target)
     except PluginAlreadyAddedException as err:
@@ -227,7 +227,7 @@ def target(config_service):
 
 @pytest.fixture(scope="class")
 def dbt(config_service):
-    dbt = PluginInstall(PluginType.TRANSFORMERS, "dbt", "dbt")
+    dbt = ProjectPlugin(PluginType.TRANSFORMERS, "dbt", "dbt")
     try:
         return config_service.add_to_file(dbt)
     except PluginAlreadyAddedException as err:
