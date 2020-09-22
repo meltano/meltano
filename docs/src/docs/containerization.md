@@ -49,6 +49,24 @@ meltano add files docker
 docker build --tag meltano-demo-project:dev .
 ```
 
+The built image's [entrypoint](https://docs.docker.com/engine/reference/builder/#entrypoint)
+will be [the `meltano` command](/docs/command-line-interface.html),
+meaning that you can provide `meltano` subcommands and arguments like `elt ...` and `invoke airflow ...` directly to
+[`docker run <image-name> ...`](https://docs.docker.com/engine/reference/commandline/run/)
+as trailing arguments:
+
+```bash
+# View Meltano version
+docker run meltano-demo-project:dev --version
+
+# Run gitlab-to-jsonl pipeline with
+# mounted volume to exfiltrate target-jsonl output
+docker run \
+  --volume $(pwd)/output:/project/output \
+  meltano-demo-project:dev \
+  elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
+```
+
 ## Docker Compose
 
 If you'd like to use [Docker Compose](https://docs.docker.com/compose/) to experiment with
