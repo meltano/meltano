@@ -220,20 +220,8 @@ class PluginDiscoveryService(Versioned):
         return self.discovery[plugin_type]
 
     def get_custom_plugins_of_type(self, plugin_type):
-        def custom_plugin_def(project_plugin):
-            raw_custom_plugin = project_plugin.canonical()
-            # TODO: Clean up conversion
-            return PluginDefinition(
-                plugin_type,
-                raw_custom_plugin.pop("name"),
-                raw_custom_plugin.pop("namespace"),
-                **raw_custom_plugin,
-            )
-
-        # some plugins in the Meltano file might be custom, thus they
-        # serve both as `ProjectPlugin` and `PluginDefinition`
         return [
-            custom_plugin_def(project_plugin)
+            project_plugin.custom_definition
             for project_plugin in self.config_service.get_plugins_of_type(plugin_type)
             if project_plugin.is_custom()
         ]

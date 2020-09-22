@@ -142,7 +142,7 @@ class PluginInvoker:
 
     @property
     def executable(self):
-        return self.plugin.executable or self.plugin.name
+        return self.plugin_def.executable or self.plugin.name
 
     def exec_path(self):
         return self.venv_service.exec_path(

@@ -100,26 +100,22 @@ class PluginSettingsService(SettingsService):
     def extra_setting_definitions(self):
         extra_settings = deepcopy(self.project_plugin.extra_settings)
 
-        if self.project_plugin.is_custom():
-            # No need to set defaults, because values will already be picked up
-            # from `meltano.yml`
-            return extra_settings
-
         # Set defaults from plugin definition
         defaults = {f"_{k}": v for k, v in self.plugin_def.extras.items()}
 
-        for setting in extra_settings:
-            default_value = defaults.get(setting.name)
-            if default_value is not None:
-                setting.value = default_value
+        if defaults:
+            for setting in extra_settings:
+                default_value = defaults.get(setting.name)
+                if default_value is not None:
+                    setting.value = default_value
 
-        # Create setting definitions for unknown defaults,
-        # including flattened keys of default nested object items
-        extra_settings.extend(
-            SettingDefinition.from_missing(
-                extra_settings, defaults, custom=False, default=True
+            # Create setting definitions for unknown defaults,
+            # including flattened keys of default nested object items
+            extra_settings.extend(
+                SettingDefinition.from_missing(
+                    extra_settings, defaults, custom=False, default=True
+                )
             )
-        )
 
         return extra_settings
 

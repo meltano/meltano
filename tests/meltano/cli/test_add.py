@@ -271,10 +271,14 @@ class TestCliAdd:
         with pytest.raises(PluginMissingError):
             config_service.find_plugin("tap-mock", PluginType.EXTRACTORS)
 
-    def test_add_custom(self, project, cli_runner, config_service):
+    def test_add_custom(
+        self, project, cli_runner, config_service, plugin_discovery_service
+    ):
+        pip_url = "-e path/to/tap-custom"
+        executable = "tap-custom-bin"
         stdin = os.linesep.join(
-            # namespace, executable, pip_url
-            ["custom", "-e path/to/tap-custom", "tap-custom-bin"]
+            # namespace, pip_url, executable, capabilities, settings
+            ["tap_custom", pip_url, executable, "foo,bar", "baz,qux"]
         )
 
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
@@ -283,9 +287,21 @@ class TestCliAdd:
                 cli, ["add", "--custom", "extractor", "tap-custom"], input=stdin
             )
 
-            plugin = config_service.find_plugin("tap-custom", PluginType.EXTRACTORS)
+            plugin = config_service.find_plugin(
+                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-custom"
+            )
             assert plugin.name == "tap-custom"
-            assert plugin.executable == "tap-custom-bin"
+            assert plugin.pip_url == pip_url
+
+            plugin_def = plugin_discovery_service.find_plugin(
+                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-custom"
+            )
+            assert plugin_def.name == "tap-custom"
+            assert plugin_def.namespace == "tap_custom"
+            assert plugin_def.pip_url == pip_url
+            assert plugin_def.executable == executable
+            assert plugin_def.capabilities == ["foo", "bar"]
+            assert [s.name for s in plugin_def.settings] == ["baz", "qux"]
 
             install_plugin_mock.assert_called_once_with(
                 project, [plugin], reason=PluginInstallReason.ADD

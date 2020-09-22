@@ -16,6 +16,7 @@ from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
     VERSION,
 )
+from meltano.core.config_service import PluginAlreadyAddedException
 from meltano.core.behavior.versioned import IncompatibleVersionError
 
 
@@ -41,13 +42,14 @@ def discovery_url_mock(subject):
 @pytest.fixture(scope="class")
 def tap_covid_19(project_add_service):
     try:
-        return project_add_service.add_custom(
+        plugin_def = PluginDefinition(
             PluginType.EXTRACTORS,
             "tap-covid-19",
             namespace="tap-covid_19",
             pip_url="tap-covid-19",
             executable="tap-covid-19",
         )
+        return project_add_service.add_custom(plugin_def)
     except PluginAlreadyAddedException as err:
         return err.plugin
 

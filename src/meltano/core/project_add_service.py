@@ -37,10 +37,7 @@ class ProjectAddService:
         project_plugin = plugin_def.in_project()
         return self.config_service.add_to_file(project_plugin)
 
-    def add_custom(
-        self, plugin_type: PluginType, plugin_name: str, namespace: str, **kwargs
-    ) -> ProjectPlugin:
-        plugin_def = PluginDefinition(plugin_type, plugin_name, namespace, **kwargs)
+    def add_custom(self, plugin_def: PluginDefinition) -> ProjectPlugin:
         project_plugin = plugin_def.in_project(custom=True)
         return self.config_service.add_to_file(project_plugin)
 
