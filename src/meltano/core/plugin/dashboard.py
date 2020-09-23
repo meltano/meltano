@@ -1,6 +1,6 @@
 import logging
 
-from meltano.core.plugin import PluginInstall, PluginType
+from meltano.core.plugin import ProjectPlugin, PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.behavior.hookable import hook
 from meltano.core.m5o.m5o_collection_parser import (
@@ -205,7 +205,7 @@ class DashboardImporter(RecordImporter):
         )
 
 
-class DashboardPlugin(PluginInstall):
+class DashboardPlugin(ProjectPlugin):
     __plugin_type__ = PluginType.DASHBOARDS
 
     def __init__(self, *args, **kwargs):

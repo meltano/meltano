@@ -8,7 +8,7 @@ from .project import Project
 from .config_service import ConfigService
 from .plugin.settings_service import PluginSettingsService
 from .plugin_discovery_service import PluginDiscoveryService
-from .plugin import Plugin, PluginType, PluginInstall
+from .plugin import PluginDefinition, PluginType, ProjectPlugin
 from .db import project_engine
 
 
@@ -36,7 +36,7 @@ class TransformAddService:
         self.packages_file = dbt_project_path.joinpath("packages.yml")
         self.dbt_project_file = dbt_project_path.joinpath("dbt_project.yml")
 
-    def add_to_packages(self, plugin: Plugin):
+    def add_to_packages(self, plugin: ProjectPlugin):
         if not os.path.exists(self.packages_file):
             with open(self.packages_file, "w"):
                 pass
@@ -52,7 +52,7 @@ class TransformAddService:
         with open(self.packages_file, "w") as f:
             f.write(yaml.dump(package_yaml, default_flow_style=False, sort_keys=False))
 
-    def update_dbt_project(self, plugin: PluginInstall):
+    def update_dbt_project(self, plugin: ProjectPlugin):
         settings_service = PluginSettingsService(
             self.project,
             plugin,

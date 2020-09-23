@@ -4,14 +4,14 @@ from collections import namedtuple
 from meltano.core.project import Project
 from meltano.core.job import Job
 from meltano.core.config_service import ConfigService
-from meltano.core.plugin import Plugin, PluginType, PluginRef
+from meltano.core.plugin import PluginDefinition, PluginType, PluginRef
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin_invoker import invoker_factory
 
 
 class PluginContext(
-    namedtuple("PluginContext", "ref install definition settings_service session")
+    namedtuple("PluginContext", "ref in_project definition settings_service session")
 ):
     @property
     def namespace(self):
@@ -19,7 +19,7 @@ class PluginContext(
 
     @property
     def name(self):
-        return self.install.name
+        return self.in_project.name
 
     @property
     def type(self):
@@ -38,7 +38,7 @@ class PluginContext(
     def env(self):
         return {
             **self.definition.info_env,
-            **self.install.info_env,
+            **self.in_project.info_env,
             **self.config_env(),
         }
 
@@ -87,20 +87,20 @@ class ELTContext:
             return self.project.job_dir(self.job.job_id, str(self.job.run_id))
 
     def invoker_for(self, plugin_type):
-        plugins = {
+        plugin_contexts = {
             PluginType.EXTRACTORS: self.extractor,
             PluginType.LOADERS: self.loader,
             PluginType.TRANSFORMERS: self.transformer,
         }
 
-        plugin = plugins[plugin_type]
+        plugin_context = plugin_contexts[plugin_type]
 
         return invoker_factory(
             self.project,
-            plugin.install,
+            plugin_context.in_project,
             context=self,
             run_dir=self.elt_run_dir,
-            plugin_settings_service=plugin.settings_service,
+            plugin_settings_service=plugin_context.settings_service,
             plugin_discovery_service=self.plugin_discovery_service,
         )
 
@@ -224,18 +224,18 @@ class ELTContextBuilder:
 
         return refs
 
-    def plugin_context(self, plugin: PluginRef, env={}, config={}):
+    def plugin_context(self, plugin_ref: PluginRef, env={}, config={}):
         return PluginContext(
-            ref=plugin,
-            install=self.config_service.find_plugin(
-                plugin_name=plugin.name, plugin_type=plugin.type
+            ref=plugin_ref,
+            in_project=self.config_service.find_plugin(
+                plugin_name=plugin_ref.name, plugin_type=plugin_ref.type
             ),
             definition=self.plugin_discovery_service.find_plugin(
-                plugin_name=plugin.name, plugin_type=plugin.type
+                plugin_name=plugin_ref.name, plugin_type=plugin_ref.type
             ),
             settings_service=PluginSettingsService(
                 self.project,
-                plugin,
+                plugin_ref,
                 config_service=self.config_service,
                 plugin_discovery_service=self.plugin_discovery_service,
                 env_override=env,

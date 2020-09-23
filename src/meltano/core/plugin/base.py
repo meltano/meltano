@@ -133,37 +133,41 @@ class PluginRef:
         return hash((self.type, self.name, self.current_profile_name))
 
 
-class PluginInstall(HookObject, Canonical, PluginRef):
+class ProjectPlugin(HookObject, Canonical, PluginRef):
     def __init__(
         self,
         plugin_type: PluginType,
         name: str,
-        label: Optional[str] = None,
-        logo_url: Optional[str] = None,
         namespace: Optional[str] = None,
+        custom_definition: Optional["PluginDefinition"] = None,
         pip_url: Optional[str] = None,
-        executable: str = None,
-        capabilities: list = [],
-        settings: list = [],
-        config={},
-        profiles: list = [],
+        config: Optional[dict] = {},
+        profiles: Optional[list] = [],
         **extras,
     ):
+        if namespace:
+            custom_definition = PluginDefinition(
+                plugin_type, name, namespace, pip_url=pip_url, **extras
+            )
+            extras = {}
+
+        if custom_definition:
+            # All of the definition's extras are really ours
+            extras.update(custom_definition.extras)
+            custom_definition.extras = {}
+
         super().__init__(
             plugin_type,
             name,
             # Attributes will be listed in meltano.yml in this order:
-            label=label,
-            logo_url=logo_url,
-            namespace=namespace,
+            custom_definition=custom_definition,
             pip_url=pip_url,
-            executable=executable,
-            capabilities=list(capabilities),
-            settings=list(map(SettingDefinition.parse, settings)),
             config=copy.deepcopy(config),
             extras=extras,
             profiles=list(map(Profile.parse, profiles)),
         )
+
+        self._flattened.add("custom_definition")
 
     def is_installable(self):
         return self.pip_url is not None
@@ -186,7 +190,7 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         return []
 
     def is_custom(self):
-        return self.namespace is not None
+        return self.custom_definition is not None
 
     def get_profile(self, profile_name: str) -> Profile:
         if profile_name == Profile.DEFAULT.name:
@@ -251,14 +255,7 @@ class PluginInstall(HookObject, Canonical, PluginRef):
         return config
 
 
-class Plugin(Canonical, PluginRef):
-    """
-    Args:
-    name: The unique name for the installed plugin
-    pip_url: The pip-compatible installation URI, like `git+https://…` or `-e /path/to/pkg`
-    executable: The plugin executable name (default: <name>)
-    """
-
+class PluginDefinition(Canonical, PluginRef):
     def __init__(
         self,
         plugin_type: PluginType,
@@ -270,6 +267,7 @@ class Plugin(Canonical, PluginRef):
         docs=None,
         repo=None,
         pip_url: Optional[str] = None,
+        executable: str = None,
         capabilities: list = [],
         settings_group_validation: list = [],
         settings: list = [],
@@ -279,13 +277,14 @@ class Plugin(Canonical, PluginRef):
             plugin_type,
             name,
             # Attributes will be listed in meltano.yml in this order:
+            namespace=namespace,
             label=label,
             logo_url=logo_url,
             description=description,
             docs=docs,
             repo=repo,
-            namespace=namespace,
             pip_url=pip_url,
+            executable=executable,
             capabilities=list(capabilities),
             settings_group_validation=list(settings_group_validation),
             settings=list(map(SettingDefinition.parse, settings)),
@@ -296,14 +295,10 @@ class Plugin(Canonical, PluginRef):
     def info(self):
         return {**super().info, "namespace": self.namespace}
 
-    def as_installed(self, custom=False) -> PluginInstall:
-        extras = {}
-        if custom:
-            extras = {
-                "namespace": self.namespace,
-                "capabilities": self.capabilities,
-                "settings": self.settings,
-                **self.extras,
-            }
-
-        return PluginInstall(self.type, self.name, pip_url=self.pip_url, **extras)
+    def in_project(self, custom=False) -> ProjectPlugin:
+        return ProjectPlugin(
+            self.type,
+            self.name,
+            pip_url=self.pip_url,
+            custom_definition=(self if custom else None),
+        )

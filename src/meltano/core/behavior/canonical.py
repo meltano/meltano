@@ -25,6 +25,7 @@ class Canonical(object):
             setattr(self, attr, value)
 
         self._verbatim = set()
+        self._flattened = {"extras"}
 
     @classmethod
     def as_canonical(cls, target):
@@ -76,8 +77,11 @@ class Canonical(object):
             if isinstance(v, Canonical) and not dict(v):
                 continue
 
-            if k == "extras":
-                yield from v.items()
+            if k in self._flattened:
+                if isinstance(v, Canonical):
+                    yield from v
+                else:
+                    yield from v.items()
             else:
                 yield (k, v)
 

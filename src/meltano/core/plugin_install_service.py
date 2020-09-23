@@ -1,4 +1,5 @@
 import logging
+from typing import Iterable
 from enum import Enum
 
 from .compiler.project_compiler import ProjectCompiler
@@ -7,7 +8,7 @@ from .project_add_service import ProjectAddService
 from .config_service import ConfigService
 from .venv_service import VenvService
 from .utils import noop
-from .plugin import PluginType, PluginInstall, Plugin, PluginRef
+from .plugin import PluginType, ProjectPlugin, PluginDefinition, PluginRef
 from .project import Project
 from .error import (
     PluginInstallError,
@@ -23,7 +24,7 @@ class PluginInstallReason(str, Enum):
     UPGRADE = "upgrade"
 
 
-def installer_factory(project, plugin, *args, **kwargs):
+def installer_factory(project, plugin: ProjectPlugin, *args, **kwargs):
     cls = PipPluginInstaller
 
     if hasattr(plugin.__class__, "__installer_cls__"):
@@ -38,13 +39,15 @@ class PluginInstallService:
         self.config_service = config_service or ConfigService(project)
 
     def install_all_plugins(self, reason=PluginInstallReason.INSTALL, status_cb=noop):
-        # TODO: config service returns PluginInstall, not Plugin
         return self.install_plugins(
             self.config_service.plugins(), reason=reason, status_cb=status_cb
         )
 
     def install_plugins(
-        self, plugins, reason=PluginInstallReason.INSTALL, status_cb=noop
+        self,
+        plugins: Iterable[ProjectPlugin],
+        reason=PluginInstallReason.INSTALL,
+        status_cb=noop,
     ):
         errors = []
         installed = []
@@ -84,7 +87,7 @@ class PluginInstallService:
 
     def install_plugin(
         self,
-        plugin: PluginInstall,
+        plugin: ProjectPlugin,
         reason=PluginInstallReason.INSTALL,
         compile_models=True,
     ):
@@ -116,7 +119,9 @@ class PluginInstallService:
 
 
 class PipPluginInstaller:
-    def __init__(self, project, plugin: PluginRef, venv_service: VenvService = None):
+    def __init__(
+        self, project, plugin: ProjectPlugin, venv_service: VenvService = None
+    ):
         self.plugin = plugin
         self.venv_service = venv_service or VenvService(project)
 

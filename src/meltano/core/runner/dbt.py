@@ -23,7 +23,7 @@ class DbtRunner(Runner):
         return self.context.project
 
     @property
-    def plugin(self):
+    def plugin_context(self):
         return self.context.transformer
 
     async def invoke(self, dbt: PluginInvoker, cmd, *args, log=None, **kwargs):
@@ -64,5 +64,9 @@ class DbtRunner(Runner):
 
             cmd = "compile" if self.context.dry_run else "run"
             await self.invoke(
-                dbt, cmd, "--models", str(self.plugin.get_config("models")), log=log
+                dbt,
+                cmd,
+                "--models",
+                str(self.plugin_context.get_config("models")),
+                log=log,
             )

@@ -1,10 +1,10 @@
 from typing import Dict
 import importlib
 
-from . import PluginType
+from . import PluginType, ProjectPlugin
 
 
-def plugin_factory(plugin_type: PluginType, plugin_def: Dict):
+def plugin_factory(plugin_type: PluginType, raw_plugin: Dict) -> ProjectPlugin:
     def lazy_import(module, cls):
         def lazy():
             return getattr(importlib.import_module(module, "meltano.core.plugin"), cls)
@@ -22,8 +22,6 @@ def plugin_factory(plugin_type: PluginType, plugin_def: Dict):
         PluginType.FILES: lazy_import(".file", "FilePlugin"),
     }
 
-    # this will parse the discovery file and create an instance of the
-    # corresponding `plugin_class` for all the plugins.
     plugin_cls = plugin_class[plugin_type]()
 
-    return plugin_cls(plugin_def.pop("name"), **plugin_def)
+    return plugin_cls(raw_plugin.pop("name"), **raw_plugin)

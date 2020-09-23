@@ -28,10 +28,10 @@ def discover(project, plugin_type):
 
     discovery_dict = discover_service.discover(plugin_type)
 
-    for plugin_type, plugins in discovery_dict.items():
+    for plugin_type, plugin_defs in discovery_dict.items():
         click.secho(plugin_type, fg="green")
-        for plugin in plugins:
-            click.echo(plugin)
+        for plugin_def in plugin_defs:
+            click.echo(plugin_def)
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_discover(plugin_type=plugin_type)

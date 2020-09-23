@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from meltano.core.plugin import PluginInstall, PluginRef, PluginType
+from meltano.core.plugin import ProjectPlugin, PluginRef, PluginType
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -15,7 +15,7 @@ class DbtInvoker(PluginInvoker):
         return {**super().Popen_options(), "cwd": self.plugin_config["project_dir"]}
 
 
-class DbtPlugin(PluginInstall):
+class DbtPlugin(ProjectPlugin):
     __plugin_type__ = PluginType.TRANSFORMERS
     __invoker_cls__ = DbtInvoker
 
@@ -24,7 +24,7 @@ class DbtPlugin(PluginInstall):
 
 
 class DbtTransformPluginInstaller:
-    def __init__(self, project, plugin):
+    def __init__(self, project, plugin: ProjectPlugin):
         self.project = project
         self.plugin = plugin
 
@@ -63,7 +63,7 @@ class DbtTransformPluginInstaller:
             )
 
 
-class DbtTransformPlugin(PluginInstall):
+class DbtTransformPlugin(ProjectPlugin):
     __plugin_type__ = PluginType.TRANSFORMS
     __installer_cls__ = DbtTransformPluginInstaller
 

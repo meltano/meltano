@@ -23,18 +23,19 @@ class CliError(Exception):
     pass
 
 
-def print_added_plugin(project, plugin, plugin_def=None, related=False):
-    descriptor = plugin.type.descriptor
+def print_added_plugin(project, project_plugin, plugin_def=None, related=False):
+    descriptor = project_plugin.type.descriptor
     if related:
         descriptor = f"related {descriptor}"
 
-    if plugin.should_add_to_file(project):
+    if project_plugin.should_add_to_file(project):
         click.secho(
-            f"Added {descriptor} '{plugin.name}' to your Meltano project", fg="green"
+            f"Added {descriptor} '{project_plugin.name}' to your Meltano project",
+            fg="green",
         )
     else:
         click.secho(
-            f"Adding {descriptor} '{plugin.name}' to your Meltano project...",
+            f"Adding {descriptor} '{project_plugin.name}' to your Meltano project...",
             fg="green",
         )
 
