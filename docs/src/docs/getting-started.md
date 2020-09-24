@@ -69,11 +69,19 @@ you can use the [`meltano/meltano` Docker image](https://hub.docker.com/r/meltan
     docker pull meltano/meltano:latest
     ```
 
-1. Optionally, verify that the [`meltano` CLI](/docs/command-line-interface.html) is now available by viewing the version:
+1. Optionally, verify that the [`meltano` CLI](/docs/command-line-interface.html) is now available through the Docker image by viewing the version:
 
     ```bash
     docker run meltano/meltano --version
     ```
+
+Now, whenever this guide or the documentation asks you to run the `meltano` command, you'll need to run it using `docker run meltano/meltano <args>` as in the example above.
+
+When running a `meltano` subcommand that requires access to your project (which you'll create in the next step), you'll also need to mount the project directory into the container and set it as the container's working directory:
+
+```bash
+docker run -v $(pwd):/project -w /project meltano/meltano <args>
+```
 
 If anything's not behaving as expected, refer to the ["Installing on Docker" section](/docs/installation.html#installing-on-docker) of the [Installation guide](/docs/installation.html) for more details.
 
