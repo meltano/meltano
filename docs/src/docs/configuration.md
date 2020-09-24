@@ -27,7 +27,7 @@ To determine the values of settings, Meltano will look in 4 places, with each ta
 2. **Your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file)**, under the plugin's `config` key.
    - Inside values, [environment variables can be referenced](#expansion-in-setting-values) as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
-3. **Your project's [**system database**](/docs/project.html#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) or [the UI](/docs/command-line-interface.html#ui) when the project is [deployed as read-only](/docs/settings.html#project-readonly).
+3. **Your project's [**system database**](/docs/project.html#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) or [the UI](/docs/ui.html) when the project is [deployed as read-only](/docs/settings.html#project-readonly).
    - Note that configuration for Meltano itself cannot be stored in the system database.
 4. **The default `value`s** set on the plugin's `settings` object in the global `discovery.yml` file (in the case of [known plugins](/docs/contributor-guide.html#known-plugins)) or [`meltano.yml`](/docs/project.html#meltano-yml-project-file) (in the case of custom plugins). `meltano config <plugin> list` will list the default values.
 
@@ -189,3 +189,9 @@ extractors:
 These extras can be thought of and interacted with as a special kind of setting,
 and [`meltano config`](/docs/command-line-interface.html#config) can be used to manage them:
 [How to use: Plugin extras](/docs/command-line-interface.html#how-to-use-plugin-extras).
+
+## Meltano UI
+
+While Meltano is optimized for usage through the [`meltano` CLI](/docs/command-line-interface.html)
+and direct changes to the [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file),
+basic plugin configuration functionality is also available in [the UI](/docs/ui.html#extractor-configuration).

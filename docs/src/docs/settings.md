@@ -121,7 +121,7 @@ in this environment.
 
 Specifically, this prevents [adding plugins](/docs/command-line-interface.md#add) or [pipeline schedules](/docs/command-line-interface.md#schedule) to your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), as well as [modifying plugin configuration](/docs/command-line-interface.md#config) stored in [`meltano.yml`](/docs/project.html#meltano-yml-project-file) or [`.env`](/docs/project.html#env).
 
-Note that [`meltano config <plugin> set`](/docs/command-line-interface.md#config) and [the UI](/docs/command-line-interface.md#ui)
+Note that [`meltano config <plugin> set`](/docs/command-line-interface.md#config) and [the UI](/docs/ui.html)
 can still be used to store configuration in the [system database](/docs/project.html#system-database),
 but that settings that are already [set in the environment](/docs/configuration.html#configuring-settings) or `meltano.yml` take precedence and cannot be overridden.
 
@@ -183,7 +183,7 @@ meltano --log-level=debug ...
 
 ## Meltano UI server
 
-These settings can be used to configure the [Meltano UI](/docs/command-line-interface.html#ui) server.
+These settings can be used to configure the [Meltano UI](/docs/ui.html) server.
 
 [Meltano UI feature settings](#meltano-ui-features) and [customization settings](#meltano-ui-customization) have their own sections.
 
@@ -394,7 +394,7 @@ export FORWARDED_ALLOW_IPS="*"
 
 ## Meltano UI features
 
-These settings can be used to enable certain features of [Meltano UI](/docs/command-line-interface.html#ui).
+These settings can be used to enable certain features of [Meltano UI](/docs/ui.html).
 
 [Meltano UI server settings](#meltano-ui-server) and [customization settings](#meltano-ui-customization) have their own sectionss
 
@@ -513,7 +513,7 @@ export MELTANO_UI_ANALYSIS=true
 
 ## Meltano UI customization
 
-These settings can be used to customize certain aspects of [Meltano UI](/docs/command-line-interface.html#ui).
+These settings can be used to customize certain aspects of [Meltano UI](/docs/ui.html).
 
 [Meltano UI server settings](#meltano-ui-server) and [feature settings](#meltano-ui-features) have their own sections.
 
@@ -766,7 +766,7 @@ export MELTANO_CLI_TRACKING_ID=UA-123456789-1
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_TRACKING_IDS_UI`, alias: `MELTANO_UI_TRACKING_ID`
 - Default: `UA-132758957-2`
 
-Tracking ID for usage of [Meltano UI](/docs/command-line-interface.html#ui).
+Tracking ID for usage of [Meltano UI](/docs/ui.html).
 
 ```bash
 meltano config meltano set tracking_ids ui UA-123456789-2
@@ -780,7 +780,7 @@ export MELTANO_UI_TRACKING_ID=UA-123456789-2
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_TRACKING_IDS_UI_EMBED`, alias: `MELTANO_EMBED_TRACKING_ID`
 - Default: `UA-132758957-6`
 
-Tracking ID for usage of [Meltano UI](/docs/command-line-interface.html#ui)'s [Embed feature](/docs/analysis.html#share-reports-and-dashboards).
+Tracking ID for usage of [Meltano UI](/docs/ui.html)'s [Embed feature](/docs/analysis.html#share-reports-and-dashboards).
 
 ```bash
 meltano config meltano set tracking_ids ui_embed UA-123456789-3

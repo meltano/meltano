@@ -212,8 +212,8 @@ as trailing arguments.
 
 ## Meltano UI
 
-Now that your pipelines are running, you may want to also spin up [Meltano UI](/docs/command-line-interface.html#ui),
-which lets you quickly check the status and most recent logs of your project's [scheduled pipelines](/#orchestration) right from your browser.
+Now that your pipelines are running, you may want to also spin up [Meltano UI](/docs/ui.html),
+which lets you quickly check the status and most recent logs of your project's [scheduled pipelines](/docs/orchestration.html) right from your browser.
 
 You can start Meltano UI using [`meltano ui`](/docs/command-line-interface.html#ui) just like you would locally,
 but there are [a couple of settings](/docs/settings.html#meltano-ui-server) you'll want to consider changing in production:
