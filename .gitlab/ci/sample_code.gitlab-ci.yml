@@ -3,11 +3,10 @@
   image: python:3.6
   variables:
     # `postgres` service configuration
-    POSTGRES_HOST_AUTH_METHOD: trust
     POSTGRES_ADDRESS: postgres
     POSTGRES_PORT: 5432
     POSTGRES_USER: meltano
-    POSTGRES_PASSWORD: ""
+    POSTGRES_PASSWORD: meltano
     POSTGRES_DB: demo-warehouse
 
     # `tap-covid-19` extractor configuration
