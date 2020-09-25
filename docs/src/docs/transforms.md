@@ -7,7 +7,7 @@ lastUpdatedSignificantly: 2020-02-20
 
 Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations.
 
-When Meltano elt runs with the `--transform run` option, the default dbt transformations for the extractor used are run; but Meltano will **never** modify the original source file.
+When Meltano elt runs with the `--transform run` option, the default dbt transformations for the extractor used are run if they are installed; but Meltano will **never** modify the original source file.
 
 As an example, assume that the following command runs:
 
@@ -17,7 +17,7 @@ meltano elt tap-gitlab target-postgres --transform run
 
 After the Extract and Load steps are successfully completed and data have been extracted from the GitLab API and loaded to a Postgres DB, the dbt transform runs.
 
-Meltano uses the convention that the transform has the same namespace as the extractor it is for. Transforms are automatically added the first time an elt operation that requires them runs, but they can also be discovered and added to a Meltano project manually:
+Meltano uses the convention that the transform has the same namespace as the extractor it is for. Transforms can be discovered and added to a Meltano project manually:
 
 ```
 (venv) $ meltano discover transforms

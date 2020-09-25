@@ -207,23 +207,6 @@ class ELTContextBuilder:
 
         return self
 
-    @property
-    def plugin_refs(self):
-        refs = []
-
-        if self._extractor:
-            refs.append(self._extractor)
-
-        if self._loader:
-            refs.append(self._loader)
-
-        if self._transform:
-            refs.append(self._transform)
-        elif self._transformer:
-            refs.append(self._transformer)
-
-        return refs
-
     def plugin_context(self, plugin_ref: PluginRef, env={}, config={}):
         return PluginContext(
             ref=plugin_ref,
