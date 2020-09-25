@@ -32,14 +32,13 @@ class ProjectAddService:
         )
         self.config_service = config_service or ConfigService(project)
 
-    def add(self, plugin_type: PluginType, plugin_name: str, **kwargs) -> ProjectPlugin:
-        plugin_def = self.discovery_service.find_plugin(plugin_type, plugin_name)
-        project_plugin = plugin_def.in_project()
-        return self.config_service.add_to_file(project_plugin)
+    def add(self, *args, **kwargs) -> ProjectPlugin:
+        plugin_def = self.discovery_service.find_definition(*args, **kwargs)
+        return self.add_definition(plugin_def)
 
-    def add_custom(self, plugin_def: PluginDefinition) -> ProjectPlugin:
-        project_plugin = plugin_def.in_project(custom=True)
-        return self.config_service.add_to_file(project_plugin)
+    def add_definition(self, plugin_def: PluginDefinition, **kwargs) -> ProjectPlugin:
+        plugin = plugin_def.in_project(**kwargs)
+        return self.config_service.add_to_file(plugin)
 
     def add_related(
         self,

@@ -365,11 +365,11 @@ async def run_transform(elt_context, output_logger, **kwargs):
 
 def find_transform_for_extractor(extractor: str, discovery_service):
     try:
-        extractor_plugin_def = discovery_service.find_plugin(
+        extractor_plugin_def = discovery_service.find_definition(
             PluginType.EXTRACTORS, extractor
         )
         # Check if there is a default transform for this extractor
-        transform_plugin_def = discovery_service.find_plugin_by_namespace(
+        transform_plugin_def = discovery_service.find_definition_by_namespace(
             PluginType.TRANSFORMS, extractor_plugin_def.namespace
         )
 

@@ -49,7 +49,7 @@ def tap_covid_19(project_add_service):
             pip_url="tap-covid-19",
             executable="tap-covid-19",
         )
-        return project_add_service.add_custom(plugin_def)
+        return project_add_service.add_definition(plugin_def, custom=True)
     except PluginAlreadyAddedException as err:
         return err.plugin
 
