@@ -478,7 +478,7 @@ class TestPluginSettingsService:
             "_extra": "$TAP_MOCK_MULTIPLE",
             "_extra_generic": "$MELTANO_EXTRACT_FOO",
         }
-        with mock.patch.object(subject.project_plugin, "config", config):
+        with mock.patch.object(subject.plugin, "config", config):
             config = subject.as_dict(session=session)
 
         assert config["var"] == "hello world!"
@@ -670,7 +670,7 @@ class TestPluginSettingsService:
         )
 
         monkeypatch.setitem(
-            subject.project_plugin.config, "_select", ["from_meltano_yml_config"]
+            subject.plugin.config, "_select", ["from_meltano_yml_config"]
         )
 
         assert subject.get_with_source("_select") == (
@@ -678,9 +678,7 @@ class TestPluginSettingsService:
             SettingValueStore.MELTANO_YML,
         )
 
-        monkeypatch.setitem(
-            subject.project_plugin.extras, "select", ["from_meltano_yml_extra"]
-        )
+        monkeypatch.setitem(subject.plugin.extras, "select", ["from_meltano_yml_extra"])
 
         assert subject.get_with_source("_select") == (
             ["from_meltano_yml_extra"],
@@ -742,9 +740,7 @@ class TestPluginSettingsService:
             SettingValueStore.DEFAULT,
         )
 
-        monkeypatch.setitem(
-            subject.project_plugin.extras, "vars", {"var": "from_meltano_yml"}
-        )
+        monkeypatch.setitem(subject.plugin.extras, "vars", {"var": "from_meltano_yml"})
 
         assert subject.get_with_source("_vars") == (
             {"var": "from_meltano_yml", "other": "from_default"},
