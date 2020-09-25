@@ -285,12 +285,3 @@ class PluginDiscoveryService(Versioned):
         plugin.use_variant(project_plugin.variant or Variant.ORIGINAL_NAME)
 
         return plugin
-
-    def discover(self, plugin_type: PluginType = None):
-        """Return a pretty printed list of available plugins."""
-        enabled_plugin_types = [plugin_type] if plugin_type else list(PluginType)
-
-        return {
-            plugin_type: [p.name for p in self.get_plugins_of_type(plugin_type)]
-            for plugin_type in enabled_plugin_types
-        }

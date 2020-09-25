@@ -14,11 +14,14 @@ class TestCliDiscover:
             result = cli_runner.invoke(cli, ["discover"])
             assert_cli_runner(result)
 
-            assert "extractors" in result.output
+            assert "Extractors" in result.output
             assert "tap-gitlab" in result.output
-            assert "tap-mock" in result.output
+            assert (
+                "tap-mock, variants: meltano (default), singer-io (deprecated)"
+                in result.output
+            )
 
-            assert "loaders" in result.output
+            assert "Loaders" in result.output
             assert "target-jsonl" in result.output
             assert "target-mock" in result.output
 
@@ -30,8 +33,8 @@ class TestCliDiscover:
             result = cli_runner.invoke(cli, ["discover", "extractors"])
             assert_cli_runner(result)
 
-            assert "extractors" in result.output
+            assert "Extractors" in result.output
             assert "tap-gitlab" in result.output
             assert "tap-mock" in result.output
 
-            assert "loaders" not in result.output
+            assert "Loaders" not in result.output

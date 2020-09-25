@@ -22,16 +22,23 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 def discover(project, plugin_type):
     discover_service = PluginDiscoveryService(project)
     if plugin_type == "all":
-        plugin_type = None
+        plugin_types = list(PluginType)
     else:
-        plugin_type = PluginType.from_cli_argument(plugin_type)
+        plugin_types = [PluginType.from_cli_argument(plugin_type)]
 
-    discovery_dict = discover_service.discover(plugin_type)
+    for i, plugin_type in enumerate(plugin_types):
+        if i > 0:
+            click.echo()
 
-    for plugin_type, plugin_defs in discovery_dict.items():
-        click.secho(plugin_type, fg="green")
-        for plugin_def in plugin_defs:
-            click.echo(plugin_def)
+        click.secho(f"{str(plugin_type).capitalize()}", fg="green")
+
+        for plugin_def in discover_service.get_plugins_of_type(plugin_type):
+            click.echo(plugin_def.name, nl=False)
+
+            if len(plugin_def.variants) > 1:
+                click.echo(f", variants: {plugin_def.list_variant_names()}")
+            else:
+                click.echo()
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_discover(plugin_type=plugin_type)
