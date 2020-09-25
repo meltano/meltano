@@ -11,19 +11,15 @@ from meltano.core.plugin_invoker import invoker_factory
 
 
 class PluginContext(
-    namedtuple("PluginContext", "ref in_project definition settings_service session")
+    namedtuple("PluginContext", "plugin definition settings_service session")
 ):
     @property
-    def namespace(self):
-        return self.definition.namespace
-
-    @property
     def name(self):
-        return self.in_project.name
+        return self.plugin.name
 
     @property
     def type(self):
-        return self.ref.type
+        return self.plugin.type
 
     def get_config(self, name, **kwargs):
         return self.settings_service.get(name, session=self.session, **kwargs)
@@ -36,11 +32,7 @@ class PluginContext(
 
     @property
     def env(self):
-        return {
-            **self.definition.info_env,
-            **self.in_project.info_env,
-            **self.config_env(),
-        }
+        return {**self.definition.info_env, **self.plugin.info_env, **self.config_env()}
 
 
 class ELTContext:
@@ -97,7 +89,7 @@ class ELTContext:
 
         return invoker_factory(
             self.project,
-            plugin_context.in_project,
+            plugin_context.plugin,
             context=self,
             run_dir=self.elt_run_dir,
             plugin_settings_service=plugin_context.settings_service,
@@ -225,17 +217,17 @@ class ELTContextBuilder:
         return refs
 
     def plugin_context(self, plugin_ref: PluginRef, env={}, config={}):
+        plugin = self.config_service.get_plugin(plugin_ref)
+        plugin_def = self.plugin_discovery_service.find_plugin(
+            plugin_name=plugin_ref.name, plugin_type=plugin_ref.type
+        )
+
         return PluginContext(
-            ref=plugin_ref,
-            in_project=self.config_service.find_plugin(
-                plugin_name=plugin_ref.name, plugin_type=plugin_ref.type
-            ),
-            definition=self.plugin_discovery_service.find_plugin(
-                plugin_name=plugin_ref.name, plugin_type=plugin_ref.type
-            ),
+            plugin=plugin,
+            definition=plugin_def,
             settings_service=PluginSettingsService(
                 self.project,
-                plugin_ref,
+                plugin,
                 config_service=self.config_service,
                 plugin_discovery_service=self.plugin_discovery_service,
                 env_override=env,
