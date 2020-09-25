@@ -61,7 +61,7 @@ def installed():
 
     def canonical_plugin(plugin: ProjectPlugin):
         try:
-            plugin_def = discovery.find_plugin(plugin.type, plugin.name)
+            plugin_def = discovery.get_definition(plugin)
             canonical_plugin = {**plugin_def.canonical(), **plugin.canonical()}
         except PluginNotFoundError:
             canonical_plugin = {**plugin.canonical()}

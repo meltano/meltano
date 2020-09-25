@@ -54,9 +54,7 @@ class PluginSettingsService(SettingsService):
     @property
     def plugin_def(self):
         if self._plugin_def is None:
-            self._plugin_def = self.discovery_service.find_plugin(
-                self.plugin.type, self.plugin.name
-            )
+            self._plugin_def = self.discovery_service.get_definition(self.plugin)
 
         return self._plugin_def
 

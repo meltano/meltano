@@ -15,7 +15,7 @@ from meltano.core.m5o.reports_service import ReportsService
 
 class TestCliAdd:
     @pytest.mark.parametrize(
-        "plugin_type,plugin_name,related_plugins",
+        "plugin_type,plugin_name,related_plugin_refs",
         [
             (PluginType.EXTRACTORS, "tap-carbon-intensity", []),
             (PluginType.LOADERS, "target-sqlite", []),
@@ -42,7 +42,7 @@ class TestCliAdd:
         self,
         plugin_type,
         plugin_name,
-        related_plugins,
+        related_plugin_refs,
         project,
         cli_runner,
         config_service,
@@ -62,18 +62,16 @@ class TestCliAdd:
             assert plugin
             plugins = [plugin]
 
-            for related_plugin in related_plugins:
-                project_plugin = config_service.find_plugin(
-                    related_plugin.name, related_plugin.type
-                )
-                assert project_plugin
+            for related_plugin_ref in related_plugin_refs:
+                plugin = config_service.get_plugin(related_plugin_ref)
+                assert plugin
 
                 assert (
-                    f"Added related {related_plugin.type.descriptor} '{related_plugin.name}'"
+                    f"Added related {plugin.type.descriptor} '{plugin.name}'"
                     in res.stdout
                 )
 
-                plugins.append(project_plugin)
+                plugins.append(plugin)
 
             plugins.reverse()
 
@@ -293,9 +291,7 @@ class TestCliAdd:
             assert plugin.name == "tap-custom"
             assert plugin.pip_url == pip_url
 
-            plugin_def = plugin_discovery_service.find_plugin(
-                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-custom"
-            )
+            plugin_def = plugin_discovery_service.get_definition(plugin)
             assert plugin_def.name == "tap-custom"
             assert plugin_def.namespace == "tap_custom"
             assert plugin_def.pip_url == pip_url

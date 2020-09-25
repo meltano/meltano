@@ -57,9 +57,7 @@ class ProjectAddService:
         if runner_ref:
             related_plugin_refs.append(runner_ref)
 
-        plugin_def = self.discovery_service.find_plugin(
-            target_plugin.type, target_plugin.name
-        )
+        plugin_def = self.discovery_service.get_definition(target_plugin)
         related_plugin_refs.extend(
             related_plugin_def
             for plugin_type in plugin_types
@@ -72,19 +70,16 @@ class ProjectAddService:
         added_plugins = []
         for plugin_ref in related_plugin_refs:
             try:
-                project_plugin = self.add(plugin_ref.type, plugin_ref.name)
+                plugin = self.add(plugin_ref.type, plugin_ref.name)
             except PluginAlreadyAddedException as err:
                 continue
 
-            added_plugins.append(project_plugin)
+            added_plugins.append(plugin)
 
         added_plugins_with_related = []
-        for project_plugin in added_plugins:
+        for plugin in added_plugins:
             added_plugins_with_related.extend(
-                [
-                    project_plugin,
-                    *self.add_related(project_plugin, plugin_types=plugin_types),
-                ]
+                [plugin, *self.add_related(plugin, plugin_types=plugin_types)]
             )
 
         return added_plugins_with_related

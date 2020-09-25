@@ -57,7 +57,8 @@ def add_plugin(
 ):
     try:
         plugin = add_service.add(plugin_type, plugin_name)
-        plugin_def = add_service.discovery_service.find_plugin(plugin.type, plugin.name)
+        plugin_def = add_service.discovery_service.get_definition(plugin)
+
         print_added_plugin(project, plugin, plugin_def)
     except PluginAlreadyAddedException as err:
         click.secho(
@@ -88,8 +89,8 @@ def add_related_plugins(
             plugin_install, plugin_types=plugin_types
         )
         for related_plugin in related_plugins:
-            related_plugin_def = add_service.discovery_service.find_plugin(
-                related_plugin.type, related_plugin.name
+            related_plugin_def = add_service.discovery_service.get_definition(
+                related_plugin
             )
             print_added_plugin(
                 project, related_plugin, related_plugin_def, related=True

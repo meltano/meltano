@@ -16,8 +16,10 @@ class SelectService:
         self, project: Project, extractor: str, config_service: ConfigService = None
     ):
         self.project = project
-        self.config = config_service or ConfigService(project)
-        self._extractor = self.config.find_plugin(extractor, PluginType.EXTRACTORS)
+        self.config_service = config_service or ConfigService(project)
+        self._extractor = self.config_service.find_plugin(
+            extractor, PluginType.EXTRACTORS
+        )
 
     @property
     def extractor(self):
@@ -26,7 +28,7 @@ class SelectService:
     @property
     def current_select(self):
         plugin_settings_service = PluginSettingsService(
-            self.project, self.extractor, config_service=self.config
+            self.project, self.extractor, config_service=self.config_service
         )
         return plugin_settings_service.get("_select")
 
@@ -55,4 +57,4 @@ class SelectService:
         exclude = "!" if exclude else ""
         pattern = f"{exclude}{entities_filter}.{attributes_filter}"
         self.extractor.add_select_filter(pattern)
-        self.config.update_plugin(self.extractor)
+        self.config_service.update_plugin(self.extractor)

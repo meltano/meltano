@@ -8,6 +8,7 @@ from meltano.api.models.subscription import Subscription, SubscriptionEventType
 from meltano.api.signals import PipelineSignals
 from meltano.core.project import Project
 from meltano.core.plugin import PluginType, PluginDefinition
+from meltano.core.config_service import ConfigService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 
 
@@ -22,12 +23,16 @@ class NotificationEvents:
         self,
         project: Project,
         mail_service: MailService = None,
+        config_service: ConfigService = None,
         plugin_discovery_service: PluginDiscoveryService = None,
     ):
         self.project = project
+
         self.mail_service = mail_service or MailService(project)
+        self.config_service = config_service or ConfigService(project)
         self.plugin_discovery_service = (
-            plugin_discovery_service or PluginDiscoveryService(project)
+            plugin_discovery_service
+            or PluginDiscoveryService(project, config_service=self.config_service)
         )
 
     def init_app(self, app):
@@ -39,9 +44,11 @@ class NotificationEvents:
         Returns the Data Source name for a Pipeline
         """
 
-        plugin_def = self.plugin_discovery_service.find_plugin(
-            PluginType.EXTRACTORS, pipeline["extractor"]
+        plugin = self.config_service.find_plugin(
+            pipeline["extractor"], plugin_type=PluginType.EXTRACTORS
         )
+        plugin_def = self.plugin_discovery_service.get_definition(plugin)
+
         return plugin_def.label
 
     def pipeline_urls(self, pipeline) -> str:
@@ -49,9 +56,10 @@ class NotificationEvents:
         Return external URLs to different point of interests for a Pipeline.
         """
 
-        plugin_def = self.plugin_discovery_service.find_plugin(
-            PluginType.EXTRACTORS, pipeline["extractor"]
+        plugin = self.config_service.find_plugin(
+            pipeline["extractor"], plugin_type=PluginType.EXTRACTORS
         )
+        plugin_def = self.plugin_discovery_service.get_definition(plugin)
 
         return {
             "log": url_for(

@@ -218,9 +218,7 @@ class ELTContextBuilder:
 
     def plugin_context(self, plugin_ref: PluginRef, env={}, config={}):
         plugin = self.config_service.get_plugin(plugin_ref)
-        plugin_def = self.plugin_discovery_service.find_plugin(
-            plugin_name=plugin_ref.name, plugin_type=plugin_ref.type
-        )
+        plugin_def = self.plugin_discovery_service.get_definition(plugin)
 
         return PluginContext(
             plugin=plugin,

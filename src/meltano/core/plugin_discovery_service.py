@@ -269,6 +269,19 @@ class PluginDiscoveryService(Versioned):
         except StopIteration as stop:
             raise PluginNotFoundError(namespace) from stop
 
+    def get_definition(self, project_plugin: ProjectPlugin) -> PluginDefinition:
+        if project_plugin.is_custom():
+            return project_plugin.custom_definition
+
+        try:
+            plugin = next(
+                plugin for plugin in self.plugins() if plugin == project_plugin
+            )
+
+            return plugin
+        except StopIteration as stop:
+            raise PluginNotFoundError(project_plugin.name) from stop
+
     def discover(self, plugin_type: PluginType = None):
         """Return a pretty printed list of available plugins."""
         enabled_plugin_types = [plugin_type] if plugin_type else list(PluginType)
