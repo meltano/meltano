@@ -83,7 +83,7 @@ class PluginSettingsService(SettingsService):
         extra_settings = deepcopy(self.plugin.extra_settings)
 
         # Set defaults from plugin definition
-        defaults = {f"_{k}": v for k, v in self.plugin_def.extras.items()}
+        defaults = {f"_{k}": v for k, v in self.plugin_def.all_extras.items()}
 
         if defaults:
             for setting in extra_settings:

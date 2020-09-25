@@ -14,7 +14,7 @@ from .setting_definition import SettingDefinition
 from .behavior.versioned import Versioned, IncompatibleVersionError
 from .behavior.canonical import Canonical
 from .config_service import ConfigService
-from .plugin import PluginDefinition, ProjectPlugin, PluginType, PluginRef
+from .plugin import PluginDefinition, ProjectPlugin, PluginType, PluginRef, Variant
 from .plugin.factory import plugin_factory
 
 
@@ -245,17 +245,19 @@ class PluginDiscoveryService(Versioned):
         )
 
     def find_definition(
-        self, plugin_type: PluginType, plugin_name: str
+        self, plugin_type: PluginType, plugin_name: str, variant=None
     ) -> PluginDefinition:
         name, _ = PluginRef.parse_name(plugin_name)
         try:
-            return next(
+            plugin = next(
                 plugin
                 for plugin in self.get_plugins_of_type(plugin_type)
                 if plugin.name == name
             )
-        except StopIteration:
-            raise PluginNotFoundError(name)
+            plugin.use_variant(variant)
+            return plugin
+        except StopIteration as stop:
+            raise PluginNotFoundError(name) from stop
 
     def find_definition_by_namespace(
         self, plugin_type: PluginType, namespace: str
@@ -271,16 +273,18 @@ class PluginDiscoveryService(Versioned):
 
     def get_definition(self, project_plugin: ProjectPlugin) -> PluginDefinition:
         if project_plugin.is_custom():
-            return project_plugin.custom_definition
+            plugin = project_plugin.custom_definition
+        else:
+            try:
+                plugin = next(
+                    plugin for plugin in self.plugins() if plugin == project_plugin
+                )
+            except StopIteration as stop:
+                raise PluginNotFoundError(project_plugin.name) from stop
 
-        try:
-            plugin = next(
-                plugin for plugin in self.plugins() if plugin == project_plugin
-            )
+        plugin.use_variant(project_plugin.variant or Variant.ORIGINAL_NAME)
 
-            return plugin
-        except StopIteration as stop:
-            raise PluginNotFoundError(project_plugin.name) from stop
+        return plugin
 
     def discover(self, plugin_type: PluginType = None):
         """Return a pretty printed list of available plugins."""

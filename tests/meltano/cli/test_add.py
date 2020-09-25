@@ -6,7 +6,7 @@ from unittest import mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
-from meltano.core.plugin import PluginType, PluginRef
+from meltano.core.plugin import PluginType, PluginRef, Variant
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.m5o.dashboards_service import DashboardsService
@@ -292,12 +292,21 @@ class TestCliAdd:
             assert plugin.pip_url == pip_url
 
             plugin_def = plugin_discovery_service.get_definition(plugin)
+            plugin_variant = plugin_def.current_variant
+
             assert plugin_def.name == "tap-custom"
             assert plugin_def.namespace == "tap_custom"
-            assert plugin_def.pip_url == pip_url
-            assert plugin_def.executable == executable
-            assert plugin_def.capabilities == ["foo", "bar"]
-            assert [s.name for s in plugin_def.settings] == ["baz", "qux"]
+
+            assert plugin_variant.name is None
+            assert plugin_variant.pip_url == pip_url
+            assert plugin_variant.executable == executable
+            assert plugin_variant.capabilities == ["foo", "bar"]
+            assert [s.name for s in plugin_variant.settings] == ["baz", "qux"]
+
+            assert plugin_def.pip_url == plugin_variant.pip_url
+            assert plugin_def.executable == plugin_variant.executable
+            assert plugin_def.capabilities == plugin_variant.capabilities
+            assert plugin_def.settings == plugin_variant.settings
 
             install_plugin_mock.assert_called_once_with(
                 project, [plugin], reason=PluginInstallReason.ADD

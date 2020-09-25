@@ -10,7 +10,13 @@ from unittest import mock
 import meltano.core.bundle as bundle
 
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.plugin import PluginType, PluginDefinition
+from meltano.core.plugin import (
+    PluginType,
+    PluginDefinition,
+    Variant,
+    VariantNotFoundError,
+    ProjectPlugin,
+)
 from meltano.core.plugin_discovery_service import (
     DiscoveryFile,
     PluginDiscoveryService,
@@ -95,6 +101,80 @@ class TestPluginDiscoveryService:
         assert "tap-mock" in discovery[PluginType.EXTRACTORS]
 
         assert PluginType.LOADERS not in discovery
+
+    def test_find_definition(self, subject):
+        # If no variant is specified,
+        # defaults to the first variant
+        plugin_def = subject.find_definition(PluginType.EXTRACTORS, "tap-mock")
+        assert plugin_def.type == PluginType.EXTRACTORS
+        assert plugin_def.name == "tap-mock"
+        assert plugin_def.current_variant == plugin_def.variants[0]
+
+        plugin_def = subject.find_definition(
+            PluginType.EXTRACTORS, "tap-mock", variant="singer-io"
+        )
+        assert plugin_def.type == PluginType.EXTRACTORS
+        assert plugin_def.name == "tap-mock"
+        assert plugin_def.current_variant_name == "singer-io"
+
+        plugin_def = subject.find_definition(
+            PluginType.EXTRACTORS, "tap-mock", variant="meltano"
+        )
+        assert plugin_def.type == PluginType.EXTRACTORS
+        assert plugin_def.name == "tap-mock"
+        assert plugin_def.current_variant_name == "meltano"
+
+        plugin_def = subject.find_definition(
+            PluginType.EXTRACTORS, "tap-mock", variant=Variant.ORIGINAL_NAME
+        )
+        assert plugin_def.type == PluginType.EXTRACTORS
+        assert plugin_def.name == "tap-mock"
+        assert plugin_def.current_variant_name == "singer-io"
+
+        with pytest.raises(VariantNotFoundError):
+            plugin_def = subject.find_definition(
+                PluginType.EXTRACTORS, "tap-mock", variant="unknown"
+            )
+
+    def test_get_definition(self, subject):
+        # If no variant is set on the project plugin,
+        # defaults to the original variant
+        project_plugin = ProjectPlugin(PluginType.EXTRACTORS, "tap-mock")
+        plugin_def = subject.get_definition(project_plugin)
+        assert plugin_def.type == PluginType.EXTRACTORS
+        assert plugin_def.name == "tap-mock"
+        assert plugin_def.current_variant_name == "singer-io"
+        assert plugin_def.current_variant.original
+
+        project_plugin = ProjectPlugin(
+            PluginType.EXTRACTORS, "tap-mock", variant="meltano"
+        )
+        plugin_def = subject.get_definition(project_plugin)
+        assert plugin_def.type == PluginType.EXTRACTORS
+        assert plugin_def.name == "tap-mock"
+        assert plugin_def.current_variant_name == "meltano"
+
+        project_plugin = ProjectPlugin(
+            PluginType.EXTRACTORS, "tap-mock", variant="singer-io"
+        )
+        plugin_def = subject.get_definition(project_plugin)
+        assert plugin_def.type == PluginType.EXTRACTORS
+        assert plugin_def.name == "tap-mock"
+        assert plugin_def.current_variant_name == "singer-io"
+
+        project_plugin = ProjectPlugin(
+            PluginType.EXTRACTORS, "tap-mock", variant=Variant.ORIGINAL_NAME
+        )
+        plugin_def = subject.get_definition(project_plugin)
+        assert plugin_def.type == PluginType.EXTRACTORS
+        assert plugin_def.name == "tap-mock"
+        assert plugin_def.current_variant_name == "singer-io"
+
+        project_plugin = ProjectPlugin(
+            PluginType.EXTRACTORS, "tap-mock", variant="unknown"
+        )
+        with pytest.raises(VariantNotFoundError):
+            subject.get_definition(project_plugin)
 
     @pytest.mark.usefixtures("discovery_yaml")
     def test_discovery_yaml(self, subject):
