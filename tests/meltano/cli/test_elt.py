@@ -97,47 +97,6 @@ def dbt_process(process_mock_factory, dbt):
 class TestCliEltScratchpadOne:
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
-    def test_elt_missing_plugins(
-        self, google_tracker, cli_runner, project, plugin_discovery_service
-    ):
-        args = ["elt", "tap-mock", "target-mock"]
-
-        with mock.patch(
-            "meltano.cli.elt.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch.object(
-            SingerRunner, "run", new=CoroutineMock()
-        ), mock.patch(
-            "meltano.cli.elt.install_plugins", return_value=True
-        ) as install_plugin_mock:
-            result = cli_runner.invoke(cli, args)
-            assert_cli_runner(result)
-
-            assert_lines(
-                result.output,
-                "meltano | Extractor 'tap-mock' is missing, adding it to your project...\n",
-                "meltano | Loader 'target-mock' is missing, adding it to your project...\n",
-                "meltano     | Added extractor 'tap-mock' to your Meltano project\n",
-                "meltano     | Added loader 'target-mock' to your Meltano project\n",
-                "meltano     | Running extract & load...\n",
-                "meltano     | Extract & load complete!\n",
-                "meltano     | Transformation skipped.\n",
-            )
-
-            install_plugin_mock.assert_called_once_with(
-                project,
-                [
-                    PluginRef(PluginType.LOADERS, "target-mock"),
-                    PluginRef(PluginType.EXTRACTORS, "tap-mock"),
-                ],
-                reason=PluginInstallReason.ADD,
-            )
-
-    @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
     def test_elt(
         self,
         google_tracker,
@@ -165,8 +124,6 @@ class TestCliEltScratchpadOne:
         ), mock.patch(
             "meltano.core.plugin_invoker.asyncio"
         ) as asyncio_mock, mock.patch(
-            "meltano.cli.elt.install_plugins", return_value=True
-        ) as install_plugin_mock, mock.patch(
             "meltano.core.elt_context.PluginDiscoveryService",
             return_value=plugin_discovery_service,
         ):
@@ -193,14 +150,6 @@ class TestCliEltScratchpadOne:
                 "target-mock | Running\n",
                 "target-mock | Done\n",
             )
-
-            install_plugin_mock.assert_not_called()
-
-        # aborts when there is an exception
-        with mock.patch("meltano.cli.elt.install_missing_plugins", return_value=None):
-            result = cli_runner.invoke(cli, args)
-            assert result.exit_code == 1
-            assert str(result.exception) == "Failed to install missing plugins"
 
         job_logging_service.delete_all_logs(job_id)
 
@@ -254,8 +203,6 @@ class TestCliEltScratchpadOne:
         ), mock.patch(
             "meltano.core.plugin_invoker.asyncio"
         ) as asyncio_mock, mock.patch(
-            "meltano.cli.elt.install_plugins", return_value=True
-        ) as install_plugin_mock, mock.patch(
             "meltano.core.elt_context.PluginDiscoveryService",
             return_value=plugin_discovery_service,
         ):
@@ -331,8 +278,6 @@ class TestCliEltScratchpadOne:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.cli.elt.install_plugins", return_value=True
-        ) as install_plugin_mock, mock.patch(
             "meltano.core.elt_context.PluginDiscoveryService",
             return_value=plugin_discovery_service,
         ):
@@ -382,8 +327,6 @@ class TestCliEltScratchpadOne:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.cli.elt.install_plugins", return_value=True
-        ) as install_plugin_mock, mock.patch(
             "meltano.core.elt_context.PluginDiscoveryService",
             return_value=plugin_discovery_service,
         ):
@@ -440,8 +383,6 @@ class TestCliEltScratchpadOne:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.cli.elt.install_plugins", return_value=True
-        ) as install_plugin_mock, mock.patch(
             "meltano.core.elt_context.PluginDiscoveryService",
             return_value=plugin_discovery_service,
         ):
@@ -608,60 +549,6 @@ class TestCliEltScratchpadOne:
 class TestCliEltScratchpadTwo:
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
-    def test_elt_transform_run_missing_plugins(
-        self, google_tracker, cli_runner, project, plugin_discovery_service
-    ):
-        args = ["elt", "tap-mock", "target-mock", "--transform", "run"]
-
-        with mock.patch(
-            "meltano.cli.elt.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.core.transform_add_service.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch.object(
-            SingerRunner, "run", new=CoroutineMock()
-        ), mock.patch.object(
-            DbtRunner, "run", new=CoroutineMock()
-        ), mock.patch(
-            "meltano.cli.elt.install_plugins", return_value=True
-        ) as install_plugin_mock:
-            result = cli_runner.invoke(cli, args)
-            assert_cli_runner(result)
-
-            assert_lines(
-                result.output,
-                "meltano | Extractor 'tap-mock' is missing, adding it to your project...\n",
-                "meltano | Loader 'target-mock' is missing, adding it to your project...\n",
-                "meltano | Transform 'tap-mock-transform' is missing, adding it to your project...\n",
-                "meltano     | Added extractor 'tap-mock' to your Meltano project\n",
-                "meltano     | Added loader 'target-mock' to your Meltano project\n",
-                "meltano     | Added transform 'tap-mock-transform' to your Meltano project\n",
-                "meltano     | Added related transformer 'dbt' to your Meltano project\n",
-                "meltano     | Added related file bundle 'dbt' to your Meltano project\n",
-                "meltano     | Running extract & load...\n",
-                "meltano     | Extract & load complete!\n",
-                "meltano     | Running transformation...\n",
-                "meltano     | Transformation complete!\n",
-            )
-
-            install_plugin_mock.assert_called_once_with(
-                project,
-                [
-                    PluginRef(PluginType.FILES, "dbt"),
-                    PluginRef(PluginType.TRANSFORMERS, "dbt"),
-                    PluginRef(PluginType.TRANSFORMS, "tap-mock-transform"),
-                    PluginRef(PluginType.LOADERS, "target-mock"),
-                    PluginRef(PluginType.EXTRACTORS, "tap-mock"),
-                ],
-                reason=PluginInstallReason.ADD,
-            )
-
-    @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
     def test_elt_transform_run(
         self,
         google_tracker,
@@ -699,9 +586,7 @@ class TestCliEltScratchpadTwo:
         ), mock.patch(
             "meltano.core.transform_add_service.PluginDiscoveryService",
             return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.cli.elt.install_plugins", return_value=True
-        ) as install_plugin_mock:
+        ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
@@ -725,8 +610,6 @@ class TestCliEltScratchpadTwo:
                 "dbt         | Running\n",
                 "dbt         | Done\n",
             )
-
-            install_plugin_mock.assert_not_called()
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
@@ -775,9 +658,7 @@ class TestCliEltScratchpadTwo:
         ), mock.patch(
             "meltano.core.transform_add_service.PluginDiscoveryService",
             return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.cli.elt.install_plugins", return_value=True
-        ) as install_plugin_mock:
+        ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "`dbt run` failed" in str(result.exception)
@@ -803,55 +684,8 @@ class TestCliEltScratchpadTwo:
                 "dbt         | Failure\n",
             )
 
-            install_plugin_mock.assert_not_called()
-
 
 class TestCliEltScratchpadThree:
-    @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
-    def test_elt_transform_only_missing_plugins(
-        self, google_tracker, cli_runner, project, tap, target, plugin_discovery_service
-    ):
-        args = ["elt", tap.name, target.name, "--transform", "only"]
-
-        with mock.patch(
-            "meltano.cli.elt.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.core.transform_add_service.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch.object(
-            DbtRunner, "run", new=CoroutineMock()
-        ), mock.patch(
-            "meltano.cli.elt.install_plugins", return_value=True
-        ) as install_plugin_mock:
-            result = cli_runner.invoke(cli, args)
-            assert_cli_runner(result)
-
-            assert_lines(
-                result.output,
-                "meltano | Transform 'tap-mock-transform' is missing, adding it to your project...\n",
-                "meltano | Added transform 'tap-mock-transform' to your Meltano project\n",
-                "meltano | Added related transformer 'dbt' to your Meltano project\n",
-                "meltano | Added related file bundle 'dbt' to your Meltano project\n",
-                "meltano | Extract & load skipped.\n",
-                "meltano | Running transformation...\n",
-                "meltano | Transformation complete!\n",
-            )
-
-            install_plugin_mock.assert_called_once_with(
-                project,
-                [
-                    PluginRef(PluginType.FILES, "dbt"),
-                    PluginRef(PluginType.TRANSFORMERS, "dbt"),
-                    PluginRef(PluginType.TRANSFORMS, "tap-mock-transform"),
-                ],
-                reason=PluginInstallReason.ADD,
-            )
-
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
     def test_elt_transform_only(
@@ -878,9 +712,7 @@ class TestCliEltScratchpadThree:
             return_value=plugin_discovery_service,
         ), mock.patch.object(
             DbtRunner, "run", new=CoroutineMock()
-        ), mock.patch(
-            "meltano.cli.elt.install_plugins", return_value=True
-        ) as install_plugin_mock:
+        ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
@@ -890,8 +722,6 @@ class TestCliEltScratchpadThree:
                 "meltano | Running transformation...\n",
                 "meltano | Transformation complete!\n",
             )
-
-            install_plugin_mock.assert_not_called()
 
 
 class TestCliEltScratchpadFour:
@@ -901,52 +731,3 @@ class TestCliEltScratchpadFour:
             return project_add_service.add(PluginType.EXTRACTORS, "tap-csv")
         except PluginAlreadyAddedException as err:
             return err.plugin
-
-    @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
-    def test_elt_transform_only_unknown(
-        self,
-        google_tracker,
-        cli_runner,
-        project,
-        tap_csv,
-        target,
-        plugin_discovery_service,
-    ):
-        # exit cleanly when `meltano elt ... --transform only` runs for
-        # a tap with no default transforms
-
-        args = ["elt", tap_csv.name, target.name, "--transform", "only"]
-
-        with mock.patch(
-            "meltano.cli.elt.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch.object(
-            DbtRunner, "run", new=CoroutineMock()
-        ), mock.patch(
-            "meltano.cli.elt.install_plugins", return_value=True
-        ) as install_plugin_mock:
-            result = cli_runner.invoke(cli, args)
-            assert_cli_runner(result)
-
-            assert_lines(
-                result.output,
-                "meltano | Transformer 'dbt' is missing, adding it to your project...\n",
-                "meltano | Added transformer 'dbt' to your Meltano project\n",
-                "meltano | Added related file bundle 'dbt' to your Meltano project\n",
-                "meltano | Extract & load skipped.\n",
-                "meltano | Running transformation...\n",
-                "meltano | Transformation complete!\n",
-            )
-
-            install_plugin_mock.assert_called_once_with(
-                project,
-                [
-                    PluginRef(PluginType.FILES, "dbt"),
-                    PluginRef(PluginType.TRANSFORMERS, "dbt"),
-                ],
-                reason=PluginInstallReason.ADD,
-            )

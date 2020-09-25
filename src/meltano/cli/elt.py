@@ -8,17 +8,15 @@ from contextlib import suppress, contextmanager
 from async_generator import asynccontextmanager
 
 from . import cli
-from .utils import CliError, add_plugin, add_related_plugins, install_plugins
+from .utils import CliError, add_plugin, add_related_plugins
 from .params import project
 from meltano.core.config_service import ConfigService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
-from meltano.core.project import Project, ProjectNotFound
 from meltano.core.job import Job
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginMissingError
-from meltano.core.project_add_service import ProjectAddService
 from meltano.core.transform_add_service import TransformAddService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.db import project_engine
@@ -257,16 +255,6 @@ async def run_elt(
 ):
     async with redirect_output(output_logger):
         try:
-            success = install_missing_plugins(
-                project,
-                context_builder.plugin_refs,
-                config_service=config_service,
-                discovery_service=discovery_service,
-            )
-
-            if not success:
-                raise CliError("Failed to install missing plugins")
-
             elt_context = context_builder.context()
 
             if not elt_context.only_transform:
@@ -376,61 +364,3 @@ def find_transform_for_extractor(extractor: str, discovery_service):
         return transform_plugin_def.name
     except PluginNotFoundError:
         return None
-
-
-def add_plugin_if_missing(
-    project: Project,
-    plugin_type,
-    name,
-    config_service: ConfigService,
-    add_service: ProjectAddService,
-):
-    try:
-        config_service.find_plugin(name, plugin_type=plugin_type)
-        return None
-    except PluginMissingError:
-        logs(
-            f"{plugin_type.descriptor.capitalize()} '{name}' is missing, adding it to your project...",
-            fg="yellow",
-        )
-        return add_plugin(project, plugin_type, name, add_service=add_service)
-
-
-def install_missing_plugins(
-    project: Project,
-    plugin_refs: [PluginRef],
-    config_service: ConfigService,
-    discovery_service: PluginDiscoveryService,
-):
-    add_service = ProjectAddService(
-        project,
-        plugin_discovery_service=discovery_service,
-        config_service=config_service,
-    )
-
-    plugins = []
-    for plugin_ref in plugin_refs:
-        plugin = add_plugin_if_missing(
-            project,
-            plugin_ref.type,
-            plugin_ref.name,
-            config_service=config_service,
-            add_service=add_service,
-        )
-        if plugin:
-            plugins.append(plugin)
-
-    if not plugins:
-        return True
-
-    related_plugins = add_related_plugins(
-        project, plugins, add_service=add_service, plugin_types=[PluginType.FILES]
-    )
-    plugins.extend(related_plugins)
-
-    # We will install the plugins in reverse order, since dependencies
-    # are listed after their dependents in `related_plugins`, but should
-    # be installed first.
-    plugins.reverse()
-
-    return install_plugins(project, plugins, reason=PluginInstallReason.ADD)
