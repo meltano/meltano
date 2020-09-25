@@ -35,8 +35,8 @@ export default {
       <Plugin
         v-for="plugin in column"
         :key="plugin.name"
-        v-bind="plugin"
         :type="pluginType"
+        :plugin="plugin"
       />
     </div>
   </div>
