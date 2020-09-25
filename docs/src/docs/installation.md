@@ -19,7 +19,7 @@ and the [`target-jsonl`](/plugins/loaders/jsonl.html) and [`target-postgres`](/p
 
 ## Local Installation
 
-In this section, we will install Meltano locally on your system, so that you can use it [on the command line](/docs/command-line-interface.html) and [from your browser](/docs/command-line-interface.html#ui).
+In this section, we will install Meltano locally on your system, so that you can use it [on the command line](/docs/command-line-interface.html) and [from your browser](/docs/ui.html).
 
 ### Requirements
 

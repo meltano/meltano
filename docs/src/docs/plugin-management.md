@@ -8,9 +8,7 @@ A [Meltano project](/docs/project.html)'s primary components are its [plugins](/
 that implement the various details of your ELT pipelines.
 
 Your project's plugins are defined in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), and [installed](#installing-your-project-s-plugins) inside the [`.meltano` directory](/docs/project.html#meltano-directory).
-They can be managed using various [CLI commands](/docs/command-line-interface.html) as well as the [UI](/docs/command-line-interface.html#ui).
-
-## Known and custom plugins
+They can be managed using various [CLI commands](/docs/command-line-interface.html) as well as the [UI](/docs/ui.html).
 
 ## Adding extractors and loaders to your project
 
@@ -45,3 +43,9 @@ However, since this directory is included in your project's `.gitignore` file
 by default, you'll need to explicitly run [`meltano install`](/docs/command-line-interface.html#install)
 before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
 to install (or update) all plugins specified in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
+
+## Meltano UI
+
+While Meltano is optimized for usage through the [`meltano` CLI](/docs/command-line-interface.html)
+and direct changes to the [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file),
+basic plugin management functionality is also available in [the UI](/docs/ui.html#extractors).

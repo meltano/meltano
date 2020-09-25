@@ -104,17 +104,6 @@
 
       <div class="hero-right">
         <Content class="theme-default-content" slot-key="orchestration-code" />
-
-        <a
-          href="https://airflow.apache.org/docs/stable/ui.html#dags-view"
-          target="_blank"
-        >
-          <img
-            class="screenshot"
-            alt="Screenshot of Airflow Webserver"
-            src="../assets/airflow-webserver.png"
-          />
-        </a>
       </div>
     </div>
 
@@ -138,6 +127,23 @@
           class="theme-default-content"
           slot-key="containerization-code"
         />
+      </div>
+    </div>
+
+    <div class="hero homepage-cta feature-section-wrapper" id="ui">
+      <div class="hero-left">
+        <Content class="theme-default-content" slot-key="ui" />
+
+        <p class="action">
+          <NavLink
+            class="action-button"
+            :item="$frontmatter.ui.primaryAction"
+          />
+        </p>
+      </div>
+
+      <div class="hero-right">
+        <Content class="theme-default-content" slot-key="ui-code" />
       </div>
     </div>
 
@@ -450,6 +456,12 @@ export default {
     padding: 0 !important;
     border: none !important;
   }
+
+  img {
+    border: 3px solid #282c34;
+    border-radius: 6px;
+    max-width: calc(100% - 6px);
+  }
 }
 
 .hero-right {
@@ -520,16 +532,6 @@ export default {
 
     @media (max-width: $MQMobileNarrow) {
       padding: 1rem 1.5rem 2rem;
-    }
-
-    img {
-      max-width: 100%;
-    }
-
-    img.screenshot {
-      border: 3px solid #282c34;
-      border-radius: 6px;
-      max-width: calc(100% - 6px);
     }
 
     h1, .description, .action {

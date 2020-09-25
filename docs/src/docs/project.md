@@ -173,5 +173,5 @@ You can choose to use a different system database backend or configuration using
 While you would usually not want to modify the system database directly, knowing what's in there can aid in debugging:
 
 - `job` table: One row for each [`meltano elt`](/docs/command-line-interface.html#elt) pipeline run, holding started/ended timestamps and [pipeline state](/docs/integration.html#pipeline-state).
-- `plugin_settings` table: [Plugin configuration](/docs/configuration.html#configuration-layers) set using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) or [the UI](/docs/command-line-interface.html#ui) when the project is [deployed as read-only](/docs/settings.html#project-readonly).
-- `user` table: Users for [Meltano UI](/docs/command-line-interface.html#ui) created using [`meltano user add`](/docs/command-line-interface.html#user).
+- `plugin_settings` table: [Plugin configuration](/docs/configuration.html#configuration-layers) set using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) or [the UI](/docs/ui.html) when the project is [deployed as read-only](/docs/settings.html#project-readonly).
+- `user` table: Users for [Meltano UI](/docs/ui.html) created using [`meltano user add`](/docs/command-line-interface.html#user).

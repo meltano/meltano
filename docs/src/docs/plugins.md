@@ -395,7 +395,7 @@ To learn which loaders are [known to Meltano](/docs/contributor-guide.html#known
 
 A loader's `dialect` [extra](/docs/configuration.html#plugin-extras)
 holds the name of the dialect of the target database, so that
-[transformers](#transformers) in the same pipeline and [Meltano UI](/docs/command-line-interface.html#ui)'s [Analysis feature](/docs/analysis.html)
+[transformers](#transformers) in the same pipeline and [Meltano UI](/docs/ui.html)'s [Analysis feature](/docs/analysis.html)
 can determine the type of database to connect to.
 
 The value of this extra [can be referenced](/docs/configuration.html#expansion-in-setting-values) from a transformer's configuration using the `MELTANO_LOAD__DIALECT`
@@ -434,7 +434,7 @@ export TARGET_EXAMPLE_DB__DIALECT=example-db
 
 A loader's `target_schema` [extra](/docs/configuration.html#plugin-extras)
 holds the name of the database schema the loader has been configured to load data into (assuming the destination supports schemas), so that
-[transformers](#transformers) in the same pipeline and [Meltano UI](/docs/command-line-interface.html#ui)'s [Analysis feature](/docs/analysis.html)
+[transformers](#transformers) in the same pipeline and [Meltano UI](/docs/ui.html)'s [Analysis feature](/docs/analysis.html)
 can determine the database schema to load data from.
 
 The value of this extra is usually not set explicitly, since its should correspond to the value of the loader's own "target schema" setting.
@@ -564,13 +564,13 @@ export TAP_GITLAB__VARS='{"schema": "{{ env_var(''DBT_SOURCE_SCHEMA'') }}"}'
 
 ## Models
 
-Models are [pip packages](https://pip.pypa.io/en/stable/) used by [Meltano UI](/docs/command-line-interface.html#ui) to aid in [data analysis](/docs/analysis.html).
+Models are [pip packages](https://pip.pypa.io/en/stable/) used by [Meltano UI](/docs/ui.html) to aid in [data analysis](/docs/analysis.html).
 They describe the schema of the data being analyzed and the ways different tables can be joined,
 and are used to automatically generate SQL queries using a point-and-click interface.
 
 ## Dashboards
 
-Dashboards are [pip packages](https://pip.pypa.io/en/stable/) bundling curated [Meltano UI](/docs/command-line-interface.html#ui) dashboards and reports.
+Dashboards are [pip packages](https://pip.pypa.io/en/stable/) bundling curated [Meltano UI](/docs/ui.html) dashboards and reports.
 
 When a dashboard is added to your project using [`meltano add`](/docs/command-line-interface.html#add),
 the bundled dashboards and reports will automatically be added to your project's `analyze` directory as well.

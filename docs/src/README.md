@@ -27,6 +27,10 @@ containerization:
   primaryAction:
     text: Learn more about containerization using Docker
     link: /docs/containerization.html
+ui:
+  primaryAction:
+    text: Learn more about Meltano UI
+    link: /docs/ui.html
 ---
 
 ::: slot installation
@@ -43,8 +47,9 @@ Scroll down for details on
 [Meltano projects](/#meltano-init),
 [integration (EL)](/#integration),
 [transformation (T)](/#transformation),
-[orchestration](/#orchestration), and
-[containerization](/#containerization).
+[orchestration](/#orchestration),
+[containerization](/#containerization), and
+[Meltano UI](/#ui).
 
 :::
 
@@ -285,6 +290,8 @@ meltano invoke airflow webserver
 
 Airflow is now available at <http://localhost:8080>!
 
+![Airflow webserver](images/home/airflow-webserver.png)
+
 :::
 
 ::: slot containerization
@@ -342,5 +349,35 @@ docker run \
 ```
 
 Your data has now been extracted and loaded!
+
+:::
+
+::: slot ui
+
+## A UI for management and monitoring
+
+In line with [our current focus](/docs/#focus) on data engineers comfortable with CLIs and version control,
+Meltano is optimized for usage through the [`meltano` CLI](/docs/command-line-interface.html)
+and direct changes to the [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
+
+However, a web-based UI is also available for when you want to quickly check the
+status and most recent logs of your project's [scheduled pipelines](/#orchestration),
+or if you want to give less technical team members or clients the option to [configure](/docs/configuration.html) their
+extractors, loaders, and pipelines themselves.
+
+:::
+
+::: slot ui-code
+
+<small>Follow the [project initialization instructions above](/#meltano-init) and then...</small>
+
+```bash
+# Start Meltano UI
+meltano ui
+```
+
+Meltano UI is now available at <http://localhost:5000>!
+
+![Meltano UI](images/home/ui-pipelines.png)
 
 :::

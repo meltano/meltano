@@ -2,20 +2,13 @@ const docsSidebar = [
   {
     collapsable: false,
     sidebarDepth: 2,
-    children: [
-      "/docs/",
-      "/docs/getting-started",
-      "/tutorials/",
-    ]
+    children: ["/docs/", "/docs/getting-started", "/tutorials/"],
   },
   {
     title: "Concepts",
     collapsable: false,
     sidebarDepth: 2,
-    children: [
-      "/docs/project",
-      "/docs/plugins",
-    ]
+    children: ["/docs/project", "/docs/plugins"],
   },
   {
     title: "Guide",
@@ -31,7 +24,8 @@ const docsSidebar = [
       "/docs/containerization",
       "/docs/production",
       "/docs/analysis",
-    ]
+      "/docs/ui",
+    ],
   },
   {
     title: "Reference",
@@ -41,7 +35,7 @@ const docsSidebar = [
       "/docs/command-line-interface",
       "/docs/settings",
       "/docs/architecture",
-    ]
+    ],
   },
   {
     title: "The Project",
@@ -52,8 +46,8 @@ const docsSidebar = [
       "/docs/contributor-guide",
       "/docs/responsible-disclosure",
       "/handbook/",
-    ]
-  }
+    ],
+  },
 ];
 
 module.exports = {
@@ -124,27 +118,28 @@ module.exports = {
         text: "Getting Help",
         link: "/docs/getting-help",
       },
-      { text: "Blog", link: "https://www.meltano.com/blog", target: '_self' },
+      { text: "Blog", link: "https://www.meltano.com/blog", target: "_self" },
       {
         text: "Join us on Slack",
-        link: "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw",
-        icon: "SlackIcon"
+        link:
+          "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw",
+        icon: "SlackIcon",
       },
       {
         text: "Follow us on Twitter",
         link: "https://twitter.com/meltanodata",
-        icon: "TwitterIcon"
+        icon: "TwitterIcon",
       },
       {
         text: "Contribute on GitLab",
         link: "https://gitlab.com/meltano/meltano",
-        icon: "GitLabIcon"
+        icon: "GitLabIcon",
       },
       {
         text: "Get started",
         link: "/docs/getting-started.html",
-        cta: true
-      }
+        cta: true,
+      },
     ],
     sidebar: {
       "/docs": docsSidebar,
@@ -176,7 +171,7 @@ module.exports = {
       slackChannelUrl:
         "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw",
     },
-    smoothScroll: true
+    smoothScroll: true,
   },
   plugins: [
     [

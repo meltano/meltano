@@ -3,13 +3,13 @@ description: Learn how to analyze your data and create repotrs and dashboards.
 lastUpdatedSignificantly: 2020-04-30
 ---
 
-# Analysis
+# Data Analysis
 
 If you haven't already, install Meltano and create your first project by following the [Getting Started guide](/docs/getting-started.html). You can come back here before adding an extractor and loader using the CLI, and use the UI instead.
 
 ## Start Meltano UI
 
-Start the Meltano UI web server using [`meltano ui`](/docs/command-line-interface.html#ui):
+Start the [Meltano UI](/docs/ui.html) web server using [`meltano ui`](/docs/command-line-interface.html#ui):
 
 ```bash
 meltano ui

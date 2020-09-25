@@ -24,7 +24,7 @@ For more details, refer to the repository at <https://github.com/singer-io/tap-b
 
 ### Using Meltano UI
 
-1. Start Meltano UI using [`meltano ui`](/docs/command-line-interface.html#ui):
+1. Start [Meltano UI](/docs/ui.html) using [`meltano ui`](/docs/command-line-interface.html#ui):
 
     ```bash
     meltano ui

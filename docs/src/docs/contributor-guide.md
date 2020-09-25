@@ -20,7 +20,7 @@ If you'd like to contribute, but you're not sure _what_, check out the list of o
 Any other improvements are welcome too, of course, so simply asking yourself "What about Meltano didn't work quite as smoothly as I would've liked?" is another good way to come up with ideas.
 
 If an issue for your problem or suggested improvement doesn't exist yet on our [issue tracker](https://gitlab.com/meltano/meltano/-/issues),
-please file a new one before submitting a [merge request](#merge-requests),
+please [file a new one](https://gitlab.com/meltano/meltano/-/issues/new) before submitting a [merge request](#merge-requests),
 so that the team and community are aware of your plan and can help you figure out the best way to realize it.
 
 ### Metrics (anonymous usage data) tracking
