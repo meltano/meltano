@@ -11,7 +11,7 @@ from .project_add_service import ProjectAddService
 
 
 class ProjectAddCustomService(ProjectAddService):
-    def add(self, plugin_type: PluginType, plugin_name: str):
+    def add(self, plugin_type: PluginType, plugin_name: str, variant=None):
         click.secho(
             f"Adding new custom {plugin_type.descriptor} with name '{plugin_name}'...",
             fg="green",
@@ -134,6 +134,7 @@ class ProjectAddCustomService(ProjectAddService):
             plugin_type,
             plugin_name,
             namespace,
+            variant=variant,
             pip_url=pip_url,
             executable=executable,
             capabilities=capabilities,

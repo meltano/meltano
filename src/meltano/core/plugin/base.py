@@ -13,6 +13,17 @@ from meltano.core.behavior import NameEq
 from meltano.core.utils import compact, find_named, NotFound, flatten
 
 
+class VariantNotFoundError(Exception):
+    def __init__(self, plugin: "PluginDefinition", variant_name):
+        self.plugin = plugin
+        self.variant_name = variant_name
+
+        message = f"{plugin.type.descriptor.capitalize()} '{plugin.name}' variant '{variant_name}' is not known to Meltano. "
+        message += f"Variants: {plugin.list_variant_names()}"
+
+        super().__init__(message)
+
+
 class YAMLEnum(str, Enum):
     def __str__(self):
         return self.value

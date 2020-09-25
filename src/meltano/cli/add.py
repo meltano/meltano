@@ -21,11 +21,12 @@ from meltano.core.plugin_install_service import PluginInstallReason
 @cli.command()
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_name", nargs=-1, required=True)
+@click.option("--variant")
 @click.option("--custom", is_flag=True)
 @click.option("--include-related", is_flag=True)
 @project()
 @click.pass_context
-def add(ctx, project, plugin_type, plugin_name, **flags):
+def add(ctx, project, plugin_type, plugin_name, variant=None, **flags):
     plugin_type = PluginType.from_cli_argument(plugin_type)
     plugin_names = plugin_name  # nargs=-1
 
@@ -51,7 +52,9 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
     )
 
     plugins = [
-        add_plugin(project, plugin_type, plugin_name, add_service=add_service)
+        add_plugin(
+            project, plugin_type, plugin_name, variant=variant, add_service=add_service
+        )
         for plugin_name in plugin_names
     ]
 
