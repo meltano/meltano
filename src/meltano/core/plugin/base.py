@@ -345,7 +345,11 @@ class PluginDefinition(Canonical, PluginRef):
 
     @property
     def info(self):
-        return {**super().info, "namespace": self.namespace}
+        return {
+            **super().info,
+            "namespace": self.namespace,
+            "variant": self.current_variant_name or Variant.ORIGINAL_NAME,
+        }
 
     @property
     def current_variant_name(self):

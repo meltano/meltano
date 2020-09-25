@@ -220,7 +220,7 @@ def config_service(project):
 
 @pytest.fixture(scope="class")
 def tap(config_service):
-    tap = ProjectPlugin(PluginType.EXTRACTORS, "tap-mock")
+    tap = ProjectPlugin(PluginType.EXTRACTORS, "tap-mock", variant="meltano")
     try:
         return config_service.add_to_file(tap)
     except PluginAlreadyAddedException as err:
