@@ -76,8 +76,7 @@ def add(ctx, project, plugin_type, plugin_name, **flags):
 
     printed_empty_line = False
     for plugin in plugins:
-        plugin_def = discovery_service.find_plugin(plugin.type, plugin.name)
-
+        plugin_def = discovery_service.get_definition(plugin)
         docs_url = plugin_def.docs or plugin_def.repo
         if not docs_url:
             continue

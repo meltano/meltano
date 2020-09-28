@@ -83,9 +83,7 @@ class PluginInvoker:
             plugin_discovery_service=self.discovery_service,
         )
 
-        self.plugin_def = self.discovery_service.find_plugin(
-            self.plugin.type, self.plugin.name
-        )
+        self.plugin_def = self.discovery_service.get_definition(plugin)
 
         self._prepared = False
         self.plugin_config = {}

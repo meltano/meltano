@@ -261,6 +261,7 @@ class PluginDefinition(Canonical, PluginRef):
         plugin_type: PluginType,
         name: str,
         namespace: str,
+        hidden: Optional[bool] = None,
         label: Optional[str] = None,
         logo_url: Optional[str] = None,
         description=None,
@@ -278,6 +279,7 @@ class PluginDefinition(Canonical, PluginRef):
             name,
             # Attributes will be listed in meltano.yml in this order:
             namespace=namespace,
+            hidden=hidden,
             label=label,
             logo_url=logo_url,
             description=description,

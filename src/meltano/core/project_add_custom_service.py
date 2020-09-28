@@ -139,4 +139,4 @@ class ProjectAddCustomService(ProjectAddService):
             capabilities=capabilities,
             settings=[{"name": name} for name in settings],
         )
-        return self.add_custom(plugin_def)
+        return self.add_definition(plugin_def, custom=True)

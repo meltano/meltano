@@ -207,10 +207,8 @@ const mutations = {
     state.plugins = plugins
   },
 
-  setInstalledPlugins(state, projectConfig) {
-    if (projectConfig.plugins) {
-      state.installedPlugins = projectConfig.plugins
-    }
+  setInstalledPlugins(state, plugins) {
+    state.installedPlugins = plugins
   }
 }
 

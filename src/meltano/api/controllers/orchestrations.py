@@ -318,7 +318,7 @@ def get_plugin_configuration(plugin_ref) -> Response:
     )
 
     try:
-        plugin_def = discovery_service.find_plugin(plugin.type, plugin.name)
+        plugin_def = discovery_service.get_definition(plugin)
         settings_group_validation = plugin_def.settings_group_validation
     except PluginNotFoundError:
         settings_group_validation = []

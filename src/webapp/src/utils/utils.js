@@ -164,7 +164,7 @@ export default {
     }
   },
   requiredConnectorSettingsKeys(settings, groupValidation) {
-    return groupValidation
+    return groupValidation && groupValidation.length
       ? lodash.intersection(...groupValidation)
       : settings.map(namer)
   },

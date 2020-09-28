@@ -27,10 +27,13 @@ class TestSqlHelper:
         subject,
         project,
         tap,
+        config_service,
         plugin_settings_service_factory,
         elt_context_builder,
     ):
-        target_sqlite = PluginRef(PluginType.LOADERS, "target-sqlite")
+        target_sqlite = config_service.find_plugin(
+            "target-sqlite", plugin_type=PluginType.LOADERS
+        )
         plugin_settings_service = plugin_settings_service_factory(target_sqlite)
         plugin_settings_service.set("database", "pytest")
 
@@ -51,10 +54,13 @@ class TestSqlHelper:
         app,
         subject,
         tap,
+        config_service,
         plugin_settings_service_factory,
         elt_context_builder,
     ):
-        target_postgres = PluginRef(PluginType.LOADERS, "target-postgres")
+        target_postgres = config_service.find_plugin(
+            "target-postgres", plugin_type=PluginType.LOADERS
+        )
         plugin_settings_service = plugin_settings_service_factory(target_postgres)
         plugin_settings_service.set("user", "user")
         plugin_settings_service.set("password", "password")

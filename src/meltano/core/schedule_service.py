@@ -3,6 +3,7 @@ from collections import namedtuple
 from typing import Optional
 from datetime import datetime, date
 
+from .config_service import ConfigService
 from .plugin.settings_service import PluginSettingsService, SettingMissingError
 from .plugin_discovery_service import PluginDiscoveryService, PluginNotFoundError
 from .project import Project
@@ -35,11 +36,16 @@ class ScheduleNotFoundError(Exception):
 
 class ScheduleService:
     def __init__(
-        self, project: Project, plugin_discovery_service: PluginDiscoveryService = None
+        self,
+        project: Project,
+        config_service: ConfigService = None,
+        plugin_discovery_service: PluginDiscoveryService = None,
     ):
         self.project = project
+        self.config_service = config_service or ConfigService(project)
         self.plugin_discovery_service = (
-            plugin_discovery_service or PluginDiscoveryService(project)
+            plugin_discovery_service
+            or PluginDiscoveryService(project, config_service=self.config_service)
         )
 
     def add(
@@ -70,12 +76,15 @@ class ScheduleService:
         """
         Returns the `start_date` of the extractor, or now.
         """
-        extractor_ref = PluginRef(PluginType.EXTRACTORS, extractor)
+        extractor = self.config_service.find_plugin(
+            extractor, plugin_type=PluginType.EXTRACTORS
+        )
         start_date = None
         try:
             settings_service = PluginSettingsService(
                 self.project,
-                extractor_ref,
+                extractor,
+                config_service=self.config_service,
                 plugin_discovery_service=self.plugin_discovery_service,
             )
             start_date = settings_service.get("start_date", session=session)
@@ -132,7 +141,7 @@ class ScheduleService:
         """
 
         try:
-            extractor = self.plugin_discovery_service.find_plugin_by_namespace(
+            extractor = self.plugin_discovery_service.find_definition_by_namespace(
                 PluginType.EXTRACTORS, namespace
             )
 

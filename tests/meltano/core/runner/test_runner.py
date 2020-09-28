@@ -52,13 +52,13 @@ class TestSingerRunner:
     @pytest.fixture()
     def tap_config_dir(self, mkdtemp, elt_context):
         tap_config_dir = mkdtemp()
-        create_plugin_files(tap_config_dir, elt_context.extractor.in_project)
+        create_plugin_files(tap_config_dir, elt_context.extractor.plugin)
         return tap_config_dir
 
     @pytest.fixture()
     def target_config_dir(self, mkdtemp, elt_context):
         target_config_dir = mkdtemp()
-        create_plugin_files(target_config_dir, elt_context.loader.in_project)
+        create_plugin_files(target_config_dir, elt_context.loader.plugin)
         return target_config_dir
 
     @pytest.fixture()

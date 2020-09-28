@@ -57,7 +57,7 @@ export default {
       const config = profile.config
       const requiredSettingsKeys = utils.requiredConnectorSettingsKeys(
         this.configSettings.settings,
-        this.connector.settingsGroupValidation
+        this.configSettings.settingsGroupValidation
       )
       this.configSettings.settings.forEach(setting => {
         const isIso8601Date = setting.kind && setting.kind === 'date_iso8601'

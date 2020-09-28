@@ -18,6 +18,17 @@ from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.security.auth import block_if_readonly
 
 
+def plugin_def_json(plugin_def):
+    return {
+        "name": plugin_def.name,
+        "namespace": plugin_def.namespace,
+        "hidden": plugin_def.hidden,
+        "label": plugin_def.label,
+        "logo_url": plugin_def.logo_url,
+        "description": plugin_def.description,
+    }
+
+
 pluginsBP = APIBlueprint("plugins", __name__)
 
 
@@ -31,54 +42,39 @@ def all():
     project = Project.find()
     discovery = PluginDiscoveryService(project)
 
-    def canonical_plugin(plugin_def):
-        canonical_plugin = plugin_def.canonical()
-
-        # let's remove all the settings related data
-        canonical_plugin.pop("settings", None)
-        canonical_plugin.pop("settings_group_validation", None)
-
-        return canonical_plugin
-
-    ordered_plugins = {
-        plugin_type: [canonical_plugin(plugin_def) for plugin_def in plugin_defs]
+    all_plugins = {
+        plugin_type: [plugin_def_json(plugin_def) for plugin_def in plugin_defs]
         for plugin_type, plugin_defs in discovery.plugins_by_type().items()
     }
 
-    return jsonify(ordered_plugins)
+    return jsonify(all_plugins)
 
 
 @pluginsBP.route("/installed", methods=["GET"])
 def installed():
-    """Returns JSON of all installed plugins
-
-    Fuses the discovery.yml data with meltano.yml data and sorts each type alphabetically by name
-    """
-
     project = Project.find()
     config = ConfigService(project)
     discovery = PluginDiscoveryService(project)
 
-    def canonical_plugin(plugin: ProjectPlugin):
+    def plugin_json(plugin: ProjectPlugin):
+        plugin_json = {"name": plugin.name}
+
         try:
-            plugin_def = discovery.find_plugin(plugin.type, plugin.name)
-            canonical_plugin = {**plugin_def.canonical(), **plugin.canonical()}
+            plugin_def = discovery.get_definition(plugin)
+
+            plugin_json.update(plugin_def_json(plugin_def))
+            plugin_json["docs"] = plugin_def.docs
         except PluginNotFoundError:
-            canonical_plugin = {**plugin.canonical()}
+            pass
 
-        canonical_plugin.pop("settings", None)
-        canonical_plugin.pop("select", None)
-
-        return canonical_plugin
+        return plugin_json
 
     installed_plugins = {
-        plugin_type: [
-            canonical_plugin(plugin) for plugin in sorted(plugins, key=lambda x: x.name)
-        ]
+        plugin_type: [plugin_json(plugin) for plugin in plugins]
         for plugin_type, plugins in config.plugins_by_type().items()
     }
 
-    return jsonify({**project.meltano.canonical(), "plugins": installed_plugins})
+    return jsonify(installed_plugins)
 
 
 @pluginsBP.route("/add", methods=["POST"])

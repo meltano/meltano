@@ -89,7 +89,7 @@ export default {
       }
       const isValid = this.getHasValidConfigSettings(
         configSettings,
-        this.plugin.settingsGroupValidation
+        this.localConfiguration.settingsGroupValidation
       )
       return this.isInstalled && isValid
     },
@@ -99,7 +99,7 @@ export default {
     requiredSettingsKeys() {
       return utils.requiredConnectorSettingsKeys(
         this.localConfiguration.settings,
-        this.plugin.settingsGroupValidation
+        this.localConfiguration.settingsGroupValidation
       )
     },
     singularizedType() {
@@ -296,12 +296,6 @@ export default {
         ></progress>
 
         <template v-if="!isLoadingConfigSettings">
-          <div v-if="plugin.signupUrl" class="mb1r">
-            <p>
-              This plugin requires an account. If you don't have one, you can
-              <a :href="plugin.signupUrl" target="_blank">sign up here</a>.
-            </p>
-          </div>
           <!--
             TEMP ConnectorSettingsDropdown removal from UI.
             Conditional removal so existing users with 2+ profiles already created still can access them

@@ -244,7 +244,7 @@ class PluginDiscoveryService(Versioned):
             for plugin in plugins
         )
 
-    def find_plugin(
+    def find_definition(
         self, plugin_type: PluginType, plugin_name: str
     ) -> PluginDefinition:
         name, _ = PluginRef.parse_name(plugin_name)
@@ -257,7 +257,7 @@ class PluginDiscoveryService(Versioned):
         except StopIteration:
             raise PluginNotFoundError(name)
 
-    def find_plugin_by_namespace(
+    def find_definition_by_namespace(
         self, plugin_type: PluginType, namespace: str
     ) -> PluginDefinition:
         try:
@@ -268,6 +268,19 @@ class PluginDiscoveryService(Versioned):
             )
         except StopIteration as stop:
             raise PluginNotFoundError(namespace) from stop
+
+    def get_definition(self, project_plugin: ProjectPlugin) -> PluginDefinition:
+        if project_plugin.is_custom():
+            return project_plugin.custom_definition
+
+        try:
+            plugin = next(
+                plugin for plugin in self.plugins() if plugin == project_plugin
+            )
+
+            return plugin
+        except StopIteration as stop:
+            raise PluginNotFoundError(project_plugin.name) from stop
 
     def discover(self, plugin_type: PluginType = None):
         """Return a pretty printed list of available plugins."""

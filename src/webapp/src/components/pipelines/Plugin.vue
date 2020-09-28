@@ -11,18 +11,8 @@ export default {
     ConnectorLogo
   },
   props: {
-    description: {
-      type: String,
-      required: false,
-      default: ''
-    },
-    label: {
-      type: String,
-      required: false,
-      default: ''
-    },
-    name: {
-      type: String,
+    plugin: {
+      type: Object,
       required: true
     },
     type: {
@@ -41,6 +31,15 @@ export default {
       'getHasPipelineWithPlugin',
       'getPipelinesWithPlugin'
     ]),
+    description() {
+      return this.plugin.description || ''
+    },
+    label() {
+      return this.plugin.label || ''
+    },
+    name() {
+      return this.plugin.name
+    },
     getPipelines() {
       return this.getPipelinesWithPlugin(this.singularizedType, this.name)
     },
