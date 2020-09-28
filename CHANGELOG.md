@@ -14,11 +14,17 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+### Breaks
+
+
+## 1.52.0 - (2020-09-28)
+---
+
+### Fixes
+
 - [#2360](https://gitlab.com/meltano/meltano/-/issues/2360) Remove automatic install of extractors, loaders, and transforms if they are not present.
 
 - [#2348](https://gitlab.com/meltano/meltano/-/issues/2348) Invalidate `meltano select` catalog discovery cache when extractor configuration is changed
-
-### Breaks
 
 
 ## 1.51.0 - (2020-09-21)
