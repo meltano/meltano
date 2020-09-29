@@ -142,7 +142,7 @@ export MELTANO_PROJECT_READONLY=true
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_DISCOVERY_URL`
 - Default: [`https://www.meltano.com/discovery.yml`](https://www.meltano.com/discovery.yml)
 
-Where Meltano can find the `discovery.yml` manifest that lists all [known plugins](/docs/contributor-guide.html#known-plugins).
+Where Meltano can find the `discovery.yml` manifest that lists all [discoverable plugins](/docs/plugins.html#discoverable-plugins) that are supported out of the box.
 
 This manifest is used by [`meltano discover`](/docs/command-line-interface.md#discover) and [`meltano add`](/docs/command-line-interface.md#add), among others.
 

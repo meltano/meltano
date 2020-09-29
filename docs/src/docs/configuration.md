@@ -11,7 +11,7 @@ Since this also goes for [extractors](/docs/plugins.html#extractors) and [loader
 [`config.json` files](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file) expected by Singer taps and targets,
 because Meltano will generate them on the fly whenever an extractor or loader is used through [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 
-If the plugin you'd like to use and configure is already [known to Meltano](/docs/contributor-guide.html#known-plugins) (that is, it shows up when you run [`meltano discover`](/docs/command-line-interface.html#discover)), Meltano already knows what settings it supports.
+If the plugin you'd like to use and configure is [supported out of the box](/docs/plugins.html#discoverable-plugins) (that is, it shows up when you run [`meltano discover`](/docs/command-line-interface.html#discover)), Meltano already knows what settings it supports.
 If you're [adding a custom plugin](/docs/command-line-interface.html#how-to-use-custom-plugins), on the other hand, you will be asked to provide the names of the supported configuration options yourself.
 
 You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#config) to list all available settings for a plugin with their names, [environment variables](#environment-variables), and current values. [`meltano config <plugin>`](/docs/command-line-interface.html#config) will print the current configuration in JSON format.
@@ -29,7 +29,10 @@ To determine the values of settings, Meltano will look in 4 places, with each ta
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
 3. **Your project's [**system database**](/docs/project.html#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) or [the UI](/docs/ui.html) when the project is [deployed as read-only](/docs/settings.html#project-readonly).
    - Note that configuration for Meltano itself cannot be stored in the system database.
-4. **The default `value`s** set on the plugin's `settings` object in the global `discovery.yml` file (in the case of [known plugins](/docs/contributor-guide.html#known-plugins)) or [`meltano.yml`](/docs/project.html#meltano-yml-project-file) (in the case of custom plugins). `meltano config <plugin> list` will list the default values.
+4. **The default `value`s** set in the plugin's [`settings` metadata](/docs/contributor-guide.html#connector-settings).
+   - Definitions of [discoverable plugins](/docs/plugins.html#discoverable-plugins) can be found in the [`discovery.yml` manifest](/docs/contributor-guide.html#discoverable-plugins).
+   - [Custom plugin definitions](/docs/project.html#plugins) can be found in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
+   - `meltano config <plugin> list` will list the default values.
 
 Configuration that is _not_ environment-specific or sensitive should be stored in `meltano.yml` and checked into version
 control. Sensitive values like passwords and tokens are most appropriately stored in the environment, `.env`, or the system database.
@@ -123,8 +126,8 @@ These can then be accessed from inside the plugin using the mechanism provided b
 
 Meltano keeps track of the settings a plugin supports using [`settings` metadata](/docs/contributor-guide.html#connector-settings), and will list them all when you run [`meltano config <plugin> list`](/docs/command-line-interface.html#config).
 
-If you've [added a custom plugin](/docs/command-line-interface.html#how-to-use-custom-plugins) to your project, you will have been asked provide the names of the supported configuration options yourself.
-If the plugin was already [known to Meltano](/docs/contributor-guide.html#known-plugins) when you added it to your project, this metadata will already be known as well.
+If you've added a [discoverable plugin](/docs/plugins.html#discoverable-plugins) to your project, this metadata will already be known to Meltano.
+If we're dealing with a [custom plugin](/docs/plugins.html#custom-plugins) instead, you will have been asked to provide the names of the supported configuration options yourself.
 
 If a plugin supports a setting that is not yet known to Meltano (because it may have been added after the `settings` metadata was specified, for example),
 you do not need to modify the `settings` metadata to be able to use it.

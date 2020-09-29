@@ -8,7 +8,7 @@ Meltano lets you easily extract data out of arbitrary data sources (databases, S
 
 To learn more about extracting and [loading](/plugins/loaders/) data using Meltano, refer to the [Data Integration (EL) guide](/docs/integration.html).
 
-Extractors for the following sources are currently [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box:
+Extractors for the following sources are currently [discoverable](/docs/plugins.html#discoverable-plugins) and supported out of the box:
 
 - [Bing Ads](/plugins/extractors/bing-ads.html)
 - [Comma Separated Values (CSV)](/plugins/extractors/csv.html)
@@ -31,6 +31,9 @@ If a [Singer tap](https://www.singer.io/#taps) for your source already exists,
 it can easily be [added to your project as a custom extractor](/docs/command-line-interface.html#how-to-use-custom-plugins).
 If not, you can learn how to [create your own from scratch](/tutorials/create-a-custom-extractor.html).
 
-Once you've successfully added a previously unknown extractor to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
+Once you've got the new extractor working in your project, please consider
+[contributing its definition](/docs/contributor-guide.html#discoverable-plugins)
+to the [index of discoverable plugins](/docs/plugins.html#discoverable-plugins)
+so that it can be added to this page!
 
 :::

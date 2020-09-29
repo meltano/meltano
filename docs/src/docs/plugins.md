@@ -5,20 +5,46 @@ description: A Meltano project's primary components are its plugins, that implem
 # Plugins
 
 A [Meltano project](/docs/project.html)'s primary components are its plugins,
-that implement the various details of your ELT pipelines.
+that implement the various details of your ELT pipelines:
 
-Meltano knows the following types of plugins:
+- [**Extractors**](#extractors) pull data out of arbitrary data sources.
+- [**Loaders**](#loaders) load extracted data into arbitrary data destinations.
+- [**Transforms**](#transforms) transform data that has been loaded into a database (data warehouse).
+- [**Models**](#models) describe the schema of the data being analyzed and the ways different tables can be joined.
+- [**Dashboards**](#dashboards) bundle curated Meltano UI dashboards and reports.
+- [**Orchestrators**](#orchestrators) orchestrate a project's scheduled pipelines.
+- [**Transformers**](#transformers) run transforms.
+- [**File bundles**](#file-bundles) bundle files you may want in your project.
 
-- [Extractors](#extractors)
-- [Loaders](#loaders)
-- [Transforms](#transforms)
-- [Models](#models)
-- [Dashboards](#dashboards)
-- [Orchestrators](#orchestrators)
-- [Transformers](#transformers)
-- [File bundles](#file-bundles)
+[Discoverable plugins](#discoverable-plugins) are supported out of the box, and others can easily be added as [custom plugins](#custom-plugins).
 
 To learn how to manage your project's plugins, refer to the [Plugin Management guide](/docs/plugin-management.html).
+
+## Discoverable plugins
+
+Before Meltano can use a plugin, it needs to know where its package can be found, how it can be invoked, and what [settings](/docs/configuration.html) it supports,
+on top of plugin type-specific details like an [extractor](#extractors)'s capabilities (supported executable options) or a [loader](#loaders)'s [dialect](#dialect-extra).
+
+Meltano supports many common [extractors](#extractors) (Singer taps), [loaders](#loaders) (Singer targets), and other plugins out of the box,
+since their metadata has already been collected and [contributed](/docs/contributor-guide.html#discoverable-plugins) to its index of discoverable plugins: the `discovery.yml` manifest,
+which can be found [in the Meltano repository](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml),
+ships inside the [`meltano` package](https://pypi.org/project/meltano/), and can be downloaded from <https://www.meltano.com/discovery.yml>.
+
+To find out which plugins are discoverable and supported out of the box, run [`meltano discover`](/docs/command-line-interface.html#discover) or refer to the lists of [Extractors](/plugins/extractors/) and [Loaders](/plugins/loaders/). Discoverable plugins can be added to your project using [`meltano add <type> <name>`](/docs/command-line-interface.html#add).
+
+To find discoverable plugins, Meltano will first look for the `discovery.yml` manifest at the root of your [project](/docs/project.html) (where it won't exist until you create it), then at the URL specified by the [`discovery_url` setting](/docs/settings.html#discovery-url) (<https://www.meltano.com/discovery.yml> by default), and finally inside its own package.
+
+### Custom plugins
+
+If you'd like to use Meltano with a plugin that isn't discoverable yet, you'll
+be asked to provide the relevant metadata when you add it to your project as a
+[custom plugin](/docs/project.html#custom-plugin-definitions) using
+[`meltano add --custom <type> <name>`](/docs/command-line-interface.html#how-to-use-custom-plugins).
+
+Once you've got the plugin working in your project, please consider
+[contributing its definition](/docs/contributor-guide.html#discoverable-plugins)
+to the [`discovery.yml` manifest](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml)
+so that it can be supported out of the box for new users!
 
 ## Extractors
 
@@ -27,7 +53,7 @@ They are responsible for pulling data out of arbitrary data sources: databases, 
 
 Meltano supports [Singer taps](https://singer.io): executables that implement the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
 
-To learn which extractors are [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box, refer to the [Extractors page](/plugins/extractors/).
+To learn which extractors are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Extractors page](/plugins/extractors/) or run [`meltano discover extractors`](/docs/command-line-interface.html#discover).
 
 ### `catalog` extra
 
@@ -385,7 +411,7 @@ They are responsible for loading [extracted](#extractors) data into arbitrary da
 
 Meltano supports [Singer targets](https://singer.io): executables that implement the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
 
-To learn which loaders are [known to Meltano](/docs/contributor-guide.html#known-plugins) and supported out of the box, refer to the [Loaders page](/plugins/loaders/).
+To learn which loaders are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Loaders page](/plugins/loaders/) or run [`meltano discover loaders`](/docs/command-line-interface.html#discover)
 
 ### `dialect` extra
 
@@ -596,7 +622,7 @@ its related [file bundle](#file-bundles) will automatically be added as well.
 
 ## File bundles
 
-File bundles are [pip packages](https://pip.pypa.io/en/stable/) bundling files you may want in your Meltano project.
+File bundles are [pip packages](https://pip.pypa.io/en/stable/) bundling files you may want in your project.
 
 When a file bundle is added to your project using [`meltano add`](/docs/command-line-interface.html#add),
 the bundled files will automatically be added as well.
