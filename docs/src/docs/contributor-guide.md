@@ -11,7 +11,7 @@ which houses Meltano's
 [UI](https://gitlab.com/meltano/meltano/-/tree/master/src/webapp),
 [UI API](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/api),
 [these docs](https://gitlab.com/meltano/meltano/-/tree/master/docs/src), and
-the [index of known plugins](/docs/contributor-guide.html#known-plugins),
+the [index of discoverable plugins](#discoverable-plugins),
 which feeds the lists of [Extractors](/plugins/extractors/) and [Loaders](/plugins/loaders/) that are supported out of the box.
 
 ## Where to start?
@@ -163,29 +163,14 @@ If you need to change the URL of your development environment, you can do this b
 export MELTANO_UI_URL = ""
 ```
 
-## Known plugins
+## Discoverable plugins
 
-Known plugins are those defined in a file called `discovery.yml`, which Meltano will look for in 4 places, in order of precedence:
+[Discoverable plugins](/docs/plugins.html#discoverable-plugins) are defined in the `discovery.yml` manifest, which can be found inside the Meltano repository at [`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
 
-1. At the root of the project directory. By default, no `discovery.yml` will exist here, but you can create one yourself to experiment.
-2. The URL specified by the [`discovery_url` setting](/docs/settings.html#discovery-url): <https://www.meltano.com/discovery.yml> by default
-3. `.meltano/cache/discovery.yml` inside your project's [`.meltano` directory](/docs/project.html#meltano-directory). Downloads from the discovery URL will be cached here.
-4. Inside the `meltano` package
+If you've added a custom plugin to your project that you think should be discoverable and supported out of the box, please contribute a change to that file.
+All you'll need is the [custom plugin definition](/docs/project.html#custom-plugin-definitions) from your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), which has the same format as plugin definitions in `discovery.yml`.
 
-The versions on <https://www.meltano.com> and in the package can be found inside the Meltano repository at [`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
-
-If you have a plugin you think should also be known to Meltano out of the box, you can contribute a change to that file.
-All you'll need is the [custom plugin definition](/docs/command-line-interface.html#how-to-use-custom-plugins) from your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), which has the same format as known plugin definitions in `discovery.yml`.
-
-### Changing discovery.yml
-
-#### `discovery.yml` version
-
-Whenever new functionality is introduced that changes the schema of `discovery.yml` (the exact properties it supports and their types), the `version` in `src/meltano/core/bundle/discovery.yml` and the `VERSION` constant in `src/meltano/core/plugin_discovery_service.py` must be incremented, so that older instances of Meltano don't attempt to download and parse a `discovery.yml` its parser is not compatible with.
-
-Changes to `discovery.yml` that only use existing properties do not constitute schema changes and do not require `version` to be incremented.
-
-#### Local changes to `discovery.yml`
+### Local changes to `discovery.yml`
 
 When you need to make changes to `discovery.yml`, these changes are not automatically detected inside of the `meltano` repo during development. While there are a few ways to solve this problem, it is recommended to create a symbolic link in order ensure that changes made inside of the `meltano` repo appear inside the Meltano project you initialized and are testing on.
 
@@ -209,7 +194,7 @@ bencodezen  staff   72 Nov 19 09:19 discovery.yml -> /Users/bencodezen/Projects/
 
 Now, you can see your changes in `discovery.yml` live in your project during development! 🎉
 
-#### Connector settings
+### Plugin settings
 
 Each extractor (tap) and loader (target) in the `discovery.yml` has a `settings` property. Nested under this property are a variable amount of individual settings. In the Meltano UI these settings are parsed to generate a configuration form. To improve the UX of this form, each setting has a number of optional properties:
 
@@ -230,9 +215,15 @@ Each extractor (tap) and loader (target) in the `discovery.yml` has a `settings`
       value_processor: nest_object # Optional (Use to modify stored value before it's passed to plugin. Options are `nest_object` and `upcase_string`)
 ```
 
-##### Protected settings
+#### Protected settings
 
 Until role-based access control is implemented in Meltano, we need to prevent user editing of certain settings from the UI. View this [`tap-gitlab` environment variable setup example](/tutorials/gitlab-and-postgres.html#add-extractor) to learn how to work with this current limitation.
+
+### `discovery.yml` version
+
+Whenever new functionality is introduced that changes the schema of `discovery.yml` (the exact properties it supports and their types), the `version` in `src/meltano/core/bundle/discovery.yml` and the `VERSION` constant in `src/meltano/core/plugin_discovery_service.py` must be incremented, so that older instances of Meltano don't attempt to download and parse a `discovery.yml` its parser is not compatible with.
+
+Changes to `discovery.yml` that only use existing properties do not constitute schema changes and do not require `version` to be incremented.
 
 ## Plugin Development
 

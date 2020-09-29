@@ -43,9 +43,9 @@ are stored under the `plugins` key, nested under a key named after the plugin ty
 
 At a minimum, a plugin definition must have a `name` and a `pip_url` (its [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument).
 
-#### Known plugin references
+#### Discoverable plugin references
 
-A plugin definition _without_ a `namespace` is a reference to a [known plugin](/docs/contributor-guide.html#known-plugins) with the same `name`:
+A plugin definition _without_ a `namespace` is a reference to a [discoverable plugin](/docs/plugins.html#discoverable-plugins) with the same `name`:
 
 ```yaml
 plugins:
@@ -56,9 +56,9 @@ plugins:
 
 These plugins inherit their metadata (`executable`, `capabilities`, and `settings`; see below) from the known plugin definition.
 
-#### Custom plugins
+#### Custom plugin definitions
 
-When a `namespace` is specified, we're dealing with a [custom plugin definition](/docs/command-line-interface.html#how-to-use-custom-plugins) instead, and additional properties `executable`, `capabilities`, and `settings` are available:
+When a `namespace` is specified, we're dealing with a [custom plugin](/docs/plugins.html#custom-plugins) definition instead, and additional properties `executable`, `capabilities`, and `settings` are available:
 
 ```yaml{4,6-14}
 plugins:

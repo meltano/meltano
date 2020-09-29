@@ -142,8 +142,8 @@ which will be responsible for pulling data out of your data source.
 
 *To learn more about adding plugins to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project).*
 
-1. Find out if an extractor for your data source is already [known to Meltano](/docs/contributor-guide.html#known-plugins)
-by checking the [Extractors list](/plugins/extractors/) on this website, or using [`meltano discover`](/docs/command-line-interface.html#discover):
+1. Find out if an extractor for your data source is [supported out of the box](/docs/plugins.html#discoverable-plugins)
+by checking the [Extractors list](/plugins/extractors/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
 
     ```bash
     meltano discover extractors
@@ -151,7 +151,7 @@ by checking the [Extractors list](/plugins/extractors/) on this website, or usin
 
 1. Depending on the result, pick your next step:
 
-    - If a known extractor is **available**, add it to your project using [`meltano add`](/docs/command-line-interface.html#add):
+    - If an extractor is **supported out of the box**, add it to your project using [`meltano add`](/docs/command-line-interface.html#add):
 
       ```bash
       meltano add extractor <plugin name>
@@ -165,11 +165,11 @@ by checking the [Extractors list](/plugins/extractors/) on this website, or usin
 
       You can now continue to step 4.
 
-    - If an extractor is **not yet known** to Meltano, find out if a Singer tap for your data source already exists by checking [Singer's index of taps](https://www.singer.io/#taps) and/or doing a web search for `Singer tap <data source>`, e.g. `Singer tap COVID-19`.
+    - If an extractor is **not yet discoverable**, find out if a Singer tap for your data source already exists by checking [Singer's index of taps](https://www.singer.io/#taps) and/or doing a web search for `Singer tap <data source>`, e.g. `Singer tap COVID-19`.
 
 1. Depending on the result, pick your next step:
 
-    - If a Singer tap for your data source is **available**, add it to your project as a [custom plugin](/docs/command-line-interface.html#how-to-use-custom-plugins) using [`meltano add --custom`](/docs/command-line-interface.html#add):
+    - If a Singer tap for your data source is **available**, add it to your project as a [custom plugin](/docs/plugins.html#custom-plugins) using [`meltano add --custom`](/docs/command-line-interface.html#how-to-use-custom-plugins):
 
         ```bash
         meltano add --custom extractor <tap name>
@@ -188,7 +188,10 @@ by checking the [Extractors list](/plugins/extractors/) on this website, or usin
         *To learn more about adding custom plugins, refer to the ["`meltano add`: How to use: Custom plugins" section](/docs/command-line-interface.html#how-to-use-custom-plugins) of the [CLI Reference](/docs/command-line-interface.html#add).*
 
         ::: tip
-        Once you've successfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
+        Once you've got the extractor working in your project, please consider
+        [contributing its definition](/docs/contributor-guide.html#discoverable-plugins)
+        to the [index of discoverable plugins](/docs/plugins.html#discoverable-plugins)
+        so that it can be supported out of the box for new users!
         :::
 
     - If a Singer tap for your data source **doesn't exist yet**, learn how to build your own tap by following the ["Create a Custom Extractor" tutorial](/tutorials/create-a-custom-extractor.html) or [Singer's "Developing a Tap" guide](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-tap).
@@ -334,8 +337,8 @@ which will be responsible for loading [extracted](#add-an-extractor-to-pull-data
 
 *To learn more about adding plugins to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project).*
 
-1. Find out if a loader for your data destination is already [known to Meltano](/docs/contributor-guide.html#known-plugins)
-by checking the [Loaders list](/plugins/loaders/) on this website, or using [`meltano discover`](/docs/command-line-interface.html#discover):
+1. Find out if a loader for your data destination is [supported out of the box](/docs/plugins.html#discoverable-plugins)
+by checking the [Loaders list](/plugins/loaders/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
 
     ```bash
     meltano discover loaders
@@ -343,7 +346,7 @@ by checking the [Loaders list](/plugins/loaders/) on this website, or using [`me
 
 1. Depending on the result, pick your next step:
 
-    - If a known loader is **available**, add it to your project using [`meltano add`](/docs/command-line-interface.html#add):
+    - If a loader is **supported out of the box**, add it to your project using [`meltano add`](/docs/command-line-interface.html#add):
 
       ```bash
       meltano add loader <plugin name>
@@ -354,11 +357,11 @@ by checking the [Loaders list](/plugins/loaders/) on this website, or using [`me
 
       You can now continue to step 4.
 
-    - If a loader is **not yet known** to Meltano, find out if a Singer target for your data source already exists by checking [Singer's index of targets](https://www.singer.io/#targets) and/or doing a web search for `Singer target <data destination>`, e.g. `Singer target BigQuery`.
+    - If a loader is **not yet discoverable**, find out if a Singer target for your data source already exists by checking [Singer's index of targets](https://www.singer.io/#targets) and/or doing a web search for `Singer target <data destination>`, e.g. `Singer target BigQuery`.
 
 1. Depending on the result, pick your next step:
 
-    - If a Singer target for your data destination is **available**, add it to your project as a [custom plugin](/docs/command-line-interface.html#how-to-use-custom-plugins) using [`meltano add --custom`](/docs/command-line-interface.html#add):
+    - If a Singer target for your data destination is **available**, add it to your project as a [custom plugin](/docs/plugins.html#custom-plugins) using [`meltano add --custom`](/docs/command-line-interface.html#how-to-use-custom-plugins):
 
         ```bash
         meltano add --custom loader <target name>
@@ -377,7 +380,10 @@ by checking the [Loaders list](/plugins/loaders/) on this website, or using [`me
         *To learn more about adding custom plugins, refer to the ["`meltano add`: How to use: Custom plugins" section](/docs/command-line-interface.html#how-to-use-custom-plugins) of the [CLI Reference](/docs/command-line-interface.html#add).*
 
         ::: tip
-        Once you've successfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
+        Once you've got the loader working in your project, please consider
+        [contributing its definition](/docs/contributor-guide.html#discoverable-plugins)
+        to the [index of discoverable plugins](/docs/plugins.html#discoverable-plugins)
+        so that it can be supported out of the box for new users!
         :::
 
     - If a Singer target for your data source **doesn't exist yet**, learn how to build your own target by following [Singer's "Developing a Target" guide](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target).

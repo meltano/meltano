@@ -21,9 +21,9 @@ Specifically, it will:
 Once the plugin has been added to your project, you can configure it using [`meltano config`](#config),
 invoke its executable using [`meltano invoke`](#invoke), and use it in a pipeline using [`meltano elt`](#elt).
 
-### How to use: Known plugins
+### How to use: Discoverable plugins
 
-Plugins that are already [known to Meltano](/docs/contributor-guide.html#known-plugins) will show up when you run [`meltano discover`](#discover),
+[Discoverable plugins](/docs/plugins.html#discoverable-plugins) will show up when you run [`meltano discover`](#discover),
 and can be added to your project by simply specifying their `type` and `name`:
 
 ```bash
@@ -50,7 +50,7 @@ meltano add --include-related extractor tap-gitlab
 
 ### How to use: Custom plugins
 
-Plugins that Meltano isn't familiar with yet, like arbitrary Singer taps and targets, can be added using the `--custom` flag:
+[Custom plugins](/docs/plugins.html#custom-plugins) that Meltano isn't familiar with yet, like arbitrary Singer taps and targets, can be added using the `--custom` flag:
 
 ```bash
 meltano add --custom <type> <name>
@@ -95,7 +95,10 @@ If you're adding a Singer tap or target that's listed on Singer's [index of taps
 To find out what `settings` a tap or target supports, reference its README and/or documentation. If the `capabilities` (executable flags) a tap supports are not described there, try [one of these tricks](/docs/contributor-guide.html#how-to-test-a-tap).
 
 ::: tip
-Once you've successfully added your custom plugin to your Meltano project, don't forget to make it [known to Meltano](/docs/contributor-guide.html#known-plugins) to make it easier for other people to install in the future!
+Once you've got the plugin working in your project, please consider
+[contributing its definition](/docs/contributor-guide.html#discoverable-plugins)
+to the [`discovery.yml` manifest](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml)
+to make it discoverable and supported out of the box for new users!
 :::
 
 ## `config`
