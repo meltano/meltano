@@ -58,6 +58,11 @@ meltano add --custom <type> <name>
 # For example:
 meltano add --custom extractor tap-covid-19
 meltano add --custom loader pipelinewise-target-postgres
+
+# If you're using Docker, don't forget to mount the project directory,
+# and ensure that interactive mode is enabled so that Meltano can ask you
+# additional questions about the plugin and get your answers over STDIN:
+docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-covid-19
 ```
 
 Since no additional metadata about this plugin will be known to Meltano yet,
