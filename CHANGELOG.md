@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.53.0 - (2020-10-06)
+---
+
+### New
+
 - [#2134](https://gitlab.com/meltano/meltano/-/issues/2134) Let different variants of plugins be discovered and let users choose which to add to their project
 
 ### Changes
@@ -19,8 +31,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#2372](https://gitlab.com/meltano/meltano/-/issues/2372) Upgrade `pip` and related tools to the latest version in plugin venvs
-
-### Breaks
 
 
 ## 1.52.0 - (2020-09-28)
