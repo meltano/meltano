@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2134](https://gitlab.com/meltano/meltano/-/issues/2134) Let different variants of plugins be discovered and let users choose which to add to their project
+
 ### Changes
 
 ### Fixes

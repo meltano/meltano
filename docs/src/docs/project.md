@@ -47,14 +47,31 @@ At a minimum, a plugin definition must have a `name` and a `pip_url` (its [`pip 
 
 A plugin definition _without_ a `namespace` is a reference to a [discoverable plugin](/docs/plugins.html#discoverable-plugins) with the same `name`:
 
-```yaml
+```yaml{3-4}
 plugins:
   extractors:
   - name: tap-gitlab
     pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
 ```
 
-These plugins inherit their metadata (`executable`, `capabilities`, and `settings`; see below) from the known plugin definition.
+In the context of your project, these plugins inherit their metadata (`executable`, `capabilities`, and `settings`; see below) from the discoverable plugin definition.
+
+##### Variants
+
+If multiple [variants](/docs/plugins.html#variants) of a discoverable plugin are available, the specific variant that is used in the project is identified using the `variant` key:
+
+```yaml{4}
+plugins:
+  extractors:
+  - name: tap-gitlab
+    variant: meltano
+    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+```
+
+If no `variant` is specified, the _original_ variant supported by Meltano is used.
+Note that this is not necessarily the _default_ variant that is recommended to new users and would be used if the plugin were newly added to the project.
+
+Only a single variant of a plugin can be present in a project at a time, and that variant will be used whenever you refer to the plugin by name in a [CLI](/docs/command-line-interface.html) argument or [schedule definition](#schedules).
 
 #### Custom plugin definitions
 

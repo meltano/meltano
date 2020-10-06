@@ -15,6 +15,7 @@ They can be managed using various [CLI commands](/docs/command-line-interface.ht
 Like all types of plugins, extractors and loaders can be added to a Meltano project using [`meltano add`](/docs/command-line-interface.html#add).
 
 [Discoverable plugins](/docs/plugins.html#discoverable-plugins) can be added by simply specifying their `type` and `name`, while adding a plugin that Meltano isn't familiar with yet requires adding the `--custom` flag.
+A non-default [variant](/docs/plugins.html#docs) can be selected using the `--variant` option.
 
 To find out what plugins are discoverable and supported out of the box, you can use [`meltano discover`](/docs/command-line-interface.html#discover), with an optional pluralized `<type>` argument, e.g. `meltano discover extractors`.
 You can also check out the lists of supported [extractors](/plugins/extractors/) and [loaders](/plugins/loaders/) on this website.
@@ -29,6 +30,10 @@ meltano discover loaders
 # Add a discoverable extractor or loader by name
 meltano add extractor tap-salesforce
 meltano add loader target-snowflake
+
+# Add a specific variant of a discoverable extractor loader
+meltano add extractor tap-salesforce --variant=singer-io
+meltano add loader target-snowflake --variant=transferwise
 
 # Add a custom extractor or loader
 meltano add --custom extractor tap-covid-19

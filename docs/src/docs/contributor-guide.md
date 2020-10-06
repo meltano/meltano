@@ -167,8 +167,54 @@ export MELTANO_UI_URL = ""
 
 [Discoverable plugins](/docs/plugins.html#discoverable-plugins) are defined in the `discovery.yml` manifest, which can be found inside the Meltano repository at [`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
 
-If you've added a custom plugin to your project that you think should be discoverable and supported out of the box, please contribute a change to that file.
+If you've added a custom plugin (or [variant](/docs/plugins.html#variants)) to your project that you think should be discoverable and supported out of the box, please contribute a change to that file.
 All you'll need is the [custom plugin definition](/docs/project.html#custom-plugin-definitions) from your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), which has the same format as plugin definitions in `discovery.yml`.
+
+### Plugin definitions
+
+At a minimum, a plugin definition must have a `name` and a `namespace`, and at least one [variant definition](#variant-definitions) with a `pip_url` (its [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument).
+
+It is recommended to add a `label`, `logo_url`, and `description` to the plugin definition, and `docs` and `repo` URLs to the variant definition(s).
+
+Most of the time, variant definitions should also have a `settings` array with [setting definitions](#setting-definitions).
+Additionally, `capabilities` should be specified for extractor variants, non-default variant executable names can be specified using `executable`, and default values for [plugin extras](/docs/configuration.html#plugin-extras) can be specified at the plugin definition level and further overridden at the variant definition level.
+
+#### Variant definitions
+
+If a plugin will only ever have a single [variant](/docs/plugins.html#variants) (as is typically the case for all types except for extractors and loaders),
+the variant definition can be embedded in the plugin definition (variant properties can be mixed in with plugin properties), and a variant name _should not_ be specified using a `variant` key.
+
+If a plugin currently only has a single variant, but more might be added later (as is typically the case for extractors and loaders),
+the variant definition can be embedded in the plugin definition, and a variant name _should_ be specified using the `variant` key, matching the organization name on GitHub/GitLab, e.g. `meltano`, `singer-io`, or `transferwise`.
+
+If multiple variants of a plugin are available, the plugin definition should have a `variants` array where each entry represents a variant definition with its own `name`, again matching the organization name on GitHub/GitLab.
+The first variant is considered the default, and the _original_ variant supported by Meltano should be marked with `original: true`.
+Deprecated variants should be marked with `deprecated: true`.
+
+#### Setting definitions
+
+Each extractor (tap) and loader (target) variant in the `discovery.yml` has a `settings` property. Nested under this property are a variable amount of individual settings. In the Meltano UI these settings are parsed to generate a configuration form. To improve the UX of this form, each setting has a number of optional properties:
+
+```yaml
+- settings:
+    - name: setting_name # Required (must match the connector setting name)
+      aliases: [alternative_setting_name] # Optional (alternative names that can be used in `meltano.yml` and with `meltano config set`)
+      label: Setting Name # Optional (human friendly text display of the setting name)
+      value: '' # Optional (Use to set a default value)
+      placeholder: Ex. format_like_this # Optional (Use to set the input's placeholder default)
+      kind: string # Optional (Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `password`, `options`, `file`, `array`, `object`, and `hidden`)
+      description: Setting description # Optional (Use to provide inline context)
+      tooltip: Here is some more info... # Optional (use to provide additional inline context)
+      documentation: https://meltano.com/ # Optional (use to link to specific supplemental documentation)
+      protected: true # Optional (use in combination with `value` to provide an uneditable default)
+      env: SOME_API_KEY # Optional (use to delegate to an environment variable for overriding this setting's value)
+      env_aliases: [OTHER_ENV] # Optional (use to delegate alternative environment variables for overriding this setting's value)
+      value_processor: nest_object # Optional (Use to modify stored value before it's passed to plugin. Options are `nest_object` and `upcase_string`)
+```
+
+#### Protected settings
+
+Until role-based access control is implemented in Meltano, we need to prevent user editing of certain settings from the UI. View this [`tap-gitlab` environment variable setup example](/tutorials/gitlab-and-postgres.html#add-extractor) to learn how to work with this current limitation.
 
 ### Local changes to `discovery.yml`
 
@@ -193,31 +239,6 @@ bencodezen  staff   72 Nov 19 09:19 discovery.yml -> /Users/bencodezen/Projects/
 ```
 
 Now, you can see your changes in `discovery.yml` live in your project during development! 🎉
-
-### Plugin settings
-
-Each extractor (tap) and loader (target) in the `discovery.yml` has a `settings` property. Nested under this property are a variable amount of individual settings. In the Meltano UI these settings are parsed to generate a configuration form. To improve the UX of this form, each setting has a number of optional properties:
-
-```yaml
-- settings:
-    - name: setting_name # Required (must match the connector setting name)
-      aliases: [alternative_setting_name] # Optional (alternative names that can be used in `meltano.yml` and with `meltano config set`)
-      label: Setting Name # Optional (human friendly text display of the setting name)
-      value: '' # Optional (Use to set a default value)
-      placeholder: Ex. format_like_this # Optional (Use to set the input's placeholder default)
-      kind: string # Optional (Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `password`, `options`, `file`, `array`, `object`, and `hidden`)
-      description: Setting description # Optional (Use to provide inline context)
-      tooltip: Here is some more info... # Optional (use to provide additional inline context)
-      documentation: https://meltano.com/ # Optional (use to link to specific supplemental documentation)
-      protected: true # Optional (use in combination with `value` to provide an uneditable default)
-      env: SOME_API_KEY # Optional (use to delegate to an environment variable for overriding this setting's value)
-      env_aliases: [OTHER_ENV] # Optional (use to delegate alternative environment variables for overriding this setting's value)
-      value_processor: nest_object # Optional (Use to modify stored value before it's passed to plugin. Options are `nest_object` and `upcase_string`)
-```
-
-#### Protected settings
-
-Until role-based access control is implemented in Meltano, we need to prevent user editing of certain settings from the UI. View this [`tap-gitlab` environment variable setup example](/tutorials/gitlab-and-postgres.html#add-extractor) to learn how to work with this current limitation.
 
 ### `discovery.yml` version
 

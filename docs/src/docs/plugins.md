@@ -34,6 +34,27 @@ To find out which plugins are discoverable and supported out of the box, run [`m
 
 To find discoverable plugins, Meltano will first look for the `discovery.yml` manifest at the root of your [project](/docs/project.html) (where it won't exist until you create it), then at the URL specified by the [`discovery_url` setting](/docs/settings.html#discovery-url) (<https://www.meltano.com/discovery.yml> by default), and finally inside its own package.
 
+### Variants
+
+In the case of various popular data sources and destinations, multiple alternative implementations of Singer taps ([extractors](#extractors)) and targets ([loaders](#loaders)) exist,
+some of which are forks of an original (canonical) version that evolved in their own direction, while others were developed independently from the start.
+
+These different implementations and their repositories typically use the same name (`tap-<source>` or `target-<destination>`)
+and may on the surface appear interchangeable, but often vary significantly in terms of exact behavior, quality, and supported settings.
+
+In its [index of discoverable plugins](#discoverable-plugins), Meltano considers these different implementations different _variants_ of the same plugin,
+that share a plugin name and other source/destination-specific details (like a logo and description),
+but have their own implementation-specific variant name and metadata (like capabilities and settings).
+
+Every discoverable plugin has a default variant that is known to work well and recommended for new users,
+which will be added to your project unless you explicitly select a different one.
+Users who already have experience with a different variant (or have specific reasons to prefer it) can explicitly choose to add it to their project instead of the default,
+so that they get the same behavior and can use the same settings as before.
+If the variant in question is not discoverable yet, it can be added as a [custom plugin](#custom-plugins).
+
+When multiple variants of a discoverable plugin are available, [`meltano discover`](/docs/command-line-interface.html#discover) will list their names alongside the plugin name.
+When [adding a plugin to your project](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project), a non-default variant can be specified using [`meltano add`](/docs/command-line-interface.html#add)'s [`--variant` option](/docs/command-line-interface.html#variants).
+
 ### Custom plugins
 
 If you'd like to use Meltano with a plugin that isn't discoverable yet, you'll
@@ -411,7 +432,7 @@ They are responsible for loading [extracted](#extractors) data into arbitrary da
 
 Meltano supports [Singer targets](https://singer.io): executables that implement the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
 
-To learn which loaders are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Loaders page](/plugins/loaders/) or run [`meltano discover loaders`](/docs/command-line-interface.html#discover)
+To learn which loaders are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Loaders page](/plugins/loaders/) or run [`meltano discover loaders`](/docs/command-line-interface.html#discover).
 
 ### `dialect` extra
 
