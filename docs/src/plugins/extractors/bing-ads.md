@@ -38,25 +38,13 @@ For more details, refer to the repository at <https://github.com/singer-io/tap-b
 
 `tap-bing-ads` requires the [configuration](/docs/configuration.html) of the following settings:
 
-- [Bing Ads](#bing-ads)
-  - [Installation](#installation)
-    - [Using the Command Line Interface](#using-the-command-line-interface)
-    - [Using Meltano UI](#using-meltano-ui)
-  - [Settings](#settings)
-    - [Developer Token](#developer-token)
-      - [How to use](#how-to-use)
-    - [OAuth Client ID](#oauth-client-id)
-      - [How to use](#how-to-use-1)
-    - [OAuth Client Secret](#oauth-client-secret)
-      - [How to use](#how-to-use-2)
-    - [Customer ID](#customer-id)
-      - [How to use](#how-to-use-3)
-    - [Account IDs](#account-ids)
-      - [How to use](#how-to-use-4)
-    - [Refresh Token](#refresh-token)
-      - [How to use](#how-to-use-5)
-    - [Start Date](#start-date)
-      - [How to use](#how-to-use-6)
+- [Developer Token](#developer-token)
+- [OAuth Client ID](#oauth-client-id)
+- [OAuth Client Secret](#oauth-client-secret)
+- [Customer ID](#customer-id)
+- [Account IDs](#account-ids)
+- [Refresh Token](#refresh-token)
+- [Start Date](#start-date)
 
 ### Developer Token
 
