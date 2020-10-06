@@ -1,6 +1,7 @@
 import pytest
 import os
 import sys
+import subprocess
 from unittest import mock
 
 from meltano.core.venv_service import VenvService, VirtualEnv
@@ -22,6 +23,16 @@ class TestVenvService:
         assert os.path.samefile(
             venv_dir.joinpath("bin/python"), venv_dir.joinpath("bin/python3")
         )
+
+        # ensure that pip is the latest version
+        run = subprocess.run(
+            [venv_dir.joinpath("bin/python"), "-m", "pip", "list", "--outdated"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        for line in str(run.stdout).splitlines():
+            assert line.startswith("pip ") == False
 
 
 class TestVirtualEnv:

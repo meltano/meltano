@@ -55,19 +55,42 @@ class VenvService:
     def create(self, namespace="", name=""):
         venv = VirtualEnv(self.project.venvs_dir(namespace, name))
 
-        run = subprocess.run(
+        venv_run = subprocess.run(
             [sys.executable, "-m", "venv", str(venv)],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
         )
 
-        if run.returncode != 0:
+        if venv_run.returncode != 0:
             raise SubprocessError(
-                f"Could not create of the virtualenv for '{namespace}/{name}'", run
+                f"Could not create of the virtualenv for '{namespace}/{name}'", venv_run
             )
 
-        return run
+        python_path = venv.bin_dir.joinpath("python")
+
+        upgrade_run = subprocess.run(
+            [
+                str(python_path),
+                "-m",
+                "pip",
+                "install",
+                "--upgrade",
+                "pip",
+                "setuptools",
+                "wheel",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+        )
+
+        if upgrade_run.returncode != 0:
+            raise SubprocessError(
+                f"Failed to upgrade pip to the latest version.", upgrade_run
+            )
+
+        return venv_run
 
     def install(self, pip_url, namespace="", name=""):
         """
@@ -77,14 +100,14 @@ class VenvService:
         """
 
         venv = VirtualEnv(self.project.venvs_dir(namespace, name))
-        pip_install_path = venv.bin_dir.joinpath("pip")
+        python_path = venv.bin_dir.joinpath("python")
 
         meltano_pth_path = venv.site_packages_dir.joinpath("meltano_venv.pth")
         if meltano_pth_path.exists():
             os.remove(meltano_pth_path)
 
         run = subprocess.run(
-            [str(pip_install_path), "install", *pip_url.split(" ")],
+            [str(python_path), "-m", "pip", "install", *pip_url.split(" ")],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,

@@ -16,6 +16,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2372](https://gitlab.com/meltano/meltano/-/issues/2372) Upgrade `pip` and related tools to the latest version in plugin venvs
+
 ### Breaks
 
 
