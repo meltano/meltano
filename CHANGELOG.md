@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+[#2112](https://gitlab.com/meltano/meltano/-/issues/2112) Stop inheriting Meltano venv when invoking Airflow
+
 ### Fixes
 
 ### Breaks
