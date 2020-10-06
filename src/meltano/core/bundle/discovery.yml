@@ -1,12 +1,13 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-version: 15
+version: 16
 
 extractors:
   - name: tap-bing-ads
     label: Bing Ads
     description: Advertising Platform
     namespace: tap_bing_ads
+    variant: singer-io
     docs: 'https://meltano.com/plugins/extractors/bing-ads.html'
     repo: https://github.com/singer-io/tap-bing-ads
     pip_url: tap-bing-ads
@@ -166,6 +167,7 @@ extractors:
     label: Facebook Ads
     description: Advertising Platform
     namespace: tap_facebook
+    variant: meltano
     docs: 'https://meltano.com/plugins/extractors/facebook.html'
     repo: https://gitlab.com/meltano/tap-facebook
     pip_url: 'git+https://gitlab.com/meltano/tap-facebook.git'
@@ -201,6 +203,7 @@ extractors:
     label: GitLab
     description: Single application for the entire DevOps lifecycle
     namespace: tap_gitlab
+    variant: meltano
     docs: 'https://meltano.com/plugins/extractors/gitlab.html'
     repo: https://gitlab.com/meltano/tap-gitlab
     pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
@@ -241,6 +244,7 @@ extractors:
     label: Google Ads
     description: Advertising Platform
     namespace: tap_adwords
+    variant: meltano
     docs: 'https://meltano.com/plugins/extractors/adwords.html'
     repo: https://gitlab.com/meltano/tap-adwords
     pip_url: 'git+https://gitlab.com/meltano/tap-adwords.git'
@@ -504,6 +508,7 @@ extractors:
     label: Google Analytics
     description: App and website analytics platform hosted by Google
     namespace: tap_google_analytics
+    variant: meltano
     docs: 'https://meltano.com/plugins/extractors/google-analytics.html'
     repo: https://gitlab.com/meltano/tap-google-analytics
     pip_url: 'git+https://gitlab.com/meltano/tap-google-analytics.git'
@@ -555,6 +560,7 @@ extractors:
     label: Salesforce
     description: Customer-relationship management & customer success platform
     namespace: tap_salesforce
+    variant: meltano
     docs: 'https://meltano.com/plugins/extractors/salesforce.html'
     repo: https://gitlab.com/meltano/tap-salesforce
     pip_url: 'git+https://gitlab.com/meltano/tap-salesforce.git'
@@ -600,6 +606,7 @@ extractors:
     label: Shopify
     description: Ecommerce platform
     namespace: tap_shopify
+    variant: singer-io
     docs: 'https://meltano.com/plugins/extractors/shopify.html'
     repo: https://github.com/singer-io/tap-shopify
     pip_url: tap-shopify==1.2.0
@@ -635,6 +642,7 @@ extractors:
     label: Stripe
     description: Online payment processing for internet businesses
     namespace: tap_stripe
+    variant: meltano
     docs: 'https://meltano.com/plugins/extractors/stripe.html'
     repo: https://github.com/meltano/tap-stripe
     pip_url: 'git+https://github.com/meltano/tap-stripe.git@v0.2.4'
@@ -659,6 +667,7 @@ extractors:
     label: Zendesk
     description: Support ticketing system & customer service platform
     namespace: tap_zendesk
+    variant: singer-io
     docs: 'https://meltano.com/plugins/extractors/zendesk.html'
     repo: https://github.com/singer-io/tap-zendesk
     pip_url: 'tap-zendesk'
@@ -688,6 +697,7 @@ extractors:
     label: Carbon Emissions Intensity
     description: National Grid ESO's Carbon Emissions Intensity API
     namespace: tap_carbon
+    variant: meltano
     hidden: true
     repo: https://gitlab.com/meltano/tap-carbon-intensity
     pip_url: 'git+https://gitlab.com/meltano/tap-carbon-intensity.git'
@@ -697,6 +707,7 @@ extractors:
     label: CSV
     description: Generic data extractor of CSV (comma separated value) files
     namespace: tap_csv
+    variant: meltano
     hidden: true
     docs: 'https://meltano.com/plugins/extractors/csv.html'
     repo: https://gitlab.com/meltano/tap-csv
@@ -720,6 +731,7 @@ extractors:
     label: Fastly
     description: Edge cloud computing services provider
     namespace: tap_fastly
+    variant: meltano
     hidden: true
     docs: 'https://meltano.com/plugins/extractors/fastly.html'
     repo: https://gitlab.com/meltano/tap-fastly
@@ -740,6 +752,7 @@ extractors:
     label: Marketo
     description: Marketing automation for account-based marketing
     namespace: tap_marketo
+    variant: meltano
     hidden: true
     docs: 'https://meltano.com/plugins/extractors/marketo.html'
     repo: https://gitlab.com/meltano/tap-marketo
@@ -759,6 +772,7 @@ extractors:
     label: MongoDB
     description: General purpose, document-based, distributed database
     namespace: tap_mongodb
+    variant: singer-io
     hidden: true
     docs: 'https://meltano.com/plugins/extractors/mongodb.html'
     repo: https://github.com/singer-io/tap-mongodb
@@ -795,12 +809,13 @@ extractors:
     settings:
       - name: tables
         kind: array
-        label: An array holding json objects that each describe a set of targeted source files. See docs for details.
+        description: An array holding json objects that each describe a set of targeted source files. See docs for details.
 loaders:
   - name: target-csv
     label: CSV
     description: CSV loader
     namespace: target_csv
+    variant: singer-io
     docs: 'https://meltano.com/plugins/loaders/csv.html'
     repo: https://github.com/singer-io/target-csv
     pip_url: target-csv
@@ -834,6 +849,7 @@ loaders:
     label: JSONL
     description: JSONL loader
     namespace: target_jsonl
+    variant: andyh1203
     docs: https://meltano.com/plugins/loaders/jsonl.html
     repo: https://github.com/andyh1203/target-jsonl
     pip_url: target-jsonl
@@ -850,6 +866,7 @@ loaders:
     label: PostgreSQL
     description: PostgreSQL database loader
     namespace: postgres
+    variant: meltano
     docs: 'https://meltano.com/plugins/loaders/postgres.html'
     repo: https://github.com/meltano/target-postgres
     pip_url: 'git+https://github.com/meltano/target-postgres.git'
@@ -890,6 +907,7 @@ loaders:
     label: Snowflake
     description: Snowflake database loader
     namespace: snowflake
+    variant: meltano
     docs: 'https://meltano.com/plugins/loaders/snowflake.html'
     repo: https://gitlab.com/meltano/target-snowflake
     pip_url: 'git+https://gitlab.com/meltano/target-snowflake.git'
@@ -924,6 +942,7 @@ loaders:
     label: SQLite
     description: SQLite database loader
     namespace: sqlite
+    variant: meltano
     docs: 'https://meltano.com/plugins/loaders/sqlite.html'
     repo: https://gitlab.com/meltano/target-sqlite
     pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
@@ -956,12 +975,14 @@ transformers:
 transforms:
   - name: tap-adwords
     namespace: tap_adwords
+    variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-adwords
     pip_url: 'https://gitlab.com/meltano/dbt-tap-adwords.git'
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-carbon-intensity
     namespace: tap_carbon
+    variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-carbon-intensity
     pip_url: 'https://gitlab.com/meltano/dbt-tap-carbon-intensity.git'
     vars:
@@ -970,18 +991,21 @@ transforms:
       region_table: "{{ env_var('DBT_SOURCE_SCHEMA') }}.region"
   - name: tap-salesforce
     namespace: tap_salesforce
+    variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-salesforce
     pip_url: 'https://gitlab.com/meltano/dbt-tap-salesforce.git'
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-facebook
     namespace: tap_facebook
+    variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-facebook
     pip_url: 'https://gitlab.com/meltano/dbt-tap-facebook.git'
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-gitlab
     namespace: tap_gitlab
+    variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-gitlab
     pip_url: 'https://gitlab.com/meltano/dbt-tap-gitlab.git'
     vars:
@@ -989,6 +1013,7 @@ transforms:
       ultimate_license: "{{ env_var('GITLAB_API_ULTIMATE_LICENSE', False) }}"
   - name: tap-stripe
     namespace: tap_stripe
+    variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-stripe
     pip_url: 'https://gitlab.com/meltano/dbt-tap-stripe.git'
     vars:
@@ -996,18 +1021,21 @@ transforms:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-zendesk
     namespace: tap_zendesk
+    variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-zendesk
     pip_url: 'https://gitlab.com/meltano/dbt-tap-zendesk.git'
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-google-analytics
     namespace: tap_google_analytics
+    variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-google-analytics
     pip_url: 'https://gitlab.com/meltano/dbt-tap-google-analytics.git'
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-shopify
     namespace: tap_shopify
+    variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-shopify
     pip_url: 'https://gitlab.com/meltano/dbt-tap-shopify.git'
     vars:
@@ -1015,71 +1043,88 @@ transforms:
 models:
   - name: model-adwords
     namespace: tap_adwords
+    variant: meltano
     repo: https://gitlab.com/meltano/model-adwords
     pip_url: 'git+https://gitlab.com/meltano/model-adwords.git'
   - name: model-carbon-intensity
     namespace: tap_carbon
+    variant: meltano
     repo: https://gitlab.com/meltano/model-carbon-intensity
     pip_url: 'git+https://gitlab.com/meltano/model-carbon-intensity.git'
   - name: model-facebook
     namespace: tap_facebook
+    variant: meltano
     repo: https://gitlab.com/meltano/model-facebook
     pip_url: 'git+https://gitlab.com/meltano/model-facebook.git'
   - name: model-salesforce
     namespace: tap_salesforce
+    variant: meltano
     repo: https://gitlab.com/meltano/model-salesforce
     pip_url: 'git+https://gitlab.com/meltano/model-salesforce.git'
   - name: model-gitflix
     namespace: tap_gitflix
+    variant: meltano
     repo: https://gitlab.com/jschatz1/model-gitflix
     pip_url: 'git+https://gitlab.com/jschatz1/model-gitflix.git'
   - name: model-zendesk
     namespace: tap_zendesk
+    variant: meltano
     repo: https://gitlab.com/meltano/model-zendesk
     pip_url: 'git+https://gitlab.com/meltano/model-zendesk.git'
   - name: model-gitlab
     namespace: tap_gitlab
+    variant: meltano
     repo: https://gitlab.com/meltano/model-gitlab
     pip_url: 'git+https://gitlab.com/meltano/model-gitlab.git'
   - name: model-gitlab-ultimate
     namespace: tap_gitlab_ultimate
+    variant: meltano
     repo: https://gitlab.com/meltano/model-gitlab-ultimate
     pip_url: 'git+https://gitlab.com/meltano/model-gitlab-ultimate.git'
   - name: model-stripe
     namespace: tap_stripe
+    variant: meltano
     repo: https://gitlab.com/meltano/model-stripe
     pip_url: 'git+https://gitlab.com/meltano/model-stripe.git'
   - name: model-google-analytics
     namespace: tap_google_analytics
+    variant: meltano
     repo: https://gitlab.com/meltano/model-google-analytics
     pip_url: 'git+https://gitlab.com/meltano/model-google-analytics.git'
   - name: model-shopify
     namespace: tap_shopify
+    variant: meltano
     repo: https://gitlab.com/meltano/model-shopify
     pip_url: 'git+https://gitlab.com/meltano/model-shopify.git'
 dashboards:
   - name: dashboard-adwords
     namespace: tap_adwords
+    variant: meltano
     repo: https://gitlab.com/meltano/dashboard-adwords
     pip_url: 'git+https://gitlab.com/meltano/dashboard-adwords.git'
   - name: dashboard-facebook
     namespace: tap_facebook
+    variant: meltano
     repo: https://gitlab.com/meltano/dashboard-facebook
     pip_url: 'git+https://gitlab.com/meltano/dashboard-facebook.git'
   - name: dashboard-gitlab
     namespace: tap_gitlab
+    variant: meltano
     repo: https://gitlab.com/meltano/dashboard-gitlab
     pip_url: 'git+https://gitlab.com/meltano/dashboard-gitlab.git'
   - name: dashboard-google-analytics
     namespace: tap_google_analytics
+    variant: meltano
     repo: https://gitlab.com/meltano/dashboard-google-analytics
     pip_url: 'git+https://gitlab.com/meltano/dashboard-google-analytics.git'
   - name: dashboard-stripe
     namespace: tap_stripe
+    variant: meltano
     repo: https://gitlab.com/meltano/dashboard-stripe
     pip_url: 'git+https://gitlab.com/meltano/dashboard-stripe.git'
   - name: dashboard-shopify
     namespace: tap_shopify
+    variant: meltano
     repo: https://gitlab.com/meltano/dashboard-shopify
     pip_url: 'git+https://gitlab.com/meltano/dashboard-shopify.git'
 orchestrators:

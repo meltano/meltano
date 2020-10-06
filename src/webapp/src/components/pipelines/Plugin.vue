@@ -2,13 +2,15 @@
 import { mapActions, mapGetters } from 'vuex'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
+import Dropdown from '@/components/generic/Dropdown'
 import pluralize from 'pluralize'
 import utils from '@/utils/utils'
 
 export default {
   name: 'Plugin',
   components: {
-    ConnectorLogo
+    ConnectorLogo,
+    Dropdown
   },
   props: {
     plugin: {
@@ -40,15 +42,15 @@ export default {
     name() {
       return this.plugin.name
     },
+    variants() {
+      return this.plugin.variants
+    },
     getPipelines() {
       return this.getPipelinesWithPlugin(this.singularizedType, this.name)
     },
     getPipelinesLabel() {
       const pipelineAmount = this.getPipelines.length
       return pluralize('pipeline', pipelineAmount, true)
-    },
-    getButtonLabel() {
-      return this.isInstalled ? 'Configure' : 'Add to project'
     },
     getHasPipeline() {
       return this.getHasPipelineWithPlugin(this.singularizedType, this.name)
@@ -79,6 +81,9 @@ export default {
     },
     singularizedType() {
       return utils.singularize(this.type)
+    },
+    hasVariants() {
+      return this.variants.length > 1
     }
   },
   methods: {
@@ -89,28 +94,25 @@ export default {
         params: { plugin: this.name }
       })
     },
-    handleClick() {
-      if (this.isInstalled) {
-        this.goToSettings()
-      } else {
-        this.isAdding = true
-        const addConfig = {
-          pluginType: this.type,
-          name: this.name
-        }
-        this.addPlugin(addConfig)
-          .then(() => {
-            this.goToSettings()
-            this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
-              this.isAdding = false
-            })
-            this.installPlugin(addConfig)
-          })
-          .catch(err => {
-            this.$error.handle(err)
-            this.close()
-          })
+    addToProject(variant) {
+      this.isAdding = true
+      const addConfig = {
+        pluginType: this.type,
+        name: this.name,
+        variant: variant && variant.name
       }
+      this.addPlugin(addConfig)
+        .then(() => {
+          this.goToSettings()
+          this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
+            this.isAdding = false
+          })
+          this.installPlugin(addConfig)
+        })
+        .catch(err => {
+          this.$error.handle(err)
+          this.isAdding = false
+        })
     }
   }
 }
@@ -130,20 +132,12 @@ export default {
             <br />
             <small>{{ description }}</small>
           </p>
-          <div class="buttons">
-            <button
-              class="button"
-              :class="{
-                'is-interactive-primary': !isInstalled,
-                'is-loading': isAdding,
-                disabled: isAdding
-              }"
-              @click="handleClick"
-            >
-              <span>{{ getButtonLabel }}</span>
+          <div v-if="isInstalled" class="buttons">
+            <button class="button" @click="goToSettings">
+              <span>Configure</span>
             </button>
+
             <router-link
-              v-if="isInstalled"
               class="button tooltip is-borderless"
               :data-tooltip="getPipelinesTooltip"
               tag="button"
@@ -163,6 +157,50 @@ export default {
                 {{ getPipelinesLabel }}
               </span>
             </router-link>
+          </div>
+          <div
+            v-else
+            class="control"
+            :class="{ 'field has-addons': hasVariants }"
+          >
+            <div class="control">
+              <button
+                class="button is-interactive-primary"
+                :class="{
+                  'is-loading': isAdding
+                }"
+                :disabled="isAdding"
+                @click="addToProject()"
+              >
+                <span>Add to project</span>
+              </button>
+            </div>
+
+            <div v-if="hasVariants" class="control">
+              <Dropdown
+                :disabled="isAdding"
+                button-classes="is-interactive-primary"
+              >
+                <div class="dropdown-content">
+                  <a
+                    v-for="variant in variants"
+                    :key="variant.name"
+                    class="dropdown-item"
+                    data-dropdown-auto-close
+                    @click="addToProject(variant)"
+                  >
+                    Add variant '{{ variant.name }}'
+
+                    <template v-if="variant.default">
+                      (default)
+                    </template>
+                    <template v-else-if="variant.deprecated">
+                      (deprecated)
+                    </template>
+                  </a>
+                </div>
+              </Dropdown>
+            </div>
           </div>
         </div>
       </div>

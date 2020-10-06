@@ -26,6 +26,10 @@ def plugin_def_json(plugin_def):
         "label": plugin_def.label,
         "logo_url": plugin_def.logo_url,
         "description": plugin_def.description,
+        "variants": [
+            {"name": v.name, "default": i == 0, "deprecated": v.deprecated}
+            for i, v in enumerate(plugin_def.variants)
+        ],
     }
 
 
@@ -63,6 +67,8 @@ def installed():
             plugin_def = discovery.get_definition(plugin)
 
             plugin_json.update(plugin_def_json(plugin_def))
+
+            plugin_json["variant"] = plugin_def.current_variant_name
             plugin_json["docs"] = plugin_def.docs
         except PluginNotFoundError:
             pass
@@ -83,10 +89,11 @@ def add():
     payload = request.get_json()
     plugin_type = PluginType(payload["plugin_type"])
     plugin_name = payload["name"]
+    variant = payload.get("variant", None)
 
     project = Project.find()
     add_service = ProjectAddService(project)
-    plugin = add_service.add(plugin_type, plugin_name)
+    plugin = add_service.add(plugin_type, plugin_name, variant=variant)
 
     return jsonify(plugin.canonical())
 

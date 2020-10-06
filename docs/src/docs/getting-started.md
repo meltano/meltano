@@ -159,6 +159,9 @@ by checking the [Extractors list](/plugins/extractors/) or using [`meltano disco
       # For example:
       meltano add extractor tap-gitlab
 
+      # If you have a preference for a non-default variant, select it using `--variant`:
+      meltano add extractor tap-gitlab --variant=singer-io
+
       # If you're using Docker, don't forget to mount the project directory:
       docker run -v $(pwd):/project -w /project meltano/meltano add extractor tap-gitlab
       ```
@@ -353,6 +356,9 @@ by checking the [Loaders list](/plugins/loaders/) or using [`meltano discover`](
 
       # For example:
       meltano add loader target-postgres
+
+      # If you have a preference for a non-default variant, select it using `--variant`:
+      meltano add loader target-postgres --variant=transferwise
       ```
 
       You can now continue to step 4.

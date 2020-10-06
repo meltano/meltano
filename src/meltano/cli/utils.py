@@ -14,7 +14,7 @@ from meltano.core.plugin_install_service import (
     PluginInstallService,
     PluginInstallReason,
 )
-from meltano.core.plugin import PluginType
+from meltano.core.plugin import PluginType, VariantNotFoundError
 from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
 
@@ -23,19 +23,18 @@ class CliError(Exception):
     pass
 
 
-def print_added_plugin(project, project_plugin, plugin_def=None, related=False):
-    descriptor = project_plugin.type.descriptor
+def print_added_plugin(project, plugin, plugin_def=None, related=False):
+    descriptor = plugin.type.descriptor
     if related:
         descriptor = f"related {descriptor}"
 
-    if project_plugin.should_add_to_file(project):
+    if plugin.should_add_to_file(project):
         click.secho(
-            f"Added {descriptor} '{project_plugin.name}' to your Meltano project",
-            fg="green",
+            f"Added {descriptor} '{plugin.name}' to your Meltano project", fg="green"
         )
     else:
         click.secho(
-            f"Adding {descriptor} '{project_plugin.name}' to your Meltano project...",
+            f"Adding {descriptor} '{plugin.name}' to your Meltano project...",
             fg="green",
         )
 
@@ -54,9 +53,10 @@ def add_plugin(
     plugin_type: PluginType,
     plugin_name: str,
     add_service: ProjectAddService,
+    variant=None,
 ):
     try:
-        plugin = add_service.add(plugin_type, plugin_name)
+        plugin = add_service.add(plugin_type, plugin_name, variant=variant)
         plugin_def = add_service.discovery_service.get_definition(plugin)
 
         print_added_plugin(project, plugin, plugin_def)
@@ -67,6 +67,8 @@ def add_plugin(
             err=True,
         )
         plugin = err.plugin
+    except VariantNotFoundError as err:
+        raise CliError(str(err)) from err
     except (PluginNotSupportedException, PluginNotFoundError) as err:
         raise CliError(
             f"{plugin_type.descriptor.capitalize()} '{plugin_name}' is not known to Meltano"

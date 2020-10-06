@@ -42,6 +42,18 @@ meltano add extractor tap-gitlab
 meltano add loader target-postgres
 ```
 
+#### Variants
+
+If multiple [variants](/docs/plugins.html#variants) of a discoverable plugin are available, the specific variant to add can be identified using the `--variant` option:
+
+```bash
+meltano add extractor tap-gitlab --variant=singer-io
+```
+
+If no variant is specified, the default variant will be used, which is known to work well and recommended for new users.
+
+#### Related plugins
+
 An `--include-related` flag can be passed to automatically install all transform, model, and dashboard plugins related to an extractor:
 
 ```bash
@@ -238,7 +250,7 @@ meltano config <plugin> reset
 
 ## `discover`
 
-Lists the available plugins you are interested in.
+Lists the available [discoverable plugins](/docs/plugins.html#discoverable-plugins) and their [variants](/docs/plugins.html#variants).
 
 ### How to Use
 

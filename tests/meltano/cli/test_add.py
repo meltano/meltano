@@ -6,7 +6,7 @@ from unittest import mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
-from meltano.core.plugin import PluginType, PluginRef
+from meltano.core.plugin import PluginType, PluginRef, Variant
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.m5o.dashboards_service import DashboardsService
@@ -15,33 +15,36 @@ from meltano.core.m5o.reports_service import ReportsService
 
 class TestCliAdd:
     @pytest.mark.parametrize(
-        "plugin_type,plugin_name,related_plugin_refs",
+        "plugin_type,plugin_name,default_variant,related_plugin_refs",
         [
-            (PluginType.EXTRACTORS, "tap-carbon-intensity", []),
-            (PluginType.LOADERS, "target-sqlite", []),
+            (PluginType.EXTRACTORS, "tap-carbon-intensity", "meltano", []),
+            (PluginType.LOADERS, "target-sqlite", "meltano", []),
             (
                 PluginType.TRANSFORMS,
                 "tap-carbon-intensity",
+                "meltano",
                 [
                     PluginRef(PluginType.TRANSFORMERS, "dbt"),
                     PluginRef(PluginType.FILES, "dbt"),
                 ],
             ),
-            (PluginType.MODELS, "model-carbon-intensity", []),
-            (PluginType.DASHBOARDS, "dashboard-google-analytics", []),
+            (PluginType.MODELS, "model-carbon-intensity", "meltano", []),
+            (PluginType.DASHBOARDS, "dashboard-google-analytics", "meltano", []),
             (
                 PluginType.ORCHESTRATORS,
                 "airflow",
+                None,
                 [PluginRef(PluginType.FILES, "airflow")],
             ),
             # Installed automatically because of transform 'tap-carbon-intensity'
-            # (PluginType.TRANSFORMERS, "dbt", [PluginRef(PluginType.FILES, "dbt")]),
+            # (PluginType.TRANSFORMERS, "dbt", None, [PluginRef(PluginType.FILES, "dbt")]),
         ],
     )
     def test_add(
         self,
         plugin_type,
         plugin_name,
+        default_variant,
         related_plugin_refs,
         project,
         cli_runner,
@@ -60,6 +63,8 @@ class TestCliAdd:
 
             plugin = config_service.find_plugin(plugin_name, plugin_type)
             assert plugin
+            assert plugin.variant == default_variant
+
             plugins = [plugin]
 
             for related_plugin_ref in related_plugin_refs:
@@ -269,6 +274,23 @@ class TestCliAdd:
         with pytest.raises(PluginMissingError):
             config_service.find_plugin("tap-mock", PluginType.EXTRACTORS)
 
+    def test_add_variant(
+        self, project, cli_runner, config_service, plugin_discovery_service
+    ):
+        with mock.patch(
+            "meltano.cli.add.PluginDiscoveryService",
+            return_value=plugin_discovery_service,
+        ), mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            res = cli_runner.invoke(
+                cli, ["add", "extractor", "tap-mock", "--variant", "singer-io"]
+            )
+
+            plugin = config_service.find_plugin(
+                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-mock"
+            )
+            assert plugin.variant == "singer-io"
+
     def test_add_custom(
         self, project, cli_runner, config_service, plugin_discovery_service
     ):
@@ -292,13 +314,52 @@ class TestCliAdd:
             assert plugin.pip_url == pip_url
 
             plugin_def = plugin_discovery_service.get_definition(plugin)
+            plugin_variant = plugin_def.current_variant
+
             assert plugin_def.name == "tap-custom"
             assert plugin_def.namespace == "tap_custom"
-            assert plugin_def.pip_url == pip_url
-            assert plugin_def.executable == executable
-            assert plugin_def.capabilities == ["foo", "bar"]
-            assert [s.name for s in plugin_def.settings] == ["baz", "qux"]
+
+            assert plugin_variant.name is None
+            assert plugin_variant.pip_url == pip_url
+            assert plugin_variant.executable == executable
+            assert plugin_variant.capabilities == ["foo", "bar"]
+            assert [s.name for s in plugin_variant.settings] == ["baz", "qux"]
+
+            assert plugin_def.pip_url == plugin_variant.pip_url
+            assert plugin_def.executable == plugin_variant.executable
+            assert plugin_def.capabilities == plugin_variant.capabilities
+            assert plugin_def.settings == plugin_variant.settings
 
             install_plugin_mock.assert_called_once_with(
                 project, [plugin], reason=PluginInstallReason.ADD
+            )
+
+    def test_add_custom_variant(
+        self, project, cli_runner, config_service, plugin_discovery_service
+    ):
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "add",
+                    "--custom",
+                    "extractor",
+                    "tap-custom-variant",
+                    "--variant",
+                    "personal",
+                ],
+            )
+
+            plugin = config_service.find_plugin(
+                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-custom-variant"
+            )
+            plugin_def = plugin_discovery_service.get_definition(plugin)
+            plugin_variant = plugin_def.current_variant
+
+            assert (
+                plugin.variant
+                == plugin_def.current_variant_name
+                == plugin_variant.name
+                == "personal"
             )

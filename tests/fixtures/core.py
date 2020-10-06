@@ -36,26 +36,37 @@ def discovery():
         {
             "name": "tap-mock",
             "namespace": "tap_mock",
-            "pip_url": "tap-mock",
-            "capabilities": ["discover", "catalog", "state"],
-            "settings": [
-                {"name": "test", "value": "mock"},
-                {"name": "start_date"},
-                {"name": "protected", "protected": True},
-                {"name": "secure", "kind": "password"},
-                {"name": "port", "kind": "integer", "value": 5000},
-                {"name": "list", "kind": "array", "value": []},
+            "variants": [
                 {
-                    "name": "object",
-                    "aliases": ["data"],
-                    "kind": "object",
-                    "value": {"nested": "from_default"},
+                    "name": "meltano",
+                    "pip_url": "tap-mock",
+                    "capabilities": ["discover", "catalog", "state"],
+                    "settings": [
+                        {"name": "test", "value": "mock"},
+                        {"name": "start_date"},
+                        {"name": "protected", "protected": True},
+                        {"name": "secure", "kind": "password"},
+                        {"name": "port", "kind": "integer", "value": 5000},
+                        {"name": "list", "kind": "array", "value": []},
+                        {
+                            "name": "object",
+                            "aliases": ["data"],
+                            "kind": "object",
+                            "value": {"nested": "from_default"},
+                        },
+                        {"name": "hidden", "kind": "hidden", "value": 42},
+                        {
+                            "name": "boolean",
+                            "kind": "boolean",
+                            "env_aliases": ["TAP_MOCK_ENABLED", "!TAP_MOCK_DISABLED"],
+                        },
+                    ],
                 },
-                {"name": "hidden", "kind": "hidden", "value": 42},
                 {
-                    "name": "boolean",
-                    "kind": "boolean",
-                    "env_aliases": ["TAP_MOCK_ENABLED", "!TAP_MOCK_DISABLED"],
+                    "name": "singer-io",
+                    "original": True,
+                    "deprecated": True,
+                    "pip_url": "singer-tap-mock",
                 },
             ],
         }
@@ -209,7 +220,7 @@ def config_service(project):
 
 @pytest.fixture(scope="class")
 def tap(config_service):
-    tap = ProjectPlugin(PluginType.EXTRACTORS, "tap-mock")
+    tap = ProjectPlugin(PluginType.EXTRACTORS, "tap-mock", variant="meltano")
     try:
         return config_service.add_to_file(tap)
     except PluginAlreadyAddedException as err:
