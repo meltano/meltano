@@ -14,7 +14,8 @@ class SingerPlugin(ProjectPlugin):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
 
     def process_config(self, flat_config):
-        return nest_object(flat_config)
+        non_null_config = {k: v for k, v in flat_config.items() if v is not None}
+        return nest_object(non_null_config)
 
     @hook("before_configure")
     def before_configure(self, invoker, session):

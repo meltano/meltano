@@ -510,7 +510,9 @@ class TestCliEltScratchpadOne:
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
-            assert json.loads(result.stdout) == settings_service.as_dict(extras=False)
+            assert json.loads(result.stdout) == settings_service.as_dict(
+                extras=False, process=True
+            )
 
     def test_dump_loader_config(
         self,
@@ -543,7 +545,9 @@ class TestCliEltScratchpadOne:
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
-            assert json.loads(result.stdout) == settings_service.as_dict(extras=False)
+            assert json.loads(result.stdout) == settings_service.as_dict(
+                extras=False, process=True
+            )
 
 
 class TestCliEltScratchpadTwo:

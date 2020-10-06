@@ -60,6 +60,8 @@ def discovery():
                             "kind": "boolean",
                             "env_aliases": ["TAP_MOCK_ENABLED", "!TAP_MOCK_DISABLED"],
                         },
+                        {"name": "auth.username"},
+                        {"name": "auth.password", "kind": "password"},
                     ],
                 },
                 {
