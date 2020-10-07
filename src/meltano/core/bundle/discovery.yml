@@ -1132,7 +1132,7 @@ orchestrators:
     namespace: airflow
     docs: https://meltano.com/docs/orchestration.md
     repo: https://github.com/apache/airflow
-    pip_url: 'wtforms==2.2.1 apache-airflow==1.10.2'
+    pip_url: 'apache-airflow==1.10.12'
     settings:
       - name: core.dags_folder
         value: $MELTANO_PROJECT_ROOT/orchestrate/dags
