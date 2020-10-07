@@ -248,15 +248,41 @@ class TestPluginSettingsService:
             assert redacted_config.get(k) == v
 
     def test_as_dict_process(self, subject, tap):
-        subject.set("auth.username", "nested_value")
-
         config = subject.as_dict()
-        assert config["auth.username"] == "nested_value"
+        assert config["auth.username"] is None
+        assert config["auth.password"] is None
         assert "auth" not in config
 
         config = subject.as_dict(process=True)
-        assert config["auth"]["username"] == "nested_value"
         assert "auth.username" not in config
+        assert "auth.password" not in config
+        assert "auth" not in config
+
+        subject.set("auth.username", "nested_username")
+
+        config = subject.as_dict()
+        assert config["auth.username"] == "nested_username"
+        assert config["auth.password"] is None
+        assert "auth" not in config
+
+        config = subject.as_dict(process=True)
+        assert config["auth"]["username"] == "nested_username"
+        assert "password" not in config["auth"]
+        assert "auth.username" not in config
+        assert "auth.password" not in config
+
+        subject.set("auth.password", "nested_password")
+
+        config = subject.as_dict()
+        assert config["auth.username"] == "nested_username"
+        assert config["auth.password"] == "nested_password"
+        assert "auth" not in config
+
+        config = subject.as_dict(process=True)
+        assert config["auth"]["username"] == "nested_username"
+        assert config["auth"]["password"] == "nested_password"
+        assert "auth.username" not in config
+        assert "auth.password" not in config
 
     def test_as_dict_custom(
         self, session, project, custom_tap, plugin_settings_service_factory

@@ -18,6 +18,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2334](https://gitlab.com/meltano/meltano/-/issues/2334) Omit keys for settings with `null` values from `config.json` files generated for taps and targets, to support plugins that check if a config key is present instead of checking if the value is non-null.
+
 ### Breaks
 
 
