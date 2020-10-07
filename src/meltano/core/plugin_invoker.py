@@ -49,7 +49,7 @@ class InvokerNotPreparedError(InvokerError):
 
 
 class PluginInvoker:
-    """This class handles the invocation of a `PluginDefinition` instance."""
+    """This class handles the invocation of a `ProjectPlugin` instance."""
 
     def __init__(
         self,
@@ -153,7 +153,11 @@ class PluginInvoker:
         return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
 
     def env(self):
-        env = {**self.settings_service.env, **self.plugin_config_env}
+        env = {
+            **self.project.dotenv_env,
+            **self.settings_service.env,
+            **self.plugin_config_env,
+        }
 
         # Ensure Meltano venv is not inherited
         venv = VirtualEnv(self.project.venvs_dir(self.plugin.type, self.plugin.name))
