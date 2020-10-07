@@ -126,6 +126,7 @@ class PipPluginInstaller:
         self.venv_service = venv_service or VenvService(project)
 
     def install(self, reason):
+        self.venv_service.clean(namespace=self.plugin.type, name=self.plugin.name)
         self.venv_service.create(namespace=self.plugin.type, name=self.plugin.name)
         return self.venv_service.install(
             namespace=self.plugin.type,

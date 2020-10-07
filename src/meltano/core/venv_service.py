@@ -1,7 +1,9 @@
 import subprocess
 import platform
 import sys
+import shutil
 import os
+import logging
 from pathlib import Path
 from collections import namedtuple
 
@@ -9,8 +11,9 @@ from .project import Project
 from .error import SubprocessError
 
 
-VenvSpecs = namedtuple("VenvSpecs", ("lib_dir", "bin_dir", "site_packages_dir"))
+logger = logging.getLogger(__name__)
 
+VenvSpecs = namedtuple("VenvSpecs", ("lib_dir", "bin_dir", "site_packages_dir"))
 
 POSIX = VenvSpecs(
     lib_dir="lib",
@@ -52,9 +55,22 @@ class VenvService:
     def __init__(self, project):
         self.project = project
 
+    def clean(self, namespace="", name=""):
+        venv = VirtualEnv(self.project.venvs_dir(namespace, name))
+        try:
+            shutil.rmtree(str(venv))
+            logger.debug("Removed old virtual environment")
+        except FileNotFoundError:
+            # If the VirtualEnv has never been created before do nothing
+            logger.debug("No old virtual environment to remove")
+            pass
+
+        return
+
     def create(self, namespace="", name=""):
         venv = VirtualEnv(self.project.venvs_dir(namespace, name))
 
+        logger.debug("Creating virtual environment")
         venv_run = subprocess.run(
             [sys.executable, "-m", "venv", str(venv)],
             stdout=subprocess.PIPE,
@@ -106,6 +122,7 @@ class VenvService:
         if meltano_pth_path.exists():
             os.remove(meltano_pth_path)
 
+        logger.debug("Installing into new virtual environment")
         run = subprocess.run(
             [str(python_path), "-m", "pip", "install", *pip_url.split(" ")],
             stdout=subprocess.PIPE,
