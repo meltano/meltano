@@ -15,8 +15,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2057](https://gitlab.com/meltano/meltano/-/issues/2057) Bump Airflow version to 1.10.12
 - [#2224](https://gitlab.com/meltano/meltano/-/issues/2224) Delete (if present) and recreate virtual environments for all plugins when running meltano install.
 
-
 ### Fixes
+
+- [#2376](https://gitlab.com/meltano/meltano/-/issues/2376) Fix `meltano elt ... --transform={run,only}` raising `PluginMissingError` when a default transform for the extractor is discoverable but not installed
 
 ### Breaks
 

@@ -126,20 +126,14 @@ def elt(
             select_filter=select_filter,
             catalog=catalog,
             state=state,
+            config_service=config_service,
             discovery_service=discovery_service,
         )
 
         if dump:
             dump_file(context_builder, dump)
         else:
-            run_job(
-                project,
-                job,
-                session,
-                context_builder,
-                config_service,
-                discovery_service,
-            )
+            run_job(project, job, session, context_builder)
     finally:
         session.close()
 
@@ -159,12 +153,15 @@ def elt_context_builder(
     select_filter=[],
     catalog=None,
     state=None,
+    config_service=None,
     discovery_service=None,
 ):
     transform_name = None
     if transform != "skip":
         transform_name = find_transform_for_extractor(
-            extractor, discovery_service=discovery_service
+            extractor,
+            config_service=config_service,
+            discovery_service=discovery_service,
         )
 
     return (
@@ -203,7 +200,7 @@ def dump_file(context_builder, dumpable):
         raise CliError(f"Could not dump {dumpable}: {err}") from err
 
 
-def run_job(project, job, session, context_builder, config_service, discovery_service):
+def run_job(project, job, session, context_builder):
     job_logging_service = JobLoggingService(project)
 
     with job.run(session), job_logging_service.create_log(
@@ -211,15 +208,7 @@ def run_job(project, job, session, context_builder, config_service, discovery_se
     ) as log_file:
         output_logger = OutputLogger(log_file)
 
-        run_async(
-            run_elt(
-                project,
-                context_builder,
-                output_logger,
-                config_service=config_service,
-                discovery_service=discovery_service,
-            )
-        )
+        run_async(run_elt(project, context_builder, output_logger))
 
 
 def run_async(coro):
@@ -250,9 +239,7 @@ async def redirect_output(output_logger):
             yield
 
 
-async def run_elt(
-    project, context_builder, output_logger, config_service, discovery_service
-):
+async def run_elt(project, context_builder, output_logger):
     async with redirect_output(output_logger):
         try:
             elt_context = context_builder.context()
@@ -351,16 +338,20 @@ async def run_transform(elt_context, output_logger, **kwargs):
     logs("Transformation complete!", fg="green")
 
 
-def find_transform_for_extractor(extractor: str, discovery_service):
+def find_transform_for_extractor(extractor: str, config_service, discovery_service):
     try:
         extractor_plugin_def = discovery_service.find_definition(
             PluginType.EXTRACTORS, extractor
         )
+
         # Check if there is a default transform for this extractor
         transform_plugin_def = discovery_service.find_definition_by_namespace(
             PluginType.TRANSFORMS, extractor_plugin_def.namespace
         )
 
-        return transform_plugin_def.name
-    except PluginNotFoundError:
+        # Check if the transform has been added to the project
+        transform_plugin = config_service.get_plugin(transform_plugin_def)
+
+        return transform_plugin.name
+    except (PluginNotFoundError, PluginMissingError):
         return None
