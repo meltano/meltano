@@ -700,6 +700,42 @@ class TestCliEltScratchpadThree:
         tap,
         target,
         dbt,
+        plugin_discovery_service,
+    ):
+        args = ["elt", tap.name, target.name, "--transform", "only"]
+
+        with mock.patch(
+            "meltano.cli.elt.PluginDiscoveryService",
+            return_value=plugin_discovery_service,
+        ), mock.patch(
+            "meltano.core.elt_context.PluginDiscoveryService",
+            return_value=plugin_discovery_service,
+        ), mock.patch(
+            "meltano.core.transform_add_service.PluginDiscoveryService",
+            return_value=plugin_discovery_service,
+        ), mock.patch.object(
+            DbtRunner, "run", new=CoroutineMock()
+        ):
+            result = cli_runner.invoke(cli, args)
+            assert_cli_runner(result)
+
+            assert_lines(
+                result.output,
+                "meltano | Extract & load skipped.\n",
+                "meltano | Running transformation...\n",
+                "meltano | Transformation complete!\n",
+            )
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    def test_elt_transform_only_with_transform(
+        self,
+        google_tracker,
+        cli_runner,
+        project,
+        tap,
+        target,
+        dbt,
         tap_mock_transform,
         plugin_discovery_service,
     ):
