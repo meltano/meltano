@@ -12,6 +12,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2224](https://gitlab.com/meltano/meltano/-/issues/2224) Delete (if present) and recreate virtual environments for all plugins when running meltano install.
+
+
 ### Fixes
 
 ### Breaks
