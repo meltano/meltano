@@ -191,15 +191,30 @@ using `meltano invoke airflow webserver`.
 However, do take into account Airflow's own
 [Best Practices on Deployment in Production](https://airflow.apache.org/docs/stable/best-practices.html#deployment-in-production). Specifically, you will want to configure Airflow to:
 
-- [use a PostgreSQL (or MySQL) metadata database](https://airflow.apache.org/docs/stable/best-practices.html#database-backend)
-  instead of the SQLite default ([sounds familiar?](#storing-metadata)) by
-  setting the `AIRFLOW__CORE__SQL_ALCHEMY_CONN` environment variable to a
-  [`postgresql://` URI](https://docs.sqlalchemy.org/en/13/core/engines.html#postgresql)
-  (or [`mysql://` URI](https://docs.sqlalchemy.org/en/13/core/engines.html#mysql)),
-  and to
 - [use the `LocalExecutor`](https://airflow.apache.org/docs/stable/best-practices.html#multi-node-cluster)
-  instead of the `SequentialExecutor` default by setting the `AIRFLOW__CORE__EXECUTOR`
-  environment variable to `LocalExecutor`.
+  instead of the `SequentialExecutor` default by setting the `core.executor` setting
+  (or `AIRFLOW__CORE__EXECUTOR` environment variable) to `LocalExecutor`:
+
+  ```bash
+  meltano config airflow set core.executor LocalExecutor
+
+  export AIRFLOW__CORE__EXECUTOR=LocalExecutor
+  ```
+
+- [use a PostgreSQL metadata database](https://airflow.apache.org/docs/stable/best-practices.html#database-backend)
+  instead of the SQLite default ([sounds familiar?](#storing-metadata)) by setting the `core.sql_alchemy_conn` setting
+  (or `AIRFLOW__CORE__SQL_ALCHEMY_CONN` environment variable) to a [`postgresql://` URI](https://docs.sqlalchemy.org/en/13/core/engines.html#postgresql):
+
+  ```bash
+  meltano config airflow set core.sql_alchemy_conn postgresql://...
+
+  export AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://...
+  ```
+
+  For this to work, the [`psycopg2` package](https://pypi.org/project/psycopg2/) will
+  also need to be installed alongside [`apache-airflow`](https://pypi.org/project/apache-airflow/),
+  which you can realize by adding `psycopg2` to `airflow`'s `pip_url` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) (e.g. `pip_url: psycopg2 apache-airflow`)
+  and running [`meltano install orchestrator airflow`](/docs/command-line-interface.html#install).
 
 ### Containerized Meltano project
 
