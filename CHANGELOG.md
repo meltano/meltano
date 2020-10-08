@@ -12,6 +12,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+### Fixes
+
+### Breaks
+
+
+## 1.54.0 - (2020-10-08)
+---
+
+### Changes
+
 - [#2057](https://gitlab.com/meltano/meltano/-/issues/2057) Bump Airflow version to 1.10.12
 - [#2224](https://gitlab.com/meltano/meltano/-/issues/2224) Delete (if present) and recreate virtual environments for all plugins when running meltano install.
 
@@ -20,8 +30,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2334](https://gitlab.com/meltano/meltano/-/issues/2334) Omit keys for settings with `null` values from `config.json` files generated for taps and targets, to support plugins that check if a config key is present instead of checking if the value is non-null.
 - [#2376](https://gitlab.com/meltano/meltano/-/issues/2376) Fix `meltano elt ... --transform={run,only}` raising `PluginMissingError` when a default transform for the extractor is discoverable but not installed
 - [#2377](https://gitlab.com/meltano/meltano/-/issues/2377) Ensure arbitrary env vars defined in `.env` are passed to invoked plugins
-
-### Breaks
 
 
 ## 1.53.0 - (2020-10-06)
