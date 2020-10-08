@@ -157,7 +157,7 @@ module.exports = {
     },
     logo: "/meltano-logo-with-text.svg",
     lastUpdated: "Last Updated",
-    docsDir: "src",
+    docsDir: "docs/src",
     docsRepo: "https://gitlab.com/meltano/meltano",
     editLinks: true,
     editLinkText: "Help us improve this page!",
