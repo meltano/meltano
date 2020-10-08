@@ -1,3 +1,4 @@
+import errno
 import fasteners
 import logging
 import os
@@ -17,6 +18,10 @@ from .error import Error
 from .behavior.versioned import Versioned
 from .utils import makedirs, truthy
 from .meltano_file import MeltanoFile
+
+
+logger = logging.getLogger(__name__)
+
 
 PROJECT_ROOT_ENV = "MELTANO_PROJECT_ROOT"
 PROJECT_READONLY_ENV = "MELTANO_PROJECT_READONLY"
@@ -78,8 +83,15 @@ class Project(Versioned):
                 project.run_dir().joinpath("bin").symlink_to(executable)
         except FileExistsError:
             pass
+        except OSError as e:
+            if e.errno == errno.EOPNOTSUPP:
+                logger.warning(
+                    f"Could not create symlink: {e}\nPlease make sure that the underlying filesystem supports symlinks."
+                )
+            else:
+                raise
 
-        logging.debug(f"Activated project at {project.root}")
+        logger.debug(f"Activated project at {project.root}")
 
         # set the default project
         cls._default = project
@@ -148,7 +160,7 @@ class Project(Versioned):
                     # update if everything is fine
                     yaml.dump(meltano_update, meltanofile, default_flow_style=False, sort_keys=False)
             except Exception as err:
-                logging.critical(f"Could not update meltano.yml: {err}")
+                logger.critical(f"Could not update meltano.yml: {err}")
                 raise
         # fmt: on
 
