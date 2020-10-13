@@ -602,6 +602,10 @@ extractors:
       - name: start_date
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
+      - name: max_workers
+        label: Maximum number of threads to use
+        kind: integer
+        value: 8
   - name: tap-shopify
     label: Shopify
     description: Ecommerce platform
