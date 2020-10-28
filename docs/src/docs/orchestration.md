@@ -133,5 +133,5 @@ Airflow is a full-featured orchestrator that has a lot of features that are curr
 
 ## Meltano UI
 
-While Meltano is optimized for usage through the [`meltano` CLI](/docs/command-line-interface.html)
+While Meltano is optimized for usage through the [`meltano` CLI](/docs/command-line-interface.html),
 basic pipeline management functionality is also available in [the UI](/docs/ui.html#pipelines).
