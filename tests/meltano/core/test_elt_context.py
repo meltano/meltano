@@ -53,7 +53,6 @@ def assert_transformer_env(transformer, env):
         env["MELTANO_TRANSFORM_TARGET"]
         == env["DBT_TARGET"]
         == env["MELTANO_LOAD__DIALECT"]
-        == env["MELTANO_LOADER_NAMESPACE"]
     )
     assert (
         env["MELTANO_TRANSFORM_TARGET_SCHEMA"]

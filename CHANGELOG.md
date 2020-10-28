@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2380](https://gitlab.com/meltano/meltano/-/issues/2380) Add `target_` prefix to `namespace`s of discoverable loaders target-postgres, target-snowflake, and target-sqlite
+
 ### Fixes
 
 ### Breaks
