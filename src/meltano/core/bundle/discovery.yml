@@ -815,6 +815,55 @@ extractors:
         kind: array
         description: An array holding json objects that each describe a set of targeted source files. See docs for details.
 loaders:
+  - name: target-bigquery
+    label: BigQuery
+    description: BigQuery loader
+    namespace: target_bigquery
+    dialect: bigquery
+    variants:
+      - name: transferwise
+        docs: https://meltano.com/plugins/loaders/bigquery--transferwise.html
+        repo: https://github.com/transferwise/pipelinewise-target-bigquery
+        pip_url: pipelinewise-target-bigquery
+        target_schema: $TARGET_BIGQUERY_SCHEMA
+        settings_group_validation:
+          - [dataset_id, project_id]
+        settings:
+          - name: dataset_id
+            description: BigQuery dataset
+          - name: project_id
+            description: BigQuery project
+          - name: temp_schema
+            description: Name of the schema where the temporary tables will be created. Will default to the same schema as the target tables
+          - name: default_target_schema
+            aliases: [schema]
+            env_aliases: [TARGET_BIGQUERY_SCHEMA]
+            value: $MELTANO_EXTRACT__LOAD_SCHEMA
+            description: Name of the schema where the tables will be created. If `schema_mapping` is not defined then every stream sent by the tap is loaded into this schema.
+          - name: schema_mapping
+            kind: hidden
+            description: >
+              Useful if you want to load multiple streams from one tap to multiple BigQuery schemas.
+
+              If the tap sends the `stream_id` in `<schema_name>-<table_name>` format then this option overwrites the `default_target_schema` value. Note, that using `schema_mapping` you can overwrite the `default_target_schema_select_permission` value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.
+          - name: default_target_schema_select_permission
+            description: Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific role or a list of roles. If `schema_mapping` is not defined then every stream sent by the tap is granted accordingly.
+          - name: data_flattening_max_level
+            kind: integer
+            value: 0
+            description: Object type RECORD items from taps can be loaded into VARIANT columns as JSON (default) or we can flatten the schema by creating columns automatically. When value is 0 (default) then flattening functionality is turned off.
+          - name: batch_size_rows
+            kind: integer
+            value: 100000
+            description: Maximum number of rows in each batch. At the end of each batch, the rows in the batch are loaded into BigQuery.
+          - name: add_metadata_columns
+            kind: boolean
+            value: false
+            description: Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in bigquery etc.) Metadata columns are creating automatically by adding extra columns to the tables with a column prefix `_SDC_`. The column names are following the stitch naming conventions documented at https://www.stitchdata.com/docs/data-structure/integration-schemas#sdc-columns. Enabling metadata columns will flag the deleted rows by setting the `_SDC_DELETED_AT` metadata column. Without the `add_metadata_columns` option the deleted rows from singer taps will not be recongisable in BigQuery.
+          - name: hard_delete
+            kind: boolean
+            value: false
+            description: When `hard_delete` option is true then DELETE SQL commands will be performed in BigQuery to delete rows in tables. It's achieved by continuously checking the `_SDC_DELETED_AT` metadata column sent by the singer tap. Due to deleting rows requires metadata columns, `hard_delete` option automatically enables the `add_metadata_columns` option as well.
   - name: target-csv
     label: CSV
     description: CSV loader
