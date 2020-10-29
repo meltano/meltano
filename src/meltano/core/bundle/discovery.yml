@@ -869,7 +869,7 @@ loaders:
   - name: target-postgres
     label: PostgreSQL
     description: PostgreSQL database loader
-    namespace: postgres
+    namespace: target_postgres
     variant: meltano
     docs: 'https://meltano.com/plugins/loaders/postgres.html'
     repo: https://github.com/meltano/target-postgres
@@ -881,36 +881,36 @@ loaders:
       - ['user', 'password', 'host', 'port', 'dbname', 'schema']
     settings:
       - name: url
-        env_aliases: [PG_URL]
+        env_aliases: [PG_URL, POSTGRES_URL]
       - name: user
         aliases: [username]
-        env_aliases: [PG_USERNAME]
+        env_aliases: [PG_USERNAME, POSTGRES_USERNAME]
         value: warehouse
       - name: password
         kind: password
-        env_aliases: [PG_PASSWORD]
+        env_aliases: [PG_PASSWORD, POSTGRES_PASSWORD]
         value: warehouse
       - name: host
         aliases: [address]
-        env_aliases: [PG_ADDRESS]
+        env_aliases: [PG_ADDRESS, POSTGRESS_HOST]
         value: localhost
         protected: true
       - name: port
         kind: integer
-        env_aliases: [PG_PORT]
+        env_aliases: [PG_PORT, POSTGRES_PORT]
         value: 5502
       - name: dbname
         aliases: [database]
         label: Database Name
-        env_aliases: [PG_DATABASE]
+        env_aliases: [PG_DATABASE, POSTGRES_DBNAME]
         value: warehouse
       - name: schema
-        env_aliases: [PG_SCHEMA]
+        env_aliases: [PG_SCHEMA, POSTGRES_SCHEMA]
         value: $MELTANO_EXTRACT__LOAD_SCHEMA
   - name: target-snowflake
     label: Snowflake
     description: Snowflake database loader
-    namespace: snowflake
+    namespace: target_snowflake
     variant: meltano
     docs: 'https://meltano.com/plugins/loaders/snowflake.html'
     repo: https://gitlab.com/meltano/target-snowflake
@@ -920,32 +920,32 @@ loaders:
     target_schema: $TARGET_SNOWFLAKE_SCHEMA
     settings:
       - name: account
-        env_aliases: [SF_ACCOUNT]
+        env_aliases: [SF_ACCOUNT, SNOWFLAKE_ACCOUNT]
         description: This is automatically provided by Snowflake and can be found in the URL.
       - name: username
-        env_aliases: [SF_USER]
+        env_aliases: [SF_USER, SNOWFLAKE_USERNAME]
         description: The username you use for logging in
       - name: password
-        env_aliases: [SF_PASSWORD]
+        env_aliases: [SF_PASSWORD, SNOWFLAKE_PASSWORD]
         kind: password
         description: The password you use for logging in
       - name: role
-        env_aliases: [SF_ROLE]
+        env_aliases: [SF_ROLE, SNOWFLAKE_ROLE]
         description: The role that you have assigned privileges for database access
       - name: database
-        env_aliases: [SF_DATABASE]
+        env_aliases: [SF_DATABASE, SNOWFLAKE_DATABASE]
         description: The name of the Snowflake database you want to use
       - name: warehouse
-        env_aliases: [SF_WAREHOUSE]
+        env_aliases: [SF_WAREHOUSE, SNOWFLAKE_WAREHOUSE]
         description: The name of the Snowflake warehouse you want to use
       - name: schema
-        env_aliases: [SF_SCHEMA]
+        env_aliases: [SF_SCHEMA, SNOWFLAKE_SCHEMA]
         value: $MELTANO_EXTRACT__LOAD_SCHEMA
         value_processor: upcase_string
   - name: target-sqlite
     label: SQLite
     description: SQLite database loader
-    namespace: sqlite
+    namespace: target_sqlite
     variant: meltano
     docs: 'https://meltano.com/plugins/loaders/sqlite.html'
     repo: https://gitlab.com/meltano/target-sqlite
@@ -956,6 +956,7 @@ loaders:
         label: Database Name
         description: '"warehouse" is the default name of the SQLite loader database generated at the project root. Feel free to rename it.'
         value: warehouse
+        env_aliases: [SQLITE_DATABASE]
 transformers:
   - name: dbt
     namespace: dbt

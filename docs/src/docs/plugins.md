@@ -438,7 +438,7 @@ To learn which loaders are [discoverable](#discoverable-plugins) and supported o
 
 - Setting: `_dialect`
 - [Environment variable](/docs/configuration.html#configuring-settings): `<LOADER>__DIALECT`, e.g. `TARGET_POSTGRES__DIALECT`
-- Default: `$MELTANO_LOADER_NAMESPACE`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the loader's `namespace`, e.g. `postgres` for `target-postgres` and `snowflake` for `target-snowflake`
+- Default: `$MELTANO_LOADER_NAMESPACE`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the loader's `namespace`. Note that this default has been overridden on [discoverable](#discoverable-plugins) loaders, e.g. `postgres` for `target-postgres` and `snowflake` for `target-snowflake`.
 
 A loader's `dialect` [extra](/docs/configuration.html#plugin-extras)
 holds the name of the dialect of the target database, so that

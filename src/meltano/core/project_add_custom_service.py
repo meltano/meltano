@@ -23,24 +23,22 @@ class ProjectAddCustomService(ProjectAddService):
         )
         click.echo("- identifier to find related/compatible plugins")
         if plugin_type == PluginType.EXTRACTORS:
-            click.echo("- preferred database schema (`load_schema` extra),")
+            click.echo("- default database schema (`load_schema` extra),")
             click.echo("  for use by loaders that support a target schema")
         elif plugin_type == PluginType.LOADERS:
-            click.echo("- target database dialect (`dialect` extra),")
+            click.echo("- default target database dialect (`dialect` extra),")
             click.echo("  for use by transformers that connect with the database")
         click.echo()
 
-        if plugin_type == PluginType.LOADERS:
-            default_namespace = re.sub(r"^.*target-", "", plugin_name)
-            default_description = "plugin name without `target-` prefix"
-        else:
-            default_namespace = plugin_name.replace("-", "_")
-            default_description = "plugin name with underscores instead of dashes"
-        click.echo(f"Hit Return to accept the default: {default_description}")
+        click.echo(
+            f"Hit Return to accept the default: plugin name with underscores instead of dashes"
+        )
         click.echo()
 
         namespace = click.prompt(
-            click.style("(namespace)", fg="blue"), type=str, default=default_namespace
+            click.style("(namespace)", fg="blue"),
+            type=str,
+            default=plugin_name.replace("-", "_"),
         )
 
         click.echo()
