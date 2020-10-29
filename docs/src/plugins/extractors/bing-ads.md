@@ -6,13 +6,22 @@ description: Use Meltano to extract Bing Ads data from the AdWords API and inser
 
 # Bing Ads
 
-The `tap-bing-ads` extractor pulls raw data from the [Bing Ads API](https://docs.microsoft.com/en-us/advertising/guides/).
+The `tap-bing-ads` [extractor](/plugins/extractors/) pulls raw data from the [Bing Ads API](https://docs.microsoft.com/en-us/advertising/guides/).
 
-For more details, refer to the repository at <https://github.com/singer-io/tap-bing-ads>.
+For more information, refer to the repository at <https://github.com/singer-io/tap-bing-ads>.
 
-## Installation
+## Getting Started
 
-### Using the Command Line Interface
+### Prerequisites
+
+If you haven't already, follow the initial steps of the [Getting Started guide](/docs/getting-started.html):
+
+1. [Install Meltano](/docs/getting-started.html#install-meltano)
+1. [Create your Meltano project](/docs/getting-started.html#create-your-meltano-project)
+
+### Installation and configuration
+
+#### Using the Command Line Interface
 
 1. Add the `tap-bing-ads` extractor to your project using [`meltano add`](/docs/command-line-interface.html#add):
 
@@ -22,7 +31,7 @@ For more details, refer to the repository at <https://github.com/singer-io/tap-b
 
 1. Configure the [settings](#settings) below using [`meltano config`](/docs/command-line-interface.html#config).
 
-### Using Meltano UI
+#### Using Meltano UI
 
 1. Start [Meltano UI](/docs/ui.html) using [`meltano ui`](/docs/command-line-interface.html#ui):
 
@@ -33,6 +42,14 @@ For more details, refer to the repository at <https://github.com/singer-io/tap-b
 1. Open the Extractors interface at <http://localhost:5000/extractors>.
 1. Click the "Add to project" button for "Bing Ads".
 1. Configure the [settings](#settings) below in the "Configuration" interface that opens automatically.
+
+### Next steps
+
+Follow the remaining steps of the [Getting Started guide](/docs/getting-started.html):
+
+1. [Select entities and attributes to extract](/docs/getting-started.html#select-entities-and-attributes-to-extract)
+1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
+1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
 ## Settings
 
