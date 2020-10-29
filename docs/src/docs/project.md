@@ -98,7 +98,7 @@ plugins:
 
 A plugin's [configuration](/docs/configuration.html) is stored under a `config` key. Values for [plugin extras](/docs/configuration.html#plugin-extras) are stored among the plugin's other properties, outside of the `config` object:
 
-```yaml{7-8}
+```yaml{4-8}
 extractors:
 - name: tap-example
   pip_url: tap-example
