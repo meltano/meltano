@@ -34,7 +34,7 @@ def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessio
         raise ValueError("No engine registered for this project.")
 
     logging.debug(f"Creating engine {project}@{engine_uri}")
-    engine = create_engine(engine_uri)
+    engine = create_engine(engine_uri, pool_pre_ping=True)
 
     init_hook(engine)
 
