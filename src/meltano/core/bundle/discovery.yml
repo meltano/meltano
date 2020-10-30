@@ -1137,7 +1137,7 @@ orchestrators:
     namespace: airflow
     docs: https://meltano.com/docs/orchestration.md
     repo: https://github.com/apache/airflow
-    pip_url: 'apache-airflow==1.10.12'
+    pip_url: 'apache-airflow==1.10.12 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-1.10.12/constraints-3.6.txt'
     settings:
       - name: core.dags_folder
         value: $MELTANO_PROJECT_ROOT/orchestrate/dags
