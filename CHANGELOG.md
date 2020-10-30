@@ -10,8 +10,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2368](https://gitlab.com/meltano/meltano/-/issues/2368) Add `transferwise` and `datamill-co` variants of `target-snowflake`
+
 ### Changes
 
+- [#2368](https://gitlab.com/meltano/meltano/-/issues/2368) Make `datamill-co` variant of `target-snowflake` the default instead of `meltano`
 - [#2380](https://gitlab.com/meltano/meltano/-/issues/2380) Add `target_` prefix to `namespace`s of discoverable loaders target-postgres, target-snowflake, and target-sqlite
 
 ### Fixes
