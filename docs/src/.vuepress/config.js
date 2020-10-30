@@ -103,11 +103,11 @@ module.exports = {
   themeConfig: {
     nav: [
       {
-        text: "Extractors",
+        text: "Sources",
         link: "/plugins/extractors/",
       },
       {
-        text: "Loaders",
+        text: "Destinations",
         link: "/plugins/loaders/",
       },
       {

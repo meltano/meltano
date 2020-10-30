@@ -2,11 +2,10 @@
 description: Use Meltano to easily extract data out of arbitrary data sources (databases, SaaS APIs, and file formats) using Singer taps.
 ---
 
-# Extractors: Data Sources
+# Sources (Extractors)
 
 Meltano lets you easily extract data out of arbitrary data sources (databases, SaaS APIs, and file formats) using [Singer taps](https://www.singer.io/), which take the role of [your project](/docs/project.html)'s [extractor plugins](/docs/plugins.html#extractors).
 
-To learn more about extracting and [loading](/plugins/loaders/) data using Meltano, refer to the [Data Integration (EL) guide](/docs/integration.html).
 
 Extractors for the following sources are currently [discoverable](/docs/plugins.html#discoverable-plugins) and supported out of the box:
 
@@ -24,6 +23,8 @@ Extractors for the following sources are currently [discoverable](/docs/plugins.
 - [Spreadsheets Anywhere](/plugins/extractors/spreadsheets-anywhere.html) (Excel or CSVs on localhost or Cloud storage)
 - [Stripe](/plugins/extractors/stripe.html)
 - [Zendesk](/plugins/extractors/zendesk.html)
+
+To learn more about extracting and [loading](/plugins/loaders/) data using Meltano, refer to the [Data Integration (EL) guide](/docs/integration.html).
 
 ::: tip Don't see your data source listed here?
 

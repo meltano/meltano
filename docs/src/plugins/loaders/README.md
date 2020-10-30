@@ -2,19 +2,19 @@
 description: Use Meltano to easily load extracted data into arbitrary data destinations (databases, SaaS APIs, and file formats) using Singer targets.
 ---
 
-# Loaders: Data Destinations
+# Destinations (Loaders)
 
 Meltano lets you easily load [extracted](/plugins/extractors/) data into arbitrary data destinations (databases, SaaS APIs, and file formats) using [Singer targets](https://www.singer.io/), which take the role of [your project](/docs/project.html)'s [loader plugins](/docs/plugins.html#loaders).
 
-To learn more about [extracting](/plugins/loaders/) and loading data using Meltano, refer to the [Data Integration (EL) guide](/docs/integration.html).
-
 Loaders for the following destinations are currently [discoverable](/docs/plugins.html#discoverable-plugins) and supported out of the box:
 
-- [Comma Separated Values (CSV) file](/plugins/loaders/csv.html)
-- [JSON Lines (JSON) file](/plugins/loaders/jsonl.html)
-- [Snowflake Data Warehouse](/plugins/loaders/snowflake.html)
-- [PostgreSQL Database](/plugins/loaders/postgres.html)
-- [SQLite Database](/plugins/loaders/sqlite.html)
+- [Snowflake](/plugins/loaders/snowflake.html)
+- [PostgreSQL](/plugins/loaders/postgres.html)
+- [SQLite](/plugins/loaders/sqlite.html)
+- [Comma Separated Values (CSV file)](/plugins/loaders/csv.html)
+- [JSON Lines (JSONL file)](/plugins/loaders/jsonl.html)
+
+To learn more about [extracting](/plugins/loaders/) and loading data using Meltano, refer to the [Data Integration (EL) guide](/docs/integration.html).
 
 ::: tip Don't see your data destination listed here?
 
