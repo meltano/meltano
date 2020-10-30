@@ -1,7 +1,6 @@
 ---
 sidebar: auto
-metaTitle: Extract Bing Ads Data
-description: Use Meltano to extract Bing Ads data from the AdWords API and insert it into Postgres, Snowflake, and more.
+description: Use Meltano to pull data from the Bing Ads API and load it into Snowflake, Postgres, and more
 ---
 
 # Bing Ads
@@ -62,6 +61,31 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 - [Account IDs](#account-ids)
 - [Refresh Token](#refresh-token)
 - [Start Date](#start-date)
+
+#### Minimal configuration
+
+A minimal configuration of `tap-bing-ads` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
+
+```yml{6-9}
+plugins:
+  extractors:
+  - name: tap-bing-ads
+    variant: singer-io
+    pip_url: tap-bing-ads
+    config:
+      customer_id: 163875182
+      account_ids: 163078754
+      start_date: '2020-10-01T00:00:00Z'
+```
+
+Sensitive values are most appropriately stored in [the environment](/docs/configuration.html#configuring-settings) or your project's [`.env` file](/docs/project.html#env):
+
+```bash
+export OAUTH_BING_ADS_DEVELOPER_TOKEN=my_developer_token
+export OAUTH_BING_ADS_CLIENT_ID=my_client_id
+export OAUTH_BING_ADS_CLIENT_SECRET=my_client_secret
+export TAP_BING_ADS_REFRESH_TOKEN=my_refresh_token
+```
 
 ### Developer Token
 
