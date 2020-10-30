@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1956](https://gitlab.com/meltano/meltano/-/issues/1956) Add support for Python 3.8
+
 ### Changes
 
 - [#2380](https://gitlab.com/meltano/meltano/-/issues/2380) Add `target_` prefix to `namespace`s of discoverable loaders target-postgres, target-snowflake, and target-sqlite
