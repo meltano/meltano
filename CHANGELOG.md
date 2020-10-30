@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.55.0 - (2020-10-30)
+---
+
+### New
+
 - [#2368](https://gitlab.com/meltano/meltano/-/issues/2368) Add `transferwise` and `datamill-co` variants of `target-snowflake`
 
 ### Changes
@@ -22,8 +34,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2373](https://gitlab.com/meltano/meltano/-/issues/2373) `meltano init` emits warning instead of failing when underlying filesystem doesn't support symlinks
 - [#2391](https://gitlab.com/meltano/meltano/-/issues/2391) Add missing `max_workers` setting to `tap-salesforce` discoverable plugin definition
 - [#2400](https://gitlab.com/meltano/meltano/-/issues/2400) Constrain Airflow installation to specific set of known-to-work requirements to prevent it from breaking unexpectedly
-
-### Breaks
 
 
 ## 1.54.0 - (2020-10-08)
