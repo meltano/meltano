@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+- [#2374](https://gitlab.com/meltano/meltano/-/issues/2374) Add `target-bigquery` discoverable plugin definition
 
 ### Changes
 

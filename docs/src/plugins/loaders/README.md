@@ -8,11 +8,12 @@ Meltano lets you easily load [extracted](/plugins/extractors/) data into arbitra
 
 Loaders for the following destinations are currently [discoverable](/docs/plugins.html#discoverable-plugins) and supported out of the box:
 
-- [Snowflake](/plugins/loaders/snowflake.html)
-- [PostgreSQL](/plugins/loaders/postgres.html)
-- [SQLite](/plugins/loaders/sqlite.html)
+- [BigQuery](/plugins/loaders/bigquery.html)
 - [Comma Separated Values (CSV file)](/plugins/loaders/csv.html)
 - [JSON Lines (JSONL file)](/plugins/loaders/jsonl.html)
+- [PostgreSQL](/plugins/loaders/postgres.html)
+- [SQLite](/plugins/loaders/sqlite.html)
+- [Snowflake](/plugins/loaders/snowflake.html)
 
 To learn more about [extracting](/plugins/loaders/) and loading data using Meltano, refer to the [Data Integration (EL) guide](/docs/integration.html).
 

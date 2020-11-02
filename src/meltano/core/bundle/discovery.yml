@@ -819,6 +819,54 @@ extractors:
         kind: array
         description: An array holding json objects that each describe a set of targeted source files. See docs for details.
 loaders:
+  - name: target-bigquery
+    label: BigQuery
+    description: BigQuery loader
+    namespace: target_bigquery
+    variant: adswerve
+    docs: https://meltano.com/plugins/loaders/bigquery.html
+    repo: https://github.com/adswerve/target-bigquery
+    pip_url: git+https://github.com/adswerve/target-bigquery.git@v0.10.2
+    dialect: bigquery
+    settings_group_validation:
+      - ['project_id', 'dataset_id', 'location', 'credentials_path']
+    settings:
+      - name: project_id
+        description: BigQuery project
+      - name: dataset_id
+        description: BigQuery dataset
+      - name: location
+        description: Dataset location
+        value: US
+      - name: credentials_path
+        # The target doesn't know this setting, but will read the GOOGLE_APPLICATION_CREDENTIALS env var.
+        env_aliases: [GOOGLE_APPLICATION_CREDENTIALS]
+        value: $MELTANO_PROJECT_ROOT/client_secrets.json
+        description: Fully qualified path to `client_secrets.json` for your service account.
+      - name: validate_records
+        description: Validate records
+        kind: boolean
+        value: false
+      - name: add_metadata_columns
+        description: Add `_time_extracted` and `_time_loaded` metadata columns
+        kind: boolean
+        value: false
+      - name: replication_method
+        description: Replication method, `append` or `truncate`
+        kind: options
+        options:
+          - label: Append
+            value: append
+          - label: Truncate
+            value: truncate
+        value: append
+      - name: table_prefix
+        description: Add prefix to table name
+      - name: table_suffix
+        description: Add suffix to table name
+      - name: max_cache
+        description: Maximum cache size in MB
+        value: 50
   - name: target-csv
     label: CSV
     description: CSV loader
