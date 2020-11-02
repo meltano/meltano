@@ -1,27 +1,30 @@
 .build_prod:
-  extends: .docker_build
+  extends:
+  - .docker_build
+  - .parallel:python_version
   stage: build-meltano
   variables:
     DOCKERFILE: docker/prod/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE
-    IMAGE_TAG: $CI_COMMIT_SHA
+    IMAGE_TAG: $CI_COMMIT_SHA-python$PYTHON_VERSION
   before_script:
     - source .gitlab/ci/scripts/docker_build_before_script.sh
-    - export EXTRA_ARGS="--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/base:$BASE_SHA"
+    - export EXTRA_ARGS="--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/base:$BASE_SHA-python$PYTHON_VERSION"
   artifacts:
     paths:
       - dist
 
 # Manages:
-#  - meltano/meltano:<sha>
+#  - meltano/meltano:<sha>-python<version>
 meltano_dev:
   extends: .build_prod
+  only:
+    - branches@meltano/meltano
   except:
     - master
-    - tags
 
 # Manages:
-#  - <fork namespace>/meltano:<sha>
+#  - <fork namespace>/meltano:<sha>-python<version>
 meltano_dev_forks:
   extends: .build_prod
   except:
@@ -29,7 +32,8 @@ meltano_dev_forks:
     - tags@meltano/meltano
 
 # Manages:
-#  - meltano/meltano:<sha>
+#  - meltano/meltano:<sha>-python<version>
+#  - meltano/meltano:edge-python<version>
 #  - meltano/meltano:edge
 meltano_edge:
   extends:
@@ -37,11 +41,17 @@ meltano_edge:
     - .only:master
   script:
     - source .gitlab/ci/scripts/docker_build_script.sh
-    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:edge
-    - docker push $IMAGE_NAME:edge
+
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:edge-python$PYTHON_VERSION
+    - docker push $IMAGE_NAME:edge-python$PYTHON_VERSION
+
+    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:edge || true'
+    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:edge || true'
 
 # Manages:
-#  - meltano/meltano:<sha>
+#  - meltano/meltano:<sha>-python<version>
+#  - meltano/meltano:<tag>-python<version>
+#  - meltano/meltano:latest-python<version>
 #  - meltano/meltano:<tag>
 #  - meltano/meltano:latest
 meltano:
@@ -50,7 +60,15 @@ meltano:
     - .only:version-tags
   script:
     - source .gitlab/ci/scripts/docker_build_script.sh
-    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG
-    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
-    - docker push $IMAGE_NAME:$CI_COMMIT_TAG
-    - docker push $IMAGE_NAME:latest
+
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG-python$PYTHON_VERSION
+    - docker push $IMAGE_NAME:$CI_COMMIT_TAG-python$PYTHON_VERSION
+
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest-python$PYTHON_VERSION
+    - docker push $IMAGE_NAME:latest-python$PYTHON_VERSION
+
+    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG || true'
+    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:$CI_COMMIT_TAG || true'
+
+    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest || true'
+    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:latest || true'

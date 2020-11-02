@@ -1,4 +1,6 @@
-FROM python:3.6
+ARG PYTHON_VERSION=3.6
+FROM python:$PYTHON_VERSION
+
 ENV NODE_VERSION 10
 
 RUN echo "Installing system deps" \
