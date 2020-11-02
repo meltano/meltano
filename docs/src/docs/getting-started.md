@@ -69,6 +69,9 @@ you can use the [`meltano/meltano` Docker image](https://hub.docker.com/r/meltan
     docker pull meltano/meltano:latest
     ```
 
+    By default, this image comes with the oldest version of Python supported by Meltano, currently 3.6.
+    If you'd like to use Python 3.7 or 3.8 instead, add a `-python<X.Y>` suffix to the image tag, e.g. `latest-python3.8`.
+
 1. Optionally, verify that the [`meltano` CLI](/docs/command-line-interface.html) is now available through the Docker image by viewing the version:
 
     ```bash

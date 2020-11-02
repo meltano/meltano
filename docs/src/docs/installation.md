@@ -127,15 +127,21 @@ Now that you've installed Meltano and its requirements, you can continue setting
 
 ### Using Pre-built Docker Images
 
-We provide the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docker image with Meltano pre-installed and ready to use.
+We maintain the [`meltano/meltano`](https://hub.docker.com/r/meltano/meltano) Docker image on DockerHub, which comes with Python and Meltano pre-installed.
 
-> Note: The **meltano/meltano** docker image is also available in GitLab's registry: `registry.gitlab.com`
+To get the latest version of Meltano, pull the `latest` tag. Images for specific versions of Meltano are tagged `v<X.Y.Z>`, e.g. `v1.55.0`.
 
-This image contains everything you need to get started with Meltano.
+By default, these images come with the oldest version of Python supported by Meltano, currently 3.6.
+If you'd like to use Python 3.7 or 3.8 instead, add a `-python<X.Y>` suffix to the image tag, e.g. `latest-python3.8` and `v1.54.0-python3.7`.
 
 ```bash
 # download or update to the latest version
 docker pull meltano/meltano
+
+# Or choose a specific version of Meltano and/or Python:
+# docker pull meltano/meltano:v1.55.0
+# docker pull meltano/meltano:latest-python3.7
+# docker pull meltano/meltano:v1.55.0-python3.8
 
 # check the currently installed version
 docker run meltano/meltano --version
