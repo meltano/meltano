@@ -16,9 +16,10 @@
 #  - meltano/meltano:<sha>
 meltano_dev:
   extends: .build_prod
+  only:
+    - branches@meltano/meltano
   except:
     - master
-    - tags
 
 # Manages:
 #  - <fork namespace>/meltano:<sha>
