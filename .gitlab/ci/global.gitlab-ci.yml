@@ -14,3 +14,8 @@
   parallel:
     matrix:
       - PYTHON_VERSION: ["3.6", "3.7", "3.8"]
+
+.parallel:image_tag_suffix:
+  parallel:
+    matrix:
+      - IMAGE_TAG_SUFFIX: ["", "-python3.6", "-python3.7", "-python3.8"]
