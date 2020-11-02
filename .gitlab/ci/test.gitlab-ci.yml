@@ -1,7 +1,8 @@
 .test:
+  extends: .parallel:python_version
   stage: test
   image:
-    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python$PYTHON_VERSION
     entrypoint: [""]
   before_script:
     - pip install '.[dev]'
