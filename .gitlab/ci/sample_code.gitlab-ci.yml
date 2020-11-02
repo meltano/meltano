@@ -1,4 +1,5 @@
 .sample_code:
+  extends: .parallel:python_version
   stage: test
   image: python:$PYTHON_VERSION
   variables:
@@ -15,9 +16,6 @@
     MELTANO_DISABLE_TRACKING: "true"
   services:
     - postgres:11
-  parallel:
-    matrix:
-      - PYTHON_VERSION: ["3.6", "3.7", "3.8"]
 
 homepage_sample_code:
   extends: .sample_code
