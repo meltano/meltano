@@ -5,7 +5,7 @@ description: Use Meltano to pull data from various sources and load it into Snow
 
 # Snowflake (`meltano` variant)
 
-The `target-snowflake` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into the [Snowflake](https://www.snowflake.com/) data warehouse.
+The `target-snowflake` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [Snowflake](https://www.snowflake.com/) data warehouse.
 
 For more information, refer to the repository at <https://gitlab.com/meltano/target-snowflake>.
 

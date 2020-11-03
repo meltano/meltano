@@ -5,7 +5,7 @@ description: Use Meltano to pull data from various sources and load it into BigQ
 
 # BigQuery
 
-The `target-bigquery` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into the [BigQuery](https://cloud.google.com/bigquery) data warehouse.
+The `target-bigquery` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [BigQuery](https://cloud.google.com/bigquery) data warehouse.
 
 For more information, refer to the repository at <https://github.com/adswerve/target-bigquery>.
 
