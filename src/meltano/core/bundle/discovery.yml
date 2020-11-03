@@ -220,30 +220,44 @@ extractors:
       - name: api_url
         label: GitLab Instance
         value: 'https://gitlab.com'
+        description: GitLab API/instance URL. When an API path is omitted, `/api/v4/` is assumed.
         protected: true
       - name: private_token
-        label: Access Token
-        kind: password
-        placeholder: Ex. *****************
-        value: ""
         env_aliases: [GITLAB_API_TOKEN]
+        kind: password
+        value: ""
+        label: Access Token
+        description: GitLab personal access token or other API token.
+        placeholder: Ex. *****************
       - name: groups
-        label: Group
-        value: ''
-        placeholder: Ex. my-organization
         env_aliases: [GITLAB_API_GROUPS]
-      - name: projects
-        label: Project
         value: ''
-        placeholder: Ex. my-organization/project-1
+        label: Groups
+        description: Space-separated names of groups to extract data from. Leave empty and provide a project name if you'd like to pull data from a project in a personal user namespace.
+        placeholder: Ex. my-organization
+      - name: projects
         env_aliases: [GITLAB_API_PROJECTS]
+        value: ''
+        label: Project
+        description: Space-separated `namespace/project` paths of projects to extract data from. Leave empty and provide a group name to extract data from all group projects.
+        placeholder: Ex. my-organization/project-1
       - name: ultimate_license
-        value: false
-        kind: boolean
         env_aliases: [GITLAB_API_ULTIMATE_LICENSE]
+        kind: boolean
+        value: false
+        description: Enable to pull in extra data (like Epics, Epic Issues and other entities) only available to GitLab Ultimate and GitLab.com Gold accounts.
+      - name: fetch_merge_request_commits
+        kind: boolean
+        value: false
+        description: For each Merge Request, also fetch the MR's commits and create the join table `merge_request_commits` with the Merge Request and related Commit IDs. This can slow down extraction considerably because of the many API calls required.
+      - name: fetch_pipelines_extended
+        kind: boolean
+        value: false
+        description: For every Pipeline, also fetch extended details of each of these pipelines. This can slow down extraction considerably because of the many API calls required.
       - name: start_date
         env_aliases: [GITLAB_API_START_DATE]
         kind: date_iso8601
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
   - name: tap-adwords
     label: Google Ads
     description: Advertising Platform

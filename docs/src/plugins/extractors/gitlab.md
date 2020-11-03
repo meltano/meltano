@@ -1,58 +1,116 @@
 ---
 sidebar: auto
-metaTitle: Extract Data from GitLab
-description: Use Meltano to extract raw data from GitLab and insert it into Postgres, Snowflake, and more.
+description: Use Meltano to pull data from the GitLab API and load it into Snowflake, Postgres, and more
 ---
 
 # GitLab
 
-The GitLab extractor pulls raw data from GitLab's [REST API](https://docs.gitlab.com/ee/api/README.html) and extracts the following resources from GitLab:
+The `tap-gitlab` [extractor](/plugins/extractors/) pulls raw data from the [GitLab API](https://docs.gitlab.com/ee/api/).
 
-- [Branches](https://docs.gitlab.com/ee/api/branches.html)
-- [Commits](https://docs.gitlab.com/ee/api/commits.html)
-- [Issues](https://docs.gitlab.com/ee/api/issues.html)
-- [Projects](https://docs.gitlab.com/ee/api/projects.html)
-- [Project milestones](https://docs.gitlab.com/ee/api/milestones.html)
-- [Project Merge Requests](https://docs.gitlab.com/ee/api/merge_requests.html)
-- [Users](https://docs.gitlab.com/ee/api/users.html)
-- [Groups](https://docs.gitlab.com/ee/api/group_milestones.html)
-- [Group Milestones](https://docs.gitlab.com/ee/api/users.html)
-- [Group and Project members](https://docs.gitlab.com/ee/api/members.html)
-- [Tags](https://docs.gitlab.com/ee/api/tags.html)
-- [Releases](https://docs.gitlab.com/ee/api/releases/index.html)
-- [Group Labels](https://docs.gitlab.com/ee/api/group_labels.html)
-- [Project Labels](https://docs.gitlab.com/ee/api/labels.html)
-- [Epics](https://docs.gitlab.com/ee/api/epics.html) (only available for GitLab Ultimate and GitLab.com Gold accounts)
-- [Epic Issues](https://docs.gitlab.com/ee/api/epic_issues.html) (only available for GitLab Ultimate and GitLab.com Gold accounts)
+For more information, refer to the repository at <https://gitlab.com/meltano/tap-gitlab>.
 
-For more information you can check [the documentation for tap-gitlab](https://gitlab.com/meltano/tap-gitlab).
+## Getting Started
 
-## GitLab Setup
+### Prerequisites
 
-In order to access your GitLab data, you will need:
+If you haven't already, follow the initial steps of the [Getting Started guide](/docs/getting-started.html):
 
-- GitLab Instance
-- Access Token
-- Group OR Project
-- Start Date
+1. [Install Meltano](/docs/getting-started.html#install-meltano)
+1. [Create your Meltano project](/docs/getting-started.html#create-your-meltano-project)
 
-<h3 id="api-url">GitLab Instance</h3>
+### Installation and configuration
 
-:::tip Configuration Notes
+#### Using the Command Line Interface
 
-- `https://gitlab.com` is the default, but if you have a self-hosted GitLab instance [please reach out to us](mailto:hello@meltano.com)
+1. Add the `tap-gitlab` extractor to your project using [`meltano add`](/docs/command-line-interface.html#add):
 
-:::
+    ```bash
+    meltano add extractor tap-gitlab
+    ```
 
-<h3 id="private-token">Access Token</h3>
+1. Configure the [settings](#settings) below using [`meltano config`](/docs/command-line-interface.html#config).
 
-:::tip Configuration Notes
+#### Using Meltano UI
 
-- Full access to GitLab's API requires a personal access token that will authenticate you with the server
+1. Start [Meltano UI](/docs/ui.html) using [`meltano ui`](/docs/command-line-interface.html#ui):
 
-:::
+    ```bash
+    meltano ui
+    ```
 
-The process for getting the access token is very simple:
+1. Open the Extractors interface at <http://localhost:5000/extractors>.
+1. Click the "Add to project" button for "GitLab".
+1. Configure the [settings](#settings) below in the "Configuration" interface that opens automatically.
+
+### Next steps
+
+Follow the remaining steps of the [Getting Started guide](/docs/getting-started.html):
+
+1. [Select entities and attributes to extract](/docs/getting-started.html#select-entities-and-attributes-to-extract)
+1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
+1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
+
+## Settings
+
+`tap-gitlab` requires the [configuration](/docs/configuration.html) of the following settings:
+
+- [API URL](#api-url)
+- [Private Token](#private-token), unless groups and projects are public
+- [Groups](#groups) or [Projects](#projects)
+- [Start Date](#start-date)
+
+These and other supported settings are documented below.
+To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
+
+#### Minimal configuration
+
+A minimal configuration of `tap-gitlab` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
+
+```yml{6-8}
+plugins:
+  extractors:
+  - name: tap-gitlab
+    variant: meltano
+    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+    config:
+      projects: meltano/meltano meltano/tap-gitlab
+      start_date: '2020-10-01T00:00:00Z'
+```
+
+Sensitive values are most appropriately stored in [the environment](/docs/configuration.html#configuring-settings) or your project's [`.env` file](/docs/project.html#env):
+
+```bash
+export TAP_GITLAB_PRIVATE_TOKEN=my_private_token
+```
+
+### API URL
+
+- Name: `api_url`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GITLAB_API_URL`
+- Default: `https://gitlab.com`
+
+GitLab API/instance URL. When an API path is omitted, `/api/v4/` is assumed.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-gitlab set api_url https://gitlab.example.com
+
+export TAP_GITLAB_API_URL=https://gitlab.example.com
+```
+
+### Private Token
+
+- Name: `private_token`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GITLAB_PRIVATE_TOKEN`, alias: `GITLAB_API_TOKEN`
+
+GitLab personal access token or other API token.
+
+#### How to get
+
+The process for getting the private token or personal access token is very simple:
 
 <video controls style="max-width: 100%">
   <source src="/screenshots/personal-access-token.mov">
@@ -69,85 +127,159 @@ The process for getting the access token is very simple:
 
 3. Click on `Create personal access token` to submit your request.
 
-4. You should see your token appear at the top of your screen.
+4. You should see your token appear at the top of your screen. It should look something like this: `I8vxHsiVAaDnAX3hA`
 
-5. Copy and paste the token into the `Private Token` field. It should look something like this: `I8vxHsiVAaDnAX3hA`
+#### How to use
 
-### Group
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
-:::tip Configuration Notes
+```bash
+meltano config tap-gitlab set private_token <token>
 
-- Leave empty if you'd like to pull data from a project in a personal user namespace
+export TAP_GITLAB_PRIVATE_TOKEN=<token>
+```
 
-:::
+### Groups
 
-This property allows you to scope data that the extractor fetches to only the desired group. The group name can generally be found at the root of a repository's URL. If this is left blank, you have to at least provide a project.
+- Name: `groups`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GITLAB_GROUPS`, alias: `GITLAB_API_GROUPS`
 
-For example, `https://www.gitlab.com/meltano/tap-gitlab` has a group of `meltano`. This can be confirmed as well by visiting `https://gitlab.com/meltano` and noting the Group ID below the header.
+This property allows you to scope data that the extractor fetches to only the desired group. The group name can generally be found at the root of a repository's URL. If this is left blank, you have to at least provide a [project](#projects).
 
-![Group ID verification example](/screenshots/group-header-example.png)
+Leave empty if you'd like to pull data from a project in a personal user namespace.
+
+For example, `https://www.gitlab.com/meltano/tap-gitlab` has a group of `meltano`.
+
+Multiple group names can be separated using space characters.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-gitlab set groups "<group1> <group2>"
+
+export TAP_GITLAB_GROUPS="<group1> <group2>"
+
+# For example:
+meltano config tap-gitlab set groups meltano
+meltano config tap-gitlab set groups "meltano gitlab"
+
+export TAP_GITLAB_GROUPS=meltano
+export TAP_GITLAB_GROUPS="meltano gitlab"
+```
 
 ### Projects
 
-:::tip Configuration Notes
+- Name: `projects`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GITLAB_PROJECTS`, alias: `GITLAB_API_PROJECTS`
 
-- Space separated paths of projects to pull data from, in `namespace/project` format
-- Leave empty if you've specified one or more groups and would like to pull data from all projects inside these groups
+This property allows you to scope the project(s) that the extractor fetches.
 
-:::
+Leave empty if you've specified one or more [groups](#groups) and would like to pull data from all projects inside these groups.
 
-This property allows you to scope the project that the service fetches, but it is completely optional. If this is left blank, the extractor will try to fetch all projects that it can grab.
-
-If you want to configure this, the format for it is `group/project`. Here are a couple examples:
+The format for it is `namespace/project`, where namespace can be a username or group name. Here are a couple examples:
 
 - `meltano/meltano` - The core [Meltano project](https://gitlab.com/meltano/)
 - `meltano/tap-gitlab` - The project for the [GitLab Extractor](https://gitlab.com/meltano/tap-gitlab)
 
+Multiple group paths can be separated using space characters.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-gitlab set projects "<namespace1/project1> <namespace2/project2>"
+
+export TAP_GITLAB_PROJECTS="<namespace1/project1> <namespace2/project2>"
+
+# For example:
+meltano config tap-gitlab set projects meltano/meltano
+meltano config tap-gitlab set projects "meltano/meltano meltano/tap-gitlab"
+
+export TAP_GITLAB_PROJECTS=meltano/meltano
+export TAP_GITLAB_PROJECTS="meltano/meltano meltano/tap-gitlab"
+```
+
 ### Ultimate License
 
-:::tip Configuration Notes
+- Name: `ultimate_license`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GITLAB_ULTIMATE_LICENSE`, alias: `GITLAB_API_ULTIMATE_LICENSE`
+- Default: `false`
 
-- Pull in extra data (like Epics, Epic Issues and other entities) only available to GitLab Ultimate and GitLab.com Gold accounts.
+Enable to pull in extra data (like Epics, Epic Issues and other entities) only available to GitLab Ultimate and GitLab.com Gold accounts.
 
-:::
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-gitlab set ultimate_license true
+
+export TAP_GITLAB_ULTIMATE_LICENSE=true
+```
+
+### Fetch Merge Request Commits
+
+- Name: `fetch_merge_request_commits`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GITLAB_FETCH_MERGE_REQUEST_COMMITS`
+- Default: `false`
+
+For each Merge Request, also fetch the MR's commits and create the join table `merge_request_commits` with the Merge Request and related Commit IDs.
+
+This can slow down extraction considerably because of the many API calls required.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-gitlab set fetch_merge_request_commits true
+
+export TAP_GITLAB_FETCH_MERGE_REQUEST_COMMITS=true
+```
+
+### Fetch Pipelines Extended
+
+- Name: `fetch_pipelines_extended`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GITLAB_FETCH_PIPELINES_EXTENDED`
+- Default: `false`
+
+For every Pipeline, also fetch extended details of each of these pipelines.
+
+This can slow down extraction considerably because of the many API calls required.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-gitlab set fetch_pipelines_extended true
+
+export TAP_GITLAB_FETCH_PIPELINES_EXTENDED=true
+```
 
 ### Start Date
+
+- Name: `start_date`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GITLAB_START_DATE`, alias: `GITLAB_API_START_DATE`
 
 This property determines how much historical data will be extracted.
 
 Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
-## Advanced: Command Line Installation
+#### How to use
 
-1. Navigate to your Meltano project in the terminal
-1. Run the following command:
-
-```bash
-meltano add extractor tap-gitlab
-```
-
-If you are successful, you should see `Added and installed extractors 'tap-gitlab'` in your terminal.
-
-### Configuration
-
-1. Open your project's `.env` file in a text editor
-1. Add the following variables to your file:
-
-Required:
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-export GITLAB_API_TOKEN="private access token"
-export GITLAB_API_GROUPS="myorg mygroup"
-export GITLAB_API_PROJECTS="myorg/repo-a myorg/repo-b"
-export GITLAB_API_START_DATE="YYYY-MM-DDTHH:MM:SSZ" # e.g. 2019-10-31T00:00:00Z
+meltano config tap-gitlab set start_date YYYY-MM-DDTHH:MM:SSZ
+
+export TAP_GITLAB_START_DATE=YYYY-MM-DDTHH:MM:SSZ
+
+# For example:
+meltano config tap-gitlab set start_date 2020-10-01T00:00:00Z
+
+export TAP_GITLAB_START_DATE=2020-10-01T00:00:00Z
 ```
-
-Optional:
-
-```bash
-export GITLAB_API_ULTIMATE_LICENSE="true"
-```
-
-If `ultimate_license` is true (defaults to false), then the GitLab account used has access to the GitLab Ultimate or GitLab.com Gold features. It will enable fetching Epics, Epic Issues and other entities available for GitLab Ultimate and GitLab.com Gold accounts.
-
-Check the [README](https://gitlab.com/meltano/tap-gitlab) for details.
