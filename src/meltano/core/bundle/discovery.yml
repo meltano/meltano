@@ -204,6 +204,26 @@ extractors:
         value: 0
         label: Ads Insights Buffer Days
         description: How many Days before the Start Date to fetch Ads Insights for
+  - name: tap-fastly
+    label: Fastly
+    description: Edge cloud computing services provider
+    namespace: tap_fastly
+    variant: meltano
+    docs: 'https://meltano.com/plugins/extractors/fastly.html'
+    repo: https://gitlab.com/meltano/tap-fastly
+    pip_url: 'git+https://gitlab.com/meltano/tap-fastly.git'
+    capabilities:
+      - catalog
+      - discover
+      - state
+    settings:
+      - name: api_token
+        label: API Token
+        kind: password
+        placeholder: Ex. *****************
+      - name: start_date
+        label: Start Date
+        kind: date_iso8601
   - name: tap-gitlab
     label: GitLab
     description: Single application for the entire DevOps lifecycle
@@ -775,27 +795,6 @@ extractors:
         description: Project-relative path to JSON file holding array of objects with `entity`, `file`, and `keys` keys
         placeholder: Ex. files-def.json
         documentation: https://gitlab.com/meltano/tap-csv#run
-  - name: tap-fastly
-    label: Fastly
-    description: Edge cloud computing services provider
-    namespace: tap_fastly
-    variant: meltano
-    hidden: true
-    docs: 'https://meltano.com/plugins/extractors/fastly.html'
-    repo: https://gitlab.com/meltano/tap-fastly
-    pip_url: 'git+https://gitlab.com/meltano/tap-fastly.git'
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings:
-      - name: api_token
-        label: API Token
-        kind: password
-        placeholder: Ex. *****************
-      - name: start_date
-        label: Start Date
-        kind: date_iso8601
   - name: tap-marketo
     label: Marketo
     description: Marketing automation for account-based marketing
