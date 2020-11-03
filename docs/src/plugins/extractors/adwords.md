@@ -1,36 +1,169 @@
 ---
 sidebar: auto
-metaTitle: Extract Google Ads Data
-description: Use Meltano to extract Google Ads data from the AdWords API and insert it into Postgres, Snowflake, and more.
-lastUpdatedSignificantly: 2020-04-30
+description: Use Meltano to pull data from the Google Ads (AdWords) API and load it into Snowflake, Postgres, and more
 ---
 
-# Google Ads
+# Google Ads (AdWords)
 
-The Google Ads extractor pulls raw data from Google's [AdWords API](https://developers.google.com/adwords/api/docs/guides/start) and extracts the following resources from a Google Ads account:
+The `tap-adwords` [extractor](/plugins/extractors/) pulls raw data from the [Google AdWords API](https://developers.google.com/adwords/api/).
 
-- [Accounts / Managed Customer](https://developers.google.com/adwords/api/docs/reference/v201705/ManagedCustomerService.ManagedCustomer)
-- [Campaigns](https://developers.google.com/adwords/api/docs/reference/v201705/CampaignService.Campaign)
-- [Ad Groups](https://developers.google.com/adwords/api/docs/reference/v201705/AdGroupService.AdGroup)
-- [Ads](https://developers.google.com/adwords/api/docs/reference/v201705/AdGroupAdService.AdGroupAd)
-- [Ad Performance Report](https://developers.google.com/adwords/api/docs/appendix/reports/ad-performance-report)
-- [Keywords Performance Report](https://developers.google.com/adwords/api/docs/appendix/reports/keywords-performance-report)
+To learn more about `tap-adwords`, refer to the repository at <https://gitlab.com/meltano/tap-adwords>.
 
-Note that [Smart Campaigns](https://support.google.com/google-ads/answer/7652860) are not supported, and their performance data is not available to Meltano.
+## Getting Started
 
-For more information you can check [the documentation for tap-adwords](https://gitlab.com/meltano/tap-adwords).
+### Prerequisites
 
-## Google Ads Setup
+If you haven't already, follow the initial steps of the [Getting Started guide](/docs/getting-started.html):
 
-In order to access your Google Ads data, you will need the following:
+1. [Install Meltano](/docs/getting-started.html#install-meltano)
+1. [Create your Meltano project](/docs/getting-started.html#create-your-meltano-project)
 
-- Account ID(s)
-- Access Token
-- Start Date
+### Installation and configuration
 
-<h3 id="customer-ids">Account ID(s)</h3>
+#### Using the Command Line Interface
 
-One or more Google Ads Account IDs to extract data from.
+1. Add the `tap-adwords` extractor to your project using [`meltano add`](/docs/command-line-interface.html#add):
+
+    ```bash
+    meltano add extractor tap-adwords
+    ```
+
+1. Configure the [settings](#settings) below using [`meltano config`](/docs/command-line-interface.html#config).
+
+#### Using Meltano UI
+
+1. Start [Meltano UI](/docs/ui.html) using [`meltano ui`](/docs/command-line-interface.html#ui):
+
+    ```bash
+    meltano ui
+    ```
+
+1. Open the Extractors interface at <http://localhost:5000/extractors>.
+1. Click the "Add to project" button for "Google Ads".
+1. Configure the [settings](#settings) below in the "Configuration" interface that opens automatically.
+
+### Next steps
+
+Follow the remaining steps of the [Getting Started guide](/docs/getting-started.html):
+
+1. [Select entities and attributes to extract](/docs/getting-started.html#select-entities-and-attributes-to-extract)
+1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
+1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
+
+## Settings
+
+`tap-adwords` requires the [configuration](/docs/configuration.html) of the following settings:
+
+- [Developer Token](#developer-token)
+- [OAuth Client ID](#oauth-client-id)
+- [OAuth Client Secret](#oauth-client-secret)
+- [Refresh Token](#refresh-token)
+- [Customer ID(s)](#customer-ids)
+- [Start Date](#start-date)
+
+These and other supported settings are documented below.
+To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
+
+#### Minimal configuration
+
+A minimal configuration of `tap-adwords` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
+
+```yml{6-8}
+plugins:
+  extractors:
+  - name: tap-adwords
+    variant: meltano
+    pip_url: git+https://gitlab.com/meltano/tap-adwords.git
+    config:
+      customer_ids: 1234567890,1234567891
+      start_date: '2020-10-01T00:00:00Z'
+```
+
+Sensitive values are most appropriately stored in [the environment](/docs/configuration.html#configuring-settings) or your project's [`.env` file](/docs/project.html#env):
+
+```bash
+export OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN=my_access_developer_token
+export OAUTH_GOOGLE_ADWORDS_CLIENT_ID=my_oauth_client_id
+export OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET=my_oauth_client_secret
+export TAP_ADWORDS_REFRESH_TOKEN=my_refresh_token
+```
+
+### Developer Token
+
+- Name: `developer_token`
+- [Environment variable](/docs/configuration.html#configuring-settings): `OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN`, alias: `TAP_ADWORDS_DEVELOPER_TOKEN`
+
+See <https://developers.google.com/adwords/api/docs/guides/first-api-call#request_a_developer_token>.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-adwords set developer_token <token>
+
+export OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN=<token>
+```
+
+### OAuth Client ID
+
+- Name: `oauth_client_id`
+- [Environment variable](/docs/configuration.html#configuring-settings): `OAUTH_GOOGLE_ADWORDS_OAUTH_CLIENT_ID`, alias: `TAP_ADWORDS_OAUTH_CLIENT_ID`
+
+See <https://developers.google.com/adwords/api/docs/guides/first-api-call#set_up_oauth2_authentication>.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-adwords set oauth_client_id <client_id>
+
+export OAUTH_GOOGLE_ADWORDS_OAUTH_CLIENT_ID=<client_id>
+```
+
+### OAuth Client Secret
+
+- Name: `oauth_client_secret`
+- [Environment variable](/docs/configuration.html#configuring-settings): `OAUTH_GOOGLE_ADWORDS_OAUTH_CLIENT_SECRET`, alias: `TAP_ADWORDS_OAUTH_CLIENT_SECRET`
+
+See <https://developers.google.com/adwords/api/docs/guides/first-api-call#set_up_oauth2_authentication>.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-adwords set oauth_client_secret <client_secret>
+
+export OAUTH_GOOGLE_ADWORDS_OAUTH_CLIENT_SECRET=<client_secret>
+```
+
+### Refresh Token
+
+- Name: `refresh_token`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ADWORDS_REFRESH_TOKEN`
+
+See <https://developers.google.com/adwords/api/docs/guides/first-api-call#get_an_oauth2_refresh_token_and_configure_your_client>.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-adwords set refresh_token <token>
+
+export TAP_ADWORDS_REFRESH_TOKEN=<token>
+```
+
+### Customer ID(s)
+
+- Name: `customer_ids`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ADWORDS_CUSTOMER_IDS`
+
+One or more comma-separated Google Ads Account IDs to extract data from.
+
+#### How to get
 
 To get your Account ID(s):
 
@@ -50,96 +183,133 @@ For example:
 - One Account ID: `1234567890`
 - Multiple Account IDs: `1234567890,1234567891,1234567892`
 
-<h3 id="refresh-token">Access Token</h3>
+#### How to use
 
-The Refresh Token generated through the OAuth flow run using your OAuth Client and your Developer Token.
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
-The Google account you connect needs to have access to your Ads Account.
+```bash
+meltano config tap-adwords set customer_ids <ids>
 
-If you want to manually generate a Refresh Token, check out  [Google's documentation](https://developers.google.com/adwords/api/docs/guides/first-api-call#get_an_oauth2_refresh_token_and_configure_your_client).
+export TAP_ADWORDS_CUSTOMER_IDS=<ids>
+```
 
-<h3 id="start-date">Start Date</h3>
+### Start Date
+
+- Name: `start_date`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ADWORDS_START_DATE`
 
 This property determines how much historical data will be extracted.
 
 Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
-## Meltano Setup
+#### How to use
 
-::: warning Self-Hosted
-Please note that this extractor requires advanced configuration for self-hosted Meltano instances.
-
-If you do not have (1) a developer token for your Google Ads Account and (2) an approved Google OAuth Client, the process that you have to go through to generate those may take between one and four weeks.
-:::
-
-### Prerequisites
-
-- [Running instance of Meltano](/docs/installation.html#local-installation)
-- A valid [Google OAuth 2.0 Client](https://console.cloud.google.com/apis/credentials), including:
-  - [Your Developer Token for Google AdWords](https://developers.google.com/adwords/api/docs/guides/first-api-call#request_a_developer_token)
-  - [Your Google OAuth Client ID](https://developers.google.com/adwords/api/docs/guides/first-api-call#set_up_oauth2_authentication)
-  - [Your Google OAuth Client Secret](https://developers.google.com/adwords/api/docs/guides/first-api-call#set_up_oauth2_authentication)
-
-### Configure the OAuth Client
-
-In order for the extractor to properly authenticate on Google APIs, it requires to be able to acquire new access tokens.
-The following variables are required for the authentication flow:
-
-#### Configuration
-
-1. Open your project's `.env` file in a text editor
-1. Add the following variables to your file:
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-export OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN=<developer_token>
-export OAUTH_GOOGLE_ADWORDS_CLIENT_ID=<client_id>
-export OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET=<client_secret>
+meltano config tap-adwords set start_date YYYY-MM-DDTHH:MM:SSZ
+
+export TAP_ADWORDS_START_DATE=YYYY-MM-DDTHH:MM:SSZ
+
+# For example:
+meltano config tap-adwords set start_date 2020-10-01T00:00:00Z
+
+export TAP_ADWORDS_START_DATE=2020-10-01T00:00:00Z
 ```
 
-### Configuration with the Meltano UI
+### End Date
 
-Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data sources.
+- Name: `end_date`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ADWORDS_END_DATE`
 
-![Screenshot of Meltano UI with all extractors not installed and Google Ads Extractor highlighted](/images/adwords-tutorial/01-adwords-extractor-selection.png)
+Date up to when historical data will be extracted.
 
-Let's install the Google Ads Extractor by clicking on the `Install` button inside its card.
+#### How to use
 
-On the configuration modal we want to enter all the fields descibed in the [Google Ads Setup](/plugins/extractors/adwords.html#google-ads-setup) section.
-
-![Screenshot of the Google Ads Extractor Configuration](/images/adwords-tutorial/02-adwords-configuration.png)
-
-## Advanced: Command Line Installation
-
-1. Navigate to your Meltano project in the terminal
-1. Run the following command:
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano add extractor tap-adwords
+meltano config tap-adwords set end_date YYYY-MM-DDTHH:MM:SSZ
+
+export TAP_ADWORDS_END_DATE=YYYY-MM-DDTHH:MM:SSZ
+
+# For example:
+meltano config tap-adwords set end_date 2020-10-01T00:00:00Z
+
+export TAP_ADWORDS_END_DATE=2020-10-01T00:00:00Z
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-adwords'` in your terminal.
+### User Agent
 
-### Configuration
+- Name: `user_agent`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ADWORDS_USER_AGENT`
+- Default: `tap-adwords via Meltano`
 
-1. Open your project's `.env` file in a text editor
-1. Add the following variables to your file:
+User agent to send to Google along with API requests. Typically includes name of integration and an email address you can be reached at, e.g. `tap-adwords via Meltano <user@example.com>`.
 
-Required:
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-export TAP_ADWORDS_REFRESH_TOKEN=""
-export TAP_ADWORDS_USER_AGENT=""
-export TAP_ADWORDS_CUSTOMER_IDS=""
-export TAP_ADWORDS_START_DATE="2020-01-01T00:00:00Z"
+meltano config tap-adwords set user_agent <user_agent>
+
+export TAP_ADWORDS_USER_AGENT=<user_agent>
 ```
 
-Optional:
+### Conversion Window Days
+
+- Name: `conversion_window_days`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ADWORDS_CONVERSION_WINDOW_DAYS`
+- Default: `0`
+
+How many Days before the Start Date to fetch data for Performance Reports
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-export TAP_ADWORDS_END_DATE="2020-02-17T00:00:00Z"
-export TAP_ADWORDS_CONVERSION_WINDOW_DAYS=""
+meltano config tap-adwords set conversion_window_days 7
+
+export TAP_ADWORDS_CONVERSION_WINDOW_DAYS=7
 ```
 
-`TAP_ADWORDS_CONVERSION_WINDOW_DAYS` sets how many days before the **start_date** to fetch data for Performance Reports (default: 0)
+### Primary Keys
 
-Check the [README](https://gitlab.com/meltano/tap-adwords) for more details.
+- Name: `primary_keys`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ADWORDS_PRIMARY_KEYS`
+- Default:
+
+  ```json
+  {
+    "KEYWORDS_PERFORMANCE_REPORT": ["customerID", "campaignID", "adGroupID", "keywordID", "day", "network", "device"],
+    "AD_PERFORMANCE_REPORT": ["customerID", "campaignID", "adGroupID", "adID", "day", "network", "device"]
+  }
+  ```
+
+Primary Keys for the selected Entities (Streams)
+
+#### How to use
+
+Manage this setting directly in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):
+
+```yml{6-9}
+plugins:
+  extractors:
+  - name: tap-adwords
+    variant: meltano
+    pip_url: git+https://gitlab.com/meltano/tap-adwords.git
+    config:
+      primary_keys:
+        <REPORT_NAME>: [<key1>, <key2>]
+        # ...
+```
+
+Alternatively, manage this setting using [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-adwords set primary_keys '{"<REPORT_NAME>": ["<key>", ...], ...}'
+
+export TAP_ADWORDS_PRIMARY_KEYS='{"<REPORT_NAME>": ["<key>", ...], ...}'
+```

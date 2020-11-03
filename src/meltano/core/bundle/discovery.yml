@@ -474,56 +474,57 @@ extractors:
     settings_group_validation:
       - ['developer_token', 'oauth_client_id', 'oauth_client_secret', 'refresh_token', 'user_agent', 'customer_ids', 'start_date']
     settings:
-      - name: customer_ids
-        label: Account ID(s)
-        placeholder: Ex. 1234567890,1234567891,1234567892
-        description: A comma-separated list of Ad Account IDs to replicate data from
-      - name: refresh_token
-        label: Access Token
+      - name: developer_token
+        env: OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN
+        kind: password
+        label: Developer Token
+        description: Your Developer Token for Google AdWord Application
         placeholder: Ex. *****************
-        description: The Refresh Token generated through the OAuth flow run using your OAuth Client and your Developer Token
+      - name: oauth_client_id
+        env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
+        kind: password
+        label: OAuth Client ID
+        description: Your Google OAuth Client ID
+        placeholder: Ex. 123456789012345.apps.googleusercontent.com
+      - name: oauth_client_secret
+        env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
+        kind: password
+        label: OAuth Client Secret
+        description: Your Google OAuth Client Secret
+        placeholder: Ex. *****************
+
+      - name: refresh_token
         kind: oauth
         oauth:
           # https://oauth.svc.meltanodata.com/google-adwords/
           provider: google-adwords
-      - name: start_date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-        kind: date_iso8601
+        label: Access Token
+        description: The Refresh Token generated through the OAuth flow run using your OAuth Client and your Developer Token
+        placeholder: Ex. *****************
+      - name: customer_ids
+        label: Account ID(s)
+        placeholder: Ex. 1234567890,1234567891,1234567892
+        description: A comma-separated list of Ad Account IDs to replicate data from
 
-      # Hidden fields
+      - name: start_date
+        kind: date_iso8601
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
       - name: end_date
-        kind: hidden
-      - name: developer_token
-        description: Your Developer Token for Google AdWord Application
-        env: OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN
-        kind: hidden
-        label: Developer Token
-        placeholder: Ex. *****************
-      - name: oauth_client_id
-        description: Your Google OAuth Client ID
-        env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
-        kind: hidden
-        label: OAuth Client ID
-        placeholder: Ex. 123456789012345.apps.googleusercontent.com
-      - name: oauth_client_secret
-        description: Your Google OAuth Client Secret
-        env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
-        kind: hidden
-        label: OAuth Client Secret
-        placeholder: Ex. *****************
+        kind: date_iso8601
+        description: Date up to when historical data will be extracted.
       - name: user_agent
+        value: tap-adwords via Meltano
         label: User Agent for your OAuth Client
-        value: Meltano
-        kind: hidden
-        placeholder: Ex. Meltano
+        placeholder: Ex. tap-adwords via Meltano <user@example.com>
         description: The User Agent for your OAuth Client (used in requests made to the AdWords API)
+
       - name: conversion_window_days
-        label: Conversion Window Days
+        kind: integer
         value: 0
-        kind: hidden
+        label: Conversion Window Days
         description: How many Days before the Start Date to fetch data for Performance Reports
       - name: primary_keys
-        label: Primary Keys
+        kind: hidden
         value:
           KEYWORDS_PERFORMANCE_REPORT:
             - customerID
@@ -541,7 +542,7 @@ extractors:
             - day
             - network
             - device
-        kind: hidden
+        label: Primary Keys
         description: Primary Keys for the selected Entities (Streams)
   - name: tap-google-analytics
     label: Google Analytics
