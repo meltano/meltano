@@ -7,7 +7,7 @@ description: Use Meltano to pull data from various sources and load it into Comm
 
 The `target-csv` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into [Comma Separated Values (CSV)](https://en.wikipedia.org/wiki/Comma-separated_values) files.
 
-For more information, refer to the repository at <https://github.com/singer-io/target-csv>.
+To learn more about `target-csv`, refer to the repository at <https://github.com/singer-io/target-csv>.
 
 ## Getting Started
 

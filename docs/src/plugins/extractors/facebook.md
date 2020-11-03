@@ -1,36 +1,95 @@
 ---
 sidebar: auto
-metaTitle: Extract Facebook Ads Data
-description: Use Meltano to extract Facebook Ads data from the Facebook Marketing API and insert it into Postgres, Snowflake, and more.
-lastUpdatedSignificantly: 2020-04-30
+description: Use Meltano to pull data from the Facebook Ads API and load it into Snowflake, Postgres, and more
 ---
 
 # Facebook Ads
 
-The Facebook Ads extractor pulls raw data from the [Facebook Marketing API](https://developers.facebook.com/docs/marketing-apis) and extracts the following resources from a Facebook Ads account:
+The `tap-facebook` [extractor](/plugins/extractors/) pulls raw data from the [Facebook Ads API](https://developers.facebook.com/docs/marketing-apis).
 
-- Ad Creatives
-- Ads
-- Ad Sets
-- Campaigns
-- Ads Insights
-  - Breakdown by age and gender
-  - Breakdown by country
-  - Breakdown by placement and device
+To learn more about `tap-facebook`, refer to the repository at <https://gitlab.com/meltano/tap-facebook>.
 
-For more information you can check [the documentation for tap-facebook](https://gitlab.com/meltano/tap-facebook).
+## Getting Started
 
-## Facebook Ads Setup
+### Prerequisites
 
-In order to access your Facebook Ads data, you will need the following:
+If you haven't already, follow the initial steps of the [Getting Started guide](/docs/getting-started.html):
 
-- Account ID
-- Access Token
-- Start Date
+1. [Install Meltano](/docs/getting-started.html#install-meltano)
+1. [Create your Meltano project](/docs/getting-started.html#create-your-meltano-project)
 
-<h3 id="account-id">Account ID</h3>
+### Installation and configuration
+
+#### Using the Command Line Interface
+
+1. Add the `tap-facebook` extractor to your project using [`meltano add`](/docs/command-line-interface.html#add):
+
+    ```bash
+    meltano add extractor tap-facebook
+    ```
+
+1. Configure the [settings](#settings) below using [`meltano config`](/docs/command-line-interface.html#config).
+
+#### Using Meltano UI
+
+1. Start [Meltano UI](/docs/ui.html) using [`meltano ui`](/docs/command-line-interface.html#ui):
+
+    ```bash
+    meltano ui
+    ```
+
+1. Open the Extractors interface at <http://localhost:5000/extractors>.
+1. Click the "Add to project" button for "Facebook Ads".
+1. Configure the [settings](#settings) below in the "Configuration" interface that opens automatically.
+
+### Next steps
+
+Follow the remaining steps of the [Getting Started guide](/docs/getting-started.html):
+
+1. [Select entities and attributes to extract](/docs/getting-started.html#select-entities-and-attributes-to-extract)
+1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
+1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
+
+## Settings
+
+`tap-facebook` requires the [configuration](/docs/configuration.html) of the following settings:
+
+- [Account ID](#account-id)
+- [Access Token](#access-token)
+- [Start Date](#start-date)
+
+These and other supported settings are documented below.
+To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
+
+#### Minimal configuration
+
+A minimal configuration of `tap-facebook` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
+
+```yml{6-8}
+plugins:
+  extractors:
+  - name: tap-facebook
+    variant: meltano
+    pip_url: git+https://gitlab.com/meltano/tap-facebook.git
+    config:
+      account_id: 791728544625001
+      start_date: '2020-10-01T00:00:00Z'
+```
+
+Sensitive values are most appropriately stored in [the environment](/docs/configuration.html#configuring-settings) or your project's [`.env` file](/docs/project.html#env):
+
+```bash
+export TAP_FACEBOOK_ACCESS_TOKEN=my_access_token
+```
+
+### Account ID
+
+- Name: `account_id`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_FACEBOOK_ACCOUNT_ID`
 
 Your Facebook Ads Account ID.
+
+#### How to get
 
 To get your Account ID:
 
@@ -50,7 +109,28 @@ Examples:
 
   Account ID: `791728544625001`
 
-<h3 id="access-token">Access Token</h3>
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-facebook set account_id <id>
+
+export TAP_FACEBOOK_ACCOUNT_ID=<id>
+```
+
+### Access Token
+
+- Name: `access_token`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_FACEBOOK_ACCESS_TOKEN`
+
+Facebook Marketing API Access Token
+
+#### How to get
+
+##### Create App
+
+First, you will need to create a Facebook App through the Developer Portal.
 
 ::: tip Don't feel like going through the Facebook App setup process?
 
@@ -60,10 +140,6 @@ Examples:
 
 Once you authorize Meltano to access your Facebook Ads data, Facebook will generate an access token and provide it to Meltano OAuth Service. The OAuth Service will not store or use the token, and will only display it to you once so that you can copy and paste it into your local Meltano configuration.
 :::
-
-#### Create App
-
-First, you will need to create a Facebook App through the Developer Portal.
 
 1. Go to <https://developers.facebook.com/>.
 2. Log into Facebook if you haven't already. Make sure that your account is an Admin of the Ads Account you will be pulling data from.
@@ -77,7 +153,7 @@ First, you will need to create a Facebook App through the Developer Portal.
 
 8. Under "Add a Product", find "Marketing API", and click "Set Up".
 
-#### Generate Access Token
+##### Generate Access Token
 
 Now that your app has been created and the Marketing API product has been enabled, we can generate an access token.
 
@@ -91,7 +167,7 @@ Now that your app has been created and the Marketing API product has been enable
 
 This is the Access Token you will provide to Meltano.
 
-#### Token Expiration
+##### Token Expiration
 
 Tokens generated using this method are only valid for 60 days by default.
 When the token expires, Meltano will no longer be able to automatically update your Facebook Ads data, and you will need to generate a new token and update the extractor configuration.
@@ -112,62 +188,76 @@ To prevent any interruption of your data pipeline, we recommend that you generat
 3. Click "My Apps" in the top right, and select the app you created earlier.
 4. Follow the steps under ["Generate Access Token"](#generate-access-token) above.
 
-<h3 id="start-date">Start Date</h3>
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-facebook set access_token <token>
+
+export TAP_FACEBOOK_ACCESS_TOKEN=<token>
+```
+
+### Start Date
+
+- Name: `start_date`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_FACEBOOK_START_DATE`
 
 This property determines how much historical data will be extracted.
 
 Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
-## Meltano Setup
+#### How to use
 
-### Prerequisites
-
-- [Running instance of Meltano](/docs/installation.html#local-installation)
-
-### Configure the Extractor
-
-Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data sources.
-
-![Screenshot of Meltano UI with all extractors not installed and Facebook Ads Extractor highlighted](/images/facebook-tutorial/01-facebook-extractor-selection.png)
-
-Let's install the Facebook Ads Extractor by clicking on the `Install` button inside its card.
-
-On the configuration modal we want to enter the Account ID and Access Token that Facebook Ads extractor will use to connect to the Facebook Marketing API, the Start Date we want the extracted data set to start from and the End Date.
-
-![Screenshot of the Facebook Ads Extractor Configuration](/images/facebook-tutorial/02-facebook-configuration.png)
-
-
-## Advanced: Command Line Installation
-
-1. Navigate to your Meltano project in the terminal
-1. Run the following command:
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano add extractor tap-facebook
+meltano config tap-facebook set start_date YYYY-MM-DDTHH:MM:SSZ
+
+export TAP_FACEBOOK_START_DATE=YYYY-MM-DDTHH:MM:SSZ
+
+# For example:
+meltano config tap-facebook set start_date 2020-10-01T00:00:00Z
+
+export TAP_FACEBOOK_START_DATE=2020-10-01T00:00:00Z
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-facebook'` in your terminal.
+### End Date
 
-### Configuration
+- Name: `end_date`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_FACEBOOK_END_DATE`
 
-1. Open your project's `.env` file in a text editor
-1. Add the following variables to your file:
+Date up to when historical data will be extracted.
 
-Required:
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-export TAP_FACEBOOK_ACCOUNT_ID="123456789012345"
-export TAP_FACEBOOK_ACCESS_TOKEN="YOUR ACCESS TOKEN"
-export TAP_FACEBOOK_START_DATE="2019-12-01T00:00:00Z"
+meltano config tap-facebook set end_date YYYY-MM-DDTHH:MM:SSZ
+
+export TAP_FACEBOOK_END_DATE=YYYY-MM-DDTHH:MM:SSZ
+
+# For example:
+meltano config tap-facebook set end_date 2020-10-01T00:00:00Z
+
+export TAP_FACEBOOK_END_DATE=2020-10-01T00:00:00Z
 ```
 
-Optional:
+### Insights Buffer Days
+
+- Name: `insights_buffer_days`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_FACEBOOK_INSIGHTS_BUFFER_DAYS`
+- Default: `0`
+
+How many Days before the Start Date to fetch Ads Insights for
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-export TAP_FACEBOOK_END_DATE="2019-12-31T00:00:00Z"
-export TAP_FACEBOOK_INSIGHTS_BUFFER_DAYS=0
+meltano config tap-facebook set insights_buffer_days 7
+
+export TAP_FACEBOOK_INSIGHTS_BUFFER_DAYS=7
 ```
-
-If `TAP_FACEBOOK_INSIGHTS_BUFFER_DAYS` sets how many days to start extracting Ads Insights before the **start_date** (default: 0)
-
-Check the [README](https://gitlab.com/meltano/tap-facebook) for more details.
