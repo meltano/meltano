@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2404](https://gitlab.com/meltano/meltano/-/issues/2404) Add `singer-io` variant of `tap-recharge`
+
 ### Changes
 
 ### Fixes

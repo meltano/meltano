@@ -18,6 +18,7 @@ Extractors for the following sources are currently [discoverable](/docs/plugins.
 - [Google Analytics](/plugins/extractors/google-analytics.html)
 - [Marketo](/plugins/extractors/marketo.html)
 - [MongoDB](/plugins/extractors/mongodb.html)
+- [ReCharge](/plugins/extractors/recharge.html)
 - [Salesforce](/plugins/extractors/salesforce.html)
 - [Shopify](/plugins/extractors/shopify.html)
 - [Spreadsheets Anywhere](/plugins/extractors/spreadsheets-anywhere.html) (Excel or CSVs on localhost or Cloud storage)

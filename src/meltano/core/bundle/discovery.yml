@@ -560,6 +560,30 @@ extractors:
       - name: end_date
         env_aliases: [GOOGLE_ANALYTICS_API_END_DATE]
         kind: hidden
+  - name: tap-recharge
+    label: ReCharge
+    description: Subscription payments platform
+    namespace: tap_recharge
+    variant: singer-io
+    docs: 'https://meltano.com/plugins/extractors/recharge.html'
+    repo: https://github.com/singer-io/tap-recharge
+    pip_url: tap-recharge==1.0.3
+    capabilities:
+      - catalog
+      - discover
+      - state
+    settings:
+      - name: access_token
+        kind: password
+        description: Private API Token
+        placeholder: Ex. 1a2b3c4d5e6f
+      - name: start_date
+        kind: date_iso8601
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+      - name: user_agent
+        value: tap-recharge via Meltano
+        description: User agent to send to ReCharge along with API requests. Typically includes name of integration and an email address you can be reached at
+        placeholder: Ex. tap-recharge via Meltano <user@example.com>
   - name: tap-salesforce
     label: Salesforce
     description: Customer-relationship management & customer success platform
