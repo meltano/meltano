@@ -109,7 +109,7 @@ class ProjectAddCustomService(ProjectAddService):
                 f"Specify the {singer_type}'s {click.style('supported settings', fg='blue')} (`config.json` keys)"
             )
             click.echo()
-            click.echo("Nested properties can be represented using the `.` seperator,")
+            click.echo("Nested properties can be represented using the `.` separator,")
             click.echo('e.g. `auth.username` for `{ "auth": { "username": value } }`.')
             click.echo()
             click.echo(
