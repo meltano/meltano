@@ -206,9 +206,9 @@ However, do take into account Airflow's own
   (or `AIRFLOW__CORE__SQL_ALCHEMY_CONN` environment variable) to a [`postgresql://` URI](https://docs.sqlalchemy.org/en/13/core/engines.html#postgresql):
 
   ```bash
-  meltano config airflow set core.sql_alchemy_conn postgresql://username:password@host:port/database
+  meltano config airflow set core.sql_alchemy_conn postgresql://<username>:<password>@<host>:<port>/<database>
 
-  export AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://username:password@host:port/database
+  export AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://<username>:<password>@<host>:<port>/<database>
   ```
 
   For this to work, the [`psycopg2` package](https://pypi.org/project/psycopg2/) will

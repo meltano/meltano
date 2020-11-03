@@ -103,11 +103,11 @@ option of [`meltano` subcommands](/docs/command-line-interface.html), or the `ME
 #### How to use
 
 ```bash
-meltano config meltano set database_uri postgresql://username:password@host:port/database
+meltano config meltano set database_uri postgresql://<username>:<password>@<host>:<port>/<database>
 
-export MELTANO_DATABASE_URI=postgresql://username:password@host:port/database
+export MELTANO_DATABASE_URI=postgresql://<username>:<password>@<host>:<port>/<database>
 
-meltano elt --database-uri=postgresql://username:password@host:port/database ...
+meltano elt --database-uri=postgresql://<username>:<password>@<host>:<port>/<database> ...
 ```
 
 ### `project_readonly`
