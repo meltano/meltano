@@ -1243,12 +1243,21 @@ loaders:
     repo: https://gitlab.com/meltano/target-sqlite
     pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
     dialect: sqlite
+    settings_group_validation:
+      - ['batch_size']
     settings:
       - name: database
         label: Database Name
-        description: '"warehouse" is the default name of the SQLite loader database generated at the project root. Feel free to rename it.'
+        description: Name of the SQLite database file to be used or created, relative to the project root. The `.db` extension is optional and will be added automatically when omitted.
         value: warehouse
         env_aliases: [SQLITE_DATABASE]
+      - name: batch_size
+        kind: integer
+        value: 50
+        description: How many records are sent to SQLite at a time?
+      - name: timestamp_column
+        value: '__loaded_at'
+        description: Name of the column used for recording the timestamp when Data are loaded to SQLite.
 transformers:
   - name: dbt
     namespace: dbt
