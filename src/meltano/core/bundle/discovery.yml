@@ -141,29 +141,24 @@ extractors:
     settings_group_validation:
       - ['customer_id', 'account_ids', 'oauth_client_id', 'oauth_client_secret', 'refresh_token', 'developer_token', 'start_date']
     settings:
-      # Hidden in the UI
       - name: developer_token
         env: OAUTH_BING_ADS_DEVELOPER_TOKEN
-        kind: hidden
-        env_specific: true
+        kind: password
       - name: oauth_client_id
         env: OAUTH_BING_ADS_CLIENT_ID
         label: OAuth Client ID
-        kind: hidden
-        env_specific: true
+        kind: password
       - name: oauth_client_secret
         env: OAUTH_BING_ADS_CLIENT_SECRET
         label: OAuth Client Secret
-        kind: hidden
-        env_specific: true
+        kind: password
+      - name: refresh_token
+        kind: password
 
-      # Visible in the UI
       - name: customer_id
         label: Customer ID
       - name: account_ids
         label: Account ID(s)
-      - name: refresh_token
-        kind: password
       - name: start_date
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601

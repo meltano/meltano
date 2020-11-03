@@ -57,9 +57,9 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 - [Developer Token](#developer-token)
 - [OAuth Client ID](#oauth-client-id)
 - [OAuth Client Secret](#oauth-client-secret)
+- [Refresh Token](#refresh-token)
 - [Customer ID](#customer-id)
 - [Account IDs](#account-ids)
-- [Refresh Token](#refresh-token)
 - [Start Date](#start-date)
 
 #### Minimal configuration
@@ -96,7 +96,7 @@ See <https://docs.microsoft.com/en-us/advertising/guides/get-started#get-develop
 
 #### How to use
 
-Manage this setting using [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
 meltano config tap-bing-ads set developer_token <token>
@@ -113,7 +113,7 @@ See <https://docs.microsoft.com/en-us/advertising/guides/get-started#quick-start
 
 #### How to use
 
-Manage this setting using [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
 meltano config tap-bing-ads set oauth_client_id <id>
@@ -130,12 +130,29 @@ See <https://docs.microsoft.com/en-us/advertising/guides/get-started#quick-start
 
 #### How to use
 
-Manage this setting using [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
 meltano config tap-bing-ads set oauth_client_secret <secret>
 
 export OAUTH_BING_ADS_CLIENT_SECRET=<secret>
+```
+
+### Refresh Token
+
+- Name: `refresh_token`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_BING_ADS_REFRESH_TOKEN`
+
+See <https://docs.microsoft.com/en-us/advertising/guides/get-started#quick-start-production>.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-bing-ads set refresh_token <token>
+
+export TAP_BING_ADS_REFRESH_TOKEN=<token>
 ```
 
 ### Customer ID
@@ -170,23 +187,6 @@ Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/d
 meltano config tap-bing-ads set account_ids <id>
 
 export TAP_BING_ADS_ACCOUNT_IDS=<id>
-```
-
-### Refresh Token
-
-- Name: `refresh_token`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_BING_ADS_REFRESH_TOKEN`
-
-See <https://docs.microsoft.com/en-us/advertising/guides/get-started#quick-start-production>.
-
-#### How to use
-
-Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
-
-```bash
-meltano config tap-bing-ads set refresh_token <token>
-
-export TAP_BING_ADS_REFRESH_TOKEN=<token>
 ```
 
 ### Start Date
