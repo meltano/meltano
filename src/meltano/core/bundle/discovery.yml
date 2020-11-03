@@ -960,7 +960,7 @@ loaders:
         env_aliases: [PG_URL, POSTGRES_URL]
       - name: user
         aliases: [username]
-        env_aliases: [PG_USERNAME, POSTGRES_USERNAME]
+        env_aliases: [PG_USERNAME, POSTGRES_USER]
         value: warehouse
       - name: password
         kind: password
@@ -968,7 +968,7 @@ loaders:
         value: warehouse
       - name: host
         aliases: [address]
-        env_aliases: [PG_ADDRESS, POSTGRESS_HOST]
+        env_aliases: [PG_ADDRESS, POSTGRES_HOST]
         value: localhost
         protected: true
       - name: port
