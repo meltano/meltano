@@ -194,14 +194,15 @@ extractors:
         oauth:
           provider: facebook
       - name: start_date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
       - name: end_date
-        kind: hidden
+        kind: date_iso8601
+        description: Date up to when historical data will be extracted.
       - name: insights_buffer_days
-        label: Ads Insights Buffer Days
+        kind: boolean
         value: 0
-        kind: hidden
+        label: Ads Insights Buffer Days
         description: How many Days before the Start Date to fetch Ads Insights for
   - name: tap-gitlab
     label: GitLab
