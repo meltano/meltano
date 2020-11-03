@@ -111,9 +111,14 @@ Please be aware that the larger the time period and amount of data, the longer t
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config tap-recharge set start_date <date>
+meltano config tap-recharge set start_date YYYY-MM-DDTHH:MM:SSZ
 
-export TAP_RECHARGE_START_DATE=<date>
+export TAP_RECHARGE_START_DATE=YYYY-MM-DDTHH:MM:SSZ
+
+# For example:
+meltano config tap-recharge set start_date 2020-10-01T00:00:00Z
+
+export TAP_RECHARGE_START_DATE=2020-10-01T00:00:00Z
 ```
 
 ### User Agent
