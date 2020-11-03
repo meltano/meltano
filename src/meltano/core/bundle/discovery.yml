@@ -956,8 +956,6 @@ loaders:
       - ['url', 'schema']
       - ['user', 'password', 'host', 'port', 'dbname', 'schema']
     settings:
-      - name: url
-        env_aliases: [PG_URL, POSTGRES_URL]
       - name: user
         aliases: [username]
         env_aliases: [PG_USERNAME, POSTGRES_USER]
@@ -980,6 +978,10 @@ loaders:
         label: Database Name
         env_aliases: [PG_DATABASE, POSTGRES_DBNAME]
         value: warehouse
+      - name: url
+        env_aliases: [PG_URL, POSTGRES_URL]
+        label: URL
+        description: Lets you set `user`, `password`, `host`, `port`, and `dbname` in one go using a `postgresql://` URI. Takes precedence over the other settings when set.
       - name: schema
         env_aliases: [PG_SCHEMA, POSTGRES_SCHEMA]
         value: $MELTANO_EXTRACT__LOAD_SCHEMA
