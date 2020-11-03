@@ -100,7 +100,7 @@ export TARGET_SNOWFLAKE_PASSWORD=my_password
 ### Account
 
 - Name: `account`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_ACCOUNT`, alias: `SF_ACCOUNT`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_ACCOUNT`, alias: `SF_ACCOUNT`, `SNOWFLAKE_ACCOUNT`
 
 Account Name in Snowflake (`https://XXXXX.snowflakecomputing.com`)
 
@@ -117,7 +117,7 @@ export TARGET_SNOWFLAKE_ACCOUNT=<account>
 ### Username
 
 - Name: `username`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_USERNAME`, alias: `SF_USER`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_USERNAME`, alias: `SF_USER`, `SNOWFLAKE_USER`
 
 The username you use for logging in
 
@@ -134,7 +134,7 @@ export TARGET_SNOWFLAKE_USERNAME=<username>
 ### Password
 
 - Name: `password`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_PASSWORD`, alias: `SF_PASSWORD`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_PASSWORD`, alias: `SF_PASSWORD`, `SNOWFLAKE_PASSWORD`
 
 The password you use for logging in
 
@@ -151,7 +151,7 @@ export TARGET_SNOWFLAKE_PASSWORD=<password>
 ### Role
 
 - Name: `role`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_ROLE`, alias: `SF_ROLE`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_ROLE`, alias: `SF_ROLE`, `SNOWFLAKE_ROLE`
 
 Role to be used for loading the data, e.g. `LOADER`. Also this role is GRANTed usage to all tables and schemas created
 
@@ -168,7 +168,7 @@ export TARGET_SNOWFLAKE_ROLE=<role>
 ### Database
 
 - Name: `database`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_DATABASE`, alias: `SF_DATABASE`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_DATABASE`, alias: `SF_DATABASE`, `SNOWFLAKE_DATABASE`
 
 The name of the Snowflake database you want to use
 
@@ -185,7 +185,7 @@ export TARGET_SNOWFLAKE_DATABASE=<database>
 ### Warehouse
 
 - Name: `warehouse`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_WAREHOUSE`, alias: `SF_WAREHOUSE`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_WAREHOUSE`, alias: `SF_WAREHOUSE`, `SNOWFLAKE_WAREHOUSE`
 
 The name of the Snowflake warehouse you want to use
 
@@ -202,7 +202,7 @@ export TARGET_SNOWFLAKE_WAREHOUSE=<warehouse>
 ### Schema
 
 - Name: `schema`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_SCHEMA`, alias: `SF_SCHEMA`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_SCHEMA`, alias: `SF_SCHEMA`, `SNOWFLAKE_SCHEMA`
 - Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html). Values are automatically converted to uppercase before they're passed on to the plugin, so `tap_gitlab` becomes `TAP_GITLAB`.
 
 #### How to use
