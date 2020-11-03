@@ -32,9 +32,6 @@ include:
   # publish
   - local: .gitlab/ci/publish.gitlab-ci.yml
 
-  # distribute
-  - local: .gitlab/ci/distribute.gitlab-ci.yml
-
   # SAST
   - template: SAST.gitlab-ci.yml
 

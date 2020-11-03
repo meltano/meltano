@@ -1,9 +1,0 @@
-digitalocean_marketplace:
-  extends: .only:version-tags
-  image:
-    name: hashicorp/packer
-    entrypoint: [""]
-  stage: distribute
-  script:
-    - cd cloud/packer
-    - packer build -only=digitalocean marketplace-image.json
