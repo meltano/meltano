@@ -9,15 +9,21 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-- [#2374](https://gitlab.com/meltano/meltano/-/issues/2374) Add `target-bigquery` discoverable plugin definition
-
-- [#1956](https://gitlab.com/meltano/meltano/-/issues/1956) Add support for Python 3.8
 
 ### Changes
 
 ### Fixes
 
 ### Breaks
+
+
+## 1.56.0 - (2020-11-02)
+---
+
+### New
+
+- [#2374](https://gitlab.com/meltano/meltano/-/issues/2374) Add `target-bigquery` discoverable plugin definition
+- [#1956](https://gitlab.com/meltano/meltano/-/issues/1956) Add support for Python 3.8
 
 
 ## 1.55.0 - (2020-10-30)
