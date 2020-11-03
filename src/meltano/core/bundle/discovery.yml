@@ -892,7 +892,7 @@ loaders:
         description: Maximum cache size in MB
         value: 50
   - name: target-csv
-    label: CSV
+    label: Comma Separated Values (CSV)
     description: CSV loader
     namespace: target_csv
     variant: singer-io
@@ -900,6 +900,9 @@ loaders:
     repo: https://github.com/singer-io/target-csv
     pip_url: target-csv
     settings:
+      - name: destination_path
+        description: Sets the destination path the CSV files are written to, relative to the project root. The directory needs to exist already, it will not be created automatically. To write CSV files to the project root, set an empty string (`""`).
+        value: output
       - name: delimiter
         kind: options
         options:
@@ -909,7 +912,7 @@ loaders:
             value: '\t'
           - label: Semi-colon (;)
             value: ';'
-          - label: Pipes (|)
+          - label: Pipe (|)
             value: '|'
         value: ','
         description: A one-character string used to separate fields. It defaults to a comma (,).
@@ -922,9 +925,6 @@ loaders:
             value: '"'
         value: "'"
         description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
-      - name: destination_path
-        description: Sets the destination path the CSV is written to
-        value: output
   - name: target-jsonl
     label: JSONL
     description: JSONL loader

@@ -193,10 +193,10 @@ This will result in the following configuration being passed on to the plugin:
 {"<property>": {"<subproperty>": "<value>", "<deep>": {"<nesting>": "<value>"}}}
 ```
 
-##### Dot seperator
+##### Dot separator
 
 Note that `meltano config <plugin> list` always displays full config keys
-with nesting represented by the `.` seperator, matching the internal flattened representation:
+with nesting represented by the `.` separator, matching the internal flattened representation:
 
 ```bash
 meltano config <plugin> list
@@ -204,7 +204,7 @@ meltano config <plugin> list
 # => <property>.<deep>.<nesting>
 ```
 
-You can also set nested properties using the `.` seperator, but specifying a list of names is preferred
+You can also set nested properties using the `.` separator, but specifying a list of names is preferred
 since this will result in the nesting being reflected in the plugin's `config` object in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):
 
 ```bash

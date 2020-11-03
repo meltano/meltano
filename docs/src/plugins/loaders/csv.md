@@ -1,46 +1,133 @@
 ---
 sidebar: auto
-metaTitle: Load Data into a CSV with Meltano
-description: Use Meltano to load data from numerous sources and insert it into a CSV for easy analysis.
+description: Use Meltano to pull data from various sources and load it into Comma Separated Values (CSV) files
 ---
 
 # Comma Separated Values (CSV)
 
-Comma Separated Values, better known as spreadsheets, are the swiss army knife of data analysis. Loading data into this format will create .CSV files that can be used with many other tools that are able to import/export this file type.
+The `target-csv` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into [Comma Separated Values (CSV)](https://en.wikipedia.org/wiki/Comma-separated_values) files.
 
-## Info
+For more information, refer to the repository at <https://github.com/singer-io/target-csv>.
 
-- **Data Warehouse**: CSV Files
-- **Repository**: [https://github.com/singer-io/target-csv](https://github.com/singer-io/target-csv)
+## Getting Started
 
-## Installing from the Meltano UI
+### Prerequisites
 
-From the Meltano UI, you can [select this Loader in Step 3 of your pipeline configuration](http://localhost:5000/pipelines/loaders).
+If you haven't already, follow the initial steps of the [Getting Started guide](/docs/getting-started.html):
 
-### Configuration
+1. [Install Meltano](/docs/getting-started.html#install-meltano)
+1. [Create your Meltano project](/docs/getting-started.html#create-your-meltano-project)
+1. [Add an extractor to pull data from a source](/docs/getting-started.html#add-an-extractor-to-pull-data-from-a-source)
 
-Once the loader has installed, a modal will appear with options for selecting the Delimiter and Quotechar you would like Meltano to use when loads your data into CSV format. The most commonly used options are selected by default.
+### Installation and configuration
 
-## Installing from the Meltano CLI
+#### Using the Command Line Interface
 
-1. Navigate to your Meltano project in the terminal
-2. Run the following command:
+1. Add the `target-csv` loader to your project using [`meltano add`](/docs/command-line-interface.html#add):
 
-```bash
-meltano add loader target-csv
+    ```bash
+    meltano add loader target-csv
+    ```
+
+1. Configure the [settings](#settings) below using [`meltano config`](/docs/command-line-interface.html#config).
+
+#### Using Meltano UI
+
+1. Start [Meltano UI](/docs/ui.html) using [`meltano ui`](/docs/command-line-interface.html#ui):
+
+    ```bash
+    meltano ui
+    ```
+
+1. Open the Loaders interface at <http://localhost:5000/loaders>.
+1. Click the "Add to project" button for "Comma Separated Values (CSV)".
+1. Configure the [settings](#settings) below in the "Configuration" interface that opens automatically.
+
+### Next steps
+
+Follow the remaining step of the [Getting Started guide](/docs/getting-started.html):
+
+1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
+
+## Settings
+
+`target-csv` requires the [configuration](/docs/configuration.html) of the following settings:
+
+- [Destination Path](#destination-path)
+
+These and other supported settings are documented below.
+To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
+
+#### Minimal configuration
+
+A minimal configuration of `target-csv` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
+
+```yml{6-7}
+plugins:
+  loaders:
+  - name: target-csv
+    variant: singer-io
+    pip_url: target-csv
+    config:
+      destination_path: my_csv_files
 ```
 
-If you are successful, you should see `Added and installed loaders 'target-csv'` in your terminal.
+### Destination Path
 
-### CLI Configuration
+- Name: `destination_path`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_CSV_DESTINATION_PATH`
+- Default: `output`
 
-If you want to customize your delimiter, quote character, or destination path, open `meltano.yml` for your desired project and update the configuration there.
+Sets the destination path the CSV files are written to, relative to the project root.
 
-```yaml{1-3}
-- name: target-csv
-  pip_url: git+https://github.com/singer-io/target-csv.git
-  config:
-    delimiter: "\t"
-    quotechar: "'"
-    destination_path: ""
+The directory needs to exist already, it will not be created automatically.
+
+To write CSV files to the project root, set an empty string (`""`).
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config target-csv set destination_path <path>
+
+export TARGET_CSV_DESTINATION_PATH=<path>
+```
+
+### Delimiter
+
+- Name: `delimiter`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_CSV_DELIMITER`
+- Options: Comma (`,`), Tab (`\t`), Semi-colon (`;`), Pipe (`|`)
+- Default: `,`
+
+A one-character string used to separate fields.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config target-csv set delimiter ";"
+
+export TARGET_CSV_DELIMITER=";"
+```
+
+### QuoteChar
+
+- Name: `quotechar`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_CSV_QUOTECHAR`
+- Options: Single Quote (`'`), Double Quote (`"`)
+- Default: `'`
+
+A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config target-csv set quotechar '"'
+
+export TARGET_CSV_QUOTECHAR='"'
 ```
