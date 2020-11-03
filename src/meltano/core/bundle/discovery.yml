@@ -926,7 +926,7 @@ loaders:
         value: "'"
         description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
   - name: target-jsonl
-    label: JSONL
+    label: JSON Lines (JSONL)
     description: JSONL loader
     namespace: target_jsonl
     variant: andyh1203
@@ -935,12 +935,12 @@ loaders:
     pip_url: target-jsonl
     settings:
       - name: destination_path
-        description: Directory to write the resulting .jsonl files to
+        description: Sets the destination path the JSONL files are written to, relative to the project root. The directory needs to exist already, it will not be created automatically. To write JSONL files to the project root, set an empty string (`""`).
         value: output
       - name: do_timestamp_file
         kind: boolean
         label: Include timestamp in file names
-        description: Specifies if the file should get timestamped
+        description: Specifies if the files should get timestamped
         value: false
   - name: target-postgres
     label: PostgreSQL
