@@ -31,7 +31,7 @@ Add the Postgres loader to your Meltano project through the command line:
 meltano add loader target-postgres
 ```
 
-Then setup your Postgres database by following [this tutorial](/plugins/loaders/postgres.html#tutorials).
+Then setup your Postgres database by following [this tutorial](/plugins/loaders/postgres.html).
 
 ## Setup the GitLab Extractor
 
