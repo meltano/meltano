@@ -1,57 +1,106 @@
 ---
 sidebar: auto
-metaTitle: Extract Data from Google Analytics
-description: Use Meltano to extract raw data from Google Analytics and insert it into Postgres, Snowflake, and more.
-lastUpdatedSignificantly: 2020-04-14
+description: Use Meltano to pull data from the Google Analytics API and load it into Snowflake, Postgres, and more
 ---
 
 # Google Analytics
 
-The Google Analytics extractor pulls raw data from the [Google Analytics Reporting API](https://developers.google.com/analytics/devguides/reporting/core/v4/).
+The `tap-google-analytics` [extractor](/plugins/extractors/) pulls raw data from the [Google Analytics Reporting API](https://developers.google.com/analytics/devguides/reporting/core/v4/).
 
-## Google Analytics Setup
+To learn more about `tap-google-analytics`, refer to the repository at <https://gitlab.com/meltano/tap-google-analytics>.
 
-In order to access your Google Analytics data, you will need:
+## Getting Started
 
-- View ID
-- Client Secrets _or_ OAuth Credentials
-- Start Date
+### Prerequisites
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe
-  width="560" height="315" src="https://www.youtube.com/embed/FON9ywXOcwM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</div>
+If you haven't already, follow the initial steps of the [Getting Started guide](/docs/getting-started.html):
 
-### View ID
+1. [Install Meltano](/docs/getting-started.html#install-meltano)
+1. [Create your Meltano project](/docs/getting-started.html#create-your-meltano-project)
 
-To get your View ID:
+### Installation and configuration
 
-1. Visit Google Analytics: <https://analytics.google.com/>
-2. Log in if you haven't already.
-3. Open the account/property/view selector in the top left corner
+#### Using the Command Line Interface
 
-![Screenshot of closed account selector](/images/tap-google-analytics/account-selector-closed.png)
+1. Add the `tap-google-analytics` extractor to your project using [`meltano add`](/docs/command-line-interface.html#add):
 
-3. Select the account, property, and view that you would like to connect with Meltano
+    ```bash
+    meltano add extractor tap-google-analytics
+    ```
 
-![Screenshot of open account selector](/images/tap-google-analytics/account-selector-open.png)
+1. Configure the [settings](#settings) below using [`meltano config`](/docs/command-line-interface.html#config).
 
-4. You will see the View ID displayed inside the selector below the name of the view (e.g. "All Web Site Data"): 188274549
+#### Using Meltano UI
 
-<h3 id="key-file-location">Client Secrets</h3>
+1. Start [Meltano UI](/docs/ui.html) using [`meltano ui`](/docs/command-line-interface.html#ui):
 
-:::tip Configuration Notes
+    ```bash
+    meltano ui
+    ```
 
-- Follow the steps below if you don't already have a valid `client_secrets.json` to upload
-- The process below can take over 10 minutes, but it's a one-time setup that's well worth it
+1. Open the Extractors interface at <http://localhost:5000/extractors>.
+1. Click the "Add to project" button for "Google Ads".
+1. Configure the [settings](#settings) below in the "Configuration" interface that opens automatically.
 
-:::
+### Next steps
+
+Follow the remaining steps of the [Getting Started guide](/docs/getting-started.html):
+
+1. [Select entities and attributes to extract](/docs/getting-started.html#select-entities-and-attributes-to-extract)
+1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
+1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
+
+## Settings
+
+`tap-google-analytics` requires the [configuration](/docs/configuration.html) of the following settings:
+
+- [Key File Location](#key-file-location), or all of:
+  - [OAuth Credentials: Client ID](#oauth-credentials-client-id)
+  - [OAuth Credentials: Client Secret](#oauth-credentials-client-secret)
+  - [OAuth Credentials: Access Token](#oauth-credentials-access-token)
+  - [OAuth Credentials: Refresh Token](#oauth-credentials-refresh-token)
+- [View ID](#view-id)
+- [Start Date](#start-date)
+
+These and other supported settings are documented below.
+To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
+
+#### Minimal configuration
+
+A minimal configuration of `tap-google-analytics` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
+
+```yml{6-8}
+plugins:
+  extractors:
+  - name: tap-google-analytics
+    variant: meltano
+    pip_url: git+https://gitlab.com/meltano/tap-google-analytics.git
+    config:
+      view_id: 188274549
+      start_date: '2020-10-01T00:00:00Z'
+```
+
+### Key File Location
+
+- Name: `key_file_location`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GOOGLE_ANALYTICS_KEY_FILE_LOCATION`, alias: `GOOGLE_ANALYTICS_API_CLIENT_SECRETS`
+- Default: `$MELTANO_PROJECT_ROOT/client_secrets.json`
+
+Fully qualified path to `client_secrets.json` for your service account.
+
+See <https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#service_accounts>.
+
+By default, this file is expected to be at the root of your project directory.
+
+#### How to get
+
+Follow the steps below if you don't already have a valid `client_secrets.json` to upload. The process below can take over 10 minutes, but it's a one-time setup that's well worth it.
 
 This extractor supports service account based authorization, where an administrator manually creates a service account with the appropriate permissions to view the account, property, and view you wish to fetch data from.
 
 To access your Google Analytics data, the "Analytics Reporting API" and "Analytics API" both need to be enabled. These need to be enabled for a project inside the same organization as your Google Analytics account.
 
-#### Step 1: Creating Service Account Credentials
+##### Step 1: Creating Service Account Credentials
 
 As a first step, you need to create a new project in Google Cloud Platform or use an existing one:
 
@@ -73,9 +122,9 @@ As a first step, you need to create a new project in Google Cloud Platform or us
 
    Click `Create Key`, select `JSON` as the key type and create a new private key. Then click `Save` and store it locally as `client_secrets.json`.
 
-Meltano will use the private key in this `client_secrets.json` file to connect with the Google Analytics API. You will upload it in the Meltano interface after completing the next two steps.
+Meltano will use the private key in this `client_secrets.json` file to connect with the Google Analytics API.
 
-#### Step 2: Linking Credentials to Google Analytics
+##### Step 2: Linking Credentials to Google Analytics
 
 The newly created service account will have an email address that looks similar to:
 
@@ -89,7 +138,7 @@ Only the [Read & Analyze permissions](https://support.google.com/analytics/answe
 
 ![Screenshot of Google Analytics Add User](/images/tap-google-analytics/03-ga-add-user.png)
 
-#### Step 3: Enabling the APIs
+##### Step 3: Enabling the APIs
 
 1. Visit the [Google Analytics Reporting API](https://console.developers.google.com/apis/api/analyticsreporting.googleapis.com/overview) dashboard and make sure that the project you used in the previous step is selected.
 
@@ -101,82 +150,234 @@ Only the [Read & Analyze permissions](https://support.google.com/analytics/answe
 
    ![Screenshot of Google Analytics API](/images/tap-google-analytics/05-ga-api.png)
 
-#### Next Steps
+#### How to use
 
-Now it's time to tell Meltano about the newly created service account so that it can use it to connect to the Google Analytics API:
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
-1. Click the "Upload" button to the right of "Client Secret" in the Meltano interface
-2. Select and upload the `client_secrets.json` file you generated and downloaded in step 1
+```bash
+meltano config tap-google-analytics set key_file_location /home/user/Downloads/client_secrets.json
+
+export TAP_GOOGLE_ANALYTICS_KEY_FILE_LOCATION=/home/user/Downloads/client_secrets.json
+```
+
+### OAuth Credentials: Client ID
+
+- Name: `oauth_credentials.client_id`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_CLIENT_ID`, alias: `GOOGLE_ANALYTICS_API_OAUTH_CLIENT_ID`
+
+See <https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing>.
+
+Takes precedence over [Key File Location](#key-file-location) if both are specified.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-google-analytics set oauth_credentials client_id <client_id>
+
+export TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_CLIENT_ID=<client_id>
+```
+
+### OAuth Credentials: Client Secret
+
+- Name: `oauth_credentials.client_secret`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_CLIENT_SECRET`, alias: `GOOGLE_ANALYTICS_API_OAUTH_CLIENT_SECRET`
+
+See <https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing>.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-google-analytics set oauth_credentials client_secret <client_secret>
+
+export TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_CLIENT_SECRET=<client_secret>
+```
+
+### OAuth Credentials: Access Token
+
+- Name: `oauth_credentials.access_token`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_ACCESS_TOKEN`, alias: `GOOGLE_ANALYTICS_API_OAUTH_ACCESS_TOKEN`
+
+See <https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing>.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-google-analytics set oauth_credentials access_token <token>
+
+export TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_ACCESS_TOKEN=<token>
+```
+
+### OAuth Credentials: Refresh Token
+
+- Name: `oauth_credentials.refresh_token`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_REFRESH_TOKEN`, alias: `GOOGLE_ANALYTICS_API_OAUTH_REFRESH_TOKEN`
+
+See <https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing>.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-google-analytics set oauth_credentials refresh_token <token>
+
+export TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_REFRESH_TOKEN=<token>
+```
+
+### View ID
+
+- Name: `view_id`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GOOGLE_ANALYTICS_VIEW_ID`, alias: `GOOGLE_ANALYTICS_API_VIEW_ID`
+
+Google Analytics View ID
+
+#### How to get
+
+To get your View ID:
+
+1. Visit Google Analytics: <https://analytics.google.com/>
+2. Log in if you haven't already.
+3. Open the account/property/view selector in the top left corner
+
+![Screenshot of closed account selector](/images/tap-google-analytics/account-selector-closed.png)
+
+3. Select the account, property, and view that you would like to connect with Meltano
+
+![Screenshot of open account selector](/images/tap-google-analytics/account-selector-open.png)
+
+4. You will see the View ID displayed inside the selector below the name of the view (e.g. "All Web Site Data"): `188274549`
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-google-analytics set view_id <id>
+
+export TAP_GOOGLE_ANALYTICS_VIEW_ID=<ids>
+```
+
+### Reports
+
+- Name: `reports`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GOOGLE_ANALYTICS_REPORTS`, alias: `GOOGLE_ANALYTICS_API_REPORTS`
+- Default: Bundled [`defaults/default_report_definition.json`](https://gitlab.com/meltano/tap-google-analytics/blob/master/tap_google_analytics/defaults/default_report_definition.json)
+
+Project-relative path to JSON file with the definition of the reports to be generated.
+
+See <https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/> for valid dimensions and metrics.
+
+The JSON structure expected is as follows:
+
+```json
+[
+  { "name" : "name of stream to be used",
+    "dimensions" :
+    [
+      "Google Analytics Dimension",
+      "Another Google Analytics Dimension",
+      // ... up to 7 dimensions per stream ...
+    ],
+    "metrics" :
+    [
+      "Google Analytics Metric",
+      "Another Google Analytics Metric",
+      // ... up to 10 metrics per stream ...
+    ]
+  },
+  // ... as many streams / reports as the user wants ...
+]
+```
+
+For example, if you want to extract user stats per day in a `users_per_day` stream and session stats per day and country in a `sessions_per_country_day` stream:
+
+```json
+[
+  { "name" : "users_per_day",
+    "dimensions" :
+    [
+      "ga:date"
+    ],
+    "metrics" :
+    [
+      "ga:users",
+      "ga:newUsers"
+    ]
+  },
+  { "name" : "sessions_per_country_day",
+    "dimensions" :
+    [
+      "ga:date",
+      "ga:country"
+    ],
+    "metrics" :
+    [
+      "ga:sessions",
+      "ga:sessionsPerUser",
+      "ga:avgSessionDuration"
+    ]
+  }
+]
+```
+
+### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-google-analytics set reports <path>
+
+export TAP_GOOGLE_ANALYTICS_REPORTS=<path>
+```
 
 ### Start Date
+
+- Name: `start_date`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GOOGLE_ANALYTICS_START_DATE`
 
 This property determines how much historical data will be extracted.
 
 Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
-## Meltano Setup
+#### How to use
 
-### Prerequisites
-
-- [Running instance of Meltano](/docs/installation.html#local-installation)
-
-### Configuration
-
-Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data source.
-
-Let's install `tap-google-analytics` by clicking on the `Connect` button inside its card.
-
-For the **Client Secrets**, you will need to upload your `client_secrets.json` using the file uploader.
-
-For the **View ID**, enter the ID you retrieved using [Google Analytics Account Explorer](https://ga-dev-tools.appspot.com/account-explorer/)
-
-For the **Start Date**, choose the date when you want to start extracting data for.
-
-Click `Save` to finish configuring the extractor and progress to the next step: "Configure the Loader".
-
-## Advanced: Command Line Installation
-
-1. Navigate to your Meltano project in the terminal
-2. Run the following command:
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano add extractor tap-google-analytics
+meltano config tap-google-analytics set start_date YYYY-MM-DDTHH:MM:SSZ
+
+export TAP_GOOGLE_ANALYTICS_START_DATE=YYYY-MM-DDTHH:MM:SSZ
+
+# For example:
+meltano config tap-google-analytics set start_date 2020-10-01T00:00:00Z
+
+export TAP_GOOGLE_ANALYTICS_START_DATE=2020-10-01T00:00:00Z
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-google-analytics'` in your terminal.
+### End Date
 
-### Configuration
+- Name: `end_date`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GOOGLE_ANALYTICS_END_DATE`
 
-1. Open your project's `.env` file in a text editor
-1. Add the following variables to your file:
+Date up to when historical data will be extracted.
 
-Required:
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-export GOOGLE_ANALYTICS_API_VIEW_ID="YOUR VIEW ID"
-export GOOGLE_ANALYTICS_API_START_DATE="2019-02-01T00:00:00Z"
+meltano config tap-google-analytics set end_date YYYY-MM-DDTHH:MM:SSZ
+
+export TAP_GOOGLE_ANALYTICS_END_DATE=YYYY-MM-DDTHH:MM:SSZ
+
+# For example:
+meltano config tap-google-analytics set end_date 2020-10-01T00:00:00Z
+
+export TAP_GOOGLE_ANALYTICS_END_DATE=2020-10-01T00:00:00Z
 ```
-
-Optional:
-
-```bash
-export GOOGLE_ANALYTICS_API_REPORTS="cli_reports.json"
-export GOOGLE_ANALYTICS_API_END_DATE="2019-06-01T00:00:00Z"
-```
-
-If you are authenticating using `client_secrets.json`:
-
-```bash
-export GOOGLE_ANALYTICS_API_CLIENT_SECRETS="client_secrets.json"
-```
-
-If you are authenticating using OAuth credentials:
-
-```bash
-export GOOGLE_ANALYTICS_API_OAUTH_ACCESS_TOKEN="YOUR ACCESS TOKEN"
-export GOOGLE_ANALYTICS_API_OAUTH_REFRESH_TOKEN="YOUR REFRESH TOKEN"
-export GOOGLE_ANALYTICS_API_OAUTH_CLIENT_ID="YOUR CLIENT ID"
-export GOOGLE_ANALYTICS_API_OAUTH_CLIENT_SECRET="YOUR CLIENT SECRET"
-```
-
-Check the [README](https://gitlab.com/meltano/tap-google-analytics#tap-google-analytics) for details.
