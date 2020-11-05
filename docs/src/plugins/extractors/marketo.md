@@ -1,38 +1,183 @@
 ---
 sidebar: auto
-metaTitle: Extract Data from Marketo
-description: Use Meltano to extract raw data from Marketo and insert it into Postgres, Snowflake, and more.
+description: Use Meltano to pull data from the Marketo API and load it into Snowflake, Postgres, and more
 ---
 
 # Marketo
 
-`tap-marketo` pulls raw data from Marketo's REST API and extracts activity types, activites, and leads from Marketo.
+The `tap-marketo` [extractor](/plugins/extractors/) pulls raw data from the [Marketo API](https://developers.marketo.com/rest-api/).
 
-## Info
+To learn more about `tap-marketo`, refer to the repository at <https://gitlab.com/meltano/tap-marketo>.
 
-- **Data Source**: [Marketo's REST API](http://developers.marketo.com/rest-api/)
-- **Repository**: [https://gitlab.com/meltano/tap-marketo](https://gitlab.com/meltano/tap-marketo)
+## Getting Started
 
-## Install
+### Prerequisites
 
-1. Navigate to your Meltano project in the terminal
-2. Run the following command:
+If you haven't already, follow the initial steps of the [Getting Started guide](/docs/getting-started.html):
 
-```bash
-meltano add extractor tap-marketo
+1. [Install Meltano](/docs/getting-started.html#install-meltano)
+1. [Create your Meltano project](/docs/getting-started.html#create-your-meltano-project)
+
+### Installation and configuration
+
+#### Using the Command Line Interface
+
+1. Add the `tap-marketo` extractor to your project using [`meltano add`](/docs/command-line-interface.html#add):
+
+    ```bash
+    meltano add extractor tap-marketo
+    ```
+
+1. Configure the [settings](#settings) below using [`meltano config`](/docs/command-line-interface.html#config).
+
+#### Using Meltano UI
+
+1. Start [Meltano UI](/docs/ui.html) using [`meltano ui`](/docs/command-line-interface.html#ui):
+
+    ```bash
+    meltano ui
+    ```
+
+1. Open the Extractors interface at <http://localhost:5000/extractors>.
+1. Click the "Add to project" button for "Marketo".
+1. Configure the [settings](#settings) below in the "Configuration" interface that opens automatically.
+
+### Next steps
+
+Follow the remaining steps of the [Getting Started guide](/docs/getting-started.html):
+
+1. [Select entities and attributes to extract](/docs/getting-started.html#select-entities-and-attributes-to-extract)
+1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
+1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
+
+## Settings
+
+`tap-marketo` requires the [configuration](/docs/configuration.html) of the following settings:
+
+- [Endpoint](#endpoint)
+- [Identity](#identity)
+- [Client ID](#client-id)
+- [Client Secret](#client-secret)
+- [Start Date](#start-date)
+
+These and other supported settings are documented below.
+To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
+
+#### Minimal configuration
+
+A minimal configuration of `tap-marketo` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
+
+```yml{6-10}
+plugins:
+  extractors:
+  - name: tap-marketo
+    variant: meltano
+    pip_url: git+https://gitlab.com/meltano/tap-marketo.git
+    config:
+      endpoint: https://284-RPR-133.mktorest.com/rest
+      identity: https://284-RPR-133.mktorest.com/identity
+      client_id: 70ee92a1-603f-44a8-97a3-e0e55d758d1b
+      start_date: '2020-10-01T00:00:00Z'
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-marketo'` in your terminal.
-
-## Configuration
-
-1. Open your project's `.env` file in a text editor
-1. Add the following variables to your file:
+Sensitive values are most appropriately stored in [the environment](/docs/configuration.html#configuring-settings) or your project's [`.env` file](/docs/project.html#env):
 
 ```bash
-export TAP_MARKETO_CLIENT_ID="Your Client Id"
-export TAP_MARKETO_CLIENT_SECRET="Your Client Secret"
-export TAP_MARKETO_ENDPOINT="Your Endpoint Url"
-export TAP_MARKETO_IDENTITY="Your Identity"
-export TAP_MARKETO_START_DATE="2019-01-01T00:00:00Z"
+export TAP_MARKETO_CLIENT_SECRET=my_secret
+```
+
+### Endpoint
+
+- Name: `endpoint`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_MARKETO_ENDPOINT`
+
+Endpoint URL
+
+See <https://developers.marketo.com/rest-api/base-url/>.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-marketo set endpoint <endpoint_url>
+
+export TAP_MARKETO_ENDPOINT=<endpoint_url>
+```
+
+### Identity
+
+- Name: `identity`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_MARKETO_IDENTITY`
+
+Identity URL
+
+See <https://developers.marketo.com/rest-api/base-url/>.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-marketo set identity <identity_url>
+
+export TAP_MARKETO_IDENTITY=<identity_url>
+```
+
+### Client ID
+
+- Name: `client_id`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_MARKETO_CLIENT_ID`
+
+See <https://developers.marketo.com/rest-api/authentication/>.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-marketo set client_id <client_id>
+
+export TAP_MARKETO_CLIENT_ID=<client_id>
+```
+
+### Client Secret
+
+- Name: `client_secret`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_MARKETO_CLIENT_SECRET`
+
+See <https://developers.marketo.com/rest-api/authentication/>.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-marketo set client_secret <client_secret>
+
+export TAP_MARKETO_CLIENT_SECRET=<client_secret>
+```
+
+### Start Date
+
+- Name: `start_date`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_MARKETO_START_DATE`
+
+This property determines how much historical data will be extracted.
+
+Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-marketo set start_date YYYY-MM-DDTHH:MM:SSZ
+
+export TAP_MARKETO_START_DATE=YYYY-MM-DDTHH:MM:SSZ
+
+# For example:
+meltano config tap-marketo set start_date 2020-10-01T00:00:00Z
+
+export TAP_MARKETO_START_DATE=2020-10-01T00:00:00Z
 ```

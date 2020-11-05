@@ -806,12 +806,12 @@ extractors:
     pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
     capabilities: []
     settings:
+      - name: endpoint
       - name: identity
       - name: client_id
         label: Client ID
       - name: client_secret
         kind: password
-      - name: endpoint
       - name: start_date
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
