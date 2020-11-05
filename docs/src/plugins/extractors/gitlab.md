@@ -93,7 +93,7 @@ GitLab API/instance URL. When an API path is omitted, `/api/v4/` is assumed.
 
 #### How to use
 
-Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+Manage this setting using [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
 meltano config tap-gitlab set api_url https://gitlab.example.com
