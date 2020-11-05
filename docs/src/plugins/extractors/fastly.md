@@ -80,7 +80,7 @@ Sensitive values are most appropriately stored in [the environment](/docs/config
 export TAP_FASTLY_API_TOKEN=my_api_token
 ```
 
-### Access Token
+### API Token
 
 - Name: `api_token`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TAP_FASTLY_API_TOKEN`
