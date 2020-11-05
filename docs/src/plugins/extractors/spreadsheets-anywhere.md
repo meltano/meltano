@@ -1,32 +1,108 @@
 ---
 sidebar: auto
-metaTitle: Extract tabular data from CSVs and Excel spreadsheet files on Cloud or local storage 
-description: Use Meltano to extract raw data from multiple CSVs and/or Excel spreadsheets (compressed or not) directly from localhost, S3, GCS, Azure Blob Storage, WebHDFS, SFTP, etc... 
+description: Use Meltano to pull data from CSV files and Excel spreadsheets on cloud or local storage and load it into Snowflake, Postgres, and more
 ---
 
 # Spreadsheets Anywhere
 
-The [Spreadsheets Anywhere](https://github.com/ets/tap-spreadsheets-anywhere) extractor pulls raw data from files (CSVs or Excel spreadsheets) accessible through popular "Cloud transports" such as:
+The `tap-spreadsheets-anywhere` [extractor](/plugins/extractors/) pulls raw data from [CSV](https://en.wikipedia.org/wiki/Comma-separated_values) files and Excel spreadsheets on cloud or local storage.
 
-- S3
-- SSH, SCP and SFTP
-- HTTP, HTTPS (read-only)
-- WebHDFS
-- GCS
-- Azure Blob Storage
+To learn more about `tap-spreadsheets-anywhere`, refer to the repository at <https://github.com/ets/tap-spreadsheets-anywhere>.
 
-This tap also supports pulling from local directories and will automatically decompress gzip and bzip2 files where
-supported.  Multiple individual files with the same schema can be configured & ingested into the same "Table" for processing.
+## Getting Started
 
-## Info
-Please reference the [project repository](https://github.com/ets/tap-spreadsheets-anywhere) for detailed configuration instructions.
+### Prerequisites
 
-## Installing from the Meltano CLI
+If you haven't already, follow the initial steps of the [Getting Started guide](/docs/getting-started.html):
 
-1. Navigate to your Meltano project in the terminal
-2. Run the following command:
+1. [Install Meltano](/docs/getting-started.html#install-meltano)
+1. [Create your Meltano project](/docs/getting-started.html#create-your-meltano-project)
 
-```bash
-meltano add extractor tap-spreadsheets-anywhere
+### Installation and configuration
+
+1. Add the `tap-spreadsheets-anywhere` extractor to your project using [`meltano add`](/docs/command-line-interface.html#add):
+
+    ```bash
+    meltano add extractor tap-spreadsheets-anywhere
+    ```
+
+1. Configure the [settings](#settings) below using [`meltano config`](/docs/command-line-interface.html#config).
+
+### Next steps
+
+Follow the remaining steps of the [Getting Started guide](/docs/getting-started.html):
+
+1. [Select entities and attributes to extract](/docs/getting-started.html#select-entities-and-attributes-to-extract)
+1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
+1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
+
+## Settings
+
+`tap-spreadsheets-anywhere` requires the [configuration](/docs/configuration.html) of the following settings:
+
+- [Tables](#tables)
+
+#### Minimal configuration
+
+A minimal configuration of `tap-spreadsheets-anywhere` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
+
+```yml{6-20}
+plugins:
+  extractors:
+  - name: tap-spreadsheets-anywhere
+    variant: etc
+    pip_url: git+https://github.com/ets/tap-spreadsheets-anywhere.git
+    config:
+      tables:
+        - path: s3://my-s3-bucket
+          name: target_table_name
+          pattern: "subfolder/common_prefix.*"
+          start_date: "2017-05-01T00:00:00Z"
+          key_properties: []
+          format: csv
+        - path: file:///home/user/Downloads/xls_files
+          name: another_table_name
+          pattern: "subdir/.*User.*"
+          start_date: "2017-05-01T00:00:00Z"
+          key_properties: [id]
+          format: excel
+          worksheet_name: Names
 ```
 
+### Tables
+
+- Name: `tables`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SPREADSHEETS_ANYWHERE_TABLES`
+
+Array holding objects that each describe a set of targeted source files.
+
+See <https://github.com/ets/tap-spreadsheets-anywhere#configuration>.
+
+#### How to use
+
+Manage this setting directly in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):
+
+```yml{6-14}
+plugins:
+  extractors:
+  - name: tap-spreadsheets-anywhere
+    variant: etc
+    pip_url: git+https://github.com/ets/tap-spreadsheets-anywhere.git
+    config:
+      tables:
+        - path: <path>
+          name: <table_name>
+          pattern: "<pattern>"
+          start_date: "YYYY-MM-DDTHH:MM:SSZ"
+          key_properties: [<key>]
+          format: <csv|excel>
+        # ...
+```
+
+Alternatively, manage this setting using [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-spreadsheets-anywhere set tables '[{"path": "<path>", ...}, ...]'
+
+export TAP_SPREADSHEETS_ANYWHERE_TABLES='[{"path": "<path>", ...}, ...]'
+```
