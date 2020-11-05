@@ -712,24 +712,24 @@ extractors:
     variant: meltano
     docs: 'https://meltano.com/plugins/extractors/stripe.html'
     repo: https://github.com/meltano/tap-stripe
-    pip_url: 'git+https://github.com/meltano/tap-stripe.git@v0.2.4'
+    pip_url: 'git+https://github.com/meltano/tap-stripe.git'
     capabilities:
       - catalog
       - discover
       - state
     settings:
       - name: account_id
-        label: Account ID
         env_aliases: [STRIPE_ACCOUNT_ID]
+        label: Account ID
         placeholder: Ex. acct_1a2b3c4d5e
       - name: client_secret
-        label: Secret API Key
-        kind: password
         env_aliases: [STRIPE_API_KEY]
+        kind: password
+        label: Secret API Key
         placeholder: Ex. sk_live_1a2b3c4d5e
       - name: start_date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
   - name: tap-zendesk
     label: Zendesk
     description: Support ticketing system & customer service platform
