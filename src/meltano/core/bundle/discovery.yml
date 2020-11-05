@@ -630,7 +630,6 @@ extractors:
       - name: host
         label: Host URL
         value: localhost
-        protected: true
       - name: port
         kind: integer
         value: 27017
@@ -981,7 +980,6 @@ loaders:
         aliases: [address]
         env_aliases: [PG_ADDRESS, POSTGRES_HOST]
         value: localhost
-        protected: true
       - name: port
         kind: integer
         env_aliases: [PG_PORT, POSTGRES_PORT]
