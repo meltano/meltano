@@ -54,11 +54,19 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 
 `tap-google-analytics` requires the [configuration](/docs/configuration.html) of the following settings:
 
-- [Key File Location](#key-file-location), or all of:
-  - [OAuth Credentials: Client ID](#oauth-credentials-client-id)
-  - [OAuth Credentials: Client Secret](#oauth-credentials-client-secret)
-  - [OAuth Credentials: Access Token](#oauth-credentials-access-token)
-  - [OAuth Credentials: Refresh Token](#oauth-credentials-refresh-token)
+In case of service account authentication:
+
+- [Key File Location](#key-file-location)
+
+In case of OAuth authentication:
+
+- [OAuth Credentials: Client ID](#oauth-credentials-client-id)
+- [OAuth Credentials: Client Secret](#oauth-credentials-client-secret)
+- [OAuth Credentials: Access Token](#oauth-credentials-access-token)
+- [OAuth Credentials: Refresh Token](#oauth-credentials-refresh-token)
+
+Always:
+
 - [View ID](#view-id)
 - [Start Date](#start-date)
 

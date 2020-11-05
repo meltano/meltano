@@ -1,54 +1,142 @@
 ---
 sidebar: auto
-metaTitle: Extract Data from Salesforce
-description: Use Meltano to extract raw data from Salesforce and insert it into Postgres, Snowflake, and more.
-lastUpdatedSignificantly: 2020-04-14
+description: Use Meltano to pull data from the Salesforce API and load it into Snowflake, Postgres, and more
 ---
 
 # Salesforce
 
-The Salesforce extractor pulls raw data from Salesforce's [REST API](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm) and extracts the following resources by default:
+The `tap-salesforce` [extractor](/plugins/extractors/) pulls raw data from the [Salesforce API](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm).
 
-- Users
-- Accounts
-- Leads
-- Opportunities
-- Contacts
+To learn more about `tap-salesforce`, refer to the repository at <https://gitlab.com/meltano/tap-salesforce>.
 
-For more information you can check [the documentation for tap-salesforce](https://gitlab.com/meltano/tap-salesforce).
+## Getting Started
 
-## Salesforce Setup
+### Prerequisites
 
-In order to access your Salesforce data, you will need:
+If you haven't already, follow the initial steps of the [Getting Started guide](/docs/getting-started.html):
 
-- User Name
-- Password
-- Security Token
-- Start Date
+1. [Install Meltano](/docs/getting-started.html#install-meltano)
+1. [Create your Meltano project](/docs/getting-started.html#create-your-meltano-project)
 
-<h3 id="username">User Name</h3>
+### Installation and configuration
 
-:::tip Configuration Notes
+#### Using the Command Line Interface
 
-- The user name used to sign in to your Salesforce account
+1. Add the `tap-salesforce` extractor to your project using [`meltano add`](/docs/command-line-interface.html#add):
 
-:::
+    ```bash
+    meltano add extractor tap-salesforce
+    ```
+
+1. Configure the [settings](#settings) below using [`meltano config`](/docs/command-line-interface.html#config).
+
+#### Using Meltano UI
+
+1. Start [Meltano UI](/docs/ui.html) using [`meltano ui`](/docs/command-line-interface.html#ui):
+
+    ```bash
+    meltano ui
+    ```
+
+1. Open the Extractors interface at <http://localhost:5000/extractors>.
+1. Click the "Add to project" button for "Salesforce".
+1. Configure the [settings](#settings) below in the "Configuration" interface that opens automatically.
+
+### Next steps
+
+Follow the remaining steps of the [Getting Started guide](/docs/getting-started.html):
+
+1. [Select entities and attributes to extract](/docs/getting-started.html#select-entities-and-attributes-to-extract)
+1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
+1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
+
+## Settings
+
+`tap-salesforce` requires the [configuration](/docs/configuration.html) of the following settings:
+
+In case of username/password authentication:
+
+- [Username](#username)
+- [Password](#password)
+- [Security Token](#security-token)
+
+In case of OAuth authentication:
+
+- [Client ID](#client-id)
+- [Client Secret](#client-secret)
+- [Refresh Token](#refresh-token)
+
+Always:
+
+- [Start Date](#start-date)
+
+These and other supported settings are documented below.
+To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
+
+#### Minimal configuration
+
+A minimal configuration of `tap-salesforce` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
+
+```yml{6-8}
+plugins:
+  extractors:
+  - name: tap-salesforce
+    variant: meltano
+    pip_url: git+https://gitlab.com/meltano/tap-salesforce.git
+    config:
+      username: user@example.com
+      start_date: '2020-10-01T00:00:00Z'
+```
+
+Sensitive values are most appropriately stored in [the environment](/docs/configuration.html#configuring-settings) or your project's [`.env` file](/docs/project.html#env):
+
+```bash
+export TAP_SALESFORCE_PASSWORD=my_password
+export TAP_SALESFORCE_SECURITY_TOKEN=my_token
+```
+
+### Username
+
+- Name: `username`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_USERNAME`
+
+The username (or email address) used to sign in to your Salesforce account
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-salesforce set username <username>
+
+export TAP_SALESFORCE_USERNAME=<username>
+```
 
 ### Password
 
-:::tip Configuration Notes
+- Name: `password`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_PASSWORD`
 
-- The password used to sign in to your Salesforce account
+The password used to sign in to your Salesforce account
 
-:::
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-salesforce set password <password>
+
+export TAP_SALESFORCE_PASSWORD=<password>
+```
 
 ### Security Token
 
-:::tip Configuration Notes
+- Name: `security_token`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_SECURITY_TOKEN`
 
-- Access to Salesforce's API requires a security token that will authenticate you with the server
+Access to Salesforce's API requires a security token that will authenticate you with the server.
 
-:::
+#### How to get
 
 If you don't already have a Salesforce Security Token for your account, you can generate one through the following steps:
 
@@ -88,49 +176,162 @@ If you have other third-party applications integrated with Salesforce and you re
 
 :::
 
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-salesfroce set security_token <token>
+
+export TAP_SALESFORCE_SECURITY_TOKEN=<token>
+```
+
+### Client ID
+
+- Name: `client_id`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_CLIENT_ID`
+
+See <https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_understanding_web_server_oauth_flow.htm>.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-salesforce set client_id <client_id>
+
+export TAP_SALESFORCE_CLIENT_ID=<client_id>
+```
+
+### Client Secret
+
+- Name: `client_secret`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_CLIENT_SECRET`
+
+See <https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_understanding_web_server_oauth_flow.htm>.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-salesforce set client_secret <client_secret>
+
+export TAP_SALESFORCE_CLIENT_SECRET=<client_secret>
+```
+
+### Refresh Token
+
+- Name: `refresh_token`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_REFRESH_TOKEN`
+
+See <https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_understanding_web_server_oauth_flow.htm>.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-salesforce set refresh_token <token>
+
+export TAP_SALESFORCE_REFRESH_TOKEN=<token>
+```
+
 ### Start Date
+
+- Name: `start_date`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_START_DATE`
 
 This property determines how much historical data will be extracted.
 
 Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
-## Meltano Setup
+#### How to use
 
-### Prerequisites
-
-- [Running instance of Meltano](/docs/installation.html#local-installation)
-
-### Configure the Extractor
-
-Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data sources.
-
-![Screenshot of Meltano UI with all extractors not installed and Salesforce Extractor highlighted](/images/salesforce-tutorial/01-salesforce-extractor-selection.png)
-
-Let's install `tap-salesforce` by clicking on the `Install` button inside its card.
-
-On the configuration modal we want to enter your username and password, the Security Token Salesforce extractor will use to connect to Salesforce, and the Start Date we want the extracted data set to start from.
-
-![Screenshot of Salesforce Extractor Configuration](/images/salesforce-tutorial/02-salesforce-configuration.png)
-
-## Advanced: Command Line Installation
-
-1. Navigate to your Meltano project in the terminal
-2. Run the following command:
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano add extractor tap-salesforce
+meltano config tap-salesforce set start_date YYYY-MM-DDTHH:MM:SSZ
+
+export TAP_SALESFORCE_START_DATE=YYYY-MM-DDTHH:MM:SSZ
+
+# For example:
+meltano config tap-salesforce set start_date 2020-10-01T00:00:00Z
+
+export TAP_SALESFORCE_START_DATE=2020-10-01T00:00:00Z
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-salesforce'` in your terminal.
+### API Type
 
-## Configuration
+- Name: `api_type`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_API_TYPE`
+- Options: `REST`, `BULK`
+- Default: `REST`
 
-1. Open your project's `.env` file in a text editor
-1. Add the following variables to your file:
+Used to switch the behavior of the tap between using Salesforce's "REST" and "BULK" APIs.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-export TAP_SALESFORCE_USERNAME="Your Salesforce Username"
-export TAP_SALESFORCE_PASSWORD="Your Salesforce Password"
-export TAP_SALESFORCE_SECURITY_TOKEN="Your Salesforce Security Token"
-export TAP_SALESFORCE_START_DATE="2018-01-01T00:00:00Z"
+meltano config tap-salesforce set api_type BULK
+
+export TAP_SALESFORCE_API_TYPE=BULK
+```
+
+### Select Fields By Default
+
+- Name: `select_fields_by_default`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_SELECT_FIELDS_BY_DEFAULT`
+- Default: `true`
+
+Select by default any new fields discovered in Salesforce objects
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-salesforce set select_fields_by_default false
+
+export TAP_SALESFORCE_SELECT_FIELDS_BY_DEFAULT=false
+```
+
+### State Message Threshold
+
+- Name: `state_message_threshold`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_STATE_MESSAGE_THRESHOLD`
+- Default: `1000`
+
+Used to throttle how often STATE messages are generated when the tap is using the "REST" API.
+
+This is a balance between not slowing down execution due to too many STATE messages produced and how many records must be fetched again if a tap fails unexpectedly. Defaults to 1000 (generate a STATE message every 1000 records).
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-salesforce set state_message_threshold 500
+
+export TAP_SALESFORCE_STATE_MESSAGE_THRESHOLD=500
+```
+
+### Max Workers
+
+- Name: `max_workers`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_MAX_WORKERS`
+- Default: `8`
+
+Maximum number of threads to use
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-salesforce set max_workers 16
+
+export TAP_SALESFORCE_MAX_WORKERS=16
 ```
