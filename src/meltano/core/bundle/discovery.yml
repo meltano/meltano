@@ -621,7 +621,7 @@ extractors:
     variant: singer-io
     docs: 'https://meltano.com/plugins/extractors/mongodb.html'
     repo: https://github.com/singer-io/tap-mongodb
-    pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
+    pip_url: tap-mongodb
     capabilities:
       - catalog
       - discover
