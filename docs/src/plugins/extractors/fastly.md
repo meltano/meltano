@@ -77,7 +77,7 @@ plugins:
 Sensitive values are most appropriately stored in [the environment](/docs/configuration.html#configuring-settings) or your project's [`.env` file](/docs/project.html#env):
 
 ```bash
-export TAP_FASTLY_API_ROKEN=my_api_token
+export TAP_FASTLY_API_TOKEN=my_api_token
 ```
 
 ### Access Token
