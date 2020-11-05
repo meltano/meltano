@@ -676,7 +676,7 @@ extractors:
     variant: singer-io
     docs: 'https://meltano.com/plugins/extractors/shopify.html'
     repo: https://github.com/singer-io/tap-shopify
-    pip_url: tap-shopify==1.2.0
+    pip_url: tap-shopify
     capabilities:
       - catalog
       - discover
@@ -699,12 +699,12 @@ extractors:
         label: Store Subdomain
         placeholder: Ex. my-first-store
       - name: api_key
-        label: Private App API Password
         kind: password
+        label: Private App API Password
         placeholder: Ex. shppa_1a2b3c4d5e6f
       - name: start_date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
   - name: tap-stripe
     label: Stripe
     description: Online payment processing for internet businesses

@@ -1,41 +1,116 @@
 ---
 sidebar: auto
-metaTitle: Extract Data from Shopify
-description: Use Meltano to extract raw data from Shopify and insert it into Postgres, Snowflake, and more.
+description: Use Meltano to pull data from the Shopify API and load it into Snowflake, Postgres, and more
 ---
 
 # Shopify
 
-The Shopify extractor pulls raw data from the [Shopify API](https://shopify.dev/docs/admin-api/rest/reference) and extracts the following resources from a Shopify shop:
+The `tap-shopify` [extractor](/plugins/extractors/) pulls raw data from the [Shopify API](https://shopify.dev/docs/admin-api/rest/reference).
 
-- [Abandoned Checkouts](https://help.shopify.com/en/api/reference/orders/abandoned_checkouts)
-- [Collects](https://help.shopify.com/en/api/reference/products/collect)
-- [Custom Collections](https://help.shopify.com/en/api/reference/products/customcollection)
-- [Customers](https://help.shopify.com/en/api/reference/customers)
-- [Metafields](https://help.shopify.com/en/api/reference/metafield)
-- [Orders](https://help.shopify.com/en/api/reference/orders)
-- [Products](https://help.shopify.com/en/api/reference/products)
-- [Transactions](https://help.shopify.com/en/api/reference/orders/transaction)
+To learn more about `tap-shopify`, refer to the repository at <https://github.com/singer-io/tap-shopify>.
 
-For more information you can check [the documentation for tap-shopify](https://github.com/singer-io/tap-shopify).
+## Getting Started
 
-## Shopify Setup
+### Prerequisites
 
-In order to access your Shopify data, you will need:
+If you haven't already, follow the initial steps of the [Getting Started guide](/docs/getting-started.html):
 
-- Store Subdomain
-- Private App API Password
-- Start Date
+1. [Install Meltano](/docs/getting-started.html#install-meltano)
+1. [Create your Meltano project](/docs/getting-started.html#create-your-meltano-project)
 
-<h3 id="shop">Store Subdomain</h3>
+### Installation and configuration
 
-The store subdomain can be derived from your Shopify admin URL.
+#### Using the Command Line Interface
+
+1. Add the `tap-shopify` extractor to your project using [`meltano add`](/docs/command-line-interface.html#add):
+
+    ```bash
+    meltano add extractor tap-shopify
+    ```
+
+1. Configure the [settings](#settings) below using [`meltano config`](/docs/command-line-interface.html#config).
+
+#### Using Meltano UI
+
+1. Start [Meltano UI](/docs/ui.html) using [`meltano ui`](/docs/command-line-interface.html#ui):
+
+    ```bash
+    meltano ui
+    ```
+
+1. Open the Extractors interface at <http://localhost:5000/extractors>.
+1. Click the "Add to project" button for "Shopify".
+1. Configure the [settings](#settings) below in the "Configuration" interface that opens automatically.
+
+### Next steps
+
+Follow the remaining steps of the [Getting Started guide](/docs/getting-started.html):
+
+1. [Select entities and attributes to extract](/docs/getting-started.html#select-entities-and-attributes-to-extract)
+1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
+1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
+
+## Settings
+
+`tap-shopify` requires the [configuration](/docs/configuration.html) of the following settings:
+
+- [Shop](#shop)
+- [API Key](#api-key)
+- [Start Date](#start-date)
+
+These and other supported settings are documented below.
+To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
+
+#### Minimal configuration
+
+A minimal configuration of `tap-shopify` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
+
+```yml{6-8}
+plugins:
+  extractors:
+  - name: tap-shopify
+    variant: singer-io
+    pip_url: tap-shopify
+    config:
+      shop: my_store_subdomain
+      start_date: '2020-10-01T00:00:00Z'
+```
+
+Sensitive values are most appropriately stored in [the environment](/docs/configuration.html#configuring-settings) or your project's [`.env` file](/docs/project.html#env):
+
+```bash
+export TAP_SHOPIFY_API_KEY=my_key
+```
+
+### Shop
+
+- Name: `shop`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SHOPIFY_SHOP`
+
+The store subdomain, which can be derived from your Shopify admin URL.
 
 If your admin URL starts with `https://my-first-store.myshopify.com/`, your store subdomain is `my-first-store`.
 
-<h3 id="api-key">Private App API Password</h3>
+#### How to use
 
-#### Create private app
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-shopify set shop <subdomain>
+
+export TAP_SHOPIFY_SHOP=<subdomain>
+```
+
+### API Key
+
+- Name: `api_key`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SHOPIFY_API_KEY`
+
+A Private App API Password or API Key generated using OAuth
+
+#### How to get
+
+##### Create private app
 
 First, you will need to create a [Private App](https://help.shopify.com/en/manual/apps/private-apps):
 
@@ -53,7 +128,7 @@ First, you will need to create a [Private App](https://help.shopify.com/en/manua
 9. Click "Save"
 10. In the modal that appears, click "I understand, create the app"
 
-#### Find your API password
+##### Find your API password
 
 Now that your app has been created, we can acquire the password Meltano will use to authenticate with the Shopify API.
 
@@ -62,38 +137,36 @@ Now that your app has been created, we can acquire the password Meltano will use
 
 ![Screenshot of Shopify interface showing private app API password](/images/tap-shopify/private-app-api-password.png)
 
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-shopify set api_key <key>
+
+export TAP_SHOPIFY_API_KEY=<key>
+```
+
 ### Start Date
+
+- Name: `start_date`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SHOPIFY_START_DATE`
 
 This property determines how much historical data will be extracted.
 
 Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
-## Advanced: Command Line Installation
+#### How to use
 
-1. Navigate to your Meltano project in the terminal
-2. Run the following command:
-
-```bash
-meltano add extractor tap-shopify
-```
-
-If you are successful, you should see `Added and installed extractors 'tap-shopify'` in your terminal.
-
-### Configuration
-
-1. Open your project's `.env` file in a text editor
-1. Add the following variables to your file:
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-# See above for steps on how to acquire "Store Subdomain"
-export TAP_SHOPIFY_SHOP="my-first-store"
-# See above for steps on how to acquire "Private App API Password"
-export TAP_SHOPIFY_API_KEY="shppa_1a2b3c4d5e6f"
-# The date uses ISO-8601 and supports time if desired
-export TAP_STRIPE_START_DATE="YYYY-MM-DD"
+meltano config tap-shopify set start_date YYYY-MM-DDTHH:MM:SSZ
+
+export TAP_SHOPIFY_START_DATE=YYYY-MM-DDTHH:MM:SSZ
+
+# For example:
+meltano config tap-shopify set start_date 2020-10-01T00:00:00Z
+
+export TAP_SHOPIFY_START_DATE=2020-10-01T00:00:00Z
 ```
-
-## Additional Information
-
-- **Data Source**: [Shopify's API](https://shopify.dev/docs/admin-api/rest/reference)
-- **Repository**: <https://github.com/singer-io/tap-shopify>
