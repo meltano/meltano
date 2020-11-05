@@ -737,27 +737,36 @@ extractors:
     variant: singer-io
     docs: 'https://meltano.com/plugins/extractors/zendesk.html'
     repo: https://github.com/singer-io/tap-zendesk
-    pip_url: 'tap-zendesk'
+    pip_url: tap-zendesk
     capabilities:
       - catalog
       - discover
       - state
+    settings_group_validation:
+      - ['email', 'api_token', 'subdomain', 'start_date']
+      - ['access_token', 'subdomain', 'start_date']
     settings:
       - name: email
-        placeholder: Ex. me@my-organization.com
         kind: email
+        placeholder: Ex. me@my-organization.com
       - name: api_token
+        kind: password
         label: API Token
         placeholder: Ex. *****************
-        kind: password
         documentation: https://support.zendesk.com/hc/en-us/articles/226022787-Generating-a-new-API-token-
+
+      - name: access_token
+        kind: password
+        description: OAuth Access Token
+        documentation: https://support.zendesk.com/hc/en-us/articles/203663836
+
       - name: subdomain
         label: Zendesk Subdomain
         placeholder: Ex. my-subdomain.zendesk.com
         documentation: https://support.zendesk.com/hc/en-us/articles/221682747-Where-can-I-find-my-Zendesk-subdomain-
       - name: start_date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
   # Hidden taps:
   - name: tap-carbon-intensity
