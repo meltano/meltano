@@ -3,6 +3,271 @@
 version: 16
 
 extractors:
+  - name: tap-adwords
+    label: Google Ads
+    description: Advertising Platform
+    namespace: tap_adwords
+    variant: meltano
+    docs: 'https://meltano.com/plugins/extractors/adwords.html'
+    repo: https://gitlab.com/meltano/tap-adwords
+    pip_url: 'git+https://gitlab.com/meltano/tap-adwords.git'
+    capabilities:
+      - properties
+      - discover
+      - state
+    select:
+      - campaigns.*
+      - ad_groups.*
+      - ads.*
+      - accounts.*
+      - KEYWORDS_PERFORMANCE_REPORT.customerID
+      - KEYWORDS_PERFORMANCE_REPORT.account
+      - KEYWORDS_PERFORMANCE_REPORT.currency
+      - KEYWORDS_PERFORMANCE_REPORT.timeZone
+      - KEYWORDS_PERFORMANCE_REPORT.clientName
+      - KEYWORDS_PERFORMANCE_REPORT.campaign
+      - KEYWORDS_PERFORMANCE_REPORT.campaignID
+      - KEYWORDS_PERFORMANCE_REPORT.campaignState
+      - KEYWORDS_PERFORMANCE_REPORT.adGroup
+      - KEYWORDS_PERFORMANCE_REPORT.adGroupID
+      - KEYWORDS_PERFORMANCE_REPORT.adGroupState
+      - KEYWORDS_PERFORMANCE_REPORT.day
+      - KEYWORDS_PERFORMANCE_REPORT.network
+      - KEYWORDS_PERFORMANCE_REPORT.device
+      - KEYWORDS_PERFORMANCE_REPORT.clicks
+      - KEYWORDS_PERFORMANCE_REPORT.cost
+      - KEYWORDS_PERFORMANCE_REPORT.impressions
+      - KEYWORDS_PERFORMANCE_REPORT.interactions
+      - KEYWORDS_PERFORMANCE_REPORT.engagements
+      - KEYWORDS_PERFORMANCE_REPORT.conversions
+      - KEYWORDS_PERFORMANCE_REPORT.allConv
+      - KEYWORDS_PERFORMANCE_REPORT.views
+      - KEYWORDS_PERFORMANCE_REPORT.activeViewViewableImpressions
+      - KEYWORDS_PERFORMANCE_REPORT.activeViewMeasurableImpr
+      - KEYWORDS_PERFORMANCE_REPORT.activeViewMeasurableCost
+      - KEYWORDS_PERFORMANCE_REPORT.gmailClicksToWebsite
+      - KEYWORDS_PERFORMANCE_REPORT.gmailSaves
+      - KEYWORDS_PERFORMANCE_REPORT.gmailForwards
+      - KEYWORDS_PERFORMANCE_REPORT.keywordID
+      - KEYWORDS_PERFORMANCE_REPORT.keyword
+      - KEYWORDS_PERFORMANCE_REPORT.keywordState
+      - KEYWORDS_PERFORMANCE_REPORT.criterionServingStatus
+      - KEYWORDS_PERFORMANCE_REPORT.destinationURL
+      - KEYWORDS_PERFORMANCE_REPORT.matchType
+      - KEYWORDS_PERFORMANCE_REPORT.topOfPageCPC
+      - KEYWORDS_PERFORMANCE_REPORT.firstPageCPC
+      - KEYWORDS_PERFORMANCE_REPORT.imprAbsTop
+      - KEYWORDS_PERFORMANCE_REPORT.activeViewAvgCPM
+      - KEYWORDS_PERFORMANCE_REPORT.activeViewViewableCTR
+      - KEYWORDS_PERFORMANCE_REPORT.activeViewMeasurableImprImpr
+      - KEYWORDS_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr
+      - KEYWORDS_PERFORMANCE_REPORT.allConvRate
+      - KEYWORDS_PERFORMANCE_REPORT.allConvValue
+      - KEYWORDS_PERFORMANCE_REPORT.avgCost
+      - KEYWORDS_PERFORMANCE_REPORT.avgCPC
+      - KEYWORDS_PERFORMANCE_REPORT.avgCPE
+      - KEYWORDS_PERFORMANCE_REPORT.avgCPM
+      - KEYWORDS_PERFORMANCE_REPORT.avgCPV
+      - KEYWORDS_PERFORMANCE_REPORT.avgPosition
+      - KEYWORDS_PERFORMANCE_REPORT.convRate
+      - KEYWORDS_PERFORMANCE_REPORT.totalConvValue
+      - KEYWORDS_PERFORMANCE_REPORT.costAllConv
+      - KEYWORDS_PERFORMANCE_REPORT.costConv
+      - KEYWORDS_PERFORMANCE_REPORT.costConvCurrentModel
+      - KEYWORDS_PERFORMANCE_REPORT.crossDeviceConv
+      - KEYWORDS_PERFORMANCE_REPORT.ctr
+      - KEYWORDS_PERFORMANCE_REPORT.conversionsCurrentModel
+      - KEYWORDS_PERFORMANCE_REPORT.convValueCurrentModel
+      - KEYWORDS_PERFORMANCE_REPORT.engagementRate
+      - KEYWORDS_PERFORMANCE_REPORT.interactionRate
+      - KEYWORDS_PERFORMANCE_REPORT.interactionTypes
+      - KEYWORDS_PERFORMANCE_REPORT.imprTop
+      - KEYWORDS_PERFORMANCE_REPORT.valueAllConv
+      - KEYWORDS_PERFORMANCE_REPORT.valueConv
+      - KEYWORDS_PERFORMANCE_REPORT.valueConvCurrentModel
+      - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo100
+      - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo25
+      - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo50
+      - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo75
+      - KEYWORDS_PERFORMANCE_REPORT.viewRate
+      - KEYWORDS_PERFORMANCE_REPORT.viewThroughConv
+      - KEYWORDS_PERFORMANCE_REPORT.searchAbsTopIS
+      - KEYWORDS_PERFORMANCE_REPORT.searchLostAbsTopISBudget
+      - KEYWORDS_PERFORMANCE_REPORT.searchLostTopISBudget
+      - KEYWORDS_PERFORMANCE_REPORT.searchExactMatchIS
+      - KEYWORDS_PERFORMANCE_REPORT.searchImprShare
+      - KEYWORDS_PERFORMANCE_REPORT.searchLostAbsTopISRank
+      - KEYWORDS_PERFORMANCE_REPORT.searchLostISRank
+      - KEYWORDS_PERFORMANCE_REPORT.searchLostTopISRank
+      - KEYWORDS_PERFORMANCE_REPORT.searchTopIS
+      - AD_PERFORMANCE_REPORT.customerID
+      - AD_PERFORMANCE_REPORT.account
+      - AD_PERFORMANCE_REPORT.currency
+      - AD_PERFORMANCE_REPORT.timeZone
+      - AD_PERFORMANCE_REPORT.clientName
+      - AD_PERFORMANCE_REPORT.campaign
+      - AD_PERFORMANCE_REPORT.campaignID
+      - AD_PERFORMANCE_REPORT.campaignState
+      - AD_PERFORMANCE_REPORT.adGroup
+      - AD_PERFORMANCE_REPORT.adGroupID
+      - AD_PERFORMANCE_REPORT.adGroupState
+      - AD_PERFORMANCE_REPORT.day
+      - AD_PERFORMANCE_REPORT.network
+      - AD_PERFORMANCE_REPORT.device
+      - AD_PERFORMANCE_REPORT.clicks
+      - AD_PERFORMANCE_REPORT.cost
+      - AD_PERFORMANCE_REPORT.impressions
+      - AD_PERFORMANCE_REPORT.interactions
+      - AD_PERFORMANCE_REPORT.engagements
+      - AD_PERFORMANCE_REPORT.conversions
+      - AD_PERFORMANCE_REPORT.allConv
+      - AD_PERFORMANCE_REPORT.views
+      - AD_PERFORMANCE_REPORT.activeViewViewableImpressions
+      - AD_PERFORMANCE_REPORT.activeViewMeasurableImpr
+      - AD_PERFORMANCE_REPORT.activeViewMeasurableCost
+      - AD_PERFORMANCE_REPORT.gmailClicksToWebsite
+      - AD_PERFORMANCE_REPORT.gmailSaves
+      - AD_PERFORMANCE_REPORT.gmailForwards
+      - AD_PERFORMANCE_REPORT.adID
+      - AD_PERFORMANCE_REPORT.adState
+      - AD_PERFORMANCE_REPORT.approvalStatus
+      - AD_PERFORMANCE_REPORT.adType
+      - AD_PERFORMANCE_REPORT.adStrength
+      - AD_PERFORMANCE_REPORT.autoAppliedAdSuggestion
+      - AD_PERFORMANCE_REPORT.ad
+      - AD_PERFORMANCE_REPORT.descriptionLine1
+      - AD_PERFORMANCE_REPORT.descriptionLine2
+      - AD_PERFORMANCE_REPORT.finalURL
+      - AD_PERFORMANCE_REPORT.displayURL
+      - AD_PERFORMANCE_REPORT.description
+      - AD_PERFORMANCE_REPORT.headline1
+      - AD_PERFORMANCE_REPORT.headline2
+      - AD_PERFORMANCE_REPORT.path1
+      - AD_PERFORMANCE_REPORT.businessName
+      - AD_PERFORMANCE_REPORT.callToActionTextResponsive
+      - AD_PERFORMANCE_REPORT.shortHeadline
+      - AD_PERFORMANCE_REPORT.longHeadline
+      - AD_PERFORMANCE_REPORT.promotionTextResponsive
+      - AD_PERFORMANCE_REPORT.responsiveSearchAdPath1
+      - AD_PERFORMANCE_REPORT.responsiveSearchAdHeadlines
+      - AD_PERFORMANCE_REPORT.responsiveSearchAdDescriptions
+      - AD_PERFORMANCE_REPORT.gmailAdBusinessName
+      - AD_PERFORMANCE_REPORT.gmailAdHeadline
+      - AD_PERFORMANCE_REPORT.gmailAdDescription
+      - AD_PERFORMANCE_REPORT.imageAdName
+      - AD_PERFORMANCE_REPORT.businessNameMultiAssetResponsiveDisplay
+      - AD_PERFORMANCE_REPORT.longHeadlineMultiAssetResponsiveDisplay
+      - AD_PERFORMANCE_REPORT.headlinesMultiAssetResponsiveDisplay
+      - AD_PERFORMANCE_REPORT.callToActionTextMultiAssetResponsiveDisplay
+      - AD_PERFORMANCE_REPORT.promotionTextMultiAssetResponsiveDisplay
+      - AD_PERFORMANCE_REPORT.imprAbsTop
+      - AD_PERFORMANCE_REPORT.activeViewAvgCPM
+      - AD_PERFORMANCE_REPORT.activeViewViewableCTR
+      - AD_PERFORMANCE_REPORT.activeViewMeasurableImprImpr
+      - AD_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr
+      - AD_PERFORMANCE_REPORT.allConvRate
+      - AD_PERFORMANCE_REPORT.allConvValue
+      - AD_PERFORMANCE_REPORT.avgCost
+      - AD_PERFORMANCE_REPORT.avgCPC
+      - AD_PERFORMANCE_REPORT.avgCPE
+      - AD_PERFORMANCE_REPORT.avgCPM
+      - AD_PERFORMANCE_REPORT.avgCPV
+      - AD_PERFORMANCE_REPORT.avgPosition
+      - AD_PERFORMANCE_REPORT.convRate
+      - AD_PERFORMANCE_REPORT.totalConvValue
+      - AD_PERFORMANCE_REPORT.costAllConv
+      - AD_PERFORMANCE_REPORT.costConv
+      - AD_PERFORMANCE_REPORT.costConvCurrentModel
+      - AD_PERFORMANCE_REPORT.crossDeviceConv
+      - AD_PERFORMANCE_REPORT.ctr
+      - AD_PERFORMANCE_REPORT.conversionsCurrentModel
+      - AD_PERFORMANCE_REPORT.convValueCurrentModel
+      - AD_PERFORMANCE_REPORT.engagementRate
+      - AD_PERFORMANCE_REPORT.interactionRate
+      - AD_PERFORMANCE_REPORT.interactionTypes
+      - AD_PERFORMANCE_REPORT.imprTop
+      - AD_PERFORMANCE_REPORT.valueAllConv
+      - AD_PERFORMANCE_REPORT.valueConv
+      - AD_PERFORMANCE_REPORT.valueConvCurrentModel
+      - AD_PERFORMANCE_REPORT.videoPlayedTo100
+      - AD_PERFORMANCE_REPORT.videoPlayedTo25
+      - AD_PERFORMANCE_REPORT.videoPlayedTo50
+      - AD_PERFORMANCE_REPORT.videoPlayedTo75
+      - AD_PERFORMANCE_REPORT.viewRate
+      - AD_PERFORMANCE_REPORT.viewThroughConv
+    settings_group_validation:
+      - ['developer_token', 'oauth_client_id', 'oauth_client_secret', 'refresh_token', 'user_agent', 'customer_ids', 'start_date']
+    settings:
+      - name: developer_token
+        env: OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN
+        kind: password
+        label: Developer Token
+        description: Your Developer Token for Google AdWord Application
+        placeholder: Ex. *****************
+      - name: oauth_client_id
+        env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
+        kind: password
+        label: OAuth Client ID
+        description: Your Google OAuth Client ID
+        placeholder: Ex. 123456789012345.apps.googleusercontent.com
+      - name: oauth_client_secret
+        env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
+        kind: password
+        label: OAuth Client Secret
+        description: Your Google OAuth Client Secret
+        placeholder: Ex. *****************
+
+      - name: refresh_token
+        kind: oauth
+        oauth:
+          # https://oauth.svc.meltanodata.com/google-adwords/
+          provider: google-adwords
+        label: Access Token
+        description: The Refresh Token generated through the OAuth flow run using your OAuth Client and your Developer Token
+        placeholder: Ex. *****************
+      - name: customer_ids
+        label: Account ID(s)
+        placeholder: Ex. 1234567890,1234567891,1234567892
+        description: A comma-separated list of Ad Account IDs to replicate data from
+
+      - name: start_date
+        kind: date_iso8601
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+      - name: end_date
+        kind: date_iso8601
+        description: Date up to when historical data will be extracted.
+      - name: user_agent
+        value: tap-adwords via Meltano
+        label: User Agent for your OAuth Client
+        placeholder: Ex. tap-adwords via Meltano <user@example.com>
+        description: The User Agent for your OAuth Client (used in requests made to the AdWords API)
+
+      - name: conversion_window_days
+        kind: integer
+        value: 0
+        label: Conversion Window Days
+        description: How many Days before the Start Date to fetch data for Performance Reports
+      - name: primary_keys
+        kind: hidden
+        value:
+          KEYWORDS_PERFORMANCE_REPORT:
+            - customerID
+            - campaignID
+            - adGroupID
+            - keywordID
+            - day
+            - network
+            - device
+          AD_PERFORMANCE_REPORT:
+            - customerID
+            - campaignID
+            - adGroupID
+            - adID
+            - day
+            - network
+            - device
+        label: Primary Keys
+        description: Primary Keys for the selected Entities (Streams)
   - name: tap-bing-ads
     label: Bing Ads
     description: Advertising Platform
@@ -274,271 +539,6 @@ extractors:
         env_aliases: [GITLAB_API_START_DATE]
         kind: date_iso8601
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-  - name: tap-adwords
-    label: Google Ads
-    description: Advertising Platform
-    namespace: tap_adwords
-    variant: meltano
-    docs: 'https://meltano.com/plugins/extractors/adwords.html'
-    repo: https://gitlab.com/meltano/tap-adwords
-    pip_url: 'git+https://gitlab.com/meltano/tap-adwords.git'
-    capabilities:
-      - properties
-      - discover
-      - state
-    select:
-      - campaigns.*
-      - ad_groups.*
-      - ads.*
-      - accounts.*
-      - KEYWORDS_PERFORMANCE_REPORT.customerID
-      - KEYWORDS_PERFORMANCE_REPORT.account
-      - KEYWORDS_PERFORMANCE_REPORT.currency
-      - KEYWORDS_PERFORMANCE_REPORT.timeZone
-      - KEYWORDS_PERFORMANCE_REPORT.clientName
-      - KEYWORDS_PERFORMANCE_REPORT.campaign
-      - KEYWORDS_PERFORMANCE_REPORT.campaignID
-      - KEYWORDS_PERFORMANCE_REPORT.campaignState
-      - KEYWORDS_PERFORMANCE_REPORT.adGroup
-      - KEYWORDS_PERFORMANCE_REPORT.adGroupID
-      - KEYWORDS_PERFORMANCE_REPORT.adGroupState
-      - KEYWORDS_PERFORMANCE_REPORT.day
-      - KEYWORDS_PERFORMANCE_REPORT.network
-      - KEYWORDS_PERFORMANCE_REPORT.device
-      - KEYWORDS_PERFORMANCE_REPORT.clicks
-      - KEYWORDS_PERFORMANCE_REPORT.cost
-      - KEYWORDS_PERFORMANCE_REPORT.impressions
-      - KEYWORDS_PERFORMANCE_REPORT.interactions
-      - KEYWORDS_PERFORMANCE_REPORT.engagements
-      - KEYWORDS_PERFORMANCE_REPORT.conversions
-      - KEYWORDS_PERFORMANCE_REPORT.allConv
-      - KEYWORDS_PERFORMANCE_REPORT.views
-      - KEYWORDS_PERFORMANCE_REPORT.activeViewViewableImpressions
-      - KEYWORDS_PERFORMANCE_REPORT.activeViewMeasurableImpr
-      - KEYWORDS_PERFORMANCE_REPORT.activeViewMeasurableCost
-      - KEYWORDS_PERFORMANCE_REPORT.gmailClicksToWebsite
-      - KEYWORDS_PERFORMANCE_REPORT.gmailSaves
-      - KEYWORDS_PERFORMANCE_REPORT.gmailForwards
-      - KEYWORDS_PERFORMANCE_REPORT.keywordID
-      - KEYWORDS_PERFORMANCE_REPORT.keyword
-      - KEYWORDS_PERFORMANCE_REPORT.keywordState
-      - KEYWORDS_PERFORMANCE_REPORT.criterionServingStatus
-      - KEYWORDS_PERFORMANCE_REPORT.destinationURL
-      - KEYWORDS_PERFORMANCE_REPORT.matchType
-      - KEYWORDS_PERFORMANCE_REPORT.topOfPageCPC
-      - KEYWORDS_PERFORMANCE_REPORT.firstPageCPC
-      - KEYWORDS_PERFORMANCE_REPORT.imprAbsTop
-      - KEYWORDS_PERFORMANCE_REPORT.activeViewAvgCPM
-      - KEYWORDS_PERFORMANCE_REPORT.activeViewViewableCTR
-      - KEYWORDS_PERFORMANCE_REPORT.activeViewMeasurableImprImpr
-      - KEYWORDS_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr
-      - KEYWORDS_PERFORMANCE_REPORT.allConvRate
-      - KEYWORDS_PERFORMANCE_REPORT.allConvValue
-      - KEYWORDS_PERFORMANCE_REPORT.avgCost
-      - KEYWORDS_PERFORMANCE_REPORT.avgCPC
-      - KEYWORDS_PERFORMANCE_REPORT.avgCPE
-      - KEYWORDS_PERFORMANCE_REPORT.avgCPM
-      - KEYWORDS_PERFORMANCE_REPORT.avgCPV
-      - KEYWORDS_PERFORMANCE_REPORT.avgPosition
-      - KEYWORDS_PERFORMANCE_REPORT.convRate
-      - KEYWORDS_PERFORMANCE_REPORT.totalConvValue
-      - KEYWORDS_PERFORMANCE_REPORT.costAllConv
-      - KEYWORDS_PERFORMANCE_REPORT.costConv
-      - KEYWORDS_PERFORMANCE_REPORT.costConvCurrentModel
-      - KEYWORDS_PERFORMANCE_REPORT.crossDeviceConv
-      - KEYWORDS_PERFORMANCE_REPORT.ctr
-      - KEYWORDS_PERFORMANCE_REPORT.conversionsCurrentModel
-      - KEYWORDS_PERFORMANCE_REPORT.convValueCurrentModel
-      - KEYWORDS_PERFORMANCE_REPORT.engagementRate
-      - KEYWORDS_PERFORMANCE_REPORT.interactionRate
-      - KEYWORDS_PERFORMANCE_REPORT.interactionTypes
-      - KEYWORDS_PERFORMANCE_REPORT.imprTop
-      - KEYWORDS_PERFORMANCE_REPORT.valueAllConv
-      - KEYWORDS_PERFORMANCE_REPORT.valueConv
-      - KEYWORDS_PERFORMANCE_REPORT.valueConvCurrentModel
-      - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo100
-      - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo25
-      - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo50
-      - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo75
-      - KEYWORDS_PERFORMANCE_REPORT.viewRate
-      - KEYWORDS_PERFORMANCE_REPORT.viewThroughConv
-      - KEYWORDS_PERFORMANCE_REPORT.searchAbsTopIS
-      - KEYWORDS_PERFORMANCE_REPORT.searchLostAbsTopISBudget
-      - KEYWORDS_PERFORMANCE_REPORT.searchLostTopISBudget
-      - KEYWORDS_PERFORMANCE_REPORT.searchExactMatchIS
-      - KEYWORDS_PERFORMANCE_REPORT.searchImprShare
-      - KEYWORDS_PERFORMANCE_REPORT.searchLostAbsTopISRank
-      - KEYWORDS_PERFORMANCE_REPORT.searchLostISRank
-      - KEYWORDS_PERFORMANCE_REPORT.searchLostTopISRank
-      - KEYWORDS_PERFORMANCE_REPORT.searchTopIS
-      - AD_PERFORMANCE_REPORT.customerID
-      - AD_PERFORMANCE_REPORT.account
-      - AD_PERFORMANCE_REPORT.currency
-      - AD_PERFORMANCE_REPORT.timeZone
-      - AD_PERFORMANCE_REPORT.clientName
-      - AD_PERFORMANCE_REPORT.campaign
-      - AD_PERFORMANCE_REPORT.campaignID
-      - AD_PERFORMANCE_REPORT.campaignState
-      - AD_PERFORMANCE_REPORT.adGroup
-      - AD_PERFORMANCE_REPORT.adGroupID
-      - AD_PERFORMANCE_REPORT.adGroupState
-      - AD_PERFORMANCE_REPORT.day
-      - AD_PERFORMANCE_REPORT.network
-      - AD_PERFORMANCE_REPORT.device
-      - AD_PERFORMANCE_REPORT.clicks
-      - AD_PERFORMANCE_REPORT.cost
-      - AD_PERFORMANCE_REPORT.impressions
-      - AD_PERFORMANCE_REPORT.interactions
-      - AD_PERFORMANCE_REPORT.engagements
-      - AD_PERFORMANCE_REPORT.conversions
-      - AD_PERFORMANCE_REPORT.allConv
-      - AD_PERFORMANCE_REPORT.views
-      - AD_PERFORMANCE_REPORT.activeViewViewableImpressions
-      - AD_PERFORMANCE_REPORT.activeViewMeasurableImpr
-      - AD_PERFORMANCE_REPORT.activeViewMeasurableCost
-      - AD_PERFORMANCE_REPORT.gmailClicksToWebsite
-      - AD_PERFORMANCE_REPORT.gmailSaves
-      - AD_PERFORMANCE_REPORT.gmailForwards
-      - AD_PERFORMANCE_REPORT.adID
-      - AD_PERFORMANCE_REPORT.adState
-      - AD_PERFORMANCE_REPORT.approvalStatus
-      - AD_PERFORMANCE_REPORT.adType
-      - AD_PERFORMANCE_REPORT.adStrength
-      - AD_PERFORMANCE_REPORT.autoAppliedAdSuggestion
-      - AD_PERFORMANCE_REPORT.ad
-      - AD_PERFORMANCE_REPORT.descriptionLine1
-      - AD_PERFORMANCE_REPORT.descriptionLine2
-      - AD_PERFORMANCE_REPORT.finalURL
-      - AD_PERFORMANCE_REPORT.displayURL
-      - AD_PERFORMANCE_REPORT.description
-      - AD_PERFORMANCE_REPORT.headline1
-      - AD_PERFORMANCE_REPORT.headline2
-      - AD_PERFORMANCE_REPORT.path1
-      - AD_PERFORMANCE_REPORT.businessName
-      - AD_PERFORMANCE_REPORT.callToActionTextResponsive
-      - AD_PERFORMANCE_REPORT.shortHeadline
-      - AD_PERFORMANCE_REPORT.longHeadline
-      - AD_PERFORMANCE_REPORT.promotionTextResponsive
-      - AD_PERFORMANCE_REPORT.responsiveSearchAdPath1
-      - AD_PERFORMANCE_REPORT.responsiveSearchAdHeadlines
-      - AD_PERFORMANCE_REPORT.responsiveSearchAdDescriptions
-      - AD_PERFORMANCE_REPORT.gmailAdBusinessName
-      - AD_PERFORMANCE_REPORT.gmailAdHeadline
-      - AD_PERFORMANCE_REPORT.gmailAdDescription
-      - AD_PERFORMANCE_REPORT.imageAdName
-      - AD_PERFORMANCE_REPORT.businessNameMultiAssetResponsiveDisplay
-      - AD_PERFORMANCE_REPORT.longHeadlineMultiAssetResponsiveDisplay
-      - AD_PERFORMANCE_REPORT.headlinesMultiAssetResponsiveDisplay
-      - AD_PERFORMANCE_REPORT.callToActionTextMultiAssetResponsiveDisplay
-      - AD_PERFORMANCE_REPORT.promotionTextMultiAssetResponsiveDisplay
-      - AD_PERFORMANCE_REPORT.imprAbsTop
-      - AD_PERFORMANCE_REPORT.activeViewAvgCPM
-      - AD_PERFORMANCE_REPORT.activeViewViewableCTR
-      - AD_PERFORMANCE_REPORT.activeViewMeasurableImprImpr
-      - AD_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr
-      - AD_PERFORMANCE_REPORT.allConvRate
-      - AD_PERFORMANCE_REPORT.allConvValue
-      - AD_PERFORMANCE_REPORT.avgCost
-      - AD_PERFORMANCE_REPORT.avgCPC
-      - AD_PERFORMANCE_REPORT.avgCPE
-      - AD_PERFORMANCE_REPORT.avgCPM
-      - AD_PERFORMANCE_REPORT.avgCPV
-      - AD_PERFORMANCE_REPORT.avgPosition
-      - AD_PERFORMANCE_REPORT.convRate
-      - AD_PERFORMANCE_REPORT.totalConvValue
-      - AD_PERFORMANCE_REPORT.costAllConv
-      - AD_PERFORMANCE_REPORT.costConv
-      - AD_PERFORMANCE_REPORT.costConvCurrentModel
-      - AD_PERFORMANCE_REPORT.crossDeviceConv
-      - AD_PERFORMANCE_REPORT.ctr
-      - AD_PERFORMANCE_REPORT.conversionsCurrentModel
-      - AD_PERFORMANCE_REPORT.convValueCurrentModel
-      - AD_PERFORMANCE_REPORT.engagementRate
-      - AD_PERFORMANCE_REPORT.interactionRate
-      - AD_PERFORMANCE_REPORT.interactionTypes
-      - AD_PERFORMANCE_REPORT.imprTop
-      - AD_PERFORMANCE_REPORT.valueAllConv
-      - AD_PERFORMANCE_REPORT.valueConv
-      - AD_PERFORMANCE_REPORT.valueConvCurrentModel
-      - AD_PERFORMANCE_REPORT.videoPlayedTo100
-      - AD_PERFORMANCE_REPORT.videoPlayedTo25
-      - AD_PERFORMANCE_REPORT.videoPlayedTo50
-      - AD_PERFORMANCE_REPORT.videoPlayedTo75
-      - AD_PERFORMANCE_REPORT.viewRate
-      - AD_PERFORMANCE_REPORT.viewThroughConv
-    settings_group_validation:
-      - ['developer_token', 'oauth_client_id', 'oauth_client_secret', 'refresh_token', 'user_agent', 'customer_ids', 'start_date']
-    settings:
-      - name: developer_token
-        env: OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN
-        kind: password
-        label: Developer Token
-        description: Your Developer Token for Google AdWord Application
-        placeholder: Ex. *****************
-      - name: oauth_client_id
-        env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
-        kind: password
-        label: OAuth Client ID
-        description: Your Google OAuth Client ID
-        placeholder: Ex. 123456789012345.apps.googleusercontent.com
-      - name: oauth_client_secret
-        env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
-        kind: password
-        label: OAuth Client Secret
-        description: Your Google OAuth Client Secret
-        placeholder: Ex. *****************
-
-      - name: refresh_token
-        kind: oauth
-        oauth:
-          # https://oauth.svc.meltanodata.com/google-adwords/
-          provider: google-adwords
-        label: Access Token
-        description: The Refresh Token generated through the OAuth flow run using your OAuth Client and your Developer Token
-        placeholder: Ex. *****************
-      - name: customer_ids
-        label: Account ID(s)
-        placeholder: Ex. 1234567890,1234567891,1234567892
-        description: A comma-separated list of Ad Account IDs to replicate data from
-
-      - name: start_date
-        kind: date_iso8601
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-      - name: end_date
-        kind: date_iso8601
-        description: Date up to when historical data will be extracted.
-      - name: user_agent
-        value: tap-adwords via Meltano
-        label: User Agent for your OAuth Client
-        placeholder: Ex. tap-adwords via Meltano <user@example.com>
-        description: The User Agent for your OAuth Client (used in requests made to the AdWords API)
-
-      - name: conversion_window_days
-        kind: integer
-        value: 0
-        label: Conversion Window Days
-        description: How many Days before the Start Date to fetch data for Performance Reports
-      - name: primary_keys
-        kind: hidden
-        value:
-          KEYWORDS_PERFORMANCE_REPORT:
-            - customerID
-            - campaignID
-            - adGroupID
-            - keywordID
-            - day
-            - network
-            - device
-          AD_PERFORMANCE_REPORT:
-            - customerID
-            - campaignID
-            - adGroupID
-            - adID
-            - day
-            - network
-            - device
-        label: Primary Keys
-        description: Primary Keys for the selected Entities (Streams)
   - name: tap-google-analytics
     label: Google Analytics
     description: App and website analytics platform hosted by Google
@@ -644,7 +644,7 @@ extractors:
         placeholder: Ex. me@my-organization.com
       - name: password
         label: Password
-        placeholder:  Ex. *****************
+        placeholder: Ex. *****************
         kind: password
       - name: security_token
         label: Security Token
@@ -783,8 +783,8 @@ extractors:
       - discover
       - state
     settings_group_validation:
-    - ['files']
-    - ['csv_files_definition']
+      - ['files']
+      - ['csv_files_definition']
     settings:
       - name: files
         kind: array
@@ -1064,16 +1064,16 @@ loaders:
             kind: options
             value: INFO
             options:
-            - label: Debug
-              value: DEBUG
-            - label: Info
-              value: INFO
-            - label: Warning
-              value: WARNING
-            - label: Error
-              value: ERROR
-            - label: Critical
-              value: CRITICAL
+              - label: Debug
+                value: DEBUG
+              - label: Info
+                value: INFO
+              - label: Warning
+                value: WARNING
+              - label: Error
+                value: ERROR
+              - label: Critical
+                value: CRITICAL
             description: The level for logging. Set to `DEBUG` to get things like queries executed, timing of those queries, etc.
           - name: persist_empty_tables
             kind: boolean
@@ -1280,19 +1280,19 @@ transformers:
     repo: https://github.com/fishtown-analytics/dbt
     pip_url: dbt==0.16.1
     settings:
-    - name: project_dir
-      value: $MELTANO_PROJECT_ROOT/transform
-    - name: profiles_dir
-      env: DBT_PROFILES_DIR
-      value: $MELTANO_PROJECT_ROOT/transform/profile
-    - name: target
-      value: $MELTANO_LOAD__DIALECT
-    - name: source_schema
-      value: $MELTANO_LOAD__TARGET_SCHEMA
-    - name: target_schema
-      value: analytics
-    - name: models
-      value: $MELTANO_TRANSFORM__PACKAGE_NAME $MELTANO_EXTRACTOR_NAMESPACE my_meltano_project
+      - name: project_dir
+        value: $MELTANO_PROJECT_ROOT/transform
+      - name: profiles_dir
+        env: DBT_PROFILES_DIR
+        value: $MELTANO_PROJECT_ROOT/transform/profile
+      - name: target
+        value: $MELTANO_LOAD__DIALECT
+      - name: source_schema
+        value: $MELTANO_LOAD__TARGET_SCHEMA
+      - name: target_schema
+        value: analytics
+      - name: models
+        value: $MELTANO_TRANSFORM__PACKAGE_NAME $MELTANO_EXTRACTOR_NAMESPACE my_meltano_project
 transforms:
   - name: tap-adwords
     namespace: tap_adwords
@@ -1310,13 +1310,6 @@ transforms:
       entry_table: "{{ env_var('DBT_SOURCE_SCHEMA') }}.entry"
       generationmix_table: "{{ env_var('DBT_SOURCE_SCHEMA') }}.generationmix"
       region_table: "{{ env_var('DBT_SOURCE_SCHEMA') }}.region"
-  - name: tap-salesforce
-    namespace: tap_salesforce
-    variant: meltano
-    repo: https://gitlab.com/meltano/dbt-tap-salesforce
-    pip_url: 'https://gitlab.com/meltano/dbt-tap-salesforce.git'
-    vars:
-      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-facebook
     namespace: tap_facebook
     variant: meltano
@@ -1332,6 +1325,27 @@ transforms:
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
       ultimate_license: "{{ env_var('GITLAB_API_ULTIMATE_LICENSE', False) }}"
+  - name: tap-google-analytics
+    namespace: tap_google_analytics
+    variant: meltano
+    repo: https://gitlab.com/meltano/dbt-tap-google-analytics
+    pip_url: 'https://gitlab.com/meltano/dbt-tap-google-analytics.git'
+    vars:
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+  - name: tap-salesforce
+    namespace: tap_salesforce
+    variant: meltano
+    repo: https://gitlab.com/meltano/dbt-tap-salesforce
+    pip_url: 'https://gitlab.com/meltano/dbt-tap-salesforce.git'
+    vars:
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+  - name: tap-shopify
+    namespace: tap_shopify
+    variant: meltano
+    repo: https://gitlab.com/meltano/dbt-tap-shopify
+    pip_url: 'https://gitlab.com/meltano/dbt-tap-shopify.git'
+    vars:
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-stripe
     namespace: tap_stripe
     variant: meltano
@@ -1345,20 +1359,6 @@ transforms:
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-zendesk
     pip_url: 'https://gitlab.com/meltano/dbt-tap-zendesk.git'
-    vars:
-      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
-  - name: tap-google-analytics
-    namespace: tap_google_analytics
-    variant: meltano
-    repo: https://gitlab.com/meltano/dbt-tap-google-analytics
-    pip_url: 'https://gitlab.com/meltano/dbt-tap-google-analytics.git'
-    vars:
-      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
-  - name: tap-shopify
-    namespace: tap_shopify
-    variant: meltano
-    repo: https://gitlab.com/meltano/dbt-tap-shopify
-    pip_url: 'https://gitlab.com/meltano/dbt-tap-shopify.git'
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
 models:
@@ -1377,21 +1377,11 @@ models:
     variant: meltano
     repo: https://gitlab.com/meltano/model-facebook
     pip_url: 'git+https://gitlab.com/meltano/model-facebook.git'
-  - name: model-salesforce
-    namespace: tap_salesforce
-    variant: meltano
-    repo: https://gitlab.com/meltano/model-salesforce
-    pip_url: 'git+https://gitlab.com/meltano/model-salesforce.git'
   - name: model-gitflix
     namespace: tap_gitflix
     variant: meltano
     repo: https://gitlab.com/jschatz1/model-gitflix
     pip_url: 'git+https://gitlab.com/jschatz1/model-gitflix.git'
-  - name: model-zendesk
-    namespace: tap_zendesk
-    variant: meltano
-    repo: https://gitlab.com/meltano/model-zendesk
-    pip_url: 'git+https://gitlab.com/meltano/model-zendesk.git'
   - name: model-gitlab
     namespace: tap_gitlab
     variant: meltano
@@ -1402,21 +1392,31 @@ models:
     variant: meltano
     repo: https://gitlab.com/meltano/model-gitlab-ultimate
     pip_url: 'git+https://gitlab.com/meltano/model-gitlab-ultimate.git'
-  - name: model-stripe
-    namespace: tap_stripe
-    variant: meltano
-    repo: https://gitlab.com/meltano/model-stripe
-    pip_url: 'git+https://gitlab.com/meltano/model-stripe.git'
   - name: model-google-analytics
     namespace: tap_google_analytics
     variant: meltano
     repo: https://gitlab.com/meltano/model-google-analytics
     pip_url: 'git+https://gitlab.com/meltano/model-google-analytics.git'
+  - name: model-salesforce
+    namespace: tap_salesforce
+    variant: meltano
+    repo: https://gitlab.com/meltano/model-salesforce
+    pip_url: 'git+https://gitlab.com/meltano/model-salesforce.git'
   - name: model-shopify
     namespace: tap_shopify
     variant: meltano
     repo: https://gitlab.com/meltano/model-shopify
     pip_url: 'git+https://gitlab.com/meltano/model-shopify.git'
+  - name: model-stripe
+    namespace: tap_stripe
+    variant: meltano
+    repo: https://gitlab.com/meltano/model-stripe
+    pip_url: 'git+https://gitlab.com/meltano/model-stripe.git'
+  - name: model-zendesk
+    namespace: tap_zendesk
+    variant: meltano
+    repo: https://gitlab.com/meltano/model-zendesk
+    pip_url: 'git+https://gitlab.com/meltano/model-zendesk.git'
 dashboards:
   - name: dashboard-adwords
     namespace: tap_adwords
@@ -1438,16 +1438,16 @@ dashboards:
     variant: meltano
     repo: https://gitlab.com/meltano/dashboard-google-analytics
     pip_url: 'git+https://gitlab.com/meltano/dashboard-google-analytics.git'
-  - name: dashboard-stripe
-    namespace: tap_stripe
-    variant: meltano
-    repo: https://gitlab.com/meltano/dashboard-stripe
-    pip_url: 'git+https://gitlab.com/meltano/dashboard-stripe.git'
   - name: dashboard-shopify
     namespace: tap_shopify
     variant: meltano
     repo: https://gitlab.com/meltano/dashboard-shopify
     pip_url: 'git+https://gitlab.com/meltano/dashboard-shopify.git'
+  - name: dashboard-stripe
+    namespace: tap_stripe
+    variant: meltano
+    repo: https://gitlab.com/meltano/dashboard-stripe
+    pip_url: 'git+https://gitlab.com/meltano/dashboard-stripe.git'
 orchestrators:
   - name: airflow
     namespace: airflow
@@ -1465,32 +1465,32 @@ orchestrators:
         value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/orchestrators/airflow/airflow.db
         env: AIRFLOW__CORE__SQL_ALCHEMY_CONN
       - name: core.load_examples
-        value: False
+        value: false
         env: AIRFLOW__CORE__LOAD_EXAMPLES
       - name: core.dags_are_paused_at_creation
         env: AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION
-        value: False
+        value: false
 files:
   - name: airflow
     namespace: airflow
     repo: https://gitlab.com/meltano/files-airflow
     pip_url: git+https://gitlab.com/meltano/files-airflow.git
     update:
-      orchestrate/dags/meltano.py: True
+      orchestrate/dags/meltano.py: true
   - name: dbt
     namespace: dbt
     repo: https://gitlab.com/meltano/files-dbt
     pip_url: git+https://gitlab.com/meltano/files-dbt.git
     update:
-      transform/profile/profiles.yml: True
-  - name: docker-compose
-    namespace: docker_compose
-    repo: https://gitlab.com/meltano/files-docker-compose
-    pip_url: git+https://gitlab.com/meltano/files-docker-compose.git
+      transform/profile/profiles.yml: true
   - name: docker
     namespace: docker
     repo: https://gitlab.com/meltano/files-docker
     pip_url: git+https://gitlab.com/meltano/files-docker.git
+  - name: docker-compose
+    namespace: docker_compose
+    repo: https://gitlab.com/meltano/files-docker-compose
+    pip_url: git+https://gitlab.com/meltano/files-docker-compose.git
   - name: gitlab-ci
     namespace: gitlab_ci
     repo: https://gitlab.com/meltano/files-gitlab-ci
