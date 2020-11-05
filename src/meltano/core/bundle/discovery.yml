@@ -595,6 +595,50 @@ extractors:
         env_aliases: [GOOGLE_ANALYTICS_API_END_DATE]
         kind: date_iso8601
         description: Date up to when historical data will be extracted.
+  - name: tap-marketo
+    label: Marketo
+    description: Marketing automation for account-based marketing
+    namespace: tap_marketo
+    variant: meltano
+    docs: 'https://meltano.com/plugins/extractors/marketo.html'
+    repo: https://gitlab.com/meltano/tap-marketo
+    pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
+    capabilities: []
+    settings:
+      - name: endpoint
+      - name: identity
+      - name: client_id
+        label: Client ID
+      - name: client_secret
+        kind: password
+      - name: start_date
+        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+        kind: date_iso8601
+  - name: tap-mongodb
+    label: MongoDB
+    description: General purpose, document-based, distributed database
+    namespace: tap_mongodb
+    variant: singer-io
+    docs: 'https://meltano.com/plugins/extractors/mongodb.html'
+    repo: https://github.com/singer-io/tap-mongodb
+    pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
+    capabilities:
+      - catalog
+      - discover
+      - state
+    settings:
+      - name: host
+        label: Host URL
+        value: localhost
+        protected: true
+      - name: port
+        kind: integer
+        value: 27017
+      - name: user
+      - name: password
+        kind: password
+      - name: database
+        label: Database Name
   - name: tap-recharge
     label: ReCharge
     description: Subscription payments platform
@@ -795,52 +839,6 @@ extractors:
         description: Project-relative path to JSON file holding array of objects with `entity`, `file`, and `keys` keys
         placeholder: Ex. files-def.json
         documentation: https://gitlab.com/meltano/tap-csv#run
-  - name: tap-marketo
-    label: Marketo
-    description: Marketing automation for account-based marketing
-    namespace: tap_marketo
-    variant: meltano
-    hidden: true
-    docs: 'https://meltano.com/plugins/extractors/marketo.html'
-    repo: https://gitlab.com/meltano/tap-marketo
-    pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
-    capabilities: []
-    settings:
-      - name: endpoint
-      - name: identity
-      - name: client_id
-        label: Client ID
-      - name: client_secret
-        kind: password
-      - name: start_date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-        kind: date_iso8601
-  - name: tap-mongodb
-    label: MongoDB
-    description: General purpose, document-based, distributed database
-    namespace: tap_mongodb
-    variant: singer-io
-    hidden: true
-    docs: 'https://meltano.com/plugins/extractors/mongodb.html'
-    repo: https://github.com/singer-io/tap-mongodb
-    pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings:
-      - name: host
-        label: Host URL
-        value: localhost
-        protected: true
-      - name: port
-        kind: integer
-        value: 27017
-      - name: user
-      - name: password
-        kind: password
-      - name: database
-        label: Database Name
   - name: tap-spreadsheets-anywhere
     label: Spreadsheets Anywhere
     description: Data extractor for CSV and Excel files from any smart_open supported transport (S3, SFTP, localhost, etc...)
