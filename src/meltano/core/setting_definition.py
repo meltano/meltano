@@ -7,7 +7,11 @@ from .behavior.canonical import Canonical
 from .behavior import NameEq
 from .error import Error
 
-VALUE_PROCESSORS = {"nest_object": nest_object, "upcase_string": lambda s: s.upper()}
+VALUE_PROCESSORS = {
+    "nest_object": nest_object,
+    "upcase_string": lambda s: s.upper(),
+    "stringify": lambda s: s if isinstance(s, str) else json.dumps(s),
+}
 
 
 class EnvVar:
@@ -61,6 +65,7 @@ class SettingDefinition(NameEq, Canonical):
         env_specific: bool = None,
         custom: bool = False,
         value_processor=None,
+        value_post_processor=None,
         **attrs,
     ):
         super().__init__(
@@ -81,6 +86,7 @@ class SettingDefinition(NameEq, Canonical):
             protected=protected,
             env_specific=env_specific,
             value_processor=value_processor,
+            value_post_processor=value_post_processor,
             _custom=custom,
             **attrs,
         )
@@ -160,6 +166,15 @@ class SettingDefinition(NameEq, Canonical):
                     raise ValueError(f"JSON value '{value}' is not an array")
 
         processor = self.value_processor
+        if value is not None and processor:
+            if isinstance(processor, str):
+                processor = VALUE_PROCESSORS[processor]
+            value = processor(value)
+
+        return value
+
+    def post_process_value(self, value):
+        processor = self.value_post_processor
         if value is not None and processor:
             if isinstance(processor, str):
                 processor = VALUE_PROCESSORS[processor]

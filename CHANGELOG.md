@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2368](https://gitlab.com/meltano/meltano/-/issues/2433) Add `datamill-co` variant of `target-postgres`
 - [#2404](https://gitlab.com/meltano/meltano/-/issues/2404) Add `singer-io` variant of `tap-recharge`
 - [#2407](https://gitlab.com/meltano/meltano/-/issues/2407) Refactor discovery.yaml to keep things in lexicographically ascending order and in correct format
+- [#2435](https://gitlab.com/meltano/meltano/-/issues/2435) Add new `stringify` setting `value_post_processor` that will convert values to their JSON string representation
 
 ### Changes
 
