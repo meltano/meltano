@@ -102,7 +102,7 @@ export TARGET_SNOWFLAKE_PASSWORD=my_password
 - Name: `account`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_ACCOUNT`, alias: `SF_ACCOUNT`, `SNOWFLAKE_ACCOUNT`
 
-Account Name in Snowflake (`https://XXXXX.snowflakecomputing.com`)
+Account Name in Snowflake (`https://<account>.snowflakecomputing.com`)
 
 #### How to use
 
