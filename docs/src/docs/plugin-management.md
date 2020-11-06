@@ -59,9 +59,51 @@ Traces of the plugin may remain in the [`.meltano` directory](/docs/project.html
 
 Do you think there should be a `meltano remove <type> <name>` [CLI command](/docs/command-line-interface.html) to mirror [`meltano add <type> <name>`](/docs/command-line-interface.html#add)?
 
-There's an [issue](https://gitlab.com/meltano/meltano/-/issues/2353) for that, and we'd gladly accept a [contribution](/docs/contributor-guide.html)!
+There's an [issue](https://gitlab.com/meltano/meltano/-/issues/2353) for that, and we'll gladly accept a [contribution](/docs/contributor-guide.html)!
 
 :::
+
+## Using a custom fork of a plugin
+
+If you've forked a plugin's repository and made changes to it, you can update your Meltano project to use your custom fork instead of the canonical source:
+
+1. Modify the plugin definition's `pip_url` in the [`plugins` section](/docs/project.html#plugins) of your [`meltano.yml` project file](/docs/project.html) to point at your fork using a [`git+http(s)` URL](https://pip.pypa.io/en/stable/reference/pip_install/#git), with an optional branch or tag name:
+
+    ```yaml{5-6}
+    plugins:
+      extractors:
+      - name: tap-gitlab
+        variant: meltano
+        pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+        # pip_url: git+https://gitlab.com/meltano/tap-gitlab.git@ref-name
+    ```
+
+    If your plugin source is stored in a private repository, you have two options:
+
+    - Continue to authenticate over HTTP(S), and store your credentials in a [`.netrc` file](https://ec.haxx.se/usingcurl/usingcurl-netrc#the-netrc-file-format) in your home directory:
+
+      ```bash
+      machine <hostname> # e.g. gitlab.com or github.com
+      login <username>
+      password <personal-access-token-or-password>
+      ```
+
+    - Authenticate using SSH instead, and specify a `git+ssh` URL:
+
+      ```yaml
+      pip_url: git+ssh://git@gitlab.com/meltano/tap-gitlab.git
+      ```
+
+1. Re-install the plugin from the new `pip_url` using [`meltano install`](/docs/command-line-interface.html#install):
+
+    ```bash
+    meltano install <type> <name>
+
+    # For example:
+    meltano install extractor tap-gitlab
+    ```
+
+If your fork supports additional settings, you can set them as [custom settings](/docs/configuration.html#custom-settings).
 
 ## Meltano UI
 
