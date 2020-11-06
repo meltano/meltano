@@ -49,6 +49,20 @@ by default, you'll need to explicitly run [`meltano install`](/docs/command-line
 before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
 to install (or update) all plugins specified in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
 
+## Removing plugins from your project
+
+Since the [`plugins` section](/docs/project.html#plugins) of your [`meltano.yml` project file](/docs/project.html) determines the plugins that make up your project, you can remove a plugin from your project by deleting its entry from this file.
+
+Traces of the plugin may remain in the [`.meltano` directory](/docs/project.html#meltano-directory) under `.meltano/<plugin type>/<plugin name>`, and in the `job` and `plugin_settings` tables in the [system database](/docs/project.html#system-database). You are free to delete these files and rows manually.
+
+::: tip Contribution idea
+
+Do you think there should be a `meltano remove <type> <name>` [CLI command](/docs/command-line-interface.html) to mirror [`meltano add <type> <name>`](/docs/command-line-interface.html#add)?
+
+There's an [issue](https://gitlab.com/meltano/meltano/-/issues/2353) for that, and we'd gladly accept a [contribution](/docs/contributor-guide.html)!
+
+:::
+
 ## Meltano UI
 
 While Meltano is optimized for usage through the [`meltano` CLI](/docs/command-line-interface.html)
