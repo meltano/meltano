@@ -81,8 +81,8 @@ plugins:
     variant: datamill-co
     pip_url: target-snowflake
     config:
-      snowflake_account: https://my_account.snowflakecomputing.com
-      snowflake_username: my_username
+      snowflake_account: my_account
+      snowflake_username: MY_USER
       snowflake_database: MY_DATABASE
       snowflake_warehouse: MY_WAREHOUSE
       # snowflake_schema: MY_SCHEMA     # override if default (see below) is not appropriate
@@ -99,18 +99,20 @@ export TARGET_SNOWFLAKE_PASSWORD=my_password
 - Name: `snowflake_account`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_ACCOUNT`, alias: `SF_ACCOUNT`
 
-`ACCOUNT` might require the `region` and `cloud` platform where your account is located, in the form of: `<your_account_name>.<region_id>.<cloud>` (e.g. `xy12345.east-us-2.azure`)
+You can find your account name in your Snowflake URL: `https://<account>.snowflakecomputing.com`.
 
-Refer to [Snowflake's documentation about Account](https://docs.snowflake.net/manuals/user-guide/connecting.html#your-snowflake-account-name-and-url)
+It might require the `region` and `cloud` platform where your account is located, in the form of: `<your_account_name>.<region_id>.<cloud>` (e.g. `xy12345.east-us-2.azure`)
+
+See <https://docs.snowflake.net/manuals/user-guide/connecting.html#your-snowflake-account-name-and-url>.
 
 #### How to use
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config target-snowflake set snowflake_account https://<account>.snowflakecomputing.com
+meltano config target-snowflake set snowflake_account <account>
 
-export TARGET_SNOWFLAKE_ACCOUNT=https://<account>.snowflakecomputing.com
+export TARGET_SNOWFLAKE_ACCOUNT=<account>
 ```
 
 ### Snowflake Username
