@@ -14,7 +14,7 @@ To learn more about `target-postgres`, refer to the repository at <https://githu
 Multiple [variants](/docs/plugins.html#variants) of `target-postgres` are available.
 This document describes the `meltano` variant.
 
-An alternative options is [`datamill-co`](./snowflake.html) (default).
+Alternative options are [`datamill-co`](./postgres.html) (default) and [`transferwise`](./postgres--transferwise.html).
 
 ## Getting Started
 

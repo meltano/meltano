@@ -14,7 +14,7 @@ To learn more about `target-postgres`, refer to the repository at <https://githu
 Multiple [variants](/docs/plugins.html#variants) of `target-postgres` are available.
 This document describes the default `datamill-co` variant, which is recommended for new users.
 
-An alternative option is [`meltano`](./postgres--meltano.html).
+Alternative options are [`transferwise`](./postgres--transferwise.html) and [`meltano`](./postgres--meltano.html).
 
 ## Getting Started
 
