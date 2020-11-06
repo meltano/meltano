@@ -5,7 +5,7 @@ description: Use Meltano to pull data from the Stripe API and load it into Snowf
 
 # Stripe
 
-The `tap-stripe` [extractor](/plugins/extractors/) pulls raw data from the [Stripe API](https://stripe.com/docs/api).
+The `tap-stripe` [extractor](/plugins/extractors/) pulls data from the [Stripe API](https://stripe.com/docs/api).
 
 To learn more about `tap-stripe`, refer to the repository at <https://gitlab.com/meltano/tap-stripe>.
 

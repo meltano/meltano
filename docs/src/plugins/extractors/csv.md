@@ -5,7 +5,7 @@ description: Use Meltano to pull data from Comma Separated Values (CSV) files an
 
 # Comma Separated Values (CSV)
 
-The `tap-csv` [extractor](/plugins/extractors/) pulls raw data from [Comma Separated Values (CSV)](https://en.wikipedia.org/wiki/Comma-separated_values) files.
+The `tap-csv` [extractor](/plugins/extractors/) pulls data from [Comma Separated Values (CSV)](https://en.wikipedia.org/wiki/Comma-separated_values) files.
 
 To learn more about `tap-csv`, refer to the repository at <https://gitlab.com/meltano/tap-csv>.
 

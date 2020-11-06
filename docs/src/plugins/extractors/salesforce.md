@@ -5,7 +5,7 @@ description: Use Meltano to pull data from the Salesforce API and load it into S
 
 # Salesforce
 
-The `tap-salesforce` [extractor](/plugins/extractors/) pulls raw data from the [Salesforce API](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm).
+The `tap-salesforce` [extractor](/plugins/extractors/) pulls data from the [Salesforce API](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm).
 
 To learn more about `tap-salesforce`, refer to the repository at <https://gitlab.com/meltano/tap-salesforce>.
 

@@ -5,7 +5,7 @@ description: Use Meltano to pull data from CSV files and Excel spreadsheets on c
 
 # Spreadsheets Anywhere
 
-The `tap-spreadsheets-anywhere` [extractor](/plugins/extractors/) pulls raw data from [CSV](https://en.wikipedia.org/wiki/Comma-separated_values) files and Excel spreadsheets on cloud or local storage.
+The `tap-spreadsheets-anywhere` [extractor](/plugins/extractors/) pulls data from [CSV](https://en.wikipedia.org/wiki/Comma-separated_values) files and Excel spreadsheets on cloud or local storage.
 
 To learn more about `tap-spreadsheets-anywhere`, refer to the repository at <https://github.com/ets/tap-spreadsheets-anywhere>.
 

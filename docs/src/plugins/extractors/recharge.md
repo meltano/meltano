@@ -5,7 +5,7 @@ description: Use Meltano to pull data from the ReCharge API and load it into Sno
 
 # ReCharge
 
-The `tap-recharge` [extractor](/plugins/extractors/) pulls raw data from the [ReCharge API](https://rechargepayments.com/developers/).
+The `tap-recharge` [extractor](/plugins/extractors/) pulls data from the [ReCharge API](https://rechargepayments.com/developers/).
 
 To learn more about `tap-recharge`, refer to the repository at <https://github.com/singer-io/tap-recharge>.
 

@@ -5,7 +5,7 @@ description: Use Meltano to pull data from the Zendesk API and load it into Snow
 
 # Zendesk
 
-The `tap-zendesk` [extractor](/plugins/extractors/) pulls raw data from the [Zendesk API](https://developer.zendesk.com/rest_api).
+The `tap-zendesk` [extractor](/plugins/extractors/) pulls data from the [Zendesk API](https://developer.zendesk.com/rest_api).
 
 To learn more about `tap-zendesk`, refer to the repository at <https://github.com/singer-io/tap-zendesk>.
 

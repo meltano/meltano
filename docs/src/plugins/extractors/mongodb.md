@@ -5,7 +5,7 @@ description: Use Meltano to pull data from a MongoDB database and load it into S
 
 # MongoDB
 
-The `tap-mongodb` [extractor](/plugins/extractors/) pulls raw data from a [MongoDB](https://www.mongodb.com/) database.
+The `tap-mongodb` [extractor](/plugins/extractors/) pulls data from a [MongoDB](https://www.mongodb.com/) database.
 
 To learn more about `tap-mongodb`, refer to the repository at <https://github.com/singer-io/tap-mongodb>.
 
