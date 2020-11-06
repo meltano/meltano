@@ -89,14 +89,14 @@ homepage_sample_code:
     # - you change the configuration below as appropriate
 
     # Add PostgreSQL loader
-    - meltano add loader target-postgres
+    - meltano add loader target-postgres --variant meltano
 
     # Configure target-postgres through the environment
-    - export PG_ADDRESS=$POSTGRES_ADDRESS
-    - export PG_PORT=$POSTGRES_PORT
-    - export PG_USERNAME=$POSTGRES_USER
-    - export PG_PASSWORD=$POSTGRES_PASSWORD
-    - export PG_DATABASE=$POSTGRES_DB
+    - export TARGET_POSTGRES_HOST=$POSTGRES_ADDRESS
+    - export TARGET_POSTGRES_PORT=$POSTGRES_PORT
+    - export TARGET_POSTGRES_USER=$POSTGRES_USER
+    - export TARGET_POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    - export TARGET_POSTGRES_DBNAME=$POSTGRES_DB
 
     # Add PostgreSQL-compatible dbt models for tap-gitlab
     - meltano add transformer dbt
@@ -108,7 +108,7 @@ homepage_sample_code:
     # Start `psql` shell connected to warehouse database
     - apt-get update -y
     - apt-get install -y postgresql-client # Only do this now to ensure Meltano can be installed without PostgreSQL
-    - PGPASSWORD=$PG_PASSWORD psql -U $PG_USERNAME -h $PG_ADDRESS -p $PG_PORT -d $PG_DATABASE -c "SELECT * FROM analytics.gitlab_tags LIMIT 1;"
+    - PGPASSWORD=$TARGET_POSTGRES_PASSWORD psql -U $TARGET_POSTGRES_USER -h $TARGET_POSTGRES_HOST -p $TARGET_POSTGRES_PORT -d $TARGET_POSTGRES_DBNAME -c "SELECT * FROM analytics.gitlab_tags LIMIT 1;"
 
 
     ### https://meltano.com/#orchestration
@@ -241,11 +241,12 @@ getting_started_sample_code:
 
     - meltano config target-postgres list
 
-    - meltano config target-postgres set user $POSTGRES_USER
-    - meltano config target-postgres set password $POSTGRES_PASSWORD
-    - meltano config target-postgres set host $POSTGRES_ADDRESS
-    - meltano config target-postgres set port $POSTGRES_PORT
-    - meltano config target-postgres set dbname $POSTGRES_DB
+    - meltano config target-postgres set postgres_host $POSTGRES_ADDRESS
+    - meltano config target-postgres set postgres_port $POSTGRES_PORT
+    - meltano config target-postgres set postgres_username $POSTGRES_USER
+    - meltano config target-postgres set postgres_password $POSTGRES_PASSWORD
+    - meltano config target-postgres set postgres_database $POSTGRES_DB
+    - meltano config target-postgres set postgres_schema public
 
     - meltano config target-postgres
 

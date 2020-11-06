@@ -455,11 +455,12 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     meltano config <plugin> set <setting> <value>
 
     # For example:
-    meltano config target-postgres set user meltano
-    meltano config target-postgres set password meltano
-    meltano config target-postgres set host localhost
-    meltano config target-postgres set port 5432
-    meltano config target-postgres set dbname warehouse
+    meltano config target-postgres set postgres_host localhost
+    meltano config target-postgres set postgres_port 5432
+    meltano config target-postgres set postgres_username meltano
+    meltano config target-postgres set postgres_password meltano
+    meltano config target-postgres set postgres_database warehouse
+    meltano config target-postgres set postgres_schema public
     ```
 
 1. Optionally, verify that the configuration looks like what the Singer target expects according to its documentation using [`meltano config <plugin>`](/docs/command-line-interface.html#config):

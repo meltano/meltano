@@ -116,7 +116,7 @@ export TARGET_SNOWFLAKE_ACCOUNT=https://<account>.snowflakecomputing.com
 ### Snowflake Username
 
 - Name: `snowflake_username`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_USERNAME`, alias: `SF_USER`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_USERNAME`, alias: `TARGET_SNOWFLAKE_SNOWFLAKE_USERNAME`, `SF_USER`
 
 #### How to use
 
@@ -131,7 +131,7 @@ export TARGET_SNOWFLAKE_USERNAME=<username>
 ### Snowflake Password
 
 - Name: `snowflake_password`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_PASSWORD`, alias: `SF_PASSWORD`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_PASSWORD`, alias: `TARGET_SNOWFLAKE_SNOWFLAKE_PASSWORD`, `SF_PASSWORD`
 
 #### How to use
 
@@ -146,7 +146,7 @@ export TARGET_SNOWFLAKE_PASSWORD=<password>
 ### Snowflake Role
 
 - Name: `snowflake_role`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_ROLE`, alias: `SF_ROLE`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_ROLE`, alias: `TARGET_SNOWFLAKE_SNOWFLAKE_ROLE`, `SF_ROLE`
 
 If not specified, Snowflake will use the user's default role.
 
@@ -163,7 +163,7 @@ export TARGET_SNOWFLAKE_ROLE=<role>
 ### Snowflake Database
 
 - Name: `snowflake_database`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_DATABASE`, alias: `SF_DATABASE`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_DATABASE`, alias: `TARGET_SNOWFLAKE_SNOWFLAKE_DATABASE`, `SF_DATABASE`
 
 #### How to use
 
@@ -179,7 +179,7 @@ export TARGET_SNOWFLAKE_DATABASE=<database>
 
 - Name: `snowflake_authenticator`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_AUTHENTICATOR`
-- Default: `snowflake`
+- Default:`TARGET_SNOWFLAKE_SNOWFLAKE_AUTHENTICATOR`,  `snowflake`
 
 Specifies the authentication provider for snowflake to use. Valud options are the internal one (`snowflake`), a browser session (`externalbrowser`), or Okta (`https://<your_okta_account_name>.okta.com`). See the snowflake docs for more details.
 
@@ -191,22 +191,6 @@ Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/d
 meltano config target-snowflake set snowflake_authenticator externalbrowser
 
 export TARGET_SNOWFLAKE_AUTHENTICATOR=externalbrowser
-```
-
-### Snowflake Schema
-
-- Name: `snowflake_schema`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_SCHEMA`, alias: `SF_SCHEMA`
-- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html). Values are automatically converted to uppercase before they're passed on to the plugin, so `tap_gitlab` becomes `TAP_GITLAB`.
-
-#### How to use
-
-Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
-
-```bash
-meltano config target-snowflake set snowflake_schema <schema>
-
-export TARGET_SNOWFLAKE_SCHEMA=<schema>
 ```
 
 ### Snowflake Warehouse
@@ -222,6 +206,22 @@ Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/d
 meltano config target-snowflake set snowflake_warehouse <warehouse>
 
 export TARGET_SNOWFLAKE_WAREHOUSE=<warehouse>
+```
+
+### Snowflake Schema
+
+- Name: `snowflake_schema`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_SCHEMA`, alias: `TARGET_SNOWFLAKE_SNOWFLAKE_SCHEMA`, `SF_SCHEMA`
+- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html). Values are automatically converted to uppercase before they're passed on to the plugin, so `tap_gitlab` becomes `TAP_GITLAB`.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config target-snowflake set snowflake_schema <schema>
+
+export TARGET_SNOWFLAKE_SCHEMA=<schema>
 ```
 
 ### Invalid Records Detect
@@ -321,7 +321,9 @@ export TARGET_SNOWFLAKE_PERSIST_EMPTY_TABLES=true
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_STATE_SUPPORT`
 - Default: `true`
 
-Whether the Target should emit `STATE` messages to stdout for further consumption. In this mode, which is on by default, STATE messages are buffered in memory until all the records that occurred before them are flushed according to the batch flushing schedule the target is configured with.
+Whether the Target should emit `STATE` messages to stdout for further consumption.
+
+In this mode, which is on by default, STATE messages are buffered in memory until all the records that occurred before them are flushed according to the batch flushing schedule the target is configured with.
 
 #### How to use
 
