@@ -135,10 +135,16 @@ class SettingsService(ABC):
     def as_dict(self, *args, process=False, **kwargs) -> Dict:
         config_metadata = self.config_with_metadata(*args, **kwargs)
 
-        config = {key: metadata["value"] for key, metadata in config_metadata.items()}
-
         if process:
+            config = {
+                key: metadata["setting"].post_process_value(metadata["value"])
+                for key, metadata in config_metadata.items()
+            }
             config = self._process_config(config)
+        else:
+            config = {
+                key: metadata["value"] for key, metadata in config_metadata.items()
+            }
 
         return config
 

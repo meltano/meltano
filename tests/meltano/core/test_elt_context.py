@@ -22,12 +22,12 @@ def assert_loader_env(loader, env):
     assert env["MELTANO_LOADER_VARIANT"] == loader.definition.current_variant_name
 
     assert (
-        env["MELTANO_LOAD_HOST"]
+        env["MELTANO_LOAD_POSTGRES_HOST"]
         == env["PG_ADDRESS"]
         == os.getenv("PG_ADDRESS", "localhost")
     )
     assert (
-        env["MELTANO_LOAD_SCHEMA"]
+        env["MELTANO_LOAD_POSTGRES_SCHEMA"]
         == env["PG_SCHEMA"]
         == env["MELTANO_EXTRACT__LOAD_SCHEMA"]
         == env["MELTANO_EXTRACTOR_NAMESPACE"]

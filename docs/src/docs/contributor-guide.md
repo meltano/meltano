@@ -209,7 +209,8 @@ Each extractor (tap) and loader (target) variant in the `discovery.yml` has a `s
       protected: true # Optional (use in combination with `value` to provide an uneditable default)
       env: SOME_API_KEY # Optional (use to delegate to an environment variable for overriding this setting's value)
       env_aliases: [OTHER_ENV] # Optional (use to delegate alternative environment variables for overriding this setting's value)
-      value_processor: nest_object # Optional (Use to modify stored value before it's passed to plugin. Options are `nest_object` and `upcase_string`)
+      value_processor: nest_object # Optional (Modify value after loading it from source: env, meltano.yml, system database. Target type needs to match `kind`. Options: `nest_object`, `upcase_string`)
+      value_post_processor: stringify # Optional (Modify loaded value before passing it to plugin. Target type does not need to match `kind`. Options: `stringify`)
 ```
 
 #### Protected settings

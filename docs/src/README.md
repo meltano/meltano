@@ -205,14 +205,14 @@ or [write your own](/tutorials/create-custom-transforms-and-models.html#adding-c
 # - you change the configuration below as appropriate
 
 # Add PostgreSQL loader
-meltano add loader target-postgres
+meltano add loader target-postgres --variant meltano
 
 # Configure target-postgres through the environment
-export PG_ADDRESS=localhost
-export PG_PORT=5432
-export PG_USERNAME=meltano
-export PG_PASSWORD=meltano
-export PG_DATABASE=demo-warehouse
+export TARGET_POSTGRES_HOST=localhost
+export TARGET_POSTGRES_PORT=5432
+export TARGET_POSTGRES_USER=meltano
+export TARGET_POSTGRES_PASSWORD=meltano
+export TARGET_POSTGRES_DBNAME=demo-warehouse
 
 # Add dbt transformer and initialize dbt project
 meltano add transformer dbt
@@ -224,7 +224,7 @@ meltano add transform tap-gitlab
 meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
 
 # Start `psql` shell connected to warehouse database
-PGPASSWORD=$PG_PASSWORD psql -U $PG_USERNAME -h $PG_ADDRESS -p $PG_PORT -d $PG_DATABASE
+PGPASSWORD=$TARGET_POSTGRES_PASSWORD psql -U $TARGET_POSTGRES_USER -h $TARGET_POSTGRES_HOST -p $TARGET_POSTGRES_PORT -d $TARGET_POSTGRES_DBNAME
 ```
 
 ```sql
