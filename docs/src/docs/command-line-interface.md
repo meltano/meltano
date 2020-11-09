@@ -468,6 +468,15 @@ If multiple plugins share the same name, you can provide an additional `--plugin
 meltano invoke --plugin-type=<type> <plugin> PLUGIN_ARGS...
 ```
 
+A `--dump` option can be passed to dump the content of a generated [config file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) or [extractor catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) instead of actually invoking the plugin:
+
+```bash
+meltano invoke --dump=config <plugin>
+meltano invoke --dump=catalog <plugin>
+```
+
+Like any standard output, the dumped content can be [redirected](https://en.wikipedia.org/wiki/Redirection_(computing)) to a file using `>`, e.g. `meltano invoke --dump=catalog <plugin> > state.json`.
+
 ## `schedule`
 
 ::: tip
