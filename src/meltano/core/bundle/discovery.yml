@@ -638,6 +638,59 @@ extractors:
         kind: password
       - name: database
         label: Database Name
+  - name: tap-postgres
+    label: PostgreSQL
+    description: PostgreSQL database extractor
+    namespace: tap_postgres
+    variant: transferwise
+    docs: https://meltano.com/plugins/extractors/postgres.html
+    repo: https://github.com/transferwise/pipelinewise-tap-postgres
+    pip_url: pipelinewise-tap-postgres
+    capabilities:
+      - catalog
+      - discover
+      - state
+    settings:
+      - name: host
+        value: localhost
+        description: PostgreSQL host
+      - name: port
+        kind: integer
+        value: 5432
+        description: PostgreSQL port
+      - name: user
+        description: PostgreSQL user
+      - name: password
+        kind: password
+        description: PostgreSQL password
+      - name: dbname
+        description: PostgreSQL database name
+      - name: ssl
+        kind: boolean
+        value: false
+        value_post_processor: stringify
+        description: Using SSL via postgres `sslmode='require'` option. If the server does not accept SSL connections or the client certificate is not recognized the connection will fail
+
+      - name: filter_schemas
+        description: Scan only the specified comma-separated schemas to improve the performance of data extraction
+      - name: default_replication_method
+        kind: options
+        options:
+          - label: Log-based Incremental Replication
+            value: LOG_BASED
+          - label: Key-based Incremental Replication
+            value: INCREMENTAL
+          - label: Full Table Replication
+            value: FULL_TABLE
+      - name: max_run_seconds
+        value: 43200
+        description: Stop running the tap after certain number of seconds
+      - name: logical_poll_total_seconds
+        value: 10800
+        description: Stop running the tap when no data received from wal after certain number of seconds
+      - name: break_at_end_lsn
+        value: true
+        description: Stop running the tap if the newly received lsn is after the max lsn that was detected when the tap started
   - name: tap-recharge
     label: ReCharge
     description: Subscription payments platform
