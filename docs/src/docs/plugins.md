@@ -191,7 +191,7 @@ extractors:
 - name: tap-postgres
   pip_url: tap-postgres
   metadata:
-    some_table:
+    some_stream_id:
       replication-method: INCREMENTAL
       replication-key: created_at
       created_at:
@@ -211,9 +211,9 @@ export <EXTRACTOR>__METADATA='{"<entity>": {"<key>": "<value>", "<attribute>": {
 export <EXTRACTOR>__METADATA_<ENTITY>_<ATTRIBUTE>_<KEY>=<value>
 
 # For example:
-meltano config tap-postgres set _metadata some_table replication-method INCREMENTAL
-meltano config tap-postgres set _metadata some_table replication-key created_at
-meltano config tap-postgres set _metadata some_table created_at is-replication-key true
+meltano config tap-postgres set _metadata some_stream_id replication-method INCREMENTAL
+meltano config tap-postgres set _metadata some_stream_id replication-key created_at
+meltano config tap-postgres set _metadata some_stream_id created_at is-replication-key true
 
 export TAP_POSTGRES__METADATA_SOME_TABLE_REPLICATION_METHOD=FULL_TABLE
 ```
@@ -249,7 +249,7 @@ extractors:
 - name: tap-postgres
   pip_url: tap-postgres
   schema:
-    some_table:
+    some_stream_id:
       created_at:
         type: ["string", "null"]
         format: date-time
@@ -268,8 +268,8 @@ export <EXTRACTOR>__SCHEMA='{"<entity>": {"<attribute>": {"<key>": "<value>"}}}'
 export <EXTRACTOR>__SCHEMA_<ENTITY>_<ATTRIBUTE>_<KEY>=<value>
 
 # For example:
-meltano config tap-postgres set _metadata some_table created_at type '["string", "null"]'
-meltano config tap-postgres set _metadata some_table created_at format date-time
+meltano config tap-postgres set _metadata some_stream_id created_at type '["string", "null"]'
+meltano config tap-postgres set _metadata some_stream_id created_at format date-time
 
 export TAP_POSTGRES__SCHEMA_SOME_TABLE_CREATED_AT_FORMAT=date
 ```
