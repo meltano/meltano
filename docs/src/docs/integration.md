@@ -129,7 +129,7 @@ To save you a headache, Meltano can handle catalog generation for you, by lettin
 [entity selection](#selecting-entities-and-attributes-for-extraction), [metadata](#setting-metadata), and [schema](#overriding-schemas) rules that can be configured like any other setting,
 and are applied to the discovered catalog on the fly when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 
-If you'd like to manually inspect the generated catalog for debugging purposes, you can dump it to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--dump=catalog` option.
+If you'd like to manually inspect the generated catalog for debugging purposes, you can dump it to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using the `--dump=catalog` option on [`meltano invoke`](/docs/command-line-interface.html#invoke) or [`meltano elt`](/docs/command-line-interface.html#elt).
 
 Note that if you've already manually discovered a catalog and modified it to your liking, it can be provided explicitly using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option or the [`catalog` extractor extra](/docs/plugins.html#catalog-extra).
 

@@ -1,4 +1,5 @@
 import yaml
+import json
 import pytest
 from unittest.mock import Mock, patch
 from contextlib import contextmanager
@@ -8,6 +9,7 @@ from meltano.core.project_add_service import ProjectAddService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.singer import SingerTap
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.project import Project
 
@@ -55,9 +57,29 @@ class TestCliInvoke:
 
         invoker_mock.prepared = prepared
 
-        # fmt: off
-        with patch.object(GoogleAnalyticsTracker, "track_data", return_value=None), \
-          patch("meltano.cli.invoke.invoker_factory", return_value=invoker_mock):
-        # fmt: on
+        with patch.object(
+            GoogleAnalyticsTracker, "track_data", return_value=None
+        ), patch("meltano.cli.invoke.invoker_factory", return_value=invoker_mock):
             basic = cli_runner.invoke(cli, ["invoke", tap.name])
             assert basic.exit_code == 2
+
+    def test_invoke_dump_config(
+        self, cli_runner, tap, plugin_discovery_service, plugin_settings_service_factory
+    ):
+        settings_service = plugin_settings_service_factory(tap)
+
+        with patch.object(
+            GoogleAnalyticsTracker, "track_data", return_value=None
+        ), patch(
+            "meltano.core.plugin_invoker.PluginDiscoveryService",
+            return_value=plugin_discovery_service,
+        ), patch.object(
+            SingerTap, "discover_catalog"
+        ), patch.object(
+            SingerTap, "apply_catalog_rules"
+        ):
+            result = cli_runner.invoke(cli, ["invoke", "--dump", "config", tap.name])
+
+            assert json.loads(result.stdout) == settings_service.as_dict(
+                extras=False, process=True
+            )

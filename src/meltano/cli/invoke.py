@@ -22,10 +22,15 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
 )
+@click.option(
+    "--dump",
+    type=click.Choice(["catalog", "config"]),
+    help="Dump content of generated file",
+)
 @click.argument("plugin_name")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
 @project(migrate=True)
-def invoke(project, plugin_type, plugin_name, plugin_args):
+def invoke(project, plugin_type, dump, plugin_name, plugin_args):
     plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
     _, Session = project_engine(project)
@@ -37,8 +42,12 @@ def invoke(project, plugin_type, plugin_name, plugin_args):
         )
         invoker = invoker_factory(project, plugin)
         with invoker.prepared(session):
-            handle = invoker.invoke(*plugin_args)
-            exit_code = handle.wait()
+            if dump:
+                dump_file(invoker, dump)
+                exit_code = 0
+            else:
+                handle = invoker.invoke(*plugin_args)
+                exit_code = handle.wait()
 
         tracker = GoogleAnalyticsTracker(project)
         tracker.track_meltano_invoke(
@@ -53,3 +62,13 @@ def invoke(project, plugin_type, plugin_name, plugin_args):
         raise CliError(str(err)) from err
     finally:
         session.close()
+
+
+def dump_file(invoker, file_id):
+    try:
+        content = invoker.dump(file_id)
+        print(content)
+    except FileNotFoundError as err:
+        raise CliError(f"Could not find {file_id}") from err
+    except Exception as err:
+        raise CliError(f"Could not dump {file_id}: {err}") from err
