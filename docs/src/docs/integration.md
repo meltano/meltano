@@ -10,7 +10,7 @@ which take the role of [your project](/docs/project.html)'s [extractors](/docs/p
 
 Meltano [manages your tap and target configuration](#plugin-configuration) for you,
 makes it easy to [select which entities and attributes to extract](#selecting-entities-and-attributes-for-extraction),
-and keeps track of [the state of your extraction](#pipeline-state),
+and keeps track of [the state of your extraction](#incremental-replication-state),
 so that subsequent pipeline runs with the same job ID will always pick up right where
 the previous run left off.
 
@@ -161,7 +161,7 @@ Similarly, a [`schema` extractor extra](/docs/plugins.html#schema-extra) is avai
 [Singer stream schema](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#schemas) descriptions.
 Here too, [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used to match multiple entities and/or attributes at once.
 
-## Pipeline state
+## Incremental replication state
 
 Most extractors (Singer taps) generate [state](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) when they are run, that can be passed along with a subsequent invocation to have the extractor pick up where it left off the previous time.
 

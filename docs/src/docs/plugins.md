@@ -392,7 +392,7 @@ meltano elt tap-gitlab target-jsonl --exclude project_members
 An extractor's `state` [extra](/docs/configuration.html#plugin-extras) holds a path to a [state file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) (relative to the [project directory](/docs/project.html)) to be provided to the extractor
 when it is run as part of a pipeline using [`meltano elt`](/docs/command-line-interface.html#elt).
 
-If a state path is not set, the state will be [looked up automatically](/docs/integration.html#pipeline-state) based on the ELT run's Job ID.
+If a state path is not set, the state will be [looked up automatically](/docs/integration.html#incremental-replication-state) based on the ELT run's Job ID.
 
 While this extra can be managed using [`meltano config`](/docs/command-line-interface.html#config) or environment variables like any other setting,
 a state file is typically provided using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--state` option.
