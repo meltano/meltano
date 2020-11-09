@@ -1,6 +1,6 @@
 ---
 sidebar: auto
-description: Use Meltano to pull data from a MongoDB database and load it into Snowflake, Postgres, and more
+description: Use Meltano to pull data from a MongoDB database and load it into Snowflake, PostgreSQL, and more
 ---
 
 # MongoDB

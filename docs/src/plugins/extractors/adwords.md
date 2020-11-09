@@ -1,6 +1,6 @@
 ---
 sidebar: auto
-description: Use Meltano to pull data from the Google Ads (AdWords) API and load it into Snowflake, Postgres, and more
+description: Use Meltano to pull data from the Google Ads (AdWords) API and load it into Snowflake, PostgreSQL, and more
 ---
 
 # Google Ads (AdWords)

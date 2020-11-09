@@ -1,6 +1,6 @@
 ---
 sidebar: auto
-description: Use Meltano to pull data from CSV files and Excel spreadsheets on cloud or local storage and load it into Snowflake, Postgres, and more
+description: Use Meltano to pull data from CSV files and Excel spreadsheets on cloud or local storage and load it into Snowflake, PostgreSQL, and more
 ---
 
 # Spreadsheets Anywhere
