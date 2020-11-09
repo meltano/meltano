@@ -119,7 +119,7 @@ export TARGET_POSTGRES_HOST=<host>
 
 #### How to use
 
-Manage this setting [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
 meltano config target-postgres set port 5502

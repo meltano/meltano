@@ -97,7 +97,7 @@ export TAP_MONGODB_PASSWORD=my_password
 
 #### How to use
 
-Manage this setting [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
 meltano config tap-mongodb set host <host>
@@ -113,7 +113,7 @@ export TAP_MONGODB_HOST=<host>
 
 #### How to use
 
-Manage this setting [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
 meltano config tap-mongodb set port 27018
@@ -158,7 +158,7 @@ export TAP_MONGODB_PASSWORD=<password>
 
 #### How to use
 
-Manage this setting [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
 meltano config tap-mongodb set database <database>
