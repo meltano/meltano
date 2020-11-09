@@ -333,6 +333,70 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
     meltano select --list tap-covid-19
     ```
 
+### Choose how to replicate each entity
+
+If the data source you'll be pulling data from is a database, like PostgreSQL or [MongoDB](/plugins/extractors/mongodb.html), your extractor likely requires one final setup step:
+setting a [replication method](/docs/integration.html#replication-methods) for each [selected entity (table)](#select-entities-and-attributes-to-extract).
+
+Extractors for SaaS APIs typically hard-code the appropriate replication method for each supported entity, so if you're using one, you can skip this section and [move on to setting up a loader](#add-a-loader-to-send-data-to-a-destination).
+
+Most database extractors, on the other hand, support two or more of the following replication methods and require you to choose an appropriate option for each table through the `replication-method` [stream metadata](/docs/integration.html#setting-metadata) key:
+
+- `LOG_BASED`: [Log-based Incremental Replication](/docs/integration.html#log-based-incremental-replication)
+
+    The extractor uses the database's binary log files to identify what records were inserted, updated, and deleted from the table since the last run (if any), and extracts only these records.
+
+    This option is not supported by all databases and database extractors.
+
+- `INCREMENTAL`: [Key-based Incremental Replication](/docs/integration.html#key-based-incremental-replication)
+
+    The extractor uses the value of a specific column on the table (the [Replication Key](/docs/integration.html#replication-key), e.g. an `updated_at` timestamp or incrementing `id` integer) to identify what records were inserted or updated (but not deleted) since the last run (if any), and extracts only those records.
+
+- `FULL_TABLE`: [Full Table Replication](/docs/integration.html#full-table-replication)
+
+    The extractor extracts all available records in the table on every run.
+
+*To learn more about replication methods, refer to the [Data Integration (EL) guide](/docs/integration.html#replication-methods).*
+
+1. Find out which replication methods (i.e. options for the `replication-method` [stream metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata) key) the extractor supports by checking its documentation or the README in its repository.
+
+1. Set the desired `replication-method` metadata for each [selected entity](#select-entities-and-attributes-to-extract) using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) and the extractor's [`metadata` extra](/docs/plugins.html#metadata-extra):
+
+    ```bash
+    meltano config <plugin> set _metadata <entity> replication-method <LOG_BASED|INCREMENTAL|FULL_TABLE>
+
+    # For example:
+    meltano config tap-postgres set _metadata some_entity_id replication-method INCREMENTAL
+    meltano config tap-postgres set _metadata other_entity replication-method FULL_TABLE
+
+    # Set replication-method metadata for all entities
+    meltano config tap-postgres set _metadata '*' replication-method INCREMENTAL
+
+    # Set replication-method metadata for matching entities
+    meltano config tap-postgres set _metadata '*_full' replication-method FULL_TABLE
+    ```
+
+    As you can see in the example, entity identifiers can contain wildcards (`*`) to match multiple entities at once.
+
+    If you've set a table's `replication-method` to `INCREMENTAL`, also choose a [Replication Key](/docs/integration.html#replication-key) by setting the `replication-key` metadata:
+
+    ```bash
+    meltano config <plugin> set _metadata <entity> replication-key <column>
+
+    # For example:
+    meltano config tap-postgres set _metadata some_entity_id replication-key updated_at
+    meltano config tap-postgres set _metadata some_entity_id replication-key id
+    ```
+
+1. Optionally, verify that the [stream metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata) for each table was set correctly in the extractor's [generated catalog file](/docs/integration.html#extractor-catalog-generation) by dumping it using [`meltano invoke --dump=catalog <plugin>`](/docs/command-line-interface.html#select):
+
+    ```bash
+    meltano invoke --dump=catalog <plugin>
+
+    # For example:
+    meltano invoke --dump=catalog tap-postgres
+    ```
+
 ## Add a loader to send data to a destination
 
 Now that your Meltano project has everything it needs to pull data from your source,
