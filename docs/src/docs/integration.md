@@ -10,7 +10,7 @@ which take the role of [your project](/docs/project.html)'s [extractors](/docs/p
 
 Meltano [manages your tap and target configuration](#plugin-configuration) for you,
 makes it easy to [select which entities and attributes to extract](#selecting-entities-and-attributes-for-extraction),
-and keeps track of [the state of your extraction](#pipeline-state),
+and keeps track of [the state of your extraction](#incremental-replication-state),
 so that subsequent pipeline runs with the same job ID will always pick up right where
 the previous run left off.
 
@@ -161,7 +161,54 @@ Similarly, a [`schema` extractor extra](/docs/plugins.html#schema-extra) is avai
 [Singer stream schema](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#schemas) descriptions.
 Here too, [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used to match multiple entities and/or attributes at once.
 
-## Pipeline state
+## Replication methods
+
+Extractors can replicate data from a source using one of the following methods:
+
+- [Log-based Incremental Replication](#log-based-incremental-replication)
+- [Key-based Incremental Replication](#key-based-incremental-replication)
+- [Full Table Replication](#full-table-replication)
+
+Extractors for SaaS APIs typically hard-code the appropriate replication method for each supported entity.
+Most database extractors, on the other hand, support two or more of these methods and require you to choose an appropriate option for each table through the `replication-method` [stream metadata](#setting-metadata) keyd.
+
+To support incremental replication, where a data integration pipeline run picks up where the previous run left off, Meltano keeps track of [incremental replication state](#incremental-replication-state).
+
+### Log-based Incremental Replication
+
+- `replication-method` [stream metadata](#setting-metadata) value: `LOG_BASED`
+
+The extractor uses the database's binary log files to identify what records were inserted, updated, and deleted from the table [since the last run (if any)](#incremental-replication-state), and extracts only these records.
+
+This option is not supported by all databases and database extractors.
+
+To learn more about how Log-based Incremental Replication works and its limitations, refer to the [Stitch Docs](https://www.stitchdata.com/docs/replication/replication-methods/log-based-incremental), which by and large also apply to Singer taps used with Meltano.
+
+### Key-based Incremental Replication
+
+- `replication-method` [stream metadata](#setting-metadata) value: `INCREMENTAL`
+
+The extractor uses the value of a specific column on the table (the Replication Key, e.g. an `updated_at` timestamp or incrementing `id` integer) to identify what records were inserted or updated (but not deleted) [since the last run (if any)](#incremental-replication-state), and extracts only those records.
+
+To learn more about how Key-based Incremental Replication works and its limitations, refer to the [Stitch Docs](https://www.stitchdata.com/docs/replication/replication-methods/key-based-incremental), which by and large also apply to Singer taps used with Meltano.
+
+#### Replication Key
+
+Replication Keys are columns that database extractors use to identify new and updated data for replication.
+
+When you set a table to use Key-based Incremental Replication, you’ll also need to define a Replication Key for that table by setting the `replication-key` [stream metadata](#setting-metadata) key.
+
+To learn more about replication keys, refer to the [Stitch Docs](https://www.stitchdata.com/docs/replication/replication-keys), which by and large also apply to Singer taps used with Meltano.
+
+### Full Table Replication
+
+- `replication-method` [stream metadata](#setting-metadata) value: `FULL_TABLE`
+
+The extractor extracts all available records in the table on every run.
+
+To learn more about how Full-Table Replication works and its limitations, refer to the [Stitch Docs](https://www.stitchdata.com/docs/replication/replication-methods/full-table), which by and large also apply to Singer taps used with Meltano.
+
+## Incremental replication state
 
 Most extractors (Singer taps) generate [state](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) when they are run, that can be passed along with a subsequent invocation to have the extractor pick up where it left off the previous time.
 

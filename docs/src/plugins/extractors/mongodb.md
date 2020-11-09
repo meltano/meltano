@@ -47,6 +47,12 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 Follow the remaining steps of the [Getting Started guide](/docs/getting-started.html):
 
 1. [Select entities and attributes to extract](/docs/getting-started.html#select-entities-and-attributes-to-extract)
+1. [Choose how to replicate each entity](/docs/getting-started.html#choose-how-to-replicate-each-entity)
+
+    Supported [replication methods](/docs/integration.html#replication-methods):
+    [`LOG_BASED`](/docs/integration.html#log-based-incremental-replication),
+    [`FULL_TABLE`](/docs/integration.html#full-table-replication)
+
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 

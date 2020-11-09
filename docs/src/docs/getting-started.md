@@ -333,6 +333,70 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
     meltano select --list tap-covid-19
     ```
 
+### Choose how to replicate each entity
+
+If the data source you'll be pulling data from is a database, like PostgreSQL or [MongoDB](/plugins/extractors/mongodb.html), your extractor likely requires one final setup step:
+setting a [replication method](/docs/integration.html#replication-methods) for each [selected entity (table)](#select-entities-and-attributes-to-extract).
+
+Extractors for SaaS APIs typically hard-code the appropriate replication method for each supported entity, so if you're using one, you can skip this section and [move on to setting up a loader](#add-a-loader-to-send-data-to-a-destination).
+
+Most database extractors, on the other hand, support two or more of the following replication methods and require you to choose an appropriate option for each table through the `replication-method` [stream metadata](/docs/integration.html#setting-metadata) key:
+
+- `LOG_BASED`: [Log-based Incremental Replication](/docs/integration.html#log-based-incremental-replication)
+
+    The extractor uses the database's binary log files to identify what records were inserted, updated, and deleted from the table since the last run (if any), and extracts only these records.
+
+    This option is not supported by all databases and database extractors.
+
+- `INCREMENTAL`: [Key-based Incremental Replication](/docs/integration.html#key-based-incremental-replication)
+
+    The extractor uses the value of a specific column on the table (the [Replication Key](/docs/integration.html#replication-key), e.g. an `updated_at` timestamp or incrementing `id` integer) to identify what records were inserted or updated (but not deleted) since the last run (if any), and extracts only those records.
+
+- `FULL_TABLE`: [Full Table Replication](/docs/integration.html#full-table-replication)
+
+    The extractor extracts all available records in the table on every run.
+
+*To learn more about replication methods, refer to the [Data Integration (EL) guide](/docs/integration.html#replication-methods).*
+
+1. Find out which replication methods (i.e. options for the `replication-method` [stream metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata) key) the extractor supports by checking its documentation or the README in its repository.
+
+1. Set the desired `replication-method` metadata for each [selected entity](#select-entities-and-attributes-to-extract) using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) and the extractor's [`metadata` extra](/docs/plugins.html#metadata-extra):
+
+    ```bash
+    meltano config <plugin> set _metadata <entity> replication-method <LOG_BASED|INCREMENTAL|FULL_TABLE>
+
+    # For example:
+    meltano config tap-postgres set _metadata some_entity_id replication-method INCREMENTAL
+    meltano config tap-postgres set _metadata other_entity replication-method FULL_TABLE
+
+    # Set replication-method metadata for all entities
+    meltano config tap-postgres set _metadata '*' replication-method INCREMENTAL
+
+    # Set replication-method metadata for matching entities
+    meltano config tap-postgres set _metadata '*_full' replication-method FULL_TABLE
+    ```
+
+    As you can see in the example, entity identifiers can contain wildcards (`*`) to match multiple entities at once.
+
+    If you've set a table's `replication-method` to `INCREMENTAL`, also choose a [Replication Key](/docs/integration.html#replication-key) by setting the `replication-key` metadata:
+
+    ```bash
+    meltano config <plugin> set _metadata <entity> replication-key <column>
+
+    # For example:
+    meltano config tap-postgres set _metadata some_entity_id replication-key updated_at
+    meltano config tap-postgres set _metadata some_entity_id replication-key id
+    ```
+
+1. Optionally, verify that the [stream metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata) for each table was set correctly in the extractor's [generated catalog file](/docs/integration.html#extractor-catalog-generation) by dumping it using [`meltano invoke --dump=catalog <plugin>`](/docs/command-line-interface.html#select):
+
+    ```bash
+    meltano invoke --dump=catalog <plugin>
+
+    # For example:
+    meltano invoke --dump=catalog tap-postgres
+    ```
+
 ## Add a loader to send data to a destination
 
 Now that your Meltano project has everything it needs to pull data from your source,
@@ -492,13 +556,13 @@ If everything was configured correctly, you should now see your data flow from y
 If the command failed, but it's not obvious how to resolve the issue, consider enabling [debug mode](/docs/command-line-interface.html#debugging) to get some more insight into what's going on behind the scenes.
 If that doesn't get you closer to a solution, learn how to [get help with your issue](/docs/getting-help.md).
 
-If you run `meltano elt` another time with the same Job ID, you'll see it automatically pick up where the previous run left off, assuming the extractor supports [pipeline state](/docs/integration.html#pipeline-state).
+If you run `meltano elt` another time with the same Job ID, you'll see it automatically pick up where the previous run left off, assuming the extractor supports [incremental replication](/docs/integration.html#incremental-replication-state).
 
 ::: details What if I already have a state file for this extractor?
 
 If you've used this Singer tap before without Meltano, you may have a [state file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) already.
 
-If you'd like Meltano to use it instead of [looking up state based on the Job ID](/docs/integration.html#pipeline-state), you can either use [`meltano elt`](/docs/command-line-interface.html#elt)'s `--state` option or set the [`state` extractor extra](/docs/plugins.html#state-extra).
+If you'd like Meltano to use it instead of [looking up state based on the Job ID](/docs/integration.html#incremental-replication-state), you can either use [`meltano elt`](/docs/command-line-interface.html#elt)'s `--state` option or set the [`state` extractor extra](/docs/plugins.html#state-extra).
 
 If you'd like to dump the state generated by the most recent run into a file, so that you can explicitly pass it along to the next invocation, you can use [`meltano elt`](/docs/command-line-interface.html#elt)'s `--dump=state` option:
 
@@ -538,7 +602,7 @@ To help you realize this, Meltano supports scheduled pipelines that can be orche
     meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily
     ```
 
-    The `pipeline name` argument corresponds to the `--job_id` flag on `meltano elt`, which identifies related EL(T) runs when storing and looking up [pipeline state](/docs/integration.html#pipeline-state).
+    The `pipeline name` argument corresponds to the `--job_id` flag on `meltano elt`, which identifies related EL(T) runs when storing and looking up [incremental replication state](/docs/integration.html#incremental-replication-state).
     To have scheduled runs pick up where your [earlier manual run](#run-a-data-integration-el-pipeline) left off, ensure you use the same pipeline name.
 
 1. Optionally, verify that the schedule was created successfully using [`meltano schedule list`](/docs/command-line-interface.html#schedule):
