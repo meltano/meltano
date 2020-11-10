@@ -626,6 +626,8 @@ extractors:
       - catalog
       - discover
       - state
+    settings_group_validation:
+      - ['host', 'port', 'user', 'password', 'database']
     settings:
       - name: host
         label: Host URL
@@ -650,6 +652,8 @@ extractors:
       - catalog
       - discover
       - state
+    settings_group_validation:
+      - ['host', 'port', 'user', 'password', 'dbname']
     settings:
       - name: host
         value: localhost
