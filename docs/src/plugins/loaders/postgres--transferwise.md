@@ -7,7 +7,7 @@ description: Use Meltano to pull data from various sources and load it into Post
 
 The `target-postgres` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [PostgreSQL](https://www.postgresql.org/) database.
 
-To learn more about `target-postgres`, refer to the repository at <https://github.com/transferwise/pipelinewise-target-postgres>.
+To learn more about `target-postgres`, refer to the repository at <https://github.com/transferwise/pipelinewise-target-postgres> and documentation at <https://transferwise.github.io/pipelinewise/connectors/targets/postgres.html>.
 
 #### Alternative variants
 
@@ -119,7 +119,7 @@ export TARGET_POSTGRES_HOST=<host>
 
 #### How to use
 
-Manage this setting [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
 meltano config target-postgres set port 5502

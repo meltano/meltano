@@ -1,6 +1,6 @@
 ---
 sidebar: auto
-description: Use Meltano to pull data from Comma Separated Values (CSV) files and load it into Snowflake, Postgres, and more
+description: Use Meltano to pull data from Comma Separated Values (CSV) files and load it into Snowflake, PostgreSQL, and more
 ---
 
 # Comma Separated Values (CSV)

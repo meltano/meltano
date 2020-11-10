@@ -18,6 +18,7 @@ Extractors for the following sources are currently [discoverable](/docs/plugins.
 - [Google Analytics](/plugins/extractors/google-analytics.html)
 - [Marketo](/plugins/extractors/marketo.html)
 - [MongoDB](/plugins/extractors/mongodb.html)
+- [PostgreSQL](/plugins/extractors/postgres.html)
 - [ReCharge](/plugins/extractors/recharge.html)
 - [Salesforce](/plugins/extractors/salesforce.html)
 - [Shopify](/plugins/extractors/shopify.html)
