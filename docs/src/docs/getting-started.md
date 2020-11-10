@@ -335,7 +335,7 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
 
 ### Choose how to replicate each entity
 
-If the data source you'll be pulling data from is a database, like PostgreSQL or [MongoDB](/plugins/extractors/mongodb.html), your extractor likely requires one final setup step:
+If the data source you'll be pulling data from is a database, like [PostgreSQL](/plugins/extractors/postgres.html) or [MongoDB](/plugins/extractors/mongodb.html), your extractor likely requires one final setup step:
 setting a [replication method](/docs/integration.html#replication-methods) for each [selected entity (table)](#select-entities-and-attributes-to-extract).
 
 Extractors for SaaS APIs typically hard-code the appropriate replication method for each supported entity, so if you're using one, you can skip this section and [move on to setting up a loader](#add-a-loader-to-send-data-to-a-destination).
