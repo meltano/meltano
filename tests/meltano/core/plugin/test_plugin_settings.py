@@ -2,6 +2,7 @@ import pytest
 import dotenv
 from unittest import mock
 from contextlib import contextmanager
+from datetime import date, datetime
 
 from meltano.core.config_service import PluginAlreadyAddedException
 from meltano.core.setting import Setting
@@ -613,6 +614,15 @@ class TestPluginSettingsService:
             ["foo"],
             SettingValueStore.ENV,
         )
+
+    def test_date_values(self, subject, monkeypatch):
+        today = date.today()
+        monkeypatch.setitem(subject.plugin.config, "start_date", today)
+        assert subject.get("start_date") == today.isoformat()
+
+        now = datetime.now()
+        monkeypatch.setitem(subject.plugin.config, "start_date", now)
+        assert subject.get("start_date") == now.isoformat()
 
     def test_kind_object(self, subject, tap, monkeypatch, env_var):
         assert subject.get_with_source("object") == (

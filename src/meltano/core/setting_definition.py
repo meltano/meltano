@@ -1,6 +1,7 @@
 import json
 from typing import List
 from collections import OrderedDict
+from datetime import date, datetime
 
 from .utils import truthy, flatten, nest_object, to_env_var
 from .behavior.canonical import Canonical
@@ -151,6 +152,9 @@ class SettingDefinition(NameEq, Canonical):
         return [EnvVar(key) for key in env_keys]
 
     def cast_value(self, value):
+        if isinstance(value, date) or isinstance(value, datetime):
+            value = value.isoformat()
+
         if isinstance(value, str):
             if self.kind == "boolean":
                 return truthy(value)
