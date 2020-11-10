@@ -25,6 +25,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2396](https://gitlab.com/meltano/meltano/-/issues/2396) Support unquoted `YYYY-MM-DD` date values in `meltano.yml` by converting them to ISO8601 strings before passing them to plugins
+
 ### Breaks
 
 
