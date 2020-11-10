@@ -136,5 +136,5 @@ Manage this setting using [`meltano config`](/docs/command-line-interface.html#c
 ```bash
 meltano config tap-csv set csv_files_definition <path>
 
-export TAP_CSV_TAP_CSV_FILES_DEFINITION=<path>
+export TAP_CSV_FILES_DEFINITION=<path>
 ```
