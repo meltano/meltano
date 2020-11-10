@@ -165,3 +165,70 @@ meltano config tap-mongodb set database <database>
 
 export TAP_MONGODB_DATABASE=<database>
 ```
+
+### Replica Set
+
+- Name: `replica_set`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_MONGODB_REPLICA_SET`
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-mongodb set replica_set <replica_set>
+
+export TAP_MONGODB_REPLICA_SET=<replica_set>
+```
+
+### SSL
+
+- Name: `ssl`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_MONGODB_SSL`
+- Default: `false`
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-mongodb set ssl true
+
+export TAP_MONGODB_SSL=true
+```
+
+### Verify Mode
+
+- Name: `verify_mode`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_MONGODB_VERIFY_MODE`
+- Default: `true`
+
+SSL verify mode
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-mongodb set verify_mode false
+
+export TAP_MONGODB_VERIFY_MODE=false
+```
+
+### Include Schemas In Destination Stream Name
+
+- Name: `include_schemas_in_destination_stream_name`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_MONGODB_INCLUDE_SCHEMAS_IN_DESTINATION_STREAM_NAME`
+- Default: `false`
+
+Forces the stream names to take the form `<database_name>_<collection_name>` instead of `<collection_name>`
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-mongodb set include_schemas_in_destination_stream_name true
+
+export TAP_MONGODB_INCLUDE_SCHEMAS_IN_DESTINATION_STREAM_NAME=true
+```
