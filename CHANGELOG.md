@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.57.0 - (2020-11-10)
+---
+
+### New
+
 - [#2368](https://gitlab.com/meltano/meltano/-/issues/2433) Add `datamill-co` variant of `target-postgres`
 - [#2368](https://gitlab.com/meltano/meltano/-/issues/2425) Add `transferwise` variant of `target-postgres`
 - [#2404](https://gitlab.com/meltano/meltano/-/issues/2404) Add `singer-io` variant of `tap-recharge`
@@ -22,10 +34,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#2368](https://gitlab.com/meltano/meltano/-/issues/2433) Make `datamill-co` variant of `target-postgres` the default instead of `meltano`
-
-### Fixes
-
-### Breaks
 
 
 ## 1.56.0 - (2020-11-02)
