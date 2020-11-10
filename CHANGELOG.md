@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2368](https://gitlab.com/meltano/meltano/-/issues/2425) Add `transferwise` variant of `target-postgres`
 - [#2404](https://gitlab.com/meltano/meltano/-/issues/2404) Add `singer-io` variant of `tap-recharge`
 - [#2410](https://gitlab.com/meltano/meltano/-/issues/2410) Add `transferwise` variant of `tap-postgres`
+- [#2411](https://gitlab.com/meltano/meltano/-/issues/2411) Add `transferwise` variant of `tap-mysql`
 - [#2407](https://gitlab.com/meltano/meltano/-/issues/2407) Refactor discovery.yaml to keep things in lexicographically ascending order and in correct format
 - [#2435](https://gitlab.com/meltano/meltano/-/issues/2435) Add new `stringify` setting `value_post_processor` that will convert values to their JSON string representation
 - [#2437](https://gitlab.com/meltano/meltano/-/issues/2437) Add `meltano invoke` `--dump` option with possible values `config` and `catalog` (for extractors) to dump content of plugin-specific generated file

@@ -640,6 +640,48 @@ extractors:
         kind: password
       - name: database
         label: Database Name
+  - name: tap-mysql
+    label: MySQL / MariaDB
+    description: MySQL / MariaDB database extractor
+    namespace: tap_mysql
+    variant: transferwise
+    docs: https://meltano.com/plugins/extractors/mysql.html
+    repo: https://github.com/transferwise/pipelinewise-tap-mysql
+    pip_url: pipelinewise-tap-mysql
+    capabilities:
+      - catalog
+      - discover
+      - state
+    settings_group_validation:
+      - ['host', 'port', 'user', 'password']
+    settings:
+      - name: host
+        value: localhost
+      - name: port
+        kind: integer
+        value: 3306
+      - name: user
+      - name: password
+        kind: password
+      - name: database
+      - name: ssl
+        kind: boolean
+        value: false
+        value_post_processor: stringify
+
+      - name: filter_dbs
+        description: Comma separated list of schemas to extract tables only from particular schemas and to improve data extraction performance
+      - name: export_batch_rows
+        value: 50000
+        description: Number of rows to export from MySQL in one batch.
+      - name: session_sqls
+        kind: array
+        value:
+          - SET @@session.time_zone="+0:00"
+          - SET @@session.wait_timeout=28800
+          - SET @@session.net_read_timeout=3600
+          - SET @@session.innodb_lock_wait_timeout=3600
+        description: List of SQL commands to run when a connection made. This allows to set session variables dynamically, like timeouts.
   - name: tap-postgres
     label: PostgreSQL
     description: PostgreSQL database extractor
