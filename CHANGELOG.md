@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2438](https://gitlab.com/meltano/meltano/-/issues/2438) Add missing `replica_set`, `ssl`, `verify_mode`, and `include_schemas_in_destination_stream_name` settings to `tap-mongodb`
+
 ### Changes
 
 ### Fixes
