@@ -24,7 +24,7 @@ const getters = {
 
   getHasValidConfigSettings(_, getters) {
     return (configSettings, settingsGroupValidation = null) => {
-      return settingsGroupValidation && settingsGroupValidation.lenth
+      return settingsGroupValidation && settingsGroupValidation.length
         ? getters.getHasGroupValidationConfigSettings(
             configSettings,
             settingsGroupValidation
