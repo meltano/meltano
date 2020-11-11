@@ -1,3 +1,6 @@
+import time
+import psycopg2
+import os
 import contextlib
 import logging
 import os
@@ -11,6 +14,12 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
+from sqlalchemy.exc import OperationalError
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.engine import Engine
+from psycopg2.sql import Identifier, SQL
+from .project_settings_service import ProjectSettingsService
+
 
 SystemMetadata = MetaData()
 SystemModel = declarative_base(metadata=SystemMetadata)
@@ -36,6 +45,14 @@ def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessio
     logging.debug(f"Creating engine {project}@{engine_uri}")
     engine = create_engine(engine_uri, pool_pre_ping=True)
 
+
+    settings = ProjectSettingsService(project)
+
+    max_retries = settings.get('max_retries')
+    retry_timeout_seconds = settings.get('retry_timeout_seconds')
+
+    check_db_connection(engine, max_retries, retry_timeout_seconds)
+
     init_hook(engine)
 
     create_session = sessionmaker(bind=engine)
@@ -49,6 +66,26 @@ def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessio
 
     return engine_session
 
+
+def check_db_connection(engine, max_retries=3, retry_timeout_seconds=5):
+    """
+    Checks whether the database is available the first time a project's engine
+    is created
+    """
+    attempt = 0
+    while True:
+        try:
+            engine.connect()
+            break
+        except OperationalError:
+            if attempt == max_retries:
+                logging.error("Could not connect to the Database. Max retries exceeded.")
+                raise
+            attempt += 1
+            logging.info(
+                f"DB connection failed. Will retry after {retry_timeout_seconds}s. Attempt {attempt}/{max_retries}"
+            )
+            time.sleep(retry_timeout_seconds)
 
 def init_hook(engine):
     function_map = {"sqlite": init_sqlite_hook}
