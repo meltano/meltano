@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2445](https://gitlab.com/meltano/meltano/-/issues/2445) Fix 'Test Connection' and 'Save' buttons being disabled in UI Configuration modal despite required fields being populate
+
 ### Breaks
 
 
