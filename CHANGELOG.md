@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2438](https://gitlab.com/meltano/meltano/-/issues/2438) Add missing `replica_set`, `ssl`, `verify_mode`, and `include_schemas_in_destination_stream_name` settings to `tap-mongodb`
 - [#2389](https://gitlab.com/meltano/meltano/-/issues/2389) Let user disable autoscrolling in UI job log modal
+- [#2307](https://gitlab.com/meltano/meltano/-/issues/2307) Add `ui.session_cookie_secure` setting to let `Secure` flag be enabled on session cookies when running Meltano UI with HTTPS.
 
 ### Changes
 

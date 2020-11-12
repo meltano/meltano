@@ -46,6 +46,10 @@ settings:
   env_specific: true
 - name: ui.session_cookie_domain
   env_specific: true
+- name: ui.session_cookie_secure
+  kind: boolean
+  value: false
+  env_specific: true
 - name: ui.secret_key
   value: thisisnotapropersecretkey
   env_specific: true

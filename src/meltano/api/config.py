@@ -71,6 +71,7 @@ class ProjectSettings(object):
     settings_map = {
         "SERVER_NAME": "ui.server_name",
         "SESSION_COOKIE_DOMAIN": "ui.session_cookie_domain",
+        "SESSION_COOKIE_SECURE": "ui.session_cookie_secure",
         "SECRET_KEY": "ui.secret_key",
         # Flask-Security
         "SECURITY_PASSWORD_SALT": "ui.password_salt",
