@@ -97,8 +97,3 @@ class ProjectSettings(object):
             config_key: self.settings_service.get(setting_name)
             for config_key, setting_name in self.settings_map.items()
         }
-
-
-class Production(object):
-    SESSION_COOKIE_SECURE = True
-    SESSION_COOKIE_HTTPONLY = True

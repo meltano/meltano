@@ -48,9 +48,6 @@ def create_app(config={}):
     app.config.from_mapping(**meltano.api.config.ProjectSettings(project).as_dict())
     app.config.from_mapping(**config)
 
-    if app.env == "production":
-        app.config.from_object("meltano.api.config.Production")
-
     # File logging
     file_handler = logging.handlers.RotatingFileHandler(
         str(project.run_dir("meltano-ui.log")), backupCount=3
