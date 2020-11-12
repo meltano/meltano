@@ -24,14 +24,17 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2438](https://gitlab.com/meltano/meltano/-/issues/2438) Add missing `replica_set`, `ssl`, `verify_mode`, and `include_schemas_in_destination_stream_name` settings to `tap-mongodb`
 - [#2389](https://gitlab.com/meltano/meltano/-/issues/2389) Let user disable autoscrolling in UI job log modal
-- [#2307](https://gitlab.com/meltano/meltano/-/issues/2307) Add `ui.session_cookie_secure` setting to let `Secure` flag be enabled on session cookies when running Meltano UI with HTTPS.
+- [#2307](https://gitlab.com/meltano/meltano/-/issues/2307) Add `ui.session_cookie_secure` setting to let `Secure` flag be enabled on session cookies when Meltano UI is served over HTTPS
 
+### Changes
+
+- [#2307](https://gitlab.com/meltano/meltano/-/issues/2307) The `Secure` flag is no longer enabled on Meltano UI session cookies unconditionally and by default
 
 ### Fixes
 
 - [#2396](https://gitlab.com/meltano/meltano/-/issues/2396) Support unquoted `YYYY-MM-DD` date values in `meltano.yml` by converting them to ISO8601 strings before passing them to plugins
-- [#2445](https://gitlab.com/meltano/meltano/-/issues/2445) Fix 'Test Connection' and 'Save' buttons being disabled in UI Configuration modal despite required fields being populate
-- [#2307](https://gitlab.com/meltano/meltano/-/issues/2307) Fix logging into Meltano UI in Google Chrome when running without HTTPS, by no longer unconditionally enabling the `Secure` flag on session cookies.
+- [#2445](https://gitlab.com/meltano/meltano/-/issues/2445) Fix 'Test Connection' and 'Save' buttons being disabled in UI Configuration modal despite required fields being populated
+- [#2307](https://gitlab.com/meltano/meltano/-/issues/2307) Fix logging into Meltano UI in Google Chrome when running without HTTPS
 
 
 ## 1.57.0 - (2020-11-10)
