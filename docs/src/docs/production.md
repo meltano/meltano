@@ -234,19 +234,27 @@ You can start Meltano UI using [`meltano ui`](/docs/command-line-interface.html#
 but there are [a couple of settings](/docs/settings.html#meltano-ui-server) you'll want to consider changing in production:
 
 - By default, Meltano UI will bind to host `0.0.0.0` and port `5000`.
+
   This can be changed using the [`ui.bind_host`](/docs/settings.html#ui-bind-host) and [`ui.bind_port`](/docs/settings.html#ui-bind-port) settings, and their respective environment variables and CLI options.
 
 - If you'd like to require users to sign in before they can access the Meltano UI, enable the [`ui.authentication` setting](/docs/settings.html#ui-authentication).
-  As described behind that link, this will also require you to set the [`ui.secret_key`](/docs/settings.html#ui-secret-key) and [`ui.password_salt`](/docs/settings.html#ui-password-salt) settings, as well as [`ui.server_name`](/docs/settings.html#ui-server-name) or [`ui.session_cookie_domain`](/docs/settings.html#ui-session-cookie-domain). Users can be added using [`meltano user add`](./command-line-interface.html#user) and will be stored in the configured [system database](#storing-metadata).
+
+  As described behind that link, this will also require you to set the [`ui.secret_key`](/docs/settings.html#ui-secret-key) and [`ui.password_salt`](/docs/settings.html#ui-password-salt) settings, as well as [`ui.server_name`](/docs/settings.html#ui-server-name) or [`ui.session_cookie_domain`](/docs/settings.html#ui-session-cookie-domain).
+
+  Users can be added using [`meltano user add`](./command-line-interface.html#user) and will be stored in the configured [system database](#storing-metadata).
+
+- If you will be running Meltano UI behind a front-end (reverse) proxy that will be responsible for SSL termination (HTTPS),
+  it is recommended that you enable the [`ui.session_cookie_secure` setting](/docs/settings.html#ui-session-cookie-secure) so that session cookies used for authentication are only sent along with secure requests.
+
+  You may also need to change the [`ui.forwarded_allow_ips` setting](/docs/settings.html#ui-forwarded-allow-ips) to get
+  Meltano UI to realize it should use the `https` URL scheme rather than `http` in the URLs it builds.
+
+  If your reverse proxy uses a health check to determine if Meltano UI is ready to accept traffic, you can use the `/api/health` route, which will always respond with a 200 status code.
 
 - Meltano UI can be used to make changes to your project, like adding plugins and scheduling pipelines,
   which is very useful locally but may be undesirable in production if you'd prefer for all changes to [go through version control](#off-of-your-local-machine) instead.
-  To disallow all modifications to project files through the UI, enable the [`project_readonly` setting](/docs/settings.html#project-readonly).
 
-- If you will be running Meltano UI behind a front-end (reverse) proxy that will be responsible for SSL termination,
-  you may need to change the [`ui.forwarded_allow_ips` setting](/docs/settings.html#ui-forwarded-allow-ips) to get
-  Meltano UI to realize it should use the `https` URL scheme rather than `http` in the URLs it builds.
-  If your reverse proxy uses a health check to determine if Meltano UI is ready to accept traffic, you can use the `/api/health` route, which will always respond with a 200 status code.
+  To disallow all modifications to project files through the UI, enable the [`project_readonly` setting](/docs/settings.html#project-readonly).
 
 ### Containerized Meltano project
 

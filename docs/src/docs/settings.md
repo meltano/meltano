@@ -237,7 +237,9 @@ meltano ui --bind-port=80
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_SERVER_NAME`
 - Default: None
 
-The host and port Meltano UI is available at.
+The host and port Meltano UI is available at, e.g. `<host>:<port>`.
+
+The port will usually match the [`ui.bind_port` setting](#ui-bind-port), and can be omitted when the default port for HTTP (`80`) or HTTPS (`443`) is used.
 
 Unless the [`ui.session_cookie_domain` setting](#ui-session-cookie-domain) is set, this setting will be used as the session cookie domain.
 
@@ -291,6 +293,25 @@ This setting corresponds to [Flask's `SESSION_COOKIE_DOMAIN` setting](https://fl
 meltano config meltano set ui session_cookie_domain meltano.example.com
 
 export MELTANO_UI_SESSION_COOKIE_DOMAIN=meltano.example.com
+```
+
+### `ui.session_cookie_secure`
+
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_SESSION_COOKIE_SECURE`
+- Default: `false`
+
+Enable the `Secure` flag on the session cookie, so that the client will only send it to the server in HTTPS requests.
+
+The application must be served over HTTPS for this to make sense.
+
+This setting corresponds to [Flask's `SESSION_COOKIE_SECURE` setting](https://flask.palletsprojects.com/en/1.1.x/config/#SESSION_COOKIE_SECURE).
+
+#### How to use
+
+```bash
+meltano config meltano set ui session_cookie_secure true
+
+export MELTANO_UI_SESSION_COOKIE_SECURE=true
 ```
 
 ### `ui.secret_key`
