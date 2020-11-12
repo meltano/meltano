@@ -24,7 +24,8 @@ export default {
       isPolling: true,
       jobLog: null,
       jobPoller: null,
-      jobStatus: null
+      jobStatus: null,
+      shouldAutoScroll: true
     }
   },
   computed: {
@@ -92,6 +93,9 @@ export default {
     close() {
       this.$router.push({ name: 'pipelines' })
     },
+    scrollToLogsBottom() {
+      utils.scrollToBottom(this.$refs['log-view'])
+    },
     initJobPoller() {
       const pollFn = () => {
         this.getJobLog(this.jobId)
@@ -109,7 +113,9 @@ export default {
               this.isPolling = false
               this.jobPoller.dispose()
             }
-            utils.scrollToBottom(this.$refs['log-view'])
+            if (this.shouldAutoScroll) {
+              this.scrollToLogsBottom()
+            }
           })
       }
       this.jobPoller = poller.create(pollFn, null, 1000)
@@ -209,6 +215,10 @@ export default {
           :trigger-promise="getDownloadPromise"
           :trigger-payload="{ jobId }"
         ></DownloadButton>
+        <label v-else class="checkbox is-unselectable">
+          <input v-model="shouldAutoScroll" type="checkbox" />
+          Autoscroll
+        </label>
       </section>
       <footer class="modal-card-foot h-space-between">
         <div class="field is-grouped is-grouped-multiline">
