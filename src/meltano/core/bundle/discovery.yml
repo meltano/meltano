@@ -460,7 +460,7 @@ extractors:
         kind: date_iso8601
         description: Date up to when historical data will be extracted.
       - name: insights_buffer_days
-        kind: boolean
+        kind: integer
         value: 0
         label: Ads Insights Buffer Days
         description: How many Days before the Start Date to fetch Ads Insights for
