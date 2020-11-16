@@ -8,9 +8,11 @@ import meltano.core.bundle as bundle
 from meltano.core.utils import nest, NotFound
 from .project import Project
 from .setting_definition import SettingDefinition
-from .plugin import PluginDefinition, ProjectPlugin, PluginType, PluginRef, Profile
+from .plugin import PluginDefinition, ProjectPlugin, PluginType, PluginRef
 from .plugin.factory import plugin_factory
 from .plugin.error import PluginMissingError
+
+logger = logging.getLogger(__name__)
 
 
 class PluginAlreadyAddedException(Exception):
@@ -81,13 +83,18 @@ class ConfigService:
         invokable=None,
         configurable=None,
     ) -> ProjectPlugin:
-        name, profile_name = PluginRef.parse_name(plugin_name)
+        if "@" in plugin_name:
+            plugin_name, profile_name = plugin_name.split("@", 2)
+            logger.warning(
+                f"Plugin configuration profiles are no longer supported, ignoring `@{profile_name}` in plugin name."
+            )
+
         try:
             plugin = next(
                 plugin
                 for plugin in self.plugins()
                 if (
-                    plugin.name == name
+                    plugin.name == plugin_name
                     and (plugin_type is None or plugin.type == plugin_type)
                     and (invokable is None or plugin.is_invokable() == invokable)
                     and (
@@ -95,16 +102,14 @@ class ConfigService:
                     )
                 )
             )
-            plugin.use_profile(profile_name)
 
             return plugin
         except StopIteration as stop:
-            raise PluginMissingError(name) from stop
+            raise PluginMissingError(plugin_name) from stop
 
     def get_plugin(self, plugin_ref: PluginRef) -> ProjectPlugin:
         try:
             plugin = next(plugin for plugin in self.plugins() if plugin == plugin_ref)
-            plugin.use_profile(plugin_ref.current_profile_name)
 
             return plugin
         except StopIteration as stop:

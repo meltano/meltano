@@ -56,14 +56,9 @@ export default {
         ? this.gitLabSettings
         : this.configSettings.settings
     },
-    connectorProfile() {
-      return this.configSettings
-        ? this.configSettings.profiles[this.configSettings.profileInFocusIndex]
-        : {}
-    },
     fileValue() {
       return setting => {
-        let fullPath = this.connectorProfile.config[setting.name]
+        let fullPath = this.configSettings.config[setting.name]
         return fullPath && utils.extractFileNameFromPath(fullPath)
       }
     },
@@ -119,7 +114,7 @@ export default {
     },
     getIsProtected() {
       return setting => {
-        const metadata = this.connectorProfile.configMetadata[setting.name]
+        const metadata = this.configSettings.configMetadata[setting.name]
 
         return (
           setting.protected === true || (metadata && !metadata.overwritable)
@@ -190,7 +185,7 @@ export default {
       return this.fieldClass || 'is-normal'
     },
     protectedFieldMessage() {
-      let configMetadata = this.configSettings.profiles[0].configMetadata
+      let configMetadata = this.configSettings.configMetadata
 
       return setting => {
         const metadata = configMetadata[setting.name]
@@ -206,14 +201,6 @@ export default {
     },
     successClass() {
       return setting => (setting ? 'has-text-success' : null)
-    }
-  },
-  watch: {
-    'configSettings.profileInFocusIndex': {
-      handler(newVal, oldVal) {
-        this.refocusInput(newVal, oldVal)
-        this.clearUploadFormData()
-      }
     }
   },
   mounted() {
@@ -275,10 +262,7 @@ export default {
         })
 
         // Model update as v-model on `<input type="file">` not supported
-        const profile = this.configSettings.profiles[
-          this.configSettings.profileInFocusIndex
-        ]
-        profile.config[setting.name] = file.name
+        this.configSettings.config[setting.name] = file.name
       }
     },
     onFocusInput(el) {
@@ -300,11 +284,6 @@ export default {
         this.onFocusInput(el)
       }
     },
-    refocusInput(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        this.focusInputIntelligently()
-      }
-    },
     openOAuthPopup(provider) {
       const oauthUrl = `${this.$flask.oauthServiceUrl}/${provider}`
       const winOpts =
@@ -313,11 +292,9 @@ export default {
       window.open(oauthUrl, name, winOpts)
     },
     setGitLabSource() {
-      const currentProfile = this.configSettings.profiles[
-        this.configSettings.profileInFocusIndex
-      ]
-      const hasGroupSetting = currentProfile.config.groups
-      const hasProjectSetting = currentProfile.config.projects
+      const config = this.configSettings.config
+      const hasGroupSetting = config.groups
+      const hasProjectSetting = config.projects
 
       if (hasProjectSetting) {
         this.source = 'project'
@@ -431,7 +408,7 @@ export default {
                   <input
                     v-if="getIsOfKindHidden(setting.kind)"
                     :id="getFormFieldForId(setting)"
-                    v-model="connectorProfile.config[setting.name]"
+                    v-model="configSettings.config[setting.name]"
                     type="hidden"
                   />
 
@@ -439,7 +416,7 @@ export default {
                   <input
                     v-else-if="getIsOfKindBoolean(setting.kind)"
                     :id="getFormFieldForId(setting)"
-                    v-model="connectorProfile.config[setting.name]"
+                    v-model="configSettings.config[setting.name]"
                     class="checkbox"
                     :class="successClass(setting)"
                     :disabled="getIsProtected(setting)"
@@ -449,7 +426,7 @@ export default {
                   <!-- Date -->
                   <InputDateIso8601
                     v-else-if="getIsOfKindDate(setting.kind)"
-                    v-model="connectorProfile.config[setting.name]"
+                    v-model="configSettings.config[setting.name]"
                     :name="setting.name"
                     :for-id="getFormFieldForId(setting)"
                     :input-classes="`is-small ${successClass(setting)}`"
@@ -525,11 +502,7 @@ export default {
                   >
                     <select
                       :id="`${setting.name}-select-menu`"
-                      v-model="
-                        configSettings.profiles[
-                          configSettings.profileInFocusIndex
-                        ].config[setting.name]
-                      "
+                      v-model="configSettings.config[setting.name]"
                       :name="`${setting.name}-options`"
                       :class="successClass(setting)"
                       :disabled="getIsProtected(setting)"
@@ -549,7 +522,7 @@ export default {
                   <input
                     v-else-if="getIsOfKindTextBased(setting.kind)"
                     :id="getFormFieldForId(setting)"
-                    v-model="connectorProfile.config[setting.name]"
+                    v-model="configSettings.config[setting.name]"
                     :class="['input', fieldClass, successClass(setting)]"
                     :type="getTextBasedInputType(setting)"
                     :placeholder="getPlaceholder(setting)"

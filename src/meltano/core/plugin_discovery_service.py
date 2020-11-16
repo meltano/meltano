@@ -247,17 +247,16 @@ class PluginDiscoveryService(Versioned):
     def find_definition(
         self, plugin_type: PluginType, plugin_name: str, variant=None
     ) -> PluginDefinition:
-        name, _ = PluginRef.parse_name(plugin_name)
         try:
             plugin = next(
                 plugin
                 for plugin in self.get_plugins_of_type(plugin_type)
-                if plugin.name == name
+                if plugin.name == plugin_name
             )
             plugin.use_variant(variant)
             return plugin
         except StopIteration as stop:
-            raise PluginNotFoundError(name) from stop
+            raise PluginNotFoundError(plugin_name) from stop
 
     def find_definition_by_namespace(
         self, plugin_type: PluginType, namespace: str
