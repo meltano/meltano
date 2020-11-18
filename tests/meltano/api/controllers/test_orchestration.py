@@ -2,11 +2,7 @@ import pytest
 from unittest import mock
 from flask import url_for
 
-from meltano.core.plugin.settings_service import (
-    SettingValueStore,
-    REDACTED_VALUE,
-    Profile,
-)
+from meltano.core.plugin.settings_service import SettingValueStore, REDACTED_VALUE
 
 
 class TestOrchestration:
@@ -36,9 +32,8 @@ class TestOrchestration:
             )
 
             assert res.status_code == 200
-            default_profile = res.json["profiles"][0]
-            config = default_profile["config"]
-            config_metadata = default_profile["config_metadata"]
+            config = res.json["config"]
+            config_metadata = res.json["config_metadata"]
 
             # make sure that set `password` is still present
             # but redacted in the response
@@ -100,16 +95,11 @@ class TestOrchestration:
         ), app.test_request_context():
             res = api.put(
                 url_for("orchestrations.save_plugin_configuration", plugin_ref=tap),
-                json=[
-                    {
-                        "name": Profile.DEFAULT.name,
-                        "config": {"protected": "N33DC0FF33", "secure": "newvalue"},
-                    }
-                ],
+                json={"config": {"protected": "N33DC0FF33", "secure": "newvalue"}},
             )
 
             assert res.status_code == 200
-            config = res.json[0]["config"]
+            config = res.json["config"]
 
             # make sure that set `password` has been updated
             # but redacted in the response

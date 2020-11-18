@@ -26,22 +26,19 @@ export default {
       }
       return targetModel
     },
-    getExtractor() {
-      // Split based on '@' profiles convention
-      return this.pipeline.extractor.split('@')[0]
-    },
     getIsExplorable() {
       return Boolean(this.getExploreModel)
     },
     getNamespace() {
-      return this.getInstalledPlugin('extractors', this.getExtractor).namespace
+      return this.getInstalledPlugin('extractors', this.pipeline.extractor)
+        .namespace
     }
   },
   methods: {
     goToExplore() {
       this.$router.push({
         name: 'explore',
-        params: { extractor: this.getExtractor }
+        params: { extractor: this.pipeline.extractor }
       })
     }
   }

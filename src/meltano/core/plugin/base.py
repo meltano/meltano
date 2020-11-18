@@ -1,3 +1,4 @@
+import logging
 import yaml
 import fnmatch
 import copy
@@ -11,6 +12,8 @@ from meltano.core.behavior.hookable import HookObject
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior import NameEq
 from meltano.core.utils import compact, find_named, NotFound, flatten
+
+logger = logging.getLogger(__name__)
 
 
 class VariantNotFoundError(Exception):
@@ -34,14 +37,6 @@ class YAMLEnum(str, Enum):
 
 
 yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
-
-
-class Profile(NameEq, Canonical):
-    def __init__(self, name: str = None, label: str = None, config={}, **extras):
-        super().__init__(name=name, label=label, config=config, extras=extras)
-
-
-Profile.DEFAULT = Profile(name="default", label="Default")
 
 
 class PluginType(YAMLEnum):
@@ -101,36 +96,23 @@ class PluginRef:
             if isinstance(plugin_type, PluginType)
             else PluginType(plugin_type)
         )
-        self.name, self._current_profile_name = self.parse_name(name)
 
-    @classmethod
-    def parse_name(cls, name: str):
-        name, *profile_name = name.split("@")
-        profile_name = next(iter(profile_name), Profile.DEFAULT.name)
-
-        return (name, profile_name)
+        self.name = name
 
     @property
     def type(self):
         return self._type
 
     @property
-    def current_profile_name(self):
-        return self._current_profile_name
-
-    @property
-    def full_name(self):
-        return f"{self.name}@{self.current_profile_name}"
-
-    @property
     def qualified_name(self):
-        parts = (self.type, self.name, self.current_profile_name)
+        # "default" is included for legacy reasons
+        parts = (self.type, self.name, "default")
 
         return ".".join(compact(parts))
 
     @property
     def info(self):
-        return {"name": self.name, "profile": self.current_profile_name}
+        return {"name": self.name}
 
     @property
     def info_env(self):
@@ -141,7 +123,7 @@ class PluginRef:
         return self.name == other.name and self.type == other.type
 
     def __hash__(self):
-        return hash((self.type, self.name, self.current_profile_name))
+        return hash((self.type, self.name))
 
 
 class ProjectPlugin(HookObject, Canonical, PluginRef):
@@ -154,7 +136,6 @@ class ProjectPlugin(HookObject, Canonical, PluginRef):
         variant: Optional[str] = None,
         pip_url: Optional[str] = None,
         config: Optional[dict] = {},
-        profiles: Optional[list] = [],
         **extras,
     ):
         if namespace:
@@ -170,6 +151,11 @@ class ProjectPlugin(HookObject, Canonical, PluginRef):
             extras = {**custom_definition.extras, **extras}
             custom_definition.extras = {}
 
+        if "profiles" in extras:
+            logger.warning(
+                f"Plugin configuration profiles are no longer supported, ignoring `profiles` in '{name}' {plugin_type.descriptor} definition."
+            )
+
         super().__init__(
             plugin_type,
             name,
@@ -179,7 +165,6 @@ class ProjectPlugin(HookObject, Canonical, PluginRef):
             pip_url=pip_url,
             config=copy.deepcopy(config),
             extras=extras,
-            profiles=list(map(Profile.parse, profiles)),
         )
 
         self._flattened.add("custom_definition")
@@ -207,42 +192,6 @@ class ProjectPlugin(HookObject, Canonical, PluginRef):
     def is_custom(self):
         return self.custom_definition is not None
 
-    def get_profile(self, profile_name: str) -> Profile:
-        if profile_name == Profile.DEFAULT.name:
-            return Profile.DEFAULT
-
-        return find_named(self.profiles, profile_name)
-
-    def use_profile(self, profile_or_name: Union[str, Profile]):
-        if profile_or_name is None:
-            profile = Profile.DEFAULT
-        elif isinstance(profile_or_name, Profile):
-            profile = profile_or_name
-        else:
-            profile = self.get_profile(profile_or_name)
-
-        self._current_profile_name = profile.name
-
-    @property
-    def current_profile(self):
-        return self.get_profile(self.current_profile_name)
-
-    @property
-    def current_config(self):
-        return (
-            self.config
-            if self.current_profile is Profile.DEFAULT
-            else self.current_profile.config
-        )
-
-    @property
-    def current_extras(self):
-        return (
-            self.extras
-            if self.current_profile is Profile.DEFAULT
-            else self.current_profile.extras
-        )
-
     def exec_args(self, files: Dict):
         return []
 
@@ -259,12 +208,6 @@ class ProjectPlugin(HookObject, Canonical, PluginRef):
         select = self.extras.get("select", [])
         select.append(filter)
         self.extras["select"] = select
-
-    def add_profile(self, name: str, config: dict = None, label: str = None):
-        profile = Profile(name=name, config=config, label=label)
-
-        self.profiles.append(profile)
-        return profile
 
     def process_config(self, config):
         return config
@@ -366,7 +309,7 @@ class PluginDefinition(Canonical, PluginRef):
     def current_variant_name(self):
         return self._current_variant_name
 
-    def get_variant(self, variant_name: str) -> Profile:
+    def get_variant(self, variant_name: str) -> Variant:
         try:
             return find_named(self.variants, variant_name)
         except NotFound as err:

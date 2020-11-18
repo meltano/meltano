@@ -121,16 +121,6 @@ const getters = {
     }
   },
 
-  getPluginProfiles() {
-    return plugin => {
-      const pluginProfiles = lodash.map(
-        plugin['profiles'],
-        profile => `${plugin.name}@${profile.name}`
-      )
-      return [plugin.name, ...pluginProfiles]
-    }
-  },
-
   installedPluginsOfType(state) {
     return type => state.installedPlugins[type] || []
   }

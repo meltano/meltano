@@ -72,18 +72,8 @@ class TestPluginSettingsService:
         config_service,
         plugin_settings_service_factory,
     ):
-        profile = tap.add_profile("profile", label="Profile")
-        config_service.update_plugin(tap)
-        tap_with_profile = config_service.find_plugin(tap.name)
-        tap_with_profile.use_profile(profile)
-        subject_with_profile = plugin_settings_service_factory(tap_with_profile)
-
         # returns the default value when unset
         assert subject.get_with_source("test", session=session) == (
-            "mock",
-            SettingValueStore.DEFAULT,
-        )
-        assert subject_with_profile.get_with_source("test", session=session) == (
             "mock",
             SettingValueStore.DEFAULT,
         )
@@ -92,40 +82,22 @@ class TestPluginSettingsService:
         subject.set(
             "test", "THIS_IS_FROM_DB", store=SettingValueStore.DB, session=session
         )
-        subject_with_profile.set(
-            "test",
-            "THIS_IS_FROM_DB_WITH_PROFILE",
-            store=SettingValueStore.DB,
-            session=session,
-        )
 
         assert subject.get_with_source("test", session=session) == (
             "THIS_IS_FROM_DB",
             SettingValueStore.DB,
         )
-        assert subject_with_profile.get_with_source("test", session=session) == (
-            "THIS_IS_FROM_DB_WITH_PROFILE",
-            SettingValueStore.DB,
-        )
 
         # overriden via the `meltano.yml` configuration
         subject.set("test", 42, store=SettingValueStore.MELTANO_YML, session=session)
-        subject_with_profile.set(
-            "test", 43, store=SettingValueStore.MELTANO_YML, session=session
-        )
 
         assert subject.get_with_source("test", session=session) == (
             42,
             SettingValueStore.MELTANO_YML,
         )
-        assert subject_with_profile.get_with_source("test", session=session) == (
-            43,
-            SettingValueStore.MELTANO_YML,
-        )
 
         # revert back to the original
         subject.reset(store=SettingValueStore.MELTANO_YML)
-        subject_with_profile.reset(store=SettingValueStore.MELTANO_YML)
 
         # overriden via ENV
         monkeypatch.setenv(env_var(subject, "test"), "N33DC0F33")
@@ -134,20 +106,11 @@ class TestPluginSettingsService:
             "N33DC0F33",
             SettingValueStore.ENV,
         )
-        assert subject_with_profile.get_with_source("test", session=session) == (
-            "N33DC0F33",
-            SettingValueStore.ENV,
-        )
 
         # overridden via config override
         monkeypatch.setitem(subject.config_override, "test", "foo")
-        monkeypatch.setitem(subject_with_profile.config_override, "test", "foo")
 
         assert subject.get_with_source("test", session=session) == (
-            "foo",
-            SettingValueStore.CONFIG_OVERRIDE,
-        )
-        assert subject_with_profile.get_with_source("test", session=session) == (
             "foo",
             SettingValueStore.CONFIG_OVERRIDE,
         )

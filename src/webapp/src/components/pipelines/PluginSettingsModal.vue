@@ -6,15 +6,13 @@ import lodash from 'lodash'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
-import ConnectorSettingsDropdown from '@/components/pipelines/ConnectorSettingsDropdown'
 import utils from '@/utils/utils'
 
 export default {
   name: 'PluginSettingsModal',
   components: {
     ConnectorLogo,
-    ConnectorSettings,
-    ConnectorSettingsDropdown
+    ConnectorSettings
   },
   props: {
     pluginType: {
@@ -42,11 +40,6 @@ export default {
     ]),
     ...mapState('orchestration', ['pluginInFocusConfiguration']),
 
-    currentProfile() {
-      return this.localConfiguration.profiles[
-        this.localConfiguration.profileInFocusIndex
-      ]
-    },
     getHasPipeline() {
       return this.getHasPipelineWithPlugin(
         this.singularizedType,
@@ -74,21 +67,15 @@ export default {
     isLoadingConfigSettings() {
       return !Object.prototype.hasOwnProperty.call(
         this.localConfiguration,
-        'profiles'
+        'config'
       )
     },
     isSaveable() {
       if (this.isInstalling || this.isLoadingConfigSettings) {
         return
       }
-      const configSettings = {
-        config: this.localConfiguration.profiles[
-          this.localConfiguration.profileInFocusIndex
-        ].config,
-        settings: this.localConfiguration.settings
-      }
       const isValid = this.getHasValidConfigSettings(
-        configSettings,
+        this.localConfiguration,
         this.localConfiguration.settingsGroupValidation
       )
       return this.isInstalled && isValid
@@ -107,19 +94,6 @@ export default {
     },
     singularizedTitledType() {
       return utils.titleCase(this.singularizedType)
-    },
-    submittedProfiles() {
-      if (this.plugin.name === 'tap-gitlab') {
-        return this.localConfiguration.profiles.map(profile => {
-          if (profile.config.hasOwnProperty('source')) {
-            delete profile.config.source
-          }
-
-          return profile
-        })
-      } else {
-        return this.localConfiguration.profiles
-      }
     }
   },
   created() {
@@ -153,7 +127,7 @@ export default {
     },
     createEditableConfiguration() {
       this.localConfiguration = Object.assign(
-        { profileInFocusIndex: 0 },
+        {},
         lodash.cloneDeep(this.pluginInFocusConfiguration)
       )
     },
@@ -173,7 +147,6 @@ export default {
       let uponConditionalUpload = this.uploadFormData
         ? this.$store.dispatch('orchestration/uploadPluginConfigurationFile', {
             name: this.plugin.name,
-            profileName: this.currentProfile.name,
             type: this.pluginType,
             payload: this.uploadFormData
           })
@@ -184,14 +157,16 @@ export default {
         // 2.a Update setting value with updated and secure file path
         if (response) {
           const payload = response.data
-          this.currentProfile.config[payload.settingName] = payload.path
+          this.localConfiguration.config[payload.settingName] = payload.path
         }
 
         // 3. Save config settings
         this.savePluginConfiguration({
           name: this.plugin.name,
           type: this.pluginType,
-          profiles: this.submittedProfiles
+          payload: {
+            config: this.localConfiguration.config
+          }
         })
           .then(() => {
             const message = this.pluginLacksConfigSettings
@@ -213,7 +188,6 @@ export default {
       let uponConditionalUpload = this.uploadFormData
         ? this.$store.dispatch('orchestration/uploadPluginConfigurationFile', {
             name: this.plugin.name,
-            profileName: this.currentProfile.name,
             type: this.pluginType,
             payload: { ...this.uploadFormData, tmp: true }
           })
@@ -224,7 +198,7 @@ export default {
         // 2.a Update setting value with updated and secure file path
         if (response) {
           const payload = response.data
-          this.currentProfile.config[payload.settingName] = payload.path
+          this.localConfiguration.config[payload.settingName] = payload.path
         }
 
         // 3. Save config settings
@@ -232,8 +206,7 @@ export default {
           name: this.plugin.name,
           type: this.pluginType,
           payload: {
-            profile: this.currentProfile.name,
-            config: this.currentProfile.config
+            config: this.localConfiguration.config
           }
         })
           .then(response => {
@@ -257,7 +230,6 @@ export default {
                 'orchestration/deleteUploadedPluginConfigurationFile',
                 {
                   name: this.plugin.name,
-                  profileName: this.currentProfile.name,
                   type: this.pluginType,
                   payload: {
                     ...this.uploadFormData,
@@ -296,19 +268,6 @@ export default {
         ></progress>
 
         <template v-if="!isLoadingConfigSettings">
-          <!--
-            TEMP ConnectorSettingsDropdown removal from UI.
-            Conditional removal so existing users with 2+ profiles already created still can access them
-            Get context here https://gitlab.com/meltano/meltano/issues/1389.
-          -->
-          <template v-if="localConfiguration.profiles.length > 1">
-            <ConnectorSettingsDropdown
-              v-if="!pluginLacksConfigSettings"
-              :connector="plugin"
-              :plugin-type="pluginType"
-              :config-settings="localConfiguration"
-            ></ConnectorSettingsDropdown>
-          </template>
           <ConnectorSettings
             v-if="!pluginLacksConfigSettings"
             field-class="is-small"

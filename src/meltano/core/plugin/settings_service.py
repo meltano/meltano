@@ -11,13 +11,7 @@ from meltano.core.settings_service import (
     REDACTED_VALUE,
 )
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
-from meltano.core.plugin import (
-    PluginRef,
-    PluginType,
-    PluginDefinition,
-    ProjectPlugin,
-    Profile,
-)
+from meltano.core.plugin import PluginRef, PluginType, PluginDefinition, ProjectPlugin
 from meltano.core.plugin.error import PluginMissingError
 
 
@@ -108,13 +102,13 @@ class PluginSettingsService(SettingsService):
     @property
     def _meltano_yml_config(self):
         return {
-            **self.plugin.current_config,
-            **{f"_{k}": v for k, v in self.plugin.current_extras.items()},
+            **self.plugin.config,
+            **{f"_{k}": v for k, v in self.plugin.extras.items()},
         }
 
     def _update_meltano_yml_config(self, config_with_extras):
-        config = self.plugin.current_config
-        extras = self.plugin.current_extras
+        config = self.plugin.config
+        extras = self.plugin.extras
 
         config.clear()
         extras.clear()
@@ -129,29 +123,3 @@ class PluginSettingsService(SettingsService):
 
     def _process_config(self, config):
         return self.plugin.process_config(config)
-
-    def profile_with_config(self, profile: Profile, extras=False, **kwargs):
-        self.plugin.use_profile(profile)
-
-        config_dict = {}
-        config_metadata = {}
-
-        config_with_metadata = self.config_with_metadata(extras=extras, **kwargs)
-        for key, metadata in config_with_metadata.items():
-            config_dict[key] = metadata.pop("value")
-
-            metadata.pop("setting", None)
-
-            config_metadata[key] = metadata
-
-        return {
-            **profile.canonical(),
-            "config": config_dict,
-            "config_metadata": config_metadata,
-        }
-
-    def profiles_with_config(self, **kwargs) -> List[Dict]:
-        return [
-            self.profile_with_config(profile, **kwargs)
-            for profile in (Profile.DEFAULT, *self.plugin.profiles)
-        ]
