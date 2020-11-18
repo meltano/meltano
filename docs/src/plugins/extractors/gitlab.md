@@ -46,7 +46,7 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 
 Follow the remaining steps of the [Getting Started guide](/docs/getting-started.html):
 
-1. [Select entities and attributes to extract](/docs/getting-started.html#select-entities-and-attributes-to-extract)
+1. [Select streams and properties to extract](/docs/getting-started.html#select-streams-and-properties-to-extract)
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
@@ -208,7 +208,7 @@ export TAP_GITLAB_PROJECTS="meltano/meltano meltano/tap-gitlab"
 - [Environment variable](/docs/configuration.html#configuring-settings): `TAP_GITLAB_ULTIMATE_LICENSE`, alias: `GITLAB_API_ULTIMATE_LICENSE`
 - Default: `false`
 
-Enable to pull in extra data (like Epics, Epic Issues and other entities) only available to GitLab Ultimate and GitLab.com Gold accounts.
+Enable to pull in extra data (like Epics, Epic Issues and other streams) only available to GitLab Ultimate and GitLab.com Gold accounts.
 
 #### How to use
 

@@ -177,12 +177,12 @@ class GoogleAnalyticsTracker:
     def track_meltano_select(
         self,
         extractor: str,
-        entities_filter: str,
-        attributes_filter: str,
+        streams_filter: str,
+        properties_filter: str,
         flags: [],
         debug: bool = False,
     ) -> None:
-        action = f"meltano select {extractor} {entities_filter} {attributes_filter}"
+        action = f"meltano select {extractor} {streams_filter} {properties_filter}"
 
         if flags["list"]:
             action = action + " --list"

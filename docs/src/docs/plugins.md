@@ -172,15 +172,15 @@ rules that are applied to the extractor's [discovered catalog file](https://gith
 when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
-Stream (entity) metadata `<key>: <value>` pairs (e.g. `{"replication-method": "INCREMENTAL"}`) are nested under top-level entity identifiers that correspond to Singer stream `tap_stream_id` values.
-These [nested properties](/docs/command-line-interface.html#nested-properties) can also be thought of and interacted with as settings named `_metadata.<entity>.<key>`.
+Stream (table) metadata `<key>: <value>` pairs (e.g. `{"replication-method": "INCREMENTAL"}`) are nested under top-level stream identifiers that correspond to Singer stream `tap_stream_id` values.
+These [nested properties](/docs/command-line-interface.html#nested-properties) can also be thought of and interacted with as settings named `_metadata.<stream>.<key>`.
 
-Property (attribute) metadata `<key>: <value>` pairs (e.g. `{"is-replication-key": true}`) are nested under top-level entity identifiers and second-level attribute identifiers that correspond to Singer stream property names.
-These [nested properties](/docs/command-line-interface.html#nested-properties) can also be thought of and interacted with as settings named `_metadata.<entity>.<attribute>.<key>`.
+Property (column) metadata `<key>: <value>` pairs (e.g. `{"is-replication-key": true}`) are nested under top-level stream identifiers and second-level property identifiers that correspond to Singer stream property names.
+These [nested properties](/docs/command-line-interface.html#nested-properties) can also be thought of and interacted with as settings named `_metadata.<stream>.<property>.<key>`.
 
-[Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in entity and attribute identifiers to match multiple entities and/or attributes at once.
+[Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in stream and property identifiers to match multiple streams and/or properties at once.
 
-Entity and attribute names can be discovered using [`meltano select --list --all <plugin>`](/docs/command-line-interface.html#select).
+Stream and property names can be discovered using [`meltano select --list --all <plugin>`](/docs/command-line-interface.html#select).
 
 #### How to use
 
@@ -201,14 +201,14 @@ extractors:
 ##### On the command line
 
 ```bash
-meltano config <extractor> set _metadata <entity> <key> <value>
-meltano config <extractor> set _metadata <entity> <attribute> <key> <value>
+meltano config <extractor> set _metadata <stream> <key> <value>
+meltano config <extractor> set _metadata <stream> <property> <key> <value>
 
-export <EXTRACTOR>__METADATA='{"<entity>": {"<key>": "<value>", "<attribute>": {"<key>": "<value>"}}}'
+export <EXTRACTOR>__METADATA='{"<stream>": {"<key>": "<value>", "<property>": {"<key>": "<value>"}}}'
 
 # Once metadata has been set in `meltano.yml`, environment variables can be used
 # to override specific nested properties:
-export <EXTRACTOR>__METADATA_<ENTITY>_<ATTRIBUTE>_<KEY>=<value>
+export <EXTRACTOR>__METADATA_<STREAM>_<PROPERTY>_<KEY>=<value>
 
 # For example:
 meltano config tap-postgres set _metadata some_stream_id replication-method INCREMENTAL
@@ -230,12 +230,12 @@ rules that are applied to the extractor's [discovered catalog file](https://gith
 when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
-[JSON Schema](https://json-schema.org/) descriptions for specific properties (attributes) (e.g. `{"type": ["string", "null"], "format": "date-time"}`) are nested under top-level entity identifiers that correspond to Singer stream `tap_stream_id` values, and second-level attribute identifiers that correspond to Singer stream property names.
-These [nested properties](/docs/command-line-interface.html#nested-properties) can also be thought of and interacted with as settings named `_schema.<entity>.<attribute>` and `_schema.<entity>.<attribute>.<key>`.
+[JSON Schema](https://json-schema.org/) descriptions for specific properties (properties) (e.g. `{"type": ["string", "null"], "format": "date-time"}`) are nested under top-level stream identifiers that correspond to Singer stream `tap_stream_id` values, and second-level property identifiers that correspond to Singer stream property names.
+These [nested properties](/docs/command-line-interface.html#nested-properties) can also be thought of and interacted with as settings named `_schema.<stream>.<property>` and `_schema.<stream>.<property>.<key>`.
 
-[Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in entity and attribute identifiers to match multiple entities and/or attributes at once.
+[Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in stream and property identifiers to match multiple streams and/or properties at once.
 
-Entity and attribute names can be discovered using [`meltano select --list --all <plugin>`](/docs/command-line-interface.html#select).
+Stream and property names can be discovered using [`meltano select --list --all <plugin>`](/docs/command-line-interface.html#select).
 
 If a schema is specified for a property that does not yet exist in the discovered stream's schema, the property (and its schema) will be added to the catalog.
 This allows you to define a full schema for taps such as [`tap-dynamo-db`](https://github.com/singer-io/tap-dynamodb) that do not themselves have the ability to discover the schema of their streams.
@@ -258,14 +258,14 @@ extractors:
 ##### On the command line
 
 ```bash
-meltano config <extractor> set _schema <entity> <attribute> <schema description>
-meltano config <extractor> set _schema <entity> <attribute> <key> <value>
+meltano config <extractor> set _schema <stream> <property> <schema description>
+meltano config <extractor> set _schema <stream> <property> <key> <value>
 
-export <EXTRACTOR>__SCHEMA='{"<entity>": {"<attribute>": {"<key>": "<value>"}}}'
+export <EXTRACTOR>__SCHEMA='{"<stream>": {"<property>": {"<key>": "<value>"}}}'
 
 # Once schema descriptions have been set in `meltano.yml`, environment variables can be used
 # to override specific nested properties:
-export <EXTRACTOR>__SCHEMA_<ENTITY>_<ATTRIBUTE>_<KEY>=<value>
+export <EXTRACTOR>__SCHEMA_<STREAM>_<PROPERTY>_<KEY>=<value>
 
 # For example:
 meltano config tap-postgres set _metadata some_stream_id created_at type '["string", "null"]'
@@ -280,14 +280,14 @@ export TAP_POSTGRES__SCHEMA_SOME_TABLE_CREATED_AT_FORMAT=date
 - [Environment variable](/docs/configuration.html#configuring-settings): `<EXTRACTOR>__SELECT`, e.g. `TAP_GITLAB__SELECT`
 - Default: `["*.*"]`
 
-An extractor's `select` [extra](/docs/configuration.html#plugin-extras) holds an array of [entity selection rules](/docs/command-line-interface.html#select)
+An extractor's `select` [extra](/docs/configuration.html#plugin-extras) holds an array of [stream selection rules](/docs/command-line-interface.html#select)
 that are applied to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
 when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
-A selection rule is comprised of an entity identifier that corresponds to a Singer stream's `tap_stream_id` value, and an attribute identifier that that corresponds to a Singer stream property name, separated by a period (`.`). Rules indicating that an entity or attribute should be excluded are prefixed with an exclamation mark (`!`). [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in entity and attribute identifiers to match multiple entities and/or attributes at once.
+A selection rule is comprised of an stream identifier that corresponds to a Singer stream's `tap_stream_id` value, and an property identifier that that corresponds to a Singer stream property name, separated by a period (`.`). Rules indicating that an stream or property should be excluded are prefixed with an exclamation mark (`!`). [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in stream and property identifiers to match multiple streams and/or properties at once.
 
-Entity and attribute names can be discovered using [`meltano select --list --all <plugin>`](/docs/command-line-interface.html#select).
+Stream and property names can be discovered using [`meltano select --list --all <plugin>`](/docs/command-line-interface.html#select).
 
 While this extra can be managed using [`meltano config`](/docs/command-line-interface.html#config) or environment variables like any other setting,
 selection rules are typically specified using [`meltano select`](/docs/command-line-interface.html#select).
@@ -308,11 +308,11 @@ extractors:
 ##### On the command line
 
 ```bash
-meltano config <extractor> set _select '["<entity>.<attribute>", ...]'
+meltano config <extractor> set _select '["<stream>.<property>", ...]'
 
-export <EXTRACTOR>__SELECT='["<entity>.<attribute>", ...]'
+export <EXTRACTOR>__SELECT='["<stream>.<property>", ...]'
 
-meltano select <extractor> <entity> <attribute>
+meltano select <extractor> <stream> <property>
 
 # For example:
 meltano config tap-gitlab set _select '["project_members.*", "commits.*"]'
@@ -330,16 +330,16 @@ meltano select tap-gitlab commits "*"
 - [`meltano elt`](/docs/command-line-interface.html#elt) CLI options: `--select` and `--exclude`
 - Default: `[]`
 
-An extractor's `select_filter` [extra](/docs/configuration.html#plugin-extras) holds an array of [entity selection](#select-extra) filter rules
+An extractor's `select_filter` [extra](/docs/configuration.html#plugin-extras) holds an array of [stream selection](#select-extra) filter rules
 that are applied to the extractor's [discovered](/docs/integration.html#extractor-catalog-generation) or [provided](#catalog-extra) catalog file
 when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke),
 after [schema](#schema-extra), [selection](#select-extra), and [metadata](#metadata-extra) rules are applied.
 
-It can be used to only extract records for specific matching entities, or to extract records for all entities _except_ for those specified, by letting you apply filters on top of configured [entity selection rules](#select-extra).
+It can be used to only extract records for specific matching streams, or to extract records for all streams _except_ for those specified, by letting you apply filters on top of configured [stream selection rules](#select-extra).
 
-Selection filter rules use entity identifiers that correspond to Singer stream `tap_stream_id` values. Rules indicating that an entity should be excluded are prefixed with an exclamation mark (`!`). [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in entity identifiers to match multiple entities at once.
+Selection filter rules use stream identifiers that correspond to Singer stream `tap_stream_id` values. Rules indicating that an stream should be excluded are prefixed with an exclamation mark (`!`). [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in stream identifiers to match multiple streams at once.
 
-Entity names can be discovered using [`meltano select --list --all <plugin>`](/docs/command-line-interface.html#select).
+Stream names can be discovered using [`meltano select --list --all <plugin>`](/docs/command-line-interface.html#select).
 
 While this extra can be managed using [`meltano config`](/docs/command-line-interface.html#config) or environment variables like any other setting,
 selection filers are typically specified using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--select` and `--exclude` options.
@@ -362,14 +362,14 @@ extractors:
 ##### On the command line
 
 ```bash
-meltano config <extractor> set _select_filter '["<entity>", ...]'
-meltano config <extractor> set _select_filter '["!<entity>", ...]'
+meltano config <extractor> set _select_filter '["<stream>", ...]'
+meltano config <extractor> set _select_filter '["!<stream>", ...]'
 
-export <EXTRACTOR>__SELECT_FILTER='["<entity>", ...]'
-export <EXTRACTOR>__SELECT_FILTER='["!<entity>", ...]'
+export <EXTRACTOR>__SELECT_FILTER='["<stream>", ...]'
+export <EXTRACTOR>__SELECT_FILTER='["!<stream>", ...]'
 
-meltano elt <extractor> <loader> --select <entity>
-meltano elt <extractor> <loader> --exclude <entity>
+meltano elt <extractor> <loader> --select <stream>
+meltano elt <extractor> <loader> --exclude <stream>
 
 # For example:
 meltano config tap-gitlab set _select_filter '["commits"]'

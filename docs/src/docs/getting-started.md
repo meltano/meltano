@@ -273,26 +273,26 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     meltano config tap-gitlab
     ```
 
-### Select entities and attributes to extract
+### Select streams and properties to extract
 
 Now that the extractor has been configured, it'll know where and how to find your data,
-but not yet which specific entities and attributes (tables and columns) you're interested in.
+but not yet which specific streams and properties (tables and columns) you're interested in.
 
-By default, Meltano will instruct extractors to extract all supported entities and attributes,
-but it's recommended that you [specify the specific entities and attributes you'd like to extract](/docs/integration.html#selecting-entities-and-attributes-for-extraction),
+By default, Meltano will instruct extractors to extract all supported streams and properties,
+but it's recommended that you [specify the specific streams and properties you'd like to extract](/docs/integration.html#selecting-streams-and-properties-for-extraction),
 to improve performance and save on bandwidth and storage.
 
-*To learn more about selecting entities and attributes for extraction, refer to the [Data Integration (EL) guide](/docs/integration.html#selecting-entities-and-attributes-for-extraction).*
+*To learn more about selecting streams and properties for extraction, refer to the [Data Integration (EL) guide](/docs/integration.html#selecting-streams-and-properties-for-extraction).*
 
 ::: details What if I already have a catalog file for this extractor?
 
 If you've used this Singer tap before without Meltano, you may have generated a [catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) already.
 
-If you'd like Meltano to use it instead of [generating a catalog](/docs/integration.html#extractor-catalog-generation) based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the [`catalog` extractor extra](/docs/plugins.html#catalog-extra) or use [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option when [running the data integration (EL) pipeline](#run-a-data-integration-el-pipeline) later on in this guide.
+If you'd like Meltano to use it instead of [generating a catalog](/docs/integration.html#extractor-catalog-generation) based on the stream selection rules you'll be asked to specify below, you can skip this section and either set the [`catalog` extractor extra](/docs/plugins.html#catalog-extra) or use [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option when [running the data integration (EL) pipeline](#run-a-data-integration-el-pipeline) later on in this guide.
 
 :::
 
-1. Find out whether the extractor supports entity selection, and if so, what entities and attributes are available, using [`meltano select --list --all`](/docs/command-line-interface.html#select):
+1. Find out whether the extractor supports stream selection, and if so, what streams and properties are available, using [`meltano select --list --all`](/docs/command-line-interface.html#select):
 
     ```bash
     meltano select --list --all <plugin>
@@ -301,13 +301,13 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
     meltano select --list --all tap-covid-19
     ```
 
-    If this command fails with an error, this usually means that the Singer tap does not support [catalog discovery mode](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#discovery-mode), and will always extract all supported entities and attributes.
+    If this command fails with an error, this usually means that the Singer tap does not support [catalog discovery mode](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#discovery-mode), and will always extract all supported streams and properties.
 
-1. Assuming the previous command succeeded, select the desired entities and attributes for extraction using [`meltano select`](/docs/command-line-interface.html#select):
+1. Assuming the previous command succeeded, select the desired streams and properties for extraction using [`meltano select`](/docs/command-line-interface.html#select):
 
     ```bash
-    meltano select <plugin> <entity> <attribute>
-    meltano select <plugin> --exclude <entity> <attribute>
+    meltano select <plugin> <stream> <property>
+    meltano select <plugin> --exclude <stream> <property>
 
     # For example:
     meltano select tap-covid-19 eu_daily date
@@ -315,16 +315,16 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
     meltano select tap-covid-19 eu_daily cases
     meltano select tap-covid-19 eu_daily deaths
 
-    # Include all attributes of an entity
+    # Include all properties of an stream
     meltano select tap-covid-19 eu_ecdc_daily "*"
 
-    # Exclude matching attributes of all entities
+    # Exclude matching properties of all streams
     meltano select tap-covid-19 --exclude "*" "git_*"
     ```
 
-    As you can see in the example, entity and attribute identifiers can contain wildcards (`*`) to match multiple entities or attributes at once.
+    As you can see in the example, stream and property identifiers can contain wildcards (`*`) to match multiple streams or properties at once.
 
-1. Optionally, verify that only the intended entities and attributes are now selected using [`meltano select --list`](/docs/command-line-interface.html#select):
+1. Optionally, verify that only the intended streams and properties are now selected using [`meltano select --list`](/docs/command-line-interface.html#select):
 
     ```bash
     meltano select --list <plugin>
@@ -333,12 +333,12 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
     meltano select --list tap-covid-19
     ```
 
-### Choose how to replicate each entity
+### Choose how to replicate each stream
 
 If the data source you'll be pulling data from is a database, like [PostgreSQL](/plugins/extractors/postgres.html) or [MongoDB](/plugins/extractors/mongodb.html), your extractor likely requires one final setup step:
-setting a [replication method](/docs/integration.html#replication-methods) for each [selected entity (table)](#select-entities-and-attributes-to-extract).
+setting a [replication method](/docs/integration.html#replication-methods) for each [selected stream (table)](#select-streams-and-properties-to-extract).
 
-Extractors for SaaS APIs typically hard-code the appropriate replication method for each supported entity, so if you're using one, you can skip this section and [move on to setting up a loader](#add-a-loader-to-send-data-to-a-destination).
+Extractors for SaaS APIs typically hard-code the appropriate replication method for each supported stream, so if you're using one, you can skip this section and [move on to setting up a loader](#add-a-loader-to-send-data-to-a-destination).
 
 Most database extractors, on the other hand, support two or more of the following replication methods and require you to choose an appropriate option for each table through the `replication-method` [stream metadata](/docs/integration.html#setting-metadata) key:
 
@@ -360,32 +360,32 @@ Most database extractors, on the other hand, support two or more of the followin
 
 1. Find out which replication methods (i.e. options for the `replication-method` [stream metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata) key) the extractor supports by checking its documentation or the README in its repository.
 
-1. Set the desired `replication-method` metadata for each [selected entity](#select-entities-and-attributes-to-extract) using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) and the extractor's [`metadata` extra](/docs/plugins.html#metadata-extra):
+1. Set the desired `replication-method` metadata for each [selected stream](#select-streams-and-properties-to-extract) using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) and the extractor's [`metadata` extra](/docs/plugins.html#metadata-extra):
 
     ```bash
-    meltano config <plugin> set _metadata <entity> replication-method <LOG_BASED|INCREMENTAL|FULL_TABLE>
+    meltano config <plugin> set _metadata <stream> replication-method <LOG_BASED|INCREMENTAL|FULL_TABLE>
 
     # For example:
-    meltano config tap-postgres set _metadata some_entity_id replication-method INCREMENTAL
-    meltano config tap-postgres set _metadata other_entity replication-method FULL_TABLE
+    meltano config tap-postgres set _metadata some_stream_id replication-method INCREMENTAL
+    meltano config tap-postgres set _metadata other_stream replication-method FULL_TABLE
 
-    # Set replication-method metadata for all entities
+    # Set replication-method metadata for all streams
     meltano config tap-postgres set _metadata '*' replication-method INCREMENTAL
 
-    # Set replication-method metadata for matching entities
+    # Set replication-method metadata for matching streams
     meltano config tap-postgres set _metadata '*_full' replication-method FULL_TABLE
     ```
 
-    As you can see in the example, entity identifiers can contain wildcards (`*`) to match multiple entities at once.
+    As you can see in the example, stream identifiers can contain wildcards (`*`) to match multiple streams at once.
 
     If you've set a table's `replication-method` to `INCREMENTAL`, also choose a [Replication Key](/docs/integration.html#replication-key) by setting the `replication-key` metadata:
 
     ```bash
-    meltano config <plugin> set _metadata <entity> replication-key <column>
+    meltano config <plugin> set _metadata <stream> replication-key <column>
 
     # For example:
-    meltano config tap-postgres set _metadata some_entity_id replication-key updated_at
-    meltano config tap-postgres set _metadata some_entity_id replication-key id
+    meltano config tap-postgres set _metadata some_stream_id replication-key updated_at
+    meltano config tap-postgres set _metadata some_stream_id replication-key id
     ```
 
 1. Optionally, verify that the [stream metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata) for each table was set correctly in the extractor's [generated catalog file](/docs/integration.html#extractor-catalog-generation) by dumping it using [`meltano invoke --dump=catalog <plugin>`](/docs/command-line-interface.html#select):

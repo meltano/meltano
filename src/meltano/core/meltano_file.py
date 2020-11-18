@@ -18,7 +18,7 @@ class MeltanoFile(Canonical):
         self, version: int = VERSION, plugins={}, schedules: list = [], **extras
     ):
         super().__init__(
-            # Attributes will be listed in meltano.yml in this order:
+            # Properties will be listed in meltano.yml in this order:
             version=version,
             extras=extras,
             plugins=self.load_plugins(plugins),

@@ -159,7 +159,7 @@ class ProjectPlugin(HookObject, Canonical, PluginRef):
         super().__init__(
             plugin_type,
             name,
-            # Attributes will be listed in meltano.yml in this order:
+            # Properties will be listed in meltano.yml in this order:
             custom_definition=custom_definition,
             variant=variant,
             pip_url=pip_url,
@@ -272,7 +272,7 @@ class PluginDefinition(Canonical, PluginRef):
         super().__init__(
             plugin_type,
             name,
-            # Attributes will be listed in meltano.yml in this order:
+            # Properties will be listed in meltano.yml in this order:
             namespace=namespace,
             hidden=hidden,
             label=label,

@@ -27,7 +27,7 @@ def selection_color(selection):
 
 def selection_mark(selection):
     """
-    Returns the mark to indicate the selection type of an attribute.
+    Returns the mark to indicate the selection type of an property.
 
     Examples:
       [automatic]
@@ -41,13 +41,13 @@ def selection_mark(selection):
 
 @cli.command()
 @click.argument("extractor")
-@click.argument("entities_filter", default="*")
-@click.argument("attributes_filter", default="*")
+@click.argument("streams_filter", default="*")
+@click.argument("properties_filter", default="*")
 @click.option("--list", is_flag=True)
 @click.option("--all", is_flag=True)
 @click.option("--exclude", is_flag=True)
 @project(migrate=True)
-def select(project, extractor, entities_filter, attributes_filter, **flags):
+def select(project, extractor, streams_filter, properties_filter, **flags):
     try:
         if flags["list"]:
             show(project, extractor, show_all=flags["all"])
@@ -55,25 +55,25 @@ def select(project, extractor, entities_filter, attributes_filter, **flags):
             add(
                 project,
                 extractor,
-                entities_filter,
-                attributes_filter,
+                streams_filter,
+                properties_filter,
                 exclude=flags["exclude"],
             )
 
         tracker = GoogleAnalyticsTracker(project)
         tracker.track_meltano_select(
             extractor=extractor,
-            entities_filter=entities_filter,
-            attributes_filter=attributes_filter,
+            streams_filter=streams_filter,
+            properties_filter=properties_filter,
             flags=flags,
         )
     except PluginExecutionError as err:
-        raise CliError(f"Cannot list the selected attributes: {err}") from err
+        raise CliError(f"Cannot list the selected properties: {err}") from err
 
 
-def add(project, extractor, entities_filter, attributes_filter, exclude=False):
+def add(project, extractor, streams_filter, properties_filter, exclude=False):
     select_service = SelectService(project, extractor)
-    select_service.select(entities_filter, attributes_filter, exclude)
+    select_service.select(streams_filter, properties_filter, exclude)
 
 
 def show(project, extractor, show_all=False):
@@ -97,7 +97,7 @@ def show(project, extractor, show_all=False):
         color = "red" if select.negated else "white"
         click.secho(f"\t{select.raw}", fg=color)
 
-    click.secho("\nSelected attributes:")
+    click.secho("\nSelected properties:")
     for stream, prop in (
         (stream, prop)
         for stream in list_all.streams

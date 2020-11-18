@@ -154,8 +154,8 @@ class TestSingerRunner:
         [
             (False, [], Payload.STATE),
             (True, [], Payload.STATE),
-            (False, ["entity"], Payload.STATE),
-            (True, ["entity"], Payload.INCOMPLETE_STATE),
+            (False, ["stream"], Payload.STATE),
+            (True, ["stream"], Payload.INCOMPLETE_STATE),
         ],
     )
     async def test_bookmark(

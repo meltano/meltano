@@ -314,7 +314,7 @@ class TestSingerTap:
 
             # Pretend `select` is set in discovery.yml
             monkeypatch.setitem(
-                invoker.plugin_def.extras, "select", ["UniqueEntitiesName.name"]
+                invoker.plugin_def.extras, "select", ["UniqueStreamsName.name"]
             )
             invoker.settings_service._setting_defs = None
             with invoker.prepared(session):
@@ -324,15 +324,15 @@ class TestSingerTap:
             assert_rules(
                 ["*", [], "selected", False],
                 ["*", ["properties", "*"], "selected", False],
-                ["UniqueEntitiesName", [], "selected", True],
-                ["UniqueEntitiesName", ["properties", "name"], "selected", True],
+                ["UniqueStreamsName", [], "selected", True],
+                ["UniqueStreamsName", ["properties", "name"], "selected", True],
             )
 
             reset_catalog()
 
             # Pretend `select` is set in meltano.yml
             monkeypatch.setitem(
-                invoker.plugin.extras, "select", ["UniqueEntitiesName.code"]
+                invoker.plugin.extras, "select", ["UniqueStreamsName.code"]
             )
 
             with invoker.prepared(session):
@@ -342,8 +342,8 @@ class TestSingerTap:
             assert_rules(
                 ["*", [], "selected", False],
                 ["*", ["properties", "*"], "selected", False],
-                ["UniqueEntitiesName", [], "selected", True],
-                ["UniqueEntitiesName", ["properties", "code"], "selected", True],
+                ["UniqueStreamsName", [], "selected", True],
+                ["UniqueStreamsName", ["properties", "code"], "selected", True],
             )
 
     def test_apply_catalog_rules(
@@ -397,25 +397,25 @@ class TestSingerTap:
             reset_catalog()
 
             config = {
-                "_select": ["UniqueEntitiesName.code"],
+                "_select": ["UniqueStreamsName.code"],
                 "_metadata": {
-                    "UniqueEntitiesName": {"replication-key": "created_at"},
-                    "UniqueEntitiesName.created_at": {"is-replication-key": True},
+                    "UniqueStreamsName": {"replication-key": "created_at"},
+                    "UniqueStreamsName.created_at": {"is-replication-key": True},
                 },
-                "metadata.UniqueEntitiesName.properties.payload.properties.hash.custom-metadata": "custom-value",
+                "metadata.UniqueStreamsName.properties.payload.properties.hash.custom-metadata": "custom-value",
                 "_schema": {
-                    "UniqueEntitiesName": {
+                    "UniqueStreamsName": {
                         "code": {"anyOf": [{"type": "string"}, {"type": "null"}]}
                     },
-                    "UniqueEntitiesName.payload.type": "object",
-                    "UniqueEntitiesName.payload.properties": {
+                    "UniqueStreamsName.payload.type": "object",
+                    "UniqueStreamsName.payload.properties": {
                         "content": {"type": ["string", "null"]},
                         "hash": {"type": "string"},
                     },
                 },
                 "_select_filter": [
-                    "UniqueEntitiesName",
-                    "!OtherEntitiesName",
+                    "UniqueStreamsName",
+                    "!OtherStreamsName",
                     "SelectAnother",
                     "!ExcludeAnother",
                 ],
@@ -434,12 +434,12 @@ class TestSingerTap:
             assert_rules(
                 # Schema rules
                 [
-                    "UniqueEntitiesName",
+                    "UniqueStreamsName",
                     ["properties", "code"],
                     {"anyOf": [{"type": "string"}, {"type": "null"}]},
                 ],
                 [
-                    "UniqueEntitiesName",
+                    "UniqueStreamsName",
                     ["properties", "payload"],
                     {
                         "type": "object",
@@ -453,31 +453,31 @@ class TestSingerTap:
                 ["*", [], "selected", False],
                 ["*", ["properties", "*"], "selected", False],
                 # Selection metadata rules
-                ["UniqueEntitiesName", [], "selected", True],
-                ["UniqueEntitiesName", ["properties", "code"], "selected", True],
+                ["UniqueStreamsName", [], "selected", True],
+                ["UniqueStreamsName", ["properties", "code"], "selected", True],
                 # Metadata rules
-                ["UniqueEntitiesName", [], "replication-key", "created_at"],
+                ["UniqueStreamsName", [], "replication-key", "created_at"],
                 [
-                    "UniqueEntitiesName",
+                    "UniqueStreamsName",
                     ["properties", "created_at"],
                     "is-replication-key",
                     True,
                 ],
                 [
-                    "UniqueEntitiesName",
+                    "UniqueStreamsName",
                     ["properties", "payload", "properties", "hash"],
                     "custom-metadata",
                     "custom-value",
                 ],
                 # Selection filter metadata rules
                 [
-                    ["UniqueEntitiesName", "SelectAnother"],
+                    ["UniqueStreamsName", "SelectAnother"],
                     [],
                     "selected",
                     False,
                     {"negated": True},
                 ],
-                [["OtherEntitiesName", "ExcludeAnother"], [], "selected", False],
+                [["OtherStreamsName", "ExcludeAnother"], [], "selected", False],
             )
 
             reset_catalog()
@@ -496,13 +496,13 @@ class TestSingerTap:
             assert_rules(
                 # Selection filter metadata rules
                 [
-                    ["UniqueEntitiesName", "SelectAnother"],
+                    ["UniqueStreamsName", "SelectAnother"],
                     [],
                     "selected",
                     False,
                     {"negated": True},
                 ],
-                [["OtherEntitiesName", "ExcludeAnother"], [], "selected", False],
+                [["OtherStreamsName", "ExcludeAnother"], [], "selected", False],
             )
 
             # Doesn't store a cache key when a custom catalog is provided

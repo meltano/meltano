@@ -8,7 +8,7 @@ If you are submitting an issue with a tap, please include:
 
 - account details
 - target details
-- entities selected  with meltano select (if you have selected any entities), as the bug may be related to a specific entity
+- streams selected with meltano select (if you have selected any streams), as the bug may be related to a specific stream
 - the full elt command you are running
 - full output of the meltano elt command. Logs can get pretty long, so you can add the full log as a snippet in the Meltano project and add a link in the issue.
 --->

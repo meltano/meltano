@@ -267,7 +267,7 @@ extractors:
             - network
             - device
         label: Primary Keys
-        description: Primary Keys for the selected Entities (Streams)
+        description: Primary Keys for the selected Streams (Streams)
   - name: tap-bing-ads
     label: Bing Ads
     description: Advertising Platform
@@ -526,7 +526,7 @@ extractors:
         env_aliases: [GITLAB_API_ULTIMATE_LICENSE]
         kind: boolean
         value: false
-        description: Enable to pull in extra data (like Epics, Epic Issues and other entities) only available to GitLab Ultimate and GitLab.com Gold accounts.
+        description: Enable to pull in extra data (like Epics, Epic Issues and other streams) only available to GitLab Ultimate and GitLab.com Gold accounts.
       - name: fetch_merge_request_commits
         kind: boolean
         value: false
@@ -972,11 +972,11 @@ extractors:
     settings:
       - name: files
         kind: array
-        description: Array of objects with `entity`, `file`, and `keys` keys
+        description: Array of objects with `stream`, `file`, and `keys` keys
       - name: csv_files_definition
         env: TAP_CSV_FILES_DEFINITION
         label: CSV Files Definition
-        description: Project-relative path to JSON file holding array of objects with `entity`, `file`, and `keys` keys
+        description: Project-relative path to JSON file holding array of objects with `stream`, `file`, and `keys` keys
         placeholder: Ex. files-def.json
         documentation: https://gitlab.com/meltano/tap-csv#run
   - name: tap-spreadsheets-anywhere

@@ -70,7 +70,7 @@ class SettingDefinition(NameEq, Canonical):
         **attrs,
     ):
         super().__init__(
-            # Attributes will be listed in meltano.yml in this order:
+            # Properties will be listed in meltano.yml in this order:
             name=name,
             aliases=aliases,
             env=env,

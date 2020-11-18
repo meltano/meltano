@@ -202,11 +202,9 @@ class TestQueryGeneration:
         assert q.join_order[2]["table"] == "episodes_table"
 
         # Test generating an HDA query
-        (sql, query_attributes, aggregate_columns) = q.get_query()
-        assert any(
-            attr["attribute_label"] == "Average Age" for attr in query_attributes
-        )
-        assert any(attr["attribute_name"] == "sum_minutes" for attr in query_attributes)
+        (sql, query_properties, aggregate_columns) = q.get_query()
+        assert any(attr["property_label"] == "Average Age" for attr in query_properties)
+        assert any(attr["property_name"] == "sum_minutes" for attr in query_properties)
         assert any(attr["id"] == "users_design.sum_clv" for attr in aggregate_columns)
         assert any(attr["id"] == "users_design.max_clv" for attr in aggregate_columns)
         assert any(
@@ -225,7 +223,7 @@ class TestQueryGeneration:
         assert 'JOIN "streams"' in sql
         assert 'JOIN "episodes"' in sql
 
-        # Check that the attribute used both as a column and as an aggregate
+        # Check that the property used both as a column and as an aggregate
         # 1. Only appears once in the select clause of the base query
         # 2. Properly appears as an aggregate
         assert sql.count('"streams_join"."day" "streams_join.day"') == 1
@@ -244,12 +242,10 @@ class TestQueryGeneration:
         assert q.join_order[2]["table"] == "episodes_table"
 
         # Test generating an HDA query
-        (sql, query_attributes, aggregate_columns) = q.get_query()
+        (sql, query_properties, aggregate_columns) = q.get_query()
 
-        assert any(
-            attr["attribute_label"] == "Average Age" for attr in query_attributes
-        )
-        assert any(attr["attribute_name"] == "sum_minutes" for attr in query_attributes)
+        assert any(attr["property_label"] == "Average Age" for attr in query_properties)
+        assert any(attr["property_name"] == "sum_minutes" for attr in query_properties)
         assert any(attr["id"] == "users_join.sum_clv" for attr in aggregate_columns)
 
         assert "WITH base_join AS (SELECT" in sql
@@ -274,7 +270,7 @@ class TestQueryGeneration:
         assert 'JOIN "users"' in sql
         assert 'JOIN "episodes"' in sql
 
-        # Check that the attribute used both as a column and as an aggregate
+        # Check that the property used both as a column and as an aggregate
         # 1. Only appears once in the select clause of the base query
         # 2. Properly appears as an aggregate
         assert sql.count('"streams_design"."day" "streams_design.day"') == 1
@@ -288,7 +284,7 @@ class TestQueryGeneration:
         )
 
         # Test generating an HDA query
-        (sql, query_attributes, aggregate_columns) = q.get_query()
+        (sql, query_properties, aggregate_columns) = q.get_query()
 
         # There should be one where clause and 1 having clause
         assert sql.count("WHERE") == 1
@@ -321,7 +317,7 @@ class TestQueryGeneration:
         )
 
         # Test generating an HDA query
-        (sql, query_attributes, aggregate_columns) = q.get_query()
+        (sql, query_properties, aggregate_columns) = q.get_query()
 
         # There should be one where clause and 2 having clauses
         assert sql.count("WHERE") == 1
@@ -416,7 +412,7 @@ class TestQueryGeneration:
             )
 
         assert (
-            "Attribute UNAVAILABLE_SOURCE.gender not found in design users_design"
+            "Property UNAVAILABLE_SOURCE.gender not found in design users_design"
             in str(e.value)
         )
 
@@ -435,7 +431,7 @@ class TestQueryGeneration:
             )
 
         assert (
-            "Attribute users_design.UNAVAILABLE_COLUMN not found in design users_design"
+            "Property users_design.UNAVAILABLE_COLUMN not found in design users_design"
             in str(e.value)
         )
 
@@ -454,7 +450,7 @@ class TestQueryGeneration:
             )
 
         assert (
-            "Attribute users_design.UNAVAILABLE_AGGREGATE not found in design users_design"
+            "Property users_design.UNAVAILABLE_AGGREGATE not found in design users_design"
             in str(e.value)
         )
 
@@ -490,7 +486,7 @@ class TestQueryGeneration:
         )
 
         # Generating the query
-        (sql, query_attributes, aggregate_columns) = q.get_query()
+        (sql, query_properties, aggregate_columns) = q.get_query()
 
         # Check that all the WHERE filters were added correctly
         assert '"dynamic_dates"."report_date">=\'2020-03-01\'' in sql
@@ -513,7 +509,7 @@ class TestQueryGeneration:
         )
 
         # Generating the query
-        (sql, query_attributes, aggregate_columns) = q.get_query()
+        (sql, query_properties, aggregate_columns) = q.get_query()
 
         start_date = "DATE(DATE(NOW())-INTERVAL '7 DAY')"
         end_date = "DATE(NOW())"
@@ -537,7 +533,7 @@ class TestQueryGeneration:
         )
 
         # Generating the query
-        (sql, query_attributes, aggregate_columns) = q.get_query()
+        (sql, query_properties, aggregate_columns) = q.get_query()
 
         start_date_time = "DATE(NOW())-INTERVAL '3 MONTH'"
         end_date_time = "DATE(NOW())-INTERVAL '2 DAY'+INTERVAL '23 HOUR'+INTERVAL '59 MINUTE'+INTERVAL '59 SECOND'+INTERVAL '999999 MICROSECOND'"
@@ -563,7 +559,7 @@ class TestQueryGeneration:
         )
 
         # Generating the query
-        (sql, query_attributes, aggregate_columns) = q.get_query()
+        (sql, query_properties, aggregate_columns) = q.get_query()
 
         # Check that all the WHERE filters were added correctly
         start_date = "DATE(DATE('2020-03-05')-INTERVAL '7 DAY')"
@@ -596,7 +592,7 @@ class TestQueryGeneration:
         )
 
         # Generating the query
-        (sql, query_attributes, aggregate_columns) = q.get_query()
+        (sql, query_properties, aggregate_columns) = q.get_query()
 
         assert (
             'EXTRACT(\'MONTH\' FROM "dynamic_dates"."updated_at") "dynamic_dates.updated_at.month"'

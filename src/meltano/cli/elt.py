@@ -56,14 +56,14 @@ def logs(*args, **kwargs):
 @click.option(
     "--select",
     "-s",
-    help="Select only these specific entities for extraction",
+    help="Select only these specific streams for extraction",
     multiple=True,
     default=[],
 )
 @click.option(
     "--exclude",
     "-e",
-    help="Exclude these specific entities from extraction",
+    help="Exclude these specific streams from extraction",
     multiple=True,
     default=[],
 )
@@ -99,7 +99,7 @@ def elt(
     loader_name: Which loader should be used in this extraction
     """
 
-    select_filter = [*select, *(f"!{entity}" for entity in exclude)]
+    select_filter = [*select, *(f"!{stream}" for stream in exclude)]
 
     job = Job(
         job_id=job_id

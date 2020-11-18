@@ -104,11 +104,11 @@ meltano config target-postgres
 
 This step is required if you don't want to export everything from the source db. You can skip it if you just want to export all tables.
 
-We can use `meltano select` to select which entities will be exported by the Tap from the Source DB. You can find more info on how meltano select works on [the Meltano cli commands Documentation](/docs/command-line-interface.html#select).
+We can use `meltano select` to select which streams will be exported by the Tap from the Source DB. You can find more info on how meltano select works on [the Meltano cli commands Documentation](/docs/command-line-interface.html#select).
 
-In the case of `tap-postgres`, the names of the Entities (or streams as they are called in the Singer.io Specification) are the same as the table names in the Source DB, prefixed by the DB name and the schema they are defined into: `{DB NAME}-{SCHEMA NAME}-{TABLE NAME}`.
+In the case of `tap-postgres`, the names of the Streams (or streams as they are called in the Singer.io Specification) are the same as the table names in the Source DB, prefixed by the DB name and the schema they are defined into: `{DB NAME}-{SCHEMA NAME}-{TABLE NAME}`.
 
-For example, assume that you want to export the `users` table and selected attributes from the `issues` table that reside in the `tap_gitlab` schema in `warehouse` DB. The following `meltano select` commands will only export those two tables and data for the selected attributes:
+For example, assume that you want to export the `users` table and selected properties from the `issues` table that reside in the `tap_gitlab` schema in `warehouse` DB. The following `meltano select` commands will only export those two tables and data for the selected properties:
 
 ```bash
 meltano select tap-postgres "warehouse-tap_gitlab-users" "*"
@@ -134,7 +134,7 @@ Enabled patterns:
   warehouse-tap_gitlab-issues.author_id
   warehouse-tap_gitlab-users.*
 
-Selected attributes:
+Selected properties:
   [selected ] warehouse-tap_gitlab-issues.title
   [automatic] warehouse-tap_gitlab-issues.id
   [selected ] warehouse-tap_gitlab-issues.assignee_id
@@ -161,7 +161,7 @@ You can then check that file and decide which Streams (tables in this case) shou
 
 ## Run Meltano ELT
 
-Finally run `meltano elt` to export all the selected Entities and load them to the schema of the target DB defined by the custom tap's namespace (`tap-postgres` in this example)
+Finally run `meltano elt` to export all the selected Streams and load them to the schema of the target DB defined by the custom tap's namespace (`tap-postgres` in this example)
 
 ```bash
 meltano elt tap-postgres target-postgres

@@ -100,7 +100,7 @@ class TestELTContext:
             .with_extractor(tap.name)
             .with_loader(target_postgres.name)
             .with_transform(tap_mock_transform.name)
-            .with_select_filter(["entity", "!other_entity"])
+            .with_select_filter(["stream", "!other_stream"])
             .context()
         )
 

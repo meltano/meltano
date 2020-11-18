@@ -55,7 +55,7 @@ When anonymous usage tracking is enabled, Meltano tracks the following events:
 - `meltano discover {all, extractors, loaders, transforms, models, transformers, orchestrators}`
 - `meltano install`
 - `meltano invoke {plugin_name} {plugin_args}`
-- `meltano select {extractor} {entities_filter} {attributes_filter}`
+- `meltano select {extractor} {streams_filter} {properties_filter}`
 - `meltano schedule add {name} {extractor} {loader} {interval}`
 
 Beyond the invocation of these commands and the identified command line arguments, Meltano does not track any other event metadata, plugin configuration, or processed data.

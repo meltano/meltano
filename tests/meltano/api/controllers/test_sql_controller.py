@@ -78,13 +78,13 @@ class TestSqlController:
 
         # tests the label names
         assertListEquivalence(
-            [attr["attribute_label"] for attr in res.json["query_attributes"]],
+            [attr["property_label"] for attr in res.json["query_properties"]],
             ["Region Name", "Forecast", "Percent (%)", "Fuel Type"],
         )
 
         # tests the column names
         assertListEquivalence(
-            [attr["attribute_name"] for attr in res.json["query_attributes"]],
+            [attr["property_name"] for attr in res.json["query_properties"]],
             ["name", "forecast", "perc", "fuel"],
         )
 
@@ -102,7 +102,7 @@ class TestSqlController:
         ), res.json
 
         assertListEquivalence(
-            [attr["attribute_name"] for attr in res.json["query_attributes"]],
+            [attr["property_name"] for attr in res.json["query_properties"]],
             ["name", "count"],
         )
 
@@ -146,12 +146,12 @@ class TestSqlController:
 
         # tests label
         assertListEquivalence(
-            [attr["attribute_label"] for attr in res.json["query_attributes"]],
+            [attr["property_label"] for attr in res.json["query_properties"]],
             ["Region Name", "Forecast", "From: Week", "Percent (%)", "Fuel Type"],
         )
 
         # tests column name
         assertListEquivalence(
-            [attr["attribute_name"] for attr in res.json["query_attributes"]],
+            [attr["property_name"] for attr in res.json["query_properties"]],
             ["name", "forecast", "from.week", "perc", "fuel"],
         )

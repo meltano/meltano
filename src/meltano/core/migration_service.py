@@ -39,7 +39,7 @@ class MigrationService:
         cfg = Config()
 
         # this connection is used in `env.py` for the migrations
-        cfg.attributes["connection"] = conn
+        cfg.properties["connection"] = conn
         cfg.set_main_option("script_location", str(MIGRATION_DIR))
         script = ScriptDirectory.from_config(cfg)
         # let's make sure we actually need to migrate

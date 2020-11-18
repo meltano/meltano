@@ -156,7 +156,7 @@ meltano invoke tap-gitlab-custom --discover
 If your custom tap doesn't support discovery mode, this may raise an error, but you will have verified that it was installed correctly and can be invoked through Meltano.
 
 Assuming your custom tap supports discovery mode and advertises the `discover` capability,
-use `meltano select` to parse your `catalog` and list all available entities and attributes:
+use `meltano select` to parse your `catalog` and list all available streams and properties:
 
 ```bash
 meltano select --list --all tap-gitlab-custom

@@ -32,7 +32,7 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 
 Follow the remaining steps of the [Getting Started guide](/docs/getting-started.html):
 
-1. [Select entities and attributes to extract](/docs/getting-started.html#select-entities-and-attributes-to-extract)
+1. [Select streams and properties to extract](/docs/getting-started.html#select-streams-and-properties-to-extract)
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
@@ -54,10 +54,10 @@ plugins:
     pip_url: git+https://gitlab.com/meltano/tap-csv.git
     config:
       files:
-        - entity: things
+        - stream: things
           file: extract/things.csv
           keys: [thing_id]
-        - entity: widgets
+        - stream: widgets
           file: extract/widgets.csv
           keys: [widget_id]
       # csv_files_definition: extract/csv_files.json    # if defining the files in a separate file is preferred
@@ -68,14 +68,14 @@ plugins:
 - Name: `files`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TAP_CSV_FILES`
 
-Array of objects with `entity`, `file`, and `keys` keys:
-- `entity`: The entity name, used as the table name for the data loaded from that CSV.
+Array of objects with `stream`, `file`, and `keys` keys:
+- `stream`: The stream name, used as the table name for the data loaded from that CSV.
 - `file`: Local path (relative to the project's root) to the file to be ingested. Note that this may be a directory, in which case all files in that directory and any of its subdirectories will be recursively processed
-- `keys`: The names of the columns that constitute the unique keys for that entity.
+- `keys`: The names of the columns that constitute the unique keys for that stream.
 
 Each input CSV file must be a traditionally-delimited CSV (comma separated columns, newlines indicate new rows, double quoted values).
 
-The first row is the header defining the attribute name for that column and will result to a column of the same name in the database. It must have a valid format with no spaces or special characters (like for example `!` or `@`, etc).
+The first row is the header defining the property name for that column and will result to a column of the same name in the database. It must have a valid format with no spaces or special characters (like for example `!` or `@`, etc).
 
 You can check the following files as an example of valid CSV files:
 
@@ -97,7 +97,7 @@ plugins:
     pip_url: git+https://gitlab.com/meltano/tap-csv.git
     config:
       files:
-        - entity: <entity>
+        - stream: <stream>
           file: <path>
           keys: [<key>]
         # ...
@@ -106,9 +106,9 @@ plugins:
 Alternatively, manage this setting using [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config tap-csv set files '[{"entity": "<entity>", "file": "<path>", "keys": ["<key>", ...]}, ...]'
+meltano config tap-csv set files '[{"stream": "<stream>", "file": "<path>", "keys": ["<key>", ...]}, ...]'
 
-export TAP_CSV_FILES='[{"entity": "<entity>", "file": "<file>", "keys": ["<key>", ...]}, ...]'
+export TAP_CSV_FILES='[{"stream": "<stream>", "file": "<file>", "keys": ["<key>", ...]}, ...]'
 ```
 
 ### CSV Files Definition
@@ -116,12 +116,12 @@ export TAP_CSV_FILES='[{"entity": "<entity>", "file": "<file>", "keys": ["<key>"
 - Name: `csv_files_definition`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TAP_CSV_FILES_DEFINITION`, alias: `TAP_CSV_CSV_FILES_DEFINITION`
 
-Project-relative path to JSON file holding array of objects with `entity`, `file`, and `keys` keys, as ascribed under [Files](#files):
+Project-relative path to JSON file holding array of objects with `stream`, `file`, and `keys` keys, as ascribed under [Files](#files):
 
 ```json
 [
   {
-    "entity": "<entity>",
+    "stream": "<stream>",
     "file": "<path>",
     "keys": ["<key>"]
   },

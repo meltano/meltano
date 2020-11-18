@@ -27,8 +27,8 @@ LEGACY_CATALOG = """
 {
   "streams": [
     {
-      "tap_stream_id": "UniqueEntitiesName",
-      "stream": "entities",
+      "tap_stream_id": "UniqueStreamsName",
+      "stream": "streams",
       "key_properties": [
         "id"
       ],
@@ -190,8 +190,8 @@ CATALOG = """
 {
   "streams": [
     {
-      "tap_stream_id": "UniqueEntitiesName",
-      "stream": "entities",
+      "tap_stream_id": "UniqueStreamsName",
+      "stream": "streams",
       "schema": {
         "type": "object",
         "additionalProperties": false,
@@ -356,8 +356,8 @@ JSON_SCHEMA = """
 {
   "streams": [
     {
-      "tap_stream_id": "UniqueEntitiesName",
-      "stream": "entities",
+      "tap_stream_id": "UniqueStreamsName",
+      "stream": "streams",
       "schema": {
         "type": "object",
         "additionalProperties": false,
@@ -414,8 +414,8 @@ EMPTY_STREAM_SCHEMA = """
 {
   "streams": [
     {
-      "tap_stream_id": "UniqueEntitiesName",
-      "stream": "entities",
+      "tap_stream_id": "UniqueStreamsName",
+      "stream": "streams",
       "schema": {
         "type": "object"
       }
@@ -681,14 +681,14 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     )
     def test_select(self, catalog, attrs):
         selector = SelectExecutor(
-            ["UniqueEntitiesName.name", "UniqueEntitiesName.code", "*.payload.content"]
+            ["UniqueStreamsName.name", "UniqueStreamsName.code", "*.payload.content"]
         )
         visit(catalog, selector)
 
         lister = ListSelectedExecutor()
         visit(catalog, lister)
 
-        assert lister.selected_properties["UniqueEntitiesName"] == attrs
+        assert lister.selected_properties["UniqueStreamsName"] == attrs
 
     @pytest.mark.parametrize(
         "catalog,attrs",
@@ -703,14 +703,14 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     )
     def test_select_negated(self, catalog, attrs):
         selector = SelectExecutor(
-            ["*.*", "!UniqueEntitiesName.code", "!UniqueEntitiesName.name", "!*.*.hash"]
+            ["*.*", "!UniqueStreamsName.code", "!UniqueStreamsName.name", "!*.*.hash"]
         )
         visit(catalog, selector)
 
         lister = ListSelectedExecutor()
         visit(catalog, lister)
 
-        assert lister.selected_properties["UniqueEntitiesName"] == attrs
+        assert lister.selected_properties["UniqueStreamsName"] == attrs
 
 
 class TestMetadataExecutor:
@@ -724,15 +724,15 @@ class TestMetadataExecutor:
     def test_visit(self, catalog):
         executor = MetadataExecutor(
             [
-                MetadataRule("UniqueEntitiesName", [], "replication-key", "created_at"),
+                MetadataRule("UniqueStreamsName", [], "replication-key", "created_at"),
                 MetadataRule(
-                    "UniqueEntitiesName",
+                    "UniqueStreamsName",
                     ["properties", "created_at"],
                     "is-replication-key",
                     True,
                 ),
                 MetadataRule(
-                    "UniqueEntitiesName",
+                    "UniqueStreamsName",
                     ["properties", "payload", "properties", "hash"],
                     "custom-metadata",
                     "custom-value",
@@ -742,7 +742,7 @@ class TestMetadataExecutor:
         visit(catalog, executor)
 
         stream_node = next(
-            s for s in catalog["streams"] if s["tap_stream_id"] == "UniqueEntitiesName"
+            s for s in catalog["streams"] if s["tap_stream_id"] == "UniqueStreamsName"
         )
         stream_metadata_node = next(
             m for m in stream_node["metadata"] if len(m["breadcrumb"]) == 0
@@ -782,17 +782,17 @@ class TestSchemaExecutor:
         executor = SchemaExecutor(
             [
                 SchemaRule(
-                    "UniqueEntitiesName",
+                    "UniqueStreamsName",
                     ["properties", "code"],
                     {"anyOf": [{"type": "string"}, {"type": "null"}]},
                 ),
                 SchemaRule(
-                    "UniqueEntitiesName",
+                    "UniqueStreamsName",
                     ["properties", "*_at"],
                     {"type": "string", "format": "date"},
                 ),
                 SchemaRule(
-                    "UniqueEntitiesName",
+                    "UniqueStreamsName",
                     ["properties", "payload"],
                     {
                         "type": "object",
@@ -803,7 +803,7 @@ class TestSchemaExecutor:
                     },
                 ),
                 SchemaRule(
-                    "UniqueEntitiesName",
+                    "UniqueStreamsName",
                     ["properties", "*load", "properties", "hash"],
                     {"type": ["string", "null"]},
                 ),
@@ -812,7 +812,7 @@ class TestSchemaExecutor:
         visit(catalog, executor)
 
         stream_node = next(
-            s for s in catalog["streams"] if s["tap_stream_id"] == "UniqueEntitiesName"
+            s for s in catalog["streams"] if s["tap_stream_id"] == "UniqueStreamsName"
         )
         properties_node = stream_node["schema"]["properties"]
 
@@ -846,7 +846,7 @@ class TestListExecutor:
         visit(catalog, executor)
 
         assert dict(executor.properties) == {
-            "UniqueEntitiesName": {
+            "UniqueStreamsName": {
                 "code",
                 "name",
                 "balance",

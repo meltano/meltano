@@ -131,7 +131,7 @@ or [easily write your own](/tutorials/create-a-custom-extractor.html) to extract
 data from any SaaS tool or database and load it into any data warehouse or file format.
 
 Meltano [manages your tap and target configuration](/docs/configuration.html) for you,
-makes it easy to [select which entities and attributes to extract](/docs/integration.html#selecting-entities-and-attributes-for-extraction),
+makes it easy to [select which streams and properties to extract](/docs/integration.html#selecting-streams-and-properties-for-extraction),
 and keeps track of [the state of your extraction](/docs/integration.html#incremental-replication-state),
 so that subsequent pipeline runs with the same job ID will always pick up right where
 the previous run left off.

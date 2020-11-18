@@ -71,5 +71,5 @@ async def capture_subprocess_output(reader, *line_writers):
         for writer in line_writers:
             try:
                 writer.writeline(line.decode())
-            except AttributeError:
+            except PropertyError:
                 writer.write(line)

@@ -67,7 +67,7 @@ class Canonical(fields.Raw):
     def format(self, value):
         try:
             return value.canonical(self._scopes)
-        except AttributeError:
+        except PropertyError:
             return value.id
 
 

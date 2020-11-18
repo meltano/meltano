@@ -101,10 +101,10 @@ def get_sql(namespace, topic_name, design_name):
 
     outgoing_sql = sql_dict["sql"]
     aggregates = sql_dict["aggregates"]
-    query_attributes = sql_dict["query_attributes"]
+    query_properties = sql_dict["query_properties"]
 
     base_dict = {"sql": outgoing_sql, "error": False}
-    base_dict["query_attributes"] = query_attributes
+    base_dict["query_properties"] = query_properties
     base_dict["aggregates"] = aggregates
 
     if not incoming_json["run"]:

@@ -82,13 +82,13 @@ A `Table` can be identified by the file naming schema: `<name>.table.m5o` and sh
 
 An `Aggregate` relates to a calculable column, via `count`, `sum`, `avg`, `min` or `max` (i.e., aggregate function definitions). These are limited to predefined methods with no custom SQL as well since custom SQL will be handled through transforms with dbt.
 
-An `Aggregate` can be referred as an `Attribute` in a `Design` context.
+An `Aggregate` can be referred as an `Property` in a `Design` context.
 
 #### Column
 
 A `Column` relates directly to a column in a table of a database. Some limitations of this are that it will be limited to column only and no custom SQL.
 
-A `Column` can be referred as an `Attribute` in a `Design` context.
+A `Column` can be referred as an `Property` in a `Design` context.
 
 ### Discover Available Models
 
@@ -275,13 +275,13 @@ When considering which taps and targets Meltano will maintain, some assumptions 
 
 - Every stream generated from a tap will result in a table with the same name. That table will be created in the schema from that tap based on the information sent in the `SCHEMA` message.
 
-- Meltano supports schema updates for when a schema of an entity changes during an extraction. This is enacted when Meltano receives more than one `SCHEMA` message for a specific stream in the same extract load run.
+- Meltano supports schema updates for when a schema of an stream changes during an extraction. This is enacted when Meltano receives more than one `SCHEMA` message for a specific stream in the same extract load run.
 
-  When a SCHEMA message for a stream is received, our Targets check whether there is already a table for the entity defined by the stream.
+  When a SCHEMA message for a stream is received, our Targets check whether there is already a table for the stream defined by the stream.
 
   - If the schema for the tap does not exist, it is created.
   - If the table for the stream does not exist, it is created.
-  - If a table does exist, our Targets create a diff to check if new attributes must be added to the table or already defined attributes should have their data type updated. Based on that diff, the Targets make the appropriate schema changes.
+  - If a table does exist, our Targets create a diff to check if new properties must be added to the table or already defined properties should have their data type updated. Based on that diff, the Targets make the appropriate schema changes.
 
   Rules followed:
 
@@ -289,11 +289,11 @@ When considering which taps and targets Meltano will maintain, some assumptions 
   2. If an unsupported type update is requested (e.g., float --> int), then an exception is raised.
   3. Columns are never dropped. Only UPDATE existing columns or ADD new columns.
 
-- Data is upserted when an entity has at least one primary key (key_properties not empty). If there is already a row with the same composite key (combination of key_properties) then the new record updates the existing one.
+- Data is upserted when an stream has at least one primary key (key_properties not empty). If there is already a row with the same composite key (combination of key_properties) then the new record updates the existing one.
 
   No key_properties must be defined for a target to work on append-only mode. In that case, the target tables will store historical information with entries for the same key differentiated by their `__loaded_at` timestamp.
 
-- If a timestamp_column attribute is not defined in the SCHEMA sent to the target for a specific stream, it is added explicitly. Each RECORD has the timestamp of when the target receives it as a value. As an example, `target-snowflake` sets the name of that attribute to `__loaded_at` when an explicit name is not provided in the target's configuration file.
+- If a timestamp_column property is not defined in the SCHEMA sent to the target for a specific stream, it is added explicitly. Each RECORD has the timestamp of when the target receives it as a value. As an example, `target-snowflake` sets the name of that property to `__loaded_at` when an explicit name is not provided in the target's configuration file.
 
   When a target is set to work on append-only mode (i.e. no primary keys defined for the streams), the timestamp_column's value can be used to get the most recent information for each record.
 

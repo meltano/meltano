@@ -96,7 +96,7 @@ class SqlHelper(SqlUtils):
         return engine
 
     # we need to `freeze` each result to make sure
-    # the attribute name will be correct for the lookup
+    # the property name will be correct for the lookup
     def get_query_results(self, extractor, loader, transform, sql):
         engine = self.get_db_engine(extractor, loader, transform)
         results = engine.execute(sqlalchemy.text(sql))

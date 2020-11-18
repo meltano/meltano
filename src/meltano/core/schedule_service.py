@@ -91,7 +91,7 @@ class ScheduleService:
         except SettingMissingError:
             logging.debug(f"`start_date` not found in {extractor}.")
 
-        # TODO: this coercion should be handled by the `kind` attribute
+        # TODO: this coercion should be handled by the `kind` property
         # on the actual setting
         if isinstance(start_date, date):
             return coerce_datetime(start_date)

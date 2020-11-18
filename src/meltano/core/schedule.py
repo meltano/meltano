@@ -27,7 +27,7 @@ class Schedule(NameEq, Canonical):
     ):
         super().__init__()
 
-        # Attributes will be listed in meltano.yml in this order:
+        # Properties will be listed in meltano.yml in this order:
         self.name = name
         self.extractor = extractor
         self.loader = loader

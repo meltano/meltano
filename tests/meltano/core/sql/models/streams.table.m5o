@@ -83,7 +83,7 @@
     }
     count_days {
       label = Stream Days Count
-      description = Total Days (used for testing attributes defined both as columns and as aggregates)
+      description = Total Days (used for testing properties defined both as columns and as aggregates)
       type = count
       sql = "{{table}}.day"
     }

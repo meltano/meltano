@@ -72,29 +72,29 @@ class RecordImporter:
             )
             return record
 
-        for attribute in self.__class__.UPDATABLE_ATTRIBUTES:
-            existing_value = record.get(attribute, None)
-            importable_value = importable_record.get(attribute, None)
+        for property in self.__class__.UPDATABLE_PROPERTIES:
+            existing_value = record.get(property, None)
+            importable_value = importable_record.get(property, None)
 
             if not importable_value:
                 continue
 
             if importable_value == existing_value:
                 logger.debug(
-                    f"Existing '{attribute}' value matches importable value: nothing to do"
+                    f"Existing '{property}' value matches importable value: nothing to do"
                 )
                 continue
 
-            snapshot_values = [s.get(attribute, None) for s in snapshots]
+            snapshot_values = [s.get(property, None) for s in snapshots]
 
             if existing_value in snapshot_values:
                 logger.debug(
-                    f"Existing '{attribute}' value matches a snapshot: overwriting with importable value"
+                    f"Existing '{property}' value matches a snapshot: overwriting with importable value"
                 )
-                record[attribute] = importable_value
+                record[property] = importable_value
             else:
                 logger.debug(
-                    f"Existing '{attribute}' value does not match any snapshots: not overwriting with importable value"
+                    f"Existing '{property}' value does not match any snapshots: not overwriting with importable value"
                 )
 
         return record
@@ -142,7 +142,7 @@ class RecordImporter:
 class ReportImporter(RecordImporter):
     RECORD_TYPE = M5oCollectionParserTypes.Report
     ALREADY_EXISTS_ERROR = ReportAlreadyExistsError
-    UPDATABLE_ATTRIBUTES = [
+    UPDATABLE_PROPERTIES = [
         "chart_type",
         "design",
         "model",
@@ -169,7 +169,7 @@ class ReportImporter(RecordImporter):
 class DashboardImporter(RecordImporter):
     RECORD_TYPE = M5oCollectionParserTypes.Dashboard
     ALREADY_EXISTS_ERROR = DashboardAlreadyExistsError
-    UPDATABLE_ATTRIBUTES = ["name", "description", "report_ids"]
+    UPDATABLE_PROPERTIES = ["name", "description", "report_ids"]
 
     def __init__(self, *args):
         super().__init__(*args)

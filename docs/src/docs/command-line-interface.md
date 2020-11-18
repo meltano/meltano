@@ -302,12 +302,12 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
 - A `--state` option can be passed to manually provide a [state file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) for the extractor, as an alternative to letting state be [looked up based on the Job ID](/docs/integration.html#incremental-replication-state).
   This is equivalent to setting the [`state` extractor extra](/docs/plugins.html#state-extra).
 
-- One or more `--select <entity>` options can be passed to only extract records for matching [selected entities](#select).
-  Similarly, `--exclude <entity>` can be used to extract records for all selected entities _except_ for those specified.
+- One or more `--select <stream>` options can be passed to only extract records for matching [selected streams](#select).
+  Similarly, `--exclude <stream>` can be used to extract records for all selected streams _except_ for those specified.
 
   Notes:
-  - The entities that are currently selected for extraction can be discovered using [`meltano select --list <extractor>`](#select).
-  - [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in entity identifiers to match multiple entities at once.
+  - The streams that are currently selected for extraction can be discovered using [`meltano select --list <extractor>`](#select).
+  - [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in stream identifiers to match multiple streams at once.
   - Exclusion using `--exclude` takes precedence over inclusion using `--select`.
   - Specifying `--select` and/or `--exclude` is equivalent to setting the [`select_filter` extractor extra](/docs/plugins.html#select-filter-extra).
 
@@ -515,7 +515,7 @@ meltano schedule gitlab-to-jsonl tap-gitlab target-jsonl "* * * * *"
 Use the `select` command to add select patterns to a specific extractor in your Meltano project.
 
 
-- `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attributes for a specific tap.
+- `meltano select [--list] [--all] <tap_name> [STREAMS_PATTERN] [PROPERTY_PATTERN]`: Manage the selected streams/properties for a specific tap.
 
 Selection rules will be stored in the extractor's [`select` extra](/docs/plugins.html#select-extra).
 
@@ -525,36 +525,36 @@ Not all taps support this feature. In addition, taps needs to support the `--dis
 
 ### How to use
 
-[Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in selection patterns to match multiple entities or attributes at once:
+[Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in selection patterns to match multiple streams or properties at once:
 
 - `*`: matches any sequence of characters
 - `?`: matches one character
 - `[abc]`: matches either `a`, `b`, or `c`
 - `[!abc]`: matches any character **but** `a`, `b`, or `c`
 
-Use `--list` to list the current selected tap attributes.
+Use `--list` to list the current selected tap properties.
 
-> Note: `--all` can be used to show all the tap attributes with their selected status.
+> Note: `--all` can be used to show all the tap properties with their selected status.
 
 ### Examples
 
 ```bash
-# List all available entities and attributes
+# List all available streams and properties
 meltano select --list --all tap-covid-19
 
-# Include all attributes of an entity
+# Include all properties of an stream
 meltano select tap-covid-19 eu_ecdc_daily "*"
 
-# Include specific attributes of an entity
+# Include specific properties of an stream
 meltano select tap-covid-19 eu_daily date
 meltano select tap-covid-19 eu_daily country
 meltano select tap-covid-19 eu_daily cases
 meltano select tap-covid-19 eu_daily deaths
 
-# Exclude matching attributes of all entities
+# Exclude matching properties of all streams
 meltano select tap-covid-19 --exclude "*" "git_*"
 
-# List selected (enabled) entities and attributes
+# List selected (enabled) streams and properties
 meltano select --list tap-covid-19
 ```
 
@@ -569,7 +569,7 @@ Enabled patterns:
     eu_daily.deaths
     !*.git_*
 
-Selected attributes:
+Selected properties:
     [automatic] eu_daily.__sdc_row_number
     [automatic] eu_daily.git_path
     [selected ] eu_daily.date
@@ -591,11 +591,11 @@ Most shells parse glob syntax: you must escape the special characters in the sel
 
 ### Exclude Parameter
 
-Use `--exclude` to exclude all attributes that match the filter.
+Use `--exclude` to exclude all properties that match the filter.
 
-Attributes that are `automatic` are always included, even if they match an exclude pattern. Only attributes that are `available` can be excluded.
+Properties that are `automatic` are always included, even if they match an exclude pattern. Only properties that are `available` can be excluded.
 
-Exclusion takes precedence over inclusion. If an attribute is excluded, there is no way to include it back without removing the exclusion pattern first.
+Exclusion takes precedence over inclusion. If an property is excluded, there is no way to include it back without removing the exclusion pattern first.
 
 #### Examples
 
@@ -607,7 +607,7 @@ meltano select --exclude tap-carbon-intensity '*' 'longitude'
 meltano select --exclude tap-carbon-intensity '*' 'latitude'
 ```
 
-This will exclude all `longitude` and `latitude` attributes.
+This will exclude all `longitude` and `latitude` properties.
 
 ## `ui`
 

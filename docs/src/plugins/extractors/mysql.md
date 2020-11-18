@@ -48,8 +48,8 @@ Then, follow the steps in the ["Setup requirements" section of the documentation
 
 Follow the remaining steps of the [Getting Started guide](/docs/getting-started.html):
 
-1. [Select entities and attributes to extract](/docs/getting-started.html#select-entities-and-attributes-to-extract)
-1. [Choose how to replicate each entity](/docs/getting-started.html#choose-how-to-replicate-each-entity)
+1. [Select streams and properties to extract](/docs/getting-started.html#select-streams-and-properties-to-extract)
+1. [Choose how to replicate each stream](/docs/getting-started.html#choose-how-to-replicate-each-stream)
 
     Supported [replication methods](/docs/integration.html#replication-methods):
     [`LOG_BASED`](/docs/integration.html#log-based-incremental-replication),

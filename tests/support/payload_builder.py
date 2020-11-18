@@ -74,10 +74,10 @@ class PayloadBuilder:
 
         return self
 
-    def legacy_order_by(self, source_name, attribute_name, direction):
+    def legacy_order_by(self, source_name, property_name, direction):
         order_by_clause = {
             "source_name": source_name,
-            "attribute_name": attribute_name,
+            "property_name": property_name,
             "direction": direction,
         }
         self._order_by_clauses.append(order_by_clause)

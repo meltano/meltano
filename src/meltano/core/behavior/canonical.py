@@ -7,15 +7,15 @@ from typing import Iterable
 class Canonical(object):
     """
     This class defines an object that can be reprensented as a subset of
-    its attributes.
+    its properties.
 
     Its purpose is to be serializable as the smallest possible form.
 
-    The attribute rules are:
-      - All attributes that are Truthy
-      - All attributes that are boolean (False is valid)
-      - All attributes that are listed in the `_verbatim` set and non-null
-      - All attributes that start with "_" are excluded
+    The property rules are:
+      - All properties that are Truthy
+      - All properties that are boolean (False is valid)
+      - All properties that are listed in the `_verbatim` set and non-null
+      - All properties that start with "_" are excluded
     """
 
     def __init__(self, *args, **attrs):

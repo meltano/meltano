@@ -61,7 +61,7 @@ class HookObject(metaclass=Hookable):
     def trigger_hooks(self, hook_name, *args, **kwargs):
         try:
             already_triggering = hook_name in self._triggering_hooks
-        except AttributeError:
+        except PropertyError:
             self._triggering_hooks = set()
             already_triggering = False
 

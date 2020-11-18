@@ -311,7 +311,7 @@ class SingerTap(SingerPlugin):
             and not "properties" in plugin_invoker.capabilities
         ):
             raise PluginLacksCapabilityError(
-                f"Extractor '{self.name}' does not support entity selection or catalog metadata and schema rules"
+                f"Extractor '{self.name}' does not support stream selection or catalog metadata and schema rules"
             )
 
         config = plugin_invoker.plugin_config_extras

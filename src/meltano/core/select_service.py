@@ -53,8 +53,8 @@ class SelectService:
 
         return list_all
 
-    def select(self, entities_filter, attributes_filter, exclude=False):
+    def select(self, streams_filter, properties_filter, exclude=False):
         exclude = "!" if exclude else ""
-        pattern = f"{exclude}{entities_filter}.{attributes_filter}"
+        pattern = f"{exclude}{streams_filter}.{properties_filter}"
         self.extractor.add_select_filter(pattern)
         self.config_service.update_plugin(self.extractor)

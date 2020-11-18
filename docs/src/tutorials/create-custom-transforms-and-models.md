@@ -128,7 +128,7 @@ with source as (
 
 opportunity_won as (
     select
-        -- Attributes directly fetched from the Opportunity Table
+        -- Properties directly fetched from the Opportunity Table
         opportunity_id,
         account_id,
         owner_id,
@@ -416,23 +416,23 @@ As we have properly set the connection to our Postgres Database in the Salesforc
 
 ## Closing Remarks
 
-The same process for adding custom Transforms and Model(s) would be followed if we wanted to extract and analyze additional Salesforce Entities that were not fetched in the Salesforce Tutorial:
+The same process for adding custom Transforms and Model(s) would be followed if we wanted to extract and analyze additional Salesforce Streams that were not fetched in the Salesforce Tutorial:
 
-(1) Add the additional Entities to the list of Entities to be extracted when `meltano elt` runs.
+(1) Add the additional Streams to the list of Streams to be extracted when `meltano elt` runs.
 
 As described in the Salesforce Tutorial, this can be done by using the meltano select command
 
 ```bash
-meltano select tap-salesforce "Entity Name" "*"
+meltano select tap-salesforce "Stream Name" "*"
 ```
 
-You can find the names for the supported entities by running:
+You can find the names for the supported streams by running:
 
 ```bash
 meltano select tap-salesforce --list --all
 ```
 
-(2) Follow the steps above to add custom transformations and models for the new Entities.
+(2) Follow the steps above to add custom transformations and models for the new Streams.
 
 (3) Run meltano elt to extract and transform the data.
 

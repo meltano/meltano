@@ -58,7 +58,7 @@ The Analyze page contains an interactive user interface to allow you to dynamica
 
 ![Screenshot of Analyze page for GitLab Issues](/images/gitlab-tutorial/06-gitlab-issues-analyze-page.png)
 
-Now, let's explore and analyze our GitLab Issues data by selecting the following attributes in the left column:
+Now, let's explore and analyze our GitLab Issues data by selecting the following properties in the left column:
 
 - **Columns**
   - Created Year
@@ -67,7 +67,7 @@ Now, let's explore and analyze our GitLab Issues data by selecting the following
   - Total Issues
   - Average Days to Close
 
-![Screenshot of selected attributes for GitLab Issues](/images/gitlab-tutorial/07-gitlab-issues-selected-attributes.png)
+![Screenshot of selected properties for GitLab Issues](/images/gitlab-tutorial/07-gitlab-issues-selected-properties.png)
 
 And with that, the big moment is upon us, it's time to click `Run` to run our query!
 
