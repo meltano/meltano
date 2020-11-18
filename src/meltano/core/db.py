@@ -36,11 +36,10 @@ def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessio
     logging.debug(f"Creating engine {project}@{engine_uri}")
     engine = create_engine(engine_uri, pool_pre_ping=True)
 
-
     settings = ProjectSettingsService(project)
 
-    max_retries = settings.get('max_retries')
-    retry_timeout_seconds = settings.get('retry_timeout_seconds')
+    max_retries = settings.get("max_retries")
+    retry_timeout_seconds = settings.get("retry_timeout_seconds")
 
     check_db_connection(engine, max_retries, retry_timeout_seconds)
 
@@ -70,13 +69,16 @@ def check_db_connection(engine, max_retries=3, retry_timeout_seconds=5):
             break
         except OperationalError:
             if attempt == max_retries:
-                logging.error("Could not connect to the Database. Max retries exceeded.")
+                logging.error(
+                    "Could not connect to the Database. Max retries exceeded."
+                )
                 raise
             attempt += 1
             logging.info(
                 f"DB connection failed. Will retry after {retry_timeout_seconds}s. Attempt {attempt}/{max_retries}"
             )
             time.sleep(retry_timeout_seconds)
+
 
 def init_hook(engine):
     function_map = {"sqlite": init_sqlite_hook}
