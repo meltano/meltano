@@ -6,23 +6,14 @@ import logging
 import os
 import weakref
 
-import psycopg2
-import sqlalchemy.pool as pool
-from psycopg2.sql import SQL, Identifier
-from sqlalchemy import MetaData, create_engine, event
-from sqlalchemy.engine import Engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine import Engine
 from psycopg2.sql import Identifier, SQL
 from .project_settings_service import ProjectSettingsService
 
-
-SystemMetadata = MetaData()
-SystemModel = declarative_base(metadata=SystemMetadata)
 
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project

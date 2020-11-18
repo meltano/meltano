@@ -4,8 +4,8 @@ import os
 import sqlalchemy.types as types
 from sqlalchemy import Column, UniqueConstraint
 
-from .db import SystemModel
 from .utils import nest
+from .models import SystemModel
 
 
 class Setting(SystemModel):

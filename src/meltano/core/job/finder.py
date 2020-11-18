@@ -1,5 +1,4 @@
-from meltano.core.db import DB
-from meltano.core.job.job import Job, State
+from . import Job, State
 
 
 class JobFinder:
