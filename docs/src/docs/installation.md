@@ -45,10 +45,9 @@ python --version
 
 #### pip3 and pipx
 
-- `pip` is a package installer that comes automatically with Python 3+. This is also what we will be
-  using to install Meltano.
+- `pip` is a package installer that comes automatically with Python 3+.
 - [`pipx`](https://pipxproject.github.io/pipx/) is a wrapper around `pip` which cleanly installs
-  executable python tools such as Meltano.
+  executable python tools (such as Meltano) into their own virtual environments.
 
 ```bash
 # check for current version of pip to ensure that it is using Python 3
@@ -64,9 +63,8 @@ pipx ensurepath
 
 _**Why use pipx and virtual environments?**_
 
-- _Your local environment may use a different version of Python or other dependencies that are
-difficult to manage._
-- _The pipx installer automatically creates a virtual environment and provides a
+_Your local environment may use a different version of Python or other dependencies that are
+difficult to manage. The pipx installer automatically creates a virtual environment and provides a
 "clean" isolated space without version conflicts or other compatibility issues._
 
 ## Install Meltano

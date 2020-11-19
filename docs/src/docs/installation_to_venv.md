@@ -1,6 +1,9 @@
-# Alternative Virtual Environment Based Setup
+# Alternative Virtual Environment Setup
 
-We suggest you create a directory where you want your virtual environments to be saved (e.g. `.venv/`). This can be any directory in your environment, but we recommend saving it in your Meltano project to make it easier to keep track of.
+If not using [pipx](https://pipxproject.github.io/), we strongly suggest you create a directory
+where you want your virtual environments to be saved (e.g. `.venv/`). This can be any directory in
+your environment, but we recommend saving it in your Meltano project to make it easier to keep
+track of.
 
 Then create a new virtual environment inside that directory:
 
@@ -17,12 +20,16 @@ Activate the virtual environment using:
 source .venv/meltano/bin/activate
 ```
 
-If the virtual environment was activated successfully, you'll see a `(meltano)` indicator added to your prompt.
+If the virtual environment was activated successfully, you'll see a `(meltano)` indicator added to
+your prompt.
 
 ::: tip
-Once a virtual environment is activated, it stays active until the current shell is closed. In a new shell, you must re-activate the virtual environment before interacting with the `meltano` command that will be installed in the next step.
+Once a virtual environment is activated, it stays active until the current shell is closed. In a new
+shell, you must re-activate the virtual environment before interacting with the `meltano` command
+that will be installed in the next step.
 
-To streamline this process, you can define a [shell alias](https://shapeshed.com/unix-alias/) that'll be easier to remember than the entire activation invocation:
+To streamline this process, you can define a [shell alias](https://shapeshed.com/unix-alias/)
+that'll be easier to remember than the entire activation invocation:
 
 ```bash
 # add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
@@ -38,7 +45,8 @@ You can deactivate a virtual environment by typing `deactivate` in your shell.
 
 ## Install Meltano
 
-Now that you have your virtual environment set up and running, run the following command to install the Meltano package:
+Now that you have your virtual environment set up and running, run the following command to install
+the Meltano package:
 
 ```bash
 pip3 install meltano
