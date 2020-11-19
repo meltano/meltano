@@ -45,7 +45,10 @@ python --version
 
 #### pip3 and pipx
 
-`pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
+- `pip` is a package installer that comes automatically with Python 3+. This is also what we will be
+  using to install Meltano.
+- [`pipx`](https://pipxproject.github.io/pipx/) is a wrapper around `pip` which cleanly installs
+  executable python tools such as Meltano.
 
 ```bash
 # check for current version of pip to ensure that it is using Python 3
@@ -53,30 +56,20 @@ pip3 --version
 
 # update pip3
 pip3 install --upgrade pip
-```
 
-`pipx` is a wrapper around `pip` which also automatically creates a virtual environment for your installation. The
-virtual environment prevents version conflicts with other software installed on your local machine.
-
-
-#### Virtual Environment
-
-::: danger IMPORTANT
-Unless you are building a Docker image, it is **strongly recommended** that Meltano be installed inside a virtual environment in order to avoid potential system conflicts that may be difficult to debug.
-:::
-
-**Why use pipx and virtual environments?**
-
-Your local environment may use a different version of Python or other dependencies that are difficult to manage. The virtual environment provides a "clean" space to work without these issues.
-
-## Install Meltano
-
-If you do not yet have pipx installed, you can install it using pip:
-
-```bash
+# install pipx and ensure it is on the path
 pip3 install pipx
 pipx ensurepath
 ```
+
+_**Why use pipx and virtual environments?**_
+
+- _Your local environment may use a different version of Python or other dependencies that are
+difficult to manage._
+- _The pipx installer automatically creates a virtual environment and provides a
+"clean" isolated space without version conflicts or other compatibility issues._
+
+## Install Meltano
 
 Now that you have pipx installed, run the following command to install the Meltano package into its
 own pipx-backed virtual environment:
@@ -91,10 +84,10 @@ Once the installation completes, you can check if it was successful by running:
 meltano --version
 ```
 
-_Troubleshooting:_
+_**Troubleshooting:**_
 
-- If you have difficulty with pipx or if you prefer to create a custom virtual environment, see
-  our instructions [here](installation_to_venv.md).
+- _If you have difficulty with pipx or if you prefer to create a custom virtual environment, see
+  our instructions [here](installation_to_venv.md)._
 
 ### Next Steps
 
