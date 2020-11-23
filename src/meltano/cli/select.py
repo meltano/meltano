@@ -100,8 +100,8 @@ def show(project, extractor, show_all=False):
     click.secho("\nSelected attributes:")
     for stream, prop in (
         (stream, prop)
-        for stream in list_all.streams
-        for prop in list_all.properties[stream.key]
+        for stream in sorted(list_all.streams)
+        for prop in sorted(list_all.properties[stream.key])
     ):
         entry_selection = stream.selection + prop.selection
         mark = selection_mark(entry_selection)
