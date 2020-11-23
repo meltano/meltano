@@ -248,7 +248,7 @@ extractors:
         label: Conversion Window Days
         description: How many Days before the Start Date to fetch data for Performance Reports
       - name: primary_keys
-        kind: hidden
+        kind: object
         value:
           KEYWORDS_PERFORMANCE_REPORT:
             - customerID
@@ -1261,7 +1261,7 @@ loaders:
             value: 16
             description: Max number of parallel threads to use when flushing tables.
           - name: schema_mapping
-            kind: hidden
+            kind: object
             description: >
               Useful if you want to load multiple streams from one tap to multiple Postgres schemas.
 
@@ -1494,7 +1494,7 @@ loaders:
           - name: default_target_schema_select_permission
             description: Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific role or a list of roles. If `schema_mapping` is not defined then every stream sent by the tap is granted accordingly.
           - name: schema_mapping
-            kind: hidden
+            kind: object
             description: >
               Useful if you want to load multiple streams from one tap to multiple Snowflake schemas.
 
