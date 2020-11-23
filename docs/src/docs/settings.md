@@ -149,7 +149,7 @@ meltano config meltano set database_retry_timeout 5
 
 export MELTANO_DATABASE_RETRY_TIMEOUT=5
 
-meltano elt --database-uri=5 ...
+meltano elt --database-retry-timeout=5 ...
 ```
 
 ### `project_readonly`
