@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2457](https://gitlab.com/meltano/meltano/-/issues/2457) Hide settings of kind `object` or `array` in UI
+
 ### Fixes
 
 - [#2457](https://gitlab.com/meltano/meltano/-/issues/2457) Fix configuration of tap-adwords `primary_keys` and target-snowflake and target-postgres (transferwise variants) `schema_mapping`

@@ -92,7 +92,7 @@ export default {
       return kind => kind === 'file'
     },
     getIsOfKindHidden() {
-      return kind => kind === 'hidden'
+      return kind => kind === 'hidden' || kind === 'object' || kind === 'array'
     },
     getIsOfKindOAuth() {
       return kind => this.isOAuthEnabled && kind === 'oauth'
