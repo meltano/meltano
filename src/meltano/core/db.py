@@ -20,8 +20,12 @@ from .project_settings_service import ProjectSettingsService
 _engines = dict()
 
 
-def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessionmaker):
+def project_engine(project, default=False) -> ("Engine", sessionmaker):
     """Creates and register a SQLAlchemy engine for a Meltano project instance."""
+
+    settings = ProjectSettingsService(project)
+
+    engine_uri = settings.get("database_uri")
 
     # return the default engine if it is registered
     if not engine_uri and project in _engines:
@@ -36,12 +40,10 @@ def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessio
     logging.debug(f"Creating engine {project}@{engine_uri}")
     engine = create_engine(engine_uri, pool_pre_ping=True)
 
-    settings = ProjectSettingsService(project)
+    max_retries = settings.get("database_max_retries")
+    retry_timeout = settings.get("database_retry_timeout")
 
-    max_retries = settings.get("max_retries")
-    retry_timeout_seconds = settings.get("retry_timeout_seconds")
-
-    check_db_connection(engine, max_retries, retry_timeout_seconds)
+    check_db_connection(engine, max_retries, retry_timeout)
 
     init_hook(engine)
 
@@ -57,7 +59,7 @@ def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessio
     return engine_session
 
 
-def check_db_connection(engine, max_retries=3, retry_timeout_seconds=5):
+def check_db_connection(engine, max_retries, retry_timeout):
     """
     Checks whether the database is available the first time a project's engine
     is created
@@ -75,9 +77,9 @@ def check_db_connection(engine, max_retries=3, retry_timeout_seconds=5):
                 raise
             attempt += 1
             logging.info(
-                f"DB connection failed. Will retry after {retry_timeout_seconds}s. Attempt {attempt}/{max_retries}"
+                f"DB connection failed. Will retry after {retry_timeout}s. Attempt {attempt}/{max_retries}"
             )
-            time.sleep(retry_timeout_seconds)
+            time.sleep(retry_timeout)
 
 
 def init_hook(engine):

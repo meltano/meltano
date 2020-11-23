@@ -115,6 +115,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2368](https://gitlab.com/meltano/meltano/-/issues/2433) Make `datamill-co` variant of `target-postgres` the default instead of `meltano`
 - [#2308](https://gitlab.com/meltano/meltano/-/issues/2308) enable `pool_pre_ping` for the project's SQLAlchemy engine
+- [#2308](https://gitlab.com/meltano/meltano/-/issues/2308) enable `pool_pre_ping` for the project's SQLAlchemy engine. Add `database_max_tries` and `database_retry_timeout` settings to configure retry 
+attempts when the first connection to the DB fails.
 
 ### Fixes
 

@@ -110,6 +110,48 @@ export MELTANO_DATABASE_URI=postgresql://<username>:<password>@<host>:<port>/<da
 meltano elt --database-uri=postgresql://<username>:<password>@<host>:<port>/<database> ...
 ```
 
+### `database_max_tries`
+
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_DATABASE_MAX_RETRIES`
+- `meltano *` CLI option: `--database-max-retries`
+- Default: `3`
+
+This sets the maximum number of reconnection attempts in case the initial connection to the database fails because it isn't available when Meltano starts up. 
+
+Note: This affects the initial connection attempt only after which the connection is cached. 
+Subsequent disconnections are handled by SQLALchemy
+
+#### How to use
+
+```bash
+meltano config meltano set database_max_retries 3
+
+export MELTANO_DATABASE_MAX_RETRIES=3
+
+meltano elt --database-max-retries=3 ...
+```
+
+### `database_retry_timeout`
+
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_DATABASE_RETRY_TIMEOUT`
+- `meltano *` CLI option: `--database-retry-timeout`
+- Default: `5 seconds`
+
+This controls the retry interval (in seconds) in case the initial connection to the database fails because it isn't available when Meltano starts up. 
+
+Note: This affects the initial connection attempt only after which the connection is cached. 
+Subsequent disconnections are handled by SQLALchemy
+
+#### How to use
+
+```bash
+meltano config meltano set database_retry_timeout 5
+
+export MELTANO_DATABASE_RETRY_TIMEOUT=5
+
+meltano elt --database-uri=5 ...
+```
+
 ### `project_readonly`
 
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_PROJECT_READONLY`
