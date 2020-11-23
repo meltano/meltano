@@ -1,5 +1,9 @@
 import click
 from typing import List
+import logging
+import sys
+
+from meltano.core.logging import setup_logging
 
 from meltano.core.project_add_service import (
     ProjectAddService,
@@ -18,9 +22,25 @@ from meltano.core.plugin import PluginType, VariantNotFoundError
 from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
 
+setup_logging()
+
+logger = logging.getLogger(__name__)
+
 
 class CliError(Exception):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.printed = False
+
+    def print(self):
+        if self.printed:
+            return
+
+        logger.debug(str(self), exc_info=True)
+        click.secho(str(self), fg="red")
+
+        self.printed = True
 
 
 def print_added_plugin(project, plugin, plugin_def=None, related=False):
