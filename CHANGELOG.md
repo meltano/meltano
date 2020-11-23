@@ -12,6 +12,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+### Fixes
+
+### Breaks
+
+
+## 1.59.0 - (2020-11-23)
+---
+
+### Changes
+
 - [#2450](https://gitlab.com/meltano/meltano/-/issues/2450) Remove undocumented plugin configuration profile functionality
 
 ### Fixes
@@ -19,8 +29,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2453](https://gitlab.com/meltano/meltano/-/issues/2453) Correctly pass value of `tap-facebook`'s `insights_buffer_days` setting to tap as integer instead of boolean
 - [#2387](https://gitlab.com/meltano/meltano/-/issues/2387) Order of attributes in `meltano select --list --all` is set to alphabetical order.
 - [#2458](https://gitlab.com/meltano/meltano/-/issues/2458) Adds missing `mysql-logo.png`
-
-### Breaks
 
 
 ## 1.58.0 - (2020-11-12)
