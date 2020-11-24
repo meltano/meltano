@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+- [#2367](https://gitlab.com/meltano/meltano/-/issues/2367) Adopt Poetry for dependency and build management
 
 ### Changes
 

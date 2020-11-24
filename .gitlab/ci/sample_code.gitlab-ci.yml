@@ -36,6 +36,7 @@ homepage_sample_code:
     - source .venv/bin/activate
 
     # Install Meltano
+    - pip3 install -U pip
     - pip3 install ..
 
 
@@ -175,6 +176,7 @@ getting_started_sample_code:
     - python3 -m venv .venv
     - source .venv/bin/activate
 
+    - pip3 install -U pip
     - pip3 install ..
 
     - meltano --version

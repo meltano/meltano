@@ -5,9 +5,9 @@ publish:
     entrypoint: [""]
   stage: publish
   before_script:
-    - pip install twine
+    - pip install poetry
   script:
-    - twine upload /meltano/dist/*
+    - poetry publish
 
 # registry.gitlab.com/meltano/meltano:<tag>-python<version> → docker.io/meltano:<tag>-python<version>
 # registry.gitlab.com/meltano/meltano:latest-python<version> → docker.io/meltano:latest-python<version>

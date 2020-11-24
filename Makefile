@@ -31,7 +31,7 @@ MELTANO_API = src/meltano/api
 build: ui api
 
 test:
-	${DCRN} api ./setup.py test
+	${DCRN} api poetry run pytest tests/
 
 # pip related
 TO_CLEAN  = ./build ./dist
@@ -82,11 +82,11 @@ ${MELTANO_API}/node_modules:
 # Packaging Related
 # ===========
 #
-# - `make requirements.txt` pins dependency versions. We use requirements.txt
-#   as a lockfile essentially.
+# - `make lock` pins dependency versions. We use Poetry to generate
+#   a lockfile.
 
-requirements.txt: setup.py
-	pip freeze --exclude-editable > $@
+lock:
+	poetry lock
 
 bundle: clean ui
 	mkdir -p src/meltano/api/templates && \
@@ -95,10 +95,10 @@ bundle: clean ui
 	cp -r src/webapp/dist/static/. src/meltano/api/static
 
 freeze_db:
-	scripts/alembic_freeze.py
+	poetry run scripts/alembic_freeze.py
 
 sdist: freeze_db bundle
-	python setup.py sdist
+	poetry build -f sdist
 
 docker_sdist: base_image
 	docker run --rm -v `pwd`:/meltano ${base_image_tag} \
@@ -150,7 +150,7 @@ docs/serve: docs/build
 
 .PHONY: lint show_lint
 
-BLACK_RUN = black src/meltano tests/
+BLACK_RUN = poetry run black src/meltano tests/
 ESLINT_RUN = cd ${MELTANO_WEBAPP} && yarn run lint
 
 lint_black:

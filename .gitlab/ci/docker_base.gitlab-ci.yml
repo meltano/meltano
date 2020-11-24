@@ -22,7 +22,7 @@ meltano_base:
   only:
     changes:
       - docker/base/Dockerfile
-      - requirements.txt
+      - poetry.lock
 
 # Manages:
 #  - <fork namespace>/meltano/base:<base_sha>-python<version>
