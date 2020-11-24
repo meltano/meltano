@@ -15,7 +15,8 @@ Our goal is to **make the power of data integration available to all** by buildi
 a true open source alternative to existing proprietary hosted EL(T) solutions,
 in terms of ease of use, reliability, and quantity and quality of supported data sources.
 
-For more context, read the following blog post: [Why we are building an open source platform for ELT pipelines](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/).
+For more background on the project and its current and future goals, watch this talk: [Open source EL(T) with Meltano and Singer](https://meltano.com/blog/2020/10/27/watch-now-open-source-elt-with-meltano-and-singer/) ([recording](https://www.youtube.com/watch?v=n9xZYng0Mgk), [slides](https://docs.google.com/presentation/d/1QXxoniEx7Okbsmc3jiFhKd1LScR8Drd2SE7Ah7mzsww/edit)). Or read this slightly older blog post: [Why we are building an open source platform for ELT pipelines](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/)
+
 
 ## Focus
 
