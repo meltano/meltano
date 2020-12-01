@@ -19,7 +19,6 @@ requires = [
     "click==7.0",
     "click-default-group==1.2.1",
     "colorama==0.3.9",
-    "cryptography==2.9.2",
     "gunicorn==19.9.0",
     "ipython==7.5.0",
     "jsonschema==2.6.0",
