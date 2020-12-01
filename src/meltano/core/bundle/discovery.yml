@@ -744,12 +744,15 @@ extractors:
           - label: Full Table Replication
             value: FULL_TABLE
       - name: max_run_seconds
+        kind: integer
         value: 43200
         description: Stop running the tap after certain number of seconds
       - name: logical_poll_total_seconds
+        kind: integer
         value: 10800
         description: Stop running the tap when no data received from wal after certain number of seconds
       - name: break_at_end_lsn
+        kind: boolean
         value: true
         description: Stop running the tap if the newly received lsn is after the max lsn that was detected when the tap started
   - name: tap-recharge

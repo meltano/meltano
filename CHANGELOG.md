@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#2457](https://gitlab.com/meltano/meltano/-/issues/2457) Fix configuration of tap-adwords `primary_keys` and target-snowflake and target-postgres (transferwise variants) `schema_mapping`
+- [#2463](https://gitlab.com/meltano/meltano/-/issues/2463) Fix casting of tap-postgres `max_run_seconds`, `logical_poll_total_seconds`, and `break_at_end_lsn` setting values
 
 ### Breaks
 
