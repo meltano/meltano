@@ -4,7 +4,8 @@
 !/README.md
 !/VERSION
 !/docs
-!/requirements.txt
+!/pyproject.toml
+!/poetry.lock
 !/setup.py
 !/setup.cfg
 !/MANIFEST.in
