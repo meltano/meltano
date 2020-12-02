@@ -184,6 +184,6 @@ endif
 
 release:
 	git diff --quiet || { echo "Working directory is dirty, please commit or stash your changes."; exit 1; }
-	yes | changelog release $(type)
+	yes | poetry run changelog release $(type)
 	git add CHANGELOG.md
-	bumpversion --tag --allow-dirty --new-version `changelog current` minor
+	poetry run bumpversion --tag --allow-dirty --new-version `poetry run changelog current` minor
