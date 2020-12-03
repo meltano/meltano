@@ -91,11 +91,15 @@ class Canonical(object):
     def __contains__(self, obj):
         return obj in self.__dict__
 
-    def update(self, other):
-        other = Canonical.as_canonical(other)
+    def update(self, *others, **kwargs):
+        if kwargs:
+            others = [*others, kwargs]
 
-        for k, v in other.items():
-            setattr(self, k, v)
+        for other in others:
+            other = Canonical.as_canonical(other)
+
+            for k, v in other.items():
+                setattr(self, k, v)
 
     @classmethod
     def yaml(cls, dumper, obj):
