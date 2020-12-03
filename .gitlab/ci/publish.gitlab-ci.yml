@@ -7,6 +7,8 @@ publish:
   before_script:
     - pip install poetry
   script:
+    # grab the built package
+    - ln -s /meltano/dist
     - poetry publish
 
 # registry.gitlab.com/meltano/meltano:<tag>-python<version> → docker.io/meltano:<tag>-python<version>
