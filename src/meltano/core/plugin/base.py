@@ -354,7 +354,10 @@ class PluginDefinition(Canonical, PluginRef):
         return {**self.extras, **self.current_variant.extras}
 
     def __getattr__(self, attr):
-        return getattr(self.current_variant, attr)
+        try:
+            return super().__getattr__(attr)
+        except AttributeError:
+            return getattr(self.current_variant, attr)
 
     def in_project(self, custom=False) -> ProjectPlugin:
         return ProjectPlugin(

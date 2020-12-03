@@ -19,6 +19,8 @@ class Canonical(object):
     """
 
     def __init__(self, *args, **attrs):
+        self._dict = {}
+
         super(Canonical, self).__init__(*args)
 
         for attr, value in attrs.items():
@@ -56,6 +58,20 @@ class Canonical(object):
 
         return cls(**obj)
 
+    def __getattr__(self, attr):
+        try:
+            value = self._dict[attr]
+        except KeyError as err:
+            raise AttributeError(attr) from err
+
+        return value
+
+    def __setattr__(self, attr, value):
+        if attr.startswith("_") or hasattr(self.__class__, attr):
+            super().__setattr__(attr, value)
+        else:
+            self._dict[attr] = value
+
     def __getitem__(self, attr):
         return getattr(self, attr)
 
@@ -63,10 +79,7 @@ class Canonical(object):
         return setattr(self, attr, value)
 
     def __iter__(self):
-        for k, v in self.__dict__.items():
-            if k.startswith("_"):
-                continue
-
+        for k, v in self._dict.items():
             if not v:
                 if k in self._verbatim:
                     if v is None:
@@ -89,10 +102,10 @@ class Canonical(object):
                 yield (k, v)
 
     def __len__(self):
-        return len(self.__dict__)
+        return len(self._dict)
 
     def __contains__(self, obj):
-        return obj in self.__dict__
+        return obj in self._dict
 
     def update(self, *others, **kwargs):
         if kwargs:

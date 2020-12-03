@@ -468,8 +468,8 @@ class TestPluginSettingsService:
             "_extra": "$TAP_MOCK_MULTIPLE",
             "_extra_generic": "$MELTANO_EXTRACT_FOO",
         }
-        with mock.patch.object(subject.plugin, "config", config):
-            config = subject.as_dict(session=session)
+        monkeypatch.setattr(subject.plugin, "config", config)
+        config = subject.as_dict(session=session)
 
         assert config["var"] == "hello world!"
         assert config["foo"] == "42"
