@@ -104,13 +104,6 @@ class PluginRef:
         return self._type
 
     @property
-    def qualified_name(self):
-        # "default" is included for legacy reasons
-        parts = (self.type, self.name, "default")
-
-        return ".".join(compact(parts))
-
-    @property
     def info(self):
         return {"name": self.name}
 

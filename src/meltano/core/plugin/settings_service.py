@@ -69,7 +69,8 @@ class PluginSettingsService(SettingsService):
 
     @property
     def _db_namespace(self):
-        return self.plugin.qualified_name
+        # "default" is included for legacy reasons
+        return ".".join((self.plugin.type, self.plugin.name, "default"))
 
     @property
     def extra_setting_definitions(self):
