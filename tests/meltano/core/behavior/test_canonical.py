@@ -69,10 +69,14 @@ class TestCanonical:
         assert new.canonical() == {**subject.canonical(), "new_test": "new_value"}
 
     def test_defaults(self, subject):
+        with pytest.raises(AttributeError):
+            subject.test
+
         subject.test = None
 
         assert subject.test is None
 
+        # This would typically be set from a Canonical subclass
         subject._defaults["test"] = lambda _: "default"
 
         # Default values show up when getting an attr
@@ -84,3 +88,31 @@ class TestCanonical:
 
         assert subject.test == "changed"
         assert subject.canonical()["test"] == "changed"
+
+    def test_fallbacks(self, subject):
+        # Calling an unknown attribute is not supported
+        with pytest.raises(AttributeError):
+            subject.unknown
+
+        fallback = Canonical(unknown="value", known="value")
+        # This would typically be set from a Canonical subclass
+        subject._fallback_to = fallback
+
+        # Unknown attributes fall back
+        assert subject.unknown == "value"
+
+        # Known attributes don't fall back
+        subject.known = None
+        assert subject.known is None
+
+        # Unless we make them
+        subject._fallbacks.add("known")
+        assert subject.known == "value"
+
+        # Unless there is nothing to fallback to
+        subject._fallback_to = None
+        assert subject.known is None
+
+        # Defaults are still applied
+        subject._defaults["known"] = lambda _: "default"
+        assert subject.known == "default"

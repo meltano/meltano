@@ -29,6 +29,8 @@ class Canonical(object):
         self._verbatim = set()
         self._flattened = {"extras"}
 
+        self._fallback_to = None
+        self._fallbacks = set()
         self._defaults = {}
 
     @classmethod
@@ -64,7 +66,16 @@ class Canonical(object):
         try:
             value = self._dict[attr]
         except KeyError as err:
+            if self._fallback_to and not attr.startswith("_"):
+                return getattr(self._fallback_to, attr)
+
             raise AttributeError(attr) from err
+
+        if value is not None:
+            return value
+
+        if attr in self._fallbacks and self._fallback_to:
+            value = getattr(self._fallback_to, attr)
 
         if value is not None:
             return value
