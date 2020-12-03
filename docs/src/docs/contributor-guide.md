@@ -593,7 +593,7 @@ Meltano uses [changelog-cli](https://github.com/mc706/changelog-cli) to populate
 Use `changelog (new|change|fix|breaks) MESSAGE` to describe your current work in progress.
 
 ```bash
-$ changelog new "add an amazing feature"
+$ poetry run changelog new "add an amazing feature"
 $ git add CHANGELOG.md
 ```
 

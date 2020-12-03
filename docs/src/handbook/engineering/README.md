@@ -92,7 +92,7 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
    git checkout -B release-next origin/master
 
    # view changelog (verify changes made match changes logged)
-   changelog view
+   poetry run changelog view
 
    # after the changelog has been validated, tag the release
    make release
