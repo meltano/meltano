@@ -197,11 +197,6 @@ class ProjectPlugin(HookObject, Canonical, PluginRef):
     def output_files(self):
         return dict()
 
-    def add_select_filter(self, filter: str):
-        select = self.extras.get("select", [])
-        select.append(filter)
-        self.extras["select"] = select
-
     def process_config(self, config):
         return config
 

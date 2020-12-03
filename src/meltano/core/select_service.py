@@ -56,5 +56,11 @@ class SelectService:
     def select(self, entities_filter, attributes_filter, exclude=False):
         exclude = "!" if exclude else ""
         pattern = f"{exclude}{entities_filter}.{attributes_filter}"
-        self.extractor.add_select_filter(pattern)
-        self.config_service.update_plugin(self.extractor)
+
+        plugin = self.extractor
+
+        select = plugin.extras.get("select", [])
+        select.append(pattern)
+        plugin.extras["select"] = select
+
+        self.config_service.update_plugin(plugin)
