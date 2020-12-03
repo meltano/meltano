@@ -288,6 +288,9 @@ class BasePlugin(HookObject):
 
         return existing_settings
 
+    def env_prefixes(self, for_writing=False):
+        return [self.name, self.namespace]
+
     def is_installable(self):
         return self.pip_url is not None
 

@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType, Variant
-from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin.project_plugin import CyclicInheritanceError, ProjectPlugin
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import find_named
 
@@ -229,6 +229,11 @@ class TestProjectPlugin:
             "config": {"foo": "bar"},
             "baz": "qux",
         },
+        "inherited": {
+            "name": "tap-example-foo",
+            "inherit_from": "tap-example",
+            "variant": "meltano",
+        },
     }
 
     def test_init_minimal(self):
@@ -283,35 +288,94 @@ class TestProjectPlugin:
 
         assert plugin_def.extras == variant.extras == {}
 
+    def test_init_inherited(self):
+        attrs = self.ATTRS["inherited"]
+        plugin = ProjectPlugin(PluginType.EXTRACTORS, **attrs)
+
+        assert plugin.name == "tap-example-foo"
+        assert plugin.inherit_from == "tap-example"
+        assert plugin.variant == "meltano"
+
+        # Defaults
+        assert plugin.namespace == "tap_example_foo"
+        assert plugin.label == plugin.name
+
     @pytest.mark.parametrize("attrs_key", ATTRS.keys())
     def test_canonical(self, attrs_key):
         attrs = self.ATTRS[attrs_key]
         plugin = ProjectPlugin(PluginType.EXTRACTORS, **attrs)
         assert plugin.canonical() == attrs
 
-    def test_parent(self, tap):
-        parent = tap.parent
-        assert parent.name == tap.name
+    def test_parent(self, inherited_tap):
+        tap = inherited_tap.parent
+        assert isinstance(tap, ProjectPlugin)
 
-        # Attrs that exist both on ProjectPlugin and PluginBase
-        for attr in [
-            "namespace",
-            "label",
-            "logo_url",
-            "description",
-            "variant",
-            "pip_url",
-        ]:
-            # Fall back to parent by default
-            assert getattr(tap, attr) == getattr(parent, attr)
+        base_plugin = tap.parent
+        assert isinstance(base_plugin, BasePlugin)
 
-            # Can be overridden
-            setattr(tap, attr, "custom_value")
-            assert getattr(tap, attr) == "custom_value"
+        # These attrs exist both on ProjectPlugin and PluginBase
+        for attr in ["logo_url", "description", "variant", "pip_url"]:
+            # By default, they fall back on the parent
+            assert (
+                getattr(inherited_tap, attr)
+                == getattr(tap, attr)
+                == getattr(base_plugin, attr)
+            )
 
-        # Attrs that only exist on PluginBase cannot be overridden
-        assert tap.repo == parent.repo
-        assert tap.docs == parent.docs
+            # Unless overwritten
+            setattr(tap, attr, "tap_value")
+            assert getattr(inherited_tap, attr) == getattr(tap, attr) == "tap_value"
+            setattr(tap, attr, None)
+
+            setattr(inherited_tap, attr, "inherited_tap_value")
+            assert getattr(inherited_tap, attr) == "inherited_tap_value"
+            setattr(inherited_tap, attr, None)
+
+        # Plugins that explicitly inherit_from another plugin and
+        # have their own unique name get their own namespace and label
+        assert inherited_tap.namespace == "tap_mock_inherited"
+        assert inherited_tap.label == "Mock: tap-mock-inherited"
+
+        # Until overwritten
+        inherited_tap.namespace = "inherited_tap_namespace"
+        inherited_tap.label = "inherited_tap_label"
+        assert inherited_tap.namespace == "inherited_tap_namespace"
+        assert inherited_tap.label == "inherited_tap_label"
+        inherited_tap.namespace = None
+        inherited_tap.label = None
+
+        # Shadowing plugins (with the same name as their parent) inherit namespace and label
+        assert tap.namespace == base_plugin.namespace == "tap_mock"
+        assert tap.label == base_plugin.label == "Mock"
+
+        # Until overwritten
+        tap.namespace = "tap_namespace"
+        tap.label = "tap_label"
+        assert tap.namespace == "tap_namespace"
+        assert tap.label == "tap_label"
+        tap.namespace = None
+        tap.label = None
+
+        # Attrs that only exist on PluginBase cannot be overwritten
+        assert inherited_tap.repo == tap.repo == base_plugin.repo
+        assert inherited_tap.docs == tap.docs == base_plugin.docs
+
+    def test_set_parent(self):
+        plugin_one = ProjectPlugin(
+            PluginType.EXTRACTORS, name="tap-one", inherit_from="tap-two"
+        )
+        plugin_two = ProjectPlugin(
+            PluginType.EXTRACTORS, name="tap-two", inherit_from="tap-three"
+        )
+        plugin_three = ProjectPlugin(
+            PluginType.EXTRACTORS, name="tap-three", inherit_from="tap-one"
+        )
+
+        plugin_one.parent = plugin_two
+        plugin_two.parent = plugin_three
+
+        with pytest.raises(CyclicInheritanceError):
+            plugin_three.parent = plugin_one
 
     def test_variant(self, plugin_discovery_service):
         # Without a variant set, the "original" name is used
@@ -337,12 +401,21 @@ class TestProjectPlugin:
 
         assert plugin.variant == base_plugin.variant == "meltano"
 
-    def test_env_prefixes(self):
-        plugin = ProjectPlugin(
-            PluginType.EXTRACTORS, name="tap-mock", namespace="tap_mock"
-        )
-        assert plugin.env_prefixes() == ["tap-mock", "tap_mock"]
-        assert plugin.env_prefixes(for_writing=True) == [
+    def test_env_prefixes(self, inherited_tap, tap):
+        assert tap.env_prefixes() == ["tap-mock", "tap_mock"]
+        assert tap.env_prefixes(for_writing=True) == [
+            "tap-mock",
+            "tap_mock",
+            "meltano_extract",
+        ]
+
+        assert inherited_tap.env_prefixes() == [
+            "tap-mock-inherited",
+            "tap_mock_inherited",
+        ]
+        assert inherited_tap.env_prefixes(for_writing=True) == [
+            "tap-mock-inherited",
+            "tap_mock_inherited",
             "tap-mock",
             "tap_mock",
             "meltano_extract",

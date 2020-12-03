@@ -137,6 +137,7 @@ class TestPluginDiscoveryService:
         assert base_plugin.variant == "singer-io"
         assert base_plugin._variant.original
 
+        # First variant
         project_plugin = ProjectPlugin(
             PluginType.EXTRACTORS, "tap-mock", variant="meltano"
         )
@@ -145,6 +146,7 @@ class TestPluginDiscoveryService:
         assert base_plugin.name == "tap-mock"
         assert base_plugin.variant == "meltano"
 
+        # Another variant
         project_plugin = ProjectPlugin(
             PluginType.EXTRACTORS, "tap-mock", variant="singer-io"
         )
@@ -153,6 +155,7 @@ class TestPluginDiscoveryService:
         assert base_plugin.name == "tap-mock"
         assert base_plugin.variant == "singer-io"
 
+        # Original variant
         project_plugin = ProjectPlugin(
             PluginType.EXTRACTORS, "tap-mock", variant=Variant.ORIGINAL_NAME
         )
@@ -161,11 +164,24 @@ class TestPluginDiscoveryService:
         assert base_plugin.name == "tap-mock"
         assert base_plugin.variant == "singer-io"
 
+        # Unknown variant
         project_plugin = ProjectPlugin(
             PluginType.EXTRACTORS, "tap-mock", variant="unknown"
         )
         with pytest.raises(VariantNotFoundError):
             subject.get_base_plugin(project_plugin)
+
+        # Inherited
+        project_plugin = ProjectPlugin(
+            PluginType.EXTRACTORS,
+            "tap-mock-inherited",
+            inherit_from="tap-mock",
+            variant="meltano",
+        )
+        base_plugin = subject.get_base_plugin(project_plugin)
+        assert base_plugin.type == PluginType.EXTRACTORS
+        assert base_plugin.name == "tap-mock"
+        assert base_plugin.variant == "meltano"
 
     @pytest.mark.usefixtures("discovery_yaml")
     def test_discovery_yaml(self, subject):

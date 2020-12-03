@@ -16,6 +16,19 @@ class PluginMissingError(Exception):
         return f"The requested plugin '{self.plugin_name}' is missing."
 
 
+class PluginParentNotFoundError(Exception):
+    """
+    Base exception when a plugin's parent could not be found.
+    """
+
+    def __init__(self, plugin, parent_not_found_error):
+        self.plugin = plugin
+        self.parent_not_found_error = parent_not_found_error
+
+    def __str__(self):
+        return f"Could not find parent plugin for {self.plugin.type.descriptor} '{self.plugin.name}': {self.parent_not_found_error}"
+
+
 class PluginExecutionError(Exception):
     """
     Base exception for problems that stems from the

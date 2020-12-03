@@ -256,7 +256,7 @@ class PluginDiscoveryService(Versioned):
 
     def get_base_plugin(self, project_plugin: ProjectPlugin) -> BasePlugin:
         plugin = project_plugin.custom_definition or self.find_definition(
-            project_plugin.type, project_plugin.name
+            project_plugin.type, project_plugin.inherit_from or project_plugin.name
         )
 
         return base_plugin_factory(plugin, project_plugin.variant)

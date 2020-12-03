@@ -8,7 +8,7 @@ from meltano.core.utils import NotFound, find_named
 
 from .config_service import ConfigService
 from .plugin import PluginRef, PluginType, Variant
-from .plugin.error import PluginMissingError
+from .plugin.error import PluginMissingError, PluginParentNotFoundError
 from .plugin.project_plugin import ProjectPlugin
 from .plugin_discovery_service import PluginDiscoveryService
 from .project import Project
@@ -45,7 +45,8 @@ class ProjectPluginsService:
 
             for plugin_type, plugins_of_type in plugins:
                 for plugin in plugins_of_type:
-                    plugin.parent = self.discovery_service.get_base_plugin(plugin)
+                    parent = self.get_parent(plugin, plugins_of_type)
+                    plugin.parent = parent
 
             self._current_plugins = plugins
         return self._current_plugins
@@ -144,3 +145,18 @@ class ProjectPluginsService:
             plugins[plugin.type][idx] = plugin
 
             return outdated
+
+    def get_parent(self, plugin: ProjectPlugin, plugins_of_type):
+        if plugin.inherit_from and not plugin.is_variant_set:
+            try:
+                return find_named(plugins_of_type, plugin.inherit_from)
+            except NotFound:
+                pass
+
+        try:
+            return self.discovery_service.get_base_plugin(plugin)
+        except PluginNotFoundError as err:
+            if plugin.inherit_from:
+                raise PluginParentNotFoundError(plugin, err) from err
+            else:
+                raise
