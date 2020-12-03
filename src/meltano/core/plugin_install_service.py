@@ -35,13 +35,13 @@ def installer_factory(project, plugin: ProjectPlugin, *args, **kwargs):
 
 
 class PluginInstallService:
-    def __init__(self, project: Project, config_service: ConfigService = None):
+    def __init__(self, project: Project, plugins_service: ProjectPluginsService = None):
         self.project = project
-        self.config_service = config_service or ConfigService(project)
+        self.plugins_service = plugins_service or ProjectPluginsService(project)
 
     def install_all_plugins(self, reason=PluginInstallReason.INSTALL, status_cb=noop):
         return self.install_plugins(
-            self.config_service.plugins(), reason=reason, status_cb=status_cb
+            self.plugins_service.plugins(), reason=reason, status_cb=status_cb
         )
 
     def install_plugins(

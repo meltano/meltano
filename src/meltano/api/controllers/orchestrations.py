@@ -15,15 +15,12 @@ from meltano.core.plugin.settings_service import (
     PluginSettingsService,
     SettingValueStore,
 )
-from meltano.core.plugin_discovery_service import (
-    PluginDiscoveryService,
-    PluginNotFoundError,
-)
+from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
-from meltano.core.config_service import ConfigService
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.schedule_service import (
     ScheduleService,
     ScheduleAlreadyExistsError,
@@ -317,21 +314,16 @@ def get_plugin_configuration(plugin_ref) -> Response:
     """
 
     project = Project.find()
-    config_service = ConfigService(project)
-    plugin = config_service.get_plugin(plugin_ref)
 
-    discovery_service = PluginDiscoveryService(project, config_service=config_service)
+    plugins_service = ProjectPluginsService(project)
+    plugin = plugins_service.get_plugin(plugin_ref)
+
     settings = PluginSettingsService(
-        project,
-        plugin,
-        config_service=config_service,
-        plugin_discovery_service=discovery_service,
-        show_hidden=False,
+        project, plugin, plugins_service=plugins_service, show_hidden=False
     )
 
     try:
-        plugin_def = discovery_service.get_definition(plugin)
-        settings_group_validation = plugin_def.settings_group_validation
+        settings_group_validation = plugin.settings_group_validation
     except PluginNotFoundError:
         settings_group_validation = []
 
@@ -352,11 +344,11 @@ def save_plugin_configuration(plugin_ref) -> Response:
     """
     project = Project.find()
     payload = request.get_json()
-    config_service = ConfigService(project)
-    plugin = config_service.get_plugin(plugin_ref)
+    plugins_service = ProjectPluginsService(project)
+    plugin = plugins_service.get_plugin(plugin_ref)
 
     settings = PluginSettingsService(
-        project, plugin, config_service=config_service, show_hidden=False
+        project, plugin, plugins_service=plugins_service, show_hidden=False
     )
 
     config = payload.get("config", {})
@@ -380,11 +372,11 @@ def test_plugin_configuration(plugin_ref) -> Response:
     """
     project = Project.find()
     payload = request.get_json()
-    config_service = ConfigService(project)
-    plugin = config_service.get_plugin(plugin_ref)
+    plugins_service = ProjectPluginsService(project)
+    plugin = plugins_service.get_plugin(plugin_ref)
 
     settings = PluginSettingsService(
-        project, plugin, config_service=config_service, show_hidden=False
+        project, plugin, plugins_service=plugins_service, show_hidden=False
     )
 
     config = payload.get("config", {})
@@ -407,7 +399,12 @@ def test_plugin_configuration(plugin_ref) -> Response:
     async def test_extractor():
         process = None
         try:
-            invoker = invoker_factory(project, plugin, plugin_settings_service=settings)
+            invoker = invoker_factory(
+                project,
+                plugin,
+                plugins_service=plugins_service,
+                plugin_settings_service=settings,
+            )
             with invoker.prepared(db.session):
                 process = await invoker.invoke_async(stdout=asyncio.subprocess.PIPE)
                 return await test_stream(process.stdout)

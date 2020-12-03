@@ -106,7 +106,7 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        plugin_discovery_service,
+        project_plugins_service,
         job_logging_service,
     ):
         result = cli_runner.invoke(cli, ["elt"])
@@ -124,8 +124,8 @@ class TestCliEltScratchpadOne:
         ), mock.patch(
             "meltano.core.plugin_invoker.asyncio"
         ) as asyncio_mock, mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
@@ -155,8 +155,8 @@ class TestCliEltScratchpadOne:
 
         exc = Exception("This is a grave danger.")
         with mock.patch.object(SingerRunner, "run", side_effect=exc), mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
@@ -186,7 +186,7 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        plugin_discovery_service,
+        project_plugins_service,
         job_logging_service,
         monkeypatch,
     ):
@@ -203,8 +203,8 @@ class TestCliEltScratchpadOne:
         ), mock.patch(
             "meltano.core.plugin_invoker.asyncio"
         ) as asyncio_mock, mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
@@ -262,7 +262,7 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        plugin_discovery_service,
+        project_plugins_service,
     ):
         job_id = "pytest_test_elt"
         args = ["elt", "--job_id", job_id, tap.name, target.name]
@@ -278,8 +278,8 @@ class TestCliEltScratchpadOne:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
@@ -311,7 +311,7 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        plugin_discovery_service,
+        project_plugins_service,
     ):
         job_id = "pytest_test_elt"
         args = ["elt", "--job_id", job_id, tap.name, target.name]
@@ -327,8 +327,8 @@ class TestCliEltScratchpadOne:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
@@ -360,7 +360,7 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        plugin_discovery_service,
+        project_plugins_service,
     ):
         job_id = "pytest_test_elt"
         args = ["elt", "--job_id", job_id, tap.name, target.name]
@@ -383,8 +383,8 @@ class TestCliEltScratchpadOne:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
@@ -412,7 +412,7 @@ class TestCliEltScratchpadOne:
         project,
         tap,
         target,
-        plugin_discovery_service,
+        project_plugins_service,
         plugin_settings_service_factory,
     ):
         catalog = {"streams": []}
@@ -433,8 +433,8 @@ class TestCliEltScratchpadOne:
         ]
 
         with mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
@@ -448,7 +448,7 @@ class TestCliEltScratchpadOne:
         project,
         tap,
         target,
-        plugin_discovery_service,
+        project_plugins_service,
         plugin_settings_service_factory,
     ):
         state = {"success": True}
@@ -469,8 +469,8 @@ class TestCliEltScratchpadOne:
         ]
 
         with mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ):
@@ -485,7 +485,7 @@ class TestCliEltScratchpadOne:
         project,
         tap,
         target,
-        plugin_discovery_service,
+        project_plugins_service,
         plugin_settings_service_factory,
     ):
         job_id = "pytest_test_elt"
@@ -502,8 +502,8 @@ class TestCliEltScratchpadOne:
         settings_service = plugin_settings_service_factory(tap)
 
         with mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ):
@@ -520,7 +520,7 @@ class TestCliEltScratchpadOne:
         project,
         tap,
         target,
-        plugin_discovery_service,
+        project_plugins_service,
         plugin_settings_service_factory,
     ):
         job_id = "pytest_test_elt"
@@ -537,8 +537,8 @@ class TestCliEltScratchpadOne:
         settings_service = plugin_settings_service_factory(target)
 
         with mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ):
@@ -566,7 +566,7 @@ class TestCliEltScratchpadTwo:
         silent_dbt_process,
         dbt_process,
         tap_mock_transform,
-        plugin_discovery_service,
+        project_plugins_service,
     ):
         args = ["elt", tap.name, target.name, "--transform", "run"]
 
@@ -582,14 +582,11 @@ class TestCliEltScratchpadTwo:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.cli.elt.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.core.transform_add_service.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
@@ -630,7 +627,7 @@ class TestCliEltScratchpadTwo:
         silent_dbt_process,
         dbt_process,
         tap_mock_transform,
-        plugin_discovery_service,
+        project_plugins_service,
     ):
         args = ["elt", tap.name, target.name, "--transform", "run"]
 
@@ -654,14 +651,11 @@ class TestCliEltScratchpadTwo:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.cli.elt.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.core.transform_add_service.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
@@ -700,19 +694,16 @@ class TestCliEltScratchpadThree:
         tap,
         target,
         dbt,
-        plugin_discovery_service,
+        project_plugins_service,
     ):
         args = ["elt", tap.name, target.name, "--transform", "only"]
 
         with mock.patch(
-            "meltano.cli.elt.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.core.transform_add_service.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch.object(
             DbtRunner, "run", new=CoroutineMock()
         ):
@@ -737,19 +728,16 @@ class TestCliEltScratchpadThree:
         target,
         dbt,
         tap_mock_transform,
-        plugin_discovery_service,
+        project_plugins_service,
     ):
         args = ["elt", tap.name, target.name, "--transform", "only"]
 
         with mock.patch(
-            "meltano.cli.elt.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.core.transform_add_service.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch.object(
             DbtRunner, "run", new=CoroutineMock()
         ):

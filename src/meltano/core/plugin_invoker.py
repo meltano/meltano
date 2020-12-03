@@ -12,7 +12,7 @@ from .plugin.project_plugin import ProjectPlugin
 from .plugin.error import PluginMissingError, PluginExecutionError
 from .plugin.config_service import PluginConfigService
 from .plugin.settings_service import PluginSettingsService
-from .plugin_discovery_service import PluginDiscoveryService
+from .project_plugins_service import ProjectPluginsService
 from .venv_service import VenvService, VirtualEnv
 from .error import Error, SubprocessError
 from .logging.utils import OUTPUT_BUFFER_SIZE
@@ -60,9 +60,9 @@ class PluginInvoker:
         run_dir=None,
         config_dir=None,
         venv_service: VenvService = None,
+        plugins_service: ProjectPluginsService = None,
         plugin_config_service: PluginConfigService = None,
         plugin_settings_service: PluginSettingsService = None,
-        plugin_discovery_service: PluginDiscoveryService = None,
     ):
         self.project = project
         self.plugin = plugin
@@ -74,17 +74,11 @@ class PluginInvoker:
             config_dir or self.project.plugin_dir(plugin),
             run_dir or self.project.run_dir(plugin.name),
         )
-        self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
-            project
-        )
-        self.settings_service = plugin_settings_service or PluginSettingsService(
-            project,
-            plugin,
-            config_service=self.discovery_service.config_service,
-            plugin_discovery_service=self.discovery_service,
-        )
 
-        self.plugin_def = self.discovery_service.get_definition(plugin)
+        self.plugins_service = plugins_service or ProjectPluginsService(project)
+        self.settings_service = plugin_settings_service or PluginSettingsService(
+            project, plugin, plugins_service=self.plugins_service
+        )
 
         self._prepared = False
         self.plugin_config = {}
@@ -95,7 +89,7 @@ class PluginInvoker:
     @property
     def capabilities(self):
         # we want to make sure the capabilites are immutable from the `PluginInvoker` interface
-        return frozenset(self.plugin_def.capabilities)
+        return frozenset(self.plugin.capabilities)
 
     @property
     def files(self):
@@ -141,7 +135,7 @@ class PluginInvoker:
 
     @property
     def executable(self):
-        return self.plugin_def.executable or self.plugin.name
+        return self.plugin.executable or self.plugin.name
 
     def exec_path(self):
         return self.venv_service.exec_path(

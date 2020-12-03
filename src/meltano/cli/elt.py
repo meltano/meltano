@@ -10,7 +10,7 @@ from async_generator import asynccontextmanager
 from . import cli
 from .utils import CliError, add_plugin, add_related_plugins
 from .params import project
-from meltano.core.config_service import ConfigService
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
@@ -109,10 +109,7 @@ def elt(
     _, Session = project_engine(project)
     session = Session()
     try:
-        config_service = ConfigService(project)
-        discovery_service = PluginDiscoveryService(
-            project, config_service=config_service
-        )
+        plugins_service = ProjectPluginsService(project)
 
         context_builder = elt_context_builder(
             project,
@@ -126,8 +123,7 @@ def elt(
             select_filter=select_filter,
             catalog=catalog,
             state=state,
-            config_service=config_service,
-            discovery_service=discovery_service,
+            plugins_service=plugins_service,
         )
 
         if dump:
@@ -153,19 +149,16 @@ def elt_context_builder(
     select_filter=[],
     catalog=None,
     state=None,
-    config_service=None,
-    discovery_service=None,
+    plugins_service=None,
 ):
     transform_name = None
     if transform != "skip":
         transform_name = find_transform_for_extractor(
-            extractor,
-            config_service=config_service,
-            discovery_service=discovery_service,
+            extractor, plugins_service=plugins_service
         )
 
     return (
-        ELTContextBuilder(project)
+        ELTContextBuilder(project, plugins_service=plugins_service)
         .with_session(session)
         .with_job(job)
         .with_extractor(extractor)
@@ -342,7 +335,8 @@ async def run_transform(elt_context, output_logger, **kwargs):
     logs("Transformation complete!", fg="green")
 
 
-def find_transform_for_extractor(extractor: str, config_service, discovery_service):
+def find_transform_for_extractor(extractor: str, plugins_service):
+    discovery_service = plugins_service.discovery_service
     try:
         extractor_plugin_def = discovery_service.find_definition(
             PluginType.EXTRACTORS, extractor
@@ -354,7 +348,7 @@ def find_transform_for_extractor(extractor: str, config_service, discovery_servi
         )
 
         # Check if the transform has been added to the project
-        transform_plugin = config_service.get_plugin(transform_plugin_def)
+        transform_plugin = plugins_service.get_plugin(transform_plugin_def)
 
         return transform_plugin.name
     except (PluginNotFoundError, PluginMissingError):

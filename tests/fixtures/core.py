@@ -15,12 +15,15 @@ from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import invoker_factory
-from meltano.core.config_service import ConfigService, PluginAlreadyAddedException
+from meltano.core.config_service import ConfigService
+from meltano.core.project_plugins_service import (
+    ProjectPluginsService,
+    PluginAlreadyAddedException,
+)
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin.factory import plugin_factory
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.logging.job_logging_service import JobLoggingService
 
@@ -129,10 +132,8 @@ def discovery():
 
 
 @pytest.fixture(scope="class")
-def plugin_discovery_service(project, discovery, config_service):
-    return PluginDiscoveryService(
-        project, discovery=discovery, config_service=config_service
-    )
+def plugin_discovery_service(project, discovery):
+    return PluginDiscoveryService(project, discovery=discovery)
 
 
 @pytest.fixture(scope="class")
@@ -146,28 +147,20 @@ def project_init_service():
 
 
 @pytest.fixture(scope="class")
-def plugin_install_service(project, config_service):
-    return PluginInstallService(project, config_service=config_service)
+def plugin_install_service(project, project_plugins_service):
+    return PluginInstallService(project, plugins_service=project_plugins_service)
 
 
 @pytest.fixture(scope="class")
-def project_add_service(project, config_service, plugin_discovery_service):
-    return ProjectAddService(
-        project,
-        config_service=config_service,
-        plugin_discovery_service=plugin_discovery_service,
-    )
+def project_add_service(project, project_plugins_service):
+    return ProjectAddService(project, plugins_service=project_plugins_service)
 
 
 @pytest.fixture(scope="class")
-def plugin_settings_service_factory(project, config_service, plugin_discovery_service):
+def plugin_settings_service_factory(project, project_plugins_service):
     def _factory(plugin, **kwargs):
         return PluginSettingsService(
-            project,
-            plugin,
-            config_service=config_service,
-            plugin_discovery_service=plugin_discovery_service,
-            **kwargs,
+            project, plugin, plugins_service=project_plugins_service, **kwargs
         )
 
     return _factory
@@ -175,14 +168,14 @@ def plugin_settings_service_factory(project, config_service, plugin_discovery_se
 
 @pytest.fixture(scope="class")
 def plugin_invoker_factory(
-    project, plugin_settings_service_factory, plugin_discovery_service
+    project, project_plugins_service, plugin_settings_service_factory
 ):
     def _factory(plugin, **kwargs):
         return invoker_factory(
             project,
             plugin,
+            plugins_service=project_plugins_service,
             plugin_settings_service=plugin_settings_service_factory(plugin),
-            plugin_discovery_service=plugin_discovery_service,
             **kwargs,
         )
 
@@ -218,39 +211,48 @@ def add_model(project, plugin_install_service, project_add_service):
 
 @pytest.fixture(scope="class")
 def config_service(project):
-    return ConfigService(project)
+    return ConfigService(project, use_cache=False)
 
 
 @pytest.fixture(scope="class")
-def tap(config_service):
-    tap = ProjectPlugin(PluginType.EXTRACTORS, "tap-mock", variant="meltano")
+def project_plugins_service(project, config_service, plugin_discovery_service):
+    return ProjectPluginsService(
+        project,
+        config_service=config_service,
+        discovery_service=plugin_discovery_service,
+        use_cache=False,
+    )
+
+
+@pytest.fixture(scope="class")
+def tap(project_add_service):
     try:
-        return config_service.add_to_file(tap)
+        return project_add_service.add(
+            PluginType.EXTRACTORS, "tap-mock", variant="meltano"
+        )
     except PluginAlreadyAddedException as err:
         return err.plugin
 
 
 @pytest.fixture(scope="class")
-def target(config_service):
-    target = ProjectPlugin(PluginType.LOADERS, "target-mock")
+def target(project_add_service):
     try:
-        return config_service.add_to_file(target)
+        return project_add_service.add(PluginType.LOADERS, "target-mock")
     except PluginAlreadyAddedException as err:
         return err.plugin
 
 
 @pytest.fixture(scope="class")
-def dbt(config_service):
-    dbt = ProjectPlugin(PluginType.TRANSFORMERS, "dbt")
+def dbt(project_add_service):
     try:
-        return config_service.add_to_file(dbt)
+        return project_add_service.add(PluginType.TRANSFORMERS, "dbt")
     except PluginAlreadyAddedException as err:
         return err.plugin
 
 
 @pytest.fixture(scope="class")
-def schedule_service(project, plugin_discovery_service):
-    return ScheduleService(project, plugin_discovery_service=plugin_discovery_service)
+def schedule_service(project, project_plugins_service):
+    return ScheduleService(project, plugins_service=project_plugins_service)
 
 
 @pytest.fixture(scope="class")
@@ -267,12 +269,8 @@ def schedule(project, tap, target, schedule_service):
 
 
 @pytest.fixture(scope="class")
-def elt_context_builder(project, config_service, plugin_discovery_service):
-    return ELTContextBuilder(
-        project,
-        config_service=config_service,
-        plugin_discovery_service=plugin_discovery_service,
-    )
+def elt_context_builder(project, project_plugins_service):
+    return ELTContextBuilder(project, plugins_service=project_plugins_service)
 
 
 @pytest.fixture(scope="class")

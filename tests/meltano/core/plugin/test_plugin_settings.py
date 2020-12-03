@@ -4,7 +4,7 @@ from unittest import mock
 from contextlib import contextmanager
 from datetime import date, datetime
 
-from meltano.core.config_service import PluginAlreadyAddedException
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.setting import Setting
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -37,7 +37,7 @@ def env_var(plugin_discovery_service):
 
 
 @pytest.fixture(scope="class")
-def custom_tap(config_service):
+def custom_tap(project_add_service):
     EXPECTED = {"test": "custom", "start_date": None, "secure": None}
     tap = ProjectPlugin(
         PluginType.EXTRACTORS,
@@ -46,7 +46,7 @@ def custom_tap(config_service):
         config=EXPECTED,
     )
     try:
-        return config_service.add_to_file(tap)
+        return project_add_service.add_plugin(tap)
     except PluginAlreadyAddedException as err:
         return err.plugin
 
@@ -172,8 +172,9 @@ class TestPluginSettingsService:
         )
 
     def test_definitions(self, subject, monkeypatch):
-        monkeypatch.setitem(subject.plugin_def.extras, "select", ["from_default"])
-        monkeypatch.setitem(subject.plugin_def.extras, "vars", {"foo": True})
+        variant = subject.plugin.parent._variant
+        monkeypatch.setitem(variant.extras, "select", ["from_default"])
+        monkeypatch.setitem(variant.extras, "vars", {"foo": True})
         subject.show_hidden = False
         subject._setting_defs = None
 
@@ -665,6 +666,8 @@ class TestPluginSettingsService:
         )
 
     def test_extra(self, subject, tap, monkeypatch, env_var):
+        subject._setting_defs = None
+
         assert "_select" in subject.as_dict()
         assert "_select" in subject.as_dict(extras=True)
         assert "_select" not in subject.as_dict(extras=False)
@@ -674,7 +677,9 @@ class TestPluginSettingsService:
             SettingValueStore.DEFAULT,
         )
 
-        monkeypatch.setitem(subject.plugin_def.extras, "select", ["from_default"])
+        monkeypatch.setitem(
+            subject.plugin.parent._variant.extras, "select", ["from_default"]
+        )
         subject._setting_defs = None
 
         assert subject.get_with_source("_select") == (
@@ -742,7 +747,7 @@ class TestPluginSettingsService:
         assert subject.get_with_source("_vars") == ({}, SettingValueStore.DEFAULT)
 
         monkeypatch.setitem(
-            subject.plugin_def.extras,
+            subject.plugin.parent._variant.extras,
             "vars",
             {"var": "from_default", "other": "from_default"},
         )

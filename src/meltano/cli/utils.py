@@ -43,7 +43,7 @@ class CliError(Exception):
         self.printed = True
 
 
-def print_added_plugin(project, plugin, plugin_def=None, related=False):
+def print_added_plugin(project, plugin, related=False):
     descriptor = plugin.type.descriptor
     if related:
         descriptor = f"related {descriptor}"
@@ -58,14 +58,13 @@ def print_added_plugin(project, plugin, plugin_def=None, related=False):
             fg="green",
         )
 
-    if plugin_def:
-        repo_url = plugin_def.repo
-        if repo_url:
-            click.echo(f"Repository:\t{repo_url}")
+    repo_url = plugin.repo
+    if repo_url:
+        click.echo(f"Repository:\t{repo_url}")
 
-        docs_url = plugin_def.docs
-        if docs_url:
-            click.echo(f"Documentation:\t{docs_url}")
+    docs_url = plugin.docs
+    if docs_url:
+        click.echo(f"Documentation:\t{docs_url}")
 
 
 def add_plugin(
@@ -77,9 +76,7 @@ def add_plugin(
 ):
     try:
         plugin = add_service.add(plugin_type, plugin_name, variant=variant)
-        plugin_def = add_service.discovery_service.get_definition(plugin)
-
-        print_added_plugin(project, plugin, plugin_def)
+        print_added_plugin(project, plugin)
     except PluginAlreadyAddedException as err:
         click.secho(
             f"{plugin_type.descriptor.capitalize()} '{plugin_name}' is already in your Meltano project",
@@ -111,12 +108,7 @@ def add_related_plugins(
             plugin_install, plugin_types=plugin_types
         )
         for related_plugin in related_plugins:
-            related_plugin_def = add_service.discovery_service.get_definition(
-                related_plugin
-            )
-            print_added_plugin(
-                project, related_plugin, related_plugin_def, related=True
-            )
+            print_added_plugin(project, related_plugin, related=True)
             click.echo()
 
         added_plugins.extend(related_plugins)

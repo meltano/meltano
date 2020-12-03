@@ -13,7 +13,6 @@ from meltano.core.utils import (
 )
 from .setting_definition import SettingMissingError, SettingDefinition
 from .settings_store import StoreNotSupportedError, SettingValueStore
-from .config_service import ConfigService
 
 
 logger = logging.getLogger(__name__)
@@ -26,17 +25,8 @@ REDACTED_VALUE = "(redacted)"
 class SettingsService(ABC):
     LOGGING = False
 
-    def __init__(
-        self,
-        project,
-        config_service: ConfigService = None,
-        show_hidden=True,
-        env_override={},
-        config_override={},
-    ):
+    def __init__(self, project, show_hidden=True, env_override={}, config_override={}):
         self.project = project
-
-        self.config_service = config_service or ConfigService(project)
 
         self.show_hidden = show_hidden
 

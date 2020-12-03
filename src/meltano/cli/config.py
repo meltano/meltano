@@ -14,7 +14,7 @@ from meltano.core.settings_service import SettingValueStore, StoreNotSupportedEr
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginMissingError
-from meltano.core.config_service import ConfigService
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.plugin.settings_service import PluginSettingsService
 
 
@@ -28,11 +28,12 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 @project(migrate=True)
 @click.pass_context
 def config(ctx, project, plugin_type, plugin_name, format, extras):
-    try:
-        plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
+    plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
-        config = ConfigService(project)
-        plugin = config.find_plugin(
+    plugins_service = ProjectPluginsService(project)
+
+    try:
+        plugin = plugins_service.find_plugin(
             plugin_name, plugin_type=plugin_type, configurable=True
         )
     except PluginMissingError:
@@ -45,9 +46,13 @@ def config(ctx, project, plugin_type, plugin_name, format, extras):
     session = Session()
     try:
         if plugin:
-            settings = PluginSettingsService(project, plugin, config_service=config)
+            settings = PluginSettingsService(
+                project, plugin, plugins_service=plugins_service
+            )
         else:
-            settings = ProjectSettingsService(project, config_service=config)
+            settings = ProjectSettingsService(
+                project, config_service=plugins_service.config_service
+            )
 
         ctx.obj["settings"] = settings
         ctx.obj["session"] = session

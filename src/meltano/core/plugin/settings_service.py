@@ -1,6 +1,7 @@
 from typing import Iterable, Dict, List
 
 from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import (
@@ -10,7 +11,7 @@ from meltano.core.settings_service import (
     REDACTED_VALUE,
 )
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
-from meltano.core.plugin import PluginRef, PluginType, PluginDefinition
+from meltano.core.plugin import BasePlugin
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.error import PluginMissingError
 
@@ -21,36 +22,24 @@ class PluginSettingsService(SettingsService):
         project: Project,
         plugin: ProjectPlugin,
         *args,
-        plugin_discovery_service: PluginDiscoveryService = None,
+        plugins_service: ProjectPluginsService = None,
         **kwargs,
     ):
         super().__init__(project, *args, **kwargs)
 
         self.plugin = plugin
-
-        self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
-            self.project, config_service=self.config_service
-        )
-        self._plugin_def = None
+        self.plugins_service = plugins_service or ProjectPluginsService(self.project)
 
         project_settings_service = ProjectSettingsService(
-            self.project, config_service=self.config_service
+            self.project, config_service=self.plugins_service.config_service
         )
 
         self.env_override = {
             **project_settings_service.env,
             **project_settings_service.as_env(),
             **self.env_override,
-            **self.plugin_def.info_env,
             **self.plugin.info_env,
         }
-
-    @property
-    def plugin_def(self):
-        if self._plugin_def is None:
-            self._plugin_def = self.discovery_service.get_definition(self.plugin)
-
-        return self._plugin_def
 
     @property
     def label(self):
@@ -58,11 +47,11 @@ class PluginSettingsService(SettingsService):
 
     @property
     def docs_url(self):
-        return self.plugin_def.docs
+        return self.plugin.docs
 
     @property
     def _env_prefixes(self):
-        return [self.plugin.name, self.plugin_def.namespace]
+        return [self.plugin.name, self.plugin.namespace]
 
     @property
     def _generic_env_prefix(self):
@@ -97,7 +86,7 @@ class PluginSettingsService(SettingsService):
 
     @property
     def _definitions(self):
-        return [*self.plugin_def.settings, *self.extra_setting_definitions]
+        return [*self.plugin.settings, *self.extra_setting_definitions]
 
     @property
     def _meltano_yml_config(self):
@@ -105,8 +94,7 @@ class PluginSettingsService(SettingsService):
 
     def _update_meltano_yml_config(self, config_with_extras):
         self.plugin.config_with_extras = config_with_extras
-
-        self.config_service.update_plugin(self.plugin)
+        self.plugins_service.update_plugin(self.plugin)
 
     def _process_config(self, config):
         return self.plugin.process_config(config)

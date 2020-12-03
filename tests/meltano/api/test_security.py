@@ -146,12 +146,12 @@ class TestProjectReadonlyEnabled:
             assert b"deployed as read-only" in res.data
 
     def test_pipeline_schedules_save(
-        self, app, api, tap, target, plugin_discovery_service
+        self, app, api, tap, target, project_plugins_service
     ):
         with app.test_request_context():
             with mock.patch(
-                "meltano.core.schedule_service.PluginDiscoveryService",
-                return_value=plugin_discovery_service,
+                "meltano.core.schedule_service.ProjectPluginsService",
+                return_value=project_plugins_service,
             ):
                 res = api.post(
                     url_for("orchestrations.save_pipeline_schedule"),

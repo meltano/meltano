@@ -11,7 +11,6 @@ from . import cli
 from .params import project
 from .utils import CliError
 
-from meltano.core.config_service import ConfigService
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.db import project_engine
 from meltano.core.tracking import GoogleAnalyticsTracker

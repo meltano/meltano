@@ -23,7 +23,7 @@ from meltano.core.plugin_discovery_service import (
     PluginNotFoundError,
     VERSION,
 )
-from meltano.core.config_service import PluginAlreadyAddedException
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.behavior.versioned import IncompatibleVersionError
 
 

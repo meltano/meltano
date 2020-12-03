@@ -8,7 +8,7 @@ from meltano.api.models.subscription import Subscription, SubscriptionEventType
 from meltano.api.signals import PipelineSignals
 from meltano.core.project import Project
 from meltano.core.plugin import PluginType, PluginDefinition
-from meltano.core.config_service import ConfigService
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 
 
@@ -23,17 +23,12 @@ class NotificationEvents:
         self,
         project: Project,
         mail_service: MailService = None,
-        config_service: ConfigService = None,
-        plugin_discovery_service: PluginDiscoveryService = None,
+        plugins_service: ProjectPluginsService = None,
     ):
         self.project = project
 
         self.mail_service = mail_service or MailService(project)
-        self.config_service = config_service or ConfigService(project)
-        self.plugin_discovery_service = (
-            plugin_discovery_service
-            or PluginDiscoveryService(project, config_service=self.config_service)
-        )
+        self.plugins_service = plugins_service or ProjectPluginsService(project)
 
     def init_app(self, app):
         # wire the signal handlers
@@ -44,22 +39,20 @@ class NotificationEvents:
         Returns the Data Source name for a Pipeline
         """
 
-        plugin = self.config_service.find_plugin(
+        plugin = self.plugins_service.find_plugin(
             pipeline["extractor"], plugin_type=PluginType.EXTRACTORS
         )
-        plugin_def = self.plugin_discovery_service.get_definition(plugin)
 
-        return plugin_def.label
+        return plugin.label
 
     def pipeline_urls(self, pipeline) -> str:
         """
         Return external URLs to different point of interests for a Pipeline.
         """
 
-        plugin = self.config_service.find_plugin(
+        plugin = self.plugins_service.find_plugin(
             pipeline["extractor"], plugin_type=PluginType.EXTRACTORS
         )
-        plugin_def = self.plugin_discovery_service.get_definition(plugin)
 
         return {
             "log": url_for(
@@ -70,7 +63,7 @@ class NotificationEvents:
                 path=f"data/extract/{pipeline['extractor']}",
                 _external=True,
             ),
-            "docs": plugin_def.docs,
+            "docs": plugin.docs,
         }
 
     def handle_pipeline_completed(self, sender, success: bool = None):

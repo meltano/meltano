@@ -7,7 +7,7 @@ from .utils import CliError
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import invoker_factory, InvokerError
-from meltano.core.config_service import ConfigService
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.db import project_engine
 from meltano.core.error import SubprocessError
@@ -36,11 +36,11 @@ def invoke(project, plugin_type, dump, plugin_name, plugin_args):
     _, Session = project_engine(project)
     session = Session()
     try:
-        config_service = ConfigService(project)
-        plugin = config_service.find_plugin(
+        plugins_service = ProjectPluginsService(project)
+        plugin = plugins_service.find_plugin(
             plugin_name, plugin_type=plugin_type, invokable=True
         )
-        invoker = invoker_factory(project, plugin)
+        invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
         with invoker.prepared(session):
             if dump:
                 dump_file(invoker, dump)

@@ -366,7 +366,7 @@ class SingerTap(SingerPlugin):
     def catalog_cache_key(self, plugin_invoker):
         # If the extractor is installed as editable, don't cache because
         # the result of discovery could change at any time.
-        if plugin_invoker.plugin_def.pip_url.startswith("-e"):
+        if plugin_invoker.plugin.pip_url.startswith("-e"):
             return None
 
         extras = plugin_invoker.plugin_config_extras
