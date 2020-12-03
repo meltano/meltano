@@ -188,8 +188,6 @@ class PluginDefinition(PluginRef):
             variants=list(map(Variant.parse, variants)),
         )
 
-        self.use_variant(variant)
-
     def __iter__(self):
         for k, v in super().__iter__():
             if k == "variants" and len(v) == 1:
@@ -203,42 +201,26 @@ class PluginDefinition(PluginRef):
             else:
                 yield (k, v)
 
-    @property
-    def info(self):
-        return {
-            **super().info,
-            "namespace": self.namespace,
-            "variant": self.current_variant_name or Variant.ORIGINAL_NAME,
-        }
-
-    @property
-    def current_variant_name(self):
-        return self._current_variant_name
-
     def get_variant(self, variant_name: str) -> Variant:
         try:
             return find_named(self.variants, variant_name)
         except NotFound as err:
             raise VariantNotFoundError(self, variant_name) from err
 
-    def use_variant(self, variant_or_name: Union[str, Variant] = None):
+    def find_variant(self, variant_or_name: Union[str, Variant] = None):
         if variant_or_name is None:
-            variant = self.variants[0]
-        elif isinstance(variant_or_name, Variant):
-            variant = variant_or_name
-        elif variant_or_name == Variant.ORIGINAL_NAME:
+            return self.variants[0]
+
+        if isinstance(variant_or_name, Variant):
+            return variant_or_name
+
+        if variant_or_name == Variant.ORIGINAL_NAME:
             try:
-                variant = next(v for v in self.variants if v.original)
+                return next(v for v in self.variants if v.original)
             except StopIteration:
-                variant = self.variants[0]
-        else:
-            variant = self.get_variant(variant_or_name)
+                return self.variants[0]
 
-        self._current_variant_name = variant.name
-
-    @property
-    def current_variant(self):
-        return self.get_variant(self.current_variant_name)
+        return self.get_variant(variant_or_name)
 
     def list_variant_names(self):
         names = []
@@ -255,12 +237,29 @@ class PluginDefinition(PluginRef):
 
         return ", ".join(names)
 
-    @property
-    def all_extras(self):
-        return {**self.extras, **self.current_variant.extras}
+
+class BasePlugin(HookObject):
+    EXTRA_SETTINGS = []
+
+    def __init__(self, plugin_def: PluginDefinition, variant: Variant):
+        super().__init__()
+
+        self._plugin_def = plugin_def
+        self._variant = variant
+
+    def __iter__(self):
+        yield from self._plugin_def
 
     def __getattr__(self, attr):
         try:
-            return super().__getattr__(attr)
+            return getattr(self._plugin_def, attr)
         except AttributeError:
-            return getattr(self.current_variant, attr)
+            return getattr(self._variant, attr)
+
+    @property
+    def variant(self):
+        return self._variant.name or Variant.ORIGINAL_NAME
+
+    @property
+    def extras(self):
+        return {**self._plugin_def.extras, **self._variant.extras}

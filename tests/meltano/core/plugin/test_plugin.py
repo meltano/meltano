@@ -1,8 +1,10 @@
 import pytest
 from unittest import mock
 
-from meltano.core.plugin import PluginType, PluginDefinition, Variant
+from meltano.core.plugin import PluginType, PluginDefinition, Variant, BasePlugin
 from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.setting_definition import SettingDefinition
+from meltano.core.utils import find_named
 
 
 class TestPluginDefinition:
@@ -142,6 +144,39 @@ class TestPluginDefinition:
             plugin_def.list_variant_names()
             == "meltano (default), singer-io (deprecated)"
         )
+
+
+class TestBasePlugin:
+    @pytest.fixture
+    def plugin_def(self):
+        return PluginDefinition(
+            PluginType.EXTRACTORS, **TestPluginDefinition.ATTRS["variants"]
+        )
+
+    @pytest.fixture
+    def variant(self, plugin_def):
+        return plugin_def.find_variant()
+
+    @pytest.fixture
+    def subject(self, plugin_def, variant):
+        return BasePlugin(plugin_def, variant)
+
+    def test_getattr(self, subject, plugin_def, variant):
+        # Falls back to the plugin def
+        assert subject.name == plugin_def.name
+
+        # And the variant
+        assert subject.pip_url == variant.pip_url
+
+    def test_variant(self, subject, variant):
+        assert subject.variant == variant.name
+
+        # Unless variant has no name
+        variant.name = None
+        assert subject.variant == Variant.ORIGINAL_NAME
+
+    def test_extras(self, subject):
+        assert subject.extras == {"foo": "bar", "baz": "qux"}
 
 
 class TestProjectPlugin:
