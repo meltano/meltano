@@ -1,6 +1,7 @@
 import logging
 import yaml
 import fnmatch
+import re
 import copy
 from typing import Dict, Union
 from collections import namedtuple
@@ -103,20 +104,19 @@ class PluginRef(Canonical):
     def type(self):
         return self._type
 
-    @property
-    def info(self):
-        return {"name": self.name}
-
-    @property
-    def info_env(self):
-        # MELTANO_EXTRACTOR_...
-        return flatten({"meltano": {self.type.singular: self.info}}, "env_var")
-
     def __eq__(self, other):
         return self.name == other.name and self.type == other.type
 
     def __hash__(self):
         return hash((self.type, self.name))
+
+    def set_presentation_attrs(self, extras):
+        self.update(
+            hidden=extras.pop("hidden", None),
+            label=extras.pop("label", None),
+            logo_url=extras.pop("logo_url", None),
+            description=extras.pop("description", None),
+        )
 
 
 class Variant(NameEq, Canonical):
@@ -157,14 +157,20 @@ class PluginDefinition(PluginRef):
         plugin_type: PluginType,
         name: str,
         namespace: str,
-        hidden: Optional[bool] = None,
-        label: Optional[str] = None,
-        logo_url: Optional[str] = None,
-        description: Optional[str] = None,
         variant: Optional[str] = None,
         variants: Optional[list] = [],
         **extras,
     ):
+        super().__init__(plugin_type, name)
+
+        self._defaults["label"] = lambda p: p.name
+
+        def default_logo_url(p):
+            short_name = re.sub(r"^(tap|target)-", "", p.name)
+            return f"/static/logos/{short_name}-logo.png"
+
+        self._defaults["logo_url"] = default_logo_url
+
         if not variants:
             variant = Variant(variant, **extras)
 
@@ -175,18 +181,11 @@ class PluginDefinition(PluginRef):
 
             variants = [variant]
 
-        super().__init__(
-            plugin_type,
-            name,
-            # Attributes will be listed in meltano.yml in this order:
-            namespace=namespace,
-            hidden=hidden,
-            label=label,
-            logo_url=logo_url,
-            description=description,
-            extras=extras,
-            variants=list(map(Variant.parse, variants)),
-        )
+        # Attributes will be listed in meltano.yml in this order:
+        self.namespace = namespace
+        self.set_presentation_attrs(extras)
+        self.extras = extras
+        self.variants = list(map(Variant.parse, variants))
 
     def __iter__(self):
         for k, v in super().__iter__():

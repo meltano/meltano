@@ -33,11 +33,11 @@ class TestCliAdd:
             (
                 PluginType.ORCHESTRATORS,
                 "airflow",
-                None,
+                Variant.ORIGINAL_NAME,
                 [PluginRef(PluginType.FILES, "airflow")],
             ),
             # Installed automatically because of transform 'tap-carbon-intensity'
-            # (PluginType.TRANSFORMERS, "dbt", None, [PluginRef(PluginType.FILES, "dbt")]),
+            # (PluginType.TRANSFORMERS, "dbt", Variant.ORIGINAL_NAME, [PluginRef(PluginType.FILES, "dbt")]),
         ],
     )
     def test_add(

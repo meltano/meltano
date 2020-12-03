@@ -301,12 +301,11 @@ class PluginDiscoveryService(Versioned):
         if runner_ref:
             related_plugin_refs.append(runner_ref)
 
-        plugin_def = self.get_definition(target_plugin)
         related_plugin_refs.extend(
             related_plugin_def
             for plugin_type in plugin_types
             for related_plugin_def in self.get_plugins_of_type(plugin_type)
-            if related_plugin_def.namespace == plugin_def.namespace
+            if related_plugin_def.namespace == target_plugin.namespace
         )
 
         return related_plugin_refs
