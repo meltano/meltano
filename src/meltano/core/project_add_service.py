@@ -36,8 +36,17 @@ class ProjectAddService:
         plugin_def = self.discovery_service.find_definition(*args, **kwargs)
         return self.add_definition(plugin_def)
 
-    def add_definition(self, plugin_def: PluginDefinition, **kwargs) -> ProjectPlugin:
-        plugin = plugin_def.in_project(**kwargs)
+    def add_definition(self, plugin_def: PluginDefinition) -> ProjectPlugin:
+        plugin = ProjectPlugin(
+            plugin_def.type,
+            name=plugin_def.name,
+            variant=plugin_def.current_variant_name,
+            pip_url=plugin_def.pip_url,
+        )
+
+        return self.add_plugin(plugin)
+
+    def add_plugin(self, plugin: ProjectPlugin):
         return self.config_service.add_to_file(plugin)
 
     def add_related(self, *args, **kwargs):

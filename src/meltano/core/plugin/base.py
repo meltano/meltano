@@ -346,12 +346,3 @@ class PluginDefinition(Canonical, PluginRef):
             return super().__getattr__(attr)
         except AttributeError:
             return getattr(self.current_variant, attr)
-
-    def in_project(self, custom=False) -> ProjectPlugin:
-        return ProjectPlugin(
-            self.type,
-            self.name,
-            variant=self.current_variant_name,
-            pip_url=self.pip_url,
-            custom_definition=(self if custom else None),
-        )

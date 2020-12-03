@@ -142,36 +142,6 @@ class TestPluginDefinition:
             == "meltano (default), singer-io (deprecated)"
         )
 
-    def test_in_project(self):
-        plugin_def = PluginDefinition(PluginType.EXTRACTORS, **self.ATTRS["minimal"])
-        plugin = plugin_def.in_project()
-        assert plugin.type == plugin_def.type
-        assert plugin.name == plugin_def.name
-        assert plugin.variant is None
-        assert plugin.pip_url is None
-        assert not plugin.is_custom()
-
-        plugin_def = PluginDefinition(PluginType.EXTRACTORS, **self.ATTRS["basic"])
-        plugin = plugin_def.in_project()
-        assert plugin.variant == plugin_def.current_variant_name == "meltano"
-        assert plugin.pip_url == plugin_def.pip_url == "tap-example"
-        assert not plugin.is_custom()
-
-        plugin_def = PluginDefinition(PluginType.EXTRACTORS, **self.ATTRS["variants"])
-        plugin = plugin_def.in_project()
-        assert plugin.variant == plugin_def.current_variant_name == "meltano"
-        assert plugin.pip_url == plugin_def.pip_url == "meltano-tap-example"
-        assert not plugin.is_custom()
-
-        plugin = plugin_def.in_project(custom=True)
-        assert plugin.is_custom()
-        assert plugin.custom_definition == plugin_def
-
-        plugin_def.use_variant("singer-io")
-        plugin = plugin_def.in_project()
-        assert plugin.variant == plugin_def.current_variant_name == "singer-io"
-        assert plugin.pip_url == plugin_def.pip_url == "tap-example"
-
 
 class TestProjectPlugin:
     ATTRS = {
