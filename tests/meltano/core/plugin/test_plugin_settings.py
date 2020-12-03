@@ -450,7 +450,9 @@ class TestPluginSettingsService:
         subject.reset(store=store)
         assert not project.dotenv.exists()
 
-    def test_env_var_expansion(self, session, subject, project, tap, monkeypatch):
+    def test_env_var_expansion(
+        self, session, subject, project, tap, monkeypatch, env_var
+    ):
         monkeypatch.setenv("VAR", "hello world!")
         monkeypatch.setenv("FOO", "42")
 
@@ -459,7 +461,7 @@ class TestPluginSettingsService:
         dotenv.set_key(project.dotenv, "B", "paper")
         dotenv.set_key(project.dotenv, "C", "scissors")
 
-        config = {
+        yml_config = {
             "var": "$VAR",
             "foo": "${FOO}",
             "missing": "$MISSING",
@@ -468,7 +470,11 @@ class TestPluginSettingsService:
             "_extra": "$TAP_MOCK_MULTIPLE",
             "_extra_generic": "$MELTANO_EXTRACT_FOO",
         }
-        monkeypatch.setattr(subject.plugin, "config", config)
+        monkeypatch.setattr(subject.plugin, "config", yml_config)
+
+        # Env vars inside env var values do not get expanded
+        monkeypatch.setenv(env_var(subject, "test"), "$FOO")
+
         config = subject.as_dict(session=session)
 
         assert config["var"] == "hello world!"
@@ -480,6 +486,13 @@ class TestPluginSettingsService:
         # Values of extras can reference regular settings
         assert config["_extra"] == config["multiple"]
         assert config["_extra_generic"] == config["foo"]
+
+        # Env vars inside env var values do not get expanded
+        assert config["test"] == "$FOO"
+
+        # Expansion can be disabled
+        config = subject.as_dict(session=session, expand_env_vars=False)
+        assert {k: v for k, v in config.items() if k in yml_config} == yml_config
 
     def test_nested_keys(self, session, subject, project, tap):
         def set_config(path, value):

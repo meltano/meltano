@@ -202,6 +202,7 @@ def list_settings(ctx, extras):
         value = config_metadata["value"]
         source = config_metadata["source"]
         setting_def = config_metadata["setting"]
+        unexpanded_value = config_metadata.get("unexpanded_value")
 
         if extras:
             if not setting_def.is_extra:
@@ -229,17 +230,21 @@ def list_settings(ctx, extras):
         if source is SettingValueStore.DEFAULT:
             click.echo(f" current value: {current_value}", nl=False)
 
-            # The default value and the current value may not match
-            # if env vars have been expanded
-            if setting_def.value == value:
+            if not unexpanded_value or unexpanded_value == value:
                 click.echo(" (from default)")
             else:
-                click.echo(f" (from default: {setting_def.value!r})")
+                click.echo(f" (from default: {unexpanded_value!r})")
         else:
-            if setting_def.value is not None:
-                click.echo(f" (default: {setting_def.value!r})", nl=False)
+            default_value = setting_def.value
+            if default_value is not None:
+                click.echo(f" (default: {default_value!r})", nl=False)
 
-            click.echo(f" current value: {current_value} (from {source.label})")
+            click.echo(f" current value: {current_value}", nl=False)
+
+            if not unexpanded_value or unexpanded_value == value:
+                click.echo(f" (from {source.label})")
+            else:
+                click.echo(f" (from {source.label}: {unexpanded_value!r})")
 
         if setting_def.description:
             click.echo("\t", nl=False)
