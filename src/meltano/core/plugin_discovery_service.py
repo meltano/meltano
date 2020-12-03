@@ -16,7 +16,6 @@ from .behavior.canonical import Canonical
 from .config_service import ConfigService
 from .plugin import PluginDefinition, PluginType, PluginRef, Variant
 from .plugin.project_plugin import ProjectPlugin
-from .plugin.factory import plugin_factory
 
 
 class PluginNotFoundError(Exception):

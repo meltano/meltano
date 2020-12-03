@@ -21,8 +21,8 @@ from .logging.utils import OUTPUT_BUFFER_SIZE
 def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
     cls = PluginInvoker
 
-    if hasattr(plugin.__class__, "__invoker_cls__"):
-        cls = plugin.__class__.__invoker_cls__
+    if hasattr(plugin, "invoker_class"):
+        cls = plugin.invoker_class
 
     invoker = cls(project, plugin, *args, **kwargs)
 

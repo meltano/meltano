@@ -48,7 +48,7 @@ def print_added_plugin(project, plugin, plugin_def=None, related=False):
     if related:
         descriptor = f"related {descriptor}"
 
-    if plugin.should_add_to_file(project):
+    if plugin.should_add_to_file():
         click.secho(
             f"Added {descriptor} '{plugin.name}' to your Meltano project", fg="green"
         )

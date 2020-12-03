@@ -52,26 +52,6 @@ class ProjectPlugin(HookObject, PluginRef):
 
         self._flattened.add("custom_definition")
 
-    def is_installable(self):
-        return self.pip_url is not None
-
-    def is_invokable(self):
-        return self.is_installable()
-
-    def is_configurable(self):
-        return True
-
-    def should_add_to_file(self, project):
-        return True
-
-    @property
-    def runner(self):
-        return None
-
-    @property
-    def extra_settings(self):
-        return []
-
     @property
     def extra_config(self):
         return {f"_{k}": v for k, v in self.extras.items()}
@@ -93,18 +73,3 @@ class ProjectPlugin(HookObject, PluginRef):
 
     def is_custom(self):
         return self.custom_definition is not None
-
-    def exec_args(self, files: Dict):
-        return []
-
-    @property
-    def config_files(self):
-        """Return a list of stubbed files created for this plugin."""
-        return dict()
-
-    @property
-    def output_files(self):
-        return dict()
-
-    def process_config(self, config):
-        return config

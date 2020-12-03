@@ -1,8 +1,11 @@
 import logging
 
-from meltano.core.plugin import PluginType
+from meltano.core.plugin import PluginType, BasePlugin
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.plugin_install_service import (
+    PluginInstallService,
+    PluginInstallReason,
+)
 from meltano.core.behavior.hookable import hook
 from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParser,
@@ -206,23 +209,27 @@ class DashboardImporter(RecordImporter):
         )
 
 
-class DashboardPlugin(ProjectPlugin):
+class DashboardPlugin(BasePlugin):
     __plugin_type__ = PluginType.DASHBOARDS
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
-
     @hook("after_install")
-    def after_install(self, project, reason):
+    def after_install(
+        self,
+        installer: PluginInstallService,
+        plugin: ProjectPlugin,
+        reason: PluginInstallReason,
+    ):
+        project = installer.project
+
         if reason in (PluginInstallReason.ADD, PluginInstallReason.UPGRADE):
-            venv = VirtualEnv(project.plugin_dir(self, "venv"))
+            venv = VirtualEnv(project.plugin_dir(plugin, "venv"))
             packages_dir = venv.site_packages_dir
 
             ReportImporter(packages_dir, project).import_records()
             DashboardImporter(packages_dir, project).import_records()
         else:
             print(
-                f"Run `meltano add dashboard {self.name}` to re-add this dashboard to your project."
+                f"Run `meltano add dashboard {plugin.name}` to re-add this dashboard to your project."
             )
 
     def is_invokable(self):

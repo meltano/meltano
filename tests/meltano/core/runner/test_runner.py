@@ -9,7 +9,6 @@ from meltano.core.job import Job, State, Payload
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.plugin.factory import plugin_factory
 from meltano.core.plugin.singer import SingerTap, SingerTarget
 from meltano.core.runner.singer import SingerRunner, BookmarkWriter
 from meltano.core.logging.utils import capture_subprocess_output

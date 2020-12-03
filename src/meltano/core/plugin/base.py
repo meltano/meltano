@@ -263,3 +263,34 @@ class BasePlugin(HookObject):
     @property
     def extras(self):
         return {**self._plugin_def.extras, **self._variant.extras}
+
+    def is_installable(self):
+        return self.pip_url is not None
+
+    def is_invokable(self):
+        return self.is_installable()
+
+    def is_configurable(self):
+        return True
+
+    def should_add_to_file(self):
+        return True
+
+    @property
+    def runner(self):
+        return None
+
+    def exec_args(self, files: Dict):
+        return []
+
+    @property
+    def config_files(self):
+        """Return a list of stubbed files created for this plugin."""
+        return dict()
+
+    @property
+    def output_files(self):
+        return dict()
+
+    def process_config(self, config):
+        return config
