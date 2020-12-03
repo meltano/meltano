@@ -6,7 +6,8 @@ from datetime import date, datetime
 
 from meltano.core.config_service import PluginAlreadyAddedException
 from meltano.core.setting import Setting
-from meltano.core.plugin import PluginRef, PluginType, ProjectPlugin
+from meltano.core.plugin import PluginRef, PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import (
     PluginSettingsService,
     SettingValueStore,

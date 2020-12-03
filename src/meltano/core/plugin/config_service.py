@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Union
 
 from meltano.core.project import Project
-from meltano.core.plugin import ProjectPlugin
+from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
 class PluginConfigService:

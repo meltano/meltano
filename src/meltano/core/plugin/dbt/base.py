@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from meltano.core.plugin import ProjectPlugin, PluginRef, PluginType
+from meltano.core.plugin import PluginRef, PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.plugin_install_service import PluginInstallReason

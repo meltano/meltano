@@ -7,7 +7,8 @@ from typing import Optional
 from contextlib import contextmanager
 
 from .project import Project
-from .plugin import PluginRef, ProjectPlugin
+from .plugin import PluginRef
+from .plugin.project_plugin import ProjectPlugin
 from .plugin.error import PluginMissingError, PluginExecutionError
 from .plugin.config_service import PluginConfigService
 from .plugin.settings_service import PluginSettingsService

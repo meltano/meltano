@@ -4,7 +4,8 @@ import copy
 
 from typing import Iterable, List
 from meltano.core.schedule import Schedule
-from meltano.core.plugin import ProjectPlugin, PluginType
+from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.factory import plugin_factory
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior import NameEq

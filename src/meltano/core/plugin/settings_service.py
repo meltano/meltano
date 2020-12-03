@@ -10,7 +10,8 @@ from meltano.core.settings_service import (
     REDACTED_VALUE,
 )
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
-from meltano.core.plugin import PluginRef, PluginType, PluginDefinition, ProjectPlugin
+from meltano.core.plugin import PluginRef, PluginType, PluginDefinition
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.error import PluginMissingError
 
 

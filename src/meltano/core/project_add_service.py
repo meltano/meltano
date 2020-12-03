@@ -5,7 +5,8 @@ import logging
 from typing import List
 
 from .project import Project
-from .plugin import PluginType, PluginDefinition, ProjectPlugin, PluginRef
+from .plugin import PluginType, PluginDefinition, PluginRef
+from .plugin.project_plugin import ProjectPlugin
 from .plugin_discovery_service import PluginDiscoveryService
 from .plugin.factory import plugin_factory
 from .config_service import ConfigService, PluginAlreadyAddedException

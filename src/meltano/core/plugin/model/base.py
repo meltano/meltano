@@ -1,4 +1,5 @@
-from meltano.core.plugin import ProjectPlugin, PluginType
+from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
 class ModelPlugin(ProjectPlugin):

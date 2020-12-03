@@ -1,7 +1,8 @@
 import pytest
 from unittest import mock
 
-from meltano.core.plugin import PluginType, PluginDefinition, Variant, ProjectPlugin
+from meltano.core.plugin import PluginType, PluginDefinition, Variant
+from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
 class TestPluginDefinition:

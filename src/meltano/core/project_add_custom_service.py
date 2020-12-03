@@ -6,7 +6,8 @@ import click
 import re
 
 from .project import Project
-from .plugin import PluginType, ProjectPlugin
+from .plugin import PluginType
+from .plugin.project_plugin import ProjectPlugin
 from .project_add_service import ProjectAddService
 
 

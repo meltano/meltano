@@ -15,8 +15,8 @@ from meltano.core.plugin import (
     PluginDefinition,
     Variant,
     VariantNotFoundError,
-    ProjectPlugin,
 )
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import (
     DiscoveryFile,
     PluginDiscoveryService,

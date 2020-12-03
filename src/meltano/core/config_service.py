@@ -8,7 +8,8 @@ import meltano.core.bundle as bundle
 from meltano.core.utils import nest, NotFound
 from .project import Project
 from .setting_definition import SettingDefinition
-from .plugin import PluginDefinition, ProjectPlugin, PluginType, PluginRef
+from .plugin import PluginDefinition, PluginType, PluginRef
+from .plugin.project_plugin import ProjectPlugin
 from .plugin.factory import plugin_factory
 from .plugin.error import PluginMissingError
 

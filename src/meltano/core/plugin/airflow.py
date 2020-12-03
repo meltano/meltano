@@ -2,8 +2,9 @@ import configparser
 import logging
 import subprocess
 import os
-from . import ProjectPlugin, PluginType
 
+from . import PluginType
+from .project_plugin import ProjectPlugin
 from meltano.core.error import SubprocessError
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin_invoker import PluginInvoker

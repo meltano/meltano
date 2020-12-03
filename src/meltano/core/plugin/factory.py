@@ -1,7 +1,8 @@
 from typing import Dict
 import importlib
 
-from . import PluginType, ProjectPlugin
+from . import PluginType
+from .project_plugin import ProjectPlugin
 
 
 def plugin_factory(plugin_type: PluginType, raw_plugin: Dict) -> ProjectPlugin:

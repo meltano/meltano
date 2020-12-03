@@ -8,7 +8,8 @@ from .project import Project
 from .config_service import ConfigService
 from .plugin.settings_service import PluginSettingsService
 from .plugin_discovery_service import PluginDiscoveryService
-from .plugin import PluginDefinition, PluginType, ProjectPlugin
+from .plugin import PluginDefinition, PluginType
+from .plugin.project_plugin import ProjectPlugin
 from .db import project_engine
 
 
