@@ -63,30 +63,8 @@ class PluginSettingsService(SettingsService):
         return ".".join((self.plugin.type, self.plugin.name, "default"))
 
     @property
-    def extra_setting_definitions(self):
-        defaults = {f"_{k}": v for k, v in self.plugin_def.all_extras.items()}
-
-        existing_settings = []
-        for setting in self.plugin.extra_settings:
-            default_value = defaults.get(setting.name)
-            if default_value is not None:
-                setting = setting.with_attrs(value=default_value)
-
-            existing_settings.append(setting)
-
-        # Create setting definitions for unknown defaults,
-        # including flattened keys of default nested object items
-        existing_settings.extend(
-            SettingDefinition.from_missing(
-                existing_settings, defaults, custom=False, default=True
-            )
-        )
-
-        return existing_settings
-
-    @property
     def _definitions(self):
-        return [*self.plugin.settings, *self.extra_setting_definitions]
+        return self.plugin.settings_with_extras
 
     @property
     def _meltano_yml_config(self):

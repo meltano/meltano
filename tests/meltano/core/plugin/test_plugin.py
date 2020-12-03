@@ -180,6 +180,34 @@ class TestBasePlugin:
     def test_extras(self, subject):
         assert subject.extras == {"foo": "bar", "baz": "qux"}
 
+    def test_extra_settings(self, subject):
+        subject.EXTRA_SETTINGS = [
+            SettingDefinition(name="_foo", kind="password", value="default"),
+            SettingDefinition(name="_bar", kind="integer", value=0),
+        ]
+        settings = subject.extra_settings
+
+        # Known, overwritten in plugin/variant definition
+        foo_setting = find_named(settings, "_foo")
+        assert foo_setting
+        assert foo_setting.kind == "password"
+        assert foo_setting.value == "bar"
+        assert not foo_setting._custom
+
+        # Known, not overwritten
+        bar_setting = find_named(settings, "_bar")
+        assert bar_setting
+        assert bar_setting.kind == "integer"
+        assert bar_setting.value == 0
+        assert not bar_setting._custom
+
+        # Unknown, set in plugin/variant definition
+        baz_setting = find_named(settings, "_baz")
+        assert baz_setting
+        assert baz_setting.kind is None
+        assert baz_setting.value == "qux"
+        assert not baz_setting._custom
+
 
 class TestProjectPlugin:
     ATTRS = {
@@ -327,3 +355,33 @@ class TestProjectPlugin:
 
         assert plugin.config == {"foo": "BAR", "bar": "FOO"}
         assert plugin.extras == {"baz": "QUX", "qux": "BAZ"}
+
+    def test_settings(self, tap):
+        tap.config["custom"] = "from_meltano_yml"
+        tap.config["nested"] = {"custom": True}
+
+        settings_by_name = {s.name: s for s in tap.settings}
+
+        # Regular settings
+        assert "test" in settings_by_name
+        assert "start_date" in settings_by_name
+
+        # Custom settings
+        assert "custom" in settings_by_name
+        assert "nested.custom" in settings_by_name
+        assert settings_by_name["nested.custom"].kind == "boolean"
+
+    def test_extra_settings(self, tap):
+        tap.extras["custom"] = "from_meltano_yml"
+        tap.extras["nested"] = {"custom": True}
+
+        settings_by_name = {s.name: s for s in tap.extra_settings}
+
+        # Regular extras
+        assert "_select" in settings_by_name
+        assert "_catalog" in settings_by_name
+
+        # Custom extras
+        assert "_custom" in settings_by_name
+        assert "_nested.custom" in settings_by_name
+        assert settings_by_name["_nested.custom"].kind == "boolean"

@@ -3,6 +3,7 @@ import copy
 from typing import Optional
 
 from meltano.core.utils import flatten
+from meltano.core.setting_definition import SettingDefinition
 from .base import PluginRef, PluginType, PluginDefinition, Variant
 from .factory import base_plugin_factory
 
@@ -97,6 +98,26 @@ class ProjectPlugin(PluginRef):
                 self.extras[k[1:]] = v
             else:
                 self.config[k] = v
+
+    @property
+    def settings(self):
+        existing_settings = self._parent.settings
+        return [
+            *existing_settings,
+            *SettingDefinition.from_missing(existing_settings, self.config),
+        ]
+
+    @property
+    def extra_settings(self):
+        existing_settings = self._parent.extra_settings
+        return [
+            *existing_settings,
+            *SettingDefinition.from_missing(existing_settings, self.extra_config),
+        ]
+
+    @property
+    def settings_with_extras(self):
+        return [*self.settings, *self.extra_settings]
 
     def is_custom(self):
         return self.custom_definition is not None

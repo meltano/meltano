@@ -333,17 +333,9 @@ class SettingsService(ABC):
 
     def definitions(self, extras=None) -> Iterable[Dict]:
         if self._setting_defs is None:
-            setting_defs = [
+            self._setting_defs = [
                 s for s in self._definitions if s.kind != "hidden" or self.show_hidden
             ]
-
-            setting_defs.extend(
-                SettingDefinition.from_missing(
-                    self._definitions, self.flat_meltano_yml_config
-                )
-            )
-
-            self._setting_defs = setting_defs
 
         if extras is not None:
             return [

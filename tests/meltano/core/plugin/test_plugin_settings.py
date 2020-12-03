@@ -172,14 +172,8 @@ class TestPluginSettingsService:
         )
 
     def test_definitions(self, subject, monkeypatch):
-        variant = subject.plugin.parent._variant
-        monkeypatch.setitem(variant.extras, "select", ["from_default"])
-        monkeypatch.setitem(variant.extras, "vars", {"foo": True})
         subject.show_hidden = False
         subject._setting_defs = None
-
-        subject.set("custom", "from_meltano_yml")
-        subject.set("nested.custom", True)
 
         setting_defs_by_name = {s.name: s for s in subject.definitions()}
 
@@ -189,20 +183,6 @@ class TestPluginSettingsService:
 
         # Expect hidden
         assert "secret" not in setting_defs_by_name
-
-        # Extras
-        assert "_select" in setting_defs_by_name
-        assert setting_defs_by_name["_select"].value == ["from_default"]
-
-        # Custom settings
-        assert "custom" in setting_defs_by_name
-        assert "nested.custom" in setting_defs_by_name
-        assert setting_defs_by_name["nested.custom"].kind == "boolean"
-
-        # Unknown extras
-        assert "_vars.foo" in setting_defs_by_name
-        assert setting_defs_by_name["_vars.foo"].value == True
-        assert setting_defs_by_name["_vars.foo"].kind == "boolean"
 
     def test_as_dict(self, subject, session, tap):
         EXPECTED = {"test": "mock", "start_date": None, "secure": None}

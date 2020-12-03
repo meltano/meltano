@@ -263,6 +263,28 @@ class BasePlugin(HookObject):
     def extras(self):
         return {**self._plugin_def.extras, **self._variant.extras}
 
+    @property
+    def extra_settings(self):
+        defaults = {f"_{k}": v for k, v in self.extras.items()}
+
+        existing_settings = []
+        for setting in self.EXTRA_SETTINGS:
+            default_value = defaults.get(setting.name)
+            if default_value is not None:
+                setting = setting.with_attrs(value=default_value)
+
+            existing_settings.append(setting)
+
+        # Create setting definitions for unknown defaults,
+        # including flattened keys of default nested object items
+        existing_settings.extend(
+            SettingDefinition.from_missing(
+                existing_settings, defaults, custom=False, default=True
+            )
+        )
+
+        return existing_settings
+
     def is_installable(self):
         return self.pip_url is not None
 
