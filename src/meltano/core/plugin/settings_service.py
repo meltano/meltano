@@ -101,23 +101,10 @@ class PluginSettingsService(SettingsService):
 
     @property
     def _meltano_yml_config(self):
-        return {
-            **self.plugin.config,
-            **{f"_{k}": v for k, v in self.plugin.extras.items()},
-        }
+        return self.plugin.config_with_extras
 
     def _update_meltano_yml_config(self, config_with_extras):
-        config = self.plugin.config
-        extras = self.plugin.extras
-
-        config.clear()
-        extras.clear()
-
-        for k, v in config_with_extras.items():
-            if k.startswith("_"):
-                extras[k[1:]] = v
-            else:
-                config[k] = v
+        self.plugin.config_with_extras = config_with_extras
 
         self.config_service.update_plugin(self.plugin)
 

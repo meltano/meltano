@@ -222,3 +222,22 @@ class TestProjectPlugin:
         attrs = self.ATTRS[attrs_key]
         plugin = ProjectPlugin(PluginType.EXTRACTORS, **attrs)
         assert plugin.canonical() == attrs
+
+    def test_config_with_extras(self):
+        plugin = ProjectPlugin(PluginType.EXTRACTORS, **self.ATTRS["basic"])
+
+        # It reads by combining config with extras (prefixed with _)
+        config_with_extras = plugin.config_with_extras
+        assert config_with_extras == {"foo": "bar", "_baz": "qux"}
+
+        config_with_extras["foo"] = "BAR"
+        config_with_extras["_baz"] = "QUX"
+
+        config_with_extras["bar"] = "FOO"
+        config_with_extras["_qux"] = "BAZ"
+
+        # It writes by splitting based on the _ prefix and writing config and extras
+        plugin.config_with_extras = config_with_extras
+
+        assert plugin.config == {"foo": "BAR", "bar": "FOO"}
+        assert plugin.extras == {"baz": "QUX", "qux": "BAZ"}

@@ -73,6 +73,25 @@ class ProjectPlugin(HookObject, Canonical, PluginRef):
     def extra_settings(self):
         return []
 
+    @property
+    def extra_config(self):
+        return {f"_{k}": v for k, v in self.extras.items()}
+
+    @property
+    def config_with_extras(self):
+        return {**self.config, **self.extra_config}
+
+    @config_with_extras.setter
+    def config_with_extras(self, new_config_with_extras):
+        self.config.clear()
+        self.extras.clear()
+
+        for k, v in new_config_with_extras.items():
+            if k.startswith("_"):
+                self.extras[k[1:]] = v
+            else:
+                self.config[k] = v
+
     def is_custom(self):
         return self.custom_definition is not None
 
