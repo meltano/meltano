@@ -52,7 +52,10 @@ class PluginSettingsService(SettingsService):
         return self.plugin.docs
 
     def setting_env_vars(self, setting_def, for_writing=False):
-        return setting_def.env_vars(self.plugin.env_prefixes(for_writing=for_writing))
+        return setting_def.env_vars(
+            self.plugin.env_prefixes(for_writing=for_writing),
+            include_custom=self.plugin.is_shadowing or for_writing,
+        )
 
     @property
     def _db_namespace(self):

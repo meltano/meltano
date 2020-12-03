@@ -336,6 +336,63 @@ class TestPluginSettingsService:
             == "custom_env"
         )
 
+    def test_setting_env_vars(
+        self, tap, inherited_tap, alternative_target, plugin_settings_service_factory
+    ):
+        def env_vars(service, setting_name, **kwargs):
+            return [
+                s.definition
+                for s in service.setting_env_vars(
+                    service.find_setting(setting_name), **kwargs
+                )
+            ]
+
+        # Shadowing base plugin
+        service = plugin_settings_service_factory(tap)
+        # For reading setting values from environment
+        assert env_vars(service, "boolean") == [
+            "TAP_MOCK_BOOLEAN",  # Name and namespace prefix
+            "TAP_MOCK_ENABLED",  # Custom alias
+            "!TAP_MOCK_DISABLED",  # Custom alias
+        ]
+        # For writing values into the execution environment
+        assert env_vars(service, "boolean", for_writing=True) == [
+            "TAP_MOCK_BOOLEAN",  # Name and namespace prefix
+            "MELTANO_EXTRACT_BOOLEAN",  # Generic prefix
+            "TAP_MOCK_ENABLED",  # Custom alias
+            "!TAP_MOCK_DISABLED",  # Custom alias
+        ]
+
+        # Inheriting from base plugin
+        service = plugin_settings_service_factory(alternative_target)
+        # For reading setting values from environment
+        assert env_vars(service, "schema") == [
+            "TARGET_MOCK_ALTERNATIVE_SCHEMA"  # Name and namespace prefix
+        ]
+        # For writing values into the execution environment
+        assert env_vars(service, "schema", for_writing=True) == [
+            "MOCKED_SCHEMA",  # Custom `env`
+            "TARGET_MOCK_ALTERNATIVE_SCHEMA",  # Name and namespace prefix
+            "TARGET_MOCK_SCHEMA",  # Parent name  prefix
+            "MOCK_SCHEMA",  # Parent namespace prefix
+            "MELTANO_LOAD_SCHEMA",  # Generic prefix
+        ]
+
+        # Inheriting from project plugin
+        service = plugin_settings_service_factory(inherited_tap)
+        # For reading setting values from environment
+        assert env_vars(service, "boolean") == [
+            "TAP_MOCK_INHERITED_BOOLEAN"  # Name and namespace prefix
+        ]
+        # For writing values into the execution environment
+        assert env_vars(service, "boolean", for_writing=True) == [
+            "TAP_MOCK_INHERITED_BOOLEAN",  # Name and namespace prefix
+            "TAP_MOCK_BOOLEAN",  # Parent name and namespace prefix
+            "MELTANO_EXTRACT_BOOLEAN",  # Generic prefix
+            "TAP_MOCK_ENABLED",  # Custom alias
+            "!TAP_MOCK_DISABLED",  # Custom alias
+        ]
+
     def test_store_db(self, session, subject, tap):
         store = SettingValueStore.DB
 
