@@ -14,7 +14,7 @@ class AirflowInvoker(PluginInvoker):
     def env(self):
         env = super().env()
 
-        env["AIRFLOW_HOME"] = str(self.config_service.run_dir)
+        env["AIRFLOW_HOME"] = str(self.plugin_config_service.run_dir)
         env["AIRFLOW_CONFIG"] = str(self.files["config"])
 
         return env
