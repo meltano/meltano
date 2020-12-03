@@ -133,13 +133,9 @@ class PluginInvoker:
         finally:
             self.cleanup()
 
-    @property
-    def executable(self):
-        return self.plugin.executable or self.plugin.name
-
     def exec_path(self):
         return self.venv_service.exec_path(
-            self.executable, name=self.plugin.name, namespace=self.plugin.type
+            self.plugin.executable, name=self.plugin.name, namespace=self.plugin.type
         )
 
     def exec_args(self, *args):
@@ -180,7 +176,9 @@ class PluginInvoker:
             try:
                 yield (popen_args, popen_options, popen_env)
             except FileNotFoundError as err:
-                raise ExecutableNotFoundError(self.plugin, self.executable) from err
+                raise ExecutableNotFoundError(
+                    self.plugin, self.plugin.executable
+                ) from err
 
     def invoke(self, *args, **kwargs):
         with self._invoke(*args, **kwargs) as (popen_args, popen_options, popen_env):

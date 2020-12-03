@@ -260,6 +260,10 @@ class BasePlugin(HookObject):
         return self._variant.name or Variant.ORIGINAL_NAME
 
     @property
+    def executable(self):
+        return self._variant.executable or self._plugin_def.name
+
+    @property
     def extras(self):
         return {**self._plugin_def.extras, **self._variant.extras}
 
