@@ -43,6 +43,9 @@ class Canonical(object):
     def canonical(self):
         return Canonical.as_canonical(self)
 
+    def with_attrs(self, *args, **kwargs):
+        return self.__class__(**{**self.canonical(), **kwargs})
+
     @classmethod
     def parse(cls, obj) -> "Canonical":
         if obj is None:

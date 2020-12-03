@@ -54,3 +54,16 @@ class TestCanonical:
     def test_update_kwargs(self, subject):
         subject.update(test="value")
         assert subject.test == "value"
+
+    def test_with_attrs(self, subject):
+        subject.test = "value"
+
+        assert subject.with_attrs().canonical() == subject.canonical()
+
+        new = subject.with_attrs(test="other_value")
+        assert new.test == "other_value"
+        assert new.canonical() == {**subject.canonical(), "test": "other_value"}
+
+        new = subject.with_attrs(new_test="new_value")
+        assert new.new_test == "new_value"
+        assert new.canonical() == {**subject.canonical(), "new_test": "new_value"}
