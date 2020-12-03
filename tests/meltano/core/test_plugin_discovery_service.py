@@ -84,11 +84,6 @@ class TestPluginDiscoveryService:
         plugins = list(subject.plugins())
         assert len(plugins) >= 6
 
-    def test_plugins_custom(self, subject, tap_covid_19):
-        plugins = list(subject.plugins())
-
-        assert tap_covid_19 in plugins
-
     def test_find_definition(self, subject):
         # If no variant is specified,
         # defaults to the first variant

@@ -13,7 +13,6 @@ from .project_settings_service import ProjectSettingsService
 from .setting_definition import SettingDefinition
 from .behavior.versioned import Versioned, IncompatibleVersionError
 from .behavior.canonical import Canonical
-from .config_service import ConfigService
 from .plugin import PluginDefinition, PluginType, PluginRef, Variant
 from .plugin.project_plugin import ProjectPlugin
 
@@ -64,14 +63,8 @@ class DiscoveryFile(Canonical):
 class PluginDiscoveryService(Versioned):
     __version__ = VERSION
 
-    def __init__(
-        self,
-        project,
-        config_service: ConfigService = None,
-        discovery: Optional[Dict] = None,
-    ):
+    def __init__(self, project, discovery: Optional[Dict] = None):
         self.project = project
-        self.config_service = config_service or ConfigService(project)
 
         self._discovery_version = None
         self._discovery = None
@@ -216,20 +209,8 @@ class PluginDiscoveryService(Versioned):
     def cached_discovery_file(self):
         return self.project.meltano_dir("cache", "discovery.yml")
 
-    def get_discovery_plugins_of_type(self, plugin_type):
-        return self.discovery[plugin_type]
-
-    def get_custom_plugins_of_type(self, plugin_type):
-        return [
-            project_plugin.custom_definition
-            for project_plugin in self.config_service.get_plugins_of_type(plugin_type)
-            if project_plugin.is_custom()
-        ]
-
     def get_plugins_of_type(self, plugin_type):
-        return self.get_custom_plugins_of_type(
-            plugin_type
-        ) + self.get_discovery_plugins_of_type(plugin_type)
+        return self.discovery[plugin_type]
 
     def plugins_by_type(self):
         return {
