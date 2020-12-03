@@ -41,6 +41,8 @@ class PluginSettingsService(SettingsService):
             **self.plugin.info_env,
         }
 
+        self.__inherited_settings_service = None
+
     @property
     def label(self):
         return f"{self.plugin.type.descriptor} '{self.plugin.name}'"
@@ -68,6 +70,21 @@ class PluginSettingsService(SettingsService):
     def _update_meltano_yml_config(self, config_with_extras):
         self.plugin.config_with_extras = config_with_extras
         self.plugins_service.update_plugin(self.plugin)
+
+    @property
+    def _inherited_settings_service(self):
+        parent_plugin = self.plugin.parent
+        if not isinstance(parent_plugin, ProjectPlugin):
+            return
+
+        if self.__inherited_settings_service is None:
+            self.__inherited_settings_service = self.__class__(
+                self.project,
+                parent_plugin,
+                env_override=self.env_override,
+                plugins_service=self.plugins_service,
+            )
+        return self.__inherited_settings_service
 
     def _process_config(self, config):
         return self.plugin.process_config(config)

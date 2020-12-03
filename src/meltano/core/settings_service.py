@@ -57,6 +57,10 @@ class SettingsService(ABC):
         pass
 
     @property
+    def _inherited_settings_service(self):
+        pass
+
+    @property
     @abstractmethod
     def _meltano_yml_config(self) -> Dict:
         pass

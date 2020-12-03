@@ -52,12 +52,7 @@ def custom_tap(project_add_service):
 
 
 @pytest.fixture
-def subject(session, project_add_service, tap, plugin_settings_service_factory):
-    try:
-        project_add_service.add("extractors", tap.name)
-    except PluginAlreadyAddedException:
-        pass
-
+def subject(tap, plugin_settings_service_factory):
     return plugin_settings_service_factory(tap)
 
 
@@ -65,18 +60,27 @@ class TestPluginSettingsService:
     def test_get_with_source(
         self,
         session,
-        subject,
-        project,
         tap,
+        inherited_tap,
         env_var,
         monkeypatch,
-        config_service,
         plugin_settings_service_factory,
     ):
+        subject = plugin_settings_service_factory(inherited_tap)
+
         # returns the default value when unset
         assert subject.get_with_source("test", session=session) == (
             "mock",
             SettingValueStore.DEFAULT,
+        )
+
+        # returns the inherited value when set
+        parent_subject = plugin_settings_service_factory(tap)
+        monkeypatch.setenv(env_var(parent_subject, "test"), "INHERITED")
+
+        assert subject.get_with_source("test", session=session) == (
+            "INHERITED",
+            SettingValueStore.INHERITED,
         )
 
         # overriden by an Setting db value when set
@@ -116,6 +120,7 @@ class TestPluginSettingsService:
             SettingValueStore.CONFIG_OVERRIDE,
         )
 
+    def test_get_with_source_casting(self, session, subject, env_var, monkeypatch):
         # Verify that integer settings set in env are cast correctly
         monkeypatch.setenv(env_var(subject, "port"), "3333")
 
