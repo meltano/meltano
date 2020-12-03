@@ -67,3 +67,20 @@ class TestCanonical:
         new = subject.with_attrs(new_test="new_value")
         assert new.new_test == "new_value"
         assert new.canonical() == {**subject.canonical(), "new_test": "new_value"}
+
+    def test_defaults(self, subject):
+        subject.test = None
+
+        assert subject.test is None
+
+        subject._defaults["test"] = lambda _: "default"
+
+        # Default values show up when getting an attr
+        assert subject.test == "default"
+        # But they're not included in the canonical representation
+        assert "test" not in subject.canonical()
+
+        subject.test = "changed"
+
+        assert subject.test == "changed"
+        assert subject.canonical()["test"] == "changed"

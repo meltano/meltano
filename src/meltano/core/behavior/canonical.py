@@ -29,6 +29,8 @@ class Canonical(object):
         self._verbatim = set()
         self._flattened = {"extras"}
 
+        self._defaults = {}
+
     @classmethod
     def as_canonical(cls, target):
         if isinstance(target, Canonical):
@@ -63,6 +65,12 @@ class Canonical(object):
             value = self._dict[attr]
         except KeyError as err:
             raise AttributeError(attr) from err
+
+        if value is not None:
+            return value
+
+        if attr in self._defaults:
+            value = self._defaults[attr](self)
 
         return value
 
