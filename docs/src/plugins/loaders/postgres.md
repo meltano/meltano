@@ -126,7 +126,7 @@ meltano config target-postgres set postgres_port 5502
 export TARGET_POSTGRES_PORT=5502
 ```
 
-### Posrgres Database
+### Postgres Database
 
 - Name: `postgres_database`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_POSTGRES_DATABASE`, alias: `TARGET_POSTGRES_POSTGRES_DATABASE`, `PG_DATABASE`
