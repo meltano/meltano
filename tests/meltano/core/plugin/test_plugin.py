@@ -337,6 +337,17 @@ class TestProjectPlugin:
 
         assert plugin.variant == base_plugin.variant == "meltano"
 
+    def test_env_prefixes(self):
+        plugin = ProjectPlugin(
+            PluginType.EXTRACTORS, name="tap-mock", namespace="tap_mock"
+        )
+        assert plugin.env_prefixes() == ["tap-mock", "tap_mock"]
+        assert plugin.env_prefixes(for_writing=True) == [
+            "tap-mock",
+            "tap_mock",
+            "meltano_extract",
+        ]
+
     def test_config_with_extras(self):
         plugin = ProjectPlugin(PluginType.EXTRACTORS, **self.ATTRS["basic"])
 

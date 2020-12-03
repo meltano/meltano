@@ -46,13 +46,8 @@ class SettingsService(ABC):
         pass
 
     @property
-    @abstractmethod
     def _env_prefixes(self) -> [str]:
-        pass
-
-    @property
-    def _generic_env_prefix(self) -> str:
-        return None
+        return []
 
     @property
     @abstractmethod
@@ -155,7 +150,7 @@ class SettingsService(ABC):
             setting_def = config["setting"]
             value = setting_def.stringify_value(value)
 
-            for env_var in self.setting_env_vars(setting_def, include_generic=True):
+            for env_var in self.setting_env_vars(setting_def, for_writing=True):
                 if env_var.negated:
                     continue
 
@@ -355,12 +350,8 @@ class SettingsService(ABC):
         except StopIteration as err:
             raise SettingMissingError(name) from err
 
-    def setting_env_vars(self, setting_def, include_generic=False):
-        prefixes = self._env_prefixes.copy()
-        if include_generic and self._generic_env_prefix:
-            prefixes.append(self._generic_env_prefix)
-
-        return setting_def.env_vars(prefixes)
+    def setting_env_vars(self, setting_def, for_writing=False):
+        return setting_def.env_vars(self._env_prefixes)
 
     def setting_env(self, setting_def):
         return self.setting_env_vars(setting_def)[0].key

@@ -49,13 +49,8 @@ class PluginSettingsService(SettingsService):
     def docs_url(self):
         return self.plugin.docs
 
-    @property
-    def _env_prefixes(self):
-        return [self.plugin.name, self.plugin.namespace]
-
-    @property
-    def _generic_env_prefix(self):
-        return f"meltano_{self.plugin.type.verb}"
+    def setting_env_vars(self, setting_def, for_writing=False):
+        return setting_def.env_vars(self.plugin.env_prefixes(for_writing=for_writing))
 
     @property
     def _db_namespace(self):

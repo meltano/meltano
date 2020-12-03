@@ -2,7 +2,7 @@ import logging
 import copy
 from typing import Optional
 
-from meltano.core.utils import flatten
+from meltano.core.utils import flatten, uniques_in
 from meltano.core.setting_definition import SettingDefinition
 from .base import PluginRef, PluginType, PluginDefinition, Variant
 from .factory import base_plugin_factory
@@ -79,6 +79,14 @@ class ProjectPlugin(PluginRef):
     def info_env(self):
         # MELTANO_EXTRACTOR_...
         return flatten({"meltano": {self.type.singular: self.info}}, "env_var")
+
+    def env_prefixes(self, for_writing=False):
+        prefixes = [self.name, self.namespace]
+
+        if for_writing:
+            prefixes.append(f"meltano_{self.type.verb}"),  # MELTANO_EXTRACT_...
+
+        return uniques_in(prefixes)
 
     @property
     def extra_config(self):
