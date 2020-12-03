@@ -40,30 +40,9 @@ class ProjectAddService:
         plugin = plugin_def.in_project(**kwargs)
         return self.config_service.add_to_file(plugin)
 
-    def add_related(
-        self,
-        target_plugin: ProjectPlugin,
-        plugin_types: List[PluginType] = list(PluginType),
-    ):
-        try:
-            plugin_types.remove(target_plugin.type)
-        except ValueError:
-            pass
-
-        related_plugin_refs = []
-
-        runner_ref = target_plugin.runner
-        if runner_ref:
-            related_plugin_refs.append(runner_ref)
-
-        plugin_def = self.discovery_service.get_definition(target_plugin)
-        related_plugin_refs.extend(
-            related_plugin_def
-            for plugin_type in plugin_types
-            for related_plugin_def in self.discovery_service.get_plugins_of_type(
-                plugin_type
-            )
-            if related_plugin_def.namespace == plugin_def.namespace
+    def add_related(self, *args, **kwargs):
+        related_plugin_refs = self.discovery_service.find_related_plugin_refs(
+            *args, **kwargs
         )
 
         added_plugins = []
@@ -78,7 +57,7 @@ class ProjectAddService:
         added_plugins_with_related = []
         for plugin in added_plugins:
             added_plugins_with_related.extend(
-                [plugin, *self.add_related(plugin, plugin_types=plugin_types)]
+                [plugin, *self.add_related(plugin, **kwargs)]
             )
 
         return added_plugins_with_related
