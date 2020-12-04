@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2471](https://gitlab.com/meltano/meltano/-/issues/2471) Make tap-bigquery discoverable
+
 ### Changes
 
 ### Fixes
