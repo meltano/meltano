@@ -1,4 +1,3 @@
-from copy import deepcopy
 from typing import Iterable, Dict, List
 
 from meltano.core.project import Project
@@ -74,26 +73,25 @@ class PluginSettingsService(SettingsService):
 
     @property
     def extra_setting_definitions(self):
-        extra_settings = deepcopy(self.plugin.extra_settings)
-
-        # Set defaults from plugin definition
         defaults = {f"_{k}": v for k, v in self.plugin_def.all_extras.items()}
 
-        if defaults:
-            for setting in extra_settings:
-                default_value = defaults.get(setting.name)
-                if default_value is not None:
-                    setting.value = default_value
+        existing_settings = []
+        for setting in self.plugin.extra_settings:
+            default_value = defaults.get(setting.name)
+            if default_value is not None:
+                setting = setting.with_attrs(value=default_value)
 
-            # Create setting definitions for unknown defaults,
-            # including flattened keys of default nested object items
-            extra_settings.extend(
-                SettingDefinition.from_missing(
-                    extra_settings, defaults, custom=False, default=True
-                )
+            existing_settings.append(setting)
+
+        # Create setting definitions for unknown defaults,
+        # including flattened keys of default nested object items
+        existing_settings.extend(
+            SettingDefinition.from_missing(
+                existing_settings, defaults, custom=False, default=True
             )
+        )
 
-        return extra_settings
+        return existing_settings
 
     @property
     def _definitions(self):
