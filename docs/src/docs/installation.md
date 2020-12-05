@@ -50,9 +50,6 @@ python3 --version
   executable python tools (such as Meltano) into their own virtual environments.
 
 ```bash
-# update pip to latest version
-python3 -m pip install --upgrade pip
-
 # install pipx and ensure it is on the path
 python3 -m pip install --user pipx
 pipx ensurepath
@@ -66,9 +63,9 @@ difficult to manage. The pipx installer automatically creates a virtual environm
 
 :::
 
-## Install Meltano
+### Install Meltano
 
-Now that you have pipx installed, run the following command to install the Meltano package into its
+Now that you have [pipx](https://pipxproject.github.io/pipx) installed, run the following command to install the Meltano package into its
 own pipx-backed virtual environment:
 
 ```bash
@@ -84,7 +81,7 @@ meltano --version
 ### Troubleshooting
 
 - _If you have difficulty with pipx or if you prefer to create a custom virtual environment, see
-  our instructions [here](installation_to_venv.md)._
+  our instructions [here](#install-meltano-into-virtualenv)._
 
 ### Next Steps
 
