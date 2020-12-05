@@ -67,12 +67,13 @@ python3 --version
 mkdir meltano-projects
 cd meltano-projects
 
-# Create and activate virtual environment
-python3 -m venv .venv
-source .venv/bin/activate
+
+# Install pipx package manager
+python3 -m pip install --user pipx
+pipx ensurepath
 
 # Install Meltano
-pip3 install meltano
+pipx install meltano --include-deps
 ```
 
 Meltano is now ready for its [first project](/#meltano-init)!

@@ -40,7 +40,7 @@ You may refer to [https://realpython.com/installing-python/](https://realpython.
 Use the following command to check that you have the correct Python version installed:
 
 ```bash
-python --version
+python3 --version
 ```
 
 #### pip3 and pipx
@@ -50,22 +50,21 @@ python --version
   executable python tools (such as Meltano) into their own virtual environments.
 
 ```bash
-# check for current version of pip to ensure that it is using Python 3
-pip3 --version
-
-# update pip3
-pip3 install --upgrade pip
+# update pip to latest version
+python3 -m pip install --upgrade pip
 
 # install pipx and ensure it is on the path
-pip3 install pipx
+python3 -m pip install --user pipx
 pipx ensurepath
 ```
 
-_**Why use pipx and virtual environments?**_
+::: tip Why use pipx and virtual environments?
 
 _Your local environment may use a different version of Python or other dependencies that are
 difficult to manage. The pipx installer automatically creates a virtual environment and provides a
 "clean" isolated space without version conflicts or other compatibility issues._
+
+:::
 
 ## Install Meltano
 
@@ -82,7 +81,7 @@ Once the installation completes, you can check if it was successful by running:
 meltano --version
 ```
 
-_**Troubleshooting:**_
+### Troubleshooting
 
 - _If you have difficulty with pipx or if you prefer to create a custom virtual environment, see
   our instructions [here](installation_to_venv.md)._
@@ -149,6 +148,66 @@ You can now visit [http://localhost:5000](http://localhost:5000) to access the M
 Now that you're successfully running Meltano, you can continue setting up your Meltano project by following the [Getting Started guide](/docs/getting-started.html).
 
 Note that wherever you are asked to run the `meltano` command, you will want to run it through `docker run` as in the snippet above.
+
+## VirtualEnv-Based Install
+
+If not using [pipx](https://pipxproject.github.io/), we strongly suggest you create a directory
+where you want your virtual environments to be saved (e.g. `.venv/`). This can be any directory in
+your environment, but we recommend saving it in your Meltano project to make it easier to keep
+track of.
+
+Then create a new virtual environment inside that directory:
+
+```bash
+mkdir .venv
+python -m venv .venv/meltano
+```
+
+### Activating Your Virtual Environment
+
+Activate the virtual environment using:
+
+```bash
+source .venv/meltano/bin/activate
+```
+
+If the virtual environment was activated successfully, you'll see a `(meltano)` indicator added to
+your prompt.
+
+::: tip
+Once a virtual environment is activated, it stays active until the current shell is closed. In a new
+shell, you must re-activate the virtual environment before interacting with the `meltano` command
+that will be installed in the next step.
+
+To streamline this process, you can define a [shell alias](https://shapeshed.com/unix-alias/)
+that'll be easier to remember than the entire activation invocation:
+
+```bash
+# add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
+alias meltano!="source $MELTANO_PROJECT_PATH/.venv/meltano/bin/activate"
+
+# use as follows, after creating a new shell:
+meltano!
+```
+
+You can deactivate a virtual environment by typing `deactivate` in your shell.
+
+:::
+
+### Install Meltano into VirtualEnv
+
+Now that you have your virtual environment set up and running, run the following command to install
+the Meltano package:
+
+```bash
+pip3 install meltano
+```
+
+Once the installation completes, you can check if it was successful by running:
+
+```bash
+meltano --version
+```
 
 ## Troubleshooting Installation
 
