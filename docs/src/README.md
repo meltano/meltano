@@ -67,10 +67,10 @@ python3 --version
 mkdir meltano-projects
 cd meltano-projects
 
-
 # Install pipx package manager
 python3 -m pip install --user pipx
 pipx ensurepath
+
 
 # Install Meltano
 pipx install meltano --include-deps
