@@ -41,6 +41,5 @@ def main():
                 f"The requested action could not be completed: {err}"
             ) from err
     except CliError as err:
-        logger.debug(str(err), exc_info=True)
-        click.secho(str(err), fg="red")
+        err.print()
         sys.exit(1)
