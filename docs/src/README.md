@@ -111,11 +111,7 @@ meltano init demo-project
 Your Meltano project has now been initialized in the `demo-project` directory!
 
 ```bash
-# Before using a `meltano` command, ensure that:
-# - you have navigated to your Meltano project
 cd demo-project
-# - you have activated the virtual environment
-source ../.venv/bin/activate
 ```
 
 Your Meltano project is now ready for [integration](/#integration), [transformation](/#transformation), and [orchestration](/#orchestration)!
