@@ -6,10 +6,7 @@ WORKDIR /meltano
 # building the code
 COPY . .
 
-# this enables the build process to have access to local
-# `meltano` module
-ENV PYTHONPATH=src/
-RUN make sdist
+RUN poetry install && make sdist
 
 FROM $BASE_IMAGE as runtime
 # grab the built package
@@ -27,5 +24,5 @@ WORKDIR /project
 # meltano ui
 EXPOSE 5000
 
-ENTRYPOINT ["meltano"]
+ENTRYPOINT ["poetry run meltano"]
 CMD ["ui"]

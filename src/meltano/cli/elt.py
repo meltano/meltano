@@ -236,7 +236,11 @@ async def redirect_output(output_logger):
 
     with meltano_stdout.redirect_logging(ignore_errors=(CliError,)):
         async with meltano_stdout.redirect_stdout(), meltano_stderr.redirect_stderr():
-            yield
+            try:
+                yield
+            except CliError as err:
+                err.print()
+                raise
 
 
 async def run_elt(project, context_builder, output_logger):

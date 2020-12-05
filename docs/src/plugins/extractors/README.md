@@ -10,6 +10,7 @@ Meltano lets you easily extract data out of arbitrary data sources (databases, S
 Extractors for the following sources are currently [discoverable](/docs/plugins.html#discoverable-plugins) and supported out of the box:
 
 - [Bing Ads](/plugins/extractors/bing-ads.html)
+- [BigQuery](/plugins/extractors/bigquery.html)
 - [Comma Separated Values (CSV)](/plugins/extractors/csv.html)
 - [Facebook Ads](/plugins/extractors/facebook.html)
 - [Fastly](/plugins/extractors/fastly.html)

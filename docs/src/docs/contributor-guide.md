@@ -49,24 +49,11 @@ git clone git@gitlab.com:meltano/meltano.git
 # Change directory into the Meltano project
 cd meltano
 
-# Optional, but it's best to have the latest pip3
-pip3 install --upgrade pip
-
-# Optional, but it's best to have the latest setuptools
-pip3 install --upgrade setuptools
-
-# Optional, but it's recommended to create a virtual environment
-# in order to minimize side effects from unknown environment variable
-python -m venv ~/.venv/meltano-development
-
-# Activate your virtual environment
-source ~/.venv/meltano-development/bin/activate
+# Install the Poetry tool for managing dependencies and packaging
+pip3 install poetry
 
 # Install all the dependencies
-pip3 install -r requirements.txt
-
-# Install dev dependencies with the edit flag on to detect changes
-pip3 install -e '.[dev]'
+poetry install
 
 # Bundle the Meltano UI into the `meltano` package
 make bundle
@@ -606,7 +593,7 @@ Meltano uses [changelog-cli](https://github.com/mc706/changelog-cli) to populate
 Use `changelog (new|change|fix|breaks) MESSAGE` to describe your current work in progress.
 
 ```bash
-$ changelog new "add an amazing feature"
+$ poetry run changelog new "add an amazing feature"
 $ git add CHANGELOG.md
 ```
 
