@@ -4,13 +4,12 @@ from typing import Dict
 from typing import Optional
 
 from meltano.core.behavior.hookable import HookObject
-from meltano.core.behavior.canonical import Canonical
 from .base import PluginRef, PluginType, PluginDefinition
 
 logger = logging.getLogger(__name__)
 
 
-class ProjectPlugin(HookObject, Canonical, PluginRef):
+class ProjectPlugin(HookObject, PluginRef):
     def __init__(
         self,
         plugin_type: PluginType,

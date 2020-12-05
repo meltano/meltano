@@ -48,7 +48,7 @@ class ProjectInitService:
     def create_files(self, add_discovery=False):
         click.secho(f"Creating project files...", fg="blue")
 
-        plugin = MeltanoFilePlugin("meltano", discovery=add_discovery)
+        plugin = MeltanoFilePlugin(discovery=add_discovery)
         for path in plugin.create_files(self.project):
             click.secho(f"Created", fg="blue", nl=False)
             click.echo(f" {self.project_name}/{path}")

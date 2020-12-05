@@ -89,15 +89,15 @@ class PluginType(YAMLEnum):
         return cls(value)
 
 
-class PluginRef:
-    def __init__(self, plugin_type: Union[str, PluginType], name: str):
+class PluginRef(Canonical):
+    def __init__(self, plugin_type: Union[str, PluginType], name: str, **kwargs):
         self._type = (
             plugin_type
             if isinstance(plugin_type, PluginType)
             else PluginType(plugin_type)
         )
 
-        self.name = name
+        super().__init__(name=name, **kwargs)
 
     @property
     def type(self):
@@ -151,7 +151,7 @@ class Variant(NameEq, Canonical):
         )
 
 
-class PluginDefinition(Canonical, PluginRef):
+class PluginDefinition(PluginRef):
     def __init__(
         self,
         plugin_type: PluginType,
