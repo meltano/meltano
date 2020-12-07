@@ -5,7 +5,12 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Iterable, Dict, List
 
-from meltano.core.utils import find_named, NotFound, flatten
+from meltano.core.utils import (
+    find_named,
+    NotFound,
+    flatten,
+    expand_env_vars as do_expand_env_vars,
+)
 from .setting_definition import SettingMissingError, SettingDefinition
 from .settings_store import StoreNotSupportedError, SettingValueStore
 from .config_service import ConfigService
@@ -175,6 +180,7 @@ class SettingsService(ABC):
         source=SettingValueStore.AUTO,
         source_manager=None,
         setting_def=None,
+        expand_env_vars=True,
         **kwargs,
     ):
         try:
@@ -189,20 +195,30 @@ class SettingsService(ABC):
 
         metadata = {"name": name, "source": source, "setting": setting_def}
 
-        expandible_env = {}
+        expandable_env = {**self.project.dotenv_env, **self.env}
         if setting_def and setting_def.is_extra:
-            expandible_env = self.as_env(
-                extras=False,
-                redacted=redacted,
-                source=source,
-                source_manager=source_manager,
+            expandable_env.update(
+                self.as_env(
+                    extras=False,
+                    redacted=redacted,
+                    source=source,
+                    source_manager=source_manager,
+                )
             )
 
         manager = source_manager or source.manager(self, **kwargs)
-        value, get_metadata = manager.get(
-            name, setting_def=setting_def, expandible_env=expandible_env
-        )
+        value, get_metadata = manager.get(name, setting_def=setting_def)
         metadata.update(get_metadata)
+
+        if expand_env_vars and metadata.get("expandable", False):
+            metadata["expandable"] = False
+
+            expanded_value = do_expand_env_vars(value, env=expandable_env)
+
+            if expanded_value != value:
+                metadata["expanded"] = True
+                metadata["unexpanded_value"] = value
+                value = expanded_value
 
         if setting_def:
             if (
@@ -217,6 +233,7 @@ class SettingsService(ABC):
                         redacted=redacted,
                         source=source,
                         source_manager=source_manager,
+                        expand_env_vars=expand_env_vars,
                     )
                     for nested_key, config_metadata in flat_config_metadata.items():
                         if nested_key in object_value:

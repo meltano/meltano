@@ -89,26 +89,19 @@ class PluginType(YAMLEnum):
         return cls(value)
 
 
-class PluginRef:
-    def __init__(self, plugin_type: Union[str, PluginType], name: str):
+class PluginRef(Canonical):
+    def __init__(self, plugin_type: Union[str, PluginType], name: str, **kwargs):
         self._type = (
             plugin_type
             if isinstance(plugin_type, PluginType)
             else PluginType(plugin_type)
         )
 
-        self.name = name
+        super().__init__(name=name, **kwargs)
 
     @property
     def type(self):
         return self._type
-
-    @property
-    def qualified_name(self):
-        # "default" is included for legacy reasons
-        parts = (self.type, self.name, "default")
-
-        return ".".join(compact(parts))
 
     @property
     def info(self):
@@ -124,93 +117,6 @@ class PluginRef:
 
     def __hash__(self):
         return hash((self.type, self.name))
-
-
-class ProjectPlugin(HookObject, Canonical, PluginRef):
-    def __init__(
-        self,
-        plugin_type: PluginType,
-        name: str,
-        namespace: Optional[str] = None,
-        custom_definition: Optional["PluginDefinition"] = None,
-        variant: Optional[str] = None,
-        pip_url: Optional[str] = None,
-        config: Optional[dict] = {},
-        **extras,
-    ):
-        if namespace:
-            custom_definition = PluginDefinition(
-                plugin_type, name, namespace, variant=variant, pip_url=pip_url, **extras
-            )
-            extras = {}
-
-        if custom_definition:
-            # Any properties considered "extra" by the embedded plugin definition
-            # should be considered extras of the project plugin, since they are
-            # the current values, not default values.
-            extras = {**custom_definition.extras, **extras}
-            custom_definition.extras = {}
-
-        if "profiles" in extras:
-            logger.warning(
-                f"Plugin configuration profiles are no longer supported, ignoring `profiles` in '{name}' {plugin_type.descriptor} definition."
-            )
-
-        super().__init__(
-            plugin_type,
-            name,
-            # Attributes will be listed in meltano.yml in this order:
-            custom_definition=custom_definition,
-            variant=variant,
-            pip_url=pip_url,
-            config=copy.deepcopy(config),
-            extras=extras,
-        )
-
-        self._flattened.add("custom_definition")
-
-    def is_installable(self):
-        return self.pip_url is not None
-
-    def is_invokable(self):
-        return self.is_installable()
-
-    def is_configurable(self):
-        return True
-
-    def should_add_to_file(self, project):
-        return True
-
-    @property
-    def runner(self):
-        return None
-
-    @property
-    def extra_settings(self):
-        return []
-
-    def is_custom(self):
-        return self.custom_definition is not None
-
-    def exec_args(self, files: Dict):
-        return []
-
-    @property
-    def config_files(self):
-        """Return a list of stubbed files created for this plugin."""
-        return dict()
-
-    @property
-    def output_files(self):
-        return dict()
-
-    def add_select_filter(self, filter: str):
-        select = self.extras.get("select", [])
-        select.append(filter)
-        self.extras["select"] = select
-
-    def process_config(self, config):
-        return config
 
 
 class Variant(NameEq, Canonical):
@@ -245,7 +151,7 @@ class Variant(NameEq, Canonical):
         )
 
 
-class PluginDefinition(Canonical, PluginRef):
+class PluginDefinition(PluginRef):
     def __init__(
         self,
         plugin_type: PluginType,
@@ -354,13 +260,7 @@ class PluginDefinition(Canonical, PluginRef):
         return {**self.extras, **self.current_variant.extras}
 
     def __getattr__(self, attr):
-        return getattr(self.current_variant, attr)
-
-    def in_project(self, custom=False) -> ProjectPlugin:
-        return ProjectPlugin(
-            self.type,
-            self.name,
-            variant=self.current_variant_name,
-            pip_url=self.pip_url,
-            custom_definition=(self if custom else None),
-        )
+        try:
+            return super().__getattr__(attr)
+        except AttributeError:
+            return getattr(self.current_variant, attr)

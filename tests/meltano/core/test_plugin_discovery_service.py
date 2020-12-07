@@ -15,8 +15,8 @@ from meltano.core.plugin import (
     PluginDefinition,
     Variant,
     VariantNotFoundError,
-    ProjectPlugin,
 )
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import (
     DiscoveryFile,
     PluginDiscoveryService,
@@ -48,14 +48,14 @@ def discovery_url_mock(subject):
 @pytest.fixture(scope="class")
 def tap_covid_19(project_add_service):
     try:
-        plugin_def = PluginDefinition(
+        plugin = ProjectPlugin(
             PluginType.EXTRACTORS,
             "tap-covid-19",
             namespace="tap-covid_19",
             pip_url="tap-covid-19",
             executable="tap-covid-19",
         )
-        return project_add_service.add_definition(plugin_def, custom=True)
+        return project_add_service.add_plugin(plugin)
     except PluginAlreadyAddedException as err:
         return err.plugin
 

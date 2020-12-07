@@ -1,6 +1,7 @@
 import logging
 
-from meltano.core.plugin import ProjectPlugin, PluginType
+from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.behavior.hookable import hook
 from meltano.core.m5o.m5o_collection_parser import (

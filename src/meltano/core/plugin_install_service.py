@@ -8,7 +8,8 @@ from .project_add_service import ProjectAddService
 from .config_service import ConfigService
 from .venv_service import VenvService
 from .utils import noop
-from .plugin import PluginType, ProjectPlugin, PluginDefinition, PluginRef
+from .plugin import PluginType, PluginDefinition, PluginRef
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from .project import Project
 from .error import (
     PluginInstallError,

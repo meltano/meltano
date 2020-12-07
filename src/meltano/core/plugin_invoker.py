@@ -7,7 +7,8 @@ from typing import Optional
 from contextlib import contextmanager
 
 from .project import Project
-from .plugin import PluginRef, ProjectPlugin
+from .plugin import PluginRef
+from .plugin.project_plugin import ProjectPlugin
 from .plugin.error import PluginMissingError, PluginExecutionError
 from .plugin.config_service import PluginConfigService
 from .plugin.settings_service import PluginSettingsService
@@ -68,7 +69,7 @@ class PluginInvoker:
         self.context = context
 
         self.venv_service = venv_service or VenvService(project)
-        self.config_service = plugin_config_service or PluginConfigService(
+        self.plugin_config_service = plugin_config_service or PluginConfigService(
             plugin,
             config_dir or self.project.plugin_dir(plugin),
             run_dir or self.project.run_dir(plugin.name),
@@ -101,7 +102,7 @@ class PluginInvoker:
         plugin_files = {**self.plugin.config_files, **self.plugin.output_files}
 
         return {
-            _key: self.config_service.run_dir.joinpath(filename)
+            _key: self.plugin_config_service.run_dir.joinpath(filename)
             for _key, filename in plugin_files.items()
         }
 
@@ -118,7 +119,7 @@ class PluginInvoker:
         self.plugin_config_env = self.settings_service.as_env(session=session)
 
         with self.plugin.trigger_hooks("configure", self, session):
-            self.config_service.configure()
+            self.plugin_config_service.configure()
             self._prepared = True
 
     def cleanup(self):

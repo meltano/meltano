@@ -1,4 +1,3 @@
-from copy import deepcopy
 from typing import Iterable, Dict, List
 
 from meltano.core.project import Project
@@ -11,7 +10,8 @@ from meltano.core.settings_service import (
     REDACTED_VALUE,
 )
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
-from meltano.core.plugin import PluginRef, PluginType, PluginDefinition, ProjectPlugin
+from meltano.core.plugin import PluginRef, PluginType, PluginDefinition
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.error import PluginMissingError
 
 
@@ -70,30 +70,30 @@ class PluginSettingsService(SettingsService):
 
     @property
     def _db_namespace(self):
-        return self.plugin.qualified_name
+        # "default" is included for legacy reasons
+        return ".".join((self.plugin.type, self.plugin.name, "default"))
 
     @property
     def extra_setting_definitions(self):
-        extra_settings = deepcopy(self.plugin.extra_settings)
-
-        # Set defaults from plugin definition
         defaults = {f"_{k}": v for k, v in self.plugin_def.all_extras.items()}
 
-        if defaults:
-            for setting in extra_settings:
-                default_value = defaults.get(setting.name)
-                if default_value is not None:
-                    setting.value = default_value
+        existing_settings = []
+        for setting in self.plugin.extra_settings:
+            default_value = defaults.get(setting.name)
+            if default_value is not None:
+                setting = setting.with_attrs(value=default_value)
 
-            # Create setting definitions for unknown defaults,
-            # including flattened keys of default nested object items
-            extra_settings.extend(
-                SettingDefinition.from_missing(
-                    extra_settings, defaults, custom=False, default=True
-                )
+            existing_settings.append(setting)
+
+        # Create setting definitions for unknown defaults,
+        # including flattened keys of default nested object items
+        existing_settings.extend(
+            SettingDefinition.from_missing(
+                existing_settings, defaults, custom=False, default=True
             )
+        )
 
-        return extra_settings
+        return existing_settings
 
     @property
     def _definitions(self):
@@ -101,23 +101,10 @@ class PluginSettingsService(SettingsService):
 
     @property
     def _meltano_yml_config(self):
-        return {
-            **self.plugin.config,
-            **{f"_{k}": v for k, v in self.plugin.extras.items()},
-        }
+        return self.plugin.config_with_extras
 
     def _update_meltano_yml_config(self, config_with_extras):
-        config = self.plugin.config
-        extras = self.plugin.extras
-
-        config.clear()
-        extras.clear()
-
-        for k, v in config_with_extras.items():
-            if k.startswith("_"):
-                extras[k[1:]] = v
-            else:
-                config[k] = v
+        self.plugin.config_with_extras = config_with_extras
 
         self.config_service.update_plugin(self.plugin)
 

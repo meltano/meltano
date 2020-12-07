@@ -6,7 +6,8 @@ import click
 import re
 
 from .project import Project
-from .plugin import PluginType, PluginDefinition
+from .plugin import PluginType
+from .plugin.project_plugin import ProjectPlugin
 from .project_add_service import ProjectAddService
 
 
@@ -128,14 +129,14 @@ class ProjectAddCustomService(ProjectAddService):
                 value_proc=lambda value: [c.strip() for c in value.split(",")],
             )
 
-        plugin_def = PluginDefinition(
+        plugin = ProjectPlugin(
             plugin_type,
-            plugin_name,
-            namespace,
+            name=plugin_name,
+            namespace=namespace,
             variant=variant,
             pip_url=pip_url,
             executable=executable,
             capabilities=capabilities,
             settings=[{"name": name} for name in settings],
         )
-        return self.add_definition(plugin_def, custom=True)
+        return self.add_plugin(plugin)

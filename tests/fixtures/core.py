@@ -18,7 +18,8 @@ from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.config_service import ConfigService, PluginAlreadyAddedException
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.compiler.project_compiler import ProjectCompiler
-from meltano.core.plugin import PluginRef, PluginType, ProjectPlugin
+from meltano.core.plugin import PluginRef, PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.factory import plugin_factory
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.logging.job_logging_service import JobLoggingService

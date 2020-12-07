@@ -387,11 +387,11 @@ class TestMeltanoYmlStoreManager:
 
         subject.flat_config["basic"] = "alias_value"
 
-        assert get() == ("alias_value", {"key": "basic"})
+        assert get() == ("alias_value", {"expandable": True, "key": "basic"})
 
         subject.flat_config["regular"] = "value"
 
-        assert get() == ("value", {"key": "regular"})
+        assert get() == ("value", {"expandable": True, "key": "regular"})
 
     def test_set(self, subject):
         def set_value(key, value):

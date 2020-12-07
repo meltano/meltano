@@ -1,7 +1,8 @@
 import pytest
 from unittest import mock
 
-from meltano.core.plugin import PluginType, PluginDefinition, Variant, ProjectPlugin
+from meltano.core.plugin import PluginType, PluginDefinition, Variant
+from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
 class TestPluginDefinition:
@@ -142,36 +143,6 @@ class TestPluginDefinition:
             == "meltano (default), singer-io (deprecated)"
         )
 
-    def test_in_project(self):
-        plugin_def = PluginDefinition(PluginType.EXTRACTORS, **self.ATTRS["minimal"])
-        plugin = plugin_def.in_project()
-        assert plugin.type == plugin_def.type
-        assert plugin.name == plugin_def.name
-        assert plugin.variant is None
-        assert plugin.pip_url is None
-        assert not plugin.is_custom()
-
-        plugin_def = PluginDefinition(PluginType.EXTRACTORS, **self.ATTRS["basic"])
-        plugin = plugin_def.in_project()
-        assert plugin.variant == plugin_def.current_variant_name == "meltano"
-        assert plugin.pip_url == plugin_def.pip_url == "tap-example"
-        assert not plugin.is_custom()
-
-        plugin_def = PluginDefinition(PluginType.EXTRACTORS, **self.ATTRS["variants"])
-        plugin = plugin_def.in_project()
-        assert plugin.variant == plugin_def.current_variant_name == "meltano"
-        assert plugin.pip_url == plugin_def.pip_url == "meltano-tap-example"
-        assert not plugin.is_custom()
-
-        plugin = plugin_def.in_project(custom=True)
-        assert plugin.is_custom()
-        assert plugin.custom_definition == plugin_def
-
-        plugin_def.use_variant("singer-io")
-        plugin = plugin_def.in_project()
-        assert plugin.variant == plugin_def.current_variant_name == "singer-io"
-        assert plugin.pip_url == plugin_def.pip_url == "tap-example"
-
 
 class TestProjectPlugin:
     ATTRS = {
@@ -251,3 +222,22 @@ class TestProjectPlugin:
         attrs = self.ATTRS[attrs_key]
         plugin = ProjectPlugin(PluginType.EXTRACTORS, **attrs)
         assert plugin.canonical() == attrs
+
+    def test_config_with_extras(self):
+        plugin = ProjectPlugin(PluginType.EXTRACTORS, **self.ATTRS["basic"])
+
+        # It reads by combining config with extras (prefixed with _)
+        config_with_extras = plugin.config_with_extras
+        assert config_with_extras == {"foo": "bar", "_baz": "qux"}
+
+        config_with_extras["foo"] = "BAR"
+        config_with_extras["_baz"] = "QUX"
+
+        config_with_extras["bar"] = "FOO"
+        config_with_extras["_qux"] = "BAZ"
+
+        # It writes by splitting based on the _ prefix and writing config and extras
+        plugin.config_with_extras = config_with_extras
+
+        assert plugin.config == {"foo": "BAR", "bar": "FOO"}
+        assert plugin.extras == {"baz": "QUX", "qux": "BAZ"}

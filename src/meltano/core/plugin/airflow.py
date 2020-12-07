@@ -2,8 +2,9 @@ import configparser
 import logging
 import subprocess
 import os
-from . import ProjectPlugin, PluginType
 
+from . import PluginType
+from .project_plugin import ProjectPlugin
 from meltano.core.error import SubprocessError
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin_invoker import PluginInvoker
@@ -14,7 +15,7 @@ class AirflowInvoker(PluginInvoker):
     def env(self):
         env = super().env()
 
-        env["AIRFLOW_HOME"] = str(self.config_service.run_dir)
+        env["AIRFLOW_HOME"] = str(self.plugin_config_service.run_dir)
         env["AIRFLOW_CONFIG"] = str(self.files["config"])
 
         return env
