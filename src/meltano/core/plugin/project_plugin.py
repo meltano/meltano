@@ -31,6 +31,7 @@ class ProjectPlugin(PluginRef):
         variant: Optional[str] = None,
         pip_url: Optional[str] = None,
         config: Optional[dict] = {},
+        default_variant=Variant.ORIGINAL_NAME,
         **extras,
     ):
         super().__init__(plugin_type, name)
@@ -70,8 +71,8 @@ class ProjectPlugin(PluginRef):
 
         self._fallbacks.update(["logo_url", "description", "variant", "pip_url"])
 
-        # If no variant is set, we fall back on the original one
-        self._defaults["variant"] = lambda _: Variant.ORIGINAL_NAME
+        # If no variant is set, we fall back on the default
+        self._defaults["variant"] = lambda _: default_variant
 
         if self.inherit_from:
             # When explicitly inheriting from a project plugin or discoverable definition,

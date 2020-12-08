@@ -117,6 +117,8 @@ class TestPluginDefinition:
 
         assert plugin_def.find_variant().name == "meltano"
 
+        assert plugin_def.find_variant(Variant.DEFAULT_NAME).name == "meltano"
+
         assert plugin_def.find_variant(Variant.ORIGINAL_NAME).name == "singer-io"
 
         assert plugin_def.find_variant(plugin_def.variants[1]).name == "singer-io"
@@ -173,9 +175,8 @@ class TestBasePlugin:
     def test_variant(self, subject, variant):
         assert subject.variant == variant.name
 
-        # Unless variant has no name
         variant.name = None
-        assert subject.variant == Variant.ORIGINAL_NAME
+        assert subject.variant is None
 
     def test_extras(self, subject):
         assert subject.extras == {"foo": "bar", "baz": "qux"}

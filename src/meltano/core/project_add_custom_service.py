@@ -7,13 +7,11 @@ import click
 import yaml
 
 from .plugin import PluginType
-from .plugin.project_plugin import ProjectPlugin
-from .project import Project
 from .project_add_service import ProjectAddService
 
 
 class ProjectAddCustomService(ProjectAddService):
-    def add(self, plugin_type: PluginType, plugin_name: str, variant=None):
+    def add(self, plugin_type: PluginType, plugin_name: str, variant=None, **kwargs):
         click.secho(
             f"Adding new custom {plugin_type.descriptor} with name '{plugin_name}'...",
             fg="green",
@@ -130,14 +128,14 @@ class ProjectAddCustomService(ProjectAddService):
                 value_proc=lambda value: [c.strip() for c in value.split(",")],
             )
 
-        plugin = ProjectPlugin(
+        return super().add(
             plugin_type,
-            name=plugin_name,
+            plugin_name,
             namespace=namespace,
             variant=variant,
             pip_url=pip_url,
             executable=executable,
             capabilities=capabilities,
             settings=[{"name": name} for name in settings],
+            **kwargs,
         )
-        return self.add_plugin(plugin)

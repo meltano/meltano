@@ -73,6 +73,15 @@ class ProjectPluginsService:
 
         return plugin
 
+    def remove_from_file(self, plugin: ProjectPlugin):
+        # Will raise if the plugin isn't actually in the file
+        self.get_plugin(plugin)
+
+        with self.update_plugins() as plugins:
+            plugins[plugin.type].remove(plugin)
+
+        return plugin
+
     def has_plugin(self, plugin_name: str):
         try:
             self.find_plugin(plugin_name)
@@ -147,6 +156,9 @@ class ProjectPluginsService:
             return outdated
 
     def get_parent(self, plugin: ProjectPlugin, plugins_of_type):
+        if not plugins_of_type:
+            plugins_of_type = self.get_plugins_of_type(plugin.type)
+
         if plugin.inherit_from and not plugin.is_variant_set:
             try:
                 return find_named(plugins_of_type, plugin.inherit_from)

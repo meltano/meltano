@@ -120,6 +120,7 @@ class PluginRef(Canonical):
 
 class Variant(NameEq, Canonical):
     ORIGINAL_NAME = "original"
+    DEFAULT_NAME = "default"
 
     def __init__(
         self,
@@ -206,11 +207,11 @@ class PluginDefinition(PluginRef):
             raise VariantNotFoundError(self, variant_name) from err
 
     def find_variant(self, variant_or_name: Union[str, Variant] = None):
-        if variant_or_name is None:
-            return self.variants[0]
-
         if isinstance(variant_or_name, Variant):
             return variant_or_name
+
+        if variant_or_name is None or variant_or_name == Variant.DEFAULT_NAME:
+            return self.variants[0]
 
         if variant_or_name == Variant.ORIGINAL_NAME:
             try:
@@ -256,7 +257,7 @@ class BasePlugin(HookObject):
 
     @property
     def variant(self):
-        return self._variant.name or Variant.ORIGINAL_NAME
+        return self._variant.name
 
     @property
     def executable(self):
