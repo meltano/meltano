@@ -826,6 +826,10 @@ extractors:
         kind: date_iso8601
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
 
+      - name: is_sandbox
+        kind: boolean
+        value: false
+        description: Use Salesforce Sandbox
       - name: api_type
         value: REST
         kind: options

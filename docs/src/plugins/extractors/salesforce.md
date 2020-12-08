@@ -261,6 +261,24 @@ meltano config tap-salesforce set start_date 2020-10-01T00:00:00Z
 export TAP_SALESFORCE_START_DATE=2020-10-01T00:00:00Z
 ```
 
+### Is Sandbox
+
+- Name: `is_sandbox`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_IS_SANDBOX`
+- Default: `false`
+
+Use Salesforce Sandbox
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-salesforce set is_sandbox true
+
+export TAP_SALESFORCE_IS_SANDBOX=true
+```
+
 ### API Type
 
 - Name: `api_type`
@@ -282,8 +300,8 @@ export TAP_SALESFORCE_API_TYPE=BULK
 
 ### Select Fields By Default
 
-- Name: `select_fields_by_default`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_SELECT_FIELDS_BY_DEFAULT`
+- Name: `is_sandbox`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_IS_SANDBOX`
 - Default: `true`
 
 Select by default any new fields discovered in Salesforce objects
@@ -293,9 +311,9 @@ Select by default any new fields discovered in Salesforce objects
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config tap-salesforce set select_fields_by_default false
+meltano config tap-salesforce set is_sandbox false
 
-export TAP_SALESFORCE_SELECT_FIELDS_BY_DEFAULT=false
+export TAP_SALESFORCE_IS_SANDBOX=false
 ```
 
 ### State Message Threshold
