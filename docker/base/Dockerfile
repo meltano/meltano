@@ -23,4 +23,4 @@ COPY pyproject.toml .
 COPY poetry.lock .
 RUN pip install poetry && poetry install
 
-CMD ['poetry run python']
+ENTRYPOINT ["python"]
