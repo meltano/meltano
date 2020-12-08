@@ -10,15 +10,24 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2471](https://gitlab.com/meltano/meltano/-/issues/2471) Make tap-bigquery discoverable
-
 ### Changes
 
 ### Fixes
 
-- [#2473](https://gitlab.com/meltano/meltano/-/issues/2473) Fix meltano/meltano Docker image entrypoint
-
 ### Breaks
+
+
+## 1.60.1 - (2020-12-07)
+---
+
+### New
+
+- [#2471](https://gitlab.com/meltano/meltano/-/issues/2471) Make tap-bigquery discoverable
+
+
+### Fixes
+
+- [#2473](https://gitlab.com/meltano/meltano/-/issues/2473) Fix meltano/meltano Docker image entrypoint
 
 
 ## 1.60.0 - (2020-12-02)
