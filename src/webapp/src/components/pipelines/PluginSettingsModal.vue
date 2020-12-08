@@ -4,14 +4,12 @@ import Vue from 'vue'
 
 import lodash from 'lodash'
 
-import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
 import utils from '@/utils/utils'
 
 export default {
   name: 'PluginSettingsModal',
   components: {
-    ConnectorLogo,
     ConnectorSettings
   },
   props: {
@@ -249,7 +247,7 @@ export default {
     <div :class="{ 'modal-card': true, 'is-wide': !!plugin.docs }">
       <header class="modal-card-head">
         <div class="modal-card-head-image image is-64x64 level-item">
-          <ConnectorLogo :connector="pluginName" />
+          <img :src="plugin.logoUrl" alt="" />
         </div>
         <p class="modal-card-title">
           {{ plugin.label || plugin.name }}
