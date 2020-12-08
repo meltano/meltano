@@ -11,8 +11,7 @@ from . import cli
 from .params import project
 from .utils import CliError, add_plugin, add_related_plugins, install_plugins
 from meltano.core.plugin import PluginType
-from meltano.core.config_service import ConfigService
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_add_custom_service import ProjectAddCustomService
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -30,8 +29,7 @@ def add(ctx, project, plugin_type, plugin_name, variant=None, **flags):
     plugin_type = PluginType.from_cli_argument(plugin_type)
     plugin_names = plugin_name  # nargs=-1
 
-    config_service = ConfigService(project)
-    discovery_service = PluginDiscoveryService(project, config_service=config_service)
+    plugins_service = ProjectPluginsService(project)
 
     if flags["custom"]:
         if plugin_type in (
@@ -45,11 +43,7 @@ def add(ctx, project, plugin_type, plugin_name, variant=None, **flags):
     else:
         add_service_class = ProjectAddService
 
-    add_service = add_service_class(
-        project,
-        plugin_discovery_service=discovery_service,
-        config_service=config_service,
-    )
+    add_service = add_service_class(project, plugins_service=plugins_service)
 
     plugins = [
         add_plugin(
@@ -79,8 +73,7 @@ def add(ctx, project, plugin_type, plugin_name, variant=None, **flags):
 
     printed_empty_line = False
     for plugin in plugins:
-        plugin_def = discovery_service.get_definition(plugin)
-        docs_url = plugin_def.docs or plugin_def.repo
+        docs_url = plugin.docs or plugin.repo
         if not docs_url:
             continue
 

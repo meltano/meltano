@@ -1,76 +1,92 @@
 import logging
 import copy
-from typing import Dict
 from typing import Optional
 
-from meltano.core.behavior.hookable import HookObject
-from .base import PluginRef, PluginType, PluginDefinition
+from meltano.core.utils import flatten, uniques_in
+from meltano.core.setting_definition import SettingDefinition
+from .base import PluginRef, PluginType, PluginDefinition, Variant
+from .factory import base_plugin_factory
 
 logger = logging.getLogger(__name__)
 
 
-class ProjectPlugin(HookObject, PluginRef):
+class ProjectPlugin(PluginRef):
     def __init__(
         self,
         plugin_type: PluginType,
         name: str,
         namespace: Optional[str] = None,
-        custom_definition: Optional["PluginDefinition"] = None,
         variant: Optional[str] = None,
         pip_url: Optional[str] = None,
         config: Optional[dict] = {},
         **extras,
     ):
+        super().__init__(plugin_type, name)
+
+        # If a custom definition is provided, its properties will come before all others in meltano.yml
+        self.custom_definition = None
+        self._flattened.add("custom_definition")
+
+        self._parent = None
         if namespace:
-            custom_definition = PluginDefinition(
+            self.custom_definition = PluginDefinition(
                 plugin_type, name, namespace, variant=variant, pip_url=pip_url, **extras
             )
-            extras = {}
 
-        if custom_definition:
             # Any properties considered "extra" by the embedded plugin definition
             # should be considered extras of the project plugin, since they are
             # the current values, not default values.
-            extras = {**custom_definition.extras, **extras}
-            custom_definition.extras = {}
+            extras = self.custom_definition.extras
+            self.custom_definition.extras = {}
+
+            self.parent = base_plugin_factory(self.custom_definition, variant)
+
+        # These properties are also set on the parent, but can be overridden
+        self.namespace = namespace
+        self.set_presentation_attrs(extras)
+        self.variant = variant
+        self.pip_url = pip_url
+
+        self._fallbacks.update(
+            ["namespace", "label", "logo_url", "description", "variant", "pip_url"]
+        )
+
+        # If no variant is set, we fall back on the original one
+        self._defaults["variant"] = lambda _: Variant.ORIGINAL_NAME
+
+        self.config = copy.deepcopy(config)
+        self.extras = extras
 
         if "profiles" in extras:
             logger.warning(
                 f"Plugin configuration profiles are no longer supported, ignoring `profiles` in '{name}' {plugin_type.descriptor} definition."
             )
 
-        super().__init__(
-            plugin_type,
-            name,
-            # Attributes will be listed in meltano.yml in this order:
-            custom_definition=custom_definition,
-            variant=variant,
-            pip_url=pip_url,
-            config=copy.deepcopy(config),
-            extras=extras,
-        )
+    @property
+    def parent(self):
+        return self._parent
 
-        self._flattened.add("custom_definition")
-
-    def is_installable(self):
-        return self.pip_url is not None
-
-    def is_invokable(self):
-        return self.is_installable()
-
-    def is_configurable(self):
-        return True
-
-    def should_add_to_file(self, project):
-        return True
+    @parent.setter
+    def parent(self, new_parent):
+        self._parent = new_parent
+        self._fallback_to = new_parent
 
     @property
-    def runner(self):
-        return None
+    def info(self):
+        return {"name": self.name, "namespace": self.namespace, "variant": self.variant}
 
     @property
-    def extra_settings(self):
-        return []
+    def info_env(self):
+        # MELTANO_EXTRACTOR_...
+        return flatten({"meltano": {self.type.singular: self.info}}, "env_var")
+
+    def env_prefixes(self, for_writing=False):
+        prefixes = [self.name, self.namespace]
+
+        if for_writing:
+            prefixes.append(f"meltano_{self.type.verb}"),  # MELTANO_EXTRACT_...
+
+        return uniques_in(prefixes)
 
     @property
     def extra_config(self):
@@ -91,20 +107,25 @@ class ProjectPlugin(HookObject, PluginRef):
             else:
                 self.config[k] = v
 
+    @property
+    def settings(self):
+        existing_settings = self._parent.settings
+        return [
+            *existing_settings,
+            *SettingDefinition.from_missing(existing_settings, self.config),
+        ]
+
+    @property
+    def extra_settings(self):
+        existing_settings = self._parent.extra_settings
+        return [
+            *existing_settings,
+            *SettingDefinition.from_missing(existing_settings, self.extra_config),
+        ]
+
+    @property
+    def settings_with_extras(self):
+        return [*self.settings, *self.extra_settings]
+
     def is_custom(self):
         return self.custom_definition is not None
-
-    def exec_args(self, files: Dict):
-        return []
-
-    @property
-    def config_files(self):
-        """Return a list of stubbed files created for this plugin."""
-        return dict()
-
-    @property
-    def output_files(self):
-        return dict()
-
-    def process_config(self, config):
-        return config

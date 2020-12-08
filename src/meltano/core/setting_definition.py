@@ -1,9 +1,8 @@
 import json
 from typing import List
-from collections import OrderedDict
 from datetime import date, datetime
 
-from .utils import truthy, flatten, nest_object, to_env_var
+from .utils import truthy, flatten, nest_object, to_env_var, uniques_in
 from .behavior.canonical import Canonical
 from .behavior import NameEq
 from .error import Error
@@ -146,10 +145,7 @@ class SettingDefinition(NameEq, Canonical):
 
         env_keys.extend(alias for alias in self.env_aliases)
 
-        # Drop duplicate keys
-        env_keys = list(OrderedDict.fromkeys(env_keys))
-
-        return [EnvVar(key) for key in env_keys]
+        return [EnvVar(key) for key in uniques_in(env_keys)]
 
     def cast_value(self, value):
         if isinstance(value, date) or isinstance(value, datetime):

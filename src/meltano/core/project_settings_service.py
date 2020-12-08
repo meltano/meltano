@@ -5,6 +5,7 @@ from meltano.core.settings_service import (
     SettingMissingError,
     SettingValueStore,
 )
+from .config_service import ConfigService
 from meltano.core.utils import nest_object
 
 UI_CFG_SETTINGS = {
@@ -17,8 +18,10 @@ UI_CFG_SETTINGS = {
 class ProjectSettingsService(SettingsService):
     config_override = {}
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, config_service: ConfigService = None, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.config_service = config_service or ConfigService(self.project)
 
         self.env_override = {**self.project.env, **self.env_override}
 

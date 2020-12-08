@@ -100,6 +100,7 @@ class TestCanonical:
 
         # Unknown attributes fall back
         assert subject.unknown == "value"
+        assert "unknown" not in subject.canonical()
 
         # Known attributes don't fall back
         subject.known = None
@@ -108,6 +109,7 @@ class TestCanonical:
         # Unless we make them
         subject._fallbacks.add("known")
         assert subject.known == "value"
+        assert "known" not in subject.canonical()
 
         # Unless there is nothing to fallback to
         subject._fallback_to = None
@@ -116,3 +118,9 @@ class TestCanonical:
         # Defaults are still applied
         subject._defaults["known"] = lambda _: "default"
         assert subject.known == "default"
+        assert "known" not in subject.canonical()
+
+        # Until a value is set
+        subject.known = "value"
+        assert subject.known == "value"
+        assert subject.canonical()["known"] == "value"

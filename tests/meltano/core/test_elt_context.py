@@ -1,14 +1,14 @@
 import pytest
 import os
 
-from meltano.core.config_service import PluginAlreadyAddedException
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.plugin import PluginType, Variant
 
 
 def assert_extractor_env(extractor, env):
     assert env["MELTANO_EXTRACTOR_NAME"] == extractor.name
-    assert env["MELTANO_EXTRACTOR_NAMESPACE"] == extractor.definition.namespace
-    assert env["MELTANO_EXTRACTOR_VARIANT"] == extractor.definition.current_variant_name
+    assert env["MELTANO_EXTRACTOR_NAMESPACE"] == extractor.namespace
+    assert env["MELTANO_EXTRACTOR_VARIANT"] == extractor.variant
 
     assert env["MELTANO_EXTRACT_TEST"] == env["TAP_MOCK_TEST"] == "mock"
     assert env["MELTANO_EXTRACT__SELECT"] == env["TAP_MOCK__SELECT"] == '["*.*"]'
@@ -16,8 +16,8 @@ def assert_extractor_env(extractor, env):
 
 def assert_loader_env(loader, env):
     assert env["MELTANO_LOADER_NAME"] == loader.name
-    assert env["MELTANO_LOADER_NAMESPACE"] == loader.definition.namespace
-    assert env["MELTANO_LOADER_VARIANT"] == loader.definition.current_variant_name
+    assert env["MELTANO_LOADER_NAMESPACE"] == loader.namespace
+    assert env["MELTANO_LOADER_VARIANT"] == loader.variant
 
     assert (
         env["MELTANO_LOAD_POSTGRES_HOST"]
@@ -34,7 +34,7 @@ def assert_loader_env(loader, env):
 
 def assert_transform_env(transform, env):
     assert env["MELTANO_TRANSFORM_NAME"] == transform.name
-    assert env["MELTANO_TRANSFORM_NAMESPACE"] == transform.definition.namespace
+    assert env["MELTANO_TRANSFORM_NAMESPACE"] == transform.namespace
     assert env["MELTANO_TRANSFORM_VARIANT"] == Variant.ORIGINAL_NAME
 
     assert env["MELTANO_TRANSFORM__PACKAGE_NAME"] == "dbt_mock"
@@ -42,7 +42,7 @@ def assert_transform_env(transform, env):
 
 def assert_transformer_env(transformer, env):
     assert env["MELTANO_TRANSFORMER_NAME"] == transformer.name
-    assert env["MELTANO_TRANSFORMER_NAMESPACE"] == transformer.definition.namespace
+    assert env["MELTANO_TRANSFORMER_NAMESPACE"] == transformer.namespace
     assert env["MELTANO_TRANSFORMER_VARIANT"] == Variant.ORIGINAL_NAME
 
     assert (

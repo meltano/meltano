@@ -11,7 +11,7 @@ from typing import Optional
 
 from meltano.core.project import Project
 from meltano.core.migration_service import MigrationService, MigrationError
-from meltano.core.config_service import ConfigService
+from meltano.core.project_plugins_service import ProjectPluginsService, PluginType
 from meltano.cli.utils import install_plugins, PluginInstallReason
 from meltano.core.compiler.project_compiler import ProjectCompiler
 import meltano.core.bundle as bundle
@@ -102,7 +102,9 @@ class UpgradeService:
         """
         click.secho("Updating files managed by plugins...", fg="blue")
 
-        file_plugins = ConfigService(self.project).get_files()
+        file_plugins = ProjectPluginsService(self.project).get_plugins_of_type(
+            PluginType.FILES
+        )
         if not file_plugins:
             click.echo("Nothing to update")
             return

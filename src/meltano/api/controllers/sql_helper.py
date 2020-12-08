@@ -11,7 +11,6 @@ from meltano.api.models import db
 from meltano.api.security import create_dev_user
 from meltano.api.json import freeze_keys
 from meltano.core.project import Project
-from meltano.core.config_service import ConfigService
 from meltano.core.m5o.m5oc_file import M5ocFile
 from meltano.core.sql.analysis_helper import AnalysisHelper
 from meltano.core.sql.sql_utils import SqlUtils

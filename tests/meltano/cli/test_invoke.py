@@ -5,8 +5,6 @@ from unittest.mock import Mock, patch
 from contextlib import contextmanager
 
 from meltano.cli import cli
-from meltano.core.project_add_service import ProjectAddService
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
@@ -15,13 +13,11 @@ from meltano.core.project import Project
 
 
 @pytest.fixture(scope="class")
-def project_add_service(project_add_service):
-    project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
-
-    return project_add_service.project
+def project_tap_mock(project_add_service):
+    return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
 
-@pytest.mark.usefixtures("project_add_service")
+@pytest.mark.usefixtures("project_tap_mock")
 class TestCliInvoke:
     @pytest.fixture
     def process_mock(self):
@@ -45,7 +41,9 @@ class TestCliInvoke:
 
             assert invoke.called_with(["--help"])
 
-    def test_invoke_exit_code(self, cli_runner, tap, process_mock):
+    def test_invoke_exit_code(
+        self, cli_runner, tap, process_mock, project_plugins_service
+    ):
         process_mock.wait.return_value = 2
 
         invoker_mock = Mock()
@@ -59,20 +57,25 @@ class TestCliInvoke:
 
         with patch.object(
             GoogleAnalyticsTracker, "track_data", return_value=None
-        ), patch("meltano.cli.invoke.invoker_factory", return_value=invoker_mock):
+        ), patch(
+            "meltano.cli.invoke.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), patch(
+            "meltano.cli.invoke.invoker_factory", return_value=invoker_mock
+        ):
             basic = cli_runner.invoke(cli, ["invoke", tap.name])
             assert basic.exit_code == 2
 
     def test_invoke_dump_config(
-        self, cli_runner, tap, plugin_discovery_service, plugin_settings_service_factory
+        self, cli_runner, tap, project_plugins_service, plugin_settings_service_factory
     ):
         settings_service = plugin_settings_service_factory(tap)
 
         with patch.object(
             GoogleAnalyticsTracker, "track_data", return_value=None
         ), patch(
-            "meltano.core.plugin_invoker.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.invoke.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), patch.object(
             SingerTap, "discover_catalog"
         ), patch.object(

@@ -314,7 +314,9 @@ class TestSingerTap:
 
             # Pretend `select` is set in discovery.yml
             monkeypatch.setitem(
-                invoker.plugin_def.extras, "select", ["UniqueEntitiesName.name"]
+                invoker.plugin.parent._variant.extras,
+                "select",
+                ["UniqueEntitiesName.name"],
             )
             invoker.settings_service._setting_defs = None
             with invoker.prepared(session):
@@ -698,5 +700,5 @@ class TestSingerTap:
         assert cache_key() == key
 
         # No key if pip_url is editable
-        monkeypatch.setattr(invoker.plugin_def, "pip_url", "-e local")
+        monkeypatch.setattr(invoker.plugin, "pip_url", "-e local")
         assert cache_key() is None

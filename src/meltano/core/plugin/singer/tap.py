@@ -67,27 +67,23 @@ def config_schema_rules(config):
 class SingerTap(SingerPlugin):
     __plugin_type__ = PluginType.EXTRACTORS
 
-    @property
-    def extra_settings(self):
-        return [
-            SettingDefinition(name="_catalog"),
-            SettingDefinition(name="_state"),
-            SettingDefinition(
-                name="_load_schema", value="$MELTANO_EXTRACTOR_NAMESPACE"
-            ),
-            SettingDefinition(name="_select", kind="array", value=["*.*"]),
-            SettingDefinition(
-                name="_metadata",
-                aliases=["metadata"],
-                kind="object",
-                value={},
-                value_processor="nest_object",
-            ),
-            SettingDefinition(
-                name="_schema", kind="object", value={}, value_processor="nest_object"
-            ),
-            SettingDefinition(name="_select_filter", kind="array", value=[]),
-        ]
+    EXTRA_SETTINGS = [
+        SettingDefinition(name="_catalog"),
+        SettingDefinition(name="_state"),
+        SettingDefinition(name="_load_schema", value="$MELTANO_EXTRACTOR_NAMESPACE"),
+        SettingDefinition(name="_select", kind="array", value=["*.*"]),
+        SettingDefinition(
+            name="_metadata",
+            aliases=["metadata"],
+            kind="object",
+            value={},
+            value_processor="nest_object",
+        ),
+        SettingDefinition(
+            name="_schema", kind="object", value={}, value_processor="nest_object"
+        ),
+        SettingDefinition(name="_select_filter", kind="array", value=[]),
+    ]
 
     def exec_args(self, plugin_invoker):
         """
@@ -370,7 +366,7 @@ class SingerTap(SingerPlugin):
     def catalog_cache_key(self, plugin_invoker):
         # If the extractor is installed as editable, don't cache because
         # the result of discovery could change at any time.
-        if plugin_invoker.plugin_def.pip_url.startswith("-e"):
+        if plugin_invoker.plugin.pip_url.startswith("-e"):
             return None
 
         extras = plugin_invoker.plugin_config_extras

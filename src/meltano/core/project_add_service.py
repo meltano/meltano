@@ -5,11 +5,9 @@ import logging
 from typing import List
 
 from .project import Project
-from .plugin import PluginType, PluginDefinition, PluginRef
+from .plugin import BasePlugin
 from .plugin.project_plugin import ProjectPlugin
-from .plugin_discovery_service import PluginDiscoveryService
-from .plugin.factory import plugin_factory
-from .config_service import ConfigService, PluginAlreadyAddedException
+from .project_plugins_service import ProjectPluginsService, PluginAlreadyAddedException
 
 
 class PluginNotSupportedException(Exception):
@@ -21,37 +19,32 @@ class MissingPluginException(Exception):
 
 
 class ProjectAddService:
-    def __init__(
-        self,
-        project: Project,
-        plugin_discovery_service: PluginDiscoveryService = None,
-        config_service: ConfigService = None,
-    ):
+    def __init__(self, project: Project, plugins_service: ProjectPluginsService = None):
         self.project = project
-        self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
-            project
-        )
-        self.config_service = config_service or ConfigService(project)
+        self.plugins_service = plugins_service or ProjectPluginsService(project)
 
     def add(self, *args, **kwargs) -> ProjectPlugin:
-        plugin_def = self.discovery_service.find_definition(*args, **kwargs)
-        return self.add_definition(plugin_def)
-
-    def add_definition(self, plugin_def: PluginDefinition) -> ProjectPlugin:
-        plugin = ProjectPlugin(
-            plugin_def.type,
-            name=plugin_def.name,
-            variant=plugin_def.current_variant_name,
-            pip_url=plugin_def.pip_url,
+        base_plugin = self.plugins_service.discovery_service.find_base_plugin(
+            *args, **kwargs
         )
+        return self.add_base_plugin(base_plugin)
+
+    def add_base_plugin(self, base_plugin: BasePlugin) -> ProjectPlugin:
+        plugin = ProjectPlugin(
+            base_plugin.type,
+            name=base_plugin.name,
+            variant=base_plugin.variant,
+            pip_url=base_plugin.pip_url,
+        )
+        plugin.parent = base_plugin
 
         return self.add_plugin(plugin)
 
     def add_plugin(self, plugin: ProjectPlugin):
-        return self.config_service.add_to_file(plugin)
+        return self.plugins_service.add_to_file(plugin)
 
     def add_related(self, *args, **kwargs):
-        related_plugin_refs = self.discovery_service.find_related_plugin_refs(
+        related_plugin_refs = self.plugins_service.discovery_service.find_related_plugin_refs(
             *args, **kwargs
         )
 

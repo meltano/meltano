@@ -4,15 +4,12 @@ import logging
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.project import Project
-from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin import BasePlugin
 from meltano.core.db import project_engine
 from meltano.core.utils import nest_object
 
 
-class SingerPlugin(ProjectPlugin):
-    def __init__(self, *args, **kwargs):
-        super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
-
+class SingerPlugin(BasePlugin):
     def process_config(self, flat_config):
         non_null_config = {k: v for k, v in flat_config.items() if v is not None}
         return nest_object(non_null_config)

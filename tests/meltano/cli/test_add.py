@@ -33,11 +33,11 @@ class TestCliAdd:
             (
                 PluginType.ORCHESTRATORS,
                 "airflow",
-                None,
+                Variant.ORIGINAL_NAME,
                 [PluginRef(PluginType.FILES, "airflow")],
             ),
             # Installed automatically because of transform 'tap-carbon-intensity'
-            # (PluginType.TRANSFORMERS, "dbt", None, [PluginRef(PluginType.FILES, "dbt")]),
+            # (PluginType.TRANSFORMERS, "dbt", Variant.ORIGINAL_NAME, [PluginRef(PluginType.FILES, "dbt")]),
         ],
     )
     def test_add(
@@ -48,11 +48,11 @@ class TestCliAdd:
         related_plugin_refs,
         project,
         cli_runner,
-        config_service,
+        project_plugins_service,
     ):
         # ensure the plugin is not present
         with pytest.raises(PluginMissingError):
-            config_service.find_plugin(plugin_name, plugin_type=plugin_type)
+            project_plugins_service.find_plugin(plugin_name, plugin_type=plugin_type)
 
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
@@ -61,14 +61,14 @@ class TestCliAdd:
             assert res.exit_code == 0, res.stdout
             assert f"Added {plugin_type.descriptor} '{plugin_name}'" in res.stdout
 
-            plugin = config_service.find_plugin(plugin_name, plugin_type)
+            plugin = project_plugins_service.find_plugin(plugin_name, plugin_type)
             assert plugin
             assert plugin.variant == default_variant
 
             plugins = [plugin]
 
             for related_plugin_ref in related_plugin_refs:
-                plugin = config_service.get_plugin(related_plugin_ref)
+                plugin = project_plugins_service.get_plugin(related_plugin_ref)
                 assert plugin
 
                 assert (
@@ -84,7 +84,7 @@ class TestCliAdd:
                 project, plugins, reason=PluginInstallReason.ADD
             )
 
-    def test_add_multiple(self, project, cli_runner, config_service):
+    def test_add_multiple(self, project, cli_runner, project_plugins_service):
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             cli_runner.invoke(cli, ["add", "extractors", "tap-gitlab"])
@@ -102,13 +102,15 @@ class TestCliAdd:
             assert f"Added extractor 'tap-adwords'" in res.stdout
             assert f"Added extractor 'tap-facebook'" in res.stdout
 
-            tap_gitlab = config_service.find_plugin("tap-gitlab", PluginType.EXTRACTORS)
+            tap_gitlab = project_plugins_service.find_plugin(
+                "tap-gitlab", PluginType.EXTRACTORS
+            )
             assert tap_gitlab
-            tap_adwords = config_service.find_plugin(
+            tap_adwords = project_plugins_service.find_plugin(
                 "tap-adwords", PluginType.EXTRACTORS
             )
             assert tap_adwords
-            tap_facebook = config_service.find_plugin(
+            tap_facebook = project_plugins_service.find_plugin(
                 "tap-facebook", PluginType.EXTRACTORS
             )
             assert tap_facebook
@@ -167,13 +169,17 @@ class TestCliAdd:
         assert len(reports_service.get_reports()) == reports_count
 
     def test_add_files_with_updates(
-        self, project, cli_runner, config_service, plugin_settings_service_factory
+        self,
+        project,
+        cli_runner,
+        project_plugins_service,
+        plugin_settings_service_factory,
     ):
         result = cli_runner.invoke(cli, ["add", "files", "airflow"])
         assert_cli_runner(result)
 
         # Plugin has been added to meltano.yml
-        plugin = config_service.find_plugin("airflow", PluginType.FILES)
+        plugin = project_plugins_service.find_plugin("airflow", PluginType.FILES)
         assert plugin
 
         # Automatic updating is enabled
@@ -192,13 +198,15 @@ class TestCliAdd:
             "This file is managed by the 'airflow' file bundle" in file_path.read_text()
         )
 
-    def test_add_files_without_updates(self, project, cli_runner, config_service):
+    def test_add_files_without_updates(
+        self, project, cli_runner, project_plugins_service
+    ):
         result = cli_runner.invoke(cli, ["add", "files", "docker-compose"])
         assert_cli_runner(result)
 
         # Plugin has not been added to meltano.yml
         with pytest.raises(PluginMissingError):
-            config_service.find_plugin("docker-compose", PluginType.FILES)
+            project_plugins_service.find_plugin("docker-compose", PluginType.FILES)
 
         # File has been created
         assert "Created docker-compose.yml" in result.output
@@ -209,7 +217,9 @@ class TestCliAdd:
         # File does not have "managed" header
         assert "This file is managed" not in file_path.read_text()
 
-    def test_add_files_that_already_exists(self, project, cli_runner, config_service):
+    def test_add_files_that_already_exists(
+        self, project, cli_runner, project_plugins_service
+    ):
         project.root_dir("transform/dbt_project.yml").write_text("Exists!")
 
         result = cli_runner.invoke(cli, ["add", "files", "dbt"])
@@ -222,7 +232,7 @@ class TestCliAdd:
         assert "Created transform/dbt_project (dbt).yml" in result.output
         assert project.root_dir("transform/dbt_project (dbt).yml").is_file()
 
-    def test_add_related(self, project, cli_runner, config_service):
+    def test_add_related(self, project, cli_runner, project_plugins_service):
         # Add dbt and transform/ files
         cli_runner.invoke(cli, ["add", "transformer", "dbt"])
         cli_runner.invoke(cli, ["add", "files", "dbt"])
@@ -234,13 +244,19 @@ class TestCliAdd:
             )
             assert res.exit_code == 0
 
-            tap = config_service.find_plugin("tap-gitlab", PluginType.EXTRACTORS)
+            tap = project_plugins_service.find_plugin(
+                "tap-gitlab", PluginType.EXTRACTORS
+            )
             assert tap
-            transform = config_service.find_plugin("tap-gitlab", PluginType.TRANSFORMS)
+            transform = project_plugins_service.find_plugin(
+                "tap-gitlab", PluginType.TRANSFORMS
+            )
             assert transform
-            model = config_service.find_plugin("model-gitlab", PluginType.MODELS)
+            model = project_plugins_service.find_plugin(
+                "model-gitlab", PluginType.MODELS
+            )
             assert model
-            dashboard = config_service.find_plugin(
+            dashboard = project_plugins_service.find_plugin(
                 "dashboard-gitlab", PluginType.DASHBOARDS
             )
             assert dashboard
@@ -251,7 +267,7 @@ class TestCliAdd:
                 reason=PluginInstallReason.ADD,
             )
 
-    def test_add_missing(self, project, cli_runner, config_service):
+    def test_add_missing(self, project, cli_runner, project_plugins_service):
         res = cli_runner.invoke(cli, ["add", "extractor", "tap-unknown"])
 
         assert res.exit_code == 1
@@ -260,10 +276,10 @@ class TestCliAdd:
 
         # ensure the plugin is not present
         with pytest.raises(PluginMissingError):
-            config_service.find_plugin("tap-unknown", PluginType.EXTRACTORS)
+            project_plugins_service.find_plugin("tap-unknown", PluginType.EXTRACTORS)
 
     @pytest.mark.xfail(reason="Uninstall not implemented yet.")
-    def test_add_fails(self, project, cli_runner, config_service):
+    def test_add_fails(self, project, cli_runner, project_plugins_service):
         res = cli_runner.invoke(cli, ["add", "extractor", "tap-mock"])
 
         assert res.exit_code == 1, res.stdout
@@ -272,28 +288,25 @@ class TestCliAdd:
 
         # ensure the plugin is not present
         with pytest.raises(PluginMissingError):
-            config_service.find_plugin("tap-mock", PluginType.EXTRACTORS)
+            project_plugins_service.find_plugin("tap-mock", PluginType.EXTRACTORS)
 
-    def test_add_variant(
-        self, project, cli_runner, config_service, plugin_discovery_service
-    ):
+    def test_add_variant(self, project, cli_runner, project_plugins_service):
         with mock.patch(
-            "meltano.cli.add.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.add.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
                 cli, ["add", "extractor", "tap-mock", "--variant", "singer-io"]
             )
+            assert_cli_runner(res)
 
-            plugin = config_service.find_plugin(
+            plugin = project_plugins_service.find_plugin(
                 plugin_type=PluginType.EXTRACTORS, plugin_name="tap-mock"
             )
             assert plugin.variant == "singer-io"
 
-    def test_add_custom(
-        self, project, cli_runner, config_service, plugin_discovery_service
-    ):
+    def test_add_custom(self, project, cli_runner, project_plugins_service):
         pip_url = "-e path/to/tap-custom"
         executable = "tap-custom-bin"
         stdin = os.linesep.join(
@@ -301,43 +314,49 @@ class TestCliAdd:
             ["tap_custom", pip_url, executable, "foo,bar", "baz,qux"]
         )
 
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch(
+            "meltano.cli.add.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
                 cli, ["add", "--custom", "extractor", "tap-custom"], input=stdin
             )
+            assert_cli_runner(res)
 
-            plugin = config_service.find_plugin(
+            plugin = project_plugins_service.find_plugin(
                 plugin_type=PluginType.EXTRACTORS, plugin_name="tap-custom"
             )
             assert plugin.name == "tap-custom"
             assert plugin.pip_url == pip_url
 
-            plugin_def = plugin_discovery_service.get_definition(plugin)
-            plugin_variant = plugin_def.current_variant
+            plugin_def = plugin.custom_definition
+            plugin_variant = plugin.custom_definition.variants[0]
 
-            assert plugin_def.name == "tap-custom"
-            assert plugin_def.namespace == "tap_custom"
+            assert plugin_def.type == plugin.type
+            assert plugin_def.name == plugin.name == "tap-custom"
+            assert plugin_def.namespace == plugin.namespace == "tap_custom"
 
             assert plugin_variant.name is None
-            assert plugin_variant.pip_url == pip_url
-            assert plugin_variant.executable == executable
-            assert plugin_variant.capabilities == ["foo", "bar"]
-            assert [s.name for s in plugin_variant.settings] == ["baz", "qux"]
 
-            assert plugin_def.pip_url == plugin_variant.pip_url
-            assert plugin_def.executable == plugin_variant.executable
-            assert plugin_def.capabilities == plugin_variant.capabilities
-            assert plugin_def.settings == plugin_variant.settings
+            assert plugin.pip_url == plugin_variant.pip_url == pip_url
+            assert plugin.executable == plugin_variant.executable == executable
+            assert plugin.capabilities == plugin_variant.capabilities == ["foo", "bar"]
+
+            assert [s.name for s in plugin_variant.settings] == ["baz", "qux"]
+            assert plugin.settings == plugin_variant.settings
 
             install_plugin_mock.assert_called_once_with(
                 project, [plugin], reason=PluginInstallReason.ADD
             )
 
     def test_add_custom_variant(
-        self, project, cli_runner, config_service, plugin_discovery_service
+        self, project, cli_runner, project_plugins_service, plugin_discovery_service
     ):
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch(
+            "meltano.cli.add.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
                 cli,
@@ -350,16 +369,12 @@ class TestCliAdd:
                     "personal",
                 ],
             )
+            assert_cli_runner(res)
 
-            plugin = config_service.find_plugin(
+            plugin = project_plugins_service.find_plugin(
                 plugin_type=PluginType.EXTRACTORS, plugin_name="tap-custom-variant"
             )
-            plugin_def = plugin_discovery_service.get_definition(plugin)
-            plugin_variant = plugin_def.current_variant
+            plugin_def = plugin.custom_definition
+            plugin_variant = plugin_def.variants[0]
 
-            assert (
-                plugin.variant
-                == plugin_def.current_variant_name
-                == plugin_variant.name
-                == "personal"
-            )
+            assert plugin.variant == plugin_variant.name == "personal"

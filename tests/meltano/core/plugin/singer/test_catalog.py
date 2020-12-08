@@ -1,14 +1,6 @@
 import pytest
 import json
-import logging
-from unittest import mock
-from pathlib import Path
-from copy import deepcopy
 
-from meltano.core.config_service import PluginAlreadyAddedException
-from meltano.core.plugin import PluginType
-from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin.singer.catalog import (
     visit,
     CatalogRule,

@@ -6,7 +6,6 @@ from typing import Iterable, List
 from meltano.core.schedule import Schedule
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin.factory import plugin_factory
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior import NameEq
 
@@ -37,7 +36,7 @@ class MeltanoFile(Canonical):
         # corresponding `plugin_class` for all the plugins.
         for plugin_type, raw_plugins in plugins.items():
             for raw_plugin in raw_plugins:
-                plugin = plugin_factory(plugin_type, raw_plugin)
+                plugin = ProjectPlugin(PluginType(plugin_type), **raw_plugin)
                 plugin_type_plugins[plugin.type].append(plugin)
 
         return plugin_type_plugins

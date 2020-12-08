@@ -3,7 +3,7 @@ from . import cli
 from .params import project
 from .utils import CliError, add_related_plugins, install_plugins
 from meltano.core.project_add_service import ProjectAddService
-from meltano.core.config_service import ConfigService
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.plugin import PluginType
 from meltano.core.tracking import GoogleAnalyticsTracker
 
@@ -20,18 +20,18 @@ def install(project, plugin_type, plugin_name, include_related):
     Installs all the dependencies of your project based on the meltano.yml file.
     Read more at https://www.meltano.com/docs/command-line-interface.html.
     """
-    config_service = ConfigService(project)
+    plugins_service = ProjectPluginsService(project)
 
     if plugin_type:
         plugin_type = PluginType.from_cli_argument(plugin_type)
-        plugins = config_service.get_plugins_of_type(plugin_type)
+        plugins = plugins_service.get_plugins_of_type(plugin_type)
         if plugin_name:
             plugins = [p for p in plugins if p.name in plugin_name]
     else:
-        plugins = list(config_service.plugins())
+        plugins = list(plugins_service.plugins())
 
     if include_related:
-        add_service = ProjectAddService(project, config_service=config_service)
+        add_service = ProjectAddService(project, plugins_service=plugins_service)
         related_plugins = add_related_plugins(project, plugins, add_service=add_service)
         plugins.extend(related_plugins)
 

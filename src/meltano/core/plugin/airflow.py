@@ -3,8 +3,7 @@ import logging
 import subprocess
 import os
 
-from . import PluginType
-from .project_plugin import ProjectPlugin
+from . import PluginType, BasePlugin
 from meltano.core.error import SubprocessError
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin_invoker import PluginInvoker
@@ -21,12 +20,10 @@ class AirflowInvoker(PluginInvoker):
         return env
 
 
-class Airflow(ProjectPlugin):
+class Airflow(BasePlugin):
     __plugin_type__ = PluginType.ORCHESTRATORS
-    __invoker_cls__ = AirflowInvoker
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
+    invoker_class = AirflowInvoker
 
     @property
     def config_files(self):
@@ -39,7 +36,7 @@ class Airflow(ProjectPlugin):
         return config
 
     @hook("before_install")
-    def setup_env(self, project, reason):
+    def setup_env(self, *args, **kwargs):
         # to make airflow installables without GPL dependency
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 

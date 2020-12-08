@@ -7,6 +7,7 @@ import os
 import functools
 
 from datetime import datetime, date, time
+from collections import OrderedDict
 from copy import deepcopy
 from typing import Union, Dict, Callable, Optional, Iterable
 from requests.auth import HTTPBasicAuth
@@ -333,3 +334,7 @@ def expand_env_vars(raw_value, env: Dict):
         return subst(fullmatch)
 
     return re.sub(var_matcher, subst, raw_value)
+
+
+def uniques_in(original):
+    return list(OrderedDict.fromkeys(original))

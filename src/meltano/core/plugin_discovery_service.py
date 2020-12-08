@@ -9,14 +9,14 @@ from copy import deepcopy
 from typing import Dict, Iterable, Optional, List
 
 import meltano.core.bundle as bundle
+from .utils import find_named, NotFound
 from .project_settings_service import ProjectSettingsService
 from .setting_definition import SettingDefinition
 from .behavior.versioned import Versioned, IncompatibleVersionError
 from .behavior.canonical import Canonical
-from .config_service import ConfigService
-from .plugin import PluginDefinition, PluginType, PluginRef, Variant
+from .plugin import PluginDefinition, PluginType, PluginRef, Variant, BasePlugin
 from .plugin.project_plugin import ProjectPlugin
-from .plugin.factory import plugin_factory
+from .plugin.factory import base_plugin_factory
 
 
 class PluginNotFoundError(Exception):
@@ -65,14 +65,8 @@ class DiscoveryFile(Canonical):
 class PluginDiscoveryService(Versioned):
     __version__ = VERSION
 
-    def __init__(
-        self,
-        project,
-        config_service: ConfigService = None,
-        discovery: Optional[Dict] = None,
-    ):
+    def __init__(self, project, discovery: Optional[Dict] = None):
         self.project = project
-        self.config_service = config_service or ConfigService(project)
 
         self._discovery_version = None
         self._discovery = None
@@ -217,20 +211,8 @@ class PluginDiscoveryService(Versioned):
     def cached_discovery_file(self):
         return self.project.meltano_dir("cache", "discovery.yml")
 
-    def get_discovery_plugins_of_type(self, plugin_type):
-        return self.discovery[plugin_type]
-
-    def get_custom_plugins_of_type(self, plugin_type):
-        return [
-            project_plugin.custom_definition
-            for project_plugin in self.config_service.get_plugins_of_type(plugin_type)
-            if project_plugin.is_custom()
-        ]
-
     def get_plugins_of_type(self, plugin_type):
-        return self.get_custom_plugins_of_type(
-            plugin_type
-        ) + self.get_discovery_plugins_of_type(plugin_type)
+        return self.discovery[plugin_type]
 
     def plugins_by_type(self):
         return {
@@ -246,18 +228,12 @@ class PluginDiscoveryService(Versioned):
         )
 
     def find_definition(
-        self, plugin_type: PluginType, plugin_name: str, variant=None
+        self, plugin_type: PluginType, plugin_name: str
     ) -> PluginDefinition:
         try:
-            plugin = next(
-                plugin
-                for plugin in self.get_plugins_of_type(plugin_type)
-                if plugin.name == plugin_name
-            )
-            plugin.use_variant(variant)
-            return plugin
-        except StopIteration as stop:
-            raise PluginNotFoundError(plugin_name) from stop
+            return find_named(self.get_plugins_of_type(plugin_type), plugin_name)
+        except NotFound as err:
+            raise PluginNotFoundError(plugin_name) from err
 
     def find_definition_by_namespace(
         self, plugin_type: PluginType, namespace: str
@@ -271,20 +247,18 @@ class PluginDiscoveryService(Versioned):
         except StopIteration as stop:
             raise PluginNotFoundError(namespace) from stop
 
-    def get_definition(self, project_plugin: ProjectPlugin) -> PluginDefinition:
-        if project_plugin.is_custom():
-            plugin = project_plugin.custom_definition
-        else:
-            try:
-                plugin = next(
-                    plugin for plugin in self.plugins() if plugin == project_plugin
-                )
-            except StopIteration as stop:
-                raise PluginNotFoundError(project_plugin.name) from stop
+    def find_base_plugin(
+        self, plugin_type: PluginType, plugin_name: str, variant=None
+    ) -> BasePlugin:
+        plugin = self.find_definition(plugin_type, plugin_name)
+        return base_plugin_factory(plugin, variant)
 
-        plugin.use_variant(project_plugin.variant or Variant.ORIGINAL_NAME)
+    def get_base_plugin(self, project_plugin: ProjectPlugin) -> BasePlugin:
+        plugin = project_plugin.custom_definition or self.find_definition(
+            project_plugin.type, project_plugin.name
+        )
 
-        return plugin
+        return base_plugin_factory(plugin, project_plugin.variant)
 
     def find_related_plugin_refs(
         self,
@@ -302,12 +276,11 @@ class PluginDiscoveryService(Versioned):
         if runner_ref:
             related_plugin_refs.append(runner_ref)
 
-        plugin_def = self.get_definition(target_plugin)
         related_plugin_refs.extend(
             related_plugin_def
             for plugin_type in plugin_types
             for related_plugin_def in self.get_plugins_of_type(plugin_type)
-            if related_plugin_def.namespace == plugin_def.namespace
+            if related_plugin_def.namespace == target_plugin.namespace
         )
 
         return related_plugin_refs
