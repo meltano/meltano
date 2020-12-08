@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2477](https://gitlab.com/meltano/meltano/-/issues/2477) Show array and object settings in configuration UI as unsupported instead of hiding them entirely
+
 ### Fixes
 
 ### Breaks
