@@ -112,6 +112,10 @@ class ProjectPlugin(PluginRef):
         self._fallback_to = new_parent
 
     @property
+    def is_variant_set(self):
+        return self.is_attr_set("variant")
+
+    @property
     def info(self):
         return {"name": self.name, "namespace": self.namespace, "variant": self.variant}
 

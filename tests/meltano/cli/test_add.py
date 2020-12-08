@@ -306,6 +306,118 @@ class TestCliAdd:
             )
             assert plugin.variant == "singer-io"
 
+    def test_add_inherited(
+        self,
+        project,
+        tap,
+        cli_runner,
+        project_plugins_service,
+        plugin_discovery_service,
+    ):
+        # Make sure tap-mock is not in the project as a project plugin
+        project_plugins_service.remove_from_file(tap)
+
+        with mock.patch(
+            "meltano.cli.add.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+
+            # Inheriting from a BasePlugin using --as
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "add",
+                    "extractor",
+                    "tap-mock",
+                    "--as",
+                    "tap-mock-inherited",
+                ],
+            )
+            assert_cli_runner(res)
+            assert "Inherit from:\ttap-mock, variant meltano (default)\n" in res.stdout
+
+            inherited = project_plugins_service.find_plugin(
+                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-mock-inherited"
+            )
+            assert inherited.inherit_from == "tap-mock"
+            assert inherited.variant == "meltano"
+            assert inherited.parent == plugin_discovery_service.find_base_plugin(
+                plugin_type=PluginType.EXTRACTORS,
+                plugin_name="tap-mock",
+                variant="meltano",
+            )
+
+            # Inheriting from a BasePlugin using --inherit-from and --variant
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "add",
+                    "extractor",
+                    "tap-mock--singer-io",
+                    "--inherit-from",
+                    "tap-mock",
+                    "--variant",
+                    "singer-io",
+                ],
+            )
+            assert_cli_runner(res)
+            assert (
+                "Inherit from:\ttap-mock, variant singer-io (deprecated)\n"
+                in res.stdout
+            )
+
+            inherited_variant = project_plugins_service.find_plugin(
+                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-mock--singer-io"
+            )
+            assert inherited_variant.inherit_from == "tap-mock"
+            assert inherited_variant.variant == "singer-io"
+            assert (
+                inherited_variant.parent
+                == plugin_discovery_service.find_base_plugin(
+                    plugin_type=PluginType.EXTRACTORS,
+                    plugin_name="tap-mock",
+                    variant="singer-io",
+                )
+            )
+
+            # Inheriting from a ProjectPlugin using --inherit-from
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "add",
+                    "extractor",
+                    "tap-mock-inception",
+                    "--inherit-from",
+                    "tap-mock-inherited",
+                ],
+            )
+            assert_cli_runner(res)
+            assert "Inherit from:\ttap-mock-inherited\n" in res.stdout
+
+            inception = project_plugins_service.find_plugin(
+                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-mock-inception"
+            )
+            assert inception.inherit_from == "tap-mock-inherited"
+            assert inception.parent == inherited
+
+            # Inheriting from a nonexistent plugin
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "add",
+                    "extractor",
+                    "tap-foo",
+                    "--inherit-from",
+                    "tap-bar",
+                ],
+            )
+            assert res.exit_code == 1
+            assert (
+                "Could not find parent plugin for extractor 'tap-foo': Extractor 'tap-bar' is not known to Meltano"
+                in str(res.exception)
+            )
+
     def test_add_custom(self, project, cli_runner, project_plugins_service):
         pip_url = "-e path/to/tap-custom"
         executable = "tap-custom-bin"

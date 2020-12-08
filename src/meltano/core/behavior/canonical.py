@@ -62,6 +62,9 @@ class Canonical:
 
         return cls(**obj)
 
+    def is_attr_set(self, attr):
+        return self._dict.get(attr) is not None
+
     def __getattr__(self, attr):
         try:
             value = self._dict[attr]

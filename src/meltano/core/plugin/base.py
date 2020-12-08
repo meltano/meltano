@@ -246,6 +246,12 @@ class BasePlugin(HookObject):
         self._plugin_def = plugin_def
         self._variant = variant
 
+    def __eq__(self, other):
+        return self._plugin_def == other._plugin_def and self._variant == other._variant
+
+    def __hash__(self):
+        return hash((self._plugin_def, self._variant))
+
     def __iter__(self):
         yield from self._plugin_def
 

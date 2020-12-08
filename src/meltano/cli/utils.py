@@ -57,6 +57,17 @@ def print_added_plugin(project, plugin, related=False):
             fg="green",
         )
 
+    inherit_from = plugin.inherit_from
+    has_variant = plugin.is_variant_set
+    variant_label = plugin.variant_label(plugin.variant)
+    if inherit_from:
+        if has_variant:
+            inherit_from = f"{inherit_from}, variant {variant_label}"
+
+        click.echo(f"Inherit from:\t{inherit_from}")
+    elif has_variant:
+        click.echo(f"Variant:\t{variant_label}")
+
     repo_url = plugin.repo
     if repo_url:
         click.echo(f"Repository:\t{repo_url}")
@@ -71,10 +82,10 @@ def add_plugin(
     plugin_type: PluginType,
     plugin_name: str,
     add_service: ProjectAddService,
-    variant=None,
+    **kwargs,
 ):
     try:
-        plugin = add_service.add(plugin_type, plugin_name, variant=variant)
+        plugin = add_service.add(plugin_type, plugin_name, **kwargs)
         print_added_plugin(project, plugin)
     except PluginAlreadyAddedException as err:
         click.secho(
