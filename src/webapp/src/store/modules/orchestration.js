@@ -239,12 +239,8 @@ const actions = {
       isRunning: true
     })
 
-    return orchestrationsApi.run(pipeline).then(response => {
+    return orchestrationsApi.run({ name: pipeline.name }).then(response => {
       dispatch('queuePipelinePoller', response.data)
-      const pipelineWithJobId = Object.assign(pipeline, {
-        jobId: response.data.jobId
-      })
-      commit('setPipeline', pipelineWithJobId)
     })
   },
 
