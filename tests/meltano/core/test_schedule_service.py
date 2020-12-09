@@ -113,3 +113,33 @@ class TestScheduleService:
         ):
             schedule = add("with_no_start_date", None)
             assert schedule.start_date
+
+    def test_run(self, subject, session, tap, target):
+        schedule = subject.add(
+            session,
+            "tap-to-target",
+            tap.name,
+            target.name,
+            "skip",
+            "@daily",
+            TAP_MOCK_TEST="overridden",
+        )
+
+        with mock.patch(
+            "meltano.core.schedule_service.MeltanoInvoker.invoke"
+        ) as invoke_mock:
+            subject.run(
+                schedule, "--dump=config", env={"TAP_MOCK_SECURE": "overridden"}
+            )
+
+            invoke_mock.assert_called_once_with(
+                [
+                    "elt",
+                    tap.name,
+                    target.name,
+                    f"--transform={schedule.transform}",
+                    f"--job_id={schedule.name}",
+                    "--dump=config",
+                ],
+                env={"TAP_MOCK_TEST": "overridden", "TAP_MOCK_SECURE": "overridden"},
+            )
