@@ -6,6 +6,7 @@ from datetime import datetime, date
 from .project_plugins_service import ProjectPluginsService
 from .plugin.settings_service import PluginSettingsService, SettingMissingError
 from .plugin_discovery_service import PluginDiscoveryService, PluginNotFoundError
+from .meltano_invoker import MeltanoInvoker
 from .project import Project
 from .plugin import PluginType, PluginRef
 from .db import project_engine
@@ -143,3 +144,14 @@ class ScheduleService:
 
     def schedules(self):
         return self.project.meltano.schedules
+
+    def find_schedule(self, name):
+        try:
+            return find_named(self.schedules(), name)
+        except StopIteration as err:
+            raise ScheduleNotFoundError(name) from err
+
+    def run(self, schedule, *args, env={}, **kwargs):
+        return MeltanoInvoker(self.project).invoke(
+            ["elt", *schedule.elt_args, *args], env={**schedule.env, **env}, **kwargs
+        )

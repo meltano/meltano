@@ -11,7 +11,6 @@ from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.project import Project
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.schedule_service import ScheduleService
-from meltano.core.utils import find_named
 
 
 executor = Executor()
@@ -26,13 +25,12 @@ def defer_run_schedule(name):
     project = Project.find()
     schedule_service = ScheduleService(project)
 
-    schedule = find_named(schedule_service.schedules(), name)
-
-    result = MeltanoInvoker(project).invoke(
-        ["elt", *schedule.elt_args],
+    schedule = schedule_service.find_schedule(name)
+    result = schedule_service.run(
+        schedule,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
-        env={**schedule.env, "MELTANO_JOB_TRIGGER": "ui"},
+        env={"MELTANO_JOB_TRIGGER": "ui"},
     )
 
     # It would probably be better that we would use sqlalchemy ORM events

@@ -485,6 +485,9 @@ An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Or
 
 Use the `schedule` command to define ELT pipelines to be run by an orchestrator at regular intervals. These scheduled pipelines will be added to your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
 
+You can run a specific scheduled pipeline's corresponding [`meltano elt`](#elt) command as a one-off using `meltano schedule run <schedule_name>`.
+Any command line options (e.g. `--select=<entity>` or `--dump=config`) will be passed on to [`meltano elt`](#elt).
+
 ### How to use
 
 The interval argument can be a [cron expression](https://en.wikipedia.org/wiki/Cron#CRON_expression) or one of the following presets:
@@ -496,6 +499,9 @@ meltano schedule <schedule_name> <extractor> <loader> <interval> [--transform={r
 
 # List all schedules
 meltano schedule list [--format=json]
+
+# Run a schedule
+meltano schedule run <schedule_name>
 ```
 
 ### Examples
@@ -508,6 +514,10 @@ meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily --transfor
 meltano schedule gitlab-to-jsonl tap-gitlab target-jsonl "* * * * *"
 # This specifies that the following command is to be run every minute:
 # meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
+
+meltano schedule run gitlab-to-jsonl --select=commits
+# This will run:
+# meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl --select=commits
 ```
 
 ## `select`

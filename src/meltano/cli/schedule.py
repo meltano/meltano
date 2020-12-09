@@ -116,3 +116,16 @@ def list(ctx, format):
             session.close()
 
         print(json.dumps(schedules, indent=2))
+
+
+@schedule.command(
+    context_settings=dict(ignore_unknown_options=True, allow_interspersed_args=False)
+)
+@click.argument("name")
+@click.argument("elt_options", nargs=-1, type=click.UNPROCESSED)
+@click.pass_context
+def run(ctx, name, elt_options):
+    schedule_service = ctx.obj["schedule_service"]
+
+    schedule = schedule_service.find_schedule(name)
+    schedule_service.run(schedule, *elt_options)

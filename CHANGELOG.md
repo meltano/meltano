@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2476](https://gitlab.com/meltano/meltano/-/issues/2476) Add missing tap-salesforce `is_sandbox` setting
 - [#2471](https://gitlab.com/meltano/meltano/-/issues/2471) Make tap-bigquery discoverable
+- [#2227](https://gitlab.com/meltano/meltano/-/issues/2227) Add `meltano schedule run <name>` command to run scheduled pipeline by name
 
 ### Changes
 
