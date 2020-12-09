@@ -207,7 +207,6 @@ def list_settings(ctx, extras):
         value = config_metadata["value"]
         source = config_metadata["source"]
         setting_def = config_metadata["setting"]
-        unexpanded_value = config_metadata.get("unexpanded_value")
 
         if extras:
             if not setting_def.is_extra:
@@ -231,25 +230,26 @@ def list_settings(ctx, extras):
         env_keys = [var.definition for var in settings.setting_env_vars(setting_def)]
         click.echo(f" [env: {', '.join(env_keys)}]", nl=False)
 
-        current_value = click.style(f"{value!r}", fg="green")
-        if source is SettingValueStore.DEFAULT:
-            click.echo(f" current value: {current_value}", nl=False)
-
-            if not unexpanded_value or unexpanded_value == value:
-                click.echo(" (from default)")
-            else:
-                click.echo(f" (from default: {unexpanded_value!r})")
-        else:
+        if source is not SettingValueStore.DEFAULT:
             default_value = setting_def.value
             if default_value is not None:
                 click.echo(f" (default: {default_value!r})", nl=False)
 
-            click.echo(f" current value: {current_value}", nl=False)
+        if source is SettingValueStore.DEFAULT:
+            label = "default"
+        elif source is SettingValueStore.INHERITED:
+            label = f"inherited from '{settings.plugin.parent.name}'"
+        else:
+            label = f"from {source.label}"
 
-            if not unexpanded_value or unexpanded_value == value:
-                click.echo(f" (from {source.label})")
-            else:
-                click.echo(f" (from {source.label}: {unexpanded_value!r})")
+        current_value = click.style(f"{value!r}", fg="green")
+        click.echo(f" current value: {current_value}", nl=False)
+
+        unexpanded_value = config_metadata.get("unexpanded_value")
+        if not unexpanded_value or unexpanded_value == value:
+            click.echo(f" ({label})")
+        else:
+            click.echo(f" ({label}: {unexpanded_value!r})")
 
         if setting_def.description:
             click.echo("\t", nl=False)
