@@ -10,7 +10,7 @@ from .config_service import ConfigService
 from .plugin import PluginRef, PluginType, Variant
 from .plugin.error import PluginMissingError, PluginParentNotFoundError
 from .plugin.project_plugin import ProjectPlugin
-from .plugin_discovery_service import PluginDiscoveryService
+from .plugin_discovery_service import PluginDiscoveryService, PluginNotFoundError
 from .project import Project
 
 logger = logging.getLogger(__name__)
@@ -41,14 +41,7 @@ class ProjectPluginsService:
     @property
     def current_plugins(self):
         if self._current_plugins is None or not self._use_cache:
-            plugins = self.config_service.current_meltano_yml.plugins
-
-            for plugin_type, plugins_of_type in plugins:
-                for plugin in plugins_of_type:
-                    parent = self.get_parent(plugin, plugins_of_type)
-                    plugin.parent = parent
-
-            self._current_plugins = plugins
+            self._current_plugins = self.config_service.current_meltano_yml.plugins
         return self._current_plugins
 
     @contextmanager
@@ -62,7 +55,7 @@ class ProjectPluginsService:
         if not plugin.should_add_to_file():
             return plugin
 
-        if plugin in self.plugins():
+        if plugin in self.plugins(ensure_parent=False):
             raise PluginAlreadyAddedException(plugin)
 
         with self.update_plugins() as plugins:
@@ -105,42 +98,58 @@ class ProjectPluginsService:
         try:
             plugin = next(
                 plugin
-                for plugin in self.plugins()
+                for plugin in self.plugins(ensure_parent=False)
                 if (
                     plugin.name == plugin_name
                     and (plugin_type is None or plugin.type == plugin_type)
-                    and (invokable is None or plugin.is_invokable() == invokable)
                     and (
-                        configurable is None or plugin.is_configurable() == configurable
+                        invokable is None
+                        or self.ensure_parent(plugin).is_invokable() == invokable
+                    )
+                    and (
+                        configurable is None
+                        or self.ensure_parent(plugin).is_configurable() == configurable
                     )
                 )
             )
 
-            return plugin
+            return self.ensure_parent(plugin)
         except StopIteration as stop:
             raise PluginMissingError(plugin_name) from stop
 
     def get_plugin(self, plugin_ref: PluginRef) -> ProjectPlugin:
         try:
-            plugin = next(plugin for plugin in self.plugins() if plugin == plugin_ref)
+            plugin = next(
+                plugin
+                for plugin in self.plugins(ensure_parent=False)
+                if plugin == plugin_ref
+            )
 
-            return plugin
+            return self.ensure_parent(plugin)
         except StopIteration as stop:
             raise PluginMissingError(plugin_ref.name) from stop
 
-    def get_plugins_of_type(self, plugin_type):
-        return self.current_plugins[plugin_type]
+    def get_plugins_of_type(self, plugin_type, ensure_parent=True):
+        plugins = self.current_plugins[plugin_type]
 
-    def plugins_by_type(self):
+        if ensure_parent:
+            for plugin in plugins:
+                self.ensure_parent(plugin)
+
+        return plugins
+
+    def plugins_by_type(self, ensure_parent=True):
         return {
-            plugin_type: self.get_plugins_of_type(plugin_type)
+            plugin_type: self.get_plugins_of_type(
+                plugin_type, ensure_parent=ensure_parent
+            )
             for plugin_type in PluginType
         }
 
-    def plugins(self) -> Iterable[ProjectPlugin]:
+    def plugins(self, ensure_parent=True) -> Iterable[ProjectPlugin]:
         yield from (
             plugin
-            for plugin_type, plugins in self.plugins_by_type().items()
+            for _, plugins in self.plugins_by_type(ensure_parent=ensure_parent).items()
             for plugin in plugins
         )
 
@@ -155,14 +164,13 @@ class ProjectPluginsService:
 
             return outdated
 
-    def get_parent(self, plugin: ProjectPlugin, plugins_of_type):
-        if not plugins_of_type:
-            plugins_of_type = self.get_plugins_of_type(plugin.type)
-
+    def get_parent(self, plugin: ProjectPlugin):
         if plugin.inherit_from and not plugin.is_variant_set:
             try:
-                return find_named(plugins_of_type, plugin.inherit_from)
-            except NotFound:
+                return self.find_plugin(
+                    plugin_type=plugin.type, plugin_name=plugin.inherit_from
+                )
+            except PluginMissingError:
                 pass
 
         try:
@@ -172,3 +180,9 @@ class ProjectPluginsService:
                 raise PluginParentNotFoundError(plugin, err) from err
             else:
                 raise
+
+    def ensure_parent(self, plugin: ProjectPlugin):
+        if not plugin.parent:
+            plugin.parent = self.get_parent(plugin)
+
+        return plugin

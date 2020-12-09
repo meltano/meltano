@@ -29,11 +29,11 @@ class ProjectAddService:
             plugin_type, plugin_name, **attrs, default_variant=Variant.DEFAULT_NAME
         )
 
-        parent = self.plugins_service.get_parent(plugin)
-        plugin.parent = parent
+        self.plugins_service.ensure_parent(plugin)
 
         # If we are inheriting from a base plugin definition,
         # repeat the variant and pip_url in meltano.yml
+        parent = plugin.parent
         if isinstance(parent, BasePlugin):
             plugin.variant = parent.variant
             plugin.pip_url = parent.pip_url
