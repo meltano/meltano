@@ -10,6 +10,8 @@ from meltano.api.models import db
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.project import Project
 from meltano.core.meltano_invoker import MeltanoInvoker
+from meltano.core.schedule_service import ScheduleService
+from meltano.core.utils import find_named
 
 
 executor = Executor()
@@ -20,21 +22,17 @@ def setup_executor(app, project):
     executor.init_app(app)
 
 
-def defer_run_elt(schedule_payload: dict):
+def defer_run_schedule(name):
     project = Project.find()
+    schedule_service = ScheduleService(project)
 
-    job_id = schedule_payload["name"]
-    extractor = schedule_payload["extractor"]
-    loader = schedule_payload["loader"]
-    transform = schedule_payload.get("transform")
-
-    args = ["elt", "--job_id", job_id, extractor, loader, "--transform", transform]
+    schedule = find_named(schedule_service.schedules(), name)
 
     result = MeltanoInvoker(project).invoke(
-        args,
+        ["elt", *schedule.elt_args],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
-        env={"MELTANO_JOB_TRIGGER": "ui"},
+        env={**schedule.env, "MELTANO_JOB_TRIGGER": "ui"},
     )
 
     # It would probably be better that we would use sqlalchemy ORM events
@@ -46,15 +44,14 @@ def defer_run_elt(schedule_payload: dict):
     #
     # The caveat here is that pipeline that runs from Airflow won't trigger
     # this signal, and thus won't send any notification.
-    PipelineSignals.on_complete(schedule_payload, success=result.returncode == 0)
+    PipelineSignals.on_complete(schedule, success=result.returncode == 0)
 
 
-def run_elt(project: Project, schedule_payload: dict):
-    job_id = schedule_payload["name"]
-    executor.submit(defer_run_elt, schedule_payload)
-    logger.debug(f"Defered `run_elt` to the executor with {schedule_payload}.")
+def run_schedule(project: Project, name):
+    executor.submit(defer_run_schedule, name)
+    logger.debug(f"Defered `run_schedule` to the executor with {name}.")
 
-    return job_id
+    return name
 
 
 def defer_upgrade():

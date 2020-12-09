@@ -20,6 +20,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2379](https://gitlab.com/meltano/meltano/-/issues/2379) Take into account schedule `env` when running pipeline from UI using "Run" button
+
 ### Breaks
 
 

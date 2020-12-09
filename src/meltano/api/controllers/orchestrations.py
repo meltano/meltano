@@ -37,7 +37,7 @@ from meltano.api.security.auth import block_if_readonly
 from meltano.api.models import db
 from meltano.api.models.subscription import Subscription
 from meltano.api.json import freeze_keys
-from meltano.api.executor import run_elt
+from meltano.api.executor import run_schedule
 from flask_security import roles_required
 from .errors import InvalidFileNameError
 from .upload_helper import InvalidFileTypeError, InvalidFileSizeError, UploadHelper
@@ -257,7 +257,8 @@ def download_job_log(job_id) -> Response:
 def run():
     project = Project.find()
     schedule_payload = request.get_json()
-    job_id = run_elt(project, schedule_payload)
+    name = schedule_payload["name"]
+    job_id = run_schedule(project, name)
 
     return jsonify({"job_id": job_id}), 202
 
