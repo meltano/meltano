@@ -11,8 +11,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2476](https://gitlab.com/meltano/meltano/-/issues/2476) Add missing tap-salesforce `is_sandbox` setting
+- [#2471](https://gitlab.com/meltano/meltano/-/issues/2471) Make tap-bigquery discoverable
 
 ### Changes
+
+- [#2477](https://gitlab.com/meltano/meltano/-/issues/2477) Show array and object settings in configuration UI as unsupported instead of hiding them entirely
+- [#2477](https://gitlab.com/meltano/meltano/-/issues/2477) Unhide tap-csv and tap-spreadsheets-anywhere in UI
 
 ### Fixes
 
@@ -21,11 +25,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ## 1.60.1 - (2020-12-07)
 ---
-
-### New
-
-- [#2471](https://gitlab.com/meltano/meltano/-/issues/2471) Make tap-bigquery discoverable
-
 
 ### Fixes
 

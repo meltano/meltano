@@ -92,7 +92,10 @@ export default {
       return kind => kind === 'file'
     },
     getIsOfKindHidden() {
-      return kind => kind === 'hidden' || kind === 'object' || kind === 'array'
+      return kind => kind === 'hidden'
+    },
+    getIsOfKindUnsupported() {
+      return kind => kind === 'object' || kind === 'array'
     },
     getIsOfKindOAuth() {
       return kind => this.isOAuthEnabled && kind === 'oauth'
@@ -117,12 +120,14 @@ export default {
         const metadata = this.configSettings.configMetadata[setting.name]
 
         return (
-          setting.protected === true || (metadata && !metadata.overwritable)
+          setting.protected === true ||
+          this.getIsOfKindUnsupported(setting.kind) ||
+          (metadata && !metadata.overwritable)
         )
       }
     },
     getPlaceholder() {
-      return setting => setting.placeholder || setting.value || setting.name
+      return setting => setting.placeholder || setting.value
     },
     getRequiredLabel() {
       return setting =>
@@ -184,6 +189,17 @@ export default {
     labelClass() {
       return this.fieldClass || 'is-normal'
     },
+    protectedFieldUrl() {
+      return setting => {
+        if (setting.protected) {
+          return 'https://meltano.com/docs/contributor-guide.html#protected-settings'
+        } else if (this.getIsOfKindUnsupported(setting.kind)) {
+          return 'https://meltano.com/docs/project.html#plugin-configuration'
+        } else {
+          return 'https://meltano.com/docs/configuration.html#configuration-layers'
+        }
+      }
+    },
     protectedFieldMessage() {
       let configMetadata = this.configSettings.configMetadata
 
@@ -192,6 +208,10 @@ export default {
 
         if (setting.protected) {
           return 'This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more.'
+        } else if (this.getIsOfKindUnsupported(setting.kind)) {
+          return `Settings with ${
+            setting.kind
+          } values cannot currently be managed in the UI. Manage this setting directly in your meltano.yml project file instead.`
         } else {
           return `This setting is currently set in ${
             metadata.source_label
@@ -332,7 +352,7 @@ export default {
                 :href="plugin.docs"
                 target="_blank"
                 class="is-size-7 has-text-underlined is-pulled-right"
-                >View Documentation Externally
+                >Open documentation in new tab
               </a>
             </div>
           </div>
@@ -518,6 +538,22 @@ export default {
                     </select>
                   </div>
 
+                  <!-- Unsupported: Array / Object -->
+                  <div v-else-if="getIsOfKindUnsupported(setting.kind)">
+                    <input
+                      :id="getFormFieldForId(setting)"
+                      :value="
+                        configSettings.config[setting.name] &&
+                          JSON.stringify(configSettings.config[setting.name])
+                      "
+                      :class="['input', fieldClass, successClass(setting)]"
+                      :placeholder="getPlaceholder(setting)"
+                      type="text"
+                      disabled="disabled"
+                      readonly="readonly"
+                    />
+                  </div>
+
                   <!-- Text / Password / Email -->
                   <input
                     v-else-if="getIsOfKindTextBased(setting.kind)"
@@ -536,7 +572,7 @@ export default {
                 <template v-if="!getIsOfKindHidden(setting.kind)">
                   <div v-if="getIsProtected(setting)" class="control">
                     <a
-                      href="https://meltano.com/docs/contributor-guide.html#protected-settings"
+                      :href="protectedFieldUrl(setting)"
                       target="_blank"
                       class="button is-small"
                     >
@@ -601,7 +637,7 @@ export default {
             </p>
             <p>
               <a :href="plugin.docs" target="_blank" class="button is-primary"
-                >View the documentation externally</a
+                >Open documentation in new tab</a
               >
             </p>
           </div>
