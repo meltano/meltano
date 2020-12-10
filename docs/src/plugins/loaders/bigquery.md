@@ -75,7 +75,7 @@ plugins:
     pip_url: git+https://github.com/adswerve/target-bigquery.git@v0.10.2
     config:
       project_id: my-project-id
-      dataset_id: my-dataset-id
+      # dataset_id: my-dataset-id   # override if default (see below) is not appropriate
       location: EU
 ```
 
@@ -100,6 +100,7 @@ export TARGET_BIGQUERY_PROJECT_ID=<id>
 
 - Name: `dataset_id`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_BIGQUERY_DATASET_ID`
+- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html).
 
 BigQuery dataset
 
