@@ -1046,6 +1046,7 @@ loaders:
     repo: https://github.com/adswerve/target-bigquery
     pip_url: git+https://github.com/adswerve/target-bigquery.git@v0.10.2
     dialect: bigquery
+    target_schema: $TARGET_BIGQUERY_DATASET_ID
     settings_group_validation:
       - ['project_id', 'dataset_id', 'location', 'credentials_path']
     settings:
@@ -1053,6 +1054,7 @@ loaders:
         description: BigQuery project
       - name: dataset_id
         description: BigQuery dataset
+        value: $MELTANO_EXTRACT__LOAD_SCHEMA
       - name: location
         description: Dataset location
         value: US
