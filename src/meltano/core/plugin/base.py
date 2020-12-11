@@ -22,7 +22,7 @@ class VariantNotFoundError(Exception):
         self.variant_name = variant_name
 
         message = f"{plugin.type.descriptor.capitalize()} '{plugin.name}' variant '{variant_name}' is not known to Meltano. "
-        message += f"Variants: {plugin.list_variant_names()}"
+        message += f"Variants: {plugin.variant_labels}"
 
         super().__init__(message)
 
@@ -221,20 +221,20 @@ class PluginDefinition(PluginRef):
 
         return self.get_variant(variant_or_name)
 
-    def list_variant_names(self):
-        names = []
+    def variant_label(self, variant):
+        variant = self.find_variant(variant)
 
-        for i, variant in enumerate(self.variants):
-            name = variant.name or Variant.ORIGINAL_NAME
+        label = variant.name or Variant.ORIGINAL_NAME
+        if variant == self.variants[0]:
+            label = f"{label} (default)"
+        elif variant.deprecated:
+            label = f"{label} (deprecated)"
 
-            if i == 0:
-                name += " (default)"
-            elif variant.deprecated:
-                name += " (deprecated)"
+        return label
 
-            names.append(name)
-
-        return ", ".join(names)
+    @property
+    def variant_labels(self):
+        return ", ".join([self.variant_label(variant) for variant in self.variants])
 
 
 class BasePlugin(HookObject):

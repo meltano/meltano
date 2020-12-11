@@ -123,13 +123,10 @@ class TestPluginDefinition:
 
         assert plugin_def.find_variant(plugin_def.variants[1]).name == "singer-io"
 
-    def test_list_variant_names(self):
+    def test_variant_labels(self):
         plugin_def = PluginDefinition(PluginType.EXTRACTORS, **self.ATTRS["variants"])
 
-        assert (
-            plugin_def.list_variant_names()
-            == "meltano (default), singer-io (deprecated)"
-        )
+        assert plugin_def.variant_labels == "meltano (default), singer-io (deprecated)"
 
     def test_label(self):
         plugin_def = PluginDefinition(

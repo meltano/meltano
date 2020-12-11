@@ -37,7 +37,7 @@ def discover(project, plugin_type):
             click.echo(plugin_def.name, nl=False)
 
             if len(plugin_def.variants) > 1:
-                click.echo(f", variants: {plugin_def.list_variant_names()}")
+                click.echo(f", variants: {plugin_def.variant_labels}")
             else:
                 click.echo()
 
