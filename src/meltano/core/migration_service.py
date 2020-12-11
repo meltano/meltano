@@ -1,16 +1,16 @@
-import os
-import click
 import logging
-import sqlalchemy
+import os
 from pathlib import Path
-from alembic.config import Config
-from alembic.script import ScriptDirectory
-from alembic.runtime.migration import MigrationContext
-from alembic import command
 
-from meltano.migrations import MIGRATION_DIR, LOCK_PATH
-from meltano.core.db import project_engine
+import click
+import sqlalchemy
+from alembic import command
+from alembic.config import Config
+from alembic.runtime.migration import MigrationContext
+from alembic.script import ScriptDirectory
 from meltano.api.models.security import Role, RolePermissions
+from meltano.core.db import project_engine
+from meltano.migrations import LOCK_PATH, MIGRATION_DIR
 
 
 class MigrationError(Exception):

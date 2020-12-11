@@ -2,7 +2,7 @@ import re
 from collections import namedtuple
 from enum import Enum
 
-from pypika import Field, Case
+from pypika import Case, Field
 
 
 class SubstitutionType(Enum):

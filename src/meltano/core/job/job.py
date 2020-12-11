@@ -1,18 +1,18 @@
-import sys
-import os
 import logging
-import sqlalchemy.types as types
-import uuid
+import os
 import signal
-from datetime import datetime
+import sys
+import uuid
 from contextlib import contextmanager
+from datetime import datetime
 from enum import Enum
-from sqlalchemy import Column
-from sqlalchemy.ext.mutable import MutableDict
 
+import sqlalchemy.types as types
 from meltano.core.db import SystemModel
 from meltano.core.error import Error
-from meltano.core.sqlalchemy import JSONEncodedDict, IntFlag, GUID
+from meltano.core.sqlalchemy import GUID, IntFlag, JSONEncodedDict
+from sqlalchemy import Column
+from sqlalchemy.ext.mutable import MutableDict
 
 
 class InconsistentStateError(Error):

@@ -1,14 +1,12 @@
-import yaml
 import copy
-
-
 from typing import Iterable, List
-from meltano.core.schedule import Schedule
+
+import yaml
+from meltano.core.behavior import NameEq
+from meltano.core.behavior.canonical import Canonical
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.behavior.canonical import Canonical
-from meltano.core.behavior import NameEq
-
+from meltano.core.schedule import Schedule
 
 VERSION = 1
 

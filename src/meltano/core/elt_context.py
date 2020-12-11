@@ -1,12 +1,12 @@
-from typing import Optional
 from collections import namedtuple
+from typing import Optional
 
-from meltano.core.project import Project
 from meltano.core.job import Job
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.plugin import PluginType, PluginRef
+from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import invoker_factory
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
 
 
 class PluginContext(namedtuple("PluginContext", "plugin settings_service session")):

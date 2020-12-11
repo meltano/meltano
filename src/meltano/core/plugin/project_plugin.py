@@ -1,10 +1,11 @@
-import logging
 import copy
+import logging
 from typing import Optional
 
-from meltano.core.utils import flatten, uniques_in
 from meltano.core.setting_definition import SettingDefinition
-from .base import PluginRef, PluginType, PluginDefinition, Variant
+from meltano.core.utils import flatten, uniques_in
+
+from .base import PluginDefinition, PluginRef, PluginType, Variant
 from .factory import base_plugin_factory
 
 logger = logging.getLogger(__name__)

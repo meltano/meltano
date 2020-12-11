@@ -1,7 +1,6 @@
 import pytest
-
-from meltano.core.db import project_engine
 from meltano.api.models import db
+from meltano.core.db import project_engine
 
 
 class TestApp:

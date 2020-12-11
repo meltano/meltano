@@ -1,10 +1,10 @@
-import pytest
-import tempfile
 import io
 import logging
 import sys
+import tempfile
 from pathlib import Path
 
+import pytest
 from meltano.core.logging.output_logger import OutputLogger
 
 

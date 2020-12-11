@@ -1,13 +1,14 @@
-import os
 import json
-import yaml
 import logging
-import click
+import os
 import re
 
-from .project import Project
+import click
+import yaml
+
 from .plugin import PluginType
 from .plugin.project_plugin import ProjectPlugin
+from .project import Project
 from .project_add_service import ProjectAddService
 
 

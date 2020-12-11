@@ -1,11 +1,11 @@
-import pytest
-import yaml
 import os
 import shutil
-
 from unittest import mock
-from meltano.core.plugin_install_service import PluginInstallService
+
+import pytest
+import yaml
 from meltano.core.config_service import ConfigService
+from meltano.core.plugin_install_service import PluginInstallService
 
 
 class TestPluginInstallService:

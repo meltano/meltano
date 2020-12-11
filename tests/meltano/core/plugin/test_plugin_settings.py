@@ -1,18 +1,18 @@
-import pytest
-import dotenv
-from unittest import mock
 from contextlib import contextmanager
 from datetime import date, datetime
+from unittest import mock
 
-from meltano.core.project_plugins_service import PluginAlreadyAddedException
-from meltano.core.setting import Setting
+import dotenv
+import pytest
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import (
+    REDACTED_VALUE,
     PluginSettingsService,
     SettingValueStore,
-    REDACTED_VALUE,
 )
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
+from meltano.core.setting import Setting
 
 
 def test_create(session):

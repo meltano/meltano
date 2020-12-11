@@ -1,6 +1,6 @@
+import fnmatch
 import logging
 import re
-import fnmatch
 from collections import OrderedDict, namedtuple
 from enum import Enum, auto
 from functools import singledispatch

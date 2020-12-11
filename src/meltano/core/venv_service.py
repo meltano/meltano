@@ -1,15 +1,14 @@
-import subprocess
-import platform
-import sys
-import shutil
-import os
 import logging
-from pathlib import Path
+import os
+import platform
+import shutil
+import subprocess
+import sys
 from collections import namedtuple
+from pathlib import Path
 
-from .project import Project
 from .error import SubprocessError
-
+from .project import Project
 
 logger = logging.getLogger(__name__)
 

@@ -1,8 +1,8 @@
-import pytest
 import json
-import dotenv
 from unittest import mock
 
+import dotenv
+import pytest
 from asserts import assert_cli_runner
 from meltano.cli import cli
 

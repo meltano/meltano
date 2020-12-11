@@ -1,13 +1,14 @@
-import os
 import json
-import yaml
 import logging
+import os
 from typing import List
 
-from .project import Project
+import yaml
+
 from .plugin import BasePlugin
 from .plugin.project_plugin import ProjectPlugin
-from .project_plugins_service import ProjectPluginsService, PluginAlreadyAddedException
+from .project import Project
+from .project_plugins_service import PluginAlreadyAddedException, ProjectPluginsService
 
 
 class PluginNotSupportedException(Exception):
@@ -44,8 +45,10 @@ class ProjectAddService:
         return self.plugins_service.add_to_file(plugin)
 
     def add_related(self, *args, **kwargs):
-        related_plugin_refs = self.plugins_service.discovery_service.find_related_plugin_refs(
-            *args, **kwargs
+        related_plugin_refs = (
+            self.plugins_service.discovery_service.find_related_plugin_refs(
+                *args, **kwargs
+            )
         )
 
         added_plugins = []

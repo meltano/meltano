@@ -1,6 +1,5 @@
 import pytest
-
-from meltano.core.plugin import PluginDefinition, PluginType, BasePlugin
+from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType
 
 
 class TestProjectPluginsService:

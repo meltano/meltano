@@ -1,9 +1,9 @@
 import logging
-import humps
+from collections.abc import Iterable, Mapping
 from enum import Enum
-from collections.abc import Mapping, Iterable
-from flask import request, json, current_app
 
+import humps
+from flask import current_app, json, request
 from meltano.core.utils import compose
 
 

@@ -1,17 +1,18 @@
-import os
-import click
-import shutil
 import logging
+import os
+import shutil
 from functools import singledispatch
-from typing import List, Dict
 from pathlib import Path
+from typing import Dict, List
 
-from .utils import truthy
-from .project_settings_service import ProjectSettingsService, SettingValueStore
-from .project import Project
-from .plugin.meltano_file import MeltanoFilePlugin
+import click
+
 from .db import project_engine
-from .migration_service import MigrationService, MigrationError
+from .migration_service import MigrationError, MigrationService
+from .plugin.meltano_file import MeltanoFilePlugin
+from .project import Project
+from .project_settings_service import ProjectSettingsService, SettingValueStore
+from .utils import truthy
 
 
 class ProjectInitServiceError(Exception):

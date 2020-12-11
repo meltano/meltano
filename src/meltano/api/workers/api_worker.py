@@ -1,9 +1,9 @@
 import os
-import threading
 import subprocess
+import threading
 
-from meltano.core.project import Project
 from meltano.core.meltano_invoker import MeltanoInvoker
+from meltano.core.project import Project
 from meltano.core.utils.pidfile import PIDFile
 
 

@@ -1,16 +1,16 @@
-import os
-import pytest
 import functools
-import yaml
+import os
 from unittest import mock
 
+import pytest
+import yaml
 from asserts import assert_cli_runner
 from meltano.cli import cli
-from meltano.core.plugin import PluginType, PluginRef, Variant
-from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.plugin.error import PluginMissingError
 from meltano.core.m5o.dashboards_service import DashboardsService
 from meltano.core.m5o.reports_service import ReportsService
+from meltano.core.plugin import PluginRef, PluginType, Variant
+from meltano.core.plugin.error import PluginMissingError
+from meltano.core.plugin_install_service import PluginInstallReason
 
 
 class TestCliAdd:

@@ -1,22 +1,22 @@
 import logging
 
-from meltano.core.plugin import PluginType, BasePlugin
-from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_install_service import (
-    PluginInstallService,
-    PluginInstallReason,
-)
 from meltano.core.behavior.hookable import hook
-from meltano.core.m5o.m5o_collection_parser import (
-    M5oCollectionParser,
-    M5oCollectionParserTypes,
-)
-from meltano.core.venv_service import VirtualEnv
-from meltano.core.m5o.reports_service import ReportAlreadyExistsError, ReportsService
 from meltano.core.m5o.dashboards_service import (
     DashboardAlreadyExistsError,
     DashboardsService,
 )
+from meltano.core.m5o.m5o_collection_parser import (
+    M5oCollectionParser,
+    M5oCollectionParserTypes,
+)
+from meltano.core.m5o.reports_service import ReportAlreadyExistsError, ReportsService
+from meltano.core.plugin import BasePlugin, PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin_install_service import (
+    PluginInstallReason,
+    PluginInstallService,
+)
+from meltano.core.venv_service import VirtualEnv
 
 logger = logging.getLogger(__name__)
 

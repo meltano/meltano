@@ -1,19 +1,17 @@
 import sqlalchemy
 from flask import jsonify, request
-
-from .errors import InvalidFileNameError
-
-from meltano.core.project import Project
+from flask_security import roles_required
+from meltano.api.api_blueprint import APIBlueprint
+from meltano.api.security.auth import block_if_readonly
+from meltano.api.security.resource_filter import NameFilterMixin, Need, ResourceFilter
 from meltano.core.m5o.reports_service import (
     ReportAlreadyExistsError,
     ReportDoesNotExistError,
     ReportsService,
 )
+from meltano.core.project import Project
 
-from meltano.api.api_blueprint import APIBlueprint
-from meltano.api.security.auth import block_if_readonly
-from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin, Need
-from flask_security import roles_required
+from .errors import InvalidFileNameError
 
 reportsBP = APIBlueprint("reports", __name__)
 

@@ -1,2 +1,2 @@
-from .job import Job, State, Payload
 from .finder import JobFinder
+from .job import Job, Payload, State

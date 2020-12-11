@@ -1,17 +1,17 @@
 import logging
 from collections import namedtuple
+from datetime import date, datetime
 from typing import Optional
-from datetime import datetime, date
 
-from .project_plugins_service import ProjectPluginsService
+from .db import project_engine
+from .plugin import PluginRef, PluginType
 from .plugin.settings_service import PluginSettingsService, SettingMissingError
 from .plugin_discovery_service import PluginDiscoveryService, PluginNotFoundError
 from .meltano_invoker import MeltanoInvoker
 from .project import Project
-from .plugin import PluginType, PluginRef
-from .db import project_engine
-from .utils import nest, iso8601_datetime, coerce_datetime, find_named, NotFound
+from .project_plugins_service import ProjectPluginsService
 from .schedule import Schedule
+from .utils import NotFound, coerce_datetime, find_named, iso8601_datetime, nest
 
 
 class ScheduleAlreadyExistsError(Exception):
@@ -130,8 +130,10 @@ class ScheduleService:
         """
 
         try:
-            extractor = self.plugins_service.discovery_service.find_definition_by_namespace(
-                PluginType.EXTRACTORS, namespace
+            extractor = (
+                self.plugins_service.discovery_service.find_definition_by_namespace(
+                    PluginType.EXTRACTORS, namespace
+                )
             )
 
             return next(

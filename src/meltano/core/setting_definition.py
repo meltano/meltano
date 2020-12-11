@@ -1,11 +1,11 @@
 import json
-from typing import List
 from datetime import date, datetime
+from typing import List
 
-from .utils import truthy, flatten, nest_object, to_env_var, uniques_in
-from .behavior.canonical import Canonical
 from .behavior import NameEq
+from .behavior.canonical import Canonical
 from .error import Error
+from .utils import flatten, nest_object, to_env_var, truthy, uniques_in
 
 VALUE_PROCESSORS = {
     "nest_object": nest_object,
@@ -97,7 +97,7 @@ class SettingDefinition(NameEq, Canonical):
     def from_missing(cls, defs, config, **kwargs):
         flat_config = flatten(config, "dot")
 
-        names = set(s.name for s in defs)
+        names = {s.name for s in defs}
 
         # Create custom setting definitions for unknown keys
         return [

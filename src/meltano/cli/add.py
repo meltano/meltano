@@ -1,20 +1,21 @@
-import os
-import yaml
 import json
-import click
-import sys
 import logging
-from urllib.parse import urlparse
+import os
+import sys
 from typing import List
+from urllib.parse import urlparse
+
+import click
+import yaml
+from meltano.core.plugin import PluginType
+from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.project_add_custom_service import ProjectAddCustomService
+from meltano.core.project_add_service import ProjectAddService
+from meltano.core.project_plugins_service import ProjectPluginsService
 
 from . import cli
 from .params import project
 from .utils import CliError, add_plugin, add_related_plugins, install_plugins
-from meltano.core.plugin import PluginType
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_add_service import ProjectAddService
-from meltano.core.project_add_custom_service import ProjectAddCustomService
-from meltano.core.plugin_install_service import PluginInstallReason
 
 
 @cli.command()

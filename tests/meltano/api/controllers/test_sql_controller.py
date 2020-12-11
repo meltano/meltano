@@ -1,7 +1,7 @@
-import pytest
 import re
-
 from unittest import mock
+
+import pytest
 from flask import url_for
 from support.payload_builder import PayloadBuilder
 

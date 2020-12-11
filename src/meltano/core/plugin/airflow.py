@@ -1,13 +1,14 @@
 import configparser
 import logging
-import subprocess
 import os
+import subprocess
 
-from . import PluginType, BasePlugin
-from meltano.core.error import SubprocessError
 from meltano.core.behavior.hookable import hook
+from meltano.core.error import SubprocessError
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.utils import nest
+
+from . import BasePlugin, PluginType
 
 
 class AirflowInvoker(PluginInvoker):

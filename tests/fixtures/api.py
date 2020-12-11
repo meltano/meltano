@@ -1,14 +1,14 @@
-import pytest
-from unittest import mock
 from contextlib import contextmanager
-from flask import request_started
-from flask_security.utils import login_user, logout_user
-from sqlalchemy import MetaData
+from unittest import mock
 
 import meltano.api.app
-from meltano.core.migration_service import MigrationService
-from meltano.api.security.identity import create_dev_user
+import pytest
+from flask import request_started
+from flask_security.utils import login_user, logout_user
 from meltano.api.models import db as _db
+from meltano.api.security.identity import create_dev_user
+from meltano.core.migration_service import MigrationService
+from sqlalchemy import MetaData
 
 
 @pytest.fixture

@@ -1,14 +1,15 @@
 import json
 import logging
 
-from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
-from .project import Project
+from meltano.core.plugin_invoker import invoker_factory
+from meltano.core.project_plugins_service import ProjectPluginsService
+
 from .db import project_engine
+from .project import Project
 
 
 class SelectService:

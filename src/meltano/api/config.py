@@ -1,14 +1,14 @@
-import os
-import logging
 import datetime
+import logging
+import os
 
+from meltano.api.headers import *
 from meltano.core.project import Project
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
 )
 from meltano.core.utils import truthy
-from meltano.api.headers import *
 
 # Flask
 # -----------------
@@ -67,7 +67,7 @@ CORS_EXPOSE_HEADERS = [VERSION_HEADER]
 CORS_ALLOW_HEADERS = ["CONTENT-TYPE", JSON_SCHEME_HEADER]
 
 
-class ProjectSettings(object):
+class ProjectSettings:
     settings_map = {
         "SERVER_NAME": "ui.server_name",
         "SESSION_COOKIE_DOMAIN": "ui.session_cookie_domain",

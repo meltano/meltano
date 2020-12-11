@@ -1,12 +1,12 @@
-import pytest
 from datetime import datetime
 from unittest import mock
 
+import pytest
 from meltano.core.schedule_service import (
-    ScheduleService,
     Schedule,
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
+    ScheduleService,
     SettingMissingError,
 )
 

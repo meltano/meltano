@@ -1,15 +1,13 @@
 import re
-
+from copy import deepcopy
 from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Tuple
+
 import networkx as nx
-from copy import deepcopy
-
-from pypika import functions as fn
-from pypika import AliasedQuery, Query, Order, Table, Field, Criterion, Interval
-
 from networkx.readwrite import json_graph
+from pypika import AliasedQuery, Criterion, Field, Interval, Order, Query, Table
+from pypika import functions as fn
 
 
 class ParseError(Exception):
@@ -270,7 +268,7 @@ class MeltanoTable(MeltanoBase):
         elif name in ["name", "schema", "source_name"]:
             self._attributes[name] = value
         else:
-            super(MeltanoTable, self).__setattr__(name, value)
+            super().__setattr__(name, value)
 
 
 class MeltanoColumn(MeltanoBase):
@@ -321,7 +319,7 @@ class MeltanoColumn(MeltanoBase):
         if name in ["label", "name", "type", "primary_key", "hidden", "sql"]:
             self._attributes[name] = value
         else:
-            super(MeltanoColumn, self).__setattr__(name, value)
+            super().__setattr__(name, value)
 
     def __repr__(self):
         return f"<{self.__class__.__name__} name={self.name}, alias={self.alias()}>"
@@ -373,7 +371,7 @@ class MeltanoAggregate(MeltanoBase):
             field = Field(self.column_name(), table=pika_table)
         elif base_table and base_table != self.table.find_source_name():
             sql = re.sub(
-                "\{\{TABLE\}\}",
+                r"\{\{TABLE\}\}",
                 self.table.find_source_name(),
                 self.sql,
                 flags=re.IGNORECASE,
@@ -418,7 +416,7 @@ class MeltanoAggregate(MeltanoBase):
         if name in ["name", "type", "label", "description", "sql"]:
             self._attributes[name] = value
         else:
-            super(MeltanoAggregate, self).__setattr__(name, value)
+            super().__setattr__(name, value)
 
 
 class MeltanoTimeframe(MeltanoBase):
@@ -492,7 +490,7 @@ class MeltanoTimeframe(MeltanoBase):
         if name in ["name", "label", "description", "sql"]:
             self._attributes[name] = value
         else:
-            super(MeltanoTimeframe, self).__setattr__(name, value)
+            super().__setattr__(name, value)
 
 
 class MeltanoTimeframePeriod(MeltanoBase):
@@ -541,7 +539,7 @@ class MeltanoTimeframePeriod(MeltanoBase):
             field = Field(self.timeframe.column_name(), table=pika_table)
         elif base_table and base_table != self.table.find_source_name():
             sql = re.sub(
-                "\{\{TABLE\}\}",
+                r"\{\{TABLE\}\}",
                 self.table.find_source_name(),
                 self.timeframe.sql,
                 flags=re.IGNORECASE,
@@ -563,7 +561,7 @@ class MeltanoTimeframePeriod(MeltanoBase):
         if name in ["name", "label", "part"]:
             self._attributes[name] = value
         else:
-            super(MeltanoTimeframePeriod, self).__setattr__(name, value)
+            super().__setattr__(name, value)
 
 
 class MeltanoJoin(MeltanoBase):
@@ -698,7 +696,7 @@ class MeltanoFilter(MeltanoBase):
                     raise ParseError(
                         f"You can't use '[+-]N[dmy]' filter expressions with aggregate attributes"
                     )
-                elif attribute_def.type not in ["date", "time"]:
+                elif attribute_def.type not in ["date", "time"]:  # noqa: WPS220, WPS510
                     raise ParseError(
                         f"[+-]N[dmy] filter expressions require a column atribute of type date or time"
                     )

@@ -1,17 +1,18 @@
-import os
 import json
-import click
+import os
 from urllib.parse import urlparse
+
+import click
+from meltano.core.plugin import PluginType
+from meltano.core.plugin_discovery_service import (
+    DiscoveryInvalidError,
+    PluginDiscoveryService,
+)
+from meltano.core.project import Project
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import project
-from meltano.core.plugin import PluginType
-from meltano.core.project import Project
-from meltano.core.plugin_discovery_service import (
-    PluginDiscoveryService,
-    DiscoveryInvalidError,
-)
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 @cli.command()

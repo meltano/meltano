@@ -1,18 +1,19 @@
-import os
-import click
 import fnmatch
 import json
 import logging
+import os
+
+import click
+from meltano.core.db import project_engine
+from meltano.core.plugin.error import PluginExecutionError
+from meltano.core.plugin.singer.catalog import SelectionType, parse_select_pattern
+from meltano.core.plugin_invoker import invoker_factory
+from meltano.core.select_service import SelectService
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import project
 from .utils import CliError
-from meltano.core.plugin_invoker import invoker_factory
-from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin.singer.catalog import parse_select_pattern, SelectionType
-from meltano.core.select_service import SelectService
-from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.db import project_engine
 
 
 def selection_color(selection):

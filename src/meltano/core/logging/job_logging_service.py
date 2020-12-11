@@ -5,11 +5,10 @@ import os
 import shutil
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Union, Optional
+from typing import Optional, Union
 
 from meltano.core.project import Project
-from meltano.core.utils import slugify, makedirs
-
+from meltano.core.utils import makedirs, slugify
 
 MAX_FILE_SIZE = 2_097_152  # 2MB max
 
@@ -45,7 +44,7 @@ class JobLoggingService:
 
         try:
             log_file = open(log_file_name, "w")
-        except (OSError, IOError) as err:
+        except OSError as err:
             # Don't stop the Job running if you can not open the log file
             # for writting: just return /dev/null
             logging.error(

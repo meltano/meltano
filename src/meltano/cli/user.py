@@ -1,11 +1,12 @@
-import click
 import logging
 
-from . import cli
-from .params import project
+import click
 from flask_security.utils import hash_password
 from meltano.api.app import create_app
 from meltano.core.utils import identity
+
+from . import cli
+from .params import project
 
 
 @cli.group(invoke_without_command=True)

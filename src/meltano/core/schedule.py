@@ -1,7 +1,7 @@
 import datetime
 
-from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior import NameEq
+from meltano.core.behavior.canonical import Canonical
 from meltano.core.job import JobFinder
 
 CRON_INTERVALS = {

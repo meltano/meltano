@@ -1,11 +1,12 @@
 import click
+from meltano.core.plugin import PluginType
+from meltano.core.project_add_service import ProjectAddService
+from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.tracking import GoogleAnalyticsTracker
+
 from . import cli
 from .params import project
 from .utils import CliError, add_related_plugins, install_plugins
-from meltano.core.project_add_service import ProjectAddService
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.plugin import PluginType
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 @cli.command()

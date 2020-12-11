@@ -1,12 +1,12 @@
 import sqlalchemy
 from flask import url_for
-
-from .dashboards_helper import DashboardsHelper
-from .reports_helper import ReportsHelper
 from meltano.api.models.embed_token import EmbedToken, ResourceType
 from meltano.core.m5o.dashboards_service import DashboardsService
 from meltano.core.m5o.reports_service import ReportsService
 from meltano.core.project import Project
+
+from .dashboards_helper import DashboardsHelper
+from .reports_helper import ReportsHelper
 
 
 class InvalidEmbedToken(Exception):
@@ -82,8 +82,10 @@ class EmbedsHelper:
             for report_id in dashboard["report_ids"]
         ]
         dashboards_helper = DashboardsHelper()
-        reports_with_query_results = dashboards_helper.get_dashboard_reports_with_query_results(
-            reports, today=today
+        reports_with_query_results = (
+            dashboards_helper.get_dashboard_reports_with_query_results(
+                reports, today=today
+            )
         )
         return {
             "dashboard": dashboard,

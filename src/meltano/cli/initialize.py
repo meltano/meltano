@@ -1,20 +1,21 @@
-import os
-import yaml
-import click
 import logging
+import os
 from urllib.parse import urlparse
 
+import click
+import yaml
+from meltano.core.error import SubprocessError
+from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.project_init_service import (
     ProjectInitService,
     ProjectInitServiceError,
 )
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.error import SubprocessError
+
 from . import cli
-from .utils import CliError
 from .params import database_uri_option
+from .utils import CliError
 
 EXTRACTORS = "extractors"
 LOADERS = "loaders"

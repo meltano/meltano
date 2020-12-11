@@ -1,30 +1,29 @@
-import pytest
-import requests
-import requests_mock
-import json
-import yaml
 import copy
+import json
 from contextlib import contextmanager
 from unittest import mock
 
 import meltano.core.bundle as bundle
-
-from meltano.core.project_settings_service import ProjectSettingsService
+import pytest
+import requests
+import requests_mock
+import yaml
+from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.plugin import (
-    PluginType,
     PluginDefinition,
+    PluginType,
     Variant,
     VariantNotFoundError,
 )
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import (
+    VERSION,
     DiscoveryFile,
     PluginDiscoveryService,
     PluginNotFoundError,
-    VERSION,
 )
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
-from meltano.core.behavior.versioned import IncompatibleVersionError
+from meltano.core.project_settings_service import ProjectSettingsService
 
 
 @pytest.fixture(scope="class")

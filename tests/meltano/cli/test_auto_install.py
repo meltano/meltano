@@ -1,7 +1,6 @@
 import pytest
-
-from meltano.cli import cli
 from asserts import assert_cli_runner
+from meltano.cli import cli
 
 
 class TestAutoInstall:

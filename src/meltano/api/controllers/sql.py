@@ -1,20 +1,19 @@
 import json
 import os
-import sqlalchemy
-
 from datetime import date, datetime
 from decimal import Decimal
-from flask import jsonify, request
 
-from .settings_helper import SettingsHelper
-from .sql_helper import SqlHelper, ConnectionNotFound, UnsupportedConnectionDialect
+import sqlalchemy
+from flask import jsonify, request
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.core.project import Project
-from meltano.core.schedule_service import ScheduleService, ScheduleNotFoundError
-from meltano.core.utils import find_named, NotFound
+from meltano.core.schedule_service import ScheduleNotFoundError, ScheduleService
+from meltano.core.sql.base import EmptyQuery, ParseError
 from meltano.core.sql.filter import FilterOptions
-from meltano.core.sql.base import ParseError, EmptyQuery
+from meltano.core.utils import NotFound, find_named
 
+from .settings_helper import SettingsHelper
+from .sql_helper import ConnectionNotFound, SqlHelper, UnsupportedConnectionDialect
 
 sqlBP = APIBlueprint("sql", __name__)
 

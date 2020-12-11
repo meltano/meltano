@@ -1,14 +1,14 @@
-import pytest
-from unittest import mock
 from contextlib import contextmanager
+from unittest import mock
 
-from meltano.core.settings_service import SettingsService
+import pytest
 from meltano.core.setting_definition import SettingDefinition
+from meltano.core.settings_service import SettingsService
 from meltano.core.settings_store import (
-    SettingValueStore,
-    StoreNotSupportedError,
     AutoStoreManager,
     MeltanoYmlStoreManager,
+    SettingValueStore,
+    StoreNotSupportedError,
 )
 
 Store = SettingValueStore

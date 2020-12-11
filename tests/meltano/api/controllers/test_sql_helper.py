@@ -1,8 +1,8 @@
-import pytest
 from unittest import mock
 
-from meltano.core.plugin import PluginType, PluginRef
+import pytest
 from meltano.api.controllers.sql_helper import SqlHelper, UnsupportedConnectionDialect
+from meltano.core.plugin import PluginRef, PluginType
 
 
 @pytest.mark.usefixtures("session")

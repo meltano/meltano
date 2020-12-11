@@ -1,19 +1,20 @@
-import os
-import sys
-import logging
-import click
 import datetime
 import json
+import logging
+import os
+import sys
 from pathlib import Path
+
+import click
+from click_default_group import DefaultGroup
+from meltano.core.db import project_engine
+from meltano.core.project import Project, ProjectNotFound
+from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
+from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.utils import coerce_datetime
 
 from . import cli
 from .params import project
-from click_default_group import DefaultGroup
-from meltano.core.project import Project, ProjectNotFound
-from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExistsError
-from meltano.core.db import project_engine
-from meltano.core.utils import coerce_datetime
 
 
 @cli.group(cls=DefaultGroup, default="add")

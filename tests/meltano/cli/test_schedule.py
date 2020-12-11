@@ -1,12 +1,12 @@
-import pytest
 import os
-from unittest import mock
 from functools import partial
+from unittest import mock
 
+import pytest
+from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import iso8601_datetime
-from asserts import assert_cli_runner
 
 
 class TestCliSchedule:

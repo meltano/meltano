@@ -1,17 +1,17 @@
 import functools
-import urllib
-import click
-import click.globals
 import os
+import urllib
 from pathlib import Path
 
-from .utils import CliError
-
+import click
+import click.globals
+from meltano.core.db import project_engine
+from meltano.core.migration_service import MigrationError, MigrationService
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import pop_all
-from meltano.core.migration_service import MigrationService, MigrationError
-from meltano.core.db import project_engine
+
+from .utils import CliError
 
 
 def database_uri_option(func):

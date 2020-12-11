@@ -1,25 +1,24 @@
-import click
-from typing import List
 import logging
 import sys
+from typing import List
 
+import click
 from meltano.core.logging import setup_logging
-
-from meltano.core.project_add_service import (
-    ProjectAddService,
-    PluginNotSupportedException,
-    PluginAlreadyAddedException,
-)
+from meltano.core.plugin import PluginType, VariantNotFoundError
 from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
     PluginNotFoundError,
 )
 from meltano.core.plugin_install_service import (
-    PluginInstallService,
     PluginInstallReason,
+    PluginInstallService,
 )
-from meltano.core.plugin import PluginType, VariantNotFoundError
 from meltano.core.project import Project
+from meltano.core.project_add_service import (
+    PluginAlreadyAddedException,
+    PluginNotSupportedException,
+    ProjectAddService,
+)
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 setup_logging()

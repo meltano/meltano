@@ -1,17 +1,17 @@
 import base64
+import functools
 import logging
+import os
 import re
 import sys
-import flatten_dict
-import os
-import functools
-
-from datetime import datetime, date, time
 from collections import OrderedDict
 from copy import deepcopy
-from typing import Union, Dict, Callable, Optional, Iterable
-from requests.auth import HTTPBasicAuth
+from datetime import date, datetime, time
 from pathlib import Path
+from typing import Callable, Dict, Iterable, Optional, Union
+
+import flatten_dict
+from requests.auth import HTTPBasicAuth
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +58,7 @@ def slugify(s):
 
     # "[some]___article's_title__"
     # "some___articles_title__"
-    s = re.sub("\W", "", s)
+    s = re.sub(r"\W", "", s)
 
     # "some___articles_title__"
     # "some   articles title  "
@@ -66,7 +66,7 @@ def slugify(s):
 
     # "some   articles title  "
     # "some articles title "
-    s = re.sub("\s+", " ", s)
+    s = re.sub(r"\s+", " ", s)
 
     # "some articles title "
     # "some articles title"
@@ -305,7 +305,7 @@ def expand_env_vars(raw_value, env: Dict):
 
     # find viable substitutions
     var_matcher = re.compile(
-        """
+        r"""
         \$                 # starts with a '$'
         (?:                # either $VAR or ${VAR}
             {(\w+)}|(\w+)  # capture the variable name as group[0] or group[1]

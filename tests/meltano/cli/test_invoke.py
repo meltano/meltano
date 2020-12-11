@@ -1,15 +1,15 @@
-import yaml
 import json
-import pytest
-from unittest.mock import Mock, patch
 from contextlib import contextmanager
+from unittest.mock import Mock, patch
 
+import pytest
+import yaml
 from meltano.cli import cli
-from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
-from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project import Project
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 @pytest.fixture(scope="class")

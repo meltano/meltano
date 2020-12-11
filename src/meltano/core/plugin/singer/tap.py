@@ -1,28 +1,28 @@
 import json
 import logging
-import subprocess
 import shutil
-from typing import Dict
-from jsonschema import Draft4Validator
-from pathlib import Path
+import subprocess
 from hashlib import sha1
+from pathlib import Path
+from typing import Dict
 
-from meltano.core.setting_definition import SettingDefinition
+from jsonschema import Draft4Validator
 from meltano.core.behavior.hookable import hook
+from meltano.core.job import JobFinder, Payload
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin_invoker import InvokerError
-from meltano.core.job import Payload, JobFinder
-from meltano.core.utils import file_has_data, truthy, flatten, merge
+from meltano.core.setting_definition import SettingDefinition
+from meltano.core.utils import file_has_data, flatten, merge, truthy
 
-from . import SingerPlugin, PluginType
+from . import PluginType, SingerPlugin
 from .catalog import (
     MetadataExecutor,
     MetadataRule,
     SchemaExecutor,
     SchemaRule,
     property_breadcrumb,
-    select_metadata_rules,
     select_filter_metadata_rules,
+    select_metadata_rules,
 )
 
 logger = logging.getLogger(__name__)

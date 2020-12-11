@@ -1,13 +1,13 @@
-import pytest
 import json
-from unittest import mock
 from contextlib import contextmanager
+from unittest import mock
 
+import pytest
+from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
-from meltano.core.job import Job, Payload
+from meltano.core.plugin_invoker import PluginInvoker
 
 
 class TestSingerTap:

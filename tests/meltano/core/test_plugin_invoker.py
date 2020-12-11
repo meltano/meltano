@@ -1,9 +1,8 @@
-import pytest
 import os
-import dotenv
 from unittest import mock
 
-
+import dotenv
+import pytest
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.venv_service import VirtualEnv
 

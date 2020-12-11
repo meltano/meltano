@@ -1,20 +1,20 @@
-import os
-import click
-import logging
-import psutil
 import importlib
-import meltano
-import subprocess
-import signal
+import logging
+import os
 import shutil
+import signal
+import subprocess
 from typing import Optional
 
-from meltano.core.project import Project
-from meltano.core.migration_service import MigrationService, MigrationError
-from meltano.core.project_plugins_service import ProjectPluginsService, PluginType
-from meltano.cli.utils import install_plugins, PluginInstallReason
-from meltano.core.compiler.project_compiler import ProjectCompiler
+import click
+import meltano
 import meltano.core.bundle as bundle
+import psutil
+from meltano.cli.utils import PluginInstallReason, install_plugins
+from meltano.core.compiler.project_compiler import ProjectCompiler
+from meltano.core.migration_service import MigrationError, MigrationService
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import PluginType, ProjectPluginsService
 
 
 class UpgradeError(Exception):

@@ -5,9 +5,8 @@ Revises: 23ea52e6d784
 Create Date: 2020-02-17 16:03:27.765240
 
 """
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 from meltano.migrations import GUID
 
 # revision identifiers, used by Alembic.

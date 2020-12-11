@@ -1,21 +1,21 @@
-import click
 import json
-import dotenv
 import tempfile
 from pathlib import Path
+
+import click
+import dotenv
+from meltano.core.db import project_engine
+from meltano.core.plugin import PluginType
+from meltano.core.plugin.error import PluginMissingError
+from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.settings_service import SettingValueStore, StoreNotSupportedError
 
 from . import cli
 from .params import project
 from .utils import CliError
-
-from meltano.core.db import project_engine
-from meltano.core.project import Project
-from meltano.core.settings_service import SettingValueStore, StoreNotSupportedError
-from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.plugin import PluginType
-from meltano.core.plugin.error import PluginMissingError
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.plugin.settings_service import PluginSettingsService
 
 
 @cli.group(invoke_without_command=True)

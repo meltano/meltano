@@ -1,7 +1,9 @@
 import logging
 from copy import copy
 from typing import Callable
+
 from flask_principal import Need
+
 from .auth import ResourcePermission
 
 

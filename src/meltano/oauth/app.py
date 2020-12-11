@@ -2,11 +2,10 @@ import logging
 import os
 import secrets
 
-from flask import Flask, url_for, render_template
-from werkzeug.contrib.fixers import ProxyFix
-
-from meltano.core.project import Project
 import meltano.oauth.config
+from flask import Flask, render_template, url_for
+from meltano.core.project import Project
+from werkzeug.contrib.fixers import ProxyFix
 
 
 def create_app():

@@ -1,5 +1,5 @@
-from . import Job, State
 from meltano.core.db import DB
+from meltano.core.job.job import Job, State
 
 
 class JobFinder:
@@ -13,7 +13,7 @@ class JobFinder:
     def latest(self, session):
         return (
             session.query(Job)
-            .filter((Job.job_id == self.job_id))
+            .filter(Job.job_id == self.job_id)
             .order_by(Job.started_at.desc())
             .first()
         )

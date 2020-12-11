@@ -1,17 +1,17 @@
-import click
-import sys
 import logging
+import sys
+
+import click
+from meltano.core.db import project_engine
+from meltano.core.error import SubprocessError
+from meltano.core.plugin import PluginType
+from meltano.core.plugin_invoker import InvokerError, invoker_factory
+from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.tracking import GoogleAnalyticsTracker
+
 from . import cli
 from .params import project
 from .utils import CliError
-
-from meltano.core.plugin import PluginType
-from meltano.core.plugin_invoker import invoker_factory, InvokerError
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.db import project_engine
-from meltano.core.error import SubprocessError
-
 
 logger = logging.getLogger(__name__)
 
