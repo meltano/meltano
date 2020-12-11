@@ -96,11 +96,11 @@ class TestCliAdd:
 
             assert res.exit_code == 0, res.stdout
             assert (
-                f"Extractor 'tap-gitlab' is already in your Meltano project"
+                "Extractor 'tap-gitlab' already exists in your Meltano project"
                 in res.stderr
             )
-            assert f"Added extractor 'tap-adwords'" in res.stdout
-            assert f"Added extractor 'tap-facebook'" in res.stdout
+            assert "Added extractor 'tap-adwords'" in res.stdout
+            assert "Added extractor 'tap-facebook'" in res.stdout
 
             tap_gitlab = project_plugins_service.find_plugin(
                 "tap-gitlab", PluginType.EXTRACTORS

@@ -82,18 +82,65 @@ def add_plugin(
     plugin_type: PluginType,
     plugin_name: str,
     add_service: ProjectAddService,
-    **kwargs,
+    variant=None,
+    inherit_from=None,
 ):
     try:
-        plugin = add_service.add(plugin_type, plugin_name, **kwargs)
+        plugin = add_service.add(
+            plugin_type, plugin_name, variant=variant, inherit_from=inherit_from
+        )
         print_added_plugin(project, plugin)
     except PluginAlreadyAddedException as err:
+        plugin = err.plugin
+
         click.secho(
-            f"{plugin_type.descriptor.capitalize()} '{plugin_name}' is already in your Meltano project",
+            f"{plugin_type.descriptor.capitalize()} '{plugin_name}' already exists in your Meltano project",
             fg="yellow",
             err=True,
         )
-        plugin = err.plugin
+
+        if variant and variant != plugin.variant:
+            variant = plugin.find_variant(variant)
+
+            click.echo()
+            click.echo(
+                f"To switch from the current '{plugin.variant}' variant to '{variant.name}':"
+            )
+            click.echo(
+                "1. Update `variant` and `pip_url` in your `meltano.yml` project file:"
+            )
+            click.echo(f"\tname: {plugin.name}")
+            click.echo(f"\tvariant: {variant.name}")
+            click.echo(f"\tpip_url: {variant.pip_url}")
+
+            click.echo("2. Reinstall the plugin:")
+            click.echo(f"\tmeltano install {plugin_type.singular} {plugin.name}")
+
+            click.echo(
+                "3. Check if the configuration is still valid (and make changes until it is):"
+            )
+            click.echo(f"\tmeltano config {plugin.name} list")
+
+            click.echo()
+            click.echo(
+                f"Alternatively, to keep the existing '{plugin.name}' with variant '{plugin.variant}',"
+            )
+            click.echo(
+                f"add variant '{variant.name}' as a separate plugin with its own unique name:"
+            )
+            click.echo(
+                f"\tmeltano add {plugin_type.singular} {plugin.name}--{variant.name} --inherit-from {plugin.name} --variant {variant.name}"
+            )
+        else:
+            click.echo(
+                "To add it to your project another time so that each can be configured differently,"
+            )
+            click.echo(
+                "add a new plugin inheriting from the existing one with its own unique name:"
+            )
+            click.echo(
+                f"\tmeltano add {plugin_type.singular} {plugin.name}--new --inherit-from {plugin.name}"
+            )
     except VariantNotFoundError as err:
         raise CliError(str(err)) from err
     except (PluginNotSupportedException, PluginNotFoundError) as err:

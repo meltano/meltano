@@ -55,8 +55,11 @@ class ProjectPluginsService:
         if not plugin.should_add_to_file():
             return plugin
 
-        if plugin in self.plugins(ensure_parent=False):
-            raise PluginAlreadyAddedException(plugin)
+        try:
+            existing_plugin = self.get_plugin(plugin)
+            raise PluginAlreadyAddedException(existing_plugin)
+        except PluginMissingError:
+            pass
 
         with self.update_plugins() as plugins:
             if not plugin.type in plugins:
