@@ -17,11 +17,6 @@ repos:
     - id: pyupgrade
       args:
         - '--py3-plus'
-- repo: https://github.com/Yelp/detect-secrets
-  rev: v0.14.3
-  hooks:
-    - id: detect-secrets
-      exclude: poetry.lock
 # Remove after upgrading to isort >=5
 - repo: https://github.com/asottile/seed-isort-config
   rev: v2.2.0
@@ -33,8 +28,10 @@ repos:
     - id: isort
       args:
         - '-sp pyproject.toml'
+        - '--filter-files'
       additional_dependencies:
         - toml
+      files: '.py'
 - repo: https://github.com/psf/black
   rev: 20.8b1
   hooks:
@@ -43,15 +40,20 @@ repos:
   rev: v.0.7.0
   hooks:
     - id: flakehell
-- repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v0.790
-  hooks:
-    - id: mypy
+# - repo: https://github.com/pre-commit/mirrors-mypy
+#   rev: v0.790
+#   hooks:
+#     - id: mypy
 - repo: https://github.com/pre-commit/mirrors-eslint
   rev: v7.14.0
   hooks:
     - id: eslint
+      files: '.(js|vue)'
       additional_dependencies:
-        - eslint@5.16.0
-        - eslint-plugin-prettier@3.1.0
-        - eslint-plugin-vue@5.0.0
+        - '@vue/eslint-config-prettier@^4.0.1'
+        - babel-eslint@^10.0.1
+        - eslint-config-prettier@^3.3.0
+        - eslint-plugin-prettier@^3.1.0
+        - eslint-plugin-vue@^5.0.0
+        - eslint@^5.16.0
+        - prettier@^1.15.2

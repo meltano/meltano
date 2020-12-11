@@ -55,6 +55,9 @@ pip3 install poetry
 # Install all the dependencies
 poetry install
 
+# Install the pre-commit hook
+poetry run pre-commit install --install-hooks
+
 # Bundle the Meltano UI into the `meltano` package
 make bundle
 ```
@@ -433,7 +436,18 @@ In the near future, all tests can flow automatically; but there are some complic
 
 Meltano uses the below tools to enforce consistent code style. Explore the [repo](https://gitlab.com/meltano/meltano/tree/master) to learn of the specific rules and settings of each.
 
+Python:
+- [isort](https://pycqa.github.io/isort/)
 - [Black](https://github.com/ambv/black)
+- [Flakehell](https://flakehell.readthedocs.io/)
+- [wemake-python-styleguide](https://wemake-python-stylegui.de/en/latest/)
+- [MyPy](https://mypy.readthedocs.io/en/stable/)
+
+Flakehell is a wrapper for Flake8 and its various plugins, and wemake-python-styleguide is a plugin for Flake8 that offers an extensive set of opinionated rules that encourage clean and correct code.
+
+MyPy is currently only executed as part of the build pipeline in order to avoid overwhelming developers with the complete list of violations. This allows for incremental and iterative improvement without requiring a concerted effort to fix all errors at once.
+
+Javascript:
 - [ESLint](https://eslint.org/docs/rules/)
 - [ESLint Vue Plugin](https://github.com/vuejs/eslint-plugin-vue)
 - [Prettier](https://prettier.io/)
@@ -448,7 +462,7 @@ In the spirit of GitLab's "boring solutions" with the above tools and mantra, th
 
 #### Imports
 
-`import`s are sorted using the following pattern:
+Javascript `import`s are sorted using the following pattern:
 
 1. Code source location: third-party → local (separate each group with a single blank line)
 1. Import scheme: Default imports → Partial imports
@@ -473,19 +487,7 @@ import { bar, thing } from '@/utils/utils'   // 1: local, 2: partial, 3: @/[u]ti
 ¶  // 2 blank lines to split the imports from the code
 ```
 
-```python
-import flask                                        # 1: third-party, 2: default, 3: [f]lask
-import os                                           # 1: third-party, 2: default, 3: [o]s
-from datetime import datetime                       # 1: third-party, 2: partial, 3: [d]atetime
-from functools import wraps                         # 1: third-party, 2: partial, 3: [f]unctools
-¶  # 1 blank line to split import groups
-import meltano                                      # 1: local, 2: default, 3: [meltano]
-import meltano.migrations                           # 1: local, 2: default, 3: [meltano.m]igrations
-from meltano.core.plugin import Plugin, PluginType  # 1: local, 2: partial, 3: [meltano.core.pl]ugin
-from meltano.core.project import Project            # 1: local, 2: partial, 3: [meltano.core.pr]oject
-¶
-¶  # 2 blank lines to split the imports from the code
-```
+Python imports are sorted automatically using [`isort`](https://pycqa.github.io/isort/). This is executed as part of the `make lint` command, as well as during execution of the pre-commit hook.
 
 #### Definitions
 

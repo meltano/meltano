@@ -4,10 +4,10 @@ from datetime import date, datetime
 from typing import Optional
 
 from .db import project_engine
+from .meltano_invoker import MeltanoInvoker
 from .plugin import PluginRef, PluginType
 from .plugin.settings_service import PluginSettingsService, SettingMissingError
 from .plugin_discovery_service import PluginDiscoveryService, PluginNotFoundError
-from .meltano_invoker import MeltanoInvoker
 from .project import Project
 from .project_plugins_service import ProjectPluginsService
 from .schedule import Schedule
