@@ -10,7 +10,6 @@ from click_default_group import DefaultGroup
 from meltano.api.workers import APIWorker, MeltanoCompilerWorker, UIAvailableWorker
 from meltano.core.db import project_engine
 from meltano.core.migration_service import MigrationService
-from meltano.core.plugin.error import PluginMissingError
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,

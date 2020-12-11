@@ -8,9 +8,9 @@ from meltano.core.utils import NotFound, find_named
 
 from .config_service import ConfigService
 from .plugin import PluginRef, PluginType, Variant
-from .plugin.error import PluginMissingError, PluginParentNotFoundError
+from .plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from .plugin.project_plugin import ProjectPlugin
-from .plugin_discovery_service import PluginDiscoveryService, PluginNotFoundError
+from .plugin_discovery_service import PluginDiscoveryService
 from .project import Project
 
 logger = logging.getLogger(__name__)
@@ -58,7 +58,7 @@ class ProjectPluginsService:
         try:
             existing_plugin = self.get_plugin(plugin)
             raise PluginAlreadyAddedException(existing_plugin)
-        except PluginMissingError:
+        except PluginNotFoundError:
             pass
 
         with self.update_plugins() as plugins:
@@ -82,7 +82,7 @@ class ProjectPluginsService:
         try:
             self.find_plugin(plugin_name)
             return True
-        except PluginMissingError:
+        except PluginNotFoundError:
             return False
 
     def find_plugin(
@@ -118,7 +118,9 @@ class ProjectPluginsService:
 
             return self.ensure_parent(plugin)
         except StopIteration as stop:
-            raise PluginMissingError(plugin_name) from stop
+            raise PluginNotFoundError(
+                PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name
+            ) from stop
 
     def get_plugin(self, plugin_ref: PluginRef) -> ProjectPlugin:
         try:
@@ -130,7 +132,7 @@ class ProjectPluginsService:
 
             return self.ensure_parent(plugin)
         except StopIteration as stop:
-            raise PluginMissingError(plugin_ref.name) from stop
+            raise PluginNotFoundError(plugin_ref) from stop
 
     def get_plugins_of_type(self, plugin_type, ensure_parent=True):
         plugins = self.current_plugins[plugin_type]
@@ -173,7 +175,7 @@ class ProjectPluginsService:
                 return self.find_plugin(
                     plugin_type=plugin.type, plugin_name=plugin.inherit_from
                 )
-            except PluginMissingError:
+            except PluginNotFoundError:
                 pass
 
         try:

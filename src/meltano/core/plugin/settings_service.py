@@ -1,7 +1,6 @@
 from typing import Dict, Iterable, List
 
 from meltano.core.plugin import BasePlugin
-from meltano.core.plugin.error import PluginMissingError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.project import Project

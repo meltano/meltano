@@ -13,15 +13,12 @@ import yaml
 from .behavior.canonical import Canonical
 from .behavior.versioned import IncompatibleVersionError, Versioned
 from .plugin import BasePlugin, PluginDefinition, PluginRef, PluginType, Variant
+from .plugin.error import PluginNotFoundError
 from .plugin.factory import base_plugin_factory
 from .plugin.project_plugin import ProjectPlugin
 from .project_settings_service import ProjectSettingsService
 from .setting_definition import SettingDefinition
 from .utils import NotFound, find_named
-
-
-class PluginNotFoundError(Exception):
-    pass
 
 
 class DiscoveryInvalidError(Exception):
@@ -234,7 +231,7 @@ class PluginDiscoveryService(Versioned):
         try:
             return find_named(self.get_plugins_of_type(plugin_type), plugin_name)
         except NotFound as err:
-            raise PluginNotFoundError(plugin_name) from err
+            raise PluginNotFoundError(PluginRef(plugin_type, plugin_name)) from err
 
     def find_definition_by_namespace(
         self, plugin_type: PluginType, namespace: str

@@ -12,7 +12,7 @@ from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginRef, PluginType
-from meltano.core.plugin.error import PluginMissingError
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
     PluginNotFoundError,
@@ -176,7 +176,7 @@ def elt_context_builder(
 def dump_file(context_builder, dumpable):
     try:
         elt_context = context_builder.context()
-    except PluginMissingError as err:
+    except PluginNotFoundError as err:
         raise CliError(str(err)) from err
 
     try:
@@ -351,5 +351,5 @@ def find_transform_for_extractor(extractor: str, plugins_service):
         transform_plugin = plugins_service.get_plugin(transform_plugin_def)
 
         return transform_plugin.name
-    except (PluginNotFoundError, PluginMissingError):
+    except PluginNotFoundError:
         return None

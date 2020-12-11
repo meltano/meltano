@@ -11,10 +11,6 @@ from .project import Project
 from .project_plugins_service import PluginAlreadyAddedException, ProjectPluginsService
 
 
-class PluginNotSupportedException(Exception):
-    pass
-
-
 class MissingPluginException(Exception):
     pass
 

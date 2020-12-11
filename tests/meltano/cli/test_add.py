@@ -9,7 +9,7 @@ from meltano.cli import cli
 from meltano.core.m5o.dashboards_service import DashboardsService
 from meltano.core.m5o.reports_service import ReportsService
 from meltano.core.plugin import PluginRef, PluginType, Variant
-from meltano.core.plugin.error import PluginMissingError
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_install_service import PluginInstallReason
 
 
@@ -51,7 +51,7 @@ class TestCliAdd:
         project_plugins_service,
     ):
         # ensure the plugin is not present
-        with pytest.raises(PluginMissingError):
+        with pytest.raises(PluginNotFoundError):
             project_plugins_service.find_plugin(plugin_name, plugin_type=plugin_type)
 
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
@@ -205,7 +205,7 @@ class TestCliAdd:
         assert_cli_runner(result)
 
         # Plugin has not been added to meltano.yml
-        with pytest.raises(PluginMissingError):
+        with pytest.raises(PluginNotFoundError):
             project_plugins_service.find_plugin("docker-compose", PluginType.FILES)
 
         # File has been created
@@ -275,7 +275,7 @@ class TestCliAdd:
         assert str(res.exception) == "Extractor 'tap-unknown' is not known to Meltano"
 
         # ensure the plugin is not present
-        with pytest.raises(PluginMissingError):
+        with pytest.raises(PluginNotFoundError):
             project_plugins_service.find_plugin("tap-unknown", PluginType.EXTRACTORS)
 
     @pytest.mark.xfail(reason="Uninstall not implemented yet.")
@@ -287,7 +287,7 @@ class TestCliAdd:
         assert res.stderr
 
         # ensure the plugin is not present
-        with pytest.raises(PluginMissingError):
+        with pytest.raises(PluginNotFoundError):
             project_plugins_service.find_plugin("tap-mock", PluginType.EXTRACTORS)
 
     def test_add_variant(self, project, cli_runner, project_plugins_service):

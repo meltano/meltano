@@ -6,7 +6,7 @@ import click
 import dotenv
 from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.error import PluginMissingError
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
@@ -36,7 +36,7 @@ def config(ctx, project, plugin_type, plugin_name, format, extras):
         plugin = plugins_service.find_plugin(
             plugin_name, plugin_type=plugin_type, configurable=True
         )
-    except PluginMissingError:
+    except PluginNotFoundError:
         if plugin_name == "meltano":
             plugin = None
         else:

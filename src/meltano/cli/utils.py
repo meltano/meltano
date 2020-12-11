@@ -16,7 +16,6 @@ from meltano.core.plugin_install_service import (
 from meltano.core.project import Project
 from meltano.core.project_add_service import (
     PluginAlreadyAddedException,
-    PluginNotSupportedException,
     ProjectAddService,
 )
 from meltano.core.tracking import GoogleAnalyticsTracker
@@ -143,7 +142,7 @@ def add_plugin(
             )
     except VariantNotFoundError as err:
         raise CliError(str(err)) from err
-    except (PluginNotSupportedException, PluginNotFoundError) as err:
+    except PluginNotFoundError as err:
         raise CliError(
             f"{plugin_type.descriptor.capitalize()} '{plugin_name}' is not known to Meltano"
         ) from err
