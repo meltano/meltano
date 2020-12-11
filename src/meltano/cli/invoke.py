@@ -5,8 +5,7 @@ import click
 from meltano.core.db import project_engine
 from meltano.core.error import SubprocessError
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.error import PluginNotFoundError
-from meltano.core.plugin_invoker import InvokerError, invoker_factory
+from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
@@ -36,11 +35,12 @@ def invoke(project, plugin_type, dump, plugin_name, plugin_args):
 
     _, Session = project_engine(project)
     session = Session()
+    plugins_service = ProjectPluginsService(project)
+    plugin = plugins_service.find_plugin(
+        plugin_name, plugin_type=plugin_type, invokable=True
+    )
+
     try:
-        plugins_service = ProjectPluginsService(project)
-        plugin = plugins_service.find_plugin(
-            plugin_name, plugin_type=plugin_type, invokable=True
-        )
         invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
         with invoker.prepared(session):
             if dump:
@@ -49,20 +49,18 @@ def invoke(project, plugin_type, dump, plugin_name, plugin_args):
             else:
                 handle = invoker.invoke(*plugin_args)
                 exit_code = handle.wait()
-
-        tracker = GoogleAnalyticsTracker(project)
-        tracker.track_meltano_invoke(
-            plugin_name=plugin_name, plugin_args=" ".join(plugin_args)
-        )
-
-        sys.exit(exit_code)
-    except InvokerError as err:
-        raise CliError(str(err)) from err
     except SubprocessError as err:
         logger.error(err.stderr)
-        raise CliError(str(err)) from err
+        raise
     finally:
         session.close()
+
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_invoke(
+        plugin_name=plugin_name, plugin_args=" ".join(plugin_args)
+    )
+
+    sys.exit(exit_code)
 
 
 def dump_file(invoker, file_id):

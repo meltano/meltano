@@ -4,7 +4,7 @@ from typing import List
 
 import click
 from meltano.core.logging import setup_logging
-from meltano.core.plugin import PluginType, VariantNotFoundError
+from meltano.core.plugin import PluginType
 from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
     PluginNotFoundError,
@@ -140,12 +140,6 @@ def add_plugin(
             click.echo(
                 f"\tmeltano add {plugin_type.singular} {plugin.name}--new --inherit-from {plugin.name}"
             )
-    except VariantNotFoundError as err:
-        raise CliError(str(err)) from err
-    except PluginNotFoundError as err:
-        raise CliError(
-            f"{plugin_type.descriptor.capitalize()} '{plugin_name}' is not known to Meltano"
-        ) from err
 
     click.echo()
 

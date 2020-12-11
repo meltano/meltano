@@ -46,6 +46,10 @@ def main():
             raise CliError(
                 f"The requested action could not be completed: {err}"
             ) from err
+        except KeyboardInterrupt:
+            raise
+        except Exception as err:
+            raise CliError(str(err)) from err
     except CliError as err:
         err.print()
         sys.exit(1)

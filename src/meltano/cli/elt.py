@@ -13,10 +13,6 @@ from meltano.core.job import Job
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginNotFoundError
-from meltano.core.plugin_discovery_service import (
-    PluginDiscoveryService,
-    PluginNotFoundError,
-)
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
@@ -174,10 +170,7 @@ def elt_context_builder(
 
 
 def dump_file(context_builder, dumpable):
-    try:
-        elt_context = context_builder.context()
-    except PluginNotFoundError as err:
-        raise CliError(str(err)) from err
+    elt_context = context_builder.context()
 
     try:
         plugin_type, file_id = DUMPABLES[dumpable]
