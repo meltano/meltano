@@ -1,7 +1,8 @@
-import pytest
-import yaml
 import os
 import shutil
+
+import pytest
+import yaml
 
 
 class TestConfigService:

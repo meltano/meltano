@@ -1,5 +1,5 @@
-import os
 import json
+import os
 
 from meltano.core.utils import slugify
 

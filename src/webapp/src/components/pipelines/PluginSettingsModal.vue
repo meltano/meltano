@@ -212,15 +212,11 @@ export default {
           .then(response => {
             if (response.data.isSuccess) {
               Vue.toasted.global.success(
-                `Valid ${this.singularizedTitledType} Connection - ${
-                  this.plugin.name
-                }`
+                `Valid ${this.singularizedTitledType} Connection - ${this.plugin.name}`
               )
             } else {
               Vue.toasted.global.error(
-                `Invalid ${this.singularizedTitledType} Connection - ${
-                  this.plugin.name
-                }`
+                `Invalid ${this.singularizedTitledType} Connection - ${this.plugin.name}`
               )
             }
           })

@@ -1,17 +1,18 @@
-import sqlalchemy
 import logging
-import dotenv
 from abc import ABC, abstractmethod
+from contextlib import contextmanager
 from copy import deepcopy
 from enum import Enum
 from typing import List
-from contextlib import contextmanager
 
-from .utils import set_at_path, pop_at_path
+import dotenv
+import sqlalchemy
+
 from .error import Error
 from .project import ProjectReadonly
 from .setting import Setting
 from .setting_definition import SettingMissingError
+from .utils import pop_at_path, set_at_path
 
 logger = logging.getLogger(__name__)
 

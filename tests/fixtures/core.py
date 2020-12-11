@@ -1,32 +1,31 @@
-import pytest
+import datetime
+import logging
 import os
 import shutil
-import yaml
-import logging
-import datetime
 from pathlib import Path
 
 import meltano.core.bundle
-from meltano.core.project import Project
+import pytest
+import yaml
 from meltano.core.behavior.canonical import Canonical
-from meltano.core.project_init_service import ProjectInitService
-from meltano.core.project_add_service import ProjectAddService
-from meltano.core.plugin_install_service import PluginInstallService
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
-from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_invoker import invoker_factory
-from meltano.core.config_service import ConfigService
-from meltano.core.project_plugins_service import (
-    ProjectPluginsService,
-    PluginAlreadyAddedException,
-)
-from meltano.core.schedule_service import ScheduleService
 from meltano.core.compiler.project_compiler import ProjectCompiler
-from meltano.core.plugin import PluginRef, PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.config_service import ConfigService
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.logging.job_logging_service import JobLoggingService
-
+from meltano.core.plugin import PluginRef, PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.plugin_invoker import invoker_factory
+from meltano.core.project import Project
+from meltano.core.project_add_service import ProjectAddService
+from meltano.core.project_init_service import ProjectInitService
+from meltano.core.project_plugins_service import (
+    PluginAlreadyAddedException,
+    ProjectPluginsService,
+)
+from meltano.core.schedule_service import ScheduleService
 
 PROJECT_NAME = "a_meltano_project"
 

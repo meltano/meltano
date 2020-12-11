@@ -1,19 +1,16 @@
-import os
 import logging
+import os
 import re
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Iterable, Dict, List
+from typing import Dict, Iterable, List
 
-from meltano.core.utils import (
-    find_named,
-    NotFound,
-    flatten,
-    expand_env_vars as do_expand_env_vars,
-)
-from .setting_definition import SettingMissingError, SettingDefinition
-from .settings_store import StoreNotSupportedError, SettingValueStore
+from meltano.core.utils import NotFound
+from meltano.core.utils import expand_env_vars as do_expand_env_vars
+from meltano.core.utils import find_named, flatten
 
+from .setting_definition import SettingDefinition, SettingMissingError
+from .settings_store import SettingValueStore, StoreNotSupportedError
 
 logger = logging.getLogger(__name__)
 

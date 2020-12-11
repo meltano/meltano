@@ -1,14 +1,14 @@
 from pathlib import Path
 
-from meltano.core.plugin import PluginRef, PluginType, BasePlugin
-from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.behavior.hookable import hook
 from meltano.core.error import PluginInstallError
+from meltano.core.plugin import BasePlugin, PluginRef, PluginType
 from meltano.core.plugin.error import PluginMissingError
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.transform_add_service import TransformAddService
-from meltano.core.behavior.hookable import hook
 
 
 class DbtInvoker(PluginInvoker):

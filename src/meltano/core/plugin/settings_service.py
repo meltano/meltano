@@ -1,19 +1,19 @@
-from typing import Iterable, Dict, List
+from typing import Dict, Iterable, List
 
+from meltano.core.plugin import BasePlugin
+from meltano.core.plugin.error import PluginMissingError
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import (
-    SettingsService,
-    SettingMissingError,
-    SettingValueStore,
     REDACTED_VALUE,
+    SettingMissingError,
+    SettingsService,
+    SettingValueStore,
 )
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
-from meltano.core.plugin import BasePlugin
-from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin.error import PluginMissingError
 
 
 class PluginSettingsService(SettingsService):

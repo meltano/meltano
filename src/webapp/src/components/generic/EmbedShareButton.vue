@@ -48,9 +48,7 @@ export default {
         })
         .catch(error => {
           Vue.toasted.global.error(
-            `${resource.name} embed error. [Error code: ${
-              error.response.data.code
-            }]`
+            `${resource.name} embed error. [Error code: ${error.response.data.code}]`
           )
         })
         .finally(() => (this.isAwaitingEmbed = false))

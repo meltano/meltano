@@ -1,6 +1,6 @@
-import pytest
 import os
 
+import pytest
 from meltano.core.project_settings_service import ProjectSettingsService
 
 

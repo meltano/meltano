@@ -1,10 +1,11 @@
 import logging
-import sqlalchemy.types as types
 import os
+
+import sqlalchemy.types as types
 from sqlalchemy import Column, UniqueConstraint
 
-from .utils import nest
 from .db import SystemModel
+from .utils import nest
 
 
 class Setting(SystemModel):

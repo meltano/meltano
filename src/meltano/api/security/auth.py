@@ -1,17 +1,17 @@
 import logging
+from datetime import datetime
 from fnmatch import fnmatch
 from functools import wraps
-from datetime import datetime
 
-from flask import current_app, request, jsonify
-from flask_security import auth_required
+from flask import current_app, jsonify, request
 from flask_login import current_user
-from flask_principal import Permission, Need
-from werkzeug.exceptions import Forbidden
-
+from flask_principal import Need, Permission
+from flask_security import auth_required
+from meltano.api.models import db
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.api.models import db
+from werkzeug.exceptions import Forbidden
+
 from .identity import FreeUser
 
 HTTP_READONLY_CODE = 499

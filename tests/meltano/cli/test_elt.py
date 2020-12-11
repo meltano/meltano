@@ -1,25 +1,24 @@
-import pytest
-import os
-import logging
 import json
-
-from unittest import mock
-from asynctest import CoroutineMock
+import logging
+import os
 from functools import partial
+from unittest import mock
 
+import pytest
 from asserts import assert_cli_runner
+from asynctest import CoroutineMock
 from meltano.cli import cli
-from meltano.core.project_add_service import PluginAlreadyAddedException
-from meltano.core.plugin import PluginType, PluginRef
-from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.plugin.singer import SingerTap
-from meltano.core.plugin.dbt import DbtPlugin
-from meltano.core.runner.singer import SingerRunner
-from meltano.core.runner.dbt import DbtRunner
-from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.job import Job, Payload
 from meltano.core.logging.utils import remove_ansi_escape_sequences
+from meltano.core.plugin import PluginRef, PluginType
+from meltano.core.plugin.dbt import DbtPlugin
+from meltano.core.plugin.singer import SingerTap
+from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.project_add_service import PluginAlreadyAddedException
+from meltano.core.runner.dbt import DbtRunner
+from meltano.core.runner.singer import SingerRunner
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 def assert_lines(output, *lines):

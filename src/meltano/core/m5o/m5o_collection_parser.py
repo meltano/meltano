@@ -1,17 +1,15 @@
-from pyhocon import ConfigFactory
-from pathlib import Path
-from enum import Enum
-
 import json
+from enum import Enum
+from pathlib import Path
+
+from pyhocon import ConfigFactory
 
 
 class M5oCollectionParserError(Exception):
     def __init__(self, message, file_name, *args):
         self.message = message
         self.file_name = file_name
-        super(M5oCollectionParserError, self).__init__(
-            self.message, self.file_name, *args
-        )
+        super().__init__(self.message, self.file_name, *args)
 
 
 class M5oCollectionParserTypes(str, Enum):

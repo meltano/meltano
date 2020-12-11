@@ -1,17 +1,16 @@
-import psycopg2
-import os
 import contextlib
-import sqlalchemy.pool as pool
 import logging
+import os
 import weakref
 
-from sqlalchemy import create_engine, MetaData, event
+import psycopg2
+import sqlalchemy.pool as pool
+from psycopg2.sql import SQL, Identifier
+from sqlalchemy import MetaData, create_engine, event
+from sqlalchemy.engine import Engine
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.engine import Engine
-from psycopg2.sql import Identifier, SQL
-
 
 SystemMetadata = MetaData()
 SystemModel = declarative_base(metadata=SystemMetadata)

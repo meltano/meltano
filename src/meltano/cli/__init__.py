@@ -1,27 +1,33 @@
+import logging
 import os
 import sys
-import click
-import logging
 
+import click
 from meltano.core.logging import setup_logging
 from meltano.core.project import ProjectReadonly
-from .cli import cli
+
 from .utils import CliError
-from . import (
-    elt,
-    schema,
-    discovery,
-    initialize,
+
+# TODO: Importing the cli.cli module breaks other cli module imports
+# This suggests a cyclic dependency or a poorly structured interface.
+# This should be investigated and resolved to avoid implicit behavior
+# based solely on import order.
+from .cli import cli  # isort:skip
+from . import (  # isort:skip
     add,
+    config,
+    discovery,
+    elt,
+    initialize,
     install,
     invoke,
+    model,
+    repl,
+    schedule,
+    schema,
+    select,
     ui,
     upgrade,
-    schedule,
-    select,
-    repl,
-    config,
-    model,
     user,
 )
 

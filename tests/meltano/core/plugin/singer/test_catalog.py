@@ -1,19 +1,18 @@
-import pytest
 import json
 
+import pytest
 from meltano.core.plugin.singer.catalog import (
-    visit,
     CatalogRule,
-    SelectExecutor,
+    ListExecutor,
+    ListSelectedExecutor,
     MetadataExecutor,
     MetadataRule,
     SchemaExecutor,
     SchemaRule,
-    ListExecutor,
-    ListSelectedExecutor,
+    SelectExecutor,
     path_property,
+    visit,
 )
-
 
 LEGACY_CATALOG = """
 {

@@ -5,12 +5,12 @@ Revises: 6f28844bcd3c
 Create Date: 2019-07-23 16:05:29.073296
 
 """
-import sqlalchemy as sa
-from alembic import op
-from sqlalchemy.ext.mutable import MutableDict
-from meltano.migrations import JSONEncodedDict, IntFlag
 from enum import Enum
 
+import sqlalchemy as sa
+from alembic import op
+from meltano.migrations import IntFlag, JSONEncodedDict
+from sqlalchemy.ext.mutable import MutableDict
 
 # revision identifiers, used by Alembic.
 revision = "b4c05e463b53"

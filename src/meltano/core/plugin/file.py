@@ -1,17 +1,17 @@
 import logging
 from pathlib import Path
 
-from meltano.core.db import project_engine
-from meltano.core.plugin import PluginType, BasePlugin
-from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_install_service import (
-    PluginInstallService,
-    PluginInstallReason,
-)
-from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.behavior.hookable import hook
-from meltano.core.venv_service import VirtualEnv
+from meltano.core.db import project_engine
+from meltano.core.plugin import BasePlugin, PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin_install_service import (
+    PluginInstallReason,
+    PluginInstallService,
+)
 from meltano.core.setting_definition import SettingDefinition
+from meltano.core.venv_service import VirtualEnv
 
 
 class FilePlugin(BasePlugin):

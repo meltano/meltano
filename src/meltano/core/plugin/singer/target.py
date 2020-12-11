@@ -3,7 +3,8 @@ from typing import Dict
 from meltano.core.behavior.hookable import hook
 from meltano.core.db import project_engine
 from meltano.core.setting_definition import SettingDefinition
-from . import SingerPlugin, PluginType
+
+from . import PluginType, SingerPlugin
 
 
 class SingerTarget(SingerPlugin):

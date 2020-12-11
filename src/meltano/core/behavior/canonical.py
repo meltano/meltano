@@ -1,10 +1,10 @@
-import yaml
 import copy
-
 from typing import Iterable
 
+import yaml
 
-class Canonical(object):
+
+class Canonical:
     """
     This class defines an object that can be reprensented as a subset of
     its attributes.
@@ -21,7 +21,7 @@ class Canonical(object):
     def __init__(self, *args, **attrs):
         self._dict = {}
 
-        super(Canonical, self).__init__(*args)
+        super().__init__(*args)
 
         for attr, value in attrs.items():
             setattr(self, attr, value)

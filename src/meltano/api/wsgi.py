@@ -1,10 +1,10 @@
-import os
-import logging
-import warnings
-import meltano
 import importlib
-from gunicorn.glogging import CONFIG_DEFAULTS
+import logging
+import os
+import warnings
 
+import meltano
+from gunicorn.glogging import CONFIG_DEFAULTS
 from meltano.core.logging.utils import FORMAT
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService

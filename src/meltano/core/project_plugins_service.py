@@ -1,16 +1,17 @@
-import os
-import yaml
 import logging
+import os
 from contextlib import contextmanager
-from typing import List, Optional, Iterable
+from typing import Iterable, List, Optional
 
+import yaml
 from meltano.core.utils import NotFound, find_named
-from .project import Project
+
 from .config_service import ConfigService
-from .plugin import PluginType, PluginRef, Variant
-from .plugin.project_plugin import ProjectPlugin
+from .plugin import PluginRef, PluginType, Variant
 from .plugin.error import PluginMissingError
+from .plugin.project_plugin import ProjectPlugin
 from .plugin_discovery_service import PluginDiscoveryService
+from .project import Project
 
 logger = logging.getLogger(__name__)
 

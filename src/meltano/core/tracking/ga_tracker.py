@@ -1,12 +1,11 @@
-import logging
-import requests
-import uuid
-import yaml
-import os
 import json
-
+import logging
+import os
+import uuid
 from typing import Dict
 
+import requests
+import yaml
 from meltano.core.project_settings_service import ProjectSettingsService
 
 REQUEST_TIMEOUT = 2.0

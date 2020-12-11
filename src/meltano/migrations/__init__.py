@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import meltano.core.sqlalchemy as types
 
 MIGRATION_DIR = Path(__path__[0])

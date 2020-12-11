@@ -1,12 +1,12 @@
 from dotenv import dotenv_values
-
 from meltano.core.settings_service import (
-    SettingsService,
     SettingMissingError,
+    SettingsService,
     SettingValueStore,
 )
-from .config_service import ConfigService
 from meltano.core.utils import nest_object
+
+from .config_service import ConfigService
 
 UI_CFG_SETTINGS = {
     "ui.server_name": "SERVER_NAME",

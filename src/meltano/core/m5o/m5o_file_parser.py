@@ -1,31 +1,29 @@
-import os
-import json
-import sqlparse
-from datetime import datetime, timezone
 import glob
+import json
+import os
 import uuid
-
-import networkx as nx
-
 from copy import deepcopy
-from networkx.readwrite import json_graph
+from datetime import datetime, timezone
 from pathlib import Path
-from pyhocon import ConfigFactory
 from typing import Dict, List
 
+import networkx as nx
+import sqlparse
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
-from meltano.core.sql.design_helper import PypikaJoinExecutor
-from meltano.core.project import Project
 from meltano.core.plugin.model import Package
-from meltano.core.utils import slugify, find_named, NotFound
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.project import Project
 from meltano.core.sql.base import (
-    MeltanoTable,
-    MeltanoColumn,
     MeltanoAggregate,
+    MeltanoColumn,
+    MeltanoTable,
     MeltanoTimeframe,
     MeltanoTimeframePeriod,
 )
+from meltano.core.sql.design_helper import PypikaJoinExecutor
+from meltano.core.utils import NotFound, find_named, slugify
+from networkx.readwrite import json_graph
+from pyhocon import ConfigFactory
 
 
 class MeltanoAnalysisFileParserError(Exception):

@@ -1,6 +1,5 @@
 import pytest
 import yaml
-
 from meltano.core.behavior.canonical import Canonical
 
 definition = {

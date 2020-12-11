@@ -1,7 +1,7 @@
-from typing import Union
 import importlib
+from typing import Union
 
-from . import PluginType, PluginDefinition, Variant, BasePlugin
+from . import BasePlugin, PluginDefinition, PluginType, Variant
 
 
 def lazy_import(module, cls):

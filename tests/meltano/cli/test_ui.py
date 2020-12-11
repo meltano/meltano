@@ -1,13 +1,13 @@
-import pytest
 from unittest import mock
 
-from meltano.core.tracking import GoogleAnalyticsTracker
+import pytest
+from asserts import assert_cli_runner
+from meltano.cli import cli
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
 )
-from meltano.cli import cli
-from asserts import assert_cli_runner
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 class TestCliUi:

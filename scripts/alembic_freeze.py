@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-from pathlib import Path
 from alembic.script import ScriptDirectory
-from meltano.migrations import MIGRATION_DIR, LOCK_PATH
-
+from meltano.migrations import LOCK_PATH, MIGRATION_DIR
 
 scripts = ScriptDirectory(str(MIGRATION_DIR))
 

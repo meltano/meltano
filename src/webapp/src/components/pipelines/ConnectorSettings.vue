@@ -209,13 +209,9 @@ export default {
         if (setting.protected) {
           return 'This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more.'
         } else if (this.getIsOfKindUnsupported(setting.kind)) {
-          return `Settings with ${
-            setting.kind
-          } values cannot currently be managed in the UI. Manage this setting directly in your meltano.yml project file instead.`
+          return `Settings with ${setting.kind} values cannot currently be managed in the UI. Manage this setting directly in your meltano.yml project file instead.`
         } else {
-          return `This setting is currently set in ${
-            metadata.source_label
-          } and cannot be overwritten.`
+          return `This setting is currently set in ${metadata.source_label} and cannot be overwritten.`
         }
       }
     },

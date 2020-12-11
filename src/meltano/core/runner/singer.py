@@ -1,23 +1,23 @@
-import subprocess
+import asyncio
 import json
 import logging
-import asyncio
 import os
-import sys
 import shutil
-
-from pathlib import Path
+import subprocess
+import sys
 from datetime import datetime
 from enum import IntFlag
+from pathlib import Path
+
+from meltano.core.elt_context import ELTContext
+from meltano.core.job import Job, Payload
+from meltano.core.logging import capture_subprocess_output
+from meltano.core.plugin import PluginType
+from meltano.core.plugin.singer import PluginType, SingerTap, SingerTarget
+from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+from meltano.core.utils import file_has_data
 
 from . import Runner, RunnerError
-from meltano.core.job import Job, Payload
-from meltano.core.plugin import PluginType
-from meltano.core.plugin_invoker import invoker_factory, PluginInvoker
-from meltano.core.plugin.singer import SingerTap, SingerTarget, PluginType
-from meltano.core.utils import file_has_data
-from meltano.core.logging import capture_subprocess_output
-from meltano.core.elt_context import ELTContext
 
 
 class BookmarkWriter:

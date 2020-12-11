@@ -1,22 +1,23 @@
 import logging
-from typing import Iterable
 from enum import Enum
+from typing import Iterable
+
+from meltano.core.plugin.project_plugin import ProjectPlugin
 
 from .compiler.project_compiler import ProjectCompiler
-from .plugin_discovery_service import PluginDiscoveryService
-from .project_add_service import ProjectAddService
-from .project_plugins_service import ProjectPluginsService
-from .venv_service import VenvService
-from .utils import noop
-from .plugin import PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
-from .project import Project
 from .error import (
     PluginInstallError,
     PluginInstallWarning,
-    SubprocessError,
     PluginNotInstallable,
+    SubprocessError,
 )
+from .plugin import PluginType
+from .plugin_discovery_service import PluginDiscoveryService
+from .project import Project
+from .project_add_service import ProjectAddService
+from .project_plugins_service import ProjectPluginsService
+from .utils import noop
+from .venv_service import VenvService
 
 
 class PluginInstallReason(str, Enum):

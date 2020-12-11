@@ -1,18 +1,17 @@
-import logging
-import yaml
-import fnmatch
-import re
 import copy
-from typing import Dict, Union
+import fnmatch
+import logging
+import re
 from collections import namedtuple
 from enum import Enum
-from typing import Optional, Iterable
+from typing import Dict, Iterable, Optional, Union
 
-from meltano.core.setting_definition import SettingDefinition
-from meltano.core.behavior.hookable import HookObject
-from meltano.core.behavior.canonical import Canonical
+import yaml
 from meltano.core.behavior import NameEq
-from meltano.core.utils import compact, find_named, NotFound, flatten
+from meltano.core.behavior.canonical import Canonical
+from meltano.core.behavior.hookable import HookObject
+from meltano.core.setting_definition import SettingDefinition
+from meltano.core.utils import NotFound, compact, find_named, flatten
 
 logger = logging.getLogger(__name__)
 

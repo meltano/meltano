@@ -1,10 +1,11 @@
+import itertools
+from contextlib import contextmanager
+
 import click
+from meltano.core.compiler.project_compiler import ProjectCompiler
+
 from . import cli
 from .params import project
-from contextlib import contextmanager
-import itertools
-
-from meltano.core.compiler.project_compiler import ProjectCompiler
 
 
 def indent(text: str, count=2, char="  "):

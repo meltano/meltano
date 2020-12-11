@@ -1,22 +1,23 @@
-import os
 import io
-import yaml
-import requests
 import logging
-import shutil
+import os
 import re
+import shutil
 from copy import deepcopy
-from typing import Dict, Iterable, Optional, List
+from typing import Dict, Iterable, List, Optional
 
 import meltano.core.bundle as bundle
-from .utils import find_named, NotFound
+import requests
+import yaml
+
+from .behavior.canonical import Canonical
+from .behavior.versioned import IncompatibleVersionError, Versioned
+from .plugin import BasePlugin, PluginDefinition, PluginRef, PluginType, Variant
+from .plugin.factory import base_plugin_factory
+from .plugin.project_plugin import ProjectPlugin
 from .project_settings_service import ProjectSettingsService
 from .setting_definition import SettingDefinition
-from .behavior.versioned import Versioned, IncompatibleVersionError
-from .behavior.canonical import Canonical
-from .plugin import PluginDefinition, PluginType, PluginRef, Variant, BasePlugin
-from .plugin.project_plugin import ProjectPlugin
-from .plugin.factory import base_plugin_factory
+from .utils import NotFound, find_named
 
 
 class PluginNotFoundError(Exception):

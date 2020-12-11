@@ -1,8 +1,8 @@
-import pytest
 from unittest import mock
-from flask import url_for
 
-from meltano.core.plugin.settings_service import SettingValueStore, REDACTED_VALUE
+import pytest
+from flask import url_for
+from meltano.core.plugin.settings_service import REDACTED_VALUE, SettingValueStore
 
 
 class TestOrchestration:

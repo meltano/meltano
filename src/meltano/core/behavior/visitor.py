@@ -1,5 +1,5 @@
-from typing import Callable
 from functools import wraps
+from typing import Callable
 
 
 class visit_with:

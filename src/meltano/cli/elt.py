@@ -1,33 +1,33 @@
 import asyncio
-import click
 import datetime
 import logging
 import os
 import sys
-from contextlib import suppress, contextmanager
-from async_generator import asynccontextmanager
+from contextlib import contextmanager, suppress
 
-from . import cli
-from .utils import CliError, add_plugin, add_related_plugins
-from .params import project
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.runner import RunnerError
-from meltano.core.runner.singer import SingerRunner
-from meltano.core.runner.dbt import DbtRunner
+import click
+from async_generator import asynccontextmanager
+from meltano.core.db import project_engine
+from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job
+from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginMissingError
-from meltano.core.transform_add_service import TransformAddService
-from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.db import project_engine
 from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
     PluginNotFoundError,
 )
 from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.logging import OutputLogger, JobLoggingService
-from meltano.core.elt_context import ELTContextBuilder
+from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.runner import RunnerError
+from meltano.core.runner.dbt import DbtRunner
+from meltano.core.runner.singer import SingerRunner
+from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.transform_add_service import TransformAddService
 
+from . import cli
+from .params import project
+from .utils import CliError, add_plugin, add_related_plugins
 
 DUMPABLES = {
     "catalog": (PluginType.EXTRACTORS, "catalog"),

@@ -1,11 +1,11 @@
-import pytest
-import yaml
 import os
 import shutil
 
-from meltano.core.project_add_service import ProjectAddService
-from meltano.core.plugin_discovery_service import PluginNotFoundError
+import pytest
+import yaml
 from meltano.core.plugin import PluginType
+from meltano.core.plugin_discovery_service import PluginNotFoundError
+from meltano.core.project_add_service import ProjectAddService
 
 
 class TestProjectAddService:

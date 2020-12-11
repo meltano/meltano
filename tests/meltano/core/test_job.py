@@ -1,11 +1,11 @@
-import sys
-import pytest
-import uuid
-import psutil
 import signal
+import sys
+import uuid
 from datetime import datetime
 from unittest import mock
 
+import psutil
+import pytest
 from meltano.core.job import Job, State
 
 

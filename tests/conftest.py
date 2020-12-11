@@ -1,6 +1,7 @@
-import pytest
-import os
 import logging
+import os
+
+import pytest
 from _pytest.monkeypatch import MonkeyPatch
 
 logging.basicConfig(level=logging.INFO)

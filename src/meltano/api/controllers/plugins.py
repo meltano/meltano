@@ -1,22 +1,21 @@
-from flask import request, jsonify, g
-
+from flask import g, jsonify, request
+from flask_security import roles_required
+from meltano.api.api_blueprint import APIBlueprint
+from meltano.api.security.auth import block_if_readonly
 from meltano.core.error import PluginInstallError
+from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
     PluginNotFoundError,
 )
-from meltano.core.plugin import PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin_install_service import (
+    PluginInstallReason,
+    PluginInstallService,
+)
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.plugin_install_service import (
-    PluginInstallService,
-    PluginInstallReason,
-)
-from flask_security import roles_required
-from meltano.api.api_blueprint import APIBlueprint
-from meltano.api.security.auth import block_if_readonly
 
 
 def plugin_def_json(plugin_def):

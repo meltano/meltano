@@ -1,7 +1,7 @@
 import logging
-from flask import Blueprint, request, url_for, redirect, render_template, jsonify
-from authlib.flask.client import OAuth as OAuthClient
 
+from authlib.flask.client import OAuth as OAuthClient
+from flask import Blueprint, jsonify, redirect, render_template, request, url_for
 
 OAuth = OAuthClient()
 

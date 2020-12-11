@@ -1,12 +1,10 @@
-import pytest
 from configparser import ConfigParser
 from unittest import mock
 
-
+import pytest
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin.airflow import subprocess
-
+from meltano.core.plugin_install_service import PluginInstallService
 
 AIRFLOW_CONFIG = """
 

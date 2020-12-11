@@ -1,9 +1,10 @@
-import os
-import yaml
 import logging
+import os
 from contextlib import contextmanager
 
 import meltano.core.bundle as bundle
+import yaml
+
 from .project import Project
 from .setting_definition import SettingDefinition
 

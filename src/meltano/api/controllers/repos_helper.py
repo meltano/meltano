@@ -1,7 +1,8 @@
 import json
-from .utils import enforce_secure_filename
 
 from meltano.core.project import Project
+
+from .utils import enforce_secure_filename
 
 
 class ReposHelper:

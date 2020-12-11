@@ -1,22 +1,22 @@
-import os
-import click
-import subprocess
-import psutil
-import meltano
 import logging
+import os
+import subprocess
 from pathlib import Path
-from sqlalchemy import create_engine
+
+import click
+import meltano
+import psutil
 from click_default_group import DefaultGroup
+from meltano.core.db import project_engine
+from meltano.core.meltano_invoker import MeltanoInvoker
+from meltano.core.migration_service import MigrationService
+from meltano.core.project import Project
+from meltano.core.upgrade_service import UpgradeError, UpgradeService
+from sqlalchemy import create_engine
 
 from . import cli
 from .params import project
 from .utils import CliError
-
-from meltano.core.project import Project
-from meltano.core.meltano_invoker import MeltanoInvoker
-from meltano.core.db import project_engine
-from meltano.core.migration_service import MigrationService
-from meltano.core.upgrade_service import UpgradeService, UpgradeError
 
 
 @cli.group(cls=DefaultGroup, default="all", default_if_no_args=True)

@@ -1,17 +1,17 @@
 from flask import jsonify, request
-from .dashboards_helper import DashboardsHelper
-from meltano.core.project import Project
+from flask_security import roles_required
+from meltano.api.api_blueprint import APIBlueprint
+from meltano.api.security.auth import block_if_readonly
 from meltano.core.m5o.dashboards_service import (
     DashboardAlreadyExistsError,
     DashboardDoesNotExistError,
     DashboardsService,
 )
+from meltano.core.project import Project
 from meltano.core.schedule_service import ScheduleNotFoundError
-from .errors import InvalidFileNameError
-from meltano.api.api_blueprint import APIBlueprint
-from meltano.api.security.auth import block_if_readonly
-from flask_security import roles_required
 
+from .dashboards_helper import DashboardsHelper
+from .errors import InvalidFileNameError
 
 dashboardsBP = APIBlueprint("dashboards", __name__)
 

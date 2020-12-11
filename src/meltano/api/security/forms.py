@@ -1,9 +1,8 @@
 from flask import url_for
-from flask_security.forms import LoginForm, RegisterForm, ConfirmRegisterForm
+from flask_security.forms import ConfirmRegisterForm, LoginForm, RegisterForm
 from flask_security.utils import _datastore, get_message
 from wtforms import StringField
-from wtforms.validators import Required, ValidationError, Length
-
+from wtforms.validators import Length, Required, ValidationError
 
 username_required = Required(message="USERNAME_NOT_PROVIDED")
 username_validator = Length(min=6, max=32, message="USERNAME_INVALID")

@@ -1,27 +1,25 @@
+import atexit
 import datetime
+import importlib
 import logging
 import logging.handlers
 import os
-import atexit
-import importlib
-from flask import Flask, request, g, jsonify
-from flask_login import current_user
-from flask_cors import CORS
 from urllib.parse import urlsplit
-from werkzeug.wsgi import DispatcherMiddleware
 
 import meltano.api.config
+from flask import Flask, g, jsonify, request
+from flask_cors import CORS
+from flask_login import current_user
 from meltano.api.headers import *
 from meltano.api.security.auth import HTTP_READONLY_CODE
-from meltano.core.project import ProjectReadonly
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.db import project_engine
-from meltano.core.logging.utils import setup_logging, FORMAT
-from meltano.core.project import Project
+from meltano.core.logging.utils import FORMAT, setup_logging
+from meltano.core.project import Project, ProjectReadonly
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.oauth.app import create_app as create_oauth_service
-
+from werkzeug.wsgi import DispatcherMiddleware
 
 setup_logging()
 

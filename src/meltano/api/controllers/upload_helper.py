@@ -2,8 +2,8 @@ from os import SEEK_END
 from os.path import join
 
 from meltano.core.project import Project
-from .utils import enforce_secure_filename
 
+from .utils import enforce_secure_filename
 
 MAX_FILE_SIZE = 4_194_304  # 4MB max
 ALLOWED_EXTENSIONS = {"json"}

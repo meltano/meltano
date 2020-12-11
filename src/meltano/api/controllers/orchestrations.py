@@ -1,14 +1,25 @@
 import asyncio
 import json
 import logging
-import sqlalchemy
 import shutil
-from flask import request, url_for, jsonify, make_response, Response, send_file
-from flask_restful import Api, Resource, fields, marshal, marshal_with
-from werkzeug.exceptions import Conflict, UnprocessableEntity
 
-from meltano.core.job import JobFinder, State
+import sqlalchemy
+from flask import Response, jsonify, make_response, request, send_file, url_for
+from flask_restful import Api, Resource, fields, marshal, marshal_with
+from flask_security import roles_required
+from meltano.api.api_blueprint import APIBlueprint
+from meltano.api.executor import run_schedule
+from meltano.api.json import freeze_keys
+from meltano.api.models import db
+from meltano.api.models.subscription import Subscription
+from meltano.api.security.auth import block_if_readonly
 from meltano.core.behavior.canonical import Canonical
+from meltano.core.job import JobFinder, State
+from meltano.core.logging import (
+    JobLoggingService,
+    MissingJobLogException,
+    SizeThresholdJobLogException,
+)
 from meltano.core.plugin import PluginRef
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin.settings_service import (
@@ -16,31 +27,21 @@ from meltano.core.plugin.settings_service import (
     SettingValueStore,
 )
 from meltano.core.plugin_discovery_service import PluginNotFoundError
-from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.schedule_service import (
-    ScheduleService,
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
+    ScheduleService,
 )
 from meltano.core.utils import flatten, iso8601_datetime, slugify
-from meltano.core.logging import (
-    JobLoggingService,
-    MissingJobLogException,
-    SizeThresholdJobLogException,
-)
-from meltano.api.api_blueprint import APIBlueprint
-from meltano.api.security.auth import block_if_readonly
-from meltano.api.models import db
-from meltano.api.models.subscription import Subscription
-from meltano.api.json import freeze_keys
-from meltano.api.executor import run_schedule
-from flask_security import roles_required
+from werkzeug.exceptions import Conflict, UnprocessableEntity
+
 from .errors import InvalidFileNameError
-from .upload_helper import InvalidFileTypeError, InvalidFileSizeError, UploadHelper
+from .upload_helper import InvalidFileSizeError, InvalidFileTypeError, UploadHelper
 from .utils import enforce_secure_filename
 
 
@@ -115,7 +116,7 @@ orchestrationsAPI = Api(
 
 
 @orchestrationsBP.errorhandler(ScheduleAlreadyExistsError)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (
         jsonify(
             {
@@ -128,7 +129,7 @@ def _handle(ex):
 
 
 @orchestrationsBP.errorhandler(ScheduleDoesNotExistError)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (
         jsonify(
             {
@@ -141,12 +142,12 @@ def _handle(ex):
 
 
 @orchestrationsBP.errorhandler(InvalidFileNameError)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (jsonify({"error": True, "code": f"The file lacks a valid name."}), 400)
 
 
 @orchestrationsBP.errorhandler(InvalidFileTypeError)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (
         jsonify(
             {
@@ -159,7 +160,7 @@ def _handle(ex):
 
 
 @orchestrationsBP.errorhandler(InvalidFileSizeError)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (
         jsonify(
             {
@@ -172,7 +173,7 @@ def _handle(ex):
 
 
 @orchestrationsBP.errorhandler(MissingJobLogException)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (jsonify({"error": False, "code": str(ex)}), 204)
 
 
