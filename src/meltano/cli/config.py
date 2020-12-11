@@ -211,19 +211,26 @@ def list_settings(ctx, extras):
         if extras:
             if not setting_def.is_extra:
                 continue
+
+            if setting_def._custom and not printed_custom_heading:
+                click.echo()
+                click.echo("Custom:")
+                printed_custom_heading = True
         else:
-            if setting_def.is_extra and not setting_def._custom:
-                continue
+            if setting_def.is_extra:
+                if not setting_def._custom:
+                    continue
 
-        if setting_def._custom and not printed_custom_heading:
-            click.echo()
-            click.echo("Custom:")
-            printed_custom_heading = True
-
-        if setting_def.is_extra and not printed_extra_heading:
-            click.echo()
-            click.echo("Extra:")
-            printed_extra_heading = True
+                if not printed_extra_heading:
+                    click.echo()
+                    click.echo(
+                        "Custom extras, plugin-specific options handled by Meltano:"
+                    )
+                    printed_extra_heading = True
+            elif setting_def._custom and not printed_custom_heading:
+                click.echo()
+                click.echo("Custom, possibly unsupported by the plugin:")
+                printed_custom_heading = True
 
         click.secho(name, fg="blue", nl=False)
 
