@@ -32,4 +32,3 @@ This template uses Packer's [file provisioner](https://www.packer.io/docs/provis
 This template also uses Packer's [shell provisioner](https://www.packer.io/docs/provisioners/shell.html) to run scripts from the `/scripts` directory and install APT packages using an inline task.
 
 Learn more about using Packer in [the official Packer documentation](https://www.packer.io/docs/index.html).
-

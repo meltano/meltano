@@ -88,6 +88,7 @@ use_parentheses = true
 ensure_newline_before_comments = true
 line_length = 88
 src_paths = ["src/", "tests/"]
+skip_glob = ["*.md", "*.vue", "*.js"]
 known_third_party = [
   "pytest",
   "aiohttp","alembic",

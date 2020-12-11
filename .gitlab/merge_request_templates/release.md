@@ -1,6 +1,6 @@
 <!---
 1. Set the MR to delete the `release-next` branch when merged
-2. The MR's title should be something similar to 
+2. The MR's title should be something similar to
    "Bump version: N.XX.zz -> N.YY.ww"
 3. Don't set the MR to be automatically merged when the pipeline succeeds.
 --->
@@ -11,4 +11,4 @@
 - [ ] Post to Meltano Slack `#announcements`
 - [ ] Post to Singer Slack `#meltano`
 
-/label ~Release ~"flow::Doing" 
+/label ~Release ~"flow::Doing"

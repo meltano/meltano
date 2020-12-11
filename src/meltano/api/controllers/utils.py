@@ -7,6 +7,6 @@ from .errors import InvalidFileNameError
 
 def enforce_secure_filename(string: str):
     name = secure_filename(string)
-    if name is "":
+    if name == "":
         raise InvalidFileNameError(name)
     return name
