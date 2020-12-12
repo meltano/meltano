@@ -329,11 +329,11 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
 
     @contextmanager
     def update_config(self):
-        config = deepcopy(self.settings_service._meltano_yml_config)
+        config = deepcopy(self.settings_service.meltano_yml_config)
         yield config
 
         try:
-            self.settings_service._update_meltano_yml_config(config)
+            self.settings_service.update_meltano_yml_config(config)
         except ProjectReadonly as err:
             raise StoreNotSupportedError(err)
 
@@ -412,7 +412,7 @@ class DbStoreManager(SettingsStoreManager):
 
     @property
     def namespace(self):
-        return self.settings_service._db_namespace
+        return self.settings_service.db_namespace
 
     @property
     def all_settings(self):
@@ -428,9 +428,12 @@ class DbStoreManager(SettingsStoreManager):
 
 
 class InheritedStoreManager(SettingsStoreManager):
+    """Store manager for settings inherited from a parent plugin."""
+
     label = "inherited"
 
     def __init__(self, settings_service, *args, bulk=False, **kwargs):
+        """Initialize inherited store manager."""
         super().__init__(settings_service, *args, **kwargs)
 
         self._kwargs = {**kwargs, "expand_env_vars": False}
@@ -457,10 +460,12 @@ class InheritedStoreManager(SettingsStoreManager):
 
     @property
     def inherited_settings_service(self):
-        return self.settings_service._inherited_settings_service
+        """Return settings service to inherit configuration from."""
+        return self.settings_service.inherited_settings_service
 
     @property
     def config_with_metadata(self):
+        """Return all inherited config and metadata."""
         if self._config_with_metadata is None:
             self._config_with_metadata = (
                 self.inherited_settings_service.config_with_metadata(**self._kwargs)
@@ -468,13 +473,12 @@ class InheritedStoreManager(SettingsStoreManager):
         return self._config_with_metadata
 
     def get_with_metadata(self, name):
+        """Return inherited config and metadata for the named setting."""
         if self.bulk:
             metadata = self.config_with_metadata[name]
             return metadata["value"], metadata
-        else:
-            return self.inherited_settings_service.get_with_metadata(
-                name, **self._kwargs
-            )
+
+        return self.inherited_settings_service.get_with_metadata(name, **self._kwargs)
 
 
 class DefaultStoreManager(SettingsStoreManager):

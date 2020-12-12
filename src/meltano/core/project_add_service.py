@@ -21,6 +21,7 @@ class ProjectAddService:
         self.plugins_service = plugins_service or ProjectPluginsService(project)
 
     def add(self, plugin_type: PluginType, plugin_name: str, **attrs) -> ProjectPlugin:
+        """Add plugin to project."""
         plugin = ProjectPlugin(
             plugin_type, plugin_name, **attrs, default_variant=Variant.DEFAULT_NAME
         )

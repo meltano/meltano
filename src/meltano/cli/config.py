@@ -14,7 +14,7 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import SettingValueStore, StoreNotSupportedError
 
 from . import cli
-from .params import project
+from .params import pass_project
 from .utils import CliError
 
 
@@ -25,7 +25,7 @@ from .utils import CliError
 @click.argument("plugin_name")
 @click.option("--format", type=click.Choice(["json", "env"]), default="json")
 @click.option("--extras", is_flag=True)
-@project(migrate=True)
+@pass_project(migrate=True)
 @click.pass_context
 def config(ctx, project, plugin_type, plugin_name, format, extras):
     plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
@@ -212,25 +212,22 @@ def list_settings(ctx, extras):
             if not setting_def.is_extra:
                 continue
 
-            if setting_def._custom and not printed_custom_heading:
+            if setting_def.is_custom and not printed_custom_heading:
                 click.echo()
                 click.echo("Custom:")
                 printed_custom_heading = True
-        else:
-            if setting_def.is_extra:
-                if not setting_def._custom:
-                    continue
+        elif setting_def.is_extra:
+            if not setting_def.is_custom:
+                continue
 
-                if not printed_extra_heading:
-                    click.echo()
-                    click.echo(
-                        "Custom extras, plugin-specific options handled by Meltano:"
-                    )
-                    printed_extra_heading = True
-            elif setting_def._custom and not printed_custom_heading:
+            if not printed_extra_heading:
                 click.echo()
-                click.echo("Custom, possibly unsupported by the plugin:")
-                printed_custom_heading = True
+                click.echo("Custom extras, plugin-specific options handled by Meltano:")
+                printed_extra_heading = True
+        elif setting_def.is_custom and not printed_custom_heading:
+            click.echo()
+            click.echo("Custom, possibly unsupported by the plugin:")
+            printed_custom_heading = True
 
         click.secho(name, fg="blue", nl=False)
 

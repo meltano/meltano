@@ -70,6 +70,7 @@ class ProjectPluginsService:
         return plugin
 
     def remove_from_file(self, plugin: ProjectPlugin):
+        """Remove plugin from `meltano.yml`."""
         # Will raise if the plugin isn't actually in the file
         self.get_plugin(plugin)
 
@@ -135,6 +136,7 @@ class ProjectPluginsService:
             raise PluginNotFoundError(plugin_ref) from stop
 
     def get_plugins_of_type(self, plugin_type, ensure_parent=True):
+        """Return plugins of specified type."""
         plugins = self.current_plugins[plugin_type]
 
         if ensure_parent:
@@ -144,6 +146,7 @@ class ProjectPluginsService:
         return plugins
 
     def plugins_by_type(self, ensure_parent=True):
+        """Return plugins grouped by type."""
         return {
             plugin_type: self.get_plugins_of_type(
                 plugin_type, ensure_parent=ensure_parent
@@ -152,6 +155,7 @@ class ProjectPluginsService:
         }
 
     def plugins(self, ensure_parent=True) -> Iterable[ProjectPlugin]:
+        """Return all plugins."""
         yield from (
             plugin
             for _, plugins in self.plugins_by_type(ensure_parent=ensure_parent).items()
@@ -170,6 +174,7 @@ class ProjectPluginsService:
             return outdated
 
     def get_parent(self, plugin: ProjectPlugin):
+        """Get plugin's parent plugin."""
         if plugin.inherit_from and not plugin.is_variant_set:
             try:
                 return self.find_plugin(
@@ -183,10 +188,11 @@ class ProjectPluginsService:
         except PluginNotFoundError as err:
             if plugin.inherit_from:
                 raise PluginParentNotFoundError(plugin, err) from err
-            else:
-                raise
+
+            raise
 
     def ensure_parent(self, plugin: ProjectPlugin):
+        """Ensure that plugin has a parent set."""
         if not plugin.parent:
             plugin.parent = self.get_parent(plugin)
 

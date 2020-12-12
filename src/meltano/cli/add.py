@@ -9,12 +9,11 @@ import click
 import yaml
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.project_add_custom_service import ProjectAddCustomService
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
 
 from . import cli
-from .params import project
+from .params import pass_project
 from .utils import CliError, add_plugin, add_related_plugins, install_plugins
 
 
@@ -26,7 +25,7 @@ from .utils import CliError, add_plugin, add_related_plugins, install_plugins
 @click.option("--as", "as_name")
 @click.option("--custom", is_flag=True)
 @click.option("--include-related", is_flag=True)
-@project()
+@pass_project()
 @click.pass_context
 def add(
     ctx,
@@ -38,6 +37,7 @@ def add(
     as_name=None,
     **flags,
 ):
+    """Add a plugin to your project."""
     plugin_type = PluginType.from_cli_argument(plugin_type)
     plugin_names = plugin_name  # nargs=-1
 
@@ -56,13 +56,9 @@ def add(
             PluginType.TRANSFORMS,
             PluginType.ORCHESTRATORS,
         ):
-            raise CliError(f"--custom is not supported for {ctx.invoked_subcommand}")
+            raise CliError(f"--custom is not supported for {plugin_type}")
 
-        add_service_class = ProjectAddCustomService
-    else:
-        add_service_class = ProjectAddService
-
-    add_service = add_service_class(project, plugins_service=plugins_service)
+    add_service = ProjectAddService(project, plugins_service=plugins_service)
 
     plugins = [
         add_plugin(
@@ -71,6 +67,7 @@ def add(
             plugin_name,
             inherit_from=inherit_from,
             variant=variant,
+            custom=flags["custom"],
             add_service=add_service,
         )
         for plugin_name in plugin_names
@@ -95,6 +92,10 @@ def add(
     if not success:
         raise CliError("Failed to install plugin(s)")
 
+    _print_plugins(plugins)
+
+
+def _print_plugins(plugins):
     printed_empty_line = False
     for plugin in plugins:
         docs_url = plugin.docs or plugin.repo

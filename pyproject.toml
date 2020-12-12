@@ -149,7 +149,6 @@ show_source = true
 flake8-bandit = ["+*"]
 flake8-broken-line = ["+*"]
 flake8-bugbear = ["+*"]
-flake8-commas = ["+*"]
 flake8-comprehensions = ["+*"]
 flake8-darglint = ["+*"]
 flake8-debugger = ["+*"]
@@ -168,21 +167,42 @@ pycodestyle = [
 pyflakes = ["+*"]
 wemake-python-styleguide = [
   "+*",
-  "-WPS305",  # Allow use of f-strings
-  "-WPS332",  # Allow use of assignment expressions (walrus operator :=)
-  "-WPS348",  # Allow use of `.` at beginning of line to accommodate Black formatting of multiline chained function calls
+  "-WPS110",  # Allow blacklisted variable names that can be clear enough in method context
+  "-WPS115",  # Allow upper-case constants in Enum subclasses
+  "-WPS300",  # Allow local folder imports (import .module)
+  "-WPS305",  # Allow f-strings
+  "-WPS306",  # Ignore missing base class, required by pyupgrade: https://github.com/asottile/pyupgrade#rewrites-class-declaration
+  "-WPS332",  # Allow assignment expressions (walrus operator :=)
+  "-WPS348",  # Allow `.` at beginning of line to accommodate Black formatting of multiline chained function calls
+  "-WPS420",  # Allow `pass` keywords in `except` bodies to prevent falling through to another `except`
 ]
 
 [tool.flakehell.exceptions."tests/"]
 flake8-bandit = ["-S101"]  # Don't warn on use of asserts in tests
+flake8-docstrings = ["-D101", "-D102", "-D103"] # Don't require docstrings in test classes and methods
 flake8-pytest = ["+*"]
 wemake-python-styleguide = [
+  "-WPS204",  # Don't warn on overused expressions in test methods
+  "-WPS211",  # Don't warn on too many arguments in test methods
+  "-WPS218",  # Don't warn on too many `assert` statements in test methods
   "-WPS214",  # Don't warn on too many methods in test modules
-  "-WPS306",  # Ignore missing base class in tests
+  "-WPS226",  # Don't warn on too many string constants in test methods
+  "-WPS442",  # Allow outer scope name shadowing for fixtures
+  "-WPS430",  # Allow nested functions in test methods
+  "-WPS437",  # Allow protected attribute usage in test methods
 ]
 
 [tool.flakehell.exceptions."scripts/"]
 wemake-python-styleguide = ["-WPS421"]  # Allow for print function calls
+
+[tool.flakehell.exceptions."src/meltano/cli/"]
+wemake-python-styleguide = [
+  "-WPS210",  # Allow many local variables, since these aid in string building
+  "-WPS211",  # Allow many arguments, since these often represent CLI arguments
+  "-WPS213",  # Allow many expressions, since string building requires them
+  "-WPS216",  # Allow many decorators, since `click` uses them to define the CLI
+  "-WPS202",  # Allow many module members
+]
 
 [tool.flakehell.exceptions."**/__init__.py"]
 pyflakes = ["-F401"]  # Allow for using __init__.py to promote imports to the module namespace

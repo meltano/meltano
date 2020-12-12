@@ -341,8 +341,8 @@ class TestPluginSettingsService:
     ):
         def env_vars(service, setting_name, **kwargs):
             return [
-                s.definition
-                for s in service.setting_env_vars(
+                setting.definition
+                for setting in service.setting_env_vars(
                     service.find_setting(setting_name), **kwargs
                 )
             ]

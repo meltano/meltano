@@ -22,7 +22,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.transform_add_service import TransformAddService
 
 from . import cli
-from .params import project
+from .params import pass_project
 from .utils import CliError, add_plugin, add_related_plugins
 
 DUMPABLES = {
@@ -73,7 +73,7 @@ def logs(*args, **kwargs):
 @click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
-@project(migrate=True)
+@pass_project(migrate=True)
 def elt(
     project,
     extractor,

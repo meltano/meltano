@@ -21,10 +21,13 @@ class VariantNotFoundError(Exception):
         self.plugin = plugin
         self.variant_name = variant_name
 
-        message = f"{plugin.type.descriptor.capitalize()} '{plugin.name}' variant '{variant_name}' is not known to Meltano. "
-        message += f"Variants: {plugin.variant_labels}"
-
-        super().__init__(message)
+    def __str__(self):
+        return "{type} '{name}' variant '{variant}' is not known to Meltano. Variants: {variant_labels}".format(
+            type=self.plugin.type.descriptor.capitalize(),
+            name=self.plugin.name,
+            variant=self.variant_name,
+            variant_labels=self.plugin.variant_labels,
+        )
 
 
 class YAMLEnum(str, Enum):
@@ -222,6 +225,7 @@ class PluginDefinition(PluginRef):
         return self.get_variant(variant_or_name)
 
     def variant_label(self, variant):
+        """Return label for specified variant."""
         variant = self.find_variant(variant)
 
         label = variant.name or Variant.ORIGINAL_NAME
@@ -234,6 +238,7 @@ class PluginDefinition(PluginRef):
 
     @property
     def variant_labels(self):
+        """Return labels for supported variants."""
         return ", ".join([self.variant_label(variant) for variant in self.variants])
 
 
@@ -247,7 +252,10 @@ class BasePlugin(HookObject):
         self._variant = variant
 
     def __eq__(self, other):
-        return self._plugin_def == other._plugin_def and self._variant == other._variant
+        return (
+            self._plugin_def == other._plugin_def  # noqa: WPS437
+            and self._variant == other._variant  # noqa: WPS437
+        )
 
     def __hash__(self):
         return hash((self._plugin_def, self._variant))
@@ -296,6 +304,7 @@ class BasePlugin(HookObject):
         return existing_settings
 
     def env_prefixes(self, for_writing=False):
+        """Return environment variable prefixes to use for settings."""
         return [self.name, self.namespace]
 
     def is_installable(self):

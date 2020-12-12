@@ -6,11 +6,11 @@ from meltano.api.app import create_app
 from meltano.core.utils import identity
 
 from . import cli
-from .params import project
+from .params import pass_project
 
 
 @cli.group(invoke_without_command=True)
-@project(migrate=True)
+@pass_project(migrate=True)
 @click.pass_context
 def user(ctx, project):
     ctx.obj["project"] = project

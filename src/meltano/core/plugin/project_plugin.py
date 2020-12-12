@@ -12,16 +12,25 @@ logger = logging.getLogger(__name__)
 
 
 class CyclicInheritanceError(Exception):
+    """Exception raised when project plugin inherits from itself cyclicly."""
+
     def __init__(self, plugin: "ProjectPlugin", ancestor: "ProjectPlugin"):
+        """Initialize cyclic inheritance error."""
         self.plugin = plugin
         self.ancestor = ancestor
 
-        super().__init__(
-            f"{plugin.type.descriptor.capitalize()} '{plugin.name}' cannot inherit from '{ancestor.name}', which itself inherits from '{plugin.name}'."
+    def __str__(self):
+        """Return error message."""
+        return "{type} '{name}' cannot inherit from '{ancestor}', which itself inherits from '{name}'".format(
+            type=self.plugin.type.descriptor.capitalize(),
+            name=self.plugin.name,
+            ancestor=self.ancestor.name,
         )
 
 
 class ProjectPlugin(PluginRef):
+    VARIANT_ATTR = "variant"
+
     def __init__(
         self,
         plugin_type: PluginType,
@@ -69,17 +78,21 @@ class ProjectPlugin(PluginRef):
         self.variant = variant
         self.pip_url = pip_url
 
-        self._fallbacks.update(["logo_url", "description", "variant", "pip_url"])
+        self._fallbacks.update(
+            ["logo_url", "description", self.VARIANT_ATTR, "pip_url"]
+        )
 
         # If no variant is set, we fall back on the default
-        self._defaults["variant"] = lambda _: default_variant
+        self._defaults[self.VARIANT_ATTR] = lambda _: default_variant
 
         if self.inherit_from:
             # When explicitly inheriting from a project plugin or discoverable definition,
             # derive default values from our own name
-            self._defaults["namespace"] = lambda p: p.name.replace("-", "_")
-            self._defaults["label"] = (
-                lambda p: f"{p.parent.label}: {p.name}" if p.parent else p.name
+            self._defaults["namespace"] = lambda plugin: plugin.name.replace("-", "_")
+            self._defaults["label"] = lambda plugin: (
+                f"{plugin.parent.label}: {plugin.name}"
+                if plugin.parent
+                else plugin.name
             )
         else:
             # When shadowing a discoverable definition with the same name (no `inherit_from`),
@@ -113,7 +126,8 @@ class ProjectPlugin(PluginRef):
 
     @property
     def is_variant_set(self):
-        return self.is_attr_set("variant")
+        """Return whether variant is set explicitly."""
+        return self.is_attr_set(self.VARIANT_ATTR)
 
     @property
     def info(self):
@@ -177,4 +191,5 @@ class ProjectPlugin(PluginRef):
 
     @property
     def is_shadowing(self):
+        """Return whether this plugin is shadowing a base plugin with the same name."""
         return not self.inherit_from

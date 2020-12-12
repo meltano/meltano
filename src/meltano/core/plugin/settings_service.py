@@ -40,7 +40,7 @@ class PluginSettingsService(SettingsService):
             **self.plugin.info_env,
         }
 
-        self.__inherited_settings_service = None
+        self._inherited_settings_service = None
 
     @property
     def label(self):
@@ -57,36 +57,42 @@ class PluginSettingsService(SettingsService):
         )
 
     @property
-    def _db_namespace(self):
+    def db_namespace(self):
+        """Return namespace for setting value records in system database."""
         # "default" is included for legacy reasons
         return ".".join((self.plugin.type, self.plugin.name, "default"))
 
     @property
-    def _definitions(self):
+    def setting_definitions(self):
+        """Return definitions of supported settings."""
         return self.plugin.settings_with_extras
 
     @property
-    def _meltano_yml_config(self):
+    def meltano_yml_config(self):
+        """Return current configuration in `meltano.yml`."""
         return self.plugin.config_with_extras
 
-    def _update_meltano_yml_config(self, config_with_extras):
+    def update_meltano_yml_config(self, config_with_extras):
+        """Update configuration in `meltano.yml`."""
         self.plugin.config_with_extras = config_with_extras
         self.plugins_service.update_plugin(self.plugin)
 
     @property
-    def _inherited_settings_service(self):
+    def inherited_settings_service(self):
+        """Return settings service to inherit configuration from."""
         parent_plugin = self.plugin.parent
         if not isinstance(parent_plugin, ProjectPlugin):
-            return
+            return None
 
-        if self.__inherited_settings_service is None:
-            self.__inherited_settings_service = self.__class__(
+        if self._inherited_settings_service is None:
+            self._inherited_settings_service = self.__class__(
                 self.project,
                 parent_plugin,
                 env_override=self.env_override,
                 plugins_service=self.plugins_service,
             )
-        return self.__inherited_settings_service
+        return self._inherited_settings_service
 
-    def _process_config(self, config):
+    def process_config(self, config):
+        """Process configuration dictionary to be passed to plugin."""
         return self.plugin.process_config(config)

@@ -190,21 +190,21 @@ class TestBasePlugin:
         assert foo_setting
         assert foo_setting.kind == "password"
         assert foo_setting.value == "bar"
-        assert not foo_setting._custom
+        assert not foo_setting.is_custom
 
         # Known, not overwritten
         bar_setting = find_named(settings, "_bar")
         assert bar_setting
         assert bar_setting.kind == "integer"
         assert bar_setting.value == 0
-        assert not bar_setting._custom
+        assert not bar_setting.is_custom
 
         # Unknown, set in plugin/variant definition
         baz_setting = find_named(settings, "_baz")
         assert baz_setting
         assert baz_setting.kind is None
         assert baz_setting.value == "qux"
-        assert not baz_setting._custom
+        assert not baz_setting.is_custom
 
 
 class TestProjectPlugin:
@@ -312,7 +312,7 @@ class TestProjectPlugin:
         assert isinstance(base_plugin, BasePlugin)
 
         # These attrs exist both on ProjectPlugin and PluginBase
-        for attr in ["logo_url", "description", "variant", "pip_url"]:
+        for attr in ("logo_url", "description", "variant", "pip_url"):
             # By default, they fall back on the parent
             assert (
                 getattr(inherited_tap, attr)
@@ -399,7 +399,7 @@ class TestProjectPlugin:
 
         assert plugin.variant == base_plugin.variant == "meltano"
 
-    def test_env_prefixes(self, inherited_tap, tap):
+    def testenv_prefixes(self, inherited_tap, tap):
         assert tap.env_prefixes() == ["tap-mock", "tap_mock"]
         assert tap.env_prefixes(for_writing=True) == [
             "tap-mock",

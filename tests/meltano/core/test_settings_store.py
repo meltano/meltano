@@ -36,29 +36,29 @@ class DummySettingsService(SettingsService):
         return "https://meltano.com/docs/"
 
     @property
-    def _env_prefixes(self):
+    def env_prefixes(self):
         return ["dummy"]
 
     @property
-    def _db_namespace(self):
+    def db_namespace(self):
         return "dummy"
 
     @property
-    def _definitions(self):
+    def setting_definitions(self):
         return self.__definitions
 
     @property
-    def _meltano_yml_config(self):
+    def meltano_yml_config(self):
         return self.__meltano_yml_config
 
-    def _update_meltano_yml_config(self, config):
+    def update_meltano_yml_config(self, config):
         self.__meltano_yml_config = config
 
     @property
-    def _inherited_settings_service(self):
+    def inherited_settings_service(self):
         return self._inherited_settings
 
-    def _process_config(self, config):
+    def process_config(self, config):
         return config
 
 

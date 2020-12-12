@@ -25,7 +25,9 @@ def database_uri_option(func):
     return functools.update_wrapper(decorate, func)
 
 
-class project:
+class pass_project:  # noqa: N801
+    """Pass current project to decorated CLI command function."""
+
     __name__ = "project"
 
     def __init__(self, migrate=False):

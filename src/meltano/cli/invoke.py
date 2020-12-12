@@ -10,7 +10,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
-from .params import project
+from .params import pass_project
 from .utils import CliError
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 )
 @click.argument("plugin_name")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
-@project(migrate=True)
+@pass_project(migrate=True)
 def invoke(project, plugin_type, dump, plugin_name, plugin_args):
     plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 

@@ -5,7 +5,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
-from .params import project
+from .params import pass_project
 from .utils import CliError, add_related_plugins, install_plugins
 
 
@@ -15,7 +15,7 @@ from .utils import CliError, add_related_plugins, install_plugins
 )
 @click.argument("plugin_name", nargs=-1, required=False)
 @click.option("--include-related", is_flag=True)
-@project(migrate=True)
+@pass_project(migrate=True)
 def install(project, plugin_type, plugin_name, include_related):
     """
     Installs all the dependencies of your project based on the meltano.yml file.

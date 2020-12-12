@@ -15,11 +15,11 @@ from meltano.core.upgrade_service import UpgradeService
 from sqlalchemy import create_engine
 
 from . import cli
-from .params import project
+from .params import pass_project
 
 
 @cli.group(cls=DefaultGroup, default="all", default_if_no_args=True)
-@project()
+@pass_project()
 @click.pass_context
 def upgrade(ctx, project):
     engine, _ = project_engine(project)
