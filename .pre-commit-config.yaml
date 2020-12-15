@@ -17,6 +17,7 @@ repos:
     - id: pyupgrade
       args:
         - '--py3-plus'
+        - '--py36-plus'
 # Remove after upgrading to isort >=5
 - repo: https://github.com/asottile/seed-isort-config
   rev: v2.2.0

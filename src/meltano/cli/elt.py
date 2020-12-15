@@ -12,11 +12,7 @@ from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginRef, PluginType
-from meltano.core.plugin.error import PluginMissingError
-from meltano.core.plugin_discovery_service import (
-    PluginDiscoveryService,
-    PluginNotFoundError,
-)
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
@@ -26,7 +22,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.transform_add_service import TransformAddService
 
 from . import cli
-from .params import project
+from .params import pass_project
 from .utils import CliError, add_plugin, add_related_plugins
 
 DUMPABLES = {
@@ -77,7 +73,7 @@ def logs(*args, **kwargs):
 @click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
-@project(migrate=True)
+@pass_project(migrate=True)
 def elt(
     project,
     extractor,
@@ -174,10 +170,7 @@ def elt_context_builder(
 
 
 def dump_file(context_builder, dumpable):
-    try:
-        elt_context = context_builder.context()
-    except PluginMissingError as err:
-        raise CliError(str(err)) from err
+    elt_context = context_builder.context()
 
     try:
         plugin_type, file_id = DUMPABLES[dumpable]
@@ -351,5 +344,5 @@ def find_transform_for_extractor(extractor: str, plugins_service):
         transform_plugin = plugins_service.get_plugin(transform_plugin_def)
 
         return transform_plugin.name
-    except (PluginNotFoundError, PluginMissingError):
+    except PluginNotFoundError:
         return None

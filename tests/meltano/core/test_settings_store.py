@@ -6,6 +6,7 @@ from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import SettingsService
 from meltano.core.settings_store import (
     AutoStoreManager,
+    InheritedStoreManager,
     MeltanoYmlStoreManager,
     SettingValueStore,
     StoreNotSupportedError,
@@ -24,6 +25,7 @@ class DummySettingsService(SettingsService):
             SettingDefinition("password", kind="password"),
             SettingDefinition("env_specific", env_specific=True),
         ]
+        self._inherited_settings = None
 
     @property
     def label(self):
@@ -34,25 +36,29 @@ class DummySettingsService(SettingsService):
         return "https://meltano.com/docs/"
 
     @property
-    def _env_prefixes(self):
+    def env_prefixes(self):
         return ["dummy"]
 
     @property
-    def _db_namespace(self):
+    def db_namespace(self):
         return "dummy"
 
     @property
-    def _definitions(self):
+    def setting_definitions(self):
         return self.__definitions
 
     @property
-    def _meltano_yml_config(self):
+    def meltano_yml_config(self):
         return self.__meltano_yml_config
 
-    def _update_meltano_yml_config(self, config):
+    def update_meltano_yml_config(self, config):
         self.__meltano_yml_config = config
 
-    def _process_config(self, config):
+    @property
+    def inherited_settings_service(self):
+        return self._inherited_settings
+
+    def process_config(self, config):
         return config
 
 
@@ -435,3 +441,45 @@ class TestMeltanoYmlStoreManager:
 
         assert "regular" not in subject.flat_config
         assert "basic" not in subject.flat_config
+
+
+class TestInheritedStoreManager:
+    @pytest.fixture()
+    def subject(self, dummy_settings_service):
+        return InheritedStoreManager(dummy_settings_service)
+
+    def test_get(self, subject, project):
+        def get(key="regular"):
+            return subject.get(
+                key, setting_def=subject.settings_service.find_setting(key)
+            )
+
+        with pytest.raises(StoreNotSupportedError):
+            get()
+
+        inherited_settings = DummySettingsService(project)
+        subject.settings_service._inherited_settings = inherited_settings
+
+        # Default values are not inherited
+        assert inherited_settings.get_with_source("regular") == (
+            "from_default",
+            Store.DEFAULT,
+        )
+        assert get() == (None, {})
+
+        # Non-default values are inherited
+        inherited_settings.set("regular", "$YML_VALUE", store=Store.MELTANO_YML)
+        value, metadata = get()
+
+        # Env vars are not expanded in values
+        assert value == "$YML_VALUE"
+        assert metadata["inherited_source"] is Store.MELTANO_YML
+        # Env var expandability is inherited
+        assert metadata["expandable"]
+
+        inherited_settings.set("regular", "$DOTENV_VALUE", store=Store.DOTENV)
+        value, metadata = get()
+        assert value == "$DOTENV_VALUE"
+        assert metadata["inherited_source"] is Store.DOTENV
+        # Lack of env var expandability is inherited
+        assert not metadata["expandable"]

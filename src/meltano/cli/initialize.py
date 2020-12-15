@@ -6,10 +6,7 @@ import click
 import yaml
 from meltano.core.error import SubprocessError
 from meltano.core.plugin_install_service import PluginInstallService
-from meltano.core.project_init_service import (
-    ProjectInitService,
-    ProjectInitServiceError,
-)
+from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
@@ -49,8 +46,6 @@ def init(ctx, project_name, no_usage_stats):
 
         tracker = GoogleAnalyticsTracker(project)
         tracker.track_meltano_init(project_name=project_name)
-    except ProjectInitServiceError as e:
-        raise CliError(str(e)) from e
     except SubprocessError as err:
         logger.error(err.stderr)
-        raise CliError(str(err)) from err
+        raise

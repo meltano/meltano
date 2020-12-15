@@ -39,25 +39,31 @@ class ProjectSettingsService(SettingsService):
         return "https://meltano.com/docs/settings.html"
 
     @property
-    def _env_prefixes(self):
+    def env_prefixes(self):
+        """Return prefixes for setting environment variables."""
         return ["meltano"]
 
     @property
-    def _db_namespace(self):
+    def db_namespace(self):
+        """Return namespace for setting value records in system database."""
         return "meltano"
 
     @property
-    def _definitions(self):
+    def setting_definitions(self):
+        """Return definitions of supported settings."""
         return self.config_service.settings
 
     @property
-    def _meltano_yml_config(self):
+    def meltano_yml_config(self):
+        """Return current configuration in `meltano.yml`."""
         return self.config_service.current_config
 
-    def _update_meltano_yml_config(self, config):
+    def update_meltano_yml_config(self, config):
+        """Update configuration in `meltano.yml`."""
         self.config_service.update_config(config)
 
-    def _process_config(self, config):
+    def process_config(self, config):
+        """Process configuration dictionary for presentation in `meltano config meltano`."""
         return nest_object(config)
 
     def get_with_metadata(self, name: str, *args, **kwargs):

@@ -9,7 +9,7 @@ from meltano.cli import cli
 from meltano.core.m5o.dashboards_service import DashboardsService
 from meltano.core.m5o.reports_service import ReportsService
 from meltano.core.plugin import PluginRef, PluginType, Variant
-from meltano.core.plugin.error import PluginMissingError
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_install_service import PluginInstallReason
 
 
@@ -51,7 +51,7 @@ class TestCliAdd:
         project_plugins_service,
     ):
         # ensure the plugin is not present
-        with pytest.raises(PluginMissingError):
+        with pytest.raises(PluginNotFoundError):
             project_plugins_service.find_plugin(plugin_name, plugin_type=plugin_type)
 
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
@@ -96,11 +96,11 @@ class TestCliAdd:
 
             assert res.exit_code == 0, res.stdout
             assert (
-                f"Extractor 'tap-gitlab' is already in your Meltano project"
+                "Extractor 'tap-gitlab' already exists in your Meltano project"
                 in res.stderr
             )
-            assert f"Added extractor 'tap-adwords'" in res.stdout
-            assert f"Added extractor 'tap-facebook'" in res.stdout
+            assert "Added extractor 'tap-adwords'" in res.stdout
+            assert "Added extractor 'tap-facebook'" in res.stdout
 
             tap_gitlab = project_plugins_service.find_plugin(
                 "tap-gitlab", PluginType.EXTRACTORS
@@ -205,7 +205,7 @@ class TestCliAdd:
         assert_cli_runner(result)
 
         # Plugin has not been added to meltano.yml
-        with pytest.raises(PluginMissingError):
+        with pytest.raises(PluginNotFoundError):
             project_plugins_service.find_plugin("docker-compose", PluginType.FILES)
 
         # File has been created
@@ -275,7 +275,7 @@ class TestCliAdd:
         assert str(res.exception) == "Extractor 'tap-unknown' is not known to Meltano"
 
         # ensure the plugin is not present
-        with pytest.raises(PluginMissingError):
+        with pytest.raises(PluginNotFoundError):
             project_plugins_service.find_plugin("tap-unknown", PluginType.EXTRACTORS)
 
     @pytest.mark.xfail(reason="Uninstall not implemented yet.")
@@ -287,7 +287,7 @@ class TestCliAdd:
         assert res.stderr
 
         # ensure the plugin is not present
-        with pytest.raises(PluginMissingError):
+        with pytest.raises(PluginNotFoundError):
             project_plugins_service.find_plugin("tap-mock", PluginType.EXTRACTORS)
 
     def test_add_variant(self, project, cli_runner, project_plugins_service):
@@ -305,6 +305,118 @@ class TestCliAdd:
                 plugin_type=PluginType.EXTRACTORS, plugin_name="tap-mock"
             )
             assert plugin.variant == "singer-io"
+
+    def test_add_inherited(
+        self,
+        project,
+        tap,
+        cli_runner,
+        project_plugins_service,
+        plugin_discovery_service,
+    ):
+        # Make sure tap-mock is not in the project as a project plugin
+        project_plugins_service.remove_from_file(tap)
+
+        with mock.patch(
+            "meltano.cli.add.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+
+            # Inheriting from a BasePlugin using --as
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "add",
+                    "extractor",
+                    "tap-mock",
+                    "--as",
+                    "tap-mock-inherited",
+                ],
+            )
+            assert_cli_runner(res)
+            assert "Inherit from:\ttap-mock, variant meltano (default)\n" in res.stdout
+
+            inherited = project_plugins_service.find_plugin(
+                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-mock-inherited"
+            )
+            assert inherited.inherit_from == "tap-mock"
+            assert inherited.variant == "meltano"
+            assert inherited.parent == plugin_discovery_service.find_base_plugin(
+                plugin_type=PluginType.EXTRACTORS,
+                plugin_name="tap-mock",
+                variant="meltano",
+            )
+
+            # Inheriting from a BasePlugin using --inherit-from and --variant
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "add",
+                    "extractor",
+                    "tap-mock--singer-io",
+                    "--inherit-from",
+                    "tap-mock",
+                    "--variant",
+                    "singer-io",
+                ],
+            )
+            assert_cli_runner(res)
+            assert (
+                "Inherit from:\ttap-mock, variant singer-io (deprecated)\n"
+                in res.stdout
+            )
+
+            inherited_variant = project_plugins_service.find_plugin(
+                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-mock--singer-io"
+            )
+            assert inherited_variant.inherit_from == "tap-mock"
+            assert inherited_variant.variant == "singer-io"
+            assert (
+                inherited_variant.parent
+                == plugin_discovery_service.find_base_plugin(
+                    plugin_type=PluginType.EXTRACTORS,
+                    plugin_name="tap-mock",
+                    variant="singer-io",
+                )
+            )
+
+            # Inheriting from a ProjectPlugin using --inherit-from
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "add",
+                    "extractor",
+                    "tap-mock-inception",
+                    "--inherit-from",
+                    "tap-mock-inherited",
+                ],
+            )
+            assert_cli_runner(res)
+            assert "Inherit from:\ttap-mock-inherited\n" in res.stdout
+
+            inception = project_plugins_service.find_plugin(
+                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-mock-inception"
+            )
+            assert inception.inherit_from == "tap-mock-inherited"
+            assert inception.parent == inherited
+
+            # Inheriting from a nonexistent plugin
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "add",
+                    "extractor",
+                    "tap-foo",
+                    "--inherit-from",
+                    "tap-bar",
+                ],
+            )
+            assert res.exit_code == 1
+            assert (
+                "Could not find parent plugin for extractor 'tap-foo': Extractor 'tap-bar' is not known to Meltano"
+                in str(res.exception)
+            )
 
     def test_add_custom(self, project, cli_runner, project_plugins_service):
         pip_url = "-e path/to/tap-custom"

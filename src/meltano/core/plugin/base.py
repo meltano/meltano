@@ -21,10 +21,13 @@ class VariantNotFoundError(Exception):
         self.plugin = plugin
         self.variant_name = variant_name
 
-        message = f"{plugin.type.descriptor.capitalize()} '{plugin.name}' variant '{variant_name}' is not known to Meltano. "
-        message += f"Variants: {plugin.list_variant_names()}"
-
-        super().__init__(message)
+    def __str__(self):
+        return "{type} '{name}' variant '{variant}' is not known to Meltano. Variants: {variant_labels}".format(
+            type=self.plugin.type.descriptor.capitalize(),
+            name=self.plugin.name,
+            variant=self.variant_name,
+            variant_labels=self.plugin.variant_labels,
+        )
 
 
 class YAMLEnum(str, Enum):
@@ -120,6 +123,7 @@ class PluginRef(Canonical):
 
 class Variant(NameEq, Canonical):
     ORIGINAL_NAME = "original"
+    DEFAULT_NAME = "default"
 
     def __init__(
         self,
@@ -206,11 +210,11 @@ class PluginDefinition(PluginRef):
             raise VariantNotFoundError(self, variant_name) from err
 
     def find_variant(self, variant_or_name: Union[str, Variant] = None):
-        if variant_or_name is None:
-            return self.variants[0]
-
         if isinstance(variant_or_name, Variant):
             return variant_or_name
+
+        if variant_or_name is None or variant_or_name == Variant.DEFAULT_NAME:
+            return self.variants[0]
 
         if variant_or_name == Variant.ORIGINAL_NAME:
             try:
@@ -220,20 +224,22 @@ class PluginDefinition(PluginRef):
 
         return self.get_variant(variant_or_name)
 
-    def list_variant_names(self):
-        names = []
+    def variant_label(self, variant):
+        """Return label for specified variant."""
+        variant = self.find_variant(variant)
 
-        for i, variant in enumerate(self.variants):
-            name = variant.name or Variant.ORIGINAL_NAME
+        label = variant.name or Variant.ORIGINAL_NAME
+        if variant == self.variants[0]:
+            label = f"{label} (default)"
+        elif variant.deprecated:
+            label = f"{label} (deprecated)"
 
-            if i == 0:
-                name += " (default)"
-            elif variant.deprecated:
-                name += " (deprecated)"
+        return label
 
-            names.append(name)
-
-        return ", ".join(names)
+    @property
+    def variant_labels(self):
+        """Return labels for supported variants."""
+        return ", ".join([self.variant_label(variant) for variant in self.variants])
 
 
 class BasePlugin(HookObject):
@@ -244,6 +250,15 @@ class BasePlugin(HookObject):
 
         self._plugin_def = plugin_def
         self._variant = variant
+
+    def __eq__(self, other):
+        return (
+            self._plugin_def == other._plugin_def  # noqa: WPS437
+            and self._variant == other._variant  # noqa: WPS437
+        )
+
+    def __hash__(self):
+        return hash((self._plugin_def, self._variant))
 
     def __iter__(self):
         yield from self._plugin_def
@@ -256,7 +271,7 @@ class BasePlugin(HookObject):
 
     @property
     def variant(self):
-        return self._variant.name or Variant.ORIGINAL_NAME
+        return self._variant.name
 
     @property
     def executable(self):
@@ -287,6 +302,10 @@ class BasePlugin(HookObject):
         )
 
         return existing_settings
+
+    def env_prefixes(self, for_writing=False):
+        """Return environment variable prefixes to use for settings."""
+        return [self.name, self.namespace]
 
     def is_installable(self):
         return self.pip_url is not None

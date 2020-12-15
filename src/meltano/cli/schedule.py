@@ -14,12 +14,12 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import coerce_datetime
 
 from . import cli
-from .params import project
+from .params import pass_project
 
 
 @cli.group(cls=DefaultGroup, default="add")
 @click.pass_context
-@project(migrate=True)
+@pass_project(migrate=True)
 def schedule(project, ctx):
     ctx.obj["project"] = project
     ctx.obj["schedule_service"] = schedule_service = ScheduleService(project)

@@ -3,7 +3,7 @@ from pathlib import Path
 from meltano.core.behavior.hookable import hook
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin import BasePlugin, PluginRef, PluginType
-from meltano.core.plugin.error import PluginMissingError
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin_invoker import PluginInvoker
@@ -47,7 +47,7 @@ class DbtTransformPluginInstaller:
                 )
                 print(f"Adding dbt model to '{dbt_project_path}'...")
                 transform_add_service.update_dbt_project(self.plugin)
-            except PluginMissingError:
+            except PluginNotFoundError:
                 raise PluginInstallError(
                     "Transformer 'dbt' is not installed. Run `meltano add transformer dbt` to add it to your project."
                 )

@@ -5,14 +5,10 @@ from typing import List
 
 import yaml
 
-from .plugin import BasePlugin
+from .plugin import BasePlugin, PluginType, Variant
 from .plugin.project_plugin import ProjectPlugin
 from .project import Project
 from .project_plugins_service import PluginAlreadyAddedException, ProjectPluginsService
-
-
-class PluginNotSupportedException(Exception):
-    pass
 
 
 class MissingPluginException(Exception):
@@ -24,20 +20,20 @@ class ProjectAddService:
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
 
-    def add(self, *args, **kwargs) -> ProjectPlugin:
-        base_plugin = self.plugins_service.discovery_service.find_base_plugin(
-            *args, **kwargs
-        )
-        return self.add_base_plugin(base_plugin)
-
-    def add_base_plugin(self, base_plugin: BasePlugin) -> ProjectPlugin:
+    def add(self, plugin_type: PluginType, plugin_name: str, **attrs) -> ProjectPlugin:
+        """Add plugin to project."""
         plugin = ProjectPlugin(
-            base_plugin.type,
-            name=base_plugin.name,
-            variant=base_plugin.variant,
-            pip_url=base_plugin.pip_url,
+            plugin_type, plugin_name, **attrs, default_variant=Variant.DEFAULT_NAME
         )
-        plugin.parent = base_plugin
+
+        self.plugins_service.ensure_parent(plugin)
+
+        # If we are inheriting from a base plugin definition,
+        # repeat the variant and pip_url in meltano.yml
+        parent = plugin.parent
+        if isinstance(parent, BasePlugin):
+            plugin.variant = parent.variant
+            plugin.pip_url = parent.pip_url
 
         return self.add_plugin(plugin)
 

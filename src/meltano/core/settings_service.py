@@ -43,35 +43,46 @@ class SettingsService(ABC):
         pass
 
     @property
-    def _env_prefixes(self) -> [str]:
+    def env_prefixes(self) -> [str]:
+        """Return prefixes for setting environment variables."""
         return []
 
     @property
     @abstractmethod
-    def _db_namespace(self) -> str:
+    def db_namespace(self) -> str:
+        """Return namespace for setting value records in system database."""
         pass
 
     @property
     @abstractmethod
-    def _definitions(self) -> List[SettingDefinition]:
+    def setting_definitions(self) -> List[SettingDefinition]:
+        """Return definitions of supported settings."""
+        pass
+
+    @property
+    def inherited_settings_service(self):
+        """Return settings service to inherit configuration from."""
         pass
 
     @property
     @abstractmethod
-    def _meltano_yml_config(self) -> Dict:
+    def meltano_yml_config(self) -> Dict:
+        """Return current configuration in `meltano.yml`."""
         pass
 
     @abstractmethod
-    def _update_meltano_yml_config(self, config):
+    def update_meltano_yml_config(self, config):
+        """Update configuration in `meltano.yml`."""
         pass
 
     @abstractmethod
-    def _process_config(self):
+    def process_config(self):
+        """Process configuration dictionary to be used downstream."""
         pass
 
     @property
     def flat_meltano_yml_config(self):
-        return flatten(self._meltano_yml_config, "dot")
+        return flatten(self.meltano_yml_config, "dot")
 
     @property
     def env(self):
@@ -127,7 +138,7 @@ class SettingsService(ABC):
                 key: metadata["setting"].post_process_value(metadata["value"])
                 for key, metadata in config_metadata.items()
             }
-            config = self._process_config(config)
+            config = self.process_config(config)
         else:
             config = {
                 key: metadata["value"] for key, metadata in config_metadata.items()
@@ -326,15 +337,17 @@ class SettingsService(ABC):
     def definitions(self, extras=None) -> Iterable[Dict]:
         if self._setting_defs is None:
             self._setting_defs = [
-                s for s in self._definitions if s.kind != "hidden" or self.show_hidden
+                setting
+                for setting in self.setting_definitions
+                if setting.kind != "hidden" or self.show_hidden
             ]
 
         if extras is not None:
             return [
-                s
-                for s in self._setting_defs
-                if (extras is True and s.is_extra)
-                or (extras is False and not s.is_extra)
+                setting
+                for setting in self._setting_defs
+                if (extras is True and setting.is_extra)  # noqa: WPS408
+                or (extras is False and not setting.is_extra)
             ]
 
         return self._setting_defs
@@ -348,7 +361,7 @@ class SettingsService(ABC):
             raise SettingMissingError(name) from err
 
     def setting_env_vars(self, setting_def, for_writing=False):
-        return setting_def.env_vars(self._env_prefixes)
+        return setting_def.env_vars(self.env_prefixes)
 
     def setting_env(self, setting_def):
         return self.setting_env_vars(setting_def)[0].key

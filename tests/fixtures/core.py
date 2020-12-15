@@ -38,6 +38,7 @@ def discovery():
     discovery[PluginType.EXTRACTORS].append(
         {
             "name": "tap-mock",
+            "label": "Mock",
             "namespace": "tap_mock",
             "variants": [
                 {
@@ -234,9 +235,44 @@ def tap(project_add_service):
 
 
 @pytest.fixture(scope="class")
+def alternative_tap(project_add_service, tap):
+    try:
+        return project_add_service.add(
+            PluginType.EXTRACTORS,
+            "tap-mock--singer-io",
+            inherit_from=tap.name,
+            variant="singer-io",
+        )
+    except PluginAlreadyAddedException as err:
+        return err.plugin
+
+
+@pytest.fixture(scope="class")
+def inherited_tap(project_add_service, tap):
+    try:
+        return project_add_service.add(
+            PluginType.EXTRACTORS, "tap-mock-inherited", inherit_from=tap.name
+        )
+    except PluginAlreadyAddedException as err:
+        return err.plugin
+
+
+@pytest.fixture(scope="class")
 def target(project_add_service):
     try:
         return project_add_service.add(PluginType.LOADERS, "target-mock")
+    except PluginAlreadyAddedException as err:
+        return err.plugin
+
+
+@pytest.fixture(scope="class")
+def alternative_target(project_add_service):
+    # We don't load the `target` fixture here since this ProjectPlugin should
+    # have a BasePlugin parent, not the `target` ProjectPlugin
+    try:
+        return project_add_service.add(
+            PluginType.LOADERS, "target-mock-alternative", inherit_from="target-mock"
+        )
     except PluginAlreadyAddedException as err:
         return err.plugin
 

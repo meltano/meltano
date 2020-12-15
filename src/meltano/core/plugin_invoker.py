@@ -10,7 +10,6 @@ from .error import Error, SubprocessError
 from .logging.utils import OUTPUT_BUFFER_SIZE
 from .plugin import PluginRef
 from .plugin.config_service import PluginConfigService
-from .plugin.error import PluginExecutionError, PluginMissingError
 from .plugin.project_plugin import ProjectPlugin
 from .plugin.settings_service import PluginSettingsService
 from .project import Project

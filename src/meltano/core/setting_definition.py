@@ -132,18 +132,25 @@ class SettingDefinition(NameEq, Canonical):
         return self.name.startswith("_")
 
     @property
+    def is_custom(self):
+        """Return whether the setting is custom, i.e. user-defined in `meltano.yml`."""
+        return self._custom
+
+    @property
     def is_redacted(self):
         return self.kind in ("password", "oauth")
 
-    def env_vars(self, prefixes: [str]):
+    def env_vars(self, prefixes: [str], include_custom=True):
+        """Return environment variables with the provided prefixes."""
         env_keys = []
 
-        if self.env:
+        if self.env and include_custom:
             env_keys.append(self.env)
 
         env_keys.extend(to_env_var(prefix, self.name) for prefix in prefixes)
 
-        env_keys.extend(alias for alias in self.env_aliases)
+        if include_custom:
+            env_keys.extend(alias for alias in self.env_aliases)
 
         return [EnvVar(key) for key in uniques_in(env_keys)]
 

@@ -9,26 +9,44 @@ import click
 import yaml
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.project_add_custom_service import ProjectAddCustomService
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
 
 from . import cli
-from .params import project
+from .params import pass_project
 from .utils import CliError, add_plugin, add_related_plugins, install_plugins
 
 
 @cli.command()
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_name", nargs=-1, required=True)
+@click.option("--inherit-from")
 @click.option("--variant")
+@click.option("--as", "as_name")
 @click.option("--custom", is_flag=True)
 @click.option("--include-related", is_flag=True)
-@project()
+@pass_project()
 @click.pass_context
-def add(ctx, project, plugin_type, plugin_name, variant=None, **flags):
+def add(
+    ctx,
+    project,
+    plugin_type,
+    plugin_name,
+    inherit_from=None,
+    variant=None,
+    as_name=None,
+    **flags,
+):
+    """Add a plugin to your project."""
     plugin_type = PluginType.from_cli_argument(plugin_type)
     plugin_names = plugin_name  # nargs=-1
+
+    if as_name:
+        # `add <type> <inherit-from> --as <name>``
+        # is equivalent to:
+        # `add <type> <name> --inherit-from <inherit-from>``
+        inherit_from = plugin_names[0]
+        plugin_names = [as_name]
 
     plugins_service = ProjectPluginsService(project)
 
@@ -38,17 +56,19 @@ def add(ctx, project, plugin_type, plugin_name, variant=None, **flags):
             PluginType.TRANSFORMS,
             PluginType.ORCHESTRATORS,
         ):
-            raise CliError(f"--custom is not supported for {ctx.invoked_subcommand}")
+            raise CliError(f"--custom is not supported for {plugin_type}")
 
-        add_service_class = ProjectAddCustomService
-    else:
-        add_service_class = ProjectAddService
-
-    add_service = add_service_class(project, plugins_service=plugins_service)
+    add_service = ProjectAddService(project, plugins_service=plugins_service)
 
     plugins = [
         add_plugin(
-            project, plugin_type, plugin_name, variant=variant, add_service=add_service
+            project,
+            plugin_type,
+            plugin_name,
+            inherit_from=inherit_from,
+            variant=variant,
+            custom=flags["custom"],
+            add_service=add_service,
         )
         for plugin_name in plugin_names
     ]
@@ -72,6 +92,10 @@ def add(ctx, project, plugin_type, plugin_name, variant=None, **flags):
     if not success:
         raise CliError("Failed to install plugin(s)")
 
+    _print_plugins(plugins)
+
+
+def _print_plugins(plugins):
     printed_empty_line = False
     for plugin in plugins:
         docs_url = plugin.docs or plugin.repo

@@ -5,7 +5,7 @@ import click
 from meltano.core.compiler.project_compiler import ProjectCompiler
 
 from . import cli
-from .params import project
+from .params import pass_project
 
 
 def indent(text: str, count=2, char="  "):
@@ -13,7 +13,7 @@ def indent(text: str, count=2, char="  "):
 
 
 @cli.group(hidden=True, invoke_without_command=True)
-@project()
+@pass_project()
 @click.pass_context
 def model(ctx, project):
     compiler = ctx.obj["compiler"] = ProjectCompiler(project)

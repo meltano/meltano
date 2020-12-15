@@ -62,6 +62,10 @@ class Canonical:
 
         return cls(**obj)
 
+    def is_attr_set(self, attr):
+        """Return whether specified attribute has a non-default/fallback value set."""
+        return self._dict.get(attr) is not None
+
     def __getattr__(self, attr):
         try:
             value = self._dict[attr]
