@@ -14,7 +14,10 @@ class TestConnectionRetries:
             "test_error", "test_error", "test_error"
         )
         with pytest.raises(OperationalError):
-            check_db_connection(engine, 3, 0.1)
+            check_db_connection(engine=engine, max_retries=3, retry_timeout=0.1)
+
+        calls = [call.connect(), call.connect(), call.connect(), call.connect()]
+        engine.assert_has_calls(calls, any_order=True)
 
         # check reconnect on second call to `engine.connect`
         engine.reset_mock()
@@ -22,6 +25,7 @@ class TestConnectionRetries:
             OperationalError("test_error", "test_error", "test_error"),
             None,
         ]
-        check_db_connection(engine, 3, 0.1)
+
+        check_db_connection(engine=engine, max_retries=3, retry_timeout=0.1)
         calls = [call.connect(), call.connect()]
         engine.assert_has_calls(calls, any_order=True)

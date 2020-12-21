@@ -26,15 +26,8 @@ def project_engine(project, default=False) -> ("Engine", sessionmaker):
 
     engine_uri = settings.get("database_uri")
 
-    # return the default engine if it is registered
-    if not engine_uri and project in _engines:
+    if project in _engines:
         return _engines[project]
-    elif (project, engine_uri) in _engines:
-        return _engines[(project, engine_uri)]
-
-    if not engine_uri:
-        logging.debug(f"Can't find engine for {project}@{engine_uri}")
-        raise ValueError("No engine registered for this project.")
 
     logging.debug(f"Creating engine {project}@{engine_uri}")
     engine = create_engine(engine_uri, pool_pre_ping=True)
