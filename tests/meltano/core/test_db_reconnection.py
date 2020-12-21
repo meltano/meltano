@@ -1,7 +1,8 @@
-from meltano.core.db import check_db_connection
-from unittest.mock import call, Mock
-from sqlalchemy.exc import OperationalError
+from unittest.mock import Mock, call
+
 import pytest
+from meltano.core.db import check_db_connection
+from sqlalchemy.exc import OperationalError
 
 
 class TestConnectionRetries:

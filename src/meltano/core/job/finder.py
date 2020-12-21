@@ -1,4 +1,4 @@
-from . import Job, State
+from .job import Job, State
 
 
 class JobFinder:

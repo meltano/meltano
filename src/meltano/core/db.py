@@ -1,19 +1,18 @@
-import time
-import psycopg2
-import os
 import contextlib
 import logging
 import os
+import time
 import weakref
 
+import psycopg2
+from psycopg2.sql import SQL, Identifier
 from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
-from sqlalchemy.exc import OperationalError
-from sqlalchemy.engine import Engine
-from psycopg2.sql import Identifier, SQL
-from .project_settings_service import ProjectSettingsService
 
+from .project_settings_service import ProjectSettingsService
 
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project
