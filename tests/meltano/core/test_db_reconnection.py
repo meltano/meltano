@@ -10,8 +10,7 @@ class TestConnectionRetries:
 
         # check if OperationalError is raised if a connection can't be made
         engine.connect.side_effect = OperationalError(
-            "test_error", 
-            "test_error", "test_error"
+            "test_error", "test_error", "test_error"
         )
         with pytest.raises(OperationalError):
             check_db_connection(engine, 3, 0.1)
@@ -25,4 +24,3 @@ class TestConnectionRetries:
         check_db_connection(engine, 3, 0.1)
         calls = [call.connect(), call.connect()]
         engine.assert_has_calls(calls, any_order=True)
-        
