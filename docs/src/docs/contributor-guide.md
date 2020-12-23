@@ -12,7 +12,7 @@ which houses Meltano's
 [UI API](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/api),
 [these docs](https://gitlab.com/meltano/meltano/-/tree/master/docs/src), and
 the [index of discoverable plugins](#discoverable-plugins),
-which feeds the lists of [Extractors](/plugins/extractors/) and [Loaders](/plugins/loaders/) that are supported out of the box.
+which feeds the lists of [Sources](/plugins/extractors/) and [Destinations](/plugins/loaders/) that are supported out of the box.
 
 ## Where to start?
 
@@ -157,8 +157,8 @@ export MELTANO_UI_URL = ""
 
 [Discoverable plugins](/docs/plugins.html#discoverable-plugins) are defined in the `discovery.yml` manifest, which can be found inside the Meltano repository at [`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
 
-If you've added a custom plugin (or [variant](/docs/plugins.html#variants)) to your project that you think should be discoverable and supported out of the box, please contribute a change to that file.
-All you'll need is the [custom plugin definition](/docs/project.html#custom-plugin-definitions) from your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), which has the same format as plugin definitions in `discovery.yml`.
+If you've added a [custom plugin](/docs/plugins.html#custom-plugins) (or [variant](/docs/plugins.html#variants)) to your project that you think should be discoverable and supported out of the box, please contribute a change to that file.
+All you'll need is the [custom plugin definition](/docs/project.html#custom-plugin-definitions) from your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), which has the same format as discoverable plugin definitions in `discovery.yml`.
 
 ### Plugin definitions
 
@@ -167,7 +167,11 @@ At a minimum, a plugin definition must have a `name` and a `namespace`, and at l
 It is recommended to add a `label`, `logo_url`, and `description` to the plugin definition, and `docs` and `repo` URLs to the variant definition(s).
 
 Most of the time, variant definitions should also have a `settings` array with [setting definitions](#setting-definitions).
-Additionally, `capabilities` should be specified for extractor variants, non-default variant executable names can be specified using `executable`, and default values for [plugin extras](/docs/configuration.html#plugin-extras) can be specified at the plugin definition level and further overridden at the variant definition level.
+
+Additionally:
+- `capabilities` should be specified for extractor variants,
+- non-default variant executable names can be specified using `executable`, and
+- default values for [plugin extras](/docs/configuration.html#plugin-extras) can be specified at the plugin definition level and further overridden at the variant definition level.
 
 #### Variant definitions
 

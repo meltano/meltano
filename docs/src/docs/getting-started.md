@@ -143,10 +143,10 @@ Now that you have your very own Meltano project, it's time to add some [plugins]
 The first plugin you'll want to add is an [extractor](/docs/plugins.html#extractors),
 which will be responsible for pulling data out of your data source.
 
-*To learn more about adding plugins to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project).*
+*To learn more about adding plugins to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-a-plugin-to-your-project).*
 
 1. Find out if an extractor for your data source is [supported out of the box](/docs/plugins.html#discoverable-plugins)
-by checking the [Extractors list](/plugins/extractors/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
+by checking the [Sources list](/plugins/extractors/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
 
     ```bash
     meltano discover extractors
@@ -175,7 +175,7 @@ by checking the [Extractors list](/plugins/extractors/) or using [`meltano disco
 
 1. Depending on the result, pick your next step:
 
-    - If a Singer tap for your data source is **available**, add it to your project as a [custom plugin](/docs/plugins.html#custom-plugins) using [`meltano add --custom`](/docs/command-line-interface.html#how-to-use-custom-plugins):
+    - If a Singer tap for your data source is **available**, add it to your project as a [custom plugin](/docs/plugins.html#custom-plugins) using [`meltano add --custom`](/docs/command-line-interface.html#add):
 
         ```bash
         meltano add --custom extractor <tap name>
@@ -191,11 +191,11 @@ by checking the [Extractors list](/plugins/extractors/) or using [`meltano disco
 
         Meltano will now ask you some additional questions to learn more about the plugin.
 
-        *To learn more about adding custom plugins, refer to the ["`meltano add`: How to use: Custom plugins" section](/docs/command-line-interface.html#how-to-use-custom-plugins) of the [CLI Reference](/docs/command-line-interface.html#add).*
+        *To learn more about adding custom plugins, refer to the [Plugin Management guide](/docs/plugin-management.html#custom-plugins).*
 
         ::: tip
         Once you've got the extractor working in your project, please consider
-        [contributing its definition](/docs/contributor-guide.html#discoverable-plugins)
+        [contributing its description](/docs/contributor-guide.html#discoverable-plugins)
         to the [index of discoverable plugins](/docs/plugins.html#discoverable-plugins)
         so that it can be supported out of the box for new users!
         :::
@@ -231,10 +231,9 @@ If you've used this Singer tap before without Meltano, you may have a [config fi
 
 If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) under the [plugin's `config` key](/docs/project.html#plugin-configuration):
 
-```yaml{4-7}
+```yaml{3-6}
 extractors:
 - name: tap-example
-  pip_url: tap-example
   config: {
     "setting": "value",
     "another_setting": true
@@ -405,10 +404,10 @@ it's time to tell it where that data should go!
 This is where the [loader](/docs/plugins.html#loaders) comes in,
 which will be responsible for loading [extracted](#add-an-extractor-to-pull-data-from-a-source) data into an arbitrary data destination.
 
-*To learn more about adding plugins to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project).*
+*To learn more about adding plugins to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-a-plugin-to-your-project).*
 
 1. Find out if a loader for your data destination is [supported out of the box](/docs/plugins.html#discoverable-plugins)
-by checking the [Loaders list](/plugins/loaders/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
+by checking the [Destinations list](/plugins/loaders/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
 
     ```bash
     meltano discover loaders
@@ -434,7 +433,7 @@ by checking the [Loaders list](/plugins/loaders/) or using [`meltano discover`](
 
 1. Depending on the result, pick your next step:
 
-    - If a Singer target for your data destination is **available**, add it to your project as a [custom plugin](/docs/plugins.html#custom-plugins) using [`meltano add --custom`](/docs/command-line-interface.html#how-to-use-custom-plugins):
+    - If a Singer target for your data destination is **available**, add it to your project as a [custom plugin](/docs/plugins.html#custom-plugins) using [`meltano add --custom`](/docs/command-line-interface.html#add):
 
         ```bash
         meltano add --custom loader <target name>
@@ -450,11 +449,11 @@ by checking the [Loaders list](/plugins/loaders/) or using [`meltano discover`](
 
         Meltano will now ask you some additional questions to learn more about the plugin.
 
-        *To learn more about adding custom plugins, refer to the ["`meltano add`: How to use: Custom plugins" section](/docs/command-line-interface.html#how-to-use-custom-plugins) of the [CLI Reference](/docs/command-line-interface.html#add).*
+        *To learn more about adding custom plugins, refer to the [Plugin Management guide](/docs/plugin-management.html#custom-plugins).*
 
         ::: tip
         Once you've got the loader working in your project, please consider
-        [contributing its definition](/docs/contributor-guide.html#discoverable-plugins)
+        [contributing its description](/docs/contributor-guide.html#discoverable-plugins)
         to the [index of discoverable plugins](/docs/plugins.html#discoverable-plugins)
         so that it can be supported out of the box for new users!
         :::
@@ -490,10 +489,9 @@ If you've used this Singer target before without Meltano, you may have a [config
 
 If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) under the [plugin's `config` key](/docs/project.html#plugin-configuration):
 
-```yaml{4-7}
+```yaml{3-6}
 loaders:
 - name: target-example
-  pip_url: target-example
   config: {
     "setting": "value",
     "another_setting": true

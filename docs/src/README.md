@@ -89,7 +89,7 @@ At the core of the Meltano experience is your Meltano project,
 which represents the single source of truth regarding your ELT pipelines:
 how data should be [integrated](/#integration) and [transformed](/#transformation),
 how the pipelines should be [orchestrated](/#orchestration),
-and how the various components should be [configured](/docs/configuration.html).
+and how the various [plugins](/docs/plugins.html) that make up your pipelines should be [configured](/docs/configuration.html).
 
 Since a Meltano project is just a directory on your filesystem containing
 text-based files, you can treat it like any other software development project
@@ -132,7 +132,7 @@ data from any SaaS tool or database and load it into any data warehouse or file 
 
 Meltano [manages your tap and target configuration](/docs/configuration.html) for you,
 makes it easy to [select which entities and attributes to extract](/docs/integration.html#selecting-entities-and-attributes-for-extraction),
-and keeps track of [the state of your extraction](/docs/integration.html#incremental-replication-state),
+and keeps track of [the incremental replication state](/docs/integration.html#incremental-replication-state),
 so that subsequent pipeline runs with the same job ID will always pick up right where
 the previous run left off.
 

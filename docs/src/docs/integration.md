@@ -10,7 +10,7 @@ which take the role of [your project](/docs/project.html)'s [extractors](/docs/p
 
 Meltano [manages your tap and target configuration](#plugin-configuration) for you,
 makes it easy to [select which entities and attributes to extract](#selecting-entities-and-attributes-for-extraction),
-and keeps track of [the state of your extraction](#incremental-replication-state),
+and keeps track of [the incremental replication state](#incremental-replication-state),
 so that subsequent pipeline runs with the same job ID will always pick up right where
 the previous run left off.
 
@@ -26,7 +26,7 @@ You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#c
 
 If you'd like to specify (or override) the values of certain settings at runtime, on a per-pipeline basis, you can set them in the [`meltano elt`](/docs/command-line-interface.html#elt) execution environment using [environment variables](/docs/configuration.html#configuring-settings).
 
-This lets you use the same extractors and loaders (Singer taps and targets) in multiple pipelines, configured differently each time.
+This lets you use the same extractors and loaders (Singer taps and targets) in multiple pipelines, configured differently each time, as an alternative to creating [multiple configurations](/docs/configuration.html#multiple-plugin-configurations) using [plugin inheritance](/docs/plugins.html#plugin-inheritance).
 
 On a shell, you can explicitly `export` environment variables, that will be passed along to every following command invocation, or you can specify them in-line with a specific invocation, ahead of the command:
 
