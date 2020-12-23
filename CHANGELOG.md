@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2390](https://gitlab.com/meltano/meltano/-/issues/2390) Let a plugin inherit its base plugin (package) description and configuration from another one using `--inherit-from=<name>` on `meltano add` or `inherit_from: <name>` in `meltano.yml`, so that the same package can be used in a project multiple times with different configurations.
+
 ### Changes
 
 - [#2479](https://gitlab.com/meltano/meltano/-/issues/2479) Use extractor `load_schema` (usually its namespace) as default for target-bigquery `dataset_id` setting, as it already is for target-snowflake and target-postgres `schema`
