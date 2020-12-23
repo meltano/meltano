@@ -64,12 +64,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-recharge` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-7}
+```yml{5-6}
 plugins:
   extractors:
   - name: tap-recharge
     variant: singer-io
-    pip_url: tap-recharge==1.0.3
     config:
       start_date: '2020-10-01T00:00:00Z'
 ```

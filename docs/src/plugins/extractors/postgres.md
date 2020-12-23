@@ -76,12 +76,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-postgres` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-10}
+```yml{5-9}
 plugins:
   extractors:
   - name: tap-postgres
     variant: transferwise
-    pip_url: pipelinewise-tap-postgres
     config:
       host: postgres.example.com
       port: 5432

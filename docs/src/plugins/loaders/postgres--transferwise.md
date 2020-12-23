@@ -75,12 +75,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-postgres` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-14}
+```yml{5-13}
 plugins:
   loaders:
   - name: target-postgres
     variant: transferwise
-    pip_url: pipelinewise-target-postgres
     config:
       host: postgres.example.com
       port: 5432

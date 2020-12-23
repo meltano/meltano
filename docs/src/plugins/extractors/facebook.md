@@ -65,12 +65,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-facebook` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-8}
+```yml{5-7}
 plugins:
   extractors:
   - name: tap-facebook
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/tap-facebook.git
     config:
       account_id: 791728544625001
       start_date: '2020-10-01T00:00:00Z'

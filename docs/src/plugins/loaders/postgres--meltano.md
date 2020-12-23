@@ -77,12 +77,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-postgres` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-11}
+```yml{5-10}
 plugins:
   loaders:
   - name: target-postgres
     variant: meltano
-    pip_url: git+https://github.com/meltano/target-postgres.git
     config:
       user: my_user
       host: postgres.example.com

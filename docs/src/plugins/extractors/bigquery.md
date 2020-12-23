@@ -52,12 +52,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-bigquery` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-16}
+```yml{5-15}
 plugins:
   extractors:
   - name: tap-bigquery
     variant: anelendata
-    pip_url: tap-bigquery
     config:
       streams:
         - name: users
@@ -88,12 +87,11 @@ Array of objects with `name`, `table`, `columns`, `datetime_key`, and `filters` 
 
 Manage this setting directly in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):
 
-```yml{6-15}
+```yml{5-14}
 plugins:
   extractors:
   - name: tap-bigquery
     variant: anelendata
-    pip_url: tap-bigquery
     config:
       streams:
         - name: <stream_name>

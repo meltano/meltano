@@ -77,12 +77,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-salesforce` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-8}
+```yml{5-7}
 plugins:
   extractors:
   - name: tap-salesforce
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/tap-salesforce.git
     config:
       username: user@example.com
       start_date: '2020-10-01T00:00:00Z'

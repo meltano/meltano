@@ -62,12 +62,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-jsonl` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-7}
+```yml{5-6}
 plugins:
   loaders:
   - name: target-jsonl
     variant: andyh1203
-    pip_url: target-jsonl
     config:
       destination_path: my_jsonl_files
 ```

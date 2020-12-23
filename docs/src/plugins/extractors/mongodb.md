@@ -70,12 +70,11 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 
 A minimal configuration of `tap-mongodb` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-10}
+```yml{5-9}
 plugins:
   extractors:
   - name: tap-mongodb
     variant: singer-io
-    pip_url: tap-mongodb
     config:
       host: mongodb.example.com
       port: 27017
