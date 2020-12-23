@@ -610,7 +610,6 @@ extractors:
     capabilities:
       - catalog
       - discover
-      - state
     settings_group_validation:
       - ['key_file_location', 'view_id', 'start_date']
       - ['oauth_credentials.client_id', 'oauth_credentials.client_secret', 'oauth_credentials.access_token', 'oauth_credentials.refresh_token', 'view_id', 'start_date']

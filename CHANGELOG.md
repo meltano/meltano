@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2486](https://gitlab.com/meltano/meltano/-/issues/2486) Remove `state` capability from `tap-google-analytics` because it's not actually currently supported yet
+
 ### Breaks
 
 
