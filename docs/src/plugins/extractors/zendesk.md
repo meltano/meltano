@@ -75,12 +75,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-zendesk` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-9}
+```yml{5-8}
 plugins:
   extractors:
   - name: tap-zendesk
     variant: singer-io
-    pip_url: tap-zendesk
     config:
       email: user@example.com
       subdomain: my_subdomain

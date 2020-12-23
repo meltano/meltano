@@ -7,7 +7,7 @@ description: Use Meltano to pull data from the Stripe API and load it into Snowf
 
 The `tap-stripe` [extractor](/plugins/extractors/) pulls data from the [Stripe API](https://stripe.com/docs/api).
 
-To learn more about `tap-stripe`, refer to the repository at <https://gitlab.com/meltano/tap-stripe>.
+To learn more about `tap-stripe`, refer to the repository at <https://github.com/meltano/tap-stripe>.
 
 ## Getting Started
 
@@ -65,12 +65,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-stripe` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-8}
+```yml{5-7}
 plugins:
   extractors:
   - name: tap-stripe
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/tap-stripe.git
     config:
       account_id: acct_1a2b3c4d5e
       start_date: '2020-10-01T00:00:00Z'

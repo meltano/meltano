@@ -20,11 +20,11 @@ To learn more about [extracting](/plugins/loaders/) and loading data using Melta
 ::: tip Don't see your data destination listed here?
 
 If a [Singer target](https://www.singer.io/#targets) for your destination already exists,
-it can easily be [added to your project as a custom loader](/docs/command-line-interface.html#how-to-use-custom-plugins).
+it can easily be [added to your project as a custom loader](/docs/plugin-management.html#custom-plugins).
 If not, you can learn how to [create your own from scratch](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target).
 
 Once you've got the new loader working in your project, please consider
-[contributing its definition](/docs/contributor-guide.html#discoverable-plugins)
+[contributing its description](/docs/contributor-guide.html#discoverable-plugins)
 to the [index of discoverable plugins](/docs/plugins.html#discoverable-plugins)
 so that it can be added to this page!
 

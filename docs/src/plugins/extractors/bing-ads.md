@@ -66,12 +66,11 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 
 A minimal configuration of `tap-bing-ads` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-9}
+```yml{5-8}
 plugins:
   extractors:
   - name: tap-bing-ads
     variant: singer-io
-    pip_url: tap-bing-ads
     config:
       customer_id: 163875182
       account_ids: 163078754

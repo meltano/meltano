@@ -4,40 +4,304 @@ description: Learn how to manage your Meltano project's plugins.
 
 # Plugin Management
 
-A [Meltano project](/docs/project.html)'s primary components are its [plugins](/docs/plugins.html),
-that implement the various details of your ELT pipelines.
+Meltano takes a modular approach to data engineering in general and EL(T) in particular,
+where your [project](/docs/project.html) and pipelines are composed of [plugins](/docs/plugins.html) of [different types](#types), most notably
+[**extractors**](#extractors) ([Singer](https://singer.io) taps),
+[**loaders**](#loaders) ([Singer](https://singer.io) targets),
+[**transformers**](#transformers) ([dbt](https://www.getdbt.com) and [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models)), and
+[**orchestrators**](#orchestrators) (currently [Airflow](https://airflow.apache.org/), with [Dagster](https://dagster.io/) [in development](https://gitlab.com/meltano/meltano/-/issues/2393)).
 
-Your project's plugins are defined in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), and [installed](#installing-your-project-s-plugins) inside the [`.meltano` directory](/docs/project.html#meltano-directory).
+Your project's plugins are defined in your [`meltano.yml` project file](/docs/project.html#plugins),
+and are [installed](#installing-your-project-s-plugins) inside the [`.meltano` directory](/docs/project.html#meltano-directory).
 They can be managed using various [CLI commands](/docs/command-line-interface.html) as well as the [UI](/docs/ui.html).
 
-## Adding extractors and loaders to your project
+## Adding a plugin to your project
 
-Like all types of plugins, extractors and loaders can be added to a Meltano project using [`meltano add`](/docs/command-line-interface.html#add).
+You can add a new [plugin](/docs/plugins.html#project-plugins) to your project using [`meltano add`](/docs/command-line-interface.html#add), or
+by directly modifying your [`meltano.yml` project file](/docs/project.html#plugins)
+and [installing the new plugin](#installing-your-projects-plugins) using [`meltano install`](/docs/command-line-interface.html#install).
 
-[Discoverable plugins](/docs/plugins.html#discoverable-plugins) can be added by simply specifying their `type` and `name`, while adding a plugin that Meltano isn't familiar with yet requires adding the `--custom` flag.
-A non-default [variant](/docs/plugins.html#docs) can be selected using the `--variant` option.
+If you'd like to add a [discoverable plugin](/docs/plugins.html#discoverable-plugins) that's supported by Meltano out of the box,
+like one of the extractors and loaders listed on the [Sources](/plugins/extractors/) and [Destinations](/plugins/loaders/) pages,
+refer to the ["Discoverable plugins" section](#discoverable-plugins) below.
 
-To find out what plugins are discoverable and supported out of the box, you can use [`meltano discover`](/docs/command-line-interface.html#discover), with an optional pluralized `<type>` argument, e.g. `meltano discover extractors`.
-You can also check out the lists of supported [extractors](/plugins/extractors/) and [loaders](/plugins/loaders/) on this website.
+Alternatively, if you'd like to add a [custom plugin](/docs/plugins.html#custom-plugins) that Meltano isn't familiar with yet,
+like an arbitrary Singer tap or target, refer to the ["Custom plugins" section](#custom-plugins).
 
-If the Singer tap or target you'd like to use with Meltano doesn't show up in any of these places, you're going to want to [add a custom plugin](/docs/command-line-interface.html#how-to-use-custom-plugins).
+Finally, if you'd like your new plugin to [inherit from an existing plugin](/docs/plugins.html#plugin-inheritance) in your project,
+so that it can reuse the same package but override (parts of) its configuration,
+refer to the ["Plugin inheritance" section](#plugin-inheritance).
+
+### Discoverable plugins
+
+[Discoverable plugins](/docs/plugins.html#discoverable-plugins) can be added to your project by simply providing
+[`meltano add`](/docs/command-line-interface.html#add) with their [type](/docs/plugins.html#types) and name:
 
 ```bash
-# List discoverable extractors and loaders
-meltano discover extractors
-meltano discover loaders
+meltano add <type> <name>
 
-# Add a discoverable extractor or loader by name
-meltano add extractor tap-salesforce
-meltano add loader target-snowflake
-
-# Add a specific variant of a discoverable extractor loader
-meltano add extractor tap-salesforce --variant=singer-io
-meltano add loader target-snowflake --variant=transferwise
-
-# Add a custom extractor or loader
-meltano add --custom extractor tap-covid-19
+# For example:
+meltano add extractor tap-gitlab
+meltano add loader target-postgres
+meltano add transformer dbt
+meltano add orchestrator airflow
 ```
+
+This will add a [shadowing plugin definition](/docs/project.html#shadowing-plugin-definitions) to your [`meltano.yml` project file](/docs/project.html#plugins) under the `plugins` property, inside an array named after the plugin type:
+
+```yml{3-5,7-9,11-12,14-15}
+plugins:
+  extractors:
+  - name: tap-gitlab
+    variant: meltano
+    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+  loaders:
+  - name: target-postgres
+    variant: datamill-co
+    pip_url: singer-target-postgres
+  transformer:
+  - name: dbt
+    pip_url: dbt
+  orchestrators:
+  - name: airflow
+    pip_url: apache-airflow
+```
+
+If multiple [variants](/docs/plugins.html#variants) of the discoverable plugin are available,
+the `variant` property is automatically set to the name of the default variant
+(which is known to work well and recommended for new users),
+so that your project is pinned to a specific package and its [base plugin description](/docs/plugins.html#project-plugins).
+If the `variant` property were omitted from the definition, Meltano would fall back on the _original_ supported variant instead, which does not necessarily match the default.
+
+The package's `pip_url` (its [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument)
+is repeated here for convenience, since you may want to update it to
+[point at a (custom) fork](#using-a-custom-fork-of-a-plugin) or to pin a specific version of the package.
+If this property is omitted, it is inherited from the discoverable [base plugin description](/docs/plugins.html#project-plugins) identified by the `name` (and `variant`) instead.
+
+As mentioned above, directly adding a plugin to your [`meltano.yml` project file](/docs/project.html#plugins)
+and [installing it](#installing-your-projects-plugins) using [`meltano install <type> <name>`](/docs/command-line-interface.html#install)
+has the same effect as adding it using [`meltano add`](/docs/command-line-interface.html#add).
+
+#### Variants
+
+If multiple [variants](/docs/plugins.html#variants) of a discoverable plugin are available,
+you can choose a specific (non-default) variant using the `--variant` option on [`meltano add`](/docs/command-line-interface.html#add):
+
+```bash
+meltano add <type> <name> --variant <variant>
+
+# For example:
+meltano add loader target-postgres --variant=transferwise
+```
+
+As you might expect, this will be reflected in the `variant` and `pip_url` properties in your [`meltano.yml` project file](/docs/project.html#plugins):
+
+```yml{4-5}
+plugins:
+  loaders:
+  - name: target-postgres
+    variant: transferwise
+    pip_url: pipelinewise-target-postgres
+```
+
+If you'd like to use multiple variants of the same discoverable plugin in your project at the same time, refer to ["Multiple variants" under "Explicit inheritance"](#multiple-variants) below.
+
+#### Explicit inheritance
+
+In the examples we've considered so far, plugins in your project implicitly inherit their
+[base plugin descriptions](/docs/plugins.html#project-plugins) from discoverable plugins by reusing their names, which is known as [shadowing](/docs/project.html#shadowing-plugin-definitions).
+
+Alternatively, if you'd like to give the plugin a more descriptive name in your project,
+you can use the `--inherit-from` (or `--as`) option on [`meltano add`](/docs/command-line-interface.html#add)
+to explicitly inherit from the discoverable plugin instead:
+
+```bash
+meltano add <type> <name> --inherit-from <discoverable-name>
+# Or equivalently:
+meltano add <type> <discoverable-name> --as <name>
+
+# For example:
+meltano add extractor tap-postgres--billing --inherit-from tap-postgres
+meltano add extractor tap-postgres --as tap-postgres--billing
+```
+
+The corresponding [inheriting plugin definition](/docs/project.html#inheriting-plugin-definitions) in your [`meltano.yml` project file](/docs/project.html#plugins) will use `inherit_from`:
+
+```yml{4}
+plugins:
+  extractors:
+  - name: tap-postgres--billing
+    inherit_from: tap-postgres
+    variant: transferwise
+    pip_url: pipelinewise-tap-postgres
+```
+
+Note that the `variant` and `pip_url` properties were populated automatically by `meltano add` as described above.
+
+##### Multiple variants
+
+If you'd like to use multiple [variants](#variants) of the same discoverable plugin in your project at the same time, this feature will also come in handy.
+
+Since plugins in your project need to have unique names, a discoverable plugin can only be shadowed once,
+but it can be inherited from multiple times, with each plugin free to choose its own variant:
+
+```bash
+meltano add loader target-snowflake --variant=transferwise --as target-snowflake--transferwise
+meltano add loader target-snowflake --variant=meltano --as target-snowflake--meltano
+```
+
+Assuming a regular (shadowing) `target-snowflake` was added before using `meltano add loader target-snowflake`,
+the resulting [inheriting plugin definitions](/docs/project.html#inheriting-plugin-definitions) in [`meltano.yml` project file](/docs/project.html#plugins) will look as follows:
+
+```yml{6-8,10-12}
+plugins:
+  loaders:
+  - name: target-snowflake
+    variant: datamill-co
+    pip_url: target-snowflake
+  - name: target-snowflake--transferwise
+    inherit_from: target-snowflake
+    variant: transferwise
+    pip_url: pipelinewise-target-snowflake
+  - name: target-snowflake--meltano
+    inherit_from: target-snowflake
+    variant: meltano
+    pip_url: git+https://gitlab.com/meltano/target-snowflake.git
+```
+
+Note that the `--variant` option and `variant` property are crucial here:
+since `inherit_from` can also be used to [inherit from another plugin in the project](#plugin-inheritance),
+`inherit_from: target-snowflake` by itself would have resulted in the new plugin inheriting from the existing `target-snowflake` plugin (that uses the `datamill-co` variant) instead of the discoverable plugin we're looking for.
+
+Had there been no `target-snowflake` plugin in the project yet,
+`inherit_from: target-snowflake` would necessarily refer to the discoverable plugin,
+but without a `variant` the _original_ variant would have been used rather than the default or a specific chosen one,
+just like when shadowing with a `name` but no `variant`.
+
+### Custom plugins
+
+[Custom plugins](/docs/plugins.html#custom-plugins) for packages that aren't [discoverable](#discoverable-plugins) yet,
+like arbitrary Singer taps and targets,
+can be added to your project using the `--custom` option on [`meltano add`](/docs/command-line-interface.html#add):
+
+```bash
+meltano add --custom <type> <name>
+
+# For example:
+meltano add --custom extractor tap-covid-19
+meltano add --custom loader target-bigquery--custom
+
+# If you're using Docker, don't forget to mount the project directory,
+# and ensure that interactive mode is enabled so that Meltano can ask you
+# additional questions about the plugin and get your answers over STDIN:
+docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-covid-19
+```
+
+Since Meltano doesn't have the [base plugin description](/docs/plugins.html#project-plugins) for the package in question yet,
+`meltano add --custom` will ask you to find and provide this metadata yourself:
+(Note that more context is provided in the actual command prompts.)
+
+```bash{6,10,12,14,17,20,23}
+$ meltano add --custom extractor tap-covid-19
+# Specify namespace, which will serve as the:
+# - identifier to find related/compatible plugins
+# - default database schema (`load_schema` extra)
+#   for use by loaders that support a target schema
+(namespace): tap_covid_19
+
+# Specify `pip install` argument, for example:
+# - PyPI package name:
+(pip_url): tap-covid-19
+# - Git repository URL:
+(pip_url): git+https://github.com/singer-io/tap-covid-19.git
+# - local directory, in editable/development mode:
+(pip_url): -e extract/tap-covid-19
+
+# Specify the package's executable name
+(executable): tap-covid-19
+
+# Specify supported Singer features (executable flags)
+(capabilities): catalog,discover,state
+
+# Specify supported settings (`config.json` keys)
+(settings): api_token,user_agent,start_date
+```
+
+If you're adding a Singer tap or target that's listed on Singer's [index of taps](https://www.singer.io/#taps) or [targets](https://www.singer.io/#targets),
+simply providing the package name as `pip_url` and `executable` usually suffices.
+The plugin's `name` also typically matches the name of the package, but you are free to change it to be more descriptive.
+
+If it's a tap or target you have developed or are developing yourself,
+you'll want to set `pip_url` to either a [Git repository URL](https://pip.pypa.io/en/stable/reference/pip_install/#git) or local directory path.
+If you add the `-e` flag ahead of the local path, the package will be installed in [editable mode](https://pip.pypa.io/en/stable/reference/pip_install/#editable-installs).
+
+To find out what `settings` a tap or target supports, reference the README in the repository and/or documentation.
+If the `capabilities` a tap supports (executable flags like `--discover` and `--state`) are not described there,
+you can try [one of these tricks](/docs/contributor-guide.html#how-to-test-a-tap) or refer directly to the source code.
+
+This will add a [custom plugin definition](/docs/project.html#custom-plugin-definitions) to your [`meltano.yml` project file](/docs/project.html#plugins) under the `plugins` property, inside an array named after the plugin type:
+
+```yml{3-14}
+plugins:
+  extractors:
+  - name: tap-covid-19
+    namespace: tap_covid_19
+    pip_url: tap-covid-19
+    executable: tap-covid-19
+    capabilities:
+    - catalog
+    - discover
+    - state
+    settings:
+    - name: api_token
+    - name: user_agent
+    - name: start_date
+```
+
+The `pip_url`, `executable`, `capabilities`, and `settings` properties
+constitute the plugin's [base plugin description](/docs/plugins.html#project-plugins):
+everything Meltano needs to know in order to be able to use the package as a plugin.
+
+::: tip
+Once you've got the plugin working in your project, please consider
+[contributing its description](/docs/contributor-guide.html#discoverable-plugins)
+to the [`discovery.yml` manifest](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml)
+to make it discoverable and supported out of the box for new users!
+:::
+
+### Plugin inheritance
+
+To add a new plugin to your project that [inherits from an existing plugin](/docs/plugins.html#plugin-inheritance),
+so that it can reuse the same package but override (parts of) its configuration,
+you can use the `--inherit-from` option on [`meltano add`](/docs/command-line-interface.html#add):
+
+```bash
+meltano add <type> <name> --inherit-from <existing-name>
+
+# For example:
+meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
+meltano add extractor tap-ga--client-bar --inherit-from tap-google-analytics
+meltano add extractor tap-ga--client-foo--project-baz --inherit-from tap-ga--client-foo
+```
+
+The corresponding [inheriting plugin definitions](/docs/project.html#inheriting-plugin-definitions) in your [`meltano.yml` project file](/docs/project.html#plugins) will use `inherit_from`:
+
+```yml{6-11}
+plugins:
+  extractors:
+  - name: tap-google-analytics
+    variant: meltano
+    pip_url: git+https://gitlab.com/meltano/tap-google-analytics.git
+  - name: tap-ga--client-foo
+    inherit_from: tap-google-analytics
+  - name: tap-ga--client-bar
+    inherit_from: tap-google-analytics
+  - name: tap-ga--client-foo--project-baz
+    inherit_from: tap-ga--client-foo
+```
+
+Note that the `--inherit-from` option and `inherit_from` property can also be used to
+[explicitly inherit from a discoverable plugin](#explicit-inheritance).
 
 ## Installing your project's plugins
 
@@ -49,7 +313,9 @@ by default, you'll need to explicitly run [`meltano install`](/docs/command-line
 before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
 to install (or update) all plugins specified in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
 
-## Removing plugins from your project
+To (re)install a specific plugin in your project, use [`meltano install <type> <name>`](/docs/command-line-interface.html#install), e.g. `meltano install extractor tap-gitlab`.
+
+## Removing a plugin from your project
 
 Since the [`plugins` section](/docs/project.html#plugins) of your [`meltano.yml` project file](/docs/project.html) determines the plugins that make up your project, you can remove a plugin from your project by deleting its entry from this file.
 

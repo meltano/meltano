@@ -75,12 +75,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-mysql` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-9}
+```yml{5-8}
 plugins:
   extractors:
   - name: tap-mysql
     variant: transferwise
-    pip_url: pipelinewise-tap-mysql
     config:
       host: mysql.example.com
       port: 3306
@@ -242,12 +241,11 @@ List of SQL commands to run when a connection made. This allows to set session v
 
 Manage this setting directly in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):
 
-```yml{6-9}
+```yml{5-8}
 plugins:
   extractors:
   - name: tap-mysql
     variant: transferwise
-    pip_url: pipelinewise-tap-mysql
     config:
       session_sqls:
         - SET @@session.<variable>=<value>

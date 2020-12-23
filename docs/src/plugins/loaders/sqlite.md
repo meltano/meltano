@@ -62,12 +62,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-sqlite` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-7}
+```yml{5-6}
 plugins:
   loaders:
   - name: target-sqlite
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/target-sqlite.git
     config:
       database: my_database.db
 ```

@@ -67,12 +67,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-bigquery` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-9}
+```yml{5-8}
 plugins:
   loaders:
   - name: target-bigquery
     variant: adswerve
-    pip_url: git+https://github.com/adswerve/target-bigquery.git@v0.10.2
     config:
       project_id: my-project-id
       # dataset_id: my-dataset-id   # override if default (see below) is not appropriate

@@ -80,12 +80,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-snowflake` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-14}
+```yml{5-13}
 plugins:
   loaders:
   - name: target-snowflake
     variant: transferwise
-    pip_url: pipelinewise-target-snowflake
     config:
       account: rtxxxxx.eu-central-1
       dbname: MY_DATABASE

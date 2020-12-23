@@ -68,12 +68,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-adwords` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-8}
+```yml{5-7}
 plugins:
   extractors:
   - name: tap-adwords
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/tap-adwords.git
     config:
       customer_ids: 1234567890,1234567891
       start_date: '2020-10-01T00:00:00Z'
@@ -294,12 +293,11 @@ Primary Keys for the selected Entities (Streams)
 
 Manage this setting directly in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):
 
-```yml{6-9}
+```yml{5-8}
 plugins:
   extractors:
   - name: tap-adwords
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/tap-adwords.git
     config:
       primary_keys:
         <REPORT_NAME>: [<key1>, <key2>]

@@ -10,7 +10,7 @@ At the core of the Meltano experience is your Meltano project,
 which represents the single source of truth regarding your ELT pipelines:
 how data should be [integrated](/docs/integration.html) and [transformed](/docs/transforms.html),
 how the pipelines should be [orchestrated](/docs/orchestration.html),
-and how the various components should be [configured](/docs/configuration.html).
+and how the various [plugins](#plugins) that make up your pipelines should be [configured](/docs/configuration.html).
 
 Since a Meltano project is just a directory on your filesystem containing
 text-based files, you can treat it like any other software development project
@@ -24,7 +24,7 @@ You can initialize a new Meltano project using [`meltano init`](/docs/command-li
 At a minimum, a Meltano project must contain a project file named `meltano.yml`,
 which contains your project configuration and tells Meltano that a particular directory is a Meltano project.
 
-The only required key is `version`, which currently always holds the value `1`.
+The only required property is `version`, which currently always holds the value `1`.
 
 ### Configuration
 
@@ -37,47 +37,89 @@ To learn which settings are available, refer to the [Settings reference](/docs/s
 
 ### Plugins
 
-Definitions of [plugins](/docs/plugins.html) you've [added to your project](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project)
-using [`meltano add`](/docs/command-line-interface.html#add)
-are stored under the `plugins` key, nested under a key named after the plugin type (e.g. `extractors`, `loaders`).
+Your project's [plugins](/docs/plugins.html#project-plugins),
+typically [added to your project](/docs/plugin-management.html#adding-a-plugin-to-your-project)
+using [`meltano add`](/docs/command-line-interface.html#add),
+are defined under the `plugins` property, inside an array named after the [plugin type](/docs/plugins.html#types) (e.g. `extractors`, `loaders`).
 
-At a minimum, a plugin definition must have a `name` and a `pip_url` (its [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument).
+Every plugin in your project needs to have:
+1. a `name` that's unique among plugins of the same type,
+2. a [base plugin description](/docs/plugins.html#project-plugins) describing the package in terms Meltano can understand, and
+3. [configuration](/docs/configuration.html) that can be defined across [various layers](/docs/configuration.html#configuration-layers), including the definition's [`config` property](#plugin-configuration).
 
-#### Discoverable plugin references
+A base plugin description consists of the `pip_url`, `executable`, `capabilities`, and `settings` properties,
+but not every plugin definition will specify these explicitly:
 
-A plugin definition _without_ a `namespace` is a reference to a [discoverable plugin](/docs/plugins.html#discoverable-plugins) with the same `name`:
+- An [**inheriting plugin definition**](#inheriting-plugin-definitions) has an **`inherit_from`** property and inherits its base plugin description from another plugin in your project or a [discoverable plugin](/docs/plugins.html#discoverable-plugins) identified by name.
+- A [**custom plugin definition**](#custom-plugin-definitions) has a **`namespace`** property instead and explicitly defines its base plugin description.
+- A [**shadowing plugin definition**](#shadowing-plugin-definitions) has neither property and implicitly inherits its base plugin description from the [discoverable plugin](/docs/plugins.html#discoverable-plugins) with the same **`name`**.
 
-```yaml{3-4}
+When inheriting a base plugin description, the plugin definition does not need to explicitly specify a `pip_url`
+(the package's [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument),
+but you may want to override the inherited value and set the property explicitly to [point at a (custom) fork](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin) or to pin a specific version of the package.
+When a plugin is added using `meltano add`, the `pip_url` is automatically repeated in the plugin definition for convenience.
+
+#### Inheriting plugin definitions
+
+A plugin defined with an `inherit_from` property inherits its [base plugin description](/docs/plugins.html#project-plugins) from another plugin identified by name. To find the matching plugin, other plugins in your project are considered first, followed by
+[discoverable plugins](/docs/plugins.html#discoverable-plugins):
+
+```yml{5,7}
 plugins:
   extractors:
-  - name: tap-gitlab
-    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+  - name: tap-postgres          # Shadows discoverable `tap-postgres` (see below)
+  - name: tap-postgres--billing
+    inherit_from: tap-postgres  # Inherits from project's `tap-postgres`
+  - name: tap-bigquery--events
+    inherit_from: tap-bigquery  # Inherits from discoverable `tap-bigquery`
 ```
 
-In the context of your project, these plugins inherit their metadata (`executable`, `capabilities`, and `settings`; see below) from the discoverable plugin definition.
+When inheriting from another plugin in your project, its [configuration](/docs/configuration.html) is also inherited as if the values were defaults, which can then be overridden as appropriate:
 
-##### Variants
-
-If multiple [variants](/docs/plugins.html#variants) of a discoverable plugin are available, the specific variant that is used in the project is identified using the `variant` key:
-
-```yaml{4}
+```yml{10-12,15-18}
 plugins:
   extractors:
-  - name: tap-gitlab
+  - name: tap-google-analytics
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+    config:
+      key_file_location: client_secrets.json
+      start_date: '2020-10-01T00:00:00Z'
+  - name: tap-ga--view-foo
+    inherit_from: tap-google-analytics
+    config:
+      # `key_file_location` and `start_date` are inherited
+      view_id: 123456
+  - name: tap-ga--view-bar
+    inherit_from: tap-google-analytics
+    config:
+      # `key_file_location` is inherited
+      start_date: '2020-12-01T00:00:00Z' # `start_date` is overridden
+      view_id: 789012
 ```
 
-If no `variant` is specified, the _original_ variant supported by Meltano is used.
-Note that this is not necessarily the _default_ variant that is recommended to new users and would be used if the plugin were newly added to the project.
+Note that the presence of a [`variant` property](#variants) causes only discoverable plugins to be considered
+(even if there is also a matching plugin in the project),
+since only these can have multiple [variants](/docs/plugins.html#variants):
 
-Only a single variant of a plugin can be present in a project at a time, and that variant will be used whenever you refer to the plugin by name in a [CLI](/docs/command-line-interface.html) argument or [schedule definition](#schedules).
+```yml{6,8-9}
+plugins:
+  loaders:
+  - name: target-snowflake          # Shadows discoverable `target-snowflake` (see below)
+    variant: datamill-co            # using variant `datamill-co`
+  - name: target-snowflake--derived
+    inherit_from: target-snowflake  # Inherits from project's `target-snowflake`
+  - name: target-snowflake--transferwise
+    inherit_from: target-snowflake  # Inherits from discoverable `target-snowflake`
+    variant: transferwise           # using variant `transferwise`
+```
+
+To learn how to add an inheriting plugin to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#plugin-inheritance).
 
 #### Custom plugin definitions
 
-When a `namespace` is specified, we're dealing with a [custom plugin](/docs/plugins.html#custom-plugins) definition instead, and additional properties `executable`, `capabilities`, and `settings` are available:
+A plugin defined with a `namespace` property (but no `inherit_from` property) is a [custom plugin](/docs/plugins.html#custom-plugins) that explicitly defines its [base plugin description](/docs/plugins.html#project-plugins):
 
-```yaml{4,6-14}
+```yaml{4-14}
 plugins:
   extractors:
   - name: tap-covid-19
@@ -94,14 +136,43 @@ plugins:
     - name: start_date
 ```
 
+To learn how to add a custom plugin to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#custom-plugins).
+
+#### Shadowing plugin definitions
+
+A plugin defined without an `inherit_from` or `namespace` property implicitly inherits its [base plugin description](/docs/plugins.html#project-plugins) from the [discoverable plugin](/docs/plugins.html#discoverable-plugins) with the same `name`, as a form of [shadowing](https://en.wikipedia.org/wiki/Variable_shadowing):
+
+```yaml{3}
+plugins:
+  extractors:
+  - name: tap-gitlab
+```
+
+To learn how to add a discoverable plugin to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#discoverable-plugins).
+
+##### Variants
+
+If multiple [variants](/docs/plugins.html#variants) of a discoverable plugin are available,
+the `variant` property can be used to choose a specific one:
+
+```yaml{4}
+plugins:
+  extractors:
+  - name: tap-gitlab
+    variant: meltano
+```
+
+If no `variant` is specified, the _original_ variant supported by Meltano is used.
+Note that this is not necessarily the _default_ variant that is recommended to new users and would be used if the plugin were newly added to the project.
+
 #### Plugin configuration
 
-A plugin's [configuration](/docs/configuration.html) is stored under a `config` key. Values for [plugin extras](/docs/configuration.html#plugin-extras) are stored among the plugin's other properties, outside of the `config` object:
+A plugin's [configuration](/docs/configuration.html) is stored under a `config` property.
+Values for [plugin extras](/docs/configuration.html#plugin-extras) are stored among the plugin's other properties, outside of the `config` object:
 
-```yaml{4-8}
+```yaml{3-7}
 extractors:
 - name: tap-example
-  pip_url: tap-example
   config:
     # Configuration goes here!
     example_setting: value
@@ -111,8 +182,10 @@ extractors:
 
 ### Schedules
 
-Definitions of [pipeline schedules you've created](/docs/orchestration.html#create-a-schedule)
-using [`meltano schedule`](/docs/command-line-interface.html#schedule) are stored under the `schedules` key.
+Your project's pipeline schedules,
+typically [created](/docs/orchestration.html#create-a-schedule)
+using [`meltano schedule`](/docs/command-line-interface.html#schedule),
+ are defined under the `schedules` property.
 
 A schedule definition must have a `name`, `extractor`, `loader`, `transform` and `interval`:
 

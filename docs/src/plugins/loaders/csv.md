@@ -62,12 +62,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-csv` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-7}
+```yml{5-6}
 plugins:
   loaders:
   - name: target-csv
     variant: singer-io
-    pip_url: target-csv
     config:
       destination_path: my_csv_files
 ```
