@@ -1,6 +1,6 @@
 {
   "name": "meltano",
-  "version": "1.61.0",
+  "version": "1.62.0",
   "private": true,
   "scripts": {
     "build": "yarn build:docs && yarn build:webapp",
