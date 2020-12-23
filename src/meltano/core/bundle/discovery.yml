@@ -1208,7 +1208,7 @@ loaders:
           - name: disable_collection
             kind: boolean
             value: false
-            description: "Include `true` in your config to disable Singer Usage Logging: https://github.com/datamill-co/target-snowflake#usage-logging"
+            description: "Include `true` in your config to disable Singer Usage Logging: https://github.com/datamill-co/target-postgres#usage-logging"
           - name: logging_level
             kind: options
             value: INFO

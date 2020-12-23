@@ -170,7 +170,7 @@ Extractors can replicate data from a source using one of the following methods:
 - [Full Table Replication](#full-table-replication)
 
 Extractors for SaaS APIs typically hard-code the appropriate replication method for each supported entity.
-Most database extractors, on the other hand, support two or more of these methods and require you to choose an appropriate option for each table through the `replication-method` [stream metadata](#setting-metadata) keyd.
+Most database extractors, on the other hand, support two or more of these methods and require you to choose an appropriate option for each table through the `replication-method` [stream metadata](#setting-metadata) key.
 
 To support incremental replication, where a data integration pipeline run picks up where the previous run left off, Meltano keeps track of [incremental replication state](#incremental-replication-state).
 
