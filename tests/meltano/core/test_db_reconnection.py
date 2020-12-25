@@ -16,7 +16,7 @@ class TestConnectionRetries:
         with pytest.raises(OperationalError):
             check_db_connection(engine=engine, max_retries=3, retry_timeout=0.1)
 
-        calls = [call.connect(), call.connect(), call.connect(), call.connect()]
+        calls = [call.connect() * 4]
         engine.assert_has_calls(calls, any_order=True)
 
         # check reconnect on second call to `engine.connect`

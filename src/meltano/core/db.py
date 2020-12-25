@@ -6,7 +6,7 @@ import weakref
 
 import psycopg2
 from psycopg2.sql import SQL, Identifier
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
@@ -52,10 +52,7 @@ def project_engine(project, default=False) -> ("Engine", sessionmaker):
 
 
 def check_db_connection(engine, max_retries, retry_timeout):
-    """
-    Checks whether the database is available the first time a project's engine
-    is created
-    """
+    """Check if the database is available the first time a project's engine is created."""
     attempt = 0
     while True:
         try:
