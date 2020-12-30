@@ -178,7 +178,7 @@ wemake-python-styleguide = [
 
 [tool.flakehell.exceptions."tests/"]
 flake8-bandit = ["-S101"]  # Don't warn on use of asserts in tests
-flake8-docstrings = ["-D101", "-D102", "-D103"] # Don't require docstrings in test classes and methods
+flake8-docstrings = ["-D100", "-D101", "-D102", "-D103"] # Don't require docstrings in tests
 flake8-pytest = ["+*"]
 wemake-python-styleguide = [
   "-WPS204",  # Don't warn on overused expressions in test methods

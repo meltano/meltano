@@ -1,5 +1,6 @@
-from meltano.core.db import DB
-from meltano.core.job.job import Job, State
+"""Defines JobFinder."""
+
+from .job import Job, State
 
 
 class JobFinder:

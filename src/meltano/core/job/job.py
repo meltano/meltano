@@ -8,8 +8,8 @@ from datetime import datetime
 from enum import Enum
 
 import sqlalchemy.types as types
-from meltano.core.db import SystemModel
 from meltano.core.error import Error
+from meltano.core.models import SystemModel
 from meltano.core.sqlalchemy import GUID, IntFlag, JSONEncodedDict
 from sqlalchemy import Column
 from sqlalchemy.ext.mutable import MutableDict
