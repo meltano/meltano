@@ -110,7 +110,7 @@ export MELTANO_DATABASE_URI=postgresql://<username>:<password>@<host>:<port>/<da
 meltano elt --database-uri=postgresql://<username>:<password>@<host>:<port>/<database> ...
 ```
 
-### `database_max_tries`
+### `database_max_retries`
 
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_DATABASE_MAX_RETRIES`
 - Default: `3`
