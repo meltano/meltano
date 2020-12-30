@@ -1,11 +1,8 @@
-import contextlib
-import logging
-import os
-import time
-import weakref
+"""Defines helpers related to the system database."""
 
-import psycopg2
-from psycopg2.sql import SQL, Identifier
+import logging
+import time
+
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError
@@ -22,42 +19,39 @@ _engines = dict()
 def project_engine(project, default=False) -> ("Engine", sessionmaker):
     """Creates and register a SQLAlchemy engine for a Meltano project instance."""
 
+    existing_engine = _engines.get(project)
+    if existing_engine:
+        return existing_engine
+
     settings = ProjectSettingsService(project)
 
     engine_uri = settings.get("database_uri")
-
-    if project in _engines:
-        return _engines[project]
-
     logging.debug(f"Creating engine {project}@{engine_uri}")
     engine = create_engine(engine_uri, pool_pre_ping=True)
 
-    max_retries = settings.get("database_max_retries")
-    retry_timeout = settings.get("database_retry_timeout")
-
-    check_db_connection(engine, max_retries, retry_timeout)
+    check_db_connection(
+        engine,
+        max_retries=settings.get("database_max_retries"),
+        retry_timeout=settings.get("database_retry_timeout"),
+    )
 
     init_hook(engine)
 
-    create_session = sessionmaker(bind=engine)
-    engine_session = (engine, create_session)
+    engine_session = (engine, sessionmaker(bind=engine))
 
     if default:
         # register the default engine
         _engines[project] = engine_session
-    else:
-        _engines[(project, engine_uri)] = engine_session
 
     return engine_session
 
 
-def check_db_connection(engine, max_retries, retry_timeout):
+def check_db_connection(engine, max_retries, retry_timeout):  # noqa: WPS231
     """Check if the database is available the first time a project's engine is created."""
     attempt = 0
     while True:
         try:
             engine.connect()
-            break
         except OperationalError:
             if attempt == max_retries:
                 logging.error(
@@ -69,6 +63,8 @@ def check_db_connection(engine, max_retries, retry_timeout):
                 f"DB connection failed. Will retry after {retry_timeout}s. Attempt {attempt}/{max_retries}"
             )
             time.sleep(retry_timeout)
+        else:
+            break
 
 
 def init_hook(engine):
@@ -114,6 +110,6 @@ class DB:
                 conn.execute(grant_select_schema)
                 conn.execute(grant_usage_schema)
 
-        logging.info("Schema {} has been created successfully.".format(schema_name))
+        logging.info(f"Schema {schema_name} has been created successfully.")
         for role in grant_roles:
-            logging.info("Usage has been granted for role: {}.".format(role))
+            logging.info(f"Usage has been granted for role: {role}.")

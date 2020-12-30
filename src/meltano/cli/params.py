@@ -47,7 +47,6 @@ class pass_project:  # noqa: N801
                 )
 
             # register the system database connection
-            settings_service = ProjectSettingsService(project)
             engine, _ = project_engine(project, default=True)
 
             if self.migrate:

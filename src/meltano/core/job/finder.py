@@ -1,3 +1,5 @@
+"""Defines JobFinder."""
+
 from .job import Job, State
 
 
