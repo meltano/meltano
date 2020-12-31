@@ -8,6 +8,12 @@ settings:
 - name: database_uri
   value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db
   env_specific: true
+- name: database_max_retries
+  kind: integer
+  value: 3
+- name: database_retry_timeout
+  kind: integer
+  value: 5
 - name: project_readonly
   kind: boolean
   value: false
