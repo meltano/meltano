@@ -22,7 +22,7 @@ def repl():
         "from meltano.core.db import project_engine",
         "project = Project.find()",
         "settings_service = ProjectSettingsService(project)",
-        "_, Session = project_engine(project, settings_service.get('database_uri'), default=True)",
+        "_, Session = project_engine(project, default=True)",
         "session = Session()",
         "%autoreload 2",
     ]

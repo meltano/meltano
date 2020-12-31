@@ -66,8 +66,7 @@ class ProjectInitService:
         click.secho(f"Creating system database...", fg="blue")
 
         # register the system database connection
-        database_uri = self.settings_service.get("database_uri")
-        engine, _ = project_engine(self.project, database_uri, default=True)
+        engine, _ = project_engine(self.project, default=True)
 
         try:
             migration_service = MigrationService(engine)
