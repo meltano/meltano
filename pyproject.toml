@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "1.63.0"
+version = "1.64.0"
 description = "Meltano"
 authors = ["Meltano Team and Contributors <meltano@gitlab.com>"]
 license = "MIT"
