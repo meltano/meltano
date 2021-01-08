@@ -14,9 +14,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#2478](https://gitlab.com/meltano/meltano/-/issues/2478) Fix runaway memory usage (and possible out-of-memory error) when extractor outputs messages at higher rate than loader can process them, by enabling flow control with a 64KB buffer size limit
-
 ### Breaks
+
+
+## 1.64.0 - (2021-01-07)
+---
+
+### Fixes
+
+- [#2478](https://gitlab.com/meltano/meltano/-/issues/2478) Fix runaway memory usage (and possible out-of-memory error) when extractor outputs messages at higher rate than loader can process them, by enabling flow control with a 64KB buffer size limit
 
 
 ## 1.63.0 - (2021-01-04)
