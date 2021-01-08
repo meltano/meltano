@@ -66,7 +66,7 @@ class SingerRunner(Runner):
                 process.kill()
                 logging.error(f"{process} was killed.")
 
-    async def invoke(
+    async def invoke(  # noqa: WPS217, WPS210, WPS211, WPS213, WPS231
         self,
         tap: PluginInvoker,
         target: PluginInvoker,
@@ -75,17 +75,20 @@ class SingerRunner(Runner):
         extractor_out=None,
         loader_out=None,
     ):
+        """Invoke tap and target together."""
         extractor_log = extractor_log or sys.stderr
         loader_log = loader_log or sys.stderr
 
+        # Start tap
         try:
             p_tap = await tap.invoke_async(
                 stdout=asyncio.subprocess.PIPE,  # Singer messages
                 stderr=asyncio.subprocess.PIPE,  # Log
             )
         except Exception as err:
-            raise RunnerError(f"Cannot start tap: {err}") from err
+            raise RunnerError(f"Cannot start extractor: {err}") from err
 
+        # Start target
         try:
             p_target = await target.invoke_async(
                 stdin=asyncio.subprocess.PIPE,  # Singer messages
@@ -93,46 +96,79 @@ class SingerRunner(Runner):
                 stderr=asyncio.subprocess.PIPE,  # Log
             )
         except Exception as err:
-            raise RunnerError(f"Cannot start target: {err}") from err
+            raise RunnerError(f"Cannot start loader: {err}") from err
 
+        # Process tap output
         tap_outputs = [p_target.stdin]
         if extractor_out:
             tap_outputs.insert(0, extractor_out)
 
+        tap_stdout_future = asyncio.ensure_future(
+            capture_subprocess_output(p_tap.stdout, *tap_outputs)
+        )
+        tap_stderr_future = asyncio.ensure_future(
+            capture_subprocess_output(p_tap.stderr, extractor_log)
+        )
+
+        # Process target output
         target_outputs = [self.bookmark_writer()]
         if loader_out:
             target_outputs.insert(0, loader_out)
 
-        await asyncio.wait(
-            [
-                capture_subprocess_output(p_tap.stdout, *tap_outputs),
-                capture_subprocess_output(p_tap.stderr, extractor_log),
-                p_tap.wait(),
-                capture_subprocess_output(p_target.stdout, *target_outputs),
-                capture_subprocess_output(p_target.stderr, loader_log),
-                p_target.wait(),
-            ],
+        target_stdout_future = asyncio.ensure_future(
+            capture_subprocess_output(p_target.stdout, *target_outputs)
+        )
+        target_stderr_future = asyncio.ensure_future(
+            capture_subprocess_output(p_target.stderr, loader_log)
+        )
+
+        # Wait for tap or target to complete
+        tap_process_future = asyncio.ensure_future(p_tap.wait())
+        target_process_future = asyncio.ensure_future(p_target.wait())
+        done, _ = await asyncio.wait(
+            [tap_process_future, target_process_future],
             return_when=asyncio.FIRST_COMPLETED,
         )
 
-        # Close both sides of the tap-target pipe, so that both quit if they haven't already.
-        p_tap.stdout._transport.close()
-        p_target.stdin.close()
+        if target_process_future in done:
+            # If the target completes before the tap, it failed before processing all tap output
+            target_code = target_process_future.result()
 
-        # at this point, something already stopped, the other component
-        # should die soon because of a SIGPIPE
-        tap_code = await p_tap.wait()
-        target_code = await p_target.wait()
+            # Kill tap and cancel output processing since there's no more target to forward messages to
+            p_tap.kill()
+            tap_stdout_future.cancel()
+            tap_stderr_future.cancel()
+
+            # Pretend the tap finished successfully since it didn't itself fail
+            tap_code = 0
+
+            # Wait for all buffered target output to be processed
+            await asyncio.wait([target_stdout_future, target_stderr_future])
+        else:  # if tap_process_future in done:
+            # If the tap completes before the target, the target should have a chance to process all tap output
+            tap_code = tap_process_future.result()
+
+            # Wait for all buffered tap output to be processed
+            await asyncio.wait([tap_stdout_future, tap_stderr_future])
+
+            # Close target stdin so process can complete naturally
+            p_target.stdin.close()
+
+            # Wait for all buffered target output to be processed
+            await asyncio.wait([target_stdout_future, target_stderr_future])
+
+            # Wait for target to complete
+            target_code = await target_process_future
 
         if tap_code and target_code:
             raise RunnerError(
-                f"Tap and target failed",
+                "Extractor and loader failed",
                 {PluginType.EXTRACTORS: tap_code, PluginType.LOADERS: target_code},
             )
         elif tap_code:
-            raise RunnerError(f"Tap failed", {PluginType.EXTRACTORS: tap_code})
+            raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: tap_code})
         elif target_code:
-            raise RunnerError(f"Target failed", {PluginType.LOADERS: target_code})
+            raise RunnerError("Loader failed", {PluginType.LOADERS: target_code})
 
     def bookmark_writer(self):
         incomplete_state = self.context.full_refresh and self.context.select_filter
