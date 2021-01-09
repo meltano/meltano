@@ -14,9 +14,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#2500](https://gitlab.com/meltano/meltano/-/issues/2500) Ensure all buffered messages (records) output by extractor make it to loader when extractor finishes early.
-
 ### Breaks
+
+
+## 1.64.1 - (2021-01-08)
+---
+
+### Fixes
+
+- [#2500](https://gitlab.com/meltano/meltano/-/issues/2500) Ensure all buffered messages (records) output by extractor make it to loader when extractor finishes early.
 
 
 ## 1.64.0 - (2021-01-07)
