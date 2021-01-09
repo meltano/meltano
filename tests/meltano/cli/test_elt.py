@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import os
@@ -63,6 +64,14 @@ def tap_process(process_mock_factory, tap):
 @pytest.fixture()
 def target_process(process_mock_factory, target):
     target = process_mock_factory(target)
+
+    # Have `target.wait` take 1s to make sure the tap always finishes before the target
+    async def wait_mock():
+        await asyncio.sleep(1)
+        return target.wait.return_value
+
+    target.wait.side_effect = wait_mock
+
     target.stdout.at_eof.side_effect = (False, False, False, True)
     target.stdout.readline = CoroutineMock(
         side_effect=(b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
@@ -282,7 +291,7 @@ class TestCliEltScratchpadOne:
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
-            assert "Tap failed" in str(result.exception)
+            assert "Extractor failed" in str(result.exception)
 
             assert_lines(
                 result.stdout,
@@ -301,7 +310,63 @@ class TestCliEltScratchpadOne:
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
-    def test_elt_target_failure(
+    def test_elt_target_failure_before_tap_finishes(
+        self,
+        google_tracker,
+        cli_runner,
+        project,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        project_plugins_service,
+    ):
+        job_id = "pytest_test_elt"
+        args = ["elt", "--job_id", job_id, tap.name, target.name]
+
+        # Have `tap_process.wait` take 2s to make sure the target can fail before tap finishes
+        async def wait_mock():
+            await asyncio.sleep(2)
+            return tap_process.wait.return_value
+
+        tap_process.wait.side_effect = wait_mock
+
+        target_process.wait.return_value = 1
+        target_process.stderr.readline.side_effect = (
+            b"Starting\n",
+            b"Running\n",
+            b"Failure\n",
+        )
+
+        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+            assert result.exit_code == 1
+            assert "Loader failed" in str(result.exception)
+
+            assert_lines(
+                result.stdout,
+                "meltano     | Running extract & load...\n",
+                "meltano     | Loading failed (1): Failure\n",
+            )
+            assert_lines(
+                result.stderr,
+                "tap-mock    | Starting\n",
+                "tap-mock    | Running\n",
+                "tap-mock    | Done\n",
+                "target-mock | Starting\n",
+                "target-mock | Running\n",
+                "target-mock | Failure\n",
+            )
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    def test_elt_target_failure_after_tap_finishes(
         self,
         google_tracker,
         cli_runner,
@@ -331,7 +396,7 @@ class TestCliEltScratchpadOne:
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
-            assert "Target failed" in str(result.exception)
+            assert "Loader failed" in str(result.exception)
 
             assert_lines(
                 result.stdout,
@@ -387,7 +452,7 @@ class TestCliEltScratchpadOne:
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
-            assert "Tap and target failed" in str(result.exception)
+            assert "Extractor and loader failed" in str(result.exception)
 
             assert_lines(
                 result.stdout,
