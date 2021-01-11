@@ -48,9 +48,6 @@ class BookmarkWriter:
                 "Received state is invalid, incremental state has not been updated"
             )
 
-    def flush(self):
-        pass
-
 
 class SingerRunner(Runner):
     def __init__(self, elt_context: ELTContext):
