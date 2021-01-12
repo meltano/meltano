@@ -119,25 +119,62 @@ class SingerRunner(Runner):
             capture_subprocess_output(p_target.stderr, loader_log)
         )
 
-        # Wait for tap or target to complete
+        # Wait for tap or target to complete, or for one of the output handlers to raise an exception.
         tap_process_future = asyncio.ensure_future(p_tap.wait())
         target_process_future = asyncio.ensure_future(p_target.wait())
+        output_exception_future = asyncio.ensure_future(
+            asyncio.wait(
+                [
+                    tap_stdout_future,
+                    tap_stderr_future,
+                    target_stdout_future,
+                    target_stderr_future,
+                ],
+                return_when=asyncio.FIRST_EXCEPTION,
+            ),
+        )
+
         done, _ = await asyncio.wait(
-            [tap_process_future, target_process_future],
+            [tap_process_future, target_process_future, output_exception_future],
             return_when=asyncio.FIRST_COMPLETED,
         )
 
+        # If `output_exception_future` completes first, one of the output handlers raised an exception or all completed successfully.
+        if output_exception_future in done:
+            output_futures_done, _ = output_exception_future.result()
+            output_futures_failed = [
+                future
+                for future in output_futures_done
+                if future.exception() is not None
+            ]
+
+            if output_futures_failed:
+                # If any output handler raised an exception, re-raise it.
+                failed_future = output_futures_failed.pop()
+                raise failed_future.exception()
+            else:
+                # If all of the output handlers completed without raising an exception,
+                # we still need to wait for the tap or target to complete.
+                done, _ = await asyncio.wait(
+                    [tap_process_future, target_process_future],
+                    return_when=asyncio.FIRST_COMPLETED,
+                )
+
         if target_process_future in done:
-            # If the target completes before the tap, it failed before processing all tap output
             target_code = target_process_future.result()
 
-            # Kill tap and cancel output processing since there's no more target to forward messages to
-            p_tap.kill()
-            tap_stdout_future.cancel()
-            tap_stderr_future.cancel()
+            if tap_process_future in done:
+                tap_code = tap_process_future.result()
+            else:
+                # If the target completes before the tap, it failed before processing all tap output
 
-            # Pretend the tap finished successfully since it didn't itself fail
-            tap_code = 0
+                # Kill tap and cancel output processing since there's no more target to forward messages to
+                p_tap.kill()
+                tap_stdout_future.cancel()
+                tap_stderr_future.cancel()
+
+                # Pretend the tap finished successfully since it didn't itself fail
+                tap_code = 0
 
             # Wait for all buffered target output to be processed
             await asyncio.wait([target_stdout_future, target_stderr_future])

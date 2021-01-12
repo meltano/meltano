@@ -470,6 +470,49 @@ class TestCliEltScratchpadOne:
                 "target-mock | Failure\n",
             )
 
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    def test_elt_output_handler_error(
+        self,
+        google_tracker,
+        cli_runner,
+        project,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        project_plugins_service,
+    ):
+        job_id = "pytest_test_elt"
+        args = ["elt", "--job_id", job_id, tap.name, target.name]
+
+        exc = Exception("Failed to read from target stderr.")
+        target_process.stderr.readline.side_effect = exc
+
+        # Have `tap_process.wait` take 1s to make sure the exception can be raised before tap finishes
+        async def wait_mock():
+            await asyncio.sleep(1)
+            return tap_process.wait.return_value
+
+        tap_process.wait.side_effect = wait_mock
+
+        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+            assert result.exit_code == 1
+            assert result.exception == exc
+
+            assert_lines(
+                result.stdout,
+                "meltano     | Running extract & load...\n",
+                "meltano     | Failed to read from target stderr.\n",
+            )
+
     def test_dump_catalog(
         self,
         cli_runner,
