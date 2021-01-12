@@ -56,7 +56,8 @@ class DiscoveryFile(Canonical):
                 self[plugin_type].append(plugin_def)
 
     @classmethod
-    def version(cls, attrs):
+    def file_version(cls, attrs):
+        """Return version of discovery file represented by attrs dictionary."""
         return int(attrs.get("version", 1))
 
 
@@ -69,7 +70,7 @@ class PluginDiscoveryService(Versioned):
         self._discovery_version = None
         self._discovery = None
         if discovery:
-            self._discovery_version = DiscoveryFile.version(discovery)
+            self._discovery_version = DiscoveryFile.file_version(discovery)
             self._discovery = DiscoveryFile.parse(discovery)
 
     @property
@@ -182,7 +183,7 @@ class PluginDiscoveryService(Versioned):
         try:
             discovery_yaml = yaml.safe_load(discovery_file)
 
-            self._discovery_version = DiscoveryFile.version(discovery_yaml)
+            self._discovery_version = DiscoveryFile.file_version(discovery_yaml)
             self.ensure_compatible()
 
             self._discovery = DiscoveryFile.parse(discovery_yaml)
