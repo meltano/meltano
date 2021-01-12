@@ -305,6 +305,9 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         self.assert_discovery_yaml(subject, remote_discovery)
 
         assert subject.cached_discovery_file.exists()
+        with subject.cached_discovery_file.open() as cached_discovery:
+            cached_discovery_yaml = yaml.safe_load(cached_discovery)
+            assert cached_discovery_yaml["version"] == remote_discovery["version"]
 
     def test_incompatible_remote_discovery(
         self, subject, incompatible_remote_discovery, cached_discovery
