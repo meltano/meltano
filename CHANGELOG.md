@@ -10,15 +10,24 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2392](https://gitlab.com/meltano/meltano/-/issues/2392) Add 'elt.buffer_size' setting with default value of 10MiB to let extractor output buffer size and line length limit (maximum message size) be configured as appropriate for the extractor and loader in question.
-
 ### Changes
 
 ### Fixes
 
-- [#2501](https://gitlab.com/meltano/meltano/-/issues/2501) Don't lose `version` when caching `discovery.yml`.
-
 ### Breaks
+
+
+## 1.65.0 - (2021-01-12)
+---
+
+### New
+
+- [#2392](https://gitlab.com/meltano/meltano/-/issues/2392) Add 'elt.buffer_size' setting with default value of 10MiB to let extractor output buffer size and line length limit (maximum message size) be configured as appropriate for the extractor and loader in question.
+
+
+### Fixes
+
+- [#2501](https://gitlab.com/meltano/meltano/-/issues/2501) Don't lose `version` when caching `discovery.yml`.
 
 
 ## 1.64.1 - (2021-01-08)
