@@ -205,7 +205,7 @@ def run_async(coro):
         pass
     finally:
         # The below is taken from https://stackoverflow.com/a/58532304
-        # and inspired by to Python 3.7's `asyncio.run`
+        # and inspired by Python 3.7's `asyncio.run`
         all_tasks = asyncio.gather(
             *asyncio.Task.all_tasks(loop), return_exceptions=True
         )

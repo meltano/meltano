@@ -470,6 +470,104 @@ class TestCliEltScratchpadOne:
                 "target-mock | Failure\n",
             )
 
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    def test_elt_tap_line_length_limit_error(
+        self,
+        google_tracker,
+        cli_runner,
+        project,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        project_plugins_service,
+    ):
+        job_id = "pytest_test_elt"
+        args = ["elt", "--job_id", job_id, tap.name, target.name]
+
+        # Raise a ValueError wrapping a LimitOverrunError, like StreamReader.readline does:
+        # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
+        try:  # noqa: WPS328
+            raise asyncio.LimitOverrunError(
+                "Separator is not found, and chunk exceed the limit", 0
+            )
+        except asyncio.LimitOverrunError as err:
+            try:  # noqa: WPS328, WPS505
+                # `ValueError` needs to be raised from inside the except block
+                # for `LimitOverrunError` so that `__context__` is set.
+                raise ValueError(str(err))
+            except ValueError as wrapper_err:
+                tap_process.stdout.readline.side_effect = wrapper_err
+
+        # Have `tap_process.wait` take 1s to make sure the LimitOverrunError exception can be raised before tap finishes
+        async def wait_mock():
+            await asyncio.sleep(1)
+            return tap_process.wait.return_value
+
+        tap_process.wait.side_effect = wait_mock
+
+        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+            assert result.exit_code == 1
+            assert "Output line length limit exceeded" in str(result.exception)
+
+            assert_lines(
+                result.stdout,
+                "meltano     | Running extract & load...\n",
+                "meltano     | The extractor generated a message exceeding the message size limit of 5.0MiB (half the buffer size of 10.0MiB).\n",
+                "meltano     | ELT could not be completed: Output line length limit exceeded\n",
+            )
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    def test_elt_output_handler_error(
+        self,
+        google_tracker,
+        cli_runner,
+        project,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        project_plugins_service,
+    ):
+        job_id = "pytest_test_elt"
+        args = ["elt", "--job_id", job_id, tap.name, target.name]
+
+        exc = Exception("Failed to read from target stderr.")
+        target_process.stderr.readline.side_effect = exc
+
+        # Have `tap_process.wait` take 1s to make sure the exception can be raised before tap finishes
+        async def wait_mock():
+            await asyncio.sleep(1)
+            return tap_process.wait.return_value
+
+        tap_process.wait.side_effect = wait_mock
+
+        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+            assert result.exit_code == 1
+            assert result.exception == exc
+
+            assert_lines(
+                result.stdout,
+                "meltano     | Running extract & load...\n",
+                "meltano     | Failed to read from target stderr.\n",
+            )
+
     def test_dump_catalog(
         self,
         cli_runner,
