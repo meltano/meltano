@@ -115,9 +115,9 @@ meltano elt --database-uri=postgresql://<username>:<password>@<host>:<port>/<dat
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_DATABASE_MAX_RETRIES`
 - Default: `3`
 
-This sets the maximum number of reconnection attempts in case the initial connection to the database fails because it isn't available when Meltano starts up. 
+This sets the maximum number of reconnection attempts in case the initial connection to the database fails because it isn't available when Meltano starts up.
 
-Note: This affects the initial connection attempt only after which the connection is cached. 
+Note: This affects the initial connection attempt only after which the connection is cached.
 Subsequent disconnections are handled by SQLALchemy
 
 #### How to use
@@ -133,9 +133,9 @@ export MELTANO_DATABASE_MAX_RETRIES=3
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_DATABASE_RETRY_TIMEOUT`
 - Default: `5` (seconds)
 
-This controls the retry interval (in seconds) in case the initial connection to the database fails because it isn't available when Meltano starts up. 
+This controls the retry interval (in seconds) in case the initial connection to the database fails because it isn't available when Meltano starts up.
 
-Note: This affects the initial connection attempt only after which the connection is cached. 
+Note: This affects the initial connection attempt only after which the connection is cached.
 Subsequent disconnections are handled by SQLALchemy
 
 #### How to use
@@ -215,6 +215,34 @@ export MELTANO_CLI_LOG_LEVEL=debug
 export MELTANO_LOG_LEVEL=debug
 
 meltano --log-level=debug ...
+```
+
+## `meltano elt`
+
+These settings can be used to modify the behavior of [`meltano elt`](/docs/command-line-interface.html#elt).
+
+### `elt.buffer_size`
+
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_ELT_BUFFER_SIZE`
+- Default: `10485760` (10MiB in bytes)
+
+Size (in bytes) of the buffer between extractor and loader (Singer tap and target) that stores
+[messages](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md#output)
+output by the extractor while they are waiting to be processed by the loader.
+
+When an extractor generates messages (records) faster than the loader can process them, the buffer may fill up completely,
+at which point the extractor will be blocked until the loader has worked through enough messages to make half
+of the buffer size available again for new extractor output.
+
+The length of a single line of extractor output is limited to half the buffer size.
+With a default buffer size of 10MiB, the maximum message size would therefore be 5MiB.
+
+#### How to use
+
+```bash
+meltano config meltano set elt.buffer_size 52428800 # 50MiB in bytes
+
+export MELTANO_ELT_BUFFER_SIZE=52428800
 ```
 
 ## Meltano UI server

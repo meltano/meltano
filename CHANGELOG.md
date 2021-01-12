@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2392](https://gitlab.com/meltano/meltano/-/issues/2392) Add 'elt.buffer_size' setting with default value of 10MiB to let extractor output buffer size and line length limit (maximum message size) be configured as appropriate for the extractor and loader in question.
+
 ### Changes
 
 ### Fixes

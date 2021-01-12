@@ -7,7 +7,6 @@ from contextlib import contextmanager
 from typing import Optional
 
 from .error import Error, SubprocessError
-from .logging.utils import OUTPUT_BUFFER_SIZE
 from .plugin import PluginRef
 from .plugin.config_service import PluginConfigService
 from .plugin.project_plugin import ProjectPlugin
@@ -186,7 +185,9 @@ class PluginInvoker:
     async def invoke_async(self, *args, **kwargs):
         with self._invoke(*args, **kwargs) as (popen_args, popen_options, popen_env):
             return await asyncio.create_subprocess_exec(
-                *popen_args, limit=OUTPUT_BUFFER_SIZE, **popen_options, env=popen_env
+                *popen_args,
+                **popen_options,
+                env=popen_env,
             )
 
     def dump(self, file_id):
