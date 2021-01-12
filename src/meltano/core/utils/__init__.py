@@ -1,6 +1,7 @@
 import base64
 import functools
 import logging
+import math
 import os
 import re
 import sys
@@ -338,3 +339,18 @@ def expand_env_vars(raw_value, env: Dict):
 
 def uniques_in(original):
     return list(OrderedDict.fromkeys(original))
+
+
+# https://gist.github.com/cbwar/d2dfbc19b140bd599daccbe0fe925597#gistcomment-2845059
+def human_size(num, suffix="B"):
+    """Return human-readable file size."""
+    magnitude = int(math.floor(math.log(num, 1024)))
+    val = num / math.pow(1024, magnitude)
+
+    if magnitude == 0:
+        return f"{val:.0f} bytes"
+    if magnitude > 7:
+        return f"{val:.1f}Yi{suffix}"
+
+    prefix = ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"][magnitude]
+    return f"{val:3.1f}{prefix}{suffix}"

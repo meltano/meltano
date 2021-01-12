@@ -7,11 +7,7 @@ from contextlib import contextmanager, redirect_stderr, redirect_stdout, suppres
 import click
 from async_generator import asynccontextmanager
 
-from .utils import (
-    OUTPUT_BUFFER_SIZE,
-    capture_subprocess_output,
-    remove_ansi_escape_sequences,
-)
+from .utils import capture_subprocess_output, remove_ansi_escape_sequences
 
 
 class OutputLogger:
@@ -149,7 +145,7 @@ class Out:
     async def writer(self):
         read_fd, write_fd = os.pipe()
 
-        reader = asyncio.ensure_future(self.read_from_fd(read_fd))
+        reader = asyncio.ensure_future(self._read_from_fd(read_fd))
         writer = FileDescriptorWriter(self, write_fd)
 
         try:
@@ -193,8 +189,12 @@ class Out:
         # from stripping ANSI codes
         return self.stream.isatty()
 
-    async def read_from_fd(self, read_fd):
-        reader = asyncio.StreamReader(limit=OUTPUT_BUFFER_SIZE)
+    async def _read_from_fd(self, read_fd):
+        # Since we're redirecting our own stdout and stderr output,
+        # the line length limit can be arbitrarily large.
+        line_length_limit = 1024 * 1024 * 1024  # 1 GiB
+
+        reader = asyncio.StreamReader(limit=line_length_limit)
         read_protocol = asyncio.StreamReaderProtocol(reader)
 
         loop = asyncio.get_event_loop()

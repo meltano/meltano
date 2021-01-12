@@ -20,6 +20,9 @@ settings:
   env_specific: true
 - name: discovery_url
   value: https://www.meltano.com/discovery.yml
+- name: elt.buffer_size
+  kind: integer
+  value: 10485760 # 10 MiB
 
 # CLI
 - name: cli.log_level
