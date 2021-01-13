@@ -23,7 +23,6 @@ from meltano.core.plugin_discovery_service import (
     PluginNotFoundError,
 )
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
-from meltano.core.project_settings_service import ProjectSettingsService
 
 
 @pytest.fixture(scope="class")
@@ -269,8 +268,8 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
             yield discovery_yaml
 
     @pytest.fixture
-    def disabled_remote_discovery(self, project):
-        ProjectSettingsService(project).set("discovery_url", "false")
+    def disabled_remote_discovery(self, subject):
+        subject.settings_service.set("discovery_url", "false")
 
     @pytest.fixture
     def cached_discovery(self, subject):
