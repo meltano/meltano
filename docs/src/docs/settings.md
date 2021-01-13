@@ -36,6 +36,7 @@ These are settings specific to [your Meltano project](/docs/project.html).
 By default, Meltano shares anonymous usage data with the Meltano team using Google Analytics. We use this data to learn about the size of our user base and the specific Meltano features they are (not yet) using, which helps us determine the highest impact changes we can make in each weekly release to make Meltano even more useful for you and others like you.
 
 If enabled, Meltano will use the value of the [`project_id` setting](#project-id) to uniquely identify your project in Google Analytics.
+This project ID is also sent along when Meltano loads the remote `discovery.yml` manifest from the URL identified by the [`discovery_url` setting](#discovery-url).
 
 If you'd like to send the tracking data to a different Google Analytics account than the one run by the Meltano team,
 the Tracking IDs can be configured using the [`tracking_ids.*` settings](#analytics-tracking-ids) below.
@@ -189,8 +190,10 @@ set this setting to `false` or any other string not starting with `http://` or `
 
 ```bash
 meltano config meltano set discovery_url https://meltano.example.com/discovery.yml
+meltano config meltano set discovery_url false
 
 export MELTANO_DISCOVERY_URL=https://meltano.example.com/discovery.yml
+export MELTANO_DISCOVERY_URL=false
 ```
 
 ## `meltano` CLI

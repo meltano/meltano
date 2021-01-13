@@ -74,13 +74,15 @@ class PluginDiscoveryService(Versioned):
             self._discovery_version = DiscoveryFile.file_version(discovery)
             self._discovery = DiscoveryFile.parse(discovery)
 
+        self.settings_service = ProjectSettingsService(self.project)
+
     @property
     def file_version(self):
         return self._discovery_version
 
     @property
     def discovery_url(self):
-        discovery_url = ProjectSettingsService(self.project).get("discovery_url")
+        discovery_url = self.settings_service.get("discovery_url")
 
         if not discovery_url or not re.match(r"^https?://", discovery_url):
             return None
@@ -148,12 +150,21 @@ class PluginDiscoveryService(Versioned):
             pass
 
     def load_remote_discovery(self):
-        if not self.discovery_url:
+        discovery_url = self.discovery_url
+        if not discovery_url:
             return
 
         try:
             headers = {"User-Agent": f"Meltano/{meltano.__version__}"}  # noqa: WPS609
-            response = requests.get(self.discovery_url, headers=headers)
+            params = {}
+
+            if self.settings_service.get("send_anonymous_usage_stats"):
+                project_id = self.settings_service.get("project_id")
+
+                headers["X-Project-ID"] = project_id
+                params["project_id"] = project_id
+
+            response = requests.get(discovery_url, headers=headers, params=params)
             response.raise_for_status()
 
             remote_discovery = io.StringIO(response.text)

@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2502](https://gitlab.com/meltano/meltano/-/issues/2502) Add `User-Agent` header with Meltano version to request for remote `discovery.yml` manifest (typically https://www.meltano.com/discovery.yml)
+- [#2503](https://gitlab.com/meltano/meltano/-/issues/2503) Include project ID in `X-Project-ID` header and `project_id` query param in request for remote `discovery.yml` manifest when `send_anonymous_usage_stats` setting is enabled.
 
 ### Changes
 
