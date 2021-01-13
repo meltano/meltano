@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2502](https://gitlab.com/meltano/meltano/-/issues/2502) Add `User-Agent` header with Meltano version to request for remote `discovery.yml` manifest (typically https://www.meltano.com/discovery.yml)
+
 ### Changes
 
 ### Fixes

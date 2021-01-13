@@ -6,6 +6,7 @@ import shutil
 from copy import deepcopy
 from typing import Dict, Iterable, List, Optional
 
+import meltano
 import meltano.core.bundle as bundle
 import requests
 import yaml
@@ -151,7 +152,8 @@ class PluginDiscoveryService(Versioned):
             return
 
         try:
-            response = requests.get(self.discovery_url)
+            headers = {"User-Agent": f"Meltano/{meltano.__version__}"}  # noqa: WPS609
+            response = requests.get(self.discovery_url, headers=headers)
             response.raise_for_status()
 
             remote_discovery = io.StringIO(response.text)
