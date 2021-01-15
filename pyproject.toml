@@ -207,6 +207,9 @@ wemake-python-styleguide = [
 flake8-docstrings = ["-D103"] # Don't require function docstrings in migrations
 wemake-python-styleguide = ["-WPS118"] # Allow long filenames
 
+[tool.flakehell.exceptions."src/meltano/core/job/job.py"]
+wemake-python-styleguide = ["-WPS601"] # Class attributes can be used as instance attributes in sqlalchemy.declarative model
+
 [tool.flakehell.exceptions."**/__init__.py"]
 pyflakes = ["-F401"]  # Allow for using __init__.py to promote imports to the module namespace
 

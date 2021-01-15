@@ -1,3 +1,4 @@
+"""Defines `meltano elt` command."""
 import datetime
 import logging
 import os
@@ -124,7 +125,7 @@ def elt(
         if dump:
             dump_file(context_builder, dump)
         else:
-            run_job(project, job, session, context_builder)
+            run_async(_run_job(project, job, session, context_builder))
     finally:
         session.close()
 
@@ -185,15 +186,13 @@ def dump_file(context_builder, dumpable):
         raise CliError(f"Could not dump {dumpable}: {err}") from err
 
 
-def run_job(project, job, session, context_builder):
-    job_logging_service = JobLoggingService(project)
+async def _run_job(project, job, session, context_builder):
+    async with job.run(session):
+        job_logging_service = JobLoggingService(project)
+        with job_logging_service.create_log(job.job_id, job.run_id) as log_file:
+            output_logger = OutputLogger(log_file)
 
-    with job.run(session), job_logging_service.create_log(
-        job.job_id, job.run_id
-    ) as log_file:
-        output_logger = OutputLogger(log_file)
-
-        run_async(run_elt(project, context_builder, output_logger))
+            await run_elt(project, context_builder, output_logger)
 
 
 @asynccontextmanager

@@ -1,13 +1,15 @@
 """Defines Job model class."""
+import asyncio
 import logging
 import os
 import signal
 import uuid
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from datetime import datetime
 from enum import Enum
 
 import sqlalchemy.types as types
+from async_generator import asynccontextmanager
 from meltano.core.error import Error
 from meltano.core.models import SystemModel
 from meltano.core.sqlalchemy import GUID, IntFlag, JSONEncodedDict
@@ -103,19 +105,20 @@ class Job(SystemModel):  # noqa: WPS214
 
         return transition
 
-    @contextmanager
-    def run(self, session):
+    @asynccontextmanager
+    async def run(self, session):
         """
         Run wrapped code in context of a job.
 
-        Transitions state to RUNNING and SUCCESS/FAIL as appropriate.
+        Transitions state to RUNNING and SUCCESS/FAIL as appropriate and records heartbeat every second.
         """
         try:
             self.start()
             self.save(session)
 
             with self._handling_sigterm(session):
-                yield
+                async with self._heartbeating(session):
+                    yield
 
             self.success()
             self.save(session)
@@ -154,6 +157,28 @@ class Job(SystemModel):  # noqa: WPS214
 
         return self
 
+    def _heartbeat(self):
+        self.last_heartbeat_at = datetime.utcnow()
+
+    async def _heartbeater(self, session):
+        while True:
+            self._heartbeat()
+            self.save(session)
+
+            await asyncio.sleep(1)
+
+    @asynccontextmanager
+    async def _heartbeating(self, session):
+        heartbeat_future = asyncio.ensure_future(self._heartbeater(session))
+        try:
+            yield
+        finally:
+            if not heartbeat_future.cancelled():
+                heartbeat_future.cancel()
+
+            with suppress(asyncio.CancelledError):
+                await heartbeat_future
+
     @contextmanager
     def _handling_sigterm(self, session):
         def handler(*_):  # noqa: WPS430
@@ -171,7 +196,7 @@ class Job(SystemModel):  # noqa: WPS214
         if isinstance(err, SystemExit):
             return "The process was terminated"
 
-        if isinstance(err, KeyboardInterrupt):
+        if isinstance(err, (KeyboardInterrupt, asyncio.CancelledError)):
             return "The process was interrupted"
 
         if str(err):

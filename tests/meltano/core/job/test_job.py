@@ -1,6 +1,7 @@
+import asyncio
 import signal
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import psutil
 import pytest
@@ -35,39 +36,56 @@ class TestJob:
         assert transition == (State.RUNNING, State.SUCCESS)
         subject.ended_at = datetime.utcnow()
 
-    def test_run(self, session):
+    @pytest.mark.asyncio
+    async def test_run(self, session):
         subject = self.sample_job().save(session)
 
         # A successful run will mark the subject as SUCCESS and set the `ended_at`
-        with subject.run(session):
+        async with subject.run(session):
             assert subject.state is State.RUNNING
             assert subject.ended_at is None
+
+            await asyncio.sleep(1)
+            original_heartbeat = subject.last_heartbeat_at
+            assert original_heartbeat is not None
+
+            # Heartbeat is recorded every second
+            await asyncio.sleep(2)
+            assert subject.last_heartbeat_at > original_heartbeat
+
+            # Yield to give heartbeat another chance to be updated
+            await asyncio.sleep(0)
 
         assert subject.state is State.SUCCESS
         assert subject.ended_at is not None
 
-    def test_run_failed(self, session):
+        # Allow one additional second of delay:
+        assert subject.ended_at - subject.last_heartbeat_at < timedelta(seconds=2)
+
+    @pytest.mark.asyncio
+    async def test_run_failed(self, session):
         # A failed run will mark the subject as FAILED an set the payload['error']
         subject = self.sample_job({"original_state": 1}).save(session)
         exception = Exception("This is a test.")
 
-        with pytest.raises(Exception) as e:
-            with subject.run(session):
+        with pytest.raises(Exception) as err:
+            async with subject.run(session):
                 raise exception
 
             # raise the same exception
-            assert e is exception
+            assert err is exception
 
         assert subject.state is State.FAIL
         assert subject.ended_at is not None
         assert subject.payload["original_state"] == 1
         assert subject.payload["error"] == "This is a test."
 
-    def test_run_interrupted(self, session):
+    @pytest.mark.asyncio
+    async def test_run_interrupted(self, session):
         subject = self.sample_job({"original_state": 1}).save(session)
 
-        with pytest.raises(KeyboardInterrupt) as e:
-            with subject.run(session):
+        with pytest.raises(KeyboardInterrupt):
+            async with subject.run(session):
                 psutil.Process().send_signal(signal.SIGINT)
 
         assert subject.state is State.FAIL
@@ -75,11 +93,12 @@ class TestJob:
         assert subject.payload["original_state"] == 1
         assert subject.payload["error"] == "The process was interrupted"
 
-    def test_run_terminated(self, session):
+    @pytest.mark.asyncio
+    async def test_run_terminated(self, session):
         subject = self.sample_job({"original_state": 1}).save(session)
 
         with pytest.raises(SystemExit):
-            with subject.run(session):
+            async with subject.run(session):
                 psutil.Process().terminate()
 
         assert subject.state is State.FAIL
