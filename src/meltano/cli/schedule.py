@@ -8,6 +8,7 @@ from pathlib import Path
 import click
 from click_default_group import DefaultGroup
 from meltano.core.db import project_engine
+from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 from meltano.core.tracking import GoogleAnalyticsTracker
@@ -70,22 +71,24 @@ def list(ctx, format):
     project = ctx.obj["project"]
     schedule_service = ctx.obj["schedule_service"]
 
-    if format == "text":
-        transform_elt_markers = {
-            "run": ("→", "→"),
-            "only": ("×", "→"),
-            "skip": ("→", "x"),
-        }
+    _, Session = project_engine(project)
+    session = Session()
+    try:
+        StaleJobFailer().fail_stale_jobs(session)
 
-        for schedule in schedule_service.schedules():
-            markers = transform_elt_markers[schedule.transform]
-            click.echo(
-                f"[{schedule.interval}] {schedule.name}: {schedule.extractor} {markers[0]} {schedule.loader} {markers[1]} transforms"
-            )
-    elif format == "json":
-        _, Session = project_engine(project)
-        session = Session()
-        try:
+        if format == "text":
+            transform_elt_markers = {
+                "run": ("→", "→"),
+                "only": ("×", "→"),
+                "skip": ("→", "x"),
+            }
+
+            for schedule in schedule_service.schedules():
+                markers = transform_elt_markers[schedule.transform]
+                click.echo(
+                    f"[{schedule.interval}] {schedule.name}: {schedule.extractor} {markers[0]} {schedule.loader} {markers[1]} transforms"
+                )
+        elif format == "json":
             schedules = []
             for schedule in schedule_service.schedules():
                 start_date = coerce_datetime(schedule.start_date)
@@ -113,10 +116,10 @@ def list(ctx, format):
                         "elt_args": schedule.elt_args,
                     }
                 )
-        finally:
-            session.close()
 
-        print(json.dumps(schedules, indent=2))
+            print(json.dumps(schedules, indent=2))
+    finally:
+        session.close()
 
 
 @schedule.command(
