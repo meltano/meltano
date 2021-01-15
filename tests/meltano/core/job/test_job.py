@@ -5,7 +5,12 @@ from datetime import datetime, timedelta
 
 import psutil
 import pytest
-from meltano.core.job import Job, State
+from meltano.core.job.job import (
+    HEARTBEAT_VALID_MINUTES,
+    HEARTBEATLESS_JOB_VALID_HOURS,
+    Job,
+    State,
+)
 
 
 class TestJob:
@@ -113,3 +118,60 @@ class TestJob:
 
         job.save(session)
         assert job.run_id == run_id
+
+    def test_is_stale(self):
+        job = Job()
+
+        # Idle jobs are not stale
+        assert not job.is_stale()
+
+        # Jobs that were just started are not stale
+        job.start()
+        assert not job.is_stale()
+
+        # Jobs started more than 25 hours ago without a heartbeat are stale
+        offset = timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS + 1)
+        job.started_at = datetime.utcnow() - offset
+        assert job.is_stale()
+
+        # Jobs with a recent heartbeat are not stale
+        job._heartbeat()
+        assert not job.is_stale()
+
+        # Jobs without a heartbeat for 5 minutes are stale
+        offset = timedelta(minutes=HEARTBEAT_VALID_MINUTES + 1)
+        job.last_heartbeat_at = datetime.utcnow() - offset
+        assert job.is_stale()
+
+        # Completed jobs are not stale
+        job.success()
+        assert not job.is_stale()
+
+    def test_fail_stale(self):
+        job = Job()
+
+        # Leaves a job that isn't stale alone
+        assert not job.fail_stale()
+        assert not job.has_error()
+
+        # Fails a stale job without a heartbeat
+        job.start()
+        offset = timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS + 1)
+        job.started_at = datetime.utcnow() - offset
+
+        assert job.fail_stale()
+        assert job.has_error()
+        assert "24 hours" in job.payload["error"]
+
+        # Doesn't fail a job that's already failed
+        assert not job.fail_stale()
+
+        # Fails a stale job with a heartbeat
+        job = Job()
+        job.start()
+        offset = timedelta(minutes=HEARTBEAT_VALID_MINUTES + 1)
+        job.last_heartbeat_at = datetime.utcnow() - offset
+
+        assert job.fail_stale()
+        assert job.has_error()
+        assert "5 minutes" in job.payload["error"]

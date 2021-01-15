@@ -5,7 +5,7 @@ import os
 import signal
 import uuid
 from contextlib import contextmanager, suppress
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 
 import sqlalchemy.types as types
@@ -15,6 +15,9 @@ from meltano.core.models import SystemModel
 from meltano.core.sqlalchemy import GUID, IntFlag, JSONEncodedDict
 from sqlalchemy import Column
 from sqlalchemy.ext.mutable import MutableDict
+
+HEARTBEATLESS_JOB_VALID_HOURS = 24
+HEARTBEAT_VALID_MINUTES = 5
 
 
 class InconsistentStateError(Error):
@@ -76,6 +79,25 @@ class Job(SystemModel):  # noqa: WPS214
 
     def is_running(self):
         return self.state is State.RUNNING
+
+    def is_stale(self):
+        """
+        Return whether job has gone stale.
+
+        Running jobs with a heartbeat are considered stale after no heartbeat is recorded for 5 minutes.
+        Legacy jobs without a heartbeat are considered stale after being in the running state for 24 hours.
+        """
+        if not self.is_running():
+            return False
+
+        if self.last_heartbeat_at:
+            timestamp = self.last_heartbeat_at
+            valid_for = timedelta(minutes=HEARTBEAT_VALID_MINUTES)
+        else:
+            timestamp = self.started_at
+            valid_for = timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS)
+
+        return datetime.utcnow() - timestamp > valid_for
 
     def has_error(self):
         return self.state is State.FAIL
@@ -144,6 +166,20 @@ class Job(SystemModel):  # noqa: WPS214
     def success(self):
         self.ended_at = datetime.utcnow()
         self.transit(State.SUCCESS)
+
+    def fail_stale(self):
+        """Mark job as failed if it's gone stale."""
+        if not self.is_stale():
+            return False
+
+        if self.last_heartbeat_at:
+            reason = f"No heartbeat recorded for {HEARTBEAT_VALID_MINUTES} minutes."
+        else:
+            reason = f"Still running after {HEARTBEATLESS_JOB_VALID_HOURS} hours."
+
+        self.fail(f"{reason} The process was likely killed unceremoniously.")
+
+        return True
 
     def __repr__(self):
         return (
