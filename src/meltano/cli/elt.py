@@ -107,7 +107,7 @@ def elt(
     try:
         plugins_service = ProjectPluginsService(project)
 
-        context_builder = elt_context_builder(
+        context_builder = _elt_context_builder(
             project,
             job,
             session,
@@ -133,7 +133,7 @@ def elt(
     tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)
 
 
-def elt_context_builder(
+def _elt_context_builder(
     project,
     job,
     session,
@@ -149,7 +149,7 @@ def elt_context_builder(
 ):
     transform_name = None
     if transform != "skip":
-        transform_name = find_transform_for_extractor(
+        transform_name = _find_transform_for_extractor(
             extractor, plugins_service=plugins_service
         )
 
@@ -192,11 +192,11 @@ async def _run_job(project, job, session, context_builder):
         with job_logging_service.create_log(job.job_id, job.run_id) as log_file:
             output_logger = OutputLogger(log_file)
 
-            await run_elt(project, context_builder, output_logger)
+            await _run_elt(project, context_builder, output_logger)
 
 
 @asynccontextmanager
-async def redirect_output(output_logger):
+async def _redirect_output(output_logger):
     meltano_stdout = output_logger.out("meltano", stream=sys.stdout, color="blue")
     meltano_stderr = output_logger.out("meltano", color="blue")
 
@@ -209,25 +209,25 @@ async def redirect_output(output_logger):
                 raise
 
 
-async def run_elt(project, context_builder, output_logger):
-    async with redirect_output(output_logger):
+async def _run_elt(project, context_builder, output_logger):
+    async with _redirect_output(output_logger):
         try:
             elt_context = context_builder.context()
 
             if not elt_context.only_transform:
-                await run_extract_load(elt_context, output_logger)
+                await _run_extract_load(elt_context, output_logger)
             else:
                 logs("Extract & load skipped.", fg="yellow")
 
             if elt_context.transformer:
-                await run_transform(elt_context, output_logger)
+                await _run_transform(elt_context, output_logger)
             else:
                 logs("Transformation skipped.", fg="yellow")
         except RunnerError as err:
             raise CliError(f"ELT could not be completed: {err}") from err
 
 
-async def run_extract_load(elt_context, output_logger, **kwargs):
+async def _run_extract_load(elt_context, output_logger, **kwargs):  # noqa: WPS231
     extractor = elt_context.extractor.name
     loader = elt_context.loader.name
 
@@ -284,7 +284,7 @@ async def run_extract_load(elt_context, output_logger, **kwargs):
     logs("Extract & load complete!", fg="green")
 
 
-async def run_transform(elt_context, output_logger, **kwargs):
+async def _run_transform(elt_context, output_logger, **kwargs):
     transformer_log = output_logger.out(elt_context.transformer.name, color="magenta")
 
     logs("Running transformation...")
@@ -308,7 +308,7 @@ async def run_transform(elt_context, output_logger, **kwargs):
     logs("Transformation complete!", fg="green")
 
 
-def find_transform_for_extractor(extractor: str, plugins_service):
+def _find_transform_for_extractor(extractor: str, plugins_service):
     discovery_service = plugins_service.discovery_service
     try:
         extractor_plugin_def = discovery_service.find_definition(
