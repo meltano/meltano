@@ -1,9 +1,8 @@
-import asyncio
 import datetime
 import logging
 import os
 import sys
-from contextlib import contextmanager, suppress
+from contextlib import contextmanager
 
 import click
 from async_generator import asynccontextmanager
@@ -23,7 +22,7 @@ from meltano.core.transform_add_service import TransformAddService
 
 from . import cli
 from .params import pass_project
-from .utils import CliError, add_plugin, add_related_plugins
+from .utils import CliError, run_async
 
 DUMPABLES = {
     "catalog": (PluginType.EXTRACTORS, "catalog"),
@@ -195,24 +194,6 @@ def run_job(project, job, session, context_builder):
         output_logger = OutputLogger(log_file)
 
         run_async(run_elt(project, context_builder, output_logger))
-
-
-def run_async(coro):
-    loop = asyncio.get_event_loop()
-    try:
-        loop.run_until_complete(coro)
-    except asyncio.CancelledError:
-        pass
-    finally:
-        # The below is taken from https://stackoverflow.com/a/58532304
-        # and inspired by Python 3.7's `asyncio.run`
-        all_tasks = asyncio.gather(
-            *asyncio.Task.all_tasks(loop), return_exceptions=True
-        )
-        all_tasks.cancel()
-        with suppress(asyncio.CancelledError):
-            loop.run_until_complete(all_tasks)
-        loop.run_until_complete(loop.shutdown_asyncgens())
 
 
 @asynccontextmanager
