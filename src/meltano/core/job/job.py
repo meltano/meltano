@@ -1,7 +1,7 @@
+"""Defines Job model class."""
 import logging
 import os
 import signal
-import sys
 import uuid
 from contextlib import contextmanager
 from datetime import datetime
@@ -50,7 +50,9 @@ class Payload(IntFlag):
     INCOMPLETE_STATE = 2
 
 
-class Job(SystemModel):
+class Job(SystemModel):  # noqa: WPS214
+    """Model class that represents a `meltano elt` run in the system database."""
+
     __tablename__ = "job"
 
     id = Column(types.Integer, primary_key=True)
@@ -103,45 +105,28 @@ class Job(SystemModel):
 
     @contextmanager
     def run(self, session):
-        def handle_terminate(signal, frame):
-            if self.is_running():
-                self.fail(error="The process was terminated")
-                self.save(session)
+        """
+        Run wrapped code in context of a job.
 
-            sys.exit(143)
-
+        Transitions state to RUNNING and SUCCESS/FAIL as appropriate.
+        """
         try:
-            original_termination_handler = signal.signal(
-                signal.SIGTERM, handle_terminate
-            )
-
             self.start()
             self.save(session)
 
-            yield
+            with self._handling_sigterm(session):
+                yield
 
             self.success()
             self.save(session)
-        except KeyboardInterrupt:
-            if self.is_running():
-                self.fail(error="The process was interrupted")
-                self.save(session)
-
-            raise
         except BaseException as err:
-            if self.is_running():
-                if str(err):
-                    error = str(err)
-                else:
-                    error = repr(err)
+            if not self.is_running():
+                raise
 
-                self.fail(error=error)
-                self.save(session)
+            self.fail(error=self._error_message(err))
+            self.save(session)
 
             raise
-        finally:
-            if original_termination_handler:
-                signal.signal(signal.SIGTERM, original_termination_handler)
 
     def start(self):
         self.started_at = datetime.utcnow()
@@ -168,3 +153,28 @@ class Job(SystemModel):
         session.commit()
 
         return self
+
+    @contextmanager
+    def _handling_sigterm(self, session):
+        def handler(*_):  # noqa: WPS430
+            sigterm_status = 143
+            raise SystemExit(sigterm_status)
+
+        original_termination_handler = signal.signal(signal.SIGTERM, handler)
+
+        try:
+            yield
+        finally:
+            signal.signal(signal.SIGTERM, original_termination_handler)
+
+    def _error_message(self, err):
+        if isinstance(err, SystemExit):
+            return "The process was terminated"
+
+        if isinstance(err, KeyboardInterrupt):
+            return "The process was interrupted"
+
+        if str(err):
+            return str(err)
+
+        return repr(err)

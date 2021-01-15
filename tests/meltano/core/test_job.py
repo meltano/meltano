@@ -1,8 +1,6 @@
 import signal
-import sys
 import uuid
 from datetime import datetime
-from unittest import mock
 
 import psutil
 import pytest
@@ -79,16 +77,10 @@ class TestJob:
 
     def test_run_terminated(self, session):
         subject = self.sample_job({"original_state": 1}).save(session)
-        exception = Exception("Terminated")
 
-        with pytest.raises(Exception) as er:
-            with mock.patch.object(sys, "exit", side_effect=exception) as exit_mock:
-                with subject.run(session):
-                    psutil.Process().terminate()
-
-                exit_mock.assert_called_once_with(143)
-
-            assert e is exception
+        with pytest.raises(SystemExit):
+            with subject.run(session):
+                psutil.Process().terminate()
 
         assert subject.state is State.FAIL
         assert subject.ended_at is not None
