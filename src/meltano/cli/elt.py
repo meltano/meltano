@@ -10,6 +10,7 @@ from async_generator import asynccontextmanager
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job
+from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginNotFoundError
@@ -213,6 +214,8 @@ async def _run_elt(project, context_builder, output_logger):
     async with _redirect_output(output_logger):
         try:
             elt_context = context_builder.context()
+
+            StaleJobFailer(elt_context.job.job_id).fail_stale_jobs(elt_context.session)
 
             if not elt_context.only_transform:
                 await _run_extract_load(elt_context, output_logger)
