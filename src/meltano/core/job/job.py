@@ -58,6 +58,7 @@ class Job(SystemModel):
     run_id = Column(GUID, nullable=False, default=uuid.uuid4)
     state = Column(types.Enum(State, name="job_state"))
     started_at = Column(types.DateTime)
+    last_heartbeat_at = Column(types.DateTime)
     ended_at = Column(types.DateTime)
     payload = Column(MutableDict.as_mutable(JSONEncodedDict))
     payload_flags = Column(IntFlag, default=0)

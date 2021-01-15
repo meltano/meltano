@@ -203,6 +203,10 @@ wemake-python-styleguide = [
   "-WPS202",  # Allow many module members
 ]
 
+[tool.flakehell.exceptions."src/meltano/migrations/versions/"]
+flake8-docstrings = ["-D103"] # Don't require function docstrings in migrations
+wemake-python-styleguide = ["-WPS118"] # Allow long filenames
+
 [tool.flakehell.exceptions."**/__init__.py"]
 pyflakes = ["-F401"]  # Allow for using __init__.py to promote imports to the module namespace
 
