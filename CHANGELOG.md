@@ -10,17 +10,23 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2483](https://gitlab.com/meltano/meltano/-/issues/2483) Every second, `meltano elt` records a heartbeat timestamp on the pipeline run row in the system database as long as the pipeline is running.
-- [#2483](https://gitlab.com/meltano/meltano/-/issues/2483) Before running the new pipeline, `meltano elt` automatically marks runs with the same Job ID that have become stale as failed. A run is considered stale when 5 minutes have elapsed since the last recorded heartbeat. Older runs without a heartbeat are considered stale if they are still in the running state 24 hours after starting.
-- [#2483](https://gitlab.com/meltano/meltano/-/issues/2483) `meltano schedule list` (which is run periodically by `meltano invoke airflow scheduler`) automatically marks any stale run as failed.
-- [#2502](https://gitlab.com/meltano/meltano/-/issues/2502) Add `User-Agent` header with Meltano version to request for remote `discovery.yml` manifest (typically https://www.meltano.com/discovery.yml)
-- [#2503](https://gitlab.com/meltano/meltano/-/issues/2503) Include project ID in `X-Project-ID` header and `project_id` query param in request for remote `discovery.yml` manifest when `send_anonymous_usage_stats` setting is enabled.
-
 ### Changes
 
 ### Fixes
 
 ### Breaks
+
+
+## 1.66.0 - (2021-01-18)
+---
+
+### New
+
+- [#2483](https://gitlab.com/meltano/meltano/-/issues/2483) Every second, `meltano elt` records a heartbeat timestamp on the pipeline run row in the system database as long as the pipeline is running.
+- [#2483](https://gitlab.com/meltano/meltano/-/issues/2483) Before running the new pipeline, `meltano elt` automatically marks runs with the same Job ID that have become stale as failed. A run is considered stale when 5 minutes have elapsed since the last recorded heartbeat. Older runs without a heartbeat are considered stale if they are still in the running state 24 hours after starting.
+- [#2483](https://gitlab.com/meltano/meltano/-/issues/2483) `meltano schedule list` (which is run periodically by `meltano invoke airflow scheduler`) automatically marks any stale run as failed.
+- [#2502](https://gitlab.com/meltano/meltano/-/issues/2502) Add `User-Agent` header with Meltano version to request for remote `discovery.yml` manifest (typically https://www.meltano.com/discovery.yml)
+- [#2503](https://gitlab.com/meltano/meltano/-/issues/2503) Include project ID in `X-Project-ID` header and `project_id` query param in request for remote `discovery.yml` manifest when `send_anonymous_usage_stats` setting is enabled.
 
 
 ## 1.65.0 - (2021-01-12)
