@@ -1,18 +1,23 @@
+"""Defines Job model class."""
+import asyncio
 import logging
 import os
 import signal
-import sys
 import uuid
-from contextlib import contextmanager
-from datetime import datetime
+from contextlib import contextmanager, suppress
+from datetime import datetime, timedelta
 from enum import Enum
 
 import sqlalchemy.types as types
+from async_generator import asynccontextmanager
 from meltano.core.error import Error
 from meltano.core.models import SystemModel
 from meltano.core.sqlalchemy import GUID, IntFlag, JSONEncodedDict
 from sqlalchemy import Column
 from sqlalchemy.ext.mutable import MutableDict
+
+HEARTBEATLESS_JOB_VALID_HOURS = 24
+HEARTBEAT_VALID_MINUTES = 5
 
 
 class InconsistentStateError(Error):
@@ -50,7 +55,9 @@ class Payload(IntFlag):
     INCOMPLETE_STATE = 2
 
 
-class Job(SystemModel):
+class Job(SystemModel):  # noqa: WPS214
+    """Model class that represents a `meltano elt` run in the system database."""
+
     __tablename__ = "job"
 
     id = Column(types.Integer, primary_key=True)
@@ -58,6 +65,7 @@ class Job(SystemModel):
     run_id = Column(GUID, nullable=False, default=uuid.uuid4)
     state = Column(types.Enum(State, name="job_state"))
     started_at = Column(types.DateTime)
+    last_heartbeat_at = Column(types.DateTime)
     ended_at = Column(types.DateTime)
     payload = Column(MutableDict.as_mutable(JSONEncodedDict))
     payload_flags = Column(IntFlag, default=0)
@@ -71,6 +79,25 @@ class Job(SystemModel):
 
     def is_running(self):
         return self.state is State.RUNNING
+
+    def is_stale(self):
+        """
+        Return whether job has gone stale.
+
+        Running jobs with a heartbeat are considered stale after no heartbeat is recorded for 5 minutes.
+        Legacy jobs without a heartbeat are considered stale after being in the running state for 24 hours.
+        """
+        if not self.is_running():
+            return False
+
+        if self.last_heartbeat_at:
+            timestamp = self.last_heartbeat_at
+            valid_for = timedelta(minutes=HEARTBEAT_VALID_MINUTES)
+        else:
+            timestamp = self.started_at
+            valid_for = timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS)
+
+        return datetime.utcnow() - timestamp > valid_for
 
     def has_error(self):
         return self.state is State.FAIL
@@ -100,47 +127,31 @@ class Job(SystemModel):
 
         return transition
 
-    @contextmanager
-    def run(self, session):
-        def handle_terminate(signal, frame):
-            if self.is_running():
-                self.fail(error="The process was terminated")
-                self.save(session)
+    @asynccontextmanager
+    async def run(self, session):
+        """
+        Run wrapped code in context of a job.
 
-            sys.exit(143)
-
+        Transitions state to RUNNING and SUCCESS/FAIL as appropriate and records heartbeat every second.
+        """
         try:
-            original_termination_handler = signal.signal(
-                signal.SIGTERM, handle_terminate
-            )
-
             self.start()
             self.save(session)
 
-            yield
+            with self._handling_sigterm(session):
+                async with self._heartbeating(session):
+                    yield
 
             self.success()
             self.save(session)
-        except KeyboardInterrupt:
-            if self.is_running():
-                self.fail(error="The process was interrupted")
-                self.save(session)
-
-            raise
         except BaseException as err:
-            if self.is_running():
-                if str(err):
-                    error = str(err)
-                else:
-                    error = repr(err)
+            if not self.is_running():
+                raise
 
-                self.fail(error=error)
-                self.save(session)
+            self.fail(error=self._error_message(err))
+            self.save(session)
 
             raise
-        finally:
-            if original_termination_handler:
-                signal.signal(signal.SIGTERM, original_termination_handler)
 
     def start(self):
         self.started_at = datetime.utcnow()
@@ -156,6 +167,20 @@ class Job(SystemModel):
         self.ended_at = datetime.utcnow()
         self.transit(State.SUCCESS)
 
+    def fail_stale(self):
+        """Mark job as failed if it's gone stale."""
+        if not self.is_stale():
+            return False
+
+        if self.last_heartbeat_at:
+            reason = f"No heartbeat recorded for {HEARTBEAT_VALID_MINUTES} minutes."
+        else:
+            reason = f"Still running after {HEARTBEATLESS_JOB_VALID_HOURS} hours."
+
+        self.fail(f"{reason} The process was likely killed unceremoniously.")
+
+        return True
+
     def __repr__(self):
         return (
             "<Job(id='%s', job_id='%s', state='%s', started_at='%s', ended_at='%s')>"
@@ -167,3 +192,50 @@ class Job(SystemModel):
         session.commit()
 
         return self
+
+    def _heartbeat(self):
+        self.last_heartbeat_at = datetime.utcnow()
+
+    async def _heartbeater(self, session):
+        while True:
+            self._heartbeat()
+            self.save(session)
+
+            await asyncio.sleep(1)
+
+    @asynccontextmanager
+    async def _heartbeating(self, session):
+        heartbeat_future = asyncio.ensure_future(self._heartbeater(session))
+        try:
+            yield
+        finally:
+            if not heartbeat_future.cancelled():
+                heartbeat_future.cancel()
+
+            with suppress(asyncio.CancelledError):
+                await heartbeat_future
+
+    @contextmanager
+    def _handling_sigterm(self, session):
+        def handler(*_):  # noqa: WPS430
+            sigterm_status = 143
+            raise SystemExit(sigterm_status)
+
+        original_termination_handler = signal.signal(signal.SIGTERM, handler)
+
+        try:
+            yield
+        finally:
+            signal.signal(signal.SIGTERM, original_termination_handler)
+
+    def _error_message(self, err):
+        if isinstance(err, SystemExit):
+            return "The process was terminated"
+
+        if isinstance(err, (KeyboardInterrupt, asyncio.CancelledError)):
+            return "The process was interrupted"
+
+        if str(err):
+            return str(err)
+
+        return repr(err)

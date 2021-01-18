@@ -179,7 +179,7 @@ class TestSingerRunner:
         subject.context.full_refresh = full_refresh
         subject.context.select_filter = select_filter
 
-        with subject.context.job.run(session):
+        async with subject.context.job.run(session):
             with mock.patch.object(
                 session, "add", side_effect=session.add
             ) as add_mock, mock.patch.object(
