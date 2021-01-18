@@ -14,8 +14,8 @@ from meltano.core.job.job import (
 
 
 class TestJob:
-    def sample_job(self, payload={}):
-        return Job(job_id="meltano:sample-elt", state=State.IDLE, payload=payload)
+    def sample_job(self, payload=None):
+        return Job(job_id="meltano:sample-elt", state=State.IDLE, payload=payload or {})
 
     def test_save(self, session):
         subject = self.sample_job().save(session)
@@ -23,7 +23,8 @@ class TestJob:
         assert subject.id > 0
 
     def test_load(self, session):
-        [session.add(self.sample_job({"key": i})) for i in range(0, 10)]
+        for key in range(0, 10):
+            session.add(self.sample_job({"key": key}))
 
         subjects = session.query(Job).filter_by(job_id="meltano:sample-elt")
 
