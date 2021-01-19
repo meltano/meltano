@@ -490,16 +490,52 @@ export TARGET_SNOWFLAKE_DEFAULT_TARGET_SCHEMA_SELECT_PERMISSION=<roles>
 
 Useful if you want to load multiple streams from one tap to multiple Snowflake schemas.
 
-If the tap sends the `stream_id` in `<schema_name>-<table_name>` format then this option overwrites the `default_target_schema` value. Note, that using `schema_mapping` you can overwrite the `default_target_schema_select_permission` value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.
+If the tap sends the `stream_id` in `<schema_name>-<table_name>` format then this option overwrites the `default_target_schema` value.
+
+Note, that using `schema_mapping` you can overwrite the `default_target_schema_select_permission` value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.
+
+This setting can hold an object mapping source schema names to objects with `target_schema` and (optionally) `target_schema_select_permissions` keys.
 
 #### How to use
 
-Manage this setting using [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
+Manage this setting directly in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):
+
+```yml{5-15}
+plugins:
+  loaders:
+  - name: target-snowflake
+    variant: transferwise
+    config:
+      schema_mapping:
+        <source_schema>:
+          target_schema: <target_schema>
+          target_schema_select_permissions: [<role1>, <role2>] # Optional
+        # ...
+
+        # For example:
+        public:
+          target_schema: repl_sf_public
+          target_schema_select_permissions: [grp_stats]
+```
+
+Alternatively, manage this setting using [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config target-snowflake set schema_mapping <mapping>
+meltano config target-snowflake set schema_mapping <source_schema> target_schema <target_schema>
+meltano config target-snowflake set schema_mapping <source_schema> target_schema_select_permissions '["<role>", ...]'
 
-export TARGET_SNOWFLAKE_SCHEMA_MAPPING=<mapping>
+export TARGET_SNOWFLAKE_SCHEMA_MAPPING='{"<source_schema>": {"target_schema": "<target_schema>", ...}, ...}'
+
+# Once a schema mapping has been set in `meltano.yml`, environment variables can be used
+# to override specific nested properties:
+export TARGET_SNOWFLAKE_SCHEMA_MAPPING_<SOURCE_SCHEMA>_TARGET_SCHEMA=<target_schema>
+export TARGET_SNOWFLAKE_SCHEMA_MAPPING_<SOURCE_SCHEMA>_TARGET_SCHEMA_SELECT_PERMISSIONS='["<role>", ...]'
+
+# For example:
+meltano config target-snowflake set schema_mapping public target_schema repl_sf_public
+meltano config target-snowflake set schema_mapping public target_schema_select_permissions '["grp_stats"]'
+
+export TARGET_SNOWFLAKE_SCHEMA_MAPPING_PUBLIC_TARGET_SCHEMA=new_repl_sf_public
 ```
 
 ### Disable Table Cache

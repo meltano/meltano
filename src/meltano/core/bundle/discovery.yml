@@ -1310,6 +1310,7 @@ loaders:
               Useful if you want to load multiple streams from one tap to multiple Postgres schemas.
 
               If the tap sends the `stream_id` in `<schema_name>-<table_name>` format then this option overwrites the `default_target_schema` value.
+              Note, that using `schema_mapping` you can overwrite the `default_target_schema_select_permission` value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.
           - name: add_metadata_columns
             kind: boolean
             value: false
@@ -1542,7 +1543,8 @@ loaders:
             description: >
               Useful if you want to load multiple streams from one tap to multiple Snowflake schemas.
 
-              If the tap sends the `stream_id` in `<schema_name>-<table_name>` format then this option overwrites the `default_target_schema` value. Note, that using `schema_mapping` you can overwrite the `default_target_schema_select_permission` value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.
+              If the tap sends the `stream_id` in `<schema_name>-<table_name>` format then this option overwrites the `default_target_schema` value.
+              Note, that using `schema_mapping` you can overwrite the `default_target_schema_select_permission` value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.
           - name: disable_table_cache
             kind: boolean
             value: false
