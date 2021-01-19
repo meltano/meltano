@@ -56,6 +56,8 @@ Follow the remaining step of the [Getting Started guide](/docs/getting-started.h
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, refer to the ["Troubleshooting" section](#troubleshooting) below or [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `target-postgres` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -496,3 +498,13 @@ meltano config target-postgres set after_run_sql <sql>
 
 export TARGET_POSTGRES_AFTER_RUN_SQL=<sql>
 ```
+
+## Troubleshooting
+
+### Error: `psycopg2.ProgrammingError: syntax error at or near "-"`
+
+This error message indicates that the extractor you are using this loader with generates
+stream names that include the source database schema in addition to the table name: `<schema>-<table>`, e.g. `public-accounts`.
+This is not supported by [this variant](#alternative-variants) of `target-postgres`.
+
+Instead, use the [`transferwise` variant](/plugins/loaders/postgres--transferwise.html) which was made to be used with extractors that behave this way.
