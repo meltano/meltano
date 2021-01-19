@@ -67,6 +67,8 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `tap-mysql` requires the [configuration](/docs/configuration.html) of the following settings:
