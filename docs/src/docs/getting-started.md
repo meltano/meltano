@@ -115,6 +115,18 @@ will hold the [plugins](/docs/plugins.html) that implement the various details o
     docker run -v $(pwd):/projects -w /projects meltano/meltano init my-meltano-project
     ```
 
+    This will create a new directory with, among other things, your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):
+
+    ```yml
+    version: 1
+    send_anonymous_usage_stats: true
+    project_id: <random UUID>
+    ```
+
+    It doesn't define any [plugins](/docs/project.html#plugins) or [pipeline schedules](/docs/project.html#schedules) yet,
+    but note that the [`send_anonymous_usage_stats` setting](/docs/settings.html#send-anonymous-usage-stats) is enabled by default.
+    To disable it, change the value to `false` and optionally remove the [`project_id` setting](/docs/settings.html#project-id).
+
 1. Navigate to the newly created project directory:
 
     ```bash
@@ -169,6 +181,16 @@ by checking the [Sources list](/plugins/extractors/) or using [`meltano discover
       docker run -v $(pwd):/project -w /project meltano/meltano add extractor tap-gitlab
       ```
 
+      This will add the new plugin to your [`meltano.yml` project file](/docs/project.html#plugins):
+
+      ```yml{3-5}
+      plugins:
+        extractors:
+        - name: tap-gitlab
+          variant: meltano
+          pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+      ```
+
       You can now continue to step 4.
 
     - If an extractor is **not yet discoverable**, find out if a Singer tap for your data source already exists by checking [Singer's index of taps](https://www.singer.io/#taps) and/or doing a web search for `Singer tap <data source>`, e.g. `Singer tap COVID-19`.
@@ -190,6 +212,25 @@ by checking the [Sources list](/plugins/extractors/) or using [`meltano discover
         ```
 
         Meltano will now ask you some additional questions to learn more about the plugin.
+
+        This will add the new plugin to your [`meltano.yml` project file](/docs/project.html#plugins):
+
+        ```yml{3-14}
+        plugins:
+          extractors:
+          - name: tap-covid-19
+            namespace: tap_covid_19
+            pip_url: tap-covid-19
+            executable: tap-covid-19
+            capabilities:
+            - catalog
+            - discover
+            - state
+            settings:
+            - name: api_token
+            - name: user_agent
+            - name: start_date
+        ```
 
         *To learn more about adding custom plugins, refer to the [Plugin Management guide](/docs/plugin-management.html#custom-plugins).*
 
@@ -259,8 +300,27 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     meltano config <plugin> set <setting> <value>
 
     # For example:
-    meltano config tap-gitlab set projects meltano/meltano
+    meltano config tap-gitlab set projects "meltano/meltano meltano/tap-gitlab"
     meltano config tap-gitlab set start_date 2020-05-01T00:00:00Z
+    meltano config tap-gitlab set private_token my_private_token
+    ```
+
+    This will add the non-sensitive configuration to your [`meltano.yml` project file](/docs/project.html#plugin-configuration):
+
+    ```yml{5-7}
+    plugins:
+      extractors:
+      - name: tap-gitlab
+        variant: meltano
+        config:
+          projects: meltano/meltano meltano/tap-gitlab
+          start_date: '2020-10-01T00:00:00Z'
+    ```
+
+    Sensitive configuration (like `private_token`) will instead be stored in your project's [`.env` file](/docs/project.html#env) so that it will not be checked into version control:
+
+    ```bash
+    export TAP_GITLAB_PRIVATE_TOKEN=my_private_token
     ```
 
 1. Optionally, verify that the configuration looks like what the Singer tap expects according to its documentation using [`meltano config <plugin>`](/docs/command-line-interface.html#config):
@@ -270,6 +330,21 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
 
     # For example:
     meltano config tap-gitlab
+    ```
+
+    This will show the current configuration:
+
+    ```json
+    {
+      "api_url": "https://gitlab.com",
+      "private_token": "my_private_token",
+      "groups": "",
+      "projects": "meltano/meltano meltano/tap-gitlab",
+      "ultimate_license": false,
+      "fetch_merge_request_commits": false,
+      "fetch_pipelines_extended": false,
+      "start_date": "2020-10-01T00:00:00Z"
+    }
     ```
 
 ### Select entities and attributes to extract
@@ -322,6 +397,21 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
     ```
 
     As you can see in the example, entity and attribute identifiers can contain wildcards (`*`) to match multiple entities or attributes at once.
+
+    This will add the [selection rules](/docs/plugins.html#select-extra) to your [`meltano.yml` project file](/docs/project.html#plugin-configuration):
+
+    ```yml{4-10}
+    plugins:
+      extractors:
+      - name: tap-covid-19
+        select:
+        - eu_daily.date
+        - eu_daily.country
+        - eu_daily.cases
+        - eu_daily.deaths
+        - eu_ecdc_daily.*
+        - '!*.git_*'
+    ```
 
 1. Optionally, verify that only the intended entities and attributes are now selected using [`meltano select --list`](/docs/command-line-interface.html#select):
 
@@ -387,6 +477,24 @@ Most database extractors, on the other hand, support two or more of the followin
     meltano config tap-postgres set _metadata some_entity_id replication-key id
     ```
 
+    This will add the [metadata rules](/docs/plugins.html#metadata-extra) to your [`meltano.yml` project file](/docs/project.html#plugin-configuration):
+
+    ```yml{4-13}
+    plugins:
+      extractors:
+      - name: tap-gitlab
+        metadata:
+          some_entity_id:
+            replication-method: INCREMENTAL
+            replication-key: id
+          other_entity:
+            replication-method: FULL_TABLE
+          '*':
+            replication-method: INCREMENTAL
+          '*_full':
+            replication-method: FULL_TABLE
+    ```
+
 1. Optionally, verify that the [stream metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata) for each table was set correctly in the extractor's [generated catalog file](/docs/integration.html#extractor-catalog-generation) by dumping it using [`meltano invoke --dump=catalog <plugin>`](/docs/command-line-interface.html#select):
 
     ```bash
@@ -427,6 +535,16 @@ by checking the [Destinations list](/plugins/loaders/) or using [`meltano discov
       meltano add loader target-postgres --variant=transferwise
       ```
 
+      This will add the new plugin to your [`meltano.yml` project file](/docs/project.html#plugins):
+
+      ```yml{3-5}
+      plugins:
+        loaders:
+        - name: target-postgres
+          variant: datamill-co
+          pip_url: singer-target-postgres
+      ```
+
       You can now continue to step 4.
 
     - If a loader is **not yet discoverable**, find out if a Singer target for your data source already exists by checking [Singer's index of targets](https://www.singer.io/#targets) and/or doing a web search for `Singer target <data destination>`, e.g. `Singer target BigQuery`.
@@ -448,6 +566,21 @@ by checking the [Destinations list](/plugins/loaders/) or using [`meltano discov
         ```
 
         Meltano will now ask you some additional questions to learn more about the plugin.
+
+        This will add the new plugin to your [`meltano.yml` project file](/docs/project.html#plugins):
+
+        ```yml{3-10}
+        plugins:
+          loaders:
+          - name: target-bigquery
+            namespace: target_bigquery
+            pip_url: target-bigquery
+            executable: target-bigquery
+            settings:
+            - name: project_id
+            - name: dataset_id
+            - name: table_id
+        ```
 
         *To learn more about adding custom plugins, refer to the [Plugin Management guide](/docs/plugin-management.html#custom-plugins).*
 
@@ -525,6 +658,27 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     meltano config target-postgres set postgres_schema public
     ```
 
+    This will add the non-sensitive configuration to your [`meltano.yml` project file](/docs/project.html#plugin-configuration):
+
+    ```yml{5-10}
+    plugins:
+      loaders:
+      - name: target-bigquery
+        variant: datamill-co
+        config:
+          postgres_host: localhost
+          postgres_port: 5432
+          postgres_username: meltano
+          postgres_database: warehouse
+          postgres_schema: public
+    ```
+
+    Sensitive configuration (like `postgres_password`) will instead be stored in your project's [`.env` file](/docs/project.html#env) so that it will not be checked into version control:
+
+    ```bash
+    export TARGET_POSTGRES_PASSWORD=meltano
+    ```
+
 1. Optionally, verify that the configuration looks like what the Singer target expects according to its documentation using [`meltano config <plugin>`](/docs/command-line-interface.html#config):
 
     ```bash
@@ -532,6 +686,19 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
 
     # For example:
     meltano config target-postgres
+    ```
+
+    This will show the current configuration:
+
+    ```json
+    {
+      "postgres_host": "localhost",
+      "postgres_port": 5432,
+      "postgres_username": "meltano",
+      "postgres_password": "meltano",
+      "postgres_database": "warehouse",
+      "postgres_schema": "public"
+    }
     ```
 
 ## Run a data integration (EL) pipeline
@@ -600,8 +767,19 @@ To help you realize this, Meltano supports scheduled pipelines that can be orche
     meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily
     ```
 
-    The `pipeline name` argument corresponds to the `--job_id` flag on `meltano elt`, which identifies related EL(T) runs when storing and looking up [incremental replication state](/docs/integration.html#incremental-replication-state).
+    The `pipeline name` argument corresponds to the `--job_id` option on `meltano elt`, which identifies related EL(T) runs when storing and looking up [incremental replication state](/docs/integration.html#incremental-replication-state).
     To have scheduled runs pick up where your [earlier manual run](#run-a-data-integration-el-pipeline) left off, ensure you use the same pipeline name.
+
+    This will add the new schedule to your [`meltano.yml` project file](/docs/project.html#schedules):
+
+    ```yml{2-6}
+    schedules:
+    - name: gitlab-to-postgres
+      extractor: tap-gitlab
+      loader: target-postgres
+      transform: skip
+      interval: '@daily'
+    ```
 
 1. Optionally, verify that the schedule was created successfully using [`meltano schedule list`](/docs/command-line-interface.html#schedule):
 
@@ -615,7 +793,16 @@ To help you realize this, Meltano supports scheduled pipelines that can be orche
     meltano add orchestrator airflow
     ```
 
-    This will automatically add a
+    This will add the new plugin to your [`meltano.yml` project file](/docs/project.html#plugins):
+
+    ```yml{3-4}
+    plugins:
+      orchestrators:
+      - name: airflow
+        pip_url: apache-airflow==1.10.12
+    ```
+
+    It will also automatically add a
 [`meltano elt` DAG generator](https://gitlab.com/meltano/files-airflow/-/blob/master/bundle/orchestrate/dags/meltano.py)
 to your project's `orchestrate/dags` directory, where Airflow
 will be configured to look for [DAGs](https://airflow.apache.org/docs/stable/concepts.html#dags) by default.
@@ -628,6 +815,8 @@ will be configured to look for [DAGs](https://airflow.apache.org/docs/stable/con
     # Add `-D` to run the scheduler in the background:
     meltano invoke airflow scheduler -D
     ```
+
+    As long as the scheduler is running, your scheduled pipelines will run at the appropriate times.
 
 1. Optionally, verify that a [DAG](https://airflow.apache.org/docs/stable/concepts.html#dags) was automatically created for each scheduled pipeline by starting the [Airflow web interface](https://airflow.apache.org/docs/stable/cli-ref.html#webserver):
 
