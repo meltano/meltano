@@ -1302,6 +1302,8 @@ loaders:
             kind: integer
             value: 16
             description: Max number of parallel threads to use when flushing tables.
+          - name: default_target_schema_select_permission
+            description: Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific role or a list of roles. If `schema_mapping` is not defined then every stream sent by the tap is granted accordingly.
           - name: schema_mapping
             kind: object
             description: >

@@ -285,6 +285,23 @@ meltano config target-postgres set parallelism_max 8
 export TARGET_POSTGRES_PARALLELISM_MAX=8
 ```
 
+### Default Target Schema Select Permission
+
+- Name: `default_target_schema_select_permission`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_POSTGRES_DEFAULT_TARGET_SCHEMA_SELECT_PERMISSION`
+
+Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific role or a list of roles. If `schema_mapping` is not defined then every stream sent by the tap is granted accordingly.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config target-snowflake set default_target_schema_select_permission <roles>
+
+export TARGET_POSTGRES_DEFAULT_TARGET_SCHEMA_SELECT_PERMISSION=<roles>
+```
+
 ### Schema Mapping
 
 - Name: `schema_mapping`
