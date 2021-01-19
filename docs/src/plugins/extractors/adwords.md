@@ -309,7 +309,16 @@ plugins:
 Alternatively, manage this setting using [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config tap-adwords set primary_keys '{"<REPORT_NAME>": ["<key>", ...], ...}'
+meltano config tap-adwords set primary_keys <REPORT_NAME> '["<key>", ...]'
 
 export TAP_ADWORDS_PRIMARY_KEYS='{"<REPORT_NAME>": ["<key>", ...], ...}'
+
+# Once primary keys have been set in `meltano.yml`, environment variables can be used
+# to override specific nested properties:
+export TAP_ADWORDS_PRIMARY_KEYS_<REPORT_NAME>=='["<key>", ...]'
+
+# For example:
+meltano config tap-adwords set primary_keys KEYWORDS_PERFORMANCE_REPORT '["customerID"]'
+
+export TAP_ADWORDS_PRIMARY_KEYS_KEYWORDS_PERFORMANCE_REPORT='["customerID"]'
 ```
