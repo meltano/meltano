@@ -296,7 +296,7 @@ These [nested properties](/docs/command-line-interface.html#nested-properties) c
 Entity and attribute names can be discovered using [`meltano select --list --all <plugin>`](/docs/command-line-interface.html#select).
 
 If a schema is specified for a property that does not yet exist in the discovered stream's schema, the property (and its schema) will be added to the catalog.
-This allows you to define a full schema for taps such as [`tap-dynamo-db`](https://github.com/singer-io/tap-dynamodb) that do not themselves have the ability to discover the schema of their streams.
+This allows you to define a full schema for taps such as [`tap-dynamodb`](https://github.com/singer-io/tap-dynamodb) that do not themselves have the ability to discover the schema of their streams.
 
 ##### How to use
 
