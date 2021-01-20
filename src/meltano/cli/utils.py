@@ -285,6 +285,10 @@ def add_plugin(
                 "3. Check if the configuration is still valid (and make changes until it is):"
             )
             click.echo(f"\tmeltano config {plugin.name} list")
+            click.echo()
+            click.echo(
+                "To learn more, visit https://www.meltano.com/docs/plugin-management.html#switching-from-one-variant-to-another"
+            )
 
             click.echo()
             click.echo(
@@ -297,6 +301,11 @@ def add_plugin(
                 "\tmeltano add {type} {name}--{variant} --inherit-from {name} --variant {variant}".format(
                     type=plugin_type.singular, name=plugin.name, variant=variant.name
                 )
+            )
+
+            click.echo()
+            click.echo(
+                "To learn more, visit https://www.meltano.com/docs/plugin-management.html#multiple-variants"
             )
         else:
             click.echo(

@@ -106,6 +106,8 @@ plugins:
 
 If you'd like to use multiple variants of the same discoverable plugin in your project at the same time, refer to ["Multiple variants" under "Explicit inheritance"](#multiple-variants) below.
 
+If you've already added one variant to your project and would like to switch to another, refer to the ["Switching from one variant to another" section](#switching-from-one-variant-to-another) below.
+
 #### Explicit inheritance
 
 In the examples we've considered so far, plugins in your project implicitly inherit their
@@ -360,7 +362,7 @@ If you've forked a plugin's repository and made changes to it, you can update yo
       pip_url: git+ssh://git@gitlab.com/meltano/tap-gitlab.git
       ```
 
-1. Re-install the plugin from the new `pip_url` using [`meltano install`](/docs/command-line-interface.html#install):
+1. Reinstall the plugin from the new `pip_url` using [`meltano install`](/docs/command-line-interface.html#install):
 
     ```bash
     meltano install <type> <name>
@@ -370,6 +372,94 @@ If you've forked a plugin's repository and made changes to it, you can update yo
     ```
 
 If your fork supports additional settings, you can set them as [custom settings](/docs/configuration.html#custom-settings).
+
+## Switching from one variant to another
+
+The default [variant](/docs/plugins.html#variants) of a [discoverable plugin](/docs/plugins.html#discoverable-plugins)
+is recommended for new users, but may not always be a perfect fit for your use case.
+
+If you've already added one variant to your project and would like to use another instead,
+you can [add the new variant as a separate plugin](#multiple-variants) or switch your existing plugin over to the new variant:
+
+1. Modify the plugin definition's `variant` and `pip_url` properties in the [`plugins` section](/docs/project.html#plugins) of your [`meltano.yml` project file](/docs/project.html):
+
+    ```yml{12-13}
+    # Before:
+    plugins:
+      loaders:
+      - name: target-postgres
+        variant: datamill-co
+        pip_url: singer-target-postgres
+
+    # After:
+    plugins:
+      loaders:
+      - name: target-postgres
+        variant: meltano
+        pip_url: git+https://github.com/meltano/target-postgres.git # Optional
+    ```
+
+    If you don't know the new variant's `pip_url` (its [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument),
+    you can remove this property entirely so that Meltano will fall back on the default.
+
+1. Reinstall the plugin from the new `pip_url` using [`meltano install`](/docs/command-line-interface.html#install):
+
+    ```bash
+    meltano install <type> <name>
+
+    # For example:
+    meltano install loader target-postgres
+    ```
+
+1. View the current configuration using [`meltano config <name> list`](/docs/command-line-interface.html#config) to see if it is still valid:
+
+    ```bash
+    meltano config <name> list
+
+    # For example:
+    meltano config target-postgres list
+    ```
+
+    Because different variants often use different setting names,
+    you will likely see some of the settings used by the old variant show up as
+    [custom settings](/docs/configuration.html#custom-settings),
+    indicating that they are not supported by the new variant,
+    while settings that the new variant expects show up with a `None` or default value.
+
+1. Assuming at least one setting did not carry over correctly from the old variant to the new variant,
+    modify the plugin's configuration in your [`meltano.yml` project file](/docs/project.html#plugin-configuration) to use the new setting names:
+
+    ```yml{10-13}
+    # Before:
+    config:
+      postgres_host: postgres.example.com
+      postgres_port: 5432
+      postgres_username: my_user
+      postgres_database: my_database
+
+    # After:
+    config:
+      host: postgres.example.com
+      port: 5432
+      user: my_user
+      dbname: my_database
+    ```
+
+    If any of the old settings are stored in [places other than `meltano.yml`](/docs/configuration.html#configuration-layers),
+    like a sensitive setting that may be stored in your project's [`.env` file](/docs/project.html#env),
+    you can unset the old setting and set the new one using [`meltano config`](/docs/command-line-interface.html#config):
+
+    ```bash
+    meltano config <name> unset <old_setting>
+    meltano config <name> set <setting> <value>
+
+    # For example:
+    meltano config target-postgres unset postgres_password
+    meltano config target-postgres set password my_password
+    ```
+
+    Keep doing this until `meltano config <name> list` shows a valid configuration for the new variant,
+    without any of the old variant's settings remaining as [custom settings](/docs/configuration.html#custom-settings).
 
 ## Meltano UI
 
