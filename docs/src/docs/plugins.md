@@ -273,7 +273,7 @@ meltano config tap-postgres set _metadata some_stream_id replication-method INCR
 meltano config tap-postgres set _metadata some_stream_id replication-key created_at
 meltano config tap-postgres set _metadata some_stream_id created_at is-replication-key true
 
-export TAP_POSTGRES__METADATA_SOME_TABLE_REPLICATION_METHOD=FULL_TABLE
+export TAP_POSTGRES__METADATA_SOME_STREAM_ID_REPLICATION_METHOD=FULL_TABLE
 ```
 
 #### `schema` extra
@@ -328,7 +328,7 @@ export <EXTRACTOR>__SCHEMA_<ENTITY>_<ATTRIBUTE>_<KEY>=<value>
 meltano config tap-postgres set _metadata some_stream_id created_at type '["string", "null"]'
 meltano config tap-postgres set _metadata some_stream_id created_at format date-time
 
-export TAP_POSTGRES__SCHEMA_SOME_TABLE_CREATED_AT_FORMAT=date
+export TAP_POSTGRES__SCHEMA_SOME_STREAM_ID_CREATED_AT_FORMAT=date
 ```
 
 #### `select` extra
