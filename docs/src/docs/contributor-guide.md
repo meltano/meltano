@@ -155,10 +155,23 @@ export MELTANO_UI_URL = ""
 
 ## Discoverable plugins
 
-[Discoverable plugins](/docs/plugins.html#discoverable-plugins) are defined in the `discovery.yml` manifest, which can be found inside the Meltano repository at [`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
+[Discoverable plugins](/docs/plugins.html#discoverable-plugins) that are supported out of the box are defined in the `discovery.yml` manifest,
+which can be found inside the Meltano repository at
+[`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
 
-If you've added a [custom plugin](/docs/plugins.html#custom-plugins) (or [variant](/docs/plugins.html#variants)) to your project that you think should be discoverable and supported out of the box, please contribute a change to that file.
-All you'll need is the [custom plugin definition](/docs/project.html#custom-plugin-definitions) from your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), which has the same format as discoverable plugin definitions in `discovery.yml`.
+If you've added a [custom plugin](/docs/plugins.html#custom-plugins) (or [variant](/docs/plugins.html#variants)) to your project that could be discoverable and supported out of the box for new users, please contribute its description to this file to save the next user the hassle of setting up the custom plugin.
+The [GitLab Web IDE](https://docs.gitlab.com/ee/user/project/web_ide/) makes it very easy to contribute changes without requiring you to leave your browser.
+
+Discoverable plugin definitions in `discovery.yml` have the same format as [custom plugin definition](/docs/project.html#custom-plugin-definitions) in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), so a copy-paste is usually sufficient.
+The format and further requirements are laid out in more detail below.
+
+Besides the new definition in `discovery.yml`, a new discoverable plugin should be documented in the
+[Sources](/plugins/extractors/) or [Destinations](/plugins/loaders/) section of this website,
+which live inside the repository under
+[`docs/src/plugins/extractors`](https://gitlab.com/meltano/meltano/-/tree/master/docs/src/plugins/extractors) and
+[`docs/src/plugins/loaders`](https://gitlab.com/meltano/meltano/-/tree/master/docs/src/plugins/loaders).
+However, it is _not_ required to include documentation when you contribute a new plugin definition to `discovery.yml`,
+as members of the core team are happy to any missing docs themselves as part of the review process.
 
 ### Plugin definitions
 
