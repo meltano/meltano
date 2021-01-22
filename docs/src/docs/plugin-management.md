@@ -75,7 +75,7 @@ If the `variant` property were omitted from the definition, Meltano would fall b
 
 The package's `pip_url` (its [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument)
 is repeated here for convenience, since you may want to update it to
-[point at a (custom) fork](#using-a-custom-fork-of-a-plugin) or to pin a specific version of the package.
+[point at a (custom) fork](#using-a-custom-fork-of-a-plugin) or to [pin a package to a specific version](#pinning-a-plugin-to-a-specific-version).
 If this property is omitted, it is inherited from the discoverable [base plugin description](/docs/plugins.html#project-plugins) identified by the `name` (and `variant`) instead.
 
 As mentioned above, directly adding a plugin to your [`meltano.yml` project file](/docs/project.html#plugins)
@@ -316,6 +316,76 @@ before any other `meltano` commands whenever you clone or pull an existing Melta
 to install (or update) all plugins specified in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
 
 To (re)install a specific plugin in your project, use [`meltano install <type> <name>`](/docs/command-line-interface.html#install), e.g. `meltano install extractor tap-gitlab`.
+
+## Pinning a plugin to a specific version
+
+When you [add a plugin to your project](#adding-a-plugin-to-your-project), the plugin definition's `pip_url` property
+(the package's [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument)
+in your [`meltano.yml` project file](/docs/project.html#plugins)
+typically points at a [PyPI](https://pypi.org/) package or Git repository without specifying a specific version,
+to ensure that you always get the latest and (presumably) greatest.
+
+This makes sense when a plugin is installed for the first time, but can lead to unwelcome surprises down the line,
+as your pipeline may break when a new version of the package is released that introduces a bug or changes its behavior in a backward-incompatible or otherwise undesireable way.
+
+To ensure that [`meltano install`](/docs/command-line-interface.html#install) always installs the same version that was used when you originally got the pipeline working,
+you can modify the plugin definition in your [`meltano.yml` project file](/docs/project.html#plugins) to include a version identifier in the `pip_url`.
+
+The exact steps to determine the version and modify the `pip_url` will depend on whether you are installing a package from [PyPI](https://pypi.org/) or a Git repository:
+
+### PyPI package
+
+If the plugin's `pip_url` is set to a package name, e.g. `tap-shopify`, [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) will look for a package by that name on [PyPI](https://pypi.org/).
+
+To pin the latest version:
+
+1. Determine the latest version of the package by browsing to `https://pypi.org/project/<package>`, e.g. <https://pypi.org/project/tap-shopify>.
+
+    At the time of writing, the latest version of `tap-shopify` is `1.2.6`.
+
+1. Add an `==<version>` or `~=<version>` [version specifier](https://pip.pypa.io/en/stable/reference/pip_install/#requirement-specifiers) to the `pip_url`:
+
+    ```yaml{5,8}
+    # Before:
+    pip_url: tap-shopify
+
+    # After:
+    pip_url: tap-shopify==1.2.6 # Always install version 1.2.6
+
+    # Alternatively:
+    pip_url: tap-shopify~=1.2.6 # Install 1.2.6 or a newer version in the 1.2.x range
+    ```
+
+### Git repository
+
+If the plugin's `pip_url` is set to a `git+http(s)` URL, e.g. `git+https://gitlab.com/meltano/tap-gitlab.git` or `git+https://github.com/adswerve/target-bigquery.git`, [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) will look for a package in that repository.
+
+To pin the latest version:
+
+1. Determine the latest version of the package by browsing to the `https://` part of the repository URL, e.g. <https://gitlab.com/meltano/tap-gitlab> or <https://github.com/adswerve/target-bigquery>, and finding the latest Git tag.
+
+    At the time of writing, the [latest tag](https://gitlab.com/meltano/tap-gitlab/-/tags) of <https://gitlab.com/meltano/tap-gitlab> is `v0.9.11`,
+    and the [latest tag](https://github.com/adswerve/target-bigquery/tags) of <https://github.com/adswerve/target-bigquery> is`v0.10.2`.
+
+    If no tags are available, you can also use the SHA of the latest commit, e.g.
+    [`2657b89e8896face4ce320a03b8413bbc196cec9`](https://gitlab.com/meltano/tap-gitlab/-/commit/2657b89e8896face4ce320a03b8413bbc196cec9) or
+    [`3df97b951b7eebdfa331a1ff570f1fe3487d632f`](https://github.com/adswerve/target-bigquery/commit/3df97b951b7eebdfa331a1ff570f1fe3487d632f).
+
+1. Add an `@<tag>` or `@<sha>` [Git ref specifier](https://pip.pypa.io/en/stable/reference/pip_install/#git) to the `pip_url`:
+
+    ```yaml{6-7,10-11}
+    # Before:
+    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+    pip_url: git+https://github.com/adswerve/target-bigquery.git
+
+    # After:
+    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git@v0.9.11
+    pip_url: git+https://github.com/adswerve/target-bigquery.git@v0.10.2
+
+    # Alternatively:
+    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git@2657b89e8896face4ce320a03b8413bbc196cec9
+    pip_url: git+https://github.com/adswerve/target-bigquery.git@3df97b951b7eebdfa331a1ff570f1fe3487d632f
+    ```
 
 ## Removing a plugin from your project
 
