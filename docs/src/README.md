@@ -50,6 +50,17 @@ Scroll down to learn more about
 
 :::
 
+::: slot logos
+
+<small>Powering pipelines at hundreds of organizations around the world</small>
+
+- [![GitLab logo](images/home/logos/gitlab.png)](https://about.gitlab.com/)
+- [![Netlify logo](images/home/logos/netlify.png)](https://www.netlify.com/)
+- [![LivePerson logo](images/home/logos/liveperson.png)](https://www.liveperson.com/)
+- [![MIT logo](images/home/logos/mit.png)](https://mit.edu/)
+
+:::
+
 ::: slot installation-code
 
 **Experience it for yourself in just a few minutes!**
