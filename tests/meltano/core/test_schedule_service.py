@@ -125,12 +125,19 @@ class TestScheduleService:
             TAP_MOCK_TEST="overridden",
         )
 
+        # It fails because tap and target are not actually installed
+        process = subject.run(schedule)
+        assert process.returncode == 1
+
+        process_mock = mock.Mock(returncode=0)
         with mock.patch(
-            "meltano.core.schedule_service.MeltanoInvoker.invoke"
+            "meltano.core.schedule_service.MeltanoInvoker.invoke",
+            return_value=process_mock,
         ) as invoke_mock:
-            subject.run(
+            process = subject.run(
                 schedule, "--dump=config", env={"TAP_MOCK_SECURE": "overridden"}
             )
+            assert process.returncode == 0
 
             invoke_mock.assert_called_once_with(
                 [

@@ -132,4 +132,8 @@ def run(ctx, name, elt_options):
     schedule_service = ctx.obj["schedule_service"]
 
     schedule = schedule_service.find_schedule(name)
-    schedule_service.run(schedule, *elt_options)
+    process = schedule_service.run(schedule, *elt_options)
+
+    exitcode = process.returncode
+    if exitcode:
+        sys.exit(exitcode)
