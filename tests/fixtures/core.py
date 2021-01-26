@@ -25,7 +25,7 @@ from meltano.core.project_plugins_service import (
     PluginAlreadyAddedException,
     ProjectPluginsService,
 )
-from meltano.core.schedule_service import ScheduleService
+from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 
 PROJECT_NAME = "a_meltano_project"
 
@@ -292,15 +292,18 @@ def schedule_service(project, project_plugins_service):
 
 @pytest.fixture(scope="class")
 def schedule(project, tap, target, schedule_service):
-    return schedule_service.add(
-        None,
-        "schedule-mock",
-        extractor=tap.name,
-        loader=target.name,
-        transform="skip",
-        interval="@once",
-        start_date=datetime.datetime.now(),
-    )
+    try:
+        return schedule_service.add(
+            None,
+            "schedule-mock",
+            extractor=tap.name,
+            loader=target.name,
+            transform="skip",
+            interval="@once",
+            start_date=datetime.datetime.now(),
+        )
+    except ScheduleAlreadyExistsError as err:
+        return err.schedule
 
 
 @pytest.fixture(scope="class")
