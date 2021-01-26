@@ -32,6 +32,8 @@
             Contribute on GitLab
           </a>
         </p>
+
+        <Content class="theme-default-content" slot-key="logos" />
       </div>
 
       <div class="hero-right">
@@ -456,21 +458,23 @@ export default {
     padding: 0 !important;
     border: none !important;
   }
-
-  img {
-    border: 3px solid #282c34;
-    border-radius: 6px;
-    max-width: calc(100% - 6px);
-  }
 }
 
 .hero-right {
   padding-top: 2.5rem;
-}
 
-.hero-right .theme-default-content ol {
-  text-align: left;
-  padding-left: 1.5rem;
+  .theme-default-content {
+    ol {
+      text-align: left;
+      padding-left: 1.5rem;
+    }
+
+    img {
+      border: 3px solid #282c34;
+      border-radius: 6px;
+      max-width: calc(100% - 6px);
+    }
+  }
 }
 
 @media (min-width: $MQNarrow) {
@@ -535,8 +539,12 @@ export default {
     }
 
     h1, .description, .action {
-      margin: 1.8rem auto 0;
+      margin: 1.8rem auto;
       text-align: left;
+    }
+
+    .action:last-child {
+      margin-bottom: 0;
     }
 
     .description {
@@ -642,7 +650,7 @@ export default {
       }
 
       h1, .description, .action {
-        margin: 1.2rem auto 0;
+        margin: 1.2rem auto;
       }
 
       .description {
@@ -760,5 +768,48 @@ export default {
 
 .mt-2r {
   margin-top: 1rem;
+}
+
+.content__logos {
+  text-align: center;
+
+  ul {
+    padding: 0 !important;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: 1.5rem;
+    align-items: center;
+    justify-content: center;
+
+    @media (max-width: 1200px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: $MQMobileNarrow) {
+      grid-template-columns: 1fr;
+    }
+
+    li {
+      list-style: none;
+      text-align: center;
+
+      a {
+        img {
+          height: 30px;
+          max-width: none !important;
+          filter: grayscale(1);
+          transition: filter 0.2s ease-in-out;
+
+          &:hover {
+            filter: grayscale(0);
+          }
+        }
+
+        .icon.outbound {
+          display: none;
+        }
+      }
+    }
+  }
 }
 </style>
