@@ -14,10 +14,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+### Breaks
+
+
+## 1.67.0 - (2021-01-26)
+---
+
+### Fixes
+
 - [#2540](https://gitlab.com/meltano/meltano/-/issues/2540) `meltano schedule run` exit code now matches exit code of wrapped `meltano elt`
 - [#2525](https://gitlab.com/meltano/meltano/-/issues/2525) `meltano schedule run` no longer requires `meltano` to be in the `PATH`
-
-### Breaks
 
 
 ## 1.66.0 - (2021-01-18)
