@@ -6,7 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## Unreleased
----
+- [#2487](https://gitlab.com/meltano/meltano/-/issues/2487) add `target-postgres` required dependency: libpq
 
 ### New
 

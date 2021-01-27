@@ -30,6 +30,17 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 
 #### Using the Command Line Interface
 
+1. Add `libpq` dependency
+
+    ```bash
+    # [macos](https://superuser.com/questions/296873/install-libpq-dev-on-mac-os)
+    brew install libpq
+    ```
+    ```bash
+    # ubuntu
+    sudo apt install libpq-dev
+    ```
+
 1. Add the `target-postgres` loader to your project using [`meltano add`](/docs/command-line-interface.html#add):
 
     ```bash
