@@ -26,6 +26,14 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 1. [Create your Meltano project](/docs/getting-started.html#create-your-meltano-project)
 1. [Add an extractor to pull data from a source](/docs/getting-started.html#add-an-extractor-to-pull-data-from-a-source)
 
+#### Dependencies
+
+`target-postgres` [requires](https://www.psycopg.org/docs/install.html#runtime-requirements) the
+[`libpq` library](https://www.postgresql.org/docs/current/libpq.html) to be available on your system.
+If you've installed PostgreSQL, you should already have it, but you can also install it by itself using the
+[`libpq-dev` package](https://pkgs.org/download/libpq-dev) on Ubuntu/Debian or the
+[`libpq` Homebrew formula](https://formulae.brew.sh/formula/libpq) on macOS.
+
 ### Installation and configuration
 
 #### Using the Command Line Interface
@@ -508,3 +516,9 @@ stream names that include the source database schema in addition to the table na
 This is not supported by [this variant](#alternative-variants) of `target-postgres`.
 
 Instead, use the [`transferwise` variant](/plugins/loaders/postgres--transferwise.html) which was made to be used with extractors that behave this way.
+
+### Error: `pg_config executable not found` or `libpq-fe.h: No such file or directory`
+
+This error message indicates that the [`libpq`](https://www.postgresql.org/docs/current/libpq.html) dependency is missing.
+
+To resolve this, refer to the ["Dependencies" section](#dependencies) above.
