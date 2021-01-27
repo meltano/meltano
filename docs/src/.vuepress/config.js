@@ -111,6 +111,10 @@ module.exports = {
         link: "/plugins/loaders/",
       },
       {
+        text: "Partners",
+        link: "/partners/",
+      },
+      {
         text: "Documentation",
         link: "/docs/",
       },
@@ -160,7 +164,7 @@ module.exports = {
     docsDir: "docs/src",
     docsRepo: "https://gitlab.com/meltano/meltano",
     editLinks: true,
-    editLinkText: "Help us improve this page!",
+    editLinkText: "View page source in repository",
     algolia: {
       apiKey: "6da0449ca46dc108fd88ca828f613ea9",
       indexName: "meltano",
