@@ -88,37 +88,10 @@ export default {
 
   methods: {
     createEditLink (repo, docsRepo, docsDir, docsBranch, path) {
-      const bitbucket = /bitbucket.org/
-      if (bitbucket.test(docsRepo)) {
-        const base = docsRepo
-        return (
-          base.replace(endingSlashRE, '')
-          + `/src`
-          + `/${docsBranch}/`
-          + (docsDir ? docsDir.replace(endingSlashRE, '') + '/' : '')
-          + path
-          + `?mode=edit&spa=0&at=${docsBranch}&fileviewer=file-view-default`
-        )
-      }
-
-      const gitlab = /gitlab.com/
-      if (gitlab.test(docsRepo)) {
-        const base = docsRepo
-        return (
-          base.replace(endingSlashRE, '')
-          + `/-/edit`
-          + `/${docsBranch}/`
-          + (docsDir ? docsDir.replace(endingSlashRE, '') + '/' : '')
-          + path
-        )
-      }
-
-      const base = outboundRE.test(docsRepo)
-        ? docsRepo
-        : `https://github.com/${docsRepo}`
+      const base = docsRepo
       return (
         base.replace(endingSlashRE, '')
-        + '/edit'
+        + `/-/blob`
         + `/${docsBranch}/`
         + (docsDir ? docsDir.replace(endingSlashRE, '') + '/' : '')
         + path
