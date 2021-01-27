@@ -111,6 +111,10 @@ module.exports = {
         link: "/plugins/loaders/",
       },
       {
+        text: "Partners",
+        link: "/partners/",
+      },
+      {
         text: "Documentation",
         link: "/docs/",
       },
