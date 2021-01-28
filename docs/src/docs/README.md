@@ -4,10 +4,21 @@ description: Learn where to use Meltano, how Meltano is built, and where to get 
 
 # Introduction
 
-Meltano is an [open source](https://gitlab.com/meltano/meltano) platform for
-building, running & orchestrating ELT pipelines made up of
-[Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com)
-models, that you can [run locally](/docs/installation.html) or [easily deploy in production](/docs/production.html).
+[Meltano](https://meltano.com) is ELT for the DevOps era:
+[open source](https://gitlab.com/meltano/meltano),
+[self-hosted](/docs/production.html),
+[CLI-first](/docs/command-line-interface.html),
+[debuggable](/docs/command-line-interface.html#debugging), and
+[extensible](/docs/plugins.html).
+
+[Pipelines are code](/docs/project.html) and can be version controlled,
+[containerized](/docs/containerization.html), and
+[deployed continuously](/docs/production.html#and-onto-the-production-environment).
+
+Meltano embraces the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
+[extractors](/plugins/extractors/) and
+[loaders](/plugins/loaders/),
+and leverages [dbt](https://www.getdbt.com) for [transformation](/docs/transforms.html).
 
 ## Mission
 
