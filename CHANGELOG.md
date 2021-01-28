@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2543](https://gitlab.com/meltano/meltano/-/issues/2543) Fix packages dependencies that claim Python 3.9 is supported when it actually isn't.
+
 ### Breaks
 
 
