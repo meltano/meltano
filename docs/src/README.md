@@ -43,6 +43,7 @@ Meltano is
 [CLI-first](/docs/command-line-interface.html),
 [debuggable](/docs/command-line-interface.html#debugging), and
 [extensible](/docs/plugins.html).
+
 [Pipelines are code](#meltano-init) and can be version controlled,
 [containerized](#containerization), and
 [deployed continuously](/docs/production.html#and-onto-the-production-environment).
@@ -60,7 +61,11 @@ Meltano embraces the [Singer](https://www.singer.io/) standard and its community
 [loaders](/plugins/loaders/),
 and leverages [dbt](https://www.getdbt.com) for [transformation](#transformation).
 
-Scroll down to learn more about
+:::
+
+::: slot read-on-for-more
+
+Read on for more about
 [Meltano projects](/#meltano-init),
 [data integration (EL)](/#integration),
 [transformation (T)](/#transformation),
