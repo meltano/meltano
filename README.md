@@ -1,4 +1,3 @@
-
 # Meltano: ELT for the DevOps era
 
 [![pipeline status](https://gitlab.com/meltano/meltano/badges/master/pipeline.svg)](https://gitlab.com/meltano/meltano/commits/master)
@@ -30,7 +29,8 @@ and leverages [dbt](https://www.getdbt.com) for [transformation](https://meltano
 
 ## Documentation
 
-You can find our documentation at [https://www.meltano.com/docs/](https://www.meltano.com/docs/).
+Check out the ["Getting Started" guide](https://meltano.com/docs/getting-started.html)
+or find the full documentation at <https://www.meltano.com/docs/>.
 
 ## Contributing to Meltano
 
