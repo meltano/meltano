@@ -1,8 +1,8 @@
 ---
 home: true
 heroImage: /meltano-logo.svg
-metaTitle: "Meltano: open source ELT"
-description: Meltano is an open source platform for building, running & orchestrating ELT pipelines made up of Singer taps and targets and dbt models, that you can run locally or easily deploy in production.
+metaTitle: "Meltano: ELT for the DevOps era"
+description: Open source, self-hosted, CLI-first, debuggable, and extensible. Embraces Singer and its library of connectors, and leverages dbt for transformation.
 installation:
   primaryAction:
     text: Get started
@@ -35,14 +35,40 @@ ui:
 
 ::: slot installation
 
-# Meltano: open source ELT
+# ELT for the DevOps era
 
-Meltano is an [open source](https://gitlab.com/meltano/meltano) platform for
-building, running & orchestrating ELT pipelines made up of [Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com) models, that you can [run locally](/docs/installation.html) or [easily deploy in production](/docs/production.html).
+Meltano is
+[open source](https://gitlab.com/meltano/meltano),
+[self-hosted](/docs/production.html),
+[CLI-first](/docs/command-line-interface.html),
+[debuggable](/docs/command-line-interface.html#debugging), and
+[extensible](/docs/plugins.html).
 
-Scroll down to learn more about
+[Pipelines are code](#meltano-init),
+ready to be version controlled,
+[containerized](#containerization), and
+[deployed continuously](/docs/production.html#and-onto-the-production-environment).
+Develop and test
+[locally](/docs/getting-started.html#local-installation),
+then
+[deploy in production](/docs/production.html)
+along with the built-in
+[Airflow integration](/docs/production.html#airflow-orchestrator),
+or inside your
+[orchestrator of choice](/docs/production.html#meltano-elt).
+
+Meltano embraces the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
+[extractors](/plugins/extractors/) and
+[loaders](/plugins/loaders/),
+and leverages [dbt](https://www.getdbt.com) for [transformation](#transformation).
+
+:::
+
+::: slot read-on-for-more
+
+Read on for more about
 [Meltano projects](/#meltano-init),
-[integration (EL)](/#integration),
+[data integration (EL)](/#integration),
 [transformation (T)](/#transformation),
 [orchestration](/#orchestration),
 [containerization](/#containerization), and
