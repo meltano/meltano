@@ -32,14 +32,14 @@
             Contribute on GitLab
           </a>
         </p>
-
-        <Content class="theme-default-content" slot-key="logos" />
       </div>
 
       <div class="hero-right">
         <Content class="theme-default-content" slot-key="installation-code" />
       </div>
     </div>
+
+    <Content class="hero feature-section-wrapper is-shorter" slot-key="logos" />
 
     <div class="hero homepage-cta feature-section-wrapper" id="meltano-init">
       <div class="hero-left">
@@ -771,23 +771,14 @@ export default {
 }
 
 .content__logos {
-  text-align: center;
-
   ul {
     padding: 0 !important;
+    margin: 0 !important;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     grid-gap: 1.5rem;
     align-items: center;
     justify-content: center;
-
-    @media (max-width: 1200px) {
-      grid-template-columns: 1fr 1fr;
-    }
-
-    @media (max-width: $MQMobileNarrow) {
-      grid-template-columns: 1fr;
-    }
 
     li {
       list-style: none;
