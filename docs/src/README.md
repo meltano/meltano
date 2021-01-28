@@ -2,7 +2,7 @@
 home: true
 heroImage: /meltano-logo.svg
 metaTitle: "Meltano: ELT for the DevOps era"
-description: Meltano is open source, self-hosted, CLI-first, debuggable, and extensible. It embraces the Singer standard and its community-maintained library of open source extractors and loaders, and leverages dbt for transformation.
+description: Open source, self-hosted, CLI-first, debuggable, and extensible. Embraces Singer and its library of connectors, and leverages dbt for transformation.
 installation:
   primaryAction:
     text: Get started
