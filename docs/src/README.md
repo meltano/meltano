@@ -44,17 +44,18 @@ Meltano is
 [debuggable](/docs/command-line-interface.html#debugging), and
 [extensible](/docs/plugins.html).
 
-[Pipelines are code](#meltano-init) and can be version controlled,
+[Pipelines are code](#meltano-init),
+ready to be version controlled,
 [containerized](#containerization), and
 [deployed continuously](/docs/production.html#and-onto-the-production-environment).
-Develop
+Develop and test
 [locally](/docs/getting-started.html#local-installation),
-and run your EL(T) pipelines in
-[production](/docs/production.html)
-using the built-in
-[Airflow integration](/docs/production.html#airflow-orchestrator)
-or inside an
-[existing orchestrator](/docs/production.html#meltano-elt).
+then
+[deploy in production](/docs/production.html)
+along with the built-in
+[Airflow integration](/docs/production.html#airflow-orchestrator),
+or inside your
+[orchestrator of choice](/docs/production.html#meltano-elt).
 
 Meltano embraces the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
 [extractors](/plugins/extractors/) and
