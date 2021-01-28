@@ -50,17 +50,6 @@ Scroll down to learn more about
 
 :::
 
-::: slot logos
-
-<small>Powering pipelines at hundreds of organizations around the world</small>
-
-- [![GitLab logo](images/home/logos/gitlab.png)](https://about.gitlab.com/)
-- [![Netlify logo](images/home/logos/netlify.png)](https://www.netlify.com/)
-- [![LivePerson logo](images/home/logos/liveperson.png)](https://www.liveperson.com/)
-- [![MIT logo](images/home/logos/mit.png)](https://mit.edu/)
-
-:::
-
 ::: slot installation-code
 
 **Experience it for yourself in just a few minutes!**
@@ -84,6 +73,17 @@ pip3 install meltano
 ```
 
 Meltano is now ready for its [first project](/#meltano-init)!
+
+:::
+
+::: slot logos
+
+- [![GitLab logo](images/home/logos/gitlab.png)](https://about.gitlab.com/)
+- [![MIT logo](images/home/logos/mit.png)](https://mit.edu/)
+- [![Twilio logo](images/home/logos/twilio.png)](https://www.twilio.com/)
+- [![Netlify logo](images/home/logos/netlify.png)](https://www.netlify.com/)
+- [![LivePerson logo](images/home/logos/liveperson.png)](https://www.liveperson.com/)
+- [![Penta logo](images/home/logos/penta.png)](https://www.getpenta.com/)
 
 :::
 
