@@ -32,6 +32,8 @@
             Contribute on GitLab
           </a>
         </p>
+
+        <Content slot-key="read-on-for-more" />
       </div>
 
       <div class="hero-right">
