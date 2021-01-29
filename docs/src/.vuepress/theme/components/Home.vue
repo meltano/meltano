@@ -644,6 +644,12 @@ export default {
   }
 }
 
+@media (max-width: $MQMobileNarrow) {
+  .home .hero h1 {
+    font-size: 1.8rem;
+  }
+}
+
 @media (min-width: $MQMobileNarrow) {
   .home {
     .hero {
@@ -777,7 +783,7 @@ export default {
     padding: 0 !important;
     margin: 0 !important;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     grid-gap: 1.5rem;
     align-items: center;
     justify-content: center;
@@ -788,7 +794,7 @@ export default {
 
       a {
         img {
-          height: 30px;
+          height: 50px;
           max-width: none !important;
           filter: grayscale(1);
           transition: filter 0.2s ease-in-out;
