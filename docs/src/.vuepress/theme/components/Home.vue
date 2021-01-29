@@ -644,6 +644,12 @@ export default {
   }
 }
 
+@media (max-width: $MQMobileNarrow) {
+  .home .hero h1 {
+    font-size: 1.8rem;
+  }
+}
+
 @media (min-width: $MQMobileNarrow) {
   .home {
     .hero {
