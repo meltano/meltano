@@ -29,7 +29,7 @@ you can skip steps 1 through 3 and refer primarily to the "Containerized Meltano
 
 Since a Meltano project is just a directory on your filesystem containing
 text-based files, you can treat it like any other software development project
-and benefit from DevOps best practices such as version control, code review,
+and benefit from DataOps best practices such as version control, code review,
 and continuous integration and deployment (CI/CD).
 
 As such, getting your Meltano project onto the production environment starts

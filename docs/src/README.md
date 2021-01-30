@@ -1,7 +1,7 @@
 ---
 home: true
 heroImage: /meltano-logo.svg
-metaTitle: "Meltano: ELT for the DevOps era"
+metaTitle: "Meltano: ELT for the DataOps era"
 description: Open source, self-hosted, CLI-first, debuggable, and extensible. Embraces Singer and its library of connectors, and leverages dbt for transformation.
 installation:
   primaryAction:
@@ -35,7 +35,7 @@ ui:
 
 ::: slot installation
 
-# ELT for the DevOps era
+# ELT for the DataOps era
 
 Meltano is
 [open source](https://gitlab.com/meltano/meltano),
@@ -125,7 +125,7 @@ and how the various [plugins](/docs/plugins.html) that make up your pipelines sh
 
 Since a Meltano project is just a directory on your filesystem containing
 text-based files, you can treat it like any other software development project
-and benefit from DevOps best practices such as version control, code review,
+and benefit from DataOps best practices such as version control, code review,
 and continuous integration and deployment (CI/CD).
 
 You can initialize a new Meltano project using [`meltano init`](/docs/command-line-interface.html#init).

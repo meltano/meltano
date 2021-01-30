@@ -52,7 +52,7 @@ const docsSidebar = [
 
 module.exports = {
   title: "Meltano",
-  description: "Meltano: ELT for the DevOps era",
+  description: "Meltano: ELT for the DataOps era",
   head: [
     [
       "link",
