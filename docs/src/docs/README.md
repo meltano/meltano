@@ -4,7 +4,7 @@ description: Learn where to use Meltano, how Meltano is built, and where to get 
 
 # Introduction
 
-[Meltano](https://meltano.com) is ELT for the DevOps era:
+[Meltano](https://meltano.com) is ELT for the DataOps era:
 [open source](https://gitlab.com/meltano/meltano),
 [self-hosted](/docs/production.html),
 [CLI-first](/docs/command-line-interface.html),

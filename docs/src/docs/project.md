@@ -14,7 +14,7 @@ and how the various [plugins](#plugins) that make up your pipelines should be [c
 
 Since a Meltano project is just a directory on your filesystem containing
 text-based files, you can treat it like any other software development project
-and benefit from DevOps best practices such as version control, code review,
+and benefit from DataOps best practices such as version control, code review,
 and continuous integration and deployment (CI/CD).
 
 You can initialize a new Meltano project using [`meltano init`](/docs/command-line-interface.html#init).
