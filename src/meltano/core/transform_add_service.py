@@ -1,34 +1,29 @@
-import os
 import json
-import yaml
 import logging
+import os
 from pathlib import Path
 
-from .project import Project
-from .config_service import ConfigService
-from .plugin.settings_service import PluginSettingsService
-from .plugin_discovery_service import PluginDiscoveryService
-from .plugin import PluginDefinition, PluginType, ProjectPlugin
+import yaml
+
 from .db import project_engine
+from .plugin import PluginType
+from .plugin.project_plugin import ProjectPlugin
+from .plugin.settings_service import PluginSettingsService
+from .project import Project
+from .project_plugins_service import ProjectPluginsService
 
 
 class TransformAddService:
     def __init__(self, project: Project):
         self.project = project
 
-        self.config_service = ConfigService(project)
-        dbt_plugin = self.config_service.find_plugin(
+        self.plugins_service = ProjectPluginsService(project)
+        dbt_plugin = self.plugins_service.find_plugin(
             plugin_name="dbt", plugin_type=PluginType.TRANSFORMERS
         )
 
-        self.discovery_service = PluginDiscoveryService(
-            self.project, config_service=self.config_service
-        )
         settings_service = PluginSettingsService(
-            project,
-            dbt_plugin,
-            config_service=self.config_service,
-            plugin_discovery_service=self.discovery_service,
+            project, dbt_plugin, plugins_service=self.plugins_service
         )
         dbt_project_dir = settings_service.get("project_dir")
         dbt_project_path = Path(dbt_project_dir)
@@ -54,10 +49,7 @@ class TransformAddService:
 
     def update_dbt_project(self, plugin: ProjectPlugin):
         settings_service = PluginSettingsService(
-            self.project,
-            plugin,
-            config_service=self.config_service,
-            plugin_discovery_service=self.discovery_service,
+            self.project, plugin, plugins_service=self.plugins_service
         )
 
         package_name = settings_service.get("_package_name")

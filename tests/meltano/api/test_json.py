@@ -1,5 +1,6 @@
-import pytest
 import json as _json
+
+import pytest
 from flask import json
 
 

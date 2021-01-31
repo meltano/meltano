@@ -1,11 +1,11 @@
-import os
 import json
+import os
 
 from meltano.core.utils import slugify
 
+from .dashboards_service import DashboardsService
 from .m5o_collection_parser import M5oCollectionParser, M5oCollectionParserTypes
 from .m5o_file_parser import MeltanoAnalysisFileParser
-from .dashboards_service import DashboardsService
 
 
 class ReportAlreadyExistsError(Exception):

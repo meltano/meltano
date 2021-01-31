@@ -37,6 +37,8 @@ Follow the remaining step of the [Getting Started guide](/docs/getting-started.h
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `tap-bigquery` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -52,12 +54,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-bigquery` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-16}
+```yml{5-15}
 plugins:
   extractors:
   - name: tap-bigquery
     variant: anelendata
-    pip_url: tap-bigquery
     config:
       streams:
         - name: users
@@ -88,12 +89,11 @@ Array of objects with `name`, `table`, `columns`, `datetime_key`, and `filters` 
 
 Manage this setting directly in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):
 
-```yml{6-15}
+```yml{5-14}
 plugins:
   extractors:
   - name: tap-bigquery
     variant: anelendata
-    pip_url: tap-bigquery
     config:
       streams:
         - name: <stream_name>

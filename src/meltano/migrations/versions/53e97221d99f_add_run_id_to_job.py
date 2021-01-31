@@ -5,14 +5,13 @@ Revises: 6ef30ab7b8e5
 Create Date: 2019-10-10 13:12:55.147164
 
 """
+import uuid
+
 import sqlalchemy as sa
 import sqlalchemy.orm
 import sqlalchemy.types as types
-import uuid
-
 from alembic import op
 from meltano.migrations import GUID
-
 
 # revision identifiers, used by Alembic.
 revision = "53e97221d99f"

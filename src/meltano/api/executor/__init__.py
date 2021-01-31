@@ -1,16 +1,16 @@
 import datetime
-import subprocess
 import logging
 import os
+import subprocess
 from functools import partial
-from flask_executor import Executor
 
-from meltano.api.signals import PipelineSignals
+from flask_executor import Executor
 from meltano.api.models import db
+from meltano.api.signals import PipelineSignals
+from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.project import Project
-from meltano.core.meltano_invoker import MeltanoInvoker
-
+from meltano.core.schedule_service import ScheduleService
 
 executor = Executor()
 logger = logging.getLogger(__name__)
@@ -20,18 +20,13 @@ def setup_executor(app, project):
     executor.init_app(app)
 
 
-def defer_run_elt(schedule_payload: dict):
+def defer_run_schedule(name):
     project = Project.find()
+    schedule_service = ScheduleService(project)
 
-    job_id = schedule_payload["name"]
-    extractor = schedule_payload["extractor"]
-    loader = schedule_payload["loader"]
-    transform = schedule_payload.get("transform")
-
-    args = ["elt", "--job_id", job_id, extractor, loader, "--transform", transform]
-
-    result = MeltanoInvoker(project).invoke(
-        args,
+    schedule = schedule_service.find_schedule(name)
+    result = schedule_service.run(
+        schedule,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         env={"MELTANO_JOB_TRIGGER": "ui"},
@@ -46,15 +41,14 @@ def defer_run_elt(schedule_payload: dict):
     #
     # The caveat here is that pipeline that runs from Airflow won't trigger
     # this signal, and thus won't send any notification.
-    PipelineSignals.on_complete(schedule_payload, success=result.returncode == 0)
+    PipelineSignals.on_complete(schedule, success=result.returncode == 0)
 
 
-def run_elt(project: Project, schedule_payload: dict):
-    job_id = schedule_payload["name"]
-    executor.submit(defer_run_elt, schedule_payload)
-    logger.debug(f"Defered `run_elt` to the executor with {schedule_payload}.")
+def run_schedule(project: Project, name):
+    executor.submit(defer_run_schedule, name)
+    logger.debug(f"Defered `run_schedule` to the executor with {name}.")
 
-    return job_id
+    return name
 
 
 def defer_upgrade():

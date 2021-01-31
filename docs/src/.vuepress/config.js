@@ -52,7 +52,7 @@ const docsSidebar = [
 
 module.exports = {
   title: "Meltano",
-  description: "Meltano: open source ELT",
+  description: "Meltano: ELT for the DataOps era",
   head: [
     [
       "link",
@@ -111,6 +111,10 @@ module.exports = {
         link: "/plugins/loaders/",
       },
       {
+        text: "Partners",
+        link: "/partners/",
+      },
+      {
         text: "Documentation",
         link: "/docs/",
       },
@@ -120,7 +124,7 @@ module.exports = {
       },
       { text: "Blog", link: "https://www.meltano.com/blog", target: "_self" },
       {
-        text: "Join us on Slack",
+        text: "Join 600+ on Slack",
         link:
           "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw",
         icon: "SlackIcon",
@@ -160,7 +164,7 @@ module.exports = {
     docsDir: "docs/src",
     docsRepo: "https://gitlab.com/meltano/meltano",
     editLinks: true,
-    editLinkText: "Help us improve this page!",
+    editLinkText: "View page source in repository",
     algolia: {
       apiKey: "6da0449ca46dc108fd88ca828f613ea9",
       indexName: "meltano",

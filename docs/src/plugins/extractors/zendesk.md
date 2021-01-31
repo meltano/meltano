@@ -50,6 +50,8 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `tap-zendesk` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -75,12 +77,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-zendesk` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-9}
+```yml{5-8}
 plugins:
   extractors:
   - name: tap-zendesk
     variant: singer-io
-    pip_url: tap-zendesk
     config:
       email: user@example.com
       subdomain: my_subdomain

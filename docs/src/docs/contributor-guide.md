@@ -12,7 +12,7 @@ which houses Meltano's
 [UI API](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/api),
 [these docs](https://gitlab.com/meltano/meltano/-/tree/master/docs/src), and
 the [index of discoverable plugins](#discoverable-plugins),
-which feeds the lists of [Extractors](/plugins/extractors/) and [Loaders](/plugins/loaders/) that are supported out of the box.
+which feeds the lists of [Sources](/plugins/extractors/) and [Destinations](/plugins/loaders/) that are supported out of the box.
 
 ## Where to start?
 
@@ -54,6 +54,9 @@ pip3 install poetry
 
 # Install all the dependencies
 poetry install
+
+# Install the pre-commit hook
+poetry run pre-commit install --install-hooks
 
 # Bundle the Meltano UI into the `meltano` package
 make bundle
@@ -152,10 +155,23 @@ export MELTANO_UI_URL = ""
 
 ## Discoverable plugins
 
-[Discoverable plugins](/docs/plugins.html#discoverable-plugins) are defined in the `discovery.yml` manifest, which can be found inside the Meltano repository at [`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
+[Discoverable plugins](/docs/plugins.html#discoverable-plugins) that are supported out of the box are defined in the `discovery.yml` manifest,
+which can be found inside the Meltano repository at
+[`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
 
-If you've added a custom plugin (or [variant](/docs/plugins.html#variants)) to your project that you think should be discoverable and supported out of the box, please contribute a change to that file.
-All you'll need is the [custom plugin definition](/docs/project.html#custom-plugin-definitions) from your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), which has the same format as plugin definitions in `discovery.yml`.
+If you've added a [custom plugin](/docs/plugins.html#custom-plugins) (or [variant](/docs/plugins.html#variants)) to your project that could be discoverable and supported out of the box for new users, please contribute its description to this file to save the next user the hassle of setting up the custom plugin.
+The [GitLab Web IDE](https://docs.gitlab.com/ee/user/project/web_ide/) makes it very easy to contribute changes without requiring you to leave your browser.
+
+Discoverable plugin definitions in `discovery.yml` have the same format as [custom plugin definition](/docs/project.html#custom-plugin-definitions) in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), so a copy-paste is usually sufficient.
+The format and further requirements are laid out in more detail below.
+
+Besides the new definition in `discovery.yml`, a new discoverable plugin should be documented in the
+[Sources](/plugins/extractors/) or [Destinations](/plugins/loaders/) section of this website,
+which live inside the repository under
+[`docs/src/plugins/extractors`](https://gitlab.com/meltano/meltano/-/tree/master/docs/src/plugins/extractors) and
+[`docs/src/plugins/loaders`](https://gitlab.com/meltano/meltano/-/tree/master/docs/src/plugins/loaders).
+However, it is _not_ required to include documentation when you contribute a new plugin definition to `discovery.yml`,
+as members of the core team are happy to any missing docs themselves as part of the review process.
 
 ### Plugin definitions
 
@@ -164,7 +180,11 @@ At a minimum, a plugin definition must have a `name` and a `namespace`, and at l
 It is recommended to add a `label`, `logo_url`, and `description` to the plugin definition, and `docs` and `repo` URLs to the variant definition(s).
 
 Most of the time, variant definitions should also have a `settings` array with [setting definitions](#setting-definitions).
-Additionally, `capabilities` should be specified for extractor variants, non-default variant executable names can be specified using `executable`, and default values for [plugin extras](/docs/configuration.html#plugin-extras) can be specified at the plugin definition level and further overridden at the variant definition level.
+
+Additionally:
+- `capabilities` should be specified for extractor variants,
+- non-default variant executable names can be specified using `executable`, and
+- default values for [plugin extras](/docs/configuration.html#plugin-extras) can be specified at the plugin definition level and further overridden at the variant definition level.
 
 #### Variant definitions
 
@@ -433,7 +453,18 @@ In the near future, all tests can flow automatically; but there are some complic
 
 Meltano uses the below tools to enforce consistent code style. Explore the [repo](https://gitlab.com/meltano/meltano/tree/master) to learn of the specific rules and settings of each.
 
+Python:
+- [isort](https://pycqa.github.io/isort/)
 - [Black](https://github.com/ambv/black)
+- [Flakehell](https://flakehell.readthedocs.io/)
+- [wemake-python-styleguide](https://wemake-python-stylegui.de/en/latest/)
+- [MyPy](https://mypy.readthedocs.io/en/stable/)
+
+Flakehell is a wrapper for Flake8 and its various plugins, and wemake-python-styleguide is a plugin for Flake8 that offers an extensive set of opinionated rules that encourage clean and correct code.
+
+MyPy is currently only executed as part of the build pipeline in order to avoid overwhelming developers with the complete list of violations. This allows for incremental and iterative improvement without requiring a concerted effort to fix all errors at once.
+
+Javascript:
 - [ESLint](https://eslint.org/docs/rules/)
 - [ESLint Vue Plugin](https://github.com/vuejs/eslint-plugin-vue)
 - [Prettier](https://prettier.io/)
@@ -448,7 +479,7 @@ In the spirit of GitLab's "boring solutions" with the above tools and mantra, th
 
 #### Imports
 
-`import`s are sorted using the following pattern:
+Javascript `import`s are sorted using the following pattern:
 
 1. Code source location: third-party → local (separate each group with a single blank line)
 1. Import scheme: Default imports → Partial imports
@@ -473,19 +504,7 @@ import { bar, thing } from '@/utils/utils'   // 1: local, 2: partial, 3: @/[u]ti
 ¶  // 2 blank lines to split the imports from the code
 ```
 
-```python
-import flask                                        # 1: third-party, 2: default, 3: [f]lask
-import os                                           # 1: third-party, 2: default, 3: [o]s
-from datetime import datetime                       # 1: third-party, 2: partial, 3: [d]atetime
-from functools import wraps                         # 1: third-party, 2: partial, 3: [f]unctools
-¶  # 1 blank line to split import groups
-import meltano                                      # 1: local, 2: default, 3: [meltano]
-import meltano.migrations                           # 1: local, 2: default, 3: [meltano.m]igrations
-from meltano.core.plugin import Plugin, PluginType  # 1: local, 2: partial, 3: [meltano.core.pl]ugin
-from meltano.core.project import Project            # 1: local, 2: partial, 3: [meltano.core.pr]oject
-¶
-¶  # 2 blank lines to split the imports from the code
-```
+Python imports are sorted automatically using [`isort`](https://pycqa.github.io/isort/). This is executed as part of the `make lint` command, as well as during execution of the pre-commit hook.
 
 #### Definitions
 

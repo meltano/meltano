@@ -1,12 +1,12 @@
-import pytest
 from datetime import datetime
 from unittest import mock
 
+import pytest
 from meltano.core.schedule_service import (
-    ScheduleService,
     Schedule,
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
+    ScheduleService,
     SettingMissingError,
 )
 
@@ -113,3 +113,40 @@ class TestScheduleService:
         ):
             schedule = add("with_no_start_date", None)
             assert schedule.start_date
+
+    def test_run(self, subject, session, tap, target):
+        schedule = subject.add(
+            session,
+            "tap-to-target",
+            tap.name,
+            target.name,
+            "skip",
+            "@daily",
+            TAP_MOCK_TEST="overridden",
+        )
+
+        # It fails because tap and target are not actually installed
+        process = subject.run(schedule)
+        assert process.returncode == 1
+
+        process_mock = mock.Mock(returncode=0)
+        with mock.patch(
+            "meltano.core.schedule_service.MeltanoInvoker.invoke",
+            return_value=process_mock,
+        ) as invoke_mock:
+            process = subject.run(
+                schedule, "--dump=config", env={"TAP_MOCK_SECURE": "overridden"}
+            )
+            assert process.returncode == 0
+
+            invoke_mock.assert_called_once_with(
+                [
+                    "elt",
+                    tap.name,
+                    target.name,
+                    f"--transform={schedule.transform}",
+                    f"--job_id={schedule.name}",
+                    "--dump=config",
+                ],
+                env={"TAP_MOCK_TEST": "overridden", "TAP_MOCK_SECURE": "overridden"},
+            )

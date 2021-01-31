@@ -1,19 +1,19 @@
-import os
-import click
 import fnmatch
 import json
 import logging
+import os
 
-from . import cli
-from .params import project
-from .utils import CliError
-from meltano.core.config_service import ConfigService
-from meltano.core.plugin_invoker import invoker_factory
+import click
+from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin.singer.catalog import parse_select_pattern, SelectionType
+from meltano.core.plugin.singer.catalog import SelectionType, parse_select_pattern
+from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.db import project_engine
+
+from . import cli
+from .params import pass_project
+from .utils import CliError
 
 
 def selection_color(selection):
@@ -46,7 +46,7 @@ def selection_mark(selection):
 @click.option("--list", is_flag=True)
 @click.option("--all", is_flag=True)
 @click.option("--exclude", is_flag=True)
-@project(migrate=True)
+@pass_project(migrate=True)
 def select(project, extractor, entities_filter, attributes_filter, **flags):
     try:
         if flags["list"]:

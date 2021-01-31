@@ -1,13 +1,14 @@
 from pathlib import Path
 
-from meltano.core.plugin import ProjectPlugin, PluginRef, PluginType
+from meltano.core.behavior.hookable import hook
 from meltano.core.error import PluginInstallError
-from meltano.core.plugin.error import PluginMissingError
+from meltano.core.plugin import BasePlugin, PluginRef, PluginType
+from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.transform_add_service import TransformAddService
-from meltano.core.behavior.hookable import hook
 
 
 class DbtInvoker(PluginInvoker):
@@ -15,12 +16,10 @@ class DbtInvoker(PluginInvoker):
         return {**super().Popen_options(), "cwd": self.plugin_config["project_dir"]}
 
 
-class DbtPlugin(ProjectPlugin):
+class DbtPlugin(BasePlugin):
     __plugin_type__ = PluginType.TRANSFORMERS
-    __invoker_cls__ = DbtInvoker
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
+    invoker_class = DbtInvoker
 
 
 class DbtTransformPluginInstaller:
@@ -48,7 +47,7 @@ class DbtTransformPluginInstaller:
                 )
                 print(f"Adding dbt model to '{dbt_project_path}'...")
                 transform_add_service.update_dbt_project(self.plugin)
-            except PluginMissingError:
+            except PluginNotFoundError:
                 raise PluginInstallError(
                     "Transformer 'dbt' is not installed. Run `meltano add transformer dbt` to add it to your project."
                 )
@@ -63,25 +62,19 @@ class DbtTransformPluginInstaller:
             )
 
 
-class DbtTransformPlugin(ProjectPlugin):
+class DbtTransformPlugin(BasePlugin):
     __plugin_type__ = PluginType.TRANSFORMS
-    __installer_cls__ = DbtTransformPluginInstaller
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
+    installer_class = DbtTransformPluginInstaller
 
-    def is_invokable(self):
-        return False
+    EXTRA_SETTINGS = [
+        SettingDefinition(name="_package_name", value="$MELTANO_TRANSFORM_NAMESPACE"),
+        SettingDefinition(name="_vars", kind="object", value={}),
+    ]
 
     @property
     def runner(self):
         return PluginRef(PluginType.TRANSFORMERS, "dbt")
 
-    @property
-    def extra_settings(self):
-        return [
-            SettingDefinition(
-                name="_package_name", value="$MELTANO_TRANSFORM_NAMESPACE"
-            ),
-            SettingDefinition(name="_vars", kind="object", value={}),
-        ]
+    def is_invokable(self):
+        return False

@@ -26,6 +26,14 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 1. [Create your Meltano project](/docs/getting-started.html#create-your-meltano-project)
 1. [Add an extractor to pull data from a source](/docs/getting-started.html#add-an-extractor-to-pull-data-from-a-source)
 
+#### Dependencies
+
+`target-snowflake` [requires](https://www.psycopg.org/docs/install.html#runtime-requirements) the
+[`libpq` library](https://www.postgresql.org/docs/current/libpq.html) to be available on your system.
+If you've installed PostgreSQL, you should already have it, but you can also install it by itself using the
+[`libpq-dev` package](https://pkgs.org/download/libpq-dev) on Ubuntu/Debian or the
+[`libpq` Homebrew formula](https://formulae.brew.sh/formula/libpq) on macOS.
+
 ### Installation and configuration
 
 #### Using the Command Line Interface
@@ -56,6 +64,8 @@ Follow the remaining step of the [Getting Started guide](/docs/getting-started.h
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, refer to the ["Troubleshooting" section](#troubleshooting) below or [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `target-snowflake` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -74,12 +84,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-snowflake` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-11}
+```yml{5-10}
 plugins:
   loaders:
   - name: target-snowflake
     variant: datamill-co
-    pip_url: target-snowflake
     config:
       snowflake_account: my_account
       snowflake_username: MY_USER
@@ -402,3 +411,11 @@ meltano config target-snowflake set target_s3 aws_secret_access_key <key>
 
 export TARGET_SNOWFLAKE_TARGET_S3_AWS_SECRET_ACCESS_KEY=<key>
 ```
+
+## Troubleshooting
+
+### Error: `pg_config executable not found` or `libpq-fe.h: No such file or directory`
+
+This error message indicates that the [`libpq`](https://www.postgresql.org/docs/current/libpq.html) dependency is missing.
+
+To resolve this, refer to the ["Dependencies" section](#dependencies) above.

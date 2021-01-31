@@ -1,29 +1,28 @@
-import pytest
-import requests
-import requests_mock
-import json
-import yaml
 import copy
+import json
 from contextlib import contextmanager
 from unittest import mock
 
 import meltano.core.bundle as bundle
-
-from meltano.core.project_settings_service import ProjectSettingsService
+import pytest
+import requests
+import requests_mock
+import yaml
+from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.plugin import (
-    PluginType,
     PluginDefinition,
+    PluginType,
     Variant,
     VariantNotFoundError,
-    ProjectPlugin,
 )
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import (
+    VERSION,
     DiscoveryFile,
     PluginDiscoveryService,
-    VERSION,
+    PluginNotFoundError,
 )
-from meltano.core.config_service import PluginAlreadyAddedException
-from meltano.core.behavior.versioned import IncompatibleVersionError
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
 
 @pytest.fixture(scope="class")
@@ -48,14 +47,14 @@ def discovery_url_mock(subject):
 @pytest.fixture(scope="class")
 def tap_covid_19(project_add_service):
     try:
-        plugin_def = PluginDefinition(
+        plugin = ProjectPlugin(
             PluginType.EXTRACTORS,
             "tap-covid-19",
             namespace="tap-covid_19",
             pip_url="tap-covid-19",
             executable="tap-covid-19",
         )
-        return project_add_service.add_definition(plugin_def, custom=True)
+        return project_add_service.add_plugin(plugin)
     except PluginAlreadyAddedException as err:
         return err.plugin
 
@@ -84,84 +83,104 @@ class TestPluginDiscoveryService:
         plugins = list(subject.plugins())
         assert len(plugins) >= 6
 
-    def test_plugins_custom(self, subject, tap_covid_19):
-        plugins = list(subject.plugins())
+    def test_definition(self, subject):
+        with pytest.raises(PluginNotFoundError):
+            subject.find_definition(PluginType.EXTRACTORS, "unknown")
 
-        assert tap_covid_19 in plugins
-
-    def test_find_definition(self, subject):
-        # If no variant is specified,
-        # defaults to the first variant
         plugin_def = subject.find_definition(PluginType.EXTRACTORS, "tap-mock")
         assert plugin_def.type == PluginType.EXTRACTORS
         assert plugin_def.name == "tap-mock"
-        assert plugin_def.current_variant == plugin_def.variants[0]
 
-        plugin_def = subject.find_definition(
+    def test_find_base_plugin(self, subject):
+        # If no variant is specified,
+        # defaults to the first variant
+        base_plugin = subject.find_base_plugin(PluginType.EXTRACTORS, "tap-mock")
+        assert base_plugin.type == PluginType.EXTRACTORS
+        assert base_plugin.name == "tap-mock"
+        assert base_plugin._variant == base_plugin.variants[0]
+        assert base_plugin.variant == base_plugin.variants[0].name
+
+        base_plugin = subject.find_base_plugin(
             PluginType.EXTRACTORS, "tap-mock", variant="singer-io"
         )
-        assert plugin_def.type == PluginType.EXTRACTORS
-        assert plugin_def.name == "tap-mock"
-        assert plugin_def.current_variant_name == "singer-io"
+        assert base_plugin.type == PluginType.EXTRACTORS
+        assert base_plugin.name == "tap-mock"
+        assert base_plugin.variant == "singer-io"
 
-        plugin_def = subject.find_definition(
+        base_plugin = subject.find_base_plugin(
             PluginType.EXTRACTORS, "tap-mock", variant="meltano"
         )
-        assert plugin_def.type == PluginType.EXTRACTORS
-        assert plugin_def.name == "tap-mock"
-        assert plugin_def.current_variant_name == "meltano"
+        assert base_plugin.type == PluginType.EXTRACTORS
+        assert base_plugin.name == "tap-mock"
+        assert base_plugin.variant == "meltano"
 
-        plugin_def = subject.find_definition(
+        base_plugin = subject.find_base_plugin(
             PluginType.EXTRACTORS, "tap-mock", variant=Variant.ORIGINAL_NAME
         )
-        assert plugin_def.type == PluginType.EXTRACTORS
-        assert plugin_def.name == "tap-mock"
-        assert plugin_def.current_variant_name == "singer-io"
+        assert base_plugin.type == PluginType.EXTRACTORS
+        assert base_plugin.name == "tap-mock"
+        assert base_plugin.variant == "singer-io"
 
         with pytest.raises(VariantNotFoundError):
-            plugin_def = subject.find_definition(
+            base_plugin = subject.find_base_plugin(
                 PluginType.EXTRACTORS, "tap-mock", variant="unknown"
             )
 
-    def test_get_definition(self, subject):
+    def test_get_base_plugin(self, subject):
         # If no variant is set on the project plugin,
         # defaults to the original variant
         project_plugin = ProjectPlugin(PluginType.EXTRACTORS, "tap-mock")
-        plugin_def = subject.get_definition(project_plugin)
-        assert plugin_def.type == PluginType.EXTRACTORS
-        assert plugin_def.name == "tap-mock"
-        assert plugin_def.current_variant_name == "singer-io"
-        assert plugin_def.current_variant.original
+        base_plugin = subject.get_base_plugin(project_plugin)
+        assert base_plugin.type == PluginType.EXTRACTORS
+        assert base_plugin.name == "tap-mock"
+        assert base_plugin.variant == "singer-io"
+        assert base_plugin._variant.original
 
+        # First variant
         project_plugin = ProjectPlugin(
             PluginType.EXTRACTORS, "tap-mock", variant="meltano"
         )
-        plugin_def = subject.get_definition(project_plugin)
-        assert plugin_def.type == PluginType.EXTRACTORS
-        assert plugin_def.name == "tap-mock"
-        assert plugin_def.current_variant_name == "meltano"
+        base_plugin = subject.get_base_plugin(project_plugin)
+        assert base_plugin.type == PluginType.EXTRACTORS
+        assert base_plugin.name == "tap-mock"
+        assert base_plugin.variant == "meltano"
 
+        # Another variant
         project_plugin = ProjectPlugin(
             PluginType.EXTRACTORS, "tap-mock", variant="singer-io"
         )
-        plugin_def = subject.get_definition(project_plugin)
-        assert plugin_def.type == PluginType.EXTRACTORS
-        assert plugin_def.name == "tap-mock"
-        assert plugin_def.current_variant_name == "singer-io"
+        base_plugin = subject.get_base_plugin(project_plugin)
+        assert base_plugin.type == PluginType.EXTRACTORS
+        assert base_plugin.name == "tap-mock"
+        assert base_plugin.variant == "singer-io"
 
+        # Original variant
         project_plugin = ProjectPlugin(
             PluginType.EXTRACTORS, "tap-mock", variant=Variant.ORIGINAL_NAME
         )
-        plugin_def = subject.get_definition(project_plugin)
-        assert plugin_def.type == PluginType.EXTRACTORS
-        assert plugin_def.name == "tap-mock"
-        assert plugin_def.current_variant_name == "singer-io"
+        base_plugin = subject.get_base_plugin(project_plugin)
+        assert base_plugin.type == PluginType.EXTRACTORS
+        assert base_plugin.name == "tap-mock"
+        assert base_plugin.variant == "singer-io"
 
+        # Unknown variant
         project_plugin = ProjectPlugin(
             PluginType.EXTRACTORS, "tap-mock", variant="unknown"
         )
         with pytest.raises(VariantNotFoundError):
-            subject.get_definition(project_plugin)
+            subject.get_base_plugin(project_plugin)
+
+        # Inherited
+        project_plugin = ProjectPlugin(
+            PluginType.EXTRACTORS,
+            "tap-mock-inherited",
+            inherit_from="tap-mock",
+            variant="meltano",
+        )
+        base_plugin = subject.get_base_plugin(project_plugin)
+        assert base_plugin.type == PluginType.EXTRACTORS
+        assert base_plugin.name == "tap-mock"
+        assert base_plugin.variant == "meltano"
 
     @pytest.mark.usefixtures("discovery_yaml")
     def test_discovery_yaml(self, subject):
@@ -174,7 +193,6 @@ class TestPluginDiscoveryService:
 
             plugin_type = PluginType(plugin_type)
 
-            plugin_defs = plugins_by_type[plugin_type]
             plugin_names = [plugin.name for plugin in plugins_by_type[plugin_type]]
 
             for raw_plugin_def in raw_plugin_defs:
@@ -250,8 +268,8 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
             yield discovery_yaml
 
     @pytest.fixture
-    def disabled_remote_discovery(self, project):
-        ProjectSettingsService(project).set("discovery_url", "false")
+    def disabled_remote_discovery(self, subject):
+        subject.settings_service.set("discovery_url", "false")
 
     @pytest.fixture
     def cached_discovery(self, subject):
@@ -286,6 +304,9 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         self.assert_discovery_yaml(subject, remote_discovery)
 
         assert subject.cached_discovery_file.exists()
+        with subject.cached_discovery_file.open() as cached_discovery:
+            cached_discovery_yaml = yaml.safe_load(cached_discovery)
+            assert cached_discovery_yaml["version"] == remote_discovery["version"]
 
     def test_incompatible_remote_discovery(
         self, subject, incompatible_remote_discovery, cached_discovery

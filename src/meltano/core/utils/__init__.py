@@ -1,16 +1,18 @@
 import base64
+import functools
 import logging
+import math
+import os
 import re
 import sys
-import flatten_dict
-import os
-import functools
-
-from datetime import datetime, date, time
+from collections import OrderedDict
 from copy import deepcopy
-from typing import Union, Dict, Callable, Optional, Iterable
-from requests.auth import HTTPBasicAuth
+from datetime import date, datetime, time
 from pathlib import Path
+from typing import Callable, Dict, Iterable, Optional, Union
+
+import flatten_dict
+from requests.auth import HTTPBasicAuth
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +59,7 @@ def slugify(s):
 
     # "[some]___article's_title__"
     # "some___articles_title__"
-    s = re.sub("\W", "", s)
+    s = re.sub(r"\W", "", s)
 
     # "some___articles_title__"
     # "some   articles title  "
@@ -65,7 +67,7 @@ def slugify(s):
 
     # "some   articles title  "
     # "some articles title "
-    s = re.sub("\s+", " ", s)
+    s = re.sub(r"\s+", " ", s)
 
     # "some articles title "
     # "some articles title"
@@ -304,7 +306,7 @@ def expand_env_vars(raw_value, env: Dict):
 
     # find viable substitutions
     var_matcher = re.compile(
-        """
+        r"""
         \$                 # starts with a '$'
         (?:                # either $VAR or ${VAR}
             {(\w+)}|(\w+)  # capture the variable name as group[0] or group[1]
@@ -333,3 +335,22 @@ def expand_env_vars(raw_value, env: Dict):
         return subst(fullmatch)
 
     return re.sub(var_matcher, subst, raw_value)
+
+
+def uniques_in(original):
+    return list(OrderedDict.fromkeys(original))
+
+
+# https://gist.github.com/cbwar/d2dfbc19b140bd599daccbe0fe925597#gistcomment-2845059
+def human_size(num, suffix="B"):
+    """Return human-readable file size."""
+    magnitude = int(math.floor(math.log(num, 1024)))
+    val = num / math.pow(1024, magnitude)
+
+    if magnitude == 0:
+        return f"{val:.0f} bytes"
+    if magnitude > 7:
+        return f"{val:.1f}Yi{suffix}"
+
+    prefix = ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"][magnitude]
+    return f"{val:3.1f}{prefix}{suffix}"

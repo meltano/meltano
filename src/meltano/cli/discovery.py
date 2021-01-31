@@ -1,24 +1,25 @@
-import os
 import json
-import click
+import os
 from urllib.parse import urlparse
 
-from . import cli
-from .params import project
+import click
 from meltano.core.plugin import PluginType
-from meltano.core.project import Project
 from meltano.core.plugin_discovery_service import (
-    PluginDiscoveryService,
     DiscoveryInvalidError,
+    PluginDiscoveryService,
 )
+from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
+
+from . import cli
+from .params import pass_project
 
 
 @cli.command()
 @click.argument(
     "plugin_type", type=click.Choice([*list(PluginType), "all"]), default="all"
 )
-@project()
+@pass_project()
 def discover(project, plugin_type):
     discover_service = PluginDiscoveryService(project)
     if plugin_type == "all":
@@ -36,7 +37,7 @@ def discover(project, plugin_type):
             click.echo(plugin_def.name, nl=False)
 
             if len(plugin_def.variants) > 1:
-                click.echo(f", variants: {plugin_def.list_variant_names()}")
+                click.echo(f", variants: {plugin_def.variant_labels}")
             else:
                 click.echo()
 

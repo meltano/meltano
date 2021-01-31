@@ -1,8 +1,8 @@
-import pytest
 from unittest import mock
-from flask import url_for
 
-from meltano.core.plugin.settings_service import SettingValueStore, REDACTED_VALUE
+import pytest
+from flask import url_for
+from meltano.core.plugin.settings_service import REDACTED_VALUE, SettingValueStore
 
 
 class TestOrchestration:
@@ -13,7 +13,7 @@ class TestOrchestration:
         tap,
         session,
         plugin_settings_service_factory,
-        plugin_discovery_service,
+        project_plugins_service,
         monkeypatch,
     ):
         plugin_settings_service = plugin_settings_service_factory(tap)
@@ -24,8 +24,8 @@ class TestOrchestration:
         monkeypatch.setenv("TAP_MOCK_BOOLEAN", "false")
 
         with mock.patch(
-            "meltano.api.controllers.orchestrations.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.api.controllers.orchestrations.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), app.test_request_context():
             res = api.get(
                 url_for("orchestrations.get_plugin_configuration", plugin_ref=tap)
@@ -79,7 +79,7 @@ class TestOrchestration:
         tap,
         session,
         plugin_settings_service_factory,
-        plugin_discovery_service,
+        project_plugins_service,
     ):
         plugin_settings_service = plugin_settings_service_factory(tap)
         plugin_settings_service.set(
@@ -90,8 +90,8 @@ class TestOrchestration:
         )
 
         with mock.patch(
-            "meltano.core.plugin.settings_service.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.api.controllers.orchestrations.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), app.test_request_context():
             res = api.put(
                 url_for("orchestrations.save_plugin_configuration", plugin_ref=tap),

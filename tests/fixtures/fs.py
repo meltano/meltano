@@ -1,9 +1,10 @@
 import os
-import pytest
-import tempfile
 import shutil
-from pathlib import Path
+import tempfile
 from functools import partial
+from pathlib import Path
+
+import pytest
 
 
 @pytest.fixture(scope="function")

@@ -1,8 +1,8 @@
 ---
 home: true
 heroImage: /meltano-logo.svg
-metaTitle: "Meltano: open source ELT"
-description: Meltano is an open source platform for building, running & orchestrating ELT pipelines made up of Singer taps and targets and dbt models, that you can run locally or easily deploy in production. Our goal is to make the power of data integration available to all by building a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
+metaTitle: "Meltano: ELT for the DataOps era"
+description: Open source, self-hosted, CLI-first, debuggable, and extensible. Embraces Singer and its library of connectors, and leverages dbt for transformation.
 installation:
   primaryAction:
     text: Get started
@@ -35,17 +35,40 @@ ui:
 
 ::: slot installation
 
-# Meltano: open source ELT
+# ELT for the DataOps era
 
-Meltano is an [open source](https://gitlab.com/meltano/meltano) platform for
-building, running & orchestrating ELT pipelines made up of [Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com) models, that you can [run locally](/docs/installation.html) or [easily deploy in production](/docs/production.html).
+Meltano is
+[open source](https://gitlab.com/meltano/meltano),
+[self-hosted](/docs/production.html),
+[CLI-first](/docs/command-line-interface.html),
+[debuggable](/docs/command-line-interface.html#debugging), and
+[extensible](/docs/plugins.html).
 
-Our goal is to [make the power of data integration available to all](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/)
-by building a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
+[Pipelines are code](#meltano-init),
+ready to be version controlled,
+[containerized](#containerization), and
+[deployed continuously](/docs/production.html#and-onto-the-production-environment).
+Develop and test
+[locally](/docs/getting-started.html#local-installation),
+then
+[deploy in production](/docs/production.html)
+along with the built-in
+[Airflow integration](/docs/production.html#airflow-orchestrator),
+or inside your
+[orchestrator of choice](/docs/production.html#meltano-elt).
 
-Scroll down for details on
+Meltano embraces the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
+[extractors](/plugins/extractors/) and
+[loaders](/plugins/loaders/),
+and leverages [dbt](https://www.getdbt.com) for [transformation](#transformation).
+
+:::
+
+::: slot read-on-for-more
+
+Read on for more about
 [Meltano projects](/#meltano-init),
-[integration (EL)](/#integration),
+[data integration (EL)](/#integration),
 [transformation (T)](/#transformation),
 [orchestration](/#orchestration),
 [containerization](/#containerization), and
@@ -79,6 +102,15 @@ Meltano is now ready for its [first project](/#meltano-init)!
 
 :::
 
+::: slot logos
+
+- [![GitLab logo](images/home/logos/gitlab.png)](https://about.gitlab.com/)
+- [![Twilio logo](images/home/logos/twilio.png)](https://www.twilio.com/)
+- [![Netlify logo](images/home/logos/netlify.png)](https://www.netlify.com/)
+- [![MIT logo](images/home/logos/mit.png)](https://mit.edu/)
+
+:::
+
 ::: slot meltano-init
 
 ## Your Meltano project: a single source of truth
@@ -89,11 +121,11 @@ At the core of the Meltano experience is your Meltano project,
 which represents the single source of truth regarding your ELT pipelines:
 how data should be [integrated](/#integration) and [transformed](/#transformation),
 how the pipelines should be [orchestrated](/#orchestration),
-and how the various components should be [configured](/docs/configuration.html).
+and how the various [plugins](/docs/plugins.html) that make up your pipelines should be [configured](/docs/configuration.html).
 
 Since a Meltano project is just a directory on your filesystem containing
 text-based files, you can treat it like any other software development project
-and benefit from DevOps best practices such as version control, code review,
+and benefit from DataOps best practices such as version control, code review,
 and continuous integration and deployment (CI/CD).
 
 You can initialize a new Meltano project using [`meltano init`](/docs/command-line-interface.html#init).
@@ -128,7 +160,7 @@ data from any SaaS tool or database and load it into any data warehouse or file 
 
 Meltano [manages your tap and target configuration](/docs/configuration.html) for you,
 makes it easy to [select which entities and attributes to extract](/docs/integration.html#selecting-entities-and-attributes-for-extraction),
-and keeps track of [the state of your extraction](/docs/integration.html#incremental-replication-state),
+and keeps track of [the incremental replication state](/docs/integration.html#incremental-replication-state),
 so that subsequent pipeline runs with the same job ID will always pick up right where
 the previous run left off.
 

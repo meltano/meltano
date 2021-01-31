@@ -4,7 +4,6 @@ from secrets import token_urlsafe
 
 from . import db
 
-
 TOKEN_BITS_SIZE = 32
 
 

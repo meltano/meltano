@@ -1,24 +1,24 @@
-import aiohttp
 import asyncio
-import yaml
+from typing import Generator, Iterator
 
+import aiohttp
+import yaml
 from sqlalchemy import (
-    MetaData,
-    Table,
-    String,
-    Column,
-    TIMESTAMP,
-    Float,
-    Integer,
-    Boolean,
-    Date,
+    BIGINT,
+    JSON,
     REAL,
     SMALLINT,
     TEXT,
-    BIGINT,
-    JSON,
+    TIMESTAMP,
+    Boolean,
+    Column,
+    Date,
+    Float,
+    Integer,
+    MetaData,
+    String,
+    Table,
 )
-from typing import Generator, Iterator
 
 
 async def fetch(url, session):
@@ -64,8 +64,7 @@ def fetch_urls(
     futures = get_futures(urls=urls, headers=headers, timeout=timeout)
     future = asyncio.ensure_future(futures)
     responses = loop.run_until_complete(future)
-    for resp in responses:
-        yield resp
+    yield from responses
 
 
 def get_sqlalchemy_col(

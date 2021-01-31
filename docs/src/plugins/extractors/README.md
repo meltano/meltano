@@ -33,11 +33,11 @@ To learn more about extracting and [loading](/plugins/loaders/) data using Melta
 ::: tip Don't see your data source listed here?
 
 If a [Singer tap](https://www.singer.io/#taps) for your source already exists,
-it can easily be [added to your project as a custom extractor](/docs/command-line-interface.html#how-to-use-custom-plugins).
+it can easily be [added to your project as a custom extractor](/docs/plugin-management.html#custom-plugins).
 If not, you can learn how to [create your own from scratch](/tutorials/create-a-custom-extractor.html).
 
 Once you've got the new extractor working in your project, please consider
-[contributing its definition](/docs/contributor-guide.html#discoverable-plugins)
+[contributing its description](/docs/contributor-guide.html#discoverable-plugins)
 to the [index of discoverable plugins](/docs/plugins.html#discoverable-plugins)
 so that it can be added to this page!
 

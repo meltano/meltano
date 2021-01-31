@@ -1,54 +1,70 @@
-import psycopg2
-import os
-import contextlib
-import sqlalchemy.pool as pool
-import logging
-import weakref
+"""Defines helpers related to the system database."""
 
-from sqlalchemy import create_engine, MetaData, event
+import logging
+import time
+
+from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.engine import Engine
-from psycopg2.sql import Identifier, SQL
 
-
-SystemMetadata = MetaData()
-SystemModel = declarative_base(metadata=SystemMetadata)
+from .project_settings_service import ProjectSettingsService
 
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project
 _engines = dict()
 
 
-def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessionmaker):
+def project_engine(project, default=False) -> ("Engine", sessionmaker):
     """Creates and register a SQLAlchemy engine for a Meltano project instance."""
 
-    # return the default engine if it is registered
-    if not engine_uri and project in _engines:
-        return _engines[project]
-    elif (project, engine_uri) in _engines:
-        return _engines[(project, engine_uri)]
+    existing_engine = _engines.get(project)
+    if existing_engine:
+        return existing_engine
 
-    if not engine_uri:
-        logging.debug(f"Can't find engine for {project}@{engine_uri}")
-        raise ValueError("No engine registered for this project.")
+    settings = ProjectSettingsService(project)
 
+    engine_uri = settings.get("database_uri")
     logging.debug(f"Creating engine {project}@{engine_uri}")
-    engine = create_engine(engine_uri)
+    engine = create_engine(engine_uri, pool_pre_ping=True)
+
+    check_db_connection(
+        engine,
+        max_retries=settings.get("database_max_retries"),
+        retry_timeout=settings.get("database_retry_timeout"),
+    )
 
     init_hook(engine)
 
-    create_session = sessionmaker(bind=engine)
-    engine_session = (engine, create_session)
+    engine_session = (engine, sessionmaker(bind=engine))
 
     if default:
         # register the default engine
         _engines[project] = engine_session
-    else:
-        _engines[(project, engine_uri)] = engine_session
 
     return engine_session
+
+
+def check_db_connection(engine, max_retries, retry_timeout):  # noqa: WPS231
+    """Check if the database is available the first time a project's engine is created."""
+    attempt = 0
+    while True:
+        try:
+            engine.connect()
+        except OperationalError:
+            if attempt == max_retries:
+                logging.error(
+                    "Could not connect to the Database. Max retries exceeded."
+                )
+                raise
+            attempt += 1
+            logging.info(
+                f"DB connection failed. Will retry after {retry_timeout}s. Attempt {attempt}/{max_retries}"
+            )
+            time.sleep(retry_timeout)
+        else:
+            break
 
 
 def init_hook(engine):
@@ -94,6 +110,6 @@ class DB:
                 conn.execute(grant_select_schema)
                 conn.execute(grant_usage_schema)
 
-        logging.info("Schema {} has been created successfully.".format(schema_name))
+        logging.info(f"Schema {schema_name} has been created successfully.")
         for role in grant_roles:
-            logging.info("Usage has been granted for role: {}.".format(role))
+            logging.info(f"Usage has been granted for role: {role}.")

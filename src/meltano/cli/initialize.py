@@ -1,20 +1,18 @@
-import os
-import yaml
-import click
 import logging
+import os
 from urllib.parse import urlparse
 
-from meltano.core.project_init_service import (
-    ProjectInitService,
-    ProjectInitServiceError,
-)
-from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.plugin_install_service import PluginInstallService
-from meltano.core.tracking import GoogleAnalyticsTracker
+import click
+import yaml
 from meltano.core.error import SubprocessError
+from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.project_init_service import ProjectInitService
+from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.tracking import GoogleAnalyticsTracker
+
 from . import cli
-from .utils import CliError
 from .params import database_uri_option
+from .utils import CliError
 
 EXTRACTORS = "extractors"
 LOADERS = "loaders"
@@ -48,8 +46,6 @@ def init(ctx, project_name, no_usage_stats):
 
         tracker = GoogleAnalyticsTracker(project)
         tracker.track_meltano_init(project_name=project_name)
-    except ProjectInitServiceError as e:
-        raise CliError(str(e)) from e
     except SubprocessError as err:
         logger.error(err.stderr)
-        raise CliError(str(err)) from err
+        raise

@@ -1,10 +1,9 @@
 from flask import jsonify, request
-
-from .embeds_helper import EmbedsHelper, InvalidEmbedToken
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.models import db
 from meltano.api.security import block_if_api_auth_required
 
+from .embeds_helper import EmbedsHelper, InvalidEmbedToken
 
 embedsBP = APIBlueprint("embeds", __name__, require_authentication=False)
 

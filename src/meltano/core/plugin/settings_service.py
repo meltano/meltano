@@ -1,18 +1,18 @@
-from copy import deepcopy
-from typing import Iterable, Dict, List
+from typing import Dict, Iterable, List
 
+from meltano.core.plugin import BasePlugin
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import (
-    SettingsService,
-    SettingMissingError,
-    SettingValueStore,
     REDACTED_VALUE,
+    SettingMissingError,
+    SettingsService,
+    SettingValueStore,
 )
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
-from meltano.core.plugin import PluginRef, PluginType, PluginDefinition, ProjectPlugin
-from meltano.core.plugin.error import PluginMissingError
 
 
 class PluginSettingsService(SettingsService):
@@ -21,36 +21,26 @@ class PluginSettingsService(SettingsService):
         project: Project,
         plugin: ProjectPlugin,
         *args,
-        plugin_discovery_service: PluginDiscoveryService = None,
+        plugins_service: ProjectPluginsService = None,
         **kwargs,
     ):
         super().__init__(project, *args, **kwargs)
 
         self.plugin = plugin
-
-        self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
-            self.project, config_service=self.config_service
-        )
-        self._plugin_def = None
+        self.plugins_service = plugins_service or ProjectPluginsService(self.project)
 
         project_settings_service = ProjectSettingsService(
-            self.project, config_service=self.config_service
+            self.project, config_service=self.plugins_service.config_service
         )
 
         self.env_override = {
             **project_settings_service.env,
             **project_settings_service.as_env(),
             **self.env_override,
-            **self.plugin_def.info_env,
             **self.plugin.info_env,
         }
 
-    @property
-    def plugin_def(self):
-        if self._plugin_def is None:
-            self._plugin_def = self.discovery_service.get_definition(self.plugin)
-
-        return self._plugin_def
+        self._inherited_settings_service = None
 
     @property
     def label(self):
@@ -58,68 +48,51 @@ class PluginSettingsService(SettingsService):
 
     @property
     def docs_url(self):
-        return self.plugin_def.docs
+        return self.plugin.docs
+
+    def setting_env_vars(self, setting_def, for_writing=False):
+        return setting_def.env_vars(
+            self.plugin.env_prefixes(for_writing=for_writing),
+            include_custom=self.plugin.is_shadowing or for_writing,
+        )
 
     @property
-    def _env_prefixes(self):
-        return [self.plugin.name, self.plugin_def.namespace]
+    def db_namespace(self):
+        """Return namespace for setting value records in system database."""
+        # "default" is included for legacy reasons
+        return ".".join((self.plugin.type, self.plugin.name, "default"))
 
     @property
-    def _generic_env_prefix(self):
-        return f"meltano_{self.plugin.type.verb}"
+    def setting_definitions(self):
+        """Return definitions of supported settings."""
+        return self.plugin.settings_with_extras
 
     @property
-    def _db_namespace(self):
-        return self.plugin.qualified_name
+    def meltano_yml_config(self):
+        """Return current configuration in `meltano.yml`."""
+        return self.plugin.config_with_extras
+
+    def update_meltano_yml_config(self, config_with_extras):
+        """Update configuration in `meltano.yml`."""
+        self.plugin.config_with_extras = config_with_extras
+        self.plugins_service.update_plugin(self.plugin)
 
     @property
-    def extra_setting_definitions(self):
-        extra_settings = deepcopy(self.plugin.extra_settings)
+    def inherited_settings_service(self):
+        """Return settings service to inherit configuration from."""
+        parent_plugin = self.plugin.parent
+        if not isinstance(parent_plugin, ProjectPlugin):
+            return None
 
-        # Set defaults from plugin definition
-        defaults = {f"_{k}": v for k, v in self.plugin_def.all_extras.items()}
-
-        if defaults:
-            for setting in extra_settings:
-                default_value = defaults.get(setting.name)
-                if default_value is not None:
-                    setting.value = default_value
-
-            # Create setting definitions for unknown defaults,
-            # including flattened keys of default nested object items
-            extra_settings.extend(
-                SettingDefinition.from_missing(
-                    extra_settings, defaults, custom=False, default=True
-                )
+        if self._inherited_settings_service is None:
+            self._inherited_settings_service = self.__class__(
+                self.project,
+                parent_plugin,
+                env_override=self.env_override,
+                plugins_service=self.plugins_service,
             )
+        return self._inherited_settings_service
 
-        return extra_settings
-
-    @property
-    def _definitions(self):
-        return [*self.plugin_def.settings, *self.extra_setting_definitions]
-
-    @property
-    def _meltano_yml_config(self):
-        return {
-            **self.plugin.config,
-            **{f"_{k}": v for k, v in self.plugin.extras.items()},
-        }
-
-    def _update_meltano_yml_config(self, config_with_extras):
-        config = self.plugin.config
-        extras = self.plugin.extras
-
-        config.clear()
-        extras.clear()
-
-        for k, v in config_with_extras.items():
-            if k.startswith("_"):
-                extras[k[1:]] = v
-            else:
-                config[k] = v
-
-        self.config_service.update_plugin(self.plugin)
-
-    def _process_config(self, config):
+    def process_config(self, config):
+        """Process configuration dictionary to be passed to plugin."""
         return self.plugin.process_config(config)

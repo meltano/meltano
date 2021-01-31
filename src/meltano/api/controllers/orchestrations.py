@@ -1,49 +1,47 @@
 import asyncio
 import json
 import logging
-import sqlalchemy
 import shutil
-from flask import request, url_for, jsonify, make_response, Response, send_file
-from flask_restful import Api, Resource, fields, marshal, marshal_with
-from werkzeug.exceptions import Conflict, UnprocessableEntity
 
-from meltano.core.job import JobFinder, State
+import sqlalchemy
+from flask import Response, jsonify, make_response, request, send_file, url_for
+from flask_restful import Api, Resource, fields, marshal, marshal_with
+from flask_security import roles_required
+from meltano.api.api_blueprint import APIBlueprint
+from meltano.api.executor import run_schedule
+from meltano.api.json import freeze_keys
+from meltano.api.models import db
+from meltano.api.models.subscription import Subscription
+from meltano.api.security.auth import block_if_readonly
 from meltano.core.behavior.canonical import Canonical
+from meltano.core.job import JobFinder, State
+from meltano.core.logging import (
+    JobLoggingService,
+    MissingJobLogException,
+    SizeThresholdJobLogException,
+)
 from meltano.core.plugin import PluginRef
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin.settings_service import (
     PluginSettingsService,
     SettingValueStore,
 )
-from meltano.core.plugin_discovery_service import (
-    PluginDiscoveryService,
-    PluginNotFoundError,
-)
-from meltano.core.plugin_invoker import invoker_factory
+from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
-from meltano.core.config_service import ConfigService
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.schedule_service import (
-    ScheduleService,
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
+    ScheduleService,
 )
 from meltano.core.utils import flatten, iso8601_datetime, slugify
-from meltano.core.logging import (
-    JobLoggingService,
-    MissingJobLogException,
-    SizeThresholdJobLogException,
-)
-from meltano.api.api_blueprint import APIBlueprint
-from meltano.api.security.auth import block_if_readonly
-from meltano.api.models import db
-from meltano.api.models.subscription import Subscription
-from meltano.api.json import freeze_keys
-from meltano.api.executor import run_elt
-from flask_security import roles_required
+from werkzeug.exceptions import Conflict, UnprocessableEntity
+
 from .errors import InvalidFileNameError
-from .upload_helper import InvalidFileTypeError, InvalidFileSizeError, UploadHelper
+from .upload_helper import InvalidFileSizeError, InvalidFileTypeError, UploadHelper
 from .utils import enforce_secure_filename
 
 
@@ -118,7 +116,7 @@ orchestrationsAPI = Api(
 
 
 @orchestrationsBP.errorhandler(ScheduleAlreadyExistsError)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (
         jsonify(
             {
@@ -131,7 +129,7 @@ def _handle(ex):
 
 
 @orchestrationsBP.errorhandler(ScheduleDoesNotExistError)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (
         jsonify(
             {
@@ -144,12 +142,12 @@ def _handle(ex):
 
 
 @orchestrationsBP.errorhandler(InvalidFileNameError)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (jsonify({"error": True, "code": f"The file lacks a valid name."}), 400)
 
 
 @orchestrationsBP.errorhandler(InvalidFileTypeError)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (
         jsonify(
             {
@@ -162,7 +160,7 @@ def _handle(ex):
 
 
 @orchestrationsBP.errorhandler(InvalidFileSizeError)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (
         jsonify(
             {
@@ -175,7 +173,7 @@ def _handle(ex):
 
 
 @orchestrationsBP.errorhandler(MissingJobLogException)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (jsonify({"error": False, "code": str(ex)}), 204)
 
 
@@ -260,7 +258,8 @@ def download_job_log(job_id) -> Response:
 def run():
     project = Project.find()
     schedule_payload = request.get_json()
-    job_id = run_elt(project, schedule_payload)
+    name = schedule_payload["name"]
+    job_id = run_schedule(project, name)
 
     return jsonify({"job_id": job_id}), 202
 
@@ -317,21 +316,16 @@ def get_plugin_configuration(plugin_ref) -> Response:
     """
 
     project = Project.find()
-    config_service = ConfigService(project)
-    plugin = config_service.get_plugin(plugin_ref)
 
-    discovery_service = PluginDiscoveryService(project, config_service=config_service)
+    plugins_service = ProjectPluginsService(project)
+    plugin = plugins_service.get_plugin(plugin_ref)
+
     settings = PluginSettingsService(
-        project,
-        plugin,
-        config_service=config_service,
-        plugin_discovery_service=discovery_service,
-        show_hidden=False,
+        project, plugin, plugins_service=plugins_service, show_hidden=False
     )
 
     try:
-        plugin_def = discovery_service.get_definition(plugin)
-        settings_group_validation = plugin_def.settings_group_validation
+        settings_group_validation = plugin.settings_group_validation
     except PluginNotFoundError:
         settings_group_validation = []
 
@@ -352,11 +346,11 @@ def save_plugin_configuration(plugin_ref) -> Response:
     """
     project = Project.find()
     payload = request.get_json()
-    config_service = ConfigService(project)
-    plugin = config_service.get_plugin(plugin_ref)
+    plugins_service = ProjectPluginsService(project)
+    plugin = plugins_service.get_plugin(plugin_ref)
 
     settings = PluginSettingsService(
-        project, plugin, config_service=config_service, show_hidden=False
+        project, plugin, plugins_service=plugins_service, show_hidden=False
     )
 
     config = payload.get("config", {})
@@ -380,11 +374,11 @@ def test_plugin_configuration(plugin_ref) -> Response:
     """
     project = Project.find()
     payload = request.get_json()
-    config_service = ConfigService(project)
-    plugin = config_service.get_plugin(plugin_ref)
+    plugins_service = ProjectPluginsService(project)
+    plugin = plugins_service.get_plugin(plugin_ref)
 
     settings = PluginSettingsService(
-        project, plugin, config_service=config_service, show_hidden=False
+        project, plugin, plugins_service=plugins_service, show_hidden=False
     )
 
     config = payload.get("config", {})
@@ -407,7 +401,12 @@ def test_plugin_configuration(plugin_ref) -> Response:
     async def test_extractor():
         process = None
         try:
-            invoker = invoker_factory(project, plugin, plugin_settings_service=settings)
+            invoker = invoker_factory(
+                project,
+                plugin,
+                plugins_service=plugins_service,
+                plugin_settings_service=settings,
+            )
             with invoker.prepared(db.session):
                 process = await invoker.invoke_async(stdout=asyncio.subprocess.PIPE)
                 return await test_stream(process.stdout)

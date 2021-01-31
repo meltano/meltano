@@ -1,17 +1,17 @@
 import functools
-import urllib
-import click
-import click.globals
 import os
+import urllib
 from pathlib import Path
 
-from .utils import CliError
-
+import click
+import click.globals
+from meltano.core.db import project_engine
+from meltano.core.migration_service import MigrationService
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import pop_all
-from meltano.core.migration_service import MigrationService, MigrationError
-from meltano.core.db import project_engine
+
+from .utils import CliError
 
 
 def database_uri_option(func):
@@ -25,7 +25,9 @@ def database_uri_option(func):
     return functools.update_wrapper(decorate, func)
 
 
-class project:
+class pass_project:  # noqa: N801
+    """Pass current project to decorated CLI command function."""
+
     __name__ = "project"
 
     def __init__(self, migrate=False):
@@ -45,18 +47,12 @@ class project:
                 )
 
             # register the system database connection
-            settings_service = ProjectSettingsService(project)
-            engine, _ = project_engine(
-                project, settings_service.get("database_uri"), default=True
-            )
+            engine, _ = project_engine(project, default=True)
 
             if self.migrate:
-                try:
-                    migration_service = MigrationService(engine)
-                    migration_service.upgrade(silent=True)
-                    migration_service.seed(project)
-                except MigrationError as err:
-                    raise CliError(str(err)) from err
+                migration_service = MigrationService(engine)
+                migration_service.upgrade(silent=True)
+                migration_service.seed(project)
 
             func(project, *args, **kwargs)
 

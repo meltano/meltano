@@ -1,21 +1,23 @@
 import logging
-from typing import Iterable
 from enum import Enum
+from typing import Iterable
+
+from meltano.core.plugin.project_plugin import ProjectPlugin
 
 from .compiler.project_compiler import ProjectCompiler
-from .plugin_discovery_service import PluginDiscoveryService
-from .project_add_service import ProjectAddService
-from .config_service import ConfigService
-from .venv_service import VenvService
-from .utils import noop
-from .plugin import PluginType, ProjectPlugin, PluginDefinition, PluginRef
-from .project import Project
 from .error import (
     PluginInstallError,
     PluginInstallWarning,
-    SubprocessError,
     PluginNotInstallable,
+    SubprocessError,
 )
+from .plugin import PluginType
+from .plugin_discovery_service import PluginDiscoveryService
+from .project import Project
+from .project_add_service import ProjectAddService
+from .project_plugins_service import ProjectPluginsService
+from .utils import noop
+from .venv_service import VenvService
 
 
 class PluginInstallReason(str, Enum):
@@ -27,20 +29,20 @@ class PluginInstallReason(str, Enum):
 def installer_factory(project, plugin: ProjectPlugin, *args, **kwargs):
     cls = PipPluginInstaller
 
-    if hasattr(plugin.__class__, "__installer_cls__"):
-        cls = plugin.__class__.__installer_cls__
+    if hasattr(plugin, "installer_class"):
+        cls = plugin.installer_class
 
     return cls(project, plugin, *args, **kwargs)
 
 
 class PluginInstallService:
-    def __init__(self, project: Project, config_service: ConfigService = None):
+    def __init__(self, project: Project, plugins_service: ProjectPluginsService = None):
         self.project = project
-        self.config_service = config_service or ConfigService(project)
+        self.plugins_service = plugins_service or ProjectPluginsService(project)
 
     def install_all_plugins(self, reason=PluginInstallReason.INSTALL, status_cb=noop):
         return self.install_plugins(
-            self.config_service.plugins(), reason=reason, status_cb=status_cb
+            self.plugins_service.plugins(), reason=reason, status_cb=status_cb
         )
 
     def install_plugins(
@@ -95,7 +97,7 @@ class PluginInstallService:
             raise PluginNotInstallable()
 
         try:
-            with plugin.trigger_hooks("install", self.project, reason):
+            with plugin.trigger_hooks("install", self, plugin, reason):
                 run = installer_factory(self.project, plugin).install(reason)
 
                 if compile_models and plugin.type is PluginType.MODELS:

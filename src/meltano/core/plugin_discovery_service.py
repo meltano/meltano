@@ -1,25 +1,25 @@
-import os
 import io
-import yaml
-import requests
 import logging
-import shutil
+import os
 import re
+import shutil
 from copy import deepcopy
-from typing import Dict, Iterable, Optional
+from typing import Dict, Iterable, List, Optional
 
+import meltano
 import meltano.core.bundle as bundle
+import requests
+import yaml
+
+from .behavior.canonical import Canonical
+from .behavior.versioned import IncompatibleVersionError, Versioned
+from .plugin import BasePlugin, PluginDefinition, PluginRef, PluginType, Variant
+from .plugin.error import PluginNotFoundError
+from .plugin.factory import base_plugin_factory
+from .plugin.project_plugin import ProjectPlugin
 from .project_settings_service import ProjectSettingsService
 from .setting_definition import SettingDefinition
-from .behavior.versioned import Versioned, IncompatibleVersionError
-from .behavior.canonical import Canonical
-from .config_service import ConfigService
-from .plugin import PluginDefinition, ProjectPlugin, PluginType, PluginRef, Variant
-from .plugin.factory import plugin_factory
-
-
-class PluginNotFoundError(Exception):
-    pass
+from .utils import NotFound, find_named
 
 
 class DiscoveryInvalidError(Exception):
@@ -57,27 +57,24 @@ class DiscoveryFile(Canonical):
                 self[plugin_type].append(plugin_def)
 
     @classmethod
-    def version(cls, attrs):
+    def file_version(cls, attrs):
+        """Return version of discovery file represented by attrs dictionary."""
         return int(attrs.get("version", 1))
 
 
 class PluginDiscoveryService(Versioned):
     __version__ = VERSION
 
-    def __init__(
-        self,
-        project,
-        config_service: ConfigService = None,
-        discovery: Optional[Dict] = None,
-    ):
+    def __init__(self, project, discovery: Optional[Dict] = None):
         self.project = project
-        self.config_service = config_service or ConfigService(project)
 
         self._discovery_version = None
         self._discovery = None
         if discovery:
-            self._discovery_version = DiscoveryFile.version(discovery)
+            self._discovery_version = DiscoveryFile.file_version(discovery)
             self._discovery = DiscoveryFile.parse(discovery)
+
+        self.settings_service = ProjectSettingsService(self.project)
 
     @property
     def file_version(self):
@@ -85,7 +82,7 @@ class PluginDiscoveryService(Versioned):
 
     @property
     def discovery_url(self):
-        discovery_url = ProjectSettingsService(self.project).get("discovery_url")
+        discovery_url = self.settings_service.get("discovery_url")
 
         if not discovery_url or not re.match(r"^https?://", discovery_url):
             return None
@@ -153,11 +150,21 @@ class PluginDiscoveryService(Versioned):
             pass
 
     def load_remote_discovery(self):
-        if not self.discovery_url:
+        discovery_url = self.discovery_url
+        if not discovery_url:
             return
 
         try:
-            response = requests.get(self.discovery_url)
+            headers = {"User-Agent": f"Meltano/{meltano.__version__}"}  # noqa: WPS609
+            params = {}
+
+            if self.settings_service.get("send_anonymous_usage_stats"):
+                project_id = self.settings_service.get("project_id")
+
+                headers["X-Project-ID"] = project_id
+                params["project_id"] = project_id
+
+            response = requests.get(discovery_url, headers=headers, params=params)
             response.raise_for_status()
 
             remote_discovery = io.StringIO(response.text)
@@ -189,7 +196,7 @@ class PluginDiscoveryService(Versioned):
         try:
             discovery_yaml = yaml.safe_load(discovery_file)
 
-            self._discovery_version = DiscoveryFile.version(discovery_yaml)
+            self._discovery_version = DiscoveryFile.file_version(discovery_yaml)
             self.ensure_compatible()
 
             self._discovery = DiscoveryFile.parse(discovery_yaml)
@@ -216,20 +223,8 @@ class PluginDiscoveryService(Versioned):
     def cached_discovery_file(self):
         return self.project.meltano_dir("cache", "discovery.yml")
 
-    def get_discovery_plugins_of_type(self, plugin_type):
-        return self.discovery[plugin_type]
-
-    def get_custom_plugins_of_type(self, plugin_type):
-        return [
-            project_plugin.custom_definition
-            for project_plugin in self.config_service.get_plugins_of_type(plugin_type)
-            if project_plugin.is_custom()
-        ]
-
     def get_plugins_of_type(self, plugin_type):
-        return self.get_custom_plugins_of_type(
-            plugin_type
-        ) + self.get_discovery_plugins_of_type(plugin_type)
+        return self.discovery[plugin_type]
 
     def plugins_by_type(self):
         return {
@@ -245,18 +240,12 @@ class PluginDiscoveryService(Versioned):
         )
 
     def find_definition(
-        self, plugin_type: PluginType, plugin_name: str, variant=None
+        self, plugin_type: PluginType, plugin_name: str
     ) -> PluginDefinition:
         try:
-            plugin = next(
-                plugin
-                for plugin in self.get_plugins_of_type(plugin_type)
-                if plugin.name == plugin_name
-            )
-            plugin.use_variant(variant)
-            return plugin
-        except StopIteration as stop:
-            raise PluginNotFoundError(plugin_name) from stop
+            return find_named(self.get_plugins_of_type(plugin_type), plugin_name)
+        except NotFound as err:
+            raise PluginNotFoundError(PluginRef(plugin_type, plugin_name)) from err
 
     def find_definition_by_namespace(
         self, plugin_type: PluginType, namespace: str
@@ -270,17 +259,40 @@ class PluginDiscoveryService(Versioned):
         except StopIteration as stop:
             raise PluginNotFoundError(namespace) from stop
 
-    def get_definition(self, project_plugin: ProjectPlugin) -> PluginDefinition:
-        if project_plugin.is_custom():
-            plugin = project_plugin.custom_definition
-        else:
-            try:
-                plugin = next(
-                    plugin for plugin in self.plugins() if plugin == project_plugin
-                )
-            except StopIteration as stop:
-                raise PluginNotFoundError(project_plugin.name) from stop
+    def find_base_plugin(
+        self, plugin_type: PluginType, plugin_name: str, variant=None
+    ) -> BasePlugin:
+        plugin = self.find_definition(plugin_type, plugin_name)
+        return base_plugin_factory(plugin, variant)
 
-        plugin.use_variant(project_plugin.variant or Variant.ORIGINAL_NAME)
+    def get_base_plugin(self, project_plugin: ProjectPlugin) -> BasePlugin:
+        plugin = project_plugin.custom_definition or self.find_definition(
+            project_plugin.type, project_plugin.inherit_from or project_plugin.name
+        )
 
-        return plugin
+        return base_plugin_factory(plugin, project_plugin.variant)
+
+    def find_related_plugin_refs(
+        self,
+        target_plugin: ProjectPlugin,
+        plugin_types: List[PluginType] = list(PluginType),
+    ):
+        try:
+            plugin_types.remove(target_plugin.type)
+        except ValueError:
+            pass
+
+        related_plugin_refs = []
+
+        runner_ref = target_plugin.runner
+        if runner_ref:
+            related_plugin_refs.append(runner_ref)
+
+        related_plugin_refs.extend(
+            related_plugin_def
+            for plugin_type in plugin_types
+            for related_plugin_def in self.get_plugins_of_type(plugin_type)
+            if related_plugin_def.namespace == target_plugin.namespace
+        )
+
+        return related_plugin_refs

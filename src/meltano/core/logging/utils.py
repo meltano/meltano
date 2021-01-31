@@ -18,10 +18,6 @@ FORMAT = (
     "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"
 )
 
-# Increase subprocess output buffer size from StreamReader's default 64KB to 1MB,
-# since Singer messages output by taps can be quite large.
-OUTPUT_BUFFER_SIZE = 1024 * 1024
-
 
 def parse_log_level(log_level):
     return LEVELS.get(log_level, LEVELS[DEFAULT_LEVEL])
@@ -73,3 +69,4 @@ async def capture_subprocess_output(reader, *line_writers):
                 writer.writeline(line.decode())
             except AttributeError:
                 writer.write(line)
+                await writer.drain()

@@ -1,26 +1,26 @@
-import pytest
 import json
 import os
 import shutil
-from pathlib import Path
 from os.path import join
+from pathlib import Path
 
-from support.payload_builder import PayloadBuilder
+import pytest
 from meltano.core.compiler.project_compiler import ProjectCompiler
-from meltano.core.sql.sql_utils import SqlUtils
-from meltano.core.sql.analysis_helper import AnalysisHelper
-from meltano.core.sql.date import Date
-from meltano.core.project import Project
 from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
 from meltano.core.m5o.m5oc_file import M5ocFile
+from meltano.core.project import Project
+from meltano.core.sql.analysis_helper import AnalysisHelper
 from meltano.core.sql.base import (
-    MeltanoDesign,
-    MeltanoTable,
-    MeltanoColumn,
     MeltanoAggregate,
+    MeltanoColumn,
+    MeltanoDesign,
     MeltanoQuery,
+    MeltanoTable,
     ParseError,
 )
+from meltano.core.sql.date import Date
+from meltano.core.sql.sql_utils import SqlUtils
+from support.payload_builder import PayloadBuilder
 
 
 @pytest.fixture(scope="class")

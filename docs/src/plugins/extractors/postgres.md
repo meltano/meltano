@@ -57,7 +57,17 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
     [`FULL_TABLE`](/docs/integration.html#full-table-replication)
 
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
+
+    Note that this extractor is incompatible with the default `datamill-co` [variants](/docs/plugins.html#variants)
+    of [`target-postgres`](/plugins/loaders/postgres.html) and [`target-snowflake`](/plugins/loaders/snowflake.html),
+    because they don't support stream names that include the source schema in addition to the table name: `<schema>-<table>`, e.g. `public-accounts`.
+
+    Instead, use the `transferwise` variants that were made to be used with this extractor:
+    [`target-postgres`](/plugins/loaders/postgres--transferwise.html) and [`target-snowflake`](/plugins/loaders/snowflake--transferwise.html).
+
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
+
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
 
 ## Settings
 
@@ -76,12 +86,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-postgres` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-10}
+```yml{5-9}
 plugins:
   extractors:
   - name: tap-postgres
     variant: transferwise
-    pip_url: pipelinewise-tap-postgres
     config:
       host: postgres.example.com
       port: 5432

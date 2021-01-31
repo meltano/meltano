@@ -50,6 +50,8 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `tap-bing-ads` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -66,12 +68,11 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 
 A minimal configuration of `tap-bing-ads` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-9}
+```yml{5-8}
 plugins:
   extractors:
   - name: tap-bing-ads
     variant: singer-io
-    pip_url: tap-bing-ads
     config:
       customer_id: 163875182
       account_ids: 163078754

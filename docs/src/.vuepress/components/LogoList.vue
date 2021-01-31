@@ -47,7 +47,7 @@ export default {
         <LogoListItem v-for="(logo, index) in logos"
             class="logo-list__item"
             :class="{ 'logo-list__item--dark': logo.theme === 'dark' }"
-            :imageUrl="logo.url" 
+            :imageUrl="logo.url"
             :imageAlt="logo.alt"
             :label="logo.label"
             :key="`meltano-logo-${index}`"

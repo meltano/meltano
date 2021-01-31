@@ -29,7 +29,7 @@ you can skip steps 1 through 3 and refer primarily to the "Containerized Meltano
 
 Since a Meltano project is just a directory on your filesystem containing
 text-based files, you can treat it like any other software development project
-and benefit from DevOps best practices such as version control, code review,
+and benefit from DataOps best practices such as version control, code review,
 and continuous integration and deployment (CI/CD).
 
 As such, getting your Meltano project onto the production environment starts
@@ -249,7 +249,7 @@ but there are [a couple of settings](/docs/settings.html#meltano-ui-server) you'
   You may also need to change the [`ui.forwarded_allow_ips` setting](/docs/settings.html#ui-forwarded-allow-ips) to get
   Meltano UI to realize it should use the `https` URL scheme rather than `http` in the URLs it builds.
 
-  If your reverse proxy uses a health check to determine if Meltano UI is ready to accept traffic, you can use the `/api/health` route, which will always respond with a 200 status code.
+  If your reverse proxy uses a health check to determine if Meltano UI is ready to accept traffic, you can use the `/api/v1/health` route, which will always respond with a 200 status code.
 
 - Meltano UI can be used to make changes to your project, like adding plugins and scheduling pipelines,
   which is very useful locally but may be undesirable in production if you'd prefer for all changes to [go through version control](#off-of-your-local-machine) instead.

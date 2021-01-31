@@ -1,6 +1,5 @@
 import functools
 import logging
-
 from enum import Enum
 
 
@@ -72,7 +71,7 @@ def aggregate(error_cls):
             self.exceptions = exceptions
 
         def __str__(self):
-            return "\n".join((str(e) for e in self.exceptions))
+            return "\n".join(str(e) for e in self.exceptions)
 
     if error_cls != Exception:
         error_cls.Aggregate = Aggregate

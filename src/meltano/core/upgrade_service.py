@@ -1,20 +1,20 @@
-import os
-import click
-import logging
-import psutil
 import importlib
-import meltano
-import subprocess
-import signal
+import logging
+import os
 import shutil
+import signal
+import subprocess
 from typing import Optional
 
-from meltano.core.project import Project
-from meltano.core.migration_service import MigrationService, MigrationError
-from meltano.core.config_service import ConfigService
-from meltano.cli.utils import install_plugins, PluginInstallReason
-from meltano.core.compiler.project_compiler import ProjectCompiler
+import click
+import meltano
 import meltano.core.bundle as bundle
+import psutil
+from meltano.cli.utils import PluginInstallReason, install_plugins
+from meltano.core.compiler.project_compiler import ProjectCompiler
+from meltano.core.migration_service import MigrationError, MigrationService
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import PluginType, ProjectPluginsService
 
 
 class UpgradeError(Exception):
@@ -102,7 +102,9 @@ class UpgradeService:
         """
         click.secho("Updating files managed by plugins...", fg="blue")
 
-        file_plugins = ConfigService(self.project).get_files()
+        file_plugins = ProjectPluginsService(self.project).get_plugins_of_type(
+            PluginType.FILES
+        )
         if not file_plugins:
             click.echo("Nothing to update")
             return

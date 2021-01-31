@@ -1,24 +1,24 @@
 import errno
-import fasteners
 import logging
 import os
 import sys
 import threading
-import yaml
-from copy import deepcopy
 from contextlib import contextmanager
-from dotenv import dotenv_values
+from copy import deepcopy
 from functools import wraps
 from pathlib import Path
-from typing import Union, Dict
+from typing import Dict, Union
+
+import fasteners
+import yaml
 from atomicwrites import atomic_write
+from dotenv import dotenv_values
 from werkzeug.utils import secure_filename
 
-from .error import Error
 from .behavior.versioned import Versioned
-from .utils import makedirs, truthy
+from .error import Error
 from .meltano_file import MeltanoFile
-
+from .utils import makedirs, truthy
 
 logger = logging.getLogger(__name__)
 

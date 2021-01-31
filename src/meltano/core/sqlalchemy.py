@@ -1,7 +1,8 @@
-from sqlalchemy.types import TypeDecorator, CHAR, VARCHAR, INTEGER
-from sqlalchemy.dialects.postgresql import UUID
-import uuid
 import json
+import uuid
+
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.types import CHAR, INTEGER, VARCHAR, TypeDecorator
 
 
 class JSONEncodedDict(TypeDecorator):

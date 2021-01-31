@@ -56,6 +56,8 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `tap-mongodb` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -70,12 +72,11 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 
 A minimal configuration of `tap-mongodb` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-10}
+```yml{5-9}
 plugins:
   extractors:
   - name: tap-mongodb
     variant: singer-io
-    pip_url: tap-mongodb
     config:
       host: mongodb.example.com
       port: 27017

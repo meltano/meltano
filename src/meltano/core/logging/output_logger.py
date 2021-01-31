@@ -1,19 +1,16 @@
 import asyncio
 import logging
-import click
-import sys
 import os
-from contextlib import contextmanager, suppress, redirect_stderr, redirect_stdout
+import sys
+from contextlib import contextmanager, redirect_stderr, redirect_stdout, suppress
+
+import click
 from async_generator import asynccontextmanager
 
-from .utils import (
-    OUTPUT_BUFFER_SIZE,
-    remove_ansi_escape_sequences,
-    capture_subprocess_output,
-)
+from .utils import capture_subprocess_output, remove_ansi_escape_sequences
 
 
-class OutputLogger(object):
+class OutputLogger:
     def __init__(self, file):
         self.file = file
         self.stdout = sys.stdout
@@ -43,7 +40,7 @@ class OutputLogger(object):
         return self._max_name_length
 
 
-class LineWriter(object):
+class LineWriter:
     NEWLINE = "\n"
 
     def __init__(self, out):
@@ -68,7 +65,7 @@ class LineWriter(object):
         self.__out.writeline(line)
 
 
-class FileDescriptorWriter(object):
+class FileDescriptorWriter:
     def __init__(self, out, fd):
         self.__out = out
         self.__writer = os.fdopen(fd, "w")
@@ -80,7 +77,7 @@ class FileDescriptorWriter(object):
         return self.__out.isatty()
 
 
-class Out(object):
+class Out:
     """
     Simple Out class to log anything written in a stream to a file
      and then also write it to the stream.
@@ -148,7 +145,7 @@ class Out(object):
     async def writer(self):
         read_fd, write_fd = os.pipe()
 
-        reader = asyncio.ensure_future(self.read_from_fd(read_fd))
+        reader = asyncio.ensure_future(self._read_from_fd(read_fd))
         writer = FileDescriptorWriter(self, write_fd)
 
         try:
@@ -192,8 +189,12 @@ class Out(object):
         # from stripping ANSI codes
         return self.stream.isatty()
 
-    async def read_from_fd(self, read_fd):
-        reader = asyncio.StreamReader(limit=OUTPUT_BUFFER_SIZE)
+    async def _read_from_fd(self, read_fd):
+        # Since we're redirecting our own stdout and stderr output,
+        # the line length limit can be arbitrarily large.
+        line_length_limit = 1024 * 1024 * 1024  # 1 GiB
+
+        reader = asyncio.StreamReader(limit=line_length_limit)
         read_protocol = asyncio.StreamReaderProtocol(reader)
 
         loop = asyncio.get_event_loop()

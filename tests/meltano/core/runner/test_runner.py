@@ -1,19 +1,17 @@
-import pytest
-import os
 import json
-from asynctest import CoroutineMock
+import os
 from pathlib import Path
-
 from unittest import mock
-from meltano.core.job import Job, State, Payload
-from meltano.core.elt_context import ELTContextBuilder
-from meltano.core.plugin import ProjectPlugin, PluginType
-from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.plugin.factory import plugin_factory
-from meltano.core.plugin.singer import SingerTap, SingerTarget
-from meltano.core.runner.singer import SingerRunner, BookmarkWriter
-from meltano.core.logging.utils import capture_subprocess_output
 
+import pytest
+from asynctest import CoroutineMock
+from meltano.core.elt_context import ELTContextBuilder
+from meltano.core.job import Job, Payload, State
+from meltano.core.logging.utils import capture_subprocess_output
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin.singer import SingerTap, SingerTarget
+from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.runner.singer import BookmarkWriter, SingerRunner
 
 TEST_JOB_ID = "test_job"
 
@@ -181,7 +179,7 @@ class TestSingerRunner:
         subject.context.full_refresh = full_refresh
         subject.context.select_filter = select_filter
 
-        with subject.context.job.run(session):
+        async with subject.context.job.run(session):
             with mock.patch.object(
                 session, "add", side_effect=session.add
             ) as add_mock, mock.patch.object(

@@ -1,12 +1,12 @@
-import pytest
 import os
-from unittest import mock
 from functools import partial
+from unittest import mock
 
+import pytest
+from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import iso8601_datetime
-from asserts import assert_cli_runner
 
 
 class TestCliSchedule:
@@ -43,3 +43,16 @@ class TestCliSchedule:
         assert schedule.transform == "run"
         assert schedule.interval == "@eon"  # not anytime soon ;)
         assert schedule.start_date == iso8601_datetime(TEST_DATE)
+
+    @pytest.mark.parametrize("exit_code", [0, 1, 143])
+    def test_schedule_run(self, exit_code, cli_runner, schedule):
+        process_mock = mock.Mock(returncode=exit_code)
+        with mock.patch(
+            "meltano.cli.schedule.ScheduleService.run", return_value=process_mock
+        ) as run_mock:
+            res = cli_runner.invoke(
+                cli, ["schedule", "run", schedule.name, "--transform", "run"]
+            )
+            assert res.exit_code == exit_code
+
+            run_mock.assert_called_once_with(schedule, "--transform", "run")

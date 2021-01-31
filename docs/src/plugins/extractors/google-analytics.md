@@ -50,6 +50,8 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `tap-google-analytics` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -77,12 +79,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-google-analytics` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-8}
+```yml{5-7}
 plugins:
   extractors:
   - name: tap-google-analytics
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/tap-google-analytics.git
     config:
       view_id: 188274549
       start_date: '2020-10-01T00:00:00Z'

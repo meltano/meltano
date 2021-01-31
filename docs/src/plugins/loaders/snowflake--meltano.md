@@ -57,6 +57,8 @@ Follow the remaining step of the [Getting Started guide](/docs/getting-started.h
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `target-snowflake` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -76,12 +78,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-snowflake` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-14}
+```yml{5-13}
 plugins:
   loaders:
   - name: target-snowflake
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/target-snowflake.git
     config:
       account: my_account
       username: my_username

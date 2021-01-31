@@ -1,28 +1,28 @@
 import json
 import logging
-import subprocess
 import shutil
-from typing import Dict
-from jsonschema import Draft4Validator
-from pathlib import Path
+import subprocess
 from hashlib import sha1
+from pathlib import Path
+from typing import Dict
 
-from meltano.core.setting_definition import SettingDefinition
+from jsonschema import Draft4Validator
 from meltano.core.behavior.hookable import hook
+from meltano.core.job import JobFinder, Payload
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin_invoker import InvokerError
-from meltano.core.job import Payload, JobFinder
-from meltano.core.utils import file_has_data, truthy, flatten, merge
+from meltano.core.setting_definition import SettingDefinition
+from meltano.core.utils import file_has_data, flatten, merge, truthy
 
-from . import SingerPlugin, PluginType
+from . import PluginType, SingerPlugin
 from .catalog import (
     MetadataExecutor,
     MetadataRule,
     SchemaExecutor,
     SchemaRule,
     property_breadcrumb,
-    select_metadata_rules,
     select_filter_metadata_rules,
+    select_metadata_rules,
 )
 
 logger = logging.getLogger(__name__)
@@ -67,27 +67,23 @@ def config_schema_rules(config):
 class SingerTap(SingerPlugin):
     __plugin_type__ = PluginType.EXTRACTORS
 
-    @property
-    def extra_settings(self):
-        return [
-            SettingDefinition(name="_catalog"),
-            SettingDefinition(name="_state"),
-            SettingDefinition(
-                name="_load_schema", value="$MELTANO_EXTRACTOR_NAMESPACE"
-            ),
-            SettingDefinition(name="_select", kind="array", value=["*.*"]),
-            SettingDefinition(
-                name="_metadata",
-                aliases=["metadata"],
-                kind="object",
-                value={},
-                value_processor="nest_object",
-            ),
-            SettingDefinition(
-                name="_schema", kind="object", value={}, value_processor="nest_object"
-            ),
-            SettingDefinition(name="_select_filter", kind="array", value=[]),
-        ]
+    EXTRA_SETTINGS = [
+        SettingDefinition(name="_catalog"),
+        SettingDefinition(name="_state"),
+        SettingDefinition(name="_load_schema", value="$MELTANO_EXTRACTOR_NAMESPACE"),
+        SettingDefinition(name="_select", kind="array", value=["*.*"]),
+        SettingDefinition(
+            name="_metadata",
+            aliases=["metadata"],
+            kind="object",
+            value={},
+            value_processor="nest_object",
+        ),
+        SettingDefinition(
+            name="_schema", kind="object", value={}, value_processor="nest_object"
+        ),
+        SettingDefinition(name="_select_filter", kind="array", value=[]),
+    ]
 
     def exec_args(self, plugin_invoker):
         """
@@ -370,7 +366,7 @@ class SingerTap(SingerPlugin):
     def catalog_cache_key(self, plugin_invoker):
         # If the extractor is installed as editable, don't cache because
         # the result of discovery could change at any time.
-        if plugin_invoker.plugin_def.pip_url.startswith("-e"):
+        if plugin_invoker.plugin.pip_url.startswith("-e"):
             return None
 
         extras = plugin_invoker.plugin_config_extras

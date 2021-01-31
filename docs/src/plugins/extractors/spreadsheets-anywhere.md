@@ -36,6 +36,8 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `tap-spreadsheets-anywhere` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -46,12 +48,11 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 
 A minimal configuration of `tap-spreadsheets-anywhere` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-20}
+```yml{5-19}
 plugins:
   extractors:
   - name: tap-spreadsheets-anywhere
     variant: etc
-    pip_url: git+https://github.com/ets/tap-spreadsheets-anywhere.git
     config:
       tables:
         - path: s3://my-s3-bucket
@@ -82,12 +83,11 @@ See <https://github.com/ets/tap-spreadsheets-anywhere#configuration>.
 
 Manage this setting directly in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):
 
-```yml{6-14}
+```yml{5-13}
 plugins:
   extractors:
   - name: tap-spreadsheets-anywhere
     variant: etc
-    pip_url: git+https://github.com/ets/tap-spreadsheets-anywhere.git
     config:
       tables:
         - path: <path>

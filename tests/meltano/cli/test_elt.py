@@ -1,25 +1,25 @@
-import pytest
-import os
-import logging
+import asyncio
 import json
-
-from unittest import mock
-from asynctest import CoroutineMock
+import logging
+import os
 from functools import partial
+from unittest import mock
 
+import pytest
 from asserts import assert_cli_runner
+from asynctest import CoroutineMock
 from meltano.cli import cli
-from meltano.core.project_add_service import PluginAlreadyAddedException
-from meltano.core.plugin import PluginType, PluginRef
-from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.plugin.singer import SingerTap
-from meltano.core.plugin.dbt import DbtPlugin
-from meltano.core.runner.singer import SingerRunner
-from meltano.core.runner.dbt import DbtRunner
-from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.job import Job, Payload
 from meltano.core.logging.utils import remove_ansi_escape_sequences
+from meltano.core.plugin import PluginRef, PluginType
+from meltano.core.plugin.dbt import DbtPlugin
+from meltano.core.plugin.singer import SingerTap
+from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.project_add_service import PluginAlreadyAddedException
+from meltano.core.runner.dbt import DbtRunner
+from meltano.core.runner.singer import SingerRunner
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 def assert_lines(output, *lines):
@@ -64,6 +64,14 @@ def tap_process(process_mock_factory, tap):
 @pytest.fixture()
 def target_process(process_mock_factory, target):
     target = process_mock_factory(target)
+
+    # Have `target.wait` take 1s to make sure the tap always finishes before the target
+    async def wait_mock():
+        await asyncio.sleep(1)
+        return target.wait.return_value
+
+    target.wait.side_effect = wait_mock
+
     target.stdout.at_eof.side_effect = (False, False, False, True)
     target.stdout.readline = CoroutineMock(
         side_effect=(b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
@@ -106,7 +114,7 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        plugin_discovery_service,
+        project_plugins_service,
         job_logging_service,
     ):
         result = cli_runner.invoke(cli, ["elt"])
@@ -124,8 +132,8 @@ class TestCliEltScratchpadOne:
         ), mock.patch(
             "meltano.core.plugin_invoker.asyncio"
         ) as asyncio_mock, mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
@@ -155,8 +163,8 @@ class TestCliEltScratchpadOne:
 
         exc = Exception("This is a grave danger.")
         with mock.patch.object(SingerRunner, "run", side_effect=exc), mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
@@ -186,7 +194,7 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        plugin_discovery_service,
+        project_plugins_service,
         job_logging_service,
         monkeypatch,
     ):
@@ -203,8 +211,8 @@ class TestCliEltScratchpadOne:
         ), mock.patch(
             "meltano.core.plugin_invoker.asyncio"
         ) as asyncio_mock, mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
@@ -262,7 +270,7 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        plugin_discovery_service,
+        project_plugins_service,
     ):
         job_id = "pytest_test_elt"
         args = ["elt", "--job_id", job_id, tap.name, target.name]
@@ -278,12 +286,12 @@ class TestCliEltScratchpadOne:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
-            assert "Tap failed" in str(result.exception)
+            assert "Extractor failed" in str(result.exception)
 
             assert_lines(
                 result.stdout,
@@ -302,7 +310,7 @@ class TestCliEltScratchpadOne:
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
-    def test_elt_target_failure(
+    def test_elt_target_failure_before_tap_finishes(
         self,
         google_tracker,
         cli_runner,
@@ -311,7 +319,63 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        plugin_discovery_service,
+        project_plugins_service,
+    ):
+        job_id = "pytest_test_elt"
+        args = ["elt", "--job_id", job_id, tap.name, target.name]
+
+        # Have `tap_process.wait` take 2s to make sure the target can fail before tap finishes
+        async def wait_mock():
+            await asyncio.sleep(2)
+            return tap_process.wait.return_value
+
+        tap_process.wait.side_effect = wait_mock
+
+        target_process.wait.return_value = 1
+        target_process.stderr.readline.side_effect = (
+            b"Starting\n",
+            b"Running\n",
+            b"Failure\n",
+        )
+
+        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+            assert result.exit_code == 1
+            assert "Loader failed" in str(result.exception)
+
+            assert_lines(
+                result.stdout,
+                "meltano     | Running extract & load...\n",
+                "meltano     | Loading failed (1): Failure\n",
+            )
+            assert_lines(
+                result.stderr,
+                "tap-mock    | Starting\n",
+                "tap-mock    | Running\n",
+                "tap-mock    | Done\n",
+                "target-mock | Starting\n",
+                "target-mock | Running\n",
+                "target-mock | Failure\n",
+            )
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    def test_elt_target_failure_after_tap_finishes(
+        self,
+        google_tracker,
+        cli_runner,
+        project,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        project_plugins_service,
     ):
         job_id = "pytest_test_elt"
         args = ["elt", "--job_id", job_id, tap.name, target.name]
@@ -327,12 +391,12 @@ class TestCliEltScratchpadOne:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
-            assert "Target failed" in str(result.exception)
+            assert "Loader failed" in str(result.exception)
 
             assert_lines(
                 result.stdout,
@@ -360,7 +424,7 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        plugin_discovery_service,
+        project_plugins_service,
     ):
         job_id = "pytest_test_elt"
         args = ["elt", "--job_id", job_id, tap.name, target.name]
@@ -383,12 +447,12 @@ class TestCliEltScratchpadOne:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
-            assert "Tap and target failed" in str(result.exception)
+            assert "Extractor and loader failed" in str(result.exception)
 
             assert_lines(
                 result.stdout,
@@ -406,13 +470,111 @@ class TestCliEltScratchpadOne:
                 "target-mock | Failure\n",
             )
 
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    def test_elt_tap_line_length_limit_error(
+        self,
+        google_tracker,
+        cli_runner,
+        project,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        project_plugins_service,
+    ):
+        job_id = "pytest_test_elt"
+        args = ["elt", "--job_id", job_id, tap.name, target.name]
+
+        # Raise a ValueError wrapping a LimitOverrunError, like StreamReader.readline does:
+        # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
+        try:  # noqa: WPS328
+            raise asyncio.LimitOverrunError(
+                "Separator is not found, and chunk exceed the limit", 0
+            )
+        except asyncio.LimitOverrunError as err:
+            try:  # noqa: WPS328, WPS505
+                # `ValueError` needs to be raised from inside the except block
+                # for `LimitOverrunError` so that `__context__` is set.
+                raise ValueError(str(err))
+            except ValueError as wrapper_err:
+                tap_process.stdout.readline.side_effect = wrapper_err
+
+        # Have `tap_process.wait` take 1s to make sure the LimitOverrunError exception can be raised before tap finishes
+        async def wait_mock():
+            await asyncio.sleep(1)
+            return tap_process.wait.return_value
+
+        tap_process.wait.side_effect = wait_mock
+
+        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+            assert result.exit_code == 1
+            assert "Output line length limit exceeded" in str(result.exception)
+
+            assert_lines(
+                result.stdout,
+                "meltano     | Running extract & load...\n",
+                "meltano     | The extractor generated a message exceeding the message size limit of 5.0MiB (half the buffer size of 10.0MiB).\n",
+                "meltano     | ELT could not be completed: Output line length limit exceeded\n",
+            )
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    def test_elt_output_handler_error(
+        self,
+        google_tracker,
+        cli_runner,
+        project,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        project_plugins_service,
+    ):
+        job_id = "pytest_test_elt"
+        args = ["elt", "--job_id", job_id, tap.name, target.name]
+
+        exc = Exception("Failed to read from target stderr.")
+        target_process.stderr.readline.side_effect = exc
+
+        # Have `tap_process.wait` take 1s to make sure the exception can be raised before tap finishes
+        async def wait_mock():
+            await asyncio.sleep(1)
+            return tap_process.wait.return_value
+
+        tap_process.wait.side_effect = wait_mock
+
+        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+            assert result.exit_code == 1
+            assert result.exception == exc
+
+            assert_lines(
+                result.stdout,
+                "meltano     | Running extract & load...\n",
+                "meltano     | Failed to read from target stderr.\n",
+            )
+
     def test_dump_catalog(
         self,
         cli_runner,
         project,
         tap,
         target,
-        plugin_discovery_service,
+        project_plugins_service,
         plugin_settings_service_factory,
     ):
         catalog = {"streams": []}
@@ -433,8 +595,8 @@ class TestCliEltScratchpadOne:
         ]
 
         with mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
@@ -448,7 +610,7 @@ class TestCliEltScratchpadOne:
         project,
         tap,
         target,
-        plugin_discovery_service,
+        project_plugins_service,
         plugin_settings_service_factory,
     ):
         state = {"success": True}
@@ -469,8 +631,8 @@ class TestCliEltScratchpadOne:
         ]
 
         with mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ):
@@ -485,7 +647,7 @@ class TestCliEltScratchpadOne:
         project,
         tap,
         target,
-        plugin_discovery_service,
+        project_plugins_service,
         plugin_settings_service_factory,
     ):
         job_id = "pytest_test_elt"
@@ -502,8 +664,8 @@ class TestCliEltScratchpadOne:
         settings_service = plugin_settings_service_factory(tap)
 
         with mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ):
@@ -520,7 +682,7 @@ class TestCliEltScratchpadOne:
         project,
         tap,
         target,
-        plugin_discovery_service,
+        project_plugins_service,
         plugin_settings_service_factory,
     ):
         job_id = "pytest_test_elt"
@@ -537,8 +699,8 @@ class TestCliEltScratchpadOne:
         settings_service = plugin_settings_service_factory(target)
 
         with mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ):
@@ -566,7 +728,7 @@ class TestCliEltScratchpadTwo:
         silent_dbt_process,
         dbt_process,
         tap_mock_transform,
-        plugin_discovery_service,
+        project_plugins_service,
     ):
         args = ["elt", tap.name, target.name, "--transform", "run"]
 
@@ -582,14 +744,11 @@ class TestCliEltScratchpadTwo:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.cli.elt.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.core.transform_add_service.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
@@ -630,7 +789,7 @@ class TestCliEltScratchpadTwo:
         silent_dbt_process,
         dbt_process,
         tap_mock_transform,
-        plugin_discovery_service,
+        project_plugins_service,
     ):
         args = ["elt", tap.name, target.name, "--transform", "run"]
 
@@ -654,14 +813,11 @@ class TestCliEltScratchpadTwo:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.cli.elt.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.core.transform_add_service.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
@@ -700,19 +856,16 @@ class TestCliEltScratchpadThree:
         tap,
         target,
         dbt,
-        plugin_discovery_service,
+        project_plugins_service,
     ):
         args = ["elt", tap.name, target.name, "--transform", "only"]
 
         with mock.patch(
-            "meltano.cli.elt.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.core.transform_add_service.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch.object(
             DbtRunner, "run", new=CoroutineMock()
         ):
@@ -737,19 +890,16 @@ class TestCliEltScratchpadThree:
         target,
         dbt,
         tap_mock_transform,
-        plugin_discovery_service,
+        project_plugins_service,
     ):
         args = ["elt", tap.name, target.name, "--transform", "only"]
 
         with mock.patch(
-            "meltano.cli.elt.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch(
-            "meltano.core.elt_context.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ), mock.patch(
-            "meltano.core.transform_add_service.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), mock.patch.object(
             DbtRunner, "run", new=CoroutineMock()
         ):

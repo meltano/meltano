@@ -1,7 +1,8 @@
 import logging
+
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import MetaData, create_engine
 from sqlalchemy.orm import sessionmaker
 
 

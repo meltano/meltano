@@ -1,23 +1,22 @@
-import pytest
-import gitlab
 import urllib
 from datetime import datetime
 from unittest import mock
-from sqlalchemy.orm import joinedload
+
+import gitlab
+import pytest
 from _pytest.monkeypatch import MonkeyPatch
-
-from meltano.core.project import Project, PROJECT_READONLY_ENV
-from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.api.security import FreeUser, users
-from meltano.api.security.oauth import gitlab_token_identity, OAuthError
-from meltano.api.models.security import db, User
-from meltano.api.models.oauth import OAuth
-from meltano.api.models.embed_token import EmbedToken, ResourceType
-
 from flask import url_for
 from flask_login import current_user
-from flask_security import login_user, logout_user, AnonymousUser
+from flask_security import AnonymousUser, login_user, logout_user
 from freezegun import freeze_time
+from meltano.api.models.embed_token import EmbedToken, ResourceType
+from meltano.api.models.oauth import OAuth
+from meltano.api.models.security import User, db
+from meltano.api.security import FreeUser, users
+from meltano.api.security.oauth import OAuthError, gitlab_token_identity
+from meltano.core.project import PROJECT_READONLY_ENV, Project
+from meltano.core.project_settings_service import ProjectSettingsService
+from sqlalchemy.orm import joinedload
 
 
 def gitlab_client():
@@ -146,12 +145,12 @@ class TestProjectReadonlyEnabled:
             assert b"deployed as read-only" in res.data
 
     def test_pipeline_schedules_save(
-        self, app, api, tap, target, plugin_discovery_service
+        self, app, api, tap, target, project_plugins_service
     ):
         with app.test_request_context():
             with mock.patch(
-                "meltano.core.schedule_service.PluginDiscoveryService",
-                return_value=plugin_discovery_service,
+                "meltano.core.schedule_service.ProjectPluginsService",
+                return_value=project_plugins_service,
             ):
                 res = api.post(
                     url_for("orchestrations.save_pipeline_schedule"),

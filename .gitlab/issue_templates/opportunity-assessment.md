@@ -42,5 +42,3 @@
 
 
 **10. Given the above, what’s the recommendation? (go or no-go)**
-
-

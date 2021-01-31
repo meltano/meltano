@@ -10,13 +10,115 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2471](https://gitlab.com/meltano/meltano/-/issues/2471) Make tap-bigquery discoverable
-
 ### Changes
 
 ### Fixes
 
+- [#2543](https://gitlab.com/meltano/meltano/-/issues/2543) Fix packages dependencies that claim Python 3.9 is supported when it actually isn't.
+
 ### Breaks
+
+
+## 1.67.0 - (2021-01-26)
+---
+
+### Fixes
+
+- [#2540](https://gitlab.com/meltano/meltano/-/issues/2540) `meltano schedule run` exit code now matches exit code of wrapped `meltano elt`
+- [#2525](https://gitlab.com/meltano/meltano/-/issues/2525) `meltano schedule run` no longer requires `meltano` to be in the `PATH`
+
+
+## 1.66.0 - (2021-01-18)
+---
+
+### New
+
+- [#2483](https://gitlab.com/meltano/meltano/-/issues/2483) Every second, `meltano elt` records a heartbeat timestamp on the pipeline run row in the system database as long as the pipeline is running.
+- [#2483](https://gitlab.com/meltano/meltano/-/issues/2483) Before running the new pipeline, `meltano elt` automatically marks runs with the same Job ID that have become stale as failed. A run is considered stale when 5 minutes have elapsed since the last recorded heartbeat. Older runs without a heartbeat are considered stale if they are still in the running state 24 hours after starting.
+- [#2483](https://gitlab.com/meltano/meltano/-/issues/2483) `meltano schedule list` (which is run periodically by `meltano invoke airflow scheduler`) automatically marks any stale run as failed.
+- [#2502](https://gitlab.com/meltano/meltano/-/issues/2502) Add `User-Agent` header with Meltano version to request for remote `discovery.yml` manifest (typically https://www.meltano.com/discovery.yml)
+- [#2503](https://gitlab.com/meltano/meltano/-/issues/2503) Include project ID in `X-Project-ID` header and `project_id` query param in request for remote `discovery.yml` manifest when `send_anonymous_usage_stats` setting is enabled.
+
+
+## 1.65.0 - (2021-01-12)
+---
+
+### New
+
+- [#2392](https://gitlab.com/meltano/meltano/-/issues/2392) Add 'elt.buffer_size' setting with default value of 10MiB to let extractor output buffer size and line length limit (maximum message size) be configured as appropriate for the extractor and loader in question.
+
+
+### Fixes
+
+- [#2501](https://gitlab.com/meltano/meltano/-/issues/2501) Don't lose `version` when caching `discovery.yml`.
+
+
+## 1.64.1 - (2021-01-08)
+---
+
+### Fixes
+
+- [#2500](https://gitlab.com/meltano/meltano/-/issues/2500) Ensure all buffered messages (records) output by extractor make it to loader when extractor finishes early.
+
+
+## 1.64.0 - (2021-01-07)
+---
+
+### Fixes
+
+- [#2478](https://gitlab.com/meltano/meltano/-/issues/2478) Fix runaway memory usage (and possible out-of-memory error) when extractor outputs messages at higher rate than loader can process them, by enabling flow control with a 64KB buffer size limit
+
+
+## 1.63.0 - (2021-01-04)
+---
+
+### New
+- [#2308](https://gitlab.com/meltano/meltano/-/issues/2308) Verify that system database connection is still viable when checking it out of connection pool.
+- [#2308](https://gitlab.com/meltano/meltano/-/issues/2308) Add `database_max_retries` and `database_retry_timeout` settings to configure retry attempts when the first connection to the DB fails.
+
+
+### Fixes
+
+- [#2486](https://gitlab.com/meltano/meltano/-/issues/2486) Remove `state` capability from `tap-google-analytics` because it's not actually currently supported yet
+
+
+## 1.62.0 - (2020-12-23)
+---
+
+### New
+
+- [#2390](https://gitlab.com/meltano/meltano/-/issues/2390) Let a plugin inherit its base plugin (package) description and configuration from another one using `--inherit-from=<name>` on `meltano add` or `inherit_from: <name>` in `meltano.yml`, so that the same package can be used in a project multiple times with different configurations.
+
+### Changes
+
+- [#2479](https://gitlab.com/meltano/meltano/-/issues/2479) Use extractor `load_schema` (usually its namespace) as default for target-bigquery `dataset_id` setting, as it already is for target-snowflake and target-postgres `schema`
+
+
+## 1.61.0 - (2020-12-09)
+---
+
+### New
+
+- [#2476](https://gitlab.com/meltano/meltano/-/issues/2476) Add missing tap-salesforce `is_sandbox` setting
+- [#2471](https://gitlab.com/meltano/meltano/-/issues/2471) Make tap-bigquery discoverable
+- [#2227](https://gitlab.com/meltano/meltano/-/issues/2227) Add `meltano schedule run <name>` command to run scheduled pipeline by name
+
+### Changes
+
+- [#2477](https://gitlab.com/meltano/meltano/-/issues/2477) Show array and object settings in configuration UI as unsupported instead of hiding them entirely
+- [#2477](https://gitlab.com/meltano/meltano/-/issues/2477) Unhide tap-csv and tap-spreadsheets-anywhere in UI
+
+### Fixes
+
+- [#2379](https://gitlab.com/meltano/meltano/-/issues/2379) Take into account schedule `env` when running pipeline from UI using "Run" button
+
+
+## 1.60.1 - (2020-12-07)
+---
+
+### Fixes
+
+- [#2473](https://gitlab.com/meltano/meltano/-/issues/2473) Fix meltano/meltano Docker image entrypoint
 
 
 ## 1.60.0 - (2020-12-02)

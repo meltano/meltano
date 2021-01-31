@@ -1,13 +1,13 @@
-import pytest
 import json
-from unittest import mock
 from contextlib import contextmanager
+from unittest import mock
 
+import pytest
+from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
-from meltano.core.job import Job, Payload
+from meltano.core.plugin_invoker import PluginInvoker
 
 
 class TestSingerTap:
@@ -314,7 +314,9 @@ class TestSingerTap:
 
             # Pretend `select` is set in discovery.yml
             monkeypatch.setitem(
-                invoker.plugin_def.extras, "select", ["UniqueEntitiesName.name"]
+                invoker.plugin.parent._variant.extras,
+                "select",
+                ["UniqueEntitiesName.name"],
             )
             invoker.settings_service._setting_defs = None
             with invoker.prepared(session):
@@ -422,11 +424,12 @@ class TestSingerTap:
             }
 
             # Pretend `config` is set in meltano.yml
-            with mock.patch.object(invoker.plugin, "config", config):
-                with invoker.prepared(session):
-                    subject.apply_catalog_rules(invoker)
+            monkeypatch.setattr(invoker.plugin, "config", config)
 
-                    cache_key = invoker.plugin.catalog_cache_key(invoker)
+            with invoker.prepared(session):
+                subject.apply_catalog_rules(invoker)
+
+                cache_key = invoker.plugin.catalog_cache_key(invoker)
 
             # Stores the cache key
             assert catalog_cache_key_path.read_text() == cache_key
@@ -486,12 +489,10 @@ class TestSingerTap:
             config_override = invoker.settings_service.config_override
             monkeypatch.setitem(config_override, "_catalog", "custom_catalog.json")
 
-            # Pretend `config` is set in meltano.yml
-            with mock.patch.object(invoker.plugin, "config", config):
-                with invoker.prepared(session):
-                    subject.apply_catalog_rules(invoker)
+            with invoker.prepared(session):
+                subject.apply_catalog_rules(invoker)
 
-                    cache_key = invoker.plugin.catalog_cache_key(invoker)
+                cache_key = invoker.plugin.catalog_cache_key(invoker)
 
             assert_rules(
                 # Selection filter metadata rules
@@ -699,5 +700,5 @@ class TestSingerTap:
         assert cache_key() == key
 
         # No key if pip_url is editable
-        monkeypatch.setattr(invoker.plugin_def, "pip_url", "-e local")
+        monkeypatch.setattr(invoker.plugin, "pip_url", "-e local")
         assert cache_key() is None

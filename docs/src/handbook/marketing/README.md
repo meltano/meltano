@@ -19,10 +19,10 @@ Each item (linked below) has a corresponding guide to promoting that activity. E
 | Day | Content |
 | ------ | ------ |
 | Monday | [Kickoff blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Content%20Marketing/evergreen-activities.md#promoting-kickoff), [Monday release blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Releases/Promotion%20Guidelines.md) |
-| Tuesday | Social promotion of weekly activity | 
-| Wednesday | Social promotion of weekly activity | 
-| Thursday | [Thursday release blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Releases/Promotion%20Guidelines.md), weekly newsletter | 
-| Friday | [Demo day blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Content%20Marketing/evergreen-activities.md#promoting-demo-day) | 
+| Tuesday | Social promotion of weekly activity |
+| Wednesday | Social promotion of weekly activity |
+| Thursday | [Thursday release blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Releases/Promotion%20Guidelines.md), weekly newsletter |
+| Friday | [Demo day blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Content%20Marketing/evergreen-activities.md#promoting-demo-day) |
 
 
 ## Email

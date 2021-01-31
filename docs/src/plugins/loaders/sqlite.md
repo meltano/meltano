@@ -49,6 +49,8 @@ Follow the remaining step of the [Getting Started guide](/docs/getting-started.h
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `target-sqlite` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -62,12 +64,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-sqlite` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-7}
+```yml{5-6}
 plugins:
   loaders:
   - name: target-sqlite
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/target-sqlite.git
     config:
       database: my_database.db
 ```

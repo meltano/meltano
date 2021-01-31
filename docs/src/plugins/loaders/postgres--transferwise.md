@@ -57,6 +57,8 @@ Follow the remaining step of the [Getting Started guide](/docs/getting-started.h
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `target-postgres` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -75,12 +77,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-postgres` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-14}
+```yml{5-13}
 plugins:
   loaders:
   - name: target-postgres
     variant: transferwise
-    pip_url: pipelinewise-target-postgres
     config:
       host: postgres.example.com
       port: 5432
@@ -284,6 +285,23 @@ meltano config target-postgres set parallelism_max 8
 export TARGET_POSTGRES_PARALLELISM_MAX=8
 ```
 
+### Default Target Schema Select Permission
+
+- Name: `default_target_schema_select_permission`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_POSTGRES_DEFAULT_TARGET_SCHEMA_SELECT_PERMISSION`
+
+Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific role or a list of roles. If `schema_mapping` is not defined then every stream sent by the tap is granted accordingly.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config target-snowflake set default_target_schema_select_permission <roles>
+
+export TARGET_POSTGRES_DEFAULT_TARGET_SCHEMA_SELECT_PERMISSION=<roles>
+```
+
 ### Schema Mapping
 
 - Name: `schema_mapping`
@@ -293,14 +311,50 @@ Useful if you want to load multiple streams from one tap to multiple Postgres sc
 
 If the tap sends the `stream_id` in `<schema_name>-<table_name>` format then this option overwrites the `default_target_schema` value.
 
+Note, that using `schema_mapping` you can overwrite the `default_target_schema_select_permission` value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.
+
+This setting can hold an object mapping source schema names to objects with `target_schema` and (optionally) `target_schema_select_permissions` keys.
+
 #### How to use
 
-Manage this setting using [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
+Manage this setting directly in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):
+
+```yml{5-15}
+plugins:
+  loaders:
+  - name: target-postgres
+    variant: transferwise
+    config:
+      schema_mapping:
+        <source_schema>:
+          target_schema: <target_schema>
+          target_schema_select_permissions: [<role1>, <role2>] # Optional
+        # ...
+
+        # For example:
+        public:
+          target_schema: repl_pg_public
+          target_schema_select_permissions: [grp_stats]
+```
+
+Alternatively, manage this setting using [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config target-postgres set schema_mapping <mapping>
+meltano config target-postgres set schema_mapping <source_schema> target_schema <target_schema>
+meltano config target-postgres set schema_mapping <source_schema> target_schema_select_permissions '["<role>", ...]'
 
-export TARGET_POSTGRES_SCHEMA_MAPPING=<mapping>
+export TARGET_POSTGRES_SCHEMA_MAPPING='{"<source_schema>": {"target_schema": "<target_schema>", ...}, ...}'
+
+# Once a schema mapping has been set in `meltano.yml`, environment variables can be used
+# to override specific nested properties:
+export TARGET_POSTGRES_SCHEMA_MAPPING_<SOURCE_SCHEMA>_TARGET_SCHEMA=<target_schema>
+export TARGET_POSTGRES_SCHEMA_MAPPING_<SOURCE_SCHEMA>_TARGET_SCHEMA_SELECT_PERMISSIONS='["<role>", ...]'
+
+# For example:
+meltano config target-postgres set schema_mapping public target_schema repl_pg_public
+meltano config target-postgres set schema_mapping public target_schema_select_permissions '["grp_stats"]'
+
+export TARGET_POSTGRES_SCHEMA_MAPPING_PUBLIC_TARGET_SCHEMA=new_repl_pg_public
 ```
 
 ### Add Metadata Columns

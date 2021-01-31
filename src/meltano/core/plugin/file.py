@@ -1,36 +1,31 @@
 import logging
 from pathlib import Path
 
-from meltano.core.db import project_engine
-from meltano.core.plugin import ProjectPlugin, PluginType
-from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.behavior.hookable import hook
-from meltano.core.venv_service import VirtualEnv
+from meltano.core.db import project_engine
+from meltano.core.plugin import BasePlugin, PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin_install_service import (
+    PluginInstallReason,
+    PluginInstallService,
+)
 from meltano.core.setting_definition import SettingDefinition
+from meltano.core.venv_service import VirtualEnv
 
 
-class FilePlugin(ProjectPlugin):
+class FilePlugin(BasePlugin):
     __plugin_type__ = PluginType.FILES
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
-
-        self._update_config = None
-
-    @property
-    def extra_settings(self):
-        return [
-            SettingDefinition(
-                name="_update", kind="object", aliases=["update"], value={}
-            )
-        ]
+    EXTRA_SETTINGS = [
+        SettingDefinition(name="_update", kind="object", aliases=["update"], value={})
+    ]
 
     def is_invokable(self):
         return False
 
-    def should_add_to_file(self, project):
-        return len(self.update_config(project)) > 0
+    def should_add_to_file(self):
+        return len(self.extras.get("update", [])) > 0
 
     def file_contents(self, project):
         venv = VirtualEnv(project.plugin_dir(self, "venv"))
@@ -53,33 +48,17 @@ class FilePlugin(ProjectPlugin):
             ]
         )
 
-    def project_file_contents(self, project):
-        def prepend_update_header(content, relative_path):
-            if self.should_update_file(project, relative_path):
+    def project_file_contents(self, project, paths_to_update):
+        def with_update_header(content, relative_path):
+            if str(relative_path) in paths_to_update:
                 content = "\n\n".join([self.update_file_header(relative_path), content])
 
             return content
 
         return {
-            relative_path: prepend_update_header(content, relative_path)
+            relative_path: with_update_header(content, relative_path)
             for relative_path, content in self.file_contents(project).items()
         }
-
-    def update_config(self, project):
-        if self._update_config is None:
-            plugin_settings_service = PluginSettingsService(project, self)
-            self._update_config = plugin_settings_service.get("_update")
-
-        return self._update_config
-
-    def should_update_file(self, project, relative_path):
-        try:
-            return self.update_config(project)[str(relative_path)]
-        except KeyError:
-            return False
-
-    def file_exists(self, project, relative_path):
-        return project.root_dir(relative_path).exists()
 
     def write_file(self, project, relative_path, content):
         project_path = project.root_dir(relative_path)
@@ -92,17 +71,15 @@ class FilePlugin(ProjectPlugin):
         return True
 
     def write_files(self, project, files_content):
-        paths = []
-        for relative_path, content in files_content.items():
-            if self.write_file(project, relative_path, content):
-                paths.append(relative_path)
+        return [
+            relative_path
+            for relative_path, content in files_content.items()
+            if self.write_file(project, relative_path, content)
+        ]
 
-        return paths
-
-    def files_to_create(self, project):
+    def files_to_create(self, project, paths_to_update):
         def rename_if_exists(relative_path):
-            exists = self.file_exists(project, relative_path)
-            if not exists:
+            if not project.root_dir(relative_path).exists():
                 return relative_path
 
             print(f"File {relative_path} already exists, keeping both versions")
@@ -112,33 +89,53 @@ class FilePlugin(ProjectPlugin):
 
         return {
             rename_if_exists(relative_path): content
-            for relative_path, content in self.project_file_contents(project).items()
+            for relative_path, content in self.project_file_contents(
+                project, paths_to_update
+            ).items()
         }
 
-    def files_to_update(self, project):
+    def files_to_update(self, project, paths_to_update):
         return {
             relative_path: content
-            for relative_path, content in self.project_file_contents(project).items()
-            if self.should_update_file(project, relative_path)
+            for relative_path, content in self.project_file_contents(
+                project, paths_to_update
+            ).items()
+            if str(relative_path) in paths_to_update
         }
 
-    def create_files(self, project):
-        return self.write_files(project, self.files_to_create(project))
+    def create_files(self, project, paths_to_update=[]):
+        return self.write_files(project, self.files_to_create(project, paths_to_update))
 
-    def update_files(self, project):
-        return self.write_files(project, self.files_to_update(project))
+    def update_files(self, project, paths_to_update=[]):
+        return self.write_files(project, self.files_to_update(project, paths_to_update))
 
     @hook("after_install")
-    def after_install(self, project, reason):
-        if reason is PluginInstallReason.ADD:
-            print(f"Adding '{self.name}' files to project...")
+    def after_install(
+        self,
+        installer: PluginInstallService,
+        plugin: ProjectPlugin,
+        reason: PluginInstallReason,
+    ):
+        project = installer.project
+        plugins_service = installer.plugins_service
 
-            for path in self.create_files(project):
+        plugin_settings_service = PluginSettingsService(
+            project, plugin, plugins_service=plugins_service
+        )
+        update_config = plugin_settings_service.get("_update")
+        paths_to_update = [
+            path for path, to_update in update_config.items() if to_update
+        ]
+
+        if reason is PluginInstallReason.ADD:
+            print(f"Adding '{plugin.name}' files to project...")
+
+            for path in self.create_files(project, paths_to_update):
                 print(f"Created {path}")
         elif reason is PluginInstallReason.UPGRADE:
-            print(f"Updating '{self.name}' files in project...")
+            print(f"Updating '{plugin.name}' files in project...")
 
-            updated_paths = self.update_files(project)
+            updated_paths = self.update_files(project, paths_to_update)
             if not updated_paths:
                 print("Nothing to update")
                 return
@@ -147,5 +144,5 @@ class FilePlugin(ProjectPlugin):
                 print(f"Updated {path}")
         else:
             print(
-                f"Run `meltano upgrade files` to update your project's '{self.name}' files."
+                f"Run `meltano upgrade files` to update your project's '{plugin.name}' files."
             )

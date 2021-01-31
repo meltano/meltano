@@ -24,5 +24,5 @@ WORKDIR /project
 # meltano ui
 EXPOSE 5000
 
-ENTRYPOINT ["poetry run meltano"]
+ENTRYPOINT ["meltano"]
 CMD ["ui"]

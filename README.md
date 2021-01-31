@@ -1,16 +1,36 @@
+# Meltano: ELT for the DataOps era
+
 [![pipeline status](https://gitlab.com/meltano/meltano/badges/master/pipeline.svg)](https://gitlab.com/meltano/meltano/commits/master)
 
-# Meltano: open source ELT
+[Meltano](https://meltano.com) is
+[open source](https://gitlab.com/meltano/meltano),
+[self-hosted](https://meltano.com/docs/production.html),
+[CLI-first](https://meltano.com/docs/command-line-interface.html),
+[debuggable](https://meltano.com/docs/command-line-interface.html#debugging), and
+[extensible](https://meltano.com/docs/plugins.html).
 
-[Meltano](https://meltano.com) is an open source platform for
-building, running & orchestrating ELT pipelines made up of
-[Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com)
-models, that you can [run locally](https://meltano.com/docs/installation.html) or
-[easily deploy in production](https://meltano.com/docs/production.html).
+[Pipelines are code](https://meltano.com/docs/project.html),
+ready to be version controlled,
+[containerized](https://meltano.com/docs/containerization.html), and
+[deployed continuously](https://meltano.com/docs/production.html#and-onto-the-production-environment).
+Develop and test
+[locally](https://meltano.com/docs/getting-started.html#local-installation),
+then
+[deploy in production](https://meltano.com/docs/production.html)
+along with the built-in
+[Airflow integration](https://meltano.com/docs/production.html#airflow-orchestrator),
+or inside your
+[orchestrator of choice](https://meltano.com/docs/production.html#meltano-elt).
+
+Meltano embraces the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
+[extractors](https://meltano.com/plugins/extractors/) and
+[loaders](https://meltano.com/plugins/loaders/),
+and leverages [dbt](https://www.getdbt.com) for [transformation](https://meltano.com/docs/transforms.html).
 
 ## Documentation
 
-You can find our documentation at [https://www.meltano.com/docs/](https://www.meltano.com/docs/).
+Check out the ["Getting Started" guide](https://meltano.com/docs/getting-started.html)
+or find the full documentation at <https://www.meltano.com/docs/>.
 
 ## Contributing to Meltano
 

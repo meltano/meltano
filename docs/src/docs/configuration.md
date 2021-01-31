@@ -12,7 +12,7 @@ Since this also goes for [extractors](/docs/plugins.html#extractors) and [loader
 because Meltano will generate them on the fly whenever an extractor or loader is used through [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 
 If the plugin you'd like to use and configure is [supported out of the box](/docs/plugins.html#discoverable-plugins) (that is, it shows up when you run [`meltano discover`](/docs/command-line-interface.html#discover)), Meltano already knows what settings it supports.
-If you're [adding a custom plugin](/docs/command-line-interface.html#how-to-use-custom-plugins), on the other hand, you will be asked to provide the names of the supported configuration options yourself.
+If you're adding a [custom plugin](/docs/plugins.html#custom-plugins), on the other hand, you will be asked to provide the names of the supported configuration options yourself.
 
 You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#config) to list all available settings for a plugin with their names, [environment variables](#environment-variables), and current values. [`meltano config <plugin>`](/docs/command-line-interface.html#config) will print the current configuration in JSON format.
 
@@ -20,7 +20,7 @@ Meltano itself can be configured as well. To learn more, refer to the [Settings 
 
 ## Configuration layers
 
-To determine the values of settings, Meltano will look in 4 places, with each taking precedence over the next:
+To determine the values of settings, Meltano will look in 4 main places (and one optional one), with each taking precedence over the next:
 
 1. [**Environment variables**](#configuring-settings), set through [your shell at `meltano elt` runtime](/docs/integration.html#pipeline-specific-configuration), your project's [`.env` file](/docs/project.html#env), a [scheduled pipeline's `env` dictionary](/docs/project.html#schedules), or any other method.
    - You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#config) to list the available variable names, which typically have the format `<PLUGIN_NAME>_<SETTING_NAME>`.
@@ -29,7 +29,8 @@ To determine the values of settings, Meltano will look in 4 places, with each ta
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
 3. **Your project's [**system database**](/docs/project.html#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) or [the UI](/docs/ui.html) when the project is [deployed as read-only](/docs/settings.html#project-readonly).
    - Note that configuration for Meltano itself cannot be stored in the system database.
-4. **The default `value`s** set in the plugin's [`settings` metadata](/docs/contributor-guide.html#connector-settings).
+4. _If the plugin [inherits from another plugin](/docs/plugins.html#plugin-inheritance) in your project_: **The parent plugin's own configuration**
+5. **The default `value`s** set in the plugin's [`settings` metadata](/docs/contributor-guide.html#connector-settings).
    - Definitions of [discoverable plugins](/docs/plugins.html#discoverable-plugins) can be found in the [`discovery.yml` manifest](/docs/contributor-guide.html#discoverable-plugins).
    - [Custom plugin definitions](/docs/project.html#plugins) can be found in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
    - `meltano config <plugin> list` will list the default values.
@@ -105,10 +106,9 @@ Generic `MELTANO_<PLUGIN_TYPE_VERB>_<SETTING_NAME>` variables can be used when t
 Inside the plugin `config` objects in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file),
 these variables can be referenced using standard variable expansion syntax, i.e. `$VAR` (as a single word) or `${VAR}` (inside a word):
 
-```yaml{5-8}
+```yaml{4-7}
 extractors:
 - name: tap-example
-  pip_url: tap-example
   config:
     simple_setting: $MELTANO_EXTRACTOR_NAME
     multiple_words: $MELTANO_EXTRACTOR_NAMESPACE foo
@@ -121,6 +121,69 @@ extractors:
 When Meltano invokes a plugin's executable as part of [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke), it populates the environment with the same [variables that can be referenced from settings](#available-environment-variables), as well as those describing the plugin's current configuration (including [extras](#plugin-extras)), as discoverable using [`meltano config --format=env <plugin>`](/docs/command-line-interface.html#config).
 
 These can then be accessed from inside the plugin using the mechanism provided by the standard library, e.g. Python's [`os.environ`](https://docs.python.org/3/library/os.html#os.environ).
+
+## Multiple plugin configurations
+
+Every [plugin in your project](/docs/plugins.html#project-plugins) has its own configuration,
+but you can use [plugin inheritance](/docs/plugins.html#plugin-inheritance) to define multiple plugins
+that use the same package but still have their own configuration:
+
+```yml{8-18}
+plugins:
+  extractors:
+  - name: tap-google-analytics
+    variant: meltano
+    config:
+      key_file_location: client_secrets.json
+      start_date: '2020-10-01T00:00:00Z'
+  - name: tap-ga--view-foo
+    inherit_from: tap-google-analytics
+    config:
+      # `key_file_location` and `start_date` are inherited
+      view_id: 123456
+  - name: tap-ga--view-bar
+    inherit_from: tap-google-analytics
+    config:
+      # `key_file_location` is inherited
+      start_date: '2020-12-01T00:00:00Z' # `start_date` is overridden
+      view_id: 789012
+```
+
+In this example, `tap-ga--view-foo` and `tap-ga--view-bar` are separate plugins that
+inherit their [base plugin description](/docs/plugins.html#project-plugins) (describing the package)
+and configuration (where not overridden) from `tap-google-analytics`,
+which itself [shadows](/docs/project.html#shadowing-plugin-definitions) the
+[discoverable plugin](/docs/plugins.html#discoverable-plugins) with the same name.
+
+If there is no need for the different plugins to inherit any common configuration,
+they can [directly inherit](/docs/plugin-management.html#explicit-inheritance) from the
+[discoverable plugin](/docs/plugins.html#discoverable-plugins) instead, without an intermediary plugin:
+
+```yml
+plugins:
+  extractors:
+  - name: tap-postgres--billing
+    inherit_from: tap-postgres
+    config:
+      host: one.postgres.example.com
+      user: billing_user
+      dbname: billing_db
+  - name: tap-postgres--events
+    inherit_from: tap-postgres
+    config:
+      host: two.postgres.example.com
+      user: events_user
+      dbname: events_db
+```
+
+To configure `tap-postgres`'s `password` setting, you would typically set the `TAP_POSTGRES_PASSWORD` [environment variable](#configuring-settings),
+but that will not work here as it would not be clear which plugin the password was intended for.
+
+Instead, as [`meltano config <name> list`](/docs/command-line-interface.html#config) would tell you,
+both plugins get their own unique environment variables with prefixes derived from their names:
+`TAP_POSTGRES__BILLING_PASSWORD` and `TAP_POSTGRES__EVENTS_PASSWORD`.
+
+To learn how to add an inheriting plugin to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#plugin-inheritance).
 
 ## Custom settings
 
@@ -138,10 +201,9 @@ Instead, you can define a custom setting by adding the setting name (key) to you
 meltano config tap-example set custom_setting value
 ```
 
-```yaml{6}
+```yaml{5}
 extractors:
 - name: tap-example
-  pip_url: tap-example
   config:
     known_setting: value
     custom_setting: value
@@ -178,10 +240,9 @@ Meltano currently knows these extras for these plugin types:
 
 The values of these extras are stored in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) among the plugin's other properties, _outside_ of the `config` object:
 
-```yaml{7-8}
+```yaml{6-7}
 extractors:
 - name: tap-example
-  pip_url: tap-example
   config:
     # Configuration goes here!
     example_setting: value
@@ -190,7 +251,8 @@ extractors:
 ```
 
 These extras can be thought of and interacted with as a special kind of setting,
-and [`meltano config`](/docs/command-line-interface.html#config) can be used to manage them:
+and [environment variables](#configuring-settings) and
+[`meltano config`](/docs/command-line-interface.html#config) can be used to manage them:
 [How to use: Plugin extras](/docs/command-line-interface.html#how-to-use-plugin-extras).
 
 ## Meltano UI

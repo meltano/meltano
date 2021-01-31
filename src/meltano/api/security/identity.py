@@ -1,9 +1,8 @@
 from datetime import date
-from flask_security.utils import hash_password
+
 from flask_security import AnonymousUser, SQLAlchemyUserDatastore
-
-from meltano.api.models.security import db, User, Role, RolePermissions
-
+from flask_security.utils import hash_password
+from meltano.api.models.security import Role, RolePermissions, User, db
 
 users = SQLAlchemyUserDatastore(db, User, Role)
 

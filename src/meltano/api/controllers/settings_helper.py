@@ -1,8 +1,8 @@
-import os
 import json
-
+import os
 from os.path import join
 from pathlib import Path
+
 from meltano.core.project import Project
 
 
@@ -21,7 +21,7 @@ class SettingsHelper:
         return settings_file
 
     def save_connection(self, connection):
-        with open(self.settings_file_path, "r") as f:
+        with open(self.settings_file_path) as f:
             settings = json.load(f)
         settings["settings"]["connections"].append(connection)
         with open(self.settings_file_path, "w") as f:
@@ -29,7 +29,7 @@ class SettingsHelper:
         return settings
 
     def delete_connection(self, connection):
-        with open(self.settings_file_path, "r") as f:
+        with open(self.settings_file_path) as f:
             settings = json.load(f)
         connections = settings["settings"]["connections"]
         updated_connections = [

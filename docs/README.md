@@ -4,7 +4,7 @@ Read more at [meltano.com](https://www.meltano.com).
 
 ## Prerequisites
 
-Before you move on, make sure you have [Node 8.x]((https://nodejs.org/)) or newer installed.
+Before you move on, make sure you have [Node 8.x](https://nodejs.org/) or newer installed.
 
 ## Instructions
 

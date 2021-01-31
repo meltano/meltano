@@ -1,8 +1,8 @@
-import pytest
 from unittest import mock
 
-from meltano.core.plugin import PluginType, PluginRef
+import pytest
 from meltano.api.controllers.sql_helper import SqlHelper, UnsupportedConnectionDialect
+from meltano.core.plugin import PluginRef, PluginType
 
 
 @pytest.mark.usefixtures("session")
@@ -27,11 +27,11 @@ class TestSqlHelper:
         subject,
         project,
         tap,
-        config_service,
+        project_plugins_service,
         plugin_settings_service_factory,
         elt_context_builder,
     ):
-        target_sqlite = config_service.find_plugin(
+        target_sqlite = project_plugins_service.find_plugin(
             "target-sqlite", plugin_type=PluginType.LOADERS
         )
         plugin_settings_service = plugin_settings_service_factory(target_sqlite)
@@ -54,11 +54,11 @@ class TestSqlHelper:
         app,
         subject,
         tap,
-        config_service,
+        project_plugins_service,
         plugin_settings_service_factory,
         elt_context_builder,
     ):
-        target_postgres = config_service.find_plugin(
+        target_postgres = project_plugins_service.find_plugin(
             "target-postgres", plugin_type=PluginType.LOADERS
         )
         plugin_settings_service = plugin_settings_service_factory(target_postgres)
