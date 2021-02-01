@@ -115,6 +115,7 @@ Meltano supports the following types of plugins:
 - [**Orchestrators**](#orchestrators) orchestrate a project's scheduled pipelines.
 - [**Transformers**](#transformers) run transforms.
 - [**File bundles**](#file-bundles) bundle files you may want in your project.
+- [**Any command line tools**](#clis) supplied by a python package.
 
 ### Extractors
 
@@ -747,3 +748,15 @@ meltano config --plugin-type=files dbt set _update transform/dbt_project.yml fal
 
 export DBT__UPDATE='{"transform/dbt_project.yml": false}'
 ```
+
+### Command line tools
+
+If none of the other plugin types address your needs, any [pip packages](https://pip.pypa.io/en/stable/) that expose an executable can be installed with the `cli` plugin type, even for plugins types that Meltano doesn't support yet. You will need to run these executables yourself with `meltano invoke`:
+
+```bash
+meltano install --custom cli <plugin>
+
+meltano invoke <plugin> [<plugin arguments>...]
+```
+
+The benefit of doing this as opposed to using `pip install` directly is that any packages installed this way benefit from Meltano's [`venv`](https://docs.python.org/3/tutorial/venv.html) isolation. This avoids dependency conflicts between plugins.
