@@ -20,6 +20,7 @@ base_plugin_classes = {
     PluginType.ORCHESTRATORS: lazy_import(".airflow", "Airflow"),
     PluginType.TRANSFORMERS: lazy_import(".dbt", "DbtPlugin"),
     PluginType.FILES: lazy_import(".file", "FilePlugin"),
+    PluginType.CLIS: lazy_import(".cli", "CliPlugin"),
 }
 
 

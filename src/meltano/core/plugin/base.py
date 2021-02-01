@@ -51,6 +51,7 @@ class PluginType(YAMLEnum):
     ORCHESTRATORS = "orchestrators"
     TRANSFORMERS = "transformers"
     FILES = "files"
+    CLIS = "clis"
 
     def __str__(self):
         return self.value
