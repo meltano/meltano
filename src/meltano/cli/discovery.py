@@ -14,7 +14,9 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 from . import cli
 from .params import pass_project
 
-discoverable_plugin_types = [t for t in list(PluginType) if t != PluginType.CLIS]
+discoverable_plugin_types = [
+    ptype for ptype in list(PluginType) if ptype is not PluginType.CLIS
+]
 
 
 @cli.command()
