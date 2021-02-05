@@ -754,7 +754,7 @@ export DBT__UPDATE='{"transform/dbt_project.yml": false}'
 If none of the other plugin types address your needs, any [pip packages](https://pip.pypa.io/en/stable/) that expose an executable can be installed with the `cli` plugin type, even for plugins types that Meltano doesn't support yet. You will need to run these executables yourself with `meltano invoke`:
 
 ```bash
-meltano install --custom cli <plugin>
+meltano add --custom cli <plugin>
 
 meltano invoke <plugin> [<plugin arguments>...]
 ```
