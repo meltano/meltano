@@ -56,7 +56,7 @@ schedules:
 
 Different runners and execution/orchestration platforms will have their own way of specifying environment variables along with a command invocation.
 
-Airflow's [`BashOperator`](https://airflow.apache.org/docs/stable/_api/airflow/operators/bash_operator/index.html#airflow.operators.bash_operator.BashOperator), for example, supports an `env` parameter:
+Airflow's [`BashOperator`](https://airflow.apache.org/docs/apache-airflow/1.10.14/howto/operator/bash.html), for example, supports an `env` parameter:
 
 ```python
 BashOperator(
