@@ -799,7 +799,7 @@ To help you realize this, Meltano supports scheduled pipelines that can be orche
     plugins:
       orchestrators:
       - name: airflow
-        pip_url: apache-airflow==1.10.12
+        pip_url: apache-airflow==1.10.14
     ```
 
     It will also automatically add a
