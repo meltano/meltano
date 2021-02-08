@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2559](https://gitlab.com/meltano/meltano/-/issues/2559) Bump Airflow version to 1.10.14
+
 ### Fixes
 
 - [#2543](https://gitlab.com/meltano/meltano/-/issues/2543) Fix packages dependencies that claim Python 3.9 is supported when it actually isn't.
