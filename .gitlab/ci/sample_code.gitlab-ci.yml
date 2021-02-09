@@ -219,16 +219,17 @@ getting_started_sample_code:
 
     - meltano config tap-gitlab
 
-    - "[[ $TAP_COVID_19_API_TOKEN ]] && meltano select --list --all tap-covid-19 || echo '$TAP_COVID_19_API_TOKEN is not set'"
+    - meltano select tap-gitlab --list --all
 
-    - meltano select tap-covid-19 eu_daily date
-    - meltano select tap-covid-19 eu_daily country
-    - meltano select tap-covid-19 eu_daily cases
-    - meltano select tap-covid-19 eu_daily deaths
-    - meltano select tap-covid-19 eu_ecdc_daily "*"
-    - meltano select tap-covid-19 --exclude "*" "git_*"
+    - meltano select tap-gitlab commits id
+    - meltano select tap-gitlab commits project_id
+    - meltano select tap-gitlab commits created_at
+    - meltano select tap-gitlab commits author_name
+    - meltano select tap-gitlab commits message
+    - meltano select tap-gitlab tags "*"
+    - meltano select tap-gitlab --exclude "*" "*_url"
 
-    - "[[ $TAP_COVID_19_API_TOKEN ]] && meltano select --list tap-covid-19 || echo '$TAP_COVID_19_API_TOKEN is not set'"
+    - meltano select tap-gitlab --list
 
 
     ### https://meltano.com/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination

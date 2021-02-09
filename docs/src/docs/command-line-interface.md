@@ -517,49 +517,48 @@ Use `--list` to list the current selected tap attributes.
 
 ```bash
 # List all available entities and attributes
-meltano select --list --all tap-covid-19
+meltano select tap-gitlab --list --all
 
 # Include all attributes of an entity
-meltano select tap-covid-19 eu_ecdc_daily "*"
+meltano select tap-gitlab tags "*"
 
 # Include specific attributes of an entity
-meltano select tap-covid-19 eu_daily date
-meltano select tap-covid-19 eu_daily country
-meltano select tap-covid-19 eu_daily cases
-meltano select tap-covid-19 eu_daily deaths
+meltano select tap-gitlab commits id
+meltano select tap-gitlab commits project_id
+meltano select tap-gitlab commits created_at
+meltano select tap-gitlab commits author_name
+meltano select tap-gitlab commits message
 
 # Exclude matching attributes of all entities
-meltano select tap-covid-19 --exclude "*" "git_*"
+meltano select tap-gitlab --exclude "*" "*_url"
 
 # List selected (enabled) entities and attributes
-meltano select --list tap-covid-19
+meltano select tap-gitlab --list
 ```
 
 Example output:
 
 ```
 Enabled patterns:
-    eu_ecdc_daily.*
-    eu_daily.date
-    eu_daily.country
-    eu_daily.cases
-    eu_daily.deaths
-    !*.git_*
+    tags.*
+    commits.id
+    commits.project_id
+    commits.created_at
+    commits.author_name
+    commits.message
+    !*.*_url
 
 Selected attributes:
-    [automatic] eu_daily.__sdc_row_number
-    [automatic] eu_daily.git_path
-    [selected ] eu_daily.date
-    [selected ] eu_daily.country
-    [selected ] eu_daily.cases
-    [selected ] eu_daily.deaths
-    [automatic] eu_ecdc_daily.__sdc_row_number
-    [automatic] eu_ecdc_daily.git_path
-    [selected ] eu_ecdc_daily.date
-    [selected ] eu_ecdc_daily.datetime
-    [selected ] eu_ecdc_daily.country
-    [selected ] eu_ecdc_daily.cases
-    [selected ] eu_ecdc_daily.deaths
+    [selected ] commits.author_name
+    [selected ] commits.created_at
+    [automatic] commits.id
+    [selected ] commits.message
+    [selected ] commits.project_id
+    [automatic] tags.commit_id
+    [selected ] tags.message
+    [automatic] tags.name
+    [automatic] tags.project_id
+    [selected ] tags.target
 ```
 
 ::: tip

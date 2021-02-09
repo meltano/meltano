@@ -369,10 +369,10 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
 1. Find out whether the extractor supports entity selection, and if so, what entities and attributes are available, using [`meltano select --list --all`](/docs/command-line-interface.html#select):
 
     ```bash
-    meltano select --list --all <plugin>
+    meltano select <plugin> --list --all
 
     # For example:
-    meltano select --list --all tap-covid-19
+    meltano select tap-gitlab --list --all
     ```
 
     If this command fails with an error, this usually means that the Singer tap does not support [catalog discovery mode](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#discovery-mode), and will always extract all supported entities and attributes.
@@ -384,16 +384,17 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
     meltano select <plugin> --exclude <entity> <attribute>
 
     # For example:
-    meltano select tap-covid-19 eu_daily date
-    meltano select tap-covid-19 eu_daily country
-    meltano select tap-covid-19 eu_daily cases
-    meltano select tap-covid-19 eu_daily deaths
+    meltano select tap-gitlab commits id
+    meltano select tap-gitlab commits project_id
+    meltano select tap-gitlab commits created_at
+    meltano select tap-gitlab commits author_name
+    meltano select tap-gitlab commits message
 
     # Include all attributes of an entity
-    meltano select tap-covid-19 eu_ecdc_daily "*"
+    meltano select tap-gitlab tags "*"
 
     # Exclude matching attributes of all entities
-    meltano select tap-covid-19 --exclude "*" "git_*"
+    meltano select tap-gitlab --exclude "*" "*_url"
     ```
 
     As you can see in the example, entity and attribute identifiers can contain wildcards (`*`) to match multiple entities or attributes at once.
@@ -403,23 +404,24 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
     ```yml{4-10}
     plugins:
       extractors:
-      - name: tap-covid-19
+      - name: tap-gitlab
         select:
-        - eu_daily.date
-        - eu_daily.country
-        - eu_daily.cases
-        - eu_daily.deaths
-        - eu_ecdc_daily.*
-        - '!*.git_*'
+        - tags.*
+        - commits.id
+        - commits.project_id
+        - commits.created_at
+        - commits.author_name
+        - commits.message
+        - '!*.*_url'
     ```
 
 1. Optionally, verify that only the intended entities and attributes are now selected using [`meltano select --list`](/docs/command-line-interface.html#select):
 
     ```bash
-    meltano select --list <plugin>
+    meltano select <plugin> --list
 
     # For example:
-    meltano select --list tap-covid-19
+    meltano select tap-gitlab --list
     ```
 
 ### Choose how to replicate each entity
