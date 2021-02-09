@@ -155,13 +155,14 @@ class PluginInvoker:
         return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
 
     def command_args(self, *args):
+        command = args[0]
+        extra_args = args[1:]
         try:
-            command = args[0]
-            extra_args = args[1:]
             command_args = shlex.split(self.plugin.commands[command])
-            return [str(arg) for arg in (self.exec_path(), *command_args, *extra_args)]
         except KeyError as err:
             raise UnknownCommandError(self.plugin, command) from err
+
+        return [str(arg) for arg in (self.exec_path(), *command_args, *extra_args)]
 
     def env(self):
         env = {
