@@ -49,11 +49,12 @@ class InvokerNotPreparedError(InvokerError):
 
 
 class UnknownCommandError(InvokerError):
-    """Occurs when `invoke` is called in command mode with an undefined command"""
+    """Occurs when `invoke` is called in command mode with an undefined command."""
 
     def __init__(self, plugin: PluginRef, command):
         if plugin.supported_commands:
-            desc = f"{plugin.type.descriptor.capitalize()} '{plugin.name}' supports the following commands: {','.join(plugin.supported_commands)}"
+            supported = ",".join(plugin.supported_commands)
+            desc = f"{plugin.type.descriptor.capitalize()} '{plugin.name}' supports the following commands: {supported}"
         else:
             desc = f"{plugin.type.descriptor.capitalize()} '{plugin.name}' does not define any commands"
         super().__init__(f"Command '{command}' could not be found. {desc}")
@@ -155,10 +156,10 @@ class PluginInvoker:
 
     def command_args(self, *args):
         try:
-            # TODO: not enough args
             command = args[0]
+            extra_args = args[1:]
             command_args = shlex.split(self.plugin.commands[command])
-            return [str(arg) for arg in (self.exec_path(), *command_args, *args[1:])]
+            return [str(arg) for arg in (self.exec_path(), *command_args, *extra_args)]
         except KeyError as err:
             raise UnknownCommandError(self.plugin, command) from err
 

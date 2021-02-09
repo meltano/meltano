@@ -47,10 +47,10 @@ def invoke(project, plugin_type, dump, command, plugin_name, plugin_args):
         plugin_name, plugin_type=plugin_type, invokable=True
     )
 
-    if command and len(plugin_args) == 0:
+    if command and not plugin_args:
         raise click.BadArgumentUsage(
             "When using '--command' a command name is required:\n"
-            "meltano invoke --command PLUGIN_NAME COMMAND_NAME [PLUGIN_ARGS]..."
+            + "meltano invoke --command PLUGIN_NAME COMMAND_NAME [PLUGIN_ARGS]..."
         )
 
     try:
