@@ -5,7 +5,7 @@ import click
 from meltano.core.db import project_engine
 from meltano.core.error import SubprocessError
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_invoker import invoker_factory
+from meltano.core.plugin_invoker import UnknownCommandError, invoker_factory
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
@@ -47,6 +47,12 @@ def invoke(project, plugin_type, dump, command, plugin_name, plugin_args):
         plugin_name, plugin_type=plugin_type, invokable=True
     )
 
+    if command and len(plugin_args) == 0:
+        raise click.BadArgumentUsage(
+            "When using '--command' a command name is required:\n"
+            "meltano invoke --command PLUGIN_NAME COMMAND_NAME [PLUGIN_ARGS]..."
+        )
+
     try:
         invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
         with invoker.prepared(session):
@@ -56,10 +62,11 @@ def invoke(project, plugin_type, dump, command, plugin_name, plugin_args):
             else:
                 handle = invoker.invoke(*plugin_args, command=command)
                 exit_code = handle.wait()
+    except UnknownCommandError as err:
+        raise click.BadArgumentUsage(err) from err
     except SubprocessError as err:
         logger.error(err.stderr)
         raise
-    # TODO: handle UnknownCommandError
     finally:
         session.close()
 
