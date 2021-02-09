@@ -10,7 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2544] Add support for `cli` plugin types
+- [#2544] Add support for `utility` plugin types
 
 ### Changes
 
