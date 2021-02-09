@@ -14,18 +14,16 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 from . import cli
 from .params import pass_project
 
-discoverable_plugin_types = list(PluginType)
-
 
 @cli.command()
 @click.argument(
-    "plugin_type", type=click.Choice([*discoverable_plugin_types, "all"]), default="all"
+    "plugin_type", type=click.Choice([*list(PluginType), "all"]), default="all"
 )
 @pass_project()
 def discover(project, plugin_type):
     discover_service = PluginDiscoveryService(project)
     if plugin_type == "all":
-        plugin_types = discoverable_plugin_types
+        plugin_types = list(PluginType)
     else:
         plugin_types = [PluginType.from_cli_argument(plugin_type)]
 
