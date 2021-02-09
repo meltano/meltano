@@ -67,6 +67,9 @@ def discovery():
                         {"name": "auth.username"},
                         {"name": "auth.password", "kind": "password"},
                     ],
+                    "commands": {
+                        "custom_command": "--option true",
+                    },
                 },
                 {
                     "name": "singer-io",

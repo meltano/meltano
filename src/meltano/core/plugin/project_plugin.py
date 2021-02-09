@@ -40,6 +40,7 @@ class ProjectPlugin(PluginRef):
         variant: Optional[str] = None,
         pip_url: Optional[str] = None,
         config: Optional[dict] = {},
+        commands: Optional[dict] = {},
         default_variant=Variant.ORIGINAL_NAME,
         **extras,
     ):
@@ -77,6 +78,7 @@ class ProjectPlugin(PluginRef):
         self.set_presentation_attrs(extras)
         self.variant = variant
         self.pip_url = pip_url
+        self.commands = commands
 
         self._fallbacks.update(
             ["logo_url", "description", self.VARIANT_ATTR, "pip_url"]
@@ -137,6 +139,10 @@ class ProjectPlugin(PluginRef):
     def info_env(self):
         # MELTANO_EXTRACTOR_...
         return flatten({"meltano": {self.type.singular: self.info}}, "env_var")
+
+    @property
+    def supported_commands(self):
+        return self.commands.keys()
 
     def env_prefixes(self, for_writing=False):
         prefixes = [self.name, self.namespace]

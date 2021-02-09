@@ -2,6 +2,7 @@ import asyncio
 import copy
 import logging
 import os
+import shlex
 import subprocess
 from contextlib import contextmanager
 from typing import Optional
@@ -45,6 +46,17 @@ class InvokerNotPreparedError(InvokerError):
     """Occurs when `invoke` is called before `prepare`"""
 
     pass
+
+
+class UnknownCommandError(Error):
+    """Occurs when `invoke` is called in command mode with an undefined command"""
+
+    def __init__(self, plugin: PluginRef, command):
+        super().__init__(
+            f"Command '{command}' could not be found. "
+            # TODO: better message if no supported commands
+            f"{plugin.type.descriptor.capitalize()} '{plugin.name}' supports the following commands: {','.join(plugin.supported_commands)}"
+        )
 
 
 class PluginInvoker:
@@ -141,6 +153,15 @@ class PluginInvoker:
 
         return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
 
+    def command_args(self, *args):
+        try:
+            # TODO: not enough args
+            command = args[0]
+            command_args = shlex.split(self.plugin.commands[command])
+            return [str(arg) for arg in (self.exec_path(), *command_args, *args[1:])]
+        except KeyError as err:
+            raise UnknownCommandError(self.plugin, command) from err
+
     def env(self):
         env = {
             **self.project.dotenv_env,
@@ -160,12 +181,15 @@ class PluginInvoker:
         return {}
 
     @contextmanager
-    def _invoke(self, *args, require_preparation=True, env={}, **Popen):
+    def _invoke(self, *args, require_preparation=True, env={}, command=False, **Popen):
         if require_preparation and not self._prepared:
             raise InvokerNotPreparedError()
 
         with self.plugin.trigger_hooks("invoke", self, args):
-            popen_args = self.exec_args(*args)
+            if command:
+                popen_args = self.command_args(*args)
+            else:
+                popen_args = self.exec_args(*args)
             popen_options = {**self.Popen_options(), **Popen}
             popen_env = {**self.env(), **env}
             logging.debug(f"Invoking: {popen_args}")

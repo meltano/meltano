@@ -27,10 +27,17 @@ logger = logging.getLogger(__name__)
     type=click.Choice(["catalog", "config"]),
     help="Dump content of generated file",
 )
+@click.option(
+    "-c",
+    "--command",
+    default=False,
+    is_flag=True,
+    help="Invoke a saved command by name",
+)
 @click.argument("plugin_name")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
 @pass_project(migrate=True)
-def invoke(project, plugin_type, dump, plugin_name, plugin_args):
+def invoke(project, plugin_type, dump, command, plugin_name, plugin_args):
     plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
     _, Session = project_engine(project)
@@ -47,11 +54,12 @@ def invoke(project, plugin_type, dump, plugin_name, plugin_args):
                 dump_file(invoker, dump)
                 exit_code = 0
             else:
-                handle = invoker.invoke(*plugin_args)
+                handle = invoker.invoke(*plugin_args, command=command)
                 exit_code = handle.wait()
     except SubprocessError as err:
         logger.error(err.stderr)
         raise
+    # TODO: handle UnknownCommandError
     finally:
         session.close()
 
