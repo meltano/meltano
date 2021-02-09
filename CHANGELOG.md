@@ -38,6 +38,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#2559](https://gitlab.com/meltano/meltano/-/issues/2559) Bump Airflow version to 1.10.14
+- [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for `invoke --command`
 
 ### Fixes
 
