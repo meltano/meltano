@@ -5,7 +5,7 @@ import click
 from meltano.core.db import project_engine
 from meltano.core.error import SubprocessError
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_invoker import UnknownCommandError, invoker_factory
+from meltano.core.plugin_invoker import invoker_factory, UnknownCommandError
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
