@@ -326,9 +326,6 @@ class BasePlugin(HookObject):
     def exec_args(self, files: Dict):
         return []
 
-    def command_args(self, command):
-        return []
-
     @property
     def config_files(self):
         """Return a list of stubbed files created for this plugin."""

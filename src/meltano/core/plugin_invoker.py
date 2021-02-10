@@ -14,6 +14,7 @@ from .plugin.project_plugin import ProjectPlugin
 from .plugin.settings_service import PluginSettingsService
 from .project import Project
 from .project_plugins_service import ProjectPluginsService
+from .utils import expand_env_vars
 from .venv_service import VenvService, VirtualEnv
 
 
@@ -161,20 +162,17 @@ class PluginInvoker:
             self.plugin.executable, name=self.plugin.name, namespace=self.plugin.type
         )
 
-    def exec_args(self, *args):
-        plugin_args = self.plugin.exec_args(self)
+    def exec_args(self, command, *args):
+        if command:
+            try:
+                plugin_args = self.plugin.commands[command]
+            except KeyError as err:
+                raise UnknownCommandError(self.plugin, command) from err
+            plugin_args = shlex.split(plugin_args)
+        else:
+            plugin_args = self.plugin.exec_args(self)
 
         return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
-
-    def command_args(self, *args):
-        command = args[0]
-        extra_args = args[1:]
-        try:
-            command_args = shlex.split(self.plugin.commands[command])
-        except KeyError as err:
-            raise UnknownCommandError(self.plugin, command) from err
-
-        return [str(arg) for arg in (self.exec_path(), *command_args, *extra_args)]
 
     def env(self):
         env = {
@@ -195,17 +193,15 @@ class PluginInvoker:
         return {}
 
     @contextmanager
-    def _invoke(self, *args, require_preparation=True, env={}, command=False, **Popen):
+    def _invoke(self, *args, require_preparation=True, env={}, command=None, **Popen):
         if require_preparation and not self._prepared:
             raise InvokerNotPreparedError()
 
         with self.plugin.trigger_hooks("invoke", self, args):
-            if command:
-                popen_args = self.command_args(*args)
-            else:
-                popen_args = self.exec_args(*args)
+            popen_args = self.exec_args(command, *args)
             popen_options = {**self.Popen_options(), **Popen}
             popen_env = {**self.env(), **env}
+            popen_args = [expand_env_vars(arg, popen_env) for arg in popen_args]
             logging.debug(f"Invoking: {popen_args}")
             logging.debug(f"Env: {popen_env}")
 
