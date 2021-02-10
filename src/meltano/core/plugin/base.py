@@ -137,6 +137,7 @@ class Variant(NameEq, Canonical):
         capabilities: Optional[list] = [],
         settings_group_validation: Optional[list] = [],
         settings: Optional[list] = [],
+        commands: Optional[dict] = {},
         **extras,
     ):
         super().__init__(
@@ -150,6 +151,7 @@ class Variant(NameEq, Canonical):
             capabilities=list(capabilities),
             settings_group_validation=list(settings_group_validation),
             settings=list(map(SettingDefinition.parse, settings)),
+            commands=commands,
             extras=extras,
         )
 
@@ -280,6 +282,10 @@ class BasePlugin(HookObject):
     @property
     def extras(self):
         return {**self._plugin_def.extras, **self._variant.extras}
+
+    @property
+    def all_commands(self):
+        return self._variant.commands
 
     @property
     def extra_settings(self):

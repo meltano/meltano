@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
     "--command",
     default=False,
     is_flag=True,
-    help="Invoke a saved command by name",
+    help="Invoke a named command",
 )
 @click.argument("plugin_name")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)

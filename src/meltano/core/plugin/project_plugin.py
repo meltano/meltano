@@ -141,8 +141,13 @@ class ProjectPlugin(PluginRef):
         return flatten({"meltano": {self.type.singular: self.info}}, "env_var")
 
     @property
+    def all_commands(self):
+        return {**self.commands, **self._parent.all_commands}
+
+    @property
     def supported_commands(self):
-        return self.commands.keys()
+        """Return all defined commands for the plugin."""
+        return self.all_commands.keys()
 
     def env_prefixes(self, for_writing=False):
         prefixes = [self.name, self.namespace]
