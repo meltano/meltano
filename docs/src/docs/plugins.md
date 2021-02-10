@@ -115,7 +115,7 @@ Meltano supports the following types of plugins:
 - [**Orchestrators**](#orchestrators) orchestrate a project's scheduled pipelines.
 - [**Transformers**](#transformers) run transforms.
 - [**File bundles**](#file-bundles) bundle files you may want in your project.
-- [**Any command line tools**](#utilities) supplied by a python package.
+- [**Utilities**](#utilities) perform arbitrary tasks provided by [pip packages](https://pip.pypa.io/en/stable/) with executables.
 
 ### Extractors
 
@@ -759,4 +759,5 @@ meltano add --custom utility <plugin>
 meltano invoke <plugin> [<plugin arguments>...]
 ```
 
-The benefit of doing this as opposed to using `pip install` directly is that any packages installed this way benefit from Meltano's [`venv`](https://docs.python.org/3/tutorial/venv.html) isolation. This avoids dependency conflicts between plugins.
+The benefit of doing this as opposed to adding the package to `requirements.txt` or running `pip install <package>` directly is that any packages installed this way benefit from Meltano's [virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) isolation.
+This avoids dependency conflicts between packages.
