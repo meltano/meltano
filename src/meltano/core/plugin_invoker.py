@@ -52,12 +52,24 @@ class UnknownCommandError(InvokerError):
     """Occurs when `invoke` is called in command mode with an undefined command."""
 
     def __init__(self, plugin: PluginRef, command):
-        if plugin.supported_commands:
-            supported = ",".join(plugin.supported_commands)
-            desc = f"{plugin.type.descriptor.capitalize()} '{plugin.name}' supports the following commands: {supported}"
+        """Initialize UnknownCommandError"""
+        self.plugin = plugin
+        self.command = command
+
+    def __str__(self):
+        """Return error message."""
+        if self.plugin.supported_commands:
+            supported_commands = ", ".join(self.plugin.supported_commands)
+            desc = f"supports the following commands: {supported_commands}"
         else:
-            desc = f"{plugin.type.descriptor.capitalize()} '{plugin.name}' does not define any commands"
-        super().__init__(f"Command '{command}' could not be found. {desc}")
+            desc = "does not define any commands."
+        return " ".join(
+            [
+                f"Command '{self.command}' could not be found.",
+                f"{self.plugin.type.descriptor.capitalize()} '{self.plugin.name}'",
+                desc,
+            ]
+        )
 
 
 class PluginInvoker:
