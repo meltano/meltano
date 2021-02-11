@@ -185,6 +185,9 @@ meltano config tap-gitlab set projects meltano/meltano
 # - going back to May 1st, 2020
 meltano config tap-gitlab set start_date 2020-05-01T00:00:00Z
 
+# Select all attributes of the "tags" entity
+meltano select tap-gitlab tags "*"
+
 # Add JSONL loader
 meltano add loader target-jsonl
 
@@ -251,6 +254,9 @@ meltano add transformer dbt
 
 # Add PostgreSQL-compatible dbt models for tap-gitlab
 meltano add transform tap-gitlab
+
+# Select all attributes of all entities
+meltano select tap-gitlab "*" "*"
 
 # Run data integration and transformation pipeline
 meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres

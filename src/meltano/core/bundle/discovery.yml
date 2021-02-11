@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-version: 16
+version: 17
 
 extractors:
   - name: tap-adwords
@@ -553,6 +553,8 @@ extractors:
     repo: https://gitlab.com/meltano/tap-gitlab
     pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
     capabilities:
+      - catalog
+      - discover
       - state
     settings_group_validation:
       - ['api_url', 'groups', 'start_date']
