@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.68.0 - (2021-02-11)
+---
+
+### New
+
 - [#2557](https://gitlab.com/meltano/meltano/-/issues/2557) Add support for entity and attribute selection to tap-gitlab
 
 ### Changes
@@ -19,8 +31,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#2543](https://gitlab.com/meltano/meltano/-/issues/2543) Fix packages dependencies that claim Python 3.9 is supported when it actually isn't.
-
-### Breaks
 
 
 ## 1.67.0 - (2021-01-26)
