@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2557](https://gitlab.com/meltano/meltano/-/issues/2557) Add support for entity and attribute selection to tap-gitlab
+
 ### Changes
 
 - [#2559](https://gitlab.com/meltano/meltano/-/issues/2559) Bump Airflow version to 1.10.14
