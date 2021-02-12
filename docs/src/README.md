@@ -294,7 +294,7 @@ to and run by a supported orchestrator like [Apache Airflow](https://airflow.apa
 When you add the `airflow` orchestrator to your project, a
 [Meltano DAG generator](https://gitlab.com/meltano/files-airflow/-/blob/master/bundle/orchestrate/dags/meltano.py)
 will automatically be added to the `orchestrate/dags` directory, where Airflow
-will look for [DAGs](https://airflow.apache.org/docs/apache-airflow/2.0.1/concepts.html#dags) by default.
+will look for [DAGs](https://airflow.apache.org/docs/apache-airflow/1.10.14/concepts.html#dags) by default.
 If the default behavior of simply running [`meltano elt`](/docs/command-line-interface.html#elt) on a
 schedule is not going to cut it, you can easily modify the DAG generator or add your own.
 

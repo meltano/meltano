@@ -807,9 +807,9 @@ To help you realize this, Meltano supports scheduled pipelines that can be orche
     It will also automatically add a
 [`meltano elt` DAG generator](https://gitlab.com/meltano/files-airflow/-/blob/master/bundle/orchestrate/dags/meltano.py)
 to your project's `orchestrate/dags` directory, where Airflow
-will be configured to look for [DAGs](https://airflow.apache.org/docs/apache-airflow/2.0.1/concepts.html#dags) by default.
+will be configured to look for [DAGs](https://airflow.apache.org/docs/apache-airflow/1.10.14/concepts.html#dags) by default.
 
-1. Start the [Airflow scheduler](https://airflow.apache.org/docs/apache-airflow/2.0.1/scheduler.html) using [`meltano invoke`](/docs/command-line-interface.html#invoke):
+1. Start the [Airflow scheduler](https://airflow.apache.org/docs/apache-airflow/1.10.14/scheduler.html) using [`meltano invoke`](/docs/command-line-interface.html#invoke):
 
     ```bash
     meltano invoke airflow scheduler
@@ -820,7 +820,7 @@ will be configured to look for [DAGs](https://airflow.apache.org/docs/apache-air
 
     As long as the scheduler is running, your scheduled pipelines will run at the appropriate times.
 
-1. Optionally, verify that a [DAG](https://airflow.apache.org/docs/apache-airflow/2.0.1/concepts.html#dags) was automatically created for each scheduled pipeline by starting the [Airflow web interface](https://airflow.apache.org/docs/apache-airflow/2.0.1/cli-and-env-variables-ref.html#webserver):
+1. Optionally, verify that a [DAG](https://airflow.apache.org/docs/apache-airflow/1.10.14/concepts.html#dags) was automatically created for each scheduled pipeline by starting the [Airflow web interface](https://airflow.apache.org/docs/apache-airflow/1.10.14/cli-ref.html#webserver):
 
     ```bash
     meltano invoke airflow webserver
