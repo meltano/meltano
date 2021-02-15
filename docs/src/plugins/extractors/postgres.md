@@ -20,6 +20,14 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 
 Then, follow the steps in the ["Setup requirements" section of the documentation](https://transferwise.github.io/pipelinewise/connectors/taps/postgres.html#postgresql-setup-requirements).
 
+#### Dependencies
+
+`tap-postgres` [requires](https://www.psycopg.org/docs/install.html#runtime-requirements) the
+[`libpq` library](https://www.postgresql.org/docs/current/libpq.html) to be available on your system.
+If you've installed PostgreSQL, you should already have it, but you can also install it by itself using the
+[`libpq-dev` package](https://pkgs.org/download/libpq-dev) on Ubuntu/Debian or the
+[`libpq` Homebrew formula](https://formulae.brew.sh/formula/libpq) on macOS.
+
 ### Installation and configuration
 
 #### Using the Command Line Interface
@@ -67,7 +75,7 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
-If you run into any issues, [learn how to get help](/docs/getting-help.html).
+If you run into any issues, refer to the ["Troubleshooting" section](#troubleshooting) below or [learn how to get help](/docs/getting-help.html).
 
 ## Settings
 
@@ -289,3 +297,11 @@ meltano config tap-postgres set break_at_end_lsn false
 
 export TAP_POSTGRES_BREAK_AT_END_LSN=false
 ```
+
+## Troubleshooting
+
+### Error: `pg_config executable not found` or `libpq-fe.h: No such file or directory`
+
+This error message indicates that the [`libpq`](https://www.postgresql.org/docs/current/libpq.html) dependency is missing.
+
+To resolve this, refer to the ["Dependencies" section](#dependencies) above.
