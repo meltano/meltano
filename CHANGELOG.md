@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+- [#2558](https://gitlab.com/meltano/meltano/-/issues/2558) Add support for Airflow 2.0
 
 ### Changes
 

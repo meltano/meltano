@@ -24,6 +24,7 @@ class TestAirflow:
 
         handle_mock = mock.Mock()
         handle_mock.wait.return_value = 0
+        handle_mock.communicate.return_value = "2.0.1", None
 
         original_popen = subprocess.Popen
 
@@ -37,9 +38,11 @@ class TestAirflow:
                 airflow_cfg["webserver"] = {"dummy": "dummy"}
                 with run_dir.joinpath("airflow.cfg").open("w") as cfg:
                     airflow_cfg.write(cfg)
-
-            # second time, it creates the `airflow.db`
-            elif "initdb" in popen_args:
+            # second time, check version
+            elif "version" in popen_args:
+                return handle_mock
+            # third time, it creates the `airflow.db`
+            elif {"db", "init"}.issubset(popen_args):
                 assert kwargs["env"]["AIRFLOW_HOME"] == str(run_dir)
 
                 project.plugin_dir(subject, "airflow.db").touch()
@@ -57,11 +60,14 @@ class TestAirflow:
             # This ends up calling subject.before_configure
             with invoker.prepared(session):
                 commands = [
-                    popen_args[1]
+                    popen_args
                     for _, (popen_args, *_), kwargs in popen.mock_calls
                     if isinstance(popen_args, list)
                 ]
-                assert commands == ["--help", "initdb"]
+                assert commands[0][1] == "--help"
+                assert commands[1][1] == "version"
+                assert commands[2][1] == "db"
+                assert commands[2][2] == "init"
                 assert configure.call_count == 2
 
                 assert run_dir.joinpath("airflow.cfg").exists()
