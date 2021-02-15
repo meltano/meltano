@@ -2,6 +2,7 @@ import configparser
 import logging
 import os
 import subprocess
+from distutils.version import StrictVersion
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.error import SubprocessError
@@ -76,8 +77,24 @@ class Airflow(BasePlugin):
         # prepare again on the invoker so it re-reads the configuration
         # for the Airflow plugin
         invoker.prepare(session)
+
+        # make sure we use correct db init
         handle = invoker.invoke(
-            "initdb",
+            "version",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+        )
+        version, err = handle.communicate()
+
+        init_db_cmd = (
+            ["initdb"]
+            if StrictVersion(version) < StrictVersion("2.0.0")
+            else ["db", "init"]
+        )
+
+        handle = invoker.invoke(
+            *init_db_cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
