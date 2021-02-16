@@ -10,14 +10,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2558](https://gitlab.com/meltano/meltano/-/issues/2558) Add support for Airflow 2.0
-- [#2577](https://gitlab.com/meltano/meltano/-/issues/2577) Add `hotgluexyz` variant of `tap-quickbooks`
-
 ### Changes
 
 ### Fixes
 
 ### Breaks
+
+
+## 1.69.0 - (2021-02-16)
+---
+
+### New
+
+- [#2558](https://gitlab.com/meltano/meltano/-/issues/2558) Add support for Airflow 2.0
+- [#2577](https://gitlab.com/meltano/meltano/-/issues/2577) Add `hotgluexyz` variant of `tap-quickbooks`
 
 
 ## 1.68.0 - (2021-02-11)
