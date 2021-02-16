@@ -27,17 +27,15 @@ logger = logging.getLogger(__name__)
     type=click.Choice(["catalog", "config"]),
     help="Dump content of generated file",
 )
-@click.option(
-    "-c",
-    "--command",
-    default=False,
-    is_flag=True,
-    help="Invoke a named command",
-)
-@click.argument("plugin_name")
+@click.argument("plugin_name", metavar="PLUGIN_NAME[:COMMAND_NAME]")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
 @pass_project(migrate=True)
-def invoke(project, plugin_type, dump, command, plugin_name, plugin_args):
+def invoke(project, plugin_type, dump, plugin_name, plugin_args):
+    try:
+        plugin_name, command_name = plugin_name.split(":")
+    except ValueError:
+        command_name = None
+
     plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
     _, Session = project_engine(project)
@@ -47,12 +45,6 @@ def invoke(project, plugin_type, dump, command, plugin_name, plugin_args):
         plugin_name, plugin_type=plugin_type, invokable=True
     )
 
-    if command and not plugin_args:
-        raise click.BadArgumentUsage(
-            "When using '--command' a command name is required:\n"
-            + "meltano invoke --command PLUGIN_NAME COMMAND_NAME [PLUGIN_ARGS]..."
-        )
-
     try:
         invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
         with invoker.prepared(session):
@@ -60,9 +52,6 @@ def invoke(project, plugin_type, dump, command, plugin_name, plugin_args):
                 dump_file(invoker, dump)
                 exit_code = 0
             else:
-                if command:
-                    command_name = plugin_args[0]
-                    plugin_args = plugin_args[1:]
                 handle = invoker.invoke(*plugin_args, command=command_name)
                 exit_code = handle.wait()
     except UnknownCommandError as err:
