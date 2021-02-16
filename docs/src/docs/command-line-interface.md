@@ -444,33 +444,19 @@ meltano invoke --dump=catalog <plugin>
 
 Like any standard output, the dumped content can be [redirected](https://en.wikipedia.org/wiki/Redirection_(computing)) to a file using `>`, e.g. `meltano invoke --dump=catalog <plugin> > state.json`.
 
-### `invoke --command`
+### Commands
 
-Plugins can define commands, which are shortcuts for combinations of arguments which can be shared by all users of the project.
-
-```yaml
-plugins:
-  transformers:
-  - name: dbt
-    namespace: dbt
-    pip_url: dbt==0.16.1
-    executable: dbt
-    commands:
-      seed: seed --project-dir $DBT_PROJECT_DIR --profile $DBT_PROFILE --target $MELTANO_EXTRACTOR_NAMESPACE --select $DBT_MODEL
-      snapshot: snapshot --project-dir $DBT_PROJECT_DIR --profile $DBT_PROFILE --target $MELTANO_EXTRACTOR_NAMESPACE --select $DBT_MODEL
-```
-
-For example, if a plugin defines a set of commands as above, these can be invoked with the shortcut command:
+Plugins can define [commands](/docs/configuration.html#plugin-commands), which are shortcuts for combinations of arguments which can be shared by all users of the project. These can be invoked with the shortcut command of the form `meltano invoke <plugin>:<command>`.
 
 ```bash
-meltano invoke --command dbt seed
-meltano invoke -c dbt seed
+meltano invoke dbt:seed
+meltano invoke dbt:snapshot
 ```
 
 Additional arguments can be specified as well, which will be appended to the command.
 
 ```bash
-meltano invoke --command dbt seed --verbose
+meltano invoke dbt:seed --verbose
 ```
 
 
