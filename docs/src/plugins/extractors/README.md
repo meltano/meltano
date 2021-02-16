@@ -20,6 +20,7 @@ Extractors for the following sources are currently [discoverable](/docs/plugins.
 - [Marketo](/plugins/extractors/marketo.html)
 - [MongoDB](/plugins/extractors/mongodb.html)
 - [MySQL / MariaDB](/plugins/extractors/mysql.html)
+- [Quickbooks](/plugins/extractors/quickbooks.html)
 - [PostgreSQL](/plugins/extractors/postgres.html)
 - [ReCharge](/plugins/extractors/recharge.html)
 - [Salesforce](/plugins/extractors/salesforce.html)
