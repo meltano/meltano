@@ -301,8 +301,8 @@ export TAP_SALESFORCE_API_TYPE=BULK
 
 ### Select Fields By Default
 
-- Name: `is_sandbox`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_IS_SANDBOX`
+- Name: `select_fields_by_default`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_SELECT_FIELDS_BY_DEFAULT`
 - Default: `true`
 
 Select by default any new fields discovered in Salesforce objects
@@ -312,9 +312,9 @@ Select by default any new fields discovered in Salesforce objects
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config tap-salesforce set is_sandbox false
+meltano config tap-salesforce set select_fields_by_default false
 
-export TAP_SALESFORCE_IS_SANDBOX=false
+export TAP_SALESFORCE_SELECT_FIELDS_BY_DEFAULT=false
 ```
 
 ### State Message Threshold
