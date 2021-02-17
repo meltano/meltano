@@ -73,6 +73,16 @@ class UnknownCommandError(InvokerError):
         )
 
 
+class UndefinedArgumentError(InvokerError):
+    """Occurs when an environment variable is used as a command argument but is not set."""
+
+    def __init__(self, command, arg):
+        """Initialize UndefinedArgumentError"""
+        super().__init__(
+            f"Command '{command}' referenced an unset argument '{arg}'. You should define {arg} or update the command definition for {command}."
+        )
+
+
 class PluginInvoker:
     """This class handles the invocation of a `ProjectPlugin` instance."""
 
@@ -201,12 +211,19 @@ class PluginInvoker:
             popen_args = self.exec_args(command, *args)
             popen_options = {**self.Popen_options(), **Popen}
             popen_env = {**self.env(), **env}
-            popen_args = [expand_env_vars(arg, popen_env) for arg in popen_args]
-            logging.debug(f"Invoking: {popen_args}")
+            popen_args_expanded = []
+            for arg in popen_args:
+                expanded = expand_env_vars(arg, popen_env)
+                if not expanded:
+                    raise UndefinedArgumentError(command, arg)
+
+                popen_args_expanded.append(expanded)
+
+            logging.debug(f"Invoking: {popen_args_expanded}")
             logging.debug(f"Env: {popen_env}")
 
             try:
-                yield (popen_args, popen_options, popen_env)
+                yield (popen_args_expanded, popen_options, popen_env)
             except FileNotFoundError as err:
                 raise ExecutableNotFoundError(
                     self.plugin, self.plugin.executable
