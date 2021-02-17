@@ -1757,6 +1757,13 @@ transformers:
         value: analytics
       - name: models
         value: $MELTANO_TRANSFORM__PACKAGE_NAME $MELTANO_EXTRACTOR_NAMESPACE my_meltano_project
+    commands:
+      clean: clean
+      deps: deps
+      compile: compile
+      run: run
+      seed: seed
+      snapshot: snapshot
 transforms:
   - name: tap-adwords
     namespace: tap_adwords

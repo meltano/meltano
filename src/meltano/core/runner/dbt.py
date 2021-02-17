@@ -27,14 +27,14 @@ class DbtRunner(Runner):
     def plugin_context(self):
         return self.context.transformer
 
-    async def invoke(self, dbt: PluginInvoker, cmd, *args, log=None, **kwargs):
+    async def invoke(self, dbt: PluginInvoker, *args, log=None, command=None, **kwargs):
         log = log or sys.stderr
 
         try:
             handle = await dbt.invoke_async(
-                cmd,
                 *args,
                 **kwargs,
+                command=command,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -53,21 +53,15 @@ class DbtRunner(Runner):
         exitcode = handle.returncode
         if exitcode:
             raise RunnerError(
-                f"`dbt {cmd}` failed", {PluginType.TRANSFORMERS: exitcode}
+                f"`dbt {command}` failed", {PluginType.TRANSFORMERS: exitcode}
             )
 
     async def run(self, log=None):
         dbt = self.context.transformer_invoker()
 
         with dbt.prepared(self.context.session):
-            await self.invoke(dbt, "clean", log=log)
-            await self.invoke(dbt, "deps", log=log)
+            await self.invoke(dbt, log=log, command="clean")
+            await self.invoke(dbt, log=log, command="deps")
 
             cmd = "compile" if self.context.dry_run else "run"
-            await self.invoke(
-                dbt,
-                cmd,
-                "--models",
-                str(self.plugin_context.get_config("models")),
-                log=log,
-            )
+            await self.invoke(dbt, log=log, command=cmd)
