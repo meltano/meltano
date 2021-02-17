@@ -53,7 +53,7 @@ class UnknownCommandError(InvokerError):
     """Occurs when `invoke` is called in command mode with an undefined command."""
 
     def __init__(self, plugin: PluginRef, command):
-        """Initialize UnknownCommandError"""
+        """Initialize UnknownCommandError."""
         self.plugin = plugin
         self.command = command
 
@@ -77,7 +77,7 @@ class UndefinedArgumentError(InvokerError):
     """Occurs when an environment variable is used as a command argument but is not set."""
 
     def __init__(self, command, arg):
-        """Initialize UndefinedArgumentError"""
+        """Initialize UndefinedArgumentError."""
         super().__init__(
             f"Command '{command}' referenced an unset argument '{arg}'. You should define {arg} or update the command definition for {command}."
         )
