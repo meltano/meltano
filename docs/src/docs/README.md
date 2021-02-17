@@ -22,12 +22,26 @@ and leverages [dbt](https://www.getdbt.com) for [transformation](/docs/transform
 
 ## Mission
 
-Our goal is to **make the power of data integration available to all** by building
-a true open source alternative to existing proprietary hosted EL(T) solutions,
-in terms of ease of use, reliability, and quantity and quality of supported data sources.
+We are building an **open source platform for the complete DataOps lifecycle** that
+is optimized for developer happiness and productivity,
+integrates best-in-class [open source components](/docs/plugins.html), and
+enables teams to collaborate on data projects and pipelines more efficiently and with higher confidence.
 
-For more background on the project and its current and future goals, watch this talk: [Open source EL(T) with Meltano and Singer](https://meltano.com/blog/2020/10/27/watch-now-open-source-elt-with-meltano-and-singer/) ([recording](https://www.youtube.com/watch?v=n9xZYng0Mgk), [slides](https://docs.google.com/presentation/d/1QXxoniEx7Okbsmc3jiFhKd1LScR8Drd2SE7Ah7mzsww/edit)). Or read this slightly older blog post: [Why we are building an open source platform for ELT pipelines](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/)
+Today, we are focused on realizing this vision for the first step in any data journey:
+data integration and transformation, also known as EL(T): [Extract, Load, Transform](https://en.wikipedia.org/wiki/Extract,_load,_transform),
+where traditional solutions are either off-the-shelf and near-impossible to extend, tweak, and debug,
+or fully custom and a pain to maintain.
 
+We believe that [**data integration is begging to be commoditized**](/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/),
+and are building towards a future in which fast and reliable open source connectors
+will be freely available for every data source and destination in the world,
+collectively maintained by a community of data engineers at consultancies and in-house data teams,
+and by API vendors themselves, just like we see with API client libraries today.
+
+To make this a reality, **we have embraced the [**Singer**](https://www.singer.io/) standard**
+and are committed to providing its community and ecosystem with the tools and support
+needed to **realize its full potential as the de-facto standard** for open source connectors,
+to be used with Meltano or any other tool that supports it.
 
 ## Focus
 
