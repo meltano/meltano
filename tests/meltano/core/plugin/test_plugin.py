@@ -403,11 +403,11 @@ class TestProjectPlugin:
         # base commands
         base = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
         base.parent = plugin_discovery_service.get_base_plugin(base)
-        assert base.all_commands == {"cmd-1": "cmd-1 base", "cmd-2": "cmd-2 base"}
+        assert base.commands == {"cmd-1": "cmd-1 base", "cmd-2": "cmd-2 base"}
         assert base.supported_commands == ["cmd-1", "cmd-2"]
 
         # variants
-        assert tap.all_commands == {
+        assert tap.commands == {
             "cmd-1": "cmd-1 meltano",
             "cmd-2": "cmd-2 base",
             "cmd-variant": "cmd-variant meltano",
@@ -415,7 +415,7 @@ class TestProjectPlugin:
         assert tap.supported_commands == ["cmd-1", "cmd-2", "cmd-variant"]
 
         # inheritance
-        assert inherited_tap.all_commands == {
+        assert inherited_tap.commands == {
             "cmd-1": "cmd-1 inherited",
             "cmd-2": "cmd-2 base",
             "cmd-variant": "cmd-variant meltano",
