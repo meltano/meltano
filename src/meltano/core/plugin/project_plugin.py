@@ -142,12 +142,13 @@ class ProjectPlugin(PluginRef):
 
     @property
     def all_commands(self):
-        return {**self.commands, **self._parent.all_commands}
+        inherited_commands = {} if not self._parent else self._parent.all_commands
+        return {**inherited_commands, **self.commands}
 
     @property
     def supported_commands(self):
         """Return all defined commands for the plugin."""
-        return self.all_commands.keys()
+        return [k for k in self.all_commands.keys()]
 
     def env_prefixes(self, for_writing=False):
         prefixes = [self.name, self.namespace]

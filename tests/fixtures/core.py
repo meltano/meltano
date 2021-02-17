@@ -68,7 +68,8 @@ def discovery():
                         {"name": "auth.password", "kind": "password"},
                     ],
                     "commands": {
-                        "custom_command": "--option true",
+                        "cmd-1": "cmd-1 meltano",
+                        "cmd-variant": "cmd-variant meltano",
                     },
                 },
                 {
@@ -78,6 +79,10 @@ def discovery():
                     "pip_url": "singer-tap-mock",
                 },
             ],
+            "commands": {
+                "cmd-1": "cmd-1 base",
+                "cmd-2": "cmd-2 base",
+            },
         }
     )
 
@@ -254,7 +259,13 @@ def alternative_tap(project_add_service, tap):
 def inherited_tap(project_add_service, tap):
     try:
         return project_add_service.add(
-            PluginType.EXTRACTORS, "tap-mock-inherited", inherit_from=tap.name
+            PluginType.EXTRACTORS,
+            "tap-mock-inherited",
+            inherit_from=tap.name,
+            commands={
+                "cmd-1": "cmd-1 inherited",
+                "cmd-inherited": "cmd-inherited",
+            },
         )
     except PluginAlreadyAddedException as err:
         return err.plugin
