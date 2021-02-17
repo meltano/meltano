@@ -45,21 +45,17 @@ class TestCliInvoke:
         with patch.object(
             GoogleAnalyticsTracker, "track_data", return_value=None
         ), patch.object(PluginInvoker, "invoke", return_value=process_mock) as invoke:
-            cli_runner.invoke(
-                cli, ["invoke", "--command", "tap-mock", "custom_command"]
-            )
+            cli_runner.invoke(cli, ["invoke", "tap-mock:cmd1"])
 
-            assert invoke.called_with(["--option", "true"])
+            assert invoke.called_with(["cmd1", "base"])
 
     def test_invoke_command_args(self, cli_runner, process_mock):
         with patch.object(
             GoogleAnalyticsTracker, "track_data", return_value=None
         ), patch.object(PluginInvoker, "invoke", return_value=process_mock) as invoke:
-            cli_runner.invoke(
-                cli, ["invoke", "--command", "tap-mock", "custom_command", "--verbose"]
-            )
+            cli_runner.invoke(cli, ["invoke", "tap-mock:custom_command", "--verbose"])
 
-            assert invoke.called_with(["--option", "true", "--verbose"])
+            assert invoke.called_with(["cmd1", "base", "--verbose"])
 
     def test_invoke_exit_code(
         self, cli_runner, tap, process_mock, project_plugins_service

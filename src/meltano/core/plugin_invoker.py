@@ -172,17 +172,29 @@ class PluginInvoker:
             self.plugin.executable, name=self.plugin.name, namespace=self.plugin.type
         )
 
-    def exec_args(self, command, *args):
+    def exec_args(self, *args, command=None, env={}):
         if command:
             try:
                 plugin_args = self.plugin.all_commands[command]
             except KeyError as err:
                 raise UnknownCommandError(self.plugin, command) from err
             plugin_args = shlex.split(plugin_args)
+            plugin_args = self.expanded_args(command, plugin_args, env)
         else:
             plugin_args = self.plugin.exec_args(self)
 
         return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
+
+    def expanded_args(self, command, args, env):
+        expanded_args = []
+        for arg in args:
+            expanded = expand_env_vars(arg, env)
+            if not expanded:
+                raise UndefinedArgumentError(command, arg)
+
+            expanded_args.append(expanded)
+
+        return expanded_args
 
     def env(self):
         env = {
@@ -208,22 +220,14 @@ class PluginInvoker:
             raise InvokerNotPreparedError()
 
         with self.plugin.trigger_hooks("invoke", self, args):
-            popen_args = self.exec_args(command, *args)
             popen_options = {**self.Popen_options(), **Popen}
             popen_env = {**self.env(), **env}
-            popen_args_expanded = []
-            for arg in popen_args:
-                expanded = expand_env_vars(arg, popen_env)
-                if not expanded:
-                    raise UndefinedArgumentError(command, arg)
-
-                popen_args_expanded.append(expanded)
-
-            logging.debug(f"Invoking: {popen_args_expanded}")
+            popen_args = self.exec_args(*args, command=command, env=popen_env)
+            logging.debug(f"Invoking: {popen_args}")
             logging.debug(f"Env: {popen_env}")
 
             try:
-                yield (popen_args_expanded, popen_options, popen_env)
+                yield (popen_args, popen_options, popen_env)
             except FileNotFoundError as err:
                 raise ExecutableNotFoundError(
                     self.plugin, self.plugin.executable
