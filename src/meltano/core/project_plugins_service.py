@@ -7,7 +7,7 @@ import yaml
 from meltano.core.utils import NotFound, find_named
 
 from .config_service import ConfigService
-from .plugin import PluginRef, PluginType, Variant
+from .plugin import PluginDefinition, PluginRef, PluginType, Variant
 from .plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from .plugin.project_plugin import ProjectPlugin
 from .plugin_discovery_service import PluginDiscoveryService
@@ -122,6 +122,17 @@ class ProjectPluginsService:
             raise PluginNotFoundError(
                 PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name
             ) from stop
+
+    def find_plugin_by_namespace(self, plugin_type: PluginType, namespace: str
+        ) -> ProjectPlugin:
+        try:
+            return next(
+                plugin
+                for plugin in self.plugins(ensure_parent=False)
+                if plugin.namespace == namespace
+            )
+        except StopIteration as stop:
+            raise PluginNotFoundError(namespace) from stop
 
     def get_plugin(self, plugin_ref: PluginRef) -> ProjectPlugin:
         try:

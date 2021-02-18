@@ -131,7 +131,7 @@ class ScheduleService:
 
         try:
             extractor = (
-                self.plugins_service.discovery_service.find_definition_by_namespace(
+                self.plugins_service.find_plugin_by_namespace(
                     PluginType.EXTRACTORS, namespace
                 )
             )
