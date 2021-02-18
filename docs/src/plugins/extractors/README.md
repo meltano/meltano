@@ -11,6 +11,7 @@ Extractors for the following sources are currently [discoverable](/docs/plugins.
 
 - [Bing Ads](/plugins/extractors/bing-ads.html)
 - [BigQuery](/plugins/extractors/bigquery.html)
+- [Chargebee](/plugins/extractors/chargebee.html)
 - [Comma Separated Values (CSV)](/plugins/extractors/csv.html)
 - [Facebook Ads](/plugins/extractors/facebook.html)
 - [Fastly](/plugins/extractors/fastly.html)
