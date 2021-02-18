@@ -129,7 +129,7 @@ class ProjectPluginsService:
             return next(
                 plugin
                 for plugin in self.plugins(ensure_parent=False)
-                if plugin.namespace == namespace
+                if plugin.namespace == namespace and plugin_type == plugin.type
             )
         except StopIteration as stop:
             raise PluginNotFoundError(namespace) from stop
