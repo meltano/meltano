@@ -24,6 +24,7 @@ Extractors for the following sources are currently [discoverable](/docs/plugins.
 - [Quickbooks](/plugins/extractors/quickbooks.html)
 - [PostgreSQL](/plugins/extractors/postgres.html)
 - [ReCharge](/plugins/extractors/recharge.html)
+- [Sage Intacct](/plugins/extractors/intacct.html)
 - [Salesforce](/plugins/extractors/salesforce.html)
 - [Shopify](/plugins/extractors/shopify.html)
 - [Spreadsheets Anywhere](/plugins/extractors/spreadsheets-anywhere.html) (CSV files and Excel spreadsheets on cloud or local storage)
