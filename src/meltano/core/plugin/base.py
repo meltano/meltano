@@ -286,7 +286,7 @@ class BasePlugin(HookObject):
         return {**self._plugin_def.extras, **self._variant.extras}
 
     @property
-    def commands(self):
+    def all_commands(self):
         return {**self._plugin_def.commands, **self._variant.commands}
 
     @property

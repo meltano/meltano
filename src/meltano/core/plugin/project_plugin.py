@@ -78,7 +78,7 @@ class ProjectPlugin(PluginRef):
         self.set_presentation_attrs(extras)
         self.variant = variant
         self.pip_url = pip_url
-        self._commands = commands
+        self.commands = commands
 
         self._fallbacks.update(
             ["logo_url", "description", self.VARIANT_ATTR, "pip_url"]
@@ -141,15 +141,14 @@ class ProjectPlugin(PluginRef):
         return flatten({"meltano": {self.type.singular: self.info}}, "env_var")
 
     @property
-    def commands(self):
-        """Return a mapping of commands to their arguments, including inherited commands."""
-        inherited_commands = self._parent.commands if self._parent else {}
-        return {**inherited_commands, **self._commands}
+    def all_commands(self):
+        inherited_commands = self._parent.all_commands if self._parent else {}
+        return {**inherited_commands, **self.commands}
 
     @property
     def supported_commands(self):
         """Return all defined commands for the plugin."""
-        return list(self.commands.keys())
+        return list(self.all_commands.keys())
 
     def env_prefixes(self, for_writing=False):
         prefixes = [self.name, self.namespace]

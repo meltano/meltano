@@ -175,7 +175,7 @@ class PluginInvoker:
     def exec_args(self, *args, command=None, env={}):
         if command:
             try:
-                plugin_args = self.plugin.commands[command]
+                plugin_args = self.plugin.all_commands[command]
             except KeyError as err:
                 raise UnknownCommandError(self.plugin, command) from err
             plugin_args = shlex.split(plugin_args)
