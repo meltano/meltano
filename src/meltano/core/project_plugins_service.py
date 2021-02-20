@@ -123,12 +123,13 @@ class ProjectPluginsService:
                 PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name
             ) from stop
 
-    def find_plugin_by_namespace(self, plugin_type: PluginType, namespace: str
-        ) -> ProjectPlugin:
+    def find_plugin_by_namespace(
+        self, plugin_type: PluginType, namespace: str
+    ) -> ProjectPlugin:
         try:
             return next(
                 plugin
-                for plugin in self.plugins(ensure_parent=False)
+                for plugin in self.plugins()
                 if plugin.namespace == namespace and plugin_type == plugin.type
             )
         except StopIteration as stop:
