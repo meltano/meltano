@@ -171,7 +171,7 @@ class TestScheduleService:
     def test_find_namespace_schedule(self, subject, tap, create_schedule, project_plugins_service):
         schedule = create_schedule(tap.name)
         subject.add_schedule(schedule)
-        found_schedule = [sched for sched in list(subject.schedules())][0]
+        found_schedule = [sched for sched in list(subject.schedules()) if sched.name == tap.name][0]
         with mock.patch(
             "meltano.core.project_plugins_service.ProjectPluginsService",
             return_value=project_plugins_service
@@ -182,7 +182,7 @@ class TestScheduleService:
     def test_find_namespace_schedule_custom_extractor(self, subject, create_schedule, custom_tap, project_plugins_service):
         schedule = create_schedule('tap-custom')
         subject.add_schedule(schedule)
-        found_schedule = [sched for sched in list(subject.schedules())][0]
+        found_schedule = [sched for sched in list(subject.schedules()) if sched.name == 'tap-custom'][0]
         with mock.patch(
             "meltano.core.project_plugins_service.ProjectPluginsService",
             return_value=project_plugins_service
