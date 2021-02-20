@@ -2,6 +2,8 @@ from datetime import datetime
 from unittest import mock
 
 import pytest
+from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.schedule_service import (
     Schedule,
     ScheduleAlreadyExistsError,
@@ -9,8 +11,6 @@ from meltano.core.schedule_service import (
     ScheduleService,
     SettingMissingError,
 )
-from meltano.core.plugin import PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
 @pytest.fixture(scope="session")
