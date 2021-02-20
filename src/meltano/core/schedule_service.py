@@ -130,10 +130,8 @@ class ScheduleService:
         """
 
         try:
-            extractor = (
-                self.plugins_service.find_plugin_by_namespace(
-                    PluginType.EXTRACTORS, namespace
-                )
+            extractor = self.plugins_service.find_plugin_by_namespace(
+                PluginType.EXTRACTORS, namespace
             )
 
             return next(
