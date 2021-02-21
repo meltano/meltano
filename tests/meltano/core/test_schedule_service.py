@@ -168,24 +168,36 @@ class TestScheduleService:
                 env={"TAP_MOCK_TEST": "overridden", "TAP_MOCK_SECURE": "overridden"},
             )
 
-    def test_find_namespace_schedule(self, subject, tap, create_schedule, project_plugins_service):
+    def test_find_namespace_schedule(
+        self, subject, tap, create_schedule, project_plugins_service
+    ):
         schedule = create_schedule(tap.name)
         subject.add_schedule(schedule)
-        found_schedule = [sched for sched in list(subject.schedules()) if sched.name == tap.name][0]
+        found_schedule = [
+            sched for sched in list(subject.schedules()) if sched.name == tap.name
+        ][0]
         with mock.patch(
             "meltano.core.project_plugins_service.ProjectPluginsService",
-            return_value=project_plugins_service
+            return_value=project_plugins_service,
         ):
-            extractor = project_plugins_service.find_plugin_by_namespace(PluginType.EXTRACTORS, tap.namespace)
+            extractor = project_plugins_service.find_plugin_by_namespace(
+                PluginType.EXTRACTORS, tap.namespace
+            )
             assert found_schedule.name == extractor.name
 
-    def test_find_namespace_schedule_custom_extractor(self, subject, create_schedule, custom_tap, project_plugins_service):
-        schedule = create_schedule('tap-custom')
+    def test_find_namespace_schedule_custom_extractor(
+        self, subject, create_schedule, custom_tap, project_plugins_service
+    ):
+        schedule = create_schedule("tap-custom")
         subject.add_schedule(schedule)
-        found_schedule = [sched for sched in list(subject.schedules()) if sched.name == 'tap-custom'][0]
+        found_schedule = [
+            sched for sched in list(subject.schedules()) if sched.name == "tap-custom"
+        ][0]
         with mock.patch(
             "meltano.core.project_plugins_service.ProjectPluginsService",
-            return_value=project_plugins_service
+            return_value=project_plugins_service,
         ):
-            extractor = project_plugins_service.find_plugin_by_namespace(PluginType.EXTRACTORS, custom_tap.namespace)
+            extractor = project_plugins_service.find_plugin_by_namespace(
+                PluginType.EXTRACTORS, custom_tap.namespace
+            )
             assert found_schedule.name == extractor.name
