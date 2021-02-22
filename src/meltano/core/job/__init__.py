@@ -1,2 +1,2 @@
 from .finder import JobFinder
-from .job import Job, Payload, RunningInAnotherProcessError, State
+from .job import Job, Payload, State

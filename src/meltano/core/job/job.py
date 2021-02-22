@@ -32,15 +32,6 @@ class ImpossibleTransitionError(Error):
     """
 
 
-class RunningInAnotherProcessError(Error):
-    """Occurs when a job with the same ID is still running somewhere else."""
-
-    def __init__(self, job):
-        """Initialize RunningInAnotherProcessError."""
-        self.job = job
-        super().__init__(f"Another '{job.job_id}' pipeline is already running.")
-
-
 class State(Enum):
     IDLE = (0, ("RUNNING", "FAIL"))
     RUNNING = (1, ("SUCCESS", "FAIL"))
@@ -137,26 +128,15 @@ class Job(SystemModel):  # noqa: WPS214
         return transition
 
     @asynccontextmanager
-    async def run(self, session, force=False):
+    async def run(self, session):
         """
         Run wrapped code in context of a job.
 
         Transitions state to RUNNING and SUCCESS/FAIL as appropriate and records heartbeat every second.
-
-        Use `force=True` to skip checks if the job is already running elsewhere.
         """
         try:
             self.start()
             self.save(session)
-
-            if not force:
-                from .finder import JobFinder
-
-                existing = JobFinder(self.job_id).latest_running(
-                    session, excluding=self
-                )
-                if existing:
-                    raise RunningInAnotherProcessError(existing)
 
             with self._handling_sigterm(session):
                 async with self._heartbeating(session):

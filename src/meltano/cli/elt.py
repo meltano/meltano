@@ -9,7 +9,7 @@ import click
 from async_generator import asynccontextmanager
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
-from meltano.core.job import Job, RunningInAnotherProcessError
+from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginRef, PluginType
@@ -133,7 +133,7 @@ def elt(
         if dump:
             dump_file(context_builder, dump)
         else:
-            run_async(_run_job(project, job, session, context_builder, force))
+            run_async(_run_job(project, job, session, context_builder, force=force))
     finally:
         session.close()
 
@@ -194,23 +194,23 @@ def dump_file(context_builder, dumpable):
         raise CliError(f"Could not dump {dumpable}: {err}") from err
 
 
-async def _run_job(project, job, session, context_builder, force):
-    try:
-        async with job.run(session, force=force):
-            job_logging_service = JobLoggingService(project)
-            with job_logging_service.create_log(job.job_id, job.run_id) as log_file:
-                output_logger = OutputLogger(log_file)
+async def _run_job(project, job, session, context_builder, force=False):
+    StaleJobFailer(job.job_id).fail_stale_jobs(session)
 
-                await _run_elt(project, context_builder, output_logger)
-    except RunningInAnotherProcessError as err:
-        raise CliError(
-            " ".join(
-                [
-                    f"Another '{err.job.job_id}' pipeline is already running which started at {err.job.started_at}.",
-                    "To ignore this check use the '--force' option.",
-                ]
+    if not force:
+        existing = JobFinder(job.job_id).latest_running(session)
+        if existing:
+            raise CliError(
+                f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}."
+                + "To ignore this check use the '--force' option."
             )
-        )
+
+    async with job.run(session):
+        job_logging_service = JobLoggingService(project)
+        with job_logging_service.create_log(job.job_id, job.run_id) as log_file:
+            output_logger = OutputLogger(log_file)
+
+            await _run_elt(project, context_builder, output_logger)
 
 
 @asynccontextmanager
@@ -231,8 +231,6 @@ async def _run_elt(project, context_builder, output_logger):
     async with _redirect_output(output_logger):
         try:
             elt_context = context_builder.context()
-
-            StaleJobFailer(elt_context.job.job_id).fail_stale_jobs(elt_context.session)
 
             if not elt_context.only_transform:
                 await _run_extract_load(elt_context, output_logger)
