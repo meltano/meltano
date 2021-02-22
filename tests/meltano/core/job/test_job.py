@@ -9,13 +9,14 @@ from meltano.core.job.job import (
     HEARTBEAT_VALID_MINUTES,
     HEARTBEATLESS_JOB_VALID_HOURS,
     Job,
+    RunningInAnotherProcessError,
     State,
 )
 
 
 class TestJob:
-    def sample_job(self, payload=None):
-        return Job(job_id="meltano:sample-elt", state=State.IDLE, payload=payload or {})
+    def sample_job(self, payload=None, state=State.IDLE):
+        return Job(job_id="meltano:sample-elt", state=state, payload=payload or {})
 
     def test_save(self, session):
         subject = self.sample_job().save(session)
@@ -111,6 +112,20 @@ class TestJob:
         assert subject.ended_at is not None
         assert subject.payload["original_state"] == 1
         assert subject.payload["error"] == "The process was terminated"
+
+    @pytest.mark.asyncio
+    async def test_already_running(self, session):
+        existing = self.sample_job(state=State.RUNNING).save(session)
+        subject = self.sample_job()
+
+        with pytest.raises(RunningInAnotherProcessError) as err:
+            async with subject.run(session):
+                pytest.fail("Error not raised")
+
+            assert err.job == existing
+
+        assert subject.state is State.FAIL
+        assert subject.ended_at is not None
 
     def test_run_id(self, session):
         job = Job()

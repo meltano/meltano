@@ -9,7 +9,7 @@ import click
 from async_generator import asynccontextmanager
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
-from meltano.core.job import Job
+from meltano.core.job import Job, RunningInAnotherProcessError
 from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginRef, PluginType
@@ -74,6 +74,12 @@ def logs(*args, **kwargs):
 @click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
+@click.option(
+    "--force",
+    "-f",
+    help="Ignore errors if this pipeline is already running",
+    is_flag=True,
+)
 @pass_project(migrate=True)
 def elt(
     project,
@@ -88,6 +94,7 @@ def elt(
     state,
     dump,
     job_id,
+    force,
 ):
     """
     meltano elt EXTRACTOR_NAME LOADER_NAME
@@ -126,7 +133,7 @@ def elt(
         if dump:
             dump_file(context_builder, dump)
         else:
-            run_async(_run_job(project, job, session, context_builder))
+            run_async(_run_job(project, job, session, context_builder, force))
     finally:
         session.close()
 
@@ -187,13 +194,23 @@ def dump_file(context_builder, dumpable):
         raise CliError(f"Could not dump {dumpable}: {err}") from err
 
 
-async def _run_job(project, job, session, context_builder):
-    async with job.run(session):
-        job_logging_service = JobLoggingService(project)
-        with job_logging_service.create_log(job.job_id, job.run_id) as log_file:
-            output_logger = OutputLogger(log_file)
+async def _run_job(project, job, session, context_builder, force):
+    try:
+        async with job.run(session, force=force):
+            job_logging_service = JobLoggingService(project)
+            with job_logging_service.create_log(job.job_id, job.run_id) as log_file:
+                output_logger = OutputLogger(log_file)
 
-            await _run_elt(project, context_builder, output_logger)
+                await _run_elt(project, context_builder, output_logger)
+    except RunningInAnotherProcessError as err:
+        raise CliError(
+            " ".join(
+                [
+                    f"Another '{err.job.job_id}' pipeline is already running which started at {err.job.started_at}.",
+                    "To ignore this check use the '--force' option.",
+                ]
+            )
+        )
 
 
 @asynccontextmanager

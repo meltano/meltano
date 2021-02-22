@@ -28,8 +28,19 @@ class JobFinder:
             & Job.ended_at.isnot(None)
         )
 
+    def running(self, session):
+        return session.query(Job).filter(
+            (Job.job_id == self.job_id) & (Job.state == State.RUNNING)
+        )
+
     def latest_success(self, session):
         return self.successful(session).order_by(Job.ended_at.desc()).first()
+
+    def latest_running(self, session, excluding=None):
+        query = self.running(session)
+        if excluding and excluding.id:
+            query = query.filter(Job.id != excluding.id)
+        return query.order_by(Job.started_at.desc()).first()
 
     def with_payload(self, session, flags=0, since=None):
         query = (
