@@ -1,11 +1,11 @@
 ---
 sidebar: auto
-description: Use Meltano to pull data from the Intacct API and load it into Snowflake, PostgreSQL, and more
+description: Use Meltano to pull data from the Sage Intacct API and load it into Snowflake, PostgreSQL, and more
 ---
 
 # Sage Intacct
 
-The `tap-intacct` [extractor](/plugins/extractors/) pulls data from the [Intacct API](https://developer.intacct.com/api/).
+The `tap-intacct` [extractor](/plugins/extractors/) pulls data from the [Sage Intacct API](https://developer.intacct.com/api/).
 
 To learn more about `tap-intacct`, refer to the repository at <https://github.com/hotgluexyz/tap-intacct>.
 
@@ -86,6 +86,7 @@ Sensitive values are most appropriately stored in [the environment](/docs/config
 
 ```bash
 export TAP_INTACCT_SENDER_PASSWORD=my_sender_password
+export TAP_INTACCT_USER_PASSWORD=my_user_password
 ```
 
 ### Company Id
