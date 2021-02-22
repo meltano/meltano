@@ -1858,6 +1858,160 @@ loaders:
       - name: timestamp_column
         value: '__loaded_at'
         description: Name of the column used for recording the timestamp when Data are loaded to SQLite.
+  - name: target_redshift
+    lable: Amazon Redshift
+    description: Amazon Redshift loader
+    namespace: target_redshift
+    variant: pileplinwise
+    repo: https://github.com/transferwise/pipelinewise-target-redshift
+    pip_url: pipelinewise-target-redshift
+    executable: target-redshift
+    capabilities:
+      - catalog
+      - discover
+      - state
+    settings_group_validation:
+          - ['host', 'port', 'user', 'password', 'dbname', 'default_target_schema', 's3_bucket']
+    settings:
+    - name: host
+      label: database host server
+      description: Redshift host server
+      kind: string
+    - name: port
+      label: Database port
+      kind: integer
+      default: 5439
+      description: Redshift database port
+    - name: dbname
+      label: Database Name
+      kind: string
+      description: Redshift database name
+    - name: user
+      label: User name
+      kind: string
+      description: Redshift user name
+    - name: password
+      label: Password
+      kind: string
+      description: Redshift password
+    - name: aws_profile
+      label: AWS profile name
+      kind: string
+      env_aliases: [AWS_PROFILE]
+      description: AWS profile name for profile based authentication. If not provided, AWS_PROFILE environment variable will be used.
+    - name: aws_access_key_id
+      kind: string
+      label: AWS S3 access key id
+      env_aliases: [AWS_ACCESS_KEY_ID]
+      description: S3 Access Key Id. Used for S3 and Redshfit copy operations. If not provided, AWS_ACCESS_KEY_ID environment variable will be used.
+    - name: aws_secret_access_key
+      label: AWS S3 access key secret
+      kind: string
+      env_aliases: [AWS_SECRET_ACCESS_KEY]
+      description: S3 Secret Access Key. Used for S3 and Redshfit copy operations. If not provided, AWS_SECRET_ACCESS_KEY environment variable will be used.
+    - name: aws_session_token
+      label: AWS S3 session token
+      kind: string
+      env_aliases: [AWS_SESSION_TOKEN]
+      description: S3 AWS STS token for temporary credentials. If not provided, AWS_SESSION_TOKEN environment variable will be used.
+    - name: aws_redshift_copy_role_arn
+      label: AWS Redshift copy role ARN
+      description: AWS Role ARN to be used for the Redshift COPY operation. Used instead of the given AWS keys for the COPY operation if provided - the keys are still used for other S3 operations
+    - name: s3_acl
+      label: AWS S3 ACL
+      kind: string
+      description: S3 Object ACL
+    - name: s3_bucket
+      label: S3 bucket name
+      kind: string
+      description: AWS S3 bucket name
+    - name: s3_key_prefix
+      kind: string
+      label: S3 bucket key prefix
+      description: A static prefix before the generated S3 key names. Using prefixes you can upload files into specific directories in the S3 bucket. Default(None)
+    - name: copy_options
+      label: Copy options
+      kind: string
+      default: EMPTYASNULL BLANKSASNULL TRIMBLANKS TRUNCATECOLUMNS TIMEFORMAT 'auto' COMPUPDATE OFF STATUPDATE OFF
+      description: Parameters to use in the COPY command when loading data to Redshift. Some basic file formatting parameters are fixed values and not recommended overriding them by custom values. They are like- CSV GZIP DELIMITER ',' REMOVEQUOTES ESCAPE.
+    - name: batch_size_rows
+      label: Batch size rows 
+      kind: integer
+      default: 100000
+      description: Maximum number of rows in each batch. At the end of each batch, the rows in the batch are loaded into Redshift.
+    - name: flush_all_streams
+      label: Flush all streams
+      kind: boolean
+      default: False
+      description: Flush and load every stream into Redshift when one batch is full. Warning - This may trigger the COPY command to use files with low number of records, and may cause performance problems.
+    - name: parallelism
+      label: Parallelism
+      kind: integer
+      default: 0
+      description: The number of threads used to flush tables. 0 will create a thread for each stream, up to parallelism_max. -1 will create a thread for each CPU core. Any other positive number will create that number of threads, up to parallelism_max.
+    - name: max_parallelism
+      label: Max parallelism
+      kind: integer
+      default: 16
+      description: Max number of parallel threads to use when flushing tables.
+    - name: default_target_schema
+      label: Default target schema
+      kind: string
+      description: Name of the schema where the tables will be created. If schema_mapping is not defined then every stream sent by the tap is loaded into this schema.
+    - name: default_target_schema_select_permissions
+      label: Default targer schema select permissions
+      description: Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific list of users or groups. If schema_mapping is not defined then every stream sent by the tap is granted accordingly. 
+    - name: schema_mapping
+      kind: object
+      description: Useful if you want to load multiple streams from one tap to multiple Redshift schemas. If the tap sends the stream_id in <schema_name>-<table_name> format then this option overwrites the default_target_schema value. Note, that using schema_mapping you can overwrite the default_target_schema_select_permissions value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.
+    - name: disable_table_cache
+      label: Disable table Cache
+      kind: boolean
+      default: False
+      description: By default the connector caches the available table structures in Redshift at startup. In this way it doesn't need to run additional queries when ingesting data to check if altering the target tables is required. With disable_table_cache option you can turn off this caching. You will always see the most recent table structures but will cause an extra query runtime.
+    - name: add_metadata_columns
+      label: Add metadata coloums
+      kind: boolean
+      default: False
+      description: Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in redshift etc.) Metadata columns are creating automatically by adding extra columns to the tables with a column prefix _SDC_. The metadata columns are documented at https://transferwise.github.io/pipelinewise/data_structure/sdc-columns.html. Enabling metadata columns will flag the deleted rows by setting the _SDC_DELETED_AT metadata column. Without the add_metadata_columns option the deleted rows from singer taps will not be recongisable in Redshift.
+    - name: hard_delete
+      label: Hard delete
+      kind: boolean
+      default: False
+      description: When hard_delete option is true then DELETE SQL commands will be performed in Redshift to delete rows in tables. It's achieved by continuously checking the _SDC_DELETED_AT metadata column sent by the singer tap. Due to deleting rows requires metadata columns, hard_delete option automatically enables the add_metadata_columns option as well.
+    - name: data_flattening_max_level
+      label: Max data flattening level
+      kind: integer
+      default: 0
+      description: Object type RECORD items from taps can be loaded into VARIANT columns as JSON (default) or we can flatten the schema by creating columns automatically. When value is 0 (default) then flattening functionality is turned off.
+    - name: primary_key_required
+      label: Primary key required
+      kind: boolean
+      default: true
+      description: Log based and Incremental replications on tables with no Primary Key cause duplicates when merging UPDATE events. When set to true, stop loading data if no Primary Key is defined.
+    - name: validate_records
+      label: Validate records
+      kind: boolean
+      default: False
+      description: Validate every single record message to the corresponding JSON schema. This option is disabled by default and invalid RECORD messages will fail only at load time by Redshift. Enabling this option will detect invalid records earlier but could cause performance degradation.
+    - name: skip_updates
+      label: Skip skip_updates
+      kind: boolean
+      default: False
+      description: Do not update existing records when Primary Key is defined. Useful to improve performance when records are immutable, e.g. events
+    - name:  compression
+      label: compression
+      kind: string
+      description: The compression method to use when writing files to S3 and running Redshift COPY. The currently supported methods are gzip or bzip2. Defaults to none ("").
+    - name: slices
+      label: slices
+      kind: integer
+      default: 1
+      description: The number of slices to split files into prior to running COPY on Redshift. This should be set to the number of Redshift slices. The number of slices per node depends on the node size of the cluster - run SELECT COUNT(DISTINCT slice) slices FROM stv_slices to calculate this. Defaults to 1.
+    - name: temp_dir
+      label: Temp directory
+      kind: string
+      description: Directory of temporary CSV files with RECORD messages.
 transformers:
   - name: dbt
     namespace: dbt
