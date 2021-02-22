@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2590](https://gitlab.com/meltano/meltano/-/issues/2590) Add `hotgluexyz` variant of `tap-chargebee`
+- [#2593](https://gitlab.com/meltano/meltano/-/issues/2593) Add `hotgluexyz` variant of `tap-intacct`
 
 ### Changes
 
