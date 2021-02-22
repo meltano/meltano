@@ -68,7 +68,7 @@ def discovery():
                         {"name": "auth.password", "kind": "password"},
                     ],
                     "commands": {
-                        "cmd-1": "cmd-1 meltano",
+                        "cmd": "cmd meltano",
                         "cmd-variant": "cmd-variant meltano",
                     },
                 },
@@ -79,10 +79,6 @@ def discovery():
                     "pip_url": "singer-tap-mock",
                 },
             ],
-            "commands": {
-                "cmd-1": "cmd-1 base",
-                "cmd-2": "cmd-2 base",
-            },
         }
     )
 
@@ -263,7 +259,7 @@ def inherited_tap(project_add_service, tap):
             "tap-mock-inherited",
             inherit_from=tap.name,
             commands={
-                "cmd-1": "cmd-1 inherited",
+                "cmd": "cmd inherited",
                 "cmd-inherited": "cmd-inherited",
             },
         )

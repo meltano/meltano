@@ -400,30 +400,21 @@ class TestProjectPlugin:
         assert plugin.variant == base_plugin.variant == "meltano"
 
     def test_command_inheritance(self, tap, inherited_tap, plugin_discovery_service):
-        # base commands
-        base = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
-        base.parent = plugin_discovery_service.get_base_plugin(base)
-        assert base.all_commands == {"cmd-1": "cmd-1 base", "cmd-2": "cmd-2 base"}
-        assert base.supported_commands == ["cmd-1", "cmd-2"]
-
         # variants
         assert tap.all_commands == {
-            "cmd-1": "cmd-1 meltano",
-            "cmd-2": "cmd-2 base",
+            "cmd": "cmd meltano",
             "cmd-variant": "cmd-variant meltano",
         }
-        assert tap.supported_commands == ["cmd-1", "cmd-2", "cmd-variant"]
+        assert tap.supported_commands == ["cmd", "cmd-variant"]
 
         # inheritance
         assert inherited_tap.all_commands == {
-            "cmd-1": "cmd-1 inherited",
-            "cmd-2": "cmd-2 base",
+            "cmd": "cmd inherited",
             "cmd-variant": "cmd-variant meltano",
             "cmd-inherited": "cmd-inherited",
         }
         assert inherited_tap.supported_commands == [
-            "cmd-1",
-            "cmd-2",
+            "cmd",
             "cmd-variant",
             "cmd-inherited",
         ]

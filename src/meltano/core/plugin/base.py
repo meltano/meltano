@@ -164,7 +164,6 @@ class PluginDefinition(PluginRef):
         namespace: str,
         variant: Optional[str] = None,
         variants: Optional[list] = [],
-        commands: Optional[dict] = {},
         **extras,
     ):
         super().__init__(plugin_type, name)
@@ -192,7 +191,6 @@ class PluginDefinition(PluginRef):
         self.set_presentation_attrs(extras)
         self.extras = extras
         self.variants = list(map(Variant.parse, variants))
-        self.commands = commands
 
     def __iter__(self):
         for k, v in super().__iter__():
@@ -287,7 +285,7 @@ class BasePlugin(HookObject):
 
     @property
     def all_commands(self):
-        return {**self._plugin_def.commands, **self._variant.commands}
+        return self._variant.commands
 
     @property
     def extra_settings(self):
