@@ -1879,7 +1879,7 @@ loaders:
       description: Redshift host
     - name: port
       kind: integer
-      default: 5439
+      value: 5439
       description: Redshift port
     - name: dbname
       label: Database Name
@@ -1890,6 +1890,15 @@ loaders:
     - name: password
       kind: password
       description: Redshift password
+    - name: default_target_schema
+      env_aliases: [TARGET_REDSHIFT_SCHEMA]
+      value: $MELTANO_EXTRACT__LOAD_SCHEMA
+      description: Name of the schema where the tables will be created. If schema_mapping is not defined then every stream sent by the tap is loaded into this schema.
+    - name: s3_bucket
+      label: S3 Bucket name
+      description: AWS S3 bucket name
+
+    # Optional settings
     - name: aws_profile
       label: AWS profile name
       env_aliases: [AWS_PROFILE]
@@ -1915,9 +1924,6 @@ loaders:
     - name: s3_acl
       label: AWS S3 ACL
       description: S3 Object ACL
-    - name: s3_bucket
-      label: S3 Bucket name
-      description: AWS S3 bucket name
     - name: s3_key_prefix
       label: S3 Key Prefix
       description: A static prefix before the generated S3 key names. Using prefixes you can upload files into specific directories in the S3 bucket. Default(None)
@@ -1927,7 +1933,7 @@ loaders:
       description: "Parameters to use in the COPY command when loading data to Redshift. Some basic file formatting parameters are fixed values and not recommended overriding them by custom values. They are like: `CSV GZIP DELIMITER ',' REMOVEQUOTES ESCAPE`"
     - name: batch_size_rows
       kind: integer
-      default: 100000
+      value: 100000
       description: Maximum number of rows in each batch. At the end of each batch, the rows in the batch are loaded into Redshift.
     - name: flush_all_streams
       kind: boolean
@@ -1941,10 +1947,6 @@ loaders:
       kind: integer
       value: 16
       description: Max number of parallel threads to use when flushing tables.
-    - name: default_target_schema
-      env_aliases: [TARGET_REDSHIFT_SCHEMA]
-      value: $MELTANO_EXTRACT__LOAD_SCHEMA
-      description: Name of the schema where the tables will be created. If schema_mapping is not defined then every stream sent by the tap is loaded into this schema.
     - name: default_target_schema_select_permissions
       description: Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific list of users or groups. If schema_mapping is not defined then every stream sent by the tap is granted accordingly. 
     - name: schema_mapping
