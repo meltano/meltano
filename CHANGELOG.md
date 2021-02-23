@@ -15,6 +15,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2356](https://gitlab.com/meltano/meltano/-/issues/2356) Disallow two pipelines with the same job ID to run at the same time by default
+
 ### Fixes
 
 ### Breaks

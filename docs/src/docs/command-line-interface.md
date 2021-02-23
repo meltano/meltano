@@ -263,6 +263,8 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
 
 - A `--full-refresh` flag can be passed to perform a full refresh, ignoring state left behind by any previous runs with the same job ID.
 
+- A `--force` flag can be passed to force a new run even when a pipeline with the same Job ID is already running, which would result in an error otherwise.
+
 - A `--catalog` option can be passed to manually provide a [catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) for the extractor, as an alternative to letting one be [generated on the fly](/docs/integration.html#extractor-catalog-generation).
   This is equivalent to setting the [`catalog` extractor extra](/docs/plugins.html#catalog-extra).
 
