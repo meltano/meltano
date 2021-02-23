@@ -126,10 +126,9 @@ class ProjectPluginsService:
     def find_plugin_by_namespace(
         self, plugin_type: PluginType, namespace: str
     ) -> ProjectPlugin:
-
         """
         Find a plugin based on its PluginType and namespace.
-        
+
         For example, PluginType.EXTRACTORS and namespace tap_custom
         will return the extractor for the tap-custom plugin.
         """
