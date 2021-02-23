@@ -28,8 +28,18 @@ class JobFinder:
             & Job.ended_at.isnot(None)
         )
 
+    def running(self, session):
+        """Find jobs in the running state."""
+        return session.query(Job).filter(
+            (Job.job_id == self.job_id) & (Job.state == State.RUNNING)
+        )
+
     def latest_success(self, session):
         return self.successful(session).order_by(Job.ended_at.desc()).first()
+
+    def latest_running(self, session):
+        """Find the most recent job in the running state, if any."""
+        return self.running(session).order_by(Job.started_at.desc()).first()
 
     def with_payload(self, session, flags=0, since=None):
         query = (
