@@ -11,6 +11,7 @@ Extractors for the following sources are currently [discoverable](/docs/plugins.
 
 - [Bing Ads](/plugins/extractors/bing-ads.html)
 - [BigQuery](/plugins/extractors/bigquery.html)
+- [Chargebee](/plugins/extractors/chargebee.html)
 - [Comma Separated Values (CSV)](/plugins/extractors/csv.html)
 - [Facebook Ads](/plugins/extractors/facebook.html)
 - [Fastly](/plugins/extractors/fastly.html)
@@ -23,6 +24,7 @@ Extractors for the following sources are currently [discoverable](/docs/plugins.
 - [Quickbooks](/plugins/extractors/quickbooks.html)
 - [PostgreSQL](/plugins/extractors/postgres.html)
 - [ReCharge](/plugins/extractors/recharge.html)
+- [Sage Intacct](/plugins/extractors/intacct.html)
 - [Salesforce](/plugins/extractors/salesforce.html)
 - [Shopify](/plugins/extractors/shopify.html)
 - [Spreadsheets Anywhere](/plugins/extractors/spreadsheets-anywhere.html) (CSV files and Excel spreadsheets on cloud or local storage)

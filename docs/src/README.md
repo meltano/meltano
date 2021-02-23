@@ -57,7 +57,7 @@ along with the built-in
 or inside your
 [orchestrator of choice](/docs/production.html#meltano-elt).
 
-Meltano embraces the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
+Meltano [embraces](/docs/#embracing-singer) the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
 [extractors](/plugins/extractors/) and
 [loaders](/plugins/loaders/),
 and leverages [dbt](https://www.getdbt.com) for [transformation](#transformation).

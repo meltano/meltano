@@ -22,7 +22,7 @@ along with the built-in
 or inside your
 [orchestrator of choice](https://meltano.com/docs/production.html#meltano-elt).
 
-Meltano embraces the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
+Meltano [embraces](/docs/#embracing-singer) the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
 [extractors](https://meltano.com/plugins/extractors/) and
 [loaders](https://meltano.com/plugins/loaders/),
 and leverages [dbt](https://www.getdbt.com) for [transformation](https://meltano.com/docs/transforms.html).
