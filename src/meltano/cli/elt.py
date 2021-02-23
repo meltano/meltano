@@ -77,7 +77,7 @@ def logs(*args, **kwargs):
 @click.option(
     "--force",
     "-f",
-    help="Ignore errors if this pipeline is already running",
+    help="Force a new run even when a pipeline with the same Job ID is already running",
     is_flag=True,
 )
 @pass_project(migrate=True)
@@ -201,7 +201,7 @@ async def _run_job(project, job, session, context_builder, force=False):
         existing = JobFinder(job.job_id).latest_running(session)
         if existing:
             raise CliError(
-                f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}."
+                f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
                 + "To ignore this check use the '--force' option."
             )
 
