@@ -173,8 +173,8 @@ class TestScheduleService:
             "meltano.core.project_plugins_service.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
-            extractor = subject.find_namespace_schedule(tap.namespace)
-            assert schedule.name == extractor.name
+            found_schedule = subject.find_namespace_schedule(tap.namespace)
+            assert found_schedule.extractor == tap.name
 
     def test_find_namespace_schedule_custom_extractor(
         self, subject, create_schedule, custom_tap, project_plugins_service
@@ -185,5 +185,5 @@ class TestScheduleService:
             "meltano.core.project_plugins_service.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
-            extractor = subject.find_namespace_schedule(custom_tap.namespace)
-            assert schedule.name == extractor.name
+            found_schedule = subject.find_namespace_schedule(custom_tap.namespace)
+            assert found_schedule.extractor == custom_tap.name
