@@ -19,6 +19,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2585](https://gitlab.com/meltano/meltano/-/issues/2585) Fix bug with finding a schedule based on namespace for a custom plugin
+
 ### Breaks
 
 
