@@ -2,9 +2,6 @@ from datetime import datetime
 from unittest import mock
 
 import pytest
-from meltano.core.plugin import PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.schedule_service import (
     Schedule,
     ScheduleAlreadyExistsError,
@@ -12,6 +9,8 @@ from meltano.core.schedule_service import (
     ScheduleService,
     SettingMissingError,
 )
+from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
 @pytest.fixture(scope="session")
@@ -34,12 +33,8 @@ def create_schedule():
 
 @pytest.fixture(scope="class")
 def custom_tap(project_add_service):
-    EXPECTED = {"test": "custom", "start_date": None, "secure": None}
     tap = ProjectPlugin(
-        PluginType.EXTRACTORS,
-        name="tap-custom",
-        namespace="tap_custom",
-        config=EXPECTED,
+        PluginType.EXTRACTORS, name="tap-custom", namespace="tap_custom"
     )
     try:
         return project_add_service.add_plugin(tap)
@@ -174,31 +169,21 @@ class TestScheduleService:
     ):
         schedule = create_schedule(tap.name)
         subject.add_schedule(schedule)
-        found_schedule = [
-            sched for sched in list(subject.schedules()) if sched.name == tap.name
-        ][0]
         with mock.patch(
             "meltano.core.project_plugins_service.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
-            extractor = project_plugins_service.find_plugin_by_namespace(
-                PluginType.EXTRACTORS, tap.namespace
-            )
-            assert found_schedule.name == extractor.name
+            extractor = subject.find_namespace_schedule(tap.namespace)
+            assert schedule.name == extractor.name
 
     def test_find_namespace_schedule_custom_extractor(
         self, subject, create_schedule, custom_tap, project_plugins_service
     ):
-        schedule = create_schedule("tap-custom")
+        schedule = Schedule(name="tap-custom", extractor="tap-custom")
         subject.add_schedule(schedule)
-        found_schedule = [
-            sched for sched in list(subject.schedules()) if sched.name == "tap-custom"
-        ][0]
         with mock.patch(
             "meltano.core.project_plugins_service.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
-            extractor = project_plugins_service.find_plugin_by_namespace(
-                PluginType.EXTRACTORS, custom_tap.namespace
-            )
-            assert found_schedule.name == extractor.name
+            extractor = subject.find_namespace_schedule(custom_tap.namespace)
+            assert schedule.name == extractor.name
