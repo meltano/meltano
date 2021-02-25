@@ -30,7 +30,7 @@ or fully custom and a pain to maintain.
 We believe that [data integration is begging to be commoditized](/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/),
 and are building towards a future in which fast and reliable **open source connectors
 for every data source and destination** in the world will be freely available,
-collectively maintained by a community of data engineers at consultancies and in-house data teams,
+collectively maintained by a community of data engineers in consulting and at in-house data teams,
 and by API vendors themselves, just like we see with API client libraries today.
 
 ### Embracing Singer
