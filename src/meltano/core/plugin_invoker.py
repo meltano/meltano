@@ -33,15 +33,15 @@ def expanded_args(command, args, env):
     """
     Replace any env var arguments with their values.
 
-    :raises UndefinedArgumentError: if an env var argument is not set
+    :raises UndefinedEnvVarError: if an env var argument is not set
     """
     expanded = []
     for arg in args:
-        expanded = expand_env_vars(arg, env)
-        if not expanded:
-            raise UndefinedArgumentError(command, arg)
+        value = expand_env_vars(arg, env)
+        if not value:
+            raise UndefinedEnvVarError(command, arg)
 
-        expanded.append(expanded)
+        expanded.append(value)
 
     return expanded
 
@@ -90,13 +90,14 @@ class UnknownCommandError(InvokerError):
         )
 
 
-class UndefinedArgumentError(InvokerError):
+class UndefinedEnvVarError(InvokerError):
     """Occurs when an environment variable is used as a command argument but is not set."""
 
-    def __init__(self, command, arg):
-        """Initialize UndefinedArgumentError."""
+    def __init__(self, command, var):
+        """Initialize UndefinedEnvVarError."""
         super().__init__(
-            f"Command '{command}' referenced an unset argument '{arg}'. You should define {arg} or update the command definition for {command}."
+            f"Command '{command}' referenced unset environment variable '{var}' in an argument. "
+            + "Set the environment variable or update the command definition."
         )
 
 
