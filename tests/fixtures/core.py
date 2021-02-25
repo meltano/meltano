@@ -132,6 +132,22 @@ def discovery():
         }
     )
 
+    if PluginType.UTILITIES not in discovery:
+        discovery[PluginType.UTILITIES] = []
+    discovery[PluginType.UTILITIES].append(
+        {
+            "name": "utility-mock",
+            "namespace": "utility_mock",
+            "pip_url": "utility-mock",
+            "commands": {
+                "cmd": {
+                    "args": "utility --option $ENV_VAR_ARG",
+                    "description": "description of utility command",
+                },
+            },
+        }
+    )
+
     return discovery
 
 
@@ -291,6 +307,14 @@ def alternative_target(project_add_service):
 def dbt(project_add_service):
     try:
         return project_add_service.add(PluginType.TRANSFORMERS, "dbt")
+    except PluginAlreadyAddedException as err:
+        return err.plugin
+
+
+@pytest.fixture(scope="class")
+def utility(project_add_service):
+    try:
+        return project_add_service.add(PluginType.UTILITIES, "utility-mock")
     except PluginAlreadyAddedException as err:
         return err.plugin
 
