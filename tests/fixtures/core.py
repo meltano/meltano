@@ -68,8 +68,8 @@ def discovery():
                         {"name": "auth.password", "kind": "password"},
                     ],
                     "commands": {
-                        "cmd": "cmd meltano",
-                        "cmd-variant": "cmd-variant meltano",
+                        "cmd": {"args": "cmd meltano"},
+                        "cmd-variant": {"args": "cmd-variant meltano"},
                     },
                 },
                 {
@@ -259,8 +259,8 @@ def inherited_tap(project_add_service, tap):
             "tap-mock-inherited",
             inherit_from=tap.name,
             commands={
-                "cmd": "cmd inherited",
-                "cmd-inherited": "cmd-inherited",
+                "cmd": {"args": "cmd inherited"},
+                "cmd-inherited": {"args": "cmd-inherited"},
             },
         )
     except PluginAlreadyAddedException as err:

@@ -29,6 +29,18 @@ def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
     return invoker
 
 
+def expanded_args(command, args, env):
+    expanded = []
+    for arg in args:
+        expanded = expand_env_vars(arg, env)
+        if not expanded:
+            raise UndefinedArgumentError(command, arg)
+
+        expanded.append(expanded)
+
+    return expanded
+
+
 class InvokerError(Error):
     pass
 
@@ -173,28 +185,18 @@ class PluginInvoker:
         )
 
     def exec_args(self, *args, command=None, env={}):
+        """Materialize the arguments to be passed to the executable."""
         if command:
             try:
-                plugin_args = self.plugin.all_commands[command]
+                plugin_args = self.plugin.all_commands[command]["args"]
             except KeyError as err:
                 raise UnknownCommandError(self.plugin, command) from err
             plugin_args = shlex.split(plugin_args)
-            plugin_args = self.expanded_args(command, plugin_args, env)
+            plugin_args = expanded_args(command, plugin_args, env)
         else:
             plugin_args = self.plugin.exec_args(self)
 
         return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
-
-    def expanded_args(self, command, args, env):
-        expanded_args = []
-        for arg in args:
-            expanded = expand_env_vars(arg, env)
-            if not expanded:
-                raise UndefinedArgumentError(command, arg)
-
-            expanded_args.append(expanded)
-
-        return expanded_args
 
     def env(self):
         env = {

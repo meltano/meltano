@@ -1758,12 +1758,27 @@ transformers:
       - name: models
         value: $MELTANO_TRANSFORM__PACKAGE_NAME $MELTANO_EXTRACTOR_NAMESPACE my_meltano_project
     commands:
-      clean: clean
-      deps: deps
-      compile: compile
-      run: run
-      seed: seed
-      snapshot: snapshot
+      clean:
+        args: clean
+        description: Delete all folders in the clean-targets list (usually the dbt_modules and target directories.)
+      compile:
+        args: compile
+        description: Generates executable SQL from source model, test, and analysis files. Compiled SQL files are written to the target/ directory.
+      deps:
+        args: deps
+        description: Pull the most recent version of the dependencies listed in packages.yml
+      run:
+        args: run
+        description: Compile SQL and execute against the current target database.
+      seed:
+        args: seed
+        description: Load data from csv files into your data warehouse.
+      snapshot:
+        args: snapshot
+        description: Execute snapshots defined in your project.
+      test:
+        args: test
+        description: Runs tests on data in deployed models.
 transforms:
   - name: tap-adwords
     namespace: tap_adwords
