@@ -7,8 +7,8 @@ import yaml
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
-from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 
@@ -26,36 +26,70 @@ class TestCliInvoke:
 
         return process_mock
 
-    def test_invoke(self, cli_runner, process_mock):
+    @pytest.fixture
+    def mock_invoke(self, process_mock, utility, plugin_invoker_factory):
         with patch.object(
             GoogleAnalyticsTracker, "track_data", return_value=None
-        ), patch.object(PluginInvoker, "invoke", return_value=process_mock) as invoke:
-            basic = cli_runner.invoke(cli, ["invoke", "tap-mock"])
-            assert invoke.called_once
+        ), patch(
+            "meltano.core.plugin_invoker.invoker_factory",
+            return_value=plugin_invoker_factory,
+        ), patch.object(
+            ProjectPluginsService, "find_plugin", return_value=utility
+        ), patch(
+            "subprocess.Popen", return_value=process_mock
+        ) as invoke:
+            yield invoke
 
-    def test_invoke_args(self, cli_runner, process_mock):
-        with patch.object(
-            GoogleAnalyticsTracker, "track_data", return_value=None
-        ), patch.object(PluginInvoker, "invoke", return_value=process_mock) as invoke:
-            with_args = cli_runner.invoke(cli, ["invoke", "tap-mock", "--help"])
+    def test_invoke(self, cli_runner, mock_invoke):
+        res = cli_runner.invoke(cli, ["invoke", "utility-mock"])
+        if res.exception:
+            raise res.exception
 
-            assert invoke.called_with(["--help"])
+        assert res.exit_code == 0
+        mock_invoke.assert_called_once()
+        args, kwargs = mock_invoke.call_args
+        args = args[0]
+        assert args[0].endswith("utility-mock")
+        assert isinstance(kwargs, dict)
 
-    def test_invoke_command(self, cli_runner, process_mock):
-        with patch.object(
-            GoogleAnalyticsTracker, "track_data", return_value=None
-        ), patch.object(PluginInvoker, "invoke", return_value=process_mock) as invoke:
-            cli_runner.invoke(cli, ["invoke", "tap-mock:cmd1"])
+    def test_invoke_args(self, cli_runner, mock_invoke):
+        res = cli_runner.invoke(cli, ["invoke", "utility-mock", "--help"])
+        if res.exception:
+            raise res.exception
 
-            assert invoke.called_with(["cmd1", "base"])
+        assert res.exit_code == 0
+        mock_invoke.assert_called_once()
+        args = mock_invoke.call_args[0][0]
+        assert args[0].endswith("utility-mock")
+        assert args[1] == "--help"
 
-    def test_invoke_command_args(self, cli_runner, process_mock):
-        with patch.object(
-            GoogleAnalyticsTracker, "track_data", return_value=None
-        ), patch.object(PluginInvoker, "invoke", return_value=process_mock) as invoke:
-            cli_runner.invoke(cli, ["invoke", "tap-mock:custom_command", "--verbose"])
+    def test_invoke_command(self, cli_runner, mock_invoke):
+        res = cli_runner.invoke(
+            cli, ["invoke", "utility-mock:cmd"], env={"ENV_VAR_ARG": "arg"}
+        )
+        if res.exception:
+            raise res.exception
 
-            assert invoke.called_with(["cmd1", "base", "--verbose"])
+        assert res.exit_code == 0
+        mock_invoke.assert_called_once()
+
+        args = mock_invoke.call_args[0][0]
+        assert args[0].endswith("utility-mock")
+        assert args[1:] == ["utility", "--option", "arg"]
+
+    def test_invoke_command_args(self, cli_runner, mock_invoke):
+        res = cli_runner.invoke(
+            cli, ["invoke", "utility-mock:cmd", "--verbose"], env={"ENV_VAR_ARG": "arg"}
+        )
+        if res.exception:
+            raise res.exception
+
+        assert res.exit_code == 0
+        mock_invoke.assert_called_once()
+
+        args = mock_invoke.call_args[0][0]
+        assert args[0].endswith("utility-mock")
+        assert args[1:] == ["utility", "--option", "arg", "--verbose"]
 
     def test_invoke_exit_code(
         self, cli_runner, tap, process_mock, project_plugins_service
@@ -102,3 +136,11 @@ class TestCliInvoke:
             assert json.loads(result.stdout) == settings_service.as_dict(
                 extras=False, process=True
             )
+
+    def test_list_commands(self, cli_runner, mock_invoke):
+        res = cli_runner.invoke(cli, ["invoke", "--list-commands", "utility-mock"])
+
+        assert res.exit_code == 0
+        mock_invoke.assert_not_called()
+        assert "utility-mock:cmd" in res.output
+        assert "description of utility command" in res.output
