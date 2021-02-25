@@ -190,7 +190,7 @@ class PluginInvoker:
             self.plugin.executable, name=self.plugin.name, namespace=self.plugin.type
         )
 
-    def exec_args(self, *args, command=None, env={}):
+    def exec_args(self, *args, command=None, env={}):  # noqa: WPS404
         """Materialize the arguments to be passed to the executable."""
         if command:
             try:
@@ -223,7 +223,14 @@ class PluginInvoker:
         return {}
 
     @contextmanager
-    def _invoke(self, *args, require_preparation=True, env={}, command=None, **popen):
+    def _invoke(
+        self,
+        *args,
+        require_preparation=True,
+        env={},  # noqa: WPS404
+        command=None,
+        **popen,
+    ):
         if require_preparation and not self._prepared:
             raise InvokerNotPreparedError()
 

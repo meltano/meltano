@@ -49,8 +49,8 @@ class TestPluginInvoker:
         with pytest.raises(UnknownCommandError) as err:
             plugin_invoker.invoke(command="foo")
 
-        assert err.value.command == "foo"
-        assert "supports the following commands" in str(err.value)
+        assert err.value.command == "foo"  # noqa: WPS441
+        assert "supports the following commands" in str(err.value)  # noqa: WPS441
 
     def test_expand_exec_args(self, plugin_invoker):
         exec_args = plugin_invoker.exec_args(
@@ -84,5 +84,5 @@ class TestPluginInvoker:
 
         assert (
             "Command 'cmd' referenced unset environment variable '$ENV_VAR_ARG' in an argument"
-            in str(err.value)
+            in str(err.value)  # noqa: WPS441
         )

@@ -39,8 +39,8 @@ class ProjectPlugin(PluginRef):
         namespace: Optional[str] = None,
         variant: Optional[str] = None,
         pip_url: Optional[str] = None,
-        config: Optional[dict] = {},
-        commands: Optional[dict] = {},
+        config: Optional[dict] = {},  # noqa: WPS404
+        commands: Optional[dict] = {},  # noqa: WPS404
         default_variant=Variant.ORIGINAL_NAME,
         **extras,
     ):
