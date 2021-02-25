@@ -28,6 +28,7 @@ class DbtRunner(Runner):
         return self.context.transformer
 
     async def invoke(self, dbt: PluginInvoker, *args, log=None, command=None, **kwargs):
+        """Call the dbt executable with the given arguments in a new process."""
         log = log or sys.stderr
 
         try:

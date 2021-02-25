@@ -30,6 +30,11 @@ def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
 
 
 def expanded_args(command, args, env):
+    """
+    Replace any env var arguments with their values.
+
+    :raises UndefinedArgumentError: if an env var argument is not set
+    """
     expanded = []
     for arg in args:
         expanded = expand_env_vars(arg, env)
@@ -217,12 +222,12 @@ class PluginInvoker:
         return {}
 
     @contextmanager
-    def _invoke(self, *args, require_preparation=True, env={}, command=None, **Popen):
+    def _invoke(self, *args, require_preparation=True, env={}, command=None, **popen):
         if require_preparation and not self._prepared:
             raise InvokerNotPreparedError()
 
         with self.plugin.trigger_hooks("invoke", self, args):
-            popen_options = {**self.Popen_options(), **Popen}
+            popen_options = {**self.Popen_options(), **popen}
             popen_env = {**self.env(), **env}
             popen_args = self.exec_args(*args, command=command, env=popen_env)
             logging.debug(f"Invoking: {popen_args}")

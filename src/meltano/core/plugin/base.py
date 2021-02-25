@@ -285,6 +285,7 @@ class BasePlugin(HookObject):
 
     @property
     def all_commands(self):
+        """Return a dictonary of supported commands."""
         return self._variant.commands
 
     @property
