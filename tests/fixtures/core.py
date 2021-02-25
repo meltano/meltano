@@ -132,8 +132,6 @@ def discovery():
         }
     )
 
-    if PluginType.UTILITIES not in discovery:
-        discovery[PluginType.UTILITIES] = []
     discovery[PluginType.UTILITIES].append(
         {
             "name": "utility-mock",

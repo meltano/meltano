@@ -2030,3 +2030,11 @@ files:
     namespace: gitlab_ci
     repo: https://gitlab.com/meltano/files-gitlab-ci
     pip_url: git+https://gitlab.com/meltano/files-gitlab-ci.git
+utilities:
+  - name: sqlfluff
+    namespace: sqlfluff
+    pip_url: sqlfluff==0.3.6
+    commands:
+      lint:
+        args: lint transform/models
+        description: Lint SQL in transform models
