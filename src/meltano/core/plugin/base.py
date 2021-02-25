@@ -51,6 +51,7 @@ class PluginType(YAMLEnum):
     ORCHESTRATORS = "orchestrators"
     TRANSFORMERS = "transformers"
     FILES = "files"
+    UTILITIES = "utilities"
 
     def __str__(self):
         return self.value
@@ -65,6 +66,9 @@ class PluginType(YAMLEnum):
     @property
     def singular(self):
         """Makes it singular for `meltano add PLUGIN_TYPE`"""
+        if self is self.__class__.UTILITIES:
+            return "utility"
+
         return self.value[:-1]
 
     @property
