@@ -10,7 +10,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2590](https://gitlab.com/meltano/meltano/-/issues/2590) Add `hotgluexyz` variant of `tap-chargebee`
 - [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for shortcut commands to `invoke`
 
 ### Changes
@@ -18,6 +17,23 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 ### Breaks
+
+
+## 1.70.0 - (2021-02-23)
+---
+
+### New
+
+- [#2590](https://gitlab.com/meltano/meltano/-/issues/2590) Add `hotgluexyz` variant of `tap-chargebee`
+- [#2593](https://gitlab.com/meltano/meltano/-/issues/2593) Add `hotgluexyz` variant of `tap-intacct`
+
+### Changes
+
+- [#2356](https://gitlab.com/meltano/meltano/-/issues/2356) Disallow two pipelines with the same job ID to run at the same time by default
+
+### Fixes
+
+- [#2585](https://gitlab.com/meltano/meltano/-/issues/2585) Fix bug with finding a schedule based on namespace for a custom plugin
 
 
 ## 1.69.0 - (2021-02-16)

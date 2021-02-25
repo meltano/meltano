@@ -9,7 +9,7 @@ import pytest
 from asserts import assert_cli_runner
 from asynctest import CoroutineMock
 from meltano.cli import cli
-from meltano.core.job import Job, Payload
+from meltano.core.job import Job, State
 from meltano.core.logging.utils import remove_ansi_escape_sequences
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.dbt import DbtPlugin
@@ -256,7 +256,10 @@ class TestCliEltScratchpadOne:
             log = job_logging_service.get_latest_log(job_id)
             assert_lines(
                 log,
-                *(remove_ansi_escape_sequences(l) for l in stdout_lines + stderr_lines)
+                *(
+                    remove_ansi_escape_sequences(line)
+                    for line in stdout_lines + stderr_lines
+                ),
             )
 
     @pytest.mark.backend("sqlite")
@@ -566,6 +569,27 @@ class TestCliEltScratchpadOne:
                 result.stdout,
                 "meltano     | Running extract & load...\n",
                 "meltano     | Failed to read from target stderr.\n",
+            )
+
+    def test_elt_already_running(
+        self, cli_runner, tap, target, project_plugins_service, session
+    ):
+        job_id = "already_running"
+        args = ["elt", "--job_id", job_id, tap.name, target.name]
+
+        existing_job = Job(job_id=job_id, state=State.RUNNING)
+        existing_job.save(session)
+
+        with mock.patch(
+            "meltano.cli.elt.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch(
+            "meltano.cli.elt.project_engine", return_value=(None, lambda: session)
+        ):
+            result = cli_runner.invoke(cli, args)
+            assert result.exit_code == 1
+            assert f"Another '{job_id}' pipeline is already running" in str(
+                result.exception
             )
 
     def test_dump_catalog(
@@ -912,12 +936,3 @@ class TestCliEltScratchpadThree:
                 "meltano | Running transformation...\n",
                 "meltano | Transformation complete!\n",
             )
-
-
-class TestCliEltScratchpadFour:
-    @pytest.fixture(scope="class")
-    def tap_csv(self, project_add_service):
-        try:
-            return project_add_service.add(PluginType.EXTRACTORS, "tap-csv")
-        except PluginAlreadyAddedException as err:
-            return err.plugin
