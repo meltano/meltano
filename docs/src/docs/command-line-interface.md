@@ -461,6 +461,11 @@ Additional arguments can be specified as well, which will be appended to the com
 meltano invoke dbt:seed --verbose
 ```
 
+To see what commands a plugin supports, use `--list-command`:
+
+```bash
+meltano invoke --list-commands dbt
+```
 
 ## `schedule`
 
