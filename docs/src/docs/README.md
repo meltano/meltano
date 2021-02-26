@@ -30,7 +30,7 @@ or fully custom and a pain to maintain.
 We believe that [data integration is begging to be commoditized](/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/),
 and are building towards a future in which fast and reliable **open source connectors
 for every data source and destination** in the world will be freely available,
-collectively maintained by a community of data engineers at consultancies and in-house data teams,
+collectively maintained by a community of data engineers in consulting and at in-house data teams,
 and by API vendors themselves, just like we see with API client libraries today.
 
 ### Embracing Singer
@@ -66,29 +66,41 @@ while maintaining compatibility between all taps and targets.
 
 ## Focus
 
-We have decided to focus on the following personas and use cases, in order of priority, to help us determine what improvements to prioritize building, and what [community contributions](/docs/contributor-guide.html) to accept:
+As described above, our vision for ELT in the DataOps era involves
+a decentralized ecosystem of open source connectors and
+a community of data engineers maintaining and contributing to these projects.
 
-1. Data engineers already using [Singer](https://www.singer.io/) taps and targets
-   - They are running Singer-based EL(T) pipelines in production already, likely using a hand-rolled hard-to-reproduce deployment/orchestration strategy.
-   - They have experience building and maintaining taps and targets.
-   - They are comfortable using a CLI and want to manage their Meltano project like a software engineering project, with all of the benefits of version control and CI/CD.
-   - They want to have the option of using a web-based UI to monitor (and possibly manage) their pipelines.
-   - Meltano can learn from their experience and provide tooling and documentation to make it easier for them and new users to manage and deploy Singer-based EL(T) pipelines and build and maintain new and existing Singer taps and targets.
+To make this happen, we are primarily focused on users and teams
+that have the potential and the necessary technical skills to become
+**active participants in this community**,
+rather than those who prefer a hands-off approach with off-the-shelf connectors maintained by a single (paid) provider.
 
-2. Data engineers or one-person data teams new to open source ELT
-   - They may have come across Singer already, but haven't run Singer taps and targets in production yet.
-   - Initially, they are primarily interested in using existing taps and targets instead of writing and maintaining their own, but if they run into issues, they would be comfortable attempting to fix bugs themselves and contributing the fixes upstream.
-   - Later, they would not want to be limited by existing taps and targets and will want to learn how to build and maintain their own.
-   - They are comfortable using a CLI and want to manage their Meltano project like a software engineering project, with all of the benefits of version control and CI/CD.
-   - They want to have the option of using a web-based UI to monitor (and possibly manage) their pipelines.
-   - They may also be interested in using Meltano to run [dbt](https://www.getdbt.com) model-based transformations as part of their pipelines.
+In order of priority, our target personas are:
 
-3. Hobbyists
-   - They are capable of programming and comfortable using a CLI, but may not be data engineers.
-   - They want to pull data from general or personal sources into a local database for personal use, e.g. basic analytics.
-   - They want to run Meltano locally or in a non-production self-hosted environment.
-   - They are primarily interested in using one or more specific existing extractors and loaders, but if they run into issues, they would be comfortable attempting to fix bugs themselves and contributing the fixes upstream.
-   - They may also be interested in using Meltano's [built-in analytics functionality](/docs/analysis.html), and may look into building the transformation and model plugins that support it.
+1. **Data consultants** who may become [implementation partners](/partners/)
+   - They frequently write one-off (Python) scripts to extract data from niche sources that aren't supported by commercial EL(T) vendors.
+   - They want to stop reinventing the wheel and standardize their approach to building reliable and reusable custom connectors.
+   - They are willing to open source their custom connectors to share the maintenance burden with the community and,
+      in return, get access to connectors built and maintained by other consulting firms and data engineers.
+   - They want a consistent approach to extracting data from common sources (that are supported by commercial vendors) and niche ones (that aren't).
+   - They want the ability to customize and fix bugs in connectors without having to wait on a vendor.
+   - They want to save their clients money by self-hosting pipelines instead of being beholden to vendor pricing.
+   - They want to give their clients the option of never having their sensitive data pass through systems out of their control for privacy or compliance reasons.
+   - They want to manage their data projects like any other software engineering project, with all of the benefits of version control and CI/CD.
+   - They want to offer clients a (whitelabel) web UI to set up their connections and manage their pipelines.
+2. **Data engineers** with a software development background
+   - They are comfortable using a CLI and want to manage their data project like any other software engineering project, with all of the benefits of version control and CI/CD.
+   - They recognize that connectors are like API client libraries, and are comfortable using open source options even if they may require some tweaking and contributing fixes upstream.
+   - They want a consistent approach to extracting data from common sources (that are supported by commercial vendors) and niche ones (that aren't).
+   - They want the ability to customize and fix bugs in connectors without having to wait on a vendor.
+   - They may not want their sensitive data to pass through systems out of their control for privacy or compliance reasons.
+   - They may want to extract data from region-specific sources and SaaS tools that are not supported by the US-centric commercial vendors.
+   - They may have more development time to spend than money and would rather build and contribute to connectors than pay an expensive vendor.
+3. Developers of **data products**
+   - They want to let their users connect sources directly to their product.
+   - They want to be able to configure and run pipelines programmatically.
+   - They want to leverage existing connectors so they can focus on what their product does with the data instead of getting access to it.
+   - They want to open source any custom connectors they write to share the maintenance burden with the community.
 
 ## Roadmap
 
