@@ -16,7 +16,7 @@ As Meltano is part of [GitLab](https://about.gitlab.com/), those parts of the [G
 
 ## Team
 
-- [Douwe](https://about.gitlab.com/company/team/#DouweM) - Lead
+- [Douwe](https://about.gitlab.com/company/team/#DouweM) - General Manager
 - [Taylor](https://about.gitlab.com/company/team/#tayloramurphy) - Lead
 
 ## Customer Support
