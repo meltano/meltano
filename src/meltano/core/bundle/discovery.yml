@@ -1165,6 +1165,35 @@ extractors:
       - name: start_date
         kind: date_iso8601
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+  - name: tap-zoom
+    label: Zoom
+    description: Video conferencing software
+    namespace: tap_zoom
+    variant: mashey
+    docs: 'https://meltano.com/plugins/extractors/zoom.html'
+    repo: https://github.com/mashey/tap-zoom
+    pip_url: 'git+https://github.com/mashey/tap-zoom.git'
+    capabilities:
+      - catalog
+      - discover
+      - state
+    settings_group_validation:
+      - ['jwt', 'start_date']
+      - ['client_id', 'client_secret', 'refresh_token', 'start_date']
+    settings:
+      - name: jwt
+        kind: password
+        label: JSON Web Token
+        documentation: https://marketplace.zoom.us/docs/guides/auth/jwt
+      - name: client_id
+        kind: string
+        documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
+      - name: client_secret
+        kind: password
+        documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
+      - name: refresh_token
+        kind: password
+        documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
 
   # Hidden taps:
   - name: tap-carbon-intensity

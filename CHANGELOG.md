@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2614](https://gitlab.com/meltano/meltano/-/issues/2590) Add `mashey` variant of `tap-zoom`
+
 ### Changes
 
 ### Fixes
