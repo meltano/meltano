@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for shortcut commands to `invoke`
-- [#2544] Add support for `utility` plugin types
+- [#2544](https://gitlab.com/meltano/meltano/-/issues/2544) Add support for `utility` plugin types
 
 ### Changes
 
