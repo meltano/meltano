@@ -7,7 +7,9 @@ description: Use Meltano to pull data from the Facebook Ads API and load it into
 
 The `tap-facebook` [extractor](/plugins/extractors/) pulls data from the [Facebook Ads API](https://developers.facebook.com/docs/marketing-apis).
 
-To learn more about `tap-facebook`, refer to the repository at <https://gitlab.com/meltano/tap-facebook>.
+- **Repository**: <https://gitlab.com/meltano/tap-facebook>
+- **Maintainer**: Meltano community
+- **Maintenance status**: Active
 
 ## Getting Started
 

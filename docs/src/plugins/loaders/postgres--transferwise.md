@@ -7,7 +7,10 @@ description: Use Meltano to pull data from various sources and load it into Post
 
 The `target-postgres` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [PostgreSQL](https://www.postgresql.org/) database.
 
-To learn more about `target-postgres`, refer to the repository at <https://github.com/transferwise/pipelinewise-target-postgres> and documentation at <https://transferwise.github.io/pipelinewise/connectors/targets/postgres.html>.
+- **Repository**: <https://github.com/transferwise/pipelinewise-target-postgres>
+- **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/targets/postgres.html>
+- **Maintainer**: [TransferWise](https://transferwise.com/)
+- **Maintenance status**: Active
 
 #### Alternative variants
 

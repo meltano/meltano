@@ -7,7 +7,10 @@ description: Use Meltano to pull data from a PostgreSQL database and load it int
 
 The `tap-postgres` [extractor](/plugins/extractors/) pulls data from a [PostgreSQL](https://www.postgresql.org/) database.
 
-To learn more about `tap-postgres`, refer to the repository at <https://github.com/transferwise/pipelinewise-tap-postgres> and documentation at <https://transferwise.github.io/pipelinewise/connectors/taps/postgres.html>.
+- **Repository**: <https://github.com/transferwise/pipelinewise-tap-postgres>
+- **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/taps/postgres.html>
+- **Maintainer**: [TransferWise](https://transferwise.com/)
+- **Maintenance status**: Active
 
 ## Getting Started
 

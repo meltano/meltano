@@ -7,7 +7,9 @@ description: Use Meltano to pull data from various sources and load it into SQLi
 
 The `target-sqlite` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [SQLite](https://www.sqlite.org/) database.
 
-To learn more about `target-sqlite`, refer to the repository at <https://gitlab.com/meltano/target-sqlite>.
+- **Repository**: <https://gitlab.com/meltano/target-sqlite>
+- **Maintainer**: Meltano community
+- **Maintenance status**: Active
 
 ## Getting Started
 
