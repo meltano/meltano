@@ -7,7 +7,9 @@ description: Use Meltano to pull data from the Sage Intacct API and load it into
 
 The `tap-intacct` [extractor](/plugins/extractors/) pulls data from the [Sage Intacct API](https://developer.intacct.com/api/).
 
-To learn more about `tap-intacct`, refer to the repository at <https://github.com/hotgluexyz/tap-intacct>.
+- **Repository**: <https://github.com/hotgluexyz/tap-intacct>
+- **Maintainer**: [Hotglue](https://hotglue.xyz/)
+- **Maintenance status**: Active
 
 ## Getting Started
 

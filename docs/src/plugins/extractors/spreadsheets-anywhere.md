@@ -9,6 +9,10 @@ The `tap-spreadsheets-anywhere` [extractor](/plugins/extractors/) pulls data fro
 
 To learn more about `tap-spreadsheets-anywhere`, refer to the repository at <https://github.com/ets/tap-spreadsheets-anywhere>.
 
+- **Repository**: <https://github.com/ets/tap-spreadsheets-anywhere>
+- **Maintainer**: [Eric Simmerman](https://github.com/ets)
+- **Maintenance status**: Active
+
 ## Getting Started
 
 ### Prerequisites
