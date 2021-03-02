@@ -20,6 +20,8 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 
 Then, follow the steps in the ["Setup requirements" section of the documentation](https://transferwise.github.io/pipelinewise/connectors/taps/postgres.html#postgresql-setup-requirements).
 
+If you'd like to use [log-based incremental replication](/docs/integration.html#log-based-incremental-replication), also follow the ["Existing replication slot" step in the repository's README](https://github.com/transferwise/pipelinewise-tap-postgres#log-based-replication-requirements), since Meltano does not create a replication slot automatically.
+
 #### Dependencies
 
 `tap-postgres` [requires](https://www.psycopg.org/docs/install.html#runtime-requirements) the
