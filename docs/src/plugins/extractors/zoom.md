@@ -7,7 +7,9 @@ description: Use Meltano to pull data from the Zoom API and load it into Snowfla
 
 The `tap-zoom` [extractor](/plugins/extractors/) pulls data from the [Zoom API](https://marketplace.zoom.us/docs/api-reference/introduction).
 
-To learn more about `tap-zoom`, refer to the repository at <https://github.com/Mashey/tap-zoom>.
+- **Repository**: <https://github.com/Mashey/tap-zoom>
+- **Maintainer**: [Mashey](https://www.mashey.com/)
+- **Maintenance status**: Active
 
 ## Getting Started
 
