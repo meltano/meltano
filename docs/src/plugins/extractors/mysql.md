@@ -7,7 +7,10 @@ description: Use Meltano to pull data from a MySQL or MariaDB database and load 
 
 The `tap-mysql` [extractor](/plugins/extractors/) pulls data from a [MySQL](https://www.mysql.com/) or [MariaDB](https://mariadb.org/) database.
 
-To learn more about `tap-mysql`, refer to the repository at <https://github.com/transferwise/pipelinewise-tap-mysql> and documentation at <https://transferwise.github.io/pipelinewise/connectors/taps/mysql.html>.
+- **Repository**: <https://github.com/transferwise/pipelinewise-tap-mysql>
+- **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/taps/mysql.html>
+- **Maintainer**: [TransferWise](https://transferwise.com/)
+- **Maintenance status**: Active
 
 ## Getting Started
 
