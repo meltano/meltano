@@ -70,6 +70,7 @@ In case of OAuth authentication:
 
 These and other supported settings are documented below.
 To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
+
 Note that the Start Date is not available as the API does not support incremental replication.
 Zoom also appears to "expire" meetings and webinars over time, making them unavailable to the API. Make sure your data lands in a trusted destination, as it may be the only place it eventually becomes available.
 
@@ -77,7 +78,7 @@ Zoom also appears to "expire" meetings and webinars over time, making them unava
 
 A minimal configuration of `tap-zoom` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{5-7}
+```yml
 plugins:
   extractors:
   - name: tap-zoom
