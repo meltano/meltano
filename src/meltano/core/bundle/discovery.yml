@@ -1176,17 +1176,15 @@ extractors:
     capabilities:
       - catalog
       - discover
-      - state
     settings_group_validation:
-      - ['jwt', 'start_date']
-      - ['client_id', 'client_secret', 'refresh_token', 'start_date']
+      - ['jwt']
+      - ['client_id', 'client_secret', 'refresh_token']
     settings:
       - name: jwt
         kind: password
         label: JSON Web Token
         documentation: https://marketplace.zoom.us/docs/guides/auth/jwt
       - name: client_id
-        kind: string
         documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
       - name: client_secret
         kind: password
