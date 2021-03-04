@@ -30,6 +30,7 @@ Extractors for the following sources are currently [discoverable](/docs/plugins.
 - [Spreadsheets Anywhere](/plugins/extractors/spreadsheets-anywhere.html) (CSV files and Excel spreadsheets on cloud or local storage)
 - [Stripe](/plugins/extractors/stripe.html)
 - [Zendesk](/plugins/extractors/zendesk.html)
+- [Zoom](/plugins/extractors/zoom.html)
 
 To learn more about extracting and [loading](/plugins/loaders/) data using Meltano, refer to the [Data Integration (EL) guide](/docs/integration.html).
 
