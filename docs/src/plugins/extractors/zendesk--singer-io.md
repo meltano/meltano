@@ -3,28 +3,20 @@ sidebar: auto
 description: Use Meltano to pull data from the Zendesk API and load it into Snowflake, PostgreSQL, and more
 ---
 
-# Zendesk
+# Zendesk--singer-io
 
 The `tap-zendesk` [extractor](/plugins/extractors/) pulls data from the [Zendesk API](https://developer.zendesk.com/rest_api).
 
-<<<<<<< HEAD
 - **Repository**: <https://github.com/singer-io/tap-zendesk>
 - **Maintainer**: [Stitch](https://www.stitchdata.com/)
-- **Maintenance status**: Unresponsive to community issues and contributions
-  - A [more active fork](https://github.com/singer-io/tap-zendesk/network) may be available that you can [use instead](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin).
-  - This plugin is [up for adoption](/docs/contributor-guide.html#adopting-a-plugin)!
-=======
-- **Repository**: <https://github.com/BenjMaq/tap-zendesk>
-- **Maintainer**: [Benjamin Maquet](https://github.com/BenjMaq)
-- **Maintenance status**: Active
-  
+- **Maintenance status**: Nonresponsive to community issues and contributions. A more active variant might be available, see [Alternative variants](#alternative-variants) section below.
+
 #### Alternative variants
 
 Multiple [variants](/docs/plugins.html#variants) of `tap-zendesk` are available.
-This document describes the `benjmaq` variant, which has more up-to-date contributions than the original `singer-io` variant.
+This document describes the `singer-io` variant, which was originally built to be used with [Singer](https://github.com/singer-io).
 
-Alternative option is [`singer-io`](./zendesk--singer-io.html).
->>>>>>> Add benjmaq variant for tap-zendesk
+Alternative option is [`benjmaq`](./zendesk.html) (default).
 
 ## Getting Started
 
@@ -116,7 +108,7 @@ export TAP_ZENDESK_API_TOKEN=my_api_token
 - Name: `email`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ZENDESK_EMAIL`
 
-This is the email you use to login to your Zendesk dashboard. For API Authentication, `/token` is automatically appended to the email address and is not required in the configuration.
+This is the email you use to login to your Zendesk dashboard.
 
 Not necessary when using OAuth authentication and setting [Access Token](#access-token).
 

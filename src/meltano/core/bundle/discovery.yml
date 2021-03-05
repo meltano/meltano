@@ -1177,39 +1177,73 @@ extractors:
     label: Zendesk
     description: Support ticketing system & customer service platform
     namespace: tap_zendesk
-    variant: singer-io
-    docs: 'https://meltano.com/plugins/extractors/zendesk.html'
-    repo: https://github.com/singer-io/tap-zendesk
-    pip_url: tap-zendesk
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings_group_validation:
-      - ['email', 'api_token', 'subdomain', 'start_date']
-      - ['access_token', 'subdomain', 'start_date']
-    settings:
-      - name: email
-        kind: email
-        placeholder: Ex. me@my-organization.com
-      - name: api_token
-        kind: password
-        label: API Token
-        placeholder: Ex. *****************
-        documentation: https://support.zendesk.com/hc/en-us/articles/226022787-Generating-a-new-API-token-
+    variants:
+      - name: benjmaq
+        docs: 'https://meltano.com/plugins/extractors/zendesk.html'
+        repo: https://github.com/BenjMaq/tap-zendesk
+        pip_url: tap-zendesk
+        capabilities:
+          - catalog
+          - discover
+          - state
+        settings_group_validation:
+          - ['email', 'api_token', 'subdomain', 'start_date']
+          - ['access_token', 'subdomain', 'start_date']
+        settings:
+          - name: email
+            kind: email
+            placeholder: Ex. me@my-organization.com
+          - name: api_token
+            kind: password
+            label: API Token
+            placeholder: Ex. *****************
+            documentation: https://support.zendesk.com/hc/en-us/articles/226022787-Generating-a-new-API-token-
 
-      - name: access_token
-        kind: password
-        description: OAuth Access Token
-        documentation: https://support.zendesk.com/hc/en-us/articles/203663836
+          - name: access_token
+            kind: password
+            description: OAuth Access Token
+            documentation: https://support.zendesk.com/hc/en-us/articles/203663836
 
-      - name: subdomain
-        label: Zendesk Subdomain
-        placeholder: Ex. my-subdomain.zendesk.com
-        documentation: https://support.zendesk.com/hc/en-us/articles/221682747-Where-can-I-find-my-Zendesk-subdomain-
-      - name: start_date
-        kind: date_iso8601
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+          - name: subdomain
+            label: Zendesk Subdomain
+            placeholder: Ex. my-subdomain.zendesk.com
+            documentation: https://support.zendesk.com/hc/en-us/articles/221682747-Where-can-I-find-my-Zendesk-subdomain-
+          - name: start_date
+            kind: date_iso8601
+            description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+      - name: singer-io
+        docs: 'https://meltano.com/plugins/extractors/zendesk.html'
+        repo: https://github.com/singer-io/tap-zendesk
+        pip_url: tap-zendesk
+        capabilities:
+          - catalog
+          - discover
+          - state
+        settings_group_validation:
+          - ['email', 'api_token', 'subdomain', 'start_date']
+          - ['access_token', 'subdomain', 'start_date']
+        settings:
+          - name: email
+            kind: email
+            placeholder: Ex. me@my-organization.com
+          - name: api_token
+            kind: password
+            label: API Token
+            placeholder: Ex. *****************
+            documentation: https://support.zendesk.com/hc/en-us/articles/226022787-Generating-a-new-API-token-
+
+          - name: access_token
+            kind: password
+            description: OAuth Access Token
+            documentation: https://support.zendesk.com/hc/en-us/articles/203663836
+
+          - name: subdomain
+            label: Zendesk Subdomain
+            placeholder: Ex. my-subdomain.zendesk.com
+            documentation: https://support.zendesk.com/hc/en-us/articles/221682747-Where-can-I-find-my-Zendesk-subdomain-
+          - name: start_date
+            kind: date_iso8601
+            description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
   - name: tap-zoom
     label: Zoom
     description: Video conferencing software
