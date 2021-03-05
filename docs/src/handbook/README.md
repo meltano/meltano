@@ -13,6 +13,7 @@ As Meltano is part of [GitLab](https://about.gitlab.com/), those parts of the [G
 - [Engineering Handbook](/handbook/engineering/)
 - [Marketing Handbook](/handbook/marketing/)
 - [Product Handbook](/handbook/product/)
+- [Data Learning Resources](/handbook/resources/)
 
 ## Team
 
