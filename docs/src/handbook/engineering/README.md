@@ -62,6 +62,20 @@ New labels can be created as appropriate and should be documented them here.
 When appropriate, house an issue under an existing epic: <https://gitlab.com/groups/meltano/-/epics>
 
 New epics can be created for topics or efforts that will take multiple issues over multiple sprints.
+
+## Code review
+
+All non-trivial merge requests should be reviewed and merged by someone other than the author.
+A merge request that touches code is never trivial, but one that fixes a typo in the documentation probably is.
+
+All team members are expected to review community contributions, but these can only be merged by an expert on the part of the code base in question.
+Right now, Douwe is the only expert.
+
+As experts catch issues in MRs that the original reviewers did not,
+we will update this section and the [Contributor Guide](/docs/contributor-guide.md#reviews),
+and reviewers will learn new things to look out for until they catch (almost) everything the expert would,
+at which points they will be experts themselves.
+
 ## Triage process
 
 ::: warning
