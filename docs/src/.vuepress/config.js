@@ -157,6 +157,7 @@ module.exports = {
         "/handbook/engineering/",
         "/handbook/marketing/",
         "/handbook/product/",
+        "/handbook/resources/",
       ],
     },
     logo: "/meltano-logo-with-text.svg",
