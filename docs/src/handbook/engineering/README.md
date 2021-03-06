@@ -55,34 +55,32 @@ If you come across something that needs fixing:
 
 ### Schedule
 
-Every Monday, we do a minor release (1.x) that is accompanied by a blog post.
-
-Additionally, we do a patch (1.x.y) or minor release every Thursday, to not leave users waiting to see improvements longer than necessary.
+We aim to release every Monday and Thursday, unless there are no [unreleased changes](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md#unreleased).
 
 ### Versioning
 
-Meltano uses [semver](https://semver.org/) as its version number scheme.
+Regular releases get a minor version bump (`1.1.0` -> `1.2.0`).
+Releases that only address regressions introduced in the most recent release get a patch version bump (`1.2.0` -> `1.2.1`).
 
-### Prerequisites
-
-Ensure you have the latest `master` branch locally before continuing.
-
-```bash
-git fetch origin
-```
+We may want to strictly adhere to [semver](https://semver.org/) at some point.
 
 ### Workflow
 
 Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
 
-1. Meltano has a number of dependencies for the release toolchain that are required when performing a release. If you haven't already, please navigate to your meltano installation and run the following command to install all development dependencies:
+1. Ensure you have the latest `master` branch locally before continuing.
 
    ```bash
-   # activate your virtualenv
-   source ./venv/bin/activate
+   cd meltano
 
-   # pip3 install all the development dependencies
-   pip3 install .[dev]
+   git checkout master
+   git pull
+   ```
+
+1. Install the latest versions of all release toolchain dependencies.
+
+   ```bash
+   poetry install
    ```
 
 2. Execute the commands below:
@@ -95,7 +93,9 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
    poetry run changelog view
 
    # after the changelog has been validated, tag the release
-   make release
+   make type=minor release
+   # if this is a patch release:
+   # make type=patch release
 
    # ensure the tag once the tag has been created, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
    git describe --tags --abbrev=0
@@ -107,15 +107,10 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
    git push origin release-next
    ```
 
-**Tip:** Releasing a hotfix? You can use `make type=patch release` to force a patch release. This is useful when we need to release hotfixes.
-
 1. Create a merge request from `release-next` targeting `master` and use the `release` template.
 2. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
 3. Make sure to check `delete the source branch when the changes are merged`.
-4. When the **publish** pipeline succeeds, the release is publicly available on [PyPI](https://pypi.org/project/meltano/).
-5. Follow the [Digital Ocean publish process](#digitalocean-marketplace)
-6. Upgrade all MeltanoData.com instances by running the [`meltano-upgrade.yml` Ansible playbook](./meltanodata-guide/controller-node.html#meltano-upgrade-yml)
-7. Verify that the full end-to-end flow can be completed successfully on <https://meltano.meltanodata.com>.
+4. Follow remaining tasks that are part of the `release` merge request template
 
 ## Demo Day
 
