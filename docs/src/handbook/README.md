@@ -46,6 +46,20 @@ We have three vaults in GitLab's 1Password account:
 - Meltano Test Data: Test data for sources
 - MeltanoData.com: Credentials for VMs we created on DigitalOcean for MeltanoData.com users
 
+## Calendars
+
+We have email addresses and Google Calendar accounts both under `@gitlab.com` and `@meltano.com`,
+but prefer to use the latter for Meltano-specific meetings.
+
+If team members should show up as busy on their GitLab calendars during these slots to prevent other meetings from being planned over them,
+these accounts can be invited to the event _in addition to_ the Meltano accounts.
+
+Shared calendars and meetings:
+- Team Meetings: Meetings with the team or the community
+  - Kick off: Weekly on Monday, owned by Douwe
+  - Demo Day: Weekly on Wednesday, owned by Taylor
+- Time Off: All-day events for periods team members will not be working
+
 ## Trademarks
 
 Meltano is a registered trademark of GitLab B.V. in the USA and China.
