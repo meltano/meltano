@@ -4,10 +4,6 @@ sidebarDepth: 2
 
 # Engineering Handbook
 
-## Subresources
-
-- [MeltanoData Guide](/handbook/engineering/meltanodata-guide/)
-
 ## Issue tracker best practices
 
 ### Milestones
