@@ -17,12 +17,15 @@ To find guides and references on other topics, use the Table of Contents in the 
 
 ## Mission
 
-We are building an **open source platform for the complete DataOps lifecycle** that
-is optimized for developer happiness and productivity,
-integrates best-in-class [open source components](/docs/plugins.html), and
+Our mission is to enable organizations to make the best decisions possible by 
+empowering Data Team excellence so that every organization can be data-informed.
+
+To achieve this mission we are building an **open source platform for the complete DataOps lifecycle** 
+that is optimized for the happiness and productivity of data professionals.
+It integrates best-in-class [open source components](/docs/plugins.html) and
 enables teams to collaborate on data projects and pipelines more efficiently and with higher confidence.
 
-So far, our focus has been on bringing these qualities to the first step in any data journey:
+Our focus has been on bringing these qualities to the first step in any data journey:
 integration and transformation, aka EL(T): [Extract, Load, Transform](https://en.wikipedia.org/wiki/Extract,_load,_transform),
 where traditional solutions are either off-the-shelf and near-impossible to extend, tweak, and debug,
 or fully custom and a pain to maintain.
