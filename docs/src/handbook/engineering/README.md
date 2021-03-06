@@ -132,28 +132,6 @@ For each demo day, we need to ensure that the following process is followed:
 4. Upload recording to YouTube
 5. Add features + timestamps to YouTube description
 
-## DigitalOcean Marketplace
-
-Meltano is deployed and available as a [DigitalOcean Marketplace 1-Click install](https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322).
-
-### Find the snapshot name
-
-**Tip:** The _digitalocean_marketplace_ job is only available on pipelines running off `tags`.
-
-1. The snapshot string should be available under `meltano-<timestamp>` on DigitalOcean, which you will find at the bottom of the _digitalocean_marketplace_ job. Take note of this snapshot string as you'll use it in the next step.
-
-### Update the DigitalOcean listing
-
-Then, head to the DigitalOcean vendor portal at <https://marketplace.digitalocean.com/vendorportal> to edit the Meltano listing.
-
-**Tip:** Don't see the Meltano listing? You'll have to be granted access to the DigitalOcean vendor portal. Please ask your manager for access.
-
-1. Once inside the listing, update the following entries:
-   - **Version** to the latest Meltano version
-   - **System Image** to the new image (match the aforementioned snapshot string)
-   - **Meltano Package Version** inside the _Software Included Entry_
-2. Submit it for review to finish the process.
-
 ## Outages & escalation
 
 Both https://www.meltano.com and https://meltano.meltanodata.com are automatically monitored using Pingdom, with notifications of downtime posted to:
