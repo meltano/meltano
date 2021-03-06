@@ -10,6 +10,10 @@ sidebarDepth: 2
 
 ## Triage process
 
+::: warning
+This process is not currently in use. It will be updated when we adopt a new process appropriate for the current team.
+:::
+
 The `flow::Triage` label is used on issues that need product/prioritization triage by the Product Manager (Danielle), or engineering/assignment triage by the Engineering Lead (Douwe).
 After they've been triaged, they'll have a milestone (other than `Backlog`), an assignee, and the `flow::To Do` label.
 
@@ -113,6 +117,10 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 4. Follow remaining tasks that are part of the `release` merge request template
 
 ## Demo Day
+
+::: warning
+This process is not currently in use. It will be updated when we adopt a new process appropriate for the current team.
+:::
 
 For each demo day, we need to ensure that the following process is followed:
 
