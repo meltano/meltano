@@ -148,15 +148,12 @@ module.exports = {
     sidebar: {
       "/docs": docsSidebar,
       "/tutorials": docsSidebar,
-      "/handbook/engineering/meltanodata-guide": [
-        "/handbook/engineering/meltanodata-guide/",
-        "/handbook/engineering/meltanodata-guide/controller-node",
-      ],
       "/handbook": [
         "/handbook/",
         "/handbook/engineering/",
         "/handbook/marketing/",
         "/handbook/product/",
+        "/handbook/resources/",
       ],
     },
     logo: "/meltano-logo-with-text.svg",

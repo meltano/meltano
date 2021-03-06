@@ -4,11 +4,79 @@ sidebarDepth: 2
 
 # Engineering Handbook
 
-## Subresources
+## Issue tracker best practices
 
-- [MeltanoData Guide](/handbook/engineering/meltanodata-guide/)
+### Milestones
+
+Every open issue should have a [milestone](https://gitlab.com/groups/meltano/-/milestones).
+If something we want to happen eventually is not a priority yet, use `Backlog`.
+If we don't want it to happen, close the issue.
+
+Once an issue becomes a priority, set a sprint milestone (identified by the Friday of the week in question),
+even if it's still weeks away and may end up being moved.
+
+New sprint milestones are created about 6 weeks in advance as part of preparation for the weekly kickoff meeting.
+
+### Labels
+
+Every open issue _with a sprint milestone_ should have a `flow` label:
+
+- `flow::Triage` : On our mind for this milestone, but likely to be moved to a subsequent week. If there's room in the week in question, can be moved to `flow::To Do`
+- `flow::To Do`: Something we intend to do during the week in question
+- `flow::Doing`: Currently being worked on
+- `flow::Blocked`: Blocked by some other issue
+- `flow::Review`: Currently in review
+
+When possible, an issue should have a label indicating its type:
+- `bug`
+- `feature requests`
+- `Discussion`
+- `Exploration`
+- `Community Support`
+
+If appropriate, an issue should have a stage label (one of the letters in "meltano"):
+- `Model`
+- `Extract`
+- `Load`
+- `Transform`
+- `Analyze`
+- `Notebook` (currently unused)
+- `Orchestrate`
+
+Other labels:
+- `CLI` or `UI` for issues specifically concerning the CLI or UI
+- `Documentation` for new or updated documentation
+- `Accepting Merge Requests` for issues that are ready to be picked up by a community contributor
+- `integrations` for issues relating to integrations with other open source data tools, typically as plugins
+- `Configuration` for issues relating to configuration
+- `Plugin Management` for issues relating to plugin management
+
+New labels can be created as appropriate and should be documented them here.
+
+### Epics
+
+When appropriate, house an issue under an existing epic: <https://gitlab.com/groups/meltano/-/epics>
+
+New epics can be created for topics or efforts that will take multiple issues over multiple sprints.
+
+## Code review
+
+All non-trivial merge requests should be reviewed and merged by someone other than the author.
+A merge request that touches code is never trivial, but one that fixes a typo in the documentation probably is.
+
+All team members are expected to review community contributions, but these can only be merged by an expert on the part of the code base in question.
+Right now, Douwe is the only expert.
+
+As experts catch issues in MRs that the original reviewers did not,
+we will update this section and the [Contributor Guide](/docs/contributor-guide.md#reviews),
+and reviewers will learn new things to look out for until they catch (almost) everything the expert would,
+at which points they will be experts themselves.
 
 ## Triage process
+
+::: warning
+This process is not currently in use. It will be updated when we adopt a new process appropriate for the current team.
+:::
 
 The `flow::Triage` label is used on issues that need product/prioritization triage by the Product Manager (Danielle), or engineering/assignment triage by the Engineering Lead (Douwe).
 After they've been triaged, they'll have a milestone (other than `Backlog`), an assignee, and the `flow::To Do` label.
@@ -48,41 +116,37 @@ If you come across something that needs fixing:
 
 - [Development Flow](https://gitlab.com/groups/meltano/-/boards/536761), with a column for each `flow::` label. Don't forget to filter by milestone, and/or assignee!
 - [Team Assignments](https://gitlab.com/groups/meltano/-/boards/1402405), with a column for each team member. Don't forget to filter by milestone!
-- [Current Milestone](https://gitlab.com/groups/meltano/-/boards/1288307), with a column for each `flow::` label _and_ each team member.
-- [Next Milestone](https://gitlab.com/groups/meltano/-/boards/1158410), with a column for each `flow::` label _and_ each team member.
 
 ## Release Process
 
 ### Schedule
 
-Every Monday, we do a minor release (1.x) that is accompanied by a blog post.
-
-Additionally, we do a patch (1.x.y) or minor release every Thursday, to not leave users waiting to see improvements longer than necessary.
+We aim to release every Monday and Thursday, unless there are no [unreleased changes](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md#unreleased).
 
 ### Versioning
 
-Meltano uses [semver](https://semver.org/) as its version number scheme.
+Regular releases get a minor version bump (`1.1.0` -> `1.2.0`).
+Releases that only address regressions introduced in the most recent release get a patch version bump (`1.2.0` -> `1.2.1`).
 
-### Prerequisites
-
-Ensure you have the latest `master` branch locally before continuing.
-
-```bash
-git fetch origin
-```
+We may want to strictly adhere to [semver](https://semver.org/) at some point.
 
 ### Workflow
 
 Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
 
-1. Meltano has a number of dependencies for the release toolchain that are required when performing a release. If you haven't already, please navigate to your meltano installation and run the following command to install all development dependencies:
+1. Ensure you have the latest `master` branch locally before continuing.
 
    ```bash
-   # activate your virtualenv
-   source ./venv/bin/activate
+   cd meltano
 
-   # pip3 install all the development dependencies
-   pip3 install .[dev]
+   git checkout master
+   git pull
+   ```
+
+1. Install the latest versions of all release toolchain dependencies.
+
+   ```bash
+   poetry install
    ```
 
 2. Execute the commands below:
@@ -95,7 +159,9 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
    poetry run changelog view
 
    # after the changelog has been validated, tag the release
-   make release
+   make type=minor release
+   # if this is a patch release:
+   # make type=patch release
 
    # ensure the tag once the tag has been created, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
    git describe --tags --abbrev=0
@@ -107,17 +173,16 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
    git push origin release-next
    ```
 
-**Tip:** Releasing a hotfix? You can use `make type=patch release` to force a patch release. This is useful when we need to release hotfixes.
-
 1. Create a merge request from `release-next` targeting `master` and use the `release` template.
 2. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
 3. Make sure to check `delete the source branch when the changes are merged`.
-4. When the **publish** pipeline succeeds, the release is publicly available on [PyPI](https://pypi.org/project/meltano/).
-5. Follow the [Digital Ocean publish process](#digitalocean-marketplace)
-6. Upgrade all MeltanoData.com instances by running the [`meltano-upgrade.yml` Ansible playbook](./meltanodata-guide/controller-node.html#meltano-upgrade-yml)
-7. Verify that the full end-to-end flow can be completed successfully on <https://meltano.meltanodata.com>.
+4. Follow remaining tasks that are part of the `release` merge request template
 
 ## Demo Day
+
+::: warning
+This process is not currently in use. It will be updated when we adopt a new process appropriate for the current team.
+:::
 
 For each demo day, we need to ensure that the following process is followed:
 
@@ -136,28 +201,6 @@ For each demo day, we need to ensure that the following process is followed:
 3. Generate list of features (from Setup section) paired with timestamps
 4. Upload recording to YouTube
 5. Add features + timestamps to YouTube description
-
-## DigitalOcean Marketplace
-
-Meltano is deployed and available as a [DigitalOcean Marketplace 1-Click install](https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322).
-
-### Find the snapshot name
-
-**Tip:** The _digitalocean_marketplace_ job is only available on pipelines running off `tags`.
-
-1. The snapshot string should be available under `meltano-<timestamp>` on DigitalOcean, which you will find at the bottom of the _digitalocean_marketplace_ job. Take note of this snapshot string as you'll use it in the next step.
-
-### Update the DigitalOcean listing
-
-Then, head to the DigitalOcean vendor portal at <https://marketplace.digitalocean.com/vendorportal> to edit the Meltano listing.
-
-**Tip:** Don't see the Meltano listing? You'll have to be granted access to the DigitalOcean vendor portal. Please ask your manager for access.
-
-1. Once inside the listing, update the following entries:
-   - **Version** to the latest Meltano version
-   - **System Image** to the new image (match the aforementioned snapshot string)
-   - **Meltano Package Version** inside the _Software Included Entry_
-2. Submit it for review to finish the process.
 
 ## Outages & escalation
 
