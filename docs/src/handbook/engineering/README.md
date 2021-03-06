@@ -120,8 +120,6 @@ If you come across something that needs fixing:
 
 - [Development Flow](https://gitlab.com/groups/meltano/-/boards/536761), with a column for each `flow::` label. Don't forget to filter by milestone, and/or assignee!
 - [Team Assignments](https://gitlab.com/groups/meltano/-/boards/1402405), with a column for each team member. Don't forget to filter by milestone!
-- [Current Milestone](https://gitlab.com/groups/meltano/-/boards/1288307), with a column for each `flow::` label _and_ each team member.
-- [Next Milestone](https://gitlab.com/groups/meltano/-/boards/1158410), with a column for each `flow::` label _and_ each team member.
 
 ## Release Process
 
