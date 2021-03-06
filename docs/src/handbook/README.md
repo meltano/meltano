@@ -38,6 +38,14 @@ As documented in our [Responsible Disclosure Policy](/docs/responsible-disclosur
 The [Meltano.com website](https://www.meltano.com) is set up with live chat powered by Intercom.
 Team members have their own accounts and master account login info can be found in 1Password.
 
+## 1Password
+
+We have three vaults in GitLab's 1Password account:
+
+- Meltano: Credentials for services, typically registered to `hello@meltano.com`
+- Meltano Test Data: Test data for sources
+- MeltanoData.com: Credentials for VMs we created on DigitalOcean for MeltanoData.com users
+
 ## Trademarks
 
 Meltano is a registered trademark of GitLab B.V. in the USA and China.
