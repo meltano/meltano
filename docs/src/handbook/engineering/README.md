@@ -8,6 +8,60 @@ sidebarDepth: 2
 
 - [MeltanoData Guide](/handbook/engineering/meltanodata-guide/)
 
+## Issue tracker best practices
+
+### Milestones
+
+Every open issue should have a [milestone](https://gitlab.com/groups/meltano/-/milestones).
+If something we want to happen eventually is not a priority yet, use `Backlog`.
+If we don't want it to happen, close the issue.
+
+Once an issue becomes a priority, set a sprint milestone (identified by the Friday of the week in question),
+even if it's still weeks away and may end up being moved.
+
+New sprint milestones are created about 6 weeks in advance as part of preparation for the weekly kickoff meeting.
+
+### Labels
+
+Every open issue _with a sprint milestone_ should have a `flow` label:
+
+- `flow::Triage` : On our mind for this milestone, but likely to be moved to a subsequent week. If there's room in the week in question, can be moved to `flow::To Do`
+- `flow::To Do`: Something we intend to do during the week in question
+- `flow::Doing`: Currently being worked on
+- `flow::Blocked`: Blocked by some other issue
+- `flow::Review`: Currently in review
+
+When possible, an issue should have a label indicating its type:
+- `bug`
+- `feature requests`
+- `Discussion`
+- `Exploration`
+- `Community Support`
+
+If appropriate, an issue should have a stage label (one of the letters in "meltano"):
+- `Model`
+- `Extract`
+- `Load`
+- `Transform`
+- `Analyze`
+- `Notebook` (currently unused)
+- `Orchestrate`
+
+Other labels:
+- `CLI` or `UI` for issues specifically concerning the CLI or UI
+- `Documentation` for new or updated documentation
+- `Accepting Merge Requests` for issues that are ready to be picked up by a community contributor
+- `integrations` for issues relating to integrations with other open source data tools, typically as plugins
+- `Configuration` for issues relating to configuration
+- `Plugin Management` for issues relating to plugin management
+
+New labels can be created as appropriate and should be documented them here.
+
+### Epics
+
+When appropriate, house an issue under an existing epic: <https://gitlab.com/groups/meltano/-/epics>
+
+New epics can be created for topics or efforts that will take multiple issues over multiple sprints.
 ## Triage process
 
 ::: warning
