@@ -202,6 +202,17 @@ For each demo day, we need to ensure that the following process is followed:
 4. Upload recording to YouTube
 5. Add features + timestamps to YouTube description
 
+## Office Hours
+
+Recurring office hours are available for Meltano community members to discuss our roadmap, debug issues, and ask questions. For schedules and meeting links, please check our [#office-hours](https://meltano.slack.com/archives/C01QS0RV78D) channel in [Slack](https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw).
+
+### Office Hours: Workflow
+
+1. Record each meeting with Zoom
+3. Generate list of discussed topics paired with timestamps
+4. Upload recording to YouTube
+5. Add topics + timestamps to YouTube description
+
 ## Outages & escalation
 
 Both https://www.meltano.com and https://meltano.meltanodata.com are automatically monitored using Pingdom, with notifications of downtime posted to:
@@ -212,3 +223,4 @@ Both https://www.meltano.com and https://meltano.meltanodata.com are automatical
 Other `*.meltanodata.com` instances are not currently monitored.
 
 When any instance managed by us is reported to be down, through Pingdom or any other means, resolving this becomes the team's top priority.
+
