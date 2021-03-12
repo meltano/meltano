@@ -17,8 +17,8 @@ To find guides and references on other topics, use the Table of Contents in the 
 
 ## Mission
 
-Our mission is to enable every organization to be data-informed and make the 
-best decisions possible.
+Our mission is to enable every organization to make the 
+best decisions possible by becoming data-informed.
 
 To achieve this mission we are building an **open source platform for the complete DataOps lifecycle** 
 that is optimized for the happiness and productivity of Data Teams and Data Professionals.
