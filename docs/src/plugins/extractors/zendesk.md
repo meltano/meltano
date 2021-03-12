@@ -87,7 +87,7 @@ plugins:
   - name: tap-zendesk
     variant: singer-io
     config:
-      email: user@example.com
+      email: user@example.com/token
       subdomain: my_subdomain
       start_date: '2020-10-01T00:00:00Z'
 ```
@@ -103,7 +103,9 @@ export TAP_ZENDESK_API_TOKEN=my_api_token
 - Name: `email`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ZENDESK_EMAIL`
 
-This is the email you use to login to your Zendesk dashboard.
+This is the email you use to login to your Zendesk dashboard. For API Authentication, append `/token` to the email address.
+
+For example, if your email is `user@example.com`, then the email in the config should be `user@example.com/token`.
 
 Not necessary when using OAuth authentication and setting [Access Token](#access-token).
 
