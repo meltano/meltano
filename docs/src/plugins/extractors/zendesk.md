@@ -103,7 +103,7 @@ export TAP_ZENDESK_API_TOKEN=my_api_token
 - Name: `email`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ZENDESK_EMAIL`
 
-This is the email you use to login to your Zendesk dashboard.
+This is the email you use to login to your Zendesk dashboard. For API Authentication, `/token` is automatically appended to the email address and is not required in the configuration.
 
 Not necessary when using OAuth authentication and setting [Access Token](#access-token).
 
