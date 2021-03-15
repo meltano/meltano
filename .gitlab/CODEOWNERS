@@ -1,7 +1,10 @@
 # https://gitlab.com/help/user/project/code_owners
 
-# Default codeowner
-* @DouweM
-
 # Ending a path in a `/` will specify the code owners for every file
 # nested in that directory, on any level
+
+[Default]
+* @DouweM
+
+[Handbook]
+/docs/handbook/ @meltano/core-team
