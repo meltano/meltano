@@ -208,10 +208,18 @@ Recurring office hours are available for Meltano community members to discuss ou
 
 ### Office Hours: Workflow
 
-1. Record each meeting with Zoom
-3. Generate list of discussed topics paired with timestamps
-4. Upload recording to YouTube
-5. Add topics + timestamps to YouTube description
+1. Launch zoom meeting room as usual.
+2. From the "More" or "..." menu, select "Live on Youtube".
+    1. When asked which account, select your `@meltano` account.
+    2. When asked which brand account, select the `Meltano` brand.
+    3. When asked for a stream title, accept the default title `Meltano Office Hours`. (We'll update this title later.)
+    4. Optionally, in Zoom you may copy the livestream link and paste into Slack `#office-hours` channel.
+3. After the livestream session ends:
+    1. Log into the YouTube account, locate the livestream and select the "Edit" option.
+    2. Update the video title with the date of the session, e.g. `Meltano Office Hours Livestream on YYYY-MM-DD`
+    3. Generate list of timestamps for each significant topic.
+    4. Update the topic features + timestamps within the YouTube video description.
+    5. Add a link within the video description to the `#office-hours` channel in slack.
 
 ## Outages & escalation
 
