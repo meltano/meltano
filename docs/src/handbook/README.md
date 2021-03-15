@@ -17,8 +17,9 @@ As Meltano is part of [GitLab](https://about.gitlab.com/), those parts of the [G
 
 ## Team
 
-- [Douwe](https://about.gitlab.com/company/team/#DouweM) - General Manager
-- [Taylor](https://about.gitlab.com/company/team/#tayloramurphy) - Lead
+- [Douwe Maan](https://about.gitlab.com/company/team/#DouweM) - General Manager
+- [Taylor Murphy](https://about.gitlab.com/company/team/#tayloramurphy) - Lead
+- [AJ Steers](https://about.gitlab.com/company/team/#asteers) - Lead
 
 ## Customer Support
 
@@ -55,9 +56,11 @@ If team members should show up as busy on their GitLab calendars during these sl
 these accounts can be invited to the event _in addition to_ the Meltano accounts.
 
 Shared calendars and meetings:
-- Team Meetings: Meetings with the team or the community
+- [Community Meetings](https://calendar.google.com/calendar/u/1?cid=Y18wMWNqNDhoYTRoMTk5Y3RqZWZpODV0OWRnY0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t): Meetings open to the community
+  - [Office Hours](/handbook/engineering/#office-hours): Weekly on Wednesday, owned by AJ
+  - [Demo Day](/handbook/engineering/#demo-day): Weekly on Friday, owned by Taylor
+- Team Meetings: Meetings with the team
   - Kick off: Weekly on Monday, owned by Douwe
-  - Demo Day: Weekly on Wednesday, owned by Taylor
 - Time Off: All-day events for periods team members will not be working
 
 ## Trademarks
