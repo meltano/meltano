@@ -153,6 +153,10 @@ module.exports = {
                 link: "/docs/community#demo-days"
             },
             {
+                text: "Office Hours",
+                link: "/docs/community#office-hours"
+            },
+            {
                 text: "YouTube",
                 link: "https://www.youtube.com/meltano"
             }
