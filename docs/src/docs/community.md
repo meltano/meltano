@@ -29,7 +29,7 @@ Our next demo days are:
 
 ## Office Hours
 
-We have Office Hours weekly on Wednesday at 9 AM Pacific (16:00 UTC). Join us on Zoom and bring any questions you have to the team. There is sometimes a short presentation about something top of mind from the core team, but otherwise this is your time to chat with us and get some help. Use [this link][gcal] to view the events calendar.
+We have Office Hours weekly on Wednesday at 9 AM Pacific (16:00 UTC). Join us on Zoom and bring any questions you have to the team. We will share the Zoom link in Slack and via social media prior to the event. There is sometimes a short presentation about something top of mind from the core team, but otherwise this is your time to chat with us and get some help. Use [this link][gcal] to view the events calendar.
 
 View past office hours in our [YouTube Playlist][playlist].
 
