@@ -8,7 +8,13 @@ We aim to build Meltano with the support of the community and we want everyone t
 
 ## Guidelines
 
+### Code of Conduct
+
 Everyone interacting in dbt Slack, codebase, issue trackers, and mailing lists are expected to follow the [PyPA Code of Conduct][conduct]. If you are unable to abide by the code of conduct set forth here, we encourage you not to participate in the community.
+
+### Contributor Guide
+
+We welcome contributions to the project! Please review our [Contributor Guide](/docs/contributor-guide) on how to contribute.
 
 ## Demo Days
 
@@ -23,6 +29,14 @@ Our next demo days are:
 
 ## Office Hours
 
-We have Office Hours weekly on Wednesday at 9 AM Pacific (16:00 UTC). Join us on Zoom and bring any questions you have to the team. There is sometimes a short presentation about something top of mind from the core team, but otherwise this is your time to chat with us and get some help.
+We have Office Hours weekly on Wednesday at 9 AM Pacific (16:00 UTC). Join us on Zoom and bring any questions you have to the team. There is sometimes a short presentation about something top of mind from the core team, but otherwise this is your time to chat with us and get some help. Use [this link][gcal] to view the events calendar.
+
+View past office hours in our [YouTube Playlist][playlist].
+
+## Slack
+
+Join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannelLink>, which is frequented by the core team and over 850 community members. You can ask any questions you may have in here, or just chat with fellow users.
 
 [conduct]: https://www.pypa.io/en/latest/code-of-conduct/
+[playlist]: https://www.youtube.com/watch?v=WjXIvGRHltk&list=PLO0YrxtDbWAtuuubcEz7mnCHoGfIf8voT
+[gcal]: https://calendar.google.com/calendar/embed?src=c_01cj48ha4h199ctjefi85t9dgc%40group.calendar.google.com&ctz=America%2FChicago
