@@ -39,4 +39,4 @@ Join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannel
 
 [conduct]: https://www.pypa.io/en/latest/code-of-conduct/
 [playlist]: https://www.youtube.com/watch?v=WjXIvGRHltk&list=PLO0YrxtDbWAtuuubcEz7mnCHoGfIf8voT
-[gcal]: https://calendar.google.com/calendar/embed?src=c_01cj48ha4h199ctjefi85t9dgc%40group.calendar.google.com&ctz=America%2FChicago
+[gcal]: https://calendar.google.com/calendar/embed?src=c_01cj48ha4h199ctjefi85t9dgc%40group.calendar.google.com
