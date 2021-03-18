@@ -178,6 +178,21 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 3. Make sure to check `delete the source branch when the changes are merged`.
 4. Follow remaining tasks that are part of the `release` merge request template
 
+## Zoom
+
+For community calls, use one of the following background in Zoom depending on whether you mirror your video or not.
+
+![Meltano Mirrored Background](/images/zoom-backgrounds/meltano-background-mirror.png)
+
+![Meltano Background](/images/zoom-backgrounds/meltano-background.png)
+
+Add it by doing the following:
+
+* Download the file and store it on your computer
+* Navigate to Preferences
+* Click Background & Filters
+* Within Virtual Backgrounds, click the `+` icon and add the file
+
 ## Demo Day
 
 ::: warning
