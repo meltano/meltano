@@ -182,7 +182,7 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 
 For community calls, use one of the following background in Zoom depending on whether you mirror your video or not.
 
-![Meltano Mirrored Background](/images/zoom-backgrounds/meltano-background-mirror.png)
+Note that if you mirror your video then the image will look backwards on your screen, but to others in the call it will look correct.
 
 ![Meltano Background](/images/zoom-backgrounds/meltano-background.png)
 
