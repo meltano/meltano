@@ -491,3 +491,27 @@ class TestProjectPlugin:
         assert "_custom" in settings_by_name
         assert "_nested.custom" in settings_by_name
         assert settings_by_name["_nested.custom"].kind == "boolean"
+
+
+class TestPluginType:
+    def test_properties(self):
+        for plugin_type in PluginType:
+            # assert no exceptions raised:
+            assert plugin_type.descriptor is not None
+            assert plugin_type.singular is not None
+            assert plugin_type.verb is not None
+
+    def test_specfic_properties(self):
+        assert PluginType.FILES.descriptor == "file bundle"
+        assert PluginType.TRANSFORMS.verb == "transform"
+        assert PluginType.UTILITIES.verb == "utilize"
+        assert PluginType.UTILITIES.singular == "utility"
+        assert PluginType.UTILITIES.verb == "utilize"
+
+    def test_from_cli_argument(self):
+        for plugin_type in PluginType:
+            assert PluginType.from_cli_argument(plugin_type.value) == plugin_type
+            assert PluginType.from_cli_argument(plugin_type.singular) == plugin_type
+
+        with pytest.raises(ValueError):
+            PluginType.from_cli_argument("unknown type")
