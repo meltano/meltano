@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
 @pass_project(migrate=True)
 def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_args):
-    """Handle `meltano invoke`."""
+    """Invoke the plugin's executable with specified arguments."""
     try:
         plugin_name, command_name = plugin_name.split(":")
     except ValueError:
@@ -53,7 +53,6 @@ def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_args):
 
     if list_commands:
         do_list_commands(plugin)
-        sys.exit(0)
         return
 
     try:
@@ -82,21 +81,23 @@ def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_args):
 
 
 def do_list_commands(plugin):
-    """Handle `meltano invoke --list-commands`."""
-    if plugin.supported_commands:
-        column_len = max(
-            len(f"{plugin.name}:{cmd}") for cmd in plugin.supported_commands
-        )
-        column_len += 2
-        for cmd in plugin.supported_commands:
-            click.secho(
-                f"{plugin.name}:{cmd}".ljust(column_len, " "), fg="blue", nl=False
-            )
-            click.echo(plugin.all_commands[cmd].get("description"))
-    else:
+    """List the commands supported by plugin."""
+    if not plugin.supported_commands:
         click.secho(
             f"Plugin '{plugin.name}' does not define any commands.", fg="yellow"
         )
+        return
+
+    descriptions = {}
+    for cmd in plugin.supported_commands:
+        descriptions[f"{plugin.name}:{cmd}"] = plugin.all_commands[cmd].get(
+            "description"
+        )
+
+    column_len = max([len(k) for k in descriptions.keys()]) + 2
+    for name, desc in descriptions.items():
+        click.secho(name.ljust(column_len, " "), fg="blue", nl=False)
+        click.echo(desc)
 
 
 def dump_file(invoker, file_id):
