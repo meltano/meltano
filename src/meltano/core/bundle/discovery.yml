@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-version: 16
+version: 17
 
 extractors:
   - name: tap-adwords
@@ -463,6 +463,48 @@ extractors:
       - name: start_date
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         kind: date_iso8601
+  - name: tap-chargebee
+    namespace: tap_chargebee
+    label: Chargebee
+    description: Subscription billing software
+    variant: hotgluexyz
+    docs: https://meltano.com/plugins/extractors/chargebee.html
+    repo: https://github.com/hotgluexyz/tap-chargebee
+    pip_url: git+https://github.com/hotgluexyz/tap-chargebee.git
+    capabilities:
+    - properties
+    - discover
+    - state
+    settings_group_validation:
+    - - api_key
+      - site
+      - product_catalog
+      - start_date
+    settings:
+    - name: api_key
+      label: API Key
+      kind: password
+    - name: site
+      label: Chargebee Site
+    - name: product_catalog
+      label: Chargebee Product Catalog
+    - name: start_date
+      kind: date_iso8601
+      description: Determines how much historical data will be extracted. Please be
+        aware that the larger the time period and amount of data, the longer the initial
+        extraction can be expected to take.
+    - name: select_fields_by_default
+      kind: boolean
+      value: true
+      description: Select by default any new fields discovered in Quickbooks objects
+    - name: state_message_threshold
+      kind: integer
+      value: 1000
+      description: Generate a STATE message every N records
+    - name: max_workers
+      kind: integer
+      value: 8
+      label: Maximum number of threads to use
   - name: tap-csv
     label: Comma Separated Values (CSV)
     description: Generic data extractor of CSV (comma separated value) files
@@ -553,6 +595,8 @@ extractors:
     repo: https://gitlab.com/meltano/tap-gitlab
     pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
     capabilities:
+      - catalog
+      - discover
       - state
     settings_group_validation:
       - ['api_url', 'groups', 'start_date']
@@ -654,6 +698,55 @@ extractors:
         env_aliases: [GOOGLE_ANALYTICS_API_END_DATE]
         kind: date_iso8601
         description: Date up to when historical data will be extracted.
+  - name: tap-intacct
+    namespace: tap_intacct
+    label: Sage Intacct
+    description: Financial management software
+    variant: hotgluexyz
+    docs: https://meltano.com/plugins/extractors/intacct.html
+    repo: https://github.com/hotgluexyz/tap-intacct
+    pip_url: git+https://github.com/hotgluexyz/tap-intacct.git
+    capabilities:
+    - properties
+    - discover
+    - state
+    settings_group_validation:
+    - - company_id
+      - sender_id
+      - sender_password
+      - user_id
+      - user_password
+      - start_date
+    settings:
+    - name: company_id
+      label: Company Id
+    - name: sender_id
+      label: Intacct Sender Id
+    - name: sender_password
+      label: Intacct Sender Password
+      kind: password
+    - name: user_id
+      label: Intacct User Id
+    - name: user_password
+      label: Intacct User Password
+      kind: password
+    - name: start_date
+      kind: date_iso8601
+      description: Determines how much historical data will be extracted. Please be
+        aware that the larger the time period and amount of data, the longer the initial
+        extraction can be expected to take.
+    - name: select_fields_by_default
+      kind: boolean
+      value: true
+      description: Select by default any new fields discovered in Quickbooks objects
+    - name: state_message_threshold
+      kind: integer
+      value: 1000
+      description: Generate a STATE message every N records
+    - name: max_workers
+      kind: integer
+      value: 8
+      label: Maximum number of threads to use
   - name: tap-marketo
     label: Marketo
     description: Marketing automation for account-based marketing
@@ -910,6 +1003,55 @@ extractors:
         kind: integer
         value: 8
         label: Maximum number of threads to use
+  - name: tap-quickbooks
+    namespace: tap_quickbooks
+    label: Quickbooks
+    description: Accounting management platform
+    variant: hotgluexyz
+    docs: https://meltano.com/plugins/extractors/quickbooks.html
+    repo: https://github.com/hotgluexyz/tap-quickbooks
+    pip_url: git+https://github.com/hotgluexyz/tap-quickbooks.git
+    capabilities:
+    - properties
+    - discover
+    - state
+    settings_group_validation:
+    - - client_id
+      - client_secret
+      - refresh_token
+      - realmId
+      - start_date
+    settings:
+    - name: realmId
+      label: Realm ID
+    - name: client_id
+      kind: password
+      label: Client ID
+    - name: client_secret
+      kind: password
+    - name: refresh_token
+      kind: password
+    - name: start_date
+      kind: date_iso8601
+      description: Determines how much historical data will be extracted. Please be
+        aware that the larger the time period and amount of data, the longer the initial
+        extraction can be expected to take.
+    - name: is_sandbox
+      kind: boolean
+      value: false
+      description: Use Quickbooks Sandbox
+    - name: select_fields_by_default
+      kind: boolean
+      value: true
+      description: Select by default any new fields discovered in Quickbooks objects
+    - name: state_message_threshold
+      kind: integer
+      value: 1000
+      description: Generate a STATE message every N records
+    - name: max_workers
+      kind: integer
+      value: 8
+      label: Maximum number of threads to use
   - name: tap-shopify
     label: Shopify
     description: Ecommerce platform
@@ -1023,6 +1165,33 @@ extractors:
       - name: start_date
         kind: date_iso8601
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+  - name: tap-zoom
+    label: Zoom
+    description: Video conferencing software
+    namespace: tap_zoom
+    variant: mashey
+    docs: 'https://meltano.com/plugins/extractors/zoom.html'
+    repo: https://github.com/mashey/tap-zoom
+    pip_url: 'git+https://github.com/mashey/tap-zoom.git'
+    capabilities:
+      - catalog
+      - discover
+    settings_group_validation:
+      - ['jwt']
+      - ['client_id', 'client_secret', 'refresh_token']
+    settings:
+      - name: jwt
+        kind: password
+        label: JSON Web Token
+        documentation: https://marketplace.zoom.us/docs/guides/auth/jwt
+      - name: client_id
+        documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
+      - name: client_secret
+        kind: password
+        documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
+      - name: refresh_token
+        kind: password
+        documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
 
   # Hidden taps:
   - name: tap-carbon-intensity
@@ -1824,7 +1993,7 @@ orchestrators:
     namespace: airflow
     docs: https://meltano.com/docs/orchestration.md
     repo: https://github.com/apache/airflow
-    pip_url: 'apache-airflow==1.10.12 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-1.10.12/constraints-3.6.txt'
+    pip_url: 'apache-airflow==1.10.14 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-1.10.14/constraints-3.6.txt'
     settings:
       - name: core.dags_folder
         value: $MELTANO_PROJECT_ROOT/orchestrate/dags

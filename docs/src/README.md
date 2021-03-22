@@ -57,7 +57,7 @@ along with the built-in
 or inside your
 [orchestrator of choice](/docs/production.html#meltano-elt).
 
-Meltano embraces the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
+Meltano [embraces](/docs/#embracing-singer) the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
 [extractors](/plugins/extractors/) and
 [loaders](/plugins/loaders/),
 and leverages [dbt](https://www.getdbt.com) for [transformation](#transformation).
@@ -185,6 +185,9 @@ meltano config tap-gitlab set projects meltano/meltano
 # - going back to May 1st, 2020
 meltano config tap-gitlab set start_date 2020-05-01T00:00:00Z
 
+# Select all attributes of the "tags" entity
+meltano select tap-gitlab tags "*"
+
 # Add JSONL loader
 meltano add loader target-jsonl
 
@@ -252,6 +255,9 @@ meltano add transformer dbt
 # Add PostgreSQL-compatible dbt models for tap-gitlab
 meltano add transform tap-gitlab
 
+# Select all attributes of all entities
+meltano select tap-gitlab "*" "*"
+
 # Run data integration and transformation pipeline
 meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
 
@@ -288,7 +294,7 @@ to and run by a supported orchestrator like [Apache Airflow](https://airflow.apa
 When you add the `airflow` orchestrator to your project, a
 [Meltano DAG generator](https://gitlab.com/meltano/files-airflow/-/blob/master/bundle/orchestrate/dags/meltano.py)
 will automatically be added to the `orchestrate/dags` directory, where Airflow
-will look for [DAGs](https://airflow.apache.org/docs/stable/concepts.html#dags) by default.
+will look for [DAGs](https://airflow.apache.org/docs/apache-airflow/1.10.14/concepts.html#dags) by default.
 If the default behavior of simply running [`meltano elt`](/docs/command-line-interface.html#elt) on a
 schedule is not going to cut it, you can easily modify the DAG generator or add your own.
 

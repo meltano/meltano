@@ -20,7 +20,7 @@
           </router-link>
 
           <SlackChannelLink class="action-button secondary">
-            <SlackIcon /> Join 600+ on Slack
+            <SlackIcon /> Join 850+ on Slack
           </SlackChannelLink>
 
           <a
@@ -214,7 +214,7 @@
 
     <GlobalFooter
       ><a
-        href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/views/Home.vue"
+        href="https://gitlab.com/meltano/meltano/-/blob/master/docs/src/README.md"
         target="_blank"
         >{{ $site.themeConfig.editLinkText }} <OutboundLink
       /></a>

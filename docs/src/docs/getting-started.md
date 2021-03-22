@@ -369,10 +369,10 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
 1. Find out whether the extractor supports entity selection, and if so, what entities and attributes are available, using [`meltano select --list --all`](/docs/command-line-interface.html#select):
 
     ```bash
-    meltano select --list --all <plugin>
+    meltano select <plugin> --list --all
 
     # For example:
-    meltano select --list --all tap-covid-19
+    meltano select tap-gitlab --list --all
     ```
 
     If this command fails with an error, this usually means that the Singer tap does not support [catalog discovery mode](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#discovery-mode), and will always extract all supported entities and attributes.
@@ -384,16 +384,17 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
     meltano select <plugin> --exclude <entity> <attribute>
 
     # For example:
-    meltano select tap-covid-19 eu_daily date
-    meltano select tap-covid-19 eu_daily country
-    meltano select tap-covid-19 eu_daily cases
-    meltano select tap-covid-19 eu_daily deaths
+    meltano select tap-gitlab commits id
+    meltano select tap-gitlab commits project_id
+    meltano select tap-gitlab commits created_at
+    meltano select tap-gitlab commits author_name
+    meltano select tap-gitlab commits message
 
     # Include all attributes of an entity
-    meltano select tap-covid-19 eu_ecdc_daily "*"
+    meltano select tap-gitlab tags "*"
 
     # Exclude matching attributes of all entities
-    meltano select tap-covid-19 --exclude "*" "git_*"
+    meltano select tap-gitlab --exclude "*" "*_url"
     ```
 
     As you can see in the example, entity and attribute identifiers can contain wildcards (`*`) to match multiple entities or attributes at once.
@@ -403,23 +404,24 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
     ```yml{4-10}
     plugins:
       extractors:
-      - name: tap-covid-19
+      - name: tap-gitlab
         select:
-        - eu_daily.date
-        - eu_daily.country
-        - eu_daily.cases
-        - eu_daily.deaths
-        - eu_ecdc_daily.*
-        - '!*.git_*'
+        - tags.*
+        - commits.id
+        - commits.project_id
+        - commits.created_at
+        - commits.author_name
+        - commits.message
+        - '!*.*_url'
     ```
 
 1. Optionally, verify that only the intended entities and attributes are now selected using [`meltano select --list`](/docs/command-line-interface.html#select):
 
     ```bash
-    meltano select --list <plugin>
+    meltano select <plugin> --list
 
     # For example:
-    meltano select --list tap-covid-19
+    meltano select tap-gitlab --list
     ```
 
 ### Choose how to replicate each entity
@@ -799,15 +801,15 @@ To help you realize this, Meltano supports scheduled pipelines that can be orche
     plugins:
       orchestrators:
       - name: airflow
-        pip_url: apache-airflow==1.10.12
+        pip_url: apache-airflow==1.10.14
     ```
 
     It will also automatically add a
 [`meltano elt` DAG generator](https://gitlab.com/meltano/files-airflow/-/blob/master/bundle/orchestrate/dags/meltano.py)
 to your project's `orchestrate/dags` directory, where Airflow
-will be configured to look for [DAGs](https://airflow.apache.org/docs/stable/concepts.html#dags) by default.
+will be configured to look for [DAGs](https://airflow.apache.org/docs/apache-airflow/1.10.14/concepts.html#dags) by default.
 
-1. Start the [Airflow scheduler](https://airflow.apache.org/docs/stable/cli-ref.html#scheduler) using [`meltano invoke`](/docs/command-line-interface.html#invoke):
+1. Start the [Airflow scheduler](https://airflow.apache.org/docs/apache-airflow/1.10.14/scheduler.html) using [`meltano invoke`](/docs/command-line-interface.html#invoke):
 
     ```bash
     meltano invoke airflow scheduler
@@ -818,7 +820,7 @@ will be configured to look for [DAGs](https://airflow.apache.org/docs/stable/con
 
     As long as the scheduler is running, your scheduled pipelines will run at the appropriate times.
 
-1. Optionally, verify that a [DAG](https://airflow.apache.org/docs/stable/concepts.html#dags) was automatically created for each scheduled pipeline by starting the [Airflow web interface](https://airflow.apache.org/docs/stable/cli-ref.html#webserver):
+1. Optionally, verify that a [DAG](https://airflow.apache.org/docs/apache-airflow/1.10.14/concepts.html#dags) was automatically created for each scheduled pipeline by starting the [Airflow web interface](https://airflow.apache.org/docs/apache-airflow/1.10.14/cli-ref.html#webserver):
 
     ```bash
     meltano invoke airflow webserver

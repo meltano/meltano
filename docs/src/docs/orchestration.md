@@ -62,9 +62,9 @@ This setup assumes you'll use `meltano schedule` to schedule your `meltano elt`
 pipelines, as described above, since the DAG generator iterates over the result of
 `meltano schedule list --format=json` and creates DAGs for each.
 However, you can also create your own Airflow DAGs for any pipeline you fancy
-by using [`BashOperator`](https://airflow.apache.org/docs/stable/howto/operator/bash.html)
+by using [`BashOperator`](https://airflow.apache.org/docs/apache-airflow/1.10.14/howto/operator/bash.html)
 with the [`meltano elt` command](/docs/command-line-interface.html#elt), or
-[`DockerOperator`](https://airflow.apache.org/docs/stable/_api/airflow/operators/docker_operator/index.html)
+[`DockerOperator`](https://airflow.apache.org/docs/apache-airflow/1.10.14/_api/airflow/operators/docker_operator/index.html)
 with a [project-specific Docker image](/docs/production.html#containerized-meltano-project).
 
 ## Starting the Airflow scheduler

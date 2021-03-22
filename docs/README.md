@@ -20,7 +20,7 @@ npm install
 ```
 3. Build and run
 ```bash
-npm run serve:docs
+npm run dev:docs
 ```
 4. View changes at http://localhost:8080/
 

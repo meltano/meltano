@@ -7,7 +7,9 @@ description: Use Meltano to pull data from the GitLab API and load it into Snowf
 
 The `tap-gitlab` [extractor](/plugins/extractors/) pulls data from the [GitLab API](https://docs.gitlab.com/ee/api/).
 
-To learn more about `tap-gitlab`, refer to the repository at <https://gitlab.com/meltano/tap-gitlab>.
+- **Repository**: <https://gitlab.com/meltano/tap-gitlab>
+- **Maintainer**: Meltano community
+- **Maintenance status**: Active
 
 ## Getting Started
 
@@ -211,6 +213,8 @@ export TAP_GITLAB_PROJECTS="meltano/meltano meltano/tap-gitlab"
 
 Enable to pull in extra data (like Epics, Epic Issues and other entities) only available to GitLab Ultimate and GitLab.com Gold accounts.
 
+The `epics` and `epic_issues` entities cannot be [selected](/docs/integration.html#selecting-entities-and-attributes-for-extraction) unless this setting is enabled.
+
 #### How to use
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
@@ -231,6 +235,8 @@ For each Merge Request, also fetch the MR's commits and create the join table `m
 
 This can slow down extraction considerably because of the many API calls required.
 
+The `merge_request_commits` entity cannot be [selected](/docs/integration.html#selecting-entities-and-attributes-for-extraction) unless this setting is enabled.
+
 #### How to use
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
@@ -250,6 +256,8 @@ export TAP_GITLAB_FETCH_MERGE_REQUEST_COMMITS=true
 For every Pipeline, also fetch extended details of each of these pipelines.
 
 This can slow down extraction considerably because of the many API calls required.
+
+The `pipelines_extended` entity cannot be [selected](/docs/integration.html#selecting-entities-and-attributes-for-extraction) unless this setting is enabled.
 
 #### How to use
 

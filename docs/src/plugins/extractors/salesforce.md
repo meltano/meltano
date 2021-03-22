@@ -7,7 +7,9 @@ description: Use Meltano to pull data from the Salesforce API and load it into S
 
 The `tap-salesforce` [extractor](/plugins/extractors/) pulls data from the [Salesforce API](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm).
 
-To learn more about `tap-salesforce`, refer to the repository at <https://gitlab.com/meltano/tap-salesforce>.
+- **Repository**: <https://gitlab.com/meltano/tap-salesforce>
+- **Maintainer**: Meltano community
+- **Maintenance status**: Active
 
 ## Getting Started
 
@@ -301,8 +303,8 @@ export TAP_SALESFORCE_API_TYPE=BULK
 
 ### Select Fields By Default
 
-- Name: `is_sandbox`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_IS_SANDBOX`
+- Name: `select_fields_by_default`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_SELECT_FIELDS_BY_DEFAULT`
 - Default: `true`
 
 Select by default any new fields discovered in Salesforce objects
@@ -312,9 +314,9 @@ Select by default any new fields discovered in Salesforce objects
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config tap-salesforce set is_sandbox false
+meltano config tap-salesforce set select_fields_by_default false
 
-export TAP_SALESFORCE_IS_SANDBOX=false
+export TAP_SALESFORCE_SELECT_FIELDS_BY_DEFAULT=false
 ```
 
 ### State Message Threshold

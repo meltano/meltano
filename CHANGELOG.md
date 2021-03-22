@@ -11,14 +11,55 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2544](https://gitlab.com/meltano/meltano/-/issues/2544) Add support for `utility` plugin type
+- [#2614](https://gitlab.com/meltano/meltano/-/issues/2590) Add `mashey` variant of `tap-zoom`
 
 ### Changes
 
 ### Fixes
 
-- [#2543](https://gitlab.com/meltano/meltano/-/issues/2543) Fix packages dependencies that claim Python 3.9 is supported when it actually isn't.
-
 ### Breaks
+
+
+## 1.70.0 - (2021-02-23)
+---
+
+### New
+
+- [#2590](https://gitlab.com/meltano/meltano/-/issues/2590) Add `hotgluexyz` variant of `tap-chargebee`
+- [#2593](https://gitlab.com/meltano/meltano/-/issues/2593) Add `hotgluexyz` variant of `tap-intacct`
+
+### Changes
+
+- [#2356](https://gitlab.com/meltano/meltano/-/issues/2356) Disallow two pipelines with the same job ID to run at the same time by default
+
+### Fixes
+
+- [#2585](https://gitlab.com/meltano/meltano/-/issues/2585) Fix bug with finding a schedule based on namespace for a custom plugin
+
+
+## 1.69.0 - (2021-02-16)
+---
+
+### New
+
+- [#2558](https://gitlab.com/meltano/meltano/-/issues/2558) Add support for Airflow 2.0
+- [#2577](https://gitlab.com/meltano/meltano/-/issues/2577) Add `hotgluexyz` variant of `tap-quickbooks`
+
+
+## 1.68.0 - (2021-02-11)
+---
+
+### New
+
+- [#2557](https://gitlab.com/meltano/meltano/-/issues/2557) Add support for entity and attribute selection to tap-gitlab
+
+### Changes
+
+- [#2559](https://gitlab.com/meltano/meltano/-/issues/2559) Bump Airflow version to 1.10.14
+
+### Fixes
+
+- [#2543](https://gitlab.com/meltano/meltano/-/issues/2543) Fix packages dependencies that claim Python 3.9 is supported when it actually isn't.
 
 
 ## 1.67.0 - (2021-01-26)
