@@ -7,7 +7,10 @@ description: Use Meltano to pull data from a PostgreSQL database and load it int
 
 The `tap-postgres` [extractor](/plugins/extractors/) pulls data from a [PostgreSQL](https://www.postgresql.org/) database.
 
-To learn more about `tap-postgres`, refer to the repository at <https://github.com/transferwise/pipelinewise-tap-postgres> and documentation at <https://transferwise.github.io/pipelinewise/connectors/taps/postgres.html>.
+- **Repository**: <https://github.com/transferwise/pipelinewise-tap-postgres>
+- **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/taps/postgres.html>
+- **Maintainer**: [TransferWise](https://transferwise.com/)
+- **Maintenance status**: Active
 
 ## Getting Started
 
@@ -19,6 +22,8 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 1. [Create your Meltano project](/docs/getting-started.html#create-your-meltano-project)
 
 Then, follow the steps in the ["Setup requirements" section of the documentation](https://transferwise.github.io/pipelinewise/connectors/taps/postgres.html#postgresql-setup-requirements).
+
+If you'd like to use [log-based incremental replication](/docs/integration.html#log-based-incremental-replication), also follow the ["Existing replication slot" step in the repository's README](https://github.com/transferwise/pipelinewise-tap-postgres#log-based-replication-requirements), since Meltano does not create a replication slot automatically.
 
 #### Dependencies
 

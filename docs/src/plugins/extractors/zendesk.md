@@ -7,7 +7,11 @@ description: Use Meltano to pull data from the Zendesk API and load it into Snow
 
 The `tap-zendesk` [extractor](/plugins/extractors/) pulls data from the [Zendesk API](https://developer.zendesk.com/rest_api).
 
-To learn more about `tap-zendesk`, refer to the repository at <https://github.com/singer-io/tap-zendesk>.
+- **Repository**: <https://github.com/singer-io/tap-zendesk>
+- **Maintainer**: [Stitch](https://www.stitchdata.com/)
+- **Maintenance status**: Nonresponsive to community issues and contributions
+  - A [more active fork](https://github.com/singer-io/tap-zendesk/network) may be available that you can [use instead](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin).
+  - This plugin is [up for adoption](https://gitlab.com/meltano/meltano/-/issues/2515)!
 
 ## Getting Started
 
@@ -99,7 +103,7 @@ export TAP_ZENDESK_API_TOKEN=my_api_token
 - Name: `email`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ZENDESK_EMAIL`
 
-This is the email you use to login to your Zendesk dashboard.
+This is the email you use to login to your Zendesk dashboard. For API Authentication, `/token` is automatically appended to the email address and is not required in the configuration.
 
 Not necessary when using OAuth authentication and setting [Access Token](#access-token).
 

@@ -1,10 +1,10 @@
 ---
-description: Various data consultancies have adopted Meltano and Singer as part of the stack they offer to clients.
+description: Various data consultants have adopted Meltano and Singer as part of the stack they offer to clients.
 ---
 
 # Implementation Partners
 
-Various data consultancies have adopted Meltano and [Singer](https://www.singer.io/) as part of the stack they offer to clients.
+Meltano and [Singer](https://www.singer.io/) are [popular with data consultants](/docs/#focus), and various consulting firms have adopted both as part of the stack they offer to clients.
 
 If you lack the time and/or expertise to do so yourself, they can help you
 [set up](/docs/getting-started.html) your pipelines, deploy them to [production](/docs/production.html),
@@ -14,8 +14,8 @@ that are not supported yet.
 
 More active [contributors](/docs/contributor-guide.html) to Meltano and [related open source projects](https://gitlab.com/meltano) are listed first:
 
-| Consultancy | Locations | Contributions |
-| ----------- | --------- | ------------- |
+| Consulting Firm | Locations | Contributions |
+| --------------- | --------- | ------------- |
 | [Slalom](https://www.slalom.com/) | United States: [various](https://www.slalom.com/locations); Canada: Montréal, Toronto, Vancouver; United Kingdom: London, Manchester; Australia: Melbourne, Sydney; Japan: Tokyo | [10+](https://gitlab.com/groups/meltano/-/merge_requests?author_username=aaronsteers&state=all) |
 | [Applied Labs](https://appliedlabs.io/) | United States: New York; Russia: Moscow; United Kingdom: London; Uzbekistan: Tashkent | 5+ ([1](https://gitlab.com/groups/meltano/-/merge_requests?author_username=kaboomdev&state=all), [2](https://gitlab.com/groups/meltano/-/merge_requests?author_username=dmitry-stadnik&state=all)) |
 | [b.telligent](https://www.btelligent.com/) | Germany: Berlin, Düsseldorf, Frankfurt, Hamburg, Hannover |
@@ -24,8 +24,8 @@ More active [contributors](/docs/contributor-guide.html) to Meltano and [related
 | [Mashey](https://www.mashey.com/) | United States: Denver, CO |
 | [Wheelhouse](https://www.wheelhousedmg.com/) | United States: Seattle, WA; Richmond, VA |
 
-::: tip Don't see your consultancy listed here?
+::: tip Don't see your consulting firm listed here?
 
-If your consultancy has experience with Meltano and Singer, you can add yourself to this page by viewing the source using the link below, and submitting a change using a merge request.
+If you have experience with Meltano and Singer, you can add your company to this page by viewing the source using the link below, and submitting a change using a merge request.
 
 :::

@@ -7,7 +7,10 @@ description: Use Meltano to pull data from various sources and load it into Snow
 
 The `target-snowflake` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [Snowflake](https://www.snowflake.com/) data warehouse.
 
-To learn more about `target-snowflake`, refer to the repository at <https://github.com/transferwise/pipelinewise-target-snowflake> and documentation at <https://transferwise.github.io/pipelinewise/connectors/targets/snowflake.html>.
+- **Repository**: <https://github.com/transferwise/pipelinewise-target-snowflake>
+- **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/targets/snowflake.html>
+- **Maintainer**: [TransferWise](https://transferwise.com/)
+- **Maintenance status**: Active
 
 #### Alternative variants
 

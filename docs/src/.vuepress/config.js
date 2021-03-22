@@ -43,6 +43,7 @@ const docsSidebar = [
     sidebarDepth: 2,
     children: [
       "/docs/getting-help",
+      "/docs/community",
       "/docs/contributor-guide",
       "/docs/responsible-disclosure",
       "/handbook/",
@@ -101,14 +102,19 @@ module.exports = {
   ],
   dest: "public",
   themeConfig: {
-    nav: [
+      nav: [
       {
-        text: "Sources",
-        link: "/plugins/extractors/",
-      },
-      {
-        text: "Destinations",
-        link: "/plugins/loaders/",
+        text: "Connectors",
+        items: [
+            {
+                text: "Sources",
+                link: "/plugins/extractors/",
+            },
+            {
+                text: "Destinations",
+                link: "/plugins/loaders/",
+            },
+        ]
       },
       {
         text: "Partners",
@@ -120,11 +126,45 @@ module.exports = {
       },
       {
         text: "Getting Help",
-        link: "/docs/getting-help",
+        items: [
+            {
+                text: "Issue Tracker",
+                link: "https://gitlab.com/meltano/meltano/issues"
+            },
+            {
+                text: "Slack",
+                link: "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw"
+            },
+            {
+                text: "Office Hours",
+                link: "/docs/community#office-hours"
+            }
+        ],
+      },
+      {
+        text: "Community",
+        items: [
+            {
+                text: "Guidelines",
+                link: "/docs/community#guidelines"
+            },
+            {
+                text: "Demo Days",
+                link: "/docs/community#demo-days"
+            },
+            {
+                text: "Office Hours",
+                link: "/docs/community#office-hours"
+            },
+            {
+                text: "YouTube",
+                link: "https://www.youtube.com/meltano"
+            }
+        ]
       },
       { text: "Blog", link: "https://www.meltano.com/blog", target: "_self" },
       {
-        text: "Join 750+ on Slack",
+        text: "Join 850+ on Slack",
         link:
           "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw",
         icon: "SlackIcon",
@@ -140,6 +180,11 @@ module.exports = {
         icon: "GitLabIcon",
       },
       {
+        text: "Watch on YouTube",
+        link: "https://www.youtube.com/meltano",
+        icon: "YouTubeIcon",
+      },
+      {
         text: "Get started",
         link: "/docs/getting-started.html",
         cta: true,
@@ -148,15 +193,12 @@ module.exports = {
     sidebar: {
       "/docs": docsSidebar,
       "/tutorials": docsSidebar,
-      "/handbook/engineering/meltanodata-guide": [
-        "/handbook/engineering/meltanodata-guide/",
-        "/handbook/engineering/meltanodata-guide/controller-node",
-      ],
       "/handbook": [
         "/handbook/",
         "/handbook/engineering/",
         "/handbook/marketing/",
         "/handbook/product/",
+        "/handbook/resources/",
       ],
     },
     logo: "/meltano-logo-with-text.svg",

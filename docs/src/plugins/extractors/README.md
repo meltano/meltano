@@ -9,8 +9,8 @@ Meltano lets you easily extract data out of arbitrary data sources (databases, S
 
 Extractors for the following sources are currently [discoverable](/docs/plugins.html#discoverable-plugins) and supported out of the box:
 
-- [Bing Ads](/plugins/extractors/bing-ads.html)
 - [BigQuery](/plugins/extractors/bigquery.html)
+- [Bing Ads](/plugins/extractors/bing-ads.html)
 - [Chargebee](/plugins/extractors/chargebee.html)
 - [Comma Separated Values (CSV)](/plugins/extractors/csv.html)
 - [Facebook Ads](/plugins/extractors/facebook.html)
@@ -30,6 +30,7 @@ Extractors for the following sources are currently [discoverable](/docs/plugins.
 - [Spreadsheets Anywhere](/plugins/extractors/spreadsheets-anywhere.html) (CSV files and Excel spreadsheets on cloud or local storage)
 - [Stripe](/plugins/extractors/stripe.html)
 - [Zendesk](/plugins/extractors/zendesk.html)
+- [Zoom](/plugins/extractors/zoom.html)
 
 To learn more about extracting and [loading](/plugins/loaders/) data using Meltano, refer to the [Data Integration (EL) guide](/docs/integration.html).
 
