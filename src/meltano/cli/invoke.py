@@ -90,11 +90,10 @@ def do_list_commands(plugin):
 
     descriptions = {}
     for cmd in plugin.supported_commands:
-        descriptions[f"{plugin.name}:{cmd}"] = plugin.all_commands[cmd].get(
-            "description"
-        )
+        description = plugin.all_commands[cmd].get("description")
+        descriptions[f"{plugin.name}:{cmd}"] = description
 
-    column_len = max([len(k) for k in descriptions.keys()]) + 2
+    column_len = max(len(name) for name in descriptions.keys()) + 2
     for name, desc in descriptions.items():
         click.secho(name.ljust(column_len, " "), fg="blue", nl=False)
         click.echo(desc)
