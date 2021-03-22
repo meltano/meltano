@@ -115,6 +115,7 @@ Meltano supports the following types of plugins:
 - [**Orchestrators**](#orchestrators) orchestrate a project's scheduled pipelines.
 - [**Transformers**](#transformers) run transforms.
 - [**File bundles**](#file-bundles) bundle files you may want in your project.
+- [**Utilities**](#utilities) perform arbitrary tasks provided by [pip packages](https://pip.pypa.io/en/stable/) with executables.
 
 ### Extractors
 
@@ -747,3 +748,29 @@ meltano config --plugin-type=files dbt set _update transform/dbt_project.yml fal
 
 export DBT__UPDATE='{"transform/dbt_project.yml": false}'
 ```
+
+### Utilities
+
+If none of the other plugin types address your needs, any [pip package](https://pip.pypa.io/en/stable/) that exposes an executable can be added to your project as a utility:
+
+```bash
+meltano add --custom utility <plugin>
+
+# For example:
+meltano add --custom utility yoyo
+(namespace): yoyo
+(pip_url): yoyo-migrations
+(executable): yoyo
+```
+
+You can then invoke the executable using [`meltano invoke`](/docs/command-line-interface.html#invoke):
+
+```bash
+meltano invoke <plugin> [<executable arguments>...]
+
+# For example:
+meltano invoke yoyo new ./migrations -m "Add column to foo"
+```
+
+The benefit of doing this as opposed to adding the package to `requirements.txt` or running `pip install <package>` directly is that any packages installed this way benefit from Meltano's [virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) isolation.
+This avoids dependency conflicts between packages.

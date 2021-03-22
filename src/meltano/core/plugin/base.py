@@ -51,6 +51,7 @@ class PluginType(YAMLEnum):
     ORCHESTRATORS = "orchestrators"
     TRANSFORMERS = "transformers"
     FILES = "files"
+    UTILITIES = "utilities"
 
     def __str__(self):
         return self.value
@@ -65,12 +66,17 @@ class PluginType(YAMLEnum):
     @property
     def singular(self):
         """Makes it singular for `meltano add PLUGIN_TYPE`"""
+        if self is self.__class__.UTILITIES:
+            return "utility"
+
         return self.value[:-1]
 
     @property
     def verb(self):
         if self is self.__class__.TRANSFORMS:
             return self.singular
+        if self is self.__class__.UTILITIES:
+            return "utilize"
 
         return self.value[:-3]
 
@@ -86,10 +92,11 @@ class PluginType(YAMLEnum):
 
     @classmethod
     def from_cli_argument(cls, value):
-        if not value.endswith("s"):
-            value += "s"
+        for plugin_type in cls:
+            if value in {plugin_type.value, plugin_type.singular}:
+                return plugin_type
 
-        return cls(value)
+        raise ValueError(f"{value} is not a valid {cls.__name__}")
 
 
 class PluginRef(Canonical):
