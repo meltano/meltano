@@ -9,9 +9,9 @@ The `target-csv` [loader](/plugins/loaders/) loads [extracted](/plugins/extracto
 
 - **Repository**: <https://github.com/singer-io/target-csv>
 - **Maintainer**: [Stitch](https://www.stitchdata.com/)
-- **Maintenance status**: Nonresponsive to community issues and contributions
+- **Maintenance status**: Unresponsive to community issues and contributions
   - A [more active fork](https://github.com/singer-io/target-csv/network) may be available that you can [use instead](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin).
-  - This plugin is [up for adoption](https://gitlab.com/meltano/meltano/-/issues/2515)!
+  - This plugin is [up for adoption](/docs/contributor-guide.html#adopting-a-plugin)!
 
 ## Getting Started
 

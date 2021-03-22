@@ -9,9 +9,9 @@ The `tap-mongodb` [extractor](/plugins/extractors/) pulls data from a [MongoDB](
 
 - **Repository**: <https://github.com/singer-io/tap-mongodb>
 - **Maintainer**: [Stitch](https://www.stitchdata.com/)
-- **Maintenance status**: Nonresponsive to community issues and contributions
+- **Maintenance status**: Unresponsive to community issues and contributions
   - A [more active fork](https://github.com/singer-io/tap-mongodb/network) may be available that you can [use instead](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin).
-  - This plugin is [up for adoption](https://gitlab.com/meltano/meltano/-/issues/2515)!
+  - This plugin is [up for adoption](/docs/contributor-guide.html#adopting-a-plugin)!
 
 ## Getting Started
 
