@@ -9,9 +9,9 @@ The `tap-shopify` [extractor](/plugins/extractors/) pulls data from the [Shopify
 
 - **Repository**: <https://github.com/singer-io/tap-shopify>
 - **Maintainer**: [Stitch](https://www.stitchdata.com/)
-- **Maintenance status**: Nonresponsive to community issues and contributions
+- **Maintenance status**: Unresponsive to community issues and contributions
   - A [more active fork](https://github.com/singer-io/tap-shopify/network) may be available that you can [use instead](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin).
-  - This plugin is [up for adoption](https://gitlab.com/meltano/meltano/-/issues/2515)!
+  - This plugin is [up for adoption](/docs/contributor-guide.html#adopting-a-plugin)!
 
 ## Getting Started
 
