@@ -751,12 +751,25 @@ export DBT__UPDATE='{"transform/dbt_project.yml": false}'
 
 ### Utilities
 
-If none of the other plugin types address your needs, any [pip packages](https://pip.pypa.io/en/stable/) that expose an executable can be installed with the `utility` plugin type, even for plugins types that Meltano doesn't support yet. You will need to run these executables yourself with `meltano invoke`:
+If none of the other plugin types address your needs, any [pip package](https://pip.pypa.io/en/stable/) that exposes an executable can be added to your project as a utility:
 
 ```bash
 meltano add --custom utility <plugin>
 
-meltano invoke <plugin> [<plugin arguments>...]
+# For example:
+meltano add --custom utility yoyo
+(namespace): yoyo
+(pip_url): yoyo-migrations
+(executable): yoyo
+```
+
+You can then invoke the executable using [`meltano invoke`](/docs/command-line-interface.html#invoke):
+
+```bash
+meltano invoke <plugin> [<executable arguments>...]
+
+# For example:
+meltano invoke yoyo new ./migrations -m "Add column to foo"
 ```
 
 The benefit of doing this as opposed to adding the package to `requirements.txt` or running `pip install <package>` directly is that any packages installed this way benefit from Meltano's [virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) isolation.
