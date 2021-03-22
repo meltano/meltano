@@ -307,9 +307,9 @@ def expand_env_vars(raw_value, env: Dict):
     # find viable substitutions
     var_matcher = re.compile(
         r"""
-        \$                 # starts with a '$'
-        (?:                # either $VAR or ${VAR}
-            {(\w+)}|(\w+)  # capture the variable name as group[0] or group[1]
+        \$                          # starts with a '$'
+        (?:                         # either $VAR or ${VAR}
+            {([A-Z_]+)}|([A-Z_]+)   # capture the variable name as group[0] or group[1]
         )
         """,
         re.VERBOSE,

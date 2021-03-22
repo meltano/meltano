@@ -17,6 +17,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2581](https://gitlab.com/meltano/meltano/-/issues/2581) Only expand `$ALL_CAPS` env vars in `meltano.yml` config values to prevent false positive matches in passwords
+
 ### Breaks
 
 
