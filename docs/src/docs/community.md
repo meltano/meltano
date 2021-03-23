@@ -14,7 +14,7 @@ Everyone interacting in dbt Slack, codebase, issue trackers, and mailing lists a
 
 ### Contributor Guide
 
-We welcome contributions to the project! Please review our [Contributor Guide](/docs/contributor-guide) on how to contribute.
+We welcome contributions to the project! Please review our [Contributor Guide](/docs/contributor-guide.html) on how to contribute.
 
 ## Demo Days
 
