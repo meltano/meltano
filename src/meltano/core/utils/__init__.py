@@ -307,9 +307,11 @@ def expand_env_vars(raw_value, env: Dict):
     # find viable substitutions
     var_matcher = re.compile(
         r"""
-        \$                 # starts with a '$'
-        (?:                # either $VAR or ${VAR}
-            {(\w+)}|(\w+)  # capture the variable name as group[0] or group[1]
+        \$  # starts with a '$'
+        (?:
+            {(\w+)} # ${VAR}
+            |
+            ([A-Z][A-Z0-9_]*) # $VAR
         )
         """,
         re.VERBOSE,
@@ -322,11 +324,11 @@ def expand_env_vars(raw_value, env: Dict):
             val = str(env[var])
 
             if not val:
-                logger.debug(f"Variable {var} is empty.")
+                logger.debug(f"Variable '${var}' is empty.")
 
             return val
         except KeyError as e:
-            logger.debug(f"Variable {var} is missing from the environment.")
+            logger.debug(f"Variable '${var}' is missing from the environment.")
             return None
 
     fullmatch = re.fullmatch(var_matcher, raw_value)

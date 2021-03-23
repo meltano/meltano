@@ -159,6 +159,8 @@ export MELTANO_UI_URL = ""
 which can be found inside the Meltano repository at
 [`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
 
+### Making a custom plugin discoverable
+
 If you've added a [custom plugin](/docs/plugins.html#custom-plugins) (or [variant](/docs/plugins.html#variants)) to your project that could be discoverable and supported out of the box for new users, please contribute its description to this file to save the next user the hassle of setting up the custom plugin.
 The [GitLab Web IDE](https://docs.gitlab.com/ee/user/project/web_ide/) makes it very easy to contribute changes without requiring you to leave your browser.
 
@@ -173,7 +175,7 @@ which live inside the repository under
 However, it is _not_ required to include documentation when you contribute a new plugin definition to `discovery.yml`,
 as members of the core team are happy to any missing docs themselves as part of the review process.
 
-### Plugin definitions
+#### Plugin definitions
 
 At a minimum, a plugin definition must have a `name` and a `namespace`, and at least one [variant definition](#variant-definitions) with a `pip_url` (its [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument).
 
@@ -186,7 +188,7 @@ Additionally:
 - non-default variant executable names can be specified using `executable`, and
 - default values for [plugin extras](/docs/configuration.html#plugin-extras) can be specified at the plugin definition level and further overridden at the variant definition level.
 
-#### Variant definitions
+##### Variant definitions
 
 If a plugin will only ever have a single [variant](/docs/plugins.html#variants) (as is typically the case for all types except for extractors and loaders),
 the variant definition can be embedded in the plugin definition (variant properties can be mixed in with plugin properties), and a variant name _should not_ be specified using a `variant` key.
@@ -198,7 +200,7 @@ If multiple variants of a plugin are available, the plugin definition should hav
 The first variant is considered the default, and the _original_ variant supported by Meltano should be marked with `original: true`.
 Deprecated variants should be marked with `deprecated: true`.
 
-#### Setting definitions
+##### Setting definitions
 
 Each extractor (tap) and loader (target) variant in the `discovery.yml` has a `settings` property. Nested under this property are a variable amount of individual settings. In the Meltano UI these settings are parsed to generate a configuration form. To improve the UX of this form, each setting has a number of optional properties:
 
@@ -220,9 +222,24 @@ Each extractor (tap) and loader (target) variant in the `discovery.yml` has a `s
       value_post_processor: stringify # Optional (Modify loaded value before passing it to plugin. Target type does not need to match `kind`. Options: `stringify`)
 ```
 
-#### Protected settings
+###### Protected settings
 
 Until role-based access control is implemented in Meltano, we need to prevent user editing of certain settings from the UI. View this [`tap-gitlab` environment variable setup example](/tutorials/gitlab-and-postgres.html#add-extractor) to learn how to work with this current limitation.
+
+### Adopting a plugin
+
+When the maintainer of the default [variant](/docs/plugins.html#variants) of a discoverable plugin becomes unresponsive to issues and contributions filed by the community,
+that plugin is considered up for adoption, which means that we are looking for a different variant of the plugin with a more engaged maintainer to become the new default.
+
+This new variant can either be a fork of the original default variant, or an alternative implementation for the same source or destination, as long as it is actively maintained.
+
+If you maintain or are aware of such a variant,
+please add it to your Meltano project as a [custom plugin](/docs/plugins.html#custom-plugins) and [make it discoverable](#making-a-custom-plugin-discoverable),
+or [file an issue](/docs/getting-help.html#issue-tracker) so that the Meltano core team can assist you.
+
+As a plugin's primary maintainer, you do not have to spend a lot of time improving the plugin yourself.
+In fact, attracting more users and getting the community involved is likely to recude your personal maintenance burden,
+since you'll receive contributions with bug fixes and new features that you will only be expected to review, not build yourself.
 
 ### Local changes to `discovery.yml`
 
