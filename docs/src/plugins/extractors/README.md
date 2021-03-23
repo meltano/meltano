@@ -27,6 +27,7 @@ Extractors for the following sources are currently [discoverable](/docs/plugins.
 - [Sage Intacct](/plugins/extractors/intacct.html)
 - [Salesforce](/plugins/extractors/salesforce.html)
 - [Shopify](/plugins/extractors/shopify.html)
+- [Slack](/plugins/extractors/slack.html)
 - [Spreadsheets Anywhere](/plugins/extractors/spreadsheets-anywhere.html) (CSV files and Excel spreadsheets on cloud or local storage)
 - [Stripe](/plugins/extractors/stripe.html)
 - [Zendesk](/plugins/extractors/zendesk.html)
