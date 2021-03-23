@@ -10,16 +10,25 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2544](https://gitlab.com/meltano/meltano/-/issues/2544) Add support for `utility` plugin type
-- [#2614](https://gitlab.com/meltano/meltano/-/issues/2590) Add `mashey` variant of `tap-zoom`
-
 ### Changes
 
 ### Fixes
 
-- [#2581](https://gitlab.com/meltano/meltano/-/issues/2581) Only expand `$ALL_CAPS` env vars in `meltano.yml` config values to prevent false positive matches in passwords
-
 ### Breaks
+
+
+## 1.71.0 - (2021-03-23)
+---
+
+### New
+
+- [#2544](https://gitlab.com/meltano/meltano/-/issues/2544) Add support for `utility` plugin type
+- [#2614](https://gitlab.com/meltano/meltano/-/issues/2590) Add `mashey` variant of `tap-zoom`
+
+
+### Fixes
+
+- [#2581](https://gitlab.com/meltano/meltano/-/issues/2581) Only expand `$ALL_CAPS` env vars in `meltano.yml` config values to prevent false positive matches in passwords
 
 
 ## 1.70.0 - (2021-02-23)
