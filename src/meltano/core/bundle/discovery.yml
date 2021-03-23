@@ -1088,6 +1088,22 @@ extractors:
       - name: start_date
         kind: date_iso8601
         description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+  - name: tap-slack
+    label: Slack
+    description: Team communication tool
+    namespace: tap_slack
+    docs: 'https://meltano.com/plugins/extractors/slack.html'
+    repo: https://github.com/Mashey/tap-slack
+    pip_url: git+https://github.com/Mashey/tap-slack.git
+    capabilities:
+      - catalog
+      - discover
+      - state
+    settings:
+      - name: api_token
+        ind: password
+        label: API Token
+        documentation: https://support.zendesk.com/hc/en-us/articles/226022787-Generating-a-new-API-token-
   - name: tap-spreadsheets-anywhere
     label: Spreadsheets Anywhere
     description: Data extractor for CSV and Excel files from any smart_open supported transport (S3, SFTP, localhost, etc...)
