@@ -13,6 +13,8 @@ from meltano.core.behavior.hookable import HookObject
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import NotFound, compact, find_named, flatten
 
+from .command import Command
+
 logger = logging.getLogger(__name__)
 
 
@@ -158,7 +160,7 @@ class Variant(NameEq, Canonical):
             capabilities=list(capabilities),
             settings_group_validation=list(settings_group_validation),
             settings=list(map(SettingDefinition.parse, settings)),
-            commands=commands,
+            commands=Command.parse_all(commands),
             extras=extras,
         )
 

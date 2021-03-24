@@ -42,10 +42,8 @@ class TestCliInvoke:
 
     def test_invoke(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(cli, ["invoke", "utility-mock"])
-        if res.exception:
-            raise res.exception
 
-        assert res.exit_code == 0
+        assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
         mock_invoke.assert_called_once()
         args, kwargs = mock_invoke.call_args
         args = args[0]
@@ -54,10 +52,8 @@ class TestCliInvoke:
 
     def test_invoke_args(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(cli, ["invoke", "utility-mock", "--help"])
-        if res.exception:
-            raise res.exception
 
-        assert res.exit_code == 0
+        assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
         mock_invoke.assert_called_once()
         args = mock_invoke.call_args[0][0]
         assert args[0].endswith("utility-mock")
@@ -67,10 +63,8 @@ class TestCliInvoke:
         res = cli_runner.invoke(
             cli, ["invoke", "utility-mock:cmd"], env={"ENV_VAR_ARG": "arg"}
         )
-        if res.exception:
-            raise res.exception
 
-        assert res.exit_code == 0
+        assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
         mock_invoke.assert_called_once()
 
         args = mock_invoke.call_args[0][0]
@@ -81,10 +75,8 @@ class TestCliInvoke:
         res = cli_runner.invoke(
             cli, ["invoke", "utility-mock:cmd", "--verbose"], env={"ENV_VAR_ARG": "arg"}
         )
-        if res.exception:
-            raise res.exception
 
-        assert res.exit_code == 0
+        assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
         mock_invoke.assert_called_once()
 
         args = mock_invoke.call_args[0][0]
@@ -140,7 +132,7 @@ class TestCliInvoke:
     def test_list_commands(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(cli, ["invoke", "--list-commands", "utility-mock"])
 
-        assert res.exit_code == 0
+        assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
         mock_invoke.assert_not_called()
         assert "utility-mock:cmd" in res.output
         assert "description of utility command" in res.output

@@ -6,6 +6,7 @@ from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import flatten, uniques_in
 
 from .base import PluginDefinition, PluginRef, PluginType, Variant
+from .command import Command
 from .factory import base_plugin_factory
 
 logger = logging.getLogger(__name__)
@@ -78,7 +79,7 @@ class ProjectPlugin(PluginRef):
         self.set_presentation_attrs(extras)
         self.variant = variant
         self.pip_url = pip_url
-        self.commands = commands
+        self.commands = Command.parse_all(commands)
 
         self._fallbacks.update(
             ["logo_url", "description", self.VARIANT_ATTR, "pip_url"]
@@ -148,7 +149,7 @@ class ProjectPlugin(PluginRef):
     @property
     def supported_commands(self):
         """Return all defined commands for the plugin."""
-        return [key for key, value in self.all_commands.items() if "args" in value]
+        return list(self.all_commands.keys())
 
     def env_prefixes(self, for_writing=False):
         prefixes = [self.name, self.namespace]

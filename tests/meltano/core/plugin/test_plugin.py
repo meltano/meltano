@@ -401,22 +401,17 @@ class TestProjectPlugin:
 
     def test_command_inheritance(self, tap, inherited_tap, plugin_discovery_service):
         # variants
-        assert tap.all_commands == {
-            "cmd": {
-                "args": "cmd meltano",
-            },
-            "cmd-variant": {
-                "args": "cmd-variant meltano",
-            },
-        }
+        assert tap.all_commands["cmd"].args == "cmd meltano"
+        assert tap.all_commands["cmd"].description == "a description of cmd"
+
+        assert tap.all_commands["cmd-variant"].args == "cmd-variant meltano"
+        assert tap.all_commands["cmd-variant"].description is None
         assert tap.supported_commands == ["cmd", "cmd-variant"]
 
         # inheritance
-        assert inherited_tap.all_commands == {
-            "cmd": {"args": "cmd inherited"},
-            "cmd-variant": {"args": "cmd-variant meltano"},
-            "cmd-inherited": {"args": "cmd-inherited"},
-        }
+        assert inherited_tap.all_commands["cmd"].args == "cmd inherited"
+        assert inherited_tap.all_commands["cmd-variant"].args == "cmd-variant meltano"
+        assert inherited_tap.all_commands["cmd-inherited"].args == "cmd-inherited"
         assert inherited_tap.supported_commands == [
             "cmd",
             "cmd-variant",

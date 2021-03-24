@@ -194,7 +194,7 @@ class PluginInvoker:
         """Materialize the arguments to be passed to the executable."""
         if command:
             try:
-                plugin_args = self.plugin.all_commands[command]["args"]
+                plugin_args = self.plugin.all_commands[command].args
             except KeyError as err:
                 raise UnknownCommandError(self.plugin, command) from err
             plugin_args = shlex.split(plugin_args)
