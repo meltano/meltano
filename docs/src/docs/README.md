@@ -117,6 +117,56 @@ Be aware that issue milestones serve more as a rough indication of relative prio
 since short-term priorities can change quickly in response to community feedback, and it's hard to predict how much progress can be made in a week.
 Also note that issues labeled `flow::To Do` have higher priority and are more likely to be completed in a given week than those labeled `flow::Triage`, which are often moved to the next milestone at the end of the week, with issues already scheduled for the next week pushed out to make room for them.
 
+Below you will found our current roadmap. As this projects out into the future it is subject to change based on feedback. Don't see something you want on the roadmap? [Make an issue](https://gitlab.com/meltano/meltano/-/issues) and let us know!
+
+#### April 2021
+
+Our focus for April will be around continuing to improve the Singer SDK for taps and to build out the SingerHub to make discoverability of taps and targets as easy as possible.
+
+* [Singer SDK for Taps](https://gitlab.com/groups/meltano/-/epics/90)
+* [SingerHub](https://gitlab.com/groups/meltano/-/epics/83)
+
+#### May 2021
+
+Our focus for May will be on building out the Singer SDK for targets and to improve our dbt integration.
+
+* [Singer SDK for Targets](https://gitlab.com/meltano/singer-sdk/-/issues/4)
+* [Enhanced dbt integration](https://gitlab.com/groups/meltano/-/epics/82)
+
+#### June 2021
+
+Our focus for June will be to enhance the plugin architecture to support ETLT use cases such as data obfuscation, choosing a great OLAP database to work with out-of-the-box with Meltano, and to support the "Reverse ELT" use case of loading data into a SaaS API. 
+
+* [Plugin Archiecture for ETLT Use Cases](https://gitlab.com/meltano/meltano/-/issues/2300)
+* [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
+* [Support Reverse ETL Use Case](https://gitlab.com/meltano/meltano/-/issues/2665)
+
+#### July 2021
+
+Our focus for July will be to expand our integrations for orchestration, data quality, and analysis. 
+
+* [Dagster](https://gitlab.com/meltano/meltano/-/issues/2393 )
+* [Great Expectations](https://gitlab.com/meltano/meltano/-/issues/2454)
+* [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
+* [Superset](https://gitlab.com/meltano/meltano/-/issues/2605)
+* [Jupyter Notebooks](https://gitlab.com/meltano/meltano/-/issues/2595)
+
+#### Rest of 2021-Q3
+
+Our focus for the rest of Q3 will be to enable simple cloud deployments, improve the integration with git providers, and further enhancing Singer protocol extensions such as Fast Sync.
+
+* [Simple Cloud Deploys](https://gitlab.com/groups/meltano/-/epics/28)
+* [Git-provider Integrations](https://gitlab.com/groups/meltano/-/epics/92)
+* [Fast Sync / Batch Messages](https://gitlab.com/meltano/meltano/-/issues/2364)
+
+#### 2021-Q4
+
+Our focus for Q4 will be on creating a compelling monitoring, observability, and data linage featureset. We also aim to improve the UI and potentailly start offering a SaaS deployment of Meltano.
+
+* [Monitoring, observability, and data lineage](https://gitlab.com/groups/meltano/-/epics/93)
+* [Fully featured UI](https://gitlab.com/groups/meltano/-/epics/78)
+* [SaaS Deployment of Meltano](https://gitlab.com/groups/meltano/-/epics/94)
+
 ## Contributing
 
 Meltano is built for and by its community, and we welcome your contributions to our [GitLab repository](https://gitlab.com/meltano/meltano),
