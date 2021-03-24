@@ -254,7 +254,7 @@ Recurring office hours are available for Meltano community members to discuss ou
 
 - When discussions are in progress, drop the screenshare in order to give participants more face time.
 - Be aware that the owner's view layout (gallery or otherwise) also changes the view for others.
-- Do try to drop relevant links in the zoom chat.
+- Share any relevant links in the zoom chat.
 
 #### After the livestream session ends
 
