@@ -1838,13 +1838,13 @@ transformers:
         args: clean
         description: Delete all folders in the clean-targets list (usually the dbt_modules and target directories.)
       compile:
-        args: compile
+        args: compile --models $DBT_MODELS
         description: Generates executable SQL from source model, test, and analysis files. Compiled SQL files are written to the target/ directory.
       deps:
         args: deps
         description: Pull the most recent version of the dependencies listed in packages.yml
       run:
-        args: run
+        args: run --models $DBT_MODELS
         description: Compile SQL and execute against the current target database.
       seed:
         args: seed
