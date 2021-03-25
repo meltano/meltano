@@ -9,7 +9,7 @@ The `target-postgres` [loader](/plugins/loaders/) loads [extracted](/plugins/ext
 
 - **Repository**: <https://github.com/transferwise/pipelinewise-target-postgres>
 - **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/targets/postgres.html>
-- **Maintainer**: [TransferWise](https://transferwise.com/)
+- **Maintainer**: [Wise](https://wise.com/)
 - **Maintenance status**: Active
 
 #### Alternative variants
