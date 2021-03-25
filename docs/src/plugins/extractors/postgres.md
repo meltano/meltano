@@ -9,7 +9,7 @@ The `tap-postgres` [extractor](/plugins/extractors/) pulls data from a [PostgreS
 
 - **Repository**: <https://github.com/transferwise/pipelinewise-tap-postgres>
 - **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/taps/postgres.html>
-- **Maintainer**: [TransferWise](https://transferwise.com/)
+- **Maintainer**: [Wise](https://wise.com/)
 - **Maintenance status**: Active
 
 ## Getting Started
