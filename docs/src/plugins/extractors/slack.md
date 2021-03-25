@@ -56,30 +56,12 @@ If you run into any issues, [learn how to get help](/docs/getting-help.html).
 
 ## Settings
 
-`tap-slack` requires the [configuration](/docs/configuration.html) of the following settings:
+`tap-slack` requires the [configuration](/docs/configuration.html) of the following setting:
 
-For API Authentication:
+- [API Token](#api-token)
 
-- [JSON Web Token](#json-web-token)
-
-These and other supported settings are documented below.
+This and other supported settings are documented below.
 To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
-
-To obtain a token for a single workspace you will need to create a [Slack App](https://api.slack.com/apps?new_app=1) in your workspace and assigning it the relevant scopes. The minimum required scopes for the tap are:
-
-    channels:history
-    channels:join
-    channels:read
-    files:read
-    groups:read
-    links:read
-    reactions:read
-    remote_files:read
-    remote_files:write
-    team:read
-    usergroups:read
-    users.profile:read
-    users:read
 
 #### Minimal configuration
 
@@ -97,72 +79,125 @@ plugins:
 Sensitive values are most appropriately stored in [the environment](/docs/configuration.html#configuring-settings) or your project's [`.env` file](/docs/project.html#env):
 
 ```bash
-export TAP_ZOOM_JWT=my_jwt
+export TAP_SLACK_API_TOKEN=my_api_token
 ```
 
-### JSON Web Token
+### API Token
 
-- Name: `jwt`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ZOOM_JWT`
+- Name: `api_token`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SLACK_API_TOKEN`
 
-Your Slack JSON Web Token. The JWT is likely the easiest option for tap users. Configure the JWT with a very long expiry so it does not expire.
+Your Slack API Token. To obtain a token for a single workspace you will need to create a [Slack App](https://api.slack.com/apps?new_app=1) in your workspace and assigning it the relevant scopes. The minimum required scopes for the tap are:
+
+* `channels:history`
+* `channels:join`
+* `channels:read`
+* `files:read`
+* `groups:read`
+* `links:read`
+* `reactions:read`
+* `remote_files:read`
+* `remote_files:write`
+* `team:read`
+* `usergroups:read`
+* `users.profile:read`
+* `users:read`
 
 #### How to use
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config tap-slack set jwt <jwt>
+meltano config tap-slack set api_token <api_token>
 
-export TAP_ZOOM_JWT=<jwt>
+export TAP_SLACK_API_TOKEN=<api_token>
 ```
 
-### Client ID
+### Channels
 
-- Name: `client_id`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ZOOM_CLIENT_ID`
+- Name: `channels`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SLACK_CHANNELS`
 
-Your Slack Client ID - example from docs: `7lstjK9NTyett_oeXtFiEQ`. See the [Slack OAuth App Credentials documentation](https://marketplace.slack.us/docs/guides/build/oauth-app#app-credentials) for more information.
+Optionally specify specific channels to sync. By default the tap will sync all channels it has been invited to, but this can be overriden using this configuration. Note that the values need to be channel ID, not the name, as [recommended by the Slack API](https://api.slack.com/types/conversation#other_attributes). To get the ID for a channel, either use the Slack API or find it in the [URL](https://www.wikihow.com/Find-a-Channel-ID-on-Slack-on-PC-or-Mac).
 
 #### How to use
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config tap-slack set slack_client_id <client_id>
+meltano config tap-slack set TAP_SLACK_CHANNELS '["<channelid>", ...]'
 
-export TAP_ZOOM_CLIENT_ID=<client_id>
+export TAP_SLACK_CHANNELS='["<channelid>", ...]'
 ```
 
-### Client Secret
+### Private Channels
 
-- Name: `client_secret`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ZOOM_CLIENT_SECRET`
+- Name: `private_channels`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SLACK_PRIVATE_CHANNELS`
+- Default: `true`
 
-The Slack Client Secret that is generated when app credentials are created. See the [Slack OAuth App Credentials documentation](https://marketplace.slack.us/docs/guides/build/oauth-app#app-credentials) for more information.
+Specifies whether to sync private channels or not. Default is true.
 
 #### How to use
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config tap-slack set client_secret <client secret>
+meltano config tap-slack set TAP_SLACK_PRIVATE_CHANNELS false
 
-export TAP_ZOOM_CLIENT_SECRET=<client secret>
+export TAP_SLACK_PRIVATE_CHANNELS=false
 ```
 
-### Refresh Token
+### Public Channels
 
-- Name: `refresh_token`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ZOOM_REFRESH_TOKEN`
+- Name: `join_public_channels`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SLACK_JOIN_PUBLIC_CHANNELS`
+- Default: `false`
 
-The Slack Refresh Token that is provided after successfully authenticating with Slack. See the [Slack OAuth Access Token Request documentation](https://marketplace.slack.us/docs/guides/auth/oauth#step-2-request-access-token) for more information.
+Specifies whether to have the tap auto-join all public channels in your ogranziation. Default is false.
 
 #### How to use
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config tap-slack set refresh_token <refresh token>
+meltano config tap-slack set TAP_SLACK_JOIN_PUBLIC_CHANNELS true
 
-export TAP_ZOOM_REFRESH_TOKEN=<refresh token>
+export TAP_SLACK_JOIN_PUBLIC_CHANNELS=true
+```
+
+### Archived Channels
+
+- Name: `archived_channels`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SLACK_ARCHIVED_CHANNELS`
+- Default: `false`
+
+Specifies whether the tap will sync archived channels or not. Note that a bot cannot join an archived channel, so unless the bot was added to the channel prior to it being archived it will not be able to sync the data from that channel. Default is false.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-slack set TAP_SLACK_ARCHIVED_CHANNELS true
+
+export TAP_SLACK_ARCHIVED_CHANNELS=true
+```
+
+### Date Window Size
+
+- Name: `date_window_size`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SLACK_DATE_WINDOW_SIZE`
+- Default: `7`
+
+Specifies the window size for syncing certain streams (messages, files, threads). The default is 7 days.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-slack set TAP_SLACK_DATE_WINDOW_SIZE <integer>
+
+export TAP_SLACK_DATE_WINDOW_SIZE=<integer>
+```
