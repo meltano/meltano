@@ -164,7 +164,7 @@ class PluginInvoker:
         """Materialize the arguments to be passed to the executable."""
         if command:
             try:
-                plugin_args = self.plugin.all_commands[command].expand_args(
+                plugin_args = self.plugin.all_commands[command].expanded_args(
                     command, env
                 )
             except KeyError as err:

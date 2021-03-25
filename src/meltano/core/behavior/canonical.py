@@ -45,7 +45,13 @@ class Canonical:
             return list(map(Canonical.as_canonical, target))
 
         if isinstance(target, dict):
-            return {key: Canonical.as_canonical(val) for key, val in target.items()}
+            results = {}
+            for key, val in target.items():
+                if isinstance(val, Canonical):
+                    results[key] = val.canonical()
+                else:
+                    results[key] = Canonical.as_canonical(val)
+            return results
 
         return copy.deepcopy(target)
 

@@ -23,7 +23,7 @@ class Command(Canonical):
     def __init__(self, args: str, description: Optional[str] = None):
         super().__init__(args=args, description=description)
 
-    def expand_args(self, name, env):
+    def expanded_args(self, name, env):
         """
         Replace any env var arguments with their values.
 
@@ -38,6 +38,18 @@ class Command(Canonical):
             expanded.append(value)
 
         return expanded
+
+    def canonical(self):
+        return Command.as_canonical(self)
+
+    @classmethod
+    def as_canonical(cls, target):
+        canonical = super().as_canonical(target)
+        # if there isn't a description, flatten the object
+        if "description" not in canonical:
+            return canonical["args"]
+
+        return canonical
 
     @classmethod
     def parse(cls, obj):
