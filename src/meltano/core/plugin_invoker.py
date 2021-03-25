@@ -2,7 +2,6 @@ import asyncio
 import copy
 import logging
 import os
-import shlex
 import subprocess
 from contextlib import contextmanager
 from typing import Optional
@@ -14,7 +13,6 @@ from .plugin.project_plugin import ProjectPlugin
 from .plugin.settings_service import PluginSettingsService
 from .project import Project
 from .project_plugins_service import ProjectPluginsService
-from .utils import expand_env_vars
 from .venv_service import VenvService, VirtualEnv
 
 
@@ -27,23 +25,6 @@ def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
     invoker = cls(project, plugin, *args, **kwargs)
 
     return invoker
-
-
-def expanded_args(command, args, env):
-    """
-    Replace any env var arguments with their values.
-
-    :raises UndefinedEnvVarError: if an env var argument is not set
-    """
-    expanded = []
-    for arg in args:
-        value = expand_env_vars(arg, env)
-        if not value:
-            raise UndefinedEnvVarError(command, arg)
-
-        expanded.append(value)
-
-    return expanded
 
 
 class InvokerError(Error):
@@ -87,17 +68,6 @@ class UnknownCommandError(InvokerError):
                 f"{self.plugin.type.descriptor.capitalize()} '{self.plugin.name}'",
                 desc,
             ]
-        )
-
-
-class UndefinedEnvVarError(InvokerError):
-    """Occurs when an environment variable is used as a command argument but is not set."""
-
-    def __init__(self, command, var):
-        """Initialize UndefinedEnvVarError."""
-        super().__init__(
-            f"Command '{command}' referenced unset environment variable '{var}' in an argument. "
-            + "Set the environment variable or update the command definition."
         )
 
 
@@ -194,11 +164,11 @@ class PluginInvoker:
         """Materialize the arguments to be passed to the executable."""
         if command:
             try:
-                plugin_args = self.plugin.all_commands[command].args
+                plugin_args = self.plugin.all_commands[command].expand_args(
+                    command, env
+                )
             except KeyError as err:
                 raise UnknownCommandError(self.plugin, command) from err
-            plugin_args = shlex.split(plugin_args)
-            plugin_args = expanded_args(command, plugin_args, env)
         else:
             plugin_args = self.plugin.exec_args(self)
 

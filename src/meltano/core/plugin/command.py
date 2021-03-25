@@ -1,6 +1,20 @@
+import shlex
 from typing import Optional
 
 from meltano.core.behavior.canonical import Canonical
+from meltano.core.error import Error
+from meltano.core.utils import expand_env_vars
+
+
+class UndefinedEnvVarError(Error):
+    """Occurs when an environment variable is used as a command argument but is not set."""
+
+    def __init__(self, command_name, var):
+        """Initialize UndefinedEnvVarError."""
+        super().__init__(
+            f"Command '{command_name}' referenced unset environment variable '{var}' in an argument. "
+            + "Set the environment variable or update the command definition."
+        )
 
 
 class Command(Canonical):
@@ -8,6 +22,22 @@ class Command(Canonical):
 
     def __init__(self, args: str, description: Optional[str] = None):
         super().__init__(args=args, description=description)
+
+    def expand_args(self, name, env):
+        """
+        Replace any env var arguments with their values.
+
+        :raises UndefinedEnvVarError: if an env var argument is not set
+        """
+        expanded = []
+        for arg in shlex.split(self.args):
+            value = expand_env_vars(arg, env)
+            if not value:
+                raise UndefinedEnvVarError(name, arg)
+
+            expanded.append(value)
+
+        return expanded
 
     @classmethod
     def parse(cls, obj):
