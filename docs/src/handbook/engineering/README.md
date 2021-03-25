@@ -223,18 +223,49 @@ Recurring office hours are available for Meltano community members to discuss ou
 
 ### Office Hours: Workflow
 
+#### Prepping the week ahead
+
+- Within the week or two leading up to the office hours, look out for at least one or two community members and corresponding topics which can benefit from synchronous communication.
+- Prep a list of contributor names so we can call them out during the session as time allows. (Use a dedicated slide with their names or aliases if warranted.)
+- Timebox rotating topics and set expectations ahead of time in the slides: e.g. 15 minutes for dedicated topic, 45 minutes for questions, debugging, AMA, etc.
+
+#### Day before the meeting:
+
+- Slack:
+    - Post reminder to #office-hours
+    - Share to #events and #general
+- Tweet:
+    - Draft a short memo for the Tweet text. Post should come from the brand account with office hours link and time.
+    - Schedule Tweet for 30 minutes ahead of session.
+    - RT from personal accounts.
+
+#### 10 Minutes before Meeting Time:
+
 1. Launch zoom meeting room as usual.
-2. From the "More" or "..." menu, select "Live on Youtube".
-    1. When asked which account, select your `@meltano` account.
-    2. When asked which brand account, select the `Meltano` brand.
-    3. When asked for a stream title, accept the default title `Meltano Office Hours`. (We'll update this title later.)
-    4. Optionally, in Zoom you may copy the livestream link and paste into Slack `#office-hours` channel.
-3. After the livestream session ends:
-    1. Log into the YouTube account, locate the livestream and select the "Edit" option.
-    2. Update the video title with the date of the session, e.g. `Meltano Office Hours Livestream on YYYY-MM-DD`
-    3. Generate list of timestamps for each significant topic.
-    4. Update the topic features + timestamps within the YouTube video description.
-    5. Add a link within the video description to the `#office-hours` channel in slack.
+2. Immediately start the YouTube auth flow (5-10 minutes ahead of the stream start):
+    1. From the "More" or "..." menu, select "Live on Youtube".
+    2. When asked which account, select your `@meltano` account.
+    3. When asked which brand account, select the `Meltano` brand.
+    4. When asked for a stream title, accept the default title `Meltano Office Hours`. (We'll update this title later.)
+    5. Wait on this screen until the designated meeting time and you are ready to hit 'Go Live!'
+    6. Optionally, in Zoom you may copy the livestream link and paste into Slack `#office-hours` channel.
+
+#### During the Office Hours session
+
+- When discussions are in progress, drop the screenshare in order to give participants more face time.
+- Be aware that the owner's view layout (gallery or otherwise) also changes the view for others.
+- Share any relevant links in the zoom chat.
+
+#### After the livestream session ends
+
+1. Log into the YouTube account, locate the livestream and select the "Edit" option.
+2. Update the video title with the date of the session, e.g. `Meltano Office Hours Livestream on YYYY-MM-DD`
+3. Update the video front image with a screenshot of the deck.
+4. Generate list of timestamps for each significant topic.
+5. Update the topic features + timestamps within the YouTube video description.
+6. Add a link within the video description to the `#office-hours` channel in slack.
+7. Note: Although YouTube does allow editing in the website, this feature is not available until
+   several hours after the recording, and video edits might take up to several hours to apply.
 
 ## Outages & escalation
 
