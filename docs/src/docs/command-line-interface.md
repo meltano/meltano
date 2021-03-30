@@ -458,7 +458,7 @@ meltano invoke dbt:snapshot
 Additional arguments can be specified as well, which will be appended to the command.
 
 ```bash
-meltano invoke dbt:seed --verbose
+meltano invoke dbt:seed --show --threads 5
 ```
 
 To see what commands a plugin supports, use `--list-command`:
