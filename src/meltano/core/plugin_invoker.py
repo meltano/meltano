@@ -160,8 +160,9 @@ class PluginInvoker:
             self.plugin.executable, name=self.plugin.name, namespace=self.plugin.type
         )
 
-    def exec_args(self, *args, command=None, env={}):
+    def exec_args(self, *args, command=None, env=None):
         """Materialize the arguments to be passed to the executable."""
+        env = env or {}
         if command:
             try:
                 plugin_args = self.plugin.all_commands[command].expanded_args(
@@ -193,23 +194,32 @@ class PluginInvoker:
         return {}
 
     @contextmanager
-    def _invoke(self, *args, require_preparation=True, env={}, command=None, **popen):
+    def _invoke(self, *args, require_preparation=True, **kwargs):
         if require_preparation and not self._prepared:
             raise InvokerNotPreparedError()
 
         with self.plugin.trigger_hooks("invoke", self, args):
-            popen_options = {**self.Popen_options(), **popen}
-            popen_env = {**self.env(), **env}
-            popen_args = self.exec_args(*args, command=command, env=popen_env)
-            logging.debug(f"Invoking: {popen_args}")
-            logging.debug(f"Env: {popen_env}")
+            with self._prepare_args(*args, **kwargs) as (
+                popen_args,
+                popen_options,
+                popen_env,
+            ):
+                logging.debug(f"Invoking: {popen_args}")
+                logging.debug(f"Env: {popen_env}")
 
-            try:
-                yield (popen_args, popen_options, popen_env)
-            except FileNotFoundError as err:
-                raise ExecutableNotFoundError(
-                    self.plugin, self.plugin.executable
-                ) from err
+                try:
+                    yield (popen_args, popen_options, popen_env)
+                except FileNotFoundError as err:
+                    raise ExecutableNotFoundError(
+                        self.plugin, self.plugin.executable
+                    ) from err
+
+    def _prepare_args(self, *args, env=None, command=None, **popen):
+        env = env or {}
+        popen_options = {**self.Popen_options(), **popen}
+        popen_env = {**self.env(), **env}
+        popen_args = self.exec_args(*args, command=command, env=popen_env)
+        yield (popen_args, popen_options, popen_env)
 
     def invoke(self, *args, **kwargs):
         with self._invoke(*args, **kwargs) as (popen_args, popen_options, popen_env):

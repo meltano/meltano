@@ -40,8 +40,8 @@ class ProjectPlugin(PluginRef):
         namespace: Optional[str] = None,
         variant: Optional[str] = None,
         pip_url: Optional[str] = None,
-        config: Optional[dict] = {},
-        commands: Optional[dict] = {},
+        config: Optional[dict] = None,
+        commands: Optional[dict] = None,
         default_variant=Variant.ORIGINAL_NAME,
         **extras,
     ):
@@ -103,7 +103,7 @@ class ProjectPlugin(PluginRef):
             # values derived from its name instead
             self._fallbacks.update(["namespace", "label"])
 
-        self.config = copy.deepcopy(config)
+        self.config = copy.deepcopy(config or {})
         self.extras = extras
 
         if "profiles" in extras:

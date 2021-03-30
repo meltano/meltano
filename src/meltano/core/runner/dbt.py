@@ -27,7 +27,7 @@ class DbtRunner(Runner):
     def plugin_context(self):
         return self.context.transformer
 
-    async def invoke(self, dbt: PluginInvoker, *args, log=None, command=None, **kwargs):
+    async def invoke(self, dbt: PluginInvoker, *args, log=None, **kwargs):
         """Call the dbt executable with the given arguments in a new process."""
         log = log or sys.stderr
 
@@ -35,7 +35,6 @@ class DbtRunner(Runner):
             handle = await dbt.invoke_async(
                 *args,
                 **kwargs,
-                command=command,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -53,6 +52,7 @@ class DbtRunner(Runner):
 
         exitcode = handle.returncode
         if exitcode:
+            command = kwargs["command"] or args[0]
             raise RunnerError(
                 f"`dbt {command}` failed", {PluginType.TRANSFORMERS: exitcode}
             )

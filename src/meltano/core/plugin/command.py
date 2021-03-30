@@ -1,3 +1,4 @@
+"""Stored command arguments for plugins."""
 import shlex
 from typing import Optional
 
@@ -21,6 +22,7 @@ class Command(Canonical):
     """This class represents stored command arguments for plugins."""
 
     def __init__(self, args: str, description: Optional[str] = None):
+        """Initialize a Command."""
         super().__init__(args=args, description=description)
 
     def expanded_args(self, name, env):
@@ -40,10 +42,12 @@ class Command(Canonical):
         return expanded
 
     def canonical(self):
+        """Serialize the command."""
         return Command.as_canonical(self)
 
     @classmethod
     def as_canonical(cls, target):
+        """Serialize the target command."""
         canonical = super().as_canonical(target)
         # if there isn't a description, flatten the object
         if "description" not in canonical:

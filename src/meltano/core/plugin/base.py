@@ -146,7 +146,7 @@ class Variant(NameEq, Canonical):
         capabilities: Optional[list] = [],
         settings_group_validation: Optional[list] = [],
         settings: Optional[list] = [],
-        commands: Optional[dict] = {},
+        commands: Optional[dict] = None,
         **extras,
     ):
         super().__init__(
