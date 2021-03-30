@@ -9,7 +9,7 @@ The `target-snowflake` [loader](/plugins/loaders/) loads [extracted](/plugins/ex
 
 - **Repository**: <https://github.com/transferwise/pipelinewise-target-snowflake>
 - **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/targets/snowflake.html>
-- **Maintainer**: [TransferWise](https://transferwise.com/)
+- **Maintainer**: [Wise](https://wise.com/)
 - **Maintenance status**: Active
 
 #### Alternative variants

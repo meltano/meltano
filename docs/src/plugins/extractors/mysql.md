@@ -9,7 +9,7 @@ The `tap-mysql` [extractor](/plugins/extractors/) pulls data from a [MySQL](http
 
 - **Repository**: <https://github.com/transferwise/pipelinewise-tap-mysql>
 - **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/taps/mysql.html>
-- **Maintainer**: [TransferWise](https://transferwise.com/)
+- **Maintainer**: [Wise](https://wise.com/)
 - **Maintenance status**: Active
 
 ## Getting Started

@@ -47,6 +47,7 @@ sidebarDepth: 2
 - [Data Culture](https://www.datacult.com/subscribe)
 - [Data Elixir](https://dataelixir.com/)
 - [Data is Plural](https://tinyletter.com/data-is-plural)
+- [Data Science Newsletter](https://academicdatascience.org/resources/newsletter)
 - [Data Science Roundup Newsletter](http://roundup.fishtownanalytics.com/)
 - [Data Science Weekly](https://www.datascienceweekly.org/)
 - [Import AI](https://us13.campaign-archive.com/home/?u=67bd06787e84d73db24fb0aa5&id=6c9d98ff2c)
@@ -59,6 +60,7 @@ sidebarDepth: 2
 - [One Shot Learning](https://buttondown.email/oneshotlearning)
 - [The Sequence](https://thesequence.substack.com)
 - [SF Data](http://weekly.sfdata.io/)
+- [This week in data](https://dataeco.substack.com)
 
 ## Data Blogs
 
@@ -106,8 +108,9 @@ sidebarDepth: 2
 
 ## Data Slack Communities
 
-- [Data Viz Society](https://datavizsociety.slack.com)
+- [Data Culture](https://www.datacult.com/join)
 - [Data Science Community](https://dscommunity.slack.com)
+- [Data Viz Society](https://datavizsociety.slack.com)
 - [dbt](https://slack.getdbt.com)
 - [Great Expectations](https://greatexpectations.io/slack)
 - [Locally Optimistic](https://www.locallyoptimistic.com/community/)
@@ -119,6 +122,8 @@ sidebarDepth: 2
 - [PyCarolinas](https://pycarolinas.slack.com/join/shared_invite/enQtNjI4NTY0MzM5MDc5LWE2ZjI3YmFkNTAzOTM2NmYyMWUwMmYzZGFkYTY2ZjdkZWFmZDg0YzE0MjQzMzMzMzVhOWUwN2I3MTQwMTllMjY)
 - [R for Data Analysis](https://r-data-team.slack.com)
 - [Software Engineering Daily](http://softwaredaily.herokuapp.com)
+- [Spectacles](https://join.slack.com/t/spectacles-ci/shared_invite/zt-akmm4mo6-XnPcUUaG3Z5~giRc_5JaUQ)
+- [SQLFluff](https://docs.sqlfluff.com/en/stable/jointhecommunity.html)
 - [The Data School](https://thedataschool.slack.com)
 
 ## Technical Learning Resources
