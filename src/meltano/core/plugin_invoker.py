@@ -194,12 +194,11 @@ class PluginInvoker:
         return {}
 
     @contextmanager
-    def _invoke(self, *args, env=None, command=None, **popen):
+    def _invoke(self, *args, env=None, command=None, **kwargs):
         env = env or {}
-        self._check_prepared(**popen)
-
+        self._check_prepared(**kwargs)
         with self.plugin.trigger_hooks("invoke", self, args):
-            popen_options = {**self.Popen_options(), **popen}
+            popen_options = {**self.Popen_options(), **kwargs}
             popen_env = {**self.env(), **env}
             popen_args = self.exec_args(*args, command=command, env=popen_env)
             logging.debug(f"Invoking: {popen_args}")
@@ -212,7 +211,7 @@ class PluginInvoker:
                     self.plugin, self.plugin.executable
                 ) from err
 
-    def _check_prepared(self, require_preparation=True):
+    def _check_prepared(self, require_preparation=True, **kwargs):
         if require_preparation and not self._prepared:
             raise InvokerNotPreparedError()
 
