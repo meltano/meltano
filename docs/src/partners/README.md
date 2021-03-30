@@ -18,10 +18,10 @@ More active [contributors](/docs/contributor-guide.html) to Meltano and [related
 | --------------- | --------- | ------------- |
 | [Slalom](https://www.slalom.com/) | United States: [various](https://www.slalom.com/locations); Canada: Montréal, Toronto, Vancouver; United Kingdom: London, Manchester; Australia: Melbourne, Sydney; Japan: Tokyo | [10+](https://gitlab.com/groups/meltano/-/merge_requests?author_username=aaronsteers&state=all) |
 | [Applied Labs](https://appliedlabs.io/) | United States: New York; Russia: Moscow; United Kingdom: London; Uzbekistan: Tashkent | 5+ ([1](https://gitlab.com/groups/meltano/-/merge_requests?author_username=kaboomdev&state=all), [2](https://gitlab.com/groups/meltano/-/merge_requests?author_username=dmitry-stadnik&state=all)) |
+| [Mashey](https://www.mashey.com/) | United States: Denver, CO | [1](https://gitlab.com/meltano/meltano/-/issues/2614), [2](https://gitlab.com/meltano/meltano/-/merge_requests/2074/diffs) |
 | [b.telligent](https://www.btelligent.com/) | Germany: Berlin, Düsseldorf, Frankfurt, Hamburg, Hannover |
 | [Commencis](https://www.commencis.com/) | Turkey: Istanbul; United Kingdom: London |
 | [Datateer](https://www.datateer.com/) | United States: Denver, CO |
-| [Mashey](https://www.mashey.com/) | United States: Denver, CO |
 | [Wheelhouse](https://www.wheelhousedmg.com/) | United States: Seattle, WA; Richmond, VA |
 
 ::: tip Don't see your consulting firm listed here?
