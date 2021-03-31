@@ -123,6 +123,7 @@ Optionally specify specific channels to sync. By default the tap will sync all c
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
+```bash
 meltano config tap-slack set channels '["<channelid>", ...]'
 
 export TAP_SLACK_CHANNELS='["<channelid>", ...]'
@@ -140,6 +141,7 @@ Specifies whether to sync private channels or not. Default is true.
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
+```bash
 meltano config tap-slack set private_channels false
 
 export TAP_SLACK_PRIVATE_CHANNELS=false
@@ -157,6 +159,7 @@ Specifies whether to have the tap auto-join all public channels in your ogranzia
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
+```bash
 meltano config tap-slack set join_public_channels true
 
 export TAP_SLACK_JOIN_PUBLIC_CHANNELS=true
@@ -174,6 +177,7 @@ Specifies whether the tap will sync archived channels or not. Note that a bot ca
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
+```bash
 meltano config tap-slack set archived_channels true
 
 export TAP_SLACK_ARCHIVED_CHANNELS=true
@@ -191,6 +195,7 @@ Specifies the window size for syncing certain streams (messages, files, threads)
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
+```bash
 meltano config tap-slack set date_window_size <integer>
 
 export TAP_SLACK_DATE_WINDOW_SIZE=<integer>
