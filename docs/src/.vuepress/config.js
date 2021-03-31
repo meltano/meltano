@@ -133,7 +133,7 @@ module.exports = {
             },
             {
                 text: "Slack",
-                link: "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw"
+                link: "https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q"
             },
             {
                 text: "Office Hours",
@@ -166,7 +166,7 @@ module.exports = {
       {
         text: "Join 900+ on Slack",
         link:
-          "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw",
+          "https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q",
         icon: "SlackIcon",
       },
       {
@@ -215,7 +215,7 @@ module.exports = {
       digitalOceanUrl:
         "https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322",
       slackChannelUrl:
-        "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw",
+        "https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q",
     },
     smoothScroll: true,
   },
