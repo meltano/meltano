@@ -53,11 +53,11 @@ Their maintainers are:
 | [Wise](https://wise.com/) | 2 extractors, 2 loaders |
 | [Hotglue](https://hotglue.xyz/) | 3 extractors |
 | [Data Mill](https://datamill.co/) | 2 loaders |
+| [Mashey](https://www.mashey.com/) | 2 extractors |
 | [Adswerve](https://adswerve.com/) | 1 loader |
 | [Andy Huynh](https://github.com/andyh1203) | 1 loader |
 | [Anelen](https://anelen.co/) | 1 extractor |
 | [Eric Simmerman](https://github.com/ets) | 1 extractor |
-| [Mashey](https://www.mashey.com/) | 1 extractor |
 
 ::: tip Don't see your organization listed here?
 
