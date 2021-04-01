@@ -56,76 +56,498 @@ Since taps and targets are able to communicate to each other via the Singer spec
 
 ### Messages
 
-#### Schemas
+Each of the messages have a defined schema and some required and optional fields. Note that while example messages will be shown on multiple lines, each record when output from a tap must be on its own line. 
 
 #### Records
 
+Record messages contain the actual data being moved in the extract and load process. Every record message must have the following properties:
+
+* `type` - this will always be `RECORD`
+* `stream` - the unique identifier of the data stream
+* `record` - a JSON object containing the data being extracted
+
+Record messages can optionally have:
+
+* `time_extracted` - The time the record was observed in the source. This should be an [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) formatted date-time, like "2022-11-20T16:45:33.000Z".
+
+Putting it together, a full record message looks like this:
+
+```json
+{
+  "type": "RECORD",
+  "stream": "tools",
+  "time_extracted": "2021-11-20T16:45:33.000Z",
+  "record": {
+    "id": 1,
+    "name": "Meltano",
+    "active": true,
+    "updated_at": "2021-10-20T16:45:33.000Z"
+  }
+}
+```
+
+#### Schemas
+
+Schema messages define the structure of the data sent in a record message. Every schema message must have the following properties:
+
+* `type` - this will always be `SCHEMA`
+* `stream` - the unique identifier of the data stream. This will match the stream property in record messages
+* `schema` - a [JSON Schema](http://json-schema.org/) describing the `record` property of record messages for a given stream
+* `key_properties` - a list of strings indicating which properties make up the primary key for this stream. Each item in the list must be the name of a top-level property defined in the schema. An empty list may be used to indicate there is no primary key for the stream
+
+::: tip What is JSON Schema?
+
+[JSON Schema](http://json-schema.org/) is a way to annotate and validate JSON objects. The data types available in raw JSON are limited compared to the variety of types available in many targets. Within the Singer Spec, JSON schema definitions are used to tell a target the exact data type to use when storing data. 
+
+Using the `record` example shown previously, the JSON schema for that record could be:
+
+```json
+{
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "name": {
+        "type": "string"
+      },
+      "active": {
+        "type": "boolean"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+```
+
+This definition now explicitly defines what kind of data is expected in a record and how to handle it when loading the data.
+
+:::
+
+Schema messages can optionally have:
+
+* `bookmark_properties` - a list of strings indicating which properties the tap is using as bookmarks. Each item in the list must be the name of a top-level property defined in the schema. This is discussed more in the bookmarks section. 
+
+Putting it together, a full schema message looks like this:
+
+```json
+{
+  "type": "SCHEMA",
+  "stream": "tools",
+  "schema": {
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "name": {
+        "type": "string"
+      },
+      "active": {
+        "type": "boolean"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "key_properties": ["id"],
+  "bookmark_properties": ["updated_at"]
+}
+```
+
+::: tip SCHEMA and RECORD Message Order matters
+
+Before any record messages for a given data stream are output by a tap, they must be preceded by a schema message for the stream. While the extraction will still work, it will be assumed that the record is schema-less and will be loaded in a potentially unexpected manner.
+
+:::
+
 #### State
 
+State messages contain any information that a tap is designed to persist. These are used to inform the target of the current place in the extraction of a data stream. Each state message must have the following properties:
 
+* `type` - this will always be `STATE`
+* `value` - this is a JSON object of the state values to be stored
+
+There structure of the `value` property is not defined by the spec and is determined by each tap independently. However, the following structure is recommended:
+
+```json
+{
+  "bookmarks": {
+    "tools": {
+      "updated_at": "2021-10-20T16:45:33.000Z"
+    },
+    "team": {
+      "id": 123
+    }
+  }
+}
+```
+
+The `bookmarks` key should be familiar since it's an optional key in a schema message. Each property within the `bookmarks` JSON object is a data stream from a previously defined schema and record. Each stream maps to a JSON object storing the last data point seen in the extraction.
+
+In the above example, the `tools` stream has extracted data up to the timestamp shown in the `updated_at` field. Similarly, the `team` stream has extracted up to `id` = 123.
+
+Putting it together, a full state message looks like this:
+
+```json
+{
+  "type": "STATE",
+  "value": {
+    "bookmarks": {
+      "tools": {
+        "updated_at": "2021-10-20T16:45:33.000Z"
+      },
+      "team": {
+        "id": 123
+      }
+    }
+  }
+}
+```
 
 ### Taps
 
+When taps are run, they can accept three files that provide information necessary for the it to work properly: config, state, and catalog files. Taps are required to accept the config file, and can optionally accept the state and catalog files.  
+
 #### Config Files
+
+The config file contains the parameters required by the tap to succesfully extract data from the source. Typically this will include credentials for an API or database connection.
+
+There is no required specification, but it is recommended to have the following fields:
+
+* `start_date` - this is used on the first sync to define how far back in time to pull data. Start dates should conform to the [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) specification.
+* `user_agent` - this should be an email address or other contact information should the API provider need to contact you for any reason
+
+Putting this all together, a config file may look like:
+
+```json
+# config.json
+{
+  "api_key" : "asd23ayzxz80adf",
+  "start_date" : "2022-01-01T00:00:00Z",
+  "user_agent" : "your_email@domain"
+}
+```
 
 #### State Files
 
-##### Bookmarks
+Taps can optionally use a state file to start replication from a previous point in a data stream. The structure of the state file and the state message described previously should be nearly identical. The `value` property in the state message will be the contents of any state.json file passed to a tap.
+
+Using the previous example, a state file would look like this:
+
+```json
+# state.json
+{
+  "bookmarks": {
+    "tools": {
+      "updated_at": "2021-10-20T16:45:33.000Z"
+    },
+    "team": {
+      "id": 123
+    }
+  }
+}
+```
 
 #### Catalog Files
 
+Catalog files define the structure of one or many data streams. Taps are capable of both using and generating catalog files. 
+
+The structure of a catalog file is JSON object with a single top-level property:
+
+* `streams` - this is a list containing information for each data stream that can be extracted
+
+Each item within the `streams` list is another JSON object with the following required properties:
+
+* `stream` - this is the identifier of the stream (`tools`, `team`, etc.)
+* `tap_stream_id` - this is the unique identifier of the stream which can differ from the `stream` name since some sources may have multiple streams named the same thing
+* `schema` - this is the JSON schema of the stream
+
+Optional properties within the list are:
+
+* `table_name` - this is only used for a database source and is the name of the table
+* `metadata` - this is a list that defines extra information about items within a stream. this is discussed more in the Metadata section below
+
+An example catalog with a single stream and no metadata is as follows:
+
+```json
+{
+  "streams": [
+    {
+      "stream": "tools",
+      "tap_stream_id": "tools",
+      "schema": {
+        "type": ["null", "object"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": [
+              "null",
+              "string"
+            ],
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ],
+          },
+          "updated_at": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time",
+          }
+        }
+      }
+    }
+  ]
+}
+```
+
 ##### Discovery Mode
+
+Discovery mode is how taps can generate catalogs. When a tap is invoked with a `--discover` it will output the full catalog list of streams available for extraction to `stdout`. This can then be saved to a `catalog.json` file.
+
+```bash
+tap --config config.json --discover > catalog.json
+```
+
+Note that some older taps use `properties.json` as the catalog file.
 
 ##### Metadata
 
-#### Sync/Default Mode
+Metadata is the preferred method of associating extra information about streams and properties within a stream.
 
-##### Metrics
+There are two kinds of metadata: 
+
+* `discoverable` - this metadata should be written _and_ read by a tap
+* `non-discoverable` - this metadata is written by other systems, such as Meltano, and should only be read by the tap
+
+ A tap is free to write any type of metadata they feel is useful for describing fields in the schema, although several reserved keywords exist.  A tap that extracts data from a database should use additional metadata to describe the properties of the database.
+
+**Non-discoverable Metadata**
+
+|  Keyword                    |  Tap Type  |  Description  |
+| ----------------------------|:----------:|---------------|
+| `selected`                  | All        | Either `true` or `false`.  Indicates that this node in the schema has been selected by the user for replication. |
+| `replication-method`        | All        | Either `FULL_TABLE`, `INCREMENTAL`, or `LOG_BASED`. The replication method to use for a stream. <br></br> See [Data Integration](/docs/integration.html#replication-methods) for more details on the replication type.|
+| `replication-key`           | All        | The name of a property in the source to use as a `bookmark`.  For example, this will often be an `updated_at` field or an auto-incrementing primary key (requires `replication-method`).|
+| `view-key-properties`       | Database   | List of key properties for a database view. |
+
+**Discoverable Metadata**
+
+|  Keyword                    |  Tap Type  |  Description  |
+| ----------------------------|:----------:|---------------|
+| `inclusion`                 | All        | Either `available`, `automatic`, or `unsupported`. </br></br>`available` means the field is available for selection, and the tap will only emit values for that field if it is marked with `"selected": true`. </br></br>`automatic` means that the tap will emit values for the field.  </br></br>`unsupported` means that the field exists in the source data but the tap is unable to provide it.|
+| `selected-by-default`       | All        | Either `true` or `false`.  Indicates if a node in the schema should be replicated _if_ a user has not expressed any opinion on whether or not to replicate it.|
+| `valid-replication-keys`    | All        | List of the fields that could be used as replication keys.|
+| `forced-replication-method` | All        | Used to force the replication method to either `FULL_TABLE` or `INCREMENTAL`.|
+| `table-key-properties`      | All        | List of key properties for a database table.|
+| `schema-name`               | Database   | Name of the schema.|
+| `is-view`                   | Database   | Either `true` or `false`.  Indicates whether a stream corresponds to a database view.|
+| `row-count`                 | Database   | Number of rows in a database table/view.|
+| `database-name`             | Database   | Name of the database.|
+| `sql-datatype`              | Database   | Represents the datatype of a database column.|
+
+
+Each piece of metadata has two primary keys:
+
+* `metadata` - this is a JSON object containing all of the metadata for either the stream or a property of the stream
+* `breadcrumb` - this identifies whether the metadata applies to the entire stream or a property of the stream. An empty list means the metadata applies to the stream. For specific properties within the stream, the breadcrumb will have the `properties` key followed by the name of the property being described.
+
+An example of a valid metadata object is as follows:
+
+```json
+      "metadata": [
+        {
+          "metadata": {
+            "inclusion": "available",
+            "table-key-properties": ["id"],
+            "selected": true,
+            "valid-replication-keys": ["date_modified"],
+            "schema-name": "users",
+          },
+          "breadcrumb": []
+        },
+        {
+          "metadata": {
+            "inclusion": "automatic"
+          },
+          "breadcrumb": ["properties", "id"]
+        },
+        {
+          "metadata": {
+            "inclusion": "available",
+            "selected": true
+          },
+          "breadcrumb": ["properties", "name"]
+        },
+        {
+          "metadata": {
+            "inclusion": "automatic"
+          },
+          "breadcrumb": ["properties", "updated_at"]
+        }
+      ]
+```
+
+##### Putting it Together
+
+Putting this all together, a complete catalog example looks like this:
+
+```json
+{
+  "streams": [
+    {
+      "stream": "tools",
+      "tap_stream_id": "tools",
+      "schema": {
+        "type": ["null", "object"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": [
+              "null",
+              "string"
+            ],
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ],
+          },
+          "updated_at": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time",
+          }
+        }
+      }
+    }
+  ],
+  "metadata": [
+    {
+      "metadata": {
+        "inclusion": "available",
+        "table-key-properties": ["id"],
+        "selected": true,
+        "valid-replication-keys": ["date_modified"],
+        "schema-name": "users",
+      },
+      "breadcrumb": []
+    },
+    {
+      "metadata": {
+        "inclusion": "automatic"
+      },
+      "breadcrumb": ["properties", "id"]
+    },
+    {
+      "metadata": {
+        "inclusion": "available",
+        "selected": true
+      },
+      "breadcrumb": ["properties", "name"]
+    },
+    {
+      "metadata": {
+        "inclusion": "automatic"
+      },
+      "breadcrumb": ["properties", "updated_at"]
+    }
+    ]
+}
+```
+
+#### Metrics
+
+A tap can periodically emit structured log messages containing metrics about read operations. Consumers of the tap logs can parse these metrics out of the logs for monitoring or analysis. Metrics appear in the log output with the following structure:
+
+```
+INFO METRIC: <metrics-json>
+```
+
+where `<metrics-json>` is a JSON object with the following keys:
+
+| Metric Key | Description | 
+| ---------- | ----------- |
+| `type` | The type of the metric. Indicates how consumers of the data should interpret the value field. There are two types of metrics: </br></br> `counter` - The value should be interpreted as a number that is added to a cumulative or running total </br></br> `timer` - The value is the duration in seconds of some operation. | 
+| `metric` | The name of the metric. This should consist only of letters, numbers, underscore, and dash characters. For example, "http_request_duration".|
+| `value` | The value of the datapoint, either an integer or a float. For example, "1234" or "1.234" | 
+| `tags` | Mapping of tags describing the data. The keys can be any strings consisting solely of letters, numbers, underscores, and dashes. For consistency's sake, we recommend using the following tags when they are relevant.  Note that for many metrics, many of those tags will not be relevant. </br></br> `endpoint` - For a Tap that pulls data from an HTTP API, this should be a descriptive name for the endpoint, such as "users" or "deals" or "orders". </br></br> `http_status_code` - The HTTP status code. For example, 200 or 500. </br></br> `job_type` - For a process that we are timing, some description of the type of the job. For example, if we have a Tap that does a POST to an HTTP API to generate a report and then polls with a GET until the report is done, we could use a job type of "run_report".</br></br>`status` - Either "succeeded" or "failed". |
+
+Here are some examples of metrics and how those metrics should be
+interpreted.
+
+##### Timer for Successful HTTP GET
+
+```bash
+INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 1.23, "tags": {"endpoint": "orders", "http_status_code": 200, "status": "succeeded"}}
+```
+
+The following object is what the object looks like expanded:
+
+```json
+{
+    "type": "timer", 
+    "metric": "http_request_duration", 
+    "value": 1.23, 
+    "tags": {
+        "endpoint": "orders", 
+        "http_status_code": 200, 
+        "status": "succeeded"
+    }
+}
+```
+
+This can be interpreted as: an HTTP request to an "orders" endpoint was made that took 1.23 seconds and succeeded with a status code of 200.
+
+##### Timer for Failed HTTP GET
+
+```bash
+INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 30.01, "tags": {"endpoint": "orders", "http_status_code": 500, "status": "failed"}}
+```
+
+This can be interpreted as: an HTTP request to an "orders" endpoint was made that took 30.01 seconds and failed with a status code of 500.
+
+##### Counter for Records
+
+```bash
+INFO METRIC: {"type": "counter", "metric": "record_count", "value": 100, "tags": {"endpoint": "orders"}}
+INFO METRIC: {"type": "counter", "metric": "record_count", "value": 100, "tags": {"endpoint": "orders"}}
+INFO METRIC: {"type": "counter", "metric": "record_count", "value": 100, "tags": {"endpoint": "orders"}}
+INFO METRIC: {"type": "counter", "metric": "record_count", "value": 14, "tags": {"endpoint": "orders"}}
+```
+
+This can be interpreted as: a total of 314 records were fetched from an "orders" endpoint.
+
+##### Log Output
+
+Metrics messages are interspersed with the primary 3 messages, so parsing them should be handled programmatically. This is an example of what a realistic log output might look like:
+
+```bash
+INFO Using API Token authentication.
+INFO tickets: Skipping - not selected
+{"type": "SCHEMA", "stream": "groups", "schema": {"properties": {"name": {"type": ["null", "string"]}, "created_at": {"format": "date-time", "type": ["null", "string"]}, "url": {"type": ["null", "string"]}, "updated_at": {"format": "date-time", "type": ["null", "string"]}, "deleted": {"type": ["null", "boolean"]}, "id": {"type": ["null", "integer"]}}, "type": ["null", "object"]}, "key_properties": ["id"]}
+INFO groups: Starting sync
+INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 0.6276309490203857, "tags": {"status": "succeeded"}}
+{"type": "RECORD", "stream": "groups", "record": {"id": 360007960773, "updated_at": "2020-01-09T09:57:16.000000Z"}}
+{"type": "STATE", "value": {"bookmarks": {"groups": {"updated_at": "2020-01-09T09:57:16Z"}}}}
+```
 
 ### Targets
 
 #### Config Files
 
-
+#### State Files
 
 
 
 ## Taps and Targets in Meltano
 
-
-## Definitions
-
-### JSON
-
-[JSON](https://en.wikipedia.org/wiki/JSON) is the abbreviation of JavaScript Object Notation. This is a human-readable data format that is almost universally used in many computing applications. An example JSON object:
-
-    ```json
-    {
-    "program": "Meltano",
-    "protocol": "Singer",
-    "is_active": true,
-    "age": 3,
-    "address": {
-        "global": true,
-        "streetAddress": null,
-        }
-    }
-    ```
-
-### JSON Schema
-
-
-
-### Tap
-
-### Target
-
-### Stream
-
-### Messages
-
-#### State
-
-#### Record
-
-#### Schema
