@@ -122,6 +122,8 @@ Using the `record` example shown previously, the JSON schema for that record cou
 
 This definition now explicitly defines what kind of data is expected in a record and how to handle it when loading the data.
 
+Also of note, there are [several different versions](https://json-schema.org/specification-links.html) of JSON Schema. The most common one is Draft 4 and Meltano and the Singer SDK both support this draft.
+
 :::
 
 Schema messages can optionally have:
@@ -543,11 +545,18 @@ INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 0.627
 
 ### Targets
 
+When targets are run, they can accept a single config file that provides the information necessary for it to work properly.
+
 #### Config Files
+
+Similar to taps, targets take a configuration file. There is no specification for the structure of a config file, as long as it is JSON based. 
 
 #### State Files
 
+Unlike taps, targets do not take a state file. Targets are expected to read in the state messages from `stdin`, but typically they do not do anything with the state messages beyond sending them to `stdout`. This is done once all data that appeared in the stream before the state message has been processed by the Target. 
 
+When taps and targets are ru
 
-## Taps and Targets in Meltano
+#### Schema Files
 
+Targets do not take a schema file. However, they are expected to read the schema messages from `stdin` and perform validation of the incoming record using the provided schema. 
