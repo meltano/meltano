@@ -124,7 +124,7 @@ These can then be accessed from inside the plugin using the mechanism provided b
 
 ### Custom Python Package Index (PyPi)
 
-If you need to fetch packages from a custom Python Package Index (PyPi), you can configure the `PIP_INDEX_URL` with you custom url before running `meltano install`.
+If you need to fetch packages from a custom Python Package Index (PyPi), you can configure the `PIP_INDEX_URL` with your custom URL before running `meltano install`.
 
 e.g.
 ```
