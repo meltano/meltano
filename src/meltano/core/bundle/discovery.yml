@@ -1863,7 +1863,7 @@ transformers:
     namespace: dbt
     docs: https://meltano.com/docs/transforms.md
     repo: https://github.com/fishtown-analytics/dbt
-    pip_url: dbt==0.16.1
+    pip_url: dbt==0.18.2
     settings:
       - name: project_dir
         value: $MELTANO_PROJECT_ROOT/transform
