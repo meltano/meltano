@@ -122,6 +122,15 @@ When Meltano invokes a plugin's executable as part of [`meltano elt`](/docs/comm
 
 These can then be accessed from inside the plugin using the mechanism provided by the standard library, e.g. Python's [`os.environ`](https://docs.python.org/3/library/os.html#os.environ).
 
+### Custom Python Package Index (PyPi)
+
+If you need to fetch packages from a custom Python Package Index (PyPi), you can configure the `PIP_INDEX_URL` with you custom url before running `meltano install`.
+
+e.g.
+```
+ARG PIP_INDEX_URL=<your_custom_pypi_url>
+RUN meltano install
+```
 ## Multiple plugin configurations
 
 Every [plugin in your project](/docs/plugins.html#project-plugins) has its own configuration,
