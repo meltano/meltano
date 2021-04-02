@@ -66,7 +66,7 @@ to prevent individual organizations from becoming bottlenecks as the ecosystem g
 and will support the adoption of abandoned connectors by new maintainers.
 
 Last but not least, we intend to **[**unlock the evolution**](https://gitlab.com/groups/meltano/-/epics/88) of the
-[**Singer spec**](https://github.com/singer-io/getting-started)** through
+[**Singer spec**](/docs/singer-spec.html)** through
 a framework for the proposal and consideration of optional extensions to the spec
 that compatible tools, including the SDK and Meltano, can choose to support,
 while maintaining compatibility between all taps and targets.

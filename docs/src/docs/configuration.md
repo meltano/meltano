@@ -8,7 +8,7 @@ Meltano is responsible for managing the configuration of all of a [project](/doc
 It knows what settings are supported by each plugin, and how and when different types of plugins expect to be fed that configuration.
 
 Since this also goes for [extractors](/docs/plugins.html#extractors) and [loaders](/docs/plugins.html#loaders), you do not need to manually craft the
-[`config.json` files](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file) expected by Singer taps and targets,
+[`config.json` files](/docs/singer-spec.html#config-files) expected by Singer taps and targets,
 because Meltano will generate them on the fly whenever an extractor or loader is used through [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 
 If the plugin you'd like to use and configure is [supported out of the box](/docs/plugins.html#discoverable-plugins) (that is, it shows up when you run [`meltano discover`](/docs/command-line-interface.html#discover)), Meltano already knows what settings it supports.

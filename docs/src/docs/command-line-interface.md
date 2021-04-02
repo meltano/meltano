@@ -265,10 +265,10 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
 
 - A `--force` flag can be passed to force a new run even when a pipeline with the same Job ID is already running, which would result in an error otherwise.
 
-- A `--catalog` option can be passed to manually provide a [catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) for the extractor, as an alternative to letting one be [generated on the fly](/docs/integration.html#extractor-catalog-generation).
+- A `--catalog` option can be passed to manually provide a [catalog file](/docs/singer-spec.html#catalog-files) for the extractor, as an alternative to letting one be [generated on the fly](/docs/integration.html#extractor-catalog-generation).
   This is equivalent to setting the [`catalog` extractor extra](/docs/plugins.html#catalog-extra).
 
-- A `--state` option can be passed to manually provide a [state file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) for the extractor, as an alternative to letting state be [looked up based on the Job ID](/docs/integration.html#incremental-replication-state).
+- A `--state` option can be passed to manually provide a [state file](/docs/singer-spec.html#state-files) for the extractor, as an alternative to letting state be [looked up based on the Job ID](/docs/integration.html#incremental-replication-state).
   This is equivalent to setting the [`state` extractor extra](/docs/plugins.html#state-extra).
 
 - One or more `--select <entity>` options can be passed to only extract records for matching [selected entities](#select).
@@ -285,10 +285,10 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
 
   Supported values are:
 
-  - `catalog`: Dump the extractor [catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) that would be passed to the tap's executable using the `--catalog` option.
-  - `state`: Dump the extractor [state file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) that would be passed to the tap's executable using the `--state` option.
-  - `extractor-config`: Dump the extractor [config file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file) that would be passed to the tap's executable using the `--config` option.
-  - `loader-config`: Dump the loader [config file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file) that would be passed to the target's executable using the `--config` option.
+  - `catalog`: Dump the extractor [catalog file](/docs/singer-spec.html#catalog-files) that would be passed to the tap's executable using the `--catalog` option.
+  - `state`: Dump the extractor [state file](/docs/singer-spec.html#state-files) that would be passed to the tap's executable using the `--state` option.
+  - `extractor-config`: Dump the extractor [config file](/docs/singer-spec.html#config-files) that would be passed to the tap's executable using the `--config` option.
+  - `loader-config`: Dump the loader [config file](/docs/singer-spec.html#config-files) that would be passed to the target's executable using the `--config` option.
 
   Like any standard output, the dumped content can be [redirected](https://en.wikipedia.org/wiki/Redirection_(computing)) to a file using `>`, e.g. `meltano elt ... --dump=state > state.json`.
 
@@ -322,9 +322,9 @@ meltano --log-level=debug elt ...
 ```
 
 In debug mode, `meltano elt` will log the arguments and [environment](/docs/configuration.html#accessing-from-plugins) used to invoke the Singer tap and target executables (and `dbt`, when running transformations), including the paths to the generated
-[config](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file),
-[catalog](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog), and
-[state](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) files, for you to review:
+[config](/docs/singer-spec.html#config-files),
+[catalog](/docs/singer-spec.html#catalog-files), and
+[state](/docs/singer-spec.html#state-files) files, for you to review:
 
 ```bash
 $ meltano --log-level=debug elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
@@ -338,7 +338,7 @@ meltano            | DEBUG Env: {'MELTANO_EXTRACTOR_NAME': 'tap-gitlab', 'MELTAN
 
 Note that the contents of these pipeline-specific generated files can also easily be dumped to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using the `--dump` option described above.
 
-Additionally, all [Singer messages](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md#output) output by the tap and target will be logged, identified by `<plugin name> (out)` prefixes:
+Additionally, all [Singer messages](/docs/singer-spec.html#_3-messages) output by the tap and target will be logged, identified by `<plugin name> (out)` prefixes:
 
 ```bash
 tap-gitlab         | INFO Starting sync
@@ -437,7 +437,7 @@ If multiple plugins share the same name, you can provide an additional `--plugin
 meltano invoke --plugin-type=<type> <plugin> PLUGIN_ARGS...
 ```
 
-A `--dump` option can be passed to dump the content of a generated [config file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) or [extractor catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) instead of actually invoking the plugin:
+A `--dump` option can be passed to dump the content of a generated [config file](/docs/singer-spec.html#config-files) or [extractor catalog file](/docs/singer-spec.html#catalog-files) to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) instead of actually invoking the plugin:
 
 ```bash
 meltano invoke --dump=config <plugin>
