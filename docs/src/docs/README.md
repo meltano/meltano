@@ -43,6 +43,10 @@ and are committed to providing its community and ecosystem with all of the tools
 needed for it to realize its full potential as the **de-facto standard for open source connectors**,
 to be used with Meltano or any other tool that supports them.
 
+To further support the community and ecosystem, we have [revamped the spec](/docs/singer-spec.html) to be 
+clearer for newcomers to the project. We believe the spec is great in its current implementation, but 
+confusing documentation has made it challenging for some to onboard to the community.
+
 With Meltano, we are providing a **clear path to production** with existing Singer taps and targets where there wasn't one before,
 thereby lowering the barrier to adoption and motivating people who run into an issue with an existing connector
 to debug it, contribute a fix, and see it through, instead of giving up.
