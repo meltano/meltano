@@ -392,7 +392,8 @@ To pin the latest version:
 If you need to fetch packages from a custom Python Package Index (PyPi), you can set the `PIP_INDEX_URL` environment variable to your custom URL before running `meltano install`.
 
 In a `Dockerfile`, this would look like:
-```
+
+```dockerfile
 ARG PIP_INDEX_URL=<your_custom_pypi_url>
 RUN meltano install
 ```
