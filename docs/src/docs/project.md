@@ -189,10 +189,9 @@ transformers:
 - name: dbt
   executable: dbt
   commands:
-    seed: seed --project-dir $DBT_PROJECT_DIR --profile $DBT_PROFILE --target $MELTANO_EXTRACTOR_NAMESPACE --select $DBT_MODEL
-    snapshot: snapshot --project-dir $DBT_PROJECT_DIR --profile $DBT_PROFILE --target $MELTANO_EXTRACTOR_NAMESPACE --select $DBT_MODEL
+    seed: seed --project-dir $DBT_PROJECT_DIR --profile $DBT_PROFILE --target $DBT_TARGET --select $DBT_MODEL
+    snapshot: snapshot --project-dir $DBT_PROJECT_DIR --profile $DBT_PROFILE --target $DBT_TARGET --select $DBT_MODEL
 ```
-
 
 ### Schedules
 

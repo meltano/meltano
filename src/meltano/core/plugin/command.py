@@ -49,8 +49,9 @@ class Command(Canonical):
     def as_canonical(cls, target):
         """Serialize the target command."""
         canonical = super().as_canonical(target)
-        # if there isn't a description, flatten the object
-        if "description" not in canonical:
+        # if there are only args, flatten the object
+        # to the short form
+        if "args" in canonical and len(canonical) == 1:
             return canonical["args"]
 
         return canonical

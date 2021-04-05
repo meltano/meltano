@@ -448,7 +448,7 @@ Like any standard output, the dumped content can be [redirected](https://en.wiki
 
 ### Commands
 
-Plugins can define [commands](/docs/configuration.html#plugin-commands), which are shortcuts for combinations of arguments which can be shared by all users of the project. These can be invoked with the shortcut command of the form `meltano invoke <plugin>:<command>`.
+Plugins can define [commands](/docs/configuration.html#plugin-commands), which are shortcuts for combinations of arguments. These can be invoked with the shortcut command of the form `meltano invoke <plugin>:<command>`.
 
 ```bash
 meltano invoke dbt:seed

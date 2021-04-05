@@ -65,9 +65,4 @@ class DbtRunner(Runner):
             await self.invoke(dbt, log=log, command="deps")
 
             cmd = "compile" if self.context.dry_run else "run"
-            await self.invoke(
-                dbt,
-                log=log,
-                command=cmd,
-                env={"DBT_MODELS": str(self.plugin_context.get_config("models"))},
-            )
+            await self.invoke(dbt, log=log, command=cmd)
