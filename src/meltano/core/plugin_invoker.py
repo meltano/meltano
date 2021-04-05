@@ -193,10 +193,20 @@ class PluginInvoker:
     def Popen_options(self):
         return {}
 
-    @contextmanager
-    def _invoke(self, *args, env=None, command=None, **kwargs):
+    @contextmanager  # noqa: WPS211
+    def _invoke(
+        self,
+        *args,
+        require_preparation=True,
+        env=None,
+        command=None,
+        **kwargs,
+    ):
         env = env or {}
-        self._check_prepared(**kwargs)
+
+        if require_preparation and not self._prepared:
+            raise InvokerNotPreparedError()
+
         with self.plugin.trigger_hooks("invoke", self, args):
             popen_options = {**self.Popen_options(), **kwargs}
             popen_env = {**self.env(), **env}
@@ -210,10 +220,6 @@ class PluginInvoker:
                 raise ExecutableNotFoundError(
                     self.plugin, self.plugin.executable
                 ) from err
-
-    def _check_prepared(self, require_preparation=True, **kwargs):
-        if require_preparation and not self._prepared:
-            raise InvokerNotPreparedError()
 
     def invoke(self, *args, **kwargs):
         with self._invoke(*args, **kwargs) as (popen_args, popen_options, popen_env):
