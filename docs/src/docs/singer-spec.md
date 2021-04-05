@@ -4,12 +4,16 @@ description: The Open Source Singer Specification
 
 # Singer Spec
 
-The Singer Specification is an open source standard for defining the format of data and information. 
+The Singer Specification is an open source standard for defining the format of data exchange. 
 The standard is useful because it enables Data Professionals to move data between arbritrary systems as long as the programs generating and ingesting the data can understand this format.
+
+This documentation is our attempt at simplifying the canonical specification into an easier to understand and follow format for people
+who are new to the Singer community. The full specification is in the [Singer IO](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md) project on GitHub.
 
 ## Version
 
-The current version of the Spec is 0.3.0. The original documentation is in the [Singer IO](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md) project on GitHub.
+The current version of the spec is 0.3.0. 
+This spec is versioned using [Semantic Versioning](https://semver.org/) meaning that breaking changes will be a new `MAJOR` version, and backwards-compatible changes will be a new `MINOR` version.
 
 ## Basics
 
@@ -44,7 +48,7 @@ The catalog file is a JSON-formatted file that specifies which streams and entit
 
 ### Targets
 
-The 3 message types are consumed by programs called `targets`. A target can be written in any programming language (note that Meltano will only run Python-based targets). Targets ingest the 3 messages from standard input, aka `stdin`
+The 3 message types are consumed by programs called `targets`. A target can be written in any programming language (note that Meltano will only run Python-based targets). Targets ingest the 3 messages from standard input, aka `stdin`.
 
 Targets can optionally accept a configuration file if the target system requires authentication information. For a simple target like a csv file, this would not be required, but for a more complicated target like a SaaS database, the config file would be required. 
 
@@ -60,7 +64,7 @@ Each of the messages have a defined schema and some required and optional fields
 
 #### Records
 
-Record messages contain the actual data being moved in the extract and load process. Every record message must have the following properties:
+Record messages contain the actual data being extracted from a source system. Every record message must have the following properties:
 
 * `type` - this will always be `RECORD`
 * `stream` - the unique identifier of the data stream
@@ -85,6 +89,8 @@ Putting it together, a full record message looks like this:
   }
 }
 ```
+
+Note that in the above example the message was formatted for readibility, but when output from a tap the entire message will be on a single-line.
 
 #### Schemas
 
@@ -158,6 +164,8 @@ Putting it together, a full schema message looks like this:
 }
 ```
 
+Note that in the above example the message was formatted for readibility, but when output from a tap the entire message will be on a single-line.
+
 ::: tip SCHEMA and RECORD Message Order matters
 
 Before any record messages for a given data stream are output by a tap, they must be preceded by a schema message for the stream. While the extraction will still work, it will be assumed that the record is schema-less and will be loaded in a potentially unexpected manner.
@@ -208,9 +216,11 @@ Putting it together, a full state message looks like this:
 }
 ```
 
+Note that in the above example the message was formatted for readibility, but when output from a tap the entire message will be on a single-line.
+
 ### Taps
 
-When taps are run, they can accept three files that provide information necessary for the it to work properly: config, state, and catalog files. Taps are required to accept the config file, and can optionally accept the state and catalog files.  
+When taps are run, they can accept three files that provide information necessary for it to work properly: config, state, and catalog files. Taps are required to accept the config file, and can optionally accept the state and catalog files.  
 
 #### Config Files
 
@@ -256,20 +266,20 @@ Using the previous example, a state file would look like this:
 
 Catalog files define the structure of one or many data streams. Taps are capable of both using and generating catalog files. 
 
-The structure of a catalog file is JSON object with a single top-level property:
+The structure of a catalog file is a JSON object with a single top-level property:
 
 * `streams` - this is a list containing information for each data stream that can be extracted
 
 Each item within the `streams` list is another JSON object with the following required properties:
 
 * `stream` - this is the identifier of the stream (`tools`, `team`, etc.)
-* `tap_stream_id` - this is the unique identifier of the stream which can differ from the `stream` name since some sources may have multiple streams named the same thing
+* `tap_stream_id` - this is the unique identifier of the stream which can differ from the `stream` name since some sources may have multiple streams with the same name
 * `schema` - this is the JSON schema of the stream
 
 Optional properties within the list are:
 
 * `table_name` - this is only used for a database source and is the name of the table
-* `metadata` - this is a list that defines extra information about items within a stream. this is discussed more in the Metadata section below
+* `metadata` - this is a list that defines extra information about items within a stream. This is discussed more in the [Metadata](/docs/singer-spec.html#metadata) section below
 
 An example catalog with a single stream and no metadata is as follows:
 
@@ -363,37 +373,37 @@ Each piece of metadata has two primary keys:
 An example of a valid metadata object is as follows:
 
 ```json
-      "metadata": [
-        {
-          "metadata": {
-            "inclusion": "available",
-            "table-key-properties": ["id"],
-            "selected": true,
-            "valid-replication-keys": ["date_modified"],
-            "schema-name": "users",
-          },
-          "breadcrumb": []
-        },
-        {
-          "metadata": {
-            "inclusion": "automatic"
-          },
-          "breadcrumb": ["properties", "id"]
-        },
-        {
-          "metadata": {
-            "inclusion": "available",
-            "selected": true
-          },
-          "breadcrumb": ["properties", "name"]
-        },
-        {
-          "metadata": {
-            "inclusion": "automatic"
-          },
-          "breadcrumb": ["properties", "updated_at"]
-        }
-      ]
+"metadata": [
+  {
+    "metadata": {
+      "inclusion": "available",
+      "table-key-properties": ["id"],
+      "selected": true,
+      "valid-replication-keys": ["date_modified"],
+      "schema-name": "users",
+    },
+    "breadcrumb": []
+  },
+  {
+    "metadata": {
+      "inclusion": "automatic"
+    },
+    "breadcrumb": ["properties", "id"]
+  },
+  {
+    "metadata": {
+      "inclusion": "available",
+    "selected": true
+    },
+    "breadcrumb": ["properties", "name"]
+  },
+  {
+    "metadata": {
+      "inclusion": "automatic"
+    },
+    "breadcrumb": ["properties", "updated_at"]
+  }
+]
 ```
 
 ##### Putting it Together
@@ -463,7 +473,7 @@ Putting this all together, a complete catalog example looks like this:
       },
       "breadcrumb": ["properties", "updated_at"]
     }
-    ]
+  ]
 }
 ```
 
@@ -479,10 +489,10 @@ where `<metrics-json>` is a JSON object with the following keys:
 
 | Metric Key | Description | 
 | ---------- | ----------- |
-| `type` | The type of the metric. Indicates how consumers of the data should interpret the value field. There are two types of metrics: </br></br> `counter` - The value should be interpreted as a number that is added to a cumulative or running total </br></br> `timer` - The value is the duration in seconds of some operation. | 
-| `metric` | The name of the metric. This should consist only of letters, numbers, underscore, and dash characters. For example, "http_request_duration".|
+| `type` | The type of the metric. Indicates how consumers of the data should interpret the value field. There are two types of metrics: </br></br> `counter` - The value should be interpreted as a number that is added to a cumulative or running total </br></br> `timer` - The value is the duration in seconds of some operation | 
+| `metric` | The name of the metric. This should consist only of letters, numbers, underscore, and dash characters. For example, "http_request_duration"|
 | `value` | The value of the datapoint, either an integer or a float. For example, "1234" or "1.234" | 
-| `tags` | Mapping of tags describing the data. The keys can be any strings consisting solely of letters, numbers, underscores, and dashes. For consistency's sake, we recommend using the following tags when they are relevant.  Note that for many metrics, many of those tags will not be relevant. </br></br> `endpoint` - For a Tap that pulls data from an HTTP API, this should be a descriptive name for the endpoint, such as "users" or "deals" or "orders". </br></br> `http_status_code` - The HTTP status code. For example, 200 or 500. </br></br> `job_type` - For a process that we are timing, some description of the type of the job. For example, if we have a Tap that does a POST to an HTTP API to generate a report and then polls with a GET until the report is done, we could use a job type of "run_report".</br></br>`status` - Either "succeeded" or "failed". |
+| `tags` | Mapping of tags describing the data. The keys can be any strings consisting solely of letters, numbers, underscores, and dashes. For consistency's sake, we recommend using the following tags when they are relevant.  Note that for many metrics, many of those tags will not be relevant. </br></br> `endpoint` - For a Tap that pulls data from an HTTP API, this should be a descriptive name for the endpoint, such as "users" or "deals" or "orders" </br></br> `http_status_code` - The HTTP status code. For example, 200 or 500 </br></br> `job_type` - For a process that we are timing, some description of the type of the job. For example, if we have a Tap that does a POST to an HTTP API to generate a report and then polls with a GET until the report is done, we could use a job type of "run_report".</br></br>`status` - Either "succeeded" or "failed" |
 
 Here are some examples of metrics and how those metrics should be
 interpreted.
@@ -493,7 +503,7 @@ interpreted.
 INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 1.23, "tags": {"endpoint": "orders", "http_status_code": 200, "status": "succeeded"}}
 ```
 
-The following object is what the object looks like expanded:
+The following is what the object looks like expanded:
 
 ```json
 {
@@ -554,8 +564,6 @@ Similar to taps, targets take a configuration file. There is no specification fo
 #### State Files
 
 Unlike taps, targets do not take a state file. Targets are expected to read in the state messages from `stdin`, but typically they do not do anything with the state messages beyond sending them to `stdout`. This is done once all data that appeared in the stream before the state message has been processed by the Target. 
-
-When taps and targets are ru
 
 #### Schema Files
 
