@@ -161,6 +161,9 @@ export TAP_MONGODB_PASSWORD=<password>
 - Name: `database`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TAP_MONGODB_DATABASE`
 
+This is the database used for authentication, not the database used for extraction.
+The data extracted is determined by folllowing the [selecting entities and attributes](/docs/getting-started.html#select-entities-and-attributes-to-extract) instructions.
+
 #### How to use
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
