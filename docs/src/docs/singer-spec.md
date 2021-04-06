@@ -272,8 +272,8 @@ The structure of a catalog file is a JSON object with a single top-level propert
 
 Each item within the `streams` list is another JSON object with the following required properties:
 
-* `stream` - this is the identifier of the stream (`tools`, `team`, etc.)
-* `tap_stream_id` - this is the unique identifier of the stream which can differ from the `stream` name since some sources may have multiple streams with the same name
+* `stream` - this is the primary identifier of the stream as it will be passed to the target (`tools`, `team`, etc.)
+* `tap_stream_id` - this is the unique identifier of the stream which can differ from the `stream` name since some sources may have multiple available streams with the same name
 * `schema` - this is the JSON schema of the stream
 
 Optional properties within the list are:
