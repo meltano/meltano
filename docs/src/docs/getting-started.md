@@ -268,7 +268,7 @@ Chances are that the extractor you just added to your project will require some 
 
 ::: details What if I already have a config file for this extractor?
 
-If you've used this Singer tap before without Meltano, you may have a [config file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file) already.
+If you've used this Singer tap before without Meltano, you may have a [config file](/docs/singer-spec.html#config-files) already.
 
 If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) under the [plugin's `config` key](/docs/project.html#plugin-configuration):
 
@@ -360,7 +360,7 @@ to improve performance and save on bandwidth and storage.
 
 ::: details What if I already have a catalog file for this extractor?
 
-If you've used this Singer tap before without Meltano, you may have generated a [catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) already.
+If you've used this Singer tap before without Meltano, you may have generated a [catalog file](/docs/singer-spec.html#catalog-files) already.
 
 If you'd like Meltano to use it instead of [generating a catalog](/docs/integration.html#extractor-catalog-generation) based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the [`catalog` extractor extra](/docs/plugins.html#catalog-extra) or use [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option when [running the data integration (EL) pipeline](#run-a-data-integration-el-pipeline) later on in this guide.
 
@@ -375,7 +375,7 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
     meltano select tap-gitlab --list --all
     ```
 
-    If this command fails with an error, this usually means that the Singer tap does not support [catalog discovery mode](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#discovery-mode), and will always extract all supported entities and attributes.
+    If this command fails with an error, this usually means that the Singer tap does not support [catalog discovery mode](/docs/singer-spec.html#discovery-mode), and will always extract all supported entities and attributes.
 
 1. Assuming the previous command succeeded, select the desired entities and attributes for extraction using [`meltano select`](/docs/command-line-interface.html#select):
 
@@ -449,7 +449,7 @@ Most database extractors, on the other hand, support two or more of the followin
 
 *To learn more about replication methods, refer to the [Data Integration (EL) guide](/docs/integration.html#replication-methods).*
 
-1. Find out which replication methods (i.e. options for the `replication-method` [stream metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata) key) the extractor supports by checking its documentation or the README in its repository.
+1. Find out which replication methods (i.e. options for the `replication-method` [stream metadata](/docs/singer-spec.html#metadata) key) the extractor supports by checking its documentation or the README in its repository.
 
 1. Set the desired `replication-method` metadata for each [selected entity](#select-entities-and-attributes-to-extract) using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) and the extractor's [`metadata` extra](/docs/plugins.html#metadata-extra):
 
@@ -497,7 +497,7 @@ Most database extractors, on the other hand, support two or more of the followin
             replication-method: FULL_TABLE
     ```
 
-1. Optionally, verify that the [stream metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata) for each table was set correctly in the extractor's [generated catalog file](/docs/integration.html#extractor-catalog-generation) by dumping it using [`meltano invoke --dump=catalog <plugin>`](/docs/command-line-interface.html#select):
+1. Optionally, verify that the [stream metadata](/docs/singer-spec.html#metadata) for each table was set correctly in the extractor's [generated catalog file](/docs/integration.html#extractor-catalog-generation) by dumping it using [`meltano invoke --dump=catalog <plugin>`](/docs/command-line-interface.html#select):
 
     ```bash
     meltano invoke --dump=catalog <plugin>
@@ -620,7 +620,7 @@ Chances are that the loader you just added to your project will require some amo
 
 ::: details What if I already have a config file for this loader?
 
-If you've used this Singer target before without Meltano, you may have a [config file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file) already.
+If you've used this Singer target before without Meltano, you may have a [config file](/docs/singer-spec.html#config-files) already.
 
 If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) under the [plugin's `config` key](/docs/project.html#plugin-configuration):
 
@@ -727,7 +727,7 @@ If you run `meltano elt` another time with the same Job ID, you'll see it automa
 
 ::: details What if I already have a state file for this extractor?
 
-If you've used this Singer tap before without Meltano, you may have a [state file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) already.
+If you've used this Singer tap before without Meltano, you may have a [state file](/docs/singer-spec.html#state-files) already.
 
 If you'd like Meltano to use it instead of [looking up state based on the Job ID](/docs/integration.html#incremental-replication-state), you can either use [`meltano elt`](/docs/command-line-interface.html#elt)'s `--state` option or set the [`state` extractor extra](/docs/plugins.html#state-extra).
 
