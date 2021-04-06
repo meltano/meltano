@@ -274,7 +274,7 @@ Each item within the `streams` list is another JSON object with the following re
 
 * `stream` - this is the primary identifier of the stream as it will be passed to the target (`tools`, `team`, etc.)
 * `tap_stream_id` - this is the unique identifier of the stream which can differ from the `stream` name since some sources may have multiple available streams with the same name
-* `schema` - this is the JSON schema of the stream
+* `schema` - this is the JSON schema of the stream, which will be passed in a SCHEMA message to the Target
 
 Optional properties within the list are:
 
