@@ -162,7 +162,7 @@ export TAP_MONGODB_PASSWORD=<password>
 - [Environment variable](/docs/configuration.html#configuring-settings): `TAP_MONGODB_DATABASE`
 
 This is the database used for authentication, not the database used for extraction.
-The data extracted is determined by folllowing the [selecting entities and attributes](/docs/getting-started.html#select-entities-and-attributes-to-extract) instructions.
+The data extracted is determined by following the [selecting entities and attributes](/docs/getting-started.html#select-entities-and-attributes-to-extract) instructions.
 
 #### How to use
 
