@@ -22,10 +22,10 @@ We have Demo Days every other week on Friday at 9 AM Pacific (16:00 UTC). Join u
 
 Our next demo days are:
 
-* 2021-03-26
-* 2021-04-02
-* 2021-04-16
-* 2021-04-30
+* 2021-04-09
+* 2021-04-23
+* 2021-05-07
+* 2021-05-21
 
 ## Office Hours
 
