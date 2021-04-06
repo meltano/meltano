@@ -294,19 +294,16 @@ An example catalog with a single stream and no metadata is as follows:
         "properties": {
           "id": {
             "type": [
-              "null",
               "string"
             ],
           },
           "name": {
             "type": [
-              "null",
               "string"
             ],
           },
           "updated_at": {
             "type": [
-              "null",
               "string"
             ],
             "format": "date-time",
@@ -421,19 +418,16 @@ Putting this all together, a complete catalog example looks like this:
         "properties": {
           "id": {
             "type": [
-              "null",
               "string"
             ],
           },
           "name": {
             "type": [
-              "null",
               "string"
             ],
           },
           "updated_at": {
             "type": [
-              "null",
               "string"
             ],
             "format": "date-time",
@@ -545,7 +539,7 @@ Metrics messages are interspersed with the primary 3 messages, so parsing them s
 ```bash
 INFO Using API Token authentication.
 INFO tickets: Skipping - not selected
-{"type": "SCHEMA", "stream": "groups", "schema": {"properties": {"name": {"type": ["null", "string"]}, "created_at": {"format": "date-time", "type": ["null", "string"]}, "url": {"type": ["null", "string"]}, "updated_at": {"format": "date-time", "type": ["null", "string"]}, "deleted": {"type": ["null", "boolean"]}, "id": {"type": ["null", "integer"]}}, "type": ["null", "object"]}, "key_properties": ["id"]}
+{"type": "SCHEMA", "stream": "groups", "schema": {"properties": {"name": {"type": ["string"]}, "created_at": {"format": "date-time", "type": ["string"]}, "url": {"type": ["string"]}, "updated_at": {"format": "date-time", "type": ["string"]}, "deleted": {"type": ["boolean"]}, "id": {"type": ["integer"]}}, "type": ["object"]}, "key_properties": ["id"]}
 INFO groups: Starting sync
 INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 0.6276309490203857, "tags": {"status": "succeeded"}}
 {"type": "RECORD", "stream": "groups", "record": {"id": 360007960773, "updated_at": "2020-01-09T09:57:16.000000Z"}}
