@@ -12,8 +12,7 @@ who are new to the Singer community. The full specification is in the [Singer IO
 
 ## Version
 
-The current version of the spec is 0.3.0. 
-This spec is versioned using [Semantic Versioning](https://semver.org/) meaning that breaking changes will be a new `MAJOR` version, and backwards-compatible changes will be a new `MINOR` version.
+The current version of the spec is 0.3.0 and is versioned using [Semantic Versioning](https://semver.org/).
 
 ## Basics
 
