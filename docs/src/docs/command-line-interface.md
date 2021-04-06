@@ -338,7 +338,7 @@ meltano            | DEBUG Env: {'MELTANO_EXTRACTOR_NAME': 'tap-gitlab', 'MELTAN
 
 Note that the contents of these pipeline-specific generated files can also easily be dumped to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using the `--dump` option described above.
 
-Additionally, all [Singer messages](/docs/singer-spec.html#_3-messages) output by the tap and target will be logged, identified by `<plugin name> (out)` prefixes:
+Additionally, all [Singer messages](/docs/singer-spec.html#messages) output by the tap and target will be logged, identified by `<plugin name> (out)` prefixes:
 
 ```bash
 tap-gitlab         | INFO Starting sync
