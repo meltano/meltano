@@ -17,7 +17,7 @@ export default {
       </div>
       <div>
         <p>
-          Learn how to create a custom extractor!
+          Learn how to create your own custom extractor!
         </p>
       </div>
     </div>
