@@ -14,6 +14,7 @@ Loaders for the following destinations are currently [discoverable](/docs/plugin
 - [PostgreSQL](/plugins/loaders/postgres.html)
 - [SQLite](/plugins/loaders/sqlite.html)
 - [Snowflake](/plugins/loaders/snowflake.html)
+- [Amazon Redshift](/plugins/loaders/redshift.html)
 
 To learn more about [extracting](/plugins/loaders/) and loading data using Meltano, refer to the [Data Integration (EL) guide](/docs/integration.html).
 
