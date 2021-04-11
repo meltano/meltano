@@ -14,5 +14,5 @@ class PluginRemoveService:
         plugin: ProjectPlugin,
     ):
 
-        path = self.project.meltano_dir(plugin.type, plugin.name)
+        path = self.project.meltano_dir().joinpath(plugin.type, plugin.name)
         shutil.rmtree(path)
