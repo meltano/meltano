@@ -15,4 +15,9 @@ class PluginRemoveService:
     ):
 
         path = self.project.meltano_dir().joinpath(plugin.type, plugin.name)
-        shutil.rmtree(path)
+
+        remove = path.exists()
+        if remove:
+            shutil.rmtree(path)
+
+        return remove
