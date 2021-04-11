@@ -111,6 +111,20 @@ export MELTANO_DATABASE_URI=postgresql://<username>:<password>@<host>:<port>/<da
 meltano elt --database-uri=postgresql://<username>:<password>@<host>:<port>/<database> ...
 ```
 
+#### Targeting a PostgreSQL Schema
+
+When using PostgreSQL as your [system database](/docs/project.html#system-database), you can choose the target schema within that database by adding
+`?options=-csearch_path%3D<schema>` directly to the end of your `database_uri` and `MELTANO_DATABASE_URI`.
+
+You are also able to add multiple schemas, which PostgreSQL will work through from left to right until it finds a valid schema to target by using `?options=-csearch_path%3D<schema>,<schema_two>`
+
+If you dont target a schema then by default PostgreSQL will try to use the public schema.
+
+```bash
+postgresql://<username>:<password>@<host>:<port>/<database>?options=-csearch_path%3D<schema>
+```
+
+
 ### `database_max_retries`
 
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_DATABASE_MAX_RETRIES`
