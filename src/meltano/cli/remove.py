@@ -1,5 +1,6 @@
 import click
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_remove_service import PluginRemoveService
 from meltano.core.project_plugins_service import ProjectPluginsService
@@ -19,6 +20,18 @@ def remove(ctx, project, plugin_type, plugin_name):
     plugins_service = ProjectPluginsService(project)
 
     plugin = ProjectPlugin(PluginType.from_cli_argument(plugin_type), plugin_name)
-    plugins_service.remove_from_file(plugin)
+
+    try:
+        plugins_service.remove_from_file(plugin)
+        click.secho(
+            f"Plugin '{plugin.name}' removed",
+            fg="green",
+        )
+    except PluginNotFoundError:
+        click.secho(
+            f"Plugin '{plugin.name}' not found in meltano.yml - removing plugin installation",
+            fg="yellow",
+        )
+
     plugin_remove_service = PluginRemoveService(project)
     plugin_remove_service.remove_plugin(plugin)
