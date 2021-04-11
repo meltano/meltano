@@ -24,12 +24,12 @@ def remove(ctx, project, plugin_type, plugin_name):
     try:
         plugins_service.remove_from_file(plugin)
         click.secho(
-            f"Plugin '{plugin.name}' removed",
+            f"Removed {plugin.type} '{plugin.name}'",
             fg="green",
         )
     except PluginNotFoundError:
         click.secho(
-            f"Plugin '{plugin.name}' not found in meltano.yml - removing plugin installation",
+            f"Could not find {plugin.type} '{plugin.name}' in meltano.yml - attempting to remove plugin installation",
             fg="yellow",
         )
 
