@@ -18,27 +18,33 @@ def remove(ctx, project, plugin_type, plugin_name):
     """Remove a plugin from your project."""
 
     plugins_service = ProjectPluginsService(project)
+    plugin_remove_service = PluginRemoveService(project)
 
     plugin = ProjectPlugin(PluginType.from_cli_argument(plugin_type), plugin_name)
     plugin_descriptor = f"{plugin.type.singular} '{plugin.name}'"
 
+    removed_from_meltanofile = False
+    removed_installation = False
+
     try:
         plugins_service.remove_from_file(plugin)
+        removed_from_meltanofile = True
     except PluginNotFoundError:
         click.secho(
             f"Could not find {plugin_descriptor} in meltano.yml - attempting to remove plugin installation",
             fg="yellow",
         )
 
-    plugin_remove_service = PluginRemoveService(project)
+    removed_installation = plugin_remove_service.remove_plugin(plugin)
 
-    if plugin_remove_service.remove_plugin(plugin):
-        msg = f"Removed {plugin_descriptor}"
-        fg = "green"
-    else:
-        msg = (
-            f"Could not find an existing installation of {plugin_descriptor} to remove"
+    if not removed_installation:
+        click.secho(
+            f"Could not find an existing installation of {plugin_descriptor} to remove",
+            fg="yellow",
         )
-        fg = "yellow"
 
-    click.secho(msg, fg=fg)
+    if removed_from_meltanofile or removed_installation:
+        click.secho(
+            f"Removed {plugin_descriptor}",
+            fg="green",
+        )
