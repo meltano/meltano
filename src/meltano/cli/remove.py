@@ -1,3 +1,4 @@
+"""Defines `meltano remove` command."""
 import click
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
@@ -16,7 +17,6 @@ from .params import pass_project
 @click.pass_context
 def remove(ctx, project, plugin_type, plugin_name):
     """Remove a plugin from your project."""
-
     plugins_service = ProjectPluginsService(project)
     plugin_remove_service = PluginRemoveService(project)
 
@@ -27,8 +27,7 @@ def remove(ctx, project, plugin_type, plugin_name):
     removed_installation = False
 
     try:
-        plugins_service.remove_from_file(plugin)
-        removed_from_meltanofile = True
+        removed_from_meltanofile = bool(plugins_service.remove_from_file(plugin))
     except PluginNotFoundError:
         click.secho(
             f"Could not find {plugin_descriptor} in meltano.yml - attempting to remove plugin installation",
