@@ -14,7 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 [#2689](https://gitlab.com/meltano/meltano/-/issues/2689) Add documentation for using a custom Python Package Index (PyPi)
 
 ### Changes
-* Updated database_uri documentation to show how to target a postgres schema
+* [#2700](https://gitlab.com/meltano/meltano/-/issues/2700) Updated database_uri documentation to show how to target a PostgreSQL schema
 
 ### Fixes
 
