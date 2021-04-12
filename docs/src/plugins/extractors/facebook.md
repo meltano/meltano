@@ -170,6 +170,10 @@ Now that your app has been created and the Marketing API product has been enable
 
 This is the Access Token you will provide to Meltano.
 
+##### Connect the App
+
+After generating the access token, your app will need to be connected to the ad account within Facebook Business Manager. Navigate to Business Manager > Accounts > Apps > Connected Assets > Add Assets to add the access token.
+
 ##### Token Expiration
 
 Tokens generated using this method are only valid for 60 days by default.
