@@ -13,5 +13,7 @@ where your [project](/docs/project.html) and pipelines are composed of plugins o
 
 Meltano provides the glue to make these components work together smoothly and enables consistent [configuration](/docs/configuration.html) and [deployment](/docs/production.html).
 
+To learn about the details of how plugins are structured, refer to the [Plugin Structure guide](/docs/plugin-structure.html).
+
 To learn how to manage your project's plugins, refer to the [Plugin Management guide](/docs/plugin-management.html).
 
