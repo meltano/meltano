@@ -24,7 +24,6 @@ def remove(ctx, project, plugin_type, plugin_name):
     plugin_descriptor = f"{plugin.type.singular} '{plugin.name}'"
 
     removed_from_meltanofile = False
-    removed_installation = False
 
     try:
         removed_from_meltanofile = bool(plugins_service.remove_from_file(plugin))
