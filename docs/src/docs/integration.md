@@ -6,7 +6,7 @@ description: Learn how to extract and load data using Meltano and Singer taps an
 
 Meltano lets you easily extract and load data from and to databases, SaaS APIs, and file formats
 using [Singer](https://www.singer.io/) [taps](https://www.singer.io/#taps) and [targets](https://www.singer.io/#targets),
-which take the role of [your project](/docs/project.html)'s [extractors](/docs/plugins.html#extractors) and [loaders](/docs/plugins.html#loaders).
+which take the role of [your project](/docs/project.html)'s [extractors](/docs/plugin-structure.html#extractors) and [loaders](/docs/plugin-structure.html#loaders).
 
 Meltano [manages your tap and target configuration](#plugin-configuration) for you,
 makes it easy to [select which entities and attributes to extract](#selecting-entities-and-attributes-for-extraction),
@@ -18,7 +18,7 @@ You can run EL(T) pipelines using [`meltano elt`](/docs/command-line-interface.h
 
 ## Plugin configuration
 
-As described in the [Configuration guide](/docs/configuration.html#configuration-layers), [`meltano elt`](/docs/command-line-interface.html#elt) will determine the configuration of the extractor, loader, and (optionally) transformer by looking in [**the environment**](/docs/configuration.html#configuring-settings), your project's [**`.env` file**](/docs/project-structure.html#env), the [system database](/docs/project.html#system-database), and finally your [**`meltano.yml` project file**](/docs/project.html#meltano-yml-project-file), falling back to a default value if nothing was found.
+As described in the [Configuration guide](/docs/configuration.html#configuration-layers), [`meltano elt`](/docs/command-line-interface.html#elt) will determine the configuration of the extractor, loader, and (optionally) transformer by looking in [**the environment**](/docs/configuration.html#configuring-settings), your project's [**`.env` file**](/docs/project-structure.html#env), the [system database](/docs/project-structure.html#system-database), and finally your [**`meltano.yml` project file**](/docs/project.html#meltano-yml-project-file), falling back to a default value if nothing was found.
 
 You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#config) to list all available settings with their names, environment variables, and current values. [`meltano config <plugin>`](/docs/command-line-interface.html#config) will print the current configuration in JSON format.
 
@@ -26,7 +26,7 @@ You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#c
 
 If you'd like to specify (or override) the values of certain settings at runtime, on a per-pipeline basis, you can set them in the [`meltano elt`](/docs/command-line-interface.html#elt) execution environment using [environment variables](/docs/configuration.html#configuring-settings).
 
-This lets you use the same extractors and loaders (Singer taps and targets) in multiple pipelines, configured differently each time, as an alternative to creating [multiple configurations](/docs/configuration.html#multiple-plugin-configurations) using [plugin inheritance](/docs/plugins.html#plugin-inheritance).
+This lets you use the same extractors and loaders (Singer taps and targets) in multiple pipelines, configured differently each time, as an alternative to creating [multiple configurations](/docs/configuration.html#multiple-plugin-configurations) using [plugin inheritance](/docs/plugin-structure.html#plugin-inheritance).
 
 On a shell, you can explicitly `export` environment variables, that will be passed along to every following command invocation, or you can specify them in-line with a specific invocation, ahead of the command:
 
@@ -71,34 +71,34 @@ BashOperator(
 
 ### Pipeline environment variables
 
-To allow [loaders](/docs/plugins.html#loaders) and [transformers](/docs/plugins.html#transformers) to adapt their configuration and behavior based on the extractor and loader they are run with,
+To allow [loaders](/docs/plugin-structure.html#loaders) and [transformers](/docs/plugin-structure.html#transformers) to adapt their configuration and behavior based on the extractor and loader they are run with,
 [`meltano elt`](/docs/command-line-interface.html#elt) dynamically sets a number of pipeline-specific [environment variables](/docs/configuration.html#environment-variables) before [compiling their configuration](/docs/configuration.html#expansion-in-setting-values) and [invoking their executables](/docs/configuration.html#accessing-from-plugins).
 
 #### Extractor variables
 
-In addition to [variables available to all plugins](/docs/configuration.html#available-environment-variables), the following variables describing the [extractor](/docs/plugins.html#extractors) are available to loaders _and_ transformers:
+In addition to [variables available to all plugins](/docs/configuration.html#available-environment-variables), the following variables describing the [extractor](/docs/plugin-structure.html#extractors) are available to loaders _and_ transformers:
 
 - `MELTANO_EXTRACTOR_NAME`: the extractor's `name`, e.g. `tap-gitlab`
 - `MELTANO_EXTRACTOR_NAMESPACE`: the extractor's `namespace`, e.g. `tap_gitlab`
-- `MELTANO_EXTRACT_<SETTING_NAME>`: one environment variable for each of the extractor's settings and [extras](/docs/configuration.html#plugin-extras), e.g. `MELTANO_EXTRACT_PRIVATE_TOKEN` for the `private_token` setting, and `MELTANO_EXTRACT__LOAD_SCHEMA` for the [`load_schema` extra](/docs/plugins.html#load-schema-extra)
+- `MELTANO_EXTRACT_<SETTING_NAME>`: one environment variable for each of the extractor's settings and [extras](/docs/configuration.html#plugin-extras), e.g. `MELTANO_EXTRACT_PRIVATE_TOKEN` for the `private_token` setting, and `MELTANO_EXTRACT__LOAD_SCHEMA` for the [`load_schema` extra](/docs/plugin-structure.html#load-schema-extra)
 - `<SETTING_ENV>`: all of the extractor's regular configuration environment variables, as listed by `meltano config <plugin> list`, e.g. `TAP_GITLAB_API_URL` for the `api_url` setting
 
 #### Loader variables
 
-Additionally, the following variables describing the [loader](/docs/plugins.html#loaders) are available to transformers:
+Additionally, the following variables describing the [loader](/docs/plugin-structure.html#loaders) are available to transformers:
 
 - `MELTANO_LOADER_NAME`: the loader's `name`, e.g. `target-postgres`
 - `MELTANO_LOADER_NAMESPACE`: the loader's `namespace`, e.g. `postgres`
-- `MELTANO_LOAD_<SETTING_NAME>`: one environment variable for each of the loader's settings and [extras](/docs/configuration.html#plugin-extras), e.g. `MELTANO_LOAD_SCHEMA` for the `schema` setting, and `MELTANO_LOAD__DIALECT` for the [`dialect` extra](/docs/plugins.html#dialect-extra)
+- `MELTANO_LOAD_<SETTING_NAME>`: one environment variable for each of the loader's settings and [extras](/docs/configuration.html#plugin-extras), e.g. `MELTANO_LOAD_SCHEMA` for the `schema` setting, and `MELTANO_LOAD__DIALECT` for the [`dialect` extra](/docs/plugin-structure.html#dialect-extra)
 - `<SETTING_ENV>`: all of the loader's regular configuration environment variables, as listed by `meltano config <plugin> list`, e.g. `PG_ADDRESS` for the `host` setting
 
 #### Transform variables
 
-Additionally, the following variables describing the [transform](/docs/plugins.html#transforms) are available to transformers:
+Additionally, the following variables describing the [transform](/docs/plugin-structure.html#transforms) are available to transformers:
 
 - `MELTANO_TRANSFORM_NAME`: the loader's `name`, e.g. `tap-gitlab`
 - `MELTANO_TRANSFORM_NAMESPACE`: the loader's `namespace`, e.g. `tap_gitlab`
-- `MELTANO_TRANSFORM_<SETTING_NAME>`: one environment variable for each of the transform's settings and [extras](/docs/configuration.html#plugin-extras), e.g. `MELTANO_TRANSFORM__PACKAGE_NAME` for the [`package_name` extra](/docs/plugins.html#package-name-extra)
+- `MELTANO_TRANSFORM_<SETTING_NAME>`: one environment variable for each of the transform's settings and [extras](/docs/configuration.html#plugin-extras), e.g. `MELTANO_TRANSFORM__PACKAGE_NAME` for the [`package_name` extra](/docs/plugin-structure.html#package-name-extra)
 
 #### How to use
 
@@ -106,13 +106,13 @@ Inside your loader or transformer's `config` object in your [`meltano.yml` proje
 
 This feature is used to dynamically configure the `target-postgres` and `target-snowflake` loaders and `dbt` transformer as appropriate, independent of the specific extractor and loader used:
 - Default value for the `target-postgres` and `target-snowflake` `schema` settings:
-  - [`$MELTANO_EXTRACT__LOAD_SCHEMA`](/docs/plugins.html#load-schema-extra), e.g. `tap_gitlab` for `tap-gitlab`
+  - [`$MELTANO_EXTRACT__LOAD_SCHEMA`](/docs/plugin-structure.html#load-schema-extra), e.g. `tap_gitlab` for `tap-gitlab`
 - Default value for `dbt`'s `target` setting:
-  - [`$MELTANO_LOAD__DIALECT`](/docs/plugins.html#dialect-extra), e.g. `postgres` for `target-postgres` and `snowflake` for `target-snowflake`, which correspond to the target names in `transform/profile/profiles.yml`
+  - [`$MELTANO_LOAD__DIALECT`](/docs/plugin-structure.html#dialect-extra), e.g. `postgres` for `target-postgres` and `snowflake` for `target-snowflake`, which correspond to the target names in `transform/profile/profiles.yml`
 - Default value for `dbt`'s `source_schema` setting:
-  - [`$MELTANO_LOAD__TARGET_SCHEMA`](/docs/plugins.html#target-schema-extra), the value of the `schema` setting for `target-postgres` and `target-snowflake`
+  - [`$MELTANO_LOAD__TARGET_SCHEMA`](/docs/plugin-structure.html#target-schema-extra), the value of the `schema` setting for `target-postgres` and `target-snowflake`
 - Default value for `dbt`'s `models` setting:
-  - [`$MELTANO_TRANSFORM__PACKAGE_NAME`](/docs/plugins.html#package-name-extra)`$MELTANO_EXTRACTOR_NAMESPACE my_meltano_model`, e.g. `tap_gitlab tap_gitlab my_meltano_model` for the `tap-gitlab` transform and `tap-gitlab` extractor
+  - [`$MELTANO_TRANSFORM__PACKAGE_NAME`](/docs/plugin-structure.html#package-name-extra)`$MELTANO_EXTRACTOR_NAMESPACE my_meltano_model`, e.g. `tap_gitlab tap_gitlab my_meltano_model` for the `tap-gitlab` transform and `tap-gitlab` extractor
 
 ## Extractor catalog generation
 
@@ -131,7 +131,7 @@ and are applied to the discovered catalog on the fly when the extractor is run u
 
 If you'd like to manually inspect the generated catalog for debugging purposes, you can dump it to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using the `--dump=catalog` option on [`meltano invoke`](/docs/command-line-interface.html#invoke) or [`meltano elt`](/docs/command-line-interface.html#elt).
 
-Note that if you've already manually discovered a catalog and modified it to your liking, it can be provided explicitly using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option or the [`catalog` extractor extra](/docs/plugins.html#catalog-extra).
+Note that if you've already manually discovered a catalog and modified it to your liking, it can be provided explicitly using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option or the [`catalog` extractor extra](/docs/plugin-structure.html#catalog-extra).
 
 ### Selecting entities and attributes for extraction
 
@@ -139,7 +139,7 @@ Extractors are often capable of extracting many more entities and attributes tha
 To save on bandwidth and storage, it's usually a good idea to instruct your extractor to only select those entities and attributes you actually plan on using.
 
 Meltano makes it easy to select specific entities and attributes for inclusion or exclusion using [`meltano select`](/docs/command-line-interface.html#select)
-and the [`select` extractor extra](/docs/plugins.html#select-extra),
+and the [`select` extractor extra](/docs/plugin-structure.html#select-extra),
 which let you specify inclusion and exclusion rules that can contain [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) to match multiple entities and/or attributes at once.
 
 Note that exclusion takes precedence over inclusion: if an entity or attribute is matched by an exclusion pattern, there is no way to get it back using an inclusion pattern unless the exclusion pattern is manually removed from your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) first.
@@ -150,14 +150,14 @@ If no rules are defined using `meltano select`, Meltano will fall back on catch-
 
 Additional [Singer stream and property metadata](/docs/singer-spec.html#metadata)
 (like `replication-method` and `replication-key`) can be specified
-using the [`metadata` extractor extra](/docs/plugins.html#metadata-extra),
+using the [`metadata` extractor extra](/docs/plugin-structure.html#metadata-extra),
 which can be treated like a `_metadata` setting with
 [nested properties](/docs/command-line-interface.html#nested-properties)
 `_metadata.<entity>.<key>` and `_metadata.<entity>.<attribute>.<key>`.
 
 ### Overriding schemas
 
-Similarly, a [`schema` extractor extra](/docs/plugins.html#schema-extra) is available that lets you easily override
+Similarly, a [`schema` extractor extra](/docs/plugin-structure.html#schema-extra) is available that lets you easily override
 [Singer stream schema](/docs/singer-spec.html#schemas) descriptions.
 Here too, [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used to match multiple entities and/or attributes at once.
 
@@ -214,11 +214,11 @@ Most extractors (Singer taps) generate [state](/docs/singer-spec.html#state) whe
 
 Loaders (Singer targets) take in data and state messages from extractors and are responsible for forwarding the extractor state to Meltano once the associated data has been successfully persisted in the destination.
 
-Meltano stores this pipeline state in its [system database](/docs/project.html#system-database), identified by the [`meltano elt`](/docs/command-line-interface.html#elt) run's Job ID.
+Meltano stores this pipeline state in its [system database](/docs/project-structure.html#system-database), identified by the [`meltano elt`](/docs/command-line-interface.html#elt) run's Job ID.
 
 When `meltano elt` is run a subsequent time, it will look for the most recent completed (successful or failed) pipeline run with the same job ID that generated some state. If found, this state is then passed along to the extractor.
 
-Note that if you already have a state file you'd like to use, it can be provided explicitly using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--state` option or the [`state` extractor extra](/docs/plugins.html#state-extra).
+Note that if you already have a state file you'd like to use, it can be provided explicitly using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--state` option or the [`state` extractor extra](/docs/plugin-structure.html#state-extra).
 
 If you'd like to manually inspect a pipeline's state for debugging purposes, or so that you can store it somewhere other than the system database and explicitly pass it along to the next invocation, you can dump it to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--dump=state` option.
 

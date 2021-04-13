@@ -123,7 +123,7 @@ will hold the [plugins](/docs/plugins.html) that implement the various details o
     project_id: <random UUID>
     ```
 
-    It doesn't define any [plugins](/docs/project.html#plugins) or [pipeline schedules](/docs/orchestration.html#schedules) yet,
+    It doesn't define any [plugins](/docs/plugins.html) or [pipeline schedules](/docs/orchestration.html#schedules) yet,
     but note that the [`send_anonymous_usage_stats` setting](/docs/settings.html#send-anonymous-usage-stats) is enabled by default.
     To disable it, change the value to `false` and optionally remove the [`project_id` setting](/docs/settings.html#project-id).
 
@@ -152,12 +152,12 @@ will hold the [plugins](/docs/plugins.html) that implement the various details o
 
 Now that you have your very own Meltano project, it's time to add some [plugins](/docs/plugins.html) to it!
 
-The first plugin you'll want to add is an [extractor](/docs/plugins.html#extractors),
+The first plugin you'll want to add is an [extractor](/docs/plugin-structure.html#extractors),
 which will be responsible for pulling data out of your data source.
 
 *To learn more about adding plugins to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-a-plugin-to-your-project).*
 
-1. Find out if an extractor for your data source is [supported out of the box](/docs/plugins.html#discoverable-plugins)
+1. Find out if an extractor for your data source is [supported out of the box](/docs/plugin-structure.html#discoverable-plugins)
 by checking the [Sources list](/plugins/extractors/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
 
     ```bash
@@ -181,7 +181,7 @@ by checking the [Sources list](/plugins/extractors/) or using [`meltano discover
       docker run -v $(pwd):/project -w /project meltano/meltano add extractor tap-gitlab
       ```
 
-      This will add the new plugin to your [`meltano.yml` project file](/docs/project.html#plugins):
+      This will add the new plugin to your [`meltano.yml` project file](/docs/plugins.html):
 
       ```yml{3-5}
       plugins:
@@ -197,7 +197,7 @@ by checking the [Sources list](/plugins/extractors/) or using [`meltano discover
 
 1. Depending on the result, pick your next step:
 
-    - If a Singer tap for your data source is **available**, add it to your project as a [custom plugin](/docs/plugins.html#custom-plugins) using [`meltano add --custom`](/docs/command-line-interface.html#add):
+    - If a Singer tap for your data source is **available**, add it to your project as a [custom plugin](/docs/plugin-structure.html#custom-plugins) using [`meltano add --custom`](/docs/command-line-interface.html#add):
 
         ```bash
         meltano add --custom extractor <tap name>
@@ -213,7 +213,7 @@ by checking the [Sources list](/plugins/extractors/) or using [`meltano discover
 
         Meltano will now ask you some additional questions to learn more about the plugin.
 
-        This will add the new plugin to your [`meltano.yml` project file](/docs/project.html#plugins):
+        This will add the new plugin to your [`meltano.yml` project file](/docs/plugins.html):
 
         ```yml{3-14}
         plugins:
@@ -237,7 +237,7 @@ by checking the [Sources list](/plugins/extractors/) or using [`meltano discover
         ::: tip
         Once you've got the extractor working in your project, please consider
         [contributing its description](/docs/contributor-guide.html#discoverable-plugins)
-        to the [index of discoverable plugins](/docs/plugins.html#discoverable-plugins)
+        to the [index of discoverable plugins](/docs/plugin-structure.html#discoverable-plugins)
         so that it can be supported out of the box for new users!
         :::
 
@@ -270,7 +270,7 @@ Chances are that the extractor you just added to your project will require some 
 
 If you've used this Singer tap before without Meltano, you may have a [config file](/docs/singer-spec.html#config-files) already.
 
-If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) under the [plugin's `config` key](/docs/project.html#plugin-configuration):
+If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) under the [plugin's `config` key](/docs/plugin-structure.html#plugin-configuration):
 
 ```yaml{3-6}
 extractors:
@@ -305,7 +305,7 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     meltano config tap-gitlab set private_token my_private_token
     ```
 
-    This will add the non-sensitive configuration to your [`meltano.yml` project file](/docs/project.html#plugin-configuration):
+    This will add the non-sensitive configuration to your [`meltano.yml` project file](/docs/plugin-structure.html#plugin-configuration):
 
     ```yml{5-7}
     plugins:
@@ -362,7 +362,7 @@ to improve performance and save on bandwidth and storage.
 
 If you've used this Singer tap before without Meltano, you may have generated a [catalog file](/docs/singer-spec.html#catalog-files) already.
 
-If you'd like Meltano to use it instead of [generating a catalog](/docs/integration.html#extractor-catalog-generation) based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the [`catalog` extractor extra](/docs/plugins.html#catalog-extra) or use [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option when [running the data integration (EL) pipeline](#run-a-data-integration-el-pipeline) later on in this guide.
+If you'd like Meltano to use it instead of [generating a catalog](/docs/integration.html#extractor-catalog-generation) based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the [`catalog` extractor extra](/docs/plugin-structure.html#catalog-extra) or use [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option when [running the data integration (EL) pipeline](#run-a-data-integration-el-pipeline) later on in this guide.
 
 :::
 
@@ -399,7 +399,7 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
 
     As you can see in the example, entity and attribute identifiers can contain wildcards (`*`) to match multiple entities or attributes at once.
 
-    This will add the [selection rules](/docs/plugins.html#select-extra) to your [`meltano.yml` project file](/docs/project.html#plugin-configuration):
+    This will add the [selection rules](/docs/plugin-structure.html#select-extra) to your [`meltano.yml` project file](/docs/plugin-structure.html#plugin-configuration):
 
     ```yml{4-10}
     plugins:
@@ -451,7 +451,7 @@ Most database extractors, on the other hand, support two or more of the followin
 
 1. Find out which replication methods (i.e. options for the `replication-method` [stream metadata](/docs/singer-spec.html#metadata) key) the extractor supports by checking its documentation or the README in its repository.
 
-1. Set the desired `replication-method` metadata for each [selected entity](#select-entities-and-attributes-to-extract) using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) and the extractor's [`metadata` extra](/docs/plugins.html#metadata-extra):
+1. Set the desired `replication-method` metadata for each [selected entity](#select-entities-and-attributes-to-extract) using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) and the extractor's [`metadata` extra](/docs/plugin-structure.html#metadata-extra):
 
     ```bash
     meltano config <plugin> set _metadata <entity> replication-method <LOG_BASED|INCREMENTAL|FULL_TABLE>
@@ -479,7 +479,7 @@ Most database extractors, on the other hand, support two or more of the followin
     meltano config tap-postgres set _metadata some_entity_id replication-key id
     ```
 
-    This will add the [metadata rules](/docs/plugins.html#metadata-extra) to your [`meltano.yml` project file](/docs/project.html#plugin-configuration):
+    This will add the [metadata rules](/docs/plugin-structure.html#metadata-extra) to your [`meltano.yml` project file](/docs/plugin-structure.html#plugin-configuration):
 
     ```yml{4-13}
     plugins:
@@ -511,12 +511,12 @@ Most database extractors, on the other hand, support two or more of the followin
 Now that your Meltano project has everything it needs to pull data from your source,
 it's time to tell it where that data should go!
 
-This is where the [loader](/docs/plugins.html#loaders) comes in,
+This is where the [loader](/docs/plugin-structure.html#loaders) comes in,
 which will be responsible for loading [extracted](#add-an-extractor-to-pull-data-from-a-source) data into an arbitrary data destination.
 
 *To learn more about adding plugins to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-a-plugin-to-your-project).*
 
-1. Find out if a loader for your data destination is [supported out of the box](/docs/plugins.html#discoverable-plugins)
+1. Find out if a loader for your data destination is [supported out of the box](/docs/plugin-structure.html#discoverable-plugins)
 by checking the [Destinations list](/plugins/loaders/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
 
     ```bash
@@ -537,7 +537,7 @@ by checking the [Destinations list](/plugins/loaders/) or using [`meltano discov
       meltano add loader target-postgres --variant=transferwise
       ```
 
-      This will add the new plugin to your [`meltano.yml` project file](/docs/project.html#plugins):
+      This will add the new plugin to your [`meltano.yml` project file](/docs/plugins.html):
 
       ```yml{3-5}
       plugins:
@@ -553,7 +553,7 @@ by checking the [Destinations list](/plugins/loaders/) or using [`meltano discov
 
 1. Depending on the result, pick your next step:
 
-    - If a Singer target for your data destination is **available**, add it to your project as a [custom plugin](/docs/plugins.html#custom-plugins) using [`meltano add --custom`](/docs/command-line-interface.html#add):
+    - If a Singer target for your data destination is **available**, add it to your project as a [custom plugin](/docs/plugin-structure.html#custom-plugins) using [`meltano add --custom`](/docs/command-line-interface.html#add):
 
         ```bash
         meltano add --custom loader <target name>
@@ -569,7 +569,7 @@ by checking the [Destinations list](/plugins/loaders/) or using [`meltano discov
 
         Meltano will now ask you some additional questions to learn more about the plugin.
 
-        This will add the new plugin to your [`meltano.yml` project file](/docs/project.html#plugins):
+        This will add the new plugin to your [`meltano.yml` project file](/docs/plugins.html):
 
         ```yml{3-10}
         plugins:
@@ -589,7 +589,7 @@ by checking the [Destinations list](/plugins/loaders/) or using [`meltano discov
         ::: tip
         Once you've got the loader working in your project, please consider
         [contributing its description](/docs/contributor-guide.html#discoverable-plugins)
-        to the [index of discoverable plugins](/docs/plugins.html#discoverable-plugins)
+        to the [index of discoverable plugins](/docs/plugin-structure.html#discoverable-plugins)
         so that it can be supported out of the box for new users!
         :::
 
@@ -622,7 +622,7 @@ Chances are that the loader you just added to your project will require some amo
 
 If you've used this Singer target before without Meltano, you may have a [config file](/docs/singer-spec.html#config-files) already.
 
-If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) under the [plugin's `config` key](/docs/project.html#plugin-configuration):
+If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) under the [plugin's `config` key](/docs/plugin-structure.html#plugin-configuration):
 
 ```yaml{3-6}
 loaders:
@@ -660,7 +660,7 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     meltano config target-postgres set postgres_schema public
     ```
 
-    This will add the non-sensitive configuration to your [`meltano.yml` project file](/docs/project.html#plugin-configuration):
+    This will add the non-sensitive configuration to your [`meltano.yml` project file](/docs/plugin-structure.html#plugin-configuration):
 
     ```yml{5-10}
     plugins:
@@ -729,7 +729,7 @@ If you run `meltano elt` another time with the same Job ID, you'll see it automa
 
 If you've used this Singer tap before without Meltano, you may have a [state file](/docs/singer-spec.html#state-files) already.
 
-If you'd like Meltano to use it instead of [looking up state based on the Job ID](/docs/integration.html#incremental-replication-state), you can either use [`meltano elt`](/docs/command-line-interface.html#elt)'s `--state` option or set the [`state` extractor extra](/docs/plugins.html#state-extra).
+If you'd like Meltano to use it instead of [looking up state based on the Job ID](/docs/integration.html#incremental-replication-state), you can either use [`meltano elt`](/docs/command-line-interface.html#elt)'s `--state` option or set the [`state` extractor extra](/docs/plugin-structure.html#state-extra).
 
 If you'd like to dump the state generated by the most recent run into a file, so that you can explicitly pass it along to the next invocation, you can use [`meltano elt`](/docs/command-line-interface.html#elt)'s `--dump=state` option:
 
@@ -795,7 +795,7 @@ To help you realize this, Meltano supports scheduled pipelines that can be orche
     meltano add orchestrator airflow
     ```
 
-    This will add the new plugin to your [`meltano.yml` project file](/docs/project.html#plugins):
+    This will add the new plugin to your [`meltano.yml` project file](/docs/plugins.html):
 
     ```yml{3-4}
     plugins:

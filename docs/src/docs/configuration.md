@@ -7,12 +7,12 @@ description: Learn how to manage the configuration of your project's plugins.
 Meltano is responsible for managing the configuration of all of a [project](/docs/project.html)'s [plugins](/docs/plugins.html).
 It knows what settings are supported by each plugin, and how and when different types of plugins expect to be fed that configuration.
 
-Since this also goes for [extractors](/docs/plugins.html#extractors) and [loaders](/docs/plugins.html#loaders), you do not need to manually craft the
+Since this also goes for [extractors](/docs/plugin-structure.html#extractors) and [loaders](/docs/plugin-structure.html#loaders), you do not need to manually craft the
 [`config.json` files](/docs/singer-spec.html#config-files) expected by Singer taps and targets,
 because Meltano will generate them on the fly whenever an extractor or loader is used through [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 
-If the plugin you'd like to use and configure is [supported out of the box](/docs/plugins.html#discoverable-plugins) (that is, it shows up when you run [`meltano discover`](/docs/command-line-interface.html#discover)), Meltano already knows what settings it supports.
-If you're adding a [custom plugin](/docs/plugins.html#custom-plugins), on the other hand, you will be asked to provide the names of the supported configuration options yourself.
+If the plugin you'd like to use and configure is [supported out of the box](/docs/plugin-structure.html#discoverable-plugins) (that is, it shows up when you run [`meltano discover`](/docs/command-line-interface.html#discover)), Meltano already knows what settings it supports.
+If you're adding a [custom plugin](/docs/plugin-structure.html#custom-plugins), on the other hand, you will be asked to provide the names of the supported configuration options yourself.
 
 You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#config) to list all available settings for a plugin with their names, [environment variables](#environment-variables), and current values. [`meltano config <plugin>`](/docs/command-line-interface.html#config) will print the current configuration in JSON format.
 
@@ -27,12 +27,12 @@ To determine the values of settings, Meltano will look in 4 main places (and one
 2. **Your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file)**, under the plugin's `config` key.
    - Inside values, [environment variables can be referenced](#expansion-in-setting-values) as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
-3. **Your project's [**system database**](/docs/project.html#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) or [the UI](/docs/ui.html) when the project is [deployed as read-only](/docs/settings.html#project-readonly).
+3. **Your project's [**system database**](/docs/project-structure.html#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/docs/command-line-interface.html#config) or [the UI](/docs/ui.html) when the project is [deployed as read-only](/docs/settings.html#project-readonly).
    - Note that configuration for Meltano itself cannot be stored in the system database.
-4. _If the plugin [inherits from another plugin](/docs/plugins.html#plugin-inheritance) in your project_: **The parent plugin's own configuration**
+4. _If the plugin [inherits from another plugin](/docs/plugin-structure.html#plugin-inheritance) in your project_: **The parent plugin's own configuration**
 5. **The default `value`s** set in the plugin's [`settings` metadata](/docs/contributor-guide.html#connector-settings).
-   - Definitions of [discoverable plugins](/docs/plugins.html#discoverable-plugins) can be found in the [`discovery.yml` manifest](/docs/contributor-guide.html#discoverable-plugins).
-   - [Custom plugin definitions](/docs/project.html#plugins) can be found in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
+   - Definitions of [discoverable plugins](/docs/plugin-structure.html#discoverable-plugins) can be found in the [`discovery.yml` manifest](/docs/contributor-guide.html#discoverable-plugins).
+   - [Custom plugin definitions](/docs/plugins.html) can be found in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
    - `meltano config <plugin> list` will list the default values.
 
 Configuration that is _not_ environment-specific or sensitive should be stored in `meltano.yml` and checked into version
@@ -124,8 +124,8 @@ These can then be accessed from inside the plugin using the mechanism provided b
 
 ## Multiple plugin configurations
 
-Every [plugin in your project](/docs/plugins.html#project-plugins) has its own configuration,
-but you can use [plugin inheritance](/docs/plugins.html#plugin-inheritance) to define multiple plugins
+Every [plugin in your project](/docs/plugin-structure.html#project-plugins) has its own configuration,
+but you can use [plugin inheritance](/docs/plugin-structure.html#plugin-inheritance) to define multiple plugins
 that use the same package but still have their own configuration:
 
 ```yml{8-18}
@@ -150,14 +150,14 @@ plugins:
 ```
 
 In this example, `tap-ga--view-foo` and `tap-ga--view-bar` are separate plugins that
-inherit their [base plugin description](/docs/plugins.html#project-plugins) (describing the package)
+inherit their [base plugin description](/docs/plugin-structure.html#project-plugins) (describing the package)
 and configuration (where not overridden) from `tap-google-analytics`,
-which itself [shadows](/docs/project.html#shadowing-plugin-definitions) the
-[discoverable plugin](/docs/plugins.html#discoverable-plugins) with the same name.
+which itself [shadows](/docs/plugin-structure.html#shadowing-plugin-definitions) the
+[discoverable plugin](/docs/plugin-structure.html#discoverable-plugins) with the same name.
 
 If there is no need for the different plugins to inherit any common configuration,
 they can [directly inherit](/docs/plugin-management.html#explicit-inheritance) from the
-[discoverable plugin](/docs/plugins.html#discoverable-plugins) instead, without an intermediary plugin:
+[discoverable plugin](/docs/plugin-structure.html#discoverable-plugins) instead, without an intermediary plugin:
 
 ```yml
 plugins:
@@ -189,8 +189,8 @@ To learn how to add an inheriting plugin to your project, refer to the [Plugin M
 
 Meltano keeps track of the settings a plugin supports using [`settings` metadata](/docs/contributor-guide.html#connector-settings), and will list them all when you run [`meltano config <plugin> list`](/docs/command-line-interface.html#config).
 
-If you've added a [discoverable plugin](/docs/plugins.html#discoverable-plugins) to your project, this metadata will already be known to Meltano.
-If we're dealing with a [custom plugin](/docs/plugins.html#custom-plugins) instead, you will have been asked to provide the names of the supported configuration options yourself.
+If you've added a [discoverable plugin](/docs/plugin-structure.html#discoverable-plugins) to your project, this metadata will already be known to Meltano.
+If we're dealing with a [custom plugin](/docs/plugin-structure.html#custom-plugins) instead, you will have been asked to provide the names of the supported configuration options yourself.
 
 If a plugin supports a setting that is not yet known to Meltano (because it may have been added after the `settings` metadata was specified, for example),
 you do not need to modify the `settings` metadata to be able to use it.
@@ -221,22 +221,22 @@ Plugin extras are additional configuration options specific to the type of plugi
 that are handled by Meltano instead of the plugin itself.
 
 Meltano currently knows these extras for these plugin types:
-- [Extractors](/docs/plugins.html#extractors)
-  - [`catalog`](/docs/plugins.html#catalog-extra)
-  - [`load_schema`](/docs/plugins.html#load-schema-extra)
-  - [`metadata`](/docs/plugins.html#metadata-extra)
-  - [`schema`](/docs/plugins.html#schema-extra)
-  - [`select`](/docs/plugins.html#select-extra)
-  - [`select_filter`](/docs/plugins.html#select-filter-extra)
-  - [`state`](/docs/plugins.html#state-extra)
-- [Loaders](/docs/plugins.html#loaders)
-  - [`dialect`](/docs/plugins.html#dialect-extra)
-  - [`target_schema`](/docs/plugins.html#target-schema-extra)
-- [Transforms](/docs/plugins.html#transforms)
-  - [`package_name`](/docs/plugins.html#package-name-extra)
-  - [`vars`](/docs/plugins.html#vars-extra)
-- [File bundles](/docs/plugins.html#file-bundles)
-  - [`update`](/docs/plugins.html#update-extra)
+- [Extractors](/docs/plugin-structure.html#extractors)
+  - [`catalog`](/docs/plugin-structure.html#catalog-extra)
+  - [`load_schema`](/docs/plugin-structure.html#load-schema-extra)
+  - [`metadata`](/docs/plugin-structure.html#metadata-extra)
+  - [`schema`](/docs/plugin-structure.html#schema-extra)
+  - [`select`](/docs/plugin-structure.html#select-extra)
+  - [`select_filter`](/docs/plugin-structure.html#select-filter-extra)
+  - [`state`](/docs/plugin-structure.html#state-extra)
+- [Loaders](/docs/plugin-structure.html#loaders)
+  - [`dialect`](/docs/plugin-structure.html#dialect-extra)
+  - [`target_schema`](/docs/plugin-structure.html#target-schema-extra)
+- [Transforms](/docs/plugin-structure.html#transforms)
+  - [`package_name`](/docs/plugin-structure.html#package-name-extra)
+  - [`vars`](/docs/plugin-structure.html#vars-extra)
+- [File bundles](/docs/plugin-structure.html#file-bundles)
+  - [`update`](/docs/plugin-structure.html#update-extra)
 
 The values of these extras are stored in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) among the plugin's other properties, _outside_ of the `config` object:
 

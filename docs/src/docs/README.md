@@ -56,7 +56,7 @@ This further lowers the barrier to creating new connectors and contributing to e
 and will lead to increased reliability and consistency.
 
 We are also [planning to grow](https://gitlab.com/groups/meltano/-/epics/83)
-Meltano's index of [discoverable extractors and loaders](/docs/plugins.html#discoverable-plugins)
+Meltano's index of [discoverable extractors and loaders](/docs/plugin-structure.html#discoverable-plugins)
 into the Singer equivalent of [PyPI](https://pypi.org/) or [Docker Hub](https://hub.docker.com/),
 to give users (and tools) a **central place to learn** about the behavior, supported features,
 and maintenance status of **all taps and targets in the ecosystem**,
