@@ -26,6 +26,40 @@ meltano schedule carbon__sqlite tap-carbon-intensity target-sqlite @daily
 
 Now that you've scheduled your first pipeline, you can load the "Pipeline" page in the UI and see it show up.
 
+### Schedules
+
+Your project's pipeline schedules,
+typically [created](/docs/orchestration.html#create-a-schedule)
+using [`meltano schedule`](/docs/command-line-interface.html#schedule),
+ are defined under the `schedules` property.
+
+A schedule definition must have a `name`, `extractor`, `loader`, `transform` and `interval`:
+
+```yaml
+schedules:
+- name: foo-to-bar
+  extractor: tap-foo
+  loader: target-bar
+  transform: skip
+  interval: '@hourly'
+```
+
+[Pipeline-specific configuration](/docs/integration.html#pipeline-specific-configuration) can be specified using [environment variables](/docs/configuration.html#configuring-settings) in an `env` dictionary:
+
+```yaml{7-9}
+schedules:
+- name: foo-to-bar
+  extractor: tap-foo
+  loader: target-bar
+  transform: skip
+  interval: '@hourly'
+  env:
+    TAP_FOO_BAR: bar
+    TAP_FOO_BAZ: baz
+```
+
+To learn more about pipeline schedules and orchestration, refer to the [Orchestration guide](/docs/orchestration.html).
+
 ## Installing Airflow
 
 While you can use Meltano's CLI or UI to define pipeline schedules,

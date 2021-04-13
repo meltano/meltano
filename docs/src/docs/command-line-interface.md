@@ -92,7 +92,7 @@ Enables you to manage the [configuration](/docs/configuration.html) of Meltano i
 When no explicit `--store` is specified, `meltano config <plugin> set` will automatically store the value in the [most appropriate location](/docs/configuration.html#configuration-layers):
 - the [system database](/docs/project.html#system-database), if the project is [deployed as read-only](/docs/settings.html#project-readonly);
 - the current location, if a setting's default value has already been overwritten;
-- [`.env`](/docs/project.html#env), if a setting is sensitive or environment-specific (defined as `kind: password` or `env_specific: true`);
+- [`.env`](/docs/project-structure.html#env), if a setting is sensitive or environment-specific (defined as `kind: password` or `env_specific: true`);
 - [`meltano.yml`](/docs/project.html#meltano-yml-project-file) otherwise.
 
 ### How to use
@@ -603,7 +603,7 @@ This command is only relevant for production-grade setup.
 
 Generate secrets for the [`ui.secret_key`](/docs/settings.html#ui-secret-key)
 and [`ui.password_salt`](/docs/settings.html#ui-password-salt) settings, that
-will be stored in your project's [`.env` file](/docs/project.html#env) along with the
+will be stored in your project's [`.env` file](/docs/project-structure.html#env) along with the
 specified value for the [`ui.server_name` setting](/docs/settings.html#ui-server-name).
 
 In production, you will likely want to move these settings to actual environment variables, since `.env` is in `.gitignore` by default.

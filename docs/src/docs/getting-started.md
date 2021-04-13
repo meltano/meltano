@@ -123,7 +123,7 @@ will hold the [plugins](/docs/plugins.html) that implement the various details o
     project_id: <random UUID>
     ```
 
-    It doesn't define any [plugins](/docs/project.html#plugins) or [pipeline schedules](/docs/project.html#schedules) yet,
+    It doesn't define any [plugins](/docs/project.html#plugins) or [pipeline schedules](/docs/orchestration.html#schedules) yet,
     but note that the [`send_anonymous_usage_stats` setting](/docs/settings.html#send-anonymous-usage-stats) is enabled by default.
     To disable it, change the value to `false` and optionally remove the [`project_id` setting](/docs/settings.html#project-id).
 
@@ -317,7 +317,7 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
           start_date: '2020-10-01T00:00:00Z'
     ```
 
-    Sensitive configuration (like `private_token`) will instead be stored in your project's [`.env` file](/docs/project.html#env) so that it will not be checked into version control:
+    Sensitive configuration (like `private_token`) will instead be stored in your project's [`.env` file](/docs/project-structure.html#env) so that it will not be checked into version control:
 
     ```bash
     export TAP_GITLAB_PRIVATE_TOKEN=my_private_token
@@ -675,7 +675,7 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
           postgres_schema: public
     ```
 
-    Sensitive configuration (like `postgres_password`) will instead be stored in your project's [`.env` file](/docs/project.html#env) so that it will not be checked into version control:
+    Sensitive configuration (like `postgres_password`) will instead be stored in your project's [`.env` file](/docs/project-structure.html#env) so that it will not be checked into version control:
 
     ```bash
     export TARGET_POSTGRES_PASSWORD=meltano
@@ -772,7 +772,7 @@ To help you realize this, Meltano supports scheduled pipelines that can be orche
     The `pipeline name` argument corresponds to the `--job_id` option on `meltano elt`, which identifies related EL(T) runs when storing and looking up [incremental replication state](/docs/integration.html#incremental-replication-state).
     To have scheduled runs pick up where your [earlier manual run](#run-a-data-integration-el-pipeline) left off, ensure you use the same pipeline name.
 
-    This will add the new schedule to your [`meltano.yml` project file](/docs/project.html#schedules):
+    This will add the new schedule to your [`meltano.yml` project file](/docs/orchestration.html#schedules):
 
     ```yml{2-6}
     schedules:

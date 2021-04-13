@@ -22,7 +22,7 @@ Meltano itself can be configured as well. To learn more, refer to the [Settings 
 
 To determine the values of settings, Meltano will look in 4 main places (and one optional one), with each taking precedence over the next:
 
-1. [**Environment variables**](#configuring-settings), set through [your shell at `meltano elt` runtime](/docs/integration.html#pipeline-specific-configuration), your project's [`.env` file](/docs/project.html#env), a [scheduled pipeline's `env` dictionary](/docs/project.html#schedules), or any other method.
+1. [**Environment variables**](#configuring-settings), set through [your shell at `meltano elt` runtime](/docs/integration.html#pipeline-specific-configuration), your project's [`.env` file](/docs/project-structure.html#env), a [scheduled pipeline's `env` dictionary](/docs/orchestration.html#schedules), or any other method.
    - You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#config) to list the available variable names, which typically have the format `<PLUGIN_NAME>_<SETTING_NAME>`.
 2. **Your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file)**, under the plugin's `config` key.
    - Inside values, [environment variables can be referenced](#expansion-in-setting-values) as `$VAR` (as a single word) or `${VAR}` (inside a word).
@@ -52,7 +52,7 @@ and [invokes plugin executables](#accessing-from-plugins).
 ### Configuring settings
 
 As mentioned under [Configuration layers](#configuration-layers), Meltano will look at the environment variables it was executed with
-and those specified in your project's [`.env` file](/docs/project.html#env)
+and those specified in your project's [`.env` file](/docs/project-structure.html#env)
 to determine the values of [its own settings](/docs/settings.md) and those of its plugins.
 
 Any setting can be configured by specifying an environment variable named `<PLUGIN_NAME>_<SETTING_NAME>`, with characters other than alphanumeric (`A-Z`, `0-9`) and underscores (`_`) replaced with underscores, e.g. `TAP_GITLAB_API_URL` for extractor `tap-gitlab`'s `api_url` setting:
@@ -84,7 +84,7 @@ specific properties of your project, or the plugins it is run with inside a
 The following variables can be referenced from any setting:
 
 - Those specified in the execution environment
-- Those set in your project's [`.env` file](/docs/project.html#env)
+- Those set in your project's [`.env` file](/docs/project-structure.html#env)
 - `MELTANO_PROJECT_ROOT`: Absolute path to the current [project](/docs/project.html) directory, e.g. `/home/meltano-projects/demo-project`
 
 Additionally, the following variables can be referenced from plugin settings (as opposed to [Meltano settings](/docs/settings.html)):
