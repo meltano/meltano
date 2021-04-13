@@ -12,37 +12,25 @@ from .params import pass_project
 
 @cli.command()
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
-@click.argument("plugin_name", required=True)
+@click.argument("plugin_names", nargs=-1, required=True)
 @pass_project()
 @click.pass_context
-def remove(ctx, project, plugin_type, plugin_name):
+def remove(ctx, project, plugin_type, plugin_names):
     """Remove a plugin from your project."""
     plugins_service = ProjectPluginsService(project)
     plugin_remove_service = PluginRemoveService(project)
 
-    plugin = ProjectPlugin(PluginType.from_cli_argument(plugin_type), plugin_name)
-    plugin_descriptor = f"{plugin.type.singular} '{plugin.name}'"
+    for plugin_name in plugin_names:
 
-    removed_from_meltanofile = False
+        plugin = ProjectPlugin(PluginType.from_cli_argument(plugin_type), plugin_name)
+        plugin_descriptor = f"{plugin.type.singular} '{plugin.name}'"
 
-    try:
-        removed_from_meltanofile = bool(plugins_service.remove_from_file(plugin))
-    except PluginNotFoundError:
-        click.secho(
-            f"Could not find {plugin_descriptor} in meltano.yml - attempting to remove plugin installation",
-            fg="yellow",
-        )
+        try:
+            plugins_service.remove_from_file(plugin)
+        except PluginNotFoundError:
+            click.secho(
+                f"Could not find {plugin_descriptor} in meltano.yml - attempting to remove plugin installation",
+                fg="yellow",
+            )
 
-    removed_installation = plugin_remove_service.remove_plugin(plugin)
-
-    if not removed_installation:
-        click.secho(
-            f"Could not find an existing installation of {plugin_descriptor} to remove",
-            fg="yellow",
-        )
-
-    if removed_from_meltanofile or removed_installation:
-        click.secho(
-            f"Removed {plugin_descriptor}",
-            fg="green",
-        )
+        plugin_remove_service.remove_plugin(plugin)
