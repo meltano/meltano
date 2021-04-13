@@ -1,10 +1,8 @@
 """Defines `meltano remove` command."""
 import click
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_remove_service import PluginRemoveService
-from meltano.core.project_plugins_service import ProjectPluginsService
 
 from . import cli
 from .params import pass_project
@@ -17,20 +15,26 @@ from .params import pass_project
 @click.pass_context
 def remove(ctx, project, plugin_type, plugin_names):
     """Remove a plugin from your project."""
-    plugins_service = ProjectPluginsService(project)
     plugin_remove_service = PluginRemoveService(project)
 
-    for plugin_name in plugin_names:
+    plugins = [
+        ProjectPlugin(PluginType.from_cli_argument(plugin_type), plugin_name)
+        for plugin_name in plugin_names
+    ]
 
-        plugin = ProjectPlugin(PluginType.from_cli_argument(plugin_type), plugin_name)
-        plugin_descriptor = f"{plugin.type.singular} '{plugin.name}'"
+    plugin_removal_status = plugin_remove_service.remove_plugins(plugins)
 
-        try:
-            plugins_service.remove_from_file(plugin)
-        except PluginNotFoundError:
-            click.secho(
-                f"Could not find {plugin_descriptor} in meltano.yml - attempting to remove plugin installation",
-                fg="yellow",
-            )
+    _print_plugins_removal_status(plugin_removal_status)
 
-        plugin_remove_service.remove_plugin(plugin)
+
+def _print_plugins_removal_status(plugin_removal_status):
+
+    for plugin_status in plugin_removal_status:
+        click.echo()
+        click.echo(
+            f"Attempting to remove {plugin_status['plugin_name']} from your meltano project"
+        )
+        click.echo(f"Removed from meltano.YAML: {plugin_status['removed_yaml']}")
+        click.echo(
+            f"Removed from installation: {plugin_status['removed_installation']}"
+        )
