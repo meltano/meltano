@@ -4,7 +4,7 @@ description: At the core of the Meltano experience is your Meltano project, whic
 
 # Plugin Structure
 
-### Plugins
+## Plugins
 
 Your project's [plugins](/docs/plugin-structure.html#project-plugins),
 typically [added to your project](/docs/plugin-management.html#adding-a-plugin-to-your-project)
@@ -28,7 +28,7 @@ When inheriting a base plugin description, the plugin definition does not need t
 but you may want to override the inherited value and set the property explicitly to [point at a (custom) fork](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin) or to [pin a package to a specific version](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin#pinning-a-plugin-to-a-specific-version).
 When a plugin is added using `meltano add`, the `pip_url` is automatically repeated in the plugin definition for convenience.
 
-#### Inheriting plugin definitions
+### Inheriting plugin definitions
 
 A plugin defined with an `inherit_from` property inherits its [base plugin description](/docs/plugin-structure.html#project-plugins) from another plugin identified by name. To find the matching plugin, other plugins in your project are considered first, followed by
 [discoverable plugins](/docs/plugin-structure.html#discoverable-plugins):
@@ -84,7 +84,7 @@ plugins:
 
 To learn how to add an inheriting plugin to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#plugin-inheritance).
 
-#### Custom plugin definitions
+### Custom plugin definitions
 
 A plugin defined with a `namespace` property (but no `inherit_from` property) is a [custom plugin](/docs/plugin-structure.html#custom-plugins) that explicitly defines its [base plugin description](/docs/plugin-structure.html#project-plugins):
 
@@ -107,7 +107,7 @@ plugins:
 
 To learn how to add a custom plugin to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#custom-plugins).
 
-#### Shadowing plugin definitions
+### Shadowing plugin definitions
 
 A plugin defined without an `inherit_from` or `namespace` property implicitly inherits its [base plugin description](/docs/plugin-structure.html#project-plugins) from the [discoverable plugin](/docs/plugin-structure.html#discoverable-plugins) with the same `name`, as a form of [shadowing](https://en.wikipedia.org/wiki/Variable_shadowing):
 
@@ -119,7 +119,7 @@ plugins:
 
 To learn how to add a discoverable plugin to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#discoverable-plugins).
 
-##### Variants
+#### Variants
 
 If multiple [variants](/docs/plugin-structure.html#variants) of a discoverable plugin are available,
 the `variant` property can be used to choose a specific one:
@@ -134,7 +134,7 @@ plugins:
 If no `variant` is specified, the _original_ variant supported by Meltano is used.
 Note that this is not necessarily the _default_ variant that is recommended to new users and would be used if the plugin were newly added to the project.
 
-#### Plugin configuration
+### Plugin configuration
 
 A plugin's [configuration](/docs/configuration.html) is stored under a `config` property.
 Values for [plugin extras](/docs/configuration.html#plugin-extras) are stored among the plugin's other properties, outside of the `config` object:
