@@ -241,7 +241,7 @@ by checking the [Sources list](/plugins/extractors/) or using [`meltano discover
         so that it can be supported out of the box for new users!
         :::
 
-    - If a Singer tap for your data source **doesn't exist yet**, learn how to build your own tap by following the ["Create a Custom Extractor" tutorial](/tutorials/create-a-custom-extractor.html) or [Singer's "Developing a Tap" guide](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-tap).
+    - If a Singer tap for your data source **doesn't exist yet**, learn how to build and use your own tap by following the ["Create and Use a Custom Extractor" tutorial](/tutorials/create-a-custom-extractor.html).
 
         Once you've got your new tap project set up, you can add it to your Meltano project
         as a custom plugin by following the `meltano add --custom` instructions above.
