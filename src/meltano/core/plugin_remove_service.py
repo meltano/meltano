@@ -20,6 +20,9 @@ class PluginRemoveService:
 
     def remove_plugins(self, plugins: Iterable[ProjectPlugin], status_cb=noop):
         """Remove multiple plugins."""
+        num_plugins: int = len(plugins)
+        removed_plugins: int = num_plugins
+
         for plugin in plugins:
             status = "running"
             message = ""
@@ -37,8 +40,11 @@ class PluginRemoveService:
                 message = installation.message
             else:
                 status = "nothing_to_remove"
+                removed_plugins -= 1
 
             status_cb(plugin, status, message)
+
+        return removed_plugins, num_plugins
 
     def remove_plugin(self, plugin: ProjectPlugin):
         """Remove a plugin from `meltano.yml` and its installation in `.meltano`."""
