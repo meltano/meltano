@@ -7,6 +7,7 @@ from contextlib import suppress
 import click
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
@@ -379,3 +380,27 @@ def install_plugins(project, plugins, reason=PluginInstallReason.INSTALL):
         click.secho(f"{verb} {num_installed}/{num_installed+num_failed} plugins", fg=fg)
 
     return num_failed == 0
+
+
+def remove_status_update(plugin: ProjectPlugin, status: str, message=""):
+    """Print remove status message."""
+    plugin_descriptor = f"{plugin.type.descriptor} '{plugin.name}'"
+
+    if status == "running":
+        click.secho(f"Removing {plugin_descriptor}...")
+
+    elif status == "nothing_to_remove":
+        click.secho(
+            f"Nothing to remove for {plugin_descriptor}",
+            fg="yellow",
+        )
+        click.echo()
+    elif status == "partial_success":
+        click.secho(
+            f"Removed {plugin_descriptor}: {message}",
+            fg="yellow",
+        )
+        click.echo()
+    elif status == "success":
+        click.secho(f"Removed {plugin_descriptor}", fg="green")
+        click.echo()

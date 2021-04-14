@@ -6,6 +6,7 @@ from meltano.core.plugin_remove_service import PluginRemoveService
 
 from . import cli
 from .params import pass_project
+from .utils import remove_status_update
 
 
 @cli.command()
@@ -22,19 +23,4 @@ def remove(ctx, project, plugin_type, plugin_names):
         for plugin_name in plugin_names
     ]
 
-    plugin_removal_status = plugin_remove_service.remove_plugins(plugins)
-
-    _print_plugins_removal_status(plugin_removal_status)
-
-
-def _print_plugins_removal_status(plugin_removal_status):
-
-    for plugin_status in plugin_removal_status:
-        click.echo()
-        click.echo(
-            f"Attempting to remove {plugin_status['plugin_name']} from your meltano project"
-        )
-        click.echo(f"Removed from meltano.YAML: {plugin_status['removed_yaml']}")
-        click.echo(
-            f"Removed from installation: {plugin_status['removed_installation']}"
-        )
+    plugin_remove_service.remove_plugins(plugins, status_cb=remove_status_update)
