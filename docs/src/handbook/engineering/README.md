@@ -28,8 +28,8 @@ Every open issue _with a sprint milestone_ should have a `flow` label:
 - `flow::Review`: Currently in review
 
 When possible, an issue should have a label indicating its type:
-- `bug`
-- `feature requests`
+- `Bug`
+- `Feature Request`
 - `Discussion`
 - `Exploration`
 - `Community Support`
@@ -43,15 +43,20 @@ If appropriate, an issue should have a stage label (one of the letters in "melta
 - `Notebook` (currently unused)
 - `Orchestrate`
 
+Singer related labels:
+- `Singer Ecosystem` for general Singer related issues
+- `SingerHub`
+- `Singer SDK`
+
 Other labels:
 - `CLI` or `UI` for issues specifically concerning the CLI or UI
 - `Documentation` for new or updated documentation
 - `Accepting Merge Requests` for issues that are ready to be picked up by a community contributor
-- `integrations` for issues relating to integrations with other open source data tools, typically as plugins
+- `Integrations` for issues relating to integrations with other open source data tools, typically as plugins
 - `Configuration` for issues relating to configuration
 - `Plugin Management` for issues relating to plugin management
 
-New labels can be created as appropriate and should be documented them here.
+New labels can be created as appropriate at the Group Level and should be documented them here.
 
 ### Epics
 
