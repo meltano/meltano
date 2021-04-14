@@ -29,7 +29,7 @@ Every open issue _with a sprint milestone_ should have a `flow` label:
 
 When possible, an issue should have a label indicating its type:
 - `Bug`
-- `Feature Requests`
+- `Feature Request`
 - `Discussion`
 - `Exploration`
 - `Community Support`
