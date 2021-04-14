@@ -24,10 +24,15 @@ humans to create definitions that computers can also read.
 
 Once you have this interface, you can define the level of abstraction to
 implement. With Meltano, we aim to be the system that enables easy configuration 
-and management of many different `plugins` which can be swapped in and out
+and management of many different [`plugins`](/docs/plugins.html) which can be swapped in and out
 depending on the use case. 
 
 ## `meltano.yml` project file
 
-A Meltano project will always contain a project file named `meltano.yml`.
+An [initialized](/docs/getting-started.html#create-your-meltano-project) Meltano project will always contain a project file named `meltano.yml`.
 This contains your project configuration and tells Meltano that a particular directory is a Meltano project.
+
+This is a key part of the Meltano experience and the majority of interaction with a Meltano project will be either with 
+the command line or with this file. Indeed, many of the CLI commands are methods of editing and updating the `meltano.yml` file.
+
+For more detailed information on the `meltano.yml` file, review the [Project Structure](/docs/project-structure.html#meltano-yml-project-file) Guide. 
