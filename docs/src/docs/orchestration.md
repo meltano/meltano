@@ -31,7 +31,7 @@ Now that you've scheduled your first pipeline, you can load the "Pipeline" page 
 Your project's pipeline schedules,
 typically [created](/docs/orchestration.html#create-a-schedule)
 using [`meltano schedule`](/docs/command-line-interface.html#schedule),
- are defined under the `schedules` property.
+ are defined under the `schedules` property in the [`meltano.yml`](/docs/project.html#meltano-yml-project-file) file.
 
 A schedule definition must have a `name`, `extractor`, `loader`, `transform` and `interval`:
 
@@ -57,8 +57,6 @@ schedules:
     TAP_FOO_BAR: bar
     TAP_FOO_BAZ: baz
 ```
-
-To learn more about pipeline schedules and orchestration, refer to the [Orchestration guide](/docs/orchestration.html).
 
 ## Installing Airflow
 
