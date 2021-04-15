@@ -30,3 +30,15 @@ class TestCliRemove:
             assert_cli_runner(result)
 
             remove_plugins_mock.assert_called_once_with(project, [tap, tap_gitlab])
+
+    def test_remove_type_name(self, project, tap, target, cli_runner):
+        with mock.patch("meltano.cli.remove.remove_plugins") as remove_plugins_mock:
+            result = cli_runner.invoke(cli, ["remove", "extractor", tap.name])
+            assert_cli_runner(result)
+
+            remove_plugins_mock.assert_called_once_with(project, [tap])
+
+            result = cli_runner.invoke(cli, ["remove", "loader", target.name])
+            assert_cli_runner(result)
+
+            remove_plugins_mock.assert_called_once_with(project, [target])
