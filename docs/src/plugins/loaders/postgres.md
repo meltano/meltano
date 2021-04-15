@@ -524,3 +524,10 @@ Instead, use the [`transferwise` variant](/plugins/loaders/postgres--transferwis
 This error message indicates that the [`libpq`](https://www.postgresql.org/docs/current/libpq.html) dependency is missing.
 
 To resolve this, refer to the ["Dependencies" section](#dependencies) above.
+
+### Error: `ld: library not found for -lssl` or `clang: error: linker command failed with exit code 1` or `error: command 'clang' failed with exit status 1`
+
+This error message indicates that there is a problem installing OpenSSL. This 
+[Stack Overflow answer](https://stackoverflow.com/questions/26288042/error-installing-psycopg2-library-not-found-for-lssl) 
+has specific recommendations on setting the `LDFLAGS` and/or `CPPFLAGS` environment variables. 
+Set those prior to running `meltano add loader target-postgres`.
