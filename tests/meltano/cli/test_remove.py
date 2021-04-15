@@ -36,9 +36,11 @@ class TestCliRemove:
             result = cli_runner.invoke(cli, ["remove", "extractor", tap.name])
             assert_cli_runner(result)
 
-            remove_plugins_mock.assert_called_once_with(project, [tap])
+            remove_plugins_mock.assert_called_with(project, [tap])
 
             result = cli_runner.invoke(cli, ["remove", "loader", target.name])
             assert_cli_runner(result)
 
-            remove_plugins_mock.assert_called_once_with(project, [target])
+            remove_plugins_mock.assert_called_with(project, [target])
+
+            assert remove_plugins_mock.call_count == 2
