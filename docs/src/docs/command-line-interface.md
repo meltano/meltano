@@ -9,15 +9,15 @@ To quickly find the `meltano` subcommand you're looking for, use the Table of Co
 
 ## `add`
 
-`meltano add` lets you add [plugins](/docs/plugins.html#project-plugins) to your Meltano project.
+`meltano add` lets you add [plugins](/docs/plugin-structure.html#project-plugins) to your Meltano project.
 
 Specifically, it will:
-1. add a new [plugin definition](/docs/project.html#plugins) to your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors:`, and
+1. add a new [plugin definition](/docs/plugins.html) to your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors:`, and
 2. install the new plugin using [`meltano install <type> <name>`](#install), which will:
-   1. create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/docs/project.html#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`, and
+   1. create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/docs/project-structure.html#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`, and
    2. install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>`.
 
-(Some plugin types have slightly different or additional behavior; refer to the [plugin type documentation](/docs/plugins.html#types) for more details.)
+(Some plugin types have slightly different or additional behavior; refer to the [plugin type documentation](/docs/plugin-structure.html#types) for more details.)
 
 Once the plugin has been added to your project, you can configure it using [`meltano config`](#config),
 invoke its executable using [`meltano invoke`](#invoke), and use it in a pipeline using [`meltano elt`](#elt).
@@ -26,7 +26,7 @@ To learn more about adding a plugin to your project, refer to the [Plugin Manage
 
 ### How to use
 
-The only required arguments are the new plugin's [type](/docs/plugins.html#types) and unique name:
+The only required arguments are the new plugin's [type](/docs/plugin-structure.html#types) and unique name:
 
 ```bash
 meltano add <type> <name>
@@ -37,11 +37,11 @@ meltano add loader target-postgres
 ```
 
 Without a `--custom` or `--inherit-from` option, this will add the
-[discoverable plugin](/docs/plugins.html#discoverable-plugins) with the provided name
-to your [`meltano.yml` project file](/docs/project.html#plugins)
-using a [shadowing plugin definition](/docs/project.html#shadowing-plugin-definitions).
+[discoverable plugin](/docs/plugin-structure.html#discoverable-plugins) with the provided name
+to your [`meltano.yml` project file](/docs/plugins.html)
+using a [shadowing plugin definition](/docs/plugin-structure.html#shadowing-plugin-definitions).
 
-If multiple [variants](/docs/plugins.html#variants) of the discoverable plugin are available, the specific variant to add can be identified using the `--variant` option:
+If multiple [variants](/docs/plugin-structure.html#variants) of the discoverable plugin are available, the specific variant to add can be identified using the `--variant` option:
 
 ```bash
 meltano add <type> <name> --variant <variant>
@@ -50,7 +50,7 @@ meltano add <type> <name> --variant <variant>
 meltano add loader target-postgres --variant transferwise
 ```
 
-To add a [custom plugin](/docs/plugins.html#custom-plugins) using a [custom plugin definition](/docs/project.html#custom-plugin-definitions), use the `--custom` flag:
+To add a [custom plugin](/docs/plugin-structure.html#custom-plugins) using a [custom plugin definition](/docs/plugin-structure.html#custom-plugin-definitions), use the `--custom` flag:
 
 ```bash
 meltano add --custom <type> <name>
@@ -64,7 +64,7 @@ meltano add --custom extractor tap-covid-19
 docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-covid-19
 ```
 
-To add a plugin [inheriting from](/docs/plugins.html#plugin-inheritance) an existing one using an [inheriting plugin definition](/docs/project.html#inheriting-plugin-definitions), use the `--inherit-from` option:
+To add a plugin [inheriting from](/docs/plugin-structure.html#plugin-inheritance) an existing one using an [inheriting plugin definition](/docs/plugin-structure.html#inheriting-plugin-definitions), use the `--inherit-from` option:
 
 ```bash
 meltano add <type> <name> --inherit-from <existing-name>
@@ -75,13 +75,13 @@ meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 
 #### Parameters
 
-- `--custom`: Add a [custom plugin](/docs/plugins.html#custom-plugins). The command will prompt you for the package's [base plugin description](/docs/plugins.html#project-plugins) metadata.
+- `--custom`: Add a [custom plugin](/docs/plugin-structure.html#custom-plugins). The command will prompt you for the package's [base plugin description](/docs/plugin-structure.html#project-plugins) metadata.
 
-- `--inherit-from=<existing-name>`: Add a plugin [inheriting from](/docs/plugins.html#plugin-inheritance) an existing plugin in the project or a [discoverable plugin](/docs/plugins.html#discoverable-plugins) identified by name.
+- `--inherit-from=<existing-name>`: Add a plugin [inheriting from](/docs/plugin-structure.html#plugin-inheritance) an existing plugin in the project or a [discoverable plugin](/docs/plugin-structure.html#discoverable-plugins) identified by name.
 
-- `--as=<new-name>`: `meltano add <type> <name> --as=<new-name>` is equivalent to `meltano add <type> <new-name> --inherit-from=<name>`, and can be used to add a [discoverable plugin](/docs/plugins.html#discoverable-plugins) to your project with a different name.
+- `--as=<new-name>`: `meltano add <type> <name> --as=<new-name>` is equivalent to `meltano add <type> <new-name> --inherit-from=<name>`, and can be used to add a [discoverable plugin](/docs/plugin-structure.html#discoverable-plugins) to your project with a different name.
 
-- `--variant=<variant>`: Add a specific (non-default) [variant](/docs/plugins.html#variants) of the identified [discoverable plugin](/docs/plugins.html#discoverable-plugins).
+- `--variant=<variant>`: Add a specific (non-default) [variant](/docs/plugin-structure.html#variants) of the identified [discoverable plugin](/docs/plugin-structure.html#discoverable-plugins).
 
 - `--include-related`: Also add transform, dashboard, and model plugins related to the identified discoverable extractor.
 
@@ -90,9 +90,9 @@ meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 Enables you to manage the [configuration](/docs/configuration.html) of Meltano itself or any of its plugins, as well as [plugin extras](#how-to-use-plugin-extras).
 
 When no explicit `--store` is specified, `meltano config <plugin> set` will automatically store the value in the [most appropriate location](/docs/configuration.html#configuration-layers):
-- the [system database](/docs/project.html#system-database), if the project is [deployed as read-only](/docs/settings.html#project-readonly);
+- the [system database](/docs/project-structure.html#system-database), if the project is [deployed as read-only](/docs/settings.html#project-readonly);
 - the current location, if a setting's default value has already been overwritten;
-- [`.env`](/docs/project.html#env), if a setting is sensitive or environment-specific (defined as `kind: password` or `env_specific: true`);
+- [`.env`](/docs/project-structure.html#env), if a setting is sensitive or environment-specific (defined as `kind: password` or `env_specific: true`);
 - [`meltano.yml`](/docs/project.html#meltano-yml-project-file) otherwise.
 
 ### How to use
@@ -217,7 +217,7 @@ meltano config <plugin> reset
 
 ## `discover`
 
-Lists the available [discoverable plugins](/docs/plugins.html#discoverable-plugins) and their [variants](/docs/plugins.html#variants).
+Lists the available [discoverable plugins](/docs/plugin-structure.html#discoverable-plugins) and their [variants](/docs/plugin-structure.html#variants).
 
 ### How to Use
 
@@ -237,13 +237,13 @@ meltano discover models
 
 ## `elt`
 
-This allows you to run your ELT pipeline to Extract, Load, and Transform data using an [extractor](/docs/plugins.html#extractors) and [loader](/docs/plugins.html#loaders) of your choosing,
-and optional [transformations](/docs/plugins.html#transformers).
+This allows you to run your ELT pipeline to Extract, Load, and Transform data using an [extractor](/docs/plugin-structure.html#extractors) and [loader](/docs/plugin-structure.html#loaders) of your choosing,
+and optional [transformations](/docs/plugin-structure.html#transformers).
 
 To allow subsequent pipeline runs with the same extractor/loader/transform combination to pick up right where the previous run left off,
 each ELT run has a Job ID that is used to store and look up the [incremental replication state](/docs/integration.html#incremental-replication-state) in the [system database](/docs/production.html#storing-metadata). If no stable identifier is provided using the `--job_id` flag or the `MELTANO_JOB_ID` environment variable, extraction will always start from scratch and a one-off Job ID is automatically generated using the current date and time.
 
-All the output generated by this command is also logged inside the [`.meltano` directory](/docs/project.html#meltano-directory) at `.meltano/logs/elt/{job_id}/{run_id}/elt.log`. The `run_id` is a UUID autogenerated at each run.
+All the output generated by this command is also logged inside the [`.meltano` directory](/docs/project-structure.html#meltano-directory) at `.meltano/logs/elt/{job_id}/{run_id}/elt.log`. The `run_id` is a UUID autogenerated at each run.
 
 ### How to use
 
@@ -266,10 +266,10 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
 - A `--force` flag can be passed to force a new run even when a pipeline with the same Job ID is already running, which would result in an error otherwise.
 
 - A `--catalog` option can be passed to manually provide a [catalog file](/docs/singer-spec.html#catalog-files) for the extractor, as an alternative to letting one be [generated on the fly](/docs/integration.html#extractor-catalog-generation).
-  This is equivalent to setting the [`catalog` extractor extra](/docs/plugins.html#catalog-extra).
+  This is equivalent to setting the [`catalog` extractor extra](/docs/plugin-structure.html#catalog-extra).
 
 - A `--state` option can be passed to manually provide a [state file](/docs/singer-spec.html#state-files) for the extractor, as an alternative to letting state be [looked up based on the Job ID](/docs/integration.html#incremental-replication-state).
-  This is equivalent to setting the [`state` extractor extra](/docs/plugins.html#state-extra).
+  This is equivalent to setting the [`state` extractor extra](/docs/plugin-structure.html#state-extra).
 
 - One or more `--select <entity>` options can be passed to only extract records for matching [selected entities](#select).
   Similarly, `--exclude <entity>` can be used to extract records for all selected entities _except_ for those specified.
@@ -278,7 +278,7 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
   - The entities that are currently selected for extraction can be discovered using [`meltano select --list <extractor>`](#select).
   - [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in entity identifiers to match multiple entities at once.
   - Exclusion using `--exclude` takes precedence over inclusion using `--select`.
-  - Specifying `--select` and/or `--exclude` is equivalent to setting the [`select_filter` extractor extra](/docs/plugins.html#select-filter-extra).
+  - Specifying `--select` and/or `--exclude` is equivalent to setting the [`select_filter` extractor extra](/docs/plugin-structure.html#select-filter-extra).
 
 - A `--dump` option can be passed (along with any of the other options) to dump the content of a pipeline-specific generated file to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) instead of actually running the pipeline.
   This can aid in debugging [extractor catalog generation](/docs/integration.html#extractor-catalog-generation), [incremental replication state lookup](/docs/integration.html#incremental-replication-state), and [pipeline environment variables](/docs/integration.html#pipeline-environment-variables).
@@ -496,7 +496,7 @@ Use the `select` command to add select patterns to a specific extractor in your 
 
 - `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attributes for a specific tap.
 
-Selection rules will be stored in the extractor's [`select` extra](/docs/plugins.html#select-extra).
+Selection rules will be stored in the extractor's [`select` extra](/docs/plugin-structure.html#select-extra).
 
 ::: warning
 Not all taps support this feature. In addition, taps needs to support the `--discover` switch. You can use `meltano invoke tap-... --discover` to see if the tap supports it.
@@ -603,7 +603,7 @@ This command is only relevant for production-grade setup.
 
 Generate secrets for the [`ui.secret_key`](/docs/settings.html#ui-secret-key)
 and [`ui.password_salt`](/docs/settings.html#ui-password-salt) settings, that
-will be stored in your project's [`.env` file](/docs/project.html#env) along with the
+will be stored in your project's [`.env` file](/docs/project-structure.html#env) along with the
 specified value for the [`ui.server_name` setting](/docs/settings.html#ui-server-name).
 
 In production, you will likely want to move these settings to actual environment variables, since `.env` is in `.gitignore` by default.
@@ -658,8 +658,8 @@ Upgrade Meltano and your Meltano project to the latest version.
 
 When called without arguments, this will:
 - Upgrade the `meltano` package
-- Update files [managed by](/docs/plugins.html#update-extra) [file bundles](/docs/plugins.html#file-bundles)
-- Apply migrations to [system database](/docs/project.html#system-database)
+- Update files [managed by](/docs/plugin-structure.html#update-extra) [file bundles](/docs/plugin-structure.html#file-bundles)
+- Apply migrations to [system database](/docs/project-structure.html#system-database)
 - Recompile models
 
 ### How to use

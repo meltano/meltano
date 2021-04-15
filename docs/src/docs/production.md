@@ -38,7 +38,7 @@ platform like [GitLab](https://about.gitlab.com) or [GitHub](https://github.com)
 
 By default, your Meltano project comes with a `.gitignore` file to ensure that
 environment-specific and potentially sensitive configuration stored inside the
-[`.meltano` directory](/docs/project.html#meltano-directory) and [`.env` file](/docs/project.html#env) is not leaked accidentally. All other files
+[`.meltano` directory](/docs/project-structure.html#meltano-directory) and [`.env` file](/docs/project-structure.html#env) is not leaked accidentally. All other files
 are recommended to be checked into the repository and shared between all users
 and environments that may use the project.
 
@@ -81,7 +81,7 @@ since it's built from the [`meltano/meltano`](https://hub.docker.com/r/meltano/m
 ## Installing plugins
 
 Whenever you [add a new plugin](/docs/command-line-interface.html#add) to a Meltano project, it will be
-installed into your project's [`.meltano` directory](/docs/project.html#meltano-directory) automatically.
+installed into your project's [`.meltano` directory](/docs/project-structure.html#meltano-directory) automatically.
 However, since this directory is included in your project's `.gitignore` file
 by default, you'll need to explicitly run [`meltano install`](/docs/command-line-interface.html#install)
 before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
@@ -100,9 +100,9 @@ since `meltano install` is a step in its build process.
 ## Storing metadata
 
 Meltano stores various types of metadata in a project-specific
-[system database](/docs/project.html#system-database), that takes
+[system database](/docs/project-structure.html#system-database), that takes
 the shape of a SQLite database stored inside the project at `.meltano/meltano.db`
-by default. Like all files stored in the [`.meltano` directory](/docs/project.html#meltano-directory)
+by default. Like all files stored in the [`.meltano` directory](/docs/project-structure.html#meltano-directory)
 (which you'll remember is included in your project's `.gitignore` file by default), the system database is
 also environment-specific.
 

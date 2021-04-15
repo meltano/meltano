@@ -7,12 +7,12 @@ description: Meltano supports a number of settings that allow you to fine tune i
 Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
 To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
 
-As described in the [Configuration guide](/docs/configuration.html#configuration-layers), Meltano will determine the values of these settings by first looking in [**the environment**](/docs/configuration.html#configuring-settings), then in your project's [**`.env` file**](/docs/project.html#env), and finally in your [**`meltano.yml` project file**](/docs/project.html#meltano-yml-project-file), falling back to a default value if nothing was found.
+As described in the [Configuration guide](/docs/configuration.html#configuration-layers), Meltano will determine the values of these settings by first looking in [**the environment**](/docs/configuration.html#configuring-settings), then in your project's [**`.env` file**](/docs/project-structure.html#env), and finally in your [**`meltano.yml` project file**](/docs/project.html#meltano-yml-project-file), falling back to a default value if nothing was found.
 
 You can use [`meltano config meltano list`](/docs/command-line-interface.html#config) to list all available settings with their names, [environment variables](/docs/configuration.html#configuring-settings), and current values.
 
 Configuration that is _not_ environment-specific or sensitive should be stored in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) and checked into version
-control. Sensitive values like passwords and tokens are most appropriately stored in the environment or your project's [`.env` file](/docs/project.html#env).
+control. Sensitive values like passwords and tokens are most appropriately stored in the environment or your project's [`.env` file](/docs/project-structure.html#env).
 
 [`meltano config meltano set <setting> <value>`](/docs/command-line-interface.html#config), which is used in the examples below, will automatically store configuration in `meltano.yml` or `.env` as appropriate.
 
@@ -95,8 +95,8 @@ export MELTANO_PROJECT_ID=<randomly-generated-token>
 - `meltano *` CLI option: `--database-uri`
 - Default: `sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db`
 
-Meltano stores various types of metadata in a project-specific [system database](/docs/project.html#system-database),
-that takes the shape of a SQLite database stored inside the [`.meltano` directory](/docs/project.html#meltano-directory) at `.meltano/meltano.db` by default.
+Meltano stores various types of metadata in a project-specific [system database](/docs/project-structure.html#system-database),
+that takes the shape of a SQLite database stored inside the [`.meltano` directory](/docs/project-structure.html#meltano-directory) at `.meltano/meltano.db` by default.
 
 You can choose to use a different system database backend or configuration using the `--database-uri`
 option of [`meltano` subcommands](/docs/command-line-interface.html), or the `MELTANO_DATABASE_URI` environment variable.
@@ -170,14 +170,14 @@ Enable this setting to indicate that your Meltano project is deployed as read-on
 and to block all modifications to project files through the [CLI](/docs/command-line-interface.md) and [UI](/docs/command-line-interface.md#ui)
 in this environment.
 
-Specifically, this prevents [adding plugins](/docs/command-line-interface.md#add) or [pipeline schedules](/docs/command-line-interface.md#schedule) to your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), as well as [modifying plugin configuration](/docs/command-line-interface.md#config) stored in [`meltano.yml`](/docs/project.html#meltano-yml-project-file) or [`.env`](/docs/project.html#env).
+Specifically, this prevents [adding plugins](/docs/command-line-interface.md#add) or [pipeline schedules](/docs/command-line-interface.md#schedule) to your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), as well as [modifying plugin configuration](/docs/command-line-interface.md#config) stored in [`meltano.yml`](/docs/project.html#meltano-yml-project-file) or [`.env`](/docs/project-structure.html#env).
 
 Note that [`meltano config <plugin> set`](/docs/command-line-interface.md#config) and [the UI](/docs/ui.html)
-can still be used to store configuration in the [system database](/docs/project.html#system-database),
+can still be used to store configuration in the [system database](/docs/project-structure.html#system-database),
 but that settings that are already [set in the environment](/docs/configuration.html#configuring-settings) or `meltano.yml` take precedence and cannot be overridden.
 
 This setting differs from the [`ui.readonly` setting](#ui-readonly) in two ways:
-1. it does not block write actions in the UI that do not modify project files, like storing settings in the [system database](/docs/project.html#system-database), and
+1. it does not block write actions in the UI that do not modify project files, like storing settings in the [system database](/docs/project-structure.html#system-database), and
 2. it also affects the [CLI](/docs/command-line-interface.md).
 
 #### How to use
@@ -193,7 +193,7 @@ export MELTANO_PROJECT_READONLY=true
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_DISCOVERY_URL`
 - Default: [`https://www.meltano.com/discovery.yml`](https://www.meltano.com/discovery.yml)
 
-Where Meltano can find the `discovery.yml` manifest that lists all [discoverable plugins](/docs/plugins.html#discoverable-plugins) that are supported out of the box.
+Where Meltano can find the `discovery.yml` manifest that lists all [discoverable plugins](/docs/plugin-structure.html#discoverable-plugins) that are supported out of the box.
 
 This manifest is used by [`meltano discover`](/docs/command-line-interface.md#discover) and [`meltano add`](/docs/command-line-interface.md#add), among others.
 
@@ -347,7 +347,7 @@ export MELTANO_UI_SERVER_NAME=meltano.example.com
 [`meltano ui setup <server_name>`](/docs/command-line-interface.html#setup) can be
 used to generate secrets for the [`ui.secret_key`](#ui-secret-key) and
 [`ui.password_salt`](#ui-password-salt) settings, that will be stored in a
-your project's [`.env` file](/docs/project.html#env) along with the specified `server_name`.
+your project's [`.env` file](/docs/project-structure.html#env) along with the specified `server_name`.
 
 ```bash
 meltano ui setup meltano.example.com
@@ -418,7 +418,7 @@ export MELTANO_UI_SECRET_KEY=<randomly-generated-secret>
 
 [`meltano ui setup <server_name>`](/docs/command-line-interface.html#setup) can be
 used to generate secrets for the this setting and [`ui.password_salt`](#ui-password-salt),
-that will be stored in your project's [`.env` file](/docs/project.html#env)
+that will be stored in your project's [`.env` file](/docs/project-structure.html#env)
 along with the specified [`ui.server_name`](#ui-server-name).
 
 ```bash
@@ -448,7 +448,7 @@ export MELTANO_UI_PASSWORD_SALT=<randomly-generated-secret>
 
 [`meltano ui setup <server_name>`](/docs/command-line-interface.html#setup) can be
 used to generate secrets for the this setting and [`ui.secret_key`](#ui-secret-key),
-that will be stored in your project's [`.env` file](/docs/project.html#env)
+that will be stored in your project's [`.env` file](/docs/project-structure.html#env)
 along with the specified [`ui.server_name`](#ui-server-name).
 
 ```bash
@@ -511,7 +511,7 @@ If you're enabling the [`ui.authentication` setting](#ui-authentication) and wou
 like to only use read-only mode for anonymous users, enable the [`ui.anonymous_readonly` setting](#ui-anonymous-readonly) instead.
 
 This setting differs from the [`project_readonly` setting](#project-readonly) in two ways:
-1. it also blocks write actions in the UI that do not modify project files, like storing settings in the [system database](/docs/project.html#system-database), and
+1. it also blocks write actions in the UI that do not modify project files, like storing settings in the [system database](/docs/project-structure.html#system-database), and
 2. it does not affect the [CLI](/docs/command-line-interface.md).
 
 #### How to use

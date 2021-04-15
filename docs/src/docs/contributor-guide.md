@@ -155,16 +155,16 @@ export MELTANO_UI_URL = ""
 
 ## Discoverable plugins
 
-[Discoverable plugins](/docs/plugins.html#discoverable-plugins) that are supported out of the box are defined in the `discovery.yml` manifest,
+[Discoverable plugins](/docs/plugin-structure.html#discoverable-plugins) that are supported out of the box are defined in the `discovery.yml` manifest,
 which can be found inside the Meltano repository at
 [`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
 
 ### Making a custom plugin discoverable
 
-If you've added a [custom plugin](/docs/plugins.html#custom-plugins) (or [variant](/docs/plugins.html#variants)) to your project that could be discoverable and supported out of the box for new users, please contribute its description to this file to save the next user the hassle of setting up the custom plugin.
+If you've added a [custom plugin](/docs/plugin-structure.html#custom-plugins) (or [variant](/docs/plugin-structure.html#variants)) to your project that could be discoverable and supported out of the box for new users, please contribute its description to this file to save the next user the hassle of setting up the custom plugin.
 The [GitLab Web IDE](https://docs.gitlab.com/ee/user/project/web_ide/) makes it very easy to contribute changes without requiring you to leave your browser.
 
-Discoverable plugin definitions in `discovery.yml` have the same format as [custom plugin definition](/docs/project.html#custom-plugin-definitions) in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), so a copy-paste is usually sufficient.
+Discoverable plugin definitions in `discovery.yml` have the same format as [custom plugin definition](/docs/plugin-structure.html#custom-plugin-definitions) in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), so a copy-paste is usually sufficient.
 The format and further requirements are laid out in more detail below.
 
 Besides the new definition in `discovery.yml`, a new discoverable plugin should be documented in the
@@ -190,7 +190,7 @@ Additionally:
 
 ##### Variant definitions
 
-If a plugin will only ever have a single [variant](/docs/plugins.html#variants) (as is typically the case for all types except for extractors and loaders),
+If a plugin will only ever have a single [variant](/docs/plugin-structure.html#variants) (as is typically the case for all types except for extractors and loaders),
 the variant definition can be embedded in the plugin definition (variant properties can be mixed in with plugin properties), and a variant name _should not_ be specified using a `variant` key.
 
 If a plugin currently only has a single variant, but more might be added later (as is typically the case for extractors and loaders),
@@ -228,13 +228,13 @@ Until role-based access control is implemented in Meltano, we need to prevent us
 
 ### Adopting a plugin
 
-When the maintainer of the default [variant](/docs/plugins.html#variants) of a discoverable plugin becomes unresponsive to issues and contributions filed by the community,
+When the maintainer of the default [variant](/docs/plugin-structure.html#variants) of a discoverable plugin becomes unresponsive to issues and contributions filed by the community,
 that plugin is considered up for adoption, which means that we are looking for a different variant of the plugin with a more engaged maintainer to become the new default.
 
 This new variant can either be a fork of the original default variant, or an alternative implementation for the same source or destination, as long as it is actively maintained.
 
 If you maintain or are aware of such a variant,
-please add it to your Meltano project as a [custom plugin](/docs/plugins.html#custom-plugins) and [make it discoverable](#making-a-custom-plugin-discoverable),
+please add it to your Meltano project as a [custom plugin](/docs/plugin-structure.html#custom-plugins) and [make it discoverable](#making-a-custom-plugin-discoverable),
 or [file an issue](/docs/getting-help.html#issue-tracker) so that the Meltano core team can assist you.
 
 As a plugin's primary maintainer, you do not have to spend a lot of time improving the plugin yourself.
