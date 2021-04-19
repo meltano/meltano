@@ -73,3 +73,9 @@ class TestPluginRemoveService:
             assert not os.path.exists(
                 subject.project.meltano_dir().joinpath(plugin.type, plugin.name)
             )
+
+    def test_remove_not_added_or_installed(self, subject: PluginRemoveService):
+        plugins = list(subject.plugins_service.plugins())
+        removed_plugins, total_plugins = subject.remove_plugins(plugins)
+
+        assert removed_plugins == 0
