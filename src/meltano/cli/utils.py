@@ -216,9 +216,11 @@ def _prompt_plugin_settings(plugin_type):
         click.style("(settings)", fg="blue"),
         type=list,
         default=[],
-        value_proc=lambda value: [word.strip() for word in value.split(",")],
+        value_proc=lambda value: [
+            setting.strip().split(":") for setting in value.split(",")
+        ],
     )
-    return [{"name": name} for name in settings]
+    return [{"name": name, "kind": kind} for name, kind in settings]
 
 
 def add_plugin(
