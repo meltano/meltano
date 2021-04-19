@@ -217,10 +217,10 @@ def _prompt_plugin_settings(plugin_type):
         type=list,
         default=[],
         value_proc=lambda value: [
-            setting.strip().split(":") for setting in value.split(",")
+            setting.strip().partition(":") for setting in value.split(",")
         ],
     )
-    return [{"name": name, "kind": kind} for name, kind in settings]
+    return [{"name": name, "kind": kind} for name, sep, kind in settings]
 
 
 def add_plugin(
