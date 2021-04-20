@@ -50,6 +50,20 @@ def remove_ansi_escape_sequences(line):
     return ansi_escape.sub("", line)
 
 
+async def _write_line_writer(writer, line):
+    # StreamWriters like a subprocess's stdin need special consideration
+    if isinstance(writer, asyncio.StreamWriter):
+        try:  # noqa: WPS229
+            writer.write(line)
+            await writer.drain()
+        except (BrokenPipeError, ConnectionResetError):
+            return False
+    else:
+        writer.writeline(line.decode())
+
+    return True
+
+
 async def capture_subprocess_output(reader, *line_writers):
     """
     Capture in real time the output stream of a suprocess that is run async.
@@ -65,8 +79,6 @@ async def capture_subprocess_output(reader, *line_writers):
             continue
 
         for writer in line_writers:
-            try:
-                writer.writeline(line.decode())
-            except AttributeError:
-                writer.write(line)
-                await writer.drain()
+            if not await _write_line_writer(writer, line):
+                # If the destination stream is closed, we can stop capturing output.
+                return
