@@ -197,7 +197,7 @@ Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/d
 ```bash
 meltano config target-redshift set aws_profile <aws profile>
 
-export TARGET_REDSHIFT_AWS_PROFILE=<aws profile name>
+export TARGET_REDSHIFT_AWS_PROFILE=<aws profile>
 ```
 
 ### AWS Access Key ID
