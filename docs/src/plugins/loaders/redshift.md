@@ -7,7 +7,7 @@ description: Use Meltano to pull data from various sources and load it into Amaz
 
 The `target-redshift` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into an [Amzaon Redshift](https://aws.amazon.com/de/redshift/) database.
 
-To learn more about `target-redshift`, refer to the repository at <https://github.com/transferwise/pipelinewise-target-redshift> and documentation at <transferwise.github.io/pipelinewise/connectors/targets/redshift.html>.
+To learn more about `target-redshift`, refer to the repository at <https://github.com/transferwise/pipelinewise-target-redshift> and the [Transferwise documentation](transferwise.github.io/pipelinewise/connectors/targets/redshift.html).
 
 #### Alternative variants
 
