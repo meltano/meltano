@@ -187,7 +187,6 @@ export TARGET_REDSHIFT_DBNAME=<dbname>
 
 - Name: `aws_profile`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_AWS_PROFILE`
-- Default: 
 
 AWS profile name for profile based authentication. If not provided, AWS_PROFILE environment variable will be used.
 
