@@ -5,6 +5,7 @@ import os
 import shutil
 import subprocess
 import sys
+from contextlib import suppress
 from datetime import datetime
 from enum import IntFlag
 from pathlib import Path
@@ -211,6 +212,8 @@ class SingerRunner(Runner):
 
             # Close target stdin so process can complete naturally
             p_target.stdin.close()
+            with suppress(AttributeError):  # `wait_closed` is Python 3.7+
+                await p_target.stdin.wait_closed()
 
             # Wait for all buffered target output to be processed
             await asyncio.wait([target_stdout_future, target_stderr_future])

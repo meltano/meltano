@@ -42,6 +42,7 @@ def process_mock_factory():
         process_mock.name = name
         process_mock.wait = CoroutineMock(return_value=0)
         process_mock.returncode = 0
+        process_mock.stdin.wait_closed = CoroutineMock(return_value=True)
         return process_mock
 
     return _factory

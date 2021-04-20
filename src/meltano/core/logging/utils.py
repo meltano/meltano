@@ -3,6 +3,7 @@ import logging
 import os
 import re
 import sys
+from contextlib import suppress
 
 from meltano.core.project_settings_service import ProjectSettingsService
 
@@ -57,6 +58,9 @@ async def _write_line_writer(writer, line):
             writer.write(line)
             await writer.drain()
         except (BrokenPipeError, ConnectionResetError):
+            with suppress(AttributeError):  # `wait_closed` is Python 3.7+
+                await writer.wait_closed()
+
             return False
     else:
         writer.writeline(line.decode())
