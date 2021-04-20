@@ -1864,6 +1864,7 @@ loaders:
     namespace: target_redshift
     variant: transferwise
     repo: https://github.com/transferwise/pipelinewise-target-redshift
+    docs: https://meltano.com/plugins/loaders/redshift.html
     pip_url: pipelinewise-target-redshift
     executable: target-redshift
     capabilities:
@@ -1873,9 +1874,9 @@ loaders:
     dialect: redshift
     target_schema: $TARGET_REDSHIFT_SCHEMA
     settings_group_validation:
-      - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', 'aws_profile']
-      - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', 'aws_access_key_id', 'aws_secret_access_key']
-      - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', 'aws_session_token']
+      - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', 'default_target_schema', 'aws_profile']
+      - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', 'default_target_schema', 'aws_access_key_id', 'aws_secret_access_key']
+      - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', 'default_target_schema', 'aws_session_token']
     settings:
     - name: host
       description: Redshift host
@@ -1895,6 +1896,10 @@ loaders:
     - name: s3_bucket
       label: S3 Bucket name
       description: AWS S3 bucket name
+    - name: default_target_schema
+      env_aliases: [TARGET_REDSHIFT_SCHEMA]
+      value: $MELTANO_EXTRACT__LOAD_SCHEMA
+      description: Name of the schema where the tables will be created. If schema_mapping is not defined then every stream sent by the tap is loaded into this schema.
 
     # Optional settings
     - name: aws_profile
@@ -1930,10 +1935,6 @@ loaders:
       value: EMPTYASNULL BLANKSASNULL TRIMBLANKS TRUNCATECOLUMNS TIMEFORMAT 'auto' COMPUPDATE OFF STATUPDATE OFF
       description: >
         Parameters to use in the COPY command when loading data to Redshift. Some basic file formatting parameters are fixed values and not recommended overriding them by custom values. They are like: `CSV GZIP DELIMITER ',' REMOVEQUOTES ESCAPE`.
-    - name: default_target_schema
-      env_aliases: [TARGET_REDSHIFT_SCHEMA]
-      value: $MELTANO_EXTRACT__LOAD_SCHEMA
-      description: Name of the schema where the tables will be created. If schema_mapping is not defined then every stream sent by the tap is loaded into this schema.
     - name: batch_size_rows
       kind: integer
       value: 100000

@@ -5,15 +5,12 @@ description: Use Meltano to pull data from various sources and load it into Amaz
 
 # Redshift
 
-The `target-redshift` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into an [Amzaon Redshift](https://aws.amazon.com/de/redshift/) database.
+The `target-redshift` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into an [Amazon Redshift](https://aws.amazon.com/redshift/) data warehouse.
 
-To learn more about `target-redshift`, refer to the repository at <https://github.com/transferwise/pipelinewise-target-redshift> and the [Transferwise documentation](transferwise.github.io/pipelinewise/connectors/targets/redshift.html).
-
-#### Alternative variants 
-
-This document describes the `transferwise` variant, which was originally built to be used with [PipelineWise](https://transferwise.github.io/pipelinewise/).
-
-Alternative options are currently not discoverable within Meltano.
+- **Repository**: <https://github.com/transferwise/pipelinewise-target-redshift>
+- **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/targets/redshift.html>
+- **Maintainer**: [Wise](https://wise.com/)
+- **Maintenance status**: Active
 
 ## Getting Started
 
@@ -29,7 +26,7 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 
 #### Using the Command Line Interface
 
-1. Add the `transferwise` variant of the `target-redshift` loader to your project using [`meltano add`](/docs/command-line-interface.html#add):
+1. Add the `target-redshift` loader to your project using [`meltano add`](/docs/command-line-interface.html#add):
 
     ```bash
     meltano add loader target-redshift
@@ -66,6 +63,7 @@ If you run into any issues, [learn how to get help](/docs/getting-help.html).
 - [User](#user)
 - [Password](#password)
 - [Database Name](#database-name)
+- [Default Target Schema](#default-target-schema)
 
 Since the loader will first upload the data to S3 before using a COPY command to load the data into Redshift, some additional AWS specific settings are needed: 
 
@@ -103,6 +101,7 @@ plugins:
       port: 5432
       user: my_user
       dbname: my_database
+      # default_target_schema: my_schema    # override if default (see below) is not appropriate
       s3_bucket: my-s3-bucket-name
       # AWS credential settings 
       aws_profile: my_aws_cli_profile
@@ -688,5 +687,4 @@ meltano config target-redshift set temp_dir /tmp/dir
 
 export TARGET_REDSHIFT_TEMP_DIR=/tmp/dir
 ```
-
 
