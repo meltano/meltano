@@ -1874,7 +1874,7 @@ loaders:
     target_schema: $TARGET_REDSHIFT_SCHEMA
     settings_group_validation:
       - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', 'aws_profile']
-      - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', aws_access_key_id, 'aws_secret_access_key']
+      - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', 'aws_access_key_id', 'aws_secret_access_key']
       - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', 'aws_session_token']
     settings:
     - name: host
