@@ -195,6 +195,7 @@ class SingerRunner(Runner):
 
                 # Kill tap and cancel output processing since there's no more target to forward messages to
                 p_tap.kill()
+                await tap_process_future
                 tap_stdout_future.cancel()
                 tap_stderr_future.cancel()
 
