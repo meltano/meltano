@@ -3,7 +3,7 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into Amazon Redshift
 ---
 
-# Redshift (`transferwise` variant)
+# Redshift
 
 The `target-redshift` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into an [Amzaon Redshift](https://aws.amazon.com/de/redshift/) database.
 
