@@ -65,16 +65,31 @@ If you run into any issues, [learn how to get help](/docs/getting-help.html).
 - [Port](#port)
 - [User](#user)
 - [Password](#password)
-- [DBname](#dbname)
+- [Database Name](#database-name)
 - [Default Target Schema](#default-target-schema)
+
+Since the loader will first upload the data to S3 before using a COPY command to load the data into Redshift, some additional AWS specific settings are needed: 
+
 - [S3 Bucket](#s3_bucket)
+
+and the settings for one of the three possible authentication methods:
+- [AWS profile name](#aws-profile)
+
+or 
+
+- [AWS Access Key ID](#aws-access-key-id)
+- [AWS Secret Access Key](#aws-secret-access-key)
+
+or
+
+- [AWS Session Token](#aws-session-token)   
 
 These and other supported settings are documented below.
 To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
 
 #### Minimal configuration
 
-A minimal configuration of `target-redshift` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
+A minimal configuration of `target-redshift` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this when using AWS profile authentication:
 
 ```yml{5-13}
 plugins:
@@ -82,7 +97,7 @@ plugins:
   - name: target-redshift
     variant: transferwise
     config:
-      host: postgres.example.com
+      host: my_cluster.redshift.amazonaws.com
       port: 5432
       user: my_user
       dbname: my_database
@@ -90,13 +105,7 @@ plugins:
       s3_bucket: my-s3-bucket-name
       # AWS credential settings 
       aws_profile: my_aws_cli_profile
-      # alternatively AWS IAM User key and secret
-      aws_access_key_id: my_aws_access_key
-      aws_secret_access_key: my_aws_access_secret
-      # AWS role to be used by the COPY command to load datafrom S3 into Redshift
-      aws_redshift_copy_role_arn: arn:aws:iam::<account_if>:role/<role name>
-
-```
+      ```
 
 Sensitive values are most appropriately stored in [the environment](/docs/configuration.html#configuring-settings) or your project's [`.env` file](/docs/project.html#env):
 
@@ -308,7 +317,7 @@ meltano config target-redshift set s3_bucket <s3 bucket>
 export TARGET_REDSHIFT_S3_BUCKET=<s3 bucket>
 ```
 
-### s3_key_prefix
+### S3 Key Prefix
 
 - Name: `s3_key_prefix`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_S3_KEY_PREFIX`
@@ -350,7 +359,7 @@ export TARGET_REDSHIFT_COPY_OPTIONS=<copy_options>
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_DEFAULT_TARGET_SCHEMA`
 - Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html).
 
-Name of the schema where the tables will be created. If `schema_mapping` is not defined then every stream sent by the tap is loaded into this schema.
+Name of the schema where the tables will be created. If [`schema_mapping`](#schema-mapping) is not defined then every stream sent by the tap is loaded into this schema.
 
 #### How to use
 
@@ -368,7 +377,7 @@ export TARGET_REDSHIFT_DEFAULT_TARGET_SCHEMA=<schema>
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_BATCH_SIZE_ROWS`
 - Default: `100000`
 
-Maximum number of rows in each batch. At the end of each batch, the rows in the batch are loaded into Postgres.
+Maximum number of rows in each batch. At the end of each batch, the rows in the batch are loaded into Redshift.
 
 #### How to use
 
@@ -386,7 +395,7 @@ export TARGET_REDSHIFT_BATCH_SIZE_ROWS=1000
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_FLUSH_ALL_STREAMS`
 - Default: `false`
 
-Flush and load every stream into Postgres when one batch is full. Warning: This may trigger the COPY command to use files with low number of records.
+Flush and load every stream into Redshift when one batch is full. Warning: This may trigger the COPY command to use files with low number of records.
 
 #### How to use
 
@@ -456,7 +465,7 @@ export TARGET_REDSHIFT_DEFAULT_TARGET_SCHEMA_SELECT_PERMISSION=<roles>
 - Name: `schema_mapping`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_SCHEMA_MAPPING`
 
-Useful if you want to load multiple streams from one tap to multiple Postgres schemas.
+Useful if you want to load multiple streams from one tap to multiple Redshift schemas.
 
 If the tap sends the `stream_id` in `<schema_name>-<table_name>` format then this option overwrites the `default_target_schema` value.
 
@@ -512,7 +521,7 @@ export TARGET_REDSHIFT_SCHEMA_MAPPING_PUBLIC_TARGET_SCHEMA=new_repl_pg_public
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_DISABLE_TABLE_CACHE`
 - Default: `false`
 
-By default the connector caches the available table structures in Redshift at startup. In this way it doesn't need to run additional queries when ingesting data to check if altering the target tables is required. With disable_table_cache option you can turn off this caching. You will always see the most recent table structures but will cause an extra query runtime.
+By default the connector caches the available table structures in Redshift at startup. In this way it doesn't need to run additional queries when ingesting data to check if altering the target tables is required. With `disable_table_cache` option you can turn off this caching. You will always see the most recent table structures but will cause an extra query runtime.
 
 #### How to use
 
@@ -530,7 +539,7 @@ export TARGET_REDSHIFT_DISABLE_TABLE_CACHE=true
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_ADD_METADATA_COLUMNS`
 - Default: `false`
 
-Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in postgres etc.) Metadata columns are creating automatically by adding extra columns to the tables with a column prefix `_SDC_`. The column names are following the stitch naming conventions documented at <https://www.stitchdata.com/docs/data-structure/integration-schemas#sdc-columns>. Enabling metadata columns will flag the deleted rows by setting the `_SDC_DELETED_AT` metadata column. Without the `add_metadata_columns` option the deleted rows from singer taps will not be recongisable in Postgres.
+Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in Redshift etc.) Metadata columns are creating automatically by adding extra columns to the tables with a column prefix `_SDC_`. The column names are following the stitch naming conventions documented at <https://www.stitchdata.com/docs/data-structure/integration-schemas#sdc-columns>. Enabling metadata columns will flag the deleted rows by setting the `_SDC_DELETED_AT` metadata column. Without the `add_metadata_columns` option the deleted rows from singer taps will not be recongisable in Redshift.
 
 #### How to use
 
@@ -548,7 +557,7 @@ export TARGET_REDSHIFT_ADD_METADATA_COLUMNS=true
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_HARD_DELETE`
 - Default: `false`
 
-When `hard_delete` option is true then DELETE SQL commands will be performed in Postgres to delete rows in tables. It's achieved by continuously checking the `_SDC_DELETED_AT` metadata column sent by the singer tap. Due to deleting rows requires metadata columns, `hard_delete` option automatically enables the `add_metadata_columns` option as well.
+When `hard_delete` option is true then DELETE SQL commands will be performed in Redshift to delete rows in tables. It's achieved by continuously checking the `_SDC_DELETED_AT` metadata column sent by the singer tap. Due to deleting rows requires metadata columns, `hard_delete` option automatically enables the `add_metadata_columns` option as well.
 
 #### How to use
 
@@ -602,7 +611,7 @@ export TARGET_REDSHIFT_PRIMARY_KEY_REQUIRED=false
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_VALIDATE_RECORDS`
 - Default: `false`
 
-Validate every single record message to the corresponding JSON schema. This option is disabled by default and invalid RECORD messages will fail only at load time by Postgres. Enabling this option will detect invalid records earlier but could cause performance degradation.
+Validate every single record message to the corresponding JSON schema. This option is disabled by default and invalid RECORD messages will fail only at load time by Redshift. Enabling this option will detect invalid records earlier but could cause performance degradation.
 
 #### How to use
 
@@ -668,7 +677,7 @@ meltano config target-redshift set slices 2
 export TARGET_REDSHIFT_SLICES=2
 ```
 
-### Temp Dir
+### Temp Directory
 
 - Name: `temp_dir`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_TEMP_DIR`

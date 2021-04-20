@@ -1873,7 +1873,9 @@ loaders:
     dialect: redshift
     target_schema: $TARGET_REDSHIFT_SCHEMA
     settings_group_validation:
-      - ['host', 'port', 'user', 'password', 'dbname', 'default_target_schema', 's3_bucket']
+      - ['host', 'port', 'user', 'password', 'dbname', 'default_target_schema', 's3_bucket', 'aws_profile']
+      - ['host', 'port', 'user', 'password', 'dbname', 'default_target_schema', 's3_bucket', aws_access_key_id, 'aws_secret_access_key']
+      - ['host', 'port', 'user', 'password', 'dbname', 'default_target_schema', 's3_bucket', 'aws_session_token']
     settings:
     - name: host
       description: Redshift host
@@ -1930,7 +1932,8 @@ loaders:
     - name: copy_options
       label: COPY options
       value: EMPTYASNULL BLANKSASNULL TRIMBLANKS TRUNCATECOLUMNS TIMEFORMAT 'auto' COMPUPDATE OFF STATUPDATE OFF
-      description: "Parameters to use in the COPY command when loading data to Redshift. Some basic file formatting parameters are fixed values and not recommended overriding them by custom values. They are like: `CSV GZIP DELIMITER ',' REMOVEQUOTES ESCAPE`"
+      description: >
+      Parameters to use in the COPY command when loading data to Redshift. Some basic file formatting parameters are fixed values and not recommended overriding them by custom values. They are like: `CSV GZIP DELIMITER ',' REMOVEQUOTES ESCAPE`.
     - name: batch_size_rows
       kind: integer
       value: 100000
