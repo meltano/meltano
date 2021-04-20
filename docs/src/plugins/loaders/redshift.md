@@ -47,7 +47,6 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 
 1. Open the Loaders interface at <http://localhost:5000/loaders>.
 1. Click the arrow next to the "Add to project" button for "Amazon Redshift".
-1. Choose "Add variant 'transferwise'".
 1. Configure the [settings](#settings) below in the "Configuration" interface that opens automatically.
 
 ### Next steps
