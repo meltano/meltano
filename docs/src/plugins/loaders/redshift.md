@@ -9,7 +9,7 @@ The `target-redshift` [loader](/plugins/loaders/) loads [extracted](/plugins/ext
 
 To learn more about `target-redshift`, refer to the repository at <https://github.com/transferwise/pipelinewise-target-redshift> and the [Transferwise documentation](transferwise.github.io/pipelinewise/connectors/targets/redshift.html).
 
-#### Alternative variants
+#### Alternative variants 
 
 This document describes the `transferwise` variant, which was originally built to be used with [PipelineWise](https://transferwise.github.io/pipelinewise/).
 
