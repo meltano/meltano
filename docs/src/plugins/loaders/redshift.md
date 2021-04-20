@@ -32,7 +32,7 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 1. Add the `transferwise` variant of the `target-redshift` loader to your project using [`meltano add`](/docs/command-line-interface.html#add):
 
     ```bash
-    meltano add loader target-redshift --variant transferwise
+    meltano add loader target-redshift
     ```
 
 1. Configure the [settings](#settings) below using [`meltano config`](/docs/command-line-interface.html#config).
