@@ -7,8 +7,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ## Unreleased
 
-- [#2426](https://gitlab.com/meltano/meltano/-/issues/2426) Add `transferwise` variant of `target-redshift` 
-
 ### New
 
 [#2613](https://gitlab.com/meltano/meltano/-/issues/2613) Add `mashey` variant of `tap-slack`
