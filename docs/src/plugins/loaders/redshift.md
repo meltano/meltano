@@ -171,7 +171,7 @@ export TARGET_REDSHIFT_PASSWORD=<password>
 - Name: `dbname`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_DBNAME`
 
-PostgreSQL database name
+Redshift database name
 
 #### How to use
 
