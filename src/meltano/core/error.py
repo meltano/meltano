@@ -1,3 +1,4 @@
+import asyncio
 import functools
 import logging
 from enum import Enum
@@ -26,14 +27,17 @@ class ExtractError(Error):
 class SubprocessError(Exception):
     """Happens when subprocess exits with a resultcode != 0"""
 
-    def __init__(self, message: str, process):
+    def __init__(self, message: str, process, stderr=None):
         self.process = process
+        self._stderr = stderr or process.stderr if process else None
         super().__init__(message)
 
     @property
     def stderr(self):
-        stderr = self.process.stderr
-        if not isinstance(stderr, str):
+        stderr = self._stderr
+        if not stderr:
+            return None
+        elif not isinstance(stderr, str):
             stderr = stderr.read()
 
         return stderr
@@ -42,15 +46,8 @@ class SubprocessError(Exception):
 class PluginInstallError(SubprocessError):
     """Happens when a plugin fails to install."""
 
-    def __init__(self, message: str, process=None):
-        super().__init__(message, process)
-
-    @property
-    def stderr(self):
-        if not self.process:
-            return None
-
-        return super().stderr
+    def __init__(self, message: str, process=None, stderr=None):
+        super().__init__(message, process, stderr)
 
 
 class PluginInstallWarning(Exception):

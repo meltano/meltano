@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 import platform
@@ -50,14 +51,46 @@ class VirtualEnv:
         return str(self.root)
 
 
-class VenvService:
+class VenvServiceFactory:
     def __init__(self, project):
         self.project = project
 
-    def clean(self, namespace="", name=""):
-        venv = VirtualEnv(self.project.venvs_dir(namespace, name))
+    def create(self, namespace="", name=""):
+        return VenvService(self.project, namespace, name)
+
+
+class VenvService:
+    def __init__(self, project, namespace="", name=""):
+        """
+        VenvService manages isolated virtual environments.
+
+        The methods in this class are not threadsafe.
+
+        """
+        self.project = project
+        self.namespace = namespace
+        self.name = name
+        self.venv = VirtualEnv(self.project.venvs_dir(namespace, name))
+        self.python_path = str(self.venv.bin_dir.joinpath("python"))
+
+    async def clean_install(self, *pip_urls):
+        """
+        Wipe and recreate a virtual environment and install the given
+        `pip_urls` packages in it.
+
+        :raises: SubprocessError: if any of the commands fail.
+        """
+        self.clean()
+        await self.create()
+        await self.upgrade_pip()
+        await asyncio.gather(*[self.install(pip_url) for pip_url in pip_urls])
+
+    def clean(self):
+        """
+        Destroy the virtual environment, if it exists.
+        """
         try:
-            shutil.rmtree(str(venv))
+            shutil.rmtree(str(self.venv))
             logger.debug("Removed old virtual environment")
         except FileNotFoundError:
             # If the VirtualEnv has never been created before do nothing
@@ -66,71 +99,90 @@ class VenvService:
 
         return
 
-    def create(self, namespace="", name=""):
-        venv = VirtualEnv(self.project.venvs_dir(namespace, name))
+    async def create(self):
+        """
+        Create a new virtual environment.
 
+        :raises: SubprocessError: if the command fails.
+        """
         logger.debug("Creating virtual environment")
-        venv_run = subprocess.run(
-            [sys.executable, "-m", "venv", str(venv)],
+        run = await asyncio.create_subprocess_exec(
+            sys.executable,
+            "-m",
+            "venv",
+            str(self.venv),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            universal_newlines=True,
         )
+        await run.wait()
 
-        if venv_run.returncode != 0:
+        if run.returncode != 0:
+            stderr = await run.stderr.read()
             raise SubprocessError(
-                f"Could not create of the virtualenv for '{namespace}/{name}'", venv_run
+                f"Could not create the virtualenv for '{self.namespace}/{self.name}'",
+                run,
+                stderr=stderr,
             )
 
-        python_path = venv.bin_dir.joinpath("python")
+        return run
 
-        upgrade_run = subprocess.run(
-            [
-                str(python_path),
-                "-m",
-                "pip",
-                "install",
-                "--upgrade",
-                "pip",
-                "setuptools",
-                "wheel",
-            ],
+    async def upgrade_pip(self):
+        """
+        Upgrade the `pip` package to the latest version in the virtual environment.
+
+        :raises: SubprocessError: if the command fails.
+        """
+        logger.debug("Upgrading pip")
+        run = await asyncio.create_subprocess_exec(
+            self.python_path,
+            "-m",
+            "pip",
+            "install",
+            "--upgrade",
+            "pip",
+            "setuptools",
+            "wheel",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            universal_newlines=True,
         )
+        await run.wait()
 
-        if upgrade_run.returncode != 0:
+        if run.returncode != 0:
+            stderr = await run.stderr.read()
             raise SubprocessError(
-                f"Failed to upgrade pip to the latest version.", upgrade_run
+                f"Failed to upgrade pip to the latest version.", run, stderr=stderr
             )
 
-        return venv_run
+        return run
 
-    def install(self, pip_url, namespace="", name=""):
+    async def install(self, pip_url):
         """
         Install a package using `pip` in the proper virtual environment.
 
-        This method is not threadsafe.
+        :raises: SubprocessError: if the command fails.
         """
 
-        venv = VirtualEnv(self.project.venvs_dir(namespace, name))
-        python_path = venv.bin_dir.joinpath("python")
-
-        meltano_pth_path = venv.site_packages_dir.joinpath("meltano_venv.pth")
+        meltano_pth_path = self.venv.site_packages_dir.joinpath("meltano_venv.pth")
         if meltano_pth_path.exists():
             os.remove(meltano_pth_path)
 
         logger.debug("Installing into new virtual environment")
-        run = subprocess.run(
-            [str(python_path), "-m", "pip", "install", *pip_url.split(" ")],
+        run = await asyncio.create_subprocess_exec(
+            self.python_path,
+            "-m",
+            "pip",
+            "install",
+            *pip_url.split(" "),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            universal_newlines=True,
         )
+        await run.wait()
 
         if run.returncode != 0:
-            raise SubprocessError(f"Failed to install plugin '{name}'.", run)
+            stderr = await run.stderr.read()
+            raise SubprocessError(
+                f"Failed to install plugin '{self.name}'.", run, stderr=stderr
+            )
 
         return run
 

@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from enum import Enum
 from typing import Iterable
@@ -17,7 +18,7 @@ from .project import Project
 from .project_add_service import ProjectAddService
 from .project_plugins_service import ProjectPluginsService
 from .utils import noop
-from .venv_service import VenvService
+from .venv_service import VenvServiceFactory
 
 
 class PluginInstallReason(str, Enum):
@@ -40,12 +41,14 @@ class PluginInstallService:
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
 
-    def install_all_plugins(self, reason=PluginInstallReason.INSTALL, status_cb=noop):
-        return self.install_plugins(
+    async def install_all_plugins(
+        self, reason=PluginInstallReason.INSTALL, status_cb=noop
+    ):
+        return await self.install_plugins(
             self.plugins_service.plugins(), reason=reason, status_cb=status_cb
         )
 
-    def install_plugins(
+    async def install_plugins(
         self,
         plugins: Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
@@ -55,12 +58,11 @@ class PluginInstallService:
         installed = []
         has_model = False
 
-        for plugin in plugins:
+        async def _install(plugin):
             status = {"plugin": plugin, "status": "running"}
             status_cb(status, reason)
-
             try:
-                self.install_plugin(plugin, compile_models=False, reason=reason)
+                await self.install_plugin(plugin, compile_models=False, reason=reason)
 
                 if plugin.type is PluginType.MODELS:
                     has_model = True
@@ -82,12 +84,14 @@ class PluginInstallService:
 
             status_cb(status, reason)
 
+        await asyncio.gather(*[_install(plugin) for plugin in plugins])
+
         if has_model:
             self.compile_models()
 
         return {"errors": errors, "installed": installed}
 
-    def install_plugin(
+    async def install_plugin(
         self,
         plugin: ProjectPlugin,
         reason=PluginInstallReason.INSTALL,
@@ -98,7 +102,7 @@ class PluginInstallService:
 
         try:
             with plugin.trigger_hooks("install", self, plugin, reason):
-                run = installer_factory(self.project, plugin).install(reason)
+                run = await installer_factory(self.project, plugin).install(reason)
 
                 if compile_models and plugin.type is PluginType.MODELS:
                     self.compile_models()
@@ -110,6 +114,7 @@ class PluginInstallService:
             raise PluginInstallError(
                 f"{plugin.type.descriptor} '{plugin.name}' could not be installed: {err}".capitalize(),
                 err.process,
+                stderr=err.stderr,
             ) from err
 
     def compile_models(self):
@@ -122,16 +127,17 @@ class PluginInstallService:
 
 class PipPluginInstaller:
     def __init__(
-        self, project, plugin: ProjectPlugin, venv_service: VenvService = None
+        self,
+        project,
+        plugin: ProjectPlugin,
+        venv_service_factory: VenvServiceFactory = None,
     ):
         self.plugin = plugin
-        self.venv_service = venv_service or VenvService(project)
+        self.venv_service_factory = venv_service_factory or VenvServiceFactory(project)
 
-    def install(self, reason):
-        self.venv_service.clean(namespace=self.plugin.type, name=self.plugin.name)
-        self.venv_service.create(namespace=self.plugin.type, name=self.plugin.name)
-        return self.venv_service.install(
+    async def install(self, reason):
+        venv_service = self.venv_service_factory.create(
             namespace=self.plugin.type,
             name=self.plugin.name,
-            pip_url=self.plugin.pip_url,
         )
+        return await venv_service.clean_install(self.plugin.pip_url)
