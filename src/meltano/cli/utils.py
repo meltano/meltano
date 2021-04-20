@@ -209,6 +209,11 @@ def _prompt_plugin_settings(plugin_type):
     click.echo()
     click.echo("Multiple setting names (keys) can be separated using commas.")
     click.echo()
+    click.echo(
+        "A setting kind can be specified alongside the name (key) by using the `:` delimiter,"
+    )
+    click.echo("e.g. `port:integer` to set the kind `integer` for the name `port`")
+    click.echo()
     click.echo("Default: no settings")
     click.echo()
 
