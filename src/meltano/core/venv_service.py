@@ -51,14 +51,6 @@ class VirtualEnv:
         return str(self.root)
 
 
-class VenvServiceFactory:
-    def __init__(self, project):
-        self.project = project
-
-    def create(self, namespace="", name=""):
-        return VenvService(self.project, namespace, name)
-
-
 class VenvService:
     def __init__(self, project, namespace="", name=""):
         """
@@ -106,25 +98,19 @@ class VenvService:
         :raises: SubprocessError: if the command fails.
         """
         logger.debug("Creating virtual environment")
-        run = await asyncio.create_subprocess_exec(
-            sys.executable,
-            "-m",
-            "venv",
-            str(self.venv),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        await run.wait()
-
-        if run.returncode != 0:
-            stderr = await run.stderr.read()
+        try:
+            return await self._exec(
+                sys.executable,
+                "-m",
+                "venv",
+                str(self.venv),
+            )
+        except SubprocessError as err:
             raise SubprocessError(
                 f"Could not create the virtualenv for '{self.namespace}/{self.name}'",
-                run,
-                stderr=stderr,
+                err.process,
+                stderr=err.stderr,
             )
-
-        return run
 
     async def upgrade_pip(self):
         """
@@ -133,27 +119,21 @@ class VenvService:
         :raises: SubprocessError: if the command fails.
         """
         logger.debug("Upgrading pip")
-        run = await asyncio.create_subprocess_exec(
-            self.python_path,
-            "-m",
-            "pip",
-            "install",
-            "--upgrade",
-            "pip",
-            "setuptools",
-            "wheel",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        await run.wait()
-
-        if run.returncode != 0:
-            stderr = await run.stderr.read()
-            raise SubprocessError(
-                f"Failed to upgrade pip to the latest version.", run, stderr=stderr
+        try:
+            return await self._exec(
+                self.python_path,
+                "-m",
+                "pip",
+                "install",
+                "--upgrade",
+                "pip",
+                "setuptools",
+                "wheel",
             )
-
-        return run
+        except SubprocessError as err:
+            raise SubprocessError(
+                f"Failed to upgrade pip to the latest version.", err.process, err.stderr
+            )
 
     async def install(self, pip_url):
         """
@@ -167,26 +147,36 @@ class VenvService:
             os.remove(meltano_pth_path)
 
         logger.debug("Installing into new virtual environment")
+        try:
+            return await self._exec(
+                self.python_path,
+                "-m",
+                "pip",
+                "install",
+                *pip_url.split(" "),
+            )
+        except SubprocessError as err:
+            raise SubprocessError(
+                f"Failed to install plugin '{self.name}'.", err.process, err.stderr
+            )
+
+    async def _exec(self, *args, **kwargs):
         run = await asyncio.create_subprocess_exec(
-            self.python_path,
-            "-m",
-            "pip",
-            "install",
-            *pip_url.split(" "),
+            *args,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            **kwargs,
         )
         await run.wait()
 
         if run.returncode != 0:
             stderr = await run.stderr.read()
-            raise SubprocessError(
-                f"Failed to install plugin '{self.name}'.", run, stderr=stderr
-            )
+            raise SubprocessError("Command failed", run, stderr=stderr)
 
         return run
 
-    def exec_path(self, bin, name=None, namespace=""):
-        name = name or bin
-        venv = VirtualEnv(self.project.venvs_dir(namespace, name))
-        return venv.bin_dir.joinpath(bin)
+    def exec_path(self, bin):
+        """
+        Returns the absolute path for the given binary in the virtual environment.
+        """
+        return self.venv.bin_dir.joinpath(bin)

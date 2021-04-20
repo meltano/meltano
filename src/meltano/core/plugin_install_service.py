@@ -18,7 +18,7 @@ from .project import Project
 from .project_add_service import ProjectAddService
 from .project_plugins_service import ProjectPluginsService
 from .utils import noop
-from .venv_service import VenvServiceFactory
+from .venv_service import VenvService
 
 
 class PluginInstallReason(str, Enum):
@@ -54,8 +54,6 @@ class PluginInstallService:
         reason=PluginInstallReason.INSTALL,
         status_cb=noop,
     ):
-        errors = []
-        installed = []
         has_model = False
 
         async def _install(plugin):
@@ -68,28 +66,31 @@ class PluginInstallService:
                     has_model = True
 
                 status["status"] = "success"
-                installed.append(status)
             except PluginInstallError as err:
                 status["status"] = "error"
                 status["message"] = str(err)
                 status["details"] = err.stderr
-                errors.append(status)
             except PluginInstallWarning as warn:
                 status["status"] = "warning"
                 status["message"] = str(warn)
-                errors.append(status)
             except PluginNotInstallable as info:
                 # let's totally ignore these plugins
                 pass
 
             status_cb(status, reason)
+            return status
 
-        await asyncio.gather(*[_install(plugin) for plugin in plugins])
+        statuses = await asyncio.gather(*[_install(plugin) for plugin in plugins])
 
         if has_model:
             self.compile_models()
 
-        return {"errors": errors, "installed": installed}
+        return {
+            "installed": [
+                status for status in statuses if status["status"] == "success"
+            ],
+            "errors": [status for status in statuses if status["status"] != "success"],
+        }
 
     async def install_plugin(
         self,
@@ -130,14 +131,14 @@ class PipPluginInstaller:
         self,
         project,
         plugin: ProjectPlugin,
-        venv_service_factory: VenvServiceFactory = None,
+        venv_service: VenvService = None,
     ):
         self.plugin = plugin
-        self.venv_service_factory = venv_service_factory or VenvServiceFactory(project)
-
-    async def install(self, reason):
-        venv_service = self.venv_service_factory.create(
+        self.venv_service = venv_service or VenvService(
+            project,
             namespace=self.plugin.type,
             name=self.plugin.name,
         )
-        return await venv_service.clean_install(self.plugin.pip_url)
+
+    async def install(self, reason):
+        return await self.venv_service.clean_install(self.plugin.pip_url)

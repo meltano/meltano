@@ -38,9 +38,10 @@ class TestPluginInstallService:
     def test_default_init_should_not_fail(self, subject):
         assert subject
 
+    @pytest.mark.asyncio
     @pytest.mark.slow
-    def test_install_all(self, subject):
-        all_plugins = subject.install_all_plugins()
+    async def test_install_all(self, subject):
+        all_plugins = await subject.install_all_plugins()
         assert len(all_plugins["errors"]) == 0
         assert len(all_plugins["installed"]) == 2
         assert all_plugins["installed"][0]["status"] == "success"
