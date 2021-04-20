@@ -166,7 +166,7 @@ meltano config target-redshift set password <password>
 export TARGET_REDSHIFT_PASSWORD=<password>
 ```
 
-### DBname
+### Database Name
 
 - Name: `dbname`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_DBNAME`
