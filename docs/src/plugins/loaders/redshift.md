@@ -13,7 +13,7 @@ To learn more about `target-redshift`, refer to the repository at <https://githu
 
 This document describes the `transferwise` variant, which was originally built to be used with [PipelineWise](https://transferwise.github.io/pipelinewise/).
 
-Alternative options are currently not discoverable.
+Alternative options are currently not discoverable within Meltano.
 
 ## Getting Started
 
