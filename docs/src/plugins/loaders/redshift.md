@@ -73,14 +73,17 @@ Since the loader will first upload the data to S3 before using a COPY command to
 - [S3 Bucket](#s3_bucket)
 
 and the settings for one of the three possible authentication methods:
+
+Profile Name:
+
 - [AWS profile name](#aws-profile)
 
-or 
+Access Key:
 
 - [AWS Access Key ID](#aws-access-key-id)
 - [AWS Secret Access Key](#aws-secret-access-key)
 
-or
+Session Token:
 
 - [AWS Session Token](#aws-session-token)   
 
@@ -101,11 +104,9 @@ plugins:
       port: 5432
       user: my_user
       dbname: my_database
-      # default_target_schema: my_schema   # override if default (see below) is not appropriate
       s3_bucket: my-s3-bucket-name
       # AWS credential settings 
       aws_profile: my_aws_cli_profile
-      ```
 
 Sensitive values are most appropriately stored in [the environment](/docs/configuration.html#configuring-settings) or your project's [`.env` file](/docs/project.html#env):
 
@@ -213,9 +214,8 @@ export TARGET_REDSHIFT_AWS_PROFILE=<aws profile>
 
 - Name: `aws_access_key_id`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_AWS_ACCESS_KEY_ID`
-- Default: 
 
-AWS Access Key Id. Used for S3 and Redshfit copy operations. If not provided, AWS_ACCESS_KEY_ID environment variable will be used.
+AWS Access Key Id. Used for S3 and Redshift copy operations. If not provided, `AWS_ACCESS_KEY_ID` environment variable will be used.
 
 #### How to use
 
@@ -231,9 +231,8 @@ export TARGET_REDSHIFT_AWS_ACCESS_KEY_ID=<aws access key>
 
 - Name: `aws_secret_access_key`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_AWS_SECRET_ACCESS_KEY`
-- Default: 
 
-AWS Secret Access Key. Used for S3 and Redshfit copy operations. If not provided, AWS_SECRET_ACCESS_KEY environment variable will be used.
+AWS Secret Access Key. Used for S3 and Redshift copy operations. If not provided, `AWS_SECRET_ACCESS_KEY` environment variable will be used.
 
 #### How to use
 
@@ -251,7 +250,7 @@ export TARGET_REDSHIFT_AWS_SECRET_ACCESS_KEY=<aws secret access key>
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_AWS_SESSION_TOKEN`
 - Default: 
 
-AWS STS token for temporary credentials. If not provided, AWS_SESSION_TOKEN environment variable will be used.
+AWS STS token for temporary credentials. If not provided, `AWS_SESSION_TOKEN` environment variable will be used.
 
 #### How to use
 
@@ -267,7 +266,6 @@ export TARGET_REDSHIFT_AWS_SESSION_TOKEN=<aws sts session token>
 
 - Name: `aws_redshift_copy_role_arn`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_AWS_REDSHIFT_COPY_ROLE_ARN`
-- Default: 
 
 AWS Role ARN to be used for the Redshift COPY operation. Used instead of the given AWS keys for the COPY operation if provided - the keys are still used for other S3 operations.
 
@@ -285,7 +283,6 @@ export TARGET_REDSHIFT_AWS_REDSHIFT_COPY_ROLE_ARN=<aws role arn>
 
 - Name: `s3_acl`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_S3_ACL`
-- Default: 
 
 S3 Object ACL to be applied to files created in S3 bucket.
 
@@ -303,7 +300,6 @@ export TARGET_REDSHIFT_S3_ACL=<s3 acl>
 
 - Name: `s3_bucket`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_S3_BUCKET`
-- Default: 
 
 Unique S3 Bucket name
 
@@ -321,7 +317,6 @@ export TARGET_REDSHIFT_S3_BUCKET=<s3 bucket>
 
 - Name: `s3_key_prefix`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_S3_KEY_PREFIX`
-- Default: 
 
 A static prefix before the generated S3 key names. Using prefixes you can upload files into specific directories in the S3 bucket.
 
@@ -645,7 +640,6 @@ export TARGET_REDSHIFT_SKIP_UPDATES=true
 
 - Name: `compression`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_COMPRESSION`
-- Default: 
 
 The compression method to use when writing files to S3 and running Redshift COPY. The currently supported methods are gzip or bzip2.
 
