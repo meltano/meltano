@@ -66,7 +66,6 @@ If you run into any issues, [learn how to get help](/docs/getting-help.html).
 - [User](#user)
 - [Password](#password)
 - [Database Name](#database-name)
-- [Default Target Schema](#default-target-schema)
 
 Since the loader will first upload the data to S3 before using a COPY command to load the data into Redshift, some additional AWS specific settings are needed: 
 
