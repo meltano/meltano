@@ -93,7 +93,7 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-redshift` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this when using AWS profile authentication:
 
-```yml{5-13}
+```yml{5-12}
 plugins:
   loaders:
   - name: target-redshift
@@ -106,6 +106,7 @@ plugins:
       s3_bucket: my-s3-bucket-name
       # AWS credential settings 
       aws_profile: my_aws_cli_profile
+```
 
 Sensitive values are most appropriately stored in [the environment](/docs/configuration.html#configuring-settings) or your project's [`.env` file](/docs/project.html#env):
 
