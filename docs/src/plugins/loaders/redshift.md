@@ -195,7 +195,7 @@ AWS profile name for profile based authentication. If not provided, `AWS_PROFILE
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config target-redshift set aws_profile <aws profile name>
+meltano config target-redshift set aws_profile <aws profile>
 
 export TARGET_REDSHIFT_AWS_PROFILE=<aws profile name>
 ```
