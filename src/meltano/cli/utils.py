@@ -362,10 +362,8 @@ def install_status_update(data, reason):
 
 def install_plugins(project, plugins, reason=PluginInstallReason.INSTALL):
     install_service = PluginInstallService(project)
-    install_status = asyncio.run(
-        install_service.install_plugins(
-            plugins, status_cb=install_status_update, reason=reason
-        )
+    install_status = install_service.install_plugins(
+        plugins, status_cb=install_status_update, reason=reason
     )
     num_installed = len(install_status["installed"])
     num_failed = len(install_status["errors"])
