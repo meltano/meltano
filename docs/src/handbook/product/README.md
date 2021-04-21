@@ -44,3 +44,34 @@ Sometimes, it can feel like we are chosing between two important things and this
 Meltano operates independently within GitLab and is not part of the broader product organization. However, we learn quite a bit from [the approach of our teammates](https://about.gitlab.com/handbook/product/) and often adopt their processes. If you interact with our team and notice that Meltano Product functions differently, please know this is intentional.
 
 GitLab's team and proccesses are designed for a scaled up startup with product market fit, which is a significantly different context than that of Meltano. We look forward to getting there someday!
+
+## Weekly Kickoff
+
+Every Monday we have a Kickoff call to highlight for the community what the priorities are for the week. Prior to the actual call, there are several work items to do.
+
+### Friday - Last day of Milestone
+
+* Create a kickoff issue highlighting the general priority for the next week.
+  * Title: `Weekly Kickoff for Milestone - <milestone>`
+  * Due Date for the Monday of the milestone 
+
+### Monday - Kickoff Day
+
+Before the Kickoff Call:
+
+* Review and roll community issues to the next milestone
+* Roll merge requests
+* Everyone on the team should roll their own issues to the next milestone. Take the time to review the current status of issues and align priorities with the kickoff issue.
+
+Kickoff Call:
+* Check-in with everyone
+* Highlights & lowlights from previous week
+* Confirm general priorities and do a soft review of boards
+* Review Metrics
+* Start livestream
+  * Talk about general priority
+  * Walk through issues
+
+After the Kickoff Call:
+* Close the previous milestone
+* Close Kickoff issue
