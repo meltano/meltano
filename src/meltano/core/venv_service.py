@@ -1,3 +1,4 @@
+"""Manage Python virtual environments."""
 import asyncio
 import logging
 import os
@@ -51,13 +52,33 @@ class VirtualEnv:
         return str(self.root)
 
 
+async def exec_async(*args, **kwargs):
+    """
+    Run an executable asyncronously.
+
+    :raises SubprocessError: if the command fails
+    """
+    run = await asyncio.create_subprocess_exec(
+        *args,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        **kwargs,
+    )
+    await run.wait()
+
+    if run.returncode != 0:
+        stderr = await run.stderr.read()
+        raise SubprocessError("Command failed", run, stderr=stderr)
+
+    return run
+
+
 class VenvService:
     def __init__(self, project, namespace="", name=""):
         """
-        VenvService manages isolated virtual environments.
+        Manage isolated virtual environments.
 
         The methods in this class are not threadsafe.
-
         """
         self.project = project
         self.namespace = namespace
@@ -67,8 +88,7 @@ class VenvService:
 
     async def clean_install(self, *pip_urls):
         """
-        Wipe and recreate a virtual environment and install the given
-        `pip_urls` packages in it.
+        Wipe and recreate a virtual environment and install the given `pip_urls` packages in it.
 
         :raises: SubprocessError: if any of the commands fail.
         """
@@ -78,9 +98,7 @@ class VenvService:
         await asyncio.gather(*[self.install(pip_url) for pip_url in pip_urls])
 
     def clean(self):
-        """
-        Destroy the virtual environment, if it exists.
-        """
+        """Destroy the virtual environment, if it exists."""
         try:
             shutil.rmtree(str(self.venv))
             logger.debug("Removed old virtual environment")
@@ -99,7 +117,7 @@ class VenvService:
         """
         logger.debug("Creating virtual environment")
         try:
-            return await self._exec(
+            return await exec_async(
                 sys.executable,
                 "-m",
                 "venv",
@@ -120,7 +138,7 @@ class VenvService:
         """
         logger.debug("Upgrading pip")
         try:
-            return await self._exec(
+            return await exec_async(
                 self.python_path,
                 "-m",
                 "pip",
@@ -132,7 +150,7 @@ class VenvService:
             )
         except SubprocessError as err:
             raise SubprocessError(
-                f"Failed to upgrade pip to the latest version.", err.process, err.stderr
+                "Failed to upgrade pip to the latest version.", err.process, err.stderr
             )
 
     async def install(self, pip_url):
@@ -141,14 +159,13 @@ class VenvService:
 
         :raises: SubprocessError: if the command fails.
         """
-
         meltano_pth_path = self.venv.site_packages_dir.joinpath("meltano_venv.pth")
         if meltano_pth_path.exists():
             os.remove(meltano_pth_path)
 
         logger.debug("Installing into new virtual environment")
         try:
-            return await self._exec(
+            return await exec_async(
                 self.python_path,
                 "-m",
                 "pip",
@@ -160,23 +177,6 @@ class VenvService:
                 f"Failed to install plugin '{self.name}'.", err.process, err.stderr
             )
 
-    async def _exec(self, *args, **kwargs):
-        run = await asyncio.create_subprocess_exec(
-            *args,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            **kwargs,
-        )
-        await run.wait()
-
-        if run.returncode != 0:
-            stderr = await run.stderr.read()
-            raise SubprocessError("Command failed", run, stderr=stderr)
-
-        return run
-
-    def exec_path(self, bin):
-        """
-        Returns the absolute path for the given binary in the virtual environment.
-        """
-        return self.venv.bin_dir.joinpath(bin)
+    def exec_path(self, executable):
+        """Return the absolute path for the given binary in the virtual environment."""
+        return self.venv.bin_dir.joinpath(executable)

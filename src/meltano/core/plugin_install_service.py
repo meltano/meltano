@@ -81,6 +81,11 @@ class PluginInstallService:
         reason=PluginInstallReason.INSTALL,
         status_cb=noop,
     ):
+        """
+        Install all the provided plugins.
+
+        Blocks until all plugins are installed.
+        """
         return run_coroutine(self.install_plugins_async(plugins, reason, status_cb))
 
     async def install_plugins_async(
@@ -89,8 +94,12 @@ class PluginInstallService:
         reason=PluginInstallReason.INSTALL,
         status_cb=noop,
     ):
+        """Install all the provided plugins."""
         statuses = await asyncio.gather(
-            *[self.install_with_status(plugin, reason, status_cb) for plugin in plugins]
+            *[
+                self._install_with_status(plugin, reason, status_cb)
+                for plugin in plugins
+            ]
         )
         for plugin in plugins:
             if plugin.type is PluginType.MODELS:
@@ -110,7 +119,11 @@ class PluginInstallService:
         reason=PluginInstallReason.INSTALL,
         compile_models=True,
     ):
-        """Install a plugin."""
+        """
+        Install a plugin.
+
+        Blocks until the plugin is installed.
+        """
         res = run_coroutine(self.install_plugin_async(plugin, reason=reason))
 
         if compile_models and plugin.type is PluginType.MODELS:
@@ -140,7 +153,14 @@ class PluginInstallService:
                 stderr=err.stderr,
             ) from err
 
-    async def install_with_status(self, plugin, reason, status_cb=noop):
+    def compile_models(self):
+        compiler = ProjectCompiler(self.project)
+        try:
+            compiler.compile()
+        except Exception:
+            pass
+
+    async def _install_with_status(self, plugin, reason, status_cb=noop):
         status = {"plugin": plugin, "status": "running"}
         status_cb(status, reason)
         try:
@@ -161,13 +181,6 @@ class PluginInstallService:
         status_cb(status, reason)
         return status
 
-    def compile_models(self):
-        compiler = ProjectCompiler(self.project)
-        try:
-            compiler.compile()
-        except Exception:
-            pass
-
 
 class PipPluginInstaller:
     def __init__(
@@ -184,4 +197,5 @@ class PipPluginInstaller:
         )
 
     async def install(self, reason):
+        """Install the plugin into the virtual environment using pip."""
         return await self.venv_service.clean_install(self.plugin.pip_url)

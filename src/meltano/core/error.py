@@ -1,4 +1,4 @@
-import asyncio
+"""Base Error classes."""
 import functools
 import logging
 from enum import Enum
@@ -28,6 +28,7 @@ class SubprocessError(Exception):
     """Happens when subprocess exits with a resultcode != 0"""
 
     def __init__(self, message: str, process, stderr=None):
+        """Initialize SubprocessError."""
         self.process = process
         self._stderr = stderr or process.stderr if process else None
         super().__init__(message)
@@ -46,7 +47,10 @@ class SubprocessError(Exception):
 class PluginInstallError(SubprocessError):
     """Happens when a plugin fails to install."""
 
-    def __init__(self, message: str, process=None, stderr=None):
+    def __init__(  # noqa: WPS612 - set default for process argument
+        self, message: str, process=None, stderr=None
+    ):
+        """Initialize PluginInstallError."""
         super().__init__(message, process, stderr)
 
 
