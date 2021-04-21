@@ -2,11 +2,14 @@
 import shutil
 from typing import Iterable
 
+from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.project_plugins_service import ProjectPluginsService
 
 from .project import Project
+from .settings_store import SettingValueStore
 from .utils import noop
 
 
@@ -48,8 +51,14 @@ class PluginRemoveService:
 
     def remove_plugin(self, plugin: ProjectPlugin):
         """Remove a plugin from `meltano.yml` and its installation in `.meltano`."""
+
         meltano_yml_remove_status = RemoveStatus("meltano.yml")
         installation_remove_status = RemoveStatus("installation")
+
+        plugins_settings_service = PluginSettingsService(self.project, plugin)
+
+        _, session = project_engine(self.project)
+        plugins_settings_service.reset(store=SettingValueStore.DB, session=session())
 
         try:
             meltano_yml_remove_status.removed = bool(
