@@ -238,7 +238,7 @@ Recurring office hours are available for Meltano community members to discuss ou
 
 - Slack:
     - Post reminder to #office-hours
-    - Share to #events and #general
+    - Share to #announcements
 - Tweet:
     - Draft a short memo for the Tweet text. Post should come from the brand account with office hours link and time.
     - Schedule Tweet for 30 minutes ahead of session.
@@ -275,7 +275,7 @@ Recurring office hours are available for Meltano community members to discuss ou
 ## Outages & escalation
 
 Both https://www.meltano.com and https://meltano.meltanodata.com are automatically monitored using Pingdom, with notifications of downtime posted to:
-- the #meltano Slack channel,
+- the #meltano Slack channel within GitLab,
 - Zendesk, through our `hello@` email address, and
 - Douwe, by email and SMS.
 
