@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 * [#2082](https://gitlab.com/meltano/meltano/-/issues/2082) Updated database_uri documentation to show how to target a PostgreSQL schema
+* [#2705](https://gitlab.com/meltano/meltano/-/issues/2705) Speed up `meltano install` by installing plugins in parallel
 
 ### Fixes
 
