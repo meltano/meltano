@@ -101,7 +101,9 @@ class VenvService:
         """Destroy the virtual environment, if it exists."""
         try:
             shutil.rmtree(str(self.venv))
-            logger.debug("Removed old virtual environment")
+            logger.debug(
+                f"Removed old virtual environment for '{self.namespace}/{self.name}'"
+            )
         except FileNotFoundError:
             # If the VirtualEnv has never been created before do nothing
             logger.debug("No old virtual environment to remove")
@@ -115,7 +117,7 @@ class VenvService:
 
         :raises: SubprocessError: if the command fails.
         """
-        logger.debug("Creating virtual environment")
+        logger.debug(f"Creating virtual environment for '{self.namespace}/{self.name}'")
         try:
             return await exec_async(
                 sys.executable,
@@ -136,7 +138,7 @@ class VenvService:
 
         :raises: SubprocessError: if the command fails.
         """
-        logger.debug("Upgrading pip")
+        logger.debug(f"Upgrading pip for '{self.namespace}/{self.name}'")
         try:
             return await exec_async(
                 self.python_path,
@@ -163,7 +165,9 @@ class VenvService:
         if meltano_pth_path.exists():
             os.remove(meltano_pth_path)
 
-        logger.debug("Installing into new virtual environment")
+        logger.debug(
+            f"Installing '{pip_url}' into virtual environment for '{self.namespace}/{self.name}'"
+        )
         try:
             return await exec_async(
                 self.python_path,
