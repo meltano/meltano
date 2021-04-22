@@ -338,10 +338,16 @@ def install_status_update(data, reason):
         click.echo()
 
 
-def install_plugins(project, plugins, reason=PluginInstallReason.INSTALL):
+def install_plugins(
+    project, plugins, reason=PluginInstallReason.INSTALL, parallelism=None
+):
+    """Install the provided plugins and report results to the console."""
     install_service = PluginInstallService(project)
     install_status = install_service.install_plugins(
-        plugins, status_cb=install_status_update, reason=reason
+        plugins,
+        reason=reason,
+        status_cb=install_status_update,
+        parallelism=parallelism,
     )
     num_installed = len(install_status["installed"])
     num_failed = len(install_status["errors"])

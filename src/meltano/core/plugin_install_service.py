@@ -1,7 +1,9 @@
 """Install plugins into the project, using pip in separate virtual environments by default."""
 import asyncio
 import logging
+import sys
 from enum import Enum
+from multiprocessing import cpu_count
 from typing import Iterable
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -42,34 +44,41 @@ class PluginInstallService:
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
 
-    def install_all_plugins(self, reason=PluginInstallReason.INSTALL, status_cb=noop):
-        return self.install_plugins(
-            self.plugins_service.plugins(), reason=reason, status_cb=status_cb
-        )
+    def install_all_plugins(self, *args, **kwargs):
+        """
+        Install all the plugins for the project.
 
-    def install_plugins(
-        self,
-        plugins: Iterable[ProjectPlugin],
-        reason=PluginInstallReason.INSTALL,
-        status_cb=noop,
-    ):
+        Blocks until all plugins are installed.
+        """
+        return self.install_plugins(self.plugins_service.plugins(), *args, **kwargs)
+
+    def install_plugins(self, *args, **kwargs):
         """
         Install all the provided plugins.
 
         Blocks until all plugins are installed.
         """
-        return run_async(self.install_plugins_async(plugins, reason, status_cb))
+        return run_async(self.install_plugins_async(*args, **kwargs))
 
     async def install_plugins_async(
         self,
         plugins: Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
         status_cb=noop,
+        parallelism=None,
     ):
         """Install all the provided plugins."""
+        if parallelism is None:
+            parallelism = cpu_count()
+        if parallelism < 1:
+            parallelism = sys.maxsize  # unbounded
+
+        sem = asyncio.Semaphore(parallelism)
         statuses = await asyncio.gather(
             *[
-                self._install_with_status(plugin, reason, status_cb)
+                self._install_with_status(
+                    plugin, reason, semaphore=sem, status_cb=status_cb
+                )
                 for plugin in plugins
             ]
         )
@@ -85,18 +94,13 @@ class PluginInstallService:
             "errors": [status for status in statuses if status["status"] != "success"],
         }
 
-    def install_plugin(
-        self,
-        plugin: ProjectPlugin,
-        reason=PluginInstallReason.INSTALL,
-        compile_models=True,
-    ):
+    def install_plugin(self, plugin, *args, compile_models=True, **kwargs):
         """
         Install a plugin.
 
         Blocks until the plugin is installed.
         """
-        res = run_async(self.install_plugin_async(plugin, reason=reason))
+        res = run_async(self.install_plugin_async(plugin, *args, **kwargs))
 
         if compile_models and plugin.type is PluginType.MODELS:
             self.compile_models()
@@ -132,26 +136,34 @@ class PluginInstallService:
         except Exception:
             pass
 
-    async def _install_with_status(self, plugin, reason, status_cb=noop):
-        status = {"plugin": plugin, "status": "running"}
-        status_cb(status, reason)
-        try:
-            await self.install_plugin_async(plugin, reason=reason)
+    async def _install_with_status(
+        self,
+        plugin,
+        reason,
+        semaphore=None,
+        status_cb=noop,
+    ):
+        semaphore = semaphore or asyncio.Semaphore()
+        async with semaphore:
+            status = {"plugin": plugin, "status": "running"}
+            status_cb(status, reason)
+            try:
+                await self.install_plugin_async(plugin, reason=reason)
 
-            status["status"] = "success"
-        except PluginInstallError as err:
-            status["status"] = "error"
-            status["message"] = str(err)
-            status["details"] = err.stderr
-        except PluginInstallWarning as warn:
-            status["status"] = "warning"
-            status["message"] = str(warn)
-        except PluginNotInstallable as info:
-            # let's totally ignore these plugins
-            pass
+                status["status"] = "success"
+            except PluginInstallError as err:
+                status["status"] = "error"
+                status["message"] = str(err)
+                status["details"] = err.stderr
+            except PluginInstallWarning as warn:
+                status["status"] = "warning"
+                status["message"] = str(warn)
+            except PluginNotInstallable as info:
+                # let's totally ignore these plugins
+                pass
 
-        status_cb(status, reason)
-        return status
+            status_cb(status, reason)
+            return status
 
 
 class PipPluginInstaller:
