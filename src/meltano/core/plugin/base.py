@@ -13,6 +13,8 @@ from meltano.core.behavior.hookable import HookObject
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import NotFound, compact, find_named, flatten
 
+from .command import Command
+
 logger = logging.getLogger(__name__)
 
 
@@ -144,6 +146,7 @@ class Variant(NameEq, Canonical):
         capabilities: Optional[list] = [],
         settings_group_validation: Optional[list] = [],
         settings: Optional[list] = [],
+        commands: Optional[dict] = None,
         **extras,
     ):
         super().__init__(
@@ -157,6 +160,7 @@ class Variant(NameEq, Canonical):
             capabilities=list(capabilities),
             settings_group_validation=list(settings_group_validation),
             settings=list(map(SettingDefinition.parse, settings)),
+            commands=Command.parse_all(commands),
             extras=extras,
         )
 
@@ -287,6 +291,11 @@ class BasePlugin(HookObject):
     @property
     def extras(self):
         return {**self._plugin_def.extras, **self._variant.extras}
+
+    @property
+    def all_commands(self):
+        """Return a dictonary of supported commands."""
+        return self._variant.commands
 
     @property
     def extra_settings(self):

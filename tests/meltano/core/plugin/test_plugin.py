@@ -399,6 +399,25 @@ class TestProjectPlugin:
 
         assert plugin.variant == base_plugin.variant == "meltano"
 
+    def test_command_inheritance(self, tap, inherited_tap, plugin_discovery_service):
+        # variants
+        assert tap.all_commands["cmd"].args == "cmd meltano"
+        assert tap.all_commands["cmd"].description == "a description of cmd"
+
+        assert tap.all_commands["cmd-variant"].args == "cmd-variant meltano"
+        assert tap.all_commands["cmd-variant"].description is None
+        assert tap.supported_commands == ["cmd", "cmd-variant"]
+
+        # inheritance
+        assert inherited_tap.all_commands["cmd"].args == "cmd inherited"
+        assert inherited_tap.all_commands["cmd-variant"].args == "cmd-variant meltano"
+        assert inherited_tap.all_commands["cmd-inherited"].args == "cmd-inherited"
+        assert inherited_tap.supported_commands == [
+            "cmd",
+            "cmd-variant",
+            "cmd-inherited",
+        ]
+
     def testenv_prefixes(self, inherited_tap, tap):
         assert tap.env_prefixes() == ["tap-mock", "tap_mock"]
         assert tap.env_prefixes(for_writing=True) == [

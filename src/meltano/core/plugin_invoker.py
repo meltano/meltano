@@ -47,6 +47,30 @@ class InvokerNotPreparedError(InvokerError):
     pass
 
 
+class UnknownCommandError(InvokerError):
+    """Occurs when `invoke` is called in command mode with an undefined command."""
+
+    def __init__(self, plugin: PluginRef, command):
+        """Initialize UnknownCommandError."""
+        self.plugin = plugin
+        self.command = command
+
+    def __str__(self):
+        """Return error message."""
+        if self.plugin.supported_commands:
+            supported_commands = ", ".join(self.plugin.supported_commands)
+            desc = f"supports the following commands: {supported_commands}"
+        else:
+            desc = "does not define any commands."
+        return " ".join(
+            [
+                f"Command '{self.command}' could not be found.",
+                f"{self.plugin.type.descriptor.capitalize()} '{self.plugin.name}'",
+                desc,
+            ]
+        )
+
+
 class PluginInvoker:
     """This class handles the invocation of a `ProjectPlugin` instance."""
 
@@ -136,8 +160,18 @@ class PluginInvoker:
             self.plugin.executable, name=self.plugin.name, namespace=self.plugin.type
         )
 
-    def exec_args(self, *args):
-        plugin_args = self.plugin.exec_args(self)
+    def exec_args(self, *args, command=None, env=None):
+        """Materialize the arguments to be passed to the executable."""
+        env = env or {}
+        if command:
+            try:
+                plugin_args = self.plugin.all_commands[command].expanded_args(
+                    command, env
+                )
+            except KeyError as err:
+                raise UnknownCommandError(self.plugin, command) from err
+        else:
+            plugin_args = self.plugin.exec_args(self)
 
         return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
 
@@ -160,14 +194,23 @@ class PluginInvoker:
         return {}
 
     @contextmanager
-    def _invoke(self, *args, require_preparation=True, env={}, **Popen):
+    def _invoke(
+        self,
+        *args,
+        require_preparation=True,
+        env=None,
+        command=None,
+        **kwargs,
+    ):
+        env = env or {}
+
         if require_preparation and not self._prepared:
             raise InvokerNotPreparedError()
 
         with self.plugin.trigger_hooks("invoke", self, args):
-            popen_args = self.exec_args(*args)
-            popen_options = {**self.Popen_options(), **Popen}
+            popen_options = {**self.Popen_options(), **kwargs}
             popen_env = {**self.env(), **env}
+            popen_args = self.exec_args(*args, command=command, env=popen_env)
             logging.debug(f"Invoking: {popen_args}")
             logging.debug(f"Env: {popen_env}")
 

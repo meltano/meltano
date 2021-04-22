@@ -69,7 +69,7 @@ class SingerRunner(Runner):
                 process.kill()
                 logging.error(f"{process} was killed.")
 
-    async def invoke(  # noqa: WPS217, WPS210, WPS211, WPS213, WPS231
+    async def invoke(  # noqa: WPS217, WPS210, WPS213, WPS231
         self,
         tap: PluginInvoker,
         target: PluginInvoker,
