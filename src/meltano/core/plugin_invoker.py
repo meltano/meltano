@@ -193,7 +193,7 @@ class PluginInvoker:
     def Popen_options(self):
         return {}
 
-    @contextmanager  # noqa: WPS211
+    @contextmanager
     def _invoke(
         self,
         *args,
