@@ -446,6 +446,27 @@ meltano invoke --dump=catalog <plugin>
 
 Like any standard output, the dumped content can be [redirected](https://en.wikipedia.org/wiki/Redirection_(computing)) to a file using `>`, e.g. `meltano invoke --dump=catalog <plugin> > state.json`.
 
+### Commands
+
+Plugins can define [commands](/docs/configuration.html#plugin-commands), which are shortcuts for combinations of arguments. These can be invoked with the shortcut command of the form `meltano invoke <plugin>:<command>`.
+
+```bash
+meltano invoke dbt:seed
+meltano invoke dbt:snapshot
+```
+
+Additional arguments can be specified as well, which will be appended to the command.
+
+```bash
+meltano invoke dbt:seed --show --threads 5
+```
+
+To see what commands a plugin supports, use `--list-command`:
+
+```bash
+meltano invoke --list-commands dbt
+```
+
 ## `schedule`
 
 ::: tip
