@@ -19,7 +19,7 @@ on creating a Singer tap, see the [SDK Dev Guide](https://gitlab.com/meltano/sin
 ::: tip
 [Singer](https://singer.io) taps and targets are the mechanism Meltano uses to extract
  and load data. For more details about the Singer specification, please visit our
- [Singer Spec](https://meltano.com/docs/singer-spec.html) documentation.
+ [Singer Spec](/docs/singer-spec.html) documentation.
 :::
 
 ## Create the Plugin's Package
