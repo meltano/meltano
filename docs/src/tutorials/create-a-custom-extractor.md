@@ -14,7 +14,7 @@ As much as we'd like to support all the data sources out there, we'll need your 
 
 The [Singer SDK](https://gitlab.com/meltano/singer-sdk#user-content-singer-sdk-a-framework-for-building-singer-taps)
 makes it easier than ever to create new taps for your own custom data sources. For more information
-on creating a tap, see the [SDK Dev Guide](https://gitlab.com/meltano/singer-sdk/-/blob/main/docs/dev_guide.md).
+on creating a Singer tap, see the [SDK Dev Guide](https://gitlab.com/meltano/singer-sdk/-/blob/main/docs/dev_guide.md).
 
 ::: tip
 [Singer](https://singer.io) taps and targets are the mechanism Meltano uses to extract
