@@ -67,6 +67,13 @@ def discovery():
                         {"name": "auth.username"},
                         {"name": "auth.password", "kind": "password"},
                     ],
+                    "commands": {
+                        "cmd": {
+                            "args": "cmd meltano",
+                            "description": "a description of cmd",
+                        },
+                        "cmd-variant": "cmd-variant meltano",
+                    },
                 },
                 {
                     "name": "singer-io",
@@ -125,6 +132,20 @@ def discovery():
             "name": "transformer-mock",
             "namespace": "transformer_mock",
             "pip_url": "transformer-mock",
+        }
+    )
+
+    discovery[PluginType.UTILITIES].append(
+        {
+            "name": "utility-mock",
+            "namespace": "utility_mock",
+            "pip_url": "utility-mock",
+            "commands": {
+                "cmd": {
+                    "args": "utility --option $ENV_VAR_ARG",
+                    "description": "description of utility command",
+                },
+            },
         }
     )
 
@@ -251,7 +272,13 @@ def alternative_tap(project_add_service, tap):
 def inherited_tap(project_add_service, tap):
     try:
         return project_add_service.add(
-            PluginType.EXTRACTORS, "tap-mock-inherited", inherit_from=tap.name
+            PluginType.EXTRACTORS,
+            "tap-mock-inherited",
+            inherit_from=tap.name,
+            commands={
+                "cmd": "cmd inherited",
+                "cmd-inherited": "cmd-inherited",
+            },
         )
     except PluginAlreadyAddedException as err:
         return err.plugin
@@ -281,6 +308,14 @@ def alternative_target(project_add_service):
 def dbt(project_add_service):
     try:
         return project_add_service.add(PluginType.TRANSFORMERS, "dbt")
+    except PluginAlreadyAddedException as err:
+        return err.plugin
+
+
+@pytest.fixture(scope="class")
+def utility(project_add_service):
+    try:
+        return project_add_service.add(PluginType.UTILITIES, "utility-mock")
     except PluginAlreadyAddedException as err:
         return err.plugin
 

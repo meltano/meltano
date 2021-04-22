@@ -180,6 +180,19 @@ extractors:
   example_extra: value
 ```
 
+#### Plugin commands
+
+Plugin [commands](/docs/command-line-interface.html#commands) are defined by the `commands` property. The keys are the name of the command and the values are the arguments to be passed to the plugin executable. These can contain dynamic references to [configuration](/docs/configuration.html) using the [Environment variable form](/docs/configuration.html#environment-variables) of the configuration option.
+
+```yaml{3-7}
+transformers:
+- name: dbt
+  executable: dbt
+  commands:
+    seed: seed --project-dir $DBT_PROJECT_DIR --profile $DBT_PROFILE --target $DBT_TARGET --select $DBT_MODEL
+    snapshot: snapshot --project-dir $DBT_PROJECT_DIR --profile $DBT_PROFILE --target $DBT_TARGET --select $DBT_MODEL
+```
+
 ### Schedules
 
 Your project's pipeline schedules,

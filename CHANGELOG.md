@@ -10,9 +10,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for shortcut commands to `invoke`
+- [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for `sqlfluff` utility for linting SQL transforms
 - [#2613](https://gitlab.com/meltano/meltano/-/issues/2613) Add `mashey` variant of `tap-slack`
 - [#2689](https://gitlab.com/meltano/meltano/-/issues/2689) Add documentation for using a custom Python Package Index (PyPi)
-- [#2426](https://gitlab.com/meltano/meltano/-/issues/2426) Add `transferwise` variant of `target-redshift` 
+- [#2426](https://gitlab.com/meltano/meltano/-/issues/2426) Add `transferwise` variant of `target-redshift`
 
 ### Changes
 

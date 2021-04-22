@@ -36,13 +36,22 @@ class Canonical:
     @classmethod
     def as_canonical(cls, target):
         if isinstance(target, Canonical):
-            return {k: Canonical.as_canonical(v) for k, v in target}
+            return {key: Canonical.as_canonical(val) for key, val in target}
 
         if isinstance(target, set):
             return list(map(Canonical.as_canonical, target))
 
         if isinstance(target, list):
             return list(map(Canonical.as_canonical, target))
+
+        if isinstance(target, dict):
+            results = {}
+            for key, val in target.items():
+                if isinstance(val, Canonical):
+                    results[key] = val.canonical()
+                else:
+                    results[key] = Canonical.as_canonical(val)
+            return results
 
         return copy.deepcopy(target)
 
