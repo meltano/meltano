@@ -17,25 +17,25 @@ makes it easier than ever to create new taps for your own custom data sources. F
 on creating a tap, see the [SDK Dev Guide](https://gitlab.com/meltano/singer-sdk/-/blob/main/docs/dev_guide.md).
 
 ::: tip
-[Singer](https://singer.io) taps and targets are the mechanism Meltano uses to extract 
- and load data. For more details about the Singer specification, please visit our 
+[Singer](https://singer.io) taps and targets are the mechanism Meltano uses to extract
+ and load data. For more details about the Singer specification, please visit our
  [Singer Spec](https://meltano.com/docs/singer-spec.html) documentation.
 :::
 
 ## Create the Plugin's Package
 
+As a first step, follow the [instructions](https://gitlab.com/meltano/singer-sdk/-/tree/main/cookiecutter/tap-template)
+in the SDK documentation to create a new project from the provided cookie cutter template.
+
 ::: tip
 [cookiecutter](https://cookiecutter.readthedocs.io/en/latest/) is a python tool to scaffold projects quickly from an existing template.
 :::
-
-As a first step, follow the [instructions](https://gitlab.com/meltano/singer-sdk/-/tree/main/cookiecutter/tap-template)
-in the SDK documentation to create a new project from the provided cookie cutter template.
 
 ## Add the Plugin to Your Meltano Project
 
 Meltano exposes each plugin configuration in the plugin definition, located in the [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
 
-To test the plugin as part of your Meltano project, you need to add your plugin configuration in the `meltano.yml` file for your project.
+To test the plugin as part of your Meltano project, you will need to add your plugin configuration in the `meltano.yml` file for your project.
 
 In your existing `meltano.yml`:
 
@@ -81,10 +81,6 @@ Any time you manually add new plugins to `meltano.yml`, it's a good idea to reru
 meltano install
 ```
 
-::: tip
-Meltano manages converting the plugin's configuration to the appropriate definition for the plugin. You can find the generated file in `.meltano/run/tap-my-custom-source/tap.config.json`.
-:::
-
 ### Plugin Settings
 
 When creating a new plugin, you'll often have to expose some settings to the user so that Meltano can generate the correct configuration to run your plugin.
@@ -108,7 +104,7 @@ _**It is best practice not to store sensitive values directly in `meltano.yml`.*
 
 Note in our example above, we provided values directly for `username` and `start_date` but we did not enter a value
 for password. This was intentional, to avoid storing sensitive credentials in clear text within our source code. Instead, set the environment variable for this setting by running `export TAP_MY_CUSTOM_SOURCE_PASSWORD=MyPass1234!`
-before invoking the plugin with Meltano. 
+before invoking the plugin with Meltano.
 
 You may use any of the following to configure setting values (in order of precedence):
 
@@ -130,7 +126,7 @@ meltano invoke tap-my-custom-source --discover
 You can also use `meltano select` to parse your `catalog` and list all available entities and attributes:
 
 ```bash
-meltano select --list --all 
+meltano select --list --all
 ```
 
 Now, run an ELT pipeline using your new tap:
@@ -139,20 +135,24 @@ Now, run an ELT pipeline using your new tap:
 meltano elt tap-my-custom-source target-sqlite
 ```
 
+::: tip
+Meltano manages converting the plugin's configuration to the appropriate definition for the plugin. You can find the generated file in `.meltano/run/tap-my-custom-source/tap.config.json`.
+:::
 
 ## Publishing to the world
 
 Once you've built your tap and it is providing you the data you need, we hope you will consider
 sharing it with the world! We often find that community
-members who benefit from your tap also may contribute back their own fixes and improvements in
+members who benefit from your tap also may contribute back their own improvements in
 the form of pull requests.
 
 ### Publish to PyPi
 
-If you've built your tap using the SDK, you can take advantage of the streamlined [`poetry
-publish`](https://python-poetry.org/docs/cli/#publish) command to publish your tap directly to PyPi.
+If you've built your tap using the SDK, you can take advantage of the streamlined
+[`poetry publish`](https://python-poetry.org/docs/cli/#publish) command to publish
+your tap directly to PyPi.
 
-1. Create an account with www.PyPi.org.
+1. Create an account with [PyPi](https://pypi.org).
 2. Create a PyPi API token for use in automated publishing. (Optional but recommended.)
 3. Run `poetry --build publish` from within your repo to build and push your latest version
    to the PyPi servers.
