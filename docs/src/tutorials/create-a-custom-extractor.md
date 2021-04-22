@@ -194,4 +194,4 @@ Once your repo is installable with pip, you can reference this in your `meltano.
 ## References
 
 - [Singer SDK](https://github.com/meltano/singer-sdk)
-- [Singer Spec](https://meltano.com/docs/singer-spec.html)
+- [Singer Spec](/docs/singer-spec.html)
