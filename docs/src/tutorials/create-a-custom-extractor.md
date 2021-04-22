@@ -135,10 +135,6 @@ Now, run an ELT pipeline using your new tap:
 meltano elt tap-my-custom-source target-sqlite
 ```
 
-::: tip
-Meltano manages converting the plugin's configuration to the appropriate definition for the plugin. You can find the generated file in `.meltano/run/tap-my-custom-source/tap.config.json`.
-:::
-
 ## Publishing to the world
 
 Once you've built your tap and it is providing you the data you need, we hope you will consider
