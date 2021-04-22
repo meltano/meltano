@@ -68,7 +68,7 @@ plugins:
 ```
 
 ::: tip
-You can further customize the appearance of your custom extractor in Meltano UI using the following options:
+You can further customize the appearance of your custom extractor in [Meltano UI](/docs/ui.html) using the following options:
 
 - `label`
 - `logo_url`
