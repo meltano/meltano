@@ -42,6 +42,7 @@ def process_mock_factory():
         process_mock.name = name
         process_mock.wait = CoroutineMock(return_value=0)
         process_mock.returncode = 0
+        process_mock.stdin.wait_closed = CoroutineMock(return_value=True)
         return process_mock
 
     return _factory
@@ -328,13 +329,25 @@ class TestCliEltScratchpadOne:
         args = ["elt", "--job_id", job_id, tap.name, target.name]
 
         # Have `tap_process.wait` take 2s to make sure the target can fail before tap finishes
-        async def wait_mock():
+        async def tap_wait_mock():
             await asyncio.sleep(2)
             return tap_process.wait.return_value
 
-        tap_process.wait.side_effect = wait_mock
+        tap_process.wait.side_effect = tap_wait_mock
 
-        target_process.wait.return_value = 1
+        # Writing to target stdin will fail because (we'll pretend) it has already died
+        target_process.stdin = mock.Mock(spec=asyncio.StreamWriter)
+        target_process.stdin.write.side_effect = BrokenPipeError
+        target_process.stdin.drain = CoroutineMock(side_effect=ConnectionResetError)
+        target_process.stdin.wait_closed = CoroutineMock(return_value=True)
+
+        # Have `target_process.wait` take 1s to make sure the `stdin.write`/`drain` exceptions can be raised
+        async def target_wait_mock():
+            await asyncio.sleep(1)
+            return 1
+
+        target_process.wait.side_effect = target_wait_mock
+
         target_process.stderr.readline.side_effect = (
             b"Starting\n",
             b"Running\n",
