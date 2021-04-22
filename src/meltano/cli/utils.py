@@ -1,8 +1,6 @@
 """Defines helpers for use by the CLI."""
-import asyncio
 import logging
 import os
-from contextlib import suppress
 
 import click
 from meltano.core.logging import setup_logging
@@ -37,26 +35,6 @@ class CliError(Exception):
         click.secho(str(self), fg="red")
 
         self.printed = True
-
-
-def run_async(coro):
-    """Run coroutine and handle event loop and cleanup."""
-    # Taken from https://stackoverflow.com/a/58532304
-    # and inspired by Python 3.7's `asyncio.run`
-
-    loop = asyncio.get_event_loop()
-    try:
-        loop.run_until_complete(coro)
-    except asyncio.CancelledError:
-        pass
-    finally:
-        all_tasks = asyncio.gather(
-            *asyncio.Task.all_tasks(loop), return_exceptions=True
-        )
-        all_tasks.cancel()
-        with suppress(asyncio.CancelledError):
-            loop.run_until_complete(all_tasks)
-        loop.run_until_complete(loop.shutdown_asyncgens())
 
 
 def print_added_plugin(project, plugin, related=False):

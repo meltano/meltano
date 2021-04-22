@@ -1,7 +1,6 @@
 """Install plugins into the project, using pip in separate virtual environments by default."""
 import asyncio
 import logging
-from contextlib import suppress
 from enum import Enum
 from typing import Iterable
 
@@ -19,7 +18,7 @@ from .plugin_discovery_service import PluginDiscoveryService
 from .project import Project
 from .project_add_service import ProjectAddService
 from .project_plugins_service import ProjectPluginsService
-from .utils import noop
+from .utils import noop, run_async
 from .venv_service import VenvService
 
 
@@ -36,33 +35,6 @@ def installer_factory(project, plugin: ProjectPlugin, *args, **kwargs):
         cls = plugin.installer_class
 
     return cls(project, plugin, *args, **kwargs)
-
-
-def run_coroutine(task):
-    """
-    Block until the given coroutine is complete and return the result.
-
-    This is temporary until 3.6 support is dropped, at which point asyncio.run
-    should suffice.
-    """
-    loop = asyncio.get_event_loop()
-    future = asyncio.ensure_future(task)
-    try:
-        loop.run_until_complete(future)
-        if future.exception():
-            raise future.exception()
-
-        return future.result()
-    except asyncio.CancelledError:
-        pass
-    finally:
-        all_tasks = asyncio.gather(
-            *asyncio.Task.all_tasks(loop), return_exceptions=True
-        )
-        all_tasks.cancel()
-        with suppress(asyncio.CancelledError):
-            loop.run_until_complete(all_tasks)
-        loop.run_until_complete(loop.shutdown_asyncgens())
 
 
 class PluginInstallService:
@@ -86,7 +58,7 @@ class PluginInstallService:
 
         Blocks until all plugins are installed.
         """
-        return run_coroutine(self.install_plugins_async(plugins, reason, status_cb))
+        return run_async(self.install_plugins_async(plugins, reason, status_cb))
 
     async def install_plugins_async(
         self,
@@ -124,7 +96,7 @@ class PluginInstallService:
 
         Blocks until the plugin is installed.
         """
-        res = run_coroutine(self.install_plugin_async(plugin, reason=reason))
+        res = run_async(self.install_plugin_async(plugin, reason=reason))
 
         if compile_models and plugin.type is PluginType.MODELS:
             self.compile_models()
