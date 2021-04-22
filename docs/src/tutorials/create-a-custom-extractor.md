@@ -102,8 +102,7 @@ To expose such a setting, you'll need to define it as such
 _**It is best practice not to store sensitive values directly in `meltano.yml`.**_
 
 Note in our example above, we provided values directly for `username` and `start_date` but we did not enter a value
-for password. This was intentional, to avoid storing sensitive credentials in clear text within our source code. Instead, set the environment variable for this setting by running `export TAP_MY_CUSTOM_SOURCE_PASSWORD=MyPass1234!`
-before invoking the plugin with Meltano.
+for password. This was to avoid storing sensitive credentials in clear text within our source code. Instead, run `meltano config <plugin> set password <value>` or set the environment variable for this setting by running `export TAP_MY_CUSTOM_SOURCE_PASSWORD=<value>`.
 
 You may use any of the following to configure setting values (in order of precedence):
 
