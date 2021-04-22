@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.72.0 - (2021-04-22)
+---
+
+### New
+
 - [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for shortcut commands to `invoke`
 - [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for `sqlfluff` utility for linting SQL transforms
 - [#2613](https://gitlab.com/meltano/meltano/-/issues/2613) Add `mashey` variant of `tap-slack`
@@ -23,8 +35,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#2526](https://gitlab.com/meltano/meltano/-/issues/2526) When target process fails before tap, report target output instead of `BrokenPipeError` or `ConnectionResetError`
-
-### Breaks
 
 
 ## 1.71.0 - (2021-03-23)
