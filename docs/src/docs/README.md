@@ -125,16 +125,16 @@ Below you will found our current roadmap. As this projects out into the future i
 
 #### April 2021
 
-Our focus for April will be around continuing to improve the Singer SDK for taps and to build out the SingerHub to make discoverability of taps and targets as easy as possible.
+Our focus in April has been around continuing to improve the Singer SDK for taps and to build out the initial version of the SingerHub to make discoverability of taps and targets as easy as possible.
 
-* [Singer SDK for Taps](https://gitlab.com/groups/meltano/-/epics/90)
+* [Singer SDK for Taps](https://gitlab.com/meltano/singer-sdk)
 * [SingerHub](https://gitlab.com/groups/meltano/-/epics/83)
 
 #### May 2021
 
 Our focus for May will be on building out the Singer SDK for targets and to improve our dbt integration.
 
-* [Singer SDK for Targets](https://gitlab.com/meltano/singer-sdk/-/issues/4)
+* [Singer SDK for Targets](https://gitlab.com/meltano/singer-sdk/-/issues/96)
 * [Enhanced dbt integration](https://gitlab.com/groups/meltano/-/epics/82)
 
 #### June 2021
