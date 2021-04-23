@@ -8,6 +8,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
+    PluginInstallStatus,
 )
 from meltano.core.project import Project
 from meltano.core.project_add_service import (
@@ -321,20 +322,25 @@ def add_related_plugins(
     return added_plugins
 
 
-def install_status_update(data, reason):
-    plugin = data["plugin"]
+def install_status_update(update):
+    """
+    Print the status of plugin installation.
 
-    if data["status"] == "running":
-        verb = "Updating" if reason == PluginInstallReason.UPGRADE else "Installing"
-        click.secho(f"{verb} {plugin.type.descriptor} '{plugin.name}'...")
-    elif data["status"] == "error":
-        click.secho(data["message"], fg="red")
-        click.secho(data["details"], err=True)
-    elif data["status"] == "warning":
-        click.secho(f"Warning! {data['message']}.", fg="yellow")
-    elif data["status"] == "success":
-        verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
-        click.secho(f"{verb} {plugin.type.descriptor} '{plugin.name}'", fg="green")
+    Used as the callback for PluginInstallService.
+    """
+    plugin = update.plugin
+    desc = plugin.type.descriptor
+    if update.status is PluginInstallStatus.RUNNING:
+        msg = f"{update.verb} {desc} '{plugin.name}'..."
+        click.secho(msg)
+    elif update.status == PluginInstallStatus.ERROR:
+        click.secho(update.message, fg="red")
+        click.secho(update.details, err=True)
+    elif update.status == PluginInstallStatus.WARNING:
+        click.secho(f"Warning! {update.message}.", fg="yellow")
+    elif update.status == PluginInstallStatus.SUCCESS:
+        msg = f"{update.verb} {desc} '{plugin.name}'"
+        click.secho(msg, fg="green")
         click.echo()
 
 
@@ -342,15 +348,12 @@ def install_plugins(
     project, plugins, reason=PluginInstallReason.INSTALL, parallelism=None
 ):
     """Install the provided plugins and report results to the console."""
-    install_service = PluginInstallService(project)
-    install_status = install_service.install_plugins(
-        plugins,
-        reason=reason,
-        status_cb=install_status_update,
-        parallelism=parallelism,
+    install_service = PluginInstallService(
+        project, status_cb=install_status_update, parallelism=parallelism
     )
-    num_installed = len(install_status["installed"])
-    num_failed = len(install_status["errors"])
+    install_results = install_service.install_plugins(plugins, reason=reason)
+    num_installed = len([status for status in install_results if status.successful])
+    num_failed = len([status for status in install_results if not status.successful])
 
     fg = "green"
     if num_failed >= 0 and num_installed == 0:
