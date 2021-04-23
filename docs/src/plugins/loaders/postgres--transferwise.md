@@ -60,7 +60,7 @@ Follow the remaining step of the [Getting Started guide](/docs/getting-started.h
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
-If you run into any issues, [learn how to get help](/docs/getting-help.html).
+If you run into any issues, refer to the ["Troubleshooting" section](#troubleshooting) below or [learn how to get help](/docs/getting-help.html).
 
 ## Settings
 
@@ -467,3 +467,12 @@ meltano config target-postgres set temp_dir /tmp/dir
 
 export TARGET_POSTGRES_TEMP_DIR=/tmp/dir
 ```
+
+## Troubleshooting
+
+### Error: `ld: library not found for -lssl` or `clang: error: linker command failed with exit code 1` or `error: command 'clang' failed with exit status 1`
+
+This error message indicates that there is a problem installing OpenSSL. This 
+[Stack Overflow answer](https://stackoverflow.com/questions/26288042/error-installing-psycopg2-library-not-found-for-lssl) 
+has specific recommendations on setting the `LDFLAGS` and/or `CPPFLAGS` environment variables. 
+Set those prior to running `meltano add loader target-postgres --variant transferwise`.

@@ -5,6 +5,7 @@ import os
 import shutil
 import subprocess
 import sys
+from contextlib import suppress
 from datetime import datetime
 from enum import IntFlag
 from pathlib import Path
@@ -69,7 +70,7 @@ class SingerRunner(Runner):
                 process.kill()
                 logging.error(f"{process} was killed.")
 
-    async def invoke(  # noqa: WPS217, WPS210, WPS211, WPS213, WPS231
+    async def invoke(  # noqa: WPS217, WPS210, WPS213, WPS231
         self,
         tap: PluginInvoker,
         target: PluginInvoker,
@@ -194,6 +195,7 @@ class SingerRunner(Runner):
 
                 # Kill tap and cancel output processing since there's no more target to forward messages to
                 p_tap.kill()
+                await tap_process_future
                 tap_stdout_future.cancel()
                 tap_stderr_future.cancel()
 
@@ -211,6 +213,8 @@ class SingerRunner(Runner):
 
             # Close target stdin so process can complete naturally
             p_target.stdin.close()
+            with suppress(AttributeError):  # `wait_closed` is Python 3.7+
+                await p_target.stdin.wait_closed()
 
             # Wait for all buffered target output to be processed
             await asyncio.wait([target_stdout_future, target_stderr_future])

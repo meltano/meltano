@@ -28,8 +28,8 @@ Every open issue _with a sprint milestone_ should have a `flow` label:
 - `flow::Review`: Currently in review
 
 When possible, an issue should have a label indicating its type:
-- `bug`
-- `feature requests`
+- `Bug`
+- `Feature Request`
 - `Discussion`
 - `Exploration`
 - `Community Support`
@@ -43,15 +43,20 @@ If appropriate, an issue should have a stage label (one of the letters in "melta
 - `Notebook` (currently unused)
 - `Orchestrate`
 
+Singer related labels:
+- `Singer Ecosystem` for general Singer related issues
+- `SingerHub`
+- `Singer SDK`
+
 Other labels:
 - `CLI` or `UI` for issues specifically concerning the CLI or UI
 - `Documentation` for new or updated documentation
 - `Accepting Merge Requests` for issues that are ready to be picked up by a community contributor
-- `integrations` for issues relating to integrations with other open source data tools, typically as plugins
+- `Integrations` for issues relating to integrations with other open source data tools, typically as plugins
 - `Configuration` for issues relating to configuration
 - `Plugin Management` for issues relating to plugin management
 
-New labels can be created as appropriate and should be documented them here.
+New labels can be created as appropriate at the Group Level and should be documented them here.
 
 ### Epics
 
@@ -233,7 +238,7 @@ Recurring office hours are available for Meltano community members to discuss ou
 
 - Slack:
     - Post reminder to #office-hours
-    - Share to #events and #general
+    - Share to #announcements
 - Tweet:
     - Draft a short memo for the Tweet text. Post should come from the brand account with office hours link and time.
     - Schedule Tweet for 30 minutes ahead of session.
@@ -270,7 +275,7 @@ Recurring office hours are available for Meltano community members to discuss ou
 ## Outages & escalation
 
 Both https://www.meltano.com and https://meltano.meltanodata.com are automatically monitored using Pingdom, with notifications of downtime posted to:
-- the #meltano Slack channel,
+- the #meltano Slack channel within GitLab,
 - Zendesk, through our `hello@` email address, and
 - Douwe, by email and SMS.
 
