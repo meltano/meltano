@@ -8,12 +8,10 @@ description: Learn how to use Meltano to create a custom data extractor.
 
 As much as we'd like to support all the data sources out there, we'll need your help to get there. If you find a data source that Meltano doesn't support right now, it might be time to get your hands dirty.
 
-
 ## How to Create an Extractor
 
 The [Singer SDK](https://gitlab.com/meltano/singer-sdk)
-makes it easier than ever to create new [extractors](/docs/plugins.html#extractors) for your own custom data sources. For more information
-on creating a Singer tap, see the [SDK Dev Guide](https://gitlab.com/meltano/singer-sdk/-/blob/main/docs/dev_guide.md).
+makes it easier than ever to create new [extractors](/docs/plugins.html#extractors) for your own custom data sources.
 
 ::: tip
 [Singer](https://singer.io) taps and targets are the mechanism Meltano uses to extract
@@ -23,8 +21,11 @@ on creating a Singer tap, see the [SDK Dev Guide](https://gitlab.com/meltano/sin
 
 ## Create the Plugin's Package
 
-As a first step, follow the [instructions](https://gitlab.com/meltano/singer-sdk/-/tree/main/cookiecutter/tap-template)
-in the SDK documentation to create a new project from the provided cookie cutter template.
+1. As a first step, follow the [instructions](https://gitlab.com/meltano/singer-sdk/-/tree/main/cookiecutter/tap-template)
+in the SDK documentation to create a new project from the provided cookiecutter template.
+2. As you are developing, consult the [SDK Dev Guide](https://gitlab.com/meltano/singer-sdk/-/blob/main/docs/dev_guide.md) for developer documentation and the
+[Code Samples](https://gitlab.com/meltano/singer-sdk/-/blob/main/docs/code_samples.md) page to find
+reusable sample code.
 
 ::: tip
 [cookiecutter](https://cookiecutter.readthedocs.io/en/latest/) is a python tool to scaffold projects quickly from an existing template.
@@ -78,7 +79,8 @@ You can further customize the appearance of your custom extractor in [Meltano UI
 - `description`
 :::
 
-Any time you manually add new plugins to `meltano.yml`, it's a good idea to rerun the install command:
+Any time you manually add new plugins to `meltano.yml`, you will need to rerun the
+[install](/docs/command-line-interface.html#install) command:
 
 ```bash
 meltano install
@@ -88,7 +90,7 @@ meltano install
 
 When creating a new plugin, you'll often have to expose some settings to the user so that Meltano can generate the correct configuration to run your plugin.
 
-To expose such a setting, you'll need to define it as such
+To properly expose and configure your settings, you'll need to define them:
 
 - **name**: Identifier of this setting in the configuration.
   The name is the most important field of a setting, as it defines how the value will be passed down to the underlying component.
@@ -96,17 +98,17 @@ To expose such a setting, you'll need to define it as such
 
   - `foo` represents the `{ foo: VALUE }` in the output configuration.
   - `foo.a` represents the `{ foo: { a: VALUE } }` in the output configuration.
-
-- **kind**: Represent the type of value this should be, (e.g. `password` or `date_iso8601`).
-- **value** (optional): Define the default value for this variable. It should also be used as a placeholder for UX purposes.
-- **env** (optional): Define the environment variable name used to set this value at runtime. _Defaults to `<NAMESPACE>_<SETTING_NAME>` in all-caps_.
+- **kind**: Represent the type of value this should be, (e.g. `password` for sensitive values or `date_iso8601` for dates).
+- **value** (optional): Define a default value for the plugin's setting.
 
 ### Passing sensitive setting values
 
 _**It is best practice not to store sensitive values directly in `meltano.yml`.**_
 
 Note in our example above, we provided values directly for `username` and `start_date` but we did not enter a value
-for password. This was to avoid storing sensitive credentials in clear text within our source code. Instead, run `meltano config <plugin> set password <value>` or set the environment variable for this setting by running `export TAP_MY_CUSTOM_SOURCE_PASSWORD=<value>`.
+for password. This was to avoid storing sensitive credentials in clear text within our source code. Instead, make sure the setting `kind` is set to `password` and then
+run [`meltano config <plugin> set password <value>`](https://meltano.com/docs/getting-started.html#configure-the-extractor). You can also set the matching environment variable for this
+setting by running `export TAP_MY_CUSTOM_SOURCE_PASSWORD=<value>`.
 
 You may use any of the following to configure setting values (in order of precedence):
 
@@ -125,7 +127,8 @@ Use `meltano invoke` to run your plugin in isolation:
 meltano invoke tap-my-custom-source --discover
 ```
 
-You can also use `meltano select` to parse your `catalog` and list all available entities and attributes:
+You can also use [`meltano select`](https://meltano.com/docs/getting-started.html#select-entities-and-attributes-to-extract)
+to parse your `catalog` and list all available entities and attributes:
 
 ```bash
 meltano select --list --all
@@ -178,6 +181,12 @@ pip3 install tap-my-custom-source
 ```
 
 If you have gotten this far... _**Congrats!** You are now a proud Singer tap developer!_
+
+### Make it discoverable
+
+Once you have your tap published to PyPi, consider
+[making it discoverable](https://meltano.com/docs/contributor-guide.html#making-a-custom-plugin-discoverable)
+for other users of Meltano.
 
 ### Updates for production use
 
