@@ -87,7 +87,7 @@ def installer_factory(project, plugin: ProjectPlugin, *args, **kwargs):
 def with_semaphore(func):
     """Gate acess to the method using its class's semaphore."""
 
-    @functools.wraps(func)
+    @functools.wraps(func) # noqa: WPS430
     async def wrapper(self, *args, **kwargs):  # noqa: WPS430
         async with self.semaphore:
             return await func(self, *args, **kwargs)
