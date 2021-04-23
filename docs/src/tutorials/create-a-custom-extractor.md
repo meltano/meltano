@@ -51,13 +51,17 @@ plugins:
         - state
         - catalog
         - discover
+      config:
+        # Configured values:
+        username: me@example.com
+        start_date: '2021-01-01'
       settings:
         - name: username
-          value: me@here.com
         - name: password
           kind: password
         - name: start_date
-          value: '2015-09-21T04:00:00Z'
+          # Default value for the plugin:
+          value: '2010-01-01T00:00:00Z'
   loaders:
     # your loaders here:
     - name: target-jsonl
