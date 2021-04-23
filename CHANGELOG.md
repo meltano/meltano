@@ -31,6 +31,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#2082](https://gitlab.com/meltano/meltano/-/issues/2082) Updated database_uri documentation to show how to target a PostgreSQL schema
+- [#2107](https://gitlab.com/meltano/meltano/-/issues/2107) Updated 'create a custom extractor' tutorial to use the new SDK
 
 ### Fixes
 
