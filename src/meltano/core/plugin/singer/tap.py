@@ -11,7 +11,7 @@ from meltano.core.behavior.hookable import hook
 from meltano.core.job import JobFinder, Payload
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin_invoker import InvokerError
-from meltano.core.setting_definition import SettingDefinition
+from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.utils import file_has_data, flatten, merge, truthy
 
 from . import PluginType, SingerPlugin
@@ -71,7 +71,7 @@ class SingerTap(SingerPlugin):
         SettingDefinition(name="_catalog"),
         SettingDefinition(name="_state"),
         SettingDefinition(name="_load_schema", value="$MELTANO_EXTRACTOR_NAMESPACE"),
-        SettingDefinition(name="_select", kind="array", value=["*.*"]),
+        SettingDefinition(name="_select", kind=SettingKind.ARRAY, value=["*.*"]),
         SettingDefinition(
             name="_metadata",
             aliases=["metadata"],
@@ -80,9 +80,12 @@ class SingerTap(SingerPlugin):
             value_processor="nest_object",
         ),
         SettingDefinition(
-            name="_schema", kind="object", value={}, value_processor="nest_object"
+            name="_schema",
+            kind=SettingKind.OBJECT,
+            value={},
+            value_processor="nest_object",
         ),
-        SettingDefinition(name="_select_filter", kind="array", value=[]),
+        SettingDefinition(name="_select_filter", kind=SettingKind.ARRAY, value=[]),
     ]
 
     def exec_args(self, plugin_invoker):

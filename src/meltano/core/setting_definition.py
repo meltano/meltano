@@ -67,7 +67,7 @@ class SettingDefinition(NameEq, Canonical):
         aliases: List[str] = [],
         env: str = None,
         env_aliases: List[str] = [],
-        kind: str = None,
+        kind: SettingKind = None,
         value=None,
         label: str = None,
         documentation: str = None,
@@ -125,13 +125,13 @@ class SettingDefinition(NameEq, Canonical):
     def from_key_value(cls, key, value, custom=True, default=False):
         kind = None
         if isinstance(value, bool):
-            kind = "boolean"
+            kind = SettingKind.BOOLEAN
         elif isinstance(value, int):
-            kind = "integer"
+            kind = SettingKind.INTEGER
         elif isinstance(value, dict):
-            kind = "object"
+            kind = SettingKind.OBJECT
         elif isinstance(value, list):
-            kind = "array"
+            kind = SettingKind.ARRAY
 
         attrs = {
             "name": key,
@@ -153,7 +153,7 @@ class SettingDefinition(NameEq, Canonical):
 
     @property
     def is_redacted(self):
-        return self.kind in ("password", "oauth")
+        return self.kind in (SettingKind.PASSWORD, SettingKind.OAUTH)
 
     def env_vars(self, prefixes: [str], include_custom=True):
         """Return environment variables with the provided prefixes."""
@@ -174,15 +174,15 @@ class SettingDefinition(NameEq, Canonical):
             value = value.isoformat()
 
         if isinstance(value, str):
-            if self.kind == "boolean":
+            if self.kind == SettingKind.BOOLEAN:
                 return truthy(value)
-            elif self.kind == "integer":
+            elif self.kind == SettingKind.INTEGER:
                 return int(value)
-            elif self.kind == "object":
+            elif self.kind == SettingKind.OBJECT:
                 value = json.loads(value)
                 if not isinstance(value, dict):
                     raise ValueError(f"JSON value '{value}' is not an object")
-            elif self.kind == "array":
+            elif self.kind == SettingKind.ARRAY:
                 value = json.loads(value)
                 if not isinstance(value, list):
                     raise ValueError(f"JSON value '{value}' is not an array")
@@ -208,7 +208,7 @@ class SettingDefinition(NameEq, Canonical):
         if isinstance(value, str):
             return value
 
-        if self.kind == "string":
+        if self.kind == SettingKind.STRING:
             return str(value)
 
         return json.dumps(value)
