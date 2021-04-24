@@ -1,5 +1,6 @@
 import json
 from datetime import date, datetime
+from enum import Enum
 from typing import List
 
 from .behavior import NameEq
@@ -43,6 +44,20 @@ class SettingMissingError(Error):
 
     def __init__(self, name: str):
         super().__init__(f"Cannot find setting {name}")
+
+
+class SettingKind(str, Enum):
+    STRING = "string"
+    INTEGER = "integer"
+    BOOLEAN = "boolean"
+    DATE_ISO8601 = "date_iso8601"
+    PASSWORD = "password"
+    OAUTH = "oauth"
+    OPTIONS = "options"
+    FILE = "file"
+    ARRAY = "array"
+    OBJECT = "object"
+    HIDDEN = "hidden"
 
 
 class SettingDefinition(NameEq, Canonical):
