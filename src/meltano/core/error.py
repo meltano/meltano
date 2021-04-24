@@ -38,8 +38,11 @@ class SubprocessError(Exception):
         stderr = self._stderr
         if not stderr:
             return None
+        elif isinstance(stderr, bytes):
+            return stderr.decode('utf-8')
         elif not isinstance(stderr, str):
-            stderr = stderr.read()
+            self._stderr = stderr.read()
+            return self._stderr
 
         return stderr
 
