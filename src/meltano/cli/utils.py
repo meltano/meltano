@@ -215,6 +215,11 @@ def _prompt_plugin_settings(plugin_type):
     )
     click.echo("e.g. `port:integer` to set the kind `integer` for the name `port`")
     click.echo()
+    click.echo("Supported setting kinds:")
+    click.echo(
+        " | ".join([click.style(kind.value, fg="magenta") for kind in SettingKind])
+    )
+    click.echo()
     click.echo("Default: no settings")
     click.echo()
 
