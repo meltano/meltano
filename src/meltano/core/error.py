@@ -39,7 +39,7 @@ class SubprocessError(Exception):
         if not stderr:
             return None
         elif isinstance(stderr, bytes):
-            return stderr.decode('utf-8')
+            return stderr.decode("utf-8")
         elif not isinstance(stderr, str):
             self._stderr = stderr.read()
             return self._stderr
