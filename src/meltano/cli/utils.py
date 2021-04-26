@@ -16,6 +16,7 @@ from meltano.core.project_add_service import (
     PluginAlreadyAddedException,
     ProjectAddService,
 )
+from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 setup_logging()
@@ -225,7 +226,11 @@ def _prompt_plugin_settings(plugin_type):
             setting.strip().partition(":") for setting in value.split(",")
         ],
     )
-    return [{"name": name, "kind": kind} for name, sep, kind in settings]
+
+    return [
+        {"name": name, "kind": kind and SettingKind(kind).value}
+        for name, sep, kind in settings
+    ]
 
 
 def add_plugin(
