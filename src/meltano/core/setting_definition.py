@@ -46,12 +46,14 @@ class SettingMissingError(Error):
         super().__init__(f"Cannot find setting {name}")
 
 
-class SettingKind(str, Enum):
+class SettingKind(Enum):
+    """Supported setting kinds."""
+
     STRING = "string"
     INTEGER = "integer"
     BOOLEAN = "boolean"
     DATE_ISO8601 = "date_iso8601"
-    PASSWORD = "password"
+    PASSWORD = "password"  # noqa: S105
     OAUTH = "oauth"
     OPTIONS = "options"
     FILE = "file"
@@ -153,7 +155,7 @@ class SettingDefinition(NameEq, Canonical):
 
     @property
     def is_redacted(self):
-        return self.kind in (SettingKind.PASSWORD, SettingKind.OAUTH)
+        return self.kind in {SettingKind.PASSWORD, SettingKind.OAUTH}
 
     def env_vars(self, prefixes: [str], include_custom=True):
         """Return environment variables with the provided prefixes."""
