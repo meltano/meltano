@@ -51,7 +51,7 @@ With Meltano, we are providing a **clear path to production** with existing Sing
 thereby lowering the barrier to adoption and motivating people who run into an issue with an existing connector
 to debug it, contribute a fix, and see it through, instead of giving up.
 
-The upcoming [**Singer SDK**](https://gitlab.com/meltano/singer-sdk) will enable developers to build **connectors with all the bells and whistles** without having to be become an expert on the spec.
+The [**Singer SDK**](https://gitlab.com/meltano/singer-sdk) enables developers to build **connectors with all the bells and whistles** without having to be become an expert on the spec.
 This further lowers the barrier to creating new connectors and contributing to existing ones,
 and will lead to increased reliability and consistency.
 
