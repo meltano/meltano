@@ -36,8 +36,8 @@ class PluginRemoveService:
                 plugin, yml_remove_status, installation_remove_status
             )
 
-            if meltano_yml.status is not RemoveState.REMOVED:
-                if installation.status is not RemoveState.REMOVED:
+            if meltano_yml.status is not RemoveStatus.REMOVED:
+                if installation.status is not RemoveStatus.REMOVED:
                     removed_plugins -= 1
 
             status_cb(plugin, meltano_yml)
