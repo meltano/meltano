@@ -9,7 +9,8 @@ with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destinat
 
 ::: tip Short on time, or just curious what the fuss is about?
 
-To get a sense of the Meltano experience in just a few minutes, follow the [examples on the homepage](/).
+To get a sense of the Meltano experience in just a few minutes, follow the [examples on the homepage](/),
+or watch the ["from 0 to ELT in 90 seconds" speedrun](/blog/2021/04/28/speedrun-from-0-to-elt-in-90-seconds/).
 
 They can be copy-pasted right into your terminal and will take you all the way through
 [installation](/#installation), [data integration (EL)](/#integration), [data transformation (T)](/#transformation), [orchestration](/#orchestration), and [containerization](/#containerization)
