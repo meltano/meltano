@@ -1,5 +1,6 @@
 """Defines PluginRemoveService."""
 import shutil
+from enum import Enum
 from typing import Iterable
 
 from meltano.core.db import project_engine
@@ -27,71 +28,72 @@ class PluginRemoveService:
         removed_plugins: int = num_plugins
 
         for plugin in plugins:
-            status = "running"
-            message = ""
-            status_cb(plugin, status)
+            yml_remove_status = RemoveState("meltano.yml")
+            installation_remove_status = RemoveState(f".meltano/{plugin.type}")
+            status_cb(plugin, RemoveStatus.RUNNING)
 
-            meltano_yml, installation = self.remove_plugin(plugin)
+            meltano_yml, installation = self.remove_plugin(
+                plugin, yml_remove_status, installation_remove_status
+            )
 
-            if meltano_yml.removed and installation.removed:
-                status = "success"
-            elif installation.removed:
-                status = "partial_success"
-                message = meltano_yml.message
-            elif meltano_yml.removed:
-                status = "partial_success"
-                message = installation.message
-            else:
-                status = "nothing_to_remove"
-                removed_plugins -= 1
+            if meltano_yml.status is not RemoveState.REMOVED:
+                if installation.status is not RemoveState.REMOVED:
+                    removed_plugins -= 1
 
-            status_cb(plugin, status, message)
+            status_cb(plugin, meltano_yml)
+            status_cb(plugin, installation)
 
         return removed_plugins, num_plugins
 
-    def remove_plugin(self, plugin: ProjectPlugin):
+    def remove_plugin(
+        self, plugin: ProjectPlugin, yml_remove_status, installation_remove_status
+    ):
         """Remove a plugin from `meltano.yml` and its installation in `.meltano`."""
-
-        meltano_yml_remove_status = RemoveStatus("meltano.yml")
-        installation_remove_status = RemoveStatus("installation")
-
         plugins_settings_service = PluginSettingsService(self.project, plugin)
 
         _, session = project_engine(self.project)
         plugins_settings_service.reset(store=SettingValueStore.DB, session=session())
 
+        yml_remove_status.status = RemoveStatus.REMOVED
         try:
-            meltano_yml_remove_status.removed = bool(
-                self.plugins_service.remove_from_file(plugin)
-            )
+            self.plugins_service.remove_from_file(plugin)
         except PluginNotFoundError:
-            meltano_yml_remove_status.message = (
-                f"no such {plugin.type.descriptor} in meltano.yml to remove"
-            )
+            yml_remove_status.status = RemoveStatus.NOT_FOUND
 
         path = self.project.meltano_dir().joinpath(plugin.type, plugin.name)
 
         if path.exists():
-            shutil.rmtree(path)
-            installation_remove_status.removed = True
+            installation_remove_status.status = RemoveStatus.REMOVED
+            try:
+                shutil.rmtree(path)
+            except OSError as err:
+                installation_remove_status.status = RemoveStatus.ERROR
+                installation_remove_status.message = f"ERROR ERROR {err.strerror} ERROR"
         else:
-            installation_remove_status.message = (
-                f"no install in .meltano/{plugin.type} to remove"
-            )
+            installation_remove_status.status = RemoveStatus.NOT_FOUND
 
-        return meltano_yml_remove_status, installation_remove_status
+        return yml_remove_status, installation_remove_status
 
 
-class RemoveStatus:
-    """Handle plugin removal status for a single location."""
+class RemoveStatus(Enum):
+    """Possible remove statuses."""
+
+    REMOVED = "removed"
+    ERROR = "error"
+    NOT_FOUND = "not found"
+    RUNNING = "running"
+
+
+class RemoveState:
+    """Handle plugin removal state for a single location."""
 
     def __init__(
         self,
         location,
-        removed=False,
         message="",
+        status=RemoveStatus.RUNNING,
     ):
-        """Construct a RemoveStatus instance."""
+        """Construct a RemoveState instance."""
         self.location = location
-        self.removed = removed
         self.message = message
+        self.status = status

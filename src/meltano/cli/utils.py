@@ -11,7 +11,7 @@ from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
 )
-from meltano.core.plugin_remove_service import PluginRemoveService
+from meltano.core.plugin_remove_service import PluginRemoveService, RemoveStatus
 from meltano.core.project import Project
 from meltano.core.project_add_service import (
     PluginAlreadyAddedException,
@@ -382,28 +382,30 @@ def install_plugins(project, plugins, reason=PluginInstallReason.INSTALL):
     return num_failed == 0
 
 
-def remove_status_update(plugin, status, message=""):
+def remove_status_update(plugin, remove_status):
     """Print remove status message."""
     plugin_descriptor = f"{plugin.type.descriptor} '{plugin.name}'"
 
-    if status == "running":
+    if remove_status is RemoveStatus.RUNNING:
+        click.echo()
         click.secho(f"Removing {plugin_descriptor}...")
 
-    elif status == "nothing_to_remove":
+    elif remove_status.status is RemoveStatus.ERROR:
         click.secho(
-            f"Nothing to remove for {plugin_descriptor}",
+            f"Error removing plugin {plugin_descriptor} from {remove_status.location}: {remove_status.message}",
+            fg="red",
+        )
+
+    elif remove_status.status is RemoveStatus.NOT_FOUND:
+        click.secho(
+            f"Could not find {plugin_descriptor} in {remove_status.location} to remove",
             fg="yellow",
         )
-        click.echo()
-    elif status == "partial_success":
+
+    elif remove_status.status is RemoveStatus.REMOVED:
         click.secho(
-            f"Removed {plugin_descriptor}: {message}",
-            fg="yellow",
+            f"Removed {plugin_descriptor} from {remove_status.location}", fg="green"
         )
-        click.echo()
-    elif status == "success":
-        click.secho(f"Removed {plugin_descriptor}", fg="green")
-        click.echo()
 
 
 def remove_plugins(project, plugins):
@@ -412,7 +414,7 @@ def remove_plugins(project, plugins):
     num_removed, total = remove_service.remove_plugins(
         plugins, status_cb=remove_status_update
     )
-
+    click.echo()
     fg = "green"
     if num_removed < total:
         fg = "yellow"
