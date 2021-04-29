@@ -23,7 +23,7 @@ class PluginRemoveStatus(Enum):
     RUNNING = "running"
 
 
-class RemoveState:
+class PluginRemoveState:
     """Handle plugin removal state for a single location."""
 
     def __init__(
@@ -60,8 +60,8 @@ class PluginRemoveService:
         removed_plugins: int = num_plugins
 
         for plugin in plugins:
-            yml_remove_status = RemoveState("meltano.yml")
-            installation_remove_status = RemoveState(f".meltano/{plugin.type}")
+            yml_remove_status = PluginRemoveState("meltano.yml")
+            installation_remove_status = PluginRemoveState(f".meltano/{plugin.type}")
             status_cb(plugin, PluginRemoveStatus.RUNNING)
 
             meltano_yml, installation = self.remove_plugin(
@@ -79,7 +79,7 @@ class PluginRemoveService:
 
     def remove_plugin(
         self, plugin: ProjectPlugin, yml_remove_status, installation_remove_status
-    ) -> tuple[RemoveState, RemoveState]:
+    ) -> tuple[PluginRemoveState, PluginRemoveState]:
         """
         Remove a plugin from `meltano.yml`, its installation in `.meltano`, and any settings in the Meltano system database.
 
