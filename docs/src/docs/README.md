@@ -17,10 +17,10 @@ To find guides and references on other topics, use the Table of Contents in the 
 
 ## Mission
 
-Our mission is to enable every organization to make the 
+Our mission is to enable every organization to make the
 best decisions possible by becoming data-informed.
 
-To achieve this mission we are building an **open source platform for the complete DataOps lifecycle** 
+To achieve this mission we are building an **open source platform for the complete DataOps lifecycle**
 that is optimized for the happiness and productivity of Data Teams and Data Professionals.
 It integrates best-in-class [open source components](/docs/plugins.html) and
 enables teams to collaborate on data projects and pipelines more efficiently and with higher confidence.
@@ -30,7 +30,7 @@ integration and transformation, aka EL(T): [Extract, Load, Transform](https://en
 where traditional solutions are either off-the-shelf and near-impossible to extend, tweak, and debug,
 or fully custom and a pain to maintain.
 
-We believe that [data integration is ripe for commoditization](/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/),
+We believe that [data integration is ripe for commoditization](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/),
 and are building towards a future in which fast and reliable **open source connectors
 for every data source and destination** in the world will be freely available,
 collectively maintained by a community of data engineers in consulting and at in-house data teams,
@@ -44,7 +44,7 @@ needed for it to realize its full potential as the **de-facto standard for open 
 to be used with Meltano or any other tool that supports them.
 
 To further support the community and ecosystem, we have [created an interpretation of the Singer specification](/docs/singer-spec.html)
-that aims to be clearer for newcomers to the project. We believe the spec is great in its current version, but 
+that aims to be clearer for newcomers to the project. We believe the spec is great in its current version, but
 confusing documentation has made it challenging for some to onboard to the community.
 
 With Meltano, we are providing a **clear path to production** with existing Singer taps and targets where there wasn't one before,
@@ -139,7 +139,7 @@ Our focus for May will be on building out the Singer SDK for targets and to impr
 
 #### June 2021
 
-Our focus for June will be to enhance the plugin architecture to support ETLT use cases such as data obfuscation, choosing a great OLAP database to work with out-of-the-box with Meltano, and to support the "Reverse ELT" use case of loading data into a SaaS API. 
+Our focus for June will be to enhance the plugin architecture to support ETLT use cases such as data obfuscation, choosing a great OLAP database to work with out-of-the-box with Meltano, and to support the "Reverse ELT" use case of loading data into a SaaS API.
 
 * [Plugin Archiecture for ETLT Use Cases](https://gitlab.com/meltano/meltano/-/issues/2300)
 * [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
@@ -147,7 +147,7 @@ Our focus for June will be to enhance the plugin architecture to support ETLT us
 
 #### July 2021
 
-Our focus for July will be to expand our integrations for orchestration, data quality, and analysis. 
+Our focus for July will be to expand our integrations for orchestration, data quality, and analysis.
 
 * [Dagster](https://gitlab.com/meltano/meltano/-/issues/2393 )
 * [Great Expectations](https://gitlab.com/meltano/meltano/-/issues/2454)
