@@ -353,7 +353,7 @@ def install_plugins(
     )
     install_results = install_service.install_plugins(plugins, reason=reason)
     num_installed = len([status for status in install_results if status.successful])
-    num_failed = len([status for status in install_results if not status.successful])
+    num_failed = len(install_results) - num_installed
 
     fg = "green"
     if num_failed >= 0 and num_installed == 0:
