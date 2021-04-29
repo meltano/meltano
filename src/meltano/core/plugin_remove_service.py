@@ -60,12 +60,12 @@ class PluginRemoveService:
         removed_plugins: int = num_plugins
 
         for plugin in plugins:
-            yml_remove_status = PluginRemoveState("meltano.yml")
-            installation_remove_status = PluginRemoveState(f".meltano/{plugin.type}")
+            yml_remove_state = PluginRemoveState("meltano.yml")
+            installation_remove_state = PluginRemoveState(f".meltano/{plugin.type}")
             status_cb(plugin, PluginRemoveStatus.RUNNING)
 
             meltano_yml, installation = self.remove_plugin(
-                plugin, yml_remove_status, installation_remove_status
+                plugin, yml_remove_state, installation_remove_state
             )
 
             if meltano_yml.status is not PluginRemoveStatus.REMOVED:
@@ -78,7 +78,7 @@ class PluginRemoveService:
         return removed_plugins, num_plugins
 
     def remove_plugin(
-        self, plugin: ProjectPlugin, yml_remove_status, installation_remove_status
+        self, plugin: ProjectPlugin, yml_remove_state, installation_remove_state
     ) -> tuple[PluginRemoveState, PluginRemoveState]:
         """
         Remove a plugin from `meltano.yml`, its installation in `.meltano`, and any settings in the Meltano system database.
@@ -92,22 +92,22 @@ class PluginRemoveService:
         _, session = project_engine(self.project)
         plugins_settings_service.reset(store=SettingValueStore.DB, session=session())
 
-        yml_remove_status.status = PluginRemoveStatus.REMOVED
+        yml_remove_state.status = PluginRemoveStatus.REMOVED
         try:
             self.plugins_service.remove_from_file(plugin)
         except PluginNotFoundError:
-            yml_remove_status.status = PluginRemoveStatus.NOT_FOUND
+            yml_remove_state.status = PluginRemoveStatus.NOT_FOUND
 
         path = self.project.meltano_dir().joinpath(plugin.type, plugin.name)
 
         if path.exists():
-            installation_remove_status.status = PluginRemoveStatus.REMOVED
+            installation_remove_state.status = PluginRemoveStatus.REMOVED
             try:
                 shutil.rmtree(path)
             except OSError as err:
-                installation_remove_status.status = PluginRemoveStatus.ERROR
-                installation_remove_status.message = err.strerror
+                installation_remove_state.status = PluginRemoveStatus.ERROR
+                installation_remove_state.message = err.strerror
         else:
-            installation_remove_status.status = PluginRemoveStatus.NOT_FOUND
+            installation_remove_state.status = PluginRemoveStatus.NOT_FOUND
 
-        return yml_remove_status, installation_remove_status
+        return yml_remove_state, installation_remove_state
