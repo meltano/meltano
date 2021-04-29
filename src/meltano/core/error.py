@@ -1,7 +1,10 @@
 """Base Error classes."""
 import functools
+import io
 import logging
+import subprocess
 from enum import Enum
+from typing import Optional, Union
 
 
 class ExitCode(int, Enum):
@@ -27,34 +30,34 @@ class ExtractError(Error):
 class SubprocessError(Exception):
     """Happens when subprocess exits with a resultcode != 0"""
 
-    def __init__(self, message: str, process, stderr=None):
+    def __init__(
+        self,
+        message: str,
+        process: subprocess.CompletedProcess,
+        stderr: Optional[Union[str, bytes, io.TextIOBase]] = None,
+    ):
         """Initialize SubprocessError."""
         self.process = process
-        self._stderr = stderr or process.stderr if process else None
+        self._stderr = stderr or process.stderr
         super().__init__(message)
 
     @property
-    def stderr(self):
-        stderr = self._stderr
-        if not stderr:
+    def stderr(self) -> Optional[str]:
+        """Return the output of the process to stderr."""
+        if not self._stderr:
             return None
-        elif isinstance(stderr, bytes):
-            return stderr.decode("utf-8")
-        elif not isinstance(stderr, str):
-            self._stderr = stderr.read()
-            return self._stderr
+        elif isinstance(self._stderr, bytes):
+            self._stderr = self._stderr.decode("utf-8")
+        elif not isinstance(self._stderr, str):
+            self._stderr = self._stderr.read()
 
-        return stderr
+        return self._stderr
 
 
-class PluginInstallError(SubprocessError):
+class PluginInstallError(Exception):
     """Happens when a plugin fails to install."""
 
-    def __init__(  # noqa: WPS612 - set default for process argument
-        self, message: str, process=None, stderr=None
-    ):
-        """Initialize PluginInstallError."""
-        super().__init__(message, process, stderr)
+    pass
 
 
 class PluginInstallWarning(Exception):

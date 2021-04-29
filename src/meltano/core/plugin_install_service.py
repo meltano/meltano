@@ -211,7 +211,6 @@ class PluginInstallService:
                 reason=reason,
                 status=PluginInstallStatus.ERROR,
                 message=str(err),
-                details=err.stderr,
             )
             self.status_cb(status)
             return status
