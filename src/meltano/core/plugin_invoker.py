@@ -90,7 +90,11 @@ class PluginInvoker:
         self.plugin = plugin
         self.context = context
 
-        self.venv_service = venv_service or VenvService(project)
+        self.venv_service = venv_service or VenvService(
+            project,
+            name=plugin.name,
+            namespace=plugin.type,
+        )
         self.plugin_config_service = plugin_config_service or PluginConfigService(
             plugin,
             config_dir or self.project.plugin_dir(plugin),
@@ -156,9 +160,7 @@ class PluginInvoker:
             self.cleanup()
 
     def exec_path(self):
-        return self.venv_service.exec_path(
-            self.plugin.executable, name=self.plugin.name, namespace=self.plugin.type
-        )
+        return self.venv_service.exec_path(self.plugin.executable)
 
     def exec_args(self, *args, command=None, env=None):
         """Materialize the arguments to be passed to the executable."""
