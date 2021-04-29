@@ -333,7 +333,7 @@ def install_status_update(update):
     if update.status is PluginInstallStatus.RUNNING:
         msg = f"{update.verb} {desc} '{plugin.name}'..."
         click.secho(msg)
-    elif update.status == PluginInstallStatus.ERROR:
+    elif update.status is PluginInstallStatus.ERROR:
         click.secho(update.message, fg="red")
         click.secho(update.details, err=True)
     elif update.status == PluginInstallStatus.WARNING:
