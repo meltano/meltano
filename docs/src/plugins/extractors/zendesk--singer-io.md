@@ -3,20 +3,21 @@ sidebar: auto
 description: Use Meltano to pull data from the Zendesk API and load it into Snowflake, PostgreSQL, and more
 ---
 
-# Zendesk--singer-io
+# Zendesk (`singer-io` variant)
 
 The `tap-zendesk` [extractor](/plugins/extractors/) pulls data from the [Zendesk API](https://developer.zendesk.com/rest_api).
 
 - **Repository**: <https://github.com/singer-io/tap-zendesk>
 - **Maintainer**: [Stitch](https://www.stitchdata.com/)
-- **Maintenance status**: Nonresponsive to community issues and contributions. A more active variant might be available, see [Alternative variants](#alternative-variants) section below.
+- **Maintenance status**: Nonresponsive to community issues and contributions
+  - A [more active alternative variant] is available.
 
 #### Alternative variants
 
 Multiple [variants](/docs/plugins.html#variants) of `tap-zendesk` are available.
-This document describes the `singer-io` variant, which was originally built to be used with [Singer](https://github.com/singer-io).
+This document describes the `singer-io` variant.
 
-Alternative option is [`twilio`](./zendesk.html) (default).
+Alternative option is [`twilio-labs`](./zendesk.html) (default).
 
 ## Getting Started
 
@@ -31,10 +32,10 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 
 #### Using the Command Line Interface
 
-1. Add the `tap-zendesk` extractor to your project using [`meltano add`](/docs/command-line-interface.html#add):
+1. Add the `singer-io` variant of `tap-zendesk` extractor to your project using [`meltano add`](/docs/command-line-interface.html#add):
 
     ```bash
-    meltano add extractor tap-zendesk
+    meltano add extractor tap-zendesk --variant singer-io
     ```
 
 1. Configure the [settings](#settings) below using [`meltano config`](/docs/command-line-interface.html#config).
@@ -49,6 +50,7 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 
 1. Open the Extractors interface at <http://localhost:5000/extractors>.
 1. Click the "Add to project" button for "Zendesk".
+1. Choose "Add variant 'singer-io'".
 1. Configure the [settings](#settings) below in the "Configuration" interface that opens automatically.
 
 ### Next steps

@@ -14,7 +14,7 @@ The `tap-zendesk` [extractor](/plugins/extractors/) pulls data from the [Zendesk
 #### Alternative variants
 
 Multiple [variants](/docs/plugins.html#variants) of `tap-zendesk` are available.
-This document describes the `twilio` variant, which has more up-to-date contributions than the original `singer-io` variant.
+This document describes the default `twilio-labs` variant.
 
 Alternative option is [`singer-io`](./zendesk--singer-io.html).
 

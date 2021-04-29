@@ -1178,7 +1178,7 @@ extractors:
     description: Support ticketing system & customer service platform
     namespace: tap_zendesk
     variants:
-      - name: twilio
+      - name: twilio-labs
         docs: 'https://meltano.com/plugins/extractors/zendesk.html'
         repo: https://github.com/twilio-labs/twilio-tap-zendesk
         pip_url: twilio-tap-zendesk
