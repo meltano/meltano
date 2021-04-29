@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2621](https://gitlab.com/meltano/meltano/-/issues/2621) Add `twilio-labs` variant of `tap-zendesk`
+
 ### Changes
 
 ### Fixes
