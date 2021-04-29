@@ -1,11 +1,11 @@
 import json
 from datetime import date, datetime
+from enum import Enum
 from typing import List
 
 from .behavior import NameEq
 from .behavior.canonical import Canonical
 from .error import Error
-from .plugin.base import YAMLEnum
 from .utils import flatten, nest_object, to_env_var, truthy, uniques_in
 
 VALUE_PROCESSORS = {
@@ -44,6 +44,15 @@ class SettingMissingError(Error):
 
     def __init__(self, name: str):
         super().__init__(f"Cannot find setting {name}")
+
+
+class YAMLEnum(str, Enum):
+    def __str__(self):
+        return self.value
+
+    @staticmethod
+    def yaml_representer(dumper, obj):
+        return dumper.represent_scalar("tag:yaml.org,2002:str", str(obj))
 
 
 class SettingKind(YAMLEnum):
