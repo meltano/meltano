@@ -37,7 +37,7 @@ def remove(ctx, project, plugin_type, plugin_names):
         fg = "yellow"
 
     if len(plugins) > 1:
-        click.secho(f"Removed {num_removed}/{total} plugins", fg=fg)
+        click.secho(f"Fully removed {num_removed}/{total} plugins", fg=fg)
         click.echo()
 
 
@@ -50,23 +50,24 @@ def remove_plugin_status_update(plugin):
     click.echo()
 
 
-def remove_location_status_update(plugin, remove_status):
+def remove_location_status_update(plugin, location_remove_state):
     """Print remove status message for a plugin location."""
     plugin_descriptor = f"{plugin.type.descriptor} '{plugin.name}'"
 
-    if remove_status.status is PluginLocationRemoveStatus.ERROR:
+    if location_remove_state.status is PluginLocationRemoveStatus.ERROR:
         click.secho(
-            f"Error removing plugin {plugin_descriptor} from {remove_status.location}: {remove_status.message}",
+            f"Error removing plugin {plugin_descriptor} from {location_remove_state.location}: {location_remove_state.message}",
             fg="red",
         )
 
-    elif remove_status.status is PluginLocationRemoveStatus.NOT_FOUND:
+    elif location_remove_state.status is PluginLocationRemoveStatus.NOT_FOUND:
         click.secho(
-            f"Could not find {plugin_descriptor} in {remove_status.location} to remove",
+            f"Could not find {plugin_descriptor} in {location_remove_state.location} to remove",
             fg="yellow",
         )
 
-    elif remove_status.status is PluginLocationRemoveStatus.REMOVED:
+    elif location_remove_state.status is PluginLocationRemoveStatus.REMOVED:
         click.secho(
-            f"Removed {plugin_descriptor} from {remove_status.location}", fg="green"
+            f"Removed {plugin_descriptor} from {location_remove_state.location}",
+            fg="green",
         )
