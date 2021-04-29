@@ -8,7 +8,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
-    PluginInstallStatus,
+    PluginInstallState,
 )
 from meltano.core.project import Project
 from meltano.core.project_add_service import (
@@ -330,15 +330,15 @@ def install_status_update(update):
     """
     plugin = update.plugin
     desc = plugin.type.descriptor
-    if update.status is PluginInstallStatus.RUNNING:
+    if update.state is PluginInstallState.RUNNING:
         msg = f"{update.verb} {desc} '{plugin.name}'..."
         click.secho(msg)
-    elif update.status is PluginInstallStatus.ERROR:
+    elif update.state is PluginInstallState.ERROR:
         click.secho(update.message, fg="red")
         click.secho(update.details, err=True)
-    elif update.status == PluginInstallStatus.WARNING:
+    elif update.state == PluginInstallState.WARNING:
         click.secho(f"Warning! {update.message}.", fg="yellow")
-    elif update.status == PluginInstallStatus.SUCCESS:
+    elif update.state == PluginInstallState.SUCCESS:
         msg = f"{update.verb} {desc} '{plugin.name}'"
         click.secho(msg, fg="green")
         click.echo()

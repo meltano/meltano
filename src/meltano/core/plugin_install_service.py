@@ -26,8 +26,8 @@ class PluginInstallReason(str, Enum):
     UPGRADE = "upgrade"
 
 
-class PluginInstallStatus(Enum):
-    """The status of installing a plugin."""
+class PluginInstallState(Enum):
+    """The state of the process of installing a plugin."""
 
     RUNNING = "running"
     SUCCESS = "success"
@@ -42,31 +42,31 @@ class PluginInstallUpdate:
         self,
         plugin: ProjectPlugin,
         reason: PluginInstallReason,
-        status: PluginInstallStatus,
+        state: PluginInstallState,
         message: str = None,
         details: str = None,
     ):
         # TODO: use dataclasses.dataclass for this when 3.6 support is dropped
         self.plugin = plugin
         self.reason = reason
-        self.status = status
+        self.state = state
         self.message = message
         self.details = details
 
     @property
     def successful(self):
         """If the installation completed without error."""
-        return self.status is PluginInstallStatus.SUCCESS
+        return self.state is PluginInstallState.SUCCESS
 
     @property
     def verb(self):
-        """Verb form of status."""
-        if self.status is PluginInstallStatus.RUNNING:
+        """Verb form of state."""
+        if self.state is PluginInstallState.RUNNING:
             if self.reason is PluginInstallReason.UPGRADE:
                 return "Updating"
             return "Installing"
 
-        if self.status is PluginInstallStatus.SUCCESS:
+        if self.state is PluginInstallState.SUCCESS:
             if self.reason is PluginInstallReason.UPGRADE:
                 return "Updated"
 
@@ -181,14 +181,14 @@ class PluginInstallService:
         """Install a plugin."""
         self.status_cb(
             PluginInstallUpdate(
-                plugin=plugin, reason=reason, status=PluginInstallStatus.RUNNING
+                plugin=plugin, reason=reason, state=PluginInstallState.RUNNING
             )
         )
         if not plugin.is_installable():
             status = PluginInstallUpdate(
                 plugin=plugin,
                 reason=reason,
-                status=PluginInstallStatus.WARNING,
+                state=PluginInstallState.WARNING,
                 message=f"Plugin '{plugin.name}' is not installable",
             )
             self.status_cb(status)
@@ -198,7 +198,7 @@ class PluginInstallService:
             with plugin.trigger_hooks("install", self, plugin, reason):
                 await installer_factory(self.project, plugin).install(reason)
                 status = PluginInstallUpdate(
-                    plugin=plugin, reason=reason, status=PluginInstallStatus.SUCCESS
+                    plugin=plugin, reason=reason, state=PluginInstallState.SUCCESS
                 )
                 if compile_models and plugin.type is PluginType.MODELS:
                     self.compile_models()
@@ -209,7 +209,7 @@ class PluginInstallService:
             status = PluginInstallUpdate(
                 plugin=plugin,
                 reason=reason,
-                status=PluginInstallStatus.ERROR,
+                state=PluginInstallState.ERROR,
                 message=str(err),
             )
             self.status_cb(status)
@@ -219,7 +219,7 @@ class PluginInstallService:
             status = PluginInstallUpdate(
                 plugin=plugin,
                 reason=reason,
-                status=PluginInstallStatus.WARNING,
+                state=PluginInstallState.WARNING,
                 message=str(warn),
             )
             self.status_cb(status)
@@ -229,7 +229,7 @@ class PluginInstallService:
             status = PluginInstallUpdate(
                 plugin=plugin,
                 reason=reason,
-                status=PluginInstallStatus.ERROR,
+                state=PluginInstallState.ERROR,
                 message=f"{plugin.type.descriptor} '{plugin.name}' could not be installed: {err}".capitalize(),
                 details=err.stderr,
             )
