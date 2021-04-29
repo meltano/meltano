@@ -26,8 +26,8 @@ class PluginInstallReason(str, Enum):
     UPGRADE = "upgrade"
 
 
-class PluginInstallState(Enum):
-    """The state of the process of installing a plugin."""
+class PluginInstallStatus(Enum):
+    """The status of the process of installing a plugin."""
 
     RUNNING = "running"
     SUCCESS = "success"
@@ -35,38 +35,38 @@ class PluginInstallState(Enum):
     WARNING = "warning"
 
 
-class PluginInstallUpdate:
+class PluginInstallState:
     """A message reporting the progress of installing a plugin."""
 
     def __init__(
         self,
         plugin: ProjectPlugin,
         reason: PluginInstallReason,
-        state: PluginInstallState,
+        status: PluginInstallStatus,
         message: str = None,
         details: str = None,
     ):
         # TODO: use dataclasses.dataclass for this when 3.6 support is dropped
         self.plugin = plugin
         self.reason = reason
-        self.state = state
+        self.status = status
         self.message = message
         self.details = details
 
     @property
     def successful(self):
         """If the installation completed without error."""
-        return self.state is PluginInstallState.SUCCESS
+        return self.status is PluginInstallStatus.SUCCESS
 
     @property
     def verb(self):
-        """Verb form of state."""
-        if self.state is PluginInstallState.RUNNING:
+        """Verb form of status."""
+        if self.status is PluginInstallStatus.RUNNING:
             if self.reason is PluginInstallReason.UPGRADE:
                 return "Updating"
             return "Installing"
 
-        if self.state is PluginInstallState.SUCCESS:
+        if self.status is PluginInstallStatus.SUCCESS:
             if self.reason is PluginInstallReason.UPGRADE:
                 return "Updated"
 
@@ -100,7 +100,7 @@ class PluginInstallService:
         self,
         project: Project,
         plugins_service: ProjectPluginsService = None,
-        status_cb: Callable[[PluginInstallUpdate], Any] = noop,
+        status_cb: Callable[[PluginInstallState], Any] = noop,
         parallelism=None,
     ):
         self.project = project
@@ -115,7 +115,7 @@ class PluginInstallService:
 
     def install_all_plugins(
         self, reason=PluginInstallReason.INSTALL
-    ) -> [PluginInstallUpdate]:
+    ) -> [PluginInstallState]:
         """
         Install all the plugins for the project.
 
@@ -127,7 +127,7 @@ class PluginInstallService:
         self,
         plugins: Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
-    ) -> [PluginInstallUpdate]:
+    ) -> [PluginInstallState]:
         """
         Install all the provided plugins.
 
@@ -139,7 +139,7 @@ class PluginInstallService:
         self,
         plugins: Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
-    ) -> [PluginInstallUpdate]:
+    ) -> [PluginInstallState]:
         """Install all the provided plugins."""
         results = await asyncio.gather(
             *[
@@ -159,7 +159,7 @@ class PluginInstallService:
         plugin: ProjectPlugin,
         reason=PluginInstallReason.INSTALL,
         compile_models=True,
-    ) -> PluginInstallUpdate:
+    ) -> PluginInstallState:
         """
         Install a plugin.
 
@@ -177,64 +177,64 @@ class PluginInstallService:
         plugin: ProjectPlugin,
         reason=PluginInstallReason.INSTALL,
         compile_models=True,
-    ) -> PluginInstallUpdate:
+    ) -> PluginInstallState:
         """Install a plugin."""
         self.status_cb(
-            PluginInstallUpdate(
-                plugin=plugin, reason=reason, state=PluginInstallState.RUNNING
+            PluginInstallState(
+                plugin=plugin, reason=reason, status=PluginInstallStatus.RUNNING
             )
         )
         if not plugin.is_installable():
-            status = PluginInstallUpdate(
+            state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
-                state=PluginInstallState.WARNING,
+                status=PluginInstallStatus.WARNING,
                 message=f"Plugin '{plugin.name}' is not installable",
             )
-            self.status_cb(status)
-            return status
+            self.status_cb(state)
+            return state
 
         try:
             with plugin.trigger_hooks("install", self, plugin, reason):
                 await installer_factory(self.project, plugin).install(reason)
-                status = PluginInstallUpdate(
-                    plugin=plugin, reason=reason, state=PluginInstallState.SUCCESS
+                state = PluginInstallState(
+                    plugin=plugin, reason=reason, status=PluginInstallStatus.SUCCESS
                 )
                 if compile_models and plugin.type is PluginType.MODELS:
                     self.compile_models()
-                self.status_cb(status)
-                return status
+                self.status_cb(state)
+                return state
 
         except PluginInstallError as err:
-            status = PluginInstallUpdate(
+            state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
-                state=PluginInstallState.ERROR,
+                status=PluginInstallStatus.ERROR,
                 message=str(err),
             )
-            self.status_cb(status)
-            return status
+            self.status_cb(state)
+            return state
 
         except PluginInstallWarning as warn:
-            status = PluginInstallUpdate(
+            state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
-                state=PluginInstallState.WARNING,
+                status=PluginInstallStatus.WARNING,
                 message=str(warn),
             )
-            self.status_cb(status)
-            return status
+            self.status_cb(state)
+            return state
 
         except SubprocessError as err:
-            status = PluginInstallUpdate(
+            state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
-                state=PluginInstallState.ERROR,
+                status=PluginInstallStatus.ERROR,
                 message=f"{plugin.type.descriptor} '{plugin.name}' could not be installed: {err}".capitalize(),
                 details=err.stderr,
             )
-            self.status_cb(status)
-            return status
+            self.status_cb(state)
+            return state
 
     def compile_models(self):
         compiler = ProjectCompiler(self.project)
