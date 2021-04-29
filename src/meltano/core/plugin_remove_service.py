@@ -14,7 +14,7 @@ from .settings_store import SettingValueStore
 from .utils import noop
 
 
-class RemoveStatus(Enum):
+class PluginRemoveStatus(Enum):
     """Possible remove statuses."""
 
     REMOVED = "removed"
@@ -30,7 +30,7 @@ class RemoveState:
         self,
         location,
         message="",
-        status=RemoveStatus.RUNNING,
+        status=PluginRemoveStatus.RUNNING,
     ):
         """Construct a RemoveState instance."""
         self.location = location
@@ -62,14 +62,14 @@ class PluginRemoveService:
         for plugin in plugins:
             yml_remove_status = RemoveState("meltano.yml")
             installation_remove_status = RemoveState(f".meltano/{plugin.type}")
-            status_cb(plugin, RemoveStatus.RUNNING)
+            status_cb(plugin, PluginRemoveStatus.RUNNING)
 
             meltano_yml, installation = self.remove_plugin(
                 plugin, yml_remove_status, installation_remove_status
             )
 
-            if meltano_yml.status is not RemoveStatus.REMOVED:
-                if installation.status is not RemoveStatus.REMOVED:
+            if meltano_yml.status is not PluginRemoveStatus.REMOVED:
+                if installation.status is not PluginRemoveStatus.REMOVED:
                     removed_plugins -= 1
 
             status_cb(plugin, meltano_yml)
@@ -92,22 +92,22 @@ class PluginRemoveService:
         _, session = project_engine(self.project)
         plugins_settings_service.reset(store=SettingValueStore.DB, session=session())
 
-        yml_remove_status.status = RemoveStatus.REMOVED
+        yml_remove_status.status = PluginRemoveStatus.REMOVED
         try:
             self.plugins_service.remove_from_file(plugin)
         except PluginNotFoundError:
-            yml_remove_status.status = RemoveStatus.NOT_FOUND
+            yml_remove_status.status = PluginRemoveStatus.NOT_FOUND
 
         path = self.project.meltano_dir().joinpath(plugin.type, plugin.name)
 
         if path.exists():
-            installation_remove_status.status = RemoveStatus.REMOVED
+            installation_remove_status.status = PluginRemoveStatus.REMOVED
             try:
                 shutil.rmtree(path)
             except OSError as err:
-                installation_remove_status.status = RemoveStatus.ERROR
+                installation_remove_status.status = PluginRemoveStatus.ERROR
                 installation_remove_status.message = err.strerror
         else:
-            installation_remove_status.status = RemoveStatus.NOT_FOUND
+            installation_remove_status.status = PluginRemoveStatus.NOT_FOUND
 
         return yml_remove_status, installation_remove_status

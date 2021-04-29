@@ -2,7 +2,7 @@
 import click
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_remove_service import PluginRemoveService, RemoveStatus
+from meltano.core.plugin_remove_service import PluginRemoveService, PluginRemoveStatus
 
 from . import cli
 from .params import pass_project
@@ -40,23 +40,23 @@ def remove_status_update(plugin, remove_status):
     """Print remove status message."""
     plugin_descriptor = f"{plugin.type.descriptor} '{plugin.name}'"
 
-    if remove_status is RemoveStatus.RUNNING:
+    if remove_status is PluginRemoveStatus.RUNNING:
         click.echo()
         click.secho(f"Removing {plugin_descriptor}...")
 
-    elif remove_status.status is RemoveStatus.ERROR:
+    elif remove_status.status is PluginRemoveStatus.ERROR:
         click.secho(
             f"Error removing plugin {plugin_descriptor} from {remove_status.location}: {remove_status.message}",
             fg="red",
         )
 
-    elif remove_status.status is RemoveStatus.NOT_FOUND:
+    elif remove_status.status is PluginRemoveStatus.NOT_FOUND:
         click.secho(
             f"Could not find {plugin_descriptor} in {remove_status.location} to remove",
             fg="yellow",
         )
 
-    elif remove_status.status is RemoveStatus.REMOVED:
+    elif remove_status.status is PluginRemoveStatus.REMOVED:
         click.secho(
             f"Removed {plugin_descriptor} from {remove_status.location}", fg="green"
         )
