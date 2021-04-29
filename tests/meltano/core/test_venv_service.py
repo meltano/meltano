@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 import sys
 from unittest import mock
@@ -10,10 +11,11 @@ from meltano.core.venv_service import VenvService, VirtualEnv
 class TestVenvService:
     @pytest.fixture
     def subject(self, project):
-        return VenvService(project)
+        return VenvService(project, "namespace", "name")
 
-    def test_create(self, project, subject):
-        subject.create(name="name", namespace="namespace")
+    @pytest.mark.asyncio
+    async def test_clean_install(self, project, subject):
+        await subject.clean_install("example")
         venv_dir = subject.project.venvs_dir("namespace", "name")
 
         # ensure the venv is created
@@ -24,6 +26,15 @@ class TestVenvService:
             venv_dir.joinpath("bin/python"), venv_dir.joinpath("bin/python3")
         )
 
+        # ensure that the package is installed
+        run = subprocess.run(
+            [venv_dir.joinpath("bin/python"), "-m", "pip", "list"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        assert re.search(r"example\s+0\.1\.0", str(run.stdout))
+
         # ensure that pip is the latest version
         run = subprocess.run(
             [venv_dir.joinpath("bin/python"), "-m", "pip", "list", "--outdated"],
@@ -33,6 +44,15 @@ class TestVenvService:
         )
         for line in str(run.stdout).splitlines():
             assert line.startswith("pip ") == False
+
+        assert subject.exec_path("some_exe").parts[-6:] == (
+            ".meltano",
+            "namespace",
+            "name",
+            "venv",
+            "bin",
+            "some_exe",
+        )
 
 
 class TestVirtualEnv:

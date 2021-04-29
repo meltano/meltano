@@ -1,8 +1,6 @@
 """Defines helpers for use by the CLI."""
-import asyncio
 import logging
 import os
-from contextlib import suppress
 
 import click
 from meltano.core.logging import setup_logging
@@ -10,6 +8,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
+    PluginInstallStatus,
 )
 from meltano.core.project import Project
 from meltano.core.project_add_service import (
@@ -37,26 +36,6 @@ class CliError(Exception):
         click.secho(str(self), fg="red")
 
         self.printed = True
-
-
-def run_async(coro):
-    """Run coroutine and handle event loop and cleanup."""
-    # Taken from https://stackoverflow.com/a/58532304
-    # and inspired by Python 3.7's `asyncio.run`
-
-    loop = asyncio.get_event_loop()
-    try:
-        loop.run_until_complete(coro)
-    except asyncio.CancelledError:
-        pass
-    finally:
-        all_tasks = asyncio.gather(
-            *asyncio.Task.all_tasks(loop), return_exceptions=True
-        )
-        all_tasks.cancel()
-        with suppress(asyncio.CancelledError):
-            loop.run_until_complete(all_tasks)
-        loop.run_until_complete(loop.shutdown_asyncgens())
 
 
 def print_added_plugin(project, plugin, related=False):
@@ -343,30 +322,38 @@ def add_related_plugins(
     return added_plugins
 
 
-def install_status_update(data, reason):
-    plugin = data["plugin"]
+def install_status_update(install_state):
+    """
+    Print the status of plugin installation.
 
-    if data["status"] == "running":
-        verb = "Updating" if reason == PluginInstallReason.UPGRADE else "Installing"
-        click.secho(f"{verb} {plugin.type.descriptor} '{plugin.name}'...")
-    elif data["status"] == "error":
-        click.secho(data["message"], fg="red")
-        click.secho(data["details"], err=True)
-    elif data["status"] == "warning":
-        click.secho(f"Warning! {data['message']}.", fg="yellow")
-    elif data["status"] == "success":
-        verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
-        click.secho(f"{verb} {plugin.type.descriptor} '{plugin.name}'", fg="green")
+    Used as the callback for PluginInstallService.
+    """
+    plugin = install_state.plugin
+    desc = plugin.type.descriptor
+    if install_state.status is PluginInstallStatus.RUNNING:
+        msg = f"{install_state.verb} {desc} '{plugin.name}'..."
+        click.secho(msg)
+    elif install_state.status is PluginInstallStatus.ERROR:
+        click.secho(install_state.message, fg="red")
+        click.secho(install_state.details, err=True)
+    elif install_state.status is PluginInstallStatus.WARNING:
+        click.secho(f"Warning! {install_state.message}.", fg="yellow")
+    elif install_state.status is PluginInstallStatus.SUCCESS:
+        msg = f"{install_state.verb} {desc} '{plugin.name}'"
+        click.secho(msg, fg="green")
         click.echo()
 
 
-def install_plugins(project, plugins, reason=PluginInstallReason.INSTALL):
-    install_service = PluginInstallService(project)
-    install_status = install_service.install_plugins(
-        plugins, status_cb=install_status_update, reason=reason
+def install_plugins(
+    project, plugins, reason=PluginInstallReason.INSTALL, parallelism=None
+):
+    """Install the provided plugins and report results to the console."""
+    install_service = PluginInstallService(
+        project, status_cb=install_status_update, parallelism=parallelism
     )
-    num_installed = len(install_status["installed"])
-    num_failed = len(install_status["errors"])
+    install_results = install_service.install_plugins(plugins, reason=reason)
+    num_installed = len([status for status in install_results if status.successful])
+    num_failed = len(install_results) - num_installed
 
     fg = "green"
     if num_failed >= 0 and num_installed == 0:
