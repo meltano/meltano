@@ -53,6 +53,7 @@ class SettingKind(Enum):
     INTEGER = "integer"
     BOOLEAN = "boolean"
     DATE_ISO8601 = "date_iso8601"
+    EMAIL = "email"
     PASSWORD = "password"  # noqa: S105
     OAUTH = "oauth"
     OPTIONS = "options"
