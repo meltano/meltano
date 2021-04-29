@@ -46,7 +46,7 @@ class SettingMissingError(Error):
         super().__init__(f"Cannot find setting {name}")
 
 
-class SettingKind(Enum):
+class SettingKind(str, Enum):
     """Supported setting kinds."""
 
     STRING = "string"
