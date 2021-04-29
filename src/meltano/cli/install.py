@@ -15,8 +15,15 @@ from .utils import CliError, add_related_plugins, install_plugins
 )
 @click.argument("plugin_name", nargs=-1, required=False)
 @click.option("--include-related", is_flag=True)
+@click.option(
+    "--parallelism",
+    "-p",
+    type=click.INT,
+    default=None,
+    help="Limit the number of plugins to install in parallel. Defaults to the number of cores.",
+)
 @pass_project(migrate=True)
-def install(project, plugin_type, plugin_name, include_related):
+def install(project, plugin_type, plugin_name, include_related, parallelism):
     """
     Installs all the dependencies of your project based on the meltano.yml file.
     Read more at https://www.meltano.com/docs/command-line-interface.html.
@@ -43,7 +50,7 @@ def install(project, plugin_type, plugin_name, include_related):
 
     click.echo(f"Installing {len(plugins)} plugins...")
 
-    success = install_plugins(project, plugins)
+    success = install_plugins(project, plugins, parallelism=parallelism)
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_install()
