@@ -75,7 +75,7 @@ class SingerTap(SingerPlugin):
         SettingDefinition(
             name="_metadata",
             aliases=["metadata"],
-            kind="object",
+            kind=SettingKind.OBJECT,
             value={},
             value_processor="nest_object",
         ),
