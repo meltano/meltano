@@ -220,7 +220,7 @@ class SettingDefinition(NameEq, Canonical):
         if isinstance(value, str):
             return value
 
-        if self.kind == SettingKind.STRING:
+        if not self.kind or self.kind == SettingKind.STRING:
             return str(value)
 
         return json.dumps(value)
