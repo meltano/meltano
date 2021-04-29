@@ -1,7 +1,7 @@
 """Defines PluginRemoveService."""
 import shutil
 from enum import Enum
-from typing import Iterable
+from typing import Iterable, Tuple
 
 from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginNotFoundError
@@ -48,7 +48,7 @@ class PluginRemoveService:
 
     def remove_plugins(
         self, plugins: Iterable[ProjectPlugin], status_cb=noop
-    ) -> tuple[int, int]:
+    ) -> Tuple[int, int]:
         """
         Remove multiple plugins.
 
@@ -74,7 +74,7 @@ class PluginRemoveService:
 
     def remove_plugin(
         self, plugin: ProjectPlugin
-    ) -> tuple[PluginRemoveState, PluginRemoveState]:
+    ) -> Tuple[PluginRemoveState, PluginRemoveState]:
         """
         Remove a plugin from `meltano.yml`, its installation in `.meltano`, and any settings in the Meltano system database.
 
