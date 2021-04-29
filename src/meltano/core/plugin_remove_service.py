@@ -62,14 +62,16 @@ class PluginRemoveService:
         for plugin in plugins:
             status_cb(plugin, PluginRemoveStatus.RUNNING)
 
-            meltano_yml, installation = self.remove_plugin(plugin)
+            remove_states = self.remove_plugin(plugin)
 
-            if meltano_yml.status is not PluginRemoveStatus.REMOVED:
-                if installation.status is not PluginRemoveStatus.REMOVED:
-                    removed_plugins -= 1
+            if all(
+                state.status is not PluginRemoveStatus.REMOVED
+                for state in remove_states
+            ):
+                removed_plugins -= 1
 
-            status_cb(plugin, meltano_yml)
-            status_cb(plugin, installation)
+            for state in remove_states:
+                status_cb(plugin, state)
 
         return removed_plugins, num_plugins
 
