@@ -112,6 +112,15 @@ class SettingDefinition(NameEq, Canonical):
         self._verbatim.add("value")
 
     @classmethod
+    def parse(cls, obj):
+        """Overridden method from Canonical.parse to handle kind type conversion."""
+        kind = obj.get("kind")
+        if kind:
+            obj["kind"] = SettingKind(kind)
+
+        return super().parse(obj)
+
+    @classmethod
     def from_missing(cls, defs, config, **kwargs):
         flat_config = flatten(config, "dot")
 
