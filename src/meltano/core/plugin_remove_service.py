@@ -106,7 +106,7 @@ class PluginRemoveService:
                 shutil.rmtree(path)
             except OSError as err:
                 installation_remove_status.status = RemoveStatus.ERROR
-                installation_remove_status.message = f"ERROR ERROR {err.strerror} ERROR"
+                installation_remove_status.message = err.strerror
         else:
             installation_remove_status.status = RemoveStatus.NOT_FOUND
 
