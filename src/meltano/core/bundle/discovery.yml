@@ -1178,10 +1178,10 @@ extractors:
     description: Support ticketing system & customer service platform
     namespace: tap_zendesk
     variants:
-      - name: benjmaq
+      - name: twilio
         docs: 'https://meltano.com/plugins/extractors/zendesk.html'
-        repo: https://github.com/BenjMaq/tap-zendesk
-        pip_url: tap-zendesk
+        repo: https://github.com/twilio-labs/twilio-tap-zendesk
+        pip_url: twilio-tap-zendesk
         capabilities:
           - catalog
           - discover
@@ -1986,7 +1986,7 @@ loaders:
       value: 16
       description: Max number of parallel threads to use when flushing tables.
     - name: default_target_schema_select_permissions
-      description: Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific list of users or groups. If schema_mapping is not defined then every stream sent by the tap is granted accordingly. 
+      description: Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific list of users or groups. If schema_mapping is not defined then every stream sent by the tap is granted accordingly.
     - name: schema_mapping
       kind: object
       description: Useful if you want to load multiple streams from one tap to multiple Redshift schemas. If the tap sends the stream_id in <schema_name>-<table_name> format then this option overwrites the default_target_schema value. Note, that using schema_mapping you can overwrite the default_target_schema_select_permissions value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.

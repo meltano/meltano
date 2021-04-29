@@ -16,7 +16,7 @@ The `tap-zendesk` [extractor](/plugins/extractors/) pulls data from the [Zendesk
 Multiple [variants](/docs/plugins.html#variants) of `tap-zendesk` are available.
 This document describes the `singer-io` variant, which was originally built to be used with [Singer](https://github.com/singer-io).
 
-Alternative option is [`benjmaq`](./zendesk.html) (default).
+Alternative option is [`twilio`](./zendesk.html) (default).
 
 ## Getting Started
 

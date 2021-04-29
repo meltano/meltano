@@ -7,24 +7,16 @@ description: Use Meltano to pull data from the Zendesk API and load it into Snow
 
 The `tap-zendesk` [extractor](/plugins/extractors/) pulls data from the [Zendesk API](https://developer.zendesk.com/rest_api).
 
-<<<<<<< HEAD
-- **Repository**: <https://github.com/singer-io/tap-zendesk>
-- **Maintainer**: [Stitch](https://www.stitchdata.com/)
-- **Maintenance status**: Unresponsive to community issues and contributions
-  - A [more active fork](https://github.com/singer-io/tap-zendesk/network) may be available that you can [use instead](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin).
-  - This plugin is [up for adoption](/docs/contributor-guide.html#adopting-a-plugin)!
-=======
-- **Repository**: <https://github.com/BenjMaq/tap-zendesk>
-- **Maintainer**: [Benjamin Maquet](https://github.com/BenjMaq)
+- **Repository**: <https://github.com/twilio-labs/twilio-tap-zendesk>
+- **Maintainer**: [Twilio](https://github.com/twilio-labs)
 - **Maintenance status**: Active
-  
+
 #### Alternative variants
 
 Multiple [variants](/docs/plugins.html#variants) of `tap-zendesk` are available.
-This document describes the `benjmaq` variant, which has more up-to-date contributions than the original `singer-io` variant.
+This document describes the `twilio` variant, which has more up-to-date contributions than the original `singer-io` variant.
 
 Alternative option is [`singer-io`](./zendesk--singer-io.html).
->>>>>>> Add benjmaq variant for tap-zendesk
 
 ## Getting Started
 
