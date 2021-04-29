@@ -2,7 +2,10 @@
 import click
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_remove_service import PluginRemoveService, PluginRemoveStatus
+from meltano.core.plugin_remove_service import (
+    PluginLocationRemoveStatus,
+    PluginRemoveService,
+)
 
 from . import cli
 from .params import pass_project
@@ -22,7 +25,9 @@ def remove(ctx, project, plugin_type, plugin_names):
 
     remove_service = PluginRemoveService(project)
     num_removed, total = remove_service.remove_plugins(
-        plugins, status_cb=remove_status_update
+        plugins,
+        plugin_status_cb=remove_plugin_status_update,
+        location_status_cb=remove_location_status_update,
     )
 
     click.echo()
@@ -36,27 +41,32 @@ def remove(ctx, project, plugin_type, plugin_names):
         click.echo()
 
 
-def remove_status_update(plugin, remove_status):
-    """Print remove status message."""
+def remove_plugin_status_update(plugin):
+    """Print remove status message for a plugin."""
     plugin_descriptor = f"{plugin.type.descriptor} '{plugin.name}'"
 
-    if remove_status is PluginRemoveStatus.RUNNING:
-        click.echo()
-        click.secho(f"Removing {plugin_descriptor}...")
+    click.echo()
+    click.secho(f"Removing {plugin_descriptor}...")
+    click.echo()
 
-    elif remove_status.status is PluginRemoveStatus.ERROR:
+
+def remove_location_status_update(plugin, remove_status):
+    """Print remove status message for a plugin location."""
+    plugin_descriptor = f"{plugin.type.descriptor} '{plugin.name}'"
+
+    if remove_status.status is PluginLocationRemoveStatus.ERROR:
         click.secho(
             f"Error removing plugin {plugin_descriptor} from {remove_status.location}: {remove_status.message}",
             fg="red",
         )
 
-    elif remove_status.status is PluginRemoveStatus.NOT_FOUND:
+    elif remove_status.status is PluginLocationRemoveStatus.NOT_FOUND:
         click.secho(
             f"Could not find {plugin_descriptor} in {remove_status.location} to remove",
             fg="yellow",
         )
 
-    elif remove_status.status is PluginRemoveStatus.REMOVED:
+    elif remove_status.status is PluginLocationRemoveStatus.REMOVED:
         click.secho(
             f"Removed {plugin_descriptor} from {remove_status.location}", fg="green"
         )
