@@ -98,7 +98,7 @@ class PluginRemoveService:
         except PluginNotFoundError:
             yml_remove_state.status = PluginLocationRemoveStatus.NOT_FOUND
 
-        path = self.project.plugin_dir(plugin)
+        path = self.project.meltano_dir().joinpath(plugin.type, plugin.name)
 
         if path.exists():
             installation_remove_state.status = PluginLocationRemoveStatus.REMOVED
