@@ -66,11 +66,13 @@ class PluginRemoveService:
 
             remove_states = self.remove_plugin(plugin)
 
+            any_not_removed = False
             for state in remove_states:
-                if state.status is not PluginLocationRemoveStatus.REMOVED:
-                    removed_plugins -= 1
-
+                any_not_removed = state.status is not PluginLocationRemoveStatus.REMOVED
                 location_status_cb(plugin, state)
+
+            if any_not_removed:
+                removed_plugins -= 1
 
         return removed_plugins, num_plugins
 
