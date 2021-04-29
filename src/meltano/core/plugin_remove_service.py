@@ -14,6 +14,30 @@ from .settings_store import SettingValueStore
 from .utils import noop
 
 
+class RemoveStatus(Enum):
+    """Possible remove statuses."""
+
+    REMOVED = "removed"
+    ERROR = "error"
+    NOT_FOUND = "not found"
+    RUNNING = "running"
+
+
+class RemoveState:
+    """Handle plugin removal state for a single location."""
+
+    def __init__(
+        self,
+        location,
+        message="",
+        status=RemoveStatus.RUNNING,
+    ):
+        """Construct a RemoveState instance."""
+        self.location = location
+        self.message = message
+        self.status = status
+
+
 class PluginRemoveService:
     """Handle plugin installation removal operations."""
 
@@ -22,8 +46,16 @@ class PluginRemoveService:
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
 
-    def remove_plugins(self, plugins: Iterable[ProjectPlugin], status_cb=noop):
-        """Remove multiple plugins."""
+    def remove_plugins(
+        self, plugins: Iterable[ProjectPlugin], status_cb=noop
+    ) -> tuple[int, int]:
+        """
+        Remove multiple plugins.
+
+        Returns a tuple containing:
+        1. The total number of removed plugins
+        2. The total number of plugins attempted
+        """
         num_plugins: int = len(plugins)
         removed_plugins: int = num_plugins
 
@@ -47,8 +79,14 @@ class PluginRemoveService:
 
     def remove_plugin(
         self, plugin: ProjectPlugin, yml_remove_status, installation_remove_status
-    ):
-        """Remove a plugin from `meltano.yml` and its installation in `.meltano`."""
+    ) -> tuple[RemoveState, RemoveState]:
+        """
+        Remove a plugin from `meltano.yml`, its installation in `.meltano`, and any settings in the Meltano system database.
+
+        Returns a tuple containing:
+        1. Removal state for `meltano.yml`
+        2. Removal state for installation
+        """
         plugins_settings_service = PluginSettingsService(self.project, plugin)
 
         _, session = project_engine(self.project)
@@ -73,27 +111,3 @@ class PluginRemoveService:
             installation_remove_status.status = RemoveStatus.NOT_FOUND
 
         return yml_remove_status, installation_remove_status
-
-
-class RemoveStatus(Enum):
-    """Possible remove statuses."""
-
-    REMOVED = "removed"
-    ERROR = "error"
-    NOT_FOUND = "not found"
-    RUNNING = "running"
-
-
-class RemoveState:
-    """Handle plugin removal state for a single location."""
-
-    def __init__(
-        self,
-        location,
-        message="",
-        status=RemoveStatus.RUNNING,
-    ):
-        """Construct a RemoveState instance."""
-        self.location = location
-        self.message = message
-        self.status = status
