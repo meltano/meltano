@@ -1,11 +1,11 @@
 import json
 from datetime import date, datetime
-from enum import Enum
 from typing import List
 
 from .behavior import NameEq
 from .behavior.canonical import Canonical
 from .error import Error
+from .plugin.base import YAMLEnum
 from .utils import flatten, nest_object, to_env_var, truthy, uniques_in
 
 VALUE_PROCESSORS = {
@@ -46,7 +46,7 @@ class SettingMissingError(Error):
         super().__init__(f"Cannot find setting {name}")
 
 
-class SettingKind(str, Enum):
+class SettingKind(YAMLEnum):
     """Supported setting kinds."""
 
     STRING = "string"
@@ -92,7 +92,7 @@ class SettingDefinition(NameEq, Canonical):
             aliases=aliases,
             env=env,
             env_aliases=env_aliases,
-            kind=kind,
+            kind=SettingKind(kind) if kind else None,
             value=value,
             label=label,
             documentation=documentation,
@@ -110,15 +110,6 @@ class SettingDefinition(NameEq, Canonical):
         )
 
         self._verbatim.add("value")
-
-    @classmethod
-    def parse(cls, obj):
-        """Overridden method from Canonical.parse to handle kind type conversion."""
-        kind = obj.get("kind")
-        if kind:
-            obj["kind"] = SettingKind(kind)
-
-        return super().parse(obj)
 
     @classmethod
     def from_missing(cls, defs, config, **kwargs):
