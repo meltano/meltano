@@ -10,7 +10,7 @@ The `tap-zendesk` [extractor](/plugins/extractors/) pulls data from the [Zendesk
 - **Repository**: <https://github.com/singer-io/tap-zendesk>
 - **Maintainer**: [Stitch](https://www.stitchdata.com/)
 - **Maintenance status**: Nonresponsive to community issues and contributions
-  - A [more active alternative variant] is available.
+  - A [more active alternative variant](#alternative-variants) is available.
 
 #### Alternative variants
 
