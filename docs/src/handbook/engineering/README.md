@@ -141,47 +141,44 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 
 1. Ensure you have the latest `master` branch locally before continuing.
 
-   ```bash
-   cd meltano
+    ```bash
+    cd meltano
 
-   git checkout master
-   git pull
-   ```
+    git checkout master
+    git pull
+    ```
 
 1. Install the latest versions of all release toolchain dependencies.
 
-   ```bash
-   poetry install
-   ```
+    ```bash
+    poetry install
+    ```
 
 2. Execute the commands below:
 
-   ```bash
-   # create and checkout the `release-next` branch from `origin/master`
-   git checkout -B release-next origin/master
+    ```bash
+    # create and checkout the `release-next` branch from `origin/master`
+    git checkout -B release-next origin/master
 
-   # view changelog (verify changes made match changes logged)
-   poetry run changelog view
+    # view changelog (verify changes made match changes logged)
+    poetry run changelog view
 
-   # after the changelog has been validated, tag the release
-   make type=minor release
-   # if this is a patch release:
-   # make type=patch release
+    # after the changelog has been validated, tag the release
+    make type=minor release
+    # if this is a patch release:
+    # make type=patch release
 
-   # ensure the tag once the tag has been created, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
-   git describe --tags --abbrev=0
+    # ensure the tag once the tag has been created, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
+    git describe --tags --abbrev=0
 
-   # push the tag upstream to trigger the release pipeline
-   git push origin $(git describe --tags --abbrev=0)
+    # push the tag upstream to trigger the release pipeline
+    git push origin $(git describe --tags --abbrev=0)
 
-   # push the release branch to merge the new version, then create a merge request
-   git push origin release-next
-   ```
+    # push the release branch to merge the new version, then create a merge request
+    git push origin release-next
+    ```
 
-1. Create a merge request from `release-next` targeting `master` and use the `release` template.
-2. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
-3. Make sure to check `delete the source branch when the changes are merged`.
-4. Follow remaining tasks that are part of the `release` merge request template
+3. Using the link from the `git push` output, create a merge request from `release-next` targeting `master` and use the `release` template. Follow all tasks that are part of the `release` merge request template.
 
 ## Zoom
 
