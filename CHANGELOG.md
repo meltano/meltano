@@ -10,14 +10,24 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2621](https://gitlab.com/meltano/meltano/-/issues/2621) Add `twilio-labs` variant of `tap-zendesk`
-- [#2709](https://gitlab.com/meltano/meltano/-/issues/2709) Add support for setting kind in settings prompt when using `meltano add --custom`
-
 ### Changes
 
 ### Fixes
 
 ### Breaks
+
+
+## 1.73.0 - (2021-04-29)
+---
+
+### New
+
+- [#2621](https://gitlab.com/meltano/meltano/-/issues/2621) Add `twilio-labs` variant of `tap-zendesk`
+
+### Changes
+
+- [#2705](https://gitlab.com/meltano/meltano/-/issues/2705) Speed up `meltano install` by installing plugins in parallel
+- [#2709](https://gitlab.com/meltano/meltano/-/issues/2709) Add support for setting `kind` in settings prompt when using `meltano add --custom`
 
 
 ## 1.72.0 - (2021-04-22)
@@ -34,7 +44,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 - [#2082](https://gitlab.com/meltano/meltano/-/issues/2082) Updated database_uri documentation to show how to target a PostgreSQL schema
 - [#2107](https://gitlab.com/meltano/meltano/-/issues/2107) Updated 'create a custom extractor' tutorial to use the new SDK
-- [#2705](https://gitlab.com/meltano/meltano/-/issues/2705) Speed up `meltano install` by installing plugins in parallel
 
 ### Fixes
 
