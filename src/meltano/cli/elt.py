@@ -21,10 +21,11 @@ from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.transform_add_service import TransformAddService
+from meltano.core.utils import run_async
 
 from . import cli
 from .params import pass_project
-from .utils import CliError, run_async
+from .utils import CliError
 
 DUMPABLES = {
     "catalog": (PluginType.EXTRACTORS, "catalog"),

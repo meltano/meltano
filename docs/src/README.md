@@ -78,7 +78,8 @@ Read on for more about
 
 ::: slot installation-code
 
-**Experience it for yourself in just a few minutes!**
+**Experience it for yourself in just a few minutes,**
+or watch the ["from 0 to ELT in 90 seconds" speedrun](https://meltano.com/blog/2021/04/28/speedrun-from-0-to-elt-in-90-seconds/)
 
 ```bash
 # For these examples to work, ensure that:

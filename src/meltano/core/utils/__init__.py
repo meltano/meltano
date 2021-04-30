@@ -1,3 +1,5 @@
+"""Defines helpers for the core codebase."""
+import asyncio
 import base64
 import functools
 import logging
@@ -6,6 +8,7 @@ import os
 import re
 import sys
 from collections import OrderedDict
+from contextlib import suppress
 from copy import deepcopy
 from datetime import date, datetime, time
 from pathlib import Path
@@ -25,6 +28,30 @@ class NotFound(Exception):
 
     def __init__(self, name):
         super().__init__(f"{name} was not found.")
+
+
+def run_async(coro):
+    """Run coroutine and handle event loop and cleanup."""
+    # Taken from https://stackoverflow.com/a/58532304
+    # and inspired by Python 3.7's `asyncio.run`
+    future = asyncio.ensure_future(coro)
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(future)
+    try:
+        if future.exception():
+            raise future.exception()
+
+        return future.result()
+    except asyncio.CancelledError:
+        pass
+    finally:
+        all_tasks = asyncio.gather(
+            *asyncio.Task.all_tasks(loop), return_exceptions=True
+        )
+        all_tasks.cancel()
+        with suppress(asyncio.CancelledError):
+            loop.run_until_complete(all_tasks)
+        loop.run_until_complete(loop.shutdown_asyncgens())
 
 
 # from https://github.com/jonathanj/compose/blob/master/compose.py

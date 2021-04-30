@@ -98,7 +98,7 @@ plugins:
     variant: transferwise
     config:
       host: my_cluster.redshift.amazonaws.com
-      port: 5432
+      port: 5439
       user: my_user
       dbname: my_database
       # default_target_schema: my_schema    # override if default (see below) is not appropriate
@@ -133,16 +133,16 @@ export TARGET_REDSHIFT_HOST=<host>
 
 - Name: `port`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_PORT`
-- Default: `5432`
+- Default: `5439`
 
 #### How to use
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config target-redshift set port 5502
+meltano config target-redshift set port 5440
 
-export TARGET_REDSHIFT_PORT=5502
+export TARGET_REDSHIFT_PORT=5440
 ```
 
 ### User
