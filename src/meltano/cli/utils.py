@@ -193,19 +193,11 @@ def _prompt_plugin_capabilities(plugin_type):
 def _prompt_plugin_settings(plugin_type):
     if plugin_type not in {PluginType.EXTRACTORS, PluginType.LOADERS}:
         return []
-
     singer_type = "tap" if plugin_type == PluginType.EXTRACTORS else "target"
 
     click.echo()
     click.echo(
         f"Specify the {singer_type}'s {click.style('supported settings', fg='blue')} (`config.json` keys)"
-    )
-    click.echo()
-    click.echo("Nested properties can be represented using the `.` separator,")
-    click.echo('e.g. `auth.username` for `{ "auth": { "username": value } }`.')
-    click.echo()
-    click.echo(
-        f"To find out what settings a {singer_type} supports, reference its documentation."
     )
     click.echo()
     click.echo("Multiple setting names (keys) can be separated using commas.")
@@ -220,22 +212,46 @@ def _prompt_plugin_settings(plugin_type):
         " | ".join([click.style(kind.value, fg="magenta") for kind in SettingKind])
     )
     click.echo()
+    click.echo(
+        "- Credentials and other sensitive setting types should use the "
+        + click.style("password", fg="magenta")
+        + " kind."
+    )
+    click.echo(
+        "- If not specified, setting kind defaults to "
+        + click.style("string", fg="magenta")
+        + "."
+    )
+    click.echo(
+        "- Nested properties can be represented using the `.` separator, "
+        'e.g. `auth.username` for `{ "auth": { "username": value } }`.'
+    )
+    click.echo(
+        f"- To find out what settings a {singer_type} supports, reference its documentation."
+    )
+    click.echo()
     click.echo("Default: no settings")
     click.echo()
 
-    settings = click.prompt(
-        click.style("(settings)", fg="blue"),
-        type=list,
-        default=[],
-        value_proc=lambda value: [
-            setting.strip().partition(":") for setting in value.split(",")
-        ],
-    )
+    settings: dict = None
+    while settings is None:
+        settings_input = click.prompt(
+            click.style("(settings)", fg="blue"),
+            type=list,
+            default=[],
+            value_proc=lambda value: [
+                setting.strip().partition(":") for setting in value.split(",")
+            ],
+        )
+        try:
+            settings = [
+                {"name": name, "kind": kind and SettingKind(kind).value}
+                for name, sep, kind in settings_input
+            ]
+        except ValueError as ex:
+            click.secho(str(ex), fg="red")
 
-    return [
-        {"name": name, "kind": kind and SettingKind(kind).value}
-        for name, sep, kind in settings
-    ]
+    return settings
 
 
 def add_plugin(
