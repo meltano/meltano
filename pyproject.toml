@@ -178,6 +178,7 @@ wemake-python-styleguide = [
   "-WPS348",  # Allow `.` at beginning of line to accommodate Black formatting of multiline chained function calls
   "-WPS420",  # Allow `pass` keywords in `except` bodies to prevent falling through to another `except`
   "-WPS600",  # Allow subclassing a builtin, such as 'str' (used for serializable Enums)
+  "-WPS602",  # Allow using @staticmethod
 ]
 
 [tool.flakehell.exceptions."tests/"]

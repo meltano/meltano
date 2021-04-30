@@ -203,7 +203,7 @@ def _prompt_plugin_settings(plugin_type):
     )
     click.echo(
         "- Nested properties can be represented using the `.` separator, "
-        'e.g. `auth.username` for `{ "auth": { "username": value } }`.'
+        + 'e.g. `auth.username` for `{ "auth": { "username": value } }`.'
     )
     click.echo(
         f"- To find out what settings a {singer_type} supports, reference its documentation."
@@ -213,7 +213,7 @@ def _prompt_plugin_settings(plugin_type):
     click.echo()
 
     settings: dict = None
-    while settings is None:
+    while settings is None:  # noqa:  WPS426  # allows lambda in loop
         settings_input = click.prompt(
             click.style("(settings)", fg="blue"),
             type=list,

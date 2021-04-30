@@ -47,11 +47,15 @@ class SettingMissingError(Error):
 
 
 class YAMLEnum(str, Enum):
+    """Serializable Enum class."""
+
     def __str__(self):
+        """Return as string."""
         return self.value
 
     @staticmethod
     def yaml_representer(dumper, obj):
+        """Represent as yaml."""
         return dumper.represent_scalar("tag:yaml.org,2002:str", str(obj))
 
 
