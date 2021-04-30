@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2621](https://gitlab.com/meltano/meltano/-/issues/2621) Add `twilio-labs` variant of `tap-zendesk`
 
 ### Changes
+- [#2709](https://gitlab.com/meltano/meltano/-/issues/2709) Add support for setting kind in settings prompt when using `meltano add --custom`
 
 ### Fixes
 
