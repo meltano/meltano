@@ -10,7 +10,7 @@ from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
 )
-from meltano.core.setting_definition import SettingDefinition
+from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.venv_service import VirtualEnv
 
 
@@ -18,7 +18,9 @@ class FilePlugin(BasePlugin):
     __plugin_type__ = PluginType.FILES
 
     EXTRA_SETTINGS = [
-        SettingDefinition(name="_update", kind="object", aliases=["update"], value={})
+        SettingDefinition(
+            name="_update", kind=SettingKind.OBJECT, aliases=["update"], value={}
+        )
     ]
 
     def is_invokable(self):

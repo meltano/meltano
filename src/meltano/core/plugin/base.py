@@ -3,14 +3,13 @@ import fnmatch
 import logging
 import re
 from collections import namedtuple
-from enum import Enum
 from typing import Dict, Iterable, Optional, Union
 
 import yaml
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior.hookable import HookObject
-from meltano.core.setting_definition import SettingDefinition
+from meltano.core.setting_definition import SettingDefinition, YAMLEnum
 from meltano.core.utils import NotFound, compact, find_named, flatten
 
 from .command import Command
@@ -30,15 +29,6 @@ class VariantNotFoundError(Exception):
             variant=self.variant_name,
             variant_labels=self.plugin.variant_labels,
         )
-
-
-class YAMLEnum(str, Enum):
-    def __str__(self):
-        return self.value
-
-    @staticmethod
-    def yaml_representer(dumper, obj):
-        return dumper.represent_scalar("tag:yaml.org,2002:str", str(obj))
 
 
 yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
