@@ -37,6 +37,7 @@ from meltano.core.schedule_service import (
     ScheduleDoesNotExistError,
     ScheduleService,
 )
+from meltano.core.setting_definition import SettingKind
 from meltano.core.utils import flatten, iso8601_datetime, slugify
 from werkzeug.exceptions import Conflict, UnprocessableEntity
 
@@ -80,7 +81,7 @@ def validate_plugin_config(
         logging.warning("Cannot set a 'protected' setting externally.")
         return False
 
-    if setting_def.kind == "file" and value and value != "":
+    if setting_def.kind == SettingKind.FILE and value and value != "":
         uploads_directory = project.extract_dir(plugin.name)
         resolved_file_path = project.root_dir(value).resolve()
         if not str(resolved_file_path).startswith(str(uploads_directory) + "/"):

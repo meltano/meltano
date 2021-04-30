@@ -9,7 +9,7 @@ from meltano.core.utils import NotFound
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
 from meltano.core.utils import find_named, flatten
 
-from .setting_definition import SettingDefinition, SettingMissingError
+from .setting_definition import SettingDefinition, SettingKind, SettingMissingError
 from .settings_store import SettingValueStore, StoreNotSupportedError
 
 logger = logging.getLogger(__name__)
@@ -215,7 +215,7 @@ class SettingsService(ABC):
 
         if setting_def:
             if (
-                setting_def.kind == "object"
+                setting_def.kind == SettingKind.OBJECT
                 and metadata["source"] is SettingValueStore.DEFAULT
             ):
                 object_value = {}
@@ -339,7 +339,7 @@ class SettingsService(ABC):
             self._setting_defs = [
                 setting
                 for setting in self.setting_definitions
-                if setting.kind != "hidden" or self.show_hidden
+                if setting.kind != SettingKind.HIDDEN or self.show_hidden
             ]
 
         if extras is not None:
