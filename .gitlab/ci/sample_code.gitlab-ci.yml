@@ -33,10 +33,11 @@ homepage_sample_code:
 
     # Install pipx package manager
     - python3 -m pip install --user pipx
-    - pipx ensurepath
+    - python3 -m pipx ensurepath
+    # Restart terminal to run pipx directly or prefix with `python3 -m`
 
     # Install Meltano
-    - pipx install meltano --include-deps
+    - python3 -m pipx install meltano --include-deps
 
 
     ### https://meltano.com/#meltano-init
