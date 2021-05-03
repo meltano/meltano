@@ -23,7 +23,12 @@ def remove(ctx, project, plugin_type, plugin_names):
         for plugin_name in plugin_names
     ]
 
+    remove_plugins(project, plugins)
+
+
+def remove_plugins(project, plugins):
     remove_service = PluginRemoveService(project)
+
     num_removed, total = remove_service.remove_plugins(
         plugins,
         plugin_status_cb=remove_plugin_status_update,
@@ -31,7 +36,6 @@ def remove(ctx, project, plugin_type, plugin_names):
     )
 
     click.echo()
-
     fg = "green"
     if num_removed < total:
         fg = "yellow"
