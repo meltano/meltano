@@ -27,6 +27,7 @@ def remove(ctx, project, plugin_type, plugin_names):
 
 
 def remove_plugins(project, plugins):
+    """Invoke PluginRemoveService and output CLI removal overview."""
     remove_service = PluginRemoveService(project)
 
     num_removed, total = remove_service.remove_plugins(
