@@ -123,18 +123,13 @@ Also note that issues labeled `flow::To Do` have higher priority and are more li
 
 Below you will found our current roadmap. As this projects out into the future it is subject to change based on feedback. Don't see something you want on the roadmap? [Make an issue](https://gitlab.com/meltano/meltano/-/issues) and let us know!
 
-#### April 2021
-
-Our focus in April has been around continuing to improve the Singer SDK for taps and to build out the initial version of the SingerHub to make discoverability of taps and targets as easy as possible.
-
-* [Singer SDK for Taps](https://gitlab.com/meltano/singer-sdk)
-* [SingerHub](https://gitlab.com/groups/meltano/-/epics/83)
-
 #### May 2021
 
-Our focus for May will be on building out the Singer SDK for targets and to improve our dbt integration.
+Our focus for May will be on continuing to build out the initial iterations of the Hub for Singer Connectors to make discoverability of taps and targets as easy as possible.
+We'll also be working on the first iteration of the Singer SDK for Targets as well as another iteration to improve the dbt integration within Meltano.
 
-* [Singer SDK for Targets](https://gitlab.com/meltano/singer-sdk/-/issues/96)
+* [Hub for Singer Connectors](https://gitlab.com/groups/meltano/-/epics/83)
+* [SDK for Singer Targets](https://gitlab.com/meltano/singer-sdk/-/issues/96)
 * [Enhanced dbt integration](https://gitlab.com/groups/meltano/-/epics/82)
 
 #### June 2021
