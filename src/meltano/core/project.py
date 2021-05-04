@@ -13,6 +13,7 @@ import fasteners
 import yaml
 from atomicwrites import atomic_write
 from dotenv import dotenv_values
+from meltano.core.plugin.base import PluginRef
 from werkzeug.utils import secure_filename
 
 from .behavior.versioned import Versioned
@@ -194,44 +195,54 @@ class Project(Versioned):
         yield self.dotenv
 
     @makedirs
-    def meltano_dir(self, *joinpaths):
+    def meltano_dir(self, *joinpaths, **kwargs):
+        """Path to the project `.meltano` directory."""
         return self.root.joinpath(".meltano", *joinpaths)
 
     @makedirs
-    def analyze_dir(self, *joinpaths):
+    def analyze_dir(self, *joinpaths, **kwargs):
+        """Path to the project `analyze` directory."""
         return self.root_dir("analyze", *joinpaths)
 
     @makedirs
-    def extract_dir(self, *joinpaths):
+    def extract_dir(self, *joinpaths, **kwargs):
+        """Path to the project `extract` directory."""
         return self.root_dir("extract", *joinpaths)
 
     @makedirs
-    def venvs_dir(self, *prefixes):
-        return self.meltano_dir(*prefixes, "venv")
+    def venvs_dir(self, *prefixes, **kwargs):
+        """Path to a `venv` directory in `.meltano`."""
+        return self.meltano_dir(*prefixes, "venv", **kwargs)
 
     @makedirs
-    def run_dir(self, *joinpaths):
-        return self.meltano_dir("run", *joinpaths)
+    def run_dir(self, *joinpaths, **kwargs):
+        """Path to the `run` directory in `.meltano`."""
+        return self.meltano_dir("run", *joinpaths, **kwargs)
 
     @makedirs
-    def logs_dir(self, *joinpaths):
-        return self.meltano_dir("logs", *joinpaths)
+    def logs_dir(self, *joinpaths, **kwargs):
+        """Path to the `logs` directory in `.meltano`."""
+        return self.meltano_dir("logs", *joinpaths, **kwargs)
 
     @makedirs
-    def job_dir(self, job_id, *joinpaths):
-        return self.run_dir("elt", secure_filename(job_id), *joinpaths)
+    def job_dir(self, job_id, *joinpaths, **kwargs):
+        """Path to the `elt` directory in `.meltano/run`."""
+        return self.run_dir("elt", secure_filename(job_id), *joinpaths, **kwargs)
 
     @makedirs
-    def job_logs_dir(self, job_id, *joinpaths):
-        return self.logs_dir("elt", secure_filename(job_id), *joinpaths)
+    def job_logs_dir(self, job_id, *joinpaths, **kwargs):
+        """Path to the `elt` directory in `.meltano/logs`."""
+        return self.logs_dir("elt", secure_filename(job_id), *joinpaths, **kwargs)
 
     @makedirs
-    def model_dir(self, *joinpaths):
-        return self.meltano_dir("models", *joinpaths)
+    def model_dir(self, *joinpaths, **kwargs):
+        """Path to the `models` directory in `.meltano`."""
+        return self.meltano_dir("models", *joinpaths, **kwargs)
 
     @makedirs
-    def plugin_dir(self, plugin: "PluginRef", *joinpaths):
-        return self.meltano_dir(plugin.type, plugin.name, *joinpaths)
+    def plugin_dir(self, plugin: PluginRef, *joinpaths, **kwargs):
+        """Path to the plugin installation directory in `.meltano`."""
+        return self.meltano_dir(plugin.type, plugin.name, *joinpaths, **kwargs)
 
     def __eq__(self, other):
         return self.root == other.root
