@@ -179,7 +179,7 @@ which houses Meltano's
 [UI API](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/api),
 [these docs](https://gitlab.com/meltano/meltano/-/tree/master/docs/src), and
 the [index of discoverable plugins](/docs/contributor-guide.html#discoverable-plugins),
-which feeds the lists of [Sources](https://hub.meltano.com/extractors/) and [Destinations](https://hub.meltano.com/loaders/) that are supported out of the box.
+which feeds the lists of [Extractors](https://hub.meltano.com/extractors/) and [Loaders](https://hub.meltano.com/loaders/) that are supported out of the box.
 
 To learn more about contributing to Meltano, refer to the [Contributor Guide](/docs/contributor-guide.html).
 
