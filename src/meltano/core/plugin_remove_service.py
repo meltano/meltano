@@ -100,7 +100,7 @@ class PluginRemoveService:
         except PluginNotFoundError:
             yml_remove_state.status = PluginLocationRemoveStatus.NOT_FOUND
 
-        path = self.project.plugin_dir(plugin, makedirs=False)
+        path = self.project.plugin_dir(plugin, make_dirs=False)
 
         if path.exists():
             installation_remove_state.status = PluginLocationRemoveStatus.REMOVED

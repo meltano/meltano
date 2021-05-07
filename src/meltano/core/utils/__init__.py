@@ -247,7 +247,7 @@ def makedirs(func):
     @functools.wraps(func)
     def decorate(*args, **kwargs):
 
-        enabled = kwargs.get("makedirs", True)
+        enabled = kwargs.get("make_dirs", True)
 
         path = func(*args, **kwargs)
 
