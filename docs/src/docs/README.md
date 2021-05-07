@@ -43,27 +43,30 @@ and are committed to providing its community and ecosystem with all of the tools
 needed for it to realize its full potential as the **de-facto standard for open source connectors**,
 to be used with Meltano or any other tool that supports them.
 
-To further support the community and ecosystem, we have [created an interpretation of the Singer specification](/docs/singer-spec.html)
-that aims to be clearer for newcomers to the project. We believe the spec is great in its current version, but
-confusing documentation has made it challenging for some to onboard to the community.
+To further support the community and ecosystem, we have launched the [MeltanoHub for Singer](https://hub.meltano.com/singer/).
+This is the Singer equivalent of [PyPI](https://pypi.org/) or [Docker Hub](https://hub.docker.com/),
+to give users (and tools) a **central place to learn** about the behavior, supported features,
+and maintenance status of **all taps and targets in the ecosystem**,
+which are currently scattered across Git repos and PyPI packages.
+As we continue to develop and enhance the [MeltanoHub](https://gitlab.com/groups/meltano/-/epics/83)
+we will encourage decentralized maintenance of connectors
+to prevent individual organizations from becoming bottlenecks as the ecosystem grows,
+and will support the adoption of abandoned connectors by new maintainers.
 
 With Meltano, we are providing a **clear path to production** with existing Singer taps and targets where there wasn't one before,
 thereby lowering the barrier to adoption and motivating people who run into an issue with an existing connector
 to debug it, contribute a fix, and see it through, instead of giving up.
+Meltano's index of discoverable [extractors](https://hub.meltano.com/extractors/) and [loaders](https://hub.meltano.com/loaders/) will grow as the
+number of [Singer Taps and Targets grows](https://hub.meltano.com/singer/).
 
-The [**Singer SDK**](https://gitlab.com/meltano/singer-sdk) enables developers to build **connectors with all the bells and whistles** without having to be become an expert on the spec.
+In addition to the MeltanoHub, the [**SDK for Singer Taps and Targets**](https://gitlab.com/meltano/singer-sdk) enables 
+developers to build **connectors with all the bells and whistles** without having to be become an expert on the spec.
 This further lowers the barrier to creating new connectors and contributing to existing ones,
 and will lead to increased reliability and consistency.
 
-We are also [planning to grow](https://gitlab.com/groups/meltano/-/epics/83)
-Meltano's index of [discoverable extractors and loaders](/docs/plugins.html#discoverable-plugins)
-into the Singer equivalent of [PyPI](https://pypi.org/) or [Docker Hub](https://hub.docker.com/),
-to give users (and tools) a **central place to learn** about the behavior, supported features,
-and maintenance status of **all taps and targets in the ecosystem**,
-which are currently scattered across Git repos and PyPI packages.
-We will encourage decentralized maintenance of connectors
-to prevent individual organizations from becoming bottlenecks as the ecosystem grows,
-and will support the adoption of abandoned connectors by new maintainers.
+We've also [created an interpretation of the Singer specification](/docs/singer-spec.html)
+that aims to be clearer for newcomers to the project. We believe the spec is great in its current version, but
+confusing documentation has made it challenging for some to onboard to the community.
 
 Last but not least, we intend to **[**unlock the evolution**](https://gitlab.com/groups/meltano/-/epics/88) of the
 [**Singer spec**](/docs/singer-spec.html)** through
@@ -128,7 +131,7 @@ Below you will found our current roadmap. As this projects out into the future i
 Our focus for May will be on continuing to build out the initial iterations of the Hub for Singer Connectors to make discoverability of taps and targets as easy as possible.
 We'll also be working on the first iteration of the Singer SDK for Targets as well as another iteration to improve the dbt integration within Meltano.
 
-* [Hub for Singer Connectors](https://gitlab.com/groups/meltano/-/epics/83)
+* [MeltanoHub for Plugins and Singer Connectors](https://gitlab.com/groups/meltano/-/epics/83)
 * [SDK for Singer Targets](https://gitlab.com/meltano/singer-sdk/-/issues/96)
 * [Enhanced dbt integration](https://gitlab.com/groups/meltano/-/epics/82)
 
@@ -176,7 +179,7 @@ which houses Meltano's
 [UI API](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/api),
 [these docs](https://gitlab.com/meltano/meltano/-/tree/master/docs/src), and
 the [index of discoverable plugins](/docs/contributor-guide.html#discoverable-plugins),
-which feeds the lists of [Sources](/plugins/extractors/) and [Destinations](/plugins/loaders/) that are supported out of the box.
+which feeds the lists of [Extractors](https://hub.meltano.com/extractors/) and [Loaders](https://hub.meltano.com/loaders/) that are supported out of the box.
 
 To learn more about contributing to Meltano, refer to the [Contributor Guide](/docs/contributor-guide.html).
 
