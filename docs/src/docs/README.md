@@ -48,7 +48,7 @@ This is the Singer equivalent of [PyPI](https://pypi.org/) or [Docker Hub](https
 to give users (and tools) a **central place to learn** about the behavior, supported features,
 and maintenance status of **all taps and targets in the ecosystem**,
 which are currently scattered across Git repos and PyPI packages.
-As we continue to develop and enhanced the [MeltanoHub](https://gitlab.com/groups/meltano/-/epics/83)
+As we continue to develop and enhance the [MeltanoHub](https://gitlab.com/groups/meltano/-/epics/83)
 we will encourage decentralized maintenance of connectors
 to prevent individual organizations from becoming bottlenecks as the ecosystem grows,
 and will support the adoption of abandoned connectors by new maintainers.
