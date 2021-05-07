@@ -168,10 +168,10 @@ Discoverable plugin definitions in `discovery.yml` have the same format as [cust
 The format and further requirements are laid out in more detail below.
 
 Besides the new definition in `discovery.yml`, a new discoverable plugin should be documented in the
-[Sources](https://hub.meltano.com/extractors/) or [Destinations](https://hub.meltano.com/loaders/) section of this website,
-which live inside the repository under
-[`docs/src/plugins/extractors`](https://gitlab.com/meltano/meltano/-/tree/master/docs/src/plugins/extractors) and
-[`docs/src/plugins/loaders`](https://gitlab.com/meltano/meltano/-/tree/master/docs/src/plugins/loaders).
+[Sources](https://hub.meltano.com/extractors/) or [Destinations](https://hub.meltano.com/loaders/) section of the [MeltanoHub](https://hub.meltano.com/),
+which live inside the MeltanoHub repository under
+[`/_extractors`](https://gitlab.com/meltano/hub/-/tree/main/_extractors) and
+[`/_loaders`](https://gitlab.com/meltano/hub/-/tree/main/_loaders).
 However, it is _not_ required to include documentation when you contribute a new plugin definition to `discovery.yml`,
 as members of the core team are happy to any missing docs themselves as part of the review process.
 
