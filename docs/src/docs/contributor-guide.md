@@ -12,7 +12,7 @@ which houses Meltano's
 [UI API](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/api),
 [these docs](https://gitlab.com/meltano/meltano/-/tree/master/docs/src), and
 the [index of discoverable plugins](#discoverable-plugins),
-which feeds the lists of [Sources](/plugins/extractors/) and [Destinations](/plugins/loaders/) that are supported out of the box.
+which feeds the lists of [Sources](https://hub.meltano.com/extractors/) and [Destinations](https://hub.meltano.com/loaders/) that are supported out of the box.
 
 ## Where to start?
 
@@ -168,7 +168,7 @@ Discoverable plugin definitions in `discovery.yml` have the same format as [cust
 The format and further requirements are laid out in more detail below.
 
 Besides the new definition in `discovery.yml`, a new discoverable plugin should be documented in the
-[Sources](/plugins/extractors/) or [Destinations](/plugins/loaders/) section of this website,
+[Sources](https://hub.meltano.com/extractors/) or [Destinations](https://hub.meltano.com/loaders/) section of this website,
 which live inside the repository under
 [`docs/src/plugins/extractors`](https://gitlab.com/meltano/meltano/-/tree/master/docs/src/plugins/extractors) and
 [`docs/src/plugins/loaders`](https://gitlab.com/meltano/meltano/-/tree/master/docs/src/plugins/loaders).

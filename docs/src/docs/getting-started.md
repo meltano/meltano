@@ -14,8 +14,8 @@ or watch the ["from 0 to ELT in 90 seconds" speedrun](https://meltano.com/blog/2
 
 They can be copy-pasted right into your terminal and will take you all the way through
 [installation](/#installation), [data integration (EL)](/#integration), [data transformation (T)](/#transformation), [orchestration](/#orchestration), and [containerization](/#containerization)
-with the [`tap-gitlab` extractor](/plugins/extractors/gitlab.html)
-and the [`target-jsonl`](/plugins/loaders/jsonl.html) and [`target-postgres`](/plugins/loaders/postgres.html) loaders.
+with the [`tap-gitlab` extractor](https://hub.meltano.com/extractors/gitlab.html)
+and the [`target-jsonl`](https://hub.meltano.com/loaders/jsonl.html) and [`target-postgres`](https://hub.meltano.com/loaders/postgres.html) loaders.
 
 :::
 
@@ -159,7 +159,7 @@ which will be responsible for pulling data out of your data source.
 *To learn more about adding plugins to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-a-plugin-to-your-project).*
 
 1. Find out if an extractor for your data source is [supported out of the box](/docs/plugins.html#discoverable-plugins)
-by checking the [Sources list](/plugins/extractors/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
+by checking the [Sources list](https://hub.meltano.com/extractors/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
 
     ```bash
     meltano discover extractors
@@ -427,7 +427,7 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
 
 ### Choose how to replicate each entity
 
-If the data source you'll be pulling data from is a database, like [PostgreSQL](/plugins/extractors/postgres.html) or [MongoDB](/plugins/extractors/mongodb.html), your extractor likely requires one final setup step:
+If the data source you'll be pulling data from is a database, like [PostgreSQL](https://hub.meltano.com/extractors/postgres.html) or [MongoDB](https://hub.meltano.com/extractors/mongodb.html), your extractor likely requires one final setup step:
 setting a [replication method](/docs/integration.html#replication-methods) for each [selected entity (table)](#select-entities-and-attributes-to-extract).
 
 Extractors for SaaS APIs typically hard-code the appropriate replication method for each supported entity, so if you're using one, you can skip this section and [move on to setting up a loader](#add-a-loader-to-send-data-to-a-destination).
@@ -518,7 +518,7 @@ which will be responsible for loading [extracted](#add-an-extractor-to-pull-data
 *To learn more about adding plugins to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-a-plugin-to-your-project).*
 
 1. Find out if a loader for your data destination is [supported out of the box](/docs/plugins.html#discoverable-plugins)
-by checking the [Destinations list](/plugins/loaders/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
+by checking the [Destinations list](https://hub.meltano.com/loaders/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
 
     ```bash
     meltano discover loaders
