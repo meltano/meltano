@@ -27,26 +27,26 @@ Once you're inside the Meltano UI, you'll begin on the **Connections** page to c
 
 The following data sources are fully supported by Meltano UI, from setting up your connection to creating reports and sharing dashboards:
 
-* [Facebook Ads](https://hub.meltano.com/extractors/facebook.html)
-* [GitLab](https://hub.meltano.com/extractors/gitlab.html)
-* [Google Ads](https://hub.meltano.com/extractors/adwords.html)
-* [Google Analytics](https://hub.meltano.com/extractors/google-analytics.html)
-* [Salesforce](https://hub.meltano.com/extractors/salesforce.html)
-* [Shopify](https://hub.meltano.com/extractors/shopify.html)
-* [Stripe](https://hub.meltano.com/extractors/stripe.html)
-* [Zendesk](https://hub.meltano.com/extractors/zendesk.html)
+* [Facebook Ads](/plugins/extractors/facebook.html)
+* [GitLab](/plugins/extractors/gitlab.html)
+* [Google Ads](/plugins/extractors/adwords.html)
+* [Google Analytics](/plugins/extractors/google-analytics.html)
+* [Salesforce](/plugins/extractors/salesforce.html)
+* [Shopify](/plugins/extractors/shopify.html)
+* [Stripe](/plugins/extractors/stripe.html)
+* [Zendesk](/plugins/extractors/zendesk.html)
 
-Note that only [the PostgreSQL database](https://hub.meltano.com/loaders/postgres.html) is currently supported as a data destination.
+Note that only [the PostgreSQL database](/plugins/loaders/postgres.html) is currently supported as a data destination.
 
 ::: tip Don't see your data source listed here?
 
-[Additional data sources](https://hub.meltano.com/extractors/) (including [arbitrary Singer taps](https://www.singer.io/#taps)) are available when using the [command line interface](/docs/command-line-interface.html).
+[Additional data sources](/plugins/extractors/) (including [arbitrary Singer taps](https://www.singer.io/#taps)) are available when using the [command line interface](/docs/command-line-interface.html).
 
 :::
 
 ### Connecting a data source
 
-Choose a data source to connect (we'll use [Google Ads](https://hub.meltano.com/extractors/adwords.html) in this example), fill in the form with your authentication details, **Test Connection** to ensure everything is on order, and then hit **Save**.
+Choose a data source to connect (we'll use [Google Ads](/plugins/extractors/adwords.html) in this example), fill in the form with your authentication details, **Test Connection** to ensure everything is on order, and then hit **Save**.
 
 ![Example of Google Ads docs appearing next to configuration form](/images/getting-started-guide/2-connection-setup-populated.png)
 
@@ -62,7 +62,7 @@ On the **Pipelines** page, you can see the pipeline that was automatically creat
 
 ![Pipelines page](/images/getting-started-guide/5-pipelines.png)
 
-In this example, we have used [Google Ads](https://hub.meltano.com/extractors/adwords.html), but the process looks the same for all of the [supported data sources](#supported-data-sources).
+In this example, we have used [Google Ads](/plugins/extractors/adwords.html), but the process looks the same for all of the [supported data sources](#supported-data-sources).
 
 ## Explore Your Data
 

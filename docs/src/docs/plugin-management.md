@@ -22,7 +22,7 @@ by directly modifying your [`meltano.yml` project file](/docs/project.html#plugi
 and [installing the new plugin](#installing-your-projects-plugins) using [`meltano install`](/docs/command-line-interface.html#install).
 
 If you'd like to add a [discoverable plugin](/docs/plugins.html#discoverable-plugins) that's supported by Meltano out of the box,
-like one of the extractors and loaders listed on the [Sources](https://hub.meltano.com/extractors/) and [Destinations](https://hub.meltano.com/loaders/) pages,
+like one of the extractors and loaders listed on the [Sources](/plugins/extractors/) and [Destinations](/plugins/loaders/) pages,
 refer to the ["Discoverable plugins" section](#discoverable-plugins) below.
 
 Alternatively, if you'd like to add a [custom plugin](/docs/plugins.html#custom-plugins) that Meltano isn't familiar with yet,

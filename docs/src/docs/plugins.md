@@ -29,8 +29,8 @@ In your project, **plugins** extend this description with a specific configurati
 This means that [different configurations](/docs/configuration.html#multiple-plugin-configurations) of the same package (base plugin)
 would be represented in your project as separate plugins with their own unique names,
 that can be thought of as differently initialized instances of the same class.
-For example: extractors `tap-postgres--billing` and `tap-postgres--events` derived from base extractor [`tap-postgres`](https://hub.meltano.com/extractors/postgres.html),
-or `tap-google-analytics--client-foo` and `tap-google-analytics--client-bar` derived from base extractor [`tap-google-analytics`](https://hub.meltano.com/extractors/google-analytics.html).
+For example: extractors `tap-postgres--billing` and `tap-postgres--events` derived from base extractor [`tap-postgres`](/plugins/extractors/postgres.html),
+or `tap-google-analytics--client-foo` and `tap-google-analytics--client-bar` derived from base extractor [`tap-google-analytics`](/plugins/extractors/google-analytics.html).
 
 Each plugin in a project can either:
 - inherit its base plugin description from a [discoverable plugin](#discoverable-plugins) that's supported out of the box,
@@ -53,7 +53,7 @@ If you'd like to use a different (custom) manifest in your project,
 put a `discovery.yml` file at the root of your project,
 or change the [`discovery_url` setting](/docs/settings.html#discovery-url).
 
-To find discoverable plugins, run [`meltano discover`](/docs/command-line-interface.html#discover) or refer to the lists of [Sources](https://hub.meltano.com/extractors/) and [Destinations](https://hub.meltano.com/loaders/).
+To find discoverable plugins, run [`meltano discover`](/docs/command-line-interface.html#discover) or refer to the lists of [Sources](/plugins/extractors/) and [Destinations](/plugins/loaders/).
 
 To learn how to add a discoverable plugin to your project using a [shadowing plugin definition](/docs/project.html#shadowing-plugin-definitions) or [inheriting plugin definition](/docs/project.html#inheriting-plugin-definitions), refer to the [Plugin Management guide](/docs/plugin-management.html#discoverable-plugins).
 
@@ -124,7 +124,7 @@ They are responsible for pulling data out of arbitrary data sources: databases, 
 
 Meltano supports [Singer taps](https://singer.io): executables that implement the [Singer specification](/docs/singer-spec.html).
 
-To learn which extractors are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Sources page](https://hub.meltano.com/extractors/) or run [`meltano discover extractors`](/docs/command-line-interface.html#discover).
+To learn which extractors are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Sources page](/plugins/extractors/) or run [`meltano discover extractors`](/docs/command-line-interface.html#discover).
 
 #### Extras
 
@@ -195,7 +195,7 @@ when this extractor is used in a pipeline with a [loader](#loaders) for a databa
 
 The value of this extra [can be referenced](/docs/configuration.html#expansion-in-setting-values) from a loader's configuration using the `MELTANO_EXTRACT__LOAD_SCHEMA`
 [pipeline environment variable](/docs/integration.html#pipeline-environment-variables).
-It is used as the default value for the [`target-postgres`](https://hub.meltano.com/loaders/postgres.html) and [`target-snowflake`](https://hub.meltano.com/loaders/snowflake.html) `schema` settings.
+It is used as the default value for the [`target-postgres`](/plugins/loaders/postgres.html) and [`target-snowflake`](/plugins/loaders/snowflake.html) `schema` settings.
 
 ##### How to use
 
@@ -487,7 +487,7 @@ They are responsible for loading [extracted](#extractors) data into arbitrary da
 
 Meltano supports [Singer targets](https://singer.io): executables that implement the [Singer specification](/docs/singer-spec.html).
 
-To learn which loaders are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Destinations page](https://hub.meltano.com/loaders/) or run [`meltano discover loaders`](/docs/command-line-interface.html#discover).
+To learn which loaders are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Destinations page](/plugins/loaders/) or run [`meltano discover loaders`](/docs/command-line-interface.html#discover).
 
 #### Extras
 
