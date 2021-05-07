@@ -24,6 +24,7 @@ More active [contributors](/docs/contributor-guide.html) to Meltano and [related
 | --------------- | --------- | ------------- |
 | [Slalom](https://www.slalom.com/) | United States: [various](https://www.slalom.com/locations); Canada: Montréal, Toronto, Vancouver; United Kingdom: London, Manchester; Australia: Melbourne, Sydney; Japan: Tokyo | [10+](https://gitlab.com/groups/meltano/-/merge_requests?author_username=aaronsteers&state=all) |
 | [Applied Labs](https://appliedlabs.io/) | United States: New York; Russia: Moscow; United Kingdom: London; Uzbekistan: Tashkent | 5+ ([1](https://gitlab.com/groups/meltano/-/merge_requests?author_username=kaboomdev&state=all), [2](https://gitlab.com/groups/meltano/-/merge_requests?author_username=dmitry-stadnik&state=all)) |
+| [Auto IDM](https://autoidm.com/) | United States: Michigan | [4](https://gitlab.com/groups/meltano/-/merge_requests?author_username=vischous&state=all) |
 | [AMEND](https://amendllc.com/) | United States: Cincinnati, OH |
 | [b.telligent](https://www.btelligent.com/) | Germany: Berlin, Düsseldorf, Frankfurt, Hamburg, Hannover |
 | [Commencis](https://www.commencis.com/) | Turkey: Istanbul; United Kingdom: London |
