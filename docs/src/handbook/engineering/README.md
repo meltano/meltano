@@ -45,7 +45,7 @@ If appropriate, an issue should have a stage label (one of the letters in "melta
 
 Singer related labels:
 - `Singer Ecosystem` for general Singer related issues
-- `SingerHub`
+- `MeltanoHub - Singer`
 - `Singer SDK`
 
 Other labels:
