@@ -467,6 +467,32 @@ To see what commands a plugin supports, use `--list-command`:
 meltano invoke --list-commands dbt
 ```
 
+## `remove`
+
+`meltano remove` removes one or more [plugins](/docs/plugins.html#project-plugins) of the same [type](/docs/plugins.html#types) from your Meltano [project](/docs/project.html).
+
+Specifically, [plugins](/docs/plugins.html#project-plugins) will be removed from the:
+- [`meltano.yml` project file](/docs/project.html)
+- Installation found in the [`.meltano` directory](/docs/project.html#meltano-directory) under `.meltano/<plugin_type>/<plugin_name>`
+- `plugin_settings` table in the [system database](/docs/project.html#system-database)
+
+### How to Use
+
+```bash
+meltano remove <type> <name>
+meltano remove <type> <name> <name_two>
+```
+
+### Examples
+
+```bash
+# meltano will attempt to remove an extractor called tap-gitlab
+meltano remove extractor tap-gitlab
+
+# meltano will attempt to remove two loaders; target-postgres and target-csv
+meltano remove loader target-postgres target-csv
+```
+
 ## `schedule`
 
 ::: tip
