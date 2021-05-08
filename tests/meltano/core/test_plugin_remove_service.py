@@ -1,4 +1,6 @@
+import errno
 import os
+from unittest import mock
 
 import pytest
 import yaml
@@ -77,5 +79,19 @@ class TestPluginRemoveService:
     def test_remove_not_added_or_installed(self, subject: PluginRemoveService):
         plugins = list(subject.plugins_service.plugins())
         removed_plugins, total_plugins = subject.remove_plugins(plugins)
+
+        assert removed_plugins == 0
+
+    def test_remove_installation_oserror(
+        self, subject: PluginRemoveService, add, install
+    ):
+        def raise_permissionerror(filename):
+            raise OSError(errno.EACCES, os.strerror(errno.ENOENT), filename)
+
+        plugins = list(subject.plugins_service.plugins())
+
+        with mock.patch("meltano.core.plugin_remove_service.shutil.rmtree") as rmtree:
+            rmtree.side_effect = raise_permissionerror
+            removed_plugins, total_plugins = subject.remove_plugins(plugins)
 
         assert removed_plugins == 0
