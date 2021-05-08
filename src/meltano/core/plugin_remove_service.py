@@ -68,7 +68,10 @@ class PluginRemoveService:
 
             any_not_removed = False
             for state in remove_states:
-                any_not_removed = state.status is not PluginLocationRemoveStatus.REMOVED
+                any_not_removed = (
+                    state.status is not PluginLocationRemoveStatus.REMOVED
+                    or any_not_removed
+                )
                 location_status_cb(plugin, state)
 
             if any_not_removed:
