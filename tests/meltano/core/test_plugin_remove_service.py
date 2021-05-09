@@ -5,6 +5,7 @@ from unittest import mock
 import pytest
 import yaml
 from meltano.core.plugin_remove_service import PluginRemoveService
+from sqlalchemy.exc import OperationalError
 
 
 class TestPluginRemoveService:
@@ -82,7 +83,36 @@ class TestPluginRemoveService:
 
         assert removed_plugins == 0
 
-    def test_remove_installation_oserror(
+    def test_remove_db_error(self, subject: PluginRemoveService, add, install):
+        plugins = list(subject.plugins_service.plugins())
+
+        with mock.patch(
+            "meltano.core.plugin_location_remove.PluginSettingsService.reset"
+        ) as reset:
+            reset.side_effect = OperationalError(
+                "DELETE FROM plugin_settings WHERE plugin_settings.namespace = ?",
+                ("extractors.tap-csv.default"),
+                "attempt to write a readonly database",
+            )
+            removed_plugins, total_plugins = subject.remove_plugins(plugins)
+
+        assert removed_plugins == 0
+
+    def test_remove_meltano_yml_error(self, subject: PluginRemoveService, add, install):
+        def raise_permissionerror(filename):
+            raise OSError(errno.EACCES, os.strerror(errno.ENOENT), filename)
+
+        plugins = list(subject.plugins_service.plugins())
+
+        with mock.patch(
+            "meltano.core.plugin_location_remove.ProjectPluginsService.remove_from_file"
+        ) as remove_from_file:
+            remove_from_file.side_effect = raise_permissionerror
+            removed_plugins, total_plugins = subject.remove_plugins(plugins)
+
+        assert removed_plugins == 0
+
+    def test_remove_installation_error(
         self, subject: PluginRemoveService, add, install
     ):
         def raise_permissionerror(filename):
@@ -90,7 +120,7 @@ class TestPluginRemoveService:
 
         plugins = list(subject.plugins_service.plugins())
 
-        with mock.patch("meltano.core.plugin_remove_service.shutil.rmtree") as rmtree:
+        with mock.patch("meltano.core.plugin_location_remove.shutil.rmtree") as rmtree:
             rmtree.side_effect = raise_permissionerror
             removed_plugins, total_plugins = subject.remove_plugins(plugins)
 
