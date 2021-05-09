@@ -1,40 +1,17 @@
 """Defines PluginRemoveService."""
-import shutil
-from enum import Enum
 from typing import Iterable, Tuple
 
-from meltano.core.db import project_engine
-from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin_location_remove import (
+    DbRemoveManager,
+    InstallationRemoveManager,
+    MeltanoYmlRemoveManager,
+    PluginLocationRemoveStatus,
+)
 from meltano.core.project_plugins_service import ProjectPluginsService
 
 from .project import Project
-from .settings_store import SettingValueStore
 from .utils import noop
-
-
-class PluginLocationRemoveStatus(Enum):
-    """Possible remove statuses."""
-
-    REMOVED = "removed"
-    ERROR = "error"
-    NOT_FOUND = "not found"
-
-
-class PluginLocationRemoveState:
-    """Handle plugin removal state for a single location."""
-
-    def __init__(
-        self,
-        location,
-        message=None,
-        status=None,
-    ):
-        """Construct a PluginLocationRemoveState instance."""
-        self.location = location
-        self.message = message
-        self.status = status
 
 
 class PluginRemoveService:
@@ -49,7 +26,7 @@ class PluginRemoveService:
         self,
         plugins: Iterable[ProjectPlugin],
         plugin_status_cb=noop,
-        location_status_cb=noop,
+        removal_manager_status_cb=noop,
     ) -> Tuple[int, int]:
         """
         Remove multiple plugins.
@@ -64,55 +41,31 @@ class PluginRemoveService:
         for plugin in plugins:
             plugin_status_cb(plugin)
 
-            remove_states = self.remove_plugin(plugin)
+            removal_managers = self.remove_plugin(plugin)
 
             any_not_removed = False
-            for state in remove_states:
-                any_not_removed = (
-                    state.status is not PluginLocationRemoveStatus.REMOVED
-                    or any_not_removed
-                )
-                location_status_cb(plugin, state)
+            for manager in removal_managers:
+                any_not_removed = not manager.plugin_removed or any_not_removed
+                removal_manager_status_cb(manager)
 
             if any_not_removed:
                 removed_plugins -= 1
 
         return removed_plugins, num_plugins
 
-    def remove_plugin(
-        self, plugin: ProjectPlugin
-    ) -> Tuple[PluginLocationRemoveState, PluginLocationRemoveState]:
+    def remove_plugin(self, plugin: ProjectPlugin) -> Tuple[PluginLocationRemoveStatus]:
         """
-        Remove a plugin from `meltano.yml`, its installation in `.meltano`, and any settings in the Meltano system database.
+        Remove a plugin from `meltano.yml`, its installation in `.meltano`, and its settings in the Meltano system database.
 
-        Returns a tuple containing:
-        1. Removal state for `meltano.yml`
-        2. Removal state for installation
+        Returns a tuple containing a remove manager for each location.
         """
-        yml_remove_state = PluginLocationRemoveState("meltano.yml")
-        installation_remove_state = PluginLocationRemoveState(f".meltano/{plugin.type}")
+        remove_managers = (
+            DbRemoveManager(plugin, self.project),
+            MeltanoYmlRemoveManager(plugin, self.project),
+            InstallationRemoveManager(plugin, self.project),
+        )
 
-        plugins_settings_service = PluginSettingsService(self.project, plugin)
+        for manager in remove_managers:
+            manager.remove()
 
-        _, session = project_engine(self.project)
-        plugins_settings_service.reset(store=SettingValueStore.DB, session=session())
-
-        yml_remove_state.status = PluginLocationRemoveStatus.REMOVED
-        try:
-            self.plugins_service.remove_from_file(plugin)
-        except PluginNotFoundError:
-            yml_remove_state.status = PluginLocationRemoveStatus.NOT_FOUND
-
-        path = self.project.plugin_dir(plugin, make_dirs=False)
-
-        if path.exists():
-            installation_remove_state.status = PluginLocationRemoveStatus.REMOVED
-            try:
-                shutil.rmtree(path)
-            except OSError as err:
-                installation_remove_state.status = PluginLocationRemoveStatus.ERROR
-                installation_remove_state.message = err.strerror
-        else:
-            installation_remove_state.status = PluginLocationRemoveStatus.NOT_FOUND
-
-        return yml_remove_state, installation_remove_state
+        return remove_managers
