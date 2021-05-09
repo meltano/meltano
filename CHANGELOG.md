@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+- [#2353](https://gitlab.com/meltano/meltano/-/issues/2353) Add `meltano remove` command
 
 ### Changes
 
