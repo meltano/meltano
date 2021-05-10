@@ -4,7 +4,7 @@
 # nested in that directory, on any level
 
 [Default]
-* @DouweM
+* @DouweM @aaronsteers
 
 [Handbook]
 /docs/src/handbook/ @DouweM @tayloramurphy @aaronsteers
