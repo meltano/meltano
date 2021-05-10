@@ -273,7 +273,13 @@ def find_named(xs: Iterable[dict], name: str):
 def makedirs(func):
     @functools.wraps(func)
     def decorate(*args, **kwargs):
+
+        enabled = kwargs.get("make_dirs", True)
+
         path = func(*args, **kwargs)
+
+        if not enabled:
+            return path
 
         # if there is an extension, only create the base dir
         _, ext = os.path.splitext(path)
