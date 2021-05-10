@@ -41,14 +41,14 @@ class ProjectReadonly(Error):
 
 def walk_parent_directories():
     """Yield each directory starting with the current up to the root."""
-    cwd = os.getcwd()
+    directory = os.getcwd()
     while True:
-        yield cwd
+        yield directory
 
-        new_cwd = os.path.dirname(cwd)
-        if new_cwd == cwd:
+        parent_directory = os.path.dirname(directory)
+        if parent_directory == directory:
             return
-        cwd = new_cwd
+        directory = parent_directory
 
 
 class Project(Versioned):
@@ -116,7 +116,7 @@ class Project(Versioned):
     def file_version(self):
         return self.meltano.version
 
-    @classmethod
+    @classmethod  # noqa: WPS231
     @fasteners.locked(lock="_find_lock")
     def find(cls, project_root: Union[Path, str] = None, activate=True):  # noqa: WPS231
         """
@@ -136,14 +136,15 @@ class Project(Versioned):
         project_root = project_root or os.getenv(PROJECT_ROOT_ENV)
         if project_root:
             project = Project(project_root)
+            if not project.meltanofile.exists():
+                raise ProjectNotFound(project)
         else:
-            for cwd in walk_parent_directories():
-                project = Project(cwd)
+            for directory in walk_parent_directories():
+                project = Project(directory)
                 if project.meltanofile.exists():
                     break
-
-        if not project.meltanofile.exists():
-            raise ProjectNotFound(project)
+            if not project.meltanofile.exists():
+                raise ProjectNotFound(Project(os.getcwd()))
 
         # if we activate a project using `find()`, it should
         # be set as the default project for future `find()`
