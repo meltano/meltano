@@ -400,17 +400,18 @@ RUN meltano install
 
 ## Removing a plugin from your project
 
-Since the [`plugins` section](/docs/project.html#plugins) of your [`meltano.yml` project file](/docs/project.html) determines the plugins that make up your project, you can remove a plugin from your project by deleting its entry from this file.
+You can remove a [plugin](/docs/plugins.html#project-plugins) from your Meltano [project](/docs/project.html) by using [`meltano remove`](/docs/command-line-interface.html#remove). You have to specify a [type](/docs/plugins.html#types) of plugin to remove, but you can remove multiple plugins of that type.
 
-Traces of the plugin may remain in the [`.meltano` directory](/docs/project.html#meltano-directory) under `.meltano/<plugin type>/<plugin name>`, and in the `job` and `plugin_settings` tables in the [system database](/docs/project.html#system-database). You are free to delete these files and rows manually.
+```bash
+meltano remove <type> <name>
+meltano remove <type> <name> <name_two>
 
-::: tip Contribution idea
+# For example:
+meltano remove extractor tap-gitlab
+meltano remove loader target-postgres target-csv
+```
 
-Do you think there should be a `meltano remove <type> <name>` [CLI command](/docs/command-line-interface.html) to mirror [`meltano add <type> <name>`](/docs/command-line-interface.html#add)?
-
-There's an [issue](https://gitlab.com/meltano/meltano/-/issues/2353) for that, and we'll gladly accept a [contribution](/docs/contributor-guide.html)!
-
-:::
+Since the [`plugins` section](/docs/project.html#plugins) of your [`meltano.yml` project file](/docs/project.html) determines the plugins that make up your project, you can still manually remove a [plugin](/docs/plugins.html#project-plugins) from your project by deleting its entry from this file. Traces of the plugin may remain in the other locations mentioned above.
 
 ## Using a custom fork of a plugin
 
