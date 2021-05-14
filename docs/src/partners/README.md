@@ -32,6 +32,7 @@ More active [contributors](/docs/contributor-guide.html) to Meltano and [related
 | [Mashey](https://www.mashey.com/) | United States: Denver, CO |
 | [Ryan-Miranda](https://www.ryan-miranda.com/) | United States: Pasadena, CA; Boston, MA |
 | [Wheelhouse](https://www.wheelhousedmg.com/) | United States: Seattle, WA; Richmond, VA |
+| [Substring - Data Company](https://substring.ch/) | Switzerland: Ittigen, BE |
 
 ::: tip Don't see your consulting firm listed here?
 
