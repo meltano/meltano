@@ -86,6 +86,22 @@ Any time you manually add new plugins to `meltano.yml`, you will need to rerun t
 meltano install
 ```
 
+If you get an error that your custom extractor is uninstallable try adding a pip_url variable to your meltano.yml like in the example below.
+
+```yml
+# ...
+plugins:
+  extractors:
+    # Insert a new entry:
+    - name: tap-my-custom-source
+      namespace: tap_my_custom_source
+      # If you are developing locally this can be any pip_url
+      # It won't be used when you use the invoke command
+      pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+      # Absolute path to local test script:
+      executable: /path/to/tap-my-custom-source.sh
+ ```    
+
 ### Plugin Settings
 
 When creating a new plugin, you'll often have to expose some settings to the user so that Meltano can generate the correct configuration to run your plugin.
