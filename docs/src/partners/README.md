@@ -33,6 +33,7 @@ More active [contributors](/docs/contributor-guide.html) to Meltano and [related
 | [Ryan-Miranda](https://www.ryan-miranda.com/) | United States: Pasadena, CA; Boston, MA |
 | [Substring](https://substring.ch/) | Switzerland: Ittigen |
 | [Wheelhouse](https://www.wheelhousedmg.com/) | United States: Seattle, WA; Richmond, VA |
+| [handoff](https://handoff.cloud) by [ANELEN Co., LLC](https://anelen.co) | United States: Mountain View, CA |
 
 ::: tip Don't see your consulting firm listed here?
 
@@ -58,7 +59,7 @@ Their maintainers are:
 | [Mashey](https://www.mashey.com/) | 2 extractors |
 | [Adswerve](https://adswerve.com/) | 1 loader |
 | [Andy Huynh](https://github.com/andyh1203) | 1 loader |
-| [Anelen](https://anelen.co/) | 1 extractor |
+| [handoff](https://handoff.cloud) by [ANELEN Co., LLC](https://anelen.co/) | 1 extractor |
 | [Eric Simmerman](https://github.com/ets) | 1 extractor |
 | [Twilio](https://www.twilio.com/) | 1 extractor |
 
