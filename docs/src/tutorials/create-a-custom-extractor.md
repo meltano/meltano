@@ -140,8 +140,15 @@ Now that your plugin is installed and configured, you are ready to interact with
 Use `meltano invoke` to run your plugin in isolation:
 
 ```bash
+meltano invoke tap-my-custom-source
+```
+
+You can also use the `--discover` flag to see details about the supported streams:
+
+```bash
 meltano invoke tap-my-custom-source --discover
 ```
+
 
 You can also use [`meltano select`](https://meltano.com/docs/getting-started.html#select-entities-and-attributes-to-extract)
 to parse your `catalog` and list all available entities and attributes:
