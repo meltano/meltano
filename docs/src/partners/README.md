@@ -59,7 +59,7 @@ Their maintainers are:
 | [Mashey](https://www.mashey.com/) | 2 extractors |
 | [Adswerve](https://adswerve.com/) | 1 loader |
 | [Andy Huynh](https://github.com/andyh1203) | 1 loader |
-| [handoff](https://handoff.cloud) by [ANELEN Co., LLC](https://anelen.co/) | 1 extractor |
+| [ANELEN Co., LLC](https://anelen.co/) | 1 extractor |
 | [Eric Simmerman](https://github.com/ets) | 1 extractor |
 | [Twilio](https://www.twilio.com/) | 1 extractor |
 
