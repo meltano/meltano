@@ -26,6 +26,7 @@ More active [contributors](/docs/contributor-guide.html) to Meltano and [related
 | [Applied Labs](https://appliedlabs.io/) | United States: New York; Russia: Moscow; United Kingdom: London; Uzbekistan: Tashkent | 5+ ([1](https://gitlab.com/groups/meltano/-/merge_requests?author_username=kaboomdev&state=all), [2](https://gitlab.com/groups/meltano/-/merge_requests?author_username=dmitry-stadnik&state=all)) |
 | [Auto IDM](https://autoidm.com/) | United States: Michigan | [4](https://gitlab.com/groups/meltano/-/merge_requests?author_username=vischous&state=all) |
 | [AMEND](https://amendllc.com/) | United States: Cincinnati, OH |
+| [ANELEN Co., LLC](https://anelen.co) | United States: Mountain View, CA |
 | [b.telligent](https://www.btelligent.com/) | Germany: Berlin, Düsseldorf, Frankfurt, Hamburg, Hannover |
 | [Commencis](https://www.commencis.com/) | Turkey: Istanbul; United Kingdom: London |
 | [Datateer](https://www.datateer.com/) | United States: Denver, CO |
@@ -33,7 +34,6 @@ More active [contributors](/docs/contributor-guide.html) to Meltano and [related
 | [Ryan-Miranda](https://www.ryan-miranda.com/) | United States: Pasadena, CA; Boston, MA |
 | [Substring](https://substring.ch/) | Switzerland: Ittigen |
 | [Wheelhouse](https://www.wheelhousedmg.com/) | United States: Seattle, WA; Richmond, VA |
-| [handoff](https://handoff.cloud) by [ANELEN Co., LLC](https://anelen.co) | United States: Mountain View, CA |
 
 ::: tip Don't see your consulting firm listed here?
 
