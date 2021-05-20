@@ -44,3 +44,43 @@ Join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannel
 [officehoursplaylist]: https://www.youtube.com/playlist?list=PLO0YrxtDbWAtuuubcEz7mnCHoGfIf8voT
 [demodayplaylist]: https://www.youtube.com/playlist?list=PLO0YrxtDbWAuLRElrtwFI5PwlAEMUi0AD
 [gcal]: https://calendar.google.com/calendar/embed?src=c_01cj48ha4h199ctjefi85t9dgc%40group.calendar.google.com
+
+### Channels
+
+We have a number of channels which we use on a regular basis to communicate and share information with the community. 
+
+#### #announcements
+
+This is for posts from the Core Team to the wider community. Here we will share exciting news, upcoming events, new releases, and other relevant information.
+
+##### @Channel usage
+
+We will use `@channel` no more than three times per week and aim to use it a maximum of once per day. 
+
+#### Other Useful Channels
+
+This is not an exhaustive list and we encourage you to join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannelLink> to discover more!
+
+Meltano:
+
+* #contributing - if you want to contribute to Meltano itself
+* #hub - all about the [upcoming MeltanoHub](https://gitlab.com/groups/meltano/-/epics/83)
+* #plugins-dbt - all things [dbt](https://meltano.com/docs/transforms.html)
+* #plugins-general - discussion for any other plugins
+
+Support:
+
+* #best-practices - for learning tips on how others are using Meltano and other data products
+* #getting-started - if you need some help [getting up and running with Meltano](https://meltano.com/docs/getting-started.html)
+* #troubleshooting - if you get a weird stack trace and need some help
+
+Community Events:
+
+* #demo-day - where we plan and organize [Demo Day](https://meltano.com/docs/community.html#demo-days)
+* #office-hours - where we plan and organize weekly [Office Hours](https://meltano.com/docs/community.html#office-hours)
+
+Singer Related:
+
+* #singer-batch-messages - discussion around [Fast Sync](https://gitlab.com/meltano/meltano/-/issues/2364)
+* #singer-saas-targets - all things Reverse ETL / Operational Analytics
+* #singer-sdk - discussion around the [SDK for Taps and Targets](https://gitlab.com/meltano/singer-sdk)
