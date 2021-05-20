@@ -86,7 +86,7 @@ Any time you manually add new plugins to `meltano.yml`, you will need to rerun t
 meltano install
 ```
 
-If you get an error that your custom extractor is uninstallable try adding a pip_url variable to your meltano.yml like in the example below.
+If you get an error that your custom extractor is uninstallable try adding a `pip_url` variable to your `meltano.yml`:
 
 ```yml
 # ...
