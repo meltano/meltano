@@ -39,6 +39,18 @@ class ProjectReadonly(Error):
         super().__init__(f"This Meltano project is deployed as read-only")
 
 
+def walk_parent_directories():
+    """Yield each directory starting with the current up to the root."""
+    directory = os.getcwd()
+    while True:
+        yield directory
+
+        parent_directory = os.path.dirname(directory)
+        if parent_directory == directory:
+            return
+        directory = parent_directory
+
+
 class Project(Versioned):
     """
     Represent the current Meltano project from a file-system
@@ -104,17 +116,35 @@ class Project(Versioned):
     def file_version(self):
         return self.meltano.version
 
-    @classmethod
+    @classmethod  # noqa: WPS231
     @fasteners.locked(lock="_find_lock")
-    def find(cls, project_root: Union[Path, str] = None, activate=True):
+    def find(cls, project_root: Union[Path, str] = None, activate=True):  # noqa: WPS231
+        """
+        Find a Project.
+
+        project_root: The path to the root directory of the project. If not supplied,
+            infer from PROJECT_ROOT_ENV or the current working directory and it's parents.
+        activate: Save the found project so that future calls to `find` will continue to use
+            this project.
+
+        raises ProjectNotFound: if the provided `project_root` is not a Meltano project, or
+            the current working directory is not a Meltano project or a subfolder of one.
+        """
         if cls._default:
             return cls._default
 
-        project_root = project_root or os.getenv(PROJECT_ROOT_ENV) or os.getcwd()
-        project = Project(project_root)
-
-        if not project.meltanofile.exists():
-            raise ProjectNotFound(project)
+        project_root = project_root or os.getenv(PROJECT_ROOT_ENV)
+        if project_root:
+            project = Project(project_root)
+            if not project.meltanofile.exists():
+                raise ProjectNotFound(project)
+        else:
+            for directory in walk_parent_directories():
+                project = Project(directory)
+                if project.meltanofile.exists():
+                    break
+            if not project.meltanofile.exists():
+                raise ProjectNotFound(Project(os.getcwd()))
 
         # if we activate a project using `find()`, it should
         # be set as the default project for future `find()`
