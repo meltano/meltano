@@ -61,17 +61,18 @@ class TestProject:
         assert found == project
 
         # or set the MELTANO_PROJECT_ROOT env var
-        with monkeypatch.context() as m:
-            m.chdir(project.root.joinpath("model"))
-            m.setenv(PROJECT_ROOT_ENV, "..")
+        with monkeypatch.context() as ctx1:
+            ctx1.chdir(project.root.joinpath("model"))
+            ctx1.setenv(PROJECT_ROOT_ENV, "..")
 
             found = Project.find(activate=False)
             assert found == project
 
-        # but it doens't recurse up, you have to be
-        # at the meltano.yml level
-        with pytest.raises(ProjectNotFound):
-            Project.find(project.root.joinpath("model"))
+        # it can also recurse up from a subdirectory
+        with monkeypatch.context() as ctx2:
+            ctx2.chdir(project.root.joinpath("model"))
+            found = Project.find(activate=False)
+            assert found == project
 
         # and it fails if there isn't a meltano.yml
         with pytest.raises(ProjectNotFound):
