@@ -159,7 +159,7 @@ which will be responsible for pulling data out of your data source.
 *To learn more about adding plugins to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-a-plugin-to-your-project).*
 
 1. Find out if an extractor for your data source is [supported out of the box](/docs/plugins.html#discoverable-plugins)
-by checking the [Sources list](https://hub.meltano.com/extractors/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
+by checking the [Extractors list](https://hub.meltano.com/extractors/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
 
     ```bash
     meltano discover extractors
@@ -518,7 +518,7 @@ which will be responsible for loading [extracted](#add-an-extractor-to-pull-data
 *To learn more about adding plugins to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-a-plugin-to-your-project).*
 
 1. Find out if a loader for your data destination is [supported out of the box](/docs/plugins.html#discoverable-plugins)
-by checking the [Destinations list](https://hub.meltano.com/loaders/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
+by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`meltano discover`](/docs/command-line-interface.html#discover):
 
     ```bash
     meltano discover loaders

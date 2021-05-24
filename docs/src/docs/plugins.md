@@ -53,7 +53,7 @@ If you'd like to use a different (custom) manifest in your project,
 put a `discovery.yml` file at the root of your project,
 or change the [`discovery_url` setting](/docs/settings.html#discovery-url).
 
-To find discoverable plugins, run [`meltano discover`](/docs/command-line-interface.html#discover) or refer to the lists of [Sources](https://hub.meltano.com/extractors/) and [Destinations](https://hub.meltano.com/loaders/).
+To find discoverable plugins, run [`meltano discover`](/docs/command-line-interface.html#discover) or refer to the lists of [Extractors](https://hub.meltano.com/extractors/) and [Loaders](https://hub.meltano.com/loaders/).
 
 To learn how to add a discoverable plugin to your project using a [shadowing plugin definition](/docs/project.html#shadowing-plugin-definitions) or [inheriting plugin definition](/docs/project.html#inheriting-plugin-definitions), refer to the [Plugin Management guide](/docs/plugin-management.html#discoverable-plugins).
 
@@ -124,7 +124,7 @@ They are responsible for pulling data out of arbitrary data sources: databases, 
 
 Meltano supports [Singer taps](https://singer.io): executables that implement the [Singer specification](/docs/singer-spec.html).
 
-To learn which extractors are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Sources page](https://hub.meltano.com/extractors/) or run [`meltano discover extractors`](/docs/command-line-interface.html#discover).
+To learn which extractors are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Extractors page](https://hub.meltano.com/extractors/) or run [`meltano discover extractors`](/docs/command-line-interface.html#discover).
 
 #### Extras
 
@@ -487,7 +487,7 @@ They are responsible for loading [extracted](#extractors) data into arbitrary da
 
 Meltano supports [Singer targets](https://singer.io): executables that implement the [Singer specification](/docs/singer-spec.html).
 
-To learn which loaders are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Destinations page](https://hub.meltano.com/loaders/) or run [`meltano discover loaders`](/docs/command-line-interface.html#discover).
+To learn which loaders are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Loaders page](https://hub.meltano.com/loaders/) or run [`meltano discover loaders`](/docs/command-line-interface.html#discover).
 
 #### Extras
 
