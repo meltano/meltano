@@ -109,11 +109,11 @@ module.exports = {
         items: [
             {
                 text: "Sources",
-                link: "/plugins/extractors/",
+                link: "https://hub.meltano.com/extractors/",
             },
             {
                 text: "Destinations",
-                link: "/plugins/loaders/",
+                link: "https://hub.meltano.com/loaders/",
             },
         ]
       },
