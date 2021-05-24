@@ -44,7 +44,7 @@ If you have experience with Meltano and Singer, you can add your company to this
 
 Any [Singer](https://www.singer.io/) tap or target can be used with Meltano as a [custom plugin](/docs/plugin-management.html#custom-plugins),
 but [extractors](/docs/plugins.html#extractors) and [loaders](/docs/plugins.html#loaders) for various
-[taps](https://hub.meltano.com/singer/taps) and [targets](https://hub.meltano.com/singer/targest) are supported out of the box.
+[taps](https://hub.meltano.com/extractors) and [targets](https://hub.meltano.com/loaders) are supported out of the box.
 
 Their maintainers are:
 
