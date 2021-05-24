@@ -5,7 +5,7 @@ description: Use Meltano to pull data from the Chargebee API and load it into Sn
 
 # Chargebee
 
-The `tap-chargebee` [extractor](/plugins/extractors/) pulls data from the [Chargebee API](https://apidocs.chargebee.com/docs/api).
+The `tap-chargebee` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Chargebee API](https://apidocs.chargebee.com/docs/api).
 
 - **Repository**: <https://github.com/hotgluexyz/tap-chargebee>
 - **Maintainer**: [Hotglue](https://hotglue.xyz/)

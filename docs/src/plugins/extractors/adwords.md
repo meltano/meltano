@@ -5,7 +5,7 @@ description: Use Meltano to pull data from the Google Ads (AdWords) API and load
 
 # Google Ads (AdWords)
 
-The `tap-adwords` [extractor](/plugins/extractors/) pulls data from the [Google AdWords API](https://developers.google.com/adwords/api/).
+The `tap-adwords` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Google AdWords API](https://developers.google.com/adwords/api/).
 
 - **Repository**: <https://gitlab.com/meltano/tap-adwords>
 - **Maintainer**: Meltano community

@@ -5,7 +5,7 @@ description: Use Meltano to pull data from various sources and load it into JSON
 
 # JSON Lines (JSONL)
 
-The `target-jsonl` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into [JSON Lines (JSONL)](https://jsonlines.org/) files.
+The `target-jsonl` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into [JSON Lines (JSONL)](https://jsonlines.org/) files.
 
 - **Repository**: <https://github.com/andyh1203/target-jsonl>
 - **Maintainer**: [Andy Huynh](https://github.com/andyh1203)

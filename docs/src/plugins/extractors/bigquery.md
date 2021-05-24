@@ -5,7 +5,7 @@ description: Use Meltano to pull data from a BigQuery data warehouse and load it
 
 # BigQuery
 
-The `tap-bigquery` [extractor](/plugins/extractors/) pulls data from a [BigQuery](https://cloud.google.com/bigquery) data warehouse.
+The `tap-bigquery` [extractor](https://hub.meltano.com/extractors/) pulls data from a [BigQuery](https://cloud.google.com/bigquery) data warehouse.
 
 - **Repository**: <https://github.com/anelendata/tap-bigquery>
 - **Maintainer**: [Anelen](https://anelen.co/)

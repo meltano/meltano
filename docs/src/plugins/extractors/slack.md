@@ -5,7 +5,7 @@ description: Use Meltano to pull data from the Slack API and load it into Snowfl
 
 # Slack
 
-The `tap-slack` [extractor](/plugins/extractors/) pulls data from the [Slack API](https://api.slack.com/).
+The `tap-slack` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Slack API](https://api.slack.com/).
 
 - **Repository**: <https://github.com/Mashey/tap-slack>
 - **Maintainer**: [Mashey](https://www.mashey.com/)

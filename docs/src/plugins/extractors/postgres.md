@@ -5,7 +5,7 @@ description: Use Meltano to pull data from a PostgreSQL database and load it int
 
 # PostgreSQL
 
-The `tap-postgres` [extractor](/plugins/extractors/) pulls data from a [PostgreSQL](https://www.postgresql.org/) database.
+The `tap-postgres` [extractor](https://hub.meltano.com/extractors/) pulls data from a [PostgreSQL](https://www.postgresql.org/) database.
 
 - **Repository**: <https://github.com/transferwise/pipelinewise-tap-postgres>
 - **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/taps/postgres.html>
@@ -72,11 +72,11 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 
     Note that this extractor is incompatible with the default `datamill-co` [variants](/docs/plugins.html#variants)
-    of [`target-postgres`](/plugins/loaders/postgres.html) and [`target-snowflake`](/plugins/loaders/snowflake.html),
+    of [`target-postgres`](https://hub.meltano.com/loaders/postgres.html) and [`target-snowflake`](https://hub.meltano.com/loaders/snowflake.html),
     because they don't support stream names that include the source schema in addition to the table name: `<schema>-<table>`, e.g. `public-accounts`.
 
     Instead, use the `transferwise` variants that were made to be used with this extractor:
-    [`target-postgres`](/plugins/loaders/postgres--transferwise.html) and [`target-snowflake`](/plugins/loaders/snowflake--transferwise.html).
+    [`target-postgres`](https://hub.meltano.com/loaders/postgres--transferwise.html) and [`target-snowflake`](https://hub.meltano.com/loaders/snowflake--transferwise.html).
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 

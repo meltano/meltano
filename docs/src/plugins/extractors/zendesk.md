@@ -5,7 +5,7 @@ description: Use Meltano to pull data from the Zendesk API and load it into Snow
 
 # Zendesk
 
-The `tap-zendesk` [extractor](/plugins/extractors/) pulls data from the [Zendesk API](https://developer.zendesk.com/rest_api).
+The `tap-zendesk` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Zendesk API](https://developer.zendesk.com/rest_api).
 
 - **Repository**: <https://github.com/twilio-labs/twilio-tap-zendesk>
 - **Maintainer**: [Twilio](https://www.twilio.com/)

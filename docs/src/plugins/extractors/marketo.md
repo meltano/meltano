@@ -5,7 +5,7 @@ description: Use Meltano to pull data from the Marketo API and load it into Snow
 
 # Marketo
 
-The `tap-marketo` [extractor](/plugins/extractors/) pulls data from the [Marketo API](https://developers.marketo.com/rest-api/).
+The `tap-marketo` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Marketo API](https://developers.marketo.com/rest-api/).
 
 - **Repository**: <https://gitlab.com/meltano/tap-marketo>
 - **Maintainer**: Meltano community

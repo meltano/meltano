@@ -5,7 +5,7 @@ description: Use Meltano to pull data from the Shopify API and load it into Snow
 
 # Shopify
 
-The `tap-shopify` [extractor](/plugins/extractors/) pulls data from the [Shopify API](https://shopify.dev/docs/admin-api/rest/reference).
+The `tap-shopify` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Shopify API](https://shopify.dev/docs/admin-api/rest/reference).
 
 - **Repository**: <https://github.com/singer-io/tap-shopify>
 - **Maintainer**: [Stitch](https://www.stitchdata.com/)

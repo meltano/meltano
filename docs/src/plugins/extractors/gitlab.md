@@ -5,7 +5,7 @@ description: Use Meltano to pull data from the GitLab API and load it into Snowf
 
 # GitLab
 
-The `tap-gitlab` [extractor](/plugins/extractors/) pulls data from the [GitLab API](https://docs.gitlab.com/ee/api/).
+The `tap-gitlab` [extractor](https://hub.meltano.com/extractors/) pulls data from the [GitLab API](https://docs.gitlab.com/ee/api/).
 
 - **Repository**: <https://gitlab.com/meltano/tap-gitlab>
 - **Maintainer**: Meltano community

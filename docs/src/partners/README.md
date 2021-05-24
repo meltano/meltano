@@ -15,7 +15,7 @@ Meltano and [Singer](https://www.singer.io/) are [popular with data consultants]
 If you lack the time and/or expertise to do so yourself, they can help you
 [set up](/docs/getting-started.html) your pipelines, deploy them to [production](/docs/production.html),
 [improve](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin) existing Singer taps and targets to fit your use case,
-and [build new ones](/tutorials/create-a-custom-extractor.html) for any [sources](/plugins/extractors/) and [destinations](/plugins/loaders/)
+and [build new ones](/tutorials/create-a-custom-extractor.html) for any [sources](https://hub.meltano.com/extractors/) and [destinations](https://hub.meltano.com/loaders/)
 that are not supported yet.
 
 More active [contributors](/docs/contributor-guide.html) to Meltano and [related open source projects](https://gitlab.com/meltano) are listed first:
@@ -44,7 +44,7 @@ If you have experience with Meltano and Singer, you can add your company to this
 
 Any [Singer](https://www.singer.io/) tap or target can be used with Meltano as a [custom plugin](/docs/plugin-management.html#custom-plugins),
 but [extractors](/docs/plugins.html#extractors) and [loaders](/docs/plugins.html#loaders) for various
-[sources](/plugins/extractors/) and [destinations](/plugins/extractors/) are supported out of the box.
+[sources](https://hub.meltano.com/extractors/) and [destinations](https://hub.meltano.com/extractors/) are supported out of the box.
 
 Their maintainers are:
 
@@ -71,7 +71,7 @@ If you maintain a connector that could be supported by Meltano out of the box, p
 ## Data products
 
 Meltano is a great fit for data products that want to let their users directly connect their own sources to the platform,
-since connectors for many [sources](/plugins/extractors/) and [destinations](/plugins/extractors/) are already available,
+since connectors for many [sources](https://hub.meltano.com/extractors/) and [destinations](https://hub.meltano.com/extractors/) are already available,
 new connectors can be created easily, and connectors and pipelines can be configured programmatically.
 
 These are some of the tools powered by Meltano:

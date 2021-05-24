@@ -5,7 +5,7 @@ description: Use Meltano to pull data from the Google Analytics API and load it 
 
 # Google Analytics
 
-The `tap-google-analytics` [extractor](/plugins/extractors/) pulls data from the [Google Analytics Reporting API](https://developers.google.com/analytics/devguides/reporting/core/v4/).
+The `tap-google-analytics` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Google Analytics Reporting API](https://developers.google.com/analytics/devguides/reporting/core/v4/).
 
 - **Repository**: <https://gitlab.com/meltano/tap-google-analytics>
 - **Maintainer**: Meltano community

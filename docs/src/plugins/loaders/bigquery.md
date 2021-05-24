@@ -5,7 +5,7 @@ description: Use Meltano to pull data from various sources and load it into BigQ
 
 # BigQuery
 
-The `target-bigquery` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [BigQuery](https://cloud.google.com/bigquery) data warehouse.
+The `target-bigquery` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into a [BigQuery](https://cloud.google.com/bigquery) data warehouse.
 
 - **Repository**: <https://github.com/adswerve/target-bigquery>
 - **Maintainer**: [Adswerve](https://adswerve.com/)
@@ -103,7 +103,7 @@ export TARGET_BIGQUERY_PROJECT_ID=<id>
 
 - Name: `dataset_id`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_BIGQUERY_DATASET_ID`
-- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html).
+- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](https://hub.meltano.com/extractors/gitlab.html).
 
 BigQuery dataset
 

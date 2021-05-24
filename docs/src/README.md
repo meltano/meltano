@@ -58,8 +58,8 @@ or inside your
 [orchestrator of choice](/docs/production.html#meltano-elt).
 
 Meltano [embraces](/docs/#embracing-singer) the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
-[extractors](/plugins/extractors/) and
-[loaders](/plugins/loaders/),
+[extractors](https://hub.meltano.com/extractors/) and
+[loaders](https://hub.meltano.com/loaders/),
 and leverages [dbt](https://www.getdbt.com) for [transformation](#transformation).
 
 :::
@@ -159,7 +159,7 @@ Your Meltano project is now ready for [integration](/#integration), [transformat
 
 ## Integration just a few keystrokes away
 
-You can use existing Singer [taps](/plugins/extractors/) and [targets](/plugins/loaders/)
+You can use existing Singer [taps](https://hub.meltano.com/extractors/) and [targets](https://hub.meltano.com/loaders/)
 or [easily write your own](/tutorials/create-a-custom-extractor.html) to extract
 data from any SaaS tool or database and load it into any data warehouse or file format.
 

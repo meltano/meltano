@@ -5,7 +5,7 @@ description: Use Meltano to pull data from the Quickbooks Online API and load it
 
 # Quickbooks
 
-The `tap-quickbooks` [extractor](/plugins/extractors/) pulls data from the [Quickbooks Online API](https://developer.intuit.com/app/developer/qbo/docs/develop).
+The `tap-quickbooks` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Quickbooks Online API](https://developer.intuit.com/app/developer/qbo/docs/develop).
 
 - **Repository**: <https://github.com/hotgluexyz/tap-quickbooks>
 - **Maintainer**: [Hotglue](https://hotglue.xyz/)

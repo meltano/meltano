@@ -5,7 +5,7 @@ description: Use Meltano to pull data from the Bing Ads API and load it into Sno
 
 # Bing Ads
 
-The `tap-bing-ads` [extractor](/plugins/extractors/) pulls data from the [Bing Ads API](https://docs.microsoft.com/en-us/advertising/guides/).
+The `tap-bing-ads` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Bing Ads API](https://docs.microsoft.com/en-us/advertising/guides/).
 
 - **Repository**: <https://github.com/singer-io/tap-bing-ads>
 - **Maintainer**: [Stitch](https://www.stitchdata.com/)
