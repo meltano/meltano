@@ -57,7 +57,12 @@ class PluginInstallState:
     @property
     def successful(self):
         """If the installation completed without error."""
-        return self.status is PluginInstallStatus.SUCCESS
+        return self.status in (PluginInstallStatus.SUCCESS, PluginInstallStatus.SKIPPED)
+
+    @property
+    def skipped(self):
+        """If the installation was skipped (not needed)."""
+        return self.status == PluginInstallStatus.SKIPPED
 
     @property
     def verb(self):
@@ -192,7 +197,7 @@ class PluginInstallService:
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
-                status=PluginInstallStatus.SUCCESS,
+                status=PluginInstallStatus.SKIPPED,
                 message=f"Plugin '{plugin.name}' does not require installation",
             )
             self.status_cb(state)

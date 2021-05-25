@@ -389,17 +389,27 @@ def install_plugins(
         project, status_cb=install_status_update, parallelism=parallelism
     )
     install_results = install_service.install_plugins(plugins, reason=reason)
-    num_installed = len([status for status in install_results if status.successful])
-    num_failed = len(install_results) - num_installed
+    num_successful = len([status for status in install_results if status.successful])
+    num_skipped = len([status for status in install_results if status.skipped])
+    num_failed = len(install_results) - num_successful
 
     fg = "green"
-    if num_failed >= 0 and num_installed == 0:
+    if num_failed >= 0 and num_successful == 0:
         fg = "red"
-    elif num_failed > 0 and num_installed > 0:
+    elif num_failed > 0 and num_successful > 0:
         fg = "yellow"
 
     if len(plugins) > 1:
         verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
-        click.secho(f"{verb} {num_installed}/{num_installed+num_failed} plugins", fg=fg)
+        click.secho(
+            f"{verb} {num_successful-num_skipped}/{num_successful+num_failed} plugins",
+            fg=fg,
+        )
+    if num_skipped:
+        verb = "Skipped installing"
+        click.secho(
+            f"{verb} {num_skipped}/{num_successful+num_failed} plugins",
+            fg=fg,
+        )
 
     return num_failed == 0
