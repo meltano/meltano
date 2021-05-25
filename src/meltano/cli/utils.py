@@ -1,6 +1,7 @@
 """Defines helpers for use by the CLI."""
 import logging
 import os
+from typing import Optional
 
 import click
 from meltano.core.logging import setup_logging
@@ -105,7 +106,7 @@ def _prompt_plugin_namespace(plugin_type, plugin_name):
     )
 
 
-def _prompt_plugin_pip_url(plugin_name):
+def _prompt_plugin_pip_url(plugin_name: str) -> Optional[str]:
     click.echo()
     click.echo(
         f"Specify the plugin's {click.style('`pip install` argument', fg='blue')}, for example:"
@@ -116,23 +117,26 @@ def _prompt_plugin_pip_url(plugin_name):
     click.echo(f"\tgit+https://gitlab.com/meltano/{plugin_name}.git")
     click.echo("- local directory, in editable/development mode:")
     click.echo(f"\t-e extract/{plugin_name}")
+    click.echo("- 'n' if no installation required")
     click.echo()
     click.echo("Default: plugin name as PyPI package name")
     click.echo()
 
-    return click.prompt(
+    result = click.prompt(
         click.style("(pip_url)", fg="blue"), type=str, default=plugin_name
     )
+    return None if result == "n" else result
 
 
-def _prompt_plugin_executable(pip_url):
+def _prompt_plugin_executable(pip_url: Optional[str], plugin_name: str) -> str:
+    derived_from = "pip_url" if pip_url else "plugin_name"
     click.echo()
     click.echo(f"Specify the package's {click.style('executable name', fg='blue')}")
     click.echo()
-    click.echo("Default: package name derived from `pip_url`")
+    click.echo(f"Default: name derived from `{derived_from}`")
     click.echo()
 
-    package_name, _ = os.path.splitext(os.path.basename(pip_url))
+    package_name, _ = os.path.splitext(os.path.basename(pip_url or plugin_name))
     return click.prompt(click.style("(executable)", fg="blue"), default=package_name)
 
 
@@ -246,7 +250,7 @@ def add_plugin(
     if custom:
         namespace = _prompt_plugin_namespace(plugin_type, plugin_name)
         pip_url = _prompt_plugin_pip_url(plugin_name)
-        executable = _prompt_plugin_executable(pip_url)
+        executable = _prompt_plugin_executable(pip_url, plugin_name)
         capabilities = _prompt_plugin_capabilities(plugin_type)
         settings = _prompt_plugin_settings(plugin_type)
 

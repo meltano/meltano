@@ -31,6 +31,7 @@ class PluginInstallStatus(Enum):
 
     RUNNING = "running"
     SUCCESS = "success"
+    SKIPPED = "skipped"
     ERROR = "error"
     WARNING = "warning"
 
@@ -71,6 +72,9 @@ class PluginInstallState:
                 return "Updated"
 
             return "Installed"
+
+        if self.status is PluginInstallStatus.SKIPPED:
+            return "Skipped installing"
 
         return "Errored"
 
@@ -188,8 +192,8 @@ class PluginInstallService:
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
-                status=PluginInstallStatus.WARNING,
-                message=f"Plugin '{plugin.name}' is not installable",
+                status=PluginInstallStatus.SUCCESS,
+                message=f"Plugin '{plugin.name}' does not require installation",
             )
             self.status_cb(state)
             return state

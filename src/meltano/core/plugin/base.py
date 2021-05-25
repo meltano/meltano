@@ -317,7 +317,7 @@ class BasePlugin(HookObject):
         return self.pip_url is not None
 
     def is_invokable(self):
-        return self.is_installable()
+        return self.is_installable() or self.executable is not None
 
     def is_configurable(self):
         return True
