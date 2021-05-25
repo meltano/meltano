@@ -14,6 +14,7 @@ from .plugin.settings_service import PluginSettingsService
 from .project import Project
 from .project_plugins_service import ProjectPluginsService
 from .venv_service import VenvService, VirtualEnv
+from .utils import expand_env_vars as do_expand_env_vars
 
 
 def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
@@ -161,11 +162,12 @@ class PluginInvoker:
         finally:
             self.cleanup()
 
-    def exec_path(self):
+    def exec_path(self, env=None):
+        expanded_exe = do_expand_env_vars(self.plugin.executable, env)
         if not self.venv_service:
-            return self.plugin.executable
+            return expanded_exe
 
-        return self.venv_service.exec_path(self.plugin.executable)
+        return self.venv_service.exec_path(expanded_exe)
 
     def exec_args(self, *args, command=None, env=None):
         """Materialize the arguments to be passed to the executable."""
@@ -180,7 +182,7 @@ class PluginInvoker:
         else:
             plugin_args = self.plugin.exec_args(self)
 
-        return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
+        return [str(arg) for arg in (self.exec_path(env), *plugin_args, *args)]
 
     def env(self):
         env = {
