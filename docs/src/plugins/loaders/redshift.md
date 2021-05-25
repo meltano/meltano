@@ -3,6 +3,12 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into Amazon Redshift
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/redshift)
+:::
+
 # Redshift
 
 The `target-redshift` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into an [Amazon Redshift](https://aws.amazon.com/redshift/) data warehouse.

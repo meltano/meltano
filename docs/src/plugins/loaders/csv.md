@@ -3,6 +3,12 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into Comma Separated Values (CSV) files
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/csv)
+:::
+
 # Comma Separated Values (CSV)
 
 The `target-csv` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into [Comma Separated Values (CSV)](https://en.wikipedia.org/wiki/Comma-separated_values) files.

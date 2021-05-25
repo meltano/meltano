@@ -3,6 +3,12 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into PostgreSQL
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/postgres)
+:::
+
 # PostgreSQL
 
 The `target-postgres` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into a [PostgreSQL](https://www.postgresql.org/) database.

@@ -3,6 +3,13 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into Snowflake
 ---
 
+
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/snowflake)
+:::
+
 # Snowflake
 
 The `target-snowflake` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into a [Snowflake](https://www.snowflake.com/) data warehouse.

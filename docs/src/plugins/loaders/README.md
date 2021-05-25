@@ -2,6 +2,12 @@
 description: Use Meltano to easily load extracted data into arbitrary data destinations (databases, SaaS APIs, and file formats) using Singer targets.
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/)
+:::
+
 # Destinations (Loaders)
 
 Meltano lets you easily load [extracted](https://hub.meltano.com/extractors/) data into arbitrary data destinations (databases, SaaS APIs, and file formats) using [Singer targets](https://www.singer.io/), which take the role of [your project](/docs/project.html)'s [loader plugins](/docs/plugins.html#loaders).
