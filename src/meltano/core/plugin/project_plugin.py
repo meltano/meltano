@@ -79,6 +79,7 @@ class ProjectPlugin(PluginRef):
         self.set_presentation_attrs(extras)
         self.variant = variant
         self.pip_url = pip_url
+        self.use_venv = self.pip_url is not None
         self.commands = Command.parse_all(commands)
 
         self._fallbacks.update(
