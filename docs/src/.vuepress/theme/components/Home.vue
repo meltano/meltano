@@ -20,7 +20,7 @@
           </router-link>
 
           <SlackChannelLink class="action-button secondary">
-            <SlackIcon /> Join 1000+ on Slack
+            <SlackIcon /> Join 1100+ on Slack
           </SlackChannelLink>
 
           <a
