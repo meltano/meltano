@@ -9,7 +9,10 @@ requirements.txt: ""
 model/.gitkeep: ""
 extract/.gitkeep: ""
 load/.gitkeep: ""
-transform/.gitkeep: ""
+transform/.gitignore: |
+  target/**
+  logs/**
+  dbt_modules/**
 analyze/.gitkeep: ""
 notebook/.gitkeep: ""
 orchestrate/.gitkeep: ""
