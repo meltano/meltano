@@ -486,8 +486,8 @@ class TestCliAdd:
                 plugin_type=PluginType.EXTRACTORS, plugin_name="tap-custom-no-install"
             )
             assert plugin.name == "tap-custom-no-install"
-            assert plugin.is_installable() == False
-            assert plugin.is_invokable() == True
+            assert plugin.is_installable() is False
+            assert plugin.is_invokable() is True
             assert plugin.pip_url is None
 
             plugin_def = plugin.custom_definition
