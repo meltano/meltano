@@ -3,6 +3,12 @@ sidebar: auto
 description: Use Meltano to pull data from a MySQL or MariaDB database and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/mysql)
+:::
+
 # MySQL / MariaDB
 
 The `tap-mysql` [extractor](https://hub.meltano.com/extractors/) pulls data from a [MySQL](https://www.mysql.com/) or [MariaDB](https://mariadb.org/) database.

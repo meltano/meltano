@@ -2,6 +2,12 @@
 description: Use Meltano to easily extract data out of arbitrary data sources (databases, SaaS APIs, and file formats) using Singer taps.
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/)
+:::
+
 # Sources (Extractors)
 
 Meltano lets you easily extract data out of arbitrary data sources (databases, SaaS APIs, and file formats) using [Singer taps](https://www.singer.io/), which take the role of [your project](/docs/project.html)'s [extractor plugins](/docs/plugins.html#extractors).

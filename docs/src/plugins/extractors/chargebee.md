@@ -3,6 +3,12 @@ sidebar: auto
 description: Use Meltano to pull data from the Chargebee API and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/chargebee)
+:::
+
 # Chargebee
 
 The `tap-chargebee` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Chargebee API](https://apidocs.chargebee.com/docs/api).
