@@ -92,7 +92,7 @@ class PluginInvoker:
         self.context = context
 
         self.venv_service: Optional[VenvService] = None
-        if plugin.use_venv or venv_service:
+        if plugin.pip_url or venv_service:
             self.venv_service = venv_service or VenvService(
                 project,
                 name=plugin.name,
@@ -162,12 +162,11 @@ class PluginInvoker:
         finally:
             self.cleanup()
 
-    def exec_path(self, env=None):
-        expanded_exe = do_expand_env_vars(self.plugin.executable, env)
+    def exec_path(self):
         if not self.venv_service:
-            return expanded_exe
+            return self.project.root.join(self.plugin.executable)
 
-        return self.venv_service.exec_path(expanded_exe)
+        return self.venv_service.exec_path(self.plugin.executable)
 
     def exec_args(self, *args, command=None, env=None):
         """Materialize the arguments to be passed to the executable."""
@@ -182,7 +181,7 @@ class PluginInvoker:
         else:
             plugin_args = self.plugin.exec_args(self)
 
-        return [str(arg) for arg in (self.exec_path(env), *plugin_args, *args)]
+        return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
 
     def env(self):
         env = {
@@ -192,10 +191,16 @@ class PluginInvoker:
         }
 
         # Ensure Meltano venv is not inherited
-        venv = VirtualEnv(self.project.venvs_dir(self.plugin.type, self.plugin.name))
-        env["VIRTUAL_ENV"] = str(venv.root)
-        env["PATH"] = os.pathsep.join([str(venv.bin_dir), env["PATH"]])
+        env.pop("VIRTUAL_ENV", None)
         env.pop("PYTHONPATH", None)
+        if self.venv_service:
+            # Switch to plugin-specific venv
+            venv = VirtualEnv(
+                self.project.venvs_dir(self.plugin.type, self.plugin.name)
+            )
+            venv_dir = str(venv.bin_dir)
+            env["VIRTUAL_ENV"] = str(venv.root)
+            env["PATH"] = os.pathsep.join([venv_dir, env["PATH"]])
 
         return env
 

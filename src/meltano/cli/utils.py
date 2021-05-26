@@ -117,7 +117,7 @@ def _prompt_plugin_pip_url(plugin_name: str) -> Optional[str]:
     click.echo(f"\tgit+https://gitlab.com/meltano/{plugin_name}.git")
     click.echo("- local directory, in editable/development mode:")
     click.echo(f"\t-e extract/{plugin_name}")
-    click.echo("- 'n' if no installation required")
+    click.echo("- 'n' if using a local executable (nothing to install)")
     click.echo()
     click.echo("Default: plugin name as PyPI package name")
     click.echo()
@@ -129,11 +129,16 @@ def _prompt_plugin_pip_url(plugin_name: str) -> Optional[str]:
 
 
 def _prompt_plugin_executable(pip_url: Optional[str], plugin_name: str) -> str:
-    derived_from = "pip_url" if pip_url else "plugin_name"
+    derived_from = "`pip_url`"
+    prompt_request = "executable name"
+    if pip_url is None:
+        derived_from = "plugin name"
+        prompt_request = "executable path"
+
     click.echo()
-    click.echo(f"Specify the package's {click.style('executable name', fg='blue')}")
+    click.echo(f"Specify the plugin's {click.style(prompt_request, fg='blue')}")
     click.echo()
-    click.echo(f"Default: name derived from `{derived_from}`")
+    click.echo(f"Default: name derived from {derived_from}")
     click.echo()
 
     package_name, _ = os.path.splitext(os.path.basename(pip_url or plugin_name))
