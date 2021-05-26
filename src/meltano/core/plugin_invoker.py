@@ -164,7 +164,7 @@ class PluginInvoker:
 
     def exec_path(self):
         if not self.venv_service:
-            return self.project.root.join(self.plugin.executable)
+            return self.project.root.joinpath(self.plugin.executable)
 
         return self.venv_service.exec_path(self.plugin.executable)
 
