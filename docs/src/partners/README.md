@@ -26,6 +26,7 @@ More active [contributors](/docs/contributor-guide.html) to Meltano and [related
 | [Applied Labs](https://appliedlabs.io/) | United States: New York; Russia: Moscow; United Kingdom: London; Uzbekistan: Tashkent | 5+ ([1](https://gitlab.com/groups/meltano/-/merge_requests?author_username=kaboomdev&state=all), [2](https://gitlab.com/groups/meltano/-/merge_requests?author_username=dmitry-stadnik&state=all)) |
 | [Auto IDM](https://autoidm.com/) | United States: Michigan | [4](https://gitlab.com/groups/meltano/-/merge_requests?author_username=vischous&state=all) |
 | [AMEND](https://amendllc.com/) | United States: Cincinnati, OH |
+| [ANELEN](https://anelen.co) | United States: Mountain View, CA |
 | [b.telligent](https://www.btelligent.com/) | Germany: Berlin, Düsseldorf, Frankfurt, Hamburg, Hannover |
 | [Commencis](https://www.commencis.com/) | Turkey: Istanbul; United Kingdom: London |
 | [Datateer](https://www.datateer.com/) | United States: Denver, CO |
@@ -58,7 +59,7 @@ Their maintainers are:
 | [Mashey](https://www.mashey.com/) | 2 extractors |
 | [Adswerve](https://adswerve.com/) | 1 loader |
 | [Andy Huynh](https://github.com/andyh1203) | 1 loader |
-| [Anelen](https://anelen.co/) | 1 extractor |
+| [ANELEN](https://anelen.co/) | 1 extractor |
 | [Eric Simmerman](https://github.com/ets) | 1 extractor |
 | [Twilio](https://www.twilio.com/) | 1 extractor |
 
