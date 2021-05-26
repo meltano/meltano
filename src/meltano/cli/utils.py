@@ -132,7 +132,7 @@ def _prompt_plugin_executable(pip_url: Optional[str], plugin_name: str) -> str:
     derived_from = "`pip_url`"
     prompt_request = "executable name"
     if pip_url is None:
-        derived_from = "plugin name"
+        derived_from = "the plugin name"
         prompt_request = "executable path"
 
     click.echo()
