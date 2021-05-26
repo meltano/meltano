@@ -57,7 +57,7 @@ class PluginInstallState:
     @property
     def successful(self):
         """If the installation completed without error."""
-        return self.status in (PluginInstallStatus.SUCCESS, PluginInstallStatus.SKIPPED)
+        return self.status in {PluginInstallStatus.SUCCESS, PluginInstallStatus.SKIPPED}
 
     @property
     def skipped(self):
