@@ -13,8 +13,8 @@ from .plugin.project_plugin import ProjectPlugin
 from .plugin.settings_service import PluginSettingsService
 from .project import Project
 from .project_plugins_service import ProjectPluginsService
-from .venv_service import VenvService, VirtualEnv
 from .utils import expand_env_vars as do_expand_env_vars
+from .venv_service import VenvService, VirtualEnv
 
 
 def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
