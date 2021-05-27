@@ -141,7 +141,8 @@ def _prompt_plugin_executable(pip_url: Optional[str], plugin_name: str) -> str:
     click.echo(f"Default: name derived from {derived_from}")
     click.echo()
 
-    package_name, _ = os.path.splitext(os.path.basename(pip_url or plugin_name))
+    plugin_basename = os.path.basename(pip_url or plugin_name)
+    package_name, _ = os.path.splitext(plugin_basename)
     return click.prompt(click.style("(executable)", fg="blue"), default=package_name)
 
 
