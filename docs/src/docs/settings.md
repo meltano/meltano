@@ -19,7 +19,7 @@ control. Sensitive values like passwords and tokens are most appropriately store
 ## Plugin settings
 
 For plugin settings, refer to the specific plugin's documentation
-([extractors](/plugins/extractors/), [loaders](/plugins/loaders/)),
+([extractors](https://hub.meltano.com/extractors/), [loaders](https://hub.meltano.com/loaders/)),
 or use [`meltano config <plugin> list`](/docs/command-line-interface.html#config)
 to list all available settings with their names, environment variables, and current values.
 
