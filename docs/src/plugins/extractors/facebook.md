@@ -3,9 +3,15 @@ sidebar: auto
 description: Use Meltano to pull data from the Facebook Ads API and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/facebook)
+:::
+
 # Facebook Ads
 
-The `tap-facebook` [extractor](/plugins/extractors/) pulls data from the [Facebook Ads API](https://developers.facebook.com/docs/marketing-apis).
+The `tap-facebook` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Facebook Ads API](https://developers.facebook.com/docs/marketing-apis).
 
 - **Repository**: <https://gitlab.com/meltano/tap-facebook>
 - **Maintainer**: Meltano community

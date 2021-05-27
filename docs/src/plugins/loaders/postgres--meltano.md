@@ -3,9 +3,15 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into PostgreSQL
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/postgres--meltano)
+:::
+
 # PostgreSQL (`meltano` variant)
 
-The `target-postgres` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [PostgreSQL](https://www.postgresql.org/) database.
+The `target-postgres` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into a [PostgreSQL](https://www.postgresql.org/) database.
 
 - **Repository**: <https://github.com/meltano/target-postgres>
 - **Maintainer**: Meltano community
@@ -203,7 +209,7 @@ export TARGET_POSTGRES_URL=postgresql://<username>:<password>@<host>:<port>/<dat
 
 - Name: `schema`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_POSTGRES_SCHEMA`, alias: `PG_SCHEMA`, `POSTGRES_SCHEMA`
-- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html).
+- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](https://hub.meltano.com/extractors/gitlab.html).
 
 #### How to use
 
