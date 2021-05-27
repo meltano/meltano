@@ -28,6 +28,7 @@ More active [contributors](/docs/contributor-guide.html) to Meltano and [related
 | [AMEND](https://amendllc.com/) | United States: Cincinnati, OH |
 | [ANELEN](https://anelen.co) | United States: Mountain View, CA |
 | [b.telligent](https://www.btelligent.com/) | Germany: Berlin, Düsseldorf, Frankfurt, Hamburg, Hannover |
+| [Bytecode IO](https://bytecode.io/) | United States: Walnut Creek, CA |
 | [Commencis](https://www.commencis.com/) | Turkey: Istanbul; United Kingdom: London |
 | [Datateer](https://www.datateer.com/) | United States: Denver, CO |
 | [Mashey](https://www.mashey.com/) | United States: Denver, CO |
