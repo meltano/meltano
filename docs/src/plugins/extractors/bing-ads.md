@@ -3,9 +3,15 @@ sidebar: auto
 description: Use Meltano to pull data from the Bing Ads API and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/bing-ads)
+:::
+
 # Bing Ads
 
-The `tap-bing-ads` [extractor](/plugins/extractors/) pulls data from the [Bing Ads API](https://docs.microsoft.com/en-us/advertising/guides/).
+The `tap-bing-ads` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Bing Ads API](https://docs.microsoft.com/en-us/advertising/guides/).
 
 - **Repository**: <https://github.com/singer-io/tap-bing-ads>
 - **Maintainer**: [Stitch](https://www.stitchdata.com/)

@@ -3,9 +3,15 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into PostgreSQL
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/postgres)
+:::
+
 # PostgreSQL
 
-The `target-postgres` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [PostgreSQL](https://www.postgresql.org/) database.
+The `target-postgres` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into a [PostgreSQL](https://www.postgresql.org/) database.
 
 - **Repository**: <https://github.com/datamill-co/target-postgres>
 - **Maintainer**: [Data Mill](https://datamill.co/)
@@ -186,7 +192,7 @@ export TARGET_POSTGRES_PASSWORD=<password>
 
 - Name: `postgres_schema`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_POSTGRES_SCHEMA`, alias: `TARGET_POSTGRES_POSTGRES_SCHEMA`
-- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html).
+- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](https://hub.meltano.com/extractors/gitlab.html).
 
 #### How to use
 
@@ -517,7 +523,7 @@ This error message indicates that the extractor you are using this loader with g
 stream names that include the source database schema in addition to the table name: `<schema>-<table>`, e.g. `public-accounts`.
 This is not supported by [this variant](#alternative-variants) of `target-postgres`.
 
-Instead, use the [`transferwise` variant](/plugins/loaders/postgres--transferwise.html) which was made to be used with extractors that behave this way.
+Instead, use the [`transferwise` variant](https://hub.meltano.com/loaders/postgres--transferwise.html) which was made to be used with extractors that behave this way.
 
 ### Error: `pg_config executable not found` or `libpq-fe.h: No such file or directory`
 

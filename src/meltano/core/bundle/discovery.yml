@@ -8,7 +8,7 @@ extractors:
     description: Advertising Platform
     namespace: tap_adwords
     variant: meltano
-    docs: 'https://meltano.com/plugins/extractors/adwords.html'
+    docs: 'https://hub.meltano.com/extractors/adwords.html'
     repo: https://gitlab.com/meltano/tap-adwords
     pip_url: 'git+https://gitlab.com/meltano/tap-adwords.git'
     capabilities:
@@ -273,7 +273,7 @@ extractors:
     description: BigQuery data warehouse extractor
     namespace: tap_bigquery
     variant: anelendata
-    docs: https://meltano.com/plugins/extractors/bigquery.html
+    docs: https://hub.meltano.com/extractors/bigquery.html
     repo: https://github.com/anelendata/tap-bigquery
     pip_url: tap-bigquery
     capabilities:
@@ -309,7 +309,7 @@ extractors:
     description: Advertising Platform
     namespace: tap_bing_ads
     variant: singer-io
-    docs: 'https://meltano.com/plugins/extractors/bing-ads.html'
+    docs: 'https://hub.meltano.com/extractors/bing-ads.html'
     repo: https://github.com/singer-io/tap-bing-ads
     pip_url: tap-bing-ads
     capabilities:
@@ -468,7 +468,7 @@ extractors:
     label: Chargebee
     description: Subscription billing software
     variant: hotgluexyz
-    docs: https://meltano.com/plugins/extractors/chargebee.html
+    docs: https://hub.meltano.com/extractors/chargebee.html
     repo: https://github.com/hotgluexyz/tap-chargebee
     pip_url: git+https://github.com/hotgluexyz/tap-chargebee.git
     capabilities:
@@ -510,7 +510,7 @@ extractors:
     description: Generic data extractor of CSV (comma separated value) files
     namespace: tap_csv
     variant: meltano
-    docs: 'https://meltano.com/plugins/extractors/csv.html'
+    docs: 'https://hub.meltano.com/extractors/csv.html'
     repo: https://gitlab.com/meltano/tap-csv
     pip_url: 'git+https://gitlab.com/meltano/tap-csv.git'
     capabilities:
@@ -534,7 +534,7 @@ extractors:
     description: Advertising Platform
     namespace: tap_facebook
     variant: meltano
-    docs: 'https://meltano.com/plugins/extractors/facebook.html'
+    docs: 'https://hub.meltano.com/extractors/facebook.html'
     repo: https://gitlab.com/meltano/tap-facebook
     pip_url: 'git+https://gitlab.com/meltano/tap-facebook.git'
     capabilities:
@@ -571,7 +571,7 @@ extractors:
     description: Edge cloud computing services provider
     namespace: tap_fastly
     variant: meltano
-    docs: 'https://meltano.com/plugins/extractors/fastly.html'
+    docs: 'https://hub.meltano.com/extractors/fastly.html'
     repo: https://gitlab.com/meltano/tap-fastly
     pip_url: 'git+https://gitlab.com/meltano/tap-fastly.git'
     capabilities:
@@ -591,7 +591,7 @@ extractors:
     description: Single application for the entire DevOps lifecycle
     namespace: tap_gitlab
     variant: meltano
-    docs: 'https://meltano.com/plugins/extractors/gitlab.html'
+    docs: 'https://hub.meltano.com/extractors/gitlab.html'
     repo: https://gitlab.com/meltano/tap-gitlab
     pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
     capabilities:
@@ -648,7 +648,7 @@ extractors:
     description: App and website analytics platform hosted by Google
     namespace: tap_google_analytics
     variant: meltano
-    docs: 'https://meltano.com/plugins/extractors/google-analytics.html'
+    docs: 'https://hub.meltano.com/extractors/google-analytics.html'
     repo: https://gitlab.com/meltano/tap-google-analytics
     pip_url: 'git+https://gitlab.com/meltano/tap-google-analytics.git'
     capabilities:
@@ -703,7 +703,7 @@ extractors:
     label: Sage Intacct
     description: Financial management software
     variant: hotgluexyz
-    docs: https://meltano.com/plugins/extractors/intacct.html
+    docs: https://hub.meltano.com/extractors/intacct.html
     repo: https://github.com/hotgluexyz/tap-intacct
     pip_url: git+https://github.com/hotgluexyz/tap-intacct.git
     capabilities:
@@ -752,7 +752,7 @@ extractors:
     description: Marketing automation for account-based marketing
     namespace: tap_marketo
     variant: meltano
-    docs: 'https://meltano.com/plugins/extractors/marketo.html'
+    docs: 'https://hub.meltano.com/extractors/marketo.html'
     repo: https://gitlab.com/meltano/tap-marketo
     pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
     capabilities: []
@@ -771,7 +771,7 @@ extractors:
     description: General purpose, document-based, distributed database
     namespace: tap_mongodb
     variant: singer-io
-    docs: 'https://meltano.com/plugins/extractors/mongodb.html'
+    docs: 'https://hub.meltano.com/extractors/mongodb.html'
     repo: https://github.com/singer-io/tap-mongodb
     pip_url: tap-mongodb
     capabilities:
@@ -812,7 +812,7 @@ extractors:
     description: MySQL / MariaDB database extractor
     namespace: tap_mysql
     variant: transferwise
-    docs: https://meltano.com/plugins/extractors/mysql.html
+    docs: https://hub.meltano.com/extractors/mysql.html
     repo: https://github.com/transferwise/pipelinewise-tap-mysql
     pip_url: pipelinewise-tap-mysql
     capabilities:
@@ -854,7 +854,7 @@ extractors:
     description: PostgreSQL database extractor
     namespace: tap_postgres
     variant: transferwise
-    docs: https://meltano.com/plugins/extractors/postgres.html
+    docs: https://hub.meltano.com/extractors/postgres.html
     repo: https://github.com/transferwise/pipelinewise-tap-postgres
     pip_url: pipelinewise-tap-postgres
     capabilities:
@@ -912,7 +912,7 @@ extractors:
     description: Subscription payments platform
     namespace: tap_recharge
     variant: singer-io
-    docs: 'https://meltano.com/plugins/extractors/recharge.html'
+    docs: 'https://hub.meltano.com/extractors/recharge.html'
     repo: https://github.com/singer-io/tap-recharge
     pip_url: tap-recharge==1.0.3
     capabilities:
@@ -936,7 +936,7 @@ extractors:
     description: Customer-relationship management & customer success platform
     namespace: tap_salesforce
     variant: meltano
-    docs: 'https://meltano.com/plugins/extractors/salesforce.html'
+    docs: 'https://hub.meltano.com/extractors/salesforce.html'
     repo: https://gitlab.com/meltano/tap-salesforce
     pip_url: 'git+https://gitlab.com/meltano/tap-salesforce.git'
     capabilities:
@@ -965,7 +965,7 @@ extractors:
         label: Security Token
         placeholder: Ex. *****************
         description: Your Salesforce Account access token
-        documentation: https://meltano.com/plugins/extractors/salesforce.html#salesforce-setup
+        documentation: https://hub.meltano.com/extractors/salesforce.html#salesforce-setup
 
       - name: client_id
         label: Client ID
@@ -1008,7 +1008,7 @@ extractors:
     label: Quickbooks
     description: Accounting management platform
     variant: hotgluexyz
-    docs: https://meltano.com/plugins/extractors/quickbooks.html
+    docs: https://hub.meltano.com/extractors/quickbooks.html
     repo: https://github.com/hotgluexyz/tap-quickbooks
     pip_url: git+https://github.com/hotgluexyz/tap-quickbooks.git
     capabilities:
@@ -1057,7 +1057,7 @@ extractors:
     description: Ecommerce platform
     namespace: tap_shopify
     variant: singer-io
-    docs: 'https://meltano.com/plugins/extractors/shopify.html'
+    docs: 'https://hub.meltano.com/extractors/shopify.html'
     repo: https://github.com/singer-io/tap-shopify
     pip_url: tap-shopify
     capabilities:
@@ -1092,7 +1092,7 @@ extractors:
     label: Slack
     description: Team communication tool
     namespace: tap_slack
-    docs: 'https://meltano.com/plugins/extractors/slack.html'
+    docs: 'https://hub.meltano.com/extractors/slack.html'
     repo: https://github.com/Mashey/tap-slack
     pip_url: git+https://github.com/Mashey/tap-slack.git
     capabilities:
@@ -1137,7 +1137,7 @@ extractors:
     label: Spreadsheets Anywhere
     description: Data extractor for CSV and Excel files from any smart_open supported transport (S3, SFTP, localhost, etc...)
     namespace: tap_spreadsheets_anywhere
-    docs: 'https://meltano.com/plugins/extractors/spreadsheets-anywhere.html'
+    docs: 'https://hub.meltano.com/extractors/spreadsheets-anywhere.html'
     repo: https://github.com/ets/tap-spreadsheets-anywhere
     pip_url: git+https://github.com/ets/tap-spreadsheets-anywhere.git
     capabilities:
@@ -1153,7 +1153,7 @@ extractors:
     description: Online payment processing for internet businesses
     namespace: tap_stripe
     variant: meltano
-    docs: 'https://meltano.com/plugins/extractors/stripe.html'
+    docs: 'https://hub.meltano.com/extractors/stripe.html'
     repo: https://github.com/meltano/tap-stripe
     pip_url: 'git+https://github.com/meltano/tap-stripe.git'
     capabilities:
@@ -1179,7 +1179,7 @@ extractors:
     namespace: tap_zendesk
     variants:
       - name: twilio-labs
-        docs: 'https://meltano.com/plugins/extractors/zendesk.html'
+        docs: 'https://hub.meltano.com/extractors/zendesk.html'
         repo: https://github.com/twilio-labs/twilio-tap-zendesk
         pip_url: twilio-tap-zendesk
         capabilities:
@@ -1212,7 +1212,7 @@ extractors:
             kind: date_iso8601
             description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
       - name: singer-io
-        docs: 'https://meltano.com/plugins/extractors/zendesk.html'
+        docs: 'https://hub.meltano.com/extractors/zendesk.html'
         repo: https://github.com/singer-io/tap-zendesk
         pip_url: tap-zendesk
         capabilities:
@@ -1249,7 +1249,7 @@ extractors:
     description: Video conferencing software
     namespace: tap_zoom
     variant: mashey
-    docs: 'https://meltano.com/plugins/extractors/zoom.html'
+    docs: 'https://hub.meltano.com/extractors/zoom.html'
     repo: https://github.com/mashey/tap-zoom
     pip_url: 'git+https://github.com/mashey/tap-zoom.git'
     capabilities:
@@ -1289,7 +1289,7 @@ loaders:
     description: BigQuery loader
     namespace: target_bigquery
     variant: adswerve
-    docs: https://meltano.com/plugins/loaders/bigquery.html
+    docs: https://hub.meltano.com/loaders/bigquery.html
     repo: https://github.com/adswerve/target-bigquery
     pip_url: git+https://github.com/adswerve/target-bigquery.git@v0.10.2
     dialect: bigquery
@@ -1339,7 +1339,7 @@ loaders:
     description: CSV loader
     namespace: target_csv
     variant: singer-io
-    docs: 'https://meltano.com/plugins/loaders/csv.html'
+    docs: 'https://hub.meltano.com/loaders/csv.html'
     repo: https://github.com/singer-io/target-csv
     pip_url: target-csv
     settings:
@@ -1373,7 +1373,7 @@ loaders:
     description: JSONL loader
     namespace: target_jsonl
     variant: andyh1203
-    docs: https://meltano.com/plugins/loaders/jsonl.html
+    docs: https://hub.meltano.com/loaders/jsonl.html
     repo: https://github.com/andyh1203/target-jsonl
     pip_url: target-jsonl
     settings:
@@ -1393,7 +1393,7 @@ loaders:
     target_schema: $TARGET_POSTGRES_SCHEMA
     variants:
       - name: datamill-co
-        docs: https://meltano.com/plugins/loaders/postgres.html
+        docs: https://hub.meltano.com/loaders/postgres.html
         repo: https://github.com/datamill-co/target-postgres
         pip_url: singer-target-postgres
         settings_group_validation:
@@ -1499,7 +1499,7 @@ loaders:
           - name: after_run_sql
             description: Raw SQL statement(s) to execute as soon as the connection to Postgres is opened by the target. Useful for setup like `SET ROLE` or other connection state that is important.
       - name: transferwise
-        docs: https://meltano.com/plugins/loaders/postgres--transferwise.html
+        docs: https://hub.meltano.com/loaders/postgres--transferwise.html
         repo: https://github.com/transferwise/pipelinewise-target-postgres
         pip_url: pipelinewise-target-postgres
         settings_group_validation:
@@ -1583,7 +1583,7 @@ loaders:
             description: "(Default: platform-dependent) Directory of temporary CSV files with RECORD messages."
       - name: meltano
         original: true
-        docs: 'https://meltano.com/plugins/loaders/postgres--meltano.html'
+        docs: 'https://hub.meltano.com/loaders/postgres--meltano.html'
         repo: https://github.com/meltano/target-postgres
         pip_url: 'git+https://github.com/meltano/target-postgres.git'
         settings_group_validation:
@@ -1626,7 +1626,7 @@ loaders:
     target_schema: $TARGET_SNOWFLAKE_SCHEMA
     variants:
       - name: datamill-co
-        docs: https://meltano.com/plugins/loaders/snowflake.html
+        docs: https://hub.meltano.com/loaders/snowflake.html
         repo: https://github.com/datamill-co/target-snowflake
         pip_url: target-snowflake
         settings_group_validation:
@@ -1710,7 +1710,7 @@ loaders:
           - name: target_s3.aws_secret_access_key
             kind: password
       - name: transferwise
-        docs: https://meltano.com/plugins/loaders/snowflake--transferwise.html
+        docs: https://hub.meltano.com/loaders/snowflake--transferwise.html
         repo: https://github.com/transferwise/pipelinewise-target-snowflake
         pip_url: pipelinewise-target-snowflake
         settings_group_validation:
@@ -1832,7 +1832,7 @@ loaders:
             description: Optional string to tag executed queries in Snowflake. Replaces tokens `schema` and `table` with the appropriate values. The tags are displayed in the output of the Snowflake `QUERY_HISTORY`, `QUERY_HISTORY_BY_*` functions.
       - name: meltano
         original: true
-        docs: https://meltano.com/plugins/loaders/snowflake--meltano.html
+        docs: https://hub.meltano.com/loaders/snowflake--meltano.html
         repo: https://gitlab.com/meltano/target-snowflake
         pip_url: git+https://gitlab.com/meltano/target-snowflake.git
         settings_group_validation:
@@ -1873,7 +1873,7 @@ loaders:
     description: SQLite database loader
     namespace: target_sqlite
     variant: meltano
-    docs: 'https://meltano.com/plugins/loaders/sqlite.html'
+    docs: 'https://hub.meltano.com/loaders/sqlite.html'
     repo: https://gitlab.com/meltano/target-sqlite
     pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
     dialect: sqlite
@@ -1898,7 +1898,7 @@ loaders:
     namespace: target_redshift
     variant: transferwise
     repo: https://github.com/transferwise/pipelinewise-target-redshift
-    docs: https://meltano.com/plugins/loaders/redshift.html
+    docs: https://hub.meltano.com/loaders/redshift.html
     pip_url: pipelinewise-target-redshift
     executable: target-redshift
     capabilities:

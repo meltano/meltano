@@ -3,9 +3,15 @@ sidebar: auto
 description: Use Meltano to pull data from the Zendesk API and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/zendesk--singer-io)
+:::
+
 # Zendesk (`singer-io` variant)
 
-The `tap-zendesk` [extractor](/plugins/extractors/) pulls data from the [Zendesk API](https://developer.zendesk.com/rest_api).
+The `tap-zendesk` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Zendesk API](https://developer.zendesk.com/rest_api).
 
 - **Repository**: <https://github.com/singer-io/tap-zendesk>
 - **Maintainer**: [Stitch](https://www.stitchdata.com/)

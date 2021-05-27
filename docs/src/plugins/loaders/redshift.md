@@ -3,9 +3,15 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into Amazon Redshift
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/redshift)
+:::
+
 # Redshift
 
-The `target-redshift` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into an [Amazon Redshift](https://aws.amazon.com/redshift/) data warehouse.
+The `target-redshift` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into an [Amazon Redshift](https://aws.amazon.com/redshift/) data warehouse.
 
 - **Repository**: <https://github.com/transferwise/pipelinewise-target-redshift>
 - **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/targets/redshift.html>
@@ -351,7 +357,7 @@ export TARGET_REDSHIFT_COPY_OPTIONS=<copy_options>
 
 - Name: `default_target_schema`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_REDSHIFT_DEFAULT_TARGET_SCHEMA`
-- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html).
+- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](https://hub.meltano.com/extractors/gitlab.html).
 
 Name of the schema where the tables will be created. If [`schema_mapping`](#schema-mapping) is not defined then every stream sent by the tap is loaded into this schema.
 

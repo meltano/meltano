@@ -3,9 +3,15 @@ sidebar: auto
 description: Use Meltano to pull data from the Shopify API and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/shopify)
+:::
+
 # Shopify
 
-The `tap-shopify` [extractor](/plugins/extractors/) pulls data from the [Shopify API](https://shopify.dev/docs/admin-api/rest/reference).
+The `tap-shopify` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Shopify API](https://shopify.dev/docs/admin-api/rest/reference).
 
 - **Repository**: <https://github.com/singer-io/tap-shopify>
 - **Maintainer**: [Stitch](https://www.stitchdata.com/)
