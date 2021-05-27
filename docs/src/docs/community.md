@@ -30,6 +30,14 @@ Our next demo days are:
 
 Use [this link][gcal] to view the full events calendar. View past office hours in our [YouTube Playlist][demodayplaylist].
 
+### Guidelines
+
+We aim to have Demo Day primarily as a way to have community members showcase the work they've been doing, whether it's related to Meltano or not.
+As such, we will limit the number of vendors presenting to a maximum of 1 per Demo Day. 
+
+We will prioritize vendors that don't have a strong overlap with the core capabilities of Meltano. 
+Ideally, a vendor would be able to share how their product could be compatible with Meltano or with one of the open source plugins detailed in the MeltanoHub.
+
 ## Office Hours
 
 We have Office Hours weekly on Wednesday at 9 AM Pacific (16:00 UTC). Join us on Zoom and bring any questions you have to the team. We will share the Zoom link in Slack and via social media prior to the event. There is sometimes a short presentation about something top of mind from the core team, but otherwise this is your time to chat with us and get some help. Use [this link][gcal] to view the events calendar. We also have the #office-hours Slack channel for planning and discussion.
