@@ -31,6 +31,7 @@ class PluginInstallStatus(Enum):
 
     RUNNING = "running"
     SUCCESS = "success"
+    SKIPPED = "skipped"
     ERROR = "error"
     WARNING = "warning"
 
@@ -56,9 +57,14 @@ class PluginInstallState:
     @property
     def successful(self):
         """If the installation completed without error."""
-        return self.status is PluginInstallStatus.SUCCESS
+        return self.status in {PluginInstallStatus.SUCCESS, PluginInstallStatus.SKIPPED}
 
     @property
+    def skipped(self):
+        """Return 'True' if the installation was skipped / not needed."""
+        return self.status == PluginInstallStatus.SKIPPED
+
+    @property  # noqa: WPS212  # Too many return statements
     def verb(self):
         """Verb form of status."""
         if self.status is PluginInstallStatus.RUNNING:
@@ -71,6 +77,9 @@ class PluginInstallState:
                 return "Updated"
 
             return "Installed"
+
+        if self.status is PluginInstallStatus.SKIPPED:
+            return "Skipped installing"
 
         return "Errored"
 
@@ -188,8 +197,8 @@ class PluginInstallService:
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
-                status=PluginInstallStatus.WARNING,
-                message=f"Plugin '{plugin.name}' is not installable",
+                status=PluginInstallStatus.SKIPPED,
+                message=f"Plugin '{plugin.name}' does not require installation",
             )
             self.status_cb(state)
             return state

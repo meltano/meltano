@@ -1,4 +1,3 @@
-import functools
 import os
 from unittest import mock
 
@@ -10,6 +9,7 @@ from meltano.core.m5o.dashboards_service import DashboardsService
 from meltano.core.m5o.reports_service import ReportsService
 from meltano.core.plugin import PluginRef, PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
 
 
@@ -457,6 +457,55 @@ class TestCliAdd:
 
             assert [s.name for s in plugin_variant.settings] == ["baz", "qux"]
             assert plugin.settings == plugin_variant.settings
+
+            install_plugin_mock.assert_called_once_with(
+                project, [plugin], reason=PluginInstallReason.ADD
+            )
+
+    def test_add_custom_no_install(self, project, cli_runner, project_plugins_service):
+        executable = "tap-custom-noinstall"
+        stdin = os.linesep.join(
+            # namespace, pip_url, executable, capabilities, settings
+            [
+                "tap_custom_noinstall",
+                "n",
+                executable,
+                "foo,bar",
+                "baz,qux",
+            ]
+        )
+
+        with mock.patch(
+            "meltano.cli.add.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            res = cli_runner.invoke(
+                cli,
+                ["add", "--custom", "extractor", executable],
+                input=stdin,
+            )
+            assert_cli_runner(res)
+
+            plugin: ProjectPlugin = project_plugins_service.find_plugin(
+                plugin_type=PluginType.EXTRACTORS,
+                plugin_name=executable,
+            )
+            assert plugin.name == executable
+            assert plugin.is_installable() is False
+            assert plugin.is_invokable() is True
+            assert plugin.pip_url is None
+
+            plugin_def = plugin.custom_definition
+            plugin_variant = plugin.custom_definition.variants[0]
+
+            assert plugin_def.type == plugin.type
+            assert plugin_def.name == plugin.name == executable
+
+            assert plugin_variant.name is None
+
+            assert plugin.pip_url is None and plugin_variant.pip_url is None
+            assert plugin.executable == plugin_variant.executable == executable
 
             install_plugin_mock.assert_called_once_with(
                 project, [plugin], reason=PluginInstallReason.ADD
