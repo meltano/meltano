@@ -501,16 +501,11 @@ class TestCliAdd:
 
             assert plugin_def.type == plugin.type
             assert plugin_def.name == plugin.name == executable
-            assert plugin_def.namespace == plugin.namespace == executable
 
             assert plugin_variant.name is None
 
             assert plugin.pip_url is None and plugin_variant.pip_url is None
             assert plugin.executable == plugin_variant.executable == executable
-            assert plugin.capabilities == plugin_variant.capabilities == ["foo", "bar"]
-
-            assert [s.name for s in plugin_variant.settings] == ["baz", "qux"]
-            assert plugin.settings == plugin_variant.settings
 
             install_plugin_mock.assert_called_once_with(
                 project, [plugin], reason=PluginInstallReason.ADD
