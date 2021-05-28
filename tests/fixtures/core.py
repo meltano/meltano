@@ -85,6 +85,24 @@ def discovery():
         }
     )
 
+    discovery[PluginType.EXTRACTORS].append(
+        {
+            "name": "tap-mock-noinstall",
+            "label": "Mock",
+            "namespace": "tap_mock_noinstall",
+            "variants": [
+                {
+                    "name": "meltano",
+                    "executable": "tap-mock-noinstall",
+                    "capabilities": ["discover", "catalog", "state"],
+                    "settings": [
+                        {"name": "test", "value": "mock"},
+                        {"name": "start_date"},
+                    ],
+                },
+            ],
+        }
+    )
     discovery[PluginType.LOADERS].append(
         {
             "name": "target-mock",
@@ -279,6 +297,18 @@ def inherited_tap(project_add_service, tap):
                 "cmd": "cmd inherited",
                 "cmd-inherited": "cmd-inherited",
             },
+        )
+    except PluginAlreadyAddedException as err:
+        return err.plugin
+
+
+@pytest.fixture(scope="class")
+def nonpip_tap(project_add_service):
+    try:
+        return project_add_service.add(
+            PluginType.EXTRACTORS,
+            "tap-mock-noinstall",
+            executable="tap-mock-noinstall",
         )
     except PluginAlreadyAddedException as err:
         return err.plugin
