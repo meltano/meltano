@@ -15,6 +15,12 @@ class TestPluginInvoker:
         with subject.prepared(session):
             yield subject
 
+    @pytest.fixture
+    def nonpip_plugin_invoker(self, nonpip_tap, session, plugin_invoker_factory):
+        subject = plugin_invoker_factory(nonpip_tap)
+        with subject.prepared(session):
+            yield subject
+
     def test_env(self, project, tap, session, plugin_invoker_factory):
         project.dotenv.touch()
         dotenv.set_key(project.dotenv, "DUMMY_ENV_VAR", "from_dotenv")
@@ -87,3 +93,18 @@ class TestPluginInvoker:
             "Command 'cmd' referenced unset environment variable '$ENV_VAR_ARG' in an argument"
             in str(err.value)  # noqa: WPS441
         )
+
+    @pytest.mark.parametrize(
+        "executable_str,assert_fn",
+        [
+            ("./tap-test", lambda exe: exe.endswith("meltano_project/tap-test")),
+            ("/apps/tap-test", lambda exe: exe == "/apps/tap-test"),
+        ],
+    )
+    def test_expand_nonpip_command_exec_args(
+        self, nonpip_plugin_invoker, executable_str, assert_fn
+    ):
+        nonpip_plugin_invoker.plugin.executable = executable_str
+        exec_args = nonpip_plugin_invoker.exec_args()
+
+        assert assert_fn(exec_args[0])

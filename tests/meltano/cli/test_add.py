@@ -463,10 +463,16 @@ class TestCliAdd:
             )
 
     def test_add_custom_no_install(self, project, cli_runner, project_plugins_service):
-        executable = "echo 'Success!'"
+        executable = "tap-custom-noinstall"
         stdin = os.linesep.join(
             # namespace, pip_url, executable, capabilities, settings
-            ["tap_custom_no_install", "n", executable, "foo,bar", "baz,qux"]
+            [
+                "tap_custom_noinstall",
+                "n",
+                executable,
+                "foo,bar",
+                "baz,qux",
+            ]
         )
 
         with mock.patch(
@@ -476,15 +482,16 @@ class TestCliAdd:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
                 cli,
-                ["add", "--custom", "extractor", "tap-custom-no-install"],
+                ["add", "--custom", "extractor", executable],
                 input=stdin,
             )
             assert_cli_runner(res)
 
             plugin: ProjectPlugin = project_plugins_service.find_plugin(
-                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-custom-no-install"
+                plugin_type=PluginType.EXTRACTORS,
+                plugin_name=executable,
             )
-            assert plugin.name == "tap-custom-no-install"
+            assert plugin.name == executable
             assert plugin.is_installable() is False
             assert plugin.is_invokable() is True
             assert plugin.pip_url is None
@@ -493,8 +500,8 @@ class TestCliAdd:
             plugin_variant = plugin.custom_definition.variants[0]
 
             assert plugin_def.type == plugin.type
-            assert plugin_def.name == plugin.name == "tap-custom-no-install"
-            assert plugin_def.namespace == plugin.namespace == "tap_custom_no_install"
+            assert plugin_def.name == plugin.name == executable
+            assert plugin_def.namespace == plugin.namespace == executable
 
             assert plugin_variant.name is None
 
