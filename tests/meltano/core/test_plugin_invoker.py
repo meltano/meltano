@@ -103,9 +103,15 @@ class TestPluginInvoker:
         ],
     )
     def test_expand_nonpip_command_exec_args(
-        self, nonpip_plugin_invoker, executable_str, assert_fn
+        self, nonpip_plugin_invoker, session, executable_str, assert_fn
     ):
         nonpip_plugin_invoker.plugin.executable = executable_str
         exec_args = nonpip_plugin_invoker.exec_args()
 
         assert assert_fn(exec_args[0])
+
+        nonpip_plugin_invoker.prepare(session)
+        env = nonpip_plugin_invoker.env()
+
+        assert "VIRTUAL_ENV" not in env
+        assert "PYTHONPATH" not in env
