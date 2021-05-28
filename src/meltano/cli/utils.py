@@ -1,6 +1,7 @@
 """Defines helpers for use by the CLI."""
 import logging
 import os
+from typing import Optional
 
 import click
 from meltano.core.logging import setup_logging
@@ -105,7 +106,7 @@ def _prompt_plugin_namespace(plugin_type, plugin_name):
     )
 
 
-def _prompt_plugin_pip_url(plugin_name):
+def _prompt_plugin_pip_url(plugin_name: str) -> Optional[str]:
     click.echo()
     click.echo(
         f"Specify the plugin's {click.style('`pip install` argument', fg='blue')}, for example:"
@@ -116,23 +117,32 @@ def _prompt_plugin_pip_url(plugin_name):
     click.echo(f"\tgit+https://gitlab.com/meltano/{plugin_name}.git")
     click.echo("- local directory, in editable/development mode:")
     click.echo(f"\t-e extract/{plugin_name}")
+    click.echo("- 'n' if using a local executable (nothing to install)")
     click.echo()
     click.echo("Default: plugin name as PyPI package name")
     click.echo()
 
-    return click.prompt(
+    result = click.prompt(
         click.style("(pip_url)", fg="blue"), type=str, default=plugin_name
     )
+    return None if result == "n" else result
 
 
-def _prompt_plugin_executable(pip_url):
+def _prompt_plugin_executable(pip_url: Optional[str], plugin_name: str) -> str:
+    derived_from = "`pip_url`"
+    prompt_request = "executable name"
+    if pip_url is None:
+        derived_from = "the plugin name"
+        prompt_request = "executable path"
+
     click.echo()
-    click.echo(f"Specify the package's {click.style('executable name', fg='blue')}")
+    click.echo(f"Specify the plugin's {click.style(prompt_request, fg='blue')}")
     click.echo()
-    click.echo("Default: package name derived from `pip_url`")
+    click.echo(f"Default: name derived from {derived_from}")
     click.echo()
 
-    package_name, _ = os.path.splitext(os.path.basename(pip_url))
+    plugin_basename = os.path.basename(pip_url or plugin_name)
+    package_name, _ = os.path.splitext(plugin_basename)
     return click.prompt(click.style("(executable)", fg="blue"), default=package_name)
 
 
@@ -246,7 +256,7 @@ def add_plugin(
     if custom:
         namespace = _prompt_plugin_namespace(plugin_type, plugin_name)
         pip_url = _prompt_plugin_pip_url(plugin_name)
-        executable = _prompt_plugin_executable(pip_url)
+        executable = _prompt_plugin_executable(pip_url, plugin_name)
         capabilities = _prompt_plugin_capabilities(plugin_type)
         settings = _prompt_plugin_settings(plugin_type)
 
@@ -385,17 +395,27 @@ def install_plugins(
         project, status_cb=install_status_update, parallelism=parallelism
     )
     install_results = install_service.install_plugins(plugins, reason=reason)
-    num_installed = len([status for status in install_results if status.successful])
-    num_failed = len(install_results) - num_installed
+    num_successful = len([status for status in install_results if status.successful])
+    num_skipped = len([status for status in install_results if status.skipped])
+    num_failed = len(install_results) - num_successful
 
     fg = "green"
-    if num_failed >= 0 and num_installed == 0:
+    if num_failed >= 0 and num_successful == 0:
         fg = "red"
-    elif num_failed > 0 and num_installed > 0:
+    elif num_failed > 0 and num_successful > 0:
         fg = "yellow"
 
     if len(plugins) > 1:
         verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
-        click.secho(f"{verb} {num_installed}/{num_installed+num_failed} plugins", fg=fg)
+        click.secho(
+            f"{verb} {num_successful-num_skipped}/{num_successful+num_failed} plugins",
+            fg=fg,
+        )
+    if num_skipped:
+        verb = "Skipped installing"
+        click.secho(
+            f"{verb} {num_skipped}/{num_successful+num_failed} plugins",
+            fg=fg,
+        )
 
     return num_failed == 0
