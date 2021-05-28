@@ -97,6 +97,7 @@ class TestPluginInvoker:
     @pytest.mark.parametrize(
         "executable_str,assert_fn",
         [
+            ("tap-test", lambda exe: exe == "tap-test"),
             ("./tap-test", lambda exe: exe.endswith("meltano_project/tap-test")),
             ("/apps/tap-test", lambda exe: exe == "/apps/tap-test"),
         ],

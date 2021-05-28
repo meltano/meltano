@@ -163,8 +163,14 @@ class PluginInvoker:
 
     def exec_path(self):
         if not self.venv_service:
+            if "/" not in self.plugin.executable.replace("\\", "/"):
+                # Expect executable on path
+                return self.plugin.executable
+
+            # Return executable relative to project directory
             return self.project.root.joinpath(self.plugin.executable)
 
+        # Return executable within venv
         return self.venv_service.exec_path(self.plugin.executable)
 
     def exec_args(self, *args, command=None, env=None):
