@@ -179,6 +179,7 @@ wemake-python-styleguide = [
   "-WPS420",  # Allow `pass` keywords in `except` bodies to prevent falling through to another `except`
   "-WPS600",  # Allow subclassing a builtin, such as 'str' (used for serializable Enums)
   "-WPS602",  # Allow using @staticmethod
+  "-WPS212",  # Ignore 'too many return statements' - noqa parse inconsistent between py38 vs prior
 ]
 
 [tool.flakehell.exceptions."tests/"]

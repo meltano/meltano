@@ -90,11 +90,13 @@ class PluginInvoker:
         self.plugin = plugin
         self.context = context
 
-        self.venv_service = venv_service or VenvService(
-            project,
-            name=plugin.name,
-            namespace=plugin.type,
-        )
+        self.venv_service: Optional[VenvService] = None
+        if plugin.pip_url or venv_service:
+            self.venv_service = venv_service or VenvService(
+                project,
+                name=plugin.name,
+                namespace=plugin.type,
+            )
         self.plugin_config_service = plugin_config_service or PluginConfigService(
             plugin,
             config_dir or self.project.plugin_dir(plugin),
@@ -160,6 +162,15 @@ class PluginInvoker:
             self.cleanup()
 
     def exec_path(self):
+        if not self.venv_service:
+            if "/" not in self.plugin.executable.replace("\\", "/"):
+                # Expect executable on path
+                return self.plugin.executable
+
+            # Return executable relative to project directory
+            return self.project.root.joinpath(self.plugin.executable)
+
+        # Return executable within venv
         return self.venv_service.exec_path(self.plugin.executable)
 
     def exec_args(self, *args, command=None, env=None):
@@ -185,10 +196,16 @@ class PluginInvoker:
         }
 
         # Ensure Meltano venv is not inherited
-        venv = VirtualEnv(self.project.venvs_dir(self.plugin.type, self.plugin.name))
-        env["VIRTUAL_ENV"] = str(venv.root)
-        env["PATH"] = os.pathsep.join([str(venv.bin_dir), env["PATH"]])
+        env.pop("VIRTUAL_ENV", None)
         env.pop("PYTHONPATH", None)
+        if self.venv_service:
+            # Switch to plugin-specific venv
+            venv = VirtualEnv(
+                self.project.venvs_dir(self.plugin.type, self.plugin.name)
+            )
+            venv_dir = str(venv.bin_dir)
+            env["VIRTUAL_ENV"] = str(venv.root)
+            env["PATH"] = os.pathsep.join([venv_dir, env["PATH"]])
 
         return env
 
