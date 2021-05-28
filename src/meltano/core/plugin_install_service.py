@@ -64,8 +64,8 @@ class PluginInstallState:
         """Return 'True' if the installation was skipped / not needed."""
         return self.status == PluginInstallStatus.SKIPPED
 
-    @property
-    def verb(self):  # noqa: WPS212  # Too many return statements
+    @property  # noqa: WPS212  # Too many return statements
+    def verb(self):
         """Verb form of status."""
         if self.status is PluginInstallStatus.RUNNING:
             if self.reason is PluginInstallReason.UPGRADE:
