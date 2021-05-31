@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2773](https://gitlab.com/meltano/meltano/-/issues/2773) Fix `tap-chargebee`, `tap-intacct` and `tap-quickbooks` definitions that had `properties` capability instead of `catalog`
+
 ### Breaks
 
 ## 1.75.0 - (2021-05-28)
