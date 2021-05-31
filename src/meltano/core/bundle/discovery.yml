@@ -472,7 +472,7 @@ extractors:
     repo: https://github.com/hotgluexyz/tap-chargebee
     pip_url: git+https://github.com/hotgluexyz/tap-chargebee.git
     capabilities:
-    - properties
+    - catalog
     - discover
     - state
     settings_group_validation:
@@ -707,7 +707,7 @@ extractors:
     repo: https://github.com/hotgluexyz/tap-intacct
     pip_url: git+https://github.com/hotgluexyz/tap-intacct.git
     capabilities:
-    - properties
+    - catalog
     - discover
     - state
     settings_group_validation:
@@ -1012,7 +1012,7 @@ extractors:
     repo: https://github.com/hotgluexyz/tap-quickbooks
     pip_url: git+https://github.com/hotgluexyz/tap-quickbooks.git
     capabilities:
-    - properties
+    - catalog
     - discover
     - state
     settings_group_validation:
