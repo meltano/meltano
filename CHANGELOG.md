@@ -12,12 +12,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-- [#2745](https://gitlab.com/meltano/meltano/-/issues/2745) Allow `meltano` commands to be used from a subdirectory of a project
-- [#2341](https://gitlab.com/meltano/meltano/-/issues/2341) Allow local plugins to be added with `executable` and no `pip_url`
-
 ### Fixes
 
+- [#2773](https://gitlab.com/meltano/meltano/-/issues/2773) Fix `tap-chargebee`, `tap-intacct` and `tap-quickbooks` definitions that had `properties` capability instead of `catalog`
+
 ### Breaks
+
+## 1.75.0 - (2021-05-28)
+---
+
+### Changes
+
+- [#2745](https://gitlab.com/meltano/meltano/-/issues/2745) Allow `meltano` commands to be used from a subdirectory of a project
+- [#2341](https://gitlab.com/meltano/meltano/-/issues/2341) Add support for already-installed plugins by making `pip_url` optional in custom plugin definitions
+- [#2341](https://gitlab.com/meltano/meltano/-/issues/2341) Allow non-pip plugins to be declared using relative `executable` paths and `executable` programs already on the PATH
 
 
 ## 1.74.0 - (2021-05-10)
