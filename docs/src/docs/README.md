@@ -152,13 +152,13 @@ Our focus for August will be to continue expanding integrations as well as havin
 * [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
 * [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
 
-#### Rest of 2021-Q3
+#### September 2021
 
-Our focus for the rest of Q3 will be to enable simple cloud deployments, improve the integration with git providers, and further enhancing Singer protocol extensions such as Fast Sync.
+Our focus for September will be to enable simple cloud deployments, improve the integration with git providers, and begin the conversion of MeltanoHub to a dynamic site.
 
 * [Simple Cloud Deploys](https://gitlab.com/groups/meltano/-/epics/28)
 * [Git-provider Integrations](https://gitlab.com/groups/meltano/-/epics/92)
-* [Initial conversion of MeltanoHub to dyanmice site](https://gitlab.com/groups/meltano/-/epics/83)
+* [Initial conversion of MeltanoHub to dyanmic site](https://gitlab.com/groups/meltano/-/epics/83)
 
 #### 2021-Q4
 
