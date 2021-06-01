@@ -2038,7 +2038,7 @@ loaders:
 transformers:
   - name: dbt
     namespace: dbt
-    docs: https://meltano.com/docs/transforms.md
+    docs: https://meltano.com/docs/transforms.html
     repo: https://github.com/fishtown-analytics/dbt
     pip_url: dbt==0.16.1
     settings:
