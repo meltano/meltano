@@ -126,32 +126,31 @@ Also note that issues labeled `flow::To Do` have higher priority and are more li
 
 Below you will found our current roadmap. As this projects out into the future it is subject to change based on feedback. Don't see something you want on the roadmap? [Make an issue](https://gitlab.com/meltano/meltano/-/issues) and let us know!
 
-#### May 2021
-
-Our focus for May will be on continuing to build out the initial iterations of the Hub for Singer Connectors to make discoverability of taps and targets as easy as possible.
-We'll also be working on the first iteration of the Singer SDK for Targets as well as another iteration to improve the dbt integration within Meltano.
-
-* [MeltanoHub for Plugins and Singer Connectors](https://gitlab.com/groups/meltano/-/epics/83)
-* [SDK for Singer Targets](https://gitlab.com/meltano/singer-sdk/-/issues/96)
-* [Enhanced dbt integration](https://gitlab.com/groups/meltano/-/epics/82)
-
 #### June 2021
 
-Our focus for June will be to enhance the plugin architecture to support ETLT use cases such as data obfuscation, choosing a great OLAP database to work with out-of-the-box with Meltano, and to support the "Reverse ELT" use case of loading data into a SaaS API.
+Our focus for June will be to launch the Target SDK, to add support for inline mapping transformations to the SDK and Meltano, enhance the dbt experience within Meltano, and supporting the "Reverse ELT" use case of loading data into a SaaS API.
 
-* [Plugin Archiecture for ETLT Use Cases](https://gitlab.com/meltano/meltano/-/issues/2300)
-* [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
+* [SDK for Singer Targets](https://gitlab.com/meltano/singer-sdk/-/issues/96)
+* [Enhanced dbt integration](https://gitlab.com/groups/meltano/-/epics/82)
+* [Mapping SDK for inline transformation use cases](https://gitlab.com/meltano/meltano/-/issues/2300)
 * [Support Reverse ETL Use Case](https://gitlab.com/meltano/meltano/-/issues/2665)
 
 #### July 2021
 
-Our focus for July will be to expand our integrations for orchestration, data quality, and analysis.
+Our focus for July will be to expand our integrations for orchestration, data quality, and analysis. We will also work to add support for the fast sync / batch message type to enable higher throughput for extraction and loading. 
 
 * [Dagster](https://gitlab.com/meltano/meltano/-/issues/2393 )
 * [Great Expectations](https://gitlab.com/meltano/meltano/-/issues/2454)
-* [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
+* [Fast Sync / Batch Messages](https://gitlab.com/meltano/meltano/-/issues/2364)
 * [Superset](https://gitlab.com/meltano/meltano/-/issues/2605)
+
+#### August 2021
+
+Our focus for August will be to continue expanding integrations as well as having full out-of-the-box support for an OLAP Database. 
+
 * [Jupyter Notebooks](https://gitlab.com/meltano/meltano/-/issues/2595)
+* [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
+* [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
 
 #### Rest of 2021-Q3
 
@@ -159,11 +158,11 @@ Our focus for the rest of Q3 will be to enable simple cloud deployments, improve
 
 * [Simple Cloud Deploys](https://gitlab.com/groups/meltano/-/epics/28)
 * [Git-provider Integrations](https://gitlab.com/groups/meltano/-/epics/92)
-* [Fast Sync / Batch Messages](https://gitlab.com/meltano/meltano/-/issues/2364)
+* [Initial conversion of MeltanoHub to dyanmice site](https://gitlab.com/groups/meltano/-/epics/83)
 
 #### 2021-Q4
 
-Our focus for Q4 will be on creating a compelling monitoring, observability, and data linage featureset. We also aim to improve the UI and potentailly start offering a SaaS deployment of Meltano.
+Our focus for Q4 will be on creating a compelling monitoring, observability, and data lineage featureset. We also aim to improve the UI and potentailly start offering a SaaS deployment of Meltano.
 
 * [Monitoring, observability, and data lineage](https://gitlab.com/groups/meltano/-/epics/93)
 * [Fully featured UI](https://gitlab.com/groups/meltano/-/epics/78)
@@ -188,3 +187,5 @@ To learn more about contributing to Meltano, refer to the [Contributor Guide](/d
 Meltano, originally called BizOps, was founded inside [GitLab](https://about.gitlab.com/) [in 2018](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) to serve the GitLab Data Team. It is maintained primarily by [the Meltano team](https://about.gitlab.com/handbook/meltano/) at GitLab, which continues to sponsor its development.
 
 To learn more about Meltano's history from 2018 through 2020, read the following blog post: [Revisiting the Meltano strategy: a return to our roots](https://meltano.com/blog/2020/05/13/revisiting-the-meltano-strategy-a-return-to-our-roots/).
+
+In the first half of 2021, the team grew to include AJ Steers and Taylor Murphy who are leading the Engineering and Product/Data organizations respectively. The 3-person team was able to launch the [SDK for Taps](https://meltano.com/blog/2021/04/05/meltano-launches-v0-1-0-of-the-singer-tap-sdk/), [MeltanoHub](https://meltano.com/blog/2021/06/01/meltanohub-for-singer-launches-with-over-200-taps-and-targets/), and the SDK for Targets while also growing the [Slack community to over 1000 people](https://meltano.com/blog/2021/04/23/community-milestone-1000-slack-members/).
