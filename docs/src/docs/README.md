@@ -143,6 +143,7 @@ Our focus for July will be to expand our integrations for orchestration, data qu
 * [Great Expectations](https://gitlab.com/meltano/meltano/-/issues/2454)
 * [Fast Sync / Batch Messages](https://gitlab.com/meltano/meltano/-/issues/2364)
 * [Superset](https://gitlab.com/meltano/meltano/-/issues/2605)
+* [Meltano Academy](https://gitlab.com/meltano/meta/-/issues/63)
 
 #### August 2021
 
