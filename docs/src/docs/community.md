@@ -42,7 +42,7 @@ Ideally, a vendor would be able to share how their product could be compatible w
 
 We have Office Hours weekly on **Wednesdays at 9 AM Pacific (16:00 UTC)**. Join us on Zoom and bring any questions you have to the team. There is often a short presentation of recent and upcoming updates from the core team, but otherwise this is your time to chat with us and get help on any topics you would like.
 
-Use [this link][gcal] to view the events calendar or check the [`#office-hours` channel](https://meltano.slack.com/archives/C01QS0RV78D) in the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannelLink> for weekly discussion topics and agenda updates. We will share the Zoom link in Slack and via social media prior to each weekly session.
+Use [this link][gcal] to view the events calendar or check the [`#office-hours` channel](https://meltano.slack.com/archives/C01QS0RV78D) in the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannelLink> for weekly discussion topics and agenda updates. Prior to each weekly session, we share the Zoom link in Slack and the YouTube live stream link via social media (Twitter).
 
 View past office hours in our [YouTube Playlist][officehoursplaylist].
 
