@@ -156,6 +156,8 @@ by running the extractor in [discovery mode](/docs/singer-spec.html#discovery-mo
 While this extra can be managed using [`meltano config`](/docs/command-line-interface.html#config) or environment variables like any other setting,
 a catalog file is typically provided using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option.
 
+In prior versions of the Singer spec, the `properties` capability was used instead of `catalog` for the [catalog files](https://hub.meltano.com/singer/spec#catalog-files). If this is the case for a tap, and if `properties` is specified as a [capability](/docs/contributor-guide.html#taps-targets-development), `meltano elt` will accept the catalog file in the `catalog` extra or via [`--catalog` on the command line]((/docs/command-line-interface.html#elt)), and will pass the file to the tap using the approprate flag.
+
 ##### How to use
 
 Manage this extra directly in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):

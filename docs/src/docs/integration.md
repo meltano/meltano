@@ -227,3 +227,28 @@ If you'd like to manually inspect a pipeline's state for debugging purposes, or 
 Some loaders only emit state once their work is completely done, even if some data may have been persisted already, and if earlier state messages from the extractor could have been forwarded to Meltano. When a pipeline with such a loader fails or is otherwise interrupted, no state will have been emitted yet, and a subsequent ELT run will not be able to pick up where this run actually left off.
 
 :::
+
+## Troubleshooting
+
+### Debug Mode
+
+If you're running into some trouble running a pipeline, the first recommendation is to run the same command in [debug mode](/docs/command-line-interface.html#debugging) so more information is shared on the command line.
+
+```bash
+meltano --log-level=debug elt ...
+```
+
+The output from debug mode will often be the first thing request if you're asking for help via the [Meltano Slack](https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q).
+
+### Isolate the Connector
+
+If it's unclear which part of the pipeline is generating the problem, test the tap and target individually by using `meltano invoke`. The [`invoke` command](/docs/command-line-interface.html#invoke) will run the executable with any specified arguments.
+
+```bash
+meltano invoke <plugin> PLUGIN_ARGS...
+```
+
+### Validate Tap Capabilities
+
+In prior versions of the Singer spec, the `properties` capability was used instead of `catalog` for the [catalog files](https://hub.meltano.com/singer/spec#catalog-files). If this is the case for a tap, ensure `properties` is set as a [capability](/docs/contributor-guide.html#taps-targets-development) for the tap. Then `meltano elt` will accept the catalog file, either in the [`catalog` extra](/docs/plugins.html#catalog-extra) or via [`--catalog` on the command line]((/docs/command-line-interface.html#elt)), and will pass it to the tap using the appropriate flag.
+
