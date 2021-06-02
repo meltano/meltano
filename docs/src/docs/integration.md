@@ -238,7 +238,7 @@ If you're running into some trouble running a pipeline, the first recommendation
 meltano --log-level=debug elt ...
 ```
 
-The output from debug mode will often be the first thing request if you're asking for help via the [Meltano Slack](https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q).
+The output from debug mode will often be the first thing requested if you're asking for help via the [Meltano Slack](https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q) group.
 
 ### Isolate the Connector
 
@@ -248,7 +248,12 @@ If it's unclear which part of the pipeline is generating the problem, test the t
 meltano invoke <plugin> PLUGIN_ARGS...
 ```
 
+This command can also be run in debug mode for additional information.
+
 ### Validate Tap Capabilities
 
 In prior versions of the Singer spec, the `properties` capability was used instead of `catalog` for the [catalog files](https://hub.meltano.com/singer/spec#catalog-files). If this is the case for a tap, ensure `properties` is set as a [capability](/docs/contributor-guide.html#taps-targets-development) for the tap. Then `meltano elt` will accept the catalog file, either in the [`catalog` extra](/docs/plugins.html#catalog-extra) or via [`--catalog` on the command line]((/docs/command-line-interface.html#elt)), and will pass it to the tap using the appropriate flag.
 
+### Incremental Replication Not Running as Expected
+
+If you're trying to run a tap in incremental mode using `meltano elt` but it's running a full sync, ensure that you're passing a [Job ID]((/docs/getting-started.html#run-a-data-integration-el-pipeline)) via the [`--job-id` flag](/docs/command-line-interface.html#how-to-use-4).
