@@ -24,6 +24,86 @@ Each item (linked below) has a corresponding guide to promoting that activity. E
 | Thursday | [Thursday release blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Releases/Promotion%20Guidelines.md), weekly newsletter |
 | Friday | [Demo day blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Content%20Marketing/evergreen-activities.md#promoting-demo-day) |
 
+## Talking about the Meltano Product Family and Team
+
+As of 2021 we have 3 main "product lines". Each of these should be referenced in speech and text communications in specific ways.
+
+### Meltano
+
+#### Product/Project
+  
+**Correct**
+
+    * Meltano
+    * The Meltano Open-Source Project
+
+     Example usage: Last week, a new version for Meltano was released
+
+**Incorrect**
+
+    * The Meltano
+
+    Example usage: Last week, a new version for the Meltano was released
+
+#### Team
+
+**Correct**
+
+    * the Meltano Team
+    * the Meltano Core Team
+
+    Example usage: The Meltano Team is announcing today...
+
+**Incorrect**
+
+    * The Meltano
+
+    Incorrect example usage: The Meltano is announcing today...
+
+### SDK
+
+Note that Target and Maps can be substituted for Taps in each of these examples
+
+**Correct**
+
+    * The SDK
+    * The SDK for Taps
+    * The SDK for Singer Taps
+    * The Tap SDK
+    * Meltano's Tap SDK
+    * The Tap SDK by Meltano
+
+    Example usage: Today we're releasing a new update for the SDK for Taps that...
+
+**Incorrect**
+
+    * Singer SDK
+    * Singer SDK for Taps
+    * singer-sdk
+    * Singer's SDK
+    * Meltano's Singer SDK
+    * Singer SDK by Meltano
+
+    Incorrect example usage: Today we're releasing a new update for the Singer SDK for Taps that...
+
+### MeltanoHub
+
+**Correct**
+
+    * MeltanoHub
+    * MeltanoHub for Singer
+    * The Hub
+
+    Example usage: Today we're releasing an update for MeltanoHub for Singer to...
+
+**Incorrect**
+
+    * The MeltanoHub
+    * The SingerHub
+    * The Hub for Singer
+
+    Incorrect example usage: Today we're releasing an update for the MeltanoHub for Singer to...
+
 
 ## Email
 
