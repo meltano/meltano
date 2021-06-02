@@ -144,6 +144,7 @@ exclude = [".venv", "venv", "*.md", "src/webapp/node_modules/"]
 inline-quotes = "double"
 max_line_length = 88
 show_source = true
+extended_default_ignore = []
 
 [tool.flakehell.plugins]
 flake8-bandit = [
