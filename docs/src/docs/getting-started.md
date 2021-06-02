@@ -416,6 +416,8 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
         - '!*.*_url'
     ```
 
+    Note that exclusion takes precedence over inclusion. If an attribute is excluded, there is no way to include it back without removing the exclusion pattern first. This is also detailed in the CLI documentation for the [`--exclude` parameter](/docs/command-line-interface.html#exclude-parameter).
+
 1. Optionally, verify that only the intended entities and attributes are now selected using [`meltano select --list`](/docs/command-line-interface.html#select):
 
     ```bash
