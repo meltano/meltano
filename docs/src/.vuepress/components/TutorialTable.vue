@@ -10,11 +10,11 @@ export default {
       <h2 class="tutorial-header">Table of Contents</h2>
     </div>
     <div class="tutorial-item">
-      <div class="tutorial-header">
+      <h3 class="tutorial-header">
         <a href="/tutorials/create-a-custom-extractor.html">
           Create a Custom Extractor
         </a>
-      </div>
+      </h3>
       <div>
         <p>
           Learn how to create your own custom extractor!
@@ -22,11 +22,11 @@ export default {
       </div>
     </div>
     <div class="tutorial-item">
-      <div class="tutorial-header">
+      <h3 class="tutorial-header">
         <a href="/tutorials/postgres-with-postgres.html">
           Use Postgres as a Loader and Extractor
         </a>
-      </div>
+      </h3>
       <div>
         <p>
           Learn how to run <code>tap-postgres</code> with
@@ -35,16 +35,14 @@ export default {
       </div>
     </div>
     <div class="tutorial-item">
-      <div class="tutorial-header">
+      <h3 class="tutorial-header">
         <a href="/tutorials/install-on-aws.html">
           Installing Meltano on Amazon Web Services (AWS)
         </a>
-      </div>
-      <div>
+      </h3>
         <p>
           Learn how to install Meltano on AWS
         </p>
-      </div>
     </div>
   </div>
 </template>
