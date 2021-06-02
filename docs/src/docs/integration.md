@@ -258,3 +258,15 @@ In prior versions of the Singer spec, the `properties` capability was used inste
 ### Incremental Replication Not Running as Expected
 
 If you're trying to run a tap in incremental mode using `meltano elt` but it's running a full sync, ensure that you're passing a [Job ID]((/docs/getting-started.html#run-a-data-integration-el-pipeline)) via the [`--job-id` flag](/docs/command-line-interface.html#how-to-use-4).
+
+### Testing Specific Failing Streams
+
+When extracting several streams with a single tap, it may be challenging to debug a single failing stream. In this case, it can be useful to run the tap with just the single stream selected. 
+
+Instead of duplicating the extractor in `meltano.yml`, try running `meltano elt` with the [`--select` flag](/docs/command-line-interface.html#parameters-2). This will run the pipeline with just that stream selected. 
+
+You can also have `meltano invoke` select an individual stream by setting the [`select_filter` extra](/docs/plugins.html#select-filter-extra) as an environment variable:
+
+```bash
+export TAP_NAME__SELECT_FILTER='["<your_stream>"]'
+```
