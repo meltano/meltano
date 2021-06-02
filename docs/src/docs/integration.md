@@ -15,6 +15,7 @@ so that subsequent pipeline runs with the same job ID will always pick up right 
 the previous run left off.
 
 You can run EL(T) pipelines using [`meltano elt`](/docs/command-line-interface.html#elt).
+If you're having some trouble, read our [troubleshooting tips](#troubleshooting) for some errors commonly seen.
 
 ## Plugin configuration
 
