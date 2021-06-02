@@ -2235,7 +2235,7 @@ dashboards:
 orchestrators:
   - name: airflow
     namespace: airflow
-    docs: https://meltano.com/docs/orchestration.md
+    docs: https://meltano.com/docs/orchestration.html
     repo: https://github.com/apache/airflow
     pip_url: 'apache-airflow==1.10.14 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-1.10.14/constraints-3.6.txt'
     settings:
