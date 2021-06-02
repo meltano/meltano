@@ -759,7 +759,7 @@ you have a few possible next steps:
 
 Most pipelines aren't run just once, but over and over again, to make sure additions and changes in the source eventually make their way to the destination.
 
-To help you realize this, Meltano supports scheduled pipelines that can be orchestrated using [Apache Airflow](https://apache.airflow.org/).
+To help you realize this, Meltano supports scheduled pipelines that can be orchestrated using [Apache Airflow](https://airflow.apache.org/).
 
 *To learn more about orchestration, refer to the [Orchestration guide](/docs/orchestration.html).*
 
@@ -792,7 +792,7 @@ To help you realize this, Meltano supports scheduled pipelines that can be orche
     meltano schedule list
     ```
 
-1. Add the [Apache Airflow](https://apache.airflow.org/) orchestrator to your project using [`meltano add`](/docs/command-line-interface.html#add), which will be responsible for managing the schedule and executing the appropriate `meltano elt` commands:
+1. Add the [Apache Airflow](https://airflow.apache.org/) orchestrator to your project using [`meltano add`](/docs/command-line-interface.html#add), which will be responsible for managing the schedule and executing the appropriate `meltano elt` commands:
 
     ```bash
     meltano add orchestrator airflow
