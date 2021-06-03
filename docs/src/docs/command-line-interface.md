@@ -432,13 +432,13 @@ Invoke the plugin's executable with specified arguments.
 ### How to use
 
 ```bash
-meltano invoke <plugin> PLUGIN_ARGS...
+meltano invoke <plugin> [PLUGIN]_ARGS...]
 ```
 
 If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
 
 ```bash
-meltano invoke --plugin-type=<type> <plugin> PLUGIN_ARGS...
+meltano invoke --plugin-type=<type> <plugin> [PLUGIN_ARGS...]
 ```
 
 A `--dump` option can be passed to dump the content of a generated [config file](/docs/singer-spec.html#config-files) or [extractor catalog file](/docs/singer-spec.html#catalog-files) to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) instead of actually invoking the plugin:

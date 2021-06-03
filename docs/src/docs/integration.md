@@ -246,7 +246,7 @@ The output from debug mode will often be the first thing requested if you're ask
 If it's unclear which part of the pipeline is generating the problem, test the tap and target individually by using `meltano invoke`. The [`invoke` command](/docs/command-line-interface.html#invoke) will run the executable with any specified arguments.
 
 ```bash
-meltano invoke <plugin> PLUGIN_ARGS...
+meltano invoke <plugin> [PLUGIN_ARGS...]
 ```
 
 This command can also be run in debug mode for additional information.
