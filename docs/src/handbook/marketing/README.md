@@ -32,7 +32,7 @@ As of 2021 we have 3 main "product lines". Each of these should be referenced in
 
 #### Product/Project
   
-**Correct**
+**Recommended**
 
     * Meltano
     * The Meltano Open-Source Project
@@ -47,7 +47,7 @@ As of 2021 we have 3 main "product lines". Each of these should be referenced in
 
 #### Team
 
-**Correct**
+**Recommended**
 
     * the Meltano Team
     * the Meltano Core Team
@@ -62,14 +62,19 @@ As of 2021 we have 3 main "product lines". Each of these should be referenced in
 
 ### SDK
 
-Note that Target and Maps can be substituted for Taps in each of these examples
+Note that Targets can be substituted for Taps in each of these examples
 
-**Correct**
+**Recommended**
 
     * The SDK
+    * The Tap SDK
+
+    Example usage: Today we're releasing a new update for the Tap SDK that...
+
+**OK**
+
     * The SDK for Taps
     * The SDK for Singer Taps
-    * The Tap SDK
     * Meltano's Tap SDK
     * The Tap SDK by Meltano
 
@@ -88,7 +93,7 @@ Note that Target and Maps can be substituted for Taps in each of these examples
 
 ### MeltanoHub
 
-**Correct**
+**Recommended**
 
     * MeltanoHub
     * MeltanoHub for Singer
