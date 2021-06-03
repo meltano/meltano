@@ -6,6 +6,7 @@ description: Meltano provides a command line interface (CLI) that makes it easy 
 
 Meltano provides a command line interface (CLI) that makes it easy to manage your [project](/docs/project.html), [plugins](/docs/plugin-management.html), and [EL(T) pipelines](/docs/integration.html).
 To quickly find the `meltano` subcommand you're looking for, use the Table of Contents in the sidebar.
+For a better understanding of command line documentation syntax, the [docopt](http://docopt.org/) standard is useful.
 
 ## `add`
 
