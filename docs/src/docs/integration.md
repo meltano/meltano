@@ -239,7 +239,7 @@ If you're running into some trouble running a pipeline, the first recommendation
 meltano --log-level=debug elt ...
 ```
 
-The output from debug mode will often be the first thing requested if you're asking for help via the [Meltano Slack](https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q) group.
+The output from debug mode will often be the first thing requested if you're asking for help via the <SlackChannelLink>Meltano Slack group</SlackChannelLink>.
 
 ### Isolate the Connector
 
