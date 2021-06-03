@@ -9,7 +9,7 @@ description: Learn how to use Meltano to create a custom data extractor.
 As much as we'd like to support all the data sources out there, we'll need your help to get there. If you find a data source that Meltano doesn't support right now, it might be time to get your hands dirty.
 
 ::: tip Contributions are welcome!
-If you see an error or something that can be improved with this tutorial, we welcome a [merge request](https://gitlab.com/meltano/meltano/-/merge_requests/new) to make it better!
+If you see an error or something that can be improved with this tutorial, we welcome a [merge request](https://gitlab.com/meltano/meltano/-/blob/master/docs/src/tutorials/create-a-custom-extractor.md) to make it better!
 :::
 
 ## How to Create an Extractor
@@ -17,9 +17,11 @@ If you see an error or something that can be improved with this tutorial, we wel
 The [Singer SDK](https://gitlab.com/meltano/singer-sdk)
 makes it easier than ever to create new [extractors](/docs/plugins.html#extractors) for your own custom data sources.
 
-> [Singer](https://singer.io) taps and targets are the mechanism Meltano uses to extract
+::: tip Singer
+[Singer](https://singer.io) taps and targets are the mechanism Meltano uses to extract
  and load data. For more details about the Singer specification, please visit our
  [Singer Spec](/docs/singer-spec.html) documentation.
+:::
 
 ## Create the Plugin's Package
 
@@ -29,7 +31,9 @@ in the SDK documentation to create a new project from the provided cookiecutter 
 [Code Samples](https://gitlab.com/meltano/singer-sdk/-/blob/main/docs/code_samples.md) page to find
 reusable sample code.
 
-> [cookiecutter](https://cookiecutter.readthedocs.io/en/latest/) is a python tool to scaffold projects quickly from an existing template.
+::: tip Cookiecutter
+ [cookiecutter](https://cookiecutter.readthedocs.io/en/latest/) is a python tool to scaffold projects quickly from an existing template.
+:::
 
 ## Add the Plugin to Your Meltano Project
 

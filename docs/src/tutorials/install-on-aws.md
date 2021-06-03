@@ -14,7 +14,7 @@ This guide assumes that you have a functioning Docker image where your Meltano p
 In this section, we will be going over how you can deploy a Meltano Docker image to AWS.
 
 ::: tip Contributions are welcome!
-If you see an error or something that can be improved with this tutorial, we welcome a [merge request](https://gitlab.com/meltano/meltano/-/merge_requests/new) to make it better!
+If you see an error or something that can be improved with this tutorial, we welcome a [merge request](https://gitlab.com/meltano/meltano/-/blob/master/docs/src/tutorials/install-on-aws.md) to make it better!
 :::
 
 ## Setting Up Elastic Container Service (ECS)
