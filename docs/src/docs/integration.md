@@ -268,5 +268,5 @@ Instead of duplicating the extractor in `meltano.yml`, try running `meltano elt`
 You can also have `meltano invoke` select an individual stream by setting the [`select_filter` extra](/docs/plugins.html#select-filter-extra) as an environment variable:
 
 ```bash
-export TAP_NAME__SELECT_FILTER='["<your_stream>"]'
+export <TAP_NAME>__SELECT_FILTER='["<your_stream>"]'
 ```
