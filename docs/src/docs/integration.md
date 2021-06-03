@@ -243,7 +243,8 @@ The output from debug mode will often be the first thing requested if you're ask
 
 ### Isolate the Connector
 
-If it's unclear which part of the pipeline is generating the problem, test the tap and target individually by using `meltano invoke`. The [`invoke` command](/docs/command-line-interface.html#invoke) will run the executable with any specified arguments.
+If it's unclear which part of the pipeline is generating the problem, test the tap and target individually by using `meltano invoke`. 
+The [`invoke` command](/docs/command-line-interface.html#invoke) will run the executable with any specified arguments.
 
 ```bash
 meltano invoke <plugin> [PLUGIN_ARGS...]
@@ -253,7 +254,9 @@ This command can also be run in debug mode for additional information.
 
 ### Validate Tap Capabilities
 
-In prior versions of the Singer spec, the `properties` capability was used instead of `catalog` for the [catalog files](https://hub.meltano.com/singer/spec#catalog-files). If this is the case for a tap, ensure `properties` is set as a [capability](/docs/contributor-guide.html#taps-targets-development) for the tap. Then `meltano elt` will accept the catalog file, either in the [`catalog` extra](/docs/plugins.html#catalog-extra) or via [`--catalog` on the command line](/docs/command-line-interface.html#elt), and will pass it to the tap using the appropriate flag.
+In prior versions of the Singer spec, the `properties` capability was used instead of `catalog` for the [catalog files](https://hub.meltano.com/singer/spec#catalog-files). 
+If this is the case for a tap, ensure `properties` is set as a [capability](/docs/contributor-guide.html#taps-targets-development) for the tap. 
+Then `meltano elt` will accept the catalog file, either in the [`catalog` extra](/docs/plugins.html#catalog-extra) or via [`--catalog` on the command line](/docs/command-line-interface.html#elt), and will pass it to the tap using the appropriate flag.
 
 ### Incremental Replication Not Running as Expected
 
@@ -261,9 +264,11 @@ If you're trying to run a tap in incremental mode using `meltano elt` but it's r
 
 ### Testing Specific Failing Streams
 
-When extracting several streams with a single tap, it may be challenging to debug a single failing stream. In this case, it can be useful to run the tap with just the single stream selected. 
+When extracting several streams with a single tap, it may be challenging to debug a single failing stream. 
+In this case, it can be useful to run the tap with just the single stream selected. 
 
-Instead of duplicating the extractor in `meltano.yml`, try running `meltano elt` with the [`--select` flag](/docs/command-line-interface.html#parameters-2). This will run the pipeline with just that stream selected. 
+Instead of duplicating the extractor in `meltano.yml`, try running `meltano elt` with the [`--select` flag](/docs/command-line-interface.html#parameters-2). 
+This will run the pipeline with just that stream selected. 
 
 You can also have `meltano invoke` select an individual stream by setting the [`select_filter` extra](/docs/plugins.html#select-filter-extra) as an environment variable:
 
