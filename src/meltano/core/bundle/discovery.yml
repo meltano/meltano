@@ -9,6 +9,8 @@ extractors:
     namespace: tap_adwords
     variants:
       - name: meltano
+        default: true
+        original: true
         docs: 'https://hub.meltano.com/extractors/adwords.html'
         repo: https://gitlab.com/meltano/tap-adwords
         pip_url: 'git+https://gitlab.com/meltano/tap-adwords.git'
@@ -275,6 +277,8 @@ extractors:
     namespace: tap_bigquery
     variants: 
       - name: anelendata
+        default: true
+        original: true
         docs: https://hub.meltano.com/extractors/bigquery.html
         repo: https://github.com/anelendata/tap-bigquery
         pip_url: tap-bigquery
@@ -312,6 +316,8 @@ extractors:
     namespace: tap_bing_ads
     variants: 
       - name: singer-io
+        default: true
+        original: true
         docs: 'https://hub.meltano.com/extractors/bing-ads.html'
         repo: https://github.com/singer-io/tap-bing-ads
         pip_url: tap-bing-ads
@@ -472,6 +478,8 @@ extractors:
     description: Subscription billing software
     variants: 
       - name: hotgluexyz
+        default: true
+        original: true
         docs: https://hub.meltano.com/extractors/chargebee.html
         repo: https://github.com/hotgluexyz/tap-chargebee
         pip_url: git+https://github.com/hotgluexyz/tap-chargebee.git
