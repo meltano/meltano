@@ -253,11 +253,11 @@ This command can also be run in debug mode for additional information.
 
 ### Validate Tap Capabilities
 
-In prior versions of the Singer spec, the `properties` capability was used instead of `catalog` for the [catalog files](https://hub.meltano.com/singer/spec#catalog-files). If this is the case for a tap, ensure `properties` is set as a [capability](/docs/contributor-guide.html#taps-targets-development) for the tap. Then `meltano elt` will accept the catalog file, either in the [`catalog` extra](/docs/plugins.html#catalog-extra) or via [`--catalog` on the command line]((/docs/command-line-interface.html#elt)), and will pass it to the tap using the appropriate flag.
+In prior versions of the Singer spec, the `properties` capability was used instead of `catalog` for the [catalog files](https://hub.meltano.com/singer/spec#catalog-files). If this is the case for a tap, ensure `properties` is set as a [capability](/docs/contributor-guide.html#taps-targets-development) for the tap. Then `meltano elt` will accept the catalog file, either in the [`catalog` extra](/docs/plugins.html#catalog-extra) or via [`--catalog` on the command line](/docs/command-line-interface.html#elt), and will pass it to the tap using the appropriate flag.
 
 ### Incremental Replication Not Running as Expected
 
-If you're trying to run a tap in incremental mode using `meltano elt` but it's running a full sync, ensure that you're passing a [Job ID]((/docs/getting-started.html#run-a-data-integration-el-pipeline)) via the [`--job-id` flag](/docs/command-line-interface.html#how-to-use-4).
+If you're trying to run a tap in incremental mode using `meltano elt` but it's running a full sync, ensure that you're passing a [Job ID](/docs/getting-started.html#run-a-data-integration-el-pipeline) via the [`--job-id` flag](/docs/command-line-interface.html#how-to-use-4).
 
 ### Testing Specific Failing Streams
 
