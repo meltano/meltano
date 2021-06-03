@@ -260,7 +260,7 @@ Then `meltano elt` will accept the catalog file, either in the [`catalog` extra]
 
 ### Incremental Replication Not Running as Expected
 
-If you're trying to run a tap in incremental mode using `meltano elt` but it's running a full sync, ensure that you're passing a [Job ID](/docs/getting-started.html#run-a-data-integration-el-pipeline) via the [`--job-id` flag](/docs/command-line-interface.html#how-to-use-4).
+If you're trying to run a pipeline with incremental replication using `meltano elt` but it's running a full sync, ensure that you're passing a [Job ID](/docs/getting-started.html#run-a-data-integration-el-pipeline) via the [`--job-id` flag](/docs/command-line-interface.html#how-to-use-4).
 
 ### Testing Specific Failing Streams
 
