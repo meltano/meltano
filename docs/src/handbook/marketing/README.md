@@ -67,6 +67,7 @@ Note that Targets can be substituted for Taps in each of these examples
 **Recommended**
 
     * The Meltano SDK
+    * The Meltano Tap SDK
     * The Meltano SDK for Taps
 
     Example usage: Today we're releasing a new update for the Tap SDK that...
