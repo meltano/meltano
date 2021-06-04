@@ -15,6 +15,7 @@ so that subsequent pipeline runs with the same job ID will always pick up right 
 the previous run left off.
 
 You can run EL(T) pipelines using [`meltano elt`](/docs/command-line-interface.html#elt).
+If you encounter some trouble running a pipeline, read our [troubleshooting tips](#troubleshooting) for some errors commonly seen.
 
 ## Plugin configuration
 
@@ -227,3 +228,52 @@ If you'd like to manually inspect a pipeline's state for debugging purposes, or 
 Some loaders only emit state once their work is completely done, even if some data may have been persisted already, and if earlier state messages from the extractor could have been forwarded to Meltano. When a pipeline with such a loader fails or is otherwise interrupted, no state will have been emitted yet, and a subsequent ELT run will not be able to pick up where this run actually left off.
 
 :::
+
+## Troubleshooting
+
+### Debug Mode
+
+If you're running into some trouble running a pipeline, the first recommendation is to run the same command in [debug mode](/docs/command-line-interface.html#debugging) so more information is shared on the command line.
+
+```bash
+meltano --log-level=debug elt ...
+```
+
+The output from debug mode will often be the first thing requested if you're asking for help via the <SlackChannelLink>Meltano Slack group</SlackChannelLink>.
+
+### Isolate the Connector
+
+If it's unclear which part of the pipeline is generating the problem, test the tap and target individually by using `meltano invoke`. 
+The [`invoke` command](/docs/command-line-interface.html#invoke) will run the executable with any specified arguments.
+
+```bash
+meltano invoke <plugin> [PLUGIN_ARGS...]
+```
+
+This command can also be run in debug mode for additional information.
+
+### Validate Tap Capabilities
+
+In cases where the tap is not loading any streams or it does not appear to be respecting the configured [`select`](/docs/command-line-interface.html#select) rules, you may need to validate the capabilities of the tap.
+
+In prior versions of the Singer spec, the `--properties` option was used instead of `--catalog` for the [catalog files](https://hub.meltano.com/singer/spec#catalog-files). 
+If this is the case for a tap, ensure `properties` is set as a [capability](/docs/contributor-guide.html#taps-targets-development) for the tap instead of `catalog`. 
+Then `meltano elt` will accept the catalog file and will pass it to the tap using the appropriate flag.
+
+### Incremental Replication Not Running as Expected
+
+If you're trying to run a pipeline with incremental replication using `meltano elt` but it's running a full sync, ensure that you're passing a [Job ID](/docs/getting-started.html#run-a-data-integration-el-pipeline) via the [`--job-id` flag](/docs/command-line-interface.html#how-to-use-4).
+
+### Testing Specific Failing Streams
+
+When extracting several streams with a single tap, it may be challenging to debug a single failing stream. 
+In this case, it can be useful to run the tap with just the single stream selected. 
+
+Instead of duplicating the extractor in `meltano.yml`, try running `meltano elt` with the [`--select` flag](/docs/command-line-interface.html#parameters-2). 
+This will run the pipeline with just that stream selected. 
+
+You can also have `meltano invoke` select an individual stream by setting the [`select_filter` extra](/docs/plugins.html#select-filter-extra) as an environment variable:
+
+```bash
+export <TAP_NAME>__SELECT_FILTER='["<your_stream>"]'
+```

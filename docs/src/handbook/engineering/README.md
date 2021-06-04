@@ -221,7 +221,7 @@ For each demo day, we need to ensure that the following process is followed:
 
 ## Office Hours
 
-Recurring office hours are available for Meltano community members to discuss our roadmap, debug issues, and ask questions. For schedules and meeting links, please check our [#office-hours](https://meltano.slack.com/archives/C01QS0RV78D) channel in [Slack](https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q).
+Recurring office hours are available for Meltano community members to discuss our roadmap, debug issues, and ask questions. For schedules and meeting links, please check our [#office-hours](https://meltano.slack.com/archives/C01QS0RV78D) channel in <SlackChannelLink>Slack</SlackChannelLink>.
 
 ### Office Hours: Workflow
 
