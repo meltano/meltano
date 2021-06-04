@@ -66,18 +66,21 @@ Note that Targets can be substituted for Taps in each of these examples
 
 **Recommended**
 
-    * The SDK
-    * The Tap SDK
+    * The Meltano SDK
+    * The Meltano SDK for Taps
 
     Example usage: Today we're releasing a new update for the Tap SDK that...
 
 **OK**
 
+    * The SDK
+    * The Tap SDK
     * The SDK for Taps
     * The SDK for Singer Taps
     * Meltano's Tap SDK
     * The Tap SDK by Meltano
 
+    These are OK when the proper, Meltano-specific name has already been referenced. 
     Example usage: Today we're releasing a new update for the SDK for Taps that...
 
 **Incorrect**
