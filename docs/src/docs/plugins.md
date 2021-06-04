@@ -156,6 +156,8 @@ by running the extractor in [discovery mode](/docs/singer-spec.html#discovery-mo
 While this extra can be managed using [`meltano config`](/docs/command-line-interface.html#config) or environment variables like any other setting,
 a catalog file is typically provided using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option.
 
+If the catalog does not seem to take effect, you may need to [validate the capabilities of the tap](/docs/integration.html#validate-tap-capabilities).
+
 ##### How to use
 
 Manage this extra directly in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):
