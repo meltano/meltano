@@ -3,6 +3,11 @@
   - .docker_build
   - .parallel:python_version
   stage: build-meltano
+  needs:
+    - job: meltano_base
+      optional: true
+    - job: meltano_base_forks
+      optional: true
   variables:
     DOCKERFILE: docker/prod/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE
