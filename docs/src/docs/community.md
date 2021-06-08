@@ -93,4 +93,4 @@ Singer Related:
 
 * #singer-batch-messages - discussion around [Fast Sync](https://gitlab.com/meltano/meltano/-/issues/2364)
 * #singer-saas-targets - all things Reverse ETL / Operational Analytics
-* #singer-sdk - discussion around the [SDK for Taps and Targets](https://gitlab.com/meltano/singer-sdk)
+* #singer-sdk - discussion around the [SDK for Taps and Targets](https://sdk.meltano.com)

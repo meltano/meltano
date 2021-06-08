@@ -128,7 +128,7 @@ Using the `record` example shown previously, the JSON schema for that record cou
 
 This definition now explicitly defines what kind of data is expected in a record and how to handle it when loading the data.
 
-Also of note, there are [several different versions](https://json-schema.org/specification-links.html) of JSON Schema. The most common one is Draft 4 and Meltano and the Singer SDK both support this draft.
+Also of note, there are [several different versions](https://json-schema.org/specification-links.html) of JSON Schema. The most common one is Draft 4 and Meltano and the [SDK](https://sdk.meltano.com) both support this draft.
 
 :::
 
