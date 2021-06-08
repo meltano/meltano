@@ -36,7 +36,7 @@ export MELTANO_DISABLE_TRACKING=True
 
 In order to contribute to Meltano, you will need the following:
 
-1. [Python 3.6.1+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/docs/installation.html#requirements) of the Installation instructions, that also apply here.
+1. [Python 3.6.2+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/docs/installation.html#requirements) of the Installation instructions, that also apply here.
 2. [Node 8.11.0+](https://nodejs.org/)
 3. [Yarn](https://yarnpkg.com/)
 
