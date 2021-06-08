@@ -59,7 +59,7 @@ to debug it, contribute a fix, and see it through, instead of giving up.
 Meltano's index of discoverable [extractors](https://hub.meltano.com/extractors/) and [loaders](https://hub.meltano.com/loaders/) will grow as the
 number of [Singer Taps and Targets grows](https://hub.meltano.com/singer/).
 
-In addition to the MeltanoHub, the [**SDK for Singer Taps and Targets**](https://gitlab.com/meltano/singer-sdk) enables 
+In addition to the MeltanoHub, the [**SDK for Singer Taps and Targets**](https://sdk.meltano.com) enables 
 developers to build **connectors with all the bells and whistles** without having to be become an expert on the spec.
 This further lowers the barrier to creating new connectors and contributing to existing ones,
 and will lead to increased reliability and consistency.
@@ -130,7 +130,7 @@ Below you will found our current roadmap. As this projects out into the future i
 
 Our focus for June will be to launch the Target SDK, to add support for inline mapping transformations to the SDK and Meltano, enhance the dbt experience within Meltano, and supporting the "Reverse ELT" use case of loading data into a SaaS API.
 
-* [SDK for Singer Targets](https://gitlab.com/meltano/singer-sdk/-/issues/96)
+* [SDK for Singer Targets](https://gitlab.com/meltano/sdk/-/issues/96)
 * [Enhanced dbt integration](https://gitlab.com/groups/meltano/-/epics/82)
 * [Mapping SDK for inline transformation use cases](https://gitlab.com/meltano/meltano/-/issues/2300)
 * [Support Reverse ETL Use Case](https://gitlab.com/meltano/meltano/-/issues/2665)
