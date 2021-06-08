@@ -20,7 +20,7 @@ makes it easier than ever to create new [extractors](/docs/plugins.html#extracto
 ::: tip Singer
 [Singer](https://singer.io) taps and targets are the mechanism Meltano uses to extract
  and load data. For more details about the Singer specification, please visit our
- [Singer Spec](/docs/singer-spec.html) documentation.
+ [Singer Spec](https://hub.meltano.com/singer/spec) documentation.
 :::
 
 ## Create the Plugin's Package
@@ -212,4 +212,4 @@ Once your repo is installable with pip, you can reference this in your `meltano.
 ## References
 
 - [SDK for Singer Taps and Targets](https://sdk.meltano.com)
-- [Singer Spec](/docs/singer-spec.html)
+- [Singer Spec](https://hub.meltano.com/singer/spec)

@@ -244,7 +244,7 @@ These settings can be used to modify the behavior of [`meltano elt`](/docs/comma
 - Default: `10485760` (10MiB in bytes)
 
 Size (in bytes) of the buffer between extractor and loader (Singer tap and target) that stores
-[messages](/docs/singer-spec.html#messages)
+[messages](https://hub.meltano.com/singer/spec#messages)
 output by the extractor while they are waiting to be processed by the loader.
 
 When an extractor generates messages (records) faster than the loader can process them, the buffer may fill up completely,

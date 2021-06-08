@@ -122,7 +122,7 @@ Meltano supports the following types of plugins:
 Extractors are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt`](/docs/command-line-interface.html#elt) as part of [data integration](/docs/integration.md).
 They are responsible for pulling data out of arbitrary data sources: databases, SaaS APIs, or file formats.
 
-Meltano supports [Singer taps](https://singer.io): executables that implement the [Singer specification](/docs/singer-spec.html).
+Meltano supports [Singer taps](https://singer.io): executables that implement the [Singer specification](https://hub.meltano.com/singer/spec).
 
 To learn which extractors are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Extractors page](https://hub.meltano.com/extractors/) or run [`meltano discover extractors`](/docs/command-line-interface.html#discover).
 
@@ -145,11 +145,11 @@ Extractors support the following [extras](/docs/configuration.html#plugin-extras
 - [`meltano elt`](/docs/command-line-interface.html#elt) CLI option: `--catalog`
 - Default: None
 
-An extractor's `catalog` [extra](/docs/configuration.html#plugin-extras) holds a path to a [catalog file](/docs/singer-spec.html#catalog-files) (relative to the [project directory](/docs/project.html)) to be provided to the extractor
+An extractor's `catalog` [extra](/docs/configuration.html#plugin-extras) holds a path to a [catalog file](https://hub.meltano.com/singer/spec#catalog-files) (relative to the [project directory](/docs/project.html)) to be provided to the extractor
 when it is run in [sync mode](https://github.com/singer-io/getting-started/blob/master/docs/SYNC_MODE.md) using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 
 If a catalog path is not set, the catalog will be [generated on the fly](/docs/integration.html#extractor-catalog-generation)
-by running the extractor in [discovery mode](/docs/singer-spec.html#discovery-mode) and applying the [schema](#schema-extra), [selection](#select-extra), and [metadata](#metadata-extra) rules to the discovered file.
+by running the extractor in [discovery mode](https://hub.meltano.com/singer/spec#discovery-mode) and applying the [schema](#schema-extra), [selection](#select-extra), and [metadata](#metadata-extra) rules to the discovered file.
 
 [Selection filter rules](#select-filter-extra) are always applied to manually provided catalogs as well as discovered ones.
 
@@ -229,8 +229,8 @@ export TAP_GITLAB__LOAD_SCHEMA=gitlab_data
 - Default: `{}` (an empty object)
 
 An extractor's `metadata` [extra](/docs/configuration.html#plugin-extras) holds an object describing
-[Singer stream and property metadata](/docs/singer-spec.html#metadata)
-rules that are applied to the extractor's [discovered catalog file](/docs/singer-spec.html#catalog-files)
+[Singer stream and property metadata](https://hub.meltano.com/singer/spec#metadata)
+rules that are applied to the extractor's [discovered catalog file](https://hub.meltano.com/singer/spec#catalog-files)
 when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
@@ -286,8 +286,8 @@ export TAP_POSTGRES__METADATA_SOME_STREAM_ID_REPLICATION_METHOD=FULL_TABLE
 - Default: `{}` (an empty object)
 
 An extractor's `schema` [extra](/docs/configuration.html#plugin-extras) holds an object describing
-[Singer stream schema](/docs/singer-spec.html#schemas) override
-rules that are applied to the extractor's [discovered catalog file](/docs/singer-spec.html#catalog-files)
+[Singer stream schema](https://hub.meltano.com/singer/spec#schemas) override
+rules that are applied to the extractor's [discovered catalog file](https://hub.meltano.com/singer/spec#catalog-files)
 when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
@@ -341,7 +341,7 @@ export TAP_POSTGRES__SCHEMA_SOME_STREAM_ID_CREATED_AT_FORMAT=date
 - Default: `["*.*"]`
 
 An extractor's `select` [extra](/docs/configuration.html#plugin-extras) holds an array of [entity selection rules](/docs/command-line-interface.html#select)
-that are applied to the extractor's [discovered catalog file](/docs/singer-spec.html#catalog-files)
+that are applied to the extractor's [discovered catalog file](https://hub.meltano.com/singer/spec#catalog-files)
 when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
@@ -447,7 +447,7 @@ meltano elt tap-gitlab target-jsonl --exclude project_members
 - [`meltano elt`](/docs/command-line-interface.html#elt) CLI option: `--state`
 - Default: None
 
-An extractor's `state` [extra](/docs/configuration.html#plugin-extras) holds a path to a [state file](/docs/singer-spec.html#state-files) (relative to the [project directory](/docs/project.html)) to be provided to the extractor
+An extractor's `state` [extra](/docs/configuration.html#plugin-extras) holds a path to a [state file](https://hub.meltano.com/singer/spec#state-files) (relative to the [project directory](/docs/project.html)) to be provided to the extractor
 when it is run as part of a pipeline using [`meltano elt`](/docs/command-line-interface.html#elt).
 
 If a state path is not set, the state will be [looked up automatically](/docs/integration.html#incremental-replication-state) based on the ELT run's Job ID.
@@ -487,7 +487,7 @@ meltano elt tap-gitlab target-jsonl --state extract/tap-gitlab.state.json
 Loaders are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt`](/docs/command-line-interface.html#elt) as part of [data integration](/docs/integration.md).
 They are responsible for loading [extracted](#extractors) data into arbitrary data destinations: databases, SaaS APIs, or file formats.
 
-Meltano supports [Singer targets](https://singer.io): executables that implement the [Singer specification](/docs/singer-spec.html).
+Meltano supports [Singer targets](https://singer.io): executables that implement the [Singer specification](https://hub.meltano.com/singer/spec).
 
 To learn which loaders are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Loaders page](https://hub.meltano.com/loaders/) or run [`meltano discover loaders`](/docs/command-line-interface.html#discover).
 
