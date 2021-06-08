@@ -3,6 +3,7 @@
   - .docker_build
   - .parallel:python_version
   stage: build-base
+  needs: []
   variables:
     DOCKERFILE: docker/base/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE/base
