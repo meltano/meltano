@@ -14,7 +14,7 @@ If you see an error or something that can be improved with this tutorial, we wel
 
 ## How to Create an Extractor
 
-The [Singer SDK](https://gitlab.com/meltano/singer-sdk)
+Meltano's [SDK for Taps](https://sdk.meltano.com)
 makes it easier than ever to create new [extractors](/docs/plugins.html#extractors) for your own custom data sources.
 
 ::: tip Singer
@@ -25,10 +25,10 @@ makes it easier than ever to create new [extractors](/docs/plugins.html#extracto
 
 ## Create the Plugin's Package
 
-1. As a first step, follow the [instructions](https://gitlab.com/meltano/singer-sdk/-/tree/main/cookiecutter/tap-template)
+1. As a first step, follow the [instructions](https://sdk.meltano.com/en/latest/dev_guide.html#building-a-new-tap)
 in the SDK documentation to create a new project from the provided cookiecutter template.
-2. As you are developing, consult the [SDK Dev Guide](https://gitlab.com/meltano/singer-sdk/-/blob/main/docs/dev_guide.md) for developer documentation and the
-[Code Samples](https://gitlab.com/meltano/singer-sdk/-/blob/main/docs/code_samples.md) page to find
+2. As you are developing, consult the [SDK Dev Guide](https://sdk.meltano.com/en/latest/dev_guide.html) for developer documentation and the
+[Code Samples](https://sdk.meltano.com/en/latest/code_samples.html) page to find
 reusable sample code.
 
 ::: tip Cookiecutter
@@ -211,5 +211,5 @@ Once your repo is installable with pip, you can reference this in your `meltano.
 
 ## References
 
-- [Singer SDK](https://github.com/meltano/singer-sdk)
+- [SDK for Singer Taps and Targets](https://sdk.meltano.com)
 - [Singer Spec](/docs/singer-spec.html)
