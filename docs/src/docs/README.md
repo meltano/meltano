@@ -64,12 +64,12 @@ developers to build **connectors with all the bells and whistles** without havin
 This further lowers the barrier to creating new connectors and contributing to existing ones,
 and will lead to increased reliability and consistency.
 
-We've also [created an interpretation of the Singer specification](/docs/singer-spec.html)
+We've also [created an interpretation of the Singer specification](https://hub.meltano.com/singer/spec)
 that aims to be clearer for newcomers to the project. We believe the spec is great in its current version, but
 confusing documentation has made it challenging for some to onboard to the community.
 
 Last but not least, we intend to **[**unlock the evolution**](https://gitlab.com/groups/meltano/-/epics/88) of the
-[**Singer spec**](/docs/singer-spec.html)** through
+[**Singer spec**](https://hub.meltano.com/singer/spec)** through
 a framework for the proposal and consideration of optional extensions to the spec
 that compatible tools, including the SDK and Meltano, can choose to support,
 while maintaining compatibility between all taps and targets.
