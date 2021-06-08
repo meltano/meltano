@@ -35,7 +35,7 @@ const docsSidebar = [
       "/docs/command-line-interface",
       "/docs/settings",
       "/docs/architecture",
-      "/docs/singer-spec",
+      ["https://hub.meltano.com/singer/spec","Singer Spec"],
     ],
   },
   {
