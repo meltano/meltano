@@ -115,6 +115,10 @@ module.exports = {
                 text: "Destinations",
                 link: "https://hub.meltano.com/loaders/",
             },
+            {
+                text: "Connector SDK",
+                link: "https://sdk.meltano.com/",
+            },
         ]
       },
       {
