@@ -139,8 +139,8 @@ class TestCliAdd:
         } in packages_yaml["packages"]
 
         assert "tap_google_analytics" in project_yaml["models"]
-        assert project_yaml["models"]["tap_google_analytics"] == {
-            "vars": {"schema": "{{ env_var('DBT_SOURCE_SCHEMA') }}"}
+        assert project_yaml["vars"]["tap_google_analytics"] == {
+            "schema": "{{ env_var('DBT_SOURCE_SCHEMA') }}"
         }
 
     def test_add_dashboard(self, project, cli_runner):
