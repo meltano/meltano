@@ -48,10 +48,9 @@ class TransformAddService:
             f.write(yaml.dump(package_yaml, default_flow_style=False, sort_keys=False))
 
     def update_dbt_project(self, plugin: ProjectPlugin):
-        """Set transform-specific variables in `dbt_project.yml`.
+        """Set transform package variables in `dbt_project.yml`.
 
-        The provided `plugin` is expected to be a transform-type plugin, which
-        is to say a dbt package.
+        If not already present, the package name will also be added under dbt 'models'.
         """
         settings_service = PluginSettingsService(
             self.project, plugin, plugins_service=self.plugins_service
