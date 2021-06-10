@@ -13,6 +13,7 @@ class JSONEncodedDict(TypeDecorator):
     """
 
     impl = VARCHAR
+    cache_ok = True
 
     def process_bind_param(self, value, dialect):
         if value is not None:
@@ -28,6 +29,7 @@ class JSONEncodedDict(TypeDecorator):
 
 class IntFlag(TypeDecorator):
     impl = INTEGER
+    cache_ok = True
 
     # force the cast to INTEGER
     def process_bind_param(self, value, dialect):
@@ -44,6 +46,7 @@ class GUID(TypeDecorator):
     """
 
     impl = CHAR
+    cache_ok = True
 
     def load_dialect_impl(self, dialect):
         if dialect.name == "postgresql":
