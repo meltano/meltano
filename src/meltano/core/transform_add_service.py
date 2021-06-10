@@ -74,7 +74,7 @@ class TransformAddService:
                 project_vars[package_name] = package_vars
                 dbt_project_yaml["vars"] = project_vars
 
-        # Add the package's folder definition to the list of models:
+        # Add the package's definition to the list of models:
         dbt_project_yaml["models"][package_name] = model_def
 
         with open(self.dbt_project_file, "w") as f:
