@@ -269,6 +269,44 @@ Recurring office hours are available for Meltano community members to discuss ou
 7. Note: Although YouTube does allow editing in the website, this feature is not available until
    several hours after the recording, and video edits might take up to several hours to apply.
 
+#### Preventing and responding to accidental secrets leakage
+
+As a standard practice, we should remind community members whenever they are sharing their screens: `"As a
+reminder, this session is being livestreamed and recorded. We recommend closing any 
+credential files or other sensitive documents prior to starting the screenshare."`
+
+And, although we should make a reasonable attempt to prevent confidential information on screenshare, these 
+things do accasionally happen. In those cases, our goal is to mitigate exposure such to significantly reduce the
+exposure and reduce the chances that a malicious actor takes advantage of the vulnerability.
+Towards this end, the following actions should be taken as soon as anyone on the team realizes there were 
+credentials/secrets exposed:
+
+1. Immediately reach out on slack to whoever was sharing their screen and advise them to rotate their credentials
+   as soon as possible.
+    - You can also refer them to this page. Since we don't know if they are watching slack,
+      it is a good idea to ask them for confirmation that they received your message. If they do not reply, 
+      kindly call out in Zoom chat that they should check their Slack messages.
+    - Note: because users who were watching in the stream could technically pause or screenshot the leaked creds,
+      this guidance to reset credentials should apply regardless of the duration of time that the credentials
+      were onscreen.
+2. Immediately after notifying the presenter of the issue, go to our 
+   [Meltano YouTube channel](https://studio.youtube.com/channel/UCmp7zJAZEC7I_n9BEydH8XQ/videos/upload) ->
+   "Manage Content" and locate the in-progress livestream.
+    - Change the privacy settings on the livestream to from 'Public' to 'Private'.
+    - Optionally, post to the slack channel that the livestream is temporarily down and users can rejoin with the
+      Zoom link.
+3. After the livestream ends:
+    1. Wait up to 24 hours for YouTube to complete processing _OR_ download the raw video so that you can editing
+       locally.
+    2. Once video is processed, you will be able to use YouTube's content editor to clip out the frames which
+       contained the onscreen secrets exposure.
+    3. Once the video is edited, you may need to wait again for YouTube to finish processing the edited video.
+    4. After confirming the edit by watching the video you can re-share as "Public".
+    5. If you downloaded and edited the video locally, you will need to provide a new YouTube link. If you edited
+       directly, the old links will still work once the video is made "Public" again.
+
+* _Note: if one person is leading the meeting and multiple team members are present, whoever is not presenting should take steps (1) and (2) above, while the other team member continues to lead the remainder of the session._
+
 ## Outages & escalation
 
 Both https://www.meltano.com and https://meltano.meltanodata.com are automatically monitored using Pingdom, with notifications of downtime posted to:
