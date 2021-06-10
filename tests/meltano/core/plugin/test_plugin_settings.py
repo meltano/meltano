@@ -511,6 +511,7 @@ class TestPluginSettingsService:
             "missing": "$MISSING",
             "multiple": "$A ${B} $C",
             "info": "$MELTANO_EXTRACTOR_NAME",
+            "nested": {"inner": "inner_value"},
             "password": "foo$r$6$bar",
             "_extra": "$TAP_MOCK_MULTIPLE",
             "_extra_generic": "$MELTANO_EXTRACT_FOO",
@@ -527,6 +528,7 @@ class TestPluginSettingsService:
         assert config["missing"] == None
         assert config["multiple"] == "rock paper scissors"
         assert config["info"] == "tap-mock"
+        assert config["nested"] == {"inner": "inner_value"}
 
         # Only `$ALL_CAPS` env vars are supported
         assert config["password"] == yml_config["password"]
