@@ -1,11 +1,12 @@
 # Data Transformation (T)
 
-Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations.
+Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required
+configuration, models, packages, etc in order to run the transformations.
 
 ## `dbt` (Data Build Tool) Installation and Configuration
 
 To learn more about the dbt Transformer package, please see the
-`[dbt plugin](https://hub.meltano.com/transformers/dbt) documentation on [Meltano Hub](https://hub.meltano.com).
+[dbt plugin](https://hub.meltano.com/transformers/dbt) documentation on [Meltano Hub](https://hub.meltano.com).
 
 ## Working with Transform Plugins
 
@@ -45,8 +46,8 @@ Transform tap-gitlab added to your dbt_project.yml
 
 ### Configuring Transform Plugins
 
-Entries for transformers in `meltano.yml` can have additional parameters. For example, the `tap-gitlab` dbt package requires three variables, which are used for
-finding the tables where the raw Carbon Intensity data have been loaded during the Extract-Load phase:
+Transform plugins may have additional configuration options in `meltano.yml`. For example, the `tap-gitlab` dbt package requires three variables, which are used for
+finding the tables where raw data has been loaded during the Extract-Load phase:
 
 ```yml
 transforms:
@@ -58,11 +59,7 @@ transforms:
     region_table: "{{ env_var('PG_SCHEMA') }}.region"
 ```
 
-Those entries may follow dbt's syntax in order to fetch values from environment variables. In this case, `$PG_SCHEMA` must be available in order for the
-transformations to know in which Postgres schema to find the tables with the Carbon Intensity data. Meltano uses `$PG_SCHEMA` by default as it is the same
-default schema also used by the Postgres Loader.
-
-You can keep those parameters as they are and provide the schema as an environment variable or set the schema manually in `meltano.yml`:
+As an alternative to providing values from environment variables, you can also set values directly in `meltano.yml`:
 
 ```yml
 transforms:
@@ -74,4 +71,4 @@ transforms:
     region_table: "my_raw_schema.region"
 ```
 
-When Meltano runs a new transformation, `transform/dbt_project.yml` is always kept up to date with whatever is provided in `meltano.yml`.
+Whenever Meltano runs a new transformation, `transform/dbt_project.yml` is updated using the values provided in `meltano.yml`.
