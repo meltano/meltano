@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2755](https://gitlab.com/meltano/meltano/-/issues/2755) Fix SQLAlchemy `cache_ok` warning messages when running `meltano elt`
 - [#2773](https://gitlab.com/meltano/meltano/-/issues/2773) Fix `tap-chargebee`, `tap-intacct` and `tap-quickbooks` definitions that had `properties` capability instead of `catalog`
 - [#2784](https://gitlab.com/meltano/meltano/-/issues/2784) Fix catalog discovery error when using custom plugins with no `pip_url` set
 
