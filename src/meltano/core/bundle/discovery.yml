@@ -2264,7 +2264,7 @@ files:
   - name: dbt
     namespace: dbt
     repo: https://gitlab.com/meltano/files-dbt
-    pip_url: git+https://gitlab.com/meltano/files-dbt.git
+    pip_url: git+https://gitlab.com/meltano/files-dbt.git@v2.0
     update:
       transform/profile/profiles.yml: true
   - name: docker
