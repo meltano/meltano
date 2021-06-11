@@ -45,7 +45,7 @@ class TransformAddService:
 
         revision: Optional[str] = None
         if len(git_repo.split("@")) == 2:
-            revision, git_repo = git_repo.split("@")
+            git_repo, revision = git_repo.split("@")
         for package in package_yaml["packages"]:
             same_ref = (
                 package.get("git", "") == git_repo
