@@ -2,6 +2,7 @@ import json
 import logging
 import os
 from pathlib import Path
+from typing import Optional
 
 import yaml
 
@@ -38,11 +39,25 @@ class TransformAddService:
 
         package_yaml = yaml.safe_load(self.packages_file.open()) or {"packages": []}
 
+        git_repo = plugin.pip_url
+        if not git_repo:
+            raise ValueError(f"Missing pip_url for transform plugin '{plugin.name}'")
+
+        revision: Optional[str] = None
+        if len(git_repo.split("@")) == 2:
+            revision, git_repo = git_repo.split("@")
         for package in package_yaml["packages"]:
-            if package.get("git", "") == plugin.pip_url:
+            same_ref = (
+                package.get("git", "") == git_repo
+                and package.get("revision", None) == revision
+            )
+            if same_ref:
                 return
 
-        package_yaml["packages"].append({"git": plugin.pip_url})
+        package_ref = {"git": git_repo}
+        if revision:
+            package_ref["revision"] = revision
+        package_yaml["packages"].append(package_ref)
 
         with open(self.packages_file, "w") as f:
             f.write(yaml.dump(package_yaml, default_flow_style=False, sort_keys=False))
