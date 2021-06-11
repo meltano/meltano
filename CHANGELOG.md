@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+[#2694](https://gitlab.com/meltano/meltano/-/issues/2694) Bump dbt version to `0.18.2`
+
 ### Fixes
 
 ### Breaks
