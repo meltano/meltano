@@ -28,6 +28,17 @@ class TestPluginInstallService:
                                     "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
                                 }
                             ],
+                            "transforms": [
+                                # Test with and without a git branch/tag ref
+                                {
+                                    "name": "tap-gitlab",
+                                    "pip_url": "git+https://gitlab.com/meltano/dbt-tap-gitlab.git",
+                                },
+                                {
+                                    "name": "tap-shopify",
+                                    "pip_url": "git+https://gitlab.com/meltano/dbt-tap-shopify.git@config-version-2",
+                                },
+                            ],
                         }
                     }
                 )
@@ -41,6 +52,8 @@ class TestPluginInstallService:
     @pytest.mark.slow
     def test_install_all(self, subject):
         all_plugins = subject.install_all_plugins()
-        assert len(all_plugins) == 2
+        assert len(all_plugins) == 4
         assert all_plugins[0].successful
         assert all_plugins[1].successful
+        assert all_plugins[2].successful
+        assert all_plugins[3].successful
