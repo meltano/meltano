@@ -12,6 +12,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2745](https://gitlab.com/meltano/meltano/-/issues/2745) Allow `meltano` commands to be used from a subdirectory of a project
+- [#2763](https://gitlab.com/meltano/meltano/issues/2763) Add dbt-specific files to .gitignore
+
 ### Fixes
 
 ### Breaks
