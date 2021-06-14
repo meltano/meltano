@@ -6,6 +6,6 @@
 # Default
 * @DouweM @aaronsteers
 
-[Handbook]
+# Handbook and Docs
 /docs/src/handbook/ @meltano/core-team
 /docs/src/docs/ @meltano/core-team
