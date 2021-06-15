@@ -94,3 +94,13 @@ Singer Related:
 * #singer-batch-messages - discussion around [Fast Sync](https://gitlab.com/meltano/meltano/-/issues/2364)
 * #singer-saas-targets - all things Reverse ETL / Operational Analytics
 * #singer-sdk - discussion around the [SDK for Taps and Targets](https://sdk.meltano.com)
+
+#### Channel Bookmarks
+
+We use Slack's [channel bookmarks](https://slack.com/blog/productivity/whats-new-in-slack-simplified-search-channel-bookmarks) feature to add relevant links for a specific channel.
+
+Our general guidance for bookmarks are:
+
+* Approximately 3 links max for a channel. Don't clutter and make the links feel noisy
+* Relevant to the channel topic i.e. linking to MeltanoHub for #hub and to Meltano SDK for #sdk
+* Regularly review the link if it's to the "latest" version of something i.e. blog post, release, etc.
