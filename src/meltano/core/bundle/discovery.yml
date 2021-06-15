@@ -838,9 +838,6 @@ extractors:
 
       - name: filter_dbs
         description: Comma separated list of schemas to extract tables only from particular schemas and to improve data extraction performance
-      - name: export_batch_rows
-        value: 50000
-        description: Number of rows to export from MySQL in one batch.
       - name: session_sqls
         kind: array
         value:
