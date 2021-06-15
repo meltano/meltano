@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2622](https://gitlab.com/meltano/meltano/-/issues/2622) Make hotgluexyz the default variant for the CSV loader
+
 ### Fixes
 
 ### Breaks
