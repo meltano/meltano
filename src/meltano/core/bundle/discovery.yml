@@ -1338,36 +1338,67 @@ loaders:
     label: Comma Separated Values (CSV)
     description: CSV loader
     namespace: target_csv
-    variant: singer-io
-    docs: 'https://hub.meltano.com/loaders/csv.html'
-    repo: https://github.com/singer-io/target-csv
-    pip_url: target-csv
-    settings:
-      - name: destination_path
-        description: Sets the destination path the CSV files are written to, relative to the project root. The directory needs to exist already, it will not be created automatically. To write CSV files to the project root, set an empty string (`""`).
-        value: output
-      - name: delimiter
-        kind: options
-        options:
-          - label: Comma (,)
+    variants:
+      - name: hotgluexyz
+        docs: 'https://hub.meltano.com/loaders/csv.html'
+        repo: https://github.com/hotgluexyz/target-csv
+        pip_url: git+https://github.com/hotgluexyz/target-csv.git@0.3.3
+        settings:
+          - name: destination_path
+            description: Sets the destination path the CSV files are written to, relative to the project root. The directory needs to exist already, it will not be created automatically. To write CSV files to the project root, set an empty string (`""`).
+            value: output
+          - name: delimiter
+            kind: options
+            options:
+              - label: Comma (,)
+                value: ','
+              - label: Tab (  )
+                value: '\t'
+              - label: Semi-colon (;)
+                value: ';'
+              - label: Pipe (|)
+                value: '|'
             value: ','
-          - label: Tab (  )
-            value: '\t'
-          - label: Semi-colon (;)
-            value: ';'
-          - label: Pipe (|)
-            value: '|'
-        value: ','
-        description: A one-character string used to separate fields. It defaults to a comma (,).
-      - name: quotechar
-        kind: options
-        options:
-          - label: Single Quote (')
+            description: A one-character string used to separate fields. It defaults to a comma (,).
+          - name: quotechar
+            kind: options
+            options:
+              - label: Single Quote (')
+                value: "'"
+              - label: Double Quote (")
+                value: '"'
             value: "'"
-          - label: Double Quote (")
-            value: '"'
-        value: "'"
-        description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
+            description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
+      - name: singer-io
+        docs: 'https://hub.meltano.com/loaders/csv.html'
+        repo: https://github.com/singer-io/target-csv
+        pip_url: target-csv
+        settings:
+          - name: destination_path
+            description: Sets the destination path the CSV files are written to, relative to the project root. The directory needs to exist already, it will not be created automatically. To write CSV files to the project root, set an empty string (`""`).
+            value: output
+          - name: delimiter
+            kind: options
+            options:
+              - label: Comma (,)
+                value: ','
+              - label: Tab (  )
+                value: '\t'
+              - label: Semi-colon (;)
+                value: ';'
+              - label: Pipe (|)
+                value: '|'
+            value: ','
+            description: A one-character string used to separate fields. It defaults to a comma (,).
+          - name: quotechar
+            kind: options
+            options:
+              - label: Single Quote (')
+                value: "'"
+              - label: Double Quote (")
+                value: '"'
+            value: "'"
+            description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
   - name: target-jsonl
     label: JSON Lines (JSONL)
     description: JSONL loader
