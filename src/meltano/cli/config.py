@@ -291,22 +291,27 @@ def test(ctx):
     logger.debug(f"Exec path: {invoker.exec_path()}")
     logger.debug(f"Exec args: {invoker.exec_args()}")
 
-    process = invoker.invoke(stdout=PIPE, stderr=STDOUT, universal_newlines=True)
+    process = None
+    try:
+        process = invoker.invoke(stdout=PIPE, stderr=STDOUT, universal_newlines=True)
+    except Exception:
+        pass
 
     is_valid = False
-    while process.poll() is None and not is_valid:
-        line = process.stdout.readline().strip()
-        if line:
-            logger.debug(line)
+    if process:
+        while process.poll() is None and not is_valid:
+            line = process.stdout.readline().strip()
+            if line:
+                logger.debug(line)
 
-        try:
-            message = json.loads(line)
-        except JSONDecodeError:
-            continue
+            try:
+                message = json.loads(line)
+            except JSONDecodeError:
+                continue
 
-        if message["type"] == "RECORD":
-            process.terminate()
-            is_valid = True
+            if message["type"] == "RECORD":
+                process.terminate()
+                is_valid = True
 
     if is_valid:
         click.secho("Plugin configuration is valid", fg="green")
