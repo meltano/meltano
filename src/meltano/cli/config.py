@@ -295,8 +295,9 @@ def test(ctx):
 
     is_valid = False
     while process.poll() is None and not is_valid:
-        line = process.stdout.readline()
-        logger.debug(line)
+        line = process.stdout.readline().strip()
+        if line:
+            logger.debug(line)
 
         try:
             message = json.loads(line)
