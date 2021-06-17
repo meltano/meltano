@@ -1,6 +1,9 @@
 import json
+import logging
 import tempfile
+from json.decoder import JSONDecodeError
 from pathlib import Path
+from subprocess import PIPE, STDOUT
 
 import click
 import dotenv
@@ -8,6 +11,7 @@ from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -16,6 +20,8 @@ from meltano.core.settings_service import SettingValueStore, StoreNotSupportedEr
 from . import cli
 from .params import pass_project
 from .utils import CliError
+
+logger = logging.getLogger(__name__)
 
 
 @cli.group(invoke_without_command=True)
@@ -49,13 +55,17 @@ def config(ctx, project, plugin_type, plugin_name, format, extras):
             settings = PluginSettingsService(
                 project, plugin, plugins_service=plugins_service
             )
+            invoker = PluginInvoker(project, plugin)
+            invoker.prepare(session)
         else:
             settings = ProjectSettingsService(
                 project, config_service=plugins_service.config_service
             )
+            invoker = None
 
         ctx.obj["settings"] = settings
         ctx.obj["session"] = session
+        ctx.obj["invoker"] = invoker
 
         if ctx.invoked_subcommand is None:
             if format == "json":
@@ -267,3 +277,37 @@ def list_settings(ctx, extras):
         click.echo(
             f"To learn more about {settings.label} and its settings, visit {docs_url}"
         )
+
+
+@config.command("test")
+@click.pass_context
+def test(ctx):
+    """Test the configuration of a plugin."""
+    invoker: PluginInvoker = ctx.obj["invoker"]
+
+    if not invoker:
+        return False
+
+    logger.debug(f"Exec path: {invoker.exec_path()}")
+    logger.debug(f"Exec args: {invoker.exec_args()}")
+
+    process = invoker.invoke(stdout=PIPE, stderr=STDOUT, universal_newlines=True)
+
+    is_valid = False
+    while process.poll() is None and not is_valid:
+        line = process.stdout.readline()
+        logger.debug(line)
+
+        try:
+            message = json.loads(line)
+        except JSONDecodeError:
+            continue
+
+        if message["type"] == "RECORD":
+            process.terminate()
+            is_valid = True
+
+    if is_valid:
+        click.secho("Plugin configuration is valid", fg="green")
+    else:
+        click.secho("Plugin configuration is invalid", fg="red")
