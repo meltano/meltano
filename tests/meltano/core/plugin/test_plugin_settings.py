@@ -699,6 +699,19 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
+        assert subject.as_dict(process=False)["object"] == {
+            "username": "from_meltano_yml",
+            "password": "from_meltano_yml",
+            "deep.nesting": "from_env",
+        }
+        assert subject.as_dict(process=True)["object"] == {
+            "username": "from_meltano_yml",
+            "password": "from_meltano_yml",
+            "deep": {
+                "nesting": "from_env",
+            },
+        }
+
         monkeypatch.setenv(env_var(subject, "data"), '{"foo":"from_env_alias"}')
 
         assert subject.get_with_source("object") == (
