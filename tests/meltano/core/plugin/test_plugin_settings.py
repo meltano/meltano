@@ -52,7 +52,7 @@ def custom_tap(project_add_service):
 
 
 @pytest.fixture
-def subject(tap, plugin_settings_service_factory):
+def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
     return plugin_settings_service_factory(tap)
 
 
@@ -198,7 +198,7 @@ class TestPluginSettingsService:
             assert full_config.get(k) == v
             assert redacted_config.get(k) == v
 
-    def test_as_dict_process(self, subject, tap):
+    def test_as_dict_process(self, subject: PluginSettingsService, tap):
         config = subject.as_dict()
         assert config["auth.username"] is None
         assert config["auth.password"] is None
@@ -511,7 +511,6 @@ class TestPluginSettingsService:
             "missing": "$MISSING",
             "multiple": "$A ${B} $C",
             "info": "$MELTANO_EXTRACTOR_NAME",
-            "nested": {"inner": "inner_value"},
             "password": "foo$r$6$bar",
             "_extra": "$TAP_MOCK_MULTIPLE",
             "_extra_generic": "$MELTANO_EXTRACT_FOO",
@@ -528,7 +527,6 @@ class TestPluginSettingsService:
         assert config["missing"] == None
         assert config["multiple"] == "rock paper scissors"
         assert config["info"] == "tap-mock"
-        assert config["nested"] == {"inner": "inner_value"}
 
         # Only `$ALL_CAPS` env vars are supported
         assert config["password"] == yml_config["password"]
@@ -650,7 +648,9 @@ class TestPluginSettingsService:
         monkeypatch.setitem(subject.plugin.config, "start_date", now)
         assert subject.get("start_date") == now.isoformat()
 
-    def test_kind_object(self, subject, tap, monkeypatch, env_var):
+    def test_kind_object(
+        self, subject: PluginSettingsService, tap, monkeypatch, env_var
+    ):
         assert subject.get_with_source("object") == (
             {"nested": "from_default"},
             SettingValueStore.DEFAULT,
