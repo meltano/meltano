@@ -307,6 +307,30 @@ credentials/secrets exposed:
 
 * _Note: if one person is leading the meeting and multiple team members are present, whoever is not presenting should take steps (1) and (2) above, while the other team member continues to lead the remainder of the session._
 
+## Website Administration
+
+Listed here is a map of where to go to support each component of our website properties.
+
+### Domain Leases
+
+Domains are leased from AWS and their administration is managed via our Meltano AWS account.
+
+### DNS and Routing Rules
+
+- AWS routes all traffic to SiteGround
+- SiteGround manages DNS and Routing Rules, including `CNAME` entries for
+  the `sdk.` and `hub.` subdomains, etc.
+
+### Site Hosting
+
+- Website file management and page serving is provided by SiteGround for `meltano.com`
+- SiteGround also runs our managed WordPress implementations, with wordpress
+  blog files published to the `/blog/` directory within the `meltano.com` 
+  website file store.
+- `sdk.meltano.com` is served by `readthedocs.org` (this is not the same
+  as `readthedocs.com`)
+- `hub.meltano.com` is served by Gitlab Pages.
+
 ## Outages & escalation
 
 Both https://www.meltano.com and https://meltano.meltanodata.com are automatically monitored using Pingdom, with notifications of downtime posted to:
@@ -317,4 +341,3 @@ Both https://www.meltano.com and https://meltano.meltanodata.com are automatical
 Other `*.meltanodata.com` instances are not currently monitored.
 
 When any instance managed by us is reported to be down, through Pingdom or any other means, resolving this becomes the team's top priority.
-
