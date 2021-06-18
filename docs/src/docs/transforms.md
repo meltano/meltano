@@ -1,17 +1,30 @@
----
-description: Learn how to transform your loaded data for analysis using Meltano and dbt.
-lastUpdatedSignificantly: 2020-02-20
----
-
 # Data Transformation (T)
 
-Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations.
+Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required
+configuration, models, packages, etc in order to run the transformations.
 
-When Meltano elt runs with the `--transform run` option, the default dbt transformations for the extractor used are run if they are installed; but Meltano will **never** modify the original source file.
+## `dbt` (Data Build Tool) Installation and Configuration
+
+To learn more about the dbt Transformer package, please see the
+[dbt plugin](https://hub.meltano.com/transformers/dbt) documentation on [Meltano Hub](https://hub.meltano.com).
+
+## Working with Transform Plugins
+
+`Transform` plugins are dbt packages that reside in their own repositories.
+
+When a transform is added to a project, it is added as a dbt package in `transform/packages.yml`, enabled in `transform/dbt_project.yml`, and loaded for usage the next time dbt runs.
+
+_**Note:** You do not have to use `transform` plugin packages in order to use DBT. Many teams instead choose to create their own custom transformations._
+
+For more information on how to build your own dbt models or to customize your project directly, see the [dbt docs](https://docs.getdbt.com/).
+
+### Running a Transform within your ELT pipeline
+
+When `melatno elt` runs with the `--transform run` option, the default dbt transformations for the extractor used are run if they are installed.
 
 As an example, assume that the following command runs:
 
-```
+```bash
 meltano elt tap-gitlab target-postgres --transform run
 ```
 
@@ -19,7 +32,7 @@ After the Extract and Load steps are successfully completed and data have been e
 
 Meltano uses the convention that the transform has the same namespace as the extractor it is for. Transforms can be discovered and added to a Meltano project manually:
 
-```
+```bash
 (venv) $ meltano discover transforms
 
 transforms
@@ -31,13 +44,12 @@ Transform tap-gitlab added to your dbt packages
 Transform tap-gitlab added to your dbt_project.yml
 ```
 
-Transforms are basically dbt packages that reside in their own repositories. If you want to see in more details how such a package can be defined, you can check the dbt documentation on [Package Management](https://docs.getdbt.com/docs/package-management) and [dbt-tap-gitlab](https://gitlab.com/meltano/dbt-tap-gitlab), the project used for defining the default transforms for `tap-gitlab`.
+### Configuring Transform Plugins
 
-When a transform is added to a project, it is added as a dbt package in `transform/packages.yml`, enabled in `transform/dbt_project.yml`, and loaded for usage the next time dbt runs.
+Transform plugins may have additional configuration options in `meltano.yml`. For example, the `tap-gitlab` dbt package requires three variables, which are used for
+finding the tables where raw data has been loaded during the Extract-Load phase:
 
-The format of the `meltano.yml` entries for transforms can have additional parameters. For example, the `tap-gitlab` dbt package requires three variables, which are used for finding the tables where the raw Carbon Intensity data have been loaded during the Extract-Load phase:
-
-```
+```yml
 transforms:
 - name: tap-gitlab
   pip_url: https://gitlab.com/meltano/dbt-tap-gitlab.git
@@ -47,11 +59,9 @@ transforms:
     region_table: "{{ env_var('PG_SCHEMA') }}.region"
 ```
 
-Those entries may follow dbt's syntax in order to fetch values from environment variables. In this case, $PG_SCHEMA must be available in order for the transformations to know in which Postgres schema to find the tables with the Carbon Intensity data. Meltano uses $PG_SCHEMA by default as it is the same default schema also used by the Postgres Loader.
+As an alternative to providing values from environment variables, you can also set values directly in `meltano.yml`:
 
-You can keep those parameters as they are and provide the schema as an environment variable or set the schema manually in `meltano.yml`:
-
-```
+```yml
 transforms:
 - name: tap-gitlab
   pip_url: https://gitlab.com/meltano/dbt-tap-gitlab.git
@@ -61,6 +71,4 @@ transforms:
     region_table: "my_raw_schema.region"
 ```
 
-When Meltano runs a new transformation, `transform/dbt_project.yml` is always kept up to date with whatever is provided in `meltano.yml`.
-
-Finally, dbt can be configured by updating `transform/profile/profiles.yml`. By default, Meltano sets up dbt to use the same database and user as the Postgres Loader and store the results of the transformations in the `analytics` schema.
+Whenever Meltano runs a new transformation, `transform/dbt_project.yml` is updated using the values provided in `meltano.yml`.

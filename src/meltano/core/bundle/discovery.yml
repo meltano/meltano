@@ -838,9 +838,6 @@ extractors:
 
       - name: filter_dbs
         description: Comma separated list of schemas to extract tables only from particular schemas and to improve data extraction performance
-      - name: export_batch_rows
-        value: 50000
-        description: Number of rows to export from MySQL in one batch.
       - name: session_sqls
         kind: array
         value:
@@ -1338,36 +1335,67 @@ loaders:
     label: Comma Separated Values (CSV)
     description: CSV loader
     namespace: target_csv
-    variant: singer-io
-    docs: 'https://hub.meltano.com/loaders/csv.html'
-    repo: https://github.com/singer-io/target-csv
-    pip_url: target-csv
-    settings:
-      - name: destination_path
-        description: Sets the destination path the CSV files are written to, relative to the project root. The directory needs to exist already, it will not be created automatically. To write CSV files to the project root, set an empty string (`""`).
-        value: output
-      - name: delimiter
-        kind: options
-        options:
-          - label: Comma (,)
+    variants:
+      - name: hotgluexyz
+        docs: 'https://hub.meltano.com/loaders/csv.html'
+        repo: https://github.com/hotgluexyz/target-csv
+        pip_url: git+https://github.com/hotgluexyz/target-csv.git@0.3.3
+        settings:
+          - name: destination_path
+            description: Sets the destination path the CSV files are written to, relative to the project root. The directory needs to exist already, it will not be created automatically. To write CSV files to the project root, set an empty string (`""`).
+            value: output
+          - name: delimiter
+            kind: options
+            options:
+              - label: Comma (,)
+                value: ','
+              - label: Tab (  )
+                value: '\t'
+              - label: Semi-colon (;)
+                value: ';'
+              - label: Pipe (|)
+                value: '|'
             value: ','
-          - label: Tab (  )
-            value: '\t'
-          - label: Semi-colon (;)
-            value: ';'
-          - label: Pipe (|)
-            value: '|'
-        value: ','
-        description: A one-character string used to separate fields. It defaults to a comma (,).
-      - name: quotechar
-        kind: options
-        options:
-          - label: Single Quote (')
+            description: A one-character string used to separate fields. It defaults to a comma (,).
+          - name: quotechar
+            kind: options
+            options:
+              - label: Single Quote (')
+                value: "'"
+              - label: Double Quote (")
+                value: '"'
             value: "'"
-          - label: Double Quote (")
-            value: '"'
-        value: "'"
-        description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
+            description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
+      - name: singer-io
+        docs: 'https://hub.meltano.com/loaders/csv.html'
+        repo: https://github.com/singer-io/target-csv
+        pip_url: target-csv
+        settings:
+          - name: destination_path
+            description: Sets the destination path the CSV files are written to, relative to the project root. The directory needs to exist already, it will not be created automatically. To write CSV files to the project root, set an empty string (`""`).
+            value: output
+          - name: delimiter
+            kind: options
+            options:
+              - label: Comma (,)
+                value: ','
+              - label: Tab (  )
+                value: '\t'
+              - label: Semi-colon (;)
+                value: ';'
+              - label: Pipe (|)
+                value: '|'
+            value: ','
+            description: A one-character string used to separate fields. It defaults to a comma (,).
+          - name: quotechar
+            kind: options
+            options:
+              - label: Single Quote (')
+                value: "'"
+              - label: Double Quote (")
+                value: '"'
+            value: "'"
+            description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
   - name: target-jsonl
     label: JSON Lines (JSONL)
     description: JSONL loader
@@ -2040,7 +2068,7 @@ transformers:
     namespace: dbt
     docs: https://meltano.com/docs/transforms.html
     repo: https://github.com/fishtown-analytics/dbt
-    pip_url: dbt==0.16.1
+    pip_url: dbt==0.19.1
     settings:
       - name: project_dir
         value: $MELTANO_PROJECT_ROOT/transform
@@ -2082,14 +2110,14 @@ transforms:
     namespace: tap_adwords
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-adwords
-    pip_url: 'https://gitlab.com/meltano/dbt-tap-adwords.git'
+    pip_url: 'https://gitlab.com/meltano/dbt-tap-adwords.git@config-version-2'
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-carbon-intensity
     namespace: tap_carbon
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-carbon-intensity
-    pip_url: 'https://gitlab.com/meltano/dbt-tap-carbon-intensity.git'
+    pip_url: 'https://gitlab.com/meltano/dbt-tap-carbon-intensity.git@config-version-2'
     vars:
       entry_table: "{{ env_var('DBT_SOURCE_SCHEMA') }}.entry"
       generationmix_table: "{{ env_var('DBT_SOURCE_SCHEMA') }}.generationmix"
@@ -2098,14 +2126,14 @@ transforms:
     namespace: tap_facebook
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-facebook
-    pip_url: 'https://gitlab.com/meltano/dbt-tap-facebook.git'
+    pip_url: 'https://gitlab.com/meltano/dbt-tap-facebook.git@config-version-2'
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-gitlab
     namespace: tap_gitlab
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-gitlab
-    pip_url: 'https://gitlab.com/meltano/dbt-tap-gitlab.git'
+    pip_url: 'https://gitlab.com/meltano/dbt-tap-gitlab.git@config-version-2'
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
       ultimate_license: "{{ env_var('GITLAB_API_ULTIMATE_LICENSE', False) }}"
@@ -2113,28 +2141,28 @@ transforms:
     namespace: tap_google_analytics
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-google-analytics
-    pip_url: 'https://gitlab.com/meltano/dbt-tap-google-analytics.git'
+    pip_url: 'https://gitlab.com/meltano/dbt-tap-google-analytics.git@config-version-2'
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-salesforce
     namespace: tap_salesforce
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-salesforce
-    pip_url: 'https://gitlab.com/meltano/dbt-tap-salesforce.git'
+    pip_url: 'https://gitlab.com/meltano/dbt-tap-salesforce.git@config-version-2'
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-shopify
     namespace: tap_shopify
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-shopify
-    pip_url: 'https://gitlab.com/meltano/dbt-tap-shopify.git'
+    pip_url: 'https://gitlab.com/meltano/dbt-tap-shopify.git@config-version-2'
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-stripe
     namespace: tap_stripe
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-stripe
-    pip_url: 'https://gitlab.com/meltano/dbt-tap-stripe.git'
+    pip_url: 'https://gitlab.com/meltano/dbt-tap-stripe.git@config-version-2'
     vars:
       livemode: false
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
@@ -2142,7 +2170,7 @@ transforms:
     namespace: tap_zendesk
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-zendesk
-    pip_url: 'https://gitlab.com/meltano/dbt-tap-zendesk.git'
+    pip_url: 'https://gitlab.com/meltano/dbt-tap-zendesk.git@config-version-2'
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
 models:
@@ -2264,7 +2292,7 @@ files:
   - name: dbt
     namespace: dbt
     repo: https://gitlab.com/meltano/files-dbt
-    pip_url: git+https://gitlab.com/meltano/files-dbt.git
+    pip_url: git+https://gitlab.com/meltano/files-dbt.git@config-version-2
     update:
       transform/profile/profiles.yml: true
   - name: docker
