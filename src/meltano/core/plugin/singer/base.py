@@ -21,7 +21,7 @@ class SingerPlugin(BasePlugin):
             for key, val in list(nested_config.items()):
                 if "." in key:
                     nested_config.pop(key)
-                elif isinstance(val, dict):
+                elif isinstance(val, dict):  # noqa: WPS220
                     _pop_non_leaf_keys(val)
 
         _pop_non_leaf_keys(processed_config)
