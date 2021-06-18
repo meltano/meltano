@@ -16,13 +16,13 @@ class SingerPlugin(BasePlugin):
         # Result at this point will contain duplicate entries for nested config
         # options. We need to pop those redundant entries recursively.
 
-        def _pop_non_leaf_keys(nested_config: dict):
-            """Recursively pop any dictionary keys with '.' in their names."""
-            for k, v in list(nested_config.items()):
-                if "." in k:
-                    nested_config.pop(k)
-                if isinstance(v, dict):
-                    _pop_non_leaf_keys(v)
+        def _pop_non_leaf_keys(nested_config: dict) -> None:  # noqa: WPS430
+            """Recursively pop dictionary entries with '.' in their keys."""
+            for key, val in list(nested_config.items()):
+                if "." in key:
+                    nested_config.pop(key)
+                if isinstance(val, dict):
+                    _pop_non_leaf_keys(val)
 
         _pop_non_leaf_keys(processed_config)
         return processed_config
