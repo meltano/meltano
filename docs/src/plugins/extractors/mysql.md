@@ -221,24 +221,6 @@ meltano config tap-mysql set filter_dbs <schema1>,<schema2>
 export TAP_MYSQL_FILTER_DBS=<schema1>,<schema2>
 ```
 
-### Export Batch Rows
-
-- Name: `export_batch_rows`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_MYSQL_EXPORT_BATCH_ROWS`
-- Default: `50000`
-
-Number of rows to export from MySQL in one batch.
-
-#### How to use
-
-Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
-
-```bash
-meltano config tap-mysql set export_batch_rows 100000
-
-export TAP_MYSQL_EXPORT_BATCH_ROWS=100000
-```
-
 ### Session SQLs
 
 - Name: `session_sqls`

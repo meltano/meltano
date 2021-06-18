@@ -13,13 +13,22 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 [#2694](https://gitlab.com/meltano/meltano/-/issues/2694) Bump default dbt version to `0.18.2`
+- [#2622](https://gitlab.com/meltano/meltano/-/issues/2622) Make hotgluexyz the default variant for the CSV loader
 
 ### Fixes
 
+### Breaks
+
+
+## 1.76.0 - (2021-06-10)
+---
+
+### Fixes
+
+- [#2755](https://gitlab.com/meltano/meltano/-/issues/2755) Fix SQLAlchemy `cache_ok` warning messages when running `meltano elt`
 - [#2773](https://gitlab.com/meltano/meltano/-/issues/2773) Fix `tap-chargebee`, `tap-intacct` and `tap-quickbooks` definitions that had `properties` capability instead of `catalog`
 - [#2784](https://gitlab.com/meltano/meltano/-/issues/2784) Fix catalog discovery error when using custom plugins with no `pip_url` set
 
-### Breaks
 
 ## 1.75.0 - (2021-05-28)
 ---
