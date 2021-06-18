@@ -1,4 +1,5 @@
 import json
+import sys
 import tempfile
 from pathlib import Path
 
@@ -289,3 +290,4 @@ def test(ctx):
     else:
         click.secho("Plugin configuration is invalid", fg="red")
         click.secho(detail, fg="red")
+        sys.exit(1)
