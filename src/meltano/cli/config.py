@@ -1,9 +1,6 @@
 import json
-import logging
 import tempfile
-from json.decoder import JSONDecodeError
 from pathlib import Path
-from subprocess import PIPE, STDOUT
 
 import click
 import dotenv
@@ -12,6 +9,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.plugin_test_service import PluginTestService
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -20,8 +18,6 @@ from meltano.core.settings_service import SettingValueStore, StoreNotSupportedEr
 from . import cli
 from .params import pass_project
 from .utils import CliError
-
-logger = logging.getLogger(__name__)
 
 
 @cli.group(invoke_without_command=True)
@@ -285,35 +281,11 @@ def test(ctx):
     """Test the configuration of a plugin."""
     invoker: PluginInvoker = ctx.obj["invoker"]
 
-    if not invoker:
-        return False
-
-    logger.debug(f"Exec path: {invoker.exec_path()}")
-    logger.debug(f"Exec args: {invoker.exec_args()}")
-
-    process = None
-    try:
-        process = invoker.invoke(stdout=PIPE, stderr=STDOUT, universal_newlines=True)
-    except Exception:
-        pass
-
-    is_valid = False
-    if process:
-        while process.poll() is None and not is_valid:
-            line = process.stdout.readline().strip()
-            if line:
-                logger.debug(line)
-
-            try:
-                message = json.loads(line)
-            except JSONDecodeError:
-                continue
-
-            if message["type"] == "RECORD":
-                process.terminate()
-                is_valid = True
+    plugin_test_service = PluginTestService(invoker)
+    is_valid, detail = plugin_test_service.validate()
 
     if is_valid:
         click.secho("Plugin configuration is valid", fg="green")
     else:
         click.secho("Plugin configuration is invalid", fg="red")
+        click.secho(detail, fg="red")
