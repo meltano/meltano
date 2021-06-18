@@ -16,6 +16,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2741]https://gitlab.com/meltano/meltano/-/issues/2741) Fix duplication of setting values when complex settings are applied to Singer plugins.
+
 ### Breaks
 
 
