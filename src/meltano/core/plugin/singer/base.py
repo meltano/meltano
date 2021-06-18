@@ -12,7 +12,20 @@ from meltano.core.utils import nest_object
 class SingerPlugin(BasePlugin):
     def process_config(self, flat_config):
         non_null_config = {k: v for k, v in flat_config.items() if v is not None}
-        return nest_object(non_null_config)
+        processed_config = nest_object(non_null_config)
+        # Result at this point will contain duplicate entries for nested config
+        # options. We need to pop those redundant entries recursively.
+
+        def _pop_non_leaf_keys(nested_config: dict):
+            """Recursively pop any dictionary keys with '.' in their names."""
+            for k, v in list(nested_config.items()):
+                if "." in k:
+                    nested_config.pop(k)
+                if isinstance(v, dict):
+                    _pop_non_leaf_keys(v)
+
+        _pop_non_leaf_keys(processed_config)
+        return processed_config
 
     @hook("before_configure")
     def before_configure(self, invoker, session):
