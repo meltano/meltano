@@ -12,14 +12,23 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-- [#2694](https://gitlab.com/meltano/meltano/-/issues/2694) Bump default dbt version to `0.19.1`
+### Fixes
+
+### Breaks
+
+
+## 1.77.0 - (2021-06-17)
+---
+
+### Changes
+
+- [#2694](https://gitlab.com/meltano/meltano/-/issues/2694) Use dbt [`v0.19.1`](https://github.com/fishtown-analytics/dbt/releases/tag/v0.19.1) by default for new dbt installs
+- [#2694](https://gitlab.com/meltano/meltano/-/issues/2694) Add support for dbt [`config-version: 2`](https://docs.getdbt.com/docs/guides/migration-guide/upgrading-to-0-17-0)
 - [#2622](https://gitlab.com/meltano/meltano/-/issues/2622) Make `hotgluexyz` the default variant for the CSV loader
 
 ### Fixes
 
-- [#2741]https://gitlab.com/meltano/meltano/-/issues/2741) Fix duplication of setting values when complex settings are applied to Singer plugins.
-
-### Breaks
+- [#2741](https://gitlab.com/meltano/meltano/-/issues/2741) Fix duplication of config values when complex settings are applied to Singer plugins.
 
 
 ## 1.76.0 - (2021-06-10)
