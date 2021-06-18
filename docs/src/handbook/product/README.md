@@ -6,6 +6,10 @@ sidebarDepth: 2
 
 Our [milestones and scheduled work](https://gitlab.com/groups/meltano/-/milestones) is available to the public, and we encourage anyone to [submit new issues](https://gitlab.com/meltano/meltano/issues/new).
 
+## High-level Responsibilities
+
+The Head of Product will review any [new issues](https://gitlab.com/groups/meltano/-/issues) in the Meltano group on a daily cadence and organize appropriately with labels and milestones.
+
 ## Choosing What to Work On
 
 We have limited engineering hours and focus available, and need to make sure we are working on things that will move Meltano forward towards our goal of increasing [MAUI](https://meltano.com/docs/roadmap.html#maui).

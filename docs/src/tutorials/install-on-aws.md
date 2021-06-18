@@ -76,7 +76,7 @@ The main configuration here is the **Cluster name**. We provide a suggestion bel
 
 After you click `Next`, you will have the opportunity to review all of the properties that you set. Once you confirm that the settings are correct, click `Create` to setup your ECS.
 
-You should now see a page where Amazon prepares the services we configured. There will be spinning icons on the right of each service that will live update as it finished. Once you see everything has setup properly, you're cluster has been successfully deployed!
+You should now see a page where Amazon prepares the services we configured. There will be spinning icons on the right of each service that will live update as it finished. Once you see everything has setup properly, your cluster has been successfully deployed!
 
 ## Configure network access
 
