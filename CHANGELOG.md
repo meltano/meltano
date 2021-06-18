@@ -12,8 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-[#2694](https://gitlab.com/meltano/meltano/-/issues/2694) Bump default dbt version to `0.18.2`
-- [#2622](https://gitlab.com/meltano/meltano/-/issues/2622) Make hotgluexyz the default variant for the CSV loader
+- [#2694](https://gitlab.com/meltano/meltano/-/issues/2694) Bump default dbt version to `0.19.1`
+- [#2622](https://gitlab.com/meltano/meltano/-/issues/2622) Make `hotgluexyz` the default variant for the CSV loader
 
 ### Fixes
 
