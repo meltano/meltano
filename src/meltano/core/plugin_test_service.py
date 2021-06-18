@@ -5,7 +5,10 @@ import logging
 from subprocess import PIPE, STDOUT
 from typing import Union
 
+from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker
+
+SUPPORTED_TYPES = PluginType.EXTRACTORS
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +22,10 @@ class PluginTestService:
 
     def validate(self) -> Union[bool, str]:
         """Validate plugin configuration."""
+        plugin = self.plugin_invoker.plugin
+        if plugin.type not in SUPPORTED_TYPES:
+            return False, f"Operation not supported for {plugin.type}"
+
         process = None
         try:
             process = self.plugin_invoker.invoke(
