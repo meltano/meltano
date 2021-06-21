@@ -34,10 +34,12 @@ class PluginTestService:
         except Exception as exc:
             return False, str(exc)
 
+        last_line = None
         while process.poll() is None:
             line = process.stdout.readline().strip()
             if line:
                 logger.debug(line)
+                last_line = line
 
             try:
                 message = json.loads(line)
@@ -48,4 +50,4 @@ class PluginTestService:
                 process.terminate()
                 return True, None
 
-        return False, "No RECORD message received"
+        return False, last_line if process.returncode else "No RECORD message received"
