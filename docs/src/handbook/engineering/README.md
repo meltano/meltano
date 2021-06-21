@@ -320,4 +320,4 @@ When any instance managed by us is reported to be down, through Pingdom or any o
 
 ## GitHub Mirrors
 
-We mirror the three main Meltano repositories (meltano/sdk/hub) from GitLab to GitHub. This is done using Taylor's personal GitHub account (tayloramurphy) with a personal access token made just for the use case. This was tracked in [this issue](https://gitlab.com/meltano/meta/-/issues/55).
+We mirror the three main Meltano repositories (meltano/sdk/hub) from GitLab to GitHub. This is managed via the "Mirroring repositories" section with the Settings of the GitLab repository. The push was created using Taylor's personal GitHub account (tayloramurphy) with a personal access token made just for the use case. This was tracked in [this issue](https://gitlab.com/meltano/meta/-/issues/55).
