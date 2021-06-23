@@ -1125,7 +1125,7 @@ extractors:
       - name: api_token
         kind: password
         label: API Token
-        documentation: https://support.zendesk.com/hc/en-us/articles/226022787-Generating-a-new-API-token-
+        documentation: https://slack.com/help/articles/215770388-Create-and-regenerate-API-tokens
       - name: start_date
         kind: date_iso8601
         label: Sync Start Date
