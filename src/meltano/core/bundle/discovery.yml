@@ -268,6 +268,31 @@ extractors:
             - device
         label: Primary Keys
         description: Primary Keys for the selected Entities (Streams)
+  - name: tap-ask-nicely
+    description: Customer Experience Platform
+    label: AskNicely
+    namespace: tap_ask_nicely
+    variants:
+      - default: true
+        docs: https://hub.meltano.com/extractors/ask-nicely
+        name: mashey
+        pip_url: git+https://github.com/Mashey/tap-ask-nicely.git
+        repo: https://github.com/Mashey/tap-ask-nicely
+        capabilities:
+          - catalog
+          - discover
+          - state
+        settings_group_validation:
+          - ['subdomain', 'api_key']
+        settings: 
+          - name: subdomain
+            label: Subdomain
+            description: The subdomain of your Ask Nicely account.
+          - name: api_key
+            kind: password
+            label: API Key
+            documentation: https://asknicely.asknice.ly/help/apidocs/auth
+            description: The API Key generated via your Ask Nicely account.
   - name: tap-bigquery
     label: BigQuery
     description: BigQuery data warehouse extractor
