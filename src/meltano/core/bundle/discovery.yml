@@ -273,9 +273,8 @@ extractors:
     label: AskNicely
     namespace: tap_ask_nicely
     variants:
-      - default: true
+      - name: mashey
         docs: https://hub.meltano.com/extractors/ask-nicely
-        name: mashey
         pip_url: git+https://github.com/Mashey/tap-ask-nicely.git
         repo: https://github.com/Mashey/tap-ask-nicely
         capabilities:
