@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2814](https://gitlab.com/meltano/meltano/-/issues/2814) Add `mashey` variant of `tap-ask-nicely`
+- [#2815](https://gitlab.com/meltano/meltano/-/issues/2815) Add `singer-io` variant of `tap-github`
 
 ### Changes
 
