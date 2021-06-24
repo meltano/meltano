@@ -56,8 +56,8 @@ Their maintainers are:
 | [Stitch](https://www.stitchdata.com/) | 5 extractors, 1 loader |
 | [Wise](https://wise.com/) | 2 extractors, 2 loaders |
 | [Hotglue](https://hotglue.xyz/) | 3 extractors |
+| [Mashey](https://www.mashey.com/) | 3 extractors |
 | [Data Mill](https://datamill.co/) | 2 loaders |
-| [Mashey](https://www.mashey.com/) | 2 extractors |
 | [Adswerve](https://adswerve.com/) | 1 loader |
 | [Andy Huynh](https://github.com/andyh1203) | 1 loader |
 | [ANELEN](https://anelen.co/) | 1 extractor |
