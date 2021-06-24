@@ -796,6 +796,43 @@ extractors:
           label: User Agent
           description: Used to identify the tap in the Google Remote API logs.
           placeholder: Ex. "tap-google-search-console <api_user_email@example.com>"
+  - name: tap-hubspot
+    description: Inbound Marketing software
+    label: Hubspot
+    namespace: tap_hubspot
+    variants:
+      - name: singer-io
+        maintenance_status: Active
+        docs: https://hub.meltano.com/extractors/hubspot
+        pip_url: git+https://github.com/singer-io/tap-hubspot.git
+        repo: https://github.com/singer-io/tap-hubspot
+        capabilities:
+          - discover
+          - properties
+          - state
+        settings_group_validation:
+          - ['redirect_uri','client_id','client_secret','refresh_token','start_date']
+        settings: 
+          - name: redirect_uri
+            label: Redirect URI
+            documentation: https://legacydocs.hubspot.com/docs/methods/oauth2/oauth2-quickstart
+            description: This is the URL that the user will be redirected to after they authorize your app for the requested scopes
+          - name: client_id
+            label: Client ID
+            description: This identifies the app used to connect to HubSpot.
+            documentation: https://legacydocs.hubspot.com/docs/methods/oauth2/oauth2-quickstart
+          - name: client_secret
+            label: Client Secret
+            kind: password
+            description: The client secret used for authentication.
+          - name: refresh_token
+            label: Refresh Token
+            kind: password
+            description: This is the refresh token provided by HubSpot.
+          - name: start_date
+            label: Start Date
+            kind: date_iso8601
+            description: This is the cutoff date for syncing historical data. 
   - name: tap-intacct
     namespace: tap_intacct
     label: Sage Intacct

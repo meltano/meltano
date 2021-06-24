@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2815](https://gitlab.com/meltano/meltano/-/issues/2815) Add `singer-io` variant of `tap-github`
 - [#2816](https://gitlab.com/meltano/meltano/-/issues/2816) Add `singer-io` variant of `tap-google-sheets`
 - [#2817](https://gitlab.com/meltano/meltano/-/issues/2817) Add `singer-io` variant of `tap-pendo`
+- [#2818](https://gitlab.com/meltano/meltano/-/issues/2818) Add `singer-io` variant of `tap-hubspot`
 
 ### Changes
 
