@@ -144,6 +144,7 @@ Our focus for July will be to expand our integrations for orchestration, data qu
 * [Fast Sync / Batch Messages](https://gitlab.com/meltano/meltano/-/issues/2364)
 * [Superset](https://gitlab.com/meltano/meltano/-/issues/2605)
 * [Meltano Academy](https://gitlab.com/meltano/meta/-/issues/63)
+* [MeltanoHub as SSOT for Meltano](https://gitlab.com/groups/meltano/-/epics/102)
 
 #### August 2021
 
@@ -152,6 +153,7 @@ Our focus for August will be to continue expanding integrations as well as havin
 * [Jupyter Notebooks](https://gitlab.com/meltano/meltano/-/issues/2595)
 * [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
 * [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
+* [Decentralized Management of MeltanoHub Connectors](https://gitlab.com/meltano/meta/-/issues/73)
 
 #### September 2021
 
@@ -159,7 +161,7 @@ Our focus for September will be to enable simple cloud deployments, improve the 
 
 * [Simple Cloud Deploys](https://gitlab.com/groups/meltano/-/epics/28)
 * [Git-provider Integrations](https://gitlab.com/groups/meltano/-/epics/92)
-* [Initial conversion of MeltanoHub to dyanmic site](https://gitlab.com/groups/meltano/-/epics/83)
+* [Initial conversion of MeltanoHub to dyanmic site](https://gitlab.com/groups/meltano/-/epics/101)
 
 #### 2021-Q4
 
