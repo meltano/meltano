@@ -53,7 +53,7 @@ Their maintainers are:
 | Maintainer | Connectors |
 | ---------- | ---------- |
 | Meltano community | 9 extractors, 3 loaders |
-| [Stitch](https://www.stitchdata.com/) | 8 extractors, 1 loader |
+| [Stitch](https://www.stitchdata.com/) | 9 extractors, 1 loader |
 | [Wise](https://wise.com/) | 2 extractors, 2 loaders |
 | [Hotglue](https://hotglue.xyz/) | 3 extractors |
 | [Mashey](https://www.mashey.com/) | 3 extractors |

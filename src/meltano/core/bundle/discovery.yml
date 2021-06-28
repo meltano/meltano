@@ -882,6 +882,59 @@ extractors:
       kind: integer
       value: 8
       label: Maximum number of threads to use
+  - name: tap-jira
+    description: Issue and Project Tracking Software
+    label: Jira
+    namespace: tap_jira
+    type: tap
+    variants:
+    - name: singer-io
+      docs: https://hub.meltano.com/extractors/jira
+      maintenance_status: Acive
+      pip_url: git+https://github.com/singer-io/tap-jira.git
+      repo: https://github.com/singer-io/tap-jira
+      capabilities:
+        - discover
+        - catalog
+        - state
+      settings_group_validation:
+        - ['start_date','username','password','base_url','user_agent']
+        - ['oauth_client_secret','user_agent','oauth_client_id','access_token','cloud_id','refresh_token','start_date']
+      settings:
+        - name: start_date
+          label: Start Date
+          kind: date_iso8601
+          description: Specifies the date at which the tap will begin pulling data. This works only for the streams taht suppport it.
+        - name: username
+          label: Username
+          description: Your Jira username.
+        - name: password
+          label: Password
+          kind: Your Jira password.
+        - name: base_url
+          label: Base URL
+          description: The base URL for your Jira instance.
+          placeholder: Ex. "https://mycompany.atlassian.net"
+        - name: user_agent
+          label: User Agent
+        - name: oauth_client_secret
+          label: OAuth Client Secret
+          kind: password
+          description: The client secret value used for OAuth authentication.
+        - name: oauth_client_id
+          label: OAuth Client ID
+          kind: The client ID used for OAuth authentication.
+        - name: access_token
+          label: Access Token
+          kind: password
+          description: The access token generated for your account.
+        - name: cloud_id
+          label: Cloud ID
+          description: The cloud ID of your JIRA instance.
+        - name: refresh_token
+          label: Refresh Token
+          kind: password
+          description: The refresh token generated for your account.
   - name: tap-marketo
     label: Marketo
     description: Marketing automation for account-based marketing
