@@ -59,7 +59,7 @@ ul.members
   padding: 1.5rem 0
   line-height inherit
   display grid
-  grid-template-columns 1fr 1fr 1fr
+  grid-template-columns repeat(auto-fit, minmax(150px, 1fr))
   grid-column-gap 1rem
   grid-row-gap 1.5rem
   align-items top
