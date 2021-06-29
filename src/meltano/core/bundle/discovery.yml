@@ -771,7 +771,7 @@ extractors:
       settings:
         - name: client_id
           label: Client ID
-          description: This the ID setup via the Google Cloud API. 
+          description: This is the ID setup via the Google Cloud API. 
           documentation: https://drive.google.com/open?id=1FojlvtLwS0-BzGS37R0jEXtwSHqSiO1Uw-7RKQQO-C4
         - name: client_secret
           label: Client Secret
@@ -793,6 +793,7 @@ extractors:
           placeholder: Ex. "2019-01-01T00:00:00Z"
         - name: user_agent
           label: User Agent
+          value: tap-google-sheets via Meltano
           description: Used to identify the tap in the Google Remote API logs.
           placeholder: Ex. "tap-google-search-console <api_user_email@example.com>"
   - name: tap-hubspot
