@@ -682,7 +682,7 @@ extractors:
           - discover
           - state
         settings_group_validation:
-          - ['start_date', 'access_token', 'repository']
+          - ['access_token', 'repository', 'start_date']
         settings: 
           - name: start_date
             label: Start Date
@@ -897,8 +897,8 @@ extractors:
         - catalog
         - state
       settings_group_validation:
-        - ['start_date','username','password','base_url','user_agent']
-        - ['oauth_client_secret','user_agent','oauth_client_id','access_token','cloud_id','refresh_token','start_date']
+        - ['username','password','base_url','start_date','user_agent']
+        - ['oauth_client_secret','oauth_client_id','access_token','cloud_id','refresh_token','start_date','user_agent']
       settings:
         - name: username
           label: Username
@@ -1050,7 +1050,7 @@ extractors:
         - discover
         - state
       settings_group_validation:
-        - ['start_date', 'x_pendo_integration_key', 'period']
+        - ['x_pendo_integration_key', 'period', 'start_date']
       settings:
         - name: x_pendo_integration_key
           label: Integration Key
