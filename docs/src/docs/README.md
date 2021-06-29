@@ -1,5 +1,31 @@
 ---
 description: Learn where to use Meltano, how Meltano is built, and where to get started.
+
+members:
+- name: Douwe Maan
+  title: General Manager
+  location: Mexico City, Mexico 🇲🇽
+  gravatar_hash: 73d1548ae618321220679b3a4fda7fb1 # md5(email)
+  social:
+    gitlab: DouweM
+    twitter: DouweM
+    linkedin: douwem
+- name: Taylor Murphy
+  title: Head of Product & Data
+  location: Nashville, TN, USA 🇺🇸
+  gravatar_hash: b4936f876b1093f90d7246b264084ddd
+  social:
+    gitlab: tayloramurphy
+    twitter: tayloramurphy
+    linkedin: tayloramurphy
+- name: AJ Steers
+  title: Head of Engineering
+  location: Seattle, WA, USA 🇺🇸
+  gravatar_hash: 80b61ad103a8d9fd989893b757b15dac
+  social:
+    gitlab: aaronsteers
+    twitter: aaronsteers
+    linkedin: aaronsteers
 ---
 
 # Introduction
@@ -59,7 +85,7 @@ to debug it, contribute a fix, and see it through, instead of giving up.
 Meltano's index of discoverable [extractors](https://hub.meltano.com/extractors/) and [loaders](https://hub.meltano.com/loaders/) will grow as the
 number of [Singer Taps and Targets grows](https://hub.meltano.com/singer/).
 
-In addition to the MeltanoHub, the [**SDK for Singer Taps and Targets**](https://sdk.meltano.com) enables 
+In addition to the MeltanoHub, the [**SDK for Singer Taps and Targets**](https://sdk.meltano.com) enables
 developers to build **connectors with all the bells and whistles** without having to be become an expert on the spec.
 This further lowers the barrier to creating new connectors and contributing to existing ones,
 and will lead to increased reliability and consistency.
@@ -137,7 +163,7 @@ Our focus for June will be to launch the Target SDK, to add support for inline m
 
 #### July 2021
 
-Our focus for July will be to expand our integrations for orchestration, data quality, and analysis. We will also work to add support for the fast sync / batch message type to enable higher throughput for extraction and loading. 
+Our focus for July will be to expand our integrations for orchestration, data quality, and analysis. We will also work to add support for the fast sync / batch message type to enable higher throughput for extraction and loading.
 
 * [Dagster](https://gitlab.com/meltano/meltano/-/issues/2393 )
 * [Great Expectations](https://gitlab.com/meltano/meltano/-/issues/2454)
@@ -148,7 +174,7 @@ Our focus for July will be to expand our integrations for orchestration, data qu
 
 #### August 2021
 
-Our focus for August will be to continue expanding integrations as well as having full out-of-the-box support for an OLAP Database. 
+Our focus for August will be to continue expanding integrations as well as having full out-of-the-box support for an OLAP Database.
 
 * [Jupyter Notebooks](https://gitlab.com/meltano/meltano/-/issues/2595)
 * [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
@@ -192,3 +218,9 @@ Meltano, originally called BizOps, was founded inside [GitLab](https://about.git
 To learn more about Meltano's history from 2018 through 2020, read the following blog post: [Revisiting the Meltano strategy: a return to our roots](https://meltano.com/blog/2020/05/13/revisiting-the-meltano-strategy-a-return-to-our-roots/).
 
 In the first half of 2021, the team grew to include AJ Steers and Taylor Murphy who are leading the Engineering and Product/Data organizations respectively. The 3-person team was able to launch the [SDK for Taps](https://meltano.com/blog/2021/04/05/meltano-launches-v0-1-0-of-the-singer-tap-sdk/), [MeltanoHub](https://meltano.com/blog/2021/06/01/meltanohub-for-singer-launches-with-over-200-taps-and-targets/), and the SDK for Targets while also growing the [Slack community to over 1000 people](https://meltano.com/blog/2021/04/23/community-milestone-1000-slack-members/).
+
+## Team
+
+Meltano is built by an all-remote team of {{$frontmatter.members.length}} and a [community](/docs/community.html) of [contributors](/docs/contributor-guide.html).
+
+<TeamGrid :members="$frontmatter.members" />
