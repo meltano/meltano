@@ -886,7 +886,6 @@ extractors:
     description: Issue and Project Tracking Software
     label: Jira
     namespace: tap_jira
-    type: tap
     variants:
     - name: singer-io
       docs: https://hub.meltano.com/extractors/jira
@@ -1410,7 +1409,6 @@ extractors:
     description: Cloud communications platform as a service
     label: Twilio
     namepsace: tap_twilio
-    type: tap
     variants:
     - name: transferwise
       maintenance_status: Active
