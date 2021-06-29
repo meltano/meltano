@@ -92,8 +92,9 @@ Community Events:
 Singer Related:
 
 * #singer-batch-messages - discussion around [Fast Sync](https://gitlab.com/meltano/meltano/-/issues/2364)
-* #singer-saas-targets - all things Reverse ETL / Operational Analytics
-* #singer-sdk - discussion around the [SDK for Taps and Targets](https://sdk.meltano.com)
+* #singer-tap-development - discussion around building taps with the [Meltano SDK](https://sdk.meltano.com)
+* #singer-taps - discussion around specific Singer taps
+* #singer-target-development - discussion around building targets with the [Meltano SDK](https://sdk.meltano.com), including "SaaS Targets", Reverse ETL, and Operational Analytics use cases
 
 #### Channel Bookmarks
 
