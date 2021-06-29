@@ -910,13 +910,12 @@ extractors:
           description: Your Jira username.
         - name: password
           label: Password
-          kind: Your Jira password.
+          kind: password
+          description: Your Jira password.
         - name: base_url
           label: Base URL
           description: The base URL for your Jira instance.
           placeholder: Ex. "https://mycompany.atlassian.net"
-        - name: user_agent
-          label: User Agent
         - name: oauth_client_secret
           label: OAuth Client Secret
           kind: password
@@ -935,6 +934,9 @@ extractors:
           label: Refresh Token
           kind: password
           description: The refresh token generated for your account.
+        - name: user_agent
+          label: User Agent
+          value: tap-jira via Meltano
   - name: tap-marketo
     label: Marketo
     description: Marketing automation for account-based marketing
