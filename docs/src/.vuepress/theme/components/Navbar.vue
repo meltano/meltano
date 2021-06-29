@@ -49,9 +49,12 @@ export default {
   color white
 
   p
-    line-height $bannerHeight
-    padding 0
     margin 0
+    padding 0px 1rem
+    text-overflow ellipsis
+    overflow hidden
+    white-space nowrap
+    line-height $bannerHeight
     text-align center
     font-weight bold
 
