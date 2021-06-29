@@ -1429,19 +1429,20 @@ extractors:
           label: Auth Token
           kind: password
           description: This is the authorization token for your account which can be found in the account console at twilio.com/console. 
+        - name: date_window_days
+          label: Date Window Days
+          kind: integer
+          description: This is the integer number of days (between the from and to dates) for date-windowing through the date-filtered endpoints.
+          value: 30
         - name: start_date
           label: Start Date
           kind: date_iso8601
           description: This is the absolute beginning date from which incremental loading on the initial load will start
         - name: user_agent
           label: User Agent
+          value: tap-twilio via Meltano
           description: This is used to identify the process running the tap.
           placeholder: Ex. "tap-twilio <api_user_email@your_company.com>"
-        - name: date_window_days
-          label: Date Window Days
-          kind: integer
-          description: This is the integer number of days (between the from and to dates) for date-windowing through the date-filtered endpoints.
-          value: 30
   - name: tap-zendesk
     label: Zendesk
     description: Support ticketing system & customer service platform
