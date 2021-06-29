@@ -68,6 +68,13 @@ members:
   social:
     gitlab: kgpayne
     linkedin: k-g-payne
+openings:
+- title: Backend Engineer
+  description: "Required: Python and data experience"
+- title: Frontend Engineer / UX Designer Hybrid
+  description: "Nice to have: Vue.js experience"
+- title: Data Engineer / Analyst Hybrid
+- title: Executive Assistant
 ---
 
 # Introduction
@@ -79,7 +86,7 @@ members:
 [debuggable](/docs/command-line-interface.html#debugging), and
 [extensible](/docs/plugins.html).
 
-This page covers the project's [Mission](#mission), [Focus](#focus), [Roadmap](#roadmap), and [History](#history).
+This page covers the project's [Mission](#mission), [Focus](#focus), [Roadmap](#roadmap), [History](#history), and [Team](#team).
 
 To find guides and references on other topics, use the Table of Contents in the sidebar.
 
@@ -264,5 +271,15 @@ In the first half of 2021, the team grew to include AJ Steers and Taylor Murphy 
 ## Team
 
 Meltano is built by an all-remote team of {{$frontmatter.members.length}} and a [community](/docs/community.html) of [contributors](/docs/contributor-guide.html).
+If you'd like to join the team, check out the [job openings](#job-openings)!
 
 <TeamGrid :members="$frontmatter.members" />
+
+### Job Openings
+
+The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future!
+
+If our [mission](#mission) excites you and you think could make a great addition to the team in one of the following roles, we'd love to talk to you.
+Please send a cover letter and resume to [hello@meltano.com](mailto:hello@meltano.com) and you'll hear back from us shortly.
+
+<TeamGrid :openings="$frontmatter.openings" />
