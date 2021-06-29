@@ -901,10 +901,6 @@ extractors:
         - ['start_date','username','password','base_url','user_agent']
         - ['oauth_client_secret','user_agent','oauth_client_id','access_token','cloud_id','refresh_token','start_date']
       settings:
-        - name: start_date
-          label: Start Date
-          kind: date_iso8601
-          description: Specifies the date at which the tap will begin pulling data. This works only for the streams taht suppport it.
         - name: username
           label: Username
           description: Your Jira username.
@@ -934,6 +930,10 @@ extractors:
           label: Refresh Token
           kind: password
           description: The refresh token generated for your account.
+        - name: start_date
+          label: Start Date
+          kind: date_iso8601
+          description: Specifies the date at which the tap will begin pulling data. This works only for the streams taht suppport it.
         - name: user_agent
           label: User Agent
           value: tap-jira via Meltano
