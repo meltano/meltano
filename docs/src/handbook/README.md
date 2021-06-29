@@ -15,12 +15,6 @@ As Meltano is part of [GitLab](https://about.gitlab.com/), those parts of the [G
 - [Product Handbook](/handbook/product/)
 - [Data Learning Resources](/handbook/resources/)
 
-## Team
-
-- [Douwe Maan](https://about.gitlab.com/company/team/#DouweM) - General Manager
-- [Taylor Murphy](https://about.gitlab.com/company/team/#tayloramurphy) - Lead
-- [AJ Steers](https://about.gitlab.com/company/team/#asteers) - Lead
-
 ## Customer Support
 
 ### Email
@@ -34,7 +28,7 @@ Team members have their own accounts and master account login info can be found 
 Emails to `security@meltano.com` also forward to Zendesk, and are automatically assigned to the Security group, which includes all current team members.
 As documented in our [Responsible Disclosure Policy](/docs/responsible-disclosure.md), we will acknowledge receipt of a vulnerability report the next business day and strive to send the reporter regular updates about our progress.
 
-### Intercom Live Chat powered
+### Intercom Live Chat
 
 The [Meltano.com website](https://www.meltano.com) is set up with live chat powered by Intercom.
 Team members have their own accounts and master account login info can be found in 1Password.
