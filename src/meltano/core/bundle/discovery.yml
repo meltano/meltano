@@ -1053,10 +1053,6 @@ extractors:
       settings_group_validation:
         - ['start_date', 'x_pendo_integration_key', 'period']
       settings:
-        - name: start_date
-          label: Start Date
-          description: This is the default start date value to use if no bookmark is present.
-          kind: date_iso8601
         - name: x_pendo_integration_key
           label: Integration Key
           env: TAP_PENDO_INTEGRATION_KEY
@@ -1065,6 +1061,7 @@ extractors:
         - name: period
           label: Period
           description: This defines how data is aggregated, either on a daily or hourly basis.
+          kind: options
           options:
             - label: Daily
               value: dayRange
@@ -1073,7 +1070,7 @@ extractors:
         - name: lookback_window
           kind: integer
           label: Lookback Window
-          description: The time period to use as the lookback window.
+          description: The number of days to use as the lookback window.
           value: 0
         - name: include_anonymous_visitors
           label: Include Anonymous Visitors
@@ -1081,6 +1078,10 @@ extractors:
           kind: boolean
           default: false
           value_post_processor: stringify
+        - name: start_date
+          label: Start Date
+          description: This is the default start date value to use if no bookmark is present.
+          kind: date_iso8601
   - name: tap-postgres
     label: PostgreSQL
     description: PostgreSQL database extractor
