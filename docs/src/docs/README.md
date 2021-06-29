@@ -3,7 +3,7 @@ description: Learn where to use Meltano, how Meltano is built, and where to get 
 
 members:
 - name: Douwe Maan
-  title: General Manager
+  title: Founder, CEO
   location: Mexico City, Mexico 🇲🇽
   gravatar_hash: 73d1548ae618321220679b3a4fda7fb1 # md5(email)
   social:
@@ -26,6 +26,48 @@ members:
     gitlab: aaronsteers
     twitter: aaronsteers
     linkedin: aaronsteers
+- name: Emily Kyle
+  title: Director of Marketing
+  location: Austin, TX, USA 🇺🇸
+  gravatar_hash: ad3bd918d010568b6ce9c5a6a08f0086
+  social:
+    gitlab: Emily
+    twitter: emilylucie
+    linkedin: emilylucie
+- name: Amanda Folson
+  title: Developer Relations Manager
+  location: Land o' Lakes, FL, USA 🇺🇸
+  gravatar_hash: fe416b883fb81a12313becdf9a29692c
+  social:
+    gitlab: afolson
+    twitter: AmbassadorAwsum
+    linkedin: violins
+- name: Edgar Ramírez Mondragón
+  title: Senior Software Engineer
+  location: Mexico City, Mexico 🇲🇽
+  start_date: July 5, 2021
+  gravatar_hash: a89b7e5a5d6ea347878ea4042ae31dff
+  social:
+    gitlab: edgarrmondragon
+    twitter: cofonlafaefe
+    linkedin: edgarrmondragon
+- name: Florian Hines
+  title: Staff Software Engineer
+  location: San Antonio, TX, USA 🇺🇸
+  start_date: July 12, 2021
+  gravatar_hash: 88529f59d3f298bcc9e2a705dc1f1c68
+  social:
+    gitlab: pandemicsyn
+    twitter: pandemicsyn
+    linkedin: florianhines
+- name: Ken Payne
+  title: Software Engineer
+  location: London, UK 🇬🇧
+  start_date: August 23, 2021
+  gravatar_hash: 778b432070eba884662a752b184dac7b
+  social:
+    gitlab: kgpayne
+    linkedin: k-g-payne
 ---
 
 # Introduction
