@@ -17,8 +17,6 @@ export default {
       >Copyright 2021, all rights reserved. Meltano is a trademark of GitLab,
       Inc.</a
     >
-    <a href="/terms.html">Terms of Service</a>
-    <a href="/privacy.html">Privacy Policy</a>
   </footer>
 </template>
 
