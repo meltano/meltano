@@ -165,7 +165,6 @@ Our focus for June will be to launch the Target SDK, to add support for inline m
 
 Our focus for July will be to expand our integrations for orchestration, data quality, and analysis. We will also work to add support for the fast sync / batch message type to enable higher throughput for extraction and loading.
 
-* [Dagster](https://gitlab.com/meltano/meltano/-/issues/2393 )
 * [Great Expectations](https://gitlab.com/meltano/meltano/-/issues/2454)
 * [Fast Sync / Batch Messages](https://gitlab.com/meltano/meltano/-/issues/2364)
 * [Superset](https://gitlab.com/meltano/meltano/-/issues/2605)
@@ -177,6 +176,7 @@ Our focus for July will be to expand our integrations for orchestration, data qu
 Our focus for August will be to continue expanding integrations as well as having full out-of-the-box support for an OLAP Database.
 
 * [Jupyter Notebooks](https://gitlab.com/meltano/meltano/-/issues/2595)
+* [Dagster](https://gitlab.com/meltano/meltano/-/issues/2393)
 * [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
 * [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
 * [Decentralized Management of MeltanoHub Connectors](https://gitlab.com/meltano/meta/-/issues/73)
