@@ -670,7 +670,7 @@ extractors:
   - name: tap-github
     description: Code hosting platform
     label: GitHub
-    namepsace: tap_github
+    namespace: tap_github
     variants:
       - name: singer-io
         docs: https://hub.meltano.com/extractors/github
@@ -754,7 +754,7 @@ extractors:
   - name: tap-google-sheets
     description: Cloud Spreadsheets
     label: Google Sheets
-    namepsace: tap_google_sheets
+    namespace: tap_google_sheets
     variants:
     - name: singer-io
       docs: https://hub.meltano.com/extractors/google-sheets
@@ -1403,7 +1403,7 @@ extractors:
   - name: tap-twilio
     description: Cloud communications platform as a service
     label: Twilio
-    namepsace: tap_twilio
+    namespace: tap_twilio
     variants:
     - name: transferwise
       docs: https://hub.meltano.com/extractors/twilio
