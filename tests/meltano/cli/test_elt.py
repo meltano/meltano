@@ -145,7 +145,7 @@ class TestCliEltScratchpadOne:
                 result.stdout,
                 "meltano     | Running extract & load...\n",
                 "meltano     | No state was found, complete import.\n",
-                "meltano     | Incremental state has been updated at",  # followed by timestamp
+                "meltano     | Incremental state has been updated at",  # followed by timestamp and job_id
                 "meltano     | Extract & load complete!\n",
                 "meltano     | Transformation skipped.\n",
             )
@@ -228,7 +228,7 @@ class TestCliEltScratchpadOne:
                 "meltano           | DEBUG Could not find state.json in",  # followed by path
                 "meltano           | DEBUG Created configuration at",  # followed by path
                 "meltano           | WARNING No state was found, complete import.\n",
-                "meltano           | INFO Incremental state has been updated at",  # followed by timestamp
+                "meltano           | INFO Incremental state has been updated at",  # followed by timestamp and job_id
                 "meltano           | DEBUG Incremental state: {'line': 1}\n",
                 "meltano           | DEBUG Incremental state: {'line': 2}\n",
                 "meltano           | DEBUG Incremental state: {'line': 3}\n",

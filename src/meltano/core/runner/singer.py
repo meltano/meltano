@@ -43,7 +43,7 @@ class BookmarkWriter:
             job.payload_flags |= self.payload_flag
             job.save(self.session)
 
-            logging.info(f"Incremental state has been updated at {datetime.utcnow()}.")
+            logging.info(f"Incremental state for has been updated at {datetime.utcnow()}.  Future jobs with --job_id {job.job_id} will resume from here.")
             logging.debug(f"Incremental state: {new_state}")
         except Exception as err:
             logging.warning(

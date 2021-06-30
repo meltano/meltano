@@ -165,7 +165,7 @@ class VenvService:
         if meltano_pth_path.exists():
             os.remove(meltano_pth_path)
 
-        logger.debug(
+        logger.info(
             f"Installing '{pip_url}' into virtual environment for '{self.namespace}/{self.name}'"
         )
         try:
