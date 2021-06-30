@@ -2,13 +2,6 @@ import axios from 'axios'
 import utils from '@/utils/utils'
 
 export default {
-  addConfigurationProfile({ type, name, profile }) {
-    return axios.post(
-      utils.apiUrl('orchestrations', `${type}/${name}/configuration/profiles`),
-      profile
-    )
-  },
-
   createSubscription(subscriptionPayload) {
     return axios.post(
       utils.apiUrl('orchestrations', 'subscriptions'),
@@ -67,10 +60,10 @@ export default {
     )
   },
 
-  savePluginConfiguration({ type, name, profiles }) {
+  savePluginConfiguration({ type, name, payload }) {
     return axios.put(
       utils.apiUrl('orchestrations', `${type}/${name}/configuration`),
-      profiles
+      payload
     )
   },
 
@@ -88,7 +81,7 @@ export default {
     )
   },
 
-  uploadPluginConfigurationFile({ type, name, profileName, payload }) {
+  uploadPluginConfigurationFile({ type, name, payload }) {
     const formData = new FormData()
     for (let key in payload) {
       const value = payload[key]
@@ -98,7 +91,7 @@ export default {
     return axios.post(
       utils.apiUrl(
         'orchestrations',
-        `${type}/${name}@${profileName}/configuration/upload-file`
+        `${type}/${name}/configuration/upload-file`
       ),
       formData,
       {
@@ -109,11 +102,11 @@ export default {
     )
   },
 
-  deleteUploadedPluginConfigurationFile({ type, name, profileName, payload }) {
+  deleteUploadedPluginConfigurationFile({ type, name, payload }) {
     return axios.post(
       utils.apiUrl(
         'orchestrations',
-        `${type}/${name}@${profileName}/configuration/delete-uploaded-file`
+        `${type}/${name}/configuration/delete-uploaded-file`
       ),
       payload
     )

@@ -1,33 +1,31 @@
-import asyncio
-import click
+"""Defines `meltano elt` command."""
 import datetime
 import logging
 import os
 import sys
-from contextlib import suppress, contextmanager
+from contextlib import contextmanager
+
+import click
 from async_generator import asynccontextmanager
+from meltano.core.db import project_engine
+from meltano.core.elt_context import ELTContextBuilder
+from meltano.core.job import Job, JobFinder
+from meltano.core.job.stale_job_failer import StaleJobFailer
+from meltano.core.logging import JobLoggingService, OutputLogger
+from meltano.core.plugin import PluginRef, PluginType
+from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.runner import RunnerError
+from meltano.core.runner.dbt import DbtRunner
+from meltano.core.runner.singer import SingerRunner
+from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.transform_add_service import TransformAddService
+from meltano.core.utils import run_async
 
 from . import cli
-from .utils import CliError, add_plugin, add_related_plugins
-from .params import project
-from meltano.core.config_service import ConfigService
-from meltano.core.runner import RunnerError
-from meltano.core.runner.singer import SingerRunner
-from meltano.core.runner.dbt import DbtRunner
-from meltano.core.job import Job
-from meltano.core.plugin import PluginRef, PluginType
-from meltano.core.plugin.error import PluginMissingError
-from meltano.core.transform_add_service import TransformAddService
-from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.db import project_engine
-from meltano.core.plugin_discovery_service import (
-    PluginDiscoveryService,
-    PluginNotFoundError,
-)
-from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.logging import OutputLogger, JobLoggingService
-from meltano.core.elt_context import ELTContextBuilder
-
+from .params import pass_project
+from .utils import CliError
 
 DUMPABLES = {
     "catalog": (PluginType.EXTRACTORS, "catalog"),
@@ -77,7 +75,13 @@ def logs(*args, **kwargs):
 @click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
-@project(migrate=True)
+@click.option(
+    "--force",
+    "-f",
+    help="Force a new run even when a pipeline with the same Job ID is already running",
+    is_flag=True,
+)
+@pass_project(migrate=True)
 def elt(
     project,
     extractor,
@@ -91,6 +95,7 @@ def elt(
     state,
     dump,
     job_id,
+    force,
 ):
     """
     meltano elt EXTRACTOR_NAME LOADER_NAME
@@ -109,12 +114,9 @@ def elt(
     _, Session = project_engine(project)
     session = Session()
     try:
-        config_service = ConfigService(project)
-        discovery_service = PluginDiscoveryService(
-            project, config_service=config_service
-        )
+        plugins_service = ProjectPluginsService(project)
 
-        context_builder = elt_context_builder(
+        context_builder = _elt_context_builder(
             project,
             job,
             session,
@@ -126,14 +128,13 @@ def elt(
             select_filter=select_filter,
             catalog=catalog,
             state=state,
-            config_service=config_service,
-            discovery_service=discovery_service,
+            plugins_service=plugins_service,
         )
 
         if dump:
             dump_file(context_builder, dump)
         else:
-            run_job(project, job, session, context_builder)
+            run_async(_run_job(project, job, session, context_builder, force=force))
     finally:
         session.close()
 
@@ -141,7 +142,7 @@ def elt(
     tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)
 
 
-def elt_context_builder(
+def _elt_context_builder(
     project,
     job,
     session,
@@ -153,19 +154,16 @@ def elt_context_builder(
     select_filter=[],
     catalog=None,
     state=None,
-    config_service=None,
-    discovery_service=None,
+    plugins_service=None,
 ):
     transform_name = None
     if transform != "skip":
-        transform_name = find_transform_for_extractor(
-            extractor,
-            config_service=config_service,
-            discovery_service=discovery_service,
+        transform_name = _find_transform_for_extractor(
+            extractor, plugins_service=plugins_service
         )
 
     return (
-        ELTContextBuilder(project)
+        ELTContextBuilder(project, plugins_service=plugins_service)
         .with_session(session)
         .with_job(job)
         .with_extractor(extractor)
@@ -181,10 +179,7 @@ def elt_context_builder(
 
 
 def dump_file(context_builder, dumpable):
-    try:
-        elt_context = context_builder.context()
-    except PluginMissingError as err:
-        raise CliError(str(err)) from err
+    elt_context = context_builder.context()
 
     try:
         plugin_type, file_id = DUMPABLES[dumpable]
@@ -200,64 +195,58 @@ def dump_file(context_builder, dumpable):
         raise CliError(f"Could not dump {dumpable}: {err}") from err
 
 
-def run_job(project, job, session, context_builder):
-    job_logging_service = JobLoggingService(project)
+async def _run_job(project, job, session, context_builder, force=False):
+    StaleJobFailer(job.job_id).fail_stale_jobs(session)
 
-    with job.run(session), job_logging_service.create_log(
-        job.job_id, job.run_id
-    ) as log_file:
-        output_logger = OutputLogger(log_file)
+    if not force:
+        existing = JobFinder(job.job_id).latest_running(session)
+        if existing:
+            raise CliError(
+                f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
+                + "To ignore this check use the '--force' option."
+            )
 
-        run_async(run_elt(project, context_builder, output_logger))
+    async with job.run(session):
+        job_logging_service = JobLoggingService(project)
+        with job_logging_service.create_log(job.job_id, job.run_id) as log_file:
+            output_logger = OutputLogger(log_file)
 
-
-def run_async(coro):
-    loop = asyncio.get_event_loop()
-    try:
-        loop.run_until_complete(coro)
-    except asyncio.CancelledError:
-        pass
-    finally:
-        # The below is taken from https://stackoverflow.com/a/58532304
-        # and inspired by to Python 3.7's `asyncio.run`
-        all_tasks = asyncio.gather(
-            *asyncio.Task.all_tasks(loop), return_exceptions=True
-        )
-        all_tasks.cancel()
-        with suppress(asyncio.CancelledError):
-            loop.run_until_complete(all_tasks)
-        loop.run_until_complete(loop.shutdown_asyncgens())
+            await _run_elt(project, context_builder, output_logger)
 
 
 @asynccontextmanager
-async def redirect_output(output_logger):
+async def _redirect_output(output_logger):
     meltano_stdout = output_logger.out("meltano", stream=sys.stdout, color="blue")
     meltano_stderr = output_logger.out("meltano", color="blue")
 
     with meltano_stdout.redirect_logging(ignore_errors=(CliError,)):
         async with meltano_stdout.redirect_stdout(), meltano_stderr.redirect_stderr():
-            yield
+            try:
+                yield
+            except CliError as err:
+                err.print()
+                raise
 
 
-async def run_elt(project, context_builder, output_logger):
-    async with redirect_output(output_logger):
+async def _run_elt(project, context_builder, output_logger):
+    async with _redirect_output(output_logger):
         try:
             elt_context = context_builder.context()
 
             if not elt_context.only_transform:
-                await run_extract_load(elt_context, output_logger)
+                await _run_extract_load(elt_context, output_logger)
             else:
                 logs("Extract & load skipped.", fg="yellow")
 
             if elt_context.transformer:
-                await run_transform(elt_context, output_logger)
+                await _run_transform(elt_context, output_logger)
             else:
                 logs("Transformation skipped.", fg="yellow")
         except RunnerError as err:
             raise CliError(f"ELT could not be completed: {err}") from err
 
 
-async def run_extract_load(elt_context, output_logger, **kwargs):
+async def _run_extract_load(elt_context, output_logger, **kwargs):  # noqa: WPS231
     extractor = elt_context.extractor.name
     loader = elt_context.loader.name
 
@@ -314,7 +303,7 @@ async def run_extract_load(elt_context, output_logger, **kwargs):
     logs("Extract & load complete!", fg="green")
 
 
-async def run_transform(elt_context, output_logger, **kwargs):
+async def _run_transform(elt_context, output_logger, **kwargs):
     transformer_log = output_logger.out(elt_context.transformer.name, color="magenta")
 
     logs("Running transformation...")
@@ -338,7 +327,8 @@ async def run_transform(elt_context, output_logger, **kwargs):
     logs("Transformation complete!", fg="green")
 
 
-def find_transform_for_extractor(extractor: str, config_service, discovery_service):
+def _find_transform_for_extractor(extractor: str, plugins_service):
+    discovery_service = plugins_service.discovery_service
     try:
         extractor_plugin_def = discovery_service.find_definition(
             PluginType.EXTRACTORS, extractor
@@ -350,8 +340,8 @@ def find_transform_for_extractor(extractor: str, config_service, discovery_servi
         )
 
         # Check if the transform has been added to the project
-        transform_plugin = config_service.get_plugin(transform_plugin_def)
+        transform_plugin = plugins_service.get_plugin(transform_plugin_def)
 
         return transform_plugin.name
-    except (PluginNotFoundError, PluginMissingError):
+    except PluginNotFoundError:
         return None

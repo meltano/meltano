@@ -1,10 +1,10 @@
 import logging
-import requests
 import threading
 import time
 import webbrowser
-import click
 
+import click
+import requests
 from meltano.core.project_settings_service import ProjectSettingsService
 
 

@@ -1,6 +1,6 @@
 {
   "name": "meltano",
-  "version": "1.57.0",
+  "version": "1.77.0",
   "private": true,
   "scripts": {
     "build": "yarn build:docs && yarn build:webapp",
@@ -30,20 +30,6 @@
     "babel-eslint": "^10.0.1",
     "eslint": "^5.16.0",
     "eslint-plugin-prettier": "^3.1.0",
-    "eslint-plugin-vue": "^5.0.0",
-    "lint-staged": "^8.1.5"
-  },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "{src/meltano,tests}/**/*.py": [
-      "black",
-      "git add"
-    ],
-    "*.{js,vue}": [
-      "vue-cli-service lint",
-      "git add"
-    ]
+    "eslint-plugin-vue": "^5.0.0"
   }
 }

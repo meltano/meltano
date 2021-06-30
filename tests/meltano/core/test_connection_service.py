@@ -1,8 +1,7 @@
 import pytest
-
-from meltano.core.config_service import PluginAlreadyAddedException
-from meltano.core.plugin import PluginType
 from meltano.core.connection_service import ConnectionService
+from meltano.core.plugin import PluginType
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
 
 class TestConnectionService:

@@ -3,11 +3,21 @@ sidebar: auto
 description: Use Meltano to pull data from the Shopify API and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/shopify)
+:::
+
 # Shopify
 
-The `tap-shopify` [extractor](/plugins/extractors/) pulls data from the [Shopify API](https://shopify.dev/docs/admin-api/rest/reference).
+The `tap-shopify` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Shopify API](https://shopify.dev/docs/admin-api/rest/reference).
 
-To learn more about `tap-shopify`, refer to the repository at <https://github.com/singer-io/tap-shopify>.
+- **Repository**: <https://github.com/singer-io/tap-shopify>
+- **Maintainer**: [Stitch](https://www.stitchdata.com/)
+- **Maintenance status**: Unresponsive to community issues and contributions
+  - A [more active fork](https://github.com/singer-io/tap-shopify/network) may be available that you can [use instead](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin).
+  - This plugin is [up for adoption](/docs/contributor-guide.html#adopting-a-plugin)!
 
 ## Getting Started
 
@@ -50,6 +60,8 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `tap-shopify` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -65,12 +77,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-shopify` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-8}
+```yml{5-7}
 plugins:
   extractors:
   - name: tap-shopify
     variant: singer-io
-    pip_url: tap-shopify
     config:
       shop: my_store_subdomain
       start_date: '2020-10-01T00:00:00Z'

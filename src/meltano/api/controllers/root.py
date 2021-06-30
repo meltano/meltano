@@ -1,28 +1,27 @@
-import subprocess
-import requests
 import logging
+import subprocess
 from functools import wraps
 from urllib.parse import urlsplit
-from flask import (
-    Blueprint,
-    render_template,
-    request,
-    jsonify,
-    redirect,
-    make_response,
-    g,
-    current_app,
-)
-from flask_login import current_user
-from flask_security import roles_required, logout_user
-from jinja2 import TemplateNotFound
 
 import meltano
+import requests
+from flask import (
+    Blueprint,
+    current_app,
+    g,
+    jsonify,
+    make_response,
+    redirect,
+    render_template,
+    request,
+)
+from flask_login import current_user
+from flask_security import logout_user, roles_required
+from jinja2 import TemplateNotFound
+from meltano.api.api_blueprint import APIBlueprint
+from meltano.api.security.auth import block_if_readonly, passes_authentication_checks
 from meltano.core.project import Project, ProjectReadonly
 from meltano.core.project_settings_service import ProjectSettingsService
-from flask_security import roles_required
-from meltano.api.api_blueprint import APIBlueprint
-from meltano.api.security.auth import passes_authentication_checks, block_if_readonly
 from meltano.core.utils import truthy
 
 logger = logging.getLogger(__name__)

@@ -3,11 +3,26 @@ sidebar: auto
 description: Use Meltano to pull data from the Zendesk API and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/zendesk)
+:::
+
 # Zendesk
 
-The `tap-zendesk` [extractor](/plugins/extractors/) pulls data from the [Zendesk API](https://developer.zendesk.com/rest_api).
+The `tap-zendesk` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Zendesk API](https://developer.zendesk.com/rest_api).
 
-To learn more about `tap-zendesk`, refer to the repository at <https://github.com/singer-io/tap-zendesk>.
+- **Repository**: <https://github.com/twilio-labs/twilio-tap-zendesk>
+- **Maintainer**: [Twilio](https://www.twilio.com/)
+- **Maintenance status**: Active
+
+#### Alternative variants
+
+Multiple [variants](/docs/plugins.html#variants) of `tap-zendesk` are available.
+This document describes the default `twilio-labs` variant.
+
+Alternative option is [`singer-io`](./zendesk--singer-io.html).
 
 ## Getting Started
 
@@ -50,6 +65,8 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `tap-zendesk` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -75,12 +92,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-zendesk` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-9}
+```yml{5-8}
 plugins:
   extractors:
   - name: tap-zendesk
     variant: singer-io
-    pip_url: tap-zendesk
     config:
       email: user@example.com
       subdomain: my_subdomain
@@ -98,7 +114,7 @@ export TAP_ZENDESK_API_TOKEN=my_api_token
 - Name: `email`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TAP_ZENDESK_EMAIL`
 
-This is the email you use to login to your Zendesk dashboard.
+This is the email you use to login to your Zendesk dashboard. For API Authentication, `/token` is automatically appended to the email address and is not required in the configuration.
 
 Not necessary when using OAuth authentication and setting [Access Token](#access-token).
 

@@ -3,11 +3,19 @@ sidebar: auto
 description: Use Meltano to pull data from the Salesforce API and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/salesforce)
+:::
+
 # Salesforce
 
-The `tap-salesforce` [extractor](/plugins/extractors/) pulls data from the [Salesforce API](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm).
+The `tap-salesforce` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Salesforce API](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm).
 
-To learn more about `tap-salesforce`, refer to the repository at <https://gitlab.com/meltano/tap-salesforce>.
+- **Repository**: <https://gitlab.com/meltano/tap-salesforce>
+- **Maintainer**: Meltano community
+- **Maintenance status**: Active
 
 ## Getting Started
 
@@ -50,6 +58,8 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `tap-salesforce` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -77,12 +87,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-salesforce` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-8}
+```yml{5-7}
 plugins:
   extractors:
   - name: tap-salesforce
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/tap-salesforce.git
     config:
       username: user@example.com
       start_date: '2020-10-01T00:00:00Z'
@@ -259,6 +268,24 @@ export TAP_SALESFORCE_START_DATE=YYYY-MM-DDTHH:MM:SSZ
 meltano config tap-salesforce set start_date 2020-10-01T00:00:00Z
 
 export TAP_SALESFORCE_START_DATE=2020-10-01T00:00:00Z
+```
+
+### Is Sandbox
+
+- Name: `is_sandbox`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_SALESFORCE_IS_SANDBOX`
+- Default: `false`
+
+Use Salesforce Sandbox
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-salesforce set is_sandbox true
+
+export TAP_SALESFORCE_IS_SANDBOX=true
 ```
 
 ### API Type

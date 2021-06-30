@@ -3,11 +3,19 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into SQLite
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/sqlite)
+:::
+
 # SQLite
 
-The `target-sqlite` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [SQLite](https://www.sqlite.org/) database.
+The `target-sqlite` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into a [SQLite](https://www.sqlite.org/) database.
 
-To learn more about `target-sqlite`, refer to the repository at <https://gitlab.com/meltano/target-sqlite>.
+- **Repository**: <https://gitlab.com/meltano/target-sqlite>
+- **Maintainer**: Meltano community
+- **Maintenance status**: Active
 
 ## Getting Started
 
@@ -49,6 +57,8 @@ Follow the remaining step of the [Getting Started guide](/docs/getting-started.h
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `target-sqlite` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -62,12 +72,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-sqlite` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-7}
+```yml{5-6}
 plugins:
   loaders:
   - name: target-sqlite
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/target-sqlite.git
     config:
       database: my_database.db
 ```

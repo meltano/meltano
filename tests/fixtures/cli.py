@@ -1,6 +1,6 @@
-import pytest
 import os
 
+import pytest
 from click.testing import CliRunner
 from meltano.core.project import Project
 

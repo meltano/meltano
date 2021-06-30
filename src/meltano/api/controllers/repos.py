@@ -6,24 +6,23 @@ from pathlib import Path
 import markdown
 from flask import jsonify, request
 from flask_principal import Need
-
-from .repos_helper import ReposHelper
 from meltano.api.api_blueprint import APIBlueprint
-from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin
-from meltano.api.security.auth import permit
 from meltano.api.json import freeze_keys
-from meltano.core.project import Project
+from meltano.api.security.auth import permit
+from meltano.api.security.resource_filter import NameFilterMixin, ResourceFilter
 from meltano.core.compiler.project_compiler import ProjectCompiler
-from meltano.core.m5o.m5o_file_parser import (
-    MeltanoAnalysisFileParser,
-    MeltanoAnalysisMissingTopicFilesError,
-    MeltanoAnalysisFileParserError,
-)
 from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParser,
     M5oCollectionParserTypes,
 )
+from meltano.core.m5o.m5o_file_parser import (
+    MeltanoAnalysisFileParser,
+    MeltanoAnalysisFileParserError,
+    MeltanoAnalysisMissingTopicFilesError,
+)
+from meltano.core.project import Project
 
+from .repos_helper import ReposHelper
 
 reposBP = APIBlueprint("repos", __name__)
 
@@ -182,7 +181,7 @@ def model_index():
     topicsFile = project.run_dir("models", "topics.index.m5oc")
     path = Path(topicsFile)
 
-    topics = json.load(open(path, "r")) if path.is_file() else {}
+    topics = json.load(open(path)) if path.is_file() else {}
 
     # for now let's freeze the keys, so the we can re-use the
     # key name as the design's name, but this should probably

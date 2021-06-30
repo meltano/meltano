@@ -1,25 +1,17 @@
-from typing import Optional
 from collections import namedtuple
+from typing import Optional
 
-from meltano.core.project import Project
 from meltano.core.job import Job
-from meltano.core.config_service import ConfigService
-from meltano.core.plugin import PluginDefinition, PluginType, PluginRef
+from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin_invoker import invoker_factory
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
 
 
-class PluginContext(
-    namedtuple("PluginContext", "plugin definition settings_service session")
-):
-    @property
-    def name(self):
-        return self.plugin.name
-
-    @property
-    def type(self):
-        return self.plugin.type
+class PluginContext(namedtuple("PluginContext", "plugin settings_service session")):
+    def __getattr__(self, attr):
+        return getattr(self.plugin, attr)
 
     def get_config(self, name, **kwargs):
         return self.settings_service.get(name, session=self.session, **kwargs)
@@ -32,7 +24,7 @@ class PluginContext(
 
     @property
     def env(self):
-        return {**self.definition.info_env, **self.plugin.info_env, **self.config_env()}
+        return {**self.plugin.info_env, **self.config_env()}
 
 
 class ELTContext:
@@ -51,7 +43,7 @@ class ELTContext:
         select_filter: Optional[list] = [],
         catalog: Optional[str] = None,
         state: Optional[str] = None,
-        plugin_discovery_service: PluginDiscoveryService = None,
+        plugins_service: ProjectPluginsService = None,
     ):
         self.project = project
         self.job = job
@@ -69,9 +61,7 @@ class ELTContext:
         self.catalog = catalog
         self.state = state
 
-        self.plugin_discovery_service = (
-            plugin_discovery_service or PluginDiscoveryService(project)
-        )
+        self.plugins_service = plugins_service or ProjectPluginsService(project)
 
     @property
     def elt_run_dir(self):
@@ -92,8 +82,8 @@ class ELTContext:
             plugin_context.plugin,
             context=self,
             run_dir=self.elt_run_dir,
+            plugins_service=self.plugins_service,
             plugin_settings_service=plugin_context.settings_service,
-            plugin_discovery_service=self.plugin_discovery_service,
         )
 
     def extractor_invoker(self):
@@ -107,18 +97,9 @@ class ELTContext:
 
 
 class ELTContextBuilder:
-    def __init__(
-        self,
-        project: Project,
-        config_service: ConfigService = None,
-        plugin_discovery_service: PluginDiscoveryService = None,
-    ):
+    def __init__(self, project: Project, plugins_service: ProjectPluginsService = None):
         self.project = project
-        self.config_service = config_service or ConfigService(project)
-        self.plugin_discovery_service = (
-            plugin_discovery_service
-            or PluginDiscoveryService(project, config_service=config_service)
-        )
+        self.plugins_service = plugins_service or ProjectPluginsService(project)
 
         self._session = None
         self._job = None
@@ -200,17 +181,14 @@ class ELTContextBuilder:
         return self
 
     def plugin_context(self, plugin_ref: PluginRef, env={}, config={}):
-        plugin = self.config_service.get_plugin(plugin_ref)
-        plugin_def = self.plugin_discovery_service.get_definition(plugin)
+        plugin = self.plugins_service.get_plugin(plugin_ref)
 
         return PluginContext(
             plugin=plugin,
-            definition=plugin_def,
             settings_service=PluginSettingsService(
                 self.project,
                 plugin,
-                config_service=self.config_service,
-                plugin_discovery_service=self.plugin_discovery_service,
+                plugins_service=self.plugins_service,
                 env_override=env,
                 config_override=config,
             ),
@@ -264,5 +242,5 @@ class ELTContextBuilder:
             select_filter=self._select_filter,
             catalog=self._catalog,
             state=self._state,
-            plugin_discovery_service=self.plugin_discovery_service,
+            plugins_service=self.plugins_service,
         )

@@ -1,28 +1,118 @@
 ---
 sidebarDepth: 2
-lastUpdatedSignificantly: 2020-04-30
 ---
 
 # Marketing Handbook
 
 ## Weekly Content Marketing Activities
-Each week, the Meltano team creates a fairly predictable set of content that can be utilized to generate amazing content for marketing purposes.
+On a regular basis, the Meltano team creates a fairly predictable set of artifacts that can be utilized to generate amazing content for marketing purposes.
 
 These items include:
 
-- Kickoff: YouTube video each Monday covering what will be worked on during the week
-- Release: the actual software release, which generates a changelog, version number, and all of the previous content for the week
-- Demo Day: YouTube video each Friday showing off what has shipped, demonstrated by each authoring participant as available
+- Weekly Kickoff: Livestream each Monday covering what will be worked on during the week
+- Office Hours: Community meeting for discussion about upcoming features and general Q&A
+- Demo Day: Community meeting every other Friday showing off what has shipped, demonstrated by each authoring participant as available
+- Meltano / SDK Release: the actual software release, which generates a changelog, version number, and all of the previous content for the week
 
 Each item (linked below) has a corresponding guide to promoting that activity. Each week should roughly follow the following content schedule:
 
 | Day | Content |
 | ------ | ------ |
 | Monday | [Kickoff blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Content%20Marketing/evergreen-activities.md#promoting-kickoff), [Monday release blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Releases/Promotion%20Guidelines.md) |
-| Tuesday | Social promotion of weekly activity | 
-| Wednesday | Social promotion of weekly activity | 
-| Thursday | [Thursday release blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Releases/Promotion%20Guidelines.md), weekly newsletter | 
-| Friday | [Demo day blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Content%20Marketing/evergreen-activities.md#promoting-demo-day) | 
+| Tuesday | Social promotion of weekly activity |
+| Wednesday | Social promotion of weekly activity |
+| Thursday | [Thursday release blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Releases/Promotion%20Guidelines.md), weekly newsletter |
+| Friday | [Demo day blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Content%20Marketing/evergreen-activities.md#promoting-demo-day) |
+
+## Talking about the Meltano Product Family and Team
+
+As of 2021 we have 3 main "product lines". Each of these should be referenced in speech and text communications in specific ways.
+
+### Meltano
+
+#### Product/Project
+  
+**Recommended**
+
+    * Meltano
+    * The Meltano Open-Source Project
+
+     Example usage: Last week, a new version for Meltano was released
+
+**Incorrect**
+
+    * The Meltano
+
+    Example usage: Last week, a new version for the Meltano was released
+
+#### Team
+
+**Recommended**
+
+    * the Meltano Team
+    * the Meltano Core Team
+
+    Example usage: The Meltano Team is announcing today...
+
+**Incorrect**
+
+    * The Meltano
+
+    Incorrect example usage: The Meltano is announcing today...
+
+### SDK
+
+Note that Targets can be substituted for Taps in each of these examples
+
+**Recommended**
+
+    * The Meltano SDK
+    * The Meltano Tap SDK
+    * The Meltano SDK for Taps
+    * The Meltano SDK for Singer Taps
+
+    Example usage: Today we're releasing a new update for the Meltano Tap SDK that...
+
+**OK**
+
+    * The SDK
+    * The Tap SDK
+    * The SDK for Taps
+    * The SDK for Singer Taps
+    * Meltano's Tap SDK
+    * The Tap SDK by Meltano
+
+    These are OK when the proper, Meltano-specific name has already been referenced. 
+    Example usage: Today we're releasing a new update for the SDK for Taps that...
+
+**Incorrect**
+
+    * Singer SDK
+    * Singer SDK for Taps
+    * singer-sdk
+    * Singer's SDK
+    * Meltano's Singer SDK
+    * Singer SDK by Meltano
+
+    Incorrect example usage: Today we're releasing a new update for the Singer SDK for Taps that...
+
+### MeltanoHub
+
+**Recommended**
+
+    * MeltanoHub
+    * MeltanoHub for Singer
+    * The Hub
+
+    Example usage: Today we're releasing an update for MeltanoHub for Singer to...
+
+**Incorrect**
+
+    * The MeltanoHub
+    * The SingerHub
+    * The Hub for Singer
+
+    Incorrect example usage: Today we're releasing an update for the MeltanoHub for Singer to...
 
 
 ## Email
@@ -58,6 +148,7 @@ Things to consider when writing a great, short, video description:
 - Descriptions are short and to the point, explaining what the video is covering and optionally the teams participating (engineering, marketing, leadership, security, etc)
 - Don’t worry about “how” something is being worked on, discussed, solved - that’s what the video is for! Description should cover “what, who, why"
 - Great descriptions highlight key words/phrases, especially when discussing specific integrations (“we’re discussing how to fix a bug with our Google Analytics data tap”) or an external component (“our data source for XYZ has a new feature”)
+- Timestamps can be linked to just by writing the timestamp: `1:33`.
 
 Examples of a great YouTube video description include:
 
@@ -76,15 +167,20 @@ This full example of a Meltano YouTube video description includes evergreen cont
 
 ```md
 Meltano v1.3.0 is publicly released, adding the ability to distill rocket fuel and manufacture widgets, with numerous bug fixes and improvements, including:
-- bug fix #1
-- improvement #1
-- improvement #2
+- bug fix #1 (link)
+- improvement #1 (link)
+- improvement #2 (link)
+
+1:55​ Meltano team - who we are...
+3:15​ Discussion of bug fix #1
 
 --
 
-Meltano is a free alternative to expensive SaaS tools, providing an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data. Meltano integrates the tools you use every day into a single data pipeline, including data from any CSV, Google Analytics, GitLab, Salesforce, Postgres, and much more.
+Meltano is ELT for the DataOps era: open source, self-hosted, CLI-first, debuggable, and extensible.
 
-Sign up for our free newsletter: https://meltano.substack.com/
+Pipelines are code, ready to be version controlled, containerized, and deployed continuously. Develop and test locally, then deploy in production along with the built-in Airflow integration, or inside your orchestrator of choice.
+
+Meltano embraces the Singer standard and its community-maintained library of open source extractors and loaders, and leverages dbt for transformation.
 
 GET STARTED WITH MELTANO
 Project Home: https://meltano.com
@@ -94,32 +190,9 @@ Tutorials: https://meltano.com/tutorials/
 
 SUBSCRIBE for more videos: http://www.youtube.com/subscription_center?add_user=meltano
 
-Join Us On Slack: https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw
+Join Us On Slack: https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q
 Blog: https://meltano.com/blog/
 GitLab: https://gitlab.com/meltano/meltano
 Twitter: https://twitter.com/meltanodata
 Newsletter: https://meltano.substack.com/
-
-Meltano
-http://youtube.com/Meltano
 ```
-
-## Distribution Channels
-
-### DigitalOcean Marketplace
-
-Meltano is available as a 1-Click App in the DigitalOcean Marketplace. This allows users to skip the installation and hosting steps, configure a Droplet and immediately begin using the Meltano UI in 60 seconds or less.
-
-#### Linking to our DigitalOcean Marketplace Listing
-
-It is important to form links to our listing in the following way:
-
-`https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322`
-
-This link contains the "deploy" command which allows existing DigitalOcean users to skip the marketplace listing page and go straight to deploying their Droplet. It also includes our referral code, which gets all new DigitalOcean users $50 of free credit over 30 days through the [referral program](https://www.digitalocean.com/referral-program/). We also receive $25 of credit for each new user who spends over $25, which offsets our DigitalOcean bill each month and helps us keep our operating costs low.
-
-Users will find this link on the [Meltano Installation Docs page](/docs/installation.html#digitalocean-marketplace)
-
-#### Following the DigitalOcecan Brand Guidelines
-
-It is important that we be a good partner, creating a win-win for each of us. Please refer to the [DigitalOcean Marketplace Vendor Guide](https://marketplace.digitalocean.com/vendors/getting-started-as-a-digitalocean-marketplace-vendor) for instructions on proper use of logos, language, etc.

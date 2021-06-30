@@ -3,11 +3,19 @@ sidebar: auto
 description: Use Meltano to pull data from the GitLab API and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/gitlab)
+:::
+
 # GitLab
 
-The `tap-gitlab` [extractor](/plugins/extractors/) pulls data from the [GitLab API](https://docs.gitlab.com/ee/api/).
+The `tap-gitlab` [extractor](https://hub.meltano.com/extractors/) pulls data from the [GitLab API](https://docs.gitlab.com/ee/api/).
 
-To learn more about `tap-gitlab`, refer to the repository at <https://gitlab.com/meltano/tap-gitlab>.
+- **Repository**: <https://gitlab.com/meltano/tap-gitlab>
+- **Maintainer**: Meltano community
+- **Maintenance status**: Active
 
 ## Getting Started
 
@@ -50,6 +58,8 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `tap-gitlab` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -66,12 +76,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-gitlab` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-8}
+```yml{5-7}
 plugins:
   extractors:
   - name: tap-gitlab
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
     config:
       projects: meltano/meltano meltano/tap-gitlab
       start_date: '2020-10-01T00:00:00Z'
@@ -210,6 +219,8 @@ export TAP_GITLAB_PROJECTS="meltano/meltano meltano/tap-gitlab"
 
 Enable to pull in extra data (like Epics, Epic Issues and other entities) only available to GitLab Ultimate and GitLab.com Gold accounts.
 
+The `epics` and `epic_issues` entities cannot be [selected](/docs/integration.html#selecting-entities-and-attributes-for-extraction) unless this setting is enabled.
+
 #### How to use
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
@@ -230,6 +241,8 @@ For each Merge Request, also fetch the MR's commits and create the join table `m
 
 This can slow down extraction considerably because of the many API calls required.
 
+The `merge_request_commits` entity cannot be [selected](/docs/integration.html#selecting-entities-and-attributes-for-extraction) unless this setting is enabled.
+
 #### How to use
 
 Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
@@ -249,6 +262,8 @@ export TAP_GITLAB_FETCH_MERGE_REQUEST_COMMITS=true
 For every Pipeline, also fetch extended details of each of these pipelines.
 
 This can slow down extraction considerably because of the many API calls required.
+
+The `pipelines_extended` entity cannot be [selected](/docs/integration.html#selecting-entities-and-attributes-for-extraction) unless this setting is enabled.
 
 #### How to use
 

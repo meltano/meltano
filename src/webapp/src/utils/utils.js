@@ -4,7 +4,6 @@ import flaskContext from '@/utils/flask'
 import moment from 'moment'
 import { namer } from '@/utils/mappers'
 
-const regExpConnectorLogo = /(?:tap-|target-)?(.*)/
 const regExpPrivateInput = /(password|private|secret|token)/
 // matches the W3C regex for `type=email` inputs
 const regExpEmailInput = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
@@ -47,13 +46,6 @@ export default {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-  },
-
-  getConnectorLogoUrl(connectorName) {
-    connectorName = connectorName === 'postgresql' ? 'postgres' : connectorName
-    const name = regExpConnectorLogo.exec(connectorName)[1]
-
-    return `/static/logos/${name}-logo.png`
   },
 
   getIsSubRouteOf(parentPath, currentPath) {

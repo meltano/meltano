@@ -3,11 +3,21 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into Comma Separated Values (CSV) files
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/csv)
+:::
+
 # Comma Separated Values (CSV)
 
-The `target-csv` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into [Comma Separated Values (CSV)](https://en.wikipedia.org/wiki/Comma-separated_values) files.
+The `target-csv` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into [Comma Separated Values (CSV)](https://en.wikipedia.org/wiki/Comma-separated_values) files.
 
-To learn more about `target-csv`, refer to the repository at <https://github.com/singer-io/target-csv>.
+- **Repository**: <https://github.com/singer-io/target-csv>
+- **Maintainer**: [Stitch](https://www.stitchdata.com/)
+- **Maintenance status**: Unresponsive to community issues and contributions
+  - A [more active fork](https://github.com/singer-io/target-csv/network) may be available that you can [use instead](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin).
+  - This plugin is [up for adoption](/docs/contributor-guide.html#adopting-a-plugin)!
 
 ## Getting Started
 
@@ -49,6 +59,8 @@ Follow the remaining step of the [Getting Started guide](/docs/getting-started.h
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `target-csv` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -62,12 +74,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-csv` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-7}
+```yml{5-6}
 plugins:
   loaders:
   - name: target-csv
     variant: singer-io
-    pip_url: target-csv
     config:
       destination_path: my_csv_files
 ```

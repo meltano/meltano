@@ -1,24 +1,23 @@
 import logging
 import os
-import sqlalchemy
-from pathlib import Path
 from collections import OrderedDict
-from flask import jsonify, redirect, url_for
-from pypika import Query, Order
-from sqlalchemy.event import listen
+from pathlib import Path
 
+import sqlalchemy
+from flask import jsonify, redirect, url_for
+from meltano.api.json import freeze_keys
 from meltano.api.models import db
 from meltano.api.security import create_dev_user
-from meltano.api.json import freeze_keys
-from meltano.core.project import Project
-from meltano.core.config_service import ConfigService
+from meltano.core.connection_service import ConnectionService, DialectNotSupportedError
+from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.m5o.m5oc_file import M5ocFile
+from meltano.core.project import Project
 from meltano.core.sql.analysis_helper import AnalysisHelper
 from meltano.core.sql.sql_utils import SqlUtils
-from meltano.core.elt_context import ELTContextBuilder
-from meltano.core.connection_service import ConnectionService, DialectNotSupportedError
-from .settings_helper import SettingsHelper
+from pypika import Order, Query
+from sqlalchemy.event import listen
 
+from .settings_helper import SettingsHelper
 
 ENABLED_DIALECTS = ["postgres", "sqlite"]
 

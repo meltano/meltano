@@ -3,6 +3,7 @@ import logging
 import os
 import re
 import sys
+from contextlib import suppress
 
 from meltano.core.project_settings_service import ProjectSettingsService
 
@@ -17,10 +18,6 @@ DEFAULT_LEVEL = "info"
 FORMAT = (
     "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"
 )
-
-# Increase subprocess output buffer size from StreamReader's default 64KB to 1MB,
-# since Singer messages output by taps can be quite large.
-OUTPUT_BUFFER_SIZE = 1024 * 1024
 
 
 def parse_log_level(log_level):
@@ -54,6 +51,23 @@ def remove_ansi_escape_sequences(line):
     return ansi_escape.sub("", line)
 
 
+async def _write_line_writer(writer, line):
+    # StreamWriters like a subprocess's stdin need special consideration
+    if isinstance(writer, asyncio.StreamWriter):
+        try:  # noqa: WPS229
+            writer.write(line)
+            await writer.drain()
+        except (BrokenPipeError, ConnectionResetError):
+            with suppress(AttributeError):  # `wait_closed` is Python 3.7+
+                await writer.wait_closed()
+
+            return False
+    else:
+        writer.writeline(line.decode())
+
+    return True
+
+
 async def capture_subprocess_output(reader, *line_writers):
     """
     Capture in real time the output stream of a suprocess that is run async.
@@ -69,7 +83,6 @@ async def capture_subprocess_output(reader, *line_writers):
             continue
 
         for writer in line_writers:
-            try:
-                writer.writeline(line.decode())
-            except AttributeError:
-                writer.write(line)
+            if not await _write_line_writer(writer, line):
+                # If the destination stream is closed, we can stop capturing output.
+                return

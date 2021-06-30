@@ -1,21 +1,21 @@
-from flask import request, jsonify, g
-
+from flask import g, jsonify, request
+from flask_security import roles_required
+from meltano.api.api_blueprint import APIBlueprint
+from meltano.api.security.auth import block_if_readonly
 from meltano.core.error import PluginInstallError
+from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
     PluginNotFoundError,
 )
-from meltano.core.plugin import PluginType, ProjectPlugin
+from meltano.core.plugin_install_service import (
+    PluginInstallReason,
+    PluginInstallService,
+)
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
-from meltano.core.config_service import ConfigService
-from meltano.core.plugin_install_service import (
-    PluginInstallService,
-    PluginInstallReason,
-)
-from flask_security import roles_required
-from meltano.api.api_blueprint import APIBlueprint
-from meltano.api.security.auth import block_if_readonly
+from meltano.core.project_plugins_service import ProjectPluginsService
 
 
 def plugin_def_json(plugin_def):
@@ -57,19 +57,16 @@ def all():
 @pluginsBP.route("/installed", methods=["GET"])
 def installed():
     project = Project.find()
-    config = ConfigService(project)
-    discovery = PluginDiscoveryService(project)
+    plugins_service = ProjectPluginsService(project)
 
     def plugin_json(plugin: ProjectPlugin):
         plugin_json = {"name": plugin.name}
 
         try:
-            plugin_def = discovery.get_definition(plugin)
+            plugin_json.update(plugin_def_json(plugin))
 
-            plugin_json.update(plugin_def_json(plugin_def))
-
-            plugin_json["variant"] = plugin_def.current_variant_name
-            plugin_json["docs"] = plugin_def.docs
+            plugin_json["variant"] = plugin.variant
+            plugin_json["docs"] = plugin.docs
         except PluginNotFoundError:
             pass
 
@@ -77,7 +74,7 @@ def installed():
 
     installed_plugins = {
         plugin_type: [plugin_json(plugin) for plugin in plugins]
-        for plugin_type, plugins in config.plugins_by_type().items()
+        for plugin_type, plugins in plugins_service.plugins_by_type().items()
     }
 
     return jsonify(installed_plugins)
@@ -107,10 +104,10 @@ def install_batch():
 
     project = Project.find()
 
-    config_service = ConfigService(project)
-    plugin = config_service.find_plugin(plugin_name, plugin_type=plugin_type)
+    plugins_service = ProjectPluginsService(project)
+    plugin = plugins_service.find_plugin(plugin_name, plugin_type=plugin_type)
 
-    add_service = ProjectAddService(project)
+    add_service = ProjectAddService(project, plugins_service=plugins_service)
     related_plugins = add_service.add_related(plugin)
 
     # We will install the plugins in reverse order, since dependencies
@@ -118,13 +115,14 @@ def install_batch():
     # be installed first.
     related_plugins.reverse()
 
-    install_service = PluginInstallService(project)
-    install_status = install_service.install_plugins(
+    install_service = PluginInstallService(project, plugins_service=plugins_service)
+    install_results = install_service.install_plugins(
         related_plugins, reason=PluginInstallReason.ADD
     )
 
-    for error in install_status["errors"]:
-        raise PluginInstallError(error["message"])
+    for result in install_results:
+        if not result.sucessful:
+            raise PluginInstallError(result.message)
 
     return jsonify([plugin.canonical() for plugin in related_plugins])
 
@@ -138,10 +136,10 @@ def install():
 
     project = Project.find()
 
-    config_service = ConfigService(project)
-    plugin = config_service.find_plugin(plugin_name, plugin_type=plugin_type)
+    plugins_service = ProjectPluginsService(project)
+    plugin = plugins_service.find_plugin(plugin_name, plugin_type=plugin_type)
 
-    install_service = PluginInstallService(project)
+    install_service = PluginInstallService(project, plugins_service=plugins_service)
     install_service.install_plugin(plugin, reason=PluginInstallReason.ADD)
 
     return jsonify(plugin.canonical())

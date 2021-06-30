@@ -3,11 +3,21 @@ sidebar: auto
 description: Use Meltano to pull data from the Bing Ads API and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/bing-ads)
+:::
+
 # Bing Ads
 
-The `tap-bing-ads` [extractor](/plugins/extractors/) pulls data from the [Bing Ads API](https://docs.microsoft.com/en-us/advertising/guides/).
+The `tap-bing-ads` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Bing Ads API](https://docs.microsoft.com/en-us/advertising/guides/).
 
-To learn more about `tap-bing-ads`, refer to the repository at <https://github.com/singer-io/tap-bing-ads>.
+- **Repository**: <https://github.com/singer-io/tap-bing-ads>
+- **Maintainer**: [Stitch](https://www.stitchdata.com/)
+- **Maintenance status**: Unresponsive to community issues and contributions
+  - A [more active fork](https://github.com/singer-io/tap-bing-ads/network) may be available that you can [use instead](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin).
+  - This plugin is [up for adoption](/docs/contributor-guide.html#adopting-a-plugin)!
 
 ## Getting Started
 
@@ -50,6 +60,8 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `tap-bing-ads` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -61,17 +73,17 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 - [Customer ID](#customer-id)
 - [Account IDs](#account-ids)
 - [Start Date](#start-date)
+- [Require Live Connect](#require-live-connect)
 
 #### Minimal configuration
 
 A minimal configuration of `tap-bing-ads` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-9}
+```yml{5-8}
 plugins:
   extractors:
   - name: tap-bing-ads
     variant: singer-io
-    pip_url: tap-bing-ads
     config:
       customer_id: 163875182
       account_ids: 163078754
@@ -143,7 +155,10 @@ export OAUTH_BING_ADS_CLIENT_SECRET=<secret>
 - Name: `refresh_token`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TAP_BING_ADS_REFRESH_TOKEN`
 
-See <https://docs.microsoft.com/en-us/advertising/guides/get-started#quick-start-production>.
+See <https://docs.microsoft.com/en-us/advertising/guides/get-started#quick-start-production>. 
+If you're using a Refresh Token you should not need a redirect URI in the request.
+Note that you'll need to include the OAuth Scopes when requesting the token. 
+The recommended scopes are `scope=openid%20profile%20https://ads.microsoft.com/ads.manage%20offline_access`.
 
 #### How to use
 
@@ -187,6 +202,24 @@ Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/d
 meltano config tap-bing-ads set account_ids <id>
 
 export TAP_BING_ADS_ACCOUNT_IDS=<id>
+```
+
+### Require Live Connect
+
+- Name: `require_live_connect`
+- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_BING_REQUIRE_LIVE_CONNECT`
+- Default: 'True'
+
+Note that the default is not a boolean, but a string set to 'True'. Setting the configuration to a boolean `false` will work to disable this setting.
+
+#### How to use
+
+Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
+
+```bash
+meltano config tap-bing-ads set require_live_connect false
+
+export TAP_BING_REQUIRE_LIVE_CONNECT=false
 ```
 
 ### Start Date

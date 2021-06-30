@@ -8,12 +8,13 @@ If the installation instructions on the [homepage](/) or the [Getting Started gu
 
 ::: tip Short on time, or just curious what the fuss is about?
 
-To get a sense of the Meltano experience in just a few minutes, follow the [examples on the homepage](/).
+To get a sense of the Meltano experience in just a few minutes, follow the [examples on the homepage](/),
+or watch the ["from 0 to ELT in 90 seconds" speedrun](https://meltano.com/blog/2021/04/28/speedrun-from-0-to-elt-in-90-seconds/).
 
 They can be copy-pasted right onto your command shell and will take you all the way through
 [installation](/#installation), [data integration (EL)](/#integration), [data transformation (T)](/#transformation), [orchestration](/#orchestration), and [containerization](/#containerization)
-with the [`tap-gitlab` extractor](/plugins/extractors/gitlab.html)
-and the [`target-jsonl`](/plugins/loaders/jsonl.html) and [`target-postgres`](/plugins/loaders/postgres.html) loaders.
+with the [`tap-gitlab` extractor](https://hub.meltano.com/extractors/gitlab.html)
+and the [`target-jsonl`](https://hub.meltano.com/loaders/jsonl.html) and [`target-postgres`](https://hub.meltano.com/loaders/postgres.html) loaders.
 
 :::
 

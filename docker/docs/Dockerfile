@@ -6,4 +6,4 @@ CMD ['bash']
 COPY ./ ./
 
 WORKDIR /meltano/docs
-RUN pwd && pip install --upgrade pip && pip install -r requirements.txt
+RUN pwd && pip install --upgrade pip && pip install poetry && poetry install

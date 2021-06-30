@@ -1,28 +1,25 @@
 import asyncio
-import click
 import logging
 import os
 import secrets
 import signal
 import subprocess
+
+import click
 from click_default_group import DefaultGroup
-
-from . import cli
-from .params import project
-from .utils import CliError
-
-from meltano.core.config_service import ConfigService
-from meltano.core.plugin.error import PluginMissingError
+from meltano.api.workers import APIWorker, MeltanoCompilerWorker, UIAvailableWorker
 from meltano.core.db import project_engine
-from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.utils import truthy
 from meltano.core.migration_service import MigrationService
-from meltano.api.workers import MeltanoCompilerWorker, APIWorker, UIAvailableWorker
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
 )
+from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.utils import truthy
 
+from . import cli
+from .params import pass_project
+from .utils import CliError
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +74,7 @@ def start_workers(workers):
 
 
 @cli.group(cls=DefaultGroup, default="start", default_if_no_args=True)
-@project(migrate=True)
+@pass_project(migrate=True)
 @click.pass_context
 def ui(ctx, project):
     ctx.obj["project"] = project

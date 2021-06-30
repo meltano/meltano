@@ -1,21 +1,21 @@
-import click
 import json
-import dotenv
 import tempfile
 from pathlib import Path
 
-from . import cli
-from .params import project
-from .utils import CliError
-
+import click
+import dotenv
 from meltano.core.db import project_engine
-from meltano.core.project import Project
-from meltano.core.settings_service import SettingValueStore, StoreNotSupportedError
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.error import PluginMissingError
-from meltano.core.config_service import ConfigService
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.settings_service import SettingValueStore, StoreNotSupportedError
+
+from . import cli
+from .params import pass_project
+from .utils import CliError
 
 
 @cli.group(invoke_without_command=True)
@@ -25,17 +25,18 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 @click.argument("plugin_name")
 @click.option("--format", type=click.Choice(["json", "env"]), default="json")
 @click.option("--extras", is_flag=True)
-@project(migrate=True)
+@pass_project(migrate=True)
 @click.pass_context
 def config(ctx, project, plugin_type, plugin_name, format, extras):
-    try:
-        plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
+    plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
-        config = ConfigService(project)
-        plugin = config.find_plugin(
+    plugins_service = ProjectPluginsService(project)
+
+    try:
+        plugin = plugins_service.find_plugin(
             plugin_name, plugin_type=plugin_type, configurable=True
         )
-    except PluginMissingError:
+    except PluginNotFoundError:
         if plugin_name == "meltano":
             plugin = None
         else:
@@ -45,9 +46,13 @@ def config(ctx, project, plugin_type, plugin_name, format, extras):
     session = Session()
     try:
         if plugin:
-            settings = PluginSettingsService(project, plugin, config_service=config)
+            settings = PluginSettingsService(
+                project, plugin, plugins_service=plugins_service
+            )
         else:
-            settings = ProjectSettingsService(project, config_service=config)
+            settings = ProjectSettingsService(
+                project, config_service=plugins_service.config_service
+            )
 
         ctx.obj["settings"] = settings
         ctx.obj["session"] = session
@@ -206,40 +211,49 @@ def list_settings(ctx, extras):
         if extras:
             if not setting_def.is_extra:
                 continue
-        else:
-            if setting_def.is_extra and not setting_def._custom:
+
+            if setting_def.is_custom and not printed_custom_heading:
+                click.echo()
+                click.echo("Custom:")
+                printed_custom_heading = True
+        elif setting_def.is_extra:
+            if not setting_def.is_custom:
                 continue
 
-        if setting_def._custom and not printed_custom_heading:
+            if not printed_extra_heading:
+                click.echo()
+                click.echo("Custom extras, plugin-specific options handled by Meltano:")
+                printed_extra_heading = True
+        elif setting_def.is_custom and not printed_custom_heading:
             click.echo()
-            click.echo("Custom:")
+            click.echo("Custom, possibly unsupported by the plugin:")
             printed_custom_heading = True
-
-        if setting_def.is_extra and not printed_extra_heading:
-            click.echo()
-            click.echo("Extra:")
-            printed_extra_heading = True
 
         click.secho(name, fg="blue", nl=False)
 
         env_keys = [var.definition for var in settings.setting_env_vars(setting_def)]
         click.echo(f" [env: {', '.join(env_keys)}]", nl=False)
 
-        current_value = click.style(f"{value!r}", fg="green")
+        if source is not SettingValueStore.DEFAULT:
+            default_value = setting_def.value
+            if default_value is not None:
+                click.echo(f" (default: {default_value!r})", nl=False)
+
         if source is SettingValueStore.DEFAULT:
-            click.echo(f" current value: {current_value}", nl=False)
-
-            # The default value and the current value may not match
-            # if env vars have been expanded
-            if setting_def.value == value:
-                click.echo(" (from default)")
-            else:
-                click.echo(f" (from default: {setting_def.value!r})")
+            label = "default"
+        elif source is SettingValueStore.INHERITED:
+            label = f"inherited from '{settings.plugin.parent.name}'"
         else:
-            if setting_def.value is not None:
-                click.echo(f" (default: {setting_def.value!r})", nl=False)
+            label = f"from {source.label}"
 
-            click.echo(f" current value: {current_value} (from {source.label})")
+        current_value = click.style(f"{value!r}", fg="green")
+        click.echo(f" current value: {current_value}", nl=False)
+
+        unexpanded_value = config_metadata.get("unexpanded_value")
+        if not unexpanded_value or unexpanded_value == value:
+            click.echo(f" ({label})")
+        else:
+            click.echo(f" ({label}: {unexpanded_value!r})")
 
         if setting_def.description:
             click.echo("\t", nl=False)

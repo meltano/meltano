@@ -3,11 +3,20 @@ sidebar: auto
 description: Use Meltano to pull data from a MySQL or MariaDB database and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/mysql)
+:::
+
 # MySQL / MariaDB
 
-The `tap-mysql` [extractor](/plugins/extractors/) pulls data from a [MySQL](https://www.mysql.com/) or [MariaDB](https://mariadb.org/) database.
+The `tap-mysql` [extractor](https://hub.meltano.com/extractors/) pulls data from a [MySQL](https://www.mysql.com/) or [MariaDB](https://mariadb.org/) database.
 
-To learn more about `tap-mysql`, refer to the repository at <https://github.com/transferwise/pipelinewise-tap-mysql> and documentation at <https://transferwise.github.io/pipelinewise/connectors/taps/mysql.html>.
+- **Repository**: <https://github.com/transferwise/pipelinewise-tap-mysql>
+- **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/taps/mysql.html>
+- **Maintainer**: [Wise](https://wise.com/)
+- **Maintenance status**: Active
 
 ## Getting Started
 
@@ -57,7 +66,17 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
     [`FULL_TABLE`](/docs/integration.html#full-table-replication)
 
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
+
+    Note that this extractor is incompatible with the default `datamill-co` [variants](/docs/plugins.html#variants)
+    of [`target-postgres`](https://hub.meltano.com/loaders/postgres.html) and [`target-snowflake`](https://hub.meltano.com/loaders/snowflake.html),
+    because they don't support stream names that include the source schema in addition to the table name: `<schema>-<table>`, e.g. `public-accounts`.
+
+    Instead, use the `transferwise` variants that were made to be used with this extractor:
+    [`target-postgres`](https://hub.meltano.com/loaders/postgres--transferwise.html) and [`target-snowflake`](https://hub.meltano.com/loaders/snowflake--transferwise.html).
+
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
+
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
 
 ## Settings
 
@@ -75,12 +94,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-mysql` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-9}
+```yml{5-8}
 plugins:
   extractors:
   - name: tap-mysql
     variant: transferwise
-    pip_url: pipelinewise-tap-mysql
     config:
       host: mysql.example.com
       port: 3306
@@ -203,24 +221,6 @@ meltano config tap-mysql set filter_dbs <schema1>,<schema2>
 export TAP_MYSQL_FILTER_DBS=<schema1>,<schema2>
 ```
 
-### Export Batch Rows
-
-- Name: `export_batch_rows`
-- [Environment variable](/docs/configuration.html#configuring-settings): `TAP_MYSQL_EXPORT_BATCH_ROWS`
-- Default: `50000`
-
-Number of rows to export from MySQL in one batch.
-
-#### How to use
-
-Manage this setting using [Meltano UI](#using-meltano-ui), [`meltano config`](/docs/command-line-interface.html#config), or an [environment variable](/docs/configuration.html#configuring-settings):
-
-```bash
-meltano config tap-mysql set export_batch_rows 100000
-
-export TAP_MYSQL_EXPORT_BATCH_ROWS=100000
-```
-
 ### Session SQLs
 
 - Name: `session_sqls`
@@ -242,12 +242,11 @@ List of SQL commands to run when a connection made. This allows to set session v
 
 Manage this setting directly in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):
 
-```yml{6-9}
+```yml{5-8}
 plugins:
   extractors:
   - name: tap-mysql
     variant: transferwise
-    pip_url: pipelinewise-tap-mysql
     config:
       session_sqls:
         - SET @@session.<variable>=<value>

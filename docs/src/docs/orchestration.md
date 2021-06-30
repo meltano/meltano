@@ -6,7 +6,7 @@ description: Learn how to schedule and orchestrate your pipelines using Meltano 
 
 Most EL(T) pipelines aren't run just once, but over and over again, to make sure additions and changes in the source eventually make their way to the destination.
 
-To help you realize this, Meltano supports scheduled pipelines that can be orchestrated using [Apache Airflow](https://apache.airflow.org/).
+To help you realize this, Meltano supports scheduled pipelines that can be orchestrated using [Apache Airflow](https://airflow.apache.org/).
 
 When a new pipeline schedule is created using the [UI](/docs/ui.html) or [CLI](/docs/command-line-interface.html#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 
@@ -62,9 +62,9 @@ This setup assumes you'll use `meltano schedule` to schedule your `meltano elt`
 pipelines, as described above, since the DAG generator iterates over the result of
 `meltano schedule list --format=json` and creates DAGs for each.
 However, you can also create your own Airflow DAGs for any pipeline you fancy
-by using [`BashOperator`](https://airflow.apache.org/docs/stable/howto/operator/bash.html)
+by using [`BashOperator`](https://airflow.apache.org/docs/apache-airflow/1.10.14/howto/operator/bash.html)
 with the [`meltano elt` command](/docs/command-line-interface.html#elt), or
-[`DockerOperator`](https://airflow.apache.org/docs/stable/_api/airflow/operators/docker_operator/index.html)
+[`DockerOperator`](https://airflow.apache.org/docs/apache-airflow/1.10.14/_api/airflow/operators/docker_operator/index.html)
 with a [project-specific Docker image](/docs/production.html#containerized-meltano-project).
 
 ## Starting the Airflow scheduler
@@ -91,7 +91,7 @@ meltano invoke airflow webserver
 
 By default, you'll only see Meltano's pipeline DAGs here, which are created automatically using the dynamic DAG generator included with every Meltano project, located at `orchestrate/dags/meltano.py`.
 
-You can use the bundled Airflow with custom DAGs by putting them inside the `orchestrate/dags` directory, where they'll be picked up by Airflow automatically. To learn more, check out the [Apache Airflow documentation](https://apache.airflow.org).
+You can use the bundled Airflow with custom DAGs by putting them inside the `orchestrate/dags` directory, where they'll be picked up by Airflow automatically. To learn more, check out the [Apache Airflow documentation](https://airflow.apache.org).
 
 Meltano's use of Airflow will be unaffected by other usage of Airflow as long as `orchestrate/dags/meltano.py` remains untouched and pipelines are managed through the dedicated interface.
 

@@ -1,5 +1,5 @@
 ---
-description: Meltano is open source software built by an internal team at GitLab as well as the larger Meltano community.
+description: Meltano is open source software built by a growing team and a community of contributors.
 ---
 
 # Contributor Guide
@@ -12,7 +12,7 @@ which houses Meltano's
 [UI API](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/api),
 [these docs](https://gitlab.com/meltano/meltano/-/tree/master/docs/src), and
 the [index of discoverable plugins](#discoverable-plugins),
-which feeds the lists of [Extractors](/plugins/extractors/) and [Loaders](/plugins/loaders/) that are supported out of the box.
+which feeds the lists of [Extractors](https://hub.meltano.com/extractors/) and [Loaders](https://hub.meltano.com/loaders/) that are supported out of the box.
 
 ## Where to start?
 
@@ -36,7 +36,7 @@ export MELTANO_DISABLE_TRACKING=True
 
 In order to contribute to Meltano, you will need the following:
 
-1. [Python 3.6.1+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/docs/installation.html#requirements) of the Installation instructions, that also apply here.
+1. [Python 3.6.2+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/docs/installation.html#requirements) of the Installation instructions, that also apply here.
 2. [Node 8.11.0+](https://nodejs.org/)
 3. [Yarn](https://yarnpkg.com/)
 
@@ -49,24 +49,14 @@ git clone git@gitlab.com:meltano/meltano.git
 # Change directory into the Meltano project
 cd meltano
 
-# Optional, but it's best to have the latest pip3
-pip3 install --upgrade pip
-
-# Optional, but it's best to have the latest setuptools
-pip3 install --upgrade setuptools
-
-# Optional, but it's recommended to create a virtual environment
-# in order to minimize side effects from unknown environment variable
-python -m venv ~/.venv/meltano-development
-
-# Activate your virtual environment
-source ~/.venv/meltano-development/bin/activate
+# Install the Poetry tool for managing dependencies and packaging
+pip3 install poetry
 
 # Install all the dependencies
-pip3 install -r requirements.txt
+poetry install
 
-# Install dev dependencies with the edit flag on to detect changes
-pip3 install -e '.[dev]'
+# Install the pre-commit hook
+poetry run pre-commit install --install-hooks
 
 # Bundle the Meltano UI into the `meltano` package
 make bundle
@@ -165,21 +155,40 @@ export MELTANO_UI_URL = ""
 
 ## Discoverable plugins
 
-[Discoverable plugins](/docs/plugins.html#discoverable-plugins) are defined in the `discovery.yml` manifest, which can be found inside the Meltano repository at [`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
+[Discoverable plugins](/docs/plugins.html#discoverable-plugins) that are supported out of the box are defined in the `discovery.yml` manifest,
+which can be found inside the Meltano repository at
+[`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
 
-If you've added a custom plugin (or [variant](/docs/plugins.html#variants)) to your project that you think should be discoverable and supported out of the box, please contribute a change to that file.
-All you'll need is the [custom plugin definition](/docs/project.html#custom-plugin-definitions) from your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), which has the same format as plugin definitions in `discovery.yml`.
+### Making a custom plugin discoverable
 
-### Plugin definitions
+If you've added a [custom plugin](/docs/plugins.html#custom-plugins) (or [variant](/docs/plugins.html#variants)) to your project that could be discoverable and supported out of the box for new users, please contribute its description to this file to save the next user the hassle of setting up the custom plugin.
+The [GitLab Web IDE](https://docs.gitlab.com/ee/user/project/web_ide/) makes it very easy to contribute changes without requiring you to leave your browser.
+
+Discoverable plugin definitions in `discovery.yml` have the same format as [custom plugin definition](/docs/project.html#custom-plugin-definitions) in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file), so a copy-paste is usually sufficient.
+The format and further requirements are laid out in more detail below.
+
+Besides the new definition in `discovery.yml`, a new discoverable plugin should be documented in the
+[Extractors](https://hub.meltano.com/extractors/) or [Loaders](https://hub.meltano.com/loaders/) section of the [MeltanoHub](https://hub.meltano.com/),
+which live inside the MeltanoHub repository under
+[`/_extractors`](https://gitlab.com/meltano/hub/-/tree/main/_extractors) and
+[`/_loaders`](https://gitlab.com/meltano/hub/-/tree/main/_loaders).
+However, it is _not_ required to include documentation when you contribute a new plugin definition to `discovery.yml`,
+as members of the core team are happy to any missing docs themselves as part of the review process.
+
+#### Plugin definitions
 
 At a minimum, a plugin definition must have a `name` and a `namespace`, and at least one [variant definition](#variant-definitions) with a `pip_url` (its [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument).
 
 It is recommended to add a `label`, `logo_url`, and `description` to the plugin definition, and `docs` and `repo` URLs to the variant definition(s).
 
 Most of the time, variant definitions should also have a `settings` array with [setting definitions](#setting-definitions).
-Additionally, `capabilities` should be specified for extractor variants, non-default variant executable names can be specified using `executable`, and default values for [plugin extras](/docs/configuration.html#plugin-extras) can be specified at the plugin definition level and further overridden at the variant definition level.
 
-#### Variant definitions
+Additionally:
+- `capabilities` should be specified for extractor variants,
+- non-default variant executable names can be specified using `executable`, and
+- default values for [plugin extras](/docs/configuration.html#plugin-extras) can be specified at the plugin definition level and further overridden at the variant definition level.
+
+##### Variant definitions
 
 If a plugin will only ever have a single [variant](/docs/plugins.html#variants) (as is typically the case for all types except for extractors and loaders),
 the variant definition can be embedded in the plugin definition (variant properties can be mixed in with plugin properties), and a variant name _should not_ be specified using a `variant` key.
@@ -191,7 +200,7 @@ If multiple variants of a plugin are available, the plugin definition should hav
 The first variant is considered the default, and the _original_ variant supported by Meltano should be marked with `original: true`.
 Deprecated variants should be marked with `deprecated: true`.
 
-#### Setting definitions
+##### Setting definitions
 
 Each extractor (tap) and loader (target) variant in the `discovery.yml` has a `settings` property. Nested under this property are a variable amount of individual settings. In the Meltano UI these settings are parsed to generate a configuration form. To improve the UX of this form, each setting has a number of optional properties:
 
@@ -213,9 +222,24 @@ Each extractor (tap) and loader (target) variant in the `discovery.yml` has a `s
       value_post_processor: stringify # Optional (Modify loaded value before passing it to plugin. Target type does not need to match `kind`. Options: `stringify`)
 ```
 
-#### Protected settings
+###### Protected settings
 
 Until role-based access control is implemented in Meltano, we need to prevent user editing of certain settings from the UI. View this [`tap-gitlab` environment variable setup example](/tutorials/gitlab-and-postgres.html#add-extractor) to learn how to work with this current limitation.
+
+### Adopting a plugin
+
+When the maintainer of the default [variant](/docs/plugins.html#variants) of a discoverable plugin becomes unresponsive to issues and contributions filed by the community,
+that plugin is considered up for adoption, which means that we are looking for a different variant of the plugin with a more engaged maintainer to become the new default.
+
+This new variant can either be a fork of the original default variant, or an alternative implementation for the same source or destination, as long as it is actively maintained.
+
+If you maintain or are aware of such a variant,
+please add it to your Meltano project as a [custom plugin](/docs/plugins.html#custom-plugins) and [make it discoverable](#making-a-custom-plugin-discoverable),
+or [file an issue](/docs/getting-help.html#issue-tracker) so that the Meltano core team can assist you.
+
+As a plugin's primary maintainer, you do not have to spend a lot of time improving the plugin yourself.
+In fact, attracting more users and getting the community involved is likely to recude your personal maintenance burden,
+since you'll receive contributions with bug fixes and new features that you will only be expected to review, not build yourself.
 
 ### Local changes to `discovery.yml`
 
@@ -446,7 +470,18 @@ In the near future, all tests can flow automatically; but there are some complic
 
 Meltano uses the below tools to enforce consistent code style. Explore the [repo](https://gitlab.com/meltano/meltano/tree/master) to learn of the specific rules and settings of each.
 
+Python:
+- [isort](https://pycqa.github.io/isort/)
 - [Black](https://github.com/ambv/black)
+- [Flakehell](https://flakehell.readthedocs.io/)
+- [wemake-python-styleguide](https://wemake-python-stylegui.de/en/latest/)
+- [MyPy](https://mypy.readthedocs.io/en/stable/)
+
+Flakehell is a wrapper for Flake8 and its various plugins, and wemake-python-styleguide is a plugin for Flake8 that offers an extensive set of opinionated rules that encourage clean and correct code.
+
+MyPy is currently only executed as part of the build pipeline in order to avoid overwhelming developers with the complete list of violations. This allows for incremental and iterative improvement without requiring a concerted effort to fix all errors at once.
+
+Javascript:
 - [ESLint](https://eslint.org/docs/rules/)
 - [ESLint Vue Plugin](https://github.com/vuejs/eslint-plugin-vue)
 - [Prettier](https://prettier.io/)
@@ -461,7 +496,7 @@ In the spirit of GitLab's "boring solutions" with the above tools and mantra, th
 
 #### Imports
 
-`import`s are sorted using the following pattern:
+Javascript `import`s are sorted using the following pattern:
 
 1. Code source location: third-party → local (separate each group with a single blank line)
 1. Import scheme: Default imports → Partial imports
@@ -486,19 +521,7 @@ import { bar, thing } from '@/utils/utils'   // 1: local, 2: partial, 3: @/[u]ti
 ¶  // 2 blank lines to split the imports from the code
 ```
 
-```python
-import flask                                        # 1: third-party, 2: default, 3: [f]lask
-import os                                           # 1: third-party, 2: default, 3: [o]s
-from datetime import datetime                       # 1: third-party, 2: partial, 3: [d]atetime
-from functools import wraps                         # 1: third-party, 2: partial, 3: [f]unctools
-¶  # 1 blank line to split import groups
-import meltano                                      # 1: local, 2: default, 3: [meltano]
-import meltano.migrations                           # 1: local, 2: default, 3: [meltano.m]igrations
-from meltano.core.plugin import Plugin, PluginType  # 1: local, 2: partial, 3: [meltano.core.pl]ugin
-from meltano.core.project import Project            # 1: local, 2: partial, 3: [meltano.core.pr]oject
-¶
-¶  # 2 blank lines to split the imports from the code
-```
+Python imports are sorted automatically using [`isort`](https://pycqa.github.io/isort/). This is executed as part of the `make lint` command, as well as during execution of the pre-commit hook.
 
 #### Definitions
 
@@ -606,7 +629,7 @@ Meltano uses [changelog-cli](https://github.com/mc706/changelog-cli) to populate
 Use `changelog (new|change|fix|breaks) MESSAGE` to describe your current work in progress.
 
 ```bash
-$ changelog new "add an amazing feature"
+$ poetry run changelog new "add an amazing feature"
 $ git add CHANGELOG.md
 ```
 

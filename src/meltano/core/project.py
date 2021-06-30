@@ -1,24 +1,25 @@
 import errno
-import fasteners
 import logging
 import os
 import sys
 import threading
-import yaml
-from copy import deepcopy
 from contextlib import contextmanager
-from dotenv import dotenv_values
+from copy import deepcopy
 from functools import wraps
 from pathlib import Path
-from typing import Union, Dict
+from typing import Dict, Union
+
+import fasteners
+import yaml
 from atomicwrites import atomic_write
+from dotenv import dotenv_values
+from meltano.core.plugin.base import PluginRef
 from werkzeug.utils import secure_filename
 
-from .error import Error
 from .behavior.versioned import Versioned
-from .utils import makedirs, truthy
+from .error import Error
 from .meltano_file import MeltanoFile
-
+from .utils import makedirs, truthy
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,18 @@ class ProjectNotFound(Error):
 class ProjectReadonly(Error):
     def __init__(self):
         super().__init__(f"This Meltano project is deployed as read-only")
+
+
+def walk_parent_directories():
+    """Yield each directory starting with the current up to the root."""
+    directory = os.getcwd()
+    while True:
+        yield directory
+
+        parent_directory = os.path.dirname(directory)
+        if parent_directory == directory:
+            return
+        directory = parent_directory
 
 
 class Project(Versioned):
@@ -104,17 +117,35 @@ class Project(Versioned):
     def file_version(self):
         return self.meltano.version
 
-    @classmethod
+    @classmethod  # noqa: WPS231
     @fasteners.locked(lock="_find_lock")
-    def find(cls, project_root: Union[Path, str] = None, activate=True):
+    def find(cls, project_root: Union[Path, str] = None, activate=True):  # noqa: WPS231
+        """
+        Find a Project.
+
+        project_root: The path to the root directory of the project. If not supplied,
+            infer from PROJECT_ROOT_ENV or the current working directory and it's parents.
+        activate: Save the found project so that future calls to `find` will continue to use
+            this project.
+
+        raises ProjectNotFound: if the provided `project_root` is not a Meltano project, or
+            the current working directory is not a Meltano project or a subfolder of one.
+        """
         if cls._default:
             return cls._default
 
-        project_root = project_root or os.getenv(PROJECT_ROOT_ENV) or os.getcwd()
-        project = Project(project_root)
-
-        if not project.meltanofile.exists():
-            raise ProjectNotFound(project)
+        project_root = project_root or os.getenv(PROJECT_ROOT_ENV)
+        if project_root:
+            project = Project(project_root)
+            if not project.meltanofile.exists():
+                raise ProjectNotFound(project)
+        else:
+            for directory in walk_parent_directories():
+                project = Project(directory)
+                if project.meltanofile.exists():
+                    break
+            if not project.meltanofile.exists():
+                raise ProjectNotFound(Project(os.getcwd()))
 
         # if we activate a project using `find()`, it should
         # be set as the default project for future `find()`
@@ -194,44 +225,60 @@ class Project(Versioned):
         yield self.dotenv
 
     @makedirs
-    def meltano_dir(self, *joinpaths):
+    def meltano_dir(self, *joinpaths, make_dirs: bool = True):
+        """Path to the project `.meltano` directory."""
         return self.root.joinpath(".meltano", *joinpaths)
 
     @makedirs
-    def analyze_dir(self, *joinpaths):
+    def analyze_dir(self, *joinpaths, make_dirs: bool = True):
+        """Path to the project `analyze` directory."""
         return self.root_dir("analyze", *joinpaths)
 
     @makedirs
-    def extract_dir(self, *joinpaths):
+    def extract_dir(self, *joinpaths, make_dirs: bool = True):
+        """Path to the project `extract` directory."""
         return self.root_dir("extract", *joinpaths)
 
     @makedirs
-    def venvs_dir(self, *prefixes):
-        return self.meltano_dir(*prefixes, "venv")
+    def venvs_dir(self, *prefixes, make_dirs: bool = True):
+        """Path to a `venv` directory in `.meltano`."""
+        return self.meltano_dir(*prefixes, "venv", make_dirs=make_dirs)
 
     @makedirs
-    def run_dir(self, *joinpaths):
-        return self.meltano_dir("run", *joinpaths)
+    def run_dir(self, *joinpaths, make_dirs: bool = True):
+        """Path to the `run` directory in `.meltano`."""
+        return self.meltano_dir("run", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
-    def logs_dir(self, *joinpaths):
-        return self.meltano_dir("logs", *joinpaths)
+    def logs_dir(self, *joinpaths, make_dirs: bool = True):
+        """Path to the `logs` directory in `.meltano`."""
+        return self.meltano_dir("logs", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
-    def job_dir(self, job_id, *joinpaths):
-        return self.run_dir("elt", secure_filename(job_id), *joinpaths)
+    def job_dir(self, job_id, *joinpaths, make_dirs: bool = True):
+        """Path to the `elt` directory in `.meltano/run`."""
+        return self.run_dir(
+            "elt", secure_filename(job_id), *joinpaths, make_dirs=make_dirs
+        )
 
     @makedirs
-    def job_logs_dir(self, job_id, *joinpaths):
-        return self.logs_dir("elt", secure_filename(job_id), *joinpaths)
+    def job_logs_dir(self, job_id, *joinpaths, make_dirs: bool = True):
+        """Path to the `elt` directory in `.meltano/logs`."""
+        return self.logs_dir(
+            "elt", secure_filename(job_id), *joinpaths, make_dirs=make_dirs
+        )
 
     @makedirs
-    def model_dir(self, *joinpaths):
-        return self.meltano_dir("models", *joinpaths)
+    def model_dir(self, *joinpaths, make_dirs: bool = True):
+        """Path to the `models` directory in `.meltano`."""
+        return self.meltano_dir("models", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
-    def plugin_dir(self, plugin: "PluginRef", *joinpaths):
-        return self.meltano_dir(plugin.type, plugin.name, *joinpaths)
+    def plugin_dir(self, plugin: PluginRef, *joinpaths, make_dirs: bool = True):
+        """Path to the plugin installation directory in `.meltano`."""
+        return self.meltano_dir(
+            plugin.type, plugin.name, *joinpaths, make_dirs=make_dirs
+        )
 
     def __eq__(self, other):
         return self.root == other.root

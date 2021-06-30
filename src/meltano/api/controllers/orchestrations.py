@@ -1,64 +1,75 @@
 import asyncio
 import json
 import logging
-import sqlalchemy
 import shutil
-from flask import request, url_for, jsonify, make_response, Response, send_file
-from flask_restful import Api, Resource, fields, marshal, marshal_with
-from werkzeug.exceptions import Conflict, UnprocessableEntity
 
-from meltano.core.job import JobFinder, State
+import sqlalchemy
+from flask import Response, jsonify, make_response, request, send_file, url_for
+from flask_restful import Api, Resource, fields, marshal, marshal_with
+from flask_security import roles_required
+from meltano.api.api_blueprint import APIBlueprint
+from meltano.api.executor import run_schedule
+from meltano.api.json import freeze_keys
+from meltano.api.models import db
+from meltano.api.models.subscription import Subscription
+from meltano.api.security.auth import block_if_readonly
 from meltano.core.behavior.canonical import Canonical
-from meltano.core.plugin import PluginRef, Profile
-from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
-from meltano.core.plugin.settings_service import (
-    PluginSettingsService,
-    SettingValueStore,
-)
-from meltano.core.plugin_discovery_service import (
-    PluginDiscoveryService,
-    PluginNotFoundError,
-)
-from meltano.core.plugin_invoker import invoker_factory
-from meltano.core.plugin_install_service import PluginInstallService
-from meltano.core.project import Project
-from meltano.core.project_add_service import ProjectAddService
-from meltano.core.config_service import ConfigService
-from meltano.core.schedule_service import (
-    ScheduleService,
-    ScheduleAlreadyExistsError,
-    ScheduleDoesNotExistError,
-)
-from meltano.core.utils import flatten, iso8601_datetime, slugify
+from meltano.core.job import JobFinder, State
 from meltano.core.logging import (
     JobLoggingService,
     MissingJobLogException,
     SizeThresholdJobLogException,
 )
-from meltano.api.api_blueprint import APIBlueprint
-from meltano.api.security.auth import block_if_readonly
-from meltano.api.models import db
-from meltano.api.models.subscription import Subscription
-from meltano.api.json import freeze_keys
-from meltano.api.executor import run_elt
-from flask_security import roles_required
+from meltano.core.plugin import PluginRef
+from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
+from meltano.core.plugin.settings_service import (
+    PluginSettingsService,
+    SettingValueStore,
+)
+from meltano.core.plugin_discovery_service import PluginNotFoundError
+from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.plugin_invoker import invoker_factory
+from meltano.core.project import Project
+from meltano.core.project_add_service import ProjectAddService
+from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.schedule_service import (
+    ScheduleAlreadyExistsError,
+    ScheduleDoesNotExistError,
+    ScheduleService,
+)
+from meltano.core.setting_definition import SettingKind
+from meltano.core.utils import flatten, iso8601_datetime, slugify
+from werkzeug.exceptions import Conflict, UnprocessableEntity
+
 from .errors import InvalidFileNameError
-from .upload_helper import InvalidFileTypeError, InvalidFileSizeError, UploadHelper
+from .upload_helper import InvalidFileSizeError, InvalidFileTypeError, UploadHelper
 from .utils import enforce_secure_filename
 
 
-def decorate_profile_config(profile):
-    profile["config"] = freeze_keys(profile.get("config", {}))
+def get_config_with_metadata(settings):
+    config_dict = {}
+    config_metadata = {}
 
-    config_metadata = profile.get("config_metadata", {})
-    for key, metadata in config_metadata.items():
+    config_with_metadata = settings.config_with_metadata(
+        extras=False, redacted=True, session=db.session
+    )
+    for key, metadata in config_with_metadata.items():
+        config_dict[key] = metadata.pop("value")
+
+        metadata.pop("setting", None)
+
         try:
             metadata["source_label"] = metadata["source"].label
             metadata["auto_store_label"] = metadata["auto_store"].label
         except KeyError:
             pass
 
-    profile["config_metadata"] = freeze_keys(config_metadata)
+        config_metadata[key] = metadata
+
+    return {
+        "config": freeze_keys(config_dict),
+        "config_metadata": freeze_keys(config_metadata),
+    }
 
 
 def validate_plugin_config(
@@ -70,8 +81,8 @@ def validate_plugin_config(
         logging.warning("Cannot set a 'protected' setting externally.")
         return False
 
-    if setting_def.kind == "file" and value and value != "":
-        uploads_directory = project.extract_dir(plugin.full_name)
+    if setting_def.kind == SettingKind.FILE and value and value != "":
+        uploads_directory = project.extract_dir(plugin.name)
         resolved_file_path = project.root_dir(value).resolve()
         if not str(resolved_file_path).startswith(str(uploads_directory) + "/"):
             logging.warning(
@@ -106,7 +117,7 @@ orchestrationsAPI = Api(
 
 
 @orchestrationsBP.errorhandler(ScheduleAlreadyExistsError)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (
         jsonify(
             {
@@ -119,7 +130,7 @@ def _handle(ex):
 
 
 @orchestrationsBP.errorhandler(ScheduleDoesNotExistError)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (
         jsonify(
             {
@@ -132,12 +143,12 @@ def _handle(ex):
 
 
 @orchestrationsBP.errorhandler(InvalidFileNameError)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (jsonify({"error": True, "code": f"The file lacks a valid name."}), 400)
 
 
 @orchestrationsBP.errorhandler(InvalidFileTypeError)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (
         jsonify(
             {
@@ -150,7 +161,7 @@ def _handle(ex):
 
 
 @orchestrationsBP.errorhandler(InvalidFileSizeError)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (
         jsonify(
             {
@@ -163,7 +174,7 @@ def _handle(ex):
 
 
 @orchestrationsBP.errorhandler(MissingJobLogException)
-def _handle(ex):
+def _handle(ex):  # noqa: F811
     return (jsonify({"error": False, "code": str(ex)}), 204)
 
 
@@ -248,7 +259,8 @@ def download_job_log(job_id) -> Response:
 def run():
     project = Project.find()
     schedule_payload = request.get_json()
-    job_id = run_elt(project, schedule_payload)
+    name = schedule_payload["name"]
+    job_id = run_schedule(project, name)
 
     return jsonify({"job_id": job_id}), 202
 
@@ -259,7 +271,7 @@ def run():
 @block_if_readonly
 def upload_plugin_configuration_file(plugin_ref) -> Response:
     """
-    Endpoint for uploading a file for a specific plugin's configuration profile
+    Endpoint for uploading a file for a specific plugin
     """
 
     file = request.files["file"]
@@ -268,7 +280,7 @@ def upload_plugin_configuration_file(plugin_ref) -> Response:
 
     project = Project.find()
     directory = project.extract_dir(
-        plugin_ref.full_name, ("tmp" if tmp else ""), setting_name
+        plugin_ref.name, ("tmp" if tmp else ""), setting_name
     )
     upload_helper = UploadHelper()
     file_path = upload_helper.upload_file(directory, file)
@@ -282,7 +294,7 @@ def upload_plugin_configuration_file(plugin_ref) -> Response:
 @block_if_readonly
 def delete_plugin_configuration_file(plugin_ref) -> Response:
     """
-    Endpoint for deleting a file for a specific plugin's configuration profile
+    Endpoint for deleting a file for a specific plugin
     """
 
     payload = request.get_json()
@@ -291,7 +303,7 @@ def delete_plugin_configuration_file(plugin_ref) -> Response:
 
     project = Project.find()
     directory = project.extract_dir(
-        plugin_ref.full_name, ("tmp" if tmp else ""), setting_name
+        plugin_ref.name, ("tmp" if tmp else ""), setting_name
     )
     shutil.rmtree(directory)
 
@@ -301,67 +313,30 @@ def delete_plugin_configuration_file(plugin_ref) -> Response:
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["GET"])
 def get_plugin_configuration(plugin_ref) -> Response:
     """
-    Endpoint for getting a plugin's configuration profiles
+    Endpoint for getting a plugin's configuration
     """
 
     project = Project.find()
-    config_service = ConfigService(project)
-    plugin = config_service.get_plugin(plugin_ref)
 
-    discovery_service = PluginDiscoveryService(project, config_service=config_service)
+    plugins_service = ProjectPluginsService(project)
+    plugin = plugins_service.get_plugin(plugin_ref)
+
     settings = PluginSettingsService(
-        project,
-        plugin,
-        config_service=config_service,
-        plugin_discovery_service=discovery_service,
-        show_hidden=False,
+        project, plugin, plugins_service=plugins_service, show_hidden=False
     )
 
     try:
-        plugin_def = discovery_service.get_definition(plugin)
-        settings_group_validation = plugin_def.settings_group_validation
+        settings_group_validation = plugin.settings_group_validation
     except PluginNotFoundError:
         settings_group_validation = []
 
-    profiles = settings.profiles_with_config(redacted=True, session=db.session)
-    for profile in profiles:
-        decorate_profile_config(profile)
-
     return jsonify(
         {
-            "profiles": profiles,
+            **get_config_with_metadata(settings),
             "settings": Canonical.as_canonical(settings.definitions(extras=False)),
             "settings_group_validation": settings_group_validation,
         }
     )
-
-
-@orchestrationsBP.route(
-    "/<plugin_ref:plugin_ref>/configuration/profiles", methods=["POST"]
-)
-@block_if_readonly
-def add_plugin_configuration_profile(plugin_ref) -> Response:
-    """
-    Endpoint for adding a configuration profile to a plugin
-    """
-    payload = request.get_json()
-    project = Project.find()
-    config = ConfigService(project)
-    plugin = config.get_plugin(plugin_ref)
-    settings = PluginSettingsService(project, plugin, config_service=config)
-
-    # create the new profile for this plugin
-    name = payload["name"]
-    profile = plugin.add_profile(slugify(name), label=name)
-
-    config.update_plugin(plugin)
-
-    profile_config = settings.profile_with_config(
-        profile, redacted=True, session=db.session
-    )
-    decorate_profile_config(profile_config)
-
-    return jsonify(profile_config)
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["PUT"])
@@ -372,34 +347,24 @@ def save_plugin_configuration(plugin_ref) -> Response:
     """
     project = Project.find()
     payload = request.get_json()
-    config_service = ConfigService(project)
-    plugin = config_service.get_plugin(plugin_ref)
-
-    # TODO iterate pipelines and save each, also set this connector's profile (reuse `pipelineInFocusIndex`?)
+    plugins_service = ProjectPluginsService(project)
+    plugin = plugins_service.get_plugin(plugin_ref)
 
     settings = PluginSettingsService(
-        project, plugin, config_service=config_service, show_hidden=False
+        project, plugin, plugins_service=plugins_service, show_hidden=False
     )
 
-    for profile in payload:
-        # select the correct profile
-        name = profile["name"]
-        plugin.use_profile(plugin.get_profile(name))
+    config = payload.get("config", {})
+    for name, value in config.items():
+        if not validate_plugin_config(plugin, name, value, project, settings):
+            continue
 
-        for name, value in profile["config"].items():
-            if not validate_plugin_config(plugin, name, value, project, settings):
-                continue
+        if value == "":
+            settings.unset(name, session=db.session)
+        else:
+            settings.set(name, value, session=db.session)
 
-            if value == "":
-                settings.unset(name, session=db.session)
-            else:
-                settings.set(name, value, session=db.session)
-
-    profiles = settings.profiles_with_config(redacted=True, session=db.session)
-    for profile in profiles:
-        decorate_profile_config(profile)
-
-    return jsonify(profiles)
+    return jsonify(get_config_with_metadata(settings))
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration/test", methods=["POST"])
@@ -410,14 +375,11 @@ def test_plugin_configuration(plugin_ref) -> Response:
     """
     project = Project.find()
     payload = request.get_json()
-    config_service = ConfigService(project)
-    plugin = config_service.get_plugin(plugin_ref)
-
-    # load the correct profile
-    plugin.use_profile(plugin.get_profile(payload.get("profile")))
+    plugins_service = ProjectPluginsService(project)
+    plugin = plugins_service.get_plugin(plugin_ref)
 
     settings = PluginSettingsService(
-        project, plugin, config_service=config_service, show_hidden=False
+        project, plugin, plugins_service=plugins_service, show_hidden=False
     )
 
     config = payload.get("config", {})
@@ -440,7 +402,12 @@ def test_plugin_configuration(plugin_ref) -> Response:
     async def test_extractor():
         process = None
         try:
-            invoker = invoker_factory(project, plugin, plugin_settings_service=settings)
+            invoker = invoker_factory(
+                project,
+                plugin,
+                plugins_service=plugins_service,
+                plugin_settings_service=settings,
+            )
             with invoker.prepared(db.session):
                 process = await invoker.invoke_async(stdout=asyncio.subprocess.PIPE)
                 return await test_stream(process.stdout)

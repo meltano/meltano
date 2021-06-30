@@ -56,14 +56,9 @@ export default {
         ? this.gitLabSettings
         : this.configSettings.settings
     },
-    connectorProfile() {
-      return this.configSettings
-        ? this.configSettings.profiles[this.configSettings.profileInFocusIndex]
-        : {}
-    },
     fileValue() {
       return setting => {
-        let fullPath = this.connectorProfile.config[setting.name]
+        let fullPath = this.configSettings.config[setting.name]
         return fullPath && utils.extractFileNameFromPath(fullPath)
       }
     },
@@ -99,6 +94,9 @@ export default {
     getIsOfKindHidden() {
       return kind => kind === 'hidden'
     },
+    getIsOfKindUnsupported() {
+      return kind => kind === 'object' || kind === 'array'
+    },
     getIsOfKindOAuth() {
       return kind => this.isOAuthEnabled && kind === 'oauth'
     },
@@ -119,15 +117,17 @@ export default {
     },
     getIsProtected() {
       return setting => {
-        const metadata = this.connectorProfile.configMetadata[setting.name]
+        const metadata = this.configSettings.configMetadata[setting.name]
 
         return (
-          setting.protected === true || (metadata && !metadata.overwritable)
+          setting.protected === true ||
+          this.getIsOfKindUnsupported(setting.kind) ||
+          (metadata && !metadata.overwritable)
         )
       }
     },
     getPlaceholder() {
-      return setting => setting.placeholder || setting.value || setting.name
+      return setting => setting.placeholder || setting.value
     },
     getRequiredLabel() {
       return setting =>
@@ -189,31 +189,34 @@ export default {
     labelClass() {
       return this.fieldClass || 'is-normal'
     },
+    protectedFieldUrl() {
+      return setting => {
+        if (setting.protected) {
+          return 'https://meltano.com/docs/contributor-guide.html#protected-settings'
+        } else if (this.getIsOfKindUnsupported(setting.kind)) {
+          return 'https://meltano.com/docs/project.html#plugin-configuration'
+        } else {
+          return 'https://meltano.com/docs/configuration.html#configuration-layers'
+        }
+      }
+    },
     protectedFieldMessage() {
-      let configMetadata = this.configSettings.profiles[0].configMetadata
+      let configMetadata = this.configSettings.configMetadata
 
       return setting => {
         const metadata = configMetadata[setting.name]
 
         if (setting.protected) {
           return 'This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more.'
+        } else if (this.getIsOfKindUnsupported(setting.kind)) {
+          return `Settings with ${setting.kind} values cannot currently be managed in the UI. Manage this setting directly in your meltano.yml project file instead.`
         } else {
-          return `This setting is currently set in ${
-            metadata.source_label
-          } and cannot be overwritten.`
+          return `This setting is currently set in ${metadata.source_label} and cannot be overwritten.`
         }
       }
     },
     successClass() {
       return setting => (setting ? 'has-text-success' : null)
-    }
-  },
-  watch: {
-    'configSettings.profileInFocusIndex': {
-      handler(newVal, oldVal) {
-        this.refocusInput(newVal, oldVal)
-        this.clearUploadFormData()
-      }
     }
   },
   mounted() {
@@ -275,10 +278,7 @@ export default {
         })
 
         // Model update as v-model on `<input type="file">` not supported
-        const profile = this.configSettings.profiles[
-          this.configSettings.profileInFocusIndex
-        ]
-        profile.config[setting.name] = file.name
+        this.configSettings.config[setting.name] = file.name
       }
     },
     onFocusInput(el) {
@@ -300,11 +300,6 @@ export default {
         this.onFocusInput(el)
       }
     },
-    refocusInput(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        this.focusInputIntelligently()
-      }
-    },
     openOAuthPopup(provider) {
       const oauthUrl = `${this.$flask.oauthServiceUrl}/${provider}`
       const winOpts =
@@ -313,11 +308,9 @@ export default {
       window.open(oauthUrl, name, winOpts)
     },
     setGitLabSource() {
-      const currentProfile = this.configSettings.profiles[
-        this.configSettings.profileInFocusIndex
-      ]
-      const hasGroupSetting = currentProfile.config.groups
-      const hasProjectSetting = currentProfile.config.projects
+      const config = this.configSettings.config
+      const hasGroupSetting = config.groups
+      const hasProjectSetting = config.projects
 
       if (hasProjectSetting) {
         this.source = 'project'
@@ -355,7 +348,7 @@ export default {
                 :href="plugin.docs"
                 target="_blank"
                 class="is-size-7 has-text-underlined is-pulled-right"
-                >View Documentation Externally
+                >Open documentation in new tab
               </a>
             </div>
           </div>
@@ -431,7 +424,7 @@ export default {
                   <input
                     v-if="getIsOfKindHidden(setting.kind)"
                     :id="getFormFieldForId(setting)"
-                    v-model="connectorProfile.config[setting.name]"
+                    v-model="configSettings.config[setting.name]"
                     type="hidden"
                   />
 
@@ -439,7 +432,7 @@ export default {
                   <input
                     v-else-if="getIsOfKindBoolean(setting.kind)"
                     :id="getFormFieldForId(setting)"
-                    v-model="connectorProfile.config[setting.name]"
+                    v-model="configSettings.config[setting.name]"
                     class="checkbox"
                     :class="successClass(setting)"
                     :disabled="getIsProtected(setting)"
@@ -449,7 +442,7 @@ export default {
                   <!-- Date -->
                   <InputDateIso8601
                     v-else-if="getIsOfKindDate(setting.kind)"
-                    v-model="connectorProfile.config[setting.name]"
+                    v-model="configSettings.config[setting.name]"
                     :name="setting.name"
                     :for-id="getFormFieldForId(setting)"
                     :input-classes="`is-small ${successClass(setting)}`"
@@ -525,11 +518,7 @@ export default {
                   >
                     <select
                       :id="`${setting.name}-select-menu`"
-                      v-model="
-                        configSettings.profiles[
-                          configSettings.profileInFocusIndex
-                        ].config[setting.name]
-                      "
+                      v-model="configSettings.config[setting.name]"
                       :name="`${setting.name}-options`"
                       :class="successClass(setting)"
                       :disabled="getIsProtected(setting)"
@@ -545,11 +534,27 @@ export default {
                     </select>
                   </div>
 
+                  <!-- Unsupported: Array / Object -->
+                  <div v-else-if="getIsOfKindUnsupported(setting.kind)">
+                    <input
+                      :id="getFormFieldForId(setting)"
+                      :value="
+                        configSettings.config[setting.name] &&
+                          JSON.stringify(configSettings.config[setting.name])
+                      "
+                      :class="['input', fieldClass, successClass(setting)]"
+                      :placeholder="getPlaceholder(setting)"
+                      type="text"
+                      disabled="disabled"
+                      readonly="readonly"
+                    />
+                  </div>
+
                   <!-- Text / Password / Email -->
                   <input
                     v-else-if="getIsOfKindTextBased(setting.kind)"
                     :id="getFormFieldForId(setting)"
-                    v-model="connectorProfile.config[setting.name]"
+                    v-model="configSettings.config[setting.name]"
                     :class="['input', fieldClass, successClass(setting)]"
                     :type="getTextBasedInputType(setting)"
                     :placeholder="getPlaceholder(setting)"
@@ -563,7 +568,7 @@ export default {
                 <template v-if="!getIsOfKindHidden(setting.kind)">
                   <div v-if="getIsProtected(setting)" class="control">
                     <a
-                      href="https://meltano.com/docs/contributor-guide.html#protected-settings"
+                      :href="protectedFieldUrl(setting)"
                       target="_blank"
                       class="button is-small"
                     >
@@ -628,7 +633,7 @@ export default {
             </p>
             <p>
               <a :href="plugin.docs" target="_blank" class="button is-primary"
-                >View the documentation externally</a
+                >Open documentation in new tab</a
               >
             </p>
           </div>

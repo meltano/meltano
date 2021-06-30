@@ -1,12 +1,13 @@
 import logging
+
 import click
 import psycopg2
 import psycopg2.sql
-
 from meltano.core.db import DB, project_engine
 from meltano.core.project import Project
+
 from . import cli
-from .params import project
+from .params import pass_project
 
 
 @cli.group()
@@ -17,7 +18,7 @@ def schema():
 @schema.command()
 @click.argument("schema")
 @click.argument("roles", nargs=-1, required=True)
-@project()
+@pass_project()
 def create(project, schema, roles):
     engine, _ = project_engine(project)
 

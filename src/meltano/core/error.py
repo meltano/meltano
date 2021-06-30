@@ -1,7 +1,10 @@
+"""Base Error classes."""
 import functools
+import io
 import logging
-
+import subprocess
 from enum import Enum
+from typing import Optional, Union
 
 
 class ExitCode(int, Enum):
@@ -27,31 +30,34 @@ class ExtractError(Error):
 class SubprocessError(Exception):
     """Happens when subprocess exits with a resultcode != 0"""
 
-    def __init__(self, message: str, process):
+    def __init__(
+        self,
+        message: str,
+        process: subprocess.CompletedProcess,
+        stderr: Optional[Union[str, bytes, io.TextIOBase]] = None,
+    ):
+        """Initialize SubprocessError."""
         self.process = process
+        self._stderr = stderr or process.stderr
         super().__init__(message)
 
     @property
-    def stderr(self):
-        stderr = self.process.stderr
-        if not isinstance(stderr, str):
-            stderr = stderr.read()
+    def stderr(self) -> Optional[str]:
+        """Return the output of the process to stderr."""
+        if not self._stderr:
+            return None
+        elif isinstance(self._stderr, bytes):
+            self._stderr = self._stderr.decode("utf-8")
+        elif not isinstance(self._stderr, str):
+            self._stderr = self._stderr.read()
 
-        return stderr
+        return self._stderr
 
 
-class PluginInstallError(SubprocessError):
+class PluginInstallError(Exception):
     """Happens when a plugin fails to install."""
 
-    def __init__(self, message: str, process=None):
-        super().__init__(message, process)
-
-    @property
-    def stderr(self):
-        if not self.process:
-            return None
-
-        return super().stderr
+    pass
 
 
 class PluginInstallWarning(Exception):
@@ -72,7 +78,7 @@ def aggregate(error_cls):
             self.exceptions = exceptions
 
         def __str__(self):
-            return "\n".join((str(e) for e in self.exceptions))
+            return "\n".join(str(e) for e in self.exceptions)
 
     if error_cls != Exception:
         error_cls.Aggregate = Aggregate

@@ -1,13 +1,13 @@
-import sys
-import click
 import logging
+import sys
 import warnings
 
+import click
 import meltano
+from meltano.core.behavior.versioned import IncompatibleVersionError
+from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.behavior.versioned import IncompatibleVersionError
-from meltano.core.logging import setup_logging, LEVELS
 
 logger = logging.getLogger(__name__)
 

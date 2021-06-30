@@ -1,22 +1,22 @@
 import urllib.parse
 from datetime import timedelta
 from functools import wraps
-from flask import current_app, request, redirect, jsonify, make_response
+
+from flask import current_app, jsonify, make_response, redirect, request
 from flask_login import current_user, user_logged_in
+from flask_principal import Identity, identity_loaded
 from flask_security import Security, login_required
 from flask_security.utils import login_user
-from flask_principal import identity_loaded, Identity
-
 from meltano.core.project_settings_service import ProjectSettingsService
-from .identity import users, FreeUser, create_dev_user
-from .forms import MeltanoLoginForm, MeltanoRegisterFrom, MeltanoConfirmRegisterForm
-from .auth import (
-    unauthorized_callback,
-    _user_logged_in_hook,
-    _identity_loaded_hook,
-    block_if_api_auth_required,
-)
 
+from .auth import (
+    _identity_loaded_hook,
+    _user_logged_in_hook,
+    block_if_api_auth_required,
+    unauthorized_callback,
+)
+from .forms import MeltanoConfirmRegisterForm, MeltanoLoginForm, MeltanoRegisterFrom
+from .identity import FreeUser, create_dev_user, users
 
 # normally one would setup the extension accordingly, but it
 # seems Security.init_app() overwrites all the configuration

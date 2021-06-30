@@ -35,6 +35,7 @@ const docsSidebar = [
       "/docs/command-line-interface",
       "/docs/settings",
       "/docs/architecture",
+      ["https://hub.meltano.com/singer/spec","Singer Spec"],
     ],
   },
   {
@@ -43,6 +44,7 @@ const docsSidebar = [
     sidebarDepth: 2,
     children: [
       "/docs/getting-help",
+      "/docs/community",
       "/docs/contributor-guide",
       "/docs/responsible-disclosure",
       "/handbook/",
@@ -52,7 +54,7 @@ const docsSidebar = [
 
 module.exports = {
   title: "Meltano",
-  description: "Meltano: open source ELT",
+  description: "Meltano: ELT for the DataOps era",
   head: [
     [
       "link",
@@ -101,14 +103,27 @@ module.exports = {
   ],
   dest: "public",
   themeConfig: {
-    nav: [
+      nav: [
       {
-        text: "Sources",
-        link: "/plugins/extractors/",
+        text: "Connectors",
+        items: [
+            {
+                text: "Sources",
+                link: "https://hub.meltano.com/extractors/",
+            },
+            {
+                text: "Destinations",
+                link: "https://hub.meltano.com/loaders/",
+            },
+            {
+                text: "Connector SDK",
+                link: "https://sdk.meltano.com/",
+            },
+        ]
       },
       {
-        text: "Destinations",
-        link: "/plugins/loaders/",
+        text: "Partners",
+        link: "/partners/",
       },
       {
         text: "Documentation",
@@ -116,13 +131,47 @@ module.exports = {
       },
       {
         text: "Getting Help",
-        link: "/docs/getting-help",
+        items: [
+            {
+                text: "Issue Tracker",
+                link: "https://gitlab.com/meltano/meltano/issues"
+            },
+            {
+                text: "Slack",
+                link: "https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q"
+            },
+            {
+                text: "Office Hours",
+                link: "/docs/community#office-hours"
+            }
+        ],
+      },
+      {
+        text: "Community",
+        items: [
+            {
+                text: "Guidelines",
+                link: "/docs/community#guidelines"
+            },
+            {
+                text: "Demo Days",
+                link: "/docs/community#demo-days"
+            },
+            {
+                text: "Office Hours",
+                link: "/docs/community#office-hours"
+            },
+            {
+                text: "YouTube",
+                link: "https://www.youtube.com/meltano"
+            }
+        ]
       },
       { text: "Blog", link: "https://www.meltano.com/blog", target: "_self" },
       {
-        text: "Join us on Slack",
+        text: "Join 1200+ on Slack",
         link:
-          "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw",
+          "https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q",
         icon: "SlackIcon",
       },
       {
@@ -136,6 +185,11 @@ module.exports = {
         icon: "GitLabIcon",
       },
       {
+        text: "Watch on YouTube",
+        link: "https://www.youtube.com/meltano",
+        icon: "YouTubeIcon",
+      },
+      {
         text: "Get started",
         link: "/docs/getting-started.html",
         cta: true,
@@ -144,15 +198,12 @@ module.exports = {
     sidebar: {
       "/docs": docsSidebar,
       "/tutorials": docsSidebar,
-      "/handbook/engineering/meltanodata-guide": [
-        "/handbook/engineering/meltanodata-guide/",
-        "/handbook/engineering/meltanodata-guide/controller-node",
-      ],
       "/handbook": [
         "/handbook/",
         "/handbook/engineering/",
         "/handbook/marketing/",
         "/handbook/product/",
+        "/handbook/resources/",
       ],
     },
     logo: "/meltano-logo-with-text.svg",
@@ -160,7 +211,7 @@ module.exports = {
     docsDir: "docs/src",
     docsRepo: "https://gitlab.com/meltano/meltano",
     editLinks: true,
-    editLinkText: "Help us improve this page!",
+    editLinkText: "View page source in repository",
     algolia: {
       apiKey: "6da0449ca46dc108fd88ca828f613ea9",
       indexName: "meltano",
@@ -169,7 +220,7 @@ module.exports = {
       digitalOceanUrl:
         "https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322",
       slackChannelUrl:
-        "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw",
+        "https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q",
     },
     smoothScroll: true,
   },

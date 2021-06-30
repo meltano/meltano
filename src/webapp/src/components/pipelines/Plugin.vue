@@ -1,7 +1,6 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 
-import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import Dropdown from '@/components/generic/Dropdown'
 import pluralize from 'pluralize'
 import utils from '@/utils/utils'
@@ -9,7 +8,6 @@ import utils from '@/utils/utils'
 export default {
   name: 'Plugin',
   components: {
-    ConnectorLogo,
     Dropdown
   },
   props: {
@@ -122,7 +120,7 @@ export default {
     <article class="media" :data-test-id="`${name}-extractor-card`">
       <figure class="media-left">
         <p class="image level-item is-48x48 container">
-          <ConnectorLogo :connector="name" />
+          <img :src="plugin.logoUrl" alt="" />
         </p>
       </figure>
       <div class="media-content">

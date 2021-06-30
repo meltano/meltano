@@ -9,6 +9,10 @@ lastUpdatedSignificantly: 2020-02-20
 
 This is a tutorial on how to run `tap-postgres` with `target-postgres` in Meltano.
 
+::: tip Contributions are welcome!
+If you see an error or something that can be improved with this tutorial, we welcome a [merge request](https://gitlab.com/meltano/meltano/-/blob/master/docs/src/tutorials/postgres-with-postgres.md) to make it better!
+:::
+
 ## Intro
 
 `tap-postgres` is not currently officially supported by Meltano, so you have to add it as a custom tap. For more details, check the [documentation on adding a custom extractor](/tutorials/create-a-custom-extractor.html).

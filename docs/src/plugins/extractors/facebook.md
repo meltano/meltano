@@ -3,11 +3,19 @@ sidebar: auto
 description: Use Meltano to pull data from the Facebook Ads API and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/facebook)
+:::
+
 # Facebook Ads
 
-The `tap-facebook` [extractor](/plugins/extractors/) pulls data from the [Facebook Ads API](https://developers.facebook.com/docs/marketing-apis).
+The `tap-facebook` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Facebook Ads API](https://developers.facebook.com/docs/marketing-apis).
 
-To learn more about `tap-facebook`, refer to the repository at <https://gitlab.com/meltano/tap-facebook>.
+- **Repository**: <https://gitlab.com/meltano/tap-facebook>
+- **Maintainer**: Meltano community
+- **Maintenance status**: Active
 
 ## Getting Started
 
@@ -50,6 +58,8 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `tap-facebook` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -65,12 +75,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-facebook` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-8}
+```yml{5-7}
 plugins:
   extractors:
   - name: tap-facebook
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/tap-facebook.git
     config:
       account_id: 791728544625001
       start_date: '2020-10-01T00:00:00Z'
@@ -166,6 +175,10 @@ Now that your app has been created and the Marketing API product has been enable
 ![Screenshot of "Get Access Token" section](/images/tap-facebook/get-access-token.png)
 
 This is the Access Token you will provide to Meltano.
+
+##### Connect the App
+
+After generating the access token, your app will need to be connected to the ad account within Facebook Business Manager. Navigate to Business Manager > Accounts > Apps > Connected Assets > Add Assets to add the access token.
 
 ##### Token Expiration
 

@@ -1,11 +1,11 @@
 import cProfile
+import logging
 import pstats
 import time
-import logging
+
 from flask import g
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
-
 
 logger = logging.getLogger("meltano.api.sql")
 logger.setLevel(logging.DEBUG)

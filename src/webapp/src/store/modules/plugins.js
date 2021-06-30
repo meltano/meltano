@@ -98,7 +98,7 @@ const getters = {
 
   getPluginLabel(state) {
     return (type, name) => {
-      const pluginList = state.plugins[type]
+      const pluginList = state.installedPlugins[type]
       const targetPlugin = pluginList
         ? pluginList.find(plugin => plugin.name === name)
         : {}
@@ -109,25 +109,12 @@ const getters = {
 
   getPluginLogoUrl(state) {
     return (type, name) => {
-      const pluginList = state.plugins[type]
+      const pluginList = state.installedPlugins[type]
       const targetPlugin = pluginList
         ? pluginList.find(plugin => plugin.name === name)
         : {}
 
-      return (
-        (targetPlugin && targetPlugin.logoUrl) ||
-        utils.getConnectorLogoUrl(name)
-      )
-    }
-  },
-
-  getPluginProfiles() {
-    return plugin => {
-      const pluginProfiles = lodash.map(
-        plugin['profiles'],
-        profile => `${plugin.name}@${profile.name}`
-      )
-      return [plugin.name, ...pluginProfiles]
+      return targetPlugin && targetPlugin.logoUrl
     }
   },
 

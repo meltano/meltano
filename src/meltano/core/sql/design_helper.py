@@ -1,19 +1,18 @@
 import logging
-import sqlparse
-
-import networkx as nx
-
-from copy import deepcopy
 from collections import namedtuple
+from copy import deepcopy
 from enum import Enum
 from functools import singledispatch
-from networkx.readwrite import json_graph
-from sqlparse.sql import TokenList, Comparison
 from typing import Dict
 
-from .base import MeltanoTable, MeltanoDesign
-from .analysis_helper import AnalysisHelper
+import networkx as nx
+import sqlparse
 from meltano.core.behavior.visitor import visit_with
+from networkx.readwrite import json_graph
+from sqlparse.sql import Comparison, TokenList
+
+from .analysis_helper import AnalysisHelper
+from .base import MeltanoDesign, MeltanoTable
 
 
 class InvalidIdentifier(Exception):

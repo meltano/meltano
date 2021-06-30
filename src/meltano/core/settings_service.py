@@ -1,15 +1,16 @@
-import os
 import logging
+import os
 import re
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Iterable, Dict, List
+from typing import Dict, Iterable, List
 
-from meltano.core.utils import find_named, NotFound, flatten
-from .setting_definition import SettingMissingError, SettingDefinition
-from .settings_store import StoreNotSupportedError, SettingValueStore
-from .config_service import ConfigService
+from meltano.core.utils import NotFound
+from meltano.core.utils import expand_env_vars as do_expand_env_vars
+from meltano.core.utils import find_named, flatten
 
+from .setting_definition import SettingDefinition, SettingKind, SettingMissingError
+from .settings_store import SettingValueStore, StoreNotSupportedError
 
 logger = logging.getLogger(__name__)
 
@@ -21,17 +22,8 @@ REDACTED_VALUE = "(redacted)"
 class SettingsService(ABC):
     LOGGING = False
 
-    def __init__(
-        self,
-        project,
-        config_service: ConfigService = None,
-        show_hidden=True,
-        env_override={},
-        config_override={},
-    ):
+    def __init__(self, project, show_hidden=True, env_override={}, config_override={}):
         self.project = project
-
-        self.config_service = config_service or ConfigService(project)
 
         self.show_hidden = show_hidden
 
@@ -51,40 +43,46 @@ class SettingsService(ABC):
         pass
 
     @property
-    @abstractmethod
-    def _env_prefixes(self) -> [str]:
-        pass
-
-    @property
-    def _generic_env_prefix(self) -> str:
-        return None
+    def env_prefixes(self) -> [str]:
+        """Return prefixes for setting environment variables."""
+        return []
 
     @property
     @abstractmethod
-    def _db_namespace(self) -> str:
+    def db_namespace(self) -> str:
+        """Return namespace for setting value records in system database."""
         pass
 
     @property
     @abstractmethod
-    def _definitions(self) -> List[SettingDefinition]:
+    def setting_definitions(self) -> List[SettingDefinition]:
+        """Return definitions of supported settings."""
+        pass
+
+    @property
+    def inherited_settings_service(self):
+        """Return settings service to inherit configuration from."""
         pass
 
     @property
     @abstractmethod
-    def _meltano_yml_config(self) -> Dict:
+    def meltano_yml_config(self) -> Dict:
+        """Return current configuration in `meltano.yml`."""
         pass
 
     @abstractmethod
-    def _update_meltano_yml_config(self, config):
+    def update_meltano_yml_config(self, config):
+        """Update configuration in `meltano.yml`."""
         pass
 
     @abstractmethod
-    def _process_config(self):
+    def process_config(self):
+        """Process configuration dictionary to be used downstream."""
         pass
 
     @property
     def flat_meltano_yml_config(self):
-        return flatten(self._meltano_yml_config, "dot")
+        return flatten(self.meltano_yml_config, "dot")
 
     @property
     def env(self):
@@ -140,7 +138,7 @@ class SettingsService(ABC):
                 key: metadata["setting"].post_process_value(metadata["value"])
                 for key, metadata in config_metadata.items()
             }
-            config = self._process_config(config)
+            config = self.process_config(config)
         else:
             config = {
                 key: metadata["value"] for key, metadata in config_metadata.items()
@@ -160,7 +158,7 @@ class SettingsService(ABC):
             setting_def = config["setting"]
             value = setting_def.stringify_value(value)
 
-            for env_var in self.setting_env_vars(setting_def, include_generic=True):
+            for env_var in self.setting_env_vars(setting_def, for_writing=True):
                 if env_var.negated:
                     continue
 
@@ -175,6 +173,7 @@ class SettingsService(ABC):
         source=SettingValueStore.AUTO,
         source_manager=None,
         setting_def=None,
+        expand_env_vars=True,
         **kwargs,
     ):
         try:
@@ -189,24 +188,34 @@ class SettingsService(ABC):
 
         metadata = {"name": name, "source": source, "setting": setting_def}
 
-        expandible_env = {}
+        expandable_env = {**self.project.dotenv_env, **self.env}
         if setting_def and setting_def.is_extra:
-            expandible_env = self.as_env(
-                extras=False,
-                redacted=redacted,
-                source=source,
-                source_manager=source_manager,
+            expandable_env.update(
+                self.as_env(
+                    extras=False,
+                    redacted=redacted,
+                    source=source,
+                    source_manager=source_manager,
+                )
             )
 
         manager = source_manager or source.manager(self, **kwargs)
-        value, get_metadata = manager.get(
-            name, setting_def=setting_def, expandible_env=expandible_env
-        )
+        value, get_metadata = manager.get(name, setting_def=setting_def)
         metadata.update(get_metadata)
+
+        if expand_env_vars and metadata.get("expandable", False):
+            metadata["expandable"] = False
+
+            expanded_value = do_expand_env_vars(value, env=expandable_env)
+
+            if expanded_value != value:
+                metadata["expanded"] = True
+                metadata["unexpanded_value"] = value
+                value = expanded_value
 
         if setting_def:
             if (
-                setting_def.kind == "object"
+                setting_def.kind == SettingKind.OBJECT
                 and metadata["source"] is SettingValueStore.DEFAULT
             ):
                 object_value = {}
@@ -217,6 +226,7 @@ class SettingsService(ABC):
                         redacted=redacted,
                         source=source,
                         source_manager=source_manager,
+                        expand_env_vars=expand_env_vars,
                     )
                     for nested_key, config_metadata in flat_config_metadata.items():
                         if nested_key in object_value:
@@ -326,24 +336,18 @@ class SettingsService(ABC):
 
     def definitions(self, extras=None) -> Iterable[Dict]:
         if self._setting_defs is None:
-            setting_defs = [
-                s for s in self._definitions if s.kind != "hidden" or self.show_hidden
+            self._setting_defs = [
+                setting
+                for setting in self.setting_definitions
+                if setting.kind != SettingKind.HIDDEN or self.show_hidden
             ]
-
-            setting_defs.extend(
-                SettingDefinition.from_missing(
-                    self._definitions, self.flat_meltano_yml_config
-                )
-            )
-
-            self._setting_defs = setting_defs
 
         if extras is not None:
             return [
-                s
-                for s in self._setting_defs
-                if (extras is True and s.is_extra)
-                or (extras is False and not s.is_extra)
+                setting
+                for setting in self._setting_defs
+                if (extras is True and setting.is_extra)  # noqa: WPS408
+                or (extras is False and not setting.is_extra)
             ]
 
         return self._setting_defs
@@ -356,12 +360,8 @@ class SettingsService(ABC):
         except StopIteration as err:
             raise SettingMissingError(name) from err
 
-    def setting_env_vars(self, setting_def, include_generic=False):
-        prefixes = self._env_prefixes.copy()
-        if include_generic and self._generic_env_prefix:
-            prefixes.append(self._generic_env_prefix)
-
-        return setting_def.env_vars(prefixes)
+    def setting_env_vars(self, setting_def, for_writing=False):
+        return setting_def.env_vars(self.env_prefixes)
 
     def setting_env(self, setting_def):
         return self.setting_env_vars(setting_def)[0].key

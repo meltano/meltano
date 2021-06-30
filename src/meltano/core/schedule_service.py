@@ -1,16 +1,17 @@
 import logging
 from collections import namedtuple
+from datetime import date, datetime
 from typing import Optional
-from datetime import datetime, date
 
-from .config_service import ConfigService
+from .db import project_engine
+from .meltano_invoker import MeltanoInvoker
+from .plugin import PluginRef, PluginType
 from .plugin.settings_service import PluginSettingsService, SettingMissingError
 from .plugin_discovery_service import PluginDiscoveryService, PluginNotFoundError
 from .project import Project
-from .plugin import PluginType, PluginRef
-from .db import project_engine
-from .utils import nest, iso8601_datetime, coerce_datetime, find_named, NotFound
+from .project_plugins_service import ProjectPluginsService
 from .schedule import Schedule
+from .utils import NotFound, coerce_datetime, find_named, iso8601_datetime, nest
 
 
 class ScheduleAlreadyExistsError(Exception):
@@ -35,18 +36,9 @@ class ScheduleNotFoundError(Exception):
 
 
 class ScheduleService:
-    def __init__(
-        self,
-        project: Project,
-        config_service: ConfigService = None,
-        plugin_discovery_service: PluginDiscoveryService = None,
-    ):
+    def __init__(self, project: Project, plugins_service: ProjectPluginsService = None):
         self.project = project
-        self.config_service = config_service or ConfigService(project)
-        self.plugin_discovery_service = (
-            plugin_discovery_service
-            or PluginDiscoveryService(project, config_service=self.config_service)
-        )
+        self.plugins_service = plugins_service or ProjectPluginsService(project)
 
     def add(
         self,
@@ -76,16 +68,13 @@ class ScheduleService:
         """
         Returns the `start_date` of the extractor, or now.
         """
-        extractor = self.config_service.find_plugin(
+        extractor = self.plugins_service.find_plugin(
             extractor, plugin_type=PluginType.EXTRACTORS
         )
         start_date = None
         try:
             settings_service = PluginSettingsService(
-                self.project,
-                extractor,
-                config_service=self.config_service,
-                plugin_discovery_service=self.plugin_discovery_service,
+                self.project, extractor, plugins_service=self.plugins_service
             )
             start_date = settings_service.get("start_date", session=session)
         except SettingMissingError:
@@ -141,7 +130,7 @@ class ScheduleService:
         """
 
         try:
-            extractor = self.plugin_discovery_service.find_definition_by_namespace(
+            extractor = self.plugins_service.find_plugin_by_namespace(
                 PluginType.EXTRACTORS, namespace
             )
 
@@ -155,3 +144,14 @@ class ScheduleService:
 
     def schedules(self):
         return self.project.meltano.schedules
+
+    def find_schedule(self, name):
+        try:
+            return find_named(self.schedules(), name)
+        except StopIteration as err:
+            raise ScheduleNotFoundError(name) from err
+
+    def run(self, schedule, *args, env={}, **kwargs):
+        return MeltanoInvoker(self.project).invoke(
+            ["elt", *schedule.elt_args, *args], env={**schedule.env, **env}, **kwargs
+        )

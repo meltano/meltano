@@ -1,16 +1,18 @@
-import pytest
-import dotenv
-from unittest import mock
 from contextlib import contextmanager
+from datetime import date, datetime
+from unittest import mock
 
-from meltano.core.config_service import PluginAlreadyAddedException
-from meltano.core.setting import Setting
-from meltano.core.plugin import PluginRef, PluginType, ProjectPlugin
+import dotenv
+import pytest
+from meltano.core.plugin import PluginRef, PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import (
+    REDACTED_VALUE,
     PluginSettingsService,
     SettingValueStore,
-    REDACTED_VALUE,
 )
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
+from meltano.core.setting import Setting
 
 
 def test_create(session):
@@ -35,7 +37,7 @@ def env_var(plugin_discovery_service):
 
 
 @pytest.fixture(scope="class")
-def custom_tap(config_service):
+def custom_tap(project_add_service):
     EXPECTED = {"test": "custom", "start_date": None, "secure": None}
     tap = ProjectPlugin(
         PluginType.EXTRACTORS,
@@ -44,18 +46,13 @@ def custom_tap(config_service):
         config=EXPECTED,
     )
     try:
-        return config_service.add_to_file(tap)
+        return project_add_service.add_plugin(tap)
     except PluginAlreadyAddedException as err:
         return err.plugin
 
 
 @pytest.fixture
-def subject(session, project_add_service, tap, plugin_settings_service_factory):
-    try:
-        project_add_service.add("extractors", tap.name)
-    except PluginAlreadyAddedException:
-        pass
-
+def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
     return plugin_settings_service_factory(tap)
 
 
@@ -63,68 +60,49 @@ class TestPluginSettingsService:
     def test_get_with_source(
         self,
         session,
-        subject,
-        project,
         tap,
+        inherited_tap,
         env_var,
         monkeypatch,
-        config_service,
         plugin_settings_service_factory,
     ):
-        profile = tap.add_profile("profile", label="Profile")
-        config_service.update_plugin(tap)
-        tap_with_profile = config_service.find_plugin(tap.name)
-        tap_with_profile.use_profile(profile)
-        subject_with_profile = plugin_settings_service_factory(tap_with_profile)
+        subject = plugin_settings_service_factory(inherited_tap)
 
         # returns the default value when unset
         assert subject.get_with_source("test", session=session) == (
             "mock",
             SettingValueStore.DEFAULT,
         )
-        assert subject_with_profile.get_with_source("test", session=session) == (
-            "mock",
-            SettingValueStore.DEFAULT,
+
+        # returns the inherited value when set
+        parent_subject = plugin_settings_service_factory(tap)
+        monkeypatch.setenv(env_var(parent_subject, "test"), "INHERITED")
+
+        assert subject.get_with_source("test", session=session) == (
+            "INHERITED",
+            SettingValueStore.INHERITED,
         )
 
         # overriden by an Setting db value when set
         subject.set(
             "test", "THIS_IS_FROM_DB", store=SettingValueStore.DB, session=session
         )
-        subject_with_profile.set(
-            "test",
-            "THIS_IS_FROM_DB_WITH_PROFILE",
-            store=SettingValueStore.DB,
-            session=session,
-        )
 
         assert subject.get_with_source("test", session=session) == (
             "THIS_IS_FROM_DB",
             SettingValueStore.DB,
         )
-        assert subject_with_profile.get_with_source("test", session=session) == (
-            "THIS_IS_FROM_DB_WITH_PROFILE",
-            SettingValueStore.DB,
-        )
 
         # overriden via the `meltano.yml` configuration
         subject.set("test", 42, store=SettingValueStore.MELTANO_YML, session=session)
-        subject_with_profile.set(
-            "test", 43, store=SettingValueStore.MELTANO_YML, session=session
-        )
 
         assert subject.get_with_source("test", session=session) == (
             42,
             SettingValueStore.MELTANO_YML,
         )
-        assert subject_with_profile.get_with_source("test", session=session) == (
-            43,
-            SettingValueStore.MELTANO_YML,
-        )
 
         # revert back to the original
         subject.reset(store=SettingValueStore.MELTANO_YML)
-        subject_with_profile.reset(store=SettingValueStore.MELTANO_YML)
 
         # overriden via ENV
         monkeypatch.setenv(env_var(subject, "test"), "N33DC0F33")
@@ -133,24 +111,16 @@ class TestPluginSettingsService:
             "N33DC0F33",
             SettingValueStore.ENV,
         )
-        assert subject_with_profile.get_with_source("test", session=session) == (
-            "N33DC0F33",
-            SettingValueStore.ENV,
-        )
 
         # overridden via config override
         monkeypatch.setitem(subject.config_override, "test", "foo")
-        monkeypatch.setitem(subject_with_profile.config_override, "test", "foo")
 
         assert subject.get_with_source("test", session=session) == (
             "foo",
             SettingValueStore.CONFIG_OVERRIDE,
         )
-        assert subject_with_profile.get_with_source("test", session=session) == (
-            "foo",
-            SettingValueStore.CONFIG_OVERRIDE,
-        )
 
+    def test_get_with_source_casting(self, session, subject, env_var, monkeypatch):
         # Verify that integer settings set in env are cast correctly
         monkeypatch.setenv(env_var(subject, "port"), "3333")
 
@@ -207,13 +177,8 @@ class TestPluginSettingsService:
         )
 
     def test_definitions(self, subject, monkeypatch):
-        monkeypatch.setitem(subject.plugin_def.extras, "select", ["from_default"])
-        monkeypatch.setitem(subject.plugin_def.extras, "vars", {"foo": True})
         subject.show_hidden = False
         subject._setting_defs = None
-
-        subject.set("custom", "from_meltano_yml")
-        subject.set("nested.custom", True)
 
         setting_defs_by_name = {s.name: s for s in subject.definitions()}
 
@@ -224,20 +189,6 @@ class TestPluginSettingsService:
         # Expect hidden
         assert "secret" not in setting_defs_by_name
 
-        # Extras
-        assert "_select" in setting_defs_by_name
-        assert setting_defs_by_name["_select"].value == ["from_default"]
-
-        # Custom settings
-        assert "custom" in setting_defs_by_name
-        assert "nested.custom" in setting_defs_by_name
-        assert setting_defs_by_name["nested.custom"].kind == "boolean"
-
-        # Unknown extras
-        assert "_vars.foo" in setting_defs_by_name
-        assert setting_defs_by_name["_vars.foo"].value == True
-        assert setting_defs_by_name["_vars.foo"].kind == "boolean"
-
     def test_as_dict(self, subject, session, tap):
         EXPECTED = {"test": "mock", "start_date": None, "secure": None}
         full_config = subject.as_dict(session=session)
@@ -247,7 +198,7 @@ class TestPluginSettingsService:
             assert full_config.get(k) == v
             assert redacted_config.get(k) == v
 
-    def test_as_dict_process(self, subject, tap):
+    def test_as_dict_process(self, subject: PluginSettingsService, tap):
         config = subject.as_dict()
         assert config["auth.username"] is None
         assert config["auth.password"] is None
@@ -385,6 +336,63 @@ class TestPluginSettingsService:
             == "custom_env"
         )
 
+    def test_setting_env_vars(
+        self, tap, inherited_tap, alternative_target, plugin_settings_service_factory
+    ):
+        def env_vars(service, setting_name, **kwargs):
+            return [
+                setting.definition
+                for setting in service.setting_env_vars(
+                    service.find_setting(setting_name), **kwargs
+                )
+            ]
+
+        # Shadowing base plugin
+        service = plugin_settings_service_factory(tap)
+        # For reading setting values from environment
+        assert env_vars(service, "boolean") == [
+            "TAP_MOCK_BOOLEAN",  # Name and namespace prefix
+            "TAP_MOCK_ENABLED",  # Custom alias
+            "!TAP_MOCK_DISABLED",  # Custom alias
+        ]
+        # For writing values into the execution environment
+        assert env_vars(service, "boolean", for_writing=True) == [
+            "TAP_MOCK_BOOLEAN",  # Name and namespace prefix
+            "MELTANO_EXTRACT_BOOLEAN",  # Generic prefix
+            "TAP_MOCK_ENABLED",  # Custom alias
+            "!TAP_MOCK_DISABLED",  # Custom alias
+        ]
+
+        # Inheriting from base plugin
+        service = plugin_settings_service_factory(alternative_target)
+        # For reading setting values from environment
+        assert env_vars(service, "schema") == [
+            "TARGET_MOCK_ALTERNATIVE_SCHEMA"  # Name and namespace prefix
+        ]
+        # For writing values into the execution environment
+        assert env_vars(service, "schema", for_writing=True) == [
+            "MOCKED_SCHEMA",  # Custom `env`
+            "TARGET_MOCK_ALTERNATIVE_SCHEMA",  # Name and namespace prefix
+            "TARGET_MOCK_SCHEMA",  # Parent name  prefix
+            "MOCK_SCHEMA",  # Parent namespace prefix
+            "MELTANO_LOAD_SCHEMA",  # Generic prefix
+        ]
+
+        # Inheriting from project plugin
+        service = plugin_settings_service_factory(inherited_tap)
+        # For reading setting values from environment
+        assert env_vars(service, "boolean") == [
+            "TAP_MOCK_INHERITED_BOOLEAN"  # Name and namespace prefix
+        ]
+        # For writing values into the execution environment
+        assert env_vars(service, "boolean", for_writing=True) == [
+            "TAP_MOCK_INHERITED_BOOLEAN",  # Name and namespace prefix
+            "TAP_MOCK_BOOLEAN",  # Parent name and namespace prefix
+            "MELTANO_EXTRACT_BOOLEAN",  # Generic prefix
+            "TAP_MOCK_ENABLED",  # Custom alias
+            "!TAP_MOCK_DISABLED",  # Custom alias
+        ]
+
     def test_store_db(self, session, subject, tap):
         store = SettingValueStore.DB
 
@@ -486,7 +494,9 @@ class TestPluginSettingsService:
         subject.reset(store=store)
         assert not project.dotenv.exists()
 
-    def test_env_var_expansion(self, session, subject, project, tap, monkeypatch):
+    def test_env_var_expansion(
+        self, session, subject, project, tap, monkeypatch, env_var
+    ):
         monkeypatch.setenv("VAR", "hello world!")
         monkeypatch.setenv("FOO", "42")
 
@@ -495,17 +505,22 @@ class TestPluginSettingsService:
         dotenv.set_key(project.dotenv, "B", "paper")
         dotenv.set_key(project.dotenv, "C", "scissors")
 
-        config = {
+        yml_config = {
             "var": "$VAR",
             "foo": "${FOO}",
             "missing": "$MISSING",
             "multiple": "$A ${B} $C",
             "info": "$MELTANO_EXTRACTOR_NAME",
+            "password": "foo$r$6$bar",
             "_extra": "$TAP_MOCK_MULTIPLE",
             "_extra_generic": "$MELTANO_EXTRACT_FOO",
         }
-        with mock.patch.object(subject.plugin, "config", config):
-            config = subject.as_dict(session=session)
+        monkeypatch.setattr(subject.plugin, "config", yml_config)
+
+        # Env vars inside env var values do not get expanded
+        monkeypatch.setenv(env_var(subject, "test"), "$FOO")
+
+        config = subject.as_dict(session=session)
 
         assert config["var"] == "hello world!"
         assert config["foo"] == "42"
@@ -513,9 +528,19 @@ class TestPluginSettingsService:
         assert config["multiple"] == "rock paper scissors"
         assert config["info"] == "tap-mock"
 
+        # Only `$ALL_CAPS` env vars are supported
+        assert config["password"] == yml_config["password"]
+
         # Values of extras can reference regular settings
         assert config["_extra"] == config["multiple"]
         assert config["_extra_generic"] == config["foo"]
+
+        # Env vars inside env var values do not get expanded
+        assert config["test"] == "$FOO"
+
+        # Expansion can be disabled
+        config = subject.as_dict(session=session, expand_env_vars=False)
+        assert {k: v for k, v in config.items() if k in yml_config} == yml_config
 
     def test_nested_keys(self, session, subject, project, tap):
         def set_config(path, value):
@@ -614,7 +639,18 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
-    def test_kind_object(self, subject, tap, monkeypatch, env_var):
+    def test_date_values(self, subject, monkeypatch):
+        today = date.today()
+        monkeypatch.setitem(subject.plugin.config, "start_date", today)
+        assert subject.get("start_date") == today.isoformat()
+
+        now = datetime.now()
+        monkeypatch.setitem(subject.plugin.config, "start_date", now)
+        assert subject.get("start_date") == now.isoformat()
+
+    def test_kind_object(
+        self, subject: PluginSettingsService, tap, monkeypatch, env_var
+    ):
         assert subject.get_with_source("object") == (
             {"nested": "from_default"},
             SettingValueStore.DEFAULT,
@@ -663,6 +699,19 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
+        assert subject.as_dict(process=False)["object"] == {
+            "username": "from_meltano_yml",
+            "password": "from_meltano_yml",
+            "deep.nesting": "from_env",
+        }
+        assert subject.as_dict(process=True)["object"] == {
+            "username": "from_meltano_yml",
+            "password": "from_meltano_yml",
+            "deep": {
+                "nesting": "from_env",
+            },
+        }
+
         monkeypatch.setenv(env_var(subject, "data"), '{"foo":"from_env_alias"}')
 
         assert subject.get_with_source("object") == (
@@ -678,6 +727,8 @@ class TestPluginSettingsService:
         )
 
     def test_extra(self, subject, tap, monkeypatch, env_var):
+        subject._setting_defs = None
+
         assert "_select" in subject.as_dict()
         assert "_select" in subject.as_dict(extras=True)
         assert "_select" not in subject.as_dict(extras=False)
@@ -687,7 +738,9 @@ class TestPluginSettingsService:
             SettingValueStore.DEFAULT,
         )
 
-        monkeypatch.setitem(subject.plugin_def.extras, "select", ["from_default"])
+        monkeypatch.setitem(
+            subject.plugin.parent._variant.extras, "select", ["from_default"]
+        )
         subject._setting_defs = None
 
         assert subject.get_with_source("_select") == (
@@ -755,7 +808,7 @@ class TestPluginSettingsService:
         assert subject.get_with_source("_vars") == ({}, SettingValueStore.DEFAULT)
 
         monkeypatch.setitem(
-            subject.plugin_def.extras,
+            subject.plugin.parent._variant.extras,
             "vars",
             {"var": "from_default", "other": "from_default"},
         )

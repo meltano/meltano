@@ -1,14 +1,14 @@
-import pytest
-import yaml
 import os
 import shutil
 import threading
 import time
-
-from meltano.core.project import Project, ProjectNotFound, PROJECT_ROOT_ENV
-from meltano.core.behavior.versioned import IncompatibleVersionError
 from multiprocessing import Pool
 from multiprocessing.pool import ThreadPool
+
+import pytest
+import yaml
+from meltano.core.behavior.versioned import IncompatibleVersionError
+from meltano.core.project import PROJECT_ROOT_ENV, Project, ProjectNotFound
 
 
 @pytest.fixture
@@ -61,17 +61,18 @@ class TestProject:
         assert found == project
 
         # or set the MELTANO_PROJECT_ROOT env var
-        with monkeypatch.context() as m:
-            m.chdir(project.root.joinpath("model"))
-            m.setenv(PROJECT_ROOT_ENV, "..")
+        with monkeypatch.context() as ctx1:
+            ctx1.chdir(project.root.joinpath("model"))
+            ctx1.setenv(PROJECT_ROOT_ENV, "..")
 
             found = Project.find(activate=False)
             assert found == project
 
-        # but it doens't recurse up, you have to be
-        # at the meltano.yml level
-        with pytest.raises(ProjectNotFound):
-            Project.find(project.root.joinpath("model"))
+        # it can also recurse up from a subdirectory
+        with monkeypatch.context() as ctx2:
+            ctx2.chdir(project.root.joinpath("model"))
+            found = Project.find(activate=False)
+            assert found == project
 
         # and it fails if there isn't a meltano.yml
         with pytest.raises(ProjectNotFound):

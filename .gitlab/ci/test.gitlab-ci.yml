@@ -5,22 +5,25 @@
     name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python$PYTHON_VERSION
     entrypoint: [""]
   before_script:
-    - pip install '.[dev]'
+    - pip install poetry
+
+    # Workaround for https://github.com/python-poetry/poetry/issues/3199
+    - poetry config experimental.new-installer false
+
+    - poetry install
 
 lint:
   extends: .test
-  before_script:
-    - pip install black
   script:
     - make show_lint
 
 .pytest:
   extends: .test
   script:
-    - pytest -v --cov-report= --cov meltano -m "$PYTEST_MARKERS"
-    - coverage combine .coverage
-    - coverage report
-    - coverage html
+    - poetry run pytest -v --cov-report= --cov meltano -m "$PYTEST_MARKERS"
+    - poetry run coverage combine .coverage
+    - poetry run coverage report
+    - poetry run coverage html
   artifacts:
     paths:
       - htmlcov/

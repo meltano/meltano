@@ -1,16 +1,21 @@
+"""Defines helpers for the core codebase."""
+import asyncio
 import base64
+import functools
 import logging
+import math
+import os
 import re
 import sys
-import flatten_dict
-import os
-import functools
-
-from datetime import datetime, date, time
+from collections import OrderedDict
+from contextlib import suppress
 from copy import deepcopy
-from typing import Union, Dict, Callable, Optional, Iterable
-from requests.auth import HTTPBasicAuth
+from datetime import date, datetime, time
 from pathlib import Path
+from typing import Callable, Dict, Iterable, Optional, Union
+
+import flatten_dict
+from requests.auth import HTTPBasicAuth
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +28,30 @@ class NotFound(Exception):
 
     def __init__(self, name):
         super().__init__(f"{name} was not found.")
+
+
+def run_async(coro):
+    """Run coroutine and handle event loop and cleanup."""
+    # Taken from https://stackoverflow.com/a/58532304
+    # and inspired by Python 3.7's `asyncio.run`
+    future = asyncio.ensure_future(coro)
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(future)
+    try:
+        if future.exception():
+            raise future.exception()
+
+        return future.result()
+    except asyncio.CancelledError:
+        pass
+    finally:
+        all_tasks = asyncio.gather(
+            *asyncio.Task.all_tasks(loop), return_exceptions=True
+        )
+        all_tasks.cancel()
+        with suppress(asyncio.CancelledError):
+            loop.run_until_complete(all_tasks)
+        loop.run_until_complete(loop.shutdown_asyncgens())
 
 
 # from https://github.com/jonathanj/compose/blob/master/compose.py
@@ -57,7 +86,7 @@ def slugify(s):
 
     # "[some]___article's_title__"
     # "some___articles_title__"
-    s = re.sub("\W", "", s)
+    s = re.sub(r"\W", "", s)
 
     # "some___articles_title__"
     # "some   articles title  "
@@ -65,7 +94,7 @@ def slugify(s):
 
     # "some   articles title  "
     # "some articles title "
-    s = re.sub("\s+", " ", s)
+    s = re.sub(r"\s+", " ", s)
 
     # "some articles title "
     # "some articles title"
@@ -244,7 +273,13 @@ def find_named(xs: Iterable[dict], name: str):
 def makedirs(func):
     @functools.wraps(func)
     def decorate(*args, **kwargs):
+
+        enabled = kwargs.get("make_dirs", True)
+
         path = func(*args, **kwargs)
+
+        if not enabled:
+            return path
 
         # if there is an extension, only create the base dir
         _, ext = os.path.splitext(path)
@@ -304,10 +339,12 @@ def expand_env_vars(raw_value, env: Dict):
 
     # find viable substitutions
     var_matcher = re.compile(
-        """
-        \$                 # starts with a '$'
-        (?:                # either $VAR or ${VAR}
-            {(\w+)}|(\w+)  # capture the variable name as group[0] or group[1]
+        r"""
+        \$  # starts with a '$'
+        (?:
+            {(\w+)} # ${VAR}
+            |
+            ([A-Z][A-Z0-9_]*) # $VAR
         )
         """,
         re.VERBOSE,
@@ -320,11 +357,11 @@ def expand_env_vars(raw_value, env: Dict):
             val = str(env[var])
 
             if not val:
-                logger.debug(f"Variable {var} is empty.")
+                logger.debug(f"Variable '${var}' is empty.")
 
             return val
         except KeyError as e:
-            logger.debug(f"Variable {var} is missing from the environment.")
+            logger.debug(f"Variable '${var}' is missing from the environment.")
             return None
 
     fullmatch = re.fullmatch(var_matcher, raw_value)
@@ -333,3 +370,22 @@ def expand_env_vars(raw_value, env: Dict):
         return subst(fullmatch)
 
     return re.sub(var_matcher, subst, raw_value)
+
+
+def uniques_in(original):
+    return list(OrderedDict.fromkeys(original))
+
+
+# https://gist.github.com/cbwar/d2dfbc19b140bd599daccbe0fe925597#gistcomment-2845059
+def human_size(num, suffix="B"):
+    """Return human-readable file size."""
+    magnitude = int(math.floor(math.log(num, 1024)))
+    val = num / math.pow(1024, magnitude)
+
+    if magnitude == 0:
+        return f"{val:.0f} bytes"
+    if magnitude > 7:
+        return f"{val:.1f}Yi{suffix}"
+
+    prefix = ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"][magnitude]
+    return f"{val:3.1f}{prefix}{suffix}"

@@ -1,11 +1,12 @@
 import json
+from datetime import date, datetime
+from enum import Enum
 from typing import List
-from collections import OrderedDict
 
-from .utils import truthy, flatten, nest_object, to_env_var
-from .behavior.canonical import Canonical
 from .behavior import NameEq
+from .behavior.canonical import Canonical
 from .error import Error
+from .utils import flatten, nest_object, to_env_var, truthy, uniques_in
 
 VALUE_PROCESSORS = {
     "nest_object": nest_object,
@@ -45,6 +46,36 @@ class SettingMissingError(Error):
         super().__init__(f"Cannot find setting {name}")
 
 
+class YAMLEnum(str, Enum):
+    """Serializable Enum class."""
+
+    def __str__(self):
+        """Return as string."""
+        return self.value
+
+    @staticmethod
+    def yaml_representer(dumper, obj):
+        """Represent as yaml."""
+        return dumper.represent_scalar("tag:yaml.org,2002:str", str(obj))
+
+
+class SettingKind(YAMLEnum):
+    """Supported setting kinds."""
+
+    STRING = "string"
+    INTEGER = "integer"
+    BOOLEAN = "boolean"
+    DATE_ISO8601 = "date_iso8601"
+    EMAIL = "email"
+    PASSWORD = "password"  # noqa: S105
+    OAUTH = "oauth"
+    OPTIONS = "options"
+    FILE = "file"
+    ARRAY = "array"
+    OBJECT = "object"
+    HIDDEN = "hidden"
+
+
 class SettingDefinition(NameEq, Canonical):
     def __init__(
         self,
@@ -52,7 +83,7 @@ class SettingDefinition(NameEq, Canonical):
         aliases: List[str] = [],
         env: str = None,
         env_aliases: List[str] = [],
-        kind: str = None,
+        kind: SettingKind = None,
         value=None,
         label: str = None,
         documentation: str = None,
@@ -74,7 +105,7 @@ class SettingDefinition(NameEq, Canonical):
             aliases=aliases,
             env=env,
             env_aliases=env_aliases,
-            kind=kind,
+            kind=SettingKind(kind) if kind else None,
             value=value,
             label=label,
             documentation=documentation,
@@ -97,7 +128,7 @@ class SettingDefinition(NameEq, Canonical):
     def from_missing(cls, defs, config, **kwargs):
         flat_config = flatten(config, "dot")
 
-        names = set(s.name for s in defs)
+        names = {s.name for s in defs}
 
         # Create custom setting definitions for unknown keys
         return [
@@ -110,13 +141,13 @@ class SettingDefinition(NameEq, Canonical):
     def from_key_value(cls, key, value, custom=True, default=False):
         kind = None
         if isinstance(value, bool):
-            kind = "boolean"
+            kind = SettingKind.BOOLEAN
         elif isinstance(value, int):
-            kind = "integer"
+            kind = SettingKind.INTEGER
         elif isinstance(value, dict):
-            kind = "object"
+            kind = SettingKind.OBJECT
         elif isinstance(value, list):
-            kind = "array"
+            kind = SettingKind.ARRAY
 
         attrs = {
             "name": key,
@@ -132,35 +163,42 @@ class SettingDefinition(NameEq, Canonical):
         return self.name.startswith("_")
 
     @property
-    def is_redacted(self):
-        return self.kind in ("password", "oauth")
+    def is_custom(self):
+        """Return whether the setting is custom, i.e. user-defined in `meltano.yml`."""
+        return self._custom
 
-    def env_vars(self, prefixes: [str]):
+    @property
+    def is_redacted(self):
+        return self.kind in {SettingKind.PASSWORD, SettingKind.OAUTH}
+
+    def env_vars(self, prefixes: [str], include_custom=True):
+        """Return environment variables with the provided prefixes."""
         env_keys = []
 
-        if self.env:
+        if self.env and include_custom:
             env_keys.append(self.env)
 
         env_keys.extend(to_env_var(prefix, self.name) for prefix in prefixes)
 
-        env_keys.extend(alias for alias in self.env_aliases)
+        if include_custom:
+            env_keys.extend(alias for alias in self.env_aliases)
 
-        # Drop duplicate keys
-        env_keys = list(OrderedDict.fromkeys(env_keys))
-
-        return [EnvVar(key) for key in env_keys]
+        return [EnvVar(key) for key in uniques_in(env_keys)]
 
     def cast_value(self, value):
+        if isinstance(value, date) or isinstance(value, datetime):
+            value = value.isoformat()
+
         if isinstance(value, str):
-            if self.kind == "boolean":
+            if self.kind == SettingKind.BOOLEAN:
                 return truthy(value)
-            elif self.kind == "integer":
+            elif self.kind == SettingKind.INTEGER:
                 return int(value)
-            elif self.kind == "object":
+            elif self.kind == SettingKind.OBJECT:
                 value = json.loads(value)
                 if not isinstance(value, dict):
                     raise ValueError(f"JSON value '{value}' is not an object")
-            elif self.kind == "array":
+            elif self.kind == SettingKind.ARRAY:
                 value = json.loads(value)
                 if not isinstance(value, list):
                     raise ValueError(f"JSON value '{value}' is not an array")
@@ -186,7 +224,7 @@ class SettingDefinition(NameEq, Canonical):
         if isinstance(value, str):
             return value
 
-        if self.kind == "string":
+        if not self.kind or self.kind == SettingKind.STRING:
             return str(value)
 
         return json.dumps(value)

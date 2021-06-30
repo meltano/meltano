@@ -19,7 +19,7 @@ control. Sensitive values like passwords and tokens are most appropriately store
 ## Plugin settings
 
 For plugin settings, refer to the specific plugin's documentation
-([extractors](/plugins/extractors/), [loaders](/plugins/loaders/)),
+([extractors](https://hub.meltano.com/extractors/), [loaders](https://hub.meltano.com/loaders/)),
 or use [`meltano config <plugin> list`](/docs/command-line-interface.html#config)
 to list all available settings with their names, environment variables, and current values.
 
@@ -36,6 +36,7 @@ These are settings specific to [your Meltano project](/docs/project.html).
 By default, Meltano shares anonymous usage data with the Meltano team using Google Analytics. We use this data to learn about the size of our user base and the specific Meltano features they are (not yet) using, which helps us determine the highest impact changes we can make in each weekly release to make Meltano even more useful for you and others like you.
 
 If enabled, Meltano will use the value of the [`project_id` setting](#project-id) to uniquely identify your project in Google Analytics.
+This project ID is also sent along when Meltano loads the remote `discovery.yml` manifest from the URL identified by the [`discovery_url` setting](#discovery-url).
 
 If you'd like to send the tracking data to a different Google Analytics account than the one run by the Meltano team,
 the Tracking IDs can be configured using the [`tracking_ids.*` settings](#analytics-tracking-ids) below.
@@ -110,6 +111,56 @@ export MELTANO_DATABASE_URI=postgresql://<username>:<password>@<host>:<port>/<da
 meltano elt --database-uri=postgresql://<username>:<password>@<host>:<port>/<database> ...
 ```
 
+#### Targeting a PostgreSQL Schema
+
+When using PostgreSQL as your [system database](/docs/project.html#system-database), you can choose the target schema within that database by adding
+`?options=-csearch_path%3D<schema>` directly to the end of your `database_uri` and `MELTANO_DATABASE_URI`.
+
+You are also able to add multiple schemas, which PostgreSQL will work through from left to right until it finds a valid schema to target, by using `?options=-csearch_path%3D<schema>,<schema_two>`
+
+If you dont target a schema then by default PostgreSQL will try to use the `public` schema.
+
+```bash
+postgresql://<username>:<password>@<host>:<port>/<database>?options=-csearch_path%3D<schema>
+```
+
+
+### `database_max_retries`
+
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_DATABASE_MAX_RETRIES`
+- Default: `3`
+
+This sets the maximum number of reconnection attempts in case the initial connection to the database fails because it isn't available when Meltano starts up.
+
+Note: This affects the initial connection attempt only after which the connection is cached.
+Subsequent disconnections are handled by SQLALchemy
+
+#### How to use
+
+```bash
+meltano config meltano set database_max_retries 3
+
+export MELTANO_DATABASE_MAX_RETRIES=3
+```
+
+### `database_retry_timeout`
+
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_DATABASE_RETRY_TIMEOUT`
+- Default: `5` (seconds)
+
+This controls the retry interval (in seconds) in case the initial connection to the database fails because it isn't available when Meltano starts up.
+
+Note: This affects the initial connection attempt only after which the connection is cached.
+Subsequent disconnections are handled by SQLALchemy
+
+#### How to use
+
+```bash
+meltano config meltano set database_retry_timeout 5
+
+export MELTANO_DATABASE_RETRY_TIMEOUT=5
+```
+
 ### `project_readonly`
 
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_PROJECT_READONLY`
@@ -153,8 +204,10 @@ set this setting to `false` or any other string not starting with `http://` or `
 
 ```bash
 meltano config meltano set discovery_url https://meltano.example.com/discovery.yml
+meltano config meltano set discovery_url false
 
 export MELTANO_DISCOVERY_URL=https://meltano.example.com/discovery.yml
+export MELTANO_DISCOVERY_URL=false
 ```
 
 ## `meltano` CLI
@@ -179,6 +232,34 @@ export MELTANO_CLI_LOG_LEVEL=debug
 export MELTANO_LOG_LEVEL=debug
 
 meltano --log-level=debug ...
+```
+
+## `meltano elt`
+
+These settings can be used to modify the behavior of [`meltano elt`](/docs/command-line-interface.html#elt).
+
+### `elt.buffer_size`
+
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_ELT_BUFFER_SIZE`
+- Default: `10485760` (10MiB in bytes)
+
+Size (in bytes) of the buffer between extractor and loader (Singer tap and target) that stores
+[messages](https://hub.meltano.com/singer/spec#messages)
+output by the extractor while they are waiting to be processed by the loader.
+
+When an extractor generates messages (records) faster than the loader can process them, the buffer may fill up completely,
+at which point the extractor will be blocked until the loader has worked through enough messages to make half
+of the buffer size available again for new extractor output.
+
+The length of a single line of extractor output is limited to half the buffer size.
+With a default buffer size of 10MiB, the maximum message size would therefore be 5MiB.
+
+#### How to use
+
+```bash
+meltano config meltano set elt.buffer_size 52428800 # 50MiB in bytes
+
+export MELTANO_ELT_BUFFER_SIZE=52428800
 ```
 
 ## Meltano UI server
@@ -237,7 +318,9 @@ meltano ui --bind-port=80
 - [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_SERVER_NAME`
 - Default: None
 
-The host and port Meltano UI is available at.
+The host and port Meltano UI is available at, e.g. `<host>:<port>`.
+
+The port will usually match the [`ui.bind_port` setting](#ui-bind-port), and can be omitted when the default port for HTTP (`80`) or HTTPS (`443`) is used.
 
 Unless the [`ui.session_cookie_domain` setting](#ui-session-cookie-domain) is set, this setting will be used as the session cookie domain.
 
@@ -291,6 +374,25 @@ This setting corresponds to [Flask's `SESSION_COOKIE_DOMAIN` setting](https://fl
 meltano config meltano set ui session_cookie_domain meltano.example.com
 
 export MELTANO_UI_SESSION_COOKIE_DOMAIN=meltano.example.com
+```
+
+### `ui.session_cookie_secure`
+
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_UI_SESSION_COOKIE_SECURE`
+- Default: `false`
+
+Enable the `Secure` flag on the session cookie, so that the client will only send it to the server in HTTPS requests.
+
+The application must be served over HTTPS for this to make sense.
+
+This setting corresponds to [Flask's `SESSION_COOKIE_SECURE` setting](https://flask.palletsprojects.com/en/1.1.x/config/#SESSION_COOKIE_SECURE).
+
+#### How to use
+
+```bash
+meltano config meltano set ui session_cookie_secure true
+
+export MELTANO_UI_SESSION_COOKIE_SECURE=true
 ```
 
 ### `ui.secret_key`

@@ -1,27 +1,33 @@
+import logging
 import os
 import sys
-import click
-import logging
 
 from meltano.core.logging import setup_logging
 from meltano.core.project import ProjectReadonly
-from .cli import cli
+
 from .utils import CliError
-from . import (
-    elt,
-    schema,
-    discovery,
-    initialize,
+
+# TODO: Importing the cli.cli module breaks other cli module imports
+# This suggests a cyclic dependency or a poorly structured interface.
+# This should be investigated and resolved to avoid implicit behavior
+# based solely on import order.
+from .cli import cli  # isort:skip
+from . import (  # isort:skip # noqa: F401, WPS235
     add,
+    config,
+    discovery,
+    elt,
+    initialize,
     install,
     invoke,
+    model,
+    remove,
+    repl,
+    schedule,
+    schema,
+    select,
     ui,
     upgrade,
-    schedule,
-    select,
-    repl,
-    config,
-    model,
     user,
 )
 
@@ -40,7 +46,10 @@ def main():
             raise CliError(
                 f"The requested action could not be completed: {err}"
             ) from err
+        except KeyboardInterrupt:  # noqa: WPS329
+            raise
+        except Exception as err:
+            raise CliError(str(err)) from err
     except CliError as err:
-        logger.debug(str(err), exc_info=True)
-        click.secho(str(err), fg="red")
+        err.print()
         sys.exit(1)

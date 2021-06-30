@@ -3,11 +3,19 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into PostgreSQL
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/postgres)
+:::
+
 # PostgreSQL
 
-The `target-postgres` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [PostgreSQL](https://www.postgresql.org/) database.
+The `target-postgres` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into a [PostgreSQL](https://www.postgresql.org/) database.
 
-To learn more about `target-postgres`, refer to the repository at <https://github.com/datamill-co/target-postgres>.
+- **Repository**: <https://github.com/datamill-co/target-postgres>
+- **Maintainer**: [Data Mill](https://datamill.co/)
+- **Maintenance status**: Active
 
 #### Alternative variants
 
@@ -25,6 +33,14 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 1. [Install Meltano](/docs/getting-started.html#install-meltano)
 1. [Create your Meltano project](/docs/getting-started.html#create-your-meltano-project)
 1. [Add an extractor to pull data from a source](/docs/getting-started.html#add-an-extractor-to-pull-data-from-a-source)
+
+#### Dependencies
+
+`target-postgres` [requires](https://www.psycopg.org/docs/install.html#runtime-requirements) the
+[`libpq` library](https://www.postgresql.org/docs/current/libpq.html) to be available on your system.
+If you've installed PostgreSQL, you should already have it, but you can also install it by itself using the
+[`libpq-dev` package](https://pkgs.org/download/libpq-dev) on Ubuntu/Debian or the
+[`libpq` Homebrew formula](https://formulae.brew.sh/formula/libpq) on macOS.
 
 ### Installation and configuration
 
@@ -56,6 +72,8 @@ Follow the remaining step of the [Getting Started guide](/docs/getting-started.h
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, refer to the ["Troubleshooting" section](#troubleshooting) below or [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `target-postgres` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -74,12 +92,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-postgres` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-11}
+```yml{5-10}
 plugins:
   loaders:
   - name: target-postgres
     variant: datamill-co
-    pip_url: singer-target-postgres
     config:
       postgres_host: postgres.example.com
       postgres_port: 5432
@@ -126,7 +143,7 @@ meltano config target-postgres set postgres_port 5502
 export TARGET_POSTGRES_PORT=5502
 ```
 
-### Posrgres Database
+### Postgres Database
 
 - Name: `postgres_database`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_POSTGRES_DATABASE`, alias: `TARGET_POSTGRES_POSTGRES_DATABASE`, `PG_DATABASE`
@@ -175,7 +192,7 @@ export TARGET_POSTGRES_PASSWORD=<password>
 
 - Name: `postgres_schema`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_POSTGRES_SCHEMA`, alias: `TARGET_POSTGRES_POSTGRES_SCHEMA`
-- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html).
+- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](https://hub.meltano.com/extractors/gitlab.html).
 
 #### How to use
 
@@ -497,3 +514,26 @@ meltano config target-postgres set after_run_sql <sql>
 
 export TARGET_POSTGRES_AFTER_RUN_SQL=<sql>
 ```
+
+## Troubleshooting
+
+### Error: `psycopg2.ProgrammingError: syntax error at or near "-"`
+
+This error message indicates that the extractor you are using this loader with generates
+stream names that include the source database schema in addition to the table name: `<schema>-<table>`, e.g. `public-accounts`.
+This is not supported by [this variant](#alternative-variants) of `target-postgres`.
+
+Instead, use the [`transferwise` variant](https://hub.meltano.com/loaders/postgres--transferwise.html) which was made to be used with extractors that behave this way.
+
+### Error: `pg_config executable not found` or `libpq-fe.h: No such file or directory`
+
+This error message indicates that the [`libpq`](https://www.postgresql.org/docs/current/libpq.html) dependency is missing.
+
+To resolve this, refer to the ["Dependencies" section](#dependencies) above.
+
+### Error: `ld: library not found for -lssl` or `clang: error: linker command failed with exit code 1` or `error: command 'clang' failed with exit status 1`
+
+This error message indicates that there is a problem installing OpenSSL. This 
+[Stack Overflow answer](https://stackoverflow.com/questions/26288042/error-installing-psycopg2-library-not-found-for-lssl) 
+has specific recommendations on setting the `LDFLAGS` and/or `CPPFLAGS` environment variables. 
+Set those prior to running `meltano add loader target-postgres`.

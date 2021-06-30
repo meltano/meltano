@@ -24,7 +24,7 @@ const getters = {
 
   getHasValidConfigSettings(_, getters) {
     return (configSettings, settingsGroupValidation = null) => {
-      return settingsGroupValidation && settingsGroupValidation.lenth
+      return settingsGroupValidation && settingsGroupValidation.length
         ? getters.getHasGroupValidationConfigSettings(
             configSettings,
             settingsGroupValidation
@@ -122,12 +122,6 @@ const getters = {
 }
 
 const actions = {
-  addConfigurationProfile(_, profile) {
-    return orchestrationsApi.addConfigurationProfile(profile).catch(error => {
-      Vue.toasted.global.error(error)
-    })
-  },
-
   createSubscription(_, subscription) {
     return orchestrationsApi.createSubscription(subscription)
   },
@@ -245,12 +239,8 @@ const actions = {
       isRunning: true
     })
 
-    return orchestrationsApi.run(pipeline).then(response => {
+    return orchestrationsApi.run({ name: pipeline.name }).then(response => {
       dispatch('queuePipelinePoller', response.data)
-      const pipelineWithJobId = Object.assign(pipeline, {
-        jobId: response.data.jobId
-      })
-      commit('setPipeline', pipelineWithJobId)
     })
   },
 
@@ -324,15 +314,13 @@ const mutations = {
     )
     configuration.settings.forEach(setting => {
       const isIso8601Date = setting.kind && setting.kind === 'date_iso8601'
-      configuration.profiles.forEach(profile => {
-        const isDefaultNeeded =
-          profile.config.hasOwnProperty(setting.name) &&
-          profile.config[setting.name] === null &&
-          requiredSettingsKeys.includes(setting.name)
-        if (isIso8601Date && isDefaultNeeded) {
-          profile.config[setting.name] = utils.getFirstOfMonthAsYYYYMMDD()
-        }
-      })
+      const isDefaultNeeded =
+        configuration.config.hasOwnProperty(setting.name) &&
+        configuration.config[setting.name] === null &&
+        requiredSettingsKeys.includes(setting.name)
+      if (isIso8601Date && isDefaultNeeded) {
+        configuration.config[setting.name] = utils.getFirstOfMonthAsYYYYMMDD()
+      }
     })
     state[target] = configuration
   },

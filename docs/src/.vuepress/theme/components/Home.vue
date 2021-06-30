@@ -20,7 +20,7 @@
           </router-link>
 
           <SlackChannelLink class="action-button secondary">
-            <SlackIcon /> Join us on Slack
+            <SlackIcon /> Join 1200+ on Slack
           </SlackChannelLink>
 
           <a
@@ -32,12 +32,16 @@
             Contribute on GitLab
           </a>
         </p>
+
+        <Content slot-key="read-on-for-more" />
       </div>
 
       <div class="hero-right">
         <Content class="theme-default-content" slot-key="installation-code" />
       </div>
     </div>
+
+    <Content class="hero feature-section-wrapper is-shorter" slot-key="logos" />
 
     <div class="hero homepage-cta feature-section-wrapper" id="meltano-init">
       <div class="hero-left">
@@ -210,7 +214,7 @@
 
     <GlobalFooter
       ><a
-        href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/views/Home.vue"
+        href="https://gitlab.com/meltano/meltano/-/blob/master/docs/src/README.md"
         target="_blank"
         >{{ $site.themeConfig.editLinkText }} <OutboundLink
       /></a>
@@ -456,21 +460,23 @@ export default {
     padding: 0 !important;
     border: none !important;
   }
-
-  img {
-    border: 3px solid #282c34;
-    border-radius: 6px;
-    max-width: calc(100% - 6px);
-  }
 }
 
 .hero-right {
   padding-top: 2.5rem;
-}
 
-.hero-right .theme-default-content ol {
-  text-align: left;
-  padding-left: 1.5rem;
+  .theme-default-content {
+    ol {
+      text-align: left;
+      padding-left: 1.5rem;
+    }
+
+    img {
+      border: 3px solid #282c34;
+      border-radius: 6px;
+      max-width: calc(100% - 6px);
+    }
+  }
 }
 
 @media (min-width: $MQNarrow) {
@@ -535,8 +541,12 @@ export default {
     }
 
     h1, .description, .action {
-      margin: 1.8rem auto 0;
+      margin: 1.8rem auto;
       text-align: left;
+    }
+
+    .action:last-child {
+      margin-bottom: 0;
     }
 
     .description {
@@ -634,6 +644,12 @@ export default {
   }
 }
 
+@media (max-width: $MQMobileNarrow) {
+  .home .hero h1 {
+    font-size: 1.8rem;
+  }
+}
+
 @media (min-width: $MQMobileNarrow) {
   .home {
     .hero {
@@ -642,7 +658,7 @@ export default {
       }
 
       h1, .description, .action {
-        margin: 1.2rem auto 0;
+        margin: 1.2rem auto;
       }
 
       .description {
@@ -760,5 +776,39 @@ export default {
 
 .mt-2r {
   margin-top: 1rem;
+}
+
+.content__logos {
+  ul {
+    padding: 0 !important;
+    margin: 0 !important;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-gap: 1.5rem;
+    align-items: center;
+    justify-content: center;
+
+    li {
+      list-style: none;
+      text-align: center;
+
+      a {
+        img {
+          height: 50px;
+          max-width: none !important;
+          filter: grayscale(1);
+          transition: filter 0.2s ease-in-out;
+
+          &:hover {
+            filter: grayscale(0);
+          }
+        }
+
+        .icon.outbound {
+          display: none;
+        }
+      }
+    }
+  }
 }
 </style>

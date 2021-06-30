@@ -1,12 +1,15 @@
-import pytest
 from datetime import datetime
 from unittest import mock
 
+import pytest
+from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.schedule_service import (
-    ScheduleService,
     Schedule,
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
+    ScheduleService,
     SettingMissingError,
 )
 
@@ -27,6 +30,17 @@ def create_schedule():
         return Schedule(name=name, **attrs)
 
     return make
+
+
+@pytest.fixture(scope="class")
+def custom_tap(project_add_service):
+    tap = ProjectPlugin(
+        PluginType.EXTRACTORS, name="tap-custom", namespace="tap_custom"
+    )
+    try:
+        return project_add_service.add_plugin(tap)
+    except PluginAlreadyAddedException as err:
+        return err.plugin
 
 
 class TestScheduleService:
@@ -113,3 +127,64 @@ class TestScheduleService:
         ):
             schedule = add("with_no_start_date", None)
             assert schedule.start_date
+
+    def test_run(self, subject, session, tap, target):
+        schedule = subject.add(
+            session,
+            "tap-to-target",
+            tap.name,
+            target.name,
+            "skip",
+            "@daily",
+            TAP_MOCK_TEST="overridden",
+        )
+
+        # It fails because tap and target are not actually installed
+        process = subject.run(schedule)
+        assert process.returncode == 1
+
+        process_mock = mock.Mock(returncode=0)
+        with mock.patch(
+            "meltano.core.schedule_service.MeltanoInvoker.invoke",
+            return_value=process_mock,
+        ) as invoke_mock:
+            process = subject.run(
+                schedule, "--dump=config", env={"TAP_MOCK_SECURE": "overridden"}
+            )
+            assert process.returncode == 0
+
+            invoke_mock.assert_called_once_with(
+                [
+                    "elt",
+                    tap.name,
+                    target.name,
+                    f"--transform={schedule.transform}",
+                    f"--job_id={schedule.name}",
+                    "--dump=config",
+                ],
+                env={"TAP_MOCK_TEST": "overridden", "TAP_MOCK_SECURE": "overridden"},
+            )
+
+    def test_find_namespace_schedule(
+        self, subject, tap, create_schedule, project_plugins_service
+    ):
+        schedule = create_schedule(tap.name)
+        subject.add_schedule(schedule)
+        with mock.patch(
+            "meltano.core.project_plugins_service.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            found_schedule = subject.find_namespace_schedule(tap.namespace)
+            assert found_schedule.extractor == tap.name
+
+    def test_find_namespace_schedule_custom_extractor(
+        self, subject, create_schedule, custom_tap, project_plugins_service
+    ):
+        schedule = Schedule(name="tap-custom", extractor="tap-custom")
+        subject.add_schedule(schedule)
+        with mock.patch(
+            "meltano.core.project_plugins_service.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            found_schedule = subject.find_namespace_schedule(custom_tap.namespace)
+            assert found_schedule.extractor == custom_tap.name

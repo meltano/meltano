@@ -3,11 +3,20 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into Snowflake
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/snowflake--transferwise)
+:::
+
 # Snowflake (`transferwise` variant)
 
-The `target-snowflake` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [Snowflake](https://www.snowflake.com/) data warehouse.
+The `target-snowflake` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into a [Snowflake](https://www.snowflake.com/) data warehouse.
 
-To learn more about `target-snowflake`, refer to the repository at <https://github.com/transferwise/pipelinewise-target-snowflake> and documentation at <https://transferwise.github.io/pipelinewise/connectors/targets/snowflake.html>.
+- **Repository**: <https://github.com/transferwise/pipelinewise-target-snowflake>
+- **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/targets/snowflake.html>
+- **Maintainer**: [Wise](https://wise.com/)
+- **Maintenance status**: Active
 
 #### Alternative variants
 
@@ -59,6 +68,8 @@ Follow the remaining step of the [Getting Started guide](/docs/getting-started.h
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `target-snowflake` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -80,12 +91,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-snowflake` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-14}
+```yml{5-13}
 plugins:
   loaders:
   - name: target-snowflake
     variant: transferwise
-    pip_url: pipelinewise-target-snowflake
     config:
       account: rtxxxxx.eu-central-1
       dbname: MY_DATABASE
@@ -243,7 +253,7 @@ export TARGET_SNOWFLAKE_FILE_FORMAT=<snowflake_file_format_object_name>
 
 - Name: `default_target_schema`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_DEFAULT_TARGET_SCHEMA`, alias: `TARGET_SNOWFLAKE_SCHEMA`, `SF_SCHEMA`
-- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html). Values are automatically converted to uppercase before they're passed on to the plugin, so `tap_gitlab` becomes `TAP_GITLAB`.
+- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](https://hub.meltano.com/extractors/gitlab.html). Values are automatically converted to uppercase before they're passed on to the plugin, so `tap_gitlab` becomes `TAP_GITLAB`.
 
 Name of the schema where the tables will be created, without database prefix. If `schema_mapping` is not defined then every stream sent by the tap is loaded into this schema.
 
@@ -489,16 +499,52 @@ export TARGET_SNOWFLAKE_DEFAULT_TARGET_SCHEMA_SELECT_PERMISSION=<roles>
 
 Useful if you want to load multiple streams from one tap to multiple Snowflake schemas.
 
-If the tap sends the `stream_id` in `<schema_name>-<table_name>` format then this option overwrites the `default_target_schema` value. Note, that using `schema_mapping` you can overwrite the `default_target_schema_select_permission` value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.
+If the tap sends the `stream_id` in `<schema_name>-<table_name>` format then this option overwrites the `default_target_schema` value.
+
+Note, that using `schema_mapping` you can overwrite the `default_target_schema_select_permission` value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.
+
+This setting can hold an object mapping source schema names to objects with `target_schema` and (optionally) `target_schema_select_permissions` keys.
 
 #### How to use
 
-Manage this setting using [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
+Manage this setting directly in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):
+
+```yml{5-15}
+plugins:
+  loaders:
+  - name: target-snowflake
+    variant: transferwise
+    config:
+      schema_mapping:
+        <source_schema>:
+          target_schema: <target_schema>
+          target_schema_select_permissions: [<role1>, <role2>] # Optional
+        # ...
+
+        # For example:
+        public:
+          target_schema: repl_sf_public
+          target_schema_select_permissions: [grp_stats]
+```
+
+Alternatively, manage this setting using [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config target-snowflake set schema_mapping <mapping>
+meltano config target-snowflake set schema_mapping <source_schema> target_schema <target_schema>
+meltano config target-snowflake set schema_mapping <source_schema> target_schema_select_permissions '["<role>", ...]'
 
-export TARGET_SNOWFLAKE_SCHEMA_MAPPING=<mapping>
+export TARGET_SNOWFLAKE_SCHEMA_MAPPING='{"<source_schema>": {"target_schema": "<target_schema>", ...}, ...}'
+
+# Once a schema mapping has been set in `meltano.yml`, environment variables can be used
+# to override specific nested properties:
+export TARGET_SNOWFLAKE_SCHEMA_MAPPING_<SOURCE_SCHEMA>_TARGET_SCHEMA=<target_schema>
+export TARGET_SNOWFLAKE_SCHEMA_MAPPING_<SOURCE_SCHEMA>_TARGET_SCHEMA_SELECT_PERMISSIONS='["<role>", ...]'
+
+# For example:
+meltano config target-snowflake set schema_mapping public target_schema repl_sf_public
+meltano config target-snowflake set schema_mapping public target_schema_select_permissions '["grp_stats"]'
+
+export TARGET_SNOWFLAKE_SCHEMA_MAPPING_PUBLIC_TARGET_SCHEMA=new_repl_sf_public
 ```
 
 ### Disable Table Cache

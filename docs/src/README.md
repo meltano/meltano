@@ -1,8 +1,8 @@
 ---
 home: true
 heroImage: /meltano-logo.svg
-metaTitle: "Meltano: open source ELT"
-description: Meltano is an open source platform for building, running & orchestrating ELT pipelines made up of Singer taps and targets and dbt models, that you can run locally or easily deploy in production. Our goal is to make the power of data integration available to all by building a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
+metaTitle: "Meltano: ELT for the DataOps era"
+description: Open source, self-hosted, CLI-first, debuggable, and extensible. Embraces Singer and its library of connectors, and leverages dbt for transformation.
 installation:
   primaryAction:
     text: Get started
@@ -35,17 +35,40 @@ ui:
 
 ::: slot installation
 
-# Meltano: open source ELT
+# ELT for the DataOps era
 
-Meltano is an [open source](https://gitlab.com/meltano/meltano) platform for
-building, running & orchestrating ELT pipelines made up of [Singer](https://www.singer.io/) taps and targets and [dbt](https://www.getdbt.com) models, that you can [run locally](/docs/installation.html) or [easily deploy in production](/docs/production.html).
+Meltano is
+[open source](https://gitlab.com/meltano/meltano),
+[self-hosted](/docs/production.html),
+[CLI-first](/docs/command-line-interface.html),
+[debuggable](/docs/command-line-interface.html#debugging), and
+[extensible](/docs/plugins.html).
 
-Our goal is to [make the power of data integration available to all](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/)
-by building a true open source alternative to existing proprietary hosted EL(T) solutions, in terms of ease of use, reliability, and quantity and quality of supported data sources.
+[Pipelines are code](#meltano-init),
+ready to be version controlled,
+[containerized](#containerization), and
+[deployed continuously](/docs/production.html#and-onto-the-production-environment).
+Develop and test
+[locally](/docs/getting-started.html#local-installation),
+then
+[deploy in production](/docs/production.html)
+along with the built-in
+[Airflow integration](/docs/production.html#airflow-orchestrator),
+or inside your
+[orchestrator of choice](/docs/production.html#meltano-elt).
 
-Scroll down for details on
+Meltano [embraces](/docs/#embracing-singer) the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
+[extractors](https://hub.meltano.com/extractors/) and
+[loaders](https://hub.meltano.com/loaders/),
+and leverages [dbt](https://www.getdbt.com) for [transformation](#transformation).
+
+:::
+
+::: slot read-on-for-more
+
+Read on for more about
 [Meltano projects](/#meltano-init),
-[integration (EL)](/#integration),
+[data integration (EL)](/#integration),
 [transformation (T)](/#transformation),
 [orchestration](/#orchestration),
 [containerization](/#containerization), and
@@ -55,7 +78,8 @@ Scroll down for details on
 
 ::: slot installation-code
 
-**Experience it for yourself in just a few minutes!**
+**Experience it for yourself in just a few minutes,**
+or watch the ["from 0 to ELT in 90 seconds" speedrun](https://meltano.com/blog/2021/04/28/speedrun-from-0-to-elt-in-90-seconds/)
 
 ```bash
 # For these examples to work, ensure that:
@@ -79,6 +103,15 @@ Meltano is now ready for its [first project](/#meltano-init)!
 
 :::
 
+::: slot logos
+
+- [![GitLab logo](images/home/logos/gitlab.png)](https://about.gitlab.com/)
+- [![Twilio logo](images/home/logos/twilio.png)](https://www.twilio.com/)
+- [![Netlify logo](images/home/logos/netlify.png)](https://www.netlify.com/)
+- [![MIT logo](images/home/logos/mit.png)](https://mit.edu/)
+
+:::
+
 ::: slot meltano-init
 
 ## Your Meltano project: a single source of truth
@@ -89,11 +122,11 @@ At the core of the Meltano experience is your Meltano project,
 which represents the single source of truth regarding your ELT pipelines:
 how data should be [integrated](/#integration) and [transformed](/#transformation),
 how the pipelines should be [orchestrated](/#orchestration),
-and how the various components should be [configured](/docs/configuration.html).
+and how the various [plugins](/docs/plugins.html) that make up your pipelines should be [configured](/docs/configuration.html).
 
 Since a Meltano project is just a directory on your filesystem containing
 text-based files, you can treat it like any other software development project
-and benefit from DevOps best practices such as version control, code review,
+and benefit from DataOps best practices such as version control, code review,
 and continuous integration and deployment (CI/CD).
 
 You can initialize a new Meltano project using [`meltano init`](/docs/command-line-interface.html#init).
@@ -126,13 +159,13 @@ Your Meltano project is now ready for [integration](/#integration), [transformat
 
 ## Integration just a few keystrokes away
 
-You can use existing Singer [taps](/plugins/extractors/) and [targets](/plugins/loaders/)
+You can use existing Singer [taps](https://hub.meltano.com/extractors/) and [targets](https://hub.meltano.com/loaders/)
 or [easily write your own](/tutorials/create-a-custom-extractor.html) to extract
 data from any SaaS tool or database and load it into any data warehouse or file format.
 
 Meltano [manages your tap and target configuration](/docs/configuration.html) for you,
 makes it easy to [select which entities and attributes to extract](/docs/integration.html#selecting-entities-and-attributes-for-extraction),
-and keeps track of [the state of your extraction](/docs/integration.html#incremental-replication-state),
+and keeps track of [the incremental replication state](/docs/integration.html#incremental-replication-state),
 so that subsequent pipeline runs with the same job ID will always pick up right where
 the previous run left off.
 
@@ -152,6 +185,9 @@ meltano add extractor tap-gitlab
 meltano config tap-gitlab set projects meltano/meltano
 # - going back to May 1st, 2020
 meltano config tap-gitlab set start_date 2020-05-01T00:00:00Z
+
+# Select all attributes of the "tags" entity
+meltano select tap-gitlab tags "*"
 
 # Add JSONL loader
 meltano add loader target-jsonl
@@ -220,6 +256,9 @@ meltano add transformer dbt
 # Add PostgreSQL-compatible dbt models for tap-gitlab
 meltano add transform tap-gitlab
 
+# Select all attributes of all entities
+meltano select tap-gitlab "*" "*"
+
 # Run data integration and transformation pipeline
 meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
 
@@ -256,7 +295,7 @@ to and run by a supported orchestrator like [Apache Airflow](https://airflow.apa
 When you add the `airflow` orchestrator to your project, a
 [Meltano DAG generator](https://gitlab.com/meltano/files-airflow/-/blob/master/bundle/orchestrate/dags/meltano.py)
 will automatically be added to the `orchestrate/dags` directory, where Airflow
-will look for [DAGs](https://airflow.apache.org/docs/stable/concepts.html#dags) by default.
+will look for [DAGs](https://airflow.apache.org/docs/apache-airflow/1.10.14/concepts.html#dags) by default.
 If the default behavior of simply running [`meltano elt`](/docs/command-line-interface.html#elt) on a
 schedule is not going to cut it, you can easily modify the DAG generator or add your own.
 

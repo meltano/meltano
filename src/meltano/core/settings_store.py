@@ -1,17 +1,18 @@
-import sqlalchemy
 import logging
-import dotenv
 from abc import ABC, abstractmethod
+from contextlib import contextmanager
 from copy import deepcopy
 from enum import Enum
 from typing import List
-from contextlib import contextmanager
 
-from .utils import set_at_path, pop_at_path, expand_env_vars
+import dotenv
+import sqlalchemy
+
 from .error import Error
 from .project import ProjectReadonly
 from .setting import Setting
 from .setting_definition import SettingMissingError
+from .utils import pop_at_path, set_at_path
 
 logger = logging.getLogger(__name__)
 
@@ -21,12 +22,13 @@ class StoreNotSupportedError(Error):
 
 
 class SettingValueStore(str, Enum):
-    CONFIG_OVERRIDE = "config_override"  # 0
-    ENV = "env"  # 1
-    DOTENV = "dotenv"  # 2
-    MELTANO_YML = "meltano_yml"  # 3
-    DB = "db"  # 4
-    DEFAULT = "default"  # 5
+    CONFIG_OVERRIDE = "config_override"
+    ENV = "env"
+    DOTENV = "dotenv"
+    MELTANO_YML = "meltano_yml"
+    DB = "db"
+    INHERITED = "inherited"
+    DEFAULT = "default"
     AUTO = "auto"
 
     @classmethod
@@ -46,6 +48,7 @@ class SettingValueStore(str, Enum):
             self.MELTANO_YML: MeltanoYmlStoreManager,
             self.DB: DbStoreManager,
             self.DEFAULT: DefaultStoreManager,
+            self.INHERITED: InheritedStoreManager,
             self.AUTO: AutoStoreManager,
         }
         return managers[self]
@@ -74,10 +77,8 @@ class SettingsStoreManager(ABC):
         self.settings_service = settings_service
         self.project = self.settings_service.project
 
-        self.expandible_env = {**self.project.dotenv_env, **self.settings_service.env}
-
     @abstractmethod
-    def get(self, name: str, setting_def=None, expandible_env={}):
+    def get(self, name: str, setting_def=None):
         pass
 
     def set(self, name: str, path: List[str], value, setting_def=None):
@@ -93,13 +94,6 @@ class SettingsStoreManager(ABC):
         if method != "get" and not self.writable:
             raise StoreNotSupportedError
 
-    def expand_env_vars(self, value, env={}):
-        expanded_value = expand_env_vars(value, env={**self.expandible_env, **env})
-        if expanded_value == value:
-            return value, {}
-
-        return expanded_value, {"expanded": True, "unexpanded_value": value}
-
     def log(self, message):
         self.settings_service.log(message)
 
@@ -107,7 +101,7 @@ class SettingsStoreManager(ABC):
 class ConfigOverrideStoreManager(SettingsStoreManager):
     label = "a command line flag"
 
-    def get(self, name: str, setting_def=None, expandible_env={}):
+    def get(self, name: str, setting_def=None):
         try:
             value = self.settings_service.config_override[name]
             self.log(f"Read key '{name}' from config override: {value!r}")
@@ -122,7 +116,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
     def env(self):
         pass
 
-    def get(self, name: str, setting_def=None, expandible_env={}):
+    def get(self, name: str, setting_def=None):
         if not setting_def:
             raise StoreNotSupportedError
 
@@ -253,7 +247,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         if method != "get" and self.project.readonly:
             raise StoreNotSupportedError(ProjectReadonly())
 
-    def get(self, name: str, setting_def=None, expandible_env={}):
+    def get(self, name: str, setting_def=None):
         keys = [name]
         if setting_def:
             keys = [setting_def.name, *setting_def.aliases]
@@ -263,10 +257,8 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         for key in keys:
             try:
                 value = flat_config[key]
-                value, metadata = self.expand_env_vars(value, env=expandible_env)
-
                 self.log(f"Read key '{key}' from `meltano.yml`: {value!r}")
-                return value, {"key": key, **metadata}
+                return value, {"key": key, "expandable": True}
             except KeyError:
                 pass
 
@@ -337,11 +329,11 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
 
     @contextmanager
     def update_config(self):
-        config = deepcopy(self.settings_service._meltano_yml_config)
+        config = deepcopy(self.settings_service.meltano_yml_config)
         yield config
 
         try:
-            self.settings_service._update_meltano_yml_config(config)
+            self.settings_service.update_meltano_yml_config(config)
         except ProjectReadonly as err:
             raise StoreNotSupportedError(err)
 
@@ -370,7 +362,7 @@ class DbStoreManager(SettingsStoreManager):
         if not self.session:
             raise StoreNotSupportedError("No database session provided")
 
-    def get(self, name: str, setting_def=None, expandible_env={}):
+    def get(self, name: str, setting_def=None):
         try:
             if self.bulk:
                 value = self.all_settings[name]
@@ -420,7 +412,7 @@ class DbStoreManager(SettingsStoreManager):
 
     @property
     def namespace(self):
-        return self.settings_service._db_namespace
+        return self.settings_service.db_namespace
 
     @property
     def all_settings(self):
@@ -435,18 +427,73 @@ class DbStoreManager(SettingsStoreManager):
         return self._all_settings
 
 
+class InheritedStoreManager(SettingsStoreManager):
+    """Store manager for settings inherited from a parent plugin."""
+
+    label = "inherited"
+
+    def __init__(self, settings_service, *args, bulk=False, **kwargs):
+        """Initialize inherited store manager."""
+        super().__init__(settings_service, *args, **kwargs)
+
+        self._kwargs = {**kwargs, "expand_env_vars": False}
+
+        self.bulk = bulk
+        self._config_with_metadata = None
+
+    def get(self, name: str, setting_def=None):
+        if not setting_def:
+            raise StoreNotSupportedError("Setting is missing")
+
+        if not self.inherited_settings_service:
+            raise StoreNotSupportedError("Inherited settings service is missing")
+
+        value, metadata = self.get_with_metadata(setting_def.name)
+        if value is None or metadata["source"] is SettingValueStore.DEFAULT:
+            return None, {}
+
+        self.log(f"Read key '{name}' from inherited: {value!r}")
+        return value, {
+            "inherited_source": metadata["source"],
+            "expandable": metadata.get("expandable", False),
+        }
+
+    @property
+    def inherited_settings_service(self):
+        """Return settings service to inherit configuration from."""
+        return self.settings_service.inherited_settings_service
+
+    @property
+    def config_with_metadata(self):
+        """Return all inherited config and metadata."""
+        if self._config_with_metadata is None:
+            self._config_with_metadata = (
+                self.inherited_settings_service.config_with_metadata(**self._kwargs)
+            )
+        return self._config_with_metadata
+
+    def get_with_metadata(self, name):
+        """Return inherited config and metadata for the named setting."""
+        if self.bulk:
+            metadata = self.config_with_metadata[name]
+            return metadata["value"], metadata
+
+        return self.inherited_settings_service.get_with_metadata(name, **self._kwargs)
+
+
 class DefaultStoreManager(SettingsStoreManager):
     label = "the default"
 
-    def get(self, name: str, setting_def=None, expandible_env={}):
+    def get(self, name: str, setting_def=None):
         if not setting_def:
             raise StoreNotSupportedError("Setting is missing")
 
         value = setting_def.value
-        value, metadata = self.expand_env_vars(value, env=expandible_env)
+        if value is None:
+            return None, {}
 
         self.log(f"Read key '{name}' from default: {value!r}")
-        return value, metadata
+        return value, {"expandable": True}
 
 
 class AutoStoreManager(SettingsStoreManager):

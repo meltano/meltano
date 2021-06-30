@@ -1,13 +1,12 @@
 import logging
-
-import fasteners
 import threading
 
-from meltano.core.project import Project
+import fasteners
 from meltano.core.m5o.m5o_file_parser import (
     MeltanoAnalysisFileParser,
     MeltanoAnalysisFileParserError,
 )
+from meltano.core.project import Project
 
 
 class ProjectCompiler:

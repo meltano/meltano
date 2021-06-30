@@ -7,18 +7,6 @@ h4
 h5
   font-size: 1rem
 
-.navbar
-  .logo
-    height 2.3rem !important
-    margin-top -0.1em
-
-  .site-name
-    display none
-
-.theme-container.no-navbar
-  .navbar
-    display none
-
 {$contentClass}
   a code
     color inherit
@@ -29,3 +17,8 @@ h5
 @media (max-width: $MQMobileNarrow)
   {$contentClass}
     word-break break-word
+
+    table
+      td, th
+        &:not(:first-child)
+          display: none

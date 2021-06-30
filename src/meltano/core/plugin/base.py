@@ -1,16 +1,20 @@
-import yaml
-import fnmatch
 import copy
-from typing import Dict, Union
+import fnmatch
+import logging
+import re
 from collections import namedtuple
-from enum import Enum
-from typing import Optional, Iterable
+from typing import Dict, Iterable, Optional, Union
 
-from meltano.core.setting_definition import SettingDefinition
-from meltano.core.behavior.hookable import HookObject
-from meltano.core.behavior.canonical import Canonical
+import yaml
 from meltano.core.behavior import NameEq
-from meltano.core.utils import compact, find_named, NotFound, flatten
+from meltano.core.behavior.canonical import Canonical
+from meltano.core.behavior.hookable import HookObject
+from meltano.core.setting_definition import SettingDefinition, YAMLEnum
+from meltano.core.utils import NotFound, compact, find_named, flatten
+
+from .command import Command
+
+logger = logging.getLogger(__name__)
 
 
 class VariantNotFoundError(Exception):
@@ -18,30 +22,16 @@ class VariantNotFoundError(Exception):
         self.plugin = plugin
         self.variant_name = variant_name
 
-        message = f"{plugin.type.descriptor.capitalize()} '{plugin.name}' variant '{variant_name}' is not known to Meltano. "
-        message += f"Variants: {plugin.list_variant_names()}"
-
-        super().__init__(message)
-
-
-class YAMLEnum(str, Enum):
     def __str__(self):
-        return self.value
-
-    @staticmethod
-    def yaml_representer(dumper, obj):
-        return dumper.represent_scalar("tag:yaml.org,2002:str", str(obj))
+        return "{type} '{name}' variant '{variant}' is not known to Meltano. Variants: {variant_labels}".format(
+            type=self.plugin.type.descriptor.capitalize(),
+            name=self.plugin.name,
+            variant=self.variant_name,
+            variant_labels=self.plugin.variant_labels,
+        )
 
 
 yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
-
-
-class Profile(NameEq, Canonical):
-    def __init__(self, name: str = None, label: str = None, config={}, **extras):
-        super().__init__(name=name, label=label, config=config, extras=extras)
-
-
-Profile.DEFAULT = Profile(name="default", label="Default")
 
 
 class PluginType(YAMLEnum):
@@ -53,6 +43,7 @@ class PluginType(YAMLEnum):
     ORCHESTRATORS = "orchestrators"
     TRANSFORMERS = "transformers"
     FILES = "files"
+    UTILITIES = "utilities"
 
     def __str__(self):
         return self.value
@@ -67,12 +58,17 @@ class PluginType(YAMLEnum):
     @property
     def singular(self):
         """Makes it singular for `meltano add PLUGIN_TYPE`"""
+        if self is self.__class__.UTILITIES:
+            return "utility"
+
         return self.value[:-1]
 
     @property
     def verb(self):
         if self is self.__class__.TRANSFORMS:
             return self.singular
+        if self is self.__class__.UTILITIES:
+            return "utilize"
 
         return self.value[:-3]
 
@@ -88,190 +84,45 @@ class PluginType(YAMLEnum):
 
     @classmethod
     def from_cli_argument(cls, value):
-        if not value.endswith("s"):
-            value += "s"
+        for plugin_type in cls:
+            if value in {plugin_type.value, plugin_type.singular}:
+                return plugin_type
 
-        return cls(value)
+        raise ValueError(f"{value} is not a valid {cls.__name__}")
 
 
-class PluginRef:
-    def __init__(self, plugin_type: Union[str, PluginType], name: str):
+class PluginRef(Canonical):
+    def __init__(self, plugin_type: Union[str, PluginType], name: str, **kwargs):
         self._type = (
             plugin_type
             if isinstance(plugin_type, PluginType)
             else PluginType(plugin_type)
         )
-        self.name, self._current_profile_name = self.parse_name(name)
 
-    @classmethod
-    def parse_name(cls, name: str):
-        name, *profile_name = name.split("@")
-        profile_name = next(iter(profile_name), Profile.DEFAULT.name)
-
-        return (name, profile_name)
+        super().__init__(name=name, **kwargs)
 
     @property
     def type(self):
         return self._type
 
-    @property
-    def current_profile_name(self):
-        return self._current_profile_name
-
-    @property
-    def full_name(self):
-        return f"{self.name}@{self.current_profile_name}"
-
-    @property
-    def qualified_name(self):
-        parts = (self.type, self.name, self.current_profile_name)
-
-        return ".".join(compact(parts))
-
-    @property
-    def info(self):
-        return {"name": self.name, "profile": self.current_profile_name}
-
-    @property
-    def info_env(self):
-        # MELTANO_EXTRACTOR_...
-        return flatten({"meltano": {self.type.singular: self.info}}, "env_var")
-
     def __eq__(self, other):
         return self.name == other.name and self.type == other.type
 
     def __hash__(self):
-        return hash((self.type, self.name, self.current_profile_name))
+        return hash((self.type, self.name))
 
-
-class ProjectPlugin(HookObject, Canonical, PluginRef):
-    def __init__(
-        self,
-        plugin_type: PluginType,
-        name: str,
-        namespace: Optional[str] = None,
-        custom_definition: Optional["PluginDefinition"] = None,
-        variant: Optional[str] = None,
-        pip_url: Optional[str] = None,
-        config: Optional[dict] = {},
-        profiles: Optional[list] = [],
-        **extras,
-    ):
-        if namespace:
-            custom_definition = PluginDefinition(
-                plugin_type, name, namespace, variant=variant, pip_url=pip_url, **extras
-            )
-            extras = {}
-
-        if custom_definition:
-            # Any properties considered "extra" by the embedded plugin definition
-            # should be considered extras of the project plugin, since they are
-            # the current values, not default values.
-            extras = {**custom_definition.extras, **extras}
-            custom_definition.extras = {}
-
-        super().__init__(
-            plugin_type,
-            name,
-            # Attributes will be listed in meltano.yml in this order:
-            custom_definition=custom_definition,
-            variant=variant,
-            pip_url=pip_url,
-            config=copy.deepcopy(config),
-            extras=extras,
-            profiles=list(map(Profile.parse, profiles)),
+    def set_presentation_attrs(self, extras):
+        self.update(
+            hidden=extras.pop("hidden", None),
+            label=extras.pop("label", None),
+            logo_url=extras.pop("logo_url", None),
+            description=extras.pop("description", None),
         )
-
-        self._flattened.add("custom_definition")
-
-    def is_installable(self):
-        return self.pip_url is not None
-
-    def is_invokable(self):
-        return self.is_installable()
-
-    def is_configurable(self):
-        return True
-
-    def should_add_to_file(self, project):
-        return True
-
-    @property
-    def runner(self):
-        return None
-
-    @property
-    def extra_settings(self):
-        return []
-
-    def is_custom(self):
-        return self.custom_definition is not None
-
-    def get_profile(self, profile_name: str) -> Profile:
-        if profile_name == Profile.DEFAULT.name:
-            return Profile.DEFAULT
-
-        return find_named(self.profiles, profile_name)
-
-    def use_profile(self, profile_or_name: Union[str, Profile]):
-        if profile_or_name is None:
-            profile = Profile.DEFAULT
-        elif isinstance(profile_or_name, Profile):
-            profile = profile_or_name
-        else:
-            profile = self.get_profile(profile_or_name)
-
-        self._current_profile_name = profile.name
-
-    @property
-    def current_profile(self):
-        return self.get_profile(self.current_profile_name)
-
-    @property
-    def current_config(self):
-        return (
-            self.config
-            if self.current_profile is Profile.DEFAULT
-            else self.current_profile.config
-        )
-
-    @property
-    def current_extras(self):
-        return (
-            self.extras
-            if self.current_profile is Profile.DEFAULT
-            else self.current_profile.extras
-        )
-
-    def exec_args(self, files: Dict):
-        return []
-
-    @property
-    def config_files(self):
-        """Return a list of stubbed files created for this plugin."""
-        return dict()
-
-    @property
-    def output_files(self):
-        return dict()
-
-    def add_select_filter(self, filter: str):
-        select = self.extras.get("select", [])
-        select.append(filter)
-        self.extras["select"] = select
-
-    def add_profile(self, name: str, config: dict = None, label: str = None):
-        profile = Profile(name=name, config=config, label=label)
-
-        self.profiles.append(profile)
-        return profile
-
-    def process_config(self, config):
-        return config
 
 
 class Variant(NameEq, Canonical):
     ORIGINAL_NAME = "original"
+    DEFAULT_NAME = "default"
 
     def __init__(
         self,
@@ -285,6 +136,7 @@ class Variant(NameEq, Canonical):
         capabilities: Optional[list] = [],
         settings_group_validation: Optional[list] = [],
         settings: Optional[list] = [],
+        commands: Optional[dict] = None,
         **extras,
     ):
         super().__init__(
@@ -298,24 +150,31 @@ class Variant(NameEq, Canonical):
             capabilities=list(capabilities),
             settings_group_validation=list(settings_group_validation),
             settings=list(map(SettingDefinition.parse, settings)),
+            commands=Command.parse_all(commands),
             extras=extras,
         )
 
 
-class PluginDefinition(Canonical, PluginRef):
+class PluginDefinition(PluginRef):
     def __init__(
         self,
         plugin_type: PluginType,
         name: str,
         namespace: str,
-        hidden: Optional[bool] = None,
-        label: Optional[str] = None,
-        logo_url: Optional[str] = None,
-        description: Optional[str] = None,
         variant: Optional[str] = None,
         variants: Optional[list] = [],
         **extras,
     ):
+        super().__init__(plugin_type, name)
+
+        self._defaults["label"] = lambda p: p.name
+
+        def default_logo_url(p):
+            short_name = re.sub(r"^(tap|target)-", "", p.name)
+            return f"/static/logos/{short_name}-logo.png"
+
+        self._defaults["logo_url"] = default_logo_url
+
         if not variants:
             variant = Variant(variant, **extras)
 
@@ -326,20 +185,11 @@ class PluginDefinition(Canonical, PluginRef):
 
             variants = [variant]
 
-        super().__init__(
-            plugin_type,
-            name,
-            # Attributes will be listed in meltano.yml in this order:
-            namespace=namespace,
-            hidden=hidden,
-            label=label,
-            logo_url=logo_url,
-            description=description,
-            extras=extras,
-            variants=list(map(Variant.parse, variants)),
-        )
-
-        self.use_variant(variant)
+        # Attributes will be listed in meltano.yml in this order:
+        self.namespace = namespace
+        self.set_presentation_attrs(extras)
+        self.extras = extras
+        self.variants = list(map(Variant.parse, variants))
 
     def __iter__(self):
         for k, v in super().__iter__():
@@ -354,70 +204,142 @@ class PluginDefinition(Canonical, PluginRef):
             else:
                 yield (k, v)
 
-    @property
-    def info(self):
-        return {
-            **super().info,
-            "namespace": self.namespace,
-            "variant": self.current_variant_name or Variant.ORIGINAL_NAME,
-        }
-
-    @property
-    def current_variant_name(self):
-        return self._current_variant_name
-
-    def get_variant(self, variant_name: str) -> Profile:
+    def get_variant(self, variant_name: str) -> Variant:
         try:
             return find_named(self.variants, variant_name)
         except NotFound as err:
             raise VariantNotFoundError(self, variant_name) from err
 
-    def use_variant(self, variant_or_name: Union[str, Variant] = None):
-        if variant_or_name is None:
-            variant = self.variants[0]
-        elif isinstance(variant_or_name, Variant):
-            variant = variant_or_name
-        elif variant_or_name == Variant.ORIGINAL_NAME:
+    def find_variant(self, variant_or_name: Union[str, Variant] = None):
+        if isinstance(variant_or_name, Variant):
+            return variant_or_name
+
+        if variant_or_name is None or variant_or_name == Variant.DEFAULT_NAME:
+            return self.variants[0]
+
+        if variant_or_name == Variant.ORIGINAL_NAME:
             try:
-                variant = next(v for v in self.variants if v.original)
+                return next(v for v in self.variants if v.original)
             except StopIteration:
-                variant = self.variants[0]
-        else:
-            variant = self.get_variant(variant_or_name)
+                return self.variants[0]
 
-        self._current_variant_name = variant.name
+        return self.get_variant(variant_or_name)
 
-    @property
-    def current_variant(self):
-        return self.get_variant(self.current_variant_name)
+    def variant_label(self, variant):
+        """Return label for specified variant."""
+        variant = self.find_variant(variant)
 
-    def list_variant_names(self):
-        names = []
+        label = variant.name or Variant.ORIGINAL_NAME
+        if variant == self.variants[0]:
+            label = f"{label} (default)"
+        elif variant.deprecated:
+            label = f"{label} (deprecated)"
 
-        for i, variant in enumerate(self.variants):
-            name = variant.name or Variant.ORIGINAL_NAME
-
-            if i == 0:
-                name += " (default)"
-            elif variant.deprecated:
-                name += " (deprecated)"
-
-            names.append(name)
-
-        return ", ".join(names)
+        return label
 
     @property
-    def all_extras(self):
-        return {**self.extras, **self.current_variant.extras}
+    def variant_labels(self):
+        """Return labels for supported variants."""
+        return ", ".join([self.variant_label(variant) for variant in self.variants])
+
+
+class BasePlugin(HookObject):
+    EXTRA_SETTINGS = []
+
+    def __init__(self, plugin_def: PluginDefinition, variant: Variant):
+        super().__init__()
+
+        self._plugin_def = plugin_def
+        self._variant = variant
+
+    def __eq__(self, other):
+        return (
+            self._plugin_def == other._plugin_def  # noqa: WPS437
+            and self._variant == other._variant  # noqa: WPS437
+        )
+
+    def __hash__(self):
+        return hash((self._plugin_def, self._variant))
+
+    def __iter__(self):
+        yield from self._plugin_def
 
     def __getattr__(self, attr):
-        return getattr(self.current_variant, attr)
+        try:
+            return getattr(self._plugin_def, attr)
+        except AttributeError:
+            return getattr(self._variant, attr)
 
-    def in_project(self, custom=False) -> ProjectPlugin:
-        return ProjectPlugin(
-            self.type,
-            self.name,
-            variant=self.current_variant_name,
-            pip_url=self.pip_url,
-            custom_definition=(self if custom else None),
+    @property
+    def variant(self):
+        return self._variant.name
+
+    @property
+    def executable(self):
+        return self._variant.executable or self._plugin_def.name
+
+    @property
+    def extras(self):
+        return {**self._plugin_def.extras, **self._variant.extras}
+
+    @property
+    def all_commands(self):
+        """Return a dictonary of supported commands."""
+        return self._variant.commands
+
+    @property
+    def extra_settings(self):
+        defaults = {f"_{k}": v for k, v in self.extras.items()}
+
+        existing_settings = []
+        for setting in self.EXTRA_SETTINGS:
+            default_value = defaults.get(setting.name)
+            if default_value is not None:
+                setting = setting.with_attrs(value=default_value)
+
+            existing_settings.append(setting)
+
+        # Create setting definitions for unknown defaults,
+        # including flattened keys of default nested object items
+        existing_settings.extend(
+            SettingDefinition.from_missing(
+                existing_settings, defaults, custom=False, default=True
+            )
         )
+
+        return existing_settings
+
+    def env_prefixes(self, for_writing=False):
+        """Return environment variable prefixes to use for settings."""
+        return [self.name, self.namespace]
+
+    def is_installable(self):
+        return self.pip_url is not None
+
+    def is_invokable(self):
+        return self.is_installable() or self.executable is not None
+
+    def is_configurable(self):
+        return True
+
+    def should_add_to_file(self):
+        return True
+
+    @property
+    def runner(self):
+        return None
+
+    def exec_args(self, files: Dict):
+        return []
+
+    @property
+    def config_files(self):
+        """Return a list of stubbed files created for this plugin."""
+        return dict()
+
+    @property
+    def output_files(self):
+        return dict()
+
+    def process_config(self, config):
+        return config

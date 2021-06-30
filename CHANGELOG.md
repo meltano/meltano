@@ -10,6 +10,14 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2814](https://gitlab.com/meltano/meltano/-/issues/2814) Add `mashey` variant of `tap-ask-nicely`
+- [#2815](https://gitlab.com/meltano/meltano/-/issues/2815) Add `singer-io` variant of `tap-github`
+- [#2816](https://gitlab.com/meltano/meltano/-/issues/2816) Add `singer-io` variant of `tap-google-sheets`
+- [#2817](https://gitlab.com/meltano/meltano/-/issues/2817) Add `singer-io` variant of `tap-pendo`
+- [#2818](https://gitlab.com/meltano/meltano/-/issues/2818) Add `singer-io` variant of `tap-hubspot`
+- [#2821](https://gitlab.com/meltano/meltano/-/issues/2821) Add `singer-io` variant of `tap-jira`
+- [#2823](https://gitlab.com/meltano/meltano/-/issues/2823) Add `transferwise` variant of `tap-twilio`
+
 ### Changes
 
 ### Fixes
@@ -17,13 +25,296 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Breaks
 
 
+## 1.77.0 - (2021-06-17)
+---
+
+### Changes
+
+- [#2694](https://gitlab.com/meltano/meltano/-/issues/2694) Use dbt [`v0.19.1`](https://github.com/fishtown-analytics/dbt/releases/tag/v0.19.1) by default for new dbt installs
+- [#2694](https://gitlab.com/meltano/meltano/-/issues/2694) Add support for dbt [`config-version: 2`](https://docs.getdbt.com/docs/guides/migration-guide/upgrading-to-0-17-0)
+- [#2622](https://gitlab.com/meltano/meltano/-/issues/2622) Make `hotgluexyz` the default variant for the CSV loader
+
+### Fixes
+
+- [#2741](https://gitlab.com/meltano/meltano/-/issues/2741) Fix duplication of config values when complex settings are applied to Singer plugins.
+
+
+## 1.76.0 - (2021-06-10)
+---
+
+### Fixes
+
+- [#2755](https://gitlab.com/meltano/meltano/-/issues/2755) Fix SQLAlchemy `cache_ok` warning messages when running `meltano elt`
+- [#2773](https://gitlab.com/meltano/meltano/-/issues/2773) Fix `tap-chargebee`, `tap-intacct` and `tap-quickbooks` definitions that had `properties` capability instead of `catalog`
+- [#2784](https://gitlab.com/meltano/meltano/-/issues/2784) Fix catalog discovery error when using custom plugins with no `pip_url` set
+
+
+## 1.75.0 - (2021-05-28)
+---
+
+### Changes
+
+- [#2745](https://gitlab.com/meltano/meltano/-/issues/2745) Allow `meltano` commands to be used from a subdirectory of a project
+- [#2341](https://gitlab.com/meltano/meltano/-/issues/2341) Add support for already-installed plugins by making `pip_url` optional in custom plugin definitions
+- [#2341](https://gitlab.com/meltano/meltano/-/issues/2341) Allow non-pip plugins to be declared using relative `executable` paths and `executable` programs already on the PATH
+
+
+## 1.74.0 - (2021-05-10)
+---
+
+### New
+- [#2353](https://gitlab.com/meltano/meltano/-/issues/2353) Add `meltano remove` command
+
+
+## 1.73.0 - (2021-04-29)
+---
+
+### New
+
+- [#2621](https://gitlab.com/meltano/meltano/-/issues/2621) Add `twilio-labs` variant of `tap-zendesk`
+
+### Changes
+
+- [#2705](https://gitlab.com/meltano/meltano/-/issues/2705) Speed up `meltano install` by installing plugins in parallel
+- [#2709](https://gitlab.com/meltano/meltano/-/issues/2709) Add support for setting `kind` in settings prompt when using `meltano add --custom`
+
+
+## 1.72.0 - (2021-04-22)
+---
+
+### New
+
+- [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for shortcut commands to `invoke`
+- [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for `sqlfluff` utility for linting SQL transforms
+- [#2613](https://gitlab.com/meltano/meltano/-/issues/2613) Add `mashey` variant of `tap-slack`
+- [#2689](https://gitlab.com/meltano/meltano/-/issues/2689) Add documentation for using a custom Python Package Index (PyPi)
+- [#2426](https://gitlab.com/meltano/meltano/-/issues/2426) Add `transferwise` variant of `target-redshift`
+
+### Changes
+- [#2082](https://gitlab.com/meltano/meltano/-/issues/2082) Updated database_uri documentation to show how to target a PostgreSQL schema
+- [#2107](https://gitlab.com/meltano/meltano/-/issues/2107) Updated 'create a custom extractor' tutorial to use the new SDK
+
+### Fixes
+
+- [#2526](https://gitlab.com/meltano/meltano/-/issues/2526) When target process fails before tap, report target output instead of `BrokenPipeError` or `ConnectionResetError`
+
+
+## 1.71.0 - (2021-03-23)
+---
+
+### New
+
+- [#2544](https://gitlab.com/meltano/meltano/-/issues/2544) Add support for `utility` plugin type
+- [#2614](https://gitlab.com/meltano/meltano/-/issues/2614) Add `mashey` variant of `tap-zoom`
+
+
+### Fixes
+
+- [#2581](https://gitlab.com/meltano/meltano/-/issues/2581) Only expand `$ALL_CAPS` env vars in `meltano.yml` config values to prevent false positive matches in passwords
+
+
+## 1.70.0 - (2021-02-23)
+---
+
+### New
+
+- [#2590](https://gitlab.com/meltano/meltano/-/issues/2590) Add `hotgluexyz` variant of `tap-chargebee`
+- [#2593](https://gitlab.com/meltano/meltano/-/issues/2593) Add `hotgluexyz` variant of `tap-intacct`
+
+### Changes
+
+- [#2356](https://gitlab.com/meltano/meltano/-/issues/2356) Disallow two pipelines with the same job ID to run at the same time by default
+
+### Fixes
+
+- [#2585](https://gitlab.com/meltano/meltano/-/issues/2585) Fix bug with finding a schedule based on namespace for a custom plugin
+
+
+## 1.69.0 - (2021-02-16)
+---
+
+### New
+
+- [#2558](https://gitlab.com/meltano/meltano/-/issues/2558) Add support for Airflow 2.0
+- [#2577](https://gitlab.com/meltano/meltano/-/issues/2577) Add `hotgluexyz` variant of `tap-quickbooks`
+
+
+## 1.68.0 - (2021-02-11)
+---
+
+### New
+
+- [#2557](https://gitlab.com/meltano/meltano/-/issues/2557) Add support for entity and attribute selection to tap-gitlab
+
+### Changes
+
+- [#2559](https://gitlab.com/meltano/meltano/-/issues/2559) Bump Airflow version to 1.10.14
+
+### Fixes
+
+- [#2543](https://gitlab.com/meltano/meltano/-/issues/2543) Fix packages dependencies that claim Python 3.9 is supported when it actually isn't.
+
+
+## 1.67.0 - (2021-01-26)
+---
+
+### Fixes
+
+- [#2540](https://gitlab.com/meltano/meltano/-/issues/2540) `meltano schedule run` exit code now matches exit code of wrapped `meltano elt`
+- [#2525](https://gitlab.com/meltano/meltano/-/issues/2525) `meltano schedule run` no longer requires `meltano` to be in the `PATH`
+
+
+## 1.66.0 - (2021-01-18)
+---
+
+### New
+
+- [#2483](https://gitlab.com/meltano/meltano/-/issues/2483) Every second, `meltano elt` records a heartbeat timestamp on the pipeline run row in the system database as long as the pipeline is running.
+- [#2483](https://gitlab.com/meltano/meltano/-/issues/2483) Before running the new pipeline, `meltano elt` automatically marks runs with the same Job ID that have become stale as failed. A run is considered stale when 5 minutes have elapsed since the last recorded heartbeat. Older runs without a heartbeat are considered stale if they are still in the running state 24 hours after starting.
+- [#2483](https://gitlab.com/meltano/meltano/-/issues/2483) `meltano schedule list` (which is run periodically by `meltano invoke airflow scheduler`) automatically marks any stale run as failed.
+- [#2502](https://gitlab.com/meltano/meltano/-/issues/2502) Add `User-Agent` header with Meltano version to request for remote `discovery.yml` manifest (typically https://www.meltano.com/discovery.yml)
+- [#2503](https://gitlab.com/meltano/meltano/-/issues/2503) Include project ID in `X-Project-ID` header and `project_id` query param in request for remote `discovery.yml` manifest when `send_anonymous_usage_stats` setting is enabled.
+
+
+## 1.65.0 - (2021-01-12)
+---
+
+### New
+
+- [#2392](https://gitlab.com/meltano/meltano/-/issues/2392) Add 'elt.buffer_size' setting with default value of 10MiB to let extractor output buffer size and line length limit (maximum message size) be configured as appropriate for the extractor and loader in question.
+
+
+### Fixes
+
+- [#2501](https://gitlab.com/meltano/meltano/-/issues/2501) Don't lose `version` when caching `discovery.yml`.
+
+
+## 1.64.1 - (2021-01-08)
+---
+
+### Fixes
+
+- [#2500](https://gitlab.com/meltano/meltano/-/issues/2500) Ensure all buffered messages (records) output by extractor make it to loader when extractor finishes early.
+
+
+## 1.64.0 - (2021-01-07)
+---
+
+### Fixes
+
+- [#2478](https://gitlab.com/meltano/meltano/-/issues/2478) Fix runaway memory usage (and possible out-of-memory error) when extractor outputs messages at higher rate than loader can process them, by enabling flow control with a 64KB buffer size limit
+
+
+## 1.63.0 - (2021-01-04)
+---
+
+### New
+- [#2308](https://gitlab.com/meltano/meltano/-/issues/2308) Verify that system database connection is still viable when checking it out of connection pool.
+- [#2308](https://gitlab.com/meltano/meltano/-/issues/2308) Add `database_max_retries` and `database_retry_timeout` settings to configure retry attempts when the first connection to the DB fails.
+
+
+### Fixes
+
+- [#2486](https://gitlab.com/meltano/meltano/-/issues/2486) Remove `state` capability from `tap-google-analytics` because it's not actually currently supported yet
+
+
+## 1.62.0 - (2020-12-23)
+---
+
+### New
+
+- [#2390](https://gitlab.com/meltano/meltano/-/issues/2390) Let a plugin inherit its base plugin (package) description and configuration from another one using `--inherit-from=<name>` on `meltano add` or `inherit_from: <name>` in `meltano.yml`, so that the same package can be used in a project multiple times with different configurations.
+
+### Changes
+
+- [#2479](https://gitlab.com/meltano/meltano/-/issues/2479) Use extractor `load_schema` (usually its namespace) as default for target-bigquery `dataset_id` setting, as it already is for target-snowflake and target-postgres `schema`
+
+
+## 1.61.0 - (2020-12-09)
+---
+
+### New
+
+- [#2476](https://gitlab.com/meltano/meltano/-/issues/2476) Add missing tap-salesforce `is_sandbox` setting
+- [#2471](https://gitlab.com/meltano/meltano/-/issues/2471) Make tap-bigquery discoverable
+- [#2227](https://gitlab.com/meltano/meltano/-/issues/2227) Add `meltano schedule run <name>` command to run scheduled pipeline by name
+
+### Changes
+
+- [#2477](https://gitlab.com/meltano/meltano/-/issues/2477) Show array and object settings in configuration UI as unsupported instead of hiding them entirely
+- [#2477](https://gitlab.com/meltano/meltano/-/issues/2477) Unhide tap-csv and tap-spreadsheets-anywhere in UI
+
+### Fixes
+
+- [#2379](https://gitlab.com/meltano/meltano/-/issues/2379) Take into account schedule `env` when running pipeline from UI using "Run" button
+
+
+## 1.60.1 - (2020-12-07)
+---
+
+### Fixes
+
+- [#2473](https://gitlab.com/meltano/meltano/-/issues/2473) Fix meltano/meltano Docker image entrypoint
+
+
+## 1.60.0 - (2020-12-02)
+---
+
+### New
+- [#2367](https://gitlab.com/meltano/meltano/-/issues/2367) Adopt Poetry for dependency and build management
+
+### Changes
+
+- [#2457](https://gitlab.com/meltano/meltano/-/issues/2457) Hide settings of kind `object` or `array` in UI
+
+### Fixes
+
+- [#2457](https://gitlab.com/meltano/meltano/-/issues/2457) Fix configuration of tap-adwords `primary_keys` and target-snowflake and target-postgres (transferwise variants) `schema_mapping`
+- [#2463](https://gitlab.com/meltano/meltano/-/issues/2463) Fix casting of tap-postgres `max_run_seconds`, `logical_poll_total_seconds`, and `break_at_end_lsn` setting values
+- [#2466](https://gitlab.com/meltano/meltano/-/issues/2466) Stop requiring specific version of `cryptography` that's incompatible with latest `pyOpenSSL`
+
+
+## 1.59.0 - (2020-11-23)
+---
+
+### Changes
+
+- [#2450](https://gitlab.com/meltano/meltano/-/issues/2450) Remove undocumented plugin configuration profile functionality
+
+### Fixes
+- [#2451](https://gitlab.com/meltano/meltano/-/issues/2451) Correctly show CLI error messages in log output
+- [#2453](https://gitlab.com/meltano/meltano/-/issues/2453) Correctly pass value of `tap-facebook`'s `insights_buffer_days` setting to tap as integer instead of boolean
+- [#2387](https://gitlab.com/meltano/meltano/-/issues/2387) Order of attributes in `meltano select --list --all` is set to alphabetical order.
+- [#2458](https://gitlab.com/meltano/meltano/-/issues/2458) Adds missing `mysql-logo.png`
+
+
+## 1.58.0 - (2020-11-12)
+---
+
+### New
+
+- [#2438](https://gitlab.com/meltano/meltano/-/issues/2438) Add missing `replica_set`, `ssl`, `verify_mode`, and `include_schemas_in_destination_stream_name` settings to `tap-mongodb`
+- [#2389](https://gitlab.com/meltano/meltano/-/issues/2389) Let user disable autoscrolling in UI job log modal
+- [#2307](https://gitlab.com/meltano/meltano/-/issues/2307) Add `ui.session_cookie_secure` setting to let `Secure` flag be enabled on session cookies when Meltano UI is served over HTTPS
+
+### Changes
+
+- [#2307](https://gitlab.com/meltano/meltano/-/issues/2307) The `Secure` flag is no longer enabled on Meltano UI session cookies unconditionally and by default
+
+### Fixes
+
+- [#2396](https://gitlab.com/meltano/meltano/-/issues/2396) Support unquoted `YYYY-MM-DD` date values in `meltano.yml` by converting them to ISO8601 strings before passing them to plugins
+- [#2445](https://gitlab.com/meltano/meltano/-/issues/2445) Fix 'Test Connection' and 'Save' buttons being disabled in UI Configuration modal despite required fields being populated
+- [#2307](https://gitlab.com/meltano/meltano/-/issues/2307) Fix logging into Meltano UI in Google Chrome when running without HTTPS
+
+
 ## 1.57.0 - (2020-11-10)
 ---
 
 ### New
 
-- [#2368](https://gitlab.com/meltano/meltano/-/issues/2433) Add `datamill-co` variant of `target-postgres`
-- [#2368](https://gitlab.com/meltano/meltano/-/issues/2425) Add `transferwise` variant of `target-postgres`
+- [#2433](https://gitlab.com/meltano/meltano/-/issues/2433) Add `datamill-co` variant of `target-postgres`
+- [#2425](https://gitlab.com/meltano/meltano/-/issues/2425) Add `transferwise` variant of `target-postgres`
 - [#2404](https://gitlab.com/meltano/meltano/-/issues/2404) Add `singer-io` variant of `tap-recharge`
 - [#2410](https://gitlab.com/meltano/meltano/-/issues/2410) Add `transferwise` variant of `tap-postgres`
 - [#2411](https://gitlab.com/meltano/meltano/-/issues/2411) Add `transferwise` variant of `tap-mysql`
@@ -34,6 +325,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#2368](https://gitlab.com/meltano/meltano/-/issues/2433) Make `datamill-co` variant of `target-postgres` the default instead of `meltano`
+
+### Fixes
+
+
+### Breaks
 
 
 ## 1.56.0 - (2020-11-02)

@@ -3,11 +3,19 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into BigQuery
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/bigquery)
+:::
+
 # BigQuery
 
-The `target-bigquery` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [BigQuery](https://cloud.google.com/bigquery) data warehouse.
+The `target-bigquery` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into a [BigQuery](https://cloud.google.com/bigquery) data warehouse.
 
-To learn more about `target-bigquery`, refer to the repository at <https://github.com/adswerve/target-bigquery>.
+- **Repository**: <https://github.com/adswerve/target-bigquery>
+- **Maintainer**: [Adswerve](https://adswerve.com/)
+- **Maintenance status**: Active
 
 ## Getting Started
 
@@ -51,6 +59,8 @@ Follow the remaining step of the [Getting Started guide](/docs/getting-started.h
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `target-bigquery` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -67,15 +77,14 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-bigquery` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-9}
+```yml{5-8}
 plugins:
   loaders:
   - name: target-bigquery
     variant: adswerve
-    pip_url: git+https://github.com/adswerve/target-bigquery.git@v0.10.2
     config:
       project_id: my-project-id
-      dataset_id: my-dataset-id
+      # dataset_id: my-dataset-id   # override if default (see below) is not appropriate
       location: EU
 ```
 
@@ -100,6 +109,7 @@ export TARGET_BIGQUERY_PROJECT_ID=<id>
 
 - Name: `dataset_id`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_BIGQUERY_DATASET_ID`
+- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](https://hub.meltano.com/extractors/gitlab.html).
 
 BigQuery dataset
 

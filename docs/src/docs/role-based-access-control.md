@@ -52,4 +52,3 @@ This system allows you to create any kind of hierarchical system:
 - _department.resource-name_
 - _topic.resource-name_
 - _access-level.resource-name_
-

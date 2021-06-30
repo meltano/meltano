@@ -1,10 +1,10 @@
-import pytest
-import os
-import sqlalchemy
 import contextlib
 import logging
+import os
 
-from sqlalchemy import text, create_engine
+import pytest
+import sqlalchemy
+from sqlalchemy import create_engine, text
 
 
 def recreate_database(engine, db_name):

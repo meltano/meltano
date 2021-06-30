@@ -3,11 +3,19 @@ sidebar: auto
 description: Use Meltano to pull data from the Google Ads (AdWords) API and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/adwords)
+:::
+
 # Google Ads (AdWords)
 
-The `tap-adwords` [extractor](/plugins/extractors/) pulls data from the [Google AdWords API](https://developers.google.com/adwords/api/).
+The `tap-adwords` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Google AdWords API](https://developers.google.com/adwords/api/).
 
-To learn more about `tap-adwords`, refer to the repository at <https://gitlab.com/meltano/tap-adwords>.
+- **Repository**: <https://gitlab.com/meltano/tap-adwords>
+- **Maintainer**: Meltano community
+- **Maintenance status**: Active
 
 ## Getting Started
 
@@ -50,6 +58,8 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `tap-adwords` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -68,12 +78,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-adwords` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-8}
+```yml{5-7}
 plugins:
   extractors:
   - name: tap-adwords
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/tap-adwords.git
     config:
       customer_ids: 1234567890,1234567891
       start_date: '2020-10-01T00:00:00Z'
@@ -294,12 +303,11 @@ Primary Keys for the selected Entities (Streams)
 
 Manage this setting directly in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file):
 
-```yml{6-9}
+```yml{5-8}
 plugins:
   extractors:
   - name: tap-adwords
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/tap-adwords.git
     config:
       primary_keys:
         <REPORT_NAME>: [<key1>, <key2>]
@@ -309,7 +317,16 @@ plugins:
 Alternatively, manage this setting using [`meltano config`](/docs/command-line-interface.html#config) or an [environment variable](/docs/configuration.html#configuring-settings):
 
 ```bash
-meltano config tap-adwords set primary_keys '{"<REPORT_NAME>": ["<key>", ...], ...}'
+meltano config tap-adwords set primary_keys <REPORT_NAME> '["<key>", ...]'
 
 export TAP_ADWORDS_PRIMARY_KEYS='{"<REPORT_NAME>": ["<key>", ...], ...}'
+
+# Once primary keys have been set in `meltano.yml`, environment variables can be used
+# to override specific nested properties:
+export TAP_ADWORDS_PRIMARY_KEYS_<REPORT_NAME>=='["<key>", ...]'
+
+# For example:
+meltano config tap-adwords set primary_keys KEYWORDS_PERFORMANCE_REPORT '["customerID"]'
+
+export TAP_ADWORDS_PRIMARY_KEYS_KEYWORDS_PERFORMANCE_REPORT='["customerID"]'
 ```

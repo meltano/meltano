@@ -1,31 +1,31 @@
 import configparser
 import logging
-import subprocess
 import os
-from . import ProjectPlugin, PluginType
+import subprocess
+from distutils.version import StrictVersion
 
-from meltano.core.error import SubprocessError
 from meltano.core.behavior.hookable import hook
+from meltano.core.error import SubprocessError
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.utils import nest
+
+from . import BasePlugin, PluginType
 
 
 class AirflowInvoker(PluginInvoker):
     def env(self):
         env = super().env()
 
-        env["AIRFLOW_HOME"] = str(self.config_service.run_dir)
+        env["AIRFLOW_HOME"] = str(self.plugin_config_service.run_dir)
         env["AIRFLOW_CONFIG"] = str(self.files["config"])
 
         return env
 
 
-class Airflow(ProjectPlugin):
+class Airflow(BasePlugin):
     __plugin_type__ = PluginType.ORCHESTRATORS
-    __invoker_cls__ = AirflowInvoker
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
+    invoker_class = AirflowInvoker
 
     @property
     def config_files(self):
@@ -38,7 +38,7 @@ class Airflow(ProjectPlugin):
         return config
 
     @hook("before_install")
-    def setup_env(self, project, reason):
+    def setup_env(self, *args, **kwargs):
         # to make airflow installables without GPL dependency
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
@@ -77,8 +77,24 @@ class Airflow(ProjectPlugin):
         # prepare again on the invoker so it re-reads the configuration
         # for the Airflow plugin
         invoker.prepare(session)
+
+        # make sure we use correct db init
         handle = invoker.invoke(
-            "initdb",
+            "version",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+        )
+        version, err = handle.communicate()
+
+        init_db_cmd = (
+            ["initdb"]
+            if StrictVersion(version) < StrictVersion("2.0.0")
+            else ["db", "init"]
+        )
+
+        handle = invoker.invoke(
+            *init_db_cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,

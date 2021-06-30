@@ -3,11 +3,20 @@ sidebar: auto
 description: Use Meltano to pull data from a PostgreSQL database and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/postgres)
+:::
+
 # PostgreSQL
 
-The `tap-postgres` [extractor](/plugins/extractors/) pulls data from a [PostgreSQL](https://www.postgresql.org/) database.
+The `tap-postgres` [extractor](https://hub.meltano.com/extractors/) pulls data from a [PostgreSQL](https://www.postgresql.org/) database.
 
-To learn more about `tap-postgres`, refer to the repository at <https://github.com/transferwise/pipelinewise-tap-postgres> and documentation at <https://transferwise.github.io/pipelinewise/connectors/taps/postgres.html>.
+- **Repository**: <https://github.com/transferwise/pipelinewise-tap-postgres>
+- **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/taps/postgres.html>
+- **Maintainer**: [Wise](https://wise.com/)
+- **Maintenance status**: Active
 
 ## Getting Started
 
@@ -19,6 +28,16 @@ If you haven't already, follow the initial steps of the [Getting Started guide](
 1. [Create your Meltano project](/docs/getting-started.html#create-your-meltano-project)
 
 Then, follow the steps in the ["Setup requirements" section of the documentation](https://transferwise.github.io/pipelinewise/connectors/taps/postgres.html#postgresql-setup-requirements).
+
+If you'd like to use [log-based incremental replication](/docs/integration.html#log-based-incremental-replication), also follow the ["Existing replication slot" step in the repository's README](https://github.com/transferwise/pipelinewise-tap-postgres#log-based-replication-requirements), since Meltano does not create a replication slot automatically.
+
+#### Dependencies
+
+`tap-postgres` [requires](https://www.psycopg.org/docs/install.html#runtime-requirements) the
+[`libpq` library](https://www.postgresql.org/docs/current/libpq.html) to be available on your system.
+If you've installed PostgreSQL, you should already have it, but you can also install it by itself using the
+[`libpq-dev` package](https://pkgs.org/download/libpq-dev) on Ubuntu/Debian or the
+[`libpq` Homebrew formula](https://formulae.brew.sh/formula/libpq) on macOS.
 
 ### Installation and configuration
 
@@ -57,7 +76,17 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
     [`FULL_TABLE`](/docs/integration.html#full-table-replication)
 
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
+
+    Note that this extractor is incompatible with the default `datamill-co` [variants](/docs/plugins.html#variants)
+    of [`target-postgres`](https://hub.meltano.com/loaders/postgres.html) and [`target-snowflake`](https://hub.meltano.com/loaders/snowflake.html),
+    because they don't support stream names that include the source schema in addition to the table name: `<schema>-<table>`, e.g. `public-accounts`.
+
+    Instead, use the `transferwise` variants that were made to be used with this extractor:
+    [`target-postgres`](https://hub.meltano.com/loaders/postgres--transferwise.html) and [`target-snowflake`](https://hub.meltano.com/loaders/snowflake--transferwise.html).
+
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
+
+If you run into any issues, refer to the ["Troubleshooting" section](#troubleshooting) below or [learn how to get help](/docs/getting-help.html).
 
 ## Settings
 
@@ -76,12 +105,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-postgres` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-10}
+```yml{5-9}
 plugins:
   extractors:
   - name: tap-postgres
     variant: transferwise
-    pip_url: pipelinewise-tap-postgres
     config:
       host: postgres.example.com
       port: 5432
@@ -280,3 +308,11 @@ meltano config tap-postgres set break_at_end_lsn false
 
 export TAP_POSTGRES_BREAK_AT_END_LSN=false
 ```
+
+## Troubleshooting
+
+### Error: `pg_config executable not found` or `libpq-fe.h: No such file or directory`
+
+This error message indicates that the [`libpq`](https://www.postgresql.org/docs/current/libpq.html) dependency is missing.
+
+To resolve this, refer to the ["Dependencies" section](#dependencies) above.

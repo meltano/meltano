@@ -19,7 +19,8 @@ RUN echo "Installing node and yarn" \
 WORKDIR /build
 
 # meltano core deps
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY pyproject.toml .
+COPY poetry.lock .
+RUN pip install poetry && poetry install
 
-CMD ['python']
+ENTRYPOINT ["python"]

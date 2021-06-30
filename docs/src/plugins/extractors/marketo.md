@@ -3,11 +3,19 @@ sidebar: auto
 description: Use Meltano to pull data from the Marketo API and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/marketo)
+:::
+
 # Marketo
 
-The `tap-marketo` [extractor](/plugins/extractors/) pulls data from the [Marketo API](https://developers.marketo.com/rest-api/).
+The `tap-marketo` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Marketo API](https://developers.marketo.com/rest-api/).
 
-To learn more about `tap-marketo`, refer to the repository at <https://gitlab.com/meltano/tap-marketo>.
+- **Repository**: <https://gitlab.com/meltano/tap-marketo>
+- **Maintainer**: Meltano community
+- **Maintenance status**: Active
 
 ## Getting Started
 
@@ -50,6 +58,8 @@ Follow the remaining steps of the [Getting Started guide](/docs/getting-started.
 1. [Add a loader to send data to a destination](/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination)
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `tap-marketo` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -67,12 +77,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `tap-marketo` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-10}
+```yml{5-9}
 plugins:
   extractors:
   - name: tap-marketo
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/tap-marketo.git
     config:
       endpoint: https://284-RPR-133.mktorest.com/rest
       identity: https://284-RPR-133.mktorest.com/identity

@@ -10,45 +10,23 @@ export default {
       <h2 class="tutorial-header">Table of Contents</h2>
     </div>
     <div class="tutorial-item">
-      <div class="tutorial-header">
-        <a href="/tutorials/gitlab-and-postgres.html">GitLab API + Postgres</a>
-      </div>
+      <h3 class="tutorial-header">
+        <a href="/tutorials/create-a-custom-extractor.html">
+          Create a Custom Extractor
+        </a>
+      </h3>
       <div>
         <p>
-          Experience the full extract, load, and transform pipeline with
-          authentication using Meltano CLI followed by analysis using Meltano UI
-          with its automatic SQL generation.
+          Learn how to create your own custom extractor!
         </p>
-        <ul>
-          <li>Postgres database</li>
-          <li>Authentication</li>
-          <li>Your private GitLab dataset</li>
-        </ul>
       </div>
     </div>
     <div class="tutorial-item">
-      <div class="tutorial-header">
-        <a href="/tutorials/create-custom-transforms-and-models.html">
-          Create Custom Transformations and Models
-        </a>
-      </div>
-      <div>
-        <p>Experience building custom transforms and models.</p>
-        <ul>
-          <li>Postgres database</li>
-          <li>Authentication</li>
-          <li>Your private Salesforce dataset</li>
-          <li>Custom transforms</li>
-          <li>Custom models</li>
-        </ul>
-      </div>
-    </div>
-    <div class="tutorial-item">
-      <div class="tutorial-header">
+      <h3 class="tutorial-header">
         <a href="/tutorials/postgres-with-postgres.html">
           Use Postgres as a Loader and Extractor
         </a>
-      </div>
+      </h3>
       <div>
         <p>
           Learn how to run <code>tap-postgres</code> with
@@ -57,68 +35,14 @@ export default {
       </div>
     </div>
     <div class="tutorial-item">
-      <div class="tutorial-header">
-        <a href="/tutorials/csv-with-postgres.html">
-          Loading CSV files into a Postgres Database
-        </a>
-      </div>
-      <div>
-        <p>
-          Learn how to load data stored in multiple CSV files to a Postgres
-          Database and then use Custom Transforms and Models to combine them
-          together and analyze the results.
-        </p>
-      </div>
-    </div>
-    <div class="tutorial-item">
-      <div class="tutorial-header">
-        <a href="/tutorials/using-jupyter-notebooks.html">
-          Using Jupyter Notebooks
-        </a>
-      </div>
-      <div>
-        <p>
-          Learn how to connect Jupyter Notebook to a Meltano Project that uses
-          Postgres to store the transformed data.
-        </p>
-      </div>
-    </div>
-    <div class="tutorial-item">
-      <div class="tutorial-header">
-        <a href="/tutorials/manual-digitalocean-droplet.html">
-          Manually Create a DigitalOcean Droplet for Meltano
-        </a>
-      </div>
-      <div>
-        <p>
-          Learn how to manually configure a DigitalOcean Droplet for use with
-          Meltano.
-        </p>
-      </div>
-    </div>
-    <div class="tutorial-item">
-      <div class="tutorial-header">
+      <h3 class="tutorial-header">
         <a href="/tutorials/install-on-aws.html">
           Installing Meltano on Amazon Web Services (AWS)
         </a>
-      </div>
-      <div>
+      </h3>
         <p>
           Learn how to install Meltano on AWS
         </p>
-      </div>
-    </div>
-    <div class="tutorial-item">
-      <div class="tutorial-header">
-        <a href="/tutorials/create-a-custom-extractor.html">
-          Create a Custom Extractor
-        </a>
-      </div>
-      <div>
-        <p>
-          Learn how to create a custom extractor!
-        </p>
-      </div>
     </div>
   </div>
 </template>

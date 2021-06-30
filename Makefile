@@ -31,7 +31,7 @@ MELTANO_API = src/meltano/api
 build: ui api
 
 test:
-	${DCRN} api ./setup.py test
+	${DCRN} api poetry run pytest tests/
 
 # pip related
 TO_CLEAN  = ./build ./dist
@@ -82,11 +82,11 @@ ${MELTANO_API}/node_modules:
 # Packaging Related
 # ===========
 #
-# - `make requirements.txt` pins dependency versions. We use requirements.txt
-#   as a lockfile essentially.
+# - `make lock` pins dependency versions. We use Poetry to generate
+#   a lockfile.
 
-requirements.txt: setup.py
-	pip freeze --exclude-editable > $@
+lock:
+	poetry lock
 
 bundle: clean ui
 	mkdir -p src/meltano/api/templates && \
@@ -95,10 +95,10 @@ bundle: clean ui
 	cp -r src/webapp/dist/static/. src/meltano/api/static
 
 freeze_db:
-	scripts/alembic_freeze.py
+	poetry run scripts/alembic_freeze.py
 
 sdist: freeze_db bundle
-	python setup.py sdist
+	poetry build -f sdist
 
 docker_sdist: base_image
 	docker run --rm -v `pwd`:/meltano ${base_image_tag} \
@@ -150,23 +150,29 @@ docs/serve: docs/build
 
 .PHONY: lint show_lint
 
-BLACK_RUN = black src/meltano tests/
+BLACK_RUN = poetry run black src/meltano tests/
 ESLINT_RUN = cd ${MELTANO_WEBAPP} && yarn run lint
+FLAKEHELL_RUN = poetry run flakehell lint src/ tests/
+ISORT_RUN = poetry run isort --recursive --settings-path pyproject.toml
 
-lint_black:
+lint_python:
+	${ISORT_RUN} --apply
 	${BLACK_RUN}
+	${FLAKEHELL_RUN}
 
 lint_eslint: ${MELTANO_WEBAPP}/node_modules
 	${ESLINT_RUN} --fix
 
-show_lint_black:
+show_lint_python:
+	${ISORT_RUN} --check-only --diff
 	${BLACK_RUN} --check --diff
+	${FLAKEHELL_RUN}
 
 show_lint_eslint: ${MELTANO_WEBAPP}/node_modules
 	${ESLINT_RUN}
 
-lint: lint_black lint_eslint
-show_lint: show_lint_black show_lint_eslint
+lint: lint_python lint_eslint
+show_lint: show_lint_python show_lint_eslint
 
 # Makefile Related Tasks
 # ======================
@@ -178,12 +184,9 @@ explain_makefile:
 
 # Release
 # =====================
-ifdef type
-  override type := --$(type)
-endif
 
 release:
 	git diff --quiet || { echo "Working directory is dirty, please commit or stash your changes."; exit 1; }
-	yes | changelog release $(type)
+	yes | poetry run changelog release --$(type)
 	git add CHANGELOG.md
-	bumpversion --tag --allow-dirty --new-version `changelog current` minor
+	poetry run bumpversion --tag --allow-dirty --new-version `poetry run changelog current` $(type)

@@ -1,24 +1,26 @@
-import os
-import sys
-import logging
-import click
 import datetime
 import json
+import logging
+import os
+import sys
 from pathlib import Path
 
-from . import cli
-from .params import project
+import click
 from click_default_group import DefaultGroup
-from meltano.core.project import Project, ProjectNotFound
-from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExistsError
 from meltano.core.db import project_engine
+from meltano.core.job.stale_job_failer import StaleJobFailer
+from meltano.core.project import Project, ProjectNotFound
+from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
+from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import coerce_datetime
+
+from . import cli
+from .params import pass_project
 
 
 @cli.group(cls=DefaultGroup, default="add")
 @click.pass_context
-@project(migrate=True)
+@pass_project(migrate=True)
 def schedule(project, ctx):
     ctx.obj["project"] = project
     ctx.obj["schedule_service"] = schedule_service = ScheduleService(project)
@@ -69,22 +71,24 @@ def list(ctx, format):
     project = ctx.obj["project"]
     schedule_service = ctx.obj["schedule_service"]
 
-    if format == "text":
-        transform_elt_markers = {
-            "run": ("→", "→"),
-            "only": ("×", "→"),
-            "skip": ("→", "x"),
-        }
+    _, Session = project_engine(project)
+    session = Session()
+    try:
+        StaleJobFailer().fail_stale_jobs(session)
 
-        for schedule in schedule_service.schedules():
-            markers = transform_elt_markers[schedule.transform]
-            click.echo(
-                f"[{schedule.interval}] {schedule.name}: {schedule.extractor} {markers[0]} {schedule.loader} {markers[1]} transforms"
-            )
-    elif format == "json":
-        _, Session = project_engine(project)
-        session = Session()
-        try:
+        if format == "text":
+            transform_elt_markers = {
+                "run": ("→", "→"),
+                "only": ("×", "→"),
+                "skip": ("→", "x"),
+            }
+
+            for schedule in schedule_service.schedules():
+                markers = transform_elt_markers[schedule.transform]
+                click.echo(
+                    f"[{schedule.interval}] {schedule.name}: {schedule.extractor} {markers[0]} {schedule.loader} {markers[1]} transforms"
+                )
+        elif format == "json":
             schedules = []
             for schedule in schedule_service.schedules():
                 start_date = coerce_datetime(schedule.start_date)
@@ -112,7 +116,24 @@ def list(ctx, format):
                         "elt_args": schedule.elt_args,
                     }
                 )
-        finally:
-            session.close()
 
-        print(json.dumps(schedules, indent=2))
+            print(json.dumps(schedules, indent=2))
+    finally:
+        session.close()
+
+
+@schedule.command(
+    context_settings=dict(ignore_unknown_options=True, allow_interspersed_args=False)
+)
+@click.argument("name")
+@click.argument("elt_options", nargs=-1, type=click.UNPROCESSED)
+@click.pass_context
+def run(ctx, name, elt_options):
+    schedule_service = ctx.obj["schedule_service"]
+
+    schedule = schedule_service.find_schedule(name)
+    process = schedule_service.run(schedule, *elt_options)
+
+    exitcode = process.returncode
+    if exitcode:
+        sys.exit(exitcode)

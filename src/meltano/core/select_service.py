@@ -1,23 +1,27 @@
 import json
 import logging
 
-from meltano.core.config_service import ConfigService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
-from .project import Project
+from meltano.core.plugin_invoker import invoker_factory
+from meltano.core.project_plugins_service import ProjectPluginsService
+
 from .db import project_engine
+from .project import Project
 
 
 class SelectService:
     def __init__(
-        self, project: Project, extractor: str, config_service: ConfigService = None
+        self,
+        project: Project,
+        extractor: str,
+        plugins_service: ProjectPluginsService = None,
     ):
         self.project = project
-        self.config_service = config_service or ConfigService(project)
-        self._extractor = self.config_service.find_plugin(
+        self.plugins_service = plugins_service or ProjectPluginsService(project)
+        self._extractor = self.plugins_service.find_plugin(
             extractor, PluginType.EXTRACTORS
         )
 
@@ -28,12 +32,14 @@ class SelectService:
     @property
     def current_select(self):
         plugin_settings_service = PluginSettingsService(
-            self.project, self.extractor, config_service=self.config_service
+            self.project, self.extractor, plugins_service=self.plugins_service
         )
         return plugin_settings_service.get("_select")
 
     def load_catalog(self, session):
-        invoker = invoker_factory(self.project, self.extractor)
+        invoker = invoker_factory(
+            self.project, self.extractor, plugins_service=self.plugins_service
+        )
 
         with invoker.prepared(session):
             catalog_json = invoker.dump("catalog")
@@ -56,5 +62,11 @@ class SelectService:
     def select(self, entities_filter, attributes_filter, exclude=False):
         exclude = "!" if exclude else ""
         pattern = f"{exclude}{entities_filter}.{attributes_filter}"
-        self.extractor.add_select_filter(pattern)
-        self.config_service.update_plugin(self.extractor)
+
+        plugin = self.extractor
+
+        select = plugin.extras.get("select", [])
+        select.append(pattern)
+        plugin.extras["select"] = select
+
+        self.plugins_service.update_plugin(plugin)

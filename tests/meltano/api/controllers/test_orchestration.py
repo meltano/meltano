@@ -1,12 +1,8 @@
-import pytest
 from unittest import mock
-from flask import url_for
 
-from meltano.core.plugin.settings_service import (
-    SettingValueStore,
-    REDACTED_VALUE,
-    Profile,
-)
+import pytest
+from flask import url_for
+from meltano.core.plugin.settings_service import REDACTED_VALUE, SettingValueStore
 
 
 class TestOrchestration:
@@ -17,7 +13,7 @@ class TestOrchestration:
         tap,
         session,
         plugin_settings_service_factory,
-        plugin_discovery_service,
+        project_plugins_service,
         monkeypatch,
     ):
         plugin_settings_service = plugin_settings_service_factory(tap)
@@ -28,17 +24,16 @@ class TestOrchestration:
         monkeypatch.setenv("TAP_MOCK_BOOLEAN", "false")
 
         with mock.patch(
-            "meltano.api.controllers.orchestrations.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.api.controllers.orchestrations.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), app.test_request_context():
             res = api.get(
                 url_for("orchestrations.get_plugin_configuration", plugin_ref=tap)
             )
 
             assert res.status_code == 200
-            default_profile = res.json["profiles"][0]
-            config = default_profile["config"]
-            config_metadata = default_profile["config_metadata"]
+            config = res.json["config"]
+            config_metadata = res.json["config_metadata"]
 
             # make sure that set `password` is still present
             # but redacted in the response
@@ -84,7 +79,7 @@ class TestOrchestration:
         tap,
         session,
         plugin_settings_service_factory,
-        plugin_discovery_service,
+        project_plugins_service,
     ):
         plugin_settings_service = plugin_settings_service_factory(tap)
         plugin_settings_service.set(
@@ -95,21 +90,16 @@ class TestOrchestration:
         )
 
         with mock.patch(
-            "meltano.core.plugin.settings_service.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
+            "meltano.api.controllers.orchestrations.ProjectPluginsService",
+            return_value=project_plugins_service,
         ), app.test_request_context():
             res = api.put(
                 url_for("orchestrations.save_plugin_configuration", plugin_ref=tap),
-                json=[
-                    {
-                        "name": Profile.DEFAULT.name,
-                        "config": {"protected": "N33DC0FF33", "secure": "newvalue"},
-                    }
-                ],
+                json={"config": {"protected": "N33DC0FF33", "secure": "newvalue"}},
             )
 
             assert res.status_code == 200
-            config = res.json[0]["config"]
+            config = res.json["config"]
 
             # make sure that set `password` has been updated
             # but redacted in the response

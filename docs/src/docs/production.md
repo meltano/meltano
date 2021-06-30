@@ -29,7 +29,7 @@ you can skip steps 1 through 3 and refer primarily to the "Containerized Meltano
 
 Since a Meltano project is just a directory on your filesystem containing
 text-based files, you can treat it like any other software development project
-and benefit from DevOps best practices such as version control, code review,
+and benefit from DataOps best practices such as version control, code review,
 and continuous integration and deployment (CI/CD).
 
 As such, getting your Meltano project onto the production environment starts
@@ -175,23 +175,24 @@ a pipeline using [`meltano elt`](/docs/command-line-interface.html#elt),
 just like you did locally. Congratulations!
 
 You can run the command using any mechanism capable of running executables,
-whether that's `cron`, [Airflow's `BashOperator`](https://airflow.apache.org/docs/stable/howto/operator/bash.html),
+whether that's `cron`, [Airflow's `BashOperator`](https://airflow.apache.org/docs/apache-airflow/1.10.14/howto/operator/bash.html),
 or any of dozens of other orchestration tools.
 
 ### Airflow orchestrator
 
 If you've added Airflow to your Meltano project as an [orchestrator](/#orchestration),
 you can have it automatically run your project's [scheduled pipelines](/#orchestration)
-by starting [its scheduler](https://airflow.apache.org/docs/stable/cli-ref.html#scheduler)
+by starting [its scheduler](https://airflow.apache.org/docs/apache-airflow/1.10.14/scheduler.html)
 using `meltano invoke airflow scheduler`.
 
-Similarly, you can start [its web interface](https://airflow.apache.org/docs/stable/cli-ref.html#webserver)
+Similarly, you can start [its web interface](https://airflow.apache.org/docs/apache-airflow/1.10.14/cli-ref.html#webserver)
 using `meltano invoke airflow webserver`.
 
 However, do take into account Airflow's own
-[Best Practices on Deployment in Production](https://airflow.apache.org/docs/stable/best-practices.html#deployment-in-production). Specifically, you will want to configure Airflow to:
+[Deployment in Production Best Practices](https://airflow.apache.org/docs/apache-airflow/1.10.14/best-practices.html#deployment-in-production).
+Specifically, you will want to configure Airflow to:
 
-- [use the `LocalExecutor`](https://airflow.apache.org/docs/stable/best-practices.html#multi-node-cluster)
+- [use the `LocalExecutor`](https://airflow.apache.org/docs/apache-airflow/1.10.14/best-practices.html#multi-node-cluster)
   instead of the `SequentialExecutor` default by setting the `core.executor` setting
   (or `AIRFLOW__CORE__EXECUTOR` environment variable) to `LocalExecutor`:
 
@@ -201,7 +202,7 @@ However, do take into account Airflow's own
   export AIRFLOW__CORE__EXECUTOR=LocalExecutor
   ```
 
-- [use a PostgreSQL metadata database](https://airflow.apache.org/docs/stable/best-practices.html#database-backend)
+- [use a PostgreSQL metadata database](https://airflow.apache.org/docs/apache-airflow/1.10.14/best-practices.html#database-backend)
   instead of the SQLite default ([sounds familiar?](#storing-metadata)) by setting the `core.sql_alchemy_conn` setting
   (or `AIRFLOW__CORE__SQL_ALCHEMY_CONN` environment variable) to a [`postgresql://` URI](https://docs.sqlalchemy.org/en/13/core/engines.html#postgresql):
 
@@ -234,19 +235,27 @@ You can start Meltano UI using [`meltano ui`](/docs/command-line-interface.html#
 but there are [a couple of settings](/docs/settings.html#meltano-ui-server) you'll want to consider changing in production:
 
 - By default, Meltano UI will bind to host `0.0.0.0` and port `5000`.
+
   This can be changed using the [`ui.bind_host`](/docs/settings.html#ui-bind-host) and [`ui.bind_port`](/docs/settings.html#ui-bind-port) settings, and their respective environment variables and CLI options.
 
 - If you'd like to require users to sign in before they can access the Meltano UI, enable the [`ui.authentication` setting](/docs/settings.html#ui-authentication).
-  As described behind that link, this will also require you to set the [`ui.secret_key`](/docs/settings.html#ui-secret-key) and [`ui.password_salt`](/docs/settings.html#ui-password-salt) settings, as well as [`ui.server_name`](/docs/settings.html#ui-server-name) or [`ui.session_cookie_domain`](/docs/settings.html#ui-session-cookie-domain). Users can be added using [`meltano user add`](./command-line-interface.html#user) and will be stored in the configured [system database](#storing-metadata).
+
+  As described behind that link, this will also require you to set the [`ui.secret_key`](/docs/settings.html#ui-secret-key) and [`ui.password_salt`](/docs/settings.html#ui-password-salt) settings, as well as [`ui.server_name`](/docs/settings.html#ui-server-name) or [`ui.session_cookie_domain`](/docs/settings.html#ui-session-cookie-domain).
+
+  Users can be added using [`meltano user add`](./command-line-interface.html#user) and will be stored in the configured [system database](#storing-metadata).
+
+- If you will be running Meltano UI behind a front-end (reverse) proxy that will be responsible for SSL termination (HTTPS),
+  it is recommended that you enable the [`ui.session_cookie_secure` setting](/docs/settings.html#ui-session-cookie-secure) so that session cookies used for authentication are only sent along with secure requests.
+
+  You may also need to change the [`ui.forwarded_allow_ips` setting](/docs/settings.html#ui-forwarded-allow-ips) to get
+  Meltano UI to realize it should use the `https` URL scheme rather than `http` in the URLs it builds.
+
+  If your reverse proxy uses a health check to determine if Meltano UI is ready to accept traffic, you can use the `/api/v1/health` route, which will always respond with a 200 status code.
 
 - Meltano UI can be used to make changes to your project, like adding plugins and scheduling pipelines,
   which is very useful locally but may be undesirable in production if you'd prefer for all changes to [go through version control](#off-of-your-local-machine) instead.
-  To disallow all modifications to project files through the UI, enable the [`project_readonly` setting](/docs/settings.html#project-readonly).
 
-- If you will be running Meltano UI behind a front-end (reverse) proxy that will be responsible for SSL termination,
-  you may need to change the [`ui.forwarded_allow_ips` setting](/docs/settings.html#ui-forwarded-allow-ips) to get
-  Meltano UI to realize it should use the `https` URL scheme rather than `http` in the URLs it builds.
-  If your reverse proxy uses a health check to determine if Meltano UI is ready to accept traffic, you can use the `/api/health` route, which will always respond with a 200 status code.
+  To disallow all modifications to project files through the UI, enable the [`project_readonly` setting](/docs/settings.html#project-readonly).
 
 ### Containerized Meltano project
 

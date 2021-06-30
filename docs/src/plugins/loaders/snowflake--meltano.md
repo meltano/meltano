@@ -3,11 +3,19 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into Snowflake
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/snowflake--meltano)
+:::
+
 # Snowflake (`meltano` variant)
 
-The `target-snowflake` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [Snowflake](https://www.snowflake.com/) data warehouse.
+The `target-snowflake` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into a [Snowflake](https://www.snowflake.com/) data warehouse.
 
-To learn more about `target-snowflake`, refer to the repository at <https://gitlab.com/meltano/target-snowflake>.
+- **Repository**: <https://github.com/meltano/target-snowflake>
+- **Maintainer**: Meltano community
+- **Maintenance status**: Active
 
 #### Alternative variants
 
@@ -57,6 +65,8 @@ Follow the remaining step of the [Getting Started guide](/docs/getting-started.h
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
+If you run into any issues, [learn how to get help](/docs/getting-help.html).
+
 ## Settings
 
 `target-snowflake` requires the [configuration](/docs/configuration.html) of the following settings:
@@ -76,12 +86,11 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 A minimal configuration of `target-snowflake` in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) will look like this:
 
-```yml{6-14}
+```yml{5-13}
 plugins:
   loaders:
   - name: target-snowflake
     variant: meltano
-    pip_url: git+https://gitlab.com/meltano/target-snowflake.git
     config:
       account: my_account
       username: my_username
@@ -203,7 +212,7 @@ export TARGET_SNOWFLAKE_WAREHOUSE=<warehouse>
 
 - Name: `schema`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_SCHEMA`, alias: `SF_SCHEMA`, `SNOWFLAKE_SCHEMA`
-- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html). Values are automatically converted to uppercase before they're passed on to the plugin, so `tap_gitlab` becomes `TAP_GITLAB`.
+- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](https://hub.meltano.com/extractors/gitlab.html). Values are automatically converted to uppercase before they're passed on to the plugin, so `tap_gitlab` becomes `TAP_GITLAB`.
 
 #### How to use
 

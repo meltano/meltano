@@ -6,70 +6,58 @@ description: Meltano provides a command line interface (CLI) that makes it easy 
 
 Meltano provides a command line interface (CLI) that makes it easy to manage your [project](/docs/project.html), [plugins](/docs/plugin-management.html), and [EL(T) pipelines](/docs/integration.html).
 To quickly find the `meltano` subcommand you're looking for, use the Table of Contents in the sidebar.
+For a better understanding of command line documentation syntax, the [docopt](http://docopt.org/) standard is useful.
 
 ## `add`
 
-`meltano add` lets you add [plugins](/docs/plugins.html) to your Meltano project.
+`meltano add` lets you add [plugins](/docs/plugins.html#project-plugins) to your Meltano project.
 
 Specifically, it will:
-1. add the plugin to your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors:`,
-2. create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/docs/project.html#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`, and
-3. install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>`.
+1. add a new [plugin definition](/docs/project.html#plugins) to your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors:`, and
+2. assuming a valid `pip_url` is specified, install the new plugin using [`meltano install <type> <name>`](#install), which will:
+   1. create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/docs/project.html#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`, and
+   2. install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>`.
 
-(Some plugin types have slightly different or additional behavior; refer to the [plugin type documentation](/docs/plugins.html) for more details.)
+(Some plugin types have slightly different or additional behavior; refer to the [plugin type documentation](/docs/plugins.html#types) for more details.)
 
 Once the plugin has been added to your project, you can configure it using [`meltano config`](#config),
 invoke its executable using [`meltano invoke`](#invoke), and use it in a pipeline using [`meltano elt`](#elt).
 
-### How to use: Discoverable plugins
+To learn more about adding a plugin to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-a-plugin-to-your-project).
 
-[Discoverable plugins](/docs/plugins.html#discoverable-plugins) will show up when you run [`meltano discover`](#discover),
-and can be added to your project by simply specifying their `type` and `name`:
+### How to use
+
+The only required arguments are the new plugin's [type](/docs/plugins.html#types) and unique name:
 
 ```bash
 meltano add <type> <name>
-meltano add extractor <name>
-meltano add loader <name>
-meltano add transform <name>
-meltano add model <name>
-meltano add dashboard <name>
-meltano add orchestrator <name>
-meltano add transformer <name>
-meltano add files <name>
 
 # For example:
 meltano add extractor tap-gitlab
 meltano add loader target-postgres
 ```
 
-#### Variants
+Without a `--custom` or `--inherit-from` option, this will add the
+[discoverable plugin](/docs/plugins.html#discoverable-plugins) with the provided name
+to your [`meltano.yml` project file](/docs/project.html#plugins)
+using a [shadowing plugin definition](/docs/project.html#shadowing-plugin-definitions).
 
-If multiple [variants](/docs/plugins.html#variants) of a discoverable plugin are available, the specific variant to add can be identified using the `--variant` option:
-
-```bash
-meltano add extractor tap-gitlab --variant=singer-io
-```
-
-If no variant is specified, the default variant will be used, which is known to work well and recommended for new users.
-
-#### Related plugins
-
-An `--include-related` flag can be passed to automatically install all transform, model, and dashboard plugins related to an extractor:
+If multiple [variants](/docs/plugins.html#variants) of the discoverable plugin are available, the specific variant to add can be identified using the `--variant` option:
 
 ```bash
-meltano add --include-related extractor tap-gitlab
+meltano add <type> <name> --variant <variant>
+
+# For example:
+meltano add loader target-postgres --variant transferwise
 ```
 
-### How to use: Custom plugins
-
-[Custom plugins](/docs/plugins.html#custom-plugins) that Meltano isn't familiar with yet, like arbitrary Singer taps and targets, can be added using the `--custom` flag:
+To add a [custom plugin](/docs/plugins.html#custom-plugins) using a [custom plugin definition](/docs/project.html#custom-plugin-definitions), use the `--custom` flag:
 
 ```bash
 meltano add --custom <type> <name>
 
 # For example:
 meltano add --custom extractor tap-covid-19
-meltano add --custom loader pipelinewise-target-postgres
 
 # If you're using Docker, don't forget to mount the project directory,
 # and ensure that interactive mode is enabled so that Meltano can ask you
@@ -77,46 +65,26 @@ meltano add --custom loader pipelinewise-target-postgres
 docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-covid-19
 ```
 
-Since no additional metadata about this plugin will be known to Meltano yet,
-it will ask you some additional questions to learn where the plugin's package can be found,
-how to interact with it, and how it can be expected to behave: (Note that more context is provided in the actual command prompts.)
+To add a plugin [inheriting from](/docs/plugins.html#plugin-inheritance) an existing one using an [inheriting plugin definition](/docs/project.html#inheriting-plugin-definitions), use the `--inherit-from` option:
 
 ```bash
-$ meltano add --custom extractor tap-covid-19
-# Specify namespace, which will serve as the:
-# - identifier to find related/compatible plugins
-# - default database schema (`load_schema` extra)
-#   for use by loaders that support a target schema
-(namespace): tap_covid_19
+meltano add <type> <name> --inherit-from <existing-name>
 
-# Specify `pip install` argument, for example:
-# - PyPI package name:
-(pip_url): tap-covid-19
-# - Git repository URL:
-(pip_url): git+https://github.com/singer-io/tap-covid-19.git
-# - local directory, in editable/development mode:
-(pip_url): -e extract/tap-covid-19
-
-# Specify the package's executable name
-(executable): tap-covid-19
-
-# Specify supported Singer features (executable flags)
-(capabilities): catalog,discover,state
-
-# Specify supported settings (`config.json` keys)
-(settings): api_token,user_agent,start_date
+# For example:
+meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 ```
 
-If you're adding a Singer tap or target that's listed on Singer's [index of taps](https://www.singer.io/#taps) or [targets](https://www.singer.io/#targets), simply providing the package name as `name`, `pip_url`, and `executable` should suffice. If it's a tap or target you have developed or are developing yourself, you'll want to set `pip_url` to either a Git repository URL or local directory path. If you add the `-e` flag ahead of the local path, the package will be installed in [editable mode](https://pip.pypa.io/en/stable/reference/pip_install/#editable-installs).
+#### Parameters
 
-To find out what `settings` a tap or target supports, reference its README and/or documentation. If the `capabilities` (executable flags) a tap supports are not described there, try [one of these tricks](/docs/contributor-guide.html#how-to-test-a-tap).
+- `--custom`: Add a [custom plugin](/docs/plugins.html#custom-plugins). The command will prompt you for the package's [base plugin description](/docs/plugins.html#project-plugins) metadata.
 
-::: tip
-Once you've got the plugin working in your project, please consider
-[contributing its definition](/docs/contributor-guide.html#discoverable-plugins)
-to the [`discovery.yml` manifest](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml)
-to make it discoverable and supported out of the box for new users!
-:::
+- `--inherit-from=<existing-name>`: Add a plugin [inheriting from](/docs/plugins.html#plugin-inheritance) an existing plugin in the project or a [discoverable plugin](/docs/plugins.html#discoverable-plugins) identified by name.
+
+- `--as=<new-name>`: `meltano add <type> <name> --as=<new-name>` is equivalent to `meltano add <type> <new-name> --inherit-from=<name>`, and can be used to add a [discoverable plugin](/docs/plugins.html#discoverable-plugins) to your project with a different name.
+
+- `--variant=<variant>`: Add a specific (non-default) [variant](/docs/plugins.html#variants) of the identified [discoverable plugin](/docs/plugins.html#discoverable-plugins).
+
+- `--include-related`: Also add transform, dashboard, and model plugins related to the identified discoverable extractor.
 
 ## `config`
 
@@ -296,10 +264,12 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
 
 - A `--full-refresh` flag can be passed to perform a full refresh, ignoring state left behind by any previous runs with the same job ID.
 
-- A `--catalog` option can be passed to manually provide a [catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) for the extractor, as an alternative to letting one be [generated on the fly](/docs/integration.html#extractor-catalog-generation).
+- A `--force` flag can be passed to force a new run even when a pipeline with the same Job ID is already running, which would result in an error otherwise.
+
+- A `--catalog` option can be passed to manually provide a [catalog file](https://hub.meltano.com/singer/spec#catalog-files) for the extractor, as an alternative to letting one be [generated on the fly](/docs/integration.html#extractor-catalog-generation).
   This is equivalent to setting the [`catalog` extractor extra](/docs/plugins.html#catalog-extra).
 
-- A `--state` option can be passed to manually provide a [state file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) for the extractor, as an alternative to letting state be [looked up based on the Job ID](/docs/integration.html#incremental-replication-state).
+- A `--state` option can be passed to manually provide a [state file](https://hub.meltano.com/singer/spec#state-files) for the extractor, as an alternative to letting state be [looked up based on the Job ID](/docs/integration.html#incremental-replication-state).
   This is equivalent to setting the [`state` extractor extra](/docs/plugins.html#state-extra).
 
 - One or more `--select <entity>` options can be passed to only extract records for matching [selected entities](#select).
@@ -312,14 +282,14 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
   - Specifying `--select` and/or `--exclude` is equivalent to setting the [`select_filter` extractor extra](/docs/plugins.html#select-filter-extra).
 
 - A `--dump` option can be passed (along with any of the other options) to dump the content of a pipeline-specific generated file to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) instead of actually running the pipeline.
-  This can aid in debugging [extractor catalog generation](/docs/integration.html#extractor-catalog-generation), [incremental replication state lookup](/docs/integration.html#incremental-replication-state), and [pipeline-specific configuration](/docs/integration.html#pipeline-specific-configuration).
+  This can aid in debugging [extractor catalog generation](/docs/integration.html#extractor-catalog-generation), [incremental replication state lookup](/docs/integration.html#incremental-replication-state), and [pipeline environment variables](/docs/integration.html#pipeline-environment-variables).
 
   Supported values are:
 
-  - `catalog`: Dump the extractor [catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) that would be passed to the tap's executable using the `--catalog` option.
-  - `state`: Dump the extractor [state file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) that would be passed to the tap's executable using the `--state` option.
-  - `extractor-config`: Dump the extractor [config file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file) that would be passed to the tap's executable using the `--config` option.
-  - `loader-config`: Dump the loader [config file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file) that would be passed to the target's executable using the `--config` option.
+  - `catalog`: Dump the extractor [catalog file](https://hub.meltano.com/singer/spec#catalog-files) that would be passed to the tap's executable using the `--catalog` option.
+  - `state`: Dump the extractor [state file](https://hub.meltano.com/singer/spec#state-files) that would be passed to the tap's executable using the `--state` option.
+  - `extractor-config`: Dump the extractor [config file](https://hub.meltano.com/singer/spec#config-files) that would be passed to the tap's executable using the `--config` option.
+  - `loader-config`: Dump the loader [config file](https://hub.meltano.com/singer/spec#config-files) that would be passed to the target's executable using the `--config` option.
 
   Like any standard output, the dumped content can be [redirected](https://en.wikipedia.org/wiki/Redirection_(computing)) to a file using `>`, e.g. `meltano elt ... --dump=state > state.json`.
 
@@ -353,9 +323,9 @@ meltano --log-level=debug elt ...
 ```
 
 In debug mode, `meltano elt` will log the arguments and [environment](/docs/configuration.html#accessing-from-plugins) used to invoke the Singer tap and target executables (and `dbt`, when running transformations), including the paths to the generated
-[config](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#config-file),
-[catalog](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog), and
-[state](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) files, for you to review:
+[config](https://hub.meltano.com/singer/spec#config-files),
+[catalog](https://hub.meltano.com/singer/spec#catalog-files), and
+[state](https://hub.meltano.com/singer/spec#state-files) files, for you to review:
 
 ```bash
 $ meltano --log-level=debug elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
@@ -369,7 +339,7 @@ meltano            | DEBUG Env: {'MELTANO_EXTRACTOR_NAME': 'tap-gitlab', 'MELTAN
 
 Note that the contents of these pipeline-specific generated files can also easily be dumped to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using the `--dump` option described above.
 
-Additionally, all [Singer messages](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md#output) output by the tap and target will be logged, identified by `<plugin name> (out)` prefixes:
+Additionally, all [Singer messages](https://hub.meltano.com/singer/spec#messages) output by the tap and target will be logged, identified by `<plugin name> (out)` prefixes:
 
 ```bash
 tap-gitlab         | INFO Starting sync
@@ -389,7 +359,7 @@ Used to create a new [Meltano project](/docs/project.html) directory inside the 
 
 The new project directory will contain:
 
-- a [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) that will list any [`plugins` you'll add](/docs/plugin-management.html#adding-extractors-and-loaders-to-your-project) and [pipeline `schedules` you'll create](/#orchestration),
+- a [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file) that will list any [`plugins` you'll add](/docs/plugin-management.html#adding-a-plugin-to-your-project) and [pipeline `schedules` you'll create](/#orchestration),
 - stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
 - empty `model`, `extract`, `load`, `transform`, `analyze`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
 
@@ -438,6 +408,8 @@ Additionally, plugin names can be provided to only (re)install those specific pl
 
 Use `--include-related` to automatically install transform, model, and dashboard plugins related to installed extractor plugins.
 
+Meltano installs plugins in parallel. The number of plugins to install in parallel defaults to the number of CPUs on the machine, but can be controlled with `--parallelism`. Use `--parallelism=1` to disable the feature and install them one at a time.
+
 ### How to Use
 
 ```bash
@@ -450,6 +422,8 @@ meltano install extractors tap-gitlab tap-adwords
 meltano install models
 
 meltano install --include-related
+
+meltano install --parallelism=16
 ```
 
 ## `invoke`
@@ -459,16 +433,16 @@ Invoke the plugin's executable with specified arguments.
 ### How to use
 
 ```bash
-meltano invoke <plugin> PLUGIN_ARGS...
+meltano invoke <plugin> [PLUGIN]_ARGS...]
 ```
 
 If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
 
 ```bash
-meltano invoke --plugin-type=<type> <plugin> PLUGIN_ARGS...
+meltano invoke --plugin-type=<type> <plugin> [PLUGIN_ARGS...]
 ```
 
-A `--dump` option can be passed to dump the content of a generated [config file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) or [extractor catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) instead of actually invoking the plugin:
+A `--dump` option can be passed to dump the content of a generated [config file](https://hub.meltano.com/singer/spec#config-files) or [extractor catalog file](https://hub.meltano.com/singer/spec#catalog-files) to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) instead of actually invoking the plugin:
 
 ```bash
 meltano invoke --dump=config <plugin>
@@ -477,6 +451,53 @@ meltano invoke --dump=catalog <plugin>
 
 Like any standard output, the dumped content can be [redirected](https://en.wikipedia.org/wiki/Redirection_(computing)) to a file using `>`, e.g. `meltano invoke --dump=catalog <plugin> > state.json`.
 
+### Commands
+
+Plugins can define [commands](/docs/configuration.html#plugin-commands), which are shortcuts for combinations of arguments. These can be invoked with the shortcut command of the form `meltano invoke <plugin>:<command>`.
+
+```bash
+meltano invoke dbt:seed
+meltano invoke dbt:snapshot
+```
+
+Additional arguments can be specified as well, which will be appended to the command.
+
+```bash
+meltano invoke dbt:seed --show --threads 5
+```
+
+To see what commands a plugin supports, use `--list-command`:
+
+```bash
+meltano invoke --list-commands dbt
+```
+
+## `remove`
+
+`meltano remove` removes one or more [plugins](/docs/plugins.html#project-plugins) of the same [type](/docs/plugins.html#types) from your Meltano [project](/docs/project.html).
+
+Specifically, [plugins](/docs/plugins.html#project-plugins) will be removed from the:
+- [`meltano.yml` project file](/docs/project.html)
+- Installation found in the [`.meltano` directory](/docs/project.html#meltano-directory) under `.meltano/<plugin_type>/<plugin_name>`
+- `plugin_settings` table in the [system database](/docs/project.html#system-database)
+
+### How to Use
+
+```bash
+meltano remove <type> <name>
+meltano remove <type> <name> <name_two>
+```
+
+### Examples
+
+```bash
+# meltano will attempt to remove an extractor called tap-gitlab
+meltano remove extractor tap-gitlab
+
+# meltano will attempt to remove two loaders; target-postgres and target-csv
+meltano remove loader target-postgres target-csv
+```
+
 ## `schedule`
 
 ::: tip
@@ -484,6 +505,9 @@ An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Or
 :::
 
 Use the `schedule` command to define ELT pipelines to be run by an orchestrator at regular intervals. These scheduled pipelines will be added to your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
+
+You can run a specific scheduled pipeline's corresponding [`meltano elt`](#elt) command as a one-off using `meltano schedule run <schedule_name>`.
+Any command line options (e.g. `--select=<entity>` or `--dump=config`) will be passed on to [`meltano elt`](#elt).
 
 ### How to use
 
@@ -496,6 +520,9 @@ meltano schedule <schedule_name> <extractor> <loader> <interval> [--transform={r
 
 # List all schedules
 meltano schedule list [--format=json]
+
+# Run a schedule
+meltano schedule run <schedule_name>
 ```
 
 ### Examples
@@ -508,6 +535,10 @@ meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily --transfor
 meltano schedule gitlab-to-jsonl tap-gitlab target-jsonl "* * * * *"
 # This specifies that the following command is to be run every minute:
 # meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
+
+meltano schedule run gitlab-to-jsonl --select=commits
+# This will run:
+# meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl --select=commits
 ```
 
 ## `select`
@@ -540,49 +571,48 @@ Use `--list` to list the current selected tap attributes.
 
 ```bash
 # List all available entities and attributes
-meltano select --list --all tap-covid-19
+meltano select tap-gitlab --list --all
 
 # Include all attributes of an entity
-meltano select tap-covid-19 eu_ecdc_daily "*"
+meltano select tap-gitlab tags "*"
 
 # Include specific attributes of an entity
-meltano select tap-covid-19 eu_daily date
-meltano select tap-covid-19 eu_daily country
-meltano select tap-covid-19 eu_daily cases
-meltano select tap-covid-19 eu_daily deaths
+meltano select tap-gitlab commits id
+meltano select tap-gitlab commits project_id
+meltano select tap-gitlab commits created_at
+meltano select tap-gitlab commits author_name
+meltano select tap-gitlab commits message
 
 # Exclude matching attributes of all entities
-meltano select tap-covid-19 --exclude "*" "git_*"
+meltano select tap-gitlab --exclude "*" "*_url"
 
 # List selected (enabled) entities and attributes
-meltano select --list tap-covid-19
+meltano select tap-gitlab --list
 ```
 
 Example output:
 
 ```
 Enabled patterns:
-    eu_ecdc_daily.*
-    eu_daily.date
-    eu_daily.country
-    eu_daily.cases
-    eu_daily.deaths
-    !*.git_*
+    tags.*
+    commits.id
+    commits.project_id
+    commits.created_at
+    commits.author_name
+    commits.message
+    !*.*_url
 
 Selected attributes:
-    [automatic] eu_daily.__sdc_row_number
-    [automatic] eu_daily.git_path
-    [selected ] eu_daily.date
-    [selected ] eu_daily.country
-    [selected ] eu_daily.cases
-    [selected ] eu_daily.deaths
-    [automatic] eu_ecdc_daily.__sdc_row_number
-    [automatic] eu_ecdc_daily.git_path
-    [selected ] eu_ecdc_daily.date
-    [selected ] eu_ecdc_daily.datetime
-    [selected ] eu_ecdc_daily.country
-    [selected ] eu_ecdc_daily.cases
-    [selected ] eu_ecdc_daily.deaths
+    [selected ] commits.author_name
+    [selected ] commits.created_at
+    [automatic] commits.id
+    [selected ] commits.message
+    [selected ] commits.project_id
+    [automatic] tags.commit_id
+    [selected ] tags.message
+    [automatic] tags.name
+    [automatic] tags.project_id
+    [selected ] tags.target
 ```
 
 ::: tip

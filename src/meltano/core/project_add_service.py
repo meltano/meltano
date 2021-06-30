@@ -1,18 +1,14 @@
-import os
 import json
-import yaml
 import logging
+import os
 from typing import List
 
+import yaml
+
+from .plugin import BasePlugin, PluginType, Variant
+from .plugin.project_plugin import ProjectPlugin
 from .project import Project
-from .plugin import PluginType, PluginDefinition, ProjectPlugin, PluginRef
-from .plugin_discovery_service import PluginDiscoveryService
-from .plugin.factory import plugin_factory
-from .config_service import ConfigService, PluginAlreadyAddedException
-
-
-class PluginNotSupportedException(Exception):
-    pass
+from .project_plugins_service import PluginAlreadyAddedException, ProjectPluginsService
 
 
 class MissingPluginException(Exception):
@@ -20,50 +16,35 @@ class MissingPluginException(Exception):
 
 
 class ProjectAddService:
-    def __init__(
-        self,
-        project: Project,
-        plugin_discovery_service: PluginDiscoveryService = None,
-        config_service: ConfigService = None,
-    ):
+    def __init__(self, project: Project, plugins_service: ProjectPluginsService = None):
         self.project = project
-        self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
-            project
+        self.plugins_service = plugins_service or ProjectPluginsService(project)
+
+    def add(self, plugin_type: PluginType, plugin_name: str, **attrs) -> ProjectPlugin:
+        """Add plugin to project."""
+        plugin = ProjectPlugin(
+            plugin_type, plugin_name, **attrs, default_variant=Variant.DEFAULT_NAME
         )
-        self.config_service = config_service or ConfigService(project)
 
-    def add(self, *args, **kwargs) -> ProjectPlugin:
-        plugin_def = self.discovery_service.find_definition(*args, **kwargs)
-        return self.add_definition(plugin_def)
+        self.plugins_service.ensure_parent(plugin)
 
-    def add_definition(self, plugin_def: PluginDefinition, **kwargs) -> ProjectPlugin:
-        plugin = plugin_def.in_project(**kwargs)
-        return self.config_service.add_to_file(plugin)
+        # If we are inheriting from a base plugin definition,
+        # repeat the variant and pip_url in meltano.yml
+        parent = plugin.parent
+        if isinstance(parent, BasePlugin):
+            plugin.variant = parent.variant
+            plugin.pip_url = parent.pip_url
 
-    def add_related(
-        self,
-        target_plugin: ProjectPlugin,
-        plugin_types: List[PluginType] = list(PluginType),
-    ):
-        try:
-            plugin_types.remove(target_plugin.type)
-        except ValueError:
-            pass
+        return self.add_plugin(plugin)
 
-        related_plugin_refs = []
+    def add_plugin(self, plugin: ProjectPlugin):
+        return self.plugins_service.add_to_file(plugin)
 
-        runner_ref = target_plugin.runner
-        if runner_ref:
-            related_plugin_refs.append(runner_ref)
-
-        plugin_def = self.discovery_service.get_definition(target_plugin)
-        related_plugin_refs.extend(
-            related_plugin_def
-            for plugin_type in plugin_types
-            for related_plugin_def in self.discovery_service.get_plugins_of_type(
-                plugin_type
+    def add_related(self, *args, **kwargs):
+        related_plugin_refs = (
+            self.plugins_service.discovery_service.find_related_plugin_refs(
+                *args, **kwargs
             )
-            if related_plugin_def.namespace == plugin_def.namespace
         )
 
         added_plugins = []
@@ -78,7 +59,7 @@ class ProjectAddService:
         added_plugins_with_related = []
         for plugin in added_plugins:
             added_plugins_with_related.extend(
-                [plugin, *self.add_related(plugin, plugin_types=plugin_types)]
+                [plugin, *self.add_related(plugin, **kwargs)]
             )
 
         return added_plugins_with_related
