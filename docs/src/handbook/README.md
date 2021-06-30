@@ -6,7 +6,10 @@ sidebarDepth: 2
 
 The Meltano team handbook is the central repository for how the team functions and builds the product.
 
-As Meltano is part of [GitLab](https://about.gitlab.com/), those parts of the [GitLab team handbook](https://about.gitlab.com/handbook/) that are not specific to the GitLab product can be assumed to also apply to Meltano.
+As Meltano was incubated in [GitLab](https://about.gitlab.com/) and later [spun out](https://meltano.com/blog/2021/06/30/meltano-spins-out-of-gitlab-raises-seed-round),
+many of our policies and processes are inspired by (if not outright copied from) theirs.
+If a topic isn't covered here yet, the corresponding part of GitLab's handbook can generally be assumed to apply,
+but we should explicitly move things over to our own handbook so that we can adapt things to be more appropriate for our size and unique culture.
 
 ## Subresources
 

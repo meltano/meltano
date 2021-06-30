@@ -262,11 +262,11 @@ To learn more about contributing to Meltano, refer to the [Contributor Guide](/d
 
 ## History
 
-Meltano, originally called BizOps, was founded inside [GitLab](https://about.gitlab.com/) [in 2018](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) to serve the GitLab Data Team. It is maintained primarily by [the Meltano team](https://about.gitlab.com/handbook/meltano/) at GitLab, which continues to sponsor its development.
+Meltano was [founded](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) inside [GitLab](https://about.gitlab.com/) in 2018 to serve the GitLab Data Team.
 
-To learn more about Meltano's history from 2018 through 2020, read the following blog post: [Revisiting the Meltano strategy: a return to our roots](https://meltano.com/blog/2020/05/13/revisiting-the-meltano-strategy-a-return-to-our-roots/).
+In 2020, the project [pivoted](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/) to focus on open source data integration (ELT).
 
-In the first half of 2021, the team grew to include AJ Steers and Taylor Murphy who are leading the Engineering and Product/Data organizations respectively. The 3-person team was able to launch the [SDK for Taps](https://meltano.com/blog/2021/04/05/meltano-launches-v0-1-0-of-the-singer-tap-sdk/), [MeltanoHub](https://meltano.com/blog/2021/06/01/meltanohub-for-singer-launches-with-over-200-taps-and-targets/), and the SDK for Targets while also growing the [Slack community to over 1000 people](https://meltano.com/blog/2021/04/23/community-milestone-1000-slack-members/).
+In 2021, Meltano [spun out](https://meltano.com/blog/2021/06/30/meltano-spins-out-of-gitlab-raises-seed-round) of GitLab and raised a Seed funding round to become an independent startup and bring the benefits of open source data integration and DataOps to a wider audience.
 
 ## Team
 
