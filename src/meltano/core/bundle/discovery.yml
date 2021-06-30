@@ -673,7 +673,6 @@ extractors:
     namepsace: tap_github
     variants:
       - name: singer-io
-        maintenance_status: Active
         docs: https://hub.meltano.com/extractors/github
         pip_url: git+https://github.com/singer-io/tap-github.git
         repo: https://github.com/singer-io/tap-github
@@ -759,7 +758,6 @@ extractors:
     variants:
     - name: singer-io
       docs: https://hub.meltano.com/extractors/google-sheets
-      maintenance_status: Active
       pip_url: git+https://github.com/singer-io/tap-google-sheets.git
       repo: https://github.com/singer-io/tap-google-sheets
       capabilities:
@@ -802,7 +800,6 @@ extractors:
     namespace: tap_hubspot
     variants:
       - name: singer-io
-        maintenance_status: Active
         docs: https://hub.meltano.com/extractors/hubspot
         pip_url: git+https://github.com/singer-io/tap-hubspot.git
         repo: https://github.com/singer-io/tap-hubspot
@@ -889,7 +886,6 @@ extractors:
     variants:
     - name: singer-io
       docs: https://hub.meltano.com/extractors/jira
-      maintenance_status: Acive
       pip_url: git+https://github.com/singer-io/tap-jira.git
       repo: https://github.com/singer-io/tap-jira
       capabilities:
@@ -1041,7 +1037,6 @@ extractors:
     namespace: tap_pendo
     variants:
     - name: singer-io
-      maintenance_status: Active
       docs: https://hub.meltano.com/extractors/pendo
       pip_url: git+https://github.com/singer-io/tap-pendo.git
       repo: https://github.com/singer-io/tap-pendo
@@ -1411,7 +1406,6 @@ extractors:
     namepsace: tap_twilio
     variants:
     - name: transferwise
-      maintenance_status: Active
       docs: https://hub.meltano.com/extractors/twilio
       pip_url: git+https://github.com/transferwise/pipelinewise-tap-twilio.git
       repo: https://github.com/transferwise/pipelinewise-tap-twilio
