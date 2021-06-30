@@ -74,7 +74,7 @@ This is not an exhaustive list and we encourage you to join the <SlackChannelLin
 Meltano:
 
 * #contributing - if you want to contribute to Meltano itself
-* #hub - all about the [upcoming MeltanoHub](https://gitlab.com/groups/meltano/-/epics/83)
+* #hub - all about [MeltanoHub](https://hub.meltano.com)
 * #plugins-dbt - all things [dbt](https://meltano.com/docs/transforms.html)
 * #plugins-general - discussion for any other plugins
 

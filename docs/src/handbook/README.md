@@ -36,21 +36,7 @@ As documented in our [Responsible Disclosure Policy](/docs/responsible-disclosur
 The [Meltano.com website](https://www.meltano.com) is set up with live chat powered by Intercom.
 Team members have their own accounts and master account login info can be found in 1Password.
 
-## 1Password
-
-We have three vaults in GitLab's 1Password account:
-
-- Meltano: Credentials for services, typically registered to `hello@meltano.com`
-- Meltano Test Data: Test data for sources
-- MeltanoData.com: Credentials for VMs we created on DigitalOcean for MeltanoData.com users
-
 ## Calendars
-
-We have email addresses and Google Calendar accounts both under `@gitlab.com` and `@meltano.com`,
-but prefer to use the latter for Meltano-specific meetings.
-
-If team members should show up as busy on their GitLab calendars during these slots to prevent other meetings from being planned over them,
-these accounts can be invited to the event _in addition to_ the Meltano accounts.
 
 Shared calendars and meetings:
 - [Community Meetings](https://calendar.google.com/calendar/u/1?cid=Y18wMWNqNDhoYTRoMTk5Y3RqZWZpODV0OWRnY0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t): Meetings open to the community
@@ -58,6 +44,7 @@ Shared calendars and meetings:
   - [Demo Day](/handbook/engineering/#demo-day): Weekly on Friday, owned by Taylor
 - Team Meetings: Meetings with the team
   - Kick off: Weekly on Monday, owned by Douwe
+- External Meetings: Meetings with users and partners
 - Time Off: All-day events for periods team members will not be working
 
 ## Trademarks
