@@ -913,7 +913,7 @@ extractors:
           description: The client secret value used for OAuth authentication.
         - name: oauth_client_id
           label: OAuth Client ID
-          kind: The client ID used for OAuth authentication.
+          description: The client ID used for OAuth authentication.
         - name: access_token
           label: Access Token
           kind: password
