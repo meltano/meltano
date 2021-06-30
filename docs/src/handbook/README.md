@@ -59,6 +59,6 @@ Shared calendars and meetings:
 
 ## Trademarks
 
-Meltano is a registered trademark of GitLab B.V. in the USA and China.
+Meltano is a registered trademark in the USA and China.
 
 Further details, such as the registration number and certificate, can be found in the "Meltano" 1Password vault.
