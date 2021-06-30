@@ -1,7 +1,5 @@
 <template>
   <div>
-    <Content class="intro" slot-key="intro" />
-
     <ul class="members">
       <li v-for="member in members" :key="member.name">
         <img :src="`https://secure.gravatar.com/avatar/${member.gravatar_hash}?s=240&d=identicon`" class="avatar" />
@@ -33,7 +31,26 @@
         </ul>
       </li>
 
-      <!-- TODO: You? -->
+      <li v-for="opening in openings" :key="opening.title" class="opening">
+        <img src="/android-chrome-512x512.png" class="avatar" />
+
+        <h2>Possibly You</h2>
+        <small>Anywhere, Remote 🌍</small>
+
+        <strong>{{opening.title}}</strong>
+
+        <p v-if="opening.description">
+          {{opening.description}}
+        </p>
+
+        <ul class="social">
+          <li class="email">
+            <a href="mailto:hello@meltano.com">
+              ✉️ Email us!
+            </a>
+          </li>
+        </ul>
+      </li>
     </ul>
   </div>
 </template>
@@ -45,7 +62,13 @@ export default {
   props: {
     members: {
       type: Array,
-      required: true
+      required: false,
+      default: () => []
+    },
+    openings: {
+      type: Array,
+      required: false,
+      default: () => []
     }
   },
 };
@@ -56,7 +79,8 @@ export default {
   text-align center
 
 ul.members
-  padding: 1.5rem 0
+  margin 1.5rem 0
+  padding 0
   line-height inherit
   display grid
   grid-template-columns repeat(auto-fit, minmax(150px, 1fr))
@@ -86,10 +110,10 @@ ul.members
       margin 0
       border none
 
-    small
+    small, p
       font-size 0.9em
 
-    strong
+    strong, p
       margin: 1rem auto
 
     ul.social
@@ -98,4 +122,10 @@ ul.members
       > li
         list-style: none
         display: inline-block
+
+    &.opening
+      img.avatar
+        padding 10px
+        width 100px
+        height 100px
 </style>
