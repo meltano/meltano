@@ -3,7 +3,7 @@ description: Learn where to use Meltano, how Meltano is built, and where to get 
 
 members:
 - name: Douwe Maan
-  title: General Manager
+  title: Founder, CEO
   location: Mexico City, Mexico 🇲🇽
   gravatar_hash: 73d1548ae618321220679b3a4fda7fb1 # md5(email)
   social:
@@ -26,6 +26,55 @@ members:
     gitlab: aaronsteers
     twitter: aaronsteers
     linkedin: aaronsteers
+- name: Emily Kyle
+  title: Director of Marketing
+  location: Austin, TX, USA 🇺🇸
+  gravatar_hash: ad3bd918d010568b6ce9c5a6a08f0086
+  social:
+    gitlab: Emily
+    twitter: emilylucie
+    linkedin: emilylucie
+- name: Amanda Folson
+  title: Developer Relations Manager
+  location: Land o' Lakes, FL, USA 🇺🇸
+  gravatar_hash: fe416b883fb81a12313becdf9a29692c
+  social:
+    gitlab: afolson
+    twitter: AmbassadorAwsum
+    linkedin: violins
+- name: Edgar Ramírez Mondragón
+  title: Senior Software Engineer
+  location: Mexico City, Mexico 🇲🇽
+  start_date: July 5, 2021
+  gravatar_hash: a89b7e5a5d6ea347878ea4042ae31dff
+  social:
+    gitlab: edgarrmondragon
+    twitter: cofonlafaefe
+    linkedin: edgarrmondragon
+- name: Florian Hines
+  title: Staff Software Engineer
+  location: San Antonio, TX, USA 🇺🇸
+  start_date: July 12, 2021
+  gravatar_hash: 88529f59d3f298bcc9e2a705dc1f1c68
+  social:
+    gitlab: pandemicsyn
+    twitter: pandemicsyn
+    linkedin: florianhines
+- name: Ken Payne
+  title: Software Engineer
+  location: London, UK 🇬🇧
+  start_date: August 23, 2021
+  gravatar_hash: 778b432070eba884662a752b184dac7b
+  social:
+    gitlab: kgpayne
+    linkedin: k-g-payne
+openings:
+- title: Backend Engineer
+  description: "Required: Python and data experience"
+- title: Frontend Engineer / UX Designer Hybrid
+  description: "Nice to have: Vue.js experience"
+- title: Data Engineer / Analyst Hybrid
+- title: Executive Assistant
 ---
 
 # Introduction
@@ -37,7 +86,7 @@ members:
 [debuggable](/docs/command-line-interface.html#debugging), and
 [extensible](/docs/plugins.html).
 
-This page covers the project's [Mission](#mission), [Focus](#focus), [Roadmap](#roadmap), and [History](#history).
+This page covers the project's [Mission](#mission), [Focus](#focus), [Roadmap](#roadmap), [History](#history), and [Team](#team).
 
 To find guides and references on other topics, use the Table of Contents in the sidebar.
 
@@ -213,14 +262,24 @@ To learn more about contributing to Meltano, refer to the [Contributor Guide](/d
 
 ## History
 
-Meltano, originally called BizOps, was founded inside [GitLab](https://about.gitlab.com/) [in 2018](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) to serve the GitLab Data Team. It is maintained primarily by [the Meltano team](https://about.gitlab.com/handbook/meltano/) at GitLab, which continues to sponsor its development.
+Meltano was [founded](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) inside [GitLab](https://about.gitlab.com/) in 2018 to serve the GitLab Data Team.
 
-To learn more about Meltano's history from 2018 through 2020, read the following blog post: [Revisiting the Meltano strategy: a return to our roots](https://meltano.com/blog/2020/05/13/revisiting-the-meltano-strategy-a-return-to-our-roots/).
+In 2020, the project [pivoted](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/) to focus on open source data integration (ELT).
 
-In the first half of 2021, the team grew to include AJ Steers and Taylor Murphy who are leading the Engineering and Product/Data organizations respectively. The 3-person team was able to launch the [SDK for Taps](https://meltano.com/blog/2021/04/05/meltano-launches-v0-1-0-of-the-singer-tap-sdk/), [MeltanoHub](https://meltano.com/blog/2021/06/01/meltanohub-for-singer-launches-with-over-200-taps-and-targets/), and the SDK for Targets while also growing the [Slack community to over 1000 people](https://meltano.com/blog/2021/04/23/community-milestone-1000-slack-members/).
+In 2021, Meltano [spun out](https://meltano.com/blog/2021/06/30/meltano-spins-out-of-gitlab-raises-seed-round) of GitLab and raised a Seed funding round to become an independent startup and bring the benefits of open source data integration and DataOps to a wider audience.
 
 ## Team
 
 Meltano is built by an all-remote team of {{$frontmatter.members.length}} and a [community](/docs/community.html) of [contributors](/docs/contributor-guide.html).
+If you'd like to join the team, check out the [job openings](#job-openings)!
 
 <TeamGrid :members="$frontmatter.members" />
+
+### Job Openings
+
+The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future!
+
+If our [mission](#mission) excites you and you think could make a great addition to the team in one of the following roles, we'd love to talk to you.
+Please send a cover letter and resume to [hello@meltano.com](mailto:hello@meltano.com) and you'll hear back from us shortly.
+
+<TeamGrid :openings="$frontmatter.openings" />
