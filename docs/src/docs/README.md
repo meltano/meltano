@@ -73,7 +73,8 @@ openings:
   description: "Required: Python and data experience"
 - title: Frontend Engineer / UX Designer Hybrid
   description: "Nice to have: Vue.js experience"
-- title: Data Engineer / Analyst Hybrid
+- title: Senior Data Lead
+  description: "Required: Data Engineer/Analyst and SQL/Python experience" 
 - title: Executive Assistant
 ---
 
