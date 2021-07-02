@@ -71,9 +71,10 @@ members:
 openings:
 - title: Backend Engineer
   description: "Required: Python and data experience"
-- title: Frontend Engineer / UX Designer Hybrid
+- title: Senior Frontend Engineer / UX Designer Hybrid
   description: "Nice to have: Vue.js experience"
-- title: Data Engineer / Analyst Hybrid
+- title: Senior Data Engineer / Analyst
+  description: "Required: SQL & Python experience" 
 - title: Executive Assistant
 ---
 
