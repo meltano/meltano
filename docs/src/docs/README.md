@@ -3,7 +3,7 @@ description: Learn where to use Meltano, how Meltano is built, and where to get 
 
 members:
 - name: Douwe Maan
-  title: Founder, CEO
+  title: Founder & CEO
   location: Mexico City, Mexico 🇲🇽
   gravatar_hash: 73d1548ae618321220679b3a4fda7fb1 # md5(email)
   social:
@@ -74,7 +74,7 @@ openings:
 - title: Senior Frontend Engineer / UX Designer Hybrid
   description: "Nice to have: Vue.js experience"
 - title: Senior Data Engineer / Analyst
-  description: "Required: SQL & Python experience" 
+  description: "Required: SQL & Python experience"
 - title: Executive Assistant
 ---
 
@@ -272,15 +272,15 @@ In 2021, Meltano [spun out](https://meltano.com/blog/2021/06/30/meltano-spins-ou
 ## Team
 
 Meltano is built by an all-remote team of {{$frontmatter.members.length}} and a [community](/docs/community.html) of [contributors](/docs/contributor-guide.html).
-If you'd like to join the team, check out the [job openings](#job-openings)!
+If you'd like to join the team, check out the [career opportunities](#careers) below!
 
 <TeamGrid :members="$frontmatter.members" />
 
-### Job Openings
+## Careers <a name="job-openings" />
 
 The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future!
 
-If our [mission](#mission) excites you and you think could make a great addition to the team in one of the following roles, we'd love to talk to you.
+If our [mission](#mission) excites you, and you think could make a great addition to the team in one of the following roles, we'd love to talk to you.
 Please send a cover letter and resume to [hello@meltano.com](mailto:hello@meltano.com) and you'll hear back from us shortly.
 
 <TeamGrid :openings="$frontmatter.openings" />
