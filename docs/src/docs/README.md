@@ -43,16 +43,15 @@ members:
     twitter: AmbassadorAwsum
     linkedin: violins
 - name: Edgar Ramírez Mondragón
-  title: Senior Software Engineer
+  title: Senior Backend Engineer
   location: Mexico City, Mexico 🇲🇽
-  start_date: July 5, 2021
   gravatar_hash: a89b7e5a5d6ea347878ea4042ae31dff
   social:
     gitlab: edgarrmondragon
     twitter: cofonlafaefe
     linkedin: edgarrmondragon
 - name: Florian Hines
-  title: Staff Software Engineer
+  title: Staff Backend Engineer
   location: San Antonio, TX, USA 🇺🇸
   start_date: July 12, 2021
   gravatar_hash: 88529f59d3f298bcc9e2a705dc1f1c68
@@ -61,7 +60,7 @@ members:
     twitter: pandemicsyn
     linkedin: florianhines
 - name: Ken Payne
-  title: Software Engineer
+  title: Backend Engineer
   location: London, UK 🇬🇧
   start_date: August 23, 2021
   gravatar_hash: 778b432070eba884662a752b184dac7b
@@ -69,13 +68,13 @@ members:
     gitlab: kgpayne
     linkedin: k-g-payne
 openings:
-- title: Backend Engineer
-  description: "Required: Python and data experience"
+- title: Senior Backend Engineer
+  description: "Required: Python & data experience"
 - title: Senior Frontend Engineer / UX Designer Hybrid
   description: "Nice to have: Vue.js experience"
 - title: Senior Data Engineer / Analyst
   description: "Required: SQL & Python experience"
-- title: Executive Assistant
+- title: Office Manager
 ---
 
 # Introduction
