@@ -69,8 +69,8 @@ members:
     gitlab: kgpayne
     linkedin: k-g-payne
 openings:
-- title: Backend Engineer
-  description: "Required: Python and data experience"
+- title: Senior Backend Engineer
+  description: "Required: Python & data experience"
 - title: Senior Frontend Engineer / UX Designer Hybrid
   description: "Nice to have: Vue.js experience"
 - title: Senior Data Engineer / Analyst
