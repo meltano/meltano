@@ -4,7 +4,7 @@
       <li v-for="member in members" :key="member.name">
         <img :src="`https://secure.gravatar.com/avatar/${member.gravatar_hash}?s=240&d=identicon`" class="avatar" />
 
-        <h2>{{member.name}}</h2>
+        <h3>{{member.name}}</h3>
         <small>{{member.location}}</small>
         <small v-if="member.start_date">Starts {{member.start_date}}</small>
 
@@ -34,7 +34,7 @@
       <li v-for="opening in openings" :key="opening.title" class="opening">
         <img src="/android-chrome-512x512.png" class="avatar" />
 
-        <h2>Possibly You</h2>
+        <h3>Possibly You</h3>
         <small>Anywhere, Remote 🌍</small>
 
         <strong>{{opening.title}}</strong>
@@ -104,7 +104,7 @@ ul.members
       border-radius 120px
       margin-bottom .5rem
 
-    h2
+    h3
       font-size 1.3em
       padding 0
       margin 0
