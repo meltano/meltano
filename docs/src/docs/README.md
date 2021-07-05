@@ -45,7 +45,6 @@ members:
 - name: Edgar Ramírez Mondragón
   title: Senior Backend Engineer
   location: Mexico City, Mexico 🇲🇽
-  start_date: July 5, 2021
   gravatar_hash: a89b7e5a5d6ea347878ea4042ae31dff
   social:
     gitlab: edgarrmondragon
