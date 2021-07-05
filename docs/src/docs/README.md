@@ -75,7 +75,7 @@ openings:
   description: "Nice to have: Vue.js experience"
 - title: Senior Data Engineer / Analyst
   description: "Required: SQL & Python experience"
-- title: Executive Assistant
+- title: Office Manager
 ---
 
 # Introduction
