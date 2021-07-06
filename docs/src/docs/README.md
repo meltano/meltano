@@ -70,7 +70,7 @@ members:
 openings:
 - title: Senior Backend Engineer
   description: "Required: Python & data experience"
-- title: Senior Frontend Engineer / UX Designer Hybrid
+- title: Senior Frontend Engineer & UI/UX Designer
   description: "Nice to have: Vue.js experience"
 - title: Senior Data Engineer / Analyst
   description: "Required: SQL & Python experience"
