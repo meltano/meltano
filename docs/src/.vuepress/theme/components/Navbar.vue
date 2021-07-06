@@ -23,12 +23,19 @@ export default {
 <style lang="stylus">
 .navbar
   top $bannerHeight
-  .logo
-    height 2.3rem !important
-    margin-top -0.1em
 
-  .site-name
-    display none
+  a.home-link
+    position relative
+
+    .logo
+      height 2.3rem !important
+      margin-top -0.1em
+
+    .site-name
+      position absolute
+      left 0
+      width 130px // width of logo
+      font-size 0
 
 .theme-container.no-navbar
   .navbar
