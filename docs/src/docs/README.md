@@ -74,7 +74,8 @@ openings:
   description: "Nice to have: Vue.js experience"
 - title: Senior Data Engineer / Analyst
   description: "Required: SQL & Python experience"
-- title: Office Manager
+- title: Remote Office Manager
+  description: "Oversee and assist team with administrative and PeopleOps matters"
 ---
 
 # Introduction
