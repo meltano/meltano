@@ -10,6 +10,7 @@ sidebarDepth: 2
 
 Every open issue should have a [milestone](https://gitlab.com/groups/meltano/-/milestones).
 If something we want to happen eventually is not a priority yet, use `Backlog`.
+If there is an issue we want to start prioritizing, there is a `Staging` milestone which can be used to alert the Product Lead that this is something we'd like to move into an upcoming milestone. 
 If we don't want it to happen, close the issue.
 
 Once an issue becomes a priority, set a sprint milestone (identified by the Friday of the week in question),
@@ -17,7 +18,19 @@ even if it's still weeks away and may end up being moved.
 
 New sprint milestones are created about 6 weeks in advance as part of preparation for the weekly kickoff meeting.
 
+#### End of Week Expectations
+
+By the end of day Friday, or the last day of their work week, engineers are expected to:
+
+* Add comment to issues that are started but not completed
+* Update the flow label to reflect an accurate status
+* Close any completed items
+
+This is in preparation for the Product milestone review and Wee[kly Kickoff](handbook/product/#weekly-kickoff) on Monday.
+
 ### Labels
+
+#### Flow Labels
 
 Every open issue _with a sprint milestone_ should have a `flow` label:
 
@@ -27,12 +40,54 @@ Every open issue _with a sprint milestone_ should have a `flow` label:
 - `flow::Blocked`: Blocked by some other issue
 - `flow::Review`: Currently in review
 
-When possible, an issue should have a label indicating its type:
-- `Bug`
-- `Feature Request`
-- `Discussion`
-- `Exploration`
-- `Community Support`
+#### Priority Labels
+
+We have 4 priority labels:
+
+- `priority::low`
+- `priority::high`
+- `priority::higher`
+- `priority::highest`
+
+Items marked as `priority::low` that are in a milestone have a ~75% chance of being completed within a milestone. 
+If an issue of this type is moved to another milestone because it was not completed, the priority should most likely be increased.
+
+If there is an issue of particular interest, add the `priority::high` label to it and leave a comment tagging Taylor with a note explaining why you believe it's a high priority.
+
+#### Kind Labels
+
+All issues should have a label indicating its kind:
+
+- `kind::Bug`
+- `kind::Feature`
+- `kind::Tech Debt`
+- `kind::Risk` 
+
+These kinds map onto the [Flow Framework](https://flowframework.org/) items of Feature, Defect, Debt, and Risk. 
+These are meant to be mutually exclusive and collectively exhaustive, meaning an issue will have 1 and only 1 of these labels. 
+There is a fifth label available for filtering purposes: `kind::Non-Product` which is used for administrative and business-related issues.
+
+It is the responsibility of the Product team to add this label, but Engineers are welcome to add it as well.
+
+#### Value Stream Labels
+
+All issues should have a label indicating its value stream:
+
+- `valuestream::Meltano`
+- `valuestream::Hub`
+- `valuestream::SDK`
+- `valuestream::Academy`
+- `valuestream::Ecosystem` - This is a bit of a catchall for general "community" type work that benefits the Meltano and Singer communities but does not neatly fit into another value stream. 
+
+These map to our "product lines" and are used to understand allocation of work across the value streams.
+There is an additional label for filtering purposes: `valuestream::BusinessOperation` which is used for administrative and business-related issues.
+
+These value streams are inspired by the [Flow Framework](https://flowframework.org/) and are useful for understanding every bit of work that goes into the products that deliver value for users and, eventually, customers.
+
+It is the responsibility of the Product team to add this label, but Engineers are welcome to add it as well.
+
+
+#### Meltano Area Labels
 
 If appropriate, an issue should have a stage label (one of the letters in "meltano"):
 - `Model`
@@ -43,12 +98,14 @@ If appropriate, an issue should have a stage label (one of the letters in "melta
 - `Notebook` (currently unused)
 - `Orchestrate`
 
-Singer related labels:
-- `Singer Ecosystem` for general Singer related issues
-- `MeltanoHub - Singer`
-- `Singer SDK`
+The value of these labels is under discussion as forcing them to fit the Meltano acronym may not be optimal. 
+We want a way to indicate the part of Meltano specifically that the work applies to, such as transformation, integration, etc.
 
-Other labels:
+#### Other Labels
+
+- `Discussion` for issues that require more discussion
+- `Exploration`
+- `Community Support`
 - `CLI` or `UI` for issues specifically concerning the CLI or UI
 - `Documentation` for new or updated documentation
 - `Accepting Merge Requests` for issues that are ready to be picked up by a community contributor
@@ -77,50 +134,11 @@ we will update this section and the [Contributor Guide](/docs/contributor-guide.
 and reviewers will learn new things to look out for until they catch (almost) everything the expert would,
 at which points they will be experts themselves.
 
-## Triage process
-
-::: warning
-This process is not currently in use. It will be updated when we adopt a new process appropriate for the current team.
-:::
-
-The `flow::Triage` label is used on issues that need product/prioritization triage by the Product Manager (Danielle), or engineering/assignment triage by the Engineering Lead (Douwe).
-After they've been triaged, they'll have a milestone (other than `Backlog`), an assignee, and the `flow::To Do` label.
-
-If you come across something that needs fixing:
-
-1. Create an issue describing the problem.
-2. If it's not obvious, justify how it relates to our persona and how it contributes to MAUI.
-3. Then:
-
-    - If it's more urgent (has a higher impact on MAUI) than other things you've been assigned, assign it to yourself to work on later the same week:
-
-      ```md
-      /milestone %<current milestone>
-      /label ~"flow::To Do"
-      /reassign @<yourself>
-      /cc @DouweM
-      ```
-
-    - If it's urgent, but you're not sure who should work on it, assign it to Douwe to triage:
-
-      ```md
-      /milestone %<current milestone>
-      /label ~"flow::Triage"
-      /reassign @DouweM
-      ```
-
-    - If it's _not_ urgent or you're unsure whether it's something we should do at all, assign it to Danielle to triage:
-
-      ```md
-      /milestone %“Backlog" or %<next milestone>
-      /label ~"flow::Triage"
-      /reassign @dmor
-      ```
 
 ## Useful issue boards
 
 - [Development Flow](https://gitlab.com/groups/meltano/-/boards/536761), with a column for each `flow::` label. Don't forget to filter by milestone, and/or assignee!
-- [Team Assignments](https://gitlab.com/groups/meltano/-/boards/1402405), with a column for each team member. Don't forget to filter by milestone!
+
 
 ## Release Process
 
