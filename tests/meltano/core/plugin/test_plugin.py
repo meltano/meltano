@@ -3,7 +3,7 @@ from unittest import mock
 import pytest
 from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType, Variant
 from meltano.core.plugin.project_plugin import CyclicInheritanceError, ProjectPlugin
-from meltano.core.setting_definition import SettingDefinition
+from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.utils import find_named
 
 
@@ -180,22 +180,22 @@ class TestBasePlugin:
 
     def test_extra_settings(self, subject):
         subject.EXTRA_SETTINGS = [
-            SettingDefinition(name="_foo", kind="password", value="default"),
-            SettingDefinition(name="_bar", kind="integer", value=0),
+            SettingDefinition(name="_foo", kind=SettingKind.PASSWORD, value="default"),
+            SettingDefinition(name="_bar", kind=SettingKind.INTEGER, value=0),
         ]
         settings = subject.extra_settings
 
         # Known, overwritten in plugin/variant definition
         foo_setting = find_named(settings, "_foo")
         assert foo_setting
-        assert foo_setting.kind == "password"
+        assert foo_setting.kind == SettingKind.PASSWORD
         assert foo_setting.value == "bar"
         assert not foo_setting.is_custom
 
         # Known, not overwritten
         bar_setting = find_named(settings, "_bar")
         assert bar_setting
-        assert bar_setting.kind == "integer"
+        assert bar_setting.kind == SettingKind.INTEGER
         assert bar_setting.value == 0
         assert not bar_setting.is_custom
 
@@ -399,6 +399,25 @@ class TestProjectPlugin:
 
         assert plugin.variant == base_plugin.variant == "meltano"
 
+    def test_command_inheritance(self, tap, inherited_tap, plugin_discovery_service):
+        # variants
+        assert tap.all_commands["cmd"].args == "cmd meltano"
+        assert tap.all_commands["cmd"].description == "a description of cmd"
+
+        assert tap.all_commands["cmd-variant"].args == "cmd-variant meltano"
+        assert tap.all_commands["cmd-variant"].description is None
+        assert tap.supported_commands == ["cmd", "cmd-variant"]
+
+        # inheritance
+        assert inherited_tap.all_commands["cmd"].args == "cmd inherited"
+        assert inherited_tap.all_commands["cmd-variant"].args == "cmd-variant meltano"
+        assert inherited_tap.all_commands["cmd-inherited"].args == "cmd-inherited"
+        assert inherited_tap.supported_commands == [
+            "cmd",
+            "cmd-variant",
+            "cmd-inherited",
+        ]
+
     def testenv_prefixes(self, inherited_tap, tap):
         assert tap.env_prefixes() == ["tap-mock", "tap_mock"]
         assert tap.env_prefixes(for_writing=True) == [
@@ -451,7 +470,7 @@ class TestProjectPlugin:
         # Custom settings
         assert "custom" in settings_by_name
         assert "nested.custom" in settings_by_name
-        assert settings_by_name["nested.custom"].kind == "boolean"
+        assert settings_by_name["nested.custom"].kind == SettingKind.BOOLEAN
 
     def test_extra_settings(self, tap):
         tap.extras["custom"] = "from_meltano_yml"
@@ -466,7 +485,7 @@ class TestProjectPlugin:
         # Custom extras
         assert "_custom" in settings_by_name
         assert "_nested.custom" in settings_by_name
-        assert settings_by_name["_nested.custom"].kind == "boolean"
+        assert settings_by_name["_nested.custom"].kind == SettingKind.BOOLEAN
 
 
 class TestPluginType:

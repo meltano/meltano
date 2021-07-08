@@ -116,12 +116,13 @@ def install_batch():
     related_plugins.reverse()
 
     install_service = PluginInstallService(project, plugins_service=plugins_service)
-    install_status = install_service.install_plugins(
+    install_results = install_service.install_plugins(
         related_plugins, reason=PluginInstallReason.ADD
     )
 
-    for error in install_status["errors"]:
-        raise PluginInstallError(error["message"])
+    for result in install_results:
+        if not result.sucessful:
+            raise PluginInstallError(result.message)
 
     return jsonify([plugin.canonical() for plugin in related_plugins])
 

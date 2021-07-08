@@ -3,9 +3,15 @@ sidebar: auto
 description: Use Meltano to pull data from the Zoom API and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/zoom)
+:::
+
 # Zoom
 
-The `tap-zoom` [extractor](/plugins/extractors/) pulls data from the [Zoom API](https://marketplace.zoom.us/docs/api-reference/introduction).
+The `tap-zoom` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Zoom API](https://marketplace.zoom.us/docs/api-reference/introduction).
 
 - **Repository**: <https://github.com/Mashey/tap-zoom>
 - **Maintainer**: [Mashey](https://www.mashey.com/)

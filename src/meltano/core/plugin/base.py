@@ -3,15 +3,16 @@ import fnmatch
 import logging
 import re
 from collections import namedtuple
-from enum import Enum
 from typing import Dict, Iterable, Optional, Union
 
 import yaml
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior.hookable import HookObject
-from meltano.core.setting_definition import SettingDefinition
+from meltano.core.setting_definition import SettingDefinition, YAMLEnum
 from meltano.core.utils import NotFound, compact, find_named, flatten
+
+from .command import Command
 
 logger = logging.getLogger(__name__)
 
@@ -28,15 +29,6 @@ class VariantNotFoundError(Exception):
             variant=self.variant_name,
             variant_labels=self.plugin.variant_labels,
         )
-
-
-class YAMLEnum(str, Enum):
-    def __str__(self):
-        return self.value
-
-    @staticmethod
-    def yaml_representer(dumper, obj):
-        return dumper.represent_scalar("tag:yaml.org,2002:str", str(obj))
 
 
 yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
@@ -144,6 +136,7 @@ class Variant(NameEq, Canonical):
         capabilities: Optional[list] = [],
         settings_group_validation: Optional[list] = [],
         settings: Optional[list] = [],
+        commands: Optional[dict] = None,
         **extras,
     ):
         super().__init__(
@@ -157,6 +150,7 @@ class Variant(NameEq, Canonical):
             capabilities=list(capabilities),
             settings_group_validation=list(settings_group_validation),
             settings=list(map(SettingDefinition.parse, settings)),
+            commands=Command.parse_all(commands),
             extras=extras,
         )
 
@@ -289,6 +283,11 @@ class BasePlugin(HookObject):
         return {**self._plugin_def.extras, **self._variant.extras}
 
     @property
+    def all_commands(self):
+        """Return a dictonary of supported commands."""
+        return self._variant.commands
+
+    @property
     def extra_settings(self):
         defaults = {f"_{k}": v for k, v in self.extras.items()}
 
@@ -318,7 +317,7 @@ class BasePlugin(HookObject):
         return self.pip_url is not None
 
     def is_invokable(self):
-        return self.is_installable()
+        return self.is_installable() or self.executable is not None
 
     def is_configurable(self):
         return True

@@ -35,6 +35,7 @@ const docsSidebar = [
       "/docs/command-line-interface",
       "/docs/settings",
       "/docs/architecture",
+      ["https://hub.meltano.com/singer/spec","Singer Spec"],
     ],
   },
   {
@@ -108,11 +109,15 @@ module.exports = {
         items: [
             {
                 text: "Sources",
-                link: "/plugins/extractors/",
+                link: "https://hub.meltano.com/extractors/",
             },
             {
                 text: "Destinations",
-                link: "/plugins/loaders/",
+                link: "https://hub.meltano.com/loaders/",
+            },
+            {
+                text: "Connector SDK",
+                link: "https://sdk.meltano.com/",
             },
         ]
       },
@@ -133,7 +138,7 @@ module.exports = {
             },
             {
                 text: "Slack",
-                link: "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw"
+                link: "https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q"
             },
             {
                 text: "Office Hours",
@@ -164,9 +169,9 @@ module.exports = {
       },
       { text: "Blog", link: "https://www.meltano.com/blog", target: "_self" },
       {
-        text: "Join 900+ on Slack",
+        text: "Join 1200+ on Slack",
         link:
-          "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw",
+          "https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q",
         icon: "SlackIcon",
       },
       {
@@ -215,7 +220,7 @@ module.exports = {
       digitalOceanUrl:
         "https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322",
       slackChannelUrl:
-        "https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw",
+        "https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q",
     },
     smoothScroll: true,
   },

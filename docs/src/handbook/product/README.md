@@ -6,6 +6,10 @@ sidebarDepth: 2
 
 Our [milestones and scheduled work](https://gitlab.com/groups/meltano/-/milestones) is available to the public, and we encourage anyone to [submit new issues](https://gitlab.com/meltano/meltano/issues/new).
 
+## High-level Responsibilities
+
+The Head of Product will review any [new issues](https://gitlab.com/groups/meltano/-/issues) in the Meltano group on a daily cadence and organize appropriately with labels and milestones.
+
 ## Choosing What to Work On
 
 We have limited engineering hours and focus available, and need to make sure we are working on things that will move Meltano forward towards our goal of increasing [MAUI](https://meltano.com/docs/roadmap.html#maui).
@@ -39,8 +43,33 @@ As an internal startup we are constrained by our team size and the hours in the 
 
 Sometimes, it can feel like we are chosing between two important things and this can be painful. However, we take the approach that anything is technically possible to build on the Meltano team so it's a just a question of the order of operations. On a long enough timeline, we will do everything we put on the roadmap -- so keep writing issues and hold onto that "it's an AND, not OR" mindset.
 
-## Relationship to GitLab Product Org
+## Weekly Kickoff
 
-Meltano operates independently within GitLab and is not part of the broader product organization. However, we learn quite a bit from [the approach of our teammates](https://about.gitlab.com/handbook/product/) and often adopt their processes. If you interact with our team and notice that Meltano Product functions differently, please know this is intentional.
+Every Monday we have a Kickoff call to highlight for the community what the priorities are for the week. Prior to the actual call, there are several work items to do.
 
-GitLab's team and proccesses are designed for a scaled up startup with product market fit, which is a significantly different context than that of Meltano. We look forward to getting there someday!
+### Friday - Last day of Milestone
+
+* Create a kickoff issue highlighting the general priority for the next week.
+  * Title: `Weekly Kickoff for Milestone - <milestone>`
+  * Due Date for the Monday of the milestone
+
+### Monday - Kickoff Day
+
+Before the Kickoff Call:
+
+* Review and roll community issues to the next milestone
+* Roll merge requests
+* Everyone on the team should roll their own issues to the next milestone. Take the time to review the current status of issues and align priorities with the kickoff issue.
+
+Kickoff Call:
+* Check-in with everyone
+* Highlights & lowlights from previous week
+* Confirm general priorities and do a soft review of boards
+* Review Metrics
+* Start livestream
+  * Talk about general priority
+  * Walk through issues
+
+After the Kickoff Call:
+* Close the previous milestone
+* Close Kickoff issue

@@ -10,11 +10,93 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2814](https://gitlab.com/meltano/meltano/-/issues/2814) Add `mashey` variant of `tap-ask-nicely`
+- [#2815](https://gitlab.com/meltano/meltano/-/issues/2815) Add `singer-io` variant of `tap-github`
+- [#2816](https://gitlab.com/meltano/meltano/-/issues/2816) Add `singer-io` variant of `tap-google-sheets`
+- [#2817](https://gitlab.com/meltano/meltano/-/issues/2817) Add `singer-io` variant of `tap-pendo`
+- [#2818](https://gitlab.com/meltano/meltano/-/issues/2818) Add `singer-io` variant of `tap-hubspot`
+- [#2821](https://gitlab.com/meltano/meltano/-/issues/2821) Add `singer-io` variant of `tap-jira`
+- [#2823](https://gitlab.com/meltano/meltano/-/issues/2823) Add `transferwise` variant of `tap-twilio`
+
 ### Changes
 
 ### Fixes
 
 ### Breaks
+
+
+## 1.77.0 - (2021-06-17)
+---
+
+### Changes
+
+- [#2694](https://gitlab.com/meltano/meltano/-/issues/2694) Use dbt [`v0.19.1`](https://github.com/fishtown-analytics/dbt/releases/tag/v0.19.1) by default for new dbt installs
+- [#2694](https://gitlab.com/meltano/meltano/-/issues/2694) Add support for dbt [`config-version: 2`](https://docs.getdbt.com/docs/guides/migration-guide/upgrading-to-0-17-0)
+- [#2622](https://gitlab.com/meltano/meltano/-/issues/2622) Make `hotgluexyz` the default variant for the CSV loader
+
+### Fixes
+
+- [#2741](https://gitlab.com/meltano/meltano/-/issues/2741) Fix duplication of config values when complex settings are applied to Singer plugins.
+
+
+## 1.76.0 - (2021-06-10)
+---
+
+### Fixes
+
+- [#2755](https://gitlab.com/meltano/meltano/-/issues/2755) Fix SQLAlchemy `cache_ok` warning messages when running `meltano elt`
+- [#2773](https://gitlab.com/meltano/meltano/-/issues/2773) Fix `tap-chargebee`, `tap-intacct` and `tap-quickbooks` definitions that had `properties` capability instead of `catalog`
+- [#2784](https://gitlab.com/meltano/meltano/-/issues/2784) Fix catalog discovery error when using custom plugins with no `pip_url` set
+
+
+## 1.75.0 - (2021-05-28)
+---
+
+### Changes
+
+- [#2745](https://gitlab.com/meltano/meltano/-/issues/2745) Allow `meltano` commands to be used from a subdirectory of a project
+- [#2341](https://gitlab.com/meltano/meltano/-/issues/2341) Add support for already-installed plugins by making `pip_url` optional in custom plugin definitions
+- [#2341](https://gitlab.com/meltano/meltano/-/issues/2341) Allow non-pip plugins to be declared using relative `executable` paths and `executable` programs already on the PATH
+
+
+## 1.74.0 - (2021-05-10)
+---
+
+### New
+- [#2353](https://gitlab.com/meltano/meltano/-/issues/2353) Add `meltano remove` command
+
+
+## 1.73.0 - (2021-04-29)
+---
+
+### New
+
+- [#2621](https://gitlab.com/meltano/meltano/-/issues/2621) Add `twilio-labs` variant of `tap-zendesk`
+
+### Changes
+
+- [#2705](https://gitlab.com/meltano/meltano/-/issues/2705) Speed up `meltano install` by installing plugins in parallel
+- [#2709](https://gitlab.com/meltano/meltano/-/issues/2709) Add support for setting `kind` in settings prompt when using `meltano add --custom`
+
+
+## 1.72.0 - (2021-04-22)
+---
+
+### New
+
+- [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for shortcut commands to `invoke`
+- [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for `sqlfluff` utility for linting SQL transforms
+- [#2613](https://gitlab.com/meltano/meltano/-/issues/2613) Add `mashey` variant of `tap-slack`
+- [#2689](https://gitlab.com/meltano/meltano/-/issues/2689) Add documentation for using a custom Python Package Index (PyPi)
+- [#2426](https://gitlab.com/meltano/meltano/-/issues/2426) Add `transferwise` variant of `target-redshift`
+
+### Changes
+- [#2082](https://gitlab.com/meltano/meltano/-/issues/2082) Updated database_uri documentation to show how to target a PostgreSQL schema
+- [#2107](https://gitlab.com/meltano/meltano/-/issues/2107) Updated 'create a custom extractor' tutorial to use the new SDK
+
+### Fixes
+
+- [#2526](https://gitlab.com/meltano/meltano/-/issues/2526) When target process fails before tap, report target output instead of `BrokenPipeError` or `ConnectionResetError`
 
 
 ## 1.71.0 - (2021-03-23)
@@ -23,7 +105,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2544](https://gitlab.com/meltano/meltano/-/issues/2544) Add support for `utility` plugin type
-- [#2614](https://gitlab.com/meltano/meltano/-/issues/2590) Add `mashey` variant of `tap-zoom`
+- [#2614](https://gitlab.com/meltano/meltano/-/issues/2614) Add `mashey` variant of `tap-zoom`
 
 
 ### Fixes

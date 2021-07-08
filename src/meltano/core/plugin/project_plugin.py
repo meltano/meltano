@@ -6,6 +6,7 @@ from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import flatten, uniques_in
 
 from .base import PluginDefinition, PluginRef, PluginType, Variant
+from .command import Command
 from .factory import base_plugin_factory
 
 logger = logging.getLogger(__name__)
@@ -39,7 +40,8 @@ class ProjectPlugin(PluginRef):
         namespace: Optional[str] = None,
         variant: Optional[str] = None,
         pip_url: Optional[str] = None,
-        config: Optional[dict] = {},
+        config: Optional[dict] = None,
+        commands: Optional[dict] = None,
         default_variant=Variant.ORIGINAL_NAME,
         **extras,
     ):
@@ -77,6 +79,7 @@ class ProjectPlugin(PluginRef):
         self.set_presentation_attrs(extras)
         self.variant = variant
         self.pip_url = pip_url
+        self.commands = Command.parse_all(commands)
 
         self._fallbacks.update(
             ["logo_url", "description", self.VARIANT_ATTR, "pip_url"]
@@ -100,7 +103,7 @@ class ProjectPlugin(PluginRef):
             # values derived from its name instead
             self._fallbacks.update(["namespace", "label"])
 
-        self.config = copy.deepcopy(config)
+        self.config = copy.deepcopy(config or {})
         self.extras = extras
 
         if "profiles" in extras:
@@ -137,6 +140,16 @@ class ProjectPlugin(PluginRef):
     def info_env(self):
         # MELTANO_EXTRACTOR_...
         return flatten({"meltano": {self.type.singular: self.info}}, "env_var")
+
+    @property
+    def all_commands(self):
+        """Return a dictonary of supported commands, including those inherited from the parent plugin."""
+        return {**self._parent.all_commands, **self.commands}
+
+    @property
+    def supported_commands(self):
+        """Return all defined commands for the plugin."""
+        return list(self.all_commands.keys())
 
     def env_prefixes(self, for_writing=False):
         prefixes = [self.name, self.namespace]

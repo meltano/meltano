@@ -3,9 +3,15 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into PostgreSQL
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/postgres--meltano)
+:::
+
 # PostgreSQL (`meltano` variant)
 
-The `target-postgres` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [PostgreSQL](https://www.postgresql.org/) database.
+The `target-postgres` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into a [PostgreSQL](https://www.postgresql.org/) database.
 
 - **Repository**: <https://github.com/meltano/target-postgres>
 - **Maintainer**: Meltano community
@@ -59,7 +65,7 @@ Follow the remaining step of the [Getting Started guide](/docs/getting-started.h
 
 1. [Run a data integration (EL) pipeline](/docs/getting-started.html#run-a-data-integration-el-pipeline)
 
-If you run into any issues, [learn how to get help](/docs/getting-help.html).
+If you run into any issues, refer to the ["Troubleshooting" section](#troubleshooting) below or [learn how to get help](/docs/getting-help.html).
 
 ## Settings
 
@@ -203,7 +209,7 @@ export TARGET_POSTGRES_URL=postgresql://<username>:<password>@<host>:<port>/<dat
 
 - Name: `schema`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_POSTGRES_SCHEMA`, alias: `PG_SCHEMA`, `POSTGRES_SCHEMA`
-- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html).
+- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](https://hub.meltano.com/extractors/gitlab.html).
 
 #### How to use
 
@@ -214,3 +220,12 @@ meltano config target-postgres set schema <schema>
 
 export TARGET_POSTGRES_SCHEMA=<schema>
 ```
+
+## Troubleshooting
+
+### Error: `ld: library not found for -lssl` or `clang: error: linker command failed with exit code 1` or `error: command 'clang' failed with exit status 1`
+
+This error message indicates that there is a problem installing OpenSSL. This 
+[Stack Overflow answer](https://stackoverflow.com/questions/26288042/error-installing-psycopg2-library-not-found-for-lssl) 
+has specific recommendations on setting the `LDFLAGS` and/or `CPPFLAGS` environment variables. 
+Set those prior to running `meltano add loader target-postgres --variant meltano`.

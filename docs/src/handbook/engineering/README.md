@@ -28,8 +28,8 @@ Every open issue _with a sprint milestone_ should have a `flow` label:
 - `flow::Review`: Currently in review
 
 When possible, an issue should have a label indicating its type:
-- `bug`
-- `feature requests`
+- `Bug`
+- `Feature Request`
 - `Discussion`
 - `Exploration`
 - `Community Support`
@@ -43,15 +43,20 @@ If appropriate, an issue should have a stage label (one of the letters in "melta
 - `Notebook` (currently unused)
 - `Orchestrate`
 
+Singer related labels:
+- `Singer Ecosystem` for general Singer related issues
+- `MeltanoHub - Singer`
+- `Singer SDK`
+
 Other labels:
 - `CLI` or `UI` for issues specifically concerning the CLI or UI
 - `Documentation` for new or updated documentation
 - `Accepting Merge Requests` for issues that are ready to be picked up by a community contributor
-- `integrations` for issues relating to integrations with other open source data tools, typically as plugins
+- `Integrations` for issues relating to integrations with other open source data tools, typically as plugins
 - `Configuration` for issues relating to configuration
 - `Plugin Management` for issues relating to plugin management
 
-New labels can be created as appropriate and should be documented them here.
+New labels can be created as appropriate at the Group Level and should be documented them here.
 
 ### Epics
 
@@ -136,47 +141,44 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 
 1. Ensure you have the latest `master` branch locally before continuing.
 
-   ```bash
-   cd meltano
+    ```bash
+    cd meltano
 
-   git checkout master
-   git pull
-   ```
+    git checkout master
+    git pull
+    ```
 
 1. Install the latest versions of all release toolchain dependencies.
 
-   ```bash
-   poetry install
-   ```
+    ```bash
+    poetry install
+    ```
 
 2. Execute the commands below:
 
-   ```bash
-   # create and checkout the `release-next` branch from `origin/master`
-   git checkout -B release-next origin/master
+    ```bash
+    # create and checkout the `release-next` branch from `origin/master`
+    git checkout -B release-next origin/master
 
-   # view changelog (verify changes made match changes logged)
-   poetry run changelog view
+    # view changelog (verify changes made match changes logged)
+    poetry run changelog view
 
-   # after the changelog has been validated, tag the release
-   make type=minor release
-   # if this is a patch release:
-   # make type=patch release
+    # after the changelog has been validated, tag the release
+    make type=minor release
+    # if this is a patch release:
+    # make type=patch release
 
-   # ensure the tag once the tag has been created, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
-   git describe --tags --abbrev=0
+    # ensure the tag once the tag has been created, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
+    git describe --tags --abbrev=0
 
-   # push the tag upstream to trigger the release pipeline
-   git push origin $(git describe --tags --abbrev=0)
+    # push the tag upstream to trigger the release pipeline
+    git push origin $(git describe --tags --abbrev=0)
 
-   # push the release branch to merge the new version, then create a merge request
-   git push origin release-next
-   ```
+    # push the release branch to merge the new version, then create a merge request
+    git push origin release-next
+    ```
 
-1. Create a merge request from `release-next` targeting `master` and use the `release` template.
-2. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
-3. Make sure to check `delete the source branch when the changes are merged`.
-4. Follow remaining tasks that are part of the `release` merge request template
+3. Using the link from the `git push` output, create a merge request from `release-next` targeting `master` and use the `release` template. Follow all tasks that are part of the `release` merge request template.
 
 ## Zoom
 
@@ -219,7 +221,7 @@ For each demo day, we need to ensure that the following process is followed:
 
 ## Office Hours
 
-Recurring office hours are available for Meltano community members to discuss our roadmap, debug issues, and ask questions. For schedules and meeting links, please check our [#office-hours](https://meltano.slack.com/archives/C01QS0RV78D) channel in [Slack](https://join.slack.com/t/meltano/shared_invite/zt-cz7s15aq-HXREGBo8Vnu4hEw1pydoRw).
+Recurring office hours are available for Meltano community members to discuss our roadmap, debug issues, and ask questions. For schedules and meeting links, please check our [#office-hours](https://meltano.slack.com/archives/C01QS0RV78D) channel in <SlackChannelLink>Slack</SlackChannelLink>.
 
 ### Office Hours: Workflow
 
@@ -233,7 +235,7 @@ Recurring office hours are available for Meltano community members to discuss ou
 
 - Slack:
     - Post reminder to #office-hours
-    - Share to #events and #general
+    - Share to #announcements
 - Tweet:
     - Draft a short memo for the Tweet text. Post should come from the brand account with office hours link and time.
     - Schedule Tweet for 30 minutes ahead of session.
@@ -267,14 +269,47 @@ Recurring office hours are available for Meltano community members to discuss ou
 7. Note: Although YouTube does allow editing in the website, this feature is not available until
    several hours after the recording, and video edits might take up to several hours to apply.
 
-##### Dealing with post edits
+#### Preventing and responding to accidental secrets leakage
 
-NOTE: Post edits are difficult due to the time it takes YouTube to process the video. For instance, it took over 10 hours for the Mar-24 video to be processed by YouTube and available for in-place edits. We will want another means of recording and editing if the turnaround needs to be same-day.
+As a standard practice, we should remind community members whenever they are sharing their screens: `"As a
+reminder, this session is being livestreamed and recorded. We recommend closing any
+credential files or other sensitive documents prior to starting the screenshare."`
+
+And, although we should make a reasonable attempt to prevent confidential information on screenshare, these
+things do accasionally happen. In those cases, our goal is to mitigate exposure such to significantly reduce the
+exposure and reduce the chances that a malicious actor takes advantage of the vulnerability.
+Towards this end, the following actions should be taken as soon as anyone on the team realizes there were
+credentials/secrets exposed:
+
+1. Immediately reach out on slack to whoever was sharing their screen and advise them to rotate their credentials
+   as soon as possible.
+    - You can also refer them to this page. Since we don't know if they are watching slack,
+      it is a good idea to ask them for confirmation that they received your message. If they do not reply,
+      kindly call out in Zoom chat that they should check their Slack messages.
+    - Note: because users who were watching in the stream could technically pause or screenshot the leaked creds,
+      this guidance to reset credentials should apply regardless of the duration of time that the credentials
+      were onscreen.
+2. Immediately after notifying the presenter of the issue, go to our
+   [Meltano YouTube channel](https://studio.youtube.com/channel/UCmp7zJAZEC7I_n9BEydH8XQ/videos/upload) ->
+   "Manage Content" and locate the in-progress livestream.
+    - Change the privacy settings on the livestream to from 'Public' to 'Private'.
+    - Optionally, post to the slack channel that the livestream is temporarily down and users can rejoin with the
+      Zoom link.
+3. After the livestream ends:
+    1. Wait up to 24 hours for YouTube to complete processing _OR_ download the raw video so that you can editing
+       locally.
+    2. Once video is processed, you will be able to use YouTube's content editor to clip out the frames which
+       contained the onscreen secrets exposure.
+    3. Once the video is edited, you may need to wait again for YouTube to finish processing the edited video.
+    4. After confirming the edit by watching the video you can re-share as "Public".
+    5. If you downloaded and edited the video locally, you will need to provide a new YouTube link. If you edited
+       directly, the old links will still work once the video is made "Public" again.
+
+* _Note: if one person is leading the meeting and multiple team members are present, whoever is not presenting should take steps (1) and (2) above, while the other team member continues to lead the remainder of the session._
 
 ## Outages & escalation
 
 Both https://www.meltano.com and https://meltano.meltanodata.com are automatically monitored using Pingdom, with notifications of downtime posted to:
-- the #meltano Slack channel,
 - Zendesk, through our `hello@` email address, and
 - Douwe, by email and SMS.
 
@@ -282,3 +317,6 @@ Other `*.meltanodata.com` instances are not currently monitored.
 
 When any instance managed by us is reported to be down, through Pingdom or any other means, resolving this becomes the team's top priority.
 
+## GitHub Mirrors
+
+We mirror the three main Meltano repositories (meltano/sdk/hub) from GitLab to GitHub. This is managed via the "Mirroring repositories" section with the Settings of the GitLab repository. The push was created using Taylor's personal GitHub account (tayloramurphy) with a personal access token made just for the use case. This was tracked in [this issue](https://gitlab.com/meltano/meta/-/issues/55).

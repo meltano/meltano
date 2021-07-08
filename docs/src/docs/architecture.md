@@ -255,7 +255,7 @@ A `Tap` is an application that pulls data out of a data source by using the best
 
 For example, it takes data from sources like databases or web service APIs and converts them in a format that can be used for data integration or an ETL (Extract Transform Load) pipeline.
 
-Meltano's `taps` is part of the Extractor portion of the data workflow and are based on the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
+Meltano's `taps` is part of the Extractor portion of the data workflow and are based on the [Singer specification](https://hub.meltano.com/singer/spec).
 
 ### Targets
 

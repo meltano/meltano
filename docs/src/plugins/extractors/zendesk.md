@@ -3,15 +3,26 @@ sidebar: auto
 description: Use Meltano to pull data from the Zendesk API and load it into Snowflake, PostgreSQL, and more
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/extractors/zendesk)
+:::
+
 # Zendesk
 
-The `tap-zendesk` [extractor](/plugins/extractors/) pulls data from the [Zendesk API](https://developer.zendesk.com/rest_api).
+The `tap-zendesk` [extractor](https://hub.meltano.com/extractors/) pulls data from the [Zendesk API](https://developer.zendesk.com/rest_api).
 
-- **Repository**: <https://github.com/singer-io/tap-zendesk>
-- **Maintainer**: [Stitch](https://www.stitchdata.com/)
-- **Maintenance status**: Unresponsive to community issues and contributions
-  - A [more active fork](https://github.com/singer-io/tap-zendesk/network) may be available that you can [use instead](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin).
-  - This plugin is [up for adoption](/docs/contributor-guide.html#adopting-a-plugin)!
+- **Repository**: <https://github.com/twilio-labs/twilio-tap-zendesk>
+- **Maintainer**: [Twilio](https://www.twilio.com/)
+- **Maintenance status**: Active
+
+#### Alternative variants
+
+Multiple [variants](/docs/plugins.html#variants) of `tap-zendesk` are available.
+This document describes the default `twilio-labs` variant.
+
+Alternative option is [`singer-io`](./zendesk--singer-io.html).
 
 ## Getting Started
 

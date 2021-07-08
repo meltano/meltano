@@ -2,7 +2,7 @@ from contextlib import contextmanager
 from unittest import mock
 
 import pytest
-from meltano.core.setting_definition import SettingDefinition
+from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.settings_service import SettingsService
 from meltano.core.settings_store import (
     AutoStoreManager,
@@ -22,7 +22,7 @@ class DummySettingsService(SettingsService):
         self.__meltano_yml_config = {}
         self.__definitions = [
             SettingDefinition("regular", aliases=["basic"], value="from_default"),
-            SettingDefinition("password", kind="password"),
+            SettingDefinition("password", kind=SettingKind.PASSWORD),
             SettingDefinition("env_specific", env_specific=True),
         ]
         self._inherited_settings = None

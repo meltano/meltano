@@ -3,13 +3,19 @@ sidebar: auto
 description: Use Meltano to pull data from various sources and load it into Snowflake
 ---
 
+::: warning
+This page is now deprecated and will be removed in the future.
+
+View the current documentation on the [MeltanoHub](https://hub.meltano.com/loaders/snowflake--transferwise)
+:::
+
 # Snowflake (`transferwise` variant)
 
-The `target-snowflake` [loader](/plugins/loaders/) loads [extracted](/plugins/extractors/) data into a [Snowflake](https://www.snowflake.com/) data warehouse.
+The `target-snowflake` [loader](https://hub.meltano.com/loaders/) loads [extracted](https://hub.meltano.com/extractors/) data into a [Snowflake](https://www.snowflake.com/) data warehouse.
 
 - **Repository**: <https://github.com/transferwise/pipelinewise-target-snowflake>
 - **Documentation**: <https://transferwise.github.io/pipelinewise/connectors/targets/snowflake.html>
-- **Maintainer**: [TransferWise](https://transferwise.com/)
+- **Maintainer**: [Wise](https://wise.com/)
 - **Maintenance status**: Active
 
 #### Alternative variants
@@ -247,7 +253,7 @@ export TARGET_SNOWFLAKE_FILE_FORMAT=<snowflake_file_format_object_name>
 
 - Name: `default_target_schema`
 - [Environment variable](/docs/configuration.html#configuring-settings): `TARGET_SNOWFLAKE_DEFAULT_TARGET_SCHEMA`, alias: `TARGET_SNOWFLAKE_SCHEMA`, `SF_SCHEMA`
-- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/plugins/extractors/gitlab.html). Values are automatically converted to uppercase before they're passed on to the plugin, so `tap_gitlab` becomes `TAP_GITLAB`.
+- Default: `$MELTANO_EXTRACT__LOAD_SCHEMA`, which [will expand to](/docs/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](/docs/plugins.html#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](https://hub.meltano.com/extractors/gitlab.html). Values are automatically converted to uppercase before they're passed on to the plugin, so `tap_gitlab` becomes `TAP_GITLAB`.
 
 Name of the schema where the tables will be created, without database prefix. If `schema_mapping` is not defined then every stream sent by the tap is loaded into this schema.
 

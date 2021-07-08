@@ -52,7 +52,7 @@ def custom_tap(project_add_service):
 
 
 @pytest.fixture
-def subject(tap, plugin_settings_service_factory):
+def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
     return plugin_settings_service_factory(tap)
 
 
@@ -198,7 +198,7 @@ class TestPluginSettingsService:
             assert full_config.get(k) == v
             assert redacted_config.get(k) == v
 
-    def test_as_dict_process(self, subject, tap):
+    def test_as_dict_process(self, subject: PluginSettingsService, tap):
         config = subject.as_dict()
         assert config["auth.username"] is None
         assert config["auth.password"] is None
@@ -648,7 +648,9 @@ class TestPluginSettingsService:
         monkeypatch.setitem(subject.plugin.config, "start_date", now)
         assert subject.get("start_date") == now.isoformat()
 
-    def test_kind_object(self, subject, tap, monkeypatch, env_var):
+    def test_kind_object(
+        self, subject: PluginSettingsService, tap, monkeypatch, env_var
+    ):
         assert subject.get_with_source("object") == (
             {"nested": "from_default"},
             SettingValueStore.DEFAULT,
@@ -696,6 +698,19 @@ class TestPluginSettingsService:
             },
             SettingValueStore.ENV,
         )
+
+        assert subject.as_dict(process=False)["object"] == {
+            "username": "from_meltano_yml",
+            "password": "from_meltano_yml",
+            "deep.nesting": "from_env",
+        }
+        assert subject.as_dict(process=True)["object"] == {
+            "username": "from_meltano_yml",
+            "password": "from_meltano_yml",
+            "deep": {
+                "nesting": "from_env",
+            },
+        }
 
         monkeypatch.setenv(env_var(subject, "data"), '{"foo":"from_env_alias"}')
 

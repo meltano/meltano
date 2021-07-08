@@ -29,8 +29,8 @@ In your project, **plugins** extend this description with a specific configurati
 This means that [different configurations](/docs/configuration.html#multiple-plugin-configurations) of the same package (base plugin)
 would be represented in your project as separate plugins with their own unique names,
 that can be thought of as differently initialized instances of the same class.
-For example: extractors `tap-postgres--billing` and `tap-postgres--events` derived from base extractor [`tap-postgres`](/plugins/extractors/postgres.html),
-or `tap-google-analytics--client-foo` and `tap-google-analytics--client-bar` derived from base extractor [`tap-google-analytics`](/plugins/extractors/google-analytics.html).
+For example: extractors `tap-postgres--billing` and `tap-postgres--events` derived from base extractor [`tap-postgres`](https://hub.meltano.com/extractors/postgres.html),
+or `tap-google-analytics--client-foo` and `tap-google-analytics--client-bar` derived from base extractor [`tap-google-analytics`](https://hub.meltano.com/extractors/google-analytics.html).
 
 Each plugin in a project can either:
 - inherit its base plugin description from a [discoverable plugin](#discoverable-plugins) that's supported out of the box,
@@ -53,7 +53,7 @@ If you'd like to use a different (custom) manifest in your project,
 put a `discovery.yml` file at the root of your project,
 or change the [`discovery_url` setting](/docs/settings.html#discovery-url).
 
-To find discoverable plugins, run [`meltano discover`](/docs/command-line-interface.html#discover) or refer to the lists of [Sources](/plugins/extractors/) and [Destinations](/plugins/loaders/).
+To find discoverable plugins, run [`meltano discover`](/docs/command-line-interface.html#discover) or refer to the lists of [Extractors](https://hub.meltano.com/extractors/) and [Loaders](https://hub.meltano.com/loaders/).
 
 To learn how to add a discoverable plugin to your project using a [shadowing plugin definition](/docs/project.html#shadowing-plugin-definitions) or [inheriting plugin definition](/docs/project.html#inheriting-plugin-definitions), refer to the [Plugin Management guide](/docs/plugin-management.html#discoverable-plugins).
 
@@ -122,9 +122,9 @@ Meltano supports the following types of plugins:
 Extractors are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt`](/docs/command-line-interface.html#elt) as part of [data integration](/docs/integration.md).
 They are responsible for pulling data out of arbitrary data sources: databases, SaaS APIs, or file formats.
 
-Meltano supports [Singer taps](https://singer.io): executables that implement the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
+Meltano supports [Singer taps](https://singer.io): executables that implement the [Singer specification](https://hub.meltano.com/singer/spec).
 
-To learn which extractors are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Sources page](/plugins/extractors/) or run [`meltano discover extractors`](/docs/command-line-interface.html#discover).
+To learn which extractors are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Extractors page](https://hub.meltano.com/extractors/) or run [`meltano discover extractors`](/docs/command-line-interface.html#discover).
 
 #### Extras
 
@@ -145,16 +145,18 @@ Extractors support the following [extras](/docs/configuration.html#plugin-extras
 - [`meltano elt`](/docs/command-line-interface.html#elt) CLI option: `--catalog`
 - Default: None
 
-An extractor's `catalog` [extra](/docs/configuration.html#plugin-extras) holds a path to a [catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog) (relative to the [project directory](/docs/project.html)) to be provided to the extractor
+An extractor's `catalog` [extra](/docs/configuration.html#plugin-extras) holds a path to a [catalog file](https://hub.meltano.com/singer/spec#catalog-files) (relative to the [project directory](/docs/project.html)) to be provided to the extractor
 when it is run in [sync mode](https://github.com/singer-io/getting-started/blob/master/docs/SYNC_MODE.md) using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 
 If a catalog path is not set, the catalog will be [generated on the fly](/docs/integration.html#extractor-catalog-generation)
-by running the extractor in [discovery mode](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md) and applying the [schema](#schema-extra), [selection](#select-extra), and [metadata](#metadata-extra) rules to the discovered file.
+by running the extractor in [discovery mode](https://hub.meltano.com/singer/spec#discovery-mode) and applying the [schema](#schema-extra), [selection](#select-extra), and [metadata](#metadata-extra) rules to the discovered file.
 
 [Selection filter rules](#select-filter-extra) are always applied to manually provided catalogs as well as discovered ones.
 
 While this extra can be managed using [`meltano config`](/docs/command-line-interface.html#config) or environment variables like any other setting,
 a catalog file is typically provided using [`meltano elt`](/docs/command-line-interface.html#elt)'s `--catalog` option.
+
+If the catalog does not seem to take effect, you may need to [validate the capabilities of the tap](/docs/integration.html#validate-tap-capabilities).
 
 ##### How to use
 
@@ -195,7 +197,7 @@ when this extractor is used in a pipeline with a [loader](#loaders) for a databa
 
 The value of this extra [can be referenced](/docs/configuration.html#expansion-in-setting-values) from a loader's configuration using the `MELTANO_EXTRACT__LOAD_SCHEMA`
 [pipeline environment variable](/docs/integration.html#pipeline-environment-variables).
-It is used as the default value for the [`target-postgres`](/plugins/loaders/postgres.html) and [`target-snowflake`](/plugins/loaders/snowflake.html) `schema` settings.
+It is used as the default value for the [`target-postgres`](https://hub.meltano.com/loaders/postgres.html) and [`target-snowflake`](https://hub.meltano.com/loaders/snowflake.html) `schema` settings.
 
 ##### How to use
 
@@ -227,8 +229,8 @@ export TAP_GITLAB__LOAD_SCHEMA=gitlab_data
 - Default: `{}` (an empty object)
 
 An extractor's `metadata` [extra](/docs/configuration.html#plugin-extras) holds an object describing
-[Singer stream and property metadata](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#metadata)
-rules that are applied to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
+[Singer stream and property metadata](https://hub.meltano.com/singer/spec#metadata)
+rules that are applied to the extractor's [discovered catalog file](https://hub.meltano.com/singer/spec#catalog-files)
 when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
@@ -284,8 +286,8 @@ export TAP_POSTGRES__METADATA_SOME_STREAM_ID_REPLICATION_METHOD=FULL_TABLE
 - Default: `{}` (an empty object)
 
 An extractor's `schema` [extra](/docs/configuration.html#plugin-extras) holds an object describing
-[Singer stream schema](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#schemas) override
-rules that are applied to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
+[Singer stream schema](https://hub.meltano.com/singer/spec#schemas) override
+rules that are applied to the extractor's [discovered catalog file](https://hub.meltano.com/singer/spec#catalog-files)
 when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
@@ -339,7 +341,7 @@ export TAP_POSTGRES__SCHEMA_SOME_STREAM_ID_CREATED_AT_FORMAT=date
 - Default: `["*.*"]`
 
 An extractor's `select` [extra](/docs/configuration.html#plugin-extras) holds an array of [entity selection rules](/docs/command-line-interface.html#select)
-that are applied to the extractor's [discovered catalog file](https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md)
+that are applied to the extractor's [discovered catalog file](https://hub.meltano.com/singer/spec#catalog-files)
 when the extractor is run using [`meltano elt`](/docs/command-line-interface.html#elt) or [`meltano invoke`](/docs/command-line-interface.html#invoke).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
@@ -445,7 +447,7 @@ meltano elt tap-gitlab target-jsonl --exclude project_members
 - [`meltano elt`](/docs/command-line-interface.html#elt) CLI option: `--state`
 - Default: None
 
-An extractor's `state` [extra](/docs/configuration.html#plugin-extras) holds a path to a [state file](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md#state-file) (relative to the [project directory](/docs/project.html)) to be provided to the extractor
+An extractor's `state` [extra](/docs/configuration.html#plugin-extras) holds a path to a [state file](https://hub.meltano.com/singer/spec#state-files) (relative to the [project directory](/docs/project.html)) to be provided to the extractor
 when it is run as part of a pipeline using [`meltano elt`](/docs/command-line-interface.html#elt).
 
 If a state path is not set, the state will be [looked up automatically](/docs/integration.html#incremental-replication-state) based on the ELT run's Job ID.
@@ -485,9 +487,9 @@ meltano elt tap-gitlab target-jsonl --state extract/tap-gitlab.state.json
 Loaders are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt`](/docs/command-line-interface.html#elt) as part of [data integration](/docs/integration.md).
 They are responsible for loading [extracted](#extractors) data into arbitrary data destinations: databases, SaaS APIs, or file formats.
 
-Meltano supports [Singer targets](https://singer.io): executables that implement the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
+Meltano supports [Singer targets](https://singer.io): executables that implement the [Singer specification](https://hub.meltano.com/singer/spec).
 
-To learn which loaders are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Destinations page](/plugins/loaders/) or run [`meltano discover loaders`](/docs/command-line-interface.html#discover).
+To learn which loaders are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Loaders page](https://hub.meltano.com/loaders/) or run [`meltano discover loaders`](/docs/command-line-interface.html#discover).
 
 #### Extras
 

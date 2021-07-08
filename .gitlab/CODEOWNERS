@@ -3,8 +3,9 @@
 # Ending a path in a `/` will specify the code owners for every file
 # nested in that directory, on any level
 
-[Default]
-* @DouweM
+# Default
+* @DouweM @aaronsteers
 
-[Handbook]
+# Handbook and Docs
 /docs/src/handbook/ @meltano/core-team
+/docs/src/docs/ @meltano/core-team

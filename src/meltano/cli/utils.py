@@ -1,8 +1,7 @@
 """Defines helpers for use by the CLI."""
-import asyncio
 import logging
 import os
-from contextlib import suppress
+from typing import Optional
 
 import click
 from meltano.core.logging import setup_logging
@@ -10,12 +9,14 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
+    PluginInstallStatus,
 )
 from meltano.core.project import Project
 from meltano.core.project_add_service import (
     PluginAlreadyAddedException,
     ProjectAddService,
 )
+from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 setup_logging()
@@ -37,26 +38,6 @@ class CliError(Exception):
         click.secho(str(self), fg="red")
 
         self.printed = True
-
-
-def run_async(coro):
-    """Run coroutine and handle event loop and cleanup."""
-    # Taken from https://stackoverflow.com/a/58532304
-    # and inspired by Python 3.7's `asyncio.run`
-
-    loop = asyncio.get_event_loop()
-    try:
-        loop.run_until_complete(coro)
-    except asyncio.CancelledError:
-        pass
-    finally:
-        all_tasks = asyncio.gather(
-            *asyncio.Task.all_tasks(loop), return_exceptions=True
-        )
-        all_tasks.cancel()
-        with suppress(asyncio.CancelledError):
-            loop.run_until_complete(all_tasks)
-        loop.run_until_complete(loop.shutdown_asyncgens())
 
 
 def print_added_plugin(project, plugin, related=False):
@@ -125,7 +106,7 @@ def _prompt_plugin_namespace(plugin_type, plugin_name):
     )
 
 
-def _prompt_plugin_pip_url(plugin_name):
+def _prompt_plugin_pip_url(plugin_name: str) -> Optional[str]:
     click.echo()
     click.echo(
         f"Specify the plugin's {click.style('`pip install` argument', fg='blue')}, for example:"
@@ -136,23 +117,32 @@ def _prompt_plugin_pip_url(plugin_name):
     click.echo(f"\tgit+https://gitlab.com/meltano/{plugin_name}.git")
     click.echo("- local directory, in editable/development mode:")
     click.echo(f"\t-e extract/{plugin_name}")
+    click.echo("- 'n' if using a local executable (nothing to install)")
     click.echo()
     click.echo("Default: plugin name as PyPI package name")
     click.echo()
 
-    return click.prompt(
+    result = click.prompt(
         click.style("(pip_url)", fg="blue"), type=str, default=plugin_name
     )
+    return None if result == "n" else result
 
 
-def _prompt_plugin_executable(pip_url):
+def _prompt_plugin_executable(pip_url: Optional[str], plugin_name: str) -> str:
+    derived_from = "`pip_url`"
+    prompt_request = "executable name"
+    if pip_url is None:
+        derived_from = "the plugin name"
+        prompt_request = "executable path"
+
     click.echo()
-    click.echo(f"Specify the package's {click.style('executable name', fg='blue')}")
+    click.echo(f"Specify the plugin's {click.style(prompt_request, fg='blue')}")
     click.echo()
-    click.echo("Default: package name derived from `pip_url`")
+    click.echo(f"Default: name derived from {derived_from}")
     click.echo()
 
-    package_name, _ = os.path.splitext(os.path.basename(pip_url))
+    plugin_basename = os.path.basename(pip_url or plugin_name)
+    package_name, _ = os.path.splitext(plugin_basename)
     return click.prompt(click.style("(executable)", fg="blue"), default=package_name)
 
 
@@ -192,7 +182,6 @@ def _prompt_plugin_capabilities(plugin_type):
 def _prompt_plugin_settings(plugin_type):
     if plugin_type not in {PluginType.EXTRACTORS, PluginType.LOADERS}:
         return []
-
     singer_type = "tap" if plugin_type == PluginType.EXTRACTORS else "target"
 
     click.echo()
@@ -200,25 +189,58 @@ def _prompt_plugin_settings(plugin_type):
         f"Specify the {singer_type}'s {click.style('supported settings', fg='blue')} (`config.json` keys)"
     )
     click.echo()
-    click.echo("Nested properties can be represented using the `.` separator,")
-    click.echo('e.g. `auth.username` for `{ "auth": { "username": value } }`.')
+    click.echo("Multiple setting names (keys) can be separated using commas.")
     click.echo()
     click.echo(
-        f"To find out what settings a {singer_type} supports, reference its documentation."
+        "A setting kind can be specified alongside the name (key) by using the `:` delimiter,"
+    )
+    click.echo("e.g. `port:integer` to set the kind `integer` for the name `port`")
+    click.echo()
+    click.echo("Supported setting kinds:")
+    click.echo(
+        " | ".join([click.style(kind.value, fg="magenta") for kind in SettingKind])
     )
     click.echo()
-    click.echo("Multiple setting names (keys) can be separated using commas.")
+    click.echo(
+        "- Credentials and other sensitive setting types should use the "
+        + click.style("password", fg="magenta")
+        + " kind."
+    )
+    click.echo(
+        "- If not specified, setting kind defaults to "
+        + click.style("string", fg="magenta")
+        + "."
+    )
+    click.echo(
+        "- Nested properties can be represented using the `.` separator, "
+        + 'e.g. `auth.username` for `{ "auth": { "username": value } }`.'
+    )
+    click.echo(
+        f"- To find out what settings a {singer_type} supports, reference its documentation."
+    )
     click.echo()
     click.echo("Default: no settings")
     click.echo()
 
-    settings = click.prompt(
-        click.style("(settings)", fg="blue"),
-        type=list,
-        default=[],
-        value_proc=lambda value: [word.strip() for word in value.split(",")],
-    )
-    return [{"name": name} for name in settings]
+    settings: dict = None
+    while settings is None:  # noqa:  WPS426  # allows lambda in loop
+        settings_input = click.prompt(
+            click.style("(settings)", fg="blue"),
+            type=list,
+            default=[],
+            value_proc=lambda value: [
+                setting.strip().partition(":") for setting in value.split(",")
+            ],
+        )
+        try:
+            settings = [
+                {"name": name, "kind": kind and SettingKind(kind).value}
+                for name, sep, kind in settings_input
+            ]
+        except ValueError as ex:
+            click.secho(str(ex), fg="red")
+
+    return settings
 
 
 def add_plugin(
@@ -234,7 +256,7 @@ def add_plugin(
     if custom:
         namespace = _prompt_plugin_namespace(plugin_type, plugin_name)
         pip_url = _prompt_plugin_pip_url(plugin_name)
-        executable = _prompt_plugin_executable(pip_url)
+        executable = _prompt_plugin_executable(pip_url, plugin_name)
         capabilities = _prompt_plugin_capabilities(plugin_type)
         settings = _prompt_plugin_settings(plugin_type)
 
@@ -343,39 +365,57 @@ def add_related_plugins(
     return added_plugins
 
 
-def install_status_update(data, reason):
-    plugin = data["plugin"]
+def install_status_update(install_state):
+    """
+    Print the status of plugin installation.
 
-    if data["status"] == "running":
-        verb = "Updating" if reason == PluginInstallReason.UPGRADE else "Installing"
-        click.secho(f"{verb} {plugin.type.descriptor} '{plugin.name}'...")
-    elif data["status"] == "error":
-        click.secho(data["message"], fg="red")
-        click.secho(data["details"], err=True)
-    elif data["status"] == "warning":
-        click.secho(f"Warning! {data['message']}.", fg="yellow")
-    elif data["status"] == "success":
-        verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
-        click.secho(f"{verb} {plugin.type.descriptor} '{plugin.name}'", fg="green")
+    Used as the callback for PluginInstallService.
+    """
+    plugin = install_state.plugin
+    desc = plugin.type.descriptor
+    if install_state.status is PluginInstallStatus.RUNNING:
+        msg = f"{install_state.verb} {desc} '{plugin.name}'..."
+        click.secho(msg)
+    elif install_state.status is PluginInstallStatus.ERROR:
+        click.secho(install_state.message, fg="red")
+        click.secho(install_state.details, err=True)
+    elif install_state.status is PluginInstallStatus.WARNING:
+        click.secho(f"Warning! {install_state.message}.", fg="yellow")
+    elif install_state.status is PluginInstallStatus.SUCCESS:
+        msg = f"{install_state.verb} {desc} '{plugin.name}'"
+        click.secho(msg, fg="green")
         click.echo()
 
 
-def install_plugins(project, plugins, reason=PluginInstallReason.INSTALL):
-    install_service = PluginInstallService(project)
-    install_status = install_service.install_plugins(
-        plugins, status_cb=install_status_update, reason=reason
+def install_plugins(
+    project, plugins, reason=PluginInstallReason.INSTALL, parallelism=None
+):
+    """Install the provided plugins and report results to the console."""
+    install_service = PluginInstallService(
+        project, status_cb=install_status_update, parallelism=parallelism
     )
-    num_installed = len(install_status["installed"])
-    num_failed = len(install_status["errors"])
+    install_results = install_service.install_plugins(plugins, reason=reason)
+    num_successful = len([status for status in install_results if status.successful])
+    num_skipped = len([status for status in install_results if status.skipped])
+    num_failed = len(install_results) - num_successful
 
     fg = "green"
-    if num_failed >= 0 and num_installed == 0:
+    if num_failed >= 0 and num_successful == 0:
         fg = "red"
-    elif num_failed > 0 and num_installed > 0:
+    elif num_failed > 0 and num_successful > 0:
         fg = "yellow"
 
     if len(plugins) > 1:
         verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
-        click.secho(f"{verb} {num_installed}/{num_installed+num_failed} plugins", fg=fg)
+        click.secho(
+            f"{verb} {num_successful-num_skipped}/{num_successful+num_failed} plugins",
+            fg=fg,
+        )
+    if num_skipped:
+        verb = "Skipped installing"
+        click.secho(
+            f"{verb} {num_skipped}/{num_successful+num_failed} plugins",
+            fg=fg,
+        )
 
     return num_failed == 0

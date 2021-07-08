@@ -7,7 +7,7 @@ from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.setting_definition import SettingDefinition
+from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.transform_add_service import TransformAddService
 
 
@@ -27,7 +27,8 @@ class DbtTransformPluginInstaller:
         self.project = project
         self.plugin = plugin
 
-    def install(self, reason):
+    async def install(self, reason):
+        """Install the transform into the project."""
         if reason in (PluginInstallReason.ADD, PluginInstallReason.UPGRADE):
             try:
                 transform_add_service = TransformAddService(self.project)
@@ -69,7 +70,7 @@ class DbtTransformPlugin(BasePlugin):
 
     EXTRA_SETTINGS = [
         SettingDefinition(name="_package_name", value="$MELTANO_TRANSFORM_NAMESPACE"),
-        SettingDefinition(name="_vars", kind="object", value={}),
+        SettingDefinition(name="_vars", kind=SettingKind.OBJECT, value={}),
     ]
 
     @property
