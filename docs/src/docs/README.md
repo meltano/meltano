@@ -69,12 +69,16 @@ members:
     linkedin: k-g-payne
 openings:
 - title: Senior Backend Engineer
+  location: Anywhere, Remote 🌍
   description: "Required: Python & data experience"
 - title: Senior Frontend Engineer & UI/UX Designer
+  location: Anywhere, Remote 🌍
   description: "Nice to have: Vue.js experience"
 - title: Senior Data Engineer / Analyst
+  location: Anywhere, Remote 🌍
   description: "Required: SQL & Python experience"
 - title: Remote Office Manager
+  location: US time zone, Remote 🌍
   description: "Oversee and assist team with administrative and PeopleOps matters"
 ---
 

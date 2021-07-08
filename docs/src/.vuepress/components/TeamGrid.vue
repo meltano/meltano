@@ -35,7 +35,7 @@
         <img src="/android-chrome-512x512.png" class="avatar" />
 
         <h3>Possibly You</h3>
-        <small>Anywhere, Remote 🌍</small>
+        <small>{{opening.location}}</small>
 
         <strong>{{opening.title}}</strong>
 
