@@ -206,47 +206,39 @@ Also note that issues labeled `flow::To Do` have higher priority and are more li
 
 Below you will found our current roadmap. As this projects out into the future it is subject to change based on feedback. Don't see something you want on the roadmap? [Make an issue](https://gitlab.com/meltano/meltano/-/issues) and let us know!
 
-#### June 2021
-
-Our focus for June will be to launch the Target SDK, to add support for inline mapping transformations to the SDK and Meltano, enhance the dbt experience within Meltano, and supporting the "Reverse ELT" use case of loading data into a SaaS API.
-
-* [SDK for Singer Targets](https://gitlab.com/meltano/sdk/-/issues/96)
-* [Enhanced dbt integration](https://gitlab.com/groups/meltano/-/epics/82)
-* [Mapping SDK for inline transformation use cases](https://gitlab.com/meltano/meltano/-/issues/2300)
-* [Support Reverse ETL Use Case](https://gitlab.com/meltano/meltano/-/issues/2665)
-
 #### July 2021
 
-Our focus for July will be to expand our integrations for data quality and analysis. We will also work to add support for the fast sync / batch message type to enable higher throughput for extraction and loading.
+Our focus for July will be to launch Meltano Academy to enable the community to learn about Meltano faster, make MeltanoHub the single source of truth for Meltano, refactor Meltano to enable composable pipelines, and add Superset as an available analyzer.
 
-* [Great Expectations](https://gitlab.com/meltano/meltano/-/issues/2454)
-* [Fast Sync / Batch Messages](https://gitlab.com/meltano/meltano/-/issues/2364)
-* [Superset](https://gitlab.com/meltano/meltano/-/issues/2605)
 * [Meltano Academy](https://gitlab.com/meltano/meta/-/issues/63)
 * [MeltanoHub as SSOT for Meltano](https://gitlab.com/groups/meltano/-/epics/102)
+* [Composable Meltano Pipelines](https://gitlab.com/meltano/meltano/-/issues/2725 )
+* [Superset](https://gitlab.com/meltano/meltano/-/issues/2605)
 
 #### August 2021
 
-Our focus for August will be to continue expanding integrations: adding orchestration options, notebooks integration, and out-of-the-box support for an OLAP Database.
+Our focus for August will be to expand our integrations for data quality and analysis. We will also work to add support for the fast sync / batch message type to enable higher throughput for extraction and loading. 
 
-* [Jupyter Notebooks](https://gitlab.com/meltano/meltano/-/issues/2595)
+* [Fast Sync / Batch Messages](https://gitlab.com/meltano/meltano/-/issues/2364)
+* [Add validator plugin type - Great Expectations/dbt test](https://gitlab.com/meltano/meltano/-/issues/2454)
 * [Dagster](https://gitlab.com/meltano/meltano/-/issues/2393)
-* [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
-* [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
 * [Decentralized Management of MeltanoHub Connectors](https://gitlab.com/meltano/meta/-/issues/73)
 
 #### September 2021
 
-Our focus for September will be to enable simple cloud deployments, improve the integration with git providers, and begin the conversion of MeltanoHub to a dynamic site.
+Our focus for September will be to continue expanding integrations: adding orchestration options, notebooks integration, and out-of-the-box support for an OLAP Database.
 
+* [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
+* [Jupyter Notebooks](https://gitlab.com/meltano/meltano/-/issues/2595)
+* [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
 * [Simple Cloud Deploys](https://gitlab.com/groups/meltano/-/epics/28)
-* [Git-provider Integrations](https://gitlab.com/groups/meltano/-/epics/92)
-* [Initial conversion of MeltanoHub to dyanmic site](https://gitlab.com/groups/meltano/-/epics/101)
 
 #### 2021-Q4
 
-Our focus for Q4 will be on creating a compelling monitoring, observability, and data lineage featureset. We also aim to improve the UI and potentailly start offering a SaaS deployment of Meltano.
+Our focus for Q4 will be on creating a compelling monitoring, observability, and data lineage featureset. We also aim to improve our integration with git providers, begin the conversion of MeltanoHub to a dynamic site, improve the UI of Meltano, and potentailly start offering a SaaS deployment of Meltano.
 
+* [Git-provider Integrations](https://gitlab.com/groups/meltano/-/epics/92)
+* [Initial conversion of MeltanoHub to dyanmic site](https://gitlab.com/groups/meltano/-/epics/101)
 * [Monitoring, observability, and data lineage](https://gitlab.com/groups/meltano/-/epics/93)
 * [Fully featured UI](https://gitlab.com/groups/meltano/-/epics/78)
 * [SaaS Deployment of Meltano](https://gitlab.com/groups/meltano/-/epics/94)
