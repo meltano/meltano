@@ -261,7 +261,7 @@ Recurring office hours are available for Meltano community members to discuss ou
 #### After the livestream session ends
 
 1. Log into the YouTube account, locate the livestream and select the "Edit" option.
-2. Update the video title with the date of the session, e.g. `Meltano Office Hours Livestream on YYYY-MM-DD`
+2. Update the video title with the date of the session, e.g. `Meltano Office Hours - YYYY-MM-DD`
 3. Update the video front image with a screenshot of the deck.
 4. Generate list of timestamps for each significant topic.
 5. Update the topic features + timestamps within the YouTube video description.
