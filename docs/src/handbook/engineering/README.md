@@ -40,27 +40,27 @@ Every open issue _with a sprint milestone_ should have a `flow` label:
 - `flow::Blocked`: Blocked by some other issue
 - `flow::Review`: Currently in review
 
-#### Priority Labels
+#### Urgency Labels
 
-We have 5 priority labels:
+We have 5 urgency labels:
 
-- `priority::low`
-- `priority::default`
-- `priority::high`
-- `priority::higher`
-- `priority::highest`
+- `urgency::low`
+- `urgency::default`
+- `urgency::high`
+- `urgency::higher`
+- `urgency::highest`
 
-The majority of issues should have the `priority::default` label, which is a sign that we are accomplishing [the important as well as the urgent](https://www.mindtools.com/pages/article/newHTE_91.htm). 
-The `priority::low` tag can optionally be used to indicate issues that should be the first to be deprioritized.
+The majority of issues should have the `urgency::default` label, which is a sign that we are accomplishing [the important as well as the urgent](https://www.mindtools.com/pages/article/newHTE_91.htm). 
+The `urgency::low` tag can optionally be used to indicate issues that should be the first to be deprioritized.
 
-Issues with the `priority::default` label in a milestone have a ~80% chance of being completed within a milestone. 
-Issues with the `priority::low` label have a ~50% chance of being completed within a milestone. 
-We aim to close 100% of issues with `priority::high` or above within the milestone.
+Issues with the `urgency::default` label, or no urgency label at all, in a milestone have a ~80% chance of being completed within a milestone. 
+Issues with the `urgency::low` label have a ~50% chance of being completed within a milestone. 
+We aim to close 100% of issues with `urgency::high` or above within the milestone.
 
-The `priority::highest` should be resolved for urgent user-facing issues such as the website going down - and should be resolved within 24 hours or less.
-If an issue of this type is moved to another milestone because it was not completed, the priority should most likely be increased.
+The `urgency::highest` should be resolved for urgent user-facing issues such as the website going down - and should be resolved within 24 hours or less.
+If an issue of this type is moved to another milestone because it was not completed, the urgency should most likely be increased.
 
-If there is an issue of particular interest, add the `priority::high` label to it and leave a comment tagging Taylor with a note explaining why you believe it's a high priority.
+If there is an issue of particular interest, add the `urgency::high` label to it and leave a comment tagging Taylor with a note explaining why you believe it's a high urgency.
 
 #### Kind Labels
 
@@ -162,7 +162,7 @@ at which points they will be experts themselves.
 - [Development Flow](https://gitlab.com/groups/meltano/-/boards/536761), with a column for each `flow::` label. Don't forget to filter by milestone, and/or assignee!
 - [Kind](https://gitlab.com/groups/meltano/-/boards/2917606) - useful for understanding the distribution of work across the different flow types (Bug, Feature, etc.)
 - [Value Stream](https://gitlab.com/groups/meltano/-/boards/2917637) - useful for understanding the distribution of work acrss the different product areas of Meltano
-- [Priority](https://gitlab.com/groups/meltano/-/boards/2917749) - useful for understanding the overall priority of issues in a milestone.
+- [Urgency](https://gitlab.com/groups/meltano/-/boards/2917749) - useful for understanding the overall priority of issues in a milestone.
 - [Milestone](https://gitlab.com/groups/meltano/-/boards/1933232) - used to move issues easily between milestones.
 
 ## Release Process
