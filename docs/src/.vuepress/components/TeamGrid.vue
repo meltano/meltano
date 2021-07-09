@@ -44,6 +44,11 @@
         </p>
 
         <ul class="social">
+          <li v-if="opening.description_url" class="job-description">
+            <a :href="opening.description_url" target="_blank">
+              📝 Job description
+            </a>
+          </li>
           <li class="email">
             <a href="mailto:hello@meltano.com">
               ✉️ Email us!
