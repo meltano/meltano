@@ -42,16 +42,20 @@ Every open issue _with a sprint milestone_ should have a `flow` label:
 
 #### Priority Labels
 
-We have 4 priority labels:
+We have 5 priority labels:
 
 - `priority::low`
+- `priority::default`
 - `priority::high`
 - `priority::higher`
 - `priority::highest`
 
-The majority of issues should _not_ have priority labels, which is a sign that we are accomplishing [the important as well as the urgent](https://www.mindtools.com/pages/article/newHTE_91.htm). The `priority::low` tag can optionally be used to indicate issues that should be the first to be deprioritized.
+The majority of issues should have the `priority::default` label, which is a sign that we are accomplishing [the important as well as the urgent](https://www.mindtools.com/pages/article/newHTE_91.htm). 
+The `priority::low` tag can optionally be used to indicate issues that should be the first to be deprioritized.
 
-Issues with no priority label in a milestone have a ~80% chance of being completed within a milestone. Issues with the `priority::low` label have a ~50% chance of being completed within a milestone. We aim to close 100% of issues with `priority::high` or above within the milestone.
+Issues with the `priority::default` label in a milestone have a ~80% chance of being completed within a milestone. 
+Issues with the `priority::low` label have a ~50% chance of being completed within a milestone. 
+We aim to close 100% of issues with `priority::high` or above within the milestone.
 
 The `priority::highest` should be resolved for urgent user-facing issues such as the website going down - and should be resolved within 24 hours or less.
 If an issue of this type is moved to another milestone because it was not completed, the priority should most likely be increased.
