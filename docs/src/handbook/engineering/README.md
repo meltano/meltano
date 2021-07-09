@@ -75,6 +75,20 @@ These kinds map onto the [Flow Framework](https://flowframework.org/) items of F
 These are meant to be mutually exclusive and collectively exhaustive, meaning an issue will have 1 and only 1 of these labels. 
 There is a fifth label available for filtering purposes: `kind::Non-Product` which is used for administrative and business-related issues.
 
+| Kind Item      | Delivers                                  | Description                                                           | Example Artifacts                                    |
+|----------------|-------------------------------------------|-----------------------------------------------------------------------|------------------------------------------------------|
+| Features       | New business value                        | New value added to drive a business result; visible to the customer   | Epic, user story, requirement                        |
+| Bugs (Defects) | Quality                                   | Fixes for quality problems that affect customer experience            | Bug, problem, incident, change                       |
+| Risks          | Security, governance, compliance          | Work to address security, privacy, and compliance exposures           | Vulnerability, regulatory requirement                |
+| Tech Debts     | Removal of impediments to future delivery | Improvement of the software architecture and operational architecture | API addition, refactoring, infrastructure automation |
+
+*This table is sourced from "Project to Product" by Mik Kersten.*
+
+FAQ:
+
+* Q: Where would documentation issues fit? 
+  * A: Documentation issues will most likely be considered a Bug if they are not delivered as part of a Feature.
+
 It is the responsibility of the Product team to add this label, but Engineers are welcome to add it as well.
 
 #### Value Stream Labels
