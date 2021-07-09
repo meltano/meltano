@@ -35,7 +35,7 @@ const docsSidebar = [
       "/docs/command-line-interface",
       "/docs/settings",
       "/docs/architecture",
-      ["https://hub.meltano.com/singer/spec","Singer Spec"],
+      ["https://hub.meltano.com/singer/spec", "Singer Spec"],
     ],
   },
   {
@@ -103,23 +103,23 @@ module.exports = {
   ],
   dest: "public",
   themeConfig: {
-      nav: [
+    nav: [
       {
         text: "Connectors",
         items: [
-            {
-                text: "Sources",
-                link: "https://hub.meltano.com/extractors/",
-            },
-            {
-                text: "Destinations",
-                link: "https://hub.meltano.com/loaders/",
-            },
-            {
-                text: "Connector SDK",
-                link: "https://sdk.meltano.com/",
-            },
-        ]
+          {
+            text: "Sources",
+            link: "https://hub.meltano.com/extractors/",
+          },
+          {
+            text: "Destinations",
+            link: "https://hub.meltano.com/loaders/",
+          },
+          {
+            text: "Connector SDK",
+            link: "https://sdk.meltano.com/",
+          },
+        ],
       },
       {
         text: "Partners",
@@ -132,40 +132,41 @@ module.exports = {
       {
         text: "Getting Help",
         items: [
-            {
-                text: "Issue Tracker",
-                link: "https://gitlab.com/meltano/meltano/issues"
-            },
-            {
-                text: "Slack",
-                link: "https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q"
-            },
-            {
-                text: "Office Hours",
-                link: "/docs/community#office-hours"
-            }
+          {
+            text: "Issue Tracker",
+            link: "https://gitlab.com/meltano/meltano/issues",
+          },
+          {
+            text: "Slack",
+            link:
+              "https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q",
+          },
+          {
+            text: "Office Hours",
+            link: "/docs/community#office-hours",
+          },
         ],
       },
       {
         text: "Community",
         items: [
-            {
-                text: "Guidelines",
-                link: "/docs/community#guidelines"
-            },
-            {
-                text: "Demo Days",
-                link: "/docs/community#demo-days"
-            },
-            {
-                text: "Office Hours",
-                link: "/docs/community#office-hours"
-            },
-            {
-                text: "YouTube",
-                link: "https://www.youtube.com/meltano"
-            }
-        ]
+          {
+            text: "Guidelines",
+            link: "/docs/community#guidelines",
+          },
+          {
+            text: "Demo Days",
+            link: "/docs/community#demo-days",
+          },
+          {
+            text: "Office Hours",
+            link: "/docs/community#office-hours",
+          },
+          {
+            text: "YouTube",
+            link: "https://www.youtube.com/meltano",
+          },
+        ],
       },
       { text: "Blog", link: "https://www.meltano.com/blog", target: "_self" },
       {
@@ -203,6 +204,7 @@ module.exports = {
         "/handbook/engineering/",
         "/handbook/marketing/",
         "/handbook/product/",
+        "/handbook/tech-stack/",
         "/handbook/resources/",
       ],
     },
