@@ -268,11 +268,11 @@ To learn more about contributing to Meltano, refer to the [Contributor Guide](/d
 
 ## History
 
-Meltano was [founded](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) inside [GitLab](https://about.gitlab.com/) in 2018 to serve the GitLab Data Team.
+Meltano was [founded](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) inside [GitLab](https://about.gitlab.com/) in 2018 to serve the GitLab Data Team. Meltano started as an open source tool built for GitLab’s data and analytics team, who wanted an end-to-end data platform built around open source components and DevOps principles. 
 
-In 2020, the project [pivoted](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/) to focus on open source data integration (ELT).
+In 2020, the project strategically [pivoted](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/)to focus on open source data integration (ELT).
 
-In 2021, Meltano [spun out](https://meltano.com/blog/2021/06/30/meltano-spins-out-of-gitlab-raises-seed-round) of GitLab and raised a Seed funding round to become an independent startup and bring the benefits of open source data integration and DataOps to a wider audience.
+In 2021, After 3 years of being a GitLab incubator project, Meltano [spun out](https://meltano.com/blog/2021/06/30/meltano-spins-out-of-gitlab-raises-seed-round) of GitLab and raised a seed funding round to become an independent startup and bring the benefits of open source data integration and DataOps to a wider audience.
 
 ## Team
 
@@ -289,3 +289,13 @@ If our [mission](#mission) excites you, and you think could make a great additio
 Please send a cover letter and resume to [hello@meltano.com](mailto:hello@meltano.com) and you'll hear back from us shortly.
 
 <TeamGrid :openings="$frontmatter.openings" />
+
+### Employee Perks
+* Unlimited PTO
+* Professional Development Support and Budget
+* Remote Working
+* Reimbursable coworking fees and external office space
+* Budget for Office equipment and workspace supplies
+* Team Offsites
+* Access to world class founders, investors and mentors
+
