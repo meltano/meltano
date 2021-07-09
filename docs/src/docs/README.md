@@ -80,6 +80,7 @@ openings:
 - title: Remote Office Manager
   location: US time zone, Remote 🌍
   description: "Oversee and assist team with administrative and PeopleOps matters"
+  description_url: https://docs.google.com/document/d/16cOqKZJhPInBALjXPGS0QPyZx4h7l_NhiPkkFlIqEgI/edit
 ---
 
 # Introduction
