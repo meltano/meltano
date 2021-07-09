@@ -88,3 +88,17 @@ Kickoff Call:
 After the Kickoff Call:
 * Close the previous milestone
 * Close Kickoff issue
+
+## Open Source Projects We're Keeping an Eye On
+
+This section is dedicated to tracking interesting open source projects that we want to keep an eye on that we don't already have plans to integrate with.
+This [article from BVP](https://www.bvp.com/atlas/roadmap-data-infrastructure/) is useful as well.
+
+* [Evidence](https://www.evidence.dev/)
+* [Lightdash](https://www.lightdash.com/) - BI, integrates with dbt
+* [metriql](https://metriql.com/) - Headless BI
+* [Rudderstack](https://rudderstack.com/) - Customer Data Platform
+* [Soda SQL](https://github.com/sodadata/soda-sql) - Data Testing and Monitoring
+
+Additionally, there are many "git for data" tools tracked in [this spreadsheet](https://docs.google.com/spreadsheets/d/1jGQY_wjj7dYVne6toyzmU7Ni0tfm-fUEmdh7Nw_ZH0k/edit#gid=0).
+[Project Nessie](https://projectnessie.org/) is another option not listed in the sheet.
