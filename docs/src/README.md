@@ -1,7 +1,7 @@
 ---
 home: true
 heroImage: /meltano-logo.svg
-metaTitle: "Meltano: ELT for the DataOps era"
+metaTitle: "Meltano: Open Source Data Integration"
 description: Open source, self-hosted, CLI-first, debuggable, and extensible. Embraces Singer and its library of connectors, and leverages dbt for transformation.
 installation:
   primaryAction:
@@ -35,18 +35,14 @@ ui:
 
 ::: slot installation
 
-# ELT for the DataOps era
+# ELT (Extract, Load, Transform) for the DataOps era
 
-Meltano is
-[open source](https://gitlab.com/meltano/meltano),
-[self-hosted](/docs/production.html),
-[CLI-first](/docs/command-line-interface.html),
-[debuggable](/docs/command-line-interface.html#debugging), and
-[extensible](/docs/plugins.html).
+Meltano is an open source toolset for managing data pipelines, dashboards, and orchestration. Best of all Meltano is self-hosted, CLI-first, debuggable, and extensible.
 
-[Pipelines are code](#meltano-init),
-ready to be version controlled,
-[containerized](#containerization), and
+**Experience it for yourself in just a few minutes,**
+or watch the ["from 0 to ELT in 90 seconds" speedrun](https://meltano.com/blog/2021/04/28/speedrun-from-0-to-elt-in-90-seconds/)
+
+Data pipelines are code, ready to be version controlled, containerized](#containerization), and
 [deployed continuously](/docs/production.html#and-onto-the-production-environment).
 Develop and test
 [locally](/docs/getting-started.html#local-installation),
@@ -77,9 +73,6 @@ Read on for more about
 :::
 
 ::: slot installation-code
-
-**Experience it for yourself in just a few minutes,**
-or watch the ["from 0 to ELT in 90 seconds" speedrun](https://meltano.com/blog/2021/04/28/speedrun-from-0-to-elt-in-90-seconds/)
 
 ```bash
 # For these examples to work, ensure that:
