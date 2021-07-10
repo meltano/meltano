@@ -6,10 +6,11 @@ import platform
 import shutil
 import subprocess
 import sys
+from asyncio.subprocess import Process
 from collections import namedtuple
 from pathlib import Path
 
-from .error import SubprocessError
+from .error import AsyncSubprocessError
 from .project import Project
 
 logger = logging.getLogger(__name__)
@@ -52,11 +53,11 @@ class VirtualEnv:
         return str(self.root)
 
 
-async def exec_async(*args, **kwargs):
+async def exec_async(*args, **kwargs) -> Process:
     """
     Run an executable asyncronously.
 
-    :raises SubprocessError: if the command fails
+    :raises AsyncSubprocessError: if the command fails
     """
     run = await asyncio.create_subprocess_exec(
         *args,
@@ -67,8 +68,7 @@ async def exec_async(*args, **kwargs):
     await run.wait()
 
     if run.returncode != 0:
-        stderr = await run.stderr.read()
-        raise SubprocessError("Command failed", run, stderr=stderr)
+        raise AsyncSubprocessError("Command failed", run)
 
     return run
 
@@ -125,11 +125,10 @@ class VenvService:
                 "venv",
                 str(self.venv),
             )
-        except SubprocessError as err:
-            raise SubprocessError(
+        except AsyncSubprocessError as err:
+            raise AsyncSubprocessError(
                 f"Could not create the virtualenv for '{self.namespace}/{self.name}'",
                 err.process,
-                stderr=err.stderr,
             )
 
     async def upgrade_pip(self):
@@ -150,16 +149,16 @@ class VenvService:
                 "setuptools",
                 "wheel",
             )
-        except SubprocessError as err:
-            raise SubprocessError(
-                "Failed to upgrade pip to the latest version.", err.process, err.stderr
+        except AsyncSubprocessError as err:
+            raise AsyncSubprocessError(
+                "Failed to upgrade pip to the latest version.", err.process
             )
 
-    async def install(self, pip_url):
+    async def install(self, pip_url: str):
         """
         Install a package using `pip` in the proper virtual environment.
 
-        :raises: SubprocessError: if the command fails.
+        :raises: AsyncSubprocessError: if the command fails.
         """
         meltano_pth_path = self.venv.site_packages_dir.joinpath("meltano_venv.pth")
         if meltano_pth_path.exists():
@@ -176,9 +175,9 @@ class VenvService:
                 "install",
                 *pip_url.split(" "),
             )
-        except SubprocessError as err:
-            raise SubprocessError(
-                f"Failed to install plugin '{self.name}'.", err.process, err.stderr
+        except AsyncSubprocessError as err:
+            raise AsyncSubprocessError(
+                f"Failed to install plugin '{self.name}'.", err.process
             )
 
     def exec_path(self, executable):

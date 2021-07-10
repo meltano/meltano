@@ -3,6 +3,8 @@ import functools
 import io
 import logging
 import subprocess
+from asyncio.subprocess import Process
+from asyncio.streams import StreamReader
 from enum import Enum
 from typing import Optional, Union
 
@@ -50,6 +52,32 @@ class SubprocessError(Exception):
             self._stderr = self._stderr.decode("utf-8")
         elif not isinstance(self._stderr, str):
             self._stderr = self._stderr.read()
+
+        return self._stderr
+
+
+class AsyncSubprocessError(Exception):
+    """Happens when an async subprocess exits with a resultcode != 0"""
+
+    def __init__(
+        self,
+        message: str,
+        process: Process,
+        stderr: Optional[str] = None,
+    ):
+        """Initialize AsyncSubprocessError."""
+        self.process = process
+        self._stderr = stderr or process.stderr
+        super().__init__(message)
+
+    @property
+    async def stderr(self) -> Optional[str]:
+        """Return the output of the process to stderr."""
+        if not self._stderr:
+            return None
+        elif not isinstance(self._stderr, str):
+            stream = await self._stderr.read()
+            self._stderr = stream.decode("utf-8")
 
         return self._stderr
 
