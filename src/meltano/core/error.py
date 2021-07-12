@@ -29,7 +29,7 @@ class ExtractError(Error):
 
 
 class SubprocessError(Exception):
-    """Happens when subprocess exits with a resultcode != 0"""
+    """Happens when subprocess exits with a resultcode != 0."""
 
     def __init__(
         self,
@@ -56,7 +56,7 @@ class SubprocessError(Exception):
 
 
 class AsyncSubprocessError(Exception):
-    """Happens when an async subprocess exits with a resultcode != 0"""
+    """Happens when an async subprocess exits with a resultcode != 0."""
 
     def __init__(
         self,
