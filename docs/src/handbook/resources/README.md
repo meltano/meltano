@@ -2,7 +2,7 @@
 sidebarDepth: 2
 ---
 
-## Recommended Reading, Listening, Watching
+# Recommended Reading, Listening, Watching
 
 - [Slides from a similar talk by Taylor at the 2019 Music City Tech Conference in Nashville](https://docs.google.com/presentation/d/1oSdej0y7o5d4DKlyykmTEMbokr7sRIxMkFmw6Z8a270/edit?usp=sharing)
 - [How Data Teams Do More With Less By Adopting Software Engineering Best Practices - Thomas La Piana's talk at the 2018 DataEngConf in NYC](https://www.youtube.com/watch?v=eu623QBwakc)
