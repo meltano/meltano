@@ -53,7 +53,6 @@ members:
 - name: Florian Hines
   title: Staff Backend Engineer
   location: San Antonio, TX, USA 🇺🇸
-  start_date: July 12, 2021
   gravatar_hash: 88529f59d3f298bcc9e2a705dc1f1c68
   social:
     gitlab: pandemicsyn
