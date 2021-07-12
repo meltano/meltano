@@ -124,7 +124,7 @@ class PluginInstallService:
 
     def install_all_plugins(
         self, reason=PluginInstallReason.INSTALL
-    ) -> [PluginInstallState]:
+    ) -> Tuple[PluginInstallState]:
         """
         Install all the plugins for the project.
 
@@ -136,7 +136,7 @@ class PluginInstallService:
         self,
         plugins: Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
-    ) -> [PluginInstallState]:
+    ) -> Tuple[PluginInstallState]:
         """
         Install all the provided plugins.
 
@@ -148,7 +148,7 @@ class PluginInstallService:
         self,
         plugins: Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
-    ) -> [PluginInstallState]:
+    ) -> Tuple[PluginInstallState]:
         """Install all the provided plugins."""
         results = await asyncio.gather(
             *[
