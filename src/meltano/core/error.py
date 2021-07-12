@@ -4,7 +4,6 @@ import io
 import logging
 import subprocess
 from asyncio.subprocess import Process
-from asyncio.streams import StreamReader
 from enum import Enum
 from typing import Optional, Union
 
