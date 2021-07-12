@@ -74,7 +74,7 @@ async def exec_async(*args, **kwargs) -> Process:
 
 
 class VenvService:
-    def __init__(self, project, namespace="", name=""):
+    def __init__(self, project: Project, namespace: str = "", name: str = ""):
         """
         Manage isolated virtual environments.
 
