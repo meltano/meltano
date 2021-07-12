@@ -16,6 +16,7 @@ but we should explicitly move things over to our own handbook so that we can ada
 - [Engineering Handbook](/handbook/engineering/)
 - [Marketing Handbook](/handbook/marketing/)
 - [Product Handbook](/handbook/product/)
+- [Tech Stack](/handbook/tech-stack/)
 - [Data Learning Resources](/handbook/resources/)
 
 ## Customer Support
@@ -23,8 +24,6 @@ but we should explicitly move things over to our own handbook so that we can ada
 ### Email
 
 Emails to `hello@meltano.com` forward to Zendesk so they can be triaged, assigned, and managed.
-This email is not advertised anywhere (but here), but is used for all of our subscriptions.
-Team members have their own accounts and master account login info can be found in 1Password.
 
 #### Responsible Disclosure of Security Vulnerabilities
 
@@ -34,7 +33,6 @@ As documented in our [Responsible Disclosure Policy](/docs/responsible-disclosur
 ### Intercom Live Chat
 
 The [Meltano.com website](https://www.meltano.com) is set up with live chat powered by Intercom.
-Team members have their own accounts and master account login info can be found in 1Password.
 
 ## Calendars
 
