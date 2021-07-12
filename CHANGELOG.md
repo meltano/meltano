@@ -22,6 +22,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2828](https://gitlab.com/meltano/meltano/-/issues/2828) Fix coroutine error when `python3-venv` is missing during plugin installation.
+
 ### Breaks
 
 
