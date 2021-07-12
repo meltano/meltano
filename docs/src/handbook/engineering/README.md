@@ -320,3 +320,17 @@ When any instance managed by us is reported to be down, through Pingdom or any o
 ## GitHub Mirrors
 
 We mirror the three main Meltano repositories (meltano/sdk/hub) from GitLab to GitHub. This is managed via the "Mirroring repositories" section with the Settings of the GitLab repository. The push was created using Taylor's personal GitHub account (tayloramurphy) with a personal access token made just for the use case. This was tracked in [this issue](https://gitlab.com/meltano/meta/-/issues/55).
+
+## Domain names, DNS, and hosting
+
+Domain names are typically registered with [Amazon Web Services](/handbook/tech-stack/#amazon-web-services).
+[NameCheap](/handbook/tech-stack/#namecheap) can be used if a TLD is not available there.
+For legacy reasons, one domain name is still registered with [Gandi](/handbook/tech-stack/#gandi).
+
+DNS is typically managed at [SiteGround](/handbook/tech-stack/#siteground).
+DNS for `*.meltanodata.com` is managed at [DigitalOcean](/handbook/tech-stack/#digitalocean).
+DNS for `singerhub.io` is managed at [NameCheap](/handbook/tech-stack/#namecheap).
+
+<https://meltano.com> is hosted at [SiteGround](/handbook/tech-stack/#siteground).
+<https://hub.meltano.com> is hosted using [GitLab Pages](https://docs.gitlab.com/ee/user/project/pages/) for <https://gitlab.com/meltano/hub>.
+<https://sdk.meltano.com> is hosted at [Read the Docs](/handbook/tech-stack/#read-the-docs).
