@@ -34,11 +34,13 @@ This is in preparation for the Product milestone review and Wee[kly Kickoff](han
 
 Every open issue _with a sprint milestone_ should have a `flow` label:
 
-- `flow::Triage` : On our mind for this milestone, but likely to be moved to a subsequent week. If there's room in the week in question, can be moved to `flow::To Do`
-- `flow::To Do`: Something we intend to do during the week in question
+- `flow::Triage` : We are considering removing this label.
+- `flow::To Do`: The issue is refined, assigned, and ready to be worked on
 - `flow::Doing`: Currently being worked on
 - `flow::Blocked`: Blocked by some other issue
 - `flow::Review`: Currently in review
+
+These labels do not indicate urgency and should only be used to indicate the work status.
 
 #### Urgency Labels
 
