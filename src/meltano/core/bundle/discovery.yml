@@ -677,7 +677,7 @@ extractors:
         pip_url: git+https://github.com/singer-io/tap-github.git
         repo: https://github.com/singer-io/tap-github
         capabilities:
-          - catalog
+          - properties
           - discover
           - state
         settings_group_validation:
@@ -890,7 +890,7 @@ extractors:
       repo: https://github.com/singer-io/tap-jira
       capabilities:
         - discover
-        - catalog
+        - properties
         - state
       settings_group_validation:
         - ['username','password','base_url','start_date','user_agent']
