@@ -39,8 +39,8 @@ class VirtualEnv:
 
     @classmethod
     def platform_specs(cls):
+        system = platform.system()
         try:
-            system = platform.system()
             return cls.PLATFORM_SPECS[system]
         except KeyError:
             raise Exception(f"Platform {system} not supported.")
