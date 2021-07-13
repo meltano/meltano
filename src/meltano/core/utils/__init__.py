@@ -46,7 +46,7 @@ def run_async(coro):
         pass
     finally:
         all_tasks = asyncio.gather(
-            *asyncio.all_tasks(loop), return_exceptions=True
+            *asyncio.Task.all_tasks(loop), return_exceptions=True
         )
         all_tasks.cancel()
         with suppress(asyncio.CancelledError):
