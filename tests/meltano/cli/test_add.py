@@ -81,7 +81,10 @@ class TestCliAdd:
             plugins.reverse()
 
             install_plugin_mock.assert_called_once_with(
-                project, plugins, reason=PluginInstallReason.ADD, parallelism=1,
+                project,
+                plugins,
+                reason=PluginInstallReason.ADD,
+                parallelism=1,
             )
 
     def test_add_multiple(self, project, cli_runner, project_plugins_service):
@@ -462,7 +465,10 @@ class TestCliAdd:
             assert plugin.settings == plugin_variant.settings
 
             install_plugin_mock.assert_called_once_with(
-                project, [plugin], reason=PluginInstallReason.ADD, parallelism=1,
+                project,
+                [plugin],
+                reason=PluginInstallReason.ADD,
+                parallelism=1,
             )
 
     def test_add_custom_no_install(self, project, cli_runner, project_plugins_service):
@@ -511,7 +517,10 @@ class TestCliAdd:
             assert plugin.executable == plugin_variant.executable == executable
 
             install_plugin_mock.assert_called_once_with(
-                project, [plugin], reason=PluginInstallReason.ADD, parallelism=1,
+                project,
+                [plugin],
+                reason=PluginInstallReason.ADD,
+                parallelism=1,
             )
 
     def test_add_custom_variant(
