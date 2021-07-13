@@ -81,7 +81,7 @@ class TestCliAdd:
             plugins.reverse()
 
             install_plugin_mock.assert_called_once_with(
-                project, plugins, reason=PluginInstallReason.ADD
+                project, plugins, reason=PluginInstallReason.ADD, parallelism=1,
             )
 
     def test_add_multiple(self, project, cli_runner, project_plugins_service):
@@ -119,6 +119,7 @@ class TestCliAdd:
                 project,
                 [tap_facebook, tap_adwords, tap_gitlab],
                 reason=PluginInstallReason.ADD,
+                parallelism=1,
             )
 
     def test_add_transform(self, project, cli_runner):
@@ -266,6 +267,7 @@ class TestCliAdd:
                 project,
                 [dashboard, model, transform, tap],
                 reason=PluginInstallReason.ADD,
+                parallelism=1,
             )
 
     def test_add_missing(self, project, cli_runner, project_plugins_service):
@@ -460,7 +462,7 @@ class TestCliAdd:
             assert plugin.settings == plugin_variant.settings
 
             install_plugin_mock.assert_called_once_with(
-                project, [plugin], reason=PluginInstallReason.ADD
+                project, [plugin], reason=PluginInstallReason.ADD, parallelism=1,
             )
 
     def test_add_custom_no_install(self, project, cli_runner, project_plugins_service):
@@ -509,7 +511,7 @@ class TestCliAdd:
             assert plugin.executable == plugin_variant.executable == executable
 
             install_plugin_mock.assert_called_once_with(
-                project, [plugin], reason=PluginInstallReason.ADD
+                project, [plugin], reason=PluginInstallReason.ADD, parallelism=1,
             )
 
     def test_add_custom_variant(
