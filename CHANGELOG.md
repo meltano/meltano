@@ -22,7 +22,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#2951](https://gitlab.com/meltano/meltano/-/issues/2851) Default to skipping transforms in pipeline creation
+- [#2951](https://gitlab.com/meltano/meltano/-/issues/2851) Default to skipping transforms in Meltano UI pipeline creation
 
 ### Breaks
 
