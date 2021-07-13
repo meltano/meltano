@@ -43,7 +43,7 @@ class Airflow(BasePlugin):
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
     @hook("before_configure")
-    def before_configure(self, invoker, session):
+    def before_configure(self, invoker: AirflowInvoker, session):
         # generate the default `airflow.cfg`
         handle = invoker.invoke(
             "--help",
@@ -85,7 +85,12 @@ class Airflow(BasePlugin):
             stderr=subprocess.PIPE,
             universal_newlines=True,
         )
-        version, err = handle.communicate()
+        return_code = handle.wait()
+
+        if return_code:
+            raise SubprocessError("Airflow version could not be retrieved", process=handle)
+
+        version = handle.stdout.read()
 
         init_db_cmd = (
             ["initdb"]
