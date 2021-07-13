@@ -22,6 +22,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2758](https://gitlab.com/meltano/meltano/-/issues/2758) Incorrect error message when calling `meltano invoke airflow <args>`
+
 ### Breaks
 
 
