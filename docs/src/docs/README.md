@@ -73,9 +73,10 @@ openings:
 - title: Senior Frontend Engineer & UI/UX Designer
   location: Anywhere, Remote 🌍
   description: "Nice to have: Vue.js experience"
-- title: Senior Data Engineer / Analyst
+- title: Senior Data Engineer
   location: Anywhere, Remote 🌍
-  description: "Required: SQL & Python experience"
+  description: "Use Meltano to build a world-class data platform"
+  description_url: https://docs.google.com/document/d/1cWBRnm8Bm729ew7TRLwkKbbc4U2NKHMx9rTuErh1Oos/edit
 - title: Remote Office Manager
   location: US time zone, Remote 🌍
   description: "Oversee and assist team with administrative and PeopleOps matters"
