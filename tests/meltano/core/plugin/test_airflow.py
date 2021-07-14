@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.airflow import subprocess
+from meltano.core.plugin.airflow import AirflowInvoker, subprocess
 from meltano.core.plugin_install_service import PluginInstallService
 
 AIRFLOW_CONFIG = """
@@ -25,6 +25,7 @@ class TestAirflow:
         handle_mock = mock.Mock()
         handle_mock.wait.return_value = 0
         handle_mock.communicate.return_value = "2.0.1", None
+        handle_mock.stdout.read.return_value = "2.0.1"
 
         original_popen = subprocess.Popen
 
@@ -56,7 +57,7 @@ class TestAirflow:
         ) as popen, mock.patch(
             "meltano.core.plugin_invoker.PluginConfigService.configure"
         ) as configure:
-            invoker = plugin_invoker_factory(subject)
+            invoker: AirflowInvoker = plugin_invoker_factory(subject)
             # This ends up calling subject.before_configure
             with invoker.prepared(session):
                 commands = [
