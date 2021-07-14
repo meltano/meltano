@@ -49,9 +49,13 @@ class Airflow(BasePlugin):
             "--help",
             require_preparation=False,
             stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
         )
-        handle.wait()
+        return_code = handle.wait()
+
+        if return_code:
+            raise SubprocessError("Command `airflow --help` failed", process=handle)
 
         airflow_cfg_path = invoker.files["config"]
         logging.debug(f"Generated default '{str(airflow_cfg_path)}'")
@@ -88,7 +92,7 @@ class Airflow(BasePlugin):
         return_code = handle.wait()
 
         if return_code:
-            raise SubprocessError("Airflow version could not be retrieved", process=handle)
+            raise SubprocessError("Command `airflow version` failed", process=handle)
 
         version = handle.stdout.read()
 
