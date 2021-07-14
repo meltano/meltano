@@ -37,6 +37,29 @@ class Airflow(BasePlugin):
             nest(config, key, str(value))
         return config
 
+    @staticmethod
+    def update_config_file(invoker: AirflowInvoker) -> None:
+        """Update airflow.cfg with plugin configuration."""
+        airflow_cfg_path = invoker.files["config"]
+        logging.debug(f"Generated default '{str(airflow_cfg_path)}'")
+
+        # open the configuration and update it
+        # now we let's update the config to use our stubs
+        airflow_cfg = configparser.ConfigParser()
+
+        with airflow_cfg_path.open() as cfg:
+            airflow_cfg.read_file(cfg)
+            logging.debug(f"Loaded '{str(airflow_cfg_path)}'")
+
+        config = invoker.plugin_config_processed
+        for section, cfg in config.items():
+            airflow_cfg[section].update(cfg)
+            logging.debug(f"\tUpdated section [{section}] with {cfg}")
+
+        with airflow_cfg_path.open("w") as cfg:
+            airflow_cfg.write(cfg)
+            logging.debug(f"Saved '{str(airflow_cfg_path)}'")
+
     @hook("before_install")
     def setup_env(self, *args, **kwargs):
         # to make airflow installables without GPL dependency
@@ -58,25 +81,8 @@ class Airflow(BasePlugin):
         if return_code:
             raise SubprocessError("Command `airflow --help` failed", process=handle)
 
-        airflow_cfg_path = invoker.files["config"]
-        logging.debug(f"Generated default '{str(airflow_cfg_path)}'")
-
-        # open the configuration and update it
-        # now we let's update the config to use our stubs
-        airflow_cfg = configparser.ConfigParser()
-
-        with airflow_cfg_path.open() as cfg:
-            airflow_cfg.read_file(cfg)
-            logging.debug(f"Loaded '{str(airflow_cfg_path)}'")
-
-        config = invoker.plugin_config_processed
-        for section, cfg in config.items():
-            airflow_cfg[section].update(cfg)
-            logging.debug(f"\tUpdated section [{section}] with {cfg}")
-
-        with airflow_cfg_path.open("w") as cfg:
-            airflow_cfg.write(cfg)
-            logging.debug(f"Saved '{str(airflow_cfg_path)}'")
+        # Read and update airflow.cfg
+        self.update_config_file(invoker)
 
         # we've changed the configuration here, so we need to call
         # prepare again on the invoker so it re-reads the configuration
