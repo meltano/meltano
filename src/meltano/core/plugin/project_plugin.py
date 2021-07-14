@@ -40,8 +40,8 @@ class ProjectPlugin(PluginRef):
         namespace: Optional[str] = None,
         variant: Optional[str] = None,
         pip_url: Optional[str] = None,
-        config: Optional[dict] = None,
         executable: Optional[str] = None,
+        config: Optional[dict] = None,
         commands: Optional[dict] = None,
         default_variant=Variant.ORIGINAL_NAME,
         **extras,
@@ -80,10 +80,11 @@ class ProjectPlugin(PluginRef):
         self.set_presentation_attrs(extras)
         self.variant = variant
         self.pip_url = pip_url
+        self.executable = executable
         self.commands = Command.parse_all(commands)
 
         self._fallbacks.update(
-            ["logo_url", "description", self.VARIANT_ATTR, "pip_url"]
+            ["logo_url", "description", self.VARIANT_ATTR, "pip_url", "executable"]
         )
 
         # If no variant is set, we fall back on the default
@@ -105,7 +106,6 @@ class ProjectPlugin(PluginRef):
             self._fallbacks.update(["namespace", "label"])
 
         self.config = copy.deepcopy(config or {})
-        self.executable = executable
         self.extras = extras
 
         if "profiles" in extras:

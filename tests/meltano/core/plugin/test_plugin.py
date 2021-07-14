@@ -232,7 +232,6 @@ class TestProjectPlugin:
             "name": "tap-example-foo",
             "inherit_from": "tap-example",
             "variant": "meltano",
-            "executable": "example-foo",
         },
     }
 
@@ -295,7 +294,6 @@ class TestProjectPlugin:
         assert plugin.name == "tap-example-foo"
         assert plugin.inherit_from == "tap-example"
         assert plugin.variant == "meltano"
-        assert plugin.executable == "example-foo"
 
         # Defaults
         assert plugin.namespace == "tap_example_foo"
@@ -315,7 +313,7 @@ class TestProjectPlugin:
         assert isinstance(base_plugin, BasePlugin)
 
         # These attrs exist both on ProjectPlugin and PluginBase
-        for attr in ("logo_url", "description", "variant", "pip_url"):
+        for attr in ("logo_url", "description", "variant", "pip_url", "executable"):
             # By default, they fall back on the parent
             assert (
                 getattr(inherited_tap, attr)

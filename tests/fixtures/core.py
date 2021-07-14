@@ -44,6 +44,7 @@ def discovery():
                 {
                     "name": "meltano",
                     "pip_url": "tap-mock",
+                    "executable": "tap-mock",
                     "capabilities": ["discover", "catalog", "state"],
                     "settings": [
                         {"name": "test", "value": "mock"},
@@ -293,6 +294,23 @@ def inherited_tap(project_add_service, tap):
             PluginType.EXTRACTORS,
             "tap-mock-inherited",
             inherit_from=tap.name,
+            commands={
+                "cmd": "cmd inherited",
+                "cmd-inherited": "cmd-inherited",
+            },
+        )
+    except PluginAlreadyAddedException as err:
+        return err.plugin
+
+
+@pytest.fixture(scope="class")
+def inherited_tap_with_executable(project_add_service, tap):
+    try:
+        return project_add_service.add(
+            PluginType.EXTRACTORS,
+            "tap-mock-inherited",
+            inherit_from=tap.name,
+            executable="example-override",
             commands={
                 "cmd": "cmd inherited",
                 "cmd-inherited": "cmd-inherited",
