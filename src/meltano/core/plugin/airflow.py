@@ -44,6 +44,7 @@ class Airflow(BasePlugin):
 
     @hook("before_configure")
     def before_configure(self, invoker: AirflowInvoker, session):
+        """Keep the Airflow metadata database up-to-date."""
         # generate the default `airflow.cfg`
         handle = invoker.invoke(
             "--help",
