@@ -41,6 +41,7 @@ class ProjectPlugin(PluginRef):
         variant: Optional[str] = None,
         pip_url: Optional[str] = None,
         config: Optional[dict] = None,
+        executable: Optional[str] = None,
         commands: Optional[dict] = None,
         default_variant=Variant.ORIGINAL_NAME,
         **extras,
@@ -104,6 +105,7 @@ class ProjectPlugin(PluginRef):
             self._fallbacks.update(["namespace", "label"])
 
         self.config = copy.deepcopy(config or {})
+        self.executable = executable
         self.extras = extras
 
         if "profiles" in extras:

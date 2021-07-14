@@ -226,11 +226,13 @@ class TestProjectPlugin:
             "settings": [{"name": "foo"}],
             "config": {"foo": "bar"},
             "baz": "qux",
+            "executable": "example",
         },
         "inherited": {
             "name": "tap-example-foo",
             "inherit_from": "tap-example",
             "variant": "meltano",
+            "executable": "example-foo",
         },
     }
 
@@ -293,6 +295,7 @@ class TestProjectPlugin:
         assert plugin.name == "tap-example-foo"
         assert plugin.inherit_from == "tap-example"
         assert plugin.variant == "meltano"
+        assert plugin.executable == "example-foo"
 
         # Defaults
         assert plugin.namespace == "tap_example_foo"
