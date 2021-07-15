@@ -304,23 +304,6 @@ def inherited_tap(project_add_service, tap):
 
 
 @pytest.fixture(scope="class")
-def inherited_tap_with_executable(project_add_service, tap):
-    try:
-        return project_add_service.add(
-            PluginType.EXTRACTORS,
-            "tap-mock-inherited",
-            inherit_from=tap.name,
-            executable="example-override",
-            commands={
-                "cmd": "cmd inherited",
-                "cmd-inherited": "cmd-inherited",
-            },
-        )
-    except PluginAlreadyAddedException as err:
-        return err.plugin
-
-
-@pytest.fixture(scope="class")
 def nonpip_tap(project_add_service):
     try:
         return project_add_service.add(
