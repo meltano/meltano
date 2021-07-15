@@ -25,6 +25,8 @@ invoke its executable using [`meltano invoke`](#invoke), and use it in a pipelin
 
 To learn more about adding a plugin to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-a-plugin-to-your-project).
 
+> Note: Unlike [`meltano install`](#install), this command installs plugins serially to avoid missing dependencies (e.g. a [`transform`](/docs/plugins#transforms) requires the [`dbt` plugin](/docs/transforms) to be installed first).
+
 ### How to use
 
 The only required arguments are the new plugin's [type](/docs/plugins.html#types) and unique name:

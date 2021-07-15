@@ -22,6 +22,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2826](https://gitlab.com/meltano/meltano/-/issues/2826) Make plugin installation serial during `meltano add ...`
+
 ### Breaks
 
 
