@@ -384,7 +384,6 @@ def install_status_update(install_state):
     elif install_state.status is PluginInstallStatus.SUCCESS:
         msg = f"{install_state.verb} {desc} '{plugin.name}'"
         click.secho(msg, fg="green")
-        click.echo()
 
 
 def install_plugins(
