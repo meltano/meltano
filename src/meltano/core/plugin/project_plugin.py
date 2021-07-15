@@ -61,7 +61,13 @@ class ProjectPlugin(PluginRef):
         if not self.inherit_from and namespace:
             # When not explicitly inheriting, a namespace indicates an embedded custom plugin definition
             self.custom_definition = PluginDefinition(
-                plugin_type, name, namespace, variant=variant, pip_url=pip_url, **extras
+                plugin_type,
+                name,
+                namespace,
+                variant=variant,
+                pip_url=pip_url,
+                executable=executable,
+                **extras,
             )
 
             # Any properties considered "extra" by the embedded plugin definition

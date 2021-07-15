@@ -222,11 +222,11 @@ class TestProjectPlugin:
             "namespace": "tap_example",
             "variant": "meltano",
             "pip_url": "tap-example",
+            "executable": "example",
             "repo": "https://gitlab.com/meltano/tap-example",
             "settings": [{"name": "foo"}],
             "config": {"foo": "bar"},
             "baz": "qux",
-            "executable": "example",
         },
         "inherited": {
             "name": "tap-example-foo",
@@ -283,6 +283,7 @@ class TestProjectPlugin:
         assert plugin.variant == variant.name == attrs["variant"]
 
         assert plugin.pip_url == variant.pip_url == attrs["pip_url"]
+        assert plugin.executable == variant.executable == attrs["executable"]
         assert plugin.repo == variant.repo == attrs["repo"]
 
         assert plugin_def.extras == variant.extras == {}
