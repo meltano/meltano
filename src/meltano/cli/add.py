@@ -87,7 +87,15 @@ def add(
     # be installed first.
     plugins.reverse()
 
-    success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
+    # Plugin installation can be order dependent (e.g. a dbt transform package
+    # requires the dbt transformer to be installed before), so we will disable
+    # parallelism for this operation.
+    success = install_plugins(
+        project,
+        plugins,
+        reason=PluginInstallReason.ADD,
+        parallelism=1,
+    )
 
     if not success:
         raise CliError("Failed to install plugin(s)")
