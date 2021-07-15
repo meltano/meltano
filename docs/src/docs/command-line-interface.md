@@ -412,6 +412,29 @@ Use `--include-related` to automatically install transform, model, and dashboard
 
 Meltano installs plugins in parallel. The number of plugins to install in parallel defaults to the number of CPUs on the machine, but can be controlled with `--parallelism`. Use `--parallelism=1` to disable the feature and install them one at a time.
 
+::: tip
+If you're using a custom Docker image, make sure `python3-venv` is installed:
+
+```Dockerfile
+FROM ubuntu:20.04
+
+RUN apt-get update && \
+    apt-get install -y -q \
+    gcc \
+    sqlite3 \
+    libsqlite3-dev \
+    python3 \
+    python3-pip \
+    python3-venv # Add this line
+
+RUN pip3 install meltano
+
+WORKDIR /meltano
+COPY meltano.yml meltano.yml
+RUN mkdir .meltano/ && meltano install
+```
+:::
+
 ### How to Use
 
 ```bash
