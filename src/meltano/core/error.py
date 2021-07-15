@@ -3,6 +3,7 @@ import functools
 import io
 import logging
 import subprocess
+from asyncio.streams import StreamReader
 from asyncio.subprocess import Process
 from enum import Enum
 from typing import Optional, Union
@@ -66,7 +67,7 @@ class AsyncSubprocessError(Exception):
     ):
         """Initialize AsyncSubprocessError."""
         self.process = process
-        self._stderr = stderr or process.stderr
+        self._stderr: Union[str, StreamReader, None] = stderr or process.stderr
         super().__init__(message)
 
     @property
