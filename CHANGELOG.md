@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#2951](https://gitlab.com/meltano/meltano/-/issues/2851) Default to skipping transforms in Meltano UI pipeline creation
+- [#2758](https://gitlab.com/meltano/meltano/-/issues/2758) Fix misleading error message when calling `meltano invoke airflow <args>`
 
 ### Breaks
 
