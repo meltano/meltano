@@ -150,8 +150,10 @@ New epics can be created for topics or efforts that will take multiple issues ov
 All non-trivial merge requests should be reviewed and merged by someone other than the author.
 A merge request that touches code is never trivial, but one that fixes a typo in the documentation probably is.
 
-All team members are expected to review community contributions, but these can only be merged by an expert on the part of the code base in question.
-Right now, Douwe is the only expert.
+All team members are encouraged to review community contributions, but these can only be merged by an approved
+codeowner for the part of the code base in question.
+
+If codeowners are not set, team members should use their best judgment and always ask for confirmation if unsure.
 
 As experts catch issues in MRs that the original reviewers did not,
 we will update this section and the [Contributor Guide](/docs/contributor-guide.md#reviews),
@@ -166,6 +168,8 @@ at which points they will be experts themselves.
 - [Value Stream](https://gitlab.com/groups/meltano/-/boards/2917637) - useful for understanding the distribution of work acrss the different product areas of Meltano
 - [Urgency](https://gitlab.com/groups/meltano/-/boards/2917749) - useful for understanding the overall priority of issues in a milestone.
 - [Milestone](https://gitlab.com/groups/meltano/-/boards/1933232) - used to move issues easily between milestones.
+- [Office Hours](https://gitlab.com/groups/meltano/-/boards/2923184) - used to tee up issues for community discussion and review, generally directly
+before and/or after implementing an important user-facing feature.
 
 ## Release Process
 
