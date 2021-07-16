@@ -40,6 +40,7 @@ class ProjectPlugin(PluginRef):
         namespace: Optional[str] = None,
         variant: Optional[str] = None,
         pip_url: Optional[str] = None,
+        executable: Optional[str] = None,
         config: Optional[dict] = None,
         commands: Optional[dict] = None,
         default_variant=Variant.ORIGINAL_NAME,
@@ -60,7 +61,13 @@ class ProjectPlugin(PluginRef):
         if not self.inherit_from and namespace:
             # When not explicitly inheriting, a namespace indicates an embedded custom plugin definition
             self.custom_definition = PluginDefinition(
-                plugin_type, name, namespace, variant=variant, pip_url=pip_url, **extras
+                plugin_type,
+                name,
+                namespace,
+                variant=variant,
+                pip_url=pip_url,
+                executable=executable,
+                **extras,
             )
 
             # Any properties considered "extra" by the embedded plugin definition
@@ -79,10 +86,11 @@ class ProjectPlugin(PluginRef):
         self.set_presentation_attrs(extras)
         self.variant = variant
         self.pip_url = pip_url
+        self.executable = executable
         self.commands = Command.parse_all(commands)
 
         self._fallbacks.update(
-            ["logo_url", "description", self.VARIANT_ATTR, "pip_url"]
+            ["logo_url", "description", self.VARIANT_ATTR, "pip_url", "executable"]
         )
 
         # If no variant is set, we fall back on the default
