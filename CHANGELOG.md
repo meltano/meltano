@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#2951](https://gitlab.com/meltano/meltano/-/issues/2851) Default to skipping transforms in Meltano UI pipeline creation
+- [#2855](https://gitlab.com/meltano/meltano/-/issues/2855) Allow `executable` to be overridden through plugin inheritance
 
 ### Breaks
 
