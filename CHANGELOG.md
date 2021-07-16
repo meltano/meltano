@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.78.0 - (2021-07-15)
+---
+
+### New
+
 - [#2814](https://gitlab.com/meltano/meltano/-/issues/2814) Add `mashey` variant of `tap-ask-nicely`
 - [#2815](https://gitlab.com/meltano/meltano/-/issues/2815) Add `singer-io` variant of `tap-github`
 - [#2816](https://gitlab.com/meltano/meltano/-/issues/2816) Add `singer-io` variant of `tap-google-sheets`
@@ -18,7 +30,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2821](https://gitlab.com/meltano/meltano/-/issues/2821) Add `singer-io` variant of `tap-jira`
 - [#2823](https://gitlab.com/meltano/meltano/-/issues/2823) Add `transferwise` variant of `tap-twilio`
 
-### Changes
 
 ### Fixes
 
@@ -26,8 +37,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2758](https://gitlab.com/meltano/meltano/-/issues/2758) Fix misleading error message when calling `meltano invoke airflow <args>`
 - [#2826](https://gitlab.com/meltano/meltano/-/issues/2826) Make plugin installation serial during `meltano add ...`
 - [#2828](https://gitlab.com/meltano/meltano/-/issues/2828) Fix coroutine error when `python3-venv` is missing during plugin installation.
-
-### Breaks
 
 
 ## 1.77.0 - (2021-06-17)
