@@ -70,7 +70,7 @@ class TestPluginInvoker:
         )
 
         assert exec_args[0].endswith("utility-mock")
-        assert exec_args[1:] == ["utility", "--option", "env-var-arg", "extra", "args"]
+        assert exec_args[1:] == ["--option", "env-var-arg", "extra", "args"]
 
     def test_expand_command_exec_args(self, plugin_invoker):
         exec_args = plugin_invoker.exec_args(
@@ -83,7 +83,7 @@ class TestPluginInvoker:
         )
 
         assert exec_args[0].endswith("utility-mock")
-        assert exec_args[1:] == ["utility", "--option", "env-var-arg", "extra", "args"]
+        assert exec_args[1:] == ["--option", "env-var-arg", "extra", "args"]
 
     def test_undefined_env_var(self, plugin_invoker):
         with pytest.raises(UndefinedEnvVarError) as err:
@@ -93,6 +93,19 @@ class TestPluginInvoker:
             "Command 'cmd' referenced unset environment variable '$ENV_VAR_ARG' in an argument"
             in str(err.value)  # noqa: WPS441
         )
+
+    def test_alternate_command_executable(self, plugin_invoker):
+        exec_args = plugin_invoker.exec_args(
+            "extra",
+            "args",
+            command="alternate-exec",
+            env={
+                "ENV_VAR_ARG": "env-var-arg",
+            },
+        )
+
+        assert exec_args[0].endswith("other-utility")
+        assert exec_args[1:] == ["--option", "env-var-arg", "extra", "args"]
 
     @pytest.mark.parametrize(
         "executable_str,assert_fn",

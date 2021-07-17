@@ -176,17 +176,23 @@ class PluginInvoker:
     def exec_args(self, *args, command=None, env=None):
         """Materialize the arguments to be passed to the executable."""
         env = env or {}
-        if command:
-            try:
-                plugin_args = self.plugin.all_commands[command].expanded_args(
-                    command, env
-                )
-            except KeyError as err:
-                raise UnknownCommandError(self.plugin, command) from err
-        else:
+        executable = self.exec_path()
+        if not command:
             plugin_args = self.plugin.exec_args(self)
+        else:
+            command_config = self.find_command(command)
+            plugin_args = command_config.expanded_args(command, env)
+            if command_config.executable:
+                executable = command_config.executable
 
-        return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
+        return [str(arg) for arg in (executable, *plugin_args, *args)]
+
+    def find_command(self, name):
+        """Find a Command by name. Raises `UnknownCommandError` if not defined."""
+        try:
+            return self.plugin.all_commands[name]
+        except KeyError as err:
+            raise UnknownCommandError(self.plugin, name) from err
 
     def env(self):
         env = {
