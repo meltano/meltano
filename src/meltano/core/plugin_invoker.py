@@ -177,13 +177,13 @@ class PluginInvoker:
         """Materialize the arguments to be passed to the executable."""
         env = env or {}
         executable = self.exec_path()
-        if not command:
-            plugin_args = self.plugin.exec_args(self)
-        else:
+        if command:
             command_config = self.find_command(command)
             plugin_args = command_config.expanded_args(command, env)
             if command_config.executable:
                 executable = command_config.executable
+        else:
+            plugin_args = self.plugin.exec_args(self)
 
         return [str(arg) for arg in (executable, *plugin_args, *args)]
 
