@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2860](https://gitlab.com/meltano/meltano/-/issues/2860) Allow commands to use alternate executables
+
 ### Fixes
 
 ### Breaks
