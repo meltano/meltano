@@ -37,7 +37,8 @@ On these days, we will close the doors to the Meltano virtual office, reschedule
 Team members can share about their Family and Friends Day in the #family-and-friends-day Slack channel after the event, or publicly on social media such as Twitter, LinkedIn, or wherever they're most comfortable using the hashtag #FamilyFriends1st. 
 Sharing is optional. 
 Taking the day off is strongly encouraged if your role allows it.
-Upcoming Family and Friends Days:
+
+#### Upcoming Family and Friends Days
 
 * 2021-08-20 - The first Meltano Family & Friends Day
 * 2021-09-17
