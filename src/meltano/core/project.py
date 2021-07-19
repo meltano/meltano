@@ -19,6 +19,7 @@ from werkzeug.utils import secure_filename
 from .behavior.versioned import Versioned
 from .error import Error
 from .meltano_file import MeltanoFile
+from .multiple_config import MultipleConfigService
 from .utils import makedirs, truthy
 
 logger = logging.getLogger(__name__)
@@ -162,8 +163,9 @@ class Project(Versioned):
         """Return a copy of the current meltano config"""
         # fmt: off
         with self._meltano_rw_lock.read_lock(), \
-             self.meltanofile.open() as meltanofile:
-            return MeltanoFile.parse(yaml.safe_load(meltanofile))
+             self.meltanofile as meltanofile:
+            multiple_config = MultipleConfigService(meltanofile)
+            return MeltanoFile.parse(multiple_config.load_meltano_read())
         # fmt: on
 
     @contextmanager
