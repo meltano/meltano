@@ -1,10 +1,10 @@
+import os
 from pathlib import Path
 
 import yaml
 
 
-def load(configfile: str) -> dict:
-    configfile = Path(configfile)
+def load(configfile: Path) -> dict:
     return yaml.safe_load(configfile.open())
 
 
@@ -27,9 +27,7 @@ class MultipleConfigService:
         self.key_value_holder: dict = {}
         for key in self.keys:
             self.key_value_holder[key] = {}
-        self._secondary_configs = (
-            None  # list of pathnames of secondary configs as strings
-        )
+        self._secondary_configs = []  # list of Paths of secondary configs as strings
 
     @property
     def secondary_configs(self):
@@ -39,8 +37,16 @@ class MultipleConfigService:
     def secondary_configs(self, primary_load):
         # TODO get directory contents
         try:
-            self._secondary_configs = primary_load["secondary_configs"].copy()
-            self._secondary_configs.reverse()  # this way we can perform overwrite operations in place, later
+            paths = primary_load["include-paths"].copy()
+            for path in paths:
+                full_path = self.primary.parent.joinpath(path)
+                files = sorted(os.listdir(full_path))
+                yamls = [
+                    full_path.joinpath(file) for file in files if file[-4::] == ".yml"
+                ]
+                self._secondary_configs += [
+                    yaml for yaml in yamls if yaml not in self._secondary_configs
+                ]
         except KeyError:
             pass
 
@@ -99,7 +105,7 @@ class MultipleConfigService:
             pass
 
     def load_meltano_read(self):
-        primary_load = yaml.safe_load(self.primary.open())
+        primary_load = load(self.primary)
         self.process_secondary_configs(primary_load)
         self.process_primary_config(primary_load)
         return primary_load
