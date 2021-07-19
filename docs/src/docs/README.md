@@ -205,25 +205,28 @@ Be aware that issue milestones serve more as a rough indication of relative prio
 since short-term priorities can change quickly in response to community feedback, and it's hard to predict how much progress can be made in a week.
 Also note that issues labeled `flow::To Do` have higher priority and are more likely to be completed in a given week than those labeled `flow::Triage`, which are often moved to the next milestone at the end of the week, with issues already scheduled for the next week pushed out to make room for them.
 
-Below you will found our current roadmap. As this projects out into the future it is subject to change based on feedback. Don't see something you want on the roadmap? [Make an issue](https://gitlab.com/meltano/meltano/-/issues) and let us know!
+Below you will found our current roadmap. 
+Each item should link to an Epic with the relevant issue linked to that epic.
+As this projects out into the future it is subject to change based on feedback. 
+Don't see something you want on the roadmap? [Make an issue](https://gitlab.com/meltano/meltano/-/issues) and let us know!
 
 #### July 2021
 
 Our focus for July will be to launch Meltano Academy to enable the community to learn about Meltano faster, make MeltanoHub the single source of truth for Meltano, refactor Meltano to enable composable pipelines, and add Superset as an available analyzer.
 
-* [Meltano Academy](https://gitlab.com/meltano/meta/-/issues/63)
-* [MeltanoHub as SSOT for Meltano](https://gitlab.com/groups/meltano/-/epics/102)
-* [Composable Meltano Pipelines](https://gitlab.com/meltano/meltano/-/issues/2725 )
-* [Superset](https://gitlab.com/meltano/meltano/-/issues/2605)
+* Meltano Academy - [Epic](https://gitlab.com/groups/meltano/-/epics/106)
+* MeltanoHub as SSOT for Meltano - [Epic](https://gitlab.com/groups/meltano/-/epics/102)
+* Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/79) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2725 )
+* Superset - [Epic](https://gitlab.com/groups/meltano/-/epics/112)
 
 #### August 2021
 
 Our focus for August will be to expand our integrations for data quality and analysis. We will also work to add support for the fast sync / batch message type to enable higher throughput for extraction and loading.
 
-* [Fast Sync / Batch Messages](https://gitlab.com/meltano/meltano/-/issues/2364)
-* [Add validator plugin type - Great Expectations/dbt test](https://gitlab.com/meltano/meltano/-/issues/2454)
-* [Dagster](https://gitlab.com/meltano/meltano/-/issues/2393)
-* [Decentralized Management of MeltanoHub Connectors](https://gitlab.com/meltano/meta/-/issues/73)
+* Fast Sync / Batch Messages - [Epic](https://gitlab.com/groups/meltano/-/epics/114)
+* Add validator plugin type - Great Expectations/dbt test - [Epic](https://gitlab.com/groups/meltano/-/epics/111)
+* Dagster - [Epic](https://gitlab.com/groups/meltano/-/epics/113) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2393)
+* Decentralized Management of MeltanoHub Connectors - [Epic](https://gitlab.com/groups/meltano/-/epics/105) & [Issue](https://gitlab.com/meltano/meta/-/issues/73)
 
 #### September 2021
 
@@ -239,7 +242,7 @@ Our focus for September will be to continue expanding integrations: adding orche
 Our focus for Q4 will be on creating a compelling monitoring, observability, and data lineage featureset. We also aim to improve our integration with git providers, begin the conversion of MeltanoHub to a dynamic site, improve the UI of Meltano, and potentailly start offering a SaaS deployment of Meltano.
 
 * [Git-provider Integrations](https://gitlab.com/groups/meltano/-/epics/92)
-* [Initial conversion of MeltanoHub to dyanmic site](https://gitlab.com/groups/meltano/-/epics/101)
+* [Initial conversion of MeltanoHub to dynamic site](https://gitlab.com/groups/meltano/-/epics/101)
 * [Monitoring, observability, and data lineage](https://gitlab.com/groups/meltano/-/epics/93)
 * [Fully featured UI](https://gitlab.com/groups/meltano/-/epics/78)
 * [SaaS Deployment of Meltano](https://gitlab.com/groups/meltano/-/epics/94)
