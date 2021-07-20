@@ -45,6 +45,9 @@ Taking the day off is strongly encouraged if your role allows it.
 * 2021-10-15
 * 2021-11-24
 
+These dates are tracked in the [Family and Friends Day Calendar on Google Calendar](https://calendar.google.com/calendar/embed?src=c_j080jn43dq00jsavfpdpisugm8%40group.calendar.google.com&ctz=America%2FChicago). 
+Meltano employees should mark these days off using PTO Ninja.
+
 In line with our Paid Time Off policy, we encourage Meltano Team Members to continue to take additional days off, as needed. 
 Family and Friends Day is a reminder to do this.
 
