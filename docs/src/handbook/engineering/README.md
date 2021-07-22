@@ -175,7 +175,9 @@ before and/or after implementing an important user-facing feature.
 
 ### Schedule
 
-We aim to release every Monday and Thursday, unless there are no [unreleased changes](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md#unreleased).
+A new version of Meltano is released every 1st and 3rd Thursday of the month.
+
+New versions and iterations on Meltano SDK, MeltanoHub, and any other Meltano product lines are released as needed with no particular cadence.
 
 ### Versioning
 
