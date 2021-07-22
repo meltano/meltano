@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2855](https://gitlab.com/meltano/meltano/-/issues/2855) Allow `executable` to be overridden through plugin inheritance
+
 ### Changes
 
 ### Fixes
@@ -37,7 +39,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2758](https://gitlab.com/meltano/meltano/-/issues/2758) Fix misleading error message when calling `meltano invoke airflow <args>`
 - [#2826](https://gitlab.com/meltano/meltano/-/issues/2826) Make plugin installation serial during `meltano add ...`
 - [#2828](https://gitlab.com/meltano/meltano/-/issues/2828) Fix coroutine error when `python3-venv` is missing during plugin installation.
-- [#2855](https://gitlab.com/meltano/meltano/-/issues/2855) Allow `executable` to be overridden through plugin inheritance
 
 ### Breaks
 
