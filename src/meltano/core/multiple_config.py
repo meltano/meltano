@@ -1,17 +1,35 @@
 import os
 from pathlib import Path
+from typing import List
 
 import yaml
+
+VERBOSE = ["extractors", "loaders"]
 
 
 def load(configfile: Path) -> dict:
     return yaml.safe_load(configfile.open())
 
 
+def is_yaml(filename: str) -> bool:
+    return filename[-4::] == ".yml" or filename[-5::] == ".yaml"
+
+
+def is_verbose(config: dict) -> bool:
+    """
+    A 'verbose' config file is one that contains organizational keys.
+    Organizational keys are keys that are only for organizational purposes.
+    (For example, 'plugins' in "/meltano.yml".)
+
+    Note: Currently assumes the only organizational key is 'plugins'.
+    """
+    return "plugins" in config  # May need to check for other organizational keys
+
+
 class MultipleConfigService:
     """
-    Represent the current Meltano project from a file-system
-    perspective.
+    Merge configuration information from meltano.yml and included YAMLs into a single dictionary.
+    Record history of what configuration information from which config files is used in this dictionary.
     """
 
     def __init__(
@@ -23,94 +41,87 @@ class MultipleConfigService:
             "extractors",
             "loaders",
             "schedules",
-        ]  # TODO Expand to include critical Meltano keys
+        ]  # Assumes these are the only keys that are dictionaries
         self.key_value_holder: dict = {}
         for key in self.keys:
             self.key_value_holder[key] = {}
-        self._secondary_configs = []  # list of Paths of secondary configs as strings
+        self._paths: List[Path] = []  # list of Paths of all config files
+        self.path_dicts: dict = (
+            {}
+        )  # mapping of Paths to a dictionary of the loaded config at that path.
+        # dictionaries are updated to reflect what from Path is actually used
+        self._multiple_config: dict = {}  # the output of this class
 
     @property
-    def secondary_configs(self):
-        return self._secondary_configs
+    def multiple_config(self):
+        return self._multiple_config
 
-    @secondary_configs.setter
-    def secondary_configs(self, primary_load):
-        # TODO get directory contents
+    @multiple_config.setter
+    def multiple_config(self, primary_load):
+        self._multiple_config = primary_load
+        self.process_configs()
         try:
-            paths = primary_load["include-paths"].copy()
-            for path in paths:
-                full_path = self.primary.parent.joinpath(path)
-                files = sorted(os.listdir(full_path))
-                yamls = [
-                    full_path.joinpath(file) for file in files if file[-4::] == ".yml"
-                ]
-                self._secondary_configs += [
-                    yaml for yaml in yamls if yaml not in self._secondary_configs
-                ]
-        except KeyError:
-            pass
-
-    def process_loaded_values(self, key, secondary_load):
-        try:
-            values = secondary_load[key]
-            for value in values:
-                self.key_value_holder[key][value["name"]] = value
-        except KeyError:
-            pass
-
-    def process_secondary_configs(self, primary_load):
-        # Update global key values with contents from secondary loads
-        self.secondary_configs = primary_load
-        if self.secondary_configs:
-            for secondary in self.secondary_configs:
-                secondary_load = load(secondary)
-                for key in self.keys:
-                    self.process_loaded_values(key, secondary_load)
-
-    def process_primary_config(self, primary_load):
-        # Update global key values with contents from primary load
-        try:
-            extractors = primary_load["plugins"]["extractors"]
-            for extractor in extractors:
-                self.key_value_holder["extractors"][extractor["name"]] = extractor
-        except KeyError:
-            pass
-
-        try:
-            loaders = primary_load["plugins"]["loaders"]
-            for loader in loaders:
-                self.key_value_holder["loaders"][loader["name"]] = loader
-        except KeyError:
-            pass
-
-        try:
-            schedules = primary_load["schedules"]
-            for schedule in schedules:
-                self.key_value_holder["schedules"][schedule["name"]] = schedule
-        except KeyError:
-            pass
-
-        # replace primary key values with global key values
-        try:
-            primary_load["plugins"]["extractors"] = list(
+            self._multiple_config["plugins"]["extractors"] = list(
                 self.key_value_holder["extractors"].values()
             )
-            primary_load["plugins"]["loaders"] = list(
+            self._multiple_config["plugins"]["loaders"] = list(
                 self.key_value_holder["loaders"].values()
             )
-            primary_load["schedules"] = list(
+            self._multiple_config["schedules"] = list(
                 self.key_value_holder["schedules"].values()
             )
         except KeyError:
             pass
 
-    def load_meltano_read(self):
-        primary_load = load(self.primary)
-        self.process_secondary_configs(primary_load)
-        self.process_primary_config(primary_load)
-        return primary_load
+    @property
+    def paths(self):
+        return self._paths
 
-    def load_meltano_write(self):
-        # primary_load = yaml.safe_load(self.primary.open())
-        # TODO Yield individual YAMLs (of secondary) for writing purposes
-        return None
+    @paths.setter
+    def paths(self, primary_load):
+        self._paths.append(self.primary)
+        try:
+            for path in primary_load["include-paths"]:
+                full_path = self.primary.parent.joinpath(path)
+                files = sorted(os.listdir(full_path))
+                yaml_files = [
+                    full_path.joinpath(file) for file in files if is_yaml(file)
+                ]
+                self._paths += [
+                    yaml_file
+                    for yaml_file in yaml_files
+                    if yaml_file not in self._paths
+                ]
+        except KeyError:
+            pass
+
+    def process_loaded_values(self, key, config: dict):
+        try:
+            values = (
+                config["plugins"][key]
+                if key in VERBOSE and is_verbose(config)
+                else config[key]
+            )
+            for value in values:
+                if value["name"] not in self.key_value_holder[key]:
+                    self.key_value_holder[key][value["name"]] = value
+                else:
+                    _ = (
+                        config["plugins"][key].remove(value)
+                        if key in VERBOSE and is_verbose(config)
+                        else config[key].remove(value)
+                    )
+        except KeyError:
+            pass
+
+    def process_configs(self):
+        for path in self.paths:
+            path_dict = load(path)
+            self.path_dicts[path] = path_dict
+            for key in self.keys:
+                self.process_loaded_values(key, self.path_dicts[path])
+
+    def load(self):
+        primary_load = load(self.primary)
+        self.paths = primary_load
+        self.multiple_config = primary_load

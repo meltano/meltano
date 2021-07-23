@@ -338,8 +338,10 @@ class TestMultipleConfig:
         control: MultipleConfigService,
         build_secondaries,
     ):
-        control_meltano = control.load_meltano_read()
-        experiment_meltano = subject.load_meltano_read()
+        control.load()
+        subject.load()
+        control_meltano = control.multiple_config
+        experiment_meltano = subject.multiple_config
         experiment_meltano.pop("include-paths")
 
         try:
