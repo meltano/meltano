@@ -272,17 +272,19 @@ class MetadataExecutor(CatalogExecutor):
 
     def ensure_metadata(self, breadcrumb):
         metadata_list = self._stream["metadata"]
-        try:
-            next(
+        match = next(
+            (
                 metadata
                 for metadata in metadata_list
                 if metadata["breadcrumb"] == breadcrumb
-            )
-        except StopIteration:
-            # This is to support legacy catalogs
-            metadata_list.append(
-                {"breadcrumb": breadcrumb, "metadata": {"inclusion": "automatic"}}
-            )
+            ),
+            None,
+        )
+
+        # Missing inclusion metadata for property
+        if match is None:
+            entry = {"breadcrumb": breadcrumb, "metadata": {"inclusion": "automatic"}}
+            metadata_list.append(entry)
 
     def stream_node(self, node, path):
         self._stream = node
