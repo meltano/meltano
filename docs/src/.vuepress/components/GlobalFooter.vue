@@ -33,6 +33,7 @@ export default {
 </ul>
 <!--footer_ul_amrc ends here-->
 </div>
+<hr>
     <p>
       <a
         href="https://meltano.com/docs/contributor-guide.html"
