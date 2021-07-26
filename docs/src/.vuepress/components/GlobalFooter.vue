@@ -63,6 +63,7 @@ export default {
   text-align center
   color white
   background-color #3e3c8e
+  list-style-type none
 
   p
     margin 0.5rem
