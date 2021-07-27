@@ -91,6 +91,7 @@ class PluginDiscoveryService(Versioned):
 
     @property
     def discovery_url_auth(self):
+        """Return the `discovery_url_auth` setting."""
         return self.settings_service.get("discovery_url_auth")
 
     @property
@@ -158,33 +159,33 @@ class PluginDiscoveryService(Versioned):
         if not discovery_url:
             return
 
+        headers = {"User-Agent": f"Meltano/{meltano.__version__}"}  # noqa: WPS609
+        params = {}
+
+        if self.discovery_url_auth:
+            headers["Authorization"] = self.discovery_url_auth
+
+        if self.settings_service.get("send_anonymous_usage_stats"):
+            project_id = self.settings_service.get("project_id")
+
+            headers["X-Project-ID"] = project_id
+            params["project_id"] = project_id
+
         try:
-            headers = {"User-Agent": f"Meltano/{meltano.__version__}"}  # noqa: WPS609
-            params = {}
-
-            if self.discovery_url_auth:
-                headers["Authorization"] = self.discovery_url_auth
-
-            if self.settings_service.get("send_anonymous_usage_stats"):
-                project_id = self.settings_service.get("project_id")
-
-                headers["X-Project-ID"] = project_id
-                params["project_id"] = project_id
-
             response = requests.get(discovery_url, headers=headers, params=params)
             response.raise_for_status()
-
-            remote_discovery = io.StringIO(response.text)
-            discovery = self.load_discovery(remote_discovery, cache=True)
-
-            return discovery
         except (
             requests.exceptions.ConnectionError,
             requests.exceptions.HTTPError,
         ) as err:
             logging.debug("Remote `discovery.yml` manifest could not be downloaded.")
             logging.debug(str(err))
-            pass
+            return
+
+        remote_discovery = io.StringIO(response.text)
+        discovery = self.load_discovery(remote_discovery, cache=True)
+
+        return discovery
 
     def load_cached_discovery(self):
         try:
