@@ -18,8 +18,7 @@ from werkzeug.utils import secure_filename
 
 from .behavior.versioned import Versioned
 from .error import Error
-from .meltano_file import MeltanoFile
-from .multiple_config import MultipleConfigService
+from .multiple_meltano_file import MultipleMeltanoFile
 from .utils import makedirs, truthy
 
 logger = logging.getLogger(__name__)
@@ -163,9 +162,8 @@ class Project(Versioned):
         """Return a copy of the current meltano config"""
         # fmt: off
         with self._meltano_rw_lock.read_lock(), \
-             self.meltanofile as meltanofile:
-            multiple_config = MultipleConfigService(meltanofile)
-            return MeltanoFile.parse(multiple_config.load_meltano_read())
+             self.meltanofile.open() as meltanofile:
+            return MultipleMeltanoFile.parse(yaml.safe_load(meltanofile))
         # fmt: on
 
     @contextmanager
@@ -184,10 +182,24 @@ class Project(Versioned):
 
             with self.meltanofile.open() as meltanofile:
                 # read the latest version
-                meltano_update = MeltanoFile.parse(yaml.safe_load(meltanofile))
+                meltano_update = MultipleMeltanoFile.parse(yaml.safe_load(meltanofile))
 
-            yield meltano_update
+            yield meltano_update  # TODO does this close meltanofile?
 
+            # Write back to included config files
+            for config_file_path in meltano_update.included_config_file_paths:  # TODO abstract this block away?
+                try:
+                    with atomic_write(config_file_path, overwrite=True) as configfile:
+                        # update if everything is fine TODO how is that even assessed?
+                        yaml.dump(meltano_update.get_update(config_file_path), configfile, default_flow_style=False, sort_keys=False)
+                except Exception as err:
+                    logger.critical(f"Could not update {config_file_path}: {err}")
+                    raise
+
+            # At this point, everything left in meltano_update belongs in the main meltano file.
+            # (MultipleMeltanoFile method get_update() removes content from itself.)
+
+            # Write back to main meltano file
             try:
                 with atomic_write(self.meltanofile, overwrite=True) as meltanofile:
                     # update if everything is fine
