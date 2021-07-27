@@ -90,6 +90,10 @@ class PluginDiscoveryService(Versioned):
         return discovery_url
 
     @property
+    def discovery_url_auth(self):
+        return self.settings_service.get("discovery_url_auth")
+
+    @property
     def discovery(self):
         """
         Return first compatible discovery manifest from these locations:
@@ -157,6 +161,9 @@ class PluginDiscoveryService(Versioned):
         try:
             headers = {"User-Agent": f"Meltano/{meltano.__version__}"}  # noqa: WPS609
             params = {}
+
+            if self.discovery_url_auth:
+                headers["Authorization"] = self.discovery_url_auth
 
             if self.settings_service.get("send_anonymous_usage_stats"):
                 project_id = self.settings_service.get("project_id")
