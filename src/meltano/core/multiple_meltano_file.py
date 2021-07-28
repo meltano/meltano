@@ -98,17 +98,19 @@ def get_included_config_file_paths(included_directories):
     return included_config_file_paths
 
 
-def get_included_config_file_contents(included_config_files):
+def get_included_config_file_contents(included_config_file_paths):
     # Save loaded contents of each config file
     included_config_file_contents = {}
-    for config_file in included_config_files:
+    for config_file in included_config_file_paths:
         included_config_file_contents[config_file] = load(config_file)
     return included_config_file_contents
 
 
 def get_included_config_file_plugins(included_config_file_contents):
     # Get record of plugins in each file
-    inlcuded_config_file_plugins = {}
+    inlcuded_config_file_plugins = (
+        {}
+    )  # mirrors structure of meltano config, but with plugin names only
     for config_file in included_config_file_contents:
         inlcuded_config_file_plugins[config_file] = empty_yaml()
         config_dict = included_config_file_contents[config_file]
@@ -144,6 +146,48 @@ def add_config_plugins(main_config_file, included_config_file_contents):
                     )  # TODO see if this works
 
 
+def get_updated_plugin(updated_data, config_file, included_config_file_plugins):
+    """
+    Remove updated contents from self that belong in file at config_file_path, return these contents as a dict
+    """
+
+    # Initialize empty output_config
+    output_config_data = empty_yaml()
+    config_plugin_data = included_config_file_plugins[config_file]
+
+    # Iterate through INCLUDE_KEYS of config file contents at config_file
+    for key in INCLUDE_KEYS:
+        for included_plugin_names in deep_get(config_plugin_data, key):
+            if (
+                not included_plugin_names
+            ):  # config_file does not have plugins of type 'key'
+                continue
+            for name in included_plugin_names:
+
+                # Search self for the same plugin type and name, retrieve that index
+                updated_plugins = deep_get(updated_data, key)
+                if (
+                    not updated_plugins
+                ):  # updated_data does not have plugins of type 'key'
+                    continue
+                idx = [
+                    idx
+                    for idx, plugin in enumerate(updated_plugins)
+                    if plugin.get("name") == name
+                ]
+
+                # Remove contents of self at index
+                updated_plugin = updated_plugins.pop(idx)
+
+                #  Write the contents of self at index to output config at 'key'
+                deep_get(output_config_data, key).append(updated_plugin)
+
+    # (optional) remove empty keys in output_config
+
+    # return output_config
+    return output_config_data
+
+
 class MultipleMeltanoFile(MeltanoFile):
     def __init__(
         self, *args, **attrs
@@ -159,28 +203,8 @@ class MultipleMeltanoFile(MeltanoFile):
         self.included_config_file_plugins = get_included_config_file_plugins(
             self.included_config_file_contents
         )
-        self.merged_meltano_file = add_config_plugins(
-            attrs, self.included_config_file_contents
-        )
+        add_config_plugins(attrs, self.included_config_file_contents)
         super().__init__(**attrs)
 
     def get_update(self, config_file):
-        """
-        Remove updated contents from self that belong in file at config_file_path, return these contents as a dict
-        """
-
-        # Initialize empty output_config
-
-        # Iterate through INCLUDE_KEYS of config file contents at config_file
-
-        #   Search self for the same plugin type and name, retrieve that index
-
-        #   Write the contents of self at index to output config
-
-        #   Remove contents of self at index
-
-        # (optional) remove empty keys in output_config
-
-        # return output_config
-
-        pass
+        return get_updated_plugin(self, config_file, self.included_config_file_plugins)
