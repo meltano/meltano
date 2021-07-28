@@ -33,7 +33,8 @@ def project(project):
 
 @pytest.fixture
 def subject(plugin_discovery_service):
-    return plugin_discovery_service
+    yield plugin_discovery_service
+    plugin_discovery_service.settings_service.reset()
 
 
 @pytest.fixture
@@ -272,6 +273,10 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         subject.settings_service.set("discovery_url", "false")
 
     @pytest.fixture
+    def enabled_remote_discovery_auth(self, subject):
+        subject.settings_service.set("discovery_url_auth", "test")
+
+    @pytest.fixture
     def cached_discovery(self, subject):
         with self.use_cached_discovery(
             self.build_discovery_yaml("cached"), subject
@@ -307,6 +312,63 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         with subject.cached_discovery_file.open() as cached_discovery:
             cached_discovery_yaml = yaml.safe_load(cached_discovery)
             assert cached_discovery_yaml["version"] == remote_discovery["version"]
+
+    @mock.patch("meltano.core.plugin_discovery_service.requests.get")
+    def test_remote_discovery_with_valid_auth(
+        self,
+        mock_discovery_request,
+        subject,
+        enabled_remote_discovery_auth,
+        remote_discovery,
+    ):
+        mock_discovery_request.return_value.status_code = 200
+        mock_discovery_request.return_value.text = json.dumps(remote_discovery)
+
+        discovery = subject.load_remote_discovery()
+
+        mock_discovery_request.assert_called_once()
+        expected_auth = subject.settings_service.get("discovery_url_auth")
+        actual_auth = mock_discovery_request.call_args[1]["headers"].get(
+            "Authorization"
+        )
+        assert expected_auth == actual_auth
+
+        self.assert_discovery_yaml(subject, discovery)
+
+    @mock.patch("meltano.core.plugin_discovery_service.requests.get")
+    def test_remote_discovery_with_invalid_auth(
+        self, mock_discovery_request, subject, enabled_remote_discovery_auth
+    ):
+        mock_discovery_request.return_value.status_code = 401
+        mock_discovery_request.return_value.raise_for_status.side_effect = (
+            requests.HTTPError()
+        )
+
+        discovery = subject.load_remote_discovery()
+
+        mock_discovery_request.assert_called_once()
+        expected_auth = subject.settings_service.get("discovery_url_auth")
+        actual_auth = mock_discovery_request.call_args[1]["headers"].get(
+            "Authorization"
+        )
+        assert expected_auth == actual_auth
+        assert discovery is None
+
+    @mock.patch("meltano.core.plugin_discovery_service.requests.get")
+    def test_remote_discovery_with_no_auth(self, mock_discovery_request, subject):
+        mock_discovery_request.return_value.status_code = 401
+        mock_discovery_request.return_value.raise_for_status.side_effect = (
+            requests.HTTPError()
+        )
+
+        discovery = subject.load_remote_discovery()
+
+        mock_discovery_request.assert_called_once()
+        actual_auth = mock_discovery_request.call_args[1]["headers"].get(
+            "Authorization"
+        )
+        assert actual_auth is None
+        assert discovery is None
 
     def test_incompatible_remote_discovery(
         self, subject, incompatible_remote_discovery, cached_discovery
