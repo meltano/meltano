@@ -10,26 +10,27 @@ from meltano.core.meltano_file import MeltanoFile
 # TODO:
 #   [x] appropriate name for trio: schedules, plugins.extractors, plugins.loaders
 #   [x] use trio name to rename plugin_states(), update_plugin(), add_plugins()
-#   [ ] add type annotations
 #   [x] included
 #   [ ] add type hints everywhere
 #   [x] lowercase to let caps works in paths
-#   [ ] change for loops: for key, value in dict:
+#   [x] change for loops: for key, value in dict:
 #   [x] empty_yaml -> empty_meltano_config
 #   [x] plugins -> components && included_keys -> included_components
 #   [x] get_include_config_file_plugins -> names
 #   [ ] get_included_config_file_plugins -> include docstring sample of output
-#   [ ] change comments to docstring
-#   [ ] verify where transforms belong
-#   [ ] values -> components
+#   [ ] move comments to docstrings
+#   [ ] update all docstrings
+#   [ ] verify where 'transforms' component belongs
+#   [x] values -> components
 #   [x] get_included_config_file_plugins => extract names from values as list, use that list to replace the list in config_dict
-#   [ ] don't loop through func call, assign call to variable, loop through variable
+#   [x] don't loop through func call, assign call to variable, loop through variable
 #   [ ] lock load()
 #   [ ] enforce relative paths for include-paths
 #   [ ] sorted - verify alphabetical or ascii
 #   [ ] remove *args in init if no break
 #   QUESTIONS
 #   [ ] use docstrings with :return:/:params: labels?
+#   [ ] is pop_updated_components clear?
 #   MAYBE-DO
 #   [ ] idea - default scope to current file
 #   [ ] include-paths allows files and directories
@@ -113,95 +114,81 @@ def get_included_config_file_paths(included_directories):
     return included_config_file_paths
 
 
-def get_included_config_file_data(included_config_file_paths):
+def get_included_config_file_components(included_config_file_paths):
     # Store loaded contents of each config file
-    included_config_file_data = {}
+    included_config_file_components = {}
     for config_file_path in included_config_file_paths:
-        included_config_file_data[config_file_path] = load(config_file_path)
-    return included_config_file_data
+        included_config_file_components[config_file_path] = load(config_file_path)
+    return included_config_file_components
 
 
-def get_included_config_file_component_names(included_config_file_data):
+def get_included_config_file_component_names(included_config_file_components):
     # Get names of components in each config file
     included_config_file_component_names = {}
-    for config_file_path, config_file_data in included_config_file_data.items():
+    for (
+        config_file_path,
+        config_file_components,
+    ) in included_config_file_components.items():
         included_config_file_component_names[
             config_file_path
         ] = empty_meltano_components()
         for key in COMPONENT_KEYS:
-            components = deep_get(config_file_data, key)
+            components = deep_get(config_file_components, key)
             if not components:
                 continue
             try:
                 component_names = [component["name"] for component in components]
             except KeyError:
-                pass  # TODO throw error "all plugins must have name - plugin in {configfile}.{key}"
+                pass  # TODO throw error "all {component_keys} components must have name - component in {configfile}.{key}"
             included_config = included_config_file_component_names[config_file_path]
             blank_component_names = deep_get(included_config, key)
             blank_component_names += component_names
     return included_config_file_component_names
 
 
-def add_config_plugins(main_config_file, included_config_file_contents):
+def merge_components(main_config, included_config_file_components):
     # Process keys in included configs
-    for config_file in included_config_file_contents:
-        config_dict = included_config_file_contents[
-            config_file
-        ]  # TODO rename config_dict -> ??
+    for (
+        config_file_path,
+        config_file_components,
+    ) in included_config_file_components.items():
         for key in COMPONENT_KEYS:
-            values = deep_get(config_dict, key)
-            if not values:
+            components = deep_get(config_file_components, key)
+            if not components:
                 continue
-            for value in values:
-                if contains_component(deep_get(main_config_file, key), value):
-                    pass  # TODO throw an error "{value} already exists" (FB: later "already exists in {where}")
+            existing_components = deep_get(main_config, key)
+            for component in components:
+                if contains_component(existing_components, component):
+                    pass  # TODO throw an error "{component['name']} already exists" (FB: later "already exists in {where}")
                 else:
-                    deep_get(main_config_file, key).append(
-                        value
-                    )  # TODO see if this works
-    return main_config_file
+                    existing_components.append(component)
+    return main_config
 
 
-def pop_updated_components(updated_data, config_file, included_config_file_plugins):
+def pop_updated_components(
+    updated_config, config_file_path, included_config_file_component_names
+):
     """
     Remove updated contents from self that belong in file at config_file_path, return these contents as a dict
     """
-
-    # Initialize empty output_config
-    output_config_data = empty_meltano_components()
-    config_plugin_data = included_config_file_plugins[config_file]
-
-    # Iterate through INCLUDE_KEYS of config file contents at config_file
+    output_components = empty_meltano_components()
+    config_file_component_names = included_config_file_component_names[config_file_path]
     for key in COMPONENT_KEYS:
-        for included_plugin_names in deep_get(config_plugin_data, key):
-            if (
-                not included_plugin_names
-            ):  # config_file does not have plugins of type 'key'
-                continue
-            for name in included_plugin_names:
-
-                # Search self for the same plugin type and name, retrieve that index
-                updated_plugins = deep_get(updated_data, key)
-                if (
-                    not updated_plugins
-                ):  # updated_data does not have plugins of type 'key'
-                    continue
-                idx = [
-                    idx
-                    for idx, plugin in enumerate(updated_plugins)
-                    if plugin.get("name") == name
-                ]
-
-                # Remove contents of self at index
-                updated_plugin = updated_plugins.pop(idx)
-
-                #  Write the contents of self at index to output config at 'key'
-                deep_get(output_config_data, key).append(updated_plugin)
-
+        component_names = deep_get(config_file_component_names, key)
+        if not component_names:
+            continue
+        updated_components = deep_get(updated_config, key)
+        if not updated_components:
+            continue
+        for name in component_names:
+            for idx, updated_component in enumerate(updated_components):
+                if updated_component.get("name") == name:
+                    updated_component = updated_components.pop(idx)
+                    output_components = deep_get(output_components, key)
+                    output_components.append(updated_component)
+                    break
     # (optional) remove empty keys in output_config
-
-    # return output_config
-    return output_config_data
+    return output_components
 
 
 class MultipleMeltanoFile(MeltanoFile):
@@ -215,7 +202,7 @@ class MultipleMeltanoFile(MeltanoFile):
             self.all_config_file_paths = self.included_config_file_paths.copy().append(
                 Path("meltano.yml")
             )
-            self.included_config_file_contents = get_included_config_file_data(
+            self.included_config_file_contents = get_included_config_file_components(
                 self.included_config_file_paths
             )
             self.included_config_file_plugins = (
@@ -223,7 +210,7 @@ class MultipleMeltanoFile(MeltanoFile):
                     self.included_config_file_contents
                 )
             )
-            attrs = add_config_plugins(attrs, self.included_config_file_contents)
+            attrs = merge_components(attrs, self.included_config_file_contents)
         super().__init__(**attrs)
 
     def pop_config_file_data(self, config_file):
