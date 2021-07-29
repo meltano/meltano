@@ -5,33 +5,33 @@ export default {
 </script>
 
 <template>
-  <!--footer starts from here-->
+<!--footer starts from here-->
 <footer class="footer">
 <div class="container bottom_border">
 <div class="row">
 <div class=" col-sm-4 col-md col-sm-4  col-12 col">
-<h5 class="headin5_amrc col_white_amrc pt2">Quick links</h5>
-<!--headin5_amrc-->
-<ul class="footer_ul_amrc">
+<h5 class="headin5_foot col_white_foot pt2">Quick links</h5>
+<!--headin5_foot-->
+<ul class="footer_ul_left">
 <li><a href="https://hub.meltano.com/">Meltano Hub</a></li>
 <li><a href="https://meltano.com/docs/">Doumentation</a></li>
 <li><a href="https://meltano.com/tutorials/">Tutorials</a></li>
 <li><a href="https://meltano.com/docs/community.html">Community</a></li>
 <li><a href="https://meltano.com/blog/">Blog</a></li>  
 </ul>
-<!--footer_ul_amrc ends here-->
+<!--footer_ul_left ends here-->
 </div>
 
 <div class=" col-sm-4 col-md  col-6 col">
-<h5 class="headin5_amrc col_white_amrc pt2">Company</h5>
+<h5 class="headin5_foot col_white_foot pt2">Company</h5>
 <!--headin5_amrc-->
-<ul class="footer_ul_amrc">
+<ul class="footer_ul_right">
 <li><a href="https://meltano.com/handbook/#subresources">About Meltano</a></li> 
 <li><a href="https://meltano.com/handbook/">Handbook</a></li>
 <li><a href="https://meltano.com/docs/#job-openings">Careers</a></li>
 <li><a href="https://meltano.com/press/">Press</a></li>
 </ul>
-<!--footer_ul_amrc ends here-->
+<!--footer_ul_right ends here-->
 </div>
 <hr>
     <p>
