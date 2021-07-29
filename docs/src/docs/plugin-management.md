@@ -203,7 +203,7 @@ Since Meltano doesn't have the [base plugin description](/docs/plugins.html#proj
 `meltano add --custom` will ask you to find and provide this metadata yourself:
 (Note that more context is provided in the actual command prompts.)
 
-```bash{6,10,12,14,17,20,23}
+```bash{11,24,30,45,64}
 $ meltano add --custom extractor tap-covid-19
 Adding new custom extractor with name 'tap-covid-19'...
 
@@ -228,7 +228,6 @@ Specify the plugin's `pip install` argument, for example:
 Default: plugin name as PyPI package name
 
 (pip_url) [tap-covid-19]: -e extract/tap-covid-19
-
 
 Specify the plugin's executable name
 
