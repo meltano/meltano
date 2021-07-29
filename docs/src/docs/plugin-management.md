@@ -205,28 +205,74 @@ Since Meltano doesn't have the [base plugin description](/docs/plugins.html#proj
 
 ```bash{6,10,12,14,17,20,23}
 $ meltano add --custom extractor tap-covid-19
-# Specify namespace, which will serve as the:
-# - identifier to find related/compatible plugins
-# - default database schema (`load_schema` extra)
-#   for use by loaders that support a target schema
-(namespace): tap_covid_19
+Adding new custom extractor with name 'tap-covid-19'...
 
-# Specify `pip install` argument, for example:
-# - PyPI package name:
-(pip_url): tap-covid-19
-# - Git repository URL:
-(pip_url): git+https://github.com/singer-io/tap-covid-19.git
-# - local directory, in editable/development mode:
-(pip_url): -e extract/tap-covid-19
+Specify the plugin's namespace, which will serve as the:
+- identifier to find related/compatible plugins
+- default database schema (`load_schema` extra),
+  for use by loaders that support a target schema
 
-# Specify the package's executable name
-(executable): tap-covid-19
+Hit Return to accept the default: plugin name with underscores instead of dashes
 
-# Specify supported Singer features (executable flags)
-(capabilities): catalog,discover,state
+(namespace) [tap_covid_19]: tap_covid_19
 
-# Specify supported settings (`config.json` keys)
-(settings): api_token,user_agent,start_date
+Specify the plugin's `pip install` argument, for example:
+- PyPI package name:
+	tap-covid-19
+- Git repository URL:
+	git+https://gitlab.com/meltano/tap-covid-19.git
+- local directory, in editable/development mode:
+	-e extract/tap-covid-19
+- 'n' if using a local executable (nothing to install)
+
+Default: plugin name as PyPI package name
+
+(pip_url) [tap-covid-19]: -e extract/tap-covid-19
+
+
+Specify the plugin's executable name
+
+Default: name derived from `pip_url`
+
+(executable) [tap-covid-19]: tap-covid-19
+
+Specify the tap's supported Singer features (executable flags), for example:
+	`catalog`: supports the `--catalog` flag
+	`discover`: supports the `--discover` flag
+	`properties`: supports the `--properties` flag
+	`state`: supports the `--state` flag
+
+To find out what features a tap supports, reference its documentation or try one
+of the tricks under https://meltano.com/docs/contributor-guide.html#how-to-test-a-tap.
+
+Multiple capabilities can be separated using commas.
+
+Default: no capabilities
+
+(capabilities) [[]]: catalog,discover,state
+
+Specify the tap's supported settings (`config.json` keys)
+
+Multiple setting names (keys) can be separated using commas.
+
+A setting kind can be specified alongside the name (key) by using the `:` delimiter,
+e.g. `port:integer` to set the kind `integer` for the name `port`
+
+Supported setting kinds:
+string | integer | boolean | date_iso8601 | email | password | oauth | options | file | array | object | hidden
+
+- Credentials and other sensitive setting types should use the password kind.
+- If not specified, setting kind defaults to string.
+- Nested properties can be represented using the `.` separator, e.g. `auth.username` for `{ "auth": { "username": value } }`.
+- To find out what settings a tap supports, reference its documentation.
+
+Default: no settings
+
+(settings) [[]]: api_token,user_agent,start_date
+Added extractor 'tap-covid-19' to your Meltano project
+
+Installing extractor 'tap-covid-19'...
+Installed extractor 'tap-covid-19'
 ```
 
 If you're adding a Singer tap or target that's listed on Singer's [index of taps](https://www.singer.io/#taps) or [targets](https://www.singer.io/#targets),
