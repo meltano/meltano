@@ -203,7 +203,7 @@ Since Meltano doesn't have the [base plugin description](/docs/plugins.html#proj
 `meltano add --custom` will ask you to find and provide this metadata yourself:
 (Note that more context is provided in the actual command prompts.)
 
-```bash{11,24,30,45,64}
+```{11,24,30,45,64}
 $ meltano add --custom extractor tap-covid-19
 Adding new custom extractor with name 'tap-covid-19'...
 
