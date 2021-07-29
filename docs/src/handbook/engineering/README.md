@@ -26,7 +26,7 @@ By the end of day Friday, or the last day of their work week, engineers are expe
 * Update the flow label to reflect an accurate status
 * Close any completed items
 
-This is in preparation for the Product milestone review and Wee[kly Kickoff](handbook/product/#weekly-kickoff) on Monday.
+This is in preparation for the Product milestone review and [Weekly Kickoff](handbook/product/#weekly-kickoff) on Monday.
 
 ### Labels
 
