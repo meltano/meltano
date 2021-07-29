@@ -191,7 +191,7 @@ class Project(Versioned):
                 try:
                     with atomic_write(config_file_path, overwrite=True) as configfile:
                         # update if everything is fine TODO how is that even assessed?
-                        yaml.dump(meltano_update.get_update(config_file_path), configfile, default_flow_style=False, sort_keys=False)
+                        yaml.dump(meltano_update.pop_config_file_data(config_file_path), configfile, default_flow_style=False, sort_keys=False)
                 except Exception as err:
                     logger.critical(f"Could not update {config_file_path}: {err}")
                     raise
