@@ -22,7 +22,7 @@ from meltano.core.meltano_file import MeltanoFile
 #   [ ] change comments to docstring
 #   [ ] verify where transforms belong
 #   [ ] values -> components
-#   [ ] get_included_config_file_plugins => extract names from values as list, use that list to replace the list in config_dict
+#   [x] get_included_config_file_plugins => extract names from values as list, use that list to replace the list in config_dict
 #   [ ] don't loop through func call, assign call to variable, loop through variable
 #   [ ] lock load()
 #   [ ] enforce relative paths for include-paths
@@ -132,13 +132,13 @@ def get_included_config_file_component_names(included_config_file_data):
             components = deep_get(config_file_data, key)
             if not components:
                 continue
-            for component in components:
-                included_config = included_config_file_component_names[config_file_path]
-                component_names = deep_get(included_config, key)
-                try:
-                    component_names.append(component["name"])
-                except KeyError:
-                    pass  # TODO throw error "all plugins must have name - plugin in {configfile}.{key}"
+            try:
+                component_names = [component["name"] for component in components]
+            except KeyError:
+                pass  # TODO throw error "all plugins must have name - plugin in {configfile}.{key}"
+            included_config = included_config_file_component_names[config_file_path]
+            blank_component_names = deep_get(included_config, key)
+            blank_component_names += component_names
     return included_config_file_component_names
 
 
