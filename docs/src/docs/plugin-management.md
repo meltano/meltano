@@ -267,7 +267,7 @@ string | integer | boolean | date_iso8601 | email | password | oauth | options |
 
 Default: no settings
 
-(settings) [[]]: api_token,user_agent,start_date
+(settings) [[]]: api_token:password,user_agent:string,start_date:date_iso8601
 Added extractor 'tap-covid-19' to your Meltano project
 
 Installing extractor 'tap-covid-19'...
