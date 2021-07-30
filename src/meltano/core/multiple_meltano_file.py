@@ -31,6 +31,7 @@ from meltano.core.meltano_file import MeltanoFile
 #   QUESTIONS
 #   [ ] use docstrings with :return:/:params: labels?
 #   [ ] is pop_updated_components clear?
+#   [ ] should the check in pop_config_file_data() got to project.py?
 #   MAYBE-DO
 #   [ ] idea - default scope to current file
 #   [ ] include-paths allows files and directories
@@ -47,6 +48,7 @@ COMPONENT_KEYS = [
     "transforms",
 ]
 INCLUDE_PATHS_KEY = "include-paths"
+MELTANO_FILE_PATH = "meltano.yml"
 
 
 @contextmanager
@@ -200,7 +202,7 @@ class MultipleMeltanoFile(MeltanoFile):
                 self.included_directories
             )
             self.all_config_file_paths = self.included_config_file_paths.copy().append(
-                Path("meltano.yml")
+                Path(MELTANO_FILE_PATH)
             )
             self.included_config_file_contents = get_included_config_file_components(
                 self.included_config_file_paths
@@ -214,6 +216,9 @@ class MultipleMeltanoFile(MeltanoFile):
         super().__init__(**attrs)
 
     def pop_config_file_data(self, config_file):
-        return pop_updated_components(
-            self, config_file, self.included_config_file_plugins
-        )
+        if config_file == MELTANO_FILE_PATH:
+            return self
+        else:
+            return pop_updated_components(
+                self, config_file, self.included_config_file_plugins
+            )

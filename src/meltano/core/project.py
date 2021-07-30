@@ -184,29 +184,17 @@ class Project(Versioned):
                 # read the latest version
                 meltano_update = MultipleMeltanoFile.parse(yaml.safe_load(meltanofile))
 
-            yield meltano_update  # TODO does this close meltanofile?
+            yield meltano_update
 
-            # Write back to included config files
-            for config_file_path in meltano_update.included_config_file_paths:  # TODO abstract this block away?
+            for config_file_path in meltano_update.included_config_file_paths:
                 try:
                     with atomic_write(config_file_path, overwrite=True) as configfile:
-                        # update if everything is fine TODO how is that even assessed?
-                        yaml.dump(meltano_update.pop_config_file_data(config_file_path), configfile, default_flow_style=False, sort_keys=False)
+                        # update if everything is fine
+                        config_file_data = meltano_update.pop_config_file_data(config_file_path)
+                        yaml.dump(config_file_data, configfile, default_flow_style=False, sort_keys=False)
                 except Exception as err:
                     logger.critical(f"Could not update {config_file_path}: {err}")
                     raise
-
-            # At this point, everything left in meltano_update belongs in the main meltano file.
-            # (MultipleMeltanoFile method get_update() removes content from itself.)
-
-            # Write back to main meltano file
-            try:
-                with atomic_write(self.meltanofile, overwrite=True) as meltanofile:
-                    # update if everything is fine
-                    yaml.dump(meltano_update, meltanofile, default_flow_style=False, sort_keys=False)
-            except Exception as err:
-                logger.critical(f"Could not update meltano.yml: {err}")
-                raise
         # fmt: on
 
     def root_dir(self, *joinpaths):
