@@ -26,8 +26,8 @@ By the end of day Friday, or the last day of their work week, engineers are expe
 2. Close any completed items.
 3. Add a progress comment to issues which have the `flow:Doing` label.
 4. Issues with the `flow:Review` label will be expected to be closed out once review completes.
-  - No need to add a progress comment since action items should be self-documenting.
-  - If review is not progressing due to other factors, a `flow:Blocked` label may be appropriate.
+   - No need to add a progress comment since action items should be self-documenting.
+   - If review is not progressing due to other factors, a `flow:Blocked` label may be appropriate.
 
 This is in preparation for the Product milestone review and [Weekly Kickoff](handbook/product/#weekly-kickoff) on Monday.
 
