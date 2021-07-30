@@ -22,11 +22,12 @@ New sprint milestones are created about 6 weeks in advance as part of preparatio
 
 By the end of day Friday, or the last day of their work week, engineers are expected to:
 
-1. Update the flow label to reflect an accurate status
-2. Close any completed items
-3. Add a progress comment to issues which have the `flow:Doing` label
+1. Update the flow label to reflect an accurate status.
+2. Close any completed items.
+3. Add a progress comment to issues which have the `flow:Doing` label.
 4. Issues with the `flow:Review` label will be expected to be closed out once review completes.
-  * If review is not progressing due to other factors, a `flow:Blocked` label may be appropriate.
+  - No need to add a progress comment since action items should be self-documenting.
+  - If review is not progressing due to other factors, a `flow:Blocked` label may be appropriate.
 
 This is in preparation for the Product milestone review and [Weekly Kickoff](handbook/product/#weekly-kickoff) on Monday.
 
