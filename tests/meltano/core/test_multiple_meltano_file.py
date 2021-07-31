@@ -1,11 +1,10 @@
-# import os
-#
-# import pytest
-# import yaml
-from meltano.core.multiple_meltano_file import (  # MultipleMeltanoFile,; get_included_config_file_component_names,; get_included_config_file_components,; get_included_config_file_paths,; get_included_directories,; load,; merge_components,; pop_updated_components,
+import os
+
+from meltano.core.multiple_meltano_file import (
     contains_component,
     deep_get,
     empty_meltano_components,
+    get_included_directories,
 )
 
 # Sample Extractors
@@ -38,7 +37,7 @@ nameless_target = {
     "pip_url": "another_url",
 }
 
-# Sample schedules
+# Sample Schedules
 gitlab_to_csv = {
     "name": "gitlab-to-csv",
     "extractor": "tap-gitlab",
@@ -52,8 +51,18 @@ another_schedule = {
     "transform": "skip",
 }
 
-# Sample transforms
+# Sample Transforms
 # TODO
+
+# Alpha
+alpha_extractors = [tap_gitlab, tap_facebook, tap_zoom]
+alpha_loaders = [target_csv, target_another]
+alpha_schedules = [gitlab_to_csv, another_schedule]
+
+# Beta
+beta_extractors = [tap_gitlab, tap_facebook, tap_zoom]
+beta_loaders = [target_csv, target_another]
+beta_schedules = [gitlab_to_csv, another_schedule]
 
 # Expected Meltano config
 expected_updated_extractors = [tap_gitlab, tap_facebook, tap_zoom]
@@ -118,3 +127,47 @@ class TestMultipleMeltanoFile:
     def test_contains_component_empty_list(self):
         status = contains_component([], extra_tap)
         assert status is False
+
+    def test_get_included_directories_valid(self, project):
+        project_root = project.meltanofile.parent
+        expected_directories = ["a_subdirectory", "another_subdirectory"]
+        meltano_config = {"include-paths": expected_directories + []}
+
+        # Build expected directories
+        for directory in expected_directories:
+            directory_path = project_root.joinpath(directory)
+            os.mkdir(directory_path)
+
+        actual_directories = get_included_directories(meltano_config)
+
+        # Clean expected directories
+        for directory in expected_directories:
+            directory_path = project_root.joinpath(directory)
+            os.rmdir(directory_path)
+
+        assert actual_directories == expected_directories
+
+    def test_get_included_directories_invalid(self, project):
+        project_root = project.meltanofile.parent
+        expected_directories = ["a_subdirectory", "another_subdirectory"]
+        # invalid_directory = ["this_dir_does_not_exist"]
+        # meltano_config = {"include-paths": expected_directories + invalid_directory}
+
+        # Build expected directories
+        for directory in expected_directories:
+            directory_path = project_root.joinpath(directory)
+            os.mkdir(directory_path)
+        try:
+            pass
+            # actual_directories = get_included_directories(meltano_config)
+        except OSError:  # as e:
+
+            # TODO assert error type
+
+            # Clean expected directories
+            for directory in expected_directories:
+                directory_path = project_root.joinpath(directory)
+                os.rmdir(directory_path)
+
+        # Should through error
+        # assert False
