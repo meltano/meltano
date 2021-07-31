@@ -28,10 +28,17 @@ from meltano.core.meltano_file import MeltanoFile
 #   [ ] enforce relative paths for include-paths
 #   [ ] sorted - verify alphabetical or ascii
 #   [ ] remove *args in init if no break
+#   [ ] git rm test_multiple_config.py
+#   [ ] verify + replciate how Meltano throws errors
 #   QUESTIONS
 #   [ ] use docstrings with :return:/:params: labels?
 #   [ ] is pop_updated_components clear?
 #   [ ] should the check in pop_config_file_data() got to project.py?
+#   [ ] idea for naming empty_meltano_components(), and expected_empty_config (in test_MMF)
+#   [ ] what to test for in load()
+#   [ ] keep test_empty_meltano_components()?
+#   [ ] project fxtr cleans up, but only aft entire (class? test suite?) - is there a better way to manually clean than what i have?
+#   [ ] don't add to all to attrs, just necessary - better design? (list repercussions elsewhere) (try it out first)
 #   MAYBE-DO
 #   [ ] idea - default scope to current file
 #   [ ] include-paths allows files and directories
@@ -48,7 +55,13 @@ COMPONENT_KEYS = [
     "transforms",
 ]
 INCLUDE_PATHS_KEY = "include-paths"
-MELTANO_FILE_PATH = "meltano.yml"
+MELTANO_FILE_PATH = Path("meltano.yml")
+EXTRA_KEYS = [
+    "included_directories",
+    "included_config_file_paths",
+    "included_config_file_contents",
+    "included_config_file_component_names",
+]
 
 
 @contextmanager
@@ -77,7 +90,8 @@ def empty_meltano_components():
 
 def contains_component(components: List[dict], component: dict) -> bool:
     """
-    True if component in components else False
+    True if component in components else False.
+    Assumes all components have names.
     """
     for c in components:
         if component["name"] == c["name"]:
@@ -88,12 +102,15 @@ def contains_component(components: List[dict], component: dict) -> bool:
 def get_included_directories(main_meltano_config):
     # Process included paths
     included_directories: List[str] = []
-    for path_name in main_meltano_config[INCLUDE_PATHS_KEY]:
-        # Verify each path is valid
-        if os.path.isdir(path_name):  # TODO paths must be relative to project root
-            included_directories.append(path_name)
-        else:
-            pass  # TODO throw an error (include-path {path_name} is not a valid directory)
+    try:
+        for path_name in main_meltano_config[INCLUDE_PATHS_KEY]:
+            # Verify each path is valid
+            if os.path.isdir(path_name):  # TODO paths must be relative to project root
+                included_directories.append(path_name)
+            else:
+                pass  # TODO throw an error (include-path {path_name} is not a valid directory)
+    except KeyError:
+        pass  # Include paths are optional
     return included_directories
 
 
@@ -193,32 +210,37 @@ def pop_updated_components(
     return output_components
 
 
+def pop_extras(updated_config):
+    for key in EXTRA_KEYS:
+        updated_config["extras"].pop(key)
+
+
 class MultipleMeltanoFile(MeltanoFile):
     def __init__(self, *args, **attrs):
-        # Include paths are optional
-        if attrs.get(INCLUDE_PATHS_KEY):
-            self.included_directories = get_included_directories(attrs)
-            self.included_config_file_paths = get_included_config_file_paths(
-                self.included_directories
-            )
-            self.all_config_file_paths = self.included_config_file_paths.copy().append(
-                Path(MELTANO_FILE_PATH)
-            )
-            self.included_config_file_contents = get_included_config_file_components(
-                self.included_config_file_paths
-            )
-            self.included_config_file_plugins = (
-                get_included_config_file_component_names(
-                    self.included_config_file_contents
-                )
-            )
-            attrs = merge_components(attrs, self.included_config_file_contents)
+        attrs["included_directories"] = get_included_directories(attrs)
+        attrs["included_config_file_paths"] = get_included_config_file_paths(
+            attrs["included_directories"]
+        )
+        attrs["all_config_file_paths"] = attrs["included_config_file_paths"].copy()
+        attrs["all_config_file_paths"].append(MELTANO_FILE_PATH)
+        attrs["included_config_file_contents"] = get_included_config_file_components(
+            attrs["included_config_file_paths"]
+        )
+        attrs[
+            "included_config_file_component_names"
+        ] = get_included_config_file_component_names(
+            attrs["included_config_file_contents"]
+        )
+        attrs = merge_components(attrs, attrs["included_config_file_contents"])
+        # Call to super's init will place these new attrs keys in the sub-dictionary 'extras'
         super().__init__(**attrs)
 
-    def pop_config_file_data(self, config_file):
-        if config_file == MELTANO_FILE_PATH:
+    def pop_config_file_data(self, config_file_path):
+        if config_file_path == MELTANO_FILE_PATH:
+            # Remove the new attrs keys above from the sub-dictionary 'extras'
+            pop_extras(self)
             return self
         else:
             return pop_updated_components(
-                self, config_file, self.included_config_file_plugins
+                self, config_file_path, self.included_config_file_component_names
             )

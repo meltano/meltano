@@ -186,7 +186,8 @@ class Project(Versioned):
 
             yield meltano_update
 
-            for config_file_path in meltano_update.included_config_file_paths:
+            all_config_file_paths = meltano_update["extras"].pop("all_config_file_paths")
+            for config_file_path in all_config_file_paths:
                 try:
                     with atomic_write(config_file_path, overwrite=True) as configfile:
                         # update if everything is fine
