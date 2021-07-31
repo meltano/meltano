@@ -147,27 +147,4 @@ class TestMultipleMeltanoFile:
 
         assert actual_directories == expected_directories
 
-    def test_get_included_directories_invalid(self, project):
-        project_root = project.meltanofile.parent
-        expected_directories = ["a_subdirectory", "another_subdirectory"]
-        # invalid_directory = ["this_dir_does_not_exist"]
-        # meltano_config = {"include-paths": expected_directories + invalid_directory}
-
-        # Build expected directories
-        for directory in expected_directories:
-            directory_path = project_root.joinpath(directory)
-            os.mkdir(directory_path)
-        try:
-            pass
-            # actual_directories = get_included_directories(meltano_config)
-        except OSError:  # as e:
-
-            # TODO assert error type
-
-            # Clean expected directories
-            for directory in expected_directories:
-                directory_path = project_root.joinpath(directory)
-                os.rmdir(directory_path)
-
-        # Should through error
-        # assert False
+    # TODO def test_get_included_directories_invalid(self, project):
