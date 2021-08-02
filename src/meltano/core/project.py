@@ -163,6 +163,7 @@ class Project(Versioned):
         # fmt: off
         with self._meltano_rw_lock.read_lock(), \
              self.meltanofile.open() as meltanofile:
+            # return MeltanoFile.parse(yaml.safe_load(meltanofile))
             return MultipleMeltanoFile.parse(yaml.safe_load(meltanofile))
         # fmt: on
 
@@ -186,15 +187,16 @@ class Project(Versioned):
 
             yield meltano_update
 
-            all_config_file_paths = meltano_update["extras"].pop("all_config_file_paths")
-            for config_file_path in all_config_file_paths:
+            all_config_file_path_names = meltano_update["extras"].pop("all_config_file_path_names")
+            for config_file_path_name in all_config_file_path_names:
                 try:
+                    config_file_path = Path(config_file_path_name)
                     with atomic_write(config_file_path, overwrite=True) as configfile:
                         # update if everything is fine
-                        config_file_data = meltano_update.pop_config_file_data(config_file_path)
+                        config_file_data = meltano_update.pop_config_file_data(config_file_path_name)
                         yaml.dump(config_file_data, configfile, default_flow_style=False, sort_keys=False)
                 except Exception as err:
-                    logger.critical(f"Could not update {config_file_path}: {err}")
+                    logger.critical(f"Could not update {config_file_path_name}: {err}")
                     raise
         # fmt: on
 

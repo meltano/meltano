@@ -7,6 +7,8 @@ from meltano.core.multiple_meltano_file import (
     get_included_directories,
 )
 
+INCLUDE_PATHS_KEY = "include_paths"
+
 # Sample Extractors
 tap_gitlab = {
     "name": "tap-gitlab",
@@ -131,7 +133,7 @@ class TestMultipleMeltanoFile:
     def test_get_included_directories_valid(self, project):
         project_root = project.meltanofile.parent
         expected_directories = ["a_subdirectory", "another_subdirectory"]
-        meltano_config = {"include-paths": expected_directories + []}
+        meltano_config = {INCLUDE_PATHS_KEY: expected_directories + []}
 
         # Build expected directories
         for directory in expected_directories:
