@@ -227,7 +227,10 @@ def pop_updated_components(
 
 def pop_extras(updated_config):
     for key in EXTRA_KEYS:
-        updated_config["extras"].pop(key)
+        try:
+            updated_config["extras"].pop(key)
+        except KeyError:
+            pass  # Secondary configs were empty
 
 
 class MultipleMeltanoFile(MeltanoFile):
@@ -248,7 +251,9 @@ class MultipleMeltanoFile(MeltanoFile):
         ] = get_included_config_file_component_names(
             attrs["included_config_file_contents"]
         )
-        attrs = merge_components(attrs, attrs["included_config_file_contents"])
+        attrs = merge_components(
+            attrs, attrs["included_config_file_contents"]
+        )  # TODO Nonetype is not iterable
         # Call to super's init will place these new attrs keys in the sub-dictionary 'extras'
         super().__init__(**attrs)
 
@@ -258,6 +263,9 @@ class MultipleMeltanoFile(MeltanoFile):
             pop_extras(self)
             return self
         else:
+            included_config_file_component_names = self["extras"].get(
+                "included_config_file_component_names"
+            )  # TODO check if is none
             return pop_updated_components(
-                self, config_file_path_name, self.included_config_file_component_names
+                self, config_file_path_name, included_config_file_component_names
             )
