@@ -175,9 +175,13 @@ before and/or after implementing an important user-facing feature.
 
 ### Schedule
 
-A new version of Meltano is released every 1st and 3rd Thursday of the month.
+We aim to release at least 2 new minor versions of Meltano and Meltano SDK per month.
+These releases are decoupled from any marketing/social announcements.
+There are active [discussions](https://gitlab.com/meltano/meta/-/issues/134) about how to improve the documentation process around new features and fixes. 
 
-New versions and iterations on Meltano SDK, MeltanoHub, and any other Meltano product lines are released as needed with no particular cadence.
+There are on-going [discussions](https://gitlab.com/meltano/meta/-/issues/135) about how to have nightly/edge releases.
+
+New versions and iterations on MeltanoHub and any other Meltano product lines are released as needed with no particular cadence.
 
 ### Versioning
 
