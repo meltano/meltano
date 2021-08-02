@@ -195,7 +195,6 @@ class Project(Versioned):
                         # update if everything is fine
                         config_file_data = meltano_update.pop_config_file_data(config_file_path_name)  # target
                         yaml.dump(config_file_data, configfile, default_flow_style=False, sort_keys=False)
-                        print("dump successful")
                 except Exception as err:
                     logger.critical(f"Could not update {config_file_path_name}: {err}")
                     raise
