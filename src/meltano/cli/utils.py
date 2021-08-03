@@ -1,6 +1,8 @@
 """Defines helpers for use by the CLI."""
 import logging
 import os
+import signal
+from contextlib import contextmanager
 from typing import Optional
 
 import click
@@ -418,3 +420,18 @@ def install_plugins(
         )
 
     return num_failed == 0
+
+
+@contextmanager
+def propigate_stop_signals(proc):
+    """When a stop signal is received, send it to `proc` in addition to interrupting execution."""
+
+    def _handler(sig, _):  # noqa: WPS430
+        proc.send_signal(sig)
+        raise KeyboardInterrupt()
+
+    original_termination_handler = signal.signal(signal.SIGTERM, _handler)
+    try:
+        yield
+    finally:
+        signal.signal(signal.SIGTERM, original_termination_handler)
