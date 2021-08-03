@@ -447,6 +447,7 @@ class ListSelectedExecutor(CatalogExecutor):
         return selected
 
     def node_selection(self, node: MetadataNode):
+        """Get selection type from metadata entry."""
         try:
             metadata = node["metadata"]
             if metadata.get("inclusion") == "automatic":
@@ -460,14 +461,17 @@ class ListSelectedExecutor(CatalogExecutor):
             return False
 
     def stream_node(self, node: MetadataNode, path: str):
+        """Initialize empty set for selected nodes in stream."""
         self._stream = node["tap_stream_id"]
         self.properties[self._stream] = set()
 
     def stream_metadata_node(self, node: MetadataNode, path: str):
+        """Add stream selection to tap's collection."""
         selection = self.SelectedNode(self._stream, self.node_selection(node))
         self.streams.add(selection)
 
     def property_metadata_node(self, node: MetadataNode, path: str):
+        """Add property selection to stream's collection."""
         property_path = ".".join(node["breadcrumb"])
         prop = path_property(property_path)
         selection = self.SelectedNode(prop, self.node_selection(node))
