@@ -285,7 +285,19 @@ class MetadataExecutor(CatalogExecutor):
 
         # Missing inclusion metadata for property
         if match is None:
-            entry = {"breadcrumb": breadcrumb, "metadata": {"inclusion": "automatic"}}
+            # Streams and top-level properties.
+            if len(breadcrumb) <= 2:
+                entry = {
+                    "breadcrumb": breadcrumb,
+                    "metadata": {"inclusion": "automatic"},
+                }
+            # Exclude nested properties.
+            else:
+                entry = {
+                    "breadcrumb": breadcrumb,
+                    "metadata": {"inclusion": "available"},
+                }
+
             metadata_list.append(entry)
 
     def stream_node(self, node, path):
