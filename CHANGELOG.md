@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#2860](https://gitlab.com/meltano/meltano/-/issues/2860) Allow commands to use alternate executables
+- [#2771](https://gitlab.com/meltano/meltano/-/issues/2771) Update stale `meltano add --custom` documentation example
 
 ### Fixes
 

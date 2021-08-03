@@ -100,6 +100,12 @@ Connected to [Google Workspace](#google-workspace).
 Every team member has their own account.
 Main account details are in the `Executive` 1Password vault.
 
+## [Greenhouse](https://www.greenhouse.io/)
+
+Manage job applicants, our job board, and our hiring process.
+
+Select team members have their own account.
+
 ## [Instagram](https://www.instagram.com/)
 
 [`meltanodata`](https://www.instagram.com/meltanodata/) Instagram account.
