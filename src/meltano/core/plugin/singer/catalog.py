@@ -4,9 +4,11 @@ import re
 from collections import OrderedDict, namedtuple
 from enum import Enum, auto
 from functools import singledispatch
-from typing import List
+from typing import Any, Dict, List
 
 from meltano.core.behavior.visitor import visit_with
+
+MetadataNode = Dict[str, Any]
 
 
 class CatalogRule:
@@ -299,7 +301,7 @@ class MetadataExecutor(CatalogExecutor):
             # Legacy catalogs have underscorized keys on the streams themselves
             self.set_metadata(node, path, rule.key.replace("-", "_"), rule.value)
 
-    def property_node(self, node, path):
+    def property_node(self, node, path: str):
         breadcrumb_idx = path.index("properties")
         breadcrumb = path[breadcrumb_idx:].split(".")
 
@@ -432,7 +434,7 @@ class ListSelectedExecutor(CatalogExecutor):
 
         return selected
 
-    def node_selection(self, node):
+    def node_selection(self, node: MetadataNode):
         try:
             metadata = node["metadata"]
             if metadata.get("inclusion") == "automatic":
@@ -445,15 +447,15 @@ class ListSelectedExecutor(CatalogExecutor):
         except KeyError:
             return False
 
-    def stream_node(self, node, path):
+    def stream_node(self, node: MetadataNode, path: str):
         self._stream = node["tap_stream_id"]
         self.properties[self._stream] = set()
 
-    def stream_metadata_node(self, node, path):
+    def stream_metadata_node(self, node: MetadataNode, path: str):
         selection = self.SelectedNode(self._stream, self.node_selection(node))
         self.streams.add(selection)
 
-    def property_metadata_node(self, node, path):
+    def property_metadata_node(self, node: MetadataNode, path: str):
         property_path = ".".join(node["breadcrumb"])
         prop = path_property(property_path)
         selection = self.SelectedNode(prop, self.node_selection(node))
