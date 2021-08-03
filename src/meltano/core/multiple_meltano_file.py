@@ -11,7 +11,8 @@ from meltano.core.meltano_file import MeltanoFile
 #   [x] appropriate name for trio: schedules, plugins.extractors, plugins.loaders
 #   [x] use trio name to rename plugin_states(), update_plugin(), add_plugins()
 #   [x] included
-#   [ ] add type hints everywhere
+#   [x] type hint parameters
+#   [ ] type hint confusing variables
 #   [x] lowercase to let caps works in paths
 #   [x] change for loops: for key, value in dict:
 #   [x] empty_yaml -> empty_meltano_config
@@ -30,6 +31,7 @@ from meltano.core.meltano_file import MeltanoFile
 #   [ ] remove *args in init if no break
 #   [x] git rm test_multiple_config.py
 #   [ ] verify + replciate how Meltano throws errors
+#   [ ] warnings when things shouldn't be none
 #   QUESTIONS
 #   [ ] use docstrings with :return:/:params: labels?
 #   [ ] is pop_updated_components clear?
@@ -68,17 +70,25 @@ EXTRA_KEYS = [
 ]
 
 
-def load(configfile_path_name: str) -> dict:
-    configfile = Path(configfile_path_name)
-    return yaml.safe_load(configfile.open())
+def load(config_file_path_name: str) -> dict:
+    config_file = Path(config_file_path_name)
+    return yaml.safe_load(config_file.open())
 
 
-def deep_get(dictionary, keys, default=None):
+def deep_get(dictionary: dict, keys: str, default=None):
     return reduce(
         lambda d, key: d.get(key, default) if isinstance(d, dict) else default,
         keys.split("."),
         dictionary,
     )
+
+
+def pop_keys(dictionary: dict, keys: List[str]):
+    try:
+        for k in keys:
+            dictionary.pop(k)
+    except KeyError:
+        pass
 
 
 def empty_meltano_components():
@@ -103,7 +113,7 @@ def contains_component(components: List[dict], component: dict) -> bool:
     return False
 
 
-def get_included_directories(main_meltano_config):
+def get_included_directories(main_meltano_config: dict):
     # Process included paths
     included_directories: List[str] = []
     try:
@@ -121,7 +131,7 @@ def get_included_directories(main_meltano_config):
     return included_directories
 
 
-def get_included_config_file_path_names(included_directories):
+def get_included_config_file_path_names(included_directories: List[str]):
     # Get config paths in included directories
     included_config_file_path_names: List[str] = []
     for (
@@ -140,18 +150,20 @@ def get_included_config_file_path_names(included_directories):
     return included_config_file_path_names
 
 
-def get_included_config_file_components(included_config_file_path_names):
+def get_included_config_file_components(included_config_file_path_names: List[str]):
     # Store loaded contents of each config file
-    included_config_file_components: Dict[Path, dict] = dict()
+    included_config_file_components: Dict[str, dict] = {}
     for config_file_path_name in included_config_file_path_names:
         config_file_components = load(config_file_path_name)
         included_config_file_components[config_file_path_name] = config_file_components
     return included_config_file_components
 
 
-def get_included_config_file_component_names(included_config_file_components):
+def get_included_config_file_component_names(
+    included_config_file_components: Dict[str, dict]
+):
     # Get names of components in each config file
-    included_config_file_component_names = {}
+    included_config_file_component_names: Dict[str, dict] = {}
     for (
         config_file_path_name,
         config_file_components,
@@ -178,7 +190,9 @@ def get_included_config_file_component_names(included_config_file_components):
     return included_config_file_component_names
 
 
-def merge_components(main_config, included_config_file_components):
+def merge_components(
+    main_config: dict, included_config_file_components: Dict[str, dict]
+):
     # Process keys in included configs
     for (
         config_file_path_name,
@@ -188,9 +202,16 @@ def merge_components(main_config, included_config_file_components):
             components = deep_get(config_file_components, key)
             if not components:
                 continue
-            existing_components = deep_get(main_config, key)
+            print("should break")
+            existing_components = deep_get(
+                main_config, key
+            )  # TODO 1 ensure maing_config has empty lists
+            # if existing_components is None:
+            #     logger.critical(f"'meltano.yml' missing component '{key}'.")
+            #     raise Exception("Missing Component")
             for component in components:
                 if contains_component(existing_components, component):
+                    print("should have broken")
                     logger.critical(f"Component {component['name']} already exists.")
                     raise Exception("Duplicate Component")
                 else:
@@ -199,12 +220,14 @@ def merge_components(main_config, included_config_file_components):
 
 
 def pop_updated_components(
-    updated_config, config_file_path_name, included_config_file_component_names
+    updated_config: dict,
+    config_file_path_name: str,
+    included_config_file_component_names: Dict[str, dict],
 ):
     """
     Remove updated contents from self that belong in file at config_file_path_name, return these contents as a dict
     """
-    all_output_components = empty_meltano_components()
+    output_meltano_components = empty_meltano_components()
     config_file_component_names = included_config_file_component_names[
         config_file_path_name
     ]
@@ -219,25 +242,16 @@ def pop_updated_components(
             for idx, updated_component in enumerate(updated_components):
                 if updated_component.get("name") == name:
                     updated_component = updated_components.pop(idx)
-                    output_components = deep_get(all_output_components, key)
+                    output_components = deep_get(output_meltano_components, key)
                     output_components.append(updated_component)
                     break
-    # (optional) remove empty keys in output_config
-    return all_output_components
+    # TODO 2 remove empty keys in output_config, apply to updated_component too
+    return output_meltano_components
 
 
-def pop_extras(updated_config):  # TODO change to general 'pop keys from dict'
-    for key in EXTRA_KEYS:
-        try:
-            updated_config.pop(key)
-        except KeyError:
-            pass  # Secondary configs were empty
-
-
-def pop_config_file_data(updated_config, config_file_path_name):
+def pop_config_file_data(updated_config: dict, config_file_path_name: str):
     if config_file_path_name == MELTANO_FILE_PATH_NAME:
-        # Remove the new attrs keys above from the sub-dictionary 'extras'
-        pop_extras(updated_config)
+        pop_keys(updated_config, EXTRA_KEYS)
         return updated_config
     else:
         included_config_file_component_names = updated_config[
@@ -250,6 +264,7 @@ def pop_config_file_data(updated_config, config_file_path_name):
 
 class MultipleMeltanoFile(MeltanoFile):
     def __init__(self, **attrs):
+        # TODO apply 'fill_keys' to attrs (see TODO 1)
         attrs["included_directories"] = get_included_directories(attrs)
         attrs["included_config_file_path_names"] = get_included_config_file_path_names(
             attrs["included_directories"]
