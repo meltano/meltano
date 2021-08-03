@@ -174,7 +174,10 @@ class PluginInvoker:
         return self.venv_service.exec_path(self.plugin.executable)
 
     def exec_args(self, *args, command=None, env=None):
-        """Materialize the arguments to be passed to the executable."""
+        """Materialize the arguments to be passed to the executable.
+
+        Raises `UnknownCommandError` if requested command is not defined.
+        """
         env = env or {}
         executable = self.exec_path()
         if command:
