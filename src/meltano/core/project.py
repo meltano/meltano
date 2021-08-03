@@ -18,7 +18,7 @@ from werkzeug.utils import secure_filename
 
 from .behavior.versioned import Versioned
 from .error import Error
-from .multiple_meltano_file import MultipleMeltanoFile
+from .multiple_meltano_file import MultipleMeltanoFile, pop_config_file_data
 from .utils import makedirs, truthy
 
 logger = logging.getLogger(__name__)
@@ -187,13 +187,14 @@ class Project(Versioned):
 
             yield meltano_update
 
-            all_config_file_path_names = meltano_update["extras"].pop("all_config_file_path_names")
+            meltano_update = meltano_update.canonical()
+            all_config_file_path_names = meltano_update.pop("all_config_file_path_names")
             for config_file_path_name in all_config_file_path_names:
                 try:
                     config_file_path = Path(config_file_path_name)
                     with atomic_write(config_file_path, overwrite=True) as configfile:
                         # update if everything is fine
-                        config_file_data = meltano_update.pop_config_file_data(config_file_path_name)  # target
+                        config_file_data = pop_config_file_data(meltano_update, config_file_path_name)  # target
                         yaml.dump(config_file_data, configfile, default_flow_style=False, sort_keys=False)
                 except Exception as err:
                     logger.critical(f"Could not update {config_file_path_name}: {err}")

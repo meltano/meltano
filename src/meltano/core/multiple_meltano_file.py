@@ -28,7 +28,7 @@ from meltano.core.meltano_file import MeltanoFile
 #   [ ] enforce relative paths for include-paths
 #   [ ] sorted - verify alphabetical or ascii
 #   [ ] remove *args in init if no break
-#   [ ] git rm test_multiple_config.py
+#   [x] git rm test_multiple_config.py
 #   [ ] verify + replciate how Meltano throws errors
 #   QUESTIONS
 #   [ ] use docstrings with :return:/:params: labels?
@@ -203,7 +203,7 @@ def pop_updated_components(
     """
     Remove updated contents from self that belong in file at config_file_path_name, return these contents as a dict
     """
-    output_components = empty_meltano_components()
+    all_output_components = empty_meltano_components()
     config_file_component_names = included_config_file_component_names[
         config_file_path_name
     ]
@@ -218,23 +218,37 @@ def pop_updated_components(
             for idx, updated_component in enumerate(updated_components):
                 if updated_component.get("name") == name:
                     updated_component = updated_components.pop(idx)
-                    output_components = deep_get(output_components, key)
+                    output_components = deep_get(all_output_components, key)
                     output_components.append(updated_component)
                     break
     # (optional) remove empty keys in output_config
-    return output_components
+    return all_output_components
 
 
-def pop_extras(updated_config):
+def pop_extras(updated_config):  # TODO change to general 'pop keys from dict'
     for key in EXTRA_KEYS:
         try:
-            updated_config["extras"].pop(key)
+            updated_config.pop(key)
         except KeyError:
             pass  # Secondary configs were empty
 
 
+def pop_config_file_data(updated_config, config_file_path_name):
+    if config_file_path_name == MELTANO_FILE_PATH_NAME:
+        # Remove the new attrs keys above from the sub-dictionary 'extras'
+        pop_extras(updated_config)
+        return updated_config
+    else:
+        included_config_file_component_names = updated_config[
+            "included_config_file_component_names"
+        ]
+        return pop_updated_components(
+            updated_config, config_file_path_name, included_config_file_component_names
+        )
+
+
 class MultipleMeltanoFile(MeltanoFile):
-    def __init__(self, *args, **attrs):
+    def __init__(self, **attrs):
         attrs["included_directories"] = get_included_directories(attrs)
         attrs["included_config_file_path_names"] = get_included_config_file_path_names(
             attrs["included_directories"]
@@ -251,21 +265,6 @@ class MultipleMeltanoFile(MeltanoFile):
         ] = get_included_config_file_component_names(
             attrs["included_config_file_contents"]
         )
-        attrs = merge_components(
-            attrs, attrs["included_config_file_contents"]
-        )  # TODO Nonetype is not iterable
+        attrs = merge_components(attrs, attrs["included_config_file_contents"])
         # Call to super's init will place these new attrs keys in the sub-dictionary 'extras'
         super().__init__(**attrs)
-
-    def pop_config_file_data(self, config_file_path_name):
-        if config_file_path_name == MELTANO_FILE_PATH_NAME:
-            # Remove the new attrs keys above from the sub-dictionary 'extras'
-            pop_extras(self)
-            return self
-        else:
-            included_config_file_component_names = self["extras"].get(
-                "included_config_file_component_names"
-            )  # TODO check if is none
-            return pop_updated_components(
-                self, config_file_path_name, included_config_file_component_names
-            )
