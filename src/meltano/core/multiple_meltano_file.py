@@ -64,6 +64,7 @@ EXTRA_KEYS = [
     "included_config_file_path_names",
     "included_config_file_contents",
     "included_config_file_component_names",
+    "all_config_file_path_names",
 ]
 
 
