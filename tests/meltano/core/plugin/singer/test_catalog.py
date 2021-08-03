@@ -424,7 +424,6 @@ CATALOG_PROPERTIES = {
     "active",
     "payload",
     "payload.content",
-    "payload.hash",
 }
 
 
@@ -664,7 +663,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         [
             (
                 "CATALOG",
-                {"id", "code", "name", "code", "created_at", "payload.content"},
+                {"id", "code", "name", "created_at", "payload.content"},
             ),
             ("JSON_SCHEMA", CATALOG_PROPERTIES),
         ],
