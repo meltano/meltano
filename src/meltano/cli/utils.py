@@ -423,7 +423,7 @@ def install_plugins(
 
 
 @contextmanager
-def propigate_stop_signals(proc):
+def propagate_stop_signals(proc):
     """When a stop signal is received, send it to `proc` in addition to interrupting execution."""
 
     def _handler(sig, _):  # noqa: WPS430

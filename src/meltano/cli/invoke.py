@@ -11,7 +11,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import pass_project
-from .utils import CliError, propigate_stop_signals
+from .utils import CliError, propagate_stop_signals
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +63,7 @@ def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_args):
                 exit_code = 0
             else:
                 handle = invoker.invoke(*plugin_args, command=command_name)
-                with propigate_stop_signals(handle):
+                with propagate_stop_signals(handle):
                     exit_code = handle.wait()
 
     except UnknownCommandError as err:
