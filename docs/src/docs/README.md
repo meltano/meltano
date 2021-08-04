@@ -71,16 +71,19 @@ members:
   location: CA, USA 🇺🇸
   start_date: September 9, 2021
 openings:
+- title: Head of Partnerships
+  location: Anywhere, Remote 🌍
+  description: "Build and nourish relationships with data consultancies, open source data tools Meltano can integrate with, and connector maintainers including SaaS vendors"
 - title: Senior Backend Engineer
   location: Anywhere, Remote 🌍
   description: "Required: Python & data experience"
-- title: Senior Frontend Engineer & UI/UX Designer
-  location: Anywhere, Remote 🌍
-  description: "Nice to have: Vue.js experience"
 - title: Senior Data Engineer
   location: Anywhere, Remote 🌍
   description: "Use Meltano to build a world-class data platform"
   description_url: https://docs.google.com/document/d/1cWBRnm8Bm729ew7TRLwkKbbc4U2NKHMx9rTuErh1Oos/edit
+- title: Senior Frontend Engineer & UI/UX Designer
+  location: Anywhere, Remote 🌍
+  description: "Nice to have: Vue.js experience"
 - title: Technical Content Marketer
   location: Anywhere, Remote 🌍
   description: "Identify and deliver strategies and programs to improve the community experience and build engagement"
