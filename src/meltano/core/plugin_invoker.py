@@ -74,11 +74,16 @@ class UnknownCommandError(InvokerError):
 class PluginInvoker:
     """This class handles the invocation of a `ProjectPlugin` instance."""
 
+    STD_IN = "stdin"
+    STD_OUT = "stdout"
+    STD_ERR = "stderr"
+
     def __init__(
         self,
         project: Project,
         plugin: ProjectPlugin,
         context: Optional[object] = None,
+        output_handlers: Optional[dict] = None,
         run_dir=None,
         config_dir=None,
         venv_service: VenvService = None,
@@ -89,6 +94,7 @@ class PluginInvoker:
         self.project = project
         self.plugin = plugin
         self.context = context
+        self.output_handlers = output_handlers
 
         self.venv_service: Optional[VenvService] = None
         if plugin.pip_url or venv_service:
@@ -259,3 +265,9 @@ class PluginInvoker:
         except ExecutableNotFoundError as err:
             # Unwrap FileNotFoundError
             raise err.__cause__
+
+    def add_output_handler(self, src: str, handler: object):
+        if self.output_handlers:
+            self.output_handlers[src].append(handler)
+        else:
+            self.output_handlers = {src: [handler]}

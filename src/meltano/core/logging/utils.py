@@ -4,6 +4,7 @@ import os
 import re
 import sys
 from contextlib import suppress
+from typing import Optional
 
 from meltano.core.project_settings_service import ProjectSettingsService
 
@@ -68,7 +69,9 @@ async def _write_line_writer(writer, line):
     return True
 
 
-async def capture_subprocess_output(reader, *line_writers):
+async def capture_subprocess_output(
+    reader: Optional[asyncio.StreamReader], *line_writers
+):
     """
     Capture in real time the output stream of a suprocess that is run async.
     The stream has been set to asyncio.subprocess.PIPE and is provided using
