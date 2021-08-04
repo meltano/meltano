@@ -183,8 +183,6 @@ wemake-python-styleguide = [
   "-WPS602",  # Allow using @staticmethod
   "-WPS212",  # Ignore 'too many return statements' - noqa parse inconsistent between py38 vs prior
 ]
-max-returns = 16
-max_returns = 16
 
 [tool.flakehell.exceptions."tests/"]
 flake8-bandit = ["-S101"]  # Don't warn on use of asserts in tests
