@@ -84,7 +84,7 @@ openings:
 - title: Senior Frontend Engineer & UI/UX Designer
   location: Anywhere, Remote 🌍
   description: "Nice to have: Vue.js experience"
-- title: Technical Content Marketer
+- title: Technical Marketing Manager
   location: Anywhere, Remote 🌍
   description: "Identify and deliver strategies and programs to improve the community experience and build engagement"
 ---
