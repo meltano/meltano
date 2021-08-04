@@ -81,6 +81,9 @@ openings:
   location: Anywhere, Remote 🌍
   description: "Use Meltano to build a world-class data platform"
   description_url: https://docs.google.com/document/d/1cWBRnm8Bm729ew7TRLwkKbbc4U2NKHMx9rTuErh1Oos/edit
+- title: Technical Content Marketer
+  location: Anywhere, Remote 🌍
+  description: "Identify and deliver strategies and programs to improve the community experience and build engagement"
 ---
 
 # Introduction
