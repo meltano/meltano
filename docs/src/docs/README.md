@@ -73,7 +73,7 @@ members:
 openings:
 - title: Head of Partnerships
   location: Anywhere, Remote 🌍
-  description: "Build and nourish relationships with data consultancies, open soure data tools Meltano can integrate with, and connector maintainers including SaaS vendors"
+  description: "Build and nourish relationships with data consultancies, open source data tools Meltano can integrate with, and connector maintainers including SaaS vendors"
 - title: Senior Backend Engineer
   location: Anywhere, Remote 🌍
   description: "Required: Python & data experience"
