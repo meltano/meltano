@@ -74,9 +74,9 @@ openings:
 - title: Head of Partnerships
   location: Anywhere, Remote 🌍
   description: "Build and nourish relationships with data consultancies, open source data tools Meltano can integrate with, and connector maintainers including SaaS vendors"
-- title: Senior Backend Engineer
+- title: Technical Marketing Manager
   location: Anywhere, Remote 🌍
-  description: "Required: Python & data experience"
+  description: "Identify and deliver strategies and programs to improve the community experience and build engagement"
 - title: Senior Data Engineer
   location: Anywhere, Remote 🌍
   description: "Use Meltano to build a world-class data platform"
@@ -84,9 +84,9 @@ openings:
 - title: Senior Frontend Engineer & UI/UX Designer
   location: Anywhere, Remote 🌍
   description: "Nice to have: Vue.js experience"
-- title: Technical Marketing Manager
+- title: Senior Backend Engineer
   location: Anywhere, Remote 🌍
-  description: "Identify and deliver strategies and programs to improve the community experience and build engagement"
+  description: "Required: Python & data experience"
 ---
 
 # Introduction
