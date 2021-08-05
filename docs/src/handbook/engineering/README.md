@@ -173,20 +173,48 @@ before and/or after implementing an important user-facing feature.
 
 ## Release Process
 
+The process below applies to both Meltano and then SDK, unless otherwise noted.
+
+### Evergreen Release Process
+
+We are always releasing, and we aim to have an _evergreen_ release process, handling the operational release and marketing work simultaneously while performing development.
+
+### The Release Checklist
+
+All release steps are documented in the Gitlab issue template, and a new `Release` checklist issue should be created each time one is closed. 
+
+In either the SDK or Meltano project on Gitlab, begin a new issue and select the `Release` template from the dropdown options.
+
 ### Schedule
 
-We aim to release every Monday and Thursday, unless there are no [unreleased changes](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md#unreleased).
+The release schedule is determined by Product and Marketing. The Engineering team aims to _always_ be ready to ship, with sufficient automation and documentation in place to allow _anyone_ in the company to perform the role of Release Manager.
+
+### Rotating Release Managers
+
+We have a sliding window of `Release Manager` role within the Engineering team, with the prior `Release Manager` oncall to support the next `Release Manager`. If issues arise or a second opinion is needed during release, the last person who ran the release process will perform this supporting function for the next.
 
 ### Versioning
-
 Regular releases get a minor version bump (`1.1.0` -> `1.2.0`).
 Releases that only address regressions introduced in the most recent release get a patch version bump (`1.2.0` -> `1.2.1`).
 
-We may want to strictly adhere to [semver](https://semver.org/) at some point.
+### Version Bump Processes
 
-### Workflow
+#### SDK Version Bump Process
 
-Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
+The SDK version bump process is documented in the Release issue template. No further actions are needed besides what is listed in the checklist.
+
+#### Meltano Version Bump Process
+
+Meltano has a manual version bump process.
+
+The below process should be performed in each release. This process accomplishes the following:
+
+1. Bump version numbers in all affected files.
+2. Flush `Unreleased` changelog events and tag to the new version number.
+3. Push a git tag with the new version number.
+
+_Note: the Meltano project uses tags and CI/CD to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package._
+
 
 1. Ensure you have the latest `master` branch locally before continuing.
 
