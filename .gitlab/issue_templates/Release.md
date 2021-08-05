@@ -37,25 +37,14 @@ Rotating `assignee`, on the morning of the release:
     3. [ ] The `release-vX.Y.Z` MR is ready when:
         1. [ ] Changelog includes all meaningful user-facing updates since the last release
             - [ ] Compare against `main` branch [commit history](https://gitlab.com/meltano/meltano/-/commits/main)
-        2. [ ] Version is bumped:
-            - [ ] `pyproject.toml`
-            - [ ] `docs/conf.py`
-            - [ ] `cookiecutter/tap-template/pyproject.toml`
-            - [ ] `cookiecutter/target-template/pyproject.toml`
-        3. [ ] Changelog is flushed with the appropriate version number
-        4. [ ] Changes above are committed as `changelog and version bump`
-        5. [ ] Open the Changelog in preview mode, mouse over each link and ensure tooltip descriptions match the resolved issue. Check contributor profile links to make sure they are correct.
-    4. [ ] Check this box when the CI pipeline status is **green** :white_check_mark:
-    5. [ ] Merge to `main` with the merge commit message `Release vX.Y.Z`
-2. [ ] Release steps:
-   1. [ ] Manual:
-      1. [ ] Complete the [Version Bump Process](https://meltano.com/handbook/engineering/#meltano-version-bump-process) documented in the Meltano Engineering Handbook.
-   2. [ ] Automated [CD pipeline](https://gitlab.com/meltano/meltano/-/pipelines?scope=tags):
+        2. [ ] Open the Changelog in preview mode, mouse over each link and ensure tooltip descriptions match the resolved issue. Check contributor profile links to make sure they are correct.
+    4. [ ] Complete the [Version Bump Process](https://meltano.com/handbook/engineering/#meltano-version-bump-process) documented in the Meltano Engineering Handbook:
+2. [ ] Automated [CD pipeline](https://gitlab.com/meltano/meltano/-/pipelines?scope=tags):
        - In response to new tag creation, these steps are performed automatically in Gitlab pipelines:
            - Abort if tag `vX.Y.Z` does not match output from `poetry version --short`
-           - Publish to [PyPi](https://pypi.org/project/meltano/#history)
-               - [ ] Check this box when confirmed
-           - Create a Gitlab 'Release' from the specified tag
+           - Publish to [PyPi](https://pypi.org/project/meltano/#history) and [Docker]
+    4. [ ] Check this box when the CI pipeline status is **green** :white_check_mark:
+    5. [ ] Merge the resulting MR to `main` with the merge commit message `Release vX.Y.Z`
 3. [ ] Open the next `Release` issue, assign as appropriate, and provide that link here: `___`
 
 ### Announcements, Marketing, and Promotion
