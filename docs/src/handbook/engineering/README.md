@@ -175,7 +175,13 @@ before and/or after implementing an important user-facing feature.
 
 ### Schedule
 
-We aim to release every Monday and Thursday, unless there are no [unreleased changes](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md#unreleased).
+We aim to release at least 2 new minor versions of Meltano and Meltano SDK per month.
+These releases are decoupled from any marketing/social announcements.
+There are active [discussions](https://gitlab.com/meltano/meta/-/issues/134) about how to improve the documentation process around new features and fixes. 
+
+There are on-going [discussions](https://gitlab.com/meltano/meta/-/issues/135) about how to have nightly/edge releases.
+
+New versions and iterations on MeltanoHub and any other Meltano product lines are released as needed with no particular cadence.
 
 ### Versioning
 
