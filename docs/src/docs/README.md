@@ -77,10 +77,6 @@ openings:
 - title: Technical Marketing Manager
   location: Anywhere, Remote 🌍
   description: "Identify and deliver strategies and programs to improve the community experience and build engagement"
-- title: Senior Data Engineer
-  location: Anywhere, Remote 🌍
-  description: "Use Meltano to build a world-class data platform"
-  description_url: https://docs.google.com/document/d/1cWBRnm8Bm729ew7TRLwkKbbc4U2NKHMx9rTuErh1Oos/edit
 - title: Senior Frontend Engineer & UI/UX Designer
   location: Anywhere, Remote 🌍
   description: "Nice to have: Vue.js experience"
