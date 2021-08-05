@@ -3,7 +3,7 @@ import os
 from meltano.core.multiple_meltano_file import (
     contains_component,
     deep_get,
-    empty_meltano_components,
+    empty_components,
     get_included_directories,
 )
 
@@ -86,9 +86,15 @@ expected_empty_config = {
     "plugins": {
         "extractors": [],
         "loaders": [],
+        "transforms": [],
+        "models": [],
+        "dashboards": [],
+        "orchestrators": [],
+        "transformers": [],
+        "files": [],
+        "utilities": [],
     },
     "schedules": [],
-    "transforms": [],
 }
 
 
@@ -116,7 +122,7 @@ class TestMultipleMeltanoFile:
         assert value is None
 
     def test_empty_meltano_components(self):
-        assert empty_meltano_components() == expected_empty_config
+        assert empty_components() == expected_empty_config
 
     def test_contains_component_has(self):
         status = contains_component(expected_updated_extractors, tap_zoom)
