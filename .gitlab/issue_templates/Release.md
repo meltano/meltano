@@ -49,8 +49,7 @@ Rotating `assignee`, on the morning of the release:
     5. [ ] Merge to `main` with the merge commit message `Release vX.Y.Z`
 2. [ ] Release steps:
    1. [ ] Manual:
-      1. [ ] [Cut a tag](https://gitlab.com/meltano/meltano/-/tags/new) from `main` named `vX.Y.Z` with Message=`Release vX.Y.Z`
-           - _Note: tag name must exactly match poetry version text_
+      1. [ ] Complete the [Version Bump Process](https://meltano.com/handbook/engineering/#meltano-version-bump-process) documented in the Meltano Engineering Handbook.
    2. [ ] Automated [CD pipeline](https://gitlab.com/meltano/meltano/-/pipelines?scope=tags):
        - In response to new tag creation, these steps are performed automatically in Gitlab pipelines:
            - Abort if tag `vX.Y.Z` does not match output from `poetry version --short`
