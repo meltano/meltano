@@ -259,15 +259,15 @@ def pop_updated_components(
     return all_output_components
 
 
-def pop_config_file_data(updated_config: dict, config_file_path_name: str):
+def pop_config_file_data(
+    updated_config: dict,
+    config_file_path_name: str,
+    included_config_file_component_names: Dict[str, dict],
+):
     if config_file_path_name == MELTANO_FILE_PATH_NAME:
-        pop_keys(updated_config, EXTRA_KEYS)
         updated_config = clean_components(updated_config)
         return updated_config
     else:
-        included_config_file_component_names = updated_config[
-            "included_config_file_component_names"
-        ]
         output_config = pop_updated_components(
             updated_config, config_file_path_name, included_config_file_component_names
         )
@@ -297,3 +297,14 @@ class MultipleMeltanoFile(MeltanoFile):
         attrs = merge_components(attrs, attrs["included_config_file_contents"])
         # Call to super's init will place these new attrs keys in the sub-dictionary 'extras'
         super().__init__(**attrs)
+
+    def get_config_path_names(self):
+        return self["extras"]["all_config_file_path_names"]
+
+    def get_included_component_names(self):
+        return self["extras"]["included_config_file_component_names"]
+
+    def canonical(self):
+        as_canonical = super().canonical()
+        pop_keys(as_canonical, EXTRA_KEYS)
+        return as_canonical
