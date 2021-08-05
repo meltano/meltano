@@ -2,6 +2,7 @@ import json
 import logging
 import shutil
 import subprocess
+from uuid import uuid4
 from hashlib import sha1
 from pathlib import Path
 from typing import Dict
@@ -115,15 +116,21 @@ class SingerTap(SingerPlugin):
                 )
 
         return args
-
+    
     @property
     def config_files(self):
         return {
-            "config": "tap.config.json",
+            "config": f"tap.{self.tap_uuid}.config.json",
             "catalog": "tap.properties.json",
             "catalog_cache_key": "tap.properties.cache_key",
             "state": "state.json",
         }
+
+    @property
+    def tap_uuid(self):
+        if not self._tap_uuid:
+            self._tap_uuid=str(uuid4())
+        return self._tap_uuid
 
     @property
     def output_files(self):

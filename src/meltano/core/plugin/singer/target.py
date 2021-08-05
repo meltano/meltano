@@ -1,5 +1,6 @@
 from typing import Dict
 
+from uuid import uuid4
 from meltano.core.behavior.hookable import hook
 from meltano.core.db import project_engine
 from meltano.core.setting_definition import SettingDefinition
@@ -22,7 +23,13 @@ class SingerTarget(SingerPlugin):
 
     @property
     def config_files(self):
-        return {"config": "target.config.json"}
+        return {"config": "target.{self.target_uuid}.config.json"}
+
+    @property
+    def target_uuid(self):
+        if not self._target_uuid:
+            self._target_uuid=str(uuid4())
+        return self._target_uuid
 
     @property
     def output_files(self):
