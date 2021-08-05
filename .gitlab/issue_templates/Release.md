@@ -72,3 +72,5 @@ Rotating `assignee`, on the morning of the release:
     5. [ ] Tweet the blog post
 
 ----------------
+
+/label ~Release ~"flow::Doing"
