@@ -7,48 +7,6 @@ from typing import Dict, List
 import yaml
 from meltano.core.meltano_file import MeltanoFile
 
-# TODO:
-#   [x] appropriate name for trio: schedules, plugins.extractors, plugins.loaders
-#   [x] use trio name to rename plugin_states(), update_plugin(), add_plugins()
-#   [x] included
-#   [x] type hint parameters
-#   [ ] type hint confusing variables
-#   [x] lowercase to let caps works in paths
-#   [x] change for loops: for key, value in dict:
-#   [x] empty_yaml -> empty_meltano_config
-#   [x] plugins -> components && included_keys -> included_components
-#   [x] get_include_config_file_plugins -> names
-#   [ ] get_included_config_file_plugins -> include docstring sample of output
-#   [ ] move comments to docstrings
-#   [ ] update all docstrings
-#   [x] verify where 'transforms' component belongs
-#   [x] values -> components
-#   [x] get_included_config_file_plugins => extract names from values as list, use that list to replace the list in config_dict
-#   [x] don't loop through func call, assign call to variable, loop through variable
-#   [ ] lock load()
-#   [ ] enforce relative paths for include-paths
-#   [ ] sorted - verify alphabetical or ascii
-#   [x] remove *args in init if no break
-#   [x] git rm test_multiple_config.py
-#   [ ] verify + replicate how Meltano throws errors
-#   [ ] warnings when things shouldn't be none
-#   QUESTIONS
-#   [ ] use docstrings with :return:/:params: labels?
-#   [ ] is pop_updated_components clear?
-#   [ ] should the check in pop_config_file_data() got to project.py?
-#   [ ] idea for naming empty_meltano_components(), and expected_empty_config (in test_MMF)
-#   [ ] what to test for in load()
-#   [ ] keep test_empty_meltano_components()?
-#   [ ] project fxtr cleans up, but only aft entire (class? test suite?) - is there a better way to manually clean than what i have?
-#   [ ] don't add to all to attrs, just necessary - better design? (list repercussions elsewhere) (try it out first)
-#   MAYBE-DO
-#   [ ] idea - default scope to current file
-#   [ ] include-paths allows files and directories
-#   [x] create deep_set(), use to replace pre-init empty nested dicts
-#   ALLOW-LIST
-#   1.  write to multiple Meltano files for Plugins.Extractors, Plugins.Loaders, Schedules
-#   2.  duplicate plugins/schedules throw build error (this means record is not needed)
-
 logger = logging.getLogger(__name__)
 
 
@@ -178,7 +136,10 @@ def get_included_directories(main_config: dict):
     try:
         for path_name in main_config[INCLUDE_PATHS_KEY]:
             # Verify each path is valid
-            if os.path.isdir(path_name):  # TODO paths must be relative to project root
+            # TODO abs_path = get absolute of path_name, pass to isdir() (Project() should have abs_path)
+            if os.path.isdir(
+                path_name
+            ):  # TODO paths_name must be relative to project root
                 included_directories.append(path_name)
             else:
                 logger.critical(
