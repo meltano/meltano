@@ -9,12 +9,17 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* [2456] Let project plugin definitions and config be defined in multiple individual YAML files instead of meltano.yml
 
 ### Changes
+* [2456] Project class methods meltano() and meltano_update() use new class MultipleMeltanoFile instead of MeltanoFile
+
+* [2456] Project class method meltano_update() updates meltano.yml and any other included YAMLs
 
 ### Fixes
 
 ### Breaks
+* [2456] cli command output assumes meltano.yml is the only config YAML - this is no longer guaranteed
 
 
 ## 1.78.0 - (2021-07-15)
