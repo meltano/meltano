@@ -267,6 +267,12 @@ class PluginInvoker:
             raise err.__cause__
 
     def add_output_handler(self, src: str, handler: object):
+        """Append an output handler for a given stdio stream.
+
+        Args:
+            src: stdio source you'd like to subscribe, likely either 'stdout' or 'stderr'
+            handler: either a StreamWriter or an object with a callable writelines(str) method
+        """
         if self.output_handlers:
             self.output_handlers[src].append(handler)
         else:
