@@ -22,7 +22,7 @@ sync_discovery_yml_from_hub:
       NEW_BRANCH="auto-discovery-sync-$(date +%Y-%m-%d)";
       # CURR_BRANCH="$(git rev-parse --abbrev-ref HEAD)";
       [[ $CI_COMMIT_REF_NAME == *master ]] && echo "Detected main/master branch. Initializing branch: $NEW_BRANCH";
-      [[ $CI_COMMIT_REF_NAME == *master ]] && echo git branch $NEW_BRANCH;
+      [[ $CI_COMMIT_REF_NAME == *master ]] && git branch $NEW_BRANCH;
       [[ $CI_COMMIT_REF_NAME == *master ]] || echo "Detected non-main branch: '$CI_COMMIT_REF_NAME'. Committing directly.";
     - git commit -m "sync from hub.meltano.com/discovery.yml, $(date +%Y-%m-%d)"
-  # - git push
+    - git push
