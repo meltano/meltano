@@ -198,7 +198,29 @@ Meltano v1.3.0 is publicly released, adding the ability to distill rocket fuel a
 
 ## Social
 
-### Posting Best Practices
+## Social Channels
+
+| Channels |
+| ------------------------------------------ |
+| [Meltano Twitter](https://twitter.com/meltanodata) |
+| [Meltano LinkedIn](https://www.linkedin.com/company/meltano/) |
+| [Meltano Facebook](https://www.facebook.com/meltano) |
+| [Meltano Instagram](https://www.instagram.com/meltanodata/) |
+| [Meltano YouTube](https://www.youtube.com/meltano) |
+
+### Channel Use
+
+#### Twitter <a name="twitter"></a>
+
+#### LinkedIn <a name="linkedin"></a>
+
+#### Facebook <a name="facebook"></a>
+
+#### Instagram <a name="instagram"></a>
+
+#### TikTok <a name="tiktok"></a>
+
+#### Posting Best Practices
 
 
 --
