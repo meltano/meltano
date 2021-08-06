@@ -161,17 +161,23 @@ class PluginInvoker:
         finally:
             self.cleanup()
 
-    def exec_path(self):
+    def exec_path(self, executable=None):
+        """
+        Return the absolute path to the executable.
+
+        Uses the plugin executable if none is specified.
+        """
+        executable = executable or self.plugin.executable
         if not self.venv_service:
-            if "/" not in self.plugin.executable.replace("\\", "/"):
+            if "/" not in executable.replace("\\", "/"):
                 # Expect executable on path
-                return self.plugin.executable
+                return executable
 
             # Return executable relative to project directory
-            return self.project.root.joinpath(self.plugin.executable)
+            return self.project.root.joinpath(executable)
 
         # Return executable within venv
-        return self.venv_service.exec_path(self.plugin.executable)
+        return self.venv_service.exec_path(executable)
 
     def exec_args(self, *args, command=None, env=None):
         """Materialize the arguments to be passed to the executable.
@@ -184,7 +190,7 @@ class PluginInvoker:
             command_config = self.find_command(command)
             plugin_args = command_config.expanded_args(command, env)
             if command_config.executable:
-                executable = command_config.executable
+                executable = self.exec_path(command_config.executable)
         else:
             plugin_args = self.plugin.exec_args(self)
 
