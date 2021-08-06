@@ -427,7 +427,7 @@ class SchemaExecutor(CatalogExecutor):
         self._stream = None
         self._rules = rules
 
-    def ensure_property(self, breadcrumb: List[str]):
+    def ensure_property(self, breadcrumb: List[str]):  # noqa: WPS231
         """Create nodes for the breadcrumb and schema extra that matches."""
         next_node: Dict[str, Any] = self._stream["schema"]
 
