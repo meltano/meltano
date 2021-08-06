@@ -451,22 +451,23 @@ class ListSelectedExecutor(CatalogExecutor):
         """Get selection type from metadata entry."""
         try:
             metadata: Dict[str, Any] = node["metadata"]
-            inclusion: str = metadata.get("inclusion")
-            selected: Optional[bool] = metadata.get("selected")
-            selected_by_default: bool = metadata.get("selected-by-default", False)
-
-            if inclusion == "automatic":
-                return SelectionType.AUTOMATIC
-
-            if selected is True:
-                return SelectionType.SELECTED
-
-            if selected is None and selected_by_default:
-                return SelectionType.SELECTED
-
-            return SelectionType.EXCLUDED
         except KeyError:
             return False
+
+        inclusion: str = metadata.get("inclusion")
+        selected: Optional[bool] = metadata.get("selected")
+        selected_by_default: bool = metadata.get("selected-by-default", False)
+
+        if inclusion == "automatic":
+            return SelectionType.AUTOMATIC
+
+        if selected is True:
+            return SelectionType.SELECTED
+
+        if selected is None and selected_by_default:
+            return SelectionType.SELECTED
+
+        return SelectionType.EXCLUDED
 
     def stream_node(self, node: MetadataNode, path: str):
         """Initialize empty set for selected nodes in stream."""
