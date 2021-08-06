@@ -20,7 +20,7 @@ sync_discovery_yml_from_hub:
       if [[ "$(git rev-parse --abbrev-ref HEAD)" == *master ]]; then
         NEW_BRANCH="auto-discovery-sync-$(date +%Y-%m-%d)"
         echo "Detected main/master branch. Initializing branch: $NEW_BRANCH"
-        echo git branch $NEW_BRANCH";
+        echo git branch $NEW_BRANCH;
       else;
         echo "Detected non-main branch: '$(git rev-parse --abbrev-ref HEAD)'. Committing directly."
       fi;
