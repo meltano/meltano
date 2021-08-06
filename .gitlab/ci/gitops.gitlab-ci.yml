@@ -17,12 +17,10 @@ sync_discovery_yml_from_hub:
     - git diff
     # TODO: Once tested, remove the "echo wrapper" and uncomment 'git push'
     - |
-      if [[ "$(git rev-parse --abbrev-ref HEAD)" == *master ]]; then
-        NEW_BRANCH="auto-discovery-sync-$(date +%Y-%m-%d)"
-        echo "Detected main/master branch. Initializing branch: $NEW_BRANCH"
-        echo git branch $NEW_BRANCH;
-      else;
-        echo "Detected non-main branch: '$(git rev-parse --abbrev-ref HEAD)'. Committing directly."
-      fi;
+      NEW_BRANCH="auto-discovery-sync-$(date +%Y-%m-%d)";
+      CURR_BRANCH="$(git rev-parse --abbrev-ref HEAD)";
+      [[ $CURR_BRANCH == *master ]] && echo "Detected main/master branch. Initializing branch: $NEW_BRANCH";
+      [[ $CURR_BRANCH == *master ]] && echo git branch $NEW_BRANCH;
+      [[ $CURR_BRANCH == *master ]] || echo "Detected non-main branch: '$(git rev-parse --abbrev-ref HEAD)'. Committing directly.";
     - git commit -m "sync from hub.meltano.com/discovery.yml, $(date +%Y-%m-%d)"
   # - git push
