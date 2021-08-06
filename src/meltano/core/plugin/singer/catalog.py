@@ -4,7 +4,7 @@ import re
 from collections import OrderedDict, namedtuple
 from enum import Enum, auto
 from functools import singledispatch
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from meltano.core.behavior.visitor import visit_with
 
@@ -446,14 +446,22 @@ class ListSelectedExecutor(CatalogExecutor):
 
         return selected
 
-    def node_selection(self, node: MetadataNode):
+    @staticmethod
+    def node_selection(node: MetadataNode):
         """Get selection type from metadata entry."""
         try:
-            metadata = node["metadata"]
-            if metadata.get("inclusion") == "automatic":
+            metadata: Dict[str, Any] = node["metadata"]
+            inclusion: str = metadata.get("inclusion")
+            selected: Optional[bool] = metadata.get("selected")
+            selected_by_default: bool = metadata.get("selected-by-default", False)
+
+            if inclusion == "automatic":
                 return SelectionType.AUTOMATIC
 
-            if metadata.get("selected", False):
+            if selected is True:
+                return SelectionType.SELECTED
+
+            if selected is None and selected_by_default:
                 return SelectionType.SELECTED
 
             return SelectionType.EXCLUDED

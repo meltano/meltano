@@ -6,10 +6,12 @@ from meltano.core.plugin.singer.catalog import (
     ListExecutor,
     ListSelectedExecutor,
     MetadataExecutor,
+    MetadataNode,
     MetadataRule,
     SchemaExecutor,
     SchemaRule,
     SelectExecutor,
+    SelectionType,
     path_property,
     visit,
 )
@@ -228,7 +230,8 @@ CATALOG = """
             "type": "object",
             "properties": {
               "content": {"type": ["string", "null"]},
-              "hash": {"type": "string"}
+              "hash": {"type": "string"},
+              "timestamp": {"type": "string", "format": "date-time"}
             },
             "required": ["hash"]
           }
@@ -327,6 +330,18 @@ CATALOG = """
           ],
           "metadata": {
             "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "payload",
+            "properties",
+            "timestamp"
+          ],
+          "metadata": {
+            "inclusion": "available",
+            "selected-by-default": true
           }
         },
         {
@@ -663,7 +678,14 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         [
             (
                 "CATALOG",
-                {"id", "code", "name", "created_at", "payload.content"},
+                {
+                    "id",
+                    "code",
+                    "name",
+                    "created_at",
+                    "payload.content",
+                    "payload.timestamp",
+                },
             ),
             ("JSON_SCHEMA", CATALOG_PROPERTIES),
         ],
@@ -693,7 +715,13 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     )
     def test_select_negated(self, catalog, attrs):
         selector = SelectExecutor(
-            ["*.*", "!UniqueEntitiesName.code", "!UniqueEntitiesName.name", "!*.*.hash"]
+            [
+                "*.*",
+                "!UniqueEntitiesName.code",
+                "!UniqueEntitiesName.name",
+                "!*.*.hash",
+                "!*.*.timestamp",
+            ]
         )
         visit(catalog, selector)
 
@@ -701,6 +729,75 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         visit(catalog, lister)
 
         assert lister.selected_properties["UniqueEntitiesName"] == attrs
+
+    @pytest.mark.parametrize(
+        "node,selection_type",
+        [
+            (
+                {"breadcrumb": ["properties", "a"], "metadata": {"selected": True}},
+                SelectionType.SELECTED,
+            ),
+            (
+                {"breadcrumb": ["properties", "a"], "metadata": {"selected": False}},
+                SelectionType.EXCLUDED,
+            ),
+            (
+                {
+                    "breadcrumb": ["properties", "a"],
+                    "metadata": {"inclusion": "automatic"},
+                },
+                SelectionType.AUTOMATIC,
+            ),
+            (
+                {
+                    "breadcrumb": ["properties", "a"],
+                    "metadata": {"inclusion": "unsupported"},
+                },
+                SelectionType.EXCLUDED,
+            ),
+            (
+                {
+                    "breadcrumb": ["properties", "a"],
+                    "metadata": {"inclusion": "available"},
+                },
+                SelectionType.EXCLUDED,
+            ),
+            (
+                {
+                    "breadcrumb": ["properties", "a"],
+                    "metadata": {"selected": True, "inclusion": "available"},
+                },
+                SelectionType.SELECTED,
+            ),
+            (
+                {
+                    "breadcrumb": ["properties", "a"],
+                    "metadata": {"selected": False, "selected-by-default": True},
+                },
+                SelectionType.EXCLUDED,
+            ),
+            (
+                {
+                    "breadcrumb": ["properties", "a"],
+                    "metadata": {"selected-by-default": True},
+                },
+                SelectionType.SELECTED,
+            ),
+        ],
+        ids=[
+            "selected: true",
+            "selected: false",
+            "inclusion: available",
+            "selected: true, inclusion: available",
+            "inclusion: automatic",
+            "inclusion: unsupported",
+            "selected: false, selected-by-default: true",
+            "selected-by-default: true",
+        ],
+    )
+    def test_node_selection(self, node: MetadataNode, selection_type: SelectionType):
+        """Test that selection metadata produces the expected selection type member."""
+        assert ListSelectedExecutor.node_selection(node) == selection_type
 
 
 class TestMetadataExecutor:
@@ -847,5 +944,6 @@ class TestListExecutor:
                 "payload",
                 "payload.content",
                 "payload.hash",
+                "payload.timestamp",
             }
         }
