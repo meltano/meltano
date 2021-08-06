@@ -19,11 +19,10 @@ sync_discovery_yml_from_hub:
     - git diff
     # TODO: Once tested, remove the "echo wrapper" and uncomment 'git push'
     - |
-      NEW_BRANCH="auto-discovery-sync-$(date +%Y-%m-%d)";
-      # CURR_BRANCH="$(git rev-parse --abbrev-ref HEAD)";
-      [[ $CI_COMMIT_REF_NAME == *master ]] && echo "Detected main/master branch. Initializing branch: $NEW_BRANCH";
-      [[ $CI_COMMIT_REF_NAME == *master ]] && git branch $NEW_BRANCH;
+      [[ $CI_COMMIT_REF_NAME == *master ]] && REMOTE_BRANCH="auto-discovery-sync-$(date +%Y-%m-%d)";
+      [[ $CI_COMMIT_REF_NAME == *master ]] && echo "Detected main/master branch. Initializing branch: '$REMOTE_BRANCH'";
+      [[ $CI_COMMIT_REF_NAME == *master ]] && git branch $REMOTE_BRANCH;
       [[ $CI_COMMIT_REF_NAME == *master ]] || echo "Detected non-main branch: '$CI_COMMIT_REF_NAME'. Committing directly.";
-      [[ $CI_COMMIT_REF_NAME == *master ]] || git branch $CI_COMMIT_REF_NAME;
+      [[ $CI_COMMIT_REF_NAME == *master ]] || REMOTE_BRANCH="$CI_COMMIT_REF_NAME";
     - git commit -m "sync from hub.meltano.com/discovery.yml, $(date +%Y-%m-%d)"
-    - git push
+    - git push origin HEAD:$REMOTE_BRANCH
