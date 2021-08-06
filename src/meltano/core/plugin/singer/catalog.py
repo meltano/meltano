@@ -259,7 +259,7 @@ class SelectionType(str, Enum):
 
 @singledispatch
 def visit(node, executor, path: str = ""):
-    logging.debug(f"Skipping node at '{path}'")
+    logging.debug("Skipping node at '%s'", path)  # noqa: WPS323
 
 
 @visit.register(dict)
@@ -276,7 +276,7 @@ def _(node: dict, executor, path=""):
         node_type = CatalogNode.METADATA
 
     if node_type:
-        logging.debug(f"Visiting {node_type} at '{path}'.")
+        logging.debug("Visiting %s at '%s'.", node_type, path)  # noqa: WPS323
         executor(node_type, node, path)
 
     for child_path, child_node in node.items():
@@ -305,7 +305,7 @@ class CatalogExecutor:
         try:
             dispatch[node_type](node, path)
         except KeyError:
-            logging.debug(f"Unknown node type '{node_type}'.")
+            logging.debug("Unknown node type '%s'.", node_type)  # noqa: WPS323
 
     def stream_node(self, node, path: str):
         """Process stream node."""
@@ -395,7 +395,9 @@ class MetadataExecutor(CatalogExecutor):
         breadcrumb = node["breadcrumb"]
 
         logging.debug(
-            f"Visiting metadata node for tap_stream_id '{tap_stream_id}', breadcrumb '{breadcrumb}'"
+            "Visiting metadata node for tap_stream_id '%s', breadcrumb '%s'",  # noqa: WPS323
+            tap_stream_id,
+            breadcrumb,
         )
 
         for rule in MetadataRule.matching(self._rules, tap_stream_id, breadcrumb):
@@ -414,7 +416,7 @@ class MetadataExecutor(CatalogExecutor):
             return
 
         node[key] = value
-        logging.debug(f"Setting '{path}.{key}' to '{value}'")
+        logging.debug("Setting '%s.%s' to '%s'", path, key, value)  # noqa: WPS323
 
 
 class SelectExecutor(MetadataExecutor):
