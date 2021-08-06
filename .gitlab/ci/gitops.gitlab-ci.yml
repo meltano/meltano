@@ -5,6 +5,9 @@ sync_discovery_yml_from_hub:
   except:
     - tags
   stage: docs
+  before_script:
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
   script:
     - |
       echo "Setting up 'discovery.yml' sync from 'hub.meltano.com'"
@@ -25,4 +28,4 @@ sync_discovery_yml_from_hub:
       [[ $CI_COMMIT_REF_NAME == *master ]] || echo "Detected non-main branch: '$CI_COMMIT_REF_NAME'. Committing directly.";
       [[ $CI_COMMIT_REF_NAME == *master ]] || REMOTE_BRANCH="$CI_COMMIT_REF_NAME";
     - git commit -m "sync from hub.meltano.com/discovery.yml, $(date +%Y-%m-%d)"
-    - git push origin HEAD:$REMOTE_BRANCH
+    - git push http://root:$CI_COMMITS_GITLAB_TOKEN@$CI_SERVER_HOST:$CI_PROJECT_PATH.git HEAD:$REMOTE_BRANCH
