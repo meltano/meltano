@@ -28,4 +28,4 @@ sync_discovery_yml_from_hub:
       [[ $CI_COMMIT_REF_NAME == *master ]] || echo "Detected non-main branch: '$CI_COMMIT_REF_NAME'. Committing directly.";
       [[ $CI_COMMIT_REF_NAME == *master ]] || REMOTE_BRANCH="$CI_COMMIT_REF_NAME";
     - git commit -m "sync from hub.meltano.com/discovery.yml, $(date +%Y-%m-%d)"
-    - git push http://root:$CI_COMMITS_GITLAB_TOKEN@$CI_SERVER_HOST:$CI_PROJECT_PATH.git HEAD:$REMOTE_BRANCH
+    - git push https://root:$CI_COMMITS_GITLAB_TOKEN@$CI_SERVER_HOST:$CI_PROJECT_PATH.git HEAD:$REMOTE_BRANCH
