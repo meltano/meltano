@@ -214,7 +214,7 @@ Don't see something you want on the roadmap? [Make an issue](https://gitlab.com/
 
 #### August 2021
 
-August continues our bug bashing theme behind the scenes, but we also aim to make progress on several high-level features.
+August continues our bug bashing theme behind the scenes, while we also make progress on several high-level features.
 We're undergoing a large refactor to make Meltano pipelines composable, as well as working to add support for the `analyzer` and `validator` plugin types.
 Also important is supporting the Singer ecosystem even more with updates to MeltanoHub and our overall GitHub presence for community connectors.
 
