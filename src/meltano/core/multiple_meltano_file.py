@@ -31,6 +31,7 @@ EXTRA_KEYS = [
     "included_config_file_contents",
     "included_config_file_component_names",
     "all_config_file_path_names",
+    "project_root",
 ]
 
 
@@ -133,21 +134,34 @@ def clean_components(config: dict):
 def get_included_directories(main_config: dict):
     # Process included paths
     included_directories: List[str] = []
-    try:
-        for path_name in main_config[INCLUDE_PATHS_KEY]:
-            # Verify each path is valid
-            # TODO abs_path = get absolute of path_name, pass to isdir() (Project() should have abs_path)
-            if os.path.isdir(
-                path_name
-            ):  # TODO paths_name must be relative to project root
-                included_directories.append(path_name)
-            else:
+    project_root = Path(main_config["project_root"])
+    included_path_names = main_config.get(INCLUDE_PATHS_KEY)
+
+    if included_path_names is None:
+        # Include paths are optional
+        pass
+    else:
+        for path_name in included_path_names:
+
+            # Enforce relative paths
+            if os.path.isabs(path_name):
                 logger.critical(
-                    f"Included path '{path_name}' is not a valid directory."
+                    f"Included path '{path_name}' is not a relative to the project root."
                 )
                 raise Exception("Invalid Included Path")
-    except KeyError:
-        pass  # Include paths are optional
+
+            # Assumes root is already resolved
+            abs_path_name = str(project_root.joinpath(path_name))
+
+            # Verify each path is valid
+            if os.path.isdir(abs_path_name):
+                included_directories.append(abs_path_name)
+            else:
+                logger.critical(
+                    f"Included path '{abs_path_name}' is not a valid directory."
+                )
+                raise Exception("Invalid Included Path")
+
     return included_directories
 
 

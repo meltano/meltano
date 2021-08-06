@@ -157,13 +157,19 @@ class Project(Versioned):
 
         return project
 
+    def parse_meltanofile(self, meltanofile):
+        # There is a better way to do this. For now, MMF needs knowledge of root to verify directories upon __init__
+        contents = yaml.safe_load(meltanofile)
+        contents["project_root"] = str(self.root)
+        return MultipleMeltanoFile.parse(contents)
+
     @property
     def meltano(self) -> Dict:
         """Return a copy of the current meltano config"""
         # fmt: off
         with self._meltano_rw_lock.read_lock(), \
-             self.meltanofile.open() as meltanofile:
-            return MultipleMeltanoFile.parse(yaml.safe_load(meltanofile))
+                self.meltanofile.open() as meltanofile:
+            return self.parse_meltanofile(meltanofile)
         # fmt: on
 
     @contextmanager
@@ -182,7 +188,7 @@ class Project(Versioned):
 
             with self.meltanofile.open() as meltanofile:
                 # read the latest version
-                meltano_update = MultipleMeltanoFile.parse(yaml.safe_load(meltanofile))
+                meltano_update = self.parse_meltanofile(meltanofile)
 
             yield meltano_update
 
