@@ -6,7 +6,7 @@ import os
 import click
 from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin.singer.catalog import SelectionType, parse_select_pattern
+from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
@@ -93,9 +93,11 @@ def show(project, extractor, show_all=False):
 
     # report
     click.secho("\nEnabled patterns:")
-    for select in map(parse_select_pattern, select_service.current_select):
-        color = "red" if select.negated else "white"
-        click.secho(f"\t{select.raw}", fg=color)
+
+    select_pattern: SelectPattern
+    for select_pattern in map(SelectPattern.parse, select_service.current_select):
+        color = "red" if select_pattern.negated else "white"
+        click.secho(f"\t{select_pattern.raw}", fg=color)
 
     click.secho("\nSelected attributes:")
     for stream, prop in (
