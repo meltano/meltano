@@ -1,0 +1,28 @@
+# Manually-triggered pipelines which perform predefined automated actions (gitops)
+
+sync_discovery_yml_from_hub:
+  when: manual
+  except:
+    - tags
+  # stage: docs
+  script:
+    - |
+      echo "Setting up 'discovery.yml' sync from 'hub.meltano.com'"
+      echo "Current location: Ref='$CI_COMMIT_REF_NAME' and Namespace='$CI_PROJECT_NAMESPACE'..."
+    - |
+      echo "# This is a bundled version of discovery.yml" > src/meltano/core/bundle/discovery.yml
+      echo "# Please see https://hub.meltano.com/discovery.yml for latest updates." >> src/meltano/core/bundle/discovery.yml
+      curl https://hub.meltano.com/discovery.yml >> src/meltano/core/bundle/discovery.yml
+    - git add src/meltano/core/bundle/discovery.yml
+    - git diff
+    # TODO: Once tested, remove the "echo wrapper" and uncomment 'git push'
+    - |
+      if [[ "$(git rev-parse --abbrev-ref HEAD)" == *master ]]; then
+        NEW_BRANCH="auto-discovery-sync-$(date +%Y-%m-%d)"
+        echo "Detected main/master branch. Initializing branch: $NEW_BRANCH"
+        echo git branch $NEW_BRANCH";
+      else;
+        echo "Detected non-main branch: '$(git rev-parse --abbrev-ref HEAD)'. Committing directly."
+      fi;
+    - git commit -m "sync from hub.meltano.com/discovery.yml, $(date +%Y-%m-%d)"
+  # - git push
