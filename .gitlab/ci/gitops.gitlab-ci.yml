@@ -4,7 +4,7 @@ sync_discovery_yml_from_hub:
   when: manual
   except:
     - tags
-  # stage: docs
+  stage: docs
   script:
     - |
       echo "Setting up 'discovery.yml' sync from 'hub.meltano.com'"
