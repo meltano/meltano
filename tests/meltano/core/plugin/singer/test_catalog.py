@@ -6,7 +6,6 @@ from meltano.core.plugin.singer.catalog import (
     ListExecutor,
     ListSelectedExecutor,
     MetadataExecutor,
-    MetadataNode,
     MetadataRule,
     SchemaExecutor,
     SchemaRule,
@@ -795,7 +794,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
             "selected-by-default: true",
         ],
     )
-    def test_node_selection(self, node: MetadataNode, selection_type: SelectionType):
+    def test_node_selection(self, node: dict, selection_type: SelectionType):
         """Test that selection metadata produces the expected selection type member."""
         assert ListSelectedExecutor.node_selection(node) == selection_type
 
