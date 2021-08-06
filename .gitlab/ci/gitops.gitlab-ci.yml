@@ -24,5 +24,6 @@ sync_discovery_yml_from_hub:
       [[ $CI_COMMIT_REF_NAME == *master ]] && echo "Detected main/master branch. Initializing branch: $NEW_BRANCH";
       [[ $CI_COMMIT_REF_NAME == *master ]] && git branch $NEW_BRANCH;
       [[ $CI_COMMIT_REF_NAME == *master ]] || echo "Detected non-main branch: '$CI_COMMIT_REF_NAME'. Committing directly.";
+      [[ $CI_COMMIT_REF_NAME == *master ]] || git branch $CI_COMMIT_REF_NAME;
     - git commit -m "sync from hub.meltano.com/discovery.yml, $(date +%Y-%m-%d)"
     - git push
