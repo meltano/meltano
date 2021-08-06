@@ -1,7 +1,3 @@
-# This is a bundled version of discovery.yml
-# Please see https://gitlab.com/meltano/hub/-/raw/main/_data/meltano/discovery.yml for latest updates.
-
-
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
 version: 18
