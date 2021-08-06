@@ -212,41 +212,39 @@ Each item should link to an Epic with the relevant issue linked to that epic.
 As this projects out into the future it is subject to change based on feedback. 
 Don't see something you want on the roadmap? [Make an issue](https://gitlab.com/meltano/meltano/-/issues) and let us know!
 
-#### July 2021
-
-Our focus for July will be to launch Meltano Academy to enable the community to learn about Meltano faster, make MeltanoHub the single source of truth for Meltano, refactor Meltano to enable composable pipelines, and add Superset as an available analyzer.
-
-* Meltano Academy - [Epic](https://gitlab.com/groups/meltano/-/epics/106)
-* MeltanoHub as SSOT for Meltano - [Epic](https://gitlab.com/groups/meltano/-/epics/102)
-* Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/79) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2725 )
-* Superset - [Epic](https://gitlab.com/groups/meltano/-/epics/112)
-
 #### August 2021
 
-Our focus for August will be to expand our integrations for data quality and analysis. We will also work to add support for the fast sync / batch message type to enable higher throughput for extraction and loading.
+August continues our bug bashing theme behind the scenes, but we also aim to make progress on several high-level features.
+We're undergoing a large refactor to make Meltano pipelines composable, as well as working to add support for the `analyzer` and `validator` plugin types.
+Also important is supporting the Singer ecosystem even more with updates to MeltanoHub and our overall GitHub presence for community connectors.
 
-* Fast Sync / Batch Messages - [Epic](https://gitlab.com/groups/meltano/-/epics/114)
-* Add validator plugin type - Great Expectations/dbt test - [Epic](https://gitlab.com/groups/meltano/-/epics/111)
-* Dagster - [Epic](https://gitlab.com/groups/meltano/-/epics/113) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2393)
+* Add analyzer plugin type with Superset and Lightdash support - [Epic](https://gitlab.com/groups/meltano/-/epics/112)
+* Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/79) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2725 )
 * Decentralized Management of MeltanoHub Connectors - [Epic](https://gitlab.com/groups/meltano/-/epics/105) & [Issue](https://gitlab.com/meltano/meta/-/issues/73)
+* MeltanoHub as SSOT for Meltano - [Epic](https://gitlab.com/groups/meltano/-/epics/102)
+* Add validator plugin type with Great Expectations and `dbt test` support  - [Epic](https://gitlab.com/groups/meltano/-/epics/111)
 
 #### September 2021
 
-Our focus for September will be to continue expanding integrations: adding orchestration options, notebooks integration, and out-of-the-box support for an OLAP Database.
+In September we will add the first iteration of a top-level environments feature for Meltano, along with adding support for the fast sync / batch message type to enable higher throughput for extraction and loading.
+We will also add Dagster as a supported orchestrator out-of-the-box.
 
-* [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
-* [Jupyter Notebooks](https://gitlab.com/meltano/meltano/-/issues/2595)
-* [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
-* [Simple Cloud Deploys](https://gitlab.com/groups/meltano/-/epics/28)
+* Fast Sync / Batch Messages - [Epic](https://gitlab.com/groups/meltano/-/epics/114)
+* Environments - [Issue](https://gitlab.com/meltano/meltano/-/issues/2869)
+* Dagster - [Epic](https://gitlab.com/groups/meltano/-/epics/113) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2393)
 
 #### 2021-Q4
 
 Our focus for Q4 will be on creating a compelling monitoring, observability, and data lineage featureset. We also aim to improve our integration with git providers, begin the conversion of MeltanoHub to a dynamic site, improve the UI of Meltano, and potentailly start offering a SaaS deployment of Meltano.
 
+* [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
+* [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
+* [Jupyter Notebooks](https://gitlab.com/meltano/meltano/-/issues/2595)
 * [Git-provider Integrations](https://gitlab.com/groups/meltano/-/epics/92)
 * [Initial conversion of MeltanoHub to dynamic site](https://gitlab.com/groups/meltano/-/epics/101)
-* [Monitoring, observability, and data lineage](https://gitlab.com/groups/meltano/-/epics/93)
 * [Fully featured UI](https://gitlab.com/groups/meltano/-/epics/78)
+* [Monitoring, observability, and data lineage](https://gitlab.com/groups/meltano/-/epics/93)
+* [Simple Cloud Deploys](https://gitlab.com/groups/meltano/-/epics/28)
 * [SaaS Deployment of Meltano](https://gitlab.com/groups/meltano/-/epics/94)
 
 ## Contributing
