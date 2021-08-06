@@ -8,6 +8,8 @@ sync_discovery_yml_from_hub:
   before_script:
     - git config --global user.name "${GITLAB_USER_NAME}"
     - git config --global user.email "${GITLAB_USER_EMAIL}"
+  variables:
+    DISCOVERY_URL: https://gitlab.com/meltano/hub/-/raw/main/_data/meltano/discovery.yml
   script:
     - |
       echo "Setting up 'discovery.yml' sync from 'hub.meltano.com'"
@@ -16,8 +18,8 @@ sync_discovery_yml_from_hub:
       git config --global user.name "Gitlab CI (bot)"
     - |
       echo "# This is a bundled version of discovery.yml" > src/meltano/core/bundle/discovery.yml
-      echo "# Please see https://hub.meltano.com/discovery.yml for latest updates." >> src/meltano/core/bundle/discovery.yml
-      curl https://hub.meltano.com/discovery.yml >> src/meltano/core/bundle/discovery.yml
+      echo -e "# Please see $DISCOVERY_URL for latest updates.\n\n" >> src/meltano/core/bundle/discovery.yml
+      curl $DISCOVERY_URL >> src/meltano/core/bundle/discovery.yml
     - git add src/meltano/core/bundle/discovery.yml
     - git diff
     # TODO: Once tested, remove the "echo wrapper" and uncomment 'git push'
