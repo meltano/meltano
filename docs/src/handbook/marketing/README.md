@@ -4,15 +4,15 @@ sidebarDepth: 2
 
 # Marketing Handbook
 
-## Weekly Content Marketing Activities
-On a regular basis, the Meltano team creates a fairly predictable set of artifacts that can be utilized to generate amazing content for marketing purposes.
+## Weekly Community Activities
+The Meltano convenes regularly to generate content for community and learning purposes.
 
 These items include:
 
-- Weekly Kickoff: Livestream each Monday covering what will be worked on during the week
-- Office Hours: Community meeting for discussion about upcoming features and general Q&A
-- Demo Day: Community meeting every other Friday showing off what has shipped, demonstrated by each authoring participant as available
-- Meltano / SDK Release: the actual software release, which generates a changelog, version number, and all of the previous content for the week
+- **Weekly Kickoff**: Livestream each Monday covering what will be worked on during the week
+- **Office Hours**: Community meeting for discussion about upcoming features and general Q&A
+- **Demo Day**: Community meeting every other Thursday showing off what has shipped, demonstrated by each authoring participant as available
+- **Meltano / SDK Release**: the actual software release, which generates a changelog, version number, and all of the previous content for the week
 
 Each item (linked below) has a corresponding guide to promoting that activity. Each week should roughly follow the following content schedule:
 
@@ -24,7 +24,26 @@ Each item (linked below) has a corresponding guide to promoting that activity. E
 | Thursday | [Thursday release blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Releases/Promotion%20Guidelines.md), weekly newsletter |
 | Friday | [Demo day blog & promotion](https://gitlab.com/meltano/meltano-marketing/blob/master/Content%20Marketing/evergreen-activities.md#promoting-demo-day) |
 
-## Talking about the Meltano Product Family and Team
+
+## Meltano Brand Kit
+
+### Brand Personality
+Our personality is built around four main characteristics.
+
+**Human**: We write like we talk. We avoid buzzwords and jargon, and instead communicate simply, clearly, and honestly.
+**Competent**: We aim to be masterly at what we offer, and communicate with conviction.
+**Humble**: We care about helping those around us achieve great things more than we care about our personal accomplishments.
+**Inclusive**: We embrace new ideas, new voices and new perspectices. We are always happy to be educated.
+**Fun**: We like Shramp and other oddities. 
+
+### Tone of Voice
+Friendly, informative yet ambitious. We bring empathy to all interactions and stewardship to those new to the space. 
+
+### Brand Resources
+Coming Soon! (Fonts, Colors, Logos, Slide decks and much more)
+
+
+### Talking about the Meltano Product Family and Team
 
 As of 2021 we have 3 main "product lines". Each of these should be referenced in speech and text communications in specific ways.
 
@@ -44,21 +63,6 @@ As of 2021 we have 3 main "product lines". Each of these should be referenced in
     * The Meltano
 
     Example usage: Last week, a new version for the Meltano was released
-
-#### Team
-
-**Recommended**
-
-    * the Meltano Team
-    * the Meltano Core Team
-
-    Example usage: The Meltano Team is announcing today...
-
-**Incorrect**
-
-    * The Meltano
-
-    Incorrect example usage: The Meltano is announcing today...
 
 ### SDK
 
@@ -114,10 +118,28 @@ Note that Targets can be substituted for Taps in each of these examples
 
     Incorrect example usage: Today we're releasing an update for the MeltanoHub for Singer to...
 
+#### Team
 
-## Email
+**Recommended**
+
+    * the Meltano Team
+    * the Meltano Core Team
+
+    Example usage: The Meltano Team is announcing today...
+
+**Incorrect**
+
+    * The Meltano
+
+    Incorrect example usage: The Meltano is announcing today...
+
+## Meltano Newsletter
 
 Meltano uses [Substack](https://meltano.substack.com/) to collect newsletter subscribers and send emails to communicate with our community. Email is opt-in, meaning that by default users can download and install Meltano without providing us any contact information.
+
+## Meltano Blog
+
+Want to hear everything we are talking and thinking about internally and in the open source data would. Follow along, it's easy!
 
 ## YouTube
 
@@ -173,6 +195,33 @@ Meltano v1.3.0 is publicly released, adding the ability to distill rocket fuel a
 
 1:55​ Meltano team - who we are...
 3:15​ Discussion of bug fix #1
+
+## Social
+
+## Social Channels
+
+| Channels |
+| ------------------------------------------ |
+| [Meltano Twitter](https://twitter.com/meltanodata) |
+| [Meltano LinkedIn](https://www.linkedin.com/company/meltano/) |
+| [Meltano Facebook](https://www.facebook.com/meltano) |
+| [Meltano Instagram](https://www.instagram.com/meltanodata/) |
+| [Meltano YouTube](https://www.youtube.com/meltano) |
+
+### Channel Use
+
+#### Twitter <a name="twitter"></a>
+
+#### LinkedIn <a name="linkedin"></a>
+
+#### Facebook <a name="facebook"></a>
+
+#### Instagram <a name="instagram"></a>
+
+#### TikTok <a name="tiktok"></a>
+
+#### Posting Best Practices
+
 
 --
 
