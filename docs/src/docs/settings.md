@@ -227,7 +227,7 @@ No `Authorization` header is applied under the following conditions:
 meltano config meltano set discovery_url_auth "Bearer $ACCESS_TOKEN"
 meltano config meltano set discovery_url_auth false
 
-export MELTANO_DISCOVERY_URL_AUTH=https://meltano.example.com/discovery.yml
+export MELTANO_DISCOVERY_URL_AUTH="Bearer $ACCESS_TOKEN"
 export MELTANO_DISCOVERY_URL_AUTH=false
 ```
 
