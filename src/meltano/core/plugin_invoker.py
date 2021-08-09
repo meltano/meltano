@@ -1,10 +1,13 @@
 import asyncio
 import copy
+import enum
 import logging
 import os
 import subprocess
 from contextlib import contextmanager
 from typing import Optional
+
+from meltano.core.logging.utils import SubprocessOutputWriter
 
 from .error import Error, SubprocessError
 from .plugin import PluginRef
@@ -74,9 +77,12 @@ class UnknownCommandError(InvokerError):
 class PluginInvoker:
     """This class handles the invocation of a `ProjectPlugin` instance."""
 
-    STD_IN = "stdin"
-    STD_OUT = "stdout"
-    STD_ERR = "stderr"
+    class StdioSource(str, enum.Enum):  # noqa: WPS431
+        """Describes the available unix style std io sources."""
+
+        STDIN = "stdin"
+        STDOUT = "stdout"
+        STDERR = "stderr"
 
     def __init__(
         self,
@@ -266,12 +272,12 @@ class PluginInvoker:
             # Unwrap FileNotFoundError
             raise err.__cause__
 
-    def add_output_handler(self, src: str, handler: object):
+    def add_output_handler(self, src: str, handler: SubprocessOutputWriter):
         """Append an output handler for a given stdio stream.
 
         Args:
             src: stdio source you'd like to subscribe, likely either 'stdout' or 'stderr'
-            handler: either a StreamWriter or an object with a callable writelines(str) method
+            handler: either a StreamWriter or an object matching the utils.SubprocessOutputWriter proto
         """
         if self.output_handlers:
             self.output_handlers[src].append(handler)

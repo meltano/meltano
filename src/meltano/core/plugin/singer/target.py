@@ -121,6 +121,6 @@ class SingerTarget(SingerPlugin):
         payload_flag = Payload.INCOMPLETE_STATE if incomplete_state else Payload.STATE
 
         plugin_invoker.add_output_handler(
-            plugin_invoker.STD_OUT,
+            plugin_invoker.StdioSource.STDOUT,
             BookmarkWriter(elt_context.job, elt_context.session, payload_flag),
         )

@@ -191,7 +191,7 @@ class TestSingerRunner:
             ) as commit_mock:
                 target.setup_bookmark_writer(target_invoker)
                 bookmark_writer = target_invoker.output_handlers.get(
-                    target_invoker.STD_OUT
+                    target_invoker.StdioSource.STDOUT
                 )
                 await capture_subprocess_output(target_process.stdout, *bookmark_writer)
 

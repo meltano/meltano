@@ -32,9 +32,9 @@ class TestSingerTarget:
         invoker = plugin_invoker_factory(subject, context=elt_context)
         with invoker.prepared(session):
             subject.setup_bookmark_writer(invoker)
-            assert len(invoker.output_handlers.get(invoker.STD_OUT)) == 1
+            assert len(invoker.output_handlers.get(invoker.StdioSource.STDOUT)) == 1
             assert (
-                invoker.output_handlers.get(invoker.STD_OUT)[0].payload_flag
+                invoker.output_handlers.get(invoker.StdioSource.STDOUT)[0].payload_flag
                 is Payload.STATE
             )
 
@@ -51,8 +51,8 @@ class TestSingerTarget:
         invoker = plugin_invoker_factory(subject, context=elt_context)
         with invoker.prepared(session):
             subject.setup_bookmark_writer(invoker)
-            assert len(invoker.output_handlers.get(invoker.STD_OUT)) == 1
+            assert len(invoker.output_handlers.get(invoker.StdioSource.STDOUT)) == 1
             assert (
-                invoker.output_handlers.get(invoker.STD_OUT)[0].payload_flag
+                invoker.output_handlers.get(invoker.StdioSource.STDOUT)[0].payload_flag
                 is Payload.INCOMPLETE_STATE
             )

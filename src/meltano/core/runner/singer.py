@@ -96,7 +96,7 @@ class SingerRunner(Runner):
         # Process target output
         target_outputs = []
         if target.output_handlers:
-            target_outputs = target.output_handlers.get(target.STD_OUT, [])
+            target_outputs = target.output_handlers.get(target.StdioSource.STDOUT, [])
 
         if loader_out:
             target_outputs.insert(0, loader_out)
