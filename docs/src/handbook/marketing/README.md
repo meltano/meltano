@@ -141,6 +141,9 @@ Meltano uses [Substack](https://meltano.substack.com/) to collect newsletter sub
 
 Want to hear everything we are talking and thinking about internally and in the open source data would. Follow along, it's easy!
 
+### Naming a Blog Post
+Start with the title of the post, be as descriptive as possible but succinct. Do not begin with the date. Only include a date if the content will not be evergreen and it is critical to note the date for the timeliness of the post. Adding a date to the title will instantly date the post and generally when people are looking for content they are not looking for when it was published more what they can learn in the post. 
+
 ## YouTube
 
 Meltano posts numerous videos to YouTube each week, covering everything from product releases to engineering discussions. Meltano videos posted to YouTube should follow a standard template when naming a video and adding a video description. Common naming conventions make it simple to find the latest version of our weekly videos, and an expanded description with information about Meltano and how to contact the team make it easy for individuals who discover a video to get up to speed quickly.
@@ -211,16 +214,76 @@ Meltano v1.3.0 is publicly released, adding the ability to distill rocket fuel a
 ### Channel Use
 
 #### Twitter <a name="twitter"></a>
+* **What do we use it for?**
+  * New, engagement, announcements, releases/ key feature announcements, company announcements, info gathering (polls)
 
 #### LinkedIn <a name="linkedin"></a>
+* **What do we use it for?**
+  * Hiring, thought leadership, sharing media
+* **relevant topics?**
+  * trends, best practices, events, jobs, key features, investments, partners, culture topics, remote work stuff
+* other considerations 
+* **What content performs well**
+  * photos and text, suggest using tags (to expand reach) and hashtags, around 3 is optimal (use keywords you want to be associated with)
+  * Provide a call to action
 
 #### Facebook <a name="facebook"></a>
+* **What do we use it for?**
+  * Hiring, thought leadership, sharing media, events, news, community building
+* **relevant topics?**
+  * best practices, events, jobs, how tos, investments, partners, culture topics, remote work stuff
+* other considerations 
+* **What content performs well**
+  * photos, vidoes and text
+  * Provide a call to action
 
 #### Instagram <a name="instagram"></a>
+* coming soon
 
 #### TikTok <a name="tiktok"></a>
+* coming soon
 
-#### Posting Best Practices
+#### Slack <a name="slack"></a>
+* **What do we use it for?** 
+  * Community engagement, announcements, support, releases (consider info gathering)
+* **target audience?**
+   * core community members, super fans, those getting started, trying to learn 
+* **Suggested posting cadence?**
+  * TBD- don't change until we update metrics
+* **relevant topics?**
+  * announcements, new releases, key features, 
+* **other considerations**
+  * Use it to cross-promote partners and top community members
+
+#### YouTube <a name="youtube"></a>
+* **What do we use it for?**
+  * long-form content, training, informational/ deep learning
+* **target audience?**
+  * Anyone looking to learn about how we work, function and the product
+* **relevant topics?**
+  * thought leadership, product demos and deep dives, road map walkthroughs, office hours, demo days, pitch deck overviews 
+* **other considerations** 
+  * need to be careful and curate and tag appropriately. 
+
+#### Stack Overflow <a name="stackoverflow"></a>  
+* coming soon
+
+#### Hacker news <a name="hackernews"></a>  
+* **What do we use it for?**
+  * deep community and subject matter engagement
+  * Product discussions, thought leadership
+* **target audience?**
+  * Developers, SREs/ops folks, and some data folks. Overall a pretty technical audience.
+  * FOSS advocates
+* **Suggested posting cadence?**
+  * Post our jobs on the monthly "Who's hiring?" thread as needed.
+  * Don't submit our own content to HN. Let our own community members post to HN organically.
+* **relevant topics?**
+  * We could participate in more data/dataops threads, but right now we only show up when someone is talking about us.
+* **other considerations**
+  * The HN community values transparency so you should disclose that you're an employee of Meltano when responding to Meltano-related threads.
+
+Internal folks find out more in [this issue](https://gitlab.com/meltano/marketing/marketing-general/-/issues/30)
 
 
 --
