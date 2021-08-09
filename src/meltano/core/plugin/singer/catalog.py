@@ -228,8 +228,7 @@ def select_filter_metadata_rules(patterns: Iterable[str]) -> List[MetadataRule]:
 
 
 def path_property(path: str) -> str:
-    """
-    Extract the property name from a materialized path.
+    """Extract the property name from a materialized path.
 
     As we traverse the catalog tree, we build a materialized path
     to keep track of the parent nodes.
@@ -241,7 +240,6 @@ def path_property(path: str) -> str:
         A string representing a property path in the JSON object.
 
     Examples:
-
       stream[0].properties.list_items.properties.account → list_items.account
       stream[0].properties.name                          → name
     """
