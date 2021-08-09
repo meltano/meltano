@@ -210,6 +210,27 @@ export MELTANO_DISCOVERY_URL=https://meltano.example.com/discovery.yml
 export MELTANO_DISCOVERY_URL=false
 ```
 
+### `discovery_url_auth`
+
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_DISCOVERY_URL_AUTH`
+- Default: None
+
+The value of the `Authorization` header sent when making a request to [`discovery_url`](#discovery-url).
+
+No `Authorization` header is applied under the following conditions:
+- `discovery_url_auth` is not set
+- `discovery_url_auth` is set to `false`, `null` or an empty string
+
+#### How to use
+
+```bash
+meltano config meltano set discovery_url_auth "Bearer $ACCESS_TOKEN"
+meltano config meltano set discovery_url_auth false
+
+export MELTANO_DISCOVERY_URL_AUTH="Bearer $ACCESS_TOKEN"
+export MELTANO_DISCOVERY_URL_AUTH=false
+```
+
 ## `meltano` CLI
 
 These settings can be used to modify the behavior of the [`meltano` CLI](/docs/command-line-interface.html).
