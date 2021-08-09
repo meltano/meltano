@@ -45,8 +45,16 @@ class CatalogRule:
         """Filter rules that match a given breadcrumb."""
         return [rule for rule in rules if rule.match(tap_stream_id, breadcrumb)]
 
-    def match(self, tap_stream_id: str, breadcrumb: Optional[List[str]] = None):
-        """Evaluate if rule matches a stream or breadcrumb."""
+    def match(self, tap_stream_id: str, breadcrumb: Optional[List[str]] = None) -> bool:
+        """Evaluate if rule matches a stream or breadcrumb.
+
+        Args:
+            tap_stream_id: Singer stream identifier.
+            breadcrumb: JSON property breadcrumb.
+
+        Returns:
+            A boolean representing whether the stream ID or breadcrumb matches the rules.
+        """
         patterns = (
             self.tap_stream_id
             if isinstance(self.tap_stream_id, list)
@@ -108,6 +116,14 @@ class SelectPattern(NamedTuple):
     def parse(cls, pattern: str):
         """Parse a SelectPattern instance from a string pattern.
 
+        Args:
+            pattern: Stream or property selection pattern.
+
+        Returns:
+            An appropriate `SelectPattern` instance.
+
+        Example:
+
         >>> SelectPattern.parse("!a.b.c")
         SelectedPattern(stream_pattern='a', property_pattern='b.c', negated=True, raw='!a.b.c')
         """
@@ -133,7 +149,14 @@ class SelectPattern(NamedTuple):
 
 
 def select_metadata_rules(patterns: Iterable[str]) -> List[MetadataRule]:
-    """Create metadata rules from `select` patterns."""
+    """Create metadata rules from `select` patterns.
+
+    Args:
+        patterns: Iterable of `select` string patterns.
+
+    Returns:
+        A list of corresponding metadata rule objects.
+    """
     include_rules = []
     exclude_rules = []
 
@@ -170,8 +193,15 @@ def select_metadata_rules(patterns: Iterable[str]) -> List[MetadataRule]:
     return include_rules + exclude_rules
 
 
-def select_filter_metadata_rules(patterns: Iterable[str]):
-    """Create metadata rules from `select_filter` patterns."""
+def select_filter_metadata_rules(patterns: Iterable[str]) -> List[MetadataRule]:
+    """Create metadata rules from `select_filter` patterns.
+
+    Args:
+        patterns: Iterable of `select_filter` string patterns.
+
+    Returns:
+        A list of corresponding metadata rule objects.
+    """
     # We set `selected: false` if the `tap_stream_id`
     # does NOT match any of the selection/inclusion patterns
     include_rule = MetadataRule(
@@ -197,12 +227,18 @@ def select_filter_metadata_rules(patterns: Iterable[str]):
     return rules
 
 
-def path_property(path: str):
+def path_property(path: str) -> str:
     """
     Extract the property name from a materialized path.
 
     As we traverse the catalog tree, we build a materialized path
     to keep track of the parent nodes.
+
+    Args:
+        path: String representing a property path in the JSON schema.
+
+    Returns:
+        A string representing a property path in the JSON object.
 
     Examples:
 
@@ -216,6 +252,12 @@ def path_property(path: str):
 
 def property_breadcrumb(props: List[str]) -> List[str]:
     """Create breadcrumb from properties path list.
+
+    Args:
+        props: List of strings representing a property breadcrumb in the JSON object.
+
+    Returns:
+        A list of strings representing a property breadcrumb in the JSON schema.
 
     Example:
     >>> property_breadcrumb(["payload", "content"])
@@ -533,12 +575,19 @@ class ListSelectedExecutor(CatalogExecutor):
         return selected
 
     @staticmethod
-    def node_selection(node: Node):
-        """Get selection type from metadata entry."""
+    def node_selection(node: Node) -> SelectionType:
+        """Get selection type from metadata entry.
+
+        Args:
+            node: Catalog metadata dictionary.
+
+        Returns:
+            A proper `SelectionType` given the inclusion and selection metadata.
+        """
         try:
             metadata: Dict[str, Any] = node["metadata"]
         except KeyError:
-            return False
+            return SelectionType.EXCLUDED
 
         inclusion: str = metadata.get("inclusion")
         selected: Optional[bool] = metadata.get("selected")
