@@ -32,3 +32,6 @@ include:
 
   # publish
   - local: .gitlab/ci/publish.gitlab-ci.yml
+
+  # manual (git-ops)
+  - local: .gitlab/ci/gitops.gitlab-ci.yml

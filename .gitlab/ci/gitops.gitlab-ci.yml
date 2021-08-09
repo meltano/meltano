@@ -1,0 +1,36 @@
+# Manually-triggered pipelines which perform predefined automated actions (gitops)
+
+sync_discovery_yml_from_hub:
+  when: manual
+  except:
+    - tags
+  stage: docs
+  before_script:
+    # - git config --global user.name "${GITLAB_USER_NAME}"
+    # - git config --global user.email "${GITLAB_USER_EMAIL}"
+    - git config --global user.email "hello@meltano.com"
+    - git config --global user.name "Gitlab CI (bot)"
+  variables:
+    DISCOVERY_URL: https://gitlab.com/meltano/hub/-/raw/main/_data/meltano/discovery.yml
+  script:
+    - |
+      echo "Setting up 'discovery.yml' sync from 'hub.meltano.com'..."
+      echo "Current location: Ref='$CI_COMMIT_REF_NAME' and Namespace='$CI_PROJECT_NAMESPACE'..."
+    - |
+      echo "Downloading discovery.yml from '$DISCOVERY_URL'..."
+      echo "# This is a bundled version of discovery.yml" > src/meltano/core/bundle/discovery.yml
+      echo -e "# Please see $DISCOVERY_URL for latest updates.\n\n" >> src/meltano/core/bundle/discovery.yml
+      curl $DISCOVERY_URL >> src/meltano/core/bundle/discovery.yml
+    - |
+      echo "Adding to git..."
+      git add src/meltano/core/bundle/discovery.yml
+      git diff
+    - |
+      echo "Prepping remote and local branch refs..."
+      [[ $CI_COMMIT_REF_NAME == *master ]] && REMOTE_BRANCH="auto-discovery-sync-$(date +%Y-%m-%d)";
+      [[ $CI_COMMIT_REF_NAME == *master ]] && echo "Detected main/master branch. Initializing branch: '$REMOTE_BRANCH'";
+      [[ $CI_COMMIT_REF_NAME == *master ]] && git branch $REMOTE_BRANCH;
+      [[ $CI_COMMIT_REF_NAME == *master ]] || echo "Detected non-main branch: '$CI_COMMIT_REF_NAME'. Committing directly.";
+      [[ $CI_COMMIT_REF_NAME == *master ]] || REMOTE_BRANCH="$CI_COMMIT_REF_NAME";
+    - git commit -m "sync from '$DISCOVERY_URL', $(date +%Y-%m-%d)"
+    - git push http://root:$CI_COMMITS_GITLAB_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$REMOTE_BRANCH
