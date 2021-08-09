@@ -132,7 +132,7 @@ class SelectPattern(NamedTuple):
         )
 
 
-def select_metadata_rules(patterns: Iterable[str]):
+def select_metadata_rules(patterns: Iterable[str]) -> List[MetadataRule]:
     """Create metadata rules from `select` patterns."""
     include_rules = []
     exclude_rules = []
