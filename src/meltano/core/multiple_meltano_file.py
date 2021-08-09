@@ -145,12 +145,17 @@ def get_included_directories(main_config: dict):
             # Enforce relative paths
             if os.path.isabs(path_name):
                 logger.critical(
-                    f"Included path '{path_name}' is not a relative to the project root."
+                    f"Included path '{path_name}' is not relative to the project root."
                 )
                 raise Exception("Invalid Included Path")
 
             # Assumes root is already resolved
             abs_path_name = str(project_root.joinpath(path_name))
+
+            # Exclude project root
+            if abs_path_name == str(project_root):
+                logger.critical("Project root is not allowed to be an included path.")
+                raise Exception("Invalid Included Path")
 
             # Verify each path is valid
             if os.path.isdir(abs_path_name):
@@ -167,11 +172,7 @@ def get_included_directories(main_config: dict):
 def get_included_config_file_path_names(included_directories: List[str]):
     # Get config paths in included directories
     included_config_file_path_names: List[str] = []
-    for (
-        directory
-    ) in (
-        included_directories
-    ):  # TODO prevent <project_root>/meltano.yml from being extracted here
+    for directory in included_directories:
         # Files are grabbed in UNIX system default: alphabetical/ASCII order
         file_names = sorted(os.listdir(directory))
         for file_name in file_names:
@@ -300,7 +301,7 @@ class MultipleMeltanoFile(MeltanoFile):
             "included_config_file_path_names"
         ].copy()
         attrs["all_config_file_path_names"].append(
-            os.path.join(attrs["root"], "meltano.yml")
+            os.path.join(attrs["project_root"], "meltano.yml")
         )
         attrs["included_config_file_contents"] = get_included_config_file_components(
             attrs["included_config_file_path_names"]
