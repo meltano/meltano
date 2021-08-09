@@ -24,7 +24,6 @@ COMPONENT_KEYS = [
     "schedules",
 ]
 INCLUDE_PATHS_KEY = "include_paths"
-MELTANO_FILE_PATH_NAME = "meltano.yml"
 EXTRA_KEYS = [
     "included_directories",
     "included_config_file_path_names",
@@ -277,8 +276,9 @@ def pop_config_file_data(
     updated_config: dict,
     config_file_path_name: str,
     included_config_file_component_names: Dict[str, dict],
+    is_main_config: bool = True,
 ):
-    if config_file_path_name == MELTANO_FILE_PATH_NAME:
+    if is_main_config:
         updated_config = clean_components(updated_config)
         return updated_config
     else:
@@ -299,7 +299,9 @@ class MultipleMeltanoFile(MeltanoFile):
         attrs["all_config_file_path_names"] = attrs[
             "included_config_file_path_names"
         ].copy()
-        attrs["all_config_file_path_names"].append(MELTANO_FILE_PATH_NAME)
+        attrs["all_config_file_path_names"].append(
+            os.path.join(attrs["root"], "meltano.yml")
+        )
         attrs["included_config_file_contents"] = get_included_config_file_components(
             attrs["included_config_file_path_names"]
         )

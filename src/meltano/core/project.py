@@ -184,7 +184,7 @@ class Project(Versioned):
 
         # fmt: off
         with self._meltano_rw_lock.write_lock(), \
-            self._meltano_ip_lock:
+                self._meltano_ip_lock:
 
             with self.meltanofile.open() as meltanofile:
                 # read the latest version
@@ -196,12 +196,18 @@ class Project(Versioned):
             included_config_file_component_names = meltano_update.get_included_component_names()
             meltano_update = meltano_update.canonical()
 
-            for config_file_path_name in all_config_file_path_names:
+            for idx, config_file_path_name in enumerate(all_config_file_path_names):
+                config_file_path = Path(config_file_path_name)
+                config_file_path = self.root.joinpath(config_file_path)
+                is_main_config = idx == (len(all_config_file_path_names) - 1)
                 try:
-                    config_file_path = Path(config_file_path_name)
                     with atomic_write(config_file_path, overwrite=True) as configfile:
                         # update if everything is fine
-                        config_file_data = pop_config_file_data(meltano_update, config_file_path_name, included_config_file_component_names)
+                        config_file_data = pop_config_file_data(meltano_update,
+                                                                config_file_path_name,
+                                                                included_config_file_component_names,
+                                                                is_main_config,
+                                                                )
                         yaml.dump(config_file_data, configfile, default_flow_style=False, sort_keys=False)
                 except Exception as err:
                     logger.critical(f"Could not update {config_file_path_name}: {err}")
