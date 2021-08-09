@@ -782,6 +782,10 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                 },
                 SelectionType.SELECTED,
             ),
+            (
+                {"breadcrumb": ["properties", "a"]},
+                SelectionType.EXCLUDED,
+            ),
         ],
         ids=[
             "selected: true",
@@ -792,6 +796,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
             "inclusion: unsupported",
             "selected: false, selected-by-default: true",
             "selected-by-default: true",
+            "no metadata",
         ],
     )
     def test_node_selection(self, node: dict, selection_type: SelectionType):
