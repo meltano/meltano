@@ -1,5 +1,4 @@
 import os
-import shutil
 import tempfile
 from pathlib import Path
 from typing import Dict, List
@@ -107,23 +106,18 @@ expected_empty_config = {
 }
 
 
-def build_directories(root: Path, directories: List[str]):
+def build_directories(base: str, directories: List[str]):
     """
     Given an absolute path and a list of directory names, create a directory for each name at the absolute path.
     Return the absolute paths of each directory created.
     """
     absolute_directories = []
+    base = Path(base)
     for directory in directories:
-        directory_path = root.joinpath(directory)
+        directory_path = base.joinpath(directory)
         os.mkdir(directory_path)
         absolute_directories.append(str(directory_path))
     return absolute_directories
-
-
-def destroy_directories(root: Path, directories: List[str]):
-    for directory in directories:
-        directory_path = root.joinpath(directory)
-        shutil.rmtree(directory_path)
 
 
 def build_files(directory: str, file_names: List[str]):
@@ -182,158 +176,141 @@ class TestMultipleMeltanoFile:
 
     # TODO test_clean_components
 
-    def test_get_included_directories_valid(self, project):
-        project_root = project.root
-        directories = ["a_subdirectory", "another_subdirectory"]
-        meltano_config = {
-            INCLUDE_PATHS_KEY: directories,
-            "project_root": str(project_root),
-        }
+    def test_get_included_directories_valid(self):
+        with tempfile.TemporaryDirectory() as project_root:
+            directories = ["a_subdirectory", "another_subdirectory"]
+            meltano_config = {
+                INCLUDE_PATHS_KEY: directories,
+                "project_root": project_root,
+            }
 
-        # Build expected directories
-        expected_directories = build_directories(project_root, directories)
+            # Build expected directories
+            expected_directories = build_directories(project_root, directories)
 
-        actual_directories = get_included_directories(meltano_config)
+            actual_directories = get_included_directories(meltano_config)
 
-        # Destroy expected directories
-        destroy_directories(project_root, directories)
+            assert actual_directories == expected_directories
 
-        assert actual_directories == expected_directories
+    def test_get_included_directories_dir_dne(self):
+        with tempfile.TemporaryDirectory() as project_root:
+            directories = ["a_subdirectory", "another_subdirectory"]
+            meltano_config = {
+                INCLUDE_PATHS_KEY: directories + ["this_subdirectory_DNE"],
+                "project_root": project_root,
+            }
 
-    def test_get_included_directories_dir_dne(self, project):
-        project_root = project.root
-        directories = ["a_subdirectory", "another_subdirectory"]
-        meltano_config = {
-            INCLUDE_PATHS_KEY: directories + ["this_subdirectory_DNE"],
-            "project_root": str(project_root),
-        }
+            # Build directories
+            build_directories(project_root, directories)
 
-        # Build directories
-        build_directories(project_root, directories)
+            with pytest.raises(Exception) as exception:
+                get_included_directories(meltano_config)
 
-        with pytest.raises(Exception) as exception:
-            get_included_directories(meltano_config)
+            assert "Invalid Included Path" == str(exception.value)
 
-        # Destroy directories
-        destroy_directories(project_root, directories)
+    def test_get_included_directories_abs_path(self):
+        with tempfile.TemporaryDirectory() as project_root:
+            directories = ["a_subdirectory", "another_subdirectory"]
+            meltano_config = {
+                INCLUDE_PATHS_KEY: directories + ["/absolute/path/directory/that_DNE"],
+                "project_root": project_root,
+            }
 
-        assert "Invalid Included Path" == str(exception.value)
+            # Build directories
+            build_directories(project_root, directories)
 
-    def test_get_included_directories_abs_path(self, project):
-        project_root = project.root
-        directories = ["a_subdirectory", "another_subdirectory"]
-        meltano_config = {
-            INCLUDE_PATHS_KEY: directories + ["/absolute/path/directory/that_DNE"],
-            "project_root": str(project_root),
-        }
+            with pytest.raises(Exception) as exception:
+                get_included_directories(meltano_config)
 
-        # Build directories
-        build_directories(project_root, directories)
+            assert "Invalid Included Path" == str(exception.value)
 
-        with pytest.raises(Exception) as exception:
-            get_included_directories(meltano_config)
+    def test_get_included_directories_project_root(self):
+        with tempfile.TemporaryDirectory() as project_root:
+            directories = ["./"]
+            meltano_config = {
+                INCLUDE_PATHS_KEY: directories,
+                "project_root": project_root,
+            }
 
-        # Destroy directories
-        destroy_directories(project_root, directories)
+            with pytest.raises(Exception) as exception:
+                get_included_directories(meltano_config)
 
-        assert "Invalid Included Path" == str(exception.value)
+            assert "Invalid Included Path" == str(exception.value)
 
-    def test_get_included_directories_project_root(self, project):
-        project_root = project.root
-        directories = ["./"]
-        meltano_config = {
-            INCLUDE_PATHS_KEY: directories,
-            "project_root": str(project_root),
-        }
+    def test_get_included_config_file_path_names_extension(self):
+        with tempfile.TemporaryDirectory() as project_root:
+            directories = ["a_subdirectory"]
+            files = [
+                "file1.YAML",
+                "file2.yml",
+                "file3.yaml",
+                "file4.YML",
+                "file5.YaMl",
+                "file..yaml",
+                "fileYAML",
+                "yml.file",
+                "file",
+                ".YAML",
+                ".file.yaml",
+                "..yaml",
+            ]
 
-        with pytest.raises(Exception) as exception:
-            get_included_directories(meltano_config)
+            # Build directories
+            directories = build_directories(project_root, directories)
 
-        assert "Invalid Included Path" == str(exception.value)
+            # Build files
+            build_files(directories[0], files)
 
-    def test_get_included_config_file_path_names_extension(self, project):
-        project_root: Path = project.root
-        directories = ["a_subdirectory"]
-        files = [
-            "file1.YAML",
-            "file2.yml",
-            "file3.yaml",
-            "file4.YML",
-            "file5.YaMl",
-            "file..yaml",
-            "fileYAML",
-            "yml.file",
-            "file",
-            ".YAML",
-            ".file.yaml",
-            "..yaml",
-        ]
+            expected_included_config_file_path_names = [
+                str(os.path.join(directories[0], ".file.yaml")),
+                str(os.path.join(directories[0], "file..yaml")),
+                str(os.path.join(directories[0], "file1.YAML")),
+                str(os.path.join(directories[0], "file2.yml")),
+                str(os.path.join(directories[0], "file3.yaml")),
+                str(os.path.join(directories[0], "file4.YML")),
+                str(os.path.join(directories[0], "file5.YaMl")),
+            ]
 
-        # Build directories
-        directories = build_directories(project_root, directories)
+            actual_included_config_file_path_names = (
+                get_included_config_file_path_names(directories)
+            )
 
-        # Build files
-        build_files(directories[0], files)
+            assert (
+                actual_included_config_file_path_names
+                == expected_included_config_file_path_names
+            )
 
-        # import ipdb; ipdb.set_trace()
+    def test_get_included_config_file_path_names_order(self):
+        with tempfile.TemporaryDirectory() as project_root:
+            directories = ["a_subdirectory"]
+            files = [
+                "_.yml",
+                "..yml",
+                "2.yml",
+                "a.yml",
+                "Z.yml",
+            ]
 
-        expected_included_config_file_path_names = [
-            str(os.path.join(directories[0], ".file.yaml")),
-            str(os.path.join(directories[0], "file..yaml")),
-            str(os.path.join(directories[0], "file1.YAML")),
-            str(os.path.join(directories[0], "file2.yml")),
-            str(os.path.join(directories[0], "file3.yaml")),
-            str(os.path.join(directories[0], "file4.YML")),
-            str(os.path.join(directories[0], "file5.YaMl")),
-        ]
+            # Build directories
+            directories = build_directories(project_root, directories)
 
-        actual_included_config_file_path_names = get_included_config_file_path_names(
-            directories
-        )
+            # Build files
+            build_files(directories[0], files)
 
-        # Destroy directories
-        destroy_directories(project_root, directories)
+            expected_included_config_file_path_names = [
+                str(os.path.join(directories[0], "2.yml")),
+                str(os.path.join(directories[0], "Z.yml")),
+                str(os.path.join(directories[0], "_.yml")),
+                str(os.path.join(directories[0], "a.yml")),
+            ]
 
-        assert (
-            actual_included_config_file_path_names
-            == expected_included_config_file_path_names
-        )
+            actual_included_config_file_path_names = (
+                get_included_config_file_path_names(directories)
+            )
 
-    def test_get_included_config_file_path_names_order(self, project):
-        project_root: Path = project.root
-        directories = ["a_subdirectory"]
-        files = [
-            "_.yml",
-            "..yml",
-            "2.yml",
-            "a.yml",
-            "Z.yml",
-        ]
-
-        # Build directories
-        directories = build_directories(project_root, directories)
-
-        # Build files
-        build_files(directories[0], files)
-
-        expected_included_config_file_path_names = [
-            str(os.path.join(directories[0], "2.yml")),
-            str(os.path.join(directories[0], "Z.yml")),
-            str(os.path.join(directories[0], "_.yml")),
-            str(os.path.join(directories[0], "a.yml")),
-        ]
-
-        actual_included_config_file_path_names = get_included_config_file_path_names(
-            directories
-        )
-
-        # Destroy directories
-        destroy_directories(project_root, directories)
-
-        assert (
-            actual_included_config_file_path_names
-            == expected_included_config_file_path_names
-        )
+            assert (
+                actual_included_config_file_path_names
+                == expected_included_config_file_path_names
+            )
 
     def test_get_included_config_file_components(self):
         with tempfile.TemporaryDirectory() as directory:
