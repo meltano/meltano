@@ -4,7 +4,8 @@ import logging
 import os
 import subprocess
 from contextlib import contextmanager
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Union
 
 from .error import Error, SubprocessError
 from .plugin import PluginRef
@@ -161,7 +162,7 @@ class PluginInvoker:
         finally:
             self.cleanup()
 
-    def exec_path(self, executable=None):
+    def exec_path(self, executable: Optional[str] = None) -> Union[str, Path]:
         """
         Return the absolute path to the executable.
 
