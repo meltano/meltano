@@ -32,7 +32,7 @@ class SingerTarget(SingerPlugin):
     @property
     def target_uuid(self):
         if not self._target_instance_uuid:
-            self._target_instance_uuid=str(uuid4())
+            self._target_instance_uuid = str(uuid4())
         return self._target_instance_uuid
 
     @property

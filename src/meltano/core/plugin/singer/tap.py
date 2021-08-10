@@ -120,7 +120,7 @@ class SingerTap(SingerPlugin):
                 )
 
         return args
-    
+
     @property
     def config_files(self):
         return {
@@ -133,7 +133,7 @@ class SingerTap(SingerPlugin):
     @property
     def tap_instance_uuid(self):
         if not self._tap_instance_uuid:
-            self._tap_instance_uuid=str(uuid4())
+            self._tap_instance_uuid = str(uuid4())
         return self._tap_instance_uuid
 
     @property
