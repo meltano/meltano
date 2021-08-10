@@ -30,7 +30,7 @@ class SingerTarget(SingerPlugin):
         return {"config": f"target.{self.target_instance_uuid}.config.json"}
 
     @property
-    def target_uuid(self):
+    def target_instance_uuid(self):
         if not self._target_instance_uuid:
             self._target_instance_uuid = str(uuid4())
         return self._target_instance_uuid
