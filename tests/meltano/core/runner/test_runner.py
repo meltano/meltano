@@ -9,9 +9,8 @@ from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, Payload, State
 from meltano.core.logging.utils import capture_subprocess_output
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin.singer import SingerTap, SingerTarget
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.runner.singer import BookmarkWriter, SingerRunner
+from meltano.core.runner.singer import SingerRunner
 
 TEST_JOB_ID = "test_job"
 
@@ -160,13 +159,14 @@ class TestSingerRunner:
         self,
         subject,
         session,
-        tap,
-        tap_process,
+        target,
+        target_config_dir,
         target_process,
         plugin_invoker_factory,
         full_refresh,
         select_filter,
         payload_flag,
+        elt_context,
     ):
         lines = (b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
 
@@ -179,14 +179,21 @@ class TestSingerRunner:
         subject.context.full_refresh = full_refresh
         subject.context.select_filter = select_filter
 
+        target_invoker = plugin_invoker_factory(
+            target, config_dir=target_config_dir, context=elt_context
+        )
+
         async with subject.context.job.run(session):
             with mock.patch.object(
                 session, "add", side_effect=session.add
             ) as add_mock, mock.patch.object(
                 session, "commit", side_effect=session.commit
             ) as commit_mock:
-                bookmark_writer = subject.bookmark_writer()
-                await capture_subprocess_output(target_process.stdout, bookmark_writer)
+                target.setup_bookmark_writer(target_invoker)
+                bookmark_writer = target_invoker.output_handlers.get(
+                    target_invoker.StdioSource.STDOUT
+                )
+                await capture_subprocess_output(target_process.stdout, *bookmark_writer)
 
             assert add_mock.call_count == 3
             assert commit_mock.call_count == 3
