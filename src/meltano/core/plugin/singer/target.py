@@ -16,6 +16,10 @@ class SingerTarget(SingerPlugin):
         SettingDefinition(name="_target_schema", value="$MELTANO_LOAD_SCHEMA"),
     ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._target_uuid: str = None
+
     def exec_args(self, plugin_invoker):
         args = ["--config", plugin_invoker.files["config"]]
 
