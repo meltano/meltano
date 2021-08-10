@@ -1,6 +1,6 @@
 from typing import Dict
-
 from uuid import uuid4
+
 from meltano.core.behavior.hookable import hook
 from meltano.core.db import project_engine
 from meltano.core.setting_definition import SettingDefinition

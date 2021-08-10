@@ -2,10 +2,10 @@ import json
 import logging
 import shutil
 import subprocess
-from uuid import uuid4
 from hashlib import sha1
 from pathlib import Path
 from typing import Dict
+from uuid import uuid4
 
 from jsonschema import Draft4Validator
 from meltano.core.behavior.hookable import hook
