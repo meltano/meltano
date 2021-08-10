@@ -20,6 +20,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2381](https://gitlab.com/meltano/meltano/-/issues/2381) Implement selection logic for all Singer discoverable metadata (`inclusion` and `selected-by-default`).
+
 ### Breaks
 
 
