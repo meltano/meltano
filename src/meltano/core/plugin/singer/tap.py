@@ -89,6 +89,10 @@ class SingerTap(SingerPlugin):
         SettingDefinition(name="_select_filter", kind=SettingKind.ARRAY, value=[]),
     ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._tap_uuid: str = None
+
     def exec_args(self, plugin_invoker):
         """
         Return the arguments list with the complete runtime paths.
