@@ -424,11 +424,14 @@ def install_plugins(
 
 @contextmanager
 def propagate_stop_signals(proc):
-    """When a stop signal is received, send it to `proc` in addition to interrupting execution."""
+    """When a stop signal is received, send it to `proc` and wait for it to terminate."""
 
     def _handler(sig, _):  # noqa: WPS430
         proc.send_signal(sig)
-        raise KeyboardInterrupt()
+        logger.debug("stopping child process...")
+        # unset signal handler, so that even if the child never stops,
+        # an additional stop signal will terminate as usual
+        signal.signal(signal.SIGTERM, original_termination_handler)
 
     original_termination_handler = signal.signal(signal.SIGTERM, _handler)
     try:
