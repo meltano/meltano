@@ -238,6 +238,19 @@ class TestMultipleMeltanoFile:
 
         assert "Invalid Included Path" == str(exception.value)
 
+    def test_get_included_directories_project_root(self, project):
+        project_root = project.root
+        directories = ["./"]
+        meltano_config = {
+            INCLUDE_PATHS_KEY: directories,
+            "project_root": str(project_root),
+        }
+
+        with pytest.raises(Exception) as exception:
+            get_included_directories(meltano_config)
+
+        assert "Invalid Included Path" == str(exception.value)
+
     def test_get_included_config_file_path_names_extension(self, project):
         project_root: Path = project.root
         directories = ["a_subdirectory"]
