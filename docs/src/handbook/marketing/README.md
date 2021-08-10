@@ -30,11 +30,11 @@ Each item (linked below) has a corresponding guide to promoting that activity. E
 ### Brand Personality
 Our personality is built around four main characteristics.
 
-**Human**: We write like we talk. We avoid buzzwords and jargon, and instead communicate simply, clearly, and honestly.
-**Competent**: We aim to be masterly at what we offer, and communicate with conviction.
-**Humble**: We care about helping those around us achieve great things more than we care about our personal accomplishments.
-**Inclusive**: We embrace new ideas, new voices and new perspectices. We are always happy to be educated.
-**Fun**: We like Shramp and other oddities. 
+* **Human**: We write like we talk. We avoid buzzwords and jargon, and instead communicate simply, clearly, and honestly.
+* **Competent**: We aim to be masterly at what we offer, and communicate with conviction.
+* **Humble**: We care about helping those around us achieve great things more than we care about our personal accomplishments.
+* **Inclusive**: We embrace new ideas, new voices and new perspectives. We are always happy to be educated.
+* **Fun**: We like Shramp and other oddities. 
 
 ### Tone of Voice
 Friendly, informative yet ambitious. We bring empathy to all interactions and stewardship to those new to the space. 
