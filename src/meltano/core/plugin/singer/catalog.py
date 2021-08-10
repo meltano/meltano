@@ -335,7 +335,8 @@ def _(node: list, executor, path=""):
 
 @visit_with(visit)
 class CatalogExecutor:
-    def execute(self, node_type: CatalogNode, node, path):
+    def execute(self, node_type: CatalogNode, node: Node, path: str):
+        """Dispatch all node methods."""
         dispatch = {
             CatalogNode.STREAM: self.stream_node,
             CatalogNode.PROPERTY: self.property_node,
@@ -347,30 +348,31 @@ class CatalogExecutor:
         except KeyError:
             logging.debug("Unknown node type '%s'.", node_type)  # noqa: WPS323
 
-    def stream_node(self, node, path: str):
+    def stream_node(self, node: Node, path: str):
         """Process stream node."""
         pass
 
-    def property_node(self, node, path: str):
+    def property_node(self, node: Node, path: str):
         """Process property node."""
         pass
 
-    def metadata_node(self, node, path: str):
+    def metadata_node(self, node: Node, path: str):
         """Process metadata node."""
         if len(node["breadcrumb"]) == 0:
             self.stream_metadata_node(node, path)
         else:
             self.property_metadata_node(node, path)
 
-    def stream_metadata_node(self, node, path: str):
+    def stream_metadata_node(self, node: Node, path: str):
         """Process stream metadata node."""
         pass
 
-    def property_metadata_node(self, node, path: str):
+    def property_metadata_node(self, node: Node, path: str):
         """Process property metadata node."""
         pass
 
-    def __call__(self, node_type, node, path):
+    def __call__(self, node_type, node: Node, path: str):
+        """Call this instance as a function."""
         return self.execute(node_type, node, path)
 
 
@@ -422,7 +424,7 @@ class MetadataExecutor(CatalogExecutor):
             # Legacy catalogs have underscorized keys on the streams themselves
             self.set_metadata(node, path, rule.key.replace("-", "_"), rule.value)
 
-    def property_node(self, node, path: str):
+    def property_node(self, node: Node, path: str):
         """Process property metadata node."""
         breadcrumb_idx = path.index("properties")
         breadcrumb = path[breadcrumb_idx:].split(".")
