@@ -18,7 +18,7 @@ class SingerTarget(SingerPlugin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._target_uuid: str = None
+        self._target_instance_uuid: str = None
 
     def exec_args(self, plugin_invoker):
         args = ["--config", plugin_invoker.files["config"]]
@@ -27,13 +27,13 @@ class SingerTarget(SingerPlugin):
 
     @property
     def config_files(self):
-        return {"config": f"target.{self.target_uuid}.config.json"}
+        return {"config": f"target.{self.target_instance_uuid}.config.json"}
 
     @property
     def target_uuid(self):
-        if not self._target_uuid:
-            self._target_uuid=str(uuid4())
-        return self._target_uuid
+        if not self._target_instance_uuid:
+            self._target_instance_uuid=str(uuid4())
+        return self._target_instance_uuid
 
     @property
     def output_files(self):

@@ -91,7 +91,7 @@ class SingerTap(SingerPlugin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._tap_uuid: str = None
+        self._tap_instance_uuid: str = None
 
     def exec_args(self, plugin_invoker):
         """
@@ -124,17 +124,17 @@ class SingerTap(SingerPlugin):
     @property
     def config_files(self):
         return {
-            "config": f"tap.{self.tap_uuid}.config.json",
+            "config": f"tap.{self.tap_instance_uuid}.config.json",
             "catalog": "tap.properties.json",
             "catalog_cache_key": "tap.properties.cache_key",
             "state": "state.json",
         }
 
     @property
-    def tap_uuid(self):
-        if not self._tap_uuid:
-            self._tap_uuid=str(uuid4())
-        return self._tap_uuid
+    def tap_instance_uuid(self):
+        if not self._tap_instance_uuid:
+            self._tap_instance_uuid=str(uuid4())
+        return self._tap_instance_uuid
 
     @property
     def output_files(self):
