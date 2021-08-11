@@ -9,6 +9,7 @@ from meltano.core.multiple_meltano_file import (
     INCLUDE_PATHS_KEY,
     contains_component,
     deep_get,
+    deep_set,
     empty_components,
     get_included_config_file_component_names,
     get_included_config_file_components,
@@ -152,7 +153,55 @@ class TestMultipleMeltanoFile:
         value = deep_get(expected_empty_config, non_existing_key)
         assert value is None
 
-    # TODO test_deep_set
+    def test_deep_set(self):
+        actual_dict = {
+            "one": {
+                "two": {
+                    "three": {"four_levels": 4},
+                    "another_three": 3,
+                },
+                "another_two": 2,
+            },
+            "another_one": 1,
+        }
+        key = "one.two.three.four_levels"
+        deep_set(actual_dict, key, 5)
+        expected_dict = {
+            "one": {
+                "two": {
+                    "three": {"four_levels": 5},
+                    "another_three": 3,
+                },
+                "another_two": 2,
+            },
+            "another_one": 1,
+        }
+
+        assert actual_dict == expected_dict
+
+    def test_deep_set_no_nest(self):
+        actual_dict = {"one": "replace_me"}
+        key = "one"
+        deep_set(actual_dict, key)
+        expected_dict = {"one": []}
+
+        assert actual_dict == expected_dict
+
+    def test_deep_set_custom_value(self):
+        actual_dict = {}
+        key = "one.two.three.four_levels"
+        deep_set(actual_dict, key, 5)
+        expected_dict = {"one": {"two": {"three": {"four_levels": 5}}}}
+
+        assert actual_dict == expected_dict
+
+    def test_deep_set_non_existing_keys(self):
+        actual_dict = {}
+        key = "one.two.three.four_levels"
+        deep_set(actual_dict, key)
+        expected_dict = {"one": {"two": {"three": {"four_levels": []}}}}
+
+        assert actual_dict == expected_dict
 
     # TODO test_deep_pop
 

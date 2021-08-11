@@ -47,13 +47,23 @@ def deep_get(dictionary: dict, keys: str, default=None):
     )
 
 
-def deep_set(dictionary: dict, keys: str, default=None):
-    if default is None:
-        default = []
+def deep_set(dictionary: dict, keys: str, value=None) -> None:
+    """
+    Set the value of a key in a nested dictionary.
+    If any of the keys in the chain do not exist, create them with an empty dictionary as their value.
+    Set the value of the key at the end of the chain to the given value.
+    Should not fail, returns nothing.
+    :param dictionary: A nested dictionary of n levels (where n>=0).
+    :param keys: A chain of keys (joined by '.') representing a path through the nested dictionary.
+    :param value: The value to set the key at the end of the chain. The default value is an empty list.
+    :return: None
+    """
+    if value is None:
+        value = []
     keys = keys.split(".")
     for key in keys[:-1]:
         dictionary = dictionary.setdefault(key, {})
-    dictionary[keys[-1]] = default
+    dictionary[keys[-1]] = value
 
 
 def deep_pop(dictionary: dict, keys: str, default=None):
