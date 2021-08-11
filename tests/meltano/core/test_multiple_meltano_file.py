@@ -15,6 +15,7 @@ from meltano.core.multiple_meltano_file import (
     get_included_config_file_path_names,
     get_included_directories,
     merge_components,
+    pop_config_file_data,
     pop_updated_components,
 )
 
@@ -442,10 +443,11 @@ class TestMultipleMeltanoFile:
             }
         }
 
-        actual_updated_components = pop_updated_components(
-            main_config, "config_path_name", config_file_component_names
-        )
-        expected_updated_components = {
+        expected_leftover_main = {
+            "plugins": {"extractors": main_extractors, "loaders": []},
+            "schedules": [],
+        }
+        expected_popped_components = {
             "plugins": {
                 "extractors": extractors,
                 "loaders": [],
@@ -460,10 +462,61 @@ class TestMultipleMeltanoFile:
             "schedules": [],
         }
 
-        expected_main = {
-            "plugins": {"extractors": main_extractors, "loaders": []},
+        actual_popped_components = pop_updated_components(
+            main_config, "config_path_name", config_file_component_names
+        )
+
+        assert main_config == expected_leftover_main
+        assert actual_popped_components == expected_popped_components
+
+    def test_pop_config_file_data_is_main(self):
+        extractors = [tap_zoom, tap_gitlab]
+        main_config = {
+            "version": 1,
+            "plugins": {"extractors": extractors, "loaders": []},
             "schedules": [],
         }
+        expected_leftover_main = {
+            "version": 1,
+            "plugins": {"extractors": extractors},
+        }
 
-        assert main_config == expected_main
-        assert actual_updated_components == expected_updated_components
+        actual_leftover_main = pop_config_file_data(
+            main_config, "/path/name/doesnt/matter/", {}, True
+        )
+
+        assert actual_leftover_main == expected_leftover_main
+
+    def test_pop_config_file_data_not_main(self):
+        extractors = [tap_zoom, tap_gitlab]
+        main_extractors = [tap_facebook, extra_tap]
+        config_file_component_names = {
+            "config_path_name": {
+                "plugins": {
+                    "extractors": ["tap-zoom", "tap-gitlab"],
+                    "loaders": ["target-csv"],
+                }
+            }
+        }
+        main_config = {
+            "version": 1,
+            "plugins": {"extractors": main_extractors + extractors, "loaders": []},
+            "schedules": [],
+        }
+        expected_leftover_main = {
+            "version": 1,
+            "plugins": {"extractors": main_extractors},
+        }
+        expected_popped_config = {
+            "plugins": {"extractors": extractors},
+        }
+
+        actual_leftover_main = pop_config_file_data(
+            main_config, "/path/name/doesnt/matter/", {}, True
+        )
+        actual_popped_config = pop_config_file_data(
+            main_config, "config_path_name", config_file_component_names, False
+        )
+
+        assert actual_leftover_main == expected_leftover_main
+        assert actual_popped_config == expected_popped_config
