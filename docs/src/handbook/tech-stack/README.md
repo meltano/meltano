@@ -133,8 +133,8 @@ Main account and credit card details are in the `Finance` 1Password vault.
 
 ## [NameCheap](https://www.namecheap.com/)
 
-Domain name registration for `meltanodata.com`.
-Domain name registration and DNS management for `singerhub.io`.
+Domain name registration for `meltanodata.com` and `meltano.dev`.
+Domain name registration and DNS management `singerhub.io`.
 
 Account details are in the `Engineering` 1Password vault.
 
