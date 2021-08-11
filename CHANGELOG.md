@@ -18,6 +18,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2882](https://gitlab.com/meltano/meltano/-/issues/2882) Allow multiple taps / targets to run at the same time by adding a UUID to config.json
+
 ### Breaks
 
 
