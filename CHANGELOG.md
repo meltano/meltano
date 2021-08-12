@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2871](https://gitlab.com/meltano/meltano/-/issues/2871) Add `discovery_url_auth` project setting
 - [#2855](https://gitlab.com/meltano/meltano/-/issues/2855) Allow `executable` to be overridden through plugin inheritance
+- [#2855](https://gitlab.com/meltano/meltano/-/issues/2849) Use dbt [`v0.20`](https://github.com/fishtown-analytics/dbt/releases/tag/v0.20.1) by default for new dbt installs
 
 ### Changes
 
@@ -22,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#2381](https://gitlab.com/meltano/meltano/-/issues/2381) Implement selection logic for all Singer discoverable metadata (`inclusion` and `selected-by-default`).
+- [#2890](https://gitlab.com/meltano/meltano/-/issues/2890) Hotfix to bump discovery.yml version in support of [#2575](https://gitlab.com/meltano/meltano/-/issues/2575) which could cause airflow install to fail.
 
 ### Breaks
 

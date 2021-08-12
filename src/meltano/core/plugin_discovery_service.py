@@ -36,7 +36,7 @@ class DiscoveryUnavailableError(Exception):
 
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-VERSION = 18
+VERSION = 19
 
 
 class DiscoveryFile(Canonical):
