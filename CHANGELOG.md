@@ -13,7 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2871](https://gitlab.com/meltano/meltano/-/issues/2871) Add `discovery_url_auth` project setting
 - [#2855](https://gitlab.com/meltano/meltano/-/issues/2855) Allow `executable` to be overridden through plugin inheritance
 - [#2849](https://gitlab.com/meltano/meltano/-/issues/2849) Use dbt [`v0.20`](https://github.com/fishtown-analytics/dbt/releases/tag/v0.20.1) by default for new dbt installs
-- [#2545](https://gitlab.com/meltano/meltano/-/issues/2545) Add support for Python 3.9.
+- [#2545](https://gitlab.com/meltano/meltano/-/issues/2545) Add support for Python 3.9
 
 ### Changes
 
