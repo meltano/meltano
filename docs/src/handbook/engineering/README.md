@@ -145,21 +145,42 @@ When appropriate, house an issue under an existing epic: <https://gitlab.com/gro
 
 New epics can be created for topics or efforts that will take multiple issues over multiple sprints.
 
-## Code review
+## Merge Request (MR) Process
+
+### Trivial Updates
 
 All non-trivial merge requests should be reviewed and merged by someone other than the author.
 A merge request that touches code is never trivial, but one that fixes a typo in the documentation probably is.
 
-All team members are encouraged to review community contributions, but these can only be merged by an approved
-codeowner for the part of the code base in question.
+Trivial updates, such as docs updates, do not require a logged issue.
 
-If codeowners are not set, team members should use their best judgment and always ask for confirmation if unsure.
+### MR Review Process
+
+All team members are encouraged to review community contributions. However, 
+each MR should have a single accountable reviewer, who is also approved as a CODEOWNER. That 
+reviewer can ask others in the team for feedback but they are solely accountable for the merge/approval
+decision.
+
+If you are assigned as primary reviewer and _do not_ feel confident in your ability to approve and merge,
+it is your responsibility to either (a) request assist from a team member on specific parts of the code,
+or (b) ask another team member to take the role of primary reviewer.
+
+### Responsibility to Merge
+
+Core team members may merge their own MRs, once approved by another team member. When nearing
+completion, an MR author may also invite the reviewer to "merge if approved", in order to reduce
+time spent in back-and-forth. Except in exceptional circumstances, a reviewer should not merge
+the MR on behalf of the other team member unless invited to do so.
+
+For community contributions, the community contributor should indicate readiness to merge and
+the core team member (primary reviewer) will approve the MR and also perform the merge.
+
+### Continually improving Contribution Guidelines
 
 As experts catch issues in MRs that the original reviewers did not,
 we will update this section and the [Contributor Guide](/docs/contributor-guide.md#reviews),
 and reviewers will learn new things to look out for until they catch (almost) everything the expert would,
 at which points they will be experts themselves.
-
 
 ## Useful issue boards
 
