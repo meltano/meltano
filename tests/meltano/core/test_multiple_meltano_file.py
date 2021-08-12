@@ -7,17 +7,22 @@ import pytest
 import yaml
 from meltano.core.multiple_meltano_file import (
     INCLUDE_PATHS_KEY,
+    clean_components,
     contains_component,
     deep_get,
+    deep_pop,
     deep_set,
     empty_components,
     get_included_config_file_component_names,
     get_included_config_file_components,
     get_included_config_file_path_names,
     get_included_directories,
+    load,
     merge_components,
     pop_config_file_data,
+    pop_keys,
     pop_updated_components,
+    populate_components,
 )
 
 # Sample Extractors
@@ -64,17 +69,6 @@ another_schedule = {
     "transform": "skip",
 }
 
-# TODO Sample Transforms
-
-# Alpha
-alpha_extractors = [tap_gitlab, tap_facebook, tap_zoom]
-alpha_loaders = [target_csv, target_another]
-alpha_schedules = [gitlab_to_csv, another_schedule]
-
-# Beta
-beta_extractors = [tap_gitlab, tap_facebook, tap_zoom]
-beta_loaders = [target_csv, target_another]
-beta_schedules = [gitlab_to_csv, another_schedule]
 
 # Expected Meltano config
 expected_updated_extractors = [tap_gitlab, tap_facebook, tap_zoom]
@@ -130,8 +124,17 @@ def build_files(directory: str, file_names: List[str]):
 
 
 class TestMultipleMeltanoFile:
+    def test_load(self):
+        dump = {"yaml": "file"}
+        with tempfile.TemporaryDirectory() as directory:
+            path_string = os.path.join(directory, "file.yaml")
+            with open(path_string, "w") as file:
+                yaml.dump(dump, file)
+                file.close()
 
-    # TODO test_load
+            actual_load = load(path_string)
+
+            assert actual_load == dump
 
     def test_deep_get_first_layer_existing_key(self):
         existing_key = "schedules"
@@ -203,9 +206,45 @@ class TestMultipleMeltanoFile:
 
         assert actual_dict == expected_dict
 
-    # TODO test_deep_pop
+    def test_deep_pop(self):
+        dictionary = {"one": {"two": {"three": {"four_levels": 5}}}}
+        keys = "one.two.three.four_levels"
+        expected_dictionary = {"one": {"two": {"three": {}}}}
+        expected_value = 5
+        actual_value = deep_pop(dictionary, keys)
 
-    # TODO test_pop_keys
+        assert actual_value == expected_value
+        assert dictionary == expected_dictionary
+
+    def test_deep_pop_dne_key(self):
+        dictionary = {"one": {"two": {"three": {"four_levels": 5}}}}
+        keys = "one.two.three.this_key_dne"
+        expected_dictionary = {"one": {"two": {"three": {"four_levels": 5}}}}
+
+        with pytest.raises(KeyError) as error:
+            deep_pop(dictionary, keys)
+
+        assert str(error.value) == "'this_key_dne'"
+        assert dictionary == expected_dictionary
+
+    def test_deep_pop_no_nest(self):
+        dictionary = {"one": 1}
+        keys = "one"
+        expected_dictionary = {}
+        expected_value = 1
+        actual_value = deep_pop(dictionary, keys)
+
+        assert actual_value == expected_value
+        assert dictionary == expected_dictionary
+
+    def test_pop_keys(self):
+        dictionary = {"pop": None, "each": None, "key": None}
+        expected_dictionary = {}
+        keys = ["pop", "each", "key", "even", "if", "dne"]
+
+        pop_keys(dictionary, keys)
+
+        assert dictionary == expected_dictionary
 
     def test_empty_components(self):
         assert empty_components() == expected_empty_config
@@ -222,11 +261,72 @@ class TestMultipleMeltanoFile:
         status = contains_component([], extra_tap)
         assert status is False
 
-    # TODO test_populate_components
+    def test_populate_components(self):
+        config = {"plugins": {"extractors": "a value"}}
+        expected_config = {
+            "plugins": {
+                "extractors": "a value",
+                "loaders": [],
+                "transforms": [],
+                "models": [],
+                "dashboards": [],
+                "orchestrators": [],
+                "transformers": [],
+                "files": [],
+                "utilities": [],
+            },
+            "schedules": [],
+        }
 
-    # TODO test_clean_components
+        populate_components(config)
 
-    def test_get_included_directories_valid(self):
+        assert config == expected_config
+
+    def test_populate_components_with_empty(self):
+        config = {}
+        populate_components(config)
+
+        assert config == empty_components()
+
+    def test_clean_components(self):
+        config = {
+            "plugins": {
+                "extractors": "a value",
+                "loaders": [],
+                "transforms": [],
+                "models": [],
+                "dashboards": [],
+                "orchestrators": [],
+                "transformers": [],
+                "files": [],
+                "utilities": [],
+            },
+            "schedules": [],
+        }
+
+        expected_config = {"plugins": {"extractors": "a value"}}
+
+        clean_components(config)
+
+        assert config == expected_config
+
+    def test_clean_components_from_empty(self):
+        config = {}
+
+        config = clean_components(config)
+
+        assert config == empty_components()
+
+    def test_clean_components_empty_plugina(self):
+        config = {"plugins": {}, "schedules": "a_schedule"}
+
+        config = clean_components(config)
+
+        expected_config = {"schedules": "a_schedule"}
+
+        assert config == expected_config
+
+    def test_get_included_directories(self):
         with tempfile.TemporaryDirectory() as project_root:
             directories = ["a_subdirectory", "another_subdirectory"]
             meltano_config = {
@@ -240,6 +340,38 @@ class TestMultipleMeltanoFile:
             actual_directories = get_included_directories(meltano_config)
 
             assert actual_directories == expected_directories
+
+    def test_get_included_directories_no_include_key(self):
+        with tempfile.TemporaryDirectory() as project_root:
+            meltano_config = {
+                "project_root": project_root,
+            }
+
+            actual_directories = get_included_directories(meltano_config)
+
+            assert actual_directories == []
+
+    def test_get_included_directories_include_none(self):
+        with tempfile.TemporaryDirectory() as project_root:
+            meltano_config = {
+                INCLUDE_PATHS_KEY: None,
+                "project_root": project_root,
+            }
+
+            actual_directories = get_included_directories(meltano_config)
+
+            assert actual_directories == []
+
+    def test_get_included_directories_include_empty(self):
+        with tempfile.TemporaryDirectory() as project_root:
+            meltano_config = {
+                INCLUDE_PATHS_KEY: [],
+                "project_root": project_root,
+            }
+
+            actual_directories = get_included_directories(meltano_config)
+
+            assert actual_directories == []
 
     def test_get_included_directories_dir_dne(self):
         with tempfile.TemporaryDirectory() as project_root:
@@ -255,7 +387,7 @@ class TestMultipleMeltanoFile:
             with pytest.raises(Exception) as exception:
                 get_included_directories(meltano_config)
 
-            assert "Invalid Included Path" == str(exception.value)
+            assert str(exception.value) == "Invalid Included Path"
 
     def test_get_included_directories_abs_path(self):
         with tempfile.TemporaryDirectory() as project_root:
@@ -271,7 +403,7 @@ class TestMultipleMeltanoFile:
             with pytest.raises(Exception) as exception:
                 get_included_directories(meltano_config)
 
-            assert "Invalid Included Path" == str(exception.value)
+            assert str(exception.value) == "Invalid Included Path"
 
     def test_get_included_directories_project_root(self):
         with tempfile.TemporaryDirectory() as project_root:
@@ -284,7 +416,7 @@ class TestMultipleMeltanoFile:
             with pytest.raises(Exception) as exception:
                 get_included_directories(meltano_config)
 
-            assert "Invalid Included Path" == str(exception.value)
+            assert str(exception.value) == "Invalid Included Path"
 
     def test_get_included_config_file_path_names_extension(self):
         with tempfile.TemporaryDirectory() as project_root:

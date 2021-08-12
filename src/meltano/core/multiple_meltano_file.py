@@ -49,11 +49,11 @@ def deep_get(dictionary: dict, keys: str, default=None):
 
 def deep_set(dictionary: dict, keys: str, value=None) -> None:
     """
-    Set the value of a key in a nested dictionary.
+    Set the value at a key in a nested dictionary.
     If any of the keys in the chain do not exist, create them with an empty dictionary as their value.
     Set the value of the key at the end of the chain to the given value.
     Should not fail, returns nothing.
-    :param dictionary: A nested dictionary of n levels (where n>=0).
+    :param dictionary: A nested dictionary of n layers (where n>=1).
     :param keys: A chain of keys (joined by '.') representing a path through the nested dictionary.
     :param value: The value to set the key at the end of the chain. The default value is an empty list.
     :return: None
@@ -66,21 +66,30 @@ def deep_set(dictionary: dict, keys: str, value=None) -> None:
     dictionary[keys[-1]] = value
 
 
-def deep_pop(dictionary: dict, keys: str, default=None):
+def deep_pop(dictionary: dict, keys: str):
     """
-    Assumes keys is at least two levels deep.
+    Pop a key-value pair from a nested dictionary. Raises KeyError like a normal dict.pop.
+    Also raises AttributeError if the value of any key in the chain does not have a pop method.
+    :param dictionary: A nested dictionary of n layers (where n>=1).
+    :param keys: A chain of keys (joined by '.') representing a path through the nested dictionary.
+    :return: The value popped from the dictionary at key.
     """
     keys = keys.split(".")
-    base_keys = ".".join(keys[:-1:])
-    pop_key = keys[-1]
-    base = deep_get(dictionary, base_keys)
-    try:
-        return base.pop(pop_key)
-    except KeyError:
-        return default
+    pop_key = keys.pop(-1)
+    if keys:
+        keys = ".".join(keys)
+        dictionary = deep_get(dictionary, keys)
+    return dictionary.pop(pop_key)
 
 
 def pop_keys(dictionary: dict, keys: List[str]):
+    """
+    Pop a list of keys from a dictionary and discard their values.
+    Should not fail, returns nothing.
+    :param dictionary: A dictionary.
+    :param keys: A list of keys
+    :return: None
+    """
     for k in keys:
         try:
             dictionary.pop(k)
@@ -110,6 +119,11 @@ def contains_component(components: List[dict], component: dict) -> bool:
 
 
 def populate_components(main_config: dict):
+    """
+    If any component key in COMPONENT_KEYS does not exist in the given config, create it with an empty list as its value.
+    :param main_config: A dictionary representation of a Meltano config file
+    :return: The same dictionary after cleaning.
+    """
     for key in COMPONENT_KEYS:
         if deep_get(main_config, key) is None:
             deep_set(main_config, key)
