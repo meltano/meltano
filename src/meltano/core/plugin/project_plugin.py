@@ -218,8 +218,10 @@ class ProjectPlugin(PluginRef):
 
     @property
     def formatted_pip_url(self):
-        """Return the formatted version of the pip_url, expanding ${PYTHON_VERSION} to the major.minor version string of the current runtime."""
+        """Return the formatted version of the pip_url, expanding ${MELTANO__PYTHON_VERSION} to the major.minor version string of the current runtime."""
         return expand_env_vars(
             self.pip_url,
-            {"PYTHON_VERSION": f"{sys.version_info.major}.{sys.version_info.minor}"},
+            {
+                "MELTANO__PYTHON_VERSION": f"{sys.version_info.major}.{sys.version_info.minor}"
+            },
         )
