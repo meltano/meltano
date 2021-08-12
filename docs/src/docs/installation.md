@@ -32,7 +32,7 @@ Recent versions of Linux and macOS are both fully supported, but Windows is not.
 
 If you'd like to run Meltano on Windows, you can install it inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about). You may also try [installing Meltano on Docker](#installing-on-docker), although Docker on Windows is known to have [some idiosyncrasies](https://gitlab.com/meltano/meltano/issues/1261#note_240256080) that might hinder Meltano's ability to function.
 
-#### Python 3.6, 3.7 or 3.8
+#### Python 3.6, 3.7, 3.8 or 3.9
 
 ::: tip
 You may refer to [https://realpython.com/installing-python/](https://realpython.com/installing-python/) for platform specific installation instructions.
@@ -132,8 +132,8 @@ We maintain the [`meltano/meltano`](https://hub.docker.com/r/meltano/meltano) Do
 
 To get the latest version of Meltano, pull the `latest` tag. Images for specific versions of Meltano are tagged `v<X.Y.Z>`, e.g. `v1.55.0`.
 
-By default, these images come with the oldest version of Python supported by Meltano, currently 3.6.
-If you'd like to use Python 3.7 or 3.8 instead, add a `-python<X.Y>` suffix to the image tag, e.g. `latest-python3.8` and `v1.54.0-python3.7`.
+By default, these images come with the oldest version of Python supported by Meltano, currently Python 3.6.
+If you'd like to use a newer version of Python instead, add a `-python<X.Y>` suffix to the image tag, e.g. `latest-python3.8` and `v1.54.0-python3.7`.
 
 ```bash
 # download or update to the latest version
