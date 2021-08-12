@@ -4,31 +4,27 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
 
-
 ## Unreleased
 ---
 
 ### New
 
-- [#2871](https://gitlab.com/meltano/meltano/-/issues/2871) Add `discovery_url_auth` project setting
-- [#2855](https://gitlab.com/meltano/meltano/-/issues/2855) Allow `executable` to be overridden through plugin inheritance
-- [#2849](https://gitlab.com/meltano/meltano/-/issues/2849) Use dbt [`v0.20`](https://github.com/fishtown-analytics/dbt/releases/tag/v0.20.1) by default for new dbt installs
 - [#2545](https://gitlab.com/meltano/meltano/-/issues/2545) Add support for Python 3.9
-- [#2576](https://gitlab.com/meltano/meltano/-/issues/2576) Default to Airflow 2.1\
+- [#2849](https://gitlab.com/meltano/meltano/-/issues/2849) Use dbt [`v0.20`](https://github.com/fishtown-analytics/dbt/releases/tag/v0.20.1) by default for new dbt installs
+- [#2576](https://gitlab.com/meltano/meltano/-/issues/2576) Use Airflow [v2.1](https://airflow.apache.org/docs/apache-airflow/2.1.0/changelog.html) by default for new Airflow installs
+- [#2871](https://gitlab.com/meltano/meltano/-/issues/2871) Add `discovery_url_auth` project setting to support authenticated retrieval of `discovery.yml`
+- [#2855](https://gitlab.com/meltano/meltano/-/issues/2855) Allow `executable` to be overridden through plugin inheritance
+- [#2860](https://gitlab.com/meltano/meltano/-/issues/2860) Allow commands to use alternate executables
 
 ### Changes
 
 - [#2868](https://gitlab.com/meltano/meltano/-/issues/2868) Refactor to allow SingerTarget to inject a BookmarkWriter via a new PluginInvoker callback
-- [#2575](https://gitlab.com/meltano/meltano/-/issues/2575) Support version-specific pip constraint files by allowing the special var `${MELTANO__PYTHON_VERSION}` in plugin pip_url's
-- [#2860](https://gitlab.com/meltano/meltano/-/issues/2860) Allow commands to use alternate executables
-- [#2771](https://gitlab.com/meltano/meltano/-/issues/2771) Update stale `meltano add --custom` documentation example
+- [#2575](https://gitlab.com/meltano/meltano/-/issues/2575) Support version-specific pip constraint files by allowing the special var `${MELTANO__PYTHON_VERSION}` in plugin pip_url's (bumps `discovery.yml` version ([#2890](https://gitlab.com/meltano/meltano/-/issues/2890)) to signal the required upgrade)
 
 ### Fixes
 
-- [#2882](https://gitlab.com/meltano/meltano/-/issues/2882) Allow multiple taps / targets to run at the same time by adding a UUID to config.json
-- [#2381](https://gitlab.com/meltano/meltano/-/issues/2381) Implement selection logic for all Singer discoverable metadata (`inclusion` and `selected-by-default`).
-- [#2890](https://gitlab.com/meltano/meltano/-/issues/2890) Hotfix to bump discovery.yml version in support of [#2575](https://gitlab.com/meltano/meltano/-/issues/2575) which could cause airflow install to fail.
-- [#2847](https://gitlab.com/meltano/meltano/-/issues/2847) Updates tap-github and tap-jira to have `properties` capability and not `catalog`
+- [#2882](https://gitlab.com/meltano/meltano/-/issues/2882) Allow multiple taps / targets to be invoked at the same time by adding a UUID to config.json
+- [#2381](https://gitlab.com/meltano/meltano/-/issues/2381) Implement selection logic for all Singer discoverable metadata (`inclusion` and `selected-by-default`)
 
 ### Breaks
 
