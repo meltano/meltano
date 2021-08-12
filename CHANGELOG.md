@@ -20,6 +20,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2868](https://gitlab.com/meltano/meltano/-/issues/2868) Refactor to allow SingerTarget to inject a BookmarkWriter via a new PluginInvoker callback
 - [#2575](https://gitlab.com/meltano/meltano/-/issues/2575) Support version-specific pip constraint files by allowing the special var `${MELTANO__PYTHON_VERSION}` in plugin pip_url's
+- [#2860](https://gitlab.com/meltano/meltano/-/issues/2860) Allow commands to use alternate executables
+- [#2771](https://gitlab.com/meltano/meltano/-/issues/2771) Update stale `meltano add --custom` documentation example
 
 ### Fixes
 

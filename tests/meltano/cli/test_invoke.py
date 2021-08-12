@@ -69,7 +69,7 @@ class TestCliInvoke:
 
         args = mock_invoke.call_args[0][0]
         assert args[0].endswith("utility-mock")
-        assert args[1:] == ["utility", "--option", "arg"]
+        assert args[1:] == ["--option", "arg"]
 
     def test_invoke_command_args(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(
@@ -81,7 +81,7 @@ class TestCliInvoke:
 
         args = mock_invoke.call_args[0][0]
         assert args[0].endswith("utility-mock")
-        assert args[1:] == ["utility", "--option", "arg", "--verbose"]
+        assert args[1:] == ["--option", "arg", "--verbose"]
 
     def test_invoke_exit_code(
         self, cli_runner, tap, process_mock, project_plugins_service
