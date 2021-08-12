@@ -5,7 +5,6 @@ import subprocess
 from hashlib import sha1
 from pathlib import Path
 from typing import Dict
-from uuid import uuid4
 
 from jsonschema import Draft4Validator
 from meltano.core.behavior.hookable import hook
@@ -89,11 +88,6 @@ class SingerTap(SingerPlugin):
         SettingDefinition(name="_select_filter", kind=SettingKind.ARRAY, value=[]),
     ]
 
-    def __init__(self, *args, **kwargs):
-        """Canonical class leads to  an error if the UUID is defined here directly. Also, This data attribute must be defined or we'll get errors from Canonical."""
-        super().__init__(*args, **kwargs)
-        self._tap_instance_uuid: str = None
-
     def exec_args(self, plugin_invoker):
         """
         Return the arguments list with the complete runtime paths.
@@ -125,18 +119,11 @@ class SingerTap(SingerPlugin):
     @property
     def config_files(self):
         return {
-            "config": f"tap.{self.tap_instance_uuid}.config.json",
+            "config": f"tap.{self.instance_uuid}.config.json",
             "catalog": "tap.properties.json",
             "catalog_cache_key": "tap.properties.cache_key",
             "state": "state.json",
         }
-
-    @property
-    def tap_instance_uuid(self):
-        """Multiple processes running at the same time have a unique value to use."""
-        if not self._tap_instance_uuid:
-            self._tap_instance_uuid = str(uuid4())
-        return self._tap_instance_uuid
 
     @property
     def output_files(self):

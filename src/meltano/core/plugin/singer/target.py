@@ -6,7 +6,6 @@ import json
 import logging
 from datetime import datetime
 from typing import List
-from uuid import uuid4
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.db import project_engine
@@ -76,11 +75,6 @@ class SingerTarget(SingerPlugin):
         SettingDefinition(name="_target_schema", value="$MELTANO_LOAD_SCHEMA"),
     ]
 
-    def __init__(self, *args, **kwargs):
-        """Canonical class leads to  an error if the UUID is defined here directly. Also, This data attribute must be defined or we'll get errors from Canonical."""
-        super().__init__(*args, **kwargs)
-        self._target_instance_uuid: str = None
-
     def exec_args(self, plugin_invoker):
         args = ["--config", plugin_invoker.files["config"]]
 
@@ -88,14 +82,7 @@ class SingerTarget(SingerPlugin):
 
     @property
     def config_files(self):
-        return {"config": f"target.{self.target_instance_uuid}.config.json"}
-
-    @property
-    def target_instance_uuid(self):
-        """Multiple processes running at the same time have a unique value to use."""
-        if not self._target_instance_uuid:
-            self._target_instance_uuid = str(uuid4())
-        return self._target_instance_uuid
+        return {"config": f"target.{self.instance_uuid}.config.json"}
 
     @property
     def output_files(self):
