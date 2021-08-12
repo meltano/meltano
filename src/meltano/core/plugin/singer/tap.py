@@ -90,7 +90,7 @@ class SingerTap(SingerPlugin):
     ]
 
     def __init__(self, *args, **kwargs):
-        """Canoncial class leads to  an error if the UUID is defined here directly. Also, This data attribute must be defined or we'll get errors from Canonical."""
+        """Canonical class leads to  an error if the UUID is defined here directly. Also, This data attribute must be defined or we'll get errors from Canonical."""
         super().__init__(*args, **kwargs)
         self._tap_instance_uuid: str = None
 
