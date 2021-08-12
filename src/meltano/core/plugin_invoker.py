@@ -5,7 +5,8 @@ import logging
 import os
 import subprocess
 from contextlib import contextmanager
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Union
 
 from meltano.core.logging.utils import SubprocessOutputWriter
 
@@ -173,32 +174,47 @@ class PluginInvoker:
         finally:
             self.cleanup()
 
-    def exec_path(self):
+    def exec_path(self, executable: Optional[str] = None) -> Union[str, Path]:
+        """
+        Return the absolute path to the executable.
+
+        Uses the plugin executable if none is specified.
+        """
+        executable = executable or self.plugin.executable
         if not self.venv_service:
-            if "/" not in self.plugin.executable.replace("\\", "/"):
+            if "/" not in executable.replace("\\", "/"):
                 # Expect executable on path
-                return self.plugin.executable
+                return executable
 
             # Return executable relative to project directory
-            return self.project.root.joinpath(self.plugin.executable)
+            return self.project.root.joinpath(executable)
 
         # Return executable within venv
-        return self.venv_service.exec_path(self.plugin.executable)
+        return self.venv_service.exec_path(executable)
 
     def exec_args(self, *args, command=None, env=None):
-        """Materialize the arguments to be passed to the executable."""
+        """Materialize the arguments to be passed to the executable.
+
+        Raises `UnknownCommandError` if requested command is not defined.
+        """
         env = env or {}
+        executable = self.exec_path()
         if command:
-            try:
-                plugin_args = self.plugin.all_commands[command].expanded_args(
-                    command, env
-                )
-            except KeyError as err:
-                raise UnknownCommandError(self.plugin, command) from err
+            command_config = self.find_command(command)
+            plugin_args = command_config.expanded_args(command, env)
+            if command_config.executable:
+                executable = self.exec_path(command_config.executable)
         else:
             plugin_args = self.plugin.exec_args(self)
 
-        return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
+        return [str(arg) for arg in (executable, *plugin_args, *args)]
+
+    def find_command(self, name):
+        """Find a Command by name. Raises `UnknownCommandError` if not defined."""
+        try:
+            return self.plugin.all_commands[name]
+        except KeyError as err:
+            raise UnknownCommandError(self.plugin, name) from err
 
     def env(self):
         env = {
