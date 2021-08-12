@@ -53,7 +53,6 @@ members:
 - name: Florian Hines
   title: Staff Backend Engineer
   location: San Antonio, TX, USA 🇺🇸
-  start_date: July 12, 2021
   gravatar_hash: 88529f59d3f298bcc9e2a705dc1f1c68
   social:
     gitlab: pandemicsyn
@@ -67,15 +66,23 @@ members:
   social:
     gitlab: kgpayne
     linkedin: k-g-payne
+- name: S. P.
+  title: Operations Analyst
+  location: CA, USA 🇺🇸
+  start_date: September 9, 2021
 openings:
-- title: Senior Backend Engineer
-  description: "Required: Python & data experience"
+- title: Head of Partnerships
+  location: Anywhere, Remote 🌍
+  description: "Build and nourish relationships with data consultancies, open source data tools Meltano can integrate with, and connector maintainers including SaaS vendors"
+- title: Technical Marketing Manager
+  location: Anywhere, Remote 🌍
+  description: "Identify and deliver strategies and programs to improve the community experience and build engagement"
 - title: Senior Frontend Engineer & UI/UX Designer
+  location: Anywhere, Remote 🌍
   description: "Nice to have: Vue.js experience"
-- title: Senior Data Engineer / Analyst
-  description: "Required: SQL & Python experience"
-- title: Remote Office Manager
-  description: "Oversee and assist team with administrative and PeopleOps matters"
+- title: Senior Backend Engineer
+  location: Anywhere, Remote 🌍
+  description: "Required: Python & data experience"
 ---
 
 # Introduction
@@ -200,51 +207,44 @@ Be aware that issue milestones serve more as a rough indication of relative prio
 since short-term priorities can change quickly in response to community feedback, and it's hard to predict how much progress can be made in a week.
 Also note that issues labeled `flow::To Do` have higher priority and are more likely to be completed in a given week than those labeled `flow::Triage`, which are often moved to the next milestone at the end of the week, with issues already scheduled for the next week pushed out to make room for them.
 
-Below you will found our current roadmap. As this projects out into the future it is subject to change based on feedback. Don't see something you want on the roadmap? [Make an issue](https://gitlab.com/meltano/meltano/-/issues) and let us know!
-
-#### June 2021
-
-Our focus for June will be to launch the Target SDK, to add support for inline mapping transformations to the SDK and Meltano, enhance the dbt experience within Meltano, and supporting the "Reverse ELT" use case of loading data into a SaaS API.
-
-* [SDK for Singer Targets](https://gitlab.com/meltano/sdk/-/issues/96)
-* [Enhanced dbt integration](https://gitlab.com/groups/meltano/-/epics/82)
-* [Mapping SDK for inline transformation use cases](https://gitlab.com/meltano/meltano/-/issues/2300)
-* [Support Reverse ETL Use Case](https://gitlab.com/meltano/meltano/-/issues/2665)
-
-#### July 2021
-
-Our focus for July will be to expand our integrations for data quality and analysis. We will also work to add support for the fast sync / batch message type to enable higher throughput for extraction and loading.
-
-* [Great Expectations](https://gitlab.com/meltano/meltano/-/issues/2454)
-* [Fast Sync / Batch Messages](https://gitlab.com/meltano/meltano/-/issues/2364)
-* [Superset](https://gitlab.com/meltano/meltano/-/issues/2605)
-* [Meltano Academy](https://gitlab.com/meltano/meta/-/issues/63)
-* [MeltanoHub as SSOT for Meltano](https://gitlab.com/groups/meltano/-/epics/102)
+Below you will found our current roadmap. 
+Each item should link to an Epic with the relevant issue linked to that epic.
+As this projects out into the future it is subject to change based on feedback. 
+Don't see something you want on the roadmap? [Make an issue](https://gitlab.com/meltano/meltano/-/issues) and let us know!
 
 #### August 2021
 
-Our focus for August will be to continue expanding integrations: adding orchestration options, notebooks integration, and out-of-the-box support for an OLAP Database.
+August continues our bug bashing theme behind the scenes, while we also make progress on several high-level features.
+We're undergoing a large refactor to make Meltano pipelines composable, as well as working to add support for the `analyzer` and `validator` plugin types.
+Also important is supporting the Singer ecosystem even more with updates to MeltanoHub and our overall GitHub presence for community connectors.
 
-* [Jupyter Notebooks](https://gitlab.com/meltano/meltano/-/issues/2595)
-* [Dagster](https://gitlab.com/meltano/meltano/-/issues/2393)
-* [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
-* [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
-* [Decentralized Management of MeltanoHub Connectors](https://gitlab.com/meltano/meta/-/issues/73)
+* Add analyzer plugin type with Superset and Lightdash support - [Epic](https://gitlab.com/groups/meltano/-/epics/112)
+* Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/79) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2725 )
+* Decentralized Management of MeltanoHub Connectors - [Epic](https://gitlab.com/groups/meltano/-/epics/105) & [Issue](https://gitlab.com/meltano/meta/-/issues/73)
+* MeltanoHub as SSOT for Meltano - [Epic](https://gitlab.com/groups/meltano/-/epics/102)
+* Add validator plugin type with Great Expectations and `dbt test` support  - [Epic](https://gitlab.com/groups/meltano/-/epics/111)
 
 #### September 2021
 
-Our focus for September will be to enable simple cloud deployments, improve the integration with git providers, and begin the conversion of MeltanoHub to a dynamic site.
+In September we will add the first iteration of a top-level environments feature for Meltano, along with adding support for the fast sync / batch message type to enable higher throughput for extraction and loading.
+We will also add Dagster as a supported orchestrator out-of-the-box.
 
-* [Simple Cloud Deploys](https://gitlab.com/groups/meltano/-/epics/28)
-* [Git-provider Integrations](https://gitlab.com/groups/meltano/-/epics/92)
-* [Initial conversion of MeltanoHub to dyanmic site](https://gitlab.com/groups/meltano/-/epics/101)
+* Fast Sync / Batch Messages - [Epic](https://gitlab.com/groups/meltano/-/epics/114)
+* Environments - [Issue](https://gitlab.com/meltano/meltano/-/issues/2869)
+* Dagster - [Epic](https://gitlab.com/groups/meltano/-/epics/113) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2393)
 
 #### 2021-Q4
 
-Our focus for Q4 will be on creating a compelling monitoring, observability, and data lineage featureset. We also aim to improve the UI and potentailly start offering a SaaS deployment of Meltano.
+Our focus for Q4 will be on creating a compelling monitoring, observability, and data lineage featureset. We also aim to improve our integration with git providers, begin the conversion of MeltanoHub to a dynamic site, improve the UI of Meltano, and potentailly start offering a SaaS deployment of Meltano.
 
-* [Monitoring, observability, and data lineage](https://gitlab.com/groups/meltano/-/epics/93)
+* [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
+* [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
+* [Jupyter Notebooks](https://gitlab.com/meltano/meltano/-/issues/2595)
+* [Git-provider Integrations](https://gitlab.com/groups/meltano/-/epics/92)
+* [Initial conversion of MeltanoHub to dynamic site](https://gitlab.com/groups/meltano/-/epics/101)
 * [Fully featured UI](https://gitlab.com/groups/meltano/-/epics/78)
+* [Monitoring, observability, and data lineage](https://gitlab.com/groups/meltano/-/epics/93)
+* [Simple Cloud Deploys](https://gitlab.com/groups/meltano/-/epics/28)
 * [SaaS Deployment of Meltano](https://gitlab.com/groups/meltano/-/epics/94)
 
 ## Contributing
@@ -263,11 +263,11 @@ To learn more about contributing to Meltano, refer to the [Contributor Guide](/d
 
 ## History
 
-Meltano was [founded](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) inside [GitLab](https://about.gitlab.com/) in 2018 to serve the GitLab Data Team.
+Meltano was [founded](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) inside [GitLab](https://about.gitlab.com/) in 2018 to serve the GitLab Data Team. Meltano started as an open source tool built for GitLab’s data and analytics team, who wanted an end-to-end data platform built around open source components and DevOps principles.
 
-In 2020, the project [pivoted](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/) to focus on open source data integration (ELT).
+In 2020, the project strategically [pivoted](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/)to focus on open source data integration (ELT).
 
-In 2021, Meltano [spun out](https://meltano.com/blog/2021/06/30/meltano-spins-out-of-gitlab-raises-seed-round) of GitLab and raised a Seed funding round to become an independent startup and bring the benefits of open source data integration and DataOps to a wider audience.
+In 2021, After 3 years of being a GitLab incubator project, Meltano [spun out](https://meltano.com/blog/2021/06/30/meltano-spins-out-of-gitlab-raises-seed-round) of GitLab and raised a seed funding round to become an independent startup and bring the benefits of open source data integration and DataOps to a wider audience.
 
 ## Team
 
@@ -284,3 +284,12 @@ If our [mission](#mission) excites you, and you think could make a great additio
 Please send a cover letter and resume to [hello@meltano.com](mailto:hello@meltano.com) and you'll hear back from us shortly.
 
 <TeamGrid :openings="$frontmatter.openings" />
+
+### Employee Perks
+* Unlimited PTO
+* Professional Development Support and Budget
+* Remote Working
+* Reimbursable coworking fees and external office space
+* Budget for Office equipment and workspace supplies
+* Team Offsites
+* Access to world class founders, investors and mentors

@@ -5,12 +5,12 @@ import logging
 import sys
 from enum import Enum
 from multiprocessing import cpu_count
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, Tuple
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
 
 from .compiler.project_compiler import ProjectCompiler
-from .error import PluginInstallError, PluginInstallWarning, SubprocessError
+from .error import AsyncSubprocessError, PluginInstallError, PluginInstallWarning
 from .plugin import PluginType
 from .plugin_discovery_service import PluginDiscoveryService
 from .project import Project
@@ -124,7 +124,7 @@ class PluginInstallService:
 
     def install_all_plugins(
         self, reason=PluginInstallReason.INSTALL
-    ) -> [PluginInstallState]:
+    ) -> Tuple[PluginInstallState]:
         """
         Install all the plugins for the project.
 
@@ -136,7 +136,7 @@ class PluginInstallService:
         self,
         plugins: Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
-    ) -> [PluginInstallState]:
+    ) -> Tuple[PluginInstallState]:
         """
         Install all the provided plugins.
 
@@ -148,7 +148,7 @@ class PluginInstallService:
         self,
         plugins: Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
-    ) -> [PluginInstallState]:
+    ) -> Tuple[PluginInstallState]:
         """Install all the provided plugins."""
         results = await asyncio.gather(
             *[
@@ -234,13 +234,13 @@ class PluginInstallService:
             self.status_cb(state)
             return state
 
-        except SubprocessError as err:
+        except AsyncSubprocessError as err:
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
                 status=PluginInstallStatus.ERROR,
                 message=f"{plugin.type.descriptor} '{plugin.name}' could not be installed: {err}".capitalize(),
-                details=err.stderr,
+                details=await err.stderr,
             )
             self.status_cb(state)
             return state
@@ -269,4 +269,4 @@ class PipPluginInstaller:
 
     async def install(self, reason):
         """Install the plugin into the virtual environment using pip."""
-        return await self.venv_service.clean_install(self.plugin.pip_url)
+        return await self.venv_service.clean_install(self.plugin.formatted_pip_url)

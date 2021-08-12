@@ -10,7 +10,7 @@
 
         <strong>{{member.title}}</strong>
 
-        <ul class="social">
+        <ul v-if="member.social" class="social">
           <li v-if="member.social.linkedin" class="linkedin">
             <a :href="`https://linkedin.com/in/${member.social.linkedin}`" target="_blank">
               <LinkedInIcon />
@@ -35,7 +35,7 @@
         <img src="/android-chrome-512x512.png" class="avatar" />
 
         <h3>Possibly You</h3>
-        <small>Anywhere, Remote 🌍</small>
+        <small>{{opening.location}}</small>
 
         <strong>{{opening.title}}</strong>
 
@@ -44,6 +44,11 @@
         </p>
 
         <ul class="social">
+          <li v-if="opening.description_url" class="job-description">
+            <a :href="opening.description_url" target="_blank">
+              📝 Job description
+            </a>
+          </li>
           <li class="email">
             <a href="mailto:hello@meltano.com">
               ✉️ Email us!

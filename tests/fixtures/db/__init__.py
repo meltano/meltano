@@ -3,7 +3,7 @@ import logging
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from sqlalchemy import MetaData, create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import close_all_sessions, sessionmaker
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -22,8 +22,8 @@ def vacuum_db(engine_sessionmaker):
 
     logging.debug(f"Cleaning system database...")
 
-    engine, Session = engine_sessionmaker
-    Session.close_all()
+    engine, _ = engine_sessionmaker
+    close_all_sessions()
     metadata = MetaData(bind=engine)
     metadata.reflect()
     metadata.drop_all()

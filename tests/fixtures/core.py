@@ -44,6 +44,7 @@ def discovery():
                 {
                     "name": "meltano",
                     "pip_url": "tap-mock",
+                    "executable": "tap-mock",
                     "capabilities": ["discover", "catalog", "state"],
                     "settings": [
                         {"name": "test", "value": "mock"},

@@ -1,12 +1,10 @@
 import asyncio
-import json
 import logging
 import os
 import shutil
 import subprocess
 import sys
 from contextlib import suppress
-from datetime import datetime
 from enum import IntFlag
 from pathlib import Path
 
@@ -20,35 +18,6 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import human_size
 
 from . import Runner, RunnerError
-
-
-class BookmarkWriter:
-    def __init__(self, job, session, payload_flag=Payload.STATE):
-        self.job = job
-        self.session = session
-        self.payload_flag = payload_flag
-
-    def writeline(self, line):
-        if self.job is None:
-            logging.info(
-                f"Running outside a Job context: incremental state could not be updated."
-            )
-            return
-
-        try:
-            new_state = json.loads(line)
-            job = self.job
-
-            job.payload["singer_state"] = new_state
-            job.payload_flags |= self.payload_flag
-            job.save(self.session)
-
-            logging.info(f"Incremental state has been updated at {datetime.utcnow()}.")
-            logging.debug(f"Incremental state: {new_state}")
-        except Exception as err:
-            logging.warning(
-                "Received state is invalid, incremental state has not been updated"
-            )
 
 
 class SingerRunner(Runner):
@@ -117,6 +86,7 @@ class SingerRunner(Runner):
             tap_outputs.insert(0, extractor_out)
 
         tap_stdout_future = asyncio.ensure_future(
+            # forward subproc stdout to tap_outputs (i.e. targets stdin)
             capture_subprocess_output(p_tap.stdout, *tap_outputs)
         )
         tap_stderr_future = asyncio.ensure_future(
@@ -124,7 +94,10 @@ class SingerRunner(Runner):
         )
 
         # Process target output
-        target_outputs = [self.bookmark_writer()]
+        target_outputs = []
+        if target.output_handlers:
+            target_outputs = target.output_handlers.get(target.StdioSource.STDOUT, [])
+
         if loader_out:
             target_outputs.insert(0, loader_out)
 
@@ -231,13 +204,6 @@ class SingerRunner(Runner):
             raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: tap_code})
         elif target_code:
             raise RunnerError("Loader failed", {PluginType.LOADERS: target_code})
-
-    def bookmark_writer(self):
-        incomplete_state = self.context.full_refresh and self.context.select_filter
-        payload_flag = Payload.INCOMPLETE_STATE if incomplete_state else Payload.STATE
-        return BookmarkWriter(
-            self.context.job, self.context.session, payload_flag=payload_flag
-        )
 
     def dry_run(self, tap: PluginInvoker, target: PluginInvoker):
         logging.info("Dry run:")

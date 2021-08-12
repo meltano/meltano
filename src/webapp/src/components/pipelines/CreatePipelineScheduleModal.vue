@@ -19,7 +19,7 @@ export default {
         name: '',
         extractor: '',
         loader: '',
-        transform: 'run',
+        transform: 'skip',
         interval: '',
         isRunning: false
       }
@@ -58,15 +58,6 @@ export default {
         (this.pipeline.transform === 'run' ||
           this.pipeline.transform === 'only')
       )
-    }
-  },
-  watch: {
-    hasDefaultTransforms(newVal) {
-      if (!newVal) {
-        this.pipeline.transform = 'skip'
-      } else {
-        this.pipeline.transform = 'run'
-      }
     }
   },
   created() {
