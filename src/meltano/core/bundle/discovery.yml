@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-version: 18
+version: 19
 
 extractors:
   - name: tap-adwords
@@ -283,7 +283,7 @@ extractors:
           - state
         settings_group_validation:
           - ['subdomain', 'api_key']
-        settings: 
+        settings:
           - name: subdomain
             label: Subdomain
             description: The subdomain of your Ask Nicely account.
@@ -682,7 +682,7 @@ extractors:
           - state
         settings_group_validation:
           - ['access_token', 'repository', 'start_date']
-        settings: 
+        settings:
           - name: access_token
             label: Personal Access Tokens
             docs: https://github.com/settings/tokens
@@ -769,7 +769,7 @@ extractors:
       settings:
         - name: client_id
           label: Client ID
-          description: This is the ID setup via the Google Cloud API. 
+          description: This is the ID setup via the Google Cloud API.
           documentation: https://drive.google.com/open?id=1FojlvtLwS0-BzGS37R0jEXtwSHqSiO1Uw-7RKQQO-C4
         - name: client_secret
           label: Client Secret
@@ -783,7 +783,7 @@ extractors:
           documentation: https://drive.google.com/open?id=1FojlvtLwS0-BzGS37R0jEXtwSHqSiO1Uw-7RKQQO-C4
         - name: spreadsheet_id
           label: Spreadsheet ID
-          description: The unique identifier for a spreadsheet. 
+          description: The unique identifier for a spreadsheet.
         - name: start_date
           label: Start Date
           kind: date_iso8601
@@ -809,7 +809,7 @@ extractors:
           - state
         settings_group_validation:
           - ['redirect_uri','client_id','client_secret','refresh_token','start_date']
-        settings: 
+        settings:
           - name: redirect_uri
             label: Redirect URI
             documentation: https://legacydocs.hubspot.com/docs/methods/oauth2/oauth2-quickstart
@@ -829,7 +829,7 @@ extractors:
           - name: start_date
             label: Start Date
             kind: date_iso8601
-            description: This is the cutoff date for syncing historical data. 
+            description: This is the cutoff date for syncing historical data.
   - name: tap-intacct
     namespace: tap_intacct
     label: Sage Intacct
@@ -1415,14 +1415,14 @@ extractors:
         - state
       settings_group_validation:
         - ['account_sid','auth_token','start_date','user_agent']
-      settings: 
+      settings:
         - name: account_sid
           label: Account String ID
-          description: This is the String ID of your account which can be found in the account console at twilio.com/console. 
+          description: This is the String ID of your account which can be found in the account console at twilio.com/console.
         - name: auth_token
           label: Auth Token
           kind: password
-          description: This is the authorization token for your account which can be found in the account console at twilio.com/console. 
+          description: This is the authorization token for your account which can be found in the account console at twilio.com/console.
         - name: date_window_days
           label: Date Window Days
           kind: integer
@@ -2532,7 +2532,7 @@ orchestrators:
     namespace: airflow
     docs: https://meltano.com/docs/orchestration.html
     repo: https://github.com/apache/airflow
-    pip_url: 'apache-airflow==1.10.14 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-1.10.14/constraints-3.6.txt'
+    pip_url: 'apache-airflow==2.1.2 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.1.2/constraints-${MELTANO__PYTHON_VERSION}.txt'
     settings:
       - name: core.dags_folder
         value: $MELTANO_PROJECT_ROOT/orchestrate/dags

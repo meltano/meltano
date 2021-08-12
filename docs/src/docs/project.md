@@ -59,6 +59,10 @@ When inheriting a base plugin description, the plugin definition does not need t
 but you may want to override the inherited value and set the property explicitly to [point at a (custom) fork](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin) or to [pin a package to a specific version](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin#pinning-a-plugin-to-a-specific-version).
 When a plugin is added using `meltano add`, the `pip_url` is automatically repeated in the plugin definition for convenience.
 
+In order to support version-specific pip constraint files, the pip_url value can optionally be parameterized using the
+`${MELTANO__PYTHON_VERSION}` variable. This is a special variable populated by Meltano with the specific version of Python used to
+install the plugin and will inject the major and minor versions (e.g. 3.8, 3.9, etc.).
+
 #### Inheriting plugin definitions
 
 A plugin defined with an `inherit_from` property inherits its [base plugin description](/docs/plugins.html#project-plugins) from another plugin identified by name. To find the matching plugin, other plugins in your project are considered first, followed by

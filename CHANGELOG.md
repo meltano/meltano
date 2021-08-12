@@ -10,13 +10,19 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2871](https://gitlab.com/meltano/meltano/-/issues/2871) Add `discovery_url_auth` project setting
 - [#2855](https://gitlab.com/meltano/meltano/-/issues/2855) Allow `executable` to be overridden through plugin inheritance
 
 ### Changes
 
 - [#2771](https://gitlab.com/meltano/meltano/-/issues/2771) Update stale `meltano add --custom` documentation example
+- [#2868](https://gitlab.com/meltano/meltano/-/issues/2868) Refactor to allow SingerTarget to inject a BookmarkWriter via a new PluginInvoker callback
+- [#2575](https://gitlab.com/meltano/meltano/-/issues/2575) Support version-specific pip constraint files by allowing the special var `${MELTANO__PYTHON_VERSION}` in plugin pip_url's
 
 ### Fixes
+
+- [#2381](https://gitlab.com/meltano/meltano/-/issues/2381) Implement selection logic for all Singer discoverable metadata (`inclusion` and `selected-by-default`).
+- [#2890](https://gitlab.com/meltano/meltano/-/issues/2890) Hotfix to bump discovery.yml version in support of [#2575](https://gitlab.com/meltano/meltano/-/issues/2575) which could cause airflow install to fail.
 
 ### Breaks
 

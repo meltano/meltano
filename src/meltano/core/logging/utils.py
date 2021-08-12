@@ -4,8 +4,15 @@ import os
 import re
 import sys
 from contextlib import suppress
+from typing import Optional
 
 from meltano.core.project_settings_service import ProjectSettingsService
+
+try:
+    from typing import Protocol  # noqa:  WPS433
+except ImportError:
+    from typing_extensions import Protocol  # noqa:  WPS433,WPS440
+
 
 LEVELS = {
     "debug": logging.DEBUG,
@@ -51,6 +58,14 @@ def remove_ansi_escape_sequences(line):
     return ansi_escape.sub("", line)
 
 
+class SubprocessOutputWriter(Protocol):
+    """SubprocessOutputWriter is a basic interface definition suitable for use with capture_subprocess_output."""
+
+    def writelines(self, lines: str):
+        """Any type with a writelines method accepting a string could be used as an output writer."""
+        pass
+
+
 async def _write_line_writer(writer, line):
     # StreamWriters like a subprocess's stdin need special consideration
     if isinstance(writer, asyncio.StreamWriter):
@@ -68,14 +83,17 @@ async def _write_line_writer(writer, line):
     return True
 
 
-async def capture_subprocess_output(reader, *line_writers):
-    """
-    Capture in real time the output stream of a suprocess that is run async.
+async def capture_subprocess_output(
+    reader: Optional[asyncio.StreamReader], *line_writers: SubprocessOutputWriter
+):
+    """Capture in real time the output stream of a suprocess that is run async.
+
     The stream has been set to asyncio.subprocess.PIPE and is provided using
-     reader to this function.
+    reader to this function.
+
     As new lines are captured for reader, they are written to output_stream.
     This async function should be run with await asyncio.wait() while waiting
-     for the subprocess to end.
+    for the subprocess to end.
     """
     while not reader.at_eof():
         line = await reader.readline()
