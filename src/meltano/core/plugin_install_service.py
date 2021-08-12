@@ -269,4 +269,4 @@ class PipPluginInstaller:
 
     async def install(self, reason):
         """Install the plugin into the virtual environment using pip."""
-        return await self.venv_service.clean_install(self.plugin.pip_url)
+        return await self.venv_service.clean_install(self.plugin.formatted_pip_url)
