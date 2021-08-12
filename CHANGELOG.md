@@ -14,10 +14,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2855](https://gitlab.com/meltano/meltano/-/issues/2855) Allow `executable` to be overridden through plugin inheritance
 - [#2849](https://gitlab.com/meltano/meltano/-/issues/2849) Use dbt [`v0.20`](https://github.com/fishtown-analytics/dbt/releases/tag/v0.20.1) by default for new dbt installs
 - [#2545](https://gitlab.com/meltano/meltano/-/issues/2545) Add support for Python 3.9
+- [#2576](https://gitlab.com/meltano/meltano/-/issues/2576) Default to Airflow 2.1\
 
 ### Changes
 
-- [#2771](https://gitlab.com/meltano/meltano/-/issues/2771) Update stale `meltano add --custom` documentation example
 - [#2868](https://gitlab.com/meltano/meltano/-/issues/2868) Refactor to allow SingerTarget to inject a BookmarkWriter via a new PluginInvoker callback
 - [#2575](https://gitlab.com/meltano/meltano/-/issues/2575) Support version-specific pip constraint files by allowing the special var `${MELTANO__PYTHON_VERSION}` in plugin pip_url's
 
@@ -26,6 +26,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2882](https://gitlab.com/meltano/meltano/-/issues/2882) Allow multiple taps / targets to run at the same time by adding a UUID to config.json
 - [#2381](https://gitlab.com/meltano/meltano/-/issues/2381) Implement selection logic for all Singer discoverable metadata (`inclusion` and `selected-by-default`).
 - [#2890](https://gitlab.com/meltano/meltano/-/issues/2890) Hotfix to bump discovery.yml version in support of [#2575](https://gitlab.com/meltano/meltano/-/issues/2575) which could cause airflow install to fail.
+- [#2847](https://gitlab.com/meltano/meltano/-/issues/2847) Updates tap-github and tap-jira to have `properties` capability and not `catalog`
 
 ### Breaks
 
