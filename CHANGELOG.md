@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2882](https://gitlab.com/meltano/meltano/-/issues/2882) Allow multiple taps / targets to run at the same time by adding a UUID to config.json
 - [#2381](https://gitlab.com/meltano/meltano/-/issues/2381) Implement selection logic for all Singer discoverable metadata (`inclusion` and `selected-by-default`).
 - [#2890](https://gitlab.com/meltano/meltano/-/issues/2890) Hotfix to bump discovery.yml version in support of [#2575](https://gitlab.com/meltano/meltano/-/issues/2575) which could cause airflow install to fail.
 

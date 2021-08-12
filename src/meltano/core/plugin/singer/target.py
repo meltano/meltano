@@ -82,7 +82,7 @@ class SingerTarget(SingerPlugin):
 
     @property
     def config_files(self):
-        return {"config": "target.config.json"}
+        return {"config": f"target.{self.instance_uuid}.config.json"}
 
     @property
     def output_files(self):

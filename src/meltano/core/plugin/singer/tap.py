@@ -119,7 +119,7 @@ class SingerTap(SingerPlugin):
     @property
     def config_files(self):
         return {
-            "config": "tap.config.json",
+            "config": f"tap.{self.instance_uuid}.config.json",
             "catalog": "tap.properties.json",
             "catalog_cache_key": "tap.properties.cache_key",
             "state": "state.json",
