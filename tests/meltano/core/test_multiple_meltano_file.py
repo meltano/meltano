@@ -139,7 +139,7 @@ class TestMultipleMeltanoFile:
     def test_deep_get_first_layer_existing_key(self):
         existing_key = "schedules"
         value = deep_get(expected_empty_config, existing_key)
-        assert value == []
+        assert type(value) is list and bool(value) is False
 
     def test_deep_get_first_layer_non_existing_key(self):
         non_existing_key = "non_existing_key"
@@ -149,7 +149,7 @@ class TestMultipleMeltanoFile:
     def test_deep_get_second_layer_existing_key(self):
         existing_key = "plugins.loaders"
         value = deep_get(expected_empty_config, existing_key)
-        assert value == []
+        assert type(value) is list and bool(value) is False
 
     def test_deep_get_second_layer_non_existing_key(self):
         non_existing_key = "plugins.non_existing_key"
@@ -349,7 +349,9 @@ class TestMultipleMeltanoFile:
 
             actual_directories = get_included_directories(meltano_config)
 
-            assert actual_directories == []
+            assert (
+                type(actual_directories) is list and bool(actual_directories) is False
+            )
 
     def test_get_included_directories_include_none(self):
         with tempfile.TemporaryDirectory() as project_root:
@@ -360,7 +362,9 @@ class TestMultipleMeltanoFile:
 
             actual_directories = get_included_directories(meltano_config)
 
-            assert actual_directories == []
+            assert (
+                type(actual_directories) is list and bool(actual_directories) is False
+            )
 
     def test_get_included_directories_include_empty(self):
         with tempfile.TemporaryDirectory() as project_root:
@@ -371,7 +375,9 @@ class TestMultipleMeltanoFile:
 
             actual_directories = get_included_directories(meltano_config)
 
-            assert actual_directories == []
+            assert (
+                type(actual_directories) is list and bool(actual_directories) is False
+            )
 
     def test_get_included_directories_dir_dne(self):
         with tempfile.TemporaryDirectory() as project_root:
