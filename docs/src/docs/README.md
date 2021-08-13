@@ -74,12 +74,15 @@ openings:
 - title: Head of Partnerships
   location: Anywhere, Remote 🌍
   description: "Build and nourish relationships with data consultancies, open source data tools Meltano can integrate with, and connector maintainers including SaaS vendors"
+  description_url: https://boards.greenhouse.io/meltano/jobs/4088646004
 - title: Technical Marketing Manager
   location: Anywhere, Remote 🌍
   description: "Identify and deliver strategies and programs to improve the community experience and build engagement"
+  description_url: https://boards.greenhouse.io/meltano/jobs/4075560004
 - title: Senior Frontend Engineer & UI/UX Designer
   location: Anywhere, Remote 🌍
   description: "Nice to have: Vue.js experience"
+  description_url: https://boards.greenhouse.io/meltano/jobs/4067842004
 - title: Senior Backend Engineer
   location: Anywhere, Remote 🌍
   description: "Required: Python & data experience"
