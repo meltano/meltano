@@ -278,7 +278,7 @@ If you'd like to join the team, check out the [career opportunities](#careers) b
 
 ## Careers <a name="job-openings" />
 
-The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future!
+The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future! See a complete list of our [job openings](https://boards.greenhouse.io/meltano)!
 
 If our [mission](#mission) excites you, and you think could make a great addition to the team in one of the following roles, we'd love to talk to you.
 Please send a cover letter and resume to [hello@meltano.com](mailto:hello@meltano.com) and you'll hear back from us shortly.
