@@ -137,7 +137,7 @@ sidebarDepth: 2
 - [HackerRank (Exercises)](https://www.hackerrank.com/domains/sql?filters%5Bstatus%5D%5B%5D=unsolved&badge_type=sql)
 - [Khan Academy](https://www.khanacademy.org/computing/computer-programming/sql)
 - [Machine Learning Resources](https://drive.google.com/drive/folders/1sOXWW-FujwKU2T-auG7KPR9h6xqDRx0z?usp=sharing) (GitLab Internal)
-- [Intellipaat](https://www.myjobmag.com/blog/top-skills-employers-want-in-2021)
+- [Intellipaat](https://intellipaat.com/microsoft-sql-server-certification-training/)
 - [Mode SQL Tutorial](https://mode.com/sql-tutorial/introduction-to-sql/)
 - [Stanford University Mini-Courses](https://lagunita.stanford.edu/courses/DB/2014/SelfPaced/about)
 - [Technically.dev Post on SQL](https://technically.dev/posts/sql-for-the-rest-of-us.html)
