@@ -4,7 +4,20 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.79.0 - (2021-08-13)
 ---
 
 ### New
@@ -25,8 +38,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2882](https://gitlab.com/meltano/meltano/-/issues/2882) Allow multiple taps / targets to be invoked at the same time by adding a UUID to config.json
 - [#2381](https://gitlab.com/meltano/meltano/-/issues/2381) Implement selection logic for all Singer discoverable metadata (`inclusion` and `selected-by-default`)
-
-### Breaks
 
 
 ## 1.78.0 - (2021-07-15)
