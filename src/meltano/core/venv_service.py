@@ -93,16 +93,33 @@ class VenvService:
         :raises: SubprocessError: if any of the commands fail.
         """
         self.clean()
+        self.clean_run_files()
         await self.create()
         await self.upgrade_pip()
         await asyncio.gather(*[self.install(pip_url) for pip_url in pip_urls])
 
+    def clean_run_files(self):
+        """Destroy cached configuration files, if they exist."""
+        try:
+            shutil.rmtree(self.project.run_dir(self.name))
+            logger.debug(
+                "Removed cached files for '%s/%s'",
+                self.namespace,
+                self.name,
+            )
+        except FileNotFoundError:
+            # If the VirtualEnv has never been created before do nothing
+            logger.debug("No cached files to remove")
+            pass
+
     def clean(self):
         """Destroy the virtual environment, if it exists."""
         try:
-            shutil.rmtree(str(self.venv))
+            shutil.rmtree(self.venv.root)
             logger.debug(
-                f"Removed old virtual environment for '{self.namespace}/{self.name}'"
+                "Removed old virtual environment for '%s/%s'",
+                self.namespace,
+                self.name,
             )
         except FileNotFoundError:
             # If the VirtualEnv has never been created before do nothing
