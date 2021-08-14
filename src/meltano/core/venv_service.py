@@ -103,7 +103,7 @@ class VenvService:
         try:
             shutil.rmtree(self.project.run_dir(self.name))
             logger.debug(
-                "Removed cached files for '%s/%s'",
+                "Removed cached files for '%s/%s'",  # noqa: WPS323
                 self.namespace,
                 self.name,
             )
@@ -117,7 +117,7 @@ class VenvService:
         try:
             shutil.rmtree(self.venv.root)
             logger.debug(
-                "Removed old virtual environment for '%s/%s'",
+                "Removed old virtual environment for '%s/%s'",  # noqa: WPS323
                 self.namespace,
                 self.name,
             )
