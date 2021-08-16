@@ -100,17 +100,7 @@ class VenvService:
 
     def clean_run_files(self):
         """Destroy cached configuration files, if they exist."""
-        try:
-            shutil.rmtree(self.project.run_dir(self.name))
-            logger.debug(
-                "Removed cached files for '%s/%s'",  # noqa: WPS323
-                self.namespace,
-                self.name,
-            )
-        except FileNotFoundError:
-            # If the VirtualEnv has never been created before do nothing
-            logger.debug("No cached files to remove")
-            pass
+        shutil.rmtree(self.project.run_dir(self.name), ignore_errors=True)
 
     def clean(self):
         """Destroy the virtual environment, if it exists."""
