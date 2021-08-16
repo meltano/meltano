@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2627](https://gitlab.com/meltano/meltano/-/issues/2627) Invalidate catalog cache after reinstalling a tap
+
 ### Breaks
 
 
