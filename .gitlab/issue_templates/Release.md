@@ -49,7 +49,7 @@ Rotating `assignee`, on the morning of the release:
 
 ### Announcements, Marketing, and Promotion
 
-`Marketing` or `Product` team:
+`Marketing` @emily or `Product` team:
 
 1. [ ] Post-release announcement steps:
     1. [ ] Post announcement to Meltano slack: `#announcements`
