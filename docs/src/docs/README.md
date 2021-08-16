@@ -12,7 +12,7 @@ members:
     linkedin: douwem
 - name: Taylor Murphy
   title: Head of Product & Data
-  location: Nashville, TN, USA 🇺🇸
+  location: Arlington, TX, USA 🇺🇸
   gravatar_hash: b4936f876b1093f90d7246b264084ddd
   social:
     gitlab: tayloramurphy
