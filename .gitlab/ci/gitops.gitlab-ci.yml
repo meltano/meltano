@@ -36,6 +36,9 @@ sync_discovery_yml_from_hub:
     - git push http://root:$CI_COMMITS_GITLAB_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$REMOTE_BRANCH
 
 version_bump_trigger:
+  # This job triggers for any branches named like `release/vX.Y.Z`
+  # The job will automatically flush the changelog, bump version refs,
+  # and commit and push the result back to the branch.
   extends:
     - .only:release-branches
   except:
@@ -48,8 +51,6 @@ version_bump_trigger:
     - git config --global user.name "Gitlab CI (bot)"
     - pip install changelog-cli bumpversion
     # - poetry install 
-  variables:
-    DISCOVERY_URL: https://gitlab.com/meltano/hub/-/raw/main/_data/meltano/discovery.yml
   script:
     - |
       echo "Setting up 'discovery.yml' sync from 'hub.meltano.com'..."
@@ -61,6 +62,7 @@ version_bump_trigger:
       echo "Detected current version '$CURR_VER' and new version '$NEW_VER'"
       [[ "$CURR_VER" == "" ]] && echo "Could not detect current version" && exit 1
       [[ "$NEW_VER" == "" ]] && echo "Could not detect new version" && exit 1
+      [[ "$NEW_VER" == "$CURR_VER" ]] && echo "Version is already bumped. Aborting job." && exit 0
       MAJOR_BUMP="$(bumpversion major --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
       MINOR_BUMP="$(bumpversion minor --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
       PATCH_BUMP="$(bumpversion patch --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
