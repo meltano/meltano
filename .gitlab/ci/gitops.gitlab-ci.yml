@@ -67,7 +67,7 @@ version_bump_trigger:
       [[ "$BUMP_TYPE" == "" ]] && echo "Could not detect version bump type from version text '$NEW_VER'" && exit 1
       echo "Detected bump type '$BUMP_TYPE' from '$CURR_VER' to '$NEW_VER'"
       echo "Flushing changelog entries with '--$BUMP_TYPE' flag..."
-      yes | changelog release --$BUMP_TYPE
+      changelog release --$BUMP_TYPE --yes
       echo "Adding changelog to git..."
       git add CHANGELOG.md
       echo "Bumping version entries..."
