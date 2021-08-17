@@ -46,8 +46,8 @@ version_bump_trigger:
     # - git config --global user.email "${GITLAB_USER_EMAIL}"
     - git config --global user.email "hello@meltano.com"
     - git config --global user.name "Gitlab CI (bot)"
-    - pip install poetry
-    - poetry install 
+    - pip install changelog-cli bumpversion
+    # - poetry install 
   variables:
     DISCOVERY_URL: https://gitlab.com/meltano/hub/-/raw/main/_data/meltano/discovery.yml
   script:
@@ -56,17 +56,17 @@ version_bump_trigger:
       echo "Current location: Ref='$CI_COMMIT_REF_NAME' and Namespace='$CI_PROJECT_NAMESPACE'..."
     - |
       echo "Detecting and validating version number..."
-      CURR_VER="$(poetry run bumpversion major --allow-dirty --dry-run --list | grep current_version= | cut -d'=' -f2)"
+      CURR_VER="$(bumpversion major --allow-dirty --dry-run --list | grep current_version= | cut -d'=' -f2)"
       NEW_VER="1.79.1" && echo "TODO: replace this with detected version from branch"
-      MAJOR_BUMP="$(poetry run bumpversion major --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
-      MINOR_BUMP="$(poetry run bumpversion minor --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
-      PATCH_BUMP="$(poetry run bumpversion patch --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
+      MAJOR_BUMP="$(bumpversion major --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
+      MINOR_BUMP="$(bumpversion minor --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
+      PATCH_BUMP="$(bumpversion patch --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
       [[ $NEW_VER = $MAJOR_BUMP ]] && BUMP_TYPE="major"
       [[ $NEW_VER = $MINOR_BUMP ]] && BUMP_TYPE="minor"
       [[ $NEW_VER = $PATCH_BUMP ]] && BUMP_TYPE="patch"
       [[ "$BUMP_TYPE" == "" ]] && echo "Could not detect version bump type from version text '$NEW_VER'" && exit 1
       echo "Detected bump type '$BUMP_TYPE' from '$CURR_VER' to '$NEW_VER'"
       echo "Flushing changelog entries..."
-      yes | poetry run changelog release --$BUMP_TYPE
-      poetry run bumpversion $BUMP_TYPE --allow-dirty --list
+      yes | changelog release --$BUMP_TYPE
+      bumpversion $BUMP_TYPE --allow-dirty --list
     - git push http://root:$CI_COMMITS_GITLAB_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_REF_NAME
