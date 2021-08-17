@@ -9,6 +9,8 @@ import sys
 from asyncio.subprocess import Process
 from collections import namedtuple
 from pathlib import Path
+from types import TracebackType
+from typing import Callable, Tuple, Type
 
 from .error import AsyncSubprocessError
 from .project import Project
@@ -28,6 +30,21 @@ NT = VenvSpecs(
     bin_dir="Scripts",
     site_packages_dir=os.path.join("Lib", "site-packages"),
 )
+
+
+def log_rmtree_error(
+    op: Callable,
+    path: Path,
+    exc_info: Tuple[Type[BaseException], BaseException, TracebackType],
+):
+    """Log an exception when shutil.rmtree fails.
+
+    Args:
+        op: OS operation that failed
+        path: Directory path
+        exc_info: Exception raised by shutil.rmtree
+    """
+    logger.debug("Failed to remove directory tree %s", path, exc_info=exc_info)
 
 
 class VirtualEnv:
@@ -100,7 +117,7 @@ class VenvService:
 
     def clean_run_files(self):
         """Destroy cached configuration files, if they exist."""
-        shutil.rmtree(self.project.run_dir(self.name), ignore_errors=True)
+        shutil.rmtree(self.project.run_dir(self.name, make_dirs=False), onerror=log_rmtree_error)
 
     def clean(self):
         """Destroy the virtual environment, if it exists."""
