@@ -63,7 +63,7 @@ version_bump_trigger:
       [[ $NEW_VER = $MAJOR_BUMP ]] && BUMP_TYPE="major"
       [[ $NEW_VER = $MINOR_BUMP ]] && BUMP_TYPE="minor"
       [[ $NEW_VER = $PATCH_BUMP ]] && BUMP_TYPE="patch"
-      [[ "$BUMP_TYPE" == "" ]] && echo "Could not detect version bump type from version text '$NEW_VER' && exit 1
+      [[ "$BUMP_TYPE" == "" ]] && echo "Could not detect version bump type from version text '$NEW_VER'" && exit 1
       echo "Detected bump type '$BUMP_TYPE' from '$CURR_VER' to '$NEW_VER'"
       echo "Flushing changelog entries..."
       yes | poetry run changelog release --$BUMP_TYPE
