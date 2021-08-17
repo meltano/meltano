@@ -23,12 +23,46 @@ class TestSingerTarget:
 
         job = Job(job_id="pytest_test_runner")
 
+        # test noop run outside of pipeline context
+        invoker = plugin_invoker_factory(subject, context=None)
+        with invoker.prepared(session):
+            subject.setup_bookmark_writer(invoker)
+            assert invoker.output_handlers is None
+
+        # test noop run with job but no session
+        elt_context = (
+            elt_context_builder.with_session(None)
+            .with_loader(subject.name)
+            .with_job(job)
+            .context()
+        )
+
+        invoker = plugin_invoker_factory(subject, context=elt_context)
+        with invoker.prepared(session):
+            subject.setup_bookmark_writer(invoker)
+            assert invoker.output_handlers is None
+
+        # test noop run with session but no job
+        elt_context = (
+            elt_context_builder.with_session(session)
+            .with_loader(subject.name)
+            .with_job(None)
+            .context()
+        )
+
+        invoker = plugin_invoker_factory(subject, context=elt_context)
+        with invoker.prepared(session):
+            subject.setup_bookmark_writer(invoker)
+            assert invoker.output_handlers is None
+
+        # test running inside of pipeline context
         elt_context = (
             elt_context_builder.with_session(session)
             .with_loader(subject.name)
             .with_job(job)
             .context()
         )
+
         invoker = plugin_invoker_factory(subject, context=elt_context)
         with invoker.prepared(session):
             subject.setup_bookmark_writer(invoker)
