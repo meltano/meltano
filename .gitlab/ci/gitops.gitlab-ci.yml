@@ -66,7 +66,11 @@ version_bump_trigger:
       [[ $NEW_VER = $PATCH_BUMP ]] && BUMP_TYPE="patch"
       [[ "$BUMP_TYPE" == "" ]] && echo "Could not detect version bump type from version text '$NEW_VER'" && exit 1
       echo "Detected bump type '$BUMP_TYPE' from '$CURR_VER' to '$NEW_VER'"
-      echo "Flushing changelog entries..."
+      echo "Flushing changelog entries with '--$BUMP_TYPE' flag..."
       yes | changelog release --$BUMP_TYPE
-      bumpversion $BUMP_TYPE --allow-dirty --list
-    - git push http://root:$CI_COMMITS_GITLAB_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_REF_NAME
+      echo "Adding changelog to git..."
+      git add CHANGELOG.md
+      echo "Bumping version entries..."
+      bumpversion $BUMP_TYPE --tag --allow-dirty --new-version=$NEW_VER
+      echo "Pushing branch updates..."
+      git push http://root:$CI_COMMITS_GITLAB_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_REF_NAME
