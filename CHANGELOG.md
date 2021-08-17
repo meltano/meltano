@@ -14,10 +14,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#2893](https://gitlab.com/meltano/meltano/-/issues/2893]) Fix error when invoking a target outside pipeline context
-- [#2627](https://gitlab.com/meltano/meltano/-/issues/2627) Invalidate catalog cache after reinstalling a tap
-
 ### Breaks
+
+
+## 1.79.1 - (2021-08-17)
+---
+
+### Fixes
+
+- [#2893](https://gitlab.com/meltano/meltano/-/issues/2893) Fix error when invoking a target outside pipeline context
+- [#2627](https://gitlab.com/meltano/meltano/-/issues/2627) Invalidate catalog cache after reinstalling a tap
 
 
 ## 1.79.0 - (2021-08-13)
