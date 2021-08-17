@@ -57,7 +57,10 @@ version_bump_trigger:
     - |
       echo "Detecting and validating version number..."
       CURR_VER="$(bumpversion major --allow-dirty --dry-run --list | grep current_version= | cut -d'=' -f2)"
-      NEW_VER="1.79.1" && echo "TODO: replace this with detected version from branch"
+      NEW_VER="${CI_COMMIT_REF_NAME#release/v}"
+      echo "Detected current version '$CURR_VER' and new version '$NEW_VER'"
+      [[ "$CURR_VER" == "" ]] && echo "Could not detect current version" && exit 1
+      [[ "$NEW_VER" == "" ]] && echo "Could not detect new version" && exit 1
       MAJOR_BUMP="$(bumpversion major --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
       MINOR_BUMP="$(bumpversion minor --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
       PATCH_BUMP="$(bumpversion patch --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"

@@ -8,8 +8,7 @@
 .only:release-branches:
   only:
     refs:
-      # TODO: Replace with /^release\/v.*$/
-      - /^2895.*$/
+      - /^release\/v.*$/
 
 .only:master:
   only:
