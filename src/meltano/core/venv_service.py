@@ -44,7 +44,9 @@ def log_rmtree_error(
         path: Directory path
         exc_info: Exception raised by shutil.rmtree
     """
-    logger.debug("Failed to remove directory tree %s", path, exc_info=exc_info)
+    logger.debug(
+        "Failed to remove directory tree %s", path, exc_info=exc_info  # noqa: WPS323
+    )
 
 
 class VirtualEnv:
@@ -117,7 +119,9 @@ class VenvService:
 
     def clean_run_files(self):
         """Destroy cached configuration files, if they exist."""
-        shutil.rmtree(self.project.run_dir(self.name, make_dirs=False), onerror=log_rmtree_error)
+        shutil.rmtree(
+            self.project.run_dir(self.name, make_dirs=False), onerror=log_rmtree_error
+        )
 
     def clean(self):
         """Destroy the virtual environment, if it exists."""
