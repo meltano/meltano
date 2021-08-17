@@ -10,8 +10,6 @@ sync_discovery_yml_from_hub:
     # - git config --global user.email "${GITLAB_USER_EMAIL}"
     - git config --global user.email "hello@meltano.com"
     - git config --global user.name "Gitlab CI (bot)"
-    - pip install poetry
-    - poetry install 
   variables:
     DISCOVERY_URL: https://gitlab.com/meltano/hub/-/raw/main/_data/meltano/discovery.yml
   script:
@@ -48,6 +46,8 @@ version_bump_trigger:
     # - git config --global user.email "${GITLAB_USER_EMAIL}"
     - git config --global user.email "hello@meltano.com"
     - git config --global user.name "Gitlab CI (bot)"
+    - pipx install poetry
+    - poetry install 
   variables:
     DISCOVERY_URL: https://gitlab.com/meltano/hub/-/raw/main/_data/meltano/discovery.yml
   script:
