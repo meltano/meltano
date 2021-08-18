@@ -52,12 +52,13 @@ Shared calendars and meetings:
 
 # Benefits and perks
 
-* Unlimited PTO
+* Unlimited PTO with minimums
 * Professional development support and budget
 * Reimbursable coworking fees and external office space
-* Budget for Office equipment and workspace supplies
+* Budget for office equipment and workspace supplies
 * Team offsites
 * Work with a global, distributed team
+* Flexible working hours
 * Access to world class founders, investors and mentors
 
 ## Paid time off
@@ -86,13 +87,13 @@ Team members can share about their Family and Friends Day in the #family-and-fri
 
 ### Upcoming Family and Friends Days
 
-* 2021-08-20 - The first Meltano Family & Friends Day
+* 2021-08-20 - The first Meltano Family & Friends Day!
 * 2021-09-17
 * 2021-10-15
 * 2021-11-24
 
 These dates are tracked in the [Team Meetings Calendar](/handbook/#calendars). 
-Meltano employees should mark these days off using [PTO by Roots](/handbook/tech-stack/#pto-by-roots).
+Meltano team members should mark these days off using [PTO by Roots](/handbook/tech-stack/#pto-by-roots).
 
 In line with our Paid Time Off policy, we encourage Meltano team members to continue to take additional days off, as needed. 
 Family and Friends Day is a reminder to do this.
