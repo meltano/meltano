@@ -1,0 +1,131 @@
+[flake8]
+select =
+    # flake8-bandit
+    S
+    # flake-brokenline
+    N
+    # flake8-bugbear
+    B
+    # flake8-comprehensions
+    C4
+    # flake8-debugger
+    T
+    # flake8-docstrings
+    D
+    # flake8-eradicate
+    E80
+    # flake8-isort
+    I
+    # flake8-rst-docstrings
+    RST
+    # flake8-string-format
+    P
+    # mccabe
+    C90
+    # pep8-naming
+    N
+    # pycodestyle
+    E
+    W
+    # pyflakes
+    F
+    # wemake-python-styleguide
+    WPS
+    # darglint
+    DAR
+
+ignore =
+    # flake8-bandit
+    S404
+    # wemake-python-styleguide
+    WPS110
+    WPS115
+    WPS300
+    WPS305
+    WPS306
+    WPS332
+    WPS348
+    WPS420
+    WPS600
+    WPS602
+    WPS212
+
+exclude =
+    .venv
+    venv
+    *.md
+    src/webapp/node_modules/
+inline_quotes = double
+max_line_length = 88
+show_source = true
+extended_default_ignore = []
+max_imports = 16
+docstring_style = google
+
+per_file_ignores =
+    tests/*:
+        # Don't warn on use of asserts in tests
+        S101
+        # Don't require docstrings in tests
+        DAR101
+        D100
+        D101
+        D102
+        D103
+        # Don't warn on overused expressions in test methods
+        WPS204
+        # Don't warn on too many arguments in test methods
+        WPS211
+        # Don't warn on too many `assert` statements in test methods
+        WPS218
+        # Don't warn on too many methods in test modules
+        WPS214
+        # Don't warn on too many string constants in test methods
+        WPS226
+        # Allow outer scope name shadowing for fixtures
+        WPS442
+        # Allow nested functions in test methods
+        WPS430
+        # Allow protected attribute usage in test methods
+        WPS437
+    !tests/*:
+        T
+    scripts/*:
+        # Allow for print function calls
+        WPS421
+    src/meltano/cli/*:
+        # Allow many local variables, since these aid in string building
+        WPS210
+        # Allow many arguments, since these often represent CLI arguments
+        WPS211
+        # Allow many expressions, since string building requires them
+        WPS213
+        # Allow many decorators, since `click` uses them to define the CLI
+        WPS216
+        # Allow many module members
+        WPS202
+    src/meltano/migrations/versions/*:
+        # Don't class docstrings in migrations
+        D101
+        # Don't require function docstrings in migrations
+        D103
+        # Don't require periods in the first lines of dosctrings
+        D400
+        # Allow uppercase variable names
+        N806
+        # Allow module names starting with numbers
+        WPS102
+        # Allow long filenames
+        WPS118
+        # Allow expression "overuse"
+        WPS204
+        # Allow string constant "overuse"
+        WPS226
+        # Allow "magic" numbers
+        WPS432
+    src/meltano/core/job/job.py:
+        # Class attributes can be used as instance attributes in sqlalchemy.declarative model
+        WPS601
+    **/__init__.py:
+        # Allow for using __init__.py to promote imports to the module namespace
+        F401
