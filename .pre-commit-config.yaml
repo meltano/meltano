@@ -44,6 +44,10 @@ repos:
   rev: v.0.7.0
   hooks:
     - id: flakehell
+-   repo: https://gitlab.com/PyCQA/flake8
+    rev: 3.9.2
+    hooks:
+    - id: flake8
 # - repo: https://github.com/pre-commit/mirrors-mypy
 #   rev: v0.790
 #   hooks:
