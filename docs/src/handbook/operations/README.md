@@ -137,7 +137,7 @@ It is uncommon for you to need all of the items listed below. Please use your be
 | Mouse or Trackpad              | $80 or $145          | $145                | 10/10      | Find a mouse/trackpad that works for you and is comfortable for your workflow.                                                                                                                                                                                                                                                                                        |
 | Laptop stand                                                                                          | $90                  | $90                 | 10/10      | Your eyes and head must look at the same angle as you work and so your laptop must be elevated if you are working with an external monitor.                                                                                                                                                                                                                           |
 | Webcam                                              | $80                  | $80                 | 9/10       | If you would like a much better image quality than from the camera in your laptop, a webcam can make video conversation better. For those who interface routinely with clients, leads, and external parties, you may also consider a pricier [mirrorless or DSLR camera as a webcam](https://docs.crowdcast.io/en/articles/1935406-how-to-use-your-dslr-as-a-webcam). |
-| Dedicated microphone                           | $130                 | $130                | 6/10       | For those who routinely interface with clients, leads, media, and external parties — or create regular content for GitLab channels — you may also consider a dedicated microphone to capture your voice with added richness and detail.                                                                                                                               |
+| Dedicated microphone                           | $130                 | $130                | 6/10       | For those who routinely interface with clients, leads, media, and external parties — or create regular content for Meltano channels — you may also consider a dedicated microphone to capture your voice with added richness and detail.                                                                                                                               |
 | Portable 15" external monitor                                                                         | $200                 | $200                | 9/10       | You have the freedom to work from any location, and having a portable monitor allows that your workflow does not suffer from being constrained to a single small laptop screen.                                                                                                                                                                                       |
 | USB-C Adapter                                                                                         | $80                  | $80                 | 9/10       | Most MacBooks only have 1 free USB-C port, so an adapter with additional ports is a necessity.                                                                                                                                                                                                                                                                        |
 | HDMI / monitor cable                                                                                  | $15                  | $15                 | 9/10       | Find a quality cable so that the connection between your laptop and monitor is healthy and secure.                                                                                                                                                                                                                                                                    |
@@ -328,9 +328,7 @@ Recognizing that team members may wish to share significant events in each other
 
 ## Family and Friends Day
 
-Inspired by GitLab's Family and Friends Day, Meltano has made Family and Friends Day a regular part of the culture. On these days, we will close the doors to the Meltano virtual office, reschedule all meetings, and have a publicly visible shutdown.
-
-Team members can share about their Family and Friends Day in the #family-and-friends-day Slack channel after the event, or publicly on social media such as Twitter, LinkedIn, or wherever they're most comfortable using the hashtag #FamilyFriends1st. Sharing is optional. Taking the day off is strongly encouraged if your role allows it.
+Inspired by GitLab's Family and Friends Day, Meltano has made Family and Friends Day a regular part of the culture. On these days, we will close the doors to the Meltano virtual office, reschedule all meetings, and have a publicly visible shutdown. Taking the day off is strongly encouraged if your role allows it. If you are on call or need to work during the scheduled Friends and Family Day, please select another day that works best for your schedule.
 
 ### Upcoming Family and Friends Days
 
@@ -339,8 +337,8 @@ Team members can share about their Family and Friends Day in the #family-and-fri
 * 2021-10-15
 * 2021-11-24
 
-These dates are tracked in the [Team Meetings Calendar](/handbook/#calendars). 
-Meltano team members should mark these days off using [PTO by Roots](/handbook/tech-stack/#pto-by-roots).
+These dates are tracked in the Team Meetings Calendar. 
+Meltano team members should mark these days off using PTO by Roots.
 
 In line with our Paid Time Off policy, we encourage Meltano team members to continue to take additional days off, as needed. 
 Family and Friends Day is a reminder to do this.
