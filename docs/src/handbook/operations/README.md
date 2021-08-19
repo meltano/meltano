@@ -4,10 +4,9 @@ sidebarDepth: 2
 
 ----
 
-## In this handbook
+## Table of contents
 
-- TOC
-{:toc}
+[[_TOC_]]
 
 ----
 
@@ -266,17 +265,17 @@ You can find the Home Tab by visiting `Apps` in the menu bar within Slack, and s
 * Modify your profile and calendar settings. 
 * Opt-in and out-put for reminders, including monthly messages prompting you to consider what PTO you may take this month.
 
-### Additional Features
+#### Additional Features
 
-#### Google Calendar Sync
+##### Google Calendar Sync
 
 PTO by Roots allows you to sync time off requests with your Google Calendar.
 
-#### Automatic Status + Do Not Disturb Updates
+##### Automatic Status + Do Not Disturb Updates
 
 PTO by Roots can automatically set your OOO status in Slack and apply “Do Not Disturb” settings while you’re away. You must add these permissions individually.
 
-#### Roles and Task Handoffs
+##### Roles and task handoffs
 
 PTO by Roots provides an experience that allows you to set roles and tasks for co-workers while
 you’re away. Accepted roles then become a part of a Slack away message that appears as
@@ -285,7 +284,7 @@ co-workers try to tag you in discussions while you’re OOO.
 Before assigning a `#channel` to a role, please ask for permission to do so in that channel.
 Especially in large channels and during popular vacation times, PTO's role reminders could create a lot of noise, so some teams may recommend against them until there is an option to allow turning off the PTO notifications.
 
-#### Bulk Add holidays
+##### Bulk add holidays
 
 You can bulk add holidays based on your region and then modify them manually if needed. Any Public Holidays added to PTO by Roots in your dashboard will not auto-set an OOO event for you, you will still need to create an OOO event if observing that holiday. To add a Public Holiday, follow the below instructions.
 
@@ -294,7 +293,7 @@ You can bulk add holidays based on your region and then modify them manually if 
 * Choose the desired year
 * Click on `Bulk Add By Region`
 
-#### Monthly reminder to consider taking PTO
+##### Monthly reminder to consider taking PTO
 
 We get it — life gets busy. So busy, in fact, that you may need a little nudge to consider taking time off to recharge. PTO by Roots allows you to subscribe (and unsubscribe) to a monthly prompt, sent on the first *working* day of each month, reminding you to pause and think about time away from work and prioritizing mental health.
 
@@ -305,7 +304,7 @@ To subscribe or unsubscribe, follow the below instructions:
 * Beneath your name and profile, you'll see a line that says "Send me a monthly reminder about taking time off." Click the **Subscribe** button to trigger the notification, which will begin on the first *working* day (e.g. not a weekend or a public holiday) in the month following your subscription.
 * To unsubscribe, revisit PTO by Roots within Slack Apps and click the button that says **Unsubscribe**.
 
-#### Checking "Who's Out?"
+##### Checking "Who's Out?"
 
 In order to see who is out of your team, follow the steps below:
 
