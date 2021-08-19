@@ -202,7 +202,7 @@ The first team member to review should assign themselves to the review and check
 
 ### Manager-Level Approval
 
-For both Community-Contributed MRs and Team-Authored MRs, a Manager-Level approval is required for any non-trivial updates - in addition to Team Member approval. This can be requested (1) when the structural foundation is forming, (2) when the foundation is in place, or (3) as the "final check". The manager-level approval should generally be performed _after_ the MR is otherwise "clean" - or where applicable, any known action items and questions should be called out as such when tagging the manager-level approval.
+For both Community-Contributed MRs and Team-Authored MRs, a Manager-Level approval is required for any non-trivial updates - in addition to Team Member approval. This can be requested either when the MR foundation is in place or as a "final check". The manager-level approval should generally be requested _after_ the MR is otherwise "clean" - and after known action items and questions are called out in the text of the MR.
 
 The goal in the dual-approval approach is to create a virtuous cycle of individual ownership combined with manager-level accountability, while fostering organic and supportive training opportunities for new team members.
 
