@@ -12,7 +12,7 @@ members:
     linkedin: douwem
 - name: Taylor Murphy
   title: Head of Product & Data
-  location: Nashville, TN, USA 🇺🇸
+  location: Arlington, TX, USA 🇺🇸
   gravatar_hash: b4936f876b1093f90d7246b264084ddd
   social:
     gitlab: tayloramurphy
@@ -74,12 +74,15 @@ openings:
 - title: Head of Partnerships
   location: Anywhere, Remote 🌍
   description: "Build and nourish relationships with data consultancies, open source data tools Meltano can integrate with, and connector maintainers including SaaS vendors"
+  description_url: https://boards.greenhouse.io/meltano/jobs/4088646004
 - title: Technical Marketing Manager
   location: Anywhere, Remote 🌍
   description: "Identify and deliver strategies and programs to improve the community experience and build engagement"
+  description_url: https://boards.greenhouse.io/meltano/jobs/4075560004
 - title: Senior Frontend Engineer & UI/UX Designer
   location: Anywhere, Remote 🌍
   description: "Nice to have: Vue.js experience"
+  description_url: https://boards.greenhouse.io/meltano/jobs/4067842004
 - title: Senior Backend Engineer
   location: Anywhere, Remote 🌍
   description: "Required: Python & data experience"
@@ -278,7 +281,7 @@ If you'd like to join the team, check out the [career opportunities](#careers) b
 
 ## Careers <a name="job-openings" />
 
-The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future!
+The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future! See a complete list of our [job openings](https://boards.greenhouse.io/meltano)!
 
 If our [mission](#mission) excites you, and you think could make a great addition to the team in one of the following roles, we'd love to talk to you.
 Please send a cover letter and resume to [hello@meltano.com](mailto:hello@meltano.com) and you'll hear back from us shortly.

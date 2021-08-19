@@ -5,6 +5,7 @@ import sys
 from unittest import mock
 
 import pytest
+from meltano.core.project import Project
 from meltano.core.venv_service import VenvService, VirtualEnv
 
 
@@ -13,8 +14,16 @@ class TestVenvService:
     def subject(self, project):
         return VenvService(project, "namespace", "name")
 
+    def test_clean_run_files(self, project: Project, subject: VenvService):
+        file = project.run_dir("name", "test.file.txt")
+        file.touch()
+        assert file.exists() and file.is_file()
+
+        subject.clean_run_files()
+        assert not file.exists()
+
     @pytest.mark.asyncio
-    async def test_clean_install(self, project, subject):
+    async def test_clean_install(self, project, subject: VenvService):
         await subject.clean_install("example")
         venv_dir = subject.project.venvs_dir("namespace", "name")
 

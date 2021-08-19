@@ -7,7 +7,7 @@ class TestCommand:
     @pytest.fixture
     def commands(self):
         return {
-            "foo": {"args": "foo", "description": "foo desc"},
+            "foo": {"args": "foo", "description": "foo desc", "executable": "foo"},
             "bar": {"args": "bar"},
             "baz": "baz",
         }
@@ -21,10 +21,13 @@ class TestCommand:
         serialized = Command.parse_all(commands)
         assert serialized["foo"].args == "foo"
         assert serialized["foo"].description == "foo desc"
+        assert serialized["foo"].executable == "foo"
         assert serialized["bar"].args == "bar"
         assert serialized["bar"].description is None
+        assert serialized["bar"].executable is None
         assert serialized["baz"].args == "baz"
         assert serialized["baz"].description is None
+        assert serialized["baz"].executable is None
 
     def test_deserialize(self, commands):
         serialized = Command.parse_all(commands)

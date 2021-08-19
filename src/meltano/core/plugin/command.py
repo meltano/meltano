@@ -21,9 +21,14 @@ class UndefinedEnvVarError(Error):
 class Command(Canonical):
     """This class represents stored command arguments for plugins."""
 
-    def __init__(self, args: str, description: Optional[str] = None):
+    def __init__(
+        self,
+        args: str,
+        description: Optional[str] = None,
+        executable: Optional[str] = None,
+    ):
         """Initialize a Command."""
-        super().__init__(args=args, description=description)
+        super().__init__(args=args, description=description, executable=executable)
 
     def expanded_args(self, name, env):
         """

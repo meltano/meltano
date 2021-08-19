@@ -22,9 +22,12 @@ New sprint milestones are created about 6 weeks in advance as part of preparatio
 
 By the end of day Friday, or the last day of their work week, engineers are expected to:
 
-* Add comment to issues that are started but not completed
-* Update the flow label to reflect an accurate status
-* Close any completed items
+1. Update the flow label to reflect an accurate status.
+2. Close any completed items.
+3. Add a progress comment to issues which have the `flow:Doing` label.
+4. Issues with the `flow:Review` label will be expected to be closed out once review completes.
+   - No need to add a progress comment since action items should be self-documenting.
+   - If review is not progressing due to other factors, a `flow:Blocked` label may be appropriate.
 
 This is in preparation for the Product milestone review and [Weekly Kickoff](handbook/product/#weekly-kickoff) on Monday.
 
@@ -215,68 +218,13 @@ The release schedule is determined by Product and Marketing. The Engineering tea
 We have a sliding window of `Release Manager` role within the Engineering team, with the prior `Release Manager` oncall to support the next `Release Manager`. If issues arise or a second opinion is needed during release, the last person who ran the release process will perform this supporting function for the next.
 
 ### Versioning
+
 Regular releases get a minor version bump (`1.1.0` -> `1.2.0`).
 Releases that only address regressions introduced in the most recent release get a patch version bump (`1.2.0` -> `1.2.1`).
 
 ### Version Bump Processes
 
-#### SDK Version Bump Process
-
-The SDK version bump process is documented in the Release issue template. No further actions are needed besides what is listed in the checklist.
-
-#### Meltano Version Bump Process
-
-Meltano has a manual version bump process.
-
-The below process should be performed in each release. This process accomplishes the following:
-
-1. Bump version numbers in all affected files.
-2. Flush `Unreleased` changelog events and tag to the new version number.
-3. Push a git tag with the new version number.
-
-_Note: the Meltano project uses tags and CI/CD to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package._
-
-
-1. Ensure you have the latest `master` branch locally before continuing.
-
-    ```bash
-    cd meltano
-
-    git checkout master
-    git pull
-    ```
-
-1. Install the latest versions of all release toolchain dependencies.
-
-    ```bash
-    poetry install
-    ```
-
-2. Execute the commands below:
-
-    ```bash
-    # create and checkout the `release-next` branch from `origin/master`
-    git checkout -B release-next origin/master
-
-    # view changelog (verify changes made match changes logged)
-    poetry run changelog view
-
-    # after the changelog has been validated, tag the release
-    make type=minor release
-    # if this is a patch release:
-    # make type=patch release
-
-    # ensure the tag once the tag has been created, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
-    git describe --tags --abbrev=0
-
-    # push the tag upstream to trigger the release pipeline
-    git push origin $(git describe --tags --abbrev=0)
-
-    # push the release branch to merge the new version, then create a merge request
-    git push origin release-next
-    ```
-
-3. Using the link from the `git push` output, create a merge request from `release-next` targeting `master` and use the `release` template. Follow all tasks that are part of the `release` merge request template.
+The Meltano and the SDK version bump processes are documented in the Release issue templates. No further actions are needed besides what is listed in the checklist.
 
 ## Zoom
 

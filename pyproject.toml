@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "1.78.0"
+version = "1.79.1"
 description = "Meltano"
 authors = ["Meltano Team and Contributors <meltano@gitlab.com>"]
 license = "MIT"
@@ -17,7 +17,7 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.6.2,<3.9"
+python = ">=3.6.2,<3.10"
 aiohttp = "^3.4.4"
 alembic = "^1.5.0"
 async_generator = "^1.10"
@@ -145,6 +145,7 @@ inline-quotes = "double"
 max_line_length = 88
 show_source = true
 extended_default_ignore = []
+max_imports = 16
 
 [tool.flakehell.plugins]
 flake8-bandit = [

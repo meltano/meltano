@@ -82,7 +82,7 @@ class SingerTarget(SingerPlugin):
 
     @property
     def config_files(self):
-        return {"config": "target.config.json"}
+        return {"config": f"target.{self.instance_uuid}.config.json"}
 
     @property
     def output_files(self):
@@ -107,7 +107,7 @@ class SingerTarget(SingerPlugin):
         self.setup_bookmark_writer(plugin_invoker)
 
     def setup_bookmark_writer(self, plugin_invoker: PluginInvoker):
-        """Configure the bookmark writer as an additional output handler on the invoker.
+        """Configure the bookmark writer as an additional output handler on the invoker if running in a pipeline context.
 
         This leverages calling back to PluginInvokers.add_output_handler to attach an additional
         output handler (the BookmarkWriter) to handle persisting state messages.
@@ -117,6 +117,9 @@ class SingerTarget(SingerPlugin):
             as an additional output handler.
         """
         elt_context = plugin_invoker.context
+        if not elt_context or not elt_context.job or not elt_context.session:
+            return
+
         incomplete_state = elt_context.full_refresh and elt_context.select_filter
         payload_flag = Payload.INCOMPLETE_STATE if incomplete_state else Payload.STATE
 

@@ -197,6 +197,22 @@ transformers:
     snapshot: snapshot --project-dir $DBT_PROJECT_DIR --profile $DBT_PROFILE --target $DBT_TARGET --select $DBT_MODEL
 ```
 
+Commands can optionally specify some documentation displayed when [listing commands](/docs/command-line-interface.html#commands). They can also optionally specify an alternative executable from the default one for the plugin.
+
+```yaml
+- name: dagster
+  executable: dagster
+  commands:
+    ui:
+      description: Start the webserver
+      executable: dagit
+      args: -w $DAGSTER_HOME/workspace.yaml
+    scheduler:
+      description: Run the scheduler daemon
+      executable: dagster-daemon
+      args: run
+```
+
 ### Schedules
 
 Your project's pipeline schedules,
