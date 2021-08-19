@@ -26,7 +26,7 @@ We also place an emphasis on ensuring that conclusions of offline conversations 
 1. Use `FYI @username` when you want someone to be aware of what's being discussed, but they're not required to take action.
 1. Use `@username` when you want someone to take a specific action, such as contributing to the discussion or answering a question.
 1. Aim to respond to mentions within 3 business days. If you are unabe to fulfill a specific request during that time, respond to the mention and indicate when you'll have an answer.
-1. Use direct language when communicating. If you want someone to take action, directly tell them what's required, and when you need an answer, and whether there is urgency.
+1. Use direct language when communicating. If you want someone to take action, directly tell them what's required, and when you need an answer, and whether there is urgency. Also indicate whether something is a "must have" or "nice to have" when asking for collaboration. 
 1. Don't hesitate to overcommunicate. You can mention someone in an issue, but we all know that sometimes we can miss something, so if you need something urgently (or if a request has stagnated), you can send someone a direct message as a gentle reminder. 
 
 ## Effective & responsible communication guidelines
