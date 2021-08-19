@@ -11,6 +11,23 @@ sidebarDepth: 2
 
 ----
 
+# Communication
+
+We're an all-remote company that allows people to work from almost anywhere in the world, so it's important for us to practice clear communication in ways that help us stay connected and work more efficiently.
+
+To accomplish this, we use asynchronous communication as a starting point and stay as open and transparent as we can by communicating through public issues, merge requests, and Slack channels.
+
+We also place an emphasis on ensuring that conclusions of offline conversations are written down. We communicate respectfully and professionally at all times.
+
+## Guidelines
+
+1. Always communicate with empathy and kindness. 
+1. Use `FYI @username` when you want someone to be aware of what's being discussed, but they're not required to take action.
+1. Use `@username` when you want someone to take a specific action, such as contributing to the discussion or answering a question.
+1. Aim to respond to mentions within 3 business days. If you are unabe to fulfill a specific request during that time, respond to the mention and indicate when you'll have an answer.
+1. Use direct language when communicating. If you want someone to take action, directly tell them what's required, and when you need an answer, and whether there is urgency.
+1. Don't hesitate to overcommunicate. You can mention someone in an issue, but we all know that sometimes we can miss something, so if you need something urgently (or if a request has stagnated), you can send someone a direct message as a gentle reminder. 
+
 # Financial operations
 
 Financial operations includes spending company money, guidelines, and the reimbursement policy. This section will be regularly updated.
