@@ -19,14 +19,58 @@ To accomplish this, we use asynchronous communication as a starting point and st
 
 We also place an emphasis on ensuring that conclusions of offline conversations are written down. We communicate respectfully and professionally at all times.
 
-## Guidelines
+## In practice
 
 1. Always communicate with empathy and kindness. 
+1. **Please avoid using @here or @channel unless this is about something urgent and important.** 
 1. Use `FYI @username` when you want someone to be aware of what's being discussed, but they're not required to take action.
 1. Use `@username` when you want someone to take a specific action, such as contributing to the discussion or answering a question.
 1. Aim to respond to mentions within 3 business days. If you are unabe to fulfill a specific request during that time, respond to the mention and indicate when you'll have an answer.
 1. Use direct language when communicating. If you want someone to take action, directly tell them what's required, and when you need an answer, and whether there is urgency.
 1. Don't hesitate to overcommunicate. You can mention someone in an issue, but we all know that sometimes we can miss something, so if you need something urgently (or if a request has stagnated), you can send someone a direct message as a gentle reminder. 
+
+## Effective & responsible communication guidelines
+
+1. **Kindness Matters.** You are looking at a screen, but you are really talking to a person. If you wouldn't say it to a person's face, don't send it to them in a text message.
+1. **Express Your Thoughts.** We live in different locations and often have very different perspectives. We want to know your thoughts, opinions, and feelings on things.
+1. **Own It.** If you say it or type it, own it. If it hurts the company or an individual, even unintentionally, we encourage you to look at things from other points of view and apologize easily.
+1. **Be a Role Model of our values.**
+1. **Feedback is Essential.** It is difficult to know what is appropriate in every one of our team members 60+ countries. We encourage team members to give feedback and receive feedback in a considerate way.
+1. **Don't Underestimate a 1:1.** Asynchronous communication (e.g., via text) is helpful and necessary. In some cases (e.g., to clarify misunderstandings) it can be much more effective to jump on a Zoom video call.
+1. **Always Adhere to our Anti-Harassment Policy and Code of Conduct.**
+1. **Everyone should be comfortable in their work environment.**
+1. **Focus on what we can directly influence.** There are many factors we can't directly influence and we should avoid spending time discussing those things. 
+
+Embracing asynchronous communication and learning to use it effectively requires a mental shift. This can feel unusual or even uncomfortable for those who come from a colocated environment, where in-person meetings and communiques are the norm. Learn more about mastering the use of the written word in an all-remote setting.
+
+## Best practices
+
+1. All written communication happens in English, even when sent one on one, because sometimes you need to forward an email or chat.
+1. Use **asynchronous communication** when possible: merge requests or issues. 
+1. Discussion in issues or merge requests is preferred over everything else. If you need a response urgently, you can Slack someone with a link to your comment on an issue or merge request, asking them to respond there, however be aware that they still may not see it straight away. 
+1. You are not expected to be available all the time. There is no expectation to respond to messages outside of your planned working hours.
+1. Sometimes synchronous communication is the better option, but do not default to it. For example, a video call can clear things up quickly when you are blocked. 
+1. It is very OK to ask as many questions as you have. Please ask them so many people can answer them and many people see the answer. Use issues or public chat channels instead of direct messages or one-on-one emails.
+1. If the answer to a question isn't documented, please make a merge request to add it to the handbook in a place you have looked for it. It is great for the person who answered the question to see you leading by example to ensure that question only needs to be answered once. A merge request is the best way to say thanks for help.
+1. If you mention something (a merge request, issue, commit, webpage, comment, etc.) please include a link to it.
+1. All company data should be **shareable** by default. Don't use a local text file, but rather leave comments on an issue.
+1. When someone asks something, give back a deadline or that you did it. Answers like: 'will do', 'OK', 'it is on my todo list' are not helpful. If it is small it's better to spend 2 minutes and do the tasks so the other person can mentally forget about it. If it is large you need to figure out when you'll do it, by returning that information the other person might decide to solve it in another way if it takes too long.
+1. It is OK to bring an issue to someone's attention with a CC ("cc @user"), but CCs alone are not enough if specific action is needed from someone. The mentioned user may read the issue and take no further action. If you need something, please explicitly communicate your need along with @ mentioning who you need it from.
+1. Avoid creating private groups for internal discussions:
+   1. It's disturbing (all users in the group get notified for each message).
+   1. It's not searchable.
+   1. It's not shareable: there is no way to add people in the group (and this often leads to multiple groups creation).
+   1. They don't have a subject, so everyone has to remember the topic of each private group based on the participants, or open the group again to read the content.
+1. Use [low-context communications](https://en.wikipedia.org/wiki/High-context_and_low-context_cultures) by being explicit in your communications. We are a remote-only company, located all over the world. Provide as much context as possible to avoid confusion. Relatedly, we use [ubiquitous language](#ubiquitous-language) for communication efficiency.
+1. When discussing concepts, be careful not to lean too much into hypotheticals. There is a tipping point in which it decreases value and no longer becomes constructive at helping everyone come into a unified decision.
+
+## Everyone is a Moderator
+
+If you see something that concerns you in Slack, Issues, Merge Requests, Video, Emails or any other forum, we encourage you to respectfully say something directly to the individual in a 1:1 format. If you are not comfortable reaching out to the individual directly, please reach out to your direct manager or People Business Partner to discuss.
+
+
+
+
 
 # Financial operations
 
