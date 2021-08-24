@@ -1,13 +1,15 @@
+import asyncio
 import json
 from contextlib import contextmanager
 from unittest import mock
 
 import pytest
+from asynctest import CoroutineMock
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
+from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
-from meltano.core.plugin_invoker import PluginInvoker
 
 
 class TestSingerTap:
@@ -170,71 +172,60 @@ class TestSingerTap:
         elt_context.full_refresh = True
         assert_state(None)
 
-    def test_discover_catalog(self, session, plugin_invoker_factory, subject):
+    @pytest.mark.asyncio
+    async def test_discover_catalog(
+        self, session, plugin_invoker_factory, subject
+    ):  # noqa: WPS213
         invoker = plugin_invoker_factory(subject)
 
         catalog_path = invoker.files["catalog"]
         catalog_cache_key_path = invoker.files["catalog_cache_key"]
 
-        def mock_discovery():
-            catalog_path.open("w").write('{"discovered": true}')
-            return ("", "")
-
-        process_mock = mock.Mock()
-        process_mock.communicate = mock_discovery
-        process_mock.returncode = 0
+        def mock_discovery(*args, **kwargs):
+            future = asyncio.Future()
+            future.set_result(catalog_path.open("w").write('{"discovered": true}'))
+            return future
 
         with invoker.prepared(session):
             with mock.patch.object(
-                PluginInvoker, "invoke", return_value=process_mock
-            ) as invoke:
-                subject.discover_catalog(invoker, [])
+                SingerTap, "run_discovery", side_effect=mock_discovery
+            ) as mocked_run_discovery:
+                await subject.discover_catalog(invoker, [])
 
-                assert invoke.called_with(["--discover"])
+                assert mocked_run_discovery.called
+                assert json.loads(catalog_path.read_text()) == {"discovered": True}
+                assert not catalog_cache_key_path.exists()
 
-            assert json.loads(catalog_path.read_text()) == {"discovered": True}
-            assert not catalog_cache_key_path.exists()
+                # If there is no cache key, discovery is invoked again
+                mocked_run_discovery.reset_mock()
+                await subject.discover_catalog(invoker, [])
 
-            # If there is no cache key, discovery is invoked again
-            with mock.patch.object(
-                PluginInvoker, "invoke", return_value=process_mock
-            ) as invoke:
-                subject.discover_catalog(invoker, [])
+                assert json.loads(catalog_path.read_text()) == {"discovered": True}
+                assert not catalog_cache_key_path.exists()
 
-                assert invoke.called_with(["--discover"])
+                # Apply catalog rules to store the cache key
+                subject.apply_catalog_rules(invoker, [])
+                assert catalog_cache_key_path.exists()
 
-            assert json.loads(catalog_path.read_text()) == {"discovered": True}
-            assert not catalog_cache_key_path.exists()
+                # If the cache key hasn't changed, discovery isn't invoked again
+                mocked_run_discovery.reset_mock()
+                await subject.discover_catalog(invoker, [])
 
-            # Apply catalog rules to store the cache key
-            subject.apply_catalog_rules(invoker, [])
-            assert catalog_cache_key_path.exists()
+                mocked_run_discovery.assert_not_called()
+                assert json.loads(catalog_path.read_text()) == {"discovered": True}
+                assert catalog_cache_key_path.exists()
 
-            # If the cache key hasn't changed, discovery isn't invoked again
-            with mock.patch.object(
-                PluginInvoker, "invoke", return_value=process_mock
-            ) as invoke:
-                subject.discover_catalog(invoker, [])
+                # If the cache key no longer matches, discovery is invoked again
+                mocked_run_discovery.reset_mock()
+                catalog_cache_key_path.write_text("bogus")
+                await subject.discover_catalog(invoker, [])
 
-                invoke.assert_not_called()
+                assert mocked_run_discovery.called
+                assert json.loads(catalog_path.read_text()) == {"discovered": True}
+                assert not catalog_cache_key_path.exists()
 
-            assert json.loads(catalog_path.read_text()) == {"discovered": True}
-            assert catalog_cache_key_path.exists()
-
-            # If the cache key no longer matches, discovery is invoked again
-            catalog_cache_key_path.write_text("bogus")
-
-            with mock.patch.object(
-                PluginInvoker, "invoke", return_value=process_mock
-            ) as invoke:
-                subject.discover_catalog(invoker, [])
-
-                assert invoke.called_with(["--discover"])
-
-            assert json.loads(catalog_path.read_text()) == {"discovered": True}
-            assert not catalog_cache_key_path.exists()
-
-    def test_discover_catalog_custom(
+    @pytest.mark.asyncio
+    async def test_discover_catalog_custom(
         self, project, session, plugin_invoker_factory, subject, monkeypatch
     ):
         invoker = plugin_invoker_factory(subject)
@@ -250,25 +241,9 @@ class TestSingerTap:
         )
 
         with invoker.prepared(session):
-            subject.discover_catalog(invoker, [])
+            await subject.discover_catalog(invoker, [])
 
         assert invoker.files["catalog"].read_text() == '{"custom": true}'
-
-    def test_discover_catalog_fails(self, session, plugin_invoker_factory, subject):
-        process_mock = mock.Mock()
-        process_mock.communicate.return_value = ("", "")
-        process_mock.returncode = 1  # something went wrong
-
-        invoker = plugin_invoker_factory(subject)
-        with invoker.prepared(session):
-            with mock.patch.object(
-                PluginInvoker, "invoke", return_value=process_mock
-            ) as invoke, pytest.raises(PluginExecutionError, match="returned 1"):
-                subject.discover_catalog(invoker, [])
-
-                assert not invoker.files[
-                    "catalog"
-                ].exists(), "Catalog should not be present."
 
     def test_apply_select(self, session, plugin_invoker_factory, subject, monkeypatch):
         invoker = plugin_invoker_factory(subject)
@@ -702,3 +677,67 @@ class TestSingerTap:
         # No key if pip_url is editable
         monkeypatch.setattr(invoker.plugin, "pip_url", "-e local")
         assert cache_key() is None
+
+    @pytest.mark.asyncio
+    async def test_run_discovery(
+        self,
+        plugin_invoker_factory,
+        session,
+        subject,
+        elt_context_builder,
+        project_plugins_service,
+    ):
+
+        process_mock = mock.Mock()
+        process_mock.name = subject.name
+        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.returncode = 0
+        process_mock.sterr.at_eof.side_effect = (
+            True  # no output so return eof immediately
+        )
+
+        process_mock.stdout.at_eof.side_effect = (
+            False,
+            True,
+        )  # first check needs to be false so loop starts read, after 1 line, we'll return true
+        process_mock.stdout.readline = CoroutineMock(
+            return_value=b'{"discovered": true}\n'
+        )
+
+        invoke_async = CoroutineMock(return_value=process_mock)
+        invoker = plugin_invoker_factory(subject)
+        invoker.invoke_async = invoke_async
+        catalog_path = invoker.files["catalog"]
+
+        await subject.run_discovery(invoker, catalog_path)
+        assert invoke_async.called_with(["--discover"])
+
+        with catalog_path.open("r") as catalog_file:
+            resp = json.load(catalog_file)
+            assert resp["discovered"]
+
+    @pytest.mark.asyncio
+    async def test_run_discovery_failure(
+        self,
+        plugin_invoker_factory,
+        session,
+        subject,
+        elt_context_builder,
+        project_plugins_service,
+    ):
+
+        process_mock = mock.Mock()
+        process_mock.name = subject.name
+        process_mock.wait = CoroutineMock(return_value=1)
+        process_mock.returncode = 1
+        process_mock.sterr.at_eof.side_effect = True
+        process_mock.stdout.at_eof.side_effect = True
+        process_mock.stdout.readline = CoroutineMock(return_value=b"")
+
+        invoker = plugin_invoker_factory(subject)
+        invoker.invoke_async = CoroutineMock(return_value=process_mock)
+        catalog_path = invoker.files["catalog"]
+
+        with pytest.raises(PluginExecutionError, match="returned 1"):
+            await subject.run_discovery(invoker, catalog_path)
+            assert not catalog_path.exists(), "Catalog should not be present."
