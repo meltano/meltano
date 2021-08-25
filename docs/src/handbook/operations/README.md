@@ -114,11 +114,11 @@ Meltano team memebrs are encouraged to create a comfortable, ergonomic workspace
    (Docs, Slides, Sheets, etc.) instead.
 1. For security related software, refer to the section on laptop configuration.
 
-#### Individual Subscriptions
+#### Individual subscriptions
 
 Meltano does not reimburse individual software subscriptions (e.g. Apple Music, Krisp, etc.).
 
-##### Subscription Exceptions
+##### Subscription exceptions
 
 Certain types of individual subscriptions are reimbursable, such as VPN service. If you are uncertain whether a particular service is reimbursable, please contact the Operations Analyst.
 
@@ -126,7 +126,7 @@ Certain types of individual subscriptions are reimbursable, such as VPN service.
 
 It is uncommon for you to need all of the items listed below. Please use your best judgement and buy them as you need them. If you wonder if something is common, feel free to ask your teammates.
 
-| Item                                                                                                  | Average Price in USD | Reimbursable Amount | Importance | Why                                                                                                                                                                                                                                                                                                                                                                   |
+| Item                                                                                                  | Average price in USD | reimbursable amount | Importance | Why                                                                                                                                                                                                                                                                                                                                                                   |
 |-------------------------------------------------------------------------------------------------------|----------------------|---------------------|------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Height-adjustable desk                             | $300 - $500          | $500                | 10/10      | We use our desks everyday and need them to be ergonomic and adjustable to our size and needs, whether that is sitting or standing.                                                                                                                                                                                                                                    |
 | Ergonomic chair                                      | $200 - $400          | $400                | 10/10      | We use our desk chairs hours at a time, and need them to be healthy, supportive, and comfortable.                                                                                                                                                                                                                                                                     |
@@ -180,7 +180,7 @@ We recommend either:
 
 1. (MacBook Pro) - [13” / 512gig SSD / 16gigs RAM / i5 CPU](https://www.apple.com/shop/buy-mac/macbook-pro/13-inch-space-gray-1.4ghz-quad-core-processor-with-turbo-boost-up-to-3.9ghz-256gb)
 
-### Linux Hardware
+### Linux hardware
 
 Please only request a Linux laptop if you have experience with this operating system and its requirements, all others, select a MacBook.
 {: .alert .alert-info}
@@ -228,6 +228,14 @@ Shared calendars and meetings:
 * Work with a global, distributed team
 * Flexible working hours
 * Access to world class founders, investors and mentors
+
+## Flexible working hours
+
+TK
+
+### Taking breaks during the day
+
+TK
 
 ## Paid time off
 
@@ -342,3 +350,9 @@ Meltano team members should mark these days off using PTO by Roots.
 
 In line with our Paid Time Off policy, we encourage Meltano team members to continue to take additional days off, as needed. 
 Family and Friends Day is a reminder to do this.
+
+# Business operations
+
+## Calendar quarters
+
+Use calendar quarters (e.g. 2021-Q4) rather than fiscal quarters (e.g. FY22-Q4) when discussing time. 
