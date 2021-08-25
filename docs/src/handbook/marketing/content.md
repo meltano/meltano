@@ -1,5 +1,14 @@
+# Content Marketing
+
+## Tools
+We use Sprout Social for most social posting and planning.
+
+### Social listening
+coming soon
 
 ## Social
+
+
 
 ## Social Channels
 
