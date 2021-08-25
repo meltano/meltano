@@ -4,6 +4,8 @@ sidebarDepth: 2
 
 # Marketing Handbook
 
+Welcome to Meltano marketing. 
+
 ## Weekly Community Activities
 The Meltano convenes regularly to generate content for community and learning purposes.
 
