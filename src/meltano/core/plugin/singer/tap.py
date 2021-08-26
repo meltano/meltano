@@ -134,16 +134,20 @@ class SingerTap(SingerPlugin):
         return {"output": "tap.out"}
 
     @hook("before_invoke")
-    def look_up_state_hook(self, plugin_invoker, exec_args=[]):
+    async def look_up_state_hook(self, plugin_invoker, exec_args):
+        """Look up state before being invoked."""
+        if exec_args is None:
+            exec_args = []
         if "--discover" in exec_args or "--help" in exec_args:
             return
 
         try:
-            self.look_up_state(plugin_invoker, exec_args)
+            self.look_up_state(plugin_invoker)
         except PluginLacksCapabilityError:
             pass
 
-    def look_up_state(self, plugin_invoker, exec_args=[]):
+    async def look_up_state(self, plugin_invoker):  # noqa: WPS231, WPS213
+        """Look up state, cleaning up and refreshing as needed."""
         if "state" not in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
                 f"Extractor '{self.name}' does not support incremental state"
@@ -213,7 +217,7 @@ class SingerTap(SingerPlugin):
             logger.warning("No state was found, complete import.")
 
     @hook("before_invoke")
-    def discover_catalog_hook(self, plugin_invoker, exec_args):
+    async def discover_catalog_hook(self, plugin_invoker, exec_args):
         """Before invoke hook to trigger catalog discovery for this tap.
 
         Args:
@@ -227,12 +231,12 @@ class SingerTap(SingerPlugin):
             return
 
         try:
-            self.discover_catalog(plugin_invoker)
+            await self.discover_catalog(plugin_invoker)
         except PluginLacksCapabilityError:
             pass
 
-    async def discover_catalog(self, plugin_invoker):
-        """Perform catalog discovery,
+    async def discover_catalog(self, plugin_invoker):  # noqa: WPS231
+        """Perform catalog discovery.
 
         Args:
             plugin_invoker: The invocation handler of the plugin instance.
@@ -297,8 +301,6 @@ class SingerTap(SingerPlugin):
         async def _streamresp(stream: asyncio.StreamReader, callback):  # noqa: WPS430
             while not stream.at_eof():
                 data = await stream.readline()
-                # line = data.decode('ascii').rstrip()
-                # logging.log(level, line)
                 callback.write(data)
 
         if not "discover" in plugin_invoker.capabilities:
@@ -335,7 +337,10 @@ class SingerTap(SingerPlugin):
             )
 
     @hook("before_invoke")
-    def apply_catalog_rules_hook(self, plugin_invoker, exec_args=[]):
+    async def apply_catalog_rules_hook(self, plugin_invoker, exec_args):
+        """Apply catalog rules before invoke."""
+        if exec_args is None:
+            exec_args = []
         if "--discover" in exec_args or "--help" in exec_args:
             return
 
