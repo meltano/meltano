@@ -61,22 +61,22 @@ class Airflow(BasePlugin):
             logging.debug(f"Saved '{str(airflow_cfg_path)}'")
 
     @hook("before_install")
-    def setup_env(self, *args, **kwargs):
-        # to make airflow installables without GPL dependency
+    async def setup_env(self, *args, **kwargs):
+        """Configure the env to make airflow installable without GPL deps."""
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
     @hook("before_configure")
-    def before_configure(self, invoker: AirflowInvoker, session):
+    async def before_configure(self, invoker: AirflowInvoker, session):  # noqa: WPS217
         """Keep the Airflow metadata database up-to-date."""
         # generate the default `airflow.cfg`
-        handle = invoker.invoke(
+        handle = await invoker.invoke_async(
             "--help",
             require_preparation=False,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
             universal_newlines=True,
         )
-        return_code = handle.wait()
+        return_code = await handle.wait()
 
         if return_code:
             raise SubprocessError("Command `airflow --help` failed", process=handle)
@@ -90,13 +90,13 @@ class Airflow(BasePlugin):
         invoker.prepare(session)
 
         # make sure we use correct db init
-        handle = invoker.invoke(
+        handle = await invoker.invoke_async(
             "version",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
         )
-        return_code = handle.wait()
+        return_code = await handle.wait()
 
         if return_code:
             raise SubprocessError("Command `airflow version` failed", process=handle)
@@ -109,13 +109,13 @@ class Airflow(BasePlugin):
             else ["db", "init"]
         )
 
-        handle = invoker.invoke(
+        handle = await invoker.invoke_async(
             *init_db_cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
         )
-        initdb = handle.wait()
+        initdb = await handle.wait()
 
         if initdb:
             raise SubprocessError(
@@ -126,7 +126,8 @@ class Airflow(BasePlugin):
         logging.debug("Completed `airflow initdb`")
 
     @hook("before_cleanup")
-    def before_cleanup(self, invoker):
+    async def before_cleanup(self, invoker):
+        """Delete the config file."""
         config_file = invoker.files["config"]
         config_file.unlink()
         logging.debug(f"Deleted configuration at {config_file}")
