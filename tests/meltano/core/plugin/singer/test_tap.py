@@ -17,9 +17,10 @@ class TestSingerTap:
     def subject(self, project_add_service):
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
-    def test_exec_args(self, subject, session, plugin_invoker_factory, tmpdir):
+    @pytest.mark.asyncio
+    async def test_exec_args(self, subject, session, plugin_invoker_factory, tmpdir):
         invoker = plugin_invoker_factory(subject)
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
 
             # when `catalog` has data
@@ -42,9 +43,10 @@ class TestSingerTap:
                 invoker.files["state"],
             ]
 
-    def test_cleanup(self, subject, session, plugin_invoker_factory):
+    @pytest.mark.asyncio
+    async def test_cleanup(self, subject, session, plugin_invoker_factory):
         invoker = plugin_invoker_factory(subject)
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             assert invoker.files["config"].exists()
 
         assert not invoker.files["config"].exists()
@@ -76,9 +78,9 @@ class TestSingerTap:
             yield new_job
             new_job.save(session)
 
-        def assert_state(state):
-            with invoker.prepared(session):
-                subject.look_up_state(invoker, [])
+        async def assert_state(state):
+            async with invoker.prepared(session):
+                await subject.look_up_state(invoker)
 
             if state:
                 assert invoker.files["state"].exists()
@@ -87,20 +89,20 @@ class TestSingerTap:
                 assert not invoker.files["state"].exists()
 
         # No state by default
-        assert_state(None)
+        await assert_state(None)
 
         # Running jobs with state are not considered
         with create_job() as job:
             job.payload["singer_state"] = {"success": True}
             job.payload_flags = Payload.STATE
 
-        assert_state(None)
+        await assert_state(None)
 
         # Successful jobs without state are not considered
         with create_job() as job:
             job.success()
 
-        assert_state(None)
+        await assert_state(None)
 
         # Successful jobs with incomplete state are considered
         with create_job() as job:
@@ -108,7 +110,7 @@ class TestSingerTap:
             job.payload_flags = Payload.INCOMPLETE_STATE
             job.success()
 
-        assert_state({"incomplete_success": True})
+        await assert_state({"incomplete_success": True})
 
         # Successful jobs with state are considered
         with create_job() as job:
@@ -116,20 +118,20 @@ class TestSingerTap:
             job.payload_flags = Payload.STATE
             job.success()
 
-        assert_state({"success": True})
+        await assert_state({"success": True})
 
         # Running jobs with state are not considered
         with create_job() as job:
             job.payload["singer_state"] = {"success": True}
             job.payload_flags = Payload.STATE
 
-        assert_state({"success": True})
+        await assert_state({"success": True})
 
         # Failed jobs without state are not considered
         with create_job() as job:
             job.fail("Whoops")
 
-        assert_state({"success": True})
+        await assert_state({"success": True})
 
         # Failed jobs with state are considered
         with create_job() as job:
@@ -137,7 +139,7 @@ class TestSingerTap:
             job.payload_flags = Payload.STATE
             job.fail("Whoops")
 
-        assert_state({"failed": True})
+        await assert_state({"failed": True})
 
         # Successful jobs with incomplete state are considered
         with create_job() as job:
@@ -146,7 +148,7 @@ class TestSingerTap:
             job.success()
 
         # Incomplete state is merged into complete state
-        assert_state({"failed": True, "success": True})
+        await assert_state({"failed": True, "success": True})
 
         # Failed jobs with incomplete state are considered
         with create_job() as job:
@@ -155,7 +157,7 @@ class TestSingerTap:
             job.fail("Whoops")
 
         # Incomplete state is merged into complete state
-        assert_state({"failed": True, "success": True, "failed_again": True})
+        await assert_state({"failed": True, "success": True, "failed_again": True})
 
         # Custom state takes precedence
         custom_state_filename = "custom_state.json"
@@ -166,11 +168,11 @@ class TestSingerTap:
             invoker.settings_service.config_override, "_state", custom_state_filename
         )
 
-        assert_state({"custom": True})
+        await assert_state({"custom": True})
 
         # With a full refresh, no state is considered
         elt_context.full_refresh = True
-        assert_state(None)
+        await assert_state(None)
 
     @pytest.mark.asyncio
     async def test_discover_catalog(  # noqa: WPS213
@@ -186,11 +188,11 @@ class TestSingerTap:
             future.set_result(catalog_path.open("w").write('{"discovered": true}'))
             return future
 
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             with mock.patch.object(
                 SingerTap, "run_discovery", side_effect=mock_discovery
             ) as mocked_run_discovery:
-                await subject.discover_catalog(invoker, [])
+                await subject.discover_catalog(invoker)
 
                 assert mocked_run_discovery.called
                 assert json.loads(catalog_path.read_text()) == {"discovered": True}
@@ -198,18 +200,18 @@ class TestSingerTap:
 
                 # If there is no cache key, discovery is invoked again
                 mocked_run_discovery.reset_mock()
-                await subject.discover_catalog(invoker, [])
+                await subject.discover_catalog(invoker)
 
                 assert json.loads(catalog_path.read_text()) == {"discovered": True}
                 assert not catalog_cache_key_path.exists()
 
                 # Apply catalog rules to store the cache key
-                subject.apply_catalog_rules(invoker, [])
+                subject.apply_catalog_rules(invoker)
                 assert catalog_cache_key_path.exists()
 
                 # If the cache key hasn't changed, discovery isn't invoked again
                 mocked_run_discovery.reset_mock()
-                await subject.discover_catalog(invoker, [])
+                await subject.discover_catalog(invoker)
 
                 mocked_run_discovery.assert_not_called()
                 assert json.loads(catalog_path.read_text()) == {"discovered": True}
@@ -218,7 +220,7 @@ class TestSingerTap:
                 # If the cache key no longer matches, discovery is invoked again
                 mocked_run_discovery.reset_mock()
                 catalog_cache_key_path.write_text("bogus")
-                await subject.discover_catalog(invoker, [])
+                await subject.discover_catalog(invoker)
 
                 assert mocked_run_discovery.called
                 assert json.loads(catalog_path.read_text()) == {"discovered": True}
@@ -240,12 +242,15 @@ class TestSingerTap:
             custom_catalog_filename,
         )
 
-        with invoker.prepared(session):
-            await subject.discover_catalog(invoker, [])
+        async with invoker.prepared(session):
+            await subject.discover_catalog(invoker)
 
         assert invoker.files["catalog"].read_text() == '{"custom": true}'
 
-    def test_apply_select(self, session, plugin_invoker_factory, subject, monkeypatch):
+    @pytest.mark.asyncio
+    async def test_apply_select(
+        self, session, plugin_invoker_factory, subject, monkeypatch
+    ):
         invoker = plugin_invoker_factory(subject)
 
         catalog_path = invoker.files["catalog"]
@@ -274,7 +279,7 @@ class TestSingerTap:
         ):
             reset_catalog()
 
-            with invoker.prepared(session):
+            async with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker)
 
             # When `select` isn't set in meltano.yml or discovery.yml, select all
@@ -294,7 +299,7 @@ class TestSingerTap:
                 ["UniqueEntitiesName.name"],
             )
             invoker.settings_service._setting_defs = None
-            with invoker.prepared(session):
+            async with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker)
 
             # When `select` is set in discovery.yml, use the selection
@@ -312,7 +317,7 @@ class TestSingerTap:
                 invoker.plugin.extras, "select", ["UniqueEntitiesName.code"]
             )
 
-            with invoker.prepared(session):
+            async with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker)
 
             # `select` set in meltano.yml takes precedence over discovery.yml
@@ -323,7 +328,8 @@ class TestSingerTap:
                 ["UniqueEntitiesName", ["properties", "code"], "selected", True],
             )
 
-    def test_apply_catalog_rules(
+    @pytest.mark.asyncio
+    async def test_apply_catalog_rules(
         self, session, plugin_invoker_factory, subject, monkeypatch
     ):
         invoker = plugin_invoker_factory(subject)
@@ -401,7 +407,7 @@ class TestSingerTap:
             # Pretend `config` is set in meltano.yml
             monkeypatch.setattr(invoker.plugin, "config", config)
 
-            with invoker.prepared(session):
+            async with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker)
 
                 cache_key = invoker.plugin.catalog_cache_key(invoker)
@@ -464,7 +470,7 @@ class TestSingerTap:
             config_override = invoker.settings_service.config_override
             monkeypatch.setitem(config_override, "_catalog", "custom_catalog.json")
 
-            with invoker.prepared(session):
+            async with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker)
 
                 cache_key = invoker.plugin.catalog_cache_key(invoker)
@@ -485,7 +491,8 @@ class TestSingerTap:
             assert not catalog_cache_key_path.exists()
             assert cache_key is None
 
-    def test_apply_catalog_rules_select_filter(
+    @pytest.mark.asyncio
+    async def test_apply_catalog_rules_select_filter(
         self, session, plugin_invoker_factory, subject, monkeypatch
     ):
         invoker = plugin_invoker_factory(subject)
@@ -526,13 +533,13 @@ class TestSingerTap:
             ]
         }
 
-        def selected_properties():
+        async def selected_properties():
             catalog_path = invoker.files["catalog"]
 
             with catalog_path.open("w") as catalog_file:
                 json.dump(base_catalog, catalog_file)
 
-            with invoker.prepared(session):
+            async with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker, [])
 
             with catalog_path.open() as catalog_file:
@@ -550,7 +557,7 @@ class TestSingerTap:
         )
 
         # `one` is always included because it has `inclusion: automatic`
-        assert selected_properties() == {
+        assert await selected_properties() == {
             "one": {"one"},
             "three": {"one", "three"},
             "five": {"one", "two", "three"},
@@ -558,91 +565,93 @@ class TestSingerTap:
 
         # Simple inclusion
         monkeypatch.setitem(config_override, "_select_filter", ["three"])
-        assert selected_properties() == {"three": {"one", "three"}}
+        assert await selected_properties() == {"three": {"one", "three"}}
 
         # Simple exclusion
         monkeypatch.setitem(config_override, "_select_filter", ["!three"])
-        assert selected_properties() == {
+        assert await selected_properties() == {
             "one": {"one"},
             "five": {"one", "two", "three"},
         }
 
         # Wildcard inclusion
         monkeypatch.setitem(config_override, "_select_filter", ["t*"])
-        assert selected_properties() == {"three": {"one", "three"}}
+        assert await selected_properties() == {"three": {"one", "three"}}
 
         # Wildcard exclusion
         monkeypatch.setitem(config_override, "_select_filter", ["!t*"])
-        assert selected_properties() == {
+        assert await selected_properties() == {
             "one": {"one"},
             "five": {"one", "two", "three"},
         }
 
         # Multiple inclusion
         monkeypatch.setitem(config_override, "_select_filter", ["three", "five"])
-        assert selected_properties() == {
+        assert await selected_properties() == {
             "three": {"one", "three"},
             "five": {"one", "two", "three"},
         }
 
         # Multiple exclusion
         monkeypatch.setitem(config_override, "_select_filter", ["!three", "!five"])
-        assert selected_properties() == {"one": {"one"}}
+        assert await selected_properties() == {"one": {"one"}}
 
         # Multiple wildcard inclusion
         monkeypatch.setitem(config_override, "_select_filter", ["t*", "f*"])
-        assert selected_properties() == {
+        assert await selected_properties() == {
             "three": {"one", "three"},
             "five": {"one", "two", "three"},
         }
 
         # Multiple wildcard exclusion
         monkeypatch.setitem(config_override, "_select_filter", ["!t*", "!f*"])
-        assert selected_properties() == {"one": {"one"}}
+        assert await selected_properties() == {"one": {"one"}}
 
         # Mixed inclusion and exclusion
         monkeypatch.setitem(config_override, "_select_filter", ["*e", "!*ee"])
-        assert selected_properties() == {
+        assert await selected_properties() == {
             "one": {"one"},
             "five": {"one", "two", "three"},
         }
 
-    def test_apply_catalog_rules_invalid(
+    @pytest.mark.asyncio
+    async def test_apply_catalog_rules_invalid(
         self, session, plugin_invoker_factory, subject
     ):
         invoker = plugin_invoker_factory(subject)
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             invoker.files["catalog"].open("w").write("this is invalid json")
 
             with pytest.raises(PluginExecutionError, match=r"invalid"):
                 subject.apply_catalog_rules(invoker, [])
 
-    def test_catalog_cache_key(
+    @pytest.mark.asyncio
+    async def test_catalog_cache_key(
         self, session, plugin_invoker_factory, subject, monkeypatch
     ):
         invoker = plugin_invoker_factory(subject)
         config_override = invoker.settings_service.config_override
 
-        def cache_key():
-            with invoker.prepared(session):
+        async def cache_key():
+            async with invoker.prepared(session):
                 return subject.catalog_cache_key(invoker)
 
         # No key if _catalog is set
         monkeypatch.setitem(config_override, "_catalog", "catalog.json")
-        assert cache_key() is None
+        assert await cache_key() is None
 
         # Key is set if _catalog is not set
         monkeypatch.setitem(config_override, "_catalog", None)
-        key = cache_key()
+        key = await cache_key()
         assert key is not None
 
         # Key doesn't change if nothing has changed
-        assert cache_key() == key
+        assert await cache_key() == key
 
         # Key changes if config changes
         monkeypatch.setitem(config_override, "test", "foo")
 
-        new_key = cache_key()
+        new_key = await cache_key()
         assert new_key != key
         key = new_key
 
@@ -651,7 +660,7 @@ class TestSingerTap:
             config_override, "_schema", {"stream": {"property": {"type": "string"}}}
         )
 
-        new_key = cache_key()
+        new_key = await cache_key()
         assert new_key != key
         key = new_key
 
@@ -662,21 +671,21 @@ class TestSingerTap:
             {"stream": {"property": {"is-replication-key": True}}},
         )
 
-        new_key = cache_key()
+        new_key = await cache_key()
         assert new_key != key
         key = new_key
 
         # Key does not change if _select changes
         monkeypatch.setitem(config_override, "_select", ["stream"])
-        assert cache_key() == key
+        assert await cache_key() == key
 
         # Key does not change if _select_filter changes
         monkeypatch.setitem(config_override, "_select_filter", ["stream"])
-        assert cache_key() == key
+        assert await cache_key() == key
 
         # No key if pip_url is editable
         monkeypatch.setattr(invoker.plugin, "pip_url", "-e local")
-        assert cache_key() is None
+        assert await cache_key() is None
 
     @pytest.mark.asyncio
     async def test_run_discovery(
