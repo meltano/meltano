@@ -61,7 +61,7 @@ async def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_
         invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
         async with invoker.prepared(session):
             if dump:
-                dump_file(invoker, dump)
+                await dump_file(invoker, dump)
                 exit_code = 0
             else:
                 handle = await invoker.invoke_async(*plugin_args, command=command_name)
@@ -102,9 +102,10 @@ def do_list_commands(plugin):
         click.echo(desc)
 
 
-def dump_file(invoker, file_id):
+async def dump_file(invoker, file_id):
+    """Dump file."""
     try:
-        content = invoker.dump(file_id)
+        content = await invoker.dump(file_id)
         print(content)
     except FileNotFoundError as err:
         raise CliError(f"Could not find {file_id}") from err

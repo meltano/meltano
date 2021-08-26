@@ -87,7 +87,7 @@ class Airflow(BasePlugin):
         # we've changed the configuration here, so we need to call
         # prepare again on the invoker so it re-reads the configuration
         # for the Airflow plugin
-        invoker.prepare(session)
+        await invoker.prepare(session)
 
         # make sure we use correct db init
         handle = await invoker.invoke_async(

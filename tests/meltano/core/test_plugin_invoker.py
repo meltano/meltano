@@ -115,7 +115,8 @@ class TestPluginInvoker:
             ("/apps/tap-test", lambda exe: exe == "/apps/tap-test"),
         ],
     )
-    def test_expand_nonpip_command_exec_args(
+    @pytest.mark.asyncio
+    async def test_expand_nonpip_command_exec_args(
         self, nonpip_plugin_invoker, session, executable_str, assert_fn
     ):
         nonpip_plugin_invoker.plugin.executable = executable_str
@@ -123,7 +124,7 @@ class TestPluginInvoker:
 
         assert assert_fn(exec_args[0])
 
-        nonpip_plugin_invoker.prepare(session)
+        await nonpip_plugin_invoker.prepare(session)
         env = nonpip_plugin_invoker.env()
 
         assert "VIRTUAL_ENV" not in env

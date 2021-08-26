@@ -10,6 +10,7 @@ from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.utils import click_run_async
 
 from . import cli
 from .params import pass_project
@@ -47,10 +48,12 @@ def selection_mark(selection):
 @click.option("--all", is_flag=True)
 @click.option("--exclude", is_flag=True)
 @pass_project(migrate=True)
-def select(project, extractor, entities_filter, attributes_filter, **flags):
+@click_run_async
+async def select(project, extractor, entities_filter, attributes_filter, **flags):
+    """Execute the meltano select command."""
     try:
         if flags["list"]:
-            show(project, extractor, show_all=flags["all"])
+            await show(project, extractor, show_all=flags["all"])
         else:
             add(
                 project,
@@ -76,13 +79,14 @@ def add(project, extractor, entities_filter, attributes_filter, exclude=False):
     select_service.select(entities_filter, attributes_filter, exclude)
 
 
-def show(project, extractor, show_all=False):
+async def show(project, extractor, show_all=False):
+    """Show selected."""
     _, Session = project_engine(project)
     select_service = SelectService(project, extractor)
 
     session = Session()
     try:
-        list_all = select_service.list_all(session)
+        list_all = await select_service.list_all(session)
     finally:
         session.close()
 

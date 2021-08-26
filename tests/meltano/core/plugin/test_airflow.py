@@ -19,7 +19,10 @@ class TestAirflow:
         ) as install_plugin:
             return project_add_service.add(PluginType.ORCHESTRATORS, "airflow")
 
-    def test_before_configure(self, subject, project, session, plugin_invoker_factory):
+    @pytest.mark.asyncio
+    async def test_before_configure(
+        self, subject, project, session, plugin_invoker_factory
+    ):
         run_dir = project.run_dir("airflow")
 
         handle_mock = mock.Mock()
@@ -59,7 +62,7 @@ class TestAirflow:
         ) as configure:
             invoker: AirflowInvoker = plugin_invoker_factory(subject)
             # This ends up calling subject.before_configure
-            with invoker.prepared(session):
+            async with invoker.prepared(session):
                 commands = [
                     popen_args
                     for _, (popen_args, *_), kwargs in popen.mock_calls

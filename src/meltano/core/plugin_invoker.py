@@ -281,9 +281,10 @@ class PluginInvoker:
                 env=popen_env,
             )
 
-    def dump(self, file_id):
+    async def dump(self, file_id):
+        """Dump a given file id."""
         try:
-            with self._invoke():
+            async with self._invoke():
                 return self.files[file_id].read_text()
         except ExecutableNotFoundError as err:
             # Unwrap FileNotFoundError
