@@ -105,17 +105,21 @@ class VenvService:
         self.venv = VirtualEnv(self.project.venvs_dir(namespace, name))
         self.python_path = str(self.venv.bin_dir.joinpath("python"))
 
-    async def clean_install(self, *pip_urls):
+    async def install(self, *pip_urls, clean: bool = False):
         """
         Wipe and recreate a virtual environment and install the given `pip_urls` packages in it.
 
         :raises: SubprocessError: if any of the commands fail.
         """
-        self.clean()
-        self.clean_run_files()
-        await self.create()
+        upgrade = Path(self.python_path).exists() and not clean
+        if not upgrade:
+            self.clean()
+            self.clean_run_files()
+            await self.create()
         await self.upgrade_pip()
-        await asyncio.gather(*[self.install(pip_url) for pip_url in pip_urls])
+        await asyncio.gather(
+            *[self.pip_install(pip_url, upgrade=upgrade) for pip_url in pip_urls]
+        )
 
     def clean_run_files(self):
         """Destroy cached configuration files, if they exist."""
@@ -182,7 +186,7 @@ class VenvService:
                 "Failed to upgrade pip to the latest version.", err.process
             )
 
-    async def install(self, pip_url: str):
+    async def pip_install(self, pip_url: str, upgrade: bool):
         """
         Install a package using `pip` in the proper virtual environment.
 
@@ -195,14 +199,18 @@ class VenvService:
         logger.debug(
             f"Installing '{pip_url}' into virtual environment for '{self.namespace}/{self.name}'"
         )
+        args = [
+            self.python_path,
+            "-m",
+            "pip",
+            "install",
+        ]
+        if upgrade:
+            args.append("--upgrade")
+        args.append(*pip_url.split(" "))
+
         try:
-            return await exec_async(
-                self.python_path,
-                "-m",
-                "pip",
-                "install",
-                *pip_url.split(" "),
-            )
+            return await exec_async(*args)
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(
                 f"Failed to install plugin '{self.name}'.", err.process

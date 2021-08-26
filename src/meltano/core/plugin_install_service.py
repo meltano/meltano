@@ -176,7 +176,9 @@ class PluginInstallService:
         """
         return run_async(
             self.install_plugin_async(
-                plugin, reason=reason, compile_models=compile_models
+                plugin,
+                reason=reason,
+                compile_models=compile_models,
             )
         )
 
@@ -269,4 +271,4 @@ class PipPluginInstaller:
 
     async def install(self, reason):
         """Install the plugin into the virtual environment using pip."""
-        return await self.venv_service.clean_install(self.plugin.formatted_pip_url)
+        return await self.venv_service.install(self.plugin.formatted_pip_url)

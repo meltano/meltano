@@ -24,7 +24,7 @@ class TestVenvService:
 
     @pytest.mark.asyncio
     async def test_clean_install(self, project, subject: VenvService):
-        await subject.clean_install("example")
+        await subject.install("example", clean=True)
         venv_dir = subject.project.venvs_dir("namespace", "name")
 
         # ensure the venv is created
@@ -62,6 +62,38 @@ class TestVenvService:
             "bin",
             "some_exe",
         )
+
+    @pytest.mark.asyncio
+    async def test_install(self, project, subject: VenvService):
+        # Make sure the venv exists already
+        await subject.install("example", clean=True)
+        venv_dir = subject.project.venvs_dir("namespace", "name")
+
+        # remove the package, then check that after a regular install the package exists
+        run = subprocess.run(
+            [
+                venv_dir.joinpath("bin/python"),
+                "-m",
+                "pip",
+                "uninstall",
+                "--yes",
+                "example",
+            ],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+
+        await subject.install("example")
+
+        # ensure that the package is installed
+        run = subprocess.run(
+            [venv_dir.joinpath("bin/python"), "-m", "pip", "list"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        assert re.search(r"example\s+0\.1\.0", str(run.stdout))
 
 
 class TestVirtualEnv:
