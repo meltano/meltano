@@ -173,9 +173,9 @@ class TestSingerTap:
         assert_state(None)
 
     @pytest.mark.asyncio
-    async def test_discover_catalog(
+    async def test_discover_catalog(  # noqa: WPS213
         self, session, plugin_invoker_factory, subject
-    ):  # noqa: WPS213
+    ):
         invoker = plugin_invoker_factory(subject)
 
         catalog_path = invoker.files["catalog"]

@@ -12,7 +12,6 @@ from hashlib import sha1
 from jsonschema import Draft4Validator
 from meltano.core.behavior.hookable import hook
 from meltano.core.job import JobFinder, Payload
-from meltano.core.logging import capture_subprocess_output
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition, SettingKind
@@ -142,7 +141,7 @@ class SingerTap(SingerPlugin):
             return
 
         try:
-            self.look_up_state(plugin_invoker)
+            await self.look_up_state(plugin_invoker)
         except PluginLacksCapabilityError:
             pass
 
@@ -298,10 +297,16 @@ class SingerTap(SingerPlugin):
             catalog_path: Where discovery output should be written.
         """
 
-        async def _streamresp(stream: asyncio.StreamReader, callback):  # noqa: WPS430
+        async def _streamresp(  # noqa: WPS430
+            stream: asyncio.StreamReader, callback, write_str=False
+        ):
             while not stream.at_eof():
                 data = await stream.readline()
-                callback.write(data)
+                if write_str:
+                    line = data.decode("ascii").rstrip()
+                    callback.write(line)
+                else:
+                    callback.write(data)
 
         if not "discover" in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
@@ -312,15 +317,15 @@ class SingerTap(SingerPlugin):
             with catalog_path.open(mode="wb") as catalog:
                 handle = await plugin_invoker.invoke_async(
                     "--discover",
-                    stdout=catalog,
+                    stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE,
-                    universal_newlines=True,
+                    universal_newlines=False,
                 )
                 await asyncio.wait(
                     [
                         _streamresp(handle.stdout, catalog),
                         # TODO: come back and replace with debug log capture
-                        capture_subprocess_output(handle.stderr, sys.stderr),
+                        _streamresp(handle.stderr, sys.stderr, write_str=True),
                         handle.wait(),
                     ],
                     return_when=asyncio.ALL_COMPLETED,

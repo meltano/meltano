@@ -204,7 +204,7 @@ class PluginInstallService:
             return state
 
         try:
-            with plugin.trigger_hooks("install", self, plugin, reason):
+            async with plugin.trigger_hooks("install", self, plugin, reason):
                 await installer_factory(self.project, plugin).install(reason)
                 state = PluginInstallState(
                     plugin=plugin, reason=reason, status=PluginInstallStatus.SUCCESS

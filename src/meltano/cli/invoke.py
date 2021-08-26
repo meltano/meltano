@@ -8,6 +8,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import UnknownCommandError, invoker_factory
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.utils import click_run_async
 
 from . import cli
 from .params import pass_project
@@ -35,7 +36,8 @@ logger = logging.getLogger(__name__)
 @click.argument("plugin_name", metavar="PLUGIN_NAME[:COMMAND_NAME]")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
 @pass_project(migrate=True)
-def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_args):
+@click_run_async
+async def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_args):
     """Invoke the plugin's executable with specified arguments."""
     try:
         plugin_name, command_name = plugin_name.split(":")
@@ -57,14 +59,14 @@ def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_args):
 
     try:
         invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             if dump:
                 dump_file(invoker, dump)
                 exit_code = 0
             else:
-                handle = invoker.invoke(*plugin_args, command=command_name)
+                handle = await invoker.invoke_async(*plugin_args, command=command_name)
                 with propagate_stop_signals(handle):
-                    exit_code = handle.wait()
+                    exit_code = await handle.wait()
 
     except UnknownCommandError as err:
         raise click.BadArgumentUsage(err) from err
