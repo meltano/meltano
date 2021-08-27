@@ -206,8 +206,8 @@ class VenvService:
             "install",
         ]
         if upgrade:
-            args.append("--upgrade")
-        args.append(*pip_url.split(" "))
+            args += ["--upgrade"]
+        args += pip_url.split(" ")
 
         try:
             return await exec_async(*args)

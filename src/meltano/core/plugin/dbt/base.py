@@ -27,7 +27,7 @@ class DbtTransformPluginInstaller:
         self.project = project
         self.plugin = plugin
 
-    async def install(self, reason):
+    async def install(self, reason, clean):
         """Install the transform into the project."""
         if reason in (PluginInstallReason.ADD, PluginInstallReason.UPGRADE):
             try:
