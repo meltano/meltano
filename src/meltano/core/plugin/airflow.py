@@ -74,7 +74,6 @@ class Airflow(BasePlugin):
             require_preparation=False,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
-            universal_newlines=True,
         )
         return_code = await handle.wait()
 
@@ -94,15 +93,14 @@ class Airflow(BasePlugin):
             "version",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            universal_newlines=True,
         )
-        return_code = await handle.wait()
 
-        if return_code:
+        stdout, stderr = await handle.communicate()
+
+        if handle.returncode:
             raise SubprocessError("Command `airflow version` failed", process=handle)
 
-        version = handle.stdout.read()
-
+        version = stdout.decode()
         init_db_cmd = (
             ["initdb"]
             if StrictVersion(version) < StrictVersion("2.0.0")
@@ -113,7 +111,6 @@ class Airflow(BasePlugin):
             *init_db_cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            universal_newlines=True,
         )
         initdb = await handle.wait()
 

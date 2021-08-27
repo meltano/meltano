@@ -44,8 +44,6 @@ async def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_
     except ValueError:
         command_name = None
 
-    print("DEBUG - IN INVOKE")
-
     plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
     _, Session = project_engine(project)
