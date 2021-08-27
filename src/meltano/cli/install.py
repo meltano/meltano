@@ -15,7 +15,11 @@ from .utils import CliError, add_related_plugins, install_plugins
 )
 @click.argument("plugin_name", nargs=-1, required=False)
 @click.option("--include-related", is_flag=True)
-@click.option("--clean", is_flag=True)
+@click.option(
+    "--clean",
+    is_flag=True,
+    help="Completely reinstall a plugin rather than simply upgrading if necessary.",
+)
 @click.option(
     "--parallelism",
     "-p",
