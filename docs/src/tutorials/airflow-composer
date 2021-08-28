@@ -1,0 +1,118 @@
+
+# Use Meltano with Composer (GCP hosted Airflow)
+
+Google Compute Platform has a hosted Airflow offering called [Cloud Composer](https://cloud.google.com/composer). This sets up a dedicated Kubernetes cluster, installs Airflow, and manages all of the database and UI components required to operate Airflow.
+
+This tutorial describes how to use Meltano in a Composer environment, utilizing the KubernetesOperator.
+
+## KubernetesOperator
+
+The KubernetesOperator allows you to run a DAG step inside of a Kubernetes Pod. This lets you bundle all of your Python dependencies inside a Docker container, keeping them separate from the main Airflow Python environment.
+
+[GCP Docs](https://cloud.google.com/composer/docs/how-to/using/using-kubernetes-pod-operator)
+
+###Dockerfile
+
+```Dockerfile
+FROM python:3.7.7-slim-stretch
+
+RUN apt-get update && apt-get install -y \
+    # Required for building python wheels.
+    build-essential \
+    # Required for pulling taps/targets from git repositories.
+    git \
+    --no-install-recommends && \
+    # Keep this layer as thin as possible by cleaning up unnecessary files.
+    rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+COPY . /usr/src/app/
+RUN pip install -r /usr/src/app/requirements.txt
+
+RUN meltano install
+
+ENTRYPOINT meltano
+
+# Substitute your taps/targets here, or override the `cmd` in the DAG nodes.
+CMD ["elt", "tap-gitlab", "target-postgres", "--transform", "run"]
+```
+
+After building and pushing this docker container, and ensuring that your Composer cluster's Node service-account has permission to access your private registry, you can set up the k8s DAG as follows. This is copied from the GCP Composer docs.
+
+```python
+import datetime
+
+from airflow import models
+# from airflow.contrib.kubernetes import secret
+from airflow.contrib.operators import kubernetes_pod_operator
+
+
+# A Secret is an object that contains a small amount of sensitive data such as
+# a password, a token, or a key. Such information might otherwise be put in a
+# Pod specification or in an image; putting it in a Secret object allows for
+# more control over how it is used, and reduces the risk of accidental
+# exposure.
+
+# TODO: Wire up secrets to load tap/target config.
+# secret_env = secret.Secret(
+#     # Expose the secret as environment variable.
+#     deploy_type='env',
+#     # The name of the environment variable, since deploy_type is `env` rather
+#     # than `volume`.
+#     deploy_target='SQL_CONN',
+#     # Name of the Kubernetes Secret
+#     secret='airflow-secrets',
+#     # Key of a secret stored in this Secret object
+#     key='sql_alchemy_conn'
+# )
+
+YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
+
+# If a Pod fails to launch, or has an error occur in the container, Airflow
+# will show the task as failed, as well as contain all of the task logs
+# required to debug.
+with models.DAG(
+        dag_id='k8s_example',
+        schedule_interval=datetime.timedelta(days=1),
+        start_date=YESTERDAY) as dag:
+
+    # Only name, namespace, image, and task_id are required to create a
+    # KubernetesPodOperator. In Cloud Composer, currently the operator defaults
+    # to using the config file found at `/home/airflow/composer_kube_config if
+    # no `config_file` parameter is specified. By default it will contain the
+    # credentials for Cloud Composer's Google Kubernetes Engine cluster that is
+    # created upon environment creation.
+
+    kubernetes_min_pod = kubernetes_pod_operator.KubernetesPodOperator(
+        # The ID specified for the task.
+        task_id='meltano-k8s-example',
+        # Name of task you want to run, used to generate Pod ID.
+        name='meltano-k8s-example',
+        # Entrypoint of the container, if not specified the Docker container's
+        # entrypoint is used. The cmds parameter is templated.
+        cmds=['elt', 'tap-foo', 'target-bar', '--transform', 'run'],
+        # The namespace to run within Kubernetes, default namespace is
+        # `default`. There is the potential for the resource starvation of
+        # Airflow workers and scheduler within the Cloud Composer environment,
+        # the recommended solution is to increase the amount of nodes in order
+        # to satisfy the computing requirements. Alternatively, launching pods
+        # into a custom namespace will stop fighting over resources.
+        namespace='default',
+        # Docker image specified. Defaults to hub.docker.com, but any fully
+        # qualified URLs will point to a custom repository. Supports private
+        # gcr.io images if the Composer Environment is under the same
+        # project-id as the gcr.io images and the service account that Composer
+        # uses has permission to access the Google Container Registry
+        # (the default service account has permission)
+        image='us.gcr.io/qwil-build/meltano-k8s:alpha1',
+        # secrets=[secret_env],
+    )
+```
+
+Finally, sync the dag file to the GCP storage bucket:
+
+```bash
+gsutil rsync k8s_dag.py gs://composer-bucket-abc123/dags
+```
