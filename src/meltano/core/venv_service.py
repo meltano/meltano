@@ -9,8 +9,6 @@ import sys
 from asyncio.subprocess import Process
 from collections import namedtuple
 from pathlib import Path
-from types import TracebackType
-from typing import Callable, Tuple, Type
 
 from .error import AsyncSubprocessError
 from .project import Project
@@ -31,22 +29,7 @@ NT = VenvSpecs(
     site_packages_dir=os.path.join("Lib", "site-packages"),
 )
 
-
-def log_rmtree_error(
-    op: Callable,
-    path: Path,
-    exc_info: Tuple[Type[BaseException], BaseException, TracebackType],
-):
-    """Log an exception when shutil.rmtree fails.
-
-    Args:
-        op: OS operation that failed
-        path: Directory path
-        exc_info: Exception raised by shutil.rmtree
-    """
-    logger.debug(
-        "Failed to remove directory tree %s", path, exc_info=exc_info  # noqa: WPS323
-    )
+PIP_PACKAGES = ("pip", "setuptools", "wheel")
 
 
 class VirtualEnv:
@@ -111,21 +94,33 @@ class VenvService:
 
         :raises: SubprocessError: if any of the commands fail.
         """
+        # clean up deprecated feature
+        meltano_pth_path = self.venv.site_packages_dir.joinpath("meltano_venv.pth")
+        if meltano_pth_path.exists():
+            clean = True
+
         upgrade = Path(self.python_path).exists() and not clean
         if not upgrade:
             self.clean()
             self.clean_run_files()
             await self.create()
-        await self.upgrade_pip()
-        await asyncio.gather(
-            *[self.pip_install(pip_url, upgrade=upgrade) for pip_url in pip_urls]
+            await self.upgrade_pip()
+
+        pip_urls = [pip_url for arg in pip_urls for pip_url in arg.split(" ")]
+        if upgrade:
+            pip_urls = [ *PIP_PACKAGES, *pip_urls ]
+        logger.debug(
+            f"Installing '{' '.join(pip_urls)}' into virtual environment for '{self.namespace}/{self.name}'"  # noqa: WPS221
         )
+        await self.pip_install(*pip_urls, upgrade=upgrade)
 
     def clean_run_files(self):
         """Destroy cached configuration files, if they exist."""
-        shutil.rmtree(
-            self.project.run_dir(self.name, make_dirs=False), onerror=log_rmtree_error
-        )
+        try:
+            shutil.rmtree(self.project.run_dir(self.name, make_dirs=False))
+        except FileNotFoundError:
+            logger.debug("No cached configuration files to remove")
+            pass
 
     def clean(self):
         """Destroy the virtual environment, if it exists."""
@@ -170,35 +165,20 @@ class VenvService:
         :raises: SubprocessError: if the command fails.
         """
         logger.debug(f"Upgrading pip for '{self.namespace}/{self.name}'")
+
         try:
-            return await exec_async(
-                self.python_path,
-                "-m",
-                "pip",
-                "install",
-                "--upgrade",
-                "pip",
-                "setuptools",
-                "wheel",
-            )
+            return await self.pip_install(*PIP_PACKAGES, upgrade=True)
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(
                 "Failed to upgrade pip to the latest version.", err.process
             )
 
-    async def pip_install(self, pip_url: str, upgrade: bool):
+    async def pip_install(self, *pip_urls: str, upgrade: bool = False):
         """
         Install a package using `pip` in the proper virtual environment.
 
         :raises: AsyncSubprocessError: if the command fails.
         """
-        meltano_pth_path = self.venv.site_packages_dir.joinpath("meltano_venv.pth")
-        if meltano_pth_path.exists():
-            os.remove(meltano_pth_path)
-
-        logger.debug(
-            f"Installing '{pip_url}' into virtual environment for '{self.namespace}/{self.name}'"
-        )
         args = [
             self.python_path,
             "-m",
@@ -207,7 +187,7 @@ class VenvService:
         ]
         if upgrade:
             args += ["--upgrade"]
-        args += pip_url.split(" ")
+        args += pip_urls
 
         try:
             return await exec_async(*args)
