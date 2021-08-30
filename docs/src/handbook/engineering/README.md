@@ -313,7 +313,7 @@ Listed here is a map of where to go to support each component of our website pro
 
 ### Domain Leases
 
-Domains are leased from AWS and their administration is managed via our Meltano AWS account.
+Domains are typically leased from AWS and their administration is managed via our Meltano AWS account. `meltanodata.com` and `singerhub.io` are leased from Namecheap.
 
 ### DNS and Routing Rules
 
@@ -329,7 +329,7 @@ Domains are leased from AWS and their administration is managed via our Meltano 
   website file store.
 - `sdk.meltano.com` is served by `readthedocs.org` (this is not the same
   as `readthedocs.com`)
-- `hub.meltano.com` is served by Gitlab Pages.
+- `hub.meltano.com` is served by GitLab Pages.
 
 ## Outages & escalation
 
