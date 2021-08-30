@@ -128,6 +128,13 @@ If appropriate, an issue should have a stage label (one of the letters in "melta
 The value of these labels is under discussion as forcing them to fit the Meltano acronym may not be optimal. 
 We want a way to indicate the part of Meltano specifically that the work applies to, such as transformation, integration, etc.
 
+#### Community Engagement and Marketing Labels
+
+- `Accepting Merge Requests` for issues that are ready to be picked up by a community contributor
+- `Marketing::Blog Feature` for issues which we think may deserve a blog post feature, and/or other promotion on social channels
+- `Community-Contributed MRs` for issues which have attached MRs from the community (used in prioritization and monitoring)
+- `Awaiting Action::Author` for community-contributed issues and MRs which are pending an action from the original author
+
 #### Other Labels
 
 - `Discussion` for issues that require more discussion
@@ -135,7 +142,6 @@ We want a way to indicate the part of Meltano specifically that the work applies
 - `Community Support`
 - `CLI` or `UI` for issues specifically concerning the CLI or UI
 - `Documentation` for new or updated documentation
-- `Accepting Merge Requests` for issues that are ready to be picked up by a community contributor
 - `Integrations` for issues relating to integrations with other open source data tools, typically as plugins
 - `Configuration` for issues relating to configuration
 - `Plugin Management` for issues relating to plugin management
