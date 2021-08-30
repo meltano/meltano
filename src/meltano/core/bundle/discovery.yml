@@ -622,6 +622,8 @@ extractors:
       - catalog
       - discover
       - state
+    select:
+      - commits.*
     settings_group_validation:
       - ['api_url', 'groups', 'start_date']
       - ['api_url', 'projects', 'start_date']

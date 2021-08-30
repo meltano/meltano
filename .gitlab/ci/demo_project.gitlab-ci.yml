@@ -23,3 +23,35 @@ demo_project_forks:
     - branches@meltano/meltano
     - tags@meltano/meltano
   when: manual
+
+demo_project_discovery:
+  stage: test
+  variables:
+    MELTANO_DISCOVERY_URL: https://gitlab.com/meltano/meltano/-/raw/$CI_COMMIT_SHA/src/meltano/core/bundle/discovery.yml
+  trigger:
+    project: meltano/demo-project
+    strategy: depend
+  only:
+    changes:
+      - src/meltano/core/bundle/discovery.yml
+    refs:
+      - branches@meltano/meltano
+      - tags@meltano/meltano
+
+demo_project_discovery_forks:
+  stage: test
+  script:
+    - >
+      curl
+      --request POST
+      --form "token=$CI_JOB_TOKEN"
+      --form "variables[MELTANO_DISCOVERY_URL]=https://gitlab.com/meltano/meltano/-/raw/$CI_COMMIT_SHA/src/meltano/core/bundle/discovery.yml"
+      --form ref=master
+      https://gitlab.com/api/v4/projects/meltano%2fdemo-project/trigger/pipeline
+  only:
+    changes:
+      - src/meltano/core/bundle/discovery.yml
+  except:
+    - branches@meltano/meltano
+    - tags@meltano/meltano
+  when: manual
