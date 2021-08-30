@@ -8,7 +8,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import UnknownCommandError, invoker_factory
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.utils import click_run_async
+from meltano.core.utils import run_async
 
 from . import cli
 from .params import pass_project
@@ -36,8 +36,7 @@ logger = logging.getLogger(__name__)
 @click.argument("plugin_name", metavar="PLUGIN_NAME[:COMMAND_NAME]")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
 @pass_project(migrate=True)
-@click_run_async
-async def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_args):
+def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_args):
     """Invoke the plugin's executable with specified arguments."""
     try:
         plugin_name, command_name = plugin_name.split(":")
@@ -57,8 +56,17 @@ async def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_
         do_list_commands(plugin)
         return
 
+    invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
+    exit_code = run_async(
+        _invoke(invoker, project, plugin_name, plugin_args, session, dump, command_name)
+    )
+    sys.exit(exit_code)
+
+
+async def _invoke(
+    invoker, project, plugin_name, plugin_args, session, dump, command_name
+):
     try:
-        invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
         async with invoker.prepared(session):
             if dump:
                 await dump_file(invoker, dump)
@@ -81,7 +89,7 @@ async def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_
         plugin_name=plugin_name, plugin_args=" ".join(plugin_args)
     )
 
-    sys.exit(exit_code)
+    return exit_code
 
 
 def do_list_commands(plugin):
