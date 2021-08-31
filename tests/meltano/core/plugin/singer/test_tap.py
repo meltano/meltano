@@ -52,7 +52,7 @@ class TestSingerTap:
         assert not invoker.files["config"].exists()
 
     @pytest.mark.asyncio
-    async def test_look_up_state(
+    async def test_look_up_state(  # noqa: WPS213, WPS217
         self,
         subject,
         project,
@@ -248,7 +248,7 @@ class TestSingerTap:
         assert invoker.files["catalog"].read_text() == '{"custom": true}'
 
     @pytest.mark.asyncio
-    async def test_apply_select(
+    async def test_apply_select(  # noqa: WPS213
         self, session, plugin_invoker_factory, subject, monkeypatch
     ):
         invoker = plugin_invoker_factory(subject)
@@ -329,7 +329,7 @@ class TestSingerTap:
             )
 
     @pytest.mark.asyncio
-    async def test_apply_catalog_rules(
+    async def test_apply_catalog_rules(  # noqa: WPS213
         self, session, plugin_invoker_factory, subject, monkeypatch
     ):
         invoker = plugin_invoker_factory(subject)
@@ -492,7 +492,7 @@ class TestSingerTap:
             assert cache_key is None
 
     @pytest.mark.asyncio
-    async def test_apply_catalog_rules_select_filter(
+    async def test_apply_catalog_rules_select_filter(  # noqa: WPS217, WPS213
         self, session, plugin_invoker_factory, subject, monkeypatch
     ):
         invoker = plugin_invoker_factory(subject)
@@ -626,7 +626,7 @@ class TestSingerTap:
                 subject.apply_catalog_rules(invoker, [])
 
     @pytest.mark.asyncio
-    async def test_catalog_cache_key(
+    async def test_catalog_cache_key(  # noqa: WPS217
         self, session, plugin_invoker_factory, subject, monkeypatch
     ):
         invoker = plugin_invoker_factory(subject)

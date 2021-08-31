@@ -22,7 +22,7 @@ class TestAirflow:
             return project_add_service.add(PluginType.ORCHESTRATORS, "airflow")
 
     @pytest.mark.asyncio
-    async def test_before_configure(
+    async def test_before_configure(  # noqa: WPS210
         self, subject, project, session, plugin_invoker_factory
     ):
         run_dir = project.run_dir("airflow")
@@ -31,7 +31,6 @@ class TestAirflow:
         handle_mock.name = subject.name
         handle_mock.wait = CoroutineMock(return_value=0)
         handle_mock.returncode = 0
-        handle_mock.sterr.at_eof.side_effect = True
         handle_mock.communicate = CoroutineMock(return_value=(b"2.0.1", None))
         handle_mock.stdout.at_eof.side_effect = (False, True)
 
@@ -71,8 +70,7 @@ class TestAirflow:
                 commands = [
                     popen_args
                     for _, popen_args, kwargs in popen.mock_calls
-                    if popen_args
-                    if isinstance(popen_args, tuple)
+                    if popen_args and isinstance(popen_args, tuple)
                 ]
                 assert commands[0][1] == "--help"
                 assert commands[1][1] == "version"
