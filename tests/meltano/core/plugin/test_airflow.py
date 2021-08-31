@@ -21,7 +21,7 @@ class TestAirflow:
             return project_add_service.add(PluginType.ORCHESTRATORS, "airflow")
 
     @pytest.mark.asyncio  # noqa:  WPS210
-    async def test_before_configure(
+    async def test_before_configure(  # noqa:  WPS210
         self, subject, project, session, plugin_invoker_factory
     ):
         run_dir = project.run_dir("airflow")
