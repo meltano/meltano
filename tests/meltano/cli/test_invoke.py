@@ -1,9 +1,8 @@
 import asyncio
 import json
-from unittest.mock import Mock, patch
 
 import pytest
-from asynctest import CoroutineMock
+from asynctest import CoroutineMock, Mock, patch
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap

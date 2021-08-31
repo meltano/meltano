@@ -1,8 +1,7 @@
 from configparser import ConfigParser
-from unittest import mock
 
 import pytest
-from asynctest import CoroutineMock
+from asynctest import CoroutineMock, mock
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.airflow import AirflowInvoker
 from meltano.core.plugin_install_service import PluginInstallService
@@ -21,8 +20,8 @@ class TestAirflow:
         ) as install_plugin:
             return project_add_service.add(PluginType.ORCHESTRATORS, "airflow")
 
-    @pytest.mark.asyncio
-    async def test_before_configure(  # noqa: WPS210
+    @pytest.mark.asyncio  # noqa:  WPS210
+    async def test_before_configure(
         self, subject, project, session, plugin_invoker_factory
     ):
         run_dir = project.run_dir("airflow")
