@@ -108,7 +108,7 @@ class VenvService:
 
         pip_urls = [pip_url for arg in pip_urls for pip_url in arg.split(" ")]
         if upgrade:
-            pip_urls = [ *PIP_PACKAGES, *pip_urls ]
+            pip_urls = [*PIP_PACKAGES, *pip_urls]
         logger.debug(
             f"Installing '{' '.join(pip_urls)}' into virtual environment for '{self.namespace}/{self.name}'"  # noqa: WPS221
         )
