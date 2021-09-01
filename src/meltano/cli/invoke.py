@@ -3,7 +3,7 @@ import sys
 
 import click
 from meltano.core.db import project_engine
-from meltano.core.error import SubprocessError
+from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import UnknownCommandError, invoker_factory
 from meltano.core.project_plugins_service import ProjectPluginsService
@@ -78,8 +78,8 @@ async def _invoke(
 
     except UnknownCommandError as err:
         raise click.BadArgumentUsage(err) from err
-    except SubprocessError as err:
-        logger.error(err.stderr)
+    except AsyncSubprocessError as err:
+        logger.error(await err.stderr)
         raise
     finally:
         session.close()

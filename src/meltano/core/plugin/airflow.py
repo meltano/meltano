@@ -5,7 +5,7 @@ import subprocess
 from distutils.version import StrictVersion
 
 from meltano.core.behavior.hookable import hook
-from meltano.core.error import SubprocessError
+from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.utils import nest
 
@@ -78,7 +78,9 @@ class Airflow(BasePlugin):
         return_code = await handle.wait()
 
         if return_code:
-            raise SubprocessError("Command `airflow --help` failed", process=handle)
+            raise AsyncSubprocessError(
+                "Command `airflow --help` failed", process=handle
+            )
 
         # Read and update airflow.cfg
         self.update_config_file(invoker)
@@ -98,7 +100,9 @@ class Airflow(BasePlugin):
         stdout, stderr = await handle.communicate()
 
         if handle.returncode:
-            raise SubprocessError("Command `airflow version` failed", process=handle)
+            raise AsyncSubprocessError(
+                "Command `airflow version` failed", process=handle
+            )
 
         version = stdout.decode()
         init_db_cmd = (
@@ -115,7 +119,7 @@ class Airflow(BasePlugin):
         initdb = await handle.wait()
 
         if initdb:
-            raise SubprocessError(
+            raise AsyncSubprocessError(
                 "Airflow metadata database could not be initialized: `airflow initdb` failed",
                 handle,
             )
