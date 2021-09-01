@@ -12,10 +12,10 @@
   variables:
     DOCKERFILE: docker/prod/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE
-    IMAGE_TAG: $CI_COMMIT_SHA$IMAGE_TAG_SUFFIX
+    IMAGE_TAG: $CI_COMMIT_SHA-python$PYTHON_VERSION
   before_script:
     - source .gitlab/ci/scripts/docker_build_before_script.sh
-    - export EXTRA_ARGS="--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/base:$BASE_SHA-python$PYTHON_VERSION"
+    - export EXTRA_ARGS="--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/base:$BASE_SHA$IMAGE_TAG_SUFFIX"
   artifacts:
     paths:
       - dist
