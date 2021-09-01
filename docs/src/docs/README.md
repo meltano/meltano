@@ -279,6 +279,41 @@ If you'd like to join the team, check out the [career opportunities](#careers) b
 
 <TeamGrid :members="$frontmatter.members" />
 
+## Values
+
+### Act with and for the Community
+
+We work to build a more diverse and inclusive culture by hiring globally and creating a culture that supports team members everywhere. 
+We are part of a larger community and want to enable everyone to contribute.
+
+### Act with Empathy
+
+We work with empathy in our hearts, recognizing we're not alone in this journey. 
+We bring kindness, humility, trust, honesty, and an assumption of good faith to all of our interactions.
+
+### Act Sustainably
+
+We work with a sustainable mindset so that we can be here for years to come. 
+We believe in investing in our people, community, and products for the long term.
+We do this by putting family first, by being wise with resources, and by not have a short-term mindset.
+
+### Act Accountably
+
+We work knowing we have a responsibility to ourselves, our colleagues, and our community to do our best and hold our selves and each other to a high standard. 
+We're accountable for our mistakes, but we blamelessly recognize them and move forward together towards a better tomorrow.
+
+### Act Transparently
+
+We work transparently because we believe in the value of open source and bringing others into the community. 
+We believe being transparent makes you honest which, in turn, builds trust. 
+Without trust, it's impossible to live our other values.
+
+### Act Iteratively
+
+We work in small iterations so that we can be efficient, add value quickly, and get feedback from the community. 
+We have a bias for action and aim to continually improve our product and processes, and we believe small, positive steps are the best way to achieve large goals.
+
+
 ## Careers <a name="job-openings" />
 
 The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future! See a complete list of our [job openings](https://boards.greenhouse.io/meltano)!
