@@ -12,7 +12,7 @@
     DOCKERFILE: docker/prod/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE
     IMAGE_TAG: $CI_COMMIT_SHA-python$PYTHON_VERSION
-    PYTHON_IMAGE_VERSION: 'echo $PYTHON_VERSION | cut -d "." -f1-2'
+    PYTHON_IMAGE_VERSION: echo $PYTHON_VERSION | cut -d "." -f1-2
   before_script:
     - source .gitlab/ci/scripts/docker_build_before_script.sh
     - export EXTRA_ARGS="--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/base:$BASE_SHA-python$PYTHON_IMAGE_VERSION"
