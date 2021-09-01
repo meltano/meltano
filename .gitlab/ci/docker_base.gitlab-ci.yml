@@ -2,6 +2,7 @@
   extends:
   - .docker_build
   - .parallel:python_version
+  - .parallel:image_tag_suffix
   stage: build-base
   needs: []
   variables:
@@ -10,7 +11,7 @@
   before_script:
     - source .gitlab/ci/scripts/docker_build_before_script.sh
     - export EXTRA_ARGS="--build-arg PYTHON_VERSION=$PYTHON_VERSION"
-    - export IMAGE_TAG=$BASE_SHA-python$PYTHON_VERSION
+    - export IMAGE_TAG=$BASE_SHA$IMAGE_TAG_SUFFIX
 
 # the meltano base should only be rebuild when the `requirements.txt` file
 # has a change, and should be inferable from the `BASE_SHA` environment
