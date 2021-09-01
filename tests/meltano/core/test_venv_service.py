@@ -63,6 +63,17 @@ class TestVenvService:
             "some_exe",
         )
 
+        # ensure a fingerprint file was created
+        assert venv_dir.joinpath(".meltano_plugin_fingerprint").exists()
+        with open(
+            venv_dir.joinpath(".meltano_plugin_fingerprint"), "rt"
+        ) as fingerprint_file:
+            assert (
+                fingerprint_file.read()
+                # sha256 of "example"
+                == "50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
+            )
+
     @pytest.mark.asyncio
     async def test_install(self, project, subject: VenvService):
         # Make sure the venv exists already
@@ -94,6 +105,15 @@ class TestVenvService:
             stderr=subprocess.PIPE,
         )
         assert re.search(r"example\s+0\.1\.0", str(run.stdout))
+
+    @pytest.mark.asyncio
+    async def test_requires_clean_install(self, project, subject: VenvService):
+        # Make sure the venv exists already
+        await subject.install("example", clean=True)
+
+        assert not subject.requires_clean_install(["example"])
+        assert subject.requires_clean_install(["example==0.1.0"])
+        assert subject.requires_clean_install(["example", "another-package"])
 
 
 class TestVirtualEnv:
