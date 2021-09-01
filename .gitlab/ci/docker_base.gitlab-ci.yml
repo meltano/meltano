@@ -24,6 +24,7 @@ meltano_base:
     changes:
       - docker/base/Dockerfile
       - poetry.lock
+      - pyproject.toml
 
 # Manages:
 #  - <fork namespace>/meltano/base:<base_sha>-python<version>
