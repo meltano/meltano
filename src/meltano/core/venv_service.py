@@ -222,7 +222,7 @@ class VenvService:
 
     async def _upgrade_install(self, pip_urls: List[str]):
         logger.debug(
-            f"Upgrading '{' '.join(pip_urls)}' in exsting virtual environment for '{self.namespace}/{self.name}'"  # noqa: WPS221
+            f"Upgrading '{' '.join(pip_urls)}' in existing virtual environment for '{self.namespace}/{self.name}'"  # noqa: WPS221
         )
         await self._pip_install(*PIP_PACKAGES, *pip_urls, upgrade=True)
 
