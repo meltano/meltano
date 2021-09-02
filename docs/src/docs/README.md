@@ -235,8 +235,8 @@ For the Singer ecosystem, we will finalize the work needed to make Meltano rely 
 #### 2021-Q4
 
 For the rest of the year, we have several key outcomes we're looking to achieve.
-Primarily we're still aiming to improve the Singer ecosystem and make Meltano the best ELT platform on the market. 
-We're also still building the future of Meltano as a DataOps platform by adding native environments, improving monitoring and observability with the tool, and by making deployment as easy as possible. 
+We're still primarily aiming to improve the Singer ecosystem and make Meltano the best ELT platform on the market. 
+We're also building the future of Meltano as a DataOps platform by adding native environments, improving monitoring and observability with the tool, and by making deployment as easy as possible. 
 Underpinning all of this will be a focus on improving the developer experience by enhancing our documentation.
 
 * Decentralized Management of MeltanoHub Connectors - [Epic](https://gitlab.com/groups/meltano/-/epics/105) & [Issue](https://gitlab.com/meltano/meta/-/issues/73)
@@ -250,18 +250,19 @@ Underpinning all of this will be a focus on improving the developer experience b
 * Dagster - [Epic](https://gitlab.com/groups/meltano/-/epics/113) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2393)
 
 
-
-Our focus for Q4 will be on creating a compelling monitoring, observability, and data lineage featureset. We also aim to improve our integration with git providers, begin the conversion of MeltanoHub to a dynamic site, improve the UI of Meltano, and potentailly start offering a SaaS deployment of Meltano.
-
-
 #### 2022-H1
+
+Next year will be continuing to make Meltano the best data integration tool on the market and Singer the best open source ecosystem.
+With this great foundation in place, we'll continue to invest in making Meltano the best DataOps platform on the market.
+This means focusing more on the user interface and on sell Meltano to paying customers.
+
+* [Fully featured UI](https://gitlab.com/groups/meltano/-/epics/78)
+* [SaaS Deployment of Meltano](https://gitlab.com/groups/meltano/-/epics/94)
 * [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
 * [Initial conversion of MeltanoHub to dynamic site](https://gitlab.com/groups/meltano/-/epics/101)
 * [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
 * [Jupyter Notebooks](https://gitlab.com/meltano/meltano/-/issues/2595)
 * [Git-provider Integrations](https://gitlab.com/groups/meltano/-/epics/92)
-* [Fully featured UI](https://gitlab.com/groups/meltano/-/epics/78)
-* [SaaS Deployment of Meltano](https://gitlab.com/groups/meltano/-/epics/94)
 
 ## Contributing
 
