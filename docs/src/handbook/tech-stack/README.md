@@ -246,7 +246,7 @@ Account details are in the `Engineering` 1Password vault.
 
 ## [Zendesk](https://meltano.zendesk.com/)
 
-Receives email sent to `hello@meltano.com`, which is used for most subscriptions and the occasional support email, and `security@meltano.com`.
+Receives email sent to `hello@meltano.com` and `security@meltano.com`.
 
 Select team members have their own account.
 
