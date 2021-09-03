@@ -105,7 +105,7 @@ class TestCliInvoke:
             basic = cli_runner.invoke(cli, ["invoke", tap.name])
             assert basic.exit_code == 2
 
-    def test_invoke_triggers_discovery(
+    def test_invoke_triggers(
         self,
         cli_runner: CliRunner,
         project_plugins_service: ProjectPluginsService,
@@ -120,26 +120,33 @@ class TestCliInvoke:
             SingerTap, "discover_catalog"
         ) as discover_catalog, patch.object(
             SingerTap, "apply_catalog_rules"
-        ) as apply_catalog_rules:
+        ) as apply_catalog_rules, patch.object(
+            SingerTap, "look_up_state"
+        ) as look_up_state:
+
             # Modes other than sync don't trigger discovery or applying catalog rules
             cli_runner.invoke(cli, ["invoke", tap.name, "--some-tap-option"])
             assert discover_catalog.call_count == 0
             assert apply_catalog_rules.call_count == 0
+            assert look_up_state.call_count == 0
 
             # Dumping config doesn't trigger discovery or applying catalog rules
             cli_runner.invoke(cli, ["invoke", "--dump", "config", tap.name])
             assert discover_catalog.call_count == 0
             assert apply_catalog_rules.call_count == 0
+            assert look_up_state.call_count == 0
 
             # Sync mode triggers discovery and applying catalog rules
             cli_runner.invoke(cli, ["invoke", tap.name])
             assert discover_catalog.call_count == 1
             assert apply_catalog_rules.call_count == 1
+            assert look_up_state.call_count == 1
 
             # Dumping catalog triggers discovery and applying catalog rules
             cli_runner.invoke(cli, ["invoke", "--dump", "catalog", tap.name])
             assert discover_catalog.call_count == 2
             assert apply_catalog_rules.call_count == 2
+            assert look_up_state.call_count == 2
 
     def test_invoke_dump_config(
         self, cli_runner, tap, project_plugins_service, plugin_settings_service_factory

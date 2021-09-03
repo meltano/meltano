@@ -144,9 +144,14 @@ class SingerTap(SingerPlugin):
         return {"output": "tap.out"}
 
     @hook("before_invoke")
-    async def look_up_state_hook(self, plugin_invoker, exec_args=()):
+    async def look_up_state_hook(
+        self,
+        plugin_invoker: PluginInvoker,
+        exec_args: Tuple[str, ...] = (),
+    ):
         """Look up state before being invoked."""
-        if "--discover" in exec_args or "--help" in exec_args:
+        # Use state only in sync mode (i.e. no args)
+        if exec_args:
             return
 
         try:
@@ -154,7 +159,7 @@ class SingerTap(SingerPlugin):
         except PluginLacksCapabilityError:
             pass
 
-    async def look_up_state(self, plugin_invoker):  # noqa: WPS231, WPS213
+    async def look_up_state(self, plugin_invoker: PluginInvoker):  # noqa: WPS231, WPS213
         """Look up state, cleaning up and refreshing as needed."""
         if "state" not in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
