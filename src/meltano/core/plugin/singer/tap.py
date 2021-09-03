@@ -8,6 +8,8 @@ import logging
 import shutil
 import sys
 from hashlib import sha1
+from pathlib import Path
+from typing import Tuple
 
 from jsonschema import Draft4Validator
 from meltano.core.behavior.hookable import hook
@@ -223,14 +225,19 @@ class SingerTap(SingerPlugin):
             logger.warning("No state was found, complete import.")
 
     @hook("before_invoke")
-    async def discover_catalog_hook(self, plugin_invoker, exec_args=()):
+    async def discover_catalog_hook(
+        self,
+        plugin_invoker: PluginInvoker,
+        exec_args: Tuple[str, ...] = (),
+    ):
         """Before invoke hook to trigger catalog discovery for this tap.
 
         Args:
             plugin_invoker: The invocation handler of the plugin instance.
             exec_args: List of subcommand/args that we where invoked with.
         """
-        if "--discover" in exec_args or "--help" in exec_args:
+        # Discover only in sync mode (i.e. no args)
+        if exec_args:
             return
 
         try:
@@ -238,7 +245,7 @@ class SingerTap(SingerPlugin):
         except PluginLacksCapabilityError:
             pass
 
-    async def discover_catalog(self, plugin_invoker):  # noqa: WPS231
+    async def discover_catalog(self, plugin_invoker: PluginInvoker):  # noqa: WPS231
         """Perform catalog discovery.
 
         Args:
@@ -293,7 +300,7 @@ class SingerTap(SingerPlugin):
                 f"Catalog discovery failed: invalid catalog: {err}"
             ) from err
 
-    async def run_discovery(self, plugin_invoker: PluginInvoker, catalog_path):
+    async def run_discovery(self, plugin_invoker: PluginInvoker, catalog_path: Path):
         """Actually invoke tap discovery storing output.
 
         Args:
@@ -339,9 +346,14 @@ class SingerTap(SingerPlugin):
             )
 
     @hook("before_invoke")
-    async def apply_catalog_rules_hook(self, plugin_invoker, exec_args=()):
+    async def apply_catalog_rules_hook(
+        self,
+        plugin_invoker: PluginInvoker,
+        exec_args: Tuple[str, ...] = ()
+    ):
         """Apply catalog rules before invoke."""
-        if "--discover" in exec_args or "--help" in exec_args:
+        # Apply only in sync mode (i.e. no args)
+        if exec_args:
             return
 
         try:
@@ -349,7 +361,11 @@ class SingerTap(SingerPlugin):
         except PluginLacksCapabilityError:
             pass
 
-    def apply_catalog_rules(self, plugin_invoker, exec_args=[]):
+    def apply_catalog_rules(
+        self,
+        plugin_invoker: PluginInvoker,
+        exec_args: Tuple[str, ...] = (),
+    ):
         if (
             not "catalog" in plugin_invoker.capabilities
             and not "properties" in plugin_invoker.capabilities

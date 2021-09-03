@@ -3,7 +3,7 @@ import enum
 import logging
 import os
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from async_generator import asynccontextmanager
 from meltano.core.logging.utils import SubprocessOutputWriter
@@ -238,16 +238,16 @@ class PluginInvoker:
 
         return env
 
-    def Popen_options(self):
+    def Popen_options(self) -> Dict[str, Any]:
         return {}
 
     @asynccontextmanager
     async def _invoke(
         self,
-        *args,
-        require_preparation=True,
-        env=None,
-        command=None,
+        *args: str,
+        require_preparation: bool = True,
+        env: Optional[Dict[str, Any]] = None,
+        command: Optional[str] = None,
         **kwargs,
     ):
         env = env or {}
