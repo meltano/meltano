@@ -20,7 +20,6 @@ class TestSingerTap:
     def subject(self, project_add_service):
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
-    @pytest.mark.asyncio
     def test_invoke_triggers_discovery(
         self,
         subject: ProjectPlugin,

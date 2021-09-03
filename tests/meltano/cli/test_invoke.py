@@ -2,9 +2,12 @@ import asyncio
 import json
 
 import pytest
+
 from asynctest import CoroutineMock, Mock, patch
+from click.testing import CliRunner
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import GoogleAnalyticsTracker
@@ -101,6 +104,32 @@ class TestCliInvoke:
         ):
             basic = cli_runner.invoke(cli, ["invoke", tap.name])
             assert basic.exit_code == 2
+
+    def test_invoke_triggers_discovery(
+        self,
+        cli_runner: CliRunner,
+        project_plugins_service: ProjectPluginsService,
+        tap: ProjectPlugin,
+    ):
+        with patch.object(
+            GoogleAnalyticsTracker, "track_data", return_value=None
+        ), patch(
+            "meltano.cli.invoke.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), patch.object(
+            SingerTap, "discover_catalog"
+        ) as discover_catalog, patch.object(
+            SingerTap, "apply_catalog_rules"
+        ) as apply_catalog_rules:
+            # Modes other than sync don't trigger discovery or applying catalog rules
+            cli_runner.invoke(cli, ["invoke", tap.name, "--some-tap-option"])
+            discover_catalog.assert_not_called()
+            apply_catalog_rules.assert_not_called()
+
+            # Sync mode triggers discovery and applying catalog rules
+            cli_runner.invoke(cli, ["invoke", tap.name])
+            discover_catalog.assert_called_once()
+            apply_catalog_rules.assert_called_once()
 
     def test_invoke_dump_config(
         self, cli_runner, tap, project_plugins_service, plugin_settings_service_factory
