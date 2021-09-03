@@ -1,6 +1,6 @@
 import logging
 import sys
-from typing import Literal, Tuple
+from typing import Tuple
 
 import click
 from meltano.core.db import project_engine
@@ -45,7 +45,7 @@ logger = logging.getLogger(__name__)
 def invoke(
     project: Project,
     plugin_type: str,
-    dump: Literal["catalog", "config"],
+    dump: str,
     list_commands: bool,
     plugin_name: str,
     plugin_args: Tuple[str, ...],
