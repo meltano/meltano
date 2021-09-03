@@ -1,8 +1,8 @@
 ---
 home: true
 heroImage: /meltano-logo.svg
-metaTitle: "Meltano: End to end open source DataOps"
-description: Meltano brings the benefits of open source and DevOps best practices to the data lifecycle by embracing DataOps. Meltano is your one stop destination for data integration. 
+metaTitle: "ELT tool for open source data integration with Meltano "
+description: Meltano is your one stop destination for data integration. Extract-load-transform pipelines in minutes, for free. Bring together best in class open source data tools in a single project repo:
 installation:
   primaryAction:
     text: Get started
@@ -34,7 +34,7 @@ ui:
 ---
 
 ::: slot installation
-# End to end open source DataOps
+# Open Source Data Integration (ELT)
 
 Meltano brings the benefits of open source and DevOps best practices to the data lifecycle by embracing DataOps. Meltano is your one stop destination for data integration. Meltano is the open source platform for managing data pipelines, dashboards, and orchestration. Best of all Meltano is self-hosted, CLI-first, debuggable, and extensible.
 
