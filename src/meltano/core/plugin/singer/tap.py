@@ -230,7 +230,7 @@ class SingerTap(SingerPlugin):
         plugin_invoker: PluginInvoker,
         exec_args: Tuple[str, ...] = (),
     ):
-        """Before invoke hook to trigger catalog discovery for this tap.
+        """Discover Singer catalog before invoking tap.
 
         Args:
             plugin_invoker: The invocation handler of the plugin instance.
@@ -301,7 +301,7 @@ class SingerTap(SingerPlugin):
             ) from err
 
     async def run_discovery(self, plugin_invoker: PluginInvoker, catalog_path: Path):
-        """Actually invoke tap discovery storing output.
+        """Run tap in discovery mode and store the result.
 
         Args:
             plugin_invoker: The invocation handler of the plugin instance.
@@ -361,11 +361,12 @@ class SingerTap(SingerPlugin):
         except PluginLacksCapabilityError:
             pass
 
-    def apply_catalog_rules(
+    def apply_catalog_rules(  # noqa: WPS213,WPS231
         self,
         plugin_invoker: PluginInvoker,
         exec_args: Tuple[str, ...] = (),
     ):
+        """Apply Singer catalog and schema rules to discovered catalog."""
         if (
             not "catalog" in plugin_invoker.capabilities
             and not "properties" in plugin_invoker.capabilities

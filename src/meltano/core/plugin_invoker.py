@@ -238,7 +238,8 @@ class PluginInvoker:
 
         return env
 
-    def Popen_options(self) -> Dict[str, Any]:
+    def Popen_options(self) -> Dict[str, Any]:  # noqa: N802
+        """Get options for subprocess.Popen."""
         return {}
 
     @asynccontextmanager
