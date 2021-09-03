@@ -228,9 +228,10 @@ We will also integrate Great Expectations and `dbt test` as new validators which
 For the Singer ecosystem, we will finalize the work needed to make Meltano rely on MeltanoHub and release the first iteration of the BATCH message types in the Meltano SDK.
 
 * Add validator plugin type with Great Expectations and `dbt test` support  - [Epic](https://gitlab.com/groups/meltano/-/epics/111)
-* MeltanoHub as SSOT for Meltano - [Epic](https://gitlab.com/groups/meltano/-/epics/102)
 * Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/116) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2725 )
-* Add Fast Sync / `BATCH` Messages to Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/114)
+* MeltanoHub as SSOT for Meltano - [Epic](https://gitlab.com/groups/meltano/-/epics/102)
+* Easy deployment of Meltano for local development - [Epic](https://gitlab.com/groups/meltano/-/epics/79) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2910)
+* Decentralized Management of MeltanoHub Connectors - [Epic](https://gitlab.com/groups/meltano/-/epics/105) & [Issue](https://gitlab.com/meltano/meta/-/issues/73)
 
 #### 2021-Q4
 
@@ -239,8 +240,8 @@ We're still primarily aiming to improve the Singer ecosystem and make Meltano th
 We're also building the future of Meltano as a DataOps platform by adding native environments, improving monitoring and observability with the tool, and by making deployment as easy as possible. 
 Underpinning all of this will be a focus on improving the developer experience by enhancing our documentation.
 
-* Decentralized Management of MeltanoHub Connectors - [Epic](https://gitlab.com/groups/meltano/-/epics/105) & [Issue](https://gitlab.com/meltano/meta/-/issues/73)
-* Easy deployment of Meltano for local and production development - [Epic](https://gitlab.com/groups/meltano/-/epics/79)
+* Add Fast Sync / `BATCH` Messages to Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/114)
+* Easy deployment of Meltano for production development - [Epic](https://gitlab.com/groups/meltano/-/epics/79)
 * Release v1.0 of Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/121)
 * Documentation Overhaul - [Epic](https://gitlab.com/groups/meltano/-/epics/81)
 * Support non-Python plugins - [Issue](https://gitlab.com/meltano/meltano/-/issues/2205)
