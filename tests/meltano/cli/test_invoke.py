@@ -123,13 +123,23 @@ class TestCliInvoke:
         ) as apply_catalog_rules:
             # Modes other than sync don't trigger discovery or applying catalog rules
             cli_runner.invoke(cli, ["invoke", tap.name, "--some-tap-option"])
-            discover_catalog.assert_not_called()
-            apply_catalog_rules.assert_not_called()
+            assert discover_catalog.call_count == 0
+            assert apply_catalog_rules.call_count == 0
+
+            # Dumping config doesn't trigger discovery or applying catalog rules
+            cli_runner.invoke(cli, ["invoke", "--dump", "config", tap.name])
+            assert discover_catalog.call_count == 0
+            assert apply_catalog_rules.call_count == 0
 
             # Sync mode triggers discovery and applying catalog rules
             cli_runner.invoke(cli, ["invoke", tap.name])
-            discover_catalog.assert_called_once()
-            apply_catalog_rules.assert_called_once()
+            assert discover_catalog.call_count == 1
+            assert apply_catalog_rules.call_count == 1
+
+            # Dumping catalog triggers discovery and applying catalog rules
+            cli_runner.invoke(cli, ["invoke", "--dump", "catalog", tap.name])
+            assert discover_catalog.call_count == 2
+            assert apply_catalog_rules.call_count == 2
 
     def test_invoke_dump_config(
         self, cli_runner, tap, project_plugins_service, plugin_settings_service_factory

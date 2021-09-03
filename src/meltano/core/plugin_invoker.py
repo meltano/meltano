@@ -131,7 +131,8 @@ class PluginInvoker:
         return frozenset(self.plugin.capabilities)
 
     @property
-    def files(self):
+    def files(self) -> Dict[str, Path]:
+        """Get all config and output files of the plugin."""
         plugin_files = {**self.plugin.config_files, **self.plugin.output_files}
 
         return {
@@ -282,11 +283,14 @@ class PluginInvoker:
                 env=popen_env,
             )
 
-    async def dump(self, file_id):
-        """Dump a given file id."""
+    async def dump(self, file_id: str) -> str:
+        """Dump a plugin file by id."""
         try:
-            async with self._invoke():
-                return self.files[file_id].read_text()
+            if file_id != "config":
+                async with self._invoke():
+                    return self.files[file_id].read_text()
+
+            return self.files[file_id].read_text()
         except ExecutableNotFoundError as err:
             # Unwrap FileNotFoundError
             raise err.__cause__

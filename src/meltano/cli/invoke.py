@@ -1,11 +1,17 @@
 import logging
 import sys
+from typing import Literal, Tuple
 
 import click
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_invoker import UnknownCommandError, invoker_factory
+from meltano.core.plugin_invoker import (
+    PluginInvoker,
+    UnknownCommandError,
+    invoker_factory,
+)
+from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import run_async
@@ -36,7 +42,14 @@ logger = logging.getLogger(__name__)
 @click.argument("plugin_name", metavar="PLUGIN_NAME[:COMMAND_NAME]")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
 @pass_project(migrate=True)
-def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_args):
+def invoke(
+    project: Project,
+    plugin_type: str,
+    dump: Literal["catalog", "config"],
+    list_commands: bool,
+    plugin_name: str,
+    plugin_args: Tuple[str, ...],
+):
     """Invoke the plugin's executable with specified arguments."""
     try:
         plugin_name, command_name = plugin_name.split(":")
@@ -110,7 +123,7 @@ def do_list_commands(plugin):
         click.echo(desc)
 
 
-async def dump_file(invoker, file_id):
+async def dump_file(invoker: PluginInvoker, file_id: str):
     """Dump file."""
     try:
         content = await invoker.dump(file_id)
