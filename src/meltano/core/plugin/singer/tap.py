@@ -3,6 +3,7 @@
 This module contains the SingerTap class as well as a supporting methods.
 """
 import asyncio
+import codecs
 import json
 import logging
 import shutil
@@ -302,11 +303,7 @@ class SingerTap(SingerPlugin):
         ):
             while not stream.at_eof():
                 data = await stream.readline()
-                if write_str:
-                    line = data.decode("ascii").rstrip()
-                    callback.write(line)
-                else:
-                    callback.write(data)
+                callback.write(data)
 
         if not "discover" in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
@@ -324,8 +321,9 @@ class SingerTap(SingerPlugin):
                 await asyncio.wait(
                     [
                         _streamresp(handle.stdout, catalog),
-                        # TODO: come back and replace with debug log capture
-                        _streamresp(handle.stderr, sys.stderr, write_str=True),
+                        _streamresp(
+                            codecs.getreader("ascii")(handle.stderr), sys.stderr
+                        ),
                         handle.wait(),
                     ],
                     return_when=asyncio.ALL_COMPLETED,
