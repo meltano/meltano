@@ -1,4 +1,5 @@
 ---
+title: "Events"
 sidebarDepth: 2
 ---
 
