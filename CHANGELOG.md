@@ -22,7 +22,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#2922](https://gitlab.com/meltano/meltano/-/issues/2922) Fix error during installation of some plugins caused by a `setuptools` release.
+- [#2922](https://gitlab.com/meltano/meltano/-/issues/2922) Fix error during installation of some plugins caused by a `setuptools` release. _Thanks, **[Maarten van Gijssel](https://gitlab.com/mvgijssel)**!_
 
 ## 1.79.1 - (2021-08-17)
 ---
