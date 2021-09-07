@@ -226,7 +226,7 @@ getting_started_sample_code:
     - meltano config tap-gitlab list
 
     - meltano config tap-gitlab set projects meltano/meltano
-    - meltano config tap-gitlab set start_date 2020-05-01T00:00:00Z
+    - meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
 
     - meltano config tap-gitlab
 
