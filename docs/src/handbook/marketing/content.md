@@ -1,3 +1,8 @@
+---
+title: "Content Marketing"
+sidebarDepth: 2
+---
+
 # Content Marketing
 
 ## Tools
