@@ -174,7 +174,7 @@ class VenvService:
                 "install",
                 "--upgrade",
                 "pip",
-                "setuptools",
+                "setuptools==57.5.0",
                 "wheel",
             )
         except AsyncSubprocessError as err:
