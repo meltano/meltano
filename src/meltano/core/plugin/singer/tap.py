@@ -299,11 +299,11 @@ class SingerTap(SingerPlugin):
         """
 
         async def _streamresp(  # noqa: WPS430
-            stream: asyncio.StreamReader, callback, write_str=False
+            stream: asyncio.StreamReader, file_like_obj
         ):
             while not stream.at_eof():
                 data = await stream.readline()
-                callback.write(data)
+                file_like_obj.write(data)
 
         if not "discover" in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
