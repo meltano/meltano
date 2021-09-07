@@ -134,10 +134,8 @@ class SingerTap(SingerPlugin):
         return {"output": "tap.out"}
 
     @hook("before_invoke")
-    async def look_up_state_hook(self, plugin_invoker, exec_args):
+    async def look_up_state_hook(self, plugin_invoker, exec_args=()):
         """Look up state before being invoked."""
-        if exec_args is None:
-            exec_args = []
         if "--discover" in exec_args or "--help" in exec_args:
             return
 
@@ -217,16 +215,13 @@ class SingerTap(SingerPlugin):
             logger.warning("No state was found, complete import.")
 
     @hook("before_invoke")
-    async def discover_catalog_hook(self, plugin_invoker, exec_args):
+    async def discover_catalog_hook(self, plugin_invoker, exec_args=()):
         """Before invoke hook to trigger catalog discovery for this tap.
 
         Args:
             plugin_invoker: The invocation handler of the plugin instance.
             exec_args: List of subcommand/args that we where invoked with.
         """
-        if exec_args is None:
-            exec_args = []
-
         if "--discover" in exec_args or "--help" in exec_args:
             return
 
@@ -340,10 +335,8 @@ class SingerTap(SingerPlugin):
             )
 
     @hook("before_invoke")
-    async def apply_catalog_rules_hook(self, plugin_invoker, exec_args):
+    async def apply_catalog_rules_hook(self, plugin_invoker, exec_args=()):
         """Apply catalog rules before invoke."""
-        if exec_args is None:
-            exec_args = []
         if "--discover" in exec_args or "--help" in exec_args:
             return
 
