@@ -8,17 +8,18 @@ h5
   font-size: 1rem
 
 .navbar
-  .logo
-    height 2.3rem !important
-    margin-top -0.1em
+  a.home-link
+    position relative
 
-  .site-name
-    display none
+    .logo
+      height 2.3rem !important
+      margin-top -0.1em
 
-.theme-container.no-navbar
-  .navbar
-    display none
-
+    .site-name
+      position absolute
+      left 0
+      width 130px // width of logo
+      font-size 0
 {$contentClass}
   a code
     color inherit

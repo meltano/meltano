@@ -25,6 +25,8 @@ invoke its executable using [`meltano invoke`](#invoke), and use it in a pipelin
 
 To learn more about adding a plugin to your project, refer to the [Plugin Management guide](/docs/plugin-management.html#adding-a-plugin-to-your-project).
 
+> Note: Unlike [`meltano install`](#install), this command installs plugins serially to avoid missing dependencies (e.g. a [`transform`](/docs/plugins#transforms) requires the [`dbt` plugin](/docs/transforms) to be installed first).
+
 ### How to use
 
 The only required arguments are the new plugin's [type](/docs/plugins.html#types) and unique name:
@@ -408,7 +410,32 @@ Additionally, plugin names can be provided to only (re)install those specific pl
 
 Use `--include-related` to automatically install transform, model, and dashboard plugins related to installed extractor plugins.
 
+Subsequent calls to `meltano install` will upgrade a plugin to it's latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
+
 Meltano installs plugins in parallel. The number of plugins to install in parallel defaults to the number of CPUs on the machine, but can be controlled with `--parallelism`. Use `--parallelism=1` to disable the feature and install them one at a time.
+
+::: tip
+If you're using a custom Docker image, make sure `python3-venv` is installed:
+
+```Dockerfile
+FROM ubuntu:20.04
+
+RUN apt-get update && \
+    apt-get install -y -q \
+    gcc \
+    sqlite3 \
+    libsqlite3-dev \
+    python3 \
+    python3-pip \
+    python3-venv # Add this line
+
+RUN pip3 install meltano
+
+WORKDIR /meltano
+COPY meltano.yml meltano.yml
+RUN mkdir .meltano/ && meltano install
+```
+:::
 
 ### How to Use
 
@@ -424,6 +451,7 @@ meltano install models
 meltano install --include-related
 
 meltano install --parallelism=16
+meltano install --clean
 ```
 
 ## `invoke`
@@ -453,7 +481,7 @@ Like any standard output, the dumped content can be [redirected](https://en.wiki
 
 ### Commands
 
-Plugins can define [commands](/docs/configuration.html#plugin-commands), which are shortcuts for combinations of arguments. These can be invoked with the shortcut command of the form `meltano invoke <plugin>:<command>`.
+Plugins can define [commands](/docs/project.html#plugin-commands), which are shortcuts for combinations of arguments. These can be invoked with the shortcut command of the form `meltano invoke <plugin>:<command>`.
 
 ```bash
 meltano invoke dbt:seed

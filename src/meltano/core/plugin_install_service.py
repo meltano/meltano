@@ -5,12 +5,12 @@ import logging
 import sys
 from enum import Enum
 from multiprocessing import cpu_count
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, Tuple
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
 
 from .compiler.project_compiler import ProjectCompiler
-from .error import PluginInstallError, PluginInstallWarning, SubprocessError
+from .error import AsyncSubprocessError, PluginInstallError, PluginInstallWarning
 from .plugin import PluginType
 from .plugin_discovery_service import PluginDiscoveryService
 from .project import Project
@@ -111,6 +111,7 @@ class PluginInstallService:
         plugins_service: ProjectPluginsService = None,
         status_cb: Callable[[PluginInstallState], Any] = noop,
         parallelism=None,
+        clean=False,
     ):
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
@@ -121,10 +122,11 @@ class PluginInstallService:
         if parallelism < 1:
             parallelism = sys.maxsize  # unbounded
         self.semaphore = asyncio.Semaphore(parallelism)
+        self.clean = clean
 
     def install_all_plugins(
         self, reason=PluginInstallReason.INSTALL
-    ) -> [PluginInstallState]:
+    ) -> Tuple[PluginInstallState]:
         """
         Install all the plugins for the project.
 
@@ -136,7 +138,7 @@ class PluginInstallService:
         self,
         plugins: Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
-    ) -> [PluginInstallState]:
+    ) -> Tuple[PluginInstallState]:
         """
         Install all the provided plugins.
 
@@ -148,7 +150,7 @@ class PluginInstallService:
         self,
         plugins: Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
-    ) -> [PluginInstallState]:
+    ) -> Tuple[PluginInstallState]:
         """Install all the provided plugins."""
         results = await asyncio.gather(
             *[
@@ -176,7 +178,9 @@ class PluginInstallService:
         """
         return run_async(
             self.install_plugin_async(
-                plugin, reason=reason, compile_models=compile_models
+                plugin,
+                reason=reason,
+                compile_models=compile_models,
             )
         )
 
@@ -190,7 +194,9 @@ class PluginInstallService:
         """Install a plugin."""
         self.status_cb(
             PluginInstallState(
-                plugin=plugin, reason=reason, status=PluginInstallStatus.RUNNING
+                plugin=plugin,
+                reason=reason,
+                status=PluginInstallStatus.RUNNING,
             )
         )
         if not plugin.is_installable():
@@ -205,7 +211,9 @@ class PluginInstallService:
 
         try:
             with plugin.trigger_hooks("install", self, plugin, reason):
-                await installer_factory(self.project, plugin).install(reason)
+                await installer_factory(self.project, plugin).install(
+                    reason, self.clean
+                )
                 state = PluginInstallState(
                     plugin=plugin, reason=reason, status=PluginInstallStatus.SUCCESS
                 )
@@ -234,13 +242,13 @@ class PluginInstallService:
             self.status_cb(state)
             return state
 
-        except SubprocessError as err:
+        except AsyncSubprocessError as err:
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
                 status=PluginInstallStatus.ERROR,
                 message=f"{plugin.type.descriptor} '{plugin.name}' could not be installed: {err}".capitalize(),
-                details=err.stderr,
+                details=await err.stderr,
             )
             self.status_cb(state)
             return state
@@ -267,6 +275,8 @@ class PipPluginInstaller:
             name=self.plugin.name,
         )
 
-    async def install(self, reason):
+    async def install(self, reason, clean):
         """Install the plugin into the virtual environment using pip."""
-        return await self.venv_service.clean_install(self.plugin.pip_url)
+        return await self.venv_service.install(
+            self.plugin.formatted_pip_url, clean=clean
+        )

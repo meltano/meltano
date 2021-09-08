@@ -33,9 +33,9 @@ Use [this link][gcal] to view the full events calendar. View past office hours i
 ### Guidelines
 
 We aim to have Demo Day primarily as a way to have community members showcase the work they've been doing, whether it's related to Meltano or not.
-As such, we will limit the number of vendors presenting to a maximum of 1 per Demo Day. 
+As such, we will limit the number of vendors presenting to a maximum of 1 per Demo Day.
 
-We will prioritize vendors that don't have a strong overlap with the core capabilities of Meltano. 
+We will prioritize vendors that don't have a strong overlap with the core capabilities of Meltano.
 Ideally, a vendor would be able to share how their product could be compatible with Meltano or with one of the open source plugins detailed in the MeltanoHub.
 
 ## Office Hours
@@ -48,7 +48,7 @@ View past office hours in our [YouTube Playlist][officehoursplaylist].
 
 ## Slack
 
-Join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannelLink>, which is frequented by the core team and over 850 community members. You can ask any questions you may have in here, or just chat with fellow users.
+Join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannelLink>, which is frequented by the core team and over 1000 community members. You can ask any questions you may have in here, or just chat with fellow users.
 
 [conduct]: https://www.pypa.io/en/latest/code-of-conduct/
 [officehoursplaylist]: https://www.youtube.com/playlist?list=PLO0YrxtDbWAtuuubcEz7mnCHoGfIf8voT
@@ -57,7 +57,7 @@ Join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannel
 
 ### Channels
 
-We have a number of channels which we use on a regular basis to communicate and share information with the community. 
+We have a number of channels which we use on a regular basis to communicate and share information with the community.
 
 #### #announcements
 
@@ -65,7 +65,7 @@ This is for posts from the Core Team to the wider community. Here we will share 
 
 ##### @Channel usage
 
-We will use `@channel` no more than three times per week and aim to use it a maximum of once per day. 
+We will use `@channel` no more than three times per week and aim to use it a maximum of once per day.
 
 #### Other Useful Channels
 
@@ -74,7 +74,7 @@ This is not an exhaustive list and we encourage you to join the <SlackChannelLin
 Meltano:
 
 * #contributing - if you want to contribute to Meltano itself
-* #hub - all about the [upcoming MeltanoHub](https://gitlab.com/groups/meltano/-/epics/83)
+* #hub - all about [MeltanoHub](https://hub.meltano.com)
 * #plugins-dbt - all things [dbt](https://meltano.com/docs/transforms.html)
 * #plugins-general - discussion for any other plugins
 
@@ -92,8 +92,9 @@ Community Events:
 Singer Related:
 
 * #singer-batch-messages - discussion around [Fast Sync](https://gitlab.com/meltano/meltano/-/issues/2364)
-* #singer-saas-targets - all things Reverse ETL / Operational Analytics
-* #singer-sdk - discussion around the [SDK for Taps and Targets](https://sdk.meltano.com)
+* #singer-tap-development - discussion around building taps with the [Meltano SDK](https://sdk.meltano.com)
+* #singer-taps - discussion around specific Singer taps
+* #singer-target-development - discussion around building targets with the [Meltano SDK](https://sdk.meltano.com), including "SaaS Targets", Reverse ETL, and Operational Analytics use cases
 
 #### Channel Bookmarks
 

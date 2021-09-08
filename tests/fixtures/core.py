@@ -44,6 +44,7 @@ def discovery():
                 {
                     "name": "meltano",
                     "pip_url": "tap-mock",
+                    "executable": "tap-mock",
                     "capabilities": ["discover", "catalog", "state"],
                     "settings": [
                         {"name": "test", "value": "mock"},
@@ -158,10 +159,15 @@ def discovery():
             "name": "utility-mock",
             "namespace": "utility_mock",
             "pip_url": "utility-mock",
+            "executable": "utility-mock",
             "commands": {
                 "cmd": {
-                    "args": "utility --option $ENV_VAR_ARG",
+                    "args": "--option $ENV_VAR_ARG",
                     "description": "description of utility command",
+                },
+                "alternate-exec": {
+                    "args": "--option $ENV_VAR_ARG",
+                    "executable": "other-utility",
                 },
             },
         }

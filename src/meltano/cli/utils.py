@@ -1,6 +1,8 @@
 """Defines helpers for use by the CLI."""
 import logging
 import os
+import signal
+from contextlib import contextmanager
 from typing import Optional
 
 import click
@@ -384,15 +386,14 @@ def install_status_update(install_state):
     elif install_state.status is PluginInstallStatus.SUCCESS:
         msg = f"{install_state.verb} {desc} '{plugin.name}'"
         click.secho(msg, fg="green")
-        click.echo()
 
 
 def install_plugins(
-    project, plugins, reason=PluginInstallReason.INSTALL, parallelism=None
+    project, plugins, reason=PluginInstallReason.INSTALL, parallelism=None, clean=False
 ):
     """Install the provided plugins and report results to the console."""
     install_service = PluginInstallService(
-        project, status_cb=install_status_update, parallelism=parallelism
+        project, status_cb=install_status_update, parallelism=parallelism, clean=clean
     )
     install_results = install_service.install_plugins(plugins, reason=reason)
     num_successful = len([status for status in install_results if status.successful])
@@ -419,3 +420,21 @@ def install_plugins(
         )
 
     return num_failed == 0
+
+
+@contextmanager
+def propagate_stop_signals(proc):
+    """When a stop signal is received, send it to `proc` and wait for it to terminate."""
+
+    def _handler(sig, _):  # noqa: WPS430
+        proc.send_signal(sig)
+        logger.debug("stopping child process...")
+        # unset signal handler, so that even if the child never stops,
+        # an additional stop signal will terminate as usual
+        signal.signal(signal.SIGTERM, original_termination_handler)
+
+    original_termination_handler = signal.signal(signal.SIGTERM, _handler)
+    try:
+        yield
+    finally:
+        signal.signal(signal.SIGTERM, original_termination_handler)

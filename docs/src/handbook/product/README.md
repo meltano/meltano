@@ -12,8 +12,6 @@ The Head of Product will review any [new issues](https://gitlab.com/groups/melta
 
 ## Choosing What to Work On
 
-We have limited engineering hours and focus available, and need to make sure we are working on things that will move Meltano forward towards our goal of increasing [MAUI](https://meltano.com/docs/roadmap.html#maui).
-
 When evaluating a new major piece of work, we create an exploratory issue and use an opportunity assessment (some people call this "Market Requirement Doc" or MRD) to ask the following questions:
 
 1. Exactly what problem will this solve? (value proposition)
@@ -29,9 +27,18 @@ When evaluating a new major piece of work, we create an exploratory issue and us
 
 The [opportunity assessment was created by Marty Cagan at Silicon Valley Product Group](https://svpg.com/assessing-product-opportunities/)
 
-## Product Cadence
+## Roadmap Planning
 
-We ship a new release every Monday, and always have a backlog of opportunity assessments to write and explore. However, given the stage of Meltano (pre-product/market fit) we don't plan specific work items more than a few weeks in the future.
+Each item on the roadmap (/docs/#roadmap) will be linked to an Epic. 
+
+On the first and third monday of the month, the Head of Product and Head of Engineering will meet to validate the current state of the roadmap. This will be a high-level discussion around progress on current items and negotiation on inclusion of items for current and upcoming months.
+
+Key questions to ask are:
+
+* Are we shipping what we thought we would?
+* Of the upcoming items on the roadmap, are they spec'ed out enough?
+
+Issues that are related to Roadmap items should have the `Roadmap` label.
 
 ## MR First
 
@@ -39,17 +46,19 @@ If you want to make an improvement to Meltano you don't have to wait for Product
 
 ## "AND not OR" Mentality
 
-As an internal startup we are constrained by our team size and the hours in the day, so we have to make smart trade-offs about the order and prioritization of what we do. Our goal is to chose the things that will unlock MAUI growth.
-
 Sometimes, it can feel like we are chosing between two important things and this can be painful. However, we take the approach that anything is technically possible to build on the Meltano team so it's a just a question of the order of operations. On a long enough timeline, we will do everything we put on the roadmap -- so keep writing issues and hold onto that "it's an AND, not OR" mindset.
 
-## Relationship to GitLab Product Org
+## Milestones
 
-Meltano operates independently within GitLab and is not part of the broader product organization. However, we learn quite a bit from [the approach of our teammates](https://about.gitlab.com/handbook/product/) and often adopt their processes. If you interact with our team and notice that Meltano Product functions differently, please know this is intentional.
+Meltano uses weekly milestones to track work. They are named for the Friday on which the milestone ends, i.e. `Fri: July 9, 2021`.
 
-GitLab's team and proccesses are designed for a scaled up startup with product market fit, which is a significantly different context than that of Meltano. We look forward to getting there someday!
+### Planning
 
-## Weekly Kickoff
+### Labels
+
+
+
+### Weekly Kickoff
 
 Every Monday we have a Kickoff call to highlight for the community what the priorities are for the week. Prior to the actual call, there are several work items to do.
 
@@ -57,7 +66,7 @@ Every Monday we have a Kickoff call to highlight for the community what the prio
 
 * Create a kickoff issue highlighting the general priority for the next week.
   * Title: `Weekly Kickoff for Milestone - <milestone>`
-  * Due Date for the Monday of the milestone 
+  * Due Date for the Monday of the milestone
 
 ### Monday - Kickoff Day
 
@@ -79,3 +88,18 @@ Kickoff Call:
 After the Kickoff Call:
 * Close the previous milestone
 * Close Kickoff issue
+
+## Open Source Projects We're Keeping an Eye On
+
+This section is dedicated to tracking interesting open source projects that we want to keep an eye on that we don't already have plans to integrate with.
+This [article from BVP](https://www.bvp.com/atlas/roadmap-data-infrastructure/) is useful as well.
+
+* [Evidence](https://www.evidence.dev/)
+* [Lightdash](https://www.lightdash.com/) - BI, integrates with dbt
+* [metriql](https://metriql.com/) - Headless BI
+* [Rudderstack](https://rudderstack.com/) - Customer Data Platform
+* [Soda SQL](https://github.com/sodadata/soda-sql) - Data Testing and Monitoring
+* [Feast](https://github.com/feast-dev/feast) - ML Feature Store
+
+Additionally, there are many "git for data" tools tracked in [this spreadsheet](https://docs.google.com/spreadsheets/d/1jGQY_wjj7dYVne6toyzmU7Ni0tfm-fUEmdh7Nw_ZH0k/edit#gid=0).
+[Project Nessie](https://projectnessie.org/) is another option not listed in the sheet.

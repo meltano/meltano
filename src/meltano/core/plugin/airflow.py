@@ -37,22 +37,9 @@ class Airflow(BasePlugin):
             nest(config, key, str(value))
         return config
 
-    @hook("before_install")
-    def setup_env(self, *args, **kwargs):
-        # to make airflow installables without GPL dependency
-        os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
-
-    @hook("before_configure")
-    def before_configure(self, invoker, session):
-        # generate the default `airflow.cfg`
-        handle = invoker.invoke(
-            "--help",
-            require_preparation=False,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-        handle.wait()
-
+    @staticmethod
+    def update_config_file(invoker: AirflowInvoker) -> None:
+        """Update airflow.cfg with plugin configuration."""
         airflow_cfg_path = invoker.files["config"]
         logging.debug(f"Generated default '{str(airflow_cfg_path)}'")
 
@@ -73,6 +60,30 @@ class Airflow(BasePlugin):
             airflow_cfg.write(cfg)
             logging.debug(f"Saved '{str(airflow_cfg_path)}'")
 
+    @hook("before_install")
+    def setup_env(self, *args, **kwargs):
+        # to make airflow installables without GPL dependency
+        os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
+
+    @hook("before_configure")
+    def before_configure(self, invoker: AirflowInvoker, session):
+        """Keep the Airflow metadata database up-to-date."""
+        # generate the default `airflow.cfg`
+        handle = invoker.invoke(
+            "--help",
+            require_preparation=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+        )
+        return_code = handle.wait()
+
+        if return_code:
+            raise SubprocessError("Command `airflow --help` failed", process=handle)
+
+        # Read and update airflow.cfg
+        self.update_config_file(invoker)
+
         # we've changed the configuration here, so we need to call
         # prepare again on the invoker so it re-reads the configuration
         # for the Airflow plugin
@@ -85,7 +96,12 @@ class Airflow(BasePlugin):
             stderr=subprocess.PIPE,
             universal_newlines=True,
         )
-        version, err = handle.communicate()
+        return_code = handle.wait()
+
+        if return_code:
+            raise SubprocessError("Command `airflow version` failed", process=handle)
+
+        version = handle.stdout.read()
 
         init_db_cmd = (
             ["initdb"]

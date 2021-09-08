@@ -23,6 +23,14 @@ TRUTHY = ("true", "1", "yes", "on")
 REGEX_EMAIL = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
 
 
+try:
+    # asyncio.Task.all_tasks() is fully moved to asyncio.all_tasks() starting
+    # with Python 3.9. Also applies to current_task.
+    asyncio_all_tasks = asyncio.all_tasks
+except AttributeError:
+    asyncio_all_tasks = asyncio.Task.all_tasks
+
+
 class NotFound(Exception):
     """Occurs when an element is not found."""
 
@@ -45,9 +53,7 @@ def run_async(coro):
     except asyncio.CancelledError:
         pass
     finally:
-        all_tasks = asyncio.gather(
-            *asyncio.Task.all_tasks(loop), return_exceptions=True
-        )
+        all_tasks = asyncio.gather(*asyncio_all_tasks(loop), return_exceptions=True)
         all_tasks.cancel()
         with suppress(asyncio.CancelledError):
             loop.run_until_complete(all_tasks)
