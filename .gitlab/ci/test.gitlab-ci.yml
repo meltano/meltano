@@ -2,7 +2,7 @@
   extends: .parallel:python_image_version
   stage: test
   image:
-    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python$PYTHON_VERSION
+    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python$PYTHON_IMAGE_VERSION
     entrypoint: [""]
   before_script:
     - pip install poetry
@@ -17,7 +17,7 @@ lint:
   parallel:
     matrix:
       # Lint only on 'primary' python version:
-      - PYTHON_VERSION: ["3.8"]
+      - PYTHON_IMAGE_VERSION: ["3.8"]
   script:
     - make show_lint
 
