@@ -1,8 +1,8 @@
 .test:
-  extends: .parallel:python_version
+  extends: .parallel:python_image_version
   stage: test
   image:
-    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python$PYTHON_VERSION
+    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python$PYTHON_IMAGE_VERSION
     entrypoint: [""]
   before_script:
     - pip install poetry
