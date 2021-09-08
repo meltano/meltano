@@ -104,30 +104,33 @@ class TestELTContext:
             .context()
         )
 
-    def test_extractor(self, elt_context, session, tap):
+    @pytest.mark.asyncio
+    async def test_extractor(self, elt_context, session, tap):
         extractor = elt_context.extractor
         assert extractor.type == PluginType.EXTRACTORS
         assert extractor.name == tap.name
 
         invoker = elt_context.extractor_invoker()
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             env = invoker.env()
 
         assert_extractor_env(extractor, env)
 
-    def test_loader(self, elt_context, session, target_postgres):
+    @pytest.mark.asyncio
+    async def test_loader(self, elt_context, session, target_postgres):
         loader = elt_context.loader
         assert loader.type == PluginType.LOADERS
         assert loader.name == target_postgres.name
 
         invoker = elt_context.loader_invoker()
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             env = invoker.env()
 
         assert_extractor_env(elt_context.extractor, env)
         assert_loader_env(loader, env)
 
-    def test_transformer(
+    @pytest.mark.asyncio
+    async def test_transformer(
         self, elt_context, session, target_postgres, tap_mock_transform, dbt
     ):
         transformer = elt_context.transformer
@@ -139,7 +142,7 @@ class TestELTContext:
         assert transform.name == tap_mock_transform.name
 
         invoker = elt_context.transformer_invoker()
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             env = invoker.env()
 
         assert_extractor_env(elt_context.extractor, env)
@@ -148,11 +151,12 @@ class TestELTContext:
         assert_transform_env(transform, env)
         assert_transformer_env(transformer, env)
 
-    def test_select_filter(self, elt_context, session):
+    @pytest.mark.asyncio
+    async def test_select_filter(self, elt_context, session):
         assert elt_context.select_filter
 
         invoker = elt_context.extractor_invoker()
-        invoker.prepare(session)
+        await invoker.prepare(session)
         assert (
             invoker.plugin_config_extras["_select_filter"] == elt_context.select_filter
         )
