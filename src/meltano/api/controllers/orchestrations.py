@@ -1,3 +1,5 @@
+# noqa: D100,E800
+
 import logging
 import shutil
 
