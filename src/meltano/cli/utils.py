@@ -389,11 +389,11 @@ def install_status_update(install_state):
 
 
 def install_plugins(
-    project, plugins, reason=PluginInstallReason.INSTALL, parallelism=None
+    project, plugins, reason=PluginInstallReason.INSTALL, parallelism=None, clean=False
 ):
     """Install the provided plugins and report results to the console."""
     install_service = PluginInstallService(
-        project, status_cb=install_status_update, parallelism=parallelism
+        project, status_cb=install_status_update, parallelism=parallelism, clean=clean
     )
     install_results = install_service.install_plugins(plugins, reason=reason)
     num_successful = len([status for status in install_results if status.successful])

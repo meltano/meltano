@@ -24,7 +24,7 @@ class TestVenvService:
 
     @pytest.mark.asyncio
     async def test_clean_install(self, project, subject: VenvService):
-        await subject.clean_install("example")
+        await subject.install("example", clean=True)
         venv_dir = subject.project.venvs_dir("namespace", "name")
 
         # ensure the venv is created
@@ -62,6 +62,58 @@ class TestVenvService:
             "bin",
             "some_exe",
         )
+
+        # ensure a fingerprint file was created
+        assert venv_dir.joinpath(".meltano_plugin_fingerprint").exists()
+        with open(
+            venv_dir.joinpath(".meltano_plugin_fingerprint"), "rt"
+        ) as fingerprint_file:
+            assert (
+                fingerprint_file.read()
+                # sha256 of "example"
+                == "50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
+            )
+
+    @pytest.mark.asyncio
+    async def test_install(self, project, subject: VenvService):
+        # Make sure the venv exists already
+        await subject.install("example", clean=True)
+        venv_dir = subject.project.venvs_dir("namespace", "name")
+
+        # remove the package, then check that after a regular install the package exists
+        run = subprocess.run(
+            [
+                venv_dir.joinpath("bin/python"),
+                "-m",
+                "pip",
+                "uninstall",
+                "--yes",
+                "example",
+            ],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+
+        await subject.install("example")
+
+        # ensure that the package is installed
+        run = subprocess.run(
+            [venv_dir.joinpath("bin/python"), "-m", "pip", "list"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        assert re.search(r"example\s+0\.1\.0", str(run.stdout))
+
+    @pytest.mark.asyncio
+    async def test_requires_clean_install(self, project, subject: VenvService):
+        # Make sure the venv exists already
+        await subject.install("example", clean=True)
+
+        assert not subject.requires_clean_install(["example"])
+        assert subject.requires_clean_install(["example==0.1.0"])
+        assert subject.requires_clean_install(["example", "another-package"])
 
 
 class TestVirtualEnv:
