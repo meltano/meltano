@@ -29,7 +29,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock.assert_called_once_with(
-                project, [dbt, target, tap_gitlab, tap], parallelism=None
+                project, [dbt, target, tap_gitlab, tap], parallelism=None, clean=False
             )
 
     def test_install_type(
@@ -45,7 +45,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_e.assert_called_once_with(
-                project, [tap_gitlab, tap], parallelism=None
+                project, [tap_gitlab, tap], parallelism=None, clean=False
             )
 
         with mock.patch(
@@ -58,7 +58,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_l.assert_called_once_with(
-                project, [target], parallelism=None
+                project, [target], parallelism=None, clean=False
             )
 
     def test_install_type_name(
@@ -74,7 +74,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_e.assert_called_once_with(
-                project, [tap], parallelism=None
+                project, [tap], parallelism=None, clean=False
             )
 
         with mock.patch(
@@ -87,7 +87,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_l.assert_called_once_with(
-                project, [target], parallelism=None
+                project, [target], parallelism=None, clean=False
             )
 
     def test_install_multiple(
@@ -105,7 +105,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock.assert_called_once_with(
-                project, [tap_gitlab, tap], parallelism=None
+                project, [tap_gitlab, tap], parallelism=None, clean=False
             )
 
     def test_install_parallel(
@@ -121,5 +121,21 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock.assert_called_once_with(
-                project, [dbt, target, tap_gitlab, tap], parallelism=10
+                project, [dbt, target, tap_gitlab, tap], parallelism=10, clean=False
+            )
+
+    def test_clean_install(
+        self, project, tap, tap_gitlab, target, dbt, cli_runner, project_plugins_service
+    ):
+        with mock.patch(
+            "meltano.cli.install.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+
+            result = cli_runner.invoke(cli, ["install", "--clean"])
+            assert_cli_runner(result)
+
+            install_plugin_mock.assert_called_once_with(
+                project, [dbt, target, tap_gitlab, tap], parallelism=None, clean=True
             )
