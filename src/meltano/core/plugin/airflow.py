@@ -131,7 +131,7 @@ class Airflow(BasePlugin):
         """Delete the config file."""
         config_file = invoker.files["config"]
         try:
-            config_file.unlink(missing_ok=True)
+            config_file.unlink()
         except FileNotFoundError:
             pass
         logging.debug(f"Deleted configuration at {config_file}")
